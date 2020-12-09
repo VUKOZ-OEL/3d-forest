@@ -1,0 +1,53 @@
+Introduction
+How to build this from source.
+
+Prerequisites
+Qt 5 and opengl for gui application.
+Other 3rdparty libraries are not required so far.
+
+Using "Unix Makefiles" on Windows
+1.  Installation of msys2 and mingw-w64
+    - Open https://www.msys2.org/ and follow Installation instructions
+    - Default installation will create "C:\msys64"
+
+2.  Setup Windows PATH variable
+    - Run "systempropertiesadvanced" from the search box
+    - Click "Environment Variables"
+    - In "System variables" select "Path" and click "Edit..."
+    - Click "New" and add "C:\msys64\usr\bin", hit enter
+    - Click "New" and add "C:\msys64\usr\local\bin", hit enter
+    - Click "New" and add "C:\msys64\mingw64\bin", hit enter
+    - "Move Up" these three new items to top
+
+3.  Run "MSYS2 MSYS" Windows application and install additional packages
+    - Required
+        $ pacman -S mingw-w64-x86_64-clang
+        $ pacman -S mingw-w64-x86_64-cmake
+        $ pacman -S mingw-w64-x86_64-make
+    - Optional
+        $ pacman -S mingw-w64-x86_64-python
+        $ pacman -S mingw-w64-x86_64-python-pip
+        $ pacman -S mingw-w64-x86_64-doxygen
+        $ pacman -S mingw-w64-x86_64-graphviz
+
+4.  Install Qt
+    - Download Qt installer
+    - Run the installer
+    - Run "systempropertiesadvanced" from the search box
+    - Click "Environment Variables"
+    - In "System variables" select "Path" and click "Edit..."
+    - Click "New" and add "C:\Qt\5.15.0\mingw81_64\bin", hit enter
+
+5.  Open "cmd" terminal, navigate to the project folder and build it
+    - Build
+        > mkdir build
+        > cd build
+        > cmake -G "MinGW Makefiles" .. -DCMAKE_INSTALL_PREFIX=..
+        > mingw32-make
+        > mingw32-make install
+    - Run
+        executables can be found in directory bin
+    - Extra command: Generate API documentation
+        > mingw32-make doxygen
+    - Extra command: Reformat all source files
+        > mingw32-make format
