@@ -25,7 +25,6 @@ target_include_directories(${SUB_PROJECT_NAME} PUBLIC src/common)
 target_include_directories(${SUB_PROJECT_NAME} PUBLIC src/database)
 target_include_directories(${SUB_PROJECT_NAME} PUBLIC src/io)
 target_include_directories(${SUB_PROJECT_NAME} PUBLIC src/math)
-target_include_directories(${SUB_PROJECT_NAME} PUBLIC src/pointcloud)
 target_include_directories(${SUB_PROJECT_NAME} PUBLIC src/scene)
 
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

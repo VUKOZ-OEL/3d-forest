@@ -123,12 +123,13 @@ protected:
     T data_[4][4];
 };
 
-typedef Matrix4<float> Matrix4f;
-typedef Matrix4<double> Matrix4d;
-
 template <class T> inline Matrix4<T>::Matrix4()
 {
     setToIdentity();
+}
+
+template <class T> inline Matrix4<T>::~Matrix4()
+{
 }
 
 template <class T>
@@ -151,11 +152,6 @@ inline Matrix4<T>::Matrix4(const Matrix4<B> &m)
     data_[3][1] = static_cast<T>(m.data_[3][1]);
     data_[3][2] = static_cast<T>(m.data_[3][2]);
     data_[3][3] = static_cast<T>(m.data_[3][3]);
-}
-
-template <class T> inline Matrix4<T>::~Matrix4()
-{
-    // empty
 }
 
 template <class T>

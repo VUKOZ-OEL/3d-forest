@@ -22,9 +22,9 @@
 */
 
 #include <Editor.hpp>
-#include <MeshNode.hpp>
+//#include <MeshNode.hpp>
 
-Editor::Editor()
+Editor::Editor() : unsavedChanges_(false)
 {
 }
 
@@ -34,14 +34,16 @@ Editor::~Editor()
 
 void Editor::open(const std::string &path)
 {
+    project_.read(path);
+#if 0
     db_.open(path);
 
     // Create scene
-    for (size_t i = 0; i < db_.getCellSize(); i++)
+    for (size_t i = 0; i < db_.cellSize(); i++)
     {
         std::shared_ptr<MeshNode> node = std::make_shared<MeshNode>();
 
-        const DatabaseCell &cell = db_.getCell(i);
+        const DatabaseCell &cell = db_.cell(i);
         const std::vector<double> &xyzSrc = cell.xyz;
         const std::vector<float> &rgbSrc = cell.rgb;
         std::vector<float> &xyzDst = node->xyz;
@@ -60,11 +62,36 @@ void Editor::open(const std::string &path)
     }
 
     path_ = path;
+#endif
+}
+
+void Editor::write(const std::string &path)
+{
+    project_.write(path);
+    unsavedChanges_ = false;
 }
 
 void Editor::close()
 {
-    path_ = "";
-    nodes_.clear();
-    db_.close();
+    project_.clear();
+    boundary_.clear();
+    unsavedChanges_ = false;
+}
+
+void Editor::setVisibleDataSet(size_t i, bool visible)
+{
+    project_.setVisibleDataSet(i, visible);
+    unsavedChanges_ = true;
+}
+
+void Editor::setVisibleLayer(size_t i, bool visible)
+{
+    project_.setVisibleLayer(i, visible);
+    unsavedChanges_ = true;
+}
+
+void Editor::setClipFilter(const ClipFilter &clipFilter)
+{
+    project_.setClipFilter(clipFilter);
+    unsavedChanges_ = true;
 }

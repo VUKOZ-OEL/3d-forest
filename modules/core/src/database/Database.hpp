@@ -28,12 +28,13 @@
 #include <DatabaseCell.hpp>
 #include <LasFile.hpp>
 #include <string>
+#include <vector>
 
 /** Database. */
 class Database
 {
 public:
-    Aabbd aabb;
+    Aabb<double> aabb;
 
     Database();
     ~Database();
@@ -43,11 +44,11 @@ public:
 
     // size_t map(uint64_t index);
 
-    size_t getCellSize() const { return cells_.size(); }
-    const DatabaseCell &getCell(size_t i) const { return *cells_[i]; }
+    size_t cellSize() const { return cells_.size(); }
+    const DatabaseCell &cell(size_t i) const { return *cells_[i]; }
 
 protected:
-    // LasFile las_;
+    LasFile las_;
     std::vector<std::shared_ptr<DatabaseCell>> cells_;
 };
 

@@ -47,6 +47,9 @@ public:
     T y() const { return data_[1]; };
     T z() const { return data_[2]; };
 
+    T min() const;
+    T max() const;
+
     T length() const;
     void normalize();
     Vector3<T> normalized() const;
@@ -97,12 +100,13 @@ protected:
     T data_[3];
 };
 
-typedef Vector3<float> Vector3f;
-typedef Vector3<double> Vector3d;
-
 template <class T> inline Vector3<T>::Vector3()
 {
     data_[0] = data_[1] = data_[2] = 0;
+}
+
+template <class T> inline Vector3<T>::~Vector3()
+{
 }
 
 template <class T> inline Vector3<T>::Vector3(T x, T y, T z)
@@ -121,9 +125,16 @@ inline Vector3<T>::Vector3(const Vector3<B> &v)
     data_[2] = static_cast<T>(v(2));
 }
 
-template <class T> inline Vector3<T>::~Vector3()
+template <class T> inline T Vector3<T>::min() const
 {
-    // empty
+    return data_[0] < data_[1] ? (data_[0] < data_[2] ? data_[0] : data_[2])
+                               : (data_[1] < data_[2] ? data_[1] : data_[2]);
+}
+
+template <class T> inline T Vector3<T>::max() const
+{
+    return data_[0] > data_[1] ? (data_[0] > data_[2] ? data_[0] : data_[2])
+                               : (data_[1] > data_[2] ? data_[1] : data_[2]);
 }
 
 template <class T> inline T Vector3<T>::length() const

@@ -32,16 +32,18 @@ void Json::clear()
     data_.string.reset();
 }
 
-void Json::read(const std::string &filename)
+void Json::read(const std::string &fileName)
 {
-    std::string data = File::read(filename);
+    std::string data = File::read(fileName);
     deserialize(data);
 }
 
-void Json::write(const std::string &filename, size_t indent)
+void Json::write(const std::string &fileName, size_t indent)
 {
     std::string data = serialize(indent);
-    File::write(filename, data);
+    std::string writePath = File::tmpname(fileName, fileName);
+    File::write(writePath, data);
+    File::move(fileName, writePath);
 }
 
 std::string Json::serialize(size_t indent) const
@@ -89,7 +91,7 @@ void Json::serialize(std::ostringstream &out) const
             n = data_.object->size();
             for (auto const &it : *data_.object)
             {
-                out << "\"" << it.first << "\":";
+                out << "\"" << it.first << "\": ";
                 it.second.serialize(out);
                 i++;
                 if (i < n)
@@ -140,22 +142,23 @@ void Json::serialize(std::ostringstream &out) const
 
 void Json::serialize(std::ostringstream &out,
                      const std::string &indent,
-                     const std::string &indent_plus) const
+                     const std::string &indentPlus) const
 {
     std::string indent2;
     size_t i = 0;
     size_t n;
+    bool container;
 
     switch (type_)
     {
         case TYPE_OBJECT:
             out << "{\n";
-            indent2 = indent + indent_plus;
+            indent2 = indent + indentPlus;
             n = data_.object->size();
             for (auto const &it : *data_.object)
             {
-                out << indent2 << "\"" << it.first << "\":";
-                it.second.serialize(out, indent2, indent_plus);
+                out << indent2 << "\"" << it.first << "\": ";
+                it.second.serialize(out, indent2, indentPlus);
                 i++;
                 if (i < n)
                 {
@@ -168,14 +171,33 @@ void Json::serialize(std::ostringstream &out,
         case TYPE_ARRAY:
             out << "[";
             n = data_.array->size();
+            if ((n > 0) && ((data_.array->at(0).isObject()) ||
+                            (data_.array->at(0).isArray())))
+            {
+                indent2 = indent + indentPlus;
+                out << "\n" << indent2;
+                container = true;
+            }
+            else
+            {
+                container = false;
+            }
             for (auto const &it : *data_.array)
             {
-                it.serialize(out, indent, indent_plus);
+                it.serialize(out, indent2, indentPlus);
                 i++;
                 if (i < n)
                 {
                     out << ",";
+                    if (container)
+                    {
+                        out << "\n" << indent2;
+                    }
                 }
+            }
+            if (container)
+            {
+                out << "\n" << indent;
             }
             out << "]";
             break;
@@ -232,12 +254,12 @@ void Json::deserialize(Json &obj, const char *in, size_t n, size_t &i)
             case STATE_VALUE:
                 if (in[i] == '{')
                 {
-                    obj.create_object();
+                    obj.createObject();
                     state = STATE_OBJECT;
                 }
                 else if (in[i] == '[')
                 {
-                    obj.create_array();
+                    obj.createArray();
                     state = STATE_ARRAY;
                     array_index = 0;
                 }
@@ -302,7 +324,7 @@ void Json::deserialize(Json &obj, const char *in, size_t n, size_t &i)
                 break;
 
             case STATE_STRING_VALUE:
-                obj.create_string(str);
+                obj.createString(str);
                 return;
 
             case STATE_NUMBER:
@@ -315,7 +337,7 @@ void Json::deserialize(Json &obj, const char *in, size_t n, size_t &i)
                     {
                         str[j] = in[str_start + j];
                     }
-                    obj.create_number(std::stod(str));
+                    obj.createNumber(std::stod(str));
                     return;
                 }
                 break;
@@ -347,15 +369,15 @@ void Json::deserialize(Json &obj, const char *in, size_t n, size_t &i)
 
                     if (str == "null")
                     {
-                        obj.create_type(TYPE_NULL);
+                        obj.createType(TYPE_NULL);
                     }
                     else if (str == "false")
                     {
-                        obj.create_type(TYPE_FALSE);
+                        obj.createType(TYPE_FALSE);
                     }
                     else
                     {
-                        obj.create_type(TYPE_TRUE);
+                        obj.createType(TYPE_TRUE);
                     }
 
                     return;

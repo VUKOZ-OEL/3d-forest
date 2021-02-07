@@ -21,6 +21,10 @@
     @file sandbox.cpp
 */
 
+#include <File.hpp>
+#include <Json.hpp>
+#include <OctreeIndex.hpp>
+#include <Time.hpp>
 #include <Vector3.hpp>
 #include <cstring>
 #include <iostream>

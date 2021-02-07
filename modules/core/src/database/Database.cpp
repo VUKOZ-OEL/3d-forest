@@ -34,8 +34,8 @@ Database::~Database()
 
 void Database::open(const std::string &path)
 {
-    LasFile las_;
     las_.open(path);
+    las_.readHeader();
 
     aabb.set(las_.header.min_x,
              las_.header.min_y,
@@ -43,7 +43,7 @@ void Database::open(const std::string &path)
              las_.header.max_x,
              las_.header.max_y,
              las_.header.max_z);
-
+#if 0
     std::shared_ptr<DatabaseCell> cell = std::make_shared<DatabaseCell>();
 
     uint64_t npoints = las_.header.number_of_point_records;
@@ -83,12 +83,14 @@ void Database::open(const std::string &path)
     }
 
     cells_.push_back(cell);
+#endif
 }
 
 void Database::close()
 {
+    aabb.clear();
     cells_.clear();
-    // las_.close();
+    las_.close();
 }
 
 // size_t Database::map(uint64_t index)

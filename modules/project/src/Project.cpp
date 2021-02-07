@@ -22,7 +22,13 @@
 */
 
 #include <Error.hpp>
+#include <File.hpp>
 #include <Project.hpp>
+
+static const char *PROJECT_KEY_PROJECT_NAME = "projectName";
+static const char *PROJECT_KEY_DATA_SET = "dataSets";
+static const char *PROJECT_KEY_LAYER = "layers";
+static const char *PROJECT_KEY_CLIP_FILTER = "clipFilter";
 
 Project::Project()
 {
@@ -32,59 +38,131 @@ Project::~Project()
 {
 }
 
-void Project::open(const std::string &path)
+void Project::read(const std::string &path)
 {
-    close();
+    clear();
 
-    path_ = path;
+    Json in;
+    in.read(path);
 
-    Json project;
-    project.read(path_);
+    if (!in.isObject())
+    {
+        THROW("Project file '" + path + "' is not in JSON object");
+    }
 
     try
     {
-        if (project.isObject())
-        {
-            if (project.containsString("projectName"))
-            {
-                projectName_ = project["projectName"].string();
-            }
+        size_t i;
+        size_t n;
 
-            if (project.containsArray("snapshots"))
-            {
-                for (auto const &it : project["snapshots"].array())
-                {
-                    readFile(it);
-                }
-            }
+        path_ = path;
+
+        // Project name
+        if (in.contains(PROJECT_KEY_PROJECT_NAME))
+        {
+            projectName_ = in[PROJECT_KEY_PROJECT_NAME].string();
         }
         else
         {
-            THROW("Project file is not in JSON object");
+            projectName_ = "Untitled";
+        }
+
+        // Data sets
+        if (in.contains(PROJECT_KEY_DATA_SET))
+        {
+            i = 0;
+            n = in[PROJECT_KEY_DATA_SET].array().size();
+            dataSets_.resize(n);
+
+            for (auto const &it : in[PROJECT_KEY_DATA_SET].array())
+            {
+                dataSets_[i] = std::make_shared<ProjectDataSet>();
+                dataSets_[i]->read(it, path_);
+                i++;
+            }
+        }
+
+        // Layers
+        if (in.contains(PROJECT_KEY_LAYER))
+        {
+            i = 0;
+            n = in[PROJECT_KEY_LAYER].array().size();
+            layers_.resize(n);
+
+            for (auto const &it : in[PROJECT_KEY_LAYER].array())
+            {
+                layers_[i].read(it);
+                i++;
+            }
+        }
+
+        // Clip filter
+        if (in.contains(PROJECT_KEY_CLIP_FILTER))
+        {
+            clipFilter_.read(in[PROJECT_KEY_CLIP_FILTER]);
+        }
+        else
+        {
+            clipFilter_.clear();
         }
     }
     catch (std::exception &e)
     {
-        close();
+        clear();
         throw;
     }
 }
 
-void Project::close()
+void Project::write(const std::string &path)
+{
+    Json out;
+    size_t i;
+
+    // Project name
+    out[PROJECT_KEY_PROJECT_NAME] = projectName_;
+
+    // Data sets
+    i = 0;
+    for (auto const &it : dataSets_)
+    {
+        it->write(out[PROJECT_KEY_DATA_SET][i]);
+        i++;
+    }
+
+    // Layers
+    i = 0;
+    for (auto const &it : layers_)
+    {
+        it.write(out[PROJECT_KEY_LAYER][i]);
+        i++;
+    }
+
+    // Clip filter
+    clipFilter_.write(out[PROJECT_KEY_CLIP_FILTER]);
+
+    out.write(path);
+}
+
+void Project::clear()
 {
     path_ = "";
     projectName_ = "";
-    files_.clear();
+    dataSets_.clear();
+    layers_.clear();
+    clipFilter_.clear();
 }
 
-void Project::readFile(const Json &json)
+void Project::setVisibleDataSet(size_t i, bool visible)
 {
-    if (!json.isObject())
-    {
-        THROW("A snapshot in project file is not in JSON object");
-    }
+    dataSets_[i]->visible = visible;
+}
 
-    std::shared_ptr<ProjectFile> file = std::make_shared<ProjectFile>();
-    file->read(json);
-    files_.push_back(file);
+void Project::setVisibleLayer(size_t i, bool visible)
+{
+    layers_[i].visible = visible;
+}
+
+void Project::setClipFilter(const ClipFilter &clipFilter)
+{
+    clipFilter_ = clipFilter;
 }

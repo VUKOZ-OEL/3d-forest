@@ -99,6 +99,14 @@ inline uint32_t ltoh32(const uint8_t *src)
            (static_cast<uint32_t>(src[1]) << 8) | static_cast<uint32_t>(src[0]);
 }
 
+/** Convert network big to host endian in 4 bytes. */
+inline uint32_t ntoh32(const uint8_t *src)
+{
+    return (static_cast<uint32_t>(src[0]) << 24) |
+           (static_cast<uint32_t>(src[1]) << 16) |
+           (static_cast<uint32_t>(src[2]) << 8) | static_cast<uint32_t>(src[3]);
+}
+
 /** Convert little to host endian in 8 bytes. */
 inline uint64_t ltoh64(const uint8_t *src)
 {

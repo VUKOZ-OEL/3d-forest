@@ -25,53 +25,83 @@
 #include <Error.hpp>
 #include <LasFile.hpp>
 #include <cstring>
+#include <iostream>
 #include <sstream>
+
+#define LAS_FILE_SIGNATURE_0 0x4C
+#define LAS_FILE_SIGNATURE_1 0x41
+#define LAS_FILE_SIGNATURE_2 0x53
+#define LAS_FILE_SIGNATURE_3 0x46
+#define LAS_FILE_HEADER_SIZE_V10 227
+#define LAS_FILE_HEADER_SIZE_V13 235
+#define LAS_FILE_HEADER_SIZE_V14 375
+#define LAS_FILE_FORMAT_COUNT 11
+static const int LAS_FILE_FORMAT_BYTE_COUNT[LAS_FILE_FORMAT_COUNT] =
+    {20, 28, 26, 34, 57, 63, 30, 36, 38, 59, 67};
 
 LasFile::LasFile()
 {
-    // empty
 }
 
 LasFile::~LasFile()
 {
-    // empty
 }
 
 void LasFile::open(const std::string &path)
 {
     std::memset(&header, 0, sizeof(header));
     file_.open(path);
-    read(header);
-    file_.seek(header.offset_to_point_data);
+}
+
+void LasFile::create(const std::string &path)
+{
+    std::memset(&header, 0, sizeof(header));
+    file_.create(path);
 }
 
 void LasFile::close()
 {
-    std::memset(&header, 0, sizeof(header));
     file_.close();
 }
 
-void LasFile::read(Header &hdr)
+void LasFile::seek(uint64_t offset)
+{
+    file_.seek(offset);
+}
+
+void LasFile::readHeader()
+{
+    readHeader(header);
+}
+
+void LasFile::readHeader(Header &hdr)
 {
     uint8_t buffer[256];
 
-    if (file_.size() < 227)
+    if (file_.size() < LAS_FILE_HEADER_SIZE_V10)
     {
         THROW("LAS '" + file_.path() + "' has invalid size");
     }
 
-    file_.read(buffer, 227);
+    file_.read(buffer, LAS_FILE_HEADER_SIZE_V10);
 
-    // signature
+    // signature "LASF"
     std::memcpy(hdr.file_signature, buffer, 4);
-
-    if ((hdr.file_signature[0] != 76) || (hdr.file_signature[1] != 65) ||
-        (hdr.file_signature[2] != 83) || (hdr.file_signature[3] != 70))
+    if ((hdr.file_signature[0] != LAS_FILE_SIGNATURE_0) ||
+        (hdr.file_signature[1] != LAS_FILE_SIGNATURE_1) ||
+        (hdr.file_signature[2] != LAS_FILE_SIGNATURE_2) ||
+        (hdr.file_signature[3] != LAS_FILE_SIGNATURE_3))
     {
         THROW("LAS '" + file_.path() + "' has invalid signature");
     }
 
-    // TBD read all fields from file header to memory
+    // file info
+    hdr.file_source_id = ltoh16(&buffer[4]);
+    hdr.global_encoding = ltoh16(&buffer[6]);
+    hdr.project_id_1 = ltoh32(&buffer[8]);
+    hdr.project_id_2 = ltoh16(&buffer[12]);
+    hdr.project_id_3 = ltoh16(&buffer[14]);
+    std::memcpy(hdr.project_id_4, buffer + 16, 8);
 
     // version
     hdr.version_major = buffer[24];
@@ -82,12 +112,28 @@ void LasFile::read(Header &hdr)
         THROW("LAS '" + file_.path() + "' has incompatible major version");
     }
 
+    // software/hardware generated
+    std::memcpy(hdr.system_identifier, buffer + 26, 32);
+    std::memcpy(hdr.generating_software, buffer + 58, 32);
+
+    // time
+    hdr.file_creation_day_of_year = ltoh16(&buffer[90]);
+    hdr.file_creation_year = ltoh16(&buffer[92]);
+
     // header
     hdr.header_size = ltoh16(&buffer[94]);
     hdr.offset_to_point_data = ltoh32(&buffer[96]);
+    hdr.number_of_vlr = ltoh32(&buffer[100]);
     hdr.point_data_record_format = buffer[104];
     hdr.point_data_record_length = ltoh16(&buffer[105]);
 
+    if (hdr.point_data_record_format >= LAS_FILE_FORMAT_COUNT)
+    {
+        THROW("LAS '" + file_.path() + "' has unknown record format");
+    }
+
+    // number of point records,
+    // fill both 32-bit (1.0+) and 64-bit (1.4+) values
     hdr.legacy_number_of_point_records = ltoh32(&buffer[107]);
     hdr.number_of_point_records = hdr.legacy_number_of_point_records;
     for (int i = 0; i < 5; i++)
@@ -114,7 +160,7 @@ void LasFile::read(Header &hdr)
     // version 1.3
     if (hdr.version_minor > 2)
     {
-        if (file_.size() < 235)
+        if (file_.size() < LAS_FILE_HEADER_SIZE_V13)
         {
             THROW("LAS '" + file_.path() + "' v1.3+ has invalid size");
         }
@@ -126,18 +172,107 @@ void LasFile::read(Header &hdr)
     // version 1.4
     if (hdr.version_minor > 3)
     {
-        if (file_.size() < 375)
+        if (file_.size() < LAS_FILE_HEADER_SIZE_V14)
         {
             THROW("LAS '" + file_.path() + "' v1.4+ has invalid size");
         }
 
         file_.read(buffer, 140);
+        hdr.offset_to_evlr = ltoh64(&buffer[0]);
+        hdr.number_of_evlr = ltoh32(&buffer[8]);
         hdr.number_of_point_records = ltoh64(&buffer[12]);
         for (int i = 0; i < 15; i++)
         {
             hdr.number_of_points_by_return[i] = ltoh64(&buffer[20 + (i * 8)]);
         }
     }
+}
+
+void LasFile::writeHeader()
+{
+    writeHeader(header);
+}
+
+void LasFile::writeHeader(const Header &hdr)
+{
+    uint8_t buffer[512];
+    uint32_t header_size;
+
+    // signature
+    std::memcpy(buffer, hdr.file_signature, 4);
+
+    // file info
+    htol16(&buffer[4], hdr.file_source_id);
+    htol16(&buffer[6], hdr.global_encoding);
+    htol32(&buffer[8], hdr.project_id_1);
+    htol16(&buffer[12], hdr.project_id_2);
+    htol16(&buffer[14], hdr.project_id_3);
+    std::memcpy(buffer + 16, hdr.project_id_4, 8);
+
+    // version
+    buffer[24] = hdr.version_major;
+    buffer[25] = hdr.version_minor;
+
+    // software/hardware generated
+    std::memcpy(buffer + 26, hdr.system_identifier, 32);
+    std::memcpy(buffer + 58, hdr.generating_software, 32);
+
+    // time
+    htol16(&buffer[90], hdr.file_creation_day_of_year);
+    htol16(&buffer[92], hdr.file_creation_year);
+
+    // header
+    htol16(&buffer[94], hdr.header_size);
+    htol32(&buffer[96], hdr.offset_to_point_data);
+    htol32(&buffer[100], hdr.number_of_vlr);
+    buffer[104] = hdr.point_data_record_format;
+    htol16(&buffer[105], hdr.point_data_record_length);
+
+    // number of point records
+    htol32(&buffer[107], hdr.legacy_number_of_point_records);
+    for (int i = 0; i < 5; i++)
+    {
+        htol32(&buffer[111 + i * 4], hdr.legacy_number_of_points_by_return[i]);
+    }
+
+    // scale
+    htold(&buffer[131 + (0 * 8)], hdr.x_scale_factor);
+    htold(&buffer[131 + (1 * 8)], hdr.y_scale_factor);
+    htold(&buffer[131 + (2 * 8)], hdr.z_scale_factor);
+    htold(&buffer[131 + (3 * 8)], hdr.x_offset);
+    htold(&buffer[131 + (4 * 8)], hdr.y_offset);
+    htold(&buffer[131 + (5 * 8)], hdr.z_offset);
+    htold(&buffer[131 + (6 * 8)], hdr.max_x);
+    htold(&buffer[131 + (7 * 8)], hdr.min_x);
+    htold(&buffer[131 + (8 * 8)], hdr.max_y);
+    htold(&buffer[131 + (9 * 8)], hdr.min_y);
+    htold(&buffer[131 + (10 * 8)], hdr.max_z);
+    htold(&buffer[131 + (11 * 8)], hdr.min_z);
+
+    header_size = LAS_FILE_HEADER_SIZE_V10;
+
+    // version 1.3
+    if (hdr.version_minor > 2)
+    {
+        htol64(&buffer[0], hdr.offset_to_wdpr);
+        header_size = LAS_FILE_HEADER_SIZE_V13;
+    }
+
+    // version 1.4
+    if (hdr.version_minor > 3)
+    {
+        htol64(&buffer[0], hdr.offset_to_evlr);
+        htol32(&buffer[8], hdr.number_of_evlr);
+        htol64(&buffer[12], hdr.number_of_point_records);
+        for (int i = 0; i < 15; i++)
+        {
+            htol64(&buffer[20 + (i * 8)], hdr.number_of_points_by_return[i]);
+        }
+        header_size = LAS_FILE_HEADER_SIZE_V14;
+    }
+
+    // write
+    file_.write(buffer, header_size);
 }
 
 void LasFile::read(uint8_t *buffer)
@@ -251,9 +386,45 @@ void LasFile::transform(double &x,
     z = (pz * header.z_scale_factor) + header.z_offset;
 }
 
-bool LasFile::Header::hasRgb() const
+size_t LasFile::getVersionHeaderSize() const
 {
-    switch (point_data_record_format)
+    size_t ret = 0;
+    if (header.version_major == 1)
+    {
+        if (header.version_minor < 3)
+        {
+            ret = LAS_FILE_HEADER_SIZE_V10;
+        }
+        else if (header.version_minor == 3)
+        {
+            ret = LAS_FILE_HEADER_SIZE_V13;
+        }
+        else if (header.version_minor > 3)
+        {
+            ret = LAS_FILE_HEADER_SIZE_V14;
+        }
+    }
+    return ret;
+}
+
+size_t LasFile::getPointDataRecordUserLength() const
+{
+    int ret = static_cast<int>(header.point_data_record_length) -
+              LAS_FILE_FORMAT_BYTE_COUNT[header.point_data_record_format];
+
+    if (ret < 0)
+    {
+        THROW("LAS '" + file_.path() +
+              "' has invalid record length "
+              "per record format");
+    }
+
+    return static_cast<size_t>(ret);
+}
+
+bool LasFile::hasRgb() const
+{
+    switch (header.point_data_record_format)
     {
         case 2:
         case 3:
@@ -267,7 +438,13 @@ bool LasFile::Header::hasRgb() const
     }
 }
 
-Json &LasFile::Point::serialize(Json &out) const
+std::string LasFile::dateCreated() const
+{
+    // TBD
+    return "";
+}
+
+Json &LasFile::Point::write(Json &out) const
 {
     out["coordinates"][0] = x;
     out["coordinates"][1] = y;
@@ -279,7 +456,7 @@ Json &LasFile::Point::serialize(Json &out) const
     return out;
 }
 
-Json &LasFile::Header::serialize(Json &out) const
+Json &LasFile::Header::write(Json &out) const
 {
     out["version"][0] = version_major;
     out["version"][1] = version_minor;
@@ -302,4 +479,96 @@ Json &LasFile::Header::serialize(Json &out) const
     out["min"][2] = min_z;
 
     return out;
+}
+
+void LasFile::randomize(const std::string &outputPath,
+                        const std::string &inputPath)
+{
+    uint64_t n;
+    uint64_t start;
+    uint64_t pointSize;
+    uint64_t r;
+    uint64_t rstate = 10;
+    uint8_t buffer_1[256];
+    uint8_t buffer_2[256];
+
+    // Header
+    LasFile inputLas;
+    inputLas.open(inputPath);
+    inputLas.readHeader();
+
+    LasFile outputLas;
+    std::string writePath = File::tmpname(outputPath, inputPath);
+    outputLas.create(writePath);
+    outputLas.header = inputLas.header;
+    outputLas.writeHeader();
+
+    // Copy
+    n = inputLas.file_.size() - inputLas.file_.offset();
+    outputLas.file_.write(inputLas.file_, n);
+
+    // Randomize (very slow)
+    n = outputLas.header.number_of_point_records;
+    pointSize = outputLas.header.point_data_record_length;
+    start = outputLas.header.offset_to_point_data;
+    if (n > 0)
+    {
+        n--;
+
+        for (uint64_t i = 0; i < n; i++)
+        {
+            r = i + 1 + (rstate % (n - i));
+
+            // Linear congruent pseudo-random generator
+            rstate = rstate * 69069UL + 1;
+
+            // Read A
+            outputLas.seek(start + i * pointSize);
+            outputLas.file_.read(buffer_1, pointSize);
+
+            // Read B, Overwrite B with A
+            outputLas.seek(start + r * pointSize);
+            outputLas.file_.read(buffer_2, pointSize);
+            outputLas.seek(start + r * pointSize);
+            outputLas.file_.write(buffer_1, pointSize);
+
+            // Overwrite A with B
+            outputLas.seek(start + i * pointSize);
+            outputLas.file_.write(buffer_2, pointSize);
+        }
+    }
+
+    // Close
+    inputLas.close();
+    outputLas.close();
+
+    File::move(outputPath, writePath);
+}
+
+void LasFile::format(const std::string &outputPath,
+                     const std::string &inputPath)
+{
+    (void)outputPath;
+    (void)inputPath;
+}
+
+void LasFile::index(const std::string &outputPath,
+                    const std::string &inputPath,
+                    size_t maxLeafSize1,
+                    size_t maxLeafSize2)
+{
+    (void)outputPath;
+    (void)inputPath;
+    (void)maxLeafSize1;
+    (void)maxLeafSize2;
+}
+
+void LasFile::print(const std::string &inputPath)
+{
+    LasFile las;
+    las.open(inputPath);
+    las.readHeader();
+
+    Json obj;
+    std::cout << las.header.write(obj).serialize() << std::endl;
 }

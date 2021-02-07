@@ -17,7 +17,7 @@
 
 cmake_minimum_required(VERSION 3.10)
 
-project(3DForest VERSION 0.1)
+project(3DForest VERSION 1.0)
 
 if (NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug)

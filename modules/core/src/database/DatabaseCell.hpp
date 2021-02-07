@@ -31,7 +31,8 @@
 class DatabaseCell
 {
 public:
-    struct Laser
+    /** Database Cell Attributes. */
+    struct Attributes
     {
         uint16_t intensity;
         int16_t scanAngle;
@@ -43,11 +44,11 @@ public:
 
     std::vector<double> xyz;
     std::vector<float> rgb;
-    std::vector<Laser> laser;
+    std::vector<Attributes> attrib;
     std::vector<double> gps;
+    std::vector<uint32_t> layer;
 
     uint64_t fileFrom;
-    uint64_t fileSize;
     uint64_t id;
 
     DatabaseCell();

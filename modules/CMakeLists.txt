@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-add_subdirectory(3d)
-add_subdirectory(3dforest)
+add_subdirectory(applications)
 add_subdirectory(core)
 add_subdirectory(project)
 add_subdirectory(utils)
+add_subdirectory(visualization)

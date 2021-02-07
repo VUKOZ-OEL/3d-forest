@@ -26,13 +26,14 @@
 
 #include <File.hpp>
 #include <Json.hpp>
+#include <string>
 #include <vector>
 
-/** LAS (LASer) file format. */
+/** LAS (LASer) File Format. */
 class LasFile
 {
 public:
-    /** LAS header. */
+    /** LAS Header. */
     struct Header
     {
         char file_signature[4];
@@ -88,11 +89,10 @@ public:
         uint64_t number_of_points_by_return[15];
         // end of 1.4 (375 bytes)
 
-        bool hasRgb() const;
-        Json &serialize(Json &out) const;
+        Json &write(Json &out) const;
     };
 
-    /** LAS point. */
+    /** LAS Point. */
     struct Point
     {
         // format 0 to 10
@@ -140,7 +140,10 @@ public:
         float wave_y;
         float wave_z;
 
-        Json &serialize(Json &out) const;
+        // user-specific extra bytes
+        uint8_t extra_bytes[8];
+
+        Json &write(Json &out) const;
     };
 
     Header header;
@@ -149,7 +152,13 @@ public:
     ~LasFile();
 
     void open(const std::string &path);
+    void create(const std::string &path);
     void close();
+
+    void seek(uint64_t offset);
+
+    void readHeader();
+    void writeHeader();
 
     void read(Point &pt);
     void transform(double &x, double &y, double &z, const Point &pt) const;
@@ -160,11 +169,31 @@ public:
                    double &z,
                    const uint8_t *buffer) const;
 
+    size_t getVersionHeaderSize() const;
+    size_t getPointDataRecordUserLength() const;
+    bool hasRgb() const;
+    std::string dateCreated() const;
+
+    static void randomize(const std::string &outputPath,
+                          const std::string &inputPath);
+
+    static void format(const std::string &outputPath,
+                       const std::string &inputPath);
+
+    static void index(const std::string &outputPath,
+                      const std::string &inputPath,
+                      size_t maxLeafSize1,
+                      size_t maxLeafSize2);
+
+    static void print(const std::string &inputPath);
+
 protected:
     File file_;
 
-    void read(Header &hdr);
+    void readHeader(Header &hdr);
+    void writeHeader(const Header &hdr);
     void read(Point &pt, const uint8_t *buffer, uint8_t fmt) const;
+    int getPointUserBytesCount(const Header &hdr) const;
 };
 
 #endif /* LAS_FILE_HPP */

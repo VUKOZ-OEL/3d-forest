@@ -36,7 +36,7 @@ public:
     File(const File &) = delete;
     File &operator=(const File &) = delete;
 
-    void create();
+    void create(const std::string &path);
     void open(const std::string &path);
     void open(const std::string &path, const std::string &mode);
     void close();
@@ -46,6 +46,7 @@ public:
 
     void read(uint8_t *buffer, uint64_t nbyte);
     void write(const uint8_t *buffer, uint64_t nbyte);
+    void write(File &input, uint64_t nbyte);
 
     bool eof() const;
     uint64_t size() const;
@@ -53,6 +54,13 @@ public:
     const std::string &path() const;
 
     static bool exists(const std::string &path);
+    static bool isAbsolute(const std::string &path);
+    static std::string fileName(const std::string &path);
+    static std::string fileExtension(const std::string &path);
+    static std::string replaceFileName(const std::string &path,
+                                       const std::string &newFileName);
+    static std::string replaceExtension(const std::string &path,
+                                        const std::string &newExtension);
 
     static void read(uint8_t *buffer,
                      const std::string &path,
@@ -67,9 +75,15 @@ public:
     static std::string read(const std::string &path);
     static void write(const std::string &path, const std::string &data);
 
+    static std::string tmpname(const std::string &outputPath,
+                               const std::string &inputPath);
+
     static void sort(const std::string &path,
                      size_t element_size,
                      int (*comp)(const void *, const void *));
+
+    static void move(const std::string &outputPath,
+                     const std::string &inputPath);
 
 protected:
     int fd_;
@@ -79,6 +93,7 @@ protected:
 
     static const int INVALID_DESCRIPTOR;
 
+    void create();
     static int seek(int fd, uint64_t offset);
     static int read(int fd, uint8_t *buffer, uint64_t nbyte);
     static int write(int fd, const uint8_t *buffer, uint64_t nbyte);

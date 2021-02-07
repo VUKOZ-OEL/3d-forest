@@ -24,7 +24,12 @@
 #ifndef PROJECT_HPP
 #define PROJECT_HPP
 
-#include <ProjectFile.hpp>
+#include <ClipFilter.hpp>
+#include <Json.hpp>
+#include <ProjectDataSet.hpp>
+#include <ProjectLayer.hpp>
+#include <string>
+#include <vector>
 
 /** Project. */
 class Project
@@ -33,18 +38,28 @@ public:
     Project();
     ~Project();
 
-    void open(const std::string &path);
-    void close();
+    void read(const std::string &path);
+    void write(const std::string &path);
+    void clear();
 
-    size_t size() const { return files_.size(); }
-    const ProjectFile &getSnapshot(size_t i) const { return *files_[i]; }
+    const std::string &path() const { return path_; }
+
+    size_t dataSetSize() const { return dataSets_.size(); }
+    const ProjectDataSet &dataSet(size_t i) const { return *dataSets_[i]; }
+    size_t layerSize() const { return layers_.size(); }
+    const ProjectLayer &layer(size_t i) const { return layers_[i]; }
+    const ClipFilter &clipFilter() const { return clipFilter_; }
+
+    void setVisibleDataSet(size_t i, bool visible);
+    void setVisibleLayer(size_t i, bool visible);
+    void setClipFilter(const ClipFilter &clipFilter);
 
 protected:
     std::string path_;
     std::string projectName_;
-    std::vector<std::shared_ptr<ProjectFile>> files_;
-
-    void readFile(const Json &json);
+    std::vector<std::shared_ptr<ProjectDataSet>> dataSets_;
+    std::vector<ProjectLayer> layers_;
+    ClipFilter clipFilter_;
 };
 
 #endif /* PROJECT_HPP */

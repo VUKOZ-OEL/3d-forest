@@ -1,3 +1,20 @@
+# Copyright 2020 VUKOZ
+#
+# This file is part of 3D Forest.
+#
+# 3D Forest is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# 3D Forest is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
+
 # Doxyfile 1.8.6
 
 # tags:
@@ -46,7 +63,7 @@ PROJECT_NAME           = "3DForest"
 # could be handy for archiving the generated documentation or if some version
 # control system is used.
 
-PROJECT_NUMBER         = 0.1
+PROJECT_NUMBER         = 1.0
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
@@ -689,7 +706,7 @@ SHOW_USED_FILES        = YES
 # myorig SHOW_DIRECTORIES       = YES
 #        SHOW_FILES             = YES
 
-SHOW_FILES             = YES
+SHOW_FILES             = NO
 
 # Set the SHOW_NAMESPACES tag to NO to disable the generation of the Namespaces
 # page. This will remove the Namespaces entry from the Quick Index and from the
@@ -998,7 +1015,7 @@ FILTER_SOURCE_FILES    = NO
 #
 # orig = NO
 
-SOURCE_BROWSER         = YES
+SOURCE_BROWSER         = NO
 
 # Setting the INLINE_SOURCES tag to YES will include the body of functions,
 # classes and enums directly into the documentation.
@@ -1006,7 +1023,7 @@ SOURCE_BROWSER         = YES
 #
 # orig = NO
 
-INLINE_SOURCES         = YES
+INLINE_SOURCES         = NO
 
 # Setting the STRIP_CODE_COMMENTS tag to YES will instruct doxygen to hide any
 # special comment blocks from generated source code fragments. Normal C, C++ and

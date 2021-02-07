@@ -24,10 +24,10 @@
 #ifndef EDITOR_HPP
 #define EDITOR_HPP
 
+#include <Aabb.hpp>
 #include <Database.hpp>
-#include <Node.hpp>
+#include <Project.hpp>
 #include <string>
-#include <vector>
 
 /** Editor. */
 class Editor
@@ -37,17 +37,23 @@ public:
     ~Editor();
 
     void open(const std::string &path);
+    void write(const std::string &path);
     void close();
 
-    const std::vector<std::shared_ptr<Node>> &getScene() const
-    {
-        return nodes_;
-    }
+    bool hasUnsavedChanges() const { return unsavedChanges_; }
+
+    const Project &project() const { return project_; }
+    const Aabb<double> &boundary() const { return boundary_; }
+
+    void setVisibleDataSet(size_t i, bool visible);
+    void setVisibleLayer(size_t i, bool visible);
+    void setClipFilter(const ClipFilter &clipFilter);
 
 protected:
-    std::string path_;
+    Project project_;
     Database db_;
-    std::vector<std::shared_ptr<Node>> nodes_;
+    Aabb<double> boundary_;
+    bool unsavedChanges_;
 };
 
 #endif /* EDITOR_HPP */

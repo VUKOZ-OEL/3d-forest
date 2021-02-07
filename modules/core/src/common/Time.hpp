@@ -24,8 +24,13 @@
 #ifndef TIME_HPP
 #define TIME_HPP
 
+#include <cstdint>
+
 /** Get the number of seconds since the Epoch. */
 double getRealTime();
+
+/** Get the number of seconds since the Epoch. */
+uint64_t getRealTime64();
 
 /** Makes the calling thread sleep until milliseconds have elapsed. */
 void msleep(long milliseconds);

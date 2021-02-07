@@ -26,23 +26,32 @@
 
 #include <File.hpp>
 #include <Json.hpp>
+#include <string>
 
-/** Chunk file. */
+/** Chunk File.
+    Simplified PNG/IFF like binary file format. It contains series of chunks.
+    The first chunk type provides file signature.
+    Each chunk contains both metadata (header) and data.
+    Chunk bytes are { sizeof(Chunk), headerLength, dataLength }.
+    The maximum length of chunk data is 64-bit value (16 exabytes).
+    All multi-byte integers are in little-endian format.
+    All integers should be aligned to file offsets by their size.
+*/
 class ChunkFile
 {
 public:
     static const size_t CHUNK_HEADER_SIZE;
 
-    /** Chunk. */
+    /** Chunk Header. */
     struct Chunk
     {
         uint32_t type;
-        uint8_t major_version;
-        uint8_t minor_version;
-        uint16_t header_lenght;
-        uint64_t total_length;
+        uint8_t majorVersion;
+        uint8_t minorVersion;
+        uint16_t headerLength;
+        uint64_t dataLength;
 
-        Json &serialize(Json &out) const;
+        Json &write(Json &out) const;
     };
 
     ChunkFile();
@@ -54,11 +63,16 @@ public:
     void seek(uint64_t offset);
     void skip(uint64_t nbyte);
 
-    void read(Chunk &c);
+    void read(Chunk &chunk);
     void read(uint8_t *buffer, uint64_t nbyte);
 
-    void write(const Chunk &c);
+    void write(const Chunk &chunk);
     void write(const uint8_t *buffer, uint64_t nbyte);
+
+    void validate(const Chunk &chunk,
+                  uint32_t type,
+                  uint8_t majorVersion,
+                  uint8_t minorVersion) const;
 
     bool eof() const;
     uint64_t size() const;

@@ -31,12 +31,10 @@ const size_t ChunkFile::CHUNK_HEADER_SIZE = 16;
 
 ChunkFile::ChunkFile()
 {
-    // empty
 }
 
 ChunkFile::~ChunkFile()
 {
-    // empty
 }
 
 bool ChunkFile::eof() const
@@ -98,33 +96,45 @@ void ChunkFile::write(const uint8_t *buffer, uint64_t nbyte)
     file_.write(buffer, nbyte);
 }
 
-void ChunkFile::read(ChunkFile::Chunk &c)
+void ChunkFile::read(ChunkFile::Chunk &chunk)
 {
     uint8_t buffer[CHUNK_HEADER_SIZE];
 
     file_.read(buffer, CHUNK_HEADER_SIZE);
 
-    c.type = ltoh32(&buffer[0]);
-    c.major_version = buffer[4];
-    c.minor_version = buffer[5];
-    c.header_lenght = ltoh16(&buffer[6]);
-    c.total_length = ltoh64(&buffer[8]);
+    chunk.type = ltoh32(&buffer[0]);
+    chunk.majorVersion = buffer[4];
+    chunk.minorVersion = buffer[5];
+    chunk.headerLength = ltoh16(&buffer[6]);
+    chunk.dataLength = ltoh64(&buffer[8]);
 }
 
-void ChunkFile::write(const ChunkFile::Chunk &c)
+void ChunkFile::validate(const Chunk &chunk,
+                         uint32_t type,
+                         uint8_t majorVersion,
+                         uint8_t minorVersion) const
+{
+    if ((chunk.type != type) || (chunk.majorVersion != majorVersion) ||
+        (chunk.minorVersion > minorVersion))
+    {
+        THROW("Unexpected chunk in " + status());
+    }
+}
+
+void ChunkFile::write(const ChunkFile::Chunk &chunk)
 {
     uint8_t buffer[CHUNK_HEADER_SIZE];
 
-    htol32(&buffer[0], c.type);
-    buffer[4] = c.major_version;
-    buffer[5] = c.minor_version;
-    htol16(&buffer[6], c.header_lenght);
-    htol64(&buffer[8], c.total_length);
+    htol32(&buffer[0], chunk.type);
+    buffer[4] = chunk.majorVersion;
+    buffer[5] = chunk.minorVersion;
+    htol16(&buffer[6], chunk.headerLength);
+    htol64(&buffer[8], chunk.dataLength);
 
     file_.write(buffer, CHUNK_HEADER_SIZE);
 }
 
-Json &ChunkFile::Chunk::serialize(Json &out) const
+Json &ChunkFile::Chunk::write(Json &out) const
 {
     std::string str;
 
@@ -135,10 +145,10 @@ Json &ChunkFile::Chunk::serialize(Json &out) const
     str[3] = static_cast<char>(type & 0xFFU);
 
     out["type"] = str;
-    out["major_version"] = major_version;
-    out["minor_version"] = minor_version;
-    out["header_lenght"] = header_lenght;
-    out["total_length"] = total_length;
+    out["majorVersion"] = majorVersion;
+    out["minorVersion"] = minorVersion;
+    out["headerLength"] = headerLength;
+    out["dataLength"] = dataLength;
 
     return out;
 }

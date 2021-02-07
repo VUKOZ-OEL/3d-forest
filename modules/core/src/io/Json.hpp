@@ -85,11 +85,12 @@
 class Json
 {
 public:
-    static const size_t DEFAULT_INDENT = 4;
+    static const size_t DEFAULT_INDENT = 2;
 
     Json();
     ~Json() = default;
 
+    Json(bool in);
     Json(int32_t in);
     Json(uint32_t in);
     Json(double in);
@@ -107,6 +108,8 @@ public:
     bool containsArray(const std::string &key) const;
     bool containsString(const std::string &key) const;
     bool containsNumber(const std::string &key) const;
+    bool containsBool(const std::string &key) const;
+
     Json &operator[](const std::string &key);
     const Json &operator[](const std::string &key) const;
 
@@ -122,6 +125,7 @@ public:
     double number() const;
 
     // value conversion
+    uint32_t uint32() const;
     uint64_t uint64() const;
 
     // type
@@ -138,11 +142,11 @@ public:
     void deserialize(const std::string &in);
     void deserialize(const char *in, size_t n);
 
-    void read(const std::string &filename);
-    void write(const std::string &filename, size_t indent = DEFAULT_INDENT);
+    void read(const std::string &fileName);
+    void write(const std::string &fileName, size_t indent = DEFAULT_INDENT);
 
 protected:
-    /** Value type. */
+    /** JSON Data Type. */
     enum Type
     {
         TYPE_OBJECT,
@@ -154,7 +158,7 @@ protected:
         TYPE_NULL
     };
 
-    /** Value data. */
+    /** JSON Data Value. */
     class Data
     {
     public:
@@ -167,79 +171,84 @@ protected:
     Type type_;
     Data data_;
 
-    void create_object();
-    void create_array();
-    void create_array(const std::vector<double> &in);
-    void create_string(const std::string &in);
-    void create_number(double in);
-    void create_type(Type t);
+    void createObject();
+    void createArray();
+    void createArray(const std::vector<double> &in);
+    void createString(const std::string &in);
+    void createNumber(double in);
+    void createType(Type t);
     void serialize(std::ostringstream &out) const;
     void serialize(std::ostringstream &out,
                    const std::string &indent,
-                   const std::string &indent_plus) const;
+                   const std::string &indentPlus) const;
     void deserialize(Json &obj, const char *in, size_t n, size_t &i);
 };
 
 inline Json::Json()
 {
-    create_type(TYPE_NULL);
+    createType(TYPE_NULL);
+}
+
+inline Json::Json(bool in)
+{
+    createType((in) ? TYPE_TRUE : TYPE_FALSE);
 }
 
 inline Json::Json(int32_t in)
 {
-    create_number(static_cast<double>(in));
+    createNumber(static_cast<double>(in));
 }
 
 inline Json::Json(uint32_t in)
 {
-    create_number(static_cast<double>(in));
+    createNumber(static_cast<double>(in));
 }
 
 inline Json::Json(double in)
 {
-    create_number(in);
+    createNumber(in);
 }
 
 inline Json::Json(int64_t in)
 {
-    create_number(static_cast<double>(in));
+    createNumber(static_cast<double>(in));
 }
 
 inline Json::Json(uint64_t in)
 {
-    create_number(static_cast<double>(in));
+    createNumber(static_cast<double>(in));
 }
 
 inline Json::Json(const char *in)
 {
-    create_string(in);
+    createString(in);
 }
 
 inline Json::Json(const std::string &in)
 {
-    create_string(in);
+    createString(in);
 }
 
 inline Json::Json(const std::vector<double> &in)
 {
-    create_array(in);
+    createArray(in);
 }
 
-inline void Json::create_object()
+inline void Json::createObject()
 {
     type_ = TYPE_OBJECT;
     data_.object = std::make_shared<std::map<std::string, Json>>();
 }
 
-inline void Json::create_array()
+inline void Json::createArray()
 {
     type_ = TYPE_ARRAY;
     data_.array = std::make_shared<std::vector<Json>>();
 }
 
-inline void Json::create_array(const std::vector<double> &in)
+inline void Json::createArray(const std::vector<double> &in)
 {
-    create_array();
+    createArray();
     data_.array->resize(in.size());
     for (size_t i = 0; i < in.size(); i++)
     {
@@ -247,19 +256,19 @@ inline void Json::create_array(const std::vector<double> &in)
     }
 }
 
-inline void Json::create_string(const std::string &in)
+inline void Json::createString(const std::string &in)
 {
     type_ = TYPE_STRING;
     data_.string = std::make_shared<std::string>(in);
 }
 
-inline void Json::create_number(double in)
+inline void Json::createNumber(double in)
 {
     type_ = TYPE_NUMBER;
     data_.number = in;
 }
 
-inline void Json::create_type(Type t)
+inline void Json::createType(Type t)
 {
     type_ = t;
 }
@@ -321,11 +330,24 @@ inline bool Json::containsNumber(const std::string &key) const
     return false;
 }
 
+inline bool Json::containsBool(const std::string &key) const
+{
+    if (isObject())
+    {
+        auto search = data_.object->find(key);
+        if (search != data_.object->end())
+        {
+            return search->second.isTrue() || search->second.isFalse();
+        }
+    }
+    return false;
+}
+
 inline Json &Json::operator[](const std::string &key)
 {
     if (!isObject())
     {
-        create_object();
+        createObject();
     }
 
     auto search = data_.object->find(key);
@@ -367,7 +389,7 @@ inline Json &Json::operator[](size_t index)
 {
     if (!isArray())
     {
-        create_array();
+        createArray();
     }
 
     for (size_t i = data_.array->size(); i <= index; i++)
@@ -431,6 +453,21 @@ inline double Json::number() const
     }
 
     return data_.number;
+}
+
+inline uint32_t Json::uint32() const
+{
+    if (!isNumber())
+    {
+        THROW("JSON value is not number");
+    }
+
+    if (data_.number < 0.)
+    {
+        THROW("JSON number is out of range");
+    }
+
+    return static_cast<uint32_t>(data_.number);
 }
 
 inline uint64_t Json::uint64() const

@@ -26,7 +26,7 @@
 
 #include <Json.hpp>
 
-/** AABB (Axis-aligned bounding box). */
+/** Axis-Aligned Bounding Box. */
 template <class T> class Aabb
 {
 public:
@@ -36,6 +36,7 @@ public:
     template <class B> Aabb(const Aabb<B> &box);
 
     void set(T x1, T y1, T z1, T x2, T y2, T z2);
+    void clear();
 
     const T &min(size_t idx) const { return min_[idx]; }
     const T &max(size_t idx) const { return max_[idx]; }
@@ -44,20 +45,21 @@ public:
     bool intersects(const Aabb<T> &box) const;
     bool isInside(const Aabb<T> &box) const;
 
-    Json &serialize(Json &out) const;
+    void read(const Json &in);
+    Json &write(Json &out) const;
 
 protected:
     T min_[3];
     T max_[3];
 };
 
-typedef Aabb<float> Aabbf;
-typedef Aabb<double> Aabbd;
-
 template <class T> inline Aabb<T>::Aabb()
 {
-    min_[0] = min_[1] = min_[2] = 0;
-    max_[0] = max_[1] = max_[2] = 0;
+    clear();
+}
+
+template <class T> inline Aabb<T>::~Aabb()
+{
 }
 
 template <class T> template <class B> inline Aabb<T>::Aabb(const Aabb<B> &box)
@@ -68,11 +70,6 @@ template <class T> template <class B> inline Aabb<T>::Aabb(const Aabb<B> &box)
     max_[0] = static_cast<T>(box.max_[0]);
     max_[1] = static_cast<T>(box.max_[1]);
     max_[2] = static_cast<T>(box.max_[2]);
-}
-
-template <class T> inline Aabb<T>::~Aabb()
-{
-    // empty
 }
 
 template <class T> inline void Aabb<T>::set(T x1, T y1, T z1, T x2, T y2, T z2)
@@ -111,6 +108,12 @@ template <class T> inline void Aabb<T>::set(T x1, T y1, T z1, T x2, T y2, T z2)
     }
 }
 
+template <class T> inline void Aabb<T>::clear()
+{
+    min_[0] = min_[1] = min_[2] = 0;
+    max_[0] = max_[1] = max_[2] = 0;
+}
+
 template <class T> inline void Aabb<T>::getCenter(T &x, T &y, T &z) const
 {
     x = min_[0] + ((max_[0] - min_[0]) / 2);
@@ -132,7 +135,17 @@ template <class T> inline bool Aabb<T>::isInside(const Aabb &box) const
              (max_[2] > box.max_[2] || min_[2] < box.min_[2]));
 }
 
-template <class T> inline Json &Aabb<T>::serialize(Json &out) const
+template <class T> inline void Aabb<T>::read(const Json &in)
+{
+    min_[0] = in["min"][0].number();
+    min_[1] = in["min"][1].number();
+    min_[2] = in["min"][2].number();
+    max_[0] = in["max"][0].number();
+    max_[1] = in["max"][1].number();
+    max_[2] = in["max"][2].number();
+}
+
+template <class T> inline Json &Aabb<T>::write(Json &out) const
 {
     out["min"][0] = min_[0];
     out["min"][1] = min_[1];

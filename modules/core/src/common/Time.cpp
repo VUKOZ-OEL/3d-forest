@@ -35,6 +35,16 @@ double getRealTime()
            (1e-6 * static_cast<double>(tp.tv_usec));
 }
 
+uint64_t getRealTime64()
+{
+    struct timeval tp;
+
+    (void)::gettimeofday(&tp, NULL);
+
+    return (static_cast<uint64_t>(tp.tv_sec) << 32) +
+           static_cast<uint64_t>(tp.tv_usec);
+}
+
 void msleep(long milliseconds)
 {
     struct timespec request;

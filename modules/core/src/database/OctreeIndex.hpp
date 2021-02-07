@@ -26,87 +26,105 @@
 
 #include <Aabb.hpp>
 #include <ChunkFile.hpp>
-#include <cstdint>
-#include <ostream>
 #include <vector>
 
 /** Octree Index. */
 class OctreeIndex
 {
 public:
-    static const uint32_t CHUNK_ID_OCTREE;
+    static const uint32_t CHUNK_TYPE;
 
-    enum Offset : size_t
+    /** Octree Index Node. */
+    struct Node
     {
-        OFFSET_CODE = 0,
-        OFFSET_NEXT = 1,
-        OFFSET_FROM = 2,
-        OFFSET_SIZE = 3
+        uint64_t from;
+        uint64_t size;
+        uint64_t prev;
+        uint64_t next[8];
     };
 
-    /* Node: code, next, fromL0, sizeL0, fromL1, sizeL1, .., code, .. */
-    std::vector<uint64_t> nodes;
-
-#if 0
-    /** Cell. */
-    struct Cell
+    /** Octree Index Selection. */
+    struct Selection
     {
-        uint64_t code_;
-        uint64_t from_;
-        uint64_t n_;
-        uint8_t inside_;
-
-        Cell() = default;
-        Cell(uint64_t code, uint64_t from, uint64_t n, uint8_t inside);
+        size_t idx;
+        bool partial;
     };
-    void select(std::vector<Cell> &cells,
-                const Aabbd &window,
-                int maxlevel = 0) const;
-    void setnode(uint64_t code, uint64_t from);
-#endif
 
     OctreeIndex();
     ~OctreeIndex();
 
-    void setup(const Aabbd &boundary, size_t maxlevel);
+    const Aabb<double> &boundary() const { return boundary_; }
+    size_t size() const { return nodeSize_; }
 
+    void selectLeaves(std::vector<Selection> &selection,
+                      const Aabb<double> &window) const;
+    void selectNodes(std::vector<Selection> &selection,
+                     const Aabb<double> &window) const;
+
+    const Node *root() const;
+    const Node *next(const Node *node, size_t idx) const;
+    const Node *prev(const Node *node) const;
+    const Node *at(size_t idx) const;
+
+    void read(ChunkFile &file);
+    void readPayload(ChunkFile &file, const ChunkFile::Chunk &chunk);
+    void write(ChunkFile &file) const;
+    Json &write(Json &out) const;
+
+    // Build tree
+    void insertBegin(const Aabb<double> &boundary,
+                     size_t maxSize,
+                     size_t maxLevel = 0,
+                     bool insertOnlyToLeaves = false);
     uint64_t insert(double x, double y, double z);
-
-    // void read(ChunkFile &f);
-    // void write(ChunkFile &f) const;
-
-    size_t getMaxLevel() const { return maxlevel_; }
-    size_t getNodeSize() const { return nodeSize_; }
-
-    Json &serialize(Json &out) const;
+    void insertEnd();
 
 protected:
-    size_t maxlevel_;
     size_t nodeSize_;
-    Aabbd boundary_;
+    Aabb<double> boundary_;
+    std::vector<uint64_t> nodes_; // [{From, Size, Next[8]}, {}, ..]
 
-    void setMaxLevel(size_t maxlevel);
-    void addLevel();
+    void selectLeaves(std::vector<Selection> &idxList,
+                      const Aabb<double> &window,
+                      const Aabb<double> &boundary,
+                      size_t pos) const;
 
-#if 0
-    void select(std::vector<Cell> &cells,
-                const Aabbd &window,
-                const Aabbd &boundary,
-                size_t pos,
-                int level,
-                int maxlevel) const;
+    void selectNodes(std::vector<Selection> &idxList,
+                     const Aabb<double> &window,
+                     const Aabb<double> &boundary,
+                     size_t pos) const;
 
-    void selectall(std::vector<Cell> &cells,
-                   size_t pos,
-                   int level,
-                   int maxlevel) const;
-
-    void divide(Aabbd &boundary,
+    void divide(Aabb<double> &boundary,
                 double x,
                 double y,
                 double z,
                 size_t code) const;
-#endif
+
+    Json &write(Json &out, const uint64_t *data, size_t idx) const;
+
+    // Build tree
+    /** Octree Index Build Node. */
+    struct BuildNode
+    {
+        uint64_t code;
+        uint64_t size;
+        std::unique_ptr<BuildNode> next[8];
+    };
+
+    std::unique_ptr<BuildNode> root_;
+
+    // Build tree settings
+    size_t maxSize_;
+    size_t maxLevel_;
+    bool insertOnlyToLeaves_;
+
+    uint64_t insertEndToLeaves(uint64_t *data,
+                               BuildNode *node,
+                               size_t prev,
+                               size_t &idx,
+                               uint64_t &from);
+    size_t countNodes() const;
+    size_t countNodes(BuildNode *node) const;
 };
 
 #endif /* OCTREE_INDEX_HPP */

@@ -1,0 +1,33 @@
+{
+  "clipFilter": {
+    "box": {
+      "max": [0,0,0],
+      "min": [0,0,0]
+    },
+    "enabled": "none"
+  },
+  "dataSets": [
+    {
+      "dateCreated": "2018-07-13 17:45:00",
+      "id": 0,
+      "label": "",
+      "path": "Melbourne_003_005.las",
+      "visible": true
+    },
+    {
+      "dateCreated": "2018-07-13 17:44:00",
+      "id": 1,
+      "label": "",
+      "path": "Melbourne_003_006.las",
+      "visible": false
+    }
+  ],
+  "layers": [
+    {
+      "id": 0,
+      "label": "Default",
+      "visible": true
+    }
+  ],
+  "projectName": "My First Project"
+}

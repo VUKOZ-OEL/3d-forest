@@ -23,23 +23,23 @@
 
 #include <Error.hpp>
 #include <File.hpp>
+#include <Time.hpp>
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
 #include <fcntl.h>
+#include <filesystem>
 #include <iostream>
 #include <limits>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <filesystem>
 #include <vector>
 
 const int File::INVALID_DESCRIPTOR = -1;
 
 File::File() : fd_(INVALID_DESCRIPTOR), size_(0), offset_(0), path_()
 {
-    // empty
 }
 
 File::~File()
@@ -70,17 +70,6 @@ const std::string &File::path() const
     return path_;
 }
 
-bool File::exists(const std::string &path)
-{
-    int ret;
-    struct stat st;
-
-    ret = ::stat(path.c_str(), &st);
-    (void)st;
-
-    return ret == 0;
-}
-
 void File::create()
 {
     // close
@@ -89,7 +78,7 @@ void File::create()
         (void)::close(fd_);
     }
 
-    // temporary file with a unique auto-generated filename
+    // temporary file with a unique auto-generated fileName, "wb+"
     std::FILE *tmpf = std::tmpfile();
     if (!tmpf)
     {
@@ -100,6 +89,18 @@ void File::create()
     size_ = 0;
     offset_ = 0;
     path_ = "temporary";
+}
+
+void File::create(const std::string &path)
+{
+    if (path == "")
+    {
+        create();
+    }
+    else
+    {
+        open(path, "w+");
+    }
 }
 
 void File::open(const std::string &path)
@@ -265,14 +266,6 @@ std::string File::read(const std::string &path)
     return ret;
 }
 
-void File::write(const std::string &path, const std::string &data)
-{
-    File f;
-    f.open(path, "w");
-    f.write(reinterpret_cast<const uint8_t *>(&data[0]), data.size());
-    f.close();
-}
-
 void File::read(uint8_t *buffer,
                 const std::string &path,
                 uint64_t nbyte,
@@ -369,6 +362,14 @@ int File::read(int fd, uint8_t *buffer, uint64_t nbyte)
     return 0;
 }
 
+void File::write(const std::string &path, const std::string &data)
+{
+    File f;
+    f.open(path, "w");
+    f.write(reinterpret_cast<const uint8_t *>(&data[0]), data.size());
+    f.close();
+}
+
 void File::write(const uint8_t *buffer,
                  const std::string &path,
                  uint64_t nbyte,
@@ -407,6 +408,29 @@ void File::write(const uint8_t *buffer,
     if (ret != 0)
     {
         THROW_ERRNO("Can't close file '" + path + "'");
+    }
+}
+
+void File::write(File &input, uint64_t nbyte)
+{
+    const size_t buffer_size = 1024 * 1024;
+    std::vector<uint8_t> buffer;
+    size_t n;
+
+    buffer.resize(buffer_size);
+
+    while (nbyte > 0)
+    {
+        n = nbyte;
+        if (n > buffer_size)
+        {
+            n = buffer_size;
+        }
+
+        input.read(buffer.data(), n);
+        write(buffer.data(), n);
+
+        nbyte -= n;
     }
 }
 
@@ -465,6 +489,65 @@ int File::write(int fd, const uint8_t *buffer, uint64_t nbyte)
     return 0;
 }
 
+bool File::exists(const std::string &path)
+{
+    int ret;
+    struct stat st;
+
+    ret = ::stat(path.c_str(), &st);
+    (void)st;
+
+    return ret == 0;
+}
+
+bool File::isAbsolute(const std::string &path)
+{
+    std::filesystem::path fsPath(path);
+    return fsPath.is_absolute();
+}
+
+std::string File::fileName(const std::string &path)
+{
+    std::filesystem::path fsPath(path);
+    return fsPath.filename().string();
+}
+
+std::string File::fileExtension(const std::string &path)
+{
+    std::filesystem::path fsPath(path);
+    return fsPath.extension().string();
+}
+
+std::string File::replaceFileName(const std::string &path,
+                                  const std::string &newFileName)
+{
+    std::filesystem::path fsPath(path);
+    fsPath.replace_filename(newFileName);
+    return fsPath.string();
+}
+
+std::string File::replaceExtension(const std::string &path,
+                                   const std::string &newExtension)
+{
+    std::filesystem::path fsPath(path);
+    fsPath.replace_extension(newExtension);
+    return fsPath.string();
+}
+
+std::string File::tmpname(const std::string &outputPath,
+                          const std::string &inputPath)
+{
+    if (inputPath == outputPath)
+    {
+        uint64_t t = getRealTime64();
+        char buffer[32];
+        (void)snprintf(buffer, sizeof(buffer), "%016llX", t);
+        return outputPath + "." + std::string(buffer);
+    }
+
+    return outputPath;
+}
+
 void File::sort(const std::string &path,
                 size_t element_size,
                 int (*comp)(const void *, const void *))
@@ -485,4 +568,22 @@ void File::sort(const std::string &path,
     src.open(path, "w");
     src.write(bucket.data(), bucket_size);
     src.close();
+}
+
+void File::move(const std::string &outputPath, const std::string &inputPath)
+{
+    if (inputPath == outputPath)
+    {
+        return;
+    }
+
+    if (!std::filesystem::exists(inputPath))
+    {
+        THROW("Cannot move: File '" + inputPath + "' doesn't exist");
+    }
+    if (std::filesystem::exists(outputPath))
+    {
+        (void)std::filesystem::remove(outputPath);
+    }
+    std::filesystem::rename(inputPath, outputPath);
 }

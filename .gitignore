@@ -1,2 +1,9 @@
+# Build
 bin/
 build/
+
+# Visual Studio Code
+.vscode
+
+# Other
+.DS_Store
