@@ -102,7 +102,7 @@ public:
 
     void clear();
 
-    // object pair
+    // Object pair
     bool contains(const std::string &key) const;
     bool containsObject(const std::string &key) const;
     bool containsArray(const std::string &key) const;
@@ -113,22 +113,22 @@ public:
     Json &operator[](const std::string &key);
     const Json &operator[](const std::string &key) const;
 
-    // array element
+    // Array element
     size_t size() const;
     Json &operator[](size_t index);
     const Json &operator[](size_t index) const;
 
-    // value
+    // Value
     const std::map<std::string, Json> &object() const;
     const std::vector<Json> &array() const;
     const std::string &string() const;
     double number() const;
 
-    // value conversion
+    // Value conversion
     uint32_t uint32() const;
     uint64_t uint64() const;
 
-    // type
+    // Type
     bool isObject() const { return type_ == TYPE_OBJECT; }
     bool isArray() const { return type_ == TYPE_ARRAY; }
     bool isString() const { return type_ == TYPE_STRING; }
@@ -137,7 +137,7 @@ public:
     bool isFalse() const { return type_ == TYPE_FALSE; }
     bool isNull() const { return type_ == TYPE_NULL; }
 
-    // serialization
+    // Serialization
     std::string serialize(size_t indent = DEFAULT_INDENT) const;
     void deserialize(const std::string &in);
     void deserialize(const char *in, size_t n);

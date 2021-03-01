@@ -30,14 +30,9 @@ const uint32_t OctreeIndex::CHUNK_TYPE = 0x38584449U; //! Signature "IDX8"
 #define OCTREE_INDEX_CHUNK_MAJOR_VERSION 1
 #define OCTREE_INDEX_CHUNK_MINOR_VERSION 0
 #define OCTREE_INDEX_MAX_LEVEL 17
-#define OCTREE_INDEX_NODE_SIZE 11
-#define OCTREE_INDEX_OFFSET_FROM 0
-#define OCTREE_INDEX_OFFSET_SIZE 1
-#define OCTREE_INDEX_OFFSET_PREV 2
-#define OCTREE_INDEX_OFFSET_NEXT 3
 #define OCTREE_INDEX_HEADER_SIZE_1_0 56
 
-OctreeIndex::OctreeIndex() : nodeSize_(0)
+OctreeIndex::OctreeIndex()
 {
 }
 
@@ -45,11 +40,17 @@ OctreeIndex::~OctreeIndex()
 {
 }
 
+void OctreeIndex::clear()
+{
+    nodes_.clear();
+    boundary_.clear();
+    root_.reset();
+}
+
 void OctreeIndex::selectLeaves(std::vector<Selection> &selection,
                                const Aabb<double> &window) const
 {
-    // Not empty
-    if ((nodeSize_ > 0) && (nodes_[OCTREE_INDEX_OFFSET_SIZE] > 0))
+    if (!empty())
     {
         selectLeaves(selection, window, boundary_, 0);
     }
@@ -58,25 +59,47 @@ void OctreeIndex::selectLeaves(std::vector<Selection> &selection,
 void OctreeIndex::selectNodes(std::vector<Selection> &selection,
                               const Aabb<double> &window) const
 {
-    // Not empty
-    if ((nodeSize_ > 0) && (nodes_[OCTREE_INDEX_OFFSET_SIZE] > 0))
+    if (!empty())
     {
         selectNodes(selection, window, boundary_, 0);
     }
 }
 
+const OctreeIndex::Node *OctreeIndex::selectNode(
+    std::map<const Node *, uint64_t> &used,
+    double x,
+    double y,
+    double z) const
+{
+    if (size() > 0)
+    {
+        return selectNode(used, x, y, z, boundary_, 0);
+    }
+
+    return nullptr;
+}
+
+const OctreeIndex::Node *OctreeIndex::selectLeaf(double x,
+                                                 double y,
+                                                 double z) const
+{
+    if (size() > 0)
+    {
+        return selectLeaf(x, y, z, boundary_, 0);
+    }
+
+    return nullptr;
+}
+
 void OctreeIndex::selectLeaves(std::vector<Selection> &selection,
                                const Aabb<double> &window,
                                const Aabb<double> &boundary,
-                               size_t pos) const
+                               size_t idx) const
 {
-    const Node *node = reinterpret_cast<const Node *>(&nodes_[pos]);
-
     // Select all
     if (boundary.isInside(window))
     {
-        size_t id = pos / OCTREE_INDEX_NODE_SIZE;
-        selection.push_back({id, false});
+        selection.push_back({idx, false});
         return;
     }
 
@@ -91,6 +114,7 @@ void OctreeIndex::selectLeaves(std::vector<Selection> &selection,
     double py;
     double pz;
     Aabb<double> octant;
+    const Node *node = &nodes_[idx];
     bool leaf = true;
 
     boundary.getCenter(px, py, pz);
@@ -109,18 +133,15 @@ void OctreeIndex::selectLeaves(std::vector<Selection> &selection,
     // Partial
     if (leaf)
     {
-        size_t id = pos / OCTREE_INDEX_NODE_SIZE;
-        selection.push_back({id, true});
+        selection.push_back({idx, true});
     }
 }
 
 void OctreeIndex::selectNodes(std::vector<Selection> &selection,
                               const Aabb<double> &window,
                               const Aabb<double> &boundary,
-                              size_t pos) const
+                              size_t idx) const
 {
-    const Node *node = reinterpret_cast<const Node *>(&nodes_[pos]);
-
     // Outside
     if (!boundary.intersects(window))
     {
@@ -128,14 +149,13 @@ void OctreeIndex::selectNodes(std::vector<Selection> &selection,
     }
 
     // Select all or partial
-    size_t id = pos / OCTREE_INDEX_NODE_SIZE;
     if (boundary.isInside(window))
     {
-        selection.push_back({id, true});
+        selection.push_back({idx, false});
     }
     else
     {
-        selection.push_back({id, false});
+        selection.push_back({idx, true});
     }
 
     // Octants
@@ -143,6 +163,7 @@ void OctreeIndex::selectNodes(std::vector<Selection> &selection,
     double py;
     double pz;
     Aabb<double> octant;
+    const Node *node = &nodes_[idx];
 
     boundary.getCenter(px, py, pz);
 
@@ -157,11 +178,98 @@ void OctreeIndex::selectNodes(std::vector<Selection> &selection,
     }
 }
 
+const OctreeIndex::Node *OctreeIndex::selectNode(
+    std::map<const Node *, uint64_t> &used,
+    double x,
+    double y,
+    double z,
+    const Aabb<double> &boundary,
+    size_t idx) const
+{
+    // Outside
+    if (!boundary.isInside(x, y, z))
+    {
+        return nullptr;
+    }
+
+    const Node *node = &nodes_[idx];
+    if (used[node] < node->size)
+    {
+        return node;
+    }
+
+    // Octants
+    double px;
+    double py;
+    double pz;
+    Aabb<double> octant;
+    const Node *ret;
+
+    boundary.getCenter(px, py, pz);
+
+    for (size_t i = 0; i < 8; i++)
+    {
+        if (node->next[i])
+        {
+            octant = boundary;
+            divide(octant, px, py, pz, i);
+            ret = selectNode(used, x, y, z, octant, node->next[i]);
+            if (ret)
+            {
+                return ret;
+            }
+        }
+    }
+
+    // Leaf
+    return node;
+}
+
+const OctreeIndex::Node *OctreeIndex::selectLeaf(double x,
+                                                 double y,
+                                                 double z,
+                                                 const Aabb<double> &boundary,
+                                                 size_t idx) const
+{
+    // Outside
+    if (!boundary.isInside(x, y, z))
+    {
+        return nullptr;
+    }
+
+    // Octants
+    double px;
+    double py;
+    double pz;
+    Aabb<double> octant;
+    const Node *node = &nodes_[idx];
+    const Node *ret;
+
+    boundary.getCenter(px, py, pz);
+
+    for (size_t i = 0; i < 8; i++)
+    {
+        if (node->next[i])
+        {
+            octant = boundary;
+            divide(octant, px, py, pz, i);
+            ret = selectLeaf(x, y, z, octant, node->next[i]);
+            if (ret)
+            {
+                return ret;
+            }
+        }
+    }
+
+    // Leaf
+    return node;
+}
+
 void OctreeIndex::divide(Aabb<double> &boundary,
                          double x,
                          double y,
                          double z,
-                         size_t code) const
+                         uint64_t code) const
 {
     double x1, y1, z1, x2, y2, z2;
 
@@ -203,15 +311,14 @@ void OctreeIndex::divide(Aabb<double> &boundary,
 
 const OctreeIndex::Node *OctreeIndex::root() const
 {
-    return reinterpret_cast<const Node *>(&nodes_[0]);
+    return &nodes_[0];
 }
 
 const OctreeIndex::Node *OctreeIndex::next(const Node *node, size_t idx) const
 {
-    const uint64_t ptr = node->next[idx];
-    if (ptr)
+    if (node->next[idx])
     {
-        return reinterpret_cast<const Node *>(&nodes_[ptr]);
+        return &nodes_[node->next[idx]];
     }
 
     return nullptr;
@@ -224,13 +331,50 @@ const OctreeIndex::Node *OctreeIndex::prev(const Node *node) const
         return nullptr;
     }
 
-    return reinterpret_cast<const Node *>(&nodes_[node->prev]);
+    return &nodes_[node->prev - 1];
 }
 
-const OctreeIndex::Node *OctreeIndex::at(size_t idx) const
+Aabb<double> OctreeIndex::boundary(const Node *node) const
 {
-    const size_t ptr = idx * OCTREE_INDEX_NODE_SIZE;
-    return reinterpret_cast<const Node *>(&nodes_[ptr]);
+    // Top
+    const Node *data = nodes_.data();
+    const Node *prev;
+    const Node *next;
+    uint64_t code = 0;
+    int levels = 0;
+
+    while (node && node->prev)
+    {
+        levels++;
+        prev = node;
+        node = &data[node->prev - 1];
+
+        for (size_t i = 0; i < 8; i++)
+        {
+            next = &data[node->next[i]];
+            if (next == prev)
+            {
+                code = code << 3;
+                code = code | static_cast<uint64_t>(i);
+            }
+        }
+    }
+
+    // Down
+    Aabb<double> boundary = boundary_;
+    double px;
+    double py;
+    double pz;
+
+    while (levels)
+    {
+        boundary.getCenter(px, py, pz);
+        divide(boundary, px, py, pz, code & 7ULL);
+        code = code >> 3;
+        levels--;
+    }
+
+    return boundary;
 }
 
 void OctreeIndex::insertBegin(const Aabb<double> &boundary,
@@ -239,9 +383,8 @@ void OctreeIndex::insertBegin(const Aabb<double> &boundary,
                               bool insertOnlyToLeaves)
 {
     // Initialization
-    nodeSize_ = 0;
+    clear();
     boundary_ = boundary;
-    nodes_.clear();
     root_ = std::make_unique<BuildNode>();
 
     // Build tree settings
@@ -265,13 +408,13 @@ void OctreeIndex::insertEnd()
     if (root_)
     {
         // Create 1d array tree representation
-        nodeSize_ = countNodes();
-        nodes_.resize(nodeSize_ * OCTREE_INDEX_NODE_SIZE);
+        size_t nodes = countNodes();
+        nodes_.resize(nodes);
 
         // Build tree to array
-        size_t idx = 0;
+        uint32_t idx = 0;
         uint64_t from = 0;
-        uint64_t *data = nodes_.data();
+        Node *data = nodes_.data();
 
         if (insertOnlyToLeaves_)
         {
@@ -279,13 +422,14 @@ void OctreeIndex::insertEnd()
         }
         else
         {
-            std::queue<size_t> qprev;
+            std::queue<uint32_t> qprev;
             std::queue<BuildNode *> qnode;
             BuildNode *node;
-            size_t prev;
-            size_t used = 0;
+            uint32_t prev;
+            uint32_t used = 0;
             qnode.push(root_.get());
             qprev.push(0);
+
             while (!qnode.empty())
             {
                 // Add
@@ -294,23 +438,23 @@ void OctreeIndex::insertEnd()
                 prev = qprev.front();
                 qprev.pop();
 
-                data[idx + OCTREE_INDEX_OFFSET_FROM] = from;
-                data[idx + OCTREE_INDEX_OFFSET_SIZE] = node->size;
-                data[idx + OCTREE_INDEX_OFFSET_PREV] = prev;
+                data[idx].from = from;
+                data[idx].size = node->size;
+                data[idx].prev = prev;
 
                 // Continue
                 for (size_t i = 0; i < 8; i++)
                 {
                     if (node->next[i])
                     {
-                        used += OCTREE_INDEX_NODE_SIZE;
-                        data[idx + OCTREE_INDEX_OFFSET_NEXT + i] = used;
+                        used++;
+                        data[idx].next[i] = used;
                         qnode.push(node->next[i].get());
-                        qprev.push(idx);
+                        qprev.push(idx + 1);
                     }
                 }
 
-                idx += OCTREE_INDEX_NODE_SIZE;
+                idx++;
                 from += node->size;
             }
         }
@@ -320,33 +464,32 @@ void OctreeIndex::insertEnd()
     }
 }
 
-uint64_t OctreeIndex::insertEndToLeaves(uint64_t *data,
+uint64_t OctreeIndex::insertEndToLeaves(Node *data,
                                         BuildNode *node,
-                                        size_t prev,
-                                        size_t &idx,
+                                        uint32_t prev,
+                                        uint32_t &idx,
                                         uint64_t &from)
 {
-    const size_t next = idx + OCTREE_INDEX_OFFSET_NEXT;
-    const size_t idxCopy = idx;
+    const uint32_t idxCopy = idx;
     uint64_t n = node->size;
 
-    data[idx + OCTREE_INDEX_OFFSET_FROM] = from;
-    data[idx + OCTREE_INDEX_OFFSET_PREV] = prev;
+    data[idx].from = from;
+    data[idx].prev = prev;
 
+    idx++;
     prev = idx;
-    idx += OCTREE_INDEX_NODE_SIZE;
     from += n;
 
     for (size_t i = 0; i < 8; i++)
     {
         if (node->next[i])
         {
-            data[next + i] = idx;
+            data[idxCopy].next[i] = idx;
             n += insertEndToLeaves(data, node->next[i].get(), prev, idx, from);
         }
     }
 
-    data[idxCopy + OCTREE_INDEX_OFFSET_SIZE] = n;
+    data[idxCopy].size = n;
 
     return n;
 }
@@ -467,6 +610,14 @@ uint64_t OctreeIndex::insert(double x, double y, double z)
     return ecode;
 }
 
+void OctreeIndex::read(const std::string &path)
+{
+    ChunkFile file;
+    file.open(path, "r");
+    read(file);
+    file.close();
+}
+
 void OctreeIndex::read(ChunkFile &file)
 {
     // Chunk header
@@ -487,7 +638,7 @@ void OctreeIndex::readPayload(ChunkFile &file, const ChunkFile::Chunk &chunk)
     // Header
     uint8_t buffer[64];
     file.read(buffer, chunk.headerLength);
-    nodeSize_ = ltoh64(&buffer[0]);
+    size_t n = static_cast<size_t>(ltoh64(&buffer[0]));
     double wx1 = ltohd(&buffer[8 + (0 * 8)]);
     double wy1 = ltohd(&buffer[8 + (1 * 8)]);
     double wz1 = ltohd(&buffer[8 + (2 * 8)]);
@@ -497,13 +648,32 @@ void OctreeIndex::readPayload(ChunkFile &file, const ChunkFile::Chunk &chunk)
     boundary_.set(wx1, wy1, wz1, wx2, wy2, wz2);
 
     // Data
-    nodes_.resize(nodeSize_ * OCTREE_INDEX_NODE_SIZE);
+    nodes_.resize(n);
     uint8_t *data = reinterpret_cast<uint8_t *>(nodes_.data());
     file.read(data, chunk.dataLength);
     for (size_t i = 0; i < nodes_.size(); i++)
     {
-        nodes_[i] = ltoh64(&data[i * 8]);
+        nodes_[i].from = ltoh64(&data[i * sizeof(Node)]);
+        nodes_[i].size = ltoh64(&data[i * sizeof(Node) + 8]);
+        nodes_[i].reserved = ltoh32(&data[i * sizeof(Node) + 16]);
+        nodes_[i].prev = ltoh32(&data[i * sizeof(Node) + 20]);
+        nodes_[i].next[0] = ltoh32(&data[i * sizeof(Node) + 24]);
+        nodes_[i].next[1] = ltoh32(&data[i * sizeof(Node) + 28]);
+        nodes_[i].next[2] = ltoh32(&data[i * sizeof(Node) + 32]);
+        nodes_[i].next[3] = ltoh32(&data[i * sizeof(Node) + 36]);
+        nodes_[i].next[4] = ltoh32(&data[i * sizeof(Node) + 40]);
+        nodes_[i].next[5] = ltoh32(&data[i * sizeof(Node) + 44]);
+        nodes_[i].next[6] = ltoh32(&data[i * sizeof(Node) + 48]);
+        nodes_[i].next[7] = ltoh32(&data[i * sizeof(Node) + 52]);
     }
+}
+
+void OctreeIndex::write(const std::string &path) const
+{
+    ChunkFile file;
+    file.open(path, "w");
+    write(file);
+    file.close();
 }
 
 void OctreeIndex::write(ChunkFile &file) const
@@ -514,12 +684,12 @@ void OctreeIndex::write(ChunkFile &file) const
     chunk.majorVersion = OCTREE_INDEX_CHUNK_MAJOR_VERSION;
     chunk.minorVersion = OCTREE_INDEX_CHUNK_MINOR_VERSION;
     chunk.headerLength = OCTREE_INDEX_HEADER_SIZE_1_0;
-    chunk.dataLength = nodes_.size() * sizeof(uint64_t);
+    chunk.dataLength = nodes_.size() * sizeof(Node);
     file.write(chunk);
 
     // Header
     uint8_t buffer[64];
-    htol64(&buffer[0], nodeSize_);
+    htol64(&buffer[0], nodes_.size());
     htold(&buffer[8 + (0 * 8)], boundary_.min(0));
     htold(&buffer[8 + (1 * 8)], boundary_.min(1));
     htold(&buffer[8 + (2 * 8)], boundary_.min(2));
@@ -529,39 +699,49 @@ void OctreeIndex::write(ChunkFile &file) const
     file.write(buffer, chunk.headerLength);
 
     // Data
-    std::vector<uint64_t> nodes;
-    size_t n = nodes_.size();
-    nodes.resize(n);
+    std::vector<uint8_t> nodes;
+    nodes.resize(nodes_.size() * sizeof(Node));
     uint8_t *data = reinterpret_cast<uint8_t *>(nodes.data());
-    for (size_t i = 0; i < n; i++)
+    for (size_t i = 0; i < nodes_.size(); i++)
     {
-        htol64(&data[i * 8], nodes_[i]);
+        htol64(&data[i * sizeof(Node)], nodes_[i].from);
+        htol64(&data[i * sizeof(Node) + 8], nodes_[i].size);
+        htol32(&data[i * sizeof(Node) + 16], nodes_[i].reserved);
+        htol32(&data[i * sizeof(Node) + 20], nodes_[i].prev);
+        htol32(&data[i * sizeof(Node) + 24], nodes_[i].next[0]);
+        htol32(&data[i * sizeof(Node) + 28], nodes_[i].next[1]);
+        htol32(&data[i * sizeof(Node) + 32], nodes_[i].next[2]);
+        htol32(&data[i * sizeof(Node) + 36], nodes_[i].next[3]);
+        htol32(&data[i * sizeof(Node) + 40], nodes_[i].next[4]);
+        htol32(&data[i * sizeof(Node) + 44], nodes_[i].next[5]);
+        htol32(&data[i * sizeof(Node) + 48], nodes_[i].next[6]);
+        htol32(&data[i * sizeof(Node) + 52], nodes_[i].next[7]);
     }
     file.write(data, chunk.dataLength);
 }
 
 Json &OctreeIndex::write(Json &out) const
 {
-    if (nodes_.size() >= OCTREE_INDEX_NODE_SIZE)
+    if (size() > 0)
     {
         return write(out["root"], nodes_.data(), 0);
     }
+
     return out;
 }
 
-Json &OctreeIndex::write(Json &out, const uint64_t *data, size_t idx) const
+Json &OctreeIndex::write(Json &out, const Node *data, size_t idx) const
 {
-    out["from"] = data[idx + OCTREE_INDEX_OFFSET_FROM];
-    out["count"] = data[idx + OCTREE_INDEX_OFFSET_SIZE];
+    out["from"] = data[idx].from;
+    out["count"] = data[idx].size;
 
-    const size_t next = idx + OCTREE_INDEX_OFFSET_NEXT;
     size_t used = 0;
     for (size_t i = 0; i < 8; i++)
     {
-        if (data[next + i])
+        if (data[idx].next[i])
         {
             out["nodes"][used]["octant"] = i;
-            write(out["nodes"][used], data, data[next + i]);
+            write(out["nodes"][used], data, data[idx].next[i]);
             used++;
         }
     }

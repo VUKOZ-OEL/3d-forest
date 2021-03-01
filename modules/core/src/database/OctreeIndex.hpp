@@ -26,6 +26,8 @@
 
 #include <Aabb.hpp>
 #include <ChunkFile.hpp>
+#include <limits>
+#include <map>
 #include <vector>
 
 /** Octree Index. */
@@ -39,8 +41,9 @@ public:
     {
         uint64_t from;
         uint64_t size;
-        uint64_t prev;
-        uint64_t next[8];
+        uint32_t reserved;
+        uint32_t prev;
+        uint32_t next[8];
     };
 
     /** Octree Index Selection. */
@@ -53,21 +56,38 @@ public:
     OctreeIndex();
     ~OctreeIndex();
 
-    const Aabb<double> &boundary() const { return boundary_; }
-    size_t size() const { return nodeSize_; }
+    void clear();
 
+    const Aabb<double> &boundary() const { return boundary_; }
+    size_t size() const { return nodes_.size(); }
+    bool empty() const { return (nodes_.empty() || nodes_[0].size == 0); }
+
+    // Select
     void selectLeaves(std::vector<Selection> &selection,
                       const Aabb<double> &window) const;
+
     void selectNodes(std::vector<Selection> &selection,
                      const Aabb<double> &window) const;
 
+    const Node *selectNode(std::map<const Node *, uint64_t> &used,
+                           double x,
+                           double y,
+                           double z) const;
+
+    const Node *selectLeaf(double x, double y, double z) const;
+
+    // Node
     const Node *root() const;
     const Node *next(const Node *node, size_t idx) const;
     const Node *prev(const Node *node) const;
-    const Node *at(size_t idx) const;
+    const Node *at(size_t idx) const { return &nodes_[idx]; }
+    Aabb<double> boundary(const Node *node) const;
 
+    // IO
+    void read(const std::string &path);
     void read(ChunkFile &file);
     void readPayload(ChunkFile &file, const ChunkFile::Chunk &chunk);
+    void write(const std::string &path) const;
     void write(ChunkFile &file) const;
     Json &write(Json &out) const;
 
@@ -80,27 +100,39 @@ public:
     void insertEnd();
 
 protected:
-    size_t nodeSize_;
     Aabb<double> boundary_;
-    std::vector<uint64_t> nodes_; // [{From, Size, Next[8]}, {}, ..]
+    std::vector<Node> nodes_;
 
     void selectLeaves(std::vector<Selection> &idxList,
                       const Aabb<double> &window,
                       const Aabb<double> &boundary,
-                      size_t pos) const;
+                      size_t idx) const;
 
     void selectNodes(std::vector<Selection> &idxList,
                      const Aabb<double> &window,
                      const Aabb<double> &boundary,
-                     size_t pos) const;
+                     size_t idx) const;
+
+    const Node *selectNode(std::map<const Node *, uint64_t> &used,
+                           double x,
+                           double y,
+                           double z,
+                           const Aabb<double> &boundary,
+                           size_t idx) const;
+
+    const Node *selectLeaf(double x,
+                           double y,
+                           double z,
+                           const Aabb<double> &boundary,
+                           size_t idx) const;
 
     void divide(Aabb<double> &boundary,
                 double x,
                 double y,
                 double z,
-                size_t code) const;
+                uint64_t code) const;
 
-    Json &write(Json &out, const uint64_t *data, size_t idx) const;
+    Json &write(Json &out, const Node *data, size_t idx) const;
 
     // Build tree
     /** Octree Index Build Node. */
@@ -118,10 +150,10 @@ protected:
     size_t maxLevel_;
     bool insertOnlyToLeaves_;
 
-    uint64_t insertEndToLeaves(uint64_t *data,
+    uint64_t insertEndToLeaves(Node *data,
                                BuildNode *node,
-                               size_t prev,
-                               size_t &idx,
+                               uint32_t prev,
+                               uint32_t &idx,
                                uint64_t &from);
     size_t countNodes() const;
     size_t countNodes(BuildNode *node) const;

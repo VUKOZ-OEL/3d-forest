@@ -303,7 +303,7 @@ void Json::deserialize(Json &obj, const char *in, size_t n, size_t &i)
                 break;
 
             case STATE_OBJECT_PAIR:
-                // parse object pair value
+                // Parse object pair value
                 deserialize(obj[str], in, n, i);
                 i--;
                 state = STATE_OBJECT;
@@ -345,7 +345,7 @@ void Json::deserialize(Json &obj, const char *in, size_t n, size_t &i)
             case STATE_ARRAY:
                 if (in[i] > 32 && in[i] != ']')
                 {
-                    // parse next array element
+                    // Parse next array element
                     deserialize(obj[array_index], in, n, i);
                     array_index++;
                 }

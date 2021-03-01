@@ -304,7 +304,18 @@ void Forest3dWindow::actionPluginToolStart()
         {
             if (it->name() == action->text())
             {
-                it->compute(this, editor_);
+                try
+                {
+                    it->compute(this, editor_);
+                }
+                catch (std::exception &e)
+                {
+                    showError(e.what());
+                }
+                catch (...)
+                {
+                    showError("Unknown");
+                }
                 break;
             }
         }
@@ -490,6 +501,10 @@ void Forest3dWindow::updateWindowTitle(const QString &path)
 void Forest3dWindow::timerEvent(QTimerEvent *event)
 {
     (void)event;
+
+    // TBD thread + wait condition instead of a timer
+    editor_.updateView();
+    updateViewer();
 }
 
 void Forest3dWindow::closeEvent(QCloseEvent *event)

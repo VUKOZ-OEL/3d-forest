@@ -18,5 +18,4 @@
 add_subdirectory(applications)
 add_subdirectory(core)
 add_subdirectory(project)
-add_subdirectory(utils)
 add_subdirectory(visualization)

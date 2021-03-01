@@ -18,40 +18,28 @@
 */
 
 /**
-    @file Database.hpp
+    @file DatabaseDataSet.hpp
 */
 
-#ifndef DATABASE_HPP
-#define DATABASE_HPP
+#ifndef DATABASE_DATA_SET_HPP
+#define DATABASE_DATA_SET_HPP
 
-#include <Aabb.hpp>
-#include <DatabaseCell.hpp>
-#include <DatabaseDataSet.hpp>
+#include <LasFile.hpp>
+#include <OctreeIndex.hpp>
 #include <string>
-#include <vector>
 
-/** Database. */
-class Database
+/** Database Data Set. */
+class DatabaseDataSet
 {
 public:
-    Database();
-    ~Database();
+    uint64_t id_;
+    std::string path_;
+    OctreeIndex index_;
 
-    void openDataSet(uint64_t id, const std::string &path);
-    void clear();
+    DatabaseDataSet();
+    ~DatabaseDataSet();
 
-    void updateView();
-    // size_t map(uint64_t index);
-
-    size_t cellSize() const { return cells_.size(); }
-    const DatabaseCell &cell(size_t i) const { return *cells_[i]; }
-
-protected:
-    size_t maxCache_;
-    size_t loaded_;
-    size_t maximum_;
-    std::vector<std::shared_ptr<DatabaseDataSet>> dataSets_;
-    std::vector<std::shared_ptr<DatabaseCell>> cells_;
+    void read(uint64_t id, const std::string &path);
 };
 
-#endif /* DATABASE_HPP */
+#endif /* DATABASE_DATA_SET_HPP */

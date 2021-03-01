@@ -35,34 +35,12 @@ Editor::~Editor()
 void Editor::open(const std::string &path)
 {
     project_.read(path);
-#if 0
-    db_.open(path);
 
-    // Create scene
-    for (size_t i = 0; i < db_.cellSize(); i++)
+    for (size_t i = 0; i < project_.dataSetSize(); i++)
     {
-        std::shared_ptr<MeshNode> node = std::make_shared<MeshNode>();
-
-        const DatabaseCell &cell = db_.cell(i);
-        const std::vector<double> &xyzSrc = cell.xyz;
-        const std::vector<float> &rgbSrc = cell.rgb;
-        std::vector<float> &xyzDst = node->xyz;
-        std::vector<float> &rgbDst = node->rgb;
-        xyzDst.resize(xyzSrc.size());
-        for (size_t j = 0; j < xyzSrc.size(); j++)
-        {
-            xyzDst[j] = static_cast<float>(xyzSrc[j]);
-        }
-        if (rgbSrc.size())
-        {
-            rgbDst = rgbSrc;
-        }
-
-        nodes_.push_back(node);
+        const ProjectDataSet &dataSet = project_.dataSet(i);
+        database_.openDataSet(dataSet.id, dataSet.path);
     }
-
-    path_ = path;
-#endif
 }
 
 void Editor::write(const std::string &path)
@@ -74,8 +52,14 @@ void Editor::write(const std::string &path)
 void Editor::close()
 {
     project_.clear();
+    database_.clear();
     boundary_.clear();
     unsavedChanges_ = false;
+}
+
+void Editor::updateView()
+{
+    database_.updateView();
 }
 
 void Editor::setVisibleDataSet(size_t i, bool visible)

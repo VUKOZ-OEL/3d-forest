@@ -44,6 +44,7 @@ public:
     void getCenter(T &x, T &y, T &z) const;
     bool intersects(const Aabb<T> &box) const;
     bool isInside(const Aabb<T> &box) const;
+    bool isInside(T x, T y, T z) const;
 
     void read(const Json &in);
     Json &write(Json &out) const;
@@ -133,6 +134,12 @@ template <class T> inline bool Aabb<T>::isInside(const Aabb &box) const
     return !((max_[0] > box.max_[0] || min_[0] < box.min_[0]) ||
              (max_[1] > box.max_[1] || min_[1] < box.min_[1]) ||
              (max_[2] > box.max_[2] || min_[2] < box.min_[2]));
+}
+
+template <class T> inline bool Aabb<T>::isInside(T x, T y, T z) const
+{
+    return !((x < min_[0] || x > max_[0]) || (y < min_[1] || y > max_[1]) ||
+             (z < min_[2] || z > max_[2]));
 }
 
 template <class T> inline void Aabb<T>::read(const Json &in)

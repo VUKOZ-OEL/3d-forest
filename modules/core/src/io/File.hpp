@@ -75,6 +75,7 @@ public:
     static std::string read(const std::string &path);
     static void write(const std::string &path, const std::string &data);
 
+    static std::string tmpname(const std::string &path);
     static std::string tmpname(const std::string &outputPath,
                                const std::string &inputPath);
 
@@ -84,6 +85,8 @@ public:
 
     static void move(const std::string &outputPath,
                      const std::string &inputPath);
+
+    static void remove(const std::string &path);
 
 protected:
     int fd_;

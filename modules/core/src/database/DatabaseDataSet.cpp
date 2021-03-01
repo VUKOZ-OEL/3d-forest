@@ -18,40 +18,25 @@
 */
 
 /**
-    @file Database.hpp
+    @file DatabaseDataSet.cpp
 */
 
-#ifndef DATABASE_HPP
-#define DATABASE_HPP
-
-#include <Aabb.hpp>
-#include <DatabaseCell.hpp>
+#include <DatabaseBuilder.hpp>
 #include <DatabaseDataSet.hpp>
-#include <string>
-#include <vector>
 
-/** Database. */
-class Database
+DatabaseDataSet::DatabaseDataSet()
 {
-public:
-    Database();
-    ~Database();
+}
 
-    void openDataSet(uint64_t id, const std::string &path);
-    void clear();
+DatabaseDataSet::~DatabaseDataSet()
+{
+}
 
-    void updateView();
-    // size_t map(uint64_t index);
+void DatabaseDataSet::read(uint64_t id, const std::string &path)
+{
+    id_ = id;
+    path_ = path;
 
-    size_t cellSize() const { return cells_.size(); }
-    const DatabaseCell &cell(size_t i) const { return *cells_[i]; }
-
-protected:
-    size_t maxCache_;
-    size_t loaded_;
-    size_t maximum_;
-    std::vector<std::shared_ptr<DatabaseDataSet>> dataSets_;
-    std::vector<std::shared_ptr<DatabaseCell>> cells_;
-};
-
-#endif /* DATABASE_HPP */
+    const std::string pathL1 = DatabaseBuilder::extensionL1(path_);
+    index_.read(pathL1);
+}

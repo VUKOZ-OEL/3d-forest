@@ -23,6 +23,7 @@
 
 #include <Error.hpp>
 #include <File.hpp>
+#include <LasFile.hpp>
 #include <ProjectDataSet.hpp>
 
 ProjectDataSet::ProjectDataSet()
@@ -60,12 +61,10 @@ void ProjectDataSet::read(const Json &in, const std::string &projectPath)
     }
     else
     {
-        // TBD
-        // LasFile las;
-        // las.open(path);
-        // las.readHeader();
-        // dateCreated = las.dateCreated();
-        dateCreated = "";
+        LasFile las;
+        las.open(path);
+        las.readHeader();
+        dateCreated = las.header.dateCreated();
     }
 
     // ID

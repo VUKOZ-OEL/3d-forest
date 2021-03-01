@@ -21,6 +21,7 @@
     @file sandbox.cpp
 */
 
+#include <Database.hpp>
 #include <File.hpp>
 #include <Json.hpp>
 #include <OctreeIndex.hpp>

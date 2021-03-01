@@ -310,7 +310,7 @@ void GLCamera::updateFrustrum()
 {
     const float *m = modelViewProjection_.data();
 
-    // extract the planes
+    // Extract the planes
     frustrumPlanes_[0] = m[3] - m[0];
     frustrumPlanes_[1] = m[7] - m[4];
     frustrumPlanes_[2] = m[11] - m[8];
@@ -341,7 +341,7 @@ void GLCamera::updateFrustrum()
     frustrumPlanes_[22] = m[11] + m[10];
     frustrumPlanes_[23] = m[15] + m[14];
 
-    // normalize
+    // Normalize
     size_t n = 0;
     float norm;
     for (size_t i = 0; i < 6; i++)

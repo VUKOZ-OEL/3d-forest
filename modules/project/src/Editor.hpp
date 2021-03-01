@@ -40,9 +40,12 @@ public:
     void write(const std::string &path);
     void close();
 
+    void updateView();
+
     bool hasUnsavedChanges() const { return unsavedChanges_; }
 
     const Project &project() const { return project_; }
+    const Database &database() const { return database_; }
     const Aabb<double> &boundary() const { return boundary_; }
 
     void setVisibleDataSet(size_t i, bool visible);
@@ -51,7 +54,7 @@ public:
 
 protected:
     Project project_;
-    Database db_;
+    Database database_;
     Aabb<double> boundary_;
     bool unsavedChanges_;
 };

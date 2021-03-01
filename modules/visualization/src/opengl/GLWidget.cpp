@@ -79,11 +79,34 @@ void GLWidget::updateScene(const Scene &scene)
 
 void GLWidget::updateScene(Editor *editor)
 {
-    (void)editor;
+    size_t prevSize = nodes_.size();
 
     nodes_.clear();
+
+    size_t n = editor->database().cellSize();
+    for (size_t i = 0; i < n; i++)
+    {
+        const DatabaseCell &cell = editor->database().cell(i);
+
+        std::shared_ptr<GLMesh> glmesh = std::make_shared<GLMesh>();
+        glmesh->color = QVector3D(1.F, 1.F, 1.F);
+        glmesh->mode = GLMesh::POINTS;
+
+        size_t m = cell.xyz.size();
+        glmesh->xyz.resize(m);
+        for (size_t j = 0; j < m; j++)
+        {
+            glmesh->xyz[j] = static_cast<float>(cell.xyz[j]);
+        }
+        glmesh->rgb = cell.rgb;
+        nodes_.push_back(glmesh);
+    }
+
     validateNodes();
-    resetCamera();
+    if (prevSize == 0)
+    {
+        resetCamera();
+    }
 }
 
 void GLWidget::resetCamera()
@@ -94,7 +117,7 @@ void GLWidget::resetCamera()
     if (aabb_.isValid())
     {
         center = aabb_.getCenter();
-        eye = center + QVector3D(0.F, 1.F, 0.F) * aabb_.getRadius();
+        eye = center + QVector3D(0.F, 1.F, 1.F) * aabb_.getRadius();
     }
     camera_.setLookAt(eye, center, up);
 }

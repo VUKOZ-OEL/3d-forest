@@ -26,49 +26,83 @@
 
 Database::Database()
 {
+    maxCache_ = 8;
+    loaded_ = 0;
+    maximum_ = 0;
 }
 
 Database::~Database()
 {
 }
 
-void Database::open(const std::string &path)
+void Database::openDataSet(uint64_t id, const std::string &path)
 {
-    las_.open(path);
-    las_.readHeader();
+    std::shared_ptr<DatabaseDataSet> dataSet;
+    dataSet = std::make_shared<DatabaseDataSet>();
+    dataSet->read(id, path);
+    maximum_ = dataSet->index_.size();
+    dataSets_.push_back(dataSet);
+}
 
-    aabb.set(las_.header.min_x,
-             las_.header.min_y,
-             las_.header.min_z,
-             las_.header.max_x,
-             las_.header.max_y,
-             las_.header.max_z);
-#if 0
+void Database::clear()
+{
+    loaded_ = 0;
+    dataSets_.clear();
+    cells_.clear();
+}
+
+void Database::updateView()
+{
+    if (dataSets_.size() < 1)
+    {
+        return;
+    }
+
+    if (loaded_ >= maximum_)
+    {
+        return;
+    }
+
+    DatabaseDataSet *dataSet = dataSets_[0].get();
+    const OctreeIndex::Node *node = dataSet->index_.at(loaded_);
+
     std::shared_ptr<DatabaseCell> cell = std::make_shared<DatabaseCell>();
+    LasFile las;
+    las.open(dataSet->path_);
+    las.readHeader();
 
-    uint64_t npoints = las_.header.number_of_point_records;
+    size_t n = static_cast<size_t>(node->size);
+    bool rgbFlag = las.header.hasRgb();
+    std::vector<double> &xyz = cell->xyz;
+    std::vector<float> &rgb = cell->rgb;
+    xyz.resize(n * 3);
+    if (rgbFlag)
+    {
+        rgb.resize(n * 3);
+    }
+
+    size_t pointSize = las.header.point_data_record_length;
+    uint64_t start = node->from * pointSize;
+    las.seek(start + las.header.offset_to_point_data);
+
+    std::vector<uint8_t> buffer;
+    size_t bufferSize = pointSize * n;
+    uint8_t fmt = las.header.point_data_record_format;
+    buffer.resize(bufferSize);
+    las.file().read(buffer.data(), bufferSize);
+
+    uint8_t *ptr = buffer.data();
     LasFile::Point point;
     double x;
     double y;
     double z;
-    bool rgbFlag = las_.header.hasRgb();
     constexpr float scaleU16 =
         1.F / static_cast<float>(std::numeric_limits<uint16_t>::max());
-
-    // Data
-    std::vector<double> &xyz = cell->xyz;
-    std::vector<float> &rgb = cell->rgb;
-    xyz.resize(npoints * 3);
-    if (rgbFlag)
+    for (size_t i = 0; i < n; i++)
     {
-        rgb.resize(npoints * 3);
-    }
+        las.readPoint(point, ptr + (pointSize * i), fmt);
 
-    // Read data
-    for (uint64_t i = 0; i < npoints; i++)
-    {
-        las_.read(point);
-        las_.transform(x, y, z, point);
+        las.transform(x, y, z, point);
 
         xyz[3 * i + 0] = x;
         xyz[3 * i + 1] = y;
@@ -83,14 +117,8 @@ void Database::open(const std::string &path)
     }
 
     cells_.push_back(cell);
-#endif
-}
 
-void Database::close()
-{
-    aabb.clear();
-    cells_.clear();
-    las_.close();
+    loaded_++;
 }
 
 // size_t Database::map(uint64_t index)

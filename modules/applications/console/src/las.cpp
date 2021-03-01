@@ -22,6 +22,7 @@
 */
 
 #include <Aabb.hpp>
+#include <DatabaseBuilder.hpp>
 #include <Error.hpp>
 #include <LasFile.hpp>
 #include <cstdlib>
@@ -32,9 +33,7 @@ enum Command
 {
     COMMAND_NONE,
     COMMAND_CREATE_INDEX,
-    COMMAND_FORMAT,
     COMMAND_PRINT,
-    COMMAND_RANDOMIZE,
     COMMAND_SELECT
 };
 
@@ -67,8 +66,7 @@ void getarg(const char **v, int &opt, int argc, char *argv[])
 
 void cmd_create_index(const char *outputPath,
                       const char *inputPath,
-                      size_t maxLeafSize1,
-                      size_t maxLeafSize2)
+                      const DatabaseBuilder::Settings &settings)
 {
     if (!inputPath)
     {
@@ -80,22 +78,7 @@ void cmd_create_index(const char *outputPath,
         outputPath = inputPath;
     }
 
-    LasFile::index(outputPath, inputPath, maxLeafSize1, maxLeafSize2);
-}
-
-void cmd_format(const char *outputPath, const char *inputPath)
-{
-    if (!inputPath)
-    {
-        THROW("Missing input file path argument");
-    }
-
-    if (!outputPath)
-    {
-        outputPath = inputPath;
-    }
-
-    LasFile::format(outputPath, inputPath);
+    DatabaseBuilder::index(outputPath, inputPath, settings);
 }
 
 void cmd_print(const char *inputPath)
@@ -105,22 +88,12 @@ void cmd_print(const char *inputPath)
         THROW("Missing input file path argument");
     }
 
-    LasFile::print(inputPath);
-}
+    LasFile las;
+    las.open(inputPath);
+    las.readHeader();
 
-void cmd_randomize(const char *outputPath, const char *inputPath)
-{
-    if (!inputPath)
-    {
-        THROW("Missing input file path argument");
-    }
-
-    if (!outputPath)
-    {
-        outputPath = inputPath;
-    }
-
-    LasFile::randomize(outputPath, inputPath);
+    Json obj;
+    std::cout << las.header.write(obj).serialize() << std::endl;
 }
 
 void cmd_select(const char *inputPath, const Aabb<double> &window)
@@ -136,8 +109,7 @@ void cmd_select(const char *inputPath, const Aabb<double> &window)
 int main(int argc, char *argv[])
 {
     int command = COMMAND_NONE;
-    size_t maxLeafSize1 = 10000;
-    size_t maxLeafSize2 = 32;
+    DatabaseBuilder::Settings settings;
     double wx1 = 0, wy1 = 0, wz1 = 0, wx2 = 0, wy2 = 0, wz2 = 0;
     Aabb<double> window;
     const char *outputPath = nullptr;
@@ -151,17 +123,9 @@ int main(int argc, char *argv[])
         {
             command = COMMAND_CREATE_INDEX;
         }
-        else if (strcmp(argv[opt], "-f") == 0)
-        {
-            command = COMMAND_FORMAT;
-        }
         else if (strcmp(argv[opt], "-p") == 0)
         {
             command = COMMAND_PRINT;
-        }
-        else if (strcmp(argv[opt], "-r") == 0)
-        {
-            command = COMMAND_RANDOMIZE;
         }
         else if (strcmp(argv[opt], "-s") == 0)
         {
@@ -171,11 +135,23 @@ int main(int argc, char *argv[])
         // Create index options
         else if (strcmp(argv[opt], "-m1") == 0)
         {
-            getarg(&maxLeafSize1, opt, argc, argv);
+            getarg(&settings.maxSize1, opt, argc, argv);
         }
         else if (strcmp(argv[opt], "-m2") == 0)
         {
-            getarg(&maxLeafSize2, opt, argc, argv);
+            getarg(&settings.maxSize2, opt, argc, argv);
+        }
+        else if (strcmp(argv[opt], "-l1") == 0)
+        {
+            getarg(&settings.maxLevel1, opt, argc, argv);
+        }
+        else if (strcmp(argv[opt], "-l2") == 0)
+        {
+            getarg(&settings.maxLevel2, opt, argc, argv);
+        }
+        else if (strcmp(argv[opt], "-r") == 0)
+        {
+            settings.randomize = true;
         }
 
         // Input/Output filenames
@@ -221,19 +197,10 @@ int main(int argc, char *argv[])
         switch (command)
         {
             case COMMAND_CREATE_INDEX:
-                cmd_create_index(outputPath,
-                                 inputPath,
-                                 maxLeafSize1,
-                                 maxLeafSize2);
-                break;
-            case COMMAND_FORMAT:
-                cmd_format(outputPath, inputPath);
+                cmd_create_index(outputPath, inputPath, settings);
                 break;
             case COMMAND_PRINT:
                 cmd_print(inputPath);
-                break;
-            case COMMAND_RANDOMIZE:
-                cmd_randomize(outputPath, inputPath);
                 break;
             case COMMAND_SELECT:
                 window.set(wx1, wy1, wz1, wx2, wy2, wz2);

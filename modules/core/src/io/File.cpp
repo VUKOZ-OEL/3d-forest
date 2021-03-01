@@ -72,13 +72,13 @@ const std::string &File::path() const
 
 void File::create()
 {
-    // close
+    // Close
     if (fd_ != INVALID_DESCRIPTOR)
     {
         (void)::close(fd_);
     }
 
-    // temporary file with a unique auto-generated fileName, "wb+"
+    // Temporary file with a unique auto-generated fileName, "wb+"
     std::FILE *tmpf = std::tmpfile();
     if (!tmpf)
     {
@@ -122,13 +122,13 @@ void File::open(const std::string &path, const std::string &mode)
     mode_t omode;
     struct stat st;
 
-    // close
+    // Close
     if (fd_ != INVALID_DESCRIPTOR)
     {
         (void)::close(fd_);
     }
 
-    // open
+    // Open
     oflag = 0;
 
     if (mode.find("r") != std::string::npos)
@@ -534,15 +534,20 @@ std::string File::replaceExtension(const std::string &path,
     return fsPath.string();
 }
 
+std::string File::tmpname(const std::string &path)
+{
+    uint64_t t = getRealTime64();
+    char buffer[32];
+    (void)snprintf(buffer, sizeof(buffer), "%016llX", t);
+    return path + "." + std::string(buffer);
+}
+
 std::string File::tmpname(const std::string &outputPath,
                           const std::string &inputPath)
 {
     if (inputPath == outputPath)
     {
-        uint64_t t = getRealTime64();
-        char buffer[32];
-        (void)snprintf(buffer, sizeof(buffer), "%016llX", t);
-        return outputPath + "." + std::string(buffer);
+        return File::tmpname(outputPath);
     }
 
     return outputPath;
@@ -586,4 +591,12 @@ void File::move(const std::string &outputPath, const std::string &inputPath)
         (void)std::filesystem::remove(outputPath);
     }
     std::filesystem::rename(inputPath, outputPath);
+}
+
+void File::remove(const std::string &path)
+{
+    if (std::filesystem::exists(path))
+    {
+        (void)std::filesystem::remove(path);
+    }
 }
