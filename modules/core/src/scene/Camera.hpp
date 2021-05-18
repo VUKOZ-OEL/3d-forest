@@ -18,44 +18,26 @@
 */
 
 /**
-    @file DatabaseCell.cpp
+    @file Camera.hpp
 */
 
-#include <DatabaseCell.hpp>
+#ifndef CAMERA_HPP
+#define CAMERA_HPP
 
-DatabaseCell::DatabaseCell()
-    : dataSetId(0), cellId(0), loaded(false), modified(false)
-{
-}
+#include <Matrix4.hpp>
+#include <Vector3.hpp>
 
-DatabaseCell::~DatabaseCell()
+/** Camera. */
+class Camera
 {
-}
+public:
+    Vector3<float> eye;
+    Vector3<float> center;
+    Vector3<float> up;
+    float fov;
 
-DatabaseCell::View::View() : renderStep(1), renderStepCount(1)
-{
-}
+    Camera();
+    ~Camera();
+};
 
-DatabaseCell::View::~View()
-{
-}
-
-void DatabaseCell::View::resetFrame()
-{
-    renderStep = 1;
-}
-
-void DatabaseCell::View::nextFrame()
-{
-    renderStep++;
-}
-
-bool DatabaseCell::View::isStarted() const
-{
-    return renderStep == 1;
-}
-
-bool DatabaseCell::View::isFinished() const
-{
-    return renderStep > renderStepCount;
-}
+#endif /* CAMERA_HPP */

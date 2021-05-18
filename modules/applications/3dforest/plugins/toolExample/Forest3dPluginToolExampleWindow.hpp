@@ -18,44 +18,37 @@
 */
 
 /**
-    @file DatabaseCell.cpp
+    @file Forest3dPluginToolExampleWindow.hpp
 */
 
-#include <DatabaseCell.hpp>
+#ifndef FOREST_3D_PLUGIN_TOOL_EXAMPLE_WINDOW_HPP
+#define FOREST_3D_PLUGIN_TOOL_EXAMPLE_WINDOW_HPP
 
-DatabaseCell::DatabaseCell()
-    : dataSetId(0), cellId(0), loaded(false), modified(false)
-{
-}
+#include <QDialog>
 
-DatabaseCell::~DatabaseCell()
-{
-}
+class Forest3dEditor;
+class QLabel;
+class QPushButton;
 
-DatabaseCell::View::View() : renderStep(1), renderStepCount(1)
+/** Forest 3d Plugin Tool Example Window. */
+class Forest3dPluginToolExampleWindow : public QDialog
 {
-}
+    Q_OBJECT
 
-DatabaseCell::View::~View()
-{
-}
+public:
+    Forest3dPluginToolExampleWindow(QWidget *parent, Forest3dEditor *editor);
+    ~Forest3dPluginToolExampleWindow();
 
-void DatabaseCell::View::resetFrame()
-{
-    renderStep = 1;
-}
+    QSize minimumSizeHint() const override;
+    QSize sizeHint() const override;
 
-void DatabaseCell::View::nextFrame()
-{
-    renderStep++;
-}
+private slots:
+    void run();
 
-bool DatabaseCell::View::isStarted() const
-{
-    return renderStep == 1;
-}
+protected:
+    Forest3dEditor *editor_;
+    QLabel *label_;
+    QPushButton *button_;
+};
 
-bool DatabaseCell::View::isFinished() const
-{
-    return renderStep > renderStepCount;
-}
+#endif /* FOREST_3D_PLUGIN_TOOL_EXAMPLE_WINDOW_HPP */

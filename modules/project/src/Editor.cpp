@@ -22,7 +22,6 @@
 */
 
 #include <Editor.hpp>
-//#include <MeshNode.hpp>
 
 Editor::Editor() : unsavedChanges_(false)
 {
@@ -32,14 +31,24 @@ Editor::~Editor()
 {
 }
 
+void Editor::lock()
+{
+    mutex_.lock();
+}
+
+void Editor::unlock()
+{
+    mutex_.unlock();
+}
+
 void Editor::open(const std::string &path)
 {
     project_.read(path);
 
     for (size_t i = 0; i < project_.dataSetSize(); i++)
     {
-        const ProjectDataSet &dataSet = project_.dataSet(i);
-        database_.openDataSet(dataSet.id, dataSet.path);
+        const ProjectDataSet &ds = project_.dataSet(i);
+        database_.addDataSet(ds.id, ds.path, ds.visible);
     }
 }
 
@@ -53,13 +62,17 @@ void Editor::close()
 {
     project_.clear();
     database_.clear();
-    boundary_.clear();
     unsavedChanges_ = false;
 }
 
-void Editor::updateView()
+void Editor::updateCamera(const Camera &camera, bool interactionFinished)
 {
-    database_.updateView();
+    database_.updateCamera(camera, interactionFinished);
+}
+
+bool Editor::loadView()
+{
+    return database_.loadView();
 }
 
 void Editor::setVisibleDataSet(size_t i, bool visible)

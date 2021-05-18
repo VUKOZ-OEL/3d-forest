@@ -32,14 +32,18 @@
 class DatabaseDataSet
 {
 public:
-    uint64_t id_;
+    size_t id_;
     std::string path_;
+    bool enabled_;
+
     OctreeIndex index_;
+    Aabb<double> boundary_;
+    Aabb<double> boundaryView_;
 
     DatabaseDataSet();
     ~DatabaseDataSet();
 
-    void read(uint64_t id, const std::string &path);
+    void read(size_t id, const std::string &path, bool enabled);
 };
 
 #endif /* DATABASE_DATA_SET_HPP */

@@ -32,11 +32,35 @@ DatabaseDataSet::~DatabaseDataSet()
 {
 }
 
-void DatabaseDataSet::read(uint64_t id, const std::string &path)
+void DatabaseDataSet::read(size_t id, const std::string &path, bool enabled)
 {
     id_ = id;
     path_ = path;
+    enabled_ = enabled;
 
     const std::string pathL1 = DatabaseBuilder::extensionL1(path_);
     index_.read(pathL1);
+
+    LasFile las;
+    las.open(path_);
+    las.readHeader();
+
+    double x1 = las.header.min_x;
+    double y1 = las.header.min_y;
+    double z1 = las.header.min_z;
+    double x2 = las.header.max_x;
+    double y2 = las.header.max_y;
+    double z2 = las.header.max_z;
+
+    boundary_.set(x1, y1, z1, x2, y2, z2);
+
+    las.transformInvert(x1, y1, z1);
+    las.transformInvert(x2, y2, z2);
+    x1 += las.header.x_offset;
+    y1 += las.header.y_offset;
+    z1 += las.header.z_offset;
+    x2 += las.header.x_offset;
+    y2 += las.header.y_offset;
+    z2 += las.header.z_offset;
+    boundaryView_.set(x1, y1, z1, x2, y2, z2);
 }

@@ -18,45 +18,27 @@
 */
 
 /**
-    @file GLViewer.hpp
+    @file Forest3dEditor.cpp
 */
 
-#ifndef GL_VIEWER_HPP
-#define GL_VIEWER_HPP
+#include <Forest3dEditor.hpp>
 
-#include <Editor.hpp>
-#include <QWidget>
-#include <Scene.hpp>
-#include <vector>
-
-class GLWidget;
-
-/** OpenGL Viewer. */
-class GLViewer : public QWidget
+Forest3dEditor::Forest3dEditor()
 {
-    Q_OBJECT
+    thread_.init();
+}
 
-public:
-    enum ViewLayout
-    {
-        VIEW_LAYOUT_SINGLE,
-        VIEW_LAYOUT_TWO_COLUMNS
-    };
+Forest3dEditor::~Forest3dEditor()
+{
+    thread_.stop();
+}
 
-    explicit GLViewer(QWidget *parent = nullptr);
-    ~GLViewer();
+void Forest3dEditor::cancel()
+{
+    thread_.cancel();
+}
 
-    void setViewLayout(ViewLayout viewLayout);
-    void selectViewport(GLWidget *viewport);
-
-    void updateScene(const Scene &scene);
-    void updateScene(Editor *editor);
-
-protected:
-    std::vector<GLWidget *> viewports_;
-
-    void initializeViewer();
-    GLWidget *createViewport();
-};
-
-#endif /* GL_VIEWER_HPP */
+void Forest3dEditor::render()
+{
+    thread_.restart();
+}

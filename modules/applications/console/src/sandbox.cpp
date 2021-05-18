@@ -29,6 +29,7 @@
 #include <Vector3.hpp>
 #include <cstring>
 #include <iostream>
+#include <queue>
 #include <stdexcept>
 #include <vector>
 

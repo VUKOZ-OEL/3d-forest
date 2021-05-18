@@ -36,6 +36,7 @@ add_library(
   ${PLUGIN_EXAMPLE}
   SHARED
   plugins/toolExample/Forest3dPluginToolExample.cpp
+  plugins/toolExample/Forest3dPluginToolExampleWindow.cpp
 )
 target_include_directories(${PLUGIN_EXAMPLE} PUBLIC plugins/toolExample)
 target_include_directories(${PLUGIN_EXAMPLE} PUBLIC src)

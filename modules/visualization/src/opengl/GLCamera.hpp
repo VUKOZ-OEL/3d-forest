@@ -24,8 +24,10 @@
 #ifndef GL_CAMERA_HPP
 #define GL_CAMERA_HPP
 
+#include <Camera.hpp>
 #include <QMatrix4x4>
 #include <QPoint>
+#include <QQuaternion>
 #include <QRect>
 #include <QVector3D>
 #include <vector>
@@ -46,24 +48,30 @@ public:
     int height() const { return viewport_.height(); }
 
     // Projection
+    void updateProjection();
+    void setPerspective();
+    void setOrthographic();
     void setPerspective(float fovy, float zNear, float zFar);
     void setPerspective(float fovy, float aspect, float zNear, float zFar);
 
     // Model-view
+    void setLookAt(const QVector3D &center, float distance);
+
     void setLookAt(const QVector3D &eye,
                    const QVector3D &center,
                    const QVector3D &up);
 
     void setDistance(float distance);
-    float getDistance() const;
 
+    // Camera
+    float getDistance() const { return distance_; }
     const QVector3D &getEye() const { return eye_; }
     const QVector3D &getCenter() const { return center_; }
     const QVector3D &getUp() const { return up_; }
+    const QVector3D &getRight() const { return right_; }
+    const QVector3D &getDirection() const { return direction_; }
 
-    QVector3D getDirection() const;
-    QVector3D getView() const;
-    QVector3D getRight() const;
+    Camera toCamera() const;
 
     // Transform
     QVector3D project(const QVector3D &world) const;
@@ -76,7 +84,7 @@ public:
     void wheelEvent(QWheelEvent *event);
     void rotate(int dx, int dy);
     void pan(int dx, int dy);
-    void zoom(int delta);
+    void zoom(int dy);
 
     // Matrix
     const QMatrix4x4 &getModelView() const { return modelView_; }
@@ -97,7 +105,15 @@ protected:
     // Camera
     QVector3D eye_;
     QVector3D center_;
+    QVector3D right_;
     QVector3D up_;
+    QVector3D direction_;
+    QQuaternion rotation_;
+    float distance_;
+    float fov_;
+    float zNear_;
+    float zFar_;
+    bool perspective_;
 
     // Viewport
     QRect viewport_;
@@ -115,12 +131,15 @@ protected:
 
     // Interaction
     QPoint mouseLastPosition_;
+    float sensitivityX_;
+    float sensitivityY_;
+    float sensitivityZoom_;
 
+    void updateMatrix();
     void setModelView(const QMatrix4x4 &m);
     void setProjection(const QMatrix4x4 &m);
     void setModelViewProjection(const QMatrix4x4 &m);
     void updateFrustrum();
-    QVector3D rotate(const QVector3D &v, const QVector3D &axis, float angle);
 };
 
 #endif /* GL_CAMERA_HPP */

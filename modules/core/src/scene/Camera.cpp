@@ -18,35 +18,15 @@
 */
 
 /**
-    @file GLMesh.hpp
+    @file Camera.cpp
 */
 
-#ifndef GL_MESH_HPP
-#define GL_MESH_HPP
+#include <Camera.hpp>
 
-#include <GLNode.hpp>
-#include <vector>
-
-/** OpenGL Mesh. */
-class GLMesh : public GLNode
+Camera::Camera() : fov(60.0F)
 {
-public:
-    enum Mode
-    {
-        POINTS,
-        LINES,
-        QUADS
-    };
+}
 
-    Mode mode;
-    std::vector<float> xyz;
-    std::vector<float> rgb;
-
-    GLMesh();
-    virtual ~GLMesh();
-
-    virtual void render();
-    virtual void validate();
-};
-
-#endif /* GL_MESH_HPP */
+Camera::~Camera()
+{
+}

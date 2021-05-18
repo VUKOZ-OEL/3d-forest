@@ -18,31 +18,31 @@
 */
 
 /**
-    @file GLViewer.cpp
+    @file Viewer.cpp
 */
 
-#include <GLViewer.hpp>
+#include <Editor.hpp>
 #include <GLWidget.hpp>
-#include <QDebug>
 #include <QHBoxLayout>
 #include <QSplitter>
 #include <QVBoxLayout>
+#include <Viewer.hpp>
 
-GLViewer::GLViewer(QWidget *parent) : QWidget(parent)
+Viewer::Viewer(QWidget *parent) : QWidget(parent)
 {
     initializeViewer();
 }
 
-GLViewer::~GLViewer()
+Viewer::~Viewer()
 {
 }
 
-void GLViewer::initializeViewer()
+void Viewer::initializeViewer()
 {
-    setViewLayout(ViewLayout::VIEW_LAYOUT_SINGLE);
+    setLayout(ViewLayout::VIEW_LAYOUT_SINGLE);
 }
 
-GLWidget *GLViewer::createViewport()
+GLWidget *Viewer::createViewport()
 {
     GLWidget *viewport = new GLWidget(this);
     viewport->setViewer(this);
@@ -51,7 +51,117 @@ GLWidget *GLViewer::createViewport()
     return viewport;
 }
 
-void GLViewer::setViewLayout(ViewLayout viewLayout)
+GLWidget *Viewer::selectedViewport()
+{
+    for (size_t i = 0; i < viewports_.size(); i++)
+    {
+        if (viewports_[i]->isSelected())
+        {
+            return viewports_[i];
+        }
+    }
+
+    return nullptr;
+}
+
+const GLWidget *Viewer::selectedViewport() const
+{
+    for (size_t i = 0; i < viewports_.size(); i++)
+    {
+        if (viewports_[i]->isSelected())
+        {
+            return viewports_[i];
+        }
+    }
+
+    return nullptr;
+}
+
+void Viewer::setViewport(ViewCamera viewCamera)
+{
+    GLWidget *viewport = selectedViewport();
+    if (!viewport)
+    {
+        return;
+    }
+
+    switch (viewCamera)
+    {
+        case VIEW_CAMERA_ORTHOGRAPHIC:
+            viewport->setViewOrthographic();
+            break;
+        case VIEW_CAMERA_PERSPECTIVE:
+            viewport->setViewPerspective();
+            break;
+
+        case VIEW_CAMERA_TOP:
+            viewport->setViewTop();
+            break;
+        case VIEW_CAMERA_FRONT:
+            viewport->setViewFront();
+            break;
+        case VIEW_CAMERA_LEFT:
+            viewport->setViewLeft();
+            break;
+        case VIEW_CAMERA_3D:
+            viewport->setView3d();
+            break;
+
+        case VIEW_CAMERA_RESET_DISTANCE:
+            viewport->setViewResetDistance();
+            break;
+        case VIEW_CAMERA_RESET_CENTER:
+        default:
+            viewport->setViewResetCenter();
+            break;
+    }
+}
+
+void Viewer::selectViewport(GLWidget *viewport)
+{
+    for (size_t i = 0; i < viewports_.size(); i++)
+    {
+        if (viewports_[i] == viewport)
+        {
+            viewports_[i]->setSelected(true);
+        }
+        else
+        {
+            viewports_[i]->setSelected(false);
+        }
+        viewports_[i]->update();
+    }
+}
+
+void Viewer::updateScene(Editor *editor)
+{
+    for (size_t i = 0; i < viewports_.size(); i++)
+    {
+        viewports_[i]->updateScene(editor);
+        viewports_[i]->update();
+    }
+}
+
+void Viewer::resetScene(Editor *editor)
+{
+    for (size_t i = 0; i < viewports_.size(); i++)
+    {
+        viewports_[i]->resetScene(editor);
+    }
+}
+
+Camera Viewer::camera() const
+{
+    const GLWidget *viewport = selectedViewport();
+    if (viewport)
+    {
+        return viewport->camera();
+    }
+
+    return Camera();
+}
+
+void Viewer::setLayout(ViewLayout viewLayout)
 {
     // Remove the current layout
     QLayout *oldLayout = layout();
@@ -117,7 +227,7 @@ void GLViewer::setViewLayout(ViewLayout viewLayout)
         QHBoxLayout *newLayout = new QHBoxLayout;
         newLayout->setContentsMargins(1, 1, 1, 1);
         newLayout->addWidget(viewports_[0]);
-        setLayout(newLayout);
+        QWidget::setLayout(newLayout);
     }
     else if (viewLayout == ViewLayout::VIEW_LAYOUT_TWO_COLUMNS)
     {
@@ -135,44 +245,10 @@ void GLViewer::setViewLayout(ViewLayout viewLayout)
         QHBoxLayout *newLayout = new QHBoxLayout;
         newLayout->setContentsMargins(1, 1, 1, 1);
         newLayout->addWidget(splitter);
-        setLayout(newLayout);
+        QWidget::setLayout(newLayout);
     }
     else
     {
         Q_UNREACHABLE();
-    }
-}
-
-void GLViewer::selectViewport(GLWidget *viewport)
-{
-    for (size_t i = 0; i < viewports_.size(); i++)
-    {
-        if (viewports_[i] == viewport)
-        {
-            viewports_[i]->setSelected(true);
-        }
-        else
-        {
-            viewports_[i]->setSelected(false);
-        }
-        viewports_[i]->update();
-    }
-}
-
-void GLViewer::updateScene(const Scene &scene)
-{
-    for (size_t i = 0; i < viewports_.size(); i++)
-    {
-        viewports_[i]->updateScene(scene);
-        viewports_[i]->update();
-    }
-}
-
-void GLViewer::updateScene(Editor *editor)
-{
-    for (size_t i = 0; i < viewports_.size(); i++)
-    {
-        viewports_[i]->updateScene(editor);
-        viewports_[i]->update();
     }
 }

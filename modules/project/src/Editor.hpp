@@ -25,8 +25,10 @@
 #define EDITOR_HPP
 
 #include <Aabb.hpp>
+#include <Camera.hpp>
 #include <Database.hpp>
 #include <Project.hpp>
+#include <mutex>
 #include <string>
 
 /** Editor. */
@@ -36,26 +38,37 @@ public:
     Editor();
     ~Editor();
 
+    void lock();
+    void unlock();
+
     void open(const std::string &path);
     void write(const std::string &path);
     void close();
 
-    void updateView();
+    void updateCamera(const Camera &camera, bool interactionFinished);
+    bool loadView();
 
     bool hasUnsavedChanges() const { return unsavedChanges_; }
 
     const Project &project() const { return project_; }
+
+    Database &database() { return database_; }
     const Database &database() const { return database_; }
-    const Aabb<double> &boundary() const { return boundary_; }
+
+    const Aabb<double> &boundary() const { return database_.boundary(); }
+    const Aabb<double> &boundaryView() const
+    {
+        return database_.boundaryView();
+    }
 
     void setVisibleDataSet(size_t i, bool visible);
     void setVisibleLayer(size_t i, bool visible);
     void setClipFilter(const ClipFilter &clipFilter);
 
 protected:
+    std::mutex mutex_;
     Project project_;
     Database database_;
-    Aabb<double> boundary_;
     bool unsavedChanges_;
 };
 

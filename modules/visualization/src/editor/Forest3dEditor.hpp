@@ -18,44 +18,32 @@
 */
 
 /**
-    @file DatabaseCell.cpp
+    @file Forest3dEditor.hpp
 */
 
-#include <DatabaseCell.hpp>
+#ifndef FOREST_3D_EDITOR_HPP
+#define FOREST_3D_EDITOR_HPP
 
-DatabaseCell::DatabaseCell()
-    : dataSetId(0), cellId(0), loaded(false), modified(false)
-{
-}
+#include <Editor.hpp>
+#include <Forest3dThreadRender.hpp>
+#include <QWidget>
 
-DatabaseCell::~DatabaseCell()
+/** Forest 3d Editor. */
+class Forest3dEditor
 {
-}
+    //    Q_OBJECT
 
-DatabaseCell::View::View() : renderStep(1), renderStepCount(1)
-{
-}
+public:
+    Editor editor_; // TBD
+    Forest3dThreadRender thread_; // TBD
 
-DatabaseCell::View::~View()
-{
-}
+    Forest3dEditor();
+    ~Forest3dEditor();
 
-void DatabaseCell::View::resetFrame()
-{
-    renderStep = 1;
-}
+    void cancel();
+    void render();
 
-void DatabaseCell::View::nextFrame()
-{
-    renderStep++;
-}
+protected:
+};
 
-bool DatabaseCell::View::isStarted() const
-{
-    return renderStep == 1;
-}
-
-bool DatabaseCell::View::isFinished() const
-{
-    return renderStep > renderStepCount;
-}
+#endif /* FOREST_3D_EDITOR_HPP */

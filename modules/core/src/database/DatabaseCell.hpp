@@ -24,6 +24,8 @@
 #ifndef DATABASE_CELL_HPP
 #define DATABASE_CELL_HPP
 
+#include <Aabb.hpp>
+#include <Vector3.hpp>
 #include <cstdint>
 #include <vector>
 
@@ -42,14 +44,46 @@ public:
         uint8_t userData;
     };
 
+    // Cell
+    size_t dataSetId;
+    size_t cellId;
+
+    // Data
     std::vector<double> xyz;
     std::vector<float> rgb;
     std::vector<Attributes> attrib;
     std::vector<double> gps;
     std::vector<uint32_t> layer;
 
-    uint64_t fileFrom;
-    uint64_t id;
+    Aabb<double> boundary;
+
+    // State
+    bool loaded;
+    bool modified;
+
+    // Visualization
+    class View
+    {
+    public:
+        std::vector<float> xyz;
+        std::vector<float> rgb;
+
+        Aabb<float> boundary;
+
+        View();
+        ~View();
+
+        void resetFrame();
+        void nextFrame();
+        bool isStarted() const;
+        bool isFinished() const;
+
+    protected:
+        size_t renderStep;
+        size_t renderStepCount;
+    };
+
+    View view;
 
     DatabaseCell();
     ~DatabaseCell();

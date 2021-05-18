@@ -81,7 +81,7 @@ public:
     const Node *next(const Node *node, size_t idx) const;
     const Node *prev(const Node *node) const;
     const Node *at(size_t idx) const { return &nodes_[idx]; }
-    Aabb<double> boundary(const Node *node) const;
+    Aabb<double> boundary(const Node *node, const Aabb<double> &box) const;
 
     // IO
     void read(const std::string &path);

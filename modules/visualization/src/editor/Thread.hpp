@@ -18,32 +18,54 @@
 */
 
 /**
-    @file Forest3dPluginToolExample.hpp
+    @file Thread.hpp
 */
 
-#ifndef FOREST_3D_PLUGIN_TOOL_EXAMPLE_HPP
-#define FOREST_3D_PLUGIN_TOOL_EXAMPLE_HPP
+#ifndef THREAD_HPP
+#define THREAD_HPP
 
-#include <Forest3dPluginTool.hpp>
+#include <QMutex>
+#include <QThread>
+#include <QWaitCondition>
 
-class Forest3dPluginToolExampleWindow;
-
-/** Forest 3d Plugin Tool Example. */
-class Forest3dPluginToolExample : public QObject, public Forest3dPluginTool
+/** Thread. */
+class Thread : public QThread
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID Forest3dPluginTool_iid)
-    Q_INTERFACES(Forest3dPluginTool)
 
 public:
-    Forest3dPluginToolExample();
-    virtual ~Forest3dPluginToolExample();
+    Thread(QObject *parent = nullptr);
+    virtual ~Thread();
 
-    virtual void show(QWidget *parent, Forest3dEditor *editor);
-    virtual QString name() const;
+    void init();
+    void start();
+    void cancel();
+    void stop();
+
+    virtual bool compute() = 0;
 
 protected:
-    Forest3dPluginToolExampleWindow *window_;
+    /** Thread state. */
+    enum State
+    {
+        STATE_RUN,
+        STATE_CANCEL,
+        STATE_EXIT
+    };
+
+    // Thread state
+    QMutex mutex_;
+    QWaitCondition condition_;
+    State state_;
+    bool finished_;
+
+    // Synchronization to caller
+    QMutex mutexCaller_;
+    QWaitCondition conditionCaller_;
+    bool received_;
+
+    void setState(State state);
+    void run() override;
 };
 
-#endif /* FOREST_3D_PLUGIN_TOOL_EXAMPLE_HPP */
+#endif /* THREAD_HPP */

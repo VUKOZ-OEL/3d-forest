@@ -24,7 +24,7 @@
 #ifndef FOREST_3D_WINDOW_HPP
 #define FOREST_3D_WINDOW_HPP
 
-#include <Editor.hpp>
+#include <Forest3dEditor.hpp>
 #include <QMainWindow>
 #include <vector>
 
@@ -33,7 +33,7 @@ class Forest3dDataSets;
 class Forest3dLayers;
 class Forest3dPluginFile;
 class Forest3dPluginTool;
-class GLViewer;
+class Viewer;
 
 /** Forest 3d Main Window. */
 class Forest3dWindow : public QMainWindow
@@ -51,26 +51,47 @@ public:
     QSize sizeHint() const override;
 
 public slots:
+    // Project
     void actionProjectNew();
     void actionProjectOpen();
     void actionProjectSave();
     void actionProjectSaveAs();
     void actionProjectImport();
     void actionProjectExportAs();
+
+    // Viewports
+    void actionViewOrthographic();
+    void actionViewPerspective();
+    void actionViewTop();
+    void actionViewFront();
+    void actionViewLeft();
+    void actionView3d();
+    void actionViewResetDistance();
+    void actionViewResetCenter();
+
     void actionViewLayoutSingle();
     void actionViewLayoutTwoColumns();
+
+    // Plugins
     void actionPluginToolStart();
+
+    // Windows
     void actionDataSetVisible(size_t id, bool checked);
     void actionLayerVisible(size_t id, bool checked);
     void actionClipFilter(const ClipFilter &clipFilter);
+
     void actionAbout();
 
+    // Editor
+    void actionEditorUpdate();
+    void actionCameraChanged(bool finished);
+
 protected:
-    // Data
-    Editor editor_;
+    // Editor
+    Forest3dEditor editor_;
 
     // View
-    GLViewer *viewer_;
+    Viewer *viewer_;
 
     // Plugins
     std::vector<Forest3dPluginFile *> pluginsFile_;
@@ -85,11 +106,9 @@ protected:
     QMenu *menuTools_;
     QMenu *menuWindows_;
 
-    // Timers
-    int timerNewData_;
-
     // Initialization
     void initializeWindow();
+    void createEditor();
     void createViewer();
     void createMenus();
     void createWindows();
@@ -109,7 +128,6 @@ protected:
     void updateWindowTitle(const QString &path);
 
     // Events
-    void timerEvent(QTimerEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
 };
 

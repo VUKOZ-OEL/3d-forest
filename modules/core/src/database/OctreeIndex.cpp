@@ -334,7 +334,8 @@ const OctreeIndex::Node *OctreeIndex::prev(const Node *node) const
     return &nodes_[node->prev - 1];
 }
 
-Aabb<double> OctreeIndex::boundary(const Node *node) const
+Aabb<double> OctreeIndex::boundary(const Node *node,
+                                   const Aabb<double> &box) const
 {
     // Top
     const Node *data = nodes_.data();
@@ -361,7 +362,7 @@ Aabb<double> OctreeIndex::boundary(const Node *node) const
     }
 
     // Down
-    Aabb<double> boundary = boundary_;
+    Aabb<double> boundary = box;
     double px;
     double py;
     double pz;

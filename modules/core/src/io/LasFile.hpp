@@ -180,6 +180,7 @@ public:
                    double &y,
                    double &z,
                    const uint8_t *buffer) const;
+    void transformInvert(double &x, double &y, double &z) const;
 
     File &file() { return file_; }
 

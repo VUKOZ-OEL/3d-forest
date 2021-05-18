@@ -27,7 +27,6 @@
 #include <Forest3dPluginFile.hpp>
 #include <Forest3dPluginTool.hpp>
 #include <Forest3dWindow.hpp>
-#include <GLViewer.hpp>
 #include <QCloseEvent>
 #include <QCoreApplication>
 #include <QDebug>
@@ -36,6 +35,9 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPluginLoader>
+#include <Time.hpp>
+#include <Viewer.hpp>
+#include <iostream>
 
 const QString Forest3dWindow::APPLICATION_NAME = "3DForest";
 const QString Forest3dWindow::APPLICATION_VERSION = "1.0";
@@ -50,7 +52,6 @@ Forest3dWindow::Forest3dWindow(QWidget *parent) : QMainWindow(parent)
 
 Forest3dWindow::~Forest3dWindow()
 {
-    killTimer(timerNewData_);
 }
 
 QSize Forest3dWindow::minimumSizeHint() const
@@ -66,6 +67,7 @@ QSize Forest3dWindow::sizeHint() const
 void Forest3dWindow::initializeWindow()
 {
     // Create
+    createEditor();
     createMenus();
     createViewer();
     createWindows();
@@ -73,14 +75,24 @@ void Forest3dWindow::initializeWindow()
 
     // Update
     updateProject();
+}
 
-    // Start timers
-    timerNewData_ = startTimer(1000);
+void Forest3dWindow::createEditor()
+{
+    connect(&editor_.thread_,
+            SIGNAL(statusChanged()),
+            this,
+            SLOT(actionEditorUpdate()));
 }
 
 void Forest3dWindow::createViewer()
 {
-    viewer_ = new GLViewer(this);
+    viewer_ = new Viewer(this);
+    connect(viewer_,
+            SIGNAL(cameraChanged(bool)),
+            this,
+            SLOT(actionCameraChanged(bool)));
+
     setCentralWidget(viewer_);
 }
 
@@ -117,14 +129,44 @@ void Forest3dWindow::createMenus()
 
     // View
     QMenu *menuView = menuBar()->addMenu(tr("View"));
-    QMenu *menuViewLayout = menuView->addMenu(tr("Layout"));
-    (void)menuViewLayout->addAction(tr("Single"),
+    QMenu *menuViewCamera = menuView->addMenu(tr("Camera"));
+    (void)menuViewCamera->addAction(tr("Orthographic"),
                                     this,
-                                    &Forest3dWindow::actionViewLayoutSingle);
-    (void)menuViewLayout->addAction(
-        tr("Two Columns"),
-        this,
-        &Forest3dWindow::actionViewLayoutTwoColumns);
+                                    &Forest3dWindow::actionViewOrthographic);
+    (void)menuViewCamera->addAction(tr("Perspective"),
+                                    this,
+                                    &Forest3dWindow::actionViewPerspective);
+
+    (void)menuViewCamera->addSeparator();
+    (void)menuViewCamera->addAction(tr("Top"),
+                                    this,
+                                    &Forest3dWindow::actionViewTop);
+    (void)menuViewCamera->addAction(tr("Front"),
+                                    this,
+                                    &Forest3dWindow::actionViewFront);
+    (void)menuViewCamera->addAction(tr("Left"),
+                                    this,
+                                    &Forest3dWindow::actionViewLeft);
+    (void)menuViewCamera->addAction(tr("3D"),
+                                    this,
+                                    &Forest3dWindow::actionView3d);
+
+    (void)menuViewCamera->addSeparator();
+    (void)menuViewCamera->addAction(tr("Reset distance"),
+                                    this,
+                                    &Forest3dWindow::actionViewResetDistance);
+    (void)menuViewCamera->addAction(tr("Reset center"),
+                                    this,
+                                    &Forest3dWindow::actionViewResetCenter);
+
+    // QMenu *menuViewLayout = menuView->addMenu(tr("Layout"));
+    // (void)menuViewLayout->addAction(tr("Single"),
+    //                                 this,
+    //                                 &Forest3dWindow::actionViewLayoutSingle);
+    // (void)menuViewLayout->addAction(
+    //     tr("Two Columns"),
+    //     this,
+    //     &Forest3dWindow::actionViewLayoutTwoColumns);
 
     // Tools
     menuTools_ = menuBar()->addMenu(tr("Tools"));
@@ -233,7 +275,10 @@ void Forest3dWindow::createPlugins()
 
 void Forest3dWindow::actionProjectNew()
 {
-    (void)projectClose();
+    if (projectClose())
+    {
+        updateProject();
+    }
 }
 
 void Forest3dWindow::actionProjectOpen()
@@ -281,14 +326,54 @@ void Forest3dWindow::actionProjectExportAs()
 {
 }
 
+void Forest3dWindow::actionViewOrthographic()
+{
+    viewer_->setViewport(Viewer::VIEW_CAMERA_ORTHOGRAPHIC);
+}
+
+void Forest3dWindow::actionViewPerspective()
+{
+    viewer_->setViewport(Viewer::VIEW_CAMERA_PERSPECTIVE);
+}
+
+void Forest3dWindow::actionViewTop()
+{
+    viewer_->setViewport(Viewer::VIEW_CAMERA_TOP);
+}
+
+void Forest3dWindow::actionViewFront()
+{
+    viewer_->setViewport(Viewer::VIEW_CAMERA_FRONT);
+}
+
+void Forest3dWindow::actionViewLeft()
+{
+    viewer_->setViewport(Viewer::VIEW_CAMERA_LEFT);
+}
+
+void Forest3dWindow::actionView3d()
+{
+    viewer_->setViewport(Viewer::VIEW_CAMERA_3D);
+}
+
+void Forest3dWindow::actionViewResetDistance()
+{
+    viewer_->setViewport(Viewer::VIEW_CAMERA_RESET_DISTANCE);
+}
+
+void Forest3dWindow::actionViewResetCenter()
+{
+    viewer_->setViewport(Viewer::VIEW_CAMERA_RESET_CENTER);
+}
+
 void Forest3dWindow::actionViewLayoutSingle()
 {
-    viewer_->setViewLayout(GLViewer::VIEW_LAYOUT_SINGLE);
+    viewer_->setLayout(Viewer::VIEW_LAYOUT_SINGLE);
 }
 
 void Forest3dWindow::actionViewLayoutTwoColumns()
 {
-    viewer_->setViewLayout(GLViewer::VIEW_LAYOUT_TWO_COLUMNS);
+    viewer_->setLayout(Viewer::VIEW_LAYOUT_TWO_COLUMNS);
     updateViewer();
 }
 
@@ -306,7 +391,7 @@ void Forest3dWindow::actionPluginToolStart()
             {
                 try
                 {
-                    it->compute(this, editor_);
+                    it->show(this, &editor_);
                 }
                 catch (std::exception &e)
                 {
@@ -324,19 +409,22 @@ void Forest3dWindow::actionPluginToolStart()
 
 void Forest3dWindow::actionDataSetVisible(size_t id, bool checked)
 {
-    editor_.setVisibleDataSet(id, checked);
+    // thread_.cancel();
+    // editor_.setVisibleDataSet(id, checked);
     updateViewer();
 }
 
 void Forest3dWindow::actionLayerVisible(size_t id, bool checked)
 {
-    editor_.setVisibleLayer(id, checked);
+    // thread_.cancel();
+    // editor_.setVisibleLayer(id, checked);
     updateViewer();
 }
 
 void Forest3dWindow::actionClipFilter(const ClipFilter &clipFilter)
 {
-    editor_.setClipFilter(clipFilter);
+    // thread_.cancel();
+    // editor_.setClipFilter(clipFilter);
     updateViewer();
 }
 
@@ -347,7 +435,7 @@ void Forest3dWindow::actionAbout()
                            Forest3dWindow::APPLICATION_VERSION,
                        tr("3D Forest is software for analysis of Lidar data"
                           " from forest environment.\n\n"
-                          "Copyright 2020 VUKOZ\n"
+                          "Copyright 2020-2021 VUKOZ\n"
                           "Blue Cat team and other authors\n"
                           "https://www.3dforest.eu/"));
 }
@@ -363,7 +451,7 @@ bool Forest3dWindow::projectOpen(const QString &path)
     // Open new project
     try
     {
-        editor_.open(path.toStdString());
+        editor_.editor_.open(path.toStdString());
     }
     catch (std::exception &e)
     {
@@ -378,8 +466,10 @@ bool Forest3dWindow::projectOpen(const QString &path)
 
 bool Forest3dWindow::projectClose()
 {
+    editor_.thread_.cancel();
+
     // Save changes
-    if (editor_.hasUnsavedChanges())
+    if (editor_.editor_.hasUnsavedChanges())
     {
         QMessageBox msgBox;
         msgBox.setText("The document has been modified.");
@@ -416,8 +506,14 @@ bool Forest3dWindow::projectClose()
     }
 
     // Close
-    editor_.close();
-    updateProject();
+    try
+    {
+        editor_.editor_.close();
+    }
+    catch (std::exception &e)
+    {
+        // showError(e.what());
+    }
 
     return true; // Closed
 }
@@ -426,10 +522,12 @@ bool Forest3dWindow::projectSave(const QString &path)
 {
     std::string writePath;
 
+    editor_.thread_.cancel();
+
     if (path.isEmpty())
     {
         // Save
-        writePath = editor_.project().path();
+        writePath = editor_.editor_.project().path();
         if (writePath.empty())
         {
             // First time save
@@ -455,7 +553,7 @@ bool Forest3dWindow::projectSave(const QString &path)
     // Write
     try
     {
-        editor_.write(writePath);
+        editor_.editor_.write(writePath);
     }
     catch (std::exception &e)
     {
@@ -468,16 +566,33 @@ bool Forest3dWindow::projectSave(const QString &path)
 
 void Forest3dWindow::updateProject()
 {
-    windowDataSets_->updateEditor(editor_);
-    windowLayers_->updateEditor(editor_);
-    windowClipFilter_->updateEditor(editor_);
+    editor_.thread_.cancel();
+    editor_.editor_.lock();
+    viewer_->resetScene(&editor_.editor_);
+    editor_.editor_.unlock();
+
+    windowDataSets_->updateEditor(editor_.editor_);
+    windowLayers_->updateEditor(editor_.editor_);
+    windowClipFilter_->updateEditor(editor_.editor_);
     updateViewer();
-    updateWindowTitle(QString::fromStdString(editor_.project().path()));
+    updateWindowTitle(QString::fromStdString(editor_.editor_.project().path()));
+}
+
+void Forest3dWindow::actionCameraChanged(bool finished)
+{
+    editor_.thread_.start(viewer_->camera(), &editor_.editor_, finished);
+}
+
+void Forest3dWindow::actionEditorUpdate()
+{
+    editor_.editor_.lock();
+    viewer_->updateScene(&editor_.editor_);
+    editor_.editor_.unlock();
 }
 
 void Forest3dWindow::updateViewer()
 {
-    viewer_->updateScene(&editor_);
+    actionCameraChanged(true);
 }
 
 void Forest3dWindow::showError(const char *message)
@@ -496,15 +611,6 @@ void Forest3dWindow::updateWindowTitle(const QString &path)
         QString newtitle = APPLICATION_NAME + " - " + path;
         setWindowTitle(newtitle);
     }
-}
-
-void Forest3dWindow::timerEvent(QTimerEvent *event)
-{
-    (void)event;
-
-    // TBD thread + wait condition instead of a timer
-    editor_.updateView();
-    updateViewer();
 }
 
 void Forest3dWindow::closeEvent(QCloseEvent *event)

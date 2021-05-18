@@ -25,14 +25,20 @@
 #include <QDebug>
 #include <QMouseEvent>
 #include <QWheelEvent>
+#include <QtMath>
 #include <cmath>
 
 GLCamera::GLCamera()
-    : eye_(0.F, 0.F, 5.F), center_(0.F, 0.F, 0.F), up_(0.F, 1.F, 0.F),
-      viewport_(0, 0, 100, 100)
+    : eye_(0.0F, 0.0F, 1.0F), center_(0.0F, 0.0F, 0.0F),
+      right_(1.0F, 0.0F, 0.0F), up_(0.0F, 1.0F, 0.0F),
+      direction_(0.0F, 0.0F, 1.0F), rotation_(), distance_(1.0F), fov_(60.0F),
+      zNear_(0.01F), zFar_(100000.0F), perspective_(true),
+      viewport_(0, 0, 100, 100), sensitivityX_(1.0F), sensitivityY_(1.0F),
+      sensitivityZoom_(4.0F)
 {
     frustrumPlanes_.resize(24);
-    std::fill(frustrumPlanes_.begin(), frustrumPlanes_.end(), 0.F);
+    std::fill(frustrumPlanes_.begin(), frustrumPlanes_.end(), 0.0F);
+    setOrthographic();
 }
 
 GLCamera::~GLCamera()
@@ -41,13 +47,77 @@ GLCamera::~GLCamera()
 
 void GLCamera::setViewport(int x, int y, int width, int height)
 {
+    if (width < 1)
+    {
+        width = 1;
+    }
+
+    if (height < 1)
+    {
+        height = 1;
+    }
+
     viewport_.setRect(x, y, width, height);
+}
+
+void GLCamera::updateProjection()
+{
+    if (perspective_)
+    {
+        setPerspective();
+    }
+    else
+    {
+        setOrthographic();
+    }
+}
+
+void GLCamera::setPerspective()
+{
+    perspective_ = true;
+
+    float zNear = zNear_ * distance_;
+    float zFar = zFar_ * distance_;
+    setPerspective(fov_, zNear, zFar);
+}
+
+void GLCamera::setOrthographic()
+{
+    perspective_ = false;
+
+    // Aspect ratio
+    float w = static_cast<float>(viewport_.width());
+    float h = static_cast<float>(viewport_.height());
+    float aspect = w / h;
+
+    // Fake distance scaling from perspective projection
+    float d = 0.1F * (1.0F / distance_);
+    if (d < std::numeric_limits<float>::epsilon())
+    {
+        d = std::numeric_limits<float>::epsilon();
+    }
+    float orthoScaleInverted = 1.0F / d;
+
+    // Orthographic arguments
+    float w2 = 0.1F * 0.577350269F * orthoScaleInverted;
+    float left = -aspect * w2;
+    float right = aspect * w2;
+    float top = w2;
+    float bottom = -w2;
+
+    float zNear = -zFar_ * distance_;
+    float zFar = zFar_ * distance_;
+
+    // Projection matrix
+    QMatrix4x4 m;
+    m.ortho(left, right, bottom, top, zNear, zFar);
+    setProjection(m);
 }
 
 void GLCamera::setPerspective(float fovy, float zNear, float zFar)
 {
     float w = static_cast<float>(viewport_.width());
-    float h = static_cast<float>(viewport_.height() ? viewport_.height() : 1);
+    float h = static_cast<float>(viewport_.height());
     float aspect = w / h;
     setPerspective(fovy, aspect, zNear, zFar);
 }
@@ -59,47 +129,66 @@ void GLCamera::setPerspective(float fovy, float aspect, float zNear, float zFar)
     setProjection(m);
 }
 
+void GLCamera::setLookAt(const QVector3D &center, float distance)
+{
+    center_ = center;
+    rotation_ = QQuaternion();
+
+    setDistance(distance);
+}
+
 void GLCamera::setLookAt(const QVector3D &eye,
                          const QVector3D &center,
                          const QVector3D &up)
 {
-    eye_ = eye;
     center_ = center;
-    up_ = up;
 
-    QMatrix4x4 m;
-    m.lookAt(eye_, center_, up_);
-    setModelView(m);
+    QVector3D dir = center_ - eye;
+    distance_ = dir.length();
+    dir.normalize();
+
+    QVector3D right = QVector3D::crossProduct(dir, up);
+    QVector3D u = QVector3D::crossProduct(right, dir);
+
+    QMatrix3x3 m;
+    m(0, 0) = right.x();
+    m(0, 1) = right.y();
+    m(0, 2) = right.z();
+    m(1, 0) = u.x();
+    m(1, 1) = u.y();
+    m(1, 2) = u.z();
+    m(2, 0) = -dir.x();
+    m(2, 1) = -dir.y();
+    m(2, 2) = -dir.z();
+    rotation_ = QQuaternion::fromRotationMatrix(m);
+    rotation_.normalize();
+
+    updateProjection();
+    updateMatrix();
 }
 
 void GLCamera::setDistance(float distance)
 {
-    QVector3D dir = eye_ - center_;
-    dir.normalize();
+    if (distance < 1.0F)
+    {
+        distance = 1.0F;
+    }
+    distance_ = distance;
 
-    QVector3D eye = center_ + (dir * distance);
-
-    setLookAt(eye, center_, up_);
+    updateProjection();
+    updateMatrix();
 }
 
-float GLCamera::getDistance() const
+Camera GLCamera::toCamera() const
 {
-    return (eye_ - center_).length();
-}
+    Camera ret;
 
-QVector3D GLCamera::getDirection() const
-{
-    return getView().normalized();
-}
+    ret.eye.set(eye_.x(), eye_.y(), eye_.z());
+    ret.center.set(center_.x(), center_.y(), center_.z());
+    ret.up.set(up_.x(), up_.y(), up_.z());
+    ret.fov = fov_;
 
-QVector3D GLCamera::getView() const
-{
-    return center_ - eye_;
-}
-
-QVector3D GLCamera::getRight() const
-{
-    return QVector3D::crossProduct(getDirection(), up_);
+    return ret;
 }
 
 QVector3D GLCamera::project(const QVector3D &world) const
@@ -124,12 +213,12 @@ void GLCamera::getRay(int x, int y, QVector3D *base, QVector3D *direction)
     y = h - y;
     if (w > 0 && h > 0)
     {
-        pt[0] = ((2.F * static_cast<float>(x)) / static_cast<float>(w)) - 1.F;
-        pt[1] = ((2.F * static_cast<float>(y)) / static_cast<float>(h)) - 1.F;
+        pt[0] = ((2.0F * static_cast<float>(x)) / static_cast<float>(w)) - 1.0F;
+        pt[1] = ((2.0F * static_cast<float>(y)) / static_cast<float>(h)) - 1.0F;
     }
-    pt[2] = -1.F;
+    pt[2] = -1.0F;
     QVector3D p1 = projectionInv_.map(pt);
-    pt[2] = 1.0f;
+    pt[2] = 1.0F;
     QVector3D p2 = projectionInv_.map(pt);
     *base = modelViewInv_.map(p1);
 
@@ -176,7 +265,7 @@ void GLCamera::wheelEvent(QWheelEvent *event)
     }
     else if (!numDegrees.isNull())
     {
-        QPoint numSteps = numDegrees; // / 15;
+        QPoint numSteps = numDegrees;
         zoom(-(numSteps.y()));
     }
 
@@ -185,104 +274,53 @@ void GLCamera::wheelEvent(QWheelEvent *event)
 
 void GLCamera::rotate(int dx, int dy)
 {
-    QVector3D orientation1;
-    QVector3D orientation2;
-    QVector3D eye;
-    QVector3D center;
-    QVector3D up;
-    QVector3D right;
-    float angleX;
-    float angleY;
-    float distance;
+    float x = static_cast<float>(dx) / static_cast<float>(viewport_.width());
+    float y = static_cast<float>(dy) / static_cast<float>(viewport_.height());
 
-    eye = getEye();
-    center = getCenter();
-    up = getUp();
-    angleX = static_cast<float>(-dx) * 0.005F;
-    angleY = static_cast<float>(dy) * 0.005F;
+    float az = sensitivityX_ * x * 180.0F;
+    float ax = sensitivityY_ * y * 180.0F;
 
-    // X
-    orientation1 = eye - center;
-    distance = orientation1.length();
-    orientation1.normalize();
-    orientation2 = rotate(orientation1, up, angleX);
-    eye = center + (orientation2 * distance);
-    right = QVector3D::crossProduct(orientation2, up);
+    QQuaternion qx = QQuaternion::fromAxisAndAngle(QVector3D(1, 0, 0), ax);
+    QQuaternion qz = QQuaternion::fromAxisAndAngle(QVector3D(0, 0, 1), az);
 
-    // Y
-    orientation1 = eye - center;
-    distance = orientation1.length();
-    orientation1.normalize();
-    orientation2 = rotate(orientation1, right, angleY);
-    eye = center + (orientation2 * distance);
+    rotation_ = qx * rotation_ * qz;
+    rotation_.normalize();
 
-    // Update up
-    orientation1 = eye - center;
-    orientation1.normalize();
-    up = QVector3D::crossProduct(right, orientation1);
-
-    // Force major axis, depends on ground orientation in scene data
-    // TBD should not be parallel with 'orientation2'
-    up[0] = 0;
-    up[1] = 0;
-    up[2] = 1;
-    right = QVector3D::crossProduct(orientation2, up);
-    up = QVector3D::crossProduct(right, orientation2);
-
-    setLookAt(eye, center, up);
+    updateMatrix();
 }
 
 void GLCamera::pan(int dx, int dy)
 {
-    float mx = static_cast<float>(dx) * 0.2F;
-    float my = static_cast<float>(-dy) * 0.2F;
+    float x = static_cast<float>(dx) / static_cast<float>(viewport_.width());
+    float y = static_cast<float>(-dy) / static_cast<float>(viewport_.height());
 
-    QVector3D eye = getEye();
-    QVector3D center = getCenter();
-    QVector3D up = getUp();
-    QVector3D right = getRight();
-    QVector3D shift = (mx * right) + (my * up);
+    x *= sensitivityX_ * distance_;
+    y *= sensitivityY_ * distance_;
 
-    eye -= shift;
-    center -= shift;
+    QVector3D shift = (x * right_) + (y * up_);
+    center_ -= shift;
 
-    setLookAt(eye, center, up);
+    updateMatrix();
 }
 
-void GLCamera::zoom(int delta)
+void GLCamera::zoom(int dy)
 {
-    float d = getDistance();
-    d += static_cast<float>(delta) * 2.F;
-    if (d < 1.F)
-    {
-        d = 1.F;
-    }
-
-    setDistance(d);
+    float d = static_cast<float>(dy) / static_cast<float>(viewport_.height());
+    setDistance(distance_ * std::exp(sensitivityZoom_ * d));
 }
 
-QVector3D GLCamera::rotate(const QVector3D &v,
-                           const QVector3D &axis,
-                           float angle)
+void GLCamera::updateMatrix()
 {
-    QVector3D v2 = axis.normalized();
-    float w = cosf(-angle / 2.F);
-    float s = sinf(-angle / 2.F);
-    float xr = v2[0] * s;
-    float yr = v2[1] * s;
-    float zr = v2[2] * s;
-    float w2 = w * w;
-    float x2 = xr * xr;
-    float y2 = yr * yr;
-    float z2 = zr * zr;
+    QMatrix4x4 m;
+    m.translate(0, 0, -distance_);
+    m.rotate(rotation_);
+    m.translate(-center_);
+    setModelView(m);
 
-    return QVector3D(
-        v[0] * (w2 + x2 - y2 - z2) + v[1] * 2.F * (xr * yr + w * zr) +
-            v[2] * 2.F * (xr * zr - w * yr),
-        v[0] * 2.F * (xr * yr - w * zr) + v[1] * (w2 - x2 + y2 - z2) +
-            v[2] * 2.F * (yr * zr + w * xr),
-        v[0] * 2.F * (xr * zr + w * yr) + v[1] * 2.F * (yr * zr - w * xr) +
-            v[2] * (w2 - x2 - y2 + z2));
+    up_ = QVector3D(m(1, 0), m(1, 1), m(1, 2));
+    right_ = QVector3D(m(0, 0), m(0, 1), m(0, 2));
+    direction_ = QVector3D(m(2, 0), m(2, 1), m(2, 2));
+    eye_ = center_ + (direction_ * distance_);
 }
 
 void GLCamera::setModelView(const QMatrix4x4 &m)

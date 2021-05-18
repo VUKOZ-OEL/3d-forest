@@ -33,6 +33,7 @@ public:
     Matrix4();
     Matrix4(const Matrix4<T> &m) = default;
     template <class B> Matrix4(const Matrix4<B> &m);
+    template <class B> Matrix4(const B *data);
     Matrix4(T m00,
             T m01,
             T m02,
@@ -52,15 +53,17 @@ public:
     ~Matrix4();
     Matrix4<T> &operator=(const Matrix4<T> &m) = default;
 
+    template <class B> void set(const B *data);
+
     const T &operator()(size_t r, size_t c) const { return data_[c][r]; }
     T &operator()(size_t r, size_t c) { return data_[c][r]; }
-    const T &operator[](size_t r, size_t c) const { return data_[c][r]; }
-    T &operator[](size_t r, size_t c) { return data_[c][r]; }
     const T *data() const { return &data_[0][0]; }
 
     void setToIdentity();
     void invert();
     Matrix4<T> inverted() const;
+
+    void translate(T x, T y, T z);
 
     void perspective(T fovy, T aspect, T near, T far);
     void ortho(T left, T right, T bottom, T top, T near, T far);
@@ -152,6 +155,34 @@ inline Matrix4<T>::Matrix4(const Matrix4<B> &m)
     data_[3][1] = static_cast<T>(m.data_[3][1]);
     data_[3][2] = static_cast<T>(m.data_[3][2]);
     data_[3][3] = static_cast<T>(m.data_[3][3]);
+}
+
+template <class T> template <class B> inline Matrix4<T>::Matrix4(const B *data)
+{
+    set(data);
+}
+
+template <class T> template <class B> inline void Matrix4<T>::set(const B *data)
+{
+    data_[0][0] = static_cast<T>(data[0]);
+    data_[0][1] = static_cast<T>(data[1]);
+    data_[0][2] = static_cast<T>(data[2]);
+    data_[0][3] = static_cast<T>(data[3]);
+
+    data_[1][0] = static_cast<T>(data[4]);
+    data_[1][1] = static_cast<T>(data[5]);
+    data_[1][2] = static_cast<T>(data[6]);
+    data_[1][3] = static_cast<T>(data[7]);
+
+    data_[2][0] = static_cast<T>(data[8]);
+    data_[2][1] = static_cast<T>(data[9]);
+    data_[2][2] = static_cast<T>(data[10]);
+    data_[2][3] = static_cast<T>(data[11]);
+
+    data_[3][0] = static_cast<T>(data[12]);
+    data_[3][1] = static_cast<T>(data[13]);
+    data_[3][2] = static_cast<T>(data[14]);
+    data_[3][3] = static_cast<T>(data[15]);
 }
 
 template <class T>
@@ -354,6 +385,16 @@ template <class T> inline Matrix4<T> Matrix4<T>::inverted() const
     return m;
 }
 
+template <class T> inline void Matrix4<T>::translate(T x, T y, T z)
+{
+    Matrix4<T> m1(*this);
+    Matrix4<T> m2;
+    m2.data_[3][0] = x;
+    m2.data_[3][1] = y;
+    m2.data_[3][2] = z;
+    *this = m1 * m2;
+}
+
 template <class T>
 inline void Matrix4<T>::perspective(T fovy, T aspect, T near, T far)
 {
@@ -362,8 +403,8 @@ inline void Matrix4<T>::perspective(T fovy, T aspect, T near, T far)
 
     data_[0][0] = f / aspect;
     data_[1][1] = f;
-    data_[2][2] = (far + near) / (near - far);
-    data_[3][2] = (2 * far * near) / (near - far);
+    // data_[2][2] = (far + near) / (near - far);
+    // data_[3][2] = (2 * far * near) / (near - far);
     data_[2][3] = -1;
     data_[3][3] = 0;
 }
@@ -373,10 +414,10 @@ inline void Matrix4<T>::ortho(T left, T right, T bottom, T top, T near, T far)
 {
     data_[0][0] = 2 / (right - left);
     data_[1][1] = 2 / (top - bottom);
-    data_[2][2] = -2 / (far - near);
+    // data_[2][2] = -2 / (far - near);
     data_[3][0] = -((right + left) / (right - left));
     data_[3][1] = -((top + bottom) / (top - bottom));
-    data_[3][2] = -((far + near) / (far - near));
+    // data_[3][2] = -((far + near) / (far - near));
 }
 
 template <class T>
