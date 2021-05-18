@@ -99,6 +99,7 @@ public:
     Json(const char *in);
     Json(const std::string &in);
     Json(const std::vector<double> &in);
+    Json(unsigned long in);
 
     void clear();
 
@@ -210,6 +211,10 @@ inline Json::Json(double in)
 }
 
 inline Json::Json(int64_t in)
+{
+    createNumber(static_cast<double>(in));
+}
+inline Json::Json(unsigned long in)
 {
     createNumber(static_cast<double>(in));
 }
