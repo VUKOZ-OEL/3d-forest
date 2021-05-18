@@ -25,6 +25,8 @@
 #define AABB_HPP
 
 #include <Json.hpp>
+#include <cmath>
+#include <vector>
 
 /** Axis-Aligned Bounding Box. */
 template <class T> class Aabb
@@ -36,12 +38,19 @@ public:
     template <class B> Aabb(const Aabb<B> &box);
 
     void set(T x1, T y1, T z1, T x2, T y2, T z2);
+    void set(const std::vector<T> &xyz);
+    void extend(const Aabb<T> &box);
     void clear();
+
+    bool empty() const { return empty_; }
 
     const T &min(size_t idx) const { return min_[idx]; }
     const T &max(size_t idx) const { return max_[idx]; }
 
     void getCenter(T &x, T &y, T &z) const;
+    T distance(T x, T y, T z) const;
+    T radius() const;
+
     bool intersects(const Aabb<T> &box) const;
     bool isInside(const Aabb<T> &box) const;
     bool isInside(T x, T y, T z) const;
@@ -52,6 +61,9 @@ public:
 protected:
     T min_[3];
     T max_[3];
+    bool empty_;
+
+    void validate();
 };
 
 template <class T> inline Aabb<T>::Aabb()
@@ -71,6 +83,7 @@ template <class T> template <class B> inline Aabb<T>::Aabb(const Aabb<B> &box)
     max_[0] = static_cast<T>(box.max_[0]);
     max_[1] = static_cast<T>(box.max_[1]);
     max_[2] = static_cast<T>(box.max_[2]);
+    validate();
 }
 
 template <class T> inline void Aabb<T>::set(T x1, T y1, T z1, T x2, T y2, T z2)
@@ -107,12 +120,84 @@ template <class T> inline void Aabb<T>::set(T x1, T y1, T z1, T x2, T y2, T z2)
         min_[2] = z1;
         max_[2] = z2;
     }
+
+    validate();
+}
+
+template <class T> inline void Aabb<T>::set(const std::vector<T> &xyz)
+{
+    size_t n = xyz.size() / 3;
+    if (n > 0)
+    {
+        T min_x = xyz[0];
+        T min_y = xyz[1];
+        T min_z = xyz[2];
+        T max_x = xyz[0];
+        T max_y = xyz[1];
+        T max_z = xyz[2];
+
+        for (size_t i = 1; i < n; i++)
+        {
+            if (xyz[3 * i + 0] < min_x)
+                min_x = xyz[3 * i + 0];
+            else if (xyz[3 * i + 0] > max_x)
+                max_x = xyz[3 * i + 0];
+            if (xyz[3 * i + 1] < min_y)
+                min_y = xyz[3 * i + 1];
+            else if (xyz[3 * i + 1] > max_y)
+                max_y = xyz[3 * i + 1];
+            if (xyz[3 * i + 2] < min_z)
+                min_z = xyz[3 * i + 2];
+            else if (xyz[3 * i + 2] > max_z)
+                max_z = xyz[3 * i + 2];
+        }
+
+        set(min_x, min_y, min_z, max_x, max_y, max_z);
+    }
+    else
+    {
+        clear();
+    }
+}
+
+template <class T> inline void Aabb<T>::extend(const Aabb<T> &box)
+{
+    if (!box.empty())
+    {
+        if (empty())
+        {
+            *this = box;
+        }
+        else
+        {
+            if (box.min_[0] < min_[0])
+                min_[0] = box.min_[0];
+            if (box.max_[0] > max_[0])
+                max_[0] = box.max_[0];
+            if (box.min_[1] < min_[1])
+                min_[1] = box.min_[1];
+            if (box.max_[1] > max_[1])
+                max_[1] = box.max_[1];
+            if (box.min_[2] < min_[2])
+                min_[2] = box.min_[2];
+            if (box.max_[2] > max_[2])
+                max_[2] = box.max_[2];
+
+            validate();
+        }
+    }
 }
 
 template <class T> inline void Aabb<T>::clear()
 {
     min_[0] = min_[1] = min_[2] = 0;
     max_[0] = max_[1] = max_[2] = 0;
+    empty_ = true;
+}
+
+template <class T> inline void Aabb<T>::validate()
+{
+    empty_ = false;
 }
 
 template <class T> inline void Aabb<T>::getCenter(T &x, T &y, T &z) const
@@ -120,6 +205,30 @@ template <class T> inline void Aabb<T>::getCenter(T &x, T &y, T &z) const
     x = min_[0] + ((max_[0] - min_[0]) / 2);
     y = min_[1] + ((max_[1] - min_[1]) / 2);
     z = min_[2] + ((max_[2] - min_[2]) / 2);
+}
+
+template <class T> inline T Aabb<T>::distance(T x, T y, T z) const
+{
+    T u, v, w;
+    T ret;
+
+    getCenter(u, v, w);
+    ret = std::sqrt((u - x) * (u - x) + (v - y) * (v - y) + (w - z) * (w - z));
+
+    return ret;
+}
+
+template <class T> inline T Aabb<T>::radius() const
+{
+    T u, v, w;
+    T ret;
+
+    u = (max_[0] - min_[0]) * 0.5;
+    v = (max_[1] - min_[1]) * 0.5;
+    w = (max_[2] - min_[2]) * 0.5;
+    ret = std::sqrt((u * u) + (v * v) + (w * w));
+
+    return ret;
 }
 
 template <class T> inline bool Aabb<T>::intersects(const Aabb &box) const

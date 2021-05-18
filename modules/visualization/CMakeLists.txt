@@ -35,6 +35,7 @@ file(GLOB_RECURSE SOURCES_VISUALIZATION "src/*.cpp")
 
 add_library(${SUB_PROJECT_NAME} SHARED ${SOURCES_VISUALIZATION})
 
+target_include_directories(${SUB_PROJECT_NAME} PUBLIC src/editor)
 target_include_directories(${SUB_PROJECT_NAME} PUBLIC src/opengl)
 target_include_directories(${SUB_PROJECT_NAME} PUBLIC src/widgets)
 

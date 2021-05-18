@@ -22,11 +22,9 @@
 */
 
 #include <Forest3dPluginToolExample.hpp>
-#include <Forest3dWindow.hpp>
-#include <QDebug>
-#include <QMessageBox>
+#include <Forest3dPluginToolExampleWindow.hpp>
 
-Forest3dPluginToolExample::Forest3dPluginToolExample()
+Forest3dPluginToolExample::Forest3dPluginToolExample() : window_(nullptr)
 {
 }
 
@@ -34,10 +32,16 @@ Forest3dPluginToolExample::~Forest3dPluginToolExample()
 {
 }
 
-void Forest3dPluginToolExample::compute(Forest3dWindow *parent, Editor &editor)
+void Forest3dPluginToolExample::show(QWidget *parent, Forest3dEditor *editor)
 {
-    (void)editor;
-    (void)QMessageBox::information(parent, name(), "Tool plugin example");
+    if (!window_)
+    {
+        window_ = new Forest3dPluginToolExampleWindow(parent, editor);
+    }
+
+    window_->show();
+    window_->raise();
+    window_->activateWindow();
 }
 
 QString Forest3dPluginToolExample::name() const

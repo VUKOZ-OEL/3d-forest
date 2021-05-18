@@ -25,8 +25,10 @@
 #define DATABASE_HPP
 
 #include <Aabb.hpp>
+#include <Camera.hpp>
 #include <DatabaseCell.hpp>
 #include <DatabaseDataSet.hpp>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -37,21 +39,48 @@ public:
     Database();
     ~Database();
 
-    void openDataSet(uint64_t id, const std::string &path);
+    void addDataSet(size_t id, const std::string &path, bool enabled);
     void clear();
 
-    void updateView();
-    // size_t map(uint64_t index);
+    const Aabb<double> &boundary() const { return boundary_; }
+    const Aabb<double> &boundaryView() const { return boundaryView_; }
 
-    size_t cellSize() const { return cells_.size(); }
-    const DatabaseCell &cell(size_t i) const { return *cells_[i]; }
+    void select(std::vector<OctreeIndex::Selection> &selection);
+
+    void updateCamera(const Camera &camera, bool interactionFinished);
+    bool loadView();
+
+    size_t cellSize() const { return view_.size(); }
+    DatabaseCell &cell(size_t i) { return *view_[i]; }
+    const DatabaseCell &cell(size_t i) const { return *view_[i]; }
+
+    bool isCached(size_t d, size_t c) const;
+    DatabaseCell *get(size_t d, size_t c) const;
 
 protected:
-    size_t maxCache_;
-    size_t loaded_;
-    size_t maximum_;
-    std::vector<std::shared_ptr<DatabaseDataSet>> dataSets_;
-    std::vector<std::shared_ptr<DatabaseCell>> cells_;
+    // Data Sets
+    std::map<size_t, std::shared_ptr<DatabaseDataSet>> dataSets_;
+    Aabb<double> boundary_;
+    Aabb<double> boundaryView_;
+
+    void updateBoundary();
+
+    // Cache
+    struct Key
+    {
+        size_t dataSetId;
+        size_t cellId;
+
+        bool operator<(const Key &rhs) const;
+    };
+    size_t cacheSizeMax_;
+    std::map<Key, std::shared_ptr<DatabaseCell>> cache_;
+
+    // View
+    std::vector<std::shared_ptr<DatabaseCell>> view_;
+
+    void loadView(size_t idx);
+    void resetRendering();
 };
 
 #endif /* DATABASE_HPP */

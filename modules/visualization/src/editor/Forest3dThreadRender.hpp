@@ -18,37 +18,39 @@
 */
 
 /**
-    @file GLNode.hpp
+    @file Forest3dThreadRender.hpp
 */
 
-#ifndef GL_NODE_HPP
-#define GL_NODE_HPP
+#ifndef FOREST_3D_THREAD_RENDER_HPP
+#define FOREST_3D_THREAD_RENDER_HPP
 
-#include <GLAabb.hpp>
-#include <QMatrix4x4>
-#include <QVector3D>
+#include <Camera.hpp>
+#include <QObject>
+#include <Thread.hpp>
 
-/** OpenGL Node. */
-class GLNode
+class Editor;
+
+class Forest3dThreadRender : public Thread
 {
+    Q_OBJECT
+
 public:
-    QVector3D color;
-    QMatrix4x4 transformation;
+    Forest3dThreadRender(QObject *parent = nullptr);
+    virtual ~Forest3dThreadRender();
 
-    GLNode();
-    virtual ~GLNode();
+    void start(const Camera &camera, Editor *editor, bool finished);
+    void restart();
 
-    virtual void render();
-    virtual void validate();
+    virtual bool compute();
 
-    void invalidate() { aabb_.invalidate(); }
-
-    const GLAabb &getAabb() const { return aabb_; }
+signals:
+    void statusChanged();
 
 protected:
-    GLAabb aabb_;
-
-    void renderAabb();
+    Editor *editor_;
+    Camera camera_;
+    bool interactionFinished_;
+    bool initialized_;
 };
 
-#endif /* GL_NODE_HPP */
+#endif /* FOREST_3D_THREAD_RENDER_HPP */

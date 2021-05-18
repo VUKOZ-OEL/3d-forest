@@ -661,7 +661,7 @@ void DatabaseBuilder::stateNodeInsert()
     outputLas_.file().read(buffer, step);
 
     Aabb<double> box;
-    box = indexMain_.boundary(node);
+    box = indexMain_.boundary(node, indexMain_.boundary());
 
     indexNode_.clear();
     indexNode_.insertBegin(box, settings_.maxSize2, settings_.maxLevel2, true);

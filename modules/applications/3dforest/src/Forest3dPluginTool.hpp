@@ -24,18 +24,18 @@
 #ifndef FOREST_3D_PLUGIN_TOOL_HPP
 #define FOREST_3D_PLUGIN_TOOL_HPP
 
-#include <Editor.hpp>
 #include <QString>
 #include <QtPlugin>
 
-class Forest3dWindow;
+class Forest3dEditor;
+class QWidget;
 
 /** Forest 3d Plugin Tool Interface. */
 class Forest3dPluginTool
 {
 public:
     virtual ~Forest3dPluginTool() = default;
-    virtual void compute(Forest3dWindow *parent, Editor &editor) = 0;
+    virtual void show(QWidget *parent, Forest3dEditor *editor) = 0;
     virtual QString name() const = 0; // Unique menu name for each plugin
 };
 

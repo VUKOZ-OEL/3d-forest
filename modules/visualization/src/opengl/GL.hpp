@@ -18,44 +18,38 @@
 */
 
 /**
-    @file DatabaseCell.cpp
+    @file GL.hpp
 */
 
-#include <DatabaseCell.hpp>
+#ifndef GL_HPP
+#define GL_HPP
 
-DatabaseCell::DatabaseCell()
-    : dataSetId(0), cellId(0), loaded(false), modified(false)
-{
-}
+#include <GLAabb.hpp>
+#include <QVector3D>
+#include <vector>
 
-DatabaseCell::~DatabaseCell()
+/** OpenGL. */
+class GL
 {
-}
+public:
+    enum Mode
+    {
+        POINTS,
+        LINES,
+        QUADS
+    };
 
-DatabaseCell::View::View() : renderStep(1), renderStepCount(1)
-{
-}
+    GL();
+    ~GL();
 
-DatabaseCell::View::~View()
-{
-}
+    static void render(Mode mode,
+                       const std::vector<float> &xyz,
+                       const std::vector<float> &rgb);
 
-void DatabaseCell::View::resetFrame()
-{
-    renderStep = 1;
-}
+    static void renderAabb(const GLAabb &box);
+    static void renderAxis(const GLAabb &box, const QVector3D &center);
 
-void DatabaseCell::View::nextFrame()
-{
-    renderStep++;
-}
+protected:
+};
 
-bool DatabaseCell::View::isStarted() const
-{
-    return renderStep == 1;
-}
-
-bool DatabaseCell::View::isFinished() const
-{
-    return renderStep > renderStepCount;
-}
+#endif /* GL_HPP */

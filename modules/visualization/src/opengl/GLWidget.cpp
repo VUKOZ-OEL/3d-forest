@@ -21,108 +21,28 @@
     @file GLWidget.cpp
 */
 
-#include <GLMesh.hpp>
-#include <GLViewer.hpp>
+#include <Editor.hpp>
+#include <GL.hpp>
 #include <GLWidget.hpp>
-#include <MeshNode.hpp>
-#include <QDebug>
 #include <QMouseEvent>
 #include <QWheelEvent>
+#include <Time.hpp>
+#include <Viewer.hpp>
 
 GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent)
 {
-    initializeGLWidget();
+    viewer_ = nullptr;
+    selected_ = false;
+    editor_ = nullptr;
+
+    resetCamera();
 }
 
 GLWidget::~GLWidget()
 {
 }
 
-void GLWidget::initializeGLWidget()
-{
-    validateNodes();
-
-    QVector3D eye(0.F, 0.F, 5.F);
-    QVector3D center(0.F, 0.F, 0.F);
-    QVector3D up(0.F, 1.F, 0.F);
-    if (aabb_.isValid())
-    {
-        center = aabb_.getCenter();
-        eye = center + QVector3D(0.F, 0.F, 2.F) * aabb_.getRadius();
-    }
-    camera_.setLookAt(eye, center, up);
-}
-
-void GLWidget::updateScene(const Scene &scene)
-{
-    (void)scene;
-
-    nodes_.clear();
-#if 0
-    for (const auto &it : scene)
-    {
-        const MeshNode *mesh = dynamic_cast<const MeshNode *>(it.get());
-        if (mesh)
-        {
-            std::shared_ptr<GLMesh> glmesh = std::make_shared<GLMesh>();
-            glmesh->color = QVector3D(1.F, 1.F, 1.F);
-            glmesh->mode = GLMesh::POINTS;
-            glmesh->xyz = mesh->xyz;
-            glmesh->rgb = mesh->rgb;
-            nodes_.push_back(glmesh);
-        }
-    }
-#endif
-    validateNodes();
-    resetCamera();
-}
-
-void GLWidget::updateScene(Editor *editor)
-{
-    size_t prevSize = nodes_.size();
-
-    nodes_.clear();
-
-    size_t n = editor->database().cellSize();
-    for (size_t i = 0; i < n; i++)
-    {
-        const DatabaseCell &cell = editor->database().cell(i);
-
-        std::shared_ptr<GLMesh> glmesh = std::make_shared<GLMesh>();
-        glmesh->color = QVector3D(1.F, 1.F, 1.F);
-        glmesh->mode = GLMesh::POINTS;
-
-        size_t m = cell.xyz.size();
-        glmesh->xyz.resize(m);
-        for (size_t j = 0; j < m; j++)
-        {
-            glmesh->xyz[j] = static_cast<float>(cell.xyz[j]);
-        }
-        glmesh->rgb = cell.rgb;
-        nodes_.push_back(glmesh);
-    }
-
-    validateNodes();
-    if (prevSize == 0)
-    {
-        resetCamera();
-    }
-}
-
-void GLWidget::resetCamera()
-{
-    QVector3D eye(0.F, 5.F, 0.F);
-    QVector3D center(0.F, 0.F, 0.F);
-    QVector3D up(0.F, 0.F, 1.F);
-    if (aabb_.isValid())
-    {
-        center = aabb_.getCenter();
-        eye = center + QVector3D(0.F, 1.F, 1.F) * aabb_.getRadius();
-    }
-    camera_.setLookAt(eye, center, up);
-}
-
-void GLWidget::setViewer(GLViewer *viewer)
+void GLWidget::setViewer(Viewer *viewer)
 {
     viewer_ = viewer;
 }
@@ -137,35 +57,150 @@ bool GLWidget::isSelected() const
     return selected_;
 }
 
-void GLWidget::validateNodes()
+void GLWidget::updateScene(Editor *editor)
 {
-    aabb_.invalidate();
+    editor_ = editor;
+}
 
-    for (auto &node : nodes_)
+void GLWidget::resetScene(Editor *editor)
+{
+    aabb_.set(editor->boundaryView());
+    resetCamera();
+}
+
+Camera GLWidget::camera() const
+{
+    return camera_.toCamera();
+}
+
+void GLWidget::setViewOrthographic()
+{
+    camera_.setOrthographic();
+    cameraChanged(true);
+}
+
+void GLWidget::setViewPerspective()
+{
+    camera_.setPerspective();
+    cameraChanged(true);
+}
+
+void GLWidget::setViewDirection(const QVector3D &dir, const QVector3D &up)
+{
+    QVector3D center = camera_.getCenter();
+    float distance = camera_.getDistance();
+
+    QVector3D eye = (dir * distance) + center;
+    camera_.setLookAt(eye, center, up);
+    cameraChanged(true);
+}
+
+void GLWidget::setViewTop()
+{
+    QVector3D dir(0.0F, 0.0F, 1.0F);
+    QVector3D up(0.0F, 1.0F, 0.0F);
+    setViewDirection(dir, up);
+}
+
+void GLWidget::setViewFront()
+{
+    QVector3D dir(0.0F, -1.0F, 0.0F);
+    QVector3D up(0.0F, 0.0F, 1.0F);
+    setViewDirection(dir, up);
+}
+
+void GLWidget::setViewLeft()
+{
+    QVector3D dir(-1.0F, 0.0F, 0.0F);
+    QVector3D up(0.0F, 0.0F, 1.0F);
+    setViewDirection(dir, up);
+}
+
+void GLWidget::setView3d()
+{
+    QVector3D dir(-1.0F, -1.0F, 1.0F);
+    QVector3D up(1.065F, 1.0F, 1.0F);
+    up.normalize();
+    setViewDirection(dir, up);
+}
+
+void GLWidget::resetCamera()
+{
+    QVector3D center(0.0F, 0.0F, 0.0F);
+    float distance = 1.0F;
+
+    if (aabb_.isValid())
     {
-        node->validate();
-        aabb_.extend(node->getAabb());
+        center = aabb_.getCenter();
+        center[2] = aabb_.getMin().z();
+        distance = aabb_.getRadius();
     }
+
+    QVector3D eye(-1.0F, -1.0F, 1.0F);
+    QVector3D up(1.065F, 1.0F, 1.0F);
+    up.normalize();
+
+    eye = (eye * distance) + center;
+    camera_.setLookAt(eye, center, up);
+}
+
+void GLWidget::setViewResetDistance()
+{
+    QVector3D center = camera_.getCenter();
+    QVector3D up = camera_.getUp();
+    QVector3D dir = camera_.getDirection();
+
+    float distance = 1.0F;
+    if (aabb_.isValid())
+    {
+        distance = aabb_.getRadius();
+    }
+
+    QVector3D eye = (dir * distance) + center;
+    camera_.setLookAt(eye, center, up);
+    cameraChanged(true);
+}
+
+void GLWidget::setViewResetCenter()
+{
+    QVector3D dir = camera_.getDirection();
+    QVector3D up = camera_.getUp();
+    float distance = camera_.getDistance();
+
+    QVector3D center = camera_.getCenter();
+    if (aabb_.isValid())
+    {
+        center = aabb_.getCenter();
+        center[2] = aabb_.getMin().z();
+    }
+
+    QVector3D eye = (dir * distance) + center;
+    camera_.setLookAt(eye, center, up);
+    cameraChanged(true);
 }
 
 void GLWidget::initializeGL()
 {
     initializeOpenGLFunctions();
 
+    setUpdateBehavior(QOpenGLWidget::PartialUpdate);
+
     glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+    glClearDepth(1.0F);
 }
 
 void GLWidget::paintGL()
 {
+    // Background
     if (isSelected())
     {
-        glClearColor(0.1F, 0.1F, 0.1F, 1.0F);
+        glClearColor(0.0F, 0.0F, 0.0F, 0.0F);
     }
     else
     {
-        glClearColor(0.0F, 0.0F, 0.0F, 1.0F);
+        glClearColor(0.1F, 0.1F, 0.1F, 0.0F);
     }
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Setup camera
     glViewport(0, 0, camera_.width(), camera_.height());
@@ -176,39 +211,85 @@ void GLWidget::paintGL()
     glMatrixMode(GL_MODELVIEW);
     glLoadMatrixf(camera_.getModelView().data());
 
-    // Render nodes
-    for (auto &node : nodes_)
+    // Render
+    renderScene();
+
+    GL::renderAabb(aabb_);
+    //GL::renderAxis(aabb_, camera_.getCenter());
+}
+
+void GLWidget::renderScene()
+{
+    if (!editor_)
     {
-        node->render();
+        return;
     }
+
+    editor_->lock();
+
+    double t1 = getRealTime();
+
+    size_t cellSize = editor_->database().cellSize();
+
+    for (size_t cellIndex = 0; cellIndex < cellSize; cellIndex++)
+    {
+        DatabaseCell &cell = editor_->database().cell(cellIndex);
+
+        if (cell.loaded && !cell.view.isFinished())
+        {
+            if (cellIndex == 0 && cell.view.isStarted())
+            {
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            }
+
+            GL::render(GL::POINTS, cell.view.xyz, cell.view.rgb);
+            glFlush();
+
+            cell.view.nextFrame();
+
+            double t2 = getRealTime();
+            if (t2 - t1 > 0.02 && cellIndex > 4)
+            {
+                break;
+            }
+        }
+    }
+
+    editor_->unlock();
 }
 
 void GLWidget::resizeGL(int w, int h)
 {
     camera_.setViewport(0, 0, w, h);
-    camera_.setPerspective(60.0F, 3.0F, 1000.0F);
+    camera_.updateProjection();
+    cameraChanged(true);
+}
+
+void GLWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+    (void)event;
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
-    if (!isSelected())
-    {
-        if (viewer_)
-        {
-            viewer_->selectViewport(this);
-        }
-    }
-
     camera_.mousePressEvent(event);
+    setFocus();
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
     camera_.mouseMoveEvent(event);
-    update();
+    cameraChanged(true);
 }
 
 void GLWidget::wheelEvent(QWheelEvent *event)
+{
+    camera_.wheelEvent(event);
+    setFocus();
+    cameraChanged(true);
+}
+
+void GLWidget::setFocus()
 {
     if (!isSelected())
     {
@@ -217,7 +298,12 @@ void GLWidget::wheelEvent(QWheelEvent *event)
             viewer_->selectViewport(this);
         }
     }
+}
 
-    camera_.wheelEvent(event);
-    update();
+void GLWidget::cameraChanged(bool interactionFinished)
+{
+    if (viewer_)
+    {
+        emit viewer_->cameraChanged(interactionFinished);
+    }
 }

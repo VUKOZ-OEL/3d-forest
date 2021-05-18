@@ -24,18 +24,18 @@
 #ifndef FOREST_3D_PLUGIN_FILE_HPP
 #define FOREST_3D_PLUGIN_FILE_HPP
 
-#include <Editor.hpp>
 #include <QString>
 #include <QtPlugin>
 
-class Forest3dWindow;
+class QWidget;
+class Forest3dEditor;
 
 /** Forest 3d Plugin File Interface. */
 class Forest3dPluginFile
 {
 public:
     virtual ~Forest3dPluginFile() = default;
-    virtual void compute(Forest3dWindow *parent, Editor &editor) = 0;
+    virtual void compute(QWidget *parent, Forest3dEditor *editor) = 0;
     virtual QString name() const = 0; // Unique menu name for each plugin
 };
 

@@ -540,6 +540,13 @@ void LasFile::transform(double &x,
     z = (pz * header.z_scale_factor) + header.z_offset;
 }
 
+void LasFile::transformInvert(double &x, double &y, double &z) const
+{
+    x = (x - header.x_offset) / header.x_scale_factor;
+    y = (y - header.y_offset) / header.y_scale_factor;
+    z = (z - header.z_offset) / header.z_scale_factor;
+}
+
 Json &LasFile::Point::write(Json &out) const
 {
     out["coordinates"][0] = x;

@@ -24,16 +24,14 @@
 #ifndef GL_WIDGET_HPP
 #define GL_WIDGET_HPP
 
-#include <Editor.hpp>
+#include <Camera.hpp>
 #include <GLAabb.hpp>
 #include <GLCamera.hpp>
-#include <GLNode.hpp>
 #include <QOpenGLFunctions>
 #include <QOpenGLWidget>
-#include <Scene.hpp>
-#include <vector>
 
-class GLViewer;
+class Editor;
+class Viewer;
 class QMouseEvent;
 class QWheelEvent;
 
@@ -46,36 +44,49 @@ public:
     explicit GLWidget(QWidget *parent = nullptr);
     ~GLWidget();
 
-    void setViewer(GLViewer *viewer);
+    void setViewer(Viewer *viewer);
 
     void setSelected(bool selected);
     bool isSelected() const;
 
-    void updateScene(const Scene &scene);
     void updateScene(Editor *editor);
+    void resetScene(Editor *editor);
 
-    void resetCamera();
+    Camera camera() const;
+
+    void setViewOrthographic();
+    void setViewPerspective();
+    void setViewTop();
+    void setViewFront();
+    void setViewLeft();
+    void setView3d();
+    void setViewResetDistance();
+    void setViewResetCenter();
 
 protected:
     // Qt
     void initializeGL() override;
     void paintGL() override;
     void resizeGL(int w, int h) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
 
-    // Specialized
-    GLViewer *viewer_;
+    // Viewer
+    Viewer *viewer_;
     bool selected_;
 
-    std::vector<std::shared_ptr<GLNode>> nodes_;
+    // Data
+    Editor *editor_;
     GLAabb aabb_;
-
     GLCamera camera_;
 
-    void initializeGLWidget();
-    void validateNodes();
+    void resetCamera();
+    void renderScene();
+    void cameraChanged(bool interactionFinished);
+    void setFocus();
+    void setViewDirection(const QVector3D &dir, const QVector3D &up);
 };
 
 #endif /* GL_WIDGET_HPP */

@@ -38,6 +38,8 @@ public:
     ~Vector3();
     Vector3<T> &operator=(const Vector3<T> &v) = default;
 
+    template <class B> void set(B x, B y, B z);
+
     const T &operator()(size_t idx) const { return data_[idx]; }
     T &operator()(size_t idx) { return data_[idx]; }
     const T &operator[](size_t idx) const { return data_[idx]; }
@@ -123,6 +125,13 @@ inline Vector3<T>::Vector3(const Vector3<B> &v)
     data_[0] = static_cast<T>(v(0));
     data_[1] = static_cast<T>(v(1));
     data_[2] = static_cast<T>(v(2));
+}
+
+template <class T> template <class B> inline void Vector3<T>::set(B x, B y, B z)
+{
+    data_[0] = static_cast<T>(x);
+    data_[1] = static_cast<T>(y);
+    data_[2] = static_cast<T>(z);
 }
 
 template <class T> inline T Vector3<T>::min() const

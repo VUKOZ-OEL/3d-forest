@@ -18,35 +18,32 @@
 */
 
 /**
-    @file GLMesh.hpp
+    @file Forest3dEditor.hpp
 */
 
-#ifndef GL_MESH_HPP
-#define GL_MESH_HPP
+#ifndef FOREST_3D_EDITOR_HPP
+#define FOREST_3D_EDITOR_HPP
 
-#include <GLNode.hpp>
-#include <vector>
+#include <Editor.hpp>
+#include <Forest3dThreadRender.hpp>
+#include <QWidget>
 
-/** OpenGL Mesh. */
-class GLMesh : public GLNode
+/** Forest 3d Editor. */
+class Forest3dEditor
 {
+    //    Q_OBJECT
+
 public:
-    enum Mode
-    {
-        POINTS,
-        LINES,
-        QUADS
-    };
+    Editor editor_; // TBD
+    Forest3dThreadRender thread_; // TBD
 
-    Mode mode;
-    std::vector<float> xyz;
-    std::vector<float> rgb;
+    Forest3dEditor();
+    ~Forest3dEditor();
 
-    GLMesh();
-    virtual ~GLMesh();
+    void cancel();
+    void render();
 
-    virtual void render();
-    virtual void validate();
+protected:
 };
 
-#endif /* GL_MESH_HPP */
+#endif /* FOREST_3D_EDITOR_HPP */
