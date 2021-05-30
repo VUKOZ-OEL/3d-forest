@@ -18,25 +18,47 @@
 */
 
 /**
-    @file sandbox.cpp
+    @file EditorTile.cpp
 */
 
-#include <EditorBase.hpp>
-#include <File.hpp>
-#include <Json.hpp>
-#include <OctreeIndex.hpp>
-#include <Time.hpp>
-#include <Vector3.hpp>
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
-#include <vector>
+#include <EditorTile.hpp>
 
-int main(int argc, char *argv[])
+EditorTile::EditorTile()
+    : dataSetId(0),
+      tileId(0),
+      loaded(false),
+      modified(false)
 {
-    (void)argc;
-    (void)argv;
+}
 
-    return 0;
+EditorTile::~EditorTile()
+{
+}
+
+EditorTile::View::View() : renderStep(1), renderStepCount(1)
+{
+}
+
+EditorTile::View::~View()
+{
+}
+
+void EditorTile::View::resetFrame()
+{
+    renderStep = 1;
+}
+
+void EditorTile::View::nextFrame()
+{
+    renderStep++;
+}
+
+bool EditorTile::View::isStarted() const
+{
+    return renderStep == 1;
+}
+
+bool EditorTile::View::isFinished() const
+{
+    return renderStep > renderStepCount;
 }

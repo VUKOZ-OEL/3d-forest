@@ -76,13 +76,13 @@ Camera GLWidget::camera() const
 void GLWidget::setViewOrthographic()
 {
     camera_.setOrthographic();
-    cameraChanged(true);
+    cameraChanged();
 }
 
 void GLWidget::setViewPerspective()
 {
     camera_.setPerspective();
-    cameraChanged(true);
+    cameraChanged();
 }
 
 void GLWidget::setViewDirection(const QVector3D &dir, const QVector3D &up)
@@ -92,7 +92,7 @@ void GLWidget::setViewDirection(const QVector3D &dir, const QVector3D &up)
 
     QVector3D eye = (dir * distance) + center;
     camera_.setLookAt(eye, center, up);
-    cameraChanged(true);
+    cameraChanged();
 }
 
 void GLWidget::setViewTop()
@@ -158,7 +158,7 @@ void GLWidget::setViewResetDistance()
 
     QVector3D eye = (dir * distance) + center;
     camera_.setLookAt(eye, center, up);
-    cameraChanged(true);
+    cameraChanged();
 }
 
 void GLWidget::setViewResetCenter()
@@ -176,7 +176,7 @@ void GLWidget::setViewResetCenter()
 
     QVector3D eye = (dir * distance) + center;
     camera_.setLookAt(eye, center, up);
-    cameraChanged(true);
+    cameraChanged();
 }
 
 void GLWidget::initializeGL()
@@ -215,7 +215,7 @@ void GLWidget::paintGL()
     renderScene();
 
     GL::renderAabb(aabb_);
-    //GL::renderAxis(aabb_, camera_.getCenter());
+    GL::renderAxis(aabb_, camera_.getCenter());
 }
 
 void GLWidget::renderScene()
@@ -229,31 +229,38 @@ void GLWidget::renderScene()
 
     double t1 = getRealTime();
 
-    size_t cellSize = editor_->database().cellSize();
+    size_t tileViewSize = editor_->tileViewSize();
 
-    for (size_t cellIndex = 0; cellIndex < cellSize; cellIndex++)
+    for (size_t tileIndex = 0; tileIndex < tileViewSize; tileIndex++)
     {
-        DatabaseCell &cell = editor_->database().cell(cellIndex);
+        EditorTile &tile = editor_->tileView(tileIndex);
 
-        if (cell.loaded && !cell.view.isFinished())
+        if (tile.loaded && !tile.view.isFinished())
         {
-            if (cellIndex == 0 && cell.view.isStarted())
+            if (tileIndex == 0 && tile.view.isStarted())
             {
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             }
 
-            GL::render(GL::POINTS, cell.view.xyz, cell.view.rgb);
+            GL::render(GL::POINTS, tile.view.xyz, tile.view.rgb);
             glFlush();
 
-            cell.view.nextFrame();
+            tile.view.nextFrame();
 
             double t2 = getRealTime();
-            if (t2 - t1 > 0.02 && cellIndex > 4)
+            if (t2 - t1 > 0.02 && tileIndex > 4)
             {
                 break;
             }
         }
     }
+
+    // if (editor_->clipFilter().enabled)
+    // {
+    //     GLAabb box;
+    //     box.set(editor_->clipFilter().boxView);
+    //     GL::renderAabb(box);
+    // }
 
     editor_->unlock();
 }
@@ -262,7 +269,7 @@ void GLWidget::resizeGL(int w, int h)
 {
     camera_.setViewport(0, 0, w, h);
     camera_.updateProjection();
-    cameraChanged(true);
+    cameraChanged();
 }
 
 void GLWidget::mouseReleaseEvent(QMouseEvent *event)
@@ -279,14 +286,14 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
     camera_.mouseMoveEvent(event);
-    cameraChanged(true);
+    cameraChanged();
 }
 
 void GLWidget::wheelEvent(QWheelEvent *event)
 {
     camera_.wheelEvent(event);
     setFocus();
-    cameraChanged(true);
+    cameraChanged();
 }
 
 void GLWidget::setFocus()
@@ -300,10 +307,10 @@ void GLWidget::setFocus()
     }
 }
 
-void GLWidget::cameraChanged(bool interactionFinished)
+void GLWidget::cameraChanged()
 {
     if (viewer_)
     {
-        emit viewer_->cameraChanged(interactionFinished);
+        emit viewer_->cameraChanged();
     }
 }

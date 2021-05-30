@@ -21,10 +21,10 @@
     @file LasFile.cpp
 */
 
-#include <DatabaseBuilder.hpp>
 #include <Endian.hpp>
 #include <Error.hpp>
 #include <LasFile.hpp>
+#include <LasIndexBuilder.hpp>
 #include <cstdio>
 #include <cstring>
 #include <iostream>

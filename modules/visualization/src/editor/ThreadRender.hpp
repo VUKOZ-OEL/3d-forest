@@ -18,25 +18,39 @@
 */
 
 /**
-    @file sandbox.cpp
+    @file ThreadRender.hpp
 */
 
-#include <EditorBase.hpp>
-#include <File.hpp>
-#include <Json.hpp>
-#include <OctreeIndex.hpp>
-#include <Time.hpp>
-#include <Vector3.hpp>
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
-#include <vector>
+#ifndef THREAD_RENDER_HPP
+#define THREAD_RENDER_HPP
 
-int main(int argc, char *argv[])
+#include <Camera.hpp>
+#include <QObject>
+#include <Thread.hpp>
+
+class Editor;
+
+/** Thread Render. */
+class ThreadRender : public Thread
 {
-    (void)argc;
-    (void)argv;
+    Q_OBJECT
 
-    return 0;
-}
+public:
+    ThreadRender(Editor *editor, QObject *parent = nullptr);
+    virtual ~ThreadRender();
+
+    void start(const Camera &camera);
+    void restart();
+
+    virtual bool compute();
+
+signals:
+    void statusChanged();
+
+protected:
+    Editor *editor_;
+    Camera camera_;
+    bool initialized_;
+};
+
+#endif /* THREAD_RENDER_HPP */

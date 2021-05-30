@@ -52,7 +52,7 @@ target_link_libraries(
   Qt5::Widgets
   Qt5::OpenGL
   ${OPENGL_gl_LIBRARY}
-  project
+  editor
 )
 
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

@@ -36,8 +36,8 @@
 #include <unistd.h>
 #include <vector>
 #ifndef O_BINARY
-#define O_BINARY  0
-#define O_TEXT    0
+#define O_BINARY 0
+#define O_TEXT 0
 #endif
 
 const int File::INVALID_DESCRIPTOR = -1;

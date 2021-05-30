@@ -69,7 +69,7 @@ public:
     Camera camera() const;
 
 signals:
-    void cameraChanged(bool);
+    void cameraChanged();
 
 protected:
     std::vector<GLWidget *> viewports_;

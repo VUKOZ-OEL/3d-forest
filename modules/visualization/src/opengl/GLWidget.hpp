@@ -84,7 +84,7 @@ protected:
 
     void resetCamera();
     void renderScene();
-    void cameraChanged(bool interactionFinished);
+    void cameraChanged();
     void setFocus();
     void setViewDirection(const QVector3D &dir, const QVector3D &up);
 };

@@ -24,7 +24,10 @@
 #include <Thread.hpp>
 
 Thread::Thread(QObject *parent)
-    : QThread(parent), state_(STATE_RUN), finished_(true), received_(false)
+    : QThread(parent),
+      state_(STATE_RUN),
+      finished_(true),
+      received_(false)
 {
 }
 

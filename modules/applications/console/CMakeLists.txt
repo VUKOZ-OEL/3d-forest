@@ -20,5 +20,5 @@ target_link_libraries(las PUBLIC core)
 install(TARGETS las DESTINATION bin)
 
 add_executable(sandbox src/sandbox.cpp)
-target_link_libraries(sandbox PUBLIC core)
+target_link_libraries(sandbox PUBLIC core editor)
 install(TARGETS sandbox DESTINATION bin)

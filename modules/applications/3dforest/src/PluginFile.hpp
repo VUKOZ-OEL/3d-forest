@@ -18,25 +18,29 @@
 */
 
 /**
-    @file sandbox.cpp
+    @file PluginFile.hpp
 */
 
-#include <EditorBase.hpp>
-#include <File.hpp>
-#include <Json.hpp>
-#include <OctreeIndex.hpp>
-#include <Time.hpp>
-#include <Vector3.hpp>
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
-#include <vector>
+#ifndef PLUGIN_FILE_HPP
+#define PLUGIN_FILE_HPP
 
-int main(int argc, char *argv[])
+#include <QString>
+#include <QtPlugin>
+
+class QWidget;
+class Editor;
+
+/** Plugin File Interface. */
+class PluginFile
 {
-    (void)argc;
-    (void)argv;
+public:
+    virtual ~PluginFile() = default;
+    virtual void read(QWidget *parent, Editor *editor) = 0;
+    virtual void write(QWidget *parent, Editor *editor) = 0;
+    virtual QString windowTitle() const = 0; //! Unique
+};
 
-    return 0;
-}
+#define PluginFile_iid "vukoz.3dforest.qt.PluginFile/1.0"
+Q_DECLARE_INTERFACE(PluginFile, PluginFile_iid)
+
+#endif /* PLUGIN_FILE_HPP */

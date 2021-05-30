@@ -18,25 +18,29 @@
 */
 
 /**
-    @file sandbox.cpp
+    @file PluginTool.hpp
 */
 
-#include <EditorBase.hpp>
-#include <File.hpp>
-#include <Json.hpp>
-#include <OctreeIndex.hpp>
-#include <Time.hpp>
-#include <Vector3.hpp>
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
-#include <vector>
+#ifndef PLUGIN_TOOL_HPP
+#define PLUGIN_TOOL_HPP
 
-int main(int argc, char *argv[])
+#include <QString>
+#include <QtPlugin>
+
+class Editor;
+class QWidget;
+
+/** Plugin Tool Interface. */
+class PluginTool
 {
-    (void)argc;
-    (void)argv;
+public:
+    virtual ~PluginTool() = default;
+    virtual void initialize(QWidget *parent, Editor *editor) = 0;
+    virtual void show(QWidget *parent) = 0;
+    virtual QString windowTitle() const = 0; //! Unique
+};
 
-    return 0;
-}
+#define PluginTool_iid "vukoz.3dforest.qt.PluginTool/1.0"
+Q_DECLARE_INTERFACE(PluginTool, PluginTool_iid)
+
+#endif /* PLUGIN_TOOL_HPP */

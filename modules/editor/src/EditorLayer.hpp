@@ -18,25 +18,29 @@
 */
 
 /**
-    @file sandbox.cpp
+    @file EditorLayer.hpp
 */
 
-#include <EditorBase.hpp>
-#include <File.hpp>
+#ifndef EDITOR_LAYER_HPP
+#define EDITOR_LAYER_HPP
+
 #include <Json.hpp>
-#include <OctreeIndex.hpp>
-#include <Time.hpp>
-#include <Vector3.hpp>
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
-#include <vector>
+#include <string>
 
-int main(int argc, char *argv[])
+/** Editor Layer. */
+class EditorLayer
 {
-    (void)argc;
-    (void)argv;
+public:
+    // Stored
+    std::string label;
+    size_t id;
+    bool visible;
 
-    return 0;
-}
+    EditorLayer();
+    ~EditorLayer();
+
+    void read(const Json &in);
+    Json &write(Json &out) const;
+};
+
+#endif /* EDITOR_LAYER_HPP */

@@ -18,25 +18,21 @@
 */
 
 /**
-    @file sandbox.cpp
+    @file EditorFilter.hpp
 */
 
-#include <EditorBase.hpp>
-#include <File.hpp>
-#include <Json.hpp>
-#include <OctreeIndex.hpp>
-#include <Time.hpp>
-#include <Vector3.hpp>
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
-#include <vector>
+#ifndef EDITOR_FILTER_HPP
+#define EDITOR_FILTER_HPP
 
-int main(int argc, char *argv[])
+#include <EditorTile.hpp>
+
+/** Editor Filter Interface. */
+class EditorFilter
 {
-    (void)argc;
-    (void)argv;
+public:
+    virtual ~EditorFilter() = default;
+    virtual bool isFilterEnabled() = 0;
+    virtual void filterTile(EditorTile *tile) = 0;
+};
 
-    return 0;
-}
+#endif /* EDITOR_FILTER_HPP */
