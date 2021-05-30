@@ -26,6 +26,7 @@
 
 #include <Json.hpp>
 #include <cmath>
+#include <limits>
 #include <vector>
 
 /** Axis-Aligned Bounding Box. */
@@ -197,7 +198,16 @@ template <class T> inline void Aabb<T>::clear()
 
 template <class T> inline void Aabb<T>::validate()
 {
-    empty_ = false;
+    constexpr T e = std::numeric_limits<T>::epsilon();
+    if ((max_[0] - min_[0] > e) && (max_[1] - min_[1] > e) &&
+        (max_[2] - min_[2] > e))
+    {
+        empty_ = false;
+    }
+    else
+    {
+        empty_ = true;
+    }
 }
 
 template <class T> inline void Aabb<T>::getCenter(T &x, T &y, T &z) const

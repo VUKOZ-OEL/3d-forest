@@ -31,16 +31,15 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 # Plugins
-set(PLUGIN_EXAMPLE "plugintoolexample")
+set(PLUGIN_HEIGHT_MAP "pluginheightmap")
 add_library(
-  ${PLUGIN_EXAMPLE}
+  ${PLUGIN_HEIGHT_MAP}
   SHARED
-  plugins/toolExample/Forest3dPluginToolExample.cpp
-  plugins/toolExample/Forest3dPluginToolExampleWindow.cpp
+  plugins/heightmap/PluginHeightMap.cpp
 )
-target_include_directories(${PLUGIN_EXAMPLE} PUBLIC plugins/toolExample)
-target_include_directories(${PLUGIN_EXAMPLE} PUBLIC src)
-target_link_libraries(${PLUGIN_EXAMPLE} PRIVATE Qt5::Widgets visualization)
+target_include_directories(${PLUGIN_HEIGHT_MAP} PUBLIC plugins/heightmap)
+target_include_directories(${PLUGIN_HEIGHT_MAP} PUBLIC src)
+target_link_libraries(${PLUGIN_HEIGHT_MAP} PRIVATE Qt5::Widgets visualization)
 
 # Application
 set(SUB_PROJECT_NAME "3dforest")
@@ -63,4 +62,4 @@ target_link_libraries(
 
 # Install
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)
-install(TARGETS ${PLUGIN_EXAMPLE} DESTINATION bin)
+install(TARGETS ${PLUGIN_HEIGHT_MAP} DESTINATION bin)

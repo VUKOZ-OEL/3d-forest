@@ -18,25 +18,21 @@
 */
 
 /**
-    @file sandbox.cpp
+    @file EditorCache.hpp
 */
 
-#include <EditorBase.hpp>
-#include <File.hpp>
-#include <Json.hpp>
-#include <OctreeIndex.hpp>
-#include <Time.hpp>
-#include <Vector3.hpp>
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
+#ifndef EDITOR_CACHE_HPP
+#define EDITOR_CACHE_HPP
+
+#include <EditorTile.hpp>
 #include <vector>
 
-int main(int argc, char *argv[])
+/** Editor Cache. */
+class EditorCache
 {
-    (void)argc;
-    (void)argv;
+public:
+    EditorCache();
+    ~EditorCache();
+};
 
-    return 0;
-}
+#endif /* EDITOR_CACHE_HPP */

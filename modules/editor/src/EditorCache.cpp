@@ -18,25 +18,15 @@
 */
 
 /**
-    @file sandbox.cpp
+    @file EditorCache.cpp
 */
 
-#include <EditorBase.hpp>
-#include <File.hpp>
-#include <Json.hpp>
-#include <OctreeIndex.hpp>
-#include <Time.hpp>
-#include <Vector3.hpp>
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
-#include <vector>
+#include <EditorCache.hpp>
 
-int main(int argc, char *argv[])
+EditorCache::EditorCache()
 {
-    (void)argc;
-    (void)argv;
+}
 
-    return 0;
+EditorCache::~EditorCache()
+{
 }

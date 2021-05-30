@@ -15,7 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-add_subdirectory(applications)
-add_subdirectory(core)
-add_subdirectory(editor)
-add_subdirectory(visualization)
+set(SUB_PROJECT_NAME "editor")
+
+file(GLOB_RECURSE SOURCES_EDITOR "src/*.cpp")
+
+add_library(${SUB_PROJECT_NAME} SHARED ${SOURCES_EDITOR})
+target_include_directories(${SUB_PROJECT_NAME} PUBLIC src)
+target_link_libraries(${SUB_PROJECT_NAME} core)
+
+install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

@@ -18,25 +18,54 @@
 */
 
 /**
-    @file sandbox.cpp
+    @file Editor.cpp
 */
 
-#include <EditorBase.hpp>
-#include <File.hpp>
-#include <Json.hpp>
-#include <OctreeIndex.hpp>
-#include <Time.hpp>
-#include <Vector3.hpp>
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
-#include <vector>
+#include <Editor.hpp>
 
-int main(int argc, char *argv[])
+Editor::Editor(QObject *parent) : QObject(parent), thread_(this)
 {
-    (void)argc;
-    (void)argv;
+    connect(&thread_, SIGNAL(statusChanged()), this, SLOT(render()));
 
-    return 0;
+    thread_.init();
+}
+
+Editor::~Editor()
+{
+    thread_.stop();
+}
+
+// void Editor::renderRequest()
+// {
+//     emit renderRequested();
+// }
+
+void Editor::lock()
+{
+    mutex_.lock();
+}
+
+void Editor::unlock()
+{
+    mutex_.unlock();
+}
+
+void Editor::cancelThreads()
+{
+    thread_.cancel();
+}
+
+void Editor::restartThreads()
+{
+    thread_.restart();
+}
+
+void Editor::render(const Camera &camera)
+{
+    thread_.start(camera);
+}
+
+void Editor::render()
+{
+    emit renderRequested();
 }

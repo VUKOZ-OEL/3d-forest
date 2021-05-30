@@ -1,11 +1,4 @@
 {
-  "clipFilter": {
-    "box": {
-      "max": [0,0,0],
-      "min": [0,0,0]
-    },
-    "enabled": "none"
-  },
   "dataSets": [
     {
       "dateCreated": "2018-07-13 17:45:00",

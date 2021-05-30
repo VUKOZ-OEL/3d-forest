@@ -22,7 +22,6 @@ file(GLOB_RECURSE SOURCES_CORE "src/*.cpp")
 add_library(${SUB_PROJECT_NAME} SHARED ${SOURCES_CORE})
 
 target_include_directories(${SUB_PROJECT_NAME} PUBLIC src/common)
-target_include_directories(${SUB_PROJECT_NAME} PUBLIC src/database)
 target_include_directories(${SUB_PROJECT_NAME} PUBLIC src/io)
 target_include_directories(${SUB_PROJECT_NAME} PUBLIC src/math)
 target_include_directories(${SUB_PROJECT_NAME} PUBLIC src/scene)

@@ -22,9 +22,9 @@
 */
 
 #include <Aabb.hpp>
-#include <DatabaseBuilder.hpp>
 #include <Error.hpp>
 #include <LasFile.hpp>
+#include <LasIndexBuilder.hpp>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
@@ -66,7 +66,7 @@ void getarg(const char **v, int &opt, int argc, char *argv[])
 
 void cmd_create_index(const char *outputPath,
                       const char *inputPath,
-                      const DatabaseBuilder::Settings &settings)
+                      const LasIndexBuilder::Settings &settings)
 {
     if (!inputPath)
     {
@@ -78,7 +78,7 @@ void cmd_create_index(const char *outputPath,
         outputPath = inputPath;
     }
 
-    DatabaseBuilder::index(outputPath, inputPath, settings);
+    LasIndexBuilder::index(outputPath, inputPath, settings);
 }
 
 void cmd_print(const char *inputPath)
@@ -109,7 +109,7 @@ void cmd_select(const char *inputPath, const Aabb<double> &window)
 int main(int argc, char *argv[])
 {
     int command = COMMAND_NONE;
-    DatabaseBuilder::Settings settings;
+    LasIndexBuilder::Settings settings;
     double wx1 = 0, wy1 = 0, wz1 = 0, wx2 = 0, wy2 = 0, wz2 = 0;
     Aabb<double> window;
     const char *outputPath = nullptr;

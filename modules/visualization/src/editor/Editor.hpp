@@ -18,25 +18,43 @@
 */
 
 /**
-    @file sandbox.cpp
+    @file Editor.hpp
 */
 
+#ifndef EDITOR_HPP
+#define EDITOR_HPP
+
+#include <Camera.hpp>
 #include <EditorBase.hpp>
-#include <File.hpp>
-#include <Json.hpp>
-#include <OctreeIndex.hpp>
-#include <Time.hpp>
-#include <Vector3.hpp>
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
-#include <vector>
+#include <QObject>
+#include <ThreadRender.hpp>
+#include <mutex>
 
-int main(int argc, char *argv[])
+/** Editor. */
+class Editor : public QObject, public EditorBase
 {
-    (void)argc;
-    (void)argv;
+    Q_OBJECT
 
-    return 0;
-}
+public:
+    Editor(QObject *parent = nullptr);
+    ~Editor();
+
+    void lock();
+    void unlock();
+
+    void cancelThreads();
+    void restartThreads();
+
+signals:
+    void renderRequested();
+
+public slots:
+    void render(const Camera &camera);
+    void render();
+
+protected:
+    ThreadRender thread_;
+    std::mutex mutex_;
+};
+
+#endif /* EDITOR_HPP */

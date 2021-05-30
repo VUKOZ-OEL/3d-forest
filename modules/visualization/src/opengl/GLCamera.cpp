@@ -29,11 +29,20 @@
 #include <cmath>
 
 GLCamera::GLCamera()
-    : eye_(0.0F, 0.0F, 1.0F), center_(0.0F, 0.0F, 0.0F),
-      right_(1.0F, 0.0F, 0.0F), up_(0.0F, 1.0F, 0.0F),
-      direction_(0.0F, 0.0F, 1.0F), rotation_(), distance_(1.0F), fov_(60.0F),
-      zNear_(0.01F), zFar_(100000.0F), perspective_(true),
-      viewport_(0, 0, 100, 100), sensitivityX_(1.0F), sensitivityY_(1.0F),
+    : eye_(0.0F, 0.0F, 1.0F),
+      center_(0.0F, 0.0F, 0.0F),
+      right_(1.0F, 0.0F, 0.0F),
+      up_(0.0F, 1.0F, 0.0F),
+      direction_(0.0F, 0.0F, 1.0F),
+      rotation_(),
+      distance_(1.0F),
+      fov_(60.0F),
+      zNear_(0.01F),
+      zFar_(100000.0F),
+      perspective_(true),
+      viewport_(0, 0, 100, 100),
+      sensitivityX_(1.0F),
+      sensitivityY_(1.0F),
       sensitivityZoom_(4.0F)
 {
     frustrumPlanes_.resize(24);

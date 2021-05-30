@@ -18,25 +18,29 @@
 */
 
 /**
-    @file sandbox.cpp
+    @file Application.cpp
 */
 
-#include <EditorBase.hpp>
-#include <File.hpp>
-#include <Json.hpp>
-#include <OctreeIndex.hpp>
-#include <Time.hpp>
-#include <Vector3.hpp>
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
-#include <vector>
+#include <QApplication>
+#include <QSurfaceFormat>
+#include <WindowMain.hpp>
 
 int main(int argc, char *argv[])
 {
-    (void)argc;
-    (void)argv;
+    QApplication app(argc, argv);
 
-    return 0;
+    app.setOrganizationName("VUKOZ v.v.i.");
+    app.setApplicationName(WindowMain::APPLICATION_NAME);
+    app.setApplicationVersion(WindowMain::APPLICATION_VERSION);
+    app.setWindowIcon(QIcon(":/3dforest-256.png"));
+
+    QSurfaceFormat format;
+    format.setDepthBufferSize(24);
+    QSurfaceFormat::setDefaultFormat(format);
+
+    WindowMain window;
+    window.setWindowIcon(QIcon(":/3dforest-256.png"));
+    window.show();
+
+    return app.exec();
 }

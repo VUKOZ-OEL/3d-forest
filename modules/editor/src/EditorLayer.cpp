@@ -18,25 +18,56 @@
 */
 
 /**
-    @file sandbox.cpp
+    @file EditorLayer.cpp
 */
 
-#include <EditorBase.hpp>
-#include <File.hpp>
-#include <Json.hpp>
-#include <OctreeIndex.hpp>
-#include <Time.hpp>
-#include <Vector3.hpp>
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
-#include <vector>
+#include <EditorLayer.hpp>
+#include <Error.hpp>
 
-int main(int argc, char *argv[])
+EditorLayer::EditorLayer()
 {
-    (void)argc;
-    (void)argv;
+}
 
-    return 0;
+EditorLayer::~EditorLayer()
+{
+}
+
+void EditorLayer::read(const Json &in)
+{
+    if (!in.isObject())
+    {
+        THROW("Layer is not JSON object");
+    }
+
+    // ID
+    id = in["id"].uint32();
+
+    // Label
+    if (in.contains("label"))
+    {
+        label = in["label"].string();
+    }
+    else
+    {
+        label = "";
+    }
+
+    // Visible
+    if (in.contains("visible"))
+    {
+        visible = in["visible"].isTrue();
+    }
+    else
+    {
+        visible = true;
+    }
+}
+
+Json &EditorLayer::write(Json &out) const
+{
+    out["id"] = id;
+    out["label"] = label;
+    out["visible"] = visible;
+
+    return out;
 }
