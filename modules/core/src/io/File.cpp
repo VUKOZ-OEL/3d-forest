@@ -493,6 +493,11 @@ int File::write(int fd, const uint8_t *buffer, uint64_t nbyte)
     return 0;
 }
 
+std::string File::currentPath()
+{
+    return std::filesystem::current_path().string();
+}
+
 bool File::exists(const std::string &path)
 {
     int ret;
