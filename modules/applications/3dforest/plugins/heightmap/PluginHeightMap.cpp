@@ -100,8 +100,6 @@ void PluginHeightMapFilter::filterTile(EditorTile *tile)
     double zMin = editor_->boundary().min(2);
     double zLen = editor_->boundary().max(2) - zMin;
 
-    size_t nRows = tile->xyz.size() / 3;
-
     if (tile->view.rgb.size() != tile->xyz.size())
     {
         tile->view.rgb.resize(tile->xyz.size());
@@ -109,9 +107,10 @@ void PluginHeightMapFilter::filterTile(EditorTile *tile)
 
     double colorDelta = 1.0 / static_cast<double>(colormap_.size());
 
-    for (size_t row = 0; row < nRows; row++)
+    const std::vector<unsigned int> &indices = tile->indices;
+    for (size_t i = 0; i < indices.size(); i++)
     {
-        // selectionL1[i].partial == false, otherwise select point
+        size_t row = indices[i];
         double z = tile->xyz[row * 3 + 2];
         double h = (z - zMin) / zLen;
         size_t c = static_cast<size_t>(h / colorDelta);
@@ -134,11 +133,9 @@ void PluginHeightMapFilter::applyToTiles(QWidget *widget)
     int maximum = static_cast<int>(selectionL1.size());
 
     QProgressDialog progressDialog(widget->parentWidget());
-    // progressDialog.setCancelButtonText(tr("&Cancel"));
-    progressDialog.setCancelButtonText("&Cancel");
+    progressDialog.setCancelButtonText(QObject::tr("&Cancel"));
     progressDialog.setRange(0, static_cast<int>(maximum));
-    // progressDialog.setWindowTitle(tr(PLUGIN_HEIGHT_MAP_NAME));
-    progressDialog.setWindowTitle(PLUGIN_HEIGHT_MAP_NAME);
+    progressDialog.setWindowTitle(QObject::tr(PLUGIN_HEIGHT_MAP_NAME));
     progressDialog.setWindowModality(Qt::WindowModal);
     progressDialog.setMinimumDuration(100);
 
@@ -146,8 +143,8 @@ void PluginHeightMapFilter::applyToTiles(QWidget *widget)
     {
         // Update progress
         progressDialog.setValue(i);
-        progressDialog.setLabelText("Processing");
-        // tr("Processing %1 of %n...", nullptr, maximum).arg(i));
+        progressDialog.setLabelText(
+            QObject::tr("Processing %1 of %n...", nullptr, maximum).arg(i));
         QCoreApplication::processEvents();
 
         if (progressDialog.wasCanceled())
@@ -155,7 +152,7 @@ void PluginHeightMapFilter::applyToTiles(QWidget *widget)
             break;
         }
 
-        msleep(10);
+        msleep(10); // TBD debug
 
         // Process step i
         OctreeIndex::Selection &sel = selectionL1[static_cast<size_t>(i)];
