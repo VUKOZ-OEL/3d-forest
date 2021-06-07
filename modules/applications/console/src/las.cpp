@@ -23,7 +23,7 @@
 
 #include <Aabb.hpp>
 #include <Error.hpp>
-#include <LasFile.hpp>
+#include <FileLas.hpp>
 #include <LasIndexBuilder.hpp>
 #include <cstdlib>
 #include <cstring>
@@ -88,7 +88,7 @@ void cmd_print(const char *inputPath)
         THROW("Missing input file path argument");
     }
 
-    LasFile las;
+    FileLas las;
     las.open(inputPath);
     las.readHeader();
 

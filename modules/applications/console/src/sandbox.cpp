@@ -23,6 +23,7 @@
 
 #include <EditorBase.hpp>
 #include <File.hpp>
+#include <FileLas.hpp>
 #include <Json.hpp>
 #include <OctreeIndex.hpp>
 #include <Time.hpp>

@@ -33,7 +33,8 @@ class WindowDataSets;
 class WindowLayers;
 class PluginFile;
 class PluginTool;
-class Viewer;
+class WindowViewports;
+class QTextEdit;
 
 /** Window Main. */
 class WindowMain : public QMainWindow
@@ -43,6 +44,7 @@ class WindowMain : public QMainWindow
 public:
     static const QString APPLICATION_NAME;
     static const QString APPLICATION_VERSION;
+    static QTextEdit *log;
 
     explicit WindowMain(QWidget *parent = nullptr);
     ~WindowMain();
@@ -91,17 +93,15 @@ protected:
     // Editor
     Editor editor_;
 
-    // View
-    Viewer *viewer_;
-
     // Plugins
     std::vector<PluginFile *> pluginsFile_;
     std::vector<PluginTool *> pluginsTool_;
 
     // Windows
+    WindowClipFilter *windowClipFilter_;
     WindowDataSets *windowDataSets_;
     WindowLayers *windowLayers_;
-    WindowClipFilter *windowClipFilter_;
+    WindowViewports *windowViewports_;
 
     // Menus
     QMenu *menuTools_;

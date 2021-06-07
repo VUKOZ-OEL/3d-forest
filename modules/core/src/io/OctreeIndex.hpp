@@ -25,7 +25,7 @@
 #define OCTREE_INDEX_HPP
 
 #include <Aabb.hpp>
-#include <ChunkFile.hpp>
+#include <FileChunk.hpp>
 #include <limits>
 #include <map>
 #include <vector>
@@ -84,14 +84,16 @@ public:
     const Node *next(const Node *node, size_t idx) const;
     const Node *prev(const Node *node) const;
     const Node *at(size_t idx) const { return &nodes_[idx]; }
+    Node *at(size_t idx) { return &nodes_[idx]; }
     Aabb<double> boundary(const Node *node, const Aabb<double> &box) const;
 
     // IO
     void read(const std::string &path);
-    void read(ChunkFile &file);
-    void readPayload(ChunkFile &file, const ChunkFile::Chunk &chunk);
+    void read(const std::string &path, uint64_t offset);
+    void read(FileChunk &file);
+    void readPayload(FileChunk &file, const FileChunk::Chunk &chunk);
     void write(const std::string &path) const;
-    void write(ChunkFile &file) const;
+    void write(FileChunk &file) const;
     Json &write(Json &out) const;
 
     // Build tree
@@ -163,5 +165,7 @@ protected:
     size_t countNodes() const;
     size_t countNodes(BuildNode *node) const;
 };
+
+std::ostream &operator<<(std::ostream &os, const OctreeIndex &obj);
 
 #endif /* OCTREE_INDEX_HPP */

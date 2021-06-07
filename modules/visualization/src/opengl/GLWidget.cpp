@@ -27,11 +27,11 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <Time.hpp>
-#include <Viewer.hpp>
+#include <WindowViewports.hpp>
 
 GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent)
 {
-    viewer_ = nullptr;
+    windowViewports_ = nullptr;
     selected_ = false;
     editor_ = nullptr;
 
@@ -42,9 +42,9 @@ GLWidget::~GLWidget()
 {
 }
 
-void GLWidget::setViewer(Viewer *viewer)
+void GLWidget::setWindowViewports(WindowViewports *viewer)
 {
-    viewer_ = viewer;
+    windowViewports_ = viewer;
 }
 
 void GLWidget::setSelected(bool selected)
@@ -242,7 +242,7 @@ void GLWidget::renderScene()
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             }
 
-            GL::render(GL::POINTS, tile.view.xyz, tile.view.rgb);
+            GL::render(GL::POINTS, tile.view.xyz, tile.view.rgb, tile.indices);
             glFlush();
 
             tile.view.nextFrame();
@@ -300,17 +300,17 @@ void GLWidget::setFocus()
 {
     if (!isSelected())
     {
-        if (viewer_)
+        if (windowViewports_)
         {
-            viewer_->selectViewport(this);
+            windowViewports_->selectViewport(this);
         }
     }
 }
 
 void GLWidget::cameraChanged()
 {
-    if (viewer_)
+    if (windowViewports_)
     {
-        emit viewer_->cameraChanged();
+        emit windowViewports_->cameraChanged();
     }
 }

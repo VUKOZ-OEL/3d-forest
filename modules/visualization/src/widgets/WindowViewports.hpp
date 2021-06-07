@@ -18,11 +18,11 @@
 */
 
 /**
-    @file Viewer.hpp
+    @file WindowViewports.hpp
 */
 
-#ifndef VIEWER_HPP
-#define VIEWER_HPP
+#ifndef WINDOW_VIEWPORTS_HPP
+#define WINDOW_VIEWPORTS_HPP
 
 #include <Camera.hpp>
 #include <QWidget>
@@ -31,8 +31,8 @@
 class Editor;
 class GLWidget;
 
-/** OpenGL Viewer. */
-class Viewer : public QWidget
+/** Window Viewports. */
+class WindowViewports : public QWidget
 {
     Q_OBJECT
 
@@ -43,23 +43,19 @@ public:
         VIEW_LAYOUT_TWO_COLUMNS
     };
 
-    enum ViewCamera
-    {
-        VIEW_CAMERA_ORTHOGRAPHIC,
-        VIEW_CAMERA_PERSPECTIVE,
-        VIEW_CAMERA_TOP,
-        VIEW_CAMERA_FRONT,
-        VIEW_CAMERA_LEFT,
-        VIEW_CAMERA_3D,
-        VIEW_CAMERA_RESET_DISTANCE,
-        VIEW_CAMERA_RESET_CENTER
-    };
-
-    explicit Viewer(QWidget *parent = nullptr);
-    ~Viewer();
+    explicit WindowViewports(QWidget *parent = nullptr);
+    ~WindowViewports();
 
     void setLayout(ViewLayout viewLayout);
-    void setViewport(ViewCamera viewCamera);
+
+    void setViewOrthographic();
+    void setViewPerspective();
+    void setViewTop();
+    void setViewFront();
+    void setViewLeft();
+    void setView3d();
+    void setViewResetDistance();
+    void setViewResetCenter();
 
     void selectViewport(GLWidget *viewport);
 
@@ -80,4 +76,4 @@ protected:
     const GLWidget *selectedViewport() const;
 };
 
-#endif /* VIEWER_HPP */
+#endif /* WINDOW_VIEWPORTS_HPP */

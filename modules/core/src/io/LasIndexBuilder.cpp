@@ -31,10 +31,12 @@ LasIndexBuilder::Settings::Settings()
     randomize = false;
 
     maxSize1 = 100000;
+    // maxSize1 = 100;
     maxLevel1 = 0; // TBD Fit to memory
 
     maxSize2 = 32;
-    maxLevel2 = 10;
+    maxLevel2 = 5;
+    // maxLevel2 = 2;
 
     bufferSize = 1024 * 1024;
 }
@@ -78,6 +80,7 @@ void LasIndexBuilder::index(const std::string &outputPath,
         std::snprintf(buffer, sizeof(buffer), "%6.2f %%", builder.percent());
         std::cout << "\r" << buffer << std::flush;
     }
+    std::cout << std::endl;
 }
 
 double LasIndexBuilder::percent() const
@@ -153,7 +156,7 @@ void LasIndexBuilder::openFiles()
     outputLas_.header.setGeneratingSoftware();
 
     // Format
-    sizePointOut_ = sizePointFormat_ + sizeof(LasFile::Point::layer);
+    sizePointOut_ = inputLas_.header.pointDataRecord3dForestLength();
     outputLas_.header.point_data_record_length =
         static_cast<uint16_t>(sizePointOut_);
     sizePointsOut_ = outputLas_.header.pointDataSize();
@@ -641,7 +644,7 @@ void LasIndexBuilder::stateNodeInsert()
 {
     // Step
     uint64_t step;
-    const OctreeIndex::Node *node;
+    OctreeIndex::Node *node;
 
     node = indexMain_.at(static_cast<size_t>(valueIdx_));
     step = node->size * sizePoint_;
@@ -662,21 +665,37 @@ void LasIndexBuilder::stateNodeInsert()
     outputLas_.seek(start + (node->from * sizePoint_));
     outputLas_.file().read(buffer, step);
 
+    std::vector<double> coords;
+    coords.resize(node->size * 3);
+    for (uint64_t i = 0; i < node->size; i++)
+    {
+        point = buffer + (i * sizePoint_);
+        inputLas_.transform(x, y, z, point);
+        coords[i * 3 + 0] = x;
+        coords[i * 3 + 1] = y;
+        coords[i * 3 + 2] = z;
+    }
+
     Aabb<double> box;
-    box = indexMain_.boundary(node, indexMain_.boundary());
+    box.set(coords);
+    // box = indexMain_.boundary(node, indexMain_.boundary());
 
     indexNode_.clear();
     indexNode_.insertBegin(box, settings_.maxSize2, settings_.maxLevel2, true);
 
     for (uint64_t i = 0; i < node->size; i++)
     {
-        point = buffer + (i * sizePoint_);
-        inputLas_.transform(x, y, z, point);
+        // point = buffer + (i * sizePoint_);
+        // inputLas_.transform(x, y, z, point);
+        x = coords[i * 3 + 0];
+        y = coords[i * 3 + 1];
+        z = coords[i * 3 + 2];
         bufferCodes[i * 2 + 0] = indexNode_.insert(x, y, z);
         bufferCodes[i * 2 + 1] = i;
     }
 
     indexNode_.insertEnd();
+    node->reserved = static_cast<uint32_t>(indexNodeFile_.offset());
     indexNode_.write(indexNodeFile_);
 
     // Sort
@@ -691,8 +710,8 @@ void LasIndexBuilder::stateNodeInsert()
 
     for (uint64_t i = 0; i < node->size; i++)
     {
-        point = buffer + (i * sizePoint_);
-        pointOut = bufferOut + (bufferCodes[i * 2 + 1] * sizePoint_);
+        point = buffer + (bufferCodes[i * 2 + 1] * sizePoint_);
+        pointOut = bufferOut + (i * sizePoint_);
         std::memcpy(pointOut, point, sizePoint_);
     }
 
@@ -708,6 +727,9 @@ void LasIndexBuilder::stateNodeInsert()
 
 void LasIndexBuilder::stateNodeEnd()
 {
+    std::string path = extensionL1(outputPath_);
+    indexMain_.write(path);
+
     indexNodeFile_.close();
 }
 

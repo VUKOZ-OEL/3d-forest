@@ -52,6 +52,7 @@ public:
     EditorDataSet();
     ~EditorDataSet();
 
+    void read(const std::string &filePath);
     void read(const Json &in, const std::string &projectPath);
     Json &write(Json &out) const;
 

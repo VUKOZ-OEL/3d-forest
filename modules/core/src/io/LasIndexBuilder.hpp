@@ -24,8 +24,8 @@
 #ifndef LAS_INDEX_BUILDER_HPP
 #define LAS_INDEX_BUILDER_HPP
 
-#include <ChunkFile.hpp>
-#include <LasFile.hpp>
+#include <FileChunk.hpp>
+#include <FileLas.hpp>
 #include <OctreeIndex.hpp>
 #include <map>
 #include <string>
@@ -119,10 +119,10 @@ protected:
     OctreeIndex indexMain_;
     OctreeIndex indexNode_;
     std::map<const OctreeIndex::Node *, uint64_t> indexMainUsed_;
-    ChunkFile indexNodeFile_;
+    FileChunk indexNodeFile_;
 
-    LasFile inputLas_;
-    LasFile outputLas_;
+    FileLas inputLas_;
+    FileLas outputLas_;
     std::string inputPath_;
     std::string outputPath_;
     std::string readPath_;

@@ -24,7 +24,8 @@
 #include <EditorBase.hpp>
 #include <Error.hpp>
 #include <File.hpp>
-#include <LasFile.hpp>
+#include <FileLas.hpp>
+#include <LasIndexBuilder.hpp>
 #include <iostream>
 #include <limits>
 #include <queue>
@@ -118,6 +119,31 @@ void EditorBase::open(const std::string &path)
         throw;
     }
 
+    openUpdate();
+}
+
+void EditorBase::openFile(const std::string &path)
+{
+    close();
+
+    try
+    {
+        // Data sets
+        dataSets_.resize(1);
+        dataSets_[0] = std::make_shared<EditorDataSet>();
+        dataSets_[0]->read(path);
+    }
+    catch (std::exception &e)
+    {
+        close();
+        throw;
+    }
+
+    openUpdate();
+}
+
+void EditorBase::openUpdate()
+{
     updateBoundary();
 
     if (clipFilter_.box.empty())
@@ -309,7 +335,7 @@ void EditorBase::loadView(size_t idx)
     EditorDataSet *dataSet = dataSets_[tile->dataSetId].get();
     const OctreeIndex::Node *node = dataSet->index.at(tile->tileId);
 
-    LasFile las;
+    FileLas las;
     las.open(dataSet->path);
     las.readHeader();
 
@@ -318,12 +344,15 @@ void EditorBase::loadView(size_t idx)
     std::vector<double> &xyz = tile->xyz;
     std::vector<float> &xyzView = tile->view.xyz;
     std::vector<float> &rgb = tile->rgb;
+    std::vector<unsigned int> &indices = tile->indices;
+
     xyz.resize(n * 3);
     xyzView.resize(n * 3);
     if (rgbFlag)
     {
         rgb.resize(n * 3);
     }
+    indices.resize(n);
 
     size_t pointSize = las.header.point_data_record_length;
     uint64_t start = node->from * pointSize;
@@ -336,7 +365,7 @@ void EditorBase::loadView(size_t idx)
     las.file().read(buffer.data(), bufferSize);
 
     uint8_t *ptr = buffer.data();
-    LasFile::Point point;
+    FileLas::Point point;
     double x;
     double y;
     double z;
@@ -345,6 +374,8 @@ void EditorBase::loadView(size_t idx)
 
     for (size_t i = 0; i < n; i++)
     {
+        indices[i] = static_cast<unsigned int>(i);
+
         las.readPoint(point, ptr + (pointSize * i), fmt);
 
         las.transform(x, y, z, point);
@@ -372,6 +403,63 @@ void EditorBase::loadView(size_t idx)
 
     tile->boundary.set(xyz);
     tile->view.boundary.set(xyzView);
+
+    if (clipFilter_.enabled)
+    {
+        const OctreeIndex::Node *l1 = dataSet->index.at(tile->tileId);
+
+        try
+        {
+            const std::string pathL2 =
+                LasIndexBuilder::extensionL2(dataSet->path);
+            tile->index.read(pathL2, l1->reserved);
+
+            std::vector<OctreeIndex::Selection> selection;
+            tile->index.selectLeaves(selection, clipFilter_.box, dataSet->id);
+
+            uint64_t nSelected = 0;
+            for (size_t i = 0; i < selection.size(); i++)
+            {
+                const OctreeIndex::Node *nodeL2 =
+                    tile->index.at(selection[i].idx);
+                if (nodeL2)
+                {
+                    // TBD partial selection
+                    nSelected += nodeL2->size;
+                }
+            }
+
+            size_t n2 = static_cast<size_t>(nSelected);
+            indices.resize(n2);
+
+            n2 = 0;
+            unsigned int n3;
+            unsigned int from;
+            for (size_t i = 0; i < selection.size(); i++)
+            {
+                const OctreeIndex::Node *nodeL2 =
+                    tile->index.at(selection[i].idx);
+                if (nodeL2)
+                {
+                    n3 = static_cast<unsigned int>(nodeL2->size);
+                    from = static_cast<unsigned int>(nodeL2->from);
+
+                    for (unsigned int j = 0; j < n3; j++)
+                    {
+                        indices[n2++] = from + j;
+                    }
+                }
+            }
+        }
+        catch (std::exception &e)
+        {
+            // std::cout << e.what() << "\n";
+        }
+        catch (...)
+        {
+            // std::cout << "unknown error\n";
+        }
+    }
 
     tile->loaded = true;
 }
@@ -406,6 +494,15 @@ void EditorBase::updateCamera(const Camera &camera)
         const OctreeIndex::Node *node;
         const OctreeIndex &index = dataSets_[nk.dataSetId]->index;
         node = index.at(nk.tileId);
+
+        // if (clipFilter_.enabled)
+        // {
+        //     Aabb<double> box = index.boundary(node, index.boundary());
+        //     if (!clipFilter_.box.intersects(box))
+        //     {
+        //         continue;
+        //     }
+        // }
 
         auto search = cache_.find({nk.dataSetId, nk.tileId});
         if (search != cache_.end())

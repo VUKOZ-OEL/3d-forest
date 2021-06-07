@@ -18,32 +18,37 @@
 */
 
 /**
-    @file Application.cpp
+    @file Log.cpp
 */
 
 #include <Log.hpp>
-#include <QApplication>
-#include <QSurfaceFormat>
+#include <QTextEdit>
 #include <WindowMain.hpp>
 
-int main(int argc, char *argv[])
+static void logOutput(QtMsgType type,
+                      const QMessageLogContext &context,
+                      const QString &msg)
 {
-    Log::install();
+    (void)context;
 
-    QApplication app(argc, argv);
+    switch (type)
+    {
+        case QtInfoMsg:
+        case QtDebugMsg:
+        case QtWarningMsg:
+        case QtCriticalMsg:
+        case QtFatalMsg:
+            if (WindowMain::log)
+            {
+                WindowMain::log->append(msg);
+            }
+            break;
+        default:
+            break;
+    }
+}
 
-    app.setOrganizationName("VUKOZ v.v.i.");
-    app.setApplicationName(WindowMain::APPLICATION_NAME);
-    app.setApplicationVersion(WindowMain::APPLICATION_VERSION);
-    app.setWindowIcon(QIcon(":/3dforest-256.png"));
-
-    QSurfaceFormat format;
-    format.setDepthBufferSize(24);
-    QSurfaceFormat::setDefaultFormat(format);
-
-    WindowMain window;
-    window.setWindowIcon(QIcon(":/3dforest-256.png"));
-    window.show();
-
-    return app.exec();
+void Log::install()
+{
+    qInstallMessageHandler(logOutput);
 }

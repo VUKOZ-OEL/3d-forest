@@ -18,17 +18,18 @@
 */
 
 /**
-    @file LasFile.cpp
+    @file FileLas.cpp
 */
 
 #include <Endian.hpp>
 #include <Error.hpp>
-#include <LasFile.hpp>
+#include <FileLas.hpp>
 #include <LasIndexBuilder.hpp>
 #include <cstdio>
 #include <cstring>
 #include <iostream>
 #include <sstream>
+#include <vector>
 
 #define LAS_FILE_SIGNATURE_0 0x4C
 #define LAS_FILE_SIGNATURE_1 0x41
@@ -44,7 +45,7 @@ static const size_t LAS_FILE_FORMAT_BYTE_COUNT[LAS_FILE_FORMAT_COUNT] =
 
 static const char *LAS_FILE_GENERATING_SOFTWARE = "3D Forest 1.0";
 
-size_t LasFile::Header::versionHeaderSize() const
+size_t FileLas::Header::versionHeaderSize() const
 {
     size_t ret = 0;
     if (version_major == 1)
@@ -65,24 +66,30 @@ size_t LasFile::Header::versionHeaderSize() const
     return ret;
 }
 
-size_t LasFile::Header::pointDataRecordUserLength() const
+size_t FileLas::Header::pointDataRecordFormatLength() const
+{
+    return LAS_FILE_FORMAT_BYTE_COUNT[point_data_record_format];
+}
+
+size_t FileLas::Header::pointDataRecord3dForestLength() const
+{
+    return pointDataRecordFormatLength() + sizeof(FileLas::Point::user_layer) +
+           (3 * sizeof(FileLas::Point::user_red));
+}
+
+size_t FileLas::Header::pointDataRecordUserLength() const
 {
     return static_cast<size_t>(point_data_record_length) -
            LAS_FILE_FORMAT_BYTE_COUNT[point_data_record_format];
 }
 
-size_t LasFile::Header::pointDataRecordFormatLength() const
-{
-    return LAS_FILE_FORMAT_BYTE_COUNT[point_data_record_format];
-}
-
-uint64_t LasFile::Header::pointDataSize() const
+uint64_t FileLas::Header::pointDataSize() const
 {
     return static_cast<uint64_t>(point_data_record_length) *
            number_of_point_records;
 }
 
-bool LasFile::Header::hasRgb() const
+bool FileLas::Header::hasRgb() const
 {
     switch (point_data_record_format)
     {
@@ -98,7 +105,7 @@ bool LasFile::Header::hasRgb() const
     }
 }
 
-std::string LasFile::Header::dateCreated() const
+std::string FileLas::Header::dateCreated() const
 {
     // GMT day
     int day = file_creation_day_of_year;
@@ -140,69 +147,147 @@ std::string LasFile::Header::dateCreated() const
     return "1970-01-01 00:00:00";
 }
 
-void LasFile::Header::setGeneratingSoftware()
+void FileLas::Header::setGeneratingSoftware()
 {
     std::memset(generating_software, 0, sizeof(generating_software));
     std::strcpy(static_cast<char *>(generating_software),
                 LAS_FILE_GENERATING_SOFTWARE);
 }
 
-LasFile::LasFile()
+FileLas::FileLas()
 {
 }
 
-LasFile::~LasFile()
+FileLas::~FileLas()
 {
 }
 
-void LasFile::open(const std::string &path)
+void FileLas::create(const std::string &path,
+                     const std::vector<FileLas::Point> &points,
+                     const std::array<double, 3> &scale,
+                     const std::array<double, 3> &offset)
+{
+    // Fill header
+    FileLas::Header hdr;
+    std::memset(&hdr, 0, sizeof(hdr));
+
+    hdr.file_signature[0] = LAS_FILE_SIGNATURE_0;
+    hdr.file_signature[1] = LAS_FILE_SIGNATURE_1;
+    hdr.file_signature[2] = LAS_FILE_SIGNATURE_2;
+    hdr.file_signature[3] = LAS_FILE_SIGNATURE_3;
+
+    hdr.version_major = 1;
+    hdr.version_minor = 4;
+    hdr.setGeneratingSoftware();
+    hdr.header_size = LAS_FILE_HEADER_SIZE_V14;
+    hdr.offset_to_point_data = hdr.header_size;
+
+    if (points.size() > 0)
+    {
+        hdr.point_data_record_format = points[0].format;
+    }
+    else
+    {
+        hdr.point_data_record_format = 6;
+    }
+    hdr.point_data_record_length =
+        static_cast<uint16_t>(hdr.pointDataRecord3dForestLength());
+    hdr.legacy_number_of_point_records = 0;
+    hdr.number_of_point_records = points.size();
+
+    hdr.x_scale_factor = scale[0];
+    hdr.y_scale_factor = scale[1];
+    hdr.z_scale_factor = scale[2];
+    hdr.x_offset = offset[0];
+    hdr.y_offset = offset[1];
+    hdr.z_offset = offset[2];
+
+    // Extents of point file data
+    std::vector<uint32_t> coords;
+    coords.resize(points.size() * 3);
+    for (size_t i = 0; i < points.size(); i++)
+    {
+        coords[i * 3 + 0] = points[i].x;
+        coords[i * 3 + 1] = points[i].y;
+        coords[i * 3 + 2] = points[i].z;
+    }
+    Aabb<uint32_t> box;
+    box.set(coords);
+    hdr.max_x = static_cast<double>(box.max(0)) * scale[0] + offset[0];
+    hdr.min_x = static_cast<double>(box.min(0)) * scale[0] + offset[0];
+    hdr.max_y = static_cast<double>(box.max(1)) * scale[1] + offset[1];
+    hdr.min_y = static_cast<double>(box.min(1)) * scale[1] + offset[1];
+    hdr.max_z = static_cast<double>(box.max(2)) * scale[2] + offset[2];
+    hdr.min_z = static_cast<double>(box.min(2)) * scale[2] + offset[2];
+
+    // Create file output
+    FileLas las;
+    las.create(path);
+    las.header = hdr;
+    las.writeHeader();
+
+    for (size_t i = 0; i < points.size(); i++)
+    {
+        las.writePoint(points[i]);
+    }
+
+    las.close();
+
+    // Create file index
+    LasIndexBuilder::Settings settings;
+    settings.maxSize1 = 2;
+    settings.maxSize2 = 1;
+    LasIndexBuilder::index(path, path, settings);
+}
+
+void FileLas::open(const std::string &path)
 {
     std::memset(&header, 0, sizeof(header));
     file_.open(path);
 }
 
-void LasFile::create(const std::string &path)
+void FileLas::create(const std::string &path)
 {
     std::memset(&header, 0, sizeof(header));
     file_.create(path);
 }
 
-void LasFile::close()
+void FileLas::close()
 {
     file_.close();
 }
 
-void LasFile::seek(uint64_t offset)
+void FileLas::seek(uint64_t offset)
 {
     file_.seek(offset);
 }
 
-void LasFile::seekHeader()
+void FileLas::seekHeader()
 {
     file_.seek(0);
 }
 
-void LasFile::seekVlr()
+void FileLas::seekVlr()
 {
     file_.seek(header.header_size);
 }
 
-void LasFile::seekPointData()
+void FileLas::seekPointData()
 {
     file_.seek(header.offset_to_point_data);
 }
 
-void LasFile::seekExtendedVlr()
+void FileLas::seekExtendedVlr()
 {
     file_.seek(header.offset_to_evlr);
 }
 
-void LasFile::readHeader()
+void FileLas::readHeader()
 {
     readHeader(header);
 }
 
-void LasFile::readHeader(Header &hdr)
+void FileLas::readHeader(Header &hdr)
 {
     uint8_t buffer[256];
 
@@ -335,12 +420,12 @@ void LasFile::readHeader(Header &hdr)
     }
 }
 
-void LasFile::writeHeader()
+void FileLas::writeHeader()
 {
     writeHeader(header);
 }
 
-void LasFile::writeHeader(const Header &hdr)
+void FileLas::writeHeader(const Header &hdr)
 {
     uint8_t buffer[512];
     uint32_t header_size;
@@ -401,19 +486,20 @@ void LasFile::writeHeader(const Header &hdr)
     // Version 1.3
     if (hdr.version_minor > 2)
     {
-        htol64(&buffer[0], hdr.offset_to_wdpr);
+        htol64(&buffer[header_size + 0], hdr.offset_to_wdpr);
         header_size = LAS_FILE_HEADER_SIZE_V13;
     }
 
     // Version 1.4
     if (hdr.version_minor > 3)
     {
-        htol64(&buffer[0], hdr.offset_to_evlr);
-        htol32(&buffer[8], hdr.number_of_evlr);
-        htol64(&buffer[12], hdr.number_of_point_records);
-        for (int i = 0; i < 15; i++)
+        htol64(&buffer[header_size + 0], hdr.offset_to_evlr);
+        htol32(&buffer[header_size + 8], hdr.number_of_evlr);
+        htol64(&buffer[header_size + 12], hdr.number_of_point_records);
+        for (size_t i = 0; i < 15; i++)
         {
-            htol64(&buffer[20 + (i * 8)], hdr.number_of_points_by_return[i]);
+            htol64(&buffer[header_size + 20 + (i * 8)],
+                   hdr.number_of_points_by_return[i]);
         }
         header_size = LAS_FILE_HEADER_SIZE_V14;
     }
@@ -422,7 +508,7 @@ void LasFile::writeHeader(const Header &hdr)
     file_.write(buffer, header_size);
 }
 
-void LasFile::readPoint(Point &pt)
+void FileLas::readPoint(Point &pt)
 {
     uint8_t buffer[256];
 
@@ -430,12 +516,12 @@ void LasFile::readPoint(Point &pt)
     readPoint(pt, buffer, header.point_data_record_format);
 }
 
-void LasFile::readPoint(uint8_t *buffer)
+void FileLas::readPoint(uint8_t *buffer)
 {
     file_.read(buffer, header.point_data_record_length);
 }
 
-void LasFile::readPoint(Point &pt, const uint8_t *buffer, uint8_t fmt) const
+void FileLas::readPoint(Point &pt, const uint8_t *buffer, uint8_t fmt) const
 {
     size_t pos;
 
@@ -474,7 +560,8 @@ void LasFile::readPoint(Point &pt, const uint8_t *buffer, uint8_t fmt) const
         pt.number_of_returns = static_cast<uint8_t>((data14 >> 3) & 7U);
         pt.scan_direction_flag = static_cast<uint8_t>((data14 >> 6) & 1U);
         pt.edge_of_flight_line = static_cast<uint8_t>((data14 >> 7) & 1U);
-        pt.classification = buffer[15];
+        pt.classification = buffer[15] & 0x1fU;
+        pt.classification_flags = (buffer[15] >> 5);
         pt.angle = static_cast<int16_t>(buffer[16]);
         pt.user_data = buffer[17];
         pt.source_id = ltoh16(&buffer[18]);
@@ -510,24 +597,145 @@ void LasFile::readPoint(Point &pt, const uint8_t *buffer, uint8_t fmt) const
         pt.wave_x = ltohf(&buffer[pos + 17]);
         pt.wave_y = ltohf(&buffer[pos + 21]);
         pt.wave_z = ltohf(&buffer[pos + 25]);
+        pos += 29;
     }
 
-    int length = static_cast<int>(header.point_data_record_length);
-    int userLength = length - static_cast<int>(LAS_FILE_FORMAT_BYTE_COUNT[fmt]);
-    if (userLength > 3)
+    if (header.point_data_record_length > (pos + 9))
     {
-        pt.layer = ltoh32(&buffer[length - 4]);
+        pt.user_layer = ltoh32(&buffer[pos]);
+        pt.user_red = ltoh16(&buffer[pos + 4]);
+        pt.user_green = ltoh16(&buffer[pos + 6]);
+        pt.user_blue = ltoh16(&buffer[pos + 8]);
     }
 }
 
-void LasFile::transform(double &x, double &y, double &z, const Point &pt) const
+void FileLas::writePoint(const Point &pt)
+{
+    uint8_t buffer[256];
+
+    writePoint(buffer, pt);
+    file_.write(buffer, header.point_data_record_length);
+}
+
+void FileLas::writePoint(uint8_t *buffer, const Point &pt) const
+{
+    const uint8_t fmt = pt.format;
+    size_t pos;
+
+    // TBD this is without optimization, all points have the same format
+
+    if (fmt > 5)
+    {
+        htol32(&buffer[0], pt.x);
+        htol32(&buffer[4], pt.y);
+        htol32(&buffer[8], pt.z);
+        htol16(&buffer[12], pt.intensity);
+
+        // Return Number        4 bits (bits 0 - 3)
+        // Number of Returns    4 bits (bits 4 - 7)
+        uint32_t data14 =
+            (static_cast<uint32_t>(pt.return_number) & 15U) |
+            ((static_cast<uint32_t>(pt.number_of_returns) & 15U) << 4);
+        buffer[14] = static_cast<uint8_t>(data14);
+
+        // Classification Flags 4 bits (bits 0 - 3)
+        // Scanner Channel      2 bits (bits 4 - 5)
+        // Scan Direction Flag  1 bit (bit 6)
+        // Edge of Flight Line  1 bit (bit 7)
+        uint32_t data15 =
+            (static_cast<uint32_t>(pt.classification_flags) & 15U) |
+            ((static_cast<uint32_t>(pt.scanner_channel) & 3U) << 4) |
+            ((static_cast<uint32_t>(pt.scan_direction_flag) & 1U) << 6) |
+            ((static_cast<uint32_t>(pt.edge_of_flight_line) & 1U) << 7);
+        buffer[15] = static_cast<uint8_t>(data15);
+
+        buffer[16] = pt.classification;
+        buffer[17] = pt.user_data;
+        htol16(&buffer[18], static_cast<uint16_t>(pt.angle));
+        htol16(&buffer[20], pt.source_id);
+
+        pos = 22;
+    }
+    else
+    {
+        htol32(&buffer[0], pt.x);
+        htol32(&buffer[4], pt.y);
+        htol32(&buffer[8], pt.z);
+        htol16(&buffer[12], pt.intensity);
+
+        // Return Number        3 bits (bits 0 – 2)
+        // Number of Returns    3 bits (bits 3 – 5)
+        // Scan Direction Flag  1 bit  (bit 6)
+        // Edge of Flight Line  1 bit  (bit 7)
+        uint32_t data14 =
+            (static_cast<uint32_t>(pt.return_number) & 7U) |
+            ((static_cast<uint32_t>(pt.number_of_returns) & 7U) << 3) |
+            ((static_cast<uint32_t>(pt.scan_direction_flag) & 1U) << 6) |
+            ((static_cast<uint32_t>(pt.edge_of_flight_line) & 1U) << 7);
+        buffer[14] = static_cast<uint8_t>(data14);
+
+        // Classification       5 bits (bits 0 - 4)
+        // Classification Flags 3 bits (bits 5 - 7)
+        uint32_t data15 = (pt.classification & 0x1fU) |
+                          (static_cast<uint32_t>(pt.classification_flags) << 5);
+        buffer[15] = static_cast<uint8_t>(data15);
+
+        buffer[16] = static_cast<uint8_t>(pt.angle);
+        buffer[17] = pt.user_data;
+        htol16(&buffer[18], pt.source_id);
+
+        pos = 20;
+    }
+
+    if (fmt == 1 || fmt > 2)
+    {
+        htold(&buffer[pos], pt.gps_time);
+        pos += 8;
+    }
+
+    if (fmt == 2 || fmt == 3 || fmt == 5 || fmt == 7 || fmt == 8 || fmt == 10)
+    {
+        htol16(&buffer[pos], pt.red);
+        htol16(&buffer[pos + 2], pt.green);
+        htol16(&buffer[pos + 4], pt.blue);
+        pos += 6;
+    }
+
+    if (fmt == 8 || fmt == 10)
+    {
+        htol16(&buffer[pos], pt.nir);
+        pos += 2;
+    }
+
+    if (fmt == 4 || fmt == 5 || fmt == 9 || fmt == 10)
+    {
+        buffer[pos] = pt.wave_index;
+        htol64(&buffer[pos + 1], pt.wave_offset);
+        htol32(&buffer[pos + 9], pt.wave_size);
+        htolf(&buffer[pos + 13], pt.wave_return);
+        htolf(&buffer[pos + 17], pt.wave_x);
+        htolf(&buffer[pos + 21], pt.wave_y);
+        htolf(&buffer[pos + 25], pt.wave_z);
+        pos += 29;
+    }
+
+    if (header.point_data_record_length > (pos + 9))
+    {
+        htol32(&buffer[pos], pt.user_layer);
+        htol16(&buffer[pos + 4], pt.user_red);
+        htol16(&buffer[pos + 6], pt.user_green);
+        htol16(&buffer[pos + 8], pt.user_blue);
+    }
+}
+
+void FileLas::transform(double &x, double &y, double &z, const Point &pt) const
 {
     x = (static_cast<double>(pt.x) * header.x_scale_factor) + header.x_offset;
     y = (static_cast<double>(pt.y) * header.y_scale_factor) + header.y_offset;
     z = (static_cast<double>(pt.z) * header.z_scale_factor) + header.z_offset;
 }
 
-void LasFile::transform(double &x,
+void FileLas::transform(double &x,
                         double &y,
                         double &z,
                         const uint8_t *buffer) const
@@ -540,14 +748,14 @@ void LasFile::transform(double &x,
     z = (pz * header.z_scale_factor) + header.z_offset;
 }
 
-void LasFile::transformInvert(double &x, double &y, double &z) const
+void FileLas::transformInvert(double &x, double &y, double &z) const
 {
     x = (x - header.x_offset) / header.x_scale_factor;
     y = (y - header.y_offset) / header.y_scale_factor;
     z = (z - header.z_offset) / header.z_scale_factor;
 }
 
-Json &LasFile::Point::write(Json &out) const
+Json &FileLas::Point::write(Json &out) const
 {
     out["coordinates"][0] = x;
     out["coordinates"][1] = y;
@@ -559,7 +767,7 @@ Json &LasFile::Point::write(Json &out) const
     return out;
 }
 
-Json &LasFile::Header::write(Json &out) const
+Json &FileLas::Header::write(Json &out) const
 {
     out["version"][0] = version_major;
     out["version"][1] = version_minor;
@@ -587,4 +795,18 @@ Json &LasFile::Header::write(Json &out) const
     out["min"][2] = min_z;
 
     return out;
+}
+
+std::ostream &operator<<(std::ostream &os, const FileLas::Header &obj)
+{
+    Json json;
+    os << obj.write(json).serialize();
+    return os;
+}
+
+std::ostream &operator<<(std::ostream &os, const FileLas::Point &obj)
+{
+    Json json;
+    os << obj.write(json).serialize();
+    return os;
 }

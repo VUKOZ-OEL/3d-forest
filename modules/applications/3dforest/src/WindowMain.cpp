@@ -31,16 +31,19 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPluginLoader>
+#include <QTextEdit>
 #include <Time.hpp>
-#include <Viewer.hpp>
 #include <WindowClipFilter.hpp>
 #include <WindowDataSets.hpp>
 #include <WindowLayers.hpp>
 #include <WindowMain.hpp>
+#include <WindowViewports.hpp>
 #include <iostream>
 
 const QString WindowMain::APPLICATION_NAME = "3DForest";
 const QString WindowMain::APPLICATION_VERSION = "1.0";
+QTextEdit *WindowMain::log = nullptr;
+
 static const char *WINDOW_MAIN_FILE_FILTER = "3DForest Project (*.json)";
 #define WINDOW_MAIN_DOCK_MIN 80
 #define WINDOW_MAIN_DOCK_MAX 500
@@ -87,13 +90,13 @@ void WindowMain::createEditor()
 
 void WindowMain::createViewer()
 {
-    viewer_ = new Viewer(this);
-    connect(viewer_,
+    windowViewports_ = new WindowViewports(this);
+    connect(windowViewports_,
             SIGNAL(cameraChanged()),
             this,
             SLOT(actionCameraChanged()));
 
-    setCentralWidget(viewer_);
+    setCentralWidget(windowViewports_);
 }
 
 void WindowMain::createMenus()
@@ -224,10 +227,21 @@ void WindowMain::createWindows()
     dockClipFilter->setWidget(windowClipFilter_);
     addDockWidget(Qt::LeftDockWidgetArea, dockClipFilter);
 
+    // Log
+    log = new QTextEdit(this);
+    log->setReadOnly(true);
+
+    QDockWidget *dockLog = new QDockWidget(tr("Log"), this);
+    dockLog->setMinimumHeight(200);
+    dockLog->setWidget(log);
+    dockLog->setVisible(false);
+    addDockWidget(Qt::BottomDockWidgetArea, dockLog);
+
     // Add dock widgets to Windows menu
     menuWindows_->addAction(dockClipFilter->toggleViewAction());
     menuWindows_->addAction(dockDataSets->toggleViewAction());
     menuWindows_->addAction(dockLayers->toggleViewAction());
+    menuWindows_->addAction(dockLog->toggleViewAction());
 }
 
 void WindowMain::createPlugins()
@@ -334,52 +348,52 @@ void WindowMain::actionProjectExportAs()
 
 void WindowMain::actionViewOrthographic()
 {
-    viewer_->setViewport(Viewer::VIEW_CAMERA_ORTHOGRAPHIC);
+    windowViewports_->setViewOrthographic();
 }
 
 void WindowMain::actionViewPerspective()
 {
-    viewer_->setViewport(Viewer::VIEW_CAMERA_PERSPECTIVE);
+    windowViewports_->setViewPerspective();
 }
 
 void WindowMain::actionViewTop()
 {
-    viewer_->setViewport(Viewer::VIEW_CAMERA_TOP);
+    windowViewports_->setViewTop();
 }
 
 void WindowMain::actionViewFront()
 {
-    viewer_->setViewport(Viewer::VIEW_CAMERA_FRONT);
+    windowViewports_->setViewFront();
 }
 
 void WindowMain::actionViewLeft()
 {
-    viewer_->setViewport(Viewer::VIEW_CAMERA_LEFT);
+    windowViewports_->setViewLeft();
 }
 
 void WindowMain::actionView3d()
 {
-    viewer_->setViewport(Viewer::VIEW_CAMERA_3D);
+    windowViewports_->setView3d();
 }
 
 void WindowMain::actionViewResetDistance()
 {
-    viewer_->setViewport(Viewer::VIEW_CAMERA_RESET_DISTANCE);
+    windowViewports_->setViewResetDistance();
 }
 
 void WindowMain::actionViewResetCenter()
 {
-    viewer_->setViewport(Viewer::VIEW_CAMERA_RESET_CENTER);
+    windowViewports_->setViewResetCenter();
 }
 
 void WindowMain::actionViewLayoutSingle()
 {
-    viewer_->setLayout(Viewer::VIEW_LAYOUT_SINGLE);
+    windowViewports_->setLayout(WindowViewports::VIEW_LAYOUT_SINGLE);
 }
 
 void WindowMain::actionViewLayoutTwoColumns()
 {
-    viewer_->setLayout(Viewer::VIEW_LAYOUT_TWO_COLUMNS);
+    windowViewports_->setLayout(WindowViewports::VIEW_LAYOUT_TWO_COLUMNS);
     updateViewer();
 }
 
@@ -432,14 +446,20 @@ void WindowMain::actionClipFilter(const ClipFilter &clipFilter)
 {
     editor_.cancelThreads();
     editor_.setClipFilter(clipFilter);
-    updateViewer();
+    // updateViewer();
+
+    editor_.lock();
+    editor_.tileViewClear();
+    editor_.unlock();
+
+    editor_.restartThreads();
 }
 
 void WindowMain::actionClipFilterReset()
 {
     editor_.cancelThreads();
     editor_.resetClipFilter();
-    windowClipFilter_->updateEditor(editor_);
+    windowClipFilter_->setClipFilter(editor_);
 }
 
 void WindowMain::actionAbout()
@@ -583,25 +603,25 @@ void WindowMain::updateProject()
 {
     editor_.cancelThreads();
     editor_.lock();
-    viewer_->resetScene(&editor_);
+    windowViewports_->resetScene(&editor_);
     editor_.unlock();
 
     windowDataSets_->updateEditor(editor_);
     windowLayers_->updateEditor(editor_);
-    windowClipFilter_->updateEditor(editor_);
+    windowClipFilter_->setClipFilter(editor_);
     updateViewer();
     updateWindowTitle(QString::fromStdString(editor_.path()));
 }
 
 void WindowMain::actionCameraChanged()
 {
-    editor_.render(viewer_->camera());
+    editor_.render(windowViewports_->camera());
 }
 
 void WindowMain::actionEditorRender()
 {
     editor_.lock();
-    viewer_->updateScene(&editor_);
+    windowViewports_->updateScene(&editor_);
     editor_.unlock();
 }
 

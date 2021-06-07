@@ -18,7 +18,7 @@
 */
 
 /**
-    @file Viewer.cpp
+    @file WindowViewports.cpp
 */
 
 #include <Editor.hpp>
@@ -26,32 +26,32 @@
 #include <QHBoxLayout>
 #include <QSplitter>
 #include <QVBoxLayout>
-#include <Viewer.hpp>
+#include <WindowViewports.hpp>
 
-Viewer::Viewer(QWidget *parent) : QWidget(parent)
+WindowViewports::WindowViewports(QWidget *parent) : QWidget(parent)
 {
     initializeViewer();
 }
 
-Viewer::~Viewer()
+WindowViewports::~WindowViewports()
 {
 }
 
-void Viewer::initializeViewer()
+void WindowViewports::initializeViewer()
 {
     setLayout(ViewLayout::VIEW_LAYOUT_SINGLE);
 }
 
-GLWidget *Viewer::createViewport()
+GLWidget *WindowViewports::createViewport()
 {
     GLWidget *viewport = new GLWidget(this);
-    viewport->setViewer(this);
+    viewport->setWindowViewports(this);
     viewport->setSelected(false);
 
     return viewport;
 }
 
-GLWidget *Viewer::selectedViewport()
+GLWidget *WindowViewports::selectedViewport()
 {
     for (size_t i = 0; i < viewports_.size(); i++)
     {
@@ -64,7 +64,7 @@ GLWidget *Viewer::selectedViewport()
     return nullptr;
 }
 
-const GLWidget *Viewer::selectedViewport() const
+const GLWidget *WindowViewports::selectedViewport() const
 {
     for (size_t i = 0; i < viewports_.size(); i++)
     {
@@ -77,47 +77,47 @@ const GLWidget *Viewer::selectedViewport() const
     return nullptr;
 }
 
-void Viewer::setViewport(ViewCamera viewCamera)
+void WindowViewports::setViewOrthographic()
 {
-    GLWidget *viewport = selectedViewport();
-    if (!viewport)
-    {
-        return;
-    }
-
-    switch (viewCamera)
-    {
-        case VIEW_CAMERA_ORTHOGRAPHIC:
-            viewport->setViewOrthographic();
-            break;
-        case VIEW_CAMERA_PERSPECTIVE:
-            viewport->setViewPerspective();
-            break;
-
-        case VIEW_CAMERA_TOP:
-            viewport->setViewTop();
-            break;
-        case VIEW_CAMERA_FRONT:
-            viewport->setViewFront();
-            break;
-        case VIEW_CAMERA_LEFT:
-            viewport->setViewLeft();
-            break;
-        case VIEW_CAMERA_3D:
-            viewport->setView3d();
-            break;
-
-        case VIEW_CAMERA_RESET_DISTANCE:
-            viewport->setViewResetDistance();
-            break;
-        case VIEW_CAMERA_RESET_CENTER:
-        default:
-            viewport->setViewResetCenter();
-            break;
-    }
+    selectedViewport()->setViewOrthographic();
 }
 
-void Viewer::selectViewport(GLWidget *viewport)
+void WindowViewports::setViewPerspective()
+{
+    selectedViewport()->setViewPerspective();
+}
+
+void WindowViewports::setViewTop()
+{
+    selectedViewport()->setViewTop();
+}
+
+void WindowViewports::setViewFront()
+{
+    selectedViewport()->setViewFront();
+}
+
+void WindowViewports::setViewLeft()
+{
+    selectedViewport()->setViewLeft();
+}
+
+void WindowViewports::setView3d()
+{
+    selectedViewport()->setView3d();
+}
+
+void WindowViewports::setViewResetDistance()
+{
+    selectedViewport()->setViewResetDistance();
+}
+
+void WindowViewports::setViewResetCenter()
+{
+    selectedViewport()->setViewResetCenter();
+}
+
+void WindowViewports::selectViewport(GLWidget *viewport)
 {
     for (size_t i = 0; i < viewports_.size(); i++)
     {
@@ -133,7 +133,7 @@ void Viewer::selectViewport(GLWidget *viewport)
     }
 }
 
-void Viewer::updateScene(Editor *editor)
+void WindowViewports::updateScene(Editor *editor)
 {
     for (size_t i = 0; i < viewports_.size(); i++)
     {
@@ -142,7 +142,7 @@ void Viewer::updateScene(Editor *editor)
     }
 }
 
-void Viewer::resetScene(Editor *editor)
+void WindowViewports::resetScene(Editor *editor)
 {
     for (size_t i = 0; i < viewports_.size(); i++)
     {
@@ -150,7 +150,7 @@ void Viewer::resetScene(Editor *editor)
     }
 }
 
-Camera Viewer::camera() const
+Camera WindowViewports::camera() const
 {
     const GLWidget *viewport = selectedViewport();
     if (viewport)
@@ -161,7 +161,7 @@ Camera Viewer::camera() const
     return Camera();
 }
 
-void Viewer::setLayout(ViewLayout viewLayout)
+void WindowViewports::setLayout(ViewLayout viewLayout)
 {
     // Remove the current layout
     QLayout *oldLayout = layout();

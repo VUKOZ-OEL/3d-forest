@@ -34,33 +34,33 @@
 /** JSON.
 
     example deserialize:
-\code
+@code
     Json obj;
     obj.deserialize("{\"a\":5}");
     std::cout << obj["a"].isNumber() << "\n"; // 1
     std::cout << obj["a"].number() << "\n"; // 5
-\endcode
+@endcode
 
     example number:
-\code
+@code
     Json obj;
     obj["a"] = 5;
     obj["b"] = 3.14;
     std::cout << obj.serialize(0) << "\n"; // {"a":5,"b":3.14}
-\endcode
+@endcode
 
     example string:
-\code
+@code
     Json obj;
     obj["name"] = "John";
 
     std::cout << obj["name"].isString() << "\n"; // 1
     std::cout << obj["name"].string() << "\n"; // John
     std::cout << obj.serialize(0) << "\n"; // {"name":"John"}
-\endcode
+@endcode
 
     example array:
-\code
+@code
     Json obj;
     obj["dim"][0] = 10;
     obj["dim"][1] = 20;
@@ -80,7 +80,7 @@
     std::cout << area << "\n"; // 200
 
     std::cout << obj.serialize(0) << "\n"; // {"dim":[10,20],"scale":[1,2,3]}
-\endcode
+@endcode
 */
 class Json
 {

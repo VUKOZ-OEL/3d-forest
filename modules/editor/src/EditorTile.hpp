@@ -25,6 +25,7 @@
 #define EDITOR_TILE_HPP
 
 #include <Aabb.hpp>
+#include <OctreeIndex.hpp>
 #include <Vector3.hpp>
 #include <cstdint>
 #include <vector>
@@ -56,6 +57,10 @@ public:
     std::vector<uint32_t> layer;
 
     Aabb<double> boundary;
+
+    // Index
+    OctreeIndex index;
+    std::vector<unsigned int> indices;
 
     // State
     bool loaded;

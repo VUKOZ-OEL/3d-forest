@@ -44,6 +44,7 @@ public:
     ~EditorBase();
 
     void open(const std::string &path);
+    void openFile(const std::string &path);
     void write(const std::string &path);
     const std::string &path() const { return path_; }
     bool hasUnsavedChanges() const { return unsavedChanges_; }
@@ -118,6 +119,7 @@ protected:
 
     void loadView(size_t idx);
     void resetRendering();
+    void openUpdate();
 };
 
 #endif /* EDITOR_BASE_HPP */

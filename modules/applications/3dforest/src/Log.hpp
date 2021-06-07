@@ -18,32 +18,20 @@
 */
 
 /**
-    @file Application.cpp
+    @file Log.hpp
 */
 
-#include <Log.hpp>
-#include <QApplication>
-#include <QSurfaceFormat>
-#include <WindowMain.hpp>
+#ifndef LOG_HPP
+#define LOG_HPP
 
-int main(int argc, char *argv[])
+/** Log.
+
+    TBD To make it thread safe. Now it is only for GUI thread.
+*/
+class Log
 {
-    Log::install();
+public:
+    static void install();
+};
 
-    QApplication app(argc, argv);
-
-    app.setOrganizationName("VUKOZ v.v.i.");
-    app.setApplicationName(WindowMain::APPLICATION_NAME);
-    app.setApplicationVersion(WindowMain::APPLICATION_VERSION);
-    app.setWindowIcon(QIcon(":/3dforest-256.png"));
-
-    QSurfaceFormat format;
-    format.setDepthBufferSize(24);
-    QSurfaceFormat::setDefaultFormat(format);
-
-    WindowMain window;
-    window.setWindowIcon(QIcon(":/3dforest-256.png"));
-    window.show();
-
-    return app.exec();
-}
+#endif /* LOG_HPP */
