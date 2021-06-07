@@ -24,15 +24,24 @@
 #include <EditorDataSet.hpp>
 #include <Error.hpp>
 #include <File.hpp>
-#include <LasFile.hpp>
+#include <FileLas.hpp>
 #include <LasIndexBuilder.hpp>
+#include <iostream>
 
-EditorDataSet::EditorDataSet()
+EditorDataSet::EditorDataSet() : id(0), visible(true)
 {
 }
 
 EditorDataSet::~EditorDataSet()
 {
+}
+
+void EditorDataSet::read(const std::string &filePath)
+{
+    pathUnresolved = filePath;
+    setPath(pathUnresolved, File::currentPath() + "\\project");
+
+    read();
 }
 
 void EditorDataSet::read(const Json &in, const std::string &projectPath)
@@ -50,22 +59,11 @@ void EditorDataSet::read(const Json &in, const std::string &projectPath)
 
     pathUnresolved = in["path"].string();
     setPath(pathUnresolved, projectPath);
-    if (!File::exists(path))
-    {
-        THROW("File '" + path + "' doesn't exist");
-    }
 
     // Date Created
     if (in.contains("dateCreated"))
     {
         dateCreated = in["dateCreated"].string();
-    }
-    else
-    {
-        LasFile las;
-        las.open(path);
-        las.readHeader();
-        dateCreated = las.header.dateCreated();
     }
 
     // ID
@@ -118,6 +116,11 @@ void EditorDataSet::setPath(const std::string &unresolved,
 
     // Data set file name
     fileName = File::fileName(path);
+
+    if (!File::exists(path))
+    {
+        THROW("File '" + path + "' doesn't exist");
+    }
 }
 
 void EditorDataSet::read()
@@ -125,9 +128,14 @@ void EditorDataSet::read()
     const std::string pathL1 = LasIndexBuilder::extensionL1(path);
     index.read(pathL1);
 
-    LasFile las;
+    FileLas las;
     las.open(path);
     las.readHeader();
+
+    if (dateCreated.empty())
+    {
+        dateCreated = las.header.dateCreated();
+    }
 
     double x1 = las.header.min_x;
     double y1 = las.header.min_y;
