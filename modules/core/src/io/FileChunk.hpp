@@ -18,11 +18,11 @@
 */
 
 /**
-    @file ChunkFile.hpp
+    @file FileChunk.hpp
 */
 
-#ifndef CHUNK_FILE_HPP
-#define CHUNK_FILE_HPP
+#ifndef FILE_CHUNK_HPP
+#define FILE_CHUNK_HPP
 
 #include <File.hpp>
 #include <Json.hpp>
@@ -37,7 +37,7 @@
     All multi-byte integers are in little-endian format.
     All integers should be aligned to file offsets by their size.
 */
-class ChunkFile
+class FileChunk
 {
 public:
     static const size_t CHUNK_HEADER_SIZE;
@@ -54,8 +54,8 @@ public:
         Json &write(Json &out) const;
     };
 
-    ChunkFile();
-    ~ChunkFile();
+    FileChunk();
+    ~FileChunk();
 
     void open(const std::string &path, const std::string &mode);
     void close();
@@ -85,4 +85,4 @@ protected:
     std::string status() const;
 };
 
-#endif /* CHUNK_FILE_HPP */
+#endif /* FILE_CHUNK_HPP */

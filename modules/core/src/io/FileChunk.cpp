@@ -18,46 +18,46 @@
 */
 
 /**
-    @file ChunkFile.cpp
+    @file FileChunk.cpp
 */
 
-#include <ChunkFile.hpp>
 #include <Endian.hpp>
 #include <Error.hpp>
+#include <FileChunk.hpp>
 #include <cassert>
 #include <sstream>
 
-const size_t ChunkFile::CHUNK_HEADER_SIZE = 16;
+const size_t FileChunk::CHUNK_HEADER_SIZE = 16;
 
-ChunkFile::ChunkFile()
+FileChunk::FileChunk()
 {
 }
 
-ChunkFile::~ChunkFile()
+FileChunk::~FileChunk()
 {
 }
 
-bool ChunkFile::eof() const
+bool FileChunk::eof() const
 {
     return file_.eof();
 }
 
-uint64_t ChunkFile::size() const
+uint64_t FileChunk::size() const
 {
     return file_.size();
 }
 
-uint64_t ChunkFile::offset() const
+uint64_t FileChunk::offset() const
 {
     return file_.offset();
 }
 
-const std::string &ChunkFile::path() const
+const std::string &FileChunk::path() const
 {
     return file_.path();
 }
 
-std::string ChunkFile::status() const
+std::string FileChunk::status() const
 {
     std::ostringstream output;
 
@@ -66,37 +66,37 @@ std::string ChunkFile::status() const
     return output.str();
 }
 
-void ChunkFile::open(const std::string &path, const std::string &mode)
+void FileChunk::open(const std::string &path, const std::string &mode)
 {
     file_.open(path, mode);
 }
 
-void ChunkFile::close()
+void FileChunk::close()
 {
     file_.close();
 }
 
-void ChunkFile::seek(uint64_t offset)
+void FileChunk::seek(uint64_t offset)
 {
     file_.seek(offset);
 }
 
-void ChunkFile::skip(uint64_t nbyte)
+void FileChunk::skip(uint64_t nbyte)
 {
     file_.skip(nbyte);
 }
 
-void ChunkFile::read(uint8_t *buffer, uint64_t nbyte)
+void FileChunk::read(uint8_t *buffer, uint64_t nbyte)
 {
     file_.read(buffer, nbyte);
 }
 
-void ChunkFile::write(const uint8_t *buffer, uint64_t nbyte)
+void FileChunk::write(const uint8_t *buffer, uint64_t nbyte)
 {
     file_.write(buffer, nbyte);
 }
 
-void ChunkFile::read(ChunkFile::Chunk &chunk)
+void FileChunk::read(FileChunk::Chunk &chunk)
 {
     uint8_t buffer[CHUNK_HEADER_SIZE];
 
@@ -109,7 +109,7 @@ void ChunkFile::read(ChunkFile::Chunk &chunk)
     chunk.dataLength = ltoh64(&buffer[8]);
 }
 
-void ChunkFile::validate(const Chunk &chunk,
+void FileChunk::validate(const Chunk &chunk,
                          uint32_t type,
                          uint8_t majorVersion,
                          uint8_t minorVersion) const
@@ -121,7 +121,7 @@ void ChunkFile::validate(const Chunk &chunk,
     }
 }
 
-void ChunkFile::write(const ChunkFile::Chunk &chunk)
+void FileChunk::write(const FileChunk::Chunk &chunk)
 {
     uint8_t buffer[CHUNK_HEADER_SIZE];
 
@@ -134,7 +134,7 @@ void ChunkFile::write(const ChunkFile::Chunk &chunk)
     file_.write(buffer, CHUNK_HEADER_SIZE);
 }
 
-Json &ChunkFile::Chunk::write(Json &out) const
+Json &FileChunk::Chunk::write(Json &out) const
 {
     std::string str;
 
