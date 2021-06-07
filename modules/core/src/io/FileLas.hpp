@@ -17,12 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file LasFile.hpp
-*/
+/** @file FileLas.hpp */
 
-#ifndef LAS_FILE_HPP
-#define LAS_FILE_HPP
+#ifndef FILE_LAS_HPP
+#define FILE_LAS_HPP
 
 #include <File.hpp>
 #include <Json.hpp>
@@ -30,7 +28,7 @@
 #include <vector>
 
 /** LAS (LASer) File Format. */
-class LasFile
+class FileLas
 {
 public:
     /** LAS Header. */
@@ -90,8 +88,9 @@ public:
         // End of 1.4 (375 bytes)
 
         size_t versionHeaderSize() const;
-        size_t pointDataRecordUserLength() const;
         size_t pointDataRecordFormatLength() const;
+        size_t pointDataRecord3dForestLength() const;
+        size_t pointDataRecordUserLength() const;
         uint64_t pointDataSize() const;
         std::string dateCreated() const;
         bool hasRgb() const;
@@ -105,33 +104,33 @@ public:
     {
         // Format 0 to 10
         uint32_t x;
-        uint32_t y;
+        uint32_t y; // 1*8
         uint32_t z;
         uint16_t intensity; // Optional
 
         // Format 0 to 10
-        uint8_t return_number;       // 0 to 15
-        uint8_t number_of_returns;   // 0 to 15
+        uint8_t return_number;       // 0 to 7 or 0 to 15
+        uint8_t number_of_returns;   // 0 to 7 or 0 to 15, 2 * 8
         uint8_t scan_direction_flag; // 0 or 1
         uint8_t edge_of_flight_line; // 0 or 1
 
         // Format 6 to 10
-        uint8_t classification_flags; // 0 to 15
+        uint8_t classification_flags; // 3 or 4 bit bitmask
         uint8_t scanner_channel;      // 0 to 3
 
         // Format 0 to 10
         int16_t angle;
-        uint16_t source_id;     // v1.0 user_data
-        uint8_t classification; // Sometimes optional
+        uint16_t source_id;     // v1.0 user_data, 3 * 8
+        uint8_t classification; // 0 to 31 or 0 to 255, Sometimes optional
         uint8_t user_data;      // Optional, v1.0 file_marker
-        uint8_t format;
+        uint8_t format;         // Copy of Header::point_data_record_format
 
         // Format 4, 5, 9, 10
         uint8_t wave_index;
-        uint32_t wave_size;
+        uint32_t wave_size; // 4 * 8
 
         // Format 1, 3, 4, 5, 6, 7, 8, 9, 10
-        double gps_time;
+        double gps_time; // 5 * 8
 
         // Format 2, 3, 5, 7, 8, 10
         uint16_t red;
@@ -139,25 +138,36 @@ public:
         uint16_t blue;
 
         // Format 8, 10
-        uint16_t nir;
+        uint16_t nir; // 6 * 8
 
         // Format 4, 5, 9, 10
-        uint64_t wave_offset;
+        uint64_t wave_offset; // 7 * 8
         float wave_return;
-        float wave_x;
+        float wave_x; // 8 * 8
         float wave_y;
-        float wave_z;
+        float wave_z; // 9 * 8
 
         // User-specific extra bytes
-        uint32_t layer;
+        uint32_t user_layer;
+        uint16_t user_red;
+        uint16_t user_green; // 10 * 8
+        uint16_t user_blue;
+
+        uint16_t reserved0;
+        uint32_t reserved1; // 11 * 8
 
         Json &write(Json &out) const;
     };
 
     Header header;
 
-    LasFile();
-    ~LasFile();
+    FileLas();
+    ~FileLas();
+
+    static void create(const std::string &path,
+                       const std::vector<FileLas::Point> &points,
+                       const std::array<double, 3> &scale = {0, 0, 0},
+                       const std::array<double, 3> &offset = {0, 0, 0});
 
     void open(const std::string &path);
     void create(const std::string &path);
@@ -174,6 +184,8 @@ public:
 
     void readPoint(Point &pt);
     void readPoint(Point &pt, const uint8_t *buffer, uint8_t fmt) const;
+    void writePoint(const Point &pt);
+    void writePoint(uint8_t *buffer, const Point &pt) const;
 
     void transform(double &x, double &y, double &z, const Point &pt) const;
     void transform(double &x,
@@ -192,4 +204,7 @@ protected:
     void readPoint(uint8_t *buffer);
 };
 
-#endif /* LAS_FILE_HPP */
+std::ostream &operator<<(std::ostream &os, const FileLas::Header &obj);
+std::ostream &operator<<(std::ostream &os, const FileLas::Point &obj);
+
+#endif /* FILE_LAS_HPP */
