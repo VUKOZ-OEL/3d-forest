@@ -23,60 +23,54 @@
 
 #include <Editor.hpp>
 #include <QCheckBox>
+#include <QDebug>
 #include <QDoubleSpinBox>
 #include <QGridLayout>
 #include <QLabel>
 #include <QPushButton>
 #include <WindowClipFilter.hpp>
+#include <ctkrangeslider.h>
 
-#define WINDOW_CLIP_FILTER_DECIMALS 6
+#define WINDOW_CLIP_FILTER_DECIMALS 8
+#define WINDOW_CLIP_FILTER_MAX 99
 
 WindowClipFilter::WindowClipFilter(QWidget *parent) : QWidget(parent)
 {
     // Widgets
-    xMinSpinBox_ = new QDoubleSpinBox;
-    xMinSpinBox_->setDecimals(WINDOW_CLIP_FILTER_DECIMALS);
-    connect(xMinSpinBox_,
-            SIGNAL(valueChanged(double)),
-            this,
-            SLOT(valueChanged(double)));
-    yMinSpinBox_ = new QDoubleSpinBox;
-    yMinSpinBox_->setDecimals(WINDOW_CLIP_FILTER_DECIMALS);
-    connect(yMinSpinBox_,
-            SIGNAL(valueChanged(double)),
-            this,
-            SLOT(valueChanged(double)));
-    zMinSpinBox_ = new QDoubleSpinBox;
-    zMinSpinBox_->setDecimals(WINDOW_CLIP_FILTER_DECIMALS);
-    connect(zMinSpinBox_,
-            SIGNAL(valueChanged(double)),
-            this,
-            SLOT(valueChanged(double)));
+    for (size_t i = 0; i < 3; i++)
+    {
+        rangeSlider_[i] = new ctkRangeSlider;
+        rangeSlider_[i]->setOrientation(Qt::Horizontal);
+        rangeSlider_[i]->setMaximumHeight(12);
+        connect(rangeSlider_[i],
+                SIGNAL(minimumPositionChanged(int)),
+                this,
+                SLOT(setRangeMin(int)));
+        connect(rangeSlider_[i],
+                SIGNAL(maximumPositionChanged(int)),
+                this,
+                SLOT(setRangeMax(int)));
 
-    xMaxSpinBox_ = new QDoubleSpinBox;
-    xMaxSpinBox_->setDecimals(WINDOW_CLIP_FILTER_DECIMALS);
-    connect(xMaxSpinBox_,
-            SIGNAL(valueChanged(double)),
-            this,
-            SLOT(valueChanged(double)));
-    yMaxSpinBox_ = new QDoubleSpinBox;
-    yMaxSpinBox_->setDecimals(WINDOW_CLIP_FILTER_DECIMALS);
-    connect(yMaxSpinBox_,
-            SIGNAL(valueChanged(double)),
-            this,
-            SLOT(valueChanged(double)));
-    zMaxSpinBox_ = new QDoubleSpinBox;
-    zMaxSpinBox_->setDecimals(WINDOW_CLIP_FILTER_DECIMALS);
-    connect(zMaxSpinBox_,
-            SIGNAL(valueChanged(double)),
-            this,
-            SLOT(valueChanged(double)));
+        minSpinBox_[i] = new QDoubleSpinBox;
+        minSpinBox_[i]->setDecimals(WINDOW_CLIP_FILTER_DECIMALS);
+        connect(minSpinBox_[i],
+                SIGNAL(valueChanged(double)),
+                this,
+                SLOT(setValueMin(double)));
+
+        maxSpinBox_[i] = new QDoubleSpinBox;
+        maxSpinBox_[i]->setDecimals(WINDOW_CLIP_FILTER_DECIMALS);
+        connect(maxSpinBox_[i],
+                SIGNAL(valueChanged(double)),
+                this,
+                SLOT(setValueMax(double)));
+    }
 
     enabledCheckBox_ = new QCheckBox;
     connect(enabledCheckBox_,
             SIGNAL(stateChanged(int)),
             this,
-            SLOT(stateChanged(int)));
+            SLOT(setEnabled(int)));
 
     resetButton_ = new QPushButton(tr("&Reset"), this);
     connect(resetButton_,
@@ -86,58 +80,164 @@ WindowClipFilter::WindowClipFilter(QWidget *parent) : QWidget(parent)
 
     // Layout
     QGridLayout *mainLayout = new QGridLayout();
-    mainLayout->addWidget(new QLabel(tr("X min")), 0, 0);
-    mainLayout->addWidget(xMinSpinBox_, 0, 1, 1, 2);
-    mainLayout->addWidget(new QLabel(tr("X max")), 1, 0);
-    mainLayout->addWidget(xMaxSpinBox_, 1, 1, 1, 2);
+    int row = 0;
 
-    mainLayout->addWidget(new QLabel(tr("Y min")), 2, 0);
-    mainLayout->addWidget(yMinSpinBox_, 2, 1, 1, 2);
-    mainLayout->addWidget(new QLabel(tr("Y max")), 3, 0);
-    mainLayout->addWidget(yMaxSpinBox_, 3, 1, 1, 2);
+    mainLayout->addWidget(new QLabel(tr("X")), row, 0);
+    mainLayout->addWidget(rangeSlider_[0], row, 1, 1, 2);
+    row++;
+    mainLayout->addWidget(new QLabel(tr("Y")), row, 0);
+    mainLayout->addWidget(rangeSlider_[1], row, 1, 1, 2);
+    row++;
+    mainLayout->addWidget(new QLabel(tr("Z")), row, 0);
+    mainLayout->addWidget(rangeSlider_[2], row, 1, 1, 2);
+    row++;
 
-    mainLayout->addWidget(new QLabel(tr("Z min")), 4, 0);
-    mainLayout->addWidget(zMinSpinBox_, 4, 1, 1, 2);
-    mainLayout->addWidget(new QLabel(tr("Z max")), 5, 0);
-    mainLayout->addWidget(zMaxSpinBox_, 5, 1, 1, 2);
+    mainLayout->addWidget(new QLabel(tr("X min")), row, 0);
+    mainLayout->addWidget(minSpinBox_[0], row, 1, 1, 2);
+    row++;
+    mainLayout->addWidget(new QLabel(tr("X max")), row, 0);
+    mainLayout->addWidget(maxSpinBox_[0], row, 1, 1, 2);
+    row++;
 
-    mainLayout->addWidget(new QLabel(tr("Enabled")), 6, 0);
-    mainLayout->addWidget(enabledCheckBox_, 6, 1);
-    mainLayout->addWidget(resetButton_, 6, 2, Qt::AlignRight);
+    mainLayout->addWidget(new QLabel(tr("Y min")), row, 0);
+    mainLayout->addWidget(minSpinBox_[1], row, 1, 1, 2);
+    row++;
+    mainLayout->addWidget(new QLabel(tr("Y max")), row, 0);
+    mainLayout->addWidget(maxSpinBox_[1], row, 1, 1, 2);
+    row++;
+
+    mainLayout->addWidget(new QLabel(tr("Z min")), row, 0);
+    mainLayout->addWidget(minSpinBox_[2], row, 1, 1, 2);
+    row++;
+    mainLayout->addWidget(new QLabel(tr("Z max")), row, 0);
+    mainLayout->addWidget(maxSpinBox_[2], row, 1, 1, 2);
+    row++;
+
+    mainLayout->addWidget(new QLabel(tr("Enabled")), row, 0);
+    mainLayout->addWidget(enabledCheckBox_, row, 1);
+    mainLayout->addWidget(resetButton_, row, 2, Qt::AlignRight);
+    row++;
 
     mainLayout->setVerticalSpacing(0);
     mainLayout->setColumnStretch(1, 1);
     setLayout(mainLayout);
 
-    setFixedHeight(200);
+    // Window
+    setFixedHeight(280);
 }
 
 WindowClipFilter::~WindowClipFilter()
 {
 }
 
-void WindowClipFilter::valueChanged(double d)
+void WindowClipFilter::setRangeMin(int v)
 {
-    (void)d;
-    changed();
+    QObject *obj = sender();
+
+    for (int i = 0; i < 3; i++)
+    {
+        if (obj == rangeSlider_[i])
+        {
+            double u = static_cast<double>(v) / WINDOW_CLIP_FILTER_MAX;
+            double n = minSpinBox_[i]->maximum() - minSpinBox_[i]->minimum();
+            minSpinBox_[i]->setValue(minSpinBox_[i]->minimum() + (u * n));
+
+            break;
+        }
+    }
+
+    filterUpdate();
 }
 
-void WindowClipFilter::stateChanged(int state)
+void WindowClipFilter::setRangeMax(int v)
+{
+    QObject *obj = sender();
+
+    for (int i = 0; i < 3; i++)
+    {
+        if (obj == rangeSlider_[i])
+        {
+            double u = static_cast<double>(v) / WINDOW_CLIP_FILTER_MAX;
+            double n = maxSpinBox_[i]->maximum() - maxSpinBox_[i]->minimum();
+            maxSpinBox_[i]->setValue(maxSpinBox_[i]->minimum() + (u * n));
+
+            break;
+        }
+    }
+
+    filterUpdate();
+}
+
+void WindowClipFilter::setValueMin(double d)
+{
+    QObject *obj = sender();
+
+    for (int i = 0; i < 3; i++)
+    {
+        if (obj == minSpinBox_[i])
+        {
+            double len = minSpinBox_[i]->maximum() - minSpinBox_[i]->minimum();
+            if (len > std::numeric_limits<double>::epsilon())
+            {
+                d -= minSpinBox_[i]->minimum();
+                int min = static_cast<int>((d / len) * WINDOW_CLIP_FILTER_MAX);
+                rangeSlider_[i]->setMinimumPosition(min);
+            }
+            else
+            {
+                rangeSlider_[i]->setMinimumPosition(0);
+            }
+
+            break;
+        }
+    }
+
+    filterUpdate();
+}
+
+void WindowClipFilter::setValueMax(double d)
+{
+    QObject *obj = sender();
+
+    for (int i = 0; i < 3; i++)
+    {
+        if (obj == maxSpinBox_[i])
+        {
+            double len = maxSpinBox_[i]->maximum() - maxSpinBox_[i]->minimum();
+            if (len > std::numeric_limits<double>::epsilon())
+            {
+                d -= maxSpinBox_[i]->minimum();
+                int max = static_cast<int>((d / len) * WINDOW_CLIP_FILTER_MAX);
+                rangeSlider_[i]->setMaximumPosition(max);
+            }
+            else
+            {
+                rangeSlider_[i]->setMaximumPosition(WINDOW_CLIP_FILTER_MAX);
+            }
+
+            break;
+        }
+    }
+
+    filterUpdate();
+}
+
+void WindowClipFilter::setEnabled(int state)
 {
     (void)state;
-    changed();
+    filterUpdate();
 }
 
-void WindowClipFilter::changed()
+void WindowClipFilter::filterUpdate()
 {
     ClipFilter clipFilter;
 
-    double x1 = xMinSpinBox_->value();
-    double y1 = yMinSpinBox_->value();
-    double z1 = zMinSpinBox_->value();
-    double x2 = xMaxSpinBox_->value();
-    double y2 = yMaxSpinBox_->value();
-    double z2 = zMaxSpinBox_->value();
+    double x1 = minSpinBox_[0]->value();
+    double y1 = minSpinBox_[1]->value();
+    double z1 = minSpinBox_[2]->value();
+    double x2 = maxSpinBox_[0]->value();
+    double y2 = maxSpinBox_[1]->value();
+    double z2 = maxSpinBox_[2]->value();
     bool checked = (enabledCheckBox_->checkState() == Qt::Checked);
 
     clipFilter.box.set(x1, y1, z1, x2, y2, z2);
@@ -158,25 +258,21 @@ void WindowClipFilter::reset()
     emit filterReset();
 }
 
-void WindowClipFilter::updateEditor(const Editor &editor)
+void WindowClipFilter::setClipFilter(const Editor &editor)
 {
     (void)blockSignals(true);
 
     const Aabb<double> &boundary = editor.boundary();
-    xMinSpinBox_->setRange(boundary.min(0), boundary.max(0));
-    yMinSpinBox_->setRange(boundary.min(1), boundary.max(1));
-    zMinSpinBox_->setRange(boundary.min(2), boundary.max(2));
-    xMaxSpinBox_->setRange(boundary.min(0), boundary.max(0));
-    yMaxSpinBox_->setRange(boundary.min(1), boundary.max(1));
-    zMaxSpinBox_->setRange(boundary.min(2), boundary.max(2));
-
     const ClipFilter &clipFilter = editor.clipFilter();
-    xMinSpinBox_->setValue(clipFilter.box.min(0));
-    yMinSpinBox_->setValue(clipFilter.box.min(1));
-    zMinSpinBox_->setValue(clipFilter.box.min(2));
-    xMaxSpinBox_->setValue(clipFilter.box.max(0));
-    yMaxSpinBox_->setValue(clipFilter.box.max(1));
-    zMaxSpinBox_->setValue(clipFilter.box.max(2));
+
+    for (size_t i = 0; i < 3; i++)
+    {
+        minSpinBox_[i]->setRange(boundary.min(i), boundary.max(i));
+        minSpinBox_[i]->setValue(boundary.min(i));
+
+        maxSpinBox_[i]->setRange(boundary.min(i), boundary.max(i));
+        maxSpinBox_[i]->setValue(boundary.max(i));
+    }
 
     if (clipFilter.enabled == ClipFilter::TYPE_BOX)
     {

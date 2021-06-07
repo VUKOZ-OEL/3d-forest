@@ -30,6 +30,7 @@
 class QDoubleSpinBox;
 class QCheckBox;
 class QPushButton;
+class ctkRangeSlider;
 
 /** Window Clip Filter. */
 class WindowClipFilter : public QWidget
@@ -40,27 +41,29 @@ public:
     explicit WindowClipFilter(QWidget *parent = nullptr);
     ~WindowClipFilter();
 
-    void updateEditor(const Editor &editor);
+    void setClipFilter(const Editor &editor);
 
 public slots:
-    void valueChanged(double d);
-    void stateChanged(int state);
+    void setRangeMin(int v);
+    void setRangeMax(int v);
+
+    void setValueMin(double d);
+    void setValueMax(double d);
+
+    void setEnabled(int state);
 
 signals:
     void filterChanged(const ClipFilter &clipFilter);
     void filterReset();
 
 protected:
-    QDoubleSpinBox *xMinSpinBox_;
-    QDoubleSpinBox *xMaxSpinBox_;
-    QDoubleSpinBox *yMinSpinBox_;
-    QDoubleSpinBox *yMaxSpinBox_;
-    QDoubleSpinBox *zMinSpinBox_;
-    QDoubleSpinBox *zMaxSpinBox_;
+    ctkRangeSlider *rangeSlider_[3];
+    QDoubleSpinBox *minSpinBox_[3];
+    QDoubleSpinBox *maxSpinBox_[3];
     QCheckBox *enabledCheckBox_;
     QPushButton *resetButton_;
 
-    void changed();
+    void filterUpdate();
     void reset();
 };
 
