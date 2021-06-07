@@ -48,7 +48,7 @@ list(APPEND SOURCES_3DFOREST resources/3dforest.rc)
 
 add_executable(
   ${SUB_PROJECT_NAME}
-#  WIN32
+  WIN32 MACOSX_BUNDLE
   ${SOURCES_3DFOREST}
   resources/3dforest.qrc
 )
