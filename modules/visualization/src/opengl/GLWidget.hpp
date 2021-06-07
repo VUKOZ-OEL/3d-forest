@@ -31,7 +31,7 @@
 #include <QOpenGLWidget>
 
 class Editor;
-class Viewer;
+class WindowViewports;
 class QMouseEvent;
 class QWheelEvent;
 
@@ -44,7 +44,7 @@ public:
     explicit GLWidget(QWidget *parent = nullptr);
     ~GLWidget();
 
-    void setViewer(Viewer *viewer);
+    void setWindowViewports(WindowViewports *viewer);
 
     void setSelected(bool selected);
     bool isSelected() const;
@@ -73,8 +73,8 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
 
-    // Viewer
-    Viewer *viewer_;
+    // Window Viewports
+    WindowViewports *windowViewports_;
     bool selected_;
 
     // Data

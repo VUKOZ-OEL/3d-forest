@@ -46,6 +46,11 @@ public:
                        const std::vector<float> &xyz,
                        const std::vector<float> &rgb);
 
+    static void render(Mode mode,
+                       const std::vector<float> &xyz,
+                       const std::vector<float> &rgb,
+                       const std::vector<unsigned int> &indices);
+
     static void renderAabb(const GLAabb &box);
     static void renderAxis(const GLAabb &box, const QVector3D &center);
 

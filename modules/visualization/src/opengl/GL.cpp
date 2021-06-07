@@ -76,6 +76,51 @@ void GL::render(Mode mode,
     }
 }
 
+void GL::render(Mode mode,
+                const std::vector<float> &xyz,
+                const std::vector<float> &rgb,
+                const std::vector<unsigned int> &indices)
+{
+    // Specify what kind of primitives to render
+    GLenum glmode;
+    switch (mode)
+    {
+        case LINES:
+            glmode = GL_LINES;
+            break;
+        case QUADS:
+            glmode = GL_QUADS;
+            break;
+        case POINTS:
+        default:
+            glmode = GL_POINTS;
+            break;
+    }
+
+    // Render
+    GLsizei n = static_cast<GLsizei>(indices.size());
+    if (n > 0)
+    {
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glVertexPointer(3, GL_FLOAT, 0, xyz.data());
+
+        if (!rgb.empty())
+        {
+            glEnableClientState(GL_COLOR_ARRAY);
+            glColorPointer(3, GL_FLOAT, 0, rgb.data());
+        }
+        else
+        {
+            glColor3f(1.0F, 1.0F, 1.0F);
+        }
+
+        glDrawElements(glmode, n, GL_UNSIGNED_INT, indices.data());
+
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_COLOR_ARRAY);
+    }
+}
+
 void GL::renderAabb(const GLAabb &box)
 {
     // Render wireframe cuboid
