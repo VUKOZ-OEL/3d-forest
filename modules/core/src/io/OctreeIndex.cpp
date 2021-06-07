@@ -546,7 +546,8 @@ uint64_t OctreeIndex::insert(double x, double y, double z)
 
         octant.getCenter(px, py, pz);
 
-        code = code << (level * 3);
+        // code = code << (level * 3);
+        code = code << 3;
 
         if (x > px)
         {
@@ -617,23 +618,32 @@ uint64_t OctreeIndex::insert(double x, double y, double z)
 
 void OctreeIndex::read(const std::string &path)
 {
-    ChunkFile file;
+    FileChunk file;
     file.open(path, "r");
     read(file);
     file.close();
 }
 
-void OctreeIndex::read(ChunkFile &file)
+void OctreeIndex::read(const std::string &path, uint64_t offset)
+{
+    FileChunk file;
+    file.open(path, "r");
+    file.seek(offset);
+    read(file);
+    file.close();
+}
+
+void OctreeIndex::read(FileChunk &file)
 {
     // Chunk header
-    ChunkFile::Chunk chunk;
+    FileChunk::Chunk chunk;
     file.read(chunk);
 
     // Chunk payload
     readPayload(file, chunk);
 }
 
-void OctreeIndex::readPayload(ChunkFile &file, const ChunkFile::Chunk &chunk)
+void OctreeIndex::readPayload(FileChunk &file, const FileChunk::Chunk &chunk)
 {
     file.validate(chunk,
                   CHUNK_TYPE,
@@ -675,16 +685,16 @@ void OctreeIndex::readPayload(ChunkFile &file, const ChunkFile::Chunk &chunk)
 
 void OctreeIndex::write(const std::string &path) const
 {
-    ChunkFile file;
+    FileChunk file;
     file.open(path, "w");
     write(file);
     file.close();
 }
 
-void OctreeIndex::write(ChunkFile &file) const
+void OctreeIndex::write(FileChunk &file) const
 {
     // Chunk
-    ChunkFile::Chunk chunk;
+    FileChunk::Chunk chunk;
     chunk.type = CHUNK_TYPE;
     chunk.majorVersion = OCTREE_INDEX_CHUNK_MAJOR_VERSION;
     chunk.minorVersion = OCTREE_INDEX_CHUNK_MINOR_VERSION;
@@ -752,4 +762,11 @@ Json &OctreeIndex::write(Json &out, const Node *data, size_t idx) const
     }
 
     return out;
+}
+
+std::ostream &operator<<(std::ostream &os, const OctreeIndex &obj)
+{
+    Json json;
+    os << obj.write(json).serialize();
+    return os;
 }
