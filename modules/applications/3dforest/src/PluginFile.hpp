@@ -37,7 +37,7 @@ public:
     virtual ~PluginFile() = default;
     virtual void read(QWidget *parent, Editor *editor) = 0;
     virtual void write(QWidget *parent, Editor *editor) = 0;
-    virtual QString windowTitle() const = 0; //! Unique
+    virtual QString windowTitle() const = 0; /**< Unique */
 };
 
 #define PluginFile_iid "vukoz.3dforest.qt.PluginFile/1.0"

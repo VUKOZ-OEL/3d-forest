@@ -37,7 +37,7 @@ public:
     virtual ~PluginTool() = default;
     virtual void initialize(QWidget *parent, Editor *editor) = 0;
     virtual void show(QWidget *parent) = 0;
-    virtual QString windowTitle() const = 0; //! Unique
+    virtual QString windowTitle() const = 0; /**< Unique */
 };
 
 #define PluginTool_iid "vukoz.3dforest.qt.PluginTool/1.0"

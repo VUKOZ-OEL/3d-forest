@@ -134,8 +134,8 @@ public:
     virtual void filterTile(EditorTile *tile);
 
 protected:
-    PluginHeightMapWindow *window_; //! First time use creates GUI.
-    PluginHeightMapFilter filter_;  //! Must be created from the constructor.
+    PluginHeightMapWindow *window_; /**< First time use creates GUI. */
+    PluginHeightMapFilter filter_;  /**< Must be created from the constructor.*/
 };
 
 #endif /* PLUGIN_HEIGHT_MAP_HPP */

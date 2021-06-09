@@ -35,8 +35,8 @@ class EditorDataSet
 public:
     // Stored
     std::string pathUnresolved;
-    std::string dateCreated; //! Note: Inconsistent with LAS, shared projects
-    std::string label;       //! Note: Inconsistent with LAS, shared projects
+    std::string dateCreated; /**< Inconsistent with LAS in shared projects */
+    std::string label;       /**< Inconsistent with LAS in shared projects */
     size_t id;
     bool visible;
 
