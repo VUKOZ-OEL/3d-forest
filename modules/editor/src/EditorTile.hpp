@@ -25,7 +25,7 @@
 #define EDITOR_TILE_HPP
 
 #include <Aabb.hpp>
-#include <OctreeIndex.hpp>
+#include <FileIndex.hpp>
 #include <Vector3.hpp>
 #include <cstdint>
 #include <vector>
@@ -85,7 +85,7 @@ public:
     Aabb<double> boundary;
 
     // Index
-    OctreeIndex index;
+    FileIndex index;
     std::vector<unsigned int> indices;
 
     // Tile

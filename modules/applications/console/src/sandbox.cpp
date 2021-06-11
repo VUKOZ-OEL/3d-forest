@@ -23,9 +23,9 @@
 
 #include <EditorBase.hpp>
 #include <File.hpp>
+#include <FileIndex.hpp>
 #include <FileLas.hpp>
 #include <Json.hpp>
-#include <OctreeIndex.hpp>
 #include <Time.hpp>
 #include <Vector3.hpp>
 #include <cstring>

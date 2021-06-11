@@ -18,38 +18,38 @@
 */
 
 /**
-    @file OctreeIndex.cpp
+    @file FileIndex.cpp
 */
 
 #include <Endian.hpp>
-#include <OctreeIndex.hpp>
+#include <FileIndex.hpp>
 #include <cstring>
 #include <queue>
 
-const uint32_t OctreeIndex::CHUNK_TYPE = 0x38584449U; /**< Signature "IDX8" */
+const uint32_t FileIndex::CHUNK_TYPE = 0x38584449U; /**< Signature "IDX8" */
 #define OCTREE_INDEX_CHUNK_MAJOR_VERSION 1
 #define OCTREE_INDEX_CHUNK_MINOR_VERSION 0
 #define OCTREE_INDEX_MAX_LEVEL 17
 #define OCTREE_INDEX_HEADER_SIZE_1_0 56
 
-OctreeIndex::OctreeIndex()
+FileIndex::FileIndex()
 {
 }
 
-OctreeIndex::~OctreeIndex()
+FileIndex::~FileIndex()
 {
 }
 
-void OctreeIndex::clear()
+void FileIndex::clear()
 {
     nodes_.clear();
     boundary_.clear();
     root_.reset();
 }
 
-void OctreeIndex::selectLeaves(std::vector<Selection> &selection,
-                               const Aabb<double> &window,
-                               size_t id) const
+void FileIndex::selectLeaves(std::vector<Selection> &selection,
+                             const Aabb<double> &window,
+                             size_t id) const
 {
     if (!empty())
     {
@@ -57,9 +57,9 @@ void OctreeIndex::selectLeaves(std::vector<Selection> &selection,
     }
 }
 
-void OctreeIndex::selectNodes(std::vector<Selection> &selection,
-                              const Aabb<double> &window,
-                              size_t id) const
+void FileIndex::selectNodes(std::vector<Selection> &selection,
+                            const Aabb<double> &window,
+                            size_t id) const
 {
     if (!empty())
     {
@@ -67,7 +67,7 @@ void OctreeIndex::selectNodes(std::vector<Selection> &selection,
     }
 }
 
-const OctreeIndex::Node *OctreeIndex::selectNode(
+const FileIndex::Node *FileIndex::selectNode(
     std::map<const Node *, uint64_t> &used,
     double x,
     double y,
@@ -81,9 +81,7 @@ const OctreeIndex::Node *OctreeIndex::selectNode(
     return nullptr;
 }
 
-const OctreeIndex::Node *OctreeIndex::selectLeaf(double x,
-                                                 double y,
-                                                 double z) const
+const FileIndex::Node *FileIndex::selectLeaf(double x, double y, double z) const
 {
     if (size() > 0)
     {
@@ -93,11 +91,11 @@ const OctreeIndex::Node *OctreeIndex::selectLeaf(double x,
     return nullptr;
 }
 
-void OctreeIndex::selectLeaves(std::vector<Selection> &selection,
-                               const Aabb<double> &window,
-                               const Aabb<double> &boundary,
-                               size_t idx,
-                               size_t id) const
+void FileIndex::selectLeaves(std::vector<Selection> &selection,
+                             const Aabb<double> &window,
+                             const Aabb<double> &boundary,
+                             size_t idx,
+                             size_t id) const
 {
     // Select all
     if (boundary.isInside(window))
@@ -140,11 +138,11 @@ void OctreeIndex::selectLeaves(std::vector<Selection> &selection,
     }
 }
 
-void OctreeIndex::selectNodes(std::vector<Selection> &selection,
-                              const Aabb<double> &window,
-                              const Aabb<double> &boundary,
-                              size_t idx,
-                              size_t id) const
+void FileIndex::selectNodes(std::vector<Selection> &selection,
+                            const Aabb<double> &window,
+                            const Aabb<double> &boundary,
+                            size_t idx,
+                            size_t id) const
 {
     // Outside
     if (!boundary.intersects(window))
@@ -182,7 +180,7 @@ void OctreeIndex::selectNodes(std::vector<Selection> &selection,
     }
 }
 
-const OctreeIndex::Node *OctreeIndex::selectNode(
+const FileIndex::Node *FileIndex::selectNode(
     std::map<const Node *, uint64_t> &used,
     double x,
     double y,
@@ -229,11 +227,11 @@ const OctreeIndex::Node *OctreeIndex::selectNode(
     return node;
 }
 
-const OctreeIndex::Node *OctreeIndex::selectLeaf(double x,
-                                                 double y,
-                                                 double z,
-                                                 const Aabb<double> &boundary,
-                                                 size_t idx) const
+const FileIndex::Node *FileIndex::selectLeaf(double x,
+                                             double y,
+                                             double z,
+                                             const Aabb<double> &boundary,
+                                             size_t idx) const
 {
     // Outside
     if (!boundary.isInside(x, y, z))
@@ -269,11 +267,11 @@ const OctreeIndex::Node *OctreeIndex::selectLeaf(double x,
     return node;
 }
 
-void OctreeIndex::divide(Aabb<double> &boundary,
-                         double x,
-                         double y,
-                         double z,
-                         uint64_t code) const
+void FileIndex::divide(Aabb<double> &boundary,
+                       double x,
+                       double y,
+                       double z,
+                       uint64_t code) const
 {
     double x1, y1, z1, x2, y2, z2;
 
@@ -313,12 +311,12 @@ void OctreeIndex::divide(Aabb<double> &boundary,
     boundary.set(x1, y1, z1, x2, y2, z2);
 }
 
-const OctreeIndex::Node *OctreeIndex::root() const
+const FileIndex::Node *FileIndex::root() const
 {
     return &nodes_[0];
 }
 
-const OctreeIndex::Node *OctreeIndex::next(const Node *node, size_t idx) const
+const FileIndex::Node *FileIndex::next(const Node *node, size_t idx) const
 {
     if (node->next[idx])
     {
@@ -328,7 +326,7 @@ const OctreeIndex::Node *OctreeIndex::next(const Node *node, size_t idx) const
     return nullptr;
 }
 
-const OctreeIndex::Node *OctreeIndex::prev(const Node *node) const
+const FileIndex::Node *FileIndex::prev(const Node *node) const
 {
     if (node == root())
     {
@@ -338,8 +336,8 @@ const OctreeIndex::Node *OctreeIndex::prev(const Node *node) const
     return &nodes_[node->prev - 1];
 }
 
-Aabb<double> OctreeIndex::boundary(const Node *node,
-                                   const Aabb<double> &box) const
+Aabb<double> FileIndex::boundary(const Node *node,
+                                 const Aabb<double> &box) const
 {
     // Top
     const Node *data = nodes_.data();
@@ -382,10 +380,10 @@ Aabb<double> OctreeIndex::boundary(const Node *node,
     return boundary;
 }
 
-void OctreeIndex::insertBegin(const Aabb<double> &boundary,
-                              size_t maxSize,
-                              size_t maxLevel,
-                              bool insertOnlyToLeaves)
+void FileIndex::insertBegin(const Aabb<double> &boundary,
+                            size_t maxSize,
+                            size_t maxLevel,
+                            bool insertOnlyToLeaves)
 {
     // Initialization
     clear();
@@ -408,7 +406,7 @@ void OctreeIndex::insertBegin(const Aabb<double> &boundary,
     }
 }
 
-void OctreeIndex::insertEnd()
+void FileIndex::insertEnd()
 {
     if (root_)
     {
@@ -469,11 +467,11 @@ void OctreeIndex::insertEnd()
     }
 }
 
-uint64_t OctreeIndex::insertEndToLeaves(Node *data,
-                                        BuildNode *node,
-                                        uint32_t prev,
-                                        uint32_t &idx,
-                                        uint64_t &from)
+uint64_t FileIndex::insertEndToLeaves(Node *data,
+                                      BuildNode *node,
+                                      uint32_t prev,
+                                      uint32_t &idx,
+                                      uint64_t &from)
 {
     const uint32_t idxCopy = idx;
     uint64_t n = node->size;
@@ -499,7 +497,7 @@ uint64_t OctreeIndex::insertEndToLeaves(Node *data,
     return n;
 }
 
-size_t OctreeIndex::countNodes() const
+size_t FileIndex::countNodes() const
 {
     if (root_)
     {
@@ -509,7 +507,7 @@ size_t OctreeIndex::countNodes() const
     return 0;
 }
 
-size_t OctreeIndex::countNodes(BuildNode *node) const
+size_t FileIndex::countNodes(BuildNode *node) const
 {
     size_t n = 1;
 
@@ -524,7 +522,7 @@ size_t OctreeIndex::countNodes(BuildNode *node) const
     return n;
 }
 
-uint64_t OctreeIndex::insert(double x, double y, double z)
+uint64_t FileIndex::insert(double x, double y, double z)
 {
     uint64_t code = 0;
     uint64_t ecode = 0;
@@ -616,7 +614,7 @@ uint64_t OctreeIndex::insert(double x, double y, double z)
     return ecode;
 }
 
-void OctreeIndex::read(const std::string &path)
+void FileIndex::read(const std::string &path)
 {
     FileChunk file;
     file.open(path, "r");
@@ -624,7 +622,7 @@ void OctreeIndex::read(const std::string &path)
     file.close();
 }
 
-void OctreeIndex::read(const std::string &path, uint64_t offset)
+void FileIndex::read(const std::string &path, uint64_t offset)
 {
     FileChunk file;
     file.open(path, "r");
@@ -633,7 +631,7 @@ void OctreeIndex::read(const std::string &path, uint64_t offset)
     file.close();
 }
 
-void OctreeIndex::read(FileChunk &file)
+void FileIndex::read(FileChunk &file)
 {
     // Chunk header
     FileChunk::Chunk chunk;
@@ -643,7 +641,7 @@ void OctreeIndex::read(FileChunk &file)
     readPayload(file, chunk);
 }
 
-void OctreeIndex::readPayload(FileChunk &file, const FileChunk::Chunk &chunk)
+void FileIndex::readPayload(FileChunk &file, const FileChunk::Chunk &chunk)
 {
     file.validate(chunk,
                   CHUNK_TYPE,
@@ -683,7 +681,7 @@ void OctreeIndex::readPayload(FileChunk &file, const FileChunk::Chunk &chunk)
     }
 }
 
-void OctreeIndex::write(const std::string &path) const
+void FileIndex::write(const std::string &path) const
 {
     FileChunk file;
     file.open(path, "w");
@@ -691,7 +689,7 @@ void OctreeIndex::write(const std::string &path) const
     file.close();
 }
 
-void OctreeIndex::write(FileChunk &file) const
+void FileIndex::write(FileChunk &file) const
 {
     // Chunk
     FileChunk::Chunk chunk;
@@ -735,7 +733,7 @@ void OctreeIndex::write(FileChunk &file) const
     file.write(data, chunk.dataLength);
 }
 
-Json &OctreeIndex::write(Json &out) const
+Json &FileIndex::write(Json &out) const
 {
     if (size() > 0)
     {
@@ -745,7 +743,7 @@ Json &OctreeIndex::write(Json &out) const
     return out;
 }
 
-Json &OctreeIndex::write(Json &out, const Node *data, size_t idx) const
+Json &FileIndex::write(Json &out, const Node *data, size_t idx) const
 {
     out["from"] = data[idx].from;
     out["count"] = data[idx].size;
@@ -764,7 +762,7 @@ Json &OctreeIndex::write(Json &out, const Node *data, size_t idx) const
     return out;
 }
 
-std::ostream &operator<<(std::ostream &os, const OctreeIndex &obj)
+std::ostream &operator<<(std::ostream &os, const FileIndex &obj)
 {
     Json json;
     os << obj.write(json).serialize();

@@ -74,7 +74,7 @@ public:
     void updateCamera(const Camera &camera);
     bool loadView();
 
-    void select(std::vector<OctreeIndex::Selection> &selected);
+    void select(std::vector<FileIndex::Selection> &selected);
     Aabb<double> selection() const;
 
     void tileViewClear();

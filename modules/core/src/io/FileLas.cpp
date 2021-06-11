@@ -23,8 +23,8 @@
 
 #include <Endian.hpp>
 #include <Error.hpp>
+#include <FileIndexBuilder.hpp>
 #include <FileLas.hpp>
-#include <LasIndexBuilder.hpp>
 #include <cstdio>
 #include <cstring>
 #include <iostream>
@@ -234,10 +234,10 @@ void FileLas::create(const std::string &path,
     las.close();
 
     // Create file index
-    LasIndexBuilder::Settings settings;
+    FileIndexBuilder::Settings settings;
     settings.maxSize1 = 2;
     settings.maxSize2 = 1;
-    LasIndexBuilder::index(path, path, settings);
+    FileIndexBuilder::index(path, path, settings);
 }
 
 void FileLas::open(const std::string &path)

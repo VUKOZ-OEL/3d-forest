@@ -18,15 +18,15 @@
 */
 
 /**
-    @file LasIndexBuilder.cpp
+    @file FileIndexBuilder.cpp
 */
 
-#include <LasIndexBuilder.hpp>
+#include <FileIndexBuilder.hpp>
 #include <Vector3.hpp>
 #include <cstring>
 #include <iostream>
 
-LasIndexBuilder::Settings::Settings()
+FileIndexBuilder::Settings::Settings()
 {
     randomize = false;
 
@@ -41,37 +41,37 @@ LasIndexBuilder::Settings::Settings()
     bufferSize = 1024 * 1024;
 }
 
-LasIndexBuilder::Settings::~Settings()
+FileIndexBuilder::Settings::~Settings()
 {
 }
 
-LasIndexBuilder::LasIndexBuilder()
+FileIndexBuilder::FileIndexBuilder()
     : state_(STATE_NONE),
       valueTotal_(0),
       maximumTotal_(0)
 {
 }
 
-LasIndexBuilder::~LasIndexBuilder()
+FileIndexBuilder::~FileIndexBuilder()
 {
 }
 
-std::string LasIndexBuilder::extensionL1(const std::string &path)
+std::string FileIndexBuilder::extensionL1(const std::string &path)
 {
     return File::replaceExtension(path, ".idx1");
 }
 
-std::string LasIndexBuilder::extensionL2(const std::string &path)
+std::string FileIndexBuilder::extensionL2(const std::string &path)
 {
     return File::replaceExtension(path, ".idx2");
 }
 
-void LasIndexBuilder::index(const std::string &outputPath,
-                            const std::string &inputPath,
-                            const LasIndexBuilder::Settings &settings)
+void FileIndexBuilder::index(const std::string &outputPath,
+                             const std::string &inputPath,
+                             const FileIndexBuilder::Settings &settings)
 {
     char buffer[80];
-    LasIndexBuilder builder;
+    FileIndexBuilder builder;
     builder.start(outputPath, inputPath, settings);
     while (!builder.end())
     {
@@ -83,7 +83,7 @@ void LasIndexBuilder::index(const std::string &outputPath,
     std::cout << std::endl;
 }
 
-double LasIndexBuilder::percent() const
+double FileIndexBuilder::percent() const
 {
     if (maximumTotal_ == 0)
     {
@@ -96,9 +96,9 @@ double LasIndexBuilder::percent() const
     }
 }
 
-void LasIndexBuilder::start(const std::string &outputPath,
-                            const std::string &inputPath,
-                            const LasIndexBuilder::Settings &settings)
+void FileIndexBuilder::start(const std::string &outputPath,
+                             const std::string &inputPath,
+                             const FileIndexBuilder::Settings &settings)
 {
     // Initialize
     state_ = STATE_NONE;
@@ -135,7 +135,7 @@ void LasIndexBuilder::start(const std::string &outputPath,
     nextState();
 }
 
-void LasIndexBuilder::openFiles()
+void FileIndexBuilder::openFiles()
 {
     // Input
     inputLas_.open(readPath_);
@@ -180,7 +180,7 @@ void LasIndexBuilder::openFiles()
     outputLas_.writeHeader();
 }
 
-void LasIndexBuilder::next()
+void FileIndexBuilder::next()
 {
     // Continue
     switch (state_)
@@ -254,7 +254,7 @@ void LasIndexBuilder::next()
     }
 }
 
-void LasIndexBuilder::nextState()
+void FileIndexBuilder::nextState()
 {
     value_ = 0;
     valueIdx_ = 0;
@@ -356,7 +356,7 @@ void LasIndexBuilder::nextState()
     }
 }
 
-void LasIndexBuilder::stateCopy()
+void FileIndexBuilder::stateCopy()
 {
     // Step
     uint64_t step;
@@ -378,7 +378,7 @@ void LasIndexBuilder::stateCopy()
     valueTotal_ += step;
 }
 
-void LasIndexBuilder::stateCopyPoints()
+void FileIndexBuilder::stateCopyPoints()
 {
     // Step
     uint64_t step;
@@ -425,7 +425,7 @@ void LasIndexBuilder::stateCopyPoints()
     valueTotal_ += step;
 }
 
-void LasIndexBuilder::stateRandomize()
+void FileIndexBuilder::stateRandomize()
 {
     // Step
     uint64_t step;
@@ -474,7 +474,7 @@ void LasIndexBuilder::stateRandomize()
     valueTotal_ += step;
 }
 
-void LasIndexBuilder::stateMove()
+void FileIndexBuilder::stateMove()
 {
     // Move
     inputLas_.close();
@@ -486,7 +486,7 @@ void LasIndexBuilder::stateMove()
     openFiles();
 }
 
-void LasIndexBuilder::stateMainBegin()
+void FileIndexBuilder::stateMainBegin()
 {
     // Insert begin
 #if 1
@@ -520,7 +520,7 @@ void LasIndexBuilder::stateMainBegin()
     inputLas_.seekPointData();
 }
 
-void LasIndexBuilder::stateMainInsert()
+void FileIndexBuilder::stateMainInsert()
 {
     // Step
     uint64_t step;
@@ -555,7 +555,7 @@ void LasIndexBuilder::stateMainInsert()
     valueTotal_ += step;
 }
 
-void LasIndexBuilder::stateMainEnd()
+void FileIndexBuilder::stateMainEnd()
 {
     indexMain_.insertEnd();
 
@@ -567,7 +567,7 @@ void LasIndexBuilder::stateMainEnd()
     inputLas_.seekPointData();
 }
 
-void LasIndexBuilder::stateMainSort()
+void FileIndexBuilder::stateMainSort()
 {
     // Step
     uint64_t step;
@@ -593,7 +593,7 @@ void LasIndexBuilder::stateMainSort()
     double x;
     double y;
     double z;
-    const OctreeIndex::Node *node;
+    const FileIndex::Node *node;
 
     for (uint64_t i = 0; i < stepIdx; i++)
     {
@@ -616,7 +616,7 @@ void LasIndexBuilder::stateMainSort()
     valueTotal_ += step;
 }
 
-void LasIndexBuilder::stateNodeBegin()
+void FileIndexBuilder::stateNodeBegin()
 {
     std::string path = extensionL2(outputPath_);
     indexNodeFile_.open(path, "w+");
@@ -640,11 +640,11 @@ static int DatabaseBuilderCmp(const void *a, const void *b)
     return 0;
 }
 
-void LasIndexBuilder::stateNodeInsert()
+void FileIndexBuilder::stateNodeInsert()
 {
     // Step
     uint64_t step;
-    OctreeIndex::Node *node;
+    FileIndex::Node *node;
 
     node = indexMain_.at(static_cast<size_t>(valueIdx_));
     step = node->size * sizePoint_;
@@ -725,7 +725,7 @@ void LasIndexBuilder::stateNodeInsert()
     valueTotal_ += step;
 }
 
-void LasIndexBuilder::stateNodeEnd()
+void FileIndexBuilder::stateNodeEnd()
 {
     std::string path = extensionL1(outputPath_);
     indexMain_.write(path);
@@ -733,7 +733,7 @@ void LasIndexBuilder::stateNodeEnd()
     indexNodeFile_.close();
 }
 
-void LasIndexBuilder::stateEnd()
+void FileIndexBuilder::stateEnd()
 {
     // Cleanup and create the final output file
     inputLas_.close();

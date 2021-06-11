@@ -24,8 +24,8 @@
 #include <EditorDataSet.hpp>
 #include <Error.hpp>
 #include <File.hpp>
+#include <FileIndexBuilder.hpp>
 #include <FileLas.hpp>
-#include <LasIndexBuilder.hpp>
 #include <iostream>
 
 EditorDataSet::EditorDataSet() : id(0), visible(true)
@@ -125,7 +125,7 @@ void EditorDataSet::setPath(const std::string &unresolved,
 
 void EditorDataSet::read()
 {
-    const std::string pathL1 = LasIndexBuilder::extensionL1(path);
+    const std::string pathL1 = FileIndexBuilder::extensionL1(path);
     index.read(pathL1);
 
     FileLas las;

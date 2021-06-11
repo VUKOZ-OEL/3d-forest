@@ -24,8 +24,8 @@
 #ifndef GL_HPP
 #define GL_HPP
 
-#include <GLAabb.hpp>
 #include <ClipFilter.hpp>
+#include <GLAabb.hpp>
 #include <QVector3D>
 #include <vector>
 

@@ -24,8 +24,8 @@
 #include <EditorBase.hpp>
 #include <EditorTile.hpp>
 #include <File.hpp>
+#include <FileIndexBuilder.hpp>
 #include <FileLas.hpp>
-#include <LasIndexBuilder.hpp>
 
 EditorTile::EditorTile()
     : dataSetId(0),
@@ -70,7 +70,7 @@ bool EditorTile::View::isFinished() const
 void EditorTile::read(const EditorBase *editor)
 {
     const EditorDataSet &dataSet = editor->dataSet(dataSetId);
-    const OctreeIndex::Node *node = dataSet.index.at(tileId);
+    const FileIndex::Node *node = dataSet.index.at(tileId);
 
     // Read tile buffer from LAS file
     FileLas las;
@@ -152,16 +152,16 @@ void EditorTile::read(const EditorBase *editor)
 void EditorTile::readFilter(const EditorBase *editor)
 {
     const EditorDataSet &dataSet = editor->dataSet(dataSetId);
-    const OctreeIndex::Node *node = dataSet.index.at(tileId);
+    const FileIndex::Node *node = dataSet.index.at(tileId);
 
     if (editor->clipFilter().enabled)
     {
         // Read L2 index
-        const std::string path = LasIndexBuilder::extensionL2(dataSet.path);
+        const std::string path = FileIndexBuilder::extensionL2(dataSet.path);
         index.read(path, node->reserved);
 
         // Select octants
-        std::vector<OctreeIndex::Selection> selection;
+        std::vector<FileIndex::Selection> selection;
         Aabb<double> clipBox = editor->clipFilter().box;
         index.selectLeaves(selection, clipBox, dataSet.id);
 
@@ -170,7 +170,7 @@ void EditorTile::readFilter(const EditorBase *editor)
 
         for (size_t i = 0; i < selection.size(); i++)
         {
-            const OctreeIndex::Node *nodeL2 = index.at(selection[i].idx);
+            const FileIndex::Node *nodeL2 = index.at(selection[i].idx);
             if (!nodeL2)
             {
                 continue;
@@ -186,7 +186,7 @@ void EditorTile::readFilter(const EditorBase *editor)
 
         for (size_t i = 0; i < selection.size(); i++)
         {
-            const OctreeIndex::Node *nodeL2 = index.at(selection[i].idx);
+            const FileIndex::Node *nodeL2 = index.at(selection[i].idx);
             if (!nodeL2)
             {
                 continue;

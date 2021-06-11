@@ -25,8 +25,8 @@
 #define EDITOR_DATA_SET_HPP
 
 #include <Aabb.hpp>
+#include <FileIndex.hpp>
 #include <Json.hpp>
-#include <OctreeIndex.hpp>
 #include <string>
 
 /** Editor Data Set. */
@@ -45,7 +45,7 @@ public:
     std::string fileName;
 
     // Data
-    OctreeIndex index;
+    FileIndex index;
     Aabb<double> boundary;
     Aabb<double> boundaryView;
 

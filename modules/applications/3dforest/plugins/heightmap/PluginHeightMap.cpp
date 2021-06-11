@@ -127,7 +127,7 @@ void PluginHeightMapFilter::applyToTiles(QWidget *widget)
     editor_->cancelThreads();
     editor_->lock();
 
-    std::vector<OctreeIndex::Selection> selectionL1;
+    std::vector<FileIndex::Selection> selectionL1;
     editor_->select(selectionL1);
 
     int maximum = static_cast<int>(selectionL1.size());
@@ -155,7 +155,7 @@ void PluginHeightMapFilter::applyToTiles(QWidget *widget)
         msleep(10); // TBD debug
 
         // Process step i
-        OctreeIndex::Selection &sel = selectionL1[static_cast<size_t>(i)];
+        FileIndex::Selection &sel = selectionL1[static_cast<size_t>(i)];
         EditorTile *tile = editor_->tile(sel.id, sel.idx);
         if (tile)
         {

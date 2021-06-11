@@ -247,7 +247,7 @@ void EditorBase::resetClipFilter()
     setClipFilter(clipFilter_);
 }
 
-void EditorBase::select(std::vector<OctreeIndex::Selection> &selected)
+void EditorBase::select(std::vector<FileIndex::Selection> &selected)
 {
     Aabb<double> box = selection();
 
@@ -378,8 +378,8 @@ void EditorBase::updateCamera(const Camera &camera)
         Key nk = it->second;
         queue.erase(it);
 
-        const OctreeIndex::Node *node;
-        const OctreeIndex &index = dataSets_[nk.dataSetId]->index;
+        const FileIndex::Node *node;
+        const FileIndex &index = dataSets_[nk.dataSetId]->index;
         node = index.at(nk.tileId);
 
         // if (clipFilter_.enabled)
@@ -419,7 +419,7 @@ void EditorBase::updateCamera(const Camera &camera)
         {
             if (node->next[i])
             {
-                const OctreeIndex::Node *sub = index.at(node->next[i]);
+                const FileIndex::Node *sub = index.at(node->next[i]);
                 Aabb<double> box = index.boundary(sub, boundaryView_);
 
                 double radius = box.radius();
