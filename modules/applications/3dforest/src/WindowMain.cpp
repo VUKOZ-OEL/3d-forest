@@ -37,6 +37,7 @@
 #include <WindowDataSets.hpp>
 #include <WindowLayers.hpp>
 #include <WindowMain.hpp>
+#include <WindowSettingsView.hpp>
 #include <WindowViewports.hpp>
 #include <iostream>
 
@@ -185,7 +186,7 @@ void WindowMain::createWindows()
             this,
             SLOT(actionDataSetVisible(size_t, bool)));
 
-    QDockWidget *dockDataSets = new QDockWidget(tr("Data sets"), this);
+    QDockWidget *dockDataSets = new QDockWidget(tr("Data Sets"), this);
     dockDataSets->setAllowedAreas(Qt::LeftDockWidgetArea |
                                   Qt::RightDockWidgetArea);
     dockDataSets->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
@@ -208,6 +209,21 @@ void WindowMain::createWindows()
     dockLayers->setWidget(windowLayers_);
     addDockWidget(Qt::LeftDockWidgetArea, dockLayers);
 
+    // Create view settings window
+    windowSettingsView_ = new WindowSettingsView(this);
+    connect(windowSettingsView_,
+            SIGNAL(settingsChanged()),
+            this,
+            SLOT(actionSettingsView()));
+
+    QDockWidget *dockViewSettings = new QDockWidget(tr("View Settings"), this);
+    dockViewSettings->setAllowedAreas(Qt::LeftDockWidgetArea |
+                                      Qt::RightDockWidgetArea);
+    dockViewSettings->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
+    dockViewSettings->setMaximumWidth(WINDOW_MAIN_DOCK_MAX);
+    dockViewSettings->setWidget(windowSettingsView_);
+    addDockWidget(Qt::LeftDockWidgetArea, dockViewSettings);
+
     // Create clip filter window
     windowClipFilter_ = new WindowClipFilter(this);
     connect(windowClipFilter_,
@@ -219,7 +235,7 @@ void WindowMain::createWindows()
             this,
             SLOT(actionClipFilterReset()));
 
-    QDockWidget *dockClipFilter = new QDockWidget(tr("Clip filter"), this);
+    QDockWidget *dockClipFilter = new QDockWidget(tr("Clip Filter"), this);
     dockClipFilter->setAllowedAreas(Qt::LeftDockWidgetArea |
                                     Qt::RightDockWidgetArea);
     dockClipFilter->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
@@ -238,9 +254,10 @@ void WindowMain::createWindows()
     addDockWidget(Qt::BottomDockWidgetArea, dockLog);
 
     // Add dock widgets to Windows menu
-    menuWindows_->addAction(dockClipFilter->toggleViewAction());
     menuWindows_->addAction(dockDataSets->toggleViewAction());
     menuWindows_->addAction(dockLayers->toggleViewAction());
+    menuWindows_->addAction(dockViewSettings->toggleViewAction());
+    menuWindows_->addAction(dockClipFilter->toggleViewAction());
     menuWindows_->addAction(dockLog->toggleViewAction());
 }
 
@@ -445,21 +462,31 @@ void WindowMain::actionLayerVisible(size_t id, bool checked)
 void WindowMain::actionClipFilter(const ClipFilter &clipFilter)
 {
     editor_.cancelThreads();
-    editor_.setClipFilter(clipFilter);
-    // updateViewer();
-
     editor_.lock();
+    editor_.setClipFilter(clipFilter);
     editor_.tileViewClear();
     editor_.unlock();
-
     editor_.restartThreads();
 }
 
 void WindowMain::actionClipFilterReset()
 {
     editor_.cancelThreads();
+    editor_.lock();
     editor_.resetClipFilter();
+    editor_.tileViewClear();
+    editor_.unlock();
+    editor_.restartThreads();
     windowClipFilter_->setClipFilter(editor_);
+}
+
+void WindowMain::actionSettingsView()
+{
+    editor_.cancelThreads();
+    editor_.lock();
+    editor_.setSettingsView(windowSettingsView_->settings());
+    editor_.unlock();
+    editor_.restartThreads();
 }
 
 void WindowMain::actionAbout()
@@ -608,6 +635,7 @@ void WindowMain::updateProject()
 
     windowDataSets_->updateEditor(editor_);
     windowLayers_->updateEditor(editor_);
+    windowSettingsView_->setSettings(editor_.settings().view());
     windowClipFilter_->setClipFilter(editor_);
     updateViewer();
     updateWindowTitle(QString::fromStdString(editor_.path()));

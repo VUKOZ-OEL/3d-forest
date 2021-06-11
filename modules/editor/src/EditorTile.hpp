@@ -30,6 +30,8 @@
 #include <cstdint>
 #include <vector>
 
+class EditorBase;
+
 /** Editor Tile. */
 class EditorTile
 {
@@ -45,22 +47,50 @@ public:
         uint8_t userData;
     };
 
-    // Tile
-    size_t dataSetId;
-    size_t tileId;
-
-    // Data
+    /** @name Point Data */
+    /**@{*/
+    /** Point coordinates.
+        The data are stored as [x0, y0, z0, x1, y1, ...].
+        These are actual X, Y, or Z coordinates after scaling and offset.
+     */
     std::vector<double> xyz;
-    std::vector<float> rgb;
-    std::vector<Attributes> attrib;
-    std::vector<double> gps;
-    std::vector<uint32_t> layer;
 
+    /** Red, Green, and Blue image channels.
+        The data are stored as [r0, g0, b0, r1, g1, ...].
+        Color values are in range from 0 (zero intensity) to 1 (full intensity).
+        When the input data set has no colors, then this vector is empty.
+    */
+    std::vector<float> rgb;
+
+    /** Red, Green, and Blue output colors.
+        The data are stored as [r0, g0, b0, r1, g1, ...].
+        Color values are in range from 0 (zero intensity) to 1 (full intensity).
+        This value is stored in Point Data Record extra bytes.
+    */
+    std::vector<float> rgbOutput;
+
+    /** Point attributes. */
+    std::vector<Attributes> attrib;
+
+    /** GPS time. */
+    std::vector<double> gps;
+
+    /** Layer identification numbers.
+        This value is stored in Point Data Record extra bytes.
+    */
+    std::vector<uint32_t> layer;
+    /**@}*/
+
+    // Bounding box
     Aabb<double> boundary;
 
     // Index
     OctreeIndex index;
     std::vector<unsigned int> indices;
+
+    // Tile
+    size_t dataSetId;
+    size_t tileId;
 
     // State
     bool loaded;
@@ -92,6 +122,11 @@ public:
 
     EditorTile();
     ~EditorTile();
+
+    void read(const EditorBase *editor);
+
+protected:
+    void readFilter(const EditorBase *editor);
 };
 
 #endif /* EDITOR_TILE_HPP */

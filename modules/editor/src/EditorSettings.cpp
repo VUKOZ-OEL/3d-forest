@@ -18,29 +18,26 @@
 */
 
 /**
-    @file PluginFile.hpp
+    @file EditorSettings.cpp
 */
 
-#ifndef PLUGIN_FILE_HPP
-#define PLUGIN_FILE_HPP
+#include <EditorSettings.hpp>
 
-#include <QString>
-#include <QtPlugin>
-
-class QWidget;
-class Editor;
-
-/** Plugin File Interface. */
-class PluginFile
+EditorSettings::View::View() : pointSize_(1.0F)
 {
-public:
-    virtual ~PluginFile() = default;
-    virtual void read(QWidget *parent, Editor *editor) = 0;
-    virtual void write(QWidget *parent, Editor *editor) = 0;
-    virtual QString windowTitle() const = 0; /**< Unique */
-};
+}
 
-#define PluginFile_iid "vukoz.3dforest.qt.PluginFile/1.0"
-Q_DECLARE_INTERFACE(PluginFile, PluginFile_iid)
+float EditorSettings::View::pointSize() const
+{
+    return pointSize_;
+}
 
-#endif /* PLUGIN_FILE_HPP */
+void EditorSettings::View::setPointSize(float size)
+{
+    pointSize_ = size;
+}
+
+void EditorSettings::setView(const View &view)
+{
+    view_ = view;
+}

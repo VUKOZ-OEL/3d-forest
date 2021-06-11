@@ -26,7 +26,7 @@
 #include <cstring>
 #include <queue>
 
-const uint32_t OctreeIndex::CHUNK_TYPE = 0x38584449U; //! Signature "IDX8"
+const uint32_t OctreeIndex::CHUNK_TYPE = 0x38584449U; /**< Signature "IDX8" */
 #define OCTREE_INDEX_CHUNK_MAJOR_VERSION 1
 #define OCTREE_INDEX_CHUNK_MINOR_VERSION 0
 #define OCTREE_INDEX_MAX_LEVEL 17

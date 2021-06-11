@@ -18,45 +18,35 @@
 */
 
 /**
-    @file GL.hpp
+    @file EditorSettings.hpp
 */
 
-#ifndef GL_HPP
-#define GL_HPP
+#ifndef EDITOR_SETTINGS_HPP
+#define EDITOR_SETTINGS_HPP
 
-#include <GLAabb.hpp>
-#include <ClipFilter.hpp>
-#include <QVector3D>
 #include <vector>
 
-/** OpenGL. */
-class GL
+/** Editor Settings. */
+class EditorSettings
 {
 public:
-    enum Mode
+    /** Editor Settings View. */
+    class View
     {
-        POINTS,
-        LINES,
-        QUADS
+    public:
+        View();
+        float pointSize() const;
+        void setPointSize(float size);
+
+    protected:
+        float pointSize_;
     };
 
-    GL();
-    ~GL();
-
-    static void render(Mode mode,
-                       const std::vector<float> &xyz,
-                       const std::vector<float> &rgb);
-
-    static void render(Mode mode,
-                       const std::vector<float> &xyz,
-                       const std::vector<float> &rgb,
-                       const std::vector<unsigned int> &indices);
-
-    static void renderClipFilter(const ClipFilter &clipFilter);
-    static void renderAabb(const GLAabb &box);
-    static void renderAxis(const GLAabb &box, const QVector3D &center);
+    const View &view() const { return view_; }
+    void setView(const View &view);
 
 protected:
+    View view_;
 };
 
-#endif /* GL_HPP */
+#endif /* EDITOR_SETTINGS_HPP */

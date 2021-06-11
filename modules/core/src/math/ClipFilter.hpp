@@ -38,6 +38,7 @@ public:
     };
 
     Aabb<double> box;
+    Aabb<double> boxView;
     Type enabled;
 
     ClipFilter();

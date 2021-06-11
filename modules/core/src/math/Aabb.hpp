@@ -40,6 +40,9 @@ public:
 
     void set(T x1, T y1, T z1, T x2, T y2, T z2);
     void set(const std::vector<T> &xyz);
+    void set(const Aabb<T> &box);
+    void setPercent(const Aabb<T> &box, const Aabb<T> &a, const Aabb<T> &b);
+
     void extend(const Aabb<T> &box);
     void clear();
 
@@ -159,6 +162,42 @@ template <class T> inline void Aabb<T>::set(const std::vector<T> &xyz)
     {
         clear();
     }
+}
+
+template <class T> inline void Aabb<T>::set(const Aabb<T> &box)
+{
+    min_[0] = box.min_[0];
+    max_[0] = box.max_[0];
+    min_[1] = box.min_[1];
+    max_[1] = box.max_[1];
+    min_[2] = box.min_[2];
+    max_[2] = box.max_[2];
+
+    validate();
+}
+
+template <class T>
+inline void Aabb<T>::setPercent(const Aabb<T> &box,
+                                const Aabb<T> &a,
+                                const Aabb<T> &b)
+{
+    for (int i = 0; i < 3; i++)
+    {
+        min_[i] = box.min_[i];
+        max_[i] = box.max_[i];
+
+        T lengthSrc = a.max_[i] - a.min_[i];
+
+        if (lengthSrc > 0)
+        {
+            T lengthDst = box.max_[i] - box.min_[i];
+
+            min_[i] += lengthDst * ((b.min_[i] - a.min_[i]) / lengthSrc);
+            max_[i] -= lengthDst * ((a.max_[i] - b.max_[i]) / lengthSrc);
+        }
+    }
+
+    validate();
 }
 
 template <class T> inline void Aabb<T>::extend(const Aabb<T> &box)
