@@ -83,6 +83,7 @@ protected:
     GLCamera camera_;
 
     void resetCamera();
+    void clearScreen();
     void renderScene();
     void cameraChanged();
     void setFocus();

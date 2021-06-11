@@ -195,11 +195,11 @@ void GLWidget::paintGL()
     // Background
     if (isSelected())
     {
-        glClearColor(0.0F, 0.0F, 0.0F, 0.0F);
+        glClearColor(0.2F, 0.2F, 0.2F, 0.0F);
     }
     else
     {
-        glClearColor(0.1F, 0.1F, 0.1F, 0.0F);
+        glClearColor(0.2F, 0.2F, 0.2F, 0.0F);
     }
 
     // Setup camera
@@ -214,8 +214,14 @@ void GLWidget::paintGL()
     // Render
     renderScene();
 
+    glColor3f(0.25F, 0.25F, 0.25F);
     GL::renderAabb(aabb_);
     GL::renderAxis(aabb_, camera_.getCenter());
+}
+
+void GLWidget::clearScreen()
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void GLWidget::renderScene()
@@ -227,9 +233,17 @@ void GLWidget::renderScene()
 
     editor_->lock();
 
+    const EditorSettings &settings = editor_->settings();
+    glPointSize(settings.view().pointSize());
+
     double t1 = getRealTime();
 
     size_t tileViewSize = editor_->tileViewSize();
+
+    if (tileViewSize == 0)
+    {
+        clearScreen();
+    }
 
     for (size_t tileIndex = 0; tileIndex < tileViewSize; tileIndex++)
     {
@@ -239,7 +253,7 @@ void GLWidget::renderScene()
         {
             if (tileIndex == 0 && tile.view.isStarted())
             {
-                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                clearScreen();
             }
 
             GL::render(GL::POINTS, tile.view.xyz, tile.view.rgb, tile.indices);
@@ -255,12 +269,7 @@ void GLWidget::renderScene()
         }
     }
 
-    // if (editor_->clipFilter().enabled)
-    // {
-    //     GLAabb box;
-    //     box.set(editor_->clipFilter().boxView);
-    //     GL::renderAabb(box);
-    // }
+    GL::renderClipFilter(editor_->clipFilter());
 
     editor_->unlock();
 }

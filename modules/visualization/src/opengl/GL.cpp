@@ -121,6 +121,25 @@ void GL::render(Mode mode,
     }
 }
 
+void GL::renderClipFilter(const ClipFilter &clipFilter)
+{
+    if (!clipFilter.enabled)
+    {
+        return;
+    }
+
+    GLAabb box;
+    box.set(clipFilter.boxView);
+
+    glClearColor(0.5F, 1.0F, 0.5F, 0.0F);
+    glEnable(GL_LINE_STIPPLE);
+    glLineStipple(4, 0xaaaa);
+
+    GL::renderAabb(box);
+
+    glDisable(GL_LINE_STIPPLE);
+}
+
 void GL::renderAabb(const GLAabb &box)
 {
     // Render wireframe cuboid
@@ -139,8 +158,6 @@ void GL::renderAabb(const GLAabb &box)
 
     GLuint indices[24] = {0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6,
                           6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7};
-
-    glColor3f(0.25F, 0.25F, 0.25F);
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, static_cast<GLvoid *>(&v[0]));

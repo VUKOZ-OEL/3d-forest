@@ -28,13 +28,14 @@
 #include <QMainWindow>
 #include <vector>
 
+class QTextEdit;
+class PluginFile;
+class PluginTool;
 class WindowClipFilter;
 class WindowDataSets;
 class WindowLayers;
-class PluginFile;
-class PluginTool;
 class WindowViewports;
-class QTextEdit;
+class WindowSettingsView;
 
 /** Window Main. */
 class WindowMain : public QMainWindow
@@ -82,6 +83,7 @@ public slots:
     void actionLayerVisible(size_t id, bool checked);
     void actionClipFilter(const ClipFilter &clipFilter);
     void actionClipFilterReset();
+    void actionSettingsView();
 
     void actionAbout();
 
@@ -102,6 +104,7 @@ protected:
     WindowDataSets *windowDataSets_;
     WindowLayers *windowLayers_;
     WindowViewports *windowViewports_;
+    WindowSettingsView *windowSettingsView_;
 
     // Menus
     QMenu *menuTools_;

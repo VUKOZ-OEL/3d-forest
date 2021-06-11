@@ -31,6 +31,7 @@
 #include <EditorDataSet.hpp>
 #include <EditorFilter.hpp>
 #include <EditorLayer.hpp>
+#include <EditorSettings.hpp>
 #include <EditorTile.hpp>
 #include <map>
 #include <string>
@@ -59,6 +60,9 @@ public:
     const EditorLayer &layer(size_t i) const { return layers_[i]; }
 
     const ClipFilter &clipFilter() const { return clipFilter_; }
+
+    const EditorSettings &settings() const { return settings_; }
+    void setSettingsView(const EditorSettings::View &settings);
 
     void setVisibleDataSet(size_t i, bool visible);
     void setVisibleLayer(size_t i, bool visible);
@@ -89,6 +93,7 @@ protected:
     std::vector<std::shared_ptr<EditorDataSet>> dataSets_;
     std::vector<EditorLayer> layers_;
     ClipFilter clipFilter_;
+    EditorSettings settings_;
 
     // Filter
     std::vector<EditorFilter *> filters_;

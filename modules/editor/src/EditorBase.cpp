@@ -23,9 +23,6 @@
 
 #include <EditorBase.hpp>
 #include <Error.hpp>
-#include <File.hpp>
-#include <FileLas.hpp>
-#include <LasIndexBuilder.hpp>
 #include <iostream>
 #include <limits>
 #include <queue>
@@ -218,6 +215,12 @@ void EditorBase::applyFilters(EditorTile *tile)
     }
 }
 
+void EditorBase::setSettingsView(const EditorSettings::View &settings)
+{
+    settings_.setView(settings);
+    // unsavedChanges_ = true;
+}
+
 void EditorBase::setVisibleDataSet(size_t i, bool visible)
 {
     dataSets_[i]->visible = visible;
@@ -233,13 +236,15 @@ void EditorBase::setVisibleLayer(size_t i, bool visible)
 void EditorBase::setClipFilter(const ClipFilter &clipFilter)
 {
     clipFilter_ = clipFilter;
+    clipFilter_.boxView.setPercent(boundaryView_, boundary_, clipFilter_.box);
+
     // unsavedChanges_ = true;
 }
 
 void EditorBase::resetClipFilter()
 {
     clipFilter_.box = boundary_;
-    // unsavedChanges_ = true;
+    setClipFilter(clipFilter_);
 }
 
 void EditorBase::select(std::vector<OctreeIndex::Selection> &selected)
@@ -332,136 +337,18 @@ bool EditorBase::loadView()
 void EditorBase::loadView(size_t idx)
 {
     EditorTile *tile = view_[idx].get();
-    EditorDataSet *dataSet = dataSets_[tile->dataSetId].get();
-    const OctreeIndex::Node *node = dataSet->index.at(tile->tileId);
-
-    FileLas las;
-    las.open(dataSet->path);
-    las.readHeader();
-
-    size_t n = static_cast<size_t>(node->size);
-    bool rgbFlag = las.header.hasRgb();
-    std::vector<double> &xyz = tile->xyz;
-    std::vector<float> &xyzView = tile->view.xyz;
-    std::vector<float> &rgb = tile->rgb;
-    std::vector<unsigned int> &indices = tile->indices;
-
-    xyz.resize(n * 3);
-    xyzView.resize(n * 3);
-    if (rgbFlag)
+    try
     {
-        rgb.resize(n * 3);
+        tile->read(this);
     }
-    indices.resize(n);
-
-    size_t pointSize = las.header.point_data_record_length;
-    uint64_t start = node->from * pointSize;
-    las.seek(start + las.header.offset_to_point_data);
-
-    std::vector<uint8_t> buffer;
-    size_t bufferSize = pointSize * n;
-    uint8_t fmt = las.header.point_data_record_format;
-    buffer.resize(bufferSize);
-    las.file().read(buffer.data(), bufferSize);
-
-    uint8_t *ptr = buffer.data();
-    FileLas::Point point;
-    double x;
-    double y;
-    double z;
-    constexpr float scaleU16 =
-        1.0F / static_cast<float>(std::numeric_limits<uint16_t>::max());
-
-    for (size_t i = 0; i < n; i++)
+    catch (std::exception &e)
     {
-        indices[i] = static_cast<unsigned int>(i);
-
-        las.readPoint(point, ptr + (pointSize * i), fmt);
-
-        las.transform(x, y, z, point);
-
-        xyz[3 * i + 0] = x;
-        xyz[3 * i + 1] = y;
-        xyz[3 * i + 2] = z;
-
-        xyzView[3 * i + 0] = static_cast<float>(static_cast<double>(point.x) +
-                                                las.header.x_offset);
-        xyzView[3 * i + 1] = static_cast<float>(static_cast<double>(point.y) +
-                                                las.header.y_offset);
-        xyzView[3 * i + 2] = static_cast<float>(static_cast<double>(point.z) +
-                                                las.header.z_offset);
-
-        if (rgbFlag)
-        {
-            rgb[3 * i + 0] = point.red * scaleU16;
-            rgb[3 * i + 1] = point.green * scaleU16;
-            rgb[3 * i + 2] = point.blue * scaleU16;
-        }
+        // std::cout << e.what() << "\n";
     }
-
-    tile->view.rgb = rgb;
-
-    tile->boundary.set(xyz);
-    tile->view.boundary.set(xyzView);
-
-    if (clipFilter_.enabled)
+    catch (...)
     {
-        const OctreeIndex::Node *l1 = dataSet->index.at(tile->tileId);
-
-        try
-        {
-            const std::string pathL2 =
-                LasIndexBuilder::extensionL2(dataSet->path);
-            tile->index.read(pathL2, l1->reserved);
-
-            std::vector<OctreeIndex::Selection> selection;
-            tile->index.selectLeaves(selection, clipFilter_.box, dataSet->id);
-
-            uint64_t nSelected = 0;
-            for (size_t i = 0; i < selection.size(); i++)
-            {
-                const OctreeIndex::Node *nodeL2 =
-                    tile->index.at(selection[i].idx);
-                if (nodeL2)
-                {
-                    // TBD partial selection
-                    nSelected += nodeL2->size;
-                }
-            }
-
-            size_t n2 = static_cast<size_t>(nSelected);
-            indices.resize(n2);
-
-            n2 = 0;
-            unsigned int n3;
-            unsigned int from;
-            for (size_t i = 0; i < selection.size(); i++)
-            {
-                const OctreeIndex::Node *nodeL2 =
-                    tile->index.at(selection[i].idx);
-                if (nodeL2)
-                {
-                    n3 = static_cast<unsigned int>(nodeL2->size);
-                    from = static_cast<unsigned int>(nodeL2->from);
-
-                    for (unsigned int j = 0; j < n3; j++)
-                    {
-                        indices[n2++] = from + j;
-                    }
-                }
-            }
-        }
-        catch (std::exception &e)
-        {
-            // std::cout << e.what() << "\n";
-        }
-        catch (...)
-        {
-            // std::cout << "unknown error\n";
-        }
+        // std::cout << "unknown error\n";
     }
-
-    tile->loaded = true;
 }
 
 void EditorBase::updateCamera(const Camera &camera)
