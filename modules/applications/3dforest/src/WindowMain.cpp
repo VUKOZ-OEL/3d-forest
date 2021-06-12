@@ -369,41 +369,49 @@ void WindowMain::actionProjectExportAs()
 void WindowMain::actionViewOrthographic()
 {
     windowViewports_->setViewOrthographic();
+    updateViewer();
 }
 
 void WindowMain::actionViewPerspective()
 {
     windowViewports_->setViewPerspective();
+    updateViewer();
 }
 
 void WindowMain::actionViewTop()
 {
     windowViewports_->setViewTop();
+    updateViewer();
 }
 
 void WindowMain::actionViewFront()
 {
     windowViewports_->setViewFront();
+    updateViewer();
 }
 
 void WindowMain::actionViewLeft()
 {
     windowViewports_->setViewLeft();
+    updateViewer();
 }
 
 void WindowMain::actionView3d()
 {
     windowViewports_->setView3d();
+    updateViewer();
 }
 
 void WindowMain::actionViewResetDistance()
 {
     windowViewports_->setViewResetDistance();
+    updateViewer();
 }
 
 void WindowMain::actionViewResetCenter()
 {
     windowViewports_->setViewResetCenter();
+    updateViewer();
 }
 
 void WindowMain::actionViewLayoutSingle()
@@ -681,7 +689,7 @@ void WindowMain::actionEditorRender()
 
 void WindowMain::updateViewer()
 {
-    actionCameraChanged(0);
+    actionCameraChanged(windowViewports_->selectedViewportId());
 }
 
 void WindowMain::showError(const char *message)

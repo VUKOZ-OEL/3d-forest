@@ -282,7 +282,7 @@ void WindowViewports::setLayout(ViewLayout viewLayout)
         viewports_[3] = createViewport(3);
 
         // Create new layout
-        //QWidget *right = new QWidget;
+        // QWidget *right = new QWidget;
         QSplitter *splitterRight = new QSplitter;
         splitterRight->addWidget(viewports_[1]);
         splitterRight->addWidget(viewports_[2]);
@@ -299,7 +299,6 @@ void WindowViewports::setLayout(ViewLayout viewLayout)
         newLayout->setContentsMargins(1, 1, 1, 1);
         newLayout->addWidget(splitter);
         QWidget::setLayout(newLayout);
-
     }
     else
     {

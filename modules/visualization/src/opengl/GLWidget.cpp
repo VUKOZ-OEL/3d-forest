@@ -84,13 +84,11 @@ Camera GLWidget::camera() const
 void GLWidget::setViewOrthographic()
 {
     camera_.setOrthographic();
-    cameraChanged();
 }
 
 void GLWidget::setViewPerspective()
 {
     camera_.setPerspective();
-    cameraChanged();
 }
 
 void GLWidget::setViewDirection(const QVector3D &dir, const QVector3D &up)
@@ -100,7 +98,6 @@ void GLWidget::setViewDirection(const QVector3D &dir, const QVector3D &up)
 
     QVector3D eye = (dir * distance) + center;
     camera_.setLookAt(eye, center, up);
-    cameraChanged();
 }
 
 void GLWidget::setViewTop()
@@ -140,12 +137,13 @@ void GLWidget::resetCamera()
     if (aabb_.isValid())
     {
         center = aabb_.getCenter();
-        center[2] = aabb_.getMin().z();
+        //center[2] = aabb_.getMin().z();
         distance = aabb_.getRadius();
     }
 
     QVector3D eye(-1.0F, -1.0F, 1.0F);
     QVector3D up(1.065F, 1.0F, 1.0F);
+    eye.normalize();
     up.normalize();
 
     eye = (eye * distance) + center;
@@ -166,7 +164,6 @@ void GLWidget::setViewResetDistance()
 
     QVector3D eye = (dir * distance) + center;
     camera_.setLookAt(eye, center, up);
-    cameraChanged();
 }
 
 void GLWidget::setViewResetCenter()
@@ -179,12 +176,11 @@ void GLWidget::setViewResetCenter()
     if (aabb_.isValid())
     {
         center = aabb_.getCenter();
-        center[2] = aabb_.getMin().z();
+        //center[2] = aabb_.getMin().z();
     }
 
     QVector3D eye = (dir * distance) + center;
     camera_.setLookAt(eye, center, up);
-    cameraChanged();
 }
 
 void GLWidget::initializeGL()
@@ -201,14 +197,7 @@ void GLWidget::initializeGL()
 void GLWidget::paintGL()
 {
     // Background
-    if (isSelected())
-    {
-        glClearColor(0.2F, 0.2F, 0.2F, 0.0F);
-    }
-    else
-    {
-        glClearColor(0.2F, 0.2F, 0.2F, 0.0F);
-    }
+    glClearColor(0.2F, 0.2F, 0.2F, 0.0F);
 
     // Setup camera
     glViewport(0, 0, camera_.width(), camera_.height());
