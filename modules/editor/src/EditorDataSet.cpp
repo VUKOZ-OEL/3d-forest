@@ -125,8 +125,8 @@ void EditorDataSet::setPath(const std::string &unresolved,
 
 void EditorDataSet::read()
 {
-    const std::string pathL1 = FileIndexBuilder::extensionL1(path);
-    index.read(pathL1);
+    const std::string pathIndex = FileIndexBuilder::extension(path);
+    index.read(pathIndex);
 
     FileLas las;
     las.open(path);

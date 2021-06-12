@@ -41,6 +41,7 @@ public:
     {
         uint64_t from;
         uint64_t size;
+        uint64_t offset;
         uint32_t reserved;
         uint32_t prev;
         uint32_t next[8];

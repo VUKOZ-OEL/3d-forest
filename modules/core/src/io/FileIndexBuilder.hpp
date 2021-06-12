@@ -66,8 +66,7 @@ public:
 
     double percent() const;
 
-    static std::string extensionL1(const std::string &path);
-    static std::string extensionL2(const std::string &path);
+    static std::string extension(const std::string &path);
 
     static void index(const std::string &outputPath,
                       const std::string &inputPath,
@@ -119,7 +118,7 @@ protected:
     FileIndex indexMain_;
     FileIndex indexNode_;
     std::map<const FileIndex::Node *, uint64_t> indexMainUsed_;
-    FileChunk indexNodeFile_;
+    FileChunk indexFile_;
 
     FileLas inputLas_;
     FileLas outputLas_;

@@ -56,14 +56,9 @@ FileIndexBuilder::~FileIndexBuilder()
 {
 }
 
-std::string FileIndexBuilder::extensionL1(const std::string &path)
+std::string FileIndexBuilder::extension(const std::string &path)
 {
-    return File::replaceExtension(path, ".idx1");
-}
-
-std::string FileIndexBuilder::extensionL2(const std::string &path)
-{
-    return File::replaceExtension(path, ".idx2");
+    return File::replaceExtension(path, ".idx");
 }
 
 void FileIndexBuilder::index(const std::string &outputPath,
@@ -560,8 +555,9 @@ void FileIndexBuilder::stateMainEnd()
     indexMain_.insertEnd();
 
     // Write main index
-    std::string path = extensionL1(outputPath_);
-    indexMain_.write(path);
+    std::string indexPath = extension(outputPath_);
+    indexFile_.open(indexPath, "w");
+    indexMain_.write(indexFile_);
 
     // Next initial file offset
     inputLas_.seekPointData();
@@ -618,8 +614,6 @@ void FileIndexBuilder::stateMainSort()
 
 void FileIndexBuilder::stateNodeBegin()
 {
-    std::string path = extensionL2(outputPath_);
-    indexNodeFile_.open(path, "w+");
 }
 
 static int DatabaseBuilderCmp(const void *a, const void *b)
@@ -695,8 +689,8 @@ void FileIndexBuilder::stateNodeInsert()
     }
 
     indexNode_.insertEnd();
-    node->reserved = static_cast<uint32_t>(indexNodeFile_.offset());
-    indexNode_.write(indexNodeFile_);
+    node->offset = indexFile_.offset();
+    indexNode_.write(indexFile_);
 
     // Sort
     size_t size = sizeof(uint64_t) * 2;
@@ -727,10 +721,10 @@ void FileIndexBuilder::stateNodeInsert()
 
 void FileIndexBuilder::stateNodeEnd()
 {
-    std::string path = extensionL1(outputPath_);
-    indexMain_.write(path);
+    indexFile_.seek(0);
+    indexMain_.write(indexFile_);
 
-    indexNodeFile_.close();
+    indexFile_.close();
 }
 
 void FileIndexBuilder::stateEnd()

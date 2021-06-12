@@ -157,8 +157,8 @@ void EditorTile::readFilter(const EditorBase *editor)
     if (editor->clipFilter().enabled)
     {
         // Read L2 index
-        const std::string path = FileIndexBuilder::extensionL2(dataSet.path);
-        index.read(path, node->reserved);
+        const std::string pathIndex = FileIndexBuilder::extension(dataSet.path);
+        index.read(pathIndex, node->offset);
 
         // Select octants
         std::vector<FileIndex::Selection> selection;

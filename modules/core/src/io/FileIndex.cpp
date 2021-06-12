@@ -544,7 +544,6 @@ uint64_t FileIndex::insert(double x, double y, double z)
 
         octant.getCenter(px, py, pz);
 
-        // code = code << (level * 3);
         code = code << 3;
 
         if (x > px)
@@ -648,36 +647,54 @@ void FileIndex::readPayload(FileChunk &file, const FileChunk::Chunk &chunk)
                   OCTREE_INDEX_CHUNK_MAJOR_VERSION,
                   OCTREE_INDEX_CHUNK_MINOR_VERSION);
 
+    std::vector<uint8_t> buffer;
+    buffer.resize(chunk.headerLength + chunk.dataLength);
+    uint8_t *ptr = buffer.data();
+
     // Header
-    uint8_t buffer[64];
-    file.read(buffer, chunk.headerLength);
-    size_t n = static_cast<size_t>(ltoh64(&buffer[0]));
-    double wx1 = ltohd(&buffer[8 + (0 * 8)]);
-    double wy1 = ltohd(&buffer[8 + (1 * 8)]);
-    double wz1 = ltohd(&buffer[8 + (2 * 8)]);
-    double wx2 = ltohd(&buffer[8 + (3 * 8)]);
-    double wy2 = ltohd(&buffer[8 + (4 * 8)]);
-    double wz2 = ltohd(&buffer[8 + (5 * 8)]);
+    file.read(ptr, chunk.headerLength);
+
+    size_t n = static_cast<size_t>(ltoh64(&ptr[0]));
+    double wx1 = ltohd(&ptr[8 + (0 * 8)]);
+    double wy1 = ltohd(&ptr[8 + (1 * 8)]);
+    double wz1 = ltohd(&ptr[8 + (2 * 8)]);
+    double wx2 = ltohd(&ptr[8 + (3 * 8)]);
+    double wy2 = ltohd(&ptr[8 + (4 * 8)]);
+    double wz2 = ltohd(&ptr[8 + (5 * 8)]);
     boundary_.set(wx1, wy1, wz1, wx2, wy2, wz2);
 
     // Data
     nodes_.resize(n);
-    uint8_t *data = reinterpret_cast<uint8_t *>(nodes_.data());
-    file.read(data, chunk.dataLength);
+    std::memset(nodes_.data(), 0, sizeof(Node) * n);
+
+    file.read(ptr, chunk.dataLength);
+
     for (size_t i = 0; i < nodes_.size(); i++)
     {
-        nodes_[i].from = ltoh64(&data[i * sizeof(Node)]);
-        nodes_[i].size = ltoh64(&data[i * sizeof(Node) + 8]);
-        nodes_[i].reserved = ltoh32(&data[i * sizeof(Node) + 16]);
-        nodes_[i].prev = ltoh32(&data[i * sizeof(Node) + 20]);
-        nodes_[i].next[0] = ltoh32(&data[i * sizeof(Node) + 24]);
-        nodes_[i].next[1] = ltoh32(&data[i * sizeof(Node) + 28]);
-        nodes_[i].next[2] = ltoh32(&data[i * sizeof(Node) + 32]);
-        nodes_[i].next[3] = ltoh32(&data[i * sizeof(Node) + 36]);
-        nodes_[i].next[4] = ltoh32(&data[i * sizeof(Node) + 40]);
-        nodes_[i].next[5] = ltoh32(&data[i * sizeof(Node) + 44]);
-        nodes_[i].next[6] = ltoh32(&data[i * sizeof(Node) + 48]);
-        nodes_[i].next[7] = ltoh32(&data[i * sizeof(Node) + 52]);
+        nodes_[i].reserved = ltoh32(ptr);
+        nodes_[i].prev = ltoh32(ptr + 4);
+        ptr += 8;
+
+        uint32_t c = 0;
+        uint32_t nextMask = nodes_[i].reserved & 0xffU;
+        for (int b = 0; b < 8; b++)
+        {
+            if (nextMask & (1U << b))
+            {
+                nodes_[i].next[b] = ltoh32(ptr);
+                ptr += 4;
+                c++;
+            }
+        }
+        if (c & 1U)
+        {
+            ptr += 4;
+        }
+
+        nodes_[i].from = ltoh64(ptr);
+        nodes_[i].size = ltoh64(ptr + 8);
+        nodes_[i].offset = ltoh64(ptr + 16);
+        ptr += 24;
     }
 }
 
@@ -697,40 +714,79 @@ void FileIndex::write(FileChunk &file) const
     chunk.majorVersion = OCTREE_INDEX_CHUNK_MAJOR_VERSION;
     chunk.minorVersion = OCTREE_INDEX_CHUNK_MINOR_VERSION;
     chunk.headerLength = OCTREE_INDEX_HEADER_SIZE_1_0;
-    chunk.dataLength = nodes_.size() * sizeof(Node);
+
+    // Chunk size
+    chunk.dataLength = 0;
+    std::vector<uint32_t> headers;
+    headers.resize(nodes_.size());
+    for (size_t i = 0; i < nodes_.size(); i++)
+    {
+        uint32_t c = 0;
+        uint32_t nextMask = 0;
+        for (int b = 0; b < 8; b++)
+        {
+            if (nodes_[i].next[b])
+            {
+                nextMask |= 1U << b;
+                c++;
+            }
+        }
+        if (c & 1U)
+        {
+            c++;
+        }
+        headers[i] = nextMask;
+        chunk.dataLength += c;
+    }
+    chunk.dataLength *= 4;
+    chunk.dataLength += nodes_.size() * 32;
+
+    // Chunk write
     file.write(chunk);
 
     // Header
-    uint8_t buffer[64];
-    htol64(&buffer[0], nodes_.size());
-    htold(&buffer[8 + (0 * 8)], boundary_.min(0));
-    htold(&buffer[8 + (1 * 8)], boundary_.min(1));
-    htold(&buffer[8 + (2 * 8)], boundary_.min(2));
-    htold(&buffer[8 + (3 * 8)], boundary_.max(0));
-    htold(&buffer[8 + (4 * 8)], boundary_.max(1));
-    htold(&buffer[8 + (5 * 8)], boundary_.max(2));
-    file.write(buffer, chunk.headerLength);
+    std::vector<uint8_t> buffer;
+    buffer.resize(chunk.headerLength + chunk.dataLength);
+    uint8_t *ptr = buffer.data();
+
+    htol64(&ptr[0], nodes_.size());
+    htold(&ptr[8 + (0 * 8)], boundary_.min(0));
+    htold(&ptr[8 + (1 * 8)], boundary_.min(1));
+    htold(&ptr[8 + (2 * 8)], boundary_.min(2));
+    htold(&ptr[8 + (3 * 8)], boundary_.max(0));
+    htold(&ptr[8 + (4 * 8)], boundary_.max(1));
+    htold(&ptr[8 + (5 * 8)], boundary_.max(2));
+    file.write(buffer.data(), chunk.headerLength);
 
     // Data
-    std::vector<uint8_t> nodes;
-    nodes.resize(nodes_.size() * sizeof(Node));
-    uint8_t *data = reinterpret_cast<uint8_t *>(nodes.data());
     for (size_t i = 0; i < nodes_.size(); i++)
     {
-        htol64(&data[i * sizeof(Node)], nodes_[i].from);
-        htol64(&data[i * sizeof(Node) + 8], nodes_[i].size);
-        htol32(&data[i * sizeof(Node) + 16], nodes_[i].reserved);
-        htol32(&data[i * sizeof(Node) + 20], nodes_[i].prev);
-        htol32(&data[i * sizeof(Node) + 24], nodes_[i].next[0]);
-        htol32(&data[i * sizeof(Node) + 28], nodes_[i].next[1]);
-        htol32(&data[i * sizeof(Node) + 32], nodes_[i].next[2]);
-        htol32(&data[i * sizeof(Node) + 36], nodes_[i].next[3]);
-        htol32(&data[i * sizeof(Node) + 40], nodes_[i].next[4]);
-        htol32(&data[i * sizeof(Node) + 44], nodes_[i].next[5]);
-        htol32(&data[i * sizeof(Node) + 48], nodes_[i].next[6]);
-        htol32(&data[i * sizeof(Node) + 52], nodes_[i].next[7]);
+        htol32(ptr, headers[i]);
+        htol32(ptr + 4, nodes_[i].prev);
+        ptr += 8;
+
+        uint32_t c = 0;
+        for (int b = 0; b < 8; b++)
+        {
+            if (nodes_[i].next[b])
+            {
+                htol32(ptr, nodes_[i].next[b]);
+                ptr += 4;
+                c++;
+            }
+        }
+        if (c & 1U)
+        {
+            htol32(ptr, 0);
+            ptr += 4;
+        }
+
+        htol64(ptr, nodes_[i].from);
+        htol64(ptr + 8, nodes_[i].size);
+        htol64(ptr + 16, nodes_[i].offset);
+        ptr += 24;
     }
-    file.write(data, chunk.dataLength);
+    file.write(buffer.data(), chunk.dataLength);
 }
 
 Json &FileIndex::write(Json &out) const
