@@ -1,0 +1,22 @@
+{
+    "files.eol": "\n",
+    "cmake.configureOnOpen": false,
+    "cmake.mingwSearchDirs": [
+        "C:\\msys64\\mingw-w64\\bin"
+    ],
+    "cmake.generator": "MinGW Makefiles",
+    "C_Cpp.default.includePath":[
+        "C:/Qt/5.15.0/mingw81_64/include/**",
+        "${workspaceRoot}/3rdparty/widgets",
+        "${workspaceRoot}/modules/visualization/src/editor",
+        "${workspaceRoot}/modules/visualization/src/opengl",
+        "${workspaceRoot}/modules/visualization/src/widgets",
+        "${workspaceRoot}/modules/applications/3dforest/src",
+        "${workspaceRoot}/modules/applications/3dforest/plugins/heightmap",
+        "${workspaceRoot}/modules/applications/console/src",
+        "${workspaceRoot}/modules/core/src/common",
+        "${workspaceRoot}/modules/core/src/io",
+        "${workspaceRoot}/modules/core/src/math",
+        "${workspaceRoot}/modules/core/src/scene",
+        "${workspaceRoot}/modules/editor/src"]
+}
