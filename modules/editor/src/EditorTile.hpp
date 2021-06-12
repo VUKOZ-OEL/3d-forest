@@ -27,8 +27,6 @@
 #include <Aabb.hpp>
 #include <FileIndex.hpp>
 #include <Vector3.hpp>
-#include <cstdint>
-#include <vector>
 
 class EditorBase;
 

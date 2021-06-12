@@ -65,7 +65,7 @@ QSize WindowMain::minimumSizeHint() const
 
 QSize WindowMain::sizeHint() const
 {
-    return QSize(800, 600);
+    return QSize(1024, 768);
 }
 
 void WindowMain::initializeWindow()
@@ -93,9 +93,9 @@ void WindowMain::createViewer()
 {
     windowViewports_ = new WindowViewports(this);
     connect(windowViewports_,
-            SIGNAL(cameraChanged()),
+            SIGNAL(cameraChanged(size_t)),
             this,
-            SLOT(actionCameraChanged()));
+            SLOT(actionCameraChanged(size_t)));
 
     setCentralWidget(windowViewports_);
 }
@@ -157,14 +157,16 @@ void WindowMain::createMenus()
                                     this,
                                     &WindowMain::actionViewResetCenter);
 
-    // QMenu *menuViewLayout = menuView->addMenu(tr("Layout"));
-    // (void)menuViewLayout->addAction(tr("Single"),
-    //                                 this,
-    //                                 &WindowMain::actionViewLayoutSingle);
-    // (void)menuViewLayout->addAction(
-    //     tr("Two Columns"),
-    //     this,
-    //     &WindowMain::actionViewLayoutTwoColumns);
+    QMenu *menuViewLayout = menuView->addMenu(tr("Layout"));
+    (void)menuViewLayout->addAction(tr("Single"),
+                                    this,
+                                    &WindowMain::actionViewLayoutSingle);
+    (void)menuViewLayout->addAction(tr("Two Columns"),
+                                    this,
+                                    &WindowMain::actionViewLayout2Columns);
+    (void)menuViewLayout->addAction(tr("Three Rows Right"),
+                                    this,
+                                    &WindowMain::actionViewLayout3RowsRight);
 
     // Tools
     menuTools_ = menuBar()->addMenu(tr("Tools"));
@@ -207,6 +209,7 @@ void WindowMain::createWindows()
     dockLayers->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
     dockLayers->setMaximumWidth(WINDOW_MAIN_DOCK_MAX);
     dockLayers->setWidget(windowLayers_);
+    dockLayers->setVisible(false);
     addDockWidget(Qt::LeftDockWidgetArea, dockLayers);
 
     // Create view settings window
@@ -405,12 +408,35 @@ void WindowMain::actionViewResetCenter()
 
 void WindowMain::actionViewLayoutSingle()
 {
+    editor_.cancelThreads();
+    editor_.lock();
+    editor_.setNumberOfViewports(1);
     windowViewports_->setLayout(WindowViewports::VIEW_LAYOUT_SINGLE);
+    editor_.unlock();
+    updateViewer();
 }
 
-void WindowMain::actionViewLayoutTwoColumns()
+void WindowMain::actionViewLayout2Columns()
 {
+    editor_.cancelThreads();
+    editor_.lock();
+    editor_.setNumberOfViewports(2);
     windowViewports_->setLayout(WindowViewports::VIEW_LAYOUT_TWO_COLUMNS);
+    windowViewports_->resetScene(&editor_, 1);
+    editor_.unlock();
+    updateViewer();
+}
+
+void WindowMain::actionViewLayout3RowsRight()
+{
+    editor_.cancelThreads();
+    editor_.lock();
+    editor_.setNumberOfViewports(4);
+    windowViewports_->setLayout(WindowViewports::VIEW_LAYOUT_THREE_ROWS_RIGHT);
+    windowViewports_->resetScene(&editor_, 1);
+    windowViewports_->resetScene(&editor_, 2);
+    windowViewports_->resetScene(&editor_, 3);
+    editor_.unlock();
     updateViewer();
 }
 
@@ -641,9 +667,9 @@ void WindowMain::updateProject()
     updateWindowTitle(QString::fromStdString(editor_.path()));
 }
 
-void WindowMain::actionCameraChanged()
+void WindowMain::actionCameraChanged(size_t viewportId)
 {
-    editor_.render(windowViewports_->camera());
+    editor_.render(viewportId, windowViewports_->camera(viewportId));
 }
 
 void WindowMain::actionEditorRender()
@@ -655,7 +681,7 @@ void WindowMain::actionEditorRender()
 
 void WindowMain::updateViewer()
 {
-    actionCameraChanged();
+    actionCameraChanged(0);
 }
 
 void WindowMain::showError(const char *message)

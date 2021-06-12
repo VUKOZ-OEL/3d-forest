@@ -25,6 +25,20 @@
 
 EditorSettings::View::View() : pointSize_(1.0F)
 {
+    colorSourceString_ = {
+        "Color",
+        "Intensity",
+        "Return Number",
+        "Classification",
+        "Layer",
+        "User Color",
+    };
+
+    colorSourceEnabled_.resize(colorSourceString_.size());
+    for (auto &&it : colorSourceEnabled_)
+    {
+        it = false;
+    }
 }
 
 float EditorSettings::View::pointSize() const
@@ -35,6 +49,26 @@ float EditorSettings::View::pointSize() const
 void EditorSettings::View::setPointSize(float size)
 {
     pointSize_ = size;
+}
+
+size_t EditorSettings::View::colorSourceSize() const
+{
+    return colorSourceString_.size();
+}
+
+const char *EditorSettings::View::colorSourceString(size_t id) const
+{
+    return colorSourceString_[id].c_str();
+}
+
+bool EditorSettings::View::isColorSourceEnabled(size_t id) const
+{
+    return colorSourceEnabled_[id];
+}
+
+void EditorSettings::View::setColorSourceEnabled(size_t id, bool v)
+{
+    colorSourceEnabled_[id] = v;
 }
 
 void EditorSettings::setView(const View &view)

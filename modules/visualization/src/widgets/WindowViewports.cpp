@@ -27,6 +27,7 @@
 #include <QSplitter>
 #include <QVBoxLayout>
 #include <WindowViewports.hpp>
+#include <iostream>
 
 WindowViewports::WindowViewports(QWidget *parent) : QWidget(parent)
 {
@@ -42,10 +43,10 @@ void WindowViewports::initializeViewer()
     setLayout(ViewLayout::VIEW_LAYOUT_SINGLE);
 }
 
-GLWidget *WindowViewports::createViewport()
+GLWidget *WindowViewports::createViewport(size_t viewportId)
 {
     GLWidget *viewport = new GLWidget(this);
-    viewport->setWindowViewports(this);
+    viewport->setWindowViewports(this, viewportId);
     viewport->setSelected(false);
 
     return viewport;
@@ -133,6 +134,18 @@ void WindowViewports::selectViewport(GLWidget *viewport)
     }
 }
 
+size_t WindowViewports::selectedViewportId() const
+{
+    for (size_t i = 0; i < viewports_.size(); i++)
+    {
+        if (viewports_[i]->isSelected())
+        {
+            return i;
+        }
+    }
+    return 0;
+}
+
 void WindowViewports::updateScene(Editor *editor)
 {
     for (size_t i = 0; i < viewports_.size(); i++)
@@ -150,12 +163,36 @@ void WindowViewports::resetScene(Editor *editor)
     }
 }
 
-Camera WindowViewports::camera() const
+void WindowViewports::resetScene(Editor *editor, size_t viewportId)
 {
-    const GLWidget *viewport = selectedViewport();
-    if (viewport)
+    if (viewportId == 1)
     {
-        return viewport->camera();
+        viewports_[1]->resetScene(editor);
+        viewports_[1]->setViewOrthographic();
+        viewports_[1]->setViewTop();
+    }
+    else if (viewportId == 2)
+    {
+        viewports_[2]->resetScene(editor);
+        viewports_[2]->setViewOrthographic();
+        viewports_[2]->setViewFront();
+    }
+    else if (viewportId == 3)
+    {
+        viewports_[3]->resetScene(editor);
+        viewports_[3]->setViewOrthographic();
+        viewports_[3]->setViewLeft();
+    }
+}
+
+Camera WindowViewports::camera(size_t viewportId) const
+{
+    for (size_t i = 0; i < viewports_.size(); i++)
+    {
+        if (viewports_[i]->viewportId() == viewportId)
+        {
+            return viewports_[i]->camera();
+        }
     }
 
     return Camera();
@@ -179,28 +216,16 @@ void WindowViewports::setLayout(ViewLayout viewLayout)
             QSplitter *splitter = dynamic_cast<QSplitter *>(item->widget());
             if (splitter)
             {
-                // Reparent viewports from splitter and find selected viewport
-                size_t selectedViewport = 0;
-                for (size_t i = 0; i < viewports_.size(); i++)
+                // Delete extra viewports
+                for (size_t i = 1; i < viewports_.size(); i++)
                 {
-                    if (viewports_[i]->isSelected())
-                    {
-                        selectedViewport = i;
-                    }
-                    viewports_[i]->setParent(this);
+                    viewports_[i]->hide();
+                    viewports_[i]->deleteLater();
                 }
 
                 // Delete layout content
+                viewports_[0]->setParent(this);
                 delete splitter;
-
-                // Delete extra viewports
-                GLWidget *tmpViewport = viewports_[0];
-                viewports_[0] = viewports_[selectedViewport];
-                viewports_[selectedViewport] = tmpViewport;
-                for (size_t i = 1; i < viewports_.size(); i++)
-                {
-                    delete viewports_[i];
-                }
                 viewports_.resize(1);
             }
             else
@@ -216,7 +241,7 @@ void WindowViewports::setLayout(ViewLayout viewLayout)
     if (viewports_.size() == 0)
     {
         viewports_.resize(1);
-        viewports_[0] = createViewport();
+        viewports_[0] = createViewport(0);
         viewports_[0]->setSelected(true);
     }
 
@@ -227,13 +252,14 @@ void WindowViewports::setLayout(ViewLayout viewLayout)
         QHBoxLayout *newLayout = new QHBoxLayout;
         newLayout->setContentsMargins(1, 1, 1, 1);
         newLayout->addWidget(viewports_[0]);
+        viewports_[0]->setSelected(true);
         QWidget::setLayout(newLayout);
     }
     else if (viewLayout == ViewLayout::VIEW_LAYOUT_TWO_COLUMNS)
     {
         // Create the second viewport
         viewports_.resize(2);
-        viewports_[1] = createViewport();
+        viewports_[1] = createViewport(1);
 
         // Create new layout
         QSplitter *splitter = new QSplitter;
@@ -246,6 +272,34 @@ void WindowViewports::setLayout(ViewLayout viewLayout)
         newLayout->setContentsMargins(1, 1, 1, 1);
         newLayout->addWidget(splitter);
         QWidget::setLayout(newLayout);
+    }
+    else if (viewLayout == ViewLayout::VIEW_LAYOUT_THREE_ROWS_RIGHT)
+    {
+        // Create viewports
+        viewports_.resize(4);
+        viewports_[1] = createViewport(1);
+        viewports_[2] = createViewport(2);
+        viewports_[3] = createViewport(3);
+
+        // Create new layout
+        //QWidget *right = new QWidget;
+        QSplitter *splitterRight = new QSplitter;
+        splitterRight->addWidget(viewports_[1]);
+        splitterRight->addWidget(viewports_[2]);
+        splitterRight->addWidget(viewports_[3]);
+        splitterRight->setOrientation(Qt::Vertical);
+
+        QSplitter *splitter = new QSplitter;
+        splitter->addWidget(viewports_[0]);
+        splitter->addWidget(splitterRight);
+        int w = width() / 3;
+        splitter->setSizes(QList<int>({w + w, w}));
+
+        QHBoxLayout *newLayout = new QHBoxLayout;
+        newLayout->setContentsMargins(1, 1, 1, 1);
+        newLayout->addWidget(splitter);
+        QWidget::setLayout(newLayout);
+
     }
     else
     {

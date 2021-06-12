@@ -29,12 +29,14 @@
 #include <Time.hpp>
 #include <WindowViewports.hpp>
 
-GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent)
-{
-    windowViewports_ = nullptr;
-    selected_ = false;
-    editor_ = nullptr;
+GLWidget::GLWidget(QWidget *parent)
+    : QOpenGLWidget(parent),
+      windowViewports_(nullptr),
+      viewportId_(0),
+      selected_(false),
+      editor_(nullptr)
 
+{
     resetCamera();
 }
 
@@ -42,9 +44,15 @@ GLWidget::~GLWidget()
 {
 }
 
-void GLWidget::setWindowViewports(WindowViewports *viewer)
+void GLWidget::setWindowViewports(WindowViewports *viewer, size_t viewportId)
 {
     windowViewports_ = viewer;
+    viewportId_ = viewportId;
+}
+
+size_t GLWidget::viewportId() const
+{
+    return viewportId_;
 }
 
 void GLWidget::setSelected(bool selected)
@@ -238,7 +246,7 @@ void GLWidget::renderScene()
 
     double t1 = getRealTime();
 
-    size_t tileViewSize = editor_->tileViewSize();
+    size_t tileViewSize = editor_->tileViewSize(viewportId_);
 
     if (tileViewSize == 0)
     {
@@ -247,7 +255,7 @@ void GLWidget::renderScene()
 
     for (size_t tileIndex = 0; tileIndex < tileViewSize; tileIndex++)
     {
-        EditorTile &tile = editor_->tileView(tileIndex);
+        EditorTile &tile = editor_->tileView(viewportId_, tileIndex);
 
         if (tile.loaded && !tile.view.isFinished())
         {
@@ -320,6 +328,6 @@ void GLWidget::cameraChanged()
 {
     if (windowViewports_)
     {
-        emit windowViewports_->cameraChanged();
+        emit windowViewports_->cameraChanged(viewportId_);
     }
 }

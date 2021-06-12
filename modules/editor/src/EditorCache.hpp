@@ -24,15 +24,45 @@
 #ifndef EDITOR_CACHE_HPP
 #define EDITOR_CACHE_HPP
 
+#include <Camera.hpp>
 #include <EditorTile.hpp>
-#include <vector>
+
+class EditorBase;
 
 /** Editor Cache. */
 class EditorCache
 {
 public:
-    EditorCache();
+    EditorCache(EditorBase *editor);
     ~EditorCache();
+
+    void clear();
+    void reload();
+    bool loadStep();
+    void updateCamera(const Camera &camera);
+
+    size_t tileSize() const { return lru_.size(); }
+    EditorTile &tile(size_t index) { return *lru_[index]; }
+
+protected:
+    EditorBase *editor_;
+
+    // Cache
+    struct Key
+    {
+        size_t dataSetId;
+        size_t tileId;
+
+        bool operator<(const Key &rhs) const;
+    };
+    size_t cacheSizeMax_;
+    std::map<Key, std::shared_ptr<EditorTile>> cache_;
+
+    // Last Recently Used (LRU)
+    std::vector<std::shared_ptr<EditorTile>> lru_;
+
+    void load(size_t idx);
+    void resetRendering();
 };
 
 #endif /* EDITOR_CACHE_HPP */

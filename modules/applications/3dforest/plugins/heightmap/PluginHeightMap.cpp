@@ -155,12 +155,12 @@ void PluginHeightMapFilter::applyToTiles(QWidget *widget)
         msleep(10); // TBD debug
 
         // Process step i
-        FileIndex::Selection &sel = selectionL1[static_cast<size_t>(i)];
-        EditorTile *tile = editor_->tile(sel.id, sel.idx);
-        if (tile)
-        {
-            filterTile(tile);
-        }
+        // FileIndex::Selection &sel = selectionL1[static_cast<size_t>(i)];
+        // EditorTile *tile = editor_->tile(sel.id, sel.idx);
+        // if (tile)
+        // {
+        //     filterTile(tile);
+        // }
     }
 
     editor_->unlock();

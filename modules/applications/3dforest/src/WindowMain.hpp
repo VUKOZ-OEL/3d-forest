@@ -73,7 +73,8 @@ public slots:
     void actionViewResetCenter();
 
     void actionViewLayoutSingle();
-    void actionViewLayoutTwoColumns();
+    void actionViewLayout2Columns();
+    void actionViewLayout3RowsRight();
 
     // Plugins
     void actionPluginToolShow();
@@ -89,7 +90,7 @@ public slots:
 
     // Editor
     void actionEditorRender();
-    void actionCameraChanged();
+    void actionCameraChanged(size_t viewportId);
 
 protected:
     // Editor

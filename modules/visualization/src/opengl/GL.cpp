@@ -131,13 +131,15 @@ void GL::renderClipFilter(const ClipFilter &clipFilter)
     GLAabb box;
     box.set(clipFilter.boxView);
 
-    glClearColor(0.5F, 1.0F, 0.5F, 0.0F);
+    glColor3f(0.0F, 0.75F, 0.0F);
+    glDepthMask(GL_FALSE);
     glEnable(GL_LINE_STIPPLE);
-    glLineStipple(4, 0xaaaa);
+    glLineStipple(1, 0xff);
 
     GL::renderAabb(box);
 
     glDisable(GL_LINE_STIPPLE);
+    glDepthMask(GL_TRUE);
 }
 
 void GL::renderAabb(const GLAabb &box)

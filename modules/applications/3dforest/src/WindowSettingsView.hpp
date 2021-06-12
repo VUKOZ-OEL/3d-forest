@@ -26,8 +26,9 @@
 
 #include <EditorSettings.hpp>
 #include <QWidget>
+#include <vector>
 
-class QComboBox;
+class QCheckBox;
 class QSlider;
 class QTabWidget;
 
@@ -44,7 +45,7 @@ public:
     void setSettings(const EditorSettings::View &settings);
 
 public slots:
-    void setColorIndex(int v);
+    void setColorSourceEnabled(int v);
     void setPointSize(int v);
 
 signals:
@@ -54,7 +55,7 @@ protected:
     EditorSettings::View settings_;
 
     QTabWidget *tabWidget_;
-    QComboBox *colorSourceComboBox_;
+    std::vector<QCheckBox *> colorSourceCheckBox_;
     QSlider *pointSizeSlider_;
 };
 

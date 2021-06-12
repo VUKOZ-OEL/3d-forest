@@ -21,9 +21,10 @@
     @file WindowSettingsView.cpp
 */
 
-#include <QComboBox>
+#include <QCheckBox>
 #include <QDebug>
 #include <QGridLayout>
+#include <QGroupBox>
 #include <QLabel>
 #include <QSlider>
 #include <QTabWidget>
@@ -34,14 +35,28 @@ WindowSettingsView::WindowSettingsView(QWidget *parent) : QWidget(parent)
 {
     int row;
 
-    // Tab Visualization
-    colorSourceComboBox_ = new QComboBox;
-    colorSourceComboBox_->addItem("RGB");
-    connect(colorSourceComboBox_,
-            SIGNAL(activated(int)),
-            this,
-            SLOT(setColorIndex(int)));
+    // Tab Visualization color source
+    QGroupBox *groupBox = new QGroupBox(tr("Color Source"));
+    QVBoxLayout *vbox = new QVBoxLayout;
 
+    colorSourceCheckBox_.resize(settings_.colorSourceSize());
+    for (size_t i = 0; i < colorSourceCheckBox_.size(); i++)
+    {
+        colorSourceCheckBox_[i] =
+            new QCheckBox(tr(settings_.colorSourceString(i)));
+
+        vbox->addWidget(colorSourceCheckBox_[i]);
+
+        connect(colorSourceCheckBox_[i],
+                SIGNAL(stateChanged(int)),
+                this,
+                SLOT(setColorSourceEnabled(int)));
+    }
+
+    vbox->addStretch(1);
+    groupBox->setLayout(vbox);
+
+    // Tab Visualization point size
     pointSizeSlider_ = new QSlider;
     pointSizeSlider_->setMinimum(1);
     pointSizeSlider_->setMaximum(5);
@@ -54,10 +69,10 @@ WindowSettingsView::WindowSettingsView(QWidget *parent) : QWidget(parent)
             this,
             SLOT(setPointSize(int)));
 
+    // Tab Visualization
     QGridLayout *visualizationLayout1 = new QGridLayout;
     row = 0;
-    visualizationLayout1->addWidget(new QLabel(tr("Color Source")), row, 0);
-    visualizationLayout1->addWidget(colorSourceComboBox_, row, 1);
+    visualizationLayout1->addWidget(groupBox, row, 0, 1, 2);
     row++;
     visualizationLayout1->addWidget(new QLabel(tr("Point Size")), row, 0);
     visualizationLayout1->addWidget(pointSizeSlider_, row, 1);
@@ -78,14 +93,14 @@ WindowSettingsView::WindowSettingsView(QWidget *parent) : QWidget(parent)
     setLayout(mainLayout);
 
     // Window
-    setFixedHeight(140);
+    setFixedHeight(240);
 }
 
 WindowSettingsView::~WindowSettingsView()
 {
 }
 
-void WindowSettingsView::setColorIndex(int v)
+void WindowSettingsView::setColorSourceEnabled(int v)
 {
     (void)v;
 }

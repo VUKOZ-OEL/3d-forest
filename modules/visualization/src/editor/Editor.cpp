@@ -60,9 +60,9 @@ void Editor::restartThreads()
     thread_.restart();
 }
 
-void Editor::render(const Camera &camera)
+void Editor::render(size_t viewportId, const Camera &camera)
 {
-    thread_.start(camera);
+    thread_.start(viewportId, camera);
 }
 
 void Editor::render()

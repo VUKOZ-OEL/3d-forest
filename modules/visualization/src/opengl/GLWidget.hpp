@@ -44,7 +44,8 @@ public:
     explicit GLWidget(QWidget *parent = nullptr);
     ~GLWidget();
 
-    void setWindowViewports(WindowViewports *viewer);
+    void setWindowViewports(WindowViewports *viewer, size_t viewportId);
+    size_t viewportId() const;
 
     void setSelected(bool selected);
     bool isSelected() const;
@@ -75,6 +76,7 @@ protected:
 
     // Window Viewports
     WindowViewports *windowViewports_;
+    size_t viewportId_;
     bool selected_;
 
     // Data

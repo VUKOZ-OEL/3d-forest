@@ -39,7 +39,7 @@ public:
     ThreadRender(Editor *editor, QObject *parent = nullptr);
     virtual ~ThreadRender();
 
-    void start(const Camera &camera);
+    void start(size_t viewportId, const Camera &camera);
     void restart();
 
     virtual bool compute();
@@ -49,6 +49,7 @@ signals:
 
 protected:
     Editor *editor_;
+    size_t viewportId_;
     Camera camera_;
     bool initialized_;
 };
