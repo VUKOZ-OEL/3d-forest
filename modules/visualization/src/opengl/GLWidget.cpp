@@ -114,17 +114,17 @@ void GLWidget::setViewFront()
     setViewDirection(dir, up);
 }
 
-void GLWidget::setViewLeft()
+void GLWidget::setViewRight()
 {
-    QVector3D dir(-1.0F, 0.0F, 0.0F);
+    QVector3D dir(1.0F, 0.0F, 0.0F);
     QVector3D up(0.0F, 0.0F, 1.0F);
     setViewDirection(dir, up);
 }
 
 void GLWidget::setView3d()
 {
-    QVector3D dir(-1.0F, -1.0F, 1.0F);
-    QVector3D up(1.065F, 1.0F, 1.0F);
+    QVector3D dir(1.0F, -1.0F, 1.0F);
+    QVector3D up(-1.065F, 1.0F, 1.0F);
     up.normalize();
     setViewDirection(dir, up);
 }
@@ -137,12 +137,12 @@ void GLWidget::resetCamera()
     if (aabb_.isValid())
     {
         center = aabb_.getCenter();
-        //center[2] = aabb_.getMin().z();
+        // center[2] = aabb_.getMin().z();
         distance = aabb_.getRadius();
     }
 
-    QVector3D eye(-1.0F, -1.0F, 1.0F);
-    QVector3D up(1.065F, 1.0F, 1.0F);
+    QVector3D eye(1.0F, -1.0F, 1.0F);
+    QVector3D up(-1.065F, 1.0F, 1.0F);
     eye.normalize();
     up.normalize();
 
@@ -176,7 +176,7 @@ void GLWidget::setViewResetCenter()
     if (aabb_.isValid())
     {
         center = aabb_.getCenter();
-        //center[2] = aabb_.getMin().z();
+        // center[2] = aabb_.getMin().z();
     }
 
     QVector3D eye = (dir * distance) + center;

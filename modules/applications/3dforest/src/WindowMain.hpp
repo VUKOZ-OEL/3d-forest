@@ -26,6 +26,7 @@
 
 #include <Editor.hpp>
 #include <QMainWindow>
+#include <WindowViewports.hpp>
 #include <vector>
 
 class QTextEdit;
@@ -34,7 +35,6 @@ class PluginTool;
 class WindowClipFilter;
 class WindowDataSets;
 class WindowLayers;
-class WindowViewports;
 class WindowSettingsView;
 
 /** Window Main. */
@@ -67,14 +67,16 @@ public slots:
     void actionViewPerspective();
     void actionViewTop();
     void actionViewFront();
-    void actionViewLeft();
+    void actionViewRight();
     void actionView3d();
     void actionViewResetDistance();
     void actionViewResetCenter();
 
     void actionViewLayoutSingle();
     void actionViewLayout2Columns();
+    void actionViewLayoutGrid();
     void actionViewLayout3RowsRight();
+    void actionViewLayout(WindowViewports::ViewLayout layout);
 
     // Plugins
     void actionPluginToolShow();

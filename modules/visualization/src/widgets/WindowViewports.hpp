@@ -41,6 +41,7 @@ public:
     {
         VIEW_LAYOUT_SINGLE,
         VIEW_LAYOUT_TWO_COLUMNS,
+        VIEW_LAYOUT_GRID,
         VIEW_LAYOUT_THREE_ROWS_RIGHT
     };
 
@@ -53,7 +54,7 @@ public:
     void setViewPerspective();
     void setViewTop();
     void setViewFront();
-    void setViewLeft();
+    void setViewRight();
     void setView3d();
     void setViewResetDistance();
     void setViewResetCenter();

@@ -59,7 +59,7 @@ public:
     void setViewPerspective();
     void setViewTop();
     void setViewFront();
-    void setViewLeft();
+    void setViewRight();
     void setView3d();
     void setViewResetDistance();
     void setViewResetCenter();

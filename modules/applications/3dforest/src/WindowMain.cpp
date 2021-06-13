@@ -38,8 +38,6 @@
 #include <WindowLayers.hpp>
 #include <WindowMain.hpp>
 #include <WindowSettingsView.hpp>
-#include <WindowViewports.hpp>
-#include <iostream>
 
 const QString WindowMain::APPLICATION_NAME = "3DForest";
 const QString WindowMain::APPLICATION_VERSION = "1.0";
@@ -144,9 +142,9 @@ void WindowMain::createMenus()
     (void)menuViewCamera->addAction(tr("Front"),
                                     this,
                                     &WindowMain::actionViewFront);
-    (void)menuViewCamera->addAction(tr("Left"),
+    (void)menuViewCamera->addAction(tr("Right"),
                                     this,
-                                    &WindowMain::actionViewLeft);
+                                    &WindowMain::actionViewRight);
     (void)menuViewCamera->addAction(tr("3D"), this, &WindowMain::actionView3d);
 
     (void)menuViewCamera->addSeparator();
@@ -164,6 +162,9 @@ void WindowMain::createMenus()
     (void)menuViewLayout->addAction(tr("Two Columns"),
                                     this,
                                     &WindowMain::actionViewLayout2Columns);
+    (void)menuViewLayout->addAction(tr("Grid (2x2)"),
+                                    this,
+                                    &WindowMain::actionViewLayoutGrid);
     (void)menuViewLayout->addAction(tr("Three Rows Right"),
                                     this,
                                     &WindowMain::actionViewLayout3RowsRight);
@@ -390,9 +391,9 @@ void WindowMain::actionViewFront()
     updateViewer();
 }
 
-void WindowMain::actionViewLeft()
+void WindowMain::actionViewRight()
 {
-    windowViewports_->setViewLeft();
+    windowViewports_->setViewRight();
     updateViewer();
 }
 
@@ -416,34 +417,50 @@ void WindowMain::actionViewResetCenter()
 
 void WindowMain::actionViewLayoutSingle()
 {
-    editor_.cancelThreads();
-    editor_.lock();
-    editor_.setNumberOfViewports(1);
-    windowViewports_->setLayout(WindowViewports::VIEW_LAYOUT_SINGLE);
-    editor_.unlock();
-    updateViewer();
+    actionViewLayout(WindowViewports::VIEW_LAYOUT_SINGLE);
 }
 
 void WindowMain::actionViewLayout2Columns()
 {
-    editor_.cancelThreads();
-    editor_.lock();
-    editor_.setNumberOfViewports(2);
-    windowViewports_->setLayout(WindowViewports::VIEW_LAYOUT_TWO_COLUMNS);
-    windowViewports_->resetScene(&editor_, 1);
-    editor_.unlock();
-    updateViewer();
+    actionViewLayout(WindowViewports::VIEW_LAYOUT_TWO_COLUMNS);
+}
+
+void WindowMain::actionViewLayoutGrid()
+{
+    actionViewLayout(WindowViewports::VIEW_LAYOUT_GRID);
 }
 
 void WindowMain::actionViewLayout3RowsRight()
 {
+    actionViewLayout(WindowViewports::VIEW_LAYOUT_THREE_ROWS_RIGHT);
+}
+
+void WindowMain::actionViewLayout(WindowViewports::ViewLayout layout)
+{
     editor_.cancelThreads();
     editor_.lock();
-    editor_.setNumberOfViewports(4);
-    windowViewports_->setLayout(WindowViewports::VIEW_LAYOUT_THREE_ROWS_RIGHT);
-    windowViewports_->resetScene(&editor_, 1);
-    windowViewports_->resetScene(&editor_, 2);
-    windowViewports_->resetScene(&editor_, 3);
+
+    if (layout == WindowViewports::VIEW_LAYOUT_SINGLE)
+    {
+        editor_.setNumberOfViewports(1);
+        windowViewports_->setLayout(layout);
+    }
+    else if (layout == WindowViewports::VIEW_LAYOUT_TWO_COLUMNS)
+    {
+        editor_.setNumberOfViewports(2);
+        windowViewports_->setLayout(layout);
+        windowViewports_->resetScene(&editor_, 1);
+    }
+    else if ((layout == WindowViewports::VIEW_LAYOUT_GRID) ||
+             (layout == WindowViewports::VIEW_LAYOUT_THREE_ROWS_RIGHT))
+    {
+        editor_.setNumberOfViewports(4);
+        windowViewports_->setLayout(layout);
+        windowViewports_->resetScene(&editor_, 1);
+        windowViewports_->resetScene(&editor_, 2);
+        windowViewports_->resetScene(&editor_, 3);
+    }
+
     editor_.unlock();
     updateViewer();
 }
