@@ -87,6 +87,7 @@ public slots:
     void actionClipFilter(const ClipFilter &clipFilter);
     void actionClipFilterReset();
     void actionSettingsView();
+    void actionSettingsViewColor();
 
     void actionAbout();
 
@@ -125,6 +126,8 @@ protected:
     bool projectOpen(const QString &path);
     bool projectClose();
     bool projectSave(const QString &path = "");
+    bool projectOpenFile(const QString &path);
+    bool projectCreateIndex(const QString &path);
 
     // Update
     void updateProject();

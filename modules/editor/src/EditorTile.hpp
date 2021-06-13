@@ -37,8 +37,6 @@ public:
     /** Editor Tile Attributes. */
     struct Attributes
     {
-        uint16_t intensity;
-        int16_t scanAngle;
         uint8_t returnNumber;
         uint8_t numberOfReturns;
         uint8_t classification;
@@ -53,10 +51,17 @@ public:
      */
     std::vector<double> xyz;
 
+    /** Pulse return magnitude.
+        The data are stored as [i0, i1, ...].
+        The values are in range from 0 (zero intensity) to 1 (full intensity).
+    */
+    std::vector<float> intensity;
+
     /** Red, Green, and Blue image channels.
         The data are stored as [r0, g0, b0, r1, g1, ...].
         Color values are in range from 0 (zero intensity) to 1 (full intensity).
-        When the input data set has no colors, then this vector is empty.
+        When the input data set has no colors, then the colors in this vector
+        are set to full intensity.
     */
     std::vector<float> rgb;
 
@@ -71,7 +76,7 @@ public:
     std::vector<Attributes> attrib;
 
     /** GPS time. */
-    std::vector<double> gps;
+    std::vector<double> gpsTime;
 
     /** Layer identification numbers.
         This value is stored in Point Data Record extra bytes.
@@ -125,6 +130,8 @@ public:
 
 protected:
     void readFilter(const EditorBase *editor);
+    void setColorSource(const EditorBase *editor);
+    void setColor(size_t idx, int value, int max, uint8_t *pal);
 };
 
 #endif /* EDITOR_TILE_HPP */

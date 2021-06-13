@@ -47,6 +47,11 @@ WindowSettingsView::WindowSettingsView(QWidget *parent) : QWidget(parent)
 
         vbox->addWidget(colorSourceCheckBox_[i]);
 
+        if (settings_.isColorSourceEnabled(i))
+        {
+            colorSourceCheckBox_[i]->setChecked(true);
+        }
+
         connect(colorSourceCheckBox_[i],
                 SIGNAL(stateChanged(int)),
                 this,
@@ -103,6 +108,18 @@ WindowSettingsView::~WindowSettingsView()
 void WindowSettingsView::setColorSourceEnabled(int v)
 {
     (void)v;
+    for (size_t i = 0; i < colorSourceCheckBox_.size(); i++)
+    {
+        if (colorSourceCheckBox_[i]->isChecked())
+        {
+            settings_.setColorSourceEnabled(i, true);
+        }
+        else
+        {
+            settings_.setColorSourceEnabled(i, false);
+        }
+    }
+    emit settingsColorChanged();
 }
 
 void WindowSettingsView::setPointSize(int v)

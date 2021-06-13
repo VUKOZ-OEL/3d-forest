@@ -21,6 +21,7 @@
     @file WindowMain.cpp
 */
 
+#include <FileIndexBuilder.hpp>
 #include <PluginFile.hpp>
 #include <PluginTool.hpp>
 #include <QCloseEvent>
@@ -31,6 +32,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPluginLoader>
+#include <QProgressDialog>
 #include <QTextEdit>
 #include <Time.hpp>
 #include <WindowClipFilter.hpp>
@@ -43,7 +45,8 @@ const QString WindowMain::APPLICATION_NAME = "3DForest";
 const QString WindowMain::APPLICATION_VERSION = "1.0";
 QTextEdit *WindowMain::log = nullptr;
 
-static const char *WINDOW_MAIN_FILE_FILTER = "3DForest Project (*.json)";
+#define WINDOW_MAIN_FILTER_PRJ "3DForest Project (*.json)"
+#define WINDOW_MAIN_FILTER_FILE_IN "LAS (LASer) File (*.las)"
 #define WINDOW_MAIN_DOCK_MIN 80
 #define WINDOW_MAIN_DOCK_MAX 500
 
@@ -102,21 +105,24 @@ void WindowMain::createMenus()
 {
     // File
     QMenu *menuFile = menuBar()->addMenu(tr("File"));
-    (void)menuFile->addAction(tr("New"), this, &WindowMain::actionProjectNew);
-    (void)menuFile->addAction(tr("Open..."),
+    (void)menuFile->addAction(tr("New Project"),
+                              this,
+                              &WindowMain::actionProjectNew);
+    (void)menuFile->addAction(tr("Open Project..."),
                               this,
                               &WindowMain::actionProjectOpen);
-    (void)menuFile->addAction(tr("Save"), this, &WindowMain::actionProjectSave);
-    (void)menuFile->addAction(tr("Save As..."),
+    (void)menuFile->addAction(tr("Save Project"),
+                              this,
+                              &WindowMain::actionProjectSave);
+    (void)menuFile->addAction(tr("Save Project As..."),
                               this,
                               &WindowMain::actionProjectSaveAs);
 
     QAction *action;
     (void)menuFile->addSeparator();
-    action = menuFile->addAction(tr("Add data set..."),
+    action = menuFile->addAction(tr("Open File..."),
                                  this,
                                  &WindowMain::actionProjectImport);
-    action->setEnabled(false);
     action = menuFile->addAction(tr("Export As..."),
                                  this,
                                  &WindowMain::actionProjectExportAs);
@@ -219,6 +225,10 @@ void WindowMain::createWindows()
             SIGNAL(settingsChanged()),
             this,
             SLOT(actionSettingsView()));
+    connect(windowSettingsView_,
+            SIGNAL(settingsColorChanged()),
+            this,
+            SLOT(actionSettingsViewColor()));
 
     QDockWidget *dockViewSettings = new QDockWidget(tr("View Settings"), this);
     dockViewSettings->setAllowedAreas(Qt::LeftDockWidgetArea |
@@ -326,9 +336,9 @@ void WindowMain::actionProjectOpen()
 {
     QString fileName;
     fileName = QFileDialog::getOpenFileName(this,
-                                            tr("Open"),
+                                            tr("Open Project"),
                                             "",
-                                            tr(WINDOW_MAIN_FILE_FILTER));
+                                            tr(WINDOW_MAIN_FILTER_PRJ));
 
     if (fileName.isEmpty())
     {
@@ -347,9 +357,9 @@ void WindowMain::actionProjectSaveAs()
 {
     QString fileName;
     fileName = QFileDialog::getSaveFileName(this,
-                                            tr("Save As"),
+                                            tr("Save Project As"),
                                             "",
-                                            tr(WINDOW_MAIN_FILE_FILTER));
+                                            tr(WINDOW_MAIN_FILTER_PRJ));
 
     if (fileName.isEmpty())
     {
@@ -361,6 +371,18 @@ void WindowMain::actionProjectSaveAs()
 
 void WindowMain::actionProjectImport()
 {
+    QString fileName;
+    fileName = QFileDialog::getOpenFileName(this,
+                                            tr("Open File"),
+                                            "",
+                                            tr(WINDOW_MAIN_FILTER_FILE_IN));
+
+    if (fileName.isEmpty())
+    {
+        return;
+    }
+
+    (void)projectOpenFile(fileName);
 }
 
 void WindowMain::actionProjectExportAs()
@@ -540,6 +562,16 @@ void WindowMain::actionSettingsView()
     editor_.restartThreads();
 }
 
+void WindowMain::actionSettingsViewColor()
+{
+    editor_.cancelThreads();
+    editor_.lock();
+    editor_.setSettingsView(windowSettingsView_->settings());
+    editor_.tileViewClear();
+    editor_.unlock();
+    editor_.restartThreads();
+}
+
 void WindowMain::actionAbout()
 {
     QMessageBox::about(this,
@@ -644,11 +676,10 @@ bool WindowMain::projectSave(const QString &path)
         {
             // First time save
             QString fileName;
-            fileName =
-                QFileDialog::getSaveFileName(this,
-                                             tr("Save As"),
-                                             "",
-                                             tr(WINDOW_MAIN_FILE_FILTER));
+            fileName = QFileDialog::getSaveFileName(this,
+                                                    tr("Save As"),
+                                                    "",
+                                                    tr(WINDOW_MAIN_FILTER_PRJ));
 
             if (fileName.isEmpty())
             {
@@ -675,6 +706,79 @@ bool WindowMain::projectSave(const QString &path)
     }
 
     return true; // Saved
+}
+
+bool WindowMain::projectOpenFile(const QString &path)
+{
+    editor_.cancelThreads();
+
+    // Open file
+    try
+    {
+        if (projectCreateIndex(path))
+        {
+            editor_.addFile(path.toStdString());
+        }
+    }
+    catch (std::exception &e)
+    {
+        showError(e.what());
+        return false;
+    }
+
+    updateProject();
+
+    return true; // Opened
+}
+
+bool WindowMain::projectCreateIndex(const QString &path)
+{
+    const std::string pathStd = path.toStdString();
+    if (editor_.hasFileIndex(pathStd))
+    {
+        qDebug() << "File" << path << "has index.";
+        return true;
+    }
+
+    FileIndexBuilder::Settings settings;
+    // settings.randomize = true;
+
+    qDebug() << "Create index for file" << path;
+
+    char buffer[80];
+    FileIndexBuilder builder;
+    builder.start(pathStd, pathStd, settings);
+
+    QProgressDialog progressDialog(this);
+    progressDialog.setCancelButtonText(QObject::tr("&Cancel"));
+    progressDialog.setRange(0, 100);
+    progressDialog.setWindowTitle(QObject::tr("Create Index"));
+    progressDialog.setWindowModality(Qt::WindowModal);
+    progressDialog.setMinimumDuration(100);
+
+    while (!builder.end())
+    {
+        // Update progress
+        double value = builder.percent();
+        progressDialog.setValue(static_cast<int>(value));
+        std::snprintf(buffer, sizeof(buffer), "Processing %6.2f %%", value);
+        progressDialog.setLabelText(buffer);
+
+        QCoreApplication::processEvents();
+
+        if (progressDialog.wasCanceled())
+        {
+            qDebug() << "Create index canceled.";
+            return false;
+        }
+
+        // Step
+        builder.next();
+    }
+
+    qDebug() << "Index is complete.";
+
+    return true;
 }
 
 void WindowMain::updateProject()

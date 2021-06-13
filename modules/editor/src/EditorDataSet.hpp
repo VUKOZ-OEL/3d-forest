@@ -52,9 +52,12 @@ public:
     EditorDataSet();
     ~EditorDataSet();
 
-    void read(const std::string &filePath);
+    void read(const std::string &filePath, const std::string &projectPath);
     void read(const Json &in, const std::string &projectPath);
     Json &write(Json &out) const;
+
+    static std::string resolvePath(const std::string &unresolved,
+                                   const std::string &projectPath);
 
 protected:
     void setPath(const std::string &unresolved, const std::string &projectPath);

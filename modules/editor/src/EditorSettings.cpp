@@ -29,9 +29,10 @@ EditorSettings::View::View() : pointSize_(1.0F)
         "Color",
         "Intensity",
         "Return Number",
+        "Number of Returns",
         "Classification",
-        "Layer",
-        "User Color",
+        // "Layer",
+        // "User Color",
     };
 
     colorSourceEnabled_.resize(colorSourceString_.size());
@@ -39,6 +40,7 @@ EditorSettings::View::View() : pointSize_(1.0F)
     {
         it = false;
     }
+    colorSourceEnabled_[0] = true;
 }
 
 float EditorSettings::View::pointSize() const

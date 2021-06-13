@@ -35,6 +35,15 @@ public:
     class View
     {
     public:
+        enum ColorSource
+        {
+            COLOR_SOURCE_COLOR,
+            COLOR_SOURCE_INTENSITY,
+            COLOR_SOURCE_RETURN_NUMBER,
+            COLOR_SOURCE_NUMBER_OF_RETURNS,
+            COLOR_SOURCE_CLASSIFICATION
+        };
+
         View();
 
         float pointSize() const;

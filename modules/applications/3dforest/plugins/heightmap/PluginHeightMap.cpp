@@ -99,25 +99,31 @@ void PluginHeightMapFilter::filterTile(EditorTile *tile)
     mutex_.lock();
     double zMin = editor_->boundary().min(2);
     double zLen = editor_->boundary().max(2) - zMin;
-
-    if (tile->view.rgb.size() != tile->xyz.size())
-    {
-        tile->view.rgb.resize(tile->xyz.size());
-    }
-
     double colorDelta = 1.0 / static_cast<double>(colormap_.size());
 
+    double zLenInv = 0;
+    if (zLen > 0)
+    {
+        zLenInv = 1.0 / zLen;
+    }
+
     const std::vector<unsigned int> &indices = tile->indices;
+
     for (size_t i = 0; i < indices.size(); i++)
     {
         size_t row = indices[i];
-        double z = tile->xyz[row * 3 + 2];
-        double h = (z - zMin) / zLen;
-        size_t c = static_cast<size_t>(h / colorDelta);
 
-        tile->view.rgb[row * 3 + 0] = static_cast<float>(colormap_[c].redF());
-        tile->view.rgb[row * 3 + 1] = static_cast<float>(colormap_[c].greenF());
-        tile->view.rgb[row * 3 + 2] = static_cast<float>(colormap_[c].blueF());
+        double z = tile->xyz[row * 3 + 2];
+        double zNorm = (z - zMin) * zLenInv;
+
+        size_t colorIndex = static_cast<size_t>(zNorm / colorDelta);
+        float r = static_cast<float>(colormap_[colorIndex].redF());
+        float g = static_cast<float>(colormap_[colorIndex].greenF());
+        float b = static_cast<float>(colormap_[colorIndex].blueF());
+
+        tile->view.rgb[row * 3 + 0] *= r;
+        tile->view.rgb[row * 3 + 1] *= g;
+        tile->view.rgb[row * 3 + 2] *= b;
     }
     mutex_.unlock();
 }

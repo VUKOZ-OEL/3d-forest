@@ -28,7 +28,7 @@
 
 EditorCache::EditorCache(EditorBase *editor) : editor_(editor)
 {
-    cacheSizeMax_ = 100;
+    cacheSizeMax_ = 250;
 }
 
 EditorCache::~EditorCache()
@@ -120,14 +120,14 @@ void EditorCache::updateCamera(const Camera &camera)
         const FileIndex &index = ds.index;
         node = index.at(nk.tileId);
 
-        // if (clipFilter_.enabled)
-        // {
-        //     Aabb<double> box = index.boundary(node, index.boundary());
-        //     if (!clipFilter_.box.intersects(box))
-        //     {
-        //         continue;
-        //     }
-        // }
+        if (editor_->clipFilter().enabled)
+        {
+            Aabb<double> box = index.boundary(node, index.boundary());
+            if (!editor_->clipFilter().box.intersects(box))
+            {
+                continue;
+            }
+        }
 
         auto search = cache_.find({nk.dataSetId, nk.tileId});
         if (search != cache_.end())

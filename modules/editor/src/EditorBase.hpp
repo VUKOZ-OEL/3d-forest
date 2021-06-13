@@ -40,6 +40,8 @@ public:
 
     void open(const std::string &path);
     void openFile(const std::string &path);
+    void addFile(const std::string &path);
+    bool hasFileIndex(const std::string &path);
     void write(const std::string &path);
     const std::string &path() const { return path_; }
     bool hasUnsavedChanges() const { return unsavedChanges_; }

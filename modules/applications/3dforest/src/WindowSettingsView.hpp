@@ -50,6 +50,7 @@ public slots:
 
 signals:
     void settingsChanged();
+    void settingsColorChanged();
 
 protected:
     EditorSettings::View settings_;

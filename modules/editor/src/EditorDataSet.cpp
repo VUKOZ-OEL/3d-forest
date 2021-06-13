@@ -36,10 +36,11 @@ EditorDataSet::~EditorDataSet()
 {
 }
 
-void EditorDataSet::read(const std::string &filePath)
+void EditorDataSet::read(const std::string &filePath,
+                         const std::string &projectPath)
 {
     pathUnresolved = filePath;
-    setPath(pathUnresolved, File::currentPath() + "\\project");
+    setPath(pathUnresolved, projectPath);
 
     read();
 }
@@ -107,20 +108,30 @@ void EditorDataSet::setPath(const std::string &unresolved,
                             const std::string &projectPath)
 {
     // Data set absolute path
-    path = unresolved;
-    if (!File::isAbsolute(path))
-    {
-        // Resolve path
-        path = File::replaceFileName(projectPath, path);
-    }
+    path = resolvePath(unresolved, projectPath);
 
     // Data set file name
     fileName = File::fileName(path);
+}
 
-    if (!File::exists(path))
+std::string EditorDataSet::resolvePath(const std::string &unresolved,
+                                       const std::string &projectPath)
+{
+    std::string rval;
+
+    rval = unresolved;
+    if (!File::isAbsolute(rval))
     {
-        THROW("File '" + path + "' doesn't exist");
+        // Resolve path
+        rval = File::replaceFileName(projectPath, rval);
     }
+
+    if (!File::exists(rval))
+    {
+        THROW("File '" + rval + "' doesn't exist");
+    }
+
+    return rval;
 }
 
 void EditorDataSet::read()

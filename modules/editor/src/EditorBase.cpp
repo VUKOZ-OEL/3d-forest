@@ -22,7 +22,7 @@
 */
 
 #include <EditorBase.hpp>
-//#include <limits>
+#include <FileIndexBuilder.hpp>
 
 static const char *EDITOR_BASE_KEY_PROJECT_NAME = "projectName";
 static const char *EDITOR_BASE_KEY_DATA_SET = "dataSets";
@@ -31,8 +31,7 @@ static const char *EDITOR_BASE_KEY_LAYER = "layers";
 
 EditorBase::EditorBase()
 {
-    unsavedChanges_ = false;
-
+    close();
     setNumberOfViewports(1);
 }
 
@@ -124,9 +123,9 @@ void EditorBase::openFile(const std::string &path)
     try
     {
         // Data sets
-        dataSets_.resize(1);
-        dataSets_[0] = std::make_shared<EditorDataSet>();
-        dataSets_[0]->read(path);
+        std::shared_ptr<EditorDataSet> ds = std::make_shared<EditorDataSet>();
+        ds->read(path, path_);
+        dataSets_.push_back(ds);
     }
     catch (std::exception &e)
     {
@@ -135,6 +134,30 @@ void EditorBase::openFile(const std::string &path)
     }
 
     openUpdate();
+}
+
+void EditorBase::addFile(const std::string &path)
+{
+    try
+    {
+        // Data sets
+        std::shared_ptr<EditorDataSet> ds = std::make_shared<EditorDataSet>();
+        ds->read(path, path_);
+        dataSets_.push_back(ds);
+    }
+    catch (std::exception &e)
+    {
+        throw;
+    }
+
+    openUpdate();
+}
+
+bool EditorBase::hasFileIndex(const std::string &path)
+{
+    std::string pathFile = EditorDataSet::resolvePath(path, path_);
+    std::string pathIndex = FileIndexBuilder::extension(pathFile);
+    return File::exists(pathIndex);
 }
 
 void EditorBase::write(const std::string &path)
@@ -171,7 +194,7 @@ void EditorBase::write(const std::string &path)
 
 void EditorBase::close()
 {
-    path_ = "";
+    path_ = File::currentPath() + "\\project";
     projectName_ = "";
     dataSets_.clear();
     layers_.clear();
