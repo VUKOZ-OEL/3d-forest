@@ -23,8 +23,8 @@
 
 #include <Endian.hpp>
 #include <Error.hpp>
+#include <FileIndexBuilder.hpp>
 #include <FileLas.hpp>
-#include <LasIndexBuilder.hpp>
 #include <cstdio>
 #include <cstring>
 #include <iostream>
@@ -234,10 +234,10 @@ void FileLas::create(const std::string &path,
     las.close();
 
     // Create file index
-    LasIndexBuilder::Settings settings;
+    FileIndexBuilder::Settings settings;
     settings.maxSize1 = 2;
     settings.maxSize2 = 1;
-    LasIndexBuilder::index(path, path, settings);
+    FileIndexBuilder::index(path, path, settings);
 }
 
 void FileLas::open(const std::string &path)
@@ -525,7 +525,7 @@ void FileLas::readPoint(Point &pt, const uint8_t *buffer, uint8_t fmt) const
 {
     size_t pos;
 
-    // TBD this is without optimization, all points have the same format 'fmt'
+    /** @todo Optimization, all points have the same format 'fmt'. */
 
     pt.format = fmt;
 
@@ -622,7 +622,7 @@ void FileLas::writePoint(uint8_t *buffer, const Point &pt) const
     const uint8_t fmt = pt.format;
     size_t pos;
 
-    // TBD this is without optimization, all points have the same format
+    /** @todo Optimization, all points have the same format 'fmt'. */
 
     if (fmt > 5)
     {

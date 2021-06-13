@@ -49,7 +49,7 @@ signals:
     void renderRequested();
 
 public slots:
-    void render(const Camera &camera);
+    void render(size_t viewportId, const Camera &camera);
     void render();
 
 protected:

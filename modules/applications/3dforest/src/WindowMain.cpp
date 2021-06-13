@@ -21,6 +21,7 @@
     @file WindowMain.cpp
 */
 
+#include <FileIndexBuilder.hpp>
 #include <PluginFile.hpp>
 #include <PluginTool.hpp>
 #include <QCloseEvent>
@@ -31,6 +32,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPluginLoader>
+#include <QProgressDialog>
 #include <QTextEdit>
 #include <Time.hpp>
 #include <WindowClipFilter.hpp>
@@ -38,14 +40,13 @@
 #include <WindowLayers.hpp>
 #include <WindowMain.hpp>
 #include <WindowSettingsView.hpp>
-#include <WindowViewports.hpp>
-#include <iostream>
 
 const QString WindowMain::APPLICATION_NAME = "3DForest";
 const QString WindowMain::APPLICATION_VERSION = "1.0";
 QTextEdit *WindowMain::log = nullptr;
 
-static const char *WINDOW_MAIN_FILE_FILTER = "3DForest Project (*.json)";
+#define WINDOW_MAIN_FILTER_PRJ "3DForest Project (*.json)"
+#define WINDOW_MAIN_FILTER_FILE_IN "LAS (LASer) File (*.las)"
 #define WINDOW_MAIN_DOCK_MIN 80
 #define WINDOW_MAIN_DOCK_MAX 500
 
@@ -65,7 +66,7 @@ QSize WindowMain::minimumSizeHint() const
 
 QSize WindowMain::sizeHint() const
 {
-    return QSize(800, 600);
+    return QSize(1024, 768);
 }
 
 void WindowMain::initializeWindow()
@@ -93,9 +94,9 @@ void WindowMain::createViewer()
 {
     windowViewports_ = new WindowViewports(this);
     connect(windowViewports_,
-            SIGNAL(cameraChanged()),
+            SIGNAL(cameraChanged(size_t)),
             this,
-            SLOT(actionCameraChanged()));
+            SLOT(actionCameraChanged(size_t)));
 
     setCentralWidget(windowViewports_);
 }
@@ -104,21 +105,24 @@ void WindowMain::createMenus()
 {
     // File
     QMenu *menuFile = menuBar()->addMenu(tr("File"));
-    (void)menuFile->addAction(tr("New"), this, &WindowMain::actionProjectNew);
-    (void)menuFile->addAction(tr("Open..."),
+    (void)menuFile->addAction(tr("New Project"),
+                              this,
+                              &WindowMain::actionProjectNew);
+    (void)menuFile->addAction(tr("Open Project..."),
                               this,
                               &WindowMain::actionProjectOpen);
-    (void)menuFile->addAction(tr("Save"), this, &WindowMain::actionProjectSave);
-    (void)menuFile->addAction(tr("Save As..."),
+    (void)menuFile->addAction(tr("Save Project"),
+                              this,
+                              &WindowMain::actionProjectSave);
+    (void)menuFile->addAction(tr("Save Project As..."),
                               this,
                               &WindowMain::actionProjectSaveAs);
 
     QAction *action;
     (void)menuFile->addSeparator();
-    action = menuFile->addAction(tr("Add data set..."),
+    action = menuFile->addAction(tr("Open File..."),
                                  this,
                                  &WindowMain::actionProjectImport);
-    action->setEnabled(false);
     action = menuFile->addAction(tr("Export As..."),
                                  this,
                                  &WindowMain::actionProjectExportAs);
@@ -144,9 +148,9 @@ void WindowMain::createMenus()
     (void)menuViewCamera->addAction(tr("Front"),
                                     this,
                                     &WindowMain::actionViewFront);
-    (void)menuViewCamera->addAction(tr("Left"),
+    (void)menuViewCamera->addAction(tr("Right"),
                                     this,
-                                    &WindowMain::actionViewLeft);
+                                    &WindowMain::actionViewRight);
     (void)menuViewCamera->addAction(tr("3D"), this, &WindowMain::actionView3d);
 
     (void)menuViewCamera->addSeparator();
@@ -157,14 +161,19 @@ void WindowMain::createMenus()
                                     this,
                                     &WindowMain::actionViewResetCenter);
 
-    // QMenu *menuViewLayout = menuView->addMenu(tr("Layout"));
-    // (void)menuViewLayout->addAction(tr("Single"),
-    //                                 this,
-    //                                 &WindowMain::actionViewLayoutSingle);
-    // (void)menuViewLayout->addAction(
-    //     tr("Two Columns"),
-    //     this,
-    //     &WindowMain::actionViewLayoutTwoColumns);
+    QMenu *menuViewLayout = menuView->addMenu(tr("Layout"));
+    (void)menuViewLayout->addAction(tr("Single"),
+                                    this,
+                                    &WindowMain::actionViewLayoutSingle);
+    (void)menuViewLayout->addAction(tr("Two Columns"),
+                                    this,
+                                    &WindowMain::actionViewLayout2Columns);
+    (void)menuViewLayout->addAction(tr("Grid (2x2)"),
+                                    this,
+                                    &WindowMain::actionViewLayoutGrid);
+    (void)menuViewLayout->addAction(tr("Three Rows Right"),
+                                    this,
+                                    &WindowMain::actionViewLayout3RowsRight);
 
     // Tools
     menuTools_ = menuBar()->addMenu(tr("Tools"));
@@ -207,6 +216,7 @@ void WindowMain::createWindows()
     dockLayers->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
     dockLayers->setMaximumWidth(WINDOW_MAIN_DOCK_MAX);
     dockLayers->setWidget(windowLayers_);
+    dockLayers->setVisible(false);
     addDockWidget(Qt::LeftDockWidgetArea, dockLayers);
 
     // Create view settings window
@@ -215,6 +225,10 @@ void WindowMain::createWindows()
             SIGNAL(settingsChanged()),
             this,
             SLOT(actionSettingsView()));
+    connect(windowSettingsView_,
+            SIGNAL(settingsColorChanged()),
+            this,
+            SLOT(actionSettingsViewColor()));
 
     QDockWidget *dockViewSettings = new QDockWidget(tr("View Settings"), this);
     dockViewSettings->setAllowedAreas(Qt::LeftDockWidgetArea |
@@ -322,9 +336,9 @@ void WindowMain::actionProjectOpen()
 {
     QString fileName;
     fileName = QFileDialog::getOpenFileName(this,
-                                            tr("Open"),
+                                            tr("Open Project"),
                                             "",
-                                            tr(WINDOW_MAIN_FILE_FILTER));
+                                            tr(WINDOW_MAIN_FILTER_PRJ));
 
     if (fileName.isEmpty())
     {
@@ -343,9 +357,9 @@ void WindowMain::actionProjectSaveAs()
 {
     QString fileName;
     fileName = QFileDialog::getSaveFileName(this,
-                                            tr("Save As"),
+                                            tr("Save Project As"),
                                             "",
-                                            tr(WINDOW_MAIN_FILE_FILTER));
+                                            tr(WINDOW_MAIN_FILTER_PRJ));
 
     if (fileName.isEmpty())
     {
@@ -357,6 +371,18 @@ void WindowMain::actionProjectSaveAs()
 
 void WindowMain::actionProjectImport()
 {
+    QString fileName;
+    fileName = QFileDialog::getOpenFileName(this,
+                                            tr("Open File"),
+                                            "",
+                                            tr(WINDOW_MAIN_FILTER_FILE_IN));
+
+    if (fileName.isEmpty())
+    {
+        return;
+    }
+
+    (void)projectOpenFile(fileName);
 }
 
 void WindowMain::actionProjectExportAs()
@@ -366,51 +392,98 @@ void WindowMain::actionProjectExportAs()
 void WindowMain::actionViewOrthographic()
 {
     windowViewports_->setViewOrthographic();
+    updateViewer();
 }
 
 void WindowMain::actionViewPerspective()
 {
     windowViewports_->setViewPerspective();
+    updateViewer();
 }
 
 void WindowMain::actionViewTop()
 {
     windowViewports_->setViewTop();
+    updateViewer();
 }
 
 void WindowMain::actionViewFront()
 {
     windowViewports_->setViewFront();
+    updateViewer();
 }
 
-void WindowMain::actionViewLeft()
+void WindowMain::actionViewRight()
 {
-    windowViewports_->setViewLeft();
+    windowViewports_->setViewRight();
+    updateViewer();
 }
 
 void WindowMain::actionView3d()
 {
     windowViewports_->setView3d();
+    updateViewer();
 }
 
 void WindowMain::actionViewResetDistance()
 {
     windowViewports_->setViewResetDistance();
+    updateViewer();
 }
 
 void WindowMain::actionViewResetCenter()
 {
     windowViewports_->setViewResetCenter();
+    updateViewer();
 }
 
 void WindowMain::actionViewLayoutSingle()
 {
-    windowViewports_->setLayout(WindowViewports::VIEW_LAYOUT_SINGLE);
+    actionViewLayout(WindowViewports::VIEW_LAYOUT_SINGLE);
 }
 
-void WindowMain::actionViewLayoutTwoColumns()
+void WindowMain::actionViewLayout2Columns()
 {
-    windowViewports_->setLayout(WindowViewports::VIEW_LAYOUT_TWO_COLUMNS);
+    actionViewLayout(WindowViewports::VIEW_LAYOUT_TWO_COLUMNS);
+}
+
+void WindowMain::actionViewLayoutGrid()
+{
+    actionViewLayout(WindowViewports::VIEW_LAYOUT_GRID);
+}
+
+void WindowMain::actionViewLayout3RowsRight()
+{
+    actionViewLayout(WindowViewports::VIEW_LAYOUT_THREE_ROWS_RIGHT);
+}
+
+void WindowMain::actionViewLayout(WindowViewports::ViewLayout layout)
+{
+    editor_.cancelThreads();
+    editor_.lock();
+
+    if (layout == WindowViewports::VIEW_LAYOUT_SINGLE)
+    {
+        editor_.setNumberOfViewports(1);
+        windowViewports_->setLayout(layout);
+    }
+    else if (layout == WindowViewports::VIEW_LAYOUT_TWO_COLUMNS)
+    {
+        editor_.setNumberOfViewports(2);
+        windowViewports_->setLayout(layout);
+        windowViewports_->resetScene(&editor_, 1);
+    }
+    else if ((layout == WindowViewports::VIEW_LAYOUT_GRID) ||
+             (layout == WindowViewports::VIEW_LAYOUT_THREE_ROWS_RIGHT))
+    {
+        editor_.setNumberOfViewports(4);
+        windowViewports_->setLayout(layout);
+        windowViewports_->resetScene(&editor_, 1);
+        windowViewports_->resetScene(&editor_, 2);
+        windowViewports_->resetScene(&editor_, 3);
+    }
+
+    editor_.unlock();
     updateViewer();
 }
 
@@ -485,6 +558,16 @@ void WindowMain::actionSettingsView()
     editor_.cancelThreads();
     editor_.lock();
     editor_.setSettingsView(windowSettingsView_->settings());
+    editor_.unlock();
+    editor_.restartThreads();
+}
+
+void WindowMain::actionSettingsViewColor()
+{
+    editor_.cancelThreads();
+    editor_.lock();
+    editor_.setSettingsView(windowSettingsView_->settings());
+    editor_.tileViewClear();
     editor_.unlock();
     editor_.restartThreads();
 }
@@ -593,11 +676,10 @@ bool WindowMain::projectSave(const QString &path)
         {
             // First time save
             QString fileName;
-            fileName =
-                QFileDialog::getSaveFileName(this,
-                                             tr("Save As"),
-                                             "",
-                                             tr(WINDOW_MAIN_FILE_FILTER));
+            fileName = QFileDialog::getSaveFileName(this,
+                                                    tr("Save As"),
+                                                    "",
+                                                    tr(WINDOW_MAIN_FILTER_PRJ));
 
             if (fileName.isEmpty())
             {
@@ -626,6 +708,79 @@ bool WindowMain::projectSave(const QString &path)
     return true; // Saved
 }
 
+bool WindowMain::projectOpenFile(const QString &path)
+{
+    editor_.cancelThreads();
+
+    // Open file
+    try
+    {
+        if (projectCreateIndex(path))
+        {
+            editor_.addFile(path.toStdString());
+        }
+    }
+    catch (std::exception &e)
+    {
+        showError(e.what());
+        return false;
+    }
+
+    updateProject();
+
+    return true; // Opened
+}
+
+bool WindowMain::projectCreateIndex(const QString &path)
+{
+    const std::string pathStd = path.toStdString();
+    if (editor_.hasFileIndex(pathStd))
+    {
+        qDebug() << "File" << path << "has index.";
+        return true;
+    }
+
+    FileIndexBuilder::Settings settings;
+    // settings.randomize = true;
+
+    qDebug() << "Create index for file" << path;
+
+    char buffer[80];
+    FileIndexBuilder builder;
+    builder.start(pathStd, pathStd, settings);
+
+    QProgressDialog progressDialog(this);
+    progressDialog.setCancelButtonText(QObject::tr("&Cancel"));
+    progressDialog.setRange(0, 100);
+    progressDialog.setWindowTitle(QObject::tr("Create Index"));
+    progressDialog.setWindowModality(Qt::WindowModal);
+    progressDialog.setMinimumDuration(100);
+
+    while (!builder.end())
+    {
+        // Update progress
+        double value = builder.percent();
+        progressDialog.setValue(static_cast<int>(value));
+        std::snprintf(buffer, sizeof(buffer), "Processing %6.2f %%", value);
+        progressDialog.setLabelText(buffer);
+
+        QCoreApplication::processEvents();
+
+        if (progressDialog.wasCanceled())
+        {
+            qDebug() << "Create index canceled.";
+            return false;
+        }
+
+        // Step
+        builder.next();
+    }
+
+    qDebug() << "Index is complete.";
+
+    return true;
+}
+
 void WindowMain::updateProject()
 {
     editor_.cancelThreads();
@@ -641,9 +796,9 @@ void WindowMain::updateProject()
     updateWindowTitle(QString::fromStdString(editor_.path()));
 }
 
-void WindowMain::actionCameraChanged()
+void WindowMain::actionCameraChanged(size_t viewportId)
 {
-    editor_.render(windowViewports_->camera());
+    editor_.render(viewportId, windowViewports_->camera(viewportId));
 }
 
 void WindowMain::actionEditorRender()
@@ -655,7 +810,7 @@ void WindowMain::actionEditorRender()
 
 void WindowMain::updateViewer()
 {
-    actionCameraChanged();
+    actionCameraChanged(windowViewports_->selectedViewportId());
 }
 
 void WindowMain::showError(const char *message)

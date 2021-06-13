@@ -18,11 +18,11 @@
 */
 
 /**
-    @file OctreeIndex.hpp
+    @file FileIndex.hpp
 */
 
-#ifndef OCTREE_INDEX_HPP
-#define OCTREE_INDEX_HPP
+#ifndef FILE_INDEX_HPP
+#define FILE_INDEX_HPP
 
 #include <Aabb.hpp>
 #include <FileChunk.hpp>
@@ -30,23 +30,24 @@
 #include <map>
 #include <vector>
 
-/** Octree Index. */
-class OctreeIndex
+/** File Index. */
+class FileIndex
 {
 public:
     static const uint32_t CHUNK_TYPE;
 
-    /** Octree Index Node. */
+    /** File Index Node. */
     struct Node
     {
         uint64_t from;
         uint64_t size;
+        uint64_t offset;
         uint32_t reserved;
         uint32_t prev;
         uint32_t next[8];
     };
 
-    /** Octree Index Selection. */
+    /** File Index Selection. */
     struct Selection
     {
         size_t id;
@@ -54,8 +55,8 @@ public:
         bool partial;
     };
 
-    OctreeIndex();
-    ~OctreeIndex();
+    FileIndex();
+    ~FileIndex();
 
     void clear();
 
@@ -142,7 +143,7 @@ protected:
     Json &write(Json &out, const Node *data, size_t idx) const;
 
     // Build tree
-    /** Octree Index Build Node. */
+    /** File Index Build Node. */
     struct BuildNode
     {
         uint64_t code;
@@ -166,6 +167,6 @@ protected:
     size_t countNodes(BuildNode *node) const;
 };
 
-std::ostream &operator<<(std::ostream &os, const OctreeIndex &obj);
+std::ostream &operator<<(std::ostream &os, const FileIndex &obj);
 
-#endif /* OCTREE_INDEX_HPP */
+#endif /* FILE_INDEX_HPP */

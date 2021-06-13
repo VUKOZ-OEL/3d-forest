@@ -26,7 +26,7 @@
 
 /** Log.
 
-    TBD To make it thread safe. Now it is only for GUI thread.
+    @todo To make it thread safe. Now it is only for GUI thread.
 */
 class Log
 {

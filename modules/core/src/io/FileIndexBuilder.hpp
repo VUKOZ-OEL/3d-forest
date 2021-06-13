@@ -18,24 +18,24 @@
 */
 
 /**
-    @file LasIndexBuilder.hpp
+    @file FileIndexBuilder.hpp
 */
 
-#ifndef LAS_INDEX_BUILDER_HPP
-#define LAS_INDEX_BUILDER_HPP
+#ifndef FILE_INDEX_BUILDER_HPP
+#define FILE_INDEX_BUILDER_HPP
 
 #include <FileChunk.hpp>
+#include <FileIndex.hpp>
 #include <FileLas.hpp>
-#include <OctreeIndex.hpp>
 #include <map>
 #include <string>
 #include <vector>
 
-/** LAS Index Builder. */
-class LasIndexBuilder
+/** File Index Index Builder. */
+class FileIndexBuilder
 {
 public:
-    /** LAS Builder Settings. */
+    /** File Index Builder Settings. */
     class Settings
     {
     public:
@@ -53,12 +53,12 @@ public:
         ~Settings();
     };
 
-    LasIndexBuilder();
-    ~LasIndexBuilder();
+    FileIndexBuilder();
+    ~FileIndexBuilder();
 
     void start(const std::string &outputPath,
                const std::string &inputPath,
-               const LasIndexBuilder::Settings &settings);
+               const FileIndexBuilder::Settings &settings);
 
     void next();
 
@@ -66,16 +66,15 @@ public:
 
     double percent() const;
 
-    static std::string extensionL1(const std::string &path);
-    static std::string extensionL2(const std::string &path);
+    static std::string extension(const std::string &path);
 
     static void index(const std::string &outputPath,
                       const std::string &inputPath,
-                      const LasIndexBuilder::Settings &settings);
+                      const FileIndexBuilder::Settings &settings);
 
 protected:
     // State
-    /** LAS Builder State. */
+    /** File Index Builder State. */
     enum State
     {
         STATE_NONE,
@@ -116,10 +115,10 @@ protected:
     size_t sizePointFormat_;
 
     uint64_t random_;
-    OctreeIndex indexMain_;
-    OctreeIndex indexNode_;
-    std::map<const OctreeIndex::Node *, uint64_t> indexMainUsed_;
-    FileChunk indexNodeFile_;
+    FileIndex indexMain_;
+    FileIndex indexNode_;
+    std::map<const FileIndex::Node *, uint64_t> indexMainUsed_;
+    FileChunk indexFile_;
 
     FileLas inputLas_;
     FileLas outputLas_;
@@ -129,7 +128,7 @@ protected:
     std::string writePath_;
 
     // Settings
-    LasIndexBuilder::Settings settings_;
+    FileIndexBuilder::Settings settings_;
 
     // Buffers
     std::vector<uint8_t> buffer_;
@@ -152,4 +151,4 @@ protected:
     void stateEnd();
 };
 
-#endif /* LAS_INDEX_BUILDER_HPP */
+#endif /* FILE_INDEX_BUILDER_HPP */

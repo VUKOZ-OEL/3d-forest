@@ -24,18 +24,12 @@
 #ifndef EDITOR_BASE_HPP
 #define EDITOR_BASE_HPP
 
-#include <Aabb.hpp>
-#include <Camera.hpp>
 #include <ClipFilter.hpp>
 #include <EditorCache.hpp>
 #include <EditorDataSet.hpp>
 #include <EditorFilter.hpp>
 #include <EditorLayer.hpp>
 #include <EditorSettings.hpp>
-#include <EditorTile.hpp>
-#include <map>
-#include <string>
-#include <vector>
 
 /** Editor Base. */
 class EditorBase
@@ -46,12 +40,15 @@ public:
 
     void open(const std::string &path);
     void openFile(const std::string &path);
+    void addFile(const std::string &path);
+    bool hasFileIndex(const std::string &path);
     void write(const std::string &path);
     const std::string &path() const { return path_; }
     bool hasUnsavedChanges() const { return unsavedChanges_; }
     void close();
 
     void addFilter(EditorFilter *filter);
+    void applyFilters(EditorTile *tile);
 
     size_t dataSetSize() const { return dataSets_.size(); }
     const EditorDataSet &dataSet(size_t i) const { return *dataSets_[i]; }
@@ -71,18 +68,22 @@ public:
 
     const Aabb<double> &boundary() const { return boundary_; }
     const Aabb<double> &boundaryView() const { return boundaryView_; }
-    void updateCamera(const Camera &camera);
-    bool loadView();
 
-    void select(std::vector<OctreeIndex::Selection> &selected);
+    void select(std::vector<FileIndex::Selection> &selected);
     Aabb<double> selection() const;
 
+    void setNumberOfViewports(size_t n);
+    void updateCamera(size_t viewport, const Camera &camera);
+    bool loadView();
     void tileViewClear();
-    size_t tileViewSize() const { return view_.size(); }
-    EditorTile &tileView(size_t i) { return *view_[i]; }
-    const EditorTile &tileView(size_t i) const { return *view_[i]; }
-
-    EditorTile *tile(size_t d, size_t c);
+    size_t tileViewSize(size_t viewport) const
+    {
+        return viewports_[viewport]->tileSize();
+    }
+    EditorTile &tileView(size_t viewport, size_t index)
+    {
+        return viewports_[viewport]->tile(index);
+    }
 
 protected:
     // Project
@@ -98,33 +99,15 @@ protected:
     // Filter
     std::vector<EditorFilter *> filters_;
 
-    void applyFilters(EditorTile *tile);
-
     // Database
     Aabb<double> boundary_;
     Aabb<double> boundaryView_;
 
+    void openUpdate();
     void updateBoundary();
 
     // Cache
-    struct Key
-    {
-        size_t dataSetId;
-        size_t tileId;
-
-        bool operator<(const Key &rhs) const;
-    };
-    size_t cacheSizeMax_;
-    std::map<Key, std::shared_ptr<EditorTile>> cache_;
-
-    bool isCached(size_t d, size_t c) const;
-
-    // View
-    std::vector<std::shared_ptr<EditorTile>> view_;
-
-    void loadView(size_t idx);
-    void resetRendering();
-    void openUpdate();
+    std::vector<std::shared_ptr<EditorCache>> viewports_;
 };
 
 #endif /* EDITOR_BASE_HPP */

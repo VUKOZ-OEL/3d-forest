@@ -25,8 +25,8 @@
 #define EDITOR_DATA_SET_HPP
 
 #include <Aabb.hpp>
+#include <FileIndex.hpp>
 #include <Json.hpp>
-#include <OctreeIndex.hpp>
 #include <string>
 
 /** Editor Data Set. */
@@ -45,16 +45,19 @@ public:
     std::string fileName;
 
     // Data
-    OctreeIndex index;
+    FileIndex index;
     Aabb<double> boundary;
     Aabb<double> boundaryView;
 
     EditorDataSet();
     ~EditorDataSet();
 
-    void read(const std::string &filePath);
+    void read(const std::string &filePath, const std::string &projectPath);
     void read(const Json &in, const std::string &projectPath);
     Json &write(Json &out) const;
+
+    static std::string resolvePath(const std::string &unresolved,
+                                   const std::string &projectPath);
 
 protected:
     void setPath(const std::string &unresolved, const std::string &projectPath);

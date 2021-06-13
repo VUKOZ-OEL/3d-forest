@@ -24,8 +24,27 @@
 #include <EditorBase.hpp>
 #include <EditorTile.hpp>
 #include <File.hpp>
+#include <FileIndexBuilder.hpp>
 #include <FileLas.hpp>
-#include <LasIndexBuilder.hpp>
+
+static uint8_t EDITOR_TILE_PAL[16][3]{
+    {255, 205, 243},
+    {233, 222, 187},
+    {255, 238, 51},
+    {255, 146, 51},
+    {41, 208, 208},
+    {157, 175, 255},
+    {129, 197, 122},
+    {160, 160, 160},
+    {129, 38, 192},
+    {129, 74, 25},
+    {29, 105, 20},
+    {42, 75, 215},
+    {173, 35, 35},
+    {255, 255, 255},
+    {87, 87, 87},
+    {0, 0, 0},
+};
 
 EditorTile::EditorTile()
     : dataSetId(0),
@@ -70,7 +89,7 @@ bool EditorTile::View::isFinished() const
 void EditorTile::read(const EditorBase *editor)
 {
     const EditorDataSet &dataSet = editor->dataSet(dataSetId);
-    const OctreeIndex::Node *node = dataSet.index.at(tileId);
+    const FileIndex::Node *node = dataSet.index.at(tileId);
 
     // Read tile buffer from LAS file
     FileLas las;
@@ -89,15 +108,18 @@ void EditorTile::read(const EditorBase *editor)
     las.file().read(buffer.data(), bufferSize);
 
     // Create point data
-    xyz.resize(n * 3);
-    view.xyz.resize(n * 3);
-    bool rgbFlag = las.header.hasRgb();
-    if (rgbFlag)
-    {
-        rgb.resize(n * 3);
-    }
-    rgbOutput.resize(n * 3);
     indices.resize(n);
+
+    xyz.resize(n * 3);
+    intensity.resize(n);
+    rgb.resize(n * 3);
+    rgbOutput.resize(n * 3);
+    attrib.resize(n);
+    gpsTime.resize(n);
+    layer.resize(n);
+
+    view.xyz.resize(n * 3);
+    view.rgb.resize(n * 3);
 
     // Covert buffer to point data
     uint8_t *ptr = buffer.data();
@@ -106,6 +128,7 @@ void EditorTile::read(const EditorBase *editor)
     double y;
     double z;
     const float scaleU16 = 1.0F / 65535.0F;
+    bool rgbFlag = las.header.hasRgb();
 
     for (size_t i = 0; i < n; i++)
     {
@@ -114,6 +137,7 @@ void EditorTile::read(const EditorBase *editor)
         las.readPoint(point, ptr + (pointSize * i), fmt);
         las.transform(x, y, z, point);
 
+        // xyz
         xyz[3 * i + 0] = x;
         xyz[3 * i + 1] = y;
         xyz[3 * i + 2] = z;
@@ -125,25 +149,45 @@ void EditorTile::read(const EditorBase *editor)
         view.xyz[3 * i + 1] = static_cast<float>(y);
         view.xyz[3 * i + 2] = static_cast<float>(z);
 
+        // intensity and color
+        intensity[i] = point.intensity * scaleU16;
+
         if (rgbFlag)
         {
             rgb[3 * i + 0] = point.red * scaleU16;
             rgb[3 * i + 1] = point.green * scaleU16;
             rgb[3 * i + 2] = point.blue * scaleU16;
         }
+        else
+        {
+            rgb[3 * i + 0] = 1.0F;
+            rgb[3 * i + 1] = 1.0F;
+            rgb[3 * i + 2] = 1.0F;
+        }
 
         rgbOutput[3 * i + 0] = point.user_red * scaleU16;
         rgbOutput[3 * i + 1] = point.user_green * scaleU16;
         rgbOutput[3 * i + 2] = point.user_blue * scaleU16;
-    }
 
-    view.rgb = rgb;
+        // Attributes
+        Attributes &attribute = attrib[i];
+        attribute.returnNumber = point.return_number;
+        attribute.numberOfReturns = point.number_of_returns;
+        attribute.classification = point.classification;
+
+        // GPS
+        gpsTime[i] = point.gps_time;
+
+        // Layer
+        layer[i] = point.user_layer;
+    }
 
     boundary.set(xyz);
     view.boundary.set(view.xyz);
 
     // Apply
     readFilter(editor);
+    setColorSource(editor);
 
     // Loaded
     loaded = true;
@@ -152,16 +196,16 @@ void EditorTile::read(const EditorBase *editor)
 void EditorTile::readFilter(const EditorBase *editor)
 {
     const EditorDataSet &dataSet = editor->dataSet(dataSetId);
-    const OctreeIndex::Node *node = dataSet.index.at(tileId);
+    const FileIndex::Node *node = dataSet.index.at(tileId);
 
     if (editor->clipFilter().enabled)
     {
         // Read L2 index
-        const std::string path = LasIndexBuilder::extensionL2(dataSet.path);
-        index.read(path, node->reserved);
+        const std::string pathIndex = FileIndexBuilder::extension(dataSet.path);
+        index.read(pathIndex, node->offset);
 
         // Select octants
-        std::vector<OctreeIndex::Selection> selection;
+        std::vector<FileIndex::Selection> selection;
         Aabb<double> clipBox = editor->clipFilter().box;
         index.selectLeaves(selection, clipBox, dataSet.id);
 
@@ -170,7 +214,7 @@ void EditorTile::readFilter(const EditorBase *editor)
 
         for (size_t i = 0; i < selection.size(); i++)
         {
-            const OctreeIndex::Node *nodeL2 = index.at(selection[i].idx);
+            const FileIndex::Node *nodeL2 = index.at(selection[i].idx);
             if (!nodeL2)
             {
                 continue;
@@ -186,7 +230,7 @@ void EditorTile::readFilter(const EditorBase *editor)
 
         for (size_t i = 0; i < selection.size(); i++)
         {
-            const OctreeIndex::Node *nodeL2 = index.at(selection[i].idx);
+            const FileIndex::Node *nodeL2 = index.at(selection[i].idx);
             if (!nodeL2)
             {
                 continue;
@@ -223,4 +267,72 @@ void EditorTile::readFilter(const EditorBase *editor)
 
         indices.resize(nSelected);
     }
+}
+
+void EditorTile::setColorSource(const EditorBase *editor)
+{
+    const EditorSettings::View &opt = editor->settings().view();
+    size_t n = intensity.size();
+
+    for (size_t i = 0; i < n; i++)
+    {
+        view.rgb[i * 3 + 0] = 1.0F;
+        view.rgb[i * 3 + 1] = 1.0F;
+        view.rgb[i * 3 + 2] = 1.0F;
+    }
+
+    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_COLOR))
+    {
+        view.rgb = rgb;
+    }
+
+    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_INTENSITY))
+    {
+        for (size_t i = 0; i < n; i++)
+        {
+            view.rgb[i * 3 + 0] *= intensity[i];
+            view.rgb[i * 3 + 1] *= intensity[i];
+            view.rgb[i * 3 + 2] *= intensity[i];
+        }
+    }
+
+    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_RETURN_NUMBER))
+    {
+        for (size_t i = 0; i < n; i++)
+        {
+            setColor(i, attrib[i].returnNumber, 15, &EDITOR_TILE_PAL[0][0]);
+        }
+    }
+
+    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_NUMBER_OF_RETURNS))
+    {
+        for (size_t i = 0; i < n; i++)
+        {
+            setColor(i, attrib[i].numberOfReturns, 15, &EDITOR_TILE_PAL[0][0]);
+        }
+    }
+
+    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_CLASSIFICATION))
+    {
+        for (size_t i = 0; i < n; i++)
+        {
+            setColor(i, attrib[i].classification, 15, &EDITOR_TILE_PAL[0][0]);
+        }
+    }
+}
+
+void EditorTile::setColor(size_t idx, int value, int max, uint8_t *pal)
+{
+    if (value > max)
+    {
+        value = max;
+    }
+
+    uint8_t r = pal[value * 3 + 0];
+    uint8_t g = pal[value * 3 + 1];
+    uint8_t b = pal[value * 3 + 2];
+
+    view.rgb[idx * 3 + 0] *= static_cast<float>(r) * (1.0F / 256.0F);
+    view.rgb[idx * 3 + 1] *= static_cast<float>(g) * (1.0F / 256.0F);
+    view.rgb[idx * 3 + 2] *= static_cast<float>(b) * (1.0F / 256.0F);
 }

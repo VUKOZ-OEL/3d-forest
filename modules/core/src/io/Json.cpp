@@ -310,7 +310,7 @@ void Json::deserialize(Json &obj, const char *in, size_t n, size_t &i)
                 break;
 
             case STATE_STRING:
-                // TBD extra characters
+                /** @todo Extra characters. */
                 if (in[i] == '\"')
                 {
                     str_len = i - str_start;
@@ -328,7 +328,7 @@ void Json::deserialize(Json &obj, const char *in, size_t n, size_t &i)
                 return;
 
             case STATE_NUMBER:
-                // TBD number format
+                /** @todo Number format. */
                 if (!(in[i] == '.' || (in[i] > 47 && in[i] < 58)))
                 {
                     str_len = i - str_start;

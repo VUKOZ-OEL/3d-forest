@@ -29,12 +29,14 @@
 #include <Time.hpp>
 #include <WindowViewports.hpp>
 
-GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent)
-{
-    windowViewports_ = nullptr;
-    selected_ = false;
-    editor_ = nullptr;
+GLWidget::GLWidget(QWidget *parent)
+    : QOpenGLWidget(parent),
+      windowViewports_(nullptr),
+      viewportId_(0),
+      selected_(false),
+      editor_(nullptr)
 
+{
     resetCamera();
 }
 
@@ -42,9 +44,15 @@ GLWidget::~GLWidget()
 {
 }
 
-void GLWidget::setWindowViewports(WindowViewports *viewer)
+void GLWidget::setWindowViewports(WindowViewports *viewer, size_t viewportId)
 {
     windowViewports_ = viewer;
+    viewportId_ = viewportId;
+}
+
+size_t GLWidget::viewportId() const
+{
+    return viewportId_;
 }
 
 void GLWidget::setSelected(bool selected)
@@ -76,13 +84,11 @@ Camera GLWidget::camera() const
 void GLWidget::setViewOrthographic()
 {
     camera_.setOrthographic();
-    cameraChanged();
 }
 
 void GLWidget::setViewPerspective()
 {
     camera_.setPerspective();
-    cameraChanged();
 }
 
 void GLWidget::setViewDirection(const QVector3D &dir, const QVector3D &up)
@@ -92,7 +98,6 @@ void GLWidget::setViewDirection(const QVector3D &dir, const QVector3D &up)
 
     QVector3D eye = (dir * distance) + center;
     camera_.setLookAt(eye, center, up);
-    cameraChanged();
 }
 
 void GLWidget::setViewTop()
@@ -109,17 +114,17 @@ void GLWidget::setViewFront()
     setViewDirection(dir, up);
 }
 
-void GLWidget::setViewLeft()
+void GLWidget::setViewRight()
 {
-    QVector3D dir(-1.0F, 0.0F, 0.0F);
+    QVector3D dir(1.0F, 0.0F, 0.0F);
     QVector3D up(0.0F, 0.0F, 1.0F);
     setViewDirection(dir, up);
 }
 
 void GLWidget::setView3d()
 {
-    QVector3D dir(-1.0F, -1.0F, 1.0F);
-    QVector3D up(1.065F, 1.0F, 1.0F);
+    QVector3D dir(1.0F, -1.0F, 1.0F);
+    QVector3D up(-1.065F, 1.0F, 1.0F);
     up.normalize();
     setViewDirection(dir, up);
 }
@@ -132,12 +137,13 @@ void GLWidget::resetCamera()
     if (aabb_.isValid())
     {
         center = aabb_.getCenter();
-        center[2] = aabb_.getMin().z();
+        // center[2] = aabb_.getMin().z();
         distance = aabb_.getRadius();
     }
 
-    QVector3D eye(-1.0F, -1.0F, 1.0F);
-    QVector3D up(1.065F, 1.0F, 1.0F);
+    QVector3D eye(1.0F, -1.0F, 1.0F);
+    QVector3D up(-1.065F, 1.0F, 1.0F);
+    eye.normalize();
     up.normalize();
 
     eye = (eye * distance) + center;
@@ -158,7 +164,6 @@ void GLWidget::setViewResetDistance()
 
     QVector3D eye = (dir * distance) + center;
     camera_.setLookAt(eye, center, up);
-    cameraChanged();
 }
 
 void GLWidget::setViewResetCenter()
@@ -171,12 +176,11 @@ void GLWidget::setViewResetCenter()
     if (aabb_.isValid())
     {
         center = aabb_.getCenter();
-        center[2] = aabb_.getMin().z();
+        // center[2] = aabb_.getMin().z();
     }
 
     QVector3D eye = (dir * distance) + center;
     camera_.setLookAt(eye, center, up);
-    cameraChanged();
 }
 
 void GLWidget::initializeGL()
@@ -193,14 +197,7 @@ void GLWidget::initializeGL()
 void GLWidget::paintGL()
 {
     // Background
-    if (isSelected())
-    {
-        glClearColor(0.2F, 0.2F, 0.2F, 0.0F);
-    }
-    else
-    {
-        glClearColor(0.2F, 0.2F, 0.2F, 0.0F);
-    }
+    glClearColor(0.2F, 0.2F, 0.2F, 0.0F);
 
     // Setup camera
     glViewport(0, 0, camera_.width(), camera_.height());
@@ -238,7 +235,7 @@ void GLWidget::renderScene()
 
     double t1 = getRealTime();
 
-    size_t tileViewSize = editor_->tileViewSize();
+    size_t tileViewSize = editor_->tileViewSize(viewportId_);
 
     if (tileViewSize == 0)
     {
@@ -247,7 +244,7 @@ void GLWidget::renderScene()
 
     for (size_t tileIndex = 0; tileIndex < tileViewSize; tileIndex++)
     {
-        EditorTile &tile = editor_->tileView(tileIndex);
+        EditorTile &tile = editor_->tileView(viewportId_, tileIndex);
 
         if (tile.loaded && !tile.view.isFinished())
         {
@@ -320,6 +317,6 @@ void GLWidget::cameraChanged()
 {
     if (windowViewports_)
     {
-        emit windowViewports_->cameraChanged();
+        emit windowViewports_->cameraChanged(viewportId_);
     }
 }

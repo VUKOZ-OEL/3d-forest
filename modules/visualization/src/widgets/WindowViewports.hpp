@@ -40,7 +40,9 @@ public:
     enum ViewLayout
     {
         VIEW_LAYOUT_SINGLE,
-        VIEW_LAYOUT_TWO_COLUMNS
+        VIEW_LAYOUT_TWO_COLUMNS,
+        VIEW_LAYOUT_GRID,
+        VIEW_LAYOUT_THREE_ROWS_RIGHT
     };
 
     explicit WindowViewports(QWidget *parent = nullptr);
@@ -52,26 +54,27 @@ public:
     void setViewPerspective();
     void setViewTop();
     void setViewFront();
-    void setViewLeft();
+    void setViewRight();
     void setView3d();
     void setViewResetDistance();
     void setViewResetCenter();
 
     void selectViewport(GLWidget *viewport);
+    size_t selectedViewportId() const;
+    Camera camera(size_t viewportId) const;
 
     void updateScene(Editor *editor);
     void resetScene(Editor *editor);
-
-    Camera camera() const;
+    void resetScene(Editor *editor, size_t viewportId);
 
 signals:
-    void cameraChanged();
+    void cameraChanged(size_t viewportId);
 
 protected:
     std::vector<GLWidget *> viewports_;
 
     void initializeViewer();
-    GLWidget *createViewport();
+    GLWidget *createViewport(size_t viewportId);
     GLWidget *selectedViewport();
     const GLWidget *selectedViewport() const;
 };

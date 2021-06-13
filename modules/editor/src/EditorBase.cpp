@@ -22,10 +22,7 @@
 */
 
 #include <EditorBase.hpp>
-#include <Error.hpp>
-#include <iostream>
-#include <limits>
-#include <queue>
+#include <FileIndexBuilder.hpp>
 
 static const char *EDITOR_BASE_KEY_PROJECT_NAME = "projectName";
 static const char *EDITOR_BASE_KEY_DATA_SET = "dataSets";
@@ -34,8 +31,8 @@ static const char *EDITOR_BASE_KEY_LAYER = "layers";
 
 EditorBase::EditorBase()
 {
-    unsavedChanges_ = false;
-    cacheSizeMax_ = 250;
+    close();
+    setNumberOfViewports(1);
 }
 
 EditorBase::~EditorBase()
@@ -126,9 +123,9 @@ void EditorBase::openFile(const std::string &path)
     try
     {
         // Data sets
-        dataSets_.resize(1);
-        dataSets_[0] = std::make_shared<EditorDataSet>();
-        dataSets_[0]->read(path);
+        std::shared_ptr<EditorDataSet> ds = std::make_shared<EditorDataSet>();
+        ds->read(path, path_);
+        dataSets_.push_back(ds);
     }
     catch (std::exception &e)
     {
@@ -139,14 +136,28 @@ void EditorBase::openFile(const std::string &path)
     openUpdate();
 }
 
-void EditorBase::openUpdate()
+void EditorBase::addFile(const std::string &path)
 {
-    updateBoundary();
-
-    if (clipFilter_.box.empty())
+    try
     {
-        clipFilter_.box = boundary_;
+        // Data sets
+        std::shared_ptr<EditorDataSet> ds = std::make_shared<EditorDataSet>();
+        ds->read(path, path_);
+        dataSets_.push_back(ds);
     }
+    catch (std::exception &e)
+    {
+        throw;
+    }
+
+    openUpdate();
+}
+
+bool EditorBase::hasFileIndex(const std::string &path)
+{
+    std::string pathFile = EditorDataSet::resolvePath(path, path_);
+    std::string pathIndex = FileIndexBuilder::extension(pathFile);
+    return File::exists(pathIndex);
 }
 
 void EditorBase::write(const std::string &path)
@@ -183,7 +194,7 @@ void EditorBase::write(const std::string &path)
 
 void EditorBase::close()
 {
-    path_ = "";
+    path_ = File::currentPath() + "\\project";
     projectName_ = "";
     dataSets_.clear();
     layers_.clear();
@@ -192,8 +203,11 @@ void EditorBase::close()
     dataSets_.clear();
     boundary_.clear();
     boundaryView_.clear();
-    cache_.clear();
-    view_.clear();
+
+    for (auto &it : viewports_)
+    {
+        it->clear();
+    }
 
     unsavedChanges_ = false;
 }
@@ -207,7 +221,7 @@ void EditorBase::applyFilters(EditorTile *tile)
 {
     for (auto &it : filters_)
     {
-        // TBD: collect enabled filters during preprocessing
+        /** @todo Collect enabled filters during preprocessing. */
         if (it->isFilterEnabled())
         {
             it->filterTile(tile);
@@ -247,7 +261,7 @@ void EditorBase::resetClipFilter()
     setClipFilter(clipFilter_);
 }
 
-void EditorBase::select(std::vector<OctreeIndex::Selection> &selected)
+void EditorBase::select(std::vector<FileIndex::Selection> &selected)
 {
     Aabb<double> box = selection();
 
@@ -270,20 +284,73 @@ Aabb<double> EditorBase::selection() const
     return boundary_;
 }
 
-bool EditorBase::isCached(size_t d, size_t c) const
+// EditorTile *tile(size_t d, size_t c);
+// EditorTile *EditorBase::tile(size_t d, size_t c)
+// {
+//     auto search = cache_.find({d, c});
+//     if (search != cache_.end())
+//     {
+//         return search->second.get();
+//     }
+//     return nullptr;
+// }
+
+// -----------------------------------------------------------------------------
+void EditorBase::setNumberOfViewports(size_t n)
 {
-    auto search = cache_.find({d, c});
-    return search != cache_.end();
+    size_t i = viewports_.size();
+
+    while (i < n)
+    {
+        std::shared_ptr<EditorCache> viewport =
+            std::make_shared<EditorCache>(this);
+        viewports_.push_back(viewport);
+        i++;
+    }
+
+    while (n < i)
+    {
+        viewports_.pop_back();
+        i--;
+    }
 }
 
-EditorTile *EditorBase::tile(size_t d, size_t c)
+void EditorBase::updateCamera(size_t viewport, const Camera &camera)
 {
-    auto search = cache_.find({d, c});
-    if (search != cache_.end())
+    viewports_[viewport]->updateCamera(camera);
+}
+
+void EditorBase::tileViewClear()
+{
+    for (auto &it : viewports_)
     {
-        return search->second.get();
+        it->reload();
     }
-    return nullptr;
+}
+
+bool EditorBase::loadView()
+{
+    bool rval = true;
+
+    for (auto &it : viewports_)
+    {
+        if (!it->loadStep())
+        {
+            rval = false;
+        }
+    }
+
+    return rval;
+}
+// -----------------------------------------------------------------------------
+void EditorBase::openUpdate()
+{
+    updateBoundary();
+
+    if (clipFilter_.box.empty())
+    {
+        clipFilter_.box = boundary_;
+    }
 }
 
 void EditorBase::updateBoundary()
@@ -298,157 +365,5 @@ void EditorBase::updateBoundary()
             boundary_.extend(it->boundary);
             boundaryView_.extend(it->boundaryView);
         }
-    }
-}
-
-bool EditorBase::Key::operator<(const Key &rhs) const
-{
-    return (dataSetId < rhs.dataSetId) || (tileId < rhs.tileId);
-}
-
-void EditorBase::tileViewClear()
-{
-    for (auto &it : cache_)
-    {
-        it.second->loaded = false;
-    }
-}
-
-bool EditorBase::loadView()
-{
-    for (size_t i = 0; i < view_.size(); i++)
-    {
-        if (!view_[i]->loaded)
-        {
-            loadView(i);
-            applyFilters(view_[i].get());
-            return false;
-        }
-
-        if (!view_[i]->view.isFinished())
-        {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-void EditorBase::loadView(size_t idx)
-{
-    EditorTile *tile = view_[idx].get();
-    try
-    {
-        tile->read(this);
-    }
-    catch (std::exception &e)
-    {
-        // std::cout << e.what() << "\n";
-    }
-    catch (...)
-    {
-        // std::cout << "unknown error\n";
-    }
-}
-
-void EditorBase::updateCamera(const Camera &camera)
-{
-    double eyeX = camera.eye.x();
-    double eyeY = camera.eye.y();
-    double eyeZ = camera.eye.z();
-
-    std::vector<std::shared_ptr<EditorTile>> viewPrev;
-    viewPrev = view_;
-
-    view_.clear();
-
-    std::multimap<double, Key> queue;
-
-    for (auto const &it : dataSets_)
-    {
-        if (it->visible)
-        {
-            queue.insert({0, {it->id, 0}});
-        }
-    }
-
-    while (!queue.empty() && view_.size() < cacheSizeMax_)
-    {
-        const auto it = queue.begin();
-        Key nk = it->second;
-        queue.erase(it);
-
-        const OctreeIndex::Node *node;
-        const OctreeIndex &index = dataSets_[nk.dataSetId]->index;
-        node = index.at(nk.tileId);
-
-        // if (clipFilter_.enabled)
-        // {
-        //     Aabb<double> box = index.boundary(node, index.boundary());
-        //     if (!clipFilter_.box.intersects(box))
-        //     {
-        //         continue;
-        //     }
-        // }
-
-        auto search = cache_.find({nk.dataSetId, nk.tileId});
-        if (search != cache_.end())
-        {
-            view_.push_back(search->second);
-        }
-        else
-        {
-            if (viewPrev.size() > 0)
-            {
-                const EditorTile *lru = viewPrev[viewPrev.size() - 1].get();
-                Key nkrm = {lru->dataSetId, lru->tileId};
-                cache_.erase(nkrm);
-                viewPrev.resize(viewPrev.size() - 1);
-            }
-
-            std::shared_ptr<EditorTile> tile;
-            tile = std::make_shared<EditorTile>();
-            tile->dataSetId = nk.dataSetId;
-            tile->tileId = nk.tileId;
-            tile->loaded = false;
-            cache_[nk] = tile;
-            view_.push_back(tile);
-        }
-
-        for (size_t i = 0; i < 8; i++)
-        {
-            if (node->next[i])
-            {
-                const OctreeIndex::Node *sub = index.at(node->next[i]);
-                Aabb<double> box = index.boundary(sub, boundaryView_);
-
-                double radius = box.radius();
-                double distance = box.distance(eyeX, eyeY, eyeZ);
-                double w;
-
-                if (distance < radius)
-                {
-                    w = 0;
-                }
-                else
-                {
-                    distance = distance * 0.002;
-                    distance = distance * distance;
-                    w = distance / radius;
-                }
-
-                queue.insert({w, {nk.dataSetId, node->next[i]}});
-            }
-        }
-    }
-
-    resetRendering();
-}
-
-void EditorBase::resetRendering()
-{
-    for (size_t i = 0; i < view_.size(); i++)
-    {
-        view_[i]->view.resetFrame();
     }
 }

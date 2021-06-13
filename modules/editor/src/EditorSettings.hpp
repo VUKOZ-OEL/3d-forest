@@ -24,6 +24,7 @@
 #ifndef EDITOR_SETTINGS_HPP
 #define EDITOR_SETTINGS_HPP
 
+#include <string>
 #include <vector>
 
 /** Editor Settings. */
@@ -34,12 +35,29 @@ public:
     class View
     {
     public:
+        enum ColorSource
+        {
+            COLOR_SOURCE_COLOR,
+            COLOR_SOURCE_INTENSITY,
+            COLOR_SOURCE_RETURN_NUMBER,
+            COLOR_SOURCE_NUMBER_OF_RETURNS,
+            COLOR_SOURCE_CLASSIFICATION
+        };
+
         View();
+
         float pointSize() const;
         void setPointSize(float size);
 
+        size_t colorSourceSize() const;
+        const char *colorSourceString(size_t id) const;
+        bool isColorSourceEnabled(size_t id) const;
+        void setColorSourceEnabled(size_t id, bool v);
+
     protected:
         float pointSize_;
+        std::vector<std::string> colorSourceString_;
+        std::vector<bool> colorSourceEnabled_;
     };
 
     const View &view() const { return view_; }

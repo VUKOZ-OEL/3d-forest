@@ -29,6 +29,7 @@
 ThreadRender::ThreadRender(Editor *editor, QObject *parent)
     : Thread(parent),
       editor_(editor),
+      viewportId_(0),
       initialized_(false)
 {
 }
@@ -37,10 +38,11 @@ ThreadRender::~ThreadRender()
 {
 }
 
-void ThreadRender::start(const Camera &camera)
+void ThreadRender::start(size_t viewportId, const Camera &camera)
 {
     cancel();
 
+    viewportId_ = viewportId;
     camera_ = camera;
     initialized_ = false;
 
@@ -49,7 +51,7 @@ void ThreadRender::start(const Camera &camera)
 
 void ThreadRender::restart()
 {
-    // TBD
+    /** @todo Something is missing? */
     cancel();
     initialized_ = false;
 
@@ -61,7 +63,7 @@ bool ThreadRender::compute()
     if (!initialized_)
     {
         editor_->lock();
-        editor_->updateCamera(camera_);
+        editor_->updateCamera(viewportId_, camera_);
         editor_->unlock();
         initialized_ = true;
         return false;
