@@ -169,7 +169,7 @@ void GL::renderAabb(const GLAabb &box)
 
 void GL::renderAxis(const GLAabb &box, const QVector3D &center)
 {
-    float d = box.getRadius() * 0.5F;
+    float d = box.getRadius() * 0.25F; /**< @todo Do not project length. */
 
     QVector3D v[6];
     v[0] = center;

@@ -525,7 +525,7 @@ void FileLas::readPoint(Point &pt, const uint8_t *buffer, uint8_t fmt) const
 {
     size_t pos;
 
-    // TBD this is without optimization, all points have the same format 'fmt'
+    /** @todo Optimization, all points have the same format 'fmt'. */
 
     pt.format = fmt;
 
@@ -622,7 +622,7 @@ void FileLas::writePoint(uint8_t *buffer, const Point &pt) const
     const uint8_t fmt = pt.format;
     size_t pos;
 
-    // TBD this is without optimization, all points have the same format
+    /** @todo Optimization, all points have the same format 'fmt'. */
 
     if (fmt > 5)
     {

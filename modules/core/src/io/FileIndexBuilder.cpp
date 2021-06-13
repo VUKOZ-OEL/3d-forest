@@ -32,7 +32,7 @@ FileIndexBuilder::Settings::Settings()
 
     maxSize1 = 100000;
     // maxSize1 = 100;
-    maxLevel1 = 0; // TBD Fit to memory
+    maxLevel1 = 0; // The limit is maxSize1.
 
     maxSize2 = 32;
     maxLevel2 = 5;

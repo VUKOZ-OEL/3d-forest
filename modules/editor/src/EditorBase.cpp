@@ -198,7 +198,7 @@ void EditorBase::applyFilters(EditorTile *tile)
 {
     for (auto &it : filters_)
     {
-        // TBD: collect enabled filters during preprocessing
+        /** @todo Collect enabled filters during preprocessing. */
         if (it->isFilterEnabled())
         {
             it->filterTile(tile);

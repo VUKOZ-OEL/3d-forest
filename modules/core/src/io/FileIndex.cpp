@@ -402,7 +402,7 @@ void FileIndex::insertBegin(const Aabb<double> &boundary,
 
     if (insertOnlyToLeaves_)
     {
-        maxSize_ = 0; // TBD is to use this value
+        maxSize_ = 0; /**< @todo This value should be used. */
     }
 }
 

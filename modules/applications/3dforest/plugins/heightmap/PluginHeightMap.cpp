@@ -152,7 +152,7 @@ void PluginHeightMapFilter::applyToTiles(QWidget *widget)
             break;
         }
 
-        msleep(10); // TBD debug
+        msleep(10); /**< @todo Remove. */
 
         // Process step i
         // FileIndex::Selection &sel = selectionL1[static_cast<size_t>(i)];

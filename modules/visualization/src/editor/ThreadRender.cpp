@@ -51,7 +51,7 @@ void ThreadRender::start(size_t viewportId, const Camera &camera)
 
 void ThreadRender::restart()
 {
-    // TBD
+    /** @todo Something is missing? */
     cancel();
     initialized_ = false;
 
