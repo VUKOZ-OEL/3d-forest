@@ -103,6 +103,7 @@ protected:
     Aabb<double> boundary_;
     Aabb<double> boundaryView_;
 
+    size_t freeDataSetId() const;
     void openUpdate();
     void updateBoundary();
 
