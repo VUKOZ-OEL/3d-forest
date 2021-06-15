@@ -217,10 +217,10 @@ std::vector<QColor> PluginHeightMapFilter::createColormap(const QString &name,
     }
     else if (name == PLUGIN_HEIGHT_MAP_COLORMAP_GRAY)
     {
-        float delta = 1.0F / static_cast<float>(n);
+        float delta = 1.0F / static_cast<float>(n); // 0.5 /
         for (size_t i = 0; i < n; i++)
         {
-            float v = delta * static_cast<float>(i + 1);
+            float v = delta * static_cast<float>(i + 1); // 0.5 + x
             colormap[i].setRgbF(v, v, v);
         }
     }
