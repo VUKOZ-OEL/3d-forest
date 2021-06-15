@@ -175,9 +175,9 @@ void WindowSettingsView::setPointSize(int v)
 
 void WindowSettingsView::setFogEnabled(int v)
 {
-   (void)v;
-   settings_.setFogEnabled(fogCheckBox_->isChecked());
-   emit settingsChanged();
+    (void)v;
+    settings_.setFogEnabled(fogCheckBox_->isChecked());
+    emit settingsChanged();
 }
 
 void WindowSettingsView::setSettings(const EditorSettings::View &settings)

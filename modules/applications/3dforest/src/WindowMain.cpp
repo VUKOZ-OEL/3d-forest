@@ -32,8 +32,8 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPluginLoader>
-#include <QProgressDialog>
 #include <QProgressBar>
+#include <QProgressDialog>
 #include <QTextEdit>
 #include <Time.hpp>
 #include <WindowClipFilter.hpp>

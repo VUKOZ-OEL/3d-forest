@@ -47,7 +47,7 @@ void EditorCache::reload()
     {
         it.second->view.resetFrame();
         it.second->filtered = false;
-        //it.second->loaded = false;
+        // it.second->loaded = false;
     }
 }
 

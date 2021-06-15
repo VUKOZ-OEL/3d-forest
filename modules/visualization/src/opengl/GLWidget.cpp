@@ -281,7 +281,7 @@ void GLWidget::renderSceneSettingsEnable()
 
     if (settings.view().isFogEnabled())
     {
-        GLfloat colorFog[4] {0.0F, 0.0F, 0.0F, 0.0F};
+        GLfloat colorFog[4]{0.0F, 0.0F, 0.0F, 0.0F};
         glFogi(GL_FOG_MODE, GL_LINEAR);
         glFogfv(GL_FOG_COLOR, colorFog);
         glHint(GL_FOG_HINT, GL_DONT_CARE);

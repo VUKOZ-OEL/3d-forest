@@ -24,8 +24,8 @@
 #ifndef EDITOR_SETTINGS_HPP
 #define EDITOR_SETTINGS_HPP
 
-#include <string>
 #include <array>
+#include <string>
 #include <vector>
 
 /** Editor Settings. */
