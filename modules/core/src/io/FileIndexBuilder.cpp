@@ -38,7 +38,7 @@ FileIndexBuilder::Settings::Settings()
     maxLevel2 = 5;
     // maxLevel2 = 2;
 
-    bufferSize = 1024 * 1024;
+    bufferSize = 5 * 1024 * 1024;
 }
 
 FileIndexBuilder::Settings::~Settings()
@@ -82,12 +82,12 @@ double FileIndexBuilder::percent() const
 {
     if (maximumTotal_ == 0)
     {
-        return 100.;
+        return 100.0;
     }
     else
     {
-        return 100. * (static_cast<double>(valueTotal_) /
-                       static_cast<double>(maximumTotal_));
+        return 100.0 * (static_cast<double>(valueTotal_) /
+                        static_cast<double>(maximumTotal_));
     }
 }
 
@@ -427,7 +427,8 @@ void FileIndexBuilder::stateRandomize()
     uint64_t remainIdx;
     uint64_t stepIdx;
 
-    stepIdx = buffer_.size() / sizePoint_;
+    // stepIdx = buffer_.size() / sizePoint_;
+    stepIdx = 10000; /**< @todo Rewrite function stateRandomize. */
     remainIdx = maximumIdx_ - valueIdx_;
     if (remainIdx < stepIdx)
     {
