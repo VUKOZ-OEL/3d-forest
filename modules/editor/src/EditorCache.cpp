@@ -46,7 +46,8 @@ void EditorCache::reload()
     for (auto &it : cache_)
     {
         it.second->view.resetFrame();
-        it.second->loaded = false;
+        it.second->filtered = false;
+        //it.second->loaded = false;
     }
 }
 
@@ -57,6 +58,13 @@ bool EditorCache::loadStep()
         if (!lru_[i]->loaded)
         {
             load(i);
+            editor_->applyFilters(lru_[i].get());
+            return false;
+        }
+
+        if (!lru_[i]->filtered)
+        {
+            lru_[i]->filter(editor_);
             editor_->applyFilters(lru_[i].get());
             return false;
         }

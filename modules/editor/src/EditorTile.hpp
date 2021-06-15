@@ -97,6 +97,7 @@ public:
 
     // State
     bool loaded;
+    bool filtered;
     bool modified;
 
     /** Editor Tile Visualization. */
@@ -127,6 +128,7 @@ public:
     ~EditorTile();
 
     void read(const EditorBase *editor);
+    void filter(const EditorBase *editor);
 
 protected:
     void readFilter(const EditorBase *editor);

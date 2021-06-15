@@ -40,6 +40,7 @@ public:
     void reload();
     bool loadStep();
     void updateCamera(const Camera &camera);
+    void resetRendering();
 
     size_t tileSize() const { return lru_.size(); }
     EditorTile &tile(size_t index) { return *lru_[index]; }
@@ -62,7 +63,6 @@ protected:
     std::vector<std::shared_ptr<EditorTile>> lru_;
 
     void load(size_t idx);
-    void resetRendering();
 };
 
 #endif /* EDITOR_CACHE_HPP */

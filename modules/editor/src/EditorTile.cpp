@@ -50,6 +50,7 @@ EditorTile::EditorTile()
     : dataSetId(0),
       tileId(0),
       loaded(false),
+      filtered(false),
       modified(false)
 {
 }
@@ -185,12 +186,19 @@ void EditorTile::read(const EditorBase *editor)
     boundary.set(xyz);
     view.boundary.set(view.xyz);
 
+    // Loaded
+    loaded = true;
+
     // Apply
+    filter(editor);
+}
+
+void EditorTile::filter(const EditorBase *editor)
+{
     readFilter(editor);
     setColorSource(editor);
 
-    // Loaded
-    loaded = true;
+    filtered = true;
 }
 
 void EditorTile::readFilter(const EditorBase *editor)
@@ -201,8 +209,11 @@ void EditorTile::readFilter(const EditorBase *editor)
     if (editor->clipFilter().enabled)
     {
         // Read L2 index
-        const std::string pathIndex = FileIndexBuilder::extension(dataSet.path);
-        index.read(pathIndex, node->offset);
+        if (index.empty())
+        {
+            std::string pathIndex = FileIndexBuilder::extension(dataSet.path);
+            index.read(pathIndex, node->offset);
+        }
 
         // Select octants
         std::vector<FileIndex::Selection> selection;
@@ -272,18 +283,25 @@ void EditorTile::readFilter(const EditorBase *editor)
 void EditorTile::setColorSource(const EditorBase *editor)
 {
     const EditorSettings::View &opt = editor->settings().view();
+    float r = opt.colorSourceRed();
+    float g = opt.colorSourceGreen();
+    float b = opt.colorSourceBlue();
+
     size_t n = intensity.size();
 
     for (size_t i = 0; i < n; i++)
     {
-        view.rgb[i * 3 + 0] = 1.0F;
-        view.rgb[i * 3 + 1] = 1.0F;
-        view.rgb[i * 3 + 2] = 1.0F;
+        view.rgb[i * 3 + 0] = r;
+        view.rgb[i * 3 + 1] = g;
+        view.rgb[i * 3 + 2] = b;
     }
 
     if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_COLOR))
     {
-        view.rgb = rgb;
+        for (size_t i = 0; i < (n * 3); i++)
+        {
+            view.rgb[i] *= rgb[i];
+        }
     }
 
     if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_INTENSITY))
