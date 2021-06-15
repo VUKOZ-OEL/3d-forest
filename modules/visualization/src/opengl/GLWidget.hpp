@@ -87,6 +87,8 @@ protected:
     void resetCamera();
     void clearScreen();
     void renderScene();
+    void renderSceneSettingsEnable();
+    void renderSceneSettingsDisable();
     void cameraChanged();
     void setFocus();
     void setViewDirection(const QVector3D &dir, const QVector3D &up);

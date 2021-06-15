@@ -25,6 +25,7 @@
 #define EDITOR_SETTINGS_HPP
 
 #include <string>
+#include <array>
 #include <vector>
 
 /** Editor Settings. */
@@ -49,6 +50,14 @@ public:
         float pointSize() const;
         void setPointSize(float size);
 
+        bool isFogEnabled() const;
+        void setFogEnabled(bool b);
+
+        void setColorSource(float r, float g, float b);
+        float colorSourceRed() const { return colorSource_[0]; }
+        float colorSourceGreen() const { return colorSource_[1]; }
+        float colorSourceBlue() const { return colorSource_[2]; }
+
         size_t colorSourceSize() const;
         const char *colorSourceString(size_t id) const;
         bool isColorSourceEnabled(size_t id) const;
@@ -56,6 +65,8 @@ public:
 
     protected:
         float pointSize_;
+        bool fogEnabled_;
+        std::array<float, 3> colorSource_;
         std::vector<std::string> colorSourceString_;
         std::vector<bool> colorSourceEnabled_;
     };

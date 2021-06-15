@@ -211,6 +211,7 @@ void GLWidget::paintGL()
     // Render
     renderScene();
 
+    // Render
     glColor3f(0.25F, 0.25F, 0.25F);
     GL::renderAabb(aabb_);
     GL::renderAxis(aabb_, camera_.getCenter());
@@ -230,8 +231,7 @@ void GLWidget::renderScene()
 
     editor_->lock();
 
-    const EditorSettings &settings = editor_->settings();
-    glPointSize(settings.view().pointSize());
+    renderSceneSettingsEnable();
 
     double t1 = getRealTime();
 
@@ -246,7 +246,7 @@ void GLWidget::renderScene()
     {
         EditorTile &tile = editor_->tileView(viewportId_, tileIndex);
 
-        if (tile.loaded && !tile.view.isFinished())
+        if (tile.loaded && tile.filtered && !tile.view.isFinished())
         {
             if (tileIndex == 0 && tile.view.isStarted())
             {
@@ -266,9 +266,40 @@ void GLWidget::renderScene()
         }
     }
 
+    renderSceneSettingsDisable();
+
     GL::renderClipFilter(editor_->clipFilter());
 
     editor_->unlock();
+}
+
+void GLWidget::renderSceneSettingsEnable()
+{
+    const EditorSettings &settings = editor_->settings();
+
+    glPointSize(settings.view().pointSize());
+
+    if (settings.view().isFogEnabled())
+    {
+        GLfloat colorFog[4] {0.0F, 0.0F, 0.0F, 0.0F};
+        glFogi(GL_FOG_MODE, GL_LINEAR);
+        glFogfv(GL_FOG_COLOR, colorFog);
+        glHint(GL_FOG_HINT, GL_DONT_CARE);
+        glFogf(GL_FOG_START, -aabb_.getRadius() + camera_.getDistance());
+        glFogf(GL_FOG_END, aabb_.getRadius() + camera_.getDistance());
+        glEnable(GL_FOG);
+    }
+}
+
+void GLWidget::renderSceneSettingsDisable()
+{
+    const EditorSettings &settings = editor_->settings();
+    glPointSize(1.0F);
+
+    if (settings.view().isFogEnabled())
+    {
+        glDisable(GL_FOG);
+    }
 }
 
 void GLWidget::resizeGL(int w, int h)

@@ -29,6 +29,7 @@
 #include <vector>
 
 class QCheckBox;
+class QPushButton;
 class QSlider;
 class QTabWidget;
 
@@ -45,19 +46,23 @@ public:
     void setSettings(const EditorSettings::View &settings);
 
 public slots:
+    void setColorSource();
     void setColorSourceEnabled(int v);
     void setPointSize(int v);
+    void setFogEnabled(int v);
 
 signals:
     void settingsChanged();
-    void settingsColorChanged();
+    void settingsChangedApply();
 
 protected:
     EditorSettings::View settings_;
 
     QTabWidget *tabWidget_;
+    QPushButton *colorSourceButton_;
     std::vector<QCheckBox *> colorSourceCheckBox_;
     QSlider *pointSizeSlider_;
+    QCheckBox *fogCheckBox_;
 };
 
 #endif /* WINDOW_SETTINGS_VIEW_HPP */

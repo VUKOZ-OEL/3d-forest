@@ -23,7 +23,10 @@
 
 #include <EditorSettings.hpp>
 
-EditorSettings::View::View() : pointSize_(1.0F)
+EditorSettings::View::View()
+    : pointSize_(1.0F),
+      fogEnabled_(false),
+      colorSource_({1.0F, 1.0F, 1.0F})
 {
     colorSourceString_ = {
         "Color",
@@ -51,6 +54,23 @@ float EditorSettings::View::pointSize() const
 void EditorSettings::View::setPointSize(float size)
 {
     pointSize_ = size;
+}
+
+bool EditorSettings::View::isFogEnabled() const
+{
+    return fogEnabled_;
+}
+
+void EditorSettings::View::setFogEnabled(bool b)
+{
+    fogEnabled_ = b;
+}
+
+void EditorSettings::View::setColorSource(float r, float g, float b)
+{
+    colorSource_[0] = r;
+    colorSource_[1] = g;
+    colorSource_[2] = b;
 }
 
 size_t EditorSettings::View::colorSourceSize() const
