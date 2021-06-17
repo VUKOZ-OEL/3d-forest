@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file EditorCache.cpp
-*/
+/** @file EditorCache.cpp */
 
 #include <EditorBase.hpp>
 #include <EditorCache.hpp>
@@ -46,7 +44,8 @@ void EditorCache::reload()
     for (auto &it : cache_)
     {
         it.second->view.resetFrame();
-        it.second->loaded = false;
+        it.second->filtered = false;
+        // it.second->loaded = false;
     }
 }
 
@@ -57,6 +56,13 @@ bool EditorCache::loadStep()
         if (!lru_[i]->loaded)
         {
             load(i);
+            editor_->applyFilters(lru_[i].get());
+            return false;
+        }
+
+        if (!lru_[i]->filtered)
+        {
+            lru_[i]->filter(editor_);
             editor_->applyFilters(lru_[i].get());
             return false;
         }
@@ -89,9 +95,9 @@ void EditorCache::load(size_t idx)
 
 void EditorCache::updateCamera(const Camera &camera)
 {
-    double eyeX = camera.eye.x();
-    double eyeY = camera.eye.y();
-    double eyeZ = camera.eye.z();
+    double eyeX = camera.eye[0];
+    double eyeY = camera.eye[1];
+    double eyeZ = camera.eye[2];
 
     std::vector<std::shared_ptr<EditorTile>> viewPrev;
     viewPrev = lru_;

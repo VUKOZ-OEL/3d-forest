@@ -1,0 +1,162 @@
+/*
+    Copyright 2020 VUKOZ
+
+    This file is part of 3D Forest.
+
+    3D Forest is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    3D Forest is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+/** @page cheatsheet Cheat Sheet
+
+- @subpage cheatsheet_git
+- @subpage cheatsheet_cmake
+- @subpage cheatsheet_doxygen
+
+*******************************************************************************/
+
+/** @page cheatsheet_git Git
+
+- Create your branch in GitHub if you like to make some changes:
+  -# Open web page 'https://github.com/VUKOZ-OEL/3D-Forest_1.0'.
+  -# Click on 'main' button.
+  -# In 'Switch branches/tags' popup window:
+    -# Select field 'Filter branches/tags':
+    -# Type a name of your_branch.
+    -# Hit enter.
+
+- Get the source code:
+  @verbatim
+  git clone https://github.com/VUKOZ-OEL/3D-Forest_1.0.git
+  @endverbatim
+
+- Switch to your branch if you like to make some changes:
+  @verbatim
+  git checkout your_branch
+  @endverbatim
+
+- Merging 'main' into your branch is required before making contribution from
+  your branch. Merging from 'main' may result to some unfortunate merge
+  conflicts which are resolved manually.
+  @verbatim
+  # Checking latest changes in 'main'
+  git checkout main
+  git fetch
+  git pull
+
+  # Merging your_branch into 'main'
+  git checkout your_branch
+  git merge --no-ff -m "Merge branch 'main' into your_branch" main
+  @endverbatim
+
+- Merging your branch into 'main', contribution: (Pull requests later.)
+  @verbatim
+  git checkout main
+  git merge --no-ff -m "Merge branch 'your_branch' into main" your_branch
+  git push
+  @endverbatim
+
+- Common download sequence:
+  @verbatim
+  git checkout <branch>
+  git fetch
+  git pull
+  @endverbatim
+
+- Common upload/backup of your local changes to GitHub:
+  @verbatim
+  git branch
+  git status
+  git add <path>
+  git add --all
+  git commit -m "Added feature x"
+  git push
+  @endverbatim
+
+*******************************************************************************/
+
+/** @page cheatsheet_cmake CMake
+
+Example build script executed from directory build:
+@verbatim
+cmake -G "MinGW Makefiles" .. -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug -DBUILD_EXAMPLES=ON
+mingw32-make format
+mingw32-make
+mingw32-make install
+@endverbatim
+
+*******************************************************************************/
+
+/** @page cheatsheet_doxygen Doxygen
+
+Example command to generate documentation:
+@verbatim
+mingw32-make doxygen
+@endverbatim
+
+Your favorite syntax of documentation comments.
+
+Suggestions:
+@verbatim
+/** First paragraph is automatically brief
+
+    <detail description>
+
+    @todo Documentation is not complete.
+*/
+
+int value; /**< field description, after */
+
+/** Link to function foo() */
+/** Link to parameter @e value */
+void foo(value);
+
+[in], [out], [in,out] for parameters:
+/** @param [in] milliseconds sleep until milliseconds have elapsed. */
+void msleep(long milliseconds);
+
+Group 'Point Data' creates hierarchy in generated output:
+    /** @name Point Data */
+    /**@{*/
+
+    /** Point coordinates. */
+    std::vector<double> xyz;
+
+    /** Pulse return magnitude. */
+    std::vector<float> intensity;
+
+    /**@}*/
+
+Examples:
+/** JSON.
+
+@example
+    Json obj;
+    obj["name"] = "John";
+    std::cout << obj << "\n"; // Output: {"name":"John"}
+@endexample
+*/
+
+/**
+    @section
+    @subsection
+*/
+
+/** @file Window.hpp */
+/** @class Window.cpp::Window
+
+    Documenting another file.
+*/
+@endverbatim
+
+*******************************************************************************/

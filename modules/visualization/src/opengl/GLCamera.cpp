@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file GLCamera.cpp
-*/
+/** @file GLCamera.cpp */
 
 #include <GLCamera.hpp>
 #include <QDebug>

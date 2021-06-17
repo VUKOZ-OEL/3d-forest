@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file EditorDataSet.hpp
-*/
+/** @file EditorDataSet.hpp */
 
 #ifndef EDITOR_DATA_SET_HPP
 #define EDITOR_DATA_SET_HPP

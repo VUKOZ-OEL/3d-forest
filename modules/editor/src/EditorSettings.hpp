@@ -17,13 +17,12 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file EditorSettings.hpp
-*/
+/** @file EditorSettings.hpp */
 
 #ifndef EDITOR_SETTINGS_HPP
 #define EDITOR_SETTINGS_HPP
 
+#include <Vector3.hpp>
 #include <string>
 #include <vector>
 
@@ -49,6 +48,15 @@ public:
         float pointSize() const;
         void setPointSize(float size);
 
+        bool isFogEnabled() const;
+        void setFogEnabled(bool b);
+
+        void setPointColor(float r, float g, float b);
+        const Vector3<float> &pointColor() const { return pointColor_; }
+        float pointColorRed() const { return pointColor_[0]; }
+        float pointColorGreen() const { return pointColor_[1]; }
+        float pointColorBlue() const { return pointColor_[2]; }
+
         size_t colorSourceSize() const;
         const char *colorSourceString(size_t id) const;
         bool isColorSourceEnabled(size_t id) const;
@@ -56,6 +64,8 @@ public:
 
     protected:
         float pointSize_;
+        bool fogEnabled_;
+        Vector3<float> pointColor_;
         std::vector<std::string> colorSourceString_;
         std::vector<bool> colorSourceEnabled_;
     };

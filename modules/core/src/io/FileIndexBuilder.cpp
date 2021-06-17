@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file FileIndexBuilder.cpp
-*/
+/** @file FileIndexBuilder.cpp */
 
 #include <FileIndexBuilder.hpp>
 #include <Vector3.hpp>
@@ -28,6 +26,7 @@
 
 FileIndexBuilder::Settings::Settings()
 {
+    verbose = false;
     randomize = false;
 
     maxSize1 = 100000;
@@ -38,7 +37,7 @@ FileIndexBuilder::Settings::Settings()
     maxLevel2 = 5;
     // maxLevel2 = 2;
 
-    bufferSize = 1024 * 1024;
+    bufferSize = 5 * 1024 * 1024;
 }
 
 FileIndexBuilder::Settings::~Settings()
@@ -67,27 +66,36 @@ void FileIndexBuilder::index(const std::string &outputPath,
 {
     char buffer[80];
     FileIndexBuilder builder;
+
     builder.start(outputPath, inputPath, settings);
+
     while (!builder.end())
     {
         builder.next();
 
-        std::snprintf(buffer, sizeof(buffer), "%6.2f %%", builder.percent());
-        std::cout << "\r" << buffer << std::flush;
+        if (settings.verbose)
+        {
+            std::snprintf(buffer, sizeof(buffer), "%6.2f%%", builder.percent());
+            std::cout << "\r" << buffer << std::flush;
+        }
     }
-    std::cout << std::endl;
+
+    if (settings.verbose)
+    {
+        std::cout << std::endl;
+    }
 }
 
 double FileIndexBuilder::percent() const
 {
     if (maximumTotal_ == 0)
     {
-        return 100.;
+        return 100.0;
     }
     else
     {
-        return 100. * (static_cast<double>(valueTotal_) /
-                       static_cast<double>(maximumTotal_));
+        return 100.0 * (static_cast<double>(valueTotal_) /
+                        static_cast<double>(maximumTotal_));
     }
 }
 
@@ -427,7 +435,8 @@ void FileIndexBuilder::stateRandomize()
     uint64_t remainIdx;
     uint64_t stepIdx;
 
-    stepIdx = buffer_.size() / sizePoint_;
+    // stepIdx = buffer_.size() / sizePoint_;
+    stepIdx = 10000; /**< @todo Rewrite function stateRandomize. */
     remainIdx = maximumIdx_ - valueIdx_;
     if (remainIdx < stepIdx)
     {

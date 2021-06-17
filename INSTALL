@@ -7,10 +7,16 @@ This document describes how to build, edit and debug 3D Forest.
 Build Prerequisites
 ===================
 
-Qt 5 and opengl for gui application.
+The code uses C++17 and CMake.
+Qt5 and OpenGL are required for GUI application.
 
 Downloading and installation of other 3rd party libraries is not required.
 3rd party libraries are included in "3rdparty" directory.
+
+
+CMake options
+=============
+-DBUILD_EXAMPLES=ON    - Build all examples.
 
 
 Build Using "Unix Makefiles" on Windows

@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file EditorBase.hpp
-*/
+/** @file EditorBase.hpp */
 
 #ifndef EDITOR_BASE_HPP
 #define EDITOR_BASE_HPP
@@ -103,6 +101,7 @@ protected:
     Aabb<double> boundary_;
     Aabb<double> boundaryView_;
 
+    size_t freeDataSetId() const;
     void openUpdate();
     void updateBoundary();
 

@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file Error.cpp
-*/
+/** @file Error.cpp */
 
 #include <Error.hpp>
 #include <cerrno>

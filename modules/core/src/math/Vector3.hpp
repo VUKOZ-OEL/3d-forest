@@ -17,44 +17,36 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file Vector3.hpp
-*/
+/** @file Vector3.hpp */
 
 #ifndef VECTOR3_HPP
 #define VECTOR3_HPP
 
+#include <array>
 #include <cmath>
+#include <iostream>
 #include <limits>
 
 /** Vector 3D. */
-template <class T> class Vector3
+template <class T> class Vector3 : public std::array<T, 3>
 {
 public:
     Vector3();
-    Vector3(const Vector3<T> &v) = default;
-    Vector3(T x, T y, T z);
+    Vector3(T v0, T v1, T v2);
     template <class B> Vector3(const Vector3<B> &v);
-    ~Vector3();
-    Vector3<T> &operator=(const Vector3<T> &v) = default;
+    template <class B> Vector3<T> &operator=(const Vector3<B> &v);
 
-    template <class B> void set(B x, B y, B z);
+    template <class B> void set(B v0, B v1, B v2);
 
-    const T &operator()(size_t idx) const { return data_[idx]; }
-    T &operator()(size_t idx) { return data_[idx]; }
-    const T &operator[](size_t idx) const { return data_[idx]; }
-    T &operator[](size_t idx) { return data_[idx]; }
-    const T *data() const { return &data_[0]; };
-    T x() const { return data_[0]; };
-    T y() const { return data_[1]; };
-    T z() const { return data_[2]; };
+    void clear();
 
+    T length() const;
     T min() const;
     T max() const;
 
-    T length() const;
     void normalize();
     Vector3<T> normalized() const;
+
     Vector3<T> crossProduct(const Vector3<T> &v) const;
     static Vector3<T> crossProduct(const Vector3<T> &a, const Vector3<T> &b)
     {
@@ -65,91 +57,106 @@ public:
 
     friend Vector3<T> operator+(const Vector3<T> &a, const Vector3<T> &b)
     {
-        return Vector3<T>(a(0) + b(0), a(1) + b(1), a(2) + b(2));
+        return Vector3<T>(a[0] + b[0], a[1] + b[1], a[2] + b[2]);
     }
 
     friend Vector3<T> operator-(const Vector3<T> &a, const Vector3<T> &b)
     {
-        return Vector3<T>(a(0) - b(0), a(1) - b(1), a(2) - b(2));
+        return Vector3<T>(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
     }
 
     friend Vector3<T> operator*(const Vector3<T> &a, T b)
     {
-        return Vector3<T>(a(0) * b, a(1) * b, a(2) * b);
+        return Vector3<T>(a[0] * b, a[1] * b, a[2] * b);
     }
 
     friend Vector3<T> operator*(T a, const Vector3<T> &b)
     {
-        return Vector3<T>(a * b(0), a * b(1), a * b(2));
+        return Vector3<T>(a * b[0], a * b[1], a * b[2]);
     }
 
     friend Vector3<T> operator*(const Vector3<T> &a, const Vector3<T> &b)
     {
-        return Vector3<T>(a(0) * b(0), a(1) * b(1), a(2) * b(2));
+        return Vector3<T>(a[0] * b[0], a[1] * b[1], a[2] * b[2]);
     }
 
     friend Vector3<T> operator/(const Vector3<T> &a, T b)
     {
-        return Vector3<T>(a(0) / b, a(1) / b, a(2) / b);
+        return Vector3<T>(a[0] / b, a[1] / b, a[2] / b);
     }
 
     friend Vector3<T> operator/(const Vector3<T> &a, const Vector3<T> &b)
     {
-        return Vector3<T>(a(0) / b(0), a(1) / b(1), a(2) / b(2));
+        return Vector3<T>(a[0] / b[0], a[1] / b[1], a[2] / b[2]);
     }
-
-protected:
-    T data_[3];
 };
 
 template <class T> inline Vector3<T>::Vector3()
 {
-    data_[0] = data_[1] = data_[2] = 0;
+    clear();
 }
 
-template <class T> inline Vector3<T>::~Vector3()
+template <class T> inline Vector3<T>::Vector3(T v0, T v1, T v2)
 {
-}
-
-template <class T> inline Vector3<T>::Vector3(T x, T y, T z)
-{
-    data_[0] = x;
-    data_[1] = y;
-    data_[2] = z;
+    this->operator[](0) = v0;
+    this->operator[](1) = v1;
+    this->operator[](2) = v2;
 }
 
 template <class T>
 template <class B>
-inline Vector3<T>::Vector3(const Vector3<B> &v)
+inline Vector3<T> &Vector3<T>::operator=(const Vector3<B> &v)
 {
-    data_[0] = static_cast<T>(v(0));
-    data_[1] = static_cast<T>(v(1));
-    data_[2] = static_cast<T>(v(2));
+    this->operator[](0) = static_cast<T>(v[0]);
+    this->operator[](1) = static_cast<T>(v[1]);
+    this->operator[](2) = static_cast<T>(v[2]);
+    return *this;
 }
 
-template <class T> template <class B> inline void Vector3<T>::set(B x, B y, B z)
+template <class T>
+template <class B>
+inline void Vector3<T>::set(B v0, B v1, B v2)
 {
-    data_[0] = static_cast<T>(x);
-    data_[1] = static_cast<T>(y);
-    data_[2] = static_cast<T>(z);
+    this->operator[](0) = static_cast<T>(v0);
+    this->operator[](1) = static_cast<T>(v1);
+    this->operator[](2) = static_cast<T>(v2);
+}
+
+template <class T> inline void Vector3<T>::clear()
+{
+    this->operator[](0) = 0;
+    this->operator[](1) = 0;
+    this->operator[](2) = 0;
 }
 
 template <class T> inline T Vector3<T>::min() const
 {
-    return data_[0] < data_[1] ? (data_[0] < data_[2] ? data_[0] : data_[2])
-                               : (data_[1] < data_[2] ? data_[1] : data_[2]);
+    return this->operator[](0) < this->operator[](1)
+               ? (this->operator[](0) < this->operator[](2)
+                      ? this->operator[](0)
+                      : this->operator[](2))
+               : (this->operator[](1) < this->operator[](2)
+                      ? this->operator[](1)
+                      : this->operator[](2));
 }
 
 template <class T> inline T Vector3<T>::max() const
 {
-    return data_[0] > data_[1] ? (data_[0] > data_[2] ? data_[0] : data_[2])
-                               : (data_[1] > data_[2] ? data_[1] : data_[2]);
+    return this->operator[](0) > this->operator[](1)
+               ? (this->operator[](0) > this->operator[](2)
+                      ? this->operator[](0)
+                      : this->operator[](2))
+               : (this->operator[](1) > this->operator[](2)
+                      ? this->operator[](1)
+                      : this->operator[](2));
 }
 
 template <class T> inline T Vector3<T>::length() const
 {
-    return static_cast<T>(std::sqrt(
-        (data_[0] * data_[0]) + (data_[1] * data_[1]) + (data_[2] * data_[2])));
+    return static_cast<T>(
+        std::sqrt((this->operator[](0) * this->operator[](0)) +
+                  (this->operator[](1) * this->operator[](1)) +
+                  (this->operator[](2) * this->operator[](2))));
 }
 
 template <class T> inline void Vector3<T>::normalize()
@@ -160,9 +167,9 @@ template <class T> inline void Vector3<T>::normalize()
     if (len > e)
     {
         T s = 1 / len;
-        data_[0] *= s;
-        data_[1] *= s;
-        data_[2] *= s;
+        this->operator[](0) *= s;
+        this->operator[](1) *= s;
+        this->operator[](2) *= s;
     }
 }
 
@@ -176,9 +183,9 @@ template <class T> inline Vector3<T> Vector3<T>::normalized() const
 template <class T>
 inline Vector3<T> Vector3<T>::crossProduct(const Vector3<T> &v) const
 {
-    return Vector3<T>(data_[1] * v(2) - data_[2] * v(1),
-                      data_[2] * v(0) - data_[0] * v(2),
-                      data_[0] * v(1) - data_[1] * v(0));
+    return Vector3<T>(this->operator[](1) * v[2] - this->operator[](2) * v[1],
+                      this->operator[](2) * v[0] - this->operator[](0) * v[2],
+                      this->operator[](0) * v[1] - this->operator[](1) * v[0]);
 }
 
 template <class T>
@@ -196,13 +203,22 @@ inline Vector3<T> Vector3<T>::rotated(const Vector3<T> &axis,
     T y2 = yr * yr;
     T z2 = zr * zr;
 
-    return Vector3<T>(
-        data_[0] * (w2 + x2 - y2 - z2) + data_[1] * 2 * (xr * yr + w * zr) +
-            data_[2] * 2 * (xr * zr - w * yr),
-        data_[0] * 2 * (xr * yr - w * zr) + data_[1] * (w2 - x2 + y2 - z2) +
-            data_[2] * 2 * (yr * zr + w * xr),
-        data_[0] * 2 * (xr * zr + w * yr) + data_[1] * 2 * (yr * zr - w * xr) +
-            data_[2] * (w2 - x2 - y2 + z2));
+    return Vector3<T>(this->operator[](0) * (w2 + x2 - y2 - z2) +
+                          this->operator[](1) * 2 * (xr * yr + w * zr) +
+                          this->operator[](2) * 2 * (xr * zr - w * yr),
+                      this->operator[](0) * 2 * (xr * yr - w * zr) +
+                          this->operator[](1) * (w2 - x2 + y2 - z2) +
+                          this->operator[](2) * 2 * (yr * zr + w * xr),
+                      this->operator[](0) * 2 * (xr * zr + w * yr) +
+                          this->operator[](1) * 2 * (yr * zr - w * xr) +
+                          this->operator[](2) * (w2 - x2 - y2 + z2));
+}
+
+template <class T>
+std::ostream &operator<<(std::ostream &os, const Vector3<T> &obj)
+{
+    return os << std::fixed << "{" << obj[0] << ", " << obj[1] << ", " << obj[2]
+              << "}" << std::defaultfloat;
 }
 
 #endif /* VECTOR3_HPP */

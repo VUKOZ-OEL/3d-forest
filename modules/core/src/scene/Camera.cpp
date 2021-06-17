@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file Camera.cpp
-*/
+/** @file Camera.cpp */
 
 #include <Camera.hpp>
 

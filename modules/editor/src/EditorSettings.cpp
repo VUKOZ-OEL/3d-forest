@@ -17,13 +17,14 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file EditorSettings.cpp
-*/
+/** @file EditorSettings.cpp */
 
 #include <EditorSettings.hpp>
 
-EditorSettings::View::View() : pointSize_(1.0F)
+EditorSettings::View::View()
+    : pointSize_(1.0F),
+      fogEnabled_(false),
+      pointColor_(1.0F, 1.0F, 1.0F)
 {
     colorSourceString_ = {
         "Color",
@@ -51,6 +52,21 @@ float EditorSettings::View::pointSize() const
 void EditorSettings::View::setPointSize(float size)
 {
     pointSize_ = size;
+}
+
+bool EditorSettings::View::isFogEnabled() const
+{
+    return fogEnabled_;
+}
+
+void EditorSettings::View::setFogEnabled(bool b)
+{
+    fogEnabled_ = b;
+}
+
+void EditorSettings::View::setPointColor(float r, float g, float b)
+{
+    pointColor_.set(r, g, b);
 }
 
 size_t EditorSettings::View::colorSourceSize() const

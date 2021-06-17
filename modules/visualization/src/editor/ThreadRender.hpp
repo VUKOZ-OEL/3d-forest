@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file ThreadRender.hpp
-*/
+/** @file ThreadRender.hpp */
 
 #ifndef THREAD_RENDER_HPP
 #define THREAD_RENDER_HPP

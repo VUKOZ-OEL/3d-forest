@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file Endian.hpp
-*/
+/** @file Endian.hpp */
 
 #ifndef ENDIAN_HPP
 #define ENDIAN_HPP

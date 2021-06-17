@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file EditorCache.hpp
-*/
+/** @file EditorCache.hpp */
 
 #ifndef EDITOR_CACHE_HPP
 #define EDITOR_CACHE_HPP
@@ -40,6 +38,7 @@ public:
     void reload();
     bool loadStep();
     void updateCamera(const Camera &camera);
+    void resetRendering();
 
     size_t tileSize() const { return lru_.size(); }
     EditorTile &tile(size_t index) { return *lru_[index]; }
@@ -62,7 +61,6 @@ protected:
     std::vector<std::shared_ptr<EditorTile>> lru_;
 
     void load(size_t idx);
-    void resetRendering();
 };
 
 #endif /* EDITOR_CACHE_HPP */

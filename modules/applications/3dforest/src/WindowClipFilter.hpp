@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file WindowClipFilter.hpp
-*/
+/** @file WindowClipFilter.hpp */
 
 #ifndef WINDOW_CLIP_FILTER_HPP
 #define WINDOW_CLIP_FILTER_HPP

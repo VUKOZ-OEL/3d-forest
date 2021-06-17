@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file WindowViewports.hpp
-*/
+/** @file WindowViewports.hpp */
 
 #ifndef WINDOW_VIEWPORTS_HPP
 #define WINDOW_VIEWPORTS_HPP

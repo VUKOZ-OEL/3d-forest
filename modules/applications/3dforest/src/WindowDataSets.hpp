@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file WindowDataSets.hpp
-*/
+/** @file WindowDataSets.hpp */
 
 #ifndef WINDOW_DATA_SETS_HPP
 #define WINDOW_DATA_SETS_HPP

@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file PluginTool.hpp
-*/
+/** @file PluginTool.hpp */
 
 #ifndef PLUGIN_TOOL_HPP
 #define PLUGIN_TOOL_HPP

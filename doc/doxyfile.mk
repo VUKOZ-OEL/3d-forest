@@ -80,7 +80,7 @@ PROJECT_NUMBER         = 1.0
 #
 # newflag
 
-# PROJECT_LOGO           =
+PROJECT_LOGO       = ../modules/applications/3dforest/resources/3dforest-48.png
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) path
 # into which the generated documentation will be written. If a relative path is
@@ -176,7 +176,7 @@ INLINE_INHERITED_MEMB  = NO
 # shortest path that makes the file name unique will be used
 # The default value is: YES.
 
-FULL_PATH_NAMES        = YES
+FULL_PATH_NAMES        = NO
 
 # The STRIP_FROM_PATH tag can be used to strip a user-defined part of the path.
 # Stripping is only done if one of the specified strings matches the left-hand
@@ -706,7 +706,7 @@ SHOW_USED_FILES        = YES
 # myorig SHOW_DIRECTORIES       = YES
 #        SHOW_FILES             = YES
 
-SHOW_FILES             = NO
+SHOW_FILES             = YES
 
 # Set the SHOW_NAMESPACES tag to NO to disable the generation of the Namespaces
 # page. This will remove the Namespaces entry from the Quick Index and from the
@@ -820,7 +820,9 @@ WARN_LOGFILE           =
 # spaces.
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = ../modules
+INPUT                  = ../doc/manual \
+                         ../modules \
+                         ../examples
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -878,7 +880,8 @@ FILE_PATTERNS          = *.c \
                          *.PHP \
                          *.PHP3 \
                          *.M \
-                         *.MM
+                         *.MM \
+                         *.txt
 
 # The RECURSIVE tag can be used to specify whether or not subdirectories should
 # be searched for input files as well.
@@ -950,7 +953,7 @@ EXAMPLE_RECURSIVE      = NO
 # that contain images that are to be included in the documentation (see the
 # \image command).
 
-IMAGE_PATH             =
+IMAGE_PATH             = ../doc/manual/images
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program

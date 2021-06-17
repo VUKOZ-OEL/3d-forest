@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file PluginHeightMap.hpp
-*/
+/** @file PluginHeightMap.hpp */
 
 #ifndef PLUGIN_HEIGHT_MAP_HPP
 #define PLUGIN_HEIGHT_MAP_HPP

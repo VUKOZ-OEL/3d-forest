@@ -17,12 +17,11 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file EditorBase.cpp
-*/
+/** @file EditorBase.cpp */
 
 #include <EditorBase.hpp>
 #include <FileIndexBuilder.hpp>
+#include <unordered_set>
 
 static const char *EDITOR_BASE_KEY_PROJECT_NAME = "projectName";
 static const char *EDITOR_BASE_KEY_DATA_SET = "dataSets";
@@ -142,6 +141,7 @@ void EditorBase::addFile(const std::string &path)
     {
         // Data sets
         std::shared_ptr<EditorDataSet> ds = std::make_shared<EditorDataSet>();
+        ds->id = freeDataSetId();
         ds->read(path, path_);
         dataSets_.push_back(ds);
     }
@@ -151,6 +151,28 @@ void EditorBase::addFile(const std::string &path)
     }
 
     openUpdate();
+    unsavedChanges_ = true;
+}
+
+size_t EditorBase::freeDataSetId() const
+{
+    // Collect all ids
+    std::unordered_set<size_t> hashTable;
+    for (auto &it : dataSets_)
+    {
+        hashTable.insert(it->id);
+    }
+
+    // Return minimum available id value
+    for (size_t rval = 0; rval < std::numeric_limits<size_t>::max(); rval++)
+    {
+        if (hashTable.find(rval) == hashTable.end())
+        {
+            return rval;
+        }
+    }
+
+    THROW("New data set identifier is not available.");
 }
 
 bool EditorBase::hasFileIndex(const std::string &path)
@@ -232,6 +254,12 @@ void EditorBase::applyFilters(EditorTile *tile)
 void EditorBase::setSettingsView(const EditorSettings::View &settings)
 {
     settings_.setView(settings);
+
+    for (auto &it : viewports_)
+    {
+        it->resetRendering();
+    }
+
     // unsavedChanges_ = true;
 }
 
@@ -347,10 +375,12 @@ void EditorBase::openUpdate()
 {
     updateBoundary();
 
-    if (clipFilter_.box.empty())
-    {
-        clipFilter_.box = boundary_;
-    }
+    // if (clipFilter_.box.empty())
+    // {
+    //     clipFilter_.box = boundary_;
+    // }
+    clipFilter_.box = boundary_;
+    clipFilter_.boxView = boundaryView_;
 }
 
 void EditorBase::updateBoundary()

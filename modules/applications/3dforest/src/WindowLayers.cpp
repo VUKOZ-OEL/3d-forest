@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file WindowLayers.cpp
-*/
+/** @file WindowLayers.cpp */
 
 #include <Editor.hpp>
 #include <EditorLayer.hpp>

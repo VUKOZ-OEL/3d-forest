@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file Aabb.hpp
-*/
+/** @file Aabb.hpp */
 
 #ifndef AABB_HPP
 #define AABB_HPP

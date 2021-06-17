@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file FileChunk.cpp
-*/
+/** @file FileChunk.cpp */
 
 #include <Endian.hpp>
 #include <Error.hpp>

@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file GLWidget.hpp
-*/
+/** @file GLWidget.hpp */
 
 #ifndef GL_WIDGET_HPP
 #define GL_WIDGET_HPP
@@ -87,6 +85,8 @@ protected:
     void resetCamera();
     void clearScreen();
     void renderScene();
+    void renderSceneSettingsEnable();
+    void renderSceneSettingsDisable();
     void cameraChanged();
     void setFocus();
     void setViewDirection(const QVector3D &dir, const QVector3D &up);

@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file FileIndexBuilder.hpp
-*/
+/** @file FileIndexBuilder.hpp */
 
 #ifndef FILE_INDEX_BUILDER_HPP
 #define FILE_INDEX_BUILDER_HPP
@@ -39,6 +37,7 @@ public:
     class Settings
     {
     public:
+        bool verbose;
         bool randomize;
 
         size_t maxSize1;

@@ -17,13 +17,11 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file FileLas.cpp
-*/
+/** @file FileLas.cpp */
 
+#include <Aabb.hpp>
 #include <Endian.hpp>
 #include <Error.hpp>
-#include <FileIndexBuilder.hpp>
 #include <FileLas.hpp>
 #include <cstdio>
 #include <cstring>
@@ -232,12 +230,6 @@ void FileLas::create(const std::string &path,
     }
 
     las.close();
-
-    // Create file index
-    FileIndexBuilder::Settings settings;
-    settings.maxSize1 = 2;
-    settings.maxSize2 = 1;
-    FileIndexBuilder::index(path, path, settings);
 }
 
 void FileLas::open(const std::string &path)
@@ -810,3 +802,108 @@ std::ostream &operator<<(std::ostream &os, const FileLas::Point &obj)
     os << obj.write(json).serialize();
     return os;
 }
+
+/*
+    point_data_record_format:
+
+    - 0 to 5
+        - x
+        - y
+        - z
+        - intensity
+        - return_number       : 3 bits
+        - number_of_returns   : 3 bits
+        - scan_direction_flag : 1 bit
+        - edge_of_flight_line : 1 bit
+        - classification      : 3 bits classification_flags, 5 bits class
+        - angle               : 8 bits (-90 to +90)
+        - user_data
+        - source_id
+
+    - 1
+        - gps_time
+
+    - 2
+        - red
+        - green
+        - blue
+
+    - 3
+        - gps_time
+        - red
+        - green
+        - blue
+
+    - 4
+        - gps_time
+        - wave_index
+        - wave_offset
+        - wave_size
+        - wave_return
+        - wave_x
+        - wave_y
+        - wave_z
+
+    - 5
+        - gps_time
+        - red
+        - green
+        - blue
+        - wave_index
+        - wave_offset
+        - wave_size
+        - wave_return
+        - wave_x
+        - wave_y
+        - wave_z
+
+    - 6 to 10
+        - x
+        - y
+        - z
+        - intensity
+        - return_number        : 4 bits (new 1 bit)
+        - number_of_returns    : 4 bits (new 1 bit)
+        - classification_flags : 4 bits (new)
+        - scanner_channel      : 2 bits (new)
+        - scan_direction_flag  : 1 bit
+        - edge_of_flight_line  : 1 bit
+        - classification       : 8 bits class (new 3 bits)
+        - angle                : 16 bits (new 8 bits, by 0.006 degrees)
+        - user_data
+        - source_id
+        - gps_time
+
+    - 7
+        - red
+        - green
+        - blue
+
+    - 8
+        - red
+        - green
+        - blue
+        - nir
+
+    - 9
+        - wave_index
+        - wave_offset
+        - wave_size
+        - wave_return
+        - wave_x
+        - wave_y
+        - wave_z
+
+    - 10
+        - red
+        - green
+        - blue
+        - nir
+        - wave_index
+        - wave_offset
+        - wave_size
+        - wave_return
+        - wave_x
+        - wave_y
+        - wave_z
+*/

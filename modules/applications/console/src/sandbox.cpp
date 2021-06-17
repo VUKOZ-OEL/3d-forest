@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file sandbox.cpp
-*/
+/** @file sandbox.cpp */
 
 #include <EditorBase.hpp>
 #include <File.hpp>

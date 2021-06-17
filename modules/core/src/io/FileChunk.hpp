@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file FileChunk.hpp
-*/
+/** @file FileChunk.hpp */
 
 #ifndef FILE_CHUNK_HPP
 #define FILE_CHUNK_HPP

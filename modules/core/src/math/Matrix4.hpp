@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file Matrix4.hpp
-*/
+/** @file Matrix4.hpp */
 
 #ifndef MATRIX4_HPP
 #define MATRIX4_HPP
@@ -445,9 +443,9 @@ void Matrix4<T>::lookAt(const Vector3<T> &eye,
     data_[1][1] = u(1);
     data_[2][1] = u(2);
     data_[3][1] = data_[0][1] * x + data_[1][1] * y + data_[2][1] * z;
-    data_[0][2] = -v(0);
-    data_[1][2] = -v(1);
-    data_[2][2] = -v(2);
+    data_[0][2] = -v[0];
+    data_[1][2] = -v[1];
+    data_[2][2] = -v[2];
     data_[3][2] = data_[0][2] * x + data_[1][2] * y + data_[2][2] * z;
     data_[0][3] = 0;
     data_[1][3] = 0;
@@ -457,16 +455,16 @@ void Matrix4<T>::lookAt(const Vector3<T> &eye,
 
 template <class T> Vector3<T> Matrix4<T>::map(const Vector3<T> &v)
 {
-    T x = data_[0][0] * v(0) + data_[1][0] * v(1) + data_[2][0] * v(2) +
+    T x = data_[0][0] * v[0] + data_[1][0] * v[1] + data_[2][0] * v[2] +
           data_[3][0];
 
-    T y = data_[0][1] * v(0) + data_[1][1] * v(1) + data_[2][1] * v(2) +
+    T y = data_[0][1] * v[0] + data_[1][1] * v[1] + data_[2][1] * v[2] +
           data_[3][1];
 
-    T z = data_[0][2] * v(0) + data_[1][2] * v(1) + data_[2][2] * v(2) +
+    T z = data_[0][2] * v[0] + data_[1][2] * v[1] + data_[2][2] * v[2] +
           data_[3][2];
 
-    T w = data_[0][3] * v(0) + data_[1][3] * v(1) + data_[2][3] * v(2) +
+    T w = data_[0][3] * v[0] + data_[1][3] * v[1] + data_[2][3] * v[2] +
           data_[3][3];
 
     constexpr T e = std::numeric_limits<T>::epsilon();
@@ -483,9 +481,9 @@ template <class T> Vector3<T> Matrix4<T>::map(const Vector3<T> &v)
 template <class T> Vector3<T> Matrix4<T>::mapVector(const Vector3<T> &v)
 {
     return Vector3<T>(
-        data_[0][0] * v(0) + data_[1][0] * v(1) + data_[2][0] * v(2),
-        data_[0][1] * v(0) + data_[1][1] * v(1) + data_[2][1] * v(2),
-        data_[0][2] * v(0) + data_[1][2] * v(1) + data_[2][2] * v(2));
+        data_[0][0] * v[0] + data_[1][0] * v[1] + data_[2][0] * v[2],
+        data_[0][1] * v[0] + data_[1][1] * v[1] + data_[2][1] * v[2],
+        data_[0][2] * v[0] + data_[1][2] * v[1] + data_[2][2] * v[2]);
 }
 
 template <class T> void Matrix4<T>::multiply(T &x, T &y, T &z, T &w)
@@ -507,9 +505,9 @@ template <class T> void Matrix4<T>::multiply(T &x, T &y, T &z, T &w)
 
 template <class T> Vector3<T> Matrix4<T>::project(const Vector3<T> &v)
 {
-    T x = v.x();
-    T y = v.y();
-    T z = v.z();
+    T x = v[0];
+    T y = v[1];
+    T z = v[2];
     T w = 1;
 
     multiply(x, y, z, w);
@@ -530,9 +528,9 @@ template <class T> Vector3<T> Matrix4<T>::project(const Vector3<T> &v)
 
 template <class T> Vector3<T> Matrix4<T>::unproject(const Vector3<T> &v)
 {
-    T x = v.x() * 2 - 1;
-    T y = v.y() * 2 - 1;
-    T z = v.z() * 2 - 1;
+    T x = v[0] * 2 - 1;
+    T y = v[1] * 2 - 1;
+    T z = v[2] * 2 - 1;
     T w = 1;
 
     multiply(x, y, z, w);

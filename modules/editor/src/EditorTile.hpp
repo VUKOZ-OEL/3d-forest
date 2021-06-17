@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file EditorTile.hpp
-*/
+/** @file EditorTile.hpp */
 
 #ifndef EDITOR_TILE_HPP
 #define EDITOR_TILE_HPP
@@ -97,6 +95,7 @@ public:
 
     // State
     bool loaded;
+    bool filtered;
     bool modified;
 
     /** Editor Tile Visualization. */
@@ -127,10 +126,11 @@ public:
     ~EditorTile();
 
     void read(const EditorBase *editor);
+    void filter(const EditorBase *editor);
 
 protected:
     void readFilter(const EditorBase *editor);
-    void setColorSource(const EditorBase *editor);
+    void setPointColor(const EditorBase *editor);
     void setColor(size_t idx, int value, int max, uint8_t *pal);
 };
 

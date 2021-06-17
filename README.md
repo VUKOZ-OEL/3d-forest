@@ -1,11 +1,11 @@
 # 3D Forest
-**3D Forest** is software for analysis of Lidar data from forest environment.
+3D Forest is software for analysis of Lidar data from forest environment.
 
 Copyright 2020-2021 VUKOZ
 Blue Cat team and other authors
 
 ## License
-**3D Forest** is released under the GPLv3 license.
+3D Forest is released under the GPLv3 license.
 See [LICENSE](LICENSE) for more information.
 
 ## Installation Instructions
@@ -34,7 +34,7 @@ README.md          - Project summary.
 bin/               - 3D Forest binaries. CMake install destination directory.
 build/             - CMake build directory.
 cmake/             - CMake settings.
+doc/               - Documentation.
 examples/          - Project and source code examples.
 modules/           - Source code.
-tools/             - Additional files for build tools.
 ```

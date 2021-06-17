@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file WindowMain.cpp
-*/
+/** @file WindowMain.cpp */
 
 #include <FileIndexBuilder.hpp>
 #include <PluginFile.hpp>
@@ -32,6 +30,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPluginLoader>
+#include <QProgressBar>
 #include <QProgressDialog>
 #include <QTextEdit>
 #include <Time.hpp>
@@ -226,7 +225,7 @@ void WindowMain::createWindows()
             this,
             SLOT(actionSettingsView()));
     connect(windowSettingsView_,
-            SIGNAL(settingsColorChanged()),
+            SIGNAL(settingsChangedApply()),
             this,
             SLOT(actionSettingsViewColor()));
 
@@ -733,50 +732,56 @@ bool WindowMain::projectOpenFile(const QString &path)
 
 bool WindowMain::projectCreateIndex(const QString &path)
 {
+    // If the index already exists, then return success.
     const std::string pathStd = path.toStdString();
     if (editor_.hasFileIndex(pathStd))
     {
-        qDebug() << "File" << path << "has index.";
         return true;
     }
 
+    // Create modal progress dialog with custom progress bar.
+    // Custom progress bar allows to display percentage with fractional part.
+    QProgressDialog progressDialog(this);
+    progressDialog.setWindowTitle(tr("Create Index"));
+    progressDialog.setWindowModality(Qt::WindowModal);
+    progressDialog.setCancelButtonText(tr("&Cancel"));
+    progressDialog.setMinimumDuration(100);
+
+    QProgressBar *progressBar = new QProgressBar(&progressDialog);
+    progressBar->setTextVisible(false);
+    progressBar->setRange(0, 100);
+    progressBar->setValue(progressBar->minimum());
+    progressDialog.setBar(progressBar);
+
+    // Initialize index builder.
     FileIndexBuilder::Settings settings;
-    // settings.randomize = true;
+    settings.randomize = true;
 
-    qDebug() << "Create index for file" << path;
-
-    char buffer[80];
     FileIndexBuilder builder;
     builder.start(pathStd, pathStd, settings);
 
-    QProgressDialog progressDialog(this);
-    progressDialog.setCancelButtonText(QObject::tr("&Cancel"));
-    progressDialog.setRange(0, 100);
-    progressDialog.setWindowTitle(QObject::tr("Create Index"));
-    progressDialog.setWindowModality(Qt::WindowModal);
-    progressDialog.setMinimumDuration(100);
+    char buffer[80];
 
+    // Do the operation in a loop.
     while (!builder.end())
     {
-        // Update progress
-        double value = builder.percent();
-        progressDialog.setValue(static_cast<int>(value));
-        std::snprintf(buffer, sizeof(buffer), "Processing %6.2f %%", value);
-        progressDialog.setLabelText(buffer);
+        // Update progress. The first step value is 1 in Qt.
+        double value = 1.0 + 99.0 * builder.percent();
+        std::snprintf(buffer, sizeof(buffer), "Processing... %6.2f %%", value);
 
-        QCoreApplication::processEvents();
+        progressDialog.setValue(static_cast<int>(value));
+        progressDialog.setLabelText(buffer);
 
         if (progressDialog.wasCanceled())
         {
-            qDebug() << "Create index canceled.";
             return false;
         }
 
-        // Step
+        // Process several bytes of the operation.
         builder.next();
     }
 
-    qDebug() << "Index is complete.";
+    progressDialog.setValue(progressDialog.maximum());
 
     return true;
 }
