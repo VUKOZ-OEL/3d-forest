@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file WindowSettingsView.hpp
-*/
+/** @file WindowSettingsView.hpp */
 
 #ifndef WINDOW_SETTINGS_VIEW_HPP
 #define WINDOW_SETTINGS_VIEW_HPP
@@ -46,7 +44,7 @@ public:
     void setSettings(const EditorSettings::View &settings);
 
 public slots:
-    void setColorSource();
+    void setPointColor();
     void setColorSourceEnabled(int v);
     void setPointSize(int v);
     void setFogEnabled(int v);

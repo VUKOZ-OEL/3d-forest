@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file EditorCache.cpp
-*/
+/** @file EditorCache.cpp */
 
 #include <EditorBase.hpp>
 #include <EditorCache.hpp>
@@ -97,9 +95,9 @@ void EditorCache::load(size_t idx)
 
 void EditorCache::updateCamera(const Camera &camera)
 {
-    double eyeX = camera.eye.x();
-    double eyeY = camera.eye.y();
-    double eyeZ = camera.eye.z();
+    double eyeX = camera.eye[0];
+    double eyeY = camera.eye[1];
+    double eyeZ = camera.eye[2];
 
     std::vector<std::shared_ptr<EditorTile>> viewPrev;
     viewPrev = lru_;

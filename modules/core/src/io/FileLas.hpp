@@ -166,7 +166,7 @@ public:
 
     static void create(const std::string &path,
                        const std::vector<FileLas::Point> &points,
-                       const std::array<double, 3> &scale = {0, 0, 0},
+                       const std::array<double, 3> &scale = {1, 1, 1},
                        const std::array<double, 3> &offset = {0, 0, 0});
 
     void open(const std::string &path);

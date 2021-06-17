@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file GLCamera.hpp
-*/
+/** @file GLCamera.hpp */
 
 #ifndef GL_CAMERA_HPP
 #define GL_CAMERA_HPP

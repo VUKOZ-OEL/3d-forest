@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file WindowMain.cpp
-*/
+/** @file WindowMain.cpp */
 
 #include <FileIndexBuilder.hpp>
 #include <PluginFile.hpp>

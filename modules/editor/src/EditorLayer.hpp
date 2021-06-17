@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file EditorLayer.hpp
-*/
+/** @file EditorLayer.hpp */
 
 #ifndef EDITOR_LAYER_HPP
 #define EDITOR_LAYER_HPP

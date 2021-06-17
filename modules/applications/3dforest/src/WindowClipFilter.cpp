@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file WindowClipFilter.cpp
-*/
+/** @file WindowClipFilter.cpp */
 
 #include <Editor.hpp>
 #include <QCheckBox>
@@ -31,7 +29,8 @@
 #include <WindowClipFilter.hpp>
 #include <ctkrangeslider.h>
 
-#define WINDOW_CLIP_FILTER_DECIMALS 8
+// 6 is the number of zero after decimal point in epsilon for float
+#define WINDOW_CLIP_FILTER_DECIMALS 6
 #define WINDOW_CLIP_FILTER_MAX 99
 
 WindowClipFilter::WindowClipFilter(QWidget *parent) : QWidget(parent)

@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file FileIndexBuilder.cpp
-*/
+/** @file FileIndexBuilder.cpp */
 
 #include <FileIndexBuilder.hpp>
 #include <Vector3.hpp>
@@ -28,6 +26,7 @@
 
 FileIndexBuilder::Settings::Settings()
 {
+    verbose = false;
     randomize = false;
 
     maxSize1 = 100000;
@@ -67,15 +66,24 @@ void FileIndexBuilder::index(const std::string &outputPath,
 {
     char buffer[80];
     FileIndexBuilder builder;
+
     builder.start(outputPath, inputPath, settings);
+
     while (!builder.end())
     {
         builder.next();
 
-        std::snprintf(buffer, sizeof(buffer), "%6.2f %%", builder.percent());
-        std::cout << "\r" << buffer << std::flush;
+        if (settings.verbose)
+        {
+            std::snprintf(buffer, sizeof(buffer), "%6.2f%%", builder.percent());
+            std::cout << "\r" << buffer << std::flush;
+        }
     }
-    std::cout << std::endl;
+
+    if (settings.verbose)
+    {
+        std::cout << std::endl;
+    }
 }
 
 double FileIndexBuilder::percent() const

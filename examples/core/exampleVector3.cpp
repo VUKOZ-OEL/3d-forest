@@ -17,28 +17,20 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file PluginFile.hpp */
+/** @file exampleVector3.cpp @brief Vector3 example. */
 
-#ifndef PLUGIN_FILE_HPP
-#define PLUGIN_FILE_HPP
+#include <Vector3.hpp>
 
-#include <QString>
-#include <QtPlugin>
-
-class QWidget;
-class Editor;
-
-/** Plugin File Interface. */
-class PluginFile
+int main()
 {
-public:
-    virtual ~PluginFile() = default;
-    virtual void read(QWidget *parent, Editor *editor) = 0;
-    virtual void write(QWidget *parent, Editor *editor) = 0;
-    virtual QString windowTitle() const = 0; /**< Unique */
-};
+    Vector3<float> v1 { 1, 1, 0};
 
-#define PluginFile_iid "vukoz.3dforest.qt.PluginFile/1.0"
-Q_DECLARE_INTERFACE(PluginFile, PluginFile_iid)
+    std::cout << "v1: " << v1 << "\n";
+    std::cout << "v1.length: " << v1.length() << "\n";
+    std::cout << "v1.max: " << v1.max() << "\n";
+    std::cout << "v1.min: " << v1.min() << "\n";
+    std::cout << "v1.normalized: " << v1.normalized() << "\n";
+    std::cout << "v1 + v1: " << v1 + v1 << "\n";
 
-#endif /* PLUGIN_FILE_HPP */
+    return 0;
+}

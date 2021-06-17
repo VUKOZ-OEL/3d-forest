@@ -27,5 +27,9 @@ include(cmake/cxxflags.cmake)
 
 add_subdirectory(modules)
 
+if (BUILD_EXAMPLES)
+  add_subdirectory(examples)
+endif()
+
 include(cmake/clangformat.cmake)
 include(cmake/doxygen.cmake)

@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file WindowLayers.hpp
-*/
+/** @file WindowLayers.hpp */
 
 #ifndef WINDOW_LAYERS_HPP
 #define WINDOW_LAYERS_HPP

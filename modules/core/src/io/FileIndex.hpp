@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file FileIndex.hpp
-*/
+/** @file FileIndex.hpp */
 
 #ifndef FILE_INDEX_HPP
 #define FILE_INDEX_HPP

@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file Thread.hpp
-*/
+/** @file Thread.hpp */
 
 #ifndef THREAD_HPP
 #define THREAD_HPP

@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file las.cpp
-*/
+/** @file las.cpp */
 
 #include <Aabb.hpp>
 #include <Error.hpp>
@@ -109,11 +107,13 @@ void cmd_select(const char *inputPath, const Aabb<double> &window)
 int main(int argc, char *argv[])
 {
     int command = COMMAND_NONE;
-    FileIndexBuilder::Settings settings;
     double wx1 = 0, wy1 = 0, wz1 = 0, wx2 = 0, wy2 = 0, wz2 = 0;
     Aabb<double> window;
     const char *outputPath = nullptr;
     const char *inputPath = nullptr;
+
+    FileIndexBuilder::Settings settings;
+    settings.verbose = true;
 
     // Parse command line arguments
     for (int opt = 1; opt < argc; opt++)

@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file Editor.cpp
-*/
+/** @file Editor.cpp */
 
 #include <Editor.hpp>
 

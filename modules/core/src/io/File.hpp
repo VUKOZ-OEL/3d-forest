@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file File.hpp
-*/
+/** @file File.hpp */
 
 #ifndef FILE_HPP
 #define FILE_HPP

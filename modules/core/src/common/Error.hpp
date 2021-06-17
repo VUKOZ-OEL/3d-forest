@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file Error.hpp
-*/
+/** @file Error.hpp */
 
 #ifndef ERROR_HPP
 #define ERROR_HPP

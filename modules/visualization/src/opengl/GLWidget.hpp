@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file GLWidget.hpp
-*/
+/** @file GLWidget.hpp */
 
 #ifndef GL_WIDGET_HPP
 #define GL_WIDGET_HPP

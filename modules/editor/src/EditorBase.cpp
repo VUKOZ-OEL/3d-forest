@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file EditorBase.cpp
-*/
+/** @file EditorBase.cpp */
 
 #include <EditorBase.hpp>
 #include <FileIndexBuilder.hpp>

@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file GLAabb.hpp
-*/
+/** @file GLAabb.hpp */
 
 #ifndef GL_AABB_HPP
 #define GL_AABB_HPP

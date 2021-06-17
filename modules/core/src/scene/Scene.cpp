@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file Scene.cpp
-*/
+/** @file Scene.cpp */
 
 #include <Scene.hpp>
 

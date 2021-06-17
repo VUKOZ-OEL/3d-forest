@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file EditorTile.cpp
-*/
+/** @file EditorTile.cpp */
 
 #include <EditorBase.hpp>
 #include <EditorTile.hpp>
@@ -196,7 +194,7 @@ void EditorTile::read(const EditorBase *editor)
 void EditorTile::filter(const EditorBase *editor)
 {
     readFilter(editor);
-    setColorSource(editor);
+    setPointColor(editor);
 
     filtered = true;
 }
@@ -280,12 +278,12 @@ void EditorTile::readFilter(const EditorBase *editor)
     }
 }
 
-void EditorTile::setColorSource(const EditorBase *editor)
+void EditorTile::setPointColor(const EditorBase *editor)
 {
     const EditorSettings::View &opt = editor->settings().view();
-    float r = opt.colorSourceRed();
-    float g = opt.colorSourceGreen();
-    float b = opt.colorSourceBlue();
+    float r = opt.pointColorRed();
+    float g = opt.pointColorGreen();
+    float b = opt.pointColorBlue();
 
     size_t n = intensity.size();
 

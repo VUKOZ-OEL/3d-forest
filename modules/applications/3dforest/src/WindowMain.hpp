@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file WindowMain.hpp
-*/
+/** @file WindowMain.hpp */
 
 #ifndef WINDOW_MAIN_HPP
 #define WINDOW_MAIN_HPP

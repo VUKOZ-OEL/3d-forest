@@ -15,18 +15,16 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-find_package(Doxygen)
+add_executable(exampleVector3 core/exampleVector3.cpp)
+target_link_libraries(exampleVector3 PUBLIC core)
+set_target_properties(
+  exampleVector3
+  PROPERTIES
+  COMPILE_FLAGS
+  "-save-temps -fverbose-asm"
+)
+install(TARGETS exampleVector3 DESTINATION bin)
 
-if(DOXYGEN_FOUND)
-  set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/doc/doxyfile.mk)
-  set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
-
-  configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
-
-  add_custom_target(
-    doxygen
-    COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    COMMENT "Generating API documentation with Doxygen" VERBATIM
-  )
-endif(DOXYGEN_FOUND)
+add_executable(exampleLasCreate core/exampleLasCreate.cpp)
+target_link_libraries(exampleLasCreate PUBLIC core)
+install(TARGETS exampleLasCreate DESTINATION bin)

@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file Json.hpp
-*/
+/** @file Json.hpp */
 
 #ifndef JSON_HPP
 #define JSON_HPP

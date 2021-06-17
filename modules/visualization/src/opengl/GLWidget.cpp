@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file GLWidget.cpp
-*/
+/** @file GLWidget.cpp */
 
 #include <Editor.hpp>
 #include <GL.hpp>

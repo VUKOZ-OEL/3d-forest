@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file EditorDataSet.cpp
-*/
+/** @file EditorDataSet.cpp */
 
 #include <EditorDataSet.hpp>
 #include <Error.hpp>

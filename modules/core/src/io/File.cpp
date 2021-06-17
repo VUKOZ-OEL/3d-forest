@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file File.cpp
-*/
+/** @file File.cpp */
 
 #include <Error.hpp>
 #include <File.hpp>

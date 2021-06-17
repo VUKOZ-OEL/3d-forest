@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file WindowSettingsView.cpp
-*/
+/** @file WindowSettingsView.cpp */
 
 #include <QCheckBox>
 #include <QColorDialog>
@@ -43,10 +41,7 @@ WindowSettingsView::WindowSettingsView(QWidget *parent) : QWidget(parent)
 
     colorSourceButton_ = new QPushButton(tr("Custom color"));
     vbox->addWidget(colorSourceButton_);
-    connect(colorSourceButton_,
-            SIGNAL(clicked()),
-            this,
-            SLOT(setColorSource()));
+    connect(colorSourceButton_, SIGNAL(clicked()), this, SLOT(setPointColor()));
 
     colorSourceCheckBox_.resize(settings_.colorSourceSize());
     for (size_t i = 0; i < colorSourceCheckBox_.size(); i++)
@@ -126,11 +121,11 @@ WindowSettingsView::~WindowSettingsView()
 {
 }
 
-void WindowSettingsView::setColorSource()
+void WindowSettingsView::setPointColor()
 {
-    float r = settings_.colorSourceRed();
-    float g = settings_.colorSourceGreen();
-    float b = settings_.colorSourceBlue();
+    float r = settings_.pointColorRed();
+    float g = settings_.pointColorGreen();
+    float b = settings_.pointColorBlue();
 
     QColor color;
     color.setRgbF(r, g, b);
@@ -145,7 +140,7 @@ void WindowSettingsView::setColorSource()
     r = static_cast<float>(color.redF());
     g = static_cast<float>(color.greenF());
     b = static_cast<float>(color.blueF());
-    settings_.setColorSource(r, g, b);
+    settings_.setPointColor(r, g, b);
 
     emit settingsChangedApply();
 }

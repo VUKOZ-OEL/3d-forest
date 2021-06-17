@@ -17,9 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
-    @file GL.hpp
-*/
+/** @file GL.hpp */
 
 #ifndef GL_HPP
 #define GL_HPP
