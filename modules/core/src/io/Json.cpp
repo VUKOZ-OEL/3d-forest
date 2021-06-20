@@ -21,6 +21,7 @@
 
 #include <File.hpp>
 #include <Json.hpp>
+#include <limits>
 
 void Json::clear()
 {
@@ -146,6 +147,9 @@ void Json::serialize(std::ostringstream &out,
     size_t i = 0;
     size_t n;
     bool container;
+    uint64_t num;
+    double numd;
+    constexpr double e = std::numeric_limits<double>::epsilon();
 
     switch (type_)
     {
@@ -205,7 +209,16 @@ void Json::serialize(std::ostringstream &out,
             break;
 
         case TYPE_NUMBER:
-            out << data_.number;
+            num = static_cast<uint64_t>(data_.number);
+            numd = static_cast<double>(num);
+            if (std::abs(data_.number - numd) > e)
+            {
+                out << std::fixed << data_.number << std::defaultfloat;
+            }
+            else
+            {
+                out << num;
+            }
             break;
 
         case TYPE_TRUE:
