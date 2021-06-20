@@ -37,10 +37,14 @@ add_library(
   ${SUB_PROJECT_NAME}
   SHARED
   ${SOURCES_VISUALIZATION}
-  ../../3rdparty/widgets/ctkrangeslider.cpp
+  ../../3rdparty/widgets/ctkrangeslider/ctkrangeslider.cpp
+  ../../3rdparty/widgets/qtribbonwidget/ribbon.cpp
+  ../../3rdparty/widgets/qtribbonwidget/ribbonbuttongroup.cpp
+  ../../3rdparty/widgets/qtribbonwidget/ribbontabcontent.cpp
 )
 
-target_include_directories(${SUB_PROJECT_NAME} PUBLIC ../../3rdparty/widgets)
+target_include_directories(${SUB_PROJECT_NAME} PUBLIC ../../3rdparty/widgets/ctkrangeslider)
+target_include_directories(${SUB_PROJECT_NAME} PUBLIC ../../3rdparty/widgets/qtribbonwidget)
 target_include_directories(${SUB_PROJECT_NAME} PUBLIC src/editor)
 target_include_directories(${SUB_PROJECT_NAME} PUBLIC src/opengl)
 target_include_directories(${SUB_PROJECT_NAME} PUBLIC src/widgets)
