@@ -27,25 +27,25 @@ static void createBox(const std::string &path)
     // Create points
     std::vector<FileLas::Point> points;
 
-    uint32_t n1 = 3;
-    uint32_t n2 = 4;
-    uint32_t n3 = 10;
-    points.resize(n1 * n2 * n3);
+    uint32_t nx = 3;
+    uint32_t ny = 4;
+    uint32_t nz = 5;
+    points.resize(nx * ny * nz);
 
     // Create points: set all attributes to zero
     std::memset(points.data(), 0, sizeof(FileLas::Point) * points.size());
 
     // Create points: points with resolution 1 point
-    for (uint32_t i1 = 0; i1 < n1; i1++)
+    for (uint32_t z = 0; z < nz; z++)
     {
-        for (uint32_t i2 = 0; i2 < n2; i2++)
+        for (uint32_t y = 0; y < ny; y++)
         {
-            for (uint32_t i3 = 0; i3 < n3; i3++)
+            for (uint32_t x = 0; x < nx; x++)
             {
-                uint32_t idx = (i1 * n2 * n3) + (i2 * n3) + i3;
-                points[idx].x = i1;
-                points[idx].y = i2;
-                points[idx].z = i3;
+                uint32_t idx = (x * ny * nz) + (y * nz) + z;
+                points[idx].x = x;
+                points[idx].y = y;
+                points[idx].z = z;
                 points[idx].format = 0; // Point format 0
             }
         }
@@ -60,24 +60,45 @@ static void createGrid(const std::string &path)
     // Create points
     std::vector<FileLas::Point> points;
 
-    uint32_t n1 = 15;
-    uint32_t n2 = 15;
+    size_t nx = 16;
+    size_t ny = 16;
 
-    points.resize(n1 * n2);
+    points.resize(nx * ny);
 
-    // Create points: set all attributes to zero
     std::memset(points.data(), 0, sizeof(FileLas::Point) * points.size());
 
-    // Create points: points with resolution 1 point
-    for (uint32_t i1 = 0; i1 < n1; i1++)
+    size_t idx = 0;
+    for (size_t y = 0; y < ny; y++)
     {
-        for (uint32_t i2 = 0; i2 < n2; i2++)
+        for (size_t x = 0; x < nx; x++)
         {
-            uint32_t idx = (i1 * n2) + i2;
-            points[idx].x = i1;
-            points[idx].y = i2;
+            uint16_t intensity = static_cast<uint16_t>(idx * 257); // to 65,535
+
+            points[idx].format = 7;
+
+            points[idx].x = static_cast<uint32_t>(x);
+            points[idx].y = static_cast<uint32_t>(y);
             points[idx].z = 0;
-            points[idx].format = 0; // Point format 0
+
+            points[idx].red = static_cast<uint16_t>(x * 4369);
+            points[idx].green = static_cast<uint16_t>(y * 4369);
+            points[idx].blue = 0;
+
+            points[idx].user_red = static_cast<uint16_t>(y * 4369);
+            points[idx].user_green = 0;
+            points[idx].user_blue = static_cast<uint16_t>(x * 4369);
+
+            points[idx].intensity = intensity;
+            points[idx].return_number = static_cast<uint8_t>(x);
+            points[idx].number_of_returns = static_cast<uint8_t>(y);
+            points[idx].classification_flags = 0;
+            points[idx].scanner_channel = y & 3U;
+            points[idx].scan_direction_flag = y & 4U;
+            points[idx].edge_of_flight_line = y & 8U;
+            points[idx].classification = static_cast<uint8_t>(idx);
+            points[idx].source_id = intensity;
+
+            idx++;
         }
     }
 
