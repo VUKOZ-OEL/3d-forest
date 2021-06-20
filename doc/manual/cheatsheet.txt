@@ -20,6 +20,7 @@
 /** @page cheatsheet Cheat Sheet
 
 - @subpage cheatsheet_git
+- @subpage cheatsheet_code
 - @subpage cheatsheet_cmake
 - @subpage cheatsheet_doxygen
 - @subpage cheatsheet_qtdesigner
@@ -85,6 +86,46 @@
   git commit -m "Added feature x"
   git push
   @endverbatim
+
+*******************************************************************************/
+
+
+/** @page cheatsheet_code Code style
+
+Automatic formatting. It is good to run this command before 'git add <file>'
+and git commit to GitHub:
+@verbatim
+mingw32-make format
+@endverbatim
+
+The code is using C++ std on Backend and Qt on Frontend.
+
+Function names follow mixed Qt style and std:
+@verbatim
+get:
+    bool   hasFocus() const;
+    bool   isHidden() const;
+    int    height() const;
+    size_t size() const; // Can be better than Qt like 'count'. std uses 'size'.
+
+get/set:
+    bool isSizeGripEnabled() const;
+    void setSizeGripEnabled(bool);
+
+    int  result() const;
+    void setResult(int i);
+
+signals:
+    void accepted();
+    void finished(int result);
+    void rejected();
+@endverbatim
+
+Debug:
+@verbatim
+#include <QDebug>
+qDebug() << "error:" << e.what();
+@endverbatim
 
 *******************************************************************************/
 
@@ -194,7 +235,8 @@ uic -o ui_window.h window.ui
 -#  Optionally install extension "Code Spell Checker".
     Extension identifier is "streetsidesoftware.code-spell-checker".
 
--#  Add the following lines to "3D-Forest_1.0/.vscode/settings.json":
+-#  Add the following lines to "3D-Forest_1.0/.vscode/settings.json"
+    (compiler path and IntelliSense settings):
     @verbatim
     {
         "files.eol": "\n",
@@ -258,7 +300,8 @@ uic -o ui_window.h window.ui
     - Run "CMake: Select Variant".
     - Select "Debug" to include debug information with your build.
 
--#  Create file 'launch.json' in '.vscode' directory:
+-#  Create file 'launch.json' (debugger settings, perform CMake build)
+    in '.vscode' directory:
     @verbatim
     {
         "version": "0.2.0",
@@ -286,7 +329,8 @@ uic -o ui_window.h window.ui
     }
     @endverbatim
 
--#  You may also create file 'tasks.json' in '.vscode' directory:
+-#  You may also create file 'tasks.json' (build instructions)
+    in '.vscode' directory:
     @verbatim
     {
         "version": "2.0.0",
