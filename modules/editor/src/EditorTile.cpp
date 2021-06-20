@@ -19,30 +19,12 @@
 
 /** @file EditorTile.cpp */
 
+#include <ColorPalette.hpp>
 #include <EditorBase.hpp>
 #include <EditorTile.hpp>
 #include <File.hpp>
 #include <FileIndexBuilder.hpp>
 #include <FileLas.hpp>
-
-static uint8_t EDITOR_TILE_PAL[16][3]{
-    {255, 205, 243},
-    {233, 222, 187},
-    {255, 238, 51},
-    {255, 146, 51},
-    {41, 208, 208},
-    {157, 175, 255},
-    {129, 197, 122},
-    {160, 160, 160},
-    {129, 38, 192},
-    {129, 74, 25},
-    {29, 105, 20},
-    {42, 75, 215},
-    {173, 35, 35},
-    {255, 255, 255},
-    {87, 87, 87},
-    {0, 0, 0},
-};
 
 EditorTile::EditorTile()
     : dataSetId(0),
@@ -126,7 +108,8 @@ void EditorTile::read(const EditorBase *editor)
     double x;
     double y;
     double z;
-    const float scaleU16 = 1.0F / 65535.0F;
+    const float scaleU16 = 1.0F / 65535.0F; /**< @todo Normalize during conversion. */
+    // const float scaleU16 = 1.0F / 255.0F;
     bool rgbFlag = las.header.hasRgb();
 
     for (size_t i = 0; i < n; i++)
@@ -149,7 +132,7 @@ void EditorTile::read(const EditorBase *editor)
         view.xyz[3 * i + 2] = static_cast<float>(z);
 
         // intensity and color
-        intensity[i] = point.intensity * scaleU16;
+        intensity[i] = static_cast<float>(point.intensity) * scaleU16;
 
         if (rgbFlag)
         {
@@ -316,7 +299,10 @@ void EditorTile::setPointColor(const EditorBase *editor)
     {
         for (size_t i = 0; i < n; i++)
         {
-            setColor(i, attrib[i].returnNumber, 15, &EDITOR_TILE_PAL[0][0]);
+            setColor(i,
+                     attrib[i].returnNumber,
+                     15,
+                     ColorPalette::blueCyanGreenYellowRed16);
         }
     }
 
@@ -324,7 +310,10 @@ void EditorTile::setPointColor(const EditorBase *editor)
     {
         for (size_t i = 0; i < n; i++)
         {
-            setColor(i, attrib[i].numberOfReturns, 15, &EDITOR_TILE_PAL[0][0]);
+            setColor(i,
+                     attrib[i].numberOfReturns,
+                     15,
+                     ColorPalette::blueCyanGreenYellowRed16);
         }
     }
 
@@ -332,23 +321,25 @@ void EditorTile::setPointColor(const EditorBase *editor)
     {
         for (size_t i = 0; i < n; i++)
         {
-            setColor(i, attrib[i].classification, 15, &EDITOR_TILE_PAL[0][0]);
+            setColor(i,
+                     attrib[i].classification,
+                     15,
+                     ColorPalette::Classification);
         }
     }
 }
 
-void EditorTile::setColor(size_t idx, int value, int max, uint8_t *pal)
+void EditorTile::setColor(size_t idx,
+                          size_t value,
+                          size_t max,
+                          const std::vector<Vector3<float>> &pal)
 {
     if (value > max)
     {
         value = max;
     }
 
-    uint8_t r = pal[value * 3 + 0];
-    uint8_t g = pal[value * 3 + 1];
-    uint8_t b = pal[value * 3 + 2];
-
-    view.rgb[idx * 3 + 0] *= static_cast<float>(r) * (1.0F / 256.0F);
-    view.rgb[idx * 3 + 1] *= static_cast<float>(g) * (1.0F / 256.0F);
-    view.rgb[idx * 3 + 2] *= static_cast<float>(b) * (1.0F / 256.0F);
+    view.rgb[idx * 3 + 0] *= pal[value][0];
+    view.rgb[idx * 3 + 1] *= pal[value][1];
+    view.rgb[idx * 3 + 2] *= pal[value][2];
 }
