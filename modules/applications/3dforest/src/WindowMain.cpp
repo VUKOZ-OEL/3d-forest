@@ -146,16 +146,15 @@ void WindowMain::createMenus()
     ribbon->addButton("Project", "Project", button);
 
     // Save
-    button = createMenuButton(tr("Save"),
-                              tr("Save project"),
-                              "icons8-save-close-40.png");
+    button =
+        createMenuButton(tr("Save"), tr("Save project"), "icons8-save-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionProjectSave()));
     ribbon->addButton("Project", "Project", button);
 
     // Save As
     button = createMenuButton(tr("Save As"),
                               tr("Save project to a different file"),
-                              "icons8-add-folder-40.png");
+                              "icons8-save-as-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionProjectSaveAs()));
     ribbon->addButton("Project", "Project", button);
 
@@ -185,62 +184,59 @@ void WindowMain::createMenus()
 
     button = createMenuButton(tr("Perspective"),
                               tr("Perspective"),
-                              "icons8-orthogonal-view-40.png");
+                              "perspective-view-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewPerspective()));
     ribbon->addButton("View", "Projection", button);
 
-    button =
-        createMenuButton(tr("Top"), tr("Top"), "icons8-orthogonal-view-40.png");
+    button = createMenuButton(tr("Top"), tr("Top"), "icons8-top-view-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewTop()));
     ribbon->addButton("View", "Camera", button);
 
-    button = createMenuButton(tr("Front"),
-                              tr("Front"),
-                              "icons8-orthogonal-view-40.png");
+    button =
+        createMenuButton(tr("Front"), tr("Front"), "icons8-front-view-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewFront()));
     ribbon->addButton("View", "Camera", button);
 
-    button = createMenuButton(tr("Right"),
-                              tr("Right"),
-                              "icons8-orthogonal-view-40.png");
+    button =
+        createMenuButton(tr("Right"), tr("Right"), "icons8-right-view-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewRight()));
     ribbon->addButton("View", "Camera", button);
 
-    button =
-        createMenuButton(tr("3D"), tr("3D"), "icons8-orthogonal-view-40.png");
+    button = createMenuButton(tr("3D"), tr("3D"), "icons8-portraits-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionView3d()));
     ribbon->addButton("View", "Camera", button);
 
     button = createMenuButton(tr("Distance"),
                               tr("Distance"),
-                              "icons8-enlarge-40.png");
+                              "icons8-fit-to-width-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewResetDistance()));
     ribbon->addButton("View", "Reset", button);
 
-    button = createMenuButton(tr("Center"), tr("Center"), "icons8-drag-40.png");
+    button =
+        createMenuButton(tr("Center"), tr("Center"), "icons8-collect-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewResetCenter()));
     ribbon->addButton("View", "Reset", button);
 
     button =
-        createMenuButton(tr("Single"), tr("Single"), "icons8-prototype-40.png");
+        createMenuButton(tr("Single"), tr("Single"), "layout-single-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewLayoutSingle()));
     ribbon->addButton("View", "Layout", button);
 
     button = createMenuButton(tr("Two Columns"),
                               tr("Two Columns"),
-                              "icons8-prototype-40.png");
+                              "layout-two-columns-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewLayout2Columns()));
     ribbon->addButton("View", "Layout", button);
 
     button = createMenuButton(tr("Grid (2x2)"),
                               tr("Grid (2x2)"),
-                              "icons8-prototype-40.png");
+                              "layout-grid-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewLayoutGrid()));
     ribbon->addButton("View", "Layout", button);
 
     button = createMenuButton(tr("3 Right"),
                               tr("3 Right"),
-                              "icons8-prototype-40.png");
+                              "layout-grid-right-40.png");
     connect(button,
             SIGNAL(clicked()),
             this,
@@ -269,7 +265,7 @@ void WindowMain::createMenus()
     ribbon->addButton("Windows", "Windows", button);
 
     button =
-        createMenuButton(tr("Layers"), tr("Layers"), "icons8-deviation-40.png");
+        createMenuButton(tr("Layers"), tr("Layers"), "icons8-variation-40.png");
     // connect(button, SIGNAL(clicked()), this, SLOT(actionAbout()));
     ribbon->addButton("Windows", "Windows", button);
 
@@ -277,7 +273,7 @@ void WindowMain::createMenus()
     // connect(button, SIGNAL(clicked()), this, SLOT(actionAbout()));
     ribbon->addButton("Windows", "Windows", button);
 
-    button = createMenuButton(tr("Clip"), tr("Clip"), "icons8-text-box-40.png");
+    button = createMenuButton(tr("Clip"), tr("Clip"), "icons8-crop-40.png");
     // connect(button, SIGNAL(clicked()), this, SLOT(actionAbout()));
     ribbon->addButton("Windows", "Windows", button);
 
@@ -717,7 +713,9 @@ void WindowMain::actionAbout()
                           " from forest environment.\n\n"
                           "Copyright 2020-2021 VUKOZ\n"
                           "Blue Cat team and other authors\n"
-                          "https://www.3dforest.eu/"));
+                          "https://www.3dforest.eu/\n"
+                          "\n"
+                          "Additional icons: https://icons8.com"));
 }
 
 bool WindowMain::projectOpen(const QString &path)
@@ -904,7 +902,10 @@ bool WindowMain::projectCreateIndex(const QString &path)
     {
         // Update progress. The first step value is 1 in Qt.
         double value = 1.0 + 0.99 * builder.percent();
-        std::snprintf(buffer, sizeof(buffer), "Processing... %6.2f %%", value);
+        std::snprintf(buffer,
+                      sizeof(buffer),
+                      "Overall progress: %6.2f %% complete",
+                      value);
 
         progressDialog.setValue(static_cast<int>(value));
         progressDialog.setLabelText(buffer);
