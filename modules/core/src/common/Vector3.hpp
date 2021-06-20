@@ -33,6 +33,7 @@ template <class T> class Vector3 : public std::array<T, 3>
 public:
     Vector3();
     Vector3(T v0, T v1, T v2);
+    Vector3(uint32_t v24);
     template <class B> Vector3(const Vector3<B> &v);
     template <class B> Vector3<T> &operator=(const Vector3<B> &v);
 
@@ -101,6 +102,13 @@ template <class T> inline Vector3<T>::Vector3(T v0, T v1, T v2)
     this->operator[](0) = v0;
     this->operator[](1) = v1;
     this->operator[](2) = v2;
+}
+
+template <class T> inline Vector3<T>::Vector3(uint32_t v24)
+{
+    this->operator[](0) = static_cast<T>((v24 & 0xff0000) >> 16) / 255;
+    this->operator[](1) = static_cast<T>((v24 & 0x00ff00) >> 8) / 255;
+    this->operator[](2) = static_cast<T>((v24 & 0x0000ff)) / 255;
 }
 
 template <class T>

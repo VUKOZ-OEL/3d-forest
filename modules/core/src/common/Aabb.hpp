@@ -236,10 +236,10 @@ template <class T> inline void Aabb<T>::clear()
 template <class T> inline void Aabb<T>::validate()
 {
     constexpr T e = std::numeric_limits<T>::epsilon();
-    if ((max_[0] - min_[0] > e) && (max_[1] - min_[1] > e) &&
+    if ((max_[0] - min_[0] > e) || (max_[1] - min_[1] > e) ||
         (max_[2] - min_[2] > e))
     {
-        empty_ = false;
+        empty_ = false; // Line/Plane/Cuboid
     }
     else
     {
