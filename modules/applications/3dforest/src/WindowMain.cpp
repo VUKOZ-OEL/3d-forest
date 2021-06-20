@@ -27,12 +27,14 @@
 #include <QDebug>
 #include <QDockWidget>
 #include <QFileDialog>
+#include <QGridLayout>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPluginLoader>
 #include <QProgressBar>
 #include <QProgressDialog>
 #include <QTextEdit>
+#include <Ribbon.h>
 #include <Time.hpp>
 #include <WindowClipFilter.hpp>
 #include <WindowDataSets.hpp>
@@ -51,6 +53,11 @@ QTextEdit *WindowMain::log = nullptr;
 
 WindowMain::WindowMain(QWidget *parent) : QMainWindow(parent)
 {
+    menuTools_ = nullptr;
+    menuWindows_ = nullptr;
+    pluginButton_ = nullptr;
+    pluginAction_ = nullptr;
+
     initializeWindow();
 }
 
@@ -100,89 +107,208 @@ void WindowMain::createViewer()
     setCentralWidget(windowViewports_);
 }
 
+QToolButton *WindowMain::createMenuButton(const QString &text,
+                                          const QString &toolTip,
+                                          const QString &icon)
+{
+    QToolButton *button = new QToolButton;
+
+    button->setText(text);
+    button->setToolTip(toolTip);
+    button->setIcon(QIcon(":/icons/" + icon));
+    button->setIconSize(QSize(40, 40));
+    button->setEnabled(true);
+
+    return button;
+}
+
 void WindowMain::createMenus()
 {
-    // File
-    QMenu *menuFile = menuBar()->addMenu(tr("File"));
-    (void)menuFile->addAction(tr("New Project"),
-                              this,
-                              &WindowMain::actionProjectNew);
-    (void)menuFile->addAction(tr("Open Project..."),
-                              this,
-                              &WindowMain::actionProjectOpen);
-    (void)menuFile->addAction(tr("Save Project"),
-                              this,
-                              &WindowMain::actionProjectSave);
-    (void)menuFile->addAction(tr("Save Project As..."),
-                              this,
-                              &WindowMain::actionProjectSaveAs);
+    QToolButton *button = nullptr;
+    Ribbon *ribbon = new Ribbon;
 
-    QAction *action;
-    (void)menuFile->addSeparator();
-    action = menuFile->addAction(tr("Open File..."),
-                                 this,
-                                 &WindowMain::actionProjectImport);
-    action = menuFile->addAction(tr("Export As..."),
-                                 this,
-                                 &WindowMain::actionProjectExportAs);
-    action->setEnabled(false);
+    // Project
+    ribbon->addTab(QIcon(":/icons/icons8-briefcase-40.png"), "Project");
+    ribbon->setIconSize(QSize(20, 20));
 
-    (void)menuFile->addSeparator();
-    (void)menuFile->addAction(tr("Exit"), this, &WindowMain::close);
+    // New
+    button = createMenuButton(tr("New"),
+                              tr("Create new project"),
+                              "icons8-edit-file-40.png");
+    connect(button, SIGNAL(clicked()), this, SLOT(actionProjectNew()));
+    ribbon->addButton("Project", "Project", button);
 
-    // View
-    QMenu *menuView = menuBar()->addMenu(tr("View"));
-    QMenu *menuViewCamera = menuView->addMenu(tr("Camera"));
-    (void)menuViewCamera->addAction(tr("Orthographic"),
-                                    this,
-                                    &WindowMain::actionViewOrthographic);
-    (void)menuViewCamera->addAction(tr("Perspective"),
-                                    this,
-                                    &WindowMain::actionViewPerspective);
+    // Open
+    button = createMenuButton(tr("Open"),
+                              tr("Open existing project"),
+                              "icons8-live-folder-40.png");
+    connect(button, SIGNAL(clicked()), this, SLOT(actionProjectOpen()));
+    ribbon->addButton("Project", "Project", button);
 
-    (void)menuViewCamera->addSeparator();
-    (void)menuViewCamera->addAction(tr("Top"),
-                                    this,
-                                    &WindowMain::actionViewTop);
-    (void)menuViewCamera->addAction(tr("Front"),
-                                    this,
-                                    &WindowMain::actionViewFront);
-    (void)menuViewCamera->addAction(tr("Right"),
-                                    this,
-                                    &WindowMain::actionViewRight);
-    (void)menuViewCamera->addAction(tr("3D"), this, &WindowMain::actionView3d);
+    // Save
+    button = createMenuButton(tr("Save"),
+                              tr("Save project"),
+                              "icons8-save-close-40.png");
+    connect(button, SIGNAL(clicked()), this, SLOT(actionProjectSave()));
+    ribbon->addButton("Project", "Project", button);
 
-    (void)menuViewCamera->addSeparator();
-    (void)menuViewCamera->addAction(tr("Reset distance"),
-                                    this,
-                                    &WindowMain::actionViewResetDistance);
-    (void)menuViewCamera->addAction(tr("Reset center"),
-                                    this,
-                                    &WindowMain::actionViewResetCenter);
+    // Save As
+    button = createMenuButton(tr("Save As"),
+                              tr("Save project to a different file"),
+                              "icons8-add-folder-40.png");
+    connect(button, SIGNAL(clicked()), this, SLOT(actionProjectSaveAs()));
+    ribbon->addButton("Project", "Project", button);
 
-    QMenu *menuViewLayout = menuView->addMenu(tr("Layout"));
-    (void)menuViewLayout->addAction(tr("Single"),
-                                    this,
-                                    &WindowMain::actionViewLayoutSingle);
-    (void)menuViewLayout->addAction(tr("Two Columns"),
-                                    this,
-                                    &WindowMain::actionViewLayout2Columns);
-    (void)menuViewLayout->addAction(tr("Grid (2x2)"),
-                                    this,
-                                    &WindowMain::actionViewLayoutGrid);
-    (void)menuViewLayout->addAction(tr("Three Rows Right"),
-                                    this,
-                                    &WindowMain::actionViewLayout3RowsRight);
+    // Import
+    button = createMenuButton(tr("Open"),
+                              tr("Open existing data set file"),
+                              "icons8-add-file-40.png");
+    connect(button, SIGNAL(clicked()), this, SLOT(actionProjectImport()));
+    ribbon->addButton("Project", "File", button);
+
+    // Export
+    button = createMenuButton(tr("Export"),
+                              tr("Export visible points to a file"),
+                              "icons8-send-file-40.png");
+    connect(button, SIGNAL(clicked()), this, SLOT(actionProjectExportAs()));
+    ribbon->addButton("Project", "File", button);
+
+    // Project
+    ribbon->addTab(QIcon(":/icons/icons8-monitor-40.png"), "View");
+    ribbon->setIconSize(QSize(20, 20));
+
+    button = createMenuButton(tr("Orthographic"),
+                              tr("Orthographic"),
+                              "icons8-orthogonal-view-40.png");
+    connect(button, SIGNAL(clicked()), this, SLOT(actionViewOrthographic()));
+    ribbon->addButton("View", "Projection", button);
+
+    button = createMenuButton(tr("Perspective"),
+                              tr("Perspective"),
+                              "icons8-orthogonal-view-40.png");
+    connect(button, SIGNAL(clicked()), this, SLOT(actionViewPerspective()));
+    ribbon->addButton("View", "Projection", button);
+
+    button =
+        createMenuButton(tr("Top"), tr("Top"), "icons8-orthogonal-view-40.png");
+    connect(button, SIGNAL(clicked()), this, SLOT(actionViewTop()));
+    ribbon->addButton("View", "Camera", button);
+
+    button = createMenuButton(tr("Front"),
+                              tr("Front"),
+                              "icons8-orthogonal-view-40.png");
+    connect(button, SIGNAL(clicked()), this, SLOT(actionViewFront()));
+    ribbon->addButton("View", "Camera", button);
+
+    button = createMenuButton(tr("Right"),
+                              tr("Right"),
+                              "icons8-orthogonal-view-40.png");
+    connect(button, SIGNAL(clicked()), this, SLOT(actionViewRight()));
+    ribbon->addButton("View", "Camera", button);
+
+    button =
+        createMenuButton(tr("3D"), tr("3D"), "icons8-orthogonal-view-40.png");
+    connect(button, SIGNAL(clicked()), this, SLOT(actionView3d()));
+    ribbon->addButton("View", "Camera", button);
+
+    button = createMenuButton(tr("Distance"),
+                              tr("Distance"),
+                              "icons8-enlarge-40.png");
+    connect(button, SIGNAL(clicked()), this, SLOT(actionViewResetDistance()));
+    ribbon->addButton("View", "Reset", button);
+
+    button = createMenuButton(tr("Center"), tr("Center"), "icons8-drag-40.png");
+    connect(button, SIGNAL(clicked()), this, SLOT(actionViewResetCenter()));
+    ribbon->addButton("View", "Reset", button);
+
+    button =
+        createMenuButton(tr("Single"), tr("Single"), "icons8-prototype-40.png");
+    connect(button, SIGNAL(clicked()), this, SLOT(actionViewLayoutSingle()));
+    ribbon->addButton("View", "Layout", button);
+
+    button = createMenuButton(tr("Two Columns"),
+                              tr("Two Columns"),
+                              "icons8-prototype-40.png");
+    connect(button, SIGNAL(clicked()), this, SLOT(actionViewLayout2Columns()));
+    ribbon->addButton("View", "Layout", button);
+
+    button = createMenuButton(tr("Grid (2x2)"),
+                              tr("Grid (2x2)"),
+                              "icons8-prototype-40.png");
+    connect(button, SIGNAL(clicked()), this, SLOT(actionViewLayoutGrid()));
+    ribbon->addButton("View", "Layout", button);
+
+    button = createMenuButton(tr("3 Right"),
+                              tr("3 Right"),
+                              "icons8-prototype-40.png");
+    connect(button,
+            SIGNAL(clicked()),
+            this,
+            SLOT(actionViewLayout3RowsRight()));
+    ribbon->addButton("View", "Layout", button);
 
     // Tools
-    menuTools_ = menuBar()->addMenu(tr("Tools"));
+    ribbon->addTab(QIcon(":/icons/icons8-support-40.png"), "Tools");
+    ribbon->setIconSize(QSize(20, 20));
+
+    /** @todo Add buttons from loaded plugins. */
+    pluginButton_ = createMenuButton(tr("Heightmap"),
+                                     tr("Heightmap"),
+                                     "icons8-histogram-40.png");
+    // connect(button, SIGNAL(clicked()), this, SLOT(actionPluginToolShow()));
+    ribbon->addButton("Tools", "Plugins", pluginButton_);
 
     // Windows
-    menuWindows_ = menuBar()->addMenu(tr("Windows"));
+    ribbon->addTab(QIcon(":/icons/icons8-restore-window-40.png"), "Windows");
+    ribbon->setIconSize(QSize(20, 20));
+
+    button = createMenuButton(tr("Data Sets"),
+                              tr("Data Sets"),
+                              "icons8-open-box-40.png");
+    // connect(button, SIGNAL(clicked()), this, SLOT(actionAbout()));
+    ribbon->addButton("Windows", "Windows", button);
+
+    button =
+        createMenuButton(tr("Layers"), tr("Layers"), "icons8-deviation-40.png");
+    // connect(button, SIGNAL(clicked()), this, SLOT(actionAbout()));
+    ribbon->addButton("Windows", "Windows", button);
+
+    button = createMenuButton(tr("View"), tr("View"), "icons8-tune-40.png");
+    // connect(button, SIGNAL(clicked()), this, SLOT(actionAbout()));
+    ribbon->addButton("Windows", "Windows", button);
+
+    button = createMenuButton(tr("Clip"), tr("Clip"), "icons8-text-box-40.png");
+    // connect(button, SIGNAL(clicked()), this, SLOT(actionAbout()));
+    ribbon->addButton("Windows", "Windows", button);
+
+    button = createMenuButton(tr("Log"), tr("Log"), "icons8-pass-fail-40.png");
+    // connect(button, SIGNAL(clicked()), this, SLOT(actionAbout()));
+    ribbon->addButton("Windows", "Info", button);
 
     // Help
-    QMenu *menuHelp = menuBar()->addMenu(tr("Help"));
-    (void)menuHelp->addAction(tr("About"), this, &WindowMain::actionAbout);
+    ribbon->addTab(QIcon(":/icons/icons8-information-40.png"), "Help");
+    ribbon->setIconSize(QSize(20, 20));
+
+    button = createMenuButton(tr("About"), tr("About"), "icons8-about-40.png");
+    connect(button, SIGNAL(clicked()), this, SLOT(actionAbout()));
+    ribbon->addButton("Help", "Info", button);
+
+    // Ribbon
+    QWidget *ribbonDockWidgetContents = new QWidget;
+    QGridLayout *gridLayout = new QGridLayout;
+    gridLayout->addWidget(ribbon, 0, 0);
+    gridLayout->setMargin(0);
+    ribbonDockWidgetContents->setLayout(gridLayout);
+
+    QDockWidget *ribbonDockWidget = new QDockWidget(tr("Ribbon"), this);
+    ribbonDockWidget->setTitleBarWidget(new QWidget());
+    ribbonDockWidget->setFeatures(QDockWidget::NoDockWidgetFeatures);
+    ribbonDockWidget->setAllowedAreas(Qt::TopDockWidgetArea);
+    // ribbonDockWidget->setMinimumHeight(20);
+    // ribbonDockWidget->setMaximumHeight(105);
+    ribbonDockWidget->setFixedHeight(116);
+    ribbonDockWidget->setWidget(ribbonDockWidgetContents);
+    addDockWidget(Qt::TopDockWidgetArea, ribbonDockWidget);
 }
 
 void WindowMain::createWindows()
@@ -195,10 +321,11 @@ void WindowMain::createWindows()
             SLOT(actionDataSetVisible(size_t, bool)));
 
     QDockWidget *dockDataSets = new QDockWidget(tr("Data Sets"), this);
-    dockDataSets->setAllowedAreas(Qt::LeftDockWidgetArea |
-                                  Qt::RightDockWidgetArea);
-    dockDataSets->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
-    dockDataSets->setMaximumWidth(WINDOW_MAIN_DOCK_MAX);
+    dockDataSets->setAllowedAreas(
+        Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea |
+        Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
+    // dockDataSets->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
+    // dockDataSets->setMaximumWidth(WINDOW_MAIN_DOCK_MAX);
     dockDataSets->setWidget(windowDataSets_);
     addDockWidget(Qt::LeftDockWidgetArea, dockDataSets);
 
@@ -215,7 +342,7 @@ void WindowMain::createWindows()
     dockLayers->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
     dockLayers->setMaximumWidth(WINDOW_MAIN_DOCK_MAX);
     dockLayers->setWidget(windowLayers_);
-    dockLayers->setVisible(false);
+    // dockLayers->setVisible(false);
     addDockWidget(Qt::LeftDockWidgetArea, dockLayers);
 
     // Create view settings window
@@ -235,7 +362,7 @@ void WindowMain::createWindows()
     dockViewSettings->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
     dockViewSettings->setMaximumWidth(WINDOW_MAIN_DOCK_MAX);
     dockViewSettings->setWidget(windowSettingsView_);
-    addDockWidget(Qt::LeftDockWidgetArea, dockViewSettings);
+    addDockWidget(Qt::RightDockWidgetArea, dockViewSettings);
 
     // Create clip filter window
     windowClipFilter_ = new WindowClipFilter(this);
@@ -267,11 +394,14 @@ void WindowMain::createWindows()
     addDockWidget(Qt::BottomDockWidgetArea, dockLog);
 
     // Add dock widgets to Windows menu
-    menuWindows_->addAction(dockDataSets->toggleViewAction());
-    menuWindows_->addAction(dockLayers->toggleViewAction());
-    menuWindows_->addAction(dockViewSettings->toggleViewAction());
-    menuWindows_->addAction(dockClipFilter->toggleViewAction());
-    menuWindows_->addAction(dockLog->toggleViewAction());
+    if (menuWindows_)
+    {
+        menuWindows_->addAction(dockDataSets->toggleViewAction());
+        menuWindows_->addAction(dockLayers->toggleViewAction());
+        menuWindows_->addAction(dockViewSettings->toggleViewAction());
+        menuWindows_->addAction(dockClipFilter->toggleViewAction());
+        menuWindows_->addAction(dockLog->toggleViewAction());
+    }
 }
 
 void WindowMain::createPlugins()
@@ -297,9 +427,16 @@ void WindowMain::createPlugins()
             {
                 pluginToolInterface->initialize(this, &editor_);
                 pluginsTool_.push_back(pluginToolInterface);
-                (void)menuTools_->addAction(pluginToolInterface->windowTitle(),
-                                            this,
-                                            &WindowMain::actionPluginToolShow);
+
+                pluginAction_ =
+                    new QAction(pluginToolInterface->windowTitle(), this);
+                pluginAction_->setIcon(
+                    QIcon(":/icons/icons8-histogram-40.png"));
+                connect(pluginAction_,
+                        SIGNAL(triggered()),
+                        this,
+                        SLOT(actionPluginToolShow()));
+                pluginButton_->setDefaultAction(pluginAction_);
 
                 EditorFilter *filter;
                 filter = dynamic_cast<EditorFilter *>(pluginToolInterface);
@@ -766,7 +903,7 @@ bool WindowMain::projectCreateIndex(const QString &path)
     while (!builder.end())
     {
         // Update progress. The first step value is 1 in Qt.
-        double value = 1.0 + 99.0 * builder.percent();
+        double value = 1.0 + 0.99 * builder.percent();
         std::snprintf(buffer, sizeof(buffer), "Processing... %6.2f %%", value);
 
         progressDialog.setValue(static_cast<int>(value));

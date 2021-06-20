@@ -27,7 +27,9 @@
 #include <WindowViewports.hpp>
 #include <vector>
 
+class QAction;
 class QTextEdit;
+class QToolButton;
 class PluginFile;
 class PluginTool;
 class WindowClipFilter;
@@ -112,6 +114,10 @@ protected:
     QMenu *menuTools_;
     QMenu *menuWindows_;
 
+    // Actions
+    QToolButton *pluginButton_;
+    QAction *pluginAction_;
+
     // Initialization
     void initializeWindow();
     void createEditor();
@@ -134,6 +140,9 @@ protected:
     // Utilities
     void showError(const char *message);
     void updateWindowTitle(const QString &path);
+    QToolButton *createMenuButton(const QString &text,
+                                  const QString &toolTip,
+                                  const QString &icon);
 
     // Events
     void closeEvent(QCloseEvent *event) override;
