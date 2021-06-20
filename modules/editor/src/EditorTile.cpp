@@ -108,7 +108,8 @@ void EditorTile::read(const EditorBase *editor)
     double x;
     double y;
     double z;
-    const float scaleU16 = 1.0F / 65535.0F; /**< @todo Normalize during conversion. */
+    const float scaleU16 =
+        1.0F / 65535.0F; /**< @todo Normalize during conversion. */
     // const float scaleU16 = 1.0F / 255.0F;
     bool rgbFlag = las.header.hasRgb();
 
