@@ -131,7 +131,10 @@ public:
 protected:
     void readFilter(const EditorBase *editor);
     void setPointColor(const EditorBase *editor);
-    void setColor(size_t idx, int value, int max, uint8_t *pal);
+    void setColor(size_t idx,
+                  size_t value,
+                  size_t max,
+                  const std::vector<Vector3<float>> &pal);
 };
 
 #endif /* EDITOR_TILE_HPP */

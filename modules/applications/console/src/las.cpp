@@ -90,8 +90,22 @@ void cmd_print(const char *inputPath)
     las.open(inputPath);
     las.readHeader();
 
-    Json obj;
-    std::cout << las.header.write(obj).serialize() << std::endl;
+    // Print header
+    std::cout << las.header << std::endl;
+
+    // Print points
+    las.seekPointData();
+    FileLas::Point pt;
+    uint64_t nPoints = las.header.number_of_point_records;
+    if (nPoints > 4)
+    {
+        nPoints = 4;
+    }
+    for (uint64_t i = 0; i < nPoints; i++)
+    {
+        las.readPoint(pt);
+        std::cout << pt << std::endl;
+    }
 }
 
 void cmd_select(const char *inputPath, const Aabb<double> &window)

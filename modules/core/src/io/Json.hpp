@@ -488,4 +488,9 @@ inline uint64_t Json::uint64() const
     return static_cast<uint64_t>(data_.number);
 }
 
+inline std::ostream &operator<<(std::ostream &os, const Json &obj)
+{
+    return os << obj.serialize();
+}
+
 #endif /* JSON_HPP */

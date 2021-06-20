@@ -20,8 +20,12 @@
 /** @page cheatsheet Cheat Sheet
 
 - @subpage cheatsheet_git
+- @subpage cheatsheet_code
 - @subpage cheatsheet_cmake
 - @subpage cheatsheet_doxygen
+- @subpage cheatsheet_qtdesigner
+- @subpage cheatsheet_vscode_edit
+- @subpage cheatsheet_vscode_debug
 
 *******************************************************************************/
 
@@ -82,6 +86,46 @@
   git commit -m "Added feature x"
   git push
   @endverbatim
+
+*******************************************************************************/
+
+
+/** @page cheatsheet_code Code style
+
+Automatic formatting. It is good to run this command before 'git add <file>'
+and git commit to GitHub:
+@verbatim
+mingw32-make format
+@endverbatim
+
+The code is using C++ std on Backend and Qt on Frontend.
+
+Function names follow mixed Qt style and std:
+@verbatim
+get:
+    bool   hasFocus() const;
+    bool   isHidden() const;
+    int    height() const;
+    size_t size() const; // Can be better than Qt like 'count'. std uses 'size'.
+
+get/set:
+    bool isSizeGripEnabled() const;
+    void setSizeGripEnabled(bool);
+
+    int  result() const;
+    void setResult(int i);
+
+signals:
+    void accepted();
+    void finished(int result);
+    void rejected();
+@endverbatim
+
+Debug:
+@verbatim
+#include <QDebug>
+qDebug() << "error:" << e.what();
+@endverbatim
 
 *******************************************************************************/
 
@@ -158,5 +202,177 @@ Examples:
     Documenting another file.
 */
 @endverbatim
+
+*******************************************************************************/
+
+/** @page cheatsheet_qtdesigner Qt Designer
+
+Conversion of '.ui' files to '.hpp' files by using 'uic' command line tool:
+@verbatim
+which uic
+uic -o ui_window.h window.ui
+@endverbatim
+
+*******************************************************************************/
+
+/** @page cheatsheet_vscode_edit Edit Source Code with Visual Studio Code
+
+-#  Download and install Visual Studio Code from https://code.visualstudio.com/
+    Tested with version 1.56.2.
+
+-#  In file explorer, right-click on folder "3D-Forest_1.0" and select
+    "Open with Code". This will open 3D Forest workspace.
+
+-#  Install extension "C/C++ IntelliSense, debugging, and code browsing".
+    Extension identifier is "ms-vscode.cpptools". Tested with v1.4.0.
+
+-#  Install extension "CMake Tools".
+    Extension identifier is "ms-vscode.cmake-tools". Tested with v1.7.3.
+
+-#  Optionally install extension "CMake langage support for Visual Studio Code".
+    Extension identifier is "twxs.cmake".
+
+-#  Optionally install extension "Code Spell Checker".
+    Extension identifier is "streetsidesoftware.code-spell-checker".
+
+-#  Add the following lines to "3D-Forest_1.0/.vscode/settings.json"
+    (compiler path and IntelliSense settings):
+    @verbatim
+    {
+        "files.eol": "\n",
+        "cmake.configureOnOpen": false,
+        "cmake.mingwSearchDirs": [
+            "C:\\msys64\\mingw-w64\\bin"
+        ],
+        "cmake.generator": "MinGW Makefiles",
+        "C_Cpp.default.includePath":[
+            "C:/Qt/5.15.0/mingw81_64/include/**",
+            "${workspaceRoot}/3rdparty/widgets/ctkrangeslider",
+            "${workspaceRoot}/3rdparty/widgets/qtribbonwidget",
+            "${workspaceRoot}/modules/visualization/src/editor",
+            "${workspaceRoot}/modules/visualization/src/opengl",
+            "${workspaceRoot}/modules/visualization/src/widgets",
+            "${workspaceRoot}/modules/applications/3dforest/src",
+            "${workspaceRoot}/modules/applications/3dforest/plugins/heightmap",
+            "${workspaceRoot}/modules/applications/console/src",
+            "${workspaceRoot}/modules/core/src/common",
+            "${workspaceRoot}/modules/core/src/io",
+            "${workspaceRoot}/modules/core/src/scene",
+            "${workspaceRoot}/modules/editor/src"]
+    }
+    @endverbatim
+
+-# Close the window and reopen to the same folder to apply new settings.
+
+*******************************************************************************/
+
+/** @page cheatsheet_vscode_debug Build and Debug in Visual Studio Code
+
+-#  Install GDB for msys2:
+    - Open windows Command prompt "cmd".
+    - Search for gdb to find a specific package in the repository:
+      > pacman -Ss gdb
+    - For example use the following command to install gdb package:
+      > pacman -S mingw-w64-x86_64-gdb
+
+-#  Open Visual Studio Code
+
+-#  Add the following lines to settings.json:
+    @verbatim
+    {
+        "cmake.configureOnOpen": false,
+        "cmake.mingwSearchDirs": [
+            "C:\\msys64\\mingw-w64\\bin"
+        ],
+        "cmake.generator": "MinGW Makefiles",
+    }
+    @endverbatim
+
+-#  Select a kit:
+    - Open the Command Palette.
+    - Run "CMake: Select a Kit".
+    - Click "[Scan for kits]".
+    - Select the compiler. For example "GCC 10.1.0 Using compilers:
+      C= C:\msys64\mingw-w64\bin\gcc.exe, CXX= C:\msys64\mingw-w64\bin\g++.exe".
+
+-#  Select a variant:
+    - Open the Command Palette.
+    - Run "CMake: Select Variant".
+    - Select "Debug" to include debug information with your build.
+
+-#  Create file 'launch.json' (debugger settings, perform CMake build)
+    in '.vscode' directory:
+    @verbatim
+    {
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "(gdb) Launch",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/3dforest.exe",
+                "args": [],
+                "stopAtEntry": false,
+                "cwd": "${workspaceFolder}",
+                "environment": [],
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            }
+        ]
+    }
+    @endverbatim
+
+-#  You may also create file 'tasks.json' (build instructions)
+    in '.vscode' directory:
+    @verbatim
+    {
+        "version": "2.0.0",
+        "command": "sh",
+        "args": ["-c"],
+        "presentation":
+        {
+            "echo": true,
+            "reveal": "always",
+            "focus": true,
+            "panel": "new"
+        },
+        "tasks": [
+            {
+                "label": "cmake",
+                "type": "shell",
+                "options":
+                {
+                    "cwd": "${workspaceRoot}/build"
+                },
+                "args": ["cmake -G 'MinGW Makefiles' .. -DCMAKE_INSTALL_PREFIX=.."]
+            },
+            {
+                "label": "make",
+                "type": "shell",
+                "args": ["mingw32-make"],
+                "options": {"cwd": "${workspaceRoot}/build"},
+                "dependsOn": ["cmake"],
+                "group": {"kind": "build","isDefault": true}
+            }
+        ]
+    }
+    @endverbatim
+
+-#  To build click "Build the selected target".
+
+-#  Copy shared libraries to the same folder as "3dforest.exe":
+    build\modules\applications\3dforest\
+    - libcore.dll
+    - libeditor.dll
+    - libvisualization.dll
+
+-#  To debug click "Launch the debugger for the selected target: [3dforest]".
 
 *******************************************************************************/

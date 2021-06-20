@@ -24,9 +24,9 @@
 
 #include <EditorFilter.hpp>
 #include <PluginTool.hpp>
-#include <QColor>
 #include <QDialog>
 #include <QMutex>
+#include <Vector3.hpp>
 #include <vector>
 
 class Editor;
@@ -62,10 +62,11 @@ public:
 protected:
     Editor *editor_;
     bool previewEnabled_;
-    std::vector<QColor> colormap_;
+    std::vector<Vector3<float>> colormap_;
     QMutex mutex_;
 
-    std::vector<QColor> createColormap(const QString &name, int colorCount);
+    std::vector<Vector3<float>> createColormap(const QString &name,
+                                               int colorCount);
 };
 
 /** Plugin Height Map Window.

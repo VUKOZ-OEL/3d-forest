@@ -19,6 +19,7 @@
 
 /** @file PluginHeightMap.cpp */
 
+#include <ColorPalette.hpp>
 #include <Editor.hpp>
 #include <PluginHeightMap.hpp>
 #include <QCheckBox>
@@ -34,10 +35,9 @@
 #include <Time.hpp>
 
 #define PLUGIN_HEIGHT_MAP_NAME "Heightmap"
-#define PLUGIN_HEIGHT_MAP_COLORMAP_JET "Jet"
 #define PLUGIN_HEIGHT_MAP_COLORMAP_HUE "Hue"
 #define PLUGIN_HEIGHT_MAP_COLORMAP_GRAY "Gray"
-#define PLUGIN_HEIGHT_MAP_COLORMAP_DEFAULT PLUGIN_HEIGHT_MAP_COLORMAP_JET
+#define PLUGIN_HEIGHT_MAP_COLORMAP_DEFAULT PLUGIN_HEIGHT_MAP_COLORMAP_HUE
 #define PLUGIN_HEIGHT_MAP_COLORS_MAX 65536
 #define PLUGIN_HEIGHT_MAP_COLORS_DEFAULT 256
 
@@ -97,7 +97,7 @@ void PluginHeightMapFilter::filterTile(EditorTile *tile)
     mutex_.lock();
     double zMin = editor_->boundary().min(2);
     double zLen = editor_->boundary().max(2) - zMin;
-    double colorDelta = 1.0 / static_cast<double>(colormap_.size());
+    double colorDelta = 1.0 / static_cast<double>(colormap_.size() - 1);
 
     double zLenInv = 0;
     if (zLen > 0)
@@ -115,13 +115,10 @@ void PluginHeightMapFilter::filterTile(EditorTile *tile)
         double zNorm = (z - zMin) * zLenInv;
 
         size_t colorIndex = static_cast<size_t>(zNorm / colorDelta);
-        float r = static_cast<float>(colormap_[colorIndex].redF());
-        float g = static_cast<float>(colormap_[colorIndex].greenF());
-        float b = static_cast<float>(colormap_[colorIndex].blueF());
 
-        tile->view.rgb[row * 3 + 0] *= r;
-        tile->view.rgb[row * 3 + 1] *= g;
-        tile->view.rgb[row * 3 + 2] *= b;
+        tile->view.rgb[row * 3 + 0] *= colormap_[colorIndex][0];
+        tile->view.rgb[row * 3 + 1] *= colormap_[colorIndex][1];
+        tile->view.rgb[row * 3 + 2] *= colormap_[colorIndex][2];
     }
     mutex_.unlock();
 }
@@ -171,66 +168,33 @@ void PluginHeightMapFilter::applyToTiles(QWidget *widget)
     editor_->restartThreads();
 }
 
-std::vector<QColor> PluginHeightMapFilter::createColormap(const QString &name,
-                                                          int colorCount)
+std::vector<Vector3<float>> PluginHeightMapFilter::createColormap(
+    const QString &name,
+    int colorCount)
 {
-    std::vector<QColor> colormap;
-
     size_t n = static_cast<size_t>(colorCount);
-    colormap.resize(n);
 
-    if (name == PLUGIN_HEIGHT_MAP_COLORMAP_JET)
+    if (name == PLUGIN_HEIGHT_MAP_COLORMAP_HUE)
     {
-        size_t n1 = n / 3;
-        float delta = 1.0F / static_cast<float>(n1);
-        for (size_t i = 0; i < n1; i++)
-        {
-            float v = delta * static_cast<float>(i);
-            colormap[i].setRgbF(0, v, 1.0F);
-        }
-
-        size_t n2 = n1 * 2;
-        delta = 1.0F / static_cast<float>(n2 - n1);
-        for (size_t i = n1; i < n2; i++)
-        {
-            float v = delta * static_cast<float>(i - n1);
-            colormap[i].setRgbF(v, 1.0F, 1.0F - v);
-        }
-
-        delta = 1.0F / static_cast<float>(n - n2);
-        for (size_t i = n2; i < n; i++)
-        {
-            float v = delta * static_cast<float>(i + 1 - n2);
-            colormap[i].setRgbF(1.0F, 1.0F - v, 0);
-        }
-    }
-    else if (name == PLUGIN_HEIGHT_MAP_COLORMAP_HUE)
-    {
-        float delta = 1.0F / static_cast<float>(n);
-        for (size_t i = 0; i < n; i++)
-        {
-            float v = delta * static_cast<float>(i + 1);
-            colormap[i].setHsvF(v, 1.0F, 1.0F);
-        }
+        return ColorPalette::blueCyanGreenYellowRed(n);
     }
     else if (name == PLUGIN_HEIGHT_MAP_COLORMAP_GRAY)
     {
-        float delta = 1.0F / static_cast<float>(n); // 0.5 /
-        for (size_t i = 0; i < n; i++)
-        {
-            float v = delta * static_cast<float>(i + 1); // 0.5 + x
-            colormap[i].setRgbF(v, v, v);
-        }
+        return ColorPalette::gray(n);
     }
     else
     {
+        // White
+        std::vector<Vector3<float>> colormap;
+        colormap.resize(n);
+
         for (size_t i = 0; i < n; i++)
         {
-            colormap[i].setRgb(255, 255, 255);
+            colormap[i].set(1.0F, 1.0F, 1.0F);
         }
-    }
 
-    return colormap;
+        return colormap;
+    }
 }
 // -----------------------------------------------------------------------------
 PluginHeightMapWindow::PluginHeightMapWindow(QWidget *parent,
@@ -250,7 +214,6 @@ PluginHeightMapWindow::PluginHeightMapWindow(QWidget *parent,
             SLOT(colorCountChanged(int)));
 
     colormapComboBox_ = new QComboBox;
-    colormapComboBox_->addItem(PLUGIN_HEIGHT_MAP_COLORMAP_JET);
     colormapComboBox_->addItem(PLUGIN_HEIGHT_MAP_COLORMAP_HUE);
     colormapComboBox_->addItem(PLUGIN_HEIGHT_MAP_COLORMAP_GRAY);
     colormapComboBox_->setCurrentText(PLUGIN_HEIGHT_MAP_COLORMAP_DEFAULT);

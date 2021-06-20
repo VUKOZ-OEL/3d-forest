@@ -188,10 +188,21 @@ void FileLas::create(const std::string &path,
     {
         hdr.point_data_record_format = 6;
     }
+
     hdr.point_data_record_length =
         static_cast<uint16_t>(hdr.pointDataRecord3dForestLength());
-    hdr.legacy_number_of_point_records = 0;
-    hdr.number_of_point_records = points.size();
+
+    uint64_t nPoints = points.size();
+    uint32_t maxPoints = std::numeric_limits<uint32_t>::max();
+    hdr.number_of_point_records = nPoints;
+    if (nPoints > maxPoints)
+    {
+        hdr.legacy_number_of_point_records = maxPoints;
+    }
+    else
+    {
+        hdr.legacy_number_of_point_records = static_cast<uint32_t>(nPoints);
+    }
 
     hdr.x_scale_factor = scale[0];
     hdr.y_scale_factor = scale[1];
@@ -752,6 +763,8 @@ Json &FileLas::Point::write(Json &out) const
     out["coordinates"][0] = x;
     out["coordinates"][1] = y;
     out["coordinates"][2] = z;
+
+    out["intensity"] = intensity;
     out["return_number"] = return_number;
     out["number_of_returns"] = number_of_returns;
     out["classification"] = classification;
@@ -807,18 +820,18 @@ std::ostream &operator<<(std::ostream &os, const FileLas::Point &obj)
     point_data_record_format:
 
     - 0 to 5
-        - x
-        - y
-        - z
-        - intensity
-        - return_number       : 3 bits
-        - number_of_returns   : 3 bits
-        - scan_direction_flag : 1 bit
-        - edge_of_flight_line : 1 bit
-        - classification      : 3 bits classification_flags, 5 bits class
-        - angle               : 8 bits (-90 to +90)
-        - user_data
-        - source_id
+        - x                    : 32 bits
+        - y                    : 32 bits
+        - z                    : 32 bits
+        - intensity            : 16 bits *
+        - return_number        : 3 bits
+        - number_of_returns    : 3 bits
+        - scan_direction_flag  : 1 bit
+        - edge_of_flight_line  : 1 bit
+        - classification       : 3 bits classification_flags, 5 bits class
+        - angle                : 8 bits (-90 to +90)
+        - user_data            : 8 bits *
+        - source_id            : 16 bits
 
     - 1
         - gps_time
@@ -858,21 +871,21 @@ std::ostream &operator<<(std::ostream &os, const FileLas::Point &obj)
         - wave_z
 
     - 6 to 10
-        - x
-        - y
-        - z
-        - intensity
+        - x                    : 32 bits
+        - y                    : 32 bits
+        - z                    : 32 bits
+        - intensity            : 16 bits *
         - return_number        : 4 bits (new 1 bit)
         - number_of_returns    : 4 bits (new 1 bit)
-        - classification_flags : 4 bits (new)
+        - classification_flags : 4 bits (new 1 bit) *
         - scanner_channel      : 2 bits (new)
         - scan_direction_flag  : 1 bit
         - edge_of_flight_line  : 1 bit
         - classification       : 8 bits class (new 3 bits)
-        - angle                : 16 bits (new 8 bits, by 0.006 degrees)
-        - user_data
-        - source_id
-        - gps_time
+        - user_data            : 8 bits *
+        - angle                : 16 bits signed (new 8 bits, by 0.006 degrees)
+        - source_id            : 16 bits
+        - gps_time             : 64 bits double
 
     - 7
         - red
