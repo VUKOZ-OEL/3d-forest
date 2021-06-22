@@ -116,7 +116,7 @@ QToolButton *WindowMain::createMenuButton(const QString &text,
     button->setText(text);
     button->setToolTip(toolTip);
     button->setIcon(QIcon(":/icons/" + icon));
-    button->setIconSize(QSize(40, 40));
+    button->setIconSize(QSize(40, 40)); // 20x20 is could be also ok
     button->setEnabled(true);
 
     return button;
@@ -222,15 +222,13 @@ void WindowMain::createMenus()
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewLayoutSingle()));
     ribbon->addButton("View", "Layout", button);
 
-    button = createMenuButton(tr("Two Columns"),
-                              tr("Two Columns"),
+    button = createMenuButton(tr("Columns"),
+                              tr("Columns"),
                               "layout-two-columns-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewLayout2Columns()));
     ribbon->addButton("View", "Layout", button);
 
-    button = createMenuButton(tr("Grid (2x2)"),
-                              tr("Grid (2x2)"),
-                              "layout-grid-40.png");
+    button = createMenuButton(tr("Grid"), tr("Grid"), "layout-grid-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewLayoutGrid()));
     ribbon->addButton("View", "Layout", button);
 
@@ -300,9 +298,7 @@ void WindowMain::createMenus()
     ribbonDockWidget->setTitleBarWidget(new QWidget());
     ribbonDockWidget->setFeatures(QDockWidget::NoDockWidgetFeatures);
     ribbonDockWidget->setAllowedAreas(Qt::TopDockWidgetArea);
-    // ribbonDockWidget->setMinimumHeight(20);
-    // ribbonDockWidget->setMaximumHeight(105);
-    ribbonDockWidget->setFixedHeight(116);
+    ribbonDockWidget->setFixedHeight(94);
     ribbonDockWidget->setWidget(ribbonDockWidgetContents);
     addDockWidget(Qt::TopDockWidgetArea, ribbonDockWidget);
 }
@@ -909,6 +905,7 @@ bool WindowMain::projectCreateIndex(const QString &path)
 
         progressDialog.setValue(static_cast<int>(value));
         progressDialog.setLabelText(buffer);
+        QCoreApplication::processEvents();
 
         if (progressDialog.wasCanceled())
         {
