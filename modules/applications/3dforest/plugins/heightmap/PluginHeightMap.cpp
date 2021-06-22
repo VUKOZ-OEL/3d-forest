@@ -35,9 +35,9 @@
 #include <Time.hpp>
 
 #define PLUGIN_HEIGHT_MAP_NAME "Heightmap"
-#define PLUGIN_HEIGHT_MAP_COLORMAP_HUE "Hue"
+#define PLUGIN_HEIGHT_MAP_COLORMAP_VTK "VTK"
 #define PLUGIN_HEIGHT_MAP_COLORMAP_GRAY "Gray"
-#define PLUGIN_HEIGHT_MAP_COLORMAP_DEFAULT PLUGIN_HEIGHT_MAP_COLORMAP_HUE
+#define PLUGIN_HEIGHT_MAP_COLORMAP_DEFAULT PLUGIN_HEIGHT_MAP_COLORMAP_VTK
 #define PLUGIN_HEIGHT_MAP_COLORS_MAX 65536
 #define PLUGIN_HEIGHT_MAP_COLORS_DEFAULT 256
 
@@ -174,7 +174,7 @@ std::vector<Vector3<float>> PluginHeightMapFilter::createColormap(
 {
     size_t n = static_cast<size_t>(colorCount);
 
-    if (name == PLUGIN_HEIGHT_MAP_COLORMAP_HUE)
+    if (name == PLUGIN_HEIGHT_MAP_COLORMAP_VTK)
     {
         return ColorPalette::blueCyanGreenYellowRed(n);
     }
@@ -214,7 +214,7 @@ PluginHeightMapWindow::PluginHeightMapWindow(QWidget *parent,
             SLOT(colorCountChanged(int)));
 
     colormapComboBox_ = new QComboBox;
-    colormapComboBox_->addItem(PLUGIN_HEIGHT_MAP_COLORMAP_HUE);
+    colormapComboBox_->addItem(PLUGIN_HEIGHT_MAP_COLORMAP_VTK);
     colormapComboBox_->addItem(PLUGIN_HEIGHT_MAP_COLORMAP_GRAY);
     colormapComboBox_->setCurrentText(PLUGIN_HEIGHT_MAP_COLORMAP_DEFAULT);
 
