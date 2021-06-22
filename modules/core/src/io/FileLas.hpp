@@ -88,14 +88,19 @@ public:
         // End of 1.4 (375 bytes)
 
         size_t versionHeaderSize() const;
-        size_t pointDataRecordFormatLength() const;
-        size_t pointDataRecord3dForestLength() const;
-        size_t pointDataRecordUserLength() const;
+        size_t pointDataRecordLengthFormat() const;
+        size_t pointDataRecordLength3dForest() const;
+        size_t pointDataRecordLengthUser() const;
         uint64_t pointDataSize() const;
         std::string dateCreated() const;
         bool hasRgb() const;
 
         void setGeneratingSoftware();
+        void addOffsetPointData(uint64_t increment);
+        void addOffsetWdpr(uint64_t increment);
+        void subOffsetWdpr(uint64_t decrement);
+        void addOffsetEvlr(uint64_t increment);
+        void subOffsetEvlr(uint64_t decrement);
         Json &write(Json &out) const;
     };
 
@@ -167,7 +172,8 @@ public:
     static void create(const std::string &path,
                        const std::vector<FileLas::Point> &points,
                        const std::array<double, 3> &scale = {1, 1, 1},
-                       const std::array<double, 3> &offset = {0, 0, 0});
+                       const std::array<double, 3> &offset = {0, 0, 0},
+                       uint8_t version_minor = 4);
 
     void open(const std::string &path);
     void create(const std::string &path);

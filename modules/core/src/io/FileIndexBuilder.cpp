@@ -19,6 +19,7 @@
 
 /** @file FileIndexBuilder.cpp */
 
+#include <Endian.hpp>
 #include <FileIndexBuilder.hpp>
 #include <Vector3.hpp>
 #include <cstring>
@@ -144,7 +145,7 @@ void FileIndexBuilder::openFiles()
     inputLas_.open(readPath_);
     inputLas_.readHeader();
 
-    sizePointFormat_ = inputLas_.header.pointDataRecordFormatLength();
+    sizePointFormat_ = inputLas_.header.pointDataRecordLengthFormat();
     sizePoint_ = inputLas_.header.point_data_record_length;
     sizePoints_ = inputLas_.header.pointDataSize();
     sizeFile_ = inputLas_.file().size();
@@ -158,25 +159,70 @@ void FileIndexBuilder::openFiles()
     outputLas_.header = inputLas_.header;
     outputLas_.header.setGeneratingSoftware();
 
+    // Convert to LAS 1.4+
+    if ((outputLas_.header.version_major == 1) &&
+        (outputLas_.header.version_minor < 4))
+    {
+        outputLas_.header.version_minor = 4;
+
+        switch (outputLas_.header.point_data_record_format)
+        {
+            case 0:
+            case 1:
+                outputLas_.header.point_data_record_format = 6;
+                break;
+            case 2:
+            case 3:
+                outputLas_.header.point_data_record_format = 7;
+                break;
+            case 4:
+                outputLas_.header.point_data_record_format = 9;
+                break;
+            case 5:
+                outputLas_.header.point_data_record_format = 10;
+                break;
+
+            default:
+                // Do nothing
+                break;
+        }
+    }
+
+    uint64_t headerSize = inputLas_.header.header_size;
+    uint64_t headerExtra = headerSize - offsetHeaderEnd_;
+    uint64_t offsetHeaderEndVersionOut = outputLas_.header.versionHeaderSize();
+    uint64_t headerSizeOut = offsetHeaderEndVersionOut + headerExtra;
+
+    outputLas_.header.header_size = static_cast<uint16_t>(headerSizeOut);
+    offsetHeaderEndOut_ = offsetHeaderEndVersionOut;
+
+    uint64_t offsetPointsStartDiff = headerSizeOut - headerSize;
+    offsetPointsStartOut_ = offsetPointsStart_ + offsetPointsStartDiff;
+    outputLas_.header.addOffsetPointData(offsetPointsStartDiff);
+    outputLas_.header.addOffsetWdpr(offsetPointsStartDiff);
+    outputLas_.header.addOffsetEvlr(offsetPointsStartDiff);
+
     // Format
-    sizePointOut_ = inputLas_.header.pointDataRecord3dForestLength();
+    sizePointOut_ = outputLas_.header.pointDataRecordLength3dForest();
     outputLas_.header.point_data_record_length =
         static_cast<uint16_t>(sizePointOut_);
     sizePointsOut_ = outputLas_.header.pointDataSize();
+    offsetPointsEndOut_ = offsetPointsStartOut_ + sizePointsOut_;
     sizeFileOut_ = sizeFile_;
+    sizeFileOut_ += offsetPointsStartDiff;
 
     if (sizePointsOut_ > sizePoints_)
     {
         uint64_t extraBytes = sizePointsOut_ - sizePoints_;
-        outputLas_.header.offset_to_wdpr += extraBytes;
-        outputLas_.header.offset_to_evlr += extraBytes;
+        outputLas_.header.addOffsetWdpr(extraBytes);
+        outputLas_.header.addOffsetEvlr(extraBytes);
         sizeFileOut_ += extraBytes;
     }
     else if (sizePointsOut_ < sizePoints_)
     {
         uint64_t extraBytes = sizePoints_ - sizePointsOut_;
-        outputLas_.header.offset_to_wdpr -= extraBytes;
-        outputLas_.header.offset_to_evlr -= extraBytes;
+        outputLas_.header.subOffsetWdpr(extraBytes);
+        outputLas_.header.subOffsetEvlr(extraBytes);
         sizeFileOut_ -= extraBytes;
     }
 
@@ -266,7 +312,9 @@ void FileIndexBuilder::nextState()
     switch (state_)
     {
         case STATE_BEGIN:
-            if ((sizePoint_ != sizePointOut_) || (settings_.randomize))
+            if ((sizePoint_ != sizePointOut_) ||
+                (offsetHeaderEnd_ != offsetHeaderEndOut_) ||
+                (settings_.randomize))
             {
                 state_ = STATE_COPY_VLR;
                 maximum_ = offsetPointsStart_ - offsetHeaderEnd_;
@@ -308,7 +356,7 @@ void FileIndexBuilder::nextState()
 
         case STATE_MOVE:
             state_ = STATE_COPY;
-            maximum_ = sizeFileOut_ - offsetHeaderEnd_;
+            maximum_ = sizeFileOut_ - offsetHeaderEndOut_;
             break;
 
         case STATE_COPY:
@@ -397,7 +445,9 @@ void FileIndexBuilder::stateCopyPoints()
     step = stepIdx * sizePoint_;
 
     // Format
-    if (sizePoint_ == sizePointOut_)
+    if ((sizePoint_ == sizePointOut_) &&
+        (inputLas_.header.point_data_record_format ==
+         outputLas_.header.point_data_record_format))
     {
         // Keep extra bytes garbage
         inputLas_.file().read(buffer_.data(), step);
@@ -417,6 +467,88 @@ void FileIndexBuilder::stateCopyPoints()
             std::memcpy(out + (i * sizePointOut_),
                         in + (i * sizePoint_),
                         sizePointFormat_);
+        }
+
+        if ((inputLas_.header.point_data_record_format < 6) &&
+            (outputLas_.header.point_data_record_format >= 6))
+        {
+            for (size_t i = 0; i < stepIdx; i++)
+            {
+                uint8_t *pout = out + (i * sizePointOut_);
+                uint8_t *pin = in + (i * sizePoint_);
+
+                // i: edge:1, scan:1, number_of_returns:3, return_number:3
+                // o:                 number_of_returns:4, return_number:4
+                // i:             classification_flags:3, classification:5
+                // o: edge:1, scan:1,    scanner:2, classification_flags:4
+                uint32_t pi14 = pin[14];
+                uint32_t pi15 = pin[15];
+                uint32_t po = (pi14 & 0x07U) | ((pi14 & 0x38U) << 1);
+                pout[14] = static_cast<uint8_t>(po);
+
+                po = (pi14 & 0xc0U) | (pi15 >> 5);
+                pout[15] = static_cast<uint8_t>(po);
+                pout[16] = static_cast<uint8_t>(pi15 & 0x1fU);
+
+                pout[18] = pin[16];
+                pout[19] = pin[17];
+                pout[20] = pin[18];
+                pout[21] = pin[19];
+
+                // GPS time
+                if ((inputLas_.header.point_data_record_format == 1) ||
+                    (inputLas_.header.point_data_record_format > 2))
+                {
+                    copy64(&pout[22], &pin[20]);
+                }
+                else
+                {
+                    std::memset(&pout[22], 0, 8);
+                }
+
+                // RGB
+                if (inputLas_.header.point_data_record_format == 2)
+                {
+                    std::memcpy(&pout[30], &pin[20], 6);
+                }
+                else if ((inputLas_.header.point_data_record_format == 3) ||
+                         (inputLas_.header.point_data_record_format == 5))
+                {
+                    std::memcpy(&pout[30], &pin[28], 6);
+                }
+
+                // NIR
+                if ((outputLas_.header.point_data_record_format == 8) ||
+                    (outputLas_.header.point_data_record_format == 10))
+                {
+                    pout[36] = 0;
+                    pout[37] = 0;
+                }
+
+                // Wave
+                if (inputLas_.header.point_data_record_format == 4)
+                {
+                    if (outputLas_.header.point_data_record_format == 9)
+                    {
+                        std::memcpy(&pout[30], &pin[28], 29);
+                    }
+                    else
+                    {
+                        std::memcpy(&pout[38], &pin[28], 29);
+                    }
+                }
+                else if (inputLas_.header.point_data_record_format == 5)
+                {
+                    if (outputLas_.header.point_data_record_format == 9)
+                    {
+                        std::memcpy(&pout[30], &pin[34], 29);
+                    }
+                    else
+                    {
+                        std::memcpy(&pout[38], &pin[34], 29);
+                    }
+                }
+            }
         }
 
         outputLas_.file().write(out, sizePointOut_ * stepIdx);

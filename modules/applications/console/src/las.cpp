@@ -35,7 +35,16 @@ enum Command
     COMMAND_SELECT
 };
 
-void getarg(size_t *v, int &opt, int argc, char *argv[])
+void getarg(uint32_t *v, int &opt, int argc, char *argv[])
+{
+    opt++;
+    if (opt < argc)
+    {
+        *v = std::stoul(argv[opt]);
+    }
+}
+
+void getarg(uint64_t *v, int &opt, int argc, char *argv[])
 {
     opt++;
     if (opt < argc)
@@ -79,7 +88,7 @@ void cmd_create_index(const char *outputPath,
     FileIndexBuilder::index(outputPath, inputPath, settings);
 }
 
-void cmd_print(const char *inputPath)
+void cmd_print(const char *inputPath, uint64_t nPointsMax)
 {
     if (!inputPath)
     {
@@ -97,9 +106,9 @@ void cmd_print(const char *inputPath)
     las.seekPointData();
     FileLas::Point pt;
     uint64_t nPoints = las.header.number_of_point_records;
-    if (nPoints > 4)
+    if (nPoints > nPointsMax)
     {
-        nPoints = 4;
+        nPoints = nPointsMax;
     }
     for (uint64_t i = 0; i < nPoints; i++)
     {
@@ -121,6 +130,7 @@ void cmd_select(const char *inputPath, const Aabb<double> &window)
 int main(int argc, char *argv[])
 {
     int command = COMMAND_NONE;
+    uint64_t nPointsMax = 0;
     double wx1 = 0, wy1 = 0, wz1 = 0, wx2 = 0, wy2 = 0, wz2 = 0;
     Aabb<double> window;
     const char *outputPath = nullptr;
@@ -144,6 +154,12 @@ int main(int argc, char *argv[])
         else if (strcmp(argv[opt], "-s") == 0)
         {
             command = COMMAND_SELECT;
+        }
+
+        // Maximum number of points
+        else if (strcmp(argv[opt], "-n") == 0)
+        {
+            getarg(&nPointsMax, opt, argc, argv);
         }
 
         // Create index options
@@ -214,7 +230,7 @@ int main(int argc, char *argv[])
                 cmd_create_index(outputPath, inputPath, settings);
                 break;
             case COMMAND_PRINT:
-                cmd_print(inputPath);
+                cmd_print(inputPath, nPointsMax);
                 break;
             case COMMAND_SELECT:
                 window.set(wx1, wy1, wz1, wx2, wy2, wz2);

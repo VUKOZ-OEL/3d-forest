@@ -64,18 +64,18 @@ size_t FileLas::Header::versionHeaderSize() const
     return ret;
 }
 
-size_t FileLas::Header::pointDataRecordFormatLength() const
+size_t FileLas::Header::pointDataRecordLengthFormat() const
 {
     return LAS_FILE_FORMAT_BYTE_COUNT[point_data_record_format];
 }
 
-size_t FileLas::Header::pointDataRecord3dForestLength() const
+size_t FileLas::Header::pointDataRecordLength3dForest() const
 {
-    return pointDataRecordFormatLength() + sizeof(FileLas::Point::user_layer) +
+    return pointDataRecordLengthFormat() + sizeof(FileLas::Point::user_layer) +
            (3 * sizeof(FileLas::Point::user_red));
 }
 
-size_t FileLas::Header::pointDataRecordUserLength() const
+size_t FileLas::Header::pointDataRecordLengthUser() const
 {
     return static_cast<size_t>(point_data_record_length) -
            LAS_FILE_FORMAT_BYTE_COUNT[point_data_record_format];
@@ -152,6 +152,46 @@ void FileLas::Header::setGeneratingSoftware()
                 LAS_FILE_GENERATING_SOFTWARE);
 }
 
+void FileLas::Header::addOffsetPointData(uint64_t increment)
+{
+    if (offset_to_point_data != 0)
+    {
+        offset_to_point_data += static_cast<uint32_t>(increment);
+    }
+}
+
+void FileLas::Header::addOffsetWdpr(uint64_t increment)
+{
+    if (offset_to_wdpr != 0)
+    {
+        offset_to_wdpr += static_cast<uint32_t>(increment);
+    }
+}
+
+void FileLas::Header::subOffsetWdpr(uint64_t decrement)
+{
+    if (offset_to_wdpr != 0)
+    {
+        offset_to_wdpr -= static_cast<uint32_t>(decrement);
+    }
+}
+
+void FileLas::Header::addOffsetEvlr(uint64_t increment)
+{
+    if (offset_to_evlr != 0)
+    {
+        offset_to_evlr += static_cast<uint32_t>(increment);
+    }
+}
+
+void FileLas::Header::subOffsetEvlr(uint64_t decrement)
+{
+    if (offset_to_evlr != 0)
+    {
+        offset_to_evlr -= static_cast<uint32_t>(decrement);
+    }
+}
+
 FileLas::FileLas()
 {
 }
@@ -163,7 +203,8 @@ FileLas::~FileLas()
 void FileLas::create(const std::string &path,
                      const std::vector<FileLas::Point> &points,
                      const std::array<double, 3> &scale,
-                     const std::array<double, 3> &offset)
+                     const std::array<double, 3> &offset,
+                     uint8_t version_minor)
 {
     // Fill header
     FileLas::Header hdr;
@@ -175,9 +216,22 @@ void FileLas::create(const std::string &path,
     hdr.file_signature[3] = LAS_FILE_SIGNATURE_3;
 
     hdr.version_major = 1;
-    hdr.version_minor = 4;
+    hdr.version_minor = version_minor;
     hdr.setGeneratingSoftware();
-    hdr.header_size = LAS_FILE_HEADER_SIZE_V14;
+
+    if (version_minor > 3)
+    {
+        hdr.header_size = LAS_FILE_HEADER_SIZE_V14;
+    }
+    else if (version_minor > 2)
+    {
+        hdr.header_size = LAS_FILE_HEADER_SIZE_V13;
+    }
+    else
+    {
+        hdr.header_size = LAS_FILE_HEADER_SIZE_V10;
+    }
+
     hdr.offset_to_point_data = hdr.header_size;
 
     if (points.size() > 0)
@@ -190,7 +244,7 @@ void FileLas::create(const std::string &path,
     }
 
     hdr.point_data_record_length =
-        static_cast<uint16_t>(hdr.pointDataRecord3dForestLength());
+        static_cast<uint16_t>(hdr.pointDataRecordLength3dForest());
 
     uint64_t nPoints = points.size();
     uint32_t maxPoints = std::numeric_limits<uint32_t>::max();
@@ -351,7 +405,7 @@ void FileLas::readHeader(Header &hdr)
     }
 
     size_t length = static_cast<size_t>(hdr.point_data_record_length);
-    if (length < hdr.pointDataRecordFormatLength())
+    if (length < hdr.pointDataRecordLengthFormat())
     {
         THROW("LAS '" + file_.path() +
               "' has invalid record length "
@@ -778,12 +832,15 @@ Json &FileLas::Header::write(Json &out) const
     out["version"][1] = version_minor;
     out["generating_software"] = std::string(generating_software);
     out["file_creation"] = dateCreated();
-    out["header_size"] = header_size;
 
+    out["header_size"] = header_size;
     out["offset_to_point_data"] = offset_to_point_data;
+    out["offset_to_wdpr"] = offset_to_wdpr;
+    out["offset_to_evlr"] = offset_to_evlr;
+
     out["point_data_record_format"] = point_data_record_format;
     out["point_data_record_length"] = point_data_record_length;
-    out["point_data_record_user_length"] = pointDataRecordUserLength();
+    out["point_data_record_user_length"] = pointDataRecordLengthUser();
     out["number_of_point_records"] = number_of_point_records;
 
     out["scale"][0] = x_scale_factor;
@@ -816,107 +873,86 @@ std::ostream &operator<<(std::ostream &os, const FileLas::Point &obj)
     return os;
 }
 
-/*
-    point_data_record_format:
+/** @class FileLas.cpp::FileLas
 
-    - 0 to 5
-        - x                    : 32 bits
-        - y                    : 32 bits
-        - z                    : 32 bits
-        - intensity            : 16 bits *
-        - return_number        : 3 bits
-        - number_of_returns    : 3 bits
-        - scan_direction_flag  : 1 bit
-        - edge_of_flight_line  : 1 bit
-        - classification       : 3 bits classification_flags, 5 bits class
-        - angle                : 8 bits (-90 to +90)
-        - user_data            : 8 bits *
-        - source_id            : 16 bits
+Point Data Record Format Table:
 
-    - 1
-        - gps_time
+@verbatim
+v1.0 : formats 0, 1
+       16 angle                 8 bits signed (-90 to +90)
+       17 file marker           8 bits
+       18 user_data            16 bits
 
-    - 2
-        - red
-        - green
-        - blue
+v1.1 : formats 0, 1
+v1.2 : formats 0, 1, 2, 3
+v1.3 : formats 0, 1, 2, 3, 4, 5
+       17 user_data             8 bits
+       18 source_id            16 bits
 
-    - 3
-        - gps_time
-        - red
-        - green
-        - blue
+v1.4 : formats 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+       14 return_number         4 bits (new 1 bit)
+       14 number_of_returns     4 bits (new 1 bit)
+       15 classification_flags  4 bits (new 1 bit) *
+       15 scanner_channel       2 bits (new)
+       16 classification        8 bits class (new 3 bits)
+       18 angle                16 bits signed (by 0.006 degrees)
 
-    - 4
-        - gps_time
-        - wave_index
-        - wave_offset
-        - wave_size
-        - wave_return
-        - wave_x
-        - wave_y
-        - wave_z
-
-    - 5
-        - gps_time
-        - red
-        - green
-        - blue
-        - wave_index
-        - wave_offset
-        - wave_size
-        - wave_return
-        - wave_x
-        - wave_y
-        - wave_z
-
-    - 6 to 10
-        - x                    : 32 bits
-        - y                    : 32 bits
-        - z                    : 32 bits
-        - intensity            : 16 bits *
-        - return_number        : 4 bits (new 1 bit)
-        - number_of_returns    : 4 bits (new 1 bit)
-        - classification_flags : 4 bits (new 1 bit) *
-        - scanner_channel      : 2 bits (new)
-        - scan_direction_flag  : 1 bit
-        - edge_of_flight_line  : 1 bit
-        - classification       : 8 bits class (new 3 bits)
-        - user_data            : 8 bits *
-        - angle                : 16 bits signed (new 8 bits, by 0.006 degrees)
-        - source_id            : 16 bits
-        - gps_time             : 64 bits double
-
-    - 7
-        - red
-        - green
-        - blue
-
-    - 8
-        - red
-        - green
-        - blue
-        - nir
-
-    - 9
-        - wave_index
-        - wave_offset
-        - wave_size
-        - wave_return
-        - wave_x
-        - wave_y
-        - wave_z
-
-    - 10
-        - red
-        - green
-        - blue
-        - nir
-        - wave_index
-        - wave_offset
-        - wave_size
-        - wave_return
-        - wave_x
-        - wave_y
-        - wave_z
+|-------------------------------------------------------------------|
+|    0, 20 bytes                  |    6, 30 bytes                  |
+|  0 x                    32 bits |  0 x                    32 bits |
+|  4 y                    32 bits |  4 y                    32 bits |
+|  8 z                    32 bits |  8 z                    32 bits |
+| 12 intensity *          16 bits | 12 intensity *          16 bits |
+| 14 return_number        3 bits  | 14 return_number        4 bits  |
+|    number_of_returns    3 bits  |    number_of_returns    4 bits  |
+|                                 | 15 classification_flags 4 bits  |
+|                                 |    scanner_channel      2 bits  |
+|    scan_direction_flag  1 bit   |    scan_direction_flag  1 bit   |
+|    edge_of_flight_line  1 bit   |    edge_of_flight_line  1 bit   |
+| 15 classification       5 bits  | 16 classification       8 bits  |
+|    classification_flags 3 bits  |                                 |
+| 16 angle                8 bits  | 17 user_data *          8 bits  |
+| 17 user_data *          8 bits  | 18 angle                16 bits |
+| 18 source_id            16 bits | 20 source_id            16 bits |
+|                                 | 22 gps_time             64 bits |
+|---------------------------------+---------------------------------|
+|    1, 28 bytes                  |                                 |
+| 20 gps_time             64 bits |                                 |
+|---------------------------------+---------------------------------|
+|    2, 26 bytes                  |    7, 36 bytes                  |
+| 20 red                  16 bits | 30 red                  16 bits |
+| 22 green                16 bits | 32 green                16 bits |
+| 24 blue                 16 bits | 34 blue                 16 bits |
+|---------------------------------+---------------------------------|
+|    3, 34 bytes                  |    8, 38 bytes                  |
+| 20 gps_time             64 bits | 30 red                  16 bits |
+| 28 red                  16 bits | 32 green                16 bits |
+| 30 green                16 bits | 34 blue                 16 bits |
+| 32 blue                 16 bits | 36 NIR                  16 bits |
+|---------------------------------+---------------------------------|
+|    4, 57 bytes                  |                                 |
+| 20 gps_time             64 bits |    9, 59 bytes                  |
+| 28 wave_index            8 bits | 30 wave_index            8 bits |
+| 29 wave_offset          64 bits | 31 wave_offset          64 bits |
+| 37 wave_size            32 bits | 39 wave_size            32 bits |
+| 41 wave_return          32 bits | 43 wave_return          32 bits |
+| 45 wave_x               32 bits | 47 wave_x               32 bits |
+| 49 wave_y               32 bits | 51 wave_y               32 bits |
+| 53 wave_z               32 bits | 55 wave_z               32 bits |
+|---------------------------------+---------------------------------|
+|    5, 63 bytes                  |                                 |
+| 20 gps_time             64 bits |    10, 67 bytes                 |
+| 28 red                  16 bits | 30 red                  16 bits |
+| 30 green                16 bits | 32 green                16 bits |
+| 32 blue                 16 bits | 34 blue                 16 bits |
+|                                 | 36 NIR                  16 bits |
+| 34 wave_index            8 bits | 38 wave_index            8 bits |
+| 35 wave_offset          64 bits | 39 wave_offset          64 bits |
+| 43 wave_size            32 bits | 47 wave_size            32 bits |
+| 47 wave_return          32 bits | 51 wave_return          32 bits |
+| 51 wave_x               32 bits | 55 wave_x               32 bits |
+| 55 wave_y               32 bits | 59 wave_y               32 bits |
+| 59 wave_z               32 bits | 63 wave_z               32 bits |
+|-------------------------------------------------------------------|
+@endverbatim
 */
