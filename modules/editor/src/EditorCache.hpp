@@ -43,6 +43,8 @@ public:
     size_t tileSize() const { return lru_.size(); }
     EditorTile &tile(size_t index) { return *lru_[index]; }
 
+    EditorTile *tile(size_t dataset, size_t index);
+
 protected:
     EditorBase *editor_;
 

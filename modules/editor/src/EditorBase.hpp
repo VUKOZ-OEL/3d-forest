@@ -69,6 +69,10 @@ public:
 
     void select(std::vector<FileIndex::Selection> &selected);
     Aabb<double> selection() const;
+    EditorTile *tile(size_t dataset, size_t index)
+    {
+        return working_.tile(dataset, index);
+    }
 
     void setNumberOfViewports(size_t n);
     void updateCamera(size_t viewport, const Camera &camera);
@@ -107,6 +111,7 @@ protected:
 
     // Cache
     std::vector<std::shared_ptr<EditorCache>> viewports_;
+    EditorCache working_;
 };
 
 #endif /* EDITOR_BASE_HPP */
