@@ -41,6 +41,16 @@ target_include_directories(${PLUGIN_HEIGHT_MAP} PUBLIC plugins/heightmap)
 target_include_directories(${PLUGIN_HEIGHT_MAP} PUBLIC src)
 target_link_libraries(${PLUGIN_HEIGHT_MAP} PRIVATE Qt5::Widgets visualization)
 
+set(PLUGIN_DATABASE_STATISTICS "plugindatabasestatistics")
+add_library(
+  ${PLUGIN_DATABASE_STATISTICS}
+  SHARED
+  plugins/databasestatistics/PluginDatabaseStatistics.cpp
+)
+target_include_directories(${PLUGIN_DATABASE_STATISTICS} PUBLIC plugins/databasestatistics)
+target_include_directories(${PLUGIN_DATABASE_STATISTICS} PUBLIC src)
+target_link_libraries(${PLUGIN_DATABASE_STATISTICS} PRIVATE Qt5::Widgets visualization)
+
 # Application
 set(SUB_PROJECT_NAME "3dforest")
 file(GLOB_RECURSE SOURCES_3DFOREST "src/*.cpp")
@@ -63,3 +73,4 @@ target_link_libraries(
 # Install
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)
 install(TARGETS ${PLUGIN_HEIGHT_MAP} DESTINATION bin)
+install(TARGETS ${PLUGIN_DATABASE_STATISTICS} DESTINATION bin)

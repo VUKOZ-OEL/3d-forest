@@ -53,11 +53,6 @@ QTextEdit *WindowMain::log = nullptr;
 
 WindowMain::WindowMain(QWidget *parent) : QMainWindow(parent)
 {
-    menuTools_ = nullptr;
-    menuWindows_ = nullptr;
-    pluginButton_ = nullptr;
-    pluginAction_ = nullptr;
-
     initializeWindow();
 }
 
@@ -246,11 +241,18 @@ void WindowMain::createMenus()
     ribbon->setIconSize(QSize(20, 20));
 
     /** @todo Add buttons from loaded plugins. */
-    pluginButton_ = createMenuButton(tr("Heightmap"),
-                                     tr("Heightmap"),
-                                     "icons8-histogram-40.png");
-    // connect(button, SIGNAL(clicked()), this, SLOT(actionPluginToolShow()));
-    ribbon->addButton("Tools", "Plugins", pluginButton_);
+    QToolButton *pluginButton;
+    pluginButton = createMenuButton(tr("Heightmap"),
+                                    tr("Heightmap"),
+                                    "icons8-histogram-40.png");
+    ribbon->addButton("Tools", "Plugins", pluginButton);
+    pluginsButton_.push_back(pluginButton);
+
+    pluginButton = createMenuButton(tr("Statistics"),
+                                    tr("Statistics"),
+                                    "icons8-graph-40.png");
+    ribbon->addButton("Tools", "Plugins", pluginButton);
+    pluginsButton_.push_back(pluginButton);
 
     // Windows
     ribbon->addTab(QIcon(":/icons/icons8-restore-window-40.png"), "Windows");
@@ -384,16 +386,6 @@ void WindowMain::createWindows()
     dockLog->setWidget(log);
     dockLog->setVisible(false);
     addDockWidget(Qt::BottomDockWidgetArea, dockLog);
-
-    // Add dock widgets to Windows menu
-    if (menuWindows_)
-    {
-        menuWindows_->addAction(dockDataSets->toggleViewAction());
-        menuWindows_->addAction(dockLayers->toggleViewAction());
-        menuWindows_->addAction(dockViewSettings->toggleViewAction());
-        menuWindows_->addAction(dockClipFilter->toggleViewAction());
-        menuWindows_->addAction(dockLog->toggleViewAction());
-    }
 }
 
 void WindowMain::createPlugins()
@@ -420,15 +412,36 @@ void WindowMain::createPlugins()
                 pluginToolInterface->initialize(this, &editor_);
                 pluginsTool_.push_back(pluginToolInterface);
 
-                pluginAction_ =
-                    new QAction(pluginToolInterface->windowTitle(), this);
-                pluginAction_->setIcon(
-                    QIcon(":/icons/icons8-histogram-40.png"));
-                connect(pluginAction_,
-                        SIGNAL(triggered()),
-                        this,
-                        SLOT(actionPluginToolShow()));
-                pluginButton_->setDefaultAction(pluginAction_);
+                /** @todo Load icons from plugins. */
+                QString name = pluginToolInterface->windowTitle();
+                for (QToolButton *button : pluginsButton_)
+                {
+                    if (button->text() == name)
+                    {
+                        QAction *action = new QAction(name, this);
+                        pluginsAction_.push_back(action);
+
+                        if (name == "Heightmap")
+                        {
+                            action->setIcon(
+                                QIcon(":/icons/icons8-histogram-40.png"));
+                        }
+                        else
+                        {
+                            action->setIcon(
+                                QIcon(":/icons/icons8-graph-40.png"));
+                        }
+
+                        connect(action,
+                                SIGNAL(triggered()),
+                                this,
+                                SLOT(actionPluginToolShow()));
+
+                        button->setDefaultAction(action);
+
+                        break;
+                    }
+                }
 
                 EditorFilter *filter;
                 filter = dynamic_cast<EditorFilter *>(pluginToolInterface);

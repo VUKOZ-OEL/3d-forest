@@ -110,13 +110,9 @@ protected:
     WindowViewports *windowViewports_;
     WindowSettingsView *windowSettingsView_;
 
-    // Menus
-    QMenu *menuTools_;
-    QMenu *menuWindows_;
-
     // Actions
-    QToolButton *pluginButton_;
-    QAction *pluginAction_;
+    std::vector<QToolButton *> pluginsButton_;
+    std::vector<QAction *> pluginsAction_;
 
     // Initialization
     void initializeWindow();

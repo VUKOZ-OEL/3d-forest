@@ -202,11 +202,35 @@ bool EditorCache::Key::operator<(const Key &rhs) const
     return (dataSetId < rhs.dataSetId) || (tileId < rhs.tileId);
 }
 
-#if 0
-bool isCached(size_t d, size_t c) const;
-bool EditorCache::isCached(size_t d, size_t c) const
+EditorTile *EditorCache::tile(size_t dataset, size_t index)
 {
-    auto search = cache_.find({d, c});
-    return search != cache_.end();
+    Key nk = {dataset, index};
+
+    auto search = cache_.find(nk);
+    if (search != cache_.end())
+    {
+        return search->second.get();
+    }
+    else
+    {
+        /** @todo Add LRU and drop old tiles. */
+
+        std::shared_ptr<EditorTile> tile;
+        tile = std::make_shared<EditorTile>();
+        tile->dataSetId = nk.dataSetId;
+        tile->tileId = nk.tileId;
+        tile->loaded = false;
+        cache_[nk] = tile;
+
+        try
+        {
+            tile->read(editor_);
+        }
+        catch (...)
+        {
+            // error
+        }
+
+        return tile.get();
+    }
 }
-#endif

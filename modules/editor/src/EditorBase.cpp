@@ -28,7 +28,7 @@ static const char *EDITOR_BASE_KEY_DATA_SET = "dataSets";
 static const char *EDITOR_BASE_KEY_LAYER = "layers";
 // static const char *EDITOR_BASE_KEY_CLIP_FILTER = "clipFilter";
 
-EditorBase::EditorBase()
+EditorBase::EditorBase() : working_(this)
 {
     close();
     setNumberOfViewports(1);
