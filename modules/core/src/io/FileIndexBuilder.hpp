@@ -102,9 +102,12 @@ protected:
     uint64_t maximumIdx_;
     uint64_t valueTotal_;
     uint64_t maximumTotal_;
-    uint64_t offsetHeaderEnd_;
+    uint64_t offsetHeaderEnd_;    // From version major.minor
+    uint64_t offsetHeaderEndOut_; // From version major.minor
     uint64_t offsetPointsStart_;
+    uint64_t offsetPointsStartOut_;
     uint64_t offsetPointsEnd_;
+    uint64_t offsetPointsEndOut_;
     uint64_t sizePoints_;
     uint64_t sizePointsOut_;
     uint64_t sizeFile_;

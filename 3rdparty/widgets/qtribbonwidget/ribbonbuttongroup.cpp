@@ -12,6 +12,7 @@
     Modifications Copyright 2020 VUKOZ
 
     Removed >setIconSize().
+    'ui->label' not used.
 */
 
 #include "ribbonbuttongroup.h"
@@ -35,7 +36,7 @@ RibbonButtonGroup::~RibbonButtonGroup()
 void RibbonButtonGroup::setTitle(const QString &title)
 {
   m_title = title;
-  ui->label->setText(m_title);
+  //ui->label->setText(m_title);
 }
 
 QString RibbonButtonGroup::title() const

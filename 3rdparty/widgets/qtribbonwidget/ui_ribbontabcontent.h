@@ -64,7 +64,8 @@ public:
         ribbonHorizontalLayout = new QHBoxLayout();
         ribbonHorizontalLayout->setSpacing(0);
         ribbonHorizontalLayout->setObjectName(QString::fromUtf8("ribbonHorizontalLayout"));
-        ribbonHorizontalLayout->setContentsMargins(0, 3, 0, 0);
+        //ribbonHorizontalLayout->setContentsMargins(0, 3, 0, 0);
+        ribbonHorizontalLayout->setContentsMargins(0, 0, 0, 0);
 
         gridLayout_2->addLayout(ribbonHorizontalLayout, 0, 0, 1, 1);
 

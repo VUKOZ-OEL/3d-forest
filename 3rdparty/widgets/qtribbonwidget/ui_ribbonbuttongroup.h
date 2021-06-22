@@ -26,8 +26,8 @@ public:
     QGridLayout *gridLayout;
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout;
-    QFrame *horizontalLine;
-    QLabel *label;
+    //QFrame *horizontalLine;
+    //QLabel *label;
     QFrame *verticalLine;
 
     void setupUi(QWidget *RibbonButtonGroup)
@@ -39,29 +39,33 @@ public:
         gridLayout->setSpacing(0);
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         gridLayout->setContentsMargins(0, 0, 0, 0);
+
         verticalLayout = new QVBoxLayout();
         verticalLayout->setSpacing(0);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-        verticalLayout->setContentsMargins(2, 2, 2, 2);
+        //verticalLayout->setContentsMargins(2, 2, 2, 2);
+        verticalLayout->setContentsMargins(0, 0, 0, 0);
+
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setSpacing(0);
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        horizontalLayout->setContentsMargins(0, 0, 0, 0);
 
         verticalLayout->addLayout(horizontalLayout);
 
-        horizontalLine = new QFrame(RibbonButtonGroup);
-        horizontalLine->setObjectName(QString::fromUtf8("horizontalLine"));
-        horizontalLine->setStyleSheet(QString::fromUtf8("color: #c0c0c0;"));
-        horizontalLine->setFrameShadow(QFrame::Plain);
-        horizontalLine->setFrameShape(QFrame::HLine);
+        // horizontalLine = new QFrame(RibbonButtonGroup);
+        // horizontalLine->setObjectName(QString::fromUtf8("horizontalLine"));
+        // horizontalLine->setStyleSheet(QString::fromUtf8("color: #c0c0c0;"));
+        // horizontalLine->setFrameShadow(QFrame::Plain);
+        // horizontalLine->setFrameShape(QFrame::HLine);
 
-        verticalLayout->addWidget(horizontalLine);
+        // verticalLayout->addWidget(horizontalLine);
 
-        label = new QLabel(RibbonButtonGroup);
-        label->setObjectName(QString::fromUtf8("label"));
-        label->setAlignment(Qt::AlignCenter);
+        // label = new QLabel(RibbonButtonGroup);
+        // label->setObjectName(QString::fromUtf8("label"));
+        // label->setAlignment(Qt::AlignCenter);
 
-        verticalLayout->addWidget(label);
+        // verticalLayout->addWidget(label);
 
 
         gridLayout->addLayout(verticalLayout, 0, 0, 1, 1);
@@ -83,7 +87,7 @@ public:
     void retranslateUi(QWidget *RibbonButtonGroup)
     {
         RibbonButtonGroup->setWindowTitle(QCoreApplication::translate("RibbonButtonGroup", "Form", nullptr));
-        label->setText(QCoreApplication::translate("RibbonButtonGroup", "ToolBar", nullptr));
+        //label->setText(QCoreApplication::translate("RibbonButtonGroup", "ToolBar", nullptr));
     } // retranslateUi
 
 };

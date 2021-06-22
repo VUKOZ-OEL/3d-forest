@@ -20,6 +20,7 @@
 /** @file exampleLasCreate.cpp @brief Create LAS file. */
 
 #include <FileIndexBuilder.hpp>
+#include <Vector3.hpp>
 #include <cstring>
 
 static void createBox(const std::string &path)
@@ -55,13 +56,25 @@ static void createBox(const std::string &path)
     FileLas::create(path, points);
 }
 
-static void createGrid(const std::string &path)
+static void createGrid(const std::string &path,
+                       const Vector3<double> &translate = {0, 0, 0},
+                       uint8_t version_minor = 4)
 {
     // Create points
     std::vector<FileLas::Point> points;
 
     size_t nx = 16;
     size_t ny = 16;
+    size_t s1_65535 = 257;
+    size_t s2_65535 = 4369;
+
+    if (version_minor < 4)
+    {
+        nx = 8;
+        ny = 8;
+        s1_65535 = 1040;
+        s2_65535 = 9362;
+    }
 
     points.resize(nx * ny);
 
@@ -72,21 +85,21 @@ static void createGrid(const std::string &path)
     {
         for (size_t x = 0; x < nx; x++)
         {
-            uint16_t intensity = static_cast<uint16_t>(idx * 257); // to 65,535
+            uint16_t intensity = static_cast<uint16_t>(idx * s1_65535);
 
-            points[idx].format = 7;
+            points[idx].format = 2; // rgb
 
             points[idx].x = static_cast<uint32_t>(x);
             points[idx].y = static_cast<uint32_t>(y);
             points[idx].z = 0;
 
-            points[idx].red = static_cast<uint16_t>(x * 4369);
-            points[idx].green = static_cast<uint16_t>(y * 4369);
+            points[idx].red = static_cast<uint16_t>(x * s2_65535);
+            points[idx].green = static_cast<uint16_t>(y * s2_65535);
             points[idx].blue = 0;
 
-            points[idx].user_red = static_cast<uint16_t>(y * 4369);
+            points[idx].user_red = static_cast<uint16_t>(y * s2_65535);
             points[idx].user_green = 0;
-            points[idx].user_blue = static_cast<uint16_t>(x * 4369);
+            points[idx].user_blue = static_cast<uint16_t>(x * s2_65535);
 
             points[idx].intensity = intensity;
             points[idx].return_number = static_cast<uint8_t>(x);
@@ -95,7 +108,14 @@ static void createGrid(const std::string &path)
             points[idx].scanner_channel = y & 3U;
             points[idx].scan_direction_flag = y & 4U;
             points[idx].edge_of_flight_line = y & 8U;
-            points[idx].classification = static_cast<uint8_t>(idx);
+            if (version_minor < 4)
+            {
+                points[idx].classification = static_cast<uint8_t>(idx & 0xfU);
+            }
+            else
+            {
+                points[idx].classification = static_cast<uint8_t>(idx);
+            }
             points[idx].source_id = intensity;
 
             idx++;
@@ -103,7 +123,7 @@ static void createGrid(const std::string &path)
     }
 
     // Create LAS file with scale and offset
-    FileLas::create(path, points, {1,1,1}, {10,0,0});
+    FileLas::create(path, points, {1,1,1}, translate, version_minor);
 }
 
 static void createIndex(const std::string &path)
@@ -118,8 +138,11 @@ int main()
     createBox("box.las");
     createIndex("box.las");
 
-    createGrid("grid.las");
-    createIndex("grid.las");
+    createGrid("grid_v2.las", {4,0,0}, 2);
+    //createIndex("grid_v2.las");
+
+    createGrid("grid.las", {13,0,0}, 4);
+    //createIndex("grid.las");
 
     return 0;
 }
