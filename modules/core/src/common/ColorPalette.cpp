@@ -22,19 +22,19 @@
 #include <ColorPalette.hpp>
 
 const std::vector<Vector3<float>> ColorPalette::Classification{
-    0xffffffU, //  0 : Never classified
-    0xb2b2b2U, //  1 : Unassigned
+    0xffffffU, //  0 : Created, Never classified
+    0xb2b2b2U, //  1 : Unassigned - Unclassified
     0xa87102U, //  2 : Ground
     0x407d00U, //  3 : Low Vegetation
     0x5cb200U, //  4 : Medium Vegetation
     0x85ff00U, //  5 : High Vegetation
     0xe64d43U, //  6 : Building
-    0xe60101U, //  7 : Low Point
-    0xff55ffU, //  8 : Reserved
+    0xe60101U, //  7 : Low Point (Noise)
+    0xff55ffU, //  8 :   Reserved
     0x035ee6U, //  9 : Water
     0x8504a9U, // 10 : Rail
     0xffff03U, // 11 : Road Surface
-    0xee4feeU, // 12 : Reserved
+    0xee4feeU, // 12 :   Reserved
     0xaaffffU, // 13 : Wire - Guard (Shield)
     0x00ffffU, // 14 : Wire - Conductor (Phase)
     0xb3b300U, // 15 : Transmission Tower
@@ -42,6 +42,10 @@ const std::vector<Vector3<float>> ColorPalette::Classification{
     0xe6e6e6U, // 17 : Bridge Deck
     0xff0000U, // 18 : High Noise
                // 19 - 63 : Reserved
+               // 19 : Overhead Structure (mining equipment, traffic lights)
+               // 20 : Ignored Ground (breakline proximity)
+               // 21 : Snow
+               // 22 : Temporal Exclusion (water levels, landslides, permafrost)
                // 64 - 255 : User Definable
 };
 
