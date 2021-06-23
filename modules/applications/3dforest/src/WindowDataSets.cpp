@@ -65,8 +65,7 @@ void WindowDataSets::updateEditor(const Editor &editor)
     // Header
     dataSets_->setColumnCount(COLUMN_LAST);
     QStringList labels;
-    labels << tr("Index") << tr("Select") << tr("File name")
-           << tr("Date Created");
+    labels << tr("Index") << tr("Select") << tr("File name") << tr("Date");
     dataSets_->setHeaderLabels(labels);
 
     // Content

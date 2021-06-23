@@ -212,7 +212,26 @@ void GLWidget::paintGL()
     // Render
     glColor3f(0.25F, 0.25F, 0.25F);
     GL::renderAabb(aabb_);
-    GL::renderAxis(aabb_, camera_.getCenter());
+
+    // Overlay
+    QMatrix4x4 m;
+    float w = static_cast<float>(camera_.width());
+    float h = static_cast<float>(camera_.height());
+    float aspect = w / h;
+    m.ortho(-5.0F * aspect, 5.0F * aspect, -5.0F, 5.0F, -5.0F, 5.0F);
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixf(m.data());
+
+    // Overlay: rotated
+    m = camera_.rotation();
+    glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixf(m.data());
+
+    glDisable(GL_DEPTH_TEST);
+    glLineWidth(2.0F);
+    GL::renderAxis();
+    glLineWidth(1.0F);
+    glEnable(GL_DEPTH_TEST);
 }
 
 void GLWidget::clearScreen()

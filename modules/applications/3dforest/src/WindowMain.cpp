@@ -74,9 +74,9 @@ void WindowMain::initializeWindow()
 {
     // Create
     createEditor();
+    createWindows();
     createMenus();
     createViewer();
-    createWindows();
     createPlugins();
 
     // Update
@@ -104,7 +104,8 @@ void WindowMain::createViewer()
 
 QToolButton *WindowMain::createMenuButton(const QString &text,
                                           const QString &toolTip,
-                                          const QString &icon)
+                                          const QString &icon,
+                                          QDockWidget *dockWidget)
 {
     QToolButton *button = new QToolButton;
 
@@ -113,6 +114,15 @@ QToolButton *WindowMain::createMenuButton(const QString &text,
     button->setIcon(QIcon(":/icons/" + icon));
     button->setIconSize(QSize(40, 40)); // 20x20 is could be also ok
     button->setEnabled(true);
+
+    if (dockWidget)
+    {
+        QAction *action;
+
+        action = dockWidget->toggleViewAction();
+        action->setIcon(button->icon());
+        button->setDefaultAction(action);
+    }
 
     return button;
 }
@@ -165,6 +175,7 @@ void WindowMain::createMenus()
                               tr("Export visible points to a file"),
                               "icons8-send-file-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionProjectExportAs()));
+    button->setEnabled(false);
     ribbon->addButton("Project", "File", button);
 
     // Project
@@ -260,25 +271,32 @@ void WindowMain::createMenus()
 
     button = createMenuButton(tr("Data Sets"),
                               tr("Data Sets"),
-                              "icons8-open-box-40.png");
-    // connect(button, SIGNAL(clicked()), this, SLOT(actionAbout()));
+                              "icons8-open-box-40.png",
+                              dockDataSets_);
     ribbon->addButton("Windows", "Windows", button);
 
-    button =
-        createMenuButton(tr("Layers"), tr("Layers"), "icons8-variation-40.png");
-    // connect(button, SIGNAL(clicked()), this, SLOT(actionAbout()));
+    button = createMenuButton(tr("Layers"),
+                              tr("Layers"),
+                              "icons8-variation-40.png",
+                              dockLayers_);
     ribbon->addButton("Windows", "Windows", button);
 
-    button = createMenuButton(tr("View"), tr("View"), "icons8-tune-40.png");
-    // connect(button, SIGNAL(clicked()), this, SLOT(actionAbout()));
+    button = createMenuButton(tr("View"),
+                              tr("View"),
+                              "icons8-tune-40.png",
+                              dockViewSettings_);
     ribbon->addButton("Windows", "Windows", button);
 
-    button = createMenuButton(tr("Clip"), tr("Clip"), "icons8-crop-40.png");
-    // connect(button, SIGNAL(clicked()), this, SLOT(actionAbout()));
+    button = createMenuButton(tr("Clip"),
+                              tr("Clip"),
+                              "icons8-crop-40.png",
+                              dockClipFilter_);
     ribbon->addButton("Windows", "Windows", button);
 
-    button = createMenuButton(tr("Log"), tr("Log"), "icons8-pass-fail-40.png");
-    // connect(button, SIGNAL(clicked()), this, SLOT(actionAbout()));
+    button = createMenuButton(tr("Log"),
+                              tr("Log"),
+                              "icons8-pass-fail-40.png",
+                              dockLog_);
     ribbon->addButton("Windows", "Info", button);
 
     // Help
@@ -314,14 +332,13 @@ void WindowMain::createWindows()
             this,
             SLOT(actionDataSetVisible(size_t, bool)));
 
-    QDockWidget *dockDataSets = new QDockWidget(tr("Data Sets"), this);
-    dockDataSets->setAllowedAreas(
+    dockDataSets_ = new QDockWidget(tr("Data Sets"), this);
+    dockDataSets_->setAllowedAreas(
         Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea |
         Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
-    // dockDataSets->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
-    // dockDataSets->setMaximumWidth(WINDOW_MAIN_DOCK_MAX);
-    dockDataSets->setWidget(windowDataSets_);
-    addDockWidget(Qt::LeftDockWidgetArea, dockDataSets);
+    dockDataSets_->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
+    dockDataSets_->setWidget(windowDataSets_);
+    addDockWidget(Qt::LeftDockWidgetArea, dockDataSets_);
 
     // Create layers window
     windowLayers_ = new WindowLayers(this);
@@ -330,14 +347,14 @@ void WindowMain::createWindows()
             this,
             SLOT(actionLayerVisible(size_t, bool)));
 
-    QDockWidget *dockLayers = new QDockWidget(tr("Layers"), this);
-    dockLayers->setAllowedAreas(Qt::LeftDockWidgetArea |
-                                Qt::RightDockWidgetArea);
-    dockLayers->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
-    dockLayers->setMaximumWidth(WINDOW_MAIN_DOCK_MAX);
-    dockLayers->setWidget(windowLayers_);
-    // dockLayers->setVisible(false);
-    addDockWidget(Qt::LeftDockWidgetArea, dockLayers);
+    dockLayers_ = new QDockWidget(tr("Layers"), this);
+    dockLayers_->setAllowedAreas(Qt::LeftDockWidgetArea |
+                                 Qt::RightDockWidgetArea);
+    dockLayers_->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
+    dockLayers_->setMaximumWidth(WINDOW_MAIN_DOCK_MAX);
+    dockLayers_->setWidget(windowLayers_);
+    dockLayers_->setVisible(false);
+    addDockWidget(Qt::LeftDockWidgetArea, dockLayers_);
 
     // Create view settings window
     windowSettingsView_ = new WindowSettingsView(this);
@@ -350,13 +367,13 @@ void WindowMain::createWindows()
             this,
             SLOT(actionSettingsViewColor()));
 
-    QDockWidget *dockViewSettings = new QDockWidget(tr("View Settings"), this);
-    dockViewSettings->setAllowedAreas(Qt::LeftDockWidgetArea |
-                                      Qt::RightDockWidgetArea);
-    dockViewSettings->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
-    dockViewSettings->setMaximumWidth(WINDOW_MAIN_DOCK_MAX);
-    dockViewSettings->setWidget(windowSettingsView_);
-    addDockWidget(Qt::RightDockWidgetArea, dockViewSettings);
+    dockViewSettings_ = new QDockWidget(tr("View Settings"), this);
+    dockViewSettings_->setAllowedAreas(Qt::LeftDockWidgetArea |
+                                       Qt::RightDockWidgetArea);
+    dockViewSettings_->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
+    dockViewSettings_->setMaximumWidth(WINDOW_MAIN_DOCK_MAX);
+    dockViewSettings_->setWidget(windowSettingsView_);
+    addDockWidget(Qt::RightDockWidgetArea, dockViewSettings_);
 
     // Create clip filter window
     windowClipFilter_ = new WindowClipFilter(this);
@@ -369,29 +386,29 @@ void WindowMain::createWindows()
             this,
             SLOT(actionClipFilterReset()));
 
-    QDockWidget *dockClipFilter = new QDockWidget(tr("Clip Filter"), this);
-    dockClipFilter->setAllowedAreas(Qt::LeftDockWidgetArea |
-                                    Qt::RightDockWidgetArea);
-    dockClipFilter->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
-    dockClipFilter->setMaximumWidth(WINDOW_MAIN_DOCK_MAX);
-    dockClipFilter->setWidget(windowClipFilter_);
-    addDockWidget(Qt::LeftDockWidgetArea, dockClipFilter);
+    dockClipFilter_ = new QDockWidget(tr("Clip Filter"), this);
+    dockClipFilter_->setAllowedAreas(Qt::LeftDockWidgetArea |
+                                     Qt::RightDockWidgetArea);
+    dockClipFilter_->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
+    dockClipFilter_->setMaximumWidth(WINDOW_MAIN_DOCK_MAX);
+    dockClipFilter_->setWidget(windowClipFilter_);
+    addDockWidget(Qt::LeftDockWidgetArea, dockClipFilter_);
 
     // Log
     log = new QTextEdit(this);
     log->setReadOnly(true);
 
-    QDockWidget *dockLog = new QDockWidget(tr("Log"), this);
-    dockLog->setMinimumHeight(200);
-    dockLog->setWidget(log);
-    dockLog->setVisible(false);
-    addDockWidget(Qt::BottomDockWidgetArea, dockLog);
+    dockLog_ = new QDockWidget(tr("Log"), this);
+    dockLog_->setMinimumHeight(200);
+    dockLog_->setWidget(log);
+    dockLog_->setVisible(false);
+    addDockWidget(Qt::BottomDockWidgetArea, dockLog_);
 }
 
 void WindowMain::createPlugins()
 {
     // Process all files in the application "exe" directory
-    QDir pluginsDir(QCoreApplication::applicationDirPath());
+    QDir pluginsDir(QCoreApplication::applicationDirPath() + "/plugins/");
     const QStringList entries = pluginsDir.entryList(QDir::Files);
 
     for (const QString &fileName : entries)
@@ -677,6 +694,7 @@ void WindowMain::actionClipFilter(const ClipFilter &clipFilter)
 {
     editor_.cancelThreads();
     editor_.lock();
+    /** @todo There is a bug when clip filter is disabled. */
     editor_.setClipFilter(clipFilter);
     editor_.tileViewClear();
     editor_.unlock();

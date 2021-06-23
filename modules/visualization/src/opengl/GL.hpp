@@ -52,7 +52,7 @@ public:
 
     static void renderClipFilter(const ClipFilter &clipFilter);
     static void renderAabb(const GLAabb &box);
-    static void renderAxis(const GLAabb &box, const QVector3D &center);
+    static void renderAxis();
 
 protected:
 };

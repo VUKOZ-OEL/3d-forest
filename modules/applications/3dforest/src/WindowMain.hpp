@@ -110,6 +110,12 @@ protected:
     WindowViewports *windowViewports_;
     WindowSettingsView *windowSettingsView_;
 
+    QDockWidget *dockClipFilter_;
+    QDockWidget *dockDataSets_;
+    QDockWidget *dockLayers_;
+    QDockWidget *dockViewSettings_;
+    QDockWidget *dockLog_;
+
     // Actions
     std::vector<QToolButton *> pluginsButton_;
     std::vector<QAction *> pluginsAction_;
@@ -138,7 +144,8 @@ protected:
     void updateWindowTitle(const QString &path);
     QToolButton *createMenuButton(const QString &text,
                                   const QString &toolTip,
-                                  const QString &icon);
+                                  const QString &icon,
+                                  QDockWidget *dockWidget = nullptr);
 
     // Events
     void closeEvent(QCloseEvent *event) override;

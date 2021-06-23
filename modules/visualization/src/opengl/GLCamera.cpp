@@ -316,6 +316,13 @@ void GLCamera::zoom(int dy)
     setDistance(distance_ * std::exp(sensitivityZoom_ * d));
 }
 
+QMatrix4x4 GLCamera::rotation() const
+{
+    QMatrix4x4 m;
+    m.rotate(rotation_);
+    return m;
+}
+
 void GLCamera::updateMatrix()
 {
     QMatrix4x4 m;
