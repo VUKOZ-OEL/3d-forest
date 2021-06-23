@@ -230,6 +230,7 @@ void EditorBase::close()
     {
         it->clear();
     }
+    working_.clear();
 
     unsavedChanges_ = false;
 }

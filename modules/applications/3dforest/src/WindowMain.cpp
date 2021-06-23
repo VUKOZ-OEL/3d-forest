@@ -694,6 +694,7 @@ void WindowMain::actionClipFilter(const ClipFilter &clipFilter)
 {
     editor_.cancelThreads();
     editor_.lock();
+    /** @todo There is a bug when clip filter is disabled. */
     editor_.setClipFilter(clipFilter);
     editor_.tileViewClear();
     editor_.unlock();
