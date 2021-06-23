@@ -165,12 +165,12 @@ void GL::renderAabb(const GLAabb &box)
     glDisableClientState(GL_VERTEX_ARRAY);
 }
 
-void GL::renderAxis(const GLAabb &box, const QVector3D &center)
+void GL::renderAxis()
 {
-    float d = box.getRadius() * 0.25F; /**< @todo Do not project length. */
+    float d = 1.0F;
 
     QVector3D v[6];
-    v[0] = center;
+    v[0] = QVector3D(0.0F, 0.0F, 0.0F);
     v[1] = QVector3D(v[0].x() + d, v[0].y(), v[0].z());
     v[2] = v[0];
     v[3] = QVector3D(v[0].x(), v[0].y() + d, v[0].z());
@@ -182,8 +182,8 @@ void GL::renderAxis(const GLAabb &box, const QVector3D &center)
     c[1] = QVector3D(1.0F, 0.0F, 0.0F);
     c[2] = QVector3D(0.0F, 1.0F, 0.0F);
     c[3] = QVector3D(0.0F, 1.0F, 0.0F);
-    c[4] = QVector3D(0.0F, 0.0F, 1.0F);
-    c[5] = QVector3D(0.0F, 0.0F, 1.0F);
+    c[4] = QVector3D(0.0F, 0.3F, 1.0F);
+    c[5] = QVector3D(0.0F, 0.3F, 1.0F);
 
     GLuint indices[6] = {0, 1, 2, 3, 4, 5};
 

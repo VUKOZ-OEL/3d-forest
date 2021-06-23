@@ -68,6 +68,7 @@ public:
     const QVector3D &getUp() const { return up_; }
     const QVector3D &getRight() const { return right_; }
     const QVector3D &getDirection() const { return direction_; }
+    QMatrix4x4 rotation() const;
 
     Camera toCamera() const;
 
