@@ -23,6 +23,7 @@
 #define WINDOW_MAIN_HPP
 
 #include <Editor.hpp>
+#include <QIcon>
 #include <QMainWindow>
 #include <WindowViewports.hpp>
 #include <vector>
@@ -32,6 +33,7 @@ class QTextEdit;
 class QToolButton;
 class PluginFile;
 class PluginTool;
+class Ribbon;
 class WindowClipFilter;
 class WindowDataSets;
 class WindowLayers;
@@ -117,7 +119,7 @@ protected:
     QDockWidget *dockLog_;
 
     // Actions
-    std::vector<QToolButton *> pluginsButton_;
+    Ribbon *ribbon_;
     std::vector<QAction *> pluginsAction_;
 
     // Initialization
@@ -142,6 +144,9 @@ protected:
     // Utilities
     void showError(const char *message);
     void updateWindowTitle(const QString &path);
+    QToolButton *createMenuButton(const QString &text,
+                                  const QString &toolTip,
+                                  const QIcon &icon);
     QToolButton *createMenuButton(const QString &text,
                                   const QString &toolTip,
                                   const QString &icon,

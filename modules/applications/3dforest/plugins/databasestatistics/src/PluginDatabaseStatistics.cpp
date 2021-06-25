@@ -134,6 +134,7 @@ void PluginDatabaseStatistics::show(QWidget *parent)
     if (!window_)
     {
         window_ = new PluginDatabaseStatisticsWindow(parent, editor_);
+        window_->setWindowIcon(icon());
     }
 
     window_->show();
@@ -144,4 +145,14 @@ void PluginDatabaseStatistics::show(QWidget *parent)
 QString PluginDatabaseStatistics::windowTitle() const
 {
     return tr(PLUGIN_DATABASE_STATISTICS_NAME);
+}
+
+QString PluginDatabaseStatistics::toolTip() const
+{
+    return tr("Compute database statistics");
+}
+
+QIcon PluginDatabaseStatistics::icon() const
+{
+    return QIcon(":/icons8-graph-40.png");
 }

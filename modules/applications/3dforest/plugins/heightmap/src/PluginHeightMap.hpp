@@ -128,6 +128,8 @@ public:
     virtual void initialize(QWidget *parent, Editor *editor);
     virtual void show(QWidget *parent);
     virtual QString windowTitle() const;
+    virtual QString toolTip() const;
+    virtual QIcon icon() const;
 
     virtual bool isFilterEnabled();
     virtual void filterTile(EditorTile *tile);

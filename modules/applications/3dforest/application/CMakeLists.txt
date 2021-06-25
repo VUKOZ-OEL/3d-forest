@@ -15,17 +15,26 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-find_package(Qt5 COMPONENTS Core Gui Widgets OpenGL)
-if (NOT Qt5_FOUND OR NOT Qt5OpenGL_FOUND)
-  message(WARNING "Qt5 not found - skipping 3dforest")
-  return()
-endif()
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
 
-find_package(OpenGL QUIET)
-if (NOT OpenGL_FOUND)
-  message(WARNING "OpenGL not found - skipping 3dforest")
-  return()
-endif()
+set(SUB_PROJECT_NAME "3dforest")
 
-add_subdirectory(application)
-add_subdirectory(plugins)
+file(GLOB_RECURSE SOURCES_3DFOREST "src/*.cpp")
+list(APPEND SOURCES_3DFOREST resources/3dforest.rc)
+
+add_executable(
+  ${SUB_PROJECT_NAME}
+  WIN32 MACOSX_BUNDLE
+  ${SOURCES_3DFOREST}
+  resources/3dforest.qrc
+)
+
+target_include_directories(${SUB_PROJECT_NAME} PUBLIC src)
+
+target_link_libraries(
+  ${SUB_PROJECT_NAME}
+  visualization
+)
+
+install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

@@ -22,6 +22,7 @@
 #ifndef PLUGIN_TOOL_HPP
 #define PLUGIN_TOOL_HPP
 
+#include <QIcon>
 #include <QString>
 #include <QtPlugin>
 
@@ -36,6 +37,8 @@ public:
     virtual void initialize(QWidget *parent, Editor *editor) = 0;
     virtual void show(QWidget *parent) = 0;
     virtual QString windowTitle() const = 0; /**< Unique */
+    virtual QString toolTip() const = 0;
+    virtual QIcon icon() const = 0;
 };
 
 #define PluginTool_iid "vukoz.3dforest.qt.PluginTool/1.0"
