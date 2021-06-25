@@ -313,6 +313,7 @@ void PluginHeightMap::show(QWidget *parent)
     if (!window_)
     {
         window_ = new PluginHeightMapWindow(parent, &filter_);
+        window_->setWindowIcon(icon());
     }
 
     window_->show();
@@ -323,6 +324,16 @@ void PluginHeightMap::show(QWidget *parent)
 QString PluginHeightMap::windowTitle() const
 {
     return tr(PLUGIN_HEIGHT_MAP_NAME);
+}
+
+QString PluginHeightMap::toolTip() const
+{
+    return tr("Compute height map");
+}
+
+QIcon PluginHeightMap::icon() const
+{
+    return QIcon(":/icons8-histogram-40.png");
 }
 
 bool PluginHeightMap::isFilterEnabled()

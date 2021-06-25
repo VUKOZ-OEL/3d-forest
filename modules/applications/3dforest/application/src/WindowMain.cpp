@@ -104,16 +104,27 @@ void WindowMain::createViewer()
 
 QToolButton *WindowMain::createMenuButton(const QString &text,
                                           const QString &toolTip,
-                                          const QString &icon,
-                                          QDockWidget *dockWidget)
+                                          const QIcon &icon)
 {
     QToolButton *button = new QToolButton;
 
     button->setText(text);
     button->setToolTip(toolTip);
-    button->setIcon(QIcon(":/icons/" + icon));
-    button->setIconSize(QSize(40, 40)); // 20x20 is could be also ok
+    button->setIcon(icon);
+    button->setIconSize(QSize(40, 40)); // Same size as Office ribbon icons
     button->setEnabled(true);
+
+    return button;
+}
+
+QToolButton *WindowMain::createMenuButton(const QString &text,
+                                          const QString &toolTip,
+                                          const QString &icon,
+                                          QDockWidget *dockWidget)
+{
+    QToolButton *button;
+
+    button = createMenuButton(text, toolTip, QIcon(":/icons/" + icon));
 
     if (dockWidget)
     {
@@ -130,45 +141,45 @@ QToolButton *WindowMain::createMenuButton(const QString &text,
 void WindowMain::createMenus()
 {
     QToolButton *button = nullptr;
-    Ribbon *ribbon = new Ribbon;
+    ribbon_ = new Ribbon;
 
     // Project
-    ribbon->addTab(QIcon(":/icons/icons8-briefcase-40.png"), "Project");
-    ribbon->setIconSize(QSize(20, 20));
+    ribbon_->addTab(QIcon(":/icons/icons8-briefcase-40.png"), "Project");
+    ribbon_->setIconSize(QSize(20, 20));
 
     // New
     button = createMenuButton(tr("New"),
                               tr("Create new project"),
                               "icons8-edit-file-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionProjectNew()));
-    ribbon->addButton("Project", "Project", button);
+    ribbon_->addButton("Project", "Project", button);
 
     // Open
     button = createMenuButton(tr("Open"),
                               tr("Open existing project"),
                               "icons8-live-folder-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionProjectOpen()));
-    ribbon->addButton("Project", "Project", button);
+    ribbon_->addButton("Project", "Project", button);
 
     // Save
     button =
         createMenuButton(tr("Save"), tr("Save project"), "icons8-save-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionProjectSave()));
-    ribbon->addButton("Project", "Project", button);
+    ribbon_->addButton("Project", "Project", button);
 
     // Save As
     button = createMenuButton(tr("Save As"),
                               tr("Save project to a different file"),
                               "icons8-save-as-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionProjectSaveAs()));
-    ribbon->addButton("Project", "Project", button);
+    ribbon_->addButton("Project", "Project", button);
 
     // Import
     button = createMenuButton(tr("Open"),
                               tr("Open existing data set file"),
                               "icons8-add-file-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionProjectImport()));
-    ribbon->addButton("Project", "File", button);
+    ribbon_->addButton("Project", "File", button);
 
     // Export
     button = createMenuButton(tr("Export"),
@@ -176,67 +187,67 @@ void WindowMain::createMenus()
                               "icons8-send-file-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionProjectExportAs()));
     button->setEnabled(false);
-    ribbon->addButton("Project", "File", button);
+    ribbon_->addButton("Project", "File", button);
 
     // Project
-    ribbon->addTab(QIcon(":/icons/icons8-monitor-40.png"), "View");
-    ribbon->setIconSize(QSize(20, 20));
+    ribbon_->addTab(QIcon(":/icons/icons8-monitor-40.png"), "View");
+    ribbon_->setIconSize(QSize(20, 20));
 
     button = createMenuButton(tr("Orthographic"),
                               tr("Orthographic"),
                               "icons8-orthogonal-view-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewOrthographic()));
-    ribbon->addButton("View", "Projection", button);
+    ribbon_->addButton("View", "Projection", button);
 
     button = createMenuButton(tr("Perspective"),
                               tr("Perspective"),
                               "perspective-view-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewPerspective()));
-    ribbon->addButton("View", "Projection", button);
+    ribbon_->addButton("View", "Projection", button);
 
     button = createMenuButton(tr("Top"), tr("Top"), "icons8-top-view-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewTop()));
-    ribbon->addButton("View", "Camera", button);
+    ribbon_->addButton("View", "Camera", button);
 
     button =
         createMenuButton(tr("Front"), tr("Front"), "icons8-front-view-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewFront()));
-    ribbon->addButton("View", "Camera", button);
+    ribbon_->addButton("View", "Camera", button);
 
     button =
         createMenuButton(tr("Right"), tr("Right"), "icons8-right-view-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewRight()));
-    ribbon->addButton("View", "Camera", button);
+    ribbon_->addButton("View", "Camera", button);
 
     button = createMenuButton(tr("3D"), tr("3D"), "icons8-portraits-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionView3d()));
-    ribbon->addButton("View", "Camera", button);
+    ribbon_->addButton("View", "Camera", button);
 
     button = createMenuButton(tr("Distance"),
                               tr("Distance"),
                               "icons8-fit-to-width-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewResetDistance()));
-    ribbon->addButton("View", "Reset", button);
+    ribbon_->addButton("View", "Reset", button);
 
     button =
         createMenuButton(tr("Center"), tr("Center"), "icons8-collect-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewResetCenter()));
-    ribbon->addButton("View", "Reset", button);
+    ribbon_->addButton("View", "Reset", button);
 
     button =
         createMenuButton(tr("Single"), tr("Single"), "layout-single-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewLayoutSingle()));
-    ribbon->addButton("View", "Layout", button);
+    ribbon_->addButton("View", "Layout", button);
 
     button = createMenuButton(tr("Columns"),
                               tr("Columns"),
                               "layout-two-columns-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewLayout2Columns()));
-    ribbon->addButton("View", "Layout", button);
+    ribbon_->addButton("View", "Layout", button);
 
     button = createMenuButton(tr("Grid"), tr("Grid"), "layout-grid-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewLayoutGrid()));
-    ribbon->addButton("View", "Layout", button);
+    ribbon_->addButton("View", "Layout", button);
 
     button = createMenuButton(tr("3 Right"),
                               tr("3 Right"),
@@ -245,72 +256,58 @@ void WindowMain::createMenus()
             SIGNAL(clicked()),
             this,
             SLOT(actionViewLayout3RowsRight()));
-    ribbon->addButton("View", "Layout", button);
+    ribbon_->addButton("View", "Layout", button);
 
     // Tools
-    ribbon->addTab(QIcon(":/icons/icons8-support-40.png"), "Tools");
-    ribbon->setIconSize(QSize(20, 20));
-
-    /** @todo Add buttons from loaded plugins. */
-    QToolButton *pluginButton;
-    pluginButton = createMenuButton(tr("Heightmap"),
-                                    tr("Heightmap"),
-                                    "icons8-histogram-40.png");
-    ribbon->addButton("Tools", "Plugins", pluginButton);
-    pluginsButton_.push_back(pluginButton);
-
-    pluginButton = createMenuButton(tr("Statistics"),
-                                    tr("Statistics"),
-                                    "icons8-graph-40.png");
-    ribbon->addButton("Tools", "Plugins", pluginButton);
-    pluginsButton_.push_back(pluginButton);
+    ribbon_->addTab(QIcon(":/icons/icons8-support-40.png"), "Tools");
+    ribbon_->setIconSize(QSize(20, 20));
 
     // Windows
-    ribbon->addTab(QIcon(":/icons/icons8-restore-window-40.png"), "Windows");
-    ribbon->setIconSize(QSize(20, 20));
+    ribbon_->addTab(QIcon(":/icons/icons8-restore-window-40.png"), "Windows");
+    ribbon_->setIconSize(QSize(20, 20));
 
     button = createMenuButton(tr("Data Sets"),
                               tr("Data Sets"),
                               "icons8-open-box-40.png",
                               dockDataSets_);
-    ribbon->addButton("Windows", "Windows", button);
+    ribbon_->addButton("Windows", "Windows", button);
 
     button = createMenuButton(tr("Layers"),
                               tr("Layers"),
                               "icons8-variation-40.png",
                               dockLayers_);
-    ribbon->addButton("Windows", "Windows", button);
+    ribbon_->addButton("Windows", "Windows", button);
 
     button = createMenuButton(tr("View"),
                               tr("View"),
                               "icons8-tune-40.png",
                               dockViewSettings_);
-    ribbon->addButton("Windows", "Windows", button);
+    ribbon_->addButton("Windows", "Windows", button);
 
     button = createMenuButton(tr("Clip"),
                               tr("Clip"),
                               "icons8-crop-40.png",
                               dockClipFilter_);
-    ribbon->addButton("Windows", "Windows", button);
+    ribbon_->addButton("Windows", "Windows", button);
 
     button = createMenuButton(tr("Log"),
                               tr("Log"),
                               "icons8-pass-fail-40.png",
                               dockLog_);
-    ribbon->addButton("Windows", "Info", button);
+    ribbon_->addButton("Windows", "Info", button);
 
     // Help
-    ribbon->addTab(QIcon(":/icons/icons8-information-40.png"), "Help");
-    ribbon->setIconSize(QSize(20, 20));
+    ribbon_->addTab(QIcon(":/icons/icons8-information-40.png"), "Help");
+    ribbon_->setIconSize(QSize(20, 20));
 
     button = createMenuButton(tr("About"), tr("About"), "icons8-about-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionAbout()));
-    ribbon->addButton("Help", "Info", button);
+    ribbon_->addButton("Help", "Info", button);
 
     // Ribbon
     QWidget *ribbonDockWidgetContents = new QWidget;
     QGridLayout *gridLayout = new QGridLayout;
-    gridLayout->addWidget(ribbon, 0, 0);
+    gridLayout->addWidget(ribbon_, 0, 0);
     gridLayout->setMargin(0);
     ribbonDockWidgetContents->setLayout(gridLayout);
 
@@ -429,36 +426,23 @@ void WindowMain::createPlugins()
                 pluginToolInterface->initialize(this, &editor_);
                 pluginsTool_.push_back(pluginToolInterface);
 
-                /** @todo Load icons from plugins. */
+                // Create menu button
                 QString name = pluginToolInterface->windowTitle();
-                for (QToolButton *button : pluginsButton_)
-                {
-                    if (button->text() == name)
-                    {
-                        QAction *action = new QAction(name, this);
-                        pluginsAction_.push_back(action);
+                QToolButton *button = nullptr;
+                button = createMenuButton(name,
+                                          pluginToolInterface->toolTip(),
+                                          pluginToolInterface->icon());
+                ribbon_->addButton("Tools", "Plugins", button);
 
-                        if (name == "Heightmap")
-                        {
-                            action->setIcon(
-                                QIcon(":/icons/icons8-histogram-40.png"));
-                        }
-                        else
-                        {
-                            action->setIcon(
-                                QIcon(":/icons/icons8-graph-40.png"));
-                        }
-
-                        connect(action,
-                                SIGNAL(triggered()),
-                                this,
-                                SLOT(actionPluginToolShow()));
-
-                        button->setDefaultAction(action);
-
-                        break;
-                    }
-                }
+                QAction *action = new QAction(name, this);
+                pluginsAction_.push_back(action);
+                action->setIcon(pluginToolInterface->icon());
+                action->setToolTip(pluginToolInterface->toolTip());
+                connect(action,
+                        SIGNAL(triggered()),
+                        this,
+                        SLOT(actionPluginToolShow()));
+                button->setDefaultAction(action);
 
                 EditorFilter *filter;
                 filter = dynamic_cast<EditorFilter *>(pluginToolInterface);

@@ -21,6 +21,7 @@
 
 - @subpage cheatsheet_git
 - @subpage cheatsheet_build
+- @subpage cheatsheet_filenames
 - @subpage cheatsheet_code
 - @subpage cheatsheet_cmake
 - @subpage cheatsheet_doxygen
@@ -155,7 +156,28 @@ Qt5 and OpenGL are required for GUI application.
 
 *******************************************************************************/
 
-/** @page cheatsheet_code Code style
+/** @page cheatsheet_filenames File Names
+
+@verbatim
+directory "3rd Party" is "3rdparty" lowercase, no separators
+          "Height Map" is "heightmap" which will produce "heightmap.dll"
+
+source    "WindowMain.hpp"          C++ header, CamelCase for classes
+          "WindowMain.cpp"          C++ source, CamelCase for classes
+          "examplecolorpalette.cpp" lowercase for executables
+          "las.cpp"                 lowercase for executables
+
+files     anything
+          "README.md"
+          "CMakeLists.txt"
+          "layout-grid-40.png"
+          ".clang-format"
+          ".gitignore"
+@endverbatim
+
+*******************************************************************************/
+
+/** @page cheatsheet_code Code Style
 
 Automatic formatting. It is good to run this command before 'git add <file>'
 and git commit to GitHub:
@@ -174,16 +196,22 @@ get:
     size_t size() const; // Can be better than Qt like 'count'. std uses 'size'.
 
 get/set:
-    bool isSizeGripEnabled() const;
-    void setSizeGripEnabled(bool);
+    bool isSizeGripEnabled() const;     // get
+    void setSizeGripEnabled(bool);      // set
 
-    int  result() const;
-    void setResult(int i);
+    int  result() const;                // get
+    void setResult(int i);              // set
+
+    const T &at(int i) const;           // get (inconsistent, easy to read)
+    void append(const QList<T> &value); // set (inconsistent, easy to read)
 
 signals:
     void accepted();
     void finished(int result);
     void rejected();
+    void toolsRequested(const QString &source);
+    void findTextFinished(const QString &text);
+    void loadProgress(int progress);
 @endverbatim
 
 Debug:
@@ -317,11 +345,13 @@ uic -o ui_window.h window.ui
             "${workspaceRoot}/modules/visualization/src/editor",
             "${workspaceRoot}/modules/visualization/src/opengl",
             "${workspaceRoot}/modules/visualization/src/widgets",
-            "${workspaceRoot}/modules/applications/3dforest/src",
-            "${workspaceRoot}/modules/applications/3dforest/plugins/heightmap",
+            "${workspaceRoot}/modules/applications/3dforest/application/src",
+            "${workspaceRoot}/modules/applications/3dforest/plugins/heightmap/src",
+            "${workspaceRoot}/modules/applications/3dforest/plugins/databasestatistics/src",
             "${workspaceRoot}/modules/applications/console/src",
             "${workspaceRoot}/modules/core/src/common",
             "${workspaceRoot}/modules/core/src/io",
+            "${workspaceRoot}/modules/core/src/math",
             "${workspaceRoot}/modules/core/src/scene",
             "${workspaceRoot}/modules/editor/src"]
     }
