@@ -34,9 +34,8 @@
 PluginDatabaseStatisticsWindow::PluginDatabaseStatisticsWindow(
     QMainWindow *parent,
     Editor *editor)
-    : QDockWidget(parent),
-      editor_(editor),
-      mainWindow_(parent)
+    : WindowDock(parent),
+      editor_(editor)
 {
     // Widgets
     textEdit_ = new QTextEdit;
@@ -74,7 +73,7 @@ void PluginDatabaseStatisticsWindow::compute()
 
     int maximum = static_cast<int>(selection.size());
 
-    QProgressDialog progressDialog(mainWindow_);
+    QProgressDialog progressDialog(mainWindow());
     progressDialog.setCancelButtonText(QObject::tr("&Cancel"));
     progressDialog.setRange(0, maximum);
     progressDialog.setWindowTitle(QObject::tr(PLUGIN_DATABASE_STATISTICS_NAME));
@@ -173,6 +172,7 @@ void PluginDatabaseStatistics::show(QMainWindow *parent)
     if (!window_)
     {
         window_ = new PluginDatabaseStatisticsWindow(parent, editor_);
+        window_->setWindowTitle(windowTitle());
         window_->setWindowIcon(icon());
         parent->addDockWidget(Qt::LeftDockWidgetArea, window_);
     }

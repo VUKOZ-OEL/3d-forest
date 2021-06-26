@@ -34,6 +34,7 @@ class QToolButton;
 class PluginFile;
 class PluginTool;
 class Ribbon;
+class WindowDock;
 class WindowClipFilter;
 class WindowDataSets;
 class WindowLayers;
@@ -112,11 +113,11 @@ protected:
     WindowViewports *windowViewports_;
     WindowSettingsView *windowSettingsView_;
 
-    QDockWidget *dockClipFilter_;
-    QDockWidget *dockDataSets_;
-    QDockWidget *dockLayers_;
-    QDockWidget *dockViewSettings_;
-    QDockWidget *dockLog_;
+    WindowDock *dockClipFilter_;
+    WindowDock *dockDataSets_;
+    WindowDock *dockLayers_;
+    WindowDock *dockViewSettings_;
+    WindowDock *dockLog_;
 
     // Actions
     Ribbon *ribbon_;

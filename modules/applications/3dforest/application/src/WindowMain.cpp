@@ -38,6 +38,7 @@
 #include <Time.hpp>
 #include <WindowClipFilter.hpp>
 #include <WindowDataSets.hpp>
+#include <WindowDock.hpp>
 #include <WindowLayers.hpp>
 #include <WindowMain.hpp>
 #include <WindowSettingsView.hpp>
@@ -326,7 +327,9 @@ void WindowMain::createWindows()
             this,
             SLOT(actionDataSetVisible(size_t, bool)));
 
-    dockDataSets_ = new QDockWidget(tr("Data Sets"), this);
+    dockDataSets_ = new WindowDock(this);
+    dockDataSets_->setWindowTitle(tr("Data Sets"));
+    dockDataSets_->setWindowIcon(QIcon(":/icons/icons8-open-box-40.png"));
     dockDataSets_->setAllowedAreas(
         Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea |
         Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
@@ -343,7 +346,9 @@ void WindowMain::createWindows()
             this,
             SLOT(actionLayerVisible(size_t, bool)));
 
-    dockLayers_ = new QDockWidget(tr("Layers"), this);
+    dockLayers_ = new WindowDock(this);
+    dockLayers_->setWindowTitle(tr("Layers"));
+    dockLayers_->setWindowIcon(QIcon(":/icons/icons8-variation-40.png"));
     dockLayers_->setAllowedAreas(Qt::LeftDockWidgetArea |
                                  Qt::RightDockWidgetArea);
     dockLayers_->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
@@ -364,7 +369,9 @@ void WindowMain::createWindows()
             this,
             SLOT(actionSettingsViewColor()));
 
-    dockViewSettings_ = new QDockWidget(tr("View Settings"), this);
+    dockViewSettings_ = new WindowDock(this);
+    dockViewSettings_->setWindowTitle(tr("View Settings"));
+    dockViewSettings_->setWindowIcon(QIcon(":/icons/icons8-tune-40.png"));
     dockViewSettings_->setAllowedAreas(Qt::LeftDockWidgetArea |
                                        Qt::RightDockWidgetArea);
     dockViewSettings_->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
@@ -385,7 +392,9 @@ void WindowMain::createWindows()
             this,
             SLOT(actionClipFilterReset()));
 
-    dockClipFilter_ = new QDockWidget(tr("Clip Filter"), this);
+    dockClipFilter_ = new WindowDock(this);
+    dockClipFilter_->setWindowTitle(tr("Clip Filter"));
+    dockClipFilter_->setWindowIcon(QIcon(":/icons/icons8-crop-40.png"));
     dockClipFilter_->setAllowedAreas(Qt::LeftDockWidgetArea |
                                      Qt::RightDockWidgetArea);
     dockClipFilter_->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
@@ -399,7 +408,9 @@ void WindowMain::createWindows()
     log = new QTextEdit(this);
     log->setReadOnly(true);
 
-    dockLog_ = new QDockWidget(tr("Log"), this);
+    dockLog_ = new WindowDock(this);
+    dockLog_->setWindowTitle(tr("Log"));
+    dockLog_->setWindowIcon(QIcon(":/icons/icons8-pass-fail-40.png"));
     dockLog_->setMinimumHeight(200);
     dockLog_->setWidget(log);
     dockLog_->setVisible(false);

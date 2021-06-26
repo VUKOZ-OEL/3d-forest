@@ -209,9 +209,8 @@ std::vector<Vector3<float>> PluginHeightMapFilter::createColormap(
 // -----------------------------------------------------------------------------
 PluginHeightMapWindow::PluginHeightMapWindow(QMainWindow *parent,
                                              PluginHeightMapFilter *filter)
-    : QDockWidget(parent),
-      filter_(filter),
-      mainWindow_(parent)
+    : WindowDock(parent),
+      filter_(filter)
 {
     // Widgets colormap
     colorCountSpinBox_ = new QSpinBox;
@@ -301,7 +300,7 @@ void PluginHeightMapWindow::previewChanged(int index)
 
 void PluginHeightMapWindow::apply()
 {
-    filter_->applyToTiles(mainWindow_);
+    filter_->applyToTiles(mainWindow());
 }
 
 void PluginHeightMapWindow::closeEvent(QCloseEvent *event)
@@ -332,6 +331,7 @@ void PluginHeightMap::show(QMainWindow *parent)
     if (!window_)
     {
         window_ = new PluginHeightMapWindow(parent, &filter_);
+        window_->setWindowTitle(windowTitle());
         window_->setWindowIcon(icon());
         parent->addDockWidget(Qt::LeftDockWidgetArea, window_);
     }

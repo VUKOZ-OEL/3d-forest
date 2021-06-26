@@ -23,7 +23,7 @@
 #define PLUGIN_DATABASE_STATISTICS_HPP
 
 #include <PluginTool.hpp>
-#include <QDockWidget>
+#include <WindowDock.hpp>
 
 class Editor;
 class EditorTile;
@@ -31,7 +31,7 @@ class QTextEdit;
 class QPushButton;
 
 /** Plugin Database Statistics Window. */
-class PluginDatabaseStatisticsWindow : public QDockWidget
+class PluginDatabaseStatisticsWindow : public WindowDock
 {
     Q_OBJECT
 
@@ -43,7 +43,6 @@ protected slots:
 
 protected:
     Editor *editor_;
-    QMainWindow *mainWindow_;
     QWidget *widget_;
     QTextEdit *textEdit_;
     QPushButton *computeButton_;
