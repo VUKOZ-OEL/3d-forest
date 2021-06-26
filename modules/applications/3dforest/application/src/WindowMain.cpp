@@ -333,7 +333,7 @@ void WindowMain::createWindows()
     dockDataSets_->setAllowedAreas(
         Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea |
         Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
-    dockDataSets_->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
+    // dockDataSets_->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
     dockDataSets_->setWidget(windowDataSets_);
     dockDataSets_->setVisible(false);
     dockDataSets_->setFloating(true);
@@ -351,8 +351,8 @@ void WindowMain::createWindows()
     dockLayers_->setWindowIcon(QIcon(":/icons/icons8-variation-40.png"));
     dockLayers_->setAllowedAreas(Qt::LeftDockWidgetArea |
                                  Qt::RightDockWidgetArea);
-    dockLayers_->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
-    dockLayers_->setMaximumWidth(WINDOW_MAIN_DOCK_MAX);
+    // dockLayers_->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
+    // dockLayers_->setMaximumWidth(WINDOW_MAIN_DOCK_MAX);
     dockLayers_->setWidget(windowLayers_);
     dockLayers_->setVisible(false);
     dockLayers_->setFloating(true);
@@ -374,8 +374,8 @@ void WindowMain::createWindows()
     dockViewSettings_->setWindowIcon(QIcon(":/icons/icons8-tune-40.png"));
     dockViewSettings_->setAllowedAreas(Qt::LeftDockWidgetArea |
                                        Qt::RightDockWidgetArea);
-    dockViewSettings_->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
-    dockViewSettings_->setMaximumWidth(WINDOW_MAIN_DOCK_MAX);
+    // dockViewSettings_->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
+    // dockViewSettings_->setMaximumWidth(WINDOW_MAIN_DOCK_MAX);
     dockViewSettings_->setWidget(windowSettingsView_);
     dockViewSettings_->setVisible(false);
     dockViewSettings_->setFloating(true);
@@ -397,8 +397,8 @@ void WindowMain::createWindows()
     dockClipFilter_->setWindowIcon(QIcon(":/icons/icons8-crop-40.png"));
     dockClipFilter_->setAllowedAreas(Qt::LeftDockWidgetArea |
                                      Qt::RightDockWidgetArea);
-    dockClipFilter_->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
-    dockClipFilter_->setMaximumWidth(WINDOW_MAIN_DOCK_MAX);
+    // dockClipFilter_->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
+    // dockClipFilter_->setMaximumWidth(WINDOW_MAIN_DOCK_MAX);
     dockClipFilter_->setWidget(windowClipFilter_);
     dockClipFilter_->setVisible(false);
     dockClipFilter_->setFloating(true);
@@ -411,7 +411,7 @@ void WindowMain::createWindows()
     dockLog_ = new WindowDock(this);
     dockLog_->setWindowTitle(tr("Log"));
     dockLog_->setWindowIcon(QIcon(":/icons/icons8-pass-fail-40.png"));
-    dockLog_->setMinimumHeight(200);
+    // dockLog_->setMinimumHeight(200);
     dockLog_->setWidget(log);
     dockLog_->setVisible(false);
     addDockWidget(Qt::BottomDockWidgetArea, dockLog_);

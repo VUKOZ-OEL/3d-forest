@@ -27,6 +27,7 @@
 
 class QLabel;
 class QMainWindow;
+class QToolButton;
 
 /** Dock Widget. */
 class WindowDock : public QDockWidget
@@ -41,10 +42,16 @@ public:
     void setWindowTitle(const QString &);
     void setWindowIcon(const QIcon &);
 
+public slots:
+    void windowCollapse();
+    void windowClose();
+
 protected:
     QMainWindow *mainWindow_;
-    QLabel *title_;
-    QLabel *icon_;
+    QLabel *windowIcon_;
+    QLabel *windowTitle_;
+    QToolButton *windowButtonCollapse_;
+    QToolButton *windowButtonClose_;
 };
 
 #endif /* WINDOW_DOCK_HPP */

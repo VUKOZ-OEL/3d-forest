@@ -274,8 +274,8 @@ PluginHeightMapWindow::PluginHeightMapWindow(QMainWindow *parent,
 
     // Window
     setWindowTitle(tr(PLUGIN_HEIGHT_MAP_NAME));
-    setMinimumWidth(200);
-    setFixedHeight(110);
+    widget_->setMinimumWidth(200);
+    widget_->setMinimumHeight(100);
 }
 
 void PluginHeightMapWindow::colorCountChanged(int i)

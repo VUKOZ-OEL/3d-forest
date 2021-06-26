@@ -56,8 +56,8 @@ PluginDatabaseStatisticsWindow::PluginDatabaseStatisticsWindow(
 
     // Window
     setWindowTitle(tr(PLUGIN_DATABASE_STATISTICS_NAME));
-    setMinimumWidth(300);
-    setMinimumHeight(200);
+    widget_->setMinimumWidth(300);
+    widget_->setMinimumHeight(200);
 }
 
 void PluginDatabaseStatisticsWindow::compute()

@@ -23,30 +23,57 @@
 #include <WindowDock.hpp>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QStyle>
+#include <QToolButton>
 
 WindowDock::WindowDock(QMainWindow *parent)
     : QDockWidget(parent),
       mainWindow_(parent)
 {
-    QWidget *tileBar = new QWidget;
-    tileBar->setMinimumSize(20, 20);
+    // Title bar
+    QWidget *bar = new QWidget;
+    bar->setMinimumSize(20, 20);
+
+    // Icons
+    QStyle *style = bar->style();
+    QIcon iconClose;
+    iconClose = style->standardIcon(QStyle::SP_TitleBarCloseButton, 0, bar);
+    QIcon iconMax;
+    iconMax = style->standardIcon(QStyle::SP_TitleBarMaxButton, 0, bar);
 
     // Widgets
-    icon_ = new QLabel;
-    title_ = new QLabel;
-    title_->setText("Title");
+    windowIcon_ = new QLabel;
+
+    windowTitle_ = new QLabel;
+    windowTitle_->setText("Title");
+
+    windowButtonCollapse_ = new QToolButton;
+    windowButtonCollapse_->setIcon(iconMax);
+    connect(windowButtonCollapse_,
+            SIGNAL(clicked()),
+            this,
+            SLOT(windowCollapse()));
+
+    windowButtonClose_ = new QToolButton;
+    windowButtonClose_->setIcon(iconClose);
+    connect(windowButtonClose_,
+            SIGNAL(clicked()),
+            this,
+            SLOT(windowClose()));
 
     // Layout
     QHBoxLayout *layout = new QHBoxLayout;
-    layout->addWidget(icon_);
+    layout->addWidget(windowIcon_);
     layout->addSpacing(5);
-    layout->addWidget(title_);
+    layout->addWidget(windowTitle_);
     layout->addStretch();
+    layout->addWidget(windowButtonCollapse_);
+    layout->addWidget(windowButtonClose_);
     layout->setContentsMargins(0, 0, 0, 0);
-    tileBar->setLayout(layout);
+    bar->setLayout(layout);
 
-    // Set
-    setTitleBarWidget(tileBar);
+    // Set title bar
+    setTitleBarWidget(bar);
 }
 
 QMainWindow *WindowDock::mainWindow() const
@@ -56,10 +83,27 @@ QMainWindow *WindowDock::mainWindow() const
 
 void WindowDock::setWindowTitle(const QString &text)
 {
-    title_->setText(text);
+    windowTitle_->setText(text);
 }
 
 void WindowDock::setWindowIcon(const QIcon &icon)
 {
-    icon_->setPixmap(icon.pixmap(20, 20));
+    windowIcon_->setPixmap(icon.pixmap(20, 20));
+}
+
+void WindowDock::windowCollapse()
+{
+    if (!widget()->isVisible())
+    {
+        widget()->setVisible(true);
+    }
+    else
+    {
+        widget()->setVisible(false);
+    }
+}
+
+void WindowDock::windowClose()
+{
+    setVisible(false);
 }
