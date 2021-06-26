@@ -24,7 +24,7 @@
 
 #include <EditorFilter.hpp>
 #include <PluginTool.hpp>
-#include <QDialog>
+#include <QDockWidget>
 #include <QMutex>
 #include <Vector3.hpp>
 #include <vector>
@@ -77,12 +77,12 @@ protected:
     GUI could be provided directly by the top PluginHeightMap if it was derived
     from QDialog instead of QObject.
 */
-class PluginHeightMapWindow : public QDialog
+class PluginHeightMapWindow : public QDockWidget
 {
     Q_OBJECT
 
 public:
-    PluginHeightMapWindow(QWidget *parent, PluginHeightMapFilter *filter);
+    PluginHeightMapWindow(QMainWindow *parent, PluginHeightMapFilter *filter);
     ~PluginHeightMapWindow() = default;
 
 protected slots:
@@ -93,6 +93,8 @@ protected slots:
 
 protected:
     PluginHeightMapFilter *filter_;
+    QMainWindow *mainWindow_;
+    QWidget *widget_;
     QSpinBox *colorCountSpinBox_;
     QComboBox *colormapComboBox_;
     QCheckBox *previewCheckBox_;
@@ -125,8 +127,8 @@ public:
     PluginHeightMap();
     virtual ~PluginHeightMap() = default;
 
-    virtual void initialize(QWidget *parent, Editor *editor);
-    virtual void show(QWidget *parent);
+    virtual void initialize(QMainWindow *parent, Editor *editor);
+    virtual void show(QMainWindow *parent);
     virtual QString windowTitle() const;
     virtual QString toolTip() const;
     virtual QIcon icon() const;

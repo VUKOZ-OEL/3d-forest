@@ -23,6 +23,7 @@
 #include <PluginDatabaseStatistics.hpp>
 #include <QCoreApplication>
 #include <QDebug>
+#include <QMainWindow>
 #include <QProgressDialog>
 #include <QPushButton>
 #include <QTextEdit>
@@ -30,10 +31,12 @@
 
 #define PLUGIN_DATABASE_STATISTICS_NAME "Statistics"
 
-PluginDatabaseStatisticsWindow::PluginDatabaseStatisticsWindow(QWidget *parent,
-                                                               Editor *editor)
-    : QDialog(parent),
-      editor_(editor)
+PluginDatabaseStatisticsWindow::PluginDatabaseStatisticsWindow(
+    QMainWindow *parent,
+    Editor *editor)
+    : QDockWidget(parent),
+      editor_(editor),
+      mainWindow_(parent)
 {
     // Widgets
     textEdit_ = new QTextEdit;
@@ -42,74 +45,110 @@ PluginDatabaseStatisticsWindow::PluginDatabaseStatisticsWindow(QWidget *parent,
     connect(computeButton_, SIGNAL(clicked()), this, SLOT(compute()));
 
     // Layout
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(textEdit_);
     layout->addWidget(computeButton_);
+
+    // Dock
+    widget_ = new QWidget;
+    widget_->setLayout(layout);
+    setFloating(true);
+    setWidget(widget_);
 
     // Window
     setWindowTitle(tr(PLUGIN_DATABASE_STATISTICS_NAME));
     setMinimumWidth(300);
-    setMinimumHeight(300);
+    setMinimumHeight(200);
 }
 
 void PluginDatabaseStatisticsWindow::compute()
 {
-    editor_->cancelThreads();
-    editor_->lock();
+    // 1. Clear previous result
+    computeReset();
 
-    std::vector<FileIndex::Selection> tiles;
-    editor_->select(tiles);
+    // 2. Collect new result
+    editor_->attach();
 
-    int maximum = static_cast<int>(tiles.size());
+    std::vector<FileIndex::Selection> selection;
+    editor_->select(selection);
 
-    QProgressDialog progressDialog(parentWidget());
+    int maximum = static_cast<int>(selection.size());
+
+    QProgressDialog progressDialog(mainWindow_);
     progressDialog.setCancelButtonText(QObject::tr("&Cancel"));
-    progressDialog.setRange(0, static_cast<int>(maximum));
+    progressDialog.setRange(0, maximum);
     progressDialog.setWindowTitle(QObject::tr(PLUGIN_DATABASE_STATISTICS_NAME));
     progressDialog.setWindowModality(Qt::WindowModal);
     progressDialog.setLabelText(tr("Processing..."));
     progressDialog.setMinimumDuration(100);
 
-    uint32_t classificationMaximum = 0;
-
     for (int i = 0; i < maximum; i++)
     {
-        // Update progress
+        // Update progress i
         progressDialog.setValue(i + 1);
         QCoreApplication::processEvents();
-
         if (progressDialog.wasCanceled())
         {
             break;
         }
 
         // Process step i
-        size_t idx = static_cast<size_t>(i);
-        EditorTile *tile = editor_->tile(tiles[idx].id, tiles[idx].idx);
-        if (!tile)
+        FileIndex::Selection &selected = selection[static_cast<size_t>(i)];
+        EditorTile *tile = editor_->tile(selected.id, selected.idx);
+        if (tile)
         {
-            continue;
-        }
-
-        const std::vector<EditorTile::Attributes> &attrib = tile->attrib;
-        const std::vector<unsigned int> &indices = tile->indices;
-
-        for (size_t j = 0; j < indices.size(); j++)
-        {
-            size_t row = indices[j];
-            if (attrib[row].classification > classificationMaximum)
-            {
-                classificationMaximum = attrib[row].classification;
-            }
+            computeStep(tile);
         }
     }
     progressDialog.setValue(progressDialog.maximum());
 
-    editor_->unlock();
-    editor_->restartThreads();
+    editor_->detach();
 
-    QString msg =
-        QString("Classification Maximum = %1").arg(classificationMaximum);
+    // 3. Output new result
+    computeOutput();
+}
+
+void PluginDatabaseStatisticsWindow::computeReset()
+{
+    numberOfPoints_ = 0;
+    classificationPoints_ = 0;
+    classificationMaximum_ = 0;
+}
+
+void PluginDatabaseStatisticsWindow::computeStep(EditorTile *tile)
+{
+    const std::vector<EditorTile::Attributes> &attrib = tile->attrib;
+
+    for (size_t j = 0; j < tile->indices.size(); j++)
+    {
+        numberOfPoints_++;
+
+        size_t row = tile->indices[j];
+        if (attrib[row].classification > 0)
+        {
+            classificationPoints_++;
+
+            if (attrib[row].classification > classificationMaximum_)
+            {
+                classificationMaximum_ = attrib[row].classification;
+            }
+        }
+    }
+}
+
+void PluginDatabaseStatisticsWindow::computeOutput()
+{
+    textEdit_->clear();
+
+    QString msg;
+
+    msg = QString("Number of points = %1").arg(numberOfPoints_);
+    textEdit_->append(msg);
+
+    msg = QString("Classified points = %1").arg(classificationPoints_);
+    textEdit_->append(msg);
+
+    msg = QString("Classification Maximum = %1").arg(classificationMaximum_);
     textEdit_->append(msg);
 }
 
@@ -120,7 +159,7 @@ PluginDatabaseStatistics::PluginDatabaseStatistics()
 {
 }
 
-void PluginDatabaseStatistics::initialize(QWidget *parent, Editor *editor)
+void PluginDatabaseStatistics::initialize(QMainWindow *parent, Editor *editor)
 {
     // Do not create GUI when this plugin is loaded
     (void)parent;
@@ -128,13 +167,14 @@ void PluginDatabaseStatistics::initialize(QWidget *parent, Editor *editor)
     editor_ = editor;
 }
 
-void PluginDatabaseStatistics::show(QWidget *parent)
+void PluginDatabaseStatistics::show(QMainWindow *parent)
 {
     // Create GUI only when this plugin is used for the first time
     if (!window_)
     {
         window_ = new PluginDatabaseStatisticsWindow(parent, editor_);
         window_->setWindowIcon(icon());
+        parent->addDockWidget(Qt::LeftDockWidgetArea, window_);
     }
 
     window_->show();

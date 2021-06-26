@@ -29,15 +29,18 @@
 #include <QDebug>
 #include <QGridLayout>
 #include <QLabel>
+#include <QMainWindow>
 #include <QProgressDialog>
 #include <QPushButton>
 #include <QSpinBox>
 #include <Time.hpp>
 
 #define PLUGIN_HEIGHT_MAP_NAME "Heightmap"
+#define PLUGIN_HEIGHT_MAP_COLORMAP_MATLAB_JET "Matlab Jet"
 #define PLUGIN_HEIGHT_MAP_COLORMAP_VTK "VTK"
 #define PLUGIN_HEIGHT_MAP_COLORMAP_GRAY "Gray"
-#define PLUGIN_HEIGHT_MAP_COLORMAP_DEFAULT PLUGIN_HEIGHT_MAP_COLORMAP_VTK
+#define PLUGIN_HEIGHT_MAP_COLORMAP_WIN_XP "Windows XP"
+#define PLUGIN_HEIGHT_MAP_COLORMAP_DEFAULT PLUGIN_HEIGHT_MAP_COLORMAP_MATLAB_JET
 #define PLUGIN_HEIGHT_MAP_COLORS_MAX 65536
 #define PLUGIN_HEIGHT_MAP_COLORS_DEFAULT 256
 
@@ -95,6 +98,7 @@ bool PluginHeightMapFilter::isPreviewEnabled()
 void PluginHeightMapFilter::filterTile(EditorTile *tile)
 {
     mutex_.lock();
+
     double zMin = editor_->boundary().min(2);
     double zLen = editor_->boundary().max(2) - zMin;
     double colorDelta = 1.0 / static_cast<double>(colormap_.size() - 1);
@@ -120,52 +124,50 @@ void PluginHeightMapFilter::filterTile(EditorTile *tile)
         tile->view.rgb[row * 3 + 1] *= colormap_[colorIndex][1];
         tile->view.rgb[row * 3 + 2] *= colormap_[colorIndex][2];
     }
+
     mutex_.unlock();
 }
 
 void PluginHeightMapFilter::applyToTiles(QWidget *widget)
 {
-    editor_->cancelThreads();
-    editor_->lock();
+    editor_->attach();
 
-    std::vector<FileIndex::Selection> selectionL1;
-    editor_->select(selectionL1);
+    std::vector<FileIndex::Selection> selection;
+    editor_->select(selection);
 
-    int maximum = static_cast<int>(selectionL1.size());
+    int maximum = static_cast<int>(selection.size());
 
-    QProgressDialog progressDialog(widget->parentWidget());
+    QProgressDialog progressDialog(widget);
     progressDialog.setCancelButtonText(QObject::tr("&Cancel"));
-    progressDialog.setRange(0, static_cast<int>(maximum));
+    progressDialog.setRange(0, maximum);
     progressDialog.setWindowTitle(QObject::tr(PLUGIN_HEIGHT_MAP_NAME));
     progressDialog.setWindowModality(Qt::WindowModal);
     progressDialog.setMinimumDuration(100);
 
     for (int i = 0; i < maximum; i++)
     {
-        // Update progress
-        progressDialog.setValue(i);
+        // Update progress i
+        progressDialog.setValue(i + 1);
         progressDialog.setLabelText(
-            QObject::tr("Processing %1 of %n...", nullptr, maximum).arg(i));
-        QCoreApplication::processEvents();
+            QObject::tr("Processing %1 of %n...", nullptr, maximum).arg(i + 1));
 
+        QCoreApplication::processEvents();
         if (progressDialog.wasCanceled())
         {
             break;
         }
 
-        msleep(10); /**< @todo Remove. */
-
         // Process step i
-        // FileIndex::Selection &sel = selectionL1[static_cast<size_t>(i)];
-        // EditorTile *tile = editor_->tile(sel.id, sel.idx);
-        // if (tile)
-        // {
-        //     filterTile(tile);
-        // }
+        FileIndex::Selection &sel = selection[static_cast<size_t>(i)];
+        EditorTile *tile = editor_->tile(sel.id, sel.idx);
+        if (tile)
+        {
+            filterTile(tile);
+        }
     }
+    progressDialog.setValue(progressDialog.maximum());
 
-    editor_->unlock();
-    editor_->restartThreads();
+    editor_->detach();
 }
 
 std::vector<Vector3<float>> PluginHeightMapFilter::createColormap(
@@ -174,13 +176,21 @@ std::vector<Vector3<float>> PluginHeightMapFilter::createColormap(
 {
     size_t n = static_cast<size_t>(colorCount);
 
-    if (name == PLUGIN_HEIGHT_MAP_COLORMAP_VTK)
+    if (name == PLUGIN_HEIGHT_MAP_COLORMAP_MATLAB_JET)
+    {
+        return ColorPalette::blueCyanYellowRed(n);
+    }
+    else if (name == PLUGIN_HEIGHT_MAP_COLORMAP_VTK)
     {
         return ColorPalette::blueCyanGreenYellowRed(n);
     }
     else if (name == PLUGIN_HEIGHT_MAP_COLORMAP_GRAY)
     {
         return ColorPalette::gray(n);
+    }
+    else if (name == PLUGIN_HEIGHT_MAP_COLORMAP_WIN_XP)
+    {
+        return ColorPalette::WindowsXp32;
     }
     else
     {
@@ -197,10 +207,11 @@ std::vector<Vector3<float>> PluginHeightMapFilter::createColormap(
     }
 }
 // -----------------------------------------------------------------------------
-PluginHeightMapWindow::PluginHeightMapWindow(QWidget *parent,
+PluginHeightMapWindow::PluginHeightMapWindow(QMainWindow *parent,
                                              PluginHeightMapFilter *filter)
-    : QDialog(parent),
-      filter_(filter)
+    : QDockWidget(parent),
+      filter_(filter),
+      mainWindow_(parent)
 {
     // Widgets colormap
     colorCountSpinBox_ = new QSpinBox;
@@ -214,8 +225,10 @@ PluginHeightMapWindow::PluginHeightMapWindow(QWidget *parent,
             SLOT(colorCountChanged(int)));
 
     colormapComboBox_ = new QComboBox;
+    colormapComboBox_->addItem(PLUGIN_HEIGHT_MAP_COLORMAP_MATLAB_JET);
     colormapComboBox_->addItem(PLUGIN_HEIGHT_MAP_COLORMAP_VTK);
     colormapComboBox_->addItem(PLUGIN_HEIGHT_MAP_COLORMAP_GRAY);
+    colormapComboBox_->addItem(PLUGIN_HEIGHT_MAP_COLORMAP_WIN_XP);
     colormapComboBox_->setCurrentText(PLUGIN_HEIGHT_MAP_COLORMAP_DEFAULT);
 
     connect(colormapComboBox_,
@@ -239,7 +252,7 @@ PluginHeightMapWindow::PluginHeightMapWindow(QWidget *parent,
             &PluginHeightMapWindow::apply);
 
     // Layout
-    QGridLayout *layout = new QGridLayout(this);
+    QGridLayout *layout = new QGridLayout;
 
     layout->addWidget(new QLabel(tr("N colors")), 0, 0);
     layout->addWidget(colorCountSpinBox_, 0, 1, 1, 2);
@@ -254,9 +267,15 @@ PluginHeightMapWindow::PluginHeightMapWindow(QWidget *parent,
     layout->setRowMinimumHeight(2, 50);
     layout->setColumnStretch(1, 1);
 
+    // Dock
+    widget_ = new QWidget;
+    widget_->setLayout(layout);
+    setFloating(true);
+    setWidget(widget_);
+
     // Window
     setWindowTitle(tr(PLUGIN_HEIGHT_MAP_NAME));
-    setFixedWidth(200);
+    setMinimumWidth(200);
     setFixedHeight(110);
 }
 
@@ -282,7 +301,7 @@ void PluginHeightMapWindow::previewChanged(int index)
 
 void PluginHeightMapWindow::apply()
 {
-    filter_->applyToTiles(this);
+    filter_->applyToTiles(mainWindow_);
 }
 
 void PluginHeightMapWindow::closeEvent(QCloseEvent *event)
@@ -299,7 +318,7 @@ PluginHeightMap::PluginHeightMap() : window_(nullptr)
 {
 }
 
-void PluginHeightMap::initialize(QWidget *parent, Editor *editor)
+void PluginHeightMap::initialize(QMainWindow *parent, Editor *editor)
 {
     // Do not create GUI when this plugin is loaded
     (void)parent;
@@ -307,13 +326,14 @@ void PluginHeightMap::initialize(QWidget *parent, Editor *editor)
     filter_.initialize(editor);
 }
 
-void PluginHeightMap::show(QWidget *parent)
+void PluginHeightMap::show(QMainWindow *parent)
 {
     // Create GUI only when this plugin is used for the first time
     if (!window_)
     {
         window_ = new PluginHeightMapWindow(parent, &filter_);
         window_->setWindowIcon(icon());
+        parent->addDockWidget(Qt::LeftDockWidgetArea, window_);
     }
 
     window_->show();
