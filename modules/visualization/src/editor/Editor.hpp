@@ -37,6 +37,9 @@ public:
     Editor(QObject *parent = nullptr);
     ~Editor();
 
+    void attach();
+    void detach();
+
     void lock();
     void unlock();
 
