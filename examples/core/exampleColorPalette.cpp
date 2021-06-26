@@ -17,15 +17,33 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file exampleColorPalette.cpp @brief ColorPalette example. */
+/** @file examplecolorpalette.cpp @brief ColorPalette example. */
 
 #include <ColorPalette.hpp>
 
 static void print(const std::vector<Vector3<float>> &pal)
 {
+    char buffer[32];
+    uint32_t rgb;
+
     for (size_t i = 0; i < pal.size(); i++)
     {
-        std::cout << i << ": " << pal[i] << "\n";
+        rgb = ((static_cast<uint32_t>(pal[i][0] * 255.0F) & 0xffU) << 16) |
+              ((static_cast<uint32_t>(pal[i][1] * 255.0F) & 0xffU) << 8) |
+               (static_cast<uint32_t>(pal[i][2] * 255.0F) & 0xffU);
+
+        (void)snprintf(buffer, sizeof(buffer), "0x%06x", rgb);
+
+        if (i < 10)
+        {
+            std::cout << " " << i;
+        }
+        else
+        {
+            std::cout << i;
+        }
+
+        std::cout << ": " << pal[i] << " = " << buffer <<"\n";
     }
 }
 
@@ -34,7 +52,7 @@ int main()
     print(ColorPalette::Classification);
 
     size_t nColors = 16;
-    print(ColorPalette::gray(nColors));
+    print(ColorPalette::blueCyanYellowRed(nColors));
 
     return 0;
 }

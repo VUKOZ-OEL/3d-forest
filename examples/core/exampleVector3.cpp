@@ -17,7 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file exampleVector3.cpp @brief Vector3 example. */
+/** @file examplevector3.cpp @brief Vector3 example. */
 
 #include <Vector3.hpp>
 

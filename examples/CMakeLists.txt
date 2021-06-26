@@ -15,20 +15,20 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-add_executable(exampleLasCreate core/exampleLasCreate.cpp)
-target_link_libraries(exampleLasCreate PUBLIC core)
-install(TARGETS exampleLasCreate DESTINATION bin)
+add_executable(examplelascreate core/examplelascreate.cpp)
+target_link_libraries(examplelascreate PUBLIC core)
+install(TARGETS examplelascreate DESTINATION bin)
 
-add_executable(exampleVector3 core/exampleVector3.cpp)
-target_link_libraries(exampleVector3 PUBLIC core)
+add_executable(examplevector3 core/examplevector3.cpp)
+target_link_libraries(examplevector3 PUBLIC core)
 set_target_properties(
-  exampleVector3
+  examplevector3
   PROPERTIES
   COMPILE_FLAGS
   "-save-temps -fverbose-asm"
 )
-install(TARGETS exampleVector3 DESTINATION bin)
+install(TARGETS examplevector3 DESTINATION bin)
 
-add_executable(exampleColorPalette core/exampleColorPalette.cpp)
-target_link_libraries(exampleColorPalette PUBLIC core)
-install(TARGETS exampleColorPalette DESTINATION bin)
+add_executable(examplecolorpalette core/examplecolorpalette.cpp)
+target_link_libraries(examplecolorpalette PUBLIC core)
+install(TARGETS examplecolorpalette DESTINATION bin)
