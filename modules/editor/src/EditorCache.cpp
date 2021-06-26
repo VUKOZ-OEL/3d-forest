@@ -209,11 +209,59 @@ EditorTile *EditorCache::tile(size_t dataset, size_t index)
     auto search = cache_.find(nk);
     if (search != cache_.end())
     {
+        // Move found tile to top
+        for (size_t i = 0; i < lru_.size(); i++)
+        {
+            if (lru_[i] == search->second)
+            {
+                if (i > 0)
+                {
+                    std::shared_ptr<EditorTile> tmp = lru_[i];
+                    for (size_t j = i; j > 0; j--)
+                    {
+                        lru_[j] = lru_[j - 1];
+                    }
+                    lru_[0] = tmp;
+                }
+
+                break;
+            }
+        }
+
         return search->second.get();
     }
     else
     {
-        /** @todo Add LRU and drop old tiles. */
+        // LRU
+        if (lru_.size() > 0)
+        {
+            size_t idx;
+
+            if (lru_.size() < cacheSizeMax_)
+            {
+                // Make room for new tile
+                lru_.resize(lru_.size() + 1);
+                idx = lru_.size() - 1;
+            }
+            else
+            {
+                // Drop oldest tile
+                idx = lru_.size() - 1;
+                Key nkrm = {lru_[idx]->dataSetId, lru_[idx]->tileId};
+                cache_.erase(nkrm);
+            }
+
+            // New tile is on top
+            for (size_t j = idx; j > 0; j--)
+            {
+                lru_[j] = lru_[j - 1];
+            }
+        }
+        else
+        {
+            // First tile is on top
+            lru_.resize(1);
+        }
 
         std::shared_ptr<EditorTile> tile;
         tile = std::make_shared<EditorTile>();
@@ -221,6 +269,7 @@ EditorTile *EditorCache::tile(size_t dataset, size_t index)
         tile->tileId = nk.tileId;
         tile->loaded = false;
         cache_[nk] = tile;
+        lru_[0] = tile;
 
         try
         {
