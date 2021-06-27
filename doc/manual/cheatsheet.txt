@@ -28,6 +28,7 @@
 - @subpage cheatsheet_qtdesigner
 - @subpage cheatsheet_vscode_edit
 - @subpage cheatsheet_vscode_debug
+- @subpage cheatsheet_3rd_party
 
 *******************************************************************************/
 
@@ -469,5 +470,24 @@ uic -o ui_window.h window.ui
     - libvisualization.dll
 
 -#  To debug click "Launch the debugger for the selected target: [3dforest]".
+
+*******************************************************************************/
+
+/** @page cheatsheet_3rd_party Adding Third Party Libraries
+
+Third party libraries used by 3D Forest are copied to '3rdparty' directory and
+therefore distributed together with 3D Forest.
+3rd party code is build as a part of 3D Forest build process. This removes
+inconvenient step which would require to search, download and install
+dependencies.
+
+GPLv3 compatibility matrix:
+https://www.gnu.org/licenses/gpl-faq.en.html#AllCompatibility
+
+GPL-Compatible Free Software Licenses:
+https://www.gnu.org/licenses/license-list.html#GPLCompatibleLicenses
+
+GPL-Incompatible Free Software Licenses:
+https://www.gnu.org/licenses/license-list.html#GPLIncompatibleLicenses
 
 *******************************************************************************/

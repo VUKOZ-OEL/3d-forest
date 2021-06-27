@@ -288,11 +288,19 @@ void EditorTile::setPointColor(const EditorBase *editor)
 
     if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_INTENSITY))
     {
+        // for (size_t i = 0; i < n; i++)
+        // {
+        //     view.rgb[i * 3 + 0] *= intensity[i];
+        //     view.rgb[i * 3 + 1] *= intensity[i];
+        //     view.rgb[i * 3 + 2] *= intensity[i];
+        // }
+
         for (size_t i = 0; i < n; i++)
         {
-            view.rgb[i * 3 + 0] *= intensity[i];
-            view.rgb[i * 3 + 1] *= intensity[i];
-            view.rgb[i * 3 + 2] *= intensity[i];
+            setColor(i,
+                     static_cast<size_t>(intensity[i] * 255.0F),
+                     255,
+                     ColorPalette::BlueCyanYellowRed256);
         }
     }
 
@@ -300,10 +308,7 @@ void EditorTile::setPointColor(const EditorBase *editor)
     {
         for (size_t i = 0; i < n; i++)
         {
-            setColor(i,
-                     attrib[i].returnNumber,
-                     15,
-                     ColorPalette::blueCyanGreenYellowRed16);
+            setColor(i, attrib[i].returnNumber, 15, ColorPalette::BlueYellow16);
         }
     }
 
@@ -314,7 +319,7 @@ void EditorTile::setPointColor(const EditorBase *editor)
             setColor(i,
                      attrib[i].numberOfReturns,
                      15,
-                     ColorPalette::blueCyanGreenYellowRed16);
+                     ColorPalette::BlueYellow16);
         }
     }
 

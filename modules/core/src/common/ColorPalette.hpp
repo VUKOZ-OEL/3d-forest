@@ -35,9 +35,13 @@ public:
     static const std::vector<Vector3<float>> RedBlack16;
     static const std::vector<Vector3<float>> RedGreen16;
     static const std::vector<Vector3<float>> RedYellow16;
-    static const std::vector<Vector3<float>> blueCyanGreenYellowRed16;
+    static const std::vector<Vector3<float>> BlueYellow16;
+    static const std::vector<Vector3<float>> BlueCyanYellowRed16;
+    static const std::vector<Vector3<float>> BlueCyanYellowRed256;
+    static const std::vector<Vector3<float>> BlueCyanGreenYellowRed16;
+    static const std::vector<Vector3<float>> WindowsXp32;
 
-    static std::vector<Vector3<float>> blueGreenRed(size_t nColors);
+    static std::vector<Vector3<float>> blueCyanYellowRed(size_t nColors);
     static std::vector<Vector3<float>> blueCyanGreenYellowRed(size_t nColors);
     static std::vector<Vector3<float>> gray(size_t nColors);
 };

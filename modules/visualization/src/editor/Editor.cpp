@@ -38,6 +38,18 @@ Editor::~Editor()
 //     emit renderRequested();
 // }
 
+void Editor::attach()
+{
+    cancelThreads();
+    lock();
+}
+
+void Editor::detach()
+{
+    unlock();
+    restartThreads();
+}
+
 void Editor::lock()
 {
     mutex_.lock();

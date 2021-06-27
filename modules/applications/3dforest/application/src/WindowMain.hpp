@@ -34,6 +34,7 @@ class QToolButton;
 class PluginFile;
 class PluginTool;
 class Ribbon;
+class WindowDock;
 class WindowClipFilter;
 class WindowDataSets;
 class WindowLayers;
@@ -112,12 +113,6 @@ protected:
     WindowViewports *windowViewports_;
     WindowSettingsView *windowSettingsView_;
 
-    QDockWidget *dockClipFilter_;
-    QDockWidget *dockDataSets_;
-    QDockWidget *dockLayers_;
-    QDockWidget *dockViewSettings_;
-    QDockWidget *dockLog_;
-
     // Actions
     Ribbon *ribbon_;
     std::vector<QAction *> pluginsAction_;
@@ -151,6 +146,15 @@ protected:
                                   const QString &toolTip,
                                   const QString &icon,
                                   QDockWidget *dockWidget = nullptr);
+    WindowDock *createMenuTool(
+        const QString &text,
+        const QString &toolTip,
+        const QString &icon,
+        QWidget *dockWidget,
+        Qt::DockWidgetAreas areas = Qt::LeftDockWidgetArea |
+                                    Qt::RightDockWidgetArea,
+        Qt::DockWidgetArea area = Qt::RightDockWidgetArea,
+        bool floating = true);
 
     // Events
     void closeEvent(QCloseEvent *event) override;

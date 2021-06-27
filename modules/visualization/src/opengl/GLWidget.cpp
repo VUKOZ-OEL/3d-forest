@@ -217,13 +217,18 @@ void GLWidget::paintGL()
     QMatrix4x4 m;
     float w = static_cast<float>(camera_.width());
     float h = static_cast<float>(camera_.height());
-    float aspect = w / h;
-    m.ortho(-5.0F * aspect, 5.0F * aspect, -5.0F, 5.0F, -5.0F, 5.0F);
+
+    m.ortho(-w * 0.5F, w * 0.5F, -h * 0.5F, h * 0.5F, -50.0F, 50.0F);
     glMatrixMode(GL_PROJECTION);
     glLoadMatrixf(m.data());
 
     // Overlay: rotated
-    m = camera_.rotation();
+    float axesSize = 30.0F;
+    m.setToIdentity();
+    m.translate(-w * 0.5F + axesSize + 2.0F, -h * 0.5F + axesSize + 2.0F);
+    m.scale(axesSize);
+    m = m * camera_.rotation();
+
     glMatrixMode(GL_MODELVIEW);
     glLoadMatrixf(m.data());
 

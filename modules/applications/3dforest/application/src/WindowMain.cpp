@@ -38,6 +38,7 @@
 #include <Time.hpp>
 #include <WindowClipFilter.hpp>
 #include <WindowDataSets.hpp>
+#include <WindowDock.hpp>
 #include <WindowLayers.hpp>
 #include <WindowMain.hpp>
 #include <WindowSettingsView.hpp>
@@ -74,8 +75,8 @@ void WindowMain::initializeWindow()
 {
     // Create
     createEditor();
-    createWindows();
     createMenus();
+    createWindows();
     createViewer();
     createPlugins();
 
@@ -131,11 +132,39 @@ QToolButton *WindowMain::createMenuButton(const QString &text,
         QAction *action;
 
         action = dockWidget->toggleViewAction();
+        action->setIconText(text);
+        action->setToolTip(toolTip);
         action->setIcon(button->icon());
         button->setDefaultAction(action);
     }
 
     return button;
+}
+
+WindowDock *WindowMain::createMenuTool(const QString &text,
+                                       const QString &toolTip,
+                                       const QString &icon,
+                                       QWidget *dockWidget,
+                                       Qt::DockWidgetAreas areas,
+                                       Qt::DockWidgetArea area,
+                                       bool floating)
+{
+    WindowDock *dock = new WindowDock(this);
+
+    dock->setWidget(dockWidget);
+    dock->setWindowTitle(text);
+    dock->setWindowIcon(QIcon(":/icons/" + icon));
+    dock->setAllowedAreas(areas);
+    dock->setVisible(false);
+    dock->setFloating(floating);
+    addDockWidget(area, dock);
+
+    QToolButton *button;
+
+    button = createMenuButton(text, toolTip, icon, dock);
+    ribbon_->addButton("Tools", "Windows", button);
+
+    return dock;
 }
 
 void WindowMain::createMenus()
@@ -262,40 +291,6 @@ void WindowMain::createMenus()
     ribbon_->addTab(QIcon(":/icons/icons8-support-40.png"), "Tools");
     ribbon_->setIconSize(QSize(20, 20));
 
-    // Windows
-    ribbon_->addTab(QIcon(":/icons/icons8-restore-window-40.png"), "Windows");
-    ribbon_->setIconSize(QSize(20, 20));
-
-    button = createMenuButton(tr("Data Sets"),
-                              tr("Data Sets"),
-                              "icons8-open-box-40.png",
-                              dockDataSets_);
-    ribbon_->addButton("Windows", "Windows", button);
-
-    button = createMenuButton(tr("Layers"),
-                              tr("Layers"),
-                              "icons8-variation-40.png",
-                              dockLayers_);
-    ribbon_->addButton("Windows", "Windows", button);
-
-    button = createMenuButton(tr("View"),
-                              tr("View"),
-                              "icons8-tune-40.png",
-                              dockViewSettings_);
-    ribbon_->addButton("Windows", "Windows", button);
-
-    button = createMenuButton(tr("Clip"),
-                              tr("Clip"),
-                              "icons8-crop-40.png",
-                              dockClipFilter_);
-    ribbon_->addButton("Windows", "Windows", button);
-
-    button = createMenuButton(tr("Log"),
-                              tr("Log"),
-                              "icons8-pass-fail-40.png",
-                              dockLog_);
-    ribbon_->addButton("Windows", "Info", button);
-
     // Help
     ribbon_->addTab(QIcon(":/icons/icons8-information-40.png"), "Help");
     ribbon_->setIconSize(QSize(20, 20));
@@ -329,13 +324,10 @@ void WindowMain::createWindows()
             this,
             SLOT(actionDataSetVisible(size_t, bool)));
 
-    dockDataSets_ = new QDockWidget(tr("Data Sets"), this);
-    dockDataSets_->setAllowedAreas(
-        Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea |
-        Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
-    dockDataSets_->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
-    dockDataSets_->setWidget(windowDataSets_);
-    addDockWidget(Qt::LeftDockWidgetArea, dockDataSets_);
+    (void)createMenuTool(tr("Data Sets"),
+                         tr("Show and modify data sets"),
+                         "icons8-open-box-40.png",
+                         windowDataSets_);
 
     // Create layers window
     windowLayers_ = new WindowLayers(this);
@@ -344,14 +336,10 @@ void WindowMain::createWindows()
             this,
             SLOT(actionLayerVisible(size_t, bool)));
 
-    dockLayers_ = new QDockWidget(tr("Layers"), this);
-    dockLayers_->setAllowedAreas(Qt::LeftDockWidgetArea |
-                                 Qt::RightDockWidgetArea);
-    dockLayers_->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
-    dockLayers_->setMaximumWidth(WINDOW_MAIN_DOCK_MAX);
-    dockLayers_->setWidget(windowLayers_);
-    dockLayers_->setVisible(false);
-    addDockWidget(Qt::LeftDockWidgetArea, dockLayers_);
+    (void)createMenuTool(tr("Layers"),
+                         tr("Show and modify layers"),
+                         "icons8-variation-40.png",
+                         windowLayers_);
 
     // Create view settings window
     windowSettingsView_ = new WindowSettingsView(this);
@@ -364,13 +352,10 @@ void WindowMain::createWindows()
             this,
             SLOT(actionSettingsViewColor()));
 
-    dockViewSettings_ = new QDockWidget(tr("View Settings"), this);
-    dockViewSettings_->setAllowedAreas(Qt::LeftDockWidgetArea |
-                                       Qt::RightDockWidgetArea);
-    dockViewSettings_->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
-    dockViewSettings_->setMaximumWidth(WINDOW_MAIN_DOCK_MAX);
-    dockViewSettings_->setWidget(windowSettingsView_);
-    addDockWidget(Qt::RightDockWidgetArea, dockViewSettings_);
+    (void)createMenuTool(tr("View Settings"),
+                         tr("Change view settings"),
+                         "icons8-tune-40.png",
+                         windowSettingsView_);
 
     // Create clip filter window
     windowClipFilter_ = new WindowClipFilter(this);
@@ -383,23 +368,22 @@ void WindowMain::createWindows()
             this,
             SLOT(actionClipFilterReset()));
 
-    dockClipFilter_ = new QDockWidget(tr("Clip Filter"), this);
-    dockClipFilter_->setAllowedAreas(Qt::LeftDockWidgetArea |
-                                     Qt::RightDockWidgetArea);
-    dockClipFilter_->setMinimumWidth(WINDOW_MAIN_DOCK_MIN);
-    dockClipFilter_->setMaximumWidth(WINDOW_MAIN_DOCK_MAX);
-    dockClipFilter_->setWidget(windowClipFilter_);
-    addDockWidget(Qt::LeftDockWidgetArea, dockClipFilter_);
+    (void)createMenuTool(tr("Clip Filter"),
+                         tr("Setup and apply clip filter"),
+                         "icons8-crop-40.png",
+                         windowClipFilter_);
 
     // Log
     log = new QTextEdit(this);
     log->setReadOnly(true);
 
-    dockLog_ = new QDockWidget(tr("Log"), this);
-    dockLog_->setMinimumHeight(200);
-    dockLog_->setWidget(log);
-    dockLog_->setVisible(false);
-    addDockWidget(Qt::BottomDockWidgetArea, dockLog_);
+    (void)createMenuTool(tr("Log"),
+                         tr("Display application log"),
+                         "icons8-pass-fail-40.png",
+                         log,
+                         Qt::BottomDockWidgetArea,
+                         Qt::BottomDockWidgetArea,
+                         false);
 }
 
 void WindowMain::createPlugins()

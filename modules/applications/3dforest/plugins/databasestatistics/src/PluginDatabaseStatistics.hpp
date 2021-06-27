@@ -23,27 +23,38 @@
 #define PLUGIN_DATABASE_STATISTICS_HPP
 
 #include <PluginTool.hpp>
-#include <QDialog>
+#include <WindowDock.hpp>
 
 class Editor;
+class EditorTile;
 class QTextEdit;
 class QPushButton;
 
 /** Plugin Database Statistics Window. */
-class PluginDatabaseStatisticsWindow : public QDialog
+class PluginDatabaseStatisticsWindow : public WindowDock
 {
     Q_OBJECT
 
 public:
-    PluginDatabaseStatisticsWindow(QWidget *parent, Editor *editor);
+    PluginDatabaseStatisticsWindow(QMainWindow *parent, Editor *editor);
 
 protected slots:
     void compute();
 
 protected:
     Editor *editor_;
+    QWidget *widget_;
     QTextEdit *textEdit_;
     QPushButton *computeButton_;
+
+    // Stats
+    uint64_t numberOfPoints_;
+    uint64_t classificationPoints_;
+    uint32_t classificationMaximum_;
+
+    void computeReset();
+    void computeStep(EditorTile *tile);
+    void computeOutput();
 };
 
 /** Plugin Database Statistics. */
@@ -56,8 +67,8 @@ class PluginDatabaseStatistics : public QObject, public PluginTool
 public:
     PluginDatabaseStatistics();
 
-    virtual void initialize(QWidget *parent, Editor *editor);
-    virtual void show(QWidget *parent);
+    virtual void initialize(QMainWindow *parent, Editor *editor);
+    virtual void show(QMainWindow *parent);
     virtual QString windowTitle() const;
     virtual QString toolTip() const;
     virtual QIcon icon() const;

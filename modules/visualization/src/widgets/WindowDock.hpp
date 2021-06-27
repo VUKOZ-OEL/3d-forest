@@ -17,45 +17,45 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Editor.hpp */
+/** @file WindowDock.hpp */
 
-#ifndef EDITOR_HPP
-#define EDITOR_HPP
+#ifndef WINDOW_DOCK_HPP
+#define WINDOW_DOCK_HPP
 
-#include <Camera.hpp>
-#include <EditorBase.hpp>
-#include <QObject>
-#include <ThreadRender.hpp>
-#include <mutex>
+#include <QDockWidget>
+#include <QIcon>
 
-/** Editor. */
-class Editor : public QObject, public EditorBase
+class QLabel;
+class QMainWindow;
+class QToolButton;
+class QDragEnterEvent;
+
+/** Dock Widget. */
+class WindowDock : public QDockWidget
 {
     Q_OBJECT
 
 public:
-    Editor(QObject *parent = nullptr);
-    ~Editor();
+    WindowDock(QMainWindow *parent = nullptr);
 
-    void attach();
-    void detach();
+    QMainWindow *mainWindow() const;
 
-    void lock();
-    void unlock();
+    void setWindowTitle(const QString &);
+    void setWindowIcon(const QIcon &);
 
-    void cancelThreads();
-    void restartThreads();
-
-signals:
-    void renderRequested();
+    void paintEvent(QPaintEvent *e);
 
 public slots:
-    void render(size_t viewportId, const Camera &camera);
-    void render();
+    void windowDockFloatEvent(bool topLevel);
+    void windowCollapse();
+    void windowClose();
 
 protected:
-    ThreadRender thread_;
-    std::mutex mutex_;
+    QMainWindow *mainWindow_;
+    QLabel *windowIcon_;
+    QLabel *windowTitle_;
+    QToolButton *windowButtonCollapse_;
+    QToolButton *windowButtonClose_;
 };
 
-#endif /* EDITOR_HPP */
+#endif /* WINDOW_DOCK_HPP */
