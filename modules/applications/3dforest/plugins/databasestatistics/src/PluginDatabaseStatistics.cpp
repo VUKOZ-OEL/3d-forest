@@ -41,23 +41,18 @@ PluginDatabaseStatisticsWindow::PluginDatabaseStatisticsWindow(
     textEdit_ = new QTextEdit;
 
     computeButton_ = new QPushButton(tr("&Compute"));
+    computeButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(computeButton_, SIGNAL(clicked()), this, SLOT(compute()));
 
     // Layout
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(textEdit_);
-    layout->addWidget(computeButton_);
+    layout->addWidget(computeButton_, 0, Qt::AlignRight);
 
     // Dock
     widget_ = new QWidget;
     widget_->setLayout(layout);
-    setFloating(true);
     setWidget(widget_);
-
-    // Window
-    setWindowTitle(tr(PLUGIN_DATABASE_STATISTICS_NAME));
-    widget_->setMinimumWidth(300);
-    widget_->setMinimumHeight(200);
 }
 
 void PluginDatabaseStatisticsWindow::compute()
@@ -174,7 +169,10 @@ void PluginDatabaseStatistics::show(QMainWindow *parent)
         window_ = new PluginDatabaseStatisticsWindow(parent, editor_);
         window_->setWindowTitle(windowTitle());
         window_->setWindowIcon(icon());
-        parent->addDockWidget(Qt::LeftDockWidgetArea, window_);
+        window_->setFloating(true);
+        window_->setAllowedAreas(Qt::LeftDockWidgetArea |
+                                 Qt::RightDockWidgetArea);
+        parent->addDockWidget(Qt::RightDockWidgetArea, window_);
     }
 
     window_->show();

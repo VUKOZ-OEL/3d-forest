@@ -28,11 +28,14 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QGridLayout>
+#include <QGroupBox>
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QMainWindow>
 #include <QProgressDialog>
 #include <QPushButton>
 #include <QSpinBox>
+#include <QVBoxLayout>
 #include <Time.hpp>
 
 #define PLUGIN_HEIGHT_MAP_NAME "Heightmap"
@@ -44,6 +47,7 @@
 #define PLUGIN_HEIGHT_MAP_COLORS_MAX 65536
 #define PLUGIN_HEIGHT_MAP_COLORS_DEFAULT 256
 
+#if 1 /* Allow to collapse this class */
 PluginHeightMapFilter::PluginHeightMapFilter()
     : editor_(nullptr),
       previewEnabled_(false)
@@ -206,7 +210,9 @@ std::vector<Vector3<float>> PluginHeightMapFilter::createColormap(
         return colormap;
     }
 }
+#endif /* Allow to collapse this class */
 // -----------------------------------------------------------------------------
+#if 1 /* Allow to collapse this class */
 PluginHeightMapWindow::PluginHeightMapWindow(QMainWindow *parent,
                                              PluginHeightMapFilter *filter)
     : WindowDock(parent),
@@ -244,38 +250,40 @@ PluginHeightMapWindow::PluginHeightMapWindow(QMainWindow *parent,
             this,
             &PluginHeightMapWindow::previewChanged);
 
-    applyButton_ = new QPushButton(tr("&Apply"), this);
+    applyButton_ = new QPushButton(tr("&Apply"));
+    applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(applyButton_,
             &QAbstractButton::clicked,
             this,
             &PluginHeightMapWindow::apply);
 
     // Layout
-    QGridLayout *layout = new QGridLayout;
+    QGroupBox *groupBox = new QGroupBox;
+    QGridLayout *groupBoxLayout = new QGridLayout;
+    groupBoxLayout->addWidget(new QLabel(tr("N colors")), 0, 0);
+    groupBoxLayout->addWidget(colorCountSpinBox_, 0, 1);
+    groupBoxLayout->addWidget(new QLabel(tr("Colormap")), 1, 0);
+    groupBoxLayout->addWidget(colormapComboBox_, 1, 1);
+    groupBoxLayout->setColumnStretch(1, 1);
+    groupBox->setLayout(groupBoxLayout);
 
-    layout->addWidget(new QLabel(tr("N colors")), 0, 0);
-    layout->addWidget(colorCountSpinBox_, 0, 1, 1, 2);
+    QHBoxLayout *hbox = new QHBoxLayout;
+    hbox->addWidget(previewCheckBox_);
+    hbox->addWidget(new QLabel(tr("Preview")));
+    hbox->addStretch();
+    hbox->addWidget(applyButton_, 0, Qt::AlignRight);
 
-    layout->addWidget(new QLabel(tr("Colormap")), 1, 0);
-    layout->addWidget(colormapComboBox_, 1, 1, 1, 2);
-
-    layout->addWidget(new QLabel(tr("Preview")), 2, 0);
-    layout->addWidget(previewCheckBox_, 2, 1);
-    layout->addWidget(applyButton_, 2, 2, Qt::AlignRight);
-
-    layout->setRowMinimumHeight(2, 50);
-    layout->setColumnStretch(1, 1);
+    QVBoxLayout *vbox = new QVBoxLayout;
+    vbox->addWidget(groupBox);
+    vbox->addSpacing(10);
+    vbox->addLayout(hbox);
+    vbox->addStretch();
 
     // Dock
     widget_ = new QWidget;
-    widget_->setLayout(layout);
-    setFloating(true);
+    widget_->setLayout(vbox);
+    widget_->setFixedHeight(120);
     setWidget(widget_);
-
-    // Window
-    setWindowTitle(tr(PLUGIN_HEIGHT_MAP_NAME));
-    widget_->setMinimumWidth(200);
-    widget_->setMinimumHeight(100);
 }
 
 void PluginHeightMapWindow::colorCountChanged(int i)
@@ -312,6 +320,7 @@ void PluginHeightMapWindow::closeEvent(QCloseEvent *event)
     }
     event->accept();
 }
+#endif /* Allow to collapse this class */
 // -----------------------------------------------------------------------------
 PluginHeightMap::PluginHeightMap() : window_(nullptr)
 {
@@ -333,7 +342,10 @@ void PluginHeightMap::show(QMainWindow *parent)
         window_ = new PluginHeightMapWindow(parent, &filter_);
         window_->setWindowTitle(windowTitle());
         window_->setWindowIcon(icon());
-        parent->addDockWidget(Qt::LeftDockWidgetArea, window_);
+        window_->setFloating(true);
+        window_->setAllowedAreas(Qt::LeftDockWidgetArea |
+                                 Qt::RightDockWidgetArea);
+        parent->addDockWidget(Qt::RightDockWidgetArea, window_);
     }
 
     window_->show();

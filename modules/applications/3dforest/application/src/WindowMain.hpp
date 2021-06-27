@@ -113,12 +113,6 @@ protected:
     WindowViewports *windowViewports_;
     WindowSettingsView *windowSettingsView_;
 
-    WindowDock *dockClipFilter_;
-    WindowDock *dockDataSets_;
-    WindowDock *dockLayers_;
-    WindowDock *dockViewSettings_;
-    WindowDock *dockLog_;
-
     // Actions
     Ribbon *ribbon_;
     std::vector<QAction *> pluginsAction_;
@@ -152,6 +146,15 @@ protected:
                                   const QString &toolTip,
                                   const QString &icon,
                                   QDockWidget *dockWidget = nullptr);
+    WindowDock *createMenuTool(
+        const QString &text,
+        const QString &toolTip,
+        const QString &icon,
+        QWidget *dockWidget,
+        Qt::DockWidgetAreas areas = Qt::LeftDockWidgetArea |
+                                    Qt::RightDockWidgetArea,
+        Qt::DockWidgetArea area = Qt::RightDockWidgetArea,
+        bool floating = true);
 
     // Events
     void closeEvent(QCloseEvent *event) override;

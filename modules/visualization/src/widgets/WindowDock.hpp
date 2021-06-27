@@ -28,6 +28,7 @@
 class QLabel;
 class QMainWindow;
 class QToolButton;
+class QDragEnterEvent;
 
 /** Dock Widget. */
 class WindowDock : public QDockWidget
@@ -42,7 +43,10 @@ public:
     void setWindowTitle(const QString &);
     void setWindowIcon(const QIcon &);
 
+    void paintEvent(QPaintEvent *e);
+
 public slots:
+    void windowDockFloatEvent(bool topLevel);
     void windowCollapse();
     void windowClose();
 

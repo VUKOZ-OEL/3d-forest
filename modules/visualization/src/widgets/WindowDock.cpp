@@ -19,12 +19,14 @@
 
 /** @file WindowDock.cpp */
 
-#include <QMainWindow>
-#include <WindowDock.hpp>
+#include <QDebug>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QMainWindow>
+#include <QPainter>
 #include <QStyle>
 #include <QToolButton>
+#include <WindowDock.hpp>
 
 WindowDock::WindowDock(QMainWindow *parent)
     : QDockWidget(parent),
@@ -36,8 +38,10 @@ WindowDock::WindowDock(QMainWindow *parent)
 
     // Icons
     QStyle *style = bar->style();
+
     QIcon iconClose;
     iconClose = style->standardIcon(QStyle::SP_TitleBarCloseButton, 0, bar);
+
     QIcon iconMax;
     iconMax = style->standardIcon(QStyle::SP_TitleBarMaxButton, 0, bar);
 
@@ -49,6 +53,7 @@ WindowDock::WindowDock(QMainWindow *parent)
 
     windowButtonCollapse_ = new QToolButton;
     windowButtonCollapse_->setIcon(iconMax);
+    windowButtonCollapse_->setIconSize(QSize(10, 10));
     connect(windowButtonCollapse_,
             SIGNAL(clicked()),
             this,
@@ -56,10 +61,8 @@ WindowDock::WindowDock(QMainWindow *parent)
 
     windowButtonClose_ = new QToolButton;
     windowButtonClose_->setIcon(iconClose);
-    connect(windowButtonClose_,
-            SIGNAL(clicked()),
-            this,
-            SLOT(windowClose()));
+    windowButtonClose_->setIconSize(QSize(10, 10));
+    connect(windowButtonClose_, SIGNAL(clicked()), this, SLOT(windowClose()));
 
     // Layout
     QHBoxLayout *layout = new QHBoxLayout;
@@ -74,6 +77,11 @@ WindowDock::WindowDock(QMainWindow *parent)
 
     // Set title bar
     setTitleBarWidget(bar);
+
+    connect(this,
+            SIGNAL(topLevelChanged(bool)),
+            this,
+            SLOT(windowDockFloatEvent(bool)));
 }
 
 QMainWindow *WindowDock::mainWindow() const
@@ -84,6 +92,7 @@ QMainWindow *WindowDock::mainWindow() const
 void WindowDock::setWindowTitle(const QString &text)
 {
     windowTitle_->setText(text);
+    QDockWidget::setWindowTitle(text);
 }
 
 void WindowDock::setWindowIcon(const QIcon &icon)
@@ -91,16 +100,42 @@ void WindowDock::setWindowIcon(const QIcon &icon)
     windowIcon_->setPixmap(icon.pixmap(20, 20));
 }
 
+void WindowDock::paintEvent(QPaintEvent *e)
+{
+    QWidget::paintEvent(e);
+
+    if (isFloating())
+    {
+        QPainter painter(this);
+        painter.setPen(QColor(200, 200, 200));
+        painter.drawRect(0, 0, width() - 1, height() - 1);
+    }
+}
+
+void WindowDock::windowDockFloatEvent(bool topLevel)
+{
+    if (topLevel)
+    {
+        // setWindowFlags(Qt::Tool | Qt::CustomizeWindowHint);
+    }
+}
+
 void WindowDock::windowCollapse()
 {
-    if (!widget()->isVisible())
-    {
-        widget()->setVisible(true);
-    }
-    else
+    /** @todo Collapse dock functionality.
+
+        This does not work with fixed sized widgets yet.
+    */
+#if 0
+    if (widget()->isVisible())
     {
         widget()->setVisible(false);
     }
+    else
+    {
+        widget()->setVisible(true);
+    }
+#endif
 }
 
 void WindowDock::windowClose()
