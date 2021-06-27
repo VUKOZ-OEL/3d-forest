@@ -87,12 +87,14 @@ void PluginDatabaseStatisticsWindow::compute()
         }
 
         // Process step i
+        editor_->lock();
         FileIndex::Selection &selected = selection[static_cast<size_t>(i)];
         EditorTile *tile = editor_->tile(selected.id, selected.idx);
         if (tile)
         {
             computeStep(tile);
         }
+        editor_->unlock();
     }
     progressDialog.setValue(progressDialog.maximum());
 
@@ -178,6 +180,16 @@ void PluginDatabaseStatistics::show(QMainWindow *parent)
     window_->show();
     window_->raise();
     window_->activateWindow();
+}
+
+QAction *PluginDatabaseStatistics::toggleViewAction() const
+{
+    if (window_)
+    {
+        return window_->toggleViewAction();
+    }
+
+    return nullptr;
 }
 
 QString PluginDatabaseStatistics::windowTitle() const

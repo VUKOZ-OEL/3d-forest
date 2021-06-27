@@ -22,6 +22,7 @@
 #include <Editor.hpp>
 #include <GL.hpp>
 #include <GLWidget.hpp>
+#include <QDebug>
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <Time.hpp>

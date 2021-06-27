@@ -162,12 +162,14 @@ void PluginHeightMapFilter::applyToTiles(QWidget *widget)
         }
 
         // Process step i
+        editor_->lock();
         FileIndex::Selection &sel = selection[static_cast<size_t>(i)];
         EditorTile *tile = editor_->tile(sel.id, sel.idx);
         if (tile)
         {
             filterTile(tile);
         }
+        editor_->unlock();
     }
     progressDialog.setValue(progressDialog.maximum());
 
@@ -351,6 +353,16 @@ void PluginHeightMap::show(QMainWindow *parent)
     window_->show();
     window_->raise();
     window_->activateWindow();
+}
+
+QAction *PluginHeightMap::toggleViewAction() const
+{
+    if (window_)
+    {
+        return window_->toggleViewAction();
+    }
+
+    return nullptr;
 }
 
 QString PluginHeightMap::windowTitle() const

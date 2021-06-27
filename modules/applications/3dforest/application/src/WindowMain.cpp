@@ -419,7 +419,6 @@ void WindowMain::createPlugins()
                 ribbon_->addButton("Tools", "Plugins", button);
 
                 QAction *action = new QAction(name, this);
-                pluginsAction_.push_back(action);
                 action->setIcon(pluginToolInterface->icon());
                 action->setToolTip(pluginToolInterface->toolTip());
                 connect(action,
@@ -628,6 +627,23 @@ void WindowMain::actionPluginToolShow()
                 try
                 {
                     it->show(this);
+
+                    // Update action to toggle view
+                    QList<QWidget *> widgets = action->associatedWidgets();
+                    if (widgets.count() > 0)
+                    {
+                        QWidget *widget = widgets.at(0);
+                        QToolButton *button;
+                        button = qobject_cast<QToolButton *>(widget);
+                        if (button)
+                        {
+                            action = it->toggleViewAction();
+                            action->setIconText(it->windowTitle());
+                            action->setToolTip(it->toolTip());
+                            action->setIcon(it->icon());
+                            button->setDefaultAction(action);
+                        }
+                    }
                 }
                 catch (std::exception &e)
                 {

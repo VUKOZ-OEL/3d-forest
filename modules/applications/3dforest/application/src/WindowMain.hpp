@@ -115,7 +115,6 @@ protected:
 
     // Actions
     Ribbon *ribbon_;
-    std::vector<QAction *> pluginsAction_;
 
     // Initialization
     void initializeWindow();
