@@ -27,6 +27,7 @@
 #include <QtPlugin>
 
 class Editor;
+class QAction;
 class QMainWindow;
 
 /** Plugin Tool Interface. */
@@ -36,6 +37,7 @@ public:
     virtual ~PluginTool() = default;
     virtual void initialize(QMainWindow *parent, Editor *editor) = 0;
     virtual void show(QMainWindow *parent) = 0;
+    virtual QAction *toggleViewAction() const = 0;
     virtual QString windowTitle() const = 0; /**< Unique */
     virtual QString toolTip() const = 0;
     virtual QIcon icon() const = 0;

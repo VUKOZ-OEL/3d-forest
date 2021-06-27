@@ -140,5 +140,5 @@ void WindowDock::windowCollapse()
 
 void WindowDock::windowClose()
 {
-    setVisible(false);
+    QWidget::close();
 }

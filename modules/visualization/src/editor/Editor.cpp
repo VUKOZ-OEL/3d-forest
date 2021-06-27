@@ -41,12 +41,12 @@ Editor::~Editor()
 void Editor::attach()
 {
     cancelThreads();
-    lock();
+    //lock();
 }
 
 void Editor::detach()
 {
-    unlock();
+    //unlock();
     restartThreads();
 }
 
