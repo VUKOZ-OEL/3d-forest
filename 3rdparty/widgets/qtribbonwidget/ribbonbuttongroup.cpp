@@ -11,8 +11,8 @@
 /*
     Modifications Copyright 2020 VUKOZ
 
-    Removed >setIconSize().
-    'ui->label' not used.
+    Removed setIconSize().
+    Updated setMinimumSize().
 */
 
 #include "ribbonbuttongroup.h"
@@ -36,7 +36,7 @@ RibbonButtonGroup::~RibbonButtonGroup()
 void RibbonButtonGroup::setTitle(const QString &title)
 {
   m_title = title;
-  //ui->label->setText(m_title);
+  ui->label->setText(m_title);
 }
 
 QString RibbonButtonGroup::title() const
@@ -52,9 +52,15 @@ int RibbonButtonGroup::buttonCount() const
 void RibbonButtonGroup::addButton(QToolButton *button)
 {
   button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-  button->setMinimumSize(48, 48);
+  button->setMinimumSize(20, 74);
+  button->setMaximumSize(60, 74);
+  button->setContentsMargins(0, 0, 0, 0);
   button->setAutoRaise(true);
   button->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+
+  // QFont font = button->font();
+  // font.setPointSize(font.pointSize() - 1);
+  // button->setFont(font);
 
   ui->horizontalLayout->addWidget(button);
 }

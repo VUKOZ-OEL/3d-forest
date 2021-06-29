@@ -97,16 +97,8 @@ void GLCamera::setOrthographic()
     float h = static_cast<float>(viewport_.height());
     float aspect = w / h;
 
-    // Fake distance scaling from perspective projection
-    float d = 0.1F * (1.0F / distance_);
-    if (d < std::numeric_limits<float>::epsilon())
-    {
-        d = std::numeric_limits<float>::epsilon();
-    }
-    float orthoScaleInverted = 1.0F / d;
-
     // Orthographic arguments
-    float w2 = 0.1F * 0.577350269F * orthoScaleInverted;
+    float w2 = 0.5F * distance_;
     float left = -aspect * w2;
     float right = aspect * w2;
     float top = w2;
