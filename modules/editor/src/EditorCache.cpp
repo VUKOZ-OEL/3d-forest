@@ -26,7 +26,7 @@
 
 EditorCache::EditorCache(EditorBase *editor) : editor_(editor)
 {
-    cacheSizeMax_ = 250;
+    cacheSizeMax_ = 200;
 }
 
 EditorCache::~EditorCache()

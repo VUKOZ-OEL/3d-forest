@@ -84,7 +84,8 @@ protected:
 
     void resetCamera();
     void clearScreen();
-    void renderScene();
+    bool renderScene();
+    void renderGuides();
     void renderSceneSettingsEnable();
     void renderSceneSettingsDisable();
     void cameraChanged();

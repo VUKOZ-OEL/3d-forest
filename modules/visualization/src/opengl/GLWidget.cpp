@@ -124,6 +124,7 @@ void GLWidget::setView3d()
 {
     QVector3D dir(1.0F, -1.0F, 1.0F);
     QVector3D up(-1.065F, 1.0F, 1.0F);
+    dir.normalize();
     up.normalize();
     setViewDirection(dir, up);
 }
@@ -137,7 +138,7 @@ void GLWidget::resetCamera()
     {
         center = aabb_.getCenter();
         // center[2] = aabb_.getMin().z();
-        distance = aabb_.getRadius();
+        distance = aabb_.getRadius() * 2.0F;
     }
 
     QVector3D eye(1.0F, -1.0F, 1.0F);
@@ -158,7 +159,7 @@ void GLWidget::setViewResetDistance()
     float distance = 1.0F;
     if (aabb_.isValid())
     {
-        distance = aabb_.getRadius();
+        distance = aabb_.getRadius() * 2.0F;
     }
 
     QVector3D eye = (dir * distance) + center;
@@ -208,9 +209,17 @@ void GLWidget::paintGL()
     glLoadMatrixf(camera_.getModelView().data());
 
     // Render
-    renderScene();
+    bool firstFrame = renderScene();
 
-    // Render
+    if (firstFrame)
+    {
+        renderGuides();
+    }
+}
+
+void GLWidget::renderGuides()
+{
+    // Bounding box
     glColor3f(0.25F, 0.25F, 0.25F);
     GL::renderAabb(aabb_);
 
@@ -245,12 +254,14 @@ void GLWidget::clearScreen()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void GLWidget::renderScene()
+bool GLWidget::renderScene()
 {
     if (!editor_)
     {
-        return;
+        return true;
     }
+
+    bool firstFrame = false;
 
     editor_->lock();
 
@@ -263,6 +274,7 @@ void GLWidget::renderScene()
     if (tileViewSize == 0)
     {
         clearScreen();
+        firstFrame = true;
     }
 
     for (size_t tileIndex = 0; tileIndex < tileViewSize; tileIndex++)
@@ -274,6 +286,7 @@ void GLWidget::renderScene()
             if (tileIndex == 0 && tile.view.isStarted())
             {
                 clearScreen();
+                firstFrame = true;
             }
 
             GL::render(GL::POINTS, tile.view.xyz, tile.view.rgb, tile.indices);
@@ -291,9 +304,14 @@ void GLWidget::renderScene()
 
     renderSceneSettingsDisable();
 
-    GL::renderClipFilter(editor_->clipFilter());
+    if (firstFrame)
+    {
+        GL::renderClipFilter(editor_->clipFilter());
+    }
 
     editor_->unlock();
+
+    return firstFrame;
 }
 
 void GLWidget::renderSceneSettingsEnable()

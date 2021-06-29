@@ -222,8 +222,8 @@ void WindowMain::createMenus()
     ribbon_->addTab(QIcon(":/icons/icons8-monitor-40.png"), "View");
     ribbon_->setIconSize(QSize(20, 20));
 
-    button = createMenuButton(tr("Orthographic"),
-                              tr("Orthographic"),
+    button = createMenuButton(tr("Ortho\ngraphic"),
+                              tr("Ortho\ngraphic"),
                               "icons8-orthogonal-view-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewOrthographic()));
     ribbon_->addButton("View", "Projection", button);
@@ -236,21 +236,21 @@ void WindowMain::createMenus()
 
     button = createMenuButton(tr("Top"), tr("Top"), "icons8-top-view-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewTop()));
-    ribbon_->addButton("View", "Camera", button);
+    ribbon_->addButton("View", "View", button);
 
     button =
         createMenuButton(tr("Front"), tr("Front"), "icons8-front-view-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewFront()));
-    ribbon_->addButton("View", "Camera", button);
+    ribbon_->addButton("View", "View", button);
 
     button =
         createMenuButton(tr("Right"), tr("Right"), "icons8-right-view-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewRight()));
-    ribbon_->addButton("View", "Camera", button);
+    ribbon_->addButton("View", "View", button);
 
     button = createMenuButton(tr("3D"), tr("3D"), "icons8-portraits-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionView3d()));
-    ribbon_->addButton("View", "Camera", button);
+    ribbon_->addButton("View", "View", button);
 
     button = createMenuButton(tr("Distance"),
                               tr("Distance"),
@@ -310,7 +310,7 @@ void WindowMain::createMenus()
     ribbonDockWidget->setTitleBarWidget(new QWidget());
     ribbonDockWidget->setFeatures(QDockWidget::NoDockWidgetFeatures);
     ribbonDockWidget->setAllowedAreas(Qt::TopDockWidgetArea);
-    ribbonDockWidget->setFixedHeight(94);
+    ribbonDockWidget->setFixedHeight(113);
     ribbonDockWidget->setWidget(ribbonDockWidgetContents);
     addDockWidget(Qt::TopDockWidgetArea, ribbonDockWidget);
 }
@@ -324,7 +324,7 @@ void WindowMain::createWindows()
             this,
             SLOT(actionDataSetVisible(size_t, bool)));
 
-    (void)createMenuTool(tr("Data Sets"),
+    (void)createMenuTool(tr("Data\nSets"),
                          tr("Show and modify data sets"),
                          "icons8-open-box-40.png",
                          windowDataSets_);
@@ -352,7 +352,7 @@ void WindowMain::createWindows()
             this,
             SLOT(actionSettingsViewColor()));
 
-    (void)createMenuTool(tr("View Settings"),
+    (void)createMenuTool(tr("View\nSettings"),
                          tr("Change view settings"),
                          "icons8-tune-40.png",
                          windowSettingsView_);
@@ -368,7 +368,7 @@ void WindowMain::createWindows()
             this,
             SLOT(actionClipFilterReset()));
 
-    (void)createMenuTool(tr("Clip Filter"),
+    (void)createMenuTool(tr("Clip\nFilter"),
                          tr("Setup and apply clip filter"),
                          "icons8-crop-40.png",
                          windowClipFilter_);

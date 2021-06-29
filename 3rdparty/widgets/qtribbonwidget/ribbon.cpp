@@ -12,6 +12,8 @@
     Modifications Copyright 2020 VUKOZ
 
     Renamed QPalette::Background to QPalette::Window.
+    Updated 'mid' color to Midlight.
+    Updated padding.
 */
 
 #include "ribbon.h"
@@ -26,7 +28,7 @@ Ribbon::Ribbon(QWidget *parent)
 {
   // Determine default colors
   QColor bg = qApp->palette().color(QPalette::Window);
-  QColor mid = qApp->palette().color(QPalette::Mid);
+  QColor mid = qApp->palette().color(QPalette::Midlight);
 
   // Note: the order in which the background/palette/stylesheet functions are
   // called does matter. Should be same as in Qt designer.
@@ -41,10 +43,10 @@ Ribbon::Ribbon(QWidget *parent)
     "}"
     ""
     "QTabBar::tab {"
-    "  padding-top: 5px;"
-    "  padding-bottom: 5px;"
-    "  padding-left: 10px;"
-    "  padding-right: 10px;"
+    "  padding-top: 2px;"
+    "  padding-bottom: 1px;"
+    "  padding-left: 8px;"
+    "  padding-right: 8px;"
     "  margin-top: 1px;"
     "}"
     ""
@@ -73,6 +75,7 @@ Ribbon::Ribbon(QWidget *parent)
      .arg(mid.red()).arg(mid.green()).arg(mid.blue());
 
   setStyleSheet(styleSheetText);
+  setContentsMargins(0, 0, 0, 0);
 
   // Set background color
   QPalette pal = palette();
