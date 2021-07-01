@@ -104,13 +104,19 @@ WindowSettingsView::WindowSettingsView(QWidget *parent) : QWidget(parent)
     visualizationLayout->addStretch(1);
     visualization->setLayout(visualizationLayout);
 
+    QWidget *guide = new QWidget;
+    vbox = new QVBoxLayout;
+    guide->setLayout(vbox);
+
     // Tab Main
     tabWidget_ = new QTabWidget;
-    tabWidget_->addTab(visualization, tr("Visualization"));
+    tabWidget_->addTab(visualization, tr("Visual"));
+    tabWidget_->addTab(guide, tr("Guide"));
 
     // Layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(tabWidget_);
+    mainLayout->setContentsMargins(1, 1, 1, 1);
     setLayout(mainLayout);
 
     // Window
