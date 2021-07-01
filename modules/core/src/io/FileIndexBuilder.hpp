@@ -116,6 +116,9 @@ protected:
     size_t sizePointOut_;
     size_t sizePointFormat_;
 
+    uint32_t rgbMax_;
+    uint32_t intensityMax_;
+
     uint64_t random_;
     FileIndex indexMain_;
     FileIndex indexNode_;

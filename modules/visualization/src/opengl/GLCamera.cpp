@@ -98,17 +98,21 @@ void GLCamera::setOrthographic()
     float aspect = w / h;
 
     // Orthographic arguments
-    float w2 = 0.5F * distance_;
+    float zNear = zNear_ * distance_;
+    float zFar = zFar_ * distance_;
+
+    QMatrix4x4 m;
+    m.perspective(fov_, aspect, zNear, zFar);
+    float w2 = -m(2, 3) * 28.9F;
     float left = -aspect * w2;
     float right = aspect * w2;
     float top = w2;
     float bottom = -w2;
 
-    float zNear = -zFar_ * distance_;
-    float zFar = zFar_ * distance_;
+    zNear = -zFar_ * distance_;
 
     // Projection matrix
-    QMatrix4x4 m;
+    m.setToIdentity();
     m.ortho(left, right, bottom, top, zNear, zFar);
     setProjection(m);
 }

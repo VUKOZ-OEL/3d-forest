@@ -109,6 +109,9 @@ void FileIndexBuilder::start(const std::string &outputPath,
     valueTotal_ = 0;
     maximumTotal_ = 0;
 
+    rgbMax_ = 0;
+    intensityMax_ = 0;
+
     random_ = 10;
     indexMain_.clear();
     indexNode_.clear();
@@ -678,11 +681,33 @@ void FileIndexBuilder::stateMainInsert()
     double x;
     double y;
     double z;
+    uint32_t intensity;
+    uint32_t rgb;
 
     for (uint64_t i = 0; i < stepIdx; i++)
     {
         inputLas_.transform(x, y, z, buffer + (i * sizePoint_));
         (void)indexMain_.insert(x, y, z);
+
+        intensity = ltoh16(buffer + (i * sizePoint_) + 12);
+        if (intensity > intensityMax_)
+        {
+            intensityMax_ = intensity;
+        }
+
+        if (inputLas_.header.point_data_record_format == 7 ||
+            inputLas_.header.point_data_record_format == 8 ||
+            inputLas_.header.point_data_record_format == 10)
+        {
+            rgb = ltoh16(buffer + (i * sizePoint_) + 30);
+            rgb += ltoh16(buffer + (i * sizePoint_) + 32);
+            rgb += ltoh16(buffer + (i * sizePoint_) + 34);
+
+            if (rgb > rgbMax_)
+            {
+                rgbMax_ = rgb;
+            }
+        }
     }
 
     // Next
@@ -730,12 +755,40 @@ void FileIndexBuilder::stateMainSort()
     double x;
     double y;
     double z;
+    uint16_t intensity;
+    uint16_t color;
     const FileIndex::Node *node;
 
     for (uint64_t i = 0; i < stepIdx; i++)
     {
         point = buffer + (i * sizePoint_);
         inputLas_.transform(x, y, z, point);
+
+        if (intensityMax_ > 0 && intensityMax_ < 256)
+        {
+            intensity = ltoh16(point + 12);
+            intensity = static_cast<uint16_t>(
+                (static_cast<float>(intensity) / 255.0F) * 65535.0F);
+            htol16(point + 12, intensity);
+        }
+
+        if (rgbMax_ > 0 && rgbMax_ < 766)
+        {
+            color = ltoh16(point + 30);
+            color = static_cast<uint16_t>((static_cast<float>(color) / 255.0F) *
+                                          65535.0F);
+            htol16(point + 30, color);
+
+            color = ltoh16(point + 32);
+            color = static_cast<uint16_t>((static_cast<float>(color) / 255.0F) *
+                                          65535.0F);
+            htol16(point + 32, color);
+
+            color = ltoh16(point + 34);
+            color = static_cast<uint16_t>((static_cast<float>(color) / 255.0F) *
+                                          65535.0F);
+            htol16(point + 34, color);
+        }
 
         node = indexMain_.selectNode(indexMainUsed_, x, y, z);
         if (node)

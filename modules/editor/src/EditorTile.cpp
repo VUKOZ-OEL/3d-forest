@@ -308,7 +308,10 @@ void EditorTile::setPointColor(const EditorBase *editor)
     {
         for (size_t i = 0; i < n; i++)
         {
-            setColor(i, attrib[i].returnNumber, 15, ColorPalette::BlueYellow16);
+            setColor(i,
+                     attrib[i].returnNumber,
+                     15,
+                     ColorPalette::BlueCyanGreenYellowRed16);
         }
     }
 
@@ -319,7 +322,7 @@ void EditorTile::setPointColor(const EditorBase *editor)
             setColor(i,
                      attrib[i].numberOfReturns,
                      15,
-                     ColorPalette::BlueYellow16);
+                     ColorPalette::BlueCyanGreenYellowRed16);
         }
     }
 
