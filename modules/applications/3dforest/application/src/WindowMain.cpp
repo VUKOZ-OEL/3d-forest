@@ -39,6 +39,7 @@
 #include <WindowClipFilter.hpp>
 #include <WindowDataSets.hpp>
 #include <WindowDock.hpp>
+#include <WindowHelp.hpp>
 #include <WindowLayers.hpp>
 #include <WindowMain.hpp>
 #include <WindowSettingsView.hpp>
@@ -177,14 +178,14 @@ void WindowMain::createMenus()
     ribbon_->setIconSize(QSize(20, 20));
 
     // New
-    button = createMenuButton(tr("New"),
+    button = createMenuButton(tr("New\nproject"),
                               tr("Create new project"),
                               "icons8-edit-file-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionProjectNew()));
     ribbon_->addButton("Project", "Project", button);
 
     // Open
-    button = createMenuButton(tr("Open"),
+    button = createMenuButton(tr("Open\nproject"),
                               tr("Open existing project"),
                               "icons8-live-folder-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionProjectOpen()));
@@ -204,14 +205,14 @@ void WindowMain::createMenus()
     ribbon_->addButton("Project", "Project", button);
 
     // Import
-    button = createMenuButton(tr("Open"),
+    button = createMenuButton(tr("Open\nfile"),
                               tr("Open existing data set file"),
                               "icons8-add-file-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionProjectImport()));
     ribbon_->addButton("Project", "File", button);
 
     // Export
-    button = createMenuButton(tr("Export"),
+    button = createMenuButton(tr("Export\nto file"),
                               tr("Export visible points to a file"),
                               "icons8-send-file-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionProjectExportAs()));
@@ -297,6 +298,12 @@ void WindowMain::createMenus()
 
     button = createMenuButton(tr("About"), tr("About"), "icons8-about-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionAbout()));
+    ribbon_->addButton("Help", "Info", button);
+
+    button = createMenuButton(tr("User\nManual"),
+                              tr("Open User Manual"),
+                              "icons8-user-manual-40.png");
+    connect(button, SIGNAL(clicked()), this, SLOT(actionHelp()));
     ribbon_->addButton("Help", "Info", button);
 
     // Ribbon
@@ -727,6 +734,14 @@ void WindowMain::actionAbout()
                           "https://www.3dforest.eu/\n"
                           "\n"
                           "Additional icons: https://icons8.com"));
+}
+
+void WindowMain::actionHelp()
+{
+    WindowHelp *help = new WindowHelp(this);
+    help->show();
+    help->raise();
+    help->activateWindow();
 }
 
 bool WindowMain::projectOpen(const QString &path)

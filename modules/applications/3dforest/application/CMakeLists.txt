@@ -35,6 +35,7 @@ target_include_directories(${SUB_PROJECT_NAME} PUBLIC src)
 target_link_libraries(
   ${SUB_PROJECT_NAME}
   visualization
+  Qt5::Help
 )
 
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

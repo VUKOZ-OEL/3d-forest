@@ -93,6 +93,7 @@ public slots:
     void actionSettingsViewColor();
 
     void actionAbout();
+    void actionHelp();
 
     // Editor
     void actionEditorRender();
