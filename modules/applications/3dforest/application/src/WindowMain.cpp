@@ -192,27 +192,28 @@ void WindowMain::createMenus()
     ribbon_->addButton("Project", "Project", button);
 
     // Save
-    button =
-        createMenuButton(tr("Save"), tr("Save project"), "icons8-save-40.png");
+    button = createMenuButton(tr("Save\nproject"),
+                              tr("Save project"),
+                              "icons8-save-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionProjectSave()));
     ribbon_->addButton("Project", "Project", button);
 
     // Save As
-    button = createMenuButton(tr("Save As"),
+    button = createMenuButton(tr("Save As\nproject"),
                               tr("Save project to a different file"),
                               "icons8-save-as-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionProjectSaveAs()));
     ribbon_->addButton("Project", "Project", button);
 
     // Import
-    button = createMenuButton(tr("Open\nfile"),
+    button = createMenuButton(tr("Open"),
                               tr("Open existing data set file"),
                               "icons8-add-file-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionProjectImport()));
     ribbon_->addButton("Project", "File", button);
 
     // Export
-    button = createMenuButton(tr("Export\nto file"),
+    button = createMenuButton(tr("Export"),
                               tr("Export visible points to a file"),
                               "icons8-send-file-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionProjectExportAs()));
@@ -296,11 +297,13 @@ void WindowMain::createMenus()
     ribbon_->addTab(QIcon(":/icons/icons8-information-40.png"), "Help");
     ribbon_->setIconSize(QSize(20, 20));
 
-    button = createMenuButton(tr("About"), tr("About"), "icons8-about-40.png");
+    button = createMenuButton(tr("About"),
+                              tr("About this application"),
+                              "icons8-about-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionAbout()));
     ribbon_->addButton("Help", "Info", button);
 
-    button = createMenuButton(tr("User\nManual"),
+    button = createMenuButton(tr("Manual"),
                               tr("Open User Manual"),
                               "icons8-user-manual-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionHelp()));

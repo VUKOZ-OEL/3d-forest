@@ -3,12 +3,12 @@
     <docFiles>
         <generate>
             <file>
-                <input>3dforest.qhp</input>
-                <output>3dforest.qch</output>
+                <input>../build/html/index.qhp</input>
+                <output>../build/html/index.qch</output>
             </file>
         </generate>
         <register>
-            <file>3dforest.qch</file>
+            <file>../build/html/index.qch</file>
         </register>
     </docFiles>
 </QHelpCollectionProject>

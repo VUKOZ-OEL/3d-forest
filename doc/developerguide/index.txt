@@ -17,13 +17,11 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @mainpage 3D Forest Manual
+/** @page developerguide Developer Guide
 
-Welcome.
+These documents describe how to build 3D Forest and develop new plugins
+using APIs in 3D Forest and other libraries.
 
 - @subpage cheatsheet contains frequently used things.
-
-GUI:
-@image html gui.png
 
 */
