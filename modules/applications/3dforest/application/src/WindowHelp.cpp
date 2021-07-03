@@ -54,13 +54,13 @@ WindowHelp::WindowHelp(QWidget *parent) : QDialog(parent)
 {
     // Documents
     QHelpEngine *helpEngine = new QHelpEngine(
-        QApplication::applicationDirPath() + "/documentation/3dforest.qhc");
+        QApplication::applicationDirPath() + "/documentation/index.qhc");
 
     helpEngine->setupData();
 
     // Table of Contents & Text
     HelpBrowser *textViewer = new HelpBrowser(helpEngine);
-    textViewer->setSource(QUrl("qthelp://3dforest/documentation/index.html"));
+    textViewer->setSource(QUrl("qthelp://3dforest/doc/index.html"));
     connect(helpEngine->contentWidget(),
             SIGNAL(linkActivated(QUrl)),
             textViewer,
@@ -78,5 +78,5 @@ WindowHelp::WindowHelp(QWidget *parent) : QDialog(parent)
     setLayout(mainLayout);
 
     // Window
-    setWindowTitle("User Manual");
+    setWindowTitle("Manual");
 }
