@@ -134,6 +134,12 @@ void EditorBase::addFile(const std::string &path, bool center)
             ds->translation = c1 - c2;
             ds->updateBoundary();
         }
+        else
+        {
+            Vector3<double> s = 1.0 / ds->scalingFile;
+            ds->translation = ds->translationFile * s;
+            ds->updateBoundary();
+        }
     }
     catch (std::exception &e)
     {

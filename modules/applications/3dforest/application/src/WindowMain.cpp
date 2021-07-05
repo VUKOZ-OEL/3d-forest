@@ -39,6 +39,7 @@
 #include <WindowClipFilter.hpp>
 #include <WindowDataSets.hpp>
 #include <WindowDock.hpp>
+#include <WindowFileImport.hpp>
 #include <WindowHelp.hpp>
 #include <WindowLayers.hpp>
 #include <WindowMain.hpp>
@@ -878,9 +879,15 @@ bool WindowMain::projectOpenFile(const QString &path)
     // Open file
     try
     {
+        WindowFileImport dialog(this);
+        if (dialog.exec() == QDialog::Rejected)
+        {
+            return false;
+        }
+
         if (projectCreateIndex(path))
         {
-            editor_.addFile(path.toStdString());
+            editor_.addFile(path.toStdString(), dialog.center());
         }
     }
     catch (std::exception &e)

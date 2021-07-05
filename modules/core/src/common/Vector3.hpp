@@ -88,6 +88,11 @@ public:
         return Vector3<T>(a[0] / b, a[1] / b, a[2] / b);
     }
 
+    friend Vector3<T> operator/(T a, const Vector3<T> &b)
+    {
+        return Vector3<T>(a / b[0], a / b[1], a / b[2]);
+    }
+
     friend Vector3<T> operator/(const Vector3<T> &a, const Vector3<T> &b)
     {
         return Vector3<T>(a[0] / b[0], a[1] / b[1], a[2] / b[2]);
