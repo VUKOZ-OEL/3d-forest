@@ -58,7 +58,9 @@ public:
 
     void clear();
 
+    void translate(const Vector3<double> &v);
     const Aabb<double> &boundary() const { return boundary_; }
+
     size_t size() const { return nodes_.size(); }
     bool empty() const { return (nodes_.empty() || nodes_[0].size == 0); }
 
@@ -101,10 +103,11 @@ public:
                      size_t maxLevel = 0,
                      bool insertOnlyToLeaves = false);
     uint64_t insert(double x, double y, double z);
-    void insertEnd();
+    void insertEnd(const Aabb<double> &boundary = Aabb<double>());
 
 protected:
     Aabb<double> boundary_;
+    Aabb<double> boundaryFile_;
     std::vector<Node> nodes_;
 
     void selectLeaves(std::vector<Selection> &idxList,

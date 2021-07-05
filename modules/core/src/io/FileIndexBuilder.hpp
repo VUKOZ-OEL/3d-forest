@@ -38,7 +38,6 @@ public:
     {
     public:
         bool verbose;
-        bool randomize;
 
         size_t maxSize1;
         size_t maxSize2;
@@ -81,7 +80,6 @@ protected:
         STATE_COPY_VLR,
         STATE_COPY_POINTS,
         STATE_COPY_EVLR,
-        STATE_RANDOMIZE,
         STATE_MOVE,
         STATE_COPY,
         STATE_MAIN_BEGIN,
@@ -102,6 +100,7 @@ protected:
     uint64_t maximumIdx_;
     uint64_t valueTotal_;
     uint64_t maximumTotal_;
+
     uint64_t offsetHeaderEnd_;    // From version major.minor
     uint64_t offsetHeaderEndOut_; // From version major.minor
     uint64_t offsetPointsStart_;
@@ -116,10 +115,16 @@ protected:
     size_t sizePointOut_;
     size_t sizePointFormat_;
 
+    Aabb<double> boundary_;
+
     uint32_t rgbMax_;
     uint32_t intensityMax_;
 
-    uint64_t random_;
+    uint64_t start_;
+    uint64_t current_;
+    uint64_t max_;
+    uint64_t step_;
+
     FileIndex indexMain_;
     FileIndex indexNode_;
     std::map<const FileIndex::Node *, uint64_t> indexMainUsed_;
@@ -138,13 +143,13 @@ protected:
     // Buffers
     std::vector<uint8_t> buffer_;
     std::vector<uint8_t> bufferOut_;
+    std::vector<double> coords_;
 
     void openFiles();
 
     void nextState();
     void stateCopy();
     void stateCopyPoints();
-    void stateRandomize();
     void stateMove();
     void stateMainBegin();
     void stateMainInsert();
@@ -154,6 +159,8 @@ protected:
     void stateNodeInsert();
     void stateNodeEnd();
     void stateEnd();
+
+    void formatPoint(uint8_t *pout, const uint8_t *pin) const;
 };
 
 #endif /* FILE_INDEX_BUILDER_HPP */

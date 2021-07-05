@@ -919,7 +919,6 @@ bool WindowMain::projectCreateIndex(const QString &path)
 
     // Initialize index builder.
     FileIndexBuilder::Settings settings;
-    settings.randomize = true;
 
     FileIndexBuilder builder;
     builder.start(pathStd, pathStd, settings);

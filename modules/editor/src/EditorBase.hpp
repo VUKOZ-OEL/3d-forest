@@ -37,8 +37,7 @@ public:
     ~EditorBase();
 
     void open(const std::string &path);
-    void openFile(const std::string &path);
-    void addFile(const std::string &path);
+    void addFile(const std::string &path, bool center = true);
     bool hasFileIndex(const std::string &path);
     void write(const std::string &path);
     const std::string &path() const { return path_; }

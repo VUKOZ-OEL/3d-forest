@@ -60,6 +60,12 @@ bool EditorCache::loadStep()
             return false;
         }
 
+        if (!lru_[i]->transformed)
+        {
+            lru_[i]->transform(editor_);
+            return false;
+        }
+
         if (!lru_[i]->filtered)
         {
             lru_[i]->filter(editor_);
@@ -129,6 +135,7 @@ void EditorCache::updateCamera(const Camera &camera)
         if (editor_->clipFilter().enabled)
         {
             Aabb<double> box = index.boundary(node, index.boundary());
+            box.translate(ds.translation);
             if (!editor_->clipFilter().box.intersects(box))
             {
                 continue;
@@ -263,8 +270,7 @@ EditorTile *EditorCache::tile(size_t dataset, size_t index)
             lru_.resize(1);
         }
 
-        std::shared_ptr<EditorTile> tile;
-        tile = std::make_shared<EditorTile>();
+        std::shared_ptr<EditorTile> tile = std::make_shared<EditorTile>();
         tile->dataSetId = nk.dataSetId;
         tile->tileId = nk.tileId;
         tile->loaded = false;

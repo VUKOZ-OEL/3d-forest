@@ -137,7 +137,7 @@ void GLWidget::resetCamera()
     if (aabb_.isValid())
     {
         center = aabb_.getCenter();
-        // center[2] = aabb_.getMin().z();
+        center[2] = aabb_.getMin().z();
         distance = aabb_.getRadius() * 2.0F;
     }
 
@@ -176,7 +176,7 @@ void GLWidget::setViewResetCenter()
     if (aabb_.isValid())
     {
         center = aabb_.getCenter();
-        // center[2] = aabb_.getMin().z();
+        center[2] = aabb_.getMin().z();
     }
 
     QVector3D eye = (dir * distance) + center;
@@ -281,7 +281,7 @@ bool GLWidget::renderScene()
     {
         EditorTile &tile = editor_->tileView(viewportId_, tileIndex);
 
-        if (tile.loaded && tile.filtered && !tile.view.isFinished())
+        if (tile.renderMore())
         {
             if (tileIndex == 0 && tile.view.isStarted())
             {
@@ -295,7 +295,7 @@ bool GLWidget::renderScene()
             tile.view.nextFrame();
 
             double t2 = getRealTime();
-            if (t2 - t1 > 0.02 && tileIndex > 4)
+            if (t2 - t1 > 0.02)
             {
                 break;
             }

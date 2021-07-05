@@ -42,7 +42,14 @@ void FileIndex::clear()
 {
     nodes_.clear();
     boundary_.clear();
+    boundaryFile_.clear();
     root_.reset();
+}
+
+void FileIndex::translate(const Vector3<double> &v)
+{
+    boundary_ = boundaryFile_;
+    boundary_.translate(v);
 }
 
 void FileIndex::selectLeaves(std::vector<Selection> &selection,
@@ -386,6 +393,7 @@ void FileIndex::insertBegin(const Aabb<double> &boundary,
     // Initialization
     clear();
     boundary_ = boundary;
+    boundaryFile_ = boundary_;
     root_ = std::make_unique<BuildNode>();
 
     // Build tree settings
@@ -404,8 +412,14 @@ void FileIndex::insertBegin(const Aabb<double> &boundary,
     }
 }
 
-void FileIndex::insertEnd()
+void FileIndex::insertEnd(const Aabb<double> &boundary)
 {
+    if (!boundary.empty())
+    {
+        boundary_ = boundary;
+        boundaryFile_ = boundary_;
+    }
+
     if (root_)
     {
         // Create 1d array tree representation
@@ -659,7 +673,8 @@ void FileIndex::readPayload(FileChunk &file, const FileChunk::Chunk &chunk)
     double wx2 = ltohd(&ptr[8 + (3 * 8)]);
     double wy2 = ltohd(&ptr[8 + (4 * 8)]);
     double wz2 = ltohd(&ptr[8 + (5 * 8)]);
-    boundary_.set(wx1, wy1, wz1, wx2, wy2, wz2);
+    boundaryFile_.set(wx1, wy1, wz1, wx2, wy2, wz2);
+    boundary_ = boundaryFile_;
 
     // Data
     nodes_.resize(n);
@@ -748,12 +763,12 @@ void FileIndex::write(FileChunk &file) const
     uint8_t *ptr = buffer.data();
 
     htol64(&ptr[0], nodes_.size());
-    htold(&ptr[8 + (0 * 8)], boundary_.min(0));
-    htold(&ptr[8 + (1 * 8)], boundary_.min(1));
-    htold(&ptr[8 + (2 * 8)], boundary_.min(2));
-    htold(&ptr[8 + (3 * 8)], boundary_.max(0));
-    htold(&ptr[8 + (4 * 8)], boundary_.max(1));
-    htold(&ptr[8 + (5 * 8)], boundary_.max(2));
+    htold(&ptr[8 + (0 * 8)], boundaryFile_.min(0));
+    htold(&ptr[8 + (1 * 8)], boundaryFile_.min(1));
+    htold(&ptr[8 + (2 * 8)], boundaryFile_.min(2));
+    htold(&ptr[8 + (3 * 8)], boundaryFile_.max(0));
+    htold(&ptr[8 + (4 * 8)], boundaryFile_.max(1));
+    htold(&ptr[8 + (5 * 8)], boundaryFile_.max(2));
     file.write(buffer.data(), chunk.headerLength);
 
     // Data

@@ -115,27 +115,7 @@ void EditorBase::open(const std::string &path)
     openUpdate();
 }
 
-void EditorBase::openFile(const std::string &path)
-{
-    close();
-
-    try
-    {
-        // Data sets
-        std::shared_ptr<EditorDataSet> ds = std::make_shared<EditorDataSet>();
-        ds->read(path, path_);
-        dataSets_.push_back(ds);
-    }
-    catch (std::exception &e)
-    {
-        close();
-        throw;
-    }
-
-    openUpdate();
-}
-
-void EditorBase::addFile(const std::string &path)
+void EditorBase::addFile(const std::string &path, bool center)
 {
     try
     {
@@ -144,6 +124,16 @@ void EditorBase::addFile(const std::string &path)
         ds->id = freeDataSetId();
         ds->read(path, path_);
         dataSets_.push_back(ds);
+
+        if (center)
+        {
+            Vector3<double> c1 = boundary_.getCenter();
+            Vector3<double> c2 = ds->boundaryFile.getCenter();
+            c1[2] = boundary_.min(2);
+            c2[2] = ds->boundaryFile.min(2);
+            ds->translation = c1 - c2;
+            ds->updateBoundary();
+        }
     }
     catch (std::exception &e)
     {
@@ -313,18 +303,6 @@ Aabb<double> EditorBase::selection() const
     return boundary_;
 }
 
-// EditorTile *tile(size_t d, size_t c);
-// EditorTile *EditorBase::tile(size_t d, size_t c)
-// {
-//     auto search = cache_.find({d, c});
-//     if (search != cache_.end())
-//     {
-//         return search->second.get();
-//     }
-//     return nullptr;
-// }
-
-// -----------------------------------------------------------------------------
 void EditorBase::setNumberOfViewports(size_t n)
 {
     size_t i = viewports_.size();

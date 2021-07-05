@@ -22,10 +22,9 @@
 #ifndef VECTOR3_HPP
 #define VECTOR3_HPP
 
+#include <Json.hpp>
 #include <array>
 #include <cmath>
-#include <iostream>
-#include <limits>
 
 /** Vector 3D. */
 template <class T> class Vector3 : public std::array<T, 3>
@@ -47,6 +46,9 @@ public:
 
     void normalize();
     Vector3<T> normalized() const;
+
+    void read(const Json &in);
+    Json &write(Json &out) const;
 
     Vector3<T> crossProduct(const Vector3<T> &v) const;
     static Vector3<T> crossProduct(const Vector3<T> &a, const Vector3<T> &b)
@@ -220,6 +222,22 @@ inline Vector3<T> Vector3<T>::rotated(const Vector3<T> &axis,
                       this->operator[](0) * 2 * (xr * zr + w * yr) +
                           this->operator[](1) * 2 * (yr * zr - w * xr) +
                           this->operator[](2) * (w2 - x2 - y2 + z2));
+}
+
+template <class T> inline void Vector3<T>::read(const Json &in)
+{
+    this->operator[](0) = in[0].number();
+    this->operator[](1) = in[1].number();
+    this->operator[](2) = in[2].number();
+}
+
+template <class T> inline Json &Vector3<T>::write(Json &out) const
+{
+    out[0] = this->operator[](0);
+    out[1] = this->operator[](1);
+    out[2] = this->operator[](2);
+
+    return out;
 }
 
 template <class T>
