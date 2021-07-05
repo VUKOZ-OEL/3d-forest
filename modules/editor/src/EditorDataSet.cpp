@@ -95,12 +95,15 @@ void EditorDataSet::read(const Json &in, const std::string &projectPath)
     if (in.contains("translation"))
     {
         translation.read(in["translation"]);
+
     }
 
     if (in.contains("scaling"))
     {
         scaling.read(in["scaling"]);
     }
+
+    updateBoundary();
 }
 
 Json &EditorDataSet::write(Json &out) const
@@ -110,6 +113,9 @@ Json &EditorDataSet::write(Json &out) const
     out["id"] = id;
     out["label"] = label;
     out["visible"] = visible;
+
+    translation.write(out["translation"]);
+    scaling.write(out["scaling"]);
 
     return out;
 }
@@ -168,7 +174,7 @@ void EditorDataSet::read()
                     las.header.y_scale_factor,
                     las.header.z_scale_factor);
 
-    scaling = scalingFile;
+    scaling.set(1.0, 1.0, 1.0);
 
     boundaryFile = index.boundary();
     updateBoundary();

@@ -60,7 +60,7 @@ WindowFileImport::WindowFileImport(QWidget *parent) : QDialog(parent)
     optionsLayout->addWidget(new QLabel(tr("Center offset")), row, 0);
     optionsLayout->addWidget(centerCheckBox_, row, 1);
     row++;
-    optionsLayout->addWidget(new QLabel(tr("Convert to v1.4")), row, 0);
+    optionsLayout->addWidget(new QLabel(tr("Convert to v1.4+")), row, 0);
     optionsLayout->addWidget(convertCheckBox_, row, 1);
     row++;
     options->setLayout(optionsLayout);
