@@ -19,7 +19,10 @@
 
 /** @file WindowClassification.cpp */
 
+#include <QCheckBox>
 #include <QDebug>
+#include <QHBoxLayout>
+#include <QPushButton>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QTreeWidgetItemIterator>
@@ -31,54 +34,111 @@ WindowClassification::WindowClassification(QWidget *parent) : QWidget(parent)
     // Table
     tree_ = new QTreeWidget();
 
+    enabledCheckBox_ = new QCheckBox(tr("Enabled"));
+    connect(enabledCheckBox_,
+            SIGNAL(stateChanged(int)),
+            this,
+            SLOT(setEnabled(int)));
+
+    invertButton_ = new QPushButton(tr("Invert"));
+    connect(invertButton_, SIGNAL(clicked()), this, SLOT(invertSelection()));
+
+    clearButton_ = new QPushButton(tr("Clear"));
+    connect(clearButton_, SIGNAL(clicked()), this, SLOT(clearSelection()));
+
     // Layout
+    QHBoxLayout *controlLayout = new QHBoxLayout;
+    controlLayout->addWidget(enabledCheckBox_);
+    controlLayout->addStretch();
+    controlLayout->addWidget(invertButton_);
+    controlLayout->addWidget(clearButton_);
+
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setContentsMargins(1, 1, 1, 1);
     mainLayout->addWidget(tree_);
+    mainLayout->addLayout(controlLayout);
     setLayout(mainLayout);
 }
 
-void WindowClassification::updateAll(bool checked)
+void WindowClassification::setEnabled(int state)
 {
-    // Qt::CheckState state;
-    // if (checked)
-    // {
-    //     state = Qt::Checked;
-    // }
-    // else
-    // {
-    //     state = Qt::Unchecked;
-    // }
+    bool checked = (state == Qt::Checked);
+    classification_.setEnabled(checked);
+    setEnabled(checked);
+    emit selectionChanged();
+}
 
-    QTreeWidgetItemIterator it(tree_);
-    ++it;
-    while (*it)
-    {
-        //(*it)->setCheckState(COLUMN_CHECKED, state);
-        (*it)->setDisabled(checked);
-        ++it;
-    }
+void WindowClassification::setEnabled(bool checked)
+{
+    tree_->setEnabled(checked);
+    invertButton_->setEnabled(checked);
+    clearButton_->setEnabled(checked);
+}
+
+void WindowClassification::invertSelection()
+{
+    classification_.setInvertAll();
+    updateTree();
+    emit selectionChanged();
+}
+
+void WindowClassification::clearSelection()
+{
+    classification_.setEnabledAll(false);
+    updateTree();
+    emit selectionChanged();
 }
 
 void WindowClassification::itemChanged(QTreeWidgetItem *item, int column)
 {
     if (column == COLUMN_CHECKED)
     {
-        // #id is now checked or unchecked
         size_t id = item->text(COLUMN_ID).toULong();
         bool checked = (item->checkState(COLUMN_CHECKED) == Qt::Checked);
 
-        if (id == classification_.indexAll())
-        {
-            (void)blockSignals(true);
-            updateAll(checked);
-            (void)blockSignals(false);
-        }
-
         classification_.setEnabled(id, checked);
-
         emit selectionChanged();
     }
+}
+
+void WindowClassification::updateTree()
+{
+    block();
+
+    size_t i = 0;
+    QTreeWidgetItemIterator it(tree_);
+
+    while (*it)
+    {
+        if (classification_.isEnabled(i))
+        {
+            (*it)->setCheckState(COLUMN_CHECKED, Qt::Checked);
+        }
+        else
+        {
+            (*it)->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
+        }
+
+        i++;
+        ++it;
+    }
+
+    unblock();
+}
+
+void WindowClassification::block()
+{
+    disconnect(tree_, SIGNAL(itemChanged(QTreeWidgetItem *, int)), 0, 0);
+    (void)blockSignals(true);
+}
+
+void WindowClassification::unblock()
+{
+    (void)blockSignals(false);
+    connect(tree_,
+            SIGNAL(itemChanged(QTreeWidgetItem *, int)),
+            this,
+            SLOT(itemChanged(QTreeWidgetItem *, int)));
 }
 
 void WindowClassification::addItem(size_t i)
@@ -103,9 +163,7 @@ void WindowClassification::addItem(size_t i)
 void WindowClassification::setClassification(
     const EditorClassification &classification)
 {
-    disconnect(tree_, SIGNAL(itemChanged(QTreeWidgetItem *, int)), 0, 0);
-
-    (void)blockSignals(true);
+    block();
 
     classification_ = classification;
 
@@ -118,13 +176,10 @@ void WindowClassification::setClassification(
     tree_->setHeaderLabels(labels);
 
     // Content
-    addItem(classification_.indexAll());
-    for (size_t i = 0; i < classification_.size() - 1; i++)
+    for (size_t i = 0; i < classification_.size(); i++)
     {
         addItem(i);
     }
-
-    updateAll(classification_.isEnabled(classification_.indexAll()));
 
     // Resize Columns to the minimum space
     for (int i = 0; i < COLUMN_LAST; i++)
@@ -132,10 +187,8 @@ void WindowClassification::setClassification(
         tree_->resizeColumnToContents(i);
     }
 
-    (void)blockSignals(false);
+    setEnabled(classification_.isEnabled());
+    enabledCheckBox_->setChecked(classification_.isEnabled());
 
-    connect(tree_,
-            SIGNAL(itemChanged(QTreeWidgetItem *, int)),
-            this,
-            SLOT(itemChanged(QTreeWidgetItem *, int)));
+    unblock();
 }

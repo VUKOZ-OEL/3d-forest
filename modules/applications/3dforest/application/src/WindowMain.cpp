@@ -721,6 +721,7 @@ void WindowMain::actionClassification()
     editor_.cancelThreads();
     editor_.lock();
     editor_.setClassification(windowClassification_->classification());
+    editor_.tileViewClear();
     editor_.unlock();
     editor_.restartThreads();
 }

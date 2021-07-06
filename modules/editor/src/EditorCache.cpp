@@ -45,6 +45,7 @@ void EditorCache::reload()
     {
         it.second->view.resetFrame();
         it.second->filtered = false;
+        it.second->filteredClass = false;
         // it.second->loaded = false;
     }
 }

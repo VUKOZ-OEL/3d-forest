@@ -38,15 +38,23 @@ public:
 
     EditorClassification();
 
+    bool isEnabled() const { return enabled_; }
+    void setEnabled(bool b);
+
     size_t size() const { return classes_.size(); }
-    size_t indexAll() const { return size() - 1; }
+
     bool isEnabled(size_t i) const { return classes_[i].enabled; }
     void setEnabled(size_t i, bool b) { classes_[i].enabled = b; }
-    void setEnabled(bool b);
     const std::string &label(size_t i) const { return classes_[i].label; }
+
+    void setEnabledAll(bool b);
+    void setInvertAll();
 
 protected:
     std::vector<Class> classes_;
+    bool enabled_;
+
+    void initialize();
 };
 
 #endif /* EDITOR_CLASSIFICATION_HPP */

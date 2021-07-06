@@ -32,6 +32,7 @@ EditorTile::EditorTile()
       loaded(false),
       transformed(false),
       filtered(false),
+      filteredClass(false),
       modified(false)
 {
 }
@@ -199,96 +200,137 @@ void EditorTile::transform(const EditorBase *editor)
 
 void EditorTile::filter(const EditorBase *editor)
 {
-    select(editor);
+    size_t n = attrib.size();
+    indices.resize(n);
+    for (size_t i = 0; i < n; i++)
+    {
+        indices[i] = static_cast<unsigned int>(i);
+    }
+
+    selectClip(editor);
+    selectClass(editor);
     setPointColor(editor);
 
     filtered = true;
+    filteredClass = true;
 }
 
 bool EditorTile::renderMore() const
 {
-    return loaded && transformed && filtered && !view.isFinished();
+    return loaded && transformed && filtered && filteredClass &&
+           !view.isFinished();
 }
 
-void EditorTile::select(const EditorBase *editor)
+void EditorTile::selectClip(const EditorBase *editor)
 {
+    if (!editor->clipFilter().enabled)
+    {
+        return;
+    }
+
     const EditorDataSet &dataSet = editor->dataSet(dataSetId);
     const FileIndex::Node *node = dataSet.index.at(tileId);
 
-    if (editor->clipFilter().enabled)
+    // Read L2 index
+    if (index.empty())
     {
-        // Read L2 index
-        if (index.empty())
-        {
-            std::string pathIndex = FileIndexBuilder::extension(dataSet.path);
-            index.read(pathIndex, node->offset);
-            index.translate(dataSet.translation);
-        }
-
-        // Select octants
-        std::vector<FileIndex::Selection> selection;
-        Aabb<double> clipBox = editor->clipFilter().box;
-
-        index.selectLeaves(selection, clipBox, dataSet.id);
-
-        // Compute upper limit of the number of selected points
-        size_t nSelected = 0;
-
-        for (size_t i = 0; i < selection.size(); i++)
-        {
-            const FileIndex::Node *nodeL2 = index.at(selection[i].idx);
-            if (!nodeL2)
-            {
-                continue;
-            }
-
-            nSelected += static_cast<size_t>(nodeL2->size);
-        }
-
-        indices.resize(nSelected);
-
-        // Select points
-        nSelected = 0;
-
-        for (size_t i = 0; i < selection.size(); i++)
-        {
-            const FileIndex::Node *nodeL2 = index.at(selection[i].idx);
-            if (!nodeL2)
-            {
-                continue;
-            }
-
-            unsigned int nPoints = static_cast<unsigned int>(nodeL2->size);
-            unsigned int from = static_cast<unsigned int>(nodeL2->from);
-
-            if (selection[i].partial)
-            {
-                // Partial selection, apply clip filter
-                for (unsigned int j = 0; j < nPoints; j++)
-                {
-                    unsigned int idx = from + j;
-                    double x = xyz[3 * idx + 0];
-                    double y = xyz[3 * idx + 1];
-                    double z = xyz[3 * idx + 2];
-
-                    if (clipBox.isInside(x, y, z))
-                    {
-                        indices[nSelected++] = idx;
-                    }
-                }
-            }
-            else
-            {
-                // Everything
-                for (unsigned int j = 0; j < nPoints; j++)
-                {
-                    indices[nSelected++] = from + j;
-                }
-            }
-        }
-
-        indices.resize(nSelected);
+        std::string pathIndex = FileIndexBuilder::extension(dataSet.path);
+        index.read(pathIndex, node->offset);
+        index.translate(dataSet.translation);
     }
+
+    // Select octants
+    std::vector<FileIndex::Selection> selection;
+    Aabb<double> clipBox = editor->clipFilter().box;
+
+    index.selectLeaves(selection, clipBox, dataSet.id);
+
+    // Compute upper limit of the number of selected points
+    size_t nSelected = 0;
+
+    for (size_t i = 0; i < selection.size(); i++)
+    {
+        const FileIndex::Node *nodeL2 = index.at(selection[i].idx);
+        if (!nodeL2)
+        {
+            continue;
+        }
+
+        nSelected += static_cast<size_t>(nodeL2->size);
+    }
+
+    indices.resize(nSelected);
+
+    // Select points
+    nSelected = 0;
+
+    for (size_t i = 0; i < selection.size(); i++)
+    {
+        const FileIndex::Node *nodeL2 = index.at(selection[i].idx);
+        if (!nodeL2)
+        {
+            continue;
+        }
+
+        unsigned int nPoints = static_cast<unsigned int>(nodeL2->size);
+        unsigned int from = static_cast<unsigned int>(nodeL2->from);
+
+        if (selection[i].partial)
+        {
+            // Partial selection, apply clip filter
+            for (unsigned int j = 0; j < nPoints; j++)
+            {
+                unsigned int idx = from + j;
+                double x = xyz[3 * idx + 0];
+                double y = xyz[3 * idx + 1];
+                double z = xyz[3 * idx + 2];
+
+                if (clipBox.isInside(x, y, z))
+                {
+                    indices[nSelected++] = idx;
+                }
+            }
+        }
+        else
+        {
+            // Everything
+            for (unsigned int j = 0; j < nPoints; j++)
+            {
+                indices[nSelected++] = from + j;
+            }
+        }
+    }
+
+    indices.resize(nSelected);
+}
+
+void EditorTile::selectClass(const EditorBase *editor)
+{
+    const EditorClassification &c = editor->classification();
+
+    if (!c.isEnabled())
+    {
+        return;
+    }
+
+    size_t nSelected = indices.size();
+    size_t nSelectedNew = 0;
+
+    for (size_t i = 0; i < nSelected; i++)
+    {
+        unsigned int idx = indices[i];
+
+        if (c.isEnabled(attrib[idx].classification))
+        {
+            if (nSelectedNew != i)
+            {
+                indices[nSelectedNew] = indices[i];
+            }
+            nSelectedNew++;
+        }
+    }
+
+    indices.resize(nSelectedNew);
 }
 
 void EditorTile::setPointColor(const EditorBase *editor)

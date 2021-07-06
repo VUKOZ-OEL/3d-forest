@@ -25,6 +25,8 @@
 #include <EditorClassification.hpp>
 #include <QWidget>
 
+class QCheckBox;
+class QPushButton;
 class QTreeWidget;
 class QTreeWidgetItem;
 
@@ -52,6 +54,10 @@ public:
     void setClassification(const EditorClassification &classification);
 
 public slots:
+    void setEnabled(int state);
+    void setEnabled(bool checked);
+    void invertSelection();
+    void clearSelection();
     void itemChanged(QTreeWidgetItem *item, int column);
 
 signals:
@@ -60,8 +66,13 @@ signals:
 protected:
     EditorClassification classification_;
     QTreeWidget *tree_;
+    QCheckBox *enabledCheckBox_;
+    QPushButton *invertButton_;
+    QPushButton *clearButton_;
 
-    void updateAll(bool checked);
+    void updateTree();
+    void block();
+    void unblock();
     void addItem(size_t i);
 };
 

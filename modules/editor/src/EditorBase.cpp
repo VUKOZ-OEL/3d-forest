@@ -254,7 +254,7 @@ void EditorBase::setSettingsView(const EditorSettings::View &settings)
 void EditorBase::setClassification(const EditorClassification &classification)
 {
     classification_ = classification;
-    resetRendering();
+    // resetRendering();
     // unsavedChanges_ = true;
 }
 

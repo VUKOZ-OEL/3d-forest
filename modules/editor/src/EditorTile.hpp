@@ -100,6 +100,7 @@ public:
     bool loaded;
     bool transformed;
     bool filtered;
+    bool filteredClass;
     bool modified;
 
     /** Editor Tile Visualization. */
@@ -136,7 +137,8 @@ public:
     bool renderMore() const;
 
 protected:
-    void select(const EditorBase *editor);
+    void selectClip(const EditorBase *editor);
+    void selectClass(const EditorBase *editor);
     void setPointColor(const EditorBase *editor);
     void setColor(size_t idx,
                   size_t value,

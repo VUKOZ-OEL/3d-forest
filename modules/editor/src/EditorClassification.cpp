@@ -21,9 +21,35 @@
 
 #include <EditorClassification.hpp>
 
-EditorClassification::EditorClassification()
+EditorClassification::EditorClassification() : enabled_(false)
 {
-    classes_.resize(257);
+    initialize();
+}
+
+void EditorClassification::setEnabled(bool b)
+{
+    enabled_ = b;
+}
+
+void EditorClassification::setEnabledAll(bool b)
+{
+    for (size_t i = 0; i < classes_.size(); i++)
+    {
+        classes_[i].enabled = b;
+    }
+}
+
+void EditorClassification::setInvertAll()
+{
+    for (size_t i = 0; i < classes_.size(); i++)
+    {
+        classes_[i].enabled = !classes_[i].enabled;
+    }
+}
+
+void EditorClassification::initialize()
+{
+    classes_.resize(256);
 
     classes_[0].label = "Never classified";
     classes_[1].label = "Unassigned";
@@ -60,25 +86,14 @@ EditorClassification::EditorClassification()
         classes_[i].label = "User";
     }
 
-    classes_[256].label = "All";
-
     // Enable
     for (size_t i = 0; i < classes_.size(); i++)
     {
         classes_[i].enabled = false;
     }
 
-    classes_[256].enabled = true;
     for (size_t i = 2; i < 16; i++)
     {
         classes_[i].enabled = true;
-    }
-}
-
-void EditorClassification::setEnabled(bool b)
-{
-    for (size_t i = 0; i < classes_.size(); i++)
-    {
-        classes_[i].enabled = b;
     }
 }
