@@ -19,7 +19,10 @@
 
 /** @file WindowClassification.cpp */
 
+#include <ColorPalette.hpp>
+#include <QBrush>
 #include <QCheckBox>
+#include <QColor>
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QPushButton>
@@ -35,23 +38,26 @@ WindowClassification::WindowClassification(QWidget *parent) : QWidget(parent)
     tree_ = new QTreeWidget();
 
     enabledCheckBox_ = new QCheckBox(tr("Enabled"));
+    enabledCheckBox_->setToolTip(tr("Enable or disable classification filter"));
     connect(enabledCheckBox_,
             SIGNAL(stateChanged(int)),
             this,
             SLOT(setEnabled(int)));
 
     invertButton_ = new QPushButton(tr("Invert"));
+    invertButton_->setToolTip(tr("Invert the selection"));
     connect(invertButton_, SIGNAL(clicked()), this, SLOT(invertSelection()));
 
-    clearButton_ = new QPushButton(tr("Clear"));
-    connect(clearButton_, SIGNAL(clicked()), this, SLOT(clearSelection()));
+    deselectButton_ = new QPushButton(tr("Deselect"));
+    deselectButton_->setToolTip(tr("Dismiss the selection"));
+    connect(deselectButton_, SIGNAL(clicked()), this, SLOT(clearSelection()));
 
     // Layout
     QHBoxLayout *controlLayout = new QHBoxLayout;
     controlLayout->addWidget(enabledCheckBox_);
     controlLayout->addStretch();
     controlLayout->addWidget(invertButton_);
-    controlLayout->addWidget(clearButton_);
+    controlLayout->addWidget(deselectButton_);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setContentsMargins(1, 1, 1, 1);
@@ -72,7 +78,7 @@ void WindowClassification::setEnabled(bool checked)
 {
     tree_->setEnabled(checked);
     invertButton_->setEnabled(checked);
-    clearButton_->setEnabled(checked);
+    deselectButton_->setEnabled(checked);
 }
 
 void WindowClassification::invertSelection()
@@ -158,6 +164,22 @@ void WindowClassification::addItem(size_t i)
 
     item->setText(COLUMN_LABEL,
                   QString::fromStdString(classification_.label(i)));
+
+    // Color legend
+    if (i < ColorPalette::Classification.size())
+    {
+        const Vector3<float> &rgb = ColorPalette::Classification[i];
+
+        QColor color;
+        color.setRedF(rgb[0]);
+        color.setGreenF(rgb[1]);
+        color.setBlueF(rgb[2]);
+
+        QBrush brush(color, Qt::SolidPattern);
+        item->setBackground(COLUMN_ID, brush);
+        brush.setColor(QColor(0, 0, 0));
+        item->setForeground(COLUMN_ID, brush);
+    }
 }
 
 void WindowClassification::setClassification(
