@@ -68,7 +68,7 @@ protected:
     QTreeWidget *tree_;
     QCheckBox *enabledCheckBox_;
     QPushButton *invertButton_;
-    QPushButton *clearButton_;
+    QPushButton *deselectButton_;
 
     void updateTree();
     void block();
