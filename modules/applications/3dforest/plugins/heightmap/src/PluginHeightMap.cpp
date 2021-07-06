@@ -345,8 +345,7 @@ void PluginHeightMap::show(QMainWindow *parent)
         window_->setWindowTitle(windowTitle());
         window_->setWindowIcon(icon());
         window_->setFloating(true);
-        window_->setAllowedAreas(Qt::LeftDockWidgetArea |
-                                 Qt::RightDockWidgetArea);
+        window_->setAllowedAreas(Qt::RightDockWidgetArea);
         parent->addDockWidget(Qt::RightDockWidgetArea, window_);
     }
 
@@ -368,6 +367,11 @@ QAction *PluginHeightMap::toggleViewAction() const
 QString PluginHeightMap::windowTitle() const
 {
     return tr(PLUGIN_HEIGHT_MAP_NAME);
+}
+
+QString PluginHeightMap::buttonText() const
+{
+    return tr("Height\nmap");
 }
 
 QString PluginHeightMap::toolTip() const

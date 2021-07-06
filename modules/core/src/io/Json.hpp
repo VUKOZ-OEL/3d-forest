@@ -23,6 +23,8 @@
 #define JSON_HPP
 
 #include <Error.hpp>
+#include <iostream>
+#include <limits>
 #include <map>
 #include <memory>
 #include <sstream>

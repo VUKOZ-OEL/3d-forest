@@ -89,13 +89,18 @@ public:
     FileIndex index;
     std::vector<unsigned int> indices;
 
+    // Data
+    std::vector<double> xyzBase;
+
     // Tile
     size_t dataSetId;
     size_t tileId;
 
     // State
     bool loaded;
+    bool transformed;
     bool filtered;
+    bool filteredClass;
     bool modified;
 
     /** Editor Tile Visualization. */
@@ -126,10 +131,14 @@ public:
     ~EditorTile();
 
     void read(const EditorBase *editor);
+    void transform(const EditorBase *editor);
     void filter(const EditorBase *editor);
 
+    bool renderMore() const;
+
 protected:
-    void readFilter(const EditorBase *editor);
+    void selectClip(const EditorBase *editor);
+    void selectClass(const EditorBase *editor);
     void setPointColor(const EditorBase *editor);
     void setColor(size_t idx,
                   size_t value,

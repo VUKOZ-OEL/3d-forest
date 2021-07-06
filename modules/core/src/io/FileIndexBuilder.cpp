@@ -28,10 +28,8 @@
 FileIndexBuilder::Settings::Settings()
 {
     verbose = false;
-    randomize = false;
 
     maxSize1 = 100000;
-    // maxSize1 = 100;
     maxLevel1 = 0; // The limit is maxSize1.
 
     maxSize2 = 32;
@@ -109,10 +107,10 @@ void FileIndexBuilder::start(const std::string &outputPath,
     valueTotal_ = 0;
     maximumTotal_ = 0;
 
+    boundary_.clear();
     rgbMax_ = 0;
     intensityMax_ = 0;
 
-    random_ = 10;
     indexMain_.clear();
     indexNode_.clear();
     indexMainUsed_.clear();
@@ -249,10 +247,6 @@ void FileIndexBuilder::next()
             stateCopy();
             break;
 
-        case STATE_RANDOMIZE:
-            stateRandomize();
-            break;
-
         case STATE_MOVE:
             stateMove();
             break;
@@ -315,24 +309,22 @@ void FileIndexBuilder::nextState()
     switch (state_)
     {
         case STATE_BEGIN:
-            if ((sizePoint_ != sizePointOut_) ||
-                (offsetHeaderEnd_ != offsetHeaderEndOut_) ||
-                (settings_.randomize))
-            {
-                state_ = STATE_COPY_VLR;
-                maximum_ = offsetPointsStart_ - offsetHeaderEnd_;
-            }
-            else
-            {
-                state_ = STATE_COPY;
-                maximum_ = sizeFile_ - offsetHeaderEnd_;
-            }
+            state_ = STATE_COPY_VLR;
+            maximum_ = offsetPointsStart_ - offsetHeaderEnd_;
             break;
 
         case STATE_COPY_VLR:
             state_ = STATE_COPY_POINTS;
             maximum_ = sizePoints_;
             maximumIdx_ = inputLas_.header.number_of_point_records;
+            start_ = 0;
+            current_ = 0;
+            max_ = maximumIdx_;
+            step_ = max_ / settings_.maxSize1;
+            if (max_ % settings_.maxSize1 > 0)
+            {
+                step_++;
+            }
             break;
 
         case STATE_COPY_POINTS:
@@ -341,19 +333,6 @@ void FileIndexBuilder::nextState()
             break;
 
         case STATE_COPY_EVLR:
-            if (settings_.randomize)
-            {
-                state_ = STATE_RANDOMIZE;
-                maximum_ = sizePointsOut_;
-                maximumIdx_ = outputLas_.header.number_of_point_records;
-            }
-            else
-            {
-                state_ = STATE_MOVE;
-            }
-            break;
-
-        case STATE_RANDOMIZE:
             state_ = STATE_MOVE;
             break;
 
@@ -432,6 +411,81 @@ void FileIndexBuilder::stateCopy()
     valueTotal_ += step;
 }
 
+void FileIndexBuilder::formatPoint(uint8_t *pout, const uint8_t *pin) const
+{
+    // i: edge:1, scan:1, number_of_returns:3, return_number:3
+    // o:                 number_of_returns:4, return_number:4
+    // i:             classification_flags:3, classification:5
+    // o: edge:1, scan:1,    scanner:2, classification_flags:4
+    uint32_t pi14 = pin[14];
+    uint32_t pi15 = pin[15];
+    uint32_t po = (pi14 & 0x07U) | ((pi14 & 0x38U) << 1);
+    pout[14] = static_cast<uint8_t>(po);
+
+    po = (pi14 & 0xc0U) | (pi15 >> 5);
+    pout[15] = static_cast<uint8_t>(po);
+    pout[16] = static_cast<uint8_t>(pi15 & 0x1fU);
+
+    pout[18] = pin[16];
+    pout[19] = pin[17];
+    pout[20] = pin[18];
+    pout[21] = pin[19];
+
+    // GPS time
+    if ((inputLas_.header.point_data_record_format == 1) ||
+        (inputLas_.header.point_data_record_format > 2))
+    {
+        copy64(&pout[22], &pin[20]);
+    }
+    else
+    {
+        std::memset(&pout[22], 0, 8);
+    }
+
+    // RGB
+    if (inputLas_.header.point_data_record_format == 2)
+    {
+        std::memcpy(&pout[30], &pin[20], 6);
+    }
+    else if ((inputLas_.header.point_data_record_format == 3) ||
+             (inputLas_.header.point_data_record_format == 5))
+    {
+        std::memcpy(&pout[30], &pin[28], 6);
+    }
+
+    // NIR
+    if ((outputLas_.header.point_data_record_format == 8) ||
+        (outputLas_.header.point_data_record_format == 10))
+    {
+        pout[36] = 0;
+        pout[37] = 0;
+    }
+
+    // Wave
+    if (inputLas_.header.point_data_record_format == 4)
+    {
+        if (outputLas_.header.point_data_record_format == 9)
+        {
+            std::memcpy(&pout[30], &pin[28], 29);
+        }
+        else
+        {
+            std::memcpy(&pout[38], &pin[28], 29);
+        }
+    }
+    else if (inputLas_.header.point_data_record_format == 5)
+    {
+        if (outputLas_.header.point_data_record_format == 9)
+        {
+            std::memcpy(&pout[30], &pin[34], 29);
+        }
+        else
+        {
+            std::memcpy(&pout[38], &pin[34], 29);
+        }
+    }
+}
+
 void FileIndexBuilder::stateCopyPoints()
 {
     // Step
@@ -447,165 +501,103 @@ void FileIndexBuilder::stateCopyPoints()
     }
     step = stepIdx * sizePoint_;
 
-    // Format
-    if ((sizePoint_ == sizePointOut_) &&
-        (inputLas_.header.point_data_record_format ==
-         outputLas_.header.point_data_record_format))
+    // Buffers
+    uint64_t start = inputLas_.header.offset_to_point_data;
+    uint8_t *in = buffer_.data();
+    uint8_t *bufferOut = bufferOut_.data();
+    uint8_t *out;
+
+    // Clear the output buffer
+    std::memset(bufferOut, 0, sizePointOut_ * stepIdx);
+
+    // Coordinates without scaling
+    coords_.resize(stepIdx * 3);
+
+    // Point formatting
+    bool hasDifferentFormat;
+    if ((inputLas_.header.point_data_record_format < 6) &&
+        (outputLas_.header.point_data_record_format >= 6))
     {
-        // Keep extra bytes garbage
-        inputLas_.file().read(buffer_.data(), step);
-        outputLas_.file().write(buffer_.data(), step);
+        hasDifferentFormat = true;
     }
     else
     {
-        // Extend or trim the input points
-        uint8_t *in = buffer_.data();
-        inputLas_.file().read(in, step);
+        hasDifferentFormat = false;
+    }
 
-        uint8_t *out = bufferOut_.data();
-        std::memset(out, 0, sizePointOut_ * stepIdx);
+    // To find maximums to normalize these values
+    uint32_t intensity;
+    uint32_t rgb;
 
-        for (size_t i = 0; i < stepIdx; i++)
+    bool hasColor;
+    if ((outputLas_.header.point_data_record_format == 7) ||
+        (outputLas_.header.point_data_record_format == 8) ||
+        (outputLas_.header.point_data_record_format == 10))
+    {
+        hasColor = true;
+    }
+    else
+    {
+        hasColor = false;
+    }
+
+    // Process one step of the input
+    for (size_t i = 0; i < stepIdx; i++)
+    {
+        // Reorder
+        inputLas_.seek(start + (current_ * sizePoint_));
+        current_ += step_;
+        if (current_ >= max_)
         {
-            std::memcpy(out + (i * sizePointOut_),
-                        in + (i * sizePoint_),
-                        sizePointFormat_);
+            start_++;
+            current_ = start_;
         }
 
-        if ((inputLas_.header.point_data_record_format < 6) &&
-            (outputLas_.header.point_data_record_format >= 6))
+        // Read input
+        inputLas_.file().read(in, sizePoint_);
+        out = bufferOut + (i * sizePointOut_);
+
+        // Copy
+        std::memcpy(out, in, sizePoint_); // sizePointFormat_
+
+        // Boundary of points without scaling and offset
+        coords_[i * 3 + 0] = static_cast<double>(ltoh32(out + 0));
+        coords_[i * 3 + 1] = static_cast<double>(ltoh32(out + 4));
+        coords_[i * 3 + 2] = static_cast<double>(ltoh32(out + 8));
+
+        // Format
+        if (hasDifferentFormat)
         {
-            for (size_t i = 0; i < stepIdx; i++)
+            formatPoint(out, in);
+        }
+
+        // Find maximums to normalize these values later
+        intensity = ltoh16(out + 12);
+        if (intensity > intensityMax_)
+        {
+            intensityMax_ = intensity;
+        }
+
+        if (hasColor)
+        {
+            rgb = ltoh16(out + 30);
+            rgb += ltoh16(out + 32);
+            rgb += ltoh16(out + 34);
+
+            if (rgb > rgbMax_)
             {
-                uint8_t *pout = out + (i * sizePointOut_);
-                uint8_t *pin = in + (i * sizePoint_);
-
-                // i: edge:1, scan:1, number_of_returns:3, return_number:3
-                // o:                 number_of_returns:4, return_number:4
-                // i:             classification_flags:3, classification:5
-                // o: edge:1, scan:1,    scanner:2, classification_flags:4
-                uint32_t pi14 = pin[14];
-                uint32_t pi15 = pin[15];
-                uint32_t po = (pi14 & 0x07U) | ((pi14 & 0x38U) << 1);
-                pout[14] = static_cast<uint8_t>(po);
-
-                po = (pi14 & 0xc0U) | (pi15 >> 5);
-                pout[15] = static_cast<uint8_t>(po);
-                pout[16] = static_cast<uint8_t>(pi15 & 0x1fU);
-
-                pout[18] = pin[16];
-                pout[19] = pin[17];
-                pout[20] = pin[18];
-                pout[21] = pin[19];
-
-                // GPS time
-                if ((inputLas_.header.point_data_record_format == 1) ||
-                    (inputLas_.header.point_data_record_format > 2))
-                {
-                    copy64(&pout[22], &pin[20]);
-                }
-                else
-                {
-                    std::memset(&pout[22], 0, 8);
-                }
-
-                // RGB
-                if (inputLas_.header.point_data_record_format == 2)
-                {
-                    std::memcpy(&pout[30], &pin[20], 6);
-                }
-                else if ((inputLas_.header.point_data_record_format == 3) ||
-                         (inputLas_.header.point_data_record_format == 5))
-                {
-                    std::memcpy(&pout[30], &pin[28], 6);
-                }
-
-                // NIR
-                if ((outputLas_.header.point_data_record_format == 8) ||
-                    (outputLas_.header.point_data_record_format == 10))
-                {
-                    pout[36] = 0;
-                    pout[37] = 0;
-                }
-
-                // Wave
-                if (inputLas_.header.point_data_record_format == 4)
-                {
-                    if (outputLas_.header.point_data_record_format == 9)
-                    {
-                        std::memcpy(&pout[30], &pin[28], 29);
-                    }
-                    else
-                    {
-                        std::memcpy(&pout[38], &pin[28], 29);
-                    }
-                }
-                else if (inputLas_.header.point_data_record_format == 5)
-                {
-                    if (outputLas_.header.point_data_record_format == 9)
-                    {
-                        std::memcpy(&pout[30], &pin[34], 29);
-                    }
-                    else
-                    {
-                        std::memcpy(&pout[38], &pin[34], 29);
-                    }
-                }
+                rgbMax_ = rgb;
             }
         }
-
-        outputLas_.file().write(out, sizePointOut_ * stepIdx);
     }
 
-    // Next
-    value_ += step;
-    valueIdx_ += stepIdx;
-    valueTotal_ += step;
-}
+    // Write this step to the output
+    outputLas_.file().write(bufferOut, sizePointOut_ * stepIdx);
 
-void FileIndexBuilder::stateRandomize()
-{
-    // Step
-    uint64_t step;
-    uint64_t remainIdx;
-    uint64_t stepIdx;
-
-    // stepIdx = buffer_.size() / sizePoint_;
-    stepIdx = 10000; /**< @todo Rewrite function stateRandomize. */
-    remainIdx = maximumIdx_ - valueIdx_;
-    if (remainIdx < stepIdx)
-    {
-        stepIdx = remainIdx;
-    }
-    step = stepIdx * sizePointOut_;
-
-    // Randomize
-    uint8_t *buffer1 = buffer_.data();
-    uint8_t *buffer2 = bufferOut_.data();
-    uint64_t start = outputLas_.header.offset_to_point_data;
-    uint64_t pos;
-
-    for (uint64_t i = 0; i < stepIdx; i++)
-    {
-        pos = random_ % maximumIdx_;
-
-        // Linear congruent pseudo-random generator
-        random_ = random_ * 69069UL + 1UL;
-
-        // Read A
-        outputLas_.seek(start + (valueIdx_ + i) * sizePointOut_);
-        outputLas_.file().read(buffer1, sizePointOut_);
-
-        // Read B, Overwrite B with A
-        outputLas_.seek(start + pos * sizePointOut_);
-        outputLas_.file().read(buffer2, sizePointOut_);
-        outputLas_.seek(start + pos * sizePointOut_);
-        outputLas_.file().write(buffer1, sizePointOut_);
-
-        // Overwrite A with B
-        outputLas_.seek(start + (valueIdx_ + i) * sizePointOut_);
-        outputLas_.file().write(buffer2, sizePointOut_);
-    }
+    // Boundary without scaling
+    Aabb<double> box;
+    box.set(coords_);
+    boundary_.extend(box);
 
     // Next
     value_ += step;
@@ -627,32 +619,23 @@ void FileIndexBuilder::stateMove()
 
 void FileIndexBuilder::stateMainBegin()
 {
-    // Insert begin
-#if 1
-    // Cube
-    Vector3<double> dim(inputLas_.header.max_x - inputLas_.header.min_x,
-                        inputLas_.header.max_y - inputLas_.header.min_y,
-                        inputLas_.header.max_z - inputLas_.header.min_z);
+    // Cuboid to Cube boundary for index L1
+    Vector3<double> dim(boundary_.max(0) - boundary_.min(0),
+                        boundary_.max(1) - boundary_.min(1),
+                        boundary_.max(2) - boundary_.min(2));
 
     double dimMax = dim.max();
 
     Aabb<double> box;
-    box.set(inputLas_.header.min_x,
-            inputLas_.header.min_y,
-            inputLas_.header.min_z,
-            inputLas_.header.min_x + dimMax,
-            inputLas_.header.min_y + dimMax,
-            inputLas_.header.min_z + dimMax);
-#else
-    // Cuboid
-    Aabb<double> box;
-    box.set(inputLas_.header.min_x,
-            inputLas_.header.min_y,
-            inputLas_.header.min_z,
-            inputLas_.header.max_x,
-            inputLas_.header.max_y,
-            inputLas_.header.max_z);
-#endif
+
+    box.set(boundary_.min(0),
+            boundary_.min(1),
+            boundary_.min(2),
+            boundary_.min(0) + dimMax,
+            boundary_.min(1) + dimMax,
+            boundary_.min(2) + dimMax);
+
+    // Insert begin
     indexMain_.insertBegin(box, settings_.maxSize1, settings_.maxLevel1);
 
     // Initial file offset
@@ -676,38 +659,20 @@ void FileIndexBuilder::stateMainInsert()
 
     // Points
     uint8_t *buffer = buffer_.data();
+    uint8_t *point;
     inputLas_.file().read(buffer, step);
 
     double x;
     double y;
     double z;
-    uint32_t intensity;
-    uint32_t rgb;
 
     for (uint64_t i = 0; i < stepIdx; i++)
     {
-        inputLas_.transform(x, y, z, buffer + (i * sizePoint_));
+        point = buffer + (i * sizePoint_);
+        x = static_cast<double>(ltoh32(point + 0));
+        y = static_cast<double>(ltoh32(point + 4));
+        z = static_cast<double>(ltoh32(point + 8));
         (void)indexMain_.insert(x, y, z);
-
-        intensity = ltoh16(buffer + (i * sizePoint_) + 12);
-        if (intensity > intensityMax_)
-        {
-            intensityMax_ = intensity;
-        }
-
-        if (inputLas_.header.point_data_record_format == 7 ||
-            inputLas_.header.point_data_record_format == 8 ||
-            inputLas_.header.point_data_record_format == 10)
-        {
-            rgb = ltoh16(buffer + (i * sizePoint_) + 30);
-            rgb += ltoh16(buffer + (i * sizePoint_) + 32);
-            rgb += ltoh16(buffer + (i * sizePoint_) + 34);
-
-            if (rgb > rgbMax_)
-            {
-                rgbMax_ = rgb;
-            }
-        }
     }
 
     // Next
@@ -718,7 +683,7 @@ void FileIndexBuilder::stateMainInsert()
 
 void FileIndexBuilder::stateMainEnd()
 {
-    indexMain_.insertEnd();
+    indexMain_.insertEnd(boundary_);
 
     // Write main index
     std::string indexPath = extension(outputPath_);
@@ -762,8 +727,11 @@ void FileIndexBuilder::stateMainSort()
     for (uint64_t i = 0; i < stepIdx; i++)
     {
         point = buffer + (i * sizePoint_);
-        inputLas_.transform(x, y, z, point);
+        x = static_cast<double>(ltoh32(point + 0));
+        y = static_cast<double>(ltoh32(point + 4));
+        z = static_cast<double>(ltoh32(point + 8));
 
+        // Normalize unscaled values
         if (intensityMax_ > 0 && intensityMax_ < 256)
         {
             intensity = ltoh16(point + 12);
@@ -790,6 +758,7 @@ void FileIndexBuilder::stateMainSort()
             htol16(point + 34, color);
         }
 
+        // Update node
         node = indexMain_.selectNode(indexMainUsed_, x, y, z);
         if (node)
         {
@@ -810,7 +779,7 @@ void FileIndexBuilder::stateNodeBegin()
 {
 }
 
-static int DatabaseBuilderCmp(const void *a, const void *b)
+static int FileIndexBuilderCmp(const void *a, const void *b)
 {
     uint64_t c1 = *static_cast<const uint64_t *>(a);
     uint64_t c2 = *static_cast<const uint64_t *>(b);
@@ -846,39 +815,32 @@ void FileIndexBuilder::stateNodeInsert()
     uint64_t start = outputLas_.header.offset_to_point_data;
     uint8_t *buffer = bufferNode.data();
     uint8_t *point;
-    double x;
-    double y;
-    double z;
 
     outputLas_.seek(start + (node->from * sizePoint_));
     outputLas_.file().read(buffer, step);
 
-    std::vector<double> coords;
-    coords.resize(node->size * 3);
+    // Actual boundary of this tile
+    coords_.resize(node->size * 3);
     for (uint64_t i = 0; i < node->size; i++)
     {
         point = buffer + (i * sizePoint_);
-        inputLas_.transform(x, y, z, point);
-        coords[i * 3 + 0] = x;
-        coords[i * 3 + 1] = y;
-        coords[i * 3 + 2] = z;
+        coords_[i * 3 + 0] = static_cast<double>(ltoh32(point + 0));
+        coords_[i * 3 + 1] = static_cast<double>(ltoh32(point + 4));
+        coords_[i * 3 + 2] = static_cast<double>(ltoh32(point + 8));
     }
 
     Aabb<double> box;
-    box.set(coords);
-    // box = indexMain_.boundary(node, indexMain_.boundary());
+    box.set(coords_);
 
+    // Start new node
     indexNode_.clear();
     indexNode_.insertBegin(box, settings_.maxSize2, settings_.maxLevel2, true);
 
     for (uint64_t i = 0; i < node->size; i++)
     {
-        // point = buffer + (i * sizePoint_);
-        // inputLas_.transform(x, y, z, point);
-        x = coords[i * 3 + 0];
-        y = coords[i * 3 + 1];
-        z = coords[i * 3 + 2];
-        bufferCodes[i * 2 + 0] = indexNode_.insert(x, y, z);
+        bufferCodes[i * 2 + 0] = indexNode_.insert(coords_[i * 3 + 0],
+                                                   coords_[i * 3 + 1],
+                                                   coords_[i * 3 + 2]);
         bufferCodes[i * 2 + 1] = i;
     }
 
@@ -889,7 +851,7 @@ void FileIndexBuilder::stateNodeInsert()
     // Sort
     size_t size = sizeof(uint64_t) * 2;
     size_t n = bufferCodes.size() / 2;
-    std::qsort(bufferCodes.data(), n, size, DatabaseBuilderCmp);
+    std::qsort(bufferCodes.data(), n, size, FileIndexBuilderCmp);
 
     std::vector<uint8_t> bufferNodeOut;
     bufferNodeOut.resize(step);

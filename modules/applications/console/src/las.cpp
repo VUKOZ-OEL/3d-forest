@@ -115,6 +115,23 @@ void cmd_print(const char *inputPath, uint64_t nPointsMax)
         las.readPoint(pt);
         std::cout << pt << std::endl;
     }
+
+    // Index
+    const std::string pathIndex = FileIndexBuilder::extension(inputPath);
+    if (File::exists(pathIndex))
+    {
+        FileIndex indexL1;
+        indexL1.read(pathIndex);
+
+        std::cout << "boundary: " << indexL1.boundary() << std::endl;
+
+        const FileIndex::Node *node;
+        node = indexL1.at(0);
+
+        FileIndex indexL2;
+        indexL2.read(pathIndex, node->offset);
+        std::cout << "boundary[0]: " << indexL2.boundary() << std::endl;
+    }
 }
 
 void cmd_select(const char *inputPath, const Aabb<double> &window)
@@ -178,10 +195,6 @@ int main(int argc, char *argv[])
         else if (strcmp(argv[opt], "-l2") == 0)
         {
             getarg(&settings.maxLevel2, opt, argc, argv);
-        }
-        else if (strcmp(argv[opt], "-r") == 0)
-        {
-            settings.randomize = true;
         }
 
         // Input/Output filenames

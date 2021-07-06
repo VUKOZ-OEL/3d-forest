@@ -32,3 +32,7 @@ install(TARGETS examplevector3 DESTINATION bin)
 add_executable(examplecolorpalette core/examplecolorpalette.cpp)
 target_link_libraries(examplecolorpalette PUBLIC core)
 install(TARGETS examplecolorpalette DESTINATION bin)
+
+add_executable(exampleeditor editor/exampleeditor.cpp)
+target_link_libraries(exampleeditor PUBLIC editor)
+install(TARGETS exampleeditor DESTINATION bin)

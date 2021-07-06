@@ -45,6 +45,7 @@ void EditorCache::reload()
     {
         it.second->view.resetFrame();
         it.second->filtered = false;
+        it.second->filteredClass = false;
         // it.second->loaded = false;
     }
 }
@@ -57,6 +58,12 @@ bool EditorCache::loadStep()
         {
             load(i);
             editor_->applyFilters(lru_[i].get());
+            return false;
+        }
+
+        if (!lru_[i]->transformed)
+        {
+            lru_[i]->transform(editor_);
             return false;
         }
 
@@ -129,6 +136,7 @@ void EditorCache::updateCamera(const Camera &camera)
         if (editor_->clipFilter().enabled)
         {
             Aabb<double> box = index.boundary(node, index.boundary());
+            box.translate(ds.translation);
             if (!editor_->clipFilter().box.intersects(box))
             {
                 continue;
@@ -263,8 +271,7 @@ EditorTile *EditorCache::tile(size_t dataset, size_t index)
             lru_.resize(1);
         }
 
-        std::shared_ptr<EditorTile> tile;
-        tile = std::make_shared<EditorTile>();
+        std::shared_ptr<EditorTile> tile = std::make_shared<EditorTile>();
         tile->dataSetId = nk.dataSetId;
         tile->tileId = nk.tileId;
         tile->loaded = false;

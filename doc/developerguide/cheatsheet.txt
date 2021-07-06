@@ -224,7 +224,7 @@ qDebug() << "error:" << e.what();
 
 *******************************************************************************/
 
-/** @page cheatsheet_cmake CMake
+/** @page cheatsheet_cmake CMake Build Script
 
 Example build script executed from directory build:
 @verbatim
@@ -232,6 +232,11 @@ cmake -G "MinGW Makefiles" .. -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug
 mingw32-make format
 mingw32-make
 mingw32-make install
+mingw32-make doxygen
+qhelpgenerator ..\doc\index.qhcp -o html\index.qhc
+mkdir ..\bin\documentation
+copy html\index.qhc ..\bin\documentation\
+copy html\index.qch ..\bin\documentation\
 @endverbatim
 
 *******************************************************************************/

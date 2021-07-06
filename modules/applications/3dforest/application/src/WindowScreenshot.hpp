@@ -17,34 +17,19 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file PluginTool.hpp */
+/** @file WindowScreenshot.hpp */
 
-#ifndef PLUGIN_TOOL_HPP
-#define PLUGIN_TOOL_HPP
-
-#include <QIcon>
-#include <QString>
-#include <QtPlugin>
+#ifndef WINDOW_SCREENSHOT_HPP
+#define WINDOW_SCREENSHOT_HPP
 
 class Editor;
-class QAction;
-class QMainWindow;
+class QWidget;
 
-/** Plugin Tool Interface. */
-class PluginTool
+/** Window Screenshot. */
+class WindowScreenshot
 {
 public:
-    virtual ~PluginTool() = default;
-    virtual void initialize(QMainWindow *parent, Editor *editor) = 0;
-    virtual void show(QMainWindow *parent) = 0;
-    virtual QAction *toggleViewAction() const = 0;
-    virtual QString windowTitle() const = 0; /**< Unique */
-    virtual QString buttonText() const = 0;
-    virtual QString toolTip() const = 0;
-    virtual QIcon icon() const = 0;
+    static void capture(QWidget *parent, QWidget *widget, Editor *editor);
 };
 
-#define PluginTool_iid "vukoz.3dforest.qt.PluginTool/1.0"
-Q_DECLARE_INTERFACE(PluginTool, PluginTool_iid)
-
-#endif /* PLUGIN_TOOL_HPP */
+#endif /* WINDOW_SCREENSHOT_HPP */

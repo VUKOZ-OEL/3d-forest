@@ -35,6 +35,7 @@ class PluginFile;
 class PluginTool;
 class Ribbon;
 class WindowDock;
+class WindowClassification;
 class WindowClipFilter;
 class WindowDataSets;
 class WindowLayers;
@@ -86,11 +87,14 @@ public slots:
 
     // Windows
     void actionDataSetVisible(size_t id, bool checked);
+    void actionClassification();
     void actionLayerVisible(size_t id, bool checked);
     void actionClipFilter(const ClipFilter &clipFilter);
     void actionClipFilterReset();
     void actionSettingsView();
     void actionSettingsViewColor();
+
+    void actionScreenshot();
 
     void actionAbout();
     void actionHelp();
@@ -108,6 +112,7 @@ protected:
     std::vector<PluginTool *> pluginsTool_;
 
     // Windows
+    WindowClassification *windowClassification_;
     WindowClipFilter *windowClipFilter_;
     WindowDataSets *windowDataSets_;
     WindowLayers *windowLayers_;
@@ -144,15 +149,19 @@ protected:
                                   const QIcon &icon);
     QToolButton *createMenuButton(const QString &text,
                                   const QString &toolTip,
+                                  const QString &icon);
+    QToolButton *createMenuButton(const QString &title,
+                                  const QString &text,
+                                  const QString &toolTip,
                                   const QString &icon,
-                                  QDockWidget *dockWidget = nullptr);
+                                  QDockWidget *dockWidget);
     WindowDock *createMenuTool(
+        const QString &windowTitle,
         const QString &text,
         const QString &toolTip,
         const QString &icon,
         QWidget *dockWidget,
-        Qt::DockWidgetAreas areas = Qt::LeftDockWidgetArea |
-                                    Qt::RightDockWidgetArea,
+        Qt::DockWidgetAreas areas = Qt::RightDockWidgetArea,
         Qt::DockWidgetArea area = Qt::RightDockWidgetArea,
         bool floating = true);
 

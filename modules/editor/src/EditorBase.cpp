@@ -62,10 +62,6 @@ void EditorBase::open(const std::string &path)
         {
             projectName_ = in[EDITOR_BASE_KEY_PROJECT_NAME].string();
         }
-        else
-        {
-            projectName_ = "Untitled";
-        }
 
         // Data sets
         if (in.contains(EDITOR_BASE_KEY_DATA_SET))
@@ -115,27 +111,7 @@ void EditorBase::open(const std::string &path)
     openUpdate();
 }
 
-void EditorBase::openFile(const std::string &path)
-{
-    close();
-
-    try
-    {
-        // Data sets
-        std::shared_ptr<EditorDataSet> ds = std::make_shared<EditorDataSet>();
-        ds->read(path, path_);
-        dataSets_.push_back(ds);
-    }
-    catch (std::exception &e)
-    {
-        close();
-        throw;
-    }
-
-    openUpdate();
-}
-
-void EditorBase::addFile(const std::string &path)
+void EditorBase::addFile(const std::string &path, bool center)
 {
     try
     {
@@ -144,6 +120,22 @@ void EditorBase::addFile(const std::string &path)
         ds->id = freeDataSetId();
         ds->read(path, path_);
         dataSets_.push_back(ds);
+
+        if (center)
+        {
+            Vector3<double> c1 = boundary_.getCenter();
+            Vector3<double> c2 = ds->boundaryFile.getCenter();
+            c1[2] = boundary_.min(2);
+            c2[2] = ds->boundaryFile.min(2);
+            ds->translation = c1 - c2;
+            ds->updateBoundary();
+        }
+        else
+        {
+            Vector3<double> s = 1.0 / ds->scalingFile;
+            ds->translation = ds->translationFile * s;
+            ds->updateBoundary();
+        }
     }
     catch (std::exception &e)
     {
@@ -216,8 +208,8 @@ void EditorBase::write(const std::string &path)
 
 void EditorBase::close()
 {
-    path_ = File::currentPath() + "\\project";
-    projectName_ = "";
+    path_ = File::currentPath() + "\\untitled.json";
+    projectName_ = "Untitled";
     dataSets_.clear();
     layers_.clear();
     clipFilter_.clear();
@@ -255,12 +247,14 @@ void EditorBase::applyFilters(EditorTile *tile)
 void EditorBase::setSettingsView(const EditorSettings::View &settings)
 {
     settings_.setView(settings);
+    resetRendering();
+    // unsavedChanges_ = true;
+}
 
-    for (auto &it : viewports_)
-    {
-        it->resetRendering();
-    }
-
+void EditorBase::setClassification(const EditorClassification &classification)
+{
+    classification_ = classification;
+    // resetRendering();
     // unsavedChanges_ = true;
 }
 
@@ -313,18 +307,6 @@ Aabb<double> EditorBase::selection() const
     return boundary_;
 }
 
-// EditorTile *tile(size_t d, size_t c);
-// EditorTile *EditorBase::tile(size_t d, size_t c)
-// {
-//     auto search = cache_.find({d, c});
-//     if (search != cache_.end())
-//     {
-//         return search->second.get();
-//     }
-//     return nullptr;
-// }
-
-// -----------------------------------------------------------------------------
 void EditorBase::setNumberOfViewports(size_t n)
 {
     size_t i = viewports_.size();
@@ -396,5 +378,13 @@ void EditorBase::updateBoundary()
             boundary_.extend(it->boundary);
             boundaryView_.extend(it->boundaryView);
         }
+    }
+}
+
+void EditorBase::resetRendering()
+{
+    for (auto &it : viewports_)
+    {
+        it->resetRendering();
     }
 }

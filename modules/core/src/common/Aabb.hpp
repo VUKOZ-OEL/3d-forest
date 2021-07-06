@@ -22,10 +22,7 @@
 #ifndef AABB_HPP
 #define AABB_HPP
 
-#include <Json.hpp>
-#include <cmath>
-#include <limits>
-#include <vector>
+#include <Vector3.hpp>
 
 /** Axis-Aligned Bounding Box. */
 template <class T> class Aabb
@@ -40,6 +37,7 @@ public:
     void set(const std::vector<T> &xyz);
     void set(const Aabb<T> &box);
     void setPercent(const Aabb<T> &box, const Aabb<T> &a, const Aabb<T> &b);
+    void translate(const Vector3<T> &v);
 
     void extend(const Aabb<T> &box);
     void clear();
@@ -50,6 +48,7 @@ public:
     const T &max(size_t idx) const { return max_[idx]; }
 
     void getCenter(T &x, T &y, T &z) const;
+    Vector3<T> getCenter() const;
     T distance(T x, T y, T z) const;
     T radius() const;
 
@@ -198,6 +197,17 @@ inline void Aabb<T>::setPercent(const Aabb<T> &box,
     validate();
 }
 
+template <class T> inline void Aabb<T>::translate(const Vector3<T> &v)
+{
+    for (size_t i = 0; i < 3; i++)
+    {
+        min_[i] += v[i];
+        max_[i] += v[i];
+    }
+
+    validate();
+}
+
 template <class T> inline void Aabb<T>::extend(const Aabb<T> &box)
 {
     if (!box.empty())
@@ -252,6 +262,13 @@ template <class T> inline void Aabb<T>::getCenter(T &x, T &y, T &z) const
     x = min_[0] + ((max_[0] - min_[0]) / 2);
     y = min_[1] + ((max_[1] - min_[1]) / 2);
     z = min_[2] + ((max_[2] - min_[2]) / 2);
+}
+
+template <class T> inline Vector3<T> Aabb<T>::getCenter() const
+{
+    return Vector3<T>(min_[0] + ((max_[0] - min_[0]) / 2),
+                      min_[1] + ((max_[1] - min_[1]) / 2),
+                      min_[2] + ((max_[2] - min_[2]) / 2));
 }
 
 template <class T> inline T Aabb<T>::distance(T x, T y, T z) const
@@ -318,6 +335,17 @@ template <class T> inline Json &Aabb<T>::write(Json &out) const
     out["max"][2] = max_[2];
 
     return out;
+}
+
+template <class T>
+std::ostream &operator<<(std::ostream &os, const Aabb<T> &obj)
+{
+    return os << std::fixed << "{{" << obj.min(0) << ", " << obj.min(1) << ", "
+              << obj.min(2)
+              << "}, "
+                 "{"
+              << obj.max(0) << ", " << obj.max(1) << ", " << obj.max(2) << "}"
+              << "}" << std::defaultfloat;
 }
 
 #endif /* AABB_HPP */

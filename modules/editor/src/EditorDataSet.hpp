@@ -25,6 +25,7 @@
 #include <Aabb.hpp>
 #include <FileIndex.hpp>
 #include <Json.hpp>
+#include <Vector3.hpp>
 #include <string>
 
 /** Editor Data Set. */
@@ -32,6 +33,9 @@ class EditorDataSet
 {
 public:
     // Stored
+    Vector3<double> translation;
+    Vector3<double> scaling;
+
     std::string pathUnresolved;
     std::string dateCreated; /**< Inconsistent with LAS in shared projects */
     std::string label;       /**< Inconsistent with LAS in shared projects */
@@ -44,6 +48,9 @@ public:
 
     // Data
     FileIndex index;
+    Vector3<double> translationFile;
+    Vector3<double> scalingFile;
+    Aabb<double> boundaryFile;
     Aabb<double> boundary;
     Aabb<double> boundaryView;
 
@@ -53,6 +60,8 @@ public:
     void read(const std::string &filePath, const std::string &projectPath);
     void read(const Json &in, const std::string &projectPath);
     Json &write(Json &out) const;
+
+    void updateBoundary();
 
     static std::string resolvePath(const std::string &unresolved,
                                    const std::string &projectPath);

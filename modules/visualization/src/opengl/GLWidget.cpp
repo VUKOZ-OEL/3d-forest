@@ -281,7 +281,7 @@ bool GLWidget::renderScene()
     {
         EditorTile &tile = editor_->tileView(viewportId_, tileIndex);
 
-        if (tile.loaded && tile.filtered && !tile.view.isFinished())
+        if (tile.renderMore())
         {
             if (tileIndex == 0 && tile.view.isStarted())
             {
@@ -295,7 +295,7 @@ bool GLWidget::renderScene()
             tile.view.nextFrame();
 
             double t2 = getRealTime();
-            if (t2 - t1 > 0.02 && tileIndex > 4)
+            if (t2 - t1 > 0.02)
             {
                 break;
             }

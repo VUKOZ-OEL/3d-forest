@@ -39,8 +39,8 @@ GLCamera::GLCamera()
       zFar_(100000.0F),
       perspective_(true),
       viewport_(0, 0, 100, 100),
-      sensitivityX_(0.5F),
-      sensitivityY_(0.5F),
+      sensitivityX_(1.0F),
+      sensitivityY_(1.0F),
       sensitivityZoom_(4.0F)
 {
     frustrumPlanes_.resize(24);

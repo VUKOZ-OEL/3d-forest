@@ -71,6 +71,7 @@ public:
     virtual void show(QMainWindow *parent);
     virtual QAction *toggleViewAction() const;
     virtual QString windowTitle() const;
+    virtual QString buttonText() const;
     virtual QString toolTip() const;
     virtual QIcon icon() const;
 

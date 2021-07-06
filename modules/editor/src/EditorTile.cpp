@@ -30,7 +30,9 @@ EditorTile::EditorTile()
     : dataSetId(0),
       tileId(0),
       loaded(false),
+      transformed(false),
       filtered(false),
+      filteredClass(false),
       modified(false)
 {
 }
@@ -92,6 +94,8 @@ void EditorTile::read(const EditorBase *editor)
     indices.resize(n);
 
     xyz.resize(n * 3);
+    xyzBase.resize(n * 3);
+
     intensity.resize(n);
     rgb.resize(n * 3);
     rgbOutput.resize(n * 3);
@@ -105,9 +109,6 @@ void EditorTile::read(const EditorBase *editor)
     // Covert buffer to point data
     uint8_t *ptr = buffer.data();
     FileLas::Point point;
-    double x;
-    double y;
-    double z;
     const float scaleU16 =
         1.0F / 65535.0F; /**< @todo Normalize during conversion. */
     // const float scaleU16 = 1.0F / 255.0F;
@@ -118,19 +119,11 @@ void EditorTile::read(const EditorBase *editor)
         indices[i] = static_cast<unsigned int>(i);
 
         las.readPoint(point, ptr + (pointSize * i), fmt);
-        las.transform(x, y, z, point);
 
         // xyz
-        xyz[3 * i + 0] = x;
-        xyz[3 * i + 1] = y;
-        xyz[3 * i + 2] = z;
-
-        x = static_cast<double>(point.x) + las.header.x_offset;
-        y = static_cast<double>(point.y) + las.header.y_offset;
-        z = static_cast<double>(point.z) + las.header.z_offset;
-        view.xyz[3 * i + 0] = static_cast<float>(x);
-        view.xyz[3 * i + 1] = static_cast<float>(y);
-        view.xyz[3 * i + 2] = static_cast<float>(z);
+        xyzBase[3 * i + 0] = static_cast<double>(point.x);
+        xyzBase[3 * i + 1] = static_cast<double>(point.y);
+        xyzBase[3 * i + 2] = static_cast<double>(point.z);
 
         // intensity and color
         intensity[i] = static_cast<float>(point.intensity) * scaleU16;
@@ -165,101 +158,179 @@ void EditorTile::read(const EditorBase *editor)
         layer[i] = point.user_layer;
     }
 
-    boundary.set(xyz);
-    view.boundary.set(view.xyz);
-
     // Loaded
     loaded = true;
 
     // Apply
+    transform(editor);
     filter(editor);
+}
+
+void EditorTile::transform(const EditorBase *editor)
+{
+    const EditorDataSet &dataSet = editor->dataSet(dataSetId);
+    size_t n = xyzBase.size() / 3;
+    double x;
+    double y;
+    double z;
+    double tx = dataSet.translation[0];
+    double ty = dataSet.translation[1];
+    double tz = dataSet.translation[2];
+
+    for (size_t i = 0; i < n; i++)
+    {
+        x = xyzBase[3 * i + 0] + tx;
+        y = xyzBase[3 * i + 1] + ty;
+        z = xyzBase[3 * i + 2] + tz;
+
+        xyz[3 * i + 0] = x;
+        xyz[3 * i + 1] = y;
+        xyz[3 * i + 2] = z;
+
+        view.xyz[3 * i + 0] = static_cast<float>(x);
+        view.xyz[3 * i + 1] = static_cast<float>(y);
+        view.xyz[3 * i + 2] = static_cast<float>(z);
+    }
+
+    boundary.set(xyz);
+    view.boundary.set(view.xyz);
+
+    transformed = true;
 }
 
 void EditorTile::filter(const EditorBase *editor)
 {
-    readFilter(editor);
+    size_t n = attrib.size();
+    indices.resize(n);
+    for (size_t i = 0; i < n; i++)
+    {
+        indices[i] = static_cast<unsigned int>(i);
+    }
+
+    selectClip(editor);
+    selectClass(editor);
     setPointColor(editor);
 
     filtered = true;
+    filteredClass = true;
 }
 
-void EditorTile::readFilter(const EditorBase *editor)
+bool EditorTile::renderMore() const
 {
+    return loaded && transformed && filtered && filteredClass &&
+           !view.isFinished();
+}
+
+void EditorTile::selectClip(const EditorBase *editor)
+{
+    if (!editor->clipFilter().enabled)
+    {
+        return;
+    }
+
     const EditorDataSet &dataSet = editor->dataSet(dataSetId);
     const FileIndex::Node *node = dataSet.index.at(tileId);
 
-    if (editor->clipFilter().enabled)
+    // Read L2 index
+    if (index.empty())
     {
-        // Read L2 index
-        if (index.empty())
-        {
-            std::string pathIndex = FileIndexBuilder::extension(dataSet.path);
-            index.read(pathIndex, node->offset);
-        }
-
-        // Select octants
-        std::vector<FileIndex::Selection> selection;
-        Aabb<double> clipBox = editor->clipFilter().box;
-        index.selectLeaves(selection, clipBox, dataSet.id);
-
-        // Compute upper limit of the number of selected points
-        size_t nSelected = 0;
-
-        for (size_t i = 0; i < selection.size(); i++)
-        {
-            const FileIndex::Node *nodeL2 = index.at(selection[i].idx);
-            if (!nodeL2)
-            {
-                continue;
-            }
-
-            nSelected += static_cast<size_t>(nodeL2->size);
-        }
-
-        indices.resize(nSelected);
-
-        // Select points
-        nSelected = 0;
-
-        for (size_t i = 0; i < selection.size(); i++)
-        {
-            const FileIndex::Node *nodeL2 = index.at(selection[i].idx);
-            if (!nodeL2)
-            {
-                continue;
-            }
-
-            unsigned int nPoints = static_cast<unsigned int>(nodeL2->size);
-            unsigned int from = static_cast<unsigned int>(nodeL2->from);
-
-            if (selection[i].partial)
-            {
-                // Partial selection, apply clip filter
-                for (unsigned int j = 0; j < nPoints; j++)
-                {
-                    unsigned int idx = from + j;
-                    double x = xyz[3 * idx + 0];
-                    double y = xyz[3 * idx + 1];
-                    double z = xyz[3 * idx + 2];
-
-                    if (clipBox.isInside(x, y, z))
-                    {
-                        indices[nSelected++] = idx;
-                    }
-                }
-            }
-            else
-            {
-                // Everything
-                for (unsigned int j = 0; j < nPoints; j++)
-                {
-                    indices[nSelected++] = from + j;
-                }
-            }
-        }
-
-        indices.resize(nSelected);
+        std::string pathIndex = FileIndexBuilder::extension(dataSet.path);
+        index.read(pathIndex, node->offset);
+        index.translate(dataSet.translation);
     }
+
+    // Select octants
+    std::vector<FileIndex::Selection> selection;
+    Aabb<double> clipBox = editor->clipFilter().box;
+
+    index.selectLeaves(selection, clipBox, dataSet.id);
+
+    // Compute upper limit of the number of selected points
+    size_t nSelected = 0;
+
+    for (size_t i = 0; i < selection.size(); i++)
+    {
+        const FileIndex::Node *nodeL2 = index.at(selection[i].idx);
+        if (!nodeL2)
+        {
+            continue;
+        }
+
+        nSelected += static_cast<size_t>(nodeL2->size);
+    }
+
+    indices.resize(nSelected);
+
+    // Select points
+    nSelected = 0;
+
+    for (size_t i = 0; i < selection.size(); i++)
+    {
+        const FileIndex::Node *nodeL2 = index.at(selection[i].idx);
+        if (!nodeL2)
+        {
+            continue;
+        }
+
+        unsigned int nPoints = static_cast<unsigned int>(nodeL2->size);
+        unsigned int from = static_cast<unsigned int>(nodeL2->from);
+
+        if (selection[i].partial)
+        {
+            // Partial selection, apply clip filter
+            for (unsigned int j = 0; j < nPoints; j++)
+            {
+                unsigned int idx = from + j;
+                double x = xyz[3 * idx + 0];
+                double y = xyz[3 * idx + 1];
+                double z = xyz[3 * idx + 2];
+
+                if (clipBox.isInside(x, y, z))
+                {
+                    indices[nSelected++] = idx;
+                }
+            }
+        }
+        else
+        {
+            // Everything
+            for (unsigned int j = 0; j < nPoints; j++)
+            {
+                indices[nSelected++] = from + j;
+            }
+        }
+    }
+
+    indices.resize(nSelected);
+}
+
+void EditorTile::selectClass(const EditorBase *editor)
+{
+    const EditorClassification &c = editor->classification();
+
+    if (!c.isEnabled())
+    {
+        return;
+    }
+
+    size_t nSelected = indices.size();
+    size_t nSelectedNew = 0;
+
+    for (size_t i = 0; i < nSelected; i++)
+    {
+        unsigned int idx = indices[i];
+
+        if (c.isEnabled(attrib[idx].classification))
+        {
+            if (nSelectedNew != i)
+            {
+                indices[nSelectedNew] = indices[i];
+            }
+            nSelectedNew++;
+        }
+    }
+
+    indices.resize(nSelectedNew);
 }
 
 void EditorTile::setPointColor(const EditorBase *editor)

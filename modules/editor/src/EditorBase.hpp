@@ -24,6 +24,7 @@
 
 #include <ClipFilter.hpp>
 #include <EditorCache.hpp>
+#include <EditorClassification.hpp>
 #include <EditorDataSet.hpp>
 #include <EditorFilter.hpp>
 #include <EditorLayer.hpp>
@@ -37,11 +38,11 @@ public:
     ~EditorBase();
 
     void open(const std::string &path);
-    void openFile(const std::string &path);
-    void addFile(const std::string &path);
+    void addFile(const std::string &path, bool center = true);
     bool hasFileIndex(const std::string &path);
     void write(const std::string &path);
     const std::string &path() const { return path_; }
+    const std::string &projectName() const { return projectName_; }
     bool hasUnsavedChanges() const { return unsavedChanges_; }
     void close();
 
@@ -50,6 +51,12 @@ public:
 
     size_t dataSetSize() const { return dataSets_.size(); }
     const EditorDataSet &dataSet(size_t i) const { return *dataSets_[i]; }
+
+    const EditorClassification &classification() const
+    {
+        return classification_;
+    }
+    void setClassification(const EditorClassification &classification);
 
     size_t layerSize() const { return layers_.size(); }
     const EditorLayer &layer(size_t i) const { return layers_[i]; }
@@ -97,6 +104,7 @@ protected:
     std::vector<EditorLayer> layers_;
     ClipFilter clipFilter_;
     EditorSettings settings_;
+    EditorClassification classification_;
 
     // Filter
     std::vector<EditorFilter *> filters_;
@@ -108,6 +116,7 @@ protected:
     size_t freeDataSetId() const;
     void openUpdate();
     void updateBoundary();
+    void resetRendering();
 
     // Cache
     std::vector<std::shared_ptr<EditorCache>> viewports_;

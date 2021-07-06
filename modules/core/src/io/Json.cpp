@@ -21,7 +21,6 @@
 
 #include <File.hpp>
 #include <Json.hpp>
-#include <limits>
 
 void Json::clear()
 {
