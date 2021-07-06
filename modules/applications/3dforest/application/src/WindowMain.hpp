@@ -87,6 +87,7 @@ public slots:
 
     // Windows
     void actionDataSetVisible(size_t id, bool checked);
+    void actionClassification();
     void actionLayerVisible(size_t id, bool checked);
     void actionClipFilter(const ClipFilter &clipFilter);
     void actionClipFilterReset();

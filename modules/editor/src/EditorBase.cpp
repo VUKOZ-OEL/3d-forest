@@ -247,12 +247,14 @@ void EditorBase::applyFilters(EditorTile *tile)
 void EditorBase::setSettingsView(const EditorSettings::View &settings)
 {
     settings_.setView(settings);
+    resetRendering();
+    // unsavedChanges_ = true;
+}
 
-    for (auto &it : viewports_)
-    {
-        it->resetRendering();
-    }
-
+void EditorBase::setClassification(const EditorClassification &classification)
+{
+    classification_ = classification;
+    resetRendering();
     // unsavedChanges_ = true;
 }
 
@@ -376,5 +378,13 @@ void EditorBase::updateBoundary()
             boundary_.extend(it->boundary);
             boundaryView_.extend(it->boundaryView);
         }
+    }
+}
+
+void EditorBase::resetRendering()
+{
+    for (auto &it : viewports_)
+    {
+        it->resetRendering();
     }
 }

@@ -34,6 +34,15 @@ class WindowClassification : public QWidget
     Q_OBJECT
 
 public:
+    /** Window Classification Column. */
+    enum Column
+    {
+        COLUMN_CHECKED,
+        COLUMN_ID,
+        COLUMN_LABEL,
+        COLUMN_LAST,
+    };
+
     WindowClassification(QWidget *parent);
 
     const EditorClassification &classification() const
@@ -42,12 +51,18 @@ public:
     }
     void setClassification(const EditorClassification &classification);
 
+public slots:
+    void itemChanged(QTreeWidgetItem *item, int column);
+
 signals:
     void selectionChanged();
 
 protected:
     EditorClassification classification_;
     QTreeWidget *tree_;
+
+    void updateAll(bool checked);
+    void addItem(size_t i);
 };
 
 #endif /* WINDOW_CLASSIFICATION_HPP */

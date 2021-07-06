@@ -373,10 +373,10 @@ void WindowMain::createWindows()
 
     // Create classification window
     windowClassification_ = new WindowClassification(this);
-    // connect(windowLayers_,
-    //         SIGNAL(itemChangedCheckState(size_t, bool)),
-    //         this,
-    //         SLOT(actionClassification(size_t, bool)));
+    connect(windowClassification_,
+            SIGNAL(selectionChanged()),
+            this,
+            SLOT(actionClassification()));
 
     (void)createMenuTool(tr("Classification"),
                          tr("Classifi\ncation"),
@@ -716,6 +716,15 @@ void WindowMain::actionDataSetVisible(size_t id, bool checked)
     // setWindowModified(true);
 }
 
+void WindowMain::actionClassification()
+{
+    editor_.cancelThreads();
+    editor_.lock();
+    editor_.setClassification(windowClassification_->classification());
+    editor_.unlock();
+    editor_.restartThreads();
+}
+
 void WindowMain::actionLayerVisible(size_t id, bool checked)
 {
     editor_.cancelThreads();
@@ -1022,6 +1031,7 @@ void WindowMain::updateProject()
     editor_.unlock();
 
     windowDataSets_->updateEditor(editor_);
+    windowClassification_->setClassification(editor_.classification());
     windowLayers_->updateEditor(editor_);
     windowSettingsView_->setSettings(editor_.settings().view());
     windowClipFilter_->setClipFilter(editor_);

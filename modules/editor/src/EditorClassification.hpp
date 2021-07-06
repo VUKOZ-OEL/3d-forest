@@ -30,9 +30,23 @@
 class EditorClassification
 {
 public:
+    struct Class
+    {
+        std::string label;
+        bool enabled;
+    };
+
     EditorClassification();
 
+    size_t size() const { return classes_.size(); }
+    size_t indexAll() const { return size() - 1; }
+    bool isEnabled(size_t i) const { return classes_[i].enabled; }
+    void setEnabled(size_t i, bool b) { classes_[i].enabled = b; }
+    void setEnabled(bool b);
+    const std::string &label(size_t i) const { return classes_[i].label; }
+
 protected:
+    std::vector<Class> classes_;
 };
 
 #endif /* EDITOR_CLASSIFICATION_HPP */
