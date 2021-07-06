@@ -62,10 +62,6 @@ void EditorBase::open(const std::string &path)
         {
             projectName_ = in[EDITOR_BASE_KEY_PROJECT_NAME].string();
         }
-        else
-        {
-            projectName_ = "Untitled";
-        }
 
         // Data sets
         if (in.contains(EDITOR_BASE_KEY_DATA_SET))
@@ -212,8 +208,8 @@ void EditorBase::write(const std::string &path)
 
 void EditorBase::close()
 {
-    path_ = File::currentPath() + "\\project";
-    projectName_ = "";
+    path_ = File::currentPath() + "\\untitled.json";
+    projectName_ = "Untitled";
     dataSets_.clear();
     layers_.clear();
     clipFilter_.clear();

@@ -41,6 +41,7 @@ public:
     bool hasFileIndex(const std::string &path);
     void write(const std::string &path);
     const std::string &path() const { return path_; }
+    const std::string &projectName() const { return projectName_; }
     bool hasUnsavedChanges() const { return unsavedChanges_; }
     void close();
 

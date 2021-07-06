@@ -36,6 +36,7 @@
 #include <QTextEdit>
 #include <Ribbon.h>
 #include <Time.hpp>
+#include <WindowClassification.hpp>
 #include <WindowClipFilter.hpp>
 #include <WindowDataSets.hpp>
 #include <WindowDock.hpp>
@@ -44,6 +45,7 @@
 #include <WindowLayers.hpp>
 #include <WindowMain.hpp>
 #include <WindowSettingsView.hpp>
+#include <WindowScreenshot.hpp>
 
 const QString WindowMain::APPLICATION_NAME = "3DForest";
 const QString WindowMain::APPLICATION_VERSION = "1.0";
@@ -221,6 +223,12 @@ void WindowMain::createMenus()
     button->setEnabled(false);
     ribbon_->addButton("Project", "File", button);
 
+    button = createMenuButton(tr("Screenshot"),
+                              tr("Take a snapshot of rendered data"),
+                              "icons8-picture-40.png");
+    connect(button, SIGNAL(clicked()), this, SLOT(actionScreenshot()));
+    ribbon_->addButton("Project", "File", button);
+
     // Project
     ribbon_->addTab(QIcon(":/icons/icons8-monitor-40.png"), "View");
     ribbon_->setIconSize(QSize(20, 20));
@@ -349,8 +357,20 @@ void WindowMain::createWindows()
 
     (void)createMenuTool(tr("Layers"),
                          tr("Show and modify layers"),
-                         "icons8-variation-40.png",
+                         "icons8-animated-40.png",
                          windowLayers_);
+
+    // Create classification window
+    windowClassification_ = new WindowClassification(this);
+    // connect(windowLayers_,
+    //         SIGNAL(itemChangedCheckState(size_t, bool)),
+    //         this,
+    //         SLOT(actionClassification(size_t, bool)));
+
+    (void)createMenuTool(tr("Classification"),
+                         tr("Show classification"),
+                         "icons8-variation-40.png",
+                         windowClassification_);
 
     // Create view settings window
     windowSettingsView_ = new WindowSettingsView(this);
@@ -724,6 +744,22 @@ void WindowMain::actionSettingsViewColor()
     editor_.tileViewClear();
     editor_.unlock();
     editor_.restartThreads();
+}
+
+void WindowMain::actionScreenshot()
+{
+    try
+    {
+        WindowScreenshot::capture(this, windowViewports_, &editor_);
+    }
+    catch (std::exception &e)
+    {
+        showError(e.what());
+    }
+    catch (...)
+    {
+        showError("Unknown");
+    }
 }
 
 void WindowMain::actionAbout()

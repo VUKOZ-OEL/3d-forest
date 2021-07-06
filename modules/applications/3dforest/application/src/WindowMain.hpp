@@ -35,6 +35,7 @@ class PluginFile;
 class PluginTool;
 class Ribbon;
 class WindowDock;
+class WindowClassification;
 class WindowClipFilter;
 class WindowDataSets;
 class WindowLayers;
@@ -92,6 +93,8 @@ public slots:
     void actionSettingsView();
     void actionSettingsViewColor();
 
+    void actionScreenshot();
+
     void actionAbout();
     void actionHelp();
 
@@ -108,6 +111,7 @@ protected:
     std::vector<PluginTool *> pluginsTool_;
 
     // Windows
+    WindowClassification *windowClassification_;
     WindowClipFilter *windowClipFilter_;
     WindowDataSets *windowDataSets_;
     WindowLayers *windowLayers_;
