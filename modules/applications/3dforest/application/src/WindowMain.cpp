@@ -124,28 +124,37 @@ QToolButton *WindowMain::createMenuButton(const QString &text,
 
 QToolButton *WindowMain::createMenuButton(const QString &text,
                                           const QString &toolTip,
-                                          const QString &icon,
-                                          QDockWidget *dockWidget)
+                                          const QString &icon)
 {
     QToolButton *button;
 
     button = createMenuButton(text, toolTip, QIcon(":/icons/" + icon));
 
-    if (dockWidget)
-    {
-        QAction *action;
+    return button;
+}
 
-        action = dockWidget->toggleViewAction();
-        action->setIconText(text);
-        action->setToolTip(toolTip);
-        action->setIcon(button->icon());
-        button->setDefaultAction(action);
-    }
+QToolButton *WindowMain::createMenuButton(const QString &title,
+                                          const QString &text,
+                                          const QString &toolTip,
+                                          const QString &icon,
+                                          QDockWidget *dockWidget)
+{
+    QToolButton *button;
+    button = createMenuButton(text, toolTip, icon);
+
+    QAction *action;
+    action = dockWidget->toggleViewAction();
+    action->setText(title);
+    action->setToolTip(toolTip);
+    action->setIconText(text);
+    action->setIcon(button->icon());
+    button->setDefaultAction(action);
 
     return button;
 }
 
-WindowDock *WindowMain::createMenuTool(const QString &text,
+WindowDock *WindowMain::createMenuTool(const QString &windowTitle,
+                                       const QString &text,
                                        const QString &toolTip,
                                        const QString &icon,
                                        QWidget *dockWidget,
@@ -156,7 +165,7 @@ WindowDock *WindowMain::createMenuTool(const QString &text,
     WindowDock *dock = new WindowDock(this);
 
     dock->setWidget(dockWidget);
-    dock->setWindowTitle(text);
+    dock->setWindowTitle(windowTitle);
     dock->setWindowIcon(QIcon(":/icons/" + icon));
     dock->setAllowedAreas(areas);
     dock->setVisible(false);
@@ -165,7 +174,7 @@ WindowDock *WindowMain::createMenuTool(const QString &text,
 
     QToolButton *button;
 
-    button = createMenuButton(text, toolTip, icon, dock);
+    button = createMenuButton(windowTitle, text, toolTip, icon, dock);
     ribbon_->addButton("Tools", "Windows", button);
 
     return dock;
@@ -177,7 +186,7 @@ void WindowMain::createMenus()
     ribbon_ = new Ribbon;
 
     // Project
-    ribbon_->addTab(QIcon(":/icons/icons8-briefcase-40.png"), "Project");
+    ribbon_->addTab(QIcon(":/icons/icons8-briefcase-40.png"), "File");
     ribbon_->setIconSize(QSize(20, 20));
 
     // New
@@ -185,35 +194,35 @@ void WindowMain::createMenus()
                               tr("Create new project"),
                               "icons8-edit-file-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionProjectNew()));
-    ribbon_->addButton("Project", "Project", button);
+    ribbon_->addButton("File", "Project", button);
 
     // Open
     button = createMenuButton(tr("Open\nproject"),
                               tr("Open existing project"),
                               "icons8-live-folder-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionProjectOpen()));
-    ribbon_->addButton("Project", "Project", button);
+    ribbon_->addButton("File", "Project", button);
 
     // Save
     button = createMenuButton(tr("Save\nproject"),
                               tr("Save project"),
                               "icons8-save-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionProjectSave()));
-    ribbon_->addButton("Project", "Project", button);
+    ribbon_->addButton("File", "Project", button);
 
     // Save As
     button = createMenuButton(tr("Save As\nproject"),
                               tr("Save project to a different file"),
                               "icons8-save-as-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionProjectSaveAs()));
-    ribbon_->addButton("Project", "Project", button);
+    ribbon_->addButton("File", "Project", button);
 
     // Import
     button = createMenuButton(tr("Open"),
                               tr("Open existing data set file"),
                               "icons8-add-file-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionProjectImport()));
-    ribbon_->addButton("Project", "File", button);
+    ribbon_->addButton("File", "File", button);
 
     // Export
     button = createMenuButton(tr("Export"),
@@ -221,15 +230,15 @@ void WindowMain::createMenus()
                               "icons8-send-file-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionProjectExportAs()));
     button->setEnabled(false);
-    ribbon_->addButton("Project", "File", button);
+    ribbon_->addButton("File", "File", button);
 
     button = createMenuButton(tr("Screenshot"),
                               tr("Take a snapshot of rendered data"),
                               "icons8-picture-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionScreenshot()));
-    ribbon_->addButton("Project", "File", button);
+    ribbon_->addButton("File", "File", button);
 
-    // Project
+    // View
     ribbon_->addTab(QIcon(":/icons/icons8-monitor-40.png"), "View");
     ribbon_->setIconSize(QSize(20, 20));
 
@@ -343,7 +352,8 @@ void WindowMain::createWindows()
             this,
             SLOT(actionDataSetVisible(size_t, bool)));
 
-    (void)createMenuTool(tr("Data\nSets"),
+    (void)createMenuTool(tr("Data Sets"),
+                         tr("Data\nSets"),
                          tr("Show and modify data sets"),
                          "icons8-open-box-40.png",
                          windowDataSets_);
@@ -356,6 +366,7 @@ void WindowMain::createWindows()
             SLOT(actionLayerVisible(size_t, bool)));
 
     (void)createMenuTool(tr("Layers"),
+                         tr("Layers"),
                          tr("Show and modify layers"),
                          "icons8-animated-40.png",
                          windowLayers_);
@@ -368,6 +379,7 @@ void WindowMain::createWindows()
     //         SLOT(actionClassification(size_t, bool)));
 
     (void)createMenuTool(tr("Classification"),
+                         tr("Classifi\ncation"),
                          tr("Show classification"),
                          "icons8-variation-40.png",
                          windowClassification_);
@@ -383,7 +395,8 @@ void WindowMain::createWindows()
             this,
             SLOT(actionSettingsViewColor()));
 
-    (void)createMenuTool(tr("View\nSettings"),
+    (void)createMenuTool(tr("View Settings"),
+                         tr("View\nSettings"),
                          tr("Change view settings"),
                          "icons8-tune-40.png",
                          windowSettingsView_);
@@ -399,7 +412,8 @@ void WindowMain::createWindows()
             this,
             SLOT(actionClipFilterReset()));
 
-    (void)createMenuTool(tr("Clip\nFilter"),
+    (void)createMenuTool(tr("Clip Filter"),
+                         tr("Clip\nFilter"),
                          tr("Setup and apply clip filter"),
                          "icons8-crop-40.png",
                          windowClipFilter_);
@@ -408,7 +422,8 @@ void WindowMain::createWindows()
     log = new QTextEdit(this);
     log->setReadOnly(true);
 
-    (void)createMenuTool(tr("Log"),
+    (void)createMenuTool(tr("Application Log"),
+                         tr("Log"),
                          tr("Display application log"),
                          "icons8-pass-fail-40.png",
                          log,
@@ -442,16 +457,18 @@ void WindowMain::createPlugins()
                 pluginsTool_.push_back(pluginToolInterface);
 
                 // Create menu button
-                QString name = pluginToolInterface->windowTitle();
                 QToolButton *button = nullptr;
-                button = createMenuButton(name,
+                button = createMenuButton(pluginToolInterface->buttonText(),
                                           pluginToolInterface->toolTip(),
                                           pluginToolInterface->icon());
                 ribbon_->addButton("Tools", "Plugins", button);
 
+                QString name = pluginToolInterface->windowTitle();
                 QAction *action = new QAction(name, this);
-                action->setIcon(pluginToolInterface->icon());
+                action->setText(pluginToolInterface->windowTitle());
                 action->setToolTip(pluginToolInterface->toolTip());
+                action->setIconText(pluginToolInterface->buttonText());
+                action->setIcon(pluginToolInterface->icon());
                 connect(action,
                         SIGNAL(triggered()),
                         this,
@@ -669,7 +686,8 @@ void WindowMain::actionPluginToolShow()
                         if (button)
                         {
                             action = it->toggleViewAction();
-                            action->setIconText(it->windowTitle());
+                            action->setText(it->windowTitle());
+                            action->setIconText(it->buttonText());
                             action->setToolTip(it->toolTip());
                             action->setIcon(it->icon());
                             button->setDefaultAction(action);

@@ -172,8 +172,7 @@ void PluginDatabaseStatistics::show(QMainWindow *parent)
         window_->setWindowTitle(windowTitle());
         window_->setWindowIcon(icon());
         window_->setFloating(true);
-        window_->setAllowedAreas(Qt::LeftDockWidgetArea |
-                                 Qt::RightDockWidgetArea);
+        window_->setAllowedAreas(Qt::RightDockWidgetArea);
         parent->addDockWidget(Qt::RightDockWidgetArea, window_);
     }
 
@@ -193,6 +192,11 @@ QAction *PluginDatabaseStatistics::toggleViewAction() const
 }
 
 QString PluginDatabaseStatistics::windowTitle() const
+{
+    return tr(PLUGIN_DATABASE_STATISTICS_NAME);
+}
+
+QString PluginDatabaseStatistics::buttonText() const
 {
     return tr(PLUGIN_DATABASE_STATISTICS_NAME);
 }

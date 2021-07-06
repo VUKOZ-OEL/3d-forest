@@ -148,15 +148,19 @@ protected:
                                   const QIcon &icon);
     QToolButton *createMenuButton(const QString &text,
                                   const QString &toolTip,
+                                  const QString &icon);
+    QToolButton *createMenuButton(const QString &title,
+                                  const QString &text,
+                                  const QString &toolTip,
                                   const QString &icon,
-                                  QDockWidget *dockWidget = nullptr);
+                                  QDockWidget *dockWidget);
     WindowDock *createMenuTool(
+        const QString &windowTitle,
         const QString &text,
         const QString &toolTip,
         const QString &icon,
         QWidget *dockWidget,
-        Qt::DockWidgetAreas areas = Qt::LeftDockWidgetArea |
-                                    Qt::RightDockWidgetArea,
+        Qt::DockWidgetAreas areas = Qt::RightDockWidgetArea,
         Qt::DockWidgetArea area = Qt::RightDockWidgetArea,
         bool floating = true);
 

@@ -39,6 +39,7 @@ public:
     virtual void show(QMainWindow *parent) = 0;
     virtual QAction *toggleViewAction() const = 0;
     virtual QString windowTitle() const = 0; /**< Unique */
+    virtual QString buttonText() const = 0;
     virtual QString toolTip() const = 0;
     virtual QIcon icon() const = 0;
 };
