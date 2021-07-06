@@ -44,8 +44,8 @@
 #include <WindowHelp.hpp>
 #include <WindowLayers.hpp>
 #include <WindowMain.hpp>
-#include <WindowSettingsView.hpp>
 #include <WindowScreenshot.hpp>
+#include <WindowSettingsView.hpp>
 
 const QString WindowMain::APPLICATION_NAME = "3DForest";
 const QString WindowMain::APPLICATION_VERSION = "1.0";
@@ -218,8 +218,8 @@ void WindowMain::createMenus()
     ribbon_->addButton("File", "Project", button);
 
     // Import
-    button = createMenuButton(tr("Open"),
-                              tr("Open existing data set file"),
+    button = createMenuButton(tr("Import"),
+                              tr("Append existing file to data sets"),
                               "icons8-add-file-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionProjectImport()));
     ribbon_->addButton("File", "File", button);
@@ -232,7 +232,7 @@ void WindowMain::createMenus()
     button->setEnabled(false);
     ribbon_->addButton("File", "File", button);
 
-    button = createMenuButton(tr("Screenshot"),
+    button = createMenuButton(tr("Capture\nscreenshot"),
                               tr("Take a snapshot of rendered data"),
                               "icons8-picture-40.png");
     connect(button, SIGNAL(clicked()), this, SLOT(actionScreenshot()));

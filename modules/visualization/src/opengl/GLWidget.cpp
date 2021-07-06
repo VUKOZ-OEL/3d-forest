@@ -137,7 +137,7 @@ void GLWidget::resetCamera()
     if (aabb_.isValid())
     {
         center = aabb_.getCenter();
-        center[2] = aabb_.getMin().z();
+        // center[2] = aabb_.getMin().z();
         distance = aabb_.getRadius() * 2.0F;
     }
 
@@ -176,7 +176,7 @@ void GLWidget::setViewResetCenter()
     if (aabb_.isValid())
     {
         center = aabb_.getCenter();
-        center[2] = aabb_.getMin().z();
+        // center[2] = aabb_.getMin().z();
     }
 
     QVector3D eye = (dir * distance) + center;

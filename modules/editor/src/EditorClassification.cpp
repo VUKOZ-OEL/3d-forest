@@ -17,37 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file WindowClassification.hpp */
-
-#ifndef WINDOW_CLASSIFICATION_HPP
-#define WINDOW_CLASSIFICATION_HPP
+/** @file EditorClassification.cpp */
 
 #include <EditorClassification.hpp>
-#include <QWidget>
 
-class QTreeWidget;
-class QTreeWidgetItem;
-
-/** Window Classification. */
-class WindowClassification : public QWidget
+EditorClassification::EditorClassification()
 {
-    Q_OBJECT
-
-public:
-    WindowClassification(QWidget *parent);
-
-    const EditorClassification &classification() const
-    {
-        return classification_;
-    }
-    void setClassification(const EditorClassification &classification);
-
-signals:
-    void selectionChanged();
-
-protected:
-    EditorClassification classification_;
-    QTreeWidget *tree_;
-};
-
-#endif /* WINDOW_CLASSIFICATION_HPP */
+}

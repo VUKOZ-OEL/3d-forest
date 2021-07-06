@@ -20,19 +20,19 @@
 /** @file WindowScreenshot.cpp */
 
 #include <Editor.hpp>
-#include <QWidget>
-#include <QPixmap>
-#include <QStandardPaths>
-#include <QDir>
-#include <QFileDialog>
-#include <QImageWriter>
 #include <Error.hpp>
-#include <WindowScreenshot.hpp>
-#include <QWindow>
-#include <QScreen>
-#include <QGuiApplication>
 #include <QDateTime>
 #include <QDebug>
+#include <QDir>
+#include <QFileDialog>
+#include <QGuiApplication>
+#include <QImageWriter>
+#include <QPixmap>
+#include <QScreen>
+#include <QStandardPaths>
+#include <QWidget>
+#include <QWindow>
+#include <WindowScreenshot.hpp>
 
 void WindowScreenshot::capture(QWidget *parent, QWidget *widget, Editor *editor)
 {

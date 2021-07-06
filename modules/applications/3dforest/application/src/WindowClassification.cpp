@@ -23,5 +23,14 @@
 
 WindowClassification::WindowClassification(QWidget *parent) : QWidget(parent)
 {
+}
 
+void WindowClassification::setClassification(
+    const EditorClassification &classification)
+{
+    (void)blockSignals(true);
+
+    classification_ = classification;
+
+    (void)blockSignals(false);
 }

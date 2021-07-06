@@ -95,7 +95,6 @@ void EditorDataSet::read(const Json &in, const std::string &projectPath)
     if (in.contains("translation"))
     {
         translation.read(in["translation"]);
-
     }
 
     if (in.contains("scaling"))
