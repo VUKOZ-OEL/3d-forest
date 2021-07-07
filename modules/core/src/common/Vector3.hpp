@@ -231,9 +231,9 @@ inline Vector3<T> Vector3<T>::rotated(const Vector3<T> &axis,
 
 template <class T> inline void Vector3<T>::read(const Json &in)
 {
-    this->operator[](0) = in[0].number();
-    this->operator[](1) = in[1].number();
-    this->operator[](2) = in[2].number();
+    this->operator[](0) = static_cast<T>(in[0].number());
+    this->operator[](1) = static_cast<T>(in[1].number());
+    this->operator[](2) = static_cast<T>(in[2].number());
 }
 
 template <class T> inline Json &Vector3<T>::write(Json &out) const
