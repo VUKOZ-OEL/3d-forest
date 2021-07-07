@@ -38,6 +38,8 @@ public:
 
     EditorClassification();
 
+    void clear();
+
     bool isEnabled() const { return enabled_; }
     void setEnabled(bool b);
 
@@ -50,11 +52,12 @@ public:
     void setEnabledAll(bool b);
     void setInvertAll();
 
+    void read(const Json &in);
+    Json &write(Json &out) const;
+
 protected:
     std::vector<Class> classes_;
     bool enabled_;
-
-    void initialize();
 };
 
 #endif /* EDITOR_CLASSIFICATION_HPP */

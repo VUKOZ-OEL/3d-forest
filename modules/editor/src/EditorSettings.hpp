@@ -57,21 +57,30 @@ public:
         float pointColorGreen() const { return pointColor_[1]; }
         float pointColorBlue() const { return pointColor_[2]; }
 
+        const Vector3<float> &background() const { return background_; }
+
         size_t colorSourceSize() const;
         const char *colorSourceString(size_t id) const;
         bool isColorSourceEnabled(size_t id) const;
         void setColorSourceEnabled(size_t id, bool v);
 
+        void read(const Json &in);
+        Json &write(Json &out) const;
+
     protected:
         float pointSize_;
         bool fogEnabled_;
         Vector3<float> pointColor_;
+        Vector3<float> background_;
         std::vector<std::string> colorSourceString_;
         std::vector<bool> colorSourceEnabled_;
     };
 
     const View &view() const { return view_; }
     void setView(const View &view);
+
+    void read(const Json &in);
+    Json &write(Json &out) const;
 
 protected:
     View view_;
