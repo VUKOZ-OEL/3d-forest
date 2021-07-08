@@ -139,6 +139,7 @@ public:
 protected:
     void selectClip(const EditorBase *editor);
     void selectClass(const EditorBase *editor);
+    void selectLayers(const EditorBase *editor);
     void setPointColor(const EditorBase *editor);
     void setColor(size_t idx,
                   size_t value,
