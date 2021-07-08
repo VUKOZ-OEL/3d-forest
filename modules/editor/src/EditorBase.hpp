@@ -27,7 +27,7 @@
 #include <EditorClassification.hpp>
 #include <EditorDataSet.hpp>
 #include <EditorFilter.hpp>
-#include <EditorLayer.hpp>
+#include <EditorLayers.hpp>
 #include <EditorSettings.hpp>
 
 /** Editor Base. */
@@ -49,28 +49,32 @@ public:
     void addFilter(EditorFilter *filter);
     void applyFilters(EditorTile *tile);
 
+    // Data sets
     size_t dataSetSize() const { return dataSets_.size(); }
     const EditorDataSet &dataSet(size_t i) const { return *dataSets_[i]; }
+    void setVisibleDataSet(size_t i, bool visible);
 
+    // Layers
+    const EditorLayers &layers() const { return layers_; }
+    void setLayers(const EditorLayers &layers);
+
+    // Classifications
     const EditorClassification &classification() const
     {
         return classification_;
     }
     void setClassification(const EditorClassification &classification);
 
-    size_t layerSize() const { return layers_.size(); }
-    const EditorLayer &layer(size_t i) const { return layers_[i]; }
-
+    // Clip filter
     const ClipFilter &clipFilter() const { return clipFilter_; }
-
-    const EditorSettings &settings() const { return settings_; }
-    void setSettingsView(const EditorSettings::View &settings);
-
-    void setVisibleDataSet(size_t i, bool visible);
-    void setVisibleLayer(size_t i, bool visible);
     void setClipFilter(const ClipFilter &clipFilter);
     void resetClipFilter();
 
+    // Settings
+    const EditorSettings &settings() const { return settings_; }
+    void setSettingsView(const EditorSettings::View &settings);
+
+    // Boundary
     const Aabb<double> &boundary() const { return boundary_; }
     const Aabb<double> &boundaryView() const { return boundaryView_; }
 
@@ -101,7 +105,7 @@ protected:
     bool unsavedChanges_;
 
     std::vector<std::shared_ptr<EditorDataSet>> dataSets_;
-    std::vector<EditorLayer> layers_;
+    EditorLayers layers_;
     ClipFilter clipFilter_;
     EditorSettings settings_;
     EditorClassification classification_;

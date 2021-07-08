@@ -23,22 +23,39 @@
 #define EDITOR_LAYER_HPP
 
 #include <Json.hpp>
-#include <string>
+#include <Vector3.hpp>
 
 /** Editor Layer. */
 class EditorLayer
 {
 public:
-    // Stored
-    std::string label;
-    size_t id;
-    bool visible;
-
     EditorLayer();
-    ~EditorLayer();
+
+    void set(size_t id,
+             const std::string &label,
+             bool enabled,
+             const Vector3<float> &color);
+
+    size_t id() const { return id_; }
+
+    bool isEnabled() const { return enabled_; }
+    void setEnabled(bool b);
+
+    const std::string &label() const { return label_; }
+    void setLabel(const std::string &label);
+
+    const Vector3<float> &color() const { return color_; }
+    void setColor(const Vector3<float> &color);
 
     void read(const Json &in);
     Json &write(Json &out) const;
+
+protected:
+    // Stored
+    std::string label_;
+    Vector3<float> color_;
+    size_t id_;
+    bool enabled_;
 };
 
 #endif /* EDITOR_LAYER_HPP */

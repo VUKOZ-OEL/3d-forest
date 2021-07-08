@@ -19,82 +19,190 @@
 
 /** @file WindowLayers.cpp */
 
-#include <Editor.hpp>
-#include <EditorLayer.hpp>
+#include <QBrush>
+#include <QCheckBox>
+#include <QColor>
+#include <QDebug>
+#include <QHBoxLayout>
+#include <QPushButton>
 #include <QTreeWidget>
+#include <QTreeWidgetItem>
+#include <QTreeWidgetItemIterator>
 #include <QVBoxLayout>
 #include <WindowLayers.hpp>
 
 WindowLayers::WindowLayers(QWidget *parent) : QWidget(parent)
 {
     // Table
-    layers_ = new QTreeWidget();
+    tree_ = new QTreeWidget();
 
-    connect(layers_,
-            &QTreeWidget::itemChanged,
+    enabledCheckBox_ = new QCheckBox(tr("Enabled"));
+    enabledCheckBox_->setToolTip(tr("Enable or disable layer filter"));
+    connect(enabledCheckBox_,
+            SIGNAL(stateChanged(int)),
             this,
-            &WindowLayers::itemChanged);
+            SLOT(setEnabled(int)));
+
+    invertButton_ = new QPushButton(tr("Invert"));
+    invertButton_->setToolTip(tr("Invert the selection"));
+    connect(invertButton_, SIGNAL(clicked()), this, SLOT(invertSelection()));
+
+    deselectButton_ = new QPushButton(tr("Deselect"));
+    deselectButton_->setToolTip(tr("Dismiss the selection"));
+    connect(deselectButton_, SIGNAL(clicked()), this, SLOT(clearSelection()));
 
     // Layout
+    QHBoxLayout *controlLayout = new QHBoxLayout;
+    controlLayout->addWidget(enabledCheckBox_);
+    controlLayout->addStretch();
+    controlLayout->addWidget(invertButton_);
+    controlLayout->addWidget(deselectButton_);
+
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setContentsMargins(1, 1, 1, 1);
-    mainLayout->addWidget(layers_);
+    mainLayout->addWidget(tree_);
+    mainLayout->addLayout(controlLayout);
     setLayout(mainLayout);
 }
 
-WindowLayers::~WindowLayers()
+void WindowLayers::setEnabled(int state)
 {
+    bool checked = (state == Qt::Checked);
+    layers_.setEnabled(checked);
+    setEnabled(checked);
+    emit selectionChanged();
+}
+
+void WindowLayers::setEnabled(bool checked)
+{
+    tree_->setEnabled(checked);
+    invertButton_->setEnabled(checked);
+    deselectButton_->setEnabled(checked);
+}
+
+void WindowLayers::invertSelection()
+{
+    layers_.setInvertAll();
+    updateTree();
+    emit selectionChanged();
+}
+
+void WindowLayers::clearSelection()
+{
+    layers_.setEnabledAll(false);
+    updateTree();
+    emit selectionChanged();
 }
 
 void WindowLayers::itemChanged(QTreeWidgetItem *item, int column)
 {
     if (column == COLUMN_CHECKED)
     {
-        // #id is now checked or unchecked
         size_t id = item->text(COLUMN_ID).toULong();
         bool checked = (item->checkState(COLUMN_CHECKED) == Qt::Checked);
-        emit itemChangedCheckState(id, checked);
+
+        layers_.setEnabled(id, checked);
+        emit selectionChanged();
     }
 }
 
-void WindowLayers::updateEditor(const Editor &editor)
+void WindowLayers::updateTree()
 {
-    (void)blockSignals(true);
-    layers_->clear();
+    block();
 
-    // Header
-    layers_->setColumnCount(COLUMN_LAST);
-    QStringList labels;
-    labels << tr("Index") << tr("Select") << tr("Label");
-    layers_->setHeaderLabels(labels);
+    size_t i = 0;
+    QTreeWidgetItemIterator it(tree_);
 
-    // Content
-    QList<QTreeWidgetItem *> items;
-    for (size_t i = 0; i < editor.layerSize(); i++)
+    while (*it)
     {
-        QTreeWidgetItem *item = new QTreeWidgetItem(layers_);
-        const EditorLayer &layer = editor.layer(i);
-
-        item->setText(COLUMN_ID, QString::number(i));
-        if (layer.visible)
+        if (layers_.isEnabled(i))
         {
-            item->setCheckState(COLUMN_CHECKED, Qt::Checked);
+            (*it)->setCheckState(COLUMN_CHECKED, Qt::Checked);
         }
         else
         {
-            item->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
+            (*it)->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
         }
-        item->setText(COLUMN_LABEL, QString::fromStdString(layer.label));
+
+        i++;
+        ++it;
+    }
+
+    unblock();
+}
+
+void WindowLayers::block()
+{
+    disconnect(tree_, SIGNAL(itemChanged(QTreeWidgetItem *, int)), 0, 0);
+    (void)blockSignals(true);
+}
+
+void WindowLayers::unblock()
+{
+    (void)blockSignals(false);
+    connect(tree_,
+            SIGNAL(itemChanged(QTreeWidgetItem *, int)),
+            this,
+            SLOT(itemChanged(QTreeWidgetItem *, int)));
+}
+
+void WindowLayers::addItem(size_t i)
+{
+    QTreeWidgetItem *item = new QTreeWidgetItem(tree_);
+
+    if (layers_.isEnabled(i))
+    {
+        item->setCheckState(COLUMN_CHECKED, Qt::Checked);
+    }
+    else
+    {
+        item->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
+    }
+
+    item->setText(COLUMN_ID, QString::number(layers_.id(i)));
+
+    item->setText(COLUMN_LABEL, QString::fromStdString(layers_.label(i)));
+
+    // Color legend
+    const Vector3<float> &rgb = layers_.color(i);
+
+    QColor color;
+    color.setRedF(rgb[0]);
+    color.setGreenF(rgb[1]);
+    color.setBlueF(rgb[2]);
+
+    QBrush brush(color, Qt::SolidPattern);
+    item->setBackground(COLUMN_ID, brush);
+}
+
+void WindowLayers::setLayers(const EditorLayers &layers)
+{
+    block();
+
+    layers_ = layers;
+
+    tree_->clear();
+
+    // Header
+    tree_->setColumnCount(COLUMN_LAST);
+    QStringList labels;
+    labels << tr("Select") << tr("Id") << tr("Label");
+    tree_->setHeaderLabels(labels);
+
+    // Content
+    for (size_t i = 0; i < layers_.size(); i++)
+    {
+        addItem(i);
     }
 
     // Resize Columns to the minimum space
     for (int i = 0; i < COLUMN_LAST; i++)
     {
-        layers_->resizeColumnToContents(i);
+        tree_->resizeColumnToContents(i);
     }
 
-    // Sort Content
-    layers_->setSortingEnabled(true);
-    layers_->sortItems(COLUMN_ID, Qt::AscendingOrder);
-    (void)blockSignals(false);
+    setEnabled(layers_.isEnabled());
+    enabledCheckBox_->setChecked(layers_.isEnabled());
+
+    unblock();
 }

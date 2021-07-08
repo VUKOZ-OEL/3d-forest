@@ -361,9 +361,9 @@ void WindowMain::createWindows()
     // Create layers window
     windowLayers_ = new WindowLayers(this);
     connect(windowLayers_,
-            SIGNAL(itemChangedCheckState(size_t, bool)),
+            SIGNAL(selectionChanged()),
             this,
-            SLOT(actionLayerVisible(size_t, bool)));
+            SLOT(actionLayers()));
 
     (void)createMenuTool(tr("Layers"),
                          tr("Layers"),
@@ -726,11 +726,14 @@ void WindowMain::actionClassification()
     editor_.restartThreads();
 }
 
-void WindowMain::actionLayerVisible(size_t id, bool checked)
+void WindowMain::actionLayers()
 {
     editor_.cancelThreads();
-    editor_.setVisibleLayer(id, checked);
-    updateViewer();
+    editor_.lock();
+    editor_.setLayers(windowLayers_->layers());
+    editor_.tileViewClear();
+    editor_.unlock();
+    editor_.restartThreads();
 }
 
 void WindowMain::actionClipFilter(const ClipFilter &clipFilter)
@@ -1032,10 +1035,11 @@ void WindowMain::updateProject()
     editor_.unlock();
 
     windowDataSets_->updateEditor(editor_);
+    windowLayers_->setLayers(editor_.layers());
     windowClassification_->setClassification(editor_.classification());
-    windowLayers_->updateEditor(editor_);
-    windowSettingsView_->setSettings(editor_.settings().view());
     windowClipFilter_->setClipFilter(editor_);
+    windowSettingsView_->setSettings(editor_.settings().view());
+
     updateViewer();
     updateWindowTitle(QString::fromStdString(editor_.path()));
 }

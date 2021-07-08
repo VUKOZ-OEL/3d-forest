@@ -22,9 +22,11 @@
 #ifndef WINDOW_LAYERS_HPP
 #define WINDOW_LAYERS_HPP
 
-#include <Editor.hpp>
+#include <EditorLayers.hpp>
 #include <QWidget>
 
+class QCheckBox;
+class QPushButton;
 class QTreeWidget;
 class QTreeWidgetItem;
 
@@ -37,25 +39,38 @@ public:
     /** Window Layers Column. */
     enum Column
     {
-        COLUMN_ID,
         COLUMN_CHECKED,
+        COLUMN_ID,
         COLUMN_LABEL,
         COLUMN_LAST,
     };
 
-    explicit WindowLayers(QWidget *parent = nullptr);
-    ~WindowLayers();
+    WindowLayers(QWidget *parent);
 
-    void updateEditor(const Editor &editor);
+    const EditorLayers &layers() const { return layers_; }
+    void setLayers(const EditorLayers &layers);
 
 public slots:
+    void setEnabled(int state);
+    void setEnabled(bool checked);
+    void invertSelection();
+    void clearSelection();
     void itemChanged(QTreeWidgetItem *item, int column);
 
 signals:
-    void itemChangedCheckState(size_t id, bool checked);
+    void selectionChanged();
 
 protected:
-    QTreeWidget *layers_;
+    EditorLayers layers_;
+    QTreeWidget *tree_;
+    QCheckBox *enabledCheckBox_;
+    QPushButton *invertButton_;
+    QPushButton *deselectButton_;
+
+    void updateTree();
+    void block();
+    void unblock();
+    void addItem(size_t i);
 };
 
 #endif /* WINDOW_LAYERS_HPP */

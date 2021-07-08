@@ -40,6 +40,28 @@ EditorBase::~EditorBase()
 {
 }
 
+void EditorBase::close()
+{
+    path_ = File::currentPath() + "\\untitled.json";
+    projectName_ = "Untitled";
+
+    dataSets_.clear();
+    layers_.clear();
+    clipFilter_.clear();
+    classification_.clear();
+
+    boundary_.clear();
+    boundaryView_.clear();
+
+    for (auto &it : viewports_)
+    {
+        it->clear();
+    }
+    working_.clear();
+
+    unsavedChanges_ = false;
+}
+
 void EditorBase::open(const std::string &path)
 {
     close();
@@ -83,25 +105,17 @@ void EditorBase::open(const std::string &path)
         // Layers
         if (in.contains(EDITOR_BASE_KEY_LAYER))
         {
-            i = 0;
-            n = in[EDITOR_BASE_KEY_LAYER].array().size();
-            layers_.resize(n);
-
-            for (auto const &it : in[EDITOR_BASE_KEY_LAYER].array())
-            {
-                layers_[i].read(it);
-                i++;
-            }
+            layers_.read(in[EDITOR_BASE_KEY_LAYER]);
         }
 
         // Settings
-        if (in.containsObject(EDITOR_BASE_KEY_SETTINGS))
+        if (in.contains(EDITOR_BASE_KEY_SETTINGS))
         {
             settings_.read(in[EDITOR_BASE_KEY_SETTINGS]);
         }
 
         // Classifications
-        if (in.containsObject(EDITOR_BASE_KEY_CLASSIFICATION))
+        if (in.contains(EDITOR_BASE_KEY_CLASSIFICATION))
         {
             classification_.read(in[EDITOR_BASE_KEY_CLASSIFICATION]);
         }
@@ -123,6 +137,39 @@ void EditorBase::open(const std::string &path)
     }
 
     openUpdate();
+}
+
+void EditorBase::write(const std::string &path)
+{
+    Json out;
+    size_t i;
+
+    // Project name
+    out[EDITOR_BASE_KEY_PROJECT_NAME] = projectName_;
+
+    // Data sets
+    i = 0;
+    for (auto const &it : dataSets_)
+    {
+        it->write(out[EDITOR_BASE_KEY_DATA_SET][i]);
+        i++;
+    }
+
+    // Layers
+    layers_.write(out[EDITOR_BASE_KEY_LAYER]);
+
+    // Settings
+    settings_.write(out[EDITOR_BASE_KEY_SETTINGS]);
+
+    // Classifications
+    classification_.write(out[EDITOR_BASE_KEY_CLASSIFICATION]);
+
+    // Clip filter
+    // clipFilter_.write(out[EDITOR_BASE_KEY_CLIP_FILTER]);
+
+    out.write(path);
+
+    unsavedChanges_ = false;
 }
 
 void EditorBase::addFile(const std::string &path, bool center)
@@ -188,66 +235,6 @@ bool EditorBase::hasFileIndex(const std::string &path)
     return File::exists(pathIndex);
 }
 
-void EditorBase::write(const std::string &path)
-{
-    Json out;
-    size_t i;
-
-    // Project name
-    out[EDITOR_BASE_KEY_PROJECT_NAME] = projectName_;
-
-    // Data sets
-    i = 0;
-    for (auto const &it : dataSets_)
-    {
-        it->write(out[EDITOR_BASE_KEY_DATA_SET][i]);
-        i++;
-    }
-
-    // Layers
-    i = 0;
-    for (auto const &it : layers_)
-    {
-        it.write(out[EDITOR_BASE_KEY_LAYER][i]);
-        i++;
-    }
-
-    // Settings
-    settings_.write(out[EDITOR_BASE_KEY_SETTINGS]);
-
-    // Classifications
-    classification_.write(out[EDITOR_BASE_KEY_CLASSIFICATION]);
-
-    // Clip filter
-    // clipFilter_.write(out[EDITOR_BASE_KEY_CLIP_FILTER]);
-
-    out.write(path);
-
-    unsavedChanges_ = false;
-}
-
-void EditorBase::close()
-{
-    path_ = File::currentPath() + "\\untitled.json";
-    projectName_ = "Untitled";
-    dataSets_.clear();
-    layers_.clear();
-    clipFilter_.clear();
-    classification_.clear();
-
-    dataSets_.clear();
-    boundary_.clear();
-    boundaryView_.clear();
-
-    for (auto &it : viewports_)
-    {
-        it->clear();
-    }
-    working_.clear();
-
-    unsavedChanges_ = false;
-}
-
 void EditorBase::addFilter(EditorFilter *filter)
 {
     filters_.push_back(filter);
@@ -265,29 +252,22 @@ void EditorBase::applyFilters(EditorTile *tile)
     }
 }
 
-void EditorBase::setSettingsView(const EditorSettings::View &settings)
-{
-    settings_.setView(settings);
-    resetRendering();
-    // unsavedChanges_ = true;
-}
-
-void EditorBase::setClassification(const EditorClassification &classification)
-{
-    classification_ = classification;
-    // resetRendering();
-    // unsavedChanges_ = true;
-}
-
 void EditorBase::setVisibleDataSet(size_t i, bool visible)
 {
     dataSets_[i]->visible = visible;
     unsavedChanges_ = true;
 }
 
-void EditorBase::setVisibleLayer(size_t i, bool visible)
+void EditorBase::setLayers(const EditorLayers &layers)
 {
-    layers_[i].visible = visible;
+    layers_ = layers;
+    unsavedChanges_ = true;
+}
+
+void EditorBase::setClassification(const EditorClassification &classification)
+{
+    classification_ = classification;
+    // resetRendering();
     unsavedChanges_ = true;
 }
 
@@ -303,6 +283,13 @@ void EditorBase::resetClipFilter()
 {
     clipFilter_.box = boundary_;
     setClipFilter(clipFilter_);
+}
+
+void EditorBase::setSettingsView(const EditorSettings::View &settings)
+{
+    settings_.setView(settings);
+    resetRendering();
+    unsavedChanges_ = true;
 }
 
 void EditorBase::select(std::vector<FileIndex::Selection> &selected)
