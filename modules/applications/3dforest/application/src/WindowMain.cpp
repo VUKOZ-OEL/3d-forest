@@ -983,7 +983,7 @@ bool WindowMain::projectCreateIndex(const QString &path)
     progressDialog.setWindowTitle(tr("Create Index"));
     progressDialog.setWindowModality(Qt::WindowModal);
     progressDialog.setCancelButtonText(tr("&Cancel"));
-    progressDialog.setMinimumDuration(100);
+    progressDialog.setMinimumDuration(0);
 
     QProgressBar *progressBar = new QProgressBar(&progressDialog);
     progressBar->setTextVisible(false);
@@ -998,6 +998,8 @@ bool WindowMain::projectCreateIndex(const QString &path)
     builder.start(pathStd, pathStd, settings);
 
     char buffer[80];
+
+    progressDialog.show();
 
     // Do the operation in a loop.
     while (!builder.end())
