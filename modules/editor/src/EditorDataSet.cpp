@@ -175,7 +175,7 @@ void EditorDataSet::read()
 
     scaling.set(1.0, 1.0, 1.0);
 
-    boundaryFile = index.boundary();
+    boundaryFile = index.boundaryPoints();
     updateBoundary();
 }
 
