@@ -34,7 +34,7 @@
 #include <QProgressBar>
 #include <QProgressDialog>
 #include <QTextEdit>
-#include <Ribbon.h>
+#include <ribbon.h>
 #include <Time.hpp>
 #include <WindowClassification.hpp>
 #include <WindowClipFilter.hpp>
