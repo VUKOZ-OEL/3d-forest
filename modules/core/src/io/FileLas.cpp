@@ -41,6 +41,18 @@
 static const size_t LAS_FILE_FORMAT_BYTE_COUNT[LAS_FILE_FORMAT_COUNT] =
     {20, 28, 26, 34, 57, 63, 30, 36, 38, 59, 67};
 
+static const uint8_t LAS_FILE_FORMAT_GPS_TIME[LAS_FILE_FORMAT_COUNT] =
+    {0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1};
+
+static const uint8_t LAS_FILE_FORMAT_RGB[LAS_FILE_FORMAT_COUNT] =
+    {0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1};
+
+static const uint8_t LAS_FILE_FORMAT_NIR[LAS_FILE_FORMAT_COUNT] =
+    {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1};
+
+static const uint8_t LAS_FILE_FORMAT_WAVE[LAS_FILE_FORMAT_COUNT] =
+    {0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1};
+
 static const char *LAS_FILE_GENERATING_SOFTWARE = "3D Forest 1.0";
 
 size_t FileLas::Header::versionHeaderSize() const
@@ -72,7 +84,7 @@ size_t FileLas::Header::pointDataRecordLengthFormat() const
 size_t FileLas::Header::pointDataRecordLength3dForest() const
 {
     return pointDataRecordLengthFormat() + sizeof(FileLas::Point::user_layer) +
-           (3 * sizeof(FileLas::Point::user_red));
+           (4 * sizeof(FileLas::Point::user_red));
 }
 
 size_t FileLas::Header::pointDataRecordLengthUser() const
@@ -89,18 +101,7 @@ uint64_t FileLas::Header::pointDataSize() const
 
 bool FileLas::Header::hasRgb() const
 {
-    switch (point_data_record_format)
-    {
-        case 2:
-        case 3:
-        case 5:
-        case 7:
-        case 8:
-        case 10:
-            return true;
-        default:
-            return false;
-    }
+    return LAS_FILE_FORMAT_RGB[point_data_record_format];
 }
 
 std::string FileLas::Header::dateCreated() const
@@ -819,9 +820,50 @@ Json &FileLas::Point::write(Json &out) const
     out["coordinates"][2] = z;
 
     out["intensity"] = intensity;
+
     out["return_number"] = return_number;
     out["number_of_returns"] = number_of_returns;
+    out["scan_direction_flag"] = scan_direction_flag;
+    out["edge_of_flight_line"] = edge_of_flight_line;
+    out["classification_flags"] = classification_flags;
+
+    if (format > 5)
+    {
+        out["scanner_channel"] = scanner_channel;
+    }
+
+    out["angle"] = angle;
+    out["source_id"] = source_id;
     out["classification"] = classification;
+    out["user_data"] = user_data;
+
+    if (LAS_FILE_FORMAT_GPS_TIME[format])
+    {
+        out["gps_time"] = gps_time;
+    }
+
+    if (LAS_FILE_FORMAT_RGB[format])
+    {
+        out["rgb"][0] = red;
+        out["rgb"][1] = green;
+        out["rgb"][2] = blue;
+    }
+
+    if (LAS_FILE_FORMAT_NIR[format])
+    {
+        out["nir"] = nir;
+    }
+
+    if (LAS_FILE_FORMAT_WAVE[format])
+    {
+        out["wave_index"] = wave_index;
+        out["wave_size"] = wave_size;
+        out["wave_offset"] = wave_offset;
+        out["wave_return"] = wave_return;
+        out["wave"][0] = wave_x;
+        out["wave"][1] = wave_y;
+        out["wave"][2] = wave_z;
+    }
 
     return out;
 }

@@ -88,7 +88,7 @@ public slots:
     // Windows
     void actionDataSetVisible(size_t id, bool checked);
     void actionClassification();
-    void actionLayerVisible(size_t id, bool checked);
+    void actionLayers();
     void actionClipFilter(const ClipFilter &clipFilter);
     void actionClipFilterReset();
     void actionSettingsView();
@@ -116,8 +116,8 @@ protected:
     WindowClipFilter *windowClipFilter_;
     WindowDataSets *windowDataSets_;
     WindowLayers *windowLayers_;
-    WindowViewports *windowViewports_;
     WindowSettingsView *windowSettingsView_;
+    WindowViewports *windowViewports_;
 
     // Actions
     Ribbon *ribbon_;

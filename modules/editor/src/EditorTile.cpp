@@ -209,6 +209,7 @@ void EditorTile::filter(const EditorBase *editor)
 
     selectClip(editor);
     selectClass(editor);
+    selectLayers(editor);
     setPointColor(editor);
 
     filtered = true;
@@ -321,6 +322,35 @@ void EditorTile::selectClass(const EditorBase *editor)
         unsigned int idx = indices[i];
 
         if (c.isEnabled(attrib[idx].classification))
+        {
+            if (nSelectedNew != i)
+            {
+                indices[nSelectedNew] = indices[i];
+            }
+            nSelectedNew++;
+        }
+    }
+
+    indices.resize(nSelectedNew);
+}
+
+void EditorTile::selectLayers(const EditorBase *editor)
+{
+    const EditorLayers &la = editor->layers();
+
+    if (!la.isEnabled())
+    {
+        return;
+    }
+
+    size_t nSelected = indices.size();
+    size_t nSelectedNew = 0;
+
+    for (size_t i = 0; i < nSelected; i++)
+    {
+        unsigned int idx = indices[i];
+
+        if (la.isIdEnabled(layer[idx]))
         {
             if (nSelectedNew != i)
             {

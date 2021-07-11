@@ -196,9 +196,6 @@ void GLWidget::initializeGL()
 
 void GLWidget::paintGL()
 {
-    // Background
-    glClearColor(0.2F, 0.2F, 0.2F, 0.0F);
-
     // Setup camera
     glViewport(0, 0, camera_.width(), camera_.height());
 
@@ -317,10 +314,17 @@ bool GLWidget::renderScene()
 void GLWidget::renderSceneSettingsEnable()
 {
     const EditorSettings &settings = editor_->settings();
+    const EditorSettings::View &opt = settings.view();
 
-    glPointSize(settings.view().pointSize());
+    // Background
+    const Vector3<float> &rgb = opt.background();
+    glClearColor(rgb[0], rgb[1], rgb[2], 0.0F);
 
-    if (settings.view().isFogEnabled())
+    // Point size
+    glPointSize(opt.pointSize());
+
+    // Fog
+    if (opt.isFogEnabled())
     {
         GLfloat colorFog[4]{0.0F, 0.0F, 0.0F, 0.0F};
         glFogi(GL_FOG_MODE, GL_LINEAR);

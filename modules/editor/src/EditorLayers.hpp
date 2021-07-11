@@ -17,47 +17,51 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file EditorClassification.hpp */
+/** @file EditorLayers.hpp */
 
-#ifndef EDITOR_CLASSIFICATION_HPP
-#define EDITOR_CLASSIFICATION_HPP
+#ifndef EDITOR_LAYERS_HPP
+#define EDITOR_LAYERS_HPP
 
-#include <Vector3.hpp>
-#include <string>
-#include <vector>
+#include <EditorLayer.hpp>
+#include <unordered_set>
 
-/** Editor Classification. */
-class EditorClassification
+/** Editor Layers. */
+class EditorLayers
 {
 public:
-    struct Class
-    {
-        std::string label;
-        bool enabled;
-    };
-
-    EditorClassification();
+    EditorLayers();
 
     void clear();
 
     bool isEnabled() const { return enabled_; }
     void setEnabled(bool b);
 
-    size_t size() const { return classes_.size(); }
+    size_t size() const { return layers_.size(); }
 
-    bool isEnabled(size_t i) const { return classes_[i].enabled; }
-    void setEnabled(size_t i, bool b) { classes_[i].enabled = b; }
-    const std::string &label(size_t i) const { return classes_[i].label; }
+    size_t id(size_t i) const { return layers_[i].id(); }
 
+    bool isIdEnabled(size_t id) const
+    {
+        return idHashTable_.find(id) != idHashTable_.end();
+    }
+    bool isEnabled(size_t i) const { return layers_[i].isEnabled(); }
+    void setEnabled(size_t i, bool b);
     void setEnabledAll(bool b);
     void setInvertAll();
+
+    const std::string &label(size_t i) const { return layers_[i].label(); }
+    void setLabel(size_t i, const std::string &label);
+
+    const Vector3<float> &color(size_t i) const { return layers_[i].color(); }
+    void setColor(size_t i, const Vector3<float> &color);
 
     void read(const Json &in);
     Json &write(Json &out) const;
 
 protected:
-    std::vector<Class> classes_;
+    std::vector<EditorLayer> layers_;
+    std::unordered_set<size_t> idHashTable_;
     bool enabled_;
 };
 
-#endif /* EDITOR_CLASSIFICATION_HPP */
+#endif /* EDITOR_LAYERS_HPP */

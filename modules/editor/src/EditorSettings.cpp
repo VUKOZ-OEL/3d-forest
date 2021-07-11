@@ -24,7 +24,8 @@
 EditorSettings::View::View()
     : pointSize_(1.0F),
       fogEnabled_(false),
-      pointColor_(1.0F, 1.0F, 1.0F)
+      pointColor_(1.0F, 1.0F, 1.0F),
+      background_(0.2F, 0.2F, 0.2F)
 {
     colorSourceString_ = {
         "Color",
@@ -92,4 +93,56 @@ void EditorSettings::View::setColorSourceEnabled(size_t id, bool v)
 void EditorSettings::setView(const View &view)
 {
     view_ = view;
+}
+
+void EditorSettings::View::read(const Json &in)
+{
+    if (in.contains("pointSize"))
+    {
+        pointSize_ = static_cast<float>(in["pointSize"].number());
+    }
+
+    if (in.containsObject("fog") && in["fog"].contains("enabled"))
+    {
+        fogEnabled_ = in["fog"]["enabled"].isTrue();
+    }
+    else
+    {
+        fogEnabled_ = false;
+    }
+
+    if (in.contains("pointColor"))
+    {
+        pointColor_.read(in["pointColor"]);
+    }
+
+    if (in.contains("background"))
+    {
+        background_.read(in["background"]);
+    }
+}
+
+Json &EditorSettings::View::write(Json &out) const
+{
+    out["pointSize"] = pointSize_;
+    out["fog"]["enabled"] = fogEnabled_;
+    pointColor_.write(out["pointColor"]);
+    background_.write(out["background"]);
+
+    return out;
+}
+
+void EditorSettings::read(const Json &in)
+{
+    if (in.containsObject("view"))
+    {
+        view_.read(in["view"]);
+    }
+}
+
+Json &EditorSettings::write(Json &out) const
+{
+    view_.write(out["view"]);
+
+    return out;
 }

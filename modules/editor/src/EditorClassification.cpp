@@ -23,7 +23,7 @@
 
 EditorClassification::EditorClassification() : enabled_(false)
 {
-    initialize();
+    clear();
 }
 
 void EditorClassification::setEnabled(bool b)
@@ -47,7 +47,7 @@ void EditorClassification::setInvertAll()
     }
 }
 
-void EditorClassification::initialize()
+void EditorClassification::clear()
 {
     classes_.resize(256);
 
@@ -96,4 +96,62 @@ void EditorClassification::initialize()
     {
         classes_[i].enabled = true;
     }
+}
+
+void EditorClassification::read(const Json &in)
+{
+    if (in.contains("enabled"))
+    {
+        enabled_ = in["enabled"].isTrue();
+    }
+    else
+    {
+        enabled_ = true;
+    }
+
+    if (in.contains("classes"))
+    {
+        size_t i = 0;
+        size_t n = in["classes"].array().size();
+
+        clear();
+        classes_.resize(n);
+
+        for (auto const &it : in["classes"].array())
+        {
+            if (it.contains("label"))
+            {
+                classes_[i].label = it["label"].string();
+            }
+
+            if (it.contains("enabled"))
+            {
+                classes_[i].enabled = it["enabled"].isTrue();
+            }
+            else
+            {
+                classes_[i].enabled = true;
+            }
+
+            i++;
+        }
+    }
+}
+
+Json &EditorClassification::write(Json &out) const
+{
+    out["enabled"] = enabled_;
+
+    size_t i = 0;
+
+    for (auto const &it : classes_)
+    {
+        Json &obj = out["classes"][i];
+        obj["label"] = it.label;
+        obj["enabled"] = it.enabled;
+
+        i++;
+    }
+
+    return out;
 }

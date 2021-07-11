@@ -636,7 +636,7 @@ void FileIndexBuilder::stateMainBegin()
             boundary_.min(2) + dimMax);
 
     // Insert begin
-    indexMain_.insertBegin(box, settings_.maxSize1, settings_.maxLevel1);
+    indexMain_.insertBegin(box, boundary_, settings_.maxSize1, settings_.maxLevel1);
 
     // Initial file offset
     inputLas_.seekPointData();
@@ -683,7 +683,7 @@ void FileIndexBuilder::stateMainInsert()
 
 void FileIndexBuilder::stateMainEnd()
 {
-    indexMain_.insertEnd(boundary_);
+    indexMain_.insertEnd();
 
     // Write main index
     std::string indexPath = extension(outputPath_);
@@ -834,7 +834,7 @@ void FileIndexBuilder::stateNodeInsert()
 
     // Start new node
     indexNode_.clear();
-    indexNode_.insertBegin(box, settings_.maxSize2, settings_.maxLevel2, true);
+    indexNode_.insertBegin(box, box, settings_.maxSize2, settings_.maxLevel2, true);
 
     for (uint64_t i = 0; i < node->size; i++)
     {

@@ -22,12 +22,34 @@
 #include <EditorLayer.hpp>
 #include <Error.hpp>
 
-EditorLayer::EditorLayer()
+EditorLayer::EditorLayer() : id_(0), enabled_(true)
 {
 }
 
-EditorLayer::~EditorLayer()
+void EditorLayer::set(size_t id,
+                      const std::string &label,
+                      bool enabled,
+                      const Vector3<float> &color)
 {
+    id_ = id;
+    label_ = label;
+    enabled_ = enabled;
+    color_ = color;
+}
+
+void EditorLayer::setEnabled(bool b)
+{
+    enabled_ = b;
+}
+
+void EditorLayer::setLabel(const std::string &label)
+{
+    label_ = label;
+}
+
+void EditorLayer::setColor(const Vector3<float> &color)
+{
+    color_ = color;
 }
 
 void EditorLayer::read(const Json &in)
@@ -38,34 +60,41 @@ void EditorLayer::read(const Json &in)
     }
 
     // ID
-    id = in["id"].uint32();
+    id_ = in["id"].uint32();
+
+    // Enabled
+    if (in.contains("enabled"))
+    {
+        enabled_ = in["enabled"].isTrue();
+    }
+    else
+    {
+        enabled_ = true;
+    }
 
     // Label
     if (in.contains("label"))
     {
-        label = in["label"].string();
+        label_ = in["label"].string();
     }
     else
     {
-        label = "";
+        label_ = "";
     }
 
-    // Visible
-    if (in.contains("visible"))
+    // Color
+    if (in.contains("color"))
     {
-        visible = in["visible"].isTrue();
-    }
-    else
-    {
-        visible = true;
+        color_.read(in["color"]);
     }
 }
 
 Json &EditorLayer::write(Json &out) const
 {
-    out["id"] = id;
-    out["label"] = label;
-    out["visible"] = visible;
+    out["id"] = id_;
+    out["label"] = label_;
+    out["enabled"] = enabled_;
+    color_.write(out["color"]);
 
     return out;
 }

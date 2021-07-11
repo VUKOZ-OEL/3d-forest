@@ -28,7 +28,7 @@ const uint32_t FileIndex::CHUNK_TYPE = 0x38584449U; /**< Signature "IDX8" */
 #define OCTREE_INDEX_CHUNK_MAJOR_VERSION 1
 #define OCTREE_INDEX_CHUNK_MINOR_VERSION 0
 #define OCTREE_INDEX_MAX_LEVEL 17
-#define OCTREE_INDEX_HEADER_SIZE_1_0 56
+#define OCTREE_INDEX_HEADER_SIZE_1_0 104
 
 FileIndex::FileIndex()
 {
@@ -43,6 +43,8 @@ void FileIndex::clear()
     nodes_.clear();
     boundary_.clear();
     boundaryFile_.clear();
+    boundaryPoints_.clear();
+    boundaryPointsFile_.clear();
     root_.reset();
 }
 
@@ -50,6 +52,9 @@ void FileIndex::translate(const Vector3<double> &v)
 {
     boundary_ = boundaryFile_;
     boundary_.translate(v);
+
+    boundaryPoints_ = boundaryPointsFile_;
+    boundaryPoints_.translate(v);
 }
 
 void FileIndex::selectLeaves(std::vector<Selection> &selection,
@@ -386,6 +391,7 @@ Aabb<double> FileIndex::boundary(const Node *node,
 }
 
 void FileIndex::insertBegin(const Aabb<double> &boundary,
+                            const Aabb<double> &boundaryPoints,
                             size_t maxSize,
                             size_t maxLevel,
                             bool insertOnlyToLeaves)
@@ -394,6 +400,8 @@ void FileIndex::insertBegin(const Aabb<double> &boundary,
     clear();
     boundary_ = boundary;
     boundaryFile_ = boundary_;
+    boundaryPoints_ = boundaryPoints;
+    boundaryPointsFile_ = boundaryPoints_;
     root_ = std::make_unique<BuildNode>();
 
     // Build tree settings
@@ -412,14 +420,8 @@ void FileIndex::insertBegin(const Aabb<double> &boundary,
     }
 }
 
-void FileIndex::insertEnd(const Aabb<double> &boundary)
+void FileIndex::insertEnd()
 {
-    if (!boundary.empty())
-    {
-        boundary_ = boundary;
-        boundaryFile_ = boundary_;
-    }
-
     if (root_)
     {
         // Create 1d array tree representation
@@ -676,6 +678,15 @@ void FileIndex::readPayload(FileChunk &file, const FileChunk::Chunk &chunk)
     boundaryFile_.set(wx1, wy1, wz1, wx2, wy2, wz2);
     boundary_ = boundaryFile_;
 
+    wx1 = ltohd(&ptr[8 + (6 * 8)]);
+    wy1 = ltohd(&ptr[8 + (7 * 8)]);
+    wz1 = ltohd(&ptr[8 + (8 * 8)]);
+    wx2 = ltohd(&ptr[8 + (9 * 8)]);
+    wy2 = ltohd(&ptr[8 + (10 * 8)]);
+    wz2 = ltohd(&ptr[8 + (11 * 8)]);
+    boundaryPointsFile_.set(wx1, wy1, wz1, wx2, wy2, wz2);
+    boundaryPoints_ = boundaryPointsFile_;
+
     // Data
     nodes_.resize(n);
     std::memset(nodes_.data(), 0, sizeof(Node) * n);
@@ -769,6 +780,12 @@ void FileIndex::write(FileChunk &file) const
     htold(&ptr[8 + (3 * 8)], boundaryFile_.max(0));
     htold(&ptr[8 + (4 * 8)], boundaryFile_.max(1));
     htold(&ptr[8 + (5 * 8)], boundaryFile_.max(2));
+    htold(&ptr[8 + (6 * 8)], boundaryPointsFile_.min(0));
+    htold(&ptr[8 + (7 * 8)], boundaryPointsFile_.min(1));
+    htold(&ptr[8 + (8 * 8)], boundaryPointsFile_.min(2));
+    htold(&ptr[8 + (9 * 8)], boundaryPointsFile_.max(0));
+    htold(&ptr[8 + (10 * 8)], boundaryPointsFile_.max(1));
+    htold(&ptr[8 + (11 * 8)], boundaryPointsFile_.max(2));
     file.write(buffer.data(), chunk.headerLength);
 
     // Data

@@ -177,8 +177,8 @@ void WindowClassification::addItem(size_t i)
 
         QBrush brush(color, Qt::SolidPattern);
         item->setBackground(COLUMN_ID, brush);
-        brush.setColor(QColor(0, 0, 0));
-        item->setForeground(COLUMN_ID, brush);
+        // brush.setColor(QColor(0, 0, 0));
+        // item->setForeground(COLUMN_ID, brush);
     }
 }
 

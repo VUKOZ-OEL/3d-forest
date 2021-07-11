@@ -118,6 +118,8 @@ static void createGrid(const std::string &path,
             }
             points[idx].source_id = intensity;
 
+            points[idx].user_layer = static_cast<uint32_t>(x);
+
             idx++;
         }
     }
