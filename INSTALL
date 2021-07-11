@@ -19,24 +19,27 @@ CMake options
 -DBUILD_EXAMPLES=ON    - Build all examples.
 
 
-Build Using "Unix Makefiles" on Linux
-=======================================
+Build Using "Unix Makefiles" on Linux in 20 minutes
+===================================================
 1.  Install Qt
     - Download Qt installer from https://www.qt.io/download
-        - "Downloads for open source users" button in "Go open source"
-        - "Install Qt binaries button"
-        - Recommended download was Qt Online Installer for Linux (64-bit)
+        - Clicked "Downloads for open source users" button in "Go open source"
+        - Clicked "Download the Qt Online Installer" button in bottom section
+          of the page "Looking for Qt binaries"
+        - Recommended download was "Qt Online Installer for Linux (64-bit)"
         - "Download" button saved file "qt-unified-linux-x64-4.1.1-online.run"
     - Run the installer
         - Checked "make file executable" in file properties of downloaded file
         - Open "qt-unified-linux-x64-4.1.1-online.run", shows "Qt Setup" window
+        - Entered Qt Account Email and Password, "Next"
+        - Checked "I have read" and "I am an individual person", "Next", "Next"
         - "/home/user/Qt" is directory where Qt will be installed, default
-        - Selected "Custom installation"
+        - Selected "Custom installation", "Next"
         - Additionally checked: Qt - Qt 5.15.2 - Desktop gcc 64-bit
         - Additionally checked: Qt - Qt 5.15.2 - Sources
-        - "Next", "Install", installation took less than 10 minutes
+        - "Next", "Install", the installation took 13 minutes
 
-2.  Installation of other tools: OpenGL and CMake
+2.  Installation of other tools: OpenGL and CMake from a terminal
     $ sudo apt-get update
     $ sudo apt install mesa-common-dev libglu1-mesa-dev
     $ sudo apt install cmake
@@ -59,7 +62,10 @@ Build Using "Unix Makefiles" on Linux
     $ LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/3D-Forest_1.0/bin
       :/home/user/Qt/5.15.2/gcc_64/lib ./3dforest
 
-6.  We can see that we did not store modified PATH and LD_LIBRARY_PATH to user
+6.  We can open example project "project.json" from directory
+    "/home/user/3D-Forest_1.0/examples/3dforest/project1/"
+
+7.  We can see that we did not store modified PATH and LD_LIBRARY_PATH to user
     or system variables.
     One could modify "/home/<user>/.bashrc" or "/home/<user>/.profile" to make
     the change persistent.
