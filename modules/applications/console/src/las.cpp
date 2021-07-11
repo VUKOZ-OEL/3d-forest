@@ -123,7 +123,7 @@ void cmd_print(const char *inputPath, uint64_t nPointsMax)
         FileIndex indexL1;
         indexL1.read(pathIndex);
 
-        std::cout << "boundary: " << indexL1.boundary() << std::endl;
+        std::cout << "boundary: " << indexL1.boundaryPoints() << std::endl;
 
         const FileIndex::Node *node;
         node = indexL1.at(0);

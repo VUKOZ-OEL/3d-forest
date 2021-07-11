@@ -621,7 +621,12 @@ void FileLas::readPoint(Point &pt, const uint8_t *buffer, uint8_t fmt) const
         pt.classification = buffer[15] & 0x1fU;
         pt.classification_flags =
             static_cast<uint8_t>(static_cast<uint32_t>(buffer[15]) >> 5);
-        pt.angle = static_cast<int16_t>(buffer[16]);
+
+        // Read as -15000 to 15000 from -90 to 90
+        int8_t angle = static_cast<int8_t>(buffer[16]);
+        double angled = 166.666667 * static_cast<double>(angle);
+        pt.angle = static_cast<int16_t>(angled);
+
         pt.user_data = buffer[17];
         pt.source_id = ltoh16(&buffer[18]);
         pos = 20;
@@ -659,12 +664,13 @@ void FileLas::readPoint(Point &pt, const uint8_t *buffer, uint8_t fmt) const
         pos += 29;
     }
 
-    if (header.point_data_record_length > (pos + 9))
+    if (header.point_data_record_length > (pos + 11))
     {
         pt.user_layer = ltoh32(&buffer[pos]);
         pt.user_red = ltoh16(&buffer[pos + 4]);
         pt.user_green = ltoh16(&buffer[pos + 6]);
         pt.user_blue = ltoh16(&buffer[pos + 8]);
+        pt.user_intensity = ltoh16(&buffer[pos + 10]);
     }
 }
 
@@ -739,7 +745,19 @@ void FileLas::writePoint(uint8_t *buffer, const Point &pt) const
                           (static_cast<uint32_t>(pt.classification_flags) << 5);
         buffer[15] = static_cast<uint8_t>(data15);
 
-        buffer[16] = static_cast<uint8_t>(pt.angle);
+        // Write as -90 to 90 from -15000 to 15000
+        double angled = static_cast<double>(pt.angle) / 166.666667;
+        if (angled < -90.0)
+        {
+            angled = -90.0;
+        }
+        else if (angled > 90.0)
+        {
+            angled = 90.0;
+        }
+        int8_t angle = static_cast<int8_t>(angled);
+        buffer[16] = static_cast<uint8_t>(angle);
+
         buffer[17] = pt.user_data;
         htol16(&buffer[18], pt.source_id);
 
@@ -778,12 +796,13 @@ void FileLas::writePoint(uint8_t *buffer, const Point &pt) const
         pos += 29;
     }
 
-    if (header.point_data_record_length > (pos + 9))
+    if (header.point_data_record_length > (pos + 11))
     {
         htol32(&buffer[pos], pt.user_layer);
         htol16(&buffer[pos + 4], pt.user_red);
         htol16(&buffer[pos + 6], pt.user_green);
         htol16(&buffer[pos + 8], pt.user_blue);
+        htol16(&buffer[pos + 10], pt.user_intensity);
     }
 }
 

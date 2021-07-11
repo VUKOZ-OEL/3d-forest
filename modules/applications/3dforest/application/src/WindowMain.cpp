@@ -1004,8 +1004,8 @@ bool WindowMain::projectCreateIndex(const QString &path)
     // Do the operation in a loop.
     while (!builder.end())
     {
-        // Update progress. The first step value is 1 in Qt.
-        double value = 1.0 + 0.99 * builder.percent();
+        // Update progress.
+        double value = builder.percent();
         std::snprintf(buffer,
                       sizeof(buffer),
                       "Overall progress: %6.2f %% complete",
