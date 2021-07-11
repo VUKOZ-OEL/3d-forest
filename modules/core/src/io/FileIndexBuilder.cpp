@@ -25,6 +25,9 @@
 #include <cstring>
 #include <iostream>
 
+// Define to keep the same order of LAS points.
+//#define FILE_INDEX_BUILDER_DEBUG_SAME_ORDER
+
 FileIndexBuilder::Settings::Settings()
 {
     verbose = false;
@@ -320,11 +323,15 @@ void FileIndexBuilder::nextState()
             start_ = 0;
             current_ = 0;
             max_ = maximumIdx_;
+#ifndef FILE_INDEX_BUILDER_DEBUG_SAME_ORDER
             step_ = max_ / settings_.maxSize1;
             if (max_ % settings_.maxSize1 > 0)
             {
                 step_++;
             }
+#else
+            step_ = 1;
+#endif /* FILE_INDEX_BUILDER_DEBUG_SAME_ORDER */
             break;
 
         case STATE_COPY_POINTS:
@@ -426,8 +433,13 @@ void FileIndexBuilder::formatPoint(uint8_t *pout, const uint8_t *pin) const
     pout[15] = static_cast<uint8_t>(po);
     pout[16] = static_cast<uint8_t>(pi15 & 0x1fU);
 
-    pout[18] = pin[16];
-    pout[19] = pin[17];
+    // Angle by 0.006 degree from [-90,90] to [-15000, 15000]
+    int8_t angle = static_cast<int8_t>(pin[16]);
+    double angled = 166.666667 * static_cast<double>(angle);
+    int16_t angle16 = static_cast<int16_t>(angled);
+    htol16(&pout[18], static_cast<uint16_t>(angle16));
+
+    // source_id
     pout[20] = pin[18];
     pout[21] = pin[19];
 
@@ -858,7 +870,9 @@ void FileIndexBuilder::stateNodeInsert()
     // Sort
     size_t size = sizeof(uint64_t) * 2;
     size_t n = bufferCodes.size() / 2;
+#ifndef FILE_INDEX_BUILDER_DEBUG_SAME_ORDER
     std::qsort(bufferCodes.data(), n, size, FileIndexBuilderCmp);
+#endif /* FILE_INDEX_BUILDER_DEBUG_SAME_ORDER */
 
     std::vector<uint8_t> bufferNodeOut;
     bufferNodeOut.resize(step);
