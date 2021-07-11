@@ -34,7 +34,6 @@
 #include <QProgressBar>
 #include <QProgressDialog>
 #include <QTextEdit>
-#include <Ribbon.h>
 #include <Time.hpp>
 #include <WindowClassification.hpp>
 #include <WindowClipFilter.hpp>
@@ -46,6 +45,7 @@
 #include <WindowMain.hpp>
 #include <WindowScreenshot.hpp>
 #include <WindowSettingsView.hpp>
+#include <ribbon.h>
 
 const QString WindowMain::APPLICATION_NAME = "3DForest";
 const QString WindowMain::APPLICATION_VERSION = "1.0";

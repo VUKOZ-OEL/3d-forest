@@ -47,7 +47,7 @@ static void createBox(const std::string &path)
                 points[idx].x = x;
                 points[idx].y = y;
                 points[idx].z = z;
-                points[idx].format = 0; // Point format 0
+                points[idx].format = 6;
             }
         }
     }
@@ -87,7 +87,14 @@ static void createGrid(const std::string &path,
         {
             uint16_t intensity = static_cast<uint16_t>(idx * s1_65535);
 
-            points[idx].format = 2; // rgb
+            if (version_minor < 4)
+            {
+                points[idx].format = 2; // rgb
+            }
+            else
+            {
+                points[idx].format = 7; // rgb
+            }
 
             points[idx].x = static_cast<uint32_t>(x);
             points[idx].y = static_cast<uint32_t>(y);
@@ -138,9 +145,9 @@ static void createIndex(const std::string &path)
 int main()
 {
     createBox("box.las");
-    createIndex("box.las");
+    //createIndex("box.las");
 
-    createGrid("grid_v2.las", {4,0,0}, 2);
+    //createGrid("grid_v2.las", {4,0,0}, 2);
     //createIndex("grid_v2.las");
 
     createGrid("grid.las", {13,0,0}, 4);

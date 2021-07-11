@@ -40,7 +40,7 @@ void getarg(uint32_t *v, int &opt, int argc, char *argv[])
     opt++;
     if (opt < argc)
     {
-        *v = std::stoul(argv[opt]);
+        *v = static_cast<uint32_t>(std::stoul(argv[opt]));
     }
 }
 
