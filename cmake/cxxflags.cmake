@@ -20,7 +20,7 @@ set(GCC_COMPILE_FLAGS "\
 -std=c++17 \
 -pedantic -Wall -Wextra \
 -Wshadow -Wredundant-decls \
--Wconversion -Warith-conversion -Wsign-conversion -Wfloat-equal \
+-Wconversion -Wsign-conversion -Wfloat-equal \
 -Wcast-align -Wcast-qual \
 -Wswitch-default -Wswitch-enum \
 -Wlogical-op -Wwrite-strings -Wold-style-cast -Woverloaded-virtual"
