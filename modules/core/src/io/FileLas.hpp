@@ -114,14 +114,14 @@ public:
         uint16_t intensity; // Optional
 
         // Format 0 to 10
-        uint8_t return_number;       // 0 to 7 or 0 to 15
-        uint8_t number_of_returns;   // 0 to 7 or 0 to 15, 2 * 8
-        uint8_t scan_direction_flag; // 0 or 1
-        uint8_t edge_of_flight_line; // 0 or 1
+        uint8_t return_number;        // 0 to 7 or 0 to 15
+        uint8_t number_of_returns;    // 0 to 7 or 0 to 15, 2 * 8
+        uint8_t scan_direction_flag;  // 0 or 1
+        uint8_t edge_of_flight_line;  // 0 or 1
         uint8_t classification_flags; // 3 or 4 bit bitmask
 
         // Format 6 to 10
-        uint8_t scanner_channel;      // 0 to 3
+        uint8_t scanner_channel; // 0 to 3
 
         // Format 0 to 10
         int16_t angle;
