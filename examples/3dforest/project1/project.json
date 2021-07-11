@@ -1,21 +1,1073 @@
 {
+  "classifications": {
+    "classes": [
+      {
+        "enabled": false,
+        "label": "Never classified"
+      },
+      {
+        "enabled": false,
+        "label": "Unassigned"
+      },
+      {
+        "enabled": true,
+        "label": "Ground"
+      },
+      {
+        "enabled": true,
+        "label": "Low Vegetation"
+      },
+      {
+        "enabled": true,
+        "label": "Medium Vegetation"
+      },
+      {
+        "enabled": true,
+        "label": "High Vegetation"
+      },
+      {
+        "enabled": true,
+        "label": "Building"
+      },
+      {
+        "enabled": true,
+        "label": "Low Point (Noise)"
+      },
+      {
+        "enabled": true,
+        "label": "Reserved"
+      },
+      {
+        "enabled": true,
+        "label": "Water"
+      },
+      {
+        "enabled": true,
+        "label": "Rail"
+      },
+      {
+        "enabled": true,
+        "label": "Road Surface"
+      },
+      {
+        "enabled": true,
+        "label": "Reserved"
+      },
+      {
+        "enabled": true,
+        "label": "Wire - Guard"
+      },
+      {
+        "enabled": true,
+        "label": "Wire - Conductor"
+      },
+      {
+        "enabled": true,
+        "label": "Transmission Tower"
+      },
+      {
+        "enabled": false,
+        "label": "Wire - Insulator"
+      },
+      {
+        "enabled": false,
+        "label": "Bridge Deck"
+      },
+      {
+        "enabled": false,
+        "label": "High Noise"
+      },
+      {
+        "enabled": false,
+        "label": "Overhead Structure"
+      },
+      {
+        "enabled": false,
+        "label": "Ignored Ground"
+      },
+      {
+        "enabled": false,
+        "label": "Snow"
+      },
+      {
+        "enabled": false,
+        "label": "Temporal Exclusion"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "Reserved"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      },
+      {
+        "enabled": false,
+        "label": "User"
+      }
+    ],
+    "enabled": false
+  },
   "dataSets": [
     {
-      "dateCreated": "2021-06-18 18:00:00",
+      "dateCreated": "2021-07-11 11:00:00",
       "id": 0,
-      "label": "",
-      "path": "grid.las",
+      "label": "test box",
+      "path": "box.las",
+      "scaling": [1,1,1],
+      "translation": [-1.000000,-1.500000,0],
       "visible": true
     },
     {
-      "dateCreated": "2021-06-18 18:40:00",
+      "dateCreated": "2021-07-11 12:00:00",
       "id": 1,
-      "label": "",
-      "path": "box.las",
-      "visible": false
+      "label": "test grid",
+      "path": "grid.las",
+      "scaling": [1,1,1],
+      "translation": [-7.500000,-7.500000,0],
+      "visible": true
     }
   ],
-  "layers": [
-  ],
-  "projectName": "My First Project"
+  "layers": {
+    "enabled": false,
+    "layers": [
+      {
+        "color": [1,1,1],
+        "enabled": true,
+        "id": 0,
+        "label": "main"
+      }
+    ]
+  },
+  "projectName": "Project 1",
+  "settings": {
+    "view": {
+      "background": [0.200000,0.200000,0.200000],
+      "fog": {
+        "enabled": false
+      },
+      "pointColor": [1,1,1],
+      "pointSize": 1
+    }
+  }
 }
