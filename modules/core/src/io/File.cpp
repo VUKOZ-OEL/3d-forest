@@ -28,7 +28,7 @@
 #include <fcntl.h>
 #include <filesystem>
 #include <iostream>
-#include <limits>
+#include <climits>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -543,7 +543,7 @@ std::string File::replaceExtension(const std::string &path,
 
 std::string File::tmpname(const std::string &path)
 {
-    uint64_t t = getRealTime64();
+    unsigned long long t = getRealTime64();
     char buffer[32];
     (void)snprintf(buffer, sizeof(buffer), "%016llX", t);
     return path + "." + std::string(buffer);

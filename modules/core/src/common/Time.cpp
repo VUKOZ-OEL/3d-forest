@@ -22,6 +22,7 @@
 #include <Time.hpp>
 #include <cstdio>
 #include <sys/time.h>
+#include <time.h>
 
 double getRealTime()
 {

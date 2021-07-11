@@ -126,14 +126,14 @@ std::string FileLas::Header::dateCreated() const
 
     // Find month
     int daysInMonth[] = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    for (size_t i = 0; i < 12; i++)
+    for (int i = 0; i < 12; i++)
     {
         if (day <= daysInMonth[i])
         {
             char buffer[32];
             std::snprintf(buffer,
                           sizeof(buffer),
-                          "%.4d-%.2llu-%.2d 00:00:00",
+                          "%.4d-%.2d-%.2d 00:00:00",
                           file_creation_year,
                           i + 1,
                           day);
@@ -619,7 +619,8 @@ void FileLas::readPoint(Point &pt, const uint8_t *buffer, uint8_t fmt) const
         pt.scan_direction_flag = static_cast<uint8_t>((data14 >> 6) & 1U);
         pt.edge_of_flight_line = static_cast<uint8_t>((data14 >> 7) & 1U);
         pt.classification = buffer[15] & 0x1fU;
-        pt.classification_flags = (buffer[15] >> 5);
+        pt.classification_flags = static_cast<uint8_t>
+                                  (static_cast<uint32_t>(buffer[15]) >> 5);
         pt.angle = static_cast<int16_t>(buffer[16]);
         pt.user_data = buffer[17];
         pt.source_id = ltoh16(&buffer[18]);

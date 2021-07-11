@@ -91,15 +91,16 @@ public:
     ~Json() = default;
 
     Json(bool in);
-    Json(int32_t in);
-    Json(uint32_t in);
+    Json(int in);
+    Json(unsigned int in);
     Json(double in);
-    Json(int64_t in);
-    Json(uint64_t in);
+    Json(long in);
+    Json(unsigned long in);
+    Json(long long in);
+    Json(unsigned long long in);
     Json(const char *in);
     Json(const std::string &in);
     Json(const std::vector<double> &in);
-    Json(unsigned long in);
 
     void clear();
 
@@ -195,12 +196,12 @@ inline Json::Json(bool in)
     createType((in) ? TYPE_TRUE : TYPE_FALSE);
 }
 
-inline Json::Json(int32_t in)
+inline Json::Json(int in)
 {
     createNumber(static_cast<double>(in));
 }
 
-inline Json::Json(uint32_t in)
+inline Json::Json(unsigned int in)
 {
     createNumber(static_cast<double>(in));
 }
@@ -210,16 +211,22 @@ inline Json::Json(double in)
     createNumber(in);
 }
 
-inline Json::Json(int64_t in)
+inline Json::Json(long in)
 {
     createNumber(static_cast<double>(in));
 }
+
 inline Json::Json(unsigned long in)
 {
     createNumber(static_cast<double>(in));
 }
 
-inline Json::Json(uint64_t in)
+inline Json::Json(long long in)
+{
+    createNumber(static_cast<double>(in));
+}
+
+inline Json::Json(unsigned long long in)
 {
     createNumber(static_cast<double>(in));
 }
