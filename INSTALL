@@ -19,7 +19,53 @@ CMake options
 -DBUILD_EXAMPLES=ON    - Build all examples.
 
 
-Build Using "Unix Makefiles" on Windows
+Build Using "Unix Makefiles" on Linux
+=======================================
+1.  Install Qt
+    - Download Qt installer from https://www.qt.io/download
+        - "Downloads for open source users" button in "Go open source"
+        - "Install Qt binaries button"
+        - Recommended download was Qt Online Installer for Linux (64-bit)
+        - "Download" button saved file "qt-unified-linux-x64-4.1.1-online.run"
+    - Run the installer
+        - Checked "make file executable" in file properties of downloaded file
+        - Open "qt-unified-linux-x64-4.1.1-online.run", shows "Qt Setup" window
+        - "/home/user/Qt" is directory where Qt will be installed, default
+        - Selected "Custom installation"
+        - Additionally checked: Qt - Qt 5.15.2 - Desktop gcc 64-bit
+        - Additionally checked: Qt - Qt 5.15.2 - Sources
+        - "Next", "Install", installation took less than 10 minutes
+
+2.  Installation of other tools: OpenGL and CMake
+    $ sudo apt-get update
+    $ sudo apt install mesa-common-dev libglu1-mesa-dev
+    $ sudo apt install cmake
+
+3.  Get 3D Forest source code
+    $ cd /home/user/
+    $ git clone https://github.com/VUKOZ-OEL/3D-Forest_1.0.git
+
+4.  Build 3D Forest
+    $ cd /home/user/3D-Forest_1.0
+    $ mkdir build
+    $ cd /home/user/3D-Forest_1.0/build
+    $ PATH=$PATH:/home/user/Qt/5.15.2/gcc_64/bin
+    $ cmake -G "Unix Makefiles" .. -DCMAKE_INSTALL_PREFIX=..
+    $ make
+    $ make install
+
+5.  Start 3D Forest application
+    $ cd /home/user/3D-Forest_1.0/bin
+    $ LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/3D-Forest_1.0/bin
+      :/home/user/Qt/5.15.2/gcc_64/lib ./3dforest
+
+6.  We can see that we did not store modified PATH and LD_LIBRARY_PATH to user
+    or system variables.
+    One could modify "/home/<user>/.bashrc" or "/home/<user>/.profile" to make
+    the change persistent.
+
+
+Build Using "MinGW Makefiles" on Windows
 =======================================
 
 1.  Installation of msys2 and mingw-w64
