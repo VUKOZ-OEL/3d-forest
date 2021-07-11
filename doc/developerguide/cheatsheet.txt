@@ -102,11 +102,77 @@ Qt5 and OpenGL are required for GUI application.
 
 
 @section Variants
+- @subpage cheatsheet_build_linux_make
 - @subpage cheatsheet_build_windows_make
 
 *******************************************************************************/
 
-/** @page cheatsheet_build_windows_make Build Using "Unix Makefiles" on Windows
+/** @page cheatsheet_build_linux_make Build Using "Unix Makefiles" on Linux
+
+-#  Install Qt
+    - Download Qt installer from https://www.qt.io/download
+        - Clicked "Downloads for open source users" button in "Go open source"
+        - Clicked "Download the Qt Online Installer" button in bottom section
+          of the page "Looking for Qt binaries"
+        - Recommended download was "Qt Online Installer for Linux (64-bit)"
+        - "Download" button saved file "qt-unified-linux-x64-4.1.1-online.run"
+    - Run the installer
+        - Checked "make file executable" in file properties of downloaded file
+        - Open "qt-unified-linux-x64-4.1.1-online.run", shows "Qt Setup" window
+        - Entered Qt Account Email and Password, "Next"
+        - Checked "I have read" and "I am an individual person", "Next", "Next"
+        - "/home/user/Qt" is directory where Qt will be installed, default
+        - Selected "Custom installation", "Next"
+        - Additionally checked: Qt - Qt 5.15.2 - Desktop gcc 64-bit
+        - Additionally checked: Qt - Qt 5.15.2 - Sources
+        - "Next", "Install", the installation took 13 minutes
+
+-#  Installation of other tools: OpenGL and CMake from a terminal
+    @verbatim
+    $ sudo apt-get update
+    $ sudo apt install mesa-common-dev libglu1-mesa-dev
+    $ sudo apt install cmake
+    @endverbatim
+
+-#  Installation of other tools: gcc, g++, make, libc6-dev, etc.
+    @verbatim
+    $ sudo apt-get install build-essential
+    @endverbatim
+
+-#  Get 3D Forest source code
+    @verbatim
+    $ cd /home/user/
+    $ git clone https://github.com/VUKOZ-OEL/3D-Forest_1.0.git
+    @endverbatim
+
+-#  Build 3D Forest
+    @verbatim
+    $ cd /home/user/3D-Forest_1.0
+    $ mkdir build
+    $ cd /home/user/3D-Forest_1.0/build
+    $ PATH=$PATH:/home/user/Qt/5.15.2/gcc_64/bin
+    $ cmake -G "Unix Makefiles" .. -DCMAKE_INSTALL_PREFIX=..
+    $ make
+    $ make install
+    @endverbatim
+
+-#  Start 3D Forest application
+    @verbatim
+    $ cd /home/user/3D-Forest_1.0/bin
+    $ LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/3D-Forest_1.0/bin:/home/user/Qt/5.15.2/gcc_64/lib ./3dforest
+    @endverbatim
+
+-#  We can open example project "project.json" from directory
+    "/home/user/3D-Forest_1.0/examples/3dforest/project1/"
+
+-#  We can see that we did not store modified PATH and LD_LIBRARY_PATH to user
+    or system variables.
+    One could modify "/home/<user>/.bashrc" or "/home/<user>/.profile" to make
+    the change persistent.
+
+*******************************************************************************/
+
+/** @page cheatsheet_build_windows_make Build Using "MinGW Makefiles" on Windows
 
 -#  Installation of msys2 and mingw-w64
     - Open https://www.msys2.org/ and follow Installation instructions
@@ -226,7 +292,7 @@ qDebug() << "error:" << e.what();
 
 /** @page cheatsheet_cmake CMake Build Script
 
-Example build script executed from directory build:
+Example Windows build script executed from directory build:
 @verbatim
 cmake -G "MinGW Makefiles" .. -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug -DBUILD_EXAMPLES=ON
 mingw32-make format
@@ -362,8 +428,10 @@ uic -o ui_window.h window.ui
 
 /** @page cheatsheet_vscode_edit Edit Source Code with Visual Studio Code
 
--#  Download and install Visual Studio Code from https://code.visualstudio.com/
-    Tested with version 1.56.2.
+-#  Download and install Visual Studio Code
+    - For Windows or Linux from https://code.visualstudio.com/
+    - Linux packages can be installed with: sudo apt install ./<downloaded>.deb
+    - Tested with version 1.56.2.
 
 -#  In file explorer, right-click on folder "3D-Forest_1.0" and select
     "Open with Code". This will open 3D Forest workspace.
@@ -380,7 +448,7 @@ uic -o ui_window.h window.ui
 -#  Optionally install extension "Code Spell Checker".
     Extension identifier is "streetsidesoftware.code-spell-checker".
 
--#  Add the following lines to "3D-Forest_1.0/.vscode/settings.json"
+-#  On Windows, add the following lines to "3D-Forest_1.0/.vscode/settings.json"
     (compiler path and IntelliSense settings):
     @verbatim
     {
@@ -424,7 +492,7 @@ uic -o ui_window.h window.ui
 
 -#  Open Visual Studio Code
 
--#  Add the following lines to settings.json:
+-#  On Windows, Add the following lines to settings.json:
     @verbatim
     {
         "cmake.configureOnOpen": false,
@@ -447,7 +515,7 @@ uic -o ui_window.h window.ui
     - Run "CMake: Select Variant".
     - Select "Debug" to include debug information with your build.
 
--#  Create file 'launch.json' (debugger settings, perform CMake build)
+-#  On Windows, create 'launch.json' (debugger settings, perform CMake build)
     in '.vscode' directory:
     @verbatim
     {

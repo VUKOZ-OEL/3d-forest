@@ -44,11 +44,14 @@ Build Using "Unix Makefiles" on Linux in 20 minutes
     $ sudo apt install mesa-common-dev libglu1-mesa-dev
     $ sudo apt install cmake
 
-3.  Get 3D Forest source code
+3.  Installation of other tools: gcc, g++, make, libc6-dev, etc.
+    $ sudo apt-get install build-essential
+
+4.  Get 3D Forest source code
     $ cd /home/user/
     $ git clone https://github.com/VUKOZ-OEL/3D-Forest_1.0.git
 
-4.  Build 3D Forest
+5.  Build 3D Forest
     $ cd /home/user/3D-Forest_1.0
     $ mkdir build
     $ cd /home/user/3D-Forest_1.0/build
@@ -57,22 +60,22 @@ Build Using "Unix Makefiles" on Linux in 20 minutes
     $ make
     $ make install
 
-5.  Start 3D Forest application
+6.  Start 3D Forest application
     $ cd /home/user/3D-Forest_1.0/bin
     $ LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/3D-Forest_1.0/bin
       :/home/user/Qt/5.15.2/gcc_64/lib ./3dforest
 
-6.  We can open example project "project.json" from directory
+7.  We can open example project "project.json" from directory
     "/home/user/3D-Forest_1.0/examples/3dforest/project1/"
 
-7.  We can see that we did not store modified PATH and LD_LIBRARY_PATH to user
+8.  We can see that we did not store modified PATH and LD_LIBRARY_PATH to user
     or system variables.
     One could modify "/home/<user>/.bashrc" or "/home/<user>/.profile" to make
     the change persistent.
 
 
 Build Using "MinGW Makefiles" on Windows
-=======================================
+========================================
 
 1.  Installation of msys2 and mingw-w64
     - Open https://www.msys2.org/ and follow Installation instructions
