@@ -129,9 +129,9 @@ WindowSettingsView::~WindowSettingsView()
 
 void WindowSettingsView::setPointColor()
 {
-    float r = settings_.pointColorRed();
-    float g = settings_.pointColorGreen();
-    float b = settings_.pointColorBlue();
+    float r = settings_.pointColor()[0];
+    float g = settings_.pointColor()[1];
+    float b = settings_.pointColor()[2];
 
     QColor color;
     color.setRgbF(r, g, b);
@@ -181,7 +181,7 @@ void WindowSettingsView::setFogEnabled(int v)
     emit settingsChanged();
 }
 
-void WindowSettingsView::setSettings(const EditorSettings::View &settings)
+void WindowSettingsView::setSettings(const EditorSettingsView &settings)
 {
     (void)blockSignals(true);
 

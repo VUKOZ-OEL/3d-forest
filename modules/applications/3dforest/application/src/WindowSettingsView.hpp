@@ -40,8 +40,8 @@ public:
     explicit WindowSettingsView(QWidget *parent = nullptr);
     ~WindowSettingsView();
 
-    const EditorSettings::View &settings() const { return settings_; }
-    void setSettings(const EditorSettings::View &settings);
+    const EditorSettingsView &settings() const { return settings_; }
+    void setSettings(const EditorSettingsView &settings);
 
 public slots:
     void setPointColor();
@@ -54,7 +54,7 @@ signals:
     void settingsChangedApply();
 
 protected:
-    EditorSettings::View settings_;
+    EditorSettingsView settings_;
 
     QTabWidget *tabWidget_;
     QPushButton *colorSourceButton_;

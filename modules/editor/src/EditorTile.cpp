@@ -365,10 +365,10 @@ void EditorTile::selectLayers(const EditorBase *editor)
 
 void EditorTile::setPointColor(const EditorBase *editor)
 {
-    const EditorSettings::View &opt = editor->settings().view();
-    float r = opt.pointColorRed();
-    float g = opt.pointColorGreen();
-    float b = opt.pointColorBlue();
+    const EditorSettingsView &opt = editor->settings().view();
+    float r = opt.pointColor()[0];
+    float g = opt.pointColor()[1];
+    float b = opt.pointColor()[2];
 
     size_t n = intensity.size();
 
