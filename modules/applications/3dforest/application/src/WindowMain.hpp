@@ -57,6 +57,9 @@ public:
     QSize minimumSizeHint() const override;
     QSize sizeHint() const override;
 
+    void updateProject();
+    void showError(const char *message);
+
 public slots:
     // Project
     void actionProjectNew();
@@ -134,15 +137,11 @@ protected:
     bool projectOpen(const QString &path);
     bool projectClose();
     bool projectSave(const QString &path = "");
-    bool projectOpenFile(const QString &path);
-    bool projectCreateIndex(const QString &path);
 
     // Update
-    void updateProject();
     void updateViewer();
 
     // Utilities
-    void showError(const char *message);
     void updateWindowTitle(const QString &path);
     QToolButton *createMenuButton(const QString &text,
                                   const QString &toolTip,

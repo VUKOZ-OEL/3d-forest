@@ -19,7 +19,6 @@
 
 /** @file WindowMain.cpp */
 
-#include <FileIndexBuilder.hpp>
 #include <PluginFile.hpp>
 #include <PluginTool.hpp>
 #include <QCloseEvent>
@@ -31,8 +30,6 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPluginLoader>
-#include <QProgressBar>
-#include <QProgressDialog>
 #include <QTextEdit>
 #include <Time.hpp>
 #include <WindowClassification.hpp>
@@ -52,7 +49,6 @@ const QString WindowMain::APPLICATION_VERSION = "1.0";
 QTextEdit *WindowMain::log = nullptr;
 
 #define WINDOW_MAIN_FILTER_PRJ "3DForest Project (*.json)"
-#define WINDOW_MAIN_FILTER_FILE_IN "LAS (LASer) File (*.las)"
 #define WINDOW_MAIN_DOCK_MIN 80
 #define WINDOW_MAIN_DOCK_MAX 500
 
@@ -384,23 +380,6 @@ void WindowMain::createWindows()
                          "icons8-variation-40.png",
                          windowClassification_);
 
-    // Create view settings window
-    windowSettingsView_ = new WindowSettingsView(this);
-    connect(windowSettingsView_,
-            SIGNAL(settingsChanged()),
-            this,
-            SLOT(actionSettingsView()));
-    connect(windowSettingsView_,
-            SIGNAL(settingsChangedApply()),
-            this,
-            SLOT(actionSettingsViewColor()));
-
-    (void)createMenuTool(tr("View Settings"),
-                         tr("View\nSettings"),
-                         tr("Change view settings"),
-                         "icons8-tune-40.png",
-                         windowSettingsView_);
-
     // Create clip filter window
     windowClipFilter_ = new WindowClipFilter(this);
     connect(windowClipFilter_,
@@ -417,6 +396,23 @@ void WindowMain::createWindows()
                          tr("Setup and apply clip filter"),
                          "icons8-crop-40.png",
                          windowClipFilter_);
+
+    // Create view settings window
+    windowSettingsView_ = new WindowSettingsView(this);
+    connect(windowSettingsView_,
+            SIGNAL(settingsChanged()),
+            this,
+            SLOT(actionSettingsView()));
+    connect(windowSettingsView_,
+            SIGNAL(settingsChangedApply()),
+            this,
+            SLOT(actionSettingsViewColor()));
+
+    (void)createMenuTool(tr("View Settings"),
+                         tr("View\nSettings"),
+                         tr("Change view settings"),
+                         "icons8-tune-40.png",
+                         windowSettingsView_);
 
     // Log
     log = new QTextEdit(this);
@@ -544,18 +540,7 @@ void WindowMain::actionProjectSaveAs()
 
 void WindowMain::actionProjectImport()
 {
-    QString fileName;
-    fileName = QFileDialog::getOpenFileName(this,
-                                            tr("Open File"),
-                                            "",
-                                            tr(WINDOW_MAIN_FILTER_FILE_IN));
-
-    if (fileName.isEmpty())
-    {
-        return;
-    }
-
-    (void)projectOpenFile(fileName);
+    WindowFileImport::import(this, &editor_);
 }
 
 void WindowMain::actionProjectExportAs()
@@ -937,96 +922,6 @@ bool WindowMain::projectSave(const QString &path)
     }
 
     return true; // Saved
-}
-
-bool WindowMain::projectOpenFile(const QString &path)
-{
-    editor_.cancelThreads();
-
-    // Open file
-    try
-    {
-        WindowFileImport dialog(this);
-        if (dialog.exec() == QDialog::Rejected)
-        {
-            return false;
-        }
-
-        if (projectCreateIndex(path))
-        {
-            editor_.addFile(path.toStdString(), dialog.center());
-        }
-    }
-    catch (std::exception &e)
-    {
-        showError(e.what());
-        return false;
-    }
-
-    updateProject();
-
-    return true; // Opened
-}
-
-bool WindowMain::projectCreateIndex(const QString &path)
-{
-    // If the index already exists, then return success.
-    const std::string pathStd = path.toStdString();
-    if (editor_.hasFileIndex(pathStd))
-    {
-        return true;
-    }
-
-    // Create modal progress dialog with custom progress bar.
-    // Custom progress bar allows to display percentage with fractional part.
-    QProgressDialog progressDialog(this);
-    progressDialog.setWindowTitle(tr("Create Index"));
-    progressDialog.setWindowModality(Qt::WindowModal);
-    progressDialog.setCancelButtonText(tr("&Cancel"));
-    progressDialog.setMinimumDuration(0);
-
-    QProgressBar *progressBar = new QProgressBar(&progressDialog);
-    progressBar->setTextVisible(false);
-    progressBar->setRange(0, 100);
-    progressBar->setValue(progressBar->minimum());
-    progressDialog.setBar(progressBar);
-
-    // Initialize index builder.
-    FileIndexBuilder::Settings settings;
-
-    FileIndexBuilder builder;
-    builder.start(pathStd, pathStd, settings);
-
-    char buffer[80];
-
-    progressDialog.show();
-
-    // Do the operation in a loop.
-    while (!builder.end())
-    {
-        // Update progress.
-        double value = builder.percent();
-        std::snprintf(buffer,
-                      sizeof(buffer),
-                      "Overall progress: %6.2f %% complete",
-                      value);
-
-        progressDialog.setValue(static_cast<int>(value));
-        progressDialog.setLabelText(buffer);
-        QCoreApplication::processEvents();
-
-        if (progressDialog.wasCanceled())
-        {
-            return false;
-        }
-
-        // Process several bytes of the operation.
-        builder.next();
-    }
-
-    progressDialog.setValue(progressDialog.maximum());
-
-    return true;
 }
 
 void WindowMain::updateProject()
