@@ -172,7 +172,8 @@ void EditorBase::write(const std::string &path)
     unsavedChanges_ = false;
 }
 
-void EditorBase::addFile(const std::string &path, bool center)
+void EditorBase::addFile(const std::string &path,
+                         const EditorSettingsImport &settings)
 {
     try
     {
@@ -182,7 +183,7 @@ void EditorBase::addFile(const std::string &path, bool center)
         ds->read(path, path_);
         dataSets_.push_back(ds);
 
-        if (center)
+        if (settings.isCenterEnabled())
         {
             Vector3<double> c1 = boundary_.getCenter();
             Vector3<double> c2 = ds->boundaryFile.getCenter();
@@ -285,7 +286,7 @@ void EditorBase::resetClipFilter()
     setClipFilter(clipFilter_);
 }
 
-void EditorBase::setSettingsView(const EditorSettings::View &settings)
+void EditorBase::setSettingsView(const EditorSettingsView &settings)
 {
     settings_.setView(settings);
     resetRendering();

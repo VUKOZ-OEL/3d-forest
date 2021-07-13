@@ -38,7 +38,8 @@ public:
     ~EditorBase();
 
     void open(const std::string &path);
-    void addFile(const std::string &path, bool center = true);
+    void addFile(const std::string &path,
+                 const EditorSettingsImport &settings = EditorSettingsImport());
     bool hasFileIndex(const std::string &path);
     void write(const std::string &path);
     const std::string &path() const { return path_; }
@@ -72,7 +73,7 @@ public:
 
     // Settings
     const EditorSettings &settings() const { return settings_; }
-    void setSettingsView(const EditorSettings::View &settings);
+    void setSettingsView(const EditorSettingsView &settings);
 
     // Boundary
     const Aabb<double> &boundary() const { return boundary_; }
