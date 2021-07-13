@@ -314,7 +314,7 @@ bool GLWidget::renderScene()
 void GLWidget::renderSceneSettingsEnable()
 {
     const EditorSettings &settings = editor_->settings();
-    const EditorSettings::View &opt = settings.view();
+    const EditorSettingsView &opt = settings.view();
 
     // Background
     const Vector3<float> &rgb = opt.background();
@@ -326,12 +326,21 @@ void GLWidget::renderSceneSettingsEnable()
     // Fog
     if (opt.isFogEnabled())
     {
+        QVector3D eye = camera_.getEye();
+        QVector3D direction = -camera_.getDirection();
+        direction.normalize();
+
+        float min;
+        float max;
+        aabb_.getRange(eye, direction, &min, &max);
+        float d = max - min;
+
         GLfloat colorFog[4]{0.0F, 0.0F, 0.0F, 0.0F};
         glFogi(GL_FOG_MODE, GL_LINEAR);
         glFogfv(GL_FOG_COLOR, colorFog);
         glHint(GL_FOG_HINT, GL_DONT_CARE);
-        glFogf(GL_FOG_START, -aabb_.getRadius() + camera_.getDistance());
-        glFogf(GL_FOG_END, aabb_.getRadius() + camera_.getDistance());
+        glFogf(GL_FOG_START, min);
+        glFogf(GL_FOG_END, max + d * 0.5F);
         glEnable(GL_FOG);
     }
 }

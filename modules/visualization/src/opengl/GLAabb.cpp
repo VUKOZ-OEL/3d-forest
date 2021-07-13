@@ -148,3 +148,39 @@ void GLAabb::setValid()
 
     valid_ = true;
 }
+
+void GLAabb::getRange(const QVector3D &eye,
+                      const QVector3D &direction,
+                      float *min,
+                      float *max)
+{
+    QVector3D v[8];
+    v[0] = QVector3D(min_[0], min_[1], min_[2]);
+    v[1] = QVector3D(max_[0], min_[1], min_[2]);
+    v[2] = QVector3D(max_[0], max_[1], min_[2]);
+    v[3] = QVector3D(min_[0], max_[1], min_[2]);
+    v[4] = QVector3D(min_[0], min_[1], max_[2]);
+    v[5] = QVector3D(max_[0], min_[1], max_[2]);
+    v[6] = QVector3D(max_[0], max_[1], max_[2]);
+    v[7] = QVector3D(min_[0], max_[1], max_[2]);
+
+    float d;
+    float offset = -QVector3D::dotProduct(eye, direction);
+    *min = QVector3D::dotProduct(getCenter(), direction) + offset;
+    *max = *min;
+
+    for (int i = 0; i < 8; i++)
+    {
+        d = QVector3D::dotProduct(v[i], direction) + offset;
+
+        if (d < *min)
+        {
+            *min = d;
+        }
+
+        if (d > *max)
+        {
+            *max = d;
+        }
+    }
+}

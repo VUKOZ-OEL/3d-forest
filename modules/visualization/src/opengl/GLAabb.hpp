@@ -55,6 +55,11 @@ public:
     const QVector3D &getCenter() const { return center_; }
     float getRadius() const { return radius_; }
 
+    void getRange(const QVector3D &eye,
+                  const QVector3D &direction,
+                  float *min,
+                  float *max);
+
 protected:
     QVector3D min_;
     QVector3D max_;
