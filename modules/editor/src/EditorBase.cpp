@@ -21,7 +21,6 @@
 
 #include <EditorBase.hpp>
 #include <FileIndexBuilder.hpp>
-#include <unordered_set>
 
 static const char *EDITOR_BASE_KEY_PROJECT_NAME = "projectName";
 static const char *EDITOR_BASE_KEY_DATA_SET = "dataSets";
@@ -45,13 +44,11 @@ void EditorBase::close()
     path_ = File::currentPath() + "\\untitled.json";
     projectName_ = "Untitled";
 
+    database_.clear();
     dataSets_.clear();
     layers_.clear();
     clipFilter_.clear();
     classification_.clear();
-
-    boundary_.clear();
-    boundaryView_.clear();
 
     for (auto &it : viewports_)
     {
@@ -76,9 +73,6 @@ void EditorBase::open(const std::string &path)
 
     try
     {
-        size_t i;
-        size_t n;
-
         path_ = path;
 
         // Project name
@@ -90,16 +84,8 @@ void EditorBase::open(const std::string &path)
         // Data sets
         if (in.contains(EDITOR_BASE_KEY_DATA_SET))
         {
-            i = 0;
-            n = in[EDITOR_BASE_KEY_DATA_SET].array().size();
-            dataSets_.resize(n);
-
-            for (auto const &it : in[EDITOR_BASE_KEY_DATA_SET].array())
-            {
-                dataSets_[i] = std::make_shared<EditorDataSet>();
-                dataSets_[i]->read(it, path_);
-                i++;
-            }
+            dataSets_.read(in[EDITOR_BASE_KEY_DATA_SET], path_);
+            database_.setDataSets(dataSets_);
         }
 
         // Layers
@@ -142,18 +128,12 @@ void EditorBase::open(const std::string &path)
 void EditorBase::write(const std::string &path)
 {
     Json out;
-    size_t i;
 
     // Project name
     out[EDITOR_BASE_KEY_PROJECT_NAME] = projectName_;
 
     // Data sets
-    i = 0;
-    for (auto const &it : dataSets_)
-    {
-        it->write(out[EDITOR_BASE_KEY_DATA_SET][i]);
-        i++;
-    }
+    dataSets_.write(out[EDITOR_BASE_KEY_DATA_SET]);
 
     // Layers
     layers_.write(out[EDITOR_BASE_KEY_LAYER]);
@@ -178,26 +158,13 @@ void EditorBase::addFile(const std::string &path,
     try
     {
         // Data sets
-        std::shared_ptr<EditorDataSet> ds = std::make_shared<EditorDataSet>();
-        ds->id = freeDataSetId();
-        ds->read(path, path_);
-        dataSets_.push_back(ds);
+        size_t id = dataSets_.unusedId();
+        dataSets_.read(id, path, path_, settings, database_.boundary());
 
-        if (settings.isCenterEnabled())
-        {
-            Vector3<double> c1 = boundary_.getCenter();
-            Vector3<double> c2 = ds->boundaryFile.getCenter();
-            c1[2] = boundary_.min(2);
-            c2[2] = ds->boundaryFile.min(2);
-            ds->translation = c1 - c2;
-            ds->updateBoundary();
-        }
-        else
-        {
-            Vector3<double> s = 1.0 / ds->scalingFile;
-            ds->translation = ds->translationFile * s;
-            ds->updateBoundary();
-        }
+        // Database
+        std::shared_ptr<EditorDatabase> db = std::make_shared<EditorDatabase>();
+        db->setProperties(dataSets_.at(dataSets_.size() - 1));
+        database_.push_back(db);
     }
     catch (std::exception &e)
     {
@@ -208,30 +175,9 @@ void EditorBase::addFile(const std::string &path,
     unsavedChanges_ = true;
 }
 
-size_t EditorBase::freeDataSetId() const
-{
-    // Collect all ids
-    std::unordered_set<size_t> hashTable;
-    for (auto &it : dataSets_)
-    {
-        hashTable.insert(it->id);
-    }
-
-    // Return minimum available id value
-    for (size_t rval = 0; rval < std::numeric_limits<size_t>::max(); rval++)
-    {
-        if (hashTable.find(rval) == hashTable.end())
-        {
-            return rval;
-        }
-    }
-
-    THROW("New data set identifier is not available.");
-}
-
 bool EditorBase::hasFileIndex(const std::string &path)
 {
-    std::string pathFile = EditorDataSet::resolvePath(path, path_);
+    std::string pathFile = File::resolvePath(path, path_);
     std::string pathIndex = FileIndexBuilder::extension(pathFile);
     return File::exists(pathIndex);
 }
@@ -253,9 +199,10 @@ void EditorBase::applyFilters(EditorTile *tile)
     }
 }
 
-void EditorBase::setVisibleDataSet(size_t i, bool visible)
+void EditorBase::setDataSets(const EditorDataSets &dataSets)
 {
-    dataSets_[i]->visible = visible;
+    dataSets_ = dataSets;
+    database_.setDataSets(dataSets);
     unsavedChanges_ = true;
 }
 
@@ -275,14 +222,16 @@ void EditorBase::setClassification(const EditorClassification &classification)
 void EditorBase::setClipFilter(const ClipFilter &clipFilter)
 {
     clipFilter_ = clipFilter;
-    clipFilter_.boxView.setPercent(boundaryView_, boundary_, clipFilter_.box);
+    clipFilter_.boxView.setPercent(database_.boundaryView(),
+                                   database_.boundary(),
+                                   clipFilter_.box);
 
     // unsavedChanges_ = true;
 }
 
 void EditorBase::resetClipFilter()
 {
-    clipFilter_.box = boundary_;
+    clipFilter_.box = database_.boundary();
     setClipFilter(clipFilter_);
 }
 
@@ -295,15 +244,7 @@ void EditorBase::setSettingsView(const EditorSettingsView &settings)
 
 void EditorBase::select(std::vector<FileIndex::Selection> &selected)
 {
-    Aabb<double> box = selection();
-
-    for (auto const &it : dataSets_)
-    {
-        if (it->visible)
-        {
-            it->index.selectNodes(selected, box, it->id);
-        }
-    }
+    database_.select(selected, selection());
 }
 
 Aabb<double> EditorBase::selection() const
@@ -313,7 +254,7 @@ Aabb<double> EditorBase::selection() const
         return clipFilter_.box;
     }
 
-    return boundary_;
+    return boundary();
 }
 
 void EditorBase::setNumberOfViewports(size_t n)
@@ -362,32 +303,15 @@ bool EditorBase::loadView()
 
     return rval;
 }
-// -----------------------------------------------------------------------------
+
 void EditorBase::openUpdate()
 {
-    updateBoundary();
-
     // if (clipFilter_.box.empty())
     // {
     //     clipFilter_.box = boundary_;
     // }
-    clipFilter_.box = boundary_;
-    clipFilter_.boxView = boundaryView_;
-}
-
-void EditorBase::updateBoundary()
-{
-    boundary_.clear();
-    boundaryView_.clear();
-
-    for (auto const &it : dataSets_)
-    {
-        if (it->visible)
-        {
-            boundary_.extend(it->boundary);
-            boundaryView_.extend(it->boundaryView);
-        }
-    }
+    clipFilter_.box = boundary();
+    clipFilter_.boxView = boundaryView();
 }
 
 void EditorBase::resetRendering()

@@ -89,7 +89,7 @@ public slots:
     void actionPluginToolShow();
 
     // Windows
-    void actionDataSetVisible(size_t id, bool checked);
+    void actionDataSets();
     void actionClassification();
     void actionLayers();
     void actionClipFilter(const ClipFilter &clipFilter);
@@ -115,10 +115,10 @@ protected:
     std::vector<PluginTool *> pluginsTool_;
 
     // Windows
-    WindowClassification *windowClassification_;
-    WindowClipFilter *windowClipFilter_;
     WindowDataSets *windowDataSets_;
     WindowLayers *windowLayers_;
+    WindowClassification *windowClassification_;
+    WindowClipFilter *windowClipFilter_;
     WindowSettingsView *windowSettingsView_;
     WindowViewports *windowViewports_;
 

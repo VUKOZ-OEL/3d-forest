@@ -60,6 +60,8 @@ public:
                                        const std::string &newFileName);
     static std::string replaceExtension(const std::string &path,
                                         const std::string &newExtension);
+    static std::string resolvePath(const std::string &path,
+                                   const std::string &basePath);
 
     static void read(uint8_t *buffer,
                      const std::string &path,

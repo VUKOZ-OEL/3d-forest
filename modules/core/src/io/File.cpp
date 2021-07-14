@@ -541,6 +541,26 @@ std::string File::replaceExtension(const std::string &path,
     return fsPath.string();
 }
 
+std::string File::resolvePath(const std::string &path,
+                              const std::string &basePath)
+{
+    std::string rval;
+
+    rval = path;
+    if (!File::isAbsolute(rval))
+    {
+        // Resolve path
+        rval = File::replaceFileName(basePath, rval);
+    }
+
+    if (!File::exists(rval))
+    {
+        THROW("File '" + rval + "' doesn't exist");
+    }
+
+    return rval;
+}
+
 std::string File::tmpname(const std::string &path)
 {
     unsigned long long t = getRealTime64();

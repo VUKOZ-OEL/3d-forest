@@ -23,52 +23,70 @@
 #define EDITOR_DATA_SET_HPP
 
 #include <Aabb.hpp>
-#include <FileIndex.hpp>
+#include <EditorSettingsImport.hpp>
 #include <Json.hpp>
-#include <Vector3.hpp>
-#include <string>
 
 /** Editor Data Set. */
 class EditorDataSet
 {
 public:
-    // Stored
-    Vector3<double> translation;
-    Vector3<double> scaling;
-
-    std::string pathUnresolved;
-    std::string dateCreated; /**< Inconsistent with LAS in shared projects */
-    std::string label;       /**< Inconsistent with LAS in shared projects */
-    size_t id;
-    bool visible;
-
-    // Derived
-    std::string path;
-    std::string fileName;
-
-    // Data
-    FileIndex index;
-    Vector3<double> translationFile;
-    Vector3<double> scalingFile;
-    Aabb<double> boundaryFile;
-    Aabb<double> boundary;
-    Aabb<double> boundaryView;
-
     EditorDataSet();
-    ~EditorDataSet();
 
-    void read(const std::string &filePath, const std::string &projectPath);
+    size_t id() const { return id_; }
+
+    bool isEnabled() const { return enabled_; }
+    void setEnabled(bool b);
+
+    const std::string &label() const { return label_; }
+    void setLabel(const std::string &label);
+
+    const Vector3<float> &color() const { return color_; }
+    void setColor(const Vector3<float> &color);
+
+    const std::string &path() const { return path_; }
+    const std::string &fileName() const { return fileName_; }
+    const std::string &dateCreated() const { return dateCreated_; }
+
+    const Vector3<double> &translation() const { return translation_; }
+    const Vector3<double> &scaling() const { return scaling_; }
+
+    const Aabb<double> &boundary() const { return boundary_; }
+    const Aabb<double> &boundaryView() const { return boundaryView_; }
+
+    // I/O
+    void read(size_t id,
+              const std::string &path,
+              const std::string &projectPath,
+              const EditorSettingsImport &settings,
+              const Aabb<double> &projectBoundary);
     void read(const Json &in, const std::string &projectPath);
     Json &write(Json &out) const;
 
-    void updateBoundary();
-
-    static std::string resolvePath(const std::string &unresolved,
-                                   const std::string &projectPath);
-
 protected:
-    void setPath(const std::string &unresolved, const std::string &projectPath);
+    // Stored
+    size_t id_;
+    std::string label_; /**< Inconsistent with LAS in shared projects */
+    bool enabled_;
+    Vector3<float> color_;
+    std::string pathUnresolved_;
+    std::string dateCreated_; /**< Inconsistent with LAS in shared projects */
+    Vector3<double> translation_;
+    Vector3<double> scaling_;
+
+    // Derived
+    std::string path_;
+    std::string fileName_;
+
+    // Data
+    Vector3<double> translationFile_;
+    Vector3<double> scalingFile_;
+    Aabb<double> boundaryFile_;
+    Aabb<double> boundary_;
+    Aabb<double> boundaryView_;
+
+    void setPath(const std::string &path, const std::string &projectPath);
     void read();
+    void updateBoundary();
 };
 
 #endif /* EDITOR_DATA_SET_HPP */

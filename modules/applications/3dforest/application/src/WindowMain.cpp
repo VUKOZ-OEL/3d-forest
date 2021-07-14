@@ -344,9 +344,9 @@ void WindowMain::createWindows()
     // Create data sets window
     windowDataSets_ = new WindowDataSets(this);
     connect(windowDataSets_,
-            SIGNAL(itemChangedCheckState(size_t, bool)),
+            SIGNAL(selectionChanged()),
             this,
-            SLOT(actionDataSetVisible(size_t, bool)));
+            SLOT(actionDataSets()));
 
     (void)createMenuTool(tr("Data Sets"),
                          tr("Data\nSets"),
@@ -693,12 +693,14 @@ void WindowMain::actionPluginToolShow()
     }
 }
 
-void WindowMain::actionDataSetVisible(size_t id, bool checked)
+void WindowMain::actionDataSets()
 {
     editor_.cancelThreads();
-    editor_.setVisibleDataSet(id, checked);
-    updateViewer();
-    // setWindowModified(true);
+    editor_.lock();
+    editor_.setDataSets(windowDataSets_->dataSets());
+    editor_.tileViewClear();
+    editor_.unlock();
+    editor_.restartThreads();
 }
 
 void WindowMain::actionClassification()
@@ -931,7 +933,7 @@ void WindowMain::updateProject()
     windowViewports_->resetScene(&editor_);
     editor_.unlock();
 
-    windowDataSets_->updateEditor(editor_);
+    windowDataSets_->setDataSets(editor_.dataSets());
     windowLayers_->setLayers(editor_.layers());
     windowClassification_->setClassification(editor_.classification());
     windowClipFilter_->setClipFilter(editor_);

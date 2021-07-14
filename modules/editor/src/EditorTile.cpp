@@ -71,12 +71,12 @@ bool EditorTile::View::isFinished() const
 
 void EditorTile::read(const EditorBase *editor)
 {
-    const EditorDataSet &dataSet = editor->dataSet(dataSetId);
-    const FileIndex::Node *node = dataSet.index.at(tileId);
+    const EditorDatabase &db = editor->database(dataSetId);
+    const FileIndex::Node *node = db.index().at(tileId);
 
     // Read tile buffer from LAS file
     FileLas las;
-    las.open(dataSet.path);
+    las.open(db.properties().path());
     las.readHeader();
 
     size_t pointSize = las.header.point_data_record_length;
@@ -168,14 +168,14 @@ void EditorTile::read(const EditorBase *editor)
 
 void EditorTile::transform(const EditorBase *editor)
 {
-    const EditorDataSet &dataSet = editor->dataSet(dataSetId);
+    const EditorDatabase &db = editor->database(dataSetId);
     size_t n = xyzBase.size() / 3;
     double x;
     double y;
     double z;
-    double tx = dataSet.translation[0];
-    double ty = dataSet.translation[1];
-    double tz = dataSet.translation[2];
+    double tx = db.properties().translation()[0];
+    double ty = db.properties().translation()[1];
+    double tz = db.properties().translation()[2];
 
     for (size_t i = 0; i < n; i++)
     {
@@ -229,22 +229,23 @@ void EditorTile::selectClip(const EditorBase *editor)
         return;
     }
 
-    const EditorDataSet &dataSet = editor->dataSet(dataSetId);
-    const FileIndex::Node *node = dataSet.index.at(tileId);
+    const EditorDatabase &db = editor->database(dataSetId);
+    const FileIndex::Node *node = db.index().at(tileId);
 
     // Read L2 index
     if (index.empty())
     {
-        std::string pathIndex = FileIndexBuilder::extension(dataSet.path);
+        std::string pathIndex;
+        pathIndex = FileIndexBuilder::extension(db.properties().path());
         index.read(pathIndex, node->offset);
-        index.translate(dataSet.translation);
+        index.translate(db.properties().translation());
     }
 
     // Select octants
     std::vector<FileIndex::Selection> selection;
     Aabb<double> clipBox = editor->clipFilter().box;
 
-    index.selectLeaves(selection, clipBox, dataSet.id);
+    index.selectLeaves(selection, clipBox, db.properties().id());
 
     // Compute upper limit of the number of selected points
     size_t nSelected = 0;
