@@ -49,7 +49,7 @@ public:
     bool isSelected() const;
 
     void updateScene(Editor *editor);
-    void resetScene(Editor *editor);
+    void resetScene(Editor *editor, bool resetView);
 
     Camera camera() const;
 

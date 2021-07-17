@@ -69,10 +69,13 @@ void GLWidget::updateScene(Editor *editor)
     editor_ = editor;
 }
 
-void GLWidget::resetScene(Editor *editor)
+void GLWidget::resetScene(Editor *editor, bool resetView)
 {
     aabb_.set(editor->boundaryView());
-    resetCamera();
+    if (resetView)
+    {
+        resetCamera();
+    }
 }
 
 Camera GLWidget::camera() const
