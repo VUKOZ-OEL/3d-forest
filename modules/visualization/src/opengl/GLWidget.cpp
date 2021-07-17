@@ -340,7 +340,7 @@ void GLWidget::renderSceneSettingsEnable()
         glFogfv(GL_FOG_COLOR, colorFog);
         glHint(GL_FOG_HINT, GL_DONT_CARE);
         glFogf(GL_FOG_START, min);
-        glFogf(GL_FOG_END, max + d * 0.5F);
+        glFogf(GL_FOG_END, max + d * 0.1F);
         glEnable(GL_FOG);
     }
 }
