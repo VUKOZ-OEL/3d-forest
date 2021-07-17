@@ -250,7 +250,7 @@ void WindowMain::createMenus()
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewOrthographic()));
     ribbon_->addButton("View", "Projection", button);
 
-    button = createToolButton(tr("Persp."),
+    button = createToolButton(tr("Perspective"),
                               tr("Perspective projection"),
                               "view-perspective");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewPerspective()));
@@ -296,7 +296,7 @@ void WindowMain::createMenus()
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewLayoutGrid()));
     ribbon_->addButton("View", "Layout", button);
 
-    button = createToolButton(tr("3 Right"),
+    button = createToolButton(tr("Grid 3"),
                               tr("Grid layout with 3 rows"),
                               "layout-grid-right");
     connect(button,
