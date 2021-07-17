@@ -326,7 +326,7 @@ std::vector<Vector3<float>> ColorPalette::blueCyanGreenYellowRed(size_t nColors)
     }
 
     // Green to Yellow
-    size_t i3 = i2 + nColors / 5;
+    size_t i3 = i2 + nColors / 7;
     delta = 1.0F / static_cast<float>(i3 - i2);
     for (size_t i = i2; i < i3; i++)
     {

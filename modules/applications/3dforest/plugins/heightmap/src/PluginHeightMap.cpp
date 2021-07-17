@@ -379,9 +379,9 @@ QString PluginHeightMap::toolTip() const
     return tr("Compute height map");
 }
 
-QIcon PluginHeightMap::icon() const
+QPixmap PluginHeightMap::icon() const
 {
-    return QIcon(":/icons8-histogram-40.png");
+    return QPixmap(":/histogram-ios-50.png");
 }
 
 bool PluginHeightMap::isFilterEnabled()

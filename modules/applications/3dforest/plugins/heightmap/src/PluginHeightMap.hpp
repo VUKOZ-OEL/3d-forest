@@ -132,7 +132,7 @@ public:
     virtual QString windowTitle() const;
     virtual QString buttonText() const;
     virtual QString toolTip() const;
-    virtual QIcon icon() const;
+    virtual QPixmap icon() const;
 
     virtual bool isFilterEnabled();
     virtual void filterTile(EditorTile *tile);

@@ -19,16 +19,25 @@
 
 /** @file WindowFileImport.cpp */
 
+#include <FileIndexBuilder.hpp>
 #include <QCheckBox>
+#include <QCoreApplication>
 #include <QDebug>
+#include <QFileDialog>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QProgressBar>
+#include <QProgressDialog>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <WindowFileImport.hpp>
+#include <WindowMain.hpp>
 
+#define WINDOW_FILE_IMPORT_FILTER "LAS (LASer) File (*.las)"
+
+// Import dialog
 WindowFileImport::WindowFileImport(QWidget *parent) : QDialog(parent)
 {
     // Widgets
@@ -86,11 +95,6 @@ WindowFileImport::WindowFileImport(QWidget *parent) : QDialog(parent)
     setMaximumHeight(height());
 }
 
-bool WindowFileImport::center() const
-{
-    return centerCheckBox_->isChecked();
-}
-
 void WindowFileImport::setResultAccept()
 {
     close();
@@ -101,4 +105,143 @@ void WindowFileImport::setResultReject()
 {
     close();
     setResult(QDialog::Rejected);
+}
+
+EditorSettingsImport WindowFileImport::settings() const
+{
+    EditorSettingsImport settings;
+
+    settings.setCenterEnabled(centerCheckBox_->isChecked());
+
+    return settings;
+}
+
+// Import functionality
+static void windowFileImport(WindowMain *window, Editor *editor);
+
+static void windowFileImportFile(const QString &path,
+                                 WindowMain *window,
+                                 Editor *editor);
+
+static bool windowFileImportCreateIndex(const QString &path,
+                                        const EditorSettingsImport &settings,
+                                        WindowMain *window,
+                                        Editor *editor);
+
+void WindowFileImport::import(WindowMain *window, Editor *editor)
+{
+    try
+    {
+        windowFileImport(window, editor);
+    }
+    catch (std::exception &e)
+    {
+        window->showError(e.what());
+        return;
+    }
+}
+
+static void windowFileImport(WindowMain *window, Editor *editor)
+{
+    QString fileName;
+
+    fileName =
+        QFileDialog::getOpenFileName(window,
+                                     QObject::tr("Import File"),
+                                     "",
+                                     QObject::tr(WINDOW_FILE_IMPORT_FILTER));
+
+    if (fileName.isEmpty())
+    {
+        return;
+    }
+
+    windowFileImportFile(fileName, window, editor);
+}
+
+static void windowFileImportFile(const QString &path,
+                                 WindowMain *window,
+                                 Editor *editor)
+{
+    editor->cancelThreads();
+
+    WindowFileImport dialog(window);
+
+    if (dialog.exec() == QDialog::Rejected)
+    {
+        return;
+    }
+
+    EditorSettingsImport settings = dialog.settings();
+
+    if (windowFileImportCreateIndex(path, settings, window, editor))
+    {
+        editor->addFile(path.toStdString(), settings);
+    }
+
+    window->updateProject();
+}
+
+static bool windowFileImportCreateIndex(const QString &path,
+                                        const EditorSettingsImport &settings,
+                                        WindowMain *window,
+                                        Editor *editor)
+{
+    // If the index already exists, then return success.
+    const std::string pathStd = path.toStdString();
+    if (editor->hasFileIndex(pathStd))
+    {
+        return true;
+    }
+
+    // Create modal progress dialog with custom progress bar.
+    // Custom progress bar allows to display percentage with fractional part.
+    QProgressDialog progressDialog(window);
+    progressDialog.setWindowTitle(QObject::tr("Create Index"));
+    progressDialog.setWindowModality(Qt::WindowModal);
+    progressDialog.setCancelButtonText(QObject::tr("&Cancel"));
+    progressDialog.setMinimumDuration(0);
+
+    QProgressBar *progressBar = new QProgressBar(&progressDialog);
+    progressBar->setTextVisible(false);
+    progressBar->setRange(0, 100);
+    progressBar->setValue(progressBar->minimum());
+    progressDialog.setBar(progressBar);
+
+    // Initialize index builder.
+    FileIndexBuilder builder;
+    builder.start(pathStd, pathStd, settings.indexSettings());
+
+    char buffer[80];
+
+    progressDialog.show();
+
+    // Do import operation in progress loop.
+    while (!builder.end())
+    {
+        // Update progress.
+        double value = builder.percent();
+
+        std::snprintf(buffer,
+                      sizeof(buffer),
+                      "Overall progress: %6.2f %% complete",
+                      value);
+
+        progressDialog.setValue(static_cast<int>(value));
+        progressDialog.setLabelText(buffer);
+
+        QCoreApplication::processEvents();
+
+        if (progressDialog.wasCanceled())
+        {
+            return false;
+        }
+
+        // Process several bytes of the operation.
+        builder.next();
+    }
+
+    progressDialog.setValue(progressDialog.maximum());
+
+    return true;
 }

@@ -25,7 +25,8 @@
 #include <ClipFilter.hpp>
 #include <EditorCache.hpp>
 #include <EditorClassification.hpp>
-#include <EditorDataSet.hpp>
+#include <EditorDataSets.hpp>
+#include <EditorDatabases.hpp>
 #include <EditorFilter.hpp>
 #include <EditorLayers.hpp>
 #include <EditorSettings.hpp>
@@ -38,7 +39,8 @@ public:
     ~EditorBase();
 
     void open(const std::string &path);
-    void addFile(const std::string &path, bool center = true);
+    void addFile(const std::string &path,
+                 const EditorSettingsImport &settings = EditorSettingsImport());
     bool hasFileIndex(const std::string &path);
     void write(const std::string &path);
     const std::string &path() const { return path_; }
@@ -50,9 +52,11 @@ public:
     void applyFilters(EditorTile *tile);
 
     // Data sets
-    size_t dataSetSize() const { return dataSets_.size(); }
-    const EditorDataSet &dataSet(size_t i) const { return *dataSets_[i]; }
-    void setVisibleDataSet(size_t i, bool visible);
+    size_t databaseSize() const { return database_.size(); }
+    const EditorDatabase &database(size_t i) const { return database_.at(i); }
+
+    const EditorDataSets &dataSets() const { return dataSets_; }
+    void setDataSets(const EditorDataSets &dataSets);
 
     // Layers
     const EditorLayers &layers() const { return layers_; }
@@ -72,12 +76,16 @@ public:
 
     // Settings
     const EditorSettings &settings() const { return settings_; }
-    void setSettingsView(const EditorSettings::View &settings);
+    void setSettingsView(const EditorSettingsView &settings);
 
     // Boundary
-    const Aabb<double> &boundary() const { return boundary_; }
-    const Aabb<double> &boundaryView() const { return boundaryView_; }
+    const Aabb<double> &boundary() const { return database_.boundary(); }
+    const Aabb<double> &boundaryView() const
+    {
+        return database_.boundaryView();
+    }
 
+    // Tile
     void select(std::vector<FileIndex::Selection> &selected);
     Aabb<double> selection() const;
     EditorTile *tile(size_t dataset, size_t index)
@@ -85,6 +93,7 @@ public:
         return working_.tile(dataset, index);
     }
 
+    // View
     void setNumberOfViewports(size_t n);
     void updateCamera(size_t viewport, const Camera &camera);
     bool loadView();
@@ -104,7 +113,8 @@ protected:
     std::string projectName_;
     bool unsavedChanges_;
 
-    std::vector<std::shared_ptr<EditorDataSet>> dataSets_;
+    EditorDatabases database_;
+    EditorDataSets dataSets_;
     EditorLayers layers_;
     ClipFilter clipFilter_;
     EditorSettings settings_;
@@ -113,13 +123,7 @@ protected:
     // Filter
     std::vector<EditorFilter *> filters_;
 
-    // Database
-    Aabb<double> boundary_;
-    Aabb<double> boundaryView_;
-
-    size_t freeDataSetId() const;
     void openUpdate();
-    void updateBoundary();
     void resetRendering();
 
     // Cache

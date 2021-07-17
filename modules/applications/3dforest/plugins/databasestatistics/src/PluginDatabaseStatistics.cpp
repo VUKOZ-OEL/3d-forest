@@ -206,7 +206,7 @@ QString PluginDatabaseStatistics::toolTip() const
     return tr("Compute database statistics");
 }
 
-QIcon PluginDatabaseStatistics::icon() const
+QPixmap PluginDatabaseStatistics::icon() const
 {
-    return QIcon(":/icons8-graph-40.png");
+    return QPixmap(":/graph-ios-50.png");
 }

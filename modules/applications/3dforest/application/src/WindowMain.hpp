@@ -57,6 +57,19 @@ public:
     QSize minimumSizeHint() const override;
     QSize sizeHint() const override;
 
+    void updateProject();
+    void showError(const char *message);
+
+    static QString iconPath(const QString &iconName);
+
+    static QToolButton *createToolButton(const QString &text,
+                                         const QString &toolTip,
+                                         const QPixmap &pixmap);
+
+    static QToolButton *createToolButton(const QString &text,
+                                         const QString &toolTip,
+                                         const QString &path);
+
 public slots:
     // Project
     void actionProjectNew();
@@ -86,7 +99,7 @@ public slots:
     void actionPluginToolShow();
 
     // Windows
-    void actionDataSetVisible(size_t id, bool checked);
+    void actionDataSets();
     void actionClassification();
     void actionLayers();
     void actionClipFilter(const ClipFilter &clipFilter);
@@ -112,10 +125,10 @@ protected:
     std::vector<PluginTool *> pluginsTool_;
 
     // Windows
-    WindowClassification *windowClassification_;
-    WindowClipFilter *windowClipFilter_;
     WindowDataSets *windowDataSets_;
     WindowLayers *windowLayers_;
+    WindowClassification *windowClassification_;
+    WindowClipFilter *windowClipFilter_;
     WindowSettingsView *windowSettingsView_;
     WindowViewports *windowViewports_;
 
@@ -134,23 +147,14 @@ protected:
     bool projectOpen(const QString &path);
     bool projectClose();
     bool projectSave(const QString &path = "");
-    bool projectOpenFile(const QString &path);
-    bool projectCreateIndex(const QString &path);
 
     // Update
-    void updateProject();
     void updateViewer();
 
     // Utilities
-    void showError(const char *message);
     void updateWindowTitle(const QString &path);
-    QToolButton *createMenuButton(const QString &text,
-                                  const QString &toolTip,
-                                  const QIcon &icon);
-    QToolButton *createMenuButton(const QString &text,
-                                  const QString &toolTip,
-                                  const QString &icon);
-    QToolButton *createMenuButton(const QString &title,
+
+    QToolButton *createToolButton(const QString &title,
                                   const QString &text,
                                   const QString &toolTip,
                                   const QString &icon,

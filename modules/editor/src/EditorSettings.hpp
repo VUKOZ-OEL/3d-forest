@@ -22,68 +22,21 @@
 #ifndef EDITOR_SETTINGS_HPP
 #define EDITOR_SETTINGS_HPP
 
-#include <Vector3.hpp>
-#include <string>
-#include <vector>
+#include <EditorSettingsImport.hpp>
+#include <EditorSettingsView.hpp>
 
 /** Editor Settings. */
 class EditorSettings
 {
 public:
-    /** Editor Settings View. */
-    class View
-    {
-    public:
-        enum ColorSource
-        {
-            COLOR_SOURCE_COLOR,
-            COLOR_SOURCE_INTENSITY,
-            COLOR_SOURCE_RETURN_NUMBER,
-            COLOR_SOURCE_NUMBER_OF_RETURNS,
-            COLOR_SOURCE_CLASSIFICATION
-        };
-
-        View();
-
-        float pointSize() const;
-        void setPointSize(float size);
-
-        bool isFogEnabled() const;
-        void setFogEnabled(bool b);
-
-        void setPointColor(float r, float g, float b);
-        const Vector3<float> &pointColor() const { return pointColor_; }
-        float pointColorRed() const { return pointColor_[0]; }
-        float pointColorGreen() const { return pointColor_[1]; }
-        float pointColorBlue() const { return pointColor_[2]; }
-
-        const Vector3<float> &background() const { return background_; }
-
-        size_t colorSourceSize() const;
-        const char *colorSourceString(size_t id) const;
-        bool isColorSourceEnabled(size_t id) const;
-        void setColorSourceEnabled(size_t id, bool v);
-
-        void read(const Json &in);
-        Json &write(Json &out) const;
-
-    protected:
-        float pointSize_;
-        bool fogEnabled_;
-        Vector3<float> pointColor_;
-        Vector3<float> background_;
-        std::vector<std::string> colorSourceString_;
-        std::vector<bool> colorSourceEnabled_;
-    };
-
-    const View &view() const { return view_; }
-    void setView(const View &view);
+    const EditorSettingsView &view() const { return view_; }
+    void setView(const EditorSettingsView &view);
 
     void read(const Json &in);
     Json &write(Json &out) const;
 
 protected:
-    View view_;
+    EditorSettingsView view_;
 };
 
 #endif /* EDITOR_SETTINGS_HPP */

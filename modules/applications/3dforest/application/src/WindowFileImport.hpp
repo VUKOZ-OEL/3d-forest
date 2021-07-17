@@ -22,8 +22,11 @@
 #ifndef WINDOW_FILE_IMPORT_HPP
 #define WINDOW_FILE_IMPORT_HPP
 
+#include <EditorSettingsImport.hpp>
 #include <QDialog>
 
+class Editor;
+class WindowMain;
 class QCheckBox;
 class QPushButton;
 
@@ -35,7 +38,9 @@ class WindowFileImport : public QDialog
 public:
     WindowFileImport(QWidget *parent = nullptr);
 
-    bool center() const;
+    EditorSettingsImport settings() const;
+
+    static void import(WindowMain *window, Editor *editor);
 
 public slots:
     void setResultAccept();

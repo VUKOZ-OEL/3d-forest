@@ -22,25 +22,61 @@
 #include <EditorDataSet.hpp>
 #include <Error.hpp>
 #include <File.hpp>
+#include <FileIndex.hpp>
 #include <FileIndexBuilder.hpp>
 #include <FileLas.hpp>
 #include <iostream>
 
-EditorDataSet::EditorDataSet() : id(0), visible(true)
+EditorDataSet::EditorDataSet() : id_(0), enabled_(true)
 {
 }
 
-EditorDataSet::~EditorDataSet()
+void EditorDataSet::setEnabled(bool b)
 {
+    enabled_ = b;
 }
 
-void EditorDataSet::read(const std::string &filePath,
-                         const std::string &projectPath)
+void EditorDataSet::setLabel(const std::string &label)
 {
-    pathUnresolved = filePath;
-    setPath(pathUnresolved, projectPath);
+    label_ = label;
+}
+
+void EditorDataSet::setColor(const Vector3<float> &color)
+{
+    color_ = color;
+}
+
+void EditorDataSet::read(size_t id,
+                         const std::string &path,
+                         const std::string &projectPath,
+                         const EditorSettingsImport &settings,
+                         const Aabb<double> &projectBoundary)
+{
+    pathUnresolved_ = path;
+    setPath(pathUnresolved_, projectPath);
+
+    id_ = id;
+    label_ = fileName_;
+    enabled_ = true;
+    color_.set(1.0F, 1.0F, 1.0F);
 
     read();
+
+    if (settings.isCenterEnabled())
+    {
+        Vector3<double> c1 = projectBoundary.getCenter();
+        Vector3<double> c2 = boundaryFile_.getCenter();
+        c1[2] = projectBoundary.min(2);
+        c2[2] = boundaryFile_.min(2);
+        translation_ = c1 - c2;
+        updateBoundary();
+    }
+    else
+    {
+        Vector3<double> s = 1.0 / scalingFile_;
+        translation_ = translationFile_ * s;
+        updateBoundary();
+    }
 }
 
 void EditorDataSet::read(const Json &in, const std::string &projectPath)
@@ -56,36 +92,46 @@ void EditorDataSet::read(const Json &in, const std::string &projectPath)
         THROW("Can't find string 'path' in JSON object");
     }
 
-    pathUnresolved = in["path"].string();
-    setPath(pathUnresolved, projectPath);
+    pathUnresolved_ = in["path"].string();
+    setPath(pathUnresolved_, projectPath);
 
     // Date Created
     if (in.contains("dateCreated"))
     {
-        dateCreated = in["dateCreated"].string();
+        dateCreated_ = in["dateCreated"].string();
     }
 
     // ID
-    id = in["id"].uint32();
+    id_ = in["id"].uint32();
 
     // Label
     if (in.contains("label"))
     {
-        label = in["label"].string();
+        label_ = in["label"].string();
     }
     else
     {
-        label = "";
+        label_ = fileName_;
     }
 
-    // Visible
-    if (in.contains("visible"))
+    // Enabled
+    if (in.contains("enabled"))
     {
-        visible = in["visible"].isTrue();
+        enabled_ = in["enabled"].isTrue();
     }
     else
     {
-        visible = true;
+        enabled_ = true;
+    }
+
+    // Color
+    if (in.contains("color"))
+    {
+        color_.read(in["color"]);
+    }
+    else
+    {
+        color_.set(1.0F, 1.0F, 1.0F);
     }
 
     // Read
@@ -94,12 +140,12 @@ void EditorDataSet::read(const Json &in, const std::string &projectPath)
     // Transformation
     if (in.contains("translation"))
     {
-        translation.read(in["translation"]);
+        translation_.read(in["translation"]);
     }
 
     if (in.contains("scaling"))
     {
-        scaling.read(in["scaling"]);
+        scaling_.read(in["scaling"]);
     }
 
     updateBoundary();
@@ -107,82 +153,66 @@ void EditorDataSet::read(const Json &in, const std::string &projectPath)
 
 Json &EditorDataSet::write(Json &out) const
 {
-    out["path"] = pathUnresolved;
-    out["dateCreated"] = dateCreated;
-    out["id"] = id;
-    out["label"] = label;
-    out["visible"] = visible;
+    out["id"] = id_;
+    out["label"] = label_;
+    out["enabled"] = enabled_;
+    color_.write(out["color"]);
 
-    translation.write(out["translation"]);
-    scaling.write(out["scaling"]);
+    out["path"] = pathUnresolved_;
+    out["dateCreated"] = dateCreated_;
+
+    translation_.write(out["translation"]);
+    scaling_.write(out["scaling"]);
 
     return out;
 }
 
-void EditorDataSet::setPath(const std::string &unresolved,
+void EditorDataSet::setPath(const std::string &path,
                             const std::string &projectPath)
 {
     // Data set absolute path
-    path = resolvePath(unresolved, projectPath);
+    path_ = File::resolvePath(path, projectPath);
 
     // Data set file name
-    fileName = File::fileName(path);
-}
-
-std::string EditorDataSet::resolvePath(const std::string &unresolved,
-                                       const std::string &projectPath)
-{
-    std::string rval;
-
-    rval = unresolved;
-    if (!File::isAbsolute(rval))
-    {
-        // Resolve path
-        rval = File::replaceFileName(projectPath, rval);
-    }
-
-    if (!File::exists(rval))
-    {
-        THROW("File '" + rval + "' doesn't exist");
-    }
-
-    return rval;
+    fileName_ = File::fileName(path_);
 }
 
 void EditorDataSet::read()
 {
-    const std::string pathIndex = FileIndexBuilder::extension(path);
-    index.read(pathIndex);
-
     FileLas las;
-    las.open(path);
+    las.open(path_);
     las.readHeader();
 
-    if (dateCreated.empty())
+    if (dateCreated_.empty())
     {
-        dateCreated = las.header.dateCreated();
+        dateCreated_ = las.header.dateCreated();
     }
 
-    translationFile.set(las.header.x_offset,
-                        las.header.y_offset,
-                        las.header.z_offset);
+    translationFile_.set(las.header.x_offset,
+                         las.header.y_offset,
+                         las.header.z_offset);
 
-    translation = translationFile;
+    translation_ = translationFile_;
 
-    scalingFile.set(las.header.x_scale_factor,
-                    las.header.y_scale_factor,
-                    las.header.z_scale_factor);
+    scalingFile_.set(las.header.x_scale_factor,
+                     las.header.y_scale_factor,
+                     las.header.z_scale_factor);
 
-    scaling.set(1.0, 1.0, 1.0);
+    scaling_.set(1.0, 1.0, 1.0);
 
-    boundaryFile = index.boundaryPoints();
+    // Boundary
+    const std::string pathIndex = FileIndexBuilder::extension(path_);
+    FileIndex index;
+    index.read(pathIndex);
+
+    boundaryFile_ = index.boundaryPoints();
     updateBoundary();
 }
 
 void EditorDataSet::updateBoundary()
 {
-    boundary = boundaryFile;
-    boundary.translate(translation);
+    boundary_ = boundaryFile_;
+    boundary_.translate(translation_);
 
-    boundaryView = boundary;
+    boundaryView_ = boundary_;
 }

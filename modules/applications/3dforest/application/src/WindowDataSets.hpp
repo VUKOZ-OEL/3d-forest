@@ -22,9 +22,10 @@
 #ifndef WINDOW_DATA_SETS_HPP
 #define WINDOW_DATA_SETS_HPP
 
-#include <Editor.hpp>
+#include <EditorDataSets.hpp>
 #include <QWidget>
 
+class QPushButton;
 class QTreeWidget;
 class QTreeWidgetItem;
 
@@ -37,26 +38,36 @@ public:
     /** Window Data Sets Column. */
     enum Column
     {
-        COLUMN_ID,
         COLUMN_CHECKED,
+        COLUMN_ID,
         COLUMN_FILE_NAME,
         COLUMN_DATE_CREATED,
         COLUMN_LAST,
     };
 
-    explicit WindowDataSets(QWidget *parent = nullptr);
-    ~WindowDataSets();
+    WindowDataSets(QWidget *parent);
 
-    void updateEditor(const Editor &editor);
+    const EditorDataSets &dataSets() const { return dataSets_; }
+    void setDataSets(const EditorDataSets &dataSets);
 
 public slots:
+    void invertSelection();
+    void clearSelection();
     void itemChanged(QTreeWidgetItem *item, int column);
 
 signals:
-    void itemChangedCheckState(size_t id, bool checked);
+    void selectionChanged();
 
 protected:
-    QTreeWidget *dataSets_;
+    EditorDataSets dataSets_;
+    QTreeWidget *tree_;
+    QPushButton *invertButton_;
+    QPushButton *deselectButton_;
+
+    void updateTree();
+    void block();
+    void unblock();
+    void addItem(size_t i);
 };
 
 #endif /* WINDOW_DATA_SETS_HPP */

@@ -113,12 +113,12 @@ void EditorCache::updateCamera(const Camera &camera)
 
     std::multimap<double, Key> queue;
 
-    for (size_t i = 0; i < editor_->dataSetSize(); i++)
+    for (size_t i = 0; i < editor_->databaseSize(); i++)
     {
-        const EditorDataSet &ds = editor_->dataSet(i);
-        if (ds.visible)
+        const EditorDatabase &db = editor_->database(i);
+        if (db.properties().isEnabled())
         {
-            queue.insert({0, {ds.id, 0}});
+            queue.insert({0, {db.properties().id(), 0}});
         }
     }
 
@@ -128,15 +128,15 @@ void EditorCache::updateCamera(const Camera &camera)
         Key nk = it->second;
         queue.erase(it);
 
-        const EditorDataSet &ds = editor_->dataSet(nk.dataSetId);
+        const EditorDatabase &db = editor_->database(nk.dataSetId);
         const FileIndex::Node *node;
-        const FileIndex &index = ds.index;
+        const FileIndex &index = db.index();
         node = index.at(nk.tileId);
 
         if (editor_->clipFilter().enabled)
         {
             Aabb<double> box = index.boundary(node, index.boundary());
-            box.translate(ds.translation);
+            box.translate(db.properties().translation());
             if (!editor_->clipFilter().box.intersects(box))
             {
                 continue;
