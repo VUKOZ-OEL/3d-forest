@@ -34,7 +34,8 @@ WindowDock::WindowDock(QMainWindow *parent)
 {
     // Title bar
     QWidget *bar = new QWidget;
-    bar->setMinimumSize(20, 20);
+    bar->setBackgroundRole(QPalette::Dark);
+    bar->setAutoFillBackground(true);
 
     // Icons
     QStyle *style = bar->style();
@@ -97,7 +98,7 @@ void WindowDock::setWindowTitle(const QString &text)
 
 void WindowDock::setWindowIcon(const QIcon &icon)
 {
-    windowIcon_->setPixmap(icon.pixmap(20, 20));
+    windowIcon_->setPixmap(icon.pixmap(16, 16));
 }
 
 void WindowDock::paintEvent(QPaintEvent *e)

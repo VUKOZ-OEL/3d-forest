@@ -32,6 +32,7 @@
 #include <QVBoxLayout>
 #include <WindowDataSets.hpp>
 #include <WindowMain.hpp>
+#include <QToolBar>
 
 WindowDataSets::WindowDataSets(QWidget *parent) : QWidget(parent)
 {
@@ -63,13 +64,14 @@ WindowDataSets::WindowDataSets(QWidget *parent) : QWidget(parent)
     connect(editButton_, SIGNAL(clicked()), this, SLOT(toolEdit()));
     connect(deleteButton_, SIGNAL(clicked()), this, SLOT(toolDelete()));
 
-    // Layout
-    QHBoxLayout *menuLayout = new QHBoxLayout;
-    menuLayout->addWidget(addButton_);
-    menuLayout->addWidget(editButton_);
-    menuLayout->addWidget(deleteButton_);
-    menuLayout->addStretch();
+    // Tool bar
+    QToolBar *toolBar = new QToolBar;
+    toolBar->addWidget(addButton_);
+    toolBar->addWidget(editButton_);
+    toolBar->addWidget(deleteButton_);
+    toolBar->setIconSize(QSize(25, 25));
 
+    // Layout
     QHBoxLayout *controlLayout = new QHBoxLayout;
     controlLayout->addStretch();
     controlLayout->addWidget(invertButton_);
@@ -77,7 +79,7 @@ WindowDataSets::WindowDataSets(QWidget *parent) : QWidget(parent)
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setContentsMargins(1, 1, 1, 1);
-    mainLayout->addLayout(menuLayout);
+    mainLayout->addWidget(toolBar);
     mainLayout->addWidget(tree_);
     mainLayout->addLayout(controlLayout);
     setLayout(mainLayout);

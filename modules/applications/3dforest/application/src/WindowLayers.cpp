@@ -32,6 +32,7 @@
 #include <QVBoxLayout>
 #include <WindowLayers.hpp>
 #include <WindowMain.hpp>
+#include <QToolBar>
 
 WindowLayers::WindowLayers(QWidget *parent) : QWidget(parent)
 {
@@ -69,13 +70,18 @@ WindowLayers::WindowLayers(QWidget *parent) : QWidget(parent)
     connect(editButton_, SIGNAL(clicked()), this, SLOT(toolEdit()));
     connect(deleteButton_, SIGNAL(clicked()), this, SLOT(toolDelete()));
 
-    // Layout
-    QHBoxLayout *menuLayout = new QHBoxLayout;
-    menuLayout->addWidget(addButton_);
-    menuLayout->addWidget(editButton_);
-    menuLayout->addWidget(deleteButton_);
-    menuLayout->addStretch();
+    addButton_->setEnabled(false);
+    editButton_->setEnabled(false);
+    deleteButton_->setEnabled(false);
 
+    // Tool bar
+    QToolBar *toolBar = new QToolBar;
+    toolBar->addWidget(addButton_);
+    toolBar->addWidget(editButton_);
+    toolBar->addWidget(deleteButton_);
+    toolBar->setIconSize(QSize(25, 25));
+
+    // Layout
     QHBoxLayout *controlLayout = new QHBoxLayout;
     controlLayout->addWidget(enabledCheckBox_);
     controlLayout->addStretch();
@@ -84,7 +90,7 @@ WindowLayers::WindowLayers(QWidget *parent) : QWidget(parent)
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setContentsMargins(1, 1, 1, 1);
-    mainLayout->addLayout(menuLayout);
+    mainLayout->addWidget(toolBar);
     mainLayout->addWidget(tree_);
     mainLayout->addLayout(controlLayout);
     setLayout(mainLayout);
