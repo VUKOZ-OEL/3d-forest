@@ -60,6 +60,16 @@ public:
     void updateProject();
     void showError(const char *message);
 
+    static QString iconPath(const QString &iconName);
+
+    static QToolButton *createToolButton(const QString &text,
+                                         const QString &toolTip,
+                                         const QPixmap &pixmap);
+
+    static QToolButton *createToolButton(const QString &text,
+                                         const QString &toolTip,
+                                         const QString &path);
+
 public slots:
     // Project
     void actionProjectNew();
@@ -143,13 +153,8 @@ protected:
 
     // Utilities
     void updateWindowTitle(const QString &path);
-    QToolButton *createMenuButton(const QString &text,
-                                  const QString &toolTip,
-                                  const QIcon &icon);
-    QToolButton *createMenuButton(const QString &text,
-                                  const QString &toolTip,
-                                  const QString &icon);
-    QToolButton *createMenuButton(const QString &title,
+
+    QToolButton *createToolButton(const QString &title,
                                   const QString &text,
                                   const QString &toolTip,
                                   const QString &icon,

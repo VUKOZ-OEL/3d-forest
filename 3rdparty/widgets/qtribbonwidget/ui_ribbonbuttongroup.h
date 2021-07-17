@@ -27,7 +27,7 @@ public:
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout;
     //QFrame *horizontalLine;
-    QLabel *label;
+    //QLabel *label;
     QFrame *verticalLine;
 
     void setupUi(QWidget *RibbonButtonGroup)
@@ -63,15 +63,15 @@ public:
 
         //verticalLayout->addSpacing(1);
 
-        label = new QLabel(RibbonButtonGroup);
-        label->setObjectName(QString::fromUtf8("label"));
-        label->setAlignment(Qt::AlignCenter);
-        label->setStyleSheet(QString::fromUtf8("color: #808080;"));
-        label->setContentsMargins(0, 0, 0, 0);
-        // QFont font = label->font();
-        // font.setPointSize(font.pointSize() - 1);
-        // label->setFont(font);
-        verticalLayout->addWidget(label);
+        // label = new QLabel(RibbonButtonGroup);
+        // label->setObjectName(QString::fromUtf8("label"));
+        // label->setAlignment(Qt::AlignCenter);
+        // label->setStyleSheet(QString::fromUtf8("color: #808080;"));
+        // label->setContentsMargins(0, 0, 0, 0);
+        // // QFont font = label->font();
+        // // font.setPointSize(font.pointSize() - 1);
+        // // label->setFont(font);
+        // verticalLayout->addWidget(label);
 
         gridLayout->addLayout(verticalLayout, 0, 0, 1, 1);
 
@@ -92,7 +92,7 @@ public:
     void retranslateUi(QWidget *RibbonButtonGroup)
     {
         RibbonButtonGroup->setWindowTitle(QCoreApplication::translate("RibbonButtonGroup", "Form", nullptr));
-        label->setText(QCoreApplication::translate("RibbonButtonGroup", "ToolBar", nullptr));
+        //label->setText(QCoreApplication::translate("RibbonButtonGroup", "ToolBar", nullptr));
     } // retranslateUi
 
 };

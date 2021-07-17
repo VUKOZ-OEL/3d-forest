@@ -36,7 +36,7 @@ RibbonButtonGroup::~RibbonButtonGroup()
 void RibbonButtonGroup::setTitle(const QString &title)
 {
   m_title = title;
-  ui->label->setText(m_title);
+  //ui->label->setText(m_title);
 }
 
 QString RibbonButtonGroup::title() const
@@ -52,9 +52,8 @@ int RibbonButtonGroup::buttonCount() const
 void RibbonButtonGroup::addButton(QToolButton *button)
 {
   button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-  button->setMinimumSize(20, 74);
-  button->setMaximumSize(60, 74);
-  button->setContentsMargins(0, 0, 0, 0);
+  button->setMinimumSize(40, 50);
+  button->setMaximumSize(70, 70);
   button->setAutoRaise(true);
   button->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
