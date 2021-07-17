@@ -32,7 +32,7 @@
 #include <QPluginLoader>
 #include <QTextEdit>
 #include <Time.hpp>
-#include <WindowClassification.hpp>
+#include <WindowClassifications.hpp>
 #include <WindowClipFilter.hpp>
 #include <WindowDataSets.hpp>
 #include <WindowDock.hpp>
@@ -367,18 +367,18 @@ void WindowMain::createWindows()
                          "animated",
                          windowLayers_);
 
-    // Create classification window
-    windowClassification_ = new WindowClassification(this);
-    connect(windowClassification_,
+    // Create classifications window
+    windowClassifications_ = new WindowClassifications(this);
+    connect(windowClassifications_,
             SIGNAL(selectionChanged()),
             this,
-            SLOT(actionClassification()));
+            SLOT(actionClassifications()));
 
-    (void)createMenuTool(tr("Classification"),
-                         tr("Classifi\ncation"),
-                         tr("Show classification"),
+    (void)createMenuTool(tr("Classifications"),
+                         tr("Classifi\ncations"),
+                         tr("Show classifications"),
                          "variation",
-                         windowClassification_);
+                         windowClassifications_);
 
     // Create clip filter window
     windowClipFilter_ = new WindowClipFilter(this);
@@ -703,11 +703,11 @@ void WindowMain::actionDataSets()
     editor_.restartThreads();
 }
 
-void WindowMain::actionClassification()
+void WindowMain::actionClassifications()
 {
     editor_.cancelThreads();
     editor_.lock();
-    editor_.setClassification(windowClassification_->classification());
+    editor_.setClassifications(windowClassifications_->classifications());
     editor_.tileViewClear();
     editor_.unlock();
     editor_.restartThreads();
@@ -935,7 +935,7 @@ void WindowMain::updateProject()
 
     windowDataSets_->setDataSets(editor_.dataSets());
     windowLayers_->setLayers(editor_.layers());
-    windowClassification_->setClassification(editor_.classification());
+    windowClassifications_->setClassifications(editor_.classifications());
     windowClipFilter_->setClipFilter(editor_);
     windowSettingsView_->setSettings(editor_.settings().view());
 

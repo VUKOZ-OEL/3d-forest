@@ -17,12 +17,12 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file WindowClassification.hpp */
+/** @file WindowClassifications.hpp */
 
-#ifndef WINDOW_CLASSIFICATION_HPP
-#define WINDOW_CLASSIFICATION_HPP
+#ifndef WINDOW_CLASSIFICATIONS_HPP
+#define WINDOW_CLASSIFICATIONS_HPP
 
-#include <EditorClassification.hpp>
+#include <EditorClassifications.hpp>
 #include <QWidget>
 
 class QCheckBox;
@@ -30,8 +30,8 @@ class QPushButton;
 class QTreeWidget;
 class QTreeWidgetItem;
 
-/** Window Classification. */
-class WindowClassification : public QWidget
+/** Window Classifications. */
+class WindowClassifications : public QWidget
 {
     Q_OBJECT
 
@@ -45,13 +45,13 @@ public:
         COLUMN_LAST,
     };
 
-    WindowClassification(QWidget *parent);
+    WindowClassifications(QWidget *parent);
 
-    const EditorClassification &classification() const
+    const EditorClassifications &classifications() const
     {
-        return classification_;
+        return classifications_;
     }
-    void setClassification(const EditorClassification &classification);
+    void setClassifications(const EditorClassifications &classifications);
 
 public slots:
     void setEnabled(int state);
@@ -64,7 +64,7 @@ signals:
     void selectionChanged();
 
 protected:
-    EditorClassification classification_;
+    EditorClassifications classifications_;
     QTreeWidget *tree_;
     QCheckBox *enabledCheckBox_;
     QPushButton *invertButton_;
@@ -76,4 +76,4 @@ protected:
     void addItem(size_t i);
 };
 
-#endif /* WINDOW_CLASSIFICATION_HPP */
+#endif /* WINDOW_CLASSIFICATIONS_HPP */

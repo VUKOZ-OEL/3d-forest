@@ -25,11 +25,13 @@
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QPushButton>
+#include <QToolButton>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QTreeWidgetItemIterator>
 #include <QVBoxLayout>
 #include <WindowDataSets.hpp>
+#include <WindowMain.hpp>
 
 WindowDataSets::WindowDataSets(QWidget *parent) : QWidget(parent)
 {
@@ -44,7 +46,30 @@ WindowDataSets::WindowDataSets(QWidget *parent) : QWidget(parent)
     deselectButton_->setToolTip(tr("Dismiss the selection"));
     connect(deselectButton_, SIGNAL(clicked()), this, SLOT(clearSelection()));
 
+    // Menu
+    addButton_ = WindowMain::createToolButton(tr("Add"),
+                                              tr("Add new data set"),
+                                              "file-add");
+
+    editButton_ = WindowMain::createToolButton(tr("Edit"),
+                                               tr("Edit data set"),
+                                               "file-edit");
+
+    deleteButton_ = WindowMain::createToolButton(tr("Remove"),
+                                                 tr("Remove data set"),
+                                                 "file-delete");
+
+    connect(addButton_, SIGNAL(clicked()), this, SLOT(toolAdd()));
+    connect(editButton_, SIGNAL(clicked()), this, SLOT(toolEdit()));
+    connect(deleteButton_, SIGNAL(clicked()), this, SLOT(toolDelete()));
+
     // Layout
+    QHBoxLayout *menuLayout = new QHBoxLayout;
+    menuLayout->addWidget(addButton_);
+    menuLayout->addWidget(editButton_);
+    menuLayout->addWidget(deleteButton_);
+    menuLayout->addStretch();
+
     QHBoxLayout *controlLayout = new QHBoxLayout;
     controlLayout->addStretch();
     controlLayout->addWidget(invertButton_);
@@ -52,9 +77,22 @@ WindowDataSets::WindowDataSets(QWidget *parent) : QWidget(parent)
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setContentsMargins(1, 1, 1, 1);
+    mainLayout->addLayout(menuLayout);
     mainLayout->addWidget(tree_);
     mainLayout->addLayout(controlLayout);
     setLayout(mainLayout);
+}
+
+void WindowDataSets::toolAdd()
+{
+}
+
+void WindowDataSets::toolEdit()
+{
+}
+
+void WindowDataSets::toolDelete()
+{
 }
 
 void WindowDataSets::invertSelection()

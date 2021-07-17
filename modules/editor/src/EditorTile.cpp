@@ -308,7 +308,7 @@ void EditorTile::selectClip(const EditorBase *editor)
 
 void EditorTile::selectClass(const EditorBase *editor)
 {
-    const EditorClassification &c = editor->classification();
+    const EditorClassifications &c = editor->classifications();
 
     if (!c.isEnabled())
     {

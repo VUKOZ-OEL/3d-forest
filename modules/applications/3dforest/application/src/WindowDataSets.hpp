@@ -26,6 +26,7 @@
 #include <QWidget>
 
 class QPushButton;
+class QToolButton;
 class QTreeWidget;
 class QTreeWidgetItem;
 
@@ -51,11 +52,16 @@ public:
     void setDataSets(const EditorDataSets &dataSets);
 
 public slots:
+    void toolAdd();
+    void toolEdit();
+    void toolDelete();
+
     void invertSelection();
     void clearSelection();
     void itemChanged(QTreeWidgetItem *item, int column);
 
 signals:
+    void dataChanged();
     void selectionChanged();
 
 protected:
@@ -63,6 +69,9 @@ protected:
     QTreeWidget *tree_;
     QPushButton *invertButton_;
     QPushButton *deselectButton_;
+    QToolButton *addButton_;
+    QToolButton *editButton_;
+    QToolButton *deleteButton_;
 
     void updateTree();
     void block();

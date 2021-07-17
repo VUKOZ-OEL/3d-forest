@@ -17,7 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file WindowClassification.cpp */
+/** @file WindowClassifications.cpp */
 
 #include <ColorPalette.hpp>
 #include <QBrush>
@@ -30,9 +30,9 @@
 #include <QTreeWidgetItem>
 #include <QTreeWidgetItemIterator>
 #include <QVBoxLayout>
-#include <WindowClassification.hpp>
+#include <WindowClassifications.hpp>
 
-WindowClassification::WindowClassification(QWidget *parent) : QWidget(parent)
+WindowClassifications::WindowClassifications(QWidget *parent) : QWidget(parent)
 {
     // Table
     tree_ = new QTreeWidget();
@@ -66,48 +66,48 @@ WindowClassification::WindowClassification(QWidget *parent) : QWidget(parent)
     setLayout(mainLayout);
 }
 
-void WindowClassification::setEnabled(int state)
+void WindowClassifications::setEnabled(int state)
 {
     bool checked = (state == Qt::Checked);
-    classification_.setEnabled(checked);
+    classifications_.setEnabled(checked);
     setEnabled(checked);
     emit selectionChanged();
 }
 
-void WindowClassification::setEnabled(bool checked)
+void WindowClassifications::setEnabled(bool checked)
 {
     tree_->setEnabled(checked);
     invertButton_->setEnabled(checked);
     deselectButton_->setEnabled(checked);
 }
 
-void WindowClassification::invertSelection()
+void WindowClassifications::invertSelection()
 {
-    classification_.setInvertAll();
+    classifications_.setInvertAll();
     updateTree();
     emit selectionChanged();
 }
 
-void WindowClassification::clearSelection()
+void WindowClassifications::clearSelection()
 {
-    classification_.setEnabledAll(false);
+    classifications_.setEnabledAll(false);
     updateTree();
     emit selectionChanged();
 }
 
-void WindowClassification::itemChanged(QTreeWidgetItem *item, int column)
+void WindowClassifications::itemChanged(QTreeWidgetItem *item, int column)
 {
     if (column == COLUMN_CHECKED)
     {
         size_t id = item->text(COLUMN_ID).toULong();
         bool checked = (item->checkState(COLUMN_CHECKED) == Qt::Checked);
 
-        classification_.setEnabled(id, checked);
+        classifications_.setEnabled(id, checked);
         emit selectionChanged();
     }
 }
 
-void WindowClassification::updateTree()
+void WindowClassifications::updateTree()
 {
     block();
 
@@ -116,7 +116,7 @@ void WindowClassification::updateTree()
 
     while (*it)
     {
-        if (classification_.isEnabled(i))
+        if (classifications_.isEnabled(i))
         {
             (*it)->setCheckState(COLUMN_CHECKED, Qt::Checked);
         }
@@ -132,13 +132,13 @@ void WindowClassification::updateTree()
     unblock();
 }
 
-void WindowClassification::block()
+void WindowClassifications::block()
 {
     disconnect(tree_, SIGNAL(itemChanged(QTreeWidgetItem *, int)), 0, 0);
     (void)blockSignals(true);
 }
 
-void WindowClassification::unblock()
+void WindowClassifications::unblock()
 {
     (void)blockSignals(false);
     connect(tree_,
@@ -147,11 +147,11 @@ void WindowClassification::unblock()
             SLOT(itemChanged(QTreeWidgetItem *, int)));
 }
 
-void WindowClassification::addItem(size_t i)
+void WindowClassifications::addItem(size_t i)
 {
     QTreeWidgetItem *item = new QTreeWidgetItem(tree_);
 
-    if (classification_.isEnabled(i))
+    if (classifications_.isEnabled(i))
     {
         item->setCheckState(COLUMN_CHECKED, Qt::Checked);
     }
@@ -163,7 +163,7 @@ void WindowClassification::addItem(size_t i)
     item->setText(COLUMN_ID, QString::number(i));
 
     item->setText(COLUMN_LABEL,
-                  QString::fromStdString(classification_.label(i)));
+                  QString::fromStdString(classifications_.label(i)));
 
     // Color legend
     if (i < ColorPalette::Classification.size())
@@ -182,12 +182,12 @@ void WindowClassification::addItem(size_t i)
     }
 }
 
-void WindowClassification::setClassification(
-    const EditorClassification &classification)
+void WindowClassifications::setClassifications(
+    const EditorClassifications &classifications)
 {
     block();
 
-    classification_ = classification;
+    classifications_ = classifications;
 
     tree_->clear();
 
@@ -198,7 +198,7 @@ void WindowClassification::setClassification(
     tree_->setHeaderLabels(labels);
 
     // Content
-    for (size_t i = 0; i < classification_.size(); i++)
+    for (size_t i = 0; i < classifications_.size(); i++)
     {
         addItem(i);
     }
@@ -209,8 +209,8 @@ void WindowClassification::setClassification(
         tree_->resizeColumnToContents(i);
     }
 
-    setEnabled(classification_.isEnabled());
-    enabledCheckBox_->setChecked(classification_.isEnabled());
+    setEnabled(classifications_.isEnabled());
+    enabledCheckBox_->setChecked(classifications_.isEnabled());
 
     unblock();
 }

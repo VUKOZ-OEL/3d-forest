@@ -24,7 +24,7 @@
 
 #include <ClipFilter.hpp>
 #include <EditorCache.hpp>
-#include <EditorClassification.hpp>
+#include <EditorClassifications.hpp>
 #include <EditorDataSets.hpp>
 #include <EditorDatabases.hpp>
 #include <EditorFilter.hpp>
@@ -63,11 +63,11 @@ public:
     void setLayers(const EditorLayers &layers);
 
     // Classifications
-    const EditorClassification &classification() const
+    const EditorClassifications &classifications() const
     {
-        return classification_;
+        return classifications_;
     }
-    void setClassification(const EditorClassification &classification);
+    void setClassifications(const EditorClassifications &classifications);
 
     // Clip filter
     const ClipFilter &clipFilter() const { return clipFilter_; }
@@ -118,7 +118,7 @@ protected:
     EditorLayers layers_;
     ClipFilter clipFilter_;
     EditorSettings settings_;
-    EditorClassification classification_;
+    EditorClassifications classifications_;
 
     // Filter
     std::vector<EditorFilter *> filters_;

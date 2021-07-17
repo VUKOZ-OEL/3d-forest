@@ -35,7 +35,7 @@ class PluginFile;
 class PluginTool;
 class Ribbon;
 class WindowDock;
-class WindowClassification;
+class WindowClassifications;
 class WindowClipFilter;
 class WindowDataSets;
 class WindowLayers;
@@ -100,7 +100,7 @@ public slots:
 
     // Windows
     void actionDataSets();
-    void actionClassification();
+    void actionClassifications();
     void actionLayers();
     void actionClipFilter(const ClipFilter &clipFilter);
     void actionClipFilterReset();
@@ -127,7 +127,7 @@ protected:
     // Windows
     WindowDataSets *windowDataSets_;
     WindowLayers *windowLayers_;
-    WindowClassification *windowClassification_;
+    WindowClassifications *windowClassifications_;
     WindowClipFilter *windowClipFilter_;
     WindowSettingsView *windowSettingsView_;
     WindowViewports *windowViewports_;

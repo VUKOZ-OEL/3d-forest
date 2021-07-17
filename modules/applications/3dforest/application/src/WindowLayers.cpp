@@ -25,11 +25,13 @@
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QPushButton>
+#include <QToolButton>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QTreeWidgetItemIterator>
 #include <QVBoxLayout>
 #include <WindowLayers.hpp>
+#include <WindowMain.hpp>
 
 WindowLayers::WindowLayers(QWidget *parent) : QWidget(parent)
 {
@@ -51,7 +53,29 @@ WindowLayers::WindowLayers(QWidget *parent) : QWidget(parent)
     deselectButton_->setToolTip(tr("Dismiss the selection"));
     connect(deselectButton_, SIGNAL(clicked()), this, SLOT(clearSelection()));
 
+    // Menu
+    addButton_ = WindowMain::createToolButton(tr("Add"),
+                                              tr("Add new layer"),
+                                              "file-add");
+
+    editButton_ =
+        WindowMain::createToolButton(tr("Edit"), tr("Edit layer"), "file-edit");
+
+    deleteButton_ = WindowMain::createToolButton(tr("Remove"),
+                                                 tr("Remove layer"),
+                                                 "file-delete");
+
+    connect(addButton_, SIGNAL(clicked()), this, SLOT(toolAdd()));
+    connect(editButton_, SIGNAL(clicked()), this, SLOT(toolEdit()));
+    connect(deleteButton_, SIGNAL(clicked()), this, SLOT(toolDelete()));
+
     // Layout
+    QHBoxLayout *menuLayout = new QHBoxLayout;
+    menuLayout->addWidget(addButton_);
+    menuLayout->addWidget(editButton_);
+    menuLayout->addWidget(deleteButton_);
+    menuLayout->addStretch();
+
     QHBoxLayout *controlLayout = new QHBoxLayout;
     controlLayout->addWidget(enabledCheckBox_);
     controlLayout->addStretch();
@@ -60,9 +84,22 @@ WindowLayers::WindowLayers(QWidget *parent) : QWidget(parent)
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setContentsMargins(1, 1, 1, 1);
+    mainLayout->addLayout(menuLayout);
     mainLayout->addWidget(tree_);
     mainLayout->addLayout(controlLayout);
     setLayout(mainLayout);
+}
+
+void WindowLayers::toolAdd()
+{
+}
+
+void WindowLayers::toolEdit()
+{
+}
+
+void WindowLayers::toolDelete()
+{
 }
 
 void WindowLayers::setEnabled(int state)
