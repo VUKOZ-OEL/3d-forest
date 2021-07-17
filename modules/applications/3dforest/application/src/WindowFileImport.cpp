@@ -143,14 +143,21 @@ void WindowFileImport::import(WindowMain *window, Editor *editor)
 
 static void windowFileImport(WindowMain *window, Editor *editor)
 {
-    QString fileName;
+    QFileDialog dialog(window, QObject::tr("Import File"));
+    dialog.setNameFilter(QObject::tr(WINDOW_FILE_IMPORT_FILTER));
 
-    fileName =
-        QFileDialog::getOpenFileName(window,
-                                     QObject::tr("Import File"),
-                                     "",
-                                     QObject::tr(WINDOW_FILE_IMPORT_FILTER));
+    if (dialog.exec() == QDialog::Rejected)
+    {
+        return;
+    }
 
+    QStringList files = dialog.selectedFiles();
+    if (files.count() < 1)
+    {
+        return;
+    }
+
+    QString fileName = files.at(0);
     if (fileName.isEmpty())
     {
         return;
