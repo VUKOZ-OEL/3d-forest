@@ -46,6 +46,12 @@ void EditorDataSet::setColor(const Vector3<float> &color)
     color_ = color;
 }
 
+void EditorDataSet::setTranslation(const Vector3<double> &translation)
+{
+    translation_ = translation;
+    updateBoundary();
+}
+
 void EditorDataSet::read(size_t id,
                          const std::string &path,
                          const std::string &projectPath,

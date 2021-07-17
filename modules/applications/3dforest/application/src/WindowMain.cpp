@@ -244,13 +244,13 @@ void WindowMain::createMenus()
     ribbon_->addTab(QIcon(iconPath("monitor")), "View");
     ribbon_->setIconSize(QSize(20, 20));
 
-    button = createToolButton(tr("Ortho\ngraphic"),
+    button = createToolButton(tr("Ortho"),
                               tr("Orthographic projection"),
                               "view-orthogonal");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewOrthographic()));
     ribbon_->addButton("View", "Projection", button);
 
-    button = createToolButton(tr("Perspec\ntive"),
+    button = createToolButton(tr("Persp."),
                               tr("Perspective projection"),
                               "view-perspective");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewPerspective()));
@@ -342,7 +342,7 @@ void WindowMain::createMenus()
 void WindowMain::createWindows()
 {
     // Create data sets window
-    windowDataSets_ = new WindowDataSets(this);
+    windowDataSets_ = new WindowDataSets(this, &editor_);
     connect(windowDataSets_,
             SIGNAL(selectionChanged()),
             this,
@@ -629,16 +629,16 @@ void WindowMain::actionViewLayout(WindowViewports::ViewLayout layout)
     {
         editor_.setNumberOfViewports(2);
         windowViewports_->setLayout(layout);
-        windowViewports_->resetScene(&editor_, 1);
+        windowViewports_->resetScene(&editor_, 1, true);
     }
     else if ((layout == WindowViewports::VIEW_LAYOUT_GRID) ||
              (layout == WindowViewports::VIEW_LAYOUT_THREE_ROWS_RIGHT))
     {
         editor_.setNumberOfViewports(4);
         windowViewports_->setLayout(layout);
-        windowViewports_->resetScene(&editor_, 1);
-        windowViewports_->resetScene(&editor_, 2);
-        windowViewports_->resetScene(&editor_, 3);
+        windowViewports_->resetScene(&editor_, 1, true);
+        windowViewports_->resetScene(&editor_, 2, true);
+        windowViewports_->resetScene(&editor_, 3, true);
     }
 
     editor_.unlock();
@@ -698,6 +698,7 @@ void WindowMain::actionDataSets()
     editor_.cancelThreads();
     editor_.lock();
     editor_.setDataSets(windowDataSets_->dataSets());
+    windowViewports_->resetScene(&editor_, false);
     editor_.tileViewClear();
     editor_.unlock();
     editor_.restartThreads();
@@ -930,7 +931,7 @@ void WindowMain::updateProject()
 {
     editor_.cancelThreads();
     editor_.lock();
-    windowViewports_->resetScene(&editor_);
+    windowViewports_->resetScene(&editor_, true);
     editor_.unlock();
 
     windowDataSets_->setDataSets(editor_.dataSets());

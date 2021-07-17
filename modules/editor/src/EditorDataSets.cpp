@@ -59,24 +59,41 @@ void EditorDataSets::setColor(size_t i, const Vector3<float> &color)
     dataSets_[i].setColor(color);
 }
 
+void EditorDataSets::setTranslation(size_t i,
+                                    const Vector3<double> &translation)
+{
+    dataSets_[i].setTranslation(translation);
+}
+
 void EditorDataSets::clear()
 {
     dataSets_.resize(0);
+    hashTable_.clear();
+}
+
+void EditorDataSets::remove(size_t i)
+{
+    if (dataSets_.size() > 0)
+    {
+        size_t key = id(i);
+
+        size_t n = dataSets_.size() - 1;
+        for (size_t pos = i; pos < n; pos++)
+        {
+            dataSets_[pos] = dataSets_[pos + 1];
+        }
+        dataSets_.resize(n);
+
+        hashTable_.erase(key);
+    }
 }
 
 size_t EditorDataSets::unusedId() const
 {
-    // Collect all ids
-    std::unordered_set<size_t> hashTable;
-    for (auto &it : dataSets_)
-    {
-        hashTable.insert(it.id());
-    }
-
     // Return minimum available id value
     for (size_t rval = 0; rval < std::numeric_limits<size_t>::max(); rval++)
     {
-        if (hashTable.find(rval) == hashTable.end())
+        if (hashTable_.find(rval) == hashTable_.end())
         {
             return rval;
         }
@@ -85,16 +102,17 @@ size_t EditorDataSets::unusedId() const
     THROW("New data set identifier is not available.");
 }
 
-void EditorDataSets::read(size_t id,
-                          const std::string &path,
+void EditorDataSets::read(const std::string &path,
                           const std::string &projectPath,
                           const EditorSettingsImport &settings,
                           const Aabb<double> &projectBoundary)
 {
     EditorDataSet ds;
+    size_t id = unusedId();
 
     ds.read(id, path, projectPath, settings, projectBoundary);
 
+    hashTable_[id] = dataSets_.size();
     dataSets_.push_back(ds);
 }
 
@@ -106,10 +124,12 @@ void EditorDataSets::read(const Json &in, const std::string &projectPath)
     i = 0;
     n = in.array().size();
     dataSets_.resize(n);
+    hashTable_.clear();
 
     for (auto const &it : in.array())
     {
         dataSets_[i].read(it, projectPath);
+        hashTable_[dataSets_[i].id()] = i;
         i++;
     }
 }

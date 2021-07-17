@@ -158,13 +158,12 @@ void EditorBase::addFile(const std::string &path,
     try
     {
         // Data sets
-        size_t id = dataSets_.unusedId();
-        dataSets_.read(id, path, path_, settings, database_.boundary());
+        dataSets_.read(path, path_, settings, database_.boundary());
 
         // Database
         std::shared_ptr<EditorDatabase> db = std::make_shared<EditorDatabase>();
         db->setProperties(dataSets_.at(dataSets_.size() - 1));
-        database_.push_back(db);
+        database_.pushBack(db);
     }
     catch (std::exception &e)
     {

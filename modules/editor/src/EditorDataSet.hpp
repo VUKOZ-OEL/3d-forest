@@ -48,6 +48,8 @@ public:
     const std::string &dateCreated() const { return dateCreated_; }
 
     const Vector3<double> &translation() const { return translation_; }
+    void setTranslation(const Vector3<double> &translation);
+
     const Vector3<double> &scaling() const { return scaling_; }
 
     const Aabb<double> &boundary() const { return boundary_; }

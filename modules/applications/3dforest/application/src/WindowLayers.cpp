@@ -25,6 +25,7 @@
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QPushButton>
+#include <QToolBar>
 #include <QToolButton>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
@@ -32,7 +33,6 @@
 #include <QVBoxLayout>
 #include <WindowLayers.hpp>
 #include <WindowMain.hpp>
-#include <QToolBar>
 
 WindowLayers::WindowLayers(QWidget *parent) : QWidget(parent)
 {

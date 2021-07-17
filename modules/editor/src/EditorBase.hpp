@@ -53,7 +53,11 @@ public:
 
     // Data sets
     size_t databaseSize() const { return database_.size(); }
-    const EditorDatabase &database(size_t i) const { return database_.at(i); }
+    const EditorDatabase &databaseAt(size_t i) const { return database_.at(i); }
+    const EditorDatabase &databaseId(size_t id) const
+    {
+        return database_.key(id);
+    }
 
     const EditorDataSets &dataSets() const { return dataSets_; }
     void setDataSets(const EditorDataSets &dataSets);

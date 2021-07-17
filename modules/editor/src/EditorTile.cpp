@@ -71,7 +71,7 @@ bool EditorTile::View::isFinished() const
 
 void EditorTile::read(const EditorBase *editor)
 {
-    const EditorDatabase &db = editor->database(dataSetId);
+    const EditorDatabase &db = editor->databaseId(dataSetId);
     const FileIndex::Node *node = db.index().at(tileId);
 
     // Read tile buffer from LAS file
@@ -168,7 +168,7 @@ void EditorTile::read(const EditorBase *editor)
 
 void EditorTile::transform(const EditorBase *editor)
 {
-    const EditorDatabase &db = editor->database(dataSetId);
+    const EditorDatabase &db = editor->databaseId(dataSetId);
     size_t n = xyzBase.size() / 3;
     double x;
     double y;
@@ -229,7 +229,7 @@ void EditorTile::selectClip(const EditorBase *editor)
         return;
     }
 
-    const EditorDatabase &db = editor->database(dataSetId);
+    const EditorDatabase &db = editor->databaseId(dataSetId);
     const FileIndex::Node *node = db.index().at(tileId);
 
     // Read L2 index

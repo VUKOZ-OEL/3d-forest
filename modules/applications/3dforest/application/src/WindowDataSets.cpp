@@ -19,32 +19,40 @@
 
 /** @file WindowDataSets.cpp */
 
+#include <Editor.hpp>
 #include <QBrush>
 #include <QCheckBox>
 #include <QColor>
 #include <QDebug>
+#include <QDoubleSpinBox>
+#include <QGroupBox>
 #include <QHBoxLayout>
+#include <QLabel>
 #include <QPushButton>
+#include <QToolBar>
 #include <QToolButton>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QTreeWidgetItemIterator>
 #include <QVBoxLayout>
 #include <WindowDataSets.hpp>
+#include <WindowFileImport.hpp>
 #include <WindowMain.hpp>
-#include <QToolBar>
 
-WindowDataSets::WindowDataSets(QWidget *parent) : QWidget(parent)
+WindowDataSets::WindowDataSets(WindowMain *parent, Editor *editor)
+    : QWidget(parent),
+      windowMain_(parent),
+      editor_(editor)
 {
     // Table
     tree_ = new QTreeWidget();
 
     invertButton_ = new QPushButton(tr("Invert"));
-    invertButton_->setToolTip(tr("Invert the selection"));
+    invertButton_->setToolTip(tr("Invert visibility"));
     connect(invertButton_, SIGNAL(clicked()), this, SLOT(invertSelection()));
 
-    deselectButton_ = new QPushButton(tr("Deselect"));
-    deselectButton_->setToolTip(tr("Dismiss the selection"));
+    deselectButton_ = new QPushButton(tr("Hide all"));
+    deselectButton_->setToolTip(tr("Hide all data sets"));
     connect(deselectButton_, SIGNAL(clicked()), this, SLOT(clearSelection()));
 
     // Menu
@@ -53,16 +61,19 @@ WindowDataSets::WindowDataSets(QWidget *parent) : QWidget(parent)
                                               "file-add");
 
     editButton_ = WindowMain::createToolButton(tr("Edit"),
-                                               tr("Edit data set"),
+                                               tr("Edit selected data set"),
                                                "file-edit");
 
     deleteButton_ = WindowMain::createToolButton(tr("Remove"),
-                                                 tr("Remove data set"),
+                                                 tr("Remove selected data set"),
                                                  "file-delete");
 
     connect(addButton_, SIGNAL(clicked()), this, SLOT(toolAdd()));
     connect(editButton_, SIGNAL(clicked()), this, SLOT(toolEdit()));
     connect(deleteButton_, SIGNAL(clicked()), this, SLOT(toolDelete()));
+
+    editButton_->setEnabled(false);
+    deleteButton_->setEnabled(false);
 
     // Tool bar
     QToolBar *toolBar = new QToolBar;
@@ -87,14 +98,63 @@ WindowDataSets::WindowDataSets(QWidget *parent) : QWidget(parent)
 
 void WindowDataSets::toolAdd()
 {
+    WindowFileImport::import(windowMain_, editor_);
 }
 
 void WindowDataSets::toolEdit()
 {
+    // Item
+    QList<QTreeWidgetItem *> items = tree_->selectedItems();
+
+    if (items.count() < 1)
+    {
+        return;
+    }
+
+    QTreeWidgetItem *item = items.at(0);
+    size_t idx = index(item);
+
+    // Dialog
+    WindowDataSetsEdit dialog(windowMain_);
+
+    Vector3<double> t = dataSets_.translation(idx);
+    for (size_t i = 0; i < 3; i++)
+    {
+        dialog.offsetSpinBox_[i]->setMinimum(-1e8);
+        dialog.offsetSpinBox_[i]->setMaximum(1e8);
+        dialog.offsetSpinBox_[i]->setValue(t[i]);
+    }
+
+    if (dialog.exec() == QDialog::Rejected)
+    {
+        return;
+    }
+
+    // Apply
+    for (size_t i = 0; i < 3; i++)
+    {
+        t[i] = dialog.offsetSpinBox_[i]->value();
+    }
+    dataSets_.setTranslation(idx, t);
+
+    // Update
+    emit selectionChanged();
 }
 
 void WindowDataSets::toolDelete()
 {
+    QList<QTreeWidgetItem *> items = tree_->selectedItems();
+
+    if (items.count() < 1)
+    {
+        return;
+    }
+
+    QTreeWidgetItem *item = items.at(0);
+    size_t idx = index(item);
+    dataSets_.remove(idx);
+    delete item;
+    emit selectionChanged();
 }
 
 void WindowDataSets::invertSelection()
@@ -111,28 +171,49 @@ void WindowDataSets::clearSelection()
     emit selectionChanged();
 }
 
+void WindowDataSets::itemSelectionChanged()
+{
+    QList<QTreeWidgetItem *> items = tree_->selectedItems();
+
+    if (items.count() > 0)
+    {
+        editButton_->setEnabled(true);
+        deleteButton_->setEnabled(true);
+    }
+    else
+    {
+        editButton_->setEnabled(false);
+        deleteButton_->setEnabled(false);
+    }
+}
+
 void WindowDataSets::itemChanged(QTreeWidgetItem *item, int column)
 {
     if (column == COLUMN_CHECKED)
     {
-        size_t id = item->text(COLUMN_ID).toULong();
         bool checked = (item->checkState(COLUMN_CHECKED) == Qt::Checked);
 
-        dataSets_.setEnabled(id, checked);
+        dataSets_.setEnabled(index(item), checked);
         emit selectionChanged();
     }
+}
+
+size_t WindowDataSets::index(const QTreeWidgetItem *item)
+{
+    return dataSets_.index(item->text(COLUMN_ID).toULong());
 }
 
 void WindowDataSets::updateTree()
 {
     block();
 
-    size_t i = 0;
     QTreeWidgetItemIterator it(tree_);
 
     while (*it)
     {
-        if (dataSets_.isEnabled(i))
+        size_t idx = index(*it);
+
+        if (dataSets_.isEnabled(idx))
         {
             (*it)->setCheckState(COLUMN_CHECKED, Qt::Checked);
         }
@@ -141,7 +222,6 @@ void WindowDataSets::updateTree()
             (*it)->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
         }
 
-        i++;
         ++it;
     }
 
@@ -151,6 +231,7 @@ void WindowDataSets::updateTree()
 void WindowDataSets::block()
 {
     disconnect(tree_, SIGNAL(itemChanged(QTreeWidgetItem *, int)), 0, 0);
+    disconnect(tree_, SIGNAL(itemSelectionChanged()), 0, 0);
     (void)blockSignals(true);
 }
 
@@ -161,6 +242,10 @@ void WindowDataSets::unblock()
             SIGNAL(itemChanged(QTreeWidgetItem *, int)),
             this,
             SLOT(itemChanged(QTreeWidgetItem *, int)));
+    connect(tree_,
+            SIGNAL(itemSelectionChanged()),
+            this,
+            SLOT(itemSelectionChanged()));
 }
 
 void WindowDataSets::addItem(size_t i)
@@ -178,10 +263,7 @@ void WindowDataSets::addItem(size_t i)
 
     item->setText(COLUMN_ID, QString::number(dataSets_.id(i)));
 
-    // item->setText(COLUMN_LABEL, QString::fromStdString(dataSets_.label(i)));
-
-    item->setText(COLUMN_FILE_NAME,
-                  QString::fromStdString(dataSets_.fileName(i)));
+    item->setText(COLUMN_LABEL, QString::fromStdString(dataSets_.label(i)));
     item->setText(COLUMN_DATE_CREATED,
                   QString::fromStdString(dataSets_.dateCreated(i)));
 
@@ -208,7 +290,7 @@ void WindowDataSets::setDataSets(const EditorDataSets &dataSets)
     // Header
     tree_->setColumnCount(COLUMN_LAST);
     QStringList labels;
-    labels << tr("Select") << tr("Id") << tr("File name") << tr("Date");
+    labels << tr("Visible") << tr("Id") << tr("Label") << tr("Date");
     tree_->setHeaderLabels(labels);
 
     // Content
@@ -228,4 +310,66 @@ void WindowDataSets::setDataSets(const EditorDataSets &dataSets)
     tree_->sortItems(COLUMN_ID, Qt::AscendingOrder);
 
     unblock();
+}
+
+WindowDataSetsEdit::WindowDataSetsEdit(QWidget *parent) : QDialog(parent)
+{
+    // Widgets
+    acceptButton_ = new QPushButton(tr("Apply"));
+    connect(acceptButton_, SIGNAL(clicked()), this, SLOT(setResultAccept()));
+
+    rejectButton_ = new QPushButton(tr("Cancel"));
+    connect(rejectButton_, SIGNAL(clicked()), this, SLOT(setResultReject()));
+
+    QGroupBox *offsetGroup = new QGroupBox(tr("Offset"));
+
+    for (int i = 0; i < 3; i++)
+    {
+        offsetSpinBox_[i] = new QDoubleSpinBox;
+        offsetSpinBox_[i]->setDecimals(6);
+    }
+
+    // Layout
+    QGridLayout *offsetLayout = new QGridLayout;
+    int row = 0;
+    offsetLayout->addWidget(new QLabel(tr("x")), row, 0);
+    offsetLayout->addWidget(offsetSpinBox_[0], row, 1);
+    row++;
+    offsetLayout->addWidget(new QLabel(tr("y")), row, 0);
+    offsetLayout->addWidget(offsetSpinBox_[1], row, 1);
+    row++;
+    offsetLayout->addWidget(new QLabel(tr("z")), row, 0);
+    offsetLayout->addWidget(offsetSpinBox_[2], row, 1);
+    row++;
+    offsetGroup->setLayout(offsetLayout);
+
+    QHBoxLayout *dialogButtons = new QHBoxLayout;
+    dialogButtons->addStretch();
+    dialogButtons->addWidget(acceptButton_);
+    dialogButtons->addWidget(rejectButton_);
+
+    QVBoxLayout *dialogLayout = new QVBoxLayout;
+    dialogLayout->addWidget(offsetGroup);
+    dialogLayout->addSpacing(10);
+    dialogLayout->addLayout(dialogButtons);
+    dialogLayout->addStretch();
+
+    setLayout(dialogLayout);
+
+    // Window
+    setWindowTitle("Edit Data Set");
+    setMaximumWidth(width());
+    setMaximumHeight(height());
+}
+
+void WindowDataSetsEdit::setResultAccept()
+{
+    close();
+    setResult(QDialog::Accepted);
+}
+
+void WindowDataSetsEdit::setResultReject()
+{
+    close();
+    setResult(QDialog::Rejected);
 }
