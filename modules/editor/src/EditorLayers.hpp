@@ -40,6 +40,8 @@ public:
 
     size_t size() const { return layers_.size(); }
     const EditorLayer &at(size_t i) const { return layers_[i]; }
+
+    void push_back(const EditorLayer &layer);
     void remove(size_t i);
 
     size_t id(size_t i) const { return layers_[i].id(); }

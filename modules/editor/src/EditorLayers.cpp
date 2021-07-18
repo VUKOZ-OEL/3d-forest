@@ -53,6 +53,21 @@ void EditorLayers::setEnabled(bool b)
     enabled_ = b;
 }
 
+void EditorLayers::push_back(const EditorLayer &layer)
+{
+    size_t id = layer.id();
+    size_t idx = layers_.size();
+
+    layers_.push_back(layer);
+
+    hashTableId_[id] = idx;
+
+    if (layer.isEnabled())
+    {
+        hashTableEnabledId_.insert(id);
+    }
+}
+
 void EditorLayers::remove(size_t i)
 {
     if (layers_.size() == 0)
