@@ -22,8 +22,12 @@
 #include <QBrush>
 #include <QCheckBox>
 #include <QColor>
+#include <QColorDialog>
 #include <QDebug>
 #include <QHBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPixmap>
 #include <QPushButton>
 #include <QToolBar>
 #include <QToolButton>
@@ -34,7 +38,9 @@
 #include <WindowLayers.hpp>
 #include <WindowMain.hpp>
 
-WindowLayers::WindowLayers(QWidget *parent) : QWidget(parent)
+WindowLayers::WindowLayers(WindowMain *parent)
+    : QWidget(parent),
+      windowMain_(parent)
 {
     // Table
     tree_ = new QTreeWidget();
@@ -47,23 +53,24 @@ WindowLayers::WindowLayers(QWidget *parent) : QWidget(parent)
             SLOT(setEnabled(int)));
 
     invertButton_ = new QPushButton(tr("Invert"));
-    invertButton_->setToolTip(tr("Invert visibility"));
+    invertButton_->setToolTip(tr("Inverts visibility"));
     connect(invertButton_, SIGNAL(clicked()), this, SLOT(invertSelection()));
 
     deselectButton_ = new QPushButton(tr("Hide all"));
-    deselectButton_->setToolTip(tr("Hide all layers"));
+    deselectButton_->setToolTip(tr("Hides all layers"));
     connect(deselectButton_, SIGNAL(clicked()), this, SLOT(clearSelection()));
 
     // Menu
     addButton_ = WindowMain::createToolButton(tr("Add"),
-                                              tr("Add new layer"),
+                                              tr("Adds new layer"),
                                               "file-add");
 
-    editButton_ =
-        WindowMain::createToolButton(tr("Edit"), tr("Edit layer"), "file-edit");
+    editButton_ = WindowMain::createToolButton(tr("Edit"),
+                                               tr("Edits selected layer"),
+                                               "file-edit");
 
     deleteButton_ = WindowMain::createToolButton(tr("Remove"),
-                                                 tr("Remove layer"),
+                                                 tr("Removes selected layer"),
                                                  "file-delete");
 
     connect(addButton_, SIGNAL(clicked()), this, SLOT(toolAdd()));
@@ -97,6 +104,31 @@ WindowLayers::WindowLayers(QWidget *parent) : QWidget(parent)
 
 void WindowLayers::toolAdd()
 {
+    // Dialog
+    WindowLayersNew dialog(windowMain_);
+
+    if (dialog.exec() == QDialog::Rejected)
+    {
+        return;
+    }
+
+    // Apply
+    float r = static_cast<float>(dialog.color_.redF());
+    float g = static_cast<float>(dialog.color_.greenF());
+    float b = static_cast<float>(dialog.color_.blueF());
+    Vector3<float> color(r, g, b);
+
+    EditorLayer newLayer;
+    newLayer.set(layers_.unusedId(),
+                 dialog.labelEdit_->text().toStdString(),
+                 true,
+                 color);
+
+    layers_.push_back(newLayer);
+    setLayers(layers_);
+
+    // Update
+    emit selectionChanged();
 }
 
 void WindowLayers::toolEdit()
@@ -287,4 +319,86 @@ void WindowLayers::setLayers(const EditorLayers &layers)
     enabledCheckBox_->setChecked(layers_.isEnabled());
 
     unblock();
+}
+
+WindowLayersNew::WindowLayersNew(QWidget *parent)
+    : QDialog(parent),
+      color_(255, 255, 255)
+{
+    // Widgets
+    acceptButton_ = new QPushButton(tr("Create"));
+    connect(acceptButton_, SIGNAL(clicked()), this, SLOT(setResultAccept()));
+
+    rejectButton_ = new QPushButton(tr("Cancel"));
+    connect(rejectButton_, SIGNAL(clicked()), this, SLOT(setResultReject()));
+
+    labelEdit_ = new QLineEdit("label");
+
+    colorButton_ = new QPushButton(tr("Custom"));
+    updateColor();
+    connect(colorButton_, SIGNAL(clicked()), this, SLOT(setColor()));
+
+    // Layout
+    QGridLayout *gridLayout = new QGridLayout;
+    int row = 0;
+    gridLayout->addWidget(new QLabel(tr("Label")), row, 0);
+    gridLayout->addWidget(labelEdit_, row, 1);
+    row++;
+    gridLayout->addWidget(new QLabel(tr("Color")), row, 0);
+    gridLayout->addWidget(colorButton_, row, 1);
+    row++;
+
+    QHBoxLayout *dialogButtons = new QHBoxLayout;
+    dialogButtons->addStretch();
+    dialogButtons->addWidget(acceptButton_);
+    dialogButtons->addWidget(rejectButton_);
+
+    QVBoxLayout *dialogLayout = new QVBoxLayout;
+    dialogLayout->addLayout(gridLayout);
+    dialogLayout->addSpacing(10);
+    dialogLayout->addLayout(dialogButtons);
+    dialogLayout->addStretch();
+
+    setLayout(dialogLayout);
+
+    // Window
+    setWindowTitle("New Layer");
+    setMaximumWidth(width());
+    setMaximumHeight(height());
+}
+
+void WindowLayersNew::setResultAccept()
+{
+    close();
+    setResult(QDialog::Accepted);
+}
+
+void WindowLayersNew::setResultReject()
+{
+    close();
+    setResult(QDialog::Rejected);
+}
+
+void WindowLayersNew::setColor()
+{
+    QColorDialog dialog(color_, this);
+
+    if (dialog.exec() == QDialog::Rejected)
+    {
+        return;
+    }
+
+    color_ = dialog.selectedColor();
+    updateColor();
+}
+
+void WindowLayersNew::updateColor()
+{
+    QPixmap pixmap(25, 25);
+    pixmap.fill(color_);
+
+    QIcon icon(pixmap);
+
+    colorButton_->setIcon(icon);
+    colorButton_->setIconSize(QSize(10, 10));
 }

@@ -23,13 +23,16 @@
 #define WINDOW_LAYERS_HPP
 
 #include <EditorLayers.hpp>
+#include <QDialog>
 #include <QWidget>
 
 class QCheckBox;
+class QLineEdit;
 class QPushButton;
 class QToolButton;
 class QTreeWidget;
 class QTreeWidgetItem;
+class WindowMain;
 
 /** Window Layers. */
 class WindowLayers : public QWidget
@@ -46,7 +49,7 @@ public:
         COLUMN_LAST,
     };
 
-    WindowLayers(QWidget *parent);
+    WindowLayers(WindowMain *parent);
 
     const EditorLayers &layers() const { return layers_; }
     void setLayers(const EditorLayers &layers);
@@ -69,6 +72,8 @@ signals:
     void selectionChanged();
 
 protected:
+    WindowMain *windowMain_;
+
     QTreeWidget *tree_;
     QCheckBox *enabledCheckBox_;
     QPushButton *invertButton_;
@@ -84,6 +89,31 @@ protected:
     void block();
     void unblock();
     void addItem(size_t i);
+};
+
+/** Window Layers New. */
+class WindowLayersNew : public QDialog
+{
+    Q_OBJECT
+
+public:
+    QLineEdit *labelEdit_;
+    QColor color_;
+
+    WindowLayersNew(QWidget *parent);
+
+public slots:
+    void setResultAccept();
+    void setResultReject();
+    void setColor();
+
+protected:
+    QPushButton *acceptButton_;
+    QPushButton *rejectButton_;
+
+    QPushButton *colorButton_;
+
+    void updateColor();
 };
 
 #endif /* WINDOW_LAYERS_HPP */
