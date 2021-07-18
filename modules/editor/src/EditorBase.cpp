@@ -46,7 +46,7 @@ void EditorBase::close()
 
     database_.clear();
     dataSets_.clear();
-    layers_.clear();
+    layers_.setDefault();
     classifications_.clear();
     clipFilter_.clear();
 
