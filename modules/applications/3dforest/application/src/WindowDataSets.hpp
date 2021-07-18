@@ -27,6 +27,7 @@
 #include <QWidget>
 
 class QDoubleSpinBox;
+class QLineEdit;
 class QPushButton;
 class QToolButton;
 class QTreeWidget;
@@ -95,17 +96,29 @@ class WindowDataSetsEdit : public QDialog
     Q_OBJECT
 
 public:
+    QColor color_;
+    QLineEdit *labelEdit_;
     QDoubleSpinBox *offsetSpinBox_[3];
 
-    WindowDataSetsEdit(QWidget *parent);
+    WindowDataSetsEdit(QWidget *parent,
+                       const QString &windowTitle,
+                       const QString &buttonText,
+                       const QString &label,
+                       const QColor &color,
+                       const Vector3<double> &offset);
 
 public slots:
     void setResultAccept();
     void setResultReject();
+    void setColor();
 
 protected:
     QPushButton *acceptButton_;
     QPushButton *rejectButton_;
+
+    QPushButton *colorButton_;
+
+    void updateColor();
 };
 
 #endif /* WINDOW_DATA_SETS_HPP */
