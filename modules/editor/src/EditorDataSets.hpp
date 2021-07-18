@@ -35,7 +35,7 @@ public:
 
     size_t size() const { return dataSets_.size(); }
     const EditorDataSet &at(size_t i) const { return dataSets_[i]; }
-    void remove(size_t i);
+    void erase(size_t i);
 
     size_t id(size_t i) const { return dataSets_[i].id(); }
     size_t index(size_t id) { return hashTable_[id]; }

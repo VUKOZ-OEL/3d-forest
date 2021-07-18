@@ -152,7 +152,7 @@ void WindowDataSets::toolDelete()
 
     QTreeWidgetItem *item = items.at(0);
     size_t idx = index(item);
-    dataSets_.remove(idx);
+    dataSets_.erase(idx);
     delete item;
     emit selectionChanged();
 }

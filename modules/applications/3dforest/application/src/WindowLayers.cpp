@@ -148,7 +148,7 @@ void WindowLayers::toolDelete()
     size_t idx = index(item);
     if (idx > 0)
     {
-        layers_.remove(idx);
+        layers_.erase(idx);
         delete item;
         emit selectionChanged();
     }

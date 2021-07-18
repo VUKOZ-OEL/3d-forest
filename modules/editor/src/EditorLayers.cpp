@@ -68,7 +68,7 @@ void EditorLayers::push_back(const EditorLayer &layer)
     }
 }
 
-void EditorLayers::remove(size_t i)
+void EditorLayers::erase(size_t i)
 {
     if (layers_.size() == 0)
     {

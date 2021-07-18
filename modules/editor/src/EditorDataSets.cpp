@@ -71,7 +71,7 @@ void EditorDataSets::clear()
     hashTable_.clear();
 }
 
-void EditorDataSets::remove(size_t i)
+void EditorDataSets::erase(size_t i)
 {
     if (dataSets_.size() > 0)
     {
