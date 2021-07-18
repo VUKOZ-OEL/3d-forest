@@ -23,6 +23,7 @@
 #define EDITOR_LAYERS_HPP
 
 #include <EditorLayer.hpp>
+#include <unordered_map>
 #include <unordered_set>
 
 /** Editor Layers. */
@@ -32,6 +33,7 @@ public:
     EditorLayers();
 
     void clear();
+    void setDefault();
 
     bool isEnabled() const { return enabled_; }
     void setEnabled(bool b);
@@ -39,10 +41,21 @@ public:
     size_t size() const { return layers_.size(); }
 
     size_t id(size_t i) const { return layers_[i].id(); }
-
-    bool isIdEnabled(size_t id) const
+    size_t index(size_t id) const
     {
-        return idHashTable_.find(id) != idHashTable_.end();
+        const auto &it = hashTable_.find(id);
+        if (it != hashTable_.end())
+        {
+            return it->second;
+        }
+        THROW("Invalid layer id");
+    }
+
+    size_t unusedId() const;
+
+    bool isEnabledId(size_t id) const
+    {
+        return hashTableEnabledId_.find(id) != hashTableEnabledId_.end();
     }
     bool isEnabled(size_t i) const { return layers_[i].isEnabled(); }
     void setEnabled(size_t i, bool b);
@@ -60,7 +73,8 @@ public:
 
 protected:
     std::vector<EditorLayer> layers_;
-    std::unordered_set<size_t> idHashTable_;
+    std::unordered_map<size_t, size_t> hashTable_;
+    std::unordered_set<size_t> hashTableEnabledId_;
     bool enabled_;
 };
 

@@ -351,7 +351,7 @@ void EditorTile::selectLayers(const EditorBase *editor)
     {
         unsigned int idx = indices[i];
 
-        if (la.isIdEnabled(layer[idx]))
+        if (la.isEnabledId(layer[idx]))
         {
             if (nSelectedNew != i)
             {
