@@ -44,7 +44,7 @@ Ribbon::Ribbon(QWidget *parent)
     ""
     "QTabBar::tab {"
     "  padding-top: 2px;"
-    "  padding-bottom: 1px;"
+    "  padding-bottom: 2px;"
     "  padding-left: 8px;"
     "  padding-right: 8px;"
     "  margin-top: 1px;"

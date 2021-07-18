@@ -191,7 +191,7 @@ void WindowMain::createMenus()
 
     // Project
     ribbon_->addTab(QIcon(iconPath("briefcase")), "File");
-    ribbon_->setIconSize(QSize(20, 20));
+    ribbon_->setIconSize(QSize(0, 0));
 
     // New
     button = createToolButton(tr("New\nproject"),
@@ -242,7 +242,7 @@ void WindowMain::createMenus()
 
     // View
     ribbon_->addTab(QIcon(iconPath("monitor")), "View");
-    ribbon_->setIconSize(QSize(20, 20));
+    ribbon_->setIconSize(QSize(0, 0));
 
     button = createToolButton(tr("Ortho"),
                               tr("Orthographic projection"),
@@ -307,11 +307,11 @@ void WindowMain::createMenus()
 
     // Tools
     ribbon_->addTab(QIcon(iconPath("support")), "Tools");
-    ribbon_->setIconSize(QSize(20, 20));
+    ribbon_->setIconSize(QSize(0, 0));
 
     // Help
     ribbon_->addTab(QIcon(iconPath("information")), "Help");
-    ribbon_->setIconSize(QSize(20, 20));
+    ribbon_->setIconSize(QSize(0, 0));
 
     button =
         createToolButton(tr("About"), tr("About this application"), "about");
