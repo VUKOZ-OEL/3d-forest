@@ -44,6 +44,7 @@ void EditorCache::reload()
     for (auto &it : cache_)
     {
         it.second->view.resetFrame();
+        it.second->transformed = false;
         it.second->filtered = false;
         it.second->filteredClass = false;
         // it.second->loaded = false;
@@ -115,7 +116,7 @@ void EditorCache::updateCamera(const Camera &camera)
 
     for (size_t i = 0; i < editor_->databaseSize(); i++)
     {
-        const EditorDatabase &db = editor_->database(i);
+        const EditorDatabase &db = editor_->databaseAt(i);
         if (db.properties().isEnabled())
         {
             queue.insert({0, {db.properties().id(), 0}});
@@ -128,7 +129,7 @@ void EditorCache::updateCamera(const Camera &camera)
         Key nk = it->second;
         queue.erase(it);
 
-        const EditorDatabase &db = editor_->database(nk.dataSetId);
+        const EditorDatabase &db = editor_->databaseId(nk.dataSetId);
         const FileIndex::Node *node;
         const FileIndex &index = db.index();
         node = index.at(nk.tileId);

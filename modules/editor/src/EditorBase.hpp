@@ -24,7 +24,7 @@
 
 #include <ClipFilter.hpp>
 #include <EditorCache.hpp>
-#include <EditorClassification.hpp>
+#include <EditorClassifications.hpp>
 #include <EditorDataSets.hpp>
 #include <EditorDatabases.hpp>
 #include <EditorFilter.hpp>
@@ -53,7 +53,11 @@ public:
 
     // Data sets
     size_t databaseSize() const { return database_.size(); }
-    const EditorDatabase &database(size_t i) const { return database_.at(i); }
+    const EditorDatabase &databaseAt(size_t i) const { return database_.at(i); }
+    const EditorDatabase &databaseId(size_t id) const
+    {
+        return database_.key(id);
+    }
 
     const EditorDataSets &dataSets() const { return dataSets_; }
     void setDataSets(const EditorDataSets &dataSets);
@@ -63,11 +67,11 @@ public:
     void setLayers(const EditorLayers &layers);
 
     // Classifications
-    const EditorClassification &classification() const
+    const EditorClassifications &classifications() const
     {
-        return classification_;
+        return classifications_;
     }
-    void setClassification(const EditorClassification &classification);
+    void setClassifications(const EditorClassifications &classifications);
 
     // Clip filter
     const ClipFilter &clipFilter() const { return clipFilter_; }
@@ -118,7 +122,7 @@ protected:
     EditorLayers layers_;
     ClipFilter clipFilter_;
     EditorSettings settings_;
-    EditorClassification classification_;
+    EditorClassifications classifications_;
 
     // Filter
     std::vector<EditorFilter *> filters_;

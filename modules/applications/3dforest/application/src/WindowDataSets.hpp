@@ -23,11 +23,16 @@
 #define WINDOW_DATA_SETS_HPP
 
 #include <EditorDataSets.hpp>
+#include <QDialog>
 #include <QWidget>
 
+class QDoubleSpinBox;
 class QPushButton;
+class QToolButton;
 class QTreeWidget;
 class QTreeWidgetItem;
+class WindowMain;
+class Editor;
 
 /** Window Data Sets. */
 class WindowDataSets : public QWidget
@@ -40,34 +45,67 @@ public:
     {
         COLUMN_CHECKED,
         COLUMN_ID,
-        COLUMN_FILE_NAME,
+        COLUMN_LABEL,
         COLUMN_DATE_CREATED,
         COLUMN_LAST,
     };
 
-    WindowDataSets(QWidget *parent);
+    WindowDataSets(WindowMain *parent, Editor *editor);
 
     const EditorDataSets &dataSets() const { return dataSets_; }
     void setDataSets(const EditorDataSets &dataSets);
 
 public slots:
+    void toolAdd();
+    void toolEdit();
+    void toolDelete();
+
     void invertSelection();
     void clearSelection();
+    void itemSelectionChanged();
     void itemChanged(QTreeWidgetItem *item, int column);
 
 signals:
+    void dataChanged();
     void selectionChanged();
 
 protected:
-    EditorDataSets dataSets_;
+    WindowMain *windowMain_;
+    Editor *editor_;
+
     QTreeWidget *tree_;
     QPushButton *invertButton_;
     QPushButton *deselectButton_;
+    QToolButton *addButton_;
+    QToolButton *editButton_;
+    QToolButton *deleteButton_;
 
+    EditorDataSets dataSets_;
+
+    size_t index(const QTreeWidgetItem *item);
     void updateTree();
     void block();
     void unblock();
     void addItem(size_t i);
+};
+
+/** Window Data Sets Edit. */
+class WindowDataSetsEdit : public QDialog
+{
+    Q_OBJECT
+
+public:
+    QDoubleSpinBox *offsetSpinBox_[3];
+
+    WindowDataSetsEdit(QWidget *parent);
+
+public slots:
+    void setResultAccept();
+    void setResultReject();
+
+protected:
+    QPushButton *acceptButton_;
+    QPushButton *rejectButton_;
 };
 
 #endif /* WINDOW_DATA_SETS_HPP */

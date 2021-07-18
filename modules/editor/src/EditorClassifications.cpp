@@ -17,21 +17,21 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file EditorClassification.cpp */
+/** @file EditorClassifications.cpp */
 
-#include <EditorClassification.hpp>
+#include <EditorClassifications.hpp>
 
-EditorClassification::EditorClassification() : enabled_(false)
+EditorClassifications::EditorClassifications() : enabled_(false)
 {
     clear();
 }
 
-void EditorClassification::setEnabled(bool b)
+void EditorClassifications::setEnabled(bool b)
 {
     enabled_ = b;
 }
 
-void EditorClassification::setEnabledAll(bool b)
+void EditorClassifications::setEnabledAll(bool b)
 {
     for (size_t i = 0; i < classes_.size(); i++)
     {
@@ -39,7 +39,7 @@ void EditorClassification::setEnabledAll(bool b)
     }
 }
 
-void EditorClassification::setInvertAll()
+void EditorClassifications::setInvertAll()
 {
     for (size_t i = 0; i < classes_.size(); i++)
     {
@@ -47,7 +47,7 @@ void EditorClassification::setInvertAll()
     }
 }
 
-void EditorClassification::clear()
+void EditorClassifications::clear()
 {
     classes_.resize(256);
 
@@ -98,7 +98,7 @@ void EditorClassification::clear()
     }
 }
 
-void EditorClassification::read(const Json &in)
+void EditorClassifications::read(const Json &in)
 {
     if (in.contains("enabled"))
     {
@@ -138,7 +138,7 @@ void EditorClassification::read(const Json &in)
     }
 }
 
-Json &EditorClassification::write(Json &out) const
+Json &EditorClassifications::write(Json &out) const
 {
     out["enabled"] = enabled_;
 

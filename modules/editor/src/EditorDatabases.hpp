@@ -34,13 +34,22 @@ public:
     void clear();
 
     void setDataSets(const EditorDataSets &dataSets);
-    void push_back(std::shared_ptr<EditorDatabase> &database);
+    void pushBack(std::shared_ptr<EditorDatabase> &database);
 
     void select(std::vector<FileIndex::Selection> &selected,
                 const Aabb<double> &box);
 
     size_t size() const { return database_.size(); }
     const EditorDatabase &at(size_t i) const { return *database_[i]; }
+    const EditorDatabase &key(size_t id) const
+    {
+        const auto &it = hashTable_.find(id);
+        if (it != hashTable_.end())
+        {
+            return *database_[it->second];
+        }
+        THROW("Invalid database id");
+    }
 
     const Aabb<double> &boundary() const { return boundary_; }
     const Aabb<double> &boundaryView() const { return boundaryView_; }
@@ -48,6 +57,7 @@ public:
 
 protected:
     std::vector<std::shared_ptr<EditorDatabase>> database_;
+    std::unordered_map<size_t, size_t> hashTable_;
     Aabb<double> boundary_;
     Aabb<double> boundaryView_;
 };

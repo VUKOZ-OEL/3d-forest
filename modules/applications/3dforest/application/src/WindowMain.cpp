@@ -32,7 +32,7 @@
 #include <QPluginLoader>
 #include <QTextEdit>
 #include <Time.hpp>
-#include <WindowClassification.hpp>
+#include <WindowClassifications.hpp>
 #include <WindowClipFilter.hpp>
 #include <WindowDataSets.hpp>
 #include <WindowDock.hpp>
@@ -191,7 +191,7 @@ void WindowMain::createMenus()
 
     // Project
     ribbon_->addTab(QIcon(iconPath("briefcase")), "File");
-    ribbon_->setIconSize(QSize(20, 20));
+    ribbon_->setIconSize(QSize(0, 0));
 
     // New
     button = createToolButton(tr("New\nproject"),
@@ -242,15 +242,15 @@ void WindowMain::createMenus()
 
     // View
     ribbon_->addTab(QIcon(iconPath("monitor")), "View");
-    ribbon_->setIconSize(QSize(20, 20));
+    ribbon_->setIconSize(QSize(0, 0));
 
-    button = createToolButton(tr("Ortho\ngraphic"),
+    button = createToolButton(tr("Ortho"),
                               tr("Orthographic projection"),
                               "view-orthogonal");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewOrthographic()));
     ribbon_->addButton("View", "Projection", button);
 
-    button = createToolButton(tr("Perspec\ntive"),
+    button = createToolButton(tr("Perspective"),
                               tr("Perspective projection"),
                               "view-perspective");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewPerspective()));
@@ -296,7 +296,7 @@ void WindowMain::createMenus()
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewLayoutGrid()));
     ribbon_->addButton("View", "Layout", button);
 
-    button = createToolButton(tr("3 Right"),
+    button = createToolButton(tr("Grid 3"),
                               tr("Grid layout with 3 rows"),
                               "layout-grid-right");
     connect(button,
@@ -307,11 +307,11 @@ void WindowMain::createMenus()
 
     // Tools
     ribbon_->addTab(QIcon(iconPath("support")), "Tools");
-    ribbon_->setIconSize(QSize(20, 20));
+    ribbon_->setIconSize(QSize(0, 0));
 
     // Help
     ribbon_->addTab(QIcon(iconPath("information")), "Help");
-    ribbon_->setIconSize(QSize(20, 20));
+    ribbon_->setIconSize(QSize(0, 0));
 
     button =
         createToolButton(tr("About"), tr("About this application"), "about");
@@ -342,7 +342,7 @@ void WindowMain::createMenus()
 void WindowMain::createWindows()
 {
     // Create data sets window
-    windowDataSets_ = new WindowDataSets(this);
+    windowDataSets_ = new WindowDataSets(this, &editor_);
     connect(windowDataSets_,
             SIGNAL(selectionChanged()),
             this,
@@ -367,18 +367,18 @@ void WindowMain::createWindows()
                          "animated",
                          windowLayers_);
 
-    // Create classification window
-    windowClassification_ = new WindowClassification(this);
-    connect(windowClassification_,
+    // Create classifications window
+    windowClassifications_ = new WindowClassifications(this);
+    connect(windowClassifications_,
             SIGNAL(selectionChanged()),
             this,
-            SLOT(actionClassification()));
+            SLOT(actionClassifications()));
 
-    (void)createMenuTool(tr("Classification"),
-                         tr("Classifi\ncation"),
-                         tr("Show classification"),
+    (void)createMenuTool(tr("Classifications"),
+                         tr("Classifi\ncations"),
+                         tr("Show classifications"),
                          "variation",
-                         windowClassification_);
+                         windowClassifications_);
 
     // Create clip filter window
     windowClipFilter_ = new WindowClipFilter(this);
@@ -629,16 +629,16 @@ void WindowMain::actionViewLayout(WindowViewports::ViewLayout layout)
     {
         editor_.setNumberOfViewports(2);
         windowViewports_->setLayout(layout);
-        windowViewports_->resetScene(&editor_, 1);
+        windowViewports_->resetScene(&editor_, 1, true);
     }
     else if ((layout == WindowViewports::VIEW_LAYOUT_GRID) ||
              (layout == WindowViewports::VIEW_LAYOUT_THREE_ROWS_RIGHT))
     {
         editor_.setNumberOfViewports(4);
         windowViewports_->setLayout(layout);
-        windowViewports_->resetScene(&editor_, 1);
-        windowViewports_->resetScene(&editor_, 2);
-        windowViewports_->resetScene(&editor_, 3);
+        windowViewports_->resetScene(&editor_, 1, true);
+        windowViewports_->resetScene(&editor_, 2, true);
+        windowViewports_->resetScene(&editor_, 3, true);
     }
 
     editor_.unlock();
@@ -698,16 +698,17 @@ void WindowMain::actionDataSets()
     editor_.cancelThreads();
     editor_.lock();
     editor_.setDataSets(windowDataSets_->dataSets());
+    windowViewports_->resetScene(&editor_, false);
     editor_.tileViewClear();
     editor_.unlock();
     editor_.restartThreads();
 }
 
-void WindowMain::actionClassification()
+void WindowMain::actionClassifications()
 {
     editor_.cancelThreads();
     editor_.lock();
-    editor_.setClassification(windowClassification_->classification());
+    editor_.setClassifications(windowClassifications_->classifications());
     editor_.tileViewClear();
     editor_.unlock();
     editor_.restartThreads();
@@ -791,7 +792,7 @@ void WindowMain::actionAbout()
                           "Blue Cat team and other authors\n"
                           "https://www.3dforest.eu/\n"
                           "\n"
-                          "Additional icons: https://icons8.com"));
+                          "Icons are based on: https://icons8.com"));
 }
 
 void WindowMain::actionHelp()
@@ -930,12 +931,12 @@ void WindowMain::updateProject()
 {
     editor_.cancelThreads();
     editor_.lock();
-    windowViewports_->resetScene(&editor_);
+    windowViewports_->resetScene(&editor_, true);
     editor_.unlock();
 
     windowDataSets_->setDataSets(editor_.dataSets());
     windowLayers_->setLayers(editor_.layers());
-    windowClassification_->setClassification(editor_.classification());
+    windowClassifications_->setClassifications(editor_.classifications());
     windowClipFilter_->setClipFilter(editor_);
     windowSettingsView_->setSettings(editor_.settings().view());
 

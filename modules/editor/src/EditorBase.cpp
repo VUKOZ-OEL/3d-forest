@@ -26,7 +26,7 @@ static const char *EDITOR_BASE_KEY_PROJECT_NAME = "projectName";
 static const char *EDITOR_BASE_KEY_DATA_SET = "dataSets";
 static const char *EDITOR_BASE_KEY_LAYER = "layers";
 static const char *EDITOR_BASE_KEY_SETTINGS = "settings";
-static const char *EDITOR_BASE_KEY_CLASSIFICATION = "classifications";
+static const char *EDITOR_BASE_KEY_CLASSIFICATIONS = "classifications";
 // static const char *EDITOR_BASE_KEY_CLIP_FILTER = "clipFilter";
 
 EditorBase::EditorBase() : working_(this)
@@ -46,9 +46,9 @@ void EditorBase::close()
 
     database_.clear();
     dataSets_.clear();
-    layers_.clear();
+    layers_.setDefault();
+    classifications_.clear();
     clipFilter_.clear();
-    classification_.clear();
 
     for (auto &it : viewports_)
     {
@@ -94,16 +94,16 @@ void EditorBase::open(const std::string &path)
             layers_.read(in[EDITOR_BASE_KEY_LAYER]);
         }
 
+        // Classifications
+        if (in.contains(EDITOR_BASE_KEY_CLASSIFICATIONS))
+        {
+            classifications_.read(in[EDITOR_BASE_KEY_CLASSIFICATIONS]);
+        }
+
         // Settings
         if (in.contains(EDITOR_BASE_KEY_SETTINGS))
         {
             settings_.read(in[EDITOR_BASE_KEY_SETTINGS]);
-        }
-
-        // Classifications
-        if (in.contains(EDITOR_BASE_KEY_CLASSIFICATION))
-        {
-            classification_.read(in[EDITOR_BASE_KEY_CLASSIFICATION]);
         }
 
         // Clip filter
@@ -138,11 +138,11 @@ void EditorBase::write(const std::string &path)
     // Layers
     layers_.write(out[EDITOR_BASE_KEY_LAYER]);
 
+    // Classifications
+    classifications_.write(out[EDITOR_BASE_KEY_CLASSIFICATIONS]);
+
     // Settings
     settings_.write(out[EDITOR_BASE_KEY_SETTINGS]);
-
-    // Classifications
-    classification_.write(out[EDITOR_BASE_KEY_CLASSIFICATION]);
 
     // Clip filter
     // clipFilter_.write(out[EDITOR_BASE_KEY_CLIP_FILTER]);
@@ -158,13 +158,12 @@ void EditorBase::addFile(const std::string &path,
     try
     {
         // Data sets
-        size_t id = dataSets_.unusedId();
-        dataSets_.read(id, path, path_, settings, database_.boundary());
+        dataSets_.read(path, path_, settings, database_.boundary());
 
         // Database
         std::shared_ptr<EditorDatabase> db = std::make_shared<EditorDatabase>();
         db->setProperties(dataSets_.at(dataSets_.size() - 1));
-        database_.push_back(db);
+        database_.pushBack(db);
     }
     catch (std::exception &e)
     {
@@ -212,9 +211,10 @@ void EditorBase::setLayers(const EditorLayers &layers)
     unsavedChanges_ = true;
 }
 
-void EditorBase::setClassification(const EditorClassification &classification)
+void EditorBase::setClassifications(
+    const EditorClassifications &classifications)
 {
-    classification_ = classification;
+    classifications_ = classifications;
     // resetRendering();
     unsavedChanges_ = true;
 }

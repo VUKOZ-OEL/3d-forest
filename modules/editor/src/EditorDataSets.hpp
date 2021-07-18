@@ -23,6 +23,7 @@
 #define EDITOR_DATA_SETS_HPP
 
 #include <EditorDataSet.hpp>
+#include <unordered_map>
 
 /** Editor Data Sets. */
 class EditorDataSets
@@ -34,8 +35,10 @@ public:
 
     size_t size() const { return dataSets_.size(); }
     const EditorDataSet &at(size_t i) const { return dataSets_[i]; }
+    void erase(size_t i);
 
     size_t id(size_t i) const { return dataSets_[i].id(); }
+    size_t index(size_t id) { return hashTable_[id]; }
     size_t unusedId() const;
 
     bool isEnabled(size_t i) const { return dataSets_[i].isEnabled(); }
@@ -58,8 +61,13 @@ public:
         return dataSets_[i].dateCreated();
     }
 
-    void read(size_t id,
-              const std::string &path,
+    const Vector3<double> &translation(size_t i) const
+    {
+        return dataSets_[i].translation();
+    }
+    void setTranslation(size_t i, const Vector3<double> &translation);
+
+    void read(const std::string &path,
               const std::string &projectPath,
               const EditorSettingsImport &settings,
               const Aabb<double> &projectBoundary);
@@ -68,6 +76,7 @@ public:
 
 protected:
     std::vector<EditorDataSet> dataSets_;
+    std::unordered_map<size_t, size_t> hashTable_;
 };
 
 #endif /* EDITOR_DATA_SETS_HPP */

@@ -52,7 +52,7 @@ int RibbonButtonGroup::buttonCount() const
 void RibbonButtonGroup::addButton(QToolButton *button)
 {
   button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-  button->setMinimumSize(40, 50);
+  button->setMinimumSize(50, 50);
   button->setMaximumSize(70, 70);
   button->setAutoRaise(true);
   button->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);

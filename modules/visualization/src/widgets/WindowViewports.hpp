@@ -62,8 +62,8 @@ public:
     Camera camera(size_t viewportId) const;
 
     void updateScene(Editor *editor);
-    void resetScene(Editor *editor);
-    void resetScene(Editor *editor, size_t viewportId);
+    void resetScene(Editor *editor, bool resetView);
+    void resetScene(Editor *editor, size_t viewportId, bool resetView);
 
 signals:
     void cameraChanged(size_t viewportId);

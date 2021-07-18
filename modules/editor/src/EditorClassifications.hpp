@@ -17,17 +17,17 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file EditorClassification.hpp */
+/** @file EditorClassifications.hpp */
 
-#ifndef EDITOR_CLASSIFICATION_HPP
-#define EDITOR_CLASSIFICATION_HPP
+#ifndef EDITOR_CLASSIFICATIONS_HPP
+#define EDITOR_CLASSIFICATIONS_HPP
 
 #include <Vector3.hpp>
 #include <string>
 #include <vector>
 
-/** Editor Classification. */
-class EditorClassification
+/** Editor Classifications. */
+class EditorClassifications
 {
 public:
     struct Class
@@ -36,7 +36,7 @@ public:
         bool enabled;
     };
 
-    EditorClassification();
+    EditorClassifications();
 
     void clear();
 
@@ -60,4 +60,4 @@ protected:
     bool enabled_;
 };
 
-#endif /* EDITOR_CLASSIFICATION_HPP */
+#endif /* EDITOR_CLASSIFICATIONS_HPP */

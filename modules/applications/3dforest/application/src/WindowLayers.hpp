@@ -23,12 +23,16 @@
 #define WINDOW_LAYERS_HPP
 
 #include <EditorLayers.hpp>
+#include <QDialog>
 #include <QWidget>
 
 class QCheckBox;
+class QLineEdit;
 class QPushButton;
+class QToolButton;
 class QTreeWidget;
 class QTreeWidgetItem;
+class WindowMain;
 
 /** Window Layers. */
 class WindowLayers : public QWidget
@@ -45,32 +49,75 @@ public:
         COLUMN_LAST,
     };
 
-    WindowLayers(QWidget *parent);
+    WindowLayers(WindowMain *parent);
 
     const EditorLayers &layers() const { return layers_; }
     void setLayers(const EditorLayers &layers);
 
 public slots:
+    void toolAdd();
+    void toolEdit();
+    void toolDelete();
+
     void setEnabled(int state);
     void setEnabled(bool checked);
     void invertSelection();
     void clearSelection();
+
+    void itemSelectionChanged();
     void itemChanged(QTreeWidgetItem *item, int column);
 
 signals:
+    void dataChanged();
     void selectionChanged();
 
 protected:
-    EditorLayers layers_;
+    WindowMain *windowMain_;
+
     QTreeWidget *tree_;
     QCheckBox *enabledCheckBox_;
     QPushButton *invertButton_;
     QPushButton *deselectButton_;
+    QToolButton *addButton_;
+    QToolButton *editButton_;
+    QToolButton *deleteButton_;
 
+    EditorLayers layers_;
+
+    size_t index(const QTreeWidgetItem *item);
     void updateTree();
     void block();
     void unblock();
     void addItem(size_t i);
+};
+
+/** Window Layers Edit. */
+class WindowLayersEdit : public QDialog
+{
+    Q_OBJECT
+
+public:
+    QLineEdit *labelEdit_;
+    QColor color_;
+
+    WindowLayersEdit(QWidget *parent,
+                     const QString &windowTitle,
+                     const QString &buttonText,
+                     const QString &label,
+                     const QColor &color);
+
+public slots:
+    void setResultAccept();
+    void setResultReject();
+    void setColor();
+
+protected:
+    QPushButton *acceptButton_;
+    QPushButton *rejectButton_;
+
+    QPushButton *colorButton_;
+
+    void updateColor();
 };
 
 #endif /* WINDOW_LAYERS_HPP */

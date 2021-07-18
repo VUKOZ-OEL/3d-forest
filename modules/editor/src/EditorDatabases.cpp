@@ -28,24 +28,28 @@ EditorDatabases::EditorDatabases()
 void EditorDatabases::clear()
 {
     database_.clear();
+    hashTable_.clear();
 }
 
 void EditorDatabases::setDataSets(const EditorDataSets &dataSets)
 {
     size_t n = dataSets.size();
     database_.resize(n);
+    hashTable_.clear();
 
     for (size_t i = 0; i < n; i++)
     {
         database_[i] = std::make_shared<EditorDatabase>();
         database_[i]->setProperties(dataSets.at(i));
+        hashTable_[database_[i]->properties().id()] = i;
     }
 
     updateBoundary();
 }
 
-void EditorDatabases::push_back(std::shared_ptr<EditorDatabase> &database)
+void EditorDatabases::pushBack(std::shared_ptr<EditorDatabase> &database)
 {
+    hashTable_[database->properties().id()] = database_.size();
     database_.push_back(database);
     updateBoundary();
 }

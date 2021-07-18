@@ -158,31 +158,33 @@ void WindowViewports::updateScene(Editor *editor)
     }
 }
 
-void WindowViewports::resetScene(Editor *editor)
+void WindowViewports::resetScene(Editor *editor, bool resetView)
 {
     for (size_t i = 0; i < viewports_.size(); i++)
     {
-        viewports_[i]->resetScene(editor);
+        viewports_[i]->resetScene(editor, resetView);
     }
 }
 
-void WindowViewports::resetScene(Editor *editor, size_t viewportId)
+void WindowViewports::resetScene(Editor *editor,
+                                 size_t viewportId,
+                                 bool resetView)
 {
     if (viewportId == WINDOW_VIEWPORTS_TOP)
     {
-        viewports_[WINDOW_VIEWPORTS_TOP]->resetScene(editor);
+        viewports_[WINDOW_VIEWPORTS_TOP]->resetScene(editor, resetView);
         viewports_[WINDOW_VIEWPORTS_TOP]->setViewOrthographic();
         viewports_[WINDOW_VIEWPORTS_TOP]->setViewTop();
     }
     else if (viewportId == WINDOW_VIEWPORTS_FRONT)
     {
-        viewports_[WINDOW_VIEWPORTS_FRONT]->resetScene(editor);
+        viewports_[WINDOW_VIEWPORTS_FRONT]->resetScene(editor, resetView);
         viewports_[WINDOW_VIEWPORTS_FRONT]->setViewOrthographic();
         viewports_[WINDOW_VIEWPORTS_FRONT]->setViewFront();
     }
     else if (viewportId == WINDOW_VIEWPORTS_RIGHT)
     {
-        viewports_[WINDOW_VIEWPORTS_RIGHT]->resetScene(editor);
+        viewports_[WINDOW_VIEWPORTS_RIGHT]->resetScene(editor, resetView);
         viewports_[WINDOW_VIEWPORTS_RIGHT]->setViewOrthographic();
         viewports_[WINDOW_VIEWPORTS_RIGHT]->setViewRight();
     }

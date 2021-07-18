@@ -22,16 +22,25 @@
 #include <QBrush>
 #include <QCheckBox>
 #include <QColor>
+#include <QColorDialog>
 #include <QDebug>
 #include <QHBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPixmap>
 #include <QPushButton>
+#include <QToolBar>
+#include <QToolButton>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QTreeWidgetItemIterator>
 #include <QVBoxLayout>
 #include <WindowLayers.hpp>
+#include <WindowMain.hpp>
 
-WindowLayers::WindowLayers(QWidget *parent) : QWidget(parent)
+WindowLayers::WindowLayers(WindowMain *parent)
+    : QWidget(parent),
+      windowMain_(parent)
 {
     // Table
     tree_ = new QTreeWidget();
@@ -44,12 +53,39 @@ WindowLayers::WindowLayers(QWidget *parent) : QWidget(parent)
             SLOT(setEnabled(int)));
 
     invertButton_ = new QPushButton(tr("Invert"));
-    invertButton_->setToolTip(tr("Invert the selection"));
+    invertButton_->setToolTip(tr("Inverts visibility"));
     connect(invertButton_, SIGNAL(clicked()), this, SLOT(invertSelection()));
 
-    deselectButton_ = new QPushButton(tr("Deselect"));
-    deselectButton_->setToolTip(tr("Dismiss the selection"));
+    deselectButton_ = new QPushButton(tr("Hide all"));
+    deselectButton_->setToolTip(tr("Hides all layers"));
     connect(deselectButton_, SIGNAL(clicked()), this, SLOT(clearSelection()));
+
+    // Menu
+    addButton_ = WindowMain::createToolButton(tr("Add"),
+                                              tr("Adds new layer"),
+                                              "file-add");
+
+    editButton_ = WindowMain::createToolButton(tr("Edit"),
+                                               tr("Edits selected layer"),
+                                               "file-edit");
+
+    deleteButton_ = WindowMain::createToolButton(tr("Remove"),
+                                                 tr("Removes selected layer"),
+                                                 "file-delete");
+
+    connect(addButton_, SIGNAL(clicked()), this, SLOT(toolAdd()));
+    connect(editButton_, SIGNAL(clicked()), this, SLOT(toolEdit()));
+    connect(deleteButton_, SIGNAL(clicked()), this, SLOT(toolDelete()));
+
+    editButton_->setEnabled(false);
+    deleteButton_->setEnabled(false);
+
+    // Tool bar
+    QToolBar *toolBar = new QToolBar;
+    toolBar->addWidget(addButton_);
+    toolBar->addWidget(editButton_);
+    toolBar->addWidget(deleteButton_);
+    toolBar->setIconSize(QSize(25, 25));
 
     // Layout
     QHBoxLayout *controlLayout = new QHBoxLayout;
@@ -60,9 +96,106 @@ WindowLayers::WindowLayers(QWidget *parent) : QWidget(parent)
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setContentsMargins(1, 1, 1, 1);
+    mainLayout->addWidget(toolBar);
     mainLayout->addWidget(tree_);
     mainLayout->addLayout(controlLayout);
     setLayout(mainLayout);
+}
+
+void WindowLayers::toolAdd()
+{
+    // Dialog
+    WindowLayersEdit dialog(windowMain_,
+                            "Add Layer",
+                            "Create",
+                            "label",
+                            QColor(255, 255, 255));
+
+    if (dialog.exec() == QDialog::Rejected)
+    {
+        return;
+    }
+
+    // Apply
+    float r = static_cast<float>(dialog.color_.redF());
+    float g = static_cast<float>(dialog.color_.greenF());
+    float b = static_cast<float>(dialog.color_.blueF());
+    Vector3<float> color(r, g, b);
+
+    EditorLayer newLayer;
+    newLayer.set(layers_.unusedId(),
+                 dialog.labelEdit_->text().toStdString(),
+                 true,
+                 color);
+
+    layers_.push_back(newLayer);
+    setLayers(layers_);
+
+    // Update
+    emit selectionChanged();
+}
+
+void WindowLayers::toolEdit()
+{
+    // Item
+    QList<QTreeWidgetItem *> items = tree_->selectedItems();
+
+    if (items.count() < 1)
+    {
+        return;
+    }
+
+    QTreeWidgetItem *item = items.at(0);
+    size_t idx = index(item);
+
+    QString label = QString::fromStdString(layers_.label(idx));
+    Vector3<float> rgb = layers_.color(idx);
+
+    QColor color;
+    color.setRgbF(rgb[0], rgb[1], rgb[2]);
+
+    // Dialog
+    WindowLayersEdit dialog(windowMain_, "Edit Layer", "Apply", label, color);
+
+    if (dialog.exec() == QDialog::Rejected)
+    {
+        return;
+    }
+
+    // Apply
+    label = dialog.labelEdit_->text();
+
+    float r = static_cast<float>(dialog.color_.redF());
+    float g = static_cast<float>(dialog.color_.greenF());
+    float b = static_cast<float>(dialog.color_.blueF());
+    rgb.set(r, g, b);
+
+    layers_.setLabel(idx, label.toStdString());
+    layers_.setColor(idx, rgb);
+
+    setLayers(layers_);
+
+    // Update
+    emit selectionChanged();
+}
+
+void WindowLayers::toolDelete()
+{
+    QList<QTreeWidgetItem *> items = tree_->selectedItems();
+
+    if (items.count() < 1)
+    {
+        return;
+    }
+
+    QTreeWidgetItem *item = items.at(0);
+    size_t idx = index(item);
+    if (idx > 0)
+    {
+        layers_.erase(idx);
+        delete item;
+        emit selectionChanged();
+    }
 }
 
 void WindowLayers::setEnabled(int state)
@@ -94,28 +227,49 @@ void WindowLayers::clearSelection()
     emit selectionChanged();
 }
 
+void WindowLayers::itemSelectionChanged()
+{
+    QList<QTreeWidgetItem *> items = tree_->selectedItems();
+
+    if (items.count() > 0)
+    {
+        editButton_->setEnabled(true);
+        deleteButton_->setEnabled(true);
+    }
+    else
+    {
+        editButton_->setEnabled(false);
+        deleteButton_->setEnabled(false);
+    }
+}
+
 void WindowLayers::itemChanged(QTreeWidgetItem *item, int column)
 {
     if (column == COLUMN_CHECKED)
     {
-        size_t id = item->text(COLUMN_ID).toULong();
         bool checked = (item->checkState(COLUMN_CHECKED) == Qt::Checked);
 
-        layers_.setEnabled(id, checked);
+        layers_.setEnabled(index(item), checked);
         emit selectionChanged();
     }
+}
+
+size_t WindowLayers::index(const QTreeWidgetItem *item)
+{
+    return layers_.index(item->text(COLUMN_ID).toULong());
 }
 
 void WindowLayers::updateTree()
 {
     block();
 
-    size_t i = 0;
     QTreeWidgetItemIterator it(tree_);
 
     while (*it)
     {
-        if (layers_.isEnabled(i))
+        size_t idx = index(*it);
+
+        if (layers_.isEnabled(idx))
         {
             (*it)->setCheckState(COLUMN_CHECKED, Qt::Checked);
         }
@@ -124,7 +278,6 @@ void WindowLayers::updateTree()
             (*it)->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
         }
 
-        i++;
         ++it;
     }
 
@@ -134,6 +287,7 @@ void WindowLayers::updateTree()
 void WindowLayers::block()
 {
     disconnect(tree_, SIGNAL(itemChanged(QTreeWidgetItem *, int)), 0, 0);
+    disconnect(tree_, SIGNAL(itemSelectionChanged()), 0, 0);
     (void)blockSignals(true);
 }
 
@@ -144,6 +298,10 @@ void WindowLayers::unblock()
             SIGNAL(itemChanged(QTreeWidgetItem *, int)),
             this,
             SLOT(itemChanged(QTreeWidgetItem *, int)));
+    connect(tree_,
+            SIGNAL(itemSelectionChanged()),
+            this,
+            SLOT(itemSelectionChanged()));
 }
 
 void WindowLayers::addItem(size_t i)
@@ -186,7 +344,7 @@ void WindowLayers::setLayers(const EditorLayers &layers)
     // Header
     tree_->setColumnCount(COLUMN_LAST);
     QStringList labels;
-    labels << tr("Select") << tr("Id") << tr("Label");
+    labels << tr("Visible") << tr("Id") << tr("Label");
     tree_->setHeaderLabels(labels);
 
     // Content
@@ -205,4 +363,90 @@ void WindowLayers::setLayers(const EditorLayers &layers)
     enabledCheckBox_->setChecked(layers_.isEnabled());
 
     unblock();
+}
+
+WindowLayersEdit::WindowLayersEdit(QWidget *parent,
+                                   const QString &windowTitle,
+                                   const QString &buttonText,
+                                   const QString &label,
+                                   const QColor &color)
+    : QDialog(parent),
+      color_(color)
+{
+    // Widgets
+    acceptButton_ = new QPushButton(buttonText);
+    connect(acceptButton_, SIGNAL(clicked()), this, SLOT(setResultAccept()));
+
+    rejectButton_ = new QPushButton(tr("Cancel"));
+    connect(rejectButton_, SIGNAL(clicked()), this, SLOT(setResultReject()));
+
+    labelEdit_ = new QLineEdit(label);
+
+    colorButton_ = new QPushButton(tr("Custom"));
+    updateColor();
+    connect(colorButton_, SIGNAL(clicked()), this, SLOT(setColor()));
+
+    // Layout
+    QGridLayout *gridLayout = new QGridLayout;
+    int row = 0;
+    gridLayout->addWidget(new QLabel(tr("Label")), row, 0);
+    gridLayout->addWidget(labelEdit_, row, 1);
+    row++;
+    gridLayout->addWidget(new QLabel(tr("Color")), row, 0);
+    gridLayout->addWidget(colorButton_, row, 1);
+    row++;
+
+    QHBoxLayout *dialogButtons = new QHBoxLayout;
+    dialogButtons->addStretch();
+    dialogButtons->addWidget(acceptButton_);
+    dialogButtons->addWidget(rejectButton_);
+
+    QVBoxLayout *dialogLayout = new QVBoxLayout;
+    dialogLayout->addLayout(gridLayout);
+    dialogLayout->addSpacing(10);
+    dialogLayout->addLayout(dialogButtons);
+    dialogLayout->addStretch();
+
+    setLayout(dialogLayout);
+
+    // Window
+    setWindowTitle(windowTitle);
+    setMaximumWidth(width());
+    setMaximumHeight(height());
+}
+
+void WindowLayersEdit::setResultAccept()
+{
+    close();
+    setResult(QDialog::Accepted);
+}
+
+void WindowLayersEdit::setResultReject()
+{
+    close();
+    setResult(QDialog::Rejected);
+}
+
+void WindowLayersEdit::setColor()
+{
+    QColorDialog dialog(color_, this);
+
+    if (dialog.exec() == QDialog::Rejected)
+    {
+        return;
+    }
+
+    color_ = dialog.selectedColor();
+    updateColor();
+}
+
+void WindowLayersEdit::updateColor()
+{
+    QPixmap pixmap(25, 25);
+    pixmap.fill(color_);
+
+    QIcon icon(pixmap);
+
+    colorButton_->setIcon(icon);
+    colorButton_->setIconSize(QSize(10, 10));
 }

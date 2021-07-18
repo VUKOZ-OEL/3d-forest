@@ -23,12 +23,83 @@
 
 EditorLayers::EditorLayers() : enabled_(false)
 {
-    clear();
+    setDefault();
+}
+
+void EditorLayers::clear()
+{
+    layers_.clear();
+    hashTableId_.clear();
+    hashTableEnabledId_.clear();
+}
+
+void EditorLayers::setDefault()
+{
+    size_t id = 0;
+    size_t idx = 0;
+
+    layers_.resize(1);
+    layers_[idx].set(id, "main", true, {1.0F, 1.0F, 1.0F});
+
+    hashTableId_.clear();
+    hashTableId_[id] = idx;
+
+    hashTableEnabledId_.clear();
+    hashTableEnabledId_.insert(id);
 }
 
 void EditorLayers::setEnabled(bool b)
 {
     enabled_ = b;
+}
+
+void EditorLayers::push_back(const EditorLayer &layer)
+{
+    size_t id = layer.id();
+    size_t idx = layers_.size();
+
+    layers_.push_back(layer);
+
+    hashTableId_[id] = idx;
+
+    if (layer.isEnabled())
+    {
+        hashTableEnabledId_.insert(id);
+    }
+}
+
+void EditorLayers::erase(size_t i)
+{
+    if (layers_.size() == 0)
+    {
+        return;
+    }
+
+    size_t key = id(i);
+
+    size_t n = layers_.size() - 1;
+    for (size_t pos = i; pos < n; pos++)
+    {
+        layers_[pos] = layers_[pos + 1];
+    }
+    layers_.resize(n);
+
+    hashTableId_.erase(key);
+    hashTableEnabledId_.erase(key);
+}
+
+size_t EditorLayers::unusedId() const
+{
+    // Return minimum available id value
+    for (size_t rval = 0; rval < std::numeric_limits<size_t>::max(); rval++)
+    {
+        if (hashTableId_.find(rval) == hashTableId_.end())
+        {
+            return rval;
+        }
+    }
+
+    THROW("New layer identifier is not available.");
 }
 
 void EditorLayers::setEnabled(size_t i, bool b)
@@ -37,11 +108,11 @@ void EditorLayers::setEnabled(size_t i, bool b)
 
     if (b)
     {
-        idHashTable_.insert(layers_[i].id());
+        hashTableEnabledId_.insert(layers_[i].id());
     }
     else
     {
-        idHashTable_.erase(layers_[i].id());
+        hashTableEnabledId_.erase(layers_[i].id());
     }
 }
 
@@ -52,26 +123,26 @@ void EditorLayers::setEnabledAll(bool b)
         layers_[i].setEnabled(b);
     }
 
-    idHashTable_.clear();
+    hashTableEnabledId_.clear();
     if (b)
     {
         for (size_t i = 0; i < layers_.size(); i++)
         {
-            idHashTable_.insert(layers_[i].id());
+            hashTableEnabledId_.insert(layers_[i].id());
         }
     }
 }
 
 void EditorLayers::setInvertAll()
 {
-    idHashTable_.clear();
+    hashTableEnabledId_.clear();
     for (size_t i = 0; i < layers_.size(); i++)
     {
         bool b = !layers_[i].isEnabled();
         layers_[i].setEnabled(b);
         if (b)
         {
-            idHashTable_.insert(layers_[i].id());
+            hashTableEnabledId_.insert(layers_[i].id());
         }
     }
 }
@@ -86,14 +157,10 @@ void EditorLayers::setColor(size_t i, const Vector3<float> &color)
     layers_[i].setColor(color);
 }
 
-void EditorLayers::clear()
-{
-    layers_.resize(1);
-    layers_[0].set(0, "main", true, {1.0F, 1.0F, 1.0F});
-}
-
 void EditorLayers::read(const Json &in)
 {
+    clear();
+
     if (in.contains("enabled"))
     {
         enabled_ = in["enabled"].isTrue();
@@ -108,14 +175,29 @@ void EditorLayers::read(const Json &in)
         size_t i = 0;
         size_t n = in["layers"].array().size();
 
-        clear();
         layers_.resize(n);
 
         for (auto const &it : in["layers"].array())
         {
             layers_[i].read(it);
+
+            size_t id = layers_[i].id();
+
+            hashTableId_[id] = i;
+
+            if (layers_[i].isEnabled())
+            {
+                hashTableEnabledId_.insert(id);
+            }
+
             i++;
         }
+    }
+
+    // Default
+    if (layers_.size() == 0)
+    {
+        setDefault();
     }
 }
 
