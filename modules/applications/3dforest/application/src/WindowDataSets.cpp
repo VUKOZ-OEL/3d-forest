@@ -23,11 +23,14 @@
 #include <QBrush>
 #include <QCheckBox>
 #include <QColor>
+#include <QColorDialog>
 #include <QDebug>
 #include <QDoubleSpinBox>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
+#include <QPixmap>
 #include <QPushButton>
 #include <QToolBar>
 #include <QToolButton>
@@ -114,16 +117,20 @@ void WindowDataSets::toolEdit()
     QTreeWidgetItem *item = items.at(0);
     size_t idx = index(item);
 
-    // Dialog
-    WindowDataSetsEdit dialog(windowMain_);
+    QString label = QString::fromStdString(dataSets_.label(idx));
+    Vector3<float> rgb = dataSets_.color(idx);
+    Vector3<double> offset = dataSets_.translation(idx);
 
-    Vector3<double> t = dataSets_.translation(idx);
-    for (size_t i = 0; i < 3; i++)
-    {
-        dialog.offsetSpinBox_[i]->setMinimum(-1e8);
-        dialog.offsetSpinBox_[i]->setMaximum(1e8);
-        dialog.offsetSpinBox_[i]->setValue(t[i]);
-    }
+    QColor color;
+    color.setRgbF(rgb[0], rgb[1], rgb[2]);
+
+    // Dialog
+    WindowDataSetsEdit dialog(windowMain_,
+                              "Edit Data Set",
+                              "Apply",
+                              label,
+                              color,
+                              offset);
 
     if (dialog.exec() == QDialog::Rejected)
     {
@@ -131,11 +138,23 @@ void WindowDataSets::toolEdit()
     }
 
     // Apply
+    label = dialog.labelEdit_->text();
+
+    float r = static_cast<float>(dialog.color_.redF());
+    float g = static_cast<float>(dialog.color_.greenF());
+    float b = static_cast<float>(dialog.color_.blueF());
+    rgb.set(r, g, b);
+
     for (size_t i = 0; i < 3; i++)
     {
-        t[i] = dialog.offsetSpinBox_[i]->value();
+        offset[i] = dialog.offsetSpinBox_[i]->value();
     }
-    dataSets_.setTranslation(idx, t);
+
+    dataSets_.setLabel(idx, label.toStdString());
+    dataSets_.setColor(idx, rgb);
+    dataSets_.setTranslation(idx, offset);
+
+    setDataSets(dataSets_);
 
     // Update
     emit selectionChanged();
@@ -312,36 +331,55 @@ void WindowDataSets::setDataSets(const EditorDataSets &dataSets)
     unblock();
 }
 
-WindowDataSetsEdit::WindowDataSetsEdit(QWidget *parent) : QDialog(parent)
+WindowDataSetsEdit::WindowDataSetsEdit(QWidget *parent,
+                                       const QString &windowTitle,
+                                       const QString &buttonText,
+                                       const QString &label,
+                                       const QColor &color,
+                                       const Vector3<double> &offset)
+    : QDialog(parent),
+      color_(color)
 {
     // Widgets
-    acceptButton_ = new QPushButton(tr("Apply"));
+    acceptButton_ = new QPushButton(buttonText);
     connect(acceptButton_, SIGNAL(clicked()), this, SLOT(setResultAccept()));
 
     rejectButton_ = new QPushButton(tr("Cancel"));
     connect(rejectButton_, SIGNAL(clicked()), this, SLOT(setResultReject()));
 
-    QGroupBox *offsetGroup = new QGroupBox(tr("Offset"));
+    labelEdit_ = new QLineEdit(label);
 
-    for (int i = 0; i < 3; i++)
+    colorButton_ = new QPushButton(tr("Custom"));
+    updateColor();
+    connect(colorButton_, SIGNAL(clicked()), this, SLOT(setColor()));
+
+    for (size_t i = 0; i < 3; i++)
     {
         offsetSpinBox_[i] = new QDoubleSpinBox;
         offsetSpinBox_[i]->setDecimals(6);
+        offsetSpinBox_[i]->setMinimum(-1e8);
+        offsetSpinBox_[i]->setMaximum(1e8);
+        offsetSpinBox_[i]->setValue(offset[i]);
     }
 
     // Layout
-    QGridLayout *offsetLayout = new QGridLayout;
+    QGridLayout *gridLayout = new QGridLayout;
     int row = 0;
-    offsetLayout->addWidget(new QLabel(tr("x")), row, 0);
-    offsetLayout->addWidget(offsetSpinBox_[0], row, 1);
+    gridLayout->addWidget(new QLabel(tr("Label")), row, 0);
+    gridLayout->addWidget(labelEdit_, row, 1);
     row++;
-    offsetLayout->addWidget(new QLabel(tr("y")), row, 0);
-    offsetLayout->addWidget(offsetSpinBox_[1], row, 1);
+    gridLayout->addWidget(new QLabel(tr("Color")), row, 0);
+    gridLayout->addWidget(colorButton_, row, 1);
     row++;
-    offsetLayout->addWidget(new QLabel(tr("z")), row, 0);
-    offsetLayout->addWidget(offsetSpinBox_[2], row, 1);
+    gridLayout->addWidget(new QLabel(tr("Offset x")), row, 0);
+    gridLayout->addWidget(offsetSpinBox_[0], row, 1);
     row++;
-    offsetGroup->setLayout(offsetLayout);
+    gridLayout->addWidget(new QLabel(tr("Offset y")), row, 0);
+    gridLayout->addWidget(offsetSpinBox_[1], row, 1);
+    row++;
+    gridLayout->addWidget(new QLabel(tr("Offset z")), row, 0);
+    gridLayout->addWidget(offsetSpinBox_[2], row, 1);
+    row++;
 
     QHBoxLayout *dialogButtons = new QHBoxLayout;
     dialogButtons->addStretch();
@@ -349,7 +387,7 @@ WindowDataSetsEdit::WindowDataSetsEdit(QWidget *parent) : QDialog(parent)
     dialogButtons->addWidget(rejectButton_);
 
     QVBoxLayout *dialogLayout = new QVBoxLayout;
-    dialogLayout->addWidget(offsetGroup);
+    dialogLayout->addLayout(gridLayout);
     dialogLayout->addSpacing(10);
     dialogLayout->addLayout(dialogButtons);
     dialogLayout->addStretch();
@@ -357,7 +395,7 @@ WindowDataSetsEdit::WindowDataSetsEdit(QWidget *parent) : QDialog(parent)
     setLayout(dialogLayout);
 
     // Window
-    setWindowTitle("Edit Data Set");
+    setWindowTitle(windowTitle);
     setMaximumWidth(width());
     setMaximumHeight(height());
 }
@@ -372,4 +410,28 @@ void WindowDataSetsEdit::setResultReject()
 {
     close();
     setResult(QDialog::Rejected);
+}
+
+void WindowDataSetsEdit::setColor()
+{
+    QColorDialog dialog(color_, this);
+
+    if (dialog.exec() == QDialog::Rejected)
+    {
+        return;
+    }
+
+    color_ = dialog.selectedColor();
+    updateColor();
+}
+
+void WindowDataSetsEdit::updateColor()
+{
+    QPixmap pixmap(25, 25);
+    pixmap.fill(color_);
+
+    QIcon icon(pixmap);
+
+    colorButton_->setIcon(icon);
+    colorButton_->setIconSize(QSize(10, 10));
 }
