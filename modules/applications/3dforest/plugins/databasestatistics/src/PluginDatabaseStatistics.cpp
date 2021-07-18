@@ -61,7 +61,7 @@ void PluginDatabaseStatisticsWindow::compute()
     computeReset();
 
     // 2. Collect new result
-    editor_->attach();
+    editor_->cancelThreads();
 
     std::vector<FileIndex::Selection> selection;
     editor_->select(selection);
@@ -98,7 +98,7 @@ void PluginDatabaseStatisticsWindow::compute()
     }
     progressDialog.setValue(progressDialog.maximum());
 
-    editor_->detach();
+    editor_->restartThreads();
 
     // 3. Output new result
     computeOutput();
