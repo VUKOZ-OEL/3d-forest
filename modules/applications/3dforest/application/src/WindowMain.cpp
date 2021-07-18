@@ -792,7 +792,7 @@ void WindowMain::actionAbout()
                           "Blue Cat team and other authors\n"
                           "https://www.3dforest.eu/\n"
                           "\n"
-                          "Additional icons: https://icons8.com"));
+                          "Icons are based on: https://icons8.com"));
 }
 
 void WindowMain::actionHelp()
