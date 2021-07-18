@@ -60,6 +60,8 @@ public slots:
     void setEnabled(bool checked);
     void invertSelection();
     void clearSelection();
+
+    void itemSelectionChanged();
     void itemChanged(QTreeWidgetItem *item, int column);
 
 signals:
@@ -67,7 +69,6 @@ signals:
     void selectionChanged();
 
 protected:
-    EditorLayers layers_;
     QTreeWidget *tree_;
     QCheckBox *enabledCheckBox_;
     QPushButton *invertButton_;
@@ -76,6 +77,9 @@ protected:
     QToolButton *editButton_;
     QToolButton *deleteButton_;
 
+    EditorLayers layers_;
+
+    size_t index(const QTreeWidgetItem *item);
     void updateTree();
     void block();
     void unblock();

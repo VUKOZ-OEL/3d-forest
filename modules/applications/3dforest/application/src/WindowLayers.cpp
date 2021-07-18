@@ -47,11 +47,11 @@ WindowLayers::WindowLayers(QWidget *parent) : QWidget(parent)
             SLOT(setEnabled(int)));
 
     invertButton_ = new QPushButton(tr("Invert"));
-    invertButton_->setToolTip(tr("Invert the selection"));
+    invertButton_->setToolTip(tr("Invert visibility"));
     connect(invertButton_, SIGNAL(clicked()), this, SLOT(invertSelection()));
 
-    deselectButton_ = new QPushButton(tr("Deselect"));
-    deselectButton_->setToolTip(tr("Dismiss the selection"));
+    deselectButton_ = new QPushButton(tr("Hide all"));
+    deselectButton_->setToolTip(tr("Hide all layers"));
     connect(deselectButton_, SIGNAL(clicked()), this, SLOT(clearSelection()));
 
     // Menu
@@ -70,7 +70,6 @@ WindowLayers::WindowLayers(QWidget *parent) : QWidget(parent)
     connect(editButton_, SIGNAL(clicked()), this, SLOT(toolEdit()));
     connect(deleteButton_, SIGNAL(clicked()), this, SLOT(toolDelete()));
 
-    addButton_->setEnabled(false);
     editButton_->setEnabled(false);
     deleteButton_->setEnabled(false);
 
@@ -106,6 +105,21 @@ void WindowLayers::toolEdit()
 
 void WindowLayers::toolDelete()
 {
+    QList<QTreeWidgetItem *> items = tree_->selectedItems();
+
+    if (items.count() < 1)
+    {
+        return;
+    }
+
+    QTreeWidgetItem *item = items.at(0);
+    size_t idx = index(item);
+    if (idx > 0)
+    {
+        layers_.remove(idx);
+        delete item;
+        emit selectionChanged();
+    }
 }
 
 void WindowLayers::setEnabled(int state)
@@ -137,28 +151,49 @@ void WindowLayers::clearSelection()
     emit selectionChanged();
 }
 
+void WindowLayers::itemSelectionChanged()
+{
+    QList<QTreeWidgetItem *> items = tree_->selectedItems();
+
+    if (items.count() > 0)
+    {
+        editButton_->setEnabled(true);
+        deleteButton_->setEnabled(true);
+    }
+    else
+    {
+        editButton_->setEnabled(false);
+        deleteButton_->setEnabled(false);
+    }
+}
+
 void WindowLayers::itemChanged(QTreeWidgetItem *item, int column)
 {
     if (column == COLUMN_CHECKED)
     {
-        size_t id = item->text(COLUMN_ID).toULong();
         bool checked = (item->checkState(COLUMN_CHECKED) == Qt::Checked);
 
-        layers_.setEnabled(id, checked);
+        layers_.setEnabled(index(item), checked);
         emit selectionChanged();
     }
+}
+
+size_t WindowLayers::index(const QTreeWidgetItem *item)
+{
+    return layers_.index(item->text(COLUMN_ID).toULong());
 }
 
 void WindowLayers::updateTree()
 {
     block();
 
-    size_t i = 0;
     QTreeWidgetItemIterator it(tree_);
 
     while (*it)
     {
-        if (layers_.isEnabled(i))
+        size_t idx = index(*it);
+
+        if (layers_.isEnabled(idx))
         {
             (*it)->setCheckState(COLUMN_CHECKED, Qt::Checked);
         }
@@ -167,7 +202,6 @@ void WindowLayers::updateTree()
             (*it)->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
         }
 
-        i++;
         ++it;
     }
 
@@ -177,6 +211,7 @@ void WindowLayers::updateTree()
 void WindowLayers::block()
 {
     disconnect(tree_, SIGNAL(itemChanged(QTreeWidgetItem *, int)), 0, 0);
+    disconnect(tree_, SIGNAL(itemSelectionChanged()), 0, 0);
     (void)blockSignals(true);
 }
 
@@ -187,6 +222,10 @@ void WindowLayers::unblock()
             SIGNAL(itemChanged(QTreeWidgetItem *, int)),
             this,
             SLOT(itemChanged(QTreeWidgetItem *, int)));
+    connect(tree_,
+            SIGNAL(itemSelectionChanged()),
+            this,
+            SLOT(itemSelectionChanged()));
 }
 
 void WindowLayers::addItem(size_t i)
@@ -229,7 +268,7 @@ void WindowLayers::setLayers(const EditorLayers &layers)
     // Header
     tree_->setColumnCount(COLUMN_LAST);
     QStringList labels;
-    labels << tr("Select") << tr("Id") << tr("Label");
+    labels << tr("Visible") << tr("Id") << tr("Label");
     tree_->setHeaderLabels(labels);
 
     // Content
