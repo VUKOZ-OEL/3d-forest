@@ -91,8 +91,8 @@ protected:
     void addItem(size_t i);
 };
 
-/** Window Layers New. */
-class WindowLayersNew : public QDialog
+/** Window Layers Edit. */
+class WindowLayersEdit : public QDialog
 {
     Q_OBJECT
 
@@ -100,7 +100,11 @@ public:
     QLineEdit *labelEdit_;
     QColor color_;
 
-    WindowLayersNew(QWidget *parent);
+    WindowLayersEdit(QWidget *parent,
+                     const QString &windowTitle,
+                     const QString &buttonText,
+                     const QString &label,
+                     const QColor &color);
 
 public slots:
     void setResultAccept();

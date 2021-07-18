@@ -105,7 +105,11 @@ WindowLayers::WindowLayers(WindowMain *parent)
 void WindowLayers::toolAdd()
 {
     // Dialog
-    WindowLayersNew dialog(windowMain_);
+    WindowLayersEdit dialog(windowMain_,
+                            "Add Layer",
+                            "Create",
+                            "label",
+                            QColor(255, 255, 255));
 
     if (dialog.exec() == QDialog::Rejected)
     {
@@ -133,6 +137,46 @@ void WindowLayers::toolAdd()
 
 void WindowLayers::toolEdit()
 {
+    // Item
+    QList<QTreeWidgetItem *> items = tree_->selectedItems();
+
+    if (items.count() < 1)
+    {
+        return;
+    }
+
+    QTreeWidgetItem *item = items.at(0);
+    size_t idx = index(item);
+
+    QString label = QString::fromStdString(layers_.label(idx));
+    Vector3<float> rgb = layers_.color(idx);
+
+    QColor color;
+    color.setRgbF(rgb[0], rgb[1], rgb[2]);
+
+    // Dialog
+    WindowLayersEdit dialog(windowMain_, "Edit Layer", "Apply", label, color);
+
+    if (dialog.exec() == QDialog::Rejected)
+    {
+        return;
+    }
+
+    // Apply
+    label = dialog.labelEdit_->text();
+
+    float r = static_cast<float>(dialog.color_.redF());
+    float g = static_cast<float>(dialog.color_.greenF());
+    float b = static_cast<float>(dialog.color_.blueF());
+    rgb.set(r, g, b);
+
+    layers_.setLabel(idx, label.toStdString());
+    layers_.setColor(idx, rgb);
+
+    setLayers(layers_);
+
+    // Update
+    emit selectionChanged();
 }
 
 void WindowLayers::toolDelete()
@@ -321,18 +365,22 @@ void WindowLayers::setLayers(const EditorLayers &layers)
     unblock();
 }
 
-WindowLayersNew::WindowLayersNew(QWidget *parent)
+WindowLayersEdit::WindowLayersEdit(QWidget *parent,
+                                   const QString &windowTitle,
+                                   const QString &buttonText,
+                                   const QString &label,
+                                   const QColor &color)
     : QDialog(parent),
-      color_(255, 255, 255)
+      color_(color)
 {
     // Widgets
-    acceptButton_ = new QPushButton(tr("Create"));
+    acceptButton_ = new QPushButton(buttonText);
     connect(acceptButton_, SIGNAL(clicked()), this, SLOT(setResultAccept()));
 
     rejectButton_ = new QPushButton(tr("Cancel"));
     connect(rejectButton_, SIGNAL(clicked()), this, SLOT(setResultReject()));
 
-    labelEdit_ = new QLineEdit("label");
+    labelEdit_ = new QLineEdit(label);
 
     colorButton_ = new QPushButton(tr("Custom"));
     updateColor();
@@ -362,24 +410,24 @@ WindowLayersNew::WindowLayersNew(QWidget *parent)
     setLayout(dialogLayout);
 
     // Window
-    setWindowTitle("New Layer");
+    setWindowTitle(windowTitle);
     setMaximumWidth(width());
     setMaximumHeight(height());
 }
 
-void WindowLayersNew::setResultAccept()
+void WindowLayersEdit::setResultAccept()
 {
     close();
     setResult(QDialog::Accepted);
 }
 
-void WindowLayersNew::setResultReject()
+void WindowLayersEdit::setResultReject()
 {
     close();
     setResult(QDialog::Rejected);
 }
 
-void WindowLayersNew::setColor()
+void WindowLayersEdit::setColor()
 {
     QColorDialog dialog(color_, this);
 
@@ -392,7 +440,7 @@ void WindowLayersNew::setColor()
     updateColor();
 }
 
-void WindowLayersNew::updateColor()
+void WindowLayersEdit::updateColor()
 {
     QPixmap pixmap(25, 25);
     pixmap.fill(color_);
