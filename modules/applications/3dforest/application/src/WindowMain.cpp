@@ -347,6 +347,10 @@ void WindowMain::createWindows()
             SIGNAL(selectionChanged()),
             this,
             SLOT(actionDataSets()));
+    connect(windowDataSets_,
+            SIGNAL(dataChanged()),
+            this,
+            SLOT(actionDataSetsData()));
 
     (void)createMenuTool(tr("Data Sets"),
                          tr("Data\nSets"),
@@ -695,13 +699,24 @@ void WindowMain::actionPluginToolShow()
 
 void WindowMain::actionDataSets()
 {
-    editor_.cancelThreads();
-    editor_.lock();
+    editor_.attach();
+
     editor_.setDataSets(windowDataSets_->dataSets());
     windowViewports_->resetScene(&editor_, false);
     editor_.tileViewClear();
-    editor_.unlock();
-    editor_.restartThreads();
+
+    editor_.detach();
+}
+
+void WindowMain::actionDataSetsData()
+{
+    editor_.attach();
+
+    editor_.setDataSets(windowDataSets_->dataSets());
+    windowViewports_->resetScene(&editor_, false);
+    editor_.clearCache();
+
+    editor_.detach();
 }
 
 void WindowMain::actionClassifications()

@@ -289,6 +289,16 @@ void EditorBase::tileViewClear()
     }
 }
 
+void EditorBase::clearCache()
+{
+    for (auto &it : viewports_)
+    {
+        it->clear();
+    }
+
+    working_.clear();
+}
+
 bool EditorBase::loadView()
 {
     bool rval = true;

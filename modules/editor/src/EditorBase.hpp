@@ -111,6 +111,9 @@ public:
         return viewports_[viewport]->tile(index);
     }
 
+    // Cache
+    void clearCache();
+
 protected:
     // Project
     std::string path_;
