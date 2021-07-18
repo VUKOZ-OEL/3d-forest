@@ -39,12 +39,14 @@ public:
     void setEnabled(bool b);
 
     size_t size() const { return layers_.size(); }
+    const EditorLayer &at(size_t i) const { return layers_[i]; }
+    void remove(size_t i);
 
     size_t id(size_t i) const { return layers_[i].id(); }
     size_t index(size_t id) const
     {
-        const auto &it = hashTable_.find(id);
-        if (it != hashTable_.end())
+        const auto &it = hashTableId_.find(id);
+        if (it != hashTableId_.end())
         {
             return it->second;
         }
@@ -73,7 +75,7 @@ public:
 
 protected:
     std::vector<EditorLayer> layers_;
-    std::unordered_map<size_t, size_t> hashTable_;
+    std::unordered_map<size_t, size_t> hashTableId_;
     std::unordered_set<size_t> hashTableEnabledId_;
     bool enabled_;
 };

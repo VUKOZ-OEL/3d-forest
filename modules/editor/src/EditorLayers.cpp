@@ -29,7 +29,7 @@ EditorLayers::EditorLayers() : enabled_(false)
 void EditorLayers::clear()
 {
     layers_.clear();
-    hashTable_.clear();
+    hashTableId_.clear();
     hashTableEnabledId_.clear();
 }
 
@@ -41,8 +41,8 @@ void EditorLayers::setDefault()
     layers_.resize(1);
     layers_[idx].set(id, "main", true, {1.0F, 1.0F, 1.0F});
 
-    hashTable_.clear();
-    hashTable_[id] = idx;
+    hashTableId_.clear();
+    hashTableId_[id] = idx;
 
     hashTableEnabledId_.clear();
     hashTableEnabledId_.insert(id);
@@ -53,12 +53,32 @@ void EditorLayers::setEnabled(bool b)
     enabled_ = b;
 }
 
+void EditorLayers::remove(size_t i)
+{
+    if (layers_.size() == 0)
+    {
+        return;
+    }
+
+    size_t key = id(i);
+
+    size_t n = layers_.size() - 1;
+    for (size_t pos = i; pos < n; pos++)
+    {
+        layers_[pos] = layers_[pos + 1];
+    }
+    layers_.resize(n);
+
+    hashTableId_.erase(key);
+    hashTableEnabledId_.erase(key);
+}
+
 size_t EditorLayers::unusedId() const
 {
     // Return minimum available id value
     for (size_t rval = 0; rval < std::numeric_limits<size_t>::max(); rval++)
     {
-        if (hashTable_.find(rval) == hashTable_.end())
+        if (hashTableId_.find(rval) == hashTableId_.end())
         {
             return rval;
         }
@@ -148,7 +168,7 @@ void EditorLayers::read(const Json &in)
 
             size_t id = layers_[i].id();
 
-            hashTable_[id] = i;
+            hashTableId_[id] = i;
 
             if (layers_[i].isEnabled())
             {
