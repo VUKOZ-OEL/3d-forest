@@ -123,6 +123,18 @@ QToolButton *WindowMain::createToolButton(const QString &text,
 
     button->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
+    // QString styleSheetText = QString(
+    //     "QToolButton:checked {"
+    //     "    background-color: rgb(180, 180, 180);"
+    //     "}"
+    //     "QToolButton:hover {"
+    //     "    background-color: rgb(180, 180, 180);"
+    //     "    border: 0px;"
+    //     "}"
+    // );
+
+    // button->setStyleSheet(styleSheetText);
+
     return button;
 }
 
