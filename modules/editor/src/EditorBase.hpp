@@ -48,6 +48,7 @@ public:
     bool hasUnsavedChanges() const { return unsavedChanges_; }
     void close();
 
+    // Filters
     void addFilter(EditorFilter *filter);
     void applyFilters(EditorTile *tile);
 
@@ -96,6 +97,7 @@ public:
     {
         return working_.tile(dataset, index);
     }
+    void flush(EditorTile *tile);
 
     // View
     void setNumberOfViewports(size_t n);
