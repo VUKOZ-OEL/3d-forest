@@ -47,9 +47,10 @@ public:
         verticalLayout->setContentsMargins(0, 0, 0, 0);
 
         horizontalLayout = new QHBoxLayout();
-        horizontalLayout->setSpacing(0);
+        horizontalLayout->setSpacing(2);
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
+        horizontalLayout->setContentsMargins(2, 2, 2, 2);
 
         verticalLayout->addLayout(horizontalLayout);
 
