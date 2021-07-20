@@ -137,7 +137,6 @@ void EditorCache::updateCamera(const Camera &camera)
         if (editor_->clipFilter().enabled)
         {
             Aabb<double> box = index.boundary(node, index.boundary());
-            box.translate(db.properties().translation());
             if (!editor_->clipFilter().box.intersects(box))
             {
                 continue;
@@ -154,15 +153,15 @@ void EditorCache::updateCamera(const Camera &camera)
             if (viewPrev.size() > 0)
             {
                 const EditorTile *lru = viewPrev[viewPrev.size() - 1].get();
-                Key nkrm = {lru->dataSetId, lru->tileId};
+                Key nkrm = {lru->dataSetId_, lru->tileId_};
                 cache_.erase(nkrm);
                 viewPrev.resize(viewPrev.size() - 1);
             }
 
             std::shared_ptr<EditorTile> tile;
             tile = std::make_shared<EditorTile>();
-            tile->dataSetId = nk.dataSetId;
-            tile->tileId = nk.tileId;
+            tile->dataSetId_ = nk.dataSetId;
+            tile->tileId_ = nk.tileId;
             tile->loaded = false;
             cache_[nk] = tile;
             lru_.push_back(tile);
@@ -256,7 +255,7 @@ EditorTile *EditorCache::tile(size_t dataset, size_t index)
             {
                 // Drop oldest tile
                 idx = lru_.size() - 1;
-                Key nkrm = {lru_[idx]->dataSetId, lru_[idx]->tileId};
+                Key nkrm = {lru_[idx]->dataSetId_, lru_[idx]->tileId_};
                 cache_.erase(nkrm);
             }
 
@@ -273,8 +272,8 @@ EditorTile *EditorCache::tile(size_t dataset, size_t index)
         }
 
         std::shared_ptr<EditorTile> tile = std::make_shared<EditorTile>();
-        tile->dataSetId = nk.dataSetId;
-        tile->tileId = nk.tileId;
+        tile->dataSetId_ = nk.dataSetId;
+        tile->tileId_ = nk.tileId;
         tile->loaded = false;
         cache_[nk] = tile;
         lru_[0] = tile;

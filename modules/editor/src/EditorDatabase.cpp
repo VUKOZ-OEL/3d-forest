@@ -33,6 +33,8 @@ void EditorDatabase::setProperties(const EditorDataSet &properties)
     }
 
     properties_ = properties;
+
+    index_.translate(properties_.translation());
 }
 
 void EditorDatabase::readIndex(const std::string &pathLas)

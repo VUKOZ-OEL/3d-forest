@@ -100,6 +100,7 @@ public slots:
 
     // Windows
     void actionDataSets();
+    void actionDataSetsData();
     void actionClassifications();
     void actionLayers();
     void actionClipFilter(const ClipFilter &clipFilter);

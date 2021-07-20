@@ -61,7 +61,7 @@ void PluginDatabaseStatisticsWindow::compute()
     computeReset();
 
     // 2. Collect new result
-    editor_->attach();
+    editor_->cancelThreads();
 
     std::vector<FileIndex::Selection> selection;
     editor_->select(selection);
@@ -73,13 +73,16 @@ void PluginDatabaseStatisticsWindow::compute()
     progressDialog.setRange(0, maximum);
     progressDialog.setWindowTitle(QObject::tr(PLUGIN_DATABASE_STATISTICS_NAME));
     progressDialog.setWindowModality(Qt::WindowModal);
-    progressDialog.setLabelText(tr("Processing..."));
-    progressDialog.setMinimumDuration(100);
+    progressDialog.setMinimumDuration(0);
+    progressDialog.show();
 
     for (int i = 0; i < maximum; i++)
     {
         // Update progress i
         progressDialog.setValue(i + 1);
+        progressDialog.setLabelText(
+            QObject::tr("Processing %1 of %n...", nullptr, maximum).arg(i + 1));
+
         QCoreApplication::processEvents();
         if (progressDialog.wasCanceled())
         {
@@ -98,7 +101,7 @@ void PluginDatabaseStatisticsWindow::compute()
     }
     progressDialog.setValue(progressDialog.maximum());
 
-    editor_->detach();
+    editor_->restartThreads();
 
     // 3. Output new result
     computeOutput();

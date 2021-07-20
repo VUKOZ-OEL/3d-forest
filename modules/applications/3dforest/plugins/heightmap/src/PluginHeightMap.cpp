@@ -134,7 +134,7 @@ void PluginHeightMapFilter::filterTile(EditorTile *tile)
 
 void PluginHeightMapFilter::applyToTiles(QWidget *widget)
 {
-    editor_->attach();
+    editor_->cancelThreads();
 
     std::vector<FileIndex::Selection> selection;
     editor_->select(selection);
@@ -146,7 +146,8 @@ void PluginHeightMapFilter::applyToTiles(QWidget *widget)
     progressDialog.setRange(0, maximum);
     progressDialog.setWindowTitle(QObject::tr(PLUGIN_HEIGHT_MAP_NAME));
     progressDialog.setWindowModality(Qt::WindowModal);
-    progressDialog.setMinimumDuration(100);
+    progressDialog.setMinimumDuration(0);
+    progressDialog.show();
 
     for (int i = 0; i < maximum; i++)
     {
@@ -163,17 +164,18 @@ void PluginHeightMapFilter::applyToTiles(QWidget *widget)
 
         // Process step i
         editor_->lock();
-        FileIndex::Selection &sel = selection[static_cast<size_t>(i)];
-        EditorTile *tile = editor_->tile(sel.id, sel.idx);
+        FileIndex::Selection &selected = selection[static_cast<size_t>(i)];
+        EditorTile *tile = editor_->tile(selected.id, selected.idx);
         if (tile)
         {
-            filterTile(tile);
+            editor_->applyFilters(tile);
+            editor_->flush(tile);
         }
         editor_->unlock();
     }
     progressDialog.setValue(progressDialog.maximum());
 
-    editor_->detach();
+    editor_->restartThreads();
 }
 
 std::vector<Vector3<float>> PluginHeightMapFilter::createColormap(

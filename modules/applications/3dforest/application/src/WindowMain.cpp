@@ -21,6 +21,7 @@
 
 #include <PluginFile.hpp>
 #include <PluginTool.hpp>
+#include <QApplication>
 #include <QCloseEvent>
 #include <QCoreApplication>
 #include <QDebug>
@@ -122,6 +123,27 @@ QToolButton *WindowMain::createToolButton(const QString &text,
     button->setEnabled(true);
 
     button->setToolButtonStyle(Qt::ToolButtonIconOnly);
+
+    button->setContentsMargins(0, 0, 0, 0);
+
+    QColor cb = qApp->palette().color(QPalette::Window);
+    QString styleSheetText = QString("QToolButton:checked {"
+                                     "    background-color: rgb(200, 200, 200);"
+                                     "    border: 0px;"
+                                     "}"
+                                     "QToolButton:hover {"
+                                     "    background-color: rgb(200, 200, 200);"
+                                     "    border: 0px;"
+                                     "}"
+                                     "QToolButton {"
+                                     "    background-color: rgb(%1, %2, %3);"
+                                     "    border: 0px;"
+                                     "}")
+                                 .arg(cb.red())
+                                 .arg(cb.green())
+                                 .arg(cb.blue());
+
+    button->setStyleSheet(styleSheetText);
 
     return button;
 }
@@ -250,7 +272,7 @@ void WindowMain::createMenus()
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewOrthographic()));
     ribbon_->addButton("View", "Projection", button);
 
-    button = createToolButton(tr("Perspective"),
+    button = createToolButton(tr("Depth"),
                               tr("Perspective projection"),
                               "view-perspective");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewPerspective()));
@@ -347,6 +369,10 @@ void WindowMain::createWindows()
             SIGNAL(selectionChanged()),
             this,
             SLOT(actionDataSets()));
+    connect(windowDataSets_,
+            SIGNAL(dataChanged()),
+            this,
+            SLOT(actionDataSetsData()));
 
     (void)createMenuTool(tr("Data Sets"),
                          tr("Data\nSets"),
@@ -695,13 +721,24 @@ void WindowMain::actionPluginToolShow()
 
 void WindowMain::actionDataSets()
 {
-    editor_.cancelThreads();
-    editor_.lock();
+    editor_.attach();
+
     editor_.setDataSets(windowDataSets_->dataSets());
     windowViewports_->resetScene(&editor_, false);
     editor_.tileViewClear();
-    editor_.unlock();
-    editor_.restartThreads();
+
+    editor_.detach();
+}
+
+void WindowMain::actionDataSetsData()
+{
+    editor_.attach();
+
+    editor_.setDataSets(windowDataSets_->dataSets());
+    windowViewports_->resetScene(&editor_, false);
+    editor_.clearCache();
+
+    editor_.detach();
 }
 
 void WindowMain::actionClassifications()

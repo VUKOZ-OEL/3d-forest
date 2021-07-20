@@ -11,8 +11,10 @@
 /*
     Modifications Copyright 2020 VUKOZ
 
+    Commented out group label.
     Removed setIconSize().
-    Updated setMinimumSize().
+    Removed setMinimumSize().
+	Removed setAutoRaise(true).
 */
 
 #include "ribbonbuttongroup.h"
@@ -52,9 +54,6 @@ int RibbonButtonGroup::buttonCount() const
 void RibbonButtonGroup::addButton(QToolButton *button)
 {
   button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-  button->setMinimumSize(50, 50);
-  button->setMaximumSize(70, 70);
-  button->setAutoRaise(true);
   button->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
   // QFont font = button->font();

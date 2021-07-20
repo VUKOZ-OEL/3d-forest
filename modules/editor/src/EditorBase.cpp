@@ -257,6 +257,11 @@ Aabb<double> EditorBase::selection() const
     return boundary();
 }
 
+void EditorBase::flush(EditorTile *tile)
+{
+    tile->flush(this);
+}
+
 void EditorBase::setNumberOfViewports(size_t n)
 {
     size_t i = viewports_.size();
@@ -287,6 +292,16 @@ void EditorBase::tileViewClear()
     {
         it->reload();
     }
+}
+
+void EditorBase::clearCache()
+{
+    for (auto &it : viewports_)
+    {
+        it->clear();
+    }
+
+    working_.clear();
 }
 
 bool EditorBase::loadView()

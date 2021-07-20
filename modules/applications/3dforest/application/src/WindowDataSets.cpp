@@ -173,7 +173,8 @@ void WindowDataSets::toolDelete()
     size_t idx = index(item);
     dataSets_.erase(idx);
     delete item;
-    emit selectionChanged();
+
+    emit dataChanged();
 }
 
 void WindowDataSets::invertSelection()
