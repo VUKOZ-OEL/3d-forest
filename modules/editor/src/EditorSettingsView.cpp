@@ -29,6 +29,7 @@ EditorSettingsView::EditorSettingsView()
 {
     colorSourceString_ = {
         "Color",
+        "User Color",
         "Intensity",
         "Return Number",
         "Number of Returns",

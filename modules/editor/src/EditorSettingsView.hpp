@@ -33,6 +33,7 @@ public:
     enum ColorSource
     {
         COLOR_SOURCE_COLOR,
+        COLOR_SOURCE_USER_COLOR,
         COLOR_SOURCE_INTENSITY,
         COLOR_SOURCE_RETURN_NUMBER,
         COLOR_SOURCE_NUMBER_OF_RETURNS,
