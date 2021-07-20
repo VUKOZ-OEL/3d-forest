@@ -22,13 +22,14 @@
 #include <ColorPalette.hpp>
 #include <EditorBase.hpp>
 #include <EditorTile.hpp>
+#include <Endian.hpp>
 #include <File.hpp>
 #include <FileIndexBuilder.hpp>
 #include <FileLas.hpp>
 
 EditorTile::EditorTile()
-    : dataSetId(0),
-      tileId(0),
+    : dataSetId_(0),
+      tileId_(0),
       loaded(false),
       transformed(false),
       filtered(false),
@@ -71,8 +72,8 @@ bool EditorTile::View::isFinished() const
 
 void EditorTile::read(const EditorBase *editor)
 {
-    const EditorDatabase &db = editor->databaseId(dataSetId);
-    const FileIndex::Node *node = db.index().at(tileId);
+    const EditorDatabase &db = editor->databaseId(dataSetId_);
+    const FileIndex::Node *node = db.index().at(tileId_);
 
     // Read tile buffer from LAS file
     FileLas las;
@@ -83,12 +84,11 @@ void EditorTile::read(const EditorBase *editor)
     uint64_t start = node->from * pointSize;
     las.seek(start + las.header.offset_to_point_data);
 
-    std::vector<uint8_t> buffer;
     size_t n = static_cast<size_t>(node->size);
     size_t bufferSize = pointSize * n;
     uint8_t fmt = las.header.point_data_record_format;
-    buffer.resize(bufferSize);
-    las.file().read(buffer.data(), bufferSize);
+    buffer_.resize(bufferSize);
+    las.file().read(buffer_.data(), bufferSize);
 
     // Create point data
     indices.resize(n);
@@ -107,7 +107,7 @@ void EditorTile::read(const EditorBase *editor)
     view.rgb.resize(n * 3);
 
     // Covert buffer to point data
-    uint8_t *ptr = buffer.data();
+    uint8_t *ptr = buffer_.data();
     FileLas::Point point;
     const float scaleU16 =
         1.0F / 65535.0F; /**< @todo Normalize during conversion. */
@@ -166,9 +166,59 @@ void EditorTile::read(const EditorBase *editor)
     filter(editor);
 }
 
+void EditorTile::flush(const EditorBase *editor)
+{
+    if (offsetList_.size() == 0)
+    {
+        const EditorDatabase &db = editor->databaseId(dataSetId_);
+        const FileIndex::Node *node = db.index().at(tileId_);
+
+        FileLas las;
+        las.open(db.properties().path());
+        las.readHeader();
+
+        size_t pointSize = las.header.point_data_record_length;
+        uint64_t start = node->from * pointSize;
+        las.seek(start + las.header.offset_to_point_data);
+
+        size_t n = static_cast<size_t>(node->size);
+        uint8_t fmt = las.header.point_data_record_format;
+
+        uint8_t *ptr = buffer_.data();
+
+        for (size_t i = 0; i < n; i++)
+        {
+            toPoint(ptr + (pointSize * i), i, fmt);
+        }
+
+        las.file().write(buffer_.data(), buffer_.size());
+    }
+
+    modified = false;
+}
+
+#define EDITOR_TILE_FORMAT_COUNT 11
+
+static const size_t EDITOR_TILE_FORMAT_USER[EDITOR_TILE_FORMAT_COUNT] =
+    {20, 28, 26, 34, 57, 63, 30, 36, 38, 59, 67};
+
+void EditorTile::toPoint(uint8_t *ptr, size_t i, uint8_t fmt)
+{
+    const float s16 = 65535.0F;
+    size_t pos = EDITOR_TILE_FORMAT_USER[fmt];
+
+    // Layer
+    htol32(ptr + pos, layer[i]);
+
+    // User color
+    htol16(ptr + pos + 4, static_cast<uint16_t>(view.rgb[3 * i + 0] * s16));
+    htol16(ptr + pos + 6, static_cast<uint16_t>(view.rgb[3 * i + 1] * s16));
+    htol16(ptr + pos + 8, static_cast<uint16_t>(view.rgb[3 * i + 2] * s16));
+}
+
 void EditorTile::transform(const EditorBase *editor)
 {
-    const EditorDatabase &db = editor->databaseId(dataSetId);
+    const EditorDatabase &db = editor->databaseId(dataSetId_);
     size_t n = xyzBase.size() / 3;
     double x;
     double y;
@@ -229,8 +279,8 @@ void EditorTile::selectClip(const EditorBase *editor)
         return;
     }
 
-    const EditorDatabase &db = editor->databaseId(dataSetId);
-    const FileIndex::Node *node = db.index().at(tileId);
+    const EditorDatabase &db = editor->databaseId(dataSetId_);
+    const FileIndex::Node *node = db.index().at(tileId_);
 
     // Read L2 index
     if (index.empty())
@@ -385,6 +435,14 @@ void EditorTile::setPointColor(const EditorBase *editor)
         for (size_t i = 0; i < (n * 3); i++)
         {
             view.rgb[i] *= rgb[i];
+        }
+    }
+
+    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_USER_COLOR))
+    {
+        for (size_t i = 0; i < (n * 3); i++)
+        {
+            view.rgb[i] *= rgbOutput[i];
         }
     }
 

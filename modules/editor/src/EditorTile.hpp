@@ -93,8 +93,11 @@ public:
     std::vector<double> xyzBase;
 
     // Tile
-    size_t dataSetId;
-    size_t tileId;
+    size_t dataSetId_;
+    size_t tileId_;
+    std::vector<size_t> dataSetIdList_;
+    std::vector<uint64_t> offsetList_;
+    std::vector<uint8_t> buffer_;
 
     // State
     bool loaded;
@@ -131,12 +134,16 @@ public:
     ~EditorTile();
 
     void read(const EditorBase *editor);
+    void flush(const EditorBase *editor);
+
     void transform(const EditorBase *editor);
     void filter(const EditorBase *editor);
 
     bool renderMore() const;
 
 protected:
+    void toPoint(uint8_t *ptr, size_t i, uint8_t fmt);
+
     void selectClip(const EditorBase *editor);
     void selectClass(const EditorBase *editor);
     void selectLayers(const EditorBase *editor);
