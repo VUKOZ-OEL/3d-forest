@@ -146,7 +146,8 @@ void PluginHeightMapFilter::applyToTiles(QWidget *widget)
     progressDialog.setRange(0, maximum);
     progressDialog.setWindowTitle(QObject::tr(PLUGIN_HEIGHT_MAP_NAME));
     progressDialog.setWindowModality(Qt::WindowModal);
-    progressDialog.setMinimumDuration(100);
+    progressDialog.setMinimumDuration(0);
+    progressDialog.show();
 
     for (int i = 0; i < maximum; i++)
     {
@@ -163,11 +164,12 @@ void PluginHeightMapFilter::applyToTiles(QWidget *widget)
 
         // Process step i
         editor_->lock();
-        FileIndex::Selection &sel = selection[static_cast<size_t>(i)];
-        EditorTile *tile = editor_->tile(sel.id, sel.idx);
+        FileIndex::Selection &selected = selection[static_cast<size_t>(i)];
+        EditorTile *tile = editor_->tile(selected.id, selected.idx);
         if (tile)
         {
-            filterTile(tile);
+            editor_->applyFilters(tile);
+            editor_->flush(tile);
         }
         editor_->unlock();
     }
