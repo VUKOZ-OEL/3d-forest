@@ -21,6 +21,7 @@
 
 #include <PluginFile.hpp>
 #include <PluginTool.hpp>
+#include <QApplication>
 #include <QCloseEvent>
 #include <QCoreApplication>
 #include <QDebug>
@@ -123,17 +124,26 @@ QToolButton *WindowMain::createToolButton(const QString &text,
 
     button->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
-    // QString styleSheetText = QString(
-    //     "QToolButton:checked {"
-    //     "    background-color: rgb(180, 180, 180);"
-    //     "}"
-    //     "QToolButton:hover {"
-    //     "    background-color: rgb(180, 180, 180);"
-    //     "    border: 0px;"
-    //     "}"
-    // );
+    button->setContentsMargins(0, 0, 0, 0);
 
-    // button->setStyleSheet(styleSheetText);
+    QColor cb = qApp->palette().color(QPalette::Window);
+    QString styleSheetText = QString("QToolButton:checked {"
+                                     "    background-color: rgb(200, 200, 200);"
+                                     "    border: 0px;"
+                                     "}"
+                                     "QToolButton:hover {"
+                                     "    background-color: rgb(200, 200, 200);"
+                                     "    border: 0px;"
+                                     "}"
+                                     "QToolButton {"
+                                     "    background-color: rgb(%1, %2, %3);"
+                                     "    border: 0px;"
+                                     "}")
+                                 .arg(cb.red())
+                                 .arg(cb.green())
+                                 .arg(cb.blue());
+
+    button->setStyleSheet(styleSheetText);
 
     return button;
 }
@@ -262,7 +272,7 @@ void WindowMain::createMenus()
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewOrthographic()));
     ribbon_->addButton("View", "Projection", button);
 
-    button = createToolButton(tr("Perspective"),
+    button = createToolButton(tr("Depth"),
                               tr("Perspective projection"),
                               "view-perspective");
     connect(button, SIGNAL(clicked()), this, SLOT(actionViewPerspective()));
