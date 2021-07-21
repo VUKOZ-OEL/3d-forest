@@ -263,7 +263,7 @@ PluginHeightMapWindow::PluginHeightMapWindow(QMainWindow *parent,
             this,
             &PluginHeightMapWindow::previewChanged);
 
-    applyButton_ = new QPushButton(tr("&Apply"));
+    applyButton_ = new QPushButton(tr("Apply and save"));
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(applyButton_,
             &QAbstractButton::clicked,
@@ -271,14 +271,12 @@ PluginHeightMapWindow::PluginHeightMapWindow(QMainWindow *parent,
             &PluginHeightMapWindow::apply);
 
     // Layout
-    QGroupBox *groupBox = new QGroupBox;
     QGridLayout *groupBoxLayout = new QGridLayout;
     groupBoxLayout->addWidget(new QLabel(tr("N colors")), 0, 0);
     groupBoxLayout->addWidget(colorCountSpinBox_, 0, 1);
     groupBoxLayout->addWidget(new QLabel(tr("Colormap")), 1, 0);
     groupBoxLayout->addWidget(colormapComboBox_, 1, 1);
     groupBoxLayout->setColumnStretch(1, 1);
-    groupBox->setLayout(groupBoxLayout);
 
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->addWidget(previewCheckBox_);
@@ -287,7 +285,7 @@ PluginHeightMapWindow::PluginHeightMapWindow(QMainWindow *parent,
     hbox->addWidget(applyButton_, 0, Qt::AlignRight);
 
     QVBoxLayout *vbox = new QVBoxLayout;
-    vbox->addWidget(groupBox);
+    vbox->addLayout(groupBoxLayout);
     vbox->addSpacing(10);
     vbox->addLayout(hbox);
     vbox->addStretch();
@@ -295,7 +293,7 @@ PluginHeightMapWindow::PluginHeightMapWindow(QMainWindow *parent,
     // Dock
     widget_ = new QWidget;
     widget_->setLayout(vbox);
-    widget_->setFixedHeight(120);
+    widget_->setFixedHeight(100);
     setWidget(widget_);
 }
 
