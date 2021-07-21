@@ -75,19 +75,28 @@ void PluginHeightMapFilter::setColormap(const QString &name, int colorCount)
     }
 }
 
-void PluginHeightMapFilter::setPreviewEnabled(bool enabled)
+void PluginHeightMapFilter::setPreviewEnabled(bool enabled, bool update)
 {
-    editor_->cancelThreads();
+    if (update)
+    {
+        editor_->cancelThreads();
 
-    mutex_.lock();
-    previewEnabled_ = enabled;
-    mutex_.unlock();
+        mutex_.lock();
+        previewEnabled_ = enabled;
+        mutex_.unlock();
 
-    editor_->lock();
-    editor_->tileViewClear();
-    editor_->unlock();
+        editor_->lock();
+        editor_->tileViewClear();
+        editor_->unlock();
 
-    editor_->restartThreads();
+        editor_->restartThreads();
+    }
+    else
+    {
+        mutex_.lock();
+        previewEnabled_ = enabled;
+        mutex_.unlock();
+    }
 }
 
 bool PluginHeightMapFilter::isPreviewEnabled()
@@ -312,7 +321,10 @@ void PluginHeightMapWindow::previewChanged(int index)
 
 void PluginHeightMapWindow::apply()
 {
+    // Filter is active during proccesing
+    filter_->setPreviewEnabled(true, false);
     filter_->applyToTiles(mainWindow());
+    filter_->setPreviewEnabled(previewCheckBox_->isChecked(), false);
 }
 
 void PluginHeightMapWindow::closeEvent(QCloseEvent *event)
