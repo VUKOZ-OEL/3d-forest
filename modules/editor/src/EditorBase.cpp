@@ -286,11 +286,11 @@ void EditorBase::updateCamera(size_t viewport, const Camera &camera)
     viewports_[viewport]->updateCamera(camera);
 }
 
-void EditorBase::tileViewClear()
+void EditorBase::tileViewClear(bool everything)
 {
     for (auto &it : viewports_)
     {
-        it->reload();
+        it->reload(everything);
     }
 }
 

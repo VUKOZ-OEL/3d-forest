@@ -39,7 +39,7 @@ void EditorCache::clear()
     lru_.clear();
 }
 
-void EditorCache::reload()
+void EditorCache::reload(bool everything)
 {
     for (auto &it : cache_)
     {
@@ -47,7 +47,11 @@ void EditorCache::reload()
         it.second->transformed = false;
         it.second->filtered = false;
         it.second->filteredClass = false;
-        // it.second->loaded = false;
+
+        if (everything)
+        {
+            it.second->loaded = false;
+        }
     }
 }
 
