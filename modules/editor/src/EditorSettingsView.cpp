@@ -66,9 +66,14 @@ void EditorSettingsView::setFogEnabled(bool b)
     fogEnabled_ = b;
 }
 
-void EditorSettingsView::setPointColor(float r, float g, float b)
+void EditorSettingsView::setPointColor(const Vector3<float> &rgb)
 {
-    pointColor_.set(r, g, b);
+    pointColor_ = rgb;
+}
+
+void EditorSettingsView::setBackgroundColor(const Vector3<float> &rgb)
+{
+    background_ = rgb;
 }
 
 size_t EditorSettingsView::colorSourceSize() const

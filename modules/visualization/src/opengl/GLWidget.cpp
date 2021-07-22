@@ -320,7 +320,7 @@ void GLWidget::renderSceneSettingsEnable()
     const EditorSettingsView &opt = settings.view();
 
     // Background
-    const Vector3<float> &rgb = opt.background();
+    const Vector3<float> &rgb = opt.backgroundColor();
     glClearColor(rgb[0], rgb[1], rgb[2], 0.0F);
 
     // Point size
