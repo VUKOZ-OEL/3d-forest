@@ -19,15 +19,22 @@
 
 /** @file WindowSettingsView.cpp */
 
+#include <QBrush>
 #include <QCheckBox>
+#include <QColor>
 #include <QColorDialog>
 #include <QDebug>
 #include <QGridLayout>
 #include <QGroupBox>
+#include <QHBoxLayout>
 #include <QLabel>
+#include <QPixmap>
 #include <QPushButton>
 #include <QSlider>
 #include <QTabWidget>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
+#include <QTreeWidgetItemIterator>
 #include <QVBoxLayout>
 #include <WindowSettingsView.hpp>
 
@@ -36,34 +43,24 @@ WindowSettingsView::WindowSettingsView(QWidget *parent) : QWidget(parent)
     int row;
 
     // Tab Visualization : color source
+    tree_ = new QTreeWidget();
+
+    deselectButton_ = new QPushButton(tr("Disable all"));
+    deselectButton_->setToolTip(tr("Disable all sources"));
+    connect(deselectButton_, SIGNAL(clicked()), this, SLOT(clearSelection()));
+
     QGroupBox *groupBox = new QGroupBox(tr("Color Source"));
-    QVBoxLayout *vbox = new QVBoxLayout;
 
-    colorSourceButton_ = new QPushButton(tr("Custom color"));
-    vbox->addWidget(colorSourceButton_);
-    connect(colorSourceButton_, SIGNAL(clicked()), this, SLOT(setPointColor()));
+    QHBoxLayout *controlLayout = new QHBoxLayout;
+    controlLayout->addStretch();
+    controlLayout->addWidget(deselectButton_);
 
-    colorSourceCheckBox_.resize(settings_.colorSourceSize());
-    for (size_t i = 0; i < colorSourceCheckBox_.size(); i++)
-    {
-        colorSourceCheckBox_[i] =
-            new QCheckBox(tr(settings_.colorSourceString(i)));
+    QVBoxLayout *groupBoxLayout = new QVBoxLayout;
+    groupBoxLayout->setContentsMargins(2, 1, 2, 1);
+    groupBoxLayout->addWidget(tree_);
+    groupBoxLayout->addLayout(controlLayout);
 
-        vbox->addWidget(colorSourceCheckBox_[i]);
-
-        if (settings_.isColorSourceEnabled(i))
-        {
-            colorSourceCheckBox_[i]->setChecked(true);
-        }
-
-        connect(colorSourceCheckBox_[i],
-                SIGNAL(stateChanged(int)),
-                this,
-                SLOT(setColorSourceEnabled(int)));
-    }
-
-    vbox->addStretch(1);
-    groupBox->setLayout(vbox);
+    groupBox->setLayout(groupBoxLayout);
 
     // Tab Visualization : point size
     pointSizeSlider_ = new QSlider;
@@ -105,7 +102,7 @@ WindowSettingsView::WindowSettingsView(QWidget *parent) : QWidget(parent)
     visualization->setLayout(visualizationLayout);
 
     QWidget *guide = new QWidget;
-    vbox = new QVBoxLayout;
+    QVBoxLayout *vbox = new QVBoxLayout;
     guide->setLayout(vbox);
 
     // Tab Main
@@ -127,45 +124,112 @@ WindowSettingsView::~WindowSettingsView()
 {
 }
 
-void WindowSettingsView::setPointColor()
+void WindowSettingsView::clearSelection()
 {
-    float r = settings_.pointColor()[0];
-    float g = settings_.pointColor()[1];
-    float b = settings_.pointColor()[2];
-
-    QColor color;
-    color.setRgbF(r, g, b);
-
-    QColorDialog dialog(color, this);
-    if (dialog.exec() == QDialog::Rejected)
-    {
-        return;
-    }
-
-    color = dialog.selectedColor();
-    r = static_cast<float>(color.redF());
-    g = static_cast<float>(color.greenF());
-    b = static_cast<float>(color.blueF());
-    settings_.setPointColor(r, g, b);
-
+    settings_.setColorSourceEnabledAll(false);
+    updateTree();
     emit settingsChangedApply();
 }
 
-void WindowSettingsView::setColorSourceEnabled(int v)
+void WindowSettingsView::itemChanged(QTreeWidgetItem *item, int column)
 {
-    (void)v;
-    for (size_t i = 0; i < colorSourceCheckBox_.size(); i++)
+    if (column == COLUMN_CHECKED)
     {
-        if (colorSourceCheckBox_[i]->isChecked())
+        bool checked = (item->checkState(COLUMN_CHECKED) == Qt::Checked);
+
+        settings_.setColorSourceEnabled(index(item), checked);
+        emit settingsChangedApply();
+    }
+}
+
+size_t WindowSettingsView::index(const QTreeWidgetItem *item)
+{
+    return item->text(COLUMN_ID).toULong();
+}
+
+void WindowSettingsView::updateTree()
+{
+    block();
+
+    QTreeWidgetItemIterator it(tree_);
+
+    while (*it)
+    {
+        size_t idx = index(*it);
+
+        if (settings_.isColorSourceEnabled(idx))
         {
-            settings_.setColorSourceEnabled(i, true);
+            (*it)->setCheckState(COLUMN_CHECKED, Qt::Checked);
         }
         else
         {
-            settings_.setColorSourceEnabled(i, false);
+            (*it)->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
         }
+
+        ++it;
     }
-    emit settingsChangedApply();
+
+    unblock();
+}
+
+void WindowSettingsView::block()
+{
+    disconnect(tree_, SIGNAL(itemChanged(QTreeWidgetItem *, int)), 0, 0);
+    (void)blockSignals(true);
+}
+
+void WindowSettingsView::unblock()
+{
+    (void)blockSignals(false);
+    connect(tree_,
+            SIGNAL(itemChanged(QTreeWidgetItem *, int)),
+            this,
+            SLOT(itemChanged(QTreeWidgetItem *, int)));
+}
+
+void WindowSettingsView::addItem(size_t i)
+{
+    QTreeWidgetItem *item = new QTreeWidgetItem(tree_);
+
+    if (settings_.isColorSourceEnabled(i))
+    {
+        item->setCheckState(COLUMN_CHECKED, Qt::Checked);
+    }
+    else
+    {
+        item->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
+    }
+
+    item->setText(COLUMN_ID, QString::number(i));
+
+    item->setText(COLUMN_LABEL,
+                  QString::fromStdString(settings_.colorSourceString(i)));
+    item->setText(COLUMN_OPACITY, "100%");
+}
+
+void WindowSettingsView::setColorSource(const EditorSettingsView &settings)
+{
+    tree_->clear();
+
+    // Header
+    tree_->setColumnCount(COLUMN_LAST);
+    QStringList labels;
+    labels << tr("Enabled") << tr("Id") << tr("Label") << tr("Opacity");
+    tree_->setHeaderLabels(labels);
+
+    // Content
+    for (size_t i = 0; i < settings.colorSourceSize(); i++)
+    {
+        addItem(i);
+    }
+
+    // Resize Columns to the minimum space
+    for (int i = 0; i < COLUMN_LAST; i++)
+    {
+        tree_->resizeColumnToContents(i);
+    }
+
+    tree_->setColumnHidden(COLUMN_ID, true);
 }
 
 void WindowSettingsView::setPointSize(int v)
@@ -183,11 +247,12 @@ void WindowSettingsView::setFogEnabled(int v)
 
 void WindowSettingsView::setSettings(const EditorSettingsView &settings)
 {
-    (void)blockSignals(true);
+    block();
 
     settings_ = settings;
 
+    setColorSource(settings_);
     pointSizeSlider_->setValue(static_cast<int>(settings_.pointSize()));
 
-    (void)blockSignals(false);
+    unblock();
 }
