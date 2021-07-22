@@ -825,11 +825,13 @@ void WindowMain::actionAbout()
                            WindowMain::APPLICATION_VERSION,
                        tr("3D Forest is software for analysis of Lidar data"
                           " from forest environment.\n\n"
-                          "Copyright 2020-2021 VUKOZ\n"
+                          "Copyright 2020-present VUKOZ\n"
                           "Blue Cat team and other authors\n"
                           "https://www.3dforest.eu/\n"
                           "\n"
-                          "Icons are based on: https://icons8.com"));
+                          "Uses modified icons from: https://icons8.com\n"
+                          "Uses modified Ribbon, (c) Martijn Koopman\n"
+                          "Uses modified ctkRangeSlider, (c) Kitware Inc.\n"));
 }
 
 void WindowMain::actionHelp()

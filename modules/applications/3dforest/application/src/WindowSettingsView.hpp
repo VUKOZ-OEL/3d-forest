@@ -30,6 +30,8 @@ class QCheckBox;
 class QPushButton;
 class QSlider;
 class QTabWidget;
+class QTreeWidget;
+class QTreeWidgetItem;
 
 /** Window Settings View. */
 class WindowSettingsView : public QWidget
@@ -37,6 +39,16 @@ class WindowSettingsView : public QWidget
     Q_OBJECT
 
 public:
+    /** Window Settings View Column. */
+    enum Column
+    {
+        COLUMN_CHECKED,
+        COLUMN_ID,
+        COLUMN_LABEL,
+        COLUMN_OPACITY,
+        COLUMN_LAST,
+    };
+
     explicit WindowSettingsView(QWidget *parent = nullptr);
     ~WindowSettingsView();
 
@@ -44,23 +56,40 @@ public:
     void setSettings(const EditorSettingsView &settings);
 
 public slots:
-    void setPointColor();
-    void setColorSourceEnabled(int v);
+    void clearSelection();
+    void itemChanged(QTreeWidgetItem *item, int column);
+
     void setPointSize(int v);
     void setFogEnabled(int v);
+
+    void setColorFg();
+    void setColorBg();
 
 signals:
     void settingsChanged();
     void settingsChangedApply();
 
 protected:
-    EditorSettingsView settings_;
-
     QTabWidget *tabWidget_;
-    QPushButton *colorSourceButton_;
-    std::vector<QCheckBox *> colorSourceCheckBox_;
+
+    QTreeWidget *tree_;
+    QPushButton *deselectButton_;
     QSlider *pointSizeSlider_;
     QCheckBox *fogCheckBox_;
+    QPushButton *colorFgButton_;
+    QPushButton *colorBgButton_;
+
+    EditorSettingsView settings_;
+
+    size_t index(const QTreeWidgetItem *item);
+    void updateTree();
+    void block();
+    void unblock();
+    void addItem(size_t i);
+    void setColorSource(const EditorSettingsView &settings);
+
+    bool colorDialog(Vector3<float> &rgb);
+    void setColor(QPushButton *button, const Vector3<float> &rgb);
 };
 
 #endif /* WINDOW_SETTINGS_VIEW_HPP */

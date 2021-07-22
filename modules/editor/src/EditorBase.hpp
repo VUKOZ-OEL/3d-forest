@@ -103,7 +103,7 @@ public:
     void setNumberOfViewports(size_t n);
     void updateCamera(size_t viewport, const Camera &camera);
     bool loadView();
-    void tileViewClear();
+    void tileViewClear(bool everything = false);
     size_t tileViewSize(size_t viewport) const
     {
         return viewports_[viewport]->tileSize();

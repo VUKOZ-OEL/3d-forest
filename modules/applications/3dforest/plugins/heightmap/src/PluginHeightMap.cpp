@@ -75,19 +75,30 @@ void PluginHeightMapFilter::setColormap(const QString &name, int colorCount)
     }
 }
 
-void PluginHeightMapFilter::setPreviewEnabled(bool enabled)
+void PluginHeightMapFilter::setPreviewEnabled(bool enabled,
+                                              bool update,
+                                              bool reload)
 {
-    editor_->cancelThreads();
+    if (update)
+    {
+        editor_->cancelThreads();
 
-    mutex_.lock();
-    previewEnabled_ = enabled;
-    mutex_.unlock();
+        mutex_.lock();
+        previewEnabled_ = enabled;
+        mutex_.unlock();
 
-    editor_->lock();
-    editor_->tileViewClear();
-    editor_->unlock();
+        editor_->lock();
+        editor_->tileViewClear(reload);
+        editor_->unlock();
 
-    editor_->restartThreads();
+        editor_->restartThreads();
+    }
+    else
+    {
+        mutex_.lock();
+        previewEnabled_ = enabled;
+        mutex_.unlock();
+    }
 }
 
 bool PluginHeightMapFilter::isPreviewEnabled()
@@ -254,7 +265,7 @@ PluginHeightMapWindow::PluginHeightMapWindow(QMainWindow *parent,
             this,
             &PluginHeightMapWindow::previewChanged);
 
-    applyButton_ = new QPushButton(tr("&Apply"));
+    applyButton_ = new QPushButton(tr("Apply and save"));
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(applyButton_,
             &QAbstractButton::clicked,
@@ -262,14 +273,12 @@ PluginHeightMapWindow::PluginHeightMapWindow(QMainWindow *parent,
             &PluginHeightMapWindow::apply);
 
     // Layout
-    QGroupBox *groupBox = new QGroupBox;
     QGridLayout *groupBoxLayout = new QGridLayout;
     groupBoxLayout->addWidget(new QLabel(tr("N colors")), 0, 0);
     groupBoxLayout->addWidget(colorCountSpinBox_, 0, 1);
     groupBoxLayout->addWidget(new QLabel(tr("Colormap")), 1, 0);
     groupBoxLayout->addWidget(colormapComboBox_, 1, 1);
     groupBoxLayout->setColumnStretch(1, 1);
-    groupBox->setLayout(groupBoxLayout);
 
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->addWidget(previewCheckBox_);
@@ -278,7 +287,7 @@ PluginHeightMapWindow::PluginHeightMapWindow(QMainWindow *parent,
     hbox->addWidget(applyButton_, 0, Qt::AlignRight);
 
     QVBoxLayout *vbox = new QVBoxLayout;
-    vbox->addWidget(groupBox);
+    vbox->addLayout(groupBoxLayout);
     vbox->addSpacing(10);
     vbox->addLayout(hbox);
     vbox->addStretch();
@@ -286,7 +295,7 @@ PluginHeightMapWindow::PluginHeightMapWindow(QMainWindow *parent,
     // Dock
     widget_ = new QWidget;
     widget_->setLayout(vbox);
-    widget_->setFixedHeight(120);
+    widget_->setFixedHeight(100);
     setWidget(widget_);
 }
 
@@ -312,7 +321,10 @@ void PluginHeightMapWindow::previewChanged(int index)
 
 void PluginHeightMapWindow::apply()
 {
+    // Filter is active during proccesing
+    filter_->setPreviewEnabled(true, false);
     filter_->applyToTiles(mainWindow());
+    filter_->setPreviewEnabled(previewCheckBox_->isChecked(), true, true);
 }
 
 void PluginHeightMapWindow::closeEvent(QCloseEvent *event)

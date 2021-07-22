@@ -35,7 +35,7 @@ public:
     ~EditorCache();
 
     void clear();
-    void reload();
+    void reload(bool everything = false);
     bool loadStep();
     void updateCamera(const Camera &camera);
     void resetRendering();

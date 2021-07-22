@@ -54,7 +54,9 @@ public:
 
     void initialize(Editor *editor);
     void setColormap(const QString &name, int colorCount);
-    void setPreviewEnabled(bool enabled);
+    void setPreviewEnabled(bool enabled,
+                           bool update = true,
+                           bool reload = false);
     bool isPreviewEnabled();
     void filterTile(EditorTile *tile);
     void applyToTiles(QWidget *widget);

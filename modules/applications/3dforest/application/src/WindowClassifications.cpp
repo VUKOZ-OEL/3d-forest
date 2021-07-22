@@ -45,11 +45,11 @@ WindowClassifications::WindowClassifications(QWidget *parent) : QWidget(parent)
             SLOT(setEnabled(int)));
 
     invertButton_ = new QPushButton(tr("Invert"));
-    invertButton_->setToolTip(tr("Invert the selection"));
+    invertButton_->setToolTip(tr("Invert visibility"));
     connect(invertButton_, SIGNAL(clicked()), this, SLOT(invertSelection()));
 
-    deselectButton_ = new QPushButton(tr("Deselect"));
-    deselectButton_->setToolTip(tr("Dismiss the selection"));
+    deselectButton_ = new QPushButton(tr("Hide all"));
+    deselectButton_->setToolTip(tr("Hide all classifications"));
     connect(deselectButton_, SIGNAL(clicked()), this, SLOT(clearSelection()));
 
     // Layout
@@ -194,7 +194,7 @@ void WindowClassifications::setClassifications(
     // Header
     tree_->setColumnCount(COLUMN_LAST);
     QStringList labels;
-    labels << tr("Select") << tr("Class") << tr("Label");
+    labels << tr("Visible") << tr("Class") << tr("Label");
     tree_->setHeaderLabels(labels);
 
     // Content

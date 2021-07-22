@@ -48,15 +48,17 @@ public:
     bool isFogEnabled() const;
     void setFogEnabled(bool b);
 
-    void setPointColor(float r, float g, float b);
+    void setPointColor(const Vector3<float> &rgb);
     const Vector3<float> &pointColor() const { return pointColor_; }
 
-    const Vector3<float> &background() const { return background_; }
+    void setBackgroundColor(const Vector3<float> &rgb);
+    const Vector3<float> &backgroundColor() const { return background_; }
 
     size_t colorSourceSize() const;
     const char *colorSourceString(size_t id) const;
     bool isColorSourceEnabled(size_t id) const;
     void setColorSourceEnabled(size_t id, bool v);
+    void setColorSourceEnabledAll(bool v);
 
     void read(const Json &in);
     Json &write(Json &out) const;
