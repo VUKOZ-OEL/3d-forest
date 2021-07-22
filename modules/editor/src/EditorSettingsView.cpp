@@ -91,6 +91,14 @@ void EditorSettingsView::setColorSourceEnabled(size_t id, bool v)
     colorSourceEnabled_[id] = v;
 }
 
+void EditorSettingsView::setColorSourceEnabledAll(bool v)
+{
+    for (auto &&it : colorSourceEnabled_)
+    {
+        it = v;
+    }
+}
+
 void EditorSettingsView::read(const Json &in)
 {
     if (in.contains("pointSize"))

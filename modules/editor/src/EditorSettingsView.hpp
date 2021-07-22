@@ -57,6 +57,7 @@ public:
     const char *colorSourceString(size_t id) const;
     bool isColorSourceEnabled(size_t id) const;
     void setColorSourceEnabled(size_t id, bool v);
+    void setColorSourceEnabledAll(bool v);
 
     void read(const Json &in);
     Json &write(Json &out) const;
