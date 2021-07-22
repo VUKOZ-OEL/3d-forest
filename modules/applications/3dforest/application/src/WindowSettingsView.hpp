@@ -62,6 +62,9 @@ public slots:
     void setPointSize(int v);
     void setFogEnabled(int v);
 
+    void setColorFg();
+    void setColorBg();
+
 signals:
     void settingsChanged();
     void settingsChangedApply();
@@ -73,6 +76,8 @@ protected:
     QPushButton *deselectButton_;
     QSlider *pointSizeSlider_;
     QCheckBox *fogCheckBox_;
+    QPushButton *colorFgButton_;
+    QPushButton *colorBgButton_;
 
     EditorSettingsView settings_;
 
@@ -82,6 +87,9 @@ protected:
     void unblock();
     void addItem(size_t i);
     void setColorSource(const EditorSettingsView &settings);
+
+    bool colorDialog(Vector3<float> &rgb);
+    void setColor(QPushButton *button, const Vector3<float> &rgb);
 };
 
 #endif /* WINDOW_SETTINGS_VIEW_HPP */

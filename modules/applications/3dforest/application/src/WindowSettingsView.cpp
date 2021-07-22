@@ -49,11 +49,22 @@ WindowSettingsView::WindowSettingsView(QWidget *parent) : QWidget(parent)
     deselectButton_->setToolTip(tr("Disable all sources"));
     connect(deselectButton_, SIGNAL(clicked()), this, SLOT(clearSelection()));
 
+    colorFgButton_ = new QPushButton(tr("Foreground"));
+    connect(colorFgButton_, SIGNAL(clicked()), this, SLOT(setColorFg()));
+
+    colorBgButton_ = new QPushButton(tr("Background"));
+    connect(colorBgButton_, SIGNAL(clicked()), this, SLOT(setColorBg()));
+
     QGroupBox *groupBox = new QGroupBox(tr("Color Source"));
 
     QHBoxLayout *controlLayout = new QHBoxLayout;
     controlLayout->addStretch();
     controlLayout->addWidget(deselectButton_);
+
+    QHBoxLayout *colorLayout = new QHBoxLayout;
+    colorLayout->addWidget(colorFgButton_);
+    colorLayout->addWidget(colorBgButton_);
+    colorLayout->addStretch();
 
     QVBoxLayout *groupBoxLayout = new QVBoxLayout;
     groupBoxLayout->setContentsMargins(2, 1, 2, 1);
@@ -94,6 +105,9 @@ WindowSettingsView::WindowSettingsView(QWidget *parent) : QWidget(parent)
     row++;
     visualizationLayout1->addWidget(new QLabel(tr("Fog")), row, 0);
     visualizationLayout1->addWidget(fogCheckBox_, row, 1);
+    row++;
+    visualizationLayout1->addWidget(new QLabel(tr("Color")), row, 0);
+    visualizationLayout1->addLayout(colorLayout, row, 1);
 
     QWidget *visualization = new QWidget;
     QVBoxLayout *visualizationLayout = new QVBoxLayout;
@@ -253,6 +267,66 @@ void WindowSettingsView::setSettings(const EditorSettingsView &settings)
 
     setColorSource(settings_);
     pointSizeSlider_->setValue(static_cast<int>(settings_.pointSize()));
+    setColor(colorFgButton_, settings_.pointColor());
+    setColor(colorBgButton_, settings_.backgroundColor());
 
     unblock();
+}
+
+void WindowSettingsView::setColorFg()
+{
+    Vector3<float> rgb = settings_.pointColor();
+
+    if (colorDialog(rgb))
+    {
+        settings_.setPointColor(rgb);
+        setColor(colorFgButton_, rgb);
+        emit settingsChangedApply();
+    }
+}
+
+void WindowSettingsView::setColorBg()
+{
+    Vector3<float> rgb = settings_.backgroundColor();
+
+    if (colorDialog(rgb))
+    {
+        settings_.setBackgroundColor(rgb);
+        setColor(colorBgButton_, rgb);
+        emit settingsChangedApply();
+    }
+}
+
+bool WindowSettingsView::colorDialog(Vector3<float> &rgb)
+{
+    QColor color;
+    color.setRgbF(rgb[0], rgb[1], rgb[2]);
+
+    QColorDialog dialog(color, this);
+    if (dialog.exec() == QDialog::Rejected)
+    {
+        return false;
+    }
+
+    color = dialog.selectedColor();
+    rgb[0] = static_cast<float>(color.redF());
+    rgb[1] = static_cast<float>(color.greenF());
+    rgb[2] = static_cast<float>(color.blueF());
+
+    return true;
+}
+
+void WindowSettingsView::setColor(QPushButton *button,
+                                  const Vector3<float> &rgb)
+{
+    QColor color;
+    color.setRgbF(rgb[0], rgb[1], rgb[2]);
+
+    QPixmap pixmap(25, 25);
+    pixmap.fill(color);
+
+    QIcon icon(pixmap);
+
+    button->setIcon(icon);
+    button->setIconSize(QSize(10, 10));
 }
