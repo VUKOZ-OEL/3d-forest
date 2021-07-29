@@ -361,7 +361,9 @@ void GLWidget::renderSceneSettingsDisable()
 
 void GLWidget::resizeGL(int w, int h)
 {
-    camera_.setViewport(0, 0, w, h);
+    w *= parentWidget()->devicePixelRatio();
+    h *= parentWidget()->devicePixelRatio();
+    camera_.setViewport(0,0, w, h);
     camera_.updateProjection();
     cameraChanged();
 }
