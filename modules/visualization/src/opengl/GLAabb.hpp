@@ -22,7 +22,7 @@
 #ifndef GL_AABB_HPP
 #define GL_AABB_HPP
 
-#include <Aabb.hpp>
+#include <Box.hpp>
 #include <QVector3D>
 #include <vector>
 
@@ -41,8 +41,8 @@ public:
              float max_z);
     void set(const QVector3D &min, const QVector3D &max);
     void set(const std::vector<float> &xyz);
-    void set(const Aabb<float> &box);
-    void set(const Aabb<double> &box);
+    void set(const Box<float> &box);
+    void set(const Box<double> &box);
 
     void extend(const GLAabb &box);
 

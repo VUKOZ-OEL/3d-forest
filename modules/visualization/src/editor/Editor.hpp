@@ -23,13 +23,13 @@
 #define EDITOR_HPP
 
 #include <Camera.hpp>
-#include <EditorBase.hpp>
+#include <EditorDatabase.hpp>
 #include <QObject>
 #include <ThreadRender.hpp>
 #include <mutex>
 
 /** Editor. */
-class Editor : public QObject, public EditorBase
+class Editor : public QObject, public EditorDatabase
 {
     Q_OBJECT
 

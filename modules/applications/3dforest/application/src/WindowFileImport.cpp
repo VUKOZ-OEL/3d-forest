@@ -183,7 +183,7 @@ static void windowFileImportFile(const QString &path,
 
     if (windowFileImportCreateIndex(path, settings, window, editor))
     {
-        editor->addFile(path.toStdString(), settings);
+        editor->openDataset(path.toStdString(), settings);
     }
 
     window->updateProject();
@@ -196,7 +196,10 @@ static bool windowFileImportCreateIndex(const QString &path,
 {
     // If the index already exists, then return success.
     const std::string pathStd = path.toStdString();
-    if (editor->hasFileIndex(pathStd))
+    std::string pathFile = File::resolvePath(pathStd, editor->projectPath());
+    std::string pathIndex = FileIndexBuilder::extension(pathFile);
+
+    if (File::exists(pathIndex))
     {
         return true;
     }

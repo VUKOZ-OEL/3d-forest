@@ -88,7 +88,14 @@ void PluginHeightMapFilter::setPreviewEnabled(bool enabled,
         mutex_.unlock();
 
         editor_->lock();
-        editor_->tileViewClear(reload);
+        if (reload)
+        {
+            editor_->viewports().setStateRead();
+        }
+        else
+        {
+            editor_->viewports().setStateSelect();
+        }
         editor_->unlock();
 
         editor_->restartThreads();
@@ -110,12 +117,12 @@ bool PluginHeightMapFilter::isPreviewEnabled()
     return ret;
 }
 
-void PluginHeightMapFilter::filterTile(EditorTile *tile)
+void PluginHeightMapFilter::filterPage(EditorPage *page)
 {
     mutex_.lock();
 
-    double zMin = editor_->boundary().min(2);
-    double zLen = editor_->boundary().max(2) - zMin;
+    double zMin = editor_->clipBoundary().min(2);
+    double zLen = editor_->clipBoundary().max(2) - zMin;
     double colorDelta = 1.0 / static_cast<double>(colormap_.size() - 1);
 
     double zLenInv = 0;
@@ -124,33 +131,34 @@ void PluginHeightMapFilter::filterTile(EditorTile *tile)
         zLenInv = 1.0 / zLen;
     }
 
-    const std::vector<unsigned int> &indices = tile->indices;
+    const std::vector<uint32_t> &selection = page->selection;
 
-    for (size_t i = 0; i < indices.size(); i++)
+    for (size_t i = 0; i < selection.size(); i++)
     {
-        size_t row = indices[i];
+        size_t row = selection[i];
 
-        double z = tile->xyz[row * 3 + 2];
+        double z = page->points[row].z;
         double zNorm = (z - zMin) * zLenInv;
 
         size_t colorIndex = static_cast<size_t>(zNorm / colorDelta);
 
-        tile->view.rgb[row * 3 + 0] *= colormap_[colorIndex][0];
-        tile->view.rgb[row * 3 + 1] *= colormap_[colorIndex][1];
-        tile->view.rgb[row * 3 + 2] *= colormap_[colorIndex][2];
+        page->renderColor[row * 3 + 0] *= colormap_[colorIndex][0];
+        page->renderColor[row * 3 + 1] *= colormap_[colorIndex][1];
+        page->renderColor[row * 3 + 2] *= colormap_[colorIndex][2];
     }
 
     mutex_.unlock();
 }
 
-void PluginHeightMapFilter::applyToTiles(QWidget *widget)
+void PluginHeightMapFilter::apply(QWidget *widget)
 {
     editor_->cancelThreads();
 
-    std::vector<FileIndex::Selection> selection;
-    editor_->select(selection);
+    EditorQuery query(editor_);
+    query.selectBox(editor_->clipBoundary());
+    query.exec();
 
-    int maximum = static_cast<int>(selection.size());
+    int maximum = static_cast<int>(query.pageSizeEstimate());
 
     QProgressDialog progressDialog(widget);
     progressDialog.setCancelButtonText(QObject::tr("&Cancel"));
@@ -175,12 +183,10 @@ void PluginHeightMapFilter::applyToTiles(QWidget *widget)
 
         // Process step i
         editor_->lock();
-        FileIndex::Selection &selected = selection[static_cast<size_t>(i)];
-        EditorTile *tile = editor_->tile(selected.id, selected.idx);
-        if (tile)
+        if (query.nextPage())
         {
-            editor_->applyFilters(tile);
-            editor_->flush(tile);
+            editor_->applyFilters(query.page());
+            // editor_->flush(query.page());
         }
         editor_->unlock();
     }
@@ -323,7 +329,7 @@ void PluginHeightMapWindow::apply()
 {
     // Filter is active during proccesing
     filter_->setPreviewEnabled(true, false);
-    filter_->applyToTiles(mainWindow());
+    filter_->apply(mainWindow());
     filter_->setPreviewEnabled(previewCheckBox_->isChecked(), true, true);
 }
 
@@ -403,7 +409,7 @@ bool PluginHeightMap::isFilterEnabled()
     return filter_.isPreviewEnabled();
 }
 
-void PluginHeightMap::filterTile(EditorTile *tile)
+void PluginHeightMap::filterPage(EditorPage *page)
 {
-    filter_.filterTile(tile);
+    filter_.filterPage(page);
 }

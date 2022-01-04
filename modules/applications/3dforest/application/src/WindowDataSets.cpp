@@ -117,9 +117,9 @@ void WindowDataSets::toolEdit()
     QTreeWidgetItem *item = items.at(0);
     size_t idx = index(item);
 
-    QString label = QString::fromStdString(dataSets_.label(idx));
-    Vector3<float> rgb = dataSets_.color(idx);
-    Vector3<double> offset = dataSets_.translation(idx);
+    QString label = QString::fromStdString(datasets_.label(idx));
+    Vector3<float> rgb = datasets_.color(idx);
+    Vector3<double> offset = datasets_.translation(idx);
 
     QColor color;
     color.setRgbF(rgb[0], rgb[1], rgb[2]);
@@ -150,11 +150,11 @@ void WindowDataSets::toolEdit()
         offset[i] = dialog.offsetSpinBox_[i]->value();
     }
 
-    dataSets_.setLabel(idx, label.toStdString());
-    dataSets_.setColor(idx, rgb);
-    dataSets_.setTranslation(idx, offset);
+    datasets_.setLabel(idx, label.toStdString());
+    datasets_.setColor(idx, rgb);
+    datasets_.setTranslation(idx, offset);
 
-    setDataSets(dataSets_);
+    setDatasets(datasets_);
 
     // Update
     emit selectionChanged();
@@ -171,7 +171,7 @@ void WindowDataSets::toolDelete()
 
     QTreeWidgetItem *item = items.at(0);
     size_t idx = index(item);
-    dataSets_.erase(idx);
+    datasets_.erase(idx);
     delete item;
 
     emit dataChanged();
@@ -179,14 +179,14 @@ void WindowDataSets::toolDelete()
 
 void WindowDataSets::invertSelection()
 {
-    dataSets_.setInvertAll();
+    datasets_.setInvertAll();
     updateTree();
     emit selectionChanged();
 }
 
 void WindowDataSets::clearSelection()
 {
-    dataSets_.setEnabledAll(false);
+    datasets_.setEnabledAll(false);
     updateTree();
     emit selectionChanged();
 }
@@ -213,14 +213,14 @@ void WindowDataSets::itemChanged(QTreeWidgetItem *item, int column)
     {
         bool checked = (item->checkState(COLUMN_CHECKED) == Qt::Checked);
 
-        dataSets_.setEnabled(index(item), checked);
+        datasets_.setEnabled(index(item), checked);
         emit selectionChanged();
     }
 }
 
 size_t WindowDataSets::index(const QTreeWidgetItem *item)
 {
-    return dataSets_.index(item->text(COLUMN_ID).toULong());
+    return datasets_.index(item->text(COLUMN_ID).toULong());
 }
 
 void WindowDataSets::updateTree()
@@ -233,7 +233,7 @@ void WindowDataSets::updateTree()
     {
         size_t idx = index(*it);
 
-        if (dataSets_.isEnabled(idx))
+        if (datasets_.isEnabled(idx))
         {
             (*it)->setCheckState(COLUMN_CHECKED, Qt::Checked);
         }
@@ -272,7 +272,7 @@ void WindowDataSets::addItem(size_t i)
 {
     QTreeWidgetItem *item = new QTreeWidgetItem(tree_);
 
-    if (dataSets_.isEnabled(i))
+    if (datasets_.isEnabled(i))
     {
         item->setCheckState(COLUMN_CHECKED, Qt::Checked);
     }
@@ -281,14 +281,14 @@ void WindowDataSets::addItem(size_t i)
         item->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
     }
 
-    item->setText(COLUMN_ID, QString::number(dataSets_.id(i)));
+    item->setText(COLUMN_ID, QString::number(datasets_.id(i)));
 
-    item->setText(COLUMN_LABEL, QString::fromStdString(dataSets_.label(i)));
+    item->setText(COLUMN_LABEL, QString::fromStdString(datasets_.label(i)));
     item->setText(COLUMN_DATE_CREATED,
-                  QString::fromStdString(dataSets_.dateCreated(i)));
+                  QString::fromStdString(datasets_.dateCreated(i)));
 
     // Color legend
-    const Vector3<float> &rgb = dataSets_.color(i);
+    const Vector3<float> &rgb = datasets_.color(i);
 
     QColor color;
     color.setRedF(rgb[0]);
@@ -299,11 +299,11 @@ void WindowDataSets::addItem(size_t i)
     item->setBackground(COLUMN_ID, brush);
 }
 
-void WindowDataSets::setDataSets(const EditorDataSets &dataSets)
+void WindowDataSets::setDatasets(const EditorDatasets &datasets)
 {
     block();
 
-    dataSets_ = dataSets;
+    datasets_ = datasets;
 
     tree_->clear();
 
@@ -314,7 +314,7 @@ void WindowDataSets::setDataSets(const EditorDataSets &dataSets)
     tree_->setHeaderLabels(labels);
 
     // Content
-    for (size_t i = 0; i < dataSets_.size(); i++)
+    for (size_t i = 0; i < datasets_.size(); i++)
     {
         addItem(i);
     }

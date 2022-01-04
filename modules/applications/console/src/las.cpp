@@ -19,7 +19,7 @@
 
 /** @file las.cpp */
 
-#include <Aabb.hpp>
+#include <Box.hpp>
 #include <Error.hpp>
 #include <FileIndexBuilder.hpp>
 #include <FileLas.hpp>
@@ -134,7 +134,7 @@ void cmd_print(const char *inputPath, uint64_t nPointsMax)
     }
 }
 
-void cmd_select(const char *inputPath, const Aabb<double> &window)
+void cmd_select(const char *inputPath, const Box<double> &window)
 {
     if (!inputPath)
     {
@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
     int command = COMMAND_NONE;
     uint64_t nPointsMax = 0;
     double wx1 = 0, wy1 = 0, wz1 = 0, wx2 = 0, wy2 = 0, wz2 = 0;
-    Aabb<double> window;
+    Box<double> window;
     const char *outputPath = nullptr;
     const char *inputPath = nullptr;
 

@@ -92,12 +92,12 @@ void GLAabb::set(const std::vector<float> &xyz)
     set(min_x, min_y, min_z, max_x, max_y, max_z);
 }
 
-void GLAabb::set(const Aabb<float> &box)
+void GLAabb::set(const Box<float> &box)
 {
     set(box.min(0), box.min(1), box.min(2), box.max(0), box.max(1), box.max(2));
 }
 
-void GLAabb::set(const Aabb<double> &box)
+void GLAabb::set(const Box<double> &box)
 {
     set(static_cast<float>(box.min(0)),
         static_cast<float>(box.min(1)),

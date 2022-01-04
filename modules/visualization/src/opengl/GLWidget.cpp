@@ -71,7 +71,7 @@ void GLWidget::updateScene(Editor *editor)
 
 void GLWidget::resetScene(Editor *editor, bool resetView)
 {
-    aabb_.set(editor->boundaryView());
+    aabb_.set(editor->datasets().boundary());
     if (resetView)
     {
         resetCamera();
@@ -269,30 +269,31 @@ bool GLWidget::renderScene()
 
     double t1 = getRealTime();
 
-    size_t tileViewSize = editor_->tileViewSize(viewportId_);
+    size_t pageSize = editor_->viewports().pageSize(viewportId_);
 
-    if (tileViewSize == 0)
+    if (pageSize == 0)
     {
         clearScreen();
         firstFrame = true;
     }
 
-    for (size_t tileIndex = 0; tileIndex < tileViewSize; tileIndex++)
+    for (size_t pageIndex = 0; pageIndex < pageSize; pageIndex++)
     {
-        EditorTile &tile = editor_->tileView(viewportId_, tileIndex);
+        EditorPage &page = editor_->viewports().page(viewportId_, pageIndex);
 
-        if (tile.renderMore())
+        if (page.nextStateRender())
         {
-            if (tileIndex == 0 && tile.view.isStarted())
+            if (pageIndex == 0)
             {
                 clearScreen();
                 firstFrame = true;
             }
 
-            GL::render(GL::POINTS, tile.view.xyz, tile.view.rgb, tile.indices);
+            GL::render(GL::POINTS,
+                       page.renderPosition,
+                       page.renderColor,
+                       page.selection);
             glFlush();
-
-            tile.view.nextFrame();
 
             double t2 = getRealTime();
             if (t2 - t1 > 0.02)

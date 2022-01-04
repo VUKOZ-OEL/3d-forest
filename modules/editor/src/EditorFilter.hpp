@@ -22,7 +22,7 @@
 #ifndef EDITOR_FILTER_HPP
 #define EDITOR_FILTER_HPP
 
-#include <EditorTile.hpp>
+#include <EditorPage.hpp>
 
 /** Editor Filter Interface. */
 class EditorFilter
@@ -30,7 +30,7 @@ class EditorFilter
 public:
     virtual ~EditorFilter() = default;
     virtual bool isFilterEnabled() = 0;
-    virtual void filterTile(EditorTile *tile) = 0;
+    virtual void filterPage(EditorPage *page) = 0;
 };
 
 #endif /* EDITOR_FILTER_HPP */

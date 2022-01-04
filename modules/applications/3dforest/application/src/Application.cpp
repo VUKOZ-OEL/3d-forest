@@ -19,14 +19,14 @@
 
 /** @file Application.cpp */
 
-#include <Log.hpp>
+#include <ApplicationLog.hpp>
 #include <QApplication>
 #include <QSurfaceFormat>
 #include <WindowMain.hpp>
 
 int main(int argc, char *argv[])
 {
-    Log::install();
+    ApplicationLog::install();
 
     QApplication app(argc, argv);
 

@@ -21,9 +21,9 @@
 
 #include <Endian.hpp>
 #include <FileIndexBuilder.hpp>
+#include <Log.hpp>
 #include <Vector3.hpp>
 #include <cstring>
-#include <iostream>
 
 // Define to keep the same order of LAS points.
 //#define FILE_INDEX_BUILDER_DEBUG_SAME_ORDER
@@ -607,7 +607,7 @@ void FileIndexBuilder::stateCopyPoints()
     outputLas_.file().write(bufferOut, sizePointOut_ * stepIdx);
 
     // Boundary without scaling
-    Aabb<double> box;
+    Box<double> box;
     box.set(coords_);
     boundary_.extend(box);
 
@@ -638,7 +638,7 @@ void FileIndexBuilder::stateMainBegin()
 
     double dimMax = dim.max();
 
-    Aabb<double> box;
+    Box<double> box;
 
     box.set(boundary_.min(0),
             boundary_.min(1),
@@ -834,7 +834,7 @@ void FileIndexBuilder::stateNodeInsert()
     outputLas_.seek(start + (node->from * sizePoint_));
     outputLas_.file().read(buffer, step);
 
-    // Actual boundary of this tile
+    // Actual boundary of this page
     coords_.resize(node->size * 3);
     for (uint64_t i = 0; i < node->size; i++)
     {
@@ -844,7 +844,7 @@ void FileIndexBuilder::stateNodeInsert()
         coords_[i * 3 + 2] = static_cast<double>(ltoh32(point + 8));
     }
 
-    Aabb<double> box;
+    Box<double> box;
     box.set(coords_);
 
     // Start new node

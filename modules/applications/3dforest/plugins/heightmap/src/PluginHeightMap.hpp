@@ -30,7 +30,7 @@
 #include <vector>
 
 class Editor;
-class EditorTile;
+class EditorPage;
 class QSpinBox;
 class QComboBox;
 class QCheckBox;
@@ -58,8 +58,8 @@ public:
                            bool update = true,
                            bool reload = false);
     bool isPreviewEnabled();
-    void filterTile(EditorTile *tile);
-    void applyToTiles(QWidget *widget);
+    void filterPage(EditorPage *page);
+    void apply(QWidget *widget);
 
 protected:
     Editor *editor_;
@@ -137,7 +137,7 @@ public:
     virtual QPixmap icon() const;
 
     virtual bool isFilterEnabled();
-    virtual void filterTile(EditorTile *tile);
+    virtual void filterPage(EditorPage *page);
 
 protected:
     PluginHeightMapWindow *window_; /**< First time use creates GUI. */

@@ -19,7 +19,7 @@
 
 /** @file FileLas.cpp */
 
-#include <Aabb.hpp>
+#include <Box.hpp>
 #include <Endian.hpp>
 #include <Error.hpp>
 #include <FileLas.hpp>
@@ -275,7 +275,7 @@ void FileLas::create(const std::string &path,
         coords[i * 3 + 1] = points[i].y;
         coords[i * 3 + 2] = points[i].z;
     }
-    Aabb<uint32_t> box;
+    Box<uint32_t> box;
     box.set(coords);
     hdr.max_x = static_cast<double>(box.max(0)) * scale[0] + offset[0];
     hdr.min_x = static_cast<double>(box.min(0)) * scale[0] + offset[0];

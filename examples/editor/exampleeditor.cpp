@@ -19,61 +19,62 @@
 
 /** @file exampleeditor.cpp @brief Editor example. */
 
-#include <EditorBase.hpp>
+#include <EditorDatabase.hpp>
 #include <FileIndexBuilder.hpp>
+#include <Time.hpp>
 #include <cstring>
 
-static void createDataSet(const std::string &path,
-                          const Vector3<double> &translate = {0, 0, 0})
+#define PATH_1 "dataset1.las"
+
+static void createDataSet()
 {
-    // Create points
+    FileIndexBuilder::Settings settings;
+    settings.maxSize1 = 1;
+
     std::vector<FileLas::Point> points;
 
-    uint32_t nx = 2;
-    uint32_t ny = 3;
-    uint32_t nz = 4;
-    points.resize(nx * ny * nz);
-
+    points.resize(2);
     std::memset(points.data(), 0, sizeof(FileLas::Point) * points.size());
 
-    for (uint32_t z = 0; z < nz; z++)
+    points[0].x = 0;
+    points[0].y = 0;
+    points[0].z = 0;
+
+    points[1].x = 1;
+    points[1].y = 1;
+    points[1].z = 0;
+
+    FileLas::create(PATH_1, points, {1,1,1}, {0,0,0});
+    FileIndexBuilder::index(PATH_1, PATH_1, settings);
+}
+
+static void edit()
+{
+    EditorDatabase db;
+    db.openDataset(PATH_1);
+
+    EditorQuery query(&db);
+    query.selectBox(Box<double>(0., 0., 0., 1.0, 1.0, 2.));
+    query.exec();
+
+    double zMin = db.clipBoundary().max(2);
+    while (query.nextPoint())
     {
-        for (uint32_t y = 0; y < ny; y++)
+        if (query.point()->z < zMin)
         {
-            for (uint32_t x = 0; x < nx; x++)
-            {
-                uint32_t idx = (x * ny * nz) + (y * nz) + z;
-                points[idx].x = x;
-                points[idx].y = y;
-                points[idx].z = z;
-                points[idx].format = 0;
-            }
+            zMin = query.point()->z;
         }
     }
 
-    // Create LAS file
-    FileLas::create(path, points, {1,1,1}, translate);
-
-    // Create LAS file index
-    FileIndexBuilder::Settings settings;
-    FileIndexBuilder::index(path, path, settings);
-}
-
-static void edit(const std::string &path)
-{
-    EditorBase editor;
-    editor.addFile(path);
-
+    std::cout << "z min is " << zMin << std::endl;
 }
 
 int main()
 {
     try
     {
-        std::string path = "dataset.las";
-
-        createDataSet(path, {4,0,0});
-        edit(path);
+        createDataSet();
+        edit();
     }
     catch (std::exception &e)
     {

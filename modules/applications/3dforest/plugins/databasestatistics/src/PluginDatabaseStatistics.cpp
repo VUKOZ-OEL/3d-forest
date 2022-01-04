@@ -63,10 +63,11 @@ void PluginDatabaseStatisticsWindow::compute()
     // 2. Collect new result
     editor_->cancelThreads();
 
-    std::vector<FileIndex::Selection> selection;
-    editor_->select(selection);
+    EditorQuery query(editor_);
+    query.selectBox(editor_->clipBoundary());
+    query.exec();
 
-    int maximum = static_cast<int>(selection.size());
+    int maximum = static_cast<int>(query.pageSizeEstimate());
 
     QProgressDialog progressDialog(mainWindow());
     progressDialog.setCancelButtonText(QObject::tr("&Cancel"));
@@ -91,11 +92,9 @@ void PluginDatabaseStatisticsWindow::compute()
 
         // Process step i
         editor_->lock();
-        FileIndex::Selection &selected = selection[static_cast<size_t>(i)];
-        EditorTile *tile = editor_->tile(selected.id, selected.idx);
-        if (tile)
+        if (query.nextPage())
         {
-            computeStep(tile);
+            computeStep(query.page());
         }
         editor_->unlock();
     }
@@ -114,22 +113,22 @@ void PluginDatabaseStatisticsWindow::computeReset()
     classificationMaximum_ = 0;
 }
 
-void PluginDatabaseStatisticsWindow::computeStep(EditorTile *tile)
+void PluginDatabaseStatisticsWindow::computeStep(EditorPage *page)
 {
-    const std::vector<EditorTile::Attributes> &attrib = tile->attrib;
-
-    for (size_t j = 0; j < tile->indices.size(); j++)
+    for (size_t i = 0; i < page->selection.size(); i++)
     {
         numberOfPoints_++;
 
-        size_t row = tile->indices[j];
-        if (attrib[row].classification > 0)
+        size_t row = page->selection[i];
+        uint8_t classification = page->points[row].classification;
+
+        if (classification > 0)
         {
             classificationPoints_++;
 
-            if (attrib[row].classification > classificationMaximum_)
+            if (classification > classificationMaximum_)
             {
-                classificationMaximum_ = attrib[row].classification;
+                classificationMaximum_ = classification;
             }
         }
     }

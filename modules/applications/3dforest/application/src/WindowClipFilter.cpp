@@ -261,7 +261,7 @@ void WindowClipFilter::setClipFilter(const Editor &editor)
 {
     (void)blockSignals(true);
 
-    const Aabb<double> &boundary = editor.boundary();
+    const Box<double> &boundary = editor.datasets().boundary();
     const ClipFilter &clipFilter = editor.clipFilter();
 
     for (size_t i = 0; i < 3; i++)

@@ -22,7 +22,7 @@
 #ifndef NODE_HPP
 #define NODE_HPP
 
-#include <Aabb.hpp>
+#include <Box.hpp>
 
 /** Scene Node. */
 class Node

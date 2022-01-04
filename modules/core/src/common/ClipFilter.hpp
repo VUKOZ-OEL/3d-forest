@@ -22,7 +22,7 @@
 #ifndef CLIP_FILTER_HPP
 #define CLIP_FILTER_HPP
 
-#include <Aabb.hpp>
+#include <Box.hpp>
 
 /** Clip Filter. */
 class ClipFilter
@@ -35,8 +35,8 @@ public:
         TYPE_BOX
     };
 
-    Aabb<double> box;
-    Aabb<double> boxView;
+    Box<double> box;
+    Box<double> boxView;
     Type enabled;
 
     ClipFilter();

@@ -26,7 +26,7 @@
 #include <WindowDock.hpp>
 
 class Editor;
-class EditorTile;
+class EditorPage;
 class QTextEdit;
 class QPushButton;
 
@@ -53,7 +53,7 @@ protected:
     uint32_t classificationMaximum_;
 
     void computeReset();
-    void computeStep(EditorTile *tile);
+    void computeStep(EditorPage *page);
     void computeOutput();
 };
 

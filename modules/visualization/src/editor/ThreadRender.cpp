@@ -61,7 +61,7 @@ bool ThreadRender::compute()
     if (!initialized_)
     {
         editor_->lock();
-        editor_->updateCamera(viewportId_, camera_);
+        editor_->viewports().selectCamera(viewportId_, camera_);
         editor_->unlock();
         initialized_ = true;
         return false;
@@ -70,7 +70,7 @@ bool ThreadRender::compute()
     double t1 = getRealTime();
     bool ret;
     editor_->lock();
-    ret = editor_->loadView();
+    ret = editor_->viewports().nextState();
     editor_->unlock();
 
     emit statusChanged();
