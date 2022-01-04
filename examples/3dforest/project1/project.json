@@ -1028,7 +1028,7 @@
     ],
     "enabled": false
   },
-  "dataSets": [
+  "datasets": [
     {
       "color": [1,1,1],
       "dateCreated": "2021-07-11 11:00:00",

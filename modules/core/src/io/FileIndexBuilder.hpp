@@ -115,7 +115,7 @@ protected:
     size_t sizePointOut_;
     size_t sizePointFormat_;
 
-    Aabb<double> boundary_;
+    Box<double> boundary_;
 
     uint32_t rgbMax_;
     uint32_t intensityMax_;

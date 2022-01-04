@@ -22,14 +22,15 @@
 #ifndef LOG_HPP
 #define LOG_HPP
 
-/** Log.
+#include <iostream>
 
-    @todo To make it thread safe. Now it is only for GUI thread.
-*/
-class Log
-{
-public:
-    static void install();
-};
+#define LOG_ENABLE 1
+
+#define LOG(msg)                                                               \
+    do                                                                         \
+    {                                                                          \
+        std::cout << __func__ << ": " << msg << "\n";                          \
+        std::cout.flush();                                                     \
+    } while (false)
 
 #endif /* LOG_HPP */

@@ -31,6 +31,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPluginLoader>
+#include <QString>
 #include <QTextEdit>
 #include <Time.hpp>
 #include <WindowClassifications.hpp>
@@ -52,6 +53,7 @@ QTextEdit *WindowMain::log = nullptr;
 #define WINDOW_MAIN_FILTER_PRJ "3DForest Project (*.json)"
 #define WINDOW_MAIN_DOCK_MIN 80
 #define WINDOW_MAIN_DOCK_MAX 500
+#define WINDOW_MAIN_ICON_SIZE 25
 
 WindowMain::WindowMain(QWidget *parent) : QMainWindow(parent)
 {
@@ -117,9 +119,11 @@ QToolButton *WindowMain::createToolButton(const QString &text,
 
     button->setText(text);
     button->setToolTip(toolTip);
-    button->setIcon(
-        pixmap.scaled(25, 25, Qt::IgnoreAspectRatio, Qt::FastTransformation));
-    button->setIconSize(QSize(25, 25));
+    button->setIcon(pixmap.scaled(WINDOW_MAIN_ICON_SIZE,
+                                  WINDOW_MAIN_ICON_SIZE,
+                                  Qt::IgnoreAspectRatio,
+                                  Qt::FastTransformation));
+    button->setIconSize(QSize(WINDOW_MAIN_ICON_SIZE, WINDOW_MAIN_ICON_SIZE));
     button->setEnabled(true);
 
     button->setToolButtonStyle(Qt::ToolButtonIconOnly);
@@ -648,19 +652,19 @@ void WindowMain::actionViewLayout(WindowViewports::ViewLayout layout)
 
     if (layout == WindowViewports::VIEW_LAYOUT_SINGLE)
     {
-        editor_.setNumberOfViewports(1);
+        editor_.viewportsResize(1);
         windowViewports_->setLayout(layout);
     }
     else if (layout == WindowViewports::VIEW_LAYOUT_TWO_COLUMNS)
     {
-        editor_.setNumberOfViewports(2);
+        editor_.viewportsResize(2);
         windowViewports_->setLayout(layout);
         windowViewports_->resetScene(&editor_, 1, true);
     }
     else if ((layout == WindowViewports::VIEW_LAYOUT_GRID) ||
              (layout == WindowViewports::VIEW_LAYOUT_THREE_ROWS_RIGHT))
     {
-        editor_.setNumberOfViewports(4);
+        editor_.viewportsResize(4);
         windowViewports_->setLayout(layout);
         windowViewports_->resetScene(&editor_, 1, true);
         windowViewports_->resetScene(&editor_, 2, true);
@@ -723,9 +727,9 @@ void WindowMain::actionDataSets()
 {
     editor_.attach();
 
-    editor_.setDataSets(windowDataSets_->dataSets());
+    editor_.setDatasets(windowDataSets_->datasets());
     windowViewports_->resetScene(&editor_, false);
-    editor_.tileViewClear();
+    editor_.viewports().setStateSelect();
 
     editor_.detach();
 }
@@ -734,9 +738,9 @@ void WindowMain::actionDataSetsData()
 {
     editor_.attach();
 
-    editor_.setDataSets(windowDataSets_->dataSets());
+    editor_.setDatasets(windowDataSets_->datasets());
     windowViewports_->resetScene(&editor_, false);
-    editor_.clearCache();
+    editor_.viewports().clearContent();
 
     editor_.detach();
 }
@@ -746,7 +750,7 @@ void WindowMain::actionClassifications()
     editor_.cancelThreads();
     editor_.lock();
     editor_.setClassifications(windowClassifications_->classifications());
-    editor_.tileViewClear();
+    editor_.viewports().setStateSelect();
     editor_.unlock();
     editor_.restartThreads();
 }
@@ -756,7 +760,7 @@ void WindowMain::actionLayers()
     editor_.cancelThreads();
     editor_.lock();
     editor_.setLayers(windowLayers_->layers());
-    editor_.tileViewClear();
+    editor_.viewports().setStateSelect();
     editor_.unlock();
     editor_.restartThreads();
 }
@@ -767,7 +771,7 @@ void WindowMain::actionClipFilter(const ClipFilter &clipFilter)
     editor_.lock();
     /** @todo There is a bug when clip filter is disabled. */
     editor_.setClipFilter(clipFilter);
-    editor_.tileViewClear();
+    editor_.viewports().setStateSelect();
     editor_.unlock();
     editor_.restartThreads();
 }
@@ -777,7 +781,7 @@ void WindowMain::actionClipFilterReset()
     editor_.cancelThreads();
     editor_.lock();
     editor_.resetClipFilter();
-    editor_.tileViewClear();
+    editor_.viewports().setStateSelect();
     editor_.unlock();
     editor_.restartThreads();
     windowClipFilter_->setClipFilter(editor_);
@@ -797,7 +801,7 @@ void WindowMain::actionSettingsViewColor()
     editor_.cancelThreads();
     editor_.lock();
     editor_.setSettingsView(windowSettingsView_->settings());
-    editor_.tileViewClear();
+    editor_.viewports().setStateSelect();
     editor_.unlock();
     editor_.restartThreads();
 }
@@ -853,7 +857,7 @@ bool WindowMain::projectOpen(const QString &path)
     // Open new project
     try
     {
-        editor_.open(path.toStdString());
+        editor_.openProject(path.toStdString());
     }
     catch (std::exception &e)
     {
@@ -910,7 +914,7 @@ bool WindowMain::projectClose()
     // Close
     try
     {
-        editor_.close();
+        editor_.newProject();
     }
     catch (std::exception &e)
     {
@@ -929,7 +933,7 @@ bool WindowMain::projectSave(const QString &path)
     if (path.isEmpty())
     {
         // Save
-        writePath = editor_.path();
+        writePath = editor_.projectPath();
         if (writePath.empty())
         {
             // First time save
@@ -955,7 +959,7 @@ bool WindowMain::projectSave(const QString &path)
     // Write
     try
     {
-        editor_.write(writePath);
+        editor_.saveProject(writePath);
     }
     catch (std::exception &e)
     {
@@ -973,14 +977,14 @@ void WindowMain::updateProject()
     windowViewports_->resetScene(&editor_, true);
     editor_.unlock();
 
-    windowDataSets_->setDataSets(editor_.dataSets());
+    windowDataSets_->setDatasets(editor_.datasets());
     windowLayers_->setLayers(editor_.layers());
     windowClassifications_->setClassifications(editor_.classifications());
     windowClipFilter_->setClipFilter(editor_);
     windowSettingsView_->setSettings(editor_.settings().view());
 
     updateViewer();
-    updateWindowTitle(QString::fromStdString(editor_.path()));
+    updateWindowTitle(QString::fromStdString(editor_.projectPath()));
 }
 
 void WindowMain::actionCameraChanged(size_t viewportId)

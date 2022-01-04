@@ -17,45 +17,36 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Editor.hpp */
+/** @file ApplicationLog.cpp */
 
-#ifndef EDITOR_HPP
-#define EDITOR_HPP
+#include <ApplicationLog.hpp>
+#include <QTextEdit>
+#include <WindowMain.hpp>
 
-#include <Camera.hpp>
-#include <EditorDatabase.hpp>
-#include <QObject>
-#include <ThreadRender.hpp>
-#include <mutex>
-
-/** Editor. */
-class Editor : public QObject, public EditorDatabase
+static void logOutput(QtMsgType type,
+                      const QMessageLogContext &context,
+                      const QString &msg)
 {
-    Q_OBJECT
+    (void)context;
 
-public:
-    Editor(QObject *parent = nullptr);
-    ~Editor();
+    switch (type)
+    {
+        case QtInfoMsg:
+        case QtDebugMsg:
+        case QtWarningMsg:
+        case QtCriticalMsg:
+        case QtFatalMsg:
+            if (WindowMain::log)
+            {
+                WindowMain::log->append(msg);
+            }
+            break;
+        default:
+            break;
+    }
+}
 
-    void attach();
-    void detach();
-
-    void lock();
-    void unlock();
-
-    void cancelThreads();
-    void restartThreads();
-
-signals:
-    void renderRequested();
-
-public slots:
-    void render(size_t viewportId, const Camera &camera);
-    void render();
-
-protected:
-    ThreadRender thread_;
-    std::mutex mutex_;
-};
-
-#endif /* EDITOR_HPP */
+void ApplicationLog::install()
+{
+    qInstallMessageHandler(logOutput);
+}

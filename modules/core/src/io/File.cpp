@@ -566,6 +566,7 @@ std::string File::tmpname(const std::string &path)
     unsigned long long t = getRealTime64();
     char buffer[32];
     (void)snprintf(buffer, sizeof(buffer), "%016llX", t);
+    msleep(1);
     return path + "." + std::string(buffer);
 }
 

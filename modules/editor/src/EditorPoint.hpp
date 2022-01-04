@@ -17,45 +17,40 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Editor.hpp */
+/** @file EditorPoint.hpp */
 
-#ifndef EDITOR_HPP
-#define EDITOR_HPP
+#ifndef EDITOR_POINT_HPP
+#define EDITOR_POINT_HPP
 
-#include <Camera.hpp>
-#include <EditorDatabase.hpp>
-#include <QObject>
-#include <ThreadRender.hpp>
-#include <mutex>
+#include <Json.hpp>
 
-/** Editor. */
-class Editor : public QObject, public EditorDatabase
+/** Editor Point. */
+class EditorPoint
 {
-    Q_OBJECT
-
 public:
-    Editor(QObject *parent = nullptr);
-    ~Editor();
+    double x;
+    double y;
+    double z;
+    float intensity;
+    uint8_t returnNumber;
+    uint8_t numberOfReturns;
+    uint8_t classification;
+    uint8_t userData;
+    double gpsTime;
+    float red;
+    float green;
+    float blue;
+    float userRed;
+    float userGreen;
+    float userBlue;
+    uint32_t layer;
 
-    void attach();
-    void detach();
+    EditorPoint();
+    ~EditorPoint();
 
-    void lock();
-    void unlock();
-
-    void cancelThreads();
-    void restartThreads();
-
-signals:
-    void renderRequested();
-
-public slots:
-    void render(size_t viewportId, const Camera &camera);
-    void render();
-
-protected:
-    ThreadRender thread_;
-    std::mutex mutex_;
+    Json &write(Json &out) const;
 };
 
-#endif /* EDITOR_HPP */
+std::ostream &operator<<(std::ostream &os, const EditorPoint &obj);
+
+#endif /* EDITOR_POINT_HPP */

@@ -17,46 +17,46 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file EditorDataSet.cpp */
+/** @file EditorDataset.cpp */
 
-#include <EditorDataSet.hpp>
+#include <EditorDataset.hpp>
 #include <Error.hpp>
 #include <File.hpp>
 #include <FileIndex.hpp>
 #include <FileIndexBuilder.hpp>
 #include <FileLas.hpp>
-#include <iostream>
+#include <Log.hpp>
 
-EditorDataSet::EditorDataSet() : id_(0), enabled_(true)
+EditorDataset::EditorDataset() : id_(0), enabled_(true)
 {
 }
 
-void EditorDataSet::setEnabled(bool b)
+void EditorDataset::setEnabled(bool b)
 {
     enabled_ = b;
 }
 
-void EditorDataSet::setLabel(const std::string &label)
+void EditorDataset::setLabel(const std::string &label)
 {
     label_ = label;
 }
 
-void EditorDataSet::setColor(const Vector3<float> &color)
+void EditorDataset::setColor(const Vector3<float> &color)
 {
     color_ = color;
 }
 
-void EditorDataSet::setTranslation(const Vector3<double> &translation)
+void EditorDataset::setTranslation(const Vector3<double> &translation)
 {
     translation_ = translation;
     updateBoundary();
 }
 
-void EditorDataSet::read(size_t id,
+void EditorDataset::read(size_t id,
                          const std::string &path,
                          const std::string &projectPath,
                          const EditorSettingsImport &settings,
-                         const Aabb<double> &projectBoundary)
+                         const Box<double> &projectBoundary)
 {
     pathUnresolved_ = path;
     setPath(pathUnresolved_, projectPath);
@@ -85,7 +85,7 @@ void EditorDataSet::read(size_t id,
     }
 }
 
-void EditorDataSet::read(const Json &in, const std::string &projectPath)
+void EditorDataset::read(const Json &in, const std::string &projectPath)
 {
     if (!in.isObject())
     {
@@ -157,7 +157,7 @@ void EditorDataSet::read(const Json &in, const std::string &projectPath)
     updateBoundary();
 }
 
-Json &EditorDataSet::write(Json &out) const
+Json &EditorDataset::write(Json &out) const
 {
     out["id"] = id_;
     out["label"] = label_;
@@ -173,7 +173,7 @@ Json &EditorDataSet::write(Json &out) const
     return out;
 }
 
-void EditorDataSet::setPath(const std::string &path,
+void EditorDataset::setPath(const std::string &path,
                             const std::string &projectPath)
 {
     // Data set absolute path
@@ -183,7 +183,7 @@ void EditorDataSet::setPath(const std::string &path,
     fileName_ = File::fileName(path_);
 }
 
-void EditorDataSet::read()
+void EditorDataset::read()
 {
     FileLas las;
     las.open(path_);
@@ -208,17 +208,15 @@ void EditorDataSet::read()
 
     // Boundary
     const std::string pathIndex = FileIndexBuilder::extension(path_);
-    FileIndex index;
-    index.read(pathIndex);
+    index_.read(pathIndex);
 
-    boundaryFile_ = index.boundaryPoints();
+    boundaryFile_ = index_.boundaryPoints();
     updateBoundary();
 }
 
-void EditorDataSet::updateBoundary()
+void EditorDataset::updateBoundary()
 {
     boundary_ = boundaryFile_;
     boundary_.translate(translation_);
-
-    boundaryView_ = boundary_;
+    index_.translate(translation_);
 }

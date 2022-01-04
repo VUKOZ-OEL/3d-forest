@@ -22,7 +22,7 @@
 #ifndef WINDOW_DATA_SETS_HPP
 #define WINDOW_DATA_SETS_HPP
 
-#include <EditorDataSets.hpp>
+#include <EditorDatasets.hpp>
 #include <QDialog>
 #include <QWidget>
 
@@ -53,8 +53,8 @@ public:
 
     WindowDataSets(WindowMain *parent, Editor *editor);
 
-    const EditorDataSets &dataSets() const { return dataSets_; }
-    void setDataSets(const EditorDataSets &dataSets);
+    const EditorDatasets &datasets() const { return datasets_; }
+    void setDatasets(const EditorDatasets &datasets);
 
 public slots:
     void toolAdd();
@@ -81,7 +81,7 @@ protected:
     QToolButton *editButton_;
     QToolButton *deleteButton_;
 
-    EditorDataSets dataSets_;
+    EditorDatasets datasets_;
 
     size_t index(const QTreeWidgetItem *item);
     void updateTree();

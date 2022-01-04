@@ -21,6 +21,7 @@
 
 #include <Endian.hpp>
 #include <FileIndex.hpp>
+#include <Log.hpp>
 #include <cstring>
 #include <queue>
 
@@ -57,8 +58,19 @@ void FileIndex::translate(const Vector3<double> &v)
     boundaryPoints_.translate(v);
 }
 
+void FileIndex::selectLeaves(std::vector<SelectionTile> &selection,
+                             const Box<double> &window,
+                             size_t datasetId,
+                             size_t tileId) const
+{
+    if (!empty())
+    {
+        selectLeaves(selection, window, boundary_, datasetId, tileId, 0);
+    }
+}
+
 void FileIndex::selectLeaves(std::vector<Selection> &selection,
-                             const Aabb<double> &window,
+                             const Box<double> &window,
                              size_t id) const
 {
     if (!empty())
@@ -68,7 +80,7 @@ void FileIndex::selectLeaves(std::vector<Selection> &selection,
 }
 
 void FileIndex::selectNodes(std::vector<Selection> &selection,
-                            const Aabb<double> &window,
+                            const Box<double> &window,
                             size_t id) const
 {
     if (!empty())
@@ -101,9 +113,63 @@ const FileIndex::Node *FileIndex::selectLeaf(double x, double y, double z) const
     return nullptr;
 }
 
+void FileIndex::selectLeaves(std::vector<SelectionTile> &selection,
+                             const Box<double> &window,
+                             const Box<double> &boundary,
+                             size_t datasetId,
+                             size_t tileId,
+                             size_t idx) const
+{
+    const Node *node = &nodes_[idx];
+
+    // Select all
+    if (boundary.isInside(window))
+    {
+        selection.push_back({datasetId, tileId, node->from, node->size, false});
+        return;
+    }
+
+    // Outside
+    if (!boundary.intersects(window))
+    {
+        return;
+    }
+
+    // Octants
+    double px;
+    double py;
+    double pz;
+    Box<double> octant;
+    bool leaf = true;
+
+    boundary.getCenter(px, py, pz);
+
+    for (size_t i = 0; i < 8; i++)
+    {
+        if (node->next[i])
+        {
+            octant = boundary;
+            divide(octant, px, py, pz, i);
+            selectLeaves(selection,
+                         window,
+                         octant,
+                         datasetId,
+                         tileId,
+                         node->next[i]);
+            leaf = false;
+        }
+    }
+
+    // Partial
+    if (leaf)
+    {
+        selection.push_back({datasetId, tileId, node->from, node->size, true});
+    }
+}
+
 void FileIndex::selectLeaves(std::vector<Selection> &selection,
-                             const Aabb<double> &window,
-                             const Aabb<double> &boundary,
+                             const Box<double> &window,
+                             const Box<double> &boundary,
                              size_t idx,
                              size_t id) const
 {
@@ -124,7 +190,7 @@ void FileIndex::selectLeaves(std::vector<Selection> &selection,
     double px;
     double py;
     double pz;
-    Aabb<double> octant;
+    Box<double> octant;
     const Node *node = &nodes_[idx];
     bool leaf = true;
 
@@ -149,8 +215,8 @@ void FileIndex::selectLeaves(std::vector<Selection> &selection,
 }
 
 void FileIndex::selectNodes(std::vector<Selection> &selection,
-                            const Aabb<double> &window,
-                            const Aabb<double> &boundary,
+                            const Box<double> &window,
+                            const Box<double> &boundary,
                             size_t idx,
                             size_t id) const
 {
@@ -174,7 +240,7 @@ void FileIndex::selectNodes(std::vector<Selection> &selection,
     double px;
     double py;
     double pz;
-    Aabb<double> octant;
+    Box<double> octant;
     const Node *node = &nodes_[idx];
 
     boundary.getCenter(px, py, pz);
@@ -195,7 +261,7 @@ const FileIndex::Node *FileIndex::selectNode(
     double x,
     double y,
     double z,
-    const Aabb<double> &boundary,
+    const Box<double> &boundary,
     size_t idx) const
 {
     // Outside
@@ -214,7 +280,7 @@ const FileIndex::Node *FileIndex::selectNode(
     double px;
     double py;
     double pz;
-    Aabb<double> octant;
+    Box<double> octant;
     const Node *ret;
 
     boundary.getCenter(px, py, pz);
@@ -240,7 +306,7 @@ const FileIndex::Node *FileIndex::selectNode(
 const FileIndex::Node *FileIndex::selectLeaf(double x,
                                              double y,
                                              double z,
-                                             const Aabb<double> &boundary,
+                                             const Box<double> &boundary,
                                              size_t idx) const
 {
     // Outside
@@ -253,7 +319,7 @@ const FileIndex::Node *FileIndex::selectLeaf(double x,
     double px;
     double py;
     double pz;
-    Aabb<double> octant;
+    Box<double> octant;
     const Node *node = &nodes_[idx];
     const Node *ret;
 
@@ -277,7 +343,7 @@ const FileIndex::Node *FileIndex::selectLeaf(double x,
     return node;
 }
 
-void FileIndex::divide(Aabb<double> &boundary,
+void FileIndex::divide(Box<double> &boundary,
                        double x,
                        double y,
                        double z,
@@ -346,8 +412,7 @@ const FileIndex::Node *FileIndex::prev(const Node *node) const
     return &nodes_[node->prev - 1];
 }
 
-Aabb<double> FileIndex::boundary(const Node *node,
-                                 const Aabb<double> &box) const
+Box<double> FileIndex::boundary(const Node *node, const Box<double> &box) const
 {
     // Top
     const Node *data = nodes_.data();
@@ -374,7 +439,7 @@ Aabb<double> FileIndex::boundary(const Node *node,
     }
 
     // Down
-    Aabb<double> boundary = box;
+    Box<double> boundary = box;
     double px;
     double py;
     double pz;
@@ -390,8 +455,8 @@ Aabb<double> FileIndex::boundary(const Node *node,
     return boundary;
 }
 
-void FileIndex::insertBegin(const Aabb<double> &boundary,
-                            const Aabb<double> &boundaryPoints,
+void FileIndex::insertBegin(const Box<double> &boundary,
+                            const Box<double> &boundaryPoints,
                             size_t maxSize,
                             size_t maxLevel,
                             bool insertOnlyToLeaves)
@@ -402,7 +467,7 @@ void FileIndex::insertBegin(const Aabb<double> &boundary,
     boundaryFile_ = boundary_;
     boundaryPoints_ = boundaryPoints;
     boundaryPointsFile_ = boundaryPoints_;
-    root_ = std::make_unique<BuildNode>();
+    root_ = std::make_shared<BuildNode>();
 
     // Build tree settings
     maxSize_ = maxSize;
@@ -545,7 +610,7 @@ uint64_t FileIndex::insert(double x, double y, double z)
     double py;
     double pz;
     double x1, y1, z1, x2, y2, z2;
-    Aabb<double> octant = boundary_;
+    Box<double> octant = boundary_;
     BuildNode *node = root_.get();
 
     for (size_t level = 0; level < maxLevel_; level++)

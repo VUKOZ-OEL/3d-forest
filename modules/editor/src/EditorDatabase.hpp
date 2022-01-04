@@ -22,25 +22,86 @@
 #ifndef EDITOR_DATABASE_HPP
 #define EDITOR_DATABASE_HPP
 
-#include <EditorDataSet.hpp>
-#include <FileIndex.hpp>
+#include <ClipFilter.hpp>
+#include <EditorClassifications.hpp>
+#include <EditorDatasets.hpp>
+#include <EditorFilter.hpp>
+#include <EditorLayers.hpp>
+#include <EditorSettings.hpp>
+#include <EditorViewports.hpp>
 
 /** Editor Database. */
 class EditorDatabase
 {
 public:
     EditorDatabase();
+    ~EditorDatabase();
 
-    const EditorDataSet &properties() const { return properties_; }
-    void setProperties(const EditorDataSet &properties);
+    // File
+    void newProject();
+    void openProject(const std::string &path);
+    void openDataset(
+        const std::string &path,
+        const EditorSettingsImport &settings = EditorSettingsImport());
+    void saveProject(const std::string &path);
+    const std::string &projectPath() const { return path_; }
+    const std::string &projectName() const { return projectName_; }
+    bool hasUnsavedChanges() const { return unsavedChanges_; }
 
-    const FileIndex &index() const { return index_; }
+    // Classifications
+    const EditorClassifications &classifications() const
+    {
+        return classifications_;
+    }
+    void setClassifications(const EditorClassifications &classifications);
+
+    // Clip filter
+    const ClipFilter &clipFilter() const { return clipFilter_; }
+    void setClipFilter(const ClipFilter &clipFilter);
+    void resetClipFilter();
+    Box<double> clipBoundary() const;
+
+    // Data sets
+    const EditorDatasets &datasets() const { return datasets_; }
+    void setDatasets(const EditorDatasets &datasets);
+
+    // Layers
+    const EditorLayers &layers() const { return layers_; }
+    void setLayers(const EditorLayers &layers);
+
+    // Settings
+    const EditorSettings &settings() const { return settings_; }
+    void setSettingsView(const EditorSettingsView &settings);
+
+    // Filters
+    void addFilter(EditorFilter *filter);
+    void applyFilters(EditorPage *page);
+
+    // View
+    void viewportsResize(size_t n);
+    EditorViewports &viewports() { return viewports_; }
+    const EditorViewports &viewports() const { return viewports_; }
 
 protected:
-    EditorDataSet properties_;
-    FileIndex index_;
+    // Project data
+    std::string path_;
+    std::string projectName_;
+    bool unsavedChanges_;
 
-    void readIndex(const std::string &pathLas);
+    EditorDatasets datasets_;
+    EditorLayers layers_;
+    EditorSettings settings_;
+    EditorClassifications classifications_;
+
+    ClipFilter clipFilter_;
+
+    // Filters
+    std::vector<EditorFilter *> filters_;
+
+    // Viewports
+    EditorViewports viewports_;
+
+    void updateAfterRead();
 };
 
 #endif /* EDITOR_DATABASE_HPP */

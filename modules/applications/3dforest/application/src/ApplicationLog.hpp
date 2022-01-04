@@ -17,36 +17,19 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Log.cpp */
+/** @file ApplicationLog.hpp */
 
-#include <Log.hpp>
-#include <QTextEdit>
-#include <WindowMain.hpp>
+#ifndef APPLICATION_LOG_HPP
+#define APPLICATION_LOG_HPP
 
-static void logOutput(QtMsgType type,
-                      const QMessageLogContext &context,
-                      const QString &msg)
+/** ApplicationLog.
+
+    @todo To make it thread safe. Now it is only for GUI thread.
+*/
+class ApplicationLog
 {
-    (void)context;
+public:
+    static void install();
+};
 
-    switch (type)
-    {
-        case QtInfoMsg:
-        case QtDebugMsg:
-        case QtWarningMsg:
-        case QtCriticalMsg:
-        case QtFatalMsg:
-            if (WindowMain::log)
-            {
-                WindowMain::log->append(msg);
-            }
-            break;
-        default:
-            break;
-    }
-}
-
-void Log::install()
-{
-    qInstallMessageHandler(logOutput);
-}
+#endif /* APPLICATION_LOG_HPP */

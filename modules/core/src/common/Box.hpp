@@ -17,29 +17,30 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Aabb.hpp */
+/** @file Box.hpp */
 
-#ifndef AABB_HPP
-#define AABB_HPP
+#ifndef BOX_HPP
+#define BOX_HPP
 
 #include <Vector3.hpp>
 
 /** Axis-Aligned Bounding Box. */
-template <class T> class Aabb
+template <class T> class Box
 {
 public:
-    Aabb();
-    ~Aabb();
+    Box();
+    ~Box();
 
-    template <class B> Aabb(const Aabb<B> &box);
+    template <class B> Box(const Box<B> &box);
+    template <class B> Box(B x1, B y1, B z1, B x2, B y2, B z2);
 
     void set(T x1, T y1, T z1, T x2, T y2, T z2);
     void set(const std::vector<T> &xyz);
-    void set(const Aabb<T> &box);
-    void setPercent(const Aabb<T> &box, const Aabb<T> &a, const Aabb<T> &b);
+    void set(const Box<T> &box);
+    void setPercent(const Box<T> &box, const Box<T> &a, const Box<T> &b);
     void translate(const Vector3<T> &v);
 
-    void extend(const Aabb<T> &box);
+    void extend(const Box<T> &box);
     void clear();
 
     bool empty() const { return empty_; }
@@ -52,8 +53,8 @@ public:
     T distance(T x, T y, T z) const;
     T radius() const;
 
-    bool intersects(const Aabb<T> &box) const;
-    bool isInside(const Aabb<T> &box) const;
+    bool intersects(const Box<T> &box) const;
+    bool isInside(const Box<T> &box) const;
     bool isInside(T x, T y, T z) const;
 
     void read(const Json &in);
@@ -67,16 +68,16 @@ protected:
     void validate();
 };
 
-template <class T> inline Aabb<T>::Aabb()
+template <class T> inline Box<T>::Box()
 {
     clear();
 }
 
-template <class T> inline Aabb<T>::~Aabb()
+template <class T> inline Box<T>::~Box()
 {
 }
 
-template <class T> template <class B> inline Aabb<T>::Aabb(const Aabb<B> &box)
+template <class T> template <class B> inline Box<T>::Box(const Box<B> &box)
 {
     min_[0] = static_cast<T>(box.min_[0]);
     min_[1] = static_cast<T>(box.min_[1]);
@@ -87,7 +88,14 @@ template <class T> template <class B> inline Aabb<T>::Aabb(const Aabb<B> &box)
     validate();
 }
 
-template <class T> inline void Aabb<T>::set(T x1, T y1, T z1, T x2, T y2, T z2)
+template <class T>
+template <class B>
+inline Box<T>::Box(B x1, B y1, B z1, B x2, B y2, B z2)
+{
+    set(x1, y1, z1, x2, y2, z2);
+}
+
+template <class T> inline void Box<T>::set(T x1, T y1, T z1, T x2, T y2, T z2)
 {
     if (x1 > x2)
     {
@@ -125,7 +133,7 @@ template <class T> inline void Aabb<T>::set(T x1, T y1, T z1, T x2, T y2, T z2)
     validate();
 }
 
-template <class T> inline void Aabb<T>::set(const std::vector<T> &xyz)
+template <class T> inline void Box<T>::set(const std::vector<T> &xyz)
 {
     size_t n = xyz.size() / 3;
     if (n > 0)
@@ -161,7 +169,7 @@ template <class T> inline void Aabb<T>::set(const std::vector<T> &xyz)
     }
 }
 
-template <class T> inline void Aabb<T>::set(const Aabb<T> &box)
+template <class T> inline void Box<T>::set(const Box<T> &box)
 {
     min_[0] = box.min_[0];
     max_[0] = box.max_[0];
@@ -174,9 +182,9 @@ template <class T> inline void Aabb<T>::set(const Aabb<T> &box)
 }
 
 template <class T>
-inline void Aabb<T>::setPercent(const Aabb<T> &box,
-                                const Aabb<T> &a,
-                                const Aabb<T> &b)
+inline void Box<T>::setPercent(const Box<T> &box,
+                               const Box<T> &a,
+                               const Box<T> &b)
 {
     for (int i = 0; i < 3; i++)
     {
@@ -197,7 +205,7 @@ inline void Aabb<T>::setPercent(const Aabb<T> &box,
     validate();
 }
 
-template <class T> inline void Aabb<T>::translate(const Vector3<T> &v)
+template <class T> inline void Box<T>::translate(const Vector3<T> &v)
 {
     for (size_t i = 0; i < 3; i++)
     {
@@ -208,7 +216,7 @@ template <class T> inline void Aabb<T>::translate(const Vector3<T> &v)
     validate();
 }
 
-template <class T> inline void Aabb<T>::extend(const Aabb<T> &box)
+template <class T> inline void Box<T>::extend(const Box<T> &box)
 {
     if (!box.empty())
     {
@@ -236,14 +244,14 @@ template <class T> inline void Aabb<T>::extend(const Aabb<T> &box)
     }
 }
 
-template <class T> inline void Aabb<T>::clear()
+template <class T> inline void Box<T>::clear()
 {
     min_[0] = min_[1] = min_[2] = 0;
     max_[0] = max_[1] = max_[2] = 0;
     empty_ = true;
 }
 
-template <class T> inline void Aabb<T>::validate()
+template <class T> inline void Box<T>::validate()
 {
     constexpr T e = std::numeric_limits<T>::epsilon();
     if ((max_[0] - min_[0] > e) || (max_[1] - min_[1] > e) ||
@@ -257,21 +265,21 @@ template <class T> inline void Aabb<T>::validate()
     }
 }
 
-template <class T> inline void Aabb<T>::getCenter(T &x, T &y, T &z) const
+template <class T> inline void Box<T>::getCenter(T &x, T &y, T &z) const
 {
     x = min_[0] + ((max_[0] - min_[0]) / 2);
     y = min_[1] + ((max_[1] - min_[1]) / 2);
     z = min_[2] + ((max_[2] - min_[2]) / 2);
 }
 
-template <class T> inline Vector3<T> Aabb<T>::getCenter() const
+template <class T> inline Vector3<T> Box<T>::getCenter() const
 {
     return Vector3<T>(min_[0] + ((max_[0] - min_[0]) / 2),
                       min_[1] + ((max_[1] - min_[1]) / 2),
                       min_[2] + ((max_[2] - min_[2]) / 2));
 }
 
-template <class T> inline T Aabb<T>::distance(T x, T y, T z) const
+template <class T> inline T Box<T>::distance(T x, T y, T z) const
 {
     T u, v, w;
     T ret;
@@ -282,7 +290,7 @@ template <class T> inline T Aabb<T>::distance(T x, T y, T z) const
     return ret;
 }
 
-template <class T> inline T Aabb<T>::radius() const
+template <class T> inline T Box<T>::radius() const
 {
     T u, v, w;
     T ret;
@@ -295,27 +303,27 @@ template <class T> inline T Aabb<T>::radius() const
     return ret;
 }
 
-template <class T> inline bool Aabb<T>::intersects(const Aabb &box) const
+template <class T> inline bool Box<T>::intersects(const Box &box) const
 {
     return !((min_[0] > box.max_[0] || max_[0] < box.min_[0]) ||
              (min_[1] > box.max_[1] || max_[1] < box.min_[1]) ||
              (min_[2] > box.max_[2] || max_[2] < box.min_[2]));
 }
 
-template <class T> inline bool Aabb<T>::isInside(const Aabb &box) const
+template <class T> inline bool Box<T>::isInside(const Box &box) const
 {
     return !((max_[0] > box.max_[0] || min_[0] < box.min_[0]) ||
              (max_[1] > box.max_[1] || min_[1] < box.min_[1]) ||
              (max_[2] > box.max_[2] || min_[2] < box.min_[2]));
 }
 
-template <class T> inline bool Aabb<T>::isInside(T x, T y, T z) const
+template <class T> inline bool Box<T>::isInside(T x, T y, T z) const
 {
     return !((x < min_[0] || x > max_[0]) || (y < min_[1] || y > max_[1]) ||
              (z < min_[2] || z > max_[2]));
 }
 
-template <class T> inline void Aabb<T>::read(const Json &in)
+template <class T> inline void Box<T>::read(const Json &in)
 {
     min_[0] = in["min"][0].number();
     min_[1] = in["min"][1].number();
@@ -325,7 +333,7 @@ template <class T> inline void Aabb<T>::read(const Json &in)
     max_[2] = in["max"][2].number();
 }
 
-template <class T> inline Json &Aabb<T>::write(Json &out) const
+template <class T> inline Json &Box<T>::write(Json &out) const
 {
     out["min"][0] = min_[0];
     out["min"][1] = min_[1];
@@ -337,8 +345,7 @@ template <class T> inline Json &Aabb<T>::write(Json &out) const
     return out;
 }
 
-template <class T>
-std::ostream &operator<<(std::ostream &os, const Aabb<T> &obj)
+template <class T> std::ostream &operator<<(std::ostream &os, const Box<T> &obj)
 {
     return os << std::fixed << "{{" << obj.min(0) << ", " << obj.min(1) << ", "
               << obj.min(2)
@@ -348,4 +355,4 @@ std::ostream &operator<<(std::ostream &os, const Aabb<T> &obj)
               << "}" << std::defaultfloat;
 }
 
-#endif /* AABB_HPP */
+#endif /* BOX_HPP */

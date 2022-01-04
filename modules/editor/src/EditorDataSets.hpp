@@ -17,66 +17,83 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file EditorDataSets.hpp */
+/** @file EditorDatasets.hpp */
 
 #ifndef EDITOR_DATA_SETS_HPP
 #define EDITOR_DATA_SETS_HPP
 
-#include <EditorDataSet.hpp>
+#include <EditorDataset.hpp>
 #include <unordered_map>
 
 /** Editor Data Sets. */
-class EditorDataSets
+class EditorDatasets
 {
 public:
-    EditorDataSets();
+    EditorDatasets();
 
     void clear();
 
-    size_t size() const { return dataSets_.size(); }
-    const EditorDataSet &at(size_t i) const { return dataSets_[i]; }
+    size_t size() const { return datasets_.size(); }
+    const EditorDataset &at(size_t i) const { return datasets_[i]; }
+    const EditorDataset &key(size_t id) const
+    {
+        const auto &it = hashTable_.find(id);
+        if (it != hashTable_.end())
+        {
+            return datasets_[it->second];
+        }
+        THROW("Invalid database id");
+    }
+
     void erase(size_t i);
 
-    size_t id(size_t i) const { return dataSets_[i].id(); }
+    size_t id(size_t i) const { return datasets_[i].id(); }
     size_t index(size_t id) { return hashTable_[id]; }
     size_t unusedId() const;
 
-    bool isEnabled(size_t i) const { return dataSets_[i].isEnabled(); }
+    bool isEnabled(size_t i) const { return datasets_[i].isEnabled(); }
     void setEnabled(size_t i, bool b);
     void setEnabledAll(bool b);
     void setInvertAll();
 
-    const std::string &label(size_t i) const { return dataSets_[i].label(); }
+    const std::string &label(size_t i) const { return datasets_[i].label(); }
     void setLabel(size_t i, const std::string &label);
 
-    const Vector3<float> &color(size_t i) const { return dataSets_[i].color(); }
+    const Vector3<float> &color(size_t i) const { return datasets_[i].color(); }
     void setColor(size_t i, const Vector3<float> &color);
 
     const std::string &fileName(size_t i) const
     {
-        return dataSets_[i].fileName();
+        return datasets_[i].fileName();
     }
     const std::string &dateCreated(size_t i) const
     {
-        return dataSets_[i].dateCreated();
+        return datasets_[i].dateCreated();
     }
 
     const Vector3<double> &translation(size_t i) const
     {
-        return dataSets_[i].translation();
+        return datasets_[i].translation();
     }
     void setTranslation(size_t i, const Vector3<double> &translation);
+
+    const Box<double> &boundary() const { return boundary_; }
+    void updateBoundary();
+
+    void select(std::vector<FileIndex::Selection> &selected,
+                const Box<double> &box) const;
 
     void read(const std::string &path,
               const std::string &projectPath,
               const EditorSettingsImport &settings,
-              const Aabb<double> &projectBoundary);
+              const Box<double> &projectBoundary);
     void read(const Json &in, const std::string &projectPath);
     Json &write(Json &out) const;
 
 protected:
-    std::vector<EditorDataSet> dataSets_;
+    std::vector<EditorDataset> datasets_;
     std::unordered_map<size_t, size_t> hashTable_;
+    Box<double> boundary_;
 };
 
 #endif /* EDITOR_DATA_SETS_HPP */

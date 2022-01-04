@@ -19,7 +19,7 @@
 
 /** @file sandbox.cpp */
 
-#include <EditorBase.hpp>
+#include <EditorDatabase.hpp>
 #include <File.hpp>
 #include <FileIndex.hpp>
 #include <FileLas.hpp>

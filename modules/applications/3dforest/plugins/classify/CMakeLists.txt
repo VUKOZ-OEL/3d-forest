@@ -15,6 +15,29 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-add_subdirectory(databasestatistics)
-add_subdirectory(heightmap)
-add_subdirectory(classify)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+set(SUB_PROJECT_NAME "pluginclassify")
+
+add_library(
+  ${SUB_PROJECT_NAME}
+  SHARED
+  src/PluginClassify.cpp
+  resources/pluginclassify.qrc
+)
+
+target_include_directories(
+  ${SUB_PROJECT_NAME}
+  PUBLIC
+  src
+  ../../application/src # Plugin Interfaces
+)
+
+target_link_libraries(
+  ${SUB_PROJECT_NAME}
+  PRIVATE
+  visualization
+)
+
+install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin/plugins)

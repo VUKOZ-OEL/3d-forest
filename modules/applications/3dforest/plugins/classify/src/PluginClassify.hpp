@@ -17,26 +17,34 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file PluginDatabaseStatistics.hpp */
+/** @file PluginClassify.hpp */
 
-#ifndef PLUGIN_DATABASE_STATISTICS_HPP
-#define PLUGIN_DATABASE_STATISTICS_HPP
+#ifndef PLUGIN_CLASSIFY_HPP
+#define PLUGIN_CLASSIFY_HPP
 
+#include <EditorFilter.hpp>
 #include <PluginTool.hpp>
+#include <QMutex>
+#include <Vector3.hpp>
 #include <WindowDock.hpp>
+#include <vector>
 
 class Editor;
 class EditorPage;
-class QTextEdit;
+class QSpinBox;
+class QComboBox;
+class QCheckBox;
 class QPushButton;
+class QCloseEvent;
 
-/** Plugin Database Statistics Window. */
-class PluginDatabaseStatisticsWindow : public WindowDock
+/** Plugin Classify Window. */
+class PluginClassifyWindow : public WindowDock
 {
     Q_OBJECT
 
 public:
-    PluginDatabaseStatisticsWindow(QMainWindow *parent, Editor *editor);
+    PluginClassifyWindow(QMainWindow *parent, Editor *editor);
+    ~PluginClassifyWindow() = default;
 
 protected slots:
     void compute();
@@ -44,28 +52,18 @@ protected slots:
 protected:
     Editor *editor_;
     QWidget *widget_;
-    QTextEdit *textEdit_;
     QPushButton *computeButton_;
-
-    // Stats
-    uint64_t numberOfPoints_;
-    uint64_t classificationPoints_;
-    uint32_t classificationMaximum_;
-
-    void computeReset();
-    void computeStep(EditorPage *page);
-    void computeOutput();
 };
 
-/** Plugin Database Statistics. */
-class PluginDatabaseStatistics : public QObject, public PluginTool
+/** Plugin Classify. */
+class PluginClassify : public QObject, public PluginTool
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID PluginTool_iid)
     Q_INTERFACES(PluginTool)
 
 public:
-    PluginDatabaseStatistics();
+    PluginClassify();
 
     virtual void initialize(QMainWindow *parent, Editor *editor);
     virtual void show(QMainWindow *parent);
@@ -76,8 +74,8 @@ public:
     virtual QPixmap icon() const;
 
 protected:
-    PluginDatabaseStatisticsWindow *window_;
+    PluginClassifyWindow *window_;
     Editor *editor_;
 };
 
-#endif /* PLUGIN_DATABASE_STATISTICS_HPP */
+#endif /* PLUGIN_CLASSIFY_HPP */

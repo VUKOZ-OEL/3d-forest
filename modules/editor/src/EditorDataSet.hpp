@@ -17,20 +17,21 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file EditorDataSet.hpp */
+/** @file EditorDataset.hpp */
 
 #ifndef EDITOR_DATA_SET_HPP
 #define EDITOR_DATA_SET_HPP
 
-#include <Aabb.hpp>
+#include <Box.hpp>
 #include <EditorSettingsImport.hpp>
+#include <FileIndex.hpp>
 #include <Json.hpp>
 
 /** Editor Data Set. */
-class EditorDataSet
+class EditorDataset
 {
 public:
-    EditorDataSet();
+    EditorDataset();
 
     size_t id() const { return id_; }
 
@@ -52,15 +53,16 @@ public:
 
     const Vector3<double> &scaling() const { return scaling_; }
 
-    const Aabb<double> &boundary() const { return boundary_; }
-    const Aabb<double> &boundaryView() const { return boundaryView_; }
+    const Box<double> &boundary() const { return boundary_; }
+
+    const FileIndex &index() const { return index_; }
 
     // I/O
     void read(size_t id,
               const std::string &path,
               const std::string &projectPath,
               const EditorSettingsImport &settings,
-              const Aabb<double> &projectBoundary);
+              const Box<double> &projectBoundary);
     void read(const Json &in, const std::string &projectPath);
     Json &write(Json &out) const;
 
@@ -82,9 +84,9 @@ protected:
     // Data
     Vector3<double> translationFile_;
     Vector3<double> scalingFile_;
-    Aabb<double> boundaryFile_;
-    Aabb<double> boundary_;
-    Aabb<double> boundaryView_;
+    Box<double> boundaryFile_;
+    Box<double> boundary_;
+    FileIndex index_;
 
     void setPath(const std::string &path, const std::string &projectPath);
     void read();

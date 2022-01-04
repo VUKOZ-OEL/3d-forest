@@ -17,78 +17,80 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file EditorDataSets.cpp */
+/** @file EditorDatasets.cpp */
 
-#include <EditorDataSets.hpp>
+#include <EditorDatasets.hpp>
+#include <Log.hpp>
 #include <unordered_set>
 
-EditorDataSets::EditorDataSets()
+EditorDatasets::EditorDatasets()
 {
     clear();
 }
 
-void EditorDataSets::setEnabled(size_t i, bool b)
+void EditorDatasets::setEnabled(size_t i, bool b)
 {
-    dataSets_[i].setEnabled(b);
+    datasets_[i].setEnabled(b);
 }
 
-void EditorDataSets::setEnabledAll(bool b)
+void EditorDatasets::setEnabledAll(bool b)
 {
-    for (size_t i = 0; i < dataSets_.size(); i++)
+    for (size_t i = 0; i < datasets_.size(); i++)
     {
-        dataSets_[i].setEnabled(b);
+        datasets_[i].setEnabled(b);
     }
 }
 
-void EditorDataSets::setInvertAll()
+void EditorDatasets::setInvertAll()
 {
-    for (size_t i = 0; i < dataSets_.size(); i++)
+    for (size_t i = 0; i < datasets_.size(); i++)
     {
-        bool b = !dataSets_[i].isEnabled();
-        dataSets_[i].setEnabled(b);
+        bool b = !datasets_[i].isEnabled();
+        datasets_[i].setEnabled(b);
     }
 }
 
-void EditorDataSets::setLabel(size_t i, const std::string &label)
+void EditorDatasets::setLabel(size_t i, const std::string &label)
 {
-    dataSets_[i].setLabel(label);
+    datasets_[i].setLabel(label);
 }
 
-void EditorDataSets::setColor(size_t i, const Vector3<float> &color)
+void EditorDatasets::setColor(size_t i, const Vector3<float> &color)
 {
-    dataSets_[i].setColor(color);
+    datasets_[i].setColor(color);
 }
 
-void EditorDataSets::setTranslation(size_t i,
+void EditorDatasets::setTranslation(size_t i,
                                     const Vector3<double> &translation)
 {
-    dataSets_[i].setTranslation(translation);
+    datasets_[i].setTranslation(translation);
 }
 
-void EditorDataSets::clear()
+void EditorDatasets::clear()
 {
-    dataSets_.resize(0);
+    datasets_.resize(0);
     hashTable_.clear();
+    boundary_.clear();
 }
 
-void EditorDataSets::erase(size_t i)
+void EditorDatasets::erase(size_t i)
 {
-    if (dataSets_.size() > 0)
+    if (datasets_.size() > 0)
     {
         size_t key = id(i);
 
-        size_t n = dataSets_.size() - 1;
+        size_t n = datasets_.size() - 1;
         for (size_t pos = i; pos < n; pos++)
         {
-            dataSets_[pos] = dataSets_[pos + 1];
+            datasets_[pos] = datasets_[pos + 1];
         }
-        dataSets_.resize(n);
+        datasets_.resize(n);
 
         hashTable_.erase(key);
     }
 }
 
-size_t EditorDataSets::unusedId() const
+size_t EditorDatasets::unusedId() const
 {
     // Return minimum available id value
     for (size_t rval = 0; rval < std::numeric_limits<size_t>::max(); rval++)
@@ -102,43 +104,70 @@ size_t EditorDataSets::unusedId() const
     THROW("New data set identifier is not available.");
 }
 
-void EditorDataSets::read(const std::string &path,
+void EditorDatasets::updateBoundary()
+{
+    boundary_.clear();
+
+    for (auto const &it : datasets_)
+    {
+        if (it.isEnabled())
+        {
+            boundary_.extend(it.boundary());
+        }
+    }
+}
+
+void EditorDatasets::select(std::vector<FileIndex::Selection> &selected,
+                            const Box<double> &box) const
+{
+    for (auto const &it : datasets_)
+    {
+        if (it.isEnabled())
+        {
+            it.index().selectNodes(selected, box, it.id());
+        }
+    }
+}
+
+void EditorDatasets::read(const std::string &path,
                           const std::string &projectPath,
                           const EditorSettingsImport &settings,
-                          const Aabb<double> &projectBoundary)
+                          const Box<double> &projectBoundary)
 {
-    EditorDataSet ds;
+    EditorDataset ds;
     size_t id = unusedId();
 
     ds.read(id, path, projectPath, settings, projectBoundary);
 
-    hashTable_[id] = dataSets_.size();
-    dataSets_.push_back(ds);
+    hashTable_[id] = datasets_.size();
+    datasets_.push_back(ds);
+
+    updateBoundary();
 }
 
-void EditorDataSets::read(const Json &in, const std::string &projectPath)
+void EditorDatasets::read(const Json &in, const std::string &projectPath)
 {
     size_t i;
     size_t n;
 
     i = 0;
     n = in.array().size();
-    dataSets_.resize(n);
+    datasets_.resize(n);
     hashTable_.clear();
 
     for (auto const &it : in.array())
     {
-        dataSets_[i].read(it, projectPath);
-        hashTable_[dataSets_[i].id()] = i;
+        datasets_[i].read(it, projectPath);
+        hashTable_[datasets_[i].id()] = i;
         i++;
     }
 }
 
-Json &EditorDataSets::write(Json &out) const
+Json &EditorDatasets::write(Json &out) const
 {
     size_t i = 0;
 
-    for (auto const &it : dataSets_)
+    for (auto const &it : datasets_)
     {
         it.write(out[i]);
         i++;
