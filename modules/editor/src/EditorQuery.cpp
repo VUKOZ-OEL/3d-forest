@@ -213,8 +213,7 @@ void EditorQuery::selectCamera(const Camera &camera)
             if (node->next[i])
             {
                 const FileIndex::Node *sub = index.at(node->next[i]);
-                Box<double> box =
-                    index.boundary(sub, editor_->clipBoundary());
+                Box<double> box = index.boundary(sub, editor_->clipBoundary());
 
                 double radius = box.radius();
                 double distance = box.distance(eyeX, eyeY, eyeZ);
