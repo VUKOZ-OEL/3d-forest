@@ -99,13 +99,15 @@ public:
     QColor color_;
     QLineEdit *labelEdit_;
     QDoubleSpinBox *offsetSpinBox_[3];
+    QDoubleSpinBox *scaleSpinBox_[3];
 
     WindowDataSetsEdit(QWidget *parent,
                        const QString &windowTitle,
                        const QString &buttonText,
                        const QString &label,
                        const QColor &color,
-                       const Vector3<double> &offset);
+                       const Vector3<double> &offset,
+                       const Vector3<double> &scale);
 
 public slots:
     void setResultAccept();

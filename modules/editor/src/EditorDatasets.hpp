@@ -77,6 +77,16 @@ public:
     }
     void setTranslation(size_t i, const Vector3<double> &translation);
 
+    const Vector3<double> &scaling(size_t i) const
+    {
+        return datasets_[i].scaling();
+    }
+
+    const Vector3<double> &scalingFile(size_t i) const
+    {
+        return datasets_[i].scalingFile();
+    }
+
     const Box<double> &boundary() const { return boundary_; }
     void updateBoundary();
 

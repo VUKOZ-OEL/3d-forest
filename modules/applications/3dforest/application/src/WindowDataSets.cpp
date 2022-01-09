@@ -120,6 +120,7 @@ void WindowDataSets::toolEdit()
     QString label = QString::fromStdString(datasets_.label(idx));
     Vector3<float> rgb = datasets_.color(idx);
     Vector3<double> offset = datasets_.translation(idx);
+    Vector3<double> scale = datasets_.scalingFile(idx);
 
     QColor color;
     color.setRgbF(rgb[0], rgb[1], rgb[2]);
@@ -130,7 +131,8 @@ void WindowDataSets::toolEdit()
                               "Apply",
                               label,
                               color,
-                              offset);
+                              offset,
+                              scale);
 
     if (dialog.exec() == QDialog::Rejected)
     {
@@ -337,7 +339,8 @@ WindowDataSetsEdit::WindowDataSetsEdit(QWidget *parent,
                                        const QString &buttonText,
                                        const QString &label,
                                        const QColor &color,
-                                       const Vector3<double> &offset)
+                                       const Vector3<double> &offset,
+                                       const Vector3<double> &scale)
     : QDialog(parent),
       color_(color)
 {
@@ -361,17 +364,26 @@ WindowDataSetsEdit::WindowDataSetsEdit(QWidget *parent,
         offsetSpinBox_[i]->setMinimum(-1e8);
         offsetSpinBox_[i]->setMaximum(1e8);
         offsetSpinBox_[i]->setValue(offset[i]);
+
+        scaleSpinBox_[i] = new QDoubleSpinBox;
+        scaleSpinBox_[i]->setDecimals(6);
+        scaleSpinBox_[i]->setMinimum(-1e8);
+        scaleSpinBox_[i]->setMaximum(1e8);
+        scaleSpinBox_[i]->setValue(scale[i]);
+        scaleSpinBox_[i]->setDisabled(true);
     }
 
     // Layout
     QGridLayout *gridLayout = new QGridLayout;
     int row = 0;
+
     gridLayout->addWidget(new QLabel(tr("Label")), row, 0);
     gridLayout->addWidget(labelEdit_, row, 1);
     row++;
     gridLayout->addWidget(new QLabel(tr("Color")), row, 0);
     gridLayout->addWidget(colorButton_, row, 1);
     row++;
+
     gridLayout->addWidget(new QLabel(tr("Offset x")), row, 0);
     gridLayout->addWidget(offsetSpinBox_[0], row, 1);
     row++;
@@ -380,6 +392,16 @@ WindowDataSetsEdit::WindowDataSetsEdit(QWidget *parent,
     row++;
     gridLayout->addWidget(new QLabel(tr("Offset z")), row, 0);
     gridLayout->addWidget(offsetSpinBox_[2], row, 1);
+    row++;
+
+    gridLayout->addWidget(new QLabel(tr("Scale x")), row, 0);
+    gridLayout->addWidget(scaleSpinBox_[0], row, 1);
+    row++;
+    gridLayout->addWidget(new QLabel(tr("Scale y")), row, 0);
+    gridLayout->addWidget(scaleSpinBox_[1], row, 1);
+    row++;
+    gridLayout->addWidget(new QLabel(tr("Scale z")), row, 0);
+    gridLayout->addWidget(scaleSpinBox_[2], row, 1);
     row++;
 
     QHBoxLayout *dialogButtons = new QHBoxLayout;

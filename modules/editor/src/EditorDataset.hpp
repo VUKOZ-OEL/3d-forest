@@ -52,6 +52,7 @@ public:
     void setTranslation(const Vector3<double> &translation);
 
     const Vector3<double> &scaling() const { return scaling_; }
+    const Vector3<double> &scalingFile() const { return scalingFile_; }
 
     const Box<double> &boundary() const { return boundary_; }
 
