@@ -36,7 +36,7 @@
 #include <Time.hpp>
 #include <WindowClassifications.hpp>
 #include <WindowClipFilter.hpp>
-#include <WindowDataSets.hpp>
+#include <WindowDatasets.hpp>
 #include <WindowDock.hpp>
 #include <WindowFileImport.hpp>
 #include <WindowHelp.hpp>
@@ -368,7 +368,7 @@ void WindowMain::createMenus()
 void WindowMain::createWindows()
 {
     // Create data sets window
-    windowDataSets_ = new WindowDataSets(this, &editor_);
+    windowDataSets_ = new WindowDatasets(this, &editor_);
     connect(windowDataSets_,
             SIGNAL(selectionChanged()),
             this,

@@ -17,7 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file WindowDataSets.cpp */
+/** @file WindowDatasets.cpp */
 
 #include <Editor.hpp>
 #include <QBrush>
@@ -38,11 +38,11 @@
 #include <QTreeWidgetItem>
 #include <QTreeWidgetItemIterator>
 #include <QVBoxLayout>
-#include <WindowDataSets.hpp>
+#include <WindowDatasets.hpp>
 #include <WindowFileImport.hpp>
 #include <WindowMain.hpp>
 
-WindowDataSets::WindowDataSets(WindowMain *parent, Editor *editor)
+WindowDatasets::WindowDatasets(WindowMain *parent, Editor *editor)
     : QWidget(parent),
       windowMain_(parent),
       editor_(editor)
@@ -99,12 +99,12 @@ WindowDataSets::WindowDataSets(WindowMain *parent, Editor *editor)
     setLayout(mainLayout);
 }
 
-void WindowDataSets::toolAdd()
+void WindowDatasets::toolAdd()
 {
     WindowFileImport::import(windowMain_, editor_);
 }
 
-void WindowDataSets::toolEdit()
+void WindowDatasets::toolEdit()
 {
     // Item
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
@@ -126,7 +126,7 @@ void WindowDataSets::toolEdit()
     color.setRgbF(rgb[0], rgb[1], rgb[2]);
 
     // Dialog
-    WindowDataSetsEdit dialog(windowMain_,
+    WindowDatasetsEdit dialog(windowMain_,
                               "Edit Data Set",
                               "Apply",
                               label,
@@ -162,7 +162,7 @@ void WindowDataSets::toolEdit()
     emit selectionChanged();
 }
 
-void WindowDataSets::toolDelete()
+void WindowDatasets::toolDelete()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
@@ -179,21 +179,21 @@ void WindowDataSets::toolDelete()
     emit dataChanged();
 }
 
-void WindowDataSets::invertSelection()
+void WindowDatasets::invertSelection()
 {
     datasets_.setInvertAll();
     updateTree();
     emit selectionChanged();
 }
 
-void WindowDataSets::clearSelection()
+void WindowDatasets::clearSelection()
 {
     datasets_.setEnabledAll(false);
     updateTree();
     emit selectionChanged();
 }
 
-void WindowDataSets::itemSelectionChanged()
+void WindowDatasets::itemSelectionChanged()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
@@ -209,7 +209,7 @@ void WindowDataSets::itemSelectionChanged()
     }
 }
 
-void WindowDataSets::itemChanged(QTreeWidgetItem *item, int column)
+void WindowDatasets::itemChanged(QTreeWidgetItem *item, int column)
 {
     if (column == COLUMN_CHECKED)
     {
@@ -220,12 +220,12 @@ void WindowDataSets::itemChanged(QTreeWidgetItem *item, int column)
     }
 }
 
-size_t WindowDataSets::index(const QTreeWidgetItem *item)
+size_t WindowDatasets::index(const QTreeWidgetItem *item)
 {
     return datasets_.index(item->text(COLUMN_ID).toULong());
 }
 
-void WindowDataSets::updateTree()
+void WindowDatasets::updateTree()
 {
     block();
 
@@ -250,14 +250,14 @@ void WindowDataSets::updateTree()
     unblock();
 }
 
-void WindowDataSets::block()
+void WindowDatasets::block()
 {
     disconnect(tree_, SIGNAL(itemChanged(QTreeWidgetItem *, int)), 0, 0);
     disconnect(tree_, SIGNAL(itemSelectionChanged()), 0, 0);
     (void)blockSignals(true);
 }
 
-void WindowDataSets::unblock()
+void WindowDatasets::unblock()
 {
     (void)blockSignals(false);
     connect(tree_,
@@ -270,7 +270,7 @@ void WindowDataSets::unblock()
             SLOT(itemSelectionChanged()));
 }
 
-void WindowDataSets::addItem(size_t i)
+void WindowDatasets::addItem(size_t i)
 {
     QTreeWidgetItem *item = new QTreeWidgetItem(tree_);
 
@@ -301,7 +301,7 @@ void WindowDataSets::addItem(size_t i)
     item->setBackground(COLUMN_ID, brush);
 }
 
-void WindowDataSets::setDatasets(const EditorDatasets &datasets)
+void WindowDatasets::setDatasets(const EditorDatasets &datasets)
 {
     block();
 
@@ -334,7 +334,7 @@ void WindowDataSets::setDatasets(const EditorDatasets &datasets)
     unblock();
 }
 
-WindowDataSetsEdit::WindowDataSetsEdit(QWidget *parent,
+WindowDatasetsEdit::WindowDatasetsEdit(QWidget *parent,
                                        const QString &windowTitle,
                                        const QString &buttonText,
                                        const QString &label,
@@ -423,19 +423,19 @@ WindowDataSetsEdit::WindowDataSetsEdit(QWidget *parent,
     setMaximumHeight(height());
 }
 
-void WindowDataSetsEdit::setResultAccept()
+void WindowDatasetsEdit::setResultAccept()
 {
     close();
     setResult(QDialog::Accepted);
 }
 
-void WindowDataSetsEdit::setResultReject()
+void WindowDatasetsEdit::setResultReject()
 {
     close();
     setResult(QDialog::Rejected);
 }
 
-void WindowDataSetsEdit::setColor()
+void WindowDatasetsEdit::setColor()
 {
     QColorDialog dialog(color_, this);
 
@@ -448,7 +448,7 @@ void WindowDataSetsEdit::setColor()
     updateColor();
 }
 
-void WindowDataSetsEdit::updateColor()
+void WindowDatasetsEdit::updateColor()
 {
     QPixmap pixmap(25, 25);
     pixmap.fill(color_);

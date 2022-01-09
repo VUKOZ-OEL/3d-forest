@@ -17,7 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file WindowDataSets.hpp */
+/** @file WindowDatasets.hpp */
 
 #ifndef WINDOW_DATA_SETS_HPP
 #define WINDOW_DATA_SETS_HPP
@@ -35,13 +35,13 @@ class QTreeWidgetItem;
 class WindowMain;
 class Editor;
 
-/** Window Data Sets. */
-class WindowDataSets : public QWidget
+/** Window Datasets. */
+class WindowDatasets : public QWidget
 {
     Q_OBJECT
 
 public:
-    /** Window Data Sets Column. */
+    /** Window Datasets Column. */
     enum Column
     {
         COLUMN_CHECKED,
@@ -51,7 +51,7 @@ public:
         COLUMN_LAST,
     };
 
-    WindowDataSets(WindowMain *parent, Editor *editor);
+    WindowDatasets(WindowMain *parent, Editor *editor);
 
     const EditorDatasets &datasets() const { return datasets_; }
     void setDatasets(const EditorDatasets &datasets);
@@ -90,8 +90,8 @@ protected:
     void addItem(size_t i);
 };
 
-/** Window Data Sets Edit. */
-class WindowDataSetsEdit : public QDialog
+/** Window Datasets Edit. */
+class WindowDatasetsEdit : public QDialog
 {
     Q_OBJECT
 
@@ -101,7 +101,7 @@ public:
     QDoubleSpinBox *offsetSpinBox_[3];
     QDoubleSpinBox *scaleSpinBox_[3];
 
-    WindowDataSetsEdit(QWidget *parent,
+    WindowDatasetsEdit(QWidget *parent,
                        const QString &windowTitle,
                        const QString &buttonText,
                        const QString &label,
