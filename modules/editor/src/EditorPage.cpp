@@ -52,7 +52,16 @@ EditorPage::~EditorPage()
 
 void EditorPage::clear()
 {
-    points.clear();
+    position.clear();
+    intensity.clear();
+    returnNumber.clear();
+    numberOfReturns.clear();
+    classification.clear();
+    userData.clear();
+    gpsTime.clear();
+    color.clear();
+    userColor.clear();
+    layer.clear();
 
     renderPosition.clear();
     renderColor.clear();
@@ -64,7 +73,16 @@ void EditorPage::clear()
 
 void EditorPage::resize(size_t n)
 {
-    points.resize(n);
+    position.resize(n * 3);
+    intensity.resize(n);
+    returnNumber.resize(n);
+    numberOfReturns.resize(n);
+    classification.resize(n);
+    userData.resize(n);
+    gpsTime.resize(n);
+    color.resize(n * 3);
+    userColor.resize(n * 3);
+    layer.resize(n);
 
     renderPosition.resize(n * 3);
     renderColor.resize(n * 3);
@@ -114,42 +132,41 @@ void EditorPage::read()
         positionBase_[3 * i + 1] = static_cast<double>(point.y);
         positionBase_[3 * i + 2] = static_cast<double>(point.z);
 
-        EditorPoint &pt = points[i];
-        pt.x = positionBase_[3 * i + 0];
-        pt.y = positionBase_[3 * i + 1];
-        pt.z = positionBase_[3 * i + 2];
+        position[3 * i + 0] = positionBase_[3 * i + 0];
+        position[3 * i + 1] = positionBase_[3 * i + 1];
+        position[3 * i + 2] = positionBase_[3 * i + 2];
 
         // intensity and color
-        pt.intensity = static_cast<float>(point.intensity) * scaleU16;
+        intensity[i] = static_cast<float>(point.intensity) * scaleU16;
 
         if (rgbFlag)
         {
-            pt.red = point.red * scaleU16;
-            pt.green = point.green * scaleU16;
-            pt.blue = point.blue * scaleU16;
+            color[3 * i + 0] = point.red * scaleU16;
+            color[3 * i + 1] = point.green * scaleU16;
+            color[3 * i + 2] = point.blue * scaleU16;
         }
         else
         {
-            pt.red = 1.0F;
-            pt.green = 1.0F;
-            pt.blue = 1.0F;
+            color[3 * i + 0] = 1.0F;
+            color[3 * i + 1] = 1.0F;
+            color[3 * i + 2] = 1.0F;
         }
 
-        pt.userRed = point.user_red * scaleU16;
-        pt.userGreen = point.user_green * scaleU16;
-        pt.userBlue = point.user_blue * scaleU16;
+        userColor[3 * i + 0] = point.user_red * scaleU16;
+        userColor[3 * i + 1] = point.user_green * scaleU16;
+        userColor[3 * i + 2] = point.user_blue * scaleU16;
 
         // Attributes
-        pt.returnNumber = point.return_number;
-        pt.numberOfReturns = point.number_of_returns;
-        pt.classification = point.classification;
-        pt.userData = point.user_data;
+        returnNumber[i] = point.return_number;
+        numberOfReturns[i] = point.number_of_returns;
+        classification[i] = point.classification;
+        userData[i] = point.user_data;
 
         // GPS
-        pt.gpsTime = point.gps_time;
+        gpsTime[i] = point.gps_time;
 
         // Layer
-        pt.layer = point.user_layer;
+        layer[i] = point.user_layer;
     }
 
     // Index
@@ -181,7 +198,7 @@ void EditorPage::toPoint(uint8_t *ptr, size_t i, uint8_t fmt)
     size_t pos = EDITOR_PAGE_FORMAT_USER[fmt];
 
     // Layer
-    htol32(ptr + pos, points[i].layer);
+    htol32(ptr + pos, layer[i]);
 
     // User color
     htol16(ptr + pos + 4, static_cast<uint16_t>(renderColor[3 * i + 0] * s16));
@@ -238,52 +255,19 @@ void EditorPage::transform()
         renderPosition[3 * i + 1] = static_cast<float>(y);
         renderPosition[3 * i + 2] = static_cast<float>(z);
 
-        EditorPoint &pt = points[i];
-        pt.x = x;
-        pt.y = y;
-        pt.z = z;
+        position[3 * i + 0] = x;
+        position[3 * i + 1] = y;
+        position[3 * i + 2] = z;
     }
 
-    if (n > 0)
-    {
-        double min_x = points[0].x;
-        double min_y = points[0].y;
-        double min_z = points[0].z;
-        double max_x = points[0].x;
-        double max_y = points[0].y;
-        double max_z = points[0].z;
-
-        for (size_t i = 1; i < n; i++)
-        {
-            if (points[i].x < min_x)
-                min_x = points[i].x;
-            else if (points[i].x > max_x)
-                max_x = points[i].x;
-
-            if (points[i].y < min_y)
-                min_y = points[i].y;
-            else if (points[i].y > max_y)
-                max_y = points[i].y;
-
-            if (points[i].z < min_z)
-                min_z = points[i].z;
-            else if (points[i].z > max_z)
-                max_z = points[i].z;
-        }
-
-        box.set(min_x, min_y, min_z, max_x, max_y, max_z);
-    }
-    else
-    {
-        box.clear();
-    }
+    box.set(position);
 
     transformed = true;
 }
 
 void EditorPage::select()
 {
-    size_t n = points.size();
+    size_t n = position.size() / 3;
     selection.resize(n);
     for (size_t i = 0; i < n; i++)
     {
@@ -420,9 +404,9 @@ void EditorPage::selectBox()
             for (uint32_t j = 0; j < nNodePoints; j++)
             {
                 uint32_t idx = from + j;
-                double x = points[idx].x;
-                double y = points[idx].y;
-                double z = points[idx].z;
+                double x = position[3 * idx + 0];
+                double y = position[3 * idx + 1];
+                double z = position[3 * idx + 2];
 
                 if (clipBox.isInside(x, y, z))
                 {
@@ -459,7 +443,7 @@ void EditorPage::selectClassification()
     {
         uint32_t idx = selection[i];
 
-        if (classifications.isEnabled(points[idx].classification))
+        if (classifications.isEnabled(classification[idx]))
         {
             if (nSelectedNew != i)
             {
@@ -488,7 +472,7 @@ void EditorPage::selectLayer()
     {
         uint32_t idx = selection[i];
 
-        if (layers.isEnabledId(points[idx].layer))
+        if (layers.isEnabledId(layer[idx]))
         {
             if (nSelectedNew != i)
             {
@@ -508,7 +492,7 @@ void EditorPage::selectColor()
     float g = opt.pointColor()[1];
     float b = opt.pointColor()[2];
 
-    size_t n = points.size();
+    size_t n = position.size() / 3;
 
     for (size_t i = 0; i < n; i++)
     {
@@ -521,9 +505,9 @@ void EditorPage::selectColor()
     {
         for (size_t i = 0; i < n; i++)
         {
-            renderColor[i * 3 + 0] *= points[i].red;
-            renderColor[i * 3 + 1] *= points[i].green;
-            renderColor[i * 3 + 2] *= points[i].blue;
+            renderColor[i * 3 + 0] *= color[i * 3 + 0];
+            renderColor[i * 3 + 1] *= color[i * 3 + 1];
+            renderColor[i * 3 + 2] *= color[i * 3 + 2];
         }
     }
 
@@ -531,9 +515,9 @@ void EditorPage::selectColor()
     {
         for (size_t i = 0; i < n; i++)
         {
-            renderColor[i * 3 + 0] *= points[i].userRed;
-            renderColor[i * 3 + 1] *= points[i].userGreen;
-            renderColor[i * 3 + 2] *= points[i].userBlue;
+            renderColor[i * 3 + 0] *= userColor[i * 3 + 0];
+            renderColor[i * 3 + 1] *= userColor[i * 3 + 1];
+            renderColor[i * 3 + 2] *= userColor[i * 3 + 2];
         }
     }
 
@@ -549,7 +533,7 @@ void EditorPage::selectColor()
         for (size_t i = 0; i < n; i++)
         {
             setColor(i,
-                     static_cast<size_t>(points[i].intensity * 255.0F),
+                     static_cast<size_t>(intensity[i] * 255.0F),
                      255,
                      ColorPalette::BlueCyanYellowRed256);
         }
@@ -560,7 +544,7 @@ void EditorPage::selectColor()
         for (size_t i = 0; i < n; i++)
         {
             setColor(i,
-                     points[i].returnNumber,
+                     returnNumber[i],
                      15,
                      ColorPalette::BlueCyanGreenYellowRed16);
         }
@@ -571,7 +555,7 @@ void EditorPage::selectColor()
         for (size_t i = 0; i < n; i++)
         {
             setColor(i,
-                     points[i].numberOfReturns,
+                     numberOfReturns[i],
                      15,
                      ColorPalette::BlueCyanGreenYellowRed16);
         }
@@ -581,10 +565,7 @@ void EditorPage::selectColor()
     {
         for (size_t i = 0; i < n; i++)
         {
-            setColor(i,
-                     points[i].classification,
-                     15,
-                     ColorPalette::Classification);
+            setColor(i, classification[i], 15, ColorPalette::Classification);
         }
     }
 }

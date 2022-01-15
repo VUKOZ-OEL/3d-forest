@@ -137,7 +137,7 @@ void PluginHeightMapFilter::filterPage(EditorPage *page)
     {
         size_t row = selection[i];
 
-        double z = page->points[row].z;
+        double z = page->position[3 * row + 2];
         double zNorm = (z - zMin) * zLenInv;
 
         size_t colorIndex = static_cast<size_t>(zNorm / colorDelta);

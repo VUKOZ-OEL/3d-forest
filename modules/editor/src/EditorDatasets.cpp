@@ -117,6 +117,21 @@ void EditorDatasets::updateBoundary()
     }
 }
 
+uint64_t EditorDatasets::nPoints() const
+{
+    uint64_t n = 0;
+
+    for (auto const &it : datasets_)
+    {
+        if (it.isEnabled())
+        {
+            n += it.nPoints();
+        }
+    }
+
+    return n;
+}
+
 void EditorDatasets::select(std::vector<FileIndex::Selection> &selected,
                             const Box<double> &box) const
 {

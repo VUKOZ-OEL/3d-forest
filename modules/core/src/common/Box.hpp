@@ -48,6 +48,8 @@ public:
     const T &min(size_t idx) const { return min_[idx]; }
     const T &max(size_t idx) const { return max_[idx]; }
 
+    T length(size_t idx) const { return max_[idx] - min_[idx]; }
+
     void getCenter(T &x, T &y, T &z) const;
     Vector3<T> getCenter() const;
     T distance(T x, T y, T z) const;

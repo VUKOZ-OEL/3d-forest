@@ -41,8 +41,6 @@
 
 #define PLUGIN_CLASSIFY_NAME "Classify"
 
-// -----------------------------------------------------------------------------
-#if 1 /* Allow to collapse this class */
 PluginClassifyWindow::PluginClassifyWindow(QMainWindow *parent, Editor *editor)
     : WindowDock(parent),
       editor_(editor)
@@ -71,13 +69,14 @@ PluginClassifyWindow::PluginClassifyWindow(QMainWindow *parent, Editor *editor)
 void PluginClassifyWindow::compute()
 {
     editor_->cancelThreads();
-    /*
-        Box<double> boundary = editor_->clipBoundary();
-    */
+
+    EditorQuery query(editor_);
+    query.selectGrid();
+    query.exec();
+
     editor_->restartThreads();
 }
-#endif /* Allow to collapse this class */
-// -----------------------------------------------------------------------------
+
 PluginClassify::PluginClassify() : window_(nullptr), editor_(nullptr)
 {
 }

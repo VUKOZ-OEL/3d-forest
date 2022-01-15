@@ -37,6 +37,7 @@ public:
 
     void selectBox(const Box<double> &box);
     void selectCamera(const Camera &camera);
+    void selectGrid();
 
     const Box<double> &selectedBox() const { return selectBox_; }
 
@@ -44,12 +45,59 @@ public:
     void reset();
     void clear();
 
-    bool nextPoint();
-    EditorPoint *point() { return point_; }
+    bool nextPoint()
+    {
+        if (pagePointIndex_ == pagePointIndexMax_)
+        {
+            return nextPage();
+        }
+
+        pagePointIndex_++;
+
+        return true;
+    }
+
+    /** @name Point Data */
+    /**@{*/
+    double &x() { return position_[3 * selection_[pagePointIndex_] + 0]; }
+    double &y() { return position_[3 * selection_[pagePointIndex_] + 1]; }
+    double &z() { return position_[3 * selection_[pagePointIndex_] + 2]; }
+    float &intensity() { return intensity_[selection_[pagePointIndex_]]; }
+    uint8_t &returnNumber()
+    {
+        return returnNumber_[selection_[pagePointIndex_]];
+    }
+    uint8_t &numberOfReturns()
+    {
+        return numberOfReturns_[selection_[pagePointIndex_]];
+    }
+    uint8_t &classification()
+    {
+        return classification_[selection_[pagePointIndex_]];
+    }
+    uint8_t &userData() { return userData_[selection_[pagePointIndex_]]; }
+    double &gpsTime() { return gpsTime_[selection_[pagePointIndex_]]; }
+    float &red() { return color_[3 * selection_[pagePointIndex_] + 0]; }
+    float &green() { return color_[3 * selection_[pagePointIndex_] + 1]; }
+    float &blue() { return color_[3 * selection_[pagePointIndex_] + 2]; }
+    float &userRed() { return userColor_[3 * selection_[pagePointIndex_] + 0]; }
+    float &userGreen()
+    {
+        return userColor_[3 * selection_[pagePointIndex_] + 1];
+    }
+    float &userBlue()
+    {
+        return userColor_[3 * selection_[pagePointIndex_] + 2];
+    }
+    uint32_t &layer() { return layer_[selection_[pagePointIndex_]]; }
+    /**@}*/
 
     bool nextPage();
     EditorPage *page() { return page_.get(); }
     size_t pageSizeEstimate() const;
+
+    bool nextGrid();
+    size_t gridSize() const { return gridXSize_ * gridYSize_; }
 
     void setStateRead();
     void setStateSelect();
@@ -64,9 +112,27 @@ protected:
 
     Box<double> selectBox_;
 
-    // Current
-    EditorPoint *point_;
+    Box<double> selectBoxGrid_;
+    size_t gridX_;
+    size_t gridXSize_;
+    size_t gridY_;
+    size_t gridYSize_;
+
+    // Current page
     std::shared_ptr<EditorPage> page_;
+
+    double *position_;
+    float *intensity_;
+    uint8_t *returnNumber_;
+    uint8_t *numberOfReturns_;
+    uint8_t *classification_;
+    uint8_t *userData_;
+    double *gpsTime_;
+    float *color_;
+    float *userColor_;
+    uint32_t *layer_;
+
+    uint32_t *selection_;
 
     // Iterator
     size_t pageIndex_;

@@ -53,7 +53,6 @@ void EditorQuery::clear()
     cache_.clear();
     lru_.clear();
 
-    point_ = nullptr;
     page_.reset();
 
     selectedPages_.clear();
@@ -61,20 +60,10 @@ void EditorQuery::clear()
     reset();
 }
 
-bool EditorQuery::nextPoint()
-{
-    if (pagePointIndex_ >= pagePointIndexMax_)
-    {
-        return nextPage();
-    }
-
-    point_ = &page_->points[page_->selection[pagePointIndex_++]];
-
-    return true;
-}
-
 bool EditorQuery::nextPage()
 {
+    LOG_EDITOR_QUERY("");
+
     pagePointIndex_ = 0;
     pagePointIndexMax_ = 0;
 
@@ -83,10 +72,24 @@ bool EditorQuery::nextPage()
         FileIndex::Selection &selectedPage = selectedPages_[pageIndex_];
         page_ = read(selectedPage.id, selectedPage.idx);
         pageIndex_++;
+
         if (page_.get() && page_->selection.size() > 0)
         {
-            point_ = &page_->points[page_->selection[pagePointIndex_]];
             pagePointIndexMax_ = page_->selection.size() - 1;
+
+            position_ = page_->position.data();
+            intensity_ = page_->intensity.data();
+            returnNumber_ = page_->returnNumber.data();
+            numberOfReturns_ = page_->numberOfReturns.data();
+            classification_ = page_->classification.data();
+            userData_ = page_->userData.data();
+            gpsTime_ = page_->gpsTime.data();
+            color_ = page_->color.data();
+            userColor_ = page_->userColor.data();
+            layer_ = page_->layer.data();
+
+            selection_ = page_->selection.data();
+
             return true;
         }
     }
@@ -236,6 +239,27 @@ void EditorQuery::selectCamera(const Camera &camera)
     }
 
     setStateRender();
+}
+
+void EditorQuery::selectGrid()
+{
+    gridX_ = 0;
+    gridXSize_ = 0;
+    gridY_ = 0;
+    gridYSize_ = 0;
+
+    uint64_t nPoints = editor_->datasets().nPoints();
+    Box<double> boundary = editor_->clipBoundary();
+    double area = boundary.length(0) * boundary.length(1);
+}
+
+bool EditorQuery::nextGrid()
+{
+    if (gridX_ < gridXSize_)
+    {
+    }
+
+    return false;
 }
 
 bool EditorQuery::Key::operator<(const Key &rhs) const

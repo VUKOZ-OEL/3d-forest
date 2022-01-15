@@ -212,6 +212,8 @@ void EditorDataset::read()
 
     boundaryFile_ = index_.boundaryPoints();
     updateBoundary();
+
+    nPoints_ = las.header.number_of_point_records;
 }
 
 void EditorDataset::updateBoundary()

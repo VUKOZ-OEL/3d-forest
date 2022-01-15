@@ -22,6 +22,7 @@
 #include <EditorDatabase.hpp>
 #include <FileIndexBuilder.hpp>
 #include <Time.hpp>
+#include <Error.hpp>
 #include <cstring>
 
 #define PATH_1 "dataset1.las"
@@ -29,11 +30,11 @@
 static void createDataSet()
 {
     FileIndexBuilder::Settings settings;
-    settings.maxSize1 = 1;
+    settings.maxSize1 = 2;
 
     std::vector<FileLas::Point> points;
 
-    points.resize(2);
+    points.resize(3);
     std::memset(points.data(), 0, sizeof(FileLas::Point) * points.size());
 
     points[0].x = 0;
@@ -44,6 +45,10 @@ static void createDataSet()
     points[1].y = 1;
     points[1].z = 0;
 
+    points[2].x = 0;
+    points[2].y = 1;
+    points[2].z = 0;
+
     FileLas::create(PATH_1, points, {1,1,1}, {0,0,0});
     FileIndexBuilder::index(PATH_1, PATH_1, settings);
 }
@@ -53,20 +58,21 @@ static void edit()
     EditorDatabase db;
     db.openDataset(PATH_1);
 
+    double zmin = db.clipBoundary().max(2);
+
     EditorQuery query(&db);
     query.selectBox(Box<double>(0., 0., 0., 1.0, 1.0, 2.));
     query.exec();
 
-    double zMin = db.clipBoundary().max(2);
     while (query.nextPoint())
     {
-        if (query.point()->z < zMin)
+        if (query.z() < zmin)
         {
-            zMin = query.point()->z;
+            zmin = query.z();
         }
     }
 
-    std::cout << "z min is " << zMin << std::endl;
+    std::cout << "z min is " << zmin << std::endl;
 }
 
 int main()

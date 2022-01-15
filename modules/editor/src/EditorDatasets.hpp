@@ -90,6 +90,8 @@ public:
     const Box<double> &boundary() const { return boundary_; }
     void updateBoundary();
 
+    uint64_t nPoints() const;
+
     void select(std::vector<FileIndex::Selection> &selected,
                 const Box<double> &box) const;
 

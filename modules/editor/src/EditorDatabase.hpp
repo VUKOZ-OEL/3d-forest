@@ -59,6 +59,7 @@ public:
     const ClipFilter &clipFilter() const { return clipFilter_; }
     void setClipFilter(const ClipFilter &clipFilter);
     void resetClipFilter();
+
     Box<double> clipBoundary() const;
 
     // Data sets

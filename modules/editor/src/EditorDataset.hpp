@@ -56,6 +56,8 @@ public:
 
     const Box<double> &boundary() const { return boundary_; }
 
+    uint64_t nPoints() const { return nPoints_; }
+
     const FileIndex &index() const { return index_; }
 
     // I/O
@@ -83,6 +85,7 @@ protected:
     std::string fileName_;
 
     // Data
+    uint64_t nPoints_;
     Vector3<double> translationFile_;
     Vector3<double> scalingFile_;
     Box<double> boundaryFile_;
