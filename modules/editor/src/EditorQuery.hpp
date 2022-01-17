@@ -37,7 +37,6 @@ public:
 
     void selectBox(const Box<double> &box);
     void selectCamera(const Camera &camera);
-    void selectGrid();
 
     const Box<double> &selectedBox() const { return selectBox_; }
 
@@ -57,29 +56,37 @@ public:
         return true;
     }
 
-    /** @name Point Data */
+    /** @name Point data available after nextPoint() */
     /**@{*/
     double &x() { return position_[3 * selection_[pagePointIndex_] + 0]; }
     double &y() { return position_[3 * selection_[pagePointIndex_] + 1]; }
     double &z() { return position_[3 * selection_[pagePointIndex_] + 2]; }
+
     float &intensity() { return intensity_[selection_[pagePointIndex_]]; }
+
     uint8_t &returnNumber()
     {
         return returnNumber_[selection_[pagePointIndex_]];
     }
+
     uint8_t &numberOfReturns()
     {
         return numberOfReturns_[selection_[pagePointIndex_]];
     }
+
     uint8_t &classification()
     {
         return classification_[selection_[pagePointIndex_]];
     }
+
     uint8_t &userData() { return userData_[selection_[pagePointIndex_]]; }
+
     double &gpsTime() { return gpsTime_[selection_[pagePointIndex_]]; }
+
     float &red() { return color_[3 * selection_[pagePointIndex_] + 0]; }
     float &green() { return color_[3 * selection_[pagePointIndex_] + 1]; }
     float &blue() { return color_[3 * selection_[pagePointIndex_] + 2]; }
+
     float &userRed() { return userColor_[3 * selection_[pagePointIndex_] + 0]; }
     float &userGreen()
     {
@@ -89,6 +96,7 @@ public:
     {
         return userColor_[3 * selection_[pagePointIndex_] + 2];
     }
+
     uint32_t &layer() { return layer_[selection_[pagePointIndex_]]; }
     /**@}*/
 
@@ -96,27 +104,36 @@ public:
     EditorPage *page() { return page_.get(); }
     size_t pageSizeEstimate() const;
 
+    void setGrid(size_t pointsPerCell = 10000);
     bool nextGrid();
-    size_t gridSize() const { return gridXSize_ * gridYSize_; }
+    const Box<double> &gridCell() const { return gridCell_; }
 
     void setStateRead();
     void setStateSelect();
     void setStateRender();
     bool nextState();
 
+    void setModified();
+    void write();
+
     size_t cacheSize() const { return lru_.size(); }
     EditorPage &cache(size_t index) { return *lru_[index]; }
 
 protected:
+    // Parent
     EditorDatabase *editor_;
 
+    // Query statement
     Box<double> selectBox_;
 
-    Box<double> selectBoxGrid_;
-    size_t gridX_;
+    // Grid
+    Box<double> gridCell_;
+    Box<double> gridCellBase_;
+    Box<double> gridBoundary_;
     size_t gridXSize_;
-    size_t gridY_;
     size_t gridYSize_;
+    size_t gridIndex_;
+    std::vector<uint64_t> grid_;
 
     // Current page
     std::shared_ptr<EditorPage> page_;
@@ -151,7 +168,7 @@ protected:
     size_t cacheSizeMax_;
     std::map<Key, std::shared_ptr<EditorPage>> cache_;
 
-    // Last Recently Used (LRU)
+    // Last Recently Used (LRU) for Cache
     std::vector<std::shared_ptr<EditorPage>> lru_;
 
     std::shared_ptr<EditorPage> read(size_t dataset, size_t index);

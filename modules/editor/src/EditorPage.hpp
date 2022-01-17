@@ -127,6 +127,9 @@ public:
     bool nextState();
     bool nextStateRender();
 
+    void setModified();
+    bool isModified() const { return modified; }
+
 protected:
     // Parent
     EditorDatabase *editor_;

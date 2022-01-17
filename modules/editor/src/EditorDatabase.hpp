@@ -61,6 +61,7 @@ public:
     void resetClipFilter();
 
     Box<double> clipBoundary() const;
+    const Box<double> &boundary() const { return datasets_.boundary(); }
 
     // Data sets
     const EditorDatasets &datasets() const { return datasets_; }

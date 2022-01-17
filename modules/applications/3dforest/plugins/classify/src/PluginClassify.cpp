@@ -71,8 +71,7 @@ void PluginClassifyWindow::compute()
     editor_->cancelThreads();
 
     EditorQuery query(editor_);
-    query.selectGrid();
-    query.exec();
+    query.setGrid();
 
     editor_->restartThreads();
 }

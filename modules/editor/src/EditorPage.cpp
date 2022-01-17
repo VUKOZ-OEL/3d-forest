@@ -197,6 +197,12 @@ void EditorPage::toPoint(uint8_t *ptr, size_t i, uint8_t fmt)
     const float s16 = 65535.0F;
     size_t pos = EDITOR_PAGE_FORMAT_USER[fmt];
 
+    // Classification
+    if (fmt > 5)
+    {
+        ptr[16] = classification[i];
+    }
+
     // Layer
     htol32(ptr + pos, layer[i]);
 
@@ -280,6 +286,11 @@ void EditorPage::select()
     selectColor();
 
     selected = true;
+}
+
+void EditorPage::setModified()
+{
+    modified = true;
 }
 
 void EditorPage::setStateRead()

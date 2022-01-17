@@ -22,3 +22,7 @@ install(TARGETS las DESTINATION bin)
 add_executable(sandbox src/sandbox.cpp)
 target_link_libraries(sandbox PUBLIC core editor)
 install(TARGETS sandbox DESTINATION bin)
+
+add_executable(classify src/classify.cpp)
+target_link_libraries(classify PUBLIC editor)
+install(TARGETS classify DESTINATION bin)
