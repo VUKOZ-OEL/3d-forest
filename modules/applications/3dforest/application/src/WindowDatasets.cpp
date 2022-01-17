@@ -17,7 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file WindowDataSets.cpp */
+/** @file WindowDatasets.cpp */
 
 #include <Editor.hpp>
 #include <QBrush>
@@ -38,11 +38,11 @@
 #include <QTreeWidgetItem>
 #include <QTreeWidgetItemIterator>
 #include <QVBoxLayout>
-#include <WindowDataSets.hpp>
+#include <WindowDatasets.hpp>
 #include <WindowFileImport.hpp>
 #include <WindowMain.hpp>
 
-WindowDataSets::WindowDataSets(WindowMain *parent, Editor *editor)
+WindowDatasets::WindowDatasets(WindowMain *parent, Editor *editor)
     : QWidget(parent),
       windowMain_(parent),
       editor_(editor)
@@ -99,12 +99,12 @@ WindowDataSets::WindowDataSets(WindowMain *parent, Editor *editor)
     setLayout(mainLayout);
 }
 
-void WindowDataSets::toolAdd()
+void WindowDatasets::toolAdd()
 {
     WindowFileImport::import(windowMain_, editor_);
 }
 
-void WindowDataSets::toolEdit()
+void WindowDatasets::toolEdit()
 {
     // Item
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
@@ -120,17 +120,19 @@ void WindowDataSets::toolEdit()
     QString label = QString::fromStdString(datasets_.label(idx));
     Vector3<float> rgb = datasets_.color(idx);
     Vector3<double> offset = datasets_.translation(idx);
+    Vector3<double> scale = datasets_.scalingFile(idx);
 
     QColor color;
     color.setRgbF(rgb[0], rgb[1], rgb[2]);
 
     // Dialog
-    WindowDataSetsEdit dialog(windowMain_,
+    WindowDatasetsEdit dialog(windowMain_,
                               "Edit Data Set",
                               "Apply",
                               label,
                               color,
-                              offset);
+                              offset,
+                              scale);
 
     if (dialog.exec() == QDialog::Rejected)
     {
@@ -160,7 +162,7 @@ void WindowDataSets::toolEdit()
     emit selectionChanged();
 }
 
-void WindowDataSets::toolDelete()
+void WindowDatasets::toolDelete()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
@@ -177,21 +179,21 @@ void WindowDataSets::toolDelete()
     emit dataChanged();
 }
 
-void WindowDataSets::invertSelection()
+void WindowDatasets::invertSelection()
 {
     datasets_.setInvertAll();
     updateTree();
     emit selectionChanged();
 }
 
-void WindowDataSets::clearSelection()
+void WindowDatasets::clearSelection()
 {
     datasets_.setEnabledAll(false);
     updateTree();
     emit selectionChanged();
 }
 
-void WindowDataSets::itemSelectionChanged()
+void WindowDatasets::itemSelectionChanged()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
@@ -207,7 +209,7 @@ void WindowDataSets::itemSelectionChanged()
     }
 }
 
-void WindowDataSets::itemChanged(QTreeWidgetItem *item, int column)
+void WindowDatasets::itemChanged(QTreeWidgetItem *item, int column)
 {
     if (column == COLUMN_CHECKED)
     {
@@ -218,12 +220,12 @@ void WindowDataSets::itemChanged(QTreeWidgetItem *item, int column)
     }
 }
 
-size_t WindowDataSets::index(const QTreeWidgetItem *item)
+size_t WindowDatasets::index(const QTreeWidgetItem *item)
 {
     return datasets_.index(item->text(COLUMN_ID).toULong());
 }
 
-void WindowDataSets::updateTree()
+void WindowDatasets::updateTree()
 {
     block();
 
@@ -248,14 +250,14 @@ void WindowDataSets::updateTree()
     unblock();
 }
 
-void WindowDataSets::block()
+void WindowDatasets::block()
 {
     disconnect(tree_, SIGNAL(itemChanged(QTreeWidgetItem *, int)), 0, 0);
     disconnect(tree_, SIGNAL(itemSelectionChanged()), 0, 0);
     (void)blockSignals(true);
 }
 
-void WindowDataSets::unblock()
+void WindowDatasets::unblock()
 {
     (void)blockSignals(false);
     connect(tree_,
@@ -268,7 +270,7 @@ void WindowDataSets::unblock()
             SLOT(itemSelectionChanged()));
 }
 
-void WindowDataSets::addItem(size_t i)
+void WindowDatasets::addItem(size_t i)
 {
     QTreeWidgetItem *item = new QTreeWidgetItem(tree_);
 
@@ -299,7 +301,7 @@ void WindowDataSets::addItem(size_t i)
     item->setBackground(COLUMN_ID, brush);
 }
 
-void WindowDataSets::setDatasets(const EditorDatasets &datasets)
+void WindowDatasets::setDatasets(const EditorDatasets &datasets)
 {
     block();
 
@@ -332,12 +334,13 @@ void WindowDataSets::setDatasets(const EditorDatasets &datasets)
     unblock();
 }
 
-WindowDataSetsEdit::WindowDataSetsEdit(QWidget *parent,
+WindowDatasetsEdit::WindowDatasetsEdit(QWidget *parent,
                                        const QString &windowTitle,
                                        const QString &buttonText,
                                        const QString &label,
                                        const QColor &color,
-                                       const Vector3<double> &offset)
+                                       const Vector3<double> &offset,
+                                       const Vector3<double> &scale)
     : QDialog(parent),
       color_(color)
 {
@@ -361,17 +364,26 @@ WindowDataSetsEdit::WindowDataSetsEdit(QWidget *parent,
         offsetSpinBox_[i]->setMinimum(-1e8);
         offsetSpinBox_[i]->setMaximum(1e8);
         offsetSpinBox_[i]->setValue(offset[i]);
+
+        scaleSpinBox_[i] = new QDoubleSpinBox;
+        scaleSpinBox_[i]->setDecimals(6);
+        scaleSpinBox_[i]->setMinimum(-1e8);
+        scaleSpinBox_[i]->setMaximum(1e8);
+        scaleSpinBox_[i]->setValue(scale[i]);
+        scaleSpinBox_[i]->setDisabled(true);
     }
 
     // Layout
     QGridLayout *gridLayout = new QGridLayout;
     int row = 0;
+
     gridLayout->addWidget(new QLabel(tr("Label")), row, 0);
     gridLayout->addWidget(labelEdit_, row, 1);
     row++;
     gridLayout->addWidget(new QLabel(tr("Color")), row, 0);
     gridLayout->addWidget(colorButton_, row, 1);
     row++;
+
     gridLayout->addWidget(new QLabel(tr("Offset x")), row, 0);
     gridLayout->addWidget(offsetSpinBox_[0], row, 1);
     row++;
@@ -380,6 +392,16 @@ WindowDataSetsEdit::WindowDataSetsEdit(QWidget *parent,
     row++;
     gridLayout->addWidget(new QLabel(tr("Offset z")), row, 0);
     gridLayout->addWidget(offsetSpinBox_[2], row, 1);
+    row++;
+
+    gridLayout->addWidget(new QLabel(tr("Scale x")), row, 0);
+    gridLayout->addWidget(scaleSpinBox_[0], row, 1);
+    row++;
+    gridLayout->addWidget(new QLabel(tr("Scale y")), row, 0);
+    gridLayout->addWidget(scaleSpinBox_[1], row, 1);
+    row++;
+    gridLayout->addWidget(new QLabel(tr("Scale z")), row, 0);
+    gridLayout->addWidget(scaleSpinBox_[2], row, 1);
     row++;
 
     QHBoxLayout *dialogButtons = new QHBoxLayout;
@@ -401,19 +423,19 @@ WindowDataSetsEdit::WindowDataSetsEdit(QWidget *parent,
     setMaximumHeight(height());
 }
 
-void WindowDataSetsEdit::setResultAccept()
+void WindowDatasetsEdit::setResultAccept()
 {
     close();
     setResult(QDialog::Accepted);
 }
 
-void WindowDataSetsEdit::setResultReject()
+void WindowDatasetsEdit::setResultReject()
 {
     close();
     setResult(QDialog::Rejected);
 }
 
-void WindowDataSetsEdit::setColor()
+void WindowDatasetsEdit::setColor()
 {
     QColorDialog dialog(color_, this);
 
@@ -426,7 +448,7 @@ void WindowDataSetsEdit::setColor()
     updateColor();
 }
 
-void WindowDataSetsEdit::updateColor()
+void WindowDatasetsEdit::updateColor()
 {
     QPixmap pixmap(25, 25);
     pixmap.fill(color_);

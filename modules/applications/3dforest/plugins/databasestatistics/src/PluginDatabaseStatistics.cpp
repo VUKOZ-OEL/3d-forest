@@ -120,7 +120,7 @@ void PluginDatabaseStatisticsWindow::computeStep(EditorPage *page)
         numberOfPoints_++;
 
         size_t row = page->selection[i];
-        uint8_t classification = page->points[row].classification;
+        uint8_t classification = page->classification[row];
 
         if (classification > 0)
         {

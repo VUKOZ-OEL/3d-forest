@@ -52,8 +52,11 @@ public:
     void setTranslation(const Vector3<double> &translation);
 
     const Vector3<double> &scaling() const { return scaling_; }
+    const Vector3<double> &scalingFile() const { return scalingFile_; }
 
     const Box<double> &boundary() const { return boundary_; }
+
+    uint64_t nPoints() const { return nPoints_; }
 
     const FileIndex &index() const { return index_; }
 
@@ -82,6 +85,7 @@ protected:
     std::string fileName_;
 
     // Data
+    uint64_t nPoints_;
     Vector3<double> translationFile_;
     Vector3<double> scalingFile_;
     Box<double> boundaryFile_;

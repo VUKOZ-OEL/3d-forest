@@ -33,4 +33,14 @@
         std::cout.flush();                                                     \
     } while (false)
 
+#define LOG_MODULE(module, msg)                                                \
+    do                                                                         \
+    {                                                                          \
+        std::cout << (module) << "::" << __func__ << ": " << msg << "\n";      \
+        std::cout.flush();                                                     \
+    } while (false)
+
+#define LOG_EDITOR_QUERY(msg)
+//#define LOG_EDITOR_QUERY(msg) LOG_MODULE("EditorQuery", msg)
+
 #endif /* LOG_HPP */

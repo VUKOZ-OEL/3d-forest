@@ -37,7 +37,7 @@ class Ribbon;
 class WindowDock;
 class WindowClassifications;
 class WindowClipFilter;
-class WindowDataSets;
+class WindowDatasets;
 class WindowLayers;
 class WindowSettingsView;
 
@@ -126,7 +126,7 @@ protected:
     std::vector<PluginTool *> pluginsTool_;
 
     // Windows
-    WindowDataSets *windowDataSets_;
+    WindowDatasets *windowDataSets_;
     WindowLayers *windowLayers_;
     WindowClassifications *windowClassifications_;
     WindowClipFilter *windowClipFilter_;

@@ -39,6 +39,7 @@ void EditorQuery::exec()
     selectedPages_.clear();
     editor_->datasets().select(selectedPages_, selectBox_);
     reset();
+    setStateSelect();
 }
 
 void EditorQuery::reset()
@@ -53,7 +54,6 @@ void EditorQuery::clear()
     cache_.clear();
     lru_.clear();
 
-    point_ = nullptr;
     page_.reset();
 
     selectedPages_.clear();
@@ -61,42 +61,70 @@ void EditorQuery::clear()
     reset();
 }
 
-bool EditorQuery::nextPoint()
-{
-    if (pagePointIndex_ >= pagePointIndexMax_)
-    {
-        return nextPage();
-    }
-
-    point_ = &page_->points[page_->selection[pagePointIndex_++]];
-
-    return true;
-}
-
 bool EditorQuery::nextPage()
 {
+    LOG_EDITOR_QUERY("");
+
+    // Reset point index within active page.
     pagePointIndex_ = 0;
     pagePointIndexMax_ = 0;
 
+    // Find next page in selection.
     while (pageIndex_ < selectedPages_.size())
     {
         FileIndex::Selection &selectedPage = selectedPages_[pageIndex_];
         page_ = read(selectedPage.id, selectedPage.idx);
+        page_->nextState();
         pageIndex_++;
+
         if (page_.get() && page_->selection.size() > 0)
         {
-            point_ = &page_->points[page_->selection[pagePointIndex_]];
+            // This page is in selection.
+
+            // Set point index range within the page.
             pagePointIndexMax_ = page_->selection.size() - 1;
+
+            // Point to current page data.
+            position_ = page_->position.data();
+            intensity_ = page_->intensity.data();
+            returnNumber_ = page_->returnNumber.data();
+            numberOfReturns_ = page_->numberOfReturns.data();
+            classification_ = page_->classification.data();
+            userData_ = page_->userData.data();
+            gpsTime_ = page_->gpsTime.data();
+            color_ = page_->color.data();
+            userColor_ = page_->userColor.data();
+            layer_ = page_->layer.data();
+
+            selection_ = page_->selection.data();
+
             return true;
         }
     }
 
+    // There are no more pages in selection.
     return false;
 }
 
 size_t EditorQuery::pageSizeEstimate() const
 {
     return selectedPages_.size();
+}
+
+void EditorQuery::setModified()
+{
+    page_->setModified();
+}
+
+void EditorQuery::write()
+{
+    for (size_t i = 0; i < lru_.size(); i++)
+    {
+        if (lru_[i]->isModified())
+        {
+            lru_[i]->write();
+        }
+    }
 }
 
 void EditorQuery::setStateRead()
@@ -238,6 +266,113 @@ void EditorQuery::selectCamera(const Camera &camera)
     setStateRender();
 }
 
+static void editorQueryCreateGrid(std::vector<uint64_t> &grid,
+                                  size_t x1,
+                                  size_t x2,
+                                  size_t y1,
+                                  size_t y2)
+{
+    size_t dx = x2 - x1;
+    size_t dy = y2 - y1;
+
+    if (dx < 1 || dy < 1)
+    {
+        return;
+    }
+
+    if (dx == 1 && dy == 1)
+    {
+        // 0xfffff = 20 bits = 1,048,575 cells per length.
+        uint64_t value = (x1 & 0xfffffU) | ((y1 & 0xfffffU) << 20);
+
+        grid.push_back(value);
+
+        return;
+    }
+
+    size_t px = dx / 2;
+    size_t py = dy / 2;
+
+    editorQueryCreateGrid(grid, x1, x1 + px, y1, y1 + py);
+    editorQueryCreateGrid(grid, x1 + px, x2, y1, y1 + py);
+    editorQueryCreateGrid(grid, x1, x1 + px, y1 + py, y2);
+    editorQueryCreateGrid(grid, x1 + px, x2, y1 + py, y2);
+}
+
+void EditorQuery::setGrid(size_t pointsPerCell)
+{
+    LOG_EDITOR_QUERY("");
+
+    // Calculate grid cell size.
+    uint64_t pointsPerArea = editor_->datasets().nPoints();
+    Box<double> boundary = editor_->boundary();
+    double area = boundary.length(0) * boundary.length(1);
+
+    Box<double> boundaryClip = editor_->clipBoundary();
+    double areaClip = boundaryClip.length(0) * boundaryClip.length(1);
+    double areaRatio = areaClip / area;
+    double pointsPerAreaClip = static_cast<double>(pointsPerArea) * areaRatio;
+    double nCells = pointsPerAreaClip / static_cast<double>(pointsPerCell);
+    nCells = ceil(nCells);
+    LOG_EDITOR_QUERY("nCells:" << nCells);
+
+    double areaPerCell = areaClip / nCells;
+    double cellLength = sqrt(areaPerCell);
+
+    gridXSize_ =
+        static_cast<size_t>(round(boundaryClip.length(0) / cellLength));
+    LOG_EDITOR_QUERY("gridXSize_:" << gridXSize_);
+    gridYSize_ =
+        static_cast<size_t>(round(boundaryClip.length(1) / cellLength));
+    LOG_EDITOR_QUERY("gridYSize_:" << gridYSize_);
+
+    double cellLengthX =
+        boundaryClip.length(0) / static_cast<double>(gridXSize_);
+    LOG_EDITOR_QUERY("cellLengthX:" << cellLengthX);
+    double cellLengthY =
+        boundaryClip.length(1) / static_cast<double>(gridYSize_);
+    LOG_EDITOR_QUERY("cellLengthY:" << cellLengthY);
+
+    // Set grid cell size.
+    gridBoundary_ = boundaryClip;
+    gridCellBase_
+        .set(0, 0, 0, cellLengthX, cellLengthY, boundaryClip.length(2));
+
+    gridCell_.clear();
+
+    // Create grid ordering.
+    gridIndex_ = 0;
+    grid_.clear();
+    editorQueryCreateGrid(grid_, 0, gridXSize_, 0, gridYSize_);
+}
+
+bool EditorQuery::nextGrid()
+{
+    if (gridIndex_ < grid_.size())
+    {
+        size_t x = grid_[gridIndex_] & 0xfffffU;
+        size_t y = (grid_[gridIndex_] >> 20) & 0xfffffU;
+
+        LOG_EDITOR_QUERY("x:" << x << ", y:" << y);
+
+        double dx = static_cast<double>(x) * gridCellBase_.max(0);
+        double dy = static_cast<double>(y) * gridCellBase_.max(1);
+
+        gridCell_.set(gridBoundary_.min(0) + dx,
+                      gridBoundary_.min(1) + dy,
+                      gridBoundary_.min(2),
+                      gridBoundary_.min(0) + dx + gridCellBase_.max(0),
+                      gridBoundary_.min(1) + dy + gridCellBase_.max(1),
+                      gridBoundary_.min(2) + gridCellBase_.max(2));
+
+        gridIndex_++;
+
+        return true;
+    }
+
+    return false;
+}
+
 bool EditorQuery::Key::operator<(const Key &rhs) const
 {
     return (datasetId < rhs.datasetId) || (pageId < rhs.pageId);
@@ -288,6 +423,10 @@ std::shared_ptr<EditorPage> EditorQuery::read(size_t dataset, size_t index)
             {
                 // Drop oldest page
                 idx = lru_.size() - 1;
+                if (lru_[idx]->isModified())
+                {
+                    lru_[idx]->write();
+                }
                 Key nkrm = {lru_[idx]->datasetId(), lru_[idx]->pageId()};
                 cache_.erase(nkrm);
             }

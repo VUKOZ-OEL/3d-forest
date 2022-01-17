@@ -22,7 +22,6 @@
 #ifndef EDITOR_PAGE_HPP
 #define EDITOR_PAGE_HPP
 
-#include <EditorPoint.hpp>
 #include <FileIndex.hpp>
 
 class EditorDatabase;
@@ -32,10 +31,61 @@ class EditorQuery;
 class EditorPage
 {
 public:
-    /** Points. */
-    std::vector<EditorPoint> points;
+    /** @name Point Data */
+    /**@{*/
+    /** Point coordinates.
+        The data are stored as [x0, y0, z0, x1, y1, ...].
+        These are actual X, Y, or Z coordinates after scaling and offset.
+     */
+    std::vector<double> position;
 
-    /** Index array contains indices to filtered points. */
+    /** Pulse return magnitude.
+        The data are stored as [i0, i1, ...].
+        The values are in range from 0 (zero intensity) to 1 (full intensity).
+    */
+    std::vector<float> intensity;
+
+    /** Return number.
+        Contains values from 0 to 15.
+    */
+    std::vector<uint8_t> returnNumber;
+
+    /** Number of returns.
+        Contains values from 0 to 15.
+    */
+    std::vector<uint8_t> numberOfReturns;
+
+    /** Classification. */
+    std::vector<uint8_t> classification;
+
+    /** User data. */
+    std::vector<uint8_t> userData;
+
+    /** GPS time. */
+    std::vector<double> gpsTime;
+
+    /** Red, Green, and Blue image channels.
+        The data are stored as [r0, g0, b0, r1, g1, ...].
+        Color values are in range from 0 (zero intensity) to 1 (full intensity).
+        When the input data set has no colors, then the colors in this vector
+        are set to full intensity.
+    */
+    std::vector<float> color;
+
+    /** Red, Green, and Blue output colors.
+        The data are stored as [r0, g0, b0, r1, g1, ...].
+        Color values are in range from 0 (zero intensity) to 1 (full intensity).
+        This value is stored in Point Data Record extra bytes.
+    */
+    std::vector<float> userColor;
+
+    /** Layer identification numbers.
+        This value is stored in Point Data Record extra bytes.
+    */
+    std::vector<uint32_t> layer;
+    /**@}*/
+
+    /** Index array contains indices to selected points. */
     std::vector<uint32_t> selection;
 
     /** Bounding box. */
@@ -76,6 +126,9 @@ public:
     void setStateRender();
     bool nextState();
     bool nextStateRender();
+
+    void setModified();
+    bool isModified() const { return modified; }
 
 protected:
     // Parent
