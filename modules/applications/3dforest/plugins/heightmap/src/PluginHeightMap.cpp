@@ -90,11 +90,11 @@ void PluginHeightMapFilter::setPreviewEnabled(bool enabled,
         editor_->lock();
         if (reload)
         {
-            editor_->viewports().setStateRead();
+            editor_->viewports().setState(EditorPage::STATE_READ);
         }
         else
         {
-            editor_->viewports().setStateSelect();
+            editor_->viewports().setState(EditorPage::STATE_FILTER);
         }
         editor_->unlock();
 

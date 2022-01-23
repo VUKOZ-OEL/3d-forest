@@ -108,9 +108,7 @@ public:
     bool nextGrid();
     const Box<double> &gridCell() const { return gridCell_; }
 
-    void setStateRead();
-    void setStateSelect();
-    void setStateRender();
+    void setState(EditorPage::State state);
     bool nextState();
 
     void setModified();

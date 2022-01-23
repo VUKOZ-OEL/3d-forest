@@ -38,11 +38,8 @@ EditorPage::EditorPage(EditorDatabase *editor,
       query_(query),
       datasetId_(datasetId),
       pageId_(pageId),
-      loaded(false),
-      transformed(false),
-      selected(false),
-      rendered(false),
-      modified(false)
+      state_(EditorPage::STATE_READ),
+      modified_(false)
 {
 }
 
@@ -176,15 +173,13 @@ void EditorPage::read()
     octree.translate(dataset.translation());
 
     // Loaded
-    loaded = true;
-    transformed = false;
-    selected = false;
-    rendered = false;
-    modified = false;
+    state_ = EditorPage::STATE_TRANSFORM;
+    modified_ = false;
 
     // Apply
     transform();
     select();
+    filter();
 }
 
 #define EDITOR_PAGE_FORMAT_COUNT 11
@@ -237,7 +232,7 @@ void EditorPage::write()
 
     las.file().write(buffer_.data(), buffer_.size());
 
-    modified = false;
+    modified_ = false;
 }
 
 void EditorPage::transform()
@@ -268,11 +263,12 @@ void EditorPage::transform()
 
     box.set(position);
 
-    transformed = true;
+    state_ = EditorPage::STATE_SELECT;
 }
 
 void EditorPage::select()
 {
+    // Reset selection to mark all points as selected.
     size_t n = position.size() / 3;
     selection.resize(n);
     for (size_t i = 0; i < n; i++)
@@ -280,42 +276,43 @@ void EditorPage::select()
         selection[i] = static_cast<uint32_t>(i);
     }
 
+    // Apply new selection.
     selectBox();
     selectClassification();
     selectLayer();
-    selectColor();
 
-    selected = true;
+    state_ = EditorPage::STATE_FILTER;
+}
+
+void EditorPage::filter()
+{
+    filterColor();
+    editor_->applyFilters(this);
+
+    state_ = EditorPage::STATE_RENDER;
 }
 
 void EditorPage::setModified()
 {
-    modified = true;
+    modified_ = true;
 }
 
-void EditorPage::setStateRead()
+void EditorPage::setState(EditorPage::State state)
 {
-    loaded = false;
-    transformed = false;
-    selected = false;
-    rendered = false;
-    modified = false;
-}
+    if ((state < state_) || (state == EditorPage::STATE_RENDERED))
+    {
+        state_ = state;
+    }
 
-void EditorPage::setStateSelect()
-{
-    selected = false;
-    rendered = false;
-}
-
-void EditorPage::setStateRender()
-{
-    rendered = false;
+    if (state == EditorPage::STATE_READ)
+    {
+        modified_ = false;
+    }
 }
 
 bool EditorPage::nextState()
 {
-    if (!loaded)
+    if (state_ == EditorPage::STATE_READ)
     {
         try
         {
@@ -330,41 +327,33 @@ bool EditorPage::nextState()
             // std::cout << "unknown error\n";
         }
 
-        editor_->applyFilters(this);
-
         return false;
     }
 
-    if (!transformed)
+    if (state_ == EditorPage::STATE_TRANSFORM)
     {
         transform();
         return false;
     }
 
-    if (!selected)
+    if (state_ == EditorPage::STATE_SELECT)
     {
         select();
-        editor_->applyFilters(this);
         return false;
     }
 
-    if (!rendered)
+    if (state_ == EditorPage::STATE_FILTER)
+    {
+        filter();
+        return false;
+    }
+
+    if (state_ == EditorPage::STATE_RENDER)
     {
         return false;
     }
 
     return true;
-}
-
-bool EditorPage::nextStateRender()
-{
-    if (loaded && transformed && selected && !rendered)
-    {
-        rendered = true;
-        return true;
-    }
-
-    return false;
 }
 
 void EditorPage::selectBox()
@@ -496,7 +485,7 @@ void EditorPage::selectLayer()
     selection.resize(nSelectedNew);
 }
 
-void EditorPage::selectColor()
+void EditorPage::filterColor()
 {
     const EditorSettingsView &opt = editor_->settings().view();
     float r = opt.pointColor()[0];

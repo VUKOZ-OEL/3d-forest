@@ -219,7 +219,6 @@ void EditorDatabase::setLayers(const EditorLayers &layers)
 void EditorDatabase::setSettingsView(const EditorSettingsView &settings)
 {
     settings_.setView(settings);
-    viewports_.setStateRender();
     unsavedChanges_ = true;
 }
 

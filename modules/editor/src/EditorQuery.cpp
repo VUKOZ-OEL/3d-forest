@@ -39,7 +39,7 @@ void EditorQuery::exec()
     selectedPages_.clear();
     editor_->datasets().select(selectedPages_, selectBox_);
     reset();
-    setStateSelect();
+    setState(EditorPage::STATE_SELECT);
 }
 
 void EditorQuery::reset()
@@ -127,27 +127,11 @@ void EditorQuery::write()
     }
 }
 
-void EditorQuery::setStateRead()
+void EditorQuery::setState(EditorPage::State state)
 {
     for (auto &it : cache_)
     {
-        it.second->setStateRead();
-    }
-}
-
-void EditorQuery::setStateSelect()
-{
-    for (auto &it : cache_)
-    {
-        it.second->setStateSelect();
-    }
-}
-
-void EditorQuery::setStateRender()
-{
-    for (size_t i = 0; i < lru_.size(); i++)
-    {
-        lru_[i]->setStateRender();
+        it.second->setState(state);
     }
 }
 
@@ -263,7 +247,7 @@ void EditorQuery::selectCamera(const Camera &camera)
         }
     }
 
-    setStateRender();
+    setState(EditorPage::STATE_RENDER);
 }
 
 static void editorQueryCreateGrid(std::vector<uint64_t> &grid,

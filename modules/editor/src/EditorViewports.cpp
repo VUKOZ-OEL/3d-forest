@@ -69,27 +69,11 @@ void EditorViewports::selectCamera(size_t viewport, const Camera &camera)
     viewports_[viewport]->selectCamera(camera);
 }
 
-void EditorViewports::setStateRead()
+void EditorViewports::setState(EditorPage::State state)
 {
     for (auto &it : viewports_)
     {
-        it->setStateRead();
-    }
-}
-
-void EditorViewports::setStateSelect()
-{
-    for (auto &it : viewports_)
-    {
-        it->setStateSelect();
-    }
-}
-
-void EditorViewports::setStateRender()
-{
-    for (auto &it : viewports_)
-    {
-        it->setStateRender();
+        it->setState(state);
     }
 }
 

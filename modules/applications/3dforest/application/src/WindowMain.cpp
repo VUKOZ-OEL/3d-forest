@@ -729,7 +729,7 @@ void WindowMain::actionDataSets()
 
     editor_.setDatasets(windowDataSets_->datasets());
     windowViewports_->resetScene(&editor_, false);
-    editor_.viewports().setStateSelect();
+    editor_.viewports().setState(EditorPage::STATE_SELECT);
 
     editor_.detach();
 }
@@ -750,7 +750,7 @@ void WindowMain::actionClassifications()
     editor_.cancelThreads();
     editor_.lock();
     editor_.setClassifications(windowClassifications_->classifications());
-    editor_.viewports().setStateSelect();
+    editor_.viewports().setState(EditorPage::STATE_SELECT);
     editor_.unlock();
     editor_.restartThreads();
 }
@@ -760,7 +760,7 @@ void WindowMain::actionLayers()
     editor_.cancelThreads();
     editor_.lock();
     editor_.setLayers(windowLayers_->layers());
-    editor_.viewports().setStateSelect();
+    editor_.viewports().setState(EditorPage::STATE_SELECT);
     editor_.unlock();
     editor_.restartThreads();
 }
@@ -769,9 +769,8 @@ void WindowMain::actionClipFilter(const ClipFilter &clipFilter)
 {
     editor_.cancelThreads();
     editor_.lock();
-    /** @todo There is a bug when clip filter is disabled. */
     editor_.setClipFilter(clipFilter);
-    editor_.viewports().setStateSelect();
+    editor_.viewports().setState(EditorPage::STATE_SELECT);
     editor_.unlock();
     editor_.restartThreads();
 }
@@ -781,7 +780,7 @@ void WindowMain::actionClipFilterReset()
     editor_.cancelThreads();
     editor_.lock();
     editor_.resetClipFilter();
-    editor_.viewports().setStateSelect();
+    editor_.viewports().setState(EditorPage::STATE_SELECT);
     editor_.unlock();
     editor_.restartThreads();
     windowClipFilter_->setClipFilter(editor_);
@@ -792,6 +791,7 @@ void WindowMain::actionSettingsView()
     editor_.cancelThreads();
     editor_.lock();
     editor_.setSettingsView(windowSettingsView_->settings());
+    editor_.viewports().setState(EditorPage::STATE_RENDER);
     editor_.unlock();
     editor_.restartThreads();
 }
@@ -801,7 +801,7 @@ void WindowMain::actionSettingsViewColor()
     editor_.cancelThreads();
     editor_.lock();
     editor_.setSettingsView(windowSettingsView_->settings());
-    editor_.viewports().setStateSelect();
+    editor_.viewports().setState(EditorPage::STATE_FILTER);
     editor_.unlock();
     editor_.restartThreads();
 }
