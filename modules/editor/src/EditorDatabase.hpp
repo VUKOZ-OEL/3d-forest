@@ -38,15 +38,13 @@ public:
     ~EditorDatabase();
 
     // File
-    void newProject();
-    void openProject(const std::string &path);
-    void openDataset(
-        const std::string &path,
-        const EditorSettingsImport &settings = EditorSettingsImport());
-    void saveProject(const std::string &path);
+    void open(const std::string &path,
+              const EditorSettingsImport &settings = EditorSettingsImport());
+    void save(const std::string &path);
     const std::string &projectPath() const { return path_; }
     const std::string &projectName() const { return projectName_; }
     bool hasUnsavedChanges() const { return unsavedChanges_; }
+    void close();
 
     // Classifications
     const EditorClassifications &classifications() const
@@ -102,6 +100,12 @@ protected:
 
     // Viewports
     EditorViewports viewports_;
+
+    void openProject(const std::string &path);
+
+    void openDataset(
+        const std::string &path,
+        const EditorSettingsImport &settings = EditorSettingsImport());
 
     void updateAfterRead();
 };

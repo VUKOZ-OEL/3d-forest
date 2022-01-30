@@ -165,6 +165,7 @@ protected:
     void select();
 
     void selectBox();
+    void selectCone();
     void selectClassification();
     void selectLayer();
 

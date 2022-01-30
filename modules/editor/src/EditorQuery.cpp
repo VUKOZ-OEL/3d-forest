@@ -37,8 +37,19 @@ EditorQuery::~EditorQuery()
 void EditorQuery::exec()
 {
     selectedPages_.clear();
-    editor_->datasets().select(selectedPages_, selectBox_);
+
+    if (!selectBox_.empty())
+    {
+        editor_->datasets().select(selectedPages_, selectBox_);
+    }
+
+    if (!selectCone_.empty())
+    {
+        editor_->datasets().select(selectedPages_, selectCone_.box());
+    }
+
     reset();
+
     setState(EditorPage::STATE_SELECT);
 }
 
@@ -152,6 +163,11 @@ bool EditorQuery::nextState()
 void EditorQuery::selectBox(const Box<double> &box)
 {
     selectBox_ = box;
+}
+
+void EditorQuery::selectCone(double x, double y, double z, double z2, double r)
+{
+    selectCone_.set(x, y, z, z2, r);
 }
 
 void EditorQuery::selectCamera(const Camera &camera)

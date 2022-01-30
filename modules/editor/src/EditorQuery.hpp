@@ -23,6 +23,7 @@
 #define EDITOR_QUERY_HPP
 
 #include <Camera.hpp>
+#include <Cone.hpp>
 #include <EditorPage.hpp>
 #include <unordered_set>
 
@@ -36,9 +37,11 @@ public:
     ~EditorQuery();
 
     void selectBox(const Box<double> &box);
+    void selectCone(double x, double y, double z, double z2, double r);
     void selectCamera(const Camera &camera);
 
     const Box<double> &selectedBox() const { return selectBox_; }
+    const Cone<double> &selectedCone() const { return selectCone_; }
 
     void exec();
     void reset();
@@ -104,7 +107,7 @@ public:
     EditorPage *page() { return page_.get(); }
     size_t pageSizeEstimate() const;
 
-    void setGrid(size_t pointsPerCell = 10000);
+    void setGrid(size_t pointsPerCell = 100000);
     bool nextGrid();
     const Box<double> &gridCell() const { return gridCell_; }
 
@@ -121,8 +124,9 @@ protected:
     // Parent
     EditorDatabase *editor_;
 
-    // Query statement
+    // Query
     Box<double> selectBox_;
+    Cone<double> selectCone_;
 
     // Grid
     Box<double> gridCell_;

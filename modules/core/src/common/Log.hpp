@@ -42,5 +42,7 @@
 
 #define LOG_EDITOR_QUERY(msg)
 //#define LOG_EDITOR_QUERY(msg) LOG_MODULE("EditorQuery", msg)
+#define LOG_EDITOR_PAGE(msg)
+//#define LOG_EDITOR_PAGE(msg) LOG_MODULE("EditorPage", msg)
 
 #endif /* LOG_HPP */

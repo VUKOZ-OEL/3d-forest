@@ -857,7 +857,7 @@ bool WindowMain::projectOpen(const QString &path)
     // Open new project
     try
     {
-        editor_.openProject(path.toStdString());
+        editor_.open(path.toStdString());
     }
     catch (std::exception &e)
     {
@@ -914,7 +914,7 @@ bool WindowMain::projectClose()
     // Close
     try
     {
-        editor_.newProject();
+        editor_.close();
     }
     catch (std::exception &e)
     {
@@ -959,7 +959,7 @@ bool WindowMain::projectSave(const QString &path)
     // Write
     try
     {
-        editor_.saveProject(writePath);
+        editor_.save(writePath);
     }
     catch (std::exception &e)
     {

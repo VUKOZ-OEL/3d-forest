@@ -278,6 +278,7 @@ void EditorPage::select()
 
     // Apply new selection.
     selectBox();
+    selectCone();
     selectClassification();
     selectLayer();
 
@@ -420,6 +421,66 @@ void EditorPage::selectBox()
             for (uint32_t j = 0; j < nNodePoints; j++)
             {
                 selection[nSelected++] = from + j;
+            }
+        }
+    }
+
+    selection.resize(nSelected);
+}
+
+void EditorPage::selectCone()
+{
+    const Cone<double> &cone = query_->selectedCone();
+    if (cone.empty())
+    {
+        return;
+    }
+
+    // Select octants
+    std::vector<FileIndex::Selection> selectedNodes;
+    octree.selectLeaves(selectedNodes, cone.box(), datasetId_);
+
+    // Compute upper limit of the number of selected points
+    size_t nSelected = 0;
+
+    for (size_t i = 0; i < selectedNodes.size(); i++)
+    {
+        const FileIndex::Node *nodeL2 = octree.at(selectedNodes[i].idx);
+        if (!nodeL2)
+        {
+            continue;
+        }
+
+        nSelected += static_cast<size_t>(nodeL2->size);
+    }
+
+    selection.resize(nSelected);
+
+    // Select points
+    nSelected = 0;
+
+    for (size_t i = 0; i < selectedNodes.size(); i++)
+    {
+        const FileIndex::Node *nodeL2 = octree.at(selectedNodes[i].idx);
+        if (!nodeL2)
+        {
+            continue;
+        }
+
+        uint32_t nNodePoints = static_cast<uint32_t>(nodeL2->size);
+        uint32_t from = static_cast<uint32_t>(nodeL2->from);
+
+        // Partial selection, apply clip filter
+        for (uint32_t j = 0; j < nNodePoints; j++)
+        {
+            uint32_t idx = from + j;
+            double x = position[3 * idx + 0];
+            double y = position[3 * idx + 1];
+            double z = position[3 * idx + 2];
+
+            if (cone.isInside(x, y, z))
+            {
+                selection[nSelected++] = idx;
             }
         }
     }

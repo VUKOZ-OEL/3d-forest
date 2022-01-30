@@ -33,21 +33,26 @@ static void classify(const char *inputPath)
     }
 
     EditorDatabase db;
-    db.openDataset(inputPath);
+    db.open(inputPath);
 
     double zMax = db.clipBoundary().max(2);
     double zMin = db.clipBoundary().min(2);
     double zMinCell;
     double zMaxGround;
 
+    double angle = 40.0;
+    double groundErrorPercent = 15.0;
+
     // std::cout << "z max is " << zMax << std::endl;
     // std::cout << "z min is " << zMin << std::endl;
 
+    EditorQuery queryPoint(&db);
     EditorQuery query(&db);
     query.setGrid();
 
     while (query.nextGrid())
     {
+        // Select grid cell.
         query.selectBox(query.gridCell());
         query.exec();
 
@@ -60,7 +65,7 @@ static void classify(const char *inputPath)
                 zMinCell = query.z();
             }
         }
-        zMaxGround = zMinCell + (((zMax - zMin) / 100.0) * 5.0);
+        zMaxGround = zMinCell + (((zMax - zMin) * 0.01) * groundErrorPercent);
 
         // Set classification to 'ground' or 'unassigned'.
         query.reset();
@@ -68,14 +73,31 @@ static void classify(const char *inputPath)
         {
             if (query.z() < zMaxGround)
             {
-                query.classification() = 2;
-                query.setModified();
+                queryPoint.selectCone(query.x(),
+                                      query.y(),
+                                      query.z(),
+                                      zMinCell,
+                                      angle);
+                queryPoint.exec();
+
+                if (queryPoint.nextPoint())
+                {
+                    // unassigned (has some points below inside the cone)
+                    query.classification() = 1;
+                }
+                else
+                {
+                    // ground
+                    query.classification() = 2;
+                }
             }
             else
             {
+                // unassigned (could be a roof)
                 query.classification() = 1;
-                query.setModified();
             }
+
+            query.setModified();
         }
     }
 
