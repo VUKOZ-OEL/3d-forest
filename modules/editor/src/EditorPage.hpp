@@ -121,14 +121,23 @@ public:
     void write();
 
     // Individual states
-    void setStateRead();
-    void setStateSelect();
-    void setStateRender();
+    /** Editor Page State. */
+    enum State
+    {
+        STATE_READ,
+        STATE_TRANSFORM,
+        STATE_SELECT,
+        STATE_FILTER,
+        STATE_RENDER,
+        STATE_RENDERED
+    };
+
+    EditorPage::State state() const { return state_; }
+    void setState(EditorPage::State state);
     bool nextState();
-    bool nextStateRender();
 
     void setModified();
-    bool isModified() const { return modified; }
+    bool isModified() const { return modified_; }
 
 protected:
     // Parent
@@ -140,11 +149,8 @@ protected:
     uint32_t pageId_;
 
     // State
-    bool loaded;
-    bool transformed;
-    bool selected;
-    bool rendered;
-    bool modified;
+    EditorPage::State state_;
+    bool modified_;
 
     // File data
     std::vector<uint8_t> buffer_;
@@ -159,9 +165,12 @@ protected:
     void select();
 
     void selectBox();
+    void selectCone();
     void selectClassification();
     void selectLayer();
-    void selectColor();
+
+    void filter();
+    void filterColor();
 
     void setColor(size_t idx,
                   size_t value,

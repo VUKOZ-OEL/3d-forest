@@ -37,9 +37,20 @@ EditorQuery::~EditorQuery()
 void EditorQuery::exec()
 {
     selectedPages_.clear();
-    editor_->datasets().select(selectedPages_, selectBox_);
+
+    if (!selectBox_.empty())
+    {
+        editor_->datasets().select(selectedPages_, selectBox_);
+    }
+
+    if (!selectCone_.empty())
+    {
+        editor_->datasets().select(selectedPages_, selectCone_.box());
+    }
+
     reset();
-    setStateSelect();
+
+    setState(EditorPage::STATE_SELECT);
 }
 
 void EditorQuery::reset()
@@ -127,27 +138,11 @@ void EditorQuery::write()
     }
 }
 
-void EditorQuery::setStateRead()
+void EditorQuery::setState(EditorPage::State state)
 {
     for (auto &it : cache_)
     {
-        it.second->setStateRead();
-    }
-}
-
-void EditorQuery::setStateSelect()
-{
-    for (auto &it : cache_)
-    {
-        it.second->setStateSelect();
-    }
-}
-
-void EditorQuery::setStateRender()
-{
-    for (size_t i = 0; i < lru_.size(); i++)
-    {
-        lru_[i]->setStateRender();
+        it.second->setState(state);
     }
 }
 
@@ -168,6 +163,11 @@ bool EditorQuery::nextState()
 void EditorQuery::selectBox(const Box<double> &box)
 {
     selectBox_ = box;
+}
+
+void EditorQuery::selectCone(double x, double y, double z, double z2, double r)
+{
+    selectCone_.set(x, y, z, z2, r);
 }
 
 void EditorQuery::selectCamera(const Camera &camera)
@@ -263,7 +263,7 @@ void EditorQuery::selectCamera(const Camera &camera)
         }
     }
 
-    setStateRender();
+    setState(EditorPage::STATE_RENDER);
 }
 
 static void editorQueryCreateGrid(std::vector<uint64_t> &grid,

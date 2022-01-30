@@ -281,7 +281,7 @@ bool GLWidget::renderScene()
     {
         EditorPage &page = editor_->viewports().page(viewportId_, pageIndex);
 
-        if (page.nextStateRender())
+        if (page.state() == EditorPage::STATE_RENDER)
         {
             if (pageIndex == 0)
             {
@@ -294,6 +294,8 @@ bool GLWidget::renderScene()
                        page.renderColor,
                        page.selection);
             glFlush();
+
+            page.setState(EditorPage::STATE_RENDERED);
 
             double t2 = getRealTime();
             if (t2 - t1 > 0.02)

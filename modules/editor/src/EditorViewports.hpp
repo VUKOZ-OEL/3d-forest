@@ -39,9 +39,7 @@ public:
     void selectBox(const Box<double> &box);
     void selectCamera(size_t viewport, const Camera &camera);
 
-    void setStateRead();
-    void setStateSelect();
-    void setStateRender();
+    void setState(EditorPage::State state);
     bool nextState();
 
     size_t pageSize(size_t viewport) const

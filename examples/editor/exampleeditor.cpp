@@ -56,7 +56,7 @@ static void createDataSet()
 static void edit()
 {
     EditorDatabase db;
-    db.openDataset(PATH_1);
+    db.open(PATH_1);
 
     double zmin = db.clipBoundary().max(2);
 

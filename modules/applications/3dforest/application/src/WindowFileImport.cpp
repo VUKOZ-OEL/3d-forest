@@ -183,7 +183,7 @@ static void windowFileImportFile(const QString &path,
 
     if (windowFileImportCreateIndex(path, settings, window, editor))
     {
-        editor->openDataset(path.toStdString(), settings);
+        editor->open(path.toStdString(), settings);
     }
 
     window->updateProject();

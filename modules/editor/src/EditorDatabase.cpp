@@ -32,7 +32,7 @@ static const char *EDITOR_BASE_KEY_CLASSIFICATIONS = "classifications";
 
 EditorDatabase::EditorDatabase()
 {
-    newProject();
+    close();
     viewportsResize(1);
 }
 
@@ -40,7 +40,7 @@ EditorDatabase::~EditorDatabase()
 {
 }
 
-void EditorDatabase::newProject()
+void EditorDatabase::close()
 {
     path_ = File::currentPath() + "\\untitled.json";
     projectName_ = "Untitled";
@@ -53,9 +53,31 @@ void EditorDatabase::newProject()
     unsavedChanges_ = false;
 }
 
+void EditorDatabase::open(const std::string &path,
+                          const EditorSettingsImport &settings)
+{
+    // Get filename extension in lower case (no UTF).
+    std::string ext = File::fileExtension(path);
+    for (auto &c : ext)
+    {
+        c = static_cast<char>(std::tolower(c));
+    }
+
+    if (ext == "json")
+    {
+        // Open new project from json format.
+        openProject(path);
+    }
+    else
+    {
+        // Add new dataset to existing project.
+        openDataset(path, settings);
+    }
+}
+
 void EditorDatabase::openProject(const std::string &path)
 {
-    newProject();
+    close();
 
     Json in;
     in.read(path);
@@ -111,14 +133,14 @@ void EditorDatabase::openProject(const std::string &path)
     }
     catch (std::exception &e)
     {
-        newProject();
+        close();
         throw;
     }
 
     updateAfterRead();
 }
 
-void EditorDatabase::saveProject(const std::string &path)
+void EditorDatabase::save(const std::string &path)
 {
     Json out;
 
@@ -219,7 +241,6 @@ void EditorDatabase::setLayers(const EditorLayers &layers)
 void EditorDatabase::setSettingsView(const EditorSettingsView &settings)
 {
     settings_.setView(settings);
-    viewports_.setStateRender();
     unsavedChanges_ = true;
 }
 
