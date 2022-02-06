@@ -292,7 +292,9 @@ bool GLWidget::renderScene()
             GL::render(GL::POINTS,
                        page.renderPosition,
                        page.renderColor,
-                       page.selection);
+                       page.selection,
+                       page.selectionSize);
+
             glFlush();
 
             page.setState(EditorPage::STATE_RENDERED);

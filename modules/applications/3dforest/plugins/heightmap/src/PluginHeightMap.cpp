@@ -133,7 +133,7 @@ void PluginHeightMapFilter::filterPage(EditorPage *page)
 
     const std::vector<uint32_t> &selection = page->selection;
 
-    for (size_t i = 0; i < selection.size(); i++)
+    for (size_t i = 0; i < page->selectionSize; i++)
     {
         size_t row = selection[i];
 

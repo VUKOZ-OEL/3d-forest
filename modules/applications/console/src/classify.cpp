@@ -25,7 +25,7 @@
 #include <Time.hpp>
 #include <cstring>
 
-static void classify(const char *inputPath)
+static void classify(const char *inputPath, int nGridsMax)
 {
     if (!inputPath)
     {
@@ -50,6 +50,13 @@ static void classify(const char *inputPath)
     EditorQuery query(&db);
     query.setGrid();
 
+    double t1 = getRealTime();
+
+    int nGrids = 0;
+    int nPoints = 0;
+    int nPointsGroundLevel = 0;
+    int nPointsGround = 0;
+
     while (query.nextGrid())
     {
         // Select grid cell.
@@ -71,8 +78,13 @@ static void classify(const char *inputPath)
         query.reset();
         while (query.nextPoint())
         {
+            nPoints++;
+
             if (query.z() < zMaxGround)
             {
+                nPointsGroundLevel++;
+
+                queryPoint.setMaximumResults(1);
                 queryPoint.selectCone(query.x(),
                                       query.y(),
                                       query.z(),
@@ -82,26 +94,41 @@ static void classify(const char *inputPath)
 
                 if (queryPoint.nextPoint())
                 {
-                    // unassigned (has some points below inside the cone)
-                    query.classification() = 1;
+                    // unassigned (has some points below, inside the cone)
+                    query.classification() = FileLas::CLASS_UNASSIGNED;
+                    nPointsGround++;
                 }
                 else
                 {
                     // ground
-                    query.classification() = 2;
+                    query.classification() = FileLas::CLASS_GROUND;
                 }
             }
             else
             {
                 // unassigned (could be a roof)
-                query.classification() = 1;
+                query.classification() = FileLas::CLASS_UNASSIGNED;
             }
 
             query.setModified();
         }
+
+        nGrids++;
+        if (nGrids == nGridsMax)
+        {
+            break;
+        }
     }
 
+    double t2 = getRealTime();
+
     query.write();
+
+    std::cout << (t2 - t1) << " seconds" << std::endl;
+    std::cout << "nGrids=" << nGrids << std::endl;
+    std::cout << "nPoints=" << nPoints << std::endl;
+    std::cout << "nPointsGroundLevel=" << nPointsGroundLevel << std::endl;
+    std::cout << "nPointsGround=" << nPointsGround << std::endl;
 }
 
 static void getarg(const char **v, int &opt, int argc, char *argv[])
@@ -113,9 +140,19 @@ static void getarg(const char **v, int &opt, int argc, char *argv[])
     }
 }
 
+void getarg(int *v, int &opt, int argc, char *argv[])
+{
+    opt++;
+    if (opt < argc)
+    {
+        *v = std::stoi(argv[opt]);
+    }
+}
+
 int main(int argc, char *argv[])
 {
     const char *inputPath = nullptr;
+    int nGridsMax = 0;
 
     // Parse command line arguments
     for (int opt = 1; opt < argc; opt++)
@@ -124,12 +161,16 @@ int main(int argc, char *argv[])
         {
             getarg(&inputPath, opt, argc, argv);
         }
+        else if (strcmp(argv[opt], "-m") == 0)
+        {
+            getarg(&nGridsMax, opt, argc, argv);
+        }
     }
 
     // Execute command
     try
     {
-        classify(inputPath);
+        classify(inputPath, nGridsMax);
     }
     catch (std::exception &e)
     {

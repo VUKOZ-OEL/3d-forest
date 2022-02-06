@@ -87,6 +87,7 @@ public:
 
     /** Index array contains indices to selected points. */
     std::vector<uint32_t> selection;
+    size_t selectionSize;
 
     /** Bounding box. */
     Box<double> box;
@@ -155,6 +156,9 @@ protected:
     // File data
     std::vector<uint8_t> buffer_;
     std::vector<double> positionBase_;
+
+    // Buffer
+    std::vector<FileIndex::Selection> selectedNodes_;
 
     void clear();
     void resize(size_t n);

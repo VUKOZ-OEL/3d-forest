@@ -48,7 +48,8 @@ public:
     static void render(Mode mode,
                        const std::vector<float> &xyz,
                        const std::vector<float> &rgb,
-                       const std::vector<unsigned int> &indices);
+                       const std::vector<unsigned int> &indices,
+                       size_t count);
 
     static void renderClipFilter(const ClipFilter &clipFilter);
     static void renderAabb(const GLAabb &box);

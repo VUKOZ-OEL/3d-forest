@@ -37,11 +37,13 @@ public:
     ~EditorQuery();
 
     void selectBox(const Box<double> &box);
-    void selectCone(double x, double y, double z, double z2, double r);
+    void selectCone(double x, double y, double z, double z2, double angle);
     void selectCamera(const Camera &camera);
+    void setMaximumResults(size_t nPoints);
 
     const Box<double> &selectedBox() const { return selectBox_; }
     const Cone<double> &selectedCone() const { return selectCone_; }
+    size_t maximumResults() const { return maximumResults_; }
 
     void exec();
     void reset();
@@ -127,6 +129,7 @@ protected:
     // Query
     Box<double> selectBox_;
     Cone<double> selectCone_;
+    size_t maximumResults_;
 
     // Grid
     Box<double> gridCell_;
