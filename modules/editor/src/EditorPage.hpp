@@ -87,6 +87,7 @@ public:
 
     /** Index array contains indices to selected points. */
     std::vector<uint32_t> selection;
+    size_t selectionSize;
 
     /** Bounding box. */
     Box<double> box;

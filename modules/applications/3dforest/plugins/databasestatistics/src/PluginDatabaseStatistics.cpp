@@ -115,7 +115,7 @@ void PluginDatabaseStatisticsWindow::computeReset()
 
 void PluginDatabaseStatisticsWindow::computeStep(EditorPage *page)
 {
-    for (size_t i = 0; i < page->selection.size(); i++)
+    for (size_t i = 0; i < page->selectionSize; i++)
     {
         numberOfPoints_++;
 

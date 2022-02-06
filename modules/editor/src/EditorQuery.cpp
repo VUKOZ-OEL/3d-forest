@@ -28,6 +28,7 @@
 EditorQuery::EditorQuery(EditorDatabase *editor) : editor_(editor)
 {
     cacheSizeMax_ = 200;
+    maximumResults_ = 0;
 }
 
 EditorQuery::~EditorQuery()
@@ -88,12 +89,12 @@ bool EditorQuery::nextPage()
         page_->nextState();
         pageIndex_++;
 
-        if (page_.get() && page_->selection.size() > 0)
+        if (page_.get() && page_->selectionSize > 0)
         {
             // This page is in selection.
 
             // Set point index range within the page.
-            pagePointIndexMax_ = page_->selection.size() - 1;
+            pagePointIndexMax_ = page_->selectionSize - 1;
 
             // Point to current page data.
             position_ = page_->position.data();
@@ -165,9 +166,13 @@ void EditorQuery::selectBox(const Box<double> &box)
     selectBox_ = box;
 }
 
-void EditorQuery::selectCone(double x, double y, double z, double z2, double r)
+void EditorQuery::selectCone(double x,
+                             double y,
+                             double z,
+                             double z2,
+                             double angle)
 {
-    selectCone_.set(x, y, z, z2, r);
+    selectCone_.set(x, y, z, z2, angle);
 }
 
 void EditorQuery::selectCamera(const Camera &camera)
@@ -297,6 +302,11 @@ static void editorQueryCreateGrid(std::vector<uint64_t> &grid,
     editorQueryCreateGrid(grid, x1 + px, x2, y1, y1 + py);
     editorQueryCreateGrid(grid, x1, x1 + px, y1 + py, y2);
     editorQueryCreateGrid(grid, x1 + px, x2, y1 + py, y2);
+}
+
+void EditorQuery::setMaximumResults(size_t nPoints)
+{
+    maximumResults_ = nPoints;
 }
 
 void EditorQuery::setGrid(size_t pointsPerCell)

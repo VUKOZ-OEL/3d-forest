@@ -30,6 +30,7 @@
 class EditorClassifications
 {
 public:
+    /** Editor Classifications Class. */
     struct Class
     {
         std::string label;

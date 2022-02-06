@@ -164,6 +164,18 @@ public:
         Json &write(Json &out) const;
     };
 
+    /** LAS Classification. */
+    enum Classification
+    {
+        CLASS_NEVER_CLASSIFIED,
+        CLASS_UNASSIGNED,
+        CLASS_GROUND,
+        CLASS_LOW_VEGETATION,
+        CLASS_MEDIUM_VEGETATION,
+        CLASS_HIGH_VEGETATION,
+        CLASS_BUILDING
+    };
+
     Header header;
 
     FileLas();

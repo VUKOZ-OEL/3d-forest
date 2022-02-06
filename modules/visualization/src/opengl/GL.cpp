@@ -77,7 +77,8 @@ void GL::render(Mode mode,
 void GL::render(Mode mode,
                 const std::vector<float> &xyz,
                 const std::vector<float> &rgb,
-                const std::vector<unsigned int> &indices)
+                const std::vector<unsigned int> &indices,
+                size_t count)
 {
     // Specify what kind of primitives to render
     GLenum glmode;
@@ -96,7 +97,7 @@ void GL::render(Mode mode,
     }
 
     // Render
-    GLsizei n = static_cast<GLsizei>(indices.size());
+    GLsizei n = static_cast<GLsizei>(count);
     if (n > 0)
     {
         glEnableClientState(GL_VERTEX_ARRAY);

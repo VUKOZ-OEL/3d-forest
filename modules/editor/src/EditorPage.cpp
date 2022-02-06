@@ -34,7 +34,8 @@ EditorPage::EditorPage(EditorDatabase *editor,
                        EditorQuery *query,
                        uint32_t datasetId,
                        uint32_t pageId)
-    : editor_(editor),
+    : selectionSize(0),
+      editor_(editor),
       query_(query),
       datasetId_(datasetId),
       pageId_(pageId),
@@ -64,6 +65,8 @@ void EditorPage::clear()
     renderColor.clear();
 
     selection.clear();
+    selectionSize = 0;
+
     box.clear();
     octree.clear();
 }
@@ -85,6 +88,7 @@ void EditorPage::resize(size_t n)
     renderColor.resize(n * 3);
 
     selection.resize(n);
+    selectionSize = n;
 
     positionBase_.resize(n * 3);
 }
@@ -268,12 +272,19 @@ void EditorPage::transform()
 
 void EditorPage::select()
 {
-    // Reset selection to mark all points as selected.
-    size_t n = position.size() / 3;
-    selection.resize(n);
-    for (size_t i = 0; i < n; i++)
+    const Box<double> &clipBox = query_->selectedBox();
+    const Cone<double> &cone = query_->selectedCone();
+
+    if (clipBox.empty() && cone.empty())
     {
-        selection[i] = static_cast<uint32_t>(i);
+        // Reset selection to mark all points as selected.
+        size_t n = position.size() / 3;
+        selection.resize(n);
+        selectionSize = n;
+        for (size_t i = 0; i < n; i++)
+        {
+            selection[i] = static_cast<uint32_t>(i);
+        }
     }
 
     // Apply new selection.
@@ -383,7 +394,11 @@ void EditorPage::selectBox()
         nSelected += static_cast<size_t>(nodeL2->size);
     }
 
-    selection.resize(nSelected);
+    selectionSize = nSelected;
+    if (selection.size() < selectionSize)
+    {
+        selection.resize(selectionSize);
+    }
 
     // Select points
     nSelected = 0;
@@ -398,34 +413,81 @@ void EditorPage::selectBox()
 
         uint32_t nNodePoints = static_cast<uint32_t>(nodeL2->size);
         uint32_t from = static_cast<uint32_t>(nodeL2->from);
+        size_t max = query_->maximumResults();
 
-        if (selectedNodes[i].partial)
+        if (max == 0)
         {
-            // Partial selection, apply clip filter
-            for (uint32_t j = 0; j < nNodePoints; j++)
+            // Unlimited number of results
+            if (selectedNodes[i].partial)
             {
-                uint32_t idx = from + j;
-                double x = position[3 * idx + 0];
-                double y = position[3 * idx + 1];
-                double z = position[3 * idx + 2];
-
-                if (clipBox.isInside(x, y, z))
+                // Partial selection, apply clip filter
+                for (uint32_t j = 0; j < nNodePoints; j++)
                 {
-                    selection[nSelected++] = idx;
+                    uint32_t idx = from + j;
+                    double x = position[3 * idx + 0];
+                    double y = position[3 * idx + 1];
+                    double z = position[3 * idx + 2];
+
+                    if (clipBox.isInside(x, y, z))
+                    {
+                        selection[nSelected++] = idx;
+                    }
+                }
+            }
+            else
+            {
+                // Everything
+                for (uint32_t j = 0; j < nNodePoints; j++)
+                {
+                    selection[nSelected++] = from + j;
                 }
             }
         }
         else
         {
-            // Everything
-            for (uint32_t j = 0; j < nNodePoints; j++)
+            // Limited number of results
+            if (selectedNodes[i].partial)
             {
-                selection[nSelected++] = from + j;
+                // Partial selection, apply clip filter
+                for (uint32_t j = 0; j < nNodePoints; j++)
+                {
+                    uint32_t idx = from + j;
+                    double x = position[3 * idx + 0];
+                    double y = position[3 * idx + 1];
+                    double z = position[3 * idx + 2];
+
+                    if (clipBox.isInside(x, y, z))
+                    {
+                        selection[nSelected++] = idx;
+                        if (nSelected == max)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // Everything
+                if (nNodePoints > max)
+                {
+                    nNodePoints = static_cast<uint32_t>(max);
+                }
+
+                for (uint32_t j = 0; j < nNodePoints; j++)
+                {
+                    selection[nSelected++] = from + j;
+                }
+            }
+
+            if (nSelected == max)
+            {
+                break;
             }
         }
     }
 
-    selection.resize(nSelected);
+    selectionSize = nSelected;
 }
 
 void EditorPage::selectCone()
@@ -454,7 +516,11 @@ void EditorPage::selectCone()
         nSelected += static_cast<size_t>(nodeL2->size);
     }
 
-    selection.resize(nSelected);
+    selectionSize = nSelected;
+    if (selection.size() < selectionSize)
+    {
+        selection.resize(selectionSize);
+    }
 
     // Select points
     nSelected = 0;
@@ -469,6 +535,7 @@ void EditorPage::selectCone()
 
         uint32_t nNodePoints = static_cast<uint32_t>(nodeL2->size);
         uint32_t from = static_cast<uint32_t>(nodeL2->from);
+        size_t max = query_->maximumResults();
 
         // Partial selection, apply clip filter
         for (uint32_t j = 0; j < nNodePoints; j++)
@@ -481,11 +548,20 @@ void EditorPage::selectCone()
             if (cone.isInside(x, y, z))
             {
                 selection[nSelected++] = idx;
+                if (nSelected == max)
+                {
+                    break;
+                }
             }
+        }
+
+        if (nSelected == max)
+        {
+            break;
         }
     }
 
-    selection.resize(nSelected);
+    selectionSize = nSelected;
 }
 
 void EditorPage::selectClassification()
@@ -497,10 +573,9 @@ void EditorPage::selectClassification()
         return;
     }
 
-    size_t nSelected = selection.size();
     size_t nSelectedNew = 0;
 
-    for (size_t i = 0; i < nSelected; i++)
+    for (size_t i = 0; i < selectionSize; i++)
     {
         uint32_t idx = selection[i];
 
@@ -514,7 +589,7 @@ void EditorPage::selectClassification()
         }
     }
 
-    selection.resize(nSelectedNew);
+    selectionSize = nSelectedNew;
 }
 
 void EditorPage::selectLayer()
@@ -526,10 +601,9 @@ void EditorPage::selectLayer()
         return;
     }
 
-    size_t nSelected = selection.size();
     size_t nSelectedNew = 0;
 
-    for (size_t i = 0; i < nSelected; i++)
+    for (size_t i = 0; i < selectionSize; i++)
     {
         uint32_t idx = selection[i];
 
@@ -543,7 +617,7 @@ void EditorPage::selectLayer()
         }
     }
 
-    selection.resize(nSelectedNew);
+    selectionSize = nSelectedNew;
 }
 
 void EditorPage::filterColor()
