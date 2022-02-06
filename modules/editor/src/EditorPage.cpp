@@ -91,6 +91,8 @@ void EditorPage::resize(size_t n)
     selectionSize = n;
 
     positionBase_.resize(n * 3);
+
+    selectedNodes_.reserve(32);
 }
 
 void EditorPage::read()
@@ -377,15 +379,15 @@ void EditorPage::selectBox()
     }
 
     // Select octants
-    std::vector<FileIndex::Selection> selectedNodes;
-    octree.selectLeaves(selectedNodes, clipBox, datasetId_);
+    selectedNodes_.resize(0);
+    octree.selectLeaves(selectedNodes_, clipBox, datasetId_);
 
     // Compute upper limit of the number of selected points
     size_t nSelected = 0;
 
-    for (size_t i = 0; i < selectedNodes.size(); i++)
+    for (size_t i = 0; i < selectedNodes_.size(); i++)
     {
-        const FileIndex::Node *nodeL2 = octree.at(selectedNodes[i].idx);
+        const FileIndex::Node *nodeL2 = octree.at(selectedNodes_[i].idx);
         if (!nodeL2)
         {
             continue;
@@ -403,9 +405,9 @@ void EditorPage::selectBox()
     // Select points
     nSelected = 0;
 
-    for (size_t i = 0; i < selectedNodes.size(); i++)
+    for (size_t i = 0; i < selectedNodes_.size(); i++)
     {
-        const FileIndex::Node *nodeL2 = octree.at(selectedNodes[i].idx);
+        const FileIndex::Node *nodeL2 = octree.at(selectedNodes_[i].idx);
         if (!nodeL2)
         {
             continue;
@@ -418,7 +420,7 @@ void EditorPage::selectBox()
         if (max == 0)
         {
             // Unlimited number of results
-            if (selectedNodes[i].partial)
+            if (selectedNodes_[i].partial)
             {
                 // Partial selection, apply clip filter
                 for (uint32_t j = 0; j < nNodePoints; j++)
@@ -446,7 +448,7 @@ void EditorPage::selectBox()
         else
         {
             // Limited number of results
-            if (selectedNodes[i].partial)
+            if (selectedNodes_[i].partial)
             {
                 // Partial selection, apply clip filter
                 for (uint32_t j = 0; j < nNodePoints; j++)
@@ -499,15 +501,15 @@ void EditorPage::selectCone()
     }
 
     // Select octants
-    std::vector<FileIndex::Selection> selectedNodes;
-    octree.selectLeaves(selectedNodes, cone.box(), datasetId_);
+    selectedNodes_.resize(0);
+    octree.selectLeaves(selectedNodes_, cone.box(), datasetId_);
 
     // Compute upper limit of the number of selected points
     size_t nSelected = 0;
 
-    for (size_t i = 0; i < selectedNodes.size(); i++)
+    for (size_t i = 0; i < selectedNodes_.size(); i++)
     {
-        const FileIndex::Node *nodeL2 = octree.at(selectedNodes[i].idx);
+        const FileIndex::Node *nodeL2 = octree.at(selectedNodes_[i].idx);
         if (!nodeL2)
         {
             continue;
@@ -525,9 +527,11 @@ void EditorPage::selectCone()
     // Select points
     nSelected = 0;
 
-    for (size_t i = 0; i < selectedNodes.size(); i++)
+    size_t nOutside = 0;
+
+    for (size_t i = 0; i < selectedNodes_.size(); i++)
     {
-        const FileIndex::Node *nodeL2 = octree.at(selectedNodes[i].idx);
+        const FileIndex::Node *nodeL2 = octree.at(selectedNodes_[i].idx);
         if (!nodeL2)
         {
             continue;
@@ -552,6 +556,11 @@ void EditorPage::selectCone()
                 {
                     break;
                 }
+            }
+            else
+            {
+                // 100 to 1000 outside points until the first isInside
+                nOutside++;
             }
         }
 

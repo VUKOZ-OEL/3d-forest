@@ -157,6 +157,9 @@ protected:
     std::vector<uint8_t> buffer_;
     std::vector<double> positionBase_;
 
+    // Buffer
+    std::vector<FileIndex::Selection> selectedNodes_;
+
     void clear();
     void resize(size_t n);
 

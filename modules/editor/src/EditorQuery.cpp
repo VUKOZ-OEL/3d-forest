@@ -271,6 +271,7 @@ void EditorQuery::selectCamera(const Camera &camera)
     setState(EditorPage::STATE_RENDER);
 }
 
+// Create Z-order (Morton space filling curve), linear order of a quadtree.
 static void editorQueryCreateGrid(std::vector<uint64_t> &grid,
                                   size_t x1,
                                   size_t x2,
