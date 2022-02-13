@@ -22,38 +22,9 @@
 #ifndef PLUGIN_CLASSIFY_HPP
 #define PLUGIN_CLASSIFY_HPP
 
-#include <EditorFilter.hpp>
 #include <PluginTool.hpp>
-#include <QMutex>
-#include <Vector3.hpp>
-#include <WindowDock.hpp>
-#include <vector>
 
-class Editor;
-class EditorPage;
-class QSpinBox;
-class QComboBox;
-class QCheckBox;
-class QPushButton;
-class QCloseEvent;
-
-/** Plugin Classify Window. */
-class PluginClassifyWindow : public WindowDock
-{
-    Q_OBJECT
-
-public:
-    PluginClassifyWindow(QMainWindow *parent, Editor *editor);
-    ~PluginClassifyWindow() = default;
-
-protected slots:
-    void compute();
-
-protected:
-    Editor *editor_;
-    QWidget *widget_;
-    QPushButton *computeButton_;
-};
+class PluginClassifyWindow;
 
 /** Plugin Classify. */
 class PluginClassify : public QObject, public PluginTool

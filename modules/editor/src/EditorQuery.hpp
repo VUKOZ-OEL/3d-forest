@@ -46,8 +46,14 @@ public:
     size_t maximumResults() const { return maximumResults_; }
 
     void exec();
+    void exec(const std::vector<FileIndex::Selection> &selectedPages);
     void reset();
     void clear();
+
+    const std::vector<FileIndex::Selection> &selectedPages() const
+    {
+        return selectedPages_;
+    }
 
     bool nextPoint()
     {
@@ -109,9 +115,10 @@ public:
     EditorPage *page() { return page_.get(); }
     size_t pageSizeEstimate() const;
 
-    void setGrid(size_t pointsPerCell = 100000);
+    void setGrid(size_t pointsPerCell = 100000, double cellLengthMinPct = 1.0);
     bool nextGrid();
     const Box<double> &gridCell() const { return gridCell_; }
+    size_t gridSize() const { return grid_.size(); }
 
     void setState(EditorPage::State state);
     bool nextState();
