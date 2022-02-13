@@ -54,6 +54,15 @@ void EditorQuery::exec()
     setState(EditorPage::STATE_SELECT);
 }
 
+void EditorQuery::exec(const std::vector<FileIndex::Selection> &selectedPages)
+{
+    selectedPages_ = selectedPages;
+
+    reset();
+
+    setState(EditorPage::STATE_SELECT);
+}
+
 void EditorQuery::reset()
 {
     pageIndex_ = 0;
@@ -310,7 +319,7 @@ void EditorQuery::setMaximumResults(size_t nPoints)
     maximumResults_ = nPoints;
 }
 
-void EditorQuery::setGrid(size_t pointsPerCell)
+void EditorQuery::setGrid(size_t pointsPerCell, double cellLengthMinPct)
 {
     LOG_EDITOR_QUERY("");
 
@@ -329,6 +338,17 @@ void EditorQuery::setGrid(size_t pointsPerCell)
 
     double areaPerCell = areaClip / nCells;
     double cellLength = sqrt(areaPerCell);
+
+    double cellLengthMin = boundaryClip.length(0);
+    if (boundaryClip.length(1) < cellLengthMin)
+    {
+        cellLengthMin = boundaryClip.length(1);
+    }
+    cellLengthMin = cellLengthMin * 0.01 * cellLengthMinPct;
+    if (cellLength < cellLengthMin)
+    {
+        cellLength = cellLengthMin;
+    }
 
     gridXSize_ =
         static_cast<size_t>(round(boundaryClip.length(0) / cellLength));
