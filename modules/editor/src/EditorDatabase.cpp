@@ -188,6 +188,16 @@ void EditorDatabase::setClassifications(
     const EditorClassifications &classifications)
 {
     classifications_ = classifications;
+
+    if (classifications_.isEnabled())
+    {
+        viewports_.selectClassifications(classifications_.enabledList());
+    }
+    else
+    {
+        viewports_.selectClassifications({});
+    }
+
     // viewClearRendered();
     unsavedChanges_ = true;
 }
@@ -199,7 +209,7 @@ void EditorDatabase::setClipFilter(const ClipFilter &clipFilter)
                                    datasets_.boundary(),
                                    clipFilter_.box);
 
-    viewports().selectBox(clipBoundary());
+    viewports_.selectBox(clipBoundary());
 
     // unsavedChanges_ = true;
 }
@@ -235,6 +245,16 @@ void EditorDatabase::setDatasets(const EditorDatasets &datasets)
 void EditorDatabase::setLayers(const EditorLayers &layers)
 {
     layers_ = layers;
+
+    if (layers_.isEnabled())
+    {
+        viewports_.selectLayers(layers_.enabledList());
+    }
+    else
+    {
+        viewports_.selectLayers({});
+    }
+
     unsavedChanges_ = true;
 }
 

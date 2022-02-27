@@ -25,4 +25,7 @@ install(TARGETS sandbox DESTINATION bin)
 
 add_executable(classify src/classify.cpp)
 target_link_libraries(classify PUBLIC editor)
+target_include_directories(classify PUBLIC ../../../3rdparty/delaunator)
+target_include_directories(classify PUBLIC ../../../3rdparty/eigen)
+target_include_directories(classify PUBLIC ../../../3rdparty/libigl/include)
 install(TARGETS classify DESTINATION bin)

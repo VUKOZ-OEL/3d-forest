@@ -27,8 +27,8 @@
 
 EditorQuery::EditorQuery(EditorDatabase *editor) : editor_(editor)
 {
-    cacheSizeMax_ = 200;
     maximumResults_ = 0;
+    cacheSizeMax_ = 200;
 }
 
 EditorQuery::~EditorQuery()
@@ -52,6 +52,8 @@ void EditorQuery::exec()
     reset();
 
     setState(EditorPage::STATE_SELECT);
+
+    nResults_ = 0;
 }
 
 void EditorQuery::exec(const std::vector<FileIndex::Selection> &selectedPages)
@@ -61,6 +63,8 @@ void EditorQuery::exec(const std::vector<FileIndex::Selection> &selectedPages)
     reset();
 
     setState(EditorPage::STATE_SELECT);
+
+    nResults_ = 0;
 }
 
 void EditorQuery::reset()
@@ -82,6 +86,14 @@ void EditorQuery::clear()
     reset();
 }
 
+void EditorQuery::addResults(size_t n)
+{
+    if (maximumResults_ > 0)
+    {
+        nResults_ += n;
+    }
+}
+
 bool EditorQuery::nextPage()
 {
     LOG_EDITOR_QUERY("");
@@ -90,9 +102,16 @@ bool EditorQuery::nextPage()
     pagePointIndex_ = 0;
     pagePointIndexMax_ = 0;
 
+    if ((nResults_ != 0) && (nResults_ == maximumResults_))
+    {
+        return false;
+    }
+
     // Find next page in selection.
     while (pageIndex_ < selectedPages_.size())
     {
+        LOG_EDITOR_QUERY("pageIndex " << pageIndex_ << "/"
+                                      << selectedPages_.size());
         FileIndex::Selection &selectedPage = selectedPages_[pageIndex_];
         page_ = read(selectedPage.id, selectedPage.idx);
         page_->nextState();
@@ -182,6 +201,35 @@ void EditorQuery::selectCone(double x,
                              double angle)
 {
     selectCone_.set(x, y, z, z2, angle);
+}
+
+void EditorQuery::selectClassifications(const std::unordered_set<size_t> &list)
+{
+    if (list.empty())
+    {
+        selectClassifications_.clear();
+    }
+    else
+    {
+        size_t n = 256;
+
+        selectClassifications_.resize(n);
+
+        for (size_t i = 0; i < n; i++)
+        {
+            selectClassifications_[i] = 0;
+        }
+
+        for (auto const &it : list)
+        {
+            selectClassifications_[it] = 1;
+        }
+    }
+}
+
+void EditorQuery::selectLayers(const std::unordered_set<size_t> &list)
+{
+    selectLayers_ = list;
 }
 
 void EditorQuery::selectCamera(const Camera &camera)

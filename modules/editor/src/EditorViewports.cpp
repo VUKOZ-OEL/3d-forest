@@ -64,6 +64,23 @@ void EditorViewports::selectBox(const Box<double> &box)
     }
 }
 
+void EditorViewports::selectClassifications(
+    const std::unordered_set<size_t> &list)
+{
+    for (auto &it : viewports_)
+    {
+        it->selectClassifications(list);
+    }
+}
+
+void EditorViewports::selectLayers(const std::unordered_set<size_t> &list)
+{
+    for (auto &it : viewports_)
+    {
+        it->selectLayers(list);
+    }
+}
+
 void EditorViewports::selectCamera(size_t viewport, const Camera &camera)
 {
     viewports_[viewport]->selectCamera(camera);

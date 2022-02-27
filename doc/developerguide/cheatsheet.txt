@@ -460,7 +460,9 @@ uic -o ui_window.h window.ui
         "cmake.generator": "MinGW Makefiles",
         "C_Cpp.default.includePath":[
             "C:/Qt/5.15.0/mingw81_64/include/**",
-            "${workspaceRoot}/3rdparty/eigen-3.4.0/Eigen/src/**",
+            "${workspaceRoot}/3rdparty/delaunator",
+            "${workspaceRoot}/3rdparty/eigen",
+            "${workspaceRoot}/3rdparty/libigl/include/**",
             "${workspaceRoot}/3rdparty/widgets/ctkrangeslider",
             "${workspaceRoot}/3rdparty/widgets/qtribbonwidget",
             "${workspaceRoot}/modules/applications/3dforest/application/src",
