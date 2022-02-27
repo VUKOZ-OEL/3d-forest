@@ -37,6 +37,8 @@ public:
     void clearContent();
 
     void selectBox(const Box<double> &box);
+    void selectClassifications(const std::unordered_set<size_t> &list);
+    void selectLayers(const std::unordered_set<size_t> &list);
     void selectCamera(size_t viewport, const Camera &camera);
 
     void setState(EditorPage::State state);

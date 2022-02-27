@@ -24,6 +24,7 @@
 
 #include <Box.hpp>
 #include <Log.hpp>
+#include <Math.hpp>
 
 /** Cone. */
 template <class T> class Cone
@@ -107,7 +108,7 @@ template <class T> inline bool Cone<T>::isInside(T x, T y, T z) const
     {
         // Slow
         T d = std::sqrt(((x_ - x) * (x_ - x)) + ((y_ - y) * (y_ - y)));
-        T angle = std::atan(d / std::fabs(z_ - z)) * 57.29578;
+        T angle = fastatan(d / std::fabs(z_ - z)) * 57.29578;
 
         return angle < angle_;
     }

@@ -38,11 +38,22 @@ public:
 
     void selectBox(const Box<double> &box);
     void selectCone(double x, double y, double z, double z2, double angle);
+    void selectClassifications(const std::unordered_set<size_t> &list);
+    void selectLayers(const std::unordered_set<size_t> &list);
     void selectCamera(const Camera &camera);
-    void setMaximumResults(size_t nPoints);
 
     const Box<double> &selectedBox() const { return selectBox_; }
     const Cone<double> &selectedCone() const { return selectCone_; }
+    const std::vector<int> &selectedClassifications() const
+    {
+        return selectClassifications_;
+    }
+    const std::unordered_set<size_t> &selectedLayers() const
+    {
+        return selectLayers_;
+    }
+
+    void setMaximumResults(size_t nPoints);
     size_t maximumResults() const { return maximumResults_; }
 
     void exec();
@@ -126,6 +137,9 @@ public:
     void setModified();
     void write();
 
+    size_t resultSize() const { return nResults_; }
+    void addResults(size_t n);
+
     size_t cacheSize() const { return lru_.size(); }
     EditorPage &cache(size_t index) { return *lru_[index]; }
 
@@ -136,7 +150,10 @@ protected:
     // Query
     Box<double> selectBox_;
     Cone<double> selectCone_;
+    std::vector<int> selectClassifications_;
+    std::unordered_set<size_t> selectLayers_;
     size_t maximumResults_;
+    size_t nResults_;
 
     // Grid
     Box<double> gridCell_;

@@ -19,6 +19,15 @@
 
 /** @file PluginClassify.cpp */
 
+// Ignore compiler warnings from Eigen 3rd party library.
+#if ((__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2)) ||               \
+     defined(__clang__))
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
+
 #include <ColorPalette.hpp>
 #include <Editor.hpp>
 #include <Log.hpp>
@@ -40,6 +49,8 @@
 #include <QVBoxLayout>
 #include <Time.hpp>
 #include <WindowDock.hpp>
+#include <delaunator.hpp>
+#include <igl/writeOBJ.h>
 
 #define PLUGIN_CLASSIFY_NAME "Classify"
 
@@ -182,6 +193,7 @@ void PluginClassifyWindow::apply()
         query.exec();
 
         // Find local minimum.
+        /// @todo Ignore outliers.
         zMinCell = zMax;
         while (query.nextPoint())
         {
@@ -204,12 +216,14 @@ void PluginClassifyWindow::apply()
             else
             {
                 queryPoint.setMaximumResults(1);
+
                 queryPoint.selectCone(query.x(),
                                       query.y(),
                                       query.z(),
                                       zMinCell,
                                       angle);
-                queryPoint.exec(query.selectedPages());
+
+                queryPoint.exec();
 
                 if (queryPoint.nextPoint())
                 {

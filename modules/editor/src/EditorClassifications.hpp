@@ -24,6 +24,7 @@
 
 #include <Vector3.hpp>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 /** Editor Classifications. */
@@ -48,6 +49,7 @@ public:
 
     bool isEnabled(size_t i) const { return classes_[i].enabled; }
     void setEnabled(size_t i, bool b) { classes_[i].enabled = b; }
+    std::unordered_set<size_t> enabledList() const;
     const std::string &label(size_t i) const { return classes_[i].label; }
 
     void setEnabledAll(bool b);
@@ -60,5 +62,20 @@ protected:
     std::vector<Class> classes_;
     bool enabled_;
 };
+
+inline std::unordered_set<size_t> EditorClassifications::enabledList() const
+{
+    std::unordered_set<size_t> list;
+
+    for (size_t i = 0; i < classes_.size(); i++)
+    {
+        if (classes_[i].enabled)
+        {
+            list.insert(i);
+        }
+    }
+
+    return list;
+}
 
 #endif /* EDITOR_CLASSIFICATIONS_HPP */

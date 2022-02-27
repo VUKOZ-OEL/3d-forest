@@ -92,7 +92,7 @@ void EditorPage::resize(size_t n)
 
     positionBase_.resize(n * 3);
 
-    selectedNodes_.reserve(32);
+    selectedNodes_.reserve(64);
 }
 
 void EditorPage::read()
@@ -275,17 +275,17 @@ void EditorPage::transform()
 void EditorPage::select()
 {
     const Box<double> &clipBox = query_->selectedBox();
-    const Cone<double> &cone = query_->selectedCone();
+    const Cone<double> &clipCone = query_->selectedCone();
 
-    if (clipBox.empty() && cone.empty())
+    if (clipBox.empty() && clipCone.empty())
     {
         // Reset selection to mark all points as selected.
-        size_t n = position.size() / 3;
+        uint32_t n = static_cast<uint32_t>(position.size() / 3);
         selection.resize(n);
         selectionSize = n;
-        for (size_t i = 0; i < n; i++)
+        for (uint32_t i = 0; i < n; i++)
         {
-            selection[i] = static_cast<uint32_t>(i);
+            selection[i] = i;
         }
     }
 
@@ -405,21 +405,22 @@ void EditorPage::selectBox()
     // Select points
     nSelected = 0;
 
-    for (size_t i = 0; i < selectedNodes_.size(); i++)
+    size_t max = query_->maximumResults();
+
+    if (max == 0)
     {
-        const FileIndex::Node *nodeL2 = octree.at(selectedNodes_[i].idx);
-        if (!nodeL2)
+        // Unlimited number of results
+        for (size_t i = 0; i < selectedNodes_.size(); i++)
         {
-            continue;
-        }
+            const FileIndex::Node *nodeL2 = octree.at(selectedNodes_[i].idx);
+            if (!nodeL2)
+            {
+                continue;
+            }
 
-        uint32_t nNodePoints = static_cast<uint32_t>(nodeL2->size);
-        uint32_t from = static_cast<uint32_t>(nodeL2->from);
-        size_t max = query_->maximumResults();
+            uint32_t nNodePoints = static_cast<uint32_t>(nodeL2->size);
+            uint32_t from = static_cast<uint32_t>(nodeL2->from);
 
-        if (max == 0)
-        {
-            // Unlimited number of results
             if (selectedNodes_[i].partial)
             {
                 // Partial selection, apply clip filter
@@ -445,9 +446,24 @@ void EditorPage::selectBox()
                 }
             }
         }
-        else
+    }
+    else
+    {
+        // Limited number of results
+        max = max - query_->resultSize();
+        bool maxReached = false;
+
+        for (size_t i = 0; i < selectedNodes_.size(); i++)
         {
-            // Limited number of results
+            const FileIndex::Node *nodeL2 = octree.at(selectedNodes_[i].idx);
+            if (!nodeL2)
+            {
+                continue;
+            }
+
+            uint32_t nNodePoints = static_cast<uint32_t>(nodeL2->size);
+            uint32_t from = static_cast<uint32_t>(nodeL2->from);
+
             if (selectedNodes_[i].partial)
             {
                 // Partial selection, apply clip filter
@@ -463,6 +479,7 @@ void EditorPage::selectBox()
                         selection[nSelected++] = idx;
                         if (nSelected == max)
                         {
+                            maxReached = true;
                             break;
                         }
                     }
@@ -474,6 +491,7 @@ void EditorPage::selectBox()
                 if (nNodePoints > max)
                 {
                     nNodePoints = static_cast<uint32_t>(max);
+                    maxReached = true;
                 }
 
                 for (uint32_t j = 0; j < nNodePoints; j++)
@@ -482,11 +500,13 @@ void EditorPage::selectBox()
                 }
             }
 
-            if (nSelected == max)
+            if (maxReached)
             {
                 break;
             }
         }
+
+        query_->addResults(nSelected);
     }
 
     selectionSize = nSelected;
@@ -494,15 +514,15 @@ void EditorPage::selectBox()
 
 void EditorPage::selectCone()
 {
-    const Cone<double> &cone = query_->selectedCone();
-    if (cone.empty())
+    const Cone<double> &clipCone = query_->selectedCone();
+    if (clipCone.empty())
     {
         return;
     }
 
     // Select octants
     selectedNodes_.resize(0);
-    octree.selectLeaves(selectedNodes_, cone.box(), datasetId_);
+    octree.selectLeaves(selectedNodes_, clipCone.box(), datasetId_);
 
     // Compute upper limit of the number of selected points
     size_t nSelected = 0;
@@ -527,7 +547,8 @@ void EditorPage::selectCone()
     // Select points
     nSelected = 0;
 
-    size_t nOutside = 0;
+    size_t max = query_->maximumResults() - query_->resultSize();
+    bool maxReached = false;
 
     for (size_t i = 0; i < selectedNodes_.size(); i++)
     {
@@ -539,9 +560,8 @@ void EditorPage::selectCone()
 
         uint32_t nNodePoints = static_cast<uint32_t>(nodeL2->size);
         uint32_t from = static_cast<uint32_t>(nodeL2->from);
-        size_t max = query_->maximumResults();
 
-        // Partial selection, apply clip filter
+        // Partial/Whole selection, apply clip filter
         for (uint32_t j = 0; j < nNodePoints; j++)
         {
             uint32_t idx = from + j;
@@ -549,35 +569,33 @@ void EditorPage::selectCone()
             double y = position[3 * idx + 1];
             double z = position[3 * idx + 2];
 
-            if (cone.isInside(x, y, z))
+            if (clipCone.isInside(x, y, z))
             {
                 selection[nSelected++] = idx;
                 if (nSelected == max)
                 {
+                    maxReached = true;
                     break;
                 }
             }
-            else
-            {
-                // 100 to 1000 outside points until the first isInside
-                nOutside++;
-            }
         }
 
-        if (nSelected == max)
+        if (maxReached)
         {
             break;
         }
     }
 
     selectionSize = nSelected;
+
+    query_->addResults(nSelected);
 }
 
 void EditorPage::selectClassification()
 {
-    const EditorClassifications &classifications = editor_->classifications();
+    const std::vector<int> &classifications = query_->selectedClassifications();
 
-    if (!classifications.isEnabled())
+    if (classifications.empty())
     {
         return;
     }
@@ -586,14 +604,15 @@ void EditorPage::selectClassification()
 
     for (size_t i = 0; i < selectionSize; i++)
     {
-        uint32_t idx = selection[i];
+        uint32_t id = classification[selection[i]];
 
-        if (classifications.isEnabled(classification[idx]))
+        if (classifications[id])
         {
             if (nSelectedNew != i)
             {
                 selection[nSelectedNew] = selection[i];
             }
+
             nSelectedNew++;
         }
     }
@@ -603,9 +622,9 @@ void EditorPage::selectClassification()
 
 void EditorPage::selectLayer()
 {
-    const EditorLayers &layers = editor_->layers();
+    const std::unordered_set<size_t> &layers = query_->selectedLayers();
 
-    if (!layers.isEnabled())
+    if (layers.empty())
     {
         return;
     }
@@ -614,14 +633,15 @@ void EditorPage::selectLayer()
 
     for (size_t i = 0; i < selectionSize; i++)
     {
-        uint32_t idx = selection[i];
+        uint32_t id = layer[selection[i]];
 
-        if (layers.isEnabledId(layer[idx]))
+        if (layers.find(id) != layers.end())
         {
             if (nSelectedNew != i)
             {
                 selection[nSelectedNew] = selection[i];
             }
+
             nSelectedNew++;
         }
     }

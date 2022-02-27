@@ -62,6 +62,10 @@ public:
         return hashTableEnabledId_.find(id) != hashTableEnabledId_.end();
     }
     bool isEnabled(size_t i) const { return layers_[i].isEnabled(); }
+    const std::unordered_set<size_t> &enabledList() const
+    {
+        return hashTableEnabledId_;
+    }
     void setEnabled(size_t i, bool b);
     void setEnabledAll(bool b);
     void setInvertAll();

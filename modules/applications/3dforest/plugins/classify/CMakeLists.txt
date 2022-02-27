@@ -34,6 +34,14 @@ target_include_directories(
   ../../application/src # Plugin Interfaces
 )
 
+target_include_directories(
+  ${SUB_PROJECT_NAME}
+  PUBLIC
+  ../../../../../3rdparty/delaunator
+  ../../../../../3rdparty/eigen
+  ../../../../../3rdparty/libigl/include
+)
+
 target_link_libraries(
   ${SUB_PROJECT_NAME}
   PRIVATE
