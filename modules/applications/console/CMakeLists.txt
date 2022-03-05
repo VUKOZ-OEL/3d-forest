@@ -15,10 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-add_executable(las src/las.cpp)
-target_link_libraries(las PUBLIC core)
-install(TARGETS las DESTINATION bin)
-
 add_executable(sandbox src/sandbox.cpp)
 target_link_libraries(sandbox PUBLIC core editor)
 install(TARGETS sandbox DESTINATION bin)
