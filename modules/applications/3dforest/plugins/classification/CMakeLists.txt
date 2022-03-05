@@ -18,13 +18,13 @@
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(SUB_PROJECT_NAME "pluginclassify")
+set(SUB_PROJECT_NAME "pluginclassification")
 
 add_library(
   ${SUB_PROJECT_NAME}
   SHARED
-  src/PluginClassify.cpp
-  resources/pluginclassify.qrc
+  src/PluginClassification.cpp
+  resources/pluginclassification.qrc
 )
 
 target_include_directories(

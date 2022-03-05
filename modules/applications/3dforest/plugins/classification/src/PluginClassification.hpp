@@ -17,24 +17,24 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file PluginClassify.hpp */
+/** @file PluginClassification.hpp */
 
-#ifndef PLUGIN_CLASSIFY_HPP
-#define PLUGIN_CLASSIFY_HPP
+#ifndef PLUGIN_CLASSIFICATION_HPP
+#define PLUGIN_CLASSIFICATION_HPP
 
 #include <PluginTool.hpp>
 
-class PluginClassifyWindow;
+class PluginClassificationWindow;
 
-/** Plugin Classify. */
-class PluginClassify : public QObject, public PluginTool
+/** Plugin Classification. */
+class PluginClassification : public QObject, public PluginTool
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID PluginTool_iid)
     Q_INTERFACES(PluginTool)
 
 public:
-    PluginClassify();
+    PluginClassification();
 
     virtual void initialize(QMainWindow *parent, Editor *editor);
     virtual void show(QMainWindow *parent);
@@ -45,8 +45,8 @@ public:
     virtual QPixmap icon() const;
 
 protected:
-    PluginClassifyWindow *window_;
+    PluginClassificationWindow *window_;
     Editor *editor_;
 };
 
-#endif /* PLUGIN_CLASSIFY_HPP */
+#endif /* PLUGIN_CLASSIFICATION_HPP */

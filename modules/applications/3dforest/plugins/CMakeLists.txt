@@ -17,4 +17,4 @@
 
 add_subdirectory(databasestatistics)
 add_subdirectory(heightmap)
-add_subdirectory(classify)
+add_subdirectory(classification)
