@@ -15,17 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-add_executable(las src/las.cpp)
-target_link_libraries(las PUBLIC core)
-install(TARGETS las DESTINATION bin)
-
 add_executable(sandbox src/sandbox.cpp)
 target_link_libraries(sandbox PUBLIC core editor)
 install(TARGETS sandbox DESTINATION bin)
-
-add_executable(classify src/classify.cpp)
-target_link_libraries(classify PUBLIC editor)
-target_include_directories(classify PUBLIC ../../../3rdparty/delaunator)
-target_include_directories(classify PUBLIC ../../../3rdparty/eigen)
-target_include_directories(classify PUBLIC ../../../3rdparty/libigl/include)
-install(TARGETS classify DESTINATION bin)

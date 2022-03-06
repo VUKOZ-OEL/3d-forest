@@ -17,7 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file PluginClassify.cpp */
+/** @file PluginClassification.cpp */
 
 // Ignore compiler warnings from Eigen 3rd party library.
 #if ((__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2)) ||               \
@@ -31,7 +31,7 @@
 #include <ColorPalette.hpp>
 #include <Editor.hpp>
 #include <Log.hpp>
-#include <PluginClassify.hpp>
+#include <PluginClassification.hpp>
 #include <QCheckBox>
 #include <QCloseEvent>
 #include <QComboBox>
@@ -52,16 +52,16 @@
 #include <delaunator.hpp>
 #include <igl/writeOBJ.h>
 
-#define PLUGIN_CLASSIFY_NAME "Classify"
+#define PLUGIN_CLASSIFICATION_NAME "Classification"
 
-/** Plugin Classify Window. */
-class PluginClassifyWindow : public WindowDock
+/** Plugin Classification Window. */
+class PluginClassificationWindow : public WindowDock
 {
     Q_OBJECT
 
 public:
-    PluginClassifyWindow(QMainWindow *parent, Editor *editor);
-    ~PluginClassifyWindow() = default;
+    PluginClassificationWindow(QMainWindow *parent, Editor *editor);
+    ~PluginClassificationWindow() = default;
 
 protected slots:
     void apply();
@@ -79,7 +79,8 @@ protected:
     void update();
 };
 
-PluginClassifyWindow::PluginClassifyWindow(QMainWindow *parent, Editor *editor)
+PluginClassificationWindow::PluginClassificationWindow(QMainWindow *parent,
+                                                       Editor *editor)
     : WindowDock(parent),
       editor_(editor)
 {
@@ -142,7 +143,7 @@ PluginClassifyWindow::PluginClassifyWindow(QMainWindow *parent, Editor *editor)
     setWidget(widget_);
 }
 
-void PluginClassifyWindow::apply()
+void PluginClassificationWindow::apply()
 {
     editor_->cancelThreads();
 
@@ -167,7 +168,7 @@ void PluginClassifyWindow::apply()
     QProgressDialog progressDialog(mainWindow());
     progressDialog.setCancelButtonText(QObject::tr("&Cancel"));
     progressDialog.setRange(0, maximum);
-    progressDialog.setWindowTitle(QObject::tr(PLUGIN_CLASSIFY_NAME));
+    progressDialog.setWindowTitle(QObject::tr(PLUGIN_CLASSIFICATION_NAME));
     progressDialog.setWindowModality(Qt::WindowModal);
     progressDialog.setMinimumDuration(0);
     progressDialog.show();
@@ -252,18 +253,20 @@ void PluginClassifyWindow::apply()
     editor_->restartThreads();
 }
 
-void PluginClassifyWindow::update()
+void PluginClassificationWindow::update()
 {
     editor_->lock();
     editor_->viewports().setState(EditorPage::STATE_READ);
     editor_->unlock();
 }
 
-PluginClassify::PluginClassify() : window_(nullptr), editor_(nullptr)
+PluginClassification::PluginClassification()
+    : window_(nullptr),
+      editor_(nullptr)
 {
 }
 
-void PluginClassify::initialize(QMainWindow *parent, Editor *editor)
+void PluginClassification::initialize(QMainWindow *parent, Editor *editor)
 {
     // Do not create GUI when this plugin is loaded
     (void)parent;
@@ -271,12 +274,12 @@ void PluginClassify::initialize(QMainWindow *parent, Editor *editor)
     editor_ = editor;
 }
 
-void PluginClassify::show(QMainWindow *parent)
+void PluginClassification::show(QMainWindow *parent)
 {
     // Create GUI only when this plugin is used for the first time
     if (!window_)
     {
-        window_ = new PluginClassifyWindow(parent, editor_);
+        window_ = new PluginClassificationWindow(parent, editor_);
         window_->setWindowTitle(windowTitle());
         window_->setWindowIcon(icon());
         window_->setFloating(true);
@@ -289,7 +292,7 @@ void PluginClassify::show(QMainWindow *parent)
     window_->activateWindow();
 }
 
-QAction *PluginClassify::toggleViewAction() const
+QAction *PluginClassification::toggleViewAction() const
 {
     if (window_)
     {
@@ -299,24 +302,24 @@ QAction *PluginClassify::toggleViewAction() const
     return nullptr;
 }
 
-QString PluginClassify::windowTitle() const
+QString PluginClassification::windowTitle() const
 {
-    return tr(PLUGIN_CLASSIFY_NAME);
+    return tr(PLUGIN_CLASSIFICATION_NAME);
 }
 
-QString PluginClassify::buttonText() const
+QString PluginClassification::buttonText() const
 {
-    return tr(PLUGIN_CLASSIFY_NAME);
+    return tr(PLUGIN_CLASSIFICATION_NAME);
 }
 
-QString PluginClassify::toolTip() const
+QString PluginClassification::toolTip() const
 {
-    return tr("Classify points");
+    return tr("Classify Points");
 }
 
-QPixmap PluginClassify::icon() const
+QPixmap PluginClassification::icon() const
 {
     return QPixmap(":/deviation-ios-50.png");
 }
 
-#include "PluginClassify.moc"
+#include "PluginClassification.moc"
