@@ -66,7 +66,7 @@ Build Using "Unix Makefiles" on Linux in 20 minutes
       :/home/user/Qt/5.15.2/gcc_64/lib ./3dforest
 
 7.  We can open example project "project.json" from directory
-    "/home/user/3D-Forest_1.0/examples/3dforest/project1/"
+    "/home/user/3D-Forest_1.0/data/"
 
 8.  We can see that we did not store modified PATH and LD_LIBRARY_PATH to user
     or system variables.
@@ -122,3 +122,9 @@ Build Using "MinGW Makefiles" on Windows
         > mingw32-make doxygen
     - Extra command: Reformat all source files
         > mingw32-make format
+
+6.  Optional: create batch file "build\build.bat" with the following content:
+    - cmake -G "MinGW Makefiles" .. -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug -DBUILD_EXAMPLES=1
+    - mingw32-make format
+    - mingw32-make
+    - mingw32-make install
