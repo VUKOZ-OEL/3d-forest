@@ -135,7 +135,7 @@ public:
     bool nextState();
 
     void setModified();
-    void write();
+    void flush();
 
     size_t resultSize() const { return nResults_; }
     void addResults(size_t n);
