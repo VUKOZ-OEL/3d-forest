@@ -156,7 +156,7 @@ void EditorQuery::setModified()
     page_->setModified();
 }
 
-void EditorQuery::write()
+void EditorQuery::flush()
 {
     for (size_t i = 0; i < lru_.size(); i++)
     {

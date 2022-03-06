@@ -15,11 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-add_executable(examplelascreate core/examplelascreate.cpp)
+add_executable(examplelascreate src/examplelascreate.cpp)
 target_link_libraries(examplelascreate PUBLIC core)
 install(TARGETS examplelascreate DESTINATION bin)
 
-add_executable(examplevector3 core/examplevector3.cpp)
+add_executable(examplevector3 src/examplevector3.cpp)
 target_link_libraries(examplevector3 PUBLIC core)
 set_target_properties(
   examplevector3
@@ -29,10 +29,10 @@ set_target_properties(
 )
 install(TARGETS examplevector3 DESTINATION bin)
 
-add_executable(examplecolorpalette core/examplecolorpalette.cpp)
+add_executable(examplecolorpalette src/examplecolorpalette.cpp)
 target_link_libraries(examplecolorpalette PUBLIC core)
 install(TARGETS examplecolorpalette DESTINATION bin)
 
-add_executable(exampleeditor editor/exampleeditor.cpp)
+add_executable(exampleeditor src/exampleeditor.cpp)
 target_link_libraries(exampleeditor PUBLIC editor)
 install(TARGETS exampleeditor DESTINATION bin)
