@@ -13,6 +13,17 @@ The code uses C++17 and CMake. Qt5 and OpenGL are required for GUI.
 The build process generates the main GUI application and command line utilities.
 See [INSTALL](INSTALL) for more information.
 
+## Third-Party Libraries
+3D Forest source code includes several third-party libraries which are stored
+under 3rdparty directory. This approach allows to use compatible versions of
+third-party libraries **without downloading and installation** of each library.
+
+- ctk widgets: ctkRangeSlider (Jul 27, 2018), A slider that has 2 input values.
+- delaunator-cpp (Oct 6, 2018), Delaunay triangulation of 2D points.
+- eigen (3.4.0), Template library for linear algebra.
+- libigl (2.4.0), A simple geometry processing library.
+- qt-ribbon-widget (Sep 26, 2018), A Ribbon widget for Qt.
+
 ## Known Issues
 This software is currently in development.
 
