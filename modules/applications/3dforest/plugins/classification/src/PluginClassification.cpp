@@ -65,6 +65,7 @@ public:
 
 protected slots:
     void apply();
+    void writeGroundMesh();
 
 protected:
     Editor *editor_;
@@ -75,6 +76,7 @@ protected:
     QSpinBox *angleSpinBox_;
     QCheckBox *liveCheckBox_;
     QPushButton *applyButton_;
+    QPushButton *meshButton_;
 
     void update();
 };
@@ -109,7 +111,11 @@ PluginClassificationWindow::PluginClassificationWindow(QMainWindow *parent,
     liveCheckBox_->setChecked(false);
     liveCheckBox_->setEnabled(false);
 
-    applyButton_ = new QPushButton(tr("&Apply"));
+    meshButton_ = new QPushButton(tr("Export Ground"));
+    meshButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    connect(meshButton_, SIGNAL(clicked()), this, SLOT(writeGroundMesh()));
+
+    applyButton_ = new QPushButton(tr("Classify"));
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(applyButton_, SIGNAL(clicked()), this, SLOT(apply()));
 
@@ -128,6 +134,7 @@ PluginClassificationWindow::PluginClassificationWindow(QMainWindow *parent,
     hbox->addWidget(liveCheckBox_);
     hbox->addWidget(new QLabel(tr("Live")));
     hbox->addStretch();
+    hbox->addWidget(meshButton_, 0, Qt::AlignRight);
     hbox->addWidget(applyButton_, 0, Qt::AlignRight);
 
     QVBoxLayout *vbox = new QVBoxLayout;
@@ -157,6 +164,8 @@ void PluginClassificationWindow::apply()
     double zMin = editor_->clipBoundary().min(2);
     double zMinCell;
     double zMaxGround;
+
+    size_t nPointsGroundGrid;
 
     EditorQuery queryPoint(editor_);
     EditorQuery query(editor_);
@@ -206,6 +215,7 @@ void PluginClassificationWindow::apply()
         zMaxGround = zMinCell + (((zMax - zMin) * 0.01) * groundErrorPercent);
 
         // Set classification to 'ground' or 'unassigned'.
+        nPointsGroundGrid = 0;
         query.reset();
         while (query.nextPoint())
         {
@@ -235,16 +245,41 @@ void PluginClassificationWindow::apply()
                 {
                     // ground
                     query.classification() = FileLas::CLASS_GROUND;
+
+                    nPointsGroundGrid++;
                 }
             }
 
             query.setModified();
         }
 
+        // Ground surface.
+#if 0
+        if (nPointsGroundGrid > 0)
+        {
+            groundXY.resize(nPointsGroundGrid * 2);
+            nPointsGroundGrid = 0;
+            query.reset();
+            while (query.nextPoint())
+            {
+                if (query.classification() == FileLas::CLASS_GROUND)
+                {
+                    groundXY[2 * nPointsGroundGrid] = query.x();
+                    groundXY[2 * nPointsGroundGrid + 1] = query.y();
+                    nPointsGroundGrid++;
+                }
+            }
+
+            delaunator::Delaunator d(groundXY);
+
+            std::cout << d.triangles.size() << " ground triangles\n";
+        }
+#endif
+
         editor_->unlock();
     }
 
-    query.write();
+    query.flush();
 
     progressDialog.setValue(progressDialog.maximum());
 
@@ -258,6 +293,73 @@ void PluginClassificationWindow::update()
     editor_->lock();
     editor_->viewports().setState(EditorPage::STATE_READ);
     editor_->unlock();
+}
+
+void PluginClassificationWindow::writeGroundMesh()
+{
+    editor_->cancelThreads();
+    editor_->lock();
+
+    // Obtain the number of ground points.
+    size_t nPointsGround = 0;
+
+    EditorQuery queryGround(editor_);
+    queryGround.selectClassifications({FileLas::CLASS_GROUND});
+    queryGround.selectBox(editor_->clipBoundary());
+    queryGround.exec();
+    while (queryGround.nextPoint())
+    {
+        nPointsGround++;
+    }
+
+    if (nPointsGround == 0)
+    {
+        // std::cout << "ground points not found\n";
+        return;
+    }
+
+    // Collect 2D and 3D point coordinates.
+    Eigen::MatrixXd V;
+    V.resize(nPointsGround, 3);
+
+    std::vector<double> XY;
+    XY.resize(nPointsGround * 2);
+
+    nPointsGround = 0;
+    queryGround.reset();
+    while (queryGround.nextPoint())
+    {
+        XY[2 * nPointsGround] = queryGround.x();
+        XY[2 * nPointsGround + 1] = queryGround.y();
+
+        V(nPointsGround, 0) = queryGround.x();
+        V(nPointsGround, 1) = queryGround.z();  // swap for Windows 3D Viewer
+        V(nPointsGround, 2) = -queryGround.y(); // swap for Windows 3D Viewer
+
+        nPointsGround++;
+    }
+
+    // Create triangle mesh.
+    delaunator::Delaunator delaunay(XY);
+
+    // Convert to igl triangles.
+    size_t nTriangles = delaunay.triangles.size() / 3;
+
+    Eigen::MatrixXi F;
+    F.resize(nTriangles, 3);
+
+    for (size_t i = 0; i < nTriangles; i++)
+    {
+        F(i, 0) = delaunay.triangles[i * 3];
+        F(i, 1) = delaunay.triangles[i * 3 + 1];
+        F(i, 2) = delaunay.triangles[i * 3 + 2];
+    }
+
+    // Write output file.
+    igl::writeOBJ("ground.obj", V, F);
+
+    editor_->unlock();
+    editor_->restartThreads();
 }
 
 PluginClassification::PluginClassification()
