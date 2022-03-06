@@ -700,6 +700,7 @@ void WindowMain::actionPluginToolShow()
                         button = qobject_cast<QToolButton *>(widget);
                         if (button)
                         {
+                            button->removeAction(action);
                             action = it->toggleViewAction();
                             action->setText(it->windowTitle());
                             action->setIconText(it->buttonText());
@@ -717,6 +718,7 @@ void WindowMain::actionPluginToolShow()
                 {
                     showError("Unknown");
                 }
+
                 break;
             }
         }
