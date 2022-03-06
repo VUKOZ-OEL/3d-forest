@@ -309,7 +309,7 @@ QString PluginClassification::windowTitle() const
 
 QString PluginClassification::buttonText() const
 {
-    return tr(PLUGIN_CLASSIFICATION_NAME);
+    return tr("Classifi\ncation");
 }
 
 QString PluginClassification::toolTip() const
