@@ -43,10 +43,13 @@ void EditorQuery::exec()
     {
         editor_->datasets().select(selectedPages_, selectBox_);
     }
-
     if (!selectCone_.empty())
     {
         editor_->datasets().select(selectedPages_, selectCone_.box());
+    }
+    if (!selectedSphere_.empty())
+    {
+        editor_->datasets().select(selectedPages_, selectedSphere_.box());
     }
 
     reset();
@@ -201,6 +204,11 @@ void EditorQuery::selectCone(double x,
                              double angle)
 {
     selectCone_.set(x, y, z, z2, angle);
+}
+
+void EditorQuery::selectSphere(double x, double y, double z, double radius)
+{
+    selectedSphere_.set(x, y, z, radius);
 }
 
 void EditorQuery::selectClassifications(const std::unordered_set<size_t> &list)

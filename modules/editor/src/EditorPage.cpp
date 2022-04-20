@@ -211,6 +211,10 @@ void EditorPage::toPoint(uint8_t *ptr, size_t i, uint8_t fmt)
     htol16(ptr + pos + 4, static_cast<uint16_t>(renderColor[3 * i + 0] * s16));
     htol16(ptr + pos + 6, static_cast<uint16_t>(renderColor[3 * i + 1] * s16));
     htol16(ptr + pos + 8, static_cast<uint16_t>(renderColor[3 * i + 2] * s16));
+
+    htol16(ptr + pos + 4, static_cast<uint16_t>(userColor[3 * i + 0] * s16));
+    htol16(ptr + pos + 6, static_cast<uint16_t>(userColor[3 * i + 1] * s16));
+    htol16(ptr + pos + 8, static_cast<uint16_t>(userColor[3 * i + 2] * s16));
 }
 
 void EditorPage::write()
@@ -276,8 +280,9 @@ void EditorPage::select()
 {
     const Box<double> &clipBox = query_->selectedBox();
     const Cone<double> &clipCone = query_->selectedCone();
+    const Sphere<double> &selectedSphere = query_->selectedSphere();
 
-    if (clipBox.empty() && clipCone.empty())
+    if (clipBox.empty() && clipCone.empty() && selectedSphere.empty())
     {
         // Reset selection to mark all points as selected.
         uint32_t n = static_cast<uint32_t>(position.size() / 3);
@@ -292,6 +297,7 @@ void EditorPage::select()
     // Apply new selection.
     selectBox();
     selectCone();
+    selectSphere();
     selectClassification();
     selectLayer();
 
@@ -570,6 +576,85 @@ void EditorPage::selectCone()
             double z = position[3 * idx + 2];
 
             if (clipCone.isInside(x, y, z))
+            {
+                selection[nSelected++] = idx;
+                if (nSelected == max)
+                {
+                    maxReached = true;
+                    break;
+                }
+            }
+        }
+
+        if (maxReached)
+        {
+            break;
+        }
+    }
+
+    selectionSize = nSelected;
+
+    query_->addResults(nSelected);
+}
+
+void EditorPage::selectSphere()
+{
+    const Sphere<double> &selectedSphere = query_->selectedSphere();
+    if (selectedSphere.empty())
+    {
+        return;
+    }
+
+    // Select octants
+    selectedNodes_.resize(0);
+    octree.selectLeaves(selectedNodes_, selectedSphere.box(), datasetId_);
+
+    // Compute upper limit of the number of selected points
+    size_t nSelected = 0;
+
+    for (size_t i = 0; i < selectedNodes_.size(); i++)
+    {
+        const FileIndex::Node *nodeL2 = octree.at(selectedNodes_[i].idx);
+        if (!nodeL2)
+        {
+            continue;
+        }
+
+        nSelected += static_cast<size_t>(nodeL2->size);
+    }
+
+    selectionSize = nSelected;
+    if (selection.size() < selectionSize)
+    {
+        selection.resize(selectionSize);
+    }
+
+    // Select points
+    nSelected = 0;
+
+    size_t max = query_->maximumResults() - query_->resultSize();
+    bool maxReached = false;
+
+    for (size_t i = 0; i < selectedNodes_.size(); i++)
+    {
+        const FileIndex::Node *nodeL2 = octree.at(selectedNodes_[i].idx);
+        if (!nodeL2)
+        {
+            continue;
+        }
+
+        uint32_t nNodePoints = static_cast<uint32_t>(nodeL2->size);
+        uint32_t from = static_cast<uint32_t>(nodeL2->from);
+
+        // Partial/Whole selection, apply clip filter
+        for (uint32_t j = 0; j < nNodePoints; j++)
+        {
+            uint32_t idx = from + j;
+            double x = position[3 * idx + 0];
+            double y = position[3 * idx + 1];
+            double z = position[3 * idx + 2];
+
+            if (selectedSphere.isInside(x, y, z))
             {
                 selection[nSelected++] = idx;
                 if (nSelected == max)

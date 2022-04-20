@@ -33,8 +33,10 @@ public:
 
     template <class B> Box(const Box<B> &box);
     template <class B> Box(B x1, B y1, B z1, B x2, B y2, B z2);
+    template <class B> Box(B cx, B cy, B cz, B r);
 
     void set(T x1, T y1, T z1, T x2, T y2, T z2);
+    void set(T cx, T cy, T cz, T r);
     void set(const std::vector<T> &xyz);
     void set(const Box<T> &box);
     void setPercent(const Box<T> &box, const Box<T> &a, const Box<T> &b);
@@ -95,6 +97,16 @@ template <class B>
 inline Box<T>::Box(B x1, B y1, B z1, B x2, B y2, B z2)
 {
     set(x1, y1, z1, x2, y2, z2);
+}
+
+template <class T> template <class B> inline Box<T>::Box(B cx, B cy, B cz, B r)
+{
+    set(cx, cy, cz, r);
+}
+
+template <class T> inline void Box<T>::set(T cx, T cy, T cz, T r)
+{
+    set(cx - r, cy - r, cz - r, cx + r, cy + r, cz + r);
 }
 
 template <class T> inline void Box<T>::set(T x1, T y1, T z1, T x2, T y2, T z2)

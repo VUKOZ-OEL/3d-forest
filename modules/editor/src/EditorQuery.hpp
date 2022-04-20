@@ -25,6 +25,7 @@
 #include <Camera.hpp>
 #include <Cone.hpp>
 #include <EditorPage.hpp>
+#include <Sphere.hpp>
 #include <unordered_set>
 
 class EditorDatabase;
@@ -38,12 +39,14 @@ public:
 
     void selectBox(const Box<double> &box);
     void selectCone(double x, double y, double z, double z2, double angle);
+    void selectSphere(double x, double y, double z, double radius);
     void selectClassifications(const std::unordered_set<size_t> &list);
     void selectLayers(const std::unordered_set<size_t> &list);
     void selectCamera(const Camera &camera);
 
     const Box<double> &selectedBox() const { return selectBox_; }
     const Cone<double> &selectedCone() const { return selectCone_; }
+    const Sphere<double> &selectedSphere() const { return selectedSphere_; }
     const std::vector<int> &selectedClassifications() const
     {
         return selectClassifications_;
@@ -150,6 +153,7 @@ protected:
     // Query
     Box<double> selectBox_;
     Cone<double> selectCone_;
+    Sphere<double> selectedSphere_;
     std::vector<int> selectClassifications_;
     std::unordered_set<size_t> selectLayers_;
     size_t maximumResults_;
