@@ -43,6 +43,7 @@
 #include <WindowLayers.hpp>
 #include <WindowMain.hpp>
 #include <WindowScreenshot.hpp>
+#include <WindowSegmentation.hpp>
 #include <WindowSettingsView.hpp>
 #include <ribbon.h>
 
@@ -443,6 +444,19 @@ void WindowMain::createWindows()
                          tr("Change view settings"),
                          "tune",
                          windowSettingsView_);
+
+    // Create segmentation window
+    windowSegmentation_ = new WindowSegmentation(this);
+    windowSegmentation_->setEditor(&editor_);
+    connect(windowSegmentation_,
+            SIGNAL(finished()),
+            this,
+            SLOT(actionUpdate()));
+    (void)createMenuTool(tr("Segmentation"),
+                         tr("Segmentation"),
+                         tr("Automatic segmentation"),
+                         "collage",
+                         windowSegmentation_);
 
     // Log
     log = new QTextEdit(this);
@@ -999,6 +1013,17 @@ void WindowMain::actionEditorRender()
     editor_.lock();
     windowViewports_->updateScene(&editor_);
     editor_.unlock();
+}
+
+void WindowMain::actionUpdate()
+{
+    // updateViewer();
+
+    editor_.cancelThreads();
+    editor_.lock();
+    editor_.viewports().setState(EditorPage::STATE_READ);
+    editor_.unlock();
+    editor_.restartThreads();
 }
 
 void WindowMain::updateViewer()

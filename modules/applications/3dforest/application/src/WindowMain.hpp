@@ -39,6 +39,7 @@ class WindowClassifications;
 class WindowClipFilter;
 class WindowDatasets;
 class WindowLayers;
+class WindowSegmentation;
 class WindowSettingsView;
 
 /** Window Main. */
@@ -116,6 +117,7 @@ public slots:
     // Editor
     void actionEditorRender();
     void actionCameraChanged(size_t viewportId);
+    void actionUpdate();
 
 protected:
     // Editor
@@ -130,6 +132,7 @@ protected:
     WindowLayers *windowLayers_;
     WindowClassifications *windowClassifications_;
     WindowClipFilter *windowClipFilter_;
+    WindowSegmentation *windowSegmentation_;
     WindowSettingsView *windowSettingsView_;
     WindowViewports *windowViewports_;
 

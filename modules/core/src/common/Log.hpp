@@ -44,5 +44,6 @@
 //#define LOG_EDITOR_QUERY(msg) LOG_MODULE("EditorQuery", msg)
 #define LOG_EDITOR_PAGE(msg)
 //#define LOG_EDITOR_PAGE(msg) LOG_MODULE("EditorPage", msg)
+#define LOG_WINDOW_SEGMENTATION(msg) LOG_MODULE("WindowSegmentation", msg)
 
 #endif /* LOG_HPP */
