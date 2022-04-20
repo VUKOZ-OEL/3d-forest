@@ -135,6 +135,32 @@ static void createGrid(const std::string &path,
     FileLas::create(path, points, {1,1,1}, translate, version_minor);
 }
 
+static void createLine(const std::string &path)
+{
+    // Create points
+    std::vector<FileLas::Point> points;
+
+    points.resize(5);
+
+    // Create points: set all attributes to zero
+    std::memset(points.data(), 0, sizeof(FileLas::Point) * points.size());
+
+    // Create points: set coordinates
+    points[1].z = 8;
+    points[2].z = 12;
+    points[3].z = 14;
+    points[4].z = 15;
+
+    for (size_t i = 0; i < points.size(); i++)
+    {
+        points[i].classification = FileLas::CLASS_UNASSIGNED;
+        points[i].format = 7;
+    }
+
+    // Create LAS file
+    FileLas::create(path, points);
+}
+
 static void createIndex(const std::string &path)
 {
     // Create LAS file index
@@ -152,6 +178,8 @@ int main()
 
     createGrid("grid.las", {13,0,0}, 4);
     //createIndex("grid.las");
+
+    createLine("line.las");
 
     return 0;
 }
