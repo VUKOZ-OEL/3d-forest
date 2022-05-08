@@ -15,18 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-file(
-  GLOB_RECURSE
-  ALL_SOURCE_FILES
-  src/*.cpp src/*.hpp src/*.c src/*.h
-)
+set(SUB_PROJECT_NAME "3dforestcore")
 
-add_custom_target(
-  format
-  COMMAND clang-format
-  -style=file
-  -i
-  -fallback-style=none
-#  --verbose
-  ${ALL_SOURCE_FILES}
-)
+file(GLOB_RECURSE SOURCES "*.cpp")
+
+add_library(${SUB_PROJECT_NAME} SHARED ${SOURCES})
+target_include_directories(${SUB_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+
+install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

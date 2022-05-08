@@ -15,18 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-file(
-  GLOB_RECURSE
-  ALL_SOURCE_FILES
-  src/*.cpp src/*.hpp src/*.c src/*.h
-)
+add_subdirectory(3dforest)
+add_subdirectory(tools)
 
-add_custom_target(
-  format
-  COMMAND clang-format
-  -style=file
-  -i
-  -fallback-style=none
-#  --verbose
-  ${ALL_SOURCE_FILES}
-)
+if (BUILD_EXAMPLES)
+  add_subdirectory(examples)
+endif()

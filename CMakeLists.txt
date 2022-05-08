@@ -25,11 +25,14 @@ endif()
 
 include(cmake/cxxflags.cmake)
 
-add_subdirectory(modules)
-
-if (BUILD_EXAMPLES)
-  add_subdirectory(examples)
+find_package(Qt5 COMPONENTS Core Gui Widgets Help OpenGL)
+find_package(OpenGL QUIET)
+if (Qt5_FOUND AND Qt5OpenGL_FOUND AND OpenGL_FOUND)
+  message("-- Gui with Qt5 and OpenGL found")
+  set(CMAKE_3DFOREST_GUI_FOUND 5)
 endif()
+
+add_subdirectory(src)
 
 include(cmake/clangformat.cmake)
 include(cmake/doxygen.cmake)

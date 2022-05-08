@@ -163,7 +163,7 @@ Qt5 and OpenGL are required for GUI application.
     @endverbatim
 
 -#  We can open example project "project.json" from directory
-    "/home/user/3D-Forest_1.0/examples/3dforest/project1/"
+    "/home/user/3D-Forest_1.0/data"
 
 -#  We can see that we did not store modified PATH and LD_LIBRARY_PATH to user
     or system variables.
@@ -246,10 +246,9 @@ Qt5 and OpenGL are required for GUI application.
 
 @verbatim
 directory "3rd Party" is "3rdparty" lowercase, no separators
-          "Height Map" is "heightmap" which will produce "heightmap.dll"
 
-source    "WindowMain.hpp"          C++ header, CamelCase for classes
-          "WindowMain.cpp"          C++ source, CamelCase for classes
+source    "GuiWindowMain.hpp"       C++ header, CamelCase for classes
+          "GuiWindowMain.cpp"       C++ source, CamelCase for classes
           "examplecolorpalette.cpp" lowercase for executables
           "las.cpp"                 lowercase for executables
 
@@ -471,31 +470,22 @@ uic -o ui_window.h window.ui
     @verbatim
     {
         "files.eol": "\n",
-        "cmake.configureOnOpen": false,
-        "cmake.mingwSearchDirs": [
-            "C:\\msys64\\mingw-w64\\bin"
-        ],
-        "cmake.generator": "MinGW Makefiles",
         "C_Cpp.default.includePath":[
             "C:/Qt/5.15.0/mingw81_64/include/**",
             "${workspaceRoot}/3rdparty/delaunator",
             "${workspaceRoot}/3rdparty/eigen",
             "${workspaceRoot}/3rdparty/libigl/include/**",
             "${workspaceRoot}/3rdparty/widgets/ctkrangeslider",
-            "${workspaceRoot}/3rdparty/widgets/qtribbonwidget",
-            "${workspaceRoot}/modules/applications/3dforest/application/src",
-            "${workspaceRoot}/modules/applications/3dforest/plugins/databasestatistics/src",
-            "${workspaceRoot}/modules/applications/3dforest/plugins/heightmap/src",
-            "${workspaceRoot}/modules/applications/3dforest/plugins/classification/src",
-            "${workspaceFolder}/build/modules/applications/3dforest/plugins/classification/pluginclassification_autogen/include",
-            "${workspaceRoot}/modules/applications/console/src",
-            "${workspaceRoot}/modules/core/src/common",
-            "${workspaceRoot}/modules/core/src/io",
-            "${workspaceRoot}/modules/core/src/scene",
-            "${workspaceRoot}/modules/editor/src",
-            "${workspaceRoot}/modules/visualization/src/editor",
-            "${workspaceRoot}/modules/visualization/src/opengl",
-            "${workspaceRoot}/modules/visualization/src/widgets"]
+            "${workspaceRoot}/src/app/3dforest",
+            "${workspaceRoot}/src/app/tools/sandbox",
+            "${workspaceRoot}/src/core",
+            "${workspaceRoot}/src/editor",
+            "${workspaceRoot}/src/gui",
+            "${workspaceRoot}/src/plugins/classification",
+            "${workspaceRoot}/src/plugins/import",
+            "${workspaceRoot}/src/plugins/project",
+            "${workspaceRoot}/src/plugins/segmentation",
+            "${workspaceRoot}/src/plugins/viewer"]
     }
     @endverbatim
 
@@ -605,10 +595,10 @@ uic -o ui_window.h window.ui
 -#  To build click "Build the selected target".
 
 -#  Copy shared libraries to the same folder as "3dforest.exe":
-    build\modules\applications\3dforest\
-    - libcore.dll
-    - libeditor.dll
-    - libvisualization.dll
+    build\src\app\3dforest\
+    - lib3dforestcore.dll
+    - lib3dforesteditor.dll
+    - lib3dforestgui.dll
 
 -#  To debug click "Launch the debugger for the selected target: [3dforest]".
 

@@ -15,18 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-file(
-  GLOB_RECURSE
-  ALL_SOURCE_FILES
-  src/*.cpp src/*.hpp src/*.c src/*.h
-)
-
-add_custom_target(
-  format
-  COMMAND clang-format
-  -style=file
-  -i
-  -fallback-style=none
-#  --verbose
-  ${ALL_SOURCE_FILES}
-)
+add_subdirectory(colorpalette)
+add_subdirectory(editor)
+add_subdirectory(lascreate)
+add_subdirectory(thread)
+add_subdirectory(vector3)

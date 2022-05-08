@@ -15,18 +15,32 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-file(
-  GLOB_RECURSE
-  ALL_SOURCE_FILES
-  src/*.cpp src/*.hpp src/*.c src/*.h
+set(SUB_PROJECT_NAME "3dforest")
+
+if (NOT CMAKE_3DFOREST_GUI_FOUND)
+  message(WARNING "Gui not found - skipping ${SUB_PROJECT_NAME}")
+  return()
+endif()
+
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+file(GLOB_RECURSE SOURCES "*.cpp")
+list(APPEND SOURCES resources/resources.rc)
+
+add_executable(
+  ${SUB_PROJECT_NAME}
+#  WIN32 MACOSX_BUNDLE
+  ${SOURCES}
+  resources/resources.qrc
 )
 
-add_custom_target(
-  format
-  COMMAND clang-format
-  -style=file
-  -i
-  -fallback-style=none
-#  --verbose
-  ${ALL_SOURCE_FILES}
+target_include_directories(${SUB_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+
+target_link_libraries(
+  ${SUB_PROJECT_NAME}
+  3dforestgui
+  Qt5::Help
 )
+
+install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

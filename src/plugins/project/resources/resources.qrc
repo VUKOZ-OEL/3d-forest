@@ -1,0 +1,11 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/project">
+
+<file>create-fluency-48.png</file>
+<file>new-file-fluency-48.png</file>
+<file>opened-folder-fluency-48.png</file>
+<file>save-fluency-48.png</file>
+<file>save-as-fluency-48.png</file>
+
+</qresource>
+</RCC>
