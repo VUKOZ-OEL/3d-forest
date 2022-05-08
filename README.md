@@ -22,7 +22,6 @@ third-party libraries **without downloading and installation** of each library.
 - delaunator-cpp (Oct 6, 2018), Delaunay triangulation of 2D points.
 - eigen (3.4.0), Template library for linear algebra.
 - libigl (2.4.0), A simple geometry processing library.
-- qt-ribbon-widget (Sep 26, 2018), A Ribbon widget for Qt.
 
 ## Known Issues
 This software is currently in development.
@@ -45,7 +44,7 @@ README.md          - Project summary.
 bin/               - 3D Forest binaries. CMake install destination directory.
 build/             - CMake build directory.
 cmake/             - CMake settings.
+data/              - Example data files.
 doc/               - Documentation.
-examples/          - Project and source code examples.
-modules/           - Source code.
+src/               - Source code.
 ```

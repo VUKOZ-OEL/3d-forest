@@ -15,18 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-file(
-  GLOB_RECURSE
-  ALL_SOURCE_FILES
-  src/*.cpp src/*.hpp src/*.c src/*.h
-)
+set(SUB_PROJECT_NAME "3dforestexamplevector3")
 
-add_custom_target(
-  format
-  COMMAND clang-format
-  -style=file
-  -i
-  -fallback-style=none
-#  --verbose
-  ${ALL_SOURCE_FILES}
+add_executable(${SUB_PROJECT_NAME} examplevector3.cpp)
+target_link_libraries(${SUB_PROJECT_NAME} PUBLIC 3dforestcore)
+set_target_properties(
+  ${SUB_PROJECT_NAME}
+  PROPERTIES
+  COMPILE_FLAGS
+  "-save-temps -fverbose-asm"
 )
+install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

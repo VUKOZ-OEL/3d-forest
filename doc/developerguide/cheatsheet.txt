@@ -163,7 +163,7 @@ Qt5 and OpenGL are required for GUI application.
     @endverbatim
 
 -#  We can open example project "project.json" from directory
-    "/home/user/3D-Forest_1.0/examples/3dforest/project1/"
+    "/home/user/3D-Forest_1.0/data"
 
 -#  We can see that we did not store modified PATH and LD_LIBRARY_PATH to user
     or system variables.
@@ -175,8 +175,41 @@ Qt5 and OpenGL are required for GUI application.
 /** @page cheatsheet_build_windows_make Build Using "MinGW Makefiles" on Windows
 
 -#  Installation of msys2 and mingw-w64
-    - Open https://www.msys2.org/ and follow Installation instructions
-    - Default installation will create "C:\msys64"
+    - Open https://www.msys2.org/ and follow Installation instructions:
+        - Download the installer: msys2-x86_64-20220319.exe
+        - Run the installer
+        - Default installation will create "C:\msys64" installation folder
+        - Click "Next"
+        - When complete, check "Run MSYS2 now" and click "Finish"
+        - Run the following command to update package database
+          @verbatim
+            $ pacman -Syu
+          @endverbatim
+        - MSYS2 window will be closed
+        - Run "MSYS2 MSYS" from Start menu and update the rest of the packages
+          @verbatim
+            $ pacman -Su
+          @endverbatim
+
+    - Install additional packages
+        - Install required packages
+          @verbatim
+            $ pacman -S mingw-w64-x86_64-clang
+            $ pacman -S mingw-w64-x86_64-cmake
+            $ pacman -S mingw-w64-x86_64-make
+          @endverbatim
+        - Install optional packages to build documentation
+          @verbatim
+            $ pacman -S mingw-w64-x86_64-doxygen
+            $ pacman -S mingw-w64-x86_64-graphviz
+          @endverbatim
+        - Install optional packages for python
+          @verbatim
+            $ pacman -S mingw-w64-x86_64-python
+            $ pacman -S mingw-w64-x86_64-python-pip
+          @endverbatim
+
+    - Close "MSYS2" window
 
 -#  Setup Windows PATH variable
     - Run "systempropertiesadvanced" from the search box
@@ -187,21 +220,6 @@ Qt5 and OpenGL are required for GUI application.
     - Click "New" and add "C:\msys64\mingw64\bin", hit enter
     - "Move Up" these three new items to top
 
--#  Run "MSYS2 MSYS" Windows application and install additional packages
-    - Required
-      @verbatim
-        $ pacman -S mingw-w64-x86_64-clang
-        $ pacman -S mingw-w64-x86_64-cmake
-        $ pacman -S mingw-w64-x86_64-make
-      @endverbatim
-    - Optional
-      @verbatim
-        $ pacman -S mingw-w64-x86_64-python
-        $ pacman -S mingw-w64-x86_64-python-pip
-        $ pacman -S mingw-w64-x86_64-doxygen
-        $ pacman -S mingw-w64-x86_64-graphviz
-      @endverbatim
-
 -#  Install Qt
     - Download Qt installer
     - Run the installer
@@ -210,7 +228,7 @@ Qt5 and OpenGL are required for GUI application.
     - In "System variables" select "Path" and click "Edit..."
     - Click "New" and add "C:\Qt\5.15.0\mingw81_64\bin", hit enter
 
--#  Open "cmd" terminal, navigate to the project folder and build it
+-#  Open "cmd" terminal, navigate to local git repository folder and build it
     - Build
       @verbatim
         > mkdir build
@@ -228,10 +246,9 @@ Qt5 and OpenGL are required for GUI application.
 
 @verbatim
 directory "3rd Party" is "3rdparty" lowercase, no separators
-          "Height Map" is "heightmap" which will produce "heightmap.dll"
 
-source    "WindowMain.hpp"          C++ header, CamelCase for classes
-          "WindowMain.cpp"          C++ source, CamelCase for classes
+source    "GuiWindowMain.hpp"       C++ header, CamelCase for classes
+          "GuiWindowMain.cpp"       C++ source, CamelCase for classes
           "examplecolorpalette.cpp" lowercase for executables
           "las.cpp"                 lowercase for executables
 
@@ -453,31 +470,22 @@ uic -o ui_window.h window.ui
     @verbatim
     {
         "files.eol": "\n",
-        "cmake.configureOnOpen": false,
-        "cmake.mingwSearchDirs": [
-            "C:\\msys64\\mingw-w64\\bin"
-        ],
-        "cmake.generator": "MinGW Makefiles",
         "C_Cpp.default.includePath":[
             "C:/Qt/5.15.0/mingw81_64/include/**",
             "${workspaceRoot}/3rdparty/delaunator",
             "${workspaceRoot}/3rdparty/eigen",
             "${workspaceRoot}/3rdparty/libigl/include/**",
             "${workspaceRoot}/3rdparty/widgets/ctkrangeslider",
-            "${workspaceRoot}/3rdparty/widgets/qtribbonwidget",
-            "${workspaceRoot}/modules/applications/3dforest/application/src",
-            "${workspaceRoot}/modules/applications/3dforest/plugins/databasestatistics/src",
-            "${workspaceRoot}/modules/applications/3dforest/plugins/heightmap/src",
-            "${workspaceRoot}/modules/applications/3dforest/plugins/classification/src",
-            "${workspaceFolder}/build/modules/applications/3dforest/plugins/classification/pluginclassification_autogen/include",
-            "${workspaceRoot}/modules/applications/console/src",
-            "${workspaceRoot}/modules/core/src/common",
-            "${workspaceRoot}/modules/core/src/io",
-            "${workspaceRoot}/modules/core/src/scene",
-            "${workspaceRoot}/modules/editor/src",
-            "${workspaceRoot}/modules/visualization/src/editor",
-            "${workspaceRoot}/modules/visualization/src/opengl",
-            "${workspaceRoot}/modules/visualization/src/widgets"]
+            "${workspaceRoot}/src/app/3dforest",
+            "${workspaceRoot}/src/app/tools/sandbox",
+            "${workspaceRoot}/src/core",
+            "${workspaceRoot}/src/editor",
+            "${workspaceRoot}/src/gui",
+            "${workspaceRoot}/src/plugins/classification",
+            "${workspaceRoot}/src/plugins/import",
+            "${workspaceRoot}/src/plugins/project",
+            "${workspaceRoot}/src/plugins/segmentation",
+            "${workspaceRoot}/src/plugins/viewer"]
     }
     @endverbatim
 
@@ -587,10 +595,10 @@ uic -o ui_window.h window.ui
 -#  To build click "Build the selected target".
 
 -#  Copy shared libraries to the same folder as "3dforest.exe":
-    build\modules\applications\3dforest\
-    - libcore.dll
-    - libeditor.dll
-    - libvisualization.dll
+    build\src\app\3dforest\
+    - lib3dforestcore.dll
+    - lib3dforesteditor.dll
+    - lib3dforestgui.dll
 
 -#  To debug click "Launch the debugger for the selected target: [3dforest]".
 
