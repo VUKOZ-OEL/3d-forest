@@ -17,34 +17,24 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file PluginTool.hpp */
+/** @file GuiPluginInterface.hpp */
 
-#ifndef PLUGIN_TOOL_HPP
-#define PLUGIN_TOOL_HPP
+#ifndef GUI_PLUGIN_INTERFACE_HPP
+#define GUI_PLUGIN_INTERFACE_HPP
 
-#include <QPixmap>
-#include <QString>
 #include <QtPlugin>
 
-class Editor;
-class QAction;
-class QMainWindow;
+class GuiWindowMain;
 
-/** Plugin Tool Interface. */
-class PluginTool
+/** Gui Plugin Interface. */
+class GuiPluginInterface
 {
 public:
-    virtual ~PluginTool() = default;
-    virtual void initialize(QMainWindow *parent, Editor *editor) = 0;
-    virtual void show(QMainWindow *parent) = 0;
-    virtual QAction *toggleViewAction() const = 0;
-    virtual QString windowTitle() const = 0; /**< Unique */
-    virtual QString buttonText() const = 0;
-    virtual QString toolTip() const = 0;
-    virtual QPixmap icon() const = 0;
+    virtual ~GuiPluginInterface() = default;
+    virtual void initialize(GuiWindowMain *parent) = 0;
 };
 
-#define PluginTool_iid "vukoz.3dforest.qt.PluginTool/1.0"
-Q_DECLARE_INTERFACE(PluginTool, PluginTool_iid)
+#define GuiPluginInterface_iid "vukoz.3dforest.qt.GuiPluginInterface/1.0"
+Q_DECLARE_INTERFACE(GuiPluginInterface, GuiPluginInterface_iid)
 
-#endif /* PLUGIN_TOOL_HPP */
+#endif /* GUI_PLUGIN_INTERFACE_HPP */
