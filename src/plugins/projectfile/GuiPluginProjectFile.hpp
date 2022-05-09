@@ -17,10 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file GuiPluginProject.hpp */
+/** @file GuiPluginProjectFile.hpp */
 
-#ifndef GUI_PLUGIN_PROJECT_HPP
-#define GUI_PLUGIN_PROJECT_HPP
+#ifndef GUI_PLUGIN_PROJECT_FILE_HPP
+#define GUI_PLUGIN_PROJECT_FILE_HPP
 
 #include <QObject>
 #include <QString>
@@ -29,12 +29,12 @@ class GuiWindowMain;
 class QAction;
 
 /** Gui Plugin Project. */
-class GuiPluginProject : public QObject
+class GuiPluginProjectFile : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit GuiPluginProject(GuiWindowMain *window);
+    explicit GuiPluginProjectFile(GuiWindowMain *window);
 
     bool projectClose();
 
@@ -56,4 +56,4 @@ protected:
     QAction *actionProjectSaveAs_;
 };
 
-#endif /* GUI_PLUGIN_PROJECT_HPP */
+#endif /* GUI_PLUGIN_PROJECT_FILE_HPP */

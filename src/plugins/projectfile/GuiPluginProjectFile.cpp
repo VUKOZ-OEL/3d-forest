@@ -17,20 +17,20 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file GuiPluginProject.cpp */
+/** @file GuiPluginProjectFile.cpp */
 
 #include <Log.hpp>
 
-#include <GuiPluginProject.hpp>
+#include <GuiPluginProjectFile.hpp>
 #include <GuiWindowMain.hpp>
 
 #include <QFileDialog>
 #include <QMessageBox>
 
 #define GUI_PLUGIN_PROJECT_FILTER_PRJ "3DForest Project (*.json)"
-#define ICON(name) (QIcon(":/project/" name "-fluency-48.png"))
+#define ICON(name) (QIcon(":/projectfile/" name "-fluency-48.png"))
 
-GuiPluginProject::GuiPluginProject(GuiWindowMain *window)
+GuiPluginProjectFile::GuiPluginProjectFile(GuiWindowMain *window)
     : QObject(window),
       window_(window)
 {
@@ -41,7 +41,7 @@ GuiPluginProject::GuiPluginProject(GuiWindowMain *window)
                           ICON("create"),
                           this,
                           SLOT(slotProjectNew()),
-                          false);
+                          true);
 
     window_->createAction(&actionProjectOpen_,
                           "File",
@@ -68,10 +68,10 @@ GuiPluginProject::GuiPluginProject(GuiWindowMain *window)
                           ICON("save-as"),
                           this,
                           SLOT(slotProjectSaveAs()),
-                          false);
+                          true);
 }
 
-void GuiPluginProject::slotProjectNew()
+void GuiPluginProjectFile::slotProjectNew()
 {
     if (projectClose())
     {
@@ -79,7 +79,7 @@ void GuiPluginProject::slotProjectNew()
     }
 }
 
-void GuiPluginProject::slotProjectOpen()
+void GuiPluginProjectFile::slotProjectOpen()
 {
     QString fileName;
 
@@ -96,12 +96,12 @@ void GuiPluginProject::slotProjectOpen()
     (void)projectOpen(fileName);
 }
 
-void GuiPluginProject::slotProjectSave()
+void GuiPluginProjectFile::slotProjectSave()
 {
     (void)projectSave();
 }
 
-void GuiPluginProject::slotProjectSaveAs()
+void GuiPluginProjectFile::slotProjectSaveAs()
 {
     QString fileName;
 
@@ -118,7 +118,7 @@ void GuiPluginProject::slotProjectSaveAs()
     (void)projectSave(fileName);
 }
 
-bool GuiPluginProject::projectOpen(const QString &path)
+bool GuiPluginProjectFile::projectOpen(const QString &path)
 {
     // Close the current project
     if (!projectClose())
@@ -142,7 +142,7 @@ bool GuiPluginProject::projectOpen(const QString &path)
     return true; // Opened
 }
 
-bool GuiPluginProject::projectClose()
+bool GuiPluginProjectFile::projectClose()
 {
     window_->cancelThreads();
 
@@ -196,7 +196,7 @@ bool GuiPluginProject::projectClose()
     return true; // Closed
 }
 
-bool GuiPluginProject::projectSave(const QString &path)
+bool GuiPluginProjectFile::projectSave(const QString &path)
 {
     std::string writePath;
 

@@ -483,7 +483,7 @@ uic -o ui_window.h window.ui
             "${workspaceRoot}/src/gui",
             "${workspaceRoot}/src/plugins/classification",
             "${workspaceRoot}/src/plugins/import",
-            "${workspaceRoot}/src/plugins/project",
+            "${workspaceRoot}/src/plugins/projectfile",
             "${workspaceRoot}/src/plugins/segmentation",
             "${workspaceRoot}/src/plugins/viewer"]
     }

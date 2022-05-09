@@ -27,7 +27,7 @@ set(CMAKE_AUTORCC ON)
 
 file(GLOB_RECURSE SOURCES "*.cpp")
 file(GLOB_RECURSE SOURCES_IMPORT "../plugins/import/*.cpp")
-file(GLOB_RECURSE SOURCES_PROJECT "../plugins/project/*.cpp")
+file(GLOB_RECURSE SOURCES_PROJECT_FILE "../plugins/projectfile/*.cpp")
 file(GLOB_RECURSE SOURCES_VIEWER "../plugins/viewer/*.cpp")
 
 add_library(
@@ -35,11 +35,11 @@ add_library(
   SHARED
   ${SOURCES}
   ${SOURCES_IMPORT}
-  ${SOURCES_PROJECT}
+  ${SOURCES_PROJECT_FILE}
   ${SOURCES_VIEWER}
   resources/resources.qrc
   ../plugins/import/resources/resources.qrc
-  ../plugins/project/resources/resources.qrc
+  ../plugins/projectfile/resources/resources.qrc
   ../plugins/viewer/resources/resources.qrc
 )
 
@@ -48,7 +48,7 @@ target_include_directories(
   PUBLIC
   ${CMAKE_CURRENT_LIST_DIR}
   ../plugins/import
-  ../plugins/project
+  ../plugins/projectfile
   ../plugins/viewer
 )
 

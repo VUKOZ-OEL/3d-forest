@@ -1,5 +1,5 @@
 <!DOCTYPE RCC><RCC version="1.0">
-<qresource prefix="/project">
+<qresource prefix="/projectfile">
 
 <file>create-fluency-48.png</file>
 <file>new-file-fluency-48.png</file>
