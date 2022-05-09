@@ -262,7 +262,7 @@ void Editor::setSettingsView(const EditorSettingsView &settings)
     unsavedChanges_ = true;
 }
 
-void Editor::addFilter(EditorProcessor *filter)
+void Editor::addFilter(EditorProcessorInterface *filter)
 {
     filters_.push_back(filter);
 }

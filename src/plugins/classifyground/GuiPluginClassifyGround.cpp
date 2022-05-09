@@ -17,35 +17,33 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file GuiPluginSegmentation.cpp */
+/** @file GuiPluginClassifyGround.cpp */
 
-#include <Segmentation.hpp>
-
-#include <GuiPluginSegmentation.hpp>
+#include <GuiPluginClassifyGround.hpp>
 #include <GuiWindowMain.hpp>
 
-#define ICON(name) (QIcon(":/segmentation/" name GUI_ICON_THEME ".png"))
+#define ICON(name) (QIcon(":/classifyground/" name GUI_ICON_THEME ".png"))
 
-GuiPluginSegmentation::GuiPluginSegmentation()
+GuiPluginClassifyGround::GuiPluginClassifyGround()
     : window_(nullptr),
       dockWindow_(nullptr)
 {
 }
 
-void GuiPluginSegmentation::initialize(GuiWindowMain *window)
+void GuiPluginClassifyGround::initialize(GuiWindowMain *window)
 {
     window_ = window;
 
     window_->createAction(&action_,
                           "Tools",
-                          tr("Segmentation"),
-                          tr("Segmentation"),
-                          ICON("segmentation"),
+                          tr("Classify Ground"),
+                          tr("Classify Ground"),
+                          ICON("soil"),
                           this,
                           SLOT(slotPlugin()),
                           true);
 }
 
-void GuiPluginSegmentation::slotPlugin()
+void GuiPluginClassifyGround::slotPlugin()
 {
 }

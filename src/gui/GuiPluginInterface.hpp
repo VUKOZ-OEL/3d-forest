@@ -17,20 +17,25 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file EditorProcessor.hpp */
+/** @file GuiPluginInterface.hpp */
 
-#ifndef EDITOR_PROCESSOR_HPP
-#define EDITOR_PROCESSOR_HPP
+#ifndef GUI_PLUGIN_INTERFACE_HPP
+#define GUI_PLUGIN_INTERFACE_HPP
 
-#include <EditorPage.hpp>
+#include <QtPlugin>
+#include <QtWidgets/QAction>
 
-/** Editor Processor. */
-class EditorProcessor
+class GuiWindowMain;
+
+/** Gui Plugin Interface. */
+class GuiPluginInterface
 {
 public:
-    virtual ~EditorProcessor() = default;
-    virtual bool isFilterEnabled() = 0;
-    virtual void filterPage(EditorPage *page) = 0;
+    virtual ~GuiPluginInterface() = default;
+    virtual void initialize(GuiWindowMain *window) = 0;
 };
 
-#endif /* EDITOR_PROCESSOR_HPP */
+#define GuiPluginInterface_iid "vukoz.3dforest.qt.GuiPluginInterface/1.0"
+Q_DECLARE_INTERFACE(GuiPluginInterface, GuiPluginInterface_iid)
+
+#endif /* GUI_PLUGIN_INTERFACE_HPP */

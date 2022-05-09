@@ -17,34 +17,43 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file PluginTool.hpp */
+/** @file GuiPluginProjectFile.hpp */
 
-#ifndef PLUGIN_TOOL_HPP
-#define PLUGIN_TOOL_HPP
+#ifndef GUI_PLUGIN_PROJECT_FILE_HPP
+#define GUI_PLUGIN_PROJECT_FILE_HPP
 
-#include <QPixmap>
+#include <QObject>
 #include <QString>
-#include <QtPlugin>
 
-class Editor;
+class GuiWindowMain;
 class QAction;
-class QMainWindow;
 
-/** Plugin Tool Interface. */
-class PluginTool
+/** Gui Plugin Project. */
+class GuiPluginProjectFile : public QObject
 {
+    Q_OBJECT
+
 public:
-    virtual ~PluginTool() = default;
-    virtual void initialize(QMainWindow *parent, Editor *editor) = 0;
-    virtual void show(QMainWindow *parent) = 0;
-    virtual QAction *toggleViewAction() const = 0;
-    virtual QString windowTitle() const = 0; /**< Unique */
-    virtual QString buttonText() const = 0;
-    virtual QString toolTip() const = 0;
-    virtual QPixmap icon() const = 0;
+    explicit GuiPluginProjectFile(GuiWindowMain *window);
+
+    bool projectClose();
+
+public slots:
+    void slotProjectNew();
+    void slotProjectOpen();
+    void slotProjectSave();
+    void slotProjectSaveAs();
+
+protected:
+    bool projectOpen(const QString &path);
+    bool projectSave(const QString &path = "");
+
+    GuiWindowMain *window_;
+
+    QAction *actionProjectNew_;
+    QAction *actionProjectOpen_;
+    QAction *actionProjectSave_;
+    QAction *actionProjectSaveAs_;
 };
 
-#define PluginTool_iid "vukoz.3dforest.qt.PluginTool/1.0"
-Q_DECLARE_INTERFACE(PluginTool, PluginTool_iid)
-
-#endif /* PLUGIN_TOOL_HPP */
+#endif /* GUI_PLUGIN_PROJECT_FILE_HPP */

@@ -22,14 +22,18 @@
 #include <Log.hpp>
 
 #include <GuiPluginImport.hpp>
-#include <GuiPluginProject.hpp>
+#include <GuiPluginInterface.hpp>
+#include <GuiPluginProjectFile.hpp>
 #include <GuiPluginViewer.hpp>
 #include <GuiViewports.hpp>
 #include <GuiWindowMain.hpp>
 
 #include <QCloseEvent>
+#include <QCoreApplication>
+#include <QDir>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QPluginLoader>
 #include <QStatusBar>
 #include <QToolBar>
 
@@ -45,22 +49,18 @@ GuiWindowMain::GuiWindowMain(QWidget *parent)
 {
     LOG_LOCAL("");
 
-    // Menu
-    menu_["File"] = menuBar()->addMenu(tr("&File"));
-    toolBar_["File"] = addToolBar(tr("File"));
-    menu_["View"] = menuBar()->addMenu(tr("&View"));
-    toolBar_["View"] = addToolBar(tr("View"));
-
+    // Status bar
     statusBar()->showMessage(tr("Ready"));
 
     // Menu
-    guiPluginProject_ = new GuiPluginProject(this);
-    menu_["File"]->addSeparator();
+    guiPluginProjectFile_ = new GuiPluginProjectFile(this);
+    createSeparator("File");
     guiPluginImport_ = new GuiPluginImport(this);
     guiPluginViewer_ = new GuiPluginViewer(this);
+    loadPlugins();
 
     // Exit
-    menu_["File"]->addSeparator();
+    createSeparator("File");
     createAction(&actionExit_,
                  "File",
                  tr("E&xit"),
@@ -70,6 +70,8 @@ GuiWindowMain::GuiWindowMain(QWidget *parent)
                  SLOT(close()),
                  false);
     actionExit_->setShortcuts(QKeySequence::Quit);
+
+    hideToolBar("File");
 
     // Rendering
     connect(guiPluginViewer_->viewports(),
@@ -152,10 +154,18 @@ void GuiWindowMain::createAction(QAction **result,
     }
 
     // Add action to menu
+    if (!menu_.contains(menu))
+    {
+        menu_[menu] = menuBar()->addMenu(menu);
+    }
     menu_[menu]->addAction(action);
 
     if (useToolBar && !icon.isNull())
     {
+        if (!toolBar_.contains(menu))
+        {
+            toolBar_[menu] = addToolBar(menu);
+        }
         toolBar_[menu]->addAction(action);
     }
 
@@ -165,6 +175,57 @@ void GuiWindowMain::createAction(QAction **result,
 void GuiWindowMain::createSeparator(const QString &menu)
 {
     menu_[menu]->addSeparator();
+}
+
+void GuiWindowMain::hideToolBar(const QString &menu)
+{
+    if (toolBar_.contains(menu))
+    {
+        toolBar_[menu]->close();
+    }
+}
+
+void GuiWindowMain::loadPlugins()
+{
+    // Process all files in the application "exe" directory
+    QDir pluginsDir(QCoreApplication::applicationDirPath() + "/plugins/");
+    const QStringList entries = pluginsDir.entryList(QDir::Files);
+
+    for (const QString &fileName : entries)
+    {
+        // Try to load the file as a plugin
+        QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
+        QObject *plugin = pluginLoader.instance();
+
+        loadPlugin(plugin);
+    }
+}
+
+void GuiWindowMain::loadPlugin(QObject *plugin)
+{
+    if (!plugin)
+    {
+        return;
+    }
+
+    // Detect and register various plugins
+
+    GuiPluginInterface *guiPluginInterface;
+    guiPluginInterface = qobject_cast<GuiPluginInterface *>(plugin);
+    if (guiPluginInterface)
+    {
+        guiPluginInterface->initialize(this);
+        plugins_.push_back(guiPluginInterface);
+
+        // EditorProcessorInterface *processor;
+        // processor = dynamic_cast<EditorProcessorInterface
+        // *>(guiPluginInterface); if (processor)
+        // {
+        //     editor_.addFilter(processor);
+        // }
+
+        return;
+    }
 }
 
 void GuiWindowMain::cancelThreads()
@@ -227,7 +288,7 @@ void GuiWindowMain::updateEverything()
 
 void GuiWindowMain::closeEvent(QCloseEvent *event)
 {
-    if (guiPluginProject_->projectClose())
+    if (guiPluginProjectFile_->projectClose())
     {
         event->accept();
     }

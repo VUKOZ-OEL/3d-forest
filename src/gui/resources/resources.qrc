@@ -1,5 +1,7 @@
 <!DOCTYPE RCC><RCC version="1.0">
-<qresource>
+<qresource prefix="/gui">
+
+<file>tea-fluency-48.png</file>
 
 </qresource>
 </RCC>

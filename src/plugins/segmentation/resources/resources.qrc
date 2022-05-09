@@ -2,6 +2,7 @@
 <qresource prefix="/segmentation">
 
 <file>collage-fluency-48.png</file>
+<file>segmentation-fluency-48.png</file>
 
 </qresource>
 </RCC>

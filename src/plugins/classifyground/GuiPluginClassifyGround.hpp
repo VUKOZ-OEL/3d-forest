@@ -17,12 +17,34 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file GuiPluginClassification.cpp */
+/** @file GuiPluginClassifyGround.hpp */
 
-#include <GuiPluginClassification.hpp>
+#ifndef GUI_PLUGIN_CLASSIFY_GROUND_HPP
+#define GUI_PLUGIN_CLASSIFY_GROUND_HPP
 
-#define ICON(name) (QIcon(":/classification/" name "-fluency-48.png"))
+#include <GuiPluginInterface.hpp>
 
-GuiPluginClassification::GuiPluginClassification()
+class GuiPluginClassifyGroundWindow;
+
+/** Gui Plugin Classify Ground. */
+class GuiPluginClassifyGround : public QObject, public GuiPluginInterface
 {
-}
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID GuiPluginInterface_iid)
+    Q_INTERFACES(GuiPluginInterface)
+
+public:
+    GuiPluginClassifyGround();
+
+    virtual void initialize(GuiWindowMain *window);
+
+public slots:
+    void slotPlugin();
+
+protected:
+    GuiWindowMain *window_;
+    GuiPluginClassifyGroundWindow *dockWindow_;
+    QAction *action_;
+};
+
+#endif /* GUI_PLUGIN_CLASSIFY_GROUND_HPP */

@@ -31,9 +31,12 @@
 #include <QMainWindow>
 #include <QtWidgets/QAction>
 
+class GuiPluginInterface;
 class GuiPluginImport;
-class GuiPluginProject;
+class GuiPluginProjectFile;
 class GuiPluginViewer;
+
+#define GUI_ICON_THEME "-fluency-48"
 
 /** Gui Window Main. */
 class GuiWindowMain : public QMainWindow, public ThreadCallbackInterface
@@ -63,6 +66,7 @@ public:
                       bool useToolBar);
 
     void createSeparator(const QString &menu);
+    void hideToolBar(const QString &menu);
 
     void cancelThreads();
     void resumeThreads();
@@ -81,8 +85,9 @@ signals:
     void signalRender();
 
 protected:
-    // Events
     void closeEvent(QCloseEvent *event) override;
+    void loadPlugins();
+    void loadPlugin(QObject *plugin);
 
     // Editor
     Editor editor_;
@@ -90,8 +95,9 @@ protected:
 
     // Gui
     GuiPluginImport *guiPluginImport_;
-    GuiPluginProject *guiPluginProject_;
+    GuiPluginProjectFile *guiPluginProjectFile_;
     GuiPluginViewer *guiPluginViewer_;
+    std::vector<GuiPluginInterface *> plugins_;
 
     // Menu
     QHash<QString, QMenu *> menu_;
