@@ -28,7 +28,7 @@
 #include <QMessageBox>
 
 #define GUI_PLUGIN_PROJECT_FILTER_PRJ "3DForest Project (*.json)"
-#define ICON(name) (QIcon(":/projectfile/" name "-fluency-48.png"))
+#define ICON(name) (QIcon(":/projectfile/" name GUI_ICON_THEME ".png"))
 
 GuiPluginProjectFile::GuiPluginProjectFile(GuiWindowMain *window)
     : QObject(window),

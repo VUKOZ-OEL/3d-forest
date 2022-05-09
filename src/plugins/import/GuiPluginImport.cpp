@@ -33,7 +33,7 @@
 
 #define GUI_PLUGIN_IMPORT_FILTER "LAS (LASer) File (*.las)"
 
-#define ICON(name) (QIcon(":/import/" name "-fluency-48.png"))
+#define ICON(name) (QIcon(":/import/" name GUI_ICON_THEME ".png"))
 
 GuiPluginImport::GuiPluginImport(GuiWindowMain *window)
     : QObject(window),

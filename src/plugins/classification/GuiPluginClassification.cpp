@@ -21,7 +21,7 @@
 
 #include <GuiPluginClassification.hpp>
 
-#define ICON(name) (QIcon(":/classification/" name "-fluency-48.png"))
+#define ICON(name) (QIcon(":/classification/" name GUI_ICON_THEME ".png"))
 
 GuiPluginClassification::GuiPluginClassification()
 {

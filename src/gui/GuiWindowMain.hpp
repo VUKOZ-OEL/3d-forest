@@ -35,6 +35,8 @@ class GuiPluginImport;
 class GuiPluginProjectFile;
 class GuiPluginViewer;
 
+#define GUI_ICON_THEME "-fluency-48"
+
 /** Gui Window Main. */
 class GuiWindowMain : public QMainWindow, public ThreadCallbackInterface
 {

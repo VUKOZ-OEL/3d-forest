@@ -25,7 +25,7 @@
 #include <GuiViewports.hpp>
 #include <GuiWindowMain.hpp>
 
-#define ICON(name) (QIcon(":/viewer/" name "-fluency-48.png"))
+#define ICON(name) (QIcon(":/viewer/" name GUI_ICON_THEME ".png"))
 
 GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
     : QObject(window),

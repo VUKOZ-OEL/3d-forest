@@ -21,7 +21,7 @@
 
 #include <GuiPluginSegmentation.hpp>
 
-#define ICON(name) (QIcon(":/segmentation/" name "-fluency-48.png"))
+#define ICON(name) (QIcon(":/segmentation/" name GUI_ICON_THEME ".png"))
 
 GuiPluginSegmentation::GuiPluginSegmentation()
 {
