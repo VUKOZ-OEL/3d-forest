@@ -32,7 +32,7 @@
 #include <QtWidgets/QAction>
 
 class GuiPluginImport;
-class GuiPluginProject;
+class GuiPluginProjectFile;
 class GuiPluginViewer;
 
 /** Gui Window Main. */
@@ -63,6 +63,7 @@ public:
                       bool useToolBar);
 
     void createSeparator(const QString &menu);
+    void hideToolBar(const QString &menu);
 
     void cancelThreads();
     void resumeThreads();
@@ -90,7 +91,7 @@ protected:
 
     // Gui
     GuiPluginImport *guiPluginImport_;
-    GuiPluginProject *guiPluginProject_;
+    GuiPluginProjectFile *guiPluginProjectFile_;
     GuiPluginViewer *guiPluginViewer_;
 
     // Menu

@@ -22,7 +22,7 @@
 #include <Log.hpp>
 
 #include <GuiPluginImport.hpp>
-#include <GuiPluginProject.hpp>
+#include <GuiPluginProjectFile.hpp>
 #include <GuiPluginViewer.hpp>
 #include <GuiViewports.hpp>
 #include <GuiWindowMain.hpp>
@@ -45,22 +45,17 @@ GuiWindowMain::GuiWindowMain(QWidget *parent)
 {
     LOG_LOCAL("");
 
-    // Menu
-    menu_["File"] = menuBar()->addMenu(tr("&File"));
-    toolBar_["File"] = addToolBar(tr("File"));
-    menu_["View"] = menuBar()->addMenu(tr("&View"));
-    toolBar_["View"] = addToolBar(tr("View"));
-
+    // Status bar
     statusBar()->showMessage(tr("Ready"));
 
     // Menu
-    guiPluginProject_ = new GuiPluginProject(this);
-    menu_["File"]->addSeparator();
+    guiPluginProjectFile_ = new GuiPluginProjectFile(this);
+    createSeparator("File");
     guiPluginImport_ = new GuiPluginImport(this);
     guiPluginViewer_ = new GuiPluginViewer(this);
 
     // Exit
-    menu_["File"]->addSeparator();
+    createSeparator("File");
     createAction(&actionExit_,
                  "File",
                  tr("E&xit"),
@@ -70,6 +65,8 @@ GuiWindowMain::GuiWindowMain(QWidget *parent)
                  SLOT(close()),
                  false);
     actionExit_->setShortcuts(QKeySequence::Quit);
+
+    hideToolBar("File");
 
     // Rendering
     connect(guiPluginViewer_->viewports(),
@@ -152,10 +149,18 @@ void GuiWindowMain::createAction(QAction **result,
     }
 
     // Add action to menu
+    if (!menu_.contains(menu))
+    {
+        menu_[menu] = menuBar()->addMenu(menu);
+    }
     menu_[menu]->addAction(action);
 
     if (useToolBar && !icon.isNull())
     {
+        if (!toolBar_.contains(menu))
+        {
+            toolBar_[menu] = addToolBar(menu);
+        }
         toolBar_[menu]->addAction(action);
     }
 
@@ -165,6 +170,14 @@ void GuiWindowMain::createAction(QAction **result,
 void GuiWindowMain::createSeparator(const QString &menu)
 {
     menu_[menu]->addSeparator();
+}
+
+void GuiWindowMain::hideToolBar(const QString &menu)
+{
+    if (toolBar_.contains(menu))
+    {
+        toolBar_[menu]->close();
+    }
 }
 
 void GuiWindowMain::cancelThreads()
@@ -227,7 +240,7 @@ void GuiWindowMain::updateEverything()
 
 void GuiWindowMain::closeEvent(QCloseEvent *event)
 {
-    if (guiPluginProject_->projectClose())
+    if (guiPluginProjectFile_->projectClose())
     {
         event->accept();
     }
