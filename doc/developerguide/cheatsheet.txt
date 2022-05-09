@@ -481,7 +481,7 @@ uic -o ui_window.h window.ui
             "${workspaceRoot}/src/core",
             "${workspaceRoot}/src/editor",
             "${workspaceRoot}/src/gui",
-            "${workspaceRoot}/src/plugins/classification",
+            "${workspaceRoot}/src/plugins/classifyground",
             "${workspaceRoot}/src/plugins/import",
             "${workspaceRoot}/src/plugins/projectfile",
             "${workspaceRoot}/src/plugins/segmentation",

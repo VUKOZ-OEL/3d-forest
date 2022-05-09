@@ -17,18 +17,20 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file GuiPluginClassification.hpp */
+/** @file EditorProcessorInterface.hpp */
 
-#ifndef GUI_PLUGIN_CLASSIFICATION_HPP
-#define GUI_PLUGIN_CLASSIFICATION_HPP
+#ifndef EDITOR_PROCESSOR_INTERFACE_HPP
+#define EDITOR_PROCESSOR_INTERFACE_HPP
 
-/** Gui Plugin Classification. */
-class GuiPluginClassification
+#include <EditorPage.hpp>
+
+/** Editor Processor Interface. */
+class EditorProcessorInterface
 {
 public:
-    GuiPluginClassification();
-
-protected:
+    virtual ~EditorProcessorInterface() = default;
+    virtual bool isFilterEnabled() = 0;
+    virtual void filterPage(EditorPage *page) = 0;
 };
 
-#endif /* GUI_PLUGIN_CLASSIFICATION_HPP */
+#endif /* EDITOR_PROCESSOR_INTERFACE_HPP */

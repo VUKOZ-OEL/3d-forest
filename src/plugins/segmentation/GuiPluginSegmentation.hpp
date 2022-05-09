@@ -22,15 +22,29 @@
 #ifndef GUI_PLUGIN_SEGMENTATION_HPP
 #define GUI_PLUGIN_SEGMENTATION_HPP
 
-#include <Segmentation.hpp>
+#include <GuiPluginInterface.hpp>
+
+class GuiPluginSegmentationWindow;
 
 /** Gui Plugin Segmentation. */
-class GuiPluginSegmentation
+class GuiPluginSegmentation : public QObject, public GuiPluginInterface
 {
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID GuiPluginInterface_iid)
+    Q_INTERFACES(GuiPluginInterface)
+
 public:
     GuiPluginSegmentation();
 
+    virtual void initialize(GuiWindowMain *window);
+
+public slots:
+    void slotPlugin();
+
 protected:
+    GuiWindowMain *window_;
+    GuiPluginSegmentationWindow *dockWindow_;
+    QAction *action_;
 };
 
 #endif /* GUI_PLUGIN_SEGMENTATION_HPP */

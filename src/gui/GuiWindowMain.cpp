@@ -22,14 +22,18 @@
 #include <Log.hpp>
 
 #include <GuiPluginImport.hpp>
+#include <GuiPluginInterface.hpp>
 #include <GuiPluginProjectFile.hpp>
 #include <GuiPluginViewer.hpp>
 #include <GuiViewports.hpp>
 #include <GuiWindowMain.hpp>
 
 #include <QCloseEvent>
+#include <QCoreApplication>
+#include <QDir>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QPluginLoader>
 #include <QStatusBar>
 #include <QToolBar>
 
@@ -53,6 +57,7 @@ GuiWindowMain::GuiWindowMain(QWidget *parent)
     createSeparator("File");
     guiPluginImport_ = new GuiPluginImport(this);
     guiPluginViewer_ = new GuiPluginViewer(this);
+    loadPlugins();
 
     // Exit
     createSeparator("File");
@@ -177,6 +182,49 @@ void GuiWindowMain::hideToolBar(const QString &menu)
     if (toolBar_.contains(menu))
     {
         toolBar_[menu]->close();
+    }
+}
+
+void GuiWindowMain::loadPlugins()
+{
+    // Process all files in the application "exe" directory
+    QDir pluginsDir(QCoreApplication::applicationDirPath() + "/plugins/");
+    const QStringList entries = pluginsDir.entryList(QDir::Files);
+
+    for (const QString &fileName : entries)
+    {
+        // Try to load the file as a plugin
+        QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
+        QObject *plugin = pluginLoader.instance();
+
+        loadPlugin(plugin);
+    }
+}
+
+void GuiWindowMain::loadPlugin(QObject *plugin)
+{
+    if (!plugin)
+    {
+        return;
+    }
+
+    // Detect and register various plugins
+
+    GuiPluginInterface *guiPluginInterface;
+    guiPluginInterface = qobject_cast<GuiPluginInterface *>(plugin);
+    if (guiPluginInterface)
+    {
+        guiPluginInterface->initialize(this);
+        plugins_.push_back(guiPluginInterface);
+
+        // EditorProcessorInterface *processor;
+        // processor = dynamic_cast<EditorProcessorInterface
+        // *>(guiPluginInterface); if (processor)
+        // {
+        //     editor_.addFilter(processor);
+        // }
+
+        return;
     }
 }
 

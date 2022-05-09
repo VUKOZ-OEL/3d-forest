@@ -28,7 +28,7 @@
 #include <EditorDatasets.hpp>
 #include <EditorFilterClip.hpp>
 #include <EditorLayers.hpp>
-#include <EditorProcessor.hpp>
+#include <EditorProcessorInterface.hpp>
 #include <EditorSettings.hpp>
 #include <EditorViewports.hpp>
 
@@ -76,7 +76,7 @@ public:
     void setSettingsView(const EditorSettingsView &settings);
 
     // Filters
-    void addFilter(EditorProcessor *filter);
+    void addFilter(EditorProcessorInterface *filter);
     void applyFilters(EditorPage *page);
 
     // View
@@ -104,7 +104,7 @@ protected:
     EditorFilterClip clipFilter_;
 
     // Filters
-    std::vector<EditorProcessor *> filters_;
+    std::vector<EditorProcessorInterface *> filters_;
 
     // Viewports
     EditorViewports viewports_;

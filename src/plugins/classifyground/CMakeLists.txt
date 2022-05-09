@@ -15,5 +15,35 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-add_subdirectory(classifyground)
-add_subdirectory(segmentation)
+set(SUB_PROJECT_NAME "3dforestguipluginclassifyground")
+
+if (NOT CMAKE_3DFOREST_GUI_FOUND)
+  message(WARNING "Gui not found - skipping ${SUB_PROJECT_NAME}")
+  return()
+endif()
+
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+file(GLOB_RECURSE SOURCES "*.cpp")
+
+add_library(
+  ${SUB_PROJECT_NAME}
+  SHARED
+  ${SOURCES}
+  resources/resources.qrc
+)
+
+target_include_directories(
+  ${SUB_PROJECT_NAME}
+  PUBLIC
+  ${CMAKE_CURRENT_LIST_DIR}
+)
+
+target_link_libraries(
+  ${SUB_PROJECT_NAME}
+  PRIVATE
+  3dforestgui
+)
+
+install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin/plugins)

@@ -31,6 +31,7 @@
 #include <QMainWindow>
 #include <QtWidgets/QAction>
 
+class GuiPluginInterface;
 class GuiPluginImport;
 class GuiPluginProjectFile;
 class GuiPluginViewer;
@@ -84,8 +85,9 @@ signals:
     void signalRender();
 
 protected:
-    // Events
     void closeEvent(QCloseEvent *event) override;
+    void loadPlugins();
+    void loadPlugin(QObject *plugin);
 
     // Editor
     Editor editor_;
@@ -95,6 +97,7 @@ protected:
     GuiPluginImport *guiPluginImport_;
     GuiPluginProjectFile *guiPluginProjectFile_;
     GuiPluginViewer *guiPluginViewer_;
+    std::vector<GuiPluginInterface *> plugins_;
 
     // Menu
     QHash<QString, QMenu *> menu_;

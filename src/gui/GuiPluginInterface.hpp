@@ -23,6 +23,7 @@
 #define GUI_PLUGIN_INTERFACE_HPP
 
 #include <QtPlugin>
+#include <QtWidgets/QAction>
 
 class GuiWindowMain;
 
@@ -31,7 +32,7 @@ class GuiPluginInterface
 {
 public:
     virtual ~GuiPluginInterface() = default;
-    virtual void initialize(GuiWindowMain *parent) = 0;
+    virtual void initialize(GuiWindowMain *window) = 0;
 };
 
 #define GuiPluginInterface_iid "vukoz.3dforest.qt.GuiPluginInterface/1.0"

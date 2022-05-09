@@ -17,20 +17,34 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file EditorProcessor.hpp */
+/** @file GuiPluginClassifyGround.hpp */
 
-#ifndef EDITOR_PROCESSOR_HPP
-#define EDITOR_PROCESSOR_HPP
+#ifndef GUI_PLUGIN_CLASSIFY_GROUND_HPP
+#define GUI_PLUGIN_CLASSIFY_GROUND_HPP
 
-#include <EditorPage.hpp>
+#include <GuiPluginInterface.hpp>
 
-/** Editor Processor. */
-class EditorProcessor
+class GuiPluginClassifyGroundWindow;
+
+/** Gui Plugin Classify Ground. */
+class GuiPluginClassifyGround : public QObject, public GuiPluginInterface
 {
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID GuiPluginInterface_iid)
+    Q_INTERFACES(GuiPluginInterface)
+
 public:
-    virtual ~EditorProcessor() = default;
-    virtual bool isFilterEnabled() = 0;
-    virtual void filterPage(EditorPage *page) = 0;
+    GuiPluginClassifyGround();
+
+    virtual void initialize(GuiWindowMain *window);
+
+public slots:
+    void slotPlugin();
+
+protected:
+    GuiWindowMain *window_;
+    GuiPluginClassifyGroundWindow *dockWindow_;
+    QAction *action_;
 };
 
-#endif /* EDITOR_PROCESSOR_HPP */
+#endif /* GUI_PLUGIN_CLASSIFY_GROUND_HPP */

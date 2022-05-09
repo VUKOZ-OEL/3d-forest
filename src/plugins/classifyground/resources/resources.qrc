@@ -1,5 +1,5 @@
 <!DOCTYPE RCC><RCC version="1.0">
-<qresource prefix="/classification">
+<qresource prefix="/classifyground">
 
 <file>soil-fluency-48.png</file>
 
