@@ -69,7 +69,7 @@ public:
     void createSeparator(const QString &menu);
     void hideToolBar(const QString &menu);
 
-    void cancelThreads();
+    void suspendThreads();
     void resumeThreads();
     virtual void threadProgress(bool finished);
 

@@ -234,7 +234,7 @@ void GuiWindowMain::loadPlugin(QObject *plugin)
     }
 }
 
-void GuiWindowMain::cancelThreads()
+void GuiWindowMain::suspendThreads()
 {
     LOG_LOCAL("");
     threadRender_.cancel();
@@ -278,7 +278,7 @@ void GuiWindowMain::updateEverything()
 {
     LOG_LOCAL("");
 
-    cancelThreads();
+    suspendThreads();
 
     GuiViewports *viewports = guiPluginViewer_->viewports();
 
