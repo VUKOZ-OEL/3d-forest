@@ -34,7 +34,7 @@ void GuiPluginClassifyGround::initialize(GuiWindowMain *window)
 {
     window_ = window;
 
-    window_->createAction(&action_,
+    window_->createAction(nullptr,
                           "Tools",
                           tr("Classify Ground"),
                           tr("Classify Ground"),

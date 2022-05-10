@@ -44,7 +44,6 @@ public slots:
 protected:
     GuiWindowMain *window_;
     GuiPluginClassifyGroundWindow *dockWindow_;
-    QAction *action_;
 };
 
 #endif /* GUI_PLUGIN_CLASSIFY_GROUND_HPP */

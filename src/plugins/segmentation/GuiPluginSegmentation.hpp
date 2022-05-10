@@ -44,7 +44,6 @@ public slots:
 protected:
     GuiWindowMain *window_;
     GuiPluginSegmentationWindow *dockWindow_;
-    QAction *action_;
 };
 
 #endif /* GUI_PLUGIN_SEGMENTATION_HPP */

@@ -170,7 +170,11 @@ void GuiWindowMain::createAction(QAction **result,
         toolBar_[menu]->addAction(action);
     }
 
-    *result = action;
+    // Optional return value for further customization of new action
+    if (result)
+    {
+        *result = action;
+    }
 }
 
 void GuiWindowMain::createSeparator(const QString &menu)
