@@ -102,7 +102,7 @@ static void guiPluginImport(GuiWindowMain *window)
 
 static void guiPluginImportFile(const QString &path, GuiWindowMain *window)
 {
-    window->cancelThreads();
+    window->suspendThreads();
 
     GuiPluginImportDialog dialog(window);
 

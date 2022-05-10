@@ -36,7 +36,7 @@ void GuiPluginSegmentation::initialize(GuiWindowMain *window)
 {
     window_ = window;
 
-    window_->createAction(&action_,
+    window_->createAction(nullptr,
                           "Tools",
                           tr("Segmentation"),
                           tr("Segmentation"),

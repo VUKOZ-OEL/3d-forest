@@ -216,7 +216,7 @@ void GuiPluginViewer::slotViewLayout3RowsRight()
 
 void GuiPluginViewer::slotViewLayout(GuiViewports::ViewLayout layout)
 {
-    window_->cancelThreads();
+    window_->suspendThreads();
 
     if (layout == GuiViewports::VIEW_LAYOUT_SINGLE)
     {

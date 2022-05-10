@@ -37,6 +37,7 @@ class GuiPluginProjectFile;
 class GuiPluginViewer;
 
 #define GUI_ICON_THEME "-fluency-48"
+#define GUI_ICON_SIZE_TOOL_BAR 24
 
 /** Gui Window Main. */
 class GuiWindowMain : public QMainWindow, public ThreadCallbackInterface
@@ -68,7 +69,7 @@ public:
     void createSeparator(const QString &menu);
     void hideToolBar(const QString &menu);
 
-    void cancelThreads();
+    void suspendThreads();
     void resumeThreads();
     virtual void threadProgress(bool finished);
 

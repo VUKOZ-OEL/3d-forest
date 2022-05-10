@@ -144,7 +144,7 @@ bool GuiPluginProjectFile::projectOpen(const QString &path)
 
 bool GuiPluginProjectFile::projectClose()
 {
-    window_->cancelThreads();
+    window_->suspendThreads();
 
     // Save changes
     if (window_->editor().hasUnsavedChanges())
@@ -200,7 +200,7 @@ bool GuiPluginProjectFile::projectSave(const QString &path)
 {
     std::string writePath;
 
-    window_->cancelThreads();
+    window_->suspendThreads();
 
     if (path.isEmpty())
     {

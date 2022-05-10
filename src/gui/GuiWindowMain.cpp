@@ -165,11 +165,17 @@ void GuiWindowMain::createAction(QAction **result,
         if (!toolBar_.contains(menu))
         {
             toolBar_[menu] = addToolBar(menu);
+            toolBar_[menu]->setIconSize(
+                QSize(GUI_ICON_SIZE_TOOL_BAR, GUI_ICON_SIZE_TOOL_BAR));
         }
         toolBar_[menu]->addAction(action);
     }
 
-    *result = action;
+    // Optional return value for further customization of new action
+    if (result)
+    {
+        *result = action;
+    }
 }
 
 void GuiWindowMain::createSeparator(const QString &menu)
@@ -228,7 +234,7 @@ void GuiWindowMain::loadPlugin(QObject *plugin)
     }
 }
 
-void GuiWindowMain::cancelThreads()
+void GuiWindowMain::suspendThreads()
 {
     LOG_LOCAL("");
     threadRender_.cancel();
@@ -272,7 +278,7 @@ void GuiWindowMain::updateEverything()
 {
     LOG_LOCAL("");
 
-    cancelThreads();
+    suspendThreads();
 
     GuiViewports *viewports = guiPluginViewer_->viewports();
 
