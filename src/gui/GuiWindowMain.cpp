@@ -165,7 +165,8 @@ void GuiWindowMain::createAction(QAction **result,
         if (!toolBar_.contains(menu))
         {
             toolBar_[menu] = addToolBar(menu);
-            toolBar_[menu]->setIconSize(QSize(24, 24));
+            toolBar_[menu]->setIconSize(
+                QSize(GUI_ICON_SIZE_TOOL_BAR, GUI_ICON_SIZE_TOOL_BAR));
         }
         toolBar_[menu]->addAction(action);
     }

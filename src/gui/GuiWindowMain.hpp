@@ -37,6 +37,7 @@ class GuiPluginProjectFile;
 class GuiPluginViewer;
 
 #define GUI_ICON_THEME "-fluency-48"
+#define GUI_ICON_SIZE_TOOL_BAR 24
 
 /** Gui Window Main. */
 class GuiWindowMain : public QMainWindow, public ThreadCallbackInterface
