@@ -69,6 +69,8 @@ GuiPluginProjectFile::GuiPluginProjectFile(GuiWindowMain *window)
                           ICON("save-as"),
                           this,
                           SLOT(slotProjectSaveAs()));
+
+    window_->hideToolBar("File Project");
 }
 
 void GuiPluginProjectFile::slotProjectNew()

@@ -69,10 +69,6 @@ GuiWindowMain::GuiWindowMain(QWidget *parent)
                  SLOT(close()));
     actionExit_->setShortcuts(QKeySequence::Quit);
 
-    hideToolBar("File Project");
-    hideToolBar("View Projection");
-    hideToolBar("View Layout");
-
     // Rendering
     connect(guiPluginViewer_->viewports(),
             SIGNAL(cameraChanged(size_t)),

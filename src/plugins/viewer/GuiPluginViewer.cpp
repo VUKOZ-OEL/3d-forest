@@ -141,6 +141,9 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           ICON("layout-grid-right"),
                           this,
                           SLOT(slotViewLayout3RowsRight()));
+
+    window_->hideToolBar("View Projection");
+    window_->hideToolBar("View Layout");
 }
 
 void GuiPluginViewer::slotViewOrthographic()
