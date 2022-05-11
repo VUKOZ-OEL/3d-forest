@@ -54,24 +54,25 @@ GuiWindowMain::GuiWindowMain(QWidget *parent)
 
     // Menu
     guiPluginProjectFile_ = new GuiPluginProjectFile(this);
-    createSeparator("File");
     guiPluginImport_ = new GuiPluginImport(this);
     guiPluginViewer_ = new GuiPluginViewer(this);
     loadPlugins();
 
     // Exit
-    createSeparator("File");
     createAction(&actionExit_,
                  "File",
+                 "",
                  tr("E&xit"),
                  tr("Exit the application"),
                  QIcon(),
                  this,
-                 SLOT(close()),
-                 false);
+                 SLOT(close()));
     actionExit_->setShortcuts(QKeySequence::Quit);
 
-    hideToolBar("File");
+    hideToolBar("File Project");
+    hideToolBar("File Import");
+    hideToolBar("View Projection");
+    hideToolBar("View Layout");
 
     // Rendering
     connect(guiPluginViewer_->viewports(),
@@ -124,12 +125,12 @@ void GuiWindowMain::setWindowTitle(const QString &path)
 
 void GuiWindowMain::createAction(QAction **result,
                                  const QString &menu,
+                                 const QString &toolBar,
                                  const QString &text,
                                  const QString &toolTip,
                                  const QIcon &icon,
                                  const QObject *receiver,
-                                 const char *member,
-                                 bool useToolBar)
+                                 const char *member)
 {
     QAction *action;
 
@@ -158,17 +159,21 @@ void GuiWindowMain::createAction(QAction **result,
     {
         menu_[menu] = menuBar()->addMenu(menu);
     }
+    else if (!toolBar_.contains(toolBar))
+    {
+        createMenuSeparator(menu);
+    }
     menu_[menu]->addAction(action);
 
-    if (useToolBar && !icon.isNull())
+    if (!toolBar.isEmpty() && !icon.isNull())
     {
-        if (!toolBar_.contains(menu))
+        if (!toolBar_.contains(toolBar))
         {
-            toolBar_[menu] = addToolBar(menu);
-            toolBar_[menu]->setIconSize(
+            toolBar_[toolBar] = addToolBar(toolBar);
+            toolBar_[toolBar]->setIconSize(
                 QSize(GUI_ICON_SIZE_TOOL_BAR, GUI_ICON_SIZE_TOOL_BAR));
         }
-        toolBar_[menu]->addAction(action);
+        toolBar_[toolBar]->addAction(action);
     }
 
     // Optional return value for further customization of new action
@@ -178,7 +183,7 @@ void GuiWindowMain::createAction(QAction **result,
     }
 }
 
-void GuiWindowMain::createSeparator(const QString &menu)
+void GuiWindowMain::createMenuSeparator(const QString &menu)
 {
     menu_[menu]->addSeparator();
 }

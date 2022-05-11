@@ -36,39 +36,39 @@ GuiPluginProjectFile::GuiPluginProjectFile(GuiWindowMain *window)
 {
     window_->createAction(&actionProjectNew_,
                           "File",
+                          "File Project",
                           tr("&New Project"),
                           tr("Create new project"),
                           ICON("create"),
                           this,
-                          SLOT(slotProjectNew()),
-                          true);
+                          SLOT(slotProjectNew()));
 
     window_->createAction(&actionProjectOpen_,
                           "File",
+                          "File Project",
                           tr("&Open Project..."),
                           tr("Open new project"),
                           ICON("opened-folder"),
                           this,
-                          SLOT(slotProjectOpen()),
-                          true);
+                          SLOT(slotProjectOpen()));
 
     window_->createAction(&actionProjectSave_,
                           "File",
+                          "File Project",
                           tr("&Save Project"),
                           tr("Save project"),
                           ICON("save"),
                           this,
-                          SLOT(slotProjectSave()),
-                          true);
+                          SLOT(slotProjectSave()));
 
     window_->createAction(&actionProjectSaveAs_,
                           "File",
+                          "File Project",
                           tr("Save Project &As..."),
                           tr("Save project as"),
                           ICON("save-as"),
                           this,
-                          SLOT(slotProjectSaveAs()),
-                          true);
+                          SLOT(slotProjectSaveAs()));
 }
 
 void GuiPluginProjectFile::slotProjectNew()

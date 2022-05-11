@@ -59,14 +59,13 @@ public:
 
     void createAction(QAction **result,
                       const QString &menu,
+                      const QString &toolBar,
                       const QString &text,
                       const QString &toolTip,
                       const QIcon &icon,
                       const QObject *receiver,
-                      const char *member,
-                      bool useToolBar);
+                      const char *member);
 
-    void createSeparator(const QString &menu);
     void hideToolBar(const QString &menu);
 
     void suspendThreads();
@@ -89,6 +88,7 @@ protected:
     void closeEvent(QCloseEvent *event) override;
     void loadPlugins();
     void loadPlugin(QObject *plugin);
+    void createMenuSeparator(const QString &menu);
 
     // Editor
     Editor editor_;

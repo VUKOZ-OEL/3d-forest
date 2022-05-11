@@ -36,114 +36,111 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
 
     window_->createAction(&actionViewOrthographic_,
                           "View",
+                          "View Projection",
                           tr("Orthographic"),
                           tr("Orthographic projection"),
                           ICON("pallet-ortho"),
                           this,
-                          SLOT(slotViewOrthographic()),
-                          true);
+                          SLOT(slotViewOrthographic()));
 
     window_->createAction(&actionViewPerspective_,
                           "View",
+                          "View Projection",
                           tr("Perspective"),
                           tr("Perspective projection"),
                           ICON("pallet"),
                           this,
-                          SLOT(slotViewPerspective()),
-                          true);
+                          SLOT(slotViewPerspective()));
 
-    window_->createSeparator("View");
     window_->createAction(&actionViewTop_,
+                          "View",
                           "View",
                           tr("Top view"),
                           tr("Top view"),
                           ICON("top-view"),
                           this,
-                          SLOT(slotViewTop()),
-                          true);
+                          SLOT(slotViewTop()));
 
     window_->createAction(&actionViewFront_,
+                          "View",
                           "View",
                           tr("Front view"),
                           tr("Front view"),
                           ICON("front-view"),
                           this,
-                          SLOT(slotViewFront()),
-                          true);
+                          SLOT(slotViewFront()));
 
     window_->createAction(&actionViewRight_,
+                          "View",
                           "View",
                           tr("Right view"),
                           tr("Right view"),
                           ICON("right-view"),
                           this,
-                          SLOT(slotViewRight()),
-                          true);
+                          SLOT(slotViewRight()));
 
     window_->createAction(&actionView3d_,
+                          "View",
                           "View",
                           tr("3d view"),
                           tr("3d view"),
                           ICON("perspective-view"),
                           this,
-                          SLOT(slotView3d()),
-                          true);
+                          SLOT(slotView3d()));
 
-    window_->createSeparator("View");
     window_->createAction(&actionViewResetDistance_,
+                          "View",
                           "View",
                           tr("Reset distance"),
                           tr("Reset distance"),
                           ICON("fit-to-width"),
                           this,
-                          SLOT(slotViewResetDistance()),
-                          true);
+                          SLOT(slotViewResetDistance()));
 
     window_->createAction(&actionViewResetCenter_,
+                          "View",
                           "View",
                           tr("Reset center"),
                           tr("Reset center"),
                           ICON("collect"),
                           this,
-                          SLOT(slotViewResetCenter()),
-                          true);
+                          SLOT(slotViewResetCenter()));
 
-    window_->createSeparator("View");
     window_->createAction(&actionViewLayoutSingle_,
                           "View",
+                          "View Layout",
                           tr("Single layout"),
                           tr("Single layout"),
                           ICON("layout-single"),
                           this,
-                          SLOT(slotViewLayoutSingle()),
-                          false);
+                          SLOT(slotViewLayoutSingle()));
 
     window_->createAction(&actionViewLayoutTwoColumns_,
                           "View",
+                          "View Layout",
                           tr("Column layout"),
                           tr("Layout with two columns"),
                           ICON("layout-two-columns"),
                           this,
-                          SLOT(slotViewLayout2Columns()),
-                          false);
+                          SLOT(slotViewLayout2Columns()));
 
     window_->createAction(&actionViewLayoutGrid_,
                           "View",
+                          "View Layout",
                           tr("Grid layout"),
                           tr("Grid layout"),
                           ICON("layout-grid"),
                           this,
-                          SLOT(slotViewLayoutGrid()),
-                          false);
+                          SLOT(slotViewLayoutGrid()));
 
     window_->createAction(&actionViewLayoutGridRight_,
                           "View",
+                          "View Layout",
                           tr("Grid layout 3"),
                           tr("Grid layout with 3 rows"),
                           ICON("layout-grid-right"),
                           this,
-                          SLOT(slotViewLayout3RowsRight()),
-                          false);
+                          SLOT(slotViewLayout3RowsRight()));
 }
 
 void GuiPluginViewer::slotViewOrthographic()
