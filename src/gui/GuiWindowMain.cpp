@@ -70,7 +70,6 @@ GuiWindowMain::GuiWindowMain(QWidget *parent)
     actionExit_->setShortcuts(QKeySequence::Quit);
 
     hideToolBar("File Project");
-    hideToolBar("File Import");
     hideToolBar("View Projection");
     hideToolBar("View Layout");
 
