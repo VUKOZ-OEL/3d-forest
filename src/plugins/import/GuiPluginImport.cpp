@@ -41,12 +41,14 @@ GuiPluginImport::GuiPluginImport(GuiWindowMain *window)
 {
     window_->createAction(&actionImport_,
                           "File",
+                          "File Import/Export",
                           tr("Import"),
                           tr("Import new dataset"),
-                          ICON("add-file"),
+                          ICON("add"),
                           this,
-                          SLOT(slotImport()),
-                          true);
+                          SLOT(slotImport()));
+
+    window_->hideToolBar("File Import/Export");
 }
 
 void GuiPluginImport::slotImport()

@@ -38,12 +38,12 @@ void GuiPluginSegmentation::initialize(GuiWindowMain *window)
 
     window_->createAction(nullptr,
                           "Tools",
+                          "Tools",
                           tr("Segmentation"),
                           tr("Segmentation"),
                           ICON("segmentation"),
                           this,
-                          SLOT(slotPlugin()),
-                          true);
+                          SLOT(slotPlugin()));
 }
 
 void GuiPluginSegmentation::slotPlugin()

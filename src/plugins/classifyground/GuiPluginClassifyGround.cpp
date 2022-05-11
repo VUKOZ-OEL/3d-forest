@@ -251,12 +251,12 @@ void GuiPluginClassifyGround::initialize(GuiWindowMain *window)
 
     window_->createAction(nullptr,
                           "Tools",
+                          "Tools",
                           tr("Classify Ground"),
                           tr("Classify Ground"),
                           ICON("soil"),
                           this,
-                          SLOT(slotPlugin()),
-                          true);
+                          SLOT(slotPlugin()));
 }
 
 void GuiPluginClassifyGround::slotPlugin()
