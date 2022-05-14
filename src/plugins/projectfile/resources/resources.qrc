@@ -1,11 +1,14 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource prefix="/projectfile">
 
-<file>create-fluency-48.png</file>
-<file>new-file-fluency-48.png</file>
-<file>opened-folder-fluency-48.png</file>
-<file>save-fluency-48.png</file>
-<file>save-as-fluency-48.png</file>
+<file>create-office-16.png</file>
+<file>create-office-32.png</file>
+<file>opened-folder-office-16.png</file>
+<file>opened-folder-office-32.png</file>
+<file>save-office-16.png</file>
+<file>save-office-32.png</file>
+<file>save-as-office-16.png</file>
+<file>save-as-office-32.png</file>
 
 </qresource>
 </RCC>

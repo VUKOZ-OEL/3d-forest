@@ -21,6 +21,7 @@
 
 #include <Log.hpp>
 
+#include <GuiIconTheme.hpp>
 #include <GuiPluginProjectFile.hpp>
 #include <GuiWindowMain.hpp>
 
@@ -28,7 +29,7 @@
 #include <QMessageBox>
 
 #define GUI_PLUGIN_PROJECT_FILTER_PRJ "3DForest Project (*.json)"
-#define ICON(name) (QIcon(":/projectfile/" name GUI_ICON_THEME ".png"))
+#define ICON(name) (GuiIconTheme(":/projectfile/", name))
 
 GuiPluginProjectFile::GuiPluginProjectFile(GuiWindowMain *window)
     : QObject(window),

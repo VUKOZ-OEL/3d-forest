@@ -19,6 +19,7 @@
 
 /** @file GuiPluginClassifyGround.cpp */
 
+#include <GuiIconTheme.hpp>
 #include <GuiPluginClassifyGround.hpp>
 #include <GuiWindowMain.hpp>
 
@@ -36,7 +37,7 @@
 #include <QSpinBox>
 #include <QVBoxLayout>
 
-#define ICON(name) (QIcon(":/classifyground/" name GUI_ICON_THEME ".png"))
+#define ICON(name) (GuiIconTheme(":/classifyground/", name))
 #define GUI_PLUGIN_NAME "Classify Ground"
 
 /** Gui Plugin Classify Ground Window. */
@@ -253,7 +254,7 @@ void GuiPluginClassifyGround::initialize(GuiWindowMain *window)
                           "Tools",
                           "Tools",
                           tr("Classify Ground"),
-                          tr("Classify Ground"),
+                          tr("Classify points to ground and unassigned"),
                           ICON("soil"),
                           this,
                           SLOT(slotPlugin()));

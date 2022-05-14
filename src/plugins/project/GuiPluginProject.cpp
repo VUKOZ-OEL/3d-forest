@@ -17,36 +17,33 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file GuiPluginSegmentation.cpp */
+/** @file GuiPluginProject.cpp */
 
-#include <Segmentation.hpp>
+#include <Log.hpp>
 
 #include <GuiIconTheme.hpp>
-#include <GuiPluginSegmentation.hpp>
+#include <GuiPluginProject.hpp>
 #include <GuiWindowMain.hpp>
 
-#define ICON(name) (GuiIconTheme(":/segmentation/", name))
+#include <QFileDialog>
+#include <QMessageBox>
 
-GuiPluginSegmentation::GuiPluginSegmentation()
-    : window_(nullptr),
-      dockWindow_(nullptr)
+#define ICON(name) (GuiIconTheme(":/project/", name))
+
+GuiPluginProject::GuiPluginProject(GuiWindowMain *window)
+    : QObject(window),
+      window_(window)
 {
-}
-
-void GuiPluginSegmentation::initialize(GuiWindowMain *window)
-{
-    window_ = window;
-
     window_->createAction(nullptr,
                           "Tools",
                           "Tools",
-                          tr("Segmentation"),
-                          tr("Segmentation splits forest into trees"),
-                          ICON("forest-segmentation"),
+                          tr("Project"),
+                          tr("Show project navigator"),
+                          ICON("document"),
                           this,
-                          SLOT(slotPlugin()));
+                          SLOT(slotProject()));
 }
 
-void GuiPluginSegmentation::slotPlugin()
+void GuiPluginProject::slotProject()
 {
 }

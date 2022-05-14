@@ -23,6 +23,7 @@
 
 #include <GuiPluginImport.hpp>
 #include <GuiPluginInterface.hpp>
+#include <GuiPluginProject.hpp>
 #include <GuiPluginProjectFile.hpp>
 #include <GuiPluginViewer.hpp>
 #include <GuiViewports.hpp>
@@ -39,6 +40,7 @@
 
 #define LOG_LOCAL(msg)
 //#define LOG_LOCAL(msg) LOG_MODULE("GuiWindowMain", msg)
+#define GUI_ICON_SIZE_TOOL_BAR 32
 
 const char *GuiWindowMain::APPLICATION_NAME = "3DForest";
 const char *GuiWindowMain::APPLICATION_VERSION = "1.0";
@@ -56,6 +58,7 @@ GuiWindowMain::GuiWindowMain(QWidget *parent)
     guiPluginProjectFile_ = new GuiPluginProjectFile(this);
     guiPluginImport_ = new GuiPluginImport(this);
     guiPluginViewer_ = new GuiPluginViewer(this);
+    guiPluginProject_ = new GuiPluginProject(this);
     loadPlugins();
 
     // Exit
