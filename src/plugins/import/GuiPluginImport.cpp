@@ -22,6 +22,7 @@
 #include <FileLasIndexBuilder.hpp>
 #include <Log.hpp>
 
+#include <GuiIconTheme.hpp>
 #include <GuiPluginImport.hpp>
 #include <GuiPluginImportDialog.hpp>
 #include <GuiWindowMain.hpp>
@@ -32,8 +33,7 @@
 #include <QProgressDialog>
 
 #define GUI_PLUGIN_IMPORT_FILTER "LAS (LASer) File (*.las)"
-
-#define ICON(name) (QIcon(":/import/" name GUI_ICON_THEME ".png"))
+#define ICON(name) (GuiIconTheme(":/import/", name))
 
 GuiPluginImport::GuiPluginImport(GuiWindowMain *window)
     : QObject(window),
@@ -43,8 +43,8 @@ GuiPluginImport::GuiPluginImport(GuiWindowMain *window)
                           "File",
                           "File Import/Export",
                           tr("Import"),
-                          tr("Import new dataset"),
-                          ICON("add"),
+                          tr("Import new point cloud dataset"),
+                          ICON("thick-arrow-pointing-down"),
                           this,
                           SLOT(slotImport()));
 

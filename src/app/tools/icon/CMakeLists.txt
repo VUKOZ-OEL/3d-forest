@@ -15,5 +15,29 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-add_subdirectory(icon)
-add_subdirectory(sandbox)
+set(SUB_PROJECT_NAME "3dforesticon")
+
+if (NOT CMAKE_3DFOREST_GUI_FOUND)
+  message(WARNING "Gui not found - skipping ${SUB_PROJECT_NAME}")
+  return()
+endif()
+
+file(GLOB_RECURSE SOURCES "*.cpp")
+
+add_executable(
+  ${SUB_PROJECT_NAME}
+  ${SOURCES}
+)
+
+target_include_directories(
+  ${SUB_PROJECT_NAME}
+  PUBLIC
+  ${CMAKE_CURRENT_LIST_DIR}
+)
+
+target_link_libraries(
+  ${SUB_PROJECT_NAME}
+  3dforestgui
+)
+
+install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

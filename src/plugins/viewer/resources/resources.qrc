@@ -1,18 +1,33 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource prefix="/viewer">
 
-<file>collect-fluency-48.png</file>
-<file>fit-to-width-fluency-48.png</file>
-<file>front-view-fluency-48.png</file>
-<file>layout-grid-fluency-48.png</file>
-<file>layout-grid-right-fluency-48.png</file>
-<file>layout-single-fluency-48.png</file>
-<file>layout-two-columns-fluency-48.png</file>
-<file>pallet-fluency-48.png</file>
-<file>pallet-ortho-fluency-48.png</file>
-<file>perspective-view-fluency-48.png</file>
-<file>right-view-fluency-48.png</file>
-<file>top-view-fluency-48.png</file>
+<file>inbox-ortho-office-16.png</file>
+<file>inbox-ortho-office-32.png</file>
+<file>inbox-office-16.png</file>
+<file>inbox-office-32.png</file>
+
+<file>front-view-office-16.png</file>
+<file>front-view-office-32.png</file>
+<file>right-view-office-16.png</file>
+<file>right-view-office-32.png</file>
+<file>top-view-office-16.png</file>
+<file>top-view-office-32.png</file>
+<file>abscissa-office-16.png</file>
+<file>abscissa-office-32.png</file>
+
+<file>expand-office-16.png</file>
+<file>expand-office-32.png</file>
+<file>collect-office-16.png</file>
+<file>collect-office-32.png</file>
+
+<file>layout-grid-office-16.png</file>
+<file>layout-grid-office-32.png</file>
+<file>layout-grid-right-office-16.png</file>
+<file>layout-grid-right-office-32.png</file>
+<file>layout-single-office-16.png</file>
+<file>layout-single-office-32.png</file>
+<file>layout-two-columns-office-16.png</file>
+<file>layout-two-columns-office-32.png</file>
 
 </qresource>
 </RCC>

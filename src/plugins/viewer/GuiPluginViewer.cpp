@@ -21,11 +21,12 @@
 
 #include <Log.hpp>
 
+#include <GuiIconTheme.hpp>
 #include <GuiPluginViewer.hpp>
 #include <GuiViewports.hpp>
 #include <GuiWindowMain.hpp>
 
-#define ICON(name) (QIcon(":/viewer/" name GUI_ICON_THEME ".png"))
+#define ICON(name) (GuiIconTheme(":/viewer/", name))
 
 GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
     : QObject(window),
@@ -39,7 +40,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View Projection",
                           tr("Orthographic"),
                           tr("Orthographic projection"),
-                          ICON("pallet-ortho"),
+                          ICON("inbox-ortho"),
                           this,
                           SLOT(slotViewOrthographic()));
 
@@ -48,7 +49,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View Projection",
                           tr("Perspective"),
                           tr("Perspective projection"),
-                          ICON("pallet"),
+                          ICON("inbox"),
                           this,
                           SLOT(slotViewPerspective()));
 
@@ -84,7 +85,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View",
                           tr("3d view"),
                           tr("3d view"),
-                          ICON("perspective-view"),
+                          ICON("abscissa"),
                           this,
                           SLOT(slotView3d()));
 
@@ -93,7 +94,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View",
                           tr("Reset distance"),
                           tr("Reset distance"),
-                          ICON("fit-to-width"),
+                          ICON("expand"),
                           this,
                           SLOT(slotViewResetDistance()));
 

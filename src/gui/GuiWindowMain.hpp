@@ -33,11 +33,9 @@
 
 class GuiPluginInterface;
 class GuiPluginImport;
+class GuiPluginProject;
 class GuiPluginProjectFile;
 class GuiPluginViewer;
-
-#define GUI_ICON_THEME "-fluency-48"
-#define GUI_ICON_SIZE_TOOL_BAR 24
 
 /** Gui Window Main. */
 class GuiWindowMain : public QMainWindow, public ThreadCallbackInterface
@@ -96,6 +94,7 @@ protected:
 
     // Gui
     GuiPluginImport *guiPluginImport_;
+    GuiPluginProject *guiPluginProject_;
     GuiPluginProjectFile *guiPluginProjectFile_;
     GuiPluginViewer *guiPluginViewer_;
     std::vector<GuiPluginInterface *> plugins_;
