@@ -17,28 +17,28 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file GuiPluginProject.hpp */
+/** @file GuiProjectWindow.cpp */
 
-#ifndef GUI_PLUGIN_PROJECT_HPP
-#define GUI_PLUGIN_PROJECT_HPP
+#include <GuiProjectDatasets.hpp>
+#include <GuiProjectWindow.hpp>
+#include <GuiWindowMain.hpp>
 
-#include <QObject>
+#include <QTabWidget>
 
-class GuiWindowMain;
-
-/** Gui Plugin Project. */
-class GuiPluginProject : public QObject
+GuiProjectWindow::GuiProjectWindow(GuiWindowMain *mainWindow)
+    : QDockWidget(mainWindow),
+      mainWindow_(mainWindow)
 {
-    Q_OBJECT
+    // Tab
+    datasets_ = new GuiProjectDatasets(mainWindow_);
 
-public:
-    explicit GuiPluginProject(GuiWindowMain *window);
+    // Tabs
+    tabWidget_ = new QTabWidget;
+    tabWidget_->addTab(datasets_, tr("Files"));
 
-public slots:
-    void slotProject();
-
-protected:
-    GuiWindowMain *window_;
-};
-
-#endif /* GUI_PLUGIN_PROJECT_HPP */
+    // Dock
+    setWidget(tabWidget_);
+    setWindowTitle(tr("Project Navigator"));
+    setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    mainWindow_->addDockWidget(Qt::LeftDockWidgetArea, this);
+}

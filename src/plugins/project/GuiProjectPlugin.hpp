@@ -17,33 +17,30 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file GuiPluginProject.cpp */
+/** @file GuiProjectPlugin.hpp */
 
-#include <Log.hpp>
+#ifndef GUI_PROJECT_PLUGIN_HPP
+#define GUI_PROJECT_PLUGIN_HPP
 
-#include <GuiIconTheme.hpp>
-#include <GuiPluginProject.hpp>
-#include <GuiWindowMain.hpp>
+#include <QObject>
 
-#include <QFileDialog>
-#include <QMessageBox>
+class GuiWindowMain;
+class GuiProjectWindow;
 
-#define ICON(name) (GuiIconTheme(":/project/", name))
-
-GuiPluginProject::GuiPluginProject(GuiWindowMain *window)
-    : QObject(window),
-      window_(window)
+/** Gui Project Plugin. */
+class GuiProjectPlugin : public QObject
 {
-    window_->createAction(nullptr,
-                          "Tools",
-                          "Tools",
-                          tr("Project"),
-                          tr("Show project navigator"),
-                          ICON("document"),
-                          this,
-                          SLOT(slotProject()));
-}
+    Q_OBJECT
 
-void GuiPluginProject::slotProject()
-{
-}
+public:
+    GuiProjectPlugin(GuiWindowMain *mainWindow);
+
+public slots:
+    void slotShowNavigator();
+
+protected:
+    GuiWindowMain *mainWindow_;
+    GuiProjectWindow *projectWindow_;
+};
+
+#endif /* GUI_PROJECT_PLUGIN_HPP */

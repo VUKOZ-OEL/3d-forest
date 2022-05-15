@@ -23,9 +23,9 @@
 
 #include <GuiPluginImport.hpp>
 #include <GuiPluginInterface.hpp>
-#include <GuiPluginProject.hpp>
 #include <GuiPluginProjectFile.hpp>
 #include <GuiPluginViewer.hpp>
+#include <GuiProjectPlugin.hpp>
 #include <GuiViewports.hpp>
 #include <GuiWindowMain.hpp>
 
@@ -37,6 +37,7 @@
 #include <QPluginLoader>
 #include <QStatusBar>
 #include <QToolBar>
+#include <QToolButton>
 
 #define LOG_LOCAL(msg)
 //#define LOG_LOCAL(msg) LOG_MODULE("GuiWindowMain", msg)
@@ -58,7 +59,7 @@ GuiWindowMain::GuiWindowMain(QWidget *parent)
     guiPluginProjectFile_ = new GuiPluginProjectFile(this);
     guiPluginImport_ = new GuiPluginImport(this);
     guiPluginViewer_ = new GuiPluginViewer(this);
-    guiPluginProject_ = new GuiPluginProject(this);
+    guiPluginProject_ = new GuiProjectPlugin(this);
     loadPlugins();
 
     // Exit
@@ -86,6 +87,8 @@ GuiWindowMain::GuiWindowMain(QWidget *parent)
 
     threadRender_.setCallback(this);
     threadRender_.create();
+
+    updateEverything();
 }
 
 GuiWindowMain::~GuiWindowMain()
@@ -179,6 +182,34 @@ void GuiWindowMain::createAction(QAction **result,
     {
         *result = action;
     }
+}
+
+void GuiWindowMain::createToolButton(QToolButton **result,
+                                     const QString &text,
+                                     const QString &toolTip,
+                                     const QIcon &icon,
+                                     const QObject *receiver,
+                                     const char *member)
+{
+    QToolButton *button;
+
+    // Create button
+    button = new QToolButton;
+    button->setText(text);
+    button->setToolTip(toolTip);
+    button->setStatusTip(toolTip);
+    button->setIcon(icon);
+    button->setEnabled(true);
+    button->setToolButtonStyle(Qt::ToolButtonIconOnly);
+
+    // Connect button
+    if (receiver && member)
+    {
+        connect(button, SIGNAL(clicked()), receiver, member);
+    }
+
+    // Return value
+    *result = button;
 }
 
 void GuiWindowMain::createMenuSeparator(const QString &menu)
@@ -289,10 +320,34 @@ void GuiWindowMain::updateEverything()
     viewports->resetScene(&editor_, true);
     editor_.unlock();
 
+    emit signalUpdate();
+
     size_t viewportId = viewports->selectedViewportId();
     threadRender_.render(viewportId, viewports->camera(viewportId));
 
     setWindowTitle(QString::fromStdString(editor_.projectPath()));
+}
+
+void GuiWindowMain::updateData()
+{
+    suspendThreads();
+
+    GuiViewports *viewports = guiPluginViewer_->viewports();
+    viewports->resetScene(&editor_, false);
+    editor_.viewports().clearContent();
+
+    resumeThreads();
+}
+
+void GuiWindowMain::updateSelection()
+{
+    suspendThreads();
+
+    GuiViewports *viewports = guiPluginViewer_->viewports();
+    viewports->resetScene(&editor_, false);
+    editor_.viewports().setState(EditorPage::STATE_SELECT);
+
+    resumeThreads();
 }
 
 void GuiWindowMain::closeEvent(QCloseEvent *event)
