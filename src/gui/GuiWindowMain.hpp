@@ -33,9 +33,11 @@
 
 class GuiPluginInterface;
 class GuiPluginImport;
-class GuiPluginProject;
+class GuiProjectPlugin;
 class GuiPluginProjectFile;
 class GuiPluginViewer;
+
+class QToolButton;
 
 /** Gui Window Main. */
 class GuiWindowMain : public QMainWindow, public ThreadCallbackInterface
@@ -64,6 +66,13 @@ public:
                       const QObject *receiver,
                       const char *member);
 
+    static void createToolButton(QToolButton **result,
+                                 const QString &text,
+                                 const QString &toolTip,
+                                 const QIcon &icon,
+                                 const QObject *receiver,
+                                 const char *member);
+
     void hideToolBar(const QString &menu);
 
     void suspendThreads();
@@ -71,6 +80,8 @@ public:
     virtual void threadProgress(bool finished);
 
     void updateEverything();
+    void updateData();
+    void updateSelection();
 
     Editor &editor() { return editor_; }
 
@@ -81,6 +92,7 @@ public slots:
 
 signals:
     void signalRender();
+    void signalUpdate();
 
 protected:
     void closeEvent(QCloseEvent *event) override;
@@ -94,7 +106,7 @@ protected:
 
     // Gui
     GuiPluginImport *guiPluginImport_;
-    GuiPluginProject *guiPluginProject_;
+    GuiProjectPlugin *guiPluginProject_;
     GuiPluginProjectFile *guiPluginProjectFile_;
     GuiPluginViewer *guiPluginViewer_;
     std::vector<GuiPluginInterface *> plugins_;

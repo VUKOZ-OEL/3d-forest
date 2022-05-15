@@ -41,7 +41,7 @@ add_library(
   ${SOURCES_VIEWER}
   resources/resources.qrc
   ../plugins/import/resources/resources.qrc
-  ../plugins/project/resources/resources.qrc
+  ../plugins/project/resources.qrc
   ../plugins/projectfile/resources/resources.qrc
   ../plugins/viewer/resources/resources.qrc
 )

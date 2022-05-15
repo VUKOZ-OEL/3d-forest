@@ -1,0 +1,19 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/project">
+
+<file alias="document-office-16.png">../../../data/icons/document-office-16.png</file>
+<file alias="document-office-32.png">../../../data/icons/document-office-32.png</file>
+
+<file alias="thick-arrow-pointing-down-office-16.png">../../../data/icons/thick-arrow-pointing-down-office-16.png</file>
+<file alias="thick-arrow-pointing-down-office-32.png">../../../data/icons/thick-arrow-pointing-down-office-32.png</file>
+<file alias="close-office-16.png">../../../data/icons/close-office-16.png</file>
+<file alias="close-office-32.png">../../../data/icons/close-office-32.png</file>
+<file alias="select-all-office-16.png">../../../data/icons/select-all-office-16.png</file>
+<file alias="select-all-office-32.png">../../../data/icons/select-all-office-32.png</file>
+<file alias="select-invert-office-16.png">../../../data/icons/select-invert-office-16.png</file>
+<file alias="select-invert-office-32.png">../../../data/icons/select-invert-office-32.png</file>
+<file alias="select-none-office-16.png">../../../data/icons/select-none-office-16.png</file>
+<file alias="select-none-office-32.png">../../../data/icons/select-none-office-32.png</file>
+
+</qresource>
+</RCC>

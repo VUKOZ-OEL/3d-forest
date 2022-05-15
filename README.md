@@ -44,7 +44,7 @@ README.md          - Project summary.
 bin/               - 3D Forest binaries. CMake install destination directory.
 build/             - CMake build directory.
 cmake/             - CMake settings.
-data/              - Example data files.
+data/              - Example data files and icons from https://icons8.com/.
 doc/               - Documentation.
 src/               - Source code.
 ```

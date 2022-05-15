@@ -1,8 +1,0 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource prefix="/project">
-
-<file>document-office-16.png</file>
-<file>document-office-32.png</file>
-
-</qresource>
-</RCC>
