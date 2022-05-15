@@ -21,6 +21,7 @@
 
 - @subpage cheatsheet_git
 - @subpage cheatsheet_build
+- @subpage cheatsheet_development
 - @subpage cheatsheet_filenames
 - @subpage cheatsheet_code
 - @subpage cheatsheet_cmake
@@ -40,12 +41,13 @@
   -# Click on 'main' button.
   -# In 'Switch branches/tags' popup window:
     -# Select field 'Filter branches/tags':
-    -# Type a name of your_branch.
+    -# Type a name of your_branch. Example "vb" for "Vaclav Bubnik".
     -# Hit enter.
 
 - Get the source code:
   @verbatim
   git clone https://github.com/VUKOZ-OEL/3D-Forest_1.0.git
+  cd 3D-Forest_1.0
   @endverbatim
 
 - Switch to your branch if you like to make some changes:
@@ -57,21 +59,30 @@
   your branch. Merging from 'main' may result to some unfortunate merge
   conflicts which are resolved manually.
   @verbatim
+  # Push your current changes in your branch if you have any (git status)
+  git add --all
+  git commit -m "Update"
+  git push
+
   # Checking latest changes in 'main'
   git checkout main
   git fetch
   git pull
 
-  # Merging your_branch into 'main'
+  # Merging 'main' into your branch
   git checkout your_branch
   git merge --no-ff -m "Merge branch 'main' into your_branch" main
-  @endverbatim
 
-- Merging your branch into 'main', contribution: (Pull requests later.)
-  @verbatim
+  # Resolve conflicts and push
+  git push
+
+  # Merging your branch into 'main' (contribution, pull requests later)
   git checkout main
   git merge --no-ff -m "Merge branch 'your_branch' into main" your_branch
   git push
+
+  # Return to your branch
+  git checkout your_branch
   @endverbatim
 
 - Common download sequence:
@@ -87,7 +98,7 @@
   git status
   git add <path>
   git add --all
-  git commit -m "Added feature x"
+  git commit -m "Add feature x"
   git push
   @endverbatim
 
@@ -239,6 +250,68 @@ Qt5 and OpenGL are required for GUI application.
       @endverbatim
     - Run
         executables can be found in directory bin
+
+*******************************************************************************/
+
+/** @page cheatsheet_development Development
+
+There are several ways to add new functionality:
+
+-#  The most easy way is to add new external plugin. External plugins are self
+    contained. It is not necessary to touch any file outside of your plugin
+    directory with exception of one cmake file.
+    -#  To start, one can copy and modify existing external plugin such as
+        "src/plugins/classifyground" to new directory "src/plugins/myplugin".
+    -#  Add path to "src/plugins/CMakeLists.txt" to build the new plugin:
+        @verbatim
+        add_subdirectory(myplugin)
+        @endverbatim
+    -#  External plugins will be visible from application main window.
+
+-#  It is possible to add new command line tool to "src/app/tools/mytool".
+    -#  Example command line tool "src/app/tools/sandbox".
+    -#  Example command line tool with Qt "src/app/tools/icon".
+    -#  Tools are not available from application main window.
+
+-#  The third way is to add new internal plugin.
+    -#  To start, one can copy and modify existing internal plugin such as
+        "src/plugins/projectfile" to new directory "src/plugins/myaction".
+    -#  Modify "src/gui/CMakeLists.txt" to build the new plugin into core:
+        @verbatim
+        file(GLOB_RECURSE SOURCES_MYACTION "../plugins/myaction/*.cpp")
+        add_library
+          ${SOURCES_MYACTION}
+          ../plugins/myaction/resources/resources.qrc
+        target_include_directories
+          ../plugins/myaction
+        @endverbatim
+    -#  Add field "guiPluginMyAction_" to "src/gui/GuiWindowMain.hpp".
+        @verbatim
+        class GuiPluginMyAction;
+        GuiPluginMyAction *guiPluginMyAction_;
+        @endverbatim
+    -#  Create instance in "src/gui/GuiWindowMain.cpp" constructor.
+        @verbatim
+        guiPluginMyAction_ = new GuiPluginMyAction(this);
+        @endverbatim
+    -#  Internal plugins will be visible from application main window.
+
+-#  The last and most difficult way is to modify core functionality in
+    the following directories. This functionality is available in all plugins.
+    - "src/core" build to "lib3dforestcore.dll"
+    - "src/editor" build to "lib3dforesteditor.dll"
+    - "src/gui" build to "lib3dforestgui.dll"
+
+General:
+
+-#  The main() 3D Forest application is in "src/app/3dforest/3dforest.cpp".
+
+-#  For development with Visual Studio Code, update
+    ".vscode/settings.json" to contain new directories.
+    For example, add "${workspaceRoot}/src/plugins/myaction" to
+    "C_Cpp.default.includePath" include paths.
+
+-#  Need some icon? Try to look into directory "data/icons".
 
 *******************************************************************************/
 
