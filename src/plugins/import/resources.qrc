@@ -1,0 +1,7 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/import">
+
+<file alias="add-file-regular-24.png">../../../data/icons/add-file-regular-24.png</file>
+
+</qresource>
+</RCC>

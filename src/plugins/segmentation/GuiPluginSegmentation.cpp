@@ -42,7 +42,7 @@ void GuiPluginSegmentation::initialize(GuiWindowMain *window)
                           "Tools",
                           tr("Segmentation"),
                           tr("Segmentation splits forest into trees"),
-                          ICON("forest-segmentation"),
+                          ICON("forest"),
                           this,
                           SLOT(slotPlugin()));
 }

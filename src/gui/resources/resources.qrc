@@ -1,8 +1,0 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource prefix="/gui">
-
-<file>tea-office-16.png</file>
-<file>tea-office-32.png</file>
-
-</qresource>
-</RCC>

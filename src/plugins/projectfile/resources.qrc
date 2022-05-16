@@ -1,0 +1,10 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/projectfile">
+
+<file alias="create-regular-24.png">../../../data/icons/create-regular-24.png</file>
+<file alias="opened-folder-regular-24.png">../../../data/icons/opened-folder-regular-24.png</file>
+<file alias="save-regular-24.png">../../../data/icons/save-regular-24.png</file>
+<file alias="save-as-regular-24.png">../../../data/icons/save-as-regular-24.png</file>
+
+</qresource>
+</RCC>

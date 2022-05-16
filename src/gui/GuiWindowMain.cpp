@@ -41,7 +41,7 @@
 
 #define LOG_LOCAL(msg)
 //#define LOG_LOCAL(msg) LOG_MODULE("GuiWindowMain", msg)
-#define GUI_ICON_SIZE_TOOL_BAR 32
+#define GUI_ICON_SIZE_TOOL_BAR 24
 
 const char *GuiWindowMain::APPLICATION_NAME = "3DForest";
 const char *GuiWindowMain::APPLICATION_VERSION = "1.0";

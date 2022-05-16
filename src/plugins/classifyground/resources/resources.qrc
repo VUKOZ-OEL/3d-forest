@@ -1,8 +1,7 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource prefix="/classifyground">
 
-<file>soil-office-16.png</file>
-<file>soil-office-32.png</file>
+<file>earth-element-regular-24.png</file>
 
 </qresource>
 </RCC>
