@@ -38,7 +38,7 @@ GuiProjectPlugin::GuiProjectPlugin(GuiWindowMain *mainWindow)
                               "Tools",
                               tr("Project Navigator"),
                               tr("Show project navigator"),
-                              ICON("document"),
+                              ICON("blueprint"),
                               this,
                               SLOT(slotShowNavigator()));
 }

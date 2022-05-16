@@ -39,11 +39,11 @@ add_library(
   ${SOURCES_PROJECT}
   ${SOURCES_PROJECT_FILE}
   ${SOURCES_VIEWER}
-  resources/resources.qrc
-  ../plugins/import/resources/resources.qrc
+  resources.qrc
+  ../plugins/import/resources.qrc
   ../plugins/project/resources.qrc
-  ../plugins/projectfile/resources/resources.qrc
-  ../plugins/viewer/resources/resources.qrc
+  ../plugins/projectfile/resources.qrc
+  ../plugins/viewer/resources.qrc
 )
 
 target_include_directories(

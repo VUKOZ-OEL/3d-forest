@@ -47,14 +47,14 @@ GuiProjectDatasets::GuiProjectDatasets(GuiWindowMain *mainWindow)
     GuiWindowMain::createToolButton(&addButton_,
                                     tr("Add"),
                                     tr("Add new data set"),
-                                    ICON("thick-arrow-pointing-down"),
+                                    ICON("add-file"),
                                     this,
                                     SLOT(slotAdd()));
 
     GuiWindowMain::createToolButton(&deleteButton_,
                                     tr("Remove"),
                                     tr("Remove selected data set"),
-                                    ICON("close"),
+                                    ICON("file-delete"),
                                     this,
                                     SLOT(slotDelete()));
     deleteButton_->setEnabled(false);
@@ -88,7 +88,7 @@ GuiProjectDatasets::GuiProjectDatasets(GuiWindowMain *mainWindow)
     toolBar->addWidget(selectAllButton_);
     toolBar->addWidget(selectInvertButton_);
     toolBar->addWidget(selectNoneButton_);
-    toolBar->setIconSize(QSize(16, 16));
+    toolBar->setIconSize(QSize(24, 24));
 
     // Layout
     QVBoxLayout *mainLayout = new QVBoxLayout;

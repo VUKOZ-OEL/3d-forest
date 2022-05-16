@@ -40,7 +40,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View Projection",
                           tr("Orthographic"),
                           tr("Orthographic projection"),
-                          ICON("inbox-ortho"),
+                          ICON("3d-house-ortho"),
                           this,
                           SLOT(slotViewOrthographic()));
 
@@ -49,7 +49,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View Projection",
                           tr("Perspective"),
                           tr("Perspective projection"),
-                          ICON("inbox"),
+                          ICON("3d-house-depth"),
                           this,
                           SLOT(slotViewPerspective()));
 
@@ -58,7 +58,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View",
                           tr("Top view"),
                           tr("Top view"),
-                          ICON("top-view"),
+                          ICON("view-top"),
                           this,
                           SLOT(slotViewTop()));
 
@@ -67,7 +67,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View",
                           tr("Front view"),
                           tr("Front view"),
-                          ICON("front-view"),
+                          ICON("view-front"),
                           this,
                           SLOT(slotViewFront()));
 
@@ -76,7 +76,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View",
                           tr("Right view"),
                           tr("Right view"),
-                          ICON("right-view"),
+                          ICON("view-right"),
                           this,
                           SLOT(slotViewRight()));
 
@@ -85,7 +85,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View",
                           tr("3d view"),
                           tr("3d view"),
-                          ICON("abscissa"),
+                          ICON("view-3d"),
                           this,
                           SLOT(slotView3d()));
 
@@ -94,7 +94,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View",
                           tr("Reset distance"),
                           tr("Reset distance"),
-                          ICON("expand"),
+                          ICON("fit-to-width"),
                           this,
                           SLOT(slotViewResetDistance()));
 

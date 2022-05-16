@@ -35,8 +35,7 @@ class GuiIconTheme : public QIcon
 public:
     GuiIconTheme(const QString &prefix, const QString &name) : QIcon()
     {
-        addFile(prefix + name + "-office-16.png", QSize(16, 16));
-        addFile(prefix + name + "-office-32.png", QSize(32, 32));
+        addFile(prefix + name + "-regular-24.png", QSize(24, 24));
     }
 };
 

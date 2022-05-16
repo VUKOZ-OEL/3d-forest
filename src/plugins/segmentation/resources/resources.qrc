@@ -1,8 +1,7 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource prefix="/segmentation">
 
-<file>forest-segmentation-office-16.png</file>
-<file>forest-segmentation-office-32.png</file>
+<file>forest-regular-24.png</file>
 
 </qresource>
 </RCC>
