@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 
 void process(const QString &path, const QString &fileName)
 {
-    if (!fileName.endsWith(".png"))
+    if (!(fileName.endsWith(".png") || fileName.endsWith(".ico")))
     {
         return;
     }
@@ -81,6 +81,11 @@ void process(const QString &path, const QString &fileName)
         // Keep the same size
         size = img.width();
         offset = 0;
+    }
+
+    if (fileName.endsWith(".ico"))
+    {
+        outputPath.replace(".ico", ".png");
     }
 
     // Copy

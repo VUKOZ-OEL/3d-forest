@@ -58,7 +58,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View",
                           tr("Top view"),
                           tr("Top view"),
-                          ICON("view-top"),
+                          ICON("top-view"),
                           this,
                           SLOT(slotViewTop()));
 
@@ -67,7 +67,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View",
                           tr("Front view"),
                           tr("Front view"),
-                          ICON("view-front"),
+                          ICON("front-view"),
                           this,
                           SLOT(slotViewFront()));
 
@@ -76,7 +76,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View",
                           tr("Right view"),
                           tr("Right view"),
-                          ICON("view-right"),
+                          ICON("right-view"),
                           this,
                           SLOT(slotViewRight()));
 
@@ -85,7 +85,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View",
                           tr("3d view"),
                           tr("3d view"),
-                          ICON("view-3d"),
+                          ICON("perspective-view"),
                           this,
                           SLOT(slotView3d()));
 
@@ -112,7 +112,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View Layout",
                           tr("Single layout"),
                           tr("Single layout"),
-                          ICON("layout-single"),
+                          ICON("unchecked-checkbox"),
                           this,
                           SLOT(slotViewLayoutSingle()));
 
@@ -121,7 +121,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View Layout",
                           tr("Column layout"),
                           tr("Layout with two columns"),
-                          ICON("layout-two-columns"),
+                          ICON("columns"),
                           this,
                           SLOT(slotViewLayout2Columns()));
 
@@ -130,7 +130,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View Layout",
                           tr("Grid layout"),
                           tr("Grid layout"),
-                          ICON("layout-grid"),
+                          ICON("grid-2"),
                           this,
                           SLOT(slotViewLayoutGrid()));
 
@@ -139,7 +139,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View Layout",
                           tr("Grid layout 3"),
                           tr("Grid layout with 3 rows"),
-                          ICON("layout-grid-right"),
+                          ICON("grid-2-right"),
                           this,
                           SLOT(slotViewLayout3RowsRight()));
 

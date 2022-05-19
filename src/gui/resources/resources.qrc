@@ -1,7 +1,7 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource prefix="/gui">
 
-<file alias="cafe-regular-24.png">../../data/icons/cafe-regular-24.png</file>
+<file>cafe-regular-24.png</file>
 
 </qresource>
 </RCC>
