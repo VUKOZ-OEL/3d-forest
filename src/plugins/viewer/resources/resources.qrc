@@ -1,0 +1,21 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/viewer">
+
+<file>3d-house-ortho-regular-24.png</file>
+<file>3d-house-depth-regular-24.png</file>
+
+<file>front-view-regular-24.png</file>
+<file>right-view-regular-24.png</file>
+<file>top-view-regular-24.png</file>
+<file>perspective-view-regular-24.png</file>
+
+<file>fit-to-width-regular-24.png</file>
+<file>collect-regular-24.png</file>
+
+<file>unchecked-checkbox-regular-24.png</file>
+<file>columns-regular-24.png</file>
+<file>grid-2-regular-24.png</file>
+<file>grid-2-right-regular-24.png</file>
+
+</qresource>
+</RCC>
