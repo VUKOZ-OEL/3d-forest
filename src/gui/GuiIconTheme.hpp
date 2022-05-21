@@ -35,7 +35,7 @@ class GuiIconTheme : public QIcon
 public:
     GuiIconTheme(const QString &prefix, const QString &name) : QIcon()
     {
-        addFile(prefix + name + "-regular-24.png", QSize(24, 24));
+        addFile(prefix + name + "_24px.png", QSize(24, 24));
     }
 };
 

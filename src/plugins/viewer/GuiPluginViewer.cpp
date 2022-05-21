@@ -40,7 +40,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View Projection",
                           tr("Orthographic"),
                           tr("Orthographic projection"),
-                          ICON("3d-house-ortho"),
+                          ICON("empty_box"),
                           this,
                           SLOT(slotViewOrthographic()));
 
@@ -49,7 +49,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View Projection",
                           tr("Perspective"),
                           tr("Perspective projection"),
-                          ICON("3d-house-depth"),
+                          ICON("open_box"),
                           this,
                           SLOT(slotViewPerspective()));
 
@@ -58,7 +58,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View",
                           tr("Top view"),
                           tr("Top view"),
-                          ICON("top-view"),
+                          ICON("view_top"),
                           this,
                           SLOT(slotViewTop()));
 
@@ -67,7 +67,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View",
                           tr("Front view"),
                           tr("Front view"),
-                          ICON("front-view"),
+                          ICON("view_front"),
                           this,
                           SLOT(slotViewFront()));
 
@@ -76,7 +76,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View",
                           tr("Right view"),
                           tr("Right view"),
-                          ICON("right-view"),
+                          ICON("view_right"),
                           this,
                           SLOT(slotViewRight()));
 
@@ -85,7 +85,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View",
                           tr("3d view"),
                           tr("3d view"),
-                          ICON("perspective-view"),
+                          ICON("portraits"),
                           this,
                           SLOT(slotView3d()));
 
@@ -94,7 +94,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View",
                           tr("Reset distance"),
                           tr("Reset distance"),
-                          ICON("fit-to-width"),
+                          ICON("fit_to_page"),
                           this,
                           SLOT(slotViewResetDistance()));
 
@@ -112,7 +112,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View Layout",
                           tr("Single layout"),
                           tr("Single layout"),
-                          ICON("unchecked-checkbox"),
+                          ICON("layout_single"),
                           this,
                           SLOT(slotViewLayoutSingle()));
 
@@ -121,7 +121,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View Layout",
                           tr("Column layout"),
                           tr("Layout with two columns"),
-                          ICON("columns"),
+                          ICON("layout_columns"),
                           this,
                           SLOT(slotViewLayout2Columns()));
 
@@ -130,7 +130,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View Layout",
                           tr("Grid layout"),
                           tr("Grid layout"),
-                          ICON("grid-2"),
+                          ICON("layout_grid_2"),
                           this,
                           SLOT(slotViewLayoutGrid()));
 
@@ -139,7 +139,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View Layout",
                           tr("Grid layout 3"),
                           tr("Grid layout with 3 rows"),
-                          ICON("grid-2-right"),
+                          ICON("layout_grid_3_right"),
                           this,
                           SLOT(slotViewLayout3RowsRight()));
 

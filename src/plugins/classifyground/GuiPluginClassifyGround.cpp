@@ -255,7 +255,7 @@ void GuiPluginClassifyGround::initialize(GuiWindowMain *window)
                           "Tools",
                           tr("Classify Ground"),
                           tr("Classify points to ground and unassigned"),
-                          ICON("earth-element"),
+                          ICON("mountain"),
                           this,
                           SLOT(slotPlugin()));
 }

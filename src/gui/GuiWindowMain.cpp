@@ -41,10 +41,10 @@
 
 #define LOG_LOCAL(msg)
 //#define LOG_LOCAL(msg) LOG_MODULE("GuiWindowMain", msg)
-#define GUI_ICON_SIZE_TOOL_BAR 24
 
 const char *GuiWindowMain::APPLICATION_NAME = "3DForest";
 const char *GuiWindowMain::APPLICATION_VERSION = "1.0";
+const int GuiWindowMain::ICON_SIZE = 24;
 
 GuiWindowMain::GuiWindowMain(QWidget *parent)
     : QMainWindow(parent),
@@ -171,8 +171,7 @@ void GuiWindowMain::createAction(QAction **result,
         if (!toolBar_.contains(toolBar))
         {
             toolBar_[toolBar] = addToolBar(toolBar);
-            toolBar_[toolBar]->setIconSize(
-                QSize(GUI_ICON_SIZE_TOOL_BAR, GUI_ICON_SIZE_TOOL_BAR));
+            toolBar_[toolBar]->setIconSize(QSize(ICON_SIZE, ICON_SIZE));
         }
         toolBar_[toolBar]->addAction(action);
     }
