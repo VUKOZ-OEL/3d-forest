@@ -44,7 +44,7 @@ GuiPluginImport::GuiPluginImport(GuiWindowMain *window)
                           "File Import/Export",
                           tr("Import"),
                           tr("Import new point cloud dataset"),
-                          ICON("add-file"),
+                          ICON("add_new"),
                           this,
                           SLOT(slotImport()));
 

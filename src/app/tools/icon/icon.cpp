@@ -53,7 +53,8 @@ int main(int argc, char *argv[])
 
 void process(const QString &path, const QString &fileName)
 {
-    if (!(fileName.endsWith(".png") || fileName.endsWith(".ico")))
+    if (!(fileName.endsWith(".png") || fileName.endsWith(".ico") ||
+          fileName.endsWith(".svg")))
     {
         return;
     }
@@ -69,7 +70,7 @@ void process(const QString &path, const QString &fileName)
     // Destination image
     int size;
     int offset;
-    if (fileName.endsWith("-30.png"))
+    if (img.width() == 30)
     {
         // Pixel perfect resize to 32
         size = 32;
@@ -83,16 +84,27 @@ void process(const QString &path, const QString &fileName)
         offset = 0;
     }
 
-    if (fileName.endsWith(".ico"))
+    if (outputPath.endsWith(".ico"))
     {
         outputPath.replace(".ico", ".png");
+    }
+    if (outputPath.endsWith(".svg"))
+    {
+        outputPath.replace(".svg", ".png");
     }
 
     // Copy
     QImage dest(size, size, img.format());
     dest.fill(0);
     QPainter painter(&dest);
-    painter.drawImage(offset, offset, img);
+    if (size < img.width())
+    {
+        painter.drawImage(0, 0, img, offset, offset, size, size);
+    }
+    else
+    {
+        painter.drawImage(offset, offset, img);
+    }
     painter.end();
 
     // Output
@@ -102,3 +114,55 @@ void process(const QString &path, const QString &fileName)
         std::cout << " output '" << outputPath.toStdString() << std::endl;
     }
 }
+#if 0
+void processCut(const QString &path, const QString &fileName)
+{
+    if (!fileName.endsWith(".png"))
+    {
+        return;
+    }
+
+    QString inputPath = path + "/" + fileName;
+
+    // Source image
+    QImage img(inputPath);
+    std::cout << " " << img.width() << "x" << img.height() << " depth "
+              << img.depth() << ", format " << img.format() << std::endl;
+
+    int size = 24;
+    int cell = 40;
+    int x = 0;
+    int y = 0;
+    int cx = 1;
+    int cy = 1;
+
+    // Copy
+    while (y + size <= img.height())
+    {
+        while (x + size <= img.width())
+        {
+            QImage dest(size, size, img.format());
+            dest.fill(0);
+            QPainter painter(&dest);
+            painter.drawImage(0, 0, img, x, y, size, size);
+            painter.end();
+
+            QString outputPath = inputPath;
+            QString number = QString().asprintf("%02d%02d", cx, cy);
+            outputPath.replace(".png", number + ".png");
+            std::cout << " output '" << outputPath.toStdString() << "' "
+                      << number.toStdString() << " : " << cx << ", " << cy
+                      << std::endl;
+            (void)dest.save(outputPath);
+
+            x += cell;
+            cx += 1;
+        }
+
+        x = 0;
+        cx = 1;
+        y += cell;
+        cy += 1;
+    }
+}
+#endif

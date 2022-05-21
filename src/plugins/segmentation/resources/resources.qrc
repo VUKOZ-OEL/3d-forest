@@ -1,7 +1,7 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource prefix="/segmentation">
 
-<file>forest-regular-24.png</file>
+<file>forest_24px.png</file>
 
 </qresource>
 </RCC>

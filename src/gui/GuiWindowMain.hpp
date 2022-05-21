@@ -47,6 +47,7 @@ class GuiWindowMain : public QMainWindow, public ThreadCallbackInterface
 public:
     static const char *APPLICATION_NAME;
     static const char *APPLICATION_VERSION;
+    static const int ICON_SIZE;
 
     GuiWindowMain(QWidget *parent = nullptr);
     virtual ~GuiWindowMain();

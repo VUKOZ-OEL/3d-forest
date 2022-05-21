@@ -47,14 +47,14 @@ GuiProjectDatasets::GuiProjectDatasets(GuiWindowMain *mainWindow)
     GuiWindowMain::createToolButton(&addButton_,
                                     tr("Add"),
                                     tr("Add new data set"),
-                                    ICON("add-file"),
+                                    ICON("plus"),
                                     this,
                                     SLOT(slotAdd()));
 
     GuiWindowMain::createToolButton(&deleteButton_,
                                     tr("Remove"),
                                     tr("Remove selected data set"),
-                                    ICON("file-delete"),
+                                    ICON("minus"),
                                     this,
                                     SLOT(slotDelete()));
     deleteButton_->setEnabled(false);
@@ -62,21 +62,21 @@ GuiProjectDatasets::GuiProjectDatasets(GuiWindowMain *mainWindow)
     GuiWindowMain::createToolButton(&selectAllButton_,
                                     tr("Select all"),
                                     tr("Select all"),
-                                    ICON("select-all"),
+                                    ICON("select_all"),
                                     this,
                                     SLOT(slotSelectAll()));
 
     GuiWindowMain::createToolButton(&selectInvertButton_,
                                     tr("Invert"),
                                     tr("Invert selection"),
-                                    ICON("select-invert"),
+                                    ICON("select_invert"),
                                     this,
                                     SLOT(slotSelectInvert()));
 
     GuiWindowMain::createToolButton(&selectNoneButton_,
                                     tr("Select none"),
                                     tr("Select none"),
-                                    ICON("select-none"),
+                                    ICON("select_none"),
                                     this,
                                     SLOT(slotSelectNone()));
 
@@ -88,7 +88,8 @@ GuiProjectDatasets::GuiProjectDatasets(GuiWindowMain *mainWindow)
     toolBar->addWidget(selectAllButton_);
     toolBar->addWidget(selectInvertButton_);
     toolBar->addWidget(selectNoneButton_);
-    toolBar->setIconSize(QSize(24, 24));
+    toolBar->setIconSize(
+        QSize(GuiWindowMain::ICON_SIZE, GuiWindowMain::ICON_SIZE));
 
     // Layout
     QVBoxLayout *mainLayout = new QVBoxLayout;

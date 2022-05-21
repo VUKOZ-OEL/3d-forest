@@ -1,13 +1,13 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource prefix="/project">
 
-<file>blueprint-regular-24.png</file>
+<file>blueprint_24px.png</file>
 
-<file>add-file-regular-24.png</file>
-<file>file-delete-regular-24.png</file>
-<file>select-all-regular-24.png</file>
-<file>select-invert-regular-24.png</file>
-<file>select-none-regular-24.png</file>
+<file>plus_24px.png</file>
+<file>minus_24px.png</file>
+<file>select_all_24px.png</file>
+<file>select_invert_24px.png</file>
+<file>select_none_24px.png</file>
 
 </qresource>
 </RCC>

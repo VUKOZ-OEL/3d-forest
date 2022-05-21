@@ -49,7 +49,7 @@ GuiPluginProjectFile::GuiPluginProjectFile(GuiWindowMain *window)
                           "File Project",
                           tr("&Open Project..."),
                           tr("Open new project"),
-                          ICON("opened-folder"),
+                          ICON("opened_folder"),
                           this,
                           SLOT(slotProjectOpen()));
 
@@ -67,7 +67,7 @@ GuiPluginProjectFile::GuiPluginProjectFile(GuiWindowMain *window)
                           "File Project",
                           tr("Save Project &As..."),
                           tr("Save project as"),
-                          ICON("save-as"),
+                          ICON("save_as"),
                           this,
                           SLOT(slotProjectSaveAs()));
 
