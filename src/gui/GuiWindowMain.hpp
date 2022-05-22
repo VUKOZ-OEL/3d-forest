@@ -29,7 +29,8 @@
 #include <QHash>
 #include <QIcon>
 #include <QMainWindow>
-#include <QtWidgets/QAction>
+#include <QAction>
+//#include <QtWidgets/QAction> Fix for qt5 which has two QAction classes
 
 class GuiPluginInterface;
 class GuiPluginImport;

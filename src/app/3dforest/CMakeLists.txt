@@ -17,7 +17,7 @@
 
 set(SUB_PROJECT_NAME "3dforest")
 
-if (NOT CMAKE_3DFOREST_GUI_FOUND)
+if (NOT QT_VERSION_MAJOR)
   message(WARNING "Gui not found - skipping ${SUB_PROJECT_NAME}")
   return()
 endif()
@@ -40,7 +40,7 @@ target_include_directories(${SUB_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 target_link_libraries(
   ${SUB_PROJECT_NAME}
   3dforestgui
-  Qt5::Help
+  Qt${QT_VERSION_MAJOR}::Help
 )
 
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

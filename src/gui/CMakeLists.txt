@@ -17,7 +17,7 @@
 
 set(SUB_PROJECT_NAME "3dforestgui")
 
-if (NOT CMAKE_3DFOREST_GUI_FOUND)
+if (NOT QT_VERSION_MAJOR)
   message(WARNING "Gui not found - skipping ${SUB_PROJECT_NAME}")
   return()
 endif()
@@ -56,20 +56,36 @@ target_include_directories(
   ../plugins/viewer
 )
 
-include_directories(${Qt5Widgets_INCLUDE_DIRS})
-add_definitions(${Qt5Widgets_DEFINITIONS})
+if (QT_VERSION_MAJOR EQUAL 5)
+  include_directories(${Qt5Widgets_INCLUDE_DIRS})
+  include_directories(${Qt5OpenGL_INCLUDE_DIRS})
 
-include_directories(${Qt5OpenGL_INCLUDE_DIRS})
-add_definitions(${Qt5OpenGL_DEFINITIONS})
+  add_definitions(${Qt5Widgets_DEFINITIONS})
+  add_definitions(${Qt5OpenGL_DEFINITIONS})
 
-target_link_libraries(
-  ${SUB_PROJECT_NAME}
-  3dforesteditor
-  Qt5::Core
-  Qt5::Gui
-  Qt5::Widgets
-  Qt5::OpenGL
-  ${OPENGL_gl_LIBRARY}
-)
+  target_link_libraries(
+    ${SUB_PROJECT_NAME}
+    3dforesteditor
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Gui
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::OpenGL
+    ${OPENGL_gl_LIBRARY}
+  )
+else()
+  include_directories(${Qt6OpenGLWidgets_INCLUDE_DIRS})
+  add_definitions(${Qt6OpenGLWidgets_DEFINITIONS})
+
+  target_link_libraries(
+    ${SUB_PROJECT_NAME}
+    3dforesteditor
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Gui
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::OpenGL
+    Qt${QT_VERSION_MAJOR}::OpenGLWidgets
+    ${OPENGL_gl_LIBRARY}
+  )
+endif()
 
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)
