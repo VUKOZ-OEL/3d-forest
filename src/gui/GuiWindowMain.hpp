@@ -26,10 +26,10 @@
 #include <EditorThreadRender.hpp>
 #include <ThreadCallbackInterface.hpp>
 
+#include <QAction>
 #include <QHash>
 #include <QIcon>
 #include <QMainWindow>
-#include <QAction>
 //#include <QtWidgets/QAction> Fix for qt5 which has two QAction classes
 
 class GuiPluginInterface;
