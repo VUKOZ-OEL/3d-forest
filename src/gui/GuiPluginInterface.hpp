@@ -23,7 +23,8 @@
 #define GUI_PLUGIN_INTERFACE_HPP
 
 #include <QtPlugin>
-#include <QtWidgets/QAction>
+#include <QAction>
+//#include <QtWidgets/QAction> Fix for qt5 which has two QAction classes
 
 class GuiWindowMain;
 

@@ -37,7 +37,7 @@
 /** @page cheatsheet_git Git
 
 - Create your branch in GitHub if you like to make some changes:
-  -# Open web page 'https://github.com/VUKOZ-OEL/3D-Forest_1.0'.
+  -# Open web page 'https://github.com/VUKOZ-OEL/3dforest2'.
   -# Click on 'main' button.
   -# In 'Switch branches/tags' popup window:
     -# Select field 'Filter branches/tags':
@@ -46,8 +46,8 @@
 
 - Get the source code:
   @verbatim
-  git clone https://github.com/VUKOZ-OEL/3D-Forest_1.0.git
-  cd 3D-Forest_1.0
+  git clone https://github.com/VUKOZ-OEL/3dforest2.git
+  cd 3dforest2
   @endverbatim
 
 - Switch to your branch if you like to make some changes:
@@ -153,14 +153,14 @@ Qt5 and OpenGL are required for GUI application.
 -#  Get 3D Forest source code
     @verbatim
     $ cd /home/user/
-    $ git clone https://github.com/VUKOZ-OEL/3D-Forest_1.0.git
+    $ git clone https://github.com/VUKOZ-OEL/3dforest2.git
     @endverbatim
 
 -#  Build 3D Forest
     @verbatim
-    $ cd /home/user/3D-Forest_1.0
+    $ cd /home/user/3dforest2
     $ mkdir build
-    $ cd /home/user/3D-Forest_1.0/build
+    $ cd /home/user/3dforest2/build
     $ PATH=$PATH:/home/user/Qt/5.15.2/gcc_64/bin
     $ cmake -G "Unix Makefiles" .. -DCMAKE_INSTALL_PREFIX=..
     $ make
@@ -169,12 +169,12 @@ Qt5 and OpenGL are required for GUI application.
 
 -#  Start 3D Forest application
     @verbatim
-    $ cd /home/user/3D-Forest_1.0/bin
-    $ LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/3D-Forest_1.0/bin:/home/user/Qt/5.15.2/gcc_64/lib ./3dforest
+    $ cd /home/user/3dforest2/bin
+    $ LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/3dforest2/bin:/home/user/Qt/5.15.2/gcc_64/lib ./3dforest
     @endverbatim
 
 -#  We can open example project "project.json" from directory
-    "/home/user/3D-Forest_1.0/data"
+    "/home/user/3dforest2/data"
 
 -#  We can see that we did not store modified PATH and LD_LIBRARY_PATH to user
     or system variables.
@@ -185,12 +185,63 @@ Qt5 and OpenGL are required for GUI application.
 
 /** @page cheatsheet_build_windows_make Build Using "MinGW Makefiles" on Windows
 
--#  Installation of msys2 and mingw-w64
+-#  Install git
+    - Open "Git for windows" https://git-scm.com/downloads
+    - Download installer Git-2.36.1-64-bit.exe
+    - Run the installer
+    - Choose all the options as default recommanded values with the following suggestions:
+        - You may prefer to choose default editor used by Git to "Notepad".
+        - You may choose default branch name as "main".
+        - Choose "Checkout as-is, commit as-is" eg. do not convert CRLF/LF
+          (autocrlf = false in global config). This project uses LF line endings.
+          Windows can handle LF just fine at least since version 10.
+    - Git installer creates global config in
+      "C:/Users/user/AppData/Local/Programs/Git/etc/gitconfig".
+      @verbatim
+        [diff "astextplain"]
+            textconv = astextplain
+        [filter "lfs"]
+            clean = git-lfs clean -- %f
+            smudge = git-lfs smudge -- %f
+            process = git-lfs filter-process
+            required = true
+        [http]
+            sslBackend = openssl
+            sslCAInfo = C:/Users/user/AppData/Local/Programs/Git/mingw64/ssl/certs/ca-bundle.crt
+        [core]
+            autocrlf = false
+            fscache = true
+            symlinks = false
+            editor = notepad
+        [pull]
+            rebase = false
+        [credential]
+            helper = manager-core
+        [credential "https://dev.azure.com"]
+            useHttpPath = true
+        [init]
+            defaultBranch = main
+      @endverbatim
+    - For development, setup your git user as follows:
+        - This creates configuration file in "C:\Users\user\.gitconfig":
+          @verbatim
+          $ git config --global user.name "Your Name"
+          $ git config --global user.email "youremail@yourdomain.com"
+          @endverbatim
+        - This creates configuration file in "C:\Users\user\.gitconfig":
+          @verbatim
+            [user]
+                email = vaclav@email.com
+                name = Vaclav Bubnik
+          @endverbatim
+
+-#  Install msys2 and mingw-w64
     - Open https://www.msys2.org/ and follow Installation instructions:
         - Download the installer: msys2-x86_64-20220319.exe
         - Run the installer
         - Default installation will create "C:\msys64" installation folder
         - Click "Next"
+        - Choose any "Start Menu shortcuts" and click "Next"
         - When complete, check "Run MSYS2 now" and click "Finish"
         - Run the following command to update package database
           @verbatim
@@ -198,6 +249,10 @@ Qt5 and OpenGL are required for GUI application.
           @endverbatim
         - MSYS2 window will be closed
         - Run "MSYS2 MSYS" from Start menu and update the rest of the packages
+          @verbatim
+            $ pacman -Syu
+          @endverbatim
+          or
           @verbatim
             $ pacman -Su
           @endverbatim
@@ -222,25 +277,64 @@ Qt5 and OpenGL are required for GUI application.
 
     - Close "MSYS2" window
 
--#  Setup Windows PATH variable
-    - Run "systempropertiesadvanced" from the search box
-    - Click "Environment Variables"
-    - In "System variables" select "Path" and click "Edit..."
-    - Click "New" and add "C:\msys64\usr\bin", hit enter
-    - Click "New" and add "C:\msys64\usr\local\bin", hit enter
-    - Click "New" and add "C:\msys64\mingw64\bin", hit enter
-    - "Move Up" these three new items to top
+    - Setup Windows PATH variable
+        - Run "systempropertiesadvanced" from the search box
+        - Click "Environment Variables"
+        - In "System variables" select Variable "Path" and click "Edit..."
+        - Click "New" and add "C:\msys64\usr\bin", hit enter
+        - Click "New" and add "C:\msys64\usr\local\bin", hit enter
+        - Click "New" and add "C:\msys64\mingw64\bin", hit enter
+        - "Move Up" these three new items to top
+        - Click "Ok"
 
 -#  Install Qt
-    - Download Qt installer
+    - Download Qt installer from https://www.qt.io/download
+        - Click "Downloads for open source users" button in "Go open source"
+        - Click "Download the Qt Online Installer" button in bottom section
+          of the page "Looking for Qt binaries"
+        - Recommended download was "Qt Online Installer for Windows"
+        - Click "Download" button to save file "qt-unified-windows-x86-4.3.0-1-online.exe"
     - Run the installer
+        - Run "qt-unified-windows-x86-4.3.0-1-online.exe", it shows "Qt Setup" window
+        - Enter your Qt Account Email and Password, "Next"
+        - Check "I have read" and "I am an individual person", "Next", "Next"
+        - "Preparing meta information download..." may take few minutes
+        - It is suggested to keep default installation directory "C:\Qt"
+        - Select "Custom installation", "Next"
+        - Qt 6 2022
+            - Unroll Qt tree item and check "Qt 6.3.0" or make your custom
+              installation since doing this may install 31GB of useless stuff.
+            - For example, check only the following for 13GB installation:
+                - MinGW
+                - Sources
+                - Qt 5 Compatibility Module
+                - Additional Libraries
+                - Qt Debug Information Files
+        - Qt 5 2000
+            - Additionally checked: Qt - Qt 5.15.2 - Desktop gcc 64-bit
+            - Additionally checked: Qt - Qt 5.15.2 - Sources
+        - "Next", "Install", the installation takes between 10 to 30 minutes
+        - Click "Finish"
     - Run "systempropertiesadvanced" from the search box
     - Click "Environment Variables"
-    - In "System variables" select "Path" and click "Edit..."
-    - Click "New" and add "C:\Qt\5.15.0\mingw81_64\bin", hit enter
+    - In "System variables" select Variable "Path" and click "Edit..."
+    - Click "New" and add
+      "C:\Qt\5.15.0\mingw81_64\bin" or 
+      "C:\Qt\6.3.0\mingw_64\bin" depending on your installed qt version
 
--#  Open "cmd" terminal, navigate to local git repository folder and build it
-    - Build
+-#  Build 3D Forest
+    - Open "cmd" terminal windows application
+    - Use "cd" command to navigate to local git repository folder
+      @verbatim
+        cd Documents\3dforest2
+      @endverbatim    
+      or first clone the repository to "Documents" as follows:
+      @verbatim
+        cd Documents
+        git clone https://github.com/VUKOZ-OEL/3dforest2.git
+        cd 3dforest2
+      @endverbatim
+    - Build source files to executable 3dforest application as follows:
       @verbatim
         > mkdir build
         > cd build
@@ -248,8 +342,7 @@ Qt5 and OpenGL are required for GUI application.
         > mingw32-make
         > mingw32-make install
       @endverbatim
-    - Run
-        executables can be found in directory bin
+    - Run 3dforest.exe from directory "Documents\3dforest2\bin"
 
 *******************************************************************************/
 
@@ -523,7 +616,7 @@ uic -o ui_window.h window.ui
     - Linux packages can be installed with: sudo apt install ./<downloaded>.deb
     - Tested with version 1.56.2.
 
--#  In file explorer, right-click on folder "3D-Forest_1.0" and select
+-#  In file explorer, right-click on folder "3dforest2" and select
     "Open with Code". This will open 3D Forest workspace.
 
 -#  Install extension "C/C++ IntelliSense, debugging, and code browsing".
@@ -538,7 +631,7 @@ uic -o ui_window.h window.ui
 -#  Optionally install extension "Code Spell Checker".
     Extension identifier is "streetsidesoftware.code-spell-checker".
 
--#  On Windows, add the following lines to "3D-Forest_1.0/.vscode/settings.json"
+-#  On Windows, add the following lines to "3dforest2/.vscode/settings.json"
     (compiler path and IntelliSense settings):
     @verbatim
     {

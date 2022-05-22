@@ -17,7 +17,7 @@
 
 set(SUB_PROJECT_NAME "3dforestguipluginclassifyground")
 
-if (NOT CMAKE_3DFOREST_GUI_FOUND)
+if (NOT QT_VERSION_MAJOR)
   message(WARNING "Gui not found - skipping ${SUB_PROJECT_NAME}")
   return()
 endif()
