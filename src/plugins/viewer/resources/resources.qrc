@@ -2,7 +2,7 @@
 <qresource prefix="/viewer">
 
 <file>empty_box_24px.png</file>
-<file>open_box_24px.png</file>
+<file>empty_box_ortho_24px.png</file>
 
 <file>view_top_24px.png</file>
 <file>view_front_24px.png</file>

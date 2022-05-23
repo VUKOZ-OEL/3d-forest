@@ -40,7 +40,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View Projection",
                           tr("Orthographic"),
                           tr("Orthographic projection"),
-                          ICON("empty_box"),
+                          ICON("empty_box_ortho"),
                           this,
                           SLOT(slotViewOrthographic()));
 
@@ -49,7 +49,7 @@ GuiPluginViewer::GuiPluginViewer(GuiWindowMain *window)
                           "View Projection",
                           tr("Perspective"),
                           tr("Perspective projection"),
-                          ICON("open_box"),
+                          ICON("empty_box"),
                           this,
                           SLOT(slotViewPerspective()));
 
