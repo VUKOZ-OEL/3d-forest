@@ -22,9 +22,14 @@
 #ifndef GUI_PLUGIN_INTERFACE_HPP
 #define GUI_PLUGIN_INTERFACE_HPP
 
-#include <QAction>
 #include <QtPlugin>
-//#include <QtWidgets/QAction> Fix for qt5 which has two QAction classes
+
+#if QT_VERSION_MAJOR == 5
+// Fix for qt5 which has two QAction classes
+#include <QtWidgets/QAction>
+#else
+#include <QAction>
+#endif
 
 class GuiWindowMain;
 
