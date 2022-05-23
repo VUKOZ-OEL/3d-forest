@@ -404,7 +404,7 @@ General:
     For example, add "${workspaceRoot}/src/plugins/myaction" to
     "C_Cpp.default.includePath" include paths.
 
--#  Need some icon? Try to look into directory "data/icons".
+-#  Need some icon? Try to look into directory "3rdparty/icons".
 
 *******************************************************************************/
 
