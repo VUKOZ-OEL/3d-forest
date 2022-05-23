@@ -22,6 +22,7 @@ third-party libraries **without downloading and installation** of each library.
 - delaunator-cpp (Oct 6, 2018), Delaunay triangulation of 2D points.
 - eigen (3.4.0), Template library for linear algebra.
 - libigl (2.4.0), A simple geometry processing library.
+- icons from [Icons8](https://icons8.com/)
 
 ## Known Issues
 This software is currently in development.
@@ -44,7 +45,7 @@ README.md          - Project summary.
 bin/               - 3D Forest binaries. CMake install destination directory.
 build/             - CMake build directory.
 cmake/             - CMake settings.
-data/              - Example data files and icons from https://icons8.com/.
+data/              - Example data files.
 doc/               - Documentation.
 src/               - Source code.
 ```

@@ -361,9 +361,9 @@ There are several ways to add new functionality:
         @endverbatim
     -#  External plugins will be visible from application main window.
 
--#  It is possible to add new command line tool to "src/app/tools/mytool".
-    -#  Example command line tool "src/app/tools/sandbox".
-    -#  Example command line tool with Qt "src/app/tools/icon".
+-#  It is possible to add new command line tool to "src/apps/tools/mytool".
+    -#  Example command line tool "src/apps/tools/sandbox".
+    -#  Example command line tool with Qt "src/apps/tools/icon".
     -#  Tools are not available from application main window.
 
 -#  The third way is to add new internal plugin.
@@ -397,14 +397,14 @@ There are several ways to add new functionality:
 
 General:
 
--#  The main() 3D Forest application is in "src/app/3dforest/3dforest.cpp".
+-#  The main() 3D Forest application is in "src/apps/3dforest/3dforest.cpp".
 
 -#  For development with Visual Studio Code, update
     ".vscode/settings.json" to contain new directories.
     For example, add "${workspaceRoot}/src/plugins/myaction" to
     "C_Cpp.default.includePath" include paths.
 
--#  Need some icon? Try to look into directory "data/icons".
+-#  Need some icon? Try to look into directory "3rdparty/icons".
 
 *******************************************************************************/
 
@@ -642,8 +642,8 @@ uic -o ui_window.h window.ui
             "${workspaceRoot}/3rdparty/eigen",
             "${workspaceRoot}/3rdparty/libigl/include/**",
             "${workspaceRoot}/3rdparty/widgets/ctkrangeslider",
-            "${workspaceRoot}/src/app/3dforest",
-            "${workspaceRoot}/src/app/tools/sandbox",
+            "${workspaceRoot}/src/apps/3dforest",
+            "${workspaceRoot}/src/apps/tools/sandbox",
             "${workspaceRoot}/src/core",
             "${workspaceRoot}/src/editor",
             "${workspaceRoot}/src/gui",
@@ -761,7 +761,7 @@ uic -o ui_window.h window.ui
 -#  To build click "Build the selected target".
 
 -#  Copy shared libraries to the same folder as "3dforest.exe":
-    build\src\app\3dforest\
+    build\src\apps\3dforest\
     - lib3dforestcore.dll
     - lib3dforesteditor.dll
     - lib3dforestgui.dll

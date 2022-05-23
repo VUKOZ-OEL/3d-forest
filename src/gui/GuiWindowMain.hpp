@@ -29,8 +29,13 @@
 #include <QHash>
 #include <QIcon>
 #include <QMainWindow>
+
+#if QT_VERSION_MAJOR == 5
+// Fix for qt5 which has two QAction classes
+#include <QtWidgets/QAction>
+#else
 #include <QAction>
-//#include <QtWidgets/QAction> Fix for qt5 which has two QAction classes
+#endif
 
 class GuiPluginInterface;
 class GuiPluginImport;
