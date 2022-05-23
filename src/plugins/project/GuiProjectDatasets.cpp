@@ -42,6 +42,7 @@ GuiProjectDatasets::GuiProjectDatasets(GuiWindowMain *mainWindow)
 {
     // Table
     tree_ = new QTreeWidget();
+    tree_->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
     // Tool bar buttons
     GuiWindowMain::createToolButton(&addButton_,
@@ -58,6 +59,22 @@ GuiProjectDatasets::GuiProjectDatasets(GuiWindowMain *mainWindow)
                                     this,
                                     SLOT(slotDelete()));
     deleteButton_->setEnabled(false);
+
+    GuiWindowMain::createToolButton(&showButton_,
+                                    tr("Show"),
+                                    tr("Make selected data sets visible"),
+                                    ICON("eye"),
+                                    this,
+                                    SLOT(slotShow()));
+    showButton_->setEnabled(false);
+
+    GuiWindowMain::createToolButton(&hideButton_,
+                                    tr("Hide"),
+                                    tr("Hide selected data sets"),
+                                    ICON("hide"),
+                                    this,
+                                    SLOT(slotHide()));
+    hideButton_->setEnabled(false);
 
     GuiWindowMain::createToolButton(&selectAllButton_,
                                     tr("Select all"),
@@ -84,6 +101,8 @@ GuiProjectDatasets::GuiProjectDatasets(GuiWindowMain *mainWindow)
     QToolBar *toolBar = new QToolBar;
     toolBar->addWidget(addButton_);
     toolBar->addWidget(deleteButton_);
+    toolBar->addWidget(showButton_);
+    toolBar->addWidget(hideButton_);
     toolBar->addSeparator();
     toolBar->addWidget(selectAllButton_);
     toolBar->addWidget(selectInvertButton_);
@@ -143,25 +162,63 @@ void GuiProjectDatasets::slotDelete()
     dataChanged();
 }
 
+void GuiProjectDatasets::slotShow()
+{
+    QList<QTreeWidgetItem *> items = tree_->selectedItems();
+
+    if (items.count() < 1)
+    {
+        return;
+    }
+}
+
+void GuiProjectDatasets::slotHide()
+{
+    QList<QTreeWidgetItem *> items = tree_->selectedItems();
+
+    if (items.count() < 1)
+    {
+        return;
+    }
+}
+
 void GuiProjectDatasets::slotSelectAll()
 {
-    datasets_.setEnabledAll(true);
-    updateTree();
-    selectionChanged();
+    QTreeWidgetItemIterator it(tree_);
+
+    while (*it)
+    {
+        (*it)->setSelected(true);
+        ++it;
+    }
+
+    slotItemSelectionChanged();
 }
 
 void GuiProjectDatasets::slotSelectInvert()
 {
-    datasets_.setInvertAll();
-    updateTree();
-    selectionChanged();
+    QTreeWidgetItemIterator it(tree_);
+
+    while (*it)
+    {
+        (*it)->setSelected(!(*it)->isSelected());
+        ++it;
+    }
+
+    slotItemSelectionChanged();
 }
 
 void GuiProjectDatasets::slotSelectNone()
 {
-    datasets_.setEnabledAll(false);
-    updateTree();
-    selectionChanged();
+    QTreeWidgetItemIterator it(tree_);
+
+    while (*it)
+    {
+        (*it)->setSelected(false);
+        ++it;
+    }
+
+    slotItemSelectionChanged();
 }
 
 void GuiProjectDatasets::slotItemSelectionChanged()
@@ -171,10 +228,14 @@ void GuiProjectDatasets::slotItemSelectionChanged()
     if (items.count() > 0)
     {
         deleteButton_->setEnabled(true);
+        showButton_->setEnabled(true);
+        hideButton_->setEnabled(true);
     }
     else
     {
         deleteButton_->setEnabled(false);
+        showButton_->setEnabled(false);
+        hideButton_->setEnabled(false);
     }
 }
 

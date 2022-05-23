@@ -53,6 +53,8 @@ public:
 public slots:
     void slotAdd();
     void slotDelete();
+    void slotShow();
+    void slotHide();
     void slotSelectAll();
     void slotSelectInvert();
     void slotSelectNone();
@@ -67,6 +69,8 @@ protected:
     QTreeWidget *tree_;
     QToolButton *addButton_;
     QToolButton *deleteButton_;
+    QToolButton *showButton_;
+    QToolButton *hideButton_;
     QToolButton *selectAllButton_;
     QToolButton *selectInvertButton_;
     QToolButton *selectNoneButton_;
