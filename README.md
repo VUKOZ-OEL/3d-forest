@@ -13,9 +13,6 @@ The code uses C++17 and CMake. Qt5 and OpenGL are required for GUI.
 The build process generates the main GUI application and command line utilities.
 See [INSTALL](INSTALL) for more information.
 
-## Documentation
-[Documentation](https://github.com/VUKOZ-OEL/3dforest2/tree/main/doc/output/).
-
 ## Third-Party Libraries
 3D Forest source code includes several third-party libraries which are stored
 under 3rdparty directory. This approach allows to use compatible versions of
