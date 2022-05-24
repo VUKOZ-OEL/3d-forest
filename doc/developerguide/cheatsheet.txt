@@ -28,6 +28,7 @@
 - @subpage cheatsheet_doxygen
 - @subpage cheatsheet_documentation
 - @subpage cheatsheet_qtdesigner
+- @subpage cheatsheet_commands
 - @subpage cheatsheet_vscode_edit
 - @subpage cheatsheet_vscode_debug
 - @subpage cheatsheet_3rd_party
@@ -605,6 +606,15 @@ Conversion of '.ui' files to '.hpp' files by using 'uic' command line tool:
 @verbatim
 which uic
 uic -o ui_window.h window.ui
+@endverbatim
+
+*******************************************************************************/
+
+/** @page cheatsheet_commands Commands
+
+Rename filenames:
+@verbatim
+powershell -C "gci | % {rni $_.Name ($_.Name -replace '24px', '24')}"
 @endverbatim
 
 *******************************************************************************/
