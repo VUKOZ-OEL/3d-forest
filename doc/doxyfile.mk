@@ -80,7 +80,7 @@ PROJECT_NUMBER         = 1.0
 #
 # newflag
 
-PROJECT_LOGO           = ../modules/applications/3dforest/application/resources/3dforest-48.png
+PROJECT_LOGO           = ../src/apps/3dforest/resources/3dforest-48.png
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) path
 # into which the generated documentation will be written. If a relative path is
@@ -821,9 +821,8 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = ../doc/userguide \
-                         ../doc/developerguide \
-                         ../modules \
-                         ../examples
+                         ../doc/developerguide
+#                         ../src
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
