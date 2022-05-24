@@ -14,7 +14,7 @@ The build process generates the main GUI application and command line utilities.
 See [INSTALL](INSTALL) for more information.
 
 ## Documentation
-[Documentation](doc/output/index.html).
+[Documentation](doc/output/).
 
 ## Third-Party Libraries
 3D Forest source code includes several third-party libraries which are stored
