@@ -17,31 +17,33 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file GuiPluginInterface.hpp */
+/** @file ClassifyGroundPlugin.hpp */
 
-#ifndef GUI_PLUGIN_INTERFACE_HPP
-#define GUI_PLUGIN_INTERFACE_HPP
+#ifndef CLASSIFY_GROUND_PLUGIN_HPP
+#define CLASSIFY_GROUND_PLUGIN_HPP
 
-#include <QtPlugin>
+#include <GuiPluginInterface.hpp>
 
-#if QT_VERSION_MAJOR == 5
-// Fix for qt5 which has two QAction classes
-#include <QtWidgets/QAction>
-#else
-#include <QAction>
-#endif
+class ClassifyGroundWindow;
 
-class GuiMainWindow;
-
-/** Gui Plugin Interface. */
-class GuiPluginInterface
+/** Classify Ground Plugin. */
+class ClassifyGroundPlugin : public QObject, public GuiPluginInterface
 {
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID GuiPluginInterface_iid)
+    Q_INTERFACES(GuiPluginInterface)
+
 public:
-    virtual ~GuiPluginInterface() = default;
-    virtual void initialize(GuiMainWindow *mainWindow) = 0;
+    ClassifyGroundPlugin();
+
+    virtual void initialize(GuiMainWindow *mainWindow);
+
+public slots:
+    void slotPlugin();
+
+protected:
+    GuiMainWindow *mainWindow_;
+    ClassifyGroundWindow *dockWindow_;
 };
 
-#define GuiPluginInterface_iid "vukoz.3dforest.qt.GuiPluginInterface/1.0"
-Q_DECLARE_INTERFACE(GuiPluginInterface, GuiPluginInterface_iid)
-
-#endif /* GUI_PLUGIN_INTERFACE_HPP */
+#endif /* CLASSIFY_GROUND_PLUGIN_HPP */

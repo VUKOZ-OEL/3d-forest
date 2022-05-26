@@ -17,31 +17,33 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file GuiPluginInterface.hpp */
+/** @file SegmentationPlugin.hpp */
 
-#ifndef GUI_PLUGIN_INTERFACE_HPP
-#define GUI_PLUGIN_INTERFACE_HPP
+#ifndef SEGMENTATION_PLUGIN_HPP
+#define SEGMENTATION_PLUGIN_HPP
 
-#include <QtPlugin>
+#include <GuiPluginInterface.hpp>
 
-#if QT_VERSION_MAJOR == 5
-// Fix for qt5 which has two QAction classes
-#include <QtWidgets/QAction>
-#else
-#include <QAction>
-#endif
+class SegmentationWindow;
 
-class GuiMainWindow;
-
-/** Gui Plugin Interface. */
-class GuiPluginInterface
+/** Segmentation Plugin. */
+class SegmentationPlugin : public QObject, public GuiPluginInterface
 {
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID GuiPluginInterface_iid)
+    Q_INTERFACES(GuiPluginInterface)
+
 public:
-    virtual ~GuiPluginInterface() = default;
-    virtual void initialize(GuiMainWindow *mainWindow) = 0;
+    SegmentationPlugin();
+
+    virtual void initialize(GuiMainWindow *mainWindow);
+
+public slots:
+    void slotPlugin();
+
+protected:
+    GuiMainWindow *mainWindow_;
+    SegmentationWindow *dockWindow_;
 };
 
-#define GuiPluginInterface_iid "vukoz.3dforest.qt.GuiPluginInterface/1.0"
-Q_DECLARE_INTERFACE(GuiPluginInterface, GuiPluginInterface_iid)
-
-#endif /* GUI_PLUGIN_INTERFACE_HPP */
+#endif /* SEGMENTATION_PLUGIN_HPP */

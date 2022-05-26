@@ -17,31 +17,30 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file GuiPluginInterface.hpp */
+/** @file ProjectNavigatorWindow.hpp */
 
-#ifndef GUI_PLUGIN_INTERFACE_HPP
-#define GUI_PLUGIN_INTERFACE_HPP
+#ifndef PROJECT_NAVIGATOR_WINDOW_HPP
+#define PROJECT_NAVIGATOR_WINDOW_HPP
 
-#include <QtPlugin>
-
-#if QT_VERSION_MAJOR == 5
-// Fix for qt5 which has two QAction classes
-#include <QtWidgets/QAction>
-#else
-#include <QAction>
-#endif
+#include <QDockWidget>
 
 class GuiMainWindow;
+class ProjectNavigatorFiles;
 
-/** Gui Plugin Interface. */
-class GuiPluginInterface
+class QTabWidget;
+
+/** Project Navigator Window. */
+class ProjectNavigatorWindow : public QDockWidget
 {
+    Q_OBJECT
+
 public:
-    virtual ~GuiPluginInterface() = default;
-    virtual void initialize(GuiMainWindow *mainWindow) = 0;
+    ProjectNavigatorWindow(GuiMainWindow *mainWindow);
+
+protected:
+    GuiMainWindow *mainWindow_;
+    QTabWidget *tabWidget_;
+    ProjectNavigatorFiles *datasets_;
 };
 
-#define GuiPluginInterface_iid "vukoz.3dforest.qt.GuiPluginInterface/1.0"
-Q_DECLARE_INTERFACE(GuiPluginInterface, GuiPluginInterface_iid)
-
-#endif /* GUI_PLUGIN_INTERFACE_HPP */
+#endif /* PROJECT_NAVIGATOR_WINDOW_HPP */

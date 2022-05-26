@@ -17,31 +17,38 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file GuiPluginInterface.hpp */
+/** @file ImportDialog.hpp */
 
-#ifndef GUI_PLUGIN_INTERFACE_HPP
-#define GUI_PLUGIN_INTERFACE_HPP
+#ifndef IMPORT_DIALOG_HPP
+#define IMPORT_DIALOG_HPP
 
-#include <QtPlugin>
+#include <EditorSettingsImport.hpp>
 
-#if QT_VERSION_MAJOR == 5
-// Fix for qt5 which has two QAction classes
-#include <QtWidgets/QAction>
-#else
-#include <QAction>
-#endif
+#include <QDialog>
 
 class GuiMainWindow;
+class QCheckBox;
+class QPushButton;
 
-/** Gui Plugin Interface. */
-class GuiPluginInterface
+/** Import Dialog. */
+class ImportDialog : public QDialog
 {
+    Q_OBJECT
+
 public:
-    virtual ~GuiPluginInterface() = default;
-    virtual void initialize(GuiMainWindow *mainWindow) = 0;
+    ImportDialog(GuiMainWindow *mainWindow);
+
+    EditorSettingsImport getSettings() const;
+
+public slots:
+    void slotAccept();
+    void slotReject();
+
+protected:
+    QCheckBox *centerCheckBox_;
+    QCheckBox *convertCheckBox_;
+    QPushButton *acceptButton_;
+    QPushButton *rejectButton_;
 };
 
-#define GuiPluginInterface_iid "vukoz.3dforest.qt.GuiPluginInterface/1.0"
-Q_DECLARE_INTERFACE(GuiPluginInterface, GuiPluginInterface_iid)
-
-#endif /* GUI_PLUGIN_INTERFACE_HPP */
+#endif /* IMPORT_DIALOG_HPP */

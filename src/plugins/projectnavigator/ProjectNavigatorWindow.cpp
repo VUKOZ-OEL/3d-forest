@@ -17,31 +17,28 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file GuiPluginInterface.hpp */
+/** @file ProjectNavigatorWindow.cpp */
 
-#ifndef GUI_PLUGIN_INTERFACE_HPP
-#define GUI_PLUGIN_INTERFACE_HPP
+#include <GuiMainWindow.hpp>
+#include <ProjectNavigatorFiles.hpp>
+#include <ProjectNavigatorWindow.hpp>
 
-#include <QtPlugin>
+#include <QTabWidget>
 
-#if QT_VERSION_MAJOR == 5
-// Fix for qt5 which has two QAction classes
-#include <QtWidgets/QAction>
-#else
-#include <QAction>
-#endif
-
-class GuiMainWindow;
-
-/** Gui Plugin Interface. */
-class GuiPluginInterface
+ProjectNavigatorWindow::ProjectNavigatorWindow(GuiMainWindow *mainWindow)
+    : QDockWidget(mainWindow),
+      mainWindow_(mainWindow)
 {
-public:
-    virtual ~GuiPluginInterface() = default;
-    virtual void initialize(GuiMainWindow *mainWindow) = 0;
-};
+    // Tab
+    datasets_ = new ProjectNavigatorFiles(mainWindow_);
 
-#define GuiPluginInterface_iid "vukoz.3dforest.qt.GuiPluginInterface/1.0"
-Q_DECLARE_INTERFACE(GuiPluginInterface, GuiPluginInterface_iid)
+    // Tabs
+    tabWidget_ = new QTabWidget;
+    tabWidget_->addTab(datasets_, tr("Files"));
 
-#endif /* GUI_PLUGIN_INTERFACE_HPP */
+    // Dock
+    setWidget(tabWidget_);
+    setWindowTitle(tr("Project Navigator"));
+    setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    mainWindow_->addDockWidget(Qt::LeftDockWidgetArea, this);
+}

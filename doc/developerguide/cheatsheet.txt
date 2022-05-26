@@ -379,12 +379,12 @@ There are several ways to add new functionality:
         target_include_directories
           ../plugins/myaction
         @endverbatim
-    -#  Add field "guiPluginMyAction_" to "src/gui/GuiWindowMain.hpp".
+    -#  Add field "guiPluginMyAction_" to "src/gui/GuiMainWindow.hpp".
         @verbatim
         class GuiPluginMyAction;
         GuiPluginMyAction *guiPluginMyAction_;
         @endverbatim
-    -#  Create instance in "src/gui/GuiWindowMain.cpp" constructor.
+    -#  Create instance in "src/gui/GuiMainWindow.cpp" constructor.
         @verbatim
         guiPluginMyAction_ = new GuiPluginMyAction(this);
         @endverbatim
@@ -414,8 +414,8 @@ General:
 @verbatim
 directory "3rd Party" is "3rdparty" lowercase, no separators
 
-source    "GuiWindowMain.hpp"       C++ header, CamelCase for classes
-          "GuiWindowMain.cpp"       C++ source, CamelCase for classes
+source    "GuiMainWindow.hpp"       C++ header, CamelCase for classes
+          "GuiMainWindow.cpp"       C++ source, CamelCase for classes
           "examplecolorpalette.cpp" lowercase for executables
           "las.cpp"                 lowercase for executables
 

@@ -17,31 +17,32 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file GuiPluginInterface.hpp */
+/** @file ImportPlugin.hpp */
 
-#ifndef GUI_PLUGIN_INTERFACE_HPP
-#define GUI_PLUGIN_INTERFACE_HPP
+#ifndef IMPORT_PLUGIN_HPP
+#define IMPORT_PLUGIN_HPP
 
-#include <QtPlugin>
-
-#if QT_VERSION_MAJOR == 5
-// Fix for qt5 which has two QAction classes
-#include <QtWidgets/QAction>
-#else
-#include <QAction>
-#endif
+#include <QObject>
 
 class GuiMainWindow;
+class QAction;
 
-/** Gui Plugin Interface. */
-class GuiPluginInterface
+/** Import Plugin. */
+class ImportPlugin : public QObject
 {
+    Q_OBJECT
+
 public:
-    virtual ~GuiPluginInterface() = default;
-    virtual void initialize(GuiMainWindow *mainWindow) = 0;
+    ImportPlugin(GuiMainWindow *mainWindow);
+
+    static void import(GuiMainWindow *mainWindow);
+
+public slots:
+    void slotImport();
+
+protected:
+    GuiMainWindow *mainWindow_;
+    QAction *actionImport_;
 };
 
-#define GuiPluginInterface_iid "vukoz.3dforest.qt.GuiPluginInterface/1.0"
-Q_DECLARE_INTERFACE(GuiPluginInterface, GuiPluginInterface_iid)
-
-#endif /* GUI_PLUGIN_INTERFACE_HPP */
+#endif /* IMPORT_PLUGIN_HPP */
