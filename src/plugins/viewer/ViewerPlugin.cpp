@@ -32,8 +32,8 @@ ViewerPlugin::ViewerPlugin(GuiMainWindow *mainWindow)
     : QObject(mainWindow),
       mainWindow_(mainWindow)
 {
-    guiViewports_ = new ViewerViewports(mainWindow_);
-    mainWindow_->setCentralWidget(guiViewports_);
+    viewports_ = new ViewerViewports(mainWindow_);
+    mainWindow_->setCentralWidget(viewports_);
 
     mainWindow_->createAction(&actionViewOrthographic_,
                               "View",
@@ -149,49 +149,49 @@ ViewerPlugin::ViewerPlugin(GuiMainWindow *mainWindow)
 
 void ViewerPlugin::slotViewOrthographic()
 {
-    guiViewports_->setViewOrthographic();
+    viewports_->setViewOrthographic();
     updateViewer();
 }
 
 void ViewerPlugin::slotViewPerspective()
 {
-    guiViewports_->setViewPerspective();
+    viewports_->setViewPerspective();
     updateViewer();
 }
 
 void ViewerPlugin::slotViewTop()
 {
-    guiViewports_->setViewTop();
+    viewports_->setViewTop();
     updateViewer();
 }
 
 void ViewerPlugin::slotViewFront()
 {
-    guiViewports_->setViewFront();
+    viewports_->setViewFront();
     updateViewer();
 }
 
 void ViewerPlugin::slotViewRight()
 {
-    guiViewports_->setViewRight();
+    viewports_->setViewRight();
     updateViewer();
 }
 
 void ViewerPlugin::slotView3d()
 {
-    guiViewports_->setView3d();
+    viewports_->setView3d();
     updateViewer();
 }
 
 void ViewerPlugin::slotViewResetDistance()
 {
-    guiViewports_->setViewResetDistance();
+    viewports_->setViewResetDistance();
     updateViewer();
 }
 
 void ViewerPlugin::slotViewResetCenter()
 {
-    guiViewports_->setViewResetCenter();
+    viewports_->setViewResetCenter();
     updateViewer();
 }
 
@@ -222,22 +222,22 @@ void ViewerPlugin::slotViewLayout(ViewerViewports::ViewLayout layout)
     if (layout == ViewerViewports::VIEW_LAYOUT_SINGLE)
     {
         mainWindow_->editor().viewportsResize(1);
-        guiViewports_->setLayout(layout);
+        viewports_->setLayout(layout);
     }
     else if (layout == ViewerViewports::VIEW_LAYOUT_TWO_COLUMNS)
     {
         mainWindow_->editor().viewportsResize(2);
-        guiViewports_->setLayout(layout);
-        guiViewports_->resetScene(&mainWindow_->editor(), 1, true);
+        viewports_->setLayout(layout);
+        viewports_->resetScene(&mainWindow_->editor(), 1, true);
     }
     else if ((layout == ViewerViewports::VIEW_LAYOUT_GRID) ||
              (layout == ViewerViewports::VIEW_LAYOUT_THREE_ROWS_RIGHT))
     {
         mainWindow_->editor().viewportsResize(4);
-        guiViewports_->setLayout(layout);
-        guiViewports_->resetScene(&mainWindow_->editor(), 1, true);
-        guiViewports_->resetScene(&mainWindow_->editor(), 2, true);
-        guiViewports_->resetScene(&mainWindow_->editor(), 3, true);
+        viewports_->setLayout(layout);
+        viewports_->resetScene(&mainWindow_->editor(), 1, true);
+        viewports_->resetScene(&mainWindow_->editor(), 2, true);
+        viewports_->resetScene(&mainWindow_->editor(), 3, true);
     }
 
     updateViewer();

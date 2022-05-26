@@ -28,7 +28,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-#define GUI_PLUGIN_PROJECT_FILTER_PRJ "3DForest Project (*.json)"
+#define PROJECT_FILE_PLUGIN_FILTER_PRJ "3DForest Project (*.json)"
 #define ICON(name) (GuiIconTheme(":/projectfile/", name))
 
 ProjectFilePlugin::ProjectFilePlugin(GuiMainWindow *mainWindow)
@@ -89,7 +89,7 @@ void ProjectFilePlugin::slotProjectOpen()
     fileName = QFileDialog::getOpenFileName(mainWindow_,
                                             tr("Open Project"),
                                             "",
-                                            tr(GUI_PLUGIN_PROJECT_FILTER_PRJ));
+                                            tr(PROJECT_FILE_PLUGIN_FILTER_PRJ));
 
     if (fileName.isEmpty())
     {
@@ -111,7 +111,7 @@ void ProjectFilePlugin::slotProjectSaveAs()
     fileName = QFileDialog::getSaveFileName(mainWindow_,
                                             tr("Save Project As"),
                                             "",
-                                            tr(GUI_PLUGIN_PROJECT_FILTER_PRJ));
+                                            tr(PROJECT_FILE_PLUGIN_FILTER_PRJ));
 
     if (fileName.isEmpty())
     {
@@ -214,11 +214,11 @@ bool ProjectFilePlugin::projectSave(const QString &path)
             // First time save
             QString fileName;
 
-            fileName =
-                QFileDialog::getSaveFileName(mainWindow_,
-                                             tr("Save As"),
-                                             "",
-                                             tr(GUI_PLUGIN_PROJECT_FILTER_PRJ));
+            fileName = QFileDialog::getSaveFileName(
+                mainWindow_,
+                tr("Save As"),
+                "",
+                tr(PROJECT_FILE_PLUGIN_FILTER_PRJ));
 
             if (fileName.isEmpty())
             {

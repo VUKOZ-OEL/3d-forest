@@ -37,7 +37,7 @@ class ViewerPlugin : public QObject
 public:
     ViewerPlugin(GuiMainWindow *mainWindow);
 
-    ViewerViewports *viewports() { return guiViewports_; }
+    ViewerViewports *viewports() { return viewports_; }
 
 public slots:
     void slotViewOrthographic();
@@ -76,7 +76,7 @@ protected:
     QAction *actionViewLayoutGrid_;
     QAction *actionViewLayoutGridRight_;
 
-    ViewerViewports *guiViewports_;
+    ViewerViewports *viewports_;
 
     void updateViewer();
 };

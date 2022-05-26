@@ -38,7 +38,7 @@
 #include <QVBoxLayout>
 
 #define ICON(name) (GuiIconTheme(":/classifyground/", name))
-#define GUI_PLUGIN_NAME "Classify Ground"
+#define CLASSIFY_GROUND_PLUGIN_NAME "Classify Ground"
 
 /** Classify Ground Window. */
 class ClassifyGroundWindow : public QDockWidget
@@ -123,7 +123,7 @@ ClassifyGroundWindow::ClassifyGroundWindow(GuiMainWindow *mainWindow)
     widget_->setLayout(vbox);
     widget_->setFixedHeight(180);
     setWidget(widget_);
-    setWindowTitle(QObject::tr(GUI_PLUGIN_NAME));
+    setWindowTitle(QObject::tr(CLASSIFY_GROUND_PLUGIN_NAME));
     setFloating(true);
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     mainWindow_->addDockWidget(Qt::RightDockWidgetArea, this);
@@ -156,7 +156,7 @@ void ClassifyGroundWindow::slotApply()
     QProgressDialog progressDialog(mainWindow_);
     progressDialog.setCancelButtonText(QObject::tr("&Cancel"));
     progressDialog.setRange(0, maximum);
-    progressDialog.setWindowTitle(QObject::tr(GUI_PLUGIN_NAME));
+    progressDialog.setWindowTitle(QObject::tr(CLASSIFY_GROUND_PLUGIN_NAME));
     progressDialog.setWindowModality(Qt::WindowModal);
     progressDialog.setMinimumDuration(0);
     progressDialog.show();

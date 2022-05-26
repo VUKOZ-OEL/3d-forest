@@ -32,7 +32,7 @@
 #include <QProgressBar>
 #include <QProgressDialog>
 
-#define GUI_PLUGIN_IMPORT_FILTER "LAS (LASer) File (*.las)"
+#define IMPORT_PLUGIN_FILTER "LAS (LASer) File (*.las)"
 #define ICON(name) (GuiIconTheme(":/import/", name))
 
 ImportPlugin::ImportPlugin(GuiMainWindow *mainWindow)
@@ -56,19 +56,19 @@ void ImportPlugin::slotImport()
     ImportPlugin::import(mainWindow_);
 }
 
-static void guiPluginImport(GuiMainWindow *mainWindow);
+static void importPluginDialog(GuiMainWindow *mainWindow);
 
-static void guiPluginImportFile(const QString &path, GuiMainWindow *mainWindow);
+static void importPluginFile(const QString &path, GuiMainWindow *mainWindow);
 
-static bool guiPluginImportCreateIndex(const QString &path,
-                                       const EditorSettingsImport &settings,
-                                       GuiMainWindow *mainWindow);
+static bool importPluginCreateIndex(const QString &path,
+                                    const EditorSettingsImport &settings,
+                                    GuiMainWindow *mainWindow);
 
 void ImportPlugin::import(GuiMainWindow *mainWindow)
 {
     try
     {
-        guiPluginImport(mainWindow);
+        importPluginDialog(mainWindow);
     }
     catch (std::exception &e)
     {
@@ -77,10 +77,10 @@ void ImportPlugin::import(GuiMainWindow *mainWindow)
     }
 }
 
-static void guiPluginImport(GuiMainWindow *mainWindow)
+static void importPluginDialog(GuiMainWindow *mainWindow)
 {
     QFileDialog dialog(mainWindow, QObject::tr("Import File"));
-    dialog.setNameFilter(QObject::tr(GUI_PLUGIN_IMPORT_FILTER));
+    dialog.setNameFilter(QObject::tr(IMPORT_PLUGIN_FILTER));
 
     if (dialog.exec() == QDialog::Rejected)
     {
@@ -99,10 +99,10 @@ static void guiPluginImport(GuiMainWindow *mainWindow)
         return;
     }
 
-    guiPluginImportFile(fileName, mainWindow);
+    importPluginFile(fileName, mainWindow);
 }
 
-static void guiPluginImportFile(const QString &path, GuiMainWindow *mainWindow)
+static void importPluginFile(const QString &path, GuiMainWindow *mainWindow)
 {
     mainWindow->suspendThreads();
 
@@ -115,7 +115,7 @@ static void guiPluginImportFile(const QString &path, GuiMainWindow *mainWindow)
 
     EditorSettingsImport settings = dialog.getSettings();
 
-    if (guiPluginImportCreateIndex(path, settings, mainWindow))
+    if (importPluginCreateIndex(path, settings, mainWindow))
     {
         mainWindow->editor().open(path.toStdString(), settings);
     }
@@ -123,9 +123,9 @@ static void guiPluginImportFile(const QString &path, GuiMainWindow *mainWindow)
     mainWindow->updateEverything();
 }
 
-static bool guiPluginImportCreateIndex(const QString &path,
-                                       const EditorSettingsImport &settings,
-                                       GuiMainWindow *mainWindow)
+static bool importPluginCreateIndex(const QString &path,
+                                    const EditorSettingsImport &settings,
+                                    GuiMainWindow *mainWindow)
 {
     // If the index already exists, then return success.
     std::string pathStd;
