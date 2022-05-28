@@ -243,8 +243,8 @@ void ViewerCamera::mousePressEvent(QMouseEvent *event)
 
 void ViewerCamera::mouseMoveEvent(QMouseEvent *event)
 {
-    int dx = event->x() - mouseLastPosition_.x();
-    int dy = event->y() - mouseLastPosition_.y();
+    int dx = event->pos().x() - mouseLastPosition_.x();
+    int dy = event->pos().y() - mouseLastPosition_.y();
 
     if (event->buttons() & Qt::LeftButton)
     {
