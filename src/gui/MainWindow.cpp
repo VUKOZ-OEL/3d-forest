@@ -338,7 +338,7 @@ void MainWindow::updateData()
     resumeThreads();
 }
 
-void MainWindow::updateSelection()
+void MainWindow::updateFilter()
 {
     suspendThreads();
 
