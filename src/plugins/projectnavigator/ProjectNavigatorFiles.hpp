@@ -22,11 +22,11 @@
 #ifndef PROJECT_NAVIGATOR_FILES_HPP
 #define PROJECT_NAVIGATOR_FILES_HPP
 
-#include <EditorDatasets.hpp>
+#include <DatasetList.hpp>
 
 #include <QWidget>
 
-class GuiMainWindow;
+class MainWindow;
 
 class QToolButton;
 class QTreeWidget;
@@ -48,7 +48,7 @@ public:
         COLUMN_LAST,
     };
 
-    ProjectNavigatorFiles(GuiMainWindow *mainWindow);
+    ProjectNavigatorFiles(MainWindow *mainWindow);
 
 public slots:
     void slotAdd();
@@ -65,7 +65,7 @@ public slots:
     void slotUpdate();
 
 protected:
-    GuiMainWindow *mainWindow_;
+    MainWindow *mainWindow_;
     QTreeWidget *tree_;
     QToolButton *addButton_;
     QToolButton *deleteButton_;
@@ -74,7 +74,7 @@ protected:
     QToolButton *selectAllButton_;
     QToolButton *selectInvertButton_;
     QToolButton *selectNoneButton_;
-    EditorDatasets datasets_;
+    DatasetList datasets_;
 
     void dataChanged();
     void selectionChanged();
@@ -85,7 +85,7 @@ protected:
     void unblock();
     void addItem(size_t i);
 
-    void setDatasets(const EditorDatasets &datasets);
+    void setDatasets(const DatasetList &datasets);
 };
 
 #endif /* PROJECT_NAVIGATOR_FILES_HPP */

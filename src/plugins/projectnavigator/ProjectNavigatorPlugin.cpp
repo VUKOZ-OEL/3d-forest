@@ -19,14 +19,14 @@
 
 /** @file ProjectNavigatorPlugin.cpp */
 
-#include <GuiIconTheme.hpp>
-#include <GuiMainWindow.hpp>
+#include <IconTheme.hpp>
+#include <MainWindow.hpp>
 #include <ProjectNavigatorPlugin.hpp>
 #include <ProjectNavigatorWindow.hpp>
 
-#define ICON(name) (GuiIconTheme(":/projectnavigator/", name))
+#define ICON(name) (IconTheme(":/projectnavigator/", name))
 
-ProjectNavigatorPlugin::ProjectNavigatorPlugin(GuiMainWindow *mainWindow)
+ProjectNavigatorPlugin::ProjectNavigatorPlugin(MainWindow *mainWindow)
     : QObject(mainWindow),
       mainWindow_(mainWindow),
       projectWindow_(nullptr)

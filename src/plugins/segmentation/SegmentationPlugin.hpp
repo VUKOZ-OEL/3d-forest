@@ -22,27 +22,27 @@
 #ifndef SEGMENTATION_PLUGIN_HPP
 #define SEGMENTATION_PLUGIN_HPP
 
-#include <GuiPluginInterface.hpp>
+#include <PluginInterface.hpp>
 
 class SegmentationWindow;
 
 /** Segmentation Plugin. */
-class SegmentationPlugin : public QObject, public GuiPluginInterface
+class SegmentationPlugin : public QObject, public PluginInterface
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID GuiPluginInterface_iid)
-    Q_INTERFACES(GuiPluginInterface)
+    Q_PLUGIN_METADATA(IID PluginInterface_iid)
+    Q_INTERFACES(PluginInterface)
 
 public:
     SegmentationPlugin();
 
-    virtual void initialize(GuiMainWindow *mainWindow);
+    virtual void initialize(MainWindow *mainWindow);
 
 public slots:
     void slotPlugin();
 
 protected:
-    GuiMainWindow *mainWindow_;
+    MainWindow *mainWindow_;
     SegmentationWindow *dockWindow_;
 };
 

@@ -22,27 +22,27 @@
 #ifndef CLASSIFY_GROUND_PLUGIN_HPP
 #define CLASSIFY_GROUND_PLUGIN_HPP
 
-#include <GuiPluginInterface.hpp>
+#include <PluginInterface.hpp>
 
 class ClassifyGroundWindow;
 
 /** Classify Ground Plugin. */
-class ClassifyGroundPlugin : public QObject, public GuiPluginInterface
+class ClassifyGroundPlugin : public QObject, public PluginInterface
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID GuiPluginInterface_iid)
-    Q_INTERFACES(GuiPluginInterface)
+    Q_PLUGIN_METADATA(IID PluginInterface_iid)
+    Q_INTERFACES(PluginInterface)
 
 public:
     ClassifyGroundPlugin();
 
-    virtual void initialize(GuiMainWindow *mainWindow);
+    virtual void initialize(MainWindow *mainWindow);
 
 public slots:
     void slotPlugin();
 
 protected:
-    GuiMainWindow *mainWindow_;
+    MainWindow *mainWindow_;
     ClassifyGroundWindow *dockWindow_;
 };
 

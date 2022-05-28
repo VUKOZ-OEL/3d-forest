@@ -25,7 +25,7 @@
 #include <QObject>
 #include <QString>
 
-class GuiMainWindow;
+class MainWindow;
 class QAction;
 
 /** Project File Plugin. */
@@ -34,7 +34,7 @@ class ProjectFilePlugin : public QObject
     Q_OBJECT
 
 public:
-    explicit ProjectFilePlugin(GuiMainWindow *mainWindow);
+    explicit ProjectFilePlugin(MainWindow *mainWindow);
 
     bool projectClose();
 
@@ -48,7 +48,7 @@ protected:
     bool projectOpen(const QString &path);
     bool projectSave(const QString &path = "");
 
-    GuiMainWindow *mainWindow_;
+    MainWindow *mainWindow_;
 
     QAction *actionProjectNew_;
     QAction *actionProjectOpen_;

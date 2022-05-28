@@ -24,7 +24,7 @@
 
 #include <vector>
 
-#include <EditorCamera.hpp>
+#include <Camera.hpp>
 
 #include <QWidget>
 
@@ -61,7 +61,7 @@ public:
 
     void selectViewport(ViewerOpenGLViewport *viewport);
     size_t selectedViewportId() const;
-    EditorCamera camera(size_t viewportId) const;
+    Camera camera(size_t viewportId) const;
 
     void updateScene(Editor *editor);
     void resetScene(Editor *editor, bool resetView);

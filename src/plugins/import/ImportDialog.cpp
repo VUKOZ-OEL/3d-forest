@@ -21,8 +21,8 @@
 
 #include <Log.hpp>
 
-#include <GuiMainWindow.hpp>
 #include <ImportDialog.hpp>
+#include <MainWindow.hpp>
 
 #include <QCheckBox>
 #include <QGridLayout>
@@ -32,7 +32,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-ImportDialog::ImportDialog(GuiMainWindow *window) : QDialog(window)
+ImportDialog::ImportDialog(MainWindow *mainWindow) : QDialog(mainWindow)
 {
     // Widgets
     QLabel *description = new QLabel(tr("This operation may modify"
@@ -101,9 +101,9 @@ void ImportDialog::slotReject()
     setResult(QDialog::Rejected);
 }
 
-EditorSettingsImport ImportDialog::getSettings() const
+SettingsImport ImportDialog::getSettings() const
 {
-    EditorSettingsImport settings;
+    SettingsImport settings;
 
     settings.setCenterEnabled(centerCheckBox_->isChecked());
 

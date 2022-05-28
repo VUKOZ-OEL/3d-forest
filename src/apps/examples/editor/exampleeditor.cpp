@@ -23,20 +23,20 @@
 
 #include <Editor.hpp>
 #include <Error.hpp>
-#include <FileLasIndexBuilder.hpp>
+#include <IndexFileBuilder.hpp>
 #include <Time.hpp>
 
 #define PATH_1 "dataset1.las"
 
 static void createDataSet()
 {
-    FileLasIndexBuilder::Settings settings;
+    IndexFileBuilder::Settings settings;
     settings.maxSize1 = 2;
 
-    std::vector<FileLas::Point> points;
+    std::vector<LasFile::Point> points;
 
     points.resize(3);
-    std::memset(points.data(), 0, sizeof(FileLas::Point) * points.size());
+    std::memset(points.data(), 0, sizeof(LasFile::Point) * points.size());
 
     points[0].x = 0;
     points[0].y = 0;
@@ -50,8 +50,8 @@ static void createDataSet()
     points[2].y = 1;
     points[2].z = 0;
 
-    FileLas::create(PATH_1, points, {1, 1, 1}, {0, 0, 0});
-    FileLasIndexBuilder::index(PATH_1, PATH_1, settings);
+    LasFile::create(PATH_1, points, {1, 1, 1}, {0, 0, 0});
+    IndexFileBuilder::index(PATH_1, PATH_1, settings);
 }
 
 static void edit()
@@ -61,7 +61,7 @@ static void edit()
 
     double zmin = db.clipBoundary().max(2);
 
-    EditorQuery query(&db);
+    Query query(&db);
     query.selectBox(Box<double>(0., 0., 0., 1.0, 1.0, 2.));
     query.exec();
 

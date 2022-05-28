@@ -24,7 +24,7 @@
 
 #include <QObject>
 
-class GuiMainWindow;
+class MainWindow;
 class ProjectNavigatorWindow;
 
 /** Project Navigator Plugin. */
@@ -33,13 +33,13 @@ class ProjectNavigatorPlugin : public QObject
     Q_OBJECT
 
 public:
-    ProjectNavigatorPlugin(GuiMainWindow *mainWindow);
+    ProjectNavigatorPlugin(MainWindow *mainWindow);
 
 public slots:
     void slotShowNavigator();
 
 protected:
-    GuiMainWindow *mainWindow_;
+    MainWindow *mainWindow_;
     ProjectNavigatorWindow *projectWindow_;
 };
 

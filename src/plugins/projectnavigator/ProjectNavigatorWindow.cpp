@@ -19,13 +19,13 @@
 
 /** @file ProjectNavigatorWindow.cpp */
 
-#include <GuiMainWindow.hpp>
+#include <MainWindow.hpp>
 #include <ProjectNavigatorFiles.hpp>
 #include <ProjectNavigatorWindow.hpp>
 
 #include <QTabWidget>
 
-ProjectNavigatorWindow::ProjectNavigatorWindow(GuiMainWindow *mainWindow)
+ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
     : QDockWidget(mainWindow),
       mainWindow_(mainWindow)
 {

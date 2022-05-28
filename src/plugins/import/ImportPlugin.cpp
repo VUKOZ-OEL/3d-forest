@@ -19,13 +19,13 @@
 
 /** @file ImportPlugin.cpp */
 
-#include <FileLasIndexBuilder.hpp>
+#include <IndexFileBuilder.hpp>
 #include <Log.hpp>
 
-#include <GuiIconTheme.hpp>
-#include <GuiMainWindow.hpp>
+#include <IconTheme.hpp>
 #include <ImportDialog.hpp>
 #include <ImportPlugin.hpp>
+#include <MainWindow.hpp>
 
 #include <QCoreApplication>
 #include <QFileDialog>
@@ -33,9 +33,9 @@
 #include <QProgressDialog>
 
 #define IMPORT_PLUGIN_FILTER "LAS (LASer) File (*.las)"
-#define ICON(name) (GuiIconTheme(":/import/", name))
+#define ICON(name) (IconTheme(":/import/", name))
 
-ImportPlugin::ImportPlugin(GuiMainWindow *mainWindow)
+ImportPlugin::ImportPlugin(MainWindow *mainWindow)
     : QObject(mainWindow),
       mainWindow_(mainWindow)
 {
@@ -56,15 +56,15 @@ void ImportPlugin::slotImport()
     ImportPlugin::import(mainWindow_);
 }
 
-static void importPluginDialog(GuiMainWindow *mainWindow);
+static void importPluginDialog(MainWindow *mainWindow);
 
-static void importPluginFile(const QString &path, GuiMainWindow *mainWindow);
+static void importPluginFile(const QString &path, MainWindow *mainWindow);
 
 static bool importPluginCreateIndex(const QString &path,
-                                    const EditorSettingsImport &settings,
-                                    GuiMainWindow *mainWindow);
+                                    const SettingsImport &settings,
+                                    MainWindow *mainWindow);
 
-void ImportPlugin::import(GuiMainWindow *mainWindow)
+void ImportPlugin::import(MainWindow *mainWindow)
 {
     try
     {
@@ -77,7 +77,7 @@ void ImportPlugin::import(GuiMainWindow *mainWindow)
     }
 }
 
-static void importPluginDialog(GuiMainWindow *mainWindow)
+static void importPluginDialog(MainWindow *mainWindow)
 {
     QFileDialog dialog(mainWindow, QObject::tr("Import File"));
     dialog.setNameFilter(QObject::tr(IMPORT_PLUGIN_FILTER));
@@ -102,7 +102,7 @@ static void importPluginDialog(GuiMainWindow *mainWindow)
     importPluginFile(fileName, mainWindow);
 }
 
-static void importPluginFile(const QString &path, GuiMainWindow *mainWindow)
+static void importPluginFile(const QString &path, MainWindow *mainWindow)
 {
     mainWindow->suspendThreads();
 
@@ -113,7 +113,7 @@ static void importPluginFile(const QString &path, GuiMainWindow *mainWindow)
         return;
     }
 
-    EditorSettingsImport settings = dialog.getSettings();
+    SettingsImport settings = dialog.getSettings();
 
     if (importPluginCreateIndex(path, settings, mainWindow))
     {
@@ -124,8 +124,8 @@ static void importPluginFile(const QString &path, GuiMainWindow *mainWindow)
 }
 
 static bool importPluginCreateIndex(const QString &path,
-                                    const EditorSettingsImport &settings,
-                                    GuiMainWindow *mainWindow)
+                                    const SettingsImport &settings,
+                                    MainWindow *mainWindow)
 {
     // If the index already exists, then return success.
     std::string pathStd;
@@ -134,7 +134,7 @@ static bool importPluginCreateIndex(const QString &path,
 
     pathStd = path.toStdString();
     pathFile = File::resolvePath(pathStd, mainWindow->editor().projectPath());
-    pathIndex = FileLasIndexBuilder::extension(pathFile);
+    pathIndex = IndexFileBuilder::extension(pathFile);
 
     if (File::exists(pathIndex))
     {
@@ -156,7 +156,7 @@ static bool importPluginCreateIndex(const QString &path,
     progressDialog.setBar(progressBar);
 
     // Initialize index builder.
-    FileLasIndexBuilder builder;
+    IndexFileBuilder builder;
     builder.start(pathStd, pathStd, settings.indexSettings());
 
     char buffer[80];

@@ -193,7 +193,7 @@ void ViewerViewports::resetScene(Editor *editor,
     }
 }
 
-EditorCamera ViewerViewports::camera(size_t viewportId) const
+Camera ViewerViewports::camera(size_t viewportId) const
 {
     for (size_t i = 0; i < viewports_.size(); i++)
     {
@@ -203,7 +203,7 @@ EditorCamera ViewerViewports::camera(size_t viewportId) const
         }
     }
 
-    return EditorCamera();
+    return Camera();
 }
 
 void ViewerViewports::setLayout(ViewLayout viewLayout)

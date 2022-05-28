@@ -24,7 +24,7 @@
 
 #include <vector>
 
-#include <EditorFilterClip.hpp>
+#include <Region.hpp>
 
 #include <ViewerAabb.hpp>
 
@@ -54,7 +54,7 @@ public:
                        const std::vector<unsigned int> &indices,
                        size_t count);
 
-    static void renderClipFilter(const EditorFilterClip &clipFilter);
+    static void renderClipFilter(const Region &clipFilter);
     static void renderAabb(const ViewerAabb &box);
     static void renderAxis();
 

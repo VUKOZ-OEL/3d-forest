@@ -26,7 +26,7 @@
 
 #include <QObject>
 
-class GuiMainWindow;
+class MainWindow;
 class QAction;
 
 /** Viewer Plugin. */
@@ -35,7 +35,7 @@ class ViewerPlugin : public QObject
     Q_OBJECT
 
 public:
-    ViewerPlugin(GuiMainWindow *mainWindow);
+    ViewerPlugin(MainWindow *mainWindow);
 
     ViewerViewports *viewports() { return viewports_; }
 
@@ -58,7 +58,7 @@ public slots:
     void slotViewLayout(ViewerViewports::ViewLayout layout);
 
 protected:
-    GuiMainWindow *mainWindow_;
+    MainWindow *mainWindow_;
 
     QAction *actionViewOrthographic_;
     QAction *actionViewPerspective_;

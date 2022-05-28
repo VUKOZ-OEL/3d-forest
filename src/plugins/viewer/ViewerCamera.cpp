@@ -187,9 +187,9 @@ void ViewerCamera::setDistance(float distance)
     updateMatrix();
 }
 
-EditorCamera ViewerCamera::toCamera() const
+Camera ViewerCamera::toCamera() const
 {
-    EditorCamera ret;
+    Camera ret;
 
     ret.eye.set(eye_.x(), eye_.y(), eye_.z());
     ret.center.set(center_.x(), center_.y(), center_.z());

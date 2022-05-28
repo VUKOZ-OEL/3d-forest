@@ -27,9 +27,9 @@
 
 #include <Editor.hpp>
 #include <File.hpp>
-#include <FileLas.hpp>
-#include <FileLasIndex.hpp>
+#include <IndexFile.hpp>
 #include <Json.hpp>
+#include <LasFile.hpp>
 #include <Time.hpp>
 #include <Vector3.hpp>
 

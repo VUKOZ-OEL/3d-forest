@@ -21,11 +21,11 @@
 
 #include <Segmentation.hpp>
 
-#include <GuiIconTheme.hpp>
-#include <GuiMainWindow.hpp>
+#include <IconTheme.hpp>
+#include <MainWindow.hpp>
 #include <SegmentationPlugin.hpp>
 
-#define ICON(name) (GuiIconTheme(":/segmentation/", name))
+#define ICON(name) (IconTheme(":/segmentation/", name))
 
 SegmentationPlugin::SegmentationPlugin()
     : mainWindow_(nullptr),
@@ -33,7 +33,7 @@ SegmentationPlugin::SegmentationPlugin()
 {
 }
 
-void SegmentationPlugin::initialize(GuiMainWindow *mainWindow)
+void SegmentationPlugin::initialize(MainWindow *mainWindow)
 {
     mainWindow_ = mainWindow;
 

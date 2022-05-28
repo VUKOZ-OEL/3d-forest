@@ -81,7 +81,7 @@ void ViewerOpenGLViewport::resetScene(Editor *editor, bool resetView)
     }
 }
 
-EditorCamera ViewerOpenGLViewport::camera() const
+Camera ViewerOpenGLViewport::camera() const
 {
     return camera_.toCamera();
 }
@@ -283,9 +283,9 @@ bool ViewerOpenGLViewport::renderScene()
 
     for (size_t pageIndex = 0; pageIndex < pageSize; pageIndex++)
     {
-        EditorPage &page = editor_->viewports().page(viewportId_, pageIndex);
+        Page &page = editor_->viewports().page(viewportId_, pageIndex);
 
-        if (page.state() == EditorPage::STATE_RENDER)
+        if (page.state() == Page::STATE_RENDER)
         {
             if (pageIndex == 0)
             {
@@ -301,7 +301,7 @@ bool ViewerOpenGLViewport::renderScene()
 
             glFlush();
 
-            page.setState(EditorPage::STATE_RENDERED);
+            page.setState(Page::STATE_RENDERED);
 
             double t2 = getRealTime();
             if (t2 - t1 > 0.02)
@@ -325,8 +325,8 @@ bool ViewerOpenGLViewport::renderScene()
 
 void ViewerOpenGLViewport::renderSceneSettingsEnable()
 {
-    const EditorSettings &settings = editor_->settings();
-    const EditorSettingsView &opt = settings.view();
+    const Settings &settings = editor_->settings();
+    const SettingsView &opt = settings.view();
 
     // Background
     const Vector3<float> &rgb = opt.backgroundColor();
@@ -359,7 +359,7 @@ void ViewerOpenGLViewport::renderSceneSettingsEnable()
 
 void ViewerOpenGLViewport::renderSceneSettingsDisable()
 {
-    const EditorSettings &settings = editor_->settings();
+    const Settings &settings = editor_->settings();
     glPointSize(1.0F);
 
     if (settings.view().isFogEnabled())

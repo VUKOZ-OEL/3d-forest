@@ -20,7 +20,7 @@
 /** @file Editor.cpp */
 
 #include <Editor.hpp>
-#include <FileLasIndexBuilder.hpp>
+#include <IndexFileBuilder.hpp>
 #include <Log.hpp>
 
 static const char *EDITOR_KEY_PROJECT_NAME = "projectName";
@@ -53,7 +53,7 @@ void Editor::close()
     unsavedChanges_ = false;
 }
 
-void Editor::open(const std::string &path, const EditorSettingsImport &settings)
+void Editor::open(const std::string &path, const SettingsImport &settings)
 {
     // Get filename extension in lower case (no UTF).
     std::string ext = File::fileExtension(path);
@@ -167,7 +167,7 @@ void Editor::save(const std::string &path)
 }
 
 void Editor::openDataset(const std::string &path,
-                         const EditorSettingsImport &settings)
+                         const SettingsImport &settings)
 {
     try
     {
@@ -183,7 +183,7 @@ void Editor::openDataset(const std::string &path,
     unsavedChanges_ = true;
 }
 
-void Editor::setClassifications(const EditorClassifications &classifications)
+void Editor::setClassifications(const ClassificationList &classifications)
 {
     classifications_ = classifications;
 
@@ -200,7 +200,7 @@ void Editor::setClassifications(const EditorClassifications &classifications)
     unsavedChanges_ = true;
 }
 
-void Editor::setClipFilter(const EditorFilterClip &clipFilter)
+void Editor::setClipFilter(const Region &clipFilter)
 {
     clipFilter_ = clipFilter;
     clipFilter_.boxView.setPercent(datasets_.boundary(),
@@ -234,13 +234,13 @@ void Editor::updateAfterRead()
     clipFilter_.boxView = clipFilter_.box;
 }
 
-void Editor::setDatasets(const EditorDatasets &datasets)
+void Editor::setDatasets(const DatasetList &datasets)
 {
     datasets_ = datasets;
     unsavedChanges_ = true;
 }
 
-void Editor::setLayers(const EditorLayers &layers)
+void Editor::setLayers(const LayerList &layers)
 {
     layers_ = layers;
 
@@ -256,25 +256,25 @@ void Editor::setLayers(const EditorLayers &layers)
     unsavedChanges_ = true;
 }
 
-void Editor::setSettingsView(const EditorSettingsView &settings)
+void Editor::setSettingsView(const SettingsView &settings)
 {
     settings_.setView(settings);
     unsavedChanges_ = true;
 }
 
-void Editor::addFilter(EditorProcessorInterface *filter)
+void Editor::addModifier(ModifierInterface *modifier)
 {
-    filters_.push_back(filter);
+    modifiers_.push_back(modifier);
 }
 
-void Editor::applyFilters(EditorPage *page)
+void Editor::runModifiers(Page *page)
 {
-    for (auto &it : filters_)
+    for (auto &it : modifiers_)
     {
-        /** @todo Collect enabled filters during preprocessing. */
-        if (it->isFilterEnabled())
+        /** @todo Collect enabled modifiers during preprocessing. */
+        if (it->isModifierEnabled())
         {
-            it->filterPage(page);
+            it->modifier(page);
         }
     }
 }

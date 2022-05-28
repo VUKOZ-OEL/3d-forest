@@ -22,11 +22,11 @@
 #ifndef IMPORT_DIALOG_HPP
 #define IMPORT_DIALOG_HPP
 
-#include <EditorSettingsImport.hpp>
+#include <SettingsImport.hpp>
 
 #include <QDialog>
 
-class GuiMainWindow;
+class MainWindow;
 class QCheckBox;
 class QPushButton;
 
@@ -36,9 +36,9 @@ class ImportDialog : public QDialog
     Q_OBJECT
 
 public:
-    ImportDialog(GuiMainWindow *mainWindow);
+    ImportDialog(MainWindow *mainWindow);
 
-    EditorSettingsImport getSettings() const;
+    SettingsImport getSettings() const;
 
 public slots:
     void slotAccept();

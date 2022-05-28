@@ -19,9 +19,9 @@
 
 /** @file ProjectNavigatorFiles.cpp */
 
-#include <GuiIconTheme.hpp>
-#include <GuiMainWindow.hpp>
+#include <IconTheme.hpp>
 #include <ImportPlugin.hpp>
+#include <MainWindow.hpp>
 #include <ProjectNavigatorFiles.hpp>
 
 #include <QHBoxLayout>
@@ -34,9 +34,9 @@
 #include <QTreeWidgetItemIterator>
 #include <QVBoxLayout>
 
-#define ICON(name) (GuiIconTheme(":/projectnavigator/", name))
+#define ICON(name) (IconTheme(":/projectnavigator/", name))
 
-ProjectNavigatorFiles::ProjectNavigatorFiles(GuiMainWindow *mainWindow)
+ProjectNavigatorFiles::ProjectNavigatorFiles(MainWindow *mainWindow)
     : QWidget(),
       mainWindow_(mainWindow)
 {
@@ -45,57 +45,57 @@ ProjectNavigatorFiles::ProjectNavigatorFiles(GuiMainWindow *mainWindow)
     tree_->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
     // Tool bar buttons
-    GuiMainWindow::createToolButton(&addButton_,
-                                    tr("Add"),
-                                    tr("Add new data set"),
-                                    ICON("plus"),
-                                    this,
-                                    SLOT(slotAdd()));
+    MainWindow::createToolButton(&addButton_,
+                                 tr("Add"),
+                                 tr("Add new data set"),
+                                 ICON("plus"),
+                                 this,
+                                 SLOT(slotAdd()));
 
-    GuiMainWindow::createToolButton(&deleteButton_,
-                                    tr("Remove"),
-                                    tr("Remove selected data set"),
-                                    ICON("minus"),
-                                    this,
-                                    SLOT(slotDelete()));
+    MainWindow::createToolButton(&deleteButton_,
+                                 tr("Remove"),
+                                 tr("Remove selected data set"),
+                                 ICON("minus"),
+                                 this,
+                                 SLOT(slotDelete()));
     deleteButton_->setEnabled(false);
 
-    GuiMainWindow::createToolButton(&showButton_,
-                                    tr("Show"),
-                                    tr("Make selected data sets visible"),
-                                    ICON("eye"),
-                                    this,
-                                    SLOT(slotShow()));
+    MainWindow::createToolButton(&showButton_,
+                                 tr("Show"),
+                                 tr("Make selected data sets visible"),
+                                 ICON("eye"),
+                                 this,
+                                 SLOT(slotShow()));
     showButton_->setEnabled(false);
 
-    GuiMainWindow::createToolButton(&hideButton_,
-                                    tr("Hide"),
-                                    tr("Hide selected data sets"),
-                                    ICON("hide"),
-                                    this,
-                                    SLOT(slotHide()));
+    MainWindow::createToolButton(&hideButton_,
+                                 tr("Hide"),
+                                 tr("Hide selected data sets"),
+                                 ICON("hide"),
+                                 this,
+                                 SLOT(slotHide()));
     hideButton_->setEnabled(false);
 
-    GuiMainWindow::createToolButton(&selectAllButton_,
-                                    tr("Select all"),
-                                    tr("Select all"),
-                                    ICON("select_all"),
-                                    this,
-                                    SLOT(slotSelectAll()));
+    MainWindow::createToolButton(&selectAllButton_,
+                                 tr("Select all"),
+                                 tr("Select all"),
+                                 ICON("select_all"),
+                                 this,
+                                 SLOT(slotSelectAll()));
 
-    GuiMainWindow::createToolButton(&selectInvertButton_,
-                                    tr("Invert"),
-                                    tr("Invert selection"),
-                                    ICON("select_invert"),
-                                    this,
-                                    SLOT(slotSelectInvert()));
+    MainWindow::createToolButton(&selectInvertButton_,
+                                 tr("Invert"),
+                                 tr("Invert selection"),
+                                 ICON("select_invert"),
+                                 this,
+                                 SLOT(slotSelectInvert()));
 
-    GuiMainWindow::createToolButton(&selectNoneButton_,
-                                    tr("Select none"),
-                                    tr("Select none"),
-                                    ICON("select_none"),
-                                    this,
-                                    SLOT(slotSelectNone()));
+    MainWindow::createToolButton(&selectNoneButton_,
+                                 tr("Select none"),
+                                 tr("Select none"),
+                                 ICON("select_none"),
+                                 this,
+                                 SLOT(slotSelectNone()));
 
     // Tool bar
     QToolBar *toolBar = new QToolBar;
@@ -107,8 +107,7 @@ ProjectNavigatorFiles::ProjectNavigatorFiles(GuiMainWindow *mainWindow)
     toolBar->addWidget(selectAllButton_);
     toolBar->addWidget(selectInvertButton_);
     toolBar->addWidget(selectNoneButton_);
-    toolBar->setIconSize(
-        QSize(GuiMainWindow::ICON_SIZE, GuiMainWindow::ICON_SIZE));
+    toolBar->setIconSize(QSize(MainWindow::ICON_SIZE, MainWindow::ICON_SIZE));
 
     // Layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -331,7 +330,7 @@ void ProjectNavigatorFiles::addItem(size_t i)
     item->setBackground(COLUMN_ID, brush);
 }
 
-void ProjectNavigatorFiles::setDatasets(const EditorDatasets &datasets)
+void ProjectNavigatorFiles::setDatasets(const DatasetList &datasets)
 {
     block();
 

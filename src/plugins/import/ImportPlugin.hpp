@@ -24,7 +24,7 @@
 
 #include <QObject>
 
-class GuiMainWindow;
+class MainWindow;
 class QAction;
 
 /** Import Plugin. */
@@ -33,15 +33,15 @@ class ImportPlugin : public QObject
     Q_OBJECT
 
 public:
-    ImportPlugin(GuiMainWindow *mainWindow);
+    ImportPlugin(MainWindow *mainWindow);
 
-    static void import(GuiMainWindow *mainWindow);
+    static void import(MainWindow *mainWindow);
 
 public slots:
     void slotImport();
 
 protected:
-    GuiMainWindow *mainWindow_;
+    MainWindow *mainWindow_;
     QAction *actionImport_;
 };
 

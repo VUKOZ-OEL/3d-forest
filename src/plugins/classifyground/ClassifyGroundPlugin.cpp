@@ -20,8 +20,8 @@
 /** @file ClassifyGroundPlugin.cpp */
 
 #include <ClassifyGroundPlugin.hpp>
-#include <GuiIconTheme.hpp>
-#include <GuiMainWindow.hpp>
+#include <IconTheme.hpp>
+#include <MainWindow.hpp>
 
 #include <QCheckBox>
 #include <QCloseEvent>
@@ -37,7 +37,7 @@
 #include <QSpinBox>
 #include <QVBoxLayout>
 
-#define ICON(name) (GuiIconTheme(":/classifyground/", name))
+#define ICON(name) (IconTheme(":/classifyground/", name))
 #define CLASSIFY_GROUND_PLUGIN_NAME "Classify Ground"
 
 /** Classify Ground Window. */
@@ -46,13 +46,13 @@ class ClassifyGroundWindow : public QDockWidget
     Q_OBJECT
 
 public:
-    ClassifyGroundWindow(GuiMainWindow *mainWindow);
+    ClassifyGroundWindow(MainWindow *mainWindow);
 
 protected slots:
     void slotApply();
 
 protected:
-    GuiMainWindow *mainWindow_;
+    MainWindow *mainWindow_;
 
     QWidget *widget_;
     QSpinBox *nPointsSpinBox_;
@@ -63,7 +63,7 @@ protected:
     QPushButton *applyButton_;
 };
 
-ClassifyGroundWindow::ClassifyGroundWindow(GuiMainWindow *mainWindow)
+ClassifyGroundWindow::ClassifyGroundWindow(MainWindow *mainWindow)
     : QDockWidget(mainWindow),
       mainWindow_(mainWindow)
 {
@@ -146,8 +146,8 @@ void ClassifyGroundWindow::slotApply()
 
     size_t nPointsGroundGrid;
 
-    EditorQuery queryPoint(&mainWindow_->editor());
-    EditorQuery query(&mainWindow_->editor());
+    Query queryPoint(&mainWindow_->editor());
+    Query query(&mainWindow_->editor());
     query.setGrid(pointsPerCell, cellLengthMin);
 
     int maximum = static_cast<int>(query.gridSize());
@@ -198,7 +198,7 @@ void ClassifyGroundWindow::slotApply()
             if (query.z() > zMaxGround)
             {
                 // unassigned (could be a roof)
-                query.classification() = FileLas::CLASS_UNASSIGNED;
+                query.classification() = LasFile::CLASS_UNASSIGNED;
             }
             else
             {
@@ -215,12 +215,12 @@ void ClassifyGroundWindow::slotApply()
                 if (queryPoint.nextPoint())
                 {
                     // unassigned (has some points below, inside the cone)
-                    query.classification() = FileLas::CLASS_UNASSIGNED;
+                    query.classification() = LasFile::CLASS_UNASSIGNED;
                 }
                 else
                 {
                     // ground
-                    query.classification() = FileLas::CLASS_GROUND;
+                    query.classification() = LasFile::CLASS_GROUND;
 
                     nPointsGroundGrid++;
                 }
@@ -234,7 +234,7 @@ void ClassifyGroundWindow::slotApply()
 
     progressDialog.setValue(progressDialog.maximum());
 
-    mainWindow_->editor().viewports().setState(EditorPage::STATE_READ);
+    mainWindow_->editor().viewports().setState(Page::STATE_READ);
 
     mainWindow_->resumeThreads();
 }
@@ -245,7 +245,7 @@ ClassifyGroundPlugin::ClassifyGroundPlugin()
 {
 }
 
-void ClassifyGroundPlugin::initialize(GuiMainWindow *mainWindow)
+void ClassifyGroundPlugin::initialize(MainWindow *mainWindow)
 {
     mainWindow_ = mainWindow;
 

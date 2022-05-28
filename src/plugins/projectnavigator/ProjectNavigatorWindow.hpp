@@ -24,7 +24,7 @@
 
 #include <QDockWidget>
 
-class GuiMainWindow;
+class MainWindow;
 class ProjectNavigatorFiles;
 
 class QTabWidget;
@@ -35,10 +35,10 @@ class ProjectNavigatorWindow : public QDockWidget
     Q_OBJECT
 
 public:
-    ProjectNavigatorWindow(GuiMainWindow *mainWindow);
+    ProjectNavigatorWindow(MainWindow *mainWindow);
 
 protected:
-    GuiMainWindow *mainWindow_;
+    MainWindow *mainWindow_;
     QTabWidget *tabWidget_;
     ProjectNavigatorFiles *datasets_;
 };

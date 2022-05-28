@@ -21,14 +21,14 @@
 
 #include <Log.hpp>
 
-#include <GuiIconTheme.hpp>
-#include <GuiMainWindow.hpp>
+#include <IconTheme.hpp>
+#include <MainWindow.hpp>
 #include <ViewerPlugin.hpp>
 #include <ViewerViewports.hpp>
 
-#define ICON(name) (GuiIconTheme(":/viewer/", name))
+#define ICON(name) (IconTheme(":/viewer/", name))
 
-ViewerPlugin::ViewerPlugin(GuiMainWindow *mainWindow)
+ViewerPlugin::ViewerPlugin(MainWindow *mainWindow)
     : QObject(mainWindow),
       mainWindow_(mainWindow)
 {

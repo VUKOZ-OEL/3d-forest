@@ -121,7 +121,7 @@ void ViewerOpenGL::render(Mode mode,
     }
 }
 
-void ViewerOpenGL::renderClipFilter(const EditorFilterClip &clipFilter)
+void ViewerOpenGL::renderClipFilter(const Region &clipFilter)
 {
     if (!clipFilter.enabled)
     {

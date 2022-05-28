@@ -24,7 +24,7 @@
 
 #include <vector>
 
-#include <EditorCamera.hpp>
+#include <Camera.hpp>
 
 #include <QMatrix4x4>
 #include <QPoint>
@@ -72,7 +72,7 @@ public:
     const QVector3D &getDirection() const { return direction_; }
     QMatrix4x4 rotation() const;
 
-    EditorCamera toCamera() const;
+    Camera toCamera() const;
 
     // Transform
     QVector3D project(const QVector3D &world) const;

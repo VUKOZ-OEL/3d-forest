@@ -21,13 +21,13 @@
 
 #include <cstring>
 
-#include <FileLasIndexBuilder.hpp>
+#include <IndexFileBuilder.hpp>
 #include <Vector3.hpp>
 
 static void createBox(const std::string &path)
 {
     // Create points
-    std::vector<FileLas::Point> points;
+    std::vector<LasFile::Point> points;
 
     uint32_t nx = 3;
     uint32_t ny = 4;
@@ -35,7 +35,7 @@ static void createBox(const std::string &path)
     points.resize(nx * ny * nz);
 
     // Create points: set all attributes to zero
-    std::memset(points.data(), 0, sizeof(FileLas::Point) * points.size());
+    std::memset(points.data(), 0, sizeof(LasFile::Point) * points.size());
 
     // Create points: points with resolution 1 point
     for (uint32_t z = 0; z < nz; z++)
@@ -54,7 +54,7 @@ static void createBox(const std::string &path)
     }
 
     // Create LAS file
-    FileLas::create(path, points);
+    LasFile::create(path, points);
 }
 
 static void createGrid(const std::string &path,
@@ -62,7 +62,7 @@ static void createGrid(const std::string &path,
                        uint8_t version_minor = 4)
 {
     // Create points
-    std::vector<FileLas::Point> points;
+    std::vector<LasFile::Point> points;
 
     size_t nx = 16;
     size_t ny = 16;
@@ -79,7 +79,7 @@ static void createGrid(const std::string &path,
 
     points.resize(nx * ny);
 
-    std::memset(points.data(), 0, sizeof(FileLas::Point) * points.size());
+    std::memset(points.data(), 0, sizeof(LasFile::Point) * points.size());
 
     size_t idx = 0;
     for (size_t y = 0; y < ny; y++)
@@ -133,18 +133,18 @@ static void createGrid(const std::string &path,
     }
 
     // Create LAS file with scale and offset
-    FileLas::create(path, points, {1, 1, 1}, translate, version_minor);
+    LasFile::create(path, points, {1, 1, 1}, translate, version_minor);
 }
 
 static void createLine(const std::string &path)
 {
     // Create points
-    std::vector<FileLas::Point> points;
+    std::vector<LasFile::Point> points;
 
     points.resize(5);
 
     // Create points: set all attributes to zero
-    std::memset(points.data(), 0, sizeof(FileLas::Point) * points.size());
+    std::memset(points.data(), 0, sizeof(LasFile::Point) * points.size());
 
     // Create points: set coordinates
     points[1].z = 8;
@@ -154,19 +154,19 @@ static void createLine(const std::string &path)
 
     for (size_t i = 0; i < points.size(); i++)
     {
-        points[i].classification = FileLas::CLASS_UNASSIGNED;
+        points[i].classification = LasFile::CLASS_UNASSIGNED;
         points[i].format = 7;
     }
 
     // Create LAS file
-    FileLas::create(path, points);
+    LasFile::create(path, points);
 }
 
 static void createIndex(const std::string &path)
 {
     // Create LAS file index
-    FileLasIndexBuilder::Settings settings;
-    FileLasIndexBuilder::index(path, path, settings);
+    IndexFileBuilder::Settings settings;
+    IndexFileBuilder::index(path, path, settings);
 }
 
 int main()

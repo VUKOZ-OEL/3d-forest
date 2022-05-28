@@ -21,17 +21,17 @@
 
 #include <Log.hpp>
 
-#include <GuiIconTheme.hpp>
-#include <GuiMainWindow.hpp>
+#include <IconTheme.hpp>
+#include <MainWindow.hpp>
 #include <ProjectFilePlugin.hpp>
 
 #include <QFileDialog>
 #include <QMessageBox>
 
 #define PROJECT_FILE_PLUGIN_FILTER_PRJ "3DForest Project (*.json)"
-#define ICON(name) (GuiIconTheme(":/projectfile/", name))
+#define ICON(name) (IconTheme(":/projectfile/", name))
 
-ProjectFilePlugin::ProjectFilePlugin(GuiMainWindow *mainWindow)
+ProjectFilePlugin::ProjectFilePlugin(MainWindow *mainWindow)
     : QObject(mainWindow),
       mainWindow_(mainWindow)
 {

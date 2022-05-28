@@ -22,7 +22,7 @@
 #ifndef VIEWER_OPENGL_VIEWPORT_HPP
 #define VIEWER_OPENGL_VIEWPORT_HPP
 
-#include <EditorCamera.hpp>
+#include <Camera.hpp>
 
 #include <ViewerAabb.hpp>
 #include <ViewerCamera.hpp>
@@ -53,7 +53,7 @@ public:
     void updateScene(Editor *editor);
     void resetScene(Editor *editor, bool resetView);
 
-    EditorCamera camera() const;
+    Camera camera() const;
 
     void setViewOrthographic();
     void setViewPerspective();
