@@ -370,8 +370,8 @@ void ViewerOpenGLViewport::renderSceneSettingsDisable()
 
 void ViewerOpenGLViewport::resizeGL(int w, int h)
 {
-    w *= parentWidget()->devicePixelRatio();
-    h *= parentWidget()->devicePixelRatio();
+    w = static_cast<int>(parentWidget()->devicePixelRatio() * w);
+    h = static_cast<int>(parentWidget()->devicePixelRatio() * h);
     camera_.setViewport(0, 0, w, h);
     camera_.updateProjection();
     cameraChanged();
