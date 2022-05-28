@@ -88,7 +88,7 @@ public:
 
     void updateEverything();
     void updateData();
-    void updateSelection();
+    void updateFilter();
 
     Editor &editor() { return editor_; }
 

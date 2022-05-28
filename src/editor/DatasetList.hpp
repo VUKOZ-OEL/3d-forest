@@ -109,4 +109,6 @@ protected:
     Box<double> boundary_;
 };
 
+std::ostream &operator<<(std::ostream &os, const DatasetList &obj);
+
 #endif /* DATASET_LIST_HPP */

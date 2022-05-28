@@ -77,7 +77,7 @@ protected:
     DatasetList datasets_;
 
     void dataChanged();
-    void selectionChanged();
+    void filterChanged();
 
     size_t index(const QTreeWidgetItem *item);
     void updateTree();

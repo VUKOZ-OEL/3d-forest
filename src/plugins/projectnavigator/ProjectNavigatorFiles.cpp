@@ -21,6 +21,7 @@
 
 #include <IconTheme.hpp>
 #include <ImportPlugin.hpp>
+#include <Log.hpp>
 #include <MainWindow.hpp>
 #include <ProjectNavigatorFiles.hpp>
 
@@ -43,6 +44,7 @@ ProjectNavigatorFiles::ProjectNavigatorFiles(MainWindow *mainWindow)
     // Table
     tree_ = new QTreeWidget();
     tree_->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    tree_->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     // Tool bar buttons
     MainWindow::createToolButton(&addButton_,
@@ -127,11 +129,11 @@ void ProjectNavigatorFiles::dataChanged()
     mainWindow_->updateData();
 }
 
-void ProjectNavigatorFiles::selectionChanged()
+void ProjectNavigatorFiles::filterChanged()
 {
     mainWindow_->suspendThreads();
     mainWindow_->editor().setDatasets(datasets_);
-    mainWindow_->updateSelection();
+    mainWindow_->updateFilter();
 }
 
 void ProjectNavigatorFiles::slotUpdate()
@@ -148,26 +150,34 @@ void ProjectNavigatorFiles::slotDelete()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
-    if (items.count() < 1)
+    if (items.count() > 0)
     {
-        return;
+        slotSelectNone();
+
+        for (auto &item : items)
+        {
+            size_t idx = index(item);
+            datasets_.erase(idx);
+
+            delete item;
+        }
+
+        dataChanged();
     }
-
-    QTreeWidgetItem *item = items.at(0);
-    size_t idx = index(item);
-    datasets_.erase(idx);
-    delete item;
-
-    dataChanged();
 }
 
 void ProjectNavigatorFiles::slotShow()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
-    if (items.count() < 1)
+    if (items.count() > 0)
     {
-        return;
+        for (auto &item : items)
+        {
+            item->setCheckState(COLUMN_CHECKED, Qt::Checked);
+        }
+
+        filterChanged();
     }
 }
 
@@ -175,9 +185,14 @@ void ProjectNavigatorFiles::slotHide()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
-    if (items.count() < 1)
+    if (items.count() > 0)
     {
-        return;
+        for (auto &item : items)
+        {
+            item->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
+        }
+
+        filterChanged();
     }
 }
 
@@ -245,7 +260,7 @@ void ProjectNavigatorFiles::slotItemChanged(QTreeWidgetItem *item, int column)
         bool checked = (item->checkState(COLUMN_CHECKED) == Qt::Checked);
 
         datasets_.setEnabled(index(item), checked);
-        selectionChanged();
+        filterChanged();
     }
 }
 

@@ -77,8 +77,6 @@ void DatasetList::erase(size_t i)
 {
     if (datasets_.size() > 0)
     {
-        size_t key = id(i);
-
         size_t n = datasets_.size() - 1;
         for (size_t pos = i; pos < n; pos++)
         {
@@ -86,7 +84,12 @@ void DatasetList::erase(size_t i)
         }
         datasets_.resize(n);
 
-        hashTable_.erase(key);
+        hashTable_.clear();
+        n = datasets_.size();
+        for (size_t pos = 0; pos < n; pos++)
+        {
+            hashTable_[datasets_[pos].id()] = pos;
+        }
     }
 }
 
@@ -189,4 +192,11 @@ Json &DatasetList::write(Json &out) const
     }
 
     return out;
+}
+
+std::ostream &operator<<(std::ostream &os, const DatasetList &obj)
+{
+    Json json;
+    os << obj.write(json).serialize();
+    return os;
 }
