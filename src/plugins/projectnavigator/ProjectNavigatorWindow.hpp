@@ -26,6 +26,7 @@
 
 class MainWindow;
 class ProjectNavigatorFiles;
+class ProjectNavigatorLayers;
 
 class QTabWidget;
 
@@ -41,6 +42,7 @@ protected:
     MainWindow *mainWindow_;
     QTabWidget *tabWidget_;
     ProjectNavigatorFiles *datasets_;
+    ProjectNavigatorLayers *layers_;
 };
 
 #endif /* PROJECT_NAVIGATOR_WINDOW_HPP */
