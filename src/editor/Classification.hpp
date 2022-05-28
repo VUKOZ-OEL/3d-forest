@@ -17,26 +17,19 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file sandbox.cpp */
+/** @file Classification.hpp */
 
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
-#include <vector>
+#ifndef CLASSIFICATION_HPP
+#define CLASSIFICATION_HPP
 
-#include <Editor.hpp>
-#include <File.hpp>
-#include <IndexFile.hpp>
-#include <Json.hpp>
-#include <LasFile.hpp>
-#include <Time.hpp>
-#include <Vector3.hpp>
+#include <string>
 
-int main(int argc, char *argv[])
+/** Classification. */
+class Classification
 {
-    (void)argc;
-    (void)argv;
+public:
+    std::string label;
+    bool enabled;
+};
 
-    return 0;
-}
+#endif /* CLASSIFICATION_HPP */

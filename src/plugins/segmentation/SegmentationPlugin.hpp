@@ -17,26 +17,33 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file sandbox.cpp */
+/** @file SegmentationPlugin.hpp */
 
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
-#include <vector>
+#ifndef SEGMENTATION_PLUGIN_HPP
+#define SEGMENTATION_PLUGIN_HPP
 
-#include <Editor.hpp>
-#include <File.hpp>
-#include <IndexFile.hpp>
-#include <Json.hpp>
-#include <LasFile.hpp>
-#include <Time.hpp>
-#include <Vector3.hpp>
+#include <PluginInterface.hpp>
 
-int main(int argc, char *argv[])
+class SegmentationWindow;
+
+/** Segmentation Plugin. */
+class SegmentationPlugin : public QObject, public PluginInterface
 {
-    (void)argc;
-    (void)argv;
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID PluginInterface_iid)
+    Q_INTERFACES(PluginInterface)
 
-    return 0;
-}
+public:
+    SegmentationPlugin();
+
+    virtual void initialize(MainWindow *mainWindow);
+
+public slots:
+    void slotPlugin();
+
+protected:
+    MainWindow *mainWindow_;
+    SegmentationWindow *dockWindow_;
+};
+
+#endif /* SEGMENTATION_PLUGIN_HPP */

@@ -17,26 +17,38 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file sandbox.cpp */
+/** @file ImportDialog.hpp */
 
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
-#include <vector>
+#ifndef IMPORT_DIALOG_HPP
+#define IMPORT_DIALOG_HPP
 
-#include <Editor.hpp>
-#include <File.hpp>
-#include <IndexFile.hpp>
-#include <Json.hpp>
-#include <LasFile.hpp>
-#include <Time.hpp>
-#include <Vector3.hpp>
+#include <SettingsImport.hpp>
 
-int main(int argc, char *argv[])
+#include <QDialog>
+
+class MainWindow;
+class QCheckBox;
+class QPushButton;
+
+/** Import Dialog. */
+class ImportDialog : public QDialog
 {
-    (void)argc;
-    (void)argv;
+    Q_OBJECT
 
-    return 0;
-}
+public:
+    ImportDialog(MainWindow *mainWindow);
+
+    SettingsImport getSettings() const;
+
+public slots:
+    void slotAccept();
+    void slotReject();
+
+protected:
+    QCheckBox *centerCheckBox_;
+    QCheckBox *convertCheckBox_;
+    QPushButton *acceptButton_;
+    QPushButton *rejectButton_;
+};
+
+#endif /* IMPORT_DIALOG_HPP */

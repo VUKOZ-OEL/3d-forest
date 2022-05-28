@@ -24,13 +24,13 @@
 
 #include <mutex>
 
-#include <EditorClassifications.hpp>
-#include <EditorDatasets.hpp>
-#include <EditorFilterClip.hpp>
-#include <EditorLayers.hpp>
-#include <EditorProcessorInterface.hpp>
-#include <EditorSettings.hpp>
-#include <EditorViewports.hpp>
+#include <ClassificationList.hpp>
+#include <DatasetList.hpp>
+#include <LayerList.hpp>
+#include <ModifierInterface.hpp>
+#include <Region.hpp>
+#include <Settings.hpp>
+#include <Viewports.hpp>
 
 /** Editor. */
 class Editor
@@ -41,7 +41,7 @@ public:
 
     // File
     void open(const std::string &path,
-              const EditorSettingsImport &settings = EditorSettingsImport());
+              const SettingsImport &settings = SettingsImport());
     void save(const std::string &path);
     const std::string &projectPath() const { return path_; }
     const std::string &projectName() const { return projectName_; }
@@ -49,40 +49,40 @@ public:
     void close();
 
     // Classifications
-    const EditorClassifications &classifications() const
+    const ClassificationList &classifications() const
     {
         return classifications_;
     }
-    void setClassifications(const EditorClassifications &classifications);
+    void setClassifications(const ClassificationList &classifications);
 
     // Clip filter
-    const EditorFilterClip &clipFilter() const { return clipFilter_; }
-    void setClipFilter(const EditorFilterClip &clipFilter);
+    const Region &clipFilter() const { return clipFilter_; }
+    void setClipFilter(const Region &clipFilter);
     void resetClipFilter();
 
     Box<double> clipBoundary() const;
     const Box<double> &boundary() const { return datasets_.boundary(); }
 
     // Data sets
-    const EditorDatasets &datasets() const { return datasets_; }
-    void setDatasets(const EditorDatasets &datasets);
+    const DatasetList &datasets() const { return datasets_; }
+    void setDatasets(const DatasetList &datasets);
 
     // Layers
-    const EditorLayers &layers() const { return layers_; }
-    void setLayers(const EditorLayers &layers);
+    const LayerList &layers() const { return layers_; }
+    void setLayers(const LayerList &layers);
 
     // Settings
-    const EditorSettings &settings() const { return settings_; }
-    void setSettingsView(const EditorSettingsView &settings);
+    const Settings &settings() const { return settings_; }
+    void setSettingsView(const SettingsView &settings);
 
-    // Filters
-    void addFilter(EditorProcessorInterface *filter);
-    void applyFilters(EditorPage *page);
+    // Modifiers
+    void addModifier(ModifierInterface *modifier);
+    void runModifiers(Page *page);
 
     // View
     void viewportsResize(size_t n);
-    EditorViewports &viewports() { return viewports_; }
-    const EditorViewports &viewports() const { return viewports_; }
+    Viewports &viewports() { return viewports_; }
+    const Viewports &viewports() const { return viewports_; }
 
     // Lock
     void lock();
@@ -96,24 +96,23 @@ protected:
     std::string projectName_;
     bool unsavedChanges_;
 
-    EditorDatasets datasets_;
-    EditorLayers layers_;
-    EditorSettings settings_;
-    EditorClassifications classifications_;
+    DatasetList datasets_;
+    LayerList layers_;
+    Settings settings_;
+    ClassificationList classifications_;
 
-    EditorFilterClip clipFilter_;
+    Region clipFilter_;
 
-    // Filters
-    std::vector<EditorProcessorInterface *> filters_;
+    // Modifiers
+    std::vector<ModifierInterface *> modifiers_;
 
     // Viewports
-    EditorViewports viewports_;
+    Viewports viewports_;
 
     void openProject(const std::string &path);
 
-    void openDataset(
-        const std::string &path,
-        const EditorSettingsImport &settings = EditorSettingsImport());
+    void openDataset(const std::string &path,
+                     const SettingsImport &settings = SettingsImport());
 
     void updateAfterRead();
 };

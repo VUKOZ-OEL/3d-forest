@@ -17,26 +17,31 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file sandbox.cpp */
+/** @file RenderThread.hpp */
 
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
-#include <vector>
+#ifndef RENDER_THREAD_HPP
+#define RENDER_THREAD_HPP
 
-#include <Editor.hpp>
-#include <File.hpp>
-#include <IndexFile.hpp>
-#include <Json.hpp>
-#include <LasFile.hpp>
-#include <Time.hpp>
-#include <Vector3.hpp>
+#include <Camera.hpp>
+#include <Thread.hpp>
 
-int main(int argc, char *argv[])
+class Editor;
+
+/** Render Thread. */
+class RenderThread : public Thread
 {
-    (void)argc;
-    (void)argv;
+public:
+    RenderThread(Editor *editor);
 
-    return 0;
-}
+    void render(size_t viewportId, const Camera &camera);
+
+    virtual bool compute();
+
+protected:
+    Editor *editor_;
+    size_t viewportId_;
+    Camera camera_;
+    bool initialized_;
+};
+
+#endif /* RENDER_THREAD_HPP */

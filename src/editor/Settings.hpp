@@ -17,26 +17,26 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file sandbox.cpp */
+/** @file Settings.hpp */
 
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
-#include <vector>
+#ifndef SETTINGS_HPP
+#define SETTINGS_HPP
 
-#include <Editor.hpp>
-#include <File.hpp>
-#include <IndexFile.hpp>
-#include <Json.hpp>
-#include <LasFile.hpp>
-#include <Time.hpp>
-#include <Vector3.hpp>
+#include <SettingsImport.hpp>
+#include <SettingsView.hpp>
 
-int main(int argc, char *argv[])
+/** Settings. */
+class Settings
 {
-    (void)argc;
-    (void)argv;
+public:
+    const SettingsView &view() const { return view_; }
+    void setView(const SettingsView &view);
 
-    return 0;
-}
+    void read(const Json &in);
+    Json &write(Json &out) const;
+
+protected:
+    SettingsView view_;
+};
+
+#endif /* SETTINGS_HPP */

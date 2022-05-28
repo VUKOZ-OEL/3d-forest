@@ -17,26 +17,20 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file sandbox.cpp */
+/** @file ModifierInterface.hpp */
 
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
-#include <vector>
+#ifndef MODIFIER_INTERFACE_HPP
+#define MODIFIER_INTERFACE_HPP
 
-#include <Editor.hpp>
-#include <File.hpp>
-#include <IndexFile.hpp>
-#include <Json.hpp>
-#include <LasFile.hpp>
-#include <Time.hpp>
-#include <Vector3.hpp>
+class Page;
 
-int main(int argc, char *argv[])
+/** Modifier Interface. */
+class ModifierInterface
 {
-    (void)argc;
-    (void)argv;
+public:
+    virtual ~ModifierInterface() = default;
+    virtual bool isModifierEnabled() = 0;
+    virtual void modifier(Page *page) = 0;
+};
 
-    return 0;
-}
+#endif /* MODIFIER_INTERFACE_HPP */

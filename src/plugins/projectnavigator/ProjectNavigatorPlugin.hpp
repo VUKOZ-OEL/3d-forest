@@ -17,26 +17,30 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file sandbox.cpp */
+/** @file ProjectNavigatorPlugin.hpp */
 
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
-#include <vector>
+#ifndef PROJECT_NAVIGATOR_PLUGIN_HPP
+#define PROJECT_NAVIGATOR_PLUGIN_HPP
 
-#include <Editor.hpp>
-#include <File.hpp>
-#include <IndexFile.hpp>
-#include <Json.hpp>
-#include <LasFile.hpp>
-#include <Time.hpp>
-#include <Vector3.hpp>
+#include <QObject>
 
-int main(int argc, char *argv[])
+class MainWindow;
+class ProjectNavigatorWindow;
+
+/** Project Navigator Plugin. */
+class ProjectNavigatorPlugin : public QObject
 {
-    (void)argc;
-    (void)argv;
+    Q_OBJECT
 
-    return 0;
-}
+public:
+    ProjectNavigatorPlugin(MainWindow *mainWindow);
+
+public slots:
+    void slotShowNavigator();
+
+protected:
+    MainWindow *mainWindow_;
+    ProjectNavigatorWindow *projectWindow_;
+};
+
+#endif /* PROJECT_NAVIGATOR_PLUGIN_HPP */

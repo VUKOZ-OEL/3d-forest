@@ -17,26 +17,27 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file sandbox.cpp */
+/** @file IconTheme.hpp */
 
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
-#include <vector>
+#ifndef ICON_THEME_HPP
+#define ICON_THEME_HPP
 
-#include <Editor.hpp>
-#include <File.hpp>
-#include <IndexFile.hpp>
-#include <Json.hpp>
-#include <LasFile.hpp>
-#include <Time.hpp>
-#include <Vector3.hpp>
+#include <QIcon>
+#include <QString>
 
-int main(int argc, char *argv[])
+/** Icon Theme.
+
+    QIcon encapsulates multiple pixel perfect icon sizes.
+    Qt will automatically select the best size for a given rendering.
+*/
+class IconTheme : public QIcon
 {
-    (void)argc;
-    (void)argv;
+public:
+    IconTheme(const QString &prefix, const QString &name) : QIcon()
+    {
+        addFile(prefix + name + "_24px.png", QSize(24, 24));
+        addFile(prefix + name + "_24px.svg", QSize(24, 24));
+    }
+};
 
-    return 0;
-}
+#endif /* ICON_THEME_HPP */

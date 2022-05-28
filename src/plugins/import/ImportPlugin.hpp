@@ -17,26 +17,32 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file sandbox.cpp */
+/** @file ImportPlugin.hpp */
 
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
-#include <vector>
+#ifndef IMPORT_PLUGIN_HPP
+#define IMPORT_PLUGIN_HPP
 
-#include <Editor.hpp>
-#include <File.hpp>
-#include <IndexFile.hpp>
-#include <Json.hpp>
-#include <LasFile.hpp>
-#include <Time.hpp>
-#include <Vector3.hpp>
+#include <QObject>
 
-int main(int argc, char *argv[])
+class MainWindow;
+class QAction;
+
+/** Import Plugin. */
+class ImportPlugin : public QObject
 {
-    (void)argc;
-    (void)argv;
+    Q_OBJECT
 
-    return 0;
-}
+public:
+    ImportPlugin(MainWindow *mainWindow);
+
+    static void import(MainWindow *mainWindow);
+
+public slots:
+    void slotImport();
+
+protected:
+    MainWindow *mainWindow_;
+    QAction *actionImport_;
+};
+
+#endif /* IMPORT_PLUGIN_HPP */

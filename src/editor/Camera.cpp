@@ -17,26 +17,14 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file sandbox.cpp */
+/** @file Camera.cpp */
 
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
-#include <vector>
+#include <Camera.hpp>
 
-#include <Editor.hpp>
-#include <File.hpp>
-#include <IndexFile.hpp>
-#include <Json.hpp>
-#include <LasFile.hpp>
-#include <Time.hpp>
-#include <Vector3.hpp>
-
-int main(int argc, char *argv[])
+Camera::Camera() : fov(60.0F)
 {
-    (void)argc;
-    (void)argv;
+}
 
-    return 0;
+Camera::~Camera()
+{
 }

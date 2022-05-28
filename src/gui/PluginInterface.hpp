@@ -17,26 +17,31 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file sandbox.cpp */
+/** @file PluginInterface.hpp */
 
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
-#include <vector>
+#ifndef PLUGIN_INTERFACE_HPP
+#define PLUGIN_INTERFACE_HPP
 
-#include <Editor.hpp>
-#include <File.hpp>
-#include <IndexFile.hpp>
-#include <Json.hpp>
-#include <LasFile.hpp>
-#include <Time.hpp>
-#include <Vector3.hpp>
+#include <QtPlugin>
 
-int main(int argc, char *argv[])
+#if QT_VERSION_MAJOR == 5
+// Fix for qt5 which has two QAction classes
+#include <QtWidgets/QAction>
+#else
+#include <QAction>
+#endif
+
+class MainWindow;
+
+/** Plugin Interface. */
+class PluginInterface
 {
-    (void)argc;
-    (void)argv;
+public:
+    virtual ~PluginInterface() = default;
+    virtual void initialize(MainWindow *mainWindow) = 0;
+};
 
-    return 0;
-}
+#define PluginInterface_iid "vukoz.3dforest.qt.PluginInterface/1.0"
+Q_DECLARE_INTERFACE(PluginInterface, PluginInterface_iid)
+
+#endif /* PLUGIN_INTERFACE_HPP */

@@ -369,24 +369,24 @@ There are several ways to add new functionality:
 
 -#  The third way is to add new internal plugin.
     -#  To start, one can copy and modify existing internal plugin such as
-        "src/plugins/projectfile" to new directory "src/plugins/myaction".
+        "src/plugins/projectfile" to new directory "src/plugins/myplugin".
     -#  Modify "src/gui/CMakeLists.txt" to build the new plugin into core:
         @verbatim
-        file(GLOB_RECURSE SOURCES_MYACTION "../plugins/myaction/*.cpp")
+        file(GLOB_RECURSE SOURCES_MYACTION "../plugins/myplugin/*.cpp")
         add_library
           ${SOURCES_MYACTION}
-          ../plugins/myaction/resources/resources.qrc
+          ../plugins/myplugin/resources/resources.qrc
         target_include_directories
-          ../plugins/myaction
+          ../plugins/myplugin
         @endverbatim
-    -#  Add field "guiPluginMyAction_" to "src/gui/GuiWindowMain.hpp".
+    -#  Add field "myPlugin_" to "src/gui/MainWindow.hpp".
         @verbatim
-        class GuiPluginMyAction;
-        GuiPluginMyAction *guiPluginMyAction_;
+        class MyPlugin;
+        MyPlugin *myPlugin_;
         @endverbatim
-    -#  Create instance in "src/gui/GuiWindowMain.cpp" constructor.
+    -#  Create instance in "src/gui/MainWindow.cpp" constructor.
         @verbatim
-        guiPluginMyAction_ = new GuiPluginMyAction(this);
+        myPlugin_ = new MyPlugin(this);
         @endverbatim
     -#  Internal plugins will be visible from application main window.
 
@@ -414,8 +414,8 @@ General:
 @verbatim
 directory "3rd Party" is "3rdparty" lowercase, no separators
 
-source    "GuiWindowMain.hpp"       C++ header, CamelCase for classes
-          "GuiWindowMain.cpp"       C++ source, CamelCase for classes
+source    "MainWindow.hpp"       C++ header, CamelCase for classes
+          "MainWindow.cpp"       C++ source, CamelCase for classes
           "examplecolorpalette.cpp" lowercase for executables
           "las.cpp"                 lowercase for executables
 

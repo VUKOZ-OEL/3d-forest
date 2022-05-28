@@ -17,26 +17,25 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file sandbox.cpp */
+/** @file Camera.hpp */
 
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
-#include <vector>
+#ifndef CAMERA_HPP
+#define CAMERA_HPP
 
-#include <Editor.hpp>
-#include <File.hpp>
-#include <IndexFile.hpp>
-#include <Json.hpp>
-#include <LasFile.hpp>
-#include <Time.hpp>
+#include <Matrix4.hpp>
 #include <Vector3.hpp>
 
-int main(int argc, char *argv[])
+/** Camera. */
+class Camera
 {
-    (void)argc;
-    (void)argv;
+public:
+    Vector3<float> eye;
+    Vector3<float> center;
+    Vector3<float> up;
+    float fov;
 
-    return 0;
-}
+    Camera();
+    ~Camera();
+};
+
+#endif /* CAMERA_HPP */

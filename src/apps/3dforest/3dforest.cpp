@@ -21,7 +21,7 @@
 
 //#include <ApplicationLog.hpp>
 
-#include <GuiWindowMain.hpp>
+#include <MainWindow.hpp>
 
 #include <QApplication>
 #include <QSurfaceFormat>
@@ -33,15 +33,15 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     app.setOrganizationName("VUKOZ v.v.i.");
-    app.setApplicationName(GuiWindowMain::APPLICATION_NAME);
-    app.setApplicationVersion(GuiWindowMain::APPLICATION_VERSION);
+    app.setApplicationName(MainWindow::APPLICATION_NAME);
+    app.setApplicationVersion(MainWindow::APPLICATION_VERSION);
     app.setWindowIcon(QIcon(":/3dforest-256.png"));
 
     QSurfaceFormat format;
     format.setDepthBufferSize(24);
     QSurfaceFormat::setDefaultFormat(format);
 
-    GuiWindowMain window;
+    MainWindow window;
     window.setWindowIcon(QIcon(":/3dforest-256.png"));
     window.show();
 

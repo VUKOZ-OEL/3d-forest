@@ -17,26 +17,28 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file sandbox.cpp */
+/** @file ProjectNavigatorWindow.cpp */
 
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
-#include <vector>
+#include <MainWindow.hpp>
+#include <ProjectNavigatorFiles.hpp>
+#include <ProjectNavigatorWindow.hpp>
 
-#include <Editor.hpp>
-#include <File.hpp>
-#include <IndexFile.hpp>
-#include <Json.hpp>
-#include <LasFile.hpp>
-#include <Time.hpp>
-#include <Vector3.hpp>
+#include <QTabWidget>
 
-int main(int argc, char *argv[])
+ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
+    : QDockWidget(mainWindow),
+      mainWindow_(mainWindow)
 {
-    (void)argc;
-    (void)argv;
+    // Tab
+    datasets_ = new ProjectNavigatorFiles(mainWindow_);
 
-    return 0;
+    // Tabs
+    tabWidget_ = new QTabWidget;
+    tabWidget_->addTab(datasets_, tr("Files"));
+
+    // Dock
+    setWidget(tabWidget_);
+    setWindowTitle(tr("Project Navigator"));
+    setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    mainWindow_->addDockWidget(Qt::LeftDockWidgetArea, this);
 }

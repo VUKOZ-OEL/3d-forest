@@ -17,26 +17,30 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file sandbox.cpp */
+/** @file SettingsImport.hpp */
 
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
-#include <vector>
+#ifndef SETTINGS_IMPORT_HPP
+#define SETTINGS_IMPORT_HPP
 
-#include <Editor.hpp>
-#include <File.hpp>
-#include <IndexFile.hpp>
-#include <Json.hpp>
-#include <LasFile.hpp>
-#include <Time.hpp>
-#include <Vector3.hpp>
+#include <IndexFileBuilder.hpp>
 
-int main(int argc, char *argv[])
+/** Settings Import. */
+class SettingsImport
 {
-    (void)argc;
-    (void)argv;
+public:
+    SettingsImport();
 
-    return 0;
-}
+    bool isCenterEnabled() const;
+    void setCenterEnabled(bool b);
+
+    const IndexFileBuilder::Settings &indexSettings() const
+    {
+        return indexSettings_;
+    }
+
+protected:
+    bool centerEnabled_;
+    IndexFileBuilder::Settings indexSettings_;
+};
+
+#endif /* SETTINGS_IMPORT_HPP */

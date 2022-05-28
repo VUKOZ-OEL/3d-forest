@@ -17,26 +17,30 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file sandbox.cpp */
+/** @file ProjectNavigatorWindow.hpp */
 
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
-#include <vector>
+#ifndef PROJECT_NAVIGATOR_WINDOW_HPP
+#define PROJECT_NAVIGATOR_WINDOW_HPP
 
-#include <Editor.hpp>
-#include <File.hpp>
-#include <IndexFile.hpp>
-#include <Json.hpp>
-#include <LasFile.hpp>
-#include <Time.hpp>
-#include <Vector3.hpp>
+#include <QDockWidget>
 
-int main(int argc, char *argv[])
+class MainWindow;
+class ProjectNavigatorFiles;
+
+class QTabWidget;
+
+/** Project Navigator Window. */
+class ProjectNavigatorWindow : public QDockWidget
 {
-    (void)argc;
-    (void)argv;
+    Q_OBJECT
 
-    return 0;
-}
+public:
+    ProjectNavigatorWindow(MainWindow *mainWindow);
+
+protected:
+    MainWindow *mainWindow_;
+    QTabWidget *tabWidget_;
+    ProjectNavigatorFiles *datasets_;
+};
+
+#endif /* PROJECT_NAVIGATOR_WINDOW_HPP */

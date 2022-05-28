@@ -17,26 +17,33 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file sandbox.cpp */
+/** @file ClassifyGroundPlugin.hpp */
 
-#include <cstring>
-#include <iostream>
-#include <queue>
-#include <stdexcept>
-#include <vector>
+#ifndef CLASSIFY_GROUND_PLUGIN_HPP
+#define CLASSIFY_GROUND_PLUGIN_HPP
 
-#include <Editor.hpp>
-#include <File.hpp>
-#include <IndexFile.hpp>
-#include <Json.hpp>
-#include <LasFile.hpp>
-#include <Time.hpp>
-#include <Vector3.hpp>
+#include <PluginInterface.hpp>
 
-int main(int argc, char *argv[])
+class ClassifyGroundWindow;
+
+/** Classify Ground Plugin. */
+class ClassifyGroundPlugin : public QObject, public PluginInterface
 {
-    (void)argc;
-    (void)argv;
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID PluginInterface_iid)
+    Q_INTERFACES(PluginInterface)
 
-    return 0;
-}
+public:
+    ClassifyGroundPlugin();
+
+    virtual void initialize(MainWindow *mainWindow);
+
+public slots:
+    void slotPlugin();
+
+protected:
+    MainWindow *mainWindow_;
+    ClassifyGroundWindow *dockWindow_;
+};
+
+#endif /* CLASSIFY_GROUND_PLUGIN_HPP */
