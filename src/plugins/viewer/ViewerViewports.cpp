@@ -30,10 +30,10 @@
 #include <QSplitter>
 #include <QVBoxLayout>
 
-#define WINDOW_VIEWPORTS_3D 0
-#define WINDOW_VIEWPORTS_TOP 1
-#define WINDOW_VIEWPORTS_FRONT 2
-#define WINDOW_VIEWPORTS_RIGHT 3
+#define VIEWER_VIEWPORTS_3D 0
+#define VIEWER_VIEWPORTS_TOP 1
+#define VIEWER_VIEWPORTS_FRONT 2
+#define VIEWER_VIEWPORTS_RIGHT 3
 
 ViewerViewports::ViewerViewports(QWidget *parent) : QWidget(parent)
 {
@@ -173,23 +173,23 @@ void ViewerViewports::resetScene(Editor *editor,
                                  size_t viewportId,
                                  bool resetView)
 {
-    if (viewportId == WINDOW_VIEWPORTS_TOP)
+    if (viewportId == VIEWER_VIEWPORTS_TOP)
     {
-        viewports_[WINDOW_VIEWPORTS_TOP]->resetScene(editor, resetView);
-        viewports_[WINDOW_VIEWPORTS_TOP]->setViewOrthographic();
-        viewports_[WINDOW_VIEWPORTS_TOP]->setViewTop();
+        viewports_[VIEWER_VIEWPORTS_TOP]->resetScene(editor, resetView);
+        viewports_[VIEWER_VIEWPORTS_TOP]->setViewOrthographic();
+        viewports_[VIEWER_VIEWPORTS_TOP]->setViewTop();
     }
-    else if (viewportId == WINDOW_VIEWPORTS_FRONT)
+    else if (viewportId == VIEWER_VIEWPORTS_FRONT)
     {
-        viewports_[WINDOW_VIEWPORTS_FRONT]->resetScene(editor, resetView);
-        viewports_[WINDOW_VIEWPORTS_FRONT]->setViewOrthographic();
-        viewports_[WINDOW_VIEWPORTS_FRONT]->setViewFront();
+        viewports_[VIEWER_VIEWPORTS_FRONT]->resetScene(editor, resetView);
+        viewports_[VIEWER_VIEWPORTS_FRONT]->setViewOrthographic();
+        viewports_[VIEWER_VIEWPORTS_FRONT]->setViewFront();
     }
-    else if (viewportId == WINDOW_VIEWPORTS_RIGHT)
+    else if (viewportId == VIEWER_VIEWPORTS_RIGHT)
     {
-        viewports_[WINDOW_VIEWPORTS_RIGHT]->resetScene(editor, resetView);
-        viewports_[WINDOW_VIEWPORTS_RIGHT]->setViewOrthographic();
-        viewports_[WINDOW_VIEWPORTS_RIGHT]->setViewRight();
+        viewports_[VIEWER_VIEWPORTS_RIGHT]->resetScene(editor, resetView);
+        viewports_[VIEWER_VIEWPORTS_RIGHT]->setViewOrthographic();
+        viewports_[VIEWER_VIEWPORTS_RIGHT]->setViewRight();
     }
 }
 
@@ -250,7 +250,7 @@ void ViewerViewports::setLayout(ViewLayout viewLayout)
     if (viewports_.size() == 0)
     {
         viewports_.resize(1);
-        viewports_[0] = createViewport(WINDOW_VIEWPORTS_3D);
+        viewports_[0] = createViewport(VIEWER_VIEWPORTS_3D);
         viewports_[0]->setSelected(true);
     }
 
@@ -268,7 +268,7 @@ void ViewerViewports::setLayout(ViewLayout viewLayout)
     {
         // Create viewports
         viewports_.resize(2);
-        viewports_[1] = createViewport(WINDOW_VIEWPORTS_TOP);
+        viewports_[1] = createViewport(VIEWER_VIEWPORTS_TOP);
 
         // Create new layout
         QSplitter *splitter = new QSplitter;
@@ -283,23 +283,23 @@ void ViewerViewports::setLayout(ViewLayout viewLayout)
     {
         // Create viewports
         viewports_.resize(4);
-        viewports_[1] = createViewport(WINDOW_VIEWPORTS_TOP);
-        viewports_[2] = createViewport(WINDOW_VIEWPORTS_FRONT);
-        viewports_[3] = createViewport(WINDOW_VIEWPORTS_RIGHT);
+        viewports_[1] = createViewport(VIEWER_VIEWPORTS_TOP);
+        viewports_[2] = createViewport(VIEWER_VIEWPORTS_FRONT);
+        viewports_[3] = createViewport(VIEWER_VIEWPORTS_RIGHT);
 
         // Create new layout
         int w = width() / 2;
         int h = height() / 2;
 
         QSplitter *splitterLeft = new QSplitter;
-        splitterLeft->addWidget(viewports_[WINDOW_VIEWPORTS_TOP]);
-        splitterLeft->addWidget(viewports_[WINDOW_VIEWPORTS_FRONT]);
+        splitterLeft->addWidget(viewports_[VIEWER_VIEWPORTS_TOP]);
+        splitterLeft->addWidget(viewports_[VIEWER_VIEWPORTS_FRONT]);
         splitterLeft->setOrientation(Qt::Vertical);
         splitterLeft->setSizes(QList<int>({h, h}));
 
         QSplitter *splitterRight = new QSplitter;
-        splitterRight->addWidget(viewports_[WINDOW_VIEWPORTS_3D]);
-        splitterRight->addWidget(viewports_[WINDOW_VIEWPORTS_RIGHT]);
+        splitterRight->addWidget(viewports_[VIEWER_VIEWPORTS_3D]);
+        splitterRight->addWidget(viewports_[VIEWER_VIEWPORTS_RIGHT]);
         splitterRight->setOrientation(Qt::Vertical);
         splitterRight->setSizes(QList<int>({h, h}));
 
@@ -314,9 +314,9 @@ void ViewerViewports::setLayout(ViewLayout viewLayout)
     {
         // Create viewports
         viewports_.resize(4);
-        viewports_[1] = createViewport(WINDOW_VIEWPORTS_TOP);
-        viewports_[2] = createViewport(WINDOW_VIEWPORTS_FRONT);
-        viewports_[3] = createViewport(WINDOW_VIEWPORTS_RIGHT);
+        viewports_[1] = createViewport(VIEWER_VIEWPORTS_TOP);
+        viewports_[2] = createViewport(VIEWER_VIEWPORTS_FRONT);
+        viewports_[3] = createViewport(VIEWER_VIEWPORTS_RIGHT);
 
         // Create new layout
         int w = width() / 3;
