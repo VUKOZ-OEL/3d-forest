@@ -76,16 +76,16 @@ void LayerList::erase(size_t i)
     }
 
     size_t key = id(i);
+    hashTableId_.erase(key);
+    hashTableEnabledId_.erase(key);
 
     size_t n = layers_.size() - 1;
     for (size_t pos = i; pos < n; pos++)
     {
         layers_[pos] = layers_[pos + 1];
+        hashTableId_[layers_[pos].id()] = pos;
     }
     layers_.resize(n);
-
-    hashTableId_.erase(key);
-    hashTableEnabledId_.erase(key);
 }
 
 size_t LayerList::unusedId() const

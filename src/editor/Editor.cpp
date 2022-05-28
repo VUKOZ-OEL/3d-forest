@@ -244,14 +244,7 @@ void Editor::setLayers(const LayerList &layers)
 {
     layers_ = layers;
 
-    if (layers_.isEnabled())
-    {
-        viewports_.selectLayers(layers_.enabledList());
-    }
-    else
-    {
-        viewports_.selectLayers({});
-    }
+    viewports_.selectLayers(layers_.enabledList());
 
     unsavedChanges_ = true;
 }

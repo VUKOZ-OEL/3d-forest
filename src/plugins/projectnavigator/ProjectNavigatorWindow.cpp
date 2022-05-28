@@ -21,6 +21,7 @@
 
 #include <MainWindow.hpp>
 #include <ProjectNavigatorFiles.hpp>
+#include <ProjectNavigatorLayers.hpp>
 #include <ProjectNavigatorWindow.hpp>
 
 #include <QTabWidget>
@@ -31,10 +32,12 @@ ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
 {
     // Tab
     datasets_ = new ProjectNavigatorFiles(mainWindow_);
+    layers_ = new ProjectNavigatorLayers(mainWindow_);
 
     // Tabs
     tabWidget_ = new QTabWidget;
     tabWidget_->addTab(datasets_, tr("Files"));
+    tabWidget_->addTab(layers_, tr("Layers"));
 
     // Dock
     setWidget(tabWidget_);
