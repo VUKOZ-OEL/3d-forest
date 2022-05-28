@@ -161,14 +161,14 @@ static void createLine(const std::string &path)
     // Create LAS file
     LasFile::create(path, points);
 }
-
+#if 0
 static void createIndex(const std::string &path)
 {
     // Create LAS file index
     IndexFileBuilder::Settings settings;
     IndexFileBuilder::index(path, path, settings);
 }
-
+#endif
 int main()
 {
     createBox("box.las");
