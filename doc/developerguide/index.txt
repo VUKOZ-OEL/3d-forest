@@ -22,6 +22,569 @@
 These documents describe how to build 3D Forest and develop new plugins
 using APIs in 3D Forest and other libraries.
 
+- @subpage developerguide_git
+- @subpage developerguide_build_linux_make
+- @subpage developerguide_build_windows_make
+- @subpage developerguide_add_new_functionality
+- @subpage developerguide_code
+- @subpage developerguide_doxygen
+- @subpage developerguide_documentation
+- @subpage developerguide_3rd_party
 - @subpage cheatsheet contains frequently used things.
 
+*******************************************************************************/
+
+/** @page developerguide_git Git
+
+- Create your branch in GitHub if you like to make some changes:
+  -# Open web page 'https://github.com/VUKOZ-OEL/3dforest2'.
+  -# Click on 'main' button.
+  -# In 'Switch branches/tags' popup window:
+    -# Select field 'Filter branches/tags':
+    -# Type a name of your_branch. Example "vb" for "Vaclav Bubnik".
+    -# Hit enter.
+
+- Get the source code:
+  @verbatim
+  git clone https://github.com/VUKOZ-OEL/3dforest2.git
+  cd 3dforest2
+  @endverbatim
+
+- Switch to your branch if you like to make some changes:
+  @verbatim
+  git checkout your_branch
+  @endverbatim
+
+- Merging 'main' into your branch is required before making contribution from
+  your branch. Merging from 'main' may result to some unfortunate merge
+  conflicts which are resolved manually.
+  @verbatim
+  # Push your current changes in your branch if you have any (git status)
+  git add --all
+  git commit -m "Update"
+  git push
+
+  # Checking latest changes in 'main'
+  git checkout main
+  git fetch
+  git pull
+
+  # Merging 'main' into your branch
+  git checkout your_branch
+  git merge --no-ff -m "Merge branch 'main' into your_branch" main
+
+  # Resolve conflicts and push
+  git push
+
+  # Merging your branch into 'main' (contribution, pull requests later)
+  git checkout main
+  git merge --no-ff -m "Merge branch 'your_branch' into main" your_branch
+  git push
+
+  # Return to your branch
+  git checkout your_branch
+  @endverbatim
+
+- Common download sequence:
+  @verbatim
+  git checkout <branch>
+  git fetch
+  git pull
+  @endverbatim
+
+- Common upload/backup of your local changes to GitHub:
+  @verbatim
+  git branch
+  git status
+  git add <path>
+  git add --all
+  git commit -m "Add feature x"
+  git push
+  @endverbatim
+
+*******************************************************************************/
+
+/** @page developerguide_build_linux_make Build Using "Unix Makefiles" on Linux
+
+The code uses C++17, CMake, Qt5/Qt6 and OpenGL which will be installed in the
+following steps. Qt and OpenGL are required only for GUI desktop application.
+
+-#  Install Qt
+    - Download Qt installer from https://www.qt.io/download
+        - Clicked "Downloads for open source users" button in "Go open source"
+        - Clicked "Download the Qt Online Installer" button in bottom section
+          of the page "Looking for Qt binaries"
+        - Recommended download was "Qt Online Installer for Linux (64-bit)"
+        - "Download" button saved file "qt-unified-linux-x64-4.1.1-online.run"
+    - Run the installer
+        - Checked "make file executable" in file properties of downloaded file
+        - Open "qt-unified-linux-x64-4.1.1-online.run", shows "Qt Setup" window
+        - Entered Qt Account Email and Password, "Next"
+        - Checked "I have read" and "I am an individual person", "Next", "Next"
+        - "/home/user/Qt" is directory where Qt will be installed, default
+        - Selected "Custom installation", "Next"
+        - Additionally checked: Qt - Qt 5.15.2 - Desktop gcc 64-bit
+        - Additionally checked: Qt - Qt 5.15.2 - Sources
+        - "Next", "Install", the installation took 13 minutes
+
+-#  Installation of other tools: OpenGL and CMake from a terminal
+    @verbatim
+    $ sudo apt-get update
+    $ sudo apt install mesa-common-dev libglu1-mesa-dev
+    $ sudo apt install cmake
+    @endverbatim
+
+-#  Installation of other tools: gcc, g++, make, libc6-dev, etc.
+    @verbatim
+    $ sudo apt-get install build-essential
+    @endverbatim
+
+-#  Get 3D Forest source code
+    @verbatim
+    $ cd /home/user/
+    $ git clone https://github.com/VUKOZ-OEL/3dforest2.git
+    @endverbatim
+
+-#  Build 3D Forest
+    @verbatim
+    $ cd /home/user/3dforest2
+    $ mkdir build
+    $ cd /home/user/3dforest2/build
+    $ PATH=$PATH:/home/user/Qt/5.15.2/gcc_64/bin
+    $ cmake -G "Unix Makefiles" .. -DCMAKE_INSTALL_PREFIX=..
+    $ make
+    $ make install
+    @endverbatim
+
+-#  Start 3D Forest application
+    @verbatim
+    $ cd /home/user/3dforest2/bin
+    $ LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/3dforest2/bin:/home/user/Qt/5.15.2/gcc_64/lib ./3dforest
+    @endverbatim
+
+-#  We can open example project "project.json" from directory
+    "/home/user/3dforest2/data"
+
+-#  We can see that we did not store modified PATH and LD_LIBRARY_PATH to user
+    or system variables.
+    One could modify "/home/<user>/.bashrc" or "/home/<user>/.profile" to make
+    the change persistent.
+
+*******************************************************************************/
+
+/** @page developerguide_build_windows_make Build Using "MinGW Makefiles" on Windows
+
+The code uses C++17, CMake, Qt5/Qt6 and OpenGL which will be installed in the
+following steps. Qt and OpenGL are required only for GUI desktop application.
+
+-#  Install git
+    - Open "Git for windows" https://git-scm.com/downloads
+    - Download installer Git-2.36.1-64-bit.exe
+    - Run the installer
+    - Choose all the options as default recommanded values with the following suggestions:
+        - You may prefer to choose default editor used by Git to "Notepad".
+        - You may choose default branch name as "main".
+        - Choose "Checkout as-is, commit as-is" eg. do not convert CRLF/LF
+          (autocrlf = false in global config). This project uses LF line endings.
+          Windows can handle LF just fine at least since version 10.
+    - Git installer creates global config in
+      "C:/Users/user/AppData/Local/Programs/Git/etc/gitconfig".
+      @verbatim
+        [diff "astextplain"]
+            textconv = astextplain
+        [filter "lfs"]
+            clean = git-lfs clean -- %f
+            smudge = git-lfs smudge -- %f
+            process = git-lfs filter-process
+            required = true
+        [http]
+            sslBackend = openssl
+            sslCAInfo = C:/Users/user/AppData/Local/Programs/Git/mingw64/ssl/certs/ca-bundle.crt
+        [core]
+            autocrlf = false
+            fscache = true
+            symlinks = false
+            editor = notepad
+        [pull]
+            rebase = false
+        [credential]
+            helper = manager-core
+        [credential "https://dev.azure.com"]
+            useHttpPath = true
+        [init]
+            defaultBranch = main
+      @endverbatim
+    - For development, setup your git user as follows:
+        - This creates configuration file in "C:\Users\user\.gitconfig":
+          @verbatim
+          $ git config --global user.name "Vaclav Bubnik"
+          $ git config --global user.email "vaclav@email.com"
+          @endverbatim
+        - This creates configuration file in "C:\Users\user\.gitconfig":
+          @verbatim
+            [user]
+                email = vaclav@email.com
+                name = Vaclav Bubnik
+          @endverbatim
+
+-#  Install msys2 and mingw-w64
+    - Open https://www.msys2.org/ and follow Installation instructions:
+        - Download the installer: msys2-x86_64-20220319.exe
+        - Run the installer
+        - Default installation will create "C:\msys64" installation folder
+        - Click "Next"
+        - Choose any "Start Menu shortcuts" and click "Next"
+        - When complete, check "Run MSYS2 now" and click "Finish"
+        - Run the following command to update package database
+          @verbatim
+            $ pacman -Syu
+          @endverbatim
+        - MSYS2 window will be closed
+        - Run "MSYS2 MSYS" from Start menu and update the rest of the packages
+          @verbatim
+            $ pacman -Syu
+          @endverbatim
+          or
+          @verbatim
+            $ pacman -Su
+          @endverbatim
+
+    - Install additional packages
+        - Install required packages
+          @verbatim
+            $ pacman -S mingw-w64-x86_64-clang
+            $ pacman -S mingw-w64-x86_64-cmake
+            $ pacman -S mingw-w64-x86_64-make
+          @endverbatim
+        - Install optional packages to build documentation
+          @verbatim
+            $ pacman -S mingw-w64-x86_64-doxygen
+            $ pacman -S mingw-w64-x86_64-graphviz
+          @endverbatim
+        - Install optional packages for python
+          @verbatim
+            $ pacman -S mingw-w64-x86_64-python
+            $ pacman -S mingw-w64-x86_64-python-pip
+          @endverbatim
+
+    - Close "MSYS2" window
+
+    - Setup Windows PATH variable
+        - Run "systempropertiesadvanced" from the search box
+        - Click "Environment Variables"
+        - In "System variables" select Variable "Path" and click "Edit..."
+        - Click "New" and add "C:\msys64\usr\bin", hit enter
+        - Click "New" and add "C:\msys64\usr\local\bin", hit enter
+        - Click "New" and add "C:\msys64\mingw64\bin", hit enter
+        - "Move Up" these three new items to top
+        - Click "Ok"
+
+-#  Install Qt
+    - Download Qt installer from https://www.qt.io/download
+        - Click "Downloads for open source users" button in "Go open source"
+        - Click "Download the Qt Online Installer" button in bottom section
+          of the page "Looking for Qt binaries"
+        - Recommended download was "Qt Online Installer for Windows"
+        - Click "Download" button to save file "qt-unified-windows-x86-4.3.0-1-online.exe"
+    - Run the installer
+        - Run "qt-unified-windows-x86-4.3.0-1-online.exe", it shows "Qt Setup" window
+        - Enter your Qt Account Email and Password, "Next"
+        - Check "I have read" and "I am an individual person", "Next", "Next"
+        - "Preparing meta information download..." may take few minutes
+        - It is suggested to keep default installation directory "C:\Qt"
+        - Select "Custom installation", "Next"
+        - Qt 6 2022
+            - Unroll Qt tree item and check "Qt 6.3.0" or make your custom
+              installation since doing this may install 31GB of useless stuff.
+            - For example, check only the following for 13GB installation:
+                - MinGW
+                - Sources
+                - Qt 5 Compatibility Module
+                - Additional Libraries
+                - Qt Debug Information Files
+        - Qt 5 2000
+            - Additionally checked: Qt - Qt 5.15.2 - Desktop gcc 64-bit
+            - Additionally checked: Qt - Qt 5.15.2 - Sources
+        - "Next", "Install", the installation takes between 10 to 30 minutes
+        - Click "Finish"
+    - Run "systempropertiesadvanced" from the search box
+    - Click "Environment Variables"
+    - In "System variables" select Variable "Path" and click "Edit..."
+    - Click "New" and add
+      "C:\Qt\5.15.0\mingw81_64\bin" or 
+      "C:\Qt\6.3.0\mingw_64\bin" depending on your installed qt version
+
+-#  Build 3D Forest
+    - Open "cmd" terminal windows application
+    - Use "cd" command to navigate to local git repository folder
+      @verbatim
+        cd Documents\3dforest2
+      @endverbatim    
+      or first clone the repository to "Documents" as follows:
+      @verbatim
+        cd Documents
+        git clone https://github.com/VUKOZ-OEL/3dforest2.git
+        cd 3dforest2
+      @endverbatim
+    - Build source files to executable 3dforest application as follows:
+      @verbatim
+        > mkdir build
+        > cd build
+        > cmake -G "MinGW Makefiles" .. -DCMAKE_INSTALL_PREFIX=..
+        > mingw32-make
+        > mingw32-make install
+      @endverbatim
+    - Run 3dforest.exe from directory "Documents\3dforest2\bin"
+
+*******************************************************************************/
+
+/** @page developerguide_add_new_functionality Add New Functionality
+
+There are several ways to add new functionality:
+
+-#  The most easy way is to add new external plugin. External plugins are self
+    contained. It is not necessary to touch any file outside of your plugin
+    directory with exception of one cmake file.
+    -#  To start, one can copy and modify existing external plugin such as
+        "src/plugins/classifyground" to new directory "src/plugins/myplugin".
+    -#  Add path to "src/plugins/CMakeLists.txt" to build the new plugin:
+        @verbatim
+        add_subdirectory(myplugin)
+        @endverbatim
+    -#  External plugins will be visible from application main window.
+
+-#  It is possible to add new command line tool to "src/apps/tools/mytool".
+    -#  Example command line tool "src/apps/tools/sandbox".
+    -#  Example command line tool with Qt "src/apps/tools/icon".
+    -#  Tools are not available from application main window.
+
+-#  The third way is to add new internal plugin.
+    -#  To start, one can copy and modify existing internal plugin such as
+        "src/plugins/projectfile" to new directory "src/plugins/myplugin".
+    -#  Modify "src/gui/CMakeLists.txt" to build the new plugin into core:
+        @verbatim
+        file(GLOB_RECURSE SOURCES_MYACTION "../plugins/myplugin/*.cpp")
+        add_library
+          ${SOURCES_MYACTION}
+          ../plugins/myplugin/resources/resources.qrc
+        target_include_directories
+          ../plugins/myplugin
+        @endverbatim
+    -#  Add field "myPlugin_" to "src/gui/MainWindow.hpp".
+        @verbatim
+        class MyPlugin;
+        MyPlugin *myPlugin_;
+        @endverbatim
+    -#  Create instance in "src/gui/MainWindow.cpp" constructor.
+        @verbatim
+        myPlugin_ = new MyPlugin(this);
+        @endverbatim
+    -#  Internal plugins will be visible from application main window.
+
+-#  The last and most difficult way is to modify core functionality in
+    the following directories. This functionality is available in all plugins.
+    - "src/core" build to "lib3dforestcore.dll"
+    - "src/editor" build to "lib3dforesteditor.dll"
+    - "src/gui" build to "lib3dforestgui.dll"
+
+General:
+
+-#  The main() 3D Forest application is in "src/apps/3dforest/3dforest.cpp".
+
+-#  For development with Visual Studio Code, update
+    ".vscode/settings.json" to contain new directories.
+    For example, add "${workspaceRoot}/src/plugins/myaction" to
+    "C_Cpp.default.includePath" include paths.
+
+-#  Need some icon? Try to look into directory "3rdparty/icons".
+
+*******************************************************************************/
+
+/** @page developerguide_code Code Style
+
+Automatic formatting. It is good to run this command before 'git add <file>'
+and git commit to GitHub:
+@verbatim
+mingw32-make format
+@endverbatim
+
+The code is using C++ std on Backend and Qt on Frontend.
+
+Function names follow mixed Qt style and std:
+@verbatim
+get:
+    bool   hasFocus() const;
+    bool   isHidden() const;
+    int    height() const;
+    size_t size() const; // Can be better than Qt like 'count'. std uses 'size'.
+
+get/set:
+    bool isSizeGripEnabled() const;     // get
+    void setSizeGripEnabled(bool);      // set
+
+    int  result() const;                // get
+    void setResult(int i);              // set
+
+    const T &at(int i) const;           // get (inconsistent, easy to read)
+    void append(const QList<T> &value); // set (inconsistent, easy to read)
+
+signals:
+    void accepted();
+    void finished(int result);
+    void rejected();
+    void toolsRequested(const QString &source);
+    void findTextFinished(const QString &text);
+    void loadProgress(int progress);
+@endverbatim
+
+Debug:
+@verbatim
+#include <Log.hpp>
+LOG("counter=" << counter);
+@endverbatim
+
+File Names:
+@verbatim
+directory "3rd Party" is "3rdparty" lowercase, no separators
+
+source    "MainWindow.hpp"          C++ header, CamelCase for classes
+          "MainWindow.cpp"          C++ source, CamelCase for classes
+          "examplecolorpalette.cpp" lowercase for executables
+          "las.cpp"                 lowercase for executables
+
+files     anything
+          "README.md"
+          "CMakeLists.txt"
+          "layout_grid_24px.png"
+          ".clang-format"
+          ".gitignore"
+@endverbatim
+
+*******************************************************************************/
+
+/** @page developerguide_doxygen Doxygen
+
+Example command to generate documentation:
+@verbatim
+mingw32-make doxygen
+@endverbatim
+
+Your favorite syntax of documentation comments.
+
+Suggestions:
+@verbatim
+/** First paragraph is automatically brief
+
+    <detail description>
+
+    @todo Documentation is not complete.
 */
+
+int value; /**< field description, after */
+
+/** Link to function foo() */
+/** Link to parameter @e value */
+void foo(value);
+
+[in], [out], [in,out] for parameters:
+/** @param [in] milliseconds sleep until milliseconds have elapsed. */
+void msleep(long milliseconds);
+
+Group 'Point Data' creates hierarchy in generated output:
+    /** @name Point Data */
+    /**@{*/
+
+    /** Point coordinates. */
+    std::vector<double> xyz;
+
+    /** Pulse return magnitude. */
+    std::vector<float> intensity;
+
+    /**@}*/
+
+Examples:
+/** JSON.
+
+@example
+    Json obj;
+    obj["name"] = "John";
+    std::cout << obj << "\n"; // Output: {"name":"John"}
+@endexample
+*/
+
+/**
+    @section
+    @subsection
+*/
+
+/** @file Window.hpp */
+/** @class Window.cpp::Window
+
+    Documenting another file.
+*/
+@endverbatim
+
+*******************************************************************************/
+
+/** @page developerguide_documentation Generate Help Manuals
+
+We would like to be able to give users access to documentation from within the
+user interface of our application.
+This section demonstrates how to edit, generate and distribute such
+documentation with 3D Forest.
+
+These are the locations where it is possible to write the documentation:
+-   'User Guide' in directory 'doc\userguide'.
+-   'Developer Guide' in directory 'doc\developerguide'.
+-   Doxygen comments in the source code.
+
+The following steps will generate the documentation and prepare it for
+distribution:
+-#  The following commands are executed from directory 'build'.
+
+-#  Doxygen command line tool is used to create manual pages as follows:
+    @verbatim
+    mingw32-make doxygen
+    @endverbatim
+    Produced output: html\index.qhp, html\index.qch
+
+-#  We run 'qhelpgenerator' command to generate qt help with index:
+    @verbatim
+    qhelpgenerator ..\doc\index.qhcp -o html\index.qhc
+    @endverbatim
+    Produced output: html\index.qhc, html\index.qch
+
+-#  We copy '3dforest.qch' and '3dforest.qhc' to 'documentation' directory.
+    These are help files to be shipped with the application:
+    @verbatim
+    mkdir ..\bin\documentation
+    copy html\index.qhc ..\bin\documentation\
+    copy html\index.qch ..\bin\documentation\
+    @endverbatim
+
+To show the documentation in the application:
+-#  First, we start 3dforest.exe. (Application binary name depends on platform.)
+-#  We access help via 'Help->Manual'.
+-#  The previous step displays Help dialog with table of contents on the
+    left side and relevant html page on the right side.
+
+*******************************************************************************/
+
+/** @page developerguide_3rd_party Adding Third Party Libraries
+
+Third party libraries used by 3D Forest are copied to '3rdparty' directory and
+therefore distributed together with 3D Forest.
+3rd party code is build as a part of 3D Forest build process. This removes
+inconvenient step which would require to search, download and install
+dependencies.
+
+GPLv3 compatibility matrix:
+https://www.gnu.org/licenses/gpl-faq.en.html#AllCompatibility
+
+GPL-Compatible Free Software Licenses:
+https://www.gnu.org/licenses/license-list.html#GPLCompatibleLicenses
+
+GPL-Incompatible Free Software Licenses:
+https://www.gnu.org/licenses/license-list.html#GPLIncompatibleLicenses
+
+*******************************************************************************/
