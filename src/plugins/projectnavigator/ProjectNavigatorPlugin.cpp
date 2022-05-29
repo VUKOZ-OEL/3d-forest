@@ -34,8 +34,8 @@ ProjectNavigatorPlugin::ProjectNavigatorPlugin(MainWindow *mainWindow)
     projectWindow_ = new ProjectNavigatorWindow(mainWindow_);
 
     mainWindow_->createAction(nullptr,
-                              "Tools",
-                              "Tools",
+                              "File",
+                              "File Properties",
                               tr("Project Navigator"),
                               tr("Show project navigator"),
                               ICON("blueprint"),

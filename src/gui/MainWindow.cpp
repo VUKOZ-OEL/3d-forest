@@ -59,9 +59,9 @@ MainWindow::MainWindow(QWidget *parent)
     // Menu
     projectFilePlugin_ = new ProjectFilePlugin(this);
     importPlugin_ = new ImportPlugin(this);
+    projectNavigatorPlugin_ = new ProjectNavigatorPlugin(this);
     settingsPlugin_ = new SettingsPlugin(this);
     viewerPlugin_ = new ViewerPlugin(this);
-    projectNavigatorPlugin_ = new ProjectNavigatorPlugin(this);
     loadPlugins();
 
     // Exit
