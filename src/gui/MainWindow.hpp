@@ -43,6 +43,7 @@ class ProjectNavigatorPlugin;
 class ProjectFilePlugin;
 class SettingsPlugin;
 class ViewerPlugin;
+class HelpPlugin;
 
 class QToolButton;
 
@@ -120,6 +121,7 @@ protected:
     ProjectFilePlugin *projectFilePlugin_;
     SettingsPlugin *settingsPlugin_;
     ViewerPlugin *viewerPlugin_;
+    HelpPlugin *helpPlugin_;
     std::vector<PluginInterface *> plugins_;
 
     // Menu
