@@ -35,6 +35,7 @@ SettingsWindow::SettingsWindow(MainWindow *mainWindow)
     // Tab
     tabWidget_ = new QTabWidget;
     tabWidget_->addTab(viewWidget_, tr("View"));
+    tabWidget_->setFixedHeight(330);
 
     // Dock
     setWidget(tabWidget_);
