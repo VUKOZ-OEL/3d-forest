@@ -21,6 +21,7 @@
 
 #include <Log.hpp>
 
+#include <HelpPlugin.hpp>
 #include <ImportPlugin.hpp>
 #include <MainWindow.hpp>
 #include <PluginInterface.hpp>
@@ -63,6 +64,7 @@ MainWindow::MainWindow(QWidget *parent)
     settingsPlugin_ = new SettingsPlugin(this);
     viewerPlugin_ = new ViewerPlugin(this);
     loadPlugins();
+    helpPlugin_ = new HelpPlugin(this);
 
     // Exit
     createAction(&actionExit_,

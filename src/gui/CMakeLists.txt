@@ -31,6 +31,7 @@ file(GLOB_RECURSE SOURCES_PROJECT "../plugins/projectnavigator/*.cpp")
 file(GLOB_RECURSE SOURCES_PROJECT_FILE "../plugins/projectfile/*.cpp")
 file(GLOB_RECURSE SOURCES_SETTINGS "../plugins/settings/*.cpp")
 file(GLOB_RECURSE SOURCES_VIEWER "../plugins/viewer/*.cpp")
+file(GLOB_RECURSE SOURCES_HELP "../plugins/help/*.cpp")
 
 add_library(
   ${SUB_PROJECT_NAME}
@@ -41,12 +42,14 @@ add_library(
   ${SOURCES_PROJECT_FILE}
   ${SOURCES_SETTINGS}
   ${SOURCES_VIEWER}
+  ${SOURCES_HELP}
   resources/resources.qrc
   ../plugins/import/resources/resources.qrc
   ../plugins/projectnavigator/resources/resources.qrc
   ../plugins/projectfile/resources/resources.qrc
   ../plugins/settings/resources/resources.qrc
   ../plugins/viewer/resources/resources.qrc
+  ../plugins/help/resources/resources.qrc
 )
 
 target_include_directories(
@@ -58,6 +61,7 @@ target_include_directories(
   ../plugins/projectfile
   ../plugins/settings
   ../plugins/viewer
+  ../plugins/help
 )
 
 if (QT_VERSION_MAJOR EQUAL 5)

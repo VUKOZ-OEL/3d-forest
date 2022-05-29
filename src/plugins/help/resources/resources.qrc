@@ -1,0 +1,8 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/help">
+
+<file>about_24px.png</file>
+<file>help_24px.png</file>
+
+</qresource>
+</RCC>
