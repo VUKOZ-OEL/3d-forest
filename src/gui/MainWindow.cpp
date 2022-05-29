@@ -26,6 +26,7 @@
 #include <PluginInterface.hpp>
 #include <ProjectFilePlugin.hpp>
 #include <ProjectNavigatorPlugin.hpp>
+#include <SettingsPlugin.hpp>
 #include <ViewerPlugin.hpp>
 #include <ViewerViewports.hpp>
 
@@ -58,8 +59,9 @@ MainWindow::MainWindow(QWidget *parent)
     // Menu
     projectFilePlugin_ = new ProjectFilePlugin(this);
     importPlugin_ = new ImportPlugin(this);
-    viewerPlugin_ = new ViewerPlugin(this);
     projectNavigatorPlugin_ = new ProjectNavigatorPlugin(this);
+    settingsPlugin_ = new SettingsPlugin(this);
+    viewerPlugin_ = new ViewerPlugin(this);
     loadPlugins();
 
     // Exit
@@ -346,6 +348,20 @@ void MainWindow::updateFilter()
     viewports->resetScene(&editor_, false);
     editor_.viewports().setState(Page::STATE_SELECT);
 
+    resumeThreads();
+}
+
+void MainWindow::updateModifiers()
+{
+    suspendThreads();
+    editor_.viewports().setState(Page::STATE_RUN_MODIFIERS);
+    resumeThreads();
+}
+
+void MainWindow::updateRender()
+{
+    suspendThreads();
+    editor_.viewports().setState(Page::STATE_RENDER);
     resumeThreads();
 }
 

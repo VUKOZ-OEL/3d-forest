@@ -17,35 +17,35 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ProjectNavigatorPlugin.cpp */
+/** @file SettingsPlugin.cpp */
 
 #include <IconTheme.hpp>
 #include <MainWindow.hpp>
-#include <ProjectNavigatorPlugin.hpp>
-#include <ProjectNavigatorWindow.hpp>
+#include <SettingsPlugin.hpp>
+#include <SettingsWindow.hpp>
 
-#define ICON(name) (IconTheme(":/projectnavigator/", name))
+#define ICON(name) (IconTheme(":/settings/", name))
 
-ProjectNavigatorPlugin::ProjectNavigatorPlugin(MainWindow *mainWindow)
+SettingsPlugin::SettingsPlugin(MainWindow *mainWindow)
     : QObject(mainWindow),
       mainWindow_(mainWindow),
-      projectWindow_(nullptr)
+      settingsWindow_(nullptr)
 {
-    projectWindow_ = new ProjectNavigatorWindow(mainWindow_);
+    settingsWindow_ = new SettingsWindow(mainWindow_);
 
     mainWindow_->createAction(nullptr,
                               "File",
                               "File Properties",
-                              tr("Project Navigator"),
-                              tr("Show project navigator"),
-                              ICON("blueprint"),
+                              tr("Settings"),
+                              tr("Show settings"),
+                              ICON("settings"),
                               this,
-                              SLOT(slotShowNavigator()));
+                              SLOT(slotShowSettings()));
 }
 
-void ProjectNavigatorPlugin::slotShowNavigator()
+void SettingsPlugin::slotShowSettings()
 {
-    projectWindow_->show();
-    projectWindow_->raise();
-    projectWindow_->activateWindow();
+    settingsWindow_->show();
+    settingsWindow_->raise();
+    settingsWindow_->activateWindow();
 }
