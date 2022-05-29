@@ -41,6 +41,7 @@ class PluginInterface;
 class ImportPlugin;
 class ProjectNavigatorPlugin;
 class ProjectFilePlugin;
+class SettingsPlugin;
 class ViewerPlugin;
 
 class QToolButton;
@@ -89,6 +90,8 @@ public:
     void updateEverything();
     void updateData();
     void updateFilter();
+    void updateModifiers();
+    void updateRender();
 
     Editor &editor() { return editor_; }
 
@@ -115,6 +118,7 @@ protected:
     ImportPlugin *importPlugin_;
     ProjectNavigatorPlugin *projectNavigatorPlugin_;
     ProjectFilePlugin *projectFilePlugin_;
+    SettingsPlugin *settingsPlugin_;
     ViewerPlugin *viewerPlugin_;
     std::vector<PluginInterface *> plugins_;
 

@@ -29,6 +29,7 @@ file(GLOB_RECURSE SOURCES "*.cpp")
 file(GLOB_RECURSE SOURCES_IMPORT "../plugins/import/*.cpp")
 file(GLOB_RECURSE SOURCES_PROJECT "../plugins/projectnavigator/*.cpp")
 file(GLOB_RECURSE SOURCES_PROJECT_FILE "../plugins/projectfile/*.cpp")
+file(GLOB_RECURSE SOURCES_SETTINGS "../plugins/settings/*.cpp")
 file(GLOB_RECURSE SOURCES_VIEWER "../plugins/viewer/*.cpp")
 
 add_library(
@@ -38,11 +39,13 @@ add_library(
   ${SOURCES_IMPORT}
   ${SOURCES_PROJECT}
   ${SOURCES_PROJECT_FILE}
+  ${SOURCES_SETTINGS}
   ${SOURCES_VIEWER}
   resources/resources.qrc
   ../plugins/import/resources/resources.qrc
   ../plugins/projectnavigator/resources/resources.qrc
   ../plugins/projectfile/resources/resources.qrc
+  ../plugins/settings/resources/resources.qrc
   ../plugins/viewer/resources/resources.qrc
 )
 
@@ -53,6 +56,7 @@ target_include_directories(
   ../plugins/import
   ../plugins/projectnavigator
   ../plugins/projectfile
+  ../plugins/settings
   ../plugins/viewer
 )
 
