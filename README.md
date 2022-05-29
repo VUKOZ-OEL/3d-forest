@@ -8,6 +8,10 @@ Blue Cat team and other authors
 3D Forest is released under the GPLv3 license.
 See [LICENSE](LICENSE) for more information.
 
+## Documentation
+HTML [Documentation](https://vukoz-oel.github.io/3dforest2-documentation/)
+with User Manual and Developer Guide.
+
 ## Installation Instructions
 The code uses C++17 and CMake. Qt5 and OpenGL are required for GUI.
 The build process generates the main GUI application and command line utilities.
