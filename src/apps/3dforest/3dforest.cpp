@@ -35,14 +35,14 @@ int main(int argc, char *argv[])
     app.setOrganizationName("VUKOZ v.v.i.");
     app.setApplicationName(MainWindow::APPLICATION_NAME);
     app.setApplicationVersion(MainWindow::APPLICATION_VERSION);
-    app.setWindowIcon(QIcon(":/3dforest-256.png"));
+    app.setWindowIcon(QIcon(":/3dforest_128px.png"));
 
     QSurfaceFormat format;
     format.setDepthBufferSize(24);
     QSurfaceFormat::setDefaultFormat(format);
 
     MainWindow window;
-    window.setWindowIcon(QIcon(":/3dforest-256.png"));
+    window.setWindowIcon(QIcon(":/3dforest_128px.png"));
     window.show();
 
     return app.exec();
