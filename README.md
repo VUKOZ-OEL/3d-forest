@@ -13,8 +13,8 @@ HTML [Documentation](https://vukoz-oel.github.io/3dforest2-documentation/)
 with User Manual and Developer Guide.
 
 ## Installation Instructions
-The code uses C++17 and CMake. Qt5 and OpenGL are required for GUI.
-The build process generates the main GUI application and command line utilities.
+The code uses C++17 and CMake. Qt5 or Qt6 and OpenGL are required to build desktop application.
+The build process generates desktop application with graphical user interface and command line utilities.
 See [INSTALL](INSTALL) for more information.
 
 - [Windows](https://vukoz-oel.github.io/3dforest2-documentation/developerguide_build_windows_make.html) build from source code
