@@ -22,7 +22,7 @@
 #ifndef PROJECT_NAVIGATOR_LAYERS_HPP
 #define PROJECT_NAVIGATOR_LAYERS_HPP
 
-#include <LayerList.hpp>
+#include <Layers.hpp>
 
 #include <QWidget>
 
@@ -73,7 +73,7 @@ protected:
     QToolButton *selectAllButton_;
     QToolButton *selectInvertButton_;
     QToolButton *selectNoneButton_;
-    LayerList layers_;
+    Layers layers_;
 
     void dataChanged();
     void filterChanged();
@@ -84,7 +84,7 @@ protected:
     void unblock();
     void addItem(size_t i);
 
-    void setLayers(const LayerList &layers);
+    void setLayers(const Layers &layers);
 };
 
 #endif /* PROJECT_NAVIGATOR_LAYERS_HPP */

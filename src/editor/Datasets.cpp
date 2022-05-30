@@ -17,24 +17,24 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file DatasetList.cpp */
+/** @file Datasets.cpp */
 
 #include <unordered_set>
 
-#include <DatasetList.hpp>
+#include <Datasets.hpp>
 #include <Log.hpp>
 
-DatasetList::DatasetList()
+Datasets::Datasets()
 {
     clear();
 }
 
-void DatasetList::setEnabled(size_t i, bool b)
+void Datasets::setEnabled(size_t i, bool b)
 {
     datasets_[i].setEnabled(b);
 }
 
-void DatasetList::setEnabledAll(bool b)
+void Datasets::setEnabledAll(bool b)
 {
     for (size_t i = 0; i < datasets_.size(); i++)
     {
@@ -42,7 +42,7 @@ void DatasetList::setEnabledAll(bool b)
     }
 }
 
-void DatasetList::setInvertAll()
+void Datasets::setInvertAll()
 {
     for (size_t i = 0; i < datasets_.size(); i++)
     {
@@ -51,29 +51,29 @@ void DatasetList::setInvertAll()
     }
 }
 
-void DatasetList::setLabel(size_t i, const std::string &label)
+void Datasets::setLabel(size_t i, const std::string &label)
 {
     datasets_[i].setLabel(label);
 }
 
-void DatasetList::setColor(size_t i, const Vector3<float> &color)
+void Datasets::setColor(size_t i, const Vector3<float> &color)
 {
     datasets_[i].setColor(color);
 }
 
-void DatasetList::setTranslation(size_t i, const Vector3<double> &translation)
+void Datasets::setTranslation(size_t i, const Vector3<double> &translation)
 {
     datasets_[i].setTranslation(translation);
 }
 
-void DatasetList::clear()
+void Datasets::clear()
 {
     datasets_.resize(0);
     hashTable_.clear();
     boundary_.clear();
 }
 
-void DatasetList::erase(size_t i)
+void Datasets::erase(size_t i)
 {
     if (datasets_.size() > 0)
     {
@@ -93,7 +93,7 @@ void DatasetList::erase(size_t i)
     }
 }
 
-size_t DatasetList::unusedId() const
+size_t Datasets::unusedId() const
 {
     // Return minimum available id value
     for (size_t rval = 0; rval < std::numeric_limits<size_t>::max(); rval++)
@@ -107,7 +107,7 @@ size_t DatasetList::unusedId() const
     THROW("New data set identifier is not available.");
 }
 
-void DatasetList::updateBoundary()
+void Datasets::updateBoundary()
 {
     boundary_.clear();
 
@@ -120,7 +120,7 @@ void DatasetList::updateBoundary()
     }
 }
 
-uint64_t DatasetList::nPoints() const
+uint64_t Datasets::nPoints() const
 {
     uint64_t n = 0;
 
@@ -135,8 +135,8 @@ uint64_t DatasetList::nPoints() const
     return n;
 }
 
-void DatasetList::select(std::vector<IndexFile::Selection> &selected,
-                         const Box<double> &box) const
+void Datasets::select(std::vector<IndexFile::Selection> &selected,
+                      const Box<double> &box) const
 {
     for (auto const &it : datasets_)
     {
@@ -147,10 +147,10 @@ void DatasetList::select(std::vector<IndexFile::Selection> &selected,
     }
 }
 
-void DatasetList::read(const std::string &path,
-                       const std::string &projectPath,
-                       const SettingsImport &settings,
-                       const Box<double> &projectBoundary)
+void Datasets::read(const std::string &path,
+                    const std::string &projectPath,
+                    const SettingsImport &settings,
+                    const Box<double> &projectBoundary)
 {
     Dataset ds;
     size_t id = unusedId();
@@ -163,7 +163,7 @@ void DatasetList::read(const std::string &path,
     updateBoundary();
 }
 
-void DatasetList::read(const Json &in, const std::string &projectPath)
+void Datasets::read(const Json &in, const std::string &projectPath)
 {
     size_t i;
     size_t n;
@@ -181,7 +181,7 @@ void DatasetList::read(const Json &in, const std::string &projectPath)
     }
 }
 
-Json &DatasetList::write(Json &out) const
+Json &Datasets::write(Json &out) const
 {
     size_t i = 0;
 
@@ -194,7 +194,7 @@ Json &DatasetList::write(Json &out) const
     return out;
 }
 
-std::ostream &operator<<(std::ostream &os, const DatasetList &obj)
+std::ostream &operator<<(std::ostream &os, const Datasets &obj)
 {
     Json json;
     os << obj.write(json).serialize();

@@ -17,21 +17,21 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ClassificationList.cpp */
+/** @file Classifications.cpp */
 
-#include <ClassificationList.hpp>
+#include <Classifications.hpp>
 
-ClassificationList::ClassificationList() : enabled_(false)
+Classifications::Classifications() : enabled_(false)
 {
     clear();
 }
 
-void ClassificationList::setEnabled(bool b)
+void Classifications::setEnabled(bool b)
 {
     enabled_ = b;
 }
 
-void ClassificationList::setEnabledAll(bool b)
+void Classifications::setEnabledAll(bool b)
 {
     for (size_t i = 0; i < classes_.size(); i++)
     {
@@ -39,7 +39,7 @@ void ClassificationList::setEnabledAll(bool b)
     }
 }
 
-void ClassificationList::setInvertAll()
+void Classifications::setInvertAll()
 {
     for (size_t i = 0; i < classes_.size(); i++)
     {
@@ -47,7 +47,7 @@ void ClassificationList::setInvertAll()
     }
 }
 
-void ClassificationList::clear()
+void Classifications::clear()
 {
     classes_.resize(256);
 
@@ -98,7 +98,7 @@ void ClassificationList::clear()
     }
 }
 
-void ClassificationList::read(const Json &in)
+void Classifications::read(const Json &in)
 {
     if (in.contains("enabled"))
     {
@@ -138,7 +138,7 @@ void ClassificationList::read(const Json &in)
     }
 }
 
-Json &ClassificationList::write(Json &out) const
+Json &Classifications::write(Json &out) const
 {
     out["enabled"] = enabled_;
 
