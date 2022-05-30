@@ -65,7 +65,7 @@ static void edit()
     query.selectBox(Box<double>(0., 0., 0., 1.0, 1.0, 2.));
     query.exec();
 
-    while (query.nextPoint())
+    while (query.next())
     {
         if (query.z() < zmin)
         {
