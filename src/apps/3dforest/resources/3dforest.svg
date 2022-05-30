@@ -1,228 +1,98 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="256"
-   height="256"
-   viewBox="0 0 67.733333 67.733333"
+   width="16"
+   height="16"
+   viewBox="0 0 16 16"
    version="1.1"
-   id="svg8"
-   inkscape:version="1.0.2 (e86c870879, 2021-01-15)"
+   id="svg5"
+   inkscape:version="1.2 (dc2aedaf03, 2022-05-15)"
    sodipodi:docname="3dforest.svg"
-   inkscape:export-filename="3dforest-256.png"
-   inkscape:export-xdpi="96"
-   inkscape:export-ydpi="96">
-  <title
-     id="title56">3D Forest Application Icon</title>
-  <defs
-     id="defs2" />
-  <sodipodi:namedview
-     id="base"
+   xml:space="preserve"
+   inkscape:export-filename="3dforest_128px.png"
+   inkscape:export-xdpi="768"
+   inkscape:export-ydpi="768"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"><title
+     id="title2476">3D Forest Icon</title><sodipodi:namedview
+     id="namedview7"
      pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1.0"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
      inkscape:pageopacity="0.0"
-     inkscape:pageshadow="2"
-     inkscape:zoom="2.0807086"
-     inkscape:cx="150.53172"
-     inkscape:cy="128"
+     inkscape:pagecheckerboard="false"
+     inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
-     inkscape:document-rotation="0"
-     showgrid="false"
-     inkscape:window-width="1532"
-     inkscape:window-height="1257"
-     inkscape:window-x="2428"
-     inkscape:window-y="8"
+     showgrid="true"
+     inkscape:zoom="32"
+     inkscape:cx="9.90625"
+     inkscape:cy="5.609375"
+     inkscape:window-width="1681"
+     inkscape:window-height="1032"
+     inkscape:window-x="2100"
+     inkscape:window-y="9"
      inkscape:window-maximized="0"
-     units="px"
-     width="256px" />
-  <metadata
-     id="metadata5">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title>3D Forest Application Icon</dc:title>
-        <cc:license
-           rdf:resource="www.gnu.org/licenses/gpl-3.0.html" />
-        <dc:creator>
-          <cc:Agent>
-            <dc:title>Vaclav Bubnik, Copyright 2020 VUKOZ, www.gnu.org/licenses/gpl-3.0.html</dc:title>
-          </cc:Agent>
-        </dc:creator>
-        <dc:date>2 February 2021</dc:date>
-        <dc:rights>
-          <cc:Agent>
-            <dc:title />
-          </cc:Agent>
-        </dc:rights>
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <g
-     inkscape:label="layer_main"
-     id="layer1">
-    <g
-       id="g60">
-      <path
-         style="fill:#a0c83c;fill-opacity:1;fill-rule:evenodd;stroke-width:0.0922031"
-         id="path10"
-         sodipodi:type="arc"
-         sodipodi:cx="46.566666"
-         sodipodi:cy="23.139885"
-         sodipodi:rx="17.197916"
-         sodipodi:ry="22.875301"
-         sodipodi:start="1.5707963"
-         sodipodi:end="4.712389"
-         sodipodi:open="true"
-         sodipodi:arc-type="arc"
-         inkscape:label="tree_1_right"
-         d="m 46.566666,46.015186 a 17.197916,22.875301 0 0 1 -14.893832,-11.43765 17.197916,22.875301 0 0 1 0,-22.875302 17.197916,22.875301 0 0 1 14.893832,-11.43765041" />
-      <path
-         style="fill:#82aa32;fill-opacity:1;fill-rule:evenodd;stroke-width:0.0921989;stroke-miterlimit:4;stroke-dasharray:none"
-         id="path835"
-         sodipodi:type="arc"
-         sodipodi:cx="-46.566666"
-         sodipodi:cy="-23.139885"
-         sodipodi:rx="17.197916"
-         sodipodi:ry="22.875301"
-         sodipodi:start="1.5707963"
-         sodipodi:end="4.712389"
-         sodipodi:open="true"
-         sodipodi:arc-type="arc"
-         transform="scale(-1)"
-         inkscape:label="tree_1_left"
-         d="m -46.566666,-0.26458359 a 17.197916,22.875301 0 0 1 -14.893832,-11.43765041 17.197916,22.875301 0 0 1 0,-22.875302 17.197916,22.875301 0 0 1 14.893832,-11.43765" />
-      <path
-         style="fill:#644b3c;fill-opacity:1;stroke:none;stroke-width:0.0921989;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         d="M 46.566667,17.860969 43.127083,55.5625 h 3.439584 z"
-         id="path848"
-         sodipodi:nodetypes="cccc"
-         inkscape:label="tree_1_left_trunk" />
-      <path
-         style="fill:#5a4132;fill-opacity:1;stroke:none;stroke-width:0.0921989;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         d="M 46.540208,17.860969 V 55.5625 h 3.439583 z"
-         id="path861"
-         sodipodi:nodetypes="cccc"
-         inkscape:label="tree_1_right_trunk" />
-    </g>
-    <g
-       id="g29">
-      <path
-         id="path10-2"
-         style="fill:#46aa46;fill-opacity:1;fill-rule:evenodd;stroke-width:0.0611533"
-         inkscape:label="tree_1_right"
-         d="m 15.867103,42.753193 c -3.71291,0 -7.1437797,-3.173871 -9.0002345,-8.326048 -1.8564547,-5.152176 -3.7638937,-12.6741 0,-16.652096 4.1942665,-4.43285 5.2873245,-8.3260481 9.0002345,-8.3260477"
-         sodipodi:nodetypes="cssc" />
-      <path
-         style="fill:#3c9641;fill-opacity:1;fill-rule:evenodd;stroke-width:0.0611506;stroke-miterlimit:4;stroke-dasharray:none"
-         id="path835-1"
-         sodipodi:type="arc"
-         sodipodi:cx="-15.867103"
-         sodipodi:cy="-26.101097"
-         sodipodi:rx="10.392575"
-         sodipodi:ry="16.652096"
-         sodipodi:start="1.5707963"
-         sodipodi:end="4.712389"
-         sodipodi:open="true"
-         sodipodi:arc-type="arc"
-         transform="scale(-1)"
-         inkscape:label="tree_1_left"
-         d="m -15.867103,-9.4490013 a 10.392575,16.652096 0 0 1 -9.000234,-8.3260477 10.392575,16.652096 0 0 1 0,-16.652096 10.392575,16.652096 0 0 1 9.000234,-8.326048" />
-      <path
-         style="fill:#644b3c;fill-opacity:1;stroke:none;stroke-width:0.0611506;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         d="M 15.867103,22.258307 13.788588,55.5625 h 2.078515 z"
-         id="path848-2"
-         sodipodi:nodetypes="cccc"
-         inkscape:label="tree_1_left_trunk" />
-      <path
-         style="fill:#5a4132;fill-opacity:1;stroke:none;stroke-width:0.0611506;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         d="M 15.822083,22.258307 V 55.5625 h 2.078515 z"
-         id="path861-5"
-         sodipodi:nodetypes="cccc"
-         inkscape:label="tree_1_right_trunk" />
-    </g>
-    <g
-       id="g44"
-       style="display:inline">
-      <rect
-         style="fill:#e6e600;fill-opacity:1;fill-rule:nonzero;stroke:#7f7f00;stroke-width:1.32292;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         id="rect867-2"
-         width="9.0451488"
-         height="63.5"
-         x="57.762146"
-         y="-65.616669"
-         ry="1.7979279"
-         inkscape:label="ruler_main"
-         transform="rotate(90)" />
-      <rect
-         style="fill:#7f7f00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.213598;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         id="rect885-9"
-         width="5.2916665"
-         height="2.6458333"
-         x="57.546879"
-         y="-59.031796"
-         ry="0"
-         inkscape:label="ruler_mark_1"
-         transform="rotate(90)" />
-      <rect
-         style="fill:#7f7f00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.213598;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         id="rect889-5"
-         width="5.2916665"
-         height="2.6458333"
-         x="57.546879"
-         y="-49.50679"
-         ry="0"
-         inkscape:label="ruler_mark_2"
-         transform="rotate(90)" />
-      <rect
-         style="fill:#7f7f00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.213598;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         id="rect891-2"
-         width="5.2916665"
-         height="2.6458333"
-         x="57.546879"
-         y="-39.981785"
-         ry="0"
-         inkscape:label="ruler_mark_3"
-         transform="rotate(90)" />
-      <rect
-         style="fill:#7f7f00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.213598;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         id="rect893-6"
-         width="5.2916665"
-         height="2.6458333"
-         x="57.546879"
-         y="-30.456774"
-         ry="0"
-         inkscape:label="ruler_mark_4"
-         transform="rotate(90)" />
-      <rect
-         style="fill:#7f7f00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.213598;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         id="rect895-0"
-         width="5.2916665"
-         height="2.6458333"
-         x="57.546879"
-         y="-20.931772"
-         ry="0"
-         inkscape:label="ruler_mark_5"
-         transform="rotate(90)" />
-      <rect
-         style="fill:#7f7f00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.213597;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         id="rect887-4"
-         width="5.2916665"
-         height="2.6458333"
-         x="57.546879"
-         y="-11.406764"
-         ry="0"
-         inkscape:label="ruler_mark_6"
-         transform="rotate(90)" />
-    </g>
-  </g>
-</svg>
+     inkscape:current-layer="layer1"><inkscape:grid
+       type="xygrid"
+       id="grid16"
+       originx="0.5"
+       originy="0.5"
+       empspacing="4" /></sodipodi:namedview><defs
+     id="defs2"><linearGradient
+       inkscape:collect="always"
+       id="linearGradient990"><stop
+         style="stop-color:#46aa46;stop-opacity:1;"
+         offset="0"
+         id="stop986" /><stop
+         style="stop-color:#48d648;stop-opacity:1;"
+         offset="1"
+         id="stop988" /></linearGradient><linearGradient
+       inkscape:collect="always"
+       id="linearGradient2627"><stop
+         style="stop-color:#719e08;stop-opacity:1;"
+         offset="0"
+         id="stop2623" /><stop
+         style="stop-color:#a9e619;stop-opacity:1;"
+         offset="1"
+         id="stop2625" /></linearGradient><linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient2627"
+       id="linearGradient2629"
+       x1="5.0286884"
+       y1="4.6120791"
+       x2="12.402881"
+       y2="11.174579"
+       gradientUnits="userSpaceOnUse" /><linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient990"
+       id="linearGradient992"
+       x1="0.991767"
+       y1="12.618856"
+       x2="14.417136"
+       y2="12.618856"
+       gradientUnits="userSpaceOnUse" /></defs><g
+     inkscape:label="Vector"
+     inkscape:groupmode="layer"
+     id="layer1"
+     style="display:inline"><path
+       style="display:inline;fill:url(#linearGradient992);fill-opacity:1;stroke:none;stroke-width:0.1;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:1;stroke-opacity:1;paint-order:fill markers stroke"
+       d="m 2.5773398,11.035961 c -0.1164503,0.259965 0.4016333,0.498532 0.508233,0.900563 C 2.7723279,12.239118 1.5883815,12.30036 1.5,12.5 c -0.088381,0.19964 0.8280299,0.926951 0.7458835,1.088388 -0.082146,0.161437 -0.8744099,0.273316 -1.2541165,0.613301 1.9294389,0.0085 12.50131,-0.0155 13.425369,-0.02762 -0.004,-0.277286 -11.6517573,-3.221078 -11.8397962,-3.138108 z"
+       id="Ground"
+       sodipodi:nodetypes="cczzccc"
+       inkscape:label="Ground"
+       inkscape:highlight-color="#918500" /><path
+       id="Tree"
+       style="fill:url(#linearGradient2629);fill-opacity:1;stroke:none;stroke-width:0.1;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:1;stroke-opacity:0.32342;paint-order:fill markers stroke"
+       d="m 7.9160156,1.4042969 c -0.2320894,0.066478 -3.53125,6.4003906 -3.53125,6.4003906 0,0 -0.5151466,0.6584068 -0.2734375,0.8105469 0.2417096,0.1521397 0.6171875,-0.5976563 0.6171875,-0.5976563 0,0 0.6800788,-1.0449771 1.0039063,-1.3828125 C 5.5254915,7.6286499 5.0349227,8.2343558 5.2011719,8.3183594 5.3674206,8.4023629 5.7655863,7.7892241 6.0351562,7.6992188 5.8608198,8.4584257 4.9568256,9.8451794 5.2109375,9.9726562 5.4650495,10.100133 6.3865635,8.4686707 6.6269531,8.2460938 6.6936407,8.4481225 5.89032,10.119486 5.9882812,10.195312 6.0862428,10.271141 6.7128906,9.6953125 6.7128906,9.6953125 l -0.1835937,1.8535155 2.6054687,0.646484 0.027344,-1.203124 c 0,0 2.6337104,0.513993 3.0644524,0.05469 0.04862,-0.281889 0.148814,-0.928494 -0.08203,-1.3144531 0.233162,-0.3108976 0.473306,-0.2694938 0.625,-0.6875 0.151693,-0.4180062 -0.594858,-1.3279758 -0.912109,-1.7519531 0.02393,-0.3284463 -0.02149,-1.2421876 -0.02148,-1.2421876 0,0 -3.6423902,-4.6518095 -3.9140628,-4.6464843 -0.00144,-2.6e-4 -0.00403,-5.235e-4 -0.00586,0 z m 0.2851563,1.6523437 c 0,0 0.7607018,0.5355614 1.40625,1.3925782 0.00412,0.3588877 0,0.5312499 0,0.53125 0,0 -0.8914117,0.8380806 -1.3515625,-0.3808594 -0.030259,-0.427393 -0.054688,-1.5429688 -0.054687,-1.5429688 z m 1.8906251,2.296875 c 0.424792,0.087374 0.610076,0.887104 0.607422,1.2304688 C 10.47007,6.9052521 10.28749,6.9445092 10.140625,7.0957031 9.7617416,7.1253636 8.9733932,7.3711258 8.6933594,7.5136719 8.5238104,6.8938706 8.4960937,5.6875 8.4960938,5.6875 c 0,0 1.2261523,-0.2887758 1.5957032,-0.3339844 z m 0.05469,2.0664063 c 0.05619,-1.709e-4 0.109233,0.00344 0.15625,0.00977 0.418659,0.095052 0.911974,0.384126 0.994141,0.5527344 C 11.147023,9.6094348 8.9824219,9.484375 8.9824219,9.484375 L 8.6953125,7.7011719 c 0,0 0.8468477,-0.259752 1.3945315,-0.2792969 0.01956,-6.98e-4 0.03791,-0.0019 0.05664,-0.00195 z m 0.503907,2.4472656 c 0.231774,-0.00296 0.435938,-0.00353 0.564453,0 0.287564,0.2019485 0.193218,0.5462875 -0.105469,0.7734375 -0.773774,6.55e-4 -2.1152344,-0.226563 -2.1152344,-0.226563 L 9,9.9042969 c 0,0 0.9550672,-0.02822 1.650391,-0.037109 z"
+       inkscape:label="Tree"
+       inkscape:highlight-color="#3bed00" /></g><metadata
+     id="metadata2474"><rdf:RDF><cc:Work
+         rdf:about=""><dc:title>3D Forest Icon</dc:title><dc:creator><cc:Agent><dc:title>Vaclav Bubnik, Copyright 2020 VUKOZ, www.gnu.org/licenses/gpl-3.0.html</dc:title></cc:Agent></dc:creator><dc:date>30 May 2022</dc:date></cc:Work></rdf:RDF></metadata></svg>
