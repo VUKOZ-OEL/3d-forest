@@ -70,7 +70,7 @@ public:
         return selectedPages_;
     }
 
-    bool nextPoint()
+    bool next()
     {
         if (pagePointIndex_ == pagePointIndexMax_)
         {
@@ -82,7 +82,7 @@ public:
         return true;
     }
 
-    /** @name Point data available after nextPoint() */
+    /** @name Point data available after next() */
     /**@{*/
     double &x() { return position_[3 * selection_[pagePointIndex_] + 0]; }
     double &y() { return position_[3 * selection_[pagePointIndex_] + 1]; }

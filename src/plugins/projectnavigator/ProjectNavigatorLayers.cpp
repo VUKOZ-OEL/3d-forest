@@ -343,7 +343,7 @@ void ProjectNavigatorLayers::addItem(size_t i)
     item->setBackground(COLUMN_ID, brush);
 }
 
-void ProjectNavigatorLayers::setLayers(const LayerList &layers)
+void ProjectNavigatorLayers::setLayers(const Layers &layers)
 {
     block();
 

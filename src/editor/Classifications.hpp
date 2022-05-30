@@ -17,10 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ClassificationList.hpp */
+/** @file Classifications.hpp */
 
-#ifndef CLASSIFICATION_LIST_HPP
-#define CLASSIFICATION_LIST_HPP
+#ifndef CLASSIFICATIONS_HPP
+#define CLASSIFICATIONS_HPP
 
 #include <string>
 #include <unordered_set>
@@ -30,10 +30,10 @@
 #include <Vector3.hpp>
 
 /** Classification List. */
-class ClassificationList
+class Classifications
 {
 public:
-    ClassificationList();
+    Classifications();
 
     void clear();
 
@@ -58,7 +58,7 @@ protected:
     bool enabled_;
 };
 
-inline std::unordered_set<size_t> ClassificationList::enabledList() const
+inline std::unordered_set<size_t> Classifications::enabledList() const
 {
     std::unordered_set<size_t> list;
 
@@ -73,4 +73,4 @@ inline std::unordered_set<size_t> ClassificationList::enabledList() const
     return list;
 }
 
-#endif /* CLASSIFICATION_LIST_HPP */
+#endif /* CLASSIFICATIONS_HPP */

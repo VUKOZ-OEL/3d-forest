@@ -181,7 +181,7 @@ void ClassifyGroundWindow::slotApply()
 
         // Find local minimum.
         zMinCell = zMax;
-        while (query.nextPoint())
+        while (query.next())
         {
             if (query.z() < zMinCell)
             {
@@ -193,7 +193,7 @@ void ClassifyGroundWindow::slotApply()
         // Set classification to 'ground' or 'unassigned'.
         nPointsGroundGrid = 0;
         query.reset();
-        while (query.nextPoint())
+        while (query.next())
         {
             if (query.z() > zMaxGround)
             {
@@ -212,7 +212,7 @@ void ClassifyGroundWindow::slotApply()
 
                 queryPoint.exec();
 
-                if (queryPoint.nextPoint())
+                if (queryPoint.next())
                 {
                     // unassigned (has some points below, inside the cone)
                     query.classification() = LasFile::CLASS_UNASSIGNED;

@@ -345,7 +345,7 @@ void ProjectNavigatorFiles::addItem(size_t i)
     item->setBackground(COLUMN_ID, brush);
 }
 
-void ProjectNavigatorFiles::setDatasets(const DatasetList &datasets)
+void ProjectNavigatorFiles::setDatasets(const Datasets &datasets)
 {
     block();
 

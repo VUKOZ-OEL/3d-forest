@@ -17,20 +17,20 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file DatasetList.hpp */
+/** @file Datasets.hpp */
 
-#ifndef DATASET_LIST_HPP
-#define DATASET_LIST_HPP
+#ifndef DATASETS_HPP
+#define DATASETS_HPP
 
 #include <unordered_map>
 
 #include <Dataset.hpp>
 
 /** Dataset List. */
-class DatasetList
+class Datasets
 {
 public:
-    DatasetList();
+    Datasets();
 
     void clear();
 
@@ -109,6 +109,6 @@ protected:
     Box<double> boundary_;
 };
 
-std::ostream &operator<<(std::ostream &os, const DatasetList &obj);
+std::ostream &operator<<(std::ostream &os, const Datasets &obj);
 
-#endif /* DATASET_LIST_HPP */
+#endif /* DATASETS_HPP */

@@ -17,23 +17,23 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file LayerList.cpp */
+/** @file Layers.cpp */
 
-#include <LayerList.hpp>
+#include <Layers.hpp>
 
-LayerList::LayerList() : enabled_(false)
+Layers::Layers() : enabled_(false)
 {
     setDefault();
 }
 
-void LayerList::clear()
+void Layers::clear()
 {
     layers_.clear();
     hashTableId_.clear();
     hashTableEnabledId_.clear();
 }
 
-void LayerList::setDefault()
+void Layers::setDefault()
 {
     size_t id = 0;
     size_t idx = 0;
@@ -48,12 +48,12 @@ void LayerList::setDefault()
     hashTableEnabledId_.insert(id);
 }
 
-void LayerList::setEnabled(bool b)
+void Layers::setEnabled(bool b)
 {
     enabled_ = b;
 }
 
-void LayerList::push_back(const Layer &layer)
+void Layers::push_back(const Layer &layer)
 {
     size_t id = layer.id();
     size_t idx = layers_.size();
@@ -68,7 +68,7 @@ void LayerList::push_back(const Layer &layer)
     }
 }
 
-void LayerList::erase(size_t i)
+void Layers::erase(size_t i)
 {
     if (layers_.size() == 0)
     {
@@ -88,7 +88,7 @@ void LayerList::erase(size_t i)
     layers_.resize(n);
 }
 
-size_t LayerList::unusedId() const
+size_t Layers::unusedId() const
 {
     // Return minimum available id value
     for (size_t rval = 0; rval < std::numeric_limits<size_t>::max(); rval++)
@@ -102,7 +102,7 @@ size_t LayerList::unusedId() const
     THROW("New layer identifier is not available.");
 }
 
-void LayerList::setEnabled(size_t i, bool b)
+void Layers::setEnabled(size_t i, bool b)
 {
     layers_[i].setEnabled(b);
 
@@ -116,7 +116,7 @@ void LayerList::setEnabled(size_t i, bool b)
     }
 }
 
-void LayerList::setEnabledAll(bool b)
+void Layers::setEnabledAll(bool b)
 {
     for (size_t i = 0; i < layers_.size(); i++)
     {
@@ -133,7 +133,7 @@ void LayerList::setEnabledAll(bool b)
     }
 }
 
-void LayerList::setInvertAll()
+void Layers::setInvertAll()
 {
     hashTableEnabledId_.clear();
     for (size_t i = 0; i < layers_.size(); i++)
@@ -147,17 +147,17 @@ void LayerList::setInvertAll()
     }
 }
 
-void LayerList::setLabel(size_t i, const std::string &label)
+void Layers::setLabel(size_t i, const std::string &label)
 {
     layers_[i].setLabel(label);
 }
 
-void LayerList::setColor(size_t i, const Vector3<float> &color)
+void Layers::setColor(size_t i, const Vector3<float> &color)
 {
     layers_[i].setColor(color);
 }
 
-void LayerList::read(const Json &in)
+void Layers::read(const Json &in)
 {
     clear();
 
@@ -201,7 +201,7 @@ void LayerList::read(const Json &in)
     }
 }
 
-Json &LayerList::write(Json &out) const
+Json &Layers::write(Json &out) const
 {
     out["enabled"] = enabled_;
 

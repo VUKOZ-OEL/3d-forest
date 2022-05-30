@@ -17,10 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file LayerList.hpp */
+/** @file Layers.hpp */
 
-#ifndef LAYER_LIST_HPP
-#define LAYER_LIST_HPP
+#ifndef LAYERS_HPP
+#define LAYERS_HPP
 
 #include <unordered_map>
 #include <unordered_set>
@@ -28,10 +28,10 @@
 #include <Layer.hpp>
 
 /** Layer List. */
-class LayerList
+class Layers
 {
 public:
-    LayerList();
+    Layers();
 
     void clear();
     void setDefault();
@@ -87,4 +87,4 @@ protected:
     bool enabled_;
 };
 
-#endif /* LAYER_LIST_HPP */
+#endif /* LAYERS_HPP */

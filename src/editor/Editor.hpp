@@ -24,9 +24,9 @@
 
 #include <mutex>
 
-#include <ClassificationList.hpp>
-#include <DatasetList.hpp>
-#include <LayerList.hpp>
+#include <Classifications.hpp>
+#include <Datasets.hpp>
+#include <Layers.hpp>
 #include <ModifierInterface.hpp>
 #include <Region.hpp>
 #include <Settings.hpp>
@@ -49,11 +49,8 @@ public:
     void close();
 
     // Classifications
-    const ClassificationList &classifications() const
-    {
-        return classifications_;
-    }
-    void setClassifications(const ClassificationList &classifications);
+    const Classifications &classifications() const { return classifications_; }
+    void setClassifications(const Classifications &classifications);
 
     // Clip filter
     const Region &clipFilter() const { return clipFilter_; }
@@ -64,12 +61,12 @@ public:
     const Box<double> &boundary() const { return datasets_.boundary(); }
 
     // Data sets
-    const DatasetList &datasets() const { return datasets_; }
-    void setDatasets(const DatasetList &datasets);
+    const Datasets &datasets() const { return datasets_; }
+    void setDatasets(const Datasets &datasets);
 
     // Layers
-    const LayerList &layers() const { return layers_; }
-    void setLayers(const LayerList &layers);
+    const Layers &layers() const { return layers_; }
+    void setLayers(const Layers &layers);
 
     // Settings
     const Settings &settings() const { return settings_; }
@@ -96,10 +93,10 @@ protected:
     std::string projectName_;
     bool unsavedChanges_;
 
-    DatasetList datasets_;
-    LayerList layers_;
+    Datasets datasets_;
+    Layers layers_;
     Settings settings_;
-    ClassificationList classifications_;
+    Classifications classifications_;
 
     Region clipFilter_;
 

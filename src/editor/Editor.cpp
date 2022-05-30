@@ -183,7 +183,7 @@ void Editor::openDataset(const std::string &path,
     unsavedChanges_ = true;
 }
 
-void Editor::setClassifications(const ClassificationList &classifications)
+void Editor::setClassifications(const Classifications &classifications)
 {
     classifications_ = classifications;
 
@@ -234,13 +234,13 @@ void Editor::updateAfterRead()
     clipFilter_.boxView = clipFilter_.box;
 }
 
-void Editor::setDatasets(const DatasetList &datasets)
+void Editor::setDatasets(const Datasets &datasets)
 {
     datasets_ = datasets;
     unsavedChanges_ = true;
 }
 
-void Editor::setLayers(const LayerList &layers)
+void Editor::setLayers(const Layers &layers)
 {
     layers_ = layers;
 

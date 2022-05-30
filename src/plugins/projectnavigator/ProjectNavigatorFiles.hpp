@@ -22,7 +22,7 @@
 #ifndef PROJECT_NAVIGATOR_FILES_HPP
 #define PROJECT_NAVIGATOR_FILES_HPP
 
-#include <DatasetList.hpp>
+#include <Datasets.hpp>
 
 #include <QWidget>
 
@@ -74,7 +74,7 @@ protected:
     QToolButton *selectAllButton_;
     QToolButton *selectInvertButton_;
     QToolButton *selectNoneButton_;
-    DatasetList datasets_;
+    Datasets datasets_;
 
     void dataChanged();
     void filterChanged();
@@ -85,7 +85,7 @@ protected:
     void unblock();
     void addItem(size_t i);
 
-    void setDatasets(const DatasetList &datasets);
+    void setDatasets(const Datasets &datasets);
 };
 
 #endif /* PROJECT_NAVIGATOR_FILES_HPP */
