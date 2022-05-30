@@ -80,7 +80,7 @@ PROJECT_NUMBER         =
 #
 # newflag
 
-PROJECT_LOGO           = ../src/apps/3dforest/resources/3dforest-48.png
+PROJECT_LOGO           = ../src/apps/3dforest/resources/3dforest_48px.png
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) path
 # into which the generated documentation will be written. If a relative path is
