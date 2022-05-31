@@ -60,8 +60,10 @@ MainWindow::MainWindow(QWidget *parent)
     // Menu
     projectFilePlugin_ = new ProjectFilePlugin(this);
     importPlugin_ = new ImportPlugin(this);
-    projectNavigatorPlugin_ = new ProjectNavigatorPlugin(this);
-    settingsPlugin_ = new SettingsPlugin(this);
+    projectNavigatorPlugin_ = new ProjectNavigatorPlugin();
+    projectNavigatorPlugin_->initialize(this);
+    settingsPlugin_ = new SettingsPlugin();
+    settingsPlugin_->initialize(this);
     viewerPlugin_ = new ViewerPlugin(this);
     loadPlugins();
     helpPlugin_ = new HelpPlugin(this);
@@ -76,6 +78,10 @@ MainWindow::MainWindow(QWidget *parent)
                  this,
                  SLOT(close()));
     actionExit_->setShortcuts(QKeySequence::Quit);
+
+    // Show windows
+    projectNavigatorPlugin_->slotPlugin();
+    settingsPlugin_->slotPlugin();
 
     // Rendering
     connect(viewerPlugin_->viewports(),
