@@ -26,12 +26,15 @@
 
 #define ICON(name) (IconTheme(":/projectnavigator/", name))
 
-ProjectNavigatorPlugin::ProjectNavigatorPlugin(MainWindow *mainWindow)
-    : QObject(mainWindow),
-      mainWindow_(mainWindow),
+ProjectNavigatorPlugin::ProjectNavigatorPlugin()
+    : mainWindow_(nullptr),
       projectWindow_(nullptr)
 {
-    projectWindow_ = new ProjectNavigatorWindow(mainWindow_);
+}
+
+void ProjectNavigatorPlugin::initialize(MainWindow *mainWindow)
+{
+    mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
                               "File",
@@ -40,11 +43,21 @@ ProjectNavigatorPlugin::ProjectNavigatorPlugin(MainWindow *mainWindow)
                               tr("Show project navigator"),
                               ICON("blueprint"),
                               this,
-                              SLOT(slotShowNavigator()));
+                              SLOT(slotPlugin()));
 }
 
-void ProjectNavigatorPlugin::slotShowNavigator()
+void ProjectNavigatorPlugin::slotPlugin()
 {
+    if (!mainWindow_)
+    {
+        return;
+    }
+
+    if (!projectWindow_)
+    {
+        projectWindow_ = new ProjectNavigatorWindow(mainWindow_);
+    }
+
     projectWindow_->show();
     projectWindow_->raise();
     projectWindow_->activateWindow();

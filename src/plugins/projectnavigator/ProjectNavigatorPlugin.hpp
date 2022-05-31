@@ -33,10 +33,12 @@ class ProjectNavigatorPlugin : public QObject
     Q_OBJECT
 
 public:
-    ProjectNavigatorPlugin(MainWindow *mainWindow);
+    ProjectNavigatorPlugin();
+
+    void initialize(MainWindow *mainWindow);
 
 public slots:
-    void slotShowNavigator();
+    void slotPlugin();
 
 protected:
     MainWindow *mainWindow_;
