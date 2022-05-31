@@ -34,7 +34,9 @@ class ProjectFilePlugin : public QObject
     Q_OBJECT
 
 public:
-    explicit ProjectFilePlugin(MainWindow *mainWindow);
+    ProjectFilePlugin();
+
+    void initialize(MainWindow *mainWindow);
 
     bool projectClose();
 

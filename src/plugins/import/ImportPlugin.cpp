@@ -35,10 +35,14 @@
 #define IMPORT_PLUGIN_FILTER "LAS (LASer) File (*.las)"
 #define ICON(name) (IconTheme(":/import/", name))
 
-ImportPlugin::ImportPlugin(MainWindow *mainWindow)
-    : QObject(mainWindow),
-      mainWindow_(mainWindow)
+ImportPlugin::ImportPlugin() : mainWindow_(nullptr)
 {
+}
+
+void ImportPlugin::initialize(MainWindow *mainWindow)
+{
+    mainWindow_ = mainWindow;
+
     mainWindow_->createAction(&actionImport_,
                               "File",
                               "File Import/Export",

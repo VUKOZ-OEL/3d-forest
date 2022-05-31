@@ -58,15 +58,25 @@ MainWindow::MainWindow(QWidget *parent)
     statusBar()->showMessage(tr("Ready"));
 
     // Menu
-    projectFilePlugin_ = new ProjectFilePlugin(this);
-    importPlugin_ = new ImportPlugin(this);
+    projectFilePlugin_ = new ProjectFilePlugin();
+    projectFilePlugin_->initialize(this);
+
+    importPlugin_ = new ImportPlugin();
+    importPlugin_->initialize(this);
+
     projectNavigatorPlugin_ = new ProjectNavigatorPlugin();
     projectNavigatorPlugin_->initialize(this);
+
     settingsPlugin_ = new SettingsPlugin();
     settingsPlugin_->initialize(this);
-    viewerPlugin_ = new ViewerPlugin(this);
+
+    viewerPlugin_ = new ViewerPlugin();
+    viewerPlugin_->initialize(this);
+
     loadPlugins();
-    helpPlugin_ = new HelpPlugin(this);
+
+    helpPlugin_ = new HelpPlugin();
+    helpPlugin_->initialize(this);
 
     // Exit
     createAction(&actionExit_,

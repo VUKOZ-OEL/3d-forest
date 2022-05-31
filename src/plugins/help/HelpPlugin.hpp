@@ -33,7 +33,9 @@ class HelpPlugin : public QObject
     Q_OBJECT
 
 public:
-    HelpPlugin(MainWindow *mainWindow);
+    HelpPlugin();
+
+    void initialize(MainWindow *mainWindow);
 
 public slots:
     void slotAbout();

@@ -27,10 +27,14 @@
 
 #define ICON(name) (IconTheme(":/help/", name))
 
-HelpPlugin::HelpPlugin(MainWindow *mainWindow)
-    : QObject(mainWindow),
-      mainWindow_(mainWindow)
+HelpPlugin::HelpPlugin() : mainWindow_(nullptr)
 {
+}
+
+void HelpPlugin::initialize(MainWindow *mainWindow)
+{
+    mainWindow_ = mainWindow;
+
     mainWindow_->createAction(&aboutAction_,
                               "Help",
                               "",
