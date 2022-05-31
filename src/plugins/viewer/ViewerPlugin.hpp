@@ -35,7 +35,9 @@ class ViewerPlugin : public QObject
     Q_OBJECT
 
 public:
-    ViewerPlugin(MainWindow *mainWindow);
+    ViewerPlugin();
+
+    void initialize(MainWindow *mainWindow);
 
     ViewerViewports *viewports() { return viewports_; }
 

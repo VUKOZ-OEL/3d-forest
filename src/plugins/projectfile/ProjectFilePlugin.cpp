@@ -31,10 +31,14 @@
 #define PROJECT_FILE_PLUGIN_FILTER_PRJ "3DForest Project (*.json)"
 #define ICON(name) (IconTheme(":/projectfile/", name))
 
-ProjectFilePlugin::ProjectFilePlugin(MainWindow *mainWindow)
-    : QObject(mainWindow),
-      mainWindow_(mainWindow)
+ProjectFilePlugin::ProjectFilePlugin() : mainWindow_(nullptr)
 {
+}
+
+void ProjectFilePlugin::initialize(MainWindow *mainWindow)
+{
+    mainWindow_ = mainWindow;
+
     mainWindow_->createAction(&actionProjectNew_,
                               "File",
                               "File Project",

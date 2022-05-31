@@ -28,10 +28,14 @@
 
 #define ICON(name) (IconTheme(":/viewer/", name))
 
-ViewerPlugin::ViewerPlugin(MainWindow *mainWindow)
-    : QObject(mainWindow),
-      mainWindow_(mainWindow)
+ViewerPlugin::ViewerPlugin() : mainWindow_(nullptr)
 {
+}
+
+void ViewerPlugin::initialize(MainWindow *mainWindow)
+{
+    mainWindow_ = mainWindow;
+
     viewports_ = new ViewerViewports(mainWindow_);
     mainWindow_->setCentralWidget(viewports_);
 

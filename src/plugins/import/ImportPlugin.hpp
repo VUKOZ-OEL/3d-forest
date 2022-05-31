@@ -33,7 +33,9 @@ class ImportPlugin : public QObject
     Q_OBJECT
 
 public:
-    ImportPlugin(MainWindow *mainWindow);
+    ImportPlugin();
+
+    void initialize(MainWindow *mainWindow);
 
     static void import(MainWindow *mainWindow);
 
