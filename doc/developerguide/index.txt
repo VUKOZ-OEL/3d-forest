@@ -377,7 +377,8 @@ There are several ways to add new functionality:
         @endverbatim
     -#  Create instance in "src/gui/MainWindow.cpp" constructor.
         @verbatim
-        myPlugin_ = new MyPlugin(this);
+        myPlugin_ = new MyPlugin();
+        myPlugin_->initialize(this);
         @endverbatim
     -#  Internal plugins will be visible from application main window.
 
