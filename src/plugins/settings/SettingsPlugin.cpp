@@ -26,12 +26,15 @@
 
 #define ICON(name) (IconTheme(":/settings/", name))
 
-SettingsPlugin::SettingsPlugin(MainWindow *mainWindow)
-    : QObject(mainWindow),
-      mainWindow_(mainWindow),
+SettingsPlugin::SettingsPlugin()
+    : mainWindow_(nullptr),
       settingsWindow_(nullptr)
 {
-    settingsWindow_ = new SettingsWindow(mainWindow_);
+}
+
+void SettingsPlugin::initialize(MainWindow *mainWindow)
+{
+    mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
                               "File",
@@ -40,11 +43,21 @@ SettingsPlugin::SettingsPlugin(MainWindow *mainWindow)
                               tr("Show settings"),
                               ICON("settings"),
                               this,
-                              SLOT(slotShowSettings()));
+                              SLOT(slotPlugin()));
 }
 
-void SettingsPlugin::slotShowSettings()
+void SettingsPlugin::slotPlugin()
 {
+    if (!mainWindow_)
+    {
+        return;
+    }
+
+    if (!settingsWindow_)
+    {
+        settingsWindow_ = new SettingsWindow(mainWindow_);
+    }
+
     settingsWindow_->show();
     settingsWindow_->raise();
     settingsWindow_->activateWindow();

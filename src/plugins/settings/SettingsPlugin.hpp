@@ -33,10 +33,12 @@ class SettingsPlugin : public QObject
     Q_OBJECT
 
 public:
-    SettingsPlugin(MainWindow *mainWindow);
+    SettingsPlugin();
+
+    void initialize(MainWindow *mainWindow);
 
 public slots:
-    void slotShowSettings();
+    void slotPlugin();
 
 protected:
     MainWindow *mainWindow_;
