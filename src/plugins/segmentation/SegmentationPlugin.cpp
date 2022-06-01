@@ -19,11 +19,10 @@
 
 /** @file SegmentationPlugin.cpp */
 
-#include <Segmentation.hpp>
-
 #include <IconTheme.hpp>
 #include <MainWindow.hpp>
 #include <SegmentationPlugin.hpp>
+#include <SegmentationWindow.hpp>
 
 #define ICON(name) (IconTheme(":/segmentation/", name))
 
@@ -49,4 +48,17 @@ void SegmentationPlugin::initialize(MainWindow *mainWindow)
 
 void SegmentationPlugin::slotPlugin()
 {
+    if (!mainWindow_)
+    {
+        return;
+    }
+
+    if (!dockWindow_)
+    {
+        dockWindow_ = new SegmentationWindow(mainWindow_);
+    }
+
+    dockWindow_->show();
+    dockWindow_->raise();
+    dockWindow_->activateWindow();
 }
