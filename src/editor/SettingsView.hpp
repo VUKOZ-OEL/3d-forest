@@ -25,8 +25,8 @@
 #include <string>
 #include <vector>
 
-#include <Vector3.hpp>
 #include <ExportEditor.hpp>
+#include <Vector3.hpp>
 
 /** Settings View. */
 class EXPORT_EDITOR SettingsView

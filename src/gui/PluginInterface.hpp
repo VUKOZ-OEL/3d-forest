@@ -27,10 +27,10 @@
 #include <QtPlugin>
 
 #if QT_VERSION_MAJOR == 5
-// Fix for qt5 which has two QAction classes
-#include <QtWidgets/QAction>
+    // Fix for qt5 which has two QAction classes
+    #include <QtWidgets/QAction>
 #else
-#include <QAction>
+    #include <QAction>
 #endif
 
 class MainWindow;

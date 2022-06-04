@@ -23,8 +23,8 @@
 #define RENDER_THREAD_HPP
 
 #include <Camera.hpp>
-#include <Thread.hpp>
 #include <ExportEditor.hpp>
+#include <Thread.hpp>
 
 class Editor;
 

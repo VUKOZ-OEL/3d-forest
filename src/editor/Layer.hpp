@@ -22,9 +22,9 @@
 #ifndef LAYER_HPP
 #define LAYER_HPP
 
+#include <ExportEditor.hpp>
 #include <Json.hpp>
 #include <Vector3.hpp>
-#include <ExportEditor.hpp>
 
 /** Layer. */
 class EXPORT_EDITOR Layer

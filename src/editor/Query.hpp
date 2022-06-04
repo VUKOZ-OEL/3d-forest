@@ -26,9 +26,9 @@
 
 #include <Camera.hpp>
 #include <Cone.hpp>
+#include <ExportEditor.hpp>
 #include <Page.hpp>
 #include <Sphere.hpp>
-#include <ExportEditor.hpp>
 
 class Editor;
 

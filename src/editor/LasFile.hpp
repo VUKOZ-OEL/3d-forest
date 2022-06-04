@@ -22,9 +22,9 @@
 #ifndef LAS_FILE_HPP
 #define LAS_FILE_HPP
 
+#include <ExportEditor.hpp>
 #include <File.hpp>
 #include <Json.hpp>
-#include <ExportEditor.hpp>
 
 /** LAS (LASer) File Format. */
 class EXPORT_EDITOR LasFile

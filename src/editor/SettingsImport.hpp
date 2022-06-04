@@ -22,8 +22,8 @@
 #ifndef SETTINGS_IMPORT_HPP
 #define SETTINGS_IMPORT_HPP
 
-#include <IndexFileBuilder.hpp>
 #include <ExportEditor.hpp>
+#include <IndexFileBuilder.hpp>
 
 /** Settings Import. */
 class EXPORT_EDITOR SettingsImport

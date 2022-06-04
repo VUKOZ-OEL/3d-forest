@@ -25,6 +25,7 @@ using APIs in 3D Forest and other libraries.
 - @subpage developerguide_git
 - @subpage developerguide_build_linux_make
 - @subpage developerguide_build_windows_make
+- @subpage developerguide_build_windows_visual_studio
 - @subpage developerguide_add_new_functionality
 - @subpage developerguide_code
 - @subpage developerguide_doxygen
@@ -181,7 +182,7 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
     - Open "Git for windows" https://git-scm.com/downloads
     - Download installer Git-2.36.1-64-bit.exe
     - Run the installer
-    - Choose all the options as default recommanded values with the following suggestions:
+    - Choose all the options as default recommended values with the following suggestions:
         - You may prefer to choose default editor used by Git to "Notepad".
         - You may choose default branch name as "main".
         - Choose "Checkout as-is, commit as-is" eg. do not convert CRLF/LF
@@ -335,6 +336,104 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
         > mingw32-make install
       @endverbatim
     - Run 3dforest.exe from directory "Documents\3dforest2\bin"
+
+*******************************************************************************/
+
+/** @page developerguide_build_windows_visual_studio Build with Visual Studio for Windows
+
+The code uses C++17, CMake, Qt5/Qt6 and OpenGL which will be installed in the
+following steps. Qt and OpenGL are required only for GUI desktop application.
+
+@section sec_git Install git
+    - Open "Git for windows" https://git-scm.com/downloads
+    - Download installer Git-2.36.1-64-bit.exe
+    - Run the installer
+    - Choose all the options as default recommended values with the following suggestions:
+        - You may prefer to choose default editor used by Git to "Notepad".
+        - You may choose default branch name as "main".
+        - Choose "Checkout as-is, commit as-is" eg. do not convert CRLF/LF
+          (autocrlf = false in global config). This project uses LF line endings.
+          Windows can handle LF just fine at least since version 10.
+    - Git installer creates global config in
+      "C:/Users/user/AppData/Local/Programs/Git/etc/gitconfig".
+      @verbatim
+        [diff "astextplain"]
+            textconv = astextplain
+        [filter "lfs"]
+            clean = git-lfs clean -- %f
+            smudge = git-lfs smudge -- %f
+            process = git-lfs filter-process
+            required = true
+        [http]
+            sslBackend = openssl
+            sslCAInfo = C:/Users/user/AppData/Local/Programs/Git/mingw64/ssl/certs/ca-bundle.crt
+        [core]
+            autocrlf = false
+            fscache = true
+            symlinks = false
+            editor = notepad
+        [pull]
+            rebase = false
+        [credential]
+            helper = manager-core
+        [credential "https://dev.azure.com"]
+            useHttpPath = true
+        [init]
+            defaultBranch = main
+      @endverbatim
+    - For development, setup your git user as follows:
+        - This creates configuration file in "C:\Users\user\.gitconfig":
+          @verbatim
+          $ git config --global user.name "Vaclav Bubnik"
+          $ git config --global user.email "vaclav@email.com"
+          @endverbatim
+        - This creates configuration file in "C:\Users\user\.gitconfig":
+          @verbatim
+            [user]
+                email = vaclav@email.com
+                name = Vaclav Bubnik
+          @endverbatim
+
+@section sec_vs Install Visual Studio 
+    - Open https://visualstudio.microsoft.com/downloads/
+    - Click "Free download" in Visual Studio 2022 Cummunity 
+    - Run VisualStudioSetup.exe
+    - Select "Desktop development with C++", Total size is 8 GB
+
+@section sec_qt Install Qt
+    - Download Qt installer from https://www.qt.io/download
+        - Click "Downloads for open source users" button in "Go open source"
+        - Click "Download the Qt Online Installer" button in bottom section
+          of the page "Looking for Qt binaries"
+        - Recommended download was "Qt Online Installer for Windows"
+        - Click "Download" button to save file "qt-unified-windows-x86-4.3.0-1-online.exe"
+    - Run the installer
+        - Run "qt-unified-windows-x86-4.3.0-1-online.exe", it shows "Qt Setup" window
+        - Enter your Qt Account Email and Password, "Next"
+        - Check "I have read" and "I am an individual person", "Next", "Next"
+        - "Preparing meta information download..." may take few minutes
+        - It is suggested to keep default installation directory "C:\Qt"
+        - Select "Custom installation", "Next"
+        - Qt 6 2022
+            - Unroll Qt tree item and check "Qt 6.3.0" or make your custom
+              installation since doing this may install 31GB of useless stuff.
+            - For example, check only the following for 13GB installation:
+                - MSVC
+                - Sources
+                - Qt 5 Compatibility Module
+                - Additional Libraries
+                - Qt Debug Information Files
+        - "Next", "Install", the installation takes between 10 to 30 minutes
+        - Click "Finish"
+    - Run "systempropertiesadvanced" from the search box
+    - Click "Environment Variables"
+    - In "System variables" select Variable "Path" and click "Edit..."
+    - Click "New" and add "C:\Qt\6.3.0\msvc2019_64\bin"
+
+@section sec_build Build 3D Forest
+    - Open directory "3dforest2" in Visual Studio. This will automatically 
+      create Visual Studio solution from CMake files.
+    - Click "Build All"
 
 *******************************************************************************/
 

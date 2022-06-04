@@ -23,19 +23,19 @@
 #define MAIN_WINDOW_HPP
 
 #include <Editor.hpp>
+#include <ExportGui.hpp>
 #include <RenderThread.hpp>
 #include <ThreadCallbackInterface.hpp>
-#include <ExportGui.hpp>
 
 #include <QHash>
 #include <QIcon>
 #include <QMainWindow>
 
 #if QT_VERSION_MAJOR == 5
-// Fix for qt5 which has two QAction classes
-#include <QtWidgets/QAction>
+    // Fix for qt5 which has two QAction classes
+    #include <QtWidgets/QAction>
 #else
-#include <QAction>
+    #include <QAction>
 #endif
 
 class PluginInterface;

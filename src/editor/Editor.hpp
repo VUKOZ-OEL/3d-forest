@@ -26,12 +26,12 @@
 
 #include <Classifications.hpp>
 #include <Datasets.hpp>
+#include <ExportEditor.hpp>
 #include <Layers.hpp>
 #include <ModifierInterface.hpp>
 #include <Region.hpp>
 #include <Settings.hpp>
 #include <Viewports.hpp>
-#include <ExportEditor.hpp>
 
 /** Editor. */
 class EXPORT_EDITOR Editor

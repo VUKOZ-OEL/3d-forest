@@ -25,8 +25,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include <Layer.hpp>
 #include <ExportEditor.hpp>
+#include <Layer.hpp>
 
 /** Layer List. */
 class EXPORT_EDITOR Layers

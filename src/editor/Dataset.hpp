@@ -23,10 +23,10 @@
 #define DATASET_HPP
 
 #include <Box.hpp>
+#include <ExportEditor.hpp>
 #include <IndexFile.hpp>
 #include <Json.hpp>
 #include <SettingsImport.hpp>
-#include <ExportEditor.hpp>
 
 /** Dataset. */
 class EXPORT_EDITOR Dataset

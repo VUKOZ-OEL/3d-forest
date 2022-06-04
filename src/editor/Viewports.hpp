@@ -22,8 +22,8 @@
 #ifndef VIEWPORTS_HPP
 #define VIEWPORTS_HPP
 
-#include <Query.hpp>
 #include <ExportEditor.hpp>
+#include <Query.hpp>
 
 class Editor;
 

@@ -17,7 +17,8 @@ The code uses C++17 and CMake. Qt5 or Qt6 and OpenGL are required to build deskt
 The build process generates desktop application with graphical user interface and command line utilities.
 See [INSTALL](INSTALL) for more information.
 
-- [Windows](https://vukoz-oel.github.io/3dforest2-documentation/developerguide_build_windows_make.html) build from source code
+- [Windows MinGW](https://vukoz-oel.github.io/3dforest2-documentation/developerguide_build_windows_make.html) build from source code
+- [Windows Visual Studio](https://vukoz-oel.github.io/3dforest2-documentation/developerguide_build_windows_visual_studio.html) build from source code
 - [Linux](https://vukoz-oel.github.io/3dforest2-documentation/developerguide_build_linux_make.html) build from source code
 
 ## Third-Party Libraries
