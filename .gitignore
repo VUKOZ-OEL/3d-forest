@@ -1,6 +1,7 @@
 # Build
 bin/
 build/
+out/
 
 # Visual Studio Code, Editor
 .vscode
