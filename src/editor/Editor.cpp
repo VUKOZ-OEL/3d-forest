@@ -48,6 +48,7 @@ void Editor::close()
     datasets_.clear();
     layers_.setDefault();
     classifications_.clear();
+    voxels_.clear();
     viewports_.clearContent();
 
     unsavedChanges_ = false;
@@ -240,6 +241,11 @@ void Editor::setLayers(const Layers &layers)
     viewports_.selectLayers(layers_.enabledList());
 
     unsavedChanges_ = true;
+}
+
+void Editor::setVoxels(const Voxels &voxels)
+{
+    voxels_ = voxels;
 }
 
 void Editor::setSettingsView(const SettingsView &settings)
