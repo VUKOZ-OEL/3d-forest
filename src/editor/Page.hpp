@@ -22,8 +22,8 @@
 #ifndef PAGE_HPP
 #define PAGE_HPP
 
-#include <IndexFile.hpp>
 #include <ExportEditor.hpp>
+#include <IndexFile.hpp>
 
 class Editor;
 class Query;

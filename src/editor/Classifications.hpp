@@ -27,8 +27,8 @@
 #include <vector>
 
 #include <Classification.hpp>
-#include <Vector3.hpp>
 #include <ExportEditor.hpp>
+#include <Vector3.hpp>
 
 /** Classification List. */
 class EXPORT_EDITOR Classifications

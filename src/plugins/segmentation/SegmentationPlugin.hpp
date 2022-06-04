@@ -37,7 +37,8 @@ class SegmentationWindow;
 #endif
 
 /** Segmentation Plugin. */
-class EXPORT_SEGMENTATION SegmentationPlugin : public QObject, public PluginInterface
+class EXPORT_SEGMENTATION SegmentationPlugin : public QObject,
+                                               public PluginInterface
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID PluginInterface_iid)

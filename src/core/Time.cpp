@@ -36,7 +36,8 @@ double getRealTime()
 #if defined(_MSC_VER)
     FILETIME tp;
     GetSystemTimeAsFileTime(&tp);
-    uint64_t t = (static_cast<uint64_t>(tp.dwHighDateTime) << 32) + tp.dwLowDateTime;
+    uint64_t t =
+        (static_cast<uint64_t>(tp.dwHighDateTime) << 32) + tp.dwLowDateTime;
     return (static_cast<double>(t) * 1e-7) - 11644473600.; // sec 1 Jan 1970
 #else
     struct timeval tp;

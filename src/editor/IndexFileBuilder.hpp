@@ -27,9 +27,9 @@
 #include <vector>
 
 #include <ChunkFile.hpp>
+#include <ExportEditor.hpp>
 #include <IndexFile.hpp>
 #include <LasFile.hpp>
-#include <ExportEditor.hpp>
 
 /** Index File Builder. */
 class EXPORT_EDITOR IndexFileBuilder

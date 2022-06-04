@@ -22,9 +22,9 @@
 #ifndef SETTINGS_HPP
 #define SETTINGS_HPP
 
+#include <ExportEditor.hpp>
 #include <SettingsImport.hpp>
 #include <SettingsView.hpp>
-#include <ExportEditor.hpp>
 
 /** Settings. */
 class EXPORT_EDITOR Settings

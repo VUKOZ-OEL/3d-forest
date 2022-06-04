@@ -37,7 +37,8 @@ class ClassifyGroundWindow;
 #endif
 
 /** Classify Ground Plugin. */
-class EXPORT_CLASSIFY_GROUND ClassifyGroundPlugin : public QObject, public PluginInterface
+class EXPORT_CLASSIFY_GROUND ClassifyGroundPlugin : public QObject,
+                                                    public PluginInterface
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID PluginInterface_iid)
