@@ -26,9 +26,10 @@
 #include <IndexFile.hpp>
 #include <Json.hpp>
 #include <SettingsImport.hpp>
+#include <ExportEditor.hpp>
 
 /** Dataset. */
-class Dataset
+class EXPORT_EDITOR Dataset
 {
 public:
     Dataset();

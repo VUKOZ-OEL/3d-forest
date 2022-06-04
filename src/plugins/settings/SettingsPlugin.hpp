@@ -22,13 +22,15 @@
 #ifndef SETTINGS_PLUGIN_HPP
 #define SETTINGS_PLUGIN_HPP
 
+#include <ExportGui.hpp>
+
 #include <QObject>
 
 class MainWindow;
 class SettingsWindow;
 
 /** Settings Plugin. */
-class SettingsPlugin : public QObject
+class EXPORT_GUI SettingsPlugin : public QObject
 {
     Q_OBJECT
 

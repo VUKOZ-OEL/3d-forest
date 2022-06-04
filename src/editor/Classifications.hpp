@@ -28,9 +28,10 @@
 
 #include <Classification.hpp>
 #include <Vector3.hpp>
+#include <ExportEditor.hpp>
 
 /** Classification List. */
-class Classifications
+class EXPORT_EDITOR Classifications
 {
 public:
     Classifications();

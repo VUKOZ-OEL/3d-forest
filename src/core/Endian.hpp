@@ -24,15 +24,17 @@
 
 #include <cstdint>
 
+#include <ExportCore.hpp>
+
 /** Copy 2 bytes. */
-inline void copy16(uint8_t *dst, const uint8_t *src)
+inline void EXPORT_CORE copy16(uint8_t *dst, const uint8_t *src)
 {
     dst[0] = src[0];
     dst[1] = src[1];
 }
 
 /** Copy 4 bytes. */
-inline void copy32(uint8_t *dst, const uint8_t *src)
+inline void EXPORT_CORE copy32(uint8_t *dst, const uint8_t *src)
 {
     dst[0] = src[0];
     dst[1] = src[1];
@@ -41,7 +43,7 @@ inline void copy32(uint8_t *dst, const uint8_t *src)
 }
 
 /** Copy 8 bytes. */
-inline void copy64(uint8_t *dst, const uint8_t *src)
+inline void EXPORT_CORE copy64(uint8_t *dst, const uint8_t *src)
 {
     dst[0] = src[0];
     dst[1] = src[1];
@@ -54,14 +56,14 @@ inline void copy64(uint8_t *dst, const uint8_t *src)
 }
 
 /** Swap 2 byte endian. */
-inline void swap16(uint8_t *dst, const uint8_t *src)
+inline void EXPORT_CORE swap16(uint8_t *dst, const uint8_t *src)
 {
     dst[0] = src[1];
     dst[1] = src[0];
 }
 
 /** Swap 4 byte endian. */
-inline void swap32(uint8_t *dst, const uint8_t *src)
+inline void EXPORT_CORE swap32(uint8_t *dst, const uint8_t *src)
 {
     dst[0] = src[3];
     dst[1] = src[2];
@@ -70,7 +72,7 @@ inline void swap32(uint8_t *dst, const uint8_t *src)
 }
 
 /** Swap 8 byte endian. */
-inline void swap64(uint8_t *dst, const uint8_t *src)
+inline void EXPORT_CORE swap64(uint8_t *dst, const uint8_t *src)
 {
     dst[0] = src[7];
     dst[1] = src[6];
@@ -83,14 +85,14 @@ inline void swap64(uint8_t *dst, const uint8_t *src)
 }
 
 /** Convert little to host endian in 2 bytes. */
-inline uint16_t ltoh16(const uint8_t *src)
+inline uint16_t EXPORT_CORE ltoh16(const uint8_t *src)
 {
     return static_cast<uint16_t>((static_cast<uint32_t>(src[1]) << 8) |
                                  static_cast<uint32_t>(src[0]));
 }
 
 /** Convert little to host endian in 4 bytes. */
-inline uint32_t ltoh32(const uint8_t *src)
+inline uint32_t EXPORT_CORE ltoh32(const uint8_t *src)
 {
     return (static_cast<uint32_t>(src[3]) << 24) |
            (static_cast<uint32_t>(src[2]) << 16) |
@@ -98,7 +100,7 @@ inline uint32_t ltoh32(const uint8_t *src)
 }
 
 /** Convert network big to host endian in 4 bytes. */
-inline uint32_t ntoh32(const uint8_t *src)
+inline uint32_t EXPORT_CORE ntoh32(const uint8_t *src)
 {
     return (static_cast<uint32_t>(src[0]) << 24) |
            (static_cast<uint32_t>(src[1]) << 16) |
@@ -106,7 +108,7 @@ inline uint32_t ntoh32(const uint8_t *src)
 }
 
 /** Convert little to host endian in 8 bytes. */
-inline uint64_t ltoh64(const uint8_t *src)
+inline uint64_t EXPORT_CORE ltoh64(const uint8_t *src)
 {
     return (static_cast<uint64_t>(src[7]) << 56) |
            (static_cast<uint64_t>(src[6]) << 48) |
@@ -118,7 +120,7 @@ inline uint64_t ltoh64(const uint8_t *src)
 }
 
 /** Convert little to host endian in float. */
-inline float ltohf(const uint8_t *src)
+inline float EXPORT_CORE ltohf(const uint8_t *src)
 {
     float ret;
     uint8_t *dst = reinterpret_cast<uint8_t *>(&ret);
@@ -131,7 +133,7 @@ inline float ltohf(const uint8_t *src)
 }
 
 /** Convert little to host endian in double. */
-inline double ltohd(const uint8_t *src)
+inline double EXPORT_CORE ltohd(const uint8_t *src)
 {
     double ret;
     uint8_t *dst = reinterpret_cast<uint8_t *>(&ret);
@@ -144,14 +146,14 @@ inline double ltohd(const uint8_t *src)
 }
 
 /** Convert host to little endian in 2 bytes. */
-inline void htol16(uint8_t *dst, uint16_t src)
+inline void EXPORT_CORE htol16(uint8_t *dst, uint16_t src)
 {
     dst[0] = static_cast<uint8_t>(src);
     dst[1] = static_cast<uint8_t>(src >> 8);
 }
 
 /** Convert host to little endian in 4 bytes. */
-inline void htol32(uint8_t *dst, uint32_t src)
+inline void EXPORT_CORE htol32(uint8_t *dst, uint32_t src)
 {
     dst[0] = static_cast<uint8_t>(src);
     dst[1] = static_cast<uint8_t>(src >> 8);
@@ -160,7 +162,7 @@ inline void htol32(uint8_t *dst, uint32_t src)
 }
 
 /** Convert host to little endian in 8 bytes. */
-inline void htol64(uint8_t *dst, uint64_t src)
+inline void EXPORT_CORE htol64(uint8_t *dst, uint64_t src)
 {
     dst[0] = static_cast<uint8_t>(src);
     dst[1] = static_cast<uint8_t>(src >> 8);
@@ -173,7 +175,7 @@ inline void htol64(uint8_t *dst, uint64_t src)
 }
 
 /** Convert host to little endian in float. */
-inline void htolf(uint8_t *dst, float src)
+inline void EXPORT_CORE htolf(uint8_t *dst, float src)
 {
     uint8_t *src8 = reinterpret_cast<uint8_t *>(&src);
 #if __FLOAT_WORD_ORDER__ == __ORDER_LITTLE_ENDIAN__
@@ -184,7 +186,7 @@ inline void htolf(uint8_t *dst, float src)
 }
 
 /** Convert host to little endian in double. */
-inline void htold(uint8_t *dst, double src)
+inline void EXPORT_CORE htold(uint8_t *dst, double src)
 {
     uint8_t *src8 = reinterpret_cast<uint8_t *>(&src);
 #if __FLOAT_WORD_ORDER__ == __ORDER_LITTLE_ENDIAN__

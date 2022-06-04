@@ -22,13 +22,15 @@
 #ifndef IMPORT_PLUGIN_HPP
 #define IMPORT_PLUGIN_HPP
 
+#include <ExportGui.hpp>
+
 #include <QObject>
 
 class MainWindow;
 class QAction;
 
 /** Import Plugin. */
-class ImportPlugin : public QObject
+class EXPORT_GUI ImportPlugin : public QObject
 {
     Q_OBJECT
 

@@ -23,9 +23,10 @@
 #define SETTINGS_IMPORT_HPP
 
 #include <IndexFileBuilder.hpp>
+#include <ExportEditor.hpp>
 
 /** Settings Import. */
-class SettingsImport
+class EXPORT_EDITOR SettingsImport
 {
 public:
     SettingsImport();

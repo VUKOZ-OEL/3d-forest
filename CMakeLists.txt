@@ -25,6 +25,10 @@ endif()
 
 include(cmake/cxxflags.cmake)
 
+if (MSVC)
+  set(CMAKE_PREFIX_PATH "C:\\Qt\\6.3.0\\msvc2019_64")
+endif()
+
 find_package(OpenGL QUIET)
 find_package(Qt6 COMPONENTS Core Gui Widgets Help OpenGL OpenGLWidgets)
 if (Qt6_FOUND AND Qt6OpenGL_FOUND AND OpenGL_FOUND)

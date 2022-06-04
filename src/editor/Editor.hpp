@@ -31,9 +31,10 @@
 #include <Region.hpp>
 #include <Settings.hpp>
 #include <Viewports.hpp>
+#include <ExportEditor.hpp>
 
 /** Editor. */
-class Editor
+class EXPORT_EDITOR Editor
 {
 public:
     Editor();

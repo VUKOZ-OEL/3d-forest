@@ -19,8 +19,27 @@ set(SUB_PROJECT_NAME "3dforesteditor")
 
 file(GLOB_RECURSE SOURCES "*.cpp")
 
-add_library(${SUB_PROJECT_NAME} SHARED ${SOURCES})
-target_include_directories(${SUB_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
-target_link_libraries(${SUB_PROJECT_NAME} 3dforestcore)
+add_library(
+  ${SUB_PROJECT_NAME}
+  SHARED
+  ${SOURCES}
+)
+
+target_include_directories(
+  ${SUB_PROJECT_NAME}
+  PUBLIC
+  ${CMAKE_CURRENT_LIST_DIR}
+)
+
+target_compile_definitions(
+  ${SUB_PROJECT_NAME}
+  PRIVATE
+  EXPORT_${SUB_PROJECT_NAME}=1
+)
+
+target_link_libraries(
+  ${SUB_PROJECT_NAME}
+  3dforestcore
+)
 
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

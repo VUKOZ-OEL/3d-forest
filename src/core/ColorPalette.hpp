@@ -24,10 +24,11 @@
 
 #include <vector>
 
+#include <ExportCore.hpp>
 #include <Vector3.hpp>
 
 /** Color Palette. */
-class ColorPalette
+class EXPORT_CORE ColorPalette
 {
 public:
     static const std::vector<Vector3<float>> Classification;

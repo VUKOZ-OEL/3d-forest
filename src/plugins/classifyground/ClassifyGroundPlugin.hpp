@@ -26,8 +26,18 @@
 
 class ClassifyGroundWindow;
 
+#if defined(_MSC_VER)
+    #if defined(EXPORT_3dforestguipluginclassifyground)
+        #define EXPORT_CLASSIFY_GROUND __declspec(dllexport)
+    #else
+        #define EXPORT_CLASSIFY_GROUND __declspec(dllimport)
+    #endif
+#else
+    #define EXPORT_CLASSIFY_GROUND
+#endif
+
 /** Classify Ground Plugin. */
-class ClassifyGroundPlugin : public QObject, public PluginInterface
+class EXPORT_CLASSIFY_GROUND ClassifyGroundPlugin : public QObject, public PluginInterface
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID PluginInterface_iid)

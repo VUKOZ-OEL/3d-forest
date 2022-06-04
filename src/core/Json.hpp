@@ -31,6 +31,7 @@
 #include <vector>
 
 #include <Error.hpp>
+#include <ExportCore.hpp>
 
 /** JSON.
 
@@ -83,7 +84,7 @@
     std::cout << obj.serialize(0) << "\n"; // {"dim":[10,20],"scale":[1,2,3]}
 @endcode
 */
-class Json
+class EXPORT_CORE Json
 {
 public:
     static const size_t DEFAULT_INDENT = 2;

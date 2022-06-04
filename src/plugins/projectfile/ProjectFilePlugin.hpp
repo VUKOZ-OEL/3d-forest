@@ -22,6 +22,8 @@
 #ifndef PROJECT_FILE_PLUGIN_HPP
 #define PROJECT_FILE_PLUGIN_HPP
 
+#include <ExportGui.hpp>
+
 #include <QObject>
 #include <QString>
 
@@ -29,7 +31,7 @@ class MainWindow;
 class QAction;
 
 /** Project File Plugin. */
-class ProjectFilePlugin : public QObject
+class EXPORT_GUI ProjectFilePlugin : public QObject
 {
     Q_OBJECT
 

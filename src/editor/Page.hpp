@@ -23,12 +23,13 @@
 #define PAGE_HPP
 
 #include <IndexFile.hpp>
+#include <ExportEditor.hpp>
 
 class Editor;
 class Query;
 
 /** Page. */
-class Page
+class EXPORT_EDITOR Page
 {
 public:
     /** @name Point Data */

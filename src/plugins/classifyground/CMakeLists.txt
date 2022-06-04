@@ -40,6 +40,12 @@ target_include_directories(
   ${CMAKE_CURRENT_LIST_DIR}
 )
 
+target_compile_definitions(
+  ${SUB_PROJECT_NAME}
+  PRIVATE
+  EXPORT_${SUB_PROJECT_NAME}=1
+)
+
 target_link_libraries(
   ${SUB_PROJECT_NAME}
   PRIVATE

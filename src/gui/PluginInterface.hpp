@@ -22,6 +22,8 @@
 #ifndef PLUGIN_INTERFACE_HPP
 #define PLUGIN_INTERFACE_HPP
 
+#include <ExportGui.hpp>
+
 #include <QtPlugin>
 
 #if QT_VERSION_MAJOR == 5
@@ -34,7 +36,7 @@
 class MainWindow;
 
 /** Plugin Interface. */
-class PluginInterface
+class EXPORT_GUI PluginInterface
 {
 public:
     virtual ~PluginInterface() = default;

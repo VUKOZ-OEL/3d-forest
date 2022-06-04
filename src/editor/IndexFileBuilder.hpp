@@ -29,13 +29,14 @@
 #include <ChunkFile.hpp>
 #include <IndexFile.hpp>
 #include <LasFile.hpp>
+#include <ExportEditor.hpp>
 
 /** Index File Builder. */
-class IndexFileBuilder
+class EXPORT_EDITOR IndexFileBuilder
 {
 public:
     /** Index File Builder Settings. */
-    class Settings
+    class EXPORT_EDITOR Settings
     {
     public:
         bool verbose;

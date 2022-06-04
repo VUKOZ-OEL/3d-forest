@@ -25,6 +25,7 @@
 #include <Editor.hpp>
 #include <RenderThread.hpp>
 #include <ThreadCallbackInterface.hpp>
+#include <ExportGui.hpp>
 
 #include <QHash>
 #include <QIcon>
@@ -48,7 +49,7 @@ class HelpPlugin;
 class QToolButton;
 
 /** Main Window. */
-class MainWindow : public QMainWindow, public ThreadCallbackInterface
+class EXPORT_GUI MainWindow : public QMainWindow, public ThreadCallbackInterface
 {
     Q_OBJECT
 

@@ -22,10 +22,12 @@
 #ifndef MODIFIER_INTERFACE_HPP
 #define MODIFIER_INTERFACE_HPP
 
+#include <ExportEditor.hpp>
+
 class Page;
 
 /** Modifier Interface. */
-class ModifierInterface
+class EXPORT_EDITOR ModifierInterface
 {
 public:
     virtual ~ModifierInterface() = default;

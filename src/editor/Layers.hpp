@@ -26,9 +26,10 @@
 #include <unordered_set>
 
 #include <Layer.hpp>
+#include <ExportEditor.hpp>
 
 /** Layer List. */
-class Layers
+class EXPORT_EDITOR Layers
 {
 public:
     Layers();

@@ -22,6 +22,7 @@
 #ifndef VIEWER_PLUGIN_HPP
 #define VIEWER_PLUGIN_HPP
 
+#include <ExportGui.hpp>
 #include <ViewerViewports.hpp>
 
 #include <QObject>
@@ -30,7 +31,7 @@ class MainWindow;
 class QAction;
 
 /** Viewer Plugin. */
-class ViewerPlugin : public QObject
+class EXPORT_GUI ViewerPlugin : public QObject
 {
     Q_OBJECT
 

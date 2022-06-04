@@ -28,15 +28,16 @@
 
 #include <Box.hpp>
 #include <ChunkFile.hpp>
+#include <ExportEditor.hpp>
 
 /** Index File. */
-class IndexFile
+class EXPORT_EDITOR IndexFile
 {
 public:
     static const uint32_t CHUNK_TYPE;
 
     /** Index File Node. */
-    struct Node
+    struct EXPORT_EDITOR Node
     {
         uint64_t from;
         uint64_t size;
@@ -47,7 +48,7 @@ public:
     };
 
     /** Index File Selection. */
-    struct Selection
+    struct EXPORT_EDITOR Selection
     {
         size_t id;
         size_t idx;
@@ -55,7 +56,7 @@ public:
     };
 
     /** Index File Selection Tile. */
-    struct SelectionTile
+    struct EXPORT_EDITOR SelectionTile
     {
         size_t datasetId;
         size_t tileId;

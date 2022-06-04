@@ -23,9 +23,10 @@
 #define REGION_HPP
 
 #include <Box.hpp>
+#include <ExportEditor.hpp>
 
 /** Region. */
-class Region
+class EXPORT_EDITOR Region
 {
 public:
     /** Region Type. */

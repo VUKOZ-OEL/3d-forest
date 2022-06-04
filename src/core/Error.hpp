@@ -25,6 +25,8 @@
 #include <stdexcept>
 #include <string>
 
+#include <ExportCore.hpp>
+
 /** Throw std exception. */
 #define THROW(msg) throw std::runtime_error(msg)
 
@@ -32,12 +34,12 @@
 #define THROW_ERRNO(msg) throw std::runtime_error(getErrorString(msg))
 
 /** Get error string for given error number. */
-std::string getErrorString(int errnum);
+std::string EXPORT_CORE getErrorString(int errnum);
 
 /** Get the last error string. */
-std::string getErrorString();
+std::string EXPORT_CORE getErrorString();
 
 /** Get the last error string with extra description. */
-std::string getErrorString(const std::string &message);
+std::string EXPORT_CORE getErrorString(const std::string &message);
 
 #endif /* ERROR_HPP */

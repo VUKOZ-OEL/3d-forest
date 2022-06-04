@@ -22,6 +22,8 @@
 #ifndef ICON_THEME_HPP
 #define ICON_THEME_HPP
 
+#include <ExportGui.hpp>
+
 #include <QIcon>
 #include <QString>
 
@@ -30,7 +32,7 @@
     QIcon encapsulates multiple pixel perfect icon sizes.
     Qt will automatically select the best size for a given rendering.
 */
-class IconTheme : public QIcon
+class EXPORT_GUI IconTheme : public QIcon
 {
 public:
     IconTheme(const QString &prefix, const QString &name) : QIcon()

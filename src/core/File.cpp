@@ -26,9 +26,32 @@
 #include <fcntl.h>
 #include <filesystem>
 #include <iostream>
-#include <sys/stat.h>
 #include <sys/types.h>
-#include <unistd.h>
+
+#if defined(_MSC_VER)
+    #define _CRT_INTERNAL_NONSTDC_NAMES 1
+    #include <sys/stat.h>
+
+    #if !defined(S_ISREG) && defined(S_IFMT) && defined(S_IFREG)
+        #define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
+    #endif
+
+    #if !defined(S_ISDIR) && defined(S_IFMT) && defined(S_IFDIR)
+        #define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
+    #endif
+  
+    #define S_IRUSR 0400
+    #define S_IRGRP (S_IRUSR >> 3)
+    #define S_IROTH (S_IRGRP >> 3)
+    #define S_IWUSR 0200
+    #include <io.h>
+    #define ssize_t int64_t
+    typedef unsigned short mode_t;
+#else
+    #include <sys/stat.h>
+    #include <unistd.h>
+#endif /* _MSC_VER */
+
 #include <vector>
 
 #include <Error.hpp>

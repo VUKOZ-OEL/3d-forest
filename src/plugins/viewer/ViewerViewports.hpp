@@ -25,6 +25,7 @@
 #include <vector>
 
 #include <Camera.hpp>
+#include <ExportGui.hpp>
 
 #include <QWidget>
 
@@ -32,7 +33,7 @@ class Editor;
 class ViewerOpenGLViewport;
 
 /** Viewer Viewports. */
-class ViewerViewports : public QWidget
+class EXPORT_GUI ViewerViewports : public QWidget
 {
     Q_OBJECT
 

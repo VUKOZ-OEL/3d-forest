@@ -24,13 +24,15 @@
 
 #include <cstdint>
 
-/** Get the number of seconds since the Epoch. */
-double getRealTime();
+#include <ExportCore.hpp>
 
 /** Get the number of seconds since the Epoch. */
-uint64_t getRealTime64();
+double EXPORT_CORE getRealTime();
+
+/** Get the number of seconds since the Epoch. */
+uint64_t EXPORT_CORE getRealTime64();
 
 /** Makes the calling thread sleep until milliseconds have elapsed. */
-void msleep(long milliseconds);
+void EXPORT_CORE msleep(long milliseconds);
 
 #endif /* TIME_HPP */

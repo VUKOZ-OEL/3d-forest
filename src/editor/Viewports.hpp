@@ -23,11 +23,12 @@
 #define VIEWPORTS_HPP
 
 #include <Query.hpp>
+#include <ExportEditor.hpp>
 
 class Editor;
 
 /** Viewports. */
-class Viewports
+class EXPORT_EDITOR Viewports
 {
 public:
     Viewports();

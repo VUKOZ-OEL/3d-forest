@@ -22,6 +22,7 @@
 #ifndef CHUNK_FILE_HPP
 #define CHUNK_FILE_HPP
 
+#include <ExportCore.hpp>
 #include <File.hpp>
 #include <Json.hpp>
 
@@ -34,13 +35,13 @@
     All multi-byte integers are in little-endian format.
     All integers should be aligned to file offsets by their size.
 */
-class ChunkFile
+class EXPORT_CORE ChunkFile
 {
 public:
     static const size_t CHUNK_HEADER_SIZE;
 
     /** Chunk Header. */
-    struct Chunk
+    struct EXPORT_CORE Chunk
     {
         uint32_t type;
         uint8_t majorVersion;
