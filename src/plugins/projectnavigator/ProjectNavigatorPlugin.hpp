@@ -22,13 +22,15 @@
 #ifndef PROJECT_NAVIGATOR_PLUGIN_HPP
 #define PROJECT_NAVIGATOR_PLUGIN_HPP
 
+#include <ExportGui.hpp>
+
 #include <QObject>
 
 class MainWindow;
 class ProjectNavigatorWindow;
 
 /** Project Navigator Plugin. */
-class ProjectNavigatorPlugin : public QObject
+class EXPORT_GUI ProjectNavigatorPlugin : public QObject
 {
     Q_OBJECT
 

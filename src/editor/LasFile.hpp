@@ -24,13 +24,14 @@
 
 #include <File.hpp>
 #include <Json.hpp>
+#include <ExportEditor.hpp>
 
 /** LAS (LASer) File Format. */
-class LasFile
+class EXPORT_EDITOR LasFile
 {
 public:
     /** LAS Header. */
-    struct Header
+    struct EXPORT_EDITOR Header
     {
         char file_signature[4];
 
@@ -103,7 +104,7 @@ public:
     };
 
     /** LAS Point. */
-    struct Point
+    struct EXPORT_EDITOR Point
     {
         // Format 0 to 10
         uint32_t x;

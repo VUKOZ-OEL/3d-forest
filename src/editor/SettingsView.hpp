@@ -26,9 +26,10 @@
 #include <vector>
 
 #include <Vector3.hpp>
+#include <ExportEditor.hpp>
 
 /** Settings View. */
-class SettingsView
+class EXPORT_EDITOR SettingsView
 {
 public:
     enum ColorSource

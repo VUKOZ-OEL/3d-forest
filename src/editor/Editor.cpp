@@ -187,14 +187,7 @@ void Editor::setClassifications(const Classifications &classifications)
 {
     classifications_ = classifications;
 
-    if (classifications_.isEnabled())
-    {
-        viewports_.selectClassifications(classifications_.enabledList());
-    }
-    else
-    {
-        viewports_.selectClassifications({});
-    }
+    viewports_.selectClassifications(classifications_.enabledList());
 
     // viewClearRendered();
     unsavedChanges_ = true;

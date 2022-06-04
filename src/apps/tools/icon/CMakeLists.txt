@@ -17,6 +17,11 @@
 
 set(SUB_PROJECT_NAME "3dforesticon")
 
+if (NOT BUILD_DEVEL)
+  message(STATUS "Skip devel tool ${SUB_PROJECT_NAME}")
+  return()
+endif()
+
 if (NOT QT_VERSION_MAJOR)
   message(WARNING "Gui not found - skipping ${SUB_PROJECT_NAME}")
   return()

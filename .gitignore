@@ -1,9 +1,13 @@
 # Build
 bin/
 build/
+out/
 
-# Visual Studio Code
+# Visual Studio Code, Editor
 .vscode
+
+# Visual Studio, IDE
+.vs
 
 # Other
 .DS_Store

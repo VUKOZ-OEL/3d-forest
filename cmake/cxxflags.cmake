@@ -15,7 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-set(GCC_COMPILE_FLAGS "\
+if (CMAKE_COMPILER_IS_GNUCXX)
+  message(STATUS "GCC compiler detected, adding compile flags")
+  set(GCC_COMPILE_FLAGS "\
 -D_FILE_OFFSET_BITS=64 \
 -std=c++17 \
 -pedantic -Wall -Wextra \
@@ -24,6 +26,16 @@ set(GCC_COMPILE_FLAGS "\
 -Wcast-align -Wcast-qual \
 -Wswitch-default -Wswitch-enum \
 -Wlogical-op -Wwrite-strings -Wold-style-cast -Woverloaded-virtual"
-)
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_COMPILE_FLAGS}")
+  )
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_COMPILE_FLAGS}")
+elseif(MSVC)
+  message(STATUS "MSVC compiler detected, adding compile flags")
+  set(MSVC_COMPILE_FLAGS "\
+/std:c++17 \
+/Zc:__cplusplus \
+/permissive-"
+  )
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MSVC_COMPILE_FLAGS}")
+else()
+  message(WARNING "GCC/MSVC compiler not detected")
+endif()

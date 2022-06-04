@@ -24,9 +24,10 @@
 
 #include <Matrix4.hpp>
 #include <Vector3.hpp>
+#include <ExportEditor.hpp>
 
 /** Camera. */
-class Camera
+class EXPORT_EDITOR Camera
 {
 public:
     Vector3<float> eye;

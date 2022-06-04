@@ -25,8 +25,10 @@
 #include <cstdint>
 #include <string>
 
+#include <ExportCore.hpp>
+
 /** File. */
-class File
+class EXPORT_CORE File
 {
 public:
     File();

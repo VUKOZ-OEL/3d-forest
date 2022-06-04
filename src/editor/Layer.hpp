@@ -24,9 +24,10 @@
 
 #include <Json.hpp>
 #include <Vector3.hpp>
+#include <ExportEditor.hpp>
 
 /** Layer. */
-class Layer
+class EXPORT_EDITOR Layer
 {
 public:
     Layer();

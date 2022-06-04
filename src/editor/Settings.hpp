@@ -24,9 +24,10 @@
 
 #include <SettingsImport.hpp>
 #include <SettingsView.hpp>
+#include <ExportEditor.hpp>
 
 /** Settings. */
-class Settings
+class EXPORT_EDITOR Settings
 {
 public:
     const SettingsView &view() const { return view_; }

@@ -28,11 +28,12 @@
 #include <Cone.hpp>
 #include <Page.hpp>
 #include <Sphere.hpp>
+#include <ExportEditor.hpp>
 
 class Editor;
 
 /** Query. */
-class Query
+class EXPORT_EDITOR Query
 {
 public:
     Query(Editor *editor);

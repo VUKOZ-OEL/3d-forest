@@ -17,32 +17,19 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file RenderThread.hpp */
+/** @file ExportEditor.hpp */
 
-#ifndef RENDER_THREAD_HPP
-#define RENDER_THREAD_HPP
+#ifndef EXPORT_EDITOR_HPP
+#define EXPORT_EDITOR_HPP
 
-#include <Camera.hpp>
-#include <Thread.hpp>
-#include <ExportEditor.hpp>
+#if defined(_MSC_VER)
+    #if defined(EXPORT_3dforesteditor)
+        #define EXPORT_EDITOR __declspec(dllexport)
+    #else
+        #define EXPORT_EDITOR __declspec(dllimport)
+    #endif
+#else
+    #define EXPORT_EDITOR
+#endif
 
-class Editor;
-
-/** Render Thread. */
-class EXPORT_EDITOR RenderThread : public Thread
-{
-public:
-    RenderThread(Editor *editor);
-
-    void render(size_t viewportId, const Camera &camera);
-
-    virtual bool compute();
-
-protected:
-    Editor *editor_;
-    size_t viewportId_;
-    Camera camera_;
-    bool initialized_;
-};
-
-#endif /* RENDER_THREAD_HPP */
+#endif /* EXPORT_EDITOR_HPP */

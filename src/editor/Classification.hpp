@@ -24,8 +24,10 @@
 
 #include <string>
 
+#include <ExportEditor.hpp>
+
 /** Classification. */
-class Classification
+class EXPORT_EDITOR Classification
 {
 public:
     std::string label;

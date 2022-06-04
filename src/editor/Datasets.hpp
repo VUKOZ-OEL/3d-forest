@@ -25,9 +25,10 @@
 #include <unordered_map>
 
 #include <Dataset.hpp>
+#include <ExportEditor.hpp>
 
 /** Dataset List. */
-class Datasets
+class EXPORT_EDITOR Datasets
 {
 public:
     Datasets();

@@ -26,10 +26,12 @@
 #include <mutex>
 #include <thread>
 
+#include <ExportCore.hpp>
+
 class ThreadCallbackInterface;
 
 /** Thread. */
-class Thread
+class EXPORT_CORE Thread
 {
 public:
     Thread();

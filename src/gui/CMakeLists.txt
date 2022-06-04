@@ -64,6 +64,12 @@ target_include_directories(
   ../plugins/help
 )
 
+target_compile_definitions(
+  ${SUB_PROJECT_NAME}
+  PRIVATE
+  EXPORT_${SUB_PROJECT_NAME}=1
+)
+
 if (QT_VERSION_MAJOR EQUAL 5)
   include_directories(${Qt5Widgets_INCLUDE_DIRS})
   include_directories(${Qt5OpenGL_INCLUDE_DIRS})

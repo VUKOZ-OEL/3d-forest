@@ -22,8 +22,10 @@
 #ifndef THREAD_CALLBACK_INTERFACE_HPP
 #define THREAD_CALLBACK_INTERFACE_HPP
 
+#include <ExportCore.hpp>
+
 /** Thread Callback Interface. */
-class ThreadCallbackInterface
+class EXPORT_CORE ThreadCallbackInterface
 {
 public:
     virtual ~ThreadCallbackInterface() = default;

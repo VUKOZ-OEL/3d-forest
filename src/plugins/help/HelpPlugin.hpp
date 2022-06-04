@@ -22,13 +22,15 @@
 #ifndef HELP_PLUGIN_HPP
 #define HELP_PLUGIN_HPP
 
+#include <ExportGui.hpp>
+
 #include <QObject>
 
 class MainWindow;
 class QAction;
 
 /** Help Plugin. */
-class HelpPlugin : public QObject
+class EXPORT_GUI HelpPlugin : public QObject
 {
     Q_OBJECT
 
