@@ -22,7 +22,7 @@
 These documents describe how to use 3D Forest application.
 
 
-GUI screenshot:
-@image html gui.png
+3D Forest Screenshot:
+@image html 3dforest.png "3D Forest application"
 
 */
