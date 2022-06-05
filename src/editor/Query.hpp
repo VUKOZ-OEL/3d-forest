@@ -88,6 +88,7 @@ public:
     double &x() { return position_[3 * selection_[pagePointIndex_] + 0]; }
     double &y() { return position_[3 * selection_[pagePointIndex_] + 1]; }
     double &z() { return position_[3 * selection_[pagePointIndex_] + 2]; }
+    double &elevation() { return elevation_[selection_[pagePointIndex_]]; }
 
     float &intensity() { return intensity_[selection_[pagePointIndex_]]; }
 
@@ -125,6 +126,7 @@ public:
     }
 
     uint32_t &layer() { return layer_[selection_[pagePointIndex_]]; }
+    uint64_t &element() { return element_[selection_[pagePointIndex_]]; }
     /**@}*/
 
     bool nextPage();
@@ -174,6 +176,7 @@ protected:
     std::shared_ptr<Page> page_;
 
     double *position_;
+    double *elevation_;
     float *intensity_;
     uint8_t *returnNumber_;
     uint8_t *numberOfReturns_;
@@ -183,6 +186,7 @@ protected:
     float *color_;
     float *userColor_;
     uint32_t *layer_;
+    uint64_t *element_;
 
     uint32_t *selection_;
 
