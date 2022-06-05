@@ -48,6 +48,7 @@ Page::~Page()
 void Page::clear()
 {
     position.clear();
+    elevation.clear();
     intensity.clear();
     returnNumber.clear();
     numberOfReturns.clear();
@@ -57,6 +58,7 @@ void Page::clear()
     color.clear();
     userColor.clear();
     layer.clear();
+    element.clear();
 
     renderPosition.clear();
     renderColor.clear();
@@ -71,6 +73,7 @@ void Page::clear()
 void Page::resize(size_t n)
 {
     position.resize(n * 3);
+    elevation.resize(n);
     intensity.resize(n);
     returnNumber.resize(n);
     numberOfReturns.resize(n);
@@ -80,6 +83,7 @@ void Page::resize(size_t n)
     color.resize(n * 3);
     userColor.resize(n * 3);
     layer.resize(n);
+    element.resize(n);
 
     renderPosition.resize(n * 3);
     renderColor.resize(n * 3);
@@ -136,6 +140,9 @@ void Page::read()
         position[3 * i + 1] = positionBase_[3 * i + 1];
         position[3 * i + 2] = positionBase_[3 * i + 2];
 
+        // elevation
+        elevation[i] = static_cast<double>(point.user_elevation);
+
         // intensity and color
         intensity[i] = static_cast<float>(point.intensity) * scaleU16;
 
@@ -156,17 +163,20 @@ void Page::read()
         userColor[3 * i + 1] = point.user_green * scaleU16;
         userColor[3 * i + 2] = point.user_blue * scaleU16;
 
-        // Attributes
+        // attributes
         returnNumber[i] = point.return_number;
         numberOfReturns[i] = point.number_of_returns;
         classification[i] = point.classification;
         userData[i] = point.user_data;
 
-        // GPS
+        // gps
         gpsTime[i] = point.gps_time;
 
-        // Layer
+        // layer
         layer[i] = point.user_layer;
+
+        // element
+        element[i] = point.user_element;
     }
 
     // Index
@@ -209,9 +219,13 @@ void Page::toPoint(uint8_t *ptr, size_t i, uint8_t fmt)
     htol16(ptr + pos + 6, static_cast<uint16_t>(renderColor[3 * i + 1] * s16));
     htol16(ptr + pos + 8, static_cast<uint16_t>(renderColor[3 * i + 2] * s16));
 
-    htol16(ptr + pos + 4, static_cast<uint16_t>(userColor[3 * i + 0] * s16));
-    htol16(ptr + pos + 6, static_cast<uint16_t>(userColor[3 * i + 1] * s16));
-    htol16(ptr + pos + 8, static_cast<uint16_t>(userColor[3 * i + 2] * s16));
+    // User intensity
+
+    // Elevation
+    htol32(ptr + pos + 12, static_cast<uint32_t>(elevation[i]));
+
+    // Element
+    htol64(ptr + pos + 16, element[i]);
 }
 
 void Page::write()

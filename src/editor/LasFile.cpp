@@ -85,7 +85,9 @@ size_t LasFile::Header::pointDataRecordLengthFormat() const
 size_t LasFile::Header::pointDataRecordLength3dForest() const
 {
     return pointDataRecordLengthFormat() + sizeof(LasFile::Point::user_layer) +
-           (4 * sizeof(LasFile::Point::user_red));
+           (4 * sizeof(LasFile::Point::user_red)) +
+           sizeof(LasFile::Point::user_elevation) +
+           sizeof(LasFile::Point::user_element);
 }
 
 size_t LasFile::Header::pointDataRecordLengthUser() const
@@ -665,13 +667,15 @@ void LasFile::readPoint(Point &pt, const uint8_t *buffer, uint8_t fmt) const
         pos += 29;
     }
 
-    if (header.point_data_record_length > (pos + 11))
+    if (header.point_data_record_length > (pos + 23))
     {
         pt.user_layer = ltoh32(&buffer[pos]);
         pt.user_red = ltoh16(&buffer[pos + 4]);
         pt.user_green = ltoh16(&buffer[pos + 6]);
         pt.user_blue = ltoh16(&buffer[pos + 8]);
         pt.user_intensity = ltoh16(&buffer[pos + 10]);
+        pt.user_elevation = ltoh32(&buffer[pos + 12]);
+        pt.user_element = ltoh64(&buffer[pos + 16]);
     }
 }
 
@@ -797,13 +801,15 @@ void LasFile::writePoint(uint8_t *buffer, const Point &pt) const
         pos += 29;
     }
 
-    if (header.point_data_record_length > (pos + 11))
+    if (header.point_data_record_length > (pos + 23))
     {
         htol32(&buffer[pos], pt.user_layer);
         htol16(&buffer[pos + 4], pt.user_red);
         htol16(&buffer[pos + 6], pt.user_green);
         htol16(&buffer[pos + 8], pt.user_blue);
         htol16(&buffer[pos + 10], pt.user_intensity);
+        htol32(&buffer[pos + 12], pt.user_elevation);
+        htol64(&buffer[pos + 16], pt.user_element);
     }
 }
 

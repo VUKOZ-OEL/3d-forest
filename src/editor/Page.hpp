@@ -40,6 +40,11 @@ public:
      */
     std::vector<double> position;
 
+    /** Point elevation above ground.
+        The data are stored as [e0, e1, ...].
+     */
+    std::vector<double> elevation;
+
     /** Pulse return magnitude.
         The data are stored as [i0, i1, ...].
         The values are in range from 0 (zero intensity) to 1 (full intensity).
@@ -84,6 +89,11 @@ public:
         This value is stored in Point Data Record extra bytes.
     */
     std::vector<uint32_t> layer;
+
+    /** Element identification numbers.
+        This value is stored in Point Data Record extra bytes.
+    */
+    std::vector<uint64_t> element;
     /**@}*/
 
     /** Index array contains indices to selected points. */

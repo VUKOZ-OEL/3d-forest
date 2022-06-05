@@ -132,6 +132,7 @@ bool Query::nextPage()
 
             // Point to current page data.
             position_ = page_->position.data();
+            elevation_ = page_->elevation.data();
             intensity_ = page_->intensity.data();
             returnNumber_ = page_->returnNumber.data();
             numberOfReturns_ = page_->numberOfReturns.data();
@@ -141,6 +142,7 @@ bool Query::nextPage()
             color_ = page_->color.data();
             userColor_ = page_->userColor.data();
             layer_ = page_->layer.data();
+            element_ = page_->element.data();
 
             selection_ = page_->selection.data();
 
