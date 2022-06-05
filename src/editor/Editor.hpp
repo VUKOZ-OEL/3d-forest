@@ -32,6 +32,7 @@
 #include <Region.hpp>
 #include <Settings.hpp>
 #include <Viewports.hpp>
+#include <Voxels.hpp>
 
 /** Editor. */
 class EXPORT_EDITOR Editor
@@ -69,6 +70,10 @@ public:
     const Layers &layers() const { return layers_; }
     void setLayers(const Layers &layers);
 
+    // Voxels
+    const Voxels &voxels() const { return voxels_; }
+    void setVoxels(const Voxels &voxels);
+
     // Settings
     const Settings &settings() const { return settings_; }
     void setSettingsView(const SettingsView &settings);
@@ -98,6 +103,7 @@ protected:
     Layers layers_;
     Settings settings_;
     Classifications classifications_;
+    Voxels voxels_;
 
     Region clipFilter_;
 

@@ -1,5 +1,4 @@
-<!DOCTYPE RCC>
-<!--
+/*
     Copyright 2020 VUKOZ
 
     This file is part of 3D Forest.
@@ -16,22 +15,17 @@
 
     You should have received a copy of the GNU General Public License
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
--->
-<RCC version="1.0">
-<qresource prefix="/projectnavigator">
+*/
 
-<!-- Tool bar -->
-<file>blueprint_24px.svg</file>
+/** @file Voxels.cpp */
 
-<!-- Common -->
-<file>plus_24px.svg</file>
-<file>minus_24px.svg</file>
-<file>eye_24px.svg</file>
-<file>hide_24px.svg</file>
+#include <Voxels.hpp>
 
-<file>select_all_24px.svg</file>
-<file>select_invert_24px.svg</file>
-<file>select_none_24px.svg</file>
+Voxels::Voxels()
+{
+}
 
-</qresource>
-</RCC>
+void Voxels::clear()
+{
+    value_.clear();
+}
