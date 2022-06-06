@@ -46,5 +46,5 @@ ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
     setWidget(tabWidget_);
     setWindowTitle(tr("Project Navigator"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    mainWindow_->addDockWidget(Qt::LeftDockWidgetArea, this);
+    mainWindow_->addDockWidget(Qt::RightDockWidgetArea, this);
 }

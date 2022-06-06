@@ -41,5 +41,5 @@ SettingsWindow::SettingsWindow(MainWindow *mainWindow)
     setWidget(tabWidget_);
     setWindowTitle(tr("Settings"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    mainWindow_->addDockWidget(Qt::LeftDockWidgetArea, this);
+    mainWindow_->addDockWidget(Qt::RightDockWidgetArea, this);
 }
