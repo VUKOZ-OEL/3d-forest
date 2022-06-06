@@ -39,6 +39,7 @@ public:
     {
         addFile(prefix + name + "_24px.png", QSize(24, 24));
         addFile(prefix + name + "_24px.svg", QSize(24, 24));
+        addFile(prefix + name + "_30px.svg", QSize(30, 30));
     }
 };
 

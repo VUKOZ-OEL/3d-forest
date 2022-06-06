@@ -17,27 +17,22 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @page developerguide Developer Guide
+/** @page 3dforest_developer_guide Developer Guide
 
 These documents describe how to build 3D Forest and develop new plugins
 using APIs in 3D Forest and other libraries.
 
-- @subpage developerguide_git
-- @subpage developerguide_build_linux_make
-- @subpage developerguide_build_windows_make
-- @subpage developerguide_build_windows_visual_studio
-- @subpage developerguide_add_new_functionality
-- @subpage developerguide_code
-- @subpage developerguide_doxygen
-- @subpage developerguide_documentation
-- @subpage developerguide_3rd_party
-- @subpage cheatsheet contains frequently used things.
 
-*******************************************************************************/
+@section git Git
 
-/** @page developerguide_git Git
+@subsection git_get_code Get the Source Code
+  @verbatim
+  git clone https://github.com/VUKOZ-OEL/3dforest2.git
+  cd 3dforest2
+  @endverbatim
 
-- Create your branch in GitHub if you like to make some changes:
+@subsection git_create_branch Create New Branch
+- If you like to make some changes, then create your branch in GitHub:
   -# Open web page 'https://github.com/VUKOZ-OEL/3dforest2'.
   -# Click on 'main' button.
   -# In 'Switch branches/tags' popup window:
@@ -45,12 +40,7 @@ using APIs in 3D Forest and other libraries.
     -# Type a name of your_branch. Example "vb" for "Vaclav Bubnik".
     -# Hit enter.
 
-- Get the source code:
-  @verbatim
-  git clone https://github.com/VUKOZ-OEL/3dforest2.git
-  cd 3dforest2
-  @endverbatim
-
+@subsection git_merging Merging Your Changes
 - Switch to your branch if you like to make some changes:
   @verbatim
   git checkout your_branch
@@ -86,6 +76,7 @@ using APIs in 3D Forest and other libraries.
   git checkout your_branch
   @endverbatim
 
+@subsection git_commands Commands
 - Common download sequence:
   @verbatim
   git checkout <branch>
@@ -103,14 +94,14 @@ using APIs in 3D Forest and other libraries.
   git push
   @endverbatim
 
-*******************************************************************************/
 
-/** @page developerguide_build_linux_make Build Using "Unix Makefiles" on Linux
+
+@section build_linux_make Build from Source Code in Linux with "Unix Makefiles"
 
 The code uses C++17, CMake, Qt5/Qt6 and OpenGL which will be installed in the
 following steps. Qt and OpenGL are required only for GUI desktop application.
 
--#  Install Qt
+@subsection build_linux_make_qt Install Qt
     - Download Qt installer from https://www.qt.io/download
         - Clicked "Downloads for open source users" button in "Go open source"
         - Clicked "Download the Qt Online Installer" button in bottom section
@@ -128,18 +119,19 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
         - Additionally checked: Qt - Qt 5.15.2 - Sources
         - "Next", "Install", the installation took 13 minutes
 
--#  Installation of other tools: OpenGL and CMake from a terminal
+@subsection build_linux_make_opengl Installation of other tools: OpenGL and CMake from a terminal
     @verbatim
     $ sudo apt-get update
     $ sudo apt install mesa-common-dev libglu1-mesa-dev
     $ sudo apt install cmake
     @endverbatim
 
--#  Installation of other tools: gcc, g++, make, libc6-dev, etc.
+@subsection build_linux_make_gcc Installation of other tools: gcc, g++, make, libc6-dev, etc.
     @verbatim
     $ sudo apt-get install build-essential
     @endverbatim
 
+@subsection build_linux_make_3dforest Build 3D Forest
 -#  Get 3D Forest source code
     @verbatim
     $ cd /home/user/
@@ -171,14 +163,14 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
     One could modify "/home/<user>/.bashrc" or "/home/<user>/.profile" to make
     the change persistent.
 
-*******************************************************************************/
 
-/** @page developerguide_build_windows_make Build Using "MinGW Makefiles" on Windows
+
+@section build_windows_make Build from Source Code in Windows with "MinGW Makefiles"
 
 The code uses C++17, CMake, Qt5/Qt6 and OpenGL which will be installed in the
 following steps. Qt and OpenGL are required only for GUI desktop application.
 
--#  Install git
+@subsection build_windows_make_git Install git
     - Open "Git for windows" https://git-scm.com/downloads
     - Download installer Git-2.36.1-64-bit.exe
     - Run the installer
@@ -228,7 +220,7 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
                 name = Vaclav Bubnik
           @endverbatim
 
--#  Install msys2 and mingw-w64
+@subsection build_windows_make_mingw Install msys2 and mingw-w64
     - Open https://www.msys2.org/ and follow Installation instructions:
         - Download the installer: msys2-x86_64-20220319.exe
         - Run the installer
@@ -280,7 +272,7 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
         - "Move Up" these three new items to top
         - Click "Ok"
 
--#  Install Qt
+@subsection build_windows_make_qt Install Qt
     - Download Qt installer from https://www.qt.io/download
         - Click "Downloads for open source users" button in "Go open source"
         - Click "Download the Qt Online Installer" button in bottom section
@@ -315,7 +307,7 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
       "C:\Qt\5.15.0\mingw81_64\bin" or 
       "C:\Qt\6.3.0\mingw_64\bin" depending on your installed qt version
 
--#  Build 3D Forest
+@subsection build_windows_make_3dforest Build 3D Forest
     - Open "cmd" terminal windows application
     - Use "cd" command to navigate to local git repository folder
       @verbatim
@@ -337,14 +329,14 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
       @endverbatim
     - Run 3dforest.exe from directory "Documents\3dforest2\bin"
 
-*******************************************************************************/
 
-/** @page developerguide_build_windows_visual_studio Build with Visual Studio for Windows
+
+@section build_windows_visual_studio Build from Source Code in Windows with Visual Studio
 
 The code uses C++17, CMake, Qt5/Qt6 and OpenGL which will be installed in the
 following steps. Qt and OpenGL are required only for GUI desktop application.
 
-@section sec_git Install git
+@subsection build_windows_visual_studio_git Install git
     - Open "Git for windows" https://git-scm.com/downloads
     - Download installer Git-2.36.1-64-bit.exe
     - Run the installer
@@ -394,13 +386,13 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
                 name = Vaclav Bubnik
           @endverbatim
 
-@section sec_vs Install Visual Studio 
+@subsection build_windows_visual_studio_ide Install Visual Studio 
     - Open https://visualstudio.microsoft.com/downloads/
     - Click "Free download" in Visual Studio 2022 Cummunity 
     - Run VisualStudioSetup.exe
     - Select "Desktop development with C++", Total size is 8 GB
 
-@section sec_qt Install Qt
+@subsection build_windows_visual_studio_qt Install Qt
     - Download Qt installer from https://www.qt.io/download
         - Click "Downloads for open source users" button in "Go open source"
         - Click "Download the Qt Online Installer" button in bottom section
@@ -430,18 +422,18 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
     - In "System variables" select Variable "Path" and click "Edit..."
     - Click "New" and add "C:\Qt\6.3.0\msvc2019_64\bin"
 
-@section sec_build Build 3D Forest
+@subsection build_windows_visual_studio_3dforest Build 3D Forest
     - Open directory "3dforest2" in Visual Studio. This will automatically 
       create Visual Studio solution from CMake files.
     - Click "Build All"
 
-*******************************************************************************/
 
-/** @page developerguide_add_new_functionality Add New Functionality
 
-There are several ways to add new functionality:
+@section add_new_functionality Add New Functionality
 
--#  The most easy way is to add new external plugin. External plugins are self
+@subsection add_new_functionality_plugins Plugins
+    There are several ways to add new functionality.
+    The most easy way is to add new external plugin. External plugins are self
     contained. It is not necessary to touch any file outside of your plugin
     directory with exception of one cmake file.
     -#  To start, one can copy and modify existing external plugin such as
@@ -452,12 +444,14 @@ There are several ways to add new functionality:
         @endverbatim
     -#  External plugins will be visible from application main window.
 
--#  It is possible to add new command line tool to "src/apps/tools/mytool".
+@subsection add_new_functionality_tools Tools
+    It is possible to add new command line tool to "src/apps/tools/mytool".
     -#  Example command line tool "src/apps/tools/sandbox".
     -#  Example command line tool with Qt "src/apps/tools/icon".
     -#  Tools are not available from application main window.
 
--#  The third way is to add new internal plugin.
+@subsection add_new_functionality_internal_plugins Internal Plugins
+    The third way is to add new internal plugin.
     -#  To start, one can copy and modify existing internal plugin such as
         "src/plugins/projectfile" to new directory "src/plugins/myplugin".
     -#  Modify "src/gui/CMakeLists.txt" to build the new plugin into core:
@@ -481,33 +475,33 @@ There are several ways to add new functionality:
         @endverbatim
     -#  Internal plugins will be visible from application main window.
 
--#  The last and most difficult way is to modify core functionality in
+@subsection add_new_functionality_extend_core_functionality Extend Core Functionality
+    The last and most difficult way is to modify core functionality in
     the following directories. This functionality is available in all plugins.
     - "src/core" build to "lib3dforestcore.dll"
     - "src/editor" build to "lib3dforesteditor.dll"
     - "src/gui" build to "lib3dforestgui.dll"
 
-General:
+@subsection add_new_functionality_general General
+    -#  The main() 3D Forest application is in "src/apps/3dforest/3dforest.cpp".
+    -#  For development with Visual Studio Code, update
+        ".vscode/settings.json" to contain new directories.
+        For example, add "${workspaceRoot}/src/plugins/myaction" to
+        "C_Cpp.default.includePath" include paths.
+    -#  Need some icon? Try to look into directory "3rdparty/icons".
 
--#  The main() 3D Forest application is in "src/apps/3dforest/3dforest.cpp".
 
--#  For development with Visual Studio Code, update
-    ".vscode/settings.json" to contain new directories.
-    For example, add "${workspaceRoot}/src/plugins/myaction" to
-    "C_Cpp.default.includePath" include paths.
 
--#  Need some icon? Try to look into directory "3rdparty/icons".
+@section code_format Code Format Suggestions
 
-*******************************************************************************/
-
-/** @page developerguide_code Code Style
-
-Automatic formatting. It is good to run this command before 'git add <file>'
+@subsection code_format_automatic Automatic Code Formatting
+The following command performs automatic code formatting. It is good to run this command before 'git add <file>'
 and git commit to GitHub:
 @verbatim
 mingw32-make format
 @endverbatim
 
+@subsection code_format_names Names
 The code is using C++ std on Backend and Qt on Frontend.
 
 Function names follow mixed Qt style and std:
@@ -537,13 +531,7 @@ signals:
     void loadProgress(int progress);
 @endverbatim
 
-Debug:
-@verbatim
-#include <Log.hpp>
-LOG("counter=" << counter);
-@endverbatim
-
-File Names:
+@subsection code_format_file_names File Names
 @verbatim
 directory "3rd Party" is "3rdparty" lowercase, no separators
 
@@ -560,9 +548,17 @@ files     anything
           ".gitignore"
 @endverbatim
 
-*******************************************************************************/
 
-/** @page developerguide_doxygen Doxygen
+
+@section logging Logging
+@verbatim
+#include <Log.hpp>
+LOG("counter=" << counter);
+@endverbatim
+
+
+
+@section doxygen Doxygen
 
 Example command to generate documentation:
 @verbatim
@@ -624,9 +620,9 @@ Examples:
 */
 @endverbatim
 
-*******************************************************************************/
 
-/** @page developerguide_documentation Generate Help Manuals
+
+@section generate_help_manuals Generate Help Manuals
 
 We would like to be able to give users access to documentation from within the
 user interface of our application.
@@ -668,9 +664,9 @@ To show the documentation in the application:
 -#  The previous step displays Help dialog with table of contents on the
     left side and relevant html page on the right side.
 
-*******************************************************************************/
 
-/** @page developerguide_3rd_party Adding Third Party Libraries
+
+@section adding_3rd_party_library Adding Third Party Libraries
 
 Third party libraries used by 3D Forest are copied to '3rdparty' directory and
 therefore distributed together with 3D Forest.
@@ -687,4 +683,190 @@ https://www.gnu.org/licenses/license-list.html#GPLCompatibleLicenses
 GPL-Incompatible Free Software Licenses:
 https://www.gnu.org/licenses/license-list.html#GPLIncompatibleLicenses
 
-*******************************************************************************/
+
+
+@section cheatsheet Cheat Sheet
+
+@subsection cheatsheet_cmake CMake Build Script
+Example Windows build script executed from directory build:
+@verbatim
+cmake -G "MinGW Makefiles" .. -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug -DBUILD_EXAMPLES=ON
+mingw32-make format
+mingw32-make
+mingw32-make install
+mingw32-make doxygen
+qhelpgenerator ..\doc\index.qhcp -o html\index.qhc
+mkdir ..\bin\documentation
+copy html\index.qhc ..\bin\documentation\
+copy html\index.qch ..\bin\documentation\
+@endverbatim
+
+@subsection cheatsheet_qtdesigner Qt Designer
+Conversion of '.ui' files to '.hpp' files by using 'uic' command line tool:
+@verbatim
+which uic
+uic -o ui_window.h window.ui
+@endverbatim
+
+@subsection cheatsheet_rename_files Rename Files
+Rename filenames:
+@verbatim
+powershell -C "gci | % {rni $_.Name ($_.Name -replace '24px', '24')}"
+@endverbatim
+
+@subsection cheatsheet_vscode_edit Edit Source Code with Visual Studio Code
+-#  Download and install Visual Studio Code
+    - For Windows or Linux from https://code.visualstudio.com/
+    - Linux packages can be installed with: sudo apt install ./<downloaded>.deb
+    - Tested with version 1.56.2.
+
+-#  In file explorer, right-click on folder "3dforest2" and select
+    "Open with Code". This will open 3D Forest workspace.
+
+-#  Install extension "C/C++ IntelliSense, debugging, and code browsing".
+    Extension identifier is "ms-vscode.cpptools". Tested with v1.4.0.
+
+-#  Install extension "CMake Tools".
+    Extension identifier is "ms-vscode.cmake-tools". Tested with v1.7.3.
+
+-#  Optionally install extension "CMake langage support for Visual Studio Code".
+    Extension identifier is "twxs.cmake".
+
+-#  Optionally install extension "Code Spell Checker".
+    Extension identifier is "streetsidesoftware.code-spell-checker".
+
+-#  On Windows, add the following lines to "3dforest2/.vscode/settings.json"
+    (compiler path and IntelliSense settings):
+    @verbatim
+    {
+        "files.eol": "\n",
+        "C_Cpp.default.includePath":[
+            "C:/Qt/5.15.0/mingw81_64/include/**",
+            "${workspaceRoot}/3rdparty/delaunator",
+            "${workspaceRoot}/3rdparty/eigen",
+            "${workspaceRoot}/3rdparty/libigl/include/**",
+            "${workspaceRoot}/3rdparty/widgets/ctkrangeslider",
+            "${workspaceRoot}/src/apps/3dforest",
+            "${workspaceRoot}/src/apps/tools/sandbox",
+            "${workspaceRoot}/src/core",
+            "${workspaceRoot}/src/editor",
+            "${workspaceRoot}/src/gui",
+            "${workspaceRoot}/src/plugins/classifyground",
+            "${workspaceRoot}/src/plugins/import",
+            "${workspaceRoot}/src/plugins/projectfile",
+            "${workspaceRoot}/src/plugins/segmentation",
+            "${workspaceRoot}/src/plugins/viewer"]
+    }
+    @endverbatim
+
+-# Close the window and reopen to the same folder to apply new settings.
+
+@subsection cheatsheet_vscode_debug Build and Debug in Visual Studio Code
+-#  Install GDB for msys2:
+    - Open windows Command prompt "cmd".
+    - Search for gdb to find a specific package in the repository:
+      > pacman -Ss gdb
+    - For example use the following command to install gdb package:
+      > pacman -S mingw-w64-x86_64-gdb
+
+-#  Open Visual Studio Code
+
+-#  On Windows, Add the following lines to settings.json:
+    @verbatim
+    {
+        "cmake.configureOnOpen": false,
+        "cmake.mingwSearchDirs": [
+            "C:\\msys64\\mingw-w64\\bin"
+        ],
+        "cmake.generator": "MinGW Makefiles",
+    }
+    @endverbatim
+
+-#  Select a kit:
+    - Open the Command Palette.
+    - Run "CMake: Select a Kit".
+    - Click "[Scan for kits]".
+    - Select the compiler. For example "GCC 10.1.0 Using compilers:
+      C= C:\msys64\mingw-w64\bin\gcc.exe, CXX= C:\msys64\mingw-w64\bin\g++.exe".
+
+-#  Select a variant:
+    - Open the Command Palette.
+    - Run "CMake: Select Variant".
+    - Select "Debug" to include debug information with your build.
+
+-#  On Windows, create 'launch.json' (debugger settings, perform CMake build)
+    in '.vscode' directory:
+    @verbatim
+    {
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "(gdb) Launch",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/3dforest.exe",
+                "args": [],
+                "stopAtEntry": false,
+                "cwd": "${workspaceFolder}",
+                "environment": [],
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            }
+        ]
+    }
+    @endverbatim
+
+-#  You may also create file 'tasks.json' (build instructions)
+    in '.vscode' directory:
+    @verbatim
+    {
+        "version": "2.0.0",
+        "command": "sh",
+        "args": ["-c"],
+        "presentation":
+        {
+            "echo": true,
+            "reveal": "always",
+            "focus": true,
+            "panel": "new"
+        },
+        "tasks": [
+            {
+                "label": "cmake",
+                "type": "shell",
+                "options":
+                {
+                    "cwd": "${workspaceRoot}/build"
+                },
+                "args": ["cmake -G 'MinGW Makefiles' .. -DCMAKE_INSTALL_PREFIX=.."]
+            },
+            {
+                "label": "make",
+                "type": "shell",
+                "args": ["mingw32-make"],
+                "options": {"cwd": "${workspaceRoot}/build"},
+                "dependsOn": ["cmake"],
+                "group": {"kind": "build","isDefault": true}
+            }
+        ]
+    }
+    @endverbatim
+
+-#  To build click "Build the selected target".
+
+-#  Copy shared libraries to the same folder as "3dforest.exe":
+    build\src\apps\3dforest\
+    - lib3dforestcore.dll
+    - lib3dforesteditor.dll
+    - lib3dforestgui.dll
+
+-#  To debug click "Launch the debugger for the selected target: [3dforest]".
+
+*/
