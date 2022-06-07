@@ -20,7 +20,7 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:dc="http://purl.org/dc/elements/1.1/"><title
-     id="title2476">3D Forest Hide Icon</title><sodipodi:namedview
+     id="title2476">3D Forest Icon: Hide</title><sodipodi:namedview
      id="namedview7"
      pagecolor="#ffffff"
      bordercolor="#000000"
@@ -56,17 +56,17 @@
      inkscape:groupmode="layer"
      id="layer3"
      inkscape:label="Vector"><ellipse
-       style="display:inline;fill:none;stroke:#555753;stroke-width:1.5;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:1;stroke-opacity:1;paint-order:fill markers stroke"
+       style="display:inline;fill:none;stroke:#555753;stroke-width:1.2;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:1;stroke-opacity:1;paint-order:fill markers stroke"
        id="path974"
        cx="12"
        cy="13.5"
        rx="4.5"
        ry="4" /><path
-       style="display:inline;fill:none;stroke:#555753;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:1;paint-order:fill markers stroke;stroke-width:1.5;stroke-dasharray:none"
+       style="display:inline;fill:none;stroke:#555753;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:1;paint-order:fill markers stroke;stroke-width:1.2;stroke-dasharray:none"
        d="m 0.5,13.5 c 0,0 2.5,-8 11.5,-8 9,0 11.5,8 11.5,8"
        id="path1021"
        sodipodi:nodetypes="czc" /><path
-       style="fill:none;stroke:#555753;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:1;paint-order:fill markers stroke;stroke-width:1.5;stroke-dasharray:none"
+       style="fill:none;stroke:#555753;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:1;paint-order:fill markers stroke;stroke-width:1.2;stroke-dasharray:none"
        d="m 2.5,21.5 19,-19"
        id="path314" /><ellipse
        style="display:inline;fill:#5b5b5b;stroke:#555753;stroke-width:1;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:1;stroke-opacity:1;paint-order:fill markers stroke;fill-opacity:1"
@@ -76,4 +76,4 @@
        rx="1.5"
        ry="1" /></g><metadata
      id="metadata2474"><rdf:RDF><cc:Work
-         rdf:about=""><dc:title>3D Forest Hide Icon</dc:title><dc:creator><cc:Agent><dc:title>Vaclav Bubnik, Copyright 2020 VUKOZ, www.gnu.org/licenses/gpl-3.0.html</dc:title></cc:Agent></dc:creator><dc:date>2 June 2022</dc:date></cc:Work></rdf:RDF></metadata></svg>
+         rdf:about=""><dc:title>3D Forest Icon: Hide</dc:title><dc:creator><cc:Agent><dc:title>Vaclav Bubnik</dc:title></cc:Agent></dc:creator><dc:date>2 June 2022</dc:date><dc:rights><cc:Agent><dc:title>Copyright 2020-present VUKOZ Licence GNU GPL version 3 www.gnu.org/licenses/gpl-3.0.html</dc:title></cc:Agent></dc:rights></cc:Work></rdf:RDF></metadata></svg>
