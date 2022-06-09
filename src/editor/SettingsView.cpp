@@ -27,16 +27,13 @@ SettingsView::SettingsView()
       pointColor_(1.0F, 1.0F, 1.0F),
       background_(0.2F, 0.2F, 0.2F)
 {
-    colorSourceString_ = {
-        "Color",
-        "User Color",
-        "Intensity",
-        "Return Number",
-        "Number of Returns",
-        "Classification",
-        // "Layer",
-        // "User Color",
-    };
+    colorSourceString_ = {"Color",
+                          "Intensity",
+                          "Return Number",
+                          "Number of Returns",
+                          "Classification",
+                          // "Layer",
+                          "User Color"};
 
     colorSourceEnabled_.resize(colorSourceString_.size());
     for (auto &&it : colorSourceEnabled_)

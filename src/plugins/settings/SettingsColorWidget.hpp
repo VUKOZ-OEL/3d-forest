@@ -17,10 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SettingsViewWidget.hpp */
+/** @file SettingsColorWidget.hpp */
 
-#ifndef SETTINGS_VIEW_WIDGET_HPP
-#define SETTINGS_VIEW_WIDGET_HPP
+#ifndef SETTINGS_COLOR_WIDGET_HPP
+#define SETTINGS_COLOR_WIDGET_HPP
 
 #include <vector>
 
@@ -32,18 +32,18 @@ class MainWindow;
 
 class QCheckBox;
 class QPushButton;
-class QSlider;
 class QTabWidget;
 class QTreeWidget;
 class QTreeWidgetItem;
+class QSlider;
 
-/** Settings View Widget. */
-class SettingsViewWidget : public QWidget
+/** Settings Color Widget. */
+class SettingsColorWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    /** Settings View Widget Column. */
+    /** Settings Color Widget Column. */
     enum Column
     {
         COLUMN_CHECKED,
@@ -53,28 +53,23 @@ public:
         COLUMN_LAST
     };
 
-    SettingsViewWidget(MainWindow *mainWindow);
+    SettingsColorWidget(MainWindow *mainWindow);
 
 public slots:
     void slotUpdate();
-
     void slotSetPointSize(int v);
     void slotSetFogEnabled(int v);
-
     void slotSetColorFg();
     void slotSetColorBg();
-
-    void slotClearSelection();
     void slotItemChanged(QTreeWidgetItem *item, int column);
 
 protected:
     MainWindow *mainWindow_;
-    QTreeWidget *tree_;
-    QPushButton *deselectButton_;
-    QSlider *pointSizeSlider_;
+    QTreeWidget *treeWidget_;
     QCheckBox *fogCheckBox_;
     QPushButton *colorFgButton_;
     QPushButton *colorBgButton_;
+    QSlider *pointSizeSlider_;
     SettingsView settings_;
 
     void settingsChanged();
@@ -93,4 +88,4 @@ protected:
     void setColor(QPushButton *button, const Vector3<float> &rgb);
 };
 
-#endif /* SETTINGS_VIEW_WIDGET_HPP */
+#endif /* SETTINGS_COLOR_WIDGET_HPP */

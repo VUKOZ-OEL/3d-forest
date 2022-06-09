@@ -47,17 +47,17 @@ void HelpPlugin::initialize(MainWindow *mainWindow)
 
 void HelpPlugin::slotAbout()
 {
-    QMessageBox::about(mainWindow_,
-                       tr("About 3D Forest, version ") +
-                           MainWindow::APPLICATION_VERSION,
-                       tr("3D Forest is software for analysis of Lidar data"
-                          " from forest environment.\n"
-                          "\n"
-                          "Copyright 2020-present VUKOZ\n"
-                          "Blue Cat team and other authors\n"
-                          "https://www.3dforest.eu\n"
-                          "\n"
-                          "Uses delaunator-cpp, eigen, libigl\n"
-                          "Uses modified icons from: https://icons8.com\n"
-                          "Uses modified ctkRangeSlider, (c) Kitware Inc.\n"));
+    QMessageBox::about(
+        mainWindow_,
+        tr("About 3D Forest, version ") + MainWindow::APPLICATION_VERSION,
+        tr("3D Forest is software for analysis of Lidar data from forest"
+           " environment.\n"
+           "\n"
+           "Copyright 2020-present VUKOZ\n"
+           "Blue Cat team and other authors\n"
+           "https://www.3dforest.eu\n"
+           "\n"
+           "Uses delaunator-cpp, eigen, libigl\n"
+           "Uses additional icons https://icons8.com\n"
+           "Uses modified ctkRangeSlider, (c) Kitware Inc.\n"));
 }

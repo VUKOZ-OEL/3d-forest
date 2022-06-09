@@ -17,11 +17,11 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SettingsViewWidget.cpp */
+/** @file SettingsColorWidget.cpp */
 
 #include <IconTheme.hpp>
 #include <MainWindow.hpp>
-#include <SettingsViewWidget.hpp>
+#include <SettingsColorWidget.hpp>
 
 #include <QBrush>
 #include <QCheckBox>
@@ -43,49 +43,18 @@
 
 #define ICON(name) (IconTheme(":/settings/", name))
 
-SettingsViewWidget::SettingsViewWidget(MainWindow *mainWindow)
+SettingsColorWidget::SettingsColorWidget(MainWindow *mainWindow)
     : QWidget(mainWindow),
       mainWindow_(mainWindow)
 {
     // Color source
-    tree_ = new QTreeWidget();
-
-    deselectButton_ = new QPushButton(tr("Disable all"));
-    deselectButton_->setToolTip(tr("Disable all sources"));
-    connect(deselectButton_,
-            SIGNAL(clicked()),
-            this,
-            SLOT(slotClearSelection()));
-
-    QHBoxLayout *controlLayout = new QHBoxLayout;
-    controlLayout->addStretch();
-    controlLayout->addWidget(deselectButton_);
-
-    QVBoxLayout *groupBoxLayout = new QVBoxLayout;
-    groupBoxLayout->setContentsMargins(2, 1, 2, 1);
-    groupBoxLayout->addWidget(tree_);
-    groupBoxLayout->addLayout(controlLayout);
-
-    QGroupBox *groupBox = new QGroupBox(tr("Color Source"));
-    groupBox->setLayout(groupBoxLayout);
-
-    // Point size
-    pointSizeSlider_ = new QSlider;
-    pointSizeSlider_->setMinimum(1);
-    pointSizeSlider_->setMaximum(5);
-    pointSizeSlider_->setSingleStep(1);
-    pointSizeSlider_->setTickInterval(1);
-    pointSizeSlider_->setTickPosition(QSlider::TicksAbove);
-    pointSizeSlider_->setOrientation(Qt::Horizontal);
-    connect(pointSizeSlider_,
-            SIGNAL(valueChanged(int)),
-            this,
-            SLOT(slotSetPointSize(int)));
+    treeWidget_ = new QTreeWidget();
 
     // Fog
     fogCheckBox_ = new QCheckBox;
     fogCheckBox_->setChecked(settings_.isFogEnabled());
     fogCheckBox_->setToolTip(tr("Reduce intensity with increasing distance"));
+    fogCheckBox_->setText(tr("Fog"));
     connect(fogCheckBox_,
             SIGNAL(stateChanged(int)),
             this,
@@ -101,21 +70,32 @@ SettingsViewWidget::SettingsViewWidget(MainWindow *mainWindow)
     QHBoxLayout *colorLayout = new QHBoxLayout;
     colorLayout->addWidget(colorFgButton_);
     colorLayout->addWidget(colorBgButton_);
+    colorLayout->addWidget(fogCheckBox_);
     colorLayout->addStretch();
 
+    // Point size
+    pointSizeSlider_ = new QSlider;
+    pointSizeSlider_->setMinimum(1);
+    pointSizeSlider_->setMaximum(5);
+    pointSizeSlider_->setSingleStep(1);
+    pointSizeSlider_->setTickInterval(1);
+    pointSizeSlider_->setTickPosition(QSlider::TicksAbove);
+    pointSizeSlider_->setOrientation(Qt::Horizontal);
+    connect(pointSizeSlider_,
+            SIGNAL(valueChanged(int)),
+            this,
+            SLOT(slotSetPointSize(int)));
+
+    QHBoxLayout *pointSizeLayout = new QHBoxLayout;
+    pointSizeLayout->addWidget(new QLabel(tr("Point Size")));
+    pointSizeLayout->addWidget(pointSizeSlider_);
+
     // Layout
-    QGridLayout *mainLayout = new QGridLayout;
-    int row = 0;
-    mainLayout->addWidget(groupBox, row, 0, 1, 2);
-    row++;
-    mainLayout->addWidget(new QLabel(tr("Point Size")), row, 0);
-    mainLayout->addWidget(pointSizeSlider_, row, 1);
-    row++;
-    mainLayout->addWidget(new QLabel(tr("Fog")), row, 0);
-    mainLayout->addWidget(fogCheckBox_, row, 1);
-    row++;
-    mainLayout->addWidget(new QLabel(tr("Color")), row, 0);
-    mainLayout->addLayout(colorLayout, row, 1);
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(treeWidget_);
+    mainLayout->addLayout(colorLayout);
+    mainLayout->addLayout(pointSizeLayout);
+    mainLayout->addStretch();
 
     setLayout(mainLayout);
 
@@ -123,39 +103,39 @@ SettingsViewWidget::SettingsViewWidget(MainWindow *mainWindow)
     connect(mainWindow_, SIGNAL(signalUpdate()), this, SLOT(slotUpdate()));
 }
 
-void SettingsViewWidget::slotUpdate()
+void SettingsColorWidget::slotUpdate()
 {
     setSettings(mainWindow_->editor().settings().view());
 }
 
-void SettingsViewWidget::settingsChanged()
+void SettingsColorWidget::settingsChanged()
 {
     mainWindow_->suspendThreads();
     mainWindow_->editor().setSettingsView(settings_);
     mainWindow_->updateRender();
 }
 
-void SettingsViewWidget::settingsChangedApply()
+void SettingsColorWidget::settingsChangedApply()
 {
     mainWindow_->suspendThreads();
     mainWindow_->editor().setSettingsView(settings_);
     mainWindow_->updateModifiers();
 }
 
-void SettingsViewWidget::slotSetPointSize(int v)
+void SettingsColorWidget::slotSetPointSize(int v)
 {
     settings_.setPointSize(static_cast<float>(v));
     settingsChanged();
 }
 
-void SettingsViewWidget::slotSetFogEnabled(int v)
+void SettingsColorWidget::slotSetFogEnabled(int v)
 {
     (void)v;
     settings_.setFogEnabled(fogCheckBox_->isChecked());
     settingsChanged();
 }
 
-void SettingsViewWidget::slotSetColorFg()
+void SettingsColorWidget::slotSetColorFg()
 {
     Vector3<float> rgb = settings_.pointColor();
 
@@ -167,7 +147,7 @@ void SettingsViewWidget::slotSetColorFg()
     }
 }
 
-void SettingsViewWidget::slotSetColorBg()
+void SettingsColorWidget::slotSetColorBg()
 {
     Vector3<float> rgb = settings_.backgroundColor();
 
@@ -179,7 +159,7 @@ void SettingsViewWidget::slotSetColorBg()
     }
 }
 
-bool SettingsViewWidget::colorDialog(Vector3<float> &rgb)
+bool SettingsColorWidget::colorDialog(Vector3<float> &rgb)
 {
     QColor color;
     color.setRgbF(rgb[0], rgb[1], rgb[2]);
@@ -198,13 +178,13 @@ bool SettingsViewWidget::colorDialog(Vector3<float> &rgb)
     return true;
 }
 
-void SettingsViewWidget::setColor(QPushButton *button,
-                                  const Vector3<float> &rgb)
+void SettingsColorWidget::setColor(QPushButton *button,
+                                   const Vector3<float> &rgb)
 {
     QColor color;
     color.setRgbF(rgb[0], rgb[1], rgb[2]);
 
-    QPixmap pixmap(25, 25);
+    QPixmap pixmap(24, 24);
     pixmap.fill(color);
 
     QIcon icon(pixmap);
@@ -213,14 +193,7 @@ void SettingsViewWidget::setColor(QPushButton *button,
     button->setIconSize(QSize(10, 10));
 }
 
-void SettingsViewWidget::slotClearSelection()
-{
-    settings_.setColorSourceEnabledAll(false);
-    updateTree();
-    settingsChangedApply();
-}
-
-void SettingsViewWidget::slotItemChanged(QTreeWidgetItem *item, int column)
+void SettingsColorWidget::slotItemChanged(QTreeWidgetItem *item, int column)
 {
     if (column == COLUMN_CHECKED)
     {
@@ -231,16 +204,16 @@ void SettingsViewWidget::slotItemChanged(QTreeWidgetItem *item, int column)
     }
 }
 
-size_t SettingsViewWidget::index(const QTreeWidgetItem *item)
+size_t SettingsColorWidget::index(const QTreeWidgetItem *item)
 {
     return item->text(COLUMN_ID).toULong();
 }
 
-void SettingsViewWidget::updateTree()
+void SettingsColorWidget::updateTree()
 {
     block();
 
-    QTreeWidgetItemIterator it(tree_);
+    QTreeWidgetItemIterator it(treeWidget_);
 
     while (*it)
     {
@@ -261,24 +234,24 @@ void SettingsViewWidget::updateTree()
     unblock();
 }
 
-void SettingsViewWidget::block()
+void SettingsColorWidget::block()
 {
-    disconnect(tree_, SIGNAL(itemChanged(QTreeWidgetItem *, int)), 0, 0);
+    disconnect(treeWidget_, SIGNAL(itemChanged(QTreeWidgetItem *, int)), 0, 0);
     (void)blockSignals(true);
 }
 
-void SettingsViewWidget::unblock()
+void SettingsColorWidget::unblock()
 {
     (void)blockSignals(false);
-    connect(tree_,
+    connect(treeWidget_,
             SIGNAL(itemChanged(QTreeWidgetItem *, int)),
             this,
             SLOT(slotItemChanged(QTreeWidgetItem *, int)));
 }
 
-void SettingsViewWidget::addItem(size_t i)
+void SettingsColorWidget::addItem(size_t i)
 {
-    QTreeWidgetItem *item = new QTreeWidgetItem(tree_);
+    QTreeWidgetItem *item = new QTreeWidgetItem(treeWidget_);
 
     if (settings_.isColorSourceEnabled(i))
     {
@@ -297,15 +270,15 @@ void SettingsViewWidget::addItem(size_t i)
     item->setText(COLUMN_OPACITY, "100%");
 }
 
-void SettingsViewWidget::setColorSource(const SettingsView &settings)
+void SettingsColorWidget::setColorSource(const SettingsView &settings)
 {
-    tree_->clear();
+    treeWidget_->clear();
 
     // Header
-    tree_->setColumnCount(COLUMN_LAST);
+    treeWidget_->setColumnCount(COLUMN_LAST);
     QStringList labels;
-    labels << tr("Enabled") << tr("Id") << tr("Label") << tr("Opacity");
-    tree_->setHeaderLabels(labels);
+    labels << tr("Enabled") << tr("Id") << tr("Source") << tr("Opacity");
+    treeWidget_->setHeaderLabels(labels);
 
     // Content
     for (size_t i = 0; i < settings.colorSourceSize(); i++)
@@ -316,22 +289,22 @@ void SettingsViewWidget::setColorSource(const SettingsView &settings)
     // Resize Columns to the minimum space
     for (int i = 0; i < COLUMN_LAST; i++)
     {
-        tree_->resizeColumnToContents(i);
+        treeWidget_->resizeColumnToContents(i);
     }
 
-    tree_->setColumnHidden(COLUMN_ID, true);
+    treeWidget_->setColumnHidden(COLUMN_ID, true);
 }
 
-void SettingsViewWidget::setSettings(const SettingsView &settings)
+void SettingsColorWidget::setSettings(const SettingsView &settings)
 {
     block();
 
     settings_ = settings;
 
     setColorSource(settings_);
-    pointSizeSlider_->setValue(static_cast<int>(settings_.pointSize()));
     setColor(colorFgButton_, settings_.pointColor());
     setColor(colorBgButton_, settings_.backgroundColor());
+    pointSizeSlider_->setValue(static_cast<int>(settings_.pointSize()));
 
     unblock();
 }
