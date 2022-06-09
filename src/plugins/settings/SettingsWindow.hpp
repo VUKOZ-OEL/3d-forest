@@ -25,7 +25,7 @@
 #include <QDockWidget>
 
 class MainWindow;
-class SettingsViewWidget;
+class SettingsColorWidget;
 
 class QTabWidget;
 
@@ -40,7 +40,7 @@ public:
 protected:
     MainWindow *mainWindow_;
     QTabWidget *tabWidget_;
-    SettingsViewWidget *viewWidget_;
+    SettingsColorWidget *settingsColorWidget_;
 };
 
 #endif /* SETTINGS_WINDOW_HPP */

@@ -20,7 +20,7 @@
 /** @file SettingsWindow.cpp */
 
 #include <MainWindow.hpp>
-#include <SettingsViewWidget.hpp>
+#include <SettingsColorWidget.hpp>
 #include <SettingsWindow.hpp>
 
 #include <QTabWidget>
@@ -30,12 +30,11 @@ SettingsWindow::SettingsWindow(MainWindow *mainWindow)
       mainWindow_(mainWindow)
 {
     // Tabs
-    viewWidget_ = new SettingsViewWidget(mainWindow_);
+    settingsColorWidget_ = new SettingsColorWidget(mainWindow_);
 
     // Tab
     tabWidget_ = new QTabWidget;
-    tabWidget_->addTab(viewWidget_, tr("View"));
-    tabWidget_->setFixedHeight(330);
+    tabWidget_->addTab(settingsColorWidget_, tr("Color"));
 
     // Dock
     setWidget(tabWidget_);
