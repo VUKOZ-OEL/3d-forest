@@ -19,6 +19,7 @@
 
 /** @file ProjectNavigatorWindow.cpp */
 
+#include <IconTheme.hpp>
 #include <MainWindow.hpp>
 #include <ProjectNavigatorClassifications.hpp>
 #include <ProjectNavigatorFiles.hpp>

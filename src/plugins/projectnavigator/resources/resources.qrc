@@ -34,5 +34,10 @@
 <file>select_invert_24px.svg</file>
 <file>select_none_24px.svg</file>
 
+<!-- Tabs -->
+<file>file_24px.png</file>
+<file>apps_tab_24px.png</file>
+<file>diversity_24px.png</file>
+
 </qresource>
 </RCC>
