@@ -37,8 +37,8 @@ void SegmentationPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "Tools",
-                              "Tools",
+                              "Utilities",
+                              "Utilities",
                               tr("Segmentation"),
                               tr("Segmentation splits forest into trees"),
                               ICON("forest"),
