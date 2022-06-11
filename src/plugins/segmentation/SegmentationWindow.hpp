@@ -27,6 +27,8 @@
 class MainWindow;
 
 class QSpinBox;
+class QSlider;
+class QVBoxLayout;
 
 /** Segmentation Window. */
 class SegmentationWindow : public QDockWidget
@@ -37,12 +39,39 @@ public:
     SegmentationWindow(MainWindow *mainWindow);
 
 protected slots:
+    void slotDistanceFinalValue();
+    void slotDistanceIntermediateValue(int v);
+
+    void slotThresholdFinalValue();
+    void slotThresholdIntermediateValue(int v);
+
     void slotApply();
 
 protected:
     MainWindow *mainWindow_;
     QWidget *widget_;
+
+    QWidget *distanceGroup_;
+    QSlider *distanceSlider_;
     QSpinBox *distanceSpinBox_;
+
+    QWidget *thresholdGroup_;
+    QSlider *thresholdSlider_;
+    QSpinBox *thresholdSpinBox_;
+
+    void createInputSlider(QVBoxLayout *layout,
+                           QWidget *&group,
+                           QSlider *&slider,
+                           QSpinBox *&spinBox,
+                           const char *memberIntermediateValue,
+                           const char *memberFinalValue,
+                           const QString &text,
+                           const QString &toolTip,
+                           const QString &unitsList,
+                           int step,
+                           int min,
+                           int max,
+                           int value);
 };
 
 #endif /* SEGMENTATION_WINDOW_HPP */

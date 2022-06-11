@@ -250,11 +250,11 @@ void ClassifyGroundPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "Tools",
-                              "Tools",
+                              "Utilities",
+                              "Utilities",
                               tr("Classify Ground"),
                               tr("Classify points to ground and unassigned"),
-                              ICON("mountain"),
+                              ICON("soil"),
                               this,
                               SLOT(slotPlugin()));
 }

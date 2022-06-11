@@ -57,6 +57,7 @@ public:
     static const char *APPLICATION_NAME;
     static const char *APPLICATION_VERSION;
     static const int ICON_SIZE;
+    static const int ICON_SIZE_TEXT;
 
     MainWindow(QWidget *parent = nullptr);
     virtual ~MainWindow();

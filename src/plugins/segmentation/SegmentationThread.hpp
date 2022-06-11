@@ -1,5 +1,4 @@
-<!DOCTYPE RCC>
-<!--
+/*
     Copyright 2020 VUKOZ
 
     This file is part of 3D Forest.
@@ -16,11 +15,22 @@
 
     You should have received a copy of the GNU General Public License
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
--->
-<RCC version="1.0">
-<qresource prefix="/gui">
+*/
 
-<file>question_16px.svg</file>
+/** @file SegmentationThread.hpp */
 
-</qresource>
-</RCC>
+#ifndef SEGMENTATION_THREAD_HPP
+#define SEGMENTATION_THREAD_HPP
+
+#include <Vector3.hpp>
+
+/** Segmentation Thread. */
+class SegmentationThread
+{
+public:
+    SegmentationThread();
+
+protected:
+};
+
+#endif /* SEGMENTATION_THREAD_HPP */

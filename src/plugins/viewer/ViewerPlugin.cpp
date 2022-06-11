@@ -40,8 +40,8 @@ void ViewerPlugin::initialize(MainWindow *mainWindow)
     mainWindow_->setCentralWidget(viewports_);
 
     mainWindow_->createAction(&actionViewOrthographic_,
-                              "View",
-                              "View Projection",
+                              "Viewport",
+                              "Viewport Projection",
                               tr("Orthographic"),
                               tr("Orthographic projection"),
                               ICON("empty_box_ortho"),
@@ -49,8 +49,8 @@ void ViewerPlugin::initialize(MainWindow *mainWindow)
                               SLOT(slotViewOrthographic()));
 
     mainWindow_->createAction(&actionViewPerspective_,
-                              "View",
-                              "View Projection",
+                              "Viewport",
+                              "Viewport Projection",
                               tr("Perspective"),
                               tr("Perspective projection"),
                               ICON("empty_box"),
@@ -58,8 +58,8 @@ void ViewerPlugin::initialize(MainWindow *mainWindow)
                               SLOT(slotViewPerspective()));
 
     mainWindow_->createAction(&actionViewTop_,
-                              "View",
-                              "View",
+                              "Viewport",
+                              "Viewport",
                               tr("Top view"),
                               tr("Top view"),
                               ICON("view_top"),
@@ -67,8 +67,8 @@ void ViewerPlugin::initialize(MainWindow *mainWindow)
                               SLOT(slotViewTop()));
 
     mainWindow_->createAction(&actionViewFront_,
-                              "View",
-                              "View",
+                              "Viewport",
+                              "Viewport",
                               tr("Front view"),
                               tr("Front view"),
                               ICON("view_front"),
@@ -76,8 +76,8 @@ void ViewerPlugin::initialize(MainWindow *mainWindow)
                               SLOT(slotViewFront()));
 
     mainWindow_->createAction(&actionViewRight_,
-                              "View",
-                              "View",
+                              "Viewport",
+                              "Viewport",
                               tr("Right view"),
                               tr("Right view"),
                               ICON("view_right"),
@@ -85,8 +85,8 @@ void ViewerPlugin::initialize(MainWindow *mainWindow)
                               SLOT(slotViewRight()));
 
     mainWindow_->createAction(&actionView3d_,
-                              "View",
-                              "View",
+                              "Viewport",
+                              "Viewport",
                               tr("3d view"),
                               tr("3d view"),
                               ICON("portraits"),
@@ -94,8 +94,8 @@ void ViewerPlugin::initialize(MainWindow *mainWindow)
                               SLOT(slotView3d()));
 
     mainWindow_->createAction(&actionViewResetDistance_,
-                              "View",
-                              "View",
+                              "Viewport",
+                              "Viewport",
                               tr("Reset distance"),
                               tr("Reset distance"),
                               ICON("fit_to_page"),
@@ -103,8 +103,8 @@ void ViewerPlugin::initialize(MainWindow *mainWindow)
                               SLOT(slotViewResetDistance()));
 
     mainWindow_->createAction(&actionViewResetCenter_,
-                              "View",
-                              "View",
+                              "Viewport",
+                              "Viewport",
                               tr("Reset center"),
                               tr("Reset center"),
                               ICON("collect"),
@@ -112,8 +112,8 @@ void ViewerPlugin::initialize(MainWindow *mainWindow)
                               SLOT(slotViewResetCenter()));
 
     mainWindow_->createAction(&actionViewLayoutSingle_,
-                              "View",
-                              "View Layout",
+                              "Viewport",
+                              "Viewport Layout",
                               tr("Single layout"),
                               tr("Single layout"),
                               ICON("layout_single"),
@@ -121,8 +121,8 @@ void ViewerPlugin::initialize(MainWindow *mainWindow)
                               SLOT(slotViewLayoutSingle()));
 
     mainWindow_->createAction(&actionViewLayoutTwoColumns_,
-                              "View",
-                              "View Layout",
+                              "Viewport",
+                              "Viewport Layout",
                               tr("Column layout"),
                               tr("Layout with two columns"),
                               ICON("layout_columns"),
@@ -130,8 +130,8 @@ void ViewerPlugin::initialize(MainWindow *mainWindow)
                               SLOT(slotViewLayout2Columns()));
 
     mainWindow_->createAction(&actionViewLayoutGrid_,
-                              "View",
-                              "View Layout",
+                              "Viewport",
+                              "Viewport Layout",
                               tr("Grid layout"),
                               tr("Grid layout"),
                               ICON("layout_grid_2"),
@@ -139,16 +139,16 @@ void ViewerPlugin::initialize(MainWindow *mainWindow)
                               SLOT(slotViewLayoutGrid()));
 
     mainWindow_->createAction(&actionViewLayoutGridRight_,
-                              "View",
-                              "View Layout",
+                              "Viewport",
+                              "Viewport Layout",
                               tr("Grid layout 3"),
                               tr("Grid layout with 3 rows"),
                               ICON("layout_grid_3_right"),
                               this,
                               SLOT(slotViewLayout3RowsRight()));
 
-    mainWindow_->hideToolBar("View Projection");
-    mainWindow_->hideToolBar("View Layout");
+    mainWindow_->hideToolBar("Viewport Projection");
+    mainWindow_->hideToolBar("Viewport Layout");
 }
 
 void ViewerPlugin::slotViewOrthographic()

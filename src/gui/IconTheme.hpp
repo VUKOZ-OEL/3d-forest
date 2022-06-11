@@ -37,6 +37,7 @@ class EXPORT_GUI IconTheme : public QIcon
 public:
     IconTheme(const QString &prefix, const QString &name) : QIcon()
     {
+        addFile(prefix + name + "_16px.svg", QSize(16, 16));
         addFile(prefix + name + "_24px.png", QSize(24, 24));
         addFile(prefix + name + "_24px.svg", QSize(24, 24));
         addFile(prefix + name + "_30px.svg", QSize(30, 30));
