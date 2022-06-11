@@ -20,6 +20,7 @@
 /** @file SegmentationWindow.cpp */
 
 #include <IconTheme.hpp>
+#include <Log.hpp>
 #include <MainWindow.hpp>
 #include <SegmentationWindow.hpp>
 
@@ -33,34 +34,61 @@
 #include <QLabel>
 #include <QProgressDialog>
 #include <QPushButton>
+#include <QSlider>
 #include <QSpinBox>
+#include <QToolButton>
 #include <QVBoxLayout>
 
 #define ICON(name) (IconTheme(":/segmentation/", name))
+//#define LOG_DEBUG_LOCAL(msg)
+#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("SegmentationWindow", msg)
 
 SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
     : QDockWidget(mainWindow),
       mainWindow_(mainWindow)
 {
-    // Widgets
-    distanceSpinBox_ = new QSpinBox;
-    distanceSpinBox_->setRange(1, 100);
-    distanceSpinBox_->setValue(1);
-    distanceSpinBox_->setSingleStep(1);
+    LOG_DEBUG_LOCAL("");
 
     // Layout
-    QGridLayout *gridLayout = new QGridLayout;
-    gridLayout->addWidget(new QLabel(tr("Distance")), 0, 0);
-    gridLayout->addWidget(distanceSpinBox_, 0, 1);
+    QVBoxLayout *settingsLayout = new QVBoxLayout;
 
-    QVBoxLayout *vboxLayout = new QVBoxLayout;
-    vboxLayout->addLayout(gridLayout);
-    vboxLayout->addStretch();
+    // Widgets
+    createInputSlider(settingsLayout,
+                      distanceGroup_,
+                      distanceSlider_,
+                      distanceSpinBox_,
+                      SLOT(slotDistanceIntermediateValue(int)),
+                      SLOT(slotDistanceFinalValue()),
+                      tr("Distance"),
+                      tr("Voxel size should be small enough to contain"
+                         " only one characteristic that best fits the data"),
+                      tr("pt"),
+                      1,
+                      1,
+                      100,
+                      10);
+
+    createInputSlider(settingsLayout,
+                      thresholdGroup_,
+                      thresholdSlider_,
+                      thresholdSpinBox_,
+                      SLOT(slotThresholdIntermediateValue(int)),
+                      SLOT(slotThresholdFinalValue()),
+                      tr("Threshold"),
+                      tr("Minimal cutoff threshold to consider"
+                         "computed characteristic value as a tree"),
+                      tr("%"),
+                      1,
+                      0,
+                      100,
+                      70);
+
+    // Layout
+    settingsLayout->addStretch();
 
     // Dock
     widget_ = new QWidget;
-    widget_->setLayout(vboxLayout);
-    widget_->setFixedHeight(150);
+    widget_->setLayout(settingsLayout);
     setWidget(widget_);
     setWindowTitle(QObject::tr("Segmentation"));
     setFloating(true);
@@ -68,6 +96,121 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
     mainWindow_->addDockWidget(Qt::RightDockWidgetArea, this);
 }
 
+void SegmentationWindow::slotDistanceFinalValue()
+{
+    LOG_DEBUG_LOCAL("value <" << distanceSlider_->value() << ">");
+}
+
+void SegmentationWindow::slotDistanceIntermediateValue(int v)
+{
+    LOG_DEBUG_LOCAL("value <" << v << ">");
+    QObject *obj = sender();
+    if (obj == distanceSlider_)
+    {
+        LOG_DEBUG_LOCAL("slider value");
+        distanceSpinBox_->blockSignals(true);
+        distanceSpinBox_->setValue(v);
+        distanceSpinBox_->blockSignals(false);
+    }
+    else if (obj == distanceSpinBox_)
+    {
+        LOG_DEBUG_LOCAL("spin box value");
+        distanceSlider_->blockSignals(true);
+        distanceSlider_->setValue(v);
+        distanceSlider_->blockSignals(false);
+    }
+}
+
+void SegmentationWindow::slotThresholdFinalValue()
+{
+    LOG_DEBUG_LOCAL("value <" << thresholdSlider_->value() << ">");
+}
+
+void SegmentationWindow::slotThresholdIntermediateValue(int v)
+{
+    LOG_DEBUG_LOCAL("value <" << v << ">");
+    QObject *obj = sender();
+    if (obj == thresholdSlider_)
+    {
+        LOG_DEBUG_LOCAL("slider value");
+        thresholdSpinBox_->setValue(v);
+    }
+    else if (obj == thresholdSpinBox_)
+    {
+        LOG_DEBUG_LOCAL("spin box value");
+        thresholdSlider_->setValue(v);
+    }
+}
+
 void SegmentationWindow::slotApply()
 {
+    LOG_DEBUG_LOCAL("");
+}
+
+void SegmentationWindow::createInputSlider(QVBoxLayout *layout,
+                                           QWidget *&group,
+                                           QSlider *&slider,
+                                           QSpinBox *&spinBox,
+                                           const char *memberIntermediateValue,
+                                           const char *memberFinalValue,
+                                           const QString &text,
+                                           const QString &toolTip,
+                                           const QString &unitsList,
+                                           int step,
+                                           int min,
+                                           int max,
+                                           int value)
+{
+    // Description Name
+    QLabel *label = new QLabel(text);
+
+    // Description Tool Tip
+    QLabel *help = new QLabel;
+    help->setToolTip(toolTip);
+    IconTheme helpIcon(":/gui/", "question");
+    help->setPixmap(helpIcon.pixmap(MainWindow::ICON_SIZE_TEXT));
+
+    // Description Units
+    QComboBox *units = new QComboBox;
+    units->addItem(unitsList);
+
+    // Description Layout
+    QHBoxLayout *descriptionLayout = new QHBoxLayout;
+    descriptionLayout->addWidget(label);
+    descriptionLayout->addWidget(help);
+    descriptionLayout->addStretch();
+    descriptionLayout->addWidget(units);
+
+    // Value Slider
+    slider = new QSlider;
+    slider->setRange(min, max);
+    slider->setValue(value);
+    slider->setSingleStep(step);
+    slider->setOrientation(Qt::Horizontal);
+    connect(slider, SIGNAL(valueChanged(int)), this, memberIntermediateValue);
+    connect(slider, SIGNAL(sliderReleased()), this, memberFinalValue);
+
+    // Value SpinBox
+    spinBox = new QSpinBox;
+    spinBox->setRange(min, max);
+    spinBox->setValue(value);
+    spinBox->setSingleStep(step);
+    connect(spinBox, SIGNAL(valueChanged(int)), this, memberIntermediateValue);
+    connect(spinBox, SIGNAL(editingFinished()), this, memberFinalValue);
+
+    // Value Layout
+    QHBoxLayout *valueLayout = new QHBoxLayout;
+    valueLayout->addWidget(slider);
+    valueLayout->addWidget(spinBox);
+
+    // Group Description and Value
+    QVBoxLayout *groupLayout = new QVBoxLayout;
+    groupLayout->addLayout(descriptionLayout);
+    groupLayout->addLayout(valueLayout);
+
+    group = new QWidget;
+    group->setLayout(groupLayout);
+
+    // Add Group to Main Layout
+    layout->addWidget(group);
 }
