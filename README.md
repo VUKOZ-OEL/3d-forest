@@ -9,7 +9,7 @@ Blue Cat team and other authors
 See [LICENSE](LICENSE) for more information.
 
 ## Documentation
-HTML [Documentation](https://vukoz-oel.github.io/3dforest2-documentation/3dforest_user_manual.html)
+HTML [Documentation](https://vukoz-oel.github.io/3d-forest-documentation/3d-forest-user-manual.html)
 with User Manual and Developer Guide.
 
 ## Installation Instructions
@@ -17,9 +17,9 @@ The code uses C++17 and CMake. Qt5 or Qt6 and OpenGL are required to build deskt
 The build process generates desktop application with graphical user interface and command line utilities.
 See [INSTALL](INSTALL) for more information.
 
-- [Windows MinGW](https://vukoz-oel.github.io/3dforest2-documentation/3dforest_developer_guide.html#build_windows_make) build from source code
-- [Windows Visual Studio](https://vukoz-oel.github.io/3dforest2-documentation/3dforest_developer_guide.html#build_windows_visual_studio) build from source code
-- [Linux](https://vukoz-oel.github.io/3dforest2-documentation/3dforest_developer_guide.html#build_linux_make) build from source code
+- [Windows MinGW](https://vukoz-oel.github.io/3d-forest-documentation/3d-forest-developer-guide.html#build-windows-make) build from source code
+- [Windows Visual Studio](https://vukoz-oel.github.io/3d-forest-documentation/3d-forest-developer-guide.html#build-windows-visual-studio) build from source code
+- [Linux](https://vukoz-oel.github.io/3d-forest-documentation/3d-forest-developer-guide.html#build-linux-make) build from source code
 
 ## Third-Party Libraries
 3D Forest source code includes several third-party libraries which are stored
