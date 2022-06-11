@@ -49,24 +49,24 @@ Build Using "Unix Makefiles" on Linux in 20 minutes
 
 4.  Get 3D Forest source code
     $ cd /home/user/
-    $ git clone https://github.com/VUKOZ-OEL/3dforest2.git
+    $ git clone https://github.com/VUKOZ-OEL/3d-forest.git
 
 5.  Build 3D Forest
-    $ cd /home/user/3dforest2
+    $ cd /home/user/3d-forest
     $ mkdir build
-    $ cd /home/user/3dforest2/build
+    $ cd /home/user/3d-forest/build
     $ PATH=$PATH:/home/user/Qt/5.15.2/gcc_64/bin
     $ cmake -G "Unix Makefiles" .. -DCMAKE_INSTALL_PREFIX=..
     $ make
     $ make install
 
 6.  Start 3D Forest application
-    $ cd /home/user/3dforest2/bin
-    $ LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/3dforest2/bin
+    $ cd /home/user/3d-forest/bin
+    $ LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/3d-forest/bin
       :/home/user/Qt/5.15.2/gcc_64/lib ./3dforest
 
 7.  We can open example project "project.json" from directory
-    "/home/user/3dforest2/data/"
+    "/home/user/3d-forest/data/"
 
 8.  We can see that we did not store modified PATH and LD_LIBRARY_PATH to user
     or system variables.
