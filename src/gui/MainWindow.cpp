@@ -47,6 +47,7 @@
 const char *MainWindow::APPLICATION_NAME = "3DForest";
 const char *MainWindow::APPLICATION_VERSION = "1.0";
 const int MainWindow::ICON_SIZE = 24;
+const int MainWindow::ICON_SIZE_TEXT = 16;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
