@@ -12,7 +12,17 @@ See [LICENSE](LICENSE) for more information.
 HTML [Documentation](https://vukoz-oel.github.io/3d-forest-documentation/3d-forest-user-manual.html)
 with User Manual and Developer Guide.
 
-## Installation Instructions
+## Build
+The code uses C++17, CMake, Qt5 or Qt6 and OpenGL.
+```
+    > mkdir build
+    > cd build
+    > cmake -G "MinGW Makefiles" .. -DCMAKE_INSTALL_PREFIX=..
+    > mingw32-make
+    > mingw32-make install
+```
+
+## Build Instructions
 The code uses C++17 and CMake. Qt5 or Qt6 and OpenGL are required to build desktop application.
 The build process generates desktop application with graphical user interface and command line utilities.
 See [INSTALL](INSTALL) for more information.
