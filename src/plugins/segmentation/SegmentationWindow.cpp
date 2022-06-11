@@ -44,7 +44,7 @@
 #define LOG_DEBUG_LOCAL(msg) LOG_MODULE("SegmentationWindow", msg)
 
 SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
-    : QDockWidget(mainWindow),
+    : QDialog(mainWindow),
       mainWindow_(mainWindow)
 {
     LOG_DEBUG_LOCAL("");
@@ -83,17 +83,32 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
                       100,
                       70);
 
+    acceptButton_ = new QPushButton(tr("Apply"));
+    connect(acceptButton_, SIGNAL(clicked()), this, SLOT(slotAccept()));
+
+    rejectButton_ = new QPushButton(tr("Cancel"));
+    connect(rejectButton_, SIGNAL(clicked()), this, SLOT(slotReject()));
+
     // Layout
     settingsLayout->addStretch();
 
-    // Dock
-    widget_ = new QWidget;
-    widget_->setLayout(settingsLayout);
-    setWidget(widget_);
-    setWindowTitle(QObject::tr("Segmentation"));
-    setFloating(true);
-    setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    mainWindow_->addDockWidget(Qt::RightDockWidgetArea, this);
+    QHBoxLayout *dialogButtons = new QHBoxLayout;
+    dialogButtons->addStretch();
+    dialogButtons->addWidget(acceptButton_);
+    dialogButtons->addWidget(rejectButton_);
+
+    QVBoxLayout *dialogLayout = new QVBoxLayout;
+    dialogLayout->addLayout(settingsLayout);
+    dialogLayout->addSpacing(10);
+    dialogLayout->addLayout(dialogButtons);
+    dialogLayout->addStretch();
+
+    setLayout(dialogLayout);
+
+    // Dialog
+    setWindowTitle(tr("Segmentation"));
+    setWindowIcon(ICON("forest"));
+    setMaximumHeight(height());
 }
 
 void SegmentationWindow::slotDistanceFinalValue()
@@ -142,9 +157,18 @@ void SegmentationWindow::slotThresholdIntermediateValue(int v)
     }
 }
 
-void SegmentationWindow::slotApply()
+void SegmentationWindow::slotAccept()
 {
     LOG_DEBUG_LOCAL("");
+    close();
+    setResult(QDialog::Accepted);
+}
+
+void SegmentationWindow::slotReject()
+{
+    LOG_DEBUG_LOCAL("");
+    close();
+    setResult(QDialog::Rejected);
 }
 
 void SegmentationWindow::createInputSlider(QVBoxLayout *layout,

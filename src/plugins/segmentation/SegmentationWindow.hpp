@@ -22,16 +22,17 @@
 #ifndef SEGMENTATION_WINDOW_HPP
 #define SEGMENTATION_WINDOW_HPP
 
-#include <QDockWidget>
+#include <QDialog>
 
 class MainWindow;
 
+class QPushButton;
 class QSpinBox;
 class QSlider;
 class QVBoxLayout;
 
 /** Segmentation Window. */
-class SegmentationWindow : public QDockWidget
+class SegmentationWindow : public QDialog
 {
     Q_OBJECT
 
@@ -45,11 +46,11 @@ protected slots:
     void slotThresholdFinalValue();
     void slotThresholdIntermediateValue(int v);
 
-    void slotApply();
+    void slotAccept();
+    void slotReject();
 
 protected:
     MainWindow *mainWindow_;
-    QWidget *widget_;
 
     QWidget *distanceGroup_;
     QSlider *distanceSlider_;
@@ -58,6 +59,9 @@ protected:
     QWidget *thresholdGroup_;
     QSlider *thresholdSlider_;
     QSpinBox *thresholdSpinBox_;
+
+    QPushButton *acceptButton_;
+    QPushButton *rejectButton_;
 
     void createInputSlider(QVBoxLayout *layout,
                            QWidget *&group,
