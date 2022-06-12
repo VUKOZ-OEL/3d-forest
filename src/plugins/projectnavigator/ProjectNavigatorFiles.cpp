@@ -57,7 +57,7 @@ ProjectNavigatorFiles::ProjectNavigatorFiles(MainWindow *mainWindow)
     MainWindow::createToolButton(&deleteButton_,
                                  tr("Remove"),
                                  tr("Remove selected data set"),
-                                 ICON("minus"),
+                                 ICON("remove"),
                                  this,
                                  SLOT(slotDelete()));
     deleteButton_->setEnabled(false);

@@ -49,7 +49,7 @@ ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
                        ICON("file"),
                        PROJECT_NAVIGATOR_WINDOW_TAB_TEXT[0]);
     tabWidget_->addTab(layers_,
-                       ICON("apps_tab"),
+                       ICON("layers"),
                        PROJECT_NAVIGATOR_WINDOW_TAB_TEXT[1]);
     tabWidget_->addTab(classifications_,
                        ICON("variation"),
