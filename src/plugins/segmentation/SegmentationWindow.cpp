@@ -34,6 +34,7 @@
 #include <QLabel>
 #include <QProgressDialog>
 #include <QPushButton>
+#include <QShowEvent>
 #include <QSlider>
 #include <QSpinBox>
 #include <QToolButton>
@@ -170,6 +171,12 @@ void SegmentationWindow::slotReject()
     LOG_DEBUG_LOCAL("");
     close();
     setResult(QDialog::Rejected);
+}
+
+void SegmentationWindow::showEvent(QShowEvent *event)
+{
+    LOG_DEBUG_LOCAL("");
+    QDialog::showEvent(event);
 }
 
 void SegmentationWindow::createInputSlider(QVBoxLayout *layout,

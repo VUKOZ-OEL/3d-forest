@@ -21,7 +21,7 @@
 <qresource prefix="/gui">
 
 <!-- Standard -->
-<file>question_16px.svg</file>
+<file>question_16px.png</file>
 
 </qresource>
 </RCC>

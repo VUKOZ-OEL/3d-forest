@@ -10,7 +10,7 @@
    inkscape:version="1.2 (dc2aedaf03, 2022-05-15)"
    sodipodi:docname="portraits_24px.svg"
    xml:space="preserve"
-   inkscape:export-filename="portraits_24px_sharp.png"
+   inkscape:export-filename="portraits_24px.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -57,15 +57,15 @@
      id="layer3"
      inkscape:label="Vector"><path
        style="fill:none;stroke:#2e3436;stroke-width:1.2;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:1;paint-order:fill markers stroke"
-       d="m 4.5,8.5 8,-4 8,4 v 8 l -8,4"
+       d="m 4.5,7.5 8,-4 8,4 v 9 l -8,4"
        id="path466"
        sodipodi:nodetypes="ccccc" /><path
        style="fill:none;stroke:#2e3436;stroke-width:1.2;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:1;paint-order:fill markers stroke"
-       d="m 20.5,8.5 -8,4"
+       d="m 20.5,7.5 -8,4"
        id="path468"
        sodipodi:nodetypes="cc" /><path
        style="fill:none;fill-opacity:1;stroke:#2e3436;stroke-width:1.2;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:1;paint-order:fill markers stroke"
-       d="m 12.5,20.5 -8,-4 v -8 l 8,4 z"
+       d="m 12.5,20.5 -8,-4 v -9 l 8,4 z"
        id="path368"
        sodipodi:nodetypes="ccccc" /></g><metadata
      id="metadata2474"><rdf:RDF><cc:Work

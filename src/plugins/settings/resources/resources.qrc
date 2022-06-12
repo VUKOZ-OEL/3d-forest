@@ -21,7 +21,7 @@
 <qresource prefix="/settings">
 
 <!-- Tool bar -->
-<file>settings_24px.svg</file>
+<file>settings_24px.png</file>
 
 </qresource>
 </RCC>

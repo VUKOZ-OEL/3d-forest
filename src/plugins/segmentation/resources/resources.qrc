@@ -21,7 +21,7 @@
 <qresource prefix="/segmentation">
 
 <!-- Tool bar -->
-<file>forest_24px.svg</file>
+<file>forest_24px.png</file>
 
 </qresource>
 </RCC>
