@@ -10,7 +10,7 @@
    inkscape:version="1.2 (dc2aedaf03, 2022-05-15)"
    sodipodi:docname="view_right_24px.svg"
    xml:space="preserve"
-   inkscape:export-filename="view_right_24px_sharp.png"
+   inkscape:export-filename="view_right_24px.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -59,15 +59,15 @@
        style="display:inline;fill:#f57900;fill-opacity:1;stroke:none;stroke-width:1.2;stroke-linejoin:round;stroke-dashoffset:1;paint-order:fill markers stroke"
        d="m 16.5,7.5 v 13 l 5,-5 v -13 l -5,5"
        id="path453" /><path
-       style="display:inline;fill:none;stroke:#2e3436;stroke-width:1.2;stroke-linejoin:round;stroke-dashoffset:1;paint-order:fill markers stroke"
+       style="display:inline;fill:none;stroke:#555753;stroke-width:1.2;stroke-linejoin:round;stroke-dashoffset:1;paint-order:fill markers stroke"
        d="M 3.5,7.5 9,2.5 h 12.5 v 13 l -5,5"
        id="path466"
        sodipodi:nodetypes="ccccc" /><path
-       style="display:inline;fill:none;stroke:#2e3436;stroke-width:1.2;stroke-linejoin:round;stroke-dashoffset:1;paint-order:fill markers stroke"
+       style="display:inline;fill:none;stroke:#555753;stroke-width:1.2;stroke-linejoin:round;stroke-dashoffset:1;paint-order:fill markers stroke"
        d="m 21.5,2.5 -5,5"
        id="path468"
        sodipodi:nodetypes="cc" /><path
-       style="display:inline;fill:none;fill-opacity:1;stroke:#2e3436;stroke-width:1.2;stroke-linejoin:round;stroke-dashoffset:1;stroke-opacity:1;paint-order:fill markers stroke"
+       style="display:inline;fill:none;fill-opacity:1;stroke:#555753;stroke-width:1.2;stroke-linejoin:round;stroke-dashoffset:1;stroke-opacity:1;paint-order:fill markers stroke"
        d="m 3.5,20.5 h 13 v -13 h -13 z"
        id="path368"
        sodipodi:nodetypes="ccccc" /></g><metadata

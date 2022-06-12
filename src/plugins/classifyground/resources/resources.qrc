@@ -21,7 +21,7 @@
 <qresource prefix="/classifyground">
 
 <!-- Tool bar -->
-<file>soil_24px.svg</file>
+<file>soil_24px.png</file>
 
 </qresource>
 </RCC>
