@@ -16,17 +16,17 @@
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
 file(
-  GLOB_RECURSE
-  ALL_SOURCE_FILES
-  src/*.cpp src/*.hpp src/*.c src/*.h
+    GLOB_RECURSE
+    ALL_SOURCE_FILES
+    src/*.cpp src/*.hpp src/*.c src/*.h
 )
 
 add_custom_target(
-  format
-  COMMAND clang-format
-  -style=file
-  -i
-  -fallback-style=none
-#  --verbose
-  ${ALL_SOURCE_FILES}
+    format
+    COMMAND clang-format
+    -style=file
+    -i
+    -fallback-style=none
+#    --verbose
+    ${ALL_SOURCE_FILES}
 )
