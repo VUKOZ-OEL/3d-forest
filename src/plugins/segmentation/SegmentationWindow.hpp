@@ -63,6 +63,8 @@ protected:
     QPushButton *acceptButton_;
     QPushButton *rejectButton_;
 
+    virtual void showEvent(QShowEvent *event);
+
     void createInputSlider(QVBoxLayout *layout,
                            QWidget *&group,
                            QSlider *&slider,
