@@ -17,32 +17,32 @@
 
 set(SUB_PROJECT_NAME "3dforesticon")
 
-if (NOT BUILD_DEVEL)
-  message(STATUS "Skip devel tool ${SUB_PROJECT_NAME}")
-  return()
+if(NOT BUILD_DEVEL)
+    message(STATUS "BUILD_DEVEL not set - skipping ${SUB_PROJECT_NAME}")
+    return()
 endif()
 
-if (NOT QT_VERSION_MAJOR)
-  message(WARNING "Gui not found - skipping ${SUB_PROJECT_NAME}")
-  return()
+if(NOT QT_VERSION_MAJOR)
+    message(WARNING "Gui not found - skipping ${SUB_PROJECT_NAME}")
+    return()
 endif()
 
 file(GLOB_RECURSE SOURCES "*.cpp")
 
 add_executable(
-  ${SUB_PROJECT_NAME}
-  ${SOURCES}
+    ${SUB_PROJECT_NAME}
+    ${SOURCES}
 )
 
 target_include_directories(
-  ${SUB_PROJECT_NAME}
-  PUBLIC
-  ${CMAKE_CURRENT_LIST_DIR}
+    ${SUB_PROJECT_NAME}
+    PUBLIC
+    ${CMAKE_CURRENT_LIST_DIR}
 )
 
 target_link_libraries(
-  ${SUB_PROJECT_NAME}
-  3dforestgui
+    ${SUB_PROJECT_NAME}
+    3dforestgui
 )
 
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

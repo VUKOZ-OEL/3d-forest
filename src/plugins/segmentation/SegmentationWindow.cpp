@@ -109,6 +109,7 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
     setWindowTitle(tr("Segmentation"));
     setWindowIcon(ICON("forest"));
     setMaximumHeight(height());
+    setModal(true);
 }
 
 void SegmentationWindow::slotDistanceFinalValue()

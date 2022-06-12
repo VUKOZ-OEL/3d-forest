@@ -17,9 +17,9 @@
 
 set(SUB_PROJECT_NAME "3dforestgui")
 
-if (NOT QT_VERSION_MAJOR)
-  message(WARNING "Gui not found - skipping ${SUB_PROJECT_NAME}")
-  return()
+if(NOT QT_VERSION_MAJOR)
+    message(WARNING "Gui not found - skipping ${SUB_PROJECT_NAME}")
+    return()
 endif()
 
 set(CMAKE_AUTOMOC ON)
@@ -34,72 +34,72 @@ file(GLOB_RECURSE SOURCES_VIEWER "../plugins/viewer/*.cpp")
 file(GLOB_RECURSE SOURCES_HELP "../plugins/help/*.cpp")
 
 add_library(
-  ${SUB_PROJECT_NAME}
-  SHARED
-  ${SOURCES}
-  ${SOURCES_IMPORT}
-  ${SOURCES_PROJECT}
-  ${SOURCES_PROJECT_FILE}
-  ${SOURCES_SETTINGS}
-  ${SOURCES_VIEWER}
-  ${SOURCES_HELP}
-  resources/resources.qrc
-  ../plugins/import/resources/resources.qrc
-  ../plugins/projectnavigator/resources/resources.qrc
-  ../plugins/projectfile/resources/resources.qrc
-  ../plugins/settings/resources/resources.qrc
-  ../plugins/viewer/resources/resources.qrc
-  ../plugins/help/resources/resources.qrc
+    ${SUB_PROJECT_NAME}
+    SHARED
+    ${SOURCES}
+    ${SOURCES_IMPORT}
+    ${SOURCES_PROJECT}
+    ${SOURCES_PROJECT_FILE}
+    ${SOURCES_SETTINGS}
+    ${SOURCES_VIEWER}
+    ${SOURCES_HELP}
+    resources/resources.qrc
+    ../plugins/import/resources/resources.qrc
+    ../plugins/projectnavigator/resources/resources.qrc
+    ../plugins/projectfile/resources/resources.qrc
+    ../plugins/settings/resources/resources.qrc
+    ../plugins/viewer/resources/resources.qrc
+    ../plugins/help/resources/resources.qrc
 )
 
 target_include_directories(
-  ${SUB_PROJECT_NAME}
-  PUBLIC
-  ${CMAKE_CURRENT_LIST_DIR}
-  ../plugins/import
-  ../plugins/projectnavigator
-  ../plugins/projectfile
-  ../plugins/settings
-  ../plugins/viewer
-  ../plugins/help
+    ${SUB_PROJECT_NAME}
+    PUBLIC
+    ${CMAKE_CURRENT_LIST_DIR}
+    ../plugins/import
+    ../plugins/projectnavigator
+    ../plugins/projectfile
+    ../plugins/settings
+    ../plugins/viewer
+    ../plugins/help
 )
 
 target_compile_definitions(
-  ${SUB_PROJECT_NAME}
-  PRIVATE
-  EXPORT_${SUB_PROJECT_NAME}=1
+    ${SUB_PROJECT_NAME}
+    PRIVATE
+    EXPORT_${SUB_PROJECT_NAME}=1
 )
 
-if (QT_VERSION_MAJOR EQUAL 5)
-  include_directories(${Qt5Widgets_INCLUDE_DIRS})
-  include_directories(${Qt5OpenGL_INCLUDE_DIRS})
+if(QT_VERSION_MAJOR EQUAL 5)
+    include_directories(${Qt5Widgets_INCLUDE_DIRS})
+    include_directories(${Qt5OpenGL_INCLUDE_DIRS})
 
-  add_definitions(${Qt5Widgets_DEFINITIONS})
-  add_definitions(${Qt5OpenGL_DEFINITIONS})
+    add_definitions(${Qt5Widgets_DEFINITIONS})
+    add_definitions(${Qt5OpenGL_DEFINITIONS})
 
-  target_link_libraries(
-    ${SUB_PROJECT_NAME}
-    3dforesteditor
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Gui
-    Qt${QT_VERSION_MAJOR}::Widgets
-    Qt${QT_VERSION_MAJOR}::OpenGL
-    ${OPENGL_gl_LIBRARY}
-  )
+    target_link_libraries(
+        ${SUB_PROJECT_NAME}
+        3dforesteditor
+        Qt${QT_VERSION_MAJOR}::Core
+        Qt${QT_VERSION_MAJOR}::Gui
+        Qt${QT_VERSION_MAJOR}::Widgets
+        Qt${QT_VERSION_MAJOR}::OpenGL
+        ${OPENGL_gl_LIBRARY}
+    )
 else()
-  include_directories(${Qt6OpenGLWidgets_INCLUDE_DIRS})
-  add_definitions(${Qt6OpenGLWidgets_DEFINITIONS})
+    include_directories(${Qt6OpenGLWidgets_INCLUDE_DIRS})
+    add_definitions(${Qt6OpenGLWidgets_DEFINITIONS})
 
-  target_link_libraries(
-    ${SUB_PROJECT_NAME}
-    3dforesteditor
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Gui
-    Qt${QT_VERSION_MAJOR}::Widgets
-    Qt${QT_VERSION_MAJOR}::OpenGL
-    Qt${QT_VERSION_MAJOR}::OpenGLWidgets
-    ${OPENGL_gl_LIBRARY}
-  )
+    target_link_libraries(
+        ${SUB_PROJECT_NAME}
+        3dforesteditor
+        Qt${QT_VERSION_MAJOR}::Core
+        Qt${QT_VERSION_MAJOR}::Gui
+        Qt${QT_VERSION_MAJOR}::Widgets
+        Qt${QT_VERSION_MAJOR}::OpenGL
+        Qt${QT_VERSION_MAJOR}::OpenGLWidgets
+        ${OPENGL_gl_LIBRARY}
+    )
 endif()
 
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

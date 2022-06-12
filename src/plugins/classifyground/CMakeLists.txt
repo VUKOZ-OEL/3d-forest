@@ -17,9 +17,9 @@
 
 set(SUB_PROJECT_NAME "3dforestclassifyground")
 
-if (NOT QT_VERSION_MAJOR)
-  message(WARNING "Gui not found - skipping ${SUB_PROJECT_NAME}")
-  return()
+if(NOT QT_VERSION_MAJOR)
+    message(WARNING "Gui not found - skipping ${SUB_PROJECT_NAME}")
+    return()
 endif()
 
 set(CMAKE_AUTOMOC ON)
@@ -28,28 +28,28 @@ set(CMAKE_AUTORCC ON)
 file(GLOB_RECURSE SOURCES "*.cpp")
 
 add_library(
-  ${SUB_PROJECT_NAME}
-  SHARED
-  ${SOURCES}
-  resources/resources.qrc
+    ${SUB_PROJECT_NAME}
+    SHARED
+    ${SOURCES}
+    resources/resources.qrc
 )
 
 target_include_directories(
-  ${SUB_PROJECT_NAME}
-  PUBLIC
-  ${CMAKE_CURRENT_LIST_DIR}
+    ${SUB_PROJECT_NAME}
+    PUBLIC
+    ${CMAKE_CURRENT_LIST_DIR}
 )
 
 target_compile_definitions(
-  ${SUB_PROJECT_NAME}
-  PRIVATE
-  EXPORT_${SUB_PROJECT_NAME}=1
+    ${SUB_PROJECT_NAME}
+    PRIVATE
+    EXPORT_${SUB_PROJECT_NAME}=1
 )
 
 target_link_libraries(
-  ${SUB_PROJECT_NAME}
-  PRIVATE
-  3dforestgui
+    ${SUB_PROJECT_NAME}
+    PRIVATE
+    3dforestgui
 )
 
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin/plugins)

@@ -17,7 +17,4 @@
 
 add_subdirectory(3dforest)
 add_subdirectory(tools)
-
-if (BUILD_EXAMPLES)
-  add_subdirectory(examples)
-endif()
+add_subdirectory(examples)

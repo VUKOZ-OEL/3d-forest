@@ -20,6 +20,7 @@
 <RCC version="1.0">
 <qresource prefix="/gui">
 
+<!-- Standard -->
 <file>question_16px.svg</file>
 
 </qresource>

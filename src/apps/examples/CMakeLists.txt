@@ -15,6 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
+if(NOT BUILD_EXAMPLES)
+    message(STATUS "BUILD_EXAMPLES not set - skipping examples")
+    return()
+endif()
+
 add_subdirectory(colorpalette)
 add_subdirectory(editor)
 add_subdirectory(lascreate)

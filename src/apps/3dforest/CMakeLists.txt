@@ -17,9 +17,9 @@
 
 set(SUB_PROJECT_NAME "3dforest")
 
-if (NOT QT_VERSION_MAJOR)
-  message(WARNING "Gui not found - skipping ${SUB_PROJECT_NAME}")
-  return()
+if(NOT QT_VERSION_MAJOR)
+    message(WARNING "Gui not found - skipping ${SUB_PROJECT_NAME}")
+    return()
 endif()
 
 set(CMAKE_AUTOMOC ON)
@@ -29,18 +29,22 @@ file(GLOB_RECURSE SOURCES "*.cpp")
 list(APPEND SOURCES resources/resources.rc)
 
 add_executable(
-  ${SUB_PROJECT_NAME}
-#  WIN32 MACOSX_BUNDLE
-  ${SOURCES}
-  resources/resources.qrc
+    ${SUB_PROJECT_NAME}
+#    WIN32 MACOSX_BUNDLE
+    ${SOURCES}
+    resources/resources.qrc
 )
 
-target_include_directories(${SUB_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+target_include_directories(
+    ${SUB_PROJECT_NAME}
+    PUBLIC
+    ${CMAKE_CURRENT_LIST_DIR}
+)
 
 target_link_libraries(
-  ${SUB_PROJECT_NAME}
-  3dforestgui
-  Qt${QT_VERSION_MAJOR}::Help
+    ${SUB_PROJECT_NAME}
+    3dforestgui
+    Qt${QT_VERSION_MAJOR}::Help
 )
 
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

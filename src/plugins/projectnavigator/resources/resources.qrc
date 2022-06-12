@@ -35,9 +35,9 @@
 <file>select_none_24px.svg</file>
 
 <!-- Tabs -->
-<file>file_24px.png</file>
-<file>apps_tab_24px.png</file>
-<file>diversity_24px.png</file>
+<file>file_16px.svg</file>
+<file>apps_tab_16px.svg</file>
+<file>variation_16px.svg</file>
 
 </qresource>
 </RCC>

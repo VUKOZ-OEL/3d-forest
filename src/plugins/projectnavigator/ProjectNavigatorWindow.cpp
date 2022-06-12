@@ -28,6 +28,12 @@
 
 #include <QTabWidget>
 
+#define ICON(name) (IconTheme(":/projectnavigator/", name))
+
+static const char *PROJECT_NAVIGATOR_WINDOW_TAB_TEXT[] = {"Files",
+                                                          "Layers",
+                                                          "Classification"};
+
 ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
     : QDockWidget(mainWindow),
       mainWindow_(mainWindow)
@@ -39,13 +45,39 @@ ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
 
     // Tabs
     tabWidget_ = new QTabWidget;
-    tabWidget_->addTab(datasets_, tr("Files"));
-    tabWidget_->addTab(layers_, tr("Layers"));
-    tabWidget_->addTab(classifications_, tr("Class"));
+    tabWidget_->addTab(datasets_,
+                       ICON("file"),
+                       PROJECT_NAVIGATOR_WINDOW_TAB_TEXT[0]);
+    tabWidget_->addTab(layers_,
+                       ICON("apps_tab"),
+                       PROJECT_NAVIGATOR_WINDOW_TAB_TEXT[1]);
+    tabWidget_->addTab(classifications_,
+                       ICON("variation"),
+                       PROJECT_NAVIGATOR_WINDOW_TAB_TEXT[2]);
+
+    tabWidget_->setIconSize(
+        QSize(MainWindow::ICON_SIZE_TEXT, MainWindow::ICON_SIZE_TEXT));
+
+    connect(tabWidget_,
+            SIGNAL(currentChanged(int)),
+            this,
+            SLOT(slotCurrentChanged(int)));
+
+    slotCurrentChanged(0);
 
     // Dock
     setWidget(tabWidget_);
     setWindowTitle(tr("Project Navigator"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     mainWindow_->addDockWidget(Qt::RightDockWidgetArea, this);
+}
+
+void ProjectNavigatorWindow::slotCurrentChanged(int index)
+{
+    for (int i = 0; i < tabWidget_->count(); i++)
+    {
+        tabWidget_->setTabText(i, "");
+    }
+
+    tabWidget_->setTabText(index, PROJECT_NAVIGATOR_WINDOW_TAB_TEXT[index]);
 }
