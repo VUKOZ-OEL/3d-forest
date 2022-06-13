@@ -19,10 +19,10 @@
 
 /** @file SegmentationWindow.cpp */
 
-#include <IconTheme.hpp>
 #include <Log.hpp>
 #include <MainWindow.hpp>
 #include <SegmentationWindow.hpp>
+#include <ThemeIcon.hpp>
 
 #include <QCheckBox>
 #include <QCloseEvent>
@@ -40,7 +40,7 @@
 #include <QToolButton>
 #include <QVBoxLayout>
 
-#define ICON(name) (IconTheme(":/segmentation/", name))
+#define ICON(name) (ThemeIcon(":/segmentation/", name))
 //#define LOG_DEBUG_LOCAL(msg)
 #define LOG_DEBUG_LOCAL(msg) LOG_MODULE("SegmentationWindow", msg)
 
@@ -199,7 +199,7 @@ void SegmentationWindow::createInputSlider(QVBoxLayout *layout,
     // Description Tool Tip
     QLabel *help = new QLabel;
     help->setToolTip(toolTip);
-    IconTheme helpIcon(":/gui/", "question");
+    ThemeIcon helpIcon(":/gui/", "question");
     help->setPixmap(helpIcon.pixmap(MainWindow::ICON_SIZE_TEXT));
 
     // Description Units

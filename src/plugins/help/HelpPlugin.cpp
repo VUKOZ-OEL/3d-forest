@@ -20,12 +20,12 @@
 /** @file HelpPlugin.cpp */
 
 #include <HelpPlugin.hpp>
-#include <IconTheme.hpp>
 #include <MainWindow.hpp>
+#include <ThemeIcon.hpp>
 
 #include <QMessageBox>
 
-#define ICON(name) (IconTheme(":/help/", name))
+#define ICON(name) (ThemeIcon(":/help/", name))
 
 HelpPlugin::HelpPlugin() : mainWindow_(nullptr)
 {

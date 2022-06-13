@@ -19,11 +19,11 @@
 
 /** @file ProjectNavigatorFiles.cpp */
 
-#include <IconTheme.hpp>
 #include <ImportPlugin.hpp>
 #include <Log.hpp>
 #include <MainWindow.hpp>
 #include <ProjectNavigatorFiles.hpp>
+#include <ThemeIcon.hpp>
 
 #include <QHBoxLayout>
 #include <QLabel>
@@ -35,7 +35,7 @@
 #include <QTreeWidgetItemIterator>
 #include <QVBoxLayout>
 
-#define ICON(name) (IconTheme(":/projectnavigator/", name))
+#define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
 ProjectNavigatorFiles::ProjectNavigatorFiles(MainWindow *mainWindow)
     : QWidget(),
@@ -50,7 +50,7 @@ ProjectNavigatorFiles::ProjectNavigatorFiles(MainWindow *mainWindow)
     MainWindow::createToolButton(&addButton_,
                                  tr("Add"),
                                  tr("Add new data set"),
-                                 ICON_THEME("plus"),
+                                 THEME_ICON("plus"),
                                  this,
                                  SLOT(slotAdd()));
 

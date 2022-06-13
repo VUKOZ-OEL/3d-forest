@@ -19,11 +19,11 @@
 
 /** @file ProjectNavigatorLayers.cpp */
 
-#include <IconTheme.hpp>
 #include <ImportPlugin.hpp>
 #include <Log.hpp>
 #include <MainWindow.hpp>
 #include <ProjectNavigatorLayers.hpp>
+#include <ThemeIcon.hpp>
 
 #include <QHBoxLayout>
 #include <QLabel>
@@ -35,7 +35,7 @@
 #include <QTreeWidgetItemIterator>
 #include <QVBoxLayout>
 
-#define ICON(name) (IconTheme(":/projectnavigator/", name))
+#define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
 ProjectNavigatorLayers::ProjectNavigatorLayers(MainWindow *mainWindow)
     : QWidget(),
@@ -50,7 +50,7 @@ ProjectNavigatorLayers::ProjectNavigatorLayers(MainWindow *mainWindow)
     MainWindow::createToolButton(&addButton_,
                                  tr("Add"),
                                  tr("Add new layers"),
-                                 ICON_THEME("plus"),
+                                 THEME_ICON("plus"),
                                  this,
                                  SLOT(slotAdd()));
     addButton_->setEnabled(false);

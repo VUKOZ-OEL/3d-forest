@@ -19,12 +19,12 @@
 
 /** @file SettingsPlugin.cpp */
 
-#include <IconTheme.hpp>
 #include <MainWindow.hpp>
 #include <SettingsPlugin.hpp>
 #include <SettingsWindow.hpp>
+#include <ThemeIcon.hpp>
 
-#define ICON(name) (IconTheme(":/settings/", name))
+#define ICON(name) (ThemeIcon(":/settings/", name))
 
 SettingsPlugin::SettingsPlugin()
     : mainWindow_(nullptr),

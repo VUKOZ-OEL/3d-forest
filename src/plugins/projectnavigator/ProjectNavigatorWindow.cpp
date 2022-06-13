@@ -19,16 +19,16 @@
 
 /** @file ProjectNavigatorWindow.cpp */
 
-#include <IconTheme.hpp>
 #include <MainWindow.hpp>
 #include <ProjectNavigatorClassifications.hpp>
 #include <ProjectNavigatorFiles.hpp>
 #include <ProjectNavigatorLayers.hpp>
 #include <ProjectNavigatorWindow.hpp>
+#include <ThemeIcon.hpp>
 
 #include <QTabWidget>
 
-#define ICON(name) (IconTheme(":/projectnavigator/", name))
+#define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
 static const char *PROJECT_NAVIGATOR_WINDOW_TAB_TEXT[] = {"Files",
                                                           "Layers",

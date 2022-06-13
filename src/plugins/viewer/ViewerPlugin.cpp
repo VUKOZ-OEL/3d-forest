@@ -21,12 +21,12 @@
 
 #include <Log.hpp>
 
-#include <IconTheme.hpp>
 #include <MainWindow.hpp>
+#include <ThemeIcon.hpp>
 #include <ViewerPlugin.hpp>
 #include <ViewerViewports.hpp>
 
-#define ICON(name) (IconTheme(":/viewer/", name))
+#define ICON(name) (ThemeIcon(":/viewer/", name))
 
 ViewerPlugin::ViewerPlugin() : mainWindow_(nullptr)
 {

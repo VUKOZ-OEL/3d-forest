@@ -19,12 +19,12 @@
 
 /** @file ProjectNavigatorPlugin.cpp */
 
-#include <IconTheme.hpp>
 #include <MainWindow.hpp>
 #include <ProjectNavigatorPlugin.hpp>
 #include <ProjectNavigatorWindow.hpp>
+#include <ThemeIcon.hpp>
 
-#define ICON(name) (IconTheme(":/projectnavigator/", name))
+#define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
 ProjectNavigatorPlugin::ProjectNavigatorPlugin()
     : mainWindow_(nullptr),

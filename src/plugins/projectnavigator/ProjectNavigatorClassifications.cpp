@@ -21,9 +21,9 @@
 
 #include <ColorPalette.hpp>
 
-#include <IconTheme.hpp>
 #include <MainWindow.hpp>
 #include <ProjectNavigatorClassifications.hpp>
+#include <ThemeIcon.hpp>
 
 #include <QHBoxLayout>
 #include <QLabel>
@@ -34,7 +34,7 @@
 #include <QTreeWidgetItemIterator>
 #include <QVBoxLayout>
 
-#define ICON(name) (IconTheme(":/projectnavigator/", name))
+#define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
 ProjectNavigatorClassifications::ProjectNavigatorClassifications(
     MainWindow *mainWindow)

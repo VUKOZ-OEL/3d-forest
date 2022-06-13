@@ -20,8 +20,8 @@
 /** @file ClassifyGroundPlugin.cpp */
 
 #include <ClassifyGroundPlugin.hpp>
-#include <IconTheme.hpp>
 #include <MainWindow.hpp>
+#include <ThemeIcon.hpp>
 
 #include <QCheckBox>
 #include <QCloseEvent>
@@ -37,7 +37,7 @@
 #include <QSpinBox>
 #include <QVBoxLayout>
 
-#define ICON(name) (IconTheme(":/classifyground/", name))
+#define ICON(name) (ThemeIcon(":/classifyground/", name))
 #define CLASSIFY_GROUND_PLUGIN_NAME "Classify Ground"
 
 /** Classify Ground Window. */
