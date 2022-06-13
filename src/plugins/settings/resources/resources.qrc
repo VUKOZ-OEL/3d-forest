@@ -21,6 +21,7 @@
 <qresource prefix="/settings">
 
 <!-- Tool bar -->
+<file>settings_16px.png</file>
 <file>settings_24px.png</file>
 
 </qresource>
