@@ -52,7 +52,7 @@ ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
                        ICON("layers"),
                        PROJECT_NAVIGATOR_WINDOW_TAB_TEXT[1]);
     tabWidget_->addTab(classifications_,
-                       ICON("variation"),
+                       ICON("classification"),
                        PROJECT_NAVIGATOR_WINDOW_TAB_TEXT[2]);
 
     tabWidget_->setIconSize(
