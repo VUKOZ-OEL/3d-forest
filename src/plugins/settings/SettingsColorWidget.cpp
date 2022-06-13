@@ -19,9 +19,9 @@
 
 /** @file SettingsColorWidget.cpp */
 
-#include <IconTheme.hpp>
 #include <MainWindow.hpp>
 #include <SettingsColorWidget.hpp>
+#include <ThemeIcon.hpp>
 
 #include <QBrush>
 #include <QCheckBox>
@@ -41,7 +41,7 @@
 #include <QTreeWidgetItemIterator>
 #include <QVBoxLayout>
 
-#define ICON(name) (IconTheme(":/settings/", name))
+#define ICON(name) (ThemeIcon(":/settings/", name))
 
 SettingsColorWidget::SettingsColorWidget(MainWindow *mainWindow)
     : QWidget(mainWindow),

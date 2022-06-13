@@ -19,11 +19,11 @@
 
 /** @file ProjectNavigatorLayers.cpp */
 
-#include <IconTheme.hpp>
 #include <ImportPlugin.hpp>
 #include <Log.hpp>
 #include <MainWindow.hpp>
 #include <ProjectNavigatorLayers.hpp>
+#include <ThemeIcon.hpp>
 
 #include <QHBoxLayout>
 #include <QLabel>
@@ -35,7 +35,7 @@
 #include <QTreeWidgetItemIterator>
 #include <QVBoxLayout>
 
-#define ICON(name) (IconTheme(":/projectnavigator/", name))
+#define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
 ProjectNavigatorLayers::ProjectNavigatorLayers(MainWindow *mainWindow)
     : QWidget(),
@@ -50,7 +50,7 @@ ProjectNavigatorLayers::ProjectNavigatorLayers(MainWindow *mainWindow)
     MainWindow::createToolButton(&addButton_,
                                  tr("Add"),
                                  tr("Add new layers"),
-                                 ICON("plus"),
+                                 THEME_ICON("plus"),
                                  this,
                                  SLOT(slotAdd()));
     addButton_->setEnabled(false);
@@ -58,7 +58,7 @@ ProjectNavigatorLayers::ProjectNavigatorLayers(MainWindow *mainWindow)
     MainWindow::createToolButton(&deleteButton_,
                                  tr("Remove"),
                                  tr("Remove selected layers"),
-                                 ICON("minus"),
+                                 ICON("remove"),
                                  this,
                                  SLOT(slotDelete()));
     deleteButton_->setEnabled(false);
@@ -82,21 +82,21 @@ ProjectNavigatorLayers::ProjectNavigatorLayers(MainWindow *mainWindow)
     MainWindow::createToolButton(&selectAllButton_,
                                  tr("Select all"),
                                  tr("Select all"),
-                                 ICON("select_all"),
+                                 ICON("checkbox_enabled"),
                                  this,
                                  SLOT(slotSelectAll()));
 
     MainWindow::createToolButton(&selectInvertButton_,
                                  tr("Invert"),
                                  tr("Invert selection"),
-                                 ICON("select_invert"),
+                                 ICON("checkbox_half"),
                                  this,
                                  SLOT(slotSelectInvert()));
 
     MainWindow::createToolButton(&selectNoneButton_,
                                  tr("Select none"),
                                  tr("Select none"),
-                                 ICON("select_none"),
+                                 ICON("checkbox_disabled"),
                                  this,
                                  SLOT(slotSelectNone()));
 

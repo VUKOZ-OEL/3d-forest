@@ -19,12 +19,12 @@
 
 /** @file SegmentationPlugin.cpp */
 
-#include <IconTheme.hpp>
 #include <MainWindow.hpp>
 #include <SegmentationPlugin.hpp>
 #include <SegmentationWindow.hpp>
+#include <ThemeIcon.hpp>
 
-#define ICON(name) (IconTheme(":/segmentation/", name))
+#define ICON(name) (ThemeIcon(":/segmentation/", name))
 
 SegmentationPlugin::SegmentationPlugin()
     : mainWindow_(nullptr),

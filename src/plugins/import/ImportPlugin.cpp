@@ -22,10 +22,10 @@
 #include <IndexFileBuilder.hpp>
 #include <Log.hpp>
 
-#include <IconTheme.hpp>
 #include <ImportDialog.hpp>
 #include <ImportPlugin.hpp>
 #include <MainWindow.hpp>
+#include <ThemeIcon.hpp>
 
 #include <QCoreApplication>
 #include <QFileDialog>
@@ -33,7 +33,7 @@
 #include <QProgressDialog>
 
 #define IMPORT_PLUGIN_FILTER "LAS (LASer) File (*.las)"
-#define ICON(name) (IconTheme(":/import/", name))
+//#define ICON(name) (ThemeIcon(":/import/", name))
 
 ImportPlugin::ImportPlugin() : mainWindow_(nullptr)
 {
@@ -48,7 +48,7 @@ void ImportPlugin::initialize(MainWindow *mainWindow)
                               "File Import/Export",
                               tr("Import"),
                               tr("Import new point cloud dataset"),
-                              ICON("add_new"),
+                              THEME_ICON("plus"),
                               this,
                               SLOT(slotImport()));
 

@@ -2,15 +2,15 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="24"
-   height="24"
-   viewBox="0 0 24 24"
+   width="16"
+   height="16"
+   viewBox="0 0 16 16"
    version="1.1"
    id="svg5"
    inkscape:version="1.2 (dc2aedaf03, 2022-05-15)"
-   sodipodi:docname="eye_24px.svg"
+   sodipodi:docname="plus_16px.svg"
    xml:space="preserve"
-   inkscape:export-filename="eye_24px.png"
+   inkscape:export-filename="plus_16px.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -20,7 +20,7 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:dc="http://purl.org/dc/elements/1.1/"><title
-     id="title2476">Eye</title><sodipodi:namedview
+     id="title238">Plus</title><sodipodi:namedview
      id="namedview7"
      pagecolor="#ffffff"
      bordercolor="#000000"
@@ -55,16 +55,19 @@
      id="defs2" /><g
      inkscape:groupmode="layer"
      id="layer3"
-     inkscape:label="Vector"><ellipse
-       style="display:inline;fill:none;stroke:#000000;stroke-width:1;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:1;stroke-opacity:1;paint-order:fill markers stroke"
+     inkscape:label="Vector"><circle
+       style="display:inline;fill:none;stroke:#2e3436;stroke-width:1;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:1;stroke-opacity:1;paint-order:fill markers stroke"
        id="path974"
-       cx="12"
-       cy="13.5"
-       rx="4.5"
-       ry="4" /><path
-       style="display:inline;fill:none;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:1;paint-order:fill markers stroke;stroke-width:0.8;stroke-dasharray:none"
-       d="m 0.5,13.5 c 0,0 2.5,-8 11.5,-8 9,0 11.5,8 11.5,8"
-       id="path1021"
-       sodipodi:nodetypes="czc" /></g><metadata
+       cy="7.5"
+       cx="7.5"
+       r="7" /><path
+       style="fill:#006600;stroke:#2e3436;stroke-width:1;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:1;stroke-opacity:1;paint-order:fill markers stroke"
+       d="m 3,7.5 h 9"
+       id="path421"
+       sodipodi:nodetypes="cc" /><path
+       style="fill:#006600;stroke:#2e3436;stroke-width:1;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:1;stroke-opacity:1;paint-order:fill markers stroke"
+       d="m 7.5,3 v 9"
+       id="path965"
+       sodipodi:nodetypes="cc" /></g><metadata
      id="metadata2474"><rdf:RDF><cc:Work
-         rdf:about=""><dc:title>Eye</dc:title><dc:creator><cc:Agent><dc:title>Vaclav Bubnik Copyright 2020-present VUKOZ Licence GNU GPL version 3 www.gnu.org/licenses/gpl-3.0.html</dc:title></cc:Agent></dc:creator><dc:date>2 June 2022</dc:date></cc:Work></rdf:RDF></metadata></svg>
+         rdf:about=""><dc:creator><cc:Agent><dc:title>Vaclav Bubnik Copyright 2020-present VUKOZ Licence GNU GPL version 3 www.gnu.org/licenses/gpl-3.0.html</dc:title></cc:Agent></dc:creator><dc:date>13 June 2022</dc:date><dc:title>Plus</dc:title></cc:Work></rdf:RDF></metadata></svg>

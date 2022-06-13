@@ -26,8 +26,7 @@
 <file>blueprint_30px.png</file>
 
 <!-- Common -->
-<file>plus_24px.png</file>
-<file>minus_24px.png</file>
+<file>remove_24px.png</file>
 <file>eye_24px.png</file>
 <file>hide_24px.png</file>
 
@@ -35,10 +34,14 @@
 <file>select_invert_24px.png</file>
 <file>select_none_24px.png</file>
 
+<file>checkbox_enabled_24px.png</file>
+<file>checkbox_half_24px.png</file>
+<file>checkbox_disabled_24px.png</file>
+
 <!-- Tabs -->
 <file>file_16px.png</file>
-<file>apps_tab_16px.png</file>
-<file>variation_16px.png</file>
+<file>layers_16px.png</file>
+<file>classification_16px.png</file>
 
 </qresource>
 </RCC>

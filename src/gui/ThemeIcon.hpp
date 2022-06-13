@@ -17,25 +17,27 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file IconTheme.hpp */
+/** @file ThemeIcon.hpp */
 
-#ifndef ICON_THEME_HPP
-#define ICON_THEME_HPP
+#ifndef THEME_ICON_HPP
+#define THEME_ICON_HPP
 
 #include <ExportGui.hpp>
 
 #include <QIcon>
 #include <QString>
 
-/** Icon Theme.
+#define THEME_ICON(name) (ThemeIcon(":/gui/", name))
+
+/** Theme Icon.
 
     QIcon encapsulates multiple pixel perfect icon sizes.
     Qt will automatically select the best size for a given rendering.
 */
-class EXPORT_GUI IconTheme : public QIcon
+class EXPORT_GUI ThemeIcon : public QIcon
 {
 public:
-    IconTheme(const QString &prefix, const QString &name) : QIcon()
+    ThemeIcon(const QString &prefix, const QString &name) : QIcon()
     {
         addFile(prefix + name + "_16px.png", QSize(16, 16));
         addFile(prefix + name + "_24px.png", QSize(24, 24));
@@ -43,4 +45,4 @@ public:
     }
 };
 
-#endif /* ICON_THEME_HPP */
+#endif /* THEME_ICON_HPP */
