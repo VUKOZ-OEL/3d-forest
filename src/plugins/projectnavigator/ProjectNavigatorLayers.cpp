@@ -82,21 +82,21 @@ ProjectNavigatorLayers::ProjectNavigatorLayers(MainWindow *mainWindow)
     MainWindow::createToolButton(&selectAllButton_,
                                  tr("Select all"),
                                  tr("Select all"),
-                                 ICON("select_all"),
+                                 ICON("checkbox_enabled"),
                                  this,
                                  SLOT(slotSelectAll()));
 
     MainWindow::createToolButton(&selectInvertButton_,
                                  tr("Invert"),
                                  tr("Invert selection"),
-                                 ICON("select_invert"),
+                                 ICON("checkbox_half"),
                                  this,
                                  SLOT(slotSelectInvert()));
 
     MainWindow::createToolButton(&selectNoneButton_,
                                  tr("Select none"),
                                  tr("Select none"),
-                                 ICON("select_none"),
+                                 ICON("checkbox_disabled"),
                                  this,
                                  SLOT(slotSelectNone()));
 
