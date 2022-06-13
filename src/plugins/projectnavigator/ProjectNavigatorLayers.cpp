@@ -50,7 +50,7 @@ ProjectNavigatorLayers::ProjectNavigatorLayers(MainWindow *mainWindow)
     MainWindow::createToolButton(&addButton_,
                                  tr("Add"),
                                  tr("Add new layers"),
-                                 ICON("plus"),
+                                 ICON_THEME("plus"),
                                  this,
                                  SLOT(slotAdd()));
     addButton_->setEnabled(false);

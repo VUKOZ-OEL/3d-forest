@@ -50,7 +50,7 @@ ProjectNavigatorFiles::ProjectNavigatorFiles(MainWindow *mainWindow)
     MainWindow::createToolButton(&addButton_,
                                  tr("Add"),
                                  tr("Add new data set"),
-                                 ICON("plus"),
+                                 ICON_THEME("plus"),
                                  this,
                                  SLOT(slotAdd()));
 

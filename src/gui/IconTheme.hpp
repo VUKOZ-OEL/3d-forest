@@ -27,6 +27,8 @@
 #include <QIcon>
 #include <QString>
 
+#define ICON_THEME(name) (IconTheme(":/gui/", name))
+
 /** Icon Theme.
 
     QIcon encapsulates multiple pixel perfect icon sizes.
