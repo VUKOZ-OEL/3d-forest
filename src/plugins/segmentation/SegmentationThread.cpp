@@ -19,8 +19,34 @@
 
 /** @file SegmentationThread.cpp */
 
+#include <Log.hpp>
 #include <SegmentationThread.hpp>
 
-SegmentationThread::SegmentationThread()
+#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("SegmentationThread", msg)
+
+SegmentationThread::SegmentationThread() : initialized_(false)
 {
+    LOG_DEBUG_LOCAL("");
+}
+
+void SegmentationThread::setup()
+{
+    LOG_DEBUG_LOCAL("");
+    cancel();
+    initialized_ = false;
+    Thread::start();
+}
+
+bool SegmentationThread::compute()
+{
+    LOG_DEBUG_LOCAL("initialized=" << initialized_);
+    if (!initialized_)
+    {
+        initialized_ = true;
+        return false;
+    }
+
+    LOG_DEBUG_LOCAL("nextState");
+
+    return true;
 }

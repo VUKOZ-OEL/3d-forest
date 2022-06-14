@@ -22,8 +22,11 @@
 #include <MainWindow.hpp>
 #include <SettingsColorWidget.hpp>
 #include <SettingsWindow.hpp>
+#include <ThemeIcon.hpp>
 
 #include <QTabWidget>
+
+#define ICON(name) (ThemeIcon(":/settings/", name))
 
 SettingsWindow::SettingsWindow(MainWindow *mainWindow)
     : QDockWidget(mainWindow),
@@ -34,7 +37,10 @@ SettingsWindow::SettingsWindow(MainWindow *mainWindow)
 
     // Tab
     tabWidget_ = new QTabWidget;
-    tabWidget_->addTab(settingsColorWidget_, tr("Color"));
+    tabWidget_->addTab(settingsColorWidget_, ICON("brush"), tr("Brush"));
+
+    tabWidget_->setIconSize(
+        QSize(MainWindow::ICON_SIZE_TEXT, MainWindow::ICON_SIZE_TEXT));
 
     // Dock
     setWidget(tabWidget_);

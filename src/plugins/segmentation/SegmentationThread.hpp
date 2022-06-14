@@ -22,15 +22,21 @@
 #ifndef SEGMENTATION_THREAD_HPP
 #define SEGMENTATION_THREAD_HPP
 
+#include <Thread.hpp>
 #include <Vector3.hpp>
 
 /** Segmentation Thread. */
-class SegmentationThread
+class SegmentationThread : public Thread
 {
 public:
     SegmentationThread();
 
+    void setup();
+
+    virtual bool compute();
+
 protected:
+    bool initialized_;
 };
 
 #endif /* SEGMENTATION_THREAD_HPP */

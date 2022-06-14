@@ -24,5 +24,8 @@
 <file>settings_16px.png</file>
 <file>settings_24px.png</file>
 
+<!-- Tabs -->
+<file>brush_16px.png</file>
+
 </qresource>
 </RCC>
