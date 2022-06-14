@@ -58,7 +58,7 @@ ProjectNavigatorLayers::ProjectNavigatorLayers(MainWindow *mainWindow)
     MainWindow::createToolButton(&deleteButton_,
                                  tr("Remove"),
                                  tr("Remove selected layers"),
-                                 ICON("remove"),
+                                 THEME_ICON("minus"),
                                  this,
                                  SLOT(slotDelete()));
     deleteButton_->setEnabled(false);
