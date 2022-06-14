@@ -58,6 +58,7 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
                       distanceGroup_,
                       distanceSlider_,
                       distanceSpinBox_,
+                      this,
                       SLOT(slotDistanceIntermediateValue(int)),
                       SLOT(slotDistanceFinalValue()),
                       tr("Distance"),
@@ -73,6 +74,7 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
                       thresholdGroup_,
                       thresholdSlider_,
                       thresholdSpinBox_,
+                      this,
                       SLOT(slotThresholdIntermediateValue(int)),
                       SLOT(slotThresholdFinalValue()),
                       tr("Threshold"),
@@ -111,11 +113,28 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
     setWindowIcon(ICON("forest"));
     setMaximumHeight(height());
     setModal(true);
+
+    // Connect worker thread to gui thread
+    connect(this,
+            SIGNAL(signalThread()),
+            this,
+            SLOT(slotThread()),
+            Qt::QueuedConnection);
+
+    segmentationThread_.setCallback(this);
+    segmentationThread_.create();
+}
+
+SegmentationWindow::~SegmentationWindow()
+{
+    LOG_DEBUG_LOCAL("");
+    segmentationThread_.stop();
 }
 
 void SegmentationWindow::slotDistanceFinalValue()
 {
     LOG_DEBUG_LOCAL("value <" << distanceSlider_->value() << ">");
+    resumeThreads();
 }
 
 void SegmentationWindow::slotDistanceIntermediateValue(int v)
@@ -177,12 +196,49 @@ void SegmentationWindow::showEvent(QShowEvent *event)
 {
     LOG_DEBUG_LOCAL("");
     QDialog::showEvent(event);
+    resumeThreads();
+}
+
+void SegmentationWindow::closeEvent(QCloseEvent *event)
+{
+    LOG_DEBUG_LOCAL("");
+    suspendThreads();
+    QDialog::closeEvent(event);
+}
+
+void SegmentationWindow::threadProgress(bool finished)
+{
+    (void)finished;
+    LOG_DEBUG_LOCAL("finished=" << finished);
+    // in worker thread: notify gui thread
+    emit signalThread();
+}
+
+void SegmentationWindow::slotThread()
+{
+    LOG_DEBUG_LOCAL("");
+    // in gui thread: update visualization
+}
+
+void SegmentationWindow::suspendThreads()
+{
+    LOG_DEBUG_LOCAL("");
+    // in gui thread: cancel task in worker thread
+    segmentationThread_.cancel();
+}
+
+void SegmentationWindow::resumeThreads()
+{
+    LOG_DEBUG_LOCAL("");
+    // in gui thread: start new task in worker thread
+    segmentationThread_.setup();
 }
 
 void SegmentationWindow::createInputSlider(QVBoxLayout *layout,
                                            QWidget *&group,
                                            QSlider *&slider,
                                            QSpinBox *&spinBox,
+                                           const QObject *receiver,
                                            const char *memberIntermediateValue,
                                            const char *memberFinalValue,
                                            const QString &text,
@@ -219,16 +275,22 @@ void SegmentationWindow::createInputSlider(QVBoxLayout *layout,
     slider->setValue(value);
     slider->setSingleStep(step);
     slider->setOrientation(Qt::Horizontal);
-    connect(slider, SIGNAL(valueChanged(int)), this, memberIntermediateValue);
-    connect(slider, SIGNAL(sliderReleased()), this, memberFinalValue);
+    connect(slider,
+            SIGNAL(valueChanged(int)),
+            receiver,
+            memberIntermediateValue);
+    connect(slider, SIGNAL(sliderReleased()), receiver, memberFinalValue);
 
     // Value SpinBox
     spinBox = new QSpinBox;
     spinBox->setRange(min, max);
     spinBox->setValue(value);
     spinBox->setSingleStep(step);
-    connect(spinBox, SIGNAL(valueChanged(int)), this, memberIntermediateValue);
-    connect(spinBox, SIGNAL(editingFinished()), this, memberFinalValue);
+    connect(spinBox,
+            SIGNAL(valueChanged(int)),
+            receiver,
+            memberIntermediateValue);
+    connect(spinBox, SIGNAL(editingFinished()), receiver, memberFinalValue);
 
     // Value Layout
     QHBoxLayout *valueLayout = new QHBoxLayout;

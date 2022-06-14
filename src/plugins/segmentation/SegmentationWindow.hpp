@@ -22,6 +22,9 @@
 #ifndef SEGMENTATION_WINDOW_HPP
 #define SEGMENTATION_WINDOW_HPP
 
+#include <SegmentationThread.hpp>
+#include <ThreadCallbackInterface.hpp>
+
 #include <QDialog>
 
 class MainWindow;
@@ -32,12 +35,21 @@ class QSlider;
 class QVBoxLayout;
 
 /** Segmentation Window. */
-class SegmentationWindow : public QDialog
+class SegmentationWindow : public QDialog, public ThreadCallbackInterface
 {
     Q_OBJECT
 
 public:
     SegmentationWindow(MainWindow *mainWindow);
+    virtual ~SegmentationWindow();
+
+    virtual void threadProgress(bool finished);
+
+public slots:
+    void slotThread();
+
+signals:
+    void signalThread();
 
 protected slots:
     void slotDistanceFinalValue();
@@ -63,21 +75,28 @@ protected:
     QPushButton *acceptButton_;
     QPushButton *rejectButton_;
 
-    virtual void showEvent(QShowEvent *event);
+    SegmentationThread segmentationThread_;
 
-    void createInputSlider(QVBoxLayout *layout,
-                           QWidget *&group,
-                           QSlider *&slider,
-                           QSpinBox *&spinBox,
-                           const char *memberIntermediateValue,
-                           const char *memberFinalValue,
-                           const QString &text,
-                           const QString &toolTip,
-                           const QString &unitsList,
-                           int step,
-                           int min,
-                           int max,
-                           int value);
+    virtual void showEvent(QShowEvent *event);
+    virtual void closeEvent(QCloseEvent *event);
+
+    void suspendThreads();
+    void resumeThreads();
+
+    static void createInputSlider(QVBoxLayout *layout,
+                                  QWidget *&group,
+                                  QSlider *&slider,
+                                  QSpinBox *&spinBox,
+                                  const QObject *receiver,
+                                  const char *memberIntermediateValue,
+                                  const char *memberFinalValue,
+                                  const QString &text,
+                                  const QString &toolTip,
+                                  const QString &unitsList,
+                                  int step,
+                                  int min,
+                                  int max,
+                                  int value);
 };
 
 #endif /* SEGMENTATION_WINDOW_HPP */
