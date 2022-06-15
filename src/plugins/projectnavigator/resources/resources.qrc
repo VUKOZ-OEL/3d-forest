@@ -30,9 +30,9 @@
 <file>eye_24px.png</file>
 <file>hide_24px.png</file>
 
-<file>select_all_24px.png</file>
-<file>select_invert_24px.png</file>
-<file>select_none_24px.png</file>
+<file>select_all_grid_24px.png</file>
+<file>select_invert_grid_24px.png</file>
+<file>select_none_grid_24px.png</file>
 
 <file>checkbox_enabled_24px.png</file>
 <file>checkbox_half_24px.png</file>

@@ -57,7 +57,7 @@ ProjectNavigatorFiles::ProjectNavigatorFiles(MainWindow *mainWindow)
     MainWindow::createToolButton(&deleteButton_,
                                  tr("Remove"),
                                  tr("Remove selected data set"),
-                                 THEME_ICON("minus"),
+                                 ICON("remove"),
                                  this,
                                  SLOT(slotDelete()));
     deleteButton_->setEnabled(false);
@@ -81,21 +81,21 @@ ProjectNavigatorFiles::ProjectNavigatorFiles(MainWindow *mainWindow)
     MainWindow::createToolButton(&selectAllButton_,
                                  tr("Select all"),
                                  tr("Select all"),
-                                 ICON("checkbox_enabled"),
+                                 ICON("select_all_grid"),
                                  this,
                                  SLOT(slotSelectAll()));
 
     MainWindow::createToolButton(&selectInvertButton_,
                                  tr("Invert"),
                                  tr("Invert selection"),
-                                 ICON("checkbox_half"),
+                                 ICON("select_invert_grid"),
                                  this,
                                  SLOT(slotSelectInvert()));
 
     MainWindow::createToolButton(&selectNoneButton_,
                                  tr("Select none"),
                                  tr("Select none"),
-                                 ICON("checkbox_disabled"),
+                                 ICON("select_none_grid"),
                                  this,
                                  SLOT(slotSelectNone()));
 
