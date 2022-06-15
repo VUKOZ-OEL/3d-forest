@@ -61,9 +61,13 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
                       this,
                       SLOT(slotDistanceIntermediateValue(int)),
                       SLOT(slotDistanceFinalValue()),
-                      tr("Distance"),
-                      tr("Voxel size should be small enough to contain"
-                         " only one characteristic that best fits the data"),
+                      tr("Voxel size"),
+                      tr("The automated segmentation creates voxel"
+                         " grid through the whole point cloud."
+                         "\nVoxel size should be small enough so that"
+                         " each voxel contains only one characteristic"
+                         "\nthat best fits the data inside voxel volume."
+                         " Each voxel should contain at least 3 points."),
                       tr("pt"),
                       1,
                       1,
@@ -77,9 +81,13 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
                       this,
                       SLOT(slotThresholdIntermediateValue(int)),
                       SLOT(slotThresholdFinalValue()),
-                      tr("Threshold"),
-                      tr("Minimal cutoff threshold to consider"
-                         "computed characteristic value as a tree"),
+                      tr("Use descriptor values above"),
+                      tr("The range represents the lower limit of the"
+                         " used voxels for segmentation."
+                         "\nFor example, if the input threshold value"
+                         " is 70, then only the voxels whose descriptor"
+                         "\nvalue is at 70% of the actual value range"
+                         " or higher are used for the tree extraction."),
                       tr("%"),
                       1,
                       0,
