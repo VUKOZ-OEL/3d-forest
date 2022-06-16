@@ -38,7 +38,7 @@ void HelpPlugin::initialize(MainWindow *mainWindow)
     mainWindow_->createAction(&aboutAction_,
                               "Help",
                               "",
-                              tr("About"),
+                              tr("About 3D Forest"),
                               tr("About this application"),
                               ICON("about"),
                               this,
@@ -59,5 +59,16 @@ void HelpPlugin::slotAbout()
            "\n"
            "Uses delaunator-cpp, eigen, libigl\n"
            "Uses additional icons https://icons8.com\n"
-           "Uses modified ctkRangeSlider, (c) Kitware Inc.\n"));
+           "Uses modified ctkRangeSlider, (c) Kitware Inc.\n"
+           "\n"
+           "3D Forest software license:\n"
+           "This program is free software and is distributed under the GNU\n"
+           "General Public License, version 3. In short, this means you are\n"
+           "free to use and distribute 3D Forest for any purpose, commercial\n"
+           "or non-commercial, without any restrictions. You are also free to\n"
+           "modify the program as you wish, with the only restriction that if\n"
+           "you distribute the modified version, you must provide access to\n"
+           "its source code.\n"
+           "For more details about the license, read the file LICENSE inside\n"
+           "the 3D Forest installation folder."));
 }
