@@ -22,22 +22,14 @@
 #include <Log.hpp>
 #include <MainWindow.hpp>
 #include <SegmentationWindow.hpp>
+#include <SliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
-#include <QCheckBox>
 #include <QCloseEvent>
-#include <QComboBox>
-#include <QCoreApplication>
-#include <QGridLayout>
-#include <QGroupBox>
 #include <QHBoxLayout>
-#include <QLabel>
 #include <QProgressDialog>
 #include <QPushButton>
 #include <QShowEvent>
-#include <QSlider>
-#include <QSpinBox>
-#include <QToolButton>
 #include <QVBoxLayout>
 
 #define ICON(name) (ThemeIcon(":/segmentation/", name))
@@ -54,45 +46,58 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
     QVBoxLayout *settingsLayout = new QVBoxLayout;
 
     // Widgets
-    createInputSlider(settingsLayout,
-                      distanceGroup_,
-                      distanceSlider_,
-                      distanceSpinBox_,
-                      this,
-                      SLOT(slotDistanceIntermediateValue(int)),
-                      SLOT(slotDistanceFinalValue()),
-                      tr("Voxel size"),
-                      tr("The automated segmentation creates voxel"
-                         " grid through the whole point cloud."
-                         "\nVoxel size should be small enough so that"
-                         " each voxel contains only one characteristic"
-                         "\nthat best fits the data inside voxel volume."
-                         " Each voxel should contain at least 3 points."),
-                      tr("pt"),
-                      1,
-                      1,
-                      100,
-                      10);
+    SliderWidget::create(previewSizeInput_,
+                         this,
+                         nullptr,
+                         nullptr,
+                         tr("Preview size"),
+                         tr("Preview size"),
+                         tr("%"),
+                         1,
+                         1,
+                         100,
+                         10);
 
-    createInputSlider(settingsLayout,
-                      thresholdGroup_,
-                      thresholdSlider_,
-                      thresholdSpinBox_,
-                      this,
-                      SLOT(slotThresholdIntermediateValue(int)),
-                      SLOT(slotThresholdFinalValue()),
-                      tr("Use descriptor values above"),
-                      tr("The range represents the lower limit of the"
-                         " used voxels for segmentation."
-                         "\nFor example, if the input threshold value"
-                         " is 70, then only the voxels whose descriptor"
-                         "\nvalue is at 70% of the actual value range"
-                         " or higher are used for the tree extraction."),
-                      tr("%"),
-                      1,
-                      0,
-                      100,
-                      70);
+    settingsLayout->addWidget(previewSizeInput_);
+    previewSizeInput_->setDisabled(true);
+
+    SliderWidget::create(distanceInput_,
+                         this,
+                         nullptr,
+                         SLOT(slotDistanceFinalValue()),
+                         tr("Voxel size"),
+                         tr("The automated segmentation creates voxel"
+                            " grid through the whole point cloud."
+                            "\nVoxel size should be small enough so that"
+                            " each voxel contains only one characteristic"
+                            "\nthat best fits the data inside voxel volume."
+                            " Each voxel should contain at least 3 points."),
+                         tr("pt"),
+                         1,
+                         1,
+                         100,
+                         10);
+
+    settingsLayout->addWidget(distanceInput_);
+
+    SliderWidget::create(thresholdInput_,
+                         this,
+                         nullptr,
+                         SLOT(slotThresholdFinalValue()),
+                         tr("Use descriptor values above"),
+                         tr("The range represents the lower limit of the"
+                            " used voxels for segmentation."
+                            "\nFor example, if the input threshold value"
+                            " is 70, then only the voxels whose descriptor"
+                            "\nvalue is at 70% of the actual value range"
+                            " or higher are used for the tree extraction."),
+                         tr("%"),
+                         1,
+                         0,
+                         100,
+                         70);
+
+    settingsLayout->addWidget(thresholdInput_);
 
     acceptButton_ = new QPushButton(tr("Apply"));
     connect(acceptButton_, SIGNAL(clicked()), this, SLOT(slotAccept()));
@@ -141,49 +146,13 @@ SegmentationWindow::~SegmentationWindow()
 
 void SegmentationWindow::slotDistanceFinalValue()
 {
-    LOG_DEBUG_LOCAL("value <" << distanceSlider_->value() << ">");
+    LOG_DEBUG_LOCAL("value <" << distanceInput_->value() << ">");
     resumeThreads();
-}
-
-void SegmentationWindow::slotDistanceIntermediateValue(int v)
-{
-    LOG_DEBUG_LOCAL("value <" << v << ">");
-    QObject *obj = sender();
-    if (obj == distanceSlider_)
-    {
-        LOG_DEBUG_LOCAL("slider value");
-        distanceSpinBox_->blockSignals(true);
-        distanceSpinBox_->setValue(v);
-        distanceSpinBox_->blockSignals(false);
-    }
-    else if (obj == distanceSpinBox_)
-    {
-        LOG_DEBUG_LOCAL("spin box value");
-        distanceSlider_->blockSignals(true);
-        distanceSlider_->setValue(v);
-        distanceSlider_->blockSignals(false);
-    }
 }
 
 void SegmentationWindow::slotThresholdFinalValue()
 {
-    LOG_DEBUG_LOCAL("value <" << thresholdSlider_->value() << ">");
-}
-
-void SegmentationWindow::slotThresholdIntermediateValue(int v)
-{
-    LOG_DEBUG_LOCAL("value <" << v << ">");
-    QObject *obj = sender();
-    if (obj == thresholdSlider_)
-    {
-        LOG_DEBUG_LOCAL("slider value");
-        thresholdSpinBox_->setValue(v);
-    }
-    else if (obj == thresholdSpinBox_)
-    {
-        LOG_DEBUG_LOCAL("spin box value");
-        thresholdSlider_->setValue(v);
-    }
+    LOG_DEBUG_LOCAL("value <" << thresholdInput_->value() << ">");
 }
 
 void SegmentationWindow::slotAccept()
@@ -240,79 +209,4 @@ void SegmentationWindow::resumeThreads()
     LOG_DEBUG_LOCAL("");
     // in gui thread: start new task in worker thread
     segmentationThread_.setup();
-}
-
-void SegmentationWindow::createInputSlider(QVBoxLayout *layout,
-                                           QWidget *&group,
-                                           QSlider *&slider,
-                                           QSpinBox *&spinBox,
-                                           const QObject *receiver,
-                                           const char *memberIntermediateValue,
-                                           const char *memberFinalValue,
-                                           const QString &text,
-                                           const QString &toolTip,
-                                           const QString &unitsList,
-                                           int step,
-                                           int min,
-                                           int max,
-                                           int value)
-{
-    // Description Name
-    QLabel *label = new QLabel(text);
-
-    // Description Tool Tip
-    QLabel *help = new QLabel;
-    help->setToolTip(toolTip);
-    ThemeIcon helpIcon(":/gui/", "question");
-    help->setPixmap(helpIcon.pixmap(MainWindow::ICON_SIZE_TEXT));
-
-    // Description Units
-    QComboBox *units = new QComboBox;
-    units->addItem(unitsList);
-
-    // Description Layout
-    QHBoxLayout *descriptionLayout = new QHBoxLayout;
-    descriptionLayout->addWidget(label);
-    descriptionLayout->addWidget(help);
-    descriptionLayout->addStretch();
-    descriptionLayout->addWidget(units);
-
-    // Value Slider
-    slider = new QSlider;
-    slider->setRange(min, max);
-    slider->setValue(value);
-    slider->setSingleStep(step);
-    slider->setOrientation(Qt::Horizontal);
-    connect(slider,
-            SIGNAL(valueChanged(int)),
-            receiver,
-            memberIntermediateValue);
-    connect(slider, SIGNAL(sliderReleased()), receiver, memberFinalValue);
-
-    // Value SpinBox
-    spinBox = new QSpinBox;
-    spinBox->setRange(min, max);
-    spinBox->setValue(value);
-    spinBox->setSingleStep(step);
-    connect(spinBox,
-            SIGNAL(valueChanged(int)),
-            receiver,
-            memberIntermediateValue);
-    connect(spinBox, SIGNAL(editingFinished()), receiver, memberFinalValue);
-
-    // Value Layout
-    QHBoxLayout *valueLayout = new QHBoxLayout;
-    valueLayout->addWidget(slider);
-    valueLayout->addWidget(spinBox);
-
-    // Group Description and Value
-    QVBoxLayout *groupLayout = new QVBoxLayout;
-    groupLayout->addLayout(descriptionLayout);
-    groupLayout->addLayout(valueLayout);
-
-    group = new QWidget;
-    group->setLayout(groupLayout);
-
-    // Add Group to Main Layout
-    layout->addWidget(group);
 }
