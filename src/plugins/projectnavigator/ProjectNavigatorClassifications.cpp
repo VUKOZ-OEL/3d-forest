@@ -66,21 +66,21 @@ ProjectNavigatorClassifications::ProjectNavigatorClassifications(
     MainWindow::createToolButton(&selectAllButton_,
                                  tr("Select all"),
                                  tr("Select all"),
-                                 ICON("checkbox_enabled"),
+                                 ICON("select_all"),
                                  this,
                                  SLOT(slotSelectAll()));
 
     MainWindow::createToolButton(&selectInvertButton_,
                                  tr("Invert"),
                                  tr("Invert selection"),
-                                 ICON("checkbox_half"),
+                                 ICON("select_invert"),
                                  this,
                                  SLOT(slotSelectInvert()));
 
     MainWindow::createToolButton(&selectNoneButton_,
                                  tr("Select none"),
                                  tr("Select none"),
-                                 ICON("checkbox_disabled"),
+                                 ICON("select_none"),
                                  this,
                                  SLOT(slotSelectNone()));
 

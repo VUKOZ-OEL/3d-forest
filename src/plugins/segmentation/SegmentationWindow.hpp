@@ -28,11 +28,9 @@
 #include <QDialog>
 
 class MainWindow;
+class SliderWidget;
 
 class QPushButton;
-class QSpinBox;
-class QSlider;
-class QVBoxLayout;
 
 /** Segmentation Window. */
 class SegmentationWindow : public QDialog, public ThreadCallbackInterface
@@ -53,10 +51,7 @@ signals:
 
 protected slots:
     void slotDistanceFinalValue();
-    void slotDistanceIntermediateValue(int v);
-
     void slotThresholdFinalValue();
-    void slotThresholdIntermediateValue(int v);
 
     void slotAccept();
     void slotReject();
@@ -64,13 +59,9 @@ protected slots:
 protected:
     MainWindow *mainWindow_;
 
-    QWidget *distanceGroup_;
-    QSlider *distanceSlider_;
-    QSpinBox *distanceSpinBox_;
-
-    QWidget *thresholdGroup_;
-    QSlider *thresholdSlider_;
-    QSpinBox *thresholdSpinBox_;
+    SliderWidget *previewSizeInput_;
+    SliderWidget *distanceInput_;
+    SliderWidget *thresholdInput_;
 
     QPushButton *acceptButton_;
     QPushButton *rejectButton_;
@@ -82,21 +73,6 @@ protected:
 
     void suspendThreads();
     void resumeThreads();
-
-    static void createInputSlider(QVBoxLayout *layout,
-                                  QWidget *&group,
-                                  QSlider *&slider,
-                                  QSpinBox *&spinBox,
-                                  const QObject *receiver,
-                                  const char *memberIntermediateValue,
-                                  const char *memberFinalValue,
-                                  const QString &text,
-                                  const QString &toolTip,
-                                  const QString &unitsList,
-                                  int step,
-                                  int min,
-                                  int max,
-                                  int value);
 };
 
 #endif /* SEGMENTATION_WINDOW_HPP */
