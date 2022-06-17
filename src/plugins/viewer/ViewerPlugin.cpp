@@ -44,7 +44,7 @@ void ViewerPlugin::initialize(MainWindow *mainWindow)
                               "Viewport Projection",
                               tr("Orthographic"),
                               tr("Orthographic projection"),
-                              ICON("empty_box_ortho"),
+                              ICON("orthographic"),
                               this,
                               SLOT(slotViewOrthographic()));
 
@@ -53,7 +53,7 @@ void ViewerPlugin::initialize(MainWindow *mainWindow)
                               "Viewport Projection",
                               tr("Perspective"),
                               tr("Perspective projection"),
-                              ICON("empty_box"),
+                              ICON("perspective"),
                               this,
                               SLOT(slotViewPerspective()));
 
