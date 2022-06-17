@@ -28,7 +28,10 @@
 
 SegmentationThread::SegmentationThread()
     : initialized_(false),
-      state_(STATE_NEW)
+      state_(STATE_NEW),
+      progress_(0),
+      voxelSize_(0),
+      threshold_(0)
 {
     LOG_DEBUG_LOCAL("");
 }
@@ -40,7 +43,8 @@ SegmentationThread::~SegmentationThread()
 
 void SegmentationThread::setup(int voxelSize, int threshold)
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL("voxelSize <" << voxelSize << "> threshold <" << threshold
+                                  << ">");
 
     cancel();
 
@@ -88,6 +92,13 @@ bool SegmentationThread::compute()
     double timeBegin = getRealTime();
     bool finished;
 
+    if (state_ == STATE_VOXEL_SIZE)
+    {
+    }
+    else if (state_ == STATE_THRESHOLD)
+    {
+    }
+
     finished = true;
 
     double timeEnd = getRealTime();
@@ -95,8 +106,8 @@ bool SegmentationThread::compute()
 
     if (callback_)
     {
-        LOG_DEBUG_LOCAL("callback finished <" << finished << "> time <"
-                                              << msec << ">");
+        LOG_DEBUG_LOCAL("callback finished <" << finished << "> time <" << msec
+                                              << ">");
         callback_->threadProgress(finished);
     }
 

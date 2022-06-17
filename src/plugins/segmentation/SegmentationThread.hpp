@@ -44,6 +44,7 @@ protected:
         STATE_INITIALIZE,
         STATE_VOXEL_SIZE,
         STATE_THRESHOLD,
+        STATE_FINISHED,
     };
 
     bool initialized_;
