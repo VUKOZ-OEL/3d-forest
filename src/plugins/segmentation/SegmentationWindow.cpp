@@ -42,10 +42,10 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
 {
     LOG_DEBUG_LOCAL("");
 
-    // Layout
+    // Settings layout
     QVBoxLayout *settingsLayout = new QVBoxLayout;
 
-    // Widgets
+    // Input widgets
     SliderWidget::create(previewSizeInput_,
                          this,
                          nullptr,
@@ -61,10 +61,10 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
     settingsLayout->addWidget(previewSizeInput_);
     previewSizeInput_->setDisabled(true);
 
-    SliderWidget::create(distanceInput_,
+    SliderWidget::create(voxelSizeInput_,
                          this,
                          nullptr,
-                         SLOT(slotDistanceFinalValue()),
+                         SLOT(slotVoxelSizeFinalValue()),
                          tr("Voxel size"),
                          tr("The automated segmentation creates voxel"
                             " grid through the whole point cloud."
@@ -78,7 +78,7 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
                          100,
                          10);
 
-    settingsLayout->addWidget(distanceInput_);
+    settingsLayout->addWidget(voxelSizeInput_);
 
     SliderWidget::create(thresholdInput_,
                          this,
@@ -99,20 +99,21 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
 
     settingsLayout->addWidget(thresholdInput_);
 
+    settingsLayout->addStretch();
+
+    // apply/cancel buttons
     acceptButton_ = new QPushButton(tr("Apply"));
     connect(acceptButton_, SIGNAL(clicked()), this, SLOT(slotAccept()));
 
     rejectButton_ = new QPushButton(tr("Cancel"));
     connect(rejectButton_, SIGNAL(clicked()), this, SLOT(slotReject()));
 
-    // Layout
-    settingsLayout->addStretch();
-
     QHBoxLayout *dialogButtons = new QHBoxLayout;
     dialogButtons->addStretch();
     dialogButtons->addWidget(acceptButton_);
     dialogButtons->addWidget(rejectButton_);
 
+    // Main layout
     QVBoxLayout *dialogLayout = new QVBoxLayout;
     dialogLayout->addLayout(settingsLayout);
     dialogLayout->addSpacing(10);
@@ -144,15 +145,16 @@ SegmentationWindow::~SegmentationWindow()
     segmentationThread_.stop();
 }
 
-void SegmentationWindow::slotDistanceFinalValue()
+void SegmentationWindow::slotVoxelSizeFinalValue()
 {
-    LOG_DEBUG_LOCAL("value <" << distanceInput_->value() << ">");
+    LOG_DEBUG_LOCAL("value <" << voxelSizeInput_->value() << ">");
     resumeThreads();
 }
 
 void SegmentationWindow::slotThresholdFinalValue()
 {
     LOG_DEBUG_LOCAL("value <" << thresholdInput_->value() << ">");
+    resumeThreads();
 }
 
 void SegmentationWindow::slotAccept()
@@ -195,6 +197,7 @@ void SegmentationWindow::slotThread()
 {
     LOG_DEBUG_LOCAL("");
     // in gui thread: update visualization
+    // mainWindow_->setProgressBarValue(25);
 }
 
 void SegmentationWindow::suspendThreads()
@@ -202,11 +205,14 @@ void SegmentationWindow::suspendThreads()
     LOG_DEBUG_LOCAL("");
     // in gui thread: cancel task in worker thread
     segmentationThread_.cancel();
+    mainWindow_->setProgressBarValue(0);
 }
 
 void SegmentationWindow::resumeThreads()
 {
     LOG_DEBUG_LOCAL("");
     // in gui thread: start new task in worker thread
-    segmentationThread_.setup();
+    segmentationThread_.setup(voxelSizeInput_->value(),
+                              thresholdInput_->value());
+    mainWindow_->setProgressBarValue(0);
 }

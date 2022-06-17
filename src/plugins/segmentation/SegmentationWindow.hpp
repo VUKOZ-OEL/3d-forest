@@ -24,12 +24,10 @@
 
 #include <SegmentationThread.hpp>
 #include <ThreadCallbackInterface.hpp>
-
-#include <QDialog>
-
 class MainWindow;
 class SliderWidget;
 
+#include <QDialog>
 class QPushButton;
 
 /** Segmentation Window. */
@@ -50,7 +48,7 @@ signals:
     void signalThread();
 
 protected slots:
-    void slotDistanceFinalValue();
+    void slotVoxelSizeFinalValue();
     void slotThresholdFinalValue();
 
     void slotAccept();
@@ -60,7 +58,7 @@ protected:
     MainWindow *mainWindow_;
 
     SliderWidget *previewSizeInput_;
-    SliderWidget *distanceInput_;
+    SliderWidget *voxelSizeInput_;
     SliderWidget *thresholdInput_;
 
     QPushButton *acceptButton_;

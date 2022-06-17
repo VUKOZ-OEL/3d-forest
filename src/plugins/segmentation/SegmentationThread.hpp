@@ -30,13 +30,27 @@ class SegmentationThread : public Thread
 {
 public:
     SegmentationThread();
+    virtual ~SegmentationThread();
 
-    void setup();
+    void setup(int voxelSize, int threshold);
 
     virtual bool compute();
 
 protected:
+    /** Segmentation Thread State. */
+    enum State
+    {
+        STATE_NEW,
+        STATE_INITIALIZE,
+        STATE_VOXEL_SIZE,
+        STATE_THRESHOLD,
+    };
+
     bool initialized_;
+    State state_;
+    int progress_;
+    int voxelSize_;
+    int threshold_;
 };
 
 #endif /* SEGMENTATION_THREAD_HPP */

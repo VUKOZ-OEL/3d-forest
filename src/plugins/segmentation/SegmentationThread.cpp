@@ -21,25 +21,63 @@
 
 #include <Log.hpp>
 #include <SegmentationThread.hpp>
+#include <ThreadCallbackInterface.hpp>
+#include <Time.hpp>
 
 #define LOG_DEBUG_LOCAL(msg) LOG_MODULE("SegmentationThread", msg)
 
-SegmentationThread::SegmentationThread() : initialized_(false)
+SegmentationThread::SegmentationThread()
+    : initialized_(false),
+      state_(STATE_NEW)
 {
     LOG_DEBUG_LOCAL("");
 }
 
-void SegmentationThread::setup()
+SegmentationThread::~SegmentationThread()
 {
     LOG_DEBUG_LOCAL("");
+}
+
+void SegmentationThread::setup(int voxelSize, int threshold)
+{
+    LOG_DEBUG_LOCAL("");
+
     cancel();
-    initialized_ = false;
-    Thread::start();
+
+    bool restart;
+
+    if (voxelSize != voxelSize_)
+    {
+        voxelSize_ = voxelSize;
+        state_ = STATE_VOXEL_SIZE;
+        restart = true;
+    }
+    else if (threshold != threshold_)
+    {
+        threshold_ = threshold;
+        state_ = STATE_THRESHOLD;
+        restart = true;
+    }
+    else
+    {
+        restart = false;
+    }
+
+    if (restart)
+    {
+        LOG_DEBUG_LOCAL("state <" << state_ << ">");
+
+        initialized_ = false;
+        progress_ = 0;
+
+        Thread::start();
+    }
 }
 
 bool SegmentationThread::compute()
 {
-    LOG_DEBUG_LOCAL("initialized=" << initialized_);
+    LOG_DEBUG_LOCAL("initialized <" << initialized_ << ">");
+
     if (!initialized_)
     {
         initialized_ = true;
@@ -47,6 +85,20 @@ bool SegmentationThread::compute()
     }
 
     LOG_DEBUG_LOCAL("nextState");
+    double timeBegin = getRealTime();
+    bool finished;
 
-    return true;
+    finished = true;
+
+    double timeEnd = getRealTime();
+    double msec = (timeEnd - timeBegin) * 1000.;
+
+    if (callback_)
+    {
+        LOG_DEBUG_LOCAL("callback finished <" << finished << "> time <"
+                                              << msec << ">");
+        callback_->threadProgress(finished);
+    }
+
+    return finished;
 }
