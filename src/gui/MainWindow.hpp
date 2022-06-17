@@ -26,18 +26,6 @@
 #include <ExportGui.hpp>
 #include <RenderThread.hpp>
 #include <ThreadCallbackInterface.hpp>
-
-#include <QHash>
-#include <QIcon>
-#include <QMainWindow>
-
-#if QT_VERSION_MAJOR == 5
-    // Fix for qt5 which has two QAction classes
-    #include <QtWidgets/QAction>
-#else
-    #include <QAction>
-#endif
-
 class PluginInterface;
 class ImportPlugin;
 class ProjectNavigatorPlugin;
@@ -46,7 +34,18 @@ class SettingsPlugin;
 class ViewerPlugin;
 class HelpPlugin;
 
+#include <QHash>
+#include <QIcon>
+#include <QMainWindow>
 class QToolButton;
+class QProgressBar;
+
+#if QT_VERSION_MAJOR == 5
+    // Fix for qt5 which has two QAction classes
+    #include <QtWidgets/QAction>
+#else
+    #include <QAction>
+#endif
 
 /** Main Window. */
 class EXPORT_GUI MainWindow : public QMainWindow, public ThreadCallbackInterface
@@ -98,6 +97,8 @@ public:
 
     Editor &editor() { return editor_; }
 
+    void setProgressBarValue(int percent);
+
 public slots:
     void slotRender();
     void slotRenderViewport();
@@ -125,6 +126,9 @@ protected:
     ViewerPlugin *viewerPlugin_;
     HelpPlugin *helpPlugin_;
     std::vector<PluginInterface *> plugins_;
+
+    // Window
+    QProgressBar *statusProgressBar_;
 
     // Menu
     QHash<QString, QMenu *> menu_;
