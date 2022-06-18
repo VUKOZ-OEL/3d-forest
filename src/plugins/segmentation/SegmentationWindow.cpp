@@ -38,7 +38,8 @@
 
 SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
     : QDialog(mainWindow),
-      mainWindow_(mainWindow)
+      mainWindow_(mainWindow),
+      segmentationThread_(&mainWindow->editor())
 {
     LOG_DEBUG_LOCAL("");
 
@@ -175,6 +176,7 @@ void SegmentationWindow::showEvent(QShowEvent *event)
 {
     LOG_DEBUG_LOCAL("");
     QDialog::showEvent(event);
+    mainWindow_->suspendThreads();
     resumeThreads();
 }
 
@@ -182,13 +184,14 @@ void SegmentationWindow::closeEvent(QCloseEvent *event)
 {
     LOG_DEBUG_LOCAL("");
     suspendThreads();
+    mainWindow_->resumeThreads();
     QDialog::closeEvent(event);
 }
 
 void SegmentationWindow::threadProgress(bool finished)
 {
     (void)finished;
-    LOG_DEBUG_LOCAL("finished=" << finished);
+    LOG_DEBUG_LOCAL("finished <" << finished << ">");
     // in worker thread: notify gui thread
     emit signalThread();
 }
@@ -212,7 +215,7 @@ void SegmentationWindow::resumeThreads()
 {
     LOG_DEBUG_LOCAL("");
     // in gui thread: start new task in worker thread
-    segmentationThread_.setup(voxelSizeInput_->value(),
+    segmentationThread_.start(voxelSizeInput_->value(),
                               thresholdInput_->value());
     mainWindow_->setProgressBarValue(0);
 }
