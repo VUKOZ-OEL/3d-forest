@@ -24,6 +24,11 @@
 <file>empty_box_24px.png</file>
 <file>empty_box_ortho_24px.png</file>
 
+<file>orthographic_24px.png</file>
+<file>orthographic_wire_24px.png</file>
+<file>perspective_24px.png</file>
+<file>perspective_wire_24px.png</file>
+
 <file>view_top_16px.png</file>
 <file>view_top_24px.png</file>
 <file>view_front_16px.png</file>

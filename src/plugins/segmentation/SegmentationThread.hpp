@@ -25,18 +25,41 @@
 #include <Thread.hpp>
 #include <Vector3.hpp>
 
+class Editor;
+
 /** Segmentation Thread. */
 class SegmentationThread : public Thread
 {
 public:
-    SegmentationThread();
+    SegmentationThread(Editor *editor);
+    virtual ~SegmentationThread();
 
-    void setup();
+    void start(int voxelSize, int threshold);
 
     virtual bool compute();
 
 protected:
+    /** Segmentation Thread State. */
+    enum State
+    {
+        STATE_NEW,
+        STATE_INITIALIZE,
+        STATE_VOXEL_SIZE,
+        STATE_THRESHOLD,
+        STATE_FINISHED,
+    };
+
+    Editor *editor_;
+
+    State state_;
     bool initialized_;
+    int progress_;
+    int voxelSize_;
+    int threshold_;
+
+    bool computeInitialize();
+    bool computeVoxelSize();
+    bool computeThreshold();
 };
 
 #endif /* SEGMENTATION_THREAD_HPP */
