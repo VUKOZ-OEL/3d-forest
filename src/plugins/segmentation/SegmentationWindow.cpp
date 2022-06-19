@@ -200,7 +200,7 @@ void SegmentationWindow::slotThread()
 {
     LOG_DEBUG_LOCAL("");
     // in gui thread: update visualization
-    // mainWindow_->setProgressBarValue(25);
+    // mainWindow_->setProgressBarValue(segmentationThread_.progressPercent());
 }
 
 void SegmentationWindow::suspendThreads()

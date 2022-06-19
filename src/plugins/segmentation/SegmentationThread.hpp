@@ -22,8 +22,10 @@
 #ifndef SEGMENTATION_THREAD_HPP
 #define SEGMENTATION_THREAD_HPP
 
+#include <Query.hpp>
 #include <Thread.hpp>
 #include <Vector3.hpp>
+#include <Voxels.hpp>
 
 class Editor;
 
@@ -35,6 +37,7 @@ public:
     virtual ~SegmentationThread();
 
     void start(int voxelSize, int threshold);
+    int progressPercent() const;
 
     virtual bool compute();
 
@@ -52,11 +55,19 @@ protected:
     Editor *editor_;
 
     State state_;
-    bool initialized_;
-    int progress_;
+    bool stateInitialized_;
+    uint64_t progressMax_;
+    uint64_t progressValue_;
+    int progressPercent_;
+    
     int voxelSize_;
     int threshold_;
 
+    Voxels voxels_;
+    Query voxel_;
+
+    void setState(State state);
+    void updateProgress(uint64_t increment);
     bool computeInitialize();
     bool computeVoxelSize();
     bool computeThreshold();
