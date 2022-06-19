@@ -70,5 +70,6 @@ void HelpPlugin::slotAbout()
            "you distribute the modified version, you must provide access to\n"
            "its source code.\n"
            "For more details about the license, read the file LICENSE inside\n"
-           "the 3D Forest installation folder."));
+           "the 3D Forest installation folder or see\n"
+           "https://www.gnu.org/licenses/gpl-3.0.txt"));
 }
