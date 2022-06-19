@@ -21,7 +21,6 @@
 <qresource prefix="/import">
 
 <!-- Tool bar -->
-<file>add_new_24px.png</file>
 
 </qresource>
 </RCC>
