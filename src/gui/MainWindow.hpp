@@ -97,7 +97,7 @@ public:
 
     Editor &editor() { return editor_; }
 
-    void setProgressBarValue(int percent);
+    void setStatusProgressBarPercent(int percent);
 
 public slots:
     void slotRender();

@@ -59,7 +59,7 @@ protected:
     uint64_t progressMax_;
     uint64_t progressValue_;
     int progressPercent_;
-    
+
     int voxelSize_;
     int threshold_;
 

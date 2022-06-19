@@ -237,7 +237,6 @@ bool SegmentationThread::computeVoxelSize()
     {
         updateProgress(1);
 
-
         return false;
     }
 

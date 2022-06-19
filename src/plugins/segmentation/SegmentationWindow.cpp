@@ -200,7 +200,8 @@ void SegmentationWindow::slotThread()
 {
     LOG_DEBUG_LOCAL("");
     // in gui thread: update visualization
-    // mainWindow_->setProgressBarValue(segmentationThread_.progressPercent());
+    mainWindow_->setStatusProgressBarPercent(
+        segmentationThread_.progressPercent());
 }
 
 void SegmentationWindow::suspendThreads()
@@ -208,7 +209,7 @@ void SegmentationWindow::suspendThreads()
     LOG_DEBUG_LOCAL("");
     // in gui thread: cancel task in worker thread
     segmentationThread_.cancel();
-    mainWindow_->setProgressBarValue(0);
+    mainWindow_->setStatusProgressBarPercent(0);
 }
 
 void SegmentationWindow::resumeThreads()
@@ -217,5 +218,5 @@ void SegmentationWindow::resumeThreads()
     // in gui thread: start new task in worker thread
     segmentationThread_.start(voxelSizeInput_->value(),
                               thresholdInput_->value());
-    mainWindow_->setProgressBarValue(0);
+    mainWindow_->setStatusProgressBarPercent(0);
 }
