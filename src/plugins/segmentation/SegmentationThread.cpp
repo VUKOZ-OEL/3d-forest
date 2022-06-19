@@ -30,10 +30,13 @@
 SegmentationThread::SegmentationThread(Editor *editor)
     : editor_(editor),
       state_(STATE_NEW),
-      initialized_(false),
-      progress_(0),
+      stateInitialized_(false),
+      progressMax_(0),
+      progressValue_(0),
+      progressPercent_(0),
       voxelSize_(0),
-      threshold_(0)
+      threshold_(0),
+      voxel_(editor_)
 {
     LOG_DEBUG_LOCAL("");
 }
@@ -48,38 +51,29 @@ void SegmentationThread::start(int voxelSize, int threshold)
     LOG_DEBUG_LOCAL("voxelSize <" << voxelSize << "> threshold <" << threshold
                                   << ">");
 
+    // Cancel current computation
     cancel();
 
-    // Select state
-    bool restart;
+    // Select state to start from
+    State startState = STATE_FINISHED;
 
     if (state_ == STATE_NEW)
     {
-        state_ = STATE_INITIALIZE;
-        restart = true;
+        startState = STATE_INITIALIZE;
     }
     else if (voxelSize != voxelSize_)
     {
-        state_ = STATE_VOXEL_SIZE;
-        restart = true;
+        startState = STATE_VOXEL_SIZE;
     }
     else if (threshold != threshold_)
     {
-        state_ = STATE_THRESHOLD;
-        restart = true;
-    }
-    else
-    {
-        restart = false;
+        startState = STATE_THRESHOLD;
     }
 
-    // Start state
-    if (restart)
+    // Start selected state
+    if (startState != STATE_FINISHED)
     {
-        LOG_DEBUG_LOCAL("state <" << state_ << ">");
-
-        initialized_ = false;
-        progress_ = 0;
+        setState(startState);
 
         voxelSize_ = voxelSize;
         threshold_ = threshold;
@@ -93,44 +87,43 @@ bool SegmentationThread::compute()
     LOG_DEBUG_LOCAL("state <" << state_ << ">");
 
     // Next step
-    bool finishedState;
     double timeBegin = getRealTime();
 
     if (state_ == STATE_INITIALIZE)
     {
-        finishedState = computeInitialize();
+        bool finishedState = computeInitialize();
         if (finishedState)
         {
-            state_ = STATE_VOXEL_SIZE;
+            setState(STATE_VOXEL_SIZE);
         }
     }
     else if (state_ == STATE_VOXEL_SIZE)
     {
-        finishedState = computeVoxelSize();
+        bool finishedState = computeVoxelSize();
         if (finishedState)
         {
-            state_ = STATE_THRESHOLD;
+            setState(STATE_THRESHOLD);
         }
     }
     else if (state_ == STATE_THRESHOLD)
     {
-        finishedState = computeThreshold();
+        bool finishedState = computeThreshold();
         if (finishedState)
         {
-            state_ = STATE_FINISHED;
+            setState(STATE_FINISHED);
         }
     }
     else
     {
         LOG_DEBUG_LOCAL("nothing to do");
-        state_ = STATE_FINISHED;
+        setState(STATE_FINISHED);
     }
 
     double timeEnd = getRealTime();
     double msec = (timeEnd - timeBegin) * 1000.;
     LOG_DEBUG_LOCAL("time <" << msec << "> [ms]");
 
-    // Callback
+    // Check if the whole task is finished and call callback
     bool finishedTask;
 
     if (state_ == STATE_FINISHED)
@@ -151,6 +144,38 @@ bool SegmentationThread::compute()
     return finishedTask;
 }
 
+void SegmentationThread::setState(State state)
+{
+    LOG_DEBUG_LOCAL("state <" << state << ">");
+    state_ = state;
+    stateInitialized_ = false;
+    progressMax_ = 0;
+    progressValue_ = 0;
+    progressPercent_ = 0;
+}
+
+void SegmentationThread::updateProgress(uint64_t increment)
+{
+    progressValue_ += increment;
+
+    if (progressMax_ > 0)
+    {
+        const double h = static_cast<double>(progressMax_);
+        const double v = static_cast<double>(progressValue_);
+        const double r = v / h;
+        progressPercent_ = static_cast<int>(r * 100.);
+    }
+    else
+    {
+        progressPercent_ = 100;
+    }
+}
+
+int SegmentationThread::progressPercent() const
+{
+    return progressPercent_;
+}
+
 bool SegmentationThread::computeInitialize()
 {
     LOG_DEBUG_LOCAL("");
@@ -161,6 +186,13 @@ bool SegmentationThread::computeInitialize()
     layers.clear();
     layers.setDefault();
     editor_->setLayers(layers);
+
+    const Datasets &datasets = editor_->datasets();
+    LOG_DEBUG_LOCAL("number of points <" << datasets.nPoints() << ">");
+    if (datasets.nPoints() < 1)
+    {
+        return true;
+    }
 
     // Set all points to layer 0
     Query query(editor_);
@@ -181,6 +213,38 @@ bool SegmentationThread::computeInitialize()
 bool SegmentationThread::computeVoxelSize()
 {
     LOG_DEBUG_LOCAL("");
+
+    // Initialization
+    if (!stateInitialized_)
+    {
+        voxels_.clear();
+
+        const Datasets &datasets = editor_->datasets();
+        LOG_DEBUG_LOCAL("number of points <" << datasets.nPoints() << ">");
+        if (datasets.nPoints() < 1)
+        {
+            return true;
+        }
+
+        voxel_.setGrid(1000);
+        progressMax_ = voxel_.gridSize();
+        progressValue_ = 0;
+        stateInitialized_ = true;
+    }
+
+    // Next step
+    if (voxel_.nextGrid())
+    {
+        updateProgress(1);
+
+        return false;
+    }
+
+    // Finished
+    progressPercent_ = 100;
+
+    editor_->setVoxels(voxels_);
+
     return true;
 }
 

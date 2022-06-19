@@ -63,7 +63,7 @@ MainWindow::MainWindow(QWidget *parent)
     statusProgressBar_->setTextVisible(false);
     statusProgressBar_->setFixedWidth(100);
     statusProgressBar_->setFixedHeight(MainWindow::ICON_SIZE_TEXT);
-    setProgressBarValue(0);
+    setStatusProgressBarPercent(0);
 
     QHBoxLayout *statusLayout = new QHBoxLayout;
     statusLayout->addStretch();
@@ -265,7 +265,7 @@ void MainWindow::hideToolBar(const QString &menu)
     }
 }
 
-void MainWindow::setProgressBarValue(int percent)
+void MainWindow::setStatusProgressBarPercent(int percent)
 {
     statusProgressBar_->setValue(percent);
 

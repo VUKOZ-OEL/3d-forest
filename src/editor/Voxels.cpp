@@ -29,3 +29,31 @@ void Voxels::clear()
 {
     value_.clear();
 }
+
+void Voxels::create(double x, double y, double z, double voxelSize)
+{
+    dx_ = x;
+    dy_ = y;
+    dz_ = z;
+    voxelSize_ = voxelSize;
+
+    nx_ = static_cast<size_t>(round(dx_ / voxelSize_));
+    ny_ = static_cast<size_t>(round(dy_ / voxelSize_));
+    nz_ = static_cast<size_t>(round(dz_ / voxelSize_));
+    if (nx_ < 1)
+    {
+        nx_ = 1;
+    }
+    if (ny_ < 1)
+    {
+        ny_ = 1;
+    }
+    if (nz_ < 1)
+    {
+        nz_ = 1;
+    }
+    vx_ = dx_ / static_cast<double>(nx_);
+    vy_ = dy_ / static_cast<double>(ny_);
+    vz_ = dz_ / static_cast<double>(nz_);
+    n_ = nx_ * ny_ * nz_;
+}

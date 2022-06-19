@@ -32,11 +32,35 @@ public:
     Voxels();
 
     void clear();
+    void create(double x, double y, double z, double voxelSize);
 
 protected:
+    /** Voxels Cell. */
+    struct Cell
+    {
+        size_t x;
+        size_t y;
+        size_t z;
+        size_t d;
+    };
+
+    double dx_;
+    double dy_;
+    double dz_;
+    double vx_;
+    double vy_;
+    double vz_;
+    double voxelSize_;
+    size_t nx_;
+    size_t ny_;
+    size_t nz_;
+    size_t n_;
+
     std::vector<float> value_;
     std::vector<float> position_;
     Vector3<size_t> dim_;
+
+    std::vector<Cell> stack_;
 };
 
 #endif /* VOXELS_HPP */
