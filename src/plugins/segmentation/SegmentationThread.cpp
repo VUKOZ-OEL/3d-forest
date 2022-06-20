@@ -37,8 +37,7 @@ SegmentationThread::SegmentationThread(Editor *editor)
       progressValue_(0),
       progressPercent_(0),
       voxelSize_(0),
-      threshold_(0),
-      voxel_(editor_)
+      threshold_(0)
 {
     LOG_DEBUG_LOCAL("");
 }
@@ -225,19 +224,19 @@ bool SegmentationThread::computeVoxelSize()
             return true;
         }
 
-        voxel_.setGrid(1000);
-        progressMax_ = voxel_.gridSize();
+        voxels_.create(editor_->clipBoundary(), voxelSize_);
+
+        progressMax_ = voxels_.size();
         progressValue_ = 0;
         stateInitialized_ = true;
     }
 
     // Next step
-    if (voxel_.nextGrid())
-    {
-        updateProgress(1);
-
-        return false;
-    }
+    // if (voxel_.nextGrid())
+    //{
+    //    updateProgress(1);
+    //    return false;
+    //}
 
     // Finished
     progressPercent_ = 100;

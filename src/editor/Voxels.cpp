@@ -19,41 +19,52 @@
 
 /** @file Voxels.cpp */
 
+#include <Log.hpp>
 #include <Voxels.hpp>
 
-Voxels::Voxels()
+#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("Voxels", msg)
+
+Voxels::Voxels() : voxelSizeInput_(0), numberOfVoxels_(0)
 {
 }
 
 void Voxels::clear()
 {
+    spaceRegion_.clear();
+    voxelSizeInput_ = 0;
+    numberOfVoxels_ = 0;
+    resolution_.clear();
+    voxelSize_.clear();
+
     value_.clear();
+    position_.clear();
+
+    stack_.clear();
 }
 
-void Voxels::create(double x, double y, double z, double voxelSize)
+void Voxels::create(const Box<double> &spaceRegion, double voxelSize)
 {
-    dx_ = x;
-    dy_ = y;
-    dz_ = z;
-    voxelSize_ = voxelSize;
+    spaceRegion_ = spaceRegion;
+    voxelSizeInput_ = voxelSize;
 
-    nx_ = static_cast<size_t>(round(dx_ / voxelSize_));
-    ny_ = static_cast<size_t>(round(dy_ / voxelSize_));
-    nz_ = static_cast<size_t>(round(dz_ / voxelSize_));
-    if (nx_ < 1)
+    // Compute grid resolution and actual voxel size
+    for (size_t i = 0; i < 3; i++)
     {
-        nx_ = 1;
+        resolution_[i] = static_cast<size_t>(
+            round(spaceRegion_.length(i) / voxelSizeInput_));
+
+        if (resolution_[i] < 1)
+        {
+            resolution_[i] = 1;
+        }
+
+        voxelSize_[i] =
+            spaceRegion_.length(i) / static_cast<double>(resolution_[i]);
     }
-    if (ny_ < 1)
-    {
-        ny_ = 1;
-    }
-    if (nz_ < 1)
-    {
-        nz_ = 1;
-    }
-    vx_ = dx_ / static_cast<double>(nx_);
-    vy_ = dy_ / static_cast<double>(ny_);
-    vz_ = dz_ / static_cast<double>(nz_);
-    n_ = nx_ * ny_ * nz_;
+
+    numberOfVoxels_ = resolution_[0] * resolution_[1] * resolution_[2];
+
+    LOG_DEBUG_LOCAL("numberOfVoxels <" << numberOfVoxels_ << ">");
+    LOG_DEBUG_LOCAL("resolution <" << resolution_ << ">");
+    LOG_DEBUG_LOCAL("voxelSize <" << voxelSize_ << ">");
 }

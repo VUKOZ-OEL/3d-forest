@@ -63,7 +63,6 @@ protected:
     int threshold_;
 
     Voxels voxels_;
-    Query voxel_;
 
     void setState(State state);
     void updateProgress(uint64_t increment);
