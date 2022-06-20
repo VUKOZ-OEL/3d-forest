@@ -45,8 +45,6 @@ protected:
     /** Segmentation Thread State. */
     enum State
     {
-        STATE_NEW,
-        STATE_INITIALIZE,
         STATE_VOXEL_SIZE,
         STATE_THRESHOLD,
         STATE_FINISHED,
@@ -56,6 +54,7 @@ protected:
 
     State state_;
     bool stateInitialized_;
+    bool layersCreated_;
     uint64_t progressMax_;
     uint64_t progressValue_;
     int progressPercent_;
@@ -68,7 +67,7 @@ protected:
 
     void setState(State state);
     void updateProgress(uint64_t increment);
-    bool computeInitialize();
+    void computeInitializeLayers();
     bool computeVoxelSize();
     bool computeThreshold();
 };
