@@ -33,8 +33,8 @@
 #include <QVBoxLayout>
 
 #define ICON(name) (ThemeIcon(":/segmentation/", name))
-//#define LOG_DEBUG_LOCAL(msg)
-#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("SegmentationWindow", msg)
+#define LOG_DEBUG_LOCAL(msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("SegmentationWindow", msg)
 
 SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
     : QDialog(mainWindow),
@@ -76,8 +76,8 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
                          tr("pt"),
                          1,
                          1,
-                         100,
-                         10);
+                         10000,
+                         5000);
 
     settingsLayout->addWidget(voxelSizeInput_);
 
