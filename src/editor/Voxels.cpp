@@ -64,7 +64,67 @@ void Voxels::create(const Box<double> &spaceRegion, double voxelSize)
 
     numberOfVoxels_ = resolution_[0] * resolution_[1] * resolution_[2];
 
+    stack_.push_back(Box<size_t>(static_cast<size_t>(0),
+                                 static_cast<size_t>(0),
+                                 static_cast<size_t>(0),
+                                 resolution_[0],
+                                 resolution_[1],
+                                 resolution_[2]));
+
     LOG_DEBUG_LOCAL("numberOfVoxels <" << numberOfVoxels_ << ">");
     LOG_DEBUG_LOCAL("resolution <" << resolution_ << ">");
     LOG_DEBUG_LOCAL("voxelSize <" << voxelSize_ << ">");
+}
+
+bool Voxels::next(Box<double> &cell)
+{
+    while (!stack_.empty())
+    {
+        const Box<size_t> &c = stack_.back();
+        size_t x1 = c.min(0);
+        size_t y1 = c.min(1);
+        size_t z1 = c.min(2);
+        size_t x2 = c.max(0);
+        size_t y2 = c.max(1);
+        size_t z2 = c.max(2);
+        size_t dx = x2 - x1;
+        size_t dy = y2 - y1;
+        size_t dz = z2 - z1;
+        stack_.pop_back();
+
+        if (dx < 1 || dy < 1 || dz < 1)
+        {
+            continue;
+        }
+
+        if (dx == 1 && dy == 1 && dz == 1)
+        {
+            cell.set(
+                spaceRegion_.min(0) + voxelSize_[0] * static_cast<double>(x1),
+                spaceRegion_.min(1) + voxelSize_[1] * static_cast<double>(y1),
+                spaceRegion_.min(2) + voxelSize_[2] * static_cast<double>(z1),
+                spaceRegion_.min(0) + voxelSize_[0] * static_cast<double>(x2),
+                spaceRegion_.min(1) + voxelSize_[1] * static_cast<double>(y2),
+                spaceRegion_.min(2) + voxelSize_[2] * static_cast<double>(z2));
+
+            return true;
+        }
+
+        size_t px = dx / 2;
+        size_t py = dy / 2;
+        size_t pz = dz / 2;
+
+        // Push in reverse order to iteration
+        stack_.push_back(Box<size_t>(x1 + px, y1 + py, z1 + pz, x2, y2, z2));
+        stack_.push_back(Box<size_t>(x1, y1 + py, z1 + pz, x1 + px, y2, z2));
+        stack_.push_back(Box<size_t>(x1 + px, y1, z1 + pz, x2, y1 + py, z2));
+        stack_.push_back(Box<size_t>(x1, y1, z1 + pz, x1 + px, y1 + py, z2));
+
+        stack_.push_back(Box<size_t>(x1 + px, y1 + py, z1, x2, y2, z1 + pz));
+        stack_.push_back(Box<size_t>(x1, y1 + py, z1, x1 + px, y2, z1 + pz));
+        stack_.push_back(Box<size_t>(x1 + px, y1, z1, x2, y1 + py, z1 + pz));
+        stack_.push_back(Box<size_t>(x1, y1, z1, x1 + px, y1 + py, z1 + pz));
+    }
+
+    return false;
 }

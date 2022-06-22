@@ -232,11 +232,13 @@ bool SegmentationThread::computeVoxelSize()
     }
 
     // Next step
-    // if (voxel_.nextGrid())
-    //{
-    //    updateProgress(1);
-    //    return false;
-    //}
+    Box<double> cell;
+    bool hasNextCell = voxels_.next(cell);
+    if (hasNextCell)
+    {
+        updateProgress(1);
+        return false;
+    }
 
     // Finished
     progressPercent_ = 100;
