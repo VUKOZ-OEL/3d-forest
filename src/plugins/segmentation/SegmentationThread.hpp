@@ -65,7 +65,7 @@ protected:
     Voxels voxels_;
 
     void setState(State state);
-    void updateProgress(uint64_t increment);
+    void updateProgressPercent();
     void computeInitializeLayers();
     bool computeVoxelSize();
     bool computeThreshold();

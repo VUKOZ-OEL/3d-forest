@@ -154,10 +154,8 @@ void SegmentationThread::setState(State state)
     progressPercent_ = 0;
 }
 
-void SegmentationThread::updateProgress(uint64_t increment)
+void SegmentationThread::updateProgressPercent()
 {
-    progressValue_ += increment;
-
     if (progressMax_ > 0)
     {
         const double h = static_cast<double>(progressMax_);
@@ -236,12 +234,24 @@ bool SegmentationThread::computeVoxelSize()
     size_t x;
     size_t y;
     size_t z;
+    size_t counter = 0;
 
-    bool hasNextCell = voxels_.next(cell, x, y, z);
-    if (hasNextCell)
+    double timeBegin = getRealTime();
+
+    if (voxels_.next(cell, x, y, z))
     {
-        updateProgress(1);
-        return false;
+        progressValue_++;
+        counter++;
+        if (counter > 10)
+        {
+            counter = 0;
+            double timeNow = getRealTime();
+            if (timeNow - timeBegin > 5.)
+            {
+                updateProgressPercent();
+                return false;
+            }
+        }
     }
 
     // Finished
