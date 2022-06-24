@@ -68,14 +68,14 @@ void Voxels::create(const Box<double> &spaceRegion, double voxelSize)
     {
         ny_ = 1;
     }
-    voxelSize_[0] = spaceRegion_.length(1) / static_cast<double>(ny_);
+    voxelSize_[1] = spaceRegion_.length(1) / static_cast<double>(ny_);
 
     nz_ = static_cast<size_t>(round(spaceRegion_.length(2) / voxelSizeInput_));
     if (nz_ < 1)
     {
         nz_ = 1;
     }
-    voxelSize_[0] = spaceRegion_.length(2) / static_cast<double>(nz_);
+    voxelSize_[2] = spaceRegion_.length(2) / static_cast<double>(nz_);
 
     // Create number of voxels.
     resize(nx_ * ny_ * nz_);
