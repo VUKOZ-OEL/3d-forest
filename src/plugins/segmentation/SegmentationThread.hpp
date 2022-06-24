@@ -51,6 +51,7 @@ protected:
     };
 
     Editor *editor_;
+    Query query_;
 
     State state_;
     bool stateInitialized_;

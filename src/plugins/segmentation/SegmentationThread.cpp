@@ -30,6 +30,7 @@
 
 SegmentationThread::SegmentationThread(Editor *editor)
     : editor_(editor),
+      query_(editor_),
       state_(STATE_FINISHED),
       stateInitialized_(false),
       layersCreated_(true),
@@ -193,17 +194,16 @@ void SegmentationThread::computeInitializeLayers()
     }
 
     // Set all points to layer 0
-    Query query(editor_);
-    query.selectBox(editor_->clipBoundary());
-    query.exec();
+    query_.selectBox(editor_->clipBoundary());
+    query_.exec();
 
-    while (query.next())
+    while (query_.next())
     {
-        query.layer() = 0;
-        query.setModified();
+        query_.layer() = 0;
+        query_.setModified();
     }
 
-    query.flush();
+    query_.flush();
 }
 
 bool SegmentationThread::computeVoxelSize()
