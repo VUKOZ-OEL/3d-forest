@@ -233,7 +233,11 @@ bool SegmentationThread::computeVoxelSize()
 
     // Next step
     Box<double> cell;
-    bool hasNextCell = voxels_.next(cell);
+    size_t x;
+    size_t y;
+    size_t z;
+
+    bool hasNextCell = voxels_.next(cell, x, y, z);
     if (hasNextCell)
     {
         updateProgress(1);
