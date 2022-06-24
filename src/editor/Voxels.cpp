@@ -24,8 +24,9 @@
 
 #define LOG_DEBUG_LOCAL(msg) LOG_MODULE("Voxels", msg)
 
-Voxels::Voxels() : voxelSizeInput_(0), numberOfVoxels_(0)
+Voxels::Voxels()
 {
+    clear();
 }
 
 void Voxels::clear()
@@ -33,11 +34,12 @@ void Voxels::clear()
     spaceRegion_.clear();
     voxelSizeInput_ = 0;
     numberOfVoxels_ = 0;
-    resolution_.clear();
+    nx_ = 0;
+    ny_ = 0;
+    nz_ = 0;
     voxelSize_.clear();
 
-    value_.clear();
-    position_.clear();
+    data_.clear();
 
     stack_.clear();
 }
@@ -45,9 +47,7 @@ void Voxels::clear()
 void Voxels::resize(size_t n)
 {
     numberOfVoxels_ = n;
-
-    value_.resize(n);
-    position_.resize(n);
+    data_.resize(n);
 }
 
 void Voxels::create(const Box<double> &spaceRegion, double voxelSize)
@@ -56,28 +56,35 @@ void Voxels::create(const Box<double> &spaceRegion, double voxelSize)
     voxelSizeInput_ = voxelSize;
 
     // Compute grid resolution and actual voxel size.
-    for (size_t i = 0; i < 3; i++)
+    nx_ = static_cast<size_t>(round(spaceRegion_.length(0) / voxelSizeInput_));
+    if (nx_ < 1)
     {
-        resolution_[i] = static_cast<size_t>(
-            round(spaceRegion_.length(i) / voxelSizeInput_));
-
-        if (resolution_[i] < 1)
-        {
-            resolution_[i] = 1;
-        }
-
-        voxelSize_[i] =
-            spaceRegion_.length(i) / static_cast<double>(resolution_[i]);
+        nx_ = 1;
     }
+    voxelSize_[0] = spaceRegion_.length(0) / static_cast<double>(nx_);
+
+    ny_ = static_cast<size_t>(round(spaceRegion_.length(1) / voxelSizeInput_));
+    if (ny_ < 1)
+    {
+        ny_ = 1;
+    }
+    voxelSize_[0] = spaceRegion_.length(1) / static_cast<double>(ny_);
+
+    nz_ = static_cast<size_t>(round(spaceRegion_.length(2) / voxelSizeInput_));
+    if (nz_ < 1)
+    {
+        nz_ = 1;
+    }
+    voxelSize_[0] = spaceRegion_.length(2) / static_cast<double>(nz_);
 
     // Create number of voxels.
-    resize(resolution_[0] * resolution_[1] * resolution_[2]);
+    resize(nx_ * ny_ * nz_);
 
     // Initialize voxel iterator.
-    push(0, 0, 0, resolution_[0], resolution_[1], resolution_[2]);
+    push(0, 0, 0, nx_, ny_, nz_);
 
     LOG_DEBUG_LOCAL("numberOfVoxels <" << numberOfVoxels_ << ">");
-    LOG_DEBUG_LOCAL("resolution <" << resolution_ << ">");
+    LOG_DEBUG_LOCAL("resolution <" << nx_ << "," << ny_ << "," << nz_ << ">");
     LOG_DEBUG_LOCAL("voxelSize <" << voxelSize_ << ">");
 }
 
