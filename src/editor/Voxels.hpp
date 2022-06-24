@@ -34,6 +34,7 @@ public:
     void clear();
     void create(const Box<double> &spaceRegion, double voxelSize);
     size_t size() const { return numberOfVoxels_; }
+    bool next(Box<double> &cell, size_t &x, size_t &y, size_t &z);
 
 protected:
     Box<double> spaceRegion_;
@@ -46,16 +47,10 @@ protected:
     std::vector<float> value_;
     std::vector<float> position_;
 
-    /** Voxels Stack Cell. */
-    struct StackCell
-    {
-        size_t x;
-        size_t y;
-        size_t z;
-        size_t d;
-    };
+    std::vector<Box<size_t>> stack_;
 
-    std::vector<StackCell> stack_;
+    void push(size_t x1, size_t y1, size_t z1, size_t x2, size_t y2, size_t z2);
+    void resize(size_t n);
 };
 
 #endif /* VOXELS_HPP */
