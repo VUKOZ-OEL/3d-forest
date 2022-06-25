@@ -36,7 +36,7 @@ inline double fastatan(double arg)
     return ((MATH_ATAN_A * arg2 + MATH_ATAN_B) * arg2 + MATH_ATAN_C) * arg;
 }
 
-template <class T> inline void clamp(T &value, T &min, T &max)
+template <class T> inline void clamp(T &value, const T &min, const T &max)
 {
     if (value < min)
     {
