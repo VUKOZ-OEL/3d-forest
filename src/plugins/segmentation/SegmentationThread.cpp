@@ -21,6 +21,7 @@
 
 #include <Editor.hpp>
 #include <Log.hpp>
+#include <SegmentationPca.hpp>
 #include <SegmentationThread.hpp>
 #include <ThreadCallbackInterface.hpp>
 #include <Time.hpp>
@@ -239,6 +240,7 @@ bool SegmentationThread::computeVoxelSize()
     while (voxels_.next(&cell, &index))
     {
         // Compute one voxel
+        segmentationPca();
         computeVoxelValue(cell, index);
 
         // Update progress
@@ -290,6 +292,10 @@ void SegmentationThread::computeVoxelValue(const Box<double> &cell,
         sumX = sumX / d;
         sumY = sumY / d;
         sumZ = sumZ / d;
+    }
+
+    if (nPoints > 2)
+    {
     }
 
     Voxels::Voxel &voxel = voxels_.at(index);
