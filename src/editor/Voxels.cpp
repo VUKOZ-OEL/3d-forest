@@ -20,9 +20,13 @@
 /** @file Voxels.cpp */
 
 #include <Log.hpp>
+#include <Math.hpp>
 #include <Voxels.hpp>
 
 #define LOG_DEBUG_LOCAL(msg) LOG_MODULE("Voxels", msg)
+
+// Use some maximum until the voxels can be streamed from a file.
+#define VOXELS_RESOLUTION_MAX 500
 
 Voxels::Voxels()
 {
@@ -56,25 +60,19 @@ void Voxels::create(const Box<double> &spaceRegion, double voxelSize)
     voxelSizeInput_ = voxelSize;
 
     // Compute grid resolution and actual voxel size.
+    size_t min = 1;
+    size_t max = VOXELS_RESOLUTION_MAX;
+
     nx_ = static_cast<size_t>(round(spaceRegion_.length(0) / voxelSizeInput_));
-    if (nx_ < 1)
-    {
-        nx_ = 1;
-    }
+    clamp(nx_, min, max);
     voxelSize_[0] = spaceRegion_.length(0) / static_cast<double>(nx_);
 
     ny_ = static_cast<size_t>(round(spaceRegion_.length(1) / voxelSizeInput_));
-    if (ny_ < 1)
-    {
-        ny_ = 1;
-    }
+    clamp(ny_, min, max);
     voxelSize_[1] = spaceRegion_.length(1) / static_cast<double>(ny_);
 
     nz_ = static_cast<size_t>(round(spaceRegion_.length(2) / voxelSizeInput_));
-    if (nz_ < 1)
-    {
-        nz_ = 1;
-    }
+    clamp(nz_, min, max);
     voxelSize_[2] = spaceRegion_.length(2) / static_cast<double>(nz_);
 
     // Create number of voxels.
