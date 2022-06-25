@@ -233,21 +233,22 @@ bool SegmentationThread::computeVoxelSize()
 
     // Next step
     Box<double> cell;
-    size_t x;
-    size_t y;
-    size_t z;
     size_t index;
     size_t counter = 0;
 
-    if (voxels_.next(&cell, &index, &x, &y, &z))
+    if (voxels_.next(&cell, &index))
     {
+        // Compute one voxel
+        computeVoxelValue(cell, index);
+
+        // Update progress
         progressValue_++;
         counter++;
         if (counter > 10)
         {
             counter = 0;
             double timeNow = getRealTime();
-            if (timeNow - timeBegin > 5.)
+            if (timeNow - timeBegin > 100.)
             {
                 updateProgressPercent();
                 return false;
@@ -261,6 +262,41 @@ bool SegmentationThread::computeVoxelSize()
     editor_->setVoxels(voxels_);
 
     return true;
+}
+
+void SegmentationThread::computeVoxelValue(const Box<double> &cell,
+                                           size_t index)
+{
+    size_t nPoints = 0;
+    double sumX = 0;
+    double sumY = 0;
+    double sumZ = 0;
+    double intensity = 0;
+
+    query_.selectBox(cell);
+    query_.exec();
+
+    while (query_.next())
+    {
+        sumX = query_.x();
+        sumY = query_.y();
+        sumZ = query_.z();
+        nPoints++;
+    }
+
+    if (nPoints > 0)
+    {
+        const double d = static_cast<double>(nPoints);
+        sumX = sumX / d;
+        sumY = sumY / d;
+        sumZ = sumZ / d;
+    }
+
+    Voxels::Voxel &voxel = voxels_.at(index);
+    voxel.x = static_cast<float>(sumX);
+    voxel.y = static_cast<float>(sumY);
+    voxel.z = static_cast<float>(sumZ);
+    voxel.i = static_cast<float>(intensity);
 }
 
 bool SegmentationThread::computeThreshold()
