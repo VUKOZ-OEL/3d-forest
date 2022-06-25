@@ -51,6 +51,7 @@ public:
     const T &max(size_t idx) const { return max_[idx]; }
 
     T length(size_t idx) const { return max_[idx] - min_[idx]; }
+    T maximumLength() const;
 
     void getCenter(T &x, T &y, T &z) const;
     Vector3<T> getCenter() const;
@@ -277,6 +278,23 @@ template <class T> inline void Box<T>::validate()
     {
         empty_ = true;
     }
+}
+
+template <class T> inline T Box<T>::maximumLength() const
+{
+    T max = length(0);
+
+    if (length(1) > max)
+    {
+        max = length(1);
+    }
+
+    if (length(2) > max)
+    {
+        max = length(2);
+    }
+
+    return max;
 }
 
 template <class T> inline void Box<T>::getCenter(T &x, T &y, T &z) const
