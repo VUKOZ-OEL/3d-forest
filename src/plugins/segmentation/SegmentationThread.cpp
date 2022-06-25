@@ -210,6 +210,8 @@ bool SegmentationThread::computeVoxelSize()
 {
     LOG_DEBUG_LOCAL("");
 
+    double timeBegin = getRealTime();
+
     // Initialization
     if (!stateInitialized_)
     {
@@ -236,8 +238,6 @@ bool SegmentationThread::computeVoxelSize()
     size_t z;
     size_t index;
     size_t counter = 0;
-
-    double timeBegin = getRealTime();
 
     if (voxels_.next(&cell, &index, &x, &y, &z))
     {
