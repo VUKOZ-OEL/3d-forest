@@ -39,6 +39,24 @@ int SliderWidget::value()
     return slider_->value();
 }
 
+void SliderWidget::setValue(int value)
+{
+    spinBox_->setValue(value);
+    slider_->setValue(value);
+}
+
+void SliderWidget::setMaximum(int max)
+{
+    spinBox_->setMaximum(max);
+    slider_->setMaximum(max);
+}
+
+void SliderWidget::blockSignals(bool block)
+{
+    spinBox_->blockSignals(block);
+    slider_->blockSignals(block);
+}
+
 void SliderWidget::slotFinalValue()
 {
     emit signalFinalValue();
