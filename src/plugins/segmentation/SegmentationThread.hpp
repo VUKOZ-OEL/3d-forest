@@ -23,6 +23,7 @@
 #define SEGMENTATION_THREAD_HPP
 
 #include <Query.hpp>
+#include <SegmentationPca.hpp>
 #include <Thread.hpp>
 #include <Vector3.hpp>
 #include <Voxels.hpp>
@@ -35,6 +36,8 @@ class SegmentationThread : public Thread
 public:
     SegmentationThread(Editor *editor);
     virtual ~SegmentationThread();
+
+    void clear();
 
     void start(int voxelSize, int threshold);
     int progressPercent() const;
@@ -66,6 +69,7 @@ protected:
     int threshold_;
 
     Voxels voxels_;
+    SegmentationPca pca_;
 
     void setState(State state);
     void updateProgressPercent();

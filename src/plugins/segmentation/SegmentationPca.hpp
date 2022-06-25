@@ -22,12 +22,45 @@
 #ifndef SEGMENTATION_PCA_HPP
 #define SEGMENTATION_PCA_HPP
 
+// Ignore compiler warnings from Eigen 3rd party library.
+#if ((__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2)) ||               \
+     defined(__clang__))
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wsign-conversion"
+    #pragma GCC diagnostic ignored "-Wconversion"
+    #pragma GCC diagnostic ignored "-Wfloat-equal"
+    #pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
+
+#include <Eigen/Core>
+#include <Eigen/Eigenvalues>
+
 #include <Query.hpp>
 #include <Voxels.hpp>
 
-extern void segmentationPca(Query &query,
-                            Voxels &voxels,
-                            const Box<double> &cell,
-                            size_t index);
+/** Segmentation PCA. */
+class SegmentationPca
+{
+public:
+    SegmentationPca();
+
+    void clear();
+
+    void compute(Query &query,
+                 Voxels &voxels,
+                 const Box<double> &cell,
+                 size_t index);
+
+protected:
+    Eigen::MatrixXd V;
+    Eigen::Matrix3d product;
+    Eigen::Matrix3d eigenVectors;
+    Eigen::Matrix3d eigenVectorsT;
+    Eigen::Vector3d in;
+    Eigen::Vector3d out;
+    Eigen::Vector3d min;
+    Eigen::Vector3d max;
+    Eigen::SelfAdjointEigenSolver<Eigen::Matrix3d> E;
+};
 
 #endif /* SEGMENTATION_PCA_HPP */

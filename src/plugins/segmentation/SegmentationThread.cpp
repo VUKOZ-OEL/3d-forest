@@ -49,6 +49,13 @@ SegmentationThread::~SegmentationThread()
     LOG_DEBUG_LOCAL("");
 }
 
+void SegmentationThread::clear()
+{
+    query_.clear();
+    voxels_.clear();
+    pca_.clear();
+}
+
 void SegmentationThread::start(int voxelSize, int threshold)
 {
     LOG_DEBUG_LOCAL("voxelSize <" << voxelSize << "> threshold <" << threshold
@@ -240,7 +247,7 @@ bool SegmentationThread::computeVoxelSize()
     while (voxels_.next(&cell, &index))
     {
         // Compute one voxel
-        segmentationPca(query_, voxels_, cell, index);
+        pca_.compute(query_, voxels_, cell, index);
 
         // Update progress
         progressValue_++;

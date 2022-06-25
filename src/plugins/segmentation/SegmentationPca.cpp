@@ -19,26 +19,22 @@
 
 /** @file SegmentationPca.cpp */
 
-// Ignore compiler warnings from Eigen 3rd party library.
-#if ((__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2)) ||               \
-     defined(__clang__))
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wsign-conversion"
-    #pragma GCC diagnostic ignored "-Wconversion"
-    #pragma GCC diagnostic ignored "-Wfloat-equal"
-    #pragma GCC diagnostic ignored "-Wold-style-cast"
-#endif
-
-#include <Eigen/Core>
-#include <Eigen/Eigenvalues>
-
 #include <Log.hpp>
 #include <SegmentationPca.hpp>
 
-void segmentationPca(Query &query,
-                     Voxels &voxels,
-                     const Box<double> &cell,
-                     size_t index)
+SegmentationPca::SegmentationPca()
+{
+    clear();
+}
+
+void SegmentationPca::clear()
+{
+}
+
+void SegmentationPca::compute(Query &query,
+                              Voxels &voxels,
+                              const Box<double> &cell,
+                              size_t index)
 {
     // Compute voxel centroid.
     size_t nPoints = 0;
@@ -78,7 +74,6 @@ void segmentationPca(Query &query,
     }
 
     // Get vertices.
-    Eigen::MatrixXd V;
     V.resize(nPoints, 3);
 
     query.reset();
@@ -93,27 +88,19 @@ void segmentationPca(Query &query,
     }
 
     // Shift by centroid.
-    Eigen::Vector4d mean;
-    mean[0] = meanX;
-    mean[1] = meanY;
-    mean[2] = meanZ;
-    mean[3] = 1;
-
     for (size_t i = 0; i < nPoints; i++)
     {
-        V(i, 0) -= mean[0];
-        V(i, 1) -= mean[1];
-        V(i, 2) -= mean[2];
+        V(i, 0) -= meanX;
+        V(i, 1) -= meanY;
+        V(i, 2) -= meanZ;
     }
 
     // Compute product.
-    Eigen::Matrix3d product;
-    double inv = 1. / static_cast<double>(nPoints);
+    const double inv = 1. / static_cast<double>(nPoints);
     product = inv * V.topRows<3>() * V.topRows<3>().transpose();
 
     // Compute Eigen vectors.
-    Eigen::SelfAdjointEigenSolver<Eigen::Matrix3d> E(product);
-    Eigen::Matrix3d eigenVectors;
+    E.compute(product);
     for (size_t i = 0; i < 3; i++)
     {
         eigenVectors.col(i) = E.eigenvectors().col(2 - i);
@@ -121,12 +108,14 @@ void segmentationPca(Query &query,
     eigenVectors.col(2) = eigenVectors.col(0).cross(eigenVectors.col(1));
 
     // Project.
-    Eigen::Vector3d in;
-    Eigen::Vector3d out;
-    double bigNumber = std::numeric_limits<double>::max();
-    Eigen::Vector3d min(bigNumber, bigNumber, bigNumber);
-    Eigen::Vector3d max(-bigNumber, -bigNumber, -bigNumber);
-    Eigen::Matrix3d eigenVectorsT = eigenVectors.transpose();
+    constexpr double bigNumber = std::numeric_limits<double>::max();
+    min[0] = bigNumber;
+    min[1] = bigNumber;
+    min[2] = bigNumber;
+    max[0] = -bigNumber;
+    max[1] = -bigNumber;
+    max[2] = -bigNumber;
+    eigenVectorsT = eigenVectors.transpose();
     for (size_t i = 0; i < nPoints; i++)
     {
         in[0] = V(i, 0);
