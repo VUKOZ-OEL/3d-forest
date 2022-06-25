@@ -22,6 +22,8 @@
 #ifndef SLIDER_WIDGET_HPP
 #define SLIDER_WIDGET_HPP
 
+#include <ExportGui.hpp>
+
 #include <QWidget>
 
 class QSpinBox;
@@ -29,7 +31,7 @@ class QSlider;
 class QVBoxLayout;
 
 /** Slider Widget. */
-class SliderWidget : public QWidget
+class EXPORT_GUI SliderWidget : public QWidget
 {
     Q_OBJECT
 

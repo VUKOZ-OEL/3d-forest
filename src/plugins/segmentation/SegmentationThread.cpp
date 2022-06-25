@@ -26,8 +26,8 @@
 #include <ThreadCallbackInterface.hpp>
 #include <Time.hpp>
 
-#define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE("SegmentationThread", msg)
+//#define LOG_DEBUG_LOCAL(msg)
+#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("SegmentationThread", msg)
 
 SegmentationThread::SegmentationThread(Editor *editor)
     : editor_(editor),
