@@ -43,6 +43,7 @@ public:
     void start();
     void cancel();
     void stop();
+    void wait();
 
     virtual bool compute() = 0;
 
@@ -63,6 +64,7 @@ protected:
     std::condition_variable condition_;
     State state_;
     bool finished_;
+    bool waiting_;
 
     // Synchronization to caller
     std::mutex mutexCaller_;
