@@ -236,7 +236,7 @@ bool SegmentationThread::computeVoxelSize()
     size_t index;
     size_t counter = 0;
 
-    if (voxels_.next(&cell, &index))
+    while (voxels_.next(&cell, &index))
     {
         // Compute one voxel
         computeVoxelValue(cell, index);
@@ -248,7 +248,7 @@ bool SegmentationThread::computeVoxelSize()
         {
             counter = 0;
             double timeNow = getRealTime();
-            if (timeNow - timeBegin > 100.)
+            if (timeNow - timeBegin > 0.1)
             {
                 updateProgressPercent();
                 return false;
