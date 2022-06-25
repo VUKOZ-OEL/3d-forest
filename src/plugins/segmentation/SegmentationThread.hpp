@@ -41,6 +41,8 @@ public:
 
     virtual bool compute();
 
+    const Editor *editor() const { return editor_; }
+
 protected:
     /** Segmentation Thread State. */
     enum State

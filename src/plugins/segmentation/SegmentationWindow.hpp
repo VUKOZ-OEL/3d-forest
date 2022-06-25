@@ -71,6 +71,7 @@ protected:
 
     void suspendThreads();
     void resumeThreads();
+    void updateRange();
 };
 
 #endif /* SEGMENTATION_WINDOW_HPP */
