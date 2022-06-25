@@ -21,6 +21,7 @@
 
 #include <Editor.hpp>
 #include <Log.hpp>
+#include <SegmentationPca.hpp>
 #include <SegmentationThread.hpp>
 #include <ThreadCallbackInterface.hpp>
 #include <Time.hpp>
@@ -30,6 +31,7 @@
 
 SegmentationThread::SegmentationThread(Editor *editor)
     : editor_(editor),
+      query_(editor_),
       state_(STATE_FINISHED),
       stateInitialized_(false),
       layersCreated_(true),
@@ -45,6 +47,13 @@ SegmentationThread::SegmentationThread(Editor *editor)
 SegmentationThread::~SegmentationThread()
 {
     LOG_DEBUG_LOCAL("");
+}
+
+void SegmentationThread::clear()
+{
+    query_.clear();
+    voxels_.clear();
+    pca_.clear();
 }
 
 void SegmentationThread::start(int voxelSize, int threshold)
@@ -154,10 +163,8 @@ void SegmentationThread::setState(State state)
     progressPercent_ = 0;
 }
 
-void SegmentationThread::updateProgress(uint64_t increment)
+void SegmentationThread::updateProgressPercent()
 {
-    progressValue_ += increment;
-
     if (progressMax_ > 0)
     {
         const double h = static_cast<double>(progressMax_);
@@ -195,22 +202,23 @@ void SegmentationThread::computeInitializeLayers()
     }
 
     // Set all points to layer 0
-    Query query(editor_);
-    query.selectBox(editor_->clipBoundary());
-    query.exec();
+    query_.selectBox(editor_->clipBoundary());
+    query_.exec();
 
-    while (query.next())
+    while (query_.next())
     {
-        query.layer() = 0;
-        query.setModified();
+        query_.layer() = 0;
+        query_.setModified();
     }
 
-    query.flush();
+    query_.flush();
 }
 
 bool SegmentationThread::computeVoxelSize()
 {
     LOG_DEBUG_LOCAL("");
+
+    double timeBegin = getRealTime();
 
     // Initialization
     if (!stateInitialized_)
@@ -233,15 +241,27 @@ bool SegmentationThread::computeVoxelSize()
 
     // Next step
     Box<double> cell;
-    size_t x;
-    size_t y;
-    size_t z;
+    size_t index;
+    size_t counter = 0;
 
-    bool hasNextCell = voxels_.next(cell, x, y, z);
-    if (hasNextCell)
+    while (voxels_.next(&cell, &index))
     {
-        updateProgress(1);
-        return false;
+        // Compute one voxel
+        pca_.compute(query_, voxels_, cell, index);
+
+        // Update progress
+        progressValue_++;
+        counter++;
+        if (counter > 10)
+        {
+            counter = 0;
+            double timeNow = getRealTime();
+            if (timeNow - timeBegin > 0.1)
+            {
+                updateProgressPercent();
+                return false;
+            }
+        }
     }
 
     // Finished

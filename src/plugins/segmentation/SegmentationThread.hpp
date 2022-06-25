@@ -23,6 +23,7 @@
 #define SEGMENTATION_THREAD_HPP
 
 #include <Query.hpp>
+#include <SegmentationPca.hpp>
 #include <Thread.hpp>
 #include <Vector3.hpp>
 #include <Voxels.hpp>
@@ -36,10 +37,14 @@ public:
     SegmentationThread(Editor *editor);
     virtual ~SegmentationThread();
 
+    void clear();
+
     void start(int voxelSize, int threshold);
     int progressPercent() const;
 
     virtual bool compute();
+
+    const Editor *editor() const { return editor_; }
 
 protected:
     /** Segmentation Thread State. */
@@ -51,6 +56,7 @@ protected:
     };
 
     Editor *editor_;
+    Query query_;
 
     State state_;
     bool stateInitialized_;
@@ -63,9 +69,10 @@ protected:
     int threshold_;
 
     Voxels voxels_;
+    SegmentationPca pca_;
 
     void setState(State state);
-    void updateProgress(uint64_t increment);
+    void updateProgressPercent();
     void computeInitializeLayers();
     bool computeVoxelSize();
     bool computeThreshold();

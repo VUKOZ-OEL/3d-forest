@@ -29,23 +29,51 @@
 class EXPORT_EDITOR Voxels
 {
 public:
+    struct EXPORT_EDITOR Voxel
+    {
+        float x;
+        float y;
+        float z;
+        float i;
+    };
+
     Voxels();
 
     void clear();
     void create(const Box<double> &spaceRegion, double voxelSize);
     size_t size() const { return numberOfVoxels_; }
-    bool next(Box<double> &cell, size_t &x, size_t &y, size_t &z);
+    bool next(Box<double> *cell = nullptr,
+              size_t *index = nullptr,
+              size_t *x = nullptr,
+              size_t *y = nullptr,
+              size_t *z = nullptr);
+
+    const Voxel *data() const { return data_.data(); }
+
+    const Voxel &at(size_t x, size_t y, size_t z) const
+    {
+        return data_[x + y * nx_ + z * nx_ * ny_];
+    }
+
+    Voxel &at(size_t x, size_t y, size_t z)
+    {
+        return data_[x + y * nx_ + z * nx_ * ny_];
+    }
+
+    const Voxel &at(size_t index) const { return data_[index]; }
+
+    Voxel &at(size_t index) { return data_[index]; }
 
 protected:
     Box<double> spaceRegion_;
     double voxelSizeInput_;
 
     size_t numberOfVoxels_;
-    Vector3<size_t> resolution_;
+    size_t nx_;
+    size_t ny_;
+    size_t nz_;
     Vector3<double> voxelSize_;
-
-    std::vector<float> value_;
-    std::vector<float> position_;
+    std::vector<Voxel> data_;
 
     std::vector<Box<size_t>> stack_;
 

@@ -50,6 +50,11 @@ public:
 
     int value();
 
+    void setValue(int value);
+    void setMaximum(int max);
+
+    void blockSignals(bool block);
+
 signals:
     void signalIntermediateValue(int v);
     void signalFinalValue();

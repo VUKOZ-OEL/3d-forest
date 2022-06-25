@@ -20,12 +20,17 @@
 /** @file Voxels.cpp */
 
 #include <Log.hpp>
+#include <Math.hpp>
 #include <Voxels.hpp>
 
 #define LOG_DEBUG_LOCAL(msg) LOG_MODULE("Voxels", msg)
 
-Voxels::Voxels() : voxelSizeInput_(0), numberOfVoxels_(0)
+// Use some maximum until the voxels can be streamed from a file.
+#define VOXELS_RESOLUTION_MAX 500
+
+Voxels::Voxels()
 {
+    clear();
 }
 
 void Voxels::clear()
@@ -33,11 +38,12 @@ void Voxels::clear()
     spaceRegion_.clear();
     voxelSizeInput_ = 0;
     numberOfVoxels_ = 0;
-    resolution_.clear();
+    nx_ = 0;
+    ny_ = 0;
+    nz_ = 0;
     voxelSize_.clear();
 
-    value_.clear();
-    position_.clear();
+    data_.clear();
 
     stack_.clear();
 }
@@ -45,9 +51,7 @@ void Voxels::clear()
 void Voxels::resize(size_t n)
 {
     numberOfVoxels_ = n;
-
-    value_.resize(n);
-    position_.resize(n);
+    data_.resize(n);
 }
 
 void Voxels::create(const Box<double> &spaceRegion, double voxelSize)
@@ -56,32 +60,37 @@ void Voxels::create(const Box<double> &spaceRegion, double voxelSize)
     voxelSizeInput_ = voxelSize;
 
     // Compute grid resolution and actual voxel size.
-    for (size_t i = 0; i < 3; i++)
-    {
-        resolution_[i] = static_cast<size_t>(
-            round(spaceRegion_.length(i) / voxelSizeInput_));
+    size_t min = 1;
+    size_t max = VOXELS_RESOLUTION_MAX;
 
-        if (resolution_[i] < 1)
-        {
-            resolution_[i] = 1;
-        }
+    nx_ = static_cast<size_t>(round(spaceRegion_.length(0) / voxelSizeInput_));
+    clamp(nx_, min, max);
+    voxelSize_[0] = spaceRegion_.length(0) / static_cast<double>(nx_);
 
-        voxelSize_[i] =
-            spaceRegion_.length(i) / static_cast<double>(resolution_[i]);
-    }
+    ny_ = static_cast<size_t>(round(spaceRegion_.length(1) / voxelSizeInput_));
+    clamp(ny_, min, max);
+    voxelSize_[1] = spaceRegion_.length(1) / static_cast<double>(ny_);
+
+    nz_ = static_cast<size_t>(round(spaceRegion_.length(2) / voxelSizeInput_));
+    clamp(nz_, min, max);
+    voxelSize_[2] = spaceRegion_.length(2) / static_cast<double>(nz_);
 
     // Create number of voxels.
-    resize(resolution_[0] * resolution_[1] * resolution_[2]);
+    resize(nx_ * ny_ * nz_);
 
     // Initialize voxel iterator.
-    push(0, 0, 0, resolution_[0], resolution_[1], resolution_[2]);
+    push(0, 0, 0, nx_, ny_, nz_);
 
     LOG_DEBUG_LOCAL("numberOfVoxels <" << numberOfVoxels_ << ">");
-    LOG_DEBUG_LOCAL("resolution <" << resolution_ << ">");
+    LOG_DEBUG_LOCAL("resolution <" << nx_ << "," << ny_ << "," << nz_ << ">");
     LOG_DEBUG_LOCAL("voxelSize <" << voxelSize_ << ">");
 }
 
-bool Voxels::next(Box<double> &cell, size_t &x, size_t &y, size_t &z)
+bool Voxels::next(Box<double> *cell,
+                  size_t *index,
+                  size_t *x,
+                  size_t *y,
+                  size_t *z)
 {
     // Subdivide grid until next voxel cell 1x1x1 is found.
     while (!stack_.empty())
@@ -102,17 +111,41 @@ bool Voxels::next(Box<double> &cell, size_t &x, size_t &y, size_t &z)
         // a) Return voxel cell 1x1x1.
         if (dx == 1 && dy == 1 && dz == 1)
         {
-            cell.set(
-                spaceRegion_.min(0) + voxelSize_[0] * static_cast<double>(x1),
-                spaceRegion_.min(1) + voxelSize_[1] * static_cast<double>(y1),
-                spaceRegion_.min(2) + voxelSize_[2] * static_cast<double>(z1),
-                spaceRegion_.min(0) + voxelSize_[0] * static_cast<double>(x2),
-                spaceRegion_.min(1) + voxelSize_[1] * static_cast<double>(y2),
-                spaceRegion_.min(2) + voxelSize_[2] * static_cast<double>(z2));
+            if (cell)
+            {
+                cell->set(spaceRegion_.min(0) +
+                              voxelSize_[0] * static_cast<double>(x1),
+                          spaceRegion_.min(1) +
+                              voxelSize_[1] * static_cast<double>(y1),
+                          spaceRegion_.min(2) +
+                              voxelSize_[2] * static_cast<double>(z1),
+                          spaceRegion_.min(0) +
+                              voxelSize_[0] * static_cast<double>(x2),
+                          spaceRegion_.min(1) +
+                              voxelSize_[1] * static_cast<double>(y2),
+                          spaceRegion_.min(2) +
+                              voxelSize_[2] * static_cast<double>(z2));
+            }
 
-            x = x1;
-            y = y1;
-            z = z1;
+            if (index)
+            {
+                *index = x1 + y1 * nx_ + z1 * nx_ * ny_;
+            }
+
+            if (x)
+            {
+                *x = x1;
+            }
+
+            if (y)
+            {
+                *y = y1;
+            }
+
+            if (z)
+            {
+                *z = z1;
+            }
 
             return true;
         }
