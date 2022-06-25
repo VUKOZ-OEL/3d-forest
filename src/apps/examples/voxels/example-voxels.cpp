@@ -39,13 +39,12 @@ void exampleVoxels()
     size_t x;
     size_t y;
     size_t z;
-    size_t i = 0;
+    size_t index;
 
-    while (voxels.next(cell, x, y, z))
+    while (voxels.next(&cell, &index, &x, &y, &z))
     {
-        i++;
-        std::cout << i << "/" << voxels.size() << " [" << x << ", " << y << ", "
-                  << z << "] " << cell << std::endl;
+        std::cout << index + 1 << "/" << voxels.size() << " [" << x << ", " << y
+                  << ", " << z << "] " << cell << std::endl;
 
         voxels.at(x, y, z).x = 0;
         voxels.at(x, y, z).y = 0;

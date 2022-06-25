@@ -234,11 +234,12 @@ bool SegmentationThread::computeVoxelSize()
     size_t x;
     size_t y;
     size_t z;
+    size_t index;
     size_t counter = 0;
 
     double timeBegin = getRealTime();
 
-    if (voxels_.next(cell, x, y, z))
+    if (voxels_.next(&cell, &index, &x, &y, &z))
     {
         progressValue_++;
         counter++;

@@ -88,7 +88,11 @@ void Voxels::create(const Box<double> &spaceRegion, double voxelSize)
     LOG_DEBUG_LOCAL("voxelSize <" << voxelSize_ << ">");
 }
 
-bool Voxels::next(Box<double> &cell, size_t &x, size_t &y, size_t &z)
+bool Voxels::next(Box<double> *cell,
+                  size_t *index,
+                  size_t *x,
+                  size_t *y,
+                  size_t *z)
 {
     // Subdivide grid until next voxel cell 1x1x1 is found.
     while (!stack_.empty())
@@ -109,17 +113,41 @@ bool Voxels::next(Box<double> &cell, size_t &x, size_t &y, size_t &z)
         // a) Return voxel cell 1x1x1.
         if (dx == 1 && dy == 1 && dz == 1)
         {
-            cell.set(
-                spaceRegion_.min(0) + voxelSize_[0] * static_cast<double>(x1),
-                spaceRegion_.min(1) + voxelSize_[1] * static_cast<double>(y1),
-                spaceRegion_.min(2) + voxelSize_[2] * static_cast<double>(z1),
-                spaceRegion_.min(0) + voxelSize_[0] * static_cast<double>(x2),
-                spaceRegion_.min(1) + voxelSize_[1] * static_cast<double>(y2),
-                spaceRegion_.min(2) + voxelSize_[2] * static_cast<double>(z2));
+            if (cell)
+            {
+                cell->set(spaceRegion_.min(0) +
+                              voxelSize_[0] * static_cast<double>(x1),
+                          spaceRegion_.min(1) +
+                              voxelSize_[1] * static_cast<double>(y1),
+                          spaceRegion_.min(2) +
+                              voxelSize_[2] * static_cast<double>(z1),
+                          spaceRegion_.min(0) +
+                              voxelSize_[0] * static_cast<double>(x2),
+                          spaceRegion_.min(1) +
+                              voxelSize_[1] * static_cast<double>(y2),
+                          spaceRegion_.min(2) +
+                              voxelSize_[2] * static_cast<double>(z2));
+            }
 
-            x = x1;
-            y = y1;
-            z = z1;
+            if (index)
+            {
+                *index = x1 + y1 * nx_ + z1 * nx_ * ny_;
+            }
+
+            if (x)
+            {
+                *x = x1;
+            }
+
+            if (y)
+            {
+                *y = y1;
+            }
+
+            if (z)
+            {
+                *z = z1;
+            }
 
             return true;
         }
