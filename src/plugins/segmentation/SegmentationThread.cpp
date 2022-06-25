@@ -240,8 +240,7 @@ bool SegmentationThread::computeVoxelSize()
     while (voxels_.next(&cell, &index))
     {
         // Compute one voxel
-        segmentationPca();
-        computeVoxelValue(cell, index);
+        segmentationPca(query_, voxels_, cell, index);
 
         // Update progress
         progressValue_++;
@@ -264,45 +263,6 @@ bool SegmentationThread::computeVoxelSize()
     editor_->setVoxels(voxels_);
 
     return true;
-}
-
-void SegmentationThread::computeVoxelValue(const Box<double> &cell,
-                                           size_t index)
-{
-    size_t nPoints = 0;
-    double sumX = 0;
-    double sumY = 0;
-    double sumZ = 0;
-    double intensity = 0;
-
-    query_.selectBox(cell);
-    query_.exec();
-
-    while (query_.next())
-    {
-        sumX = query_.x();
-        sumY = query_.y();
-        sumZ = query_.z();
-        nPoints++;
-    }
-
-    if (nPoints > 0)
-    {
-        const double d = static_cast<double>(nPoints);
-        sumX = sumX / d;
-        sumY = sumY / d;
-        sumZ = sumZ / d;
-    }
-
-    if (nPoints > 2)
-    {
-    }
-
-    Voxels::Voxel &voxel = voxels_.at(index);
-    voxel.x = static_cast<float>(sumX);
-    voxel.y = static_cast<float>(sumY);
-    voxel.z = static_cast<float>(sumZ);
-    voxel.i = static_cast<float>(intensity);
 }
 
 bool SegmentationThread::computeThreshold()

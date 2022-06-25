@@ -71,7 +71,6 @@ protected:
     void updateProgressPercent();
     void computeInitializeLayers();
     bool computeVoxelSize();
-    void computeVoxelValue(const Box<double> &cell, size_t index);
     bool computeThreshold();
 };
 

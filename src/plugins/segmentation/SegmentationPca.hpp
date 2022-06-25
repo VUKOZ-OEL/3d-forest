@@ -25,6 +25,9 @@
 #include <Query.hpp>
 #include <Voxels.hpp>
 
-extern void segmentationPca();
+extern void segmentationPca(Query &query,
+                            Voxels &voxels,
+                            const Box<double> &cell,
+                            size_t index);
 
 #endif /* SEGMENTATION_PCA_HPP */
