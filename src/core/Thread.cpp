@@ -23,8 +23,8 @@
 #include <Thread.hpp>
 #include <ThreadCallbackInterface.hpp>
 
-//#define LOG_DEBUG_LOCAL(msg)
-#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("Thread", msg)
+#define LOG_DEBUG_LOCAL(msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("Thread", msg)
 
 Thread::Thread()
     : callback_(nullptr),

@@ -21,9 +21,7 @@
 <qresource prefix="/projectnavigator">
 
 <!-- Tool bar -->
-<file>blueprint_16px.png</file>
-<file>blueprint_24px.png</file>
-<file>blueprint_30px.png</file>
+<file>files_24px.png</file>
 
 <!-- Common -->
 <file>remove_24px.png</file>
@@ -33,6 +31,10 @@
 <file>select_all_24px.png</file>
 <file>select_invert_24px.png</file>
 <file>select_none_24px.png</file>
+
+<file>checkbox_enabled_24px.png</file>
+<file>checkbox_half_24px.png</file>
+<file>checkbox_disabled_24px.png</file>
 
 <!-- Tabs -->
 <file>file_16px.png</file>
