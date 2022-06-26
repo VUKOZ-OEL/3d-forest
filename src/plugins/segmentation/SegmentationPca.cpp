@@ -22,6 +22,9 @@
 #include <Log.hpp>
 #include <SegmentationPca.hpp>
 
+#define LOG_DEBUG_LOCAL(msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("SegmentationPca", msg)
+
 SegmentationPca::SegmentationPca()
 {
     clear();
@@ -60,6 +63,9 @@ void SegmentationPca::compute(Query &query,
         meanY = meanY / d;
         meanZ = meanZ / d;
     }
+
+    LOG_DEBUG_LOCAL("nPoints <" << nPoints << ">");
+    LOG_DEBUG_LOCAL("mean <" << meanX << "," << meanY << "," << meanZ << ">");
 
     Voxels::Voxel &voxel = voxels.at(index);
     voxel.x = static_cast<float>(meanX);
@@ -107,6 +113,8 @@ void SegmentationPca::compute(Query &query,
     }
     eigenVectors.col(2) = eigenVectors.col(0).cross(eigenVectors.col(1));
 
+    LOG_DEBUG_LOCAL("eigen vectors\n" << eigenVectors);
+
     // Project.
     constexpr double bigNumber = std::numeric_limits<double>::max();
     min[0] = bigNumber;
@@ -128,12 +136,16 @@ void SegmentationPca::compute(Query &query,
         max = max.cwiseMax(out);
     }
 
+    LOG_DEBUG_LOCAL("min\n" << min);
+    LOG_DEBUG_LOCAL("max\n" << max);
+
     // Compute intensity.
     double eL = std::abs(max[0] - min[0]);
     double eI = std::abs(max[1] - min[1]);
     double eS = std::abs(max[2] - min[2]);
 
     // Sort values.
+    LOG_DEBUG_LOCAL("eLIS <" << eL << "," << eI << "," << eS << ">");
     if (eI < eS)
     {
         std::swap(eS, eI);
@@ -148,6 +160,7 @@ void SegmentationPca::compute(Query &query,
     {
         std::swap(eS, eI);
     }
+    LOG_DEBUG_LOCAL("eLIS <" << eL << "," << eI << "," << eS << "> sorted");
 
     // Compute intensity index.
     const double sum = eL + eI + eS;
