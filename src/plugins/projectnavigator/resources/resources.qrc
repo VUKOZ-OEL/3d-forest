@@ -21,9 +21,7 @@
 <qresource prefix="/projectnavigator">
 
 <!-- Tool bar -->
-<file>blueprint_16px.png</file>
-<file>blueprint_24px.png</file>
-<file>blueprint_30px.png</file>
+<file>files_24px.png</file>
 
 <!-- Common -->
 <file>remove_24px.png</file>
