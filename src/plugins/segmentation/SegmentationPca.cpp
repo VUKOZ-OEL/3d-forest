@@ -63,6 +63,10 @@ void SegmentationPca::compute(Query &query,
         meanY = meanY / d;
         meanZ = meanZ / d;
     }
+    else
+    {
+        cell.getCenter(meanX, meanY, meanZ);
+    }
 
     LOG_DEBUG_LOCAL("nPoints <" << nPoints << ">");
     LOG_DEBUG_LOCAL("mean <" << meanX << "," << meanY << "," << meanZ << ">");
