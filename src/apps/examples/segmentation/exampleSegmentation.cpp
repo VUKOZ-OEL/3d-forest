@@ -21,7 +21,6 @@
 
 #include <Editor.hpp>
 #include <Error.hpp>
-#include <SegmentationPca.hpp>
 #include <SegmentationThread.hpp>
 
 #define PATH "dataset.las"
@@ -31,12 +30,10 @@ static void exampleSegmentation()
     Editor editor;
     editor.open(PATH);
 
-    SegmentationPca pca;
-    SegmentationThread segmentationThread(&editor);
-
     int voxelSize = 1;
     int threshold = 50;
 
+    SegmentationThread segmentationThread(&editor);
     segmentationThread.create();
     segmentationThread.start(voxelSize, threshold);
     segmentationThread.wait();
