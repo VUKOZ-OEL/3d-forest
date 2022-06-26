@@ -24,16 +24,13 @@
 #include <Log.hpp>
 #include <SegmentationThread.hpp>
 
-#define PATH "dataset.las"
-
-static void exampleSegmentation()
+static void exampleSegmentation(const char *path, int voxelSize, int threshold)
 {
+    // Open the file in editor.
     Editor editor;
-    editor.open(PATH);
+    editor.open(path);
 
-    int voxelSize = 10;
-    int threshold = 50;
-
+    // Compute segmentation.
     SegmentationThread segmentationThread(&editor);
     segmentationThread.create();
     segmentationThread.start(voxelSize, threshold);
@@ -41,11 +38,26 @@ static void exampleSegmentation()
 
     const Voxels &voxels = editor.voxels();
     LOG("size <" << voxels.size() << ">");
+    // for (size_t i = 0; i < voxels.size(); i++)
+    //{
+    //     const Voxels::Voxel &voxel = voxels.at(i);
+    //     LOG("i <" << voxel.i << ">");
+    // }
+
+    // Export voxels.
+    std::vector<LasFile::Point> points;
+    points.resize(voxels.size());
     for (size_t i = 0; i < voxels.size(); i++)
     {
         const Voxels::Voxel &voxel = voxels.at(i);
-        LOG("i <" << voxel.i << ">");
+        points[i].format = 6;
+        points[i].x = static_cast<uint32_t>(voxel.x);
+        points[i].y = static_cast<uint32_t>(voxel.y);
+        points[i].z = static_cast<uint32_t>(voxel.z);
+        points[i].intensity = static_cast<uint16_t>(voxel.i * 655.35);
     }
+
+    LasFile::create("voxels.las", points, {1, 1, 1}, {0, 0, 0});
 }
 
 static void add(std::vector<LasFile::Point> *points,
@@ -64,7 +76,7 @@ static void add(std::vector<LasFile::Point> *points,
     points->push_back(pt);
 }
 
-static void createDataset()
+static void createDataset(const char *path)
 {
     // Create a dataset.
     std::vector<LasFile::Point> points;
@@ -74,21 +86,40 @@ static void createDataset()
     add(&points, 0, 1, 0);
     add(&points, 1, 1, 0);
 
-    LasFile::create(PATH, points, {1, 1, 1}, {0, 0, 0});
+    LasFile::create(path, points, {1, 1, 1}, {0, 0, 0});
 
     // Create index file.
     IndexFileBuilder::Settings settings;
     settings.maxSize1 = 2;
 
-    IndexFileBuilder::index(PATH, PATH, settings);
+    IndexFileBuilder::index(path, path, settings);
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+    const char *path = nullptr;
+    int voxelSize = 10;
+    int threshold = 50;
+
+    if (argc > 1)
+    {
+        path = argv[1];
+    }
+
+    if (argc > 2)
+    {
+        voxelSize = atoi(argv[2]);
+    }
+
     try
     {
-        createDataset();
-        exampleSegmentation();
+        if (!path)
+        {
+            path = "dataset.las";
+            createDataset(path);
+        }
+
+        exampleSegmentation(path, voxelSize, threshold);
     }
     catch (std::exception &e)
     {
