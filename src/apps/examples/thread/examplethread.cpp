@@ -17,7 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file examplethread.cpp @brief Thread example. */
+/** @file exampleThread.cpp @brief Thread example. */
 
 #include <Log.hpp>
 #include <Thread.hpp>
@@ -28,16 +28,25 @@
 class MyThread : public Thread
 {
 public:
-    MyThread() : counter_(3) {}
+    MyThread() : counter_(0) {}
 
     virtual bool compute()
     {
         std::cout << "MyThread::compute::counter=" << counter_ << std::endl;
-        counter_--;
-        return counter_ < 1; // finished
+
+        msleep(1000);
+        counter_++;
+
+        bool finished = counter_ > 2;
+        if (callback_)
+        {
+            callback_->threadProgress(finished);
+        }
+
+        return finished;
     }
 
-protected:
+private:
     int counter_;
 };
 
@@ -45,14 +54,8 @@ protected:
 class MyClass : public ThreadCallbackInterface
 {
 public:
-    MyClass()
-    {
-        thread_.setCallback(this);
-        thread_.create();
-        thread_.start();
-    }
-
-    virtual ~MyClass() { thread_.stop(); }
+    MyClass() {}
+    virtual ~MyClass() {}
 
     virtual void threadProgress(bool finished)
     {
@@ -60,17 +63,35 @@ public:
                   << static_cast<int>(finished) << std::endl;
     }
 
-protected:
+    void run()
+    {
+        thread_.setCallback(this);
+        thread_.create();
+        thread_.start();
+        thread_.wait();
+    }
+
+private:
     MyThread thread_;
 };
 
+static void exampleThread()
+{
+    MyClass c;
+    c.run();
+}
+
 int main()
 {
-    std::cout << "main" << std::endl;
-
-    MyClass c;
-
-    msleep(500);
+    try
+    {
+        exampleThread();
+    }
+    catch (std::exception &e)
+    {
+        std::cerr << "error: " << e.what() << std::endl;
+        return 1;
+    }
 
     return 0;
 }

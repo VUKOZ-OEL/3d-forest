@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-set(SUB_PROJECT_NAME "3dforestexamplethread")
+set(SUB_PROJECT_NAME "3d-forest-example-thread")
 
-add_executable(${SUB_PROJECT_NAME} examplethread.cpp)
+add_executable(${SUB_PROJECT_NAME} exampleThread.cpp)
 target_link_libraries(${SUB_PROJECT_NAME} PUBLIC 3dforesteditor)
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)
