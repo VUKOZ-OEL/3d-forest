@@ -8,6 +8,9 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+// Modifications Copyright 2020-present VUKOZ
+// Add reserve(), rowsCapacity(), colsCapacity()
+
 #ifndef EIGEN_DENSESTORAGEBASE_H
 #define EIGEN_DENSESTORAGEBASE_H
 
@@ -143,6 +146,11 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
     Index rows() const EIGEN_NOEXCEPT { return m_storage.rows(); }
     EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR
     Index cols() const EIGEN_NOEXCEPT { return m_storage.cols(); }
+
+    EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR
+    Index rowsCapacity() const EIGEN_NOEXCEPT { return m_storage.rowsCapacity(); }
+    EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR
+    Index colsCapacity() const EIGEN_NOEXCEPT { return m_storage.colsCapacity(); }
 
     /** This is an overloaded version of DenseCoeffsBase<Derived,ReadOnlyAccessors>::coeff(Index,Index) const
       * provided to by-pass the creation of an evaluator of the expression, thus saving compilation efforts.
@@ -283,6 +291,26 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
         if(size_changed) EIGEN_INITIALIZE_COEFFS_IF_THAT_OPTION_IS_ENABLED
       #else
         m_storage.resize(rows*cols, rows, cols);
+      #endif
+    }
+
+    /** Reserves memory for a \a rows x \a cols matrix. The size remains the same. */
+    EIGEN_DEVICE_FUNC
+    EIGEN_STRONG_INLINE void reserve(Index rows, Index cols)
+    {
+      eigen_assert(   EIGEN_IMPLIES(RowsAtCompileTime!=Dynamic,rows==RowsAtCompileTime)
+                   && EIGEN_IMPLIES(ColsAtCompileTime!=Dynamic,cols==ColsAtCompileTime)
+                   && EIGEN_IMPLIES(RowsAtCompileTime==Dynamic && MaxRowsAtCompileTime!=Dynamic,rows<=MaxRowsAtCompileTime)
+                   && EIGEN_IMPLIES(ColsAtCompileTime==Dynamic && MaxColsAtCompileTime!=Dynamic,cols<=MaxColsAtCompileTime)
+                   && rows>=0 && cols>=0 && "Invalid sizes when resizing a matrix or array.");
+      internal::check_rows_cols_for_overflow<MaxSizeAtCompileTime>::run(rows, cols);
+      #ifdef EIGEN_INITIALIZE_COEFFS
+        Index size = rows*cols;
+        bool size_changed = size != this->size();
+        m_storage.reserve(size, rows, cols);
+        if(size_changed) EIGEN_INITIALIZE_COEFFS_IF_THAT_OPTION_IS_ENABLED
+      #else
+        m_storage.reserve(rows*cols, rows, cols);
       #endif
     }
 

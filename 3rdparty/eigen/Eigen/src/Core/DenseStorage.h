@@ -9,6 +9,9 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+// Modifications Copyright 2020-present VUKOZ
+// Add reserve(), rowsCapacity(), colsCapacity()
+
 #ifndef EIGEN_MATRIXSTORAGE_H
 #define EIGEN_MATRIXSTORAGE_H
 
@@ -415,23 +418,27 @@ template<typename T, int _Options> class DenseStorage<T, Dynamic, Dynamic, Dynam
     T *m_data;
     Index m_rows;
     Index m_cols;
+    Index m_rows_reserved;
+    Index m_cols_reserved;
   public:
-    EIGEN_DEVICE_FUNC DenseStorage() : m_data(0), m_rows(0), m_cols(0) {}
+    EIGEN_DEVICE_FUNC DenseStorage() : m_data(0), m_rows(0), m_cols(0), m_rows_reserved(0), m_cols_reserved(0) {}
     EIGEN_DEVICE_FUNC explicit DenseStorage(internal::constructor_without_unaligned_array_assert)
-       : m_data(0), m_rows(0), m_cols(0) {}
+       : m_data(0), m_rows(0), m_cols(0), m_rows_reserved(0), m_cols_reserved(0) {}
     EIGEN_DEVICE_FUNC DenseStorage(Index size, Index rows, Index cols)
-      : m_data(internal::conditional_aligned_new_auto<T,(_Options&DontAlign)==0>(size)), m_rows(rows), m_cols(cols)
+      : m_data(internal::conditional_aligned_new_auto<T,(_Options&DontAlign)==0>(size)), m_rows(rows), m_cols(cols), m_rows_reserved(rows), m_cols_reserved(cols)
     {
       EIGEN_INTERNAL_DENSE_STORAGE_CTOR_PLUGIN({})
       eigen_internal_assert(size==rows*cols && rows>=0 && cols >=0);
     }
     EIGEN_DEVICE_FUNC DenseStorage(const DenseStorage& other)
-      : m_data(internal::conditional_aligned_new_auto<T,(_Options&DontAlign)==0>(other.m_rows*other.m_cols))
+      : m_data(internal::conditional_aligned_new_auto<T,(_Options&DontAlign)==0>(other.m_rows_reserved*other.m_cols))
       , m_rows(other.m_rows)
       , m_cols(other.m_cols)
+      , m_rows_reserved(other.m_rows_reserved)
+      , m_cols_reserved(other.m_cols_reserved)
     {
-      EIGEN_INTERNAL_DENSE_STORAGE_CTOR_PLUGIN(Index size = m_rows*m_cols)
-      internal::smart_copy(other.m_data, other.m_data+other.m_rows*other.m_cols, m_data);
+      EIGEN_INTERNAL_DENSE_STORAGE_CTOR_PLUGIN(Index size = m_rows_reserved*m_cols_reserved)
+      internal::smart_copy(other.m_data, other.m_data+other.m_rows_reserved*other.m_cols_reserved, m_data);
     }
     EIGEN_DEVICE_FUNC DenseStorage& operator=(const DenseStorage& other)
     {
@@ -448,10 +455,14 @@ template<typename T, int _Options> class DenseStorage<T, Dynamic, Dynamic, Dynam
       : m_data(std::move(other.m_data))
       , m_rows(std::move(other.m_rows))
       , m_cols(std::move(other.m_cols))
+      , m_rows_reserved(std::move(other.m_rows_reserved))
+      , m_cols_reserved(std::move(other.m_cols_reserved))
     {
       other.m_data = nullptr;
       other.m_rows = 0;
       other.m_cols = 0;
+      other.m_rows_reserved = 0;
+      other.m_cols_reserved = 0;
     }
     EIGEN_DEVICE_FUNC
     DenseStorage& operator=(DenseStorage&& other) EIGEN_NOEXCEPT
@@ -459,37 +470,50 @@ template<typename T, int _Options> class DenseStorage<T, Dynamic, Dynamic, Dynam
       numext::swap(m_data, other.m_data);
       numext::swap(m_rows, other.m_rows);
       numext::swap(m_cols, other.m_cols);
+      numext::swap(m_rows_reserved, other.m_rows_reserved);
+      numext::swap(m_cols_reserved, other.m_cols_reserved);
       return *this;
     }
 #endif
-    EIGEN_DEVICE_FUNC ~DenseStorage() { internal::conditional_aligned_delete_auto<T,(_Options&DontAlign)==0>(m_data, m_rows*m_cols); }
+    EIGEN_DEVICE_FUNC ~DenseStorage()
+    {
+      internal::conditional_aligned_delete_auto<T,(_Options&DontAlign)==0>(m_data, m_rows_reserved*m_cols_reserved);
+    }
     EIGEN_DEVICE_FUNC void swap(DenseStorage& other)
     {
       numext::swap(m_data,other.m_data);
       numext::swap(m_rows,other.m_rows);
       numext::swap(m_cols,other.m_cols);
+      numext::swap(m_rows_reserved,other.m_rows_reserved);
+      numext::swap(m_cols_reserved,other.m_cols_reserved);
     }
     EIGEN_DEVICE_FUNC Index rows(void) const EIGEN_NOEXCEPT {return m_rows;}
     EIGEN_DEVICE_FUNC Index cols(void) const EIGEN_NOEXCEPT {return m_cols;}
+    EIGEN_DEVICE_FUNC Index rowsCapacity(void) const EIGEN_NOEXCEPT {return m_rows_reserved;}
+    EIGEN_DEVICE_FUNC Index colsCapacity(void) const EIGEN_NOEXCEPT {return m_cols_reserved;}
     void conservativeResize(Index size, Index rows, Index cols)
     {
-      m_data = internal::conditional_aligned_realloc_new_auto<T,(_Options&DontAlign)==0>(m_data, size, m_rows*m_cols);
-      m_rows = rows;
-      m_cols = cols;
+      resize(size, rows, cols);
     }
     EIGEN_DEVICE_FUNC void resize(Index size, Index rows, Index cols)
     {
-      if(size != m_rows*m_cols)
+      if(rows > m_rows_reserved || cols > m_cols_reserved)
       {
-        internal::conditional_aligned_delete_auto<T,(_Options&DontAlign)==0>(m_data, m_rows*m_cols);
-        if (size>0) // >0 and not simply !=0 to let the compiler knows that size cannot be negative
-          m_data = internal::conditional_aligned_new_auto<T,(_Options&DontAlign)==0>(size);
-        else
-          m_data = 0;
-        EIGEN_INTERNAL_DENSE_STORAGE_CTOR_PLUGIN({})
+        reserve(size, rows, cols);
       }
       m_rows = rows;
       m_cols = cols;
+    }
+    EIGEN_DEVICE_FUNC void reserve(Index size, Index rows, Index cols)
+    {
+      if(size != m_rows_reserved*m_cols_reserved)
+      {
+        m_data = internal::conditional_aligned_realloc_new_auto<T,(_Options&DontAlign)==0>(m_data, size, m_rows_reserved*m_cols_reserved);
+      }
+      m_rows_reserved = rows;
+      m_cols_reserved = cols;
+      if(rows < m_rows) m_rows = rows;
+      if(cols < m_cols) m_cols = cols;
     }
     EIGEN_DEVICE_FUNC const T *data() const { return m_data; }
     EIGEN_DEVICE_FUNC T *data() { return m_data; }
