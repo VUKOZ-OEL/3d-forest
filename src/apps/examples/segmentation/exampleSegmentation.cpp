@@ -24,6 +24,26 @@
 #include <Log.hpp>
 #include <SegmentationThread.hpp>
 
+static void save(const Voxels &voxels, const char *path)
+{
+    LOG("number of voxels <" << voxels.size() << ">");
+
+    std::vector<LasFile::Point> points;
+    points.resize(voxels.size());
+    for (size_t i = 0; i < voxels.size(); i++)
+    {
+        const Voxels::Voxel &voxel = voxels.at(i);
+        memset(&points[i], 0, sizeof(LasFile::Point));
+        points[i].format = 6;
+        points[i].x = static_cast<uint32_t>(voxel.x);
+        points[i].y = static_cast<uint32_t>(voxel.y);
+        points[i].z = static_cast<uint32_t>(voxel.z);
+        points[i].intensity = static_cast<uint16_t>(voxel.i * 655.35F);
+    }
+
+    LasFile::create(path, points, {1, 1, 1}, {0, 0, 0});
+}
+
 static void exampleSegmentation(const char *path, int voxelSize, int threshold)
 {
     // Open the file in editor.
@@ -36,34 +56,14 @@ static void exampleSegmentation(const char *path, int voxelSize, int threshold)
     segmentationThread.start(voxelSize, threshold);
     segmentationThread.wait();
 
-    const Voxels &voxels = editor.voxels();
-    LOG("size <" << voxels.size() << ">");
-    // for (size_t i = 0; i < voxels.size(); i++)
-    //{
-    //     const Voxels::Voxel &voxel = voxels.at(i);
-    //     LOG("i <" << voxel.i << ">");
-    // }
-
     // Export voxels.
-    std::vector<LasFile::Point> points;
-    points.resize(voxels.size());
-    for (size_t i = 0; i < voxels.size(); i++)
-    {
-        const Voxels::Voxel &voxel = voxels.at(i);
-        points[i].format = 6;
-        points[i].x = static_cast<uint32_t>(voxel.x);
-        points[i].y = static_cast<uint32_t>(voxel.y);
-        points[i].z = static_cast<uint32_t>(voxel.z);
-        points[i].intensity = static_cast<uint16_t>(voxel.i * 655.35);
-    }
-
-    LasFile::create("voxels.las", points, {1, 1, 1}, {0, 0, 0});
+    save(editor.voxels(), "voxels.las");
 }
 
-static void add(std::vector<LasFile::Point> *points,
-                uint32_t x,
-                uint32_t y,
-                uint32_t z)
+static void appendPoint(std::vector<LasFile::Point> *points,
+                        uint32_t x,
+                        uint32_t y,
+                        uint32_t z)
 {
     LasFile::Point pt;
 
@@ -72,19 +72,20 @@ static void add(std::vector<LasFile::Point> *points,
     pt.x = x;
     pt.y = y;
     pt.z = z;
+    pt.classification = LasFile::CLASS_UNASSIGNED;
 
     points->push_back(pt);
 }
 
-static void createDataset(const char *path)
+static void createTestDataset(const char *path)
 {
     // Create a dataset.
     std::vector<LasFile::Point> points;
 
-    add(&points, 0, 0, 0);
-    add(&points, 1, 0, 0);
-    add(&points, 0, 1, 0);
-    add(&points, 1, 1, 0);
+    appendPoint(&points, 0, 0, 0);
+    appendPoint(&points, 1, 0, 0);
+    appendPoint(&points, 0, 1, 0);
+    appendPoint(&points, 1, 1, 0);
 
     LasFile::create(path, points, {1, 1, 1}, {0, 0, 0});
 
@@ -116,7 +117,7 @@ int main(int argc, char *argv[])
         if (!path)
         {
             path = "dataset.las";
-            createDataset(path);
+            createTestDataset(path);
         }
 
         exampleSegmentation(path, voxelSize, threshold);

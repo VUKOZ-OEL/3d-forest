@@ -19,11 +19,14 @@
 
 /** @file SegmentationPca.cpp */
 
+#include <LasFile.hpp>
 #include <Log.hpp>
 #include <SegmentationPca.hpp>
 
 #define LOG_DEBUG_LOCAL(msg)
 //#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("SegmentationPca", msg)
+
+#define SEGMENTATION_PCA_POINT_BUFFER_SIZE 2000
 
 SegmentationPca::SegmentationPca()
 {
@@ -39,20 +42,43 @@ void SegmentationPca::compute(Query &query,
                               const Box<double> &cell,
                               size_t index)
 {
-    // Compute voxel centroid.
-    size_t nPoints = 0;
+    // Get vertices and compute voxel centroid.
     double meanX = 0;
     double meanY = 0;
     double meanZ = 0;
 
+    Eigen::MatrixXd::Index nPoints = 0;
+    V.resize(3, 0);
+
     query.selectBox(cell);
+    query.selectClassifications({LasFile::CLASS_UNASSIGNED});
     query.exec();
 
     while (query.next())
     {
+        if (nPoints == V.colsCapacity())
+        {
+            if (nPoints == 0)
+            {
+                V.reserve(3, SEGMENTATION_PCA_POINT_BUFFER_SIZE);
+            }
+            else
+            {
+                V.reserve(3, nPoints * 2);
+            }
+        }
+
+        V.resize(3, nPoints + 1);
+
         meanX += query.x();
+        V(0, nPoints) = query.x();
+
         meanY += query.y();
+        V(1, nPoints) = query.y();
+
         meanZ += query.z();
+        V(2, nPoints) = query.z();
+
         nPoints++;
     }
 
@@ -83,31 +109,19 @@ void SegmentationPca::compute(Query &query,
         return;
     }
 
-    // Get vertices.
-    V.resize(nPoints, 3);
-
-    query.reset();
-    nPoints = 0;
-
-    while (query.next())
+    // Shift points by centroid.
+    LOG_DEBUG_LOCAL("V cols <" << V.cols() << "> rows <" << V.rows() << ">");
+    for (Eigen::MatrixXd::Index i = 0; i < nPoints; i++)
     {
-        V(nPoints, 0) = query.x();
-        V(nPoints, 1) = query.y();
-        V(nPoints, 2) = query.z();
-        nPoints++;
-    }
-
-    // Shift by centroid.
-    for (size_t i = 0; i < nPoints; i++)
-    {
-        V(i, 0) -= meanX;
-        V(i, 1) -= meanY;
-        V(i, 2) -= meanZ;
+        V(0, i) -= meanX;
+        V(1, i) -= meanY;
+        V(2, i) -= meanZ;
     }
 
     // Compute product.
-    const double inv = 1. / static_cast<double>(nPoints);
+    const double inv = 1. / static_cast<double>(nPoints - 1);
     product = inv * V.topRows<3>() * V.topRows<3>().transpose();
+    LOG_DEBUG_LOCAL("product\n" << product);
 
     // Compute Eigen vectors.
     E.compute(product);
@@ -128,11 +142,11 @@ void SegmentationPca::compute(Query &query,
     max[1] = -bigNumber;
     max[2] = -bigNumber;
     eigenVectorsT = eigenVectors.transpose();
-    for (size_t i = 0; i < nPoints; i++)
+    for (Eigen::MatrixXd::Index i = 0; i < nPoints; i++)
     {
-        in[0] = V(i, 0);
-        in[1] = V(i, 1);
-        in[2] = V(i, 2);
+        in[0] = V(0, i);
+        in[1] = V(1, i);
+        in[2] = V(2, i);
 
         out = eigenVectorsT * in;
 
@@ -172,5 +186,6 @@ void SegmentationPca::compute(Query &query,
     {
         const double SFFIx = 100. - (eL * 100. / sum);
         voxel.i = static_cast<float>(SFFIx);
+        LOG_DEBUG_LOCAL("intensity <" << voxel.i << ">");
     }
 }

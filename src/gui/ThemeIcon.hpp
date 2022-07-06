@@ -41,6 +41,7 @@ public:
     {
         addFile(prefix + name + "_16px.png", QSize(16, 16));
         addFile(prefix + name + "_24px.png", QSize(24, 24));
+        // addFile(prefix + name + "_24px_color.png", QSize(24, 24));
         addFile(prefix + name + "_30px.png", QSize(30, 30));
     }
 };
