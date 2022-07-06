@@ -72,6 +72,7 @@ static void appendPoint(std::vector<LasFile::Point> *points,
     pt.x = x;
     pt.y = y;
     pt.z = z;
+    pt.classification = LasFile::CLASS_UNASSIGNED;
 
     points->push_back(pt);
 }
