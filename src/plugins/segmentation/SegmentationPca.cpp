@@ -26,6 +26,8 @@
 #define LOG_DEBUG_LOCAL(msg)
 //#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("SegmentationPca", msg)
 
+#define SEGMENTATION_PCA_POINT_BUFFER_SIZE 2000
+
 SegmentationPca::SegmentationPca()
 {
     clear();
@@ -40,11 +42,13 @@ void SegmentationPca::compute(Query &query,
                               const Box<double> &cell,
                               size_t index)
 {
-    // Compute voxel centroid.
-    size_t nPoints = 0;
+    // Get vertices and compute voxel centroid.
     double meanX = 0;
     double meanY = 0;
     double meanZ = 0;
+
+    Eigen::MatrixXd::Index nPoints = 0;
+    V.resize(3, 0);
 
     query.selectBox(cell);
     query.selectClassifications({LasFile::CLASS_UNASSIGNED});
@@ -52,9 +56,29 @@ void SegmentationPca::compute(Query &query,
 
     while (query.next())
     {
+        if (nPoints == V.colsCapacity())
+        {
+            if (nPoints == 0)
+            {
+                V.reserve(3, SEGMENTATION_PCA_POINT_BUFFER_SIZE);
+            }
+            else
+            {
+                V.reserve(3, nPoints * 2);
+            }
+        }
+
+        V.resize(3, nPoints + 1);
+
         meanX += query.x();
+        V(0, nPoints) = query.x();
+
         meanY += query.y();
+        V(1, nPoints) = query.y();
+
         meanZ += query.z();
+        V(2, nPoints) = query.z();
+
         nPoints++;
     }
 
@@ -85,18 +109,13 @@ void SegmentationPca::compute(Query &query,
         return;
     }
 
-    // Get vertices shifted by centroid.
-    V.resize(3, nPoints);
-
-    query.reset();
-    nPoints = 0;
-
-    while (query.next())
+    // Shift points by centroid.
+    LOG_DEBUG_LOCAL("V cols <" << V.cols() << "> rows <" << V.rows() << ">");
+    for (Eigen::MatrixXd::Index i = 0; i < nPoints; i++)
     {
-        V(0, nPoints) = query.x() - meanX;
-        V(1, nPoints) = query.y() - meanY;
-        V(2, nPoints) = query.z() - meanZ;
-        nPoints++;
+        V(0, i) -= meanX;
+        V(1, i) -= meanY;
+        V(2, i) -= meanZ;
     }
 
     // Compute product.
@@ -123,7 +142,7 @@ void SegmentationPca::compute(Query &query,
     max[1] = -bigNumber;
     max[2] = -bigNumber;
     eigenVectorsT = eigenVectors.transpose();
-    for (size_t i = 0; i < nPoints; i++)
+    for (Eigen::MatrixXd::Index i = 0; i < nPoints; i++)
     {
         in[0] = V(0, i);
         in[1] = V(1, i);
