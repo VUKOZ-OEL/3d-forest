@@ -19,6 +19,7 @@
 
 /** @file SegmentationPca.cpp */
 
+#include <LasFile.hpp>
 #include <Log.hpp>
 #include <SegmentationPca.hpp>
 
@@ -46,6 +47,7 @@ void SegmentationPca::compute(Query &query,
     double meanZ = 0;
 
     query.selectBox(cell);
+    query.selectClassifications({LasFile::CLASS_UNASSIGNED});
     query.exec();
 
     while (query.next())
@@ -83,31 +85,24 @@ void SegmentationPca::compute(Query &query,
         return;
     }
 
-    // Get vertices.
-    V.resize(nPoints, 3);
+    // Get vertices shifted by centroid.
+    V.resize(3, nPoints);
 
     query.reset();
     nPoints = 0;
 
     while (query.next())
     {
-        V(nPoints, 0) = query.x();
-        V(nPoints, 1) = query.y();
-        V(nPoints, 2) = query.z();
+        V(0, nPoints) = query.x() - meanX;
+        V(1, nPoints) = query.y() - meanY;
+        V(2, nPoints) = query.z() - meanZ;
         nPoints++;
     }
 
-    // Shift by centroid.
-    for (size_t i = 0; i < nPoints; i++)
-    {
-        V(i, 0) -= meanX;
-        V(i, 1) -= meanY;
-        V(i, 2) -= meanZ;
-    }
-
     // Compute product.
-    const double inv = 1. / static_cast<double>(nPoints);
+    const double inv = 1. / static_cast<double>(nPoints - 1);
     product = inv * V.topRows<3>() * V.topRows<3>().transpose();
+    LOG_DEBUG_LOCAL("product\n" << product);
 
     // Compute Eigen vectors.
     E.compute(product);
@@ -130,9 +125,9 @@ void SegmentationPca::compute(Query &query,
     eigenVectorsT = eigenVectors.transpose();
     for (size_t i = 0; i < nPoints; i++)
     {
-        in[0] = V(i, 0);
-        in[1] = V(i, 1);
-        in[2] = V(i, 2);
+        in[0] = V(0, i);
+        in[1] = V(1, i);
+        in[2] = V(2, i);
 
         out = eigenVectorsT * in;
 
@@ -172,5 +167,6 @@ void SegmentationPca::compute(Query &query,
     {
         const double SFFIx = 100. - (eL * 100. / sum);
         voxel.i = static_cast<float>(SFFIx);
+        LOG_DEBUG_LOCAL("intensity <" << voxel.i << ">");
     }
 }
