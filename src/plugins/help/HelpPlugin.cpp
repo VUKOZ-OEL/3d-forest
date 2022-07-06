@@ -57,7 +57,7 @@ void HelpPlugin::slotAbout()
            "Blue Cat team and other authors\n"
            "https://www.3dforest.eu\n"
            "\n"
-           "Uses delaunator-cpp, eigen, libigl\n"
+           "Uses delaunator-cpp, modified eigen, libigl\n"
            "Uses additional icons https://icons8.com\n"
            "Uses modified ctkRangeSlider, (c) Kitware Inc.\n"
            "\n"
