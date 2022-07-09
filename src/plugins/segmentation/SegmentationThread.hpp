@@ -39,8 +39,8 @@ public:
 
     void clear();
 
-    void start(int voxelSize, int threshold);
-    int progressPercent() const;
+    void start(int voxelSize, int thresholdPercent);
+    int progressPercent() const { return progressPercent_; }
 
     virtual bool compute();
 
@@ -66,10 +66,11 @@ protected:
     int progressPercent_;
 
     int voxelSize_;
-    int threshold_;
+    int thresholdPercent_;
 
     Voxels voxels_;
     SegmentationPca pca_;
+    float thresholdIntensity_;
 
     void setState(State state);
     void updateProgressPercent();

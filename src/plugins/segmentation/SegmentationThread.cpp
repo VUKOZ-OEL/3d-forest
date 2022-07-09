@@ -39,7 +39,8 @@ SegmentationThread::SegmentationThread(Editor *editor)
       progressValue_(0),
       progressPercent_(0),
       voxelSize_(0),
-      threshold_(0)
+      thresholdPercent_(0),
+      thresholdIntensity_(0)
 {
     LOG_DEBUG_LOCAL("");
 }
@@ -56,10 +57,10 @@ void SegmentationThread::clear()
     pca_.clear();
 }
 
-void SegmentationThread::start(int voxelSize, int threshold)
+void SegmentationThread::start(int voxelSize, int thresholdPercent)
 {
-    LOG_DEBUG_LOCAL("voxelSize <" << voxelSize << "> threshold <" << threshold
-                                  << ">");
+    LOG_DEBUG_LOCAL("voxelSize <" << voxelSize << "> threshold <"
+                                  << thresholdPercent << ">");
 
     // Cancel current computation
     cancel();
@@ -71,7 +72,7 @@ void SegmentationThread::start(int voxelSize, int threshold)
     {
         startState = STATE_VOXEL_SIZE;
     }
-    else if (threshold != threshold_)
+    else if (thresholdPercent != thresholdPercent_)
     {
         startState = STATE_THRESHOLD;
     }
@@ -86,7 +87,7 @@ void SegmentationThread::start(int voxelSize, int threshold)
         setState(startState);
 
         voxelSize_ = voxelSize;
-        threshold_ = threshold;
+        thresholdPercent_ = thresholdPercent;
 
         Thread::start();
     }
@@ -176,11 +177,6 @@ void SegmentationThread::updateProgressPercent()
     {
         progressPercent_ = 100;
     }
-}
-
-int SegmentationThread::progressPercent() const
-{
-    return progressPercent_;
 }
 
 void SegmentationThread::computeInitializeLayers()
@@ -274,6 +270,13 @@ bool SegmentationThread::computeVoxelSize()
 
 bool SegmentationThread::computeThreshold()
 {
-    LOG_DEBUG_LOCAL("");
+    float min = pca_.intensityMin();
+    float max = pca_.intensityMax();
+    float thresholdNormalized = static_cast<float>(thresholdPercent_) * 0.01F;
+    thresholdIntensity_ = min + ((max - min) * thresholdNormalized);
+    LOG_DEBUG_LOCAL("threshold <" << thresholdIntensity_ << "> from min <"
+                                  << min << "> max <" << max << "> percent <"
+                                  << thresholdPercent_ << ">");
+    progressPercent_ = 100;
     return true;
 }
