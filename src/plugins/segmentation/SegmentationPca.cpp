@@ -35,6 +35,8 @@ SegmentationPca::SegmentationPca()
 
 void SegmentationPca::clear()
 {
+    intensityMin_ = std::numeric_limits<float>::max();
+    intensityMax_ = std::numeric_limits<float>::min();
 }
 
 void SegmentationPca::compute(Query &query,
@@ -42,14 +44,21 @@ void SegmentationPca::compute(Query &query,
                               const Box<double> &cell,
                               size_t index)
 {
-    // Get vertices and compute voxel centroid.
+    // Get point coordinates in voxel given by 'cell' and compute their
+    // centroid. Initialize centroid.
     double meanX = 0;
     double meanY = 0;
     double meanZ = 0;
 
+    // Initialize point coordinate buffer and reserve memory.
     Eigen::MatrixXd::Index nPoints = 0;
     V.resize(3, 0);
+    if (V.colsCapacity() == 0)
+    {
+        V.reserve(3, SEGMENTATION_PCA_POINT_BUFFER_SIZE);
+    }
 
+    // Select points in 'cell' into point coordinates and centroid.
     query.selectBox(cell);
     query.selectClassifications({LasFile::CLASS_UNASSIGNED});
     query.exec();
@@ -58,14 +67,7 @@ void SegmentationPca::compute(Query &query,
     {
         if (nPoints == V.colsCapacity())
         {
-            if (nPoints == 0)
-            {
-                V.reserve(3, SEGMENTATION_PCA_POINT_BUFFER_SIZE);
-            }
-            else
-            {
-                V.reserve(3, nPoints * 2);
-            }
+            V.reserve(3, nPoints * 2);
         }
 
         V.resize(3, nPoints + 1);
@@ -82,6 +84,7 @@ void SegmentationPca::compute(Query &query,
         nPoints++;
     }
 
+    // Create voxel.
     if (nPoints > 0)
     {
         const double d = static_cast<double>(nPoints);
@@ -109,7 +112,7 @@ void SegmentationPca::compute(Query &query,
         return;
     }
 
-    // Shift points by centroid.
+    // Shift point coordinates by centroid.
     LOG_DEBUG_LOCAL("V cols <" << V.cols() << "> rows <" << V.rows() << ">");
     for (Eigen::MatrixXd::Index i = 0; i < nPoints; i++)
     {
@@ -130,10 +133,9 @@ void SegmentationPca::compute(Query &query,
         eigenVectors.col(i) = E.eigenvectors().col(2 - i);
     }
     eigenVectors.col(2) = eigenVectors.col(0).cross(eigenVectors.col(1));
-
     LOG_DEBUG_LOCAL("eigen vectors\n" << eigenVectors);
 
-    // Project.
+    // Project point coordinates by eigen vectors.
     constexpr double bigNumber = std::numeric_limits<double>::max();
     min[0] = bigNumber;
     min[1] = bigNumber;
@@ -186,6 +188,18 @@ void SegmentationPca::compute(Query &query,
     {
         const double SFFIx = 100. - (eL * 100. / sum);
         voxel.i = static_cast<float>(SFFIx);
-        LOG_DEBUG_LOCAL("intensity <" << voxel.i << ">");
+
+        if (voxel.i < intensityMin_)
+        {
+            intensityMin_ = voxel.i;
+        }
+
+        if (voxel.i > intensityMax_)
+        {
+            intensityMax_ = voxel.i;
+        }
+
+        LOG_DEBUG_LOCAL("intensity <" << voxel.i << "> min <" << intensityMin_
+                                      << "> max <" << intensityMax_ << ">");
     }
 }

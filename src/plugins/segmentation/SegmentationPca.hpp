@@ -51,6 +51,9 @@ public:
                  const Box<double> &cell,
                  size_t index);
 
+    float intensityMin() const { return intensityMin_; }
+    float intensityMax() const { return intensityMax_; }
+
 protected:
     Eigen::MatrixXd V;
     Eigen::Matrix3d product;
@@ -61,6 +64,8 @@ protected:
     Eigen::Vector3d min;
     Eigen::Vector3d max;
     Eigen::SelfAdjointEigenSolver<Eigen::Matrix3d> E;
+    float intensityMin_;
+    float intensityMax_;
 };
 
 #endif /* SEGMENTATION_PCA_HPP */
