@@ -225,6 +225,7 @@ void SegmentationWindow::slotThread(bool finished, int progressPercent)
                                  << progressPercent << ">");
     // in gui thread: update visualization
     mainWindow_->setStatusProgressBarPercent(progressPercent);
+    (void)finished;
 }
 
 void SegmentationWindow::suspendThreads()
