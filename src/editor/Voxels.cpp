@@ -44,6 +44,7 @@ void Voxels::clear()
     voxelSize_.clear();
 
     data_.clear();
+    occupied_.clear();
 
     stack_.clear();
 }

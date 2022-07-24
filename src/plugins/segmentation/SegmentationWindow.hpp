@@ -42,10 +42,10 @@ public:
     virtual void threadProgress(bool finished);
 
 public slots:
-    void slotThread();
+    void slotThread(bool finished, int progressPercent);
 
 signals:
-    void signalThread();
+    void signalThread(bool finished, int progressPercent);
 
 protected slots:
     void slotVoxelSizeFinalValue();

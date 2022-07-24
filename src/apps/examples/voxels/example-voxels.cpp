@@ -46,10 +46,12 @@ void exampleVoxels()
         std::cout << index + 1 << "/" << voxels.size() << " [" << x << ", " << y
                   << ", " << z << "] " << cell << std::endl;
 
-        voxels.at(x, y, z).x = 0;
-        voxels.at(x, y, z).y = 0;
-        voxels.at(x, y, z).z = 0;
-        voxels.at(x, y, z).i = 0;
+        Voxels::Voxel &voxel = voxels.at(x, y, z);
+        voxel.x = 0;
+        voxel.y = 0;
+        voxel.z = 0;
+        voxel.i = 0;
+        voxel.state = 0;
     }
 }
 

@@ -39,8 +39,8 @@ public:
 
     void clear();
 
-    void start(int voxelSize, int threshold);
-    int progressPercent() const;
+    void start(int voxelSize, int thresholdPercent);
+    int progressPercent() const { return progressPercent_; }
 
     virtual bool compute();
 
@@ -52,6 +52,7 @@ protected:
     {
         STATE_VOXEL_SIZE,
         STATE_THRESHOLD,
+        STATE_MERGE_CLUSTERS,
         STATE_FINISHED,
     };
 
@@ -66,16 +67,18 @@ protected:
     int progressPercent_;
 
     int voxelSize_;
-    int threshold_;
+    int thresholdPercent_;
 
     Voxels voxels_;
     SegmentationPca pca_;
+    float thresholdIntensity_;
 
     void setState(State state);
     void updateProgressPercent();
     void computeInitializeLayers();
     bool computeVoxelSize();
     bool computeThreshold();
+    bool computeMergeClusters();
 };
 
 #endif /* SEGMENTATION_THREAD_HPP */

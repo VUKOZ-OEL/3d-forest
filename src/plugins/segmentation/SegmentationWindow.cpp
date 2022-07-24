@@ -33,6 +33,7 @@
 #include <QVBoxLayout>
 
 #define ICON(name) (ThemeIcon(":/segmentation/", name))
+
 #define LOG_DEBUG_LOCAL(msg)
 //#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("SegmentationWindow", msg)
 
@@ -134,9 +135,9 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
 
     // Connect worker thread to gui thread
     connect(this,
-            SIGNAL(signalThread()),
+            SIGNAL(signalThread(bool, int)),
             this,
-            SLOT(slotThread()),
+            SLOT(slotThread(bool, int)),
             Qt::QueuedConnection);
 
     segmentationThread_.setCallback(this);
@@ -213,18 +214,18 @@ void SegmentationWindow::closeEvent(QCloseEvent *event)
 
 void SegmentationWindow::threadProgress(bool finished)
 {
-    (void)finished;
     LOG_DEBUG_LOCAL("finished <" << finished << ">");
     // in worker thread: notify gui thread
-    emit signalThread();
+    emit signalThread(finished, segmentationThread_.progressPercent());
 }
 
-void SegmentationWindow::slotThread()
+void SegmentationWindow::slotThread(bool finished, int progressPercent)
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL("finished <" << finished << "> progress <"
+                                 << progressPercent << ">");
     // in gui thread: update visualization
-    mainWindow_->setStatusProgressBarPercent(
-        segmentationThread_.progressPercent());
+    mainWindow_->setStatusProgressBarPercent(progressPercent);
+    (void)finished;
 }
 
 void SegmentationWindow::suspendThreads()

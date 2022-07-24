@@ -17,10 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationPca.hpp */
-
-#ifndef SEGMENTATION_PCA_HPP
-#define SEGMENTATION_PCA_HPP
+/** @file example-voxels.cpp @brief Voxels example. */
 
 // Ignore compiler warnings from Eigen 3rd party library.
 #if ((__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2)) ||               \
@@ -33,39 +30,38 @@
 #endif
 
 #include <Eigen/Core>
-#include <Eigen/Eigenvalues>
 
-#include <Query.hpp>
-#include <Voxels.hpp>
+#include <Error.hpp>
+#include <Log.hpp>
 
-/** Segmentation PCA. */
-class SegmentationPca
+static void print(const Eigen::MatrixXd &V)
 {
-public:
-    SegmentationPca();
+    std::cout << "matrix " << V.rows() << " x " << V.cols() << " ("
+              << V.rowsCapacity() << " x " << V.colsCapacity() << ") data "
+              << V.data() << std::endl;
+}
 
-    void clear();
-
-    void compute(Query &query,
-                 Voxels &voxels,
-                 const Box<double> &cell,
-                 size_t index);
-
-    float intensityMin() const { return intensityMin_; }
-    float intensityMax() const { return intensityMax_; }
-
-protected:
+static void exampleEigenMatrixResize()
+{
     Eigen::MatrixXd V;
-    Eigen::Matrix3d product;
-    Eigen::Matrix3d eigenVectors;
-    Eigen::Matrix3d eigenVectorsT;
-    Eigen::Vector3d in;
-    Eigen::Vector3d out;
-    Eigen::Vector3d min;
-    Eigen::Vector3d max;
-    Eigen::SelfAdjointEigenSolver<Eigen::Matrix3d> E;
-    float intensityMin_;
-    float intensityMax_;
-};
 
-#endif /* SEGMENTATION_PCA_HPP */
+    V.resize(3, 4);
+    print(V);
+    V.resize(3, 8);
+    print(V);
+}
+
+int main()
+{
+    try
+    {
+        exampleEigenMatrixResize();
+    }
+    catch (std::exception &e)
+    {
+        std::cerr << "error: " << e.what() << std::endl;
+        return 1;
+    }
+
+    return 0;
+}
