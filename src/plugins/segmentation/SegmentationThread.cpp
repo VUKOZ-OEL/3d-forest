@@ -119,6 +119,14 @@ bool SegmentationThread::compute()
         bool finishedState = computeThreshold();
         if (finishedState)
         {
+            setState(STATE_MERGE_CLUSTERS);
+        }
+    }
+    else if (state_ == STATE_MERGE_CLUSTERS)
+    {
+        bool finishedState = computeMergeClusters();
+        if (finishedState)
+        {
             setState(STATE_FINISHED);
         }
     }
@@ -278,5 +286,26 @@ bool SegmentationThread::computeThreshold()
                                   << min << "> max <" << max << "> percent <"
                                   << thresholdPercent_ << ">");
     progressPercent_ = 100;
+    return true;
+}
+
+bool SegmentationThread::computeMergeClusters()
+{
+    LOG_DEBUG_LOCAL("");
+
+    double timeBegin = getRealTime();
+
+    // Initialization
+    if (!stateInitialized_)
+    {
+        progressMax_ = voxels_.size();
+        progressValue_ = 0;
+        stateInitialized_ = true;
+    }
+
+    // Next step
+
+    progressPercent_ = 100;
+
     return true;
 }

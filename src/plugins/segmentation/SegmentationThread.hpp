@@ -52,6 +52,7 @@ protected:
     {
         STATE_VOXEL_SIZE,
         STATE_THRESHOLD,
+        STATE_MERGE_CLUSTERS,
         STATE_FINISHED,
     };
 
@@ -77,6 +78,7 @@ protected:
     void computeInitializeLayers();
     bool computeVoxelSize();
     bool computeThreshold();
+    bool computeMergeClusters();
 };
 
 #endif /* SEGMENTATION_THREAD_HPP */
