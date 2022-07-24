@@ -26,7 +26,7 @@
 #define LOG_DEBUG_LOCAL(msg)
 //#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("SegmentationPca", msg)
 
-#define SEGMENTATION_PCA_POINT_BUFFER_SIZE 2000
+#define SEGMENTATION_PCA_POINT_BUFFER_SIZE 8192
 
 SegmentationPca::SegmentationPca()
 {
@@ -45,18 +45,20 @@ void SegmentationPca::compute(Query &query,
                               size_t index)
 {
     // Get point coordinates in voxel given by 'cell' and compute their
-    // centroid. Initialize centroid.
+    // centroid.
+    double x = 0;
+    double y = 0;
+    double z = 0;
+
+    // Initialize centroid.
     double meanX = 0;
     double meanY = 0;
     double meanZ = 0;
 
     // Initialize point coordinate buffer and reserve memory.
     Eigen::MatrixXd::Index nPoints = 0;
-    V.resize(3, 0);
-    if (V.colsCapacity() == 0)
-    {
-        V.reserve(3, SEGMENTATION_PCA_POINT_BUFFER_SIZE);
-    }
+
+    V.resize(3, SEGMENTATION_PCA_POINT_BUFFER_SIZE);
 
     // Select points in 'cell' into point coordinates and centroid.
     query.selectBox(cell);
@@ -65,24 +67,27 @@ void SegmentationPca::compute(Query &query,
 
     while (query.next())
     {
-        if (nPoints == V.colsCapacity())
+        if (nPoints == V.cols())
         {
-            V.reserve(3, nPoints * 2);
+            V.resize(3, nPoints * 2);
         }
 
-        V.resize(3, nPoints + 1);
+        x = query.x();
+        meanX += x;
+        V(0, nPoints) = x;
 
-        meanX += query.x();
-        V(0, nPoints) = query.x();
+        y = query.y();
+        meanY += y;
+        V(1, nPoints) = y;
 
-        meanY += query.y();
-        V(1, nPoints) = query.y();
-
-        meanZ += query.z();
-        V(2, nPoints) = query.z();
+        z = query.z();
+        meanZ += z;
+        V(2, nPoints) = z;
 
         nPoints++;
     }
+
+    V.resize(3, nPoints);
 
     // Create voxel.
     if (nPoints > 0)
@@ -105,6 +110,7 @@ void SegmentationPca::compute(Query &query,
     voxel.y = static_cast<float>(meanY);
     voxel.z = static_cast<float>(meanZ);
     voxel.i = 0;
+    voxel.state = 0;
 
     // Enough points for PCA?
     if (nPoints < 3)
