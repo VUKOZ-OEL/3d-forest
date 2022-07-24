@@ -35,6 +35,7 @@ public:
         float y;
         float z;
         float i;
+        uint32_t state;
     };
 
     Voxels();
@@ -64,6 +65,12 @@ public:
 
     Voxel &at(size_t index) { return data_[index]; }
 
+    // Occupied
+    void addOccupied(size_t index) { occupied_.push_back(index); }
+    size_t occupiedSize() const { return occupied_.size(); }
+    size_t occupied(size_t index) const { return occupied_[index]; }
+    const size_t *occupiedData() const { return occupied_.data(); }
+
 protected:
     Box<double> spaceRegion_;
     double voxelSizeInput_;
@@ -74,6 +81,7 @@ protected:
     size_t nz_;
     Vector3<double> voxelSize_;
     std::vector<Voxel> data_;
+    std::vector<size_t> occupied_;
 
     std::vector<Box<size_t>> stack_;
 
