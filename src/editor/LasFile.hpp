@@ -25,6 +25,7 @@
 #include <ExportEditor.hpp>
 #include <File.hpp>
 #include <Json.hpp>
+#include <array>
 
 /** LAS (LASer) File Format. */
 class EXPORT_EDITOR LasFile
@@ -183,8 +184,8 @@ public:
 
     static void create(const std::string &path,
                        const std::vector<LasFile::Point> &points,
-                       const std::array<double, 3> &scale = {1, 1, 1},
-                       const std::array<double, 3> &offset = {0, 0, 0},
+                       const std::array<double, 3> scale = {1, 1, 1},
+                       const std::array<double, 3> offset = {0, 0, 0},
                        uint8_t version_minor = 4);
 
     void open(const std::string &path);

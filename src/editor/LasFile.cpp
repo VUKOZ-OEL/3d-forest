@@ -206,8 +206,8 @@ LasFile::~LasFile()
 
 void LasFile::create(const std::string &path,
                      const std::vector<LasFile::Point> &points,
-                     const std::array<double, 3> &scale,
-                     const std::array<double, 3> &offset,
+                     const std::array<double, 3> scale,
+                     const std::array<double, 3> offset,
                      uint8_t version_minor)
 {
     // Fill header
