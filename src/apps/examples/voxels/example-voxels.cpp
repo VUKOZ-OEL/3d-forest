@@ -25,7 +25,7 @@
 #include <Time.hpp>
 #include <Voxels.hpp>
 
-void exampleVoxels()
+static void exampleVoxels()
 {
     Box<double> spaceRegion(0., 0., 0., 4., 2., 2.);
     double voxelSize = 1.;
