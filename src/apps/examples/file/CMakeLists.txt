@@ -15,15 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-set(SUB_PROJECT_NAME "3d-forest-example-eigen")
+set(SUB_PROJECT_NAME "3d-forest-example-file")
 
-add_executable(${SUB_PROJECT_NAME} exampleEigen.cpp)
-
-target_include_directories(
-    ${SUB_PROJECT_NAME}
-    PUBLIC
-    ../../../../3rdparty/eigen
-)
-
-target_link_libraries(${SUB_PROJECT_NAME} PUBLIC 3dforesteditor)
+add_executable(${SUB_PROJECT_NAME} exampleFile.cpp)
+target_link_libraries(${SUB_PROJECT_NAME} PUBLIC 3dforestcore)
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

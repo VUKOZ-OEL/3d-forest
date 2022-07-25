@@ -17,49 +17,45 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file example-voxels.cpp @brief Voxels example. */
+/** @file exampleEigen.cpp @brief Eigen matrix example. */
 
-#include <Box.hpp>
+// Ignore compiler warnings from Eigen 3rd party library.
+#if ((__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2)) ||               \
+     defined(__clang__))
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wsign-conversion"
+    #pragma GCC diagnostic ignored "-Wconversion"
+    #pragma GCC diagnostic ignored "-Wfloat-equal"
+    #pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
+
+#include <Eigen/Core>
+
 #include <Error.hpp>
 #include <Log.hpp>
-#include <Time.hpp>
-#include <Voxels.hpp>
 
-static void exampleVoxels()
+static void print(const Eigen::MatrixXd &V)
 {
-    Box<double> spaceRegion(0., 0., 0., 4., 2., 2.);
-    double voxelSize = 1.;
+    std::cout << "matrix " << V.rows() << " x " << V.cols() << " ("
+              << V.rowsCapacity() << " x " << V.colsCapacity() << ") data "
+              << V.data() << std::endl;
+}
 
-    Voxels voxels;
+static void exampleEigenMatrixResize()
+{
+    Eigen::MatrixXd V;
 
-    voxels.create(spaceRegion, voxelSize);
-    std::cout << "number of voxels is " << voxels.size() << std::endl;
-
-    Box<double> cell;
-    size_t x;
-    size_t y;
-    size_t z;
-    size_t index;
-
-    while (voxels.next(&cell, &index, &x, &y, &z))
-    {
-        std::cout << index + 1 << "/" << voxels.size() << " [" << x << ", " << y
-                  << ", " << z << "] " << cell << std::endl;
-
-        Voxels::Voxel &voxel = voxels.at(x, y, z);
-        voxel.x = 0;
-        voxel.y = 0;
-        voxel.z = 0;
-        voxel.i = 0;
-        voxel.state = 0;
-    }
+    V.resize(3, 4);
+    print(V);
+    V.resize(3, 8);
+    print(V);
 }
 
 int main()
 {
     try
     {
-        exampleVoxels();
+        exampleEigenMatrixResize();
     }
     catch (std::exception &e)
     {

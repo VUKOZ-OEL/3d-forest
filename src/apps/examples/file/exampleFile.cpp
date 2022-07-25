@@ -17,45 +17,31 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file example-voxels.cpp @brief Voxels example. */
-
-// Ignore compiler warnings from Eigen 3rd party library.
-#if ((__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2)) ||               \
-     defined(__clang__))
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wsign-conversion"
-    #pragma GCC diagnostic ignored "-Wconversion"
-    #pragma GCC diagnostic ignored "-Wfloat-equal"
-    #pragma GCC diagnostic ignored "-Wold-style-cast"
-#endif
-
-#include <Eigen/Core>
+/** @file exampleFile.cpp @brief File example. */
 
 #include <Error.hpp>
+#include <File.hpp>
 #include <Log.hpp>
 
-static void print(const Eigen::MatrixXd &V)
+static void exampleFile(const char *path)
 {
-    std::cout << "matrix " << V.rows() << " x " << V.cols() << " ("
-              << V.rowsCapacity() << " x " << V.colsCapacity() << ") data "
-              << V.data() << std::endl;
+    File f;
+    f.open(path);
+    std::cout << "file <" << path << "> size <" << f.size() << ">" << std::endl;
 }
 
-static void exampleEigenMatrixResize()
+int main(int argc, char *argv[])
 {
-    Eigen::MatrixXd V;
+    const char *path = nullptr;
 
-    V.resize(3, 4);
-    print(V);
-    V.resize(3, 8);
-    print(V);
-}
+    if (argc > 1)
+    {
+        path = argv[1];
+    }
 
-int main()
-{
     try
     {
-        exampleEigenMatrixResize();
+        exampleFile(path);
     }
     catch (std::exception &e)
     {

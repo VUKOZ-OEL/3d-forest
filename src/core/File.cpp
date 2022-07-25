@@ -147,7 +147,6 @@ void File::open(const std::string &path, const std::string &mode)
     int ret;
     int oflag;
     mode_t omode;
-    struct stat st;
 
     // Close
     if (fd_ != INVALID_DESCRIPTOR)
@@ -207,7 +206,14 @@ void File::open(const std::string &path, const std::string &mode)
         THROW_ERRNO("Can't open file '" + path + "'");
     }
 
+#if defined(_MSC_VER)
+    struct _stat64 st;
+    ret = ::_fstat64(fd_, &st);
+#else
+    struct stat st;
     ret = ::fstat(fd_, &st);
+#endif
+
     if (ret != 0)
     {
         THROW_ERRNO("Can't stat file '" + path + "'");
@@ -524,9 +530,15 @@ std::string File::currentPath()
 bool File::exists(const std::string &path)
 {
     int ret;
-    struct stat st;
 
+#if defined(_MSC_VER)
+    struct _stat64 st;
+    ret = ::_stat64(path.c_str(), &st);
+#else
+    struct stat st;
     ret = ::stat(path.c_str(), &st);
+#endif
+
     (void)st;
 
     return ret == 0;
