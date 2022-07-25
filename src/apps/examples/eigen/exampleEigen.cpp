@@ -17,7 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file example-voxels.cpp @brief Voxels example. */
+/** @file exampleEigen.cpp @brief Eigen matrix example. */
 
 // Ignore compiler warnings from Eigen 3rd party library.
 #if ((__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2)) ||               \
