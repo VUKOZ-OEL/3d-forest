@@ -17,7 +17,7 @@
 
 set(SUB_PROJECT_NAME "3d-forest-example-eigen")
 
-add_executable(${SUB_PROJECT_NAME} example-eigen.cpp)
+add_executable(${SUB_PROJECT_NAME} exampleEigen.cpp)
 
 target_include_directories(
     ${SUB_PROJECT_NAME}
