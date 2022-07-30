@@ -25,9 +25,28 @@
 
 static void exampleFile(const char *path)
 {
+    // Open file.
     File f;
     f.open(path);
-    std::cout << "file <" << path << "> size <" << f.size() << ">" << std::endl;
+
+    // Print file size.
+    uint64_t size = f.size();
+    std::cout << "file <" << path << "> size <" << size << ">" << std::endl;
+
+    // Print some values above 32-bit file size.
+    if (size >= 5007881695ULL)
+    {
+        f.seek(5007881680ULL);
+
+        uint8_t buffer[16];
+        f.read(buffer, 16);
+
+        for (size_t i = 0; i < 16; i++)
+        {
+            int value = static_cast<int>(buffer[i]);
+            std::cout << "byte <" << std::hex << value << ">" << std::endl;
+        }
+    }
 }
 
 int main(int argc, char *argv[])
