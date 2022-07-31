@@ -126,7 +126,6 @@ public:
     }
 
     uint32_t &layer() { return layer_[selection_[pagePointIndex_]]; }
-    uint64_t &element() { return element_[selection_[pagePointIndex_]]; }
     /**@}*/
 
     bool nextPage();
@@ -186,7 +185,6 @@ protected:
     float *color_;
     float *userColor_;
     uint32_t *layer_;
-    uint64_t *element_;
 
     uint32_t *selection_;
 
