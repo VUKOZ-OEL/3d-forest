@@ -89,11 +89,6 @@ public:
         This value is stored in Point Data Record extra bytes.
     */
     std::vector<uint32_t> layer;
-
-    /** Element identification numbers.
-        This value is stored in Point Data Record extra bytes.
-    */
-    std::vector<uint64_t> element;
     /**@}*/
 
     /** Index array contains indices to selected points. */

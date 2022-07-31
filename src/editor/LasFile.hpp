@@ -160,7 +160,6 @@ public:
         uint16_t user_intensity;
 
         uint32_t user_elevation; // 11 * 8
-        uint64_t user_element;   // 12 * 8 = 96 B
 
         Json &write(Json &out) const;
     };

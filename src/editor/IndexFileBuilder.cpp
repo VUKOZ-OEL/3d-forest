@@ -121,7 +121,7 @@ void IndexFileBuilder::start(const std::string &outputPath,
 
     settings_ = settings;
     buffer_.resize(settings.bufferSize);
-    bufferOut_.resize(settings.bufferSize * 2);
+    bufferOut_.resize(settings.bufferSize);
 
     // Open files
     inputPath_ = inputPath;
@@ -515,6 +515,11 @@ void IndexFileBuilder::stateCopyPoints()
     step = stepIdx * sizePoint_;
 
     // Buffers
+    if (bufferOut_.size() < sizePointOut_ * stepIdx)
+    {
+        bufferOut_.resize(sizePointOut_ * stepIdx);
+    }
+
     uint64_t start = inputLas_.header.offset_to_point_data;
     uint8_t *in = buffer_.data();
     uint8_t *bufferOut = bufferOut_.data();

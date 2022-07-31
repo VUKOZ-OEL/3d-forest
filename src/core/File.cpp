@@ -245,6 +245,20 @@ void File::close()
 
 int File::seek(int fd, uint64_t offset)
 {
+#if defined(_MSC_VER)
+    if (offset > static_cast<uint64_t>(std::numeric_limits<__int64>::max()))
+    {
+        errno = ERANGE;
+        return -1;
+    }
+
+    __int64 ret;
+    ret = ::_lseeki64(fd, static_cast<__int64>(offset), SEEK_SET);
+    if (ret == -1LL)
+    {
+        return -1;
+    }
+#else
     off_t ret;
 
     if (offset > static_cast<uint64_t>(std::numeric_limits<off_t>::max()))
@@ -258,6 +272,7 @@ int File::seek(int fd, uint64_t offset)
     {
         return -1;
     }
+#endif
 
     return 0;
 }

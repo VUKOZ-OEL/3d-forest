@@ -58,7 +58,6 @@ void Page::clear()
     color.clear();
     userColor.clear();
     layer.clear();
-    element.clear();
 
     renderPosition.clear();
     renderColor.clear();
@@ -83,7 +82,6 @@ void Page::resize(size_t n)
     color.resize(n * 3);
     userColor.resize(n * 3);
     layer.resize(n);
-    element.resize(n);
 
     renderPosition.resize(n * 3);
     renderColor.resize(n * 3);
@@ -174,9 +172,6 @@ void Page::read()
 
         // layer
         layer[i] = point.user_layer;
-
-        // element
-        element[i] = point.user_element;
     }
 
     // Index
@@ -223,9 +218,6 @@ void Page::toPoint(uint8_t *ptr, size_t i, uint8_t fmt)
 
     // Elevation
     htol32(ptr + pos + 12, static_cast<uint32_t>(elevation[i]));
-
-    // Element
-    htol64(ptr + pos + 16, element[i]);
 }
 
 void Page::write()
