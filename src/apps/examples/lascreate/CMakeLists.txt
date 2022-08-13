@@ -17,6 +17,6 @@
 
 set(SUB_PROJECT_NAME "3dforestexamplelascreate")
 
-add_executable(${SUB_PROJECT_NAME} examplelascreate.cpp)
+add_executable(${SUB_PROJECT_NAME} exampleLasCreate.cpp)
 target_link_libraries(${SUB_PROJECT_NAME} PUBLIC 3dforesteditor)
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

@@ -17,7 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file example-voxels.cpp @brief Voxels example. */
+/** @file exampleVoxels.cpp @brief Voxels example. */
 
 #include <Box.hpp>
 #include <Error.hpp>
