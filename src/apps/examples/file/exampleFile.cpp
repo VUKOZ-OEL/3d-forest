@@ -23,44 +23,52 @@
 #include <File.hpp>
 #include <Log.hpp>
 
-static void exampleFile(const char *path)
+#define TEST(cmd) std::cout << #cmd << " <" << (cmd) << ">" << std::endl;
+
+static void exampleFile()
 {
-    // Open file.
-    File f;
-    f.open(path);
+#if defined(_MSC_VER)
+    std::cout << "<_MSC_VER> is defined" << std::endl;
+#else
+    std::cout << "<_MSC_VER> is not defined" << std::endl;
+#endif
 
-    // Print file size.
-    uint64_t size = f.size();
-    std::cout << "file <" << path << "> size <" << size << ">" << std::endl;
+    TEST(File::currentPath());
 
-    // Print some values above 32-bit file size.
-    if (size >= 5007881695ULL)
-    {
-        f.seek(5007881680ULL);
+    TEST(File::isAbsolute("../Documents/file.txt"));
+    TEST(File::isAbsolute("/tmp/file.txt"));
+    TEST(File::isAbsolute("C:\\tmp\\file.txt"));
 
-        uint8_t buffer[16];
-        f.read(buffer, 16);
+    TEST(File::fileName("file.txt"));
+    TEST(File::fileName("/tmp/file.txt"));
+    TEST(File::fileName("/tmp/directory/"));
+    TEST(File::fileName("/"));
+    TEST(File::fileName("C:\\tmp\\file.txt"));
+    TEST(File::fileName("C:\\tmp\\directory\\"));
+    TEST(File::fileName("C:\\"));
+    TEST(File::fileName(""));
 
-        for (size_t i = 0; i < 16; i++)
-        {
-            int value = static_cast<int>(buffer[i]);
-            std::cout << "byte <" << std::hex << value << ">" << std::endl;
-        }
-    }
+    TEST(File::fileExtension("file.txt"));
+    TEST(File::fileExtension("/tmp/file.txt"));
+    TEST(File::fileExtension("/tmp/directory/"));
+    TEST(File::fileExtension(""));
+
+    TEST(File::replaceFileName("file.txt", "data.xml"));
+    TEST(File::replaceFileName("/tmp/file.txt", "data.xml"));
+    TEST(File::replaceFileName("/tmp/directory/", "data.xml"));
+    TEST(File::replaceFileName("", "data.xml"));
+
+    TEST(File::replaceExtension("file.txt", ".xml"));
+    TEST(File::replaceExtension("/tmp/file.txt", ".xml"));
+    TEST(File::replaceExtension("/tmp/directory/", ".xml"));
+    TEST(File::replaceExtension("", ".xml"));
 }
 
-int main(int argc, char *argv[])
+int main()
 {
-    const char *path = nullptr;
-
-    if (argc > 1)
-    {
-        path = argv[1];
-    }
-
     try
     {
-        exampleFile(path);
+        exampleFile();
     }
     catch (std::exception &e)
     {
