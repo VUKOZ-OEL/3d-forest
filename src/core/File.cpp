@@ -24,8 +24,8 @@
 #include <cstdio>
 #include <cstdlib>
 #include <fcntl.h>
-#include <filesystem>
 #include <iostream>
+#include <limits>
 #include <sys/types.h>
 
 #if defined(_MSC_VER)
@@ -47,6 +47,8 @@
     #include <io.h>
     #define ssize_t int64_t
 typedef unsigned short mode_t;
+    #include <limits.h>
+    #include <windows.h>
 #else
     #include <sys/stat.h>
     #include <unistd.h>
@@ -246,7 +248,7 @@ void File::close()
 int File::seek(int fd, uint64_t offset)
 {
 #if defined(_MSC_VER)
-    if (offset > static_cast<uint64_t>(std::numeric_limits<__int64>::max()))
+    if (offset > static_cast<uint64_t>((std::numeric_limits<__int64>::max)()))
     {
         errno = ERANGE;
         return -1;
@@ -461,7 +463,7 @@ void File::write(const uint8_t *buffer,
 
 void File::write(File &input, uint64_t nbyte)
 {
-    const size_t buffer_size = 1024 * 1024;
+    const size_t buffer_size = 1048576U;
     std::vector<uint8_t> buffer;
     size_t n;
 
@@ -539,7 +541,32 @@ int File::write(int fd, const uint8_t *buffer, uint64_t nbyte)
 
 std::string File::currentPath()
 {
-    return std::filesystem::current_path().string();
+    char buffer[8192];
+
+#if defined(_MSC_VER)
+    DWORD len = static_cast<DWORD>(sizeof(buffer));
+    len = GetCurrentDirectoryA(len, buffer);
+    if (len == 0)
+    {
+        THROW_LAST_ERROR("Cannot get current working directory");
+    }
+#else
+    char *pathname = ::getcwd(buffer, sizeof(buffer));
+    if (!pathname)
+    {
+        THROW_ERRNO("Cannot get current working directory");
+    }
+#endif
+
+    std::string path(buffer);
+    if (path.size() > 2 && path[1] == ':')
+    {
+        return path + "\\";
+    }
+    else
+    {
+        return path + "/";
+    }
 }
 
 bool File::exists(const std::string &path)
@@ -561,36 +588,121 @@ bool File::exists(const std::string &path)
 
 bool File::isAbsolute(const std::string &path)
 {
-    std::filesystem::path fsPath(path);
-    return fsPath.is_absolute();
+#if defined(_MSC_VER) || defined(__MINGW32__)
+    if (path.size() > 2)
+    {
+        return path[1] == ':'; // path="C:\Users\user" or "C:\"
+    }
+#else
+    if (path.size() > 0)
+    {
+        return path[0] == '/'; // path="/home/user" or "/"
+    }
+#endif
+
+    return false;
 }
 
 std::string File::fileName(const std::string &path)
 {
-    std::filesystem::path fsPath(path);
-    return fsPath.filename().string();
+    size_t i = path.size();
+    if (i > 0)
+    {
+        i--;
+
+        // Find last '/'
+        while (i > 0)
+        {
+            if (path[i] == '/' || path[i] == '\\')
+            {
+                return path.substr(i + 1);
+            }
+
+            i--;
+        }
+
+        return path.substr(i);
+    }
+
+    return "";
 }
 
 std::string File::fileExtension(const std::string &path)
 {
-    std::filesystem::path fsPath(path);
-    return fsPath.extension().string();
+    size_t i = path.size();
+    if (i > 0)
+    {
+        i--;
+
+        // Find last '.'
+        while (i > 0)
+        {
+            if (path[i] == '/' || path[i] == '\\')
+            {
+                return "";
+            }
+
+            if (path[i] == '.')
+            {
+                return path.substr(i + 1);
+            }
+
+            i--;
+        }
+    }
+
+    return "";
 }
 
 std::string File::replaceFileName(const std::string &path,
                                   const std::string &newFileName)
 {
-    std::filesystem::path fsPath(path);
-    fsPath.replace_filename(newFileName);
-    return fsPath.string();
+    size_t i = path.size();
+    if (i > 0)
+    {
+        i--;
+
+        // Find last '/'
+        while (i > 0)
+        {
+            if (path[i] == '/' || path[i] == '\\')
+            {
+                return path.substr(0, i + 1) + newFileName;
+            }
+
+            i--;
+        }
+    }
+
+    return newFileName;
 }
 
 std::string File::replaceExtension(const std::string &path,
                                    const std::string &newExtension)
 {
-    std::filesystem::path fsPath(path);
-    fsPath.replace_extension(newExtension);
-    return fsPath.string();
+    size_t i = path.size();
+    if (i > 0)
+    {
+        i--;
+
+        // Find last '.'
+        while (i > 0)
+        {
+            if (path[i] == '/' || path[i] == '\\')
+            {
+                return path + newExtension;
+            }
+
+            if (path[i] == '.')
+            {
+                return path.substr(0, i) + newExtension;
+            }
+
+            i--;
+        }
+    }
+
+    return path + newExtension;
 }
 
 std::string File::resolvePath(const std::string &path,
@@ -662,21 +774,31 @@ void File::move(const std::string &outputPath, const std::string &inputPath)
         return;
     }
 
-    if (!std::filesystem::exists(inputPath))
+    if (!File::exists(inputPath))
     {
         THROW("Cannot move: File '" + inputPath + "' doesn't exist");
     }
-    if (std::filesystem::exists(outputPath))
+
+    File::remove(outputPath);
+
+    int error = ::rename(inputPath.c_str(), outputPath.c_str());
+    if (error != 0)
     {
-        (void)std::filesystem::remove(outputPath);
+        THROW_ERRNO("Cannot move file '" + inputPath + "'");
     }
-    std::filesystem::rename(inputPath, outputPath);
 }
 
 void File::remove(const std::string &path)
 {
-    if (std::filesystem::exists(path))
+    if (!File::exists(path))
     {
-        (void)std::filesystem::remove(path);
+        // Nothing to remove
+        return;
+    }
+
+    int error = ::unlink(path.c_str());
+    if (error != 0)
+    {
+        THROW_ERRNO("Cannot remove file '" + path + "'");
     }
 }

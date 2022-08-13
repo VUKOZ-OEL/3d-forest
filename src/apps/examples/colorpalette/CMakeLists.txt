@@ -17,6 +17,6 @@
 
 set(SUB_PROJECT_NAME "3dforestexamplecolorpalette")
 
-add_executable(${SUB_PROJECT_NAME} examplecolorpalette.cpp)
+add_executable(${SUB_PROJECT_NAME} exampleColorPalette.cpp)
 target_link_libraries(${SUB_PROJECT_NAME} PUBLIC 3dforesteditor)
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

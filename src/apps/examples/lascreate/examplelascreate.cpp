@@ -17,7 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file examplelascreate.cpp @brief Create LAS file. */
+/** @file exampleLasCreate.cpp @brief Create LAS file. */
 
 #include <cstring>
 

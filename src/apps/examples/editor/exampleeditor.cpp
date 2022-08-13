@@ -17,7 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file exampleeditor.cpp @brief Editor example. */
+/** @file exampleEditor.cpp @brief Editor example. */
 
 #include <cstring>
 
@@ -54,7 +54,7 @@ static void createDataSet()
     IndexFileBuilder::index(PATH_1, PATH_1, settings);
 }
 
-static void edit()
+static void exampleEditor()
 {
     Editor db;
     db.open(PATH_1);
@@ -81,7 +81,7 @@ int main()
     try
     {
         createDataSet();
-        edit();
+        exampleEditor();
     }
     catch (std::exception &e)
     {

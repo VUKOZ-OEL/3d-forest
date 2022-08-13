@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-set(SUB_PROJECT_NAME "3dforestexamplelascreate")
+set(SUB_PROJECT_NAME "3dforestexamplefilesize")
 
-add_executable(${SUB_PROJECT_NAME} exampleLasCreate.cpp)
-target_link_libraries(${SUB_PROJECT_NAME} PUBLIC 3dforesteditor)
+add_executable(${SUB_PROJECT_NAME} exampleFileSize.cpp)
+target_link_libraries(${SUB_PROJECT_NAME} PUBLIC 3dforestcore)
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

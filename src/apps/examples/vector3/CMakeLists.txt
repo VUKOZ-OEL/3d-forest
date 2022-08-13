@@ -17,7 +17,7 @@
 
 set(SUB_PROJECT_NAME "3dforestexamplevector3")
 
-add_executable(${SUB_PROJECT_NAME} examplevector3.cpp)
+add_executable(${SUB_PROJECT_NAME} exampleVector3.cpp)
 target_link_libraries(${SUB_PROJECT_NAME} PUBLIC 3dforestcore)
 
 set_target_properties(

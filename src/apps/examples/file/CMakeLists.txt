@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-set(SUB_PROJECT_NAME "3d-forest-example-file")
+set(SUB_PROJECT_NAME "3dforestexamplefile")
 
 add_executable(${SUB_PROJECT_NAME} exampleFile.cpp)
 target_link_libraries(${SUB_PROJECT_NAME} PUBLIC 3dforestcore)

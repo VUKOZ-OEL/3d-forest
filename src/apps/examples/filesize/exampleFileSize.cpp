@@ -17,49 +17,50 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file example-voxels.cpp @brief Voxels example. */
+/** @file exampleFileSize.cpp @brief File size example. */
 
-#include <Box.hpp>
 #include <Error.hpp>
+#include <File.hpp>
 #include <Log.hpp>
-#include <Time.hpp>
-#include <Voxels.hpp>
 
-static void exampleVoxels()
+static void exampleFileSize(const char *path)
 {
-    Box<double> spaceRegion(0., 0., 0., 4., 2., 2.);
-    double voxelSize = 1.;
+    // Open file.
+    File f;
+    f.open(path);
 
-    Voxels voxels;
+    // Print file size.
+    uint64_t size = f.size();
+    std::cout << "file <" << path << "> size <" << size << ">" << std::endl;
 
-    voxels.create(spaceRegion, voxelSize);
-    std::cout << "number of voxels is " << voxels.size() << std::endl;
-
-    Box<double> cell;
-    size_t x;
-    size_t y;
-    size_t z;
-    size_t index;
-
-    while (voxels.next(&cell, &index, &x, &y, &z))
+    // Print some values above 32-bit file size.
+    if (size >= 5007881695ULL)
     {
-        std::cout << index + 1 << "/" << voxels.size() << " [" << x << ", " << y
-                  << ", " << z << "] " << cell << std::endl;
+        f.seek(5007881680ULL);
 
-        Voxels::Voxel &voxel = voxels.at(x, y, z);
-        voxel.x = 0;
-        voxel.y = 0;
-        voxel.z = 0;
-        voxel.i = 0;
-        voxel.state = 0;
+        uint8_t buffer[16];
+        f.read(buffer, 16);
+
+        for (size_t i = 0; i < 16; i++)
+        {
+            int value = static_cast<int>(buffer[i]);
+            std::cout << "byte <" << std::hex << value << ">" << std::endl;
+        }
     }
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+    const char *path = nullptr;
+
+    if (argc > 1)
+    {
+        path = argv[1];
+    }
+
     try
     {
-        exampleVoxels();
+        exampleFileSize(path);
     }
     catch (std::exception &e)
     {

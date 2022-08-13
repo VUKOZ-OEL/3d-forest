@@ -19,7 +19,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     message(STATUS "Clang compiler detected, adding compile flags")
     set(CLANG_COMPILE_FLAGS "\
 -D_FILE_OFFSET_BITS=64 \
--std=c++14 \
+-std=c++17 \
 -pedantic -Wall -Wextra"
     )
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_COMPILE_FLAGS}")
