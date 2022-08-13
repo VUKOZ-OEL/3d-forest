@@ -30,6 +30,7 @@ See [INSTALL](INSTALL) for more information.
 - [Windows MinGW](https://vukoz-oel.github.io/3d-forest-documentation/3d-forest-developer-guide.html#build-windows-make) build from source code
 - [Windows Visual Studio](https://vukoz-oel.github.io/3d-forest-documentation/3d-forest-developer-guide.html#build-windows-visual-studio) build from source code
 - [Linux](https://vukoz-oel.github.io/3d-forest-documentation/3d-forest-developer-guide.html#build-linux-make) build from source code
+- [macOS / Mac OS X](https://vukoz-oel.github.io/3d-forest-documentation/3d-forest-developer-guide.html#build-macos-make) build from source code
 
 ## Third-Party Libraries
 3D Forest source code includes several third-party libraries which are stored
