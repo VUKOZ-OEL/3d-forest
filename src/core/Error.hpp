@@ -30,8 +30,11 @@
 /** Throw std exception. */
 #define THROW(msg) throw std::runtime_error(msg)
 
-/** Throw std exception with the last error. */
+/** Throw std exception with the last error for POSIX functions. */
 #define THROW_ERRNO(msg) throw std::runtime_error(getErrorString(msg))
+
+/** Throw std exception with GetLastError for Windows functions. */
+#define THROW_LAST_ERROR(msg) throw std::runtime_error(getErrorStringWin(msg))
 
 /** Get error string for given error number. */
 std::string EXPORT_CORE getErrorString(int errnum);
@@ -39,7 +42,10 @@ std::string EXPORT_CORE getErrorString(int errnum);
 /** Get the last error string. */
 std::string EXPORT_CORE getErrorString();
 
-/** Get the last error string with extra description. */
+/** Get the last error string with extra description for POSIX functions. */
 std::string EXPORT_CORE getErrorString(const std::string &message);
+
+/** Get the last error string with extra description for Windows functions. */
+std::string EXPORT_CORE getErrorStringWin(const std::string &message);
 
 #endif /* ERROR_HPP */

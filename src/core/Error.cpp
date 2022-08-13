@@ -22,6 +22,12 @@
 #include <cerrno>
 #include <cstdio>
 
+#if defined(_MSC_VER)
+    #include <iomanip>
+    #include <sstream>
+    #include <windows.h>
+#endif
+
 #include <Error.hpp>
 
 std::string getErrorString(int errnum)
@@ -48,4 +54,30 @@ std::string getErrorString()
 std::string getErrorString(const std::string &message)
 {
     return message + ": " + getErrorString();
+}
+
+std::string getErrorStringWin(const std::string &message)
+{
+#if defined(_MSC_VER)
+    LPTSTR errorText = NULL;
+    DWORD error = GetLastError();
+
+    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                      FORMAT_MESSAGE_IGNORE_INSERTS,
+                  NULL,
+                  error,
+                  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                  (LPTSTR)&errorText,
+                  0,
+                  NULL);
+
+    std::stringstream errorStream;
+    errorStream << ": error code 0x" << std::hex << error << ": " << errorText;
+
+    LocalFree(errorText);
+
+    return message + errorStream.str();
+#else
+    return message;
+#endif
 }
