@@ -19,6 +19,8 @@
 
 /** @file Json.cpp */
 
+#include <cmath>
+
 #include <File.hpp>
 #include <Json.hpp>
 
@@ -210,7 +212,7 @@ void Json::serialize(std::ostringstream &out,
         case TYPE_NUMBER:
             num = static_cast<uint64_t>(data_.number);
             numd = static_cast<double>(num);
-            if (std::abs(data_.number - numd) > e)
+            if (::fabs(data_.number - numd) > e)
             {
                 out << std::fixed << data_.number << std::defaultfloat;
             }
