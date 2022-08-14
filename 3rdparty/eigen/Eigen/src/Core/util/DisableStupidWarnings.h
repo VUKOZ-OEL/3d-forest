@@ -1,3 +1,6 @@
+// Modifications Copyright 2020-present VUKOZ
+// Commented out clang "-Wimplicit-int-float-conversion"
+
 #ifndef EIGEN_WARNINGS_DISABLED
 #define EIGEN_WARNINGS_DISABLED
 
@@ -44,9 +47,9 @@
   #if __clang_major__ >= 3 && __clang_minor__ >= 5
     #pragma clang diagnostic ignored "-Wabsolute-value"
   #endif
-  #if __clang_major__ >= 10
-    #pragma clang diagnostic ignored "-Wimplicit-int-float-conversion"
-  #endif
+  //#if __clang_major__ >= 10
+  //  #pragma clang diagnostic ignored "-Wimplicit-int-float-conversion"
+  //#endif
   #if ( defined(__ALTIVEC__) || defined(__VSX__) ) && __cplusplus < 201103L
     // warning: generic selections are a C11-specific feature
     // ignoring warnings thrown at vec_ctf in Altivec/PacketMath.h
