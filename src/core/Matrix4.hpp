@@ -401,6 +401,8 @@ inline void Matrix4<T>::perspective(T fovy, T aspect, T near, T far)
 
     data_[0][0] = f / aspect;
     data_[1][1] = f;
+    (void)near;
+    (void)far;
     // data_[2][2] = (far + near) / (near - far);
     // data_[3][2] = (2 * far * near) / (near - far);
     data_[2][3] = -1;
@@ -412,6 +414,8 @@ inline void Matrix4<T>::ortho(T left, T right, T bottom, T top, T near, T far)
 {
     data_[0][0] = 2 / (right - left);
     data_[1][1] = 2 / (top - bottom);
+    (void)near;
+    (void)far;
     // data_[2][2] = -2 / (far - near);
     data_[3][0] = -((right + left) / (right - left));
     data_[3][1] = -((top + bottom) / (top - bottom));

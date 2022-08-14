@@ -87,7 +87,7 @@ public:
 
     void suspendThreads();
     void resumeThreads();
-    virtual void threadProgress(bool finished);
+    virtual void threadProgress(bool finished) override;
 
     void updateEverything();
     void updateData();

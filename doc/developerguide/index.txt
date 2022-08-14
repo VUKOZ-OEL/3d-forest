@@ -222,9 +222,14 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
       @verbatim
         > mkdir build
         > cd build
-        > /Applications/CMake.app/Contents/bin/cmake -G "Unix Makefiles" .. -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_PREFIX_PATH=/Users/user/Qt/5.15.2/clang_64
+        > /Applications/CMake.app/Contents/bin/cmake -G "Unix Makefiles" .. -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_PREFIX_PATH=/Users/user/Qt/5.15.2/clang_64 -DCMAKE_BUILD_TYPE=Debug -DBUILD_EXAMPLES=ON -DFORCE_QT5=ON
         > make
         > make install
+      @endverbatim
+    - Run file example:
+      @verbatim
+        > cd /Users/user/Documents/3d-forest/bin
+        > DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/Users/user/Documents/3d-forest/bin ./3dforestexamplefile
       @endverbatim
 
 
