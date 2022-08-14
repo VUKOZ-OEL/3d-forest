@@ -44,7 +44,7 @@ target_include_directories(
 target_link_libraries(
     ${SUB_PROJECT_NAME}
     3dforestgui
-    Qt${QT_VERSION_MAJOR}::Help
+#    Qt${QT_VERSION_MAJOR}::Help
 )
 
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)
