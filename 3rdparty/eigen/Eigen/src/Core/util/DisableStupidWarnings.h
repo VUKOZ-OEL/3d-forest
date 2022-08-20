@@ -1,5 +1,6 @@
 // Modifications Copyright 2020-present VUKOZ
 // Commented out clang "-Wimplicit-int-float-conversion"
+// Disabled useful "-Wsign-conversion", "-Wconversion", "-Wfloat-equal", and  "-Wold-style-cast"
 
 #ifndef EIGEN_WARNINGS_DISABLED
 #define EIGEN_WARNINGS_DISABLED
@@ -42,6 +43,12 @@
   //     this is really a stupid warning as it warns on compile-time expressions involving enums
   #ifndef EIGEN_PERMANENTLY_DISABLE_STUPID_WARNINGS
     #pragma clang diagnostic push
+
+    // The following warnings are unfortunately useful, they can detect bugs and exploits
+    #pragma GCC diagnostic ignored "-Wsign-conversion"
+    #pragma GCC diagnostic ignored "-Wconversion"
+    #pragma GCC diagnostic ignored "-Wfloat-equal"
+    #pragma GCC diagnostic ignored "-Wold-style-cast"
   #endif
   #pragma clang diagnostic ignored "-Wconstant-logical-operand"
   #if __clang_major__ >= 3 && __clang_minor__ >= 5
@@ -60,6 +67,12 @@
 
   #if (!defined(EIGEN_PERMANENTLY_DISABLE_STUPID_WARNINGS)) &&  (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6))
     #pragma GCC diagnostic push
+
+    // The following warnings are unfortunately useful, they can detect bugs and exploits
+    #pragma GCC diagnostic ignored "-Wsign-conversion"
+    #pragma GCC diagnostic ignored "-Wconversion"
+    #pragma GCC diagnostic ignored "-Wfloat-equal"
+    #pragma GCC diagnostic ignored "-Wold-style-cast"
   #endif
   // g++ warns about local variables shadowing member functions, which is too strict
   #pragma GCC diagnostic ignored "-Wshadow"

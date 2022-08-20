@@ -19,16 +19,6 @@
 
 /** @file exampleEigen.cpp @brief Eigen matrix example. */
 
-// Ignore compiler warnings from Eigen 3rd party library.
-#if ((__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2)) ||               \
-     defined(__clang__))
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wsign-conversion"
-    #pragma GCC diagnostic ignored "-Wconversion"
-    #pragma GCC diagnostic ignored "-Wfloat-equal"
-    #pragma GCC diagnostic ignored "-Wold-style-cast"
-#endif
-
 #include <Eigen/Core>
 
 #include <Error.hpp>
