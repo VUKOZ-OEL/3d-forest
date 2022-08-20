@@ -419,6 +419,8 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
 The code uses C++17, CMake, Qt5/Qt6 and OpenGL which will be installed in the
 following steps. Qt and OpenGL are required only for GUI desktop application.
 
+@image html 3d-forest-windows-visual-studio-debug.png "3D Forest application in Visual Studio Debug"
+
 @subsection build-windows-visual-studio-git Install git
     - Open "Git for windows" https://git-scm.com/downloads
     - Download installer Git-2.36.1-64-bit.exe
@@ -508,7 +510,8 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
 @subsection build-windows-visual-studio-3dforest Build 3D Forest
     - Open directory "3d-forest" in Visual Studio. This will automatically 
       create Visual Studio solution from CMake files.
-    - Click "Build All"
+    - Change "Select Startup Item" to "3dforest.exe (install) (bin\3dforest.exe)" from the tool bar.
+    - Click on "3dforest.exe (install) (bin\3dforest.exe)" to build and start 3d Forest.
 
 
 
