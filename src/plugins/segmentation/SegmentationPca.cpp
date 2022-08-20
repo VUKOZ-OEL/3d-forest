@@ -134,7 +134,7 @@ void SegmentationPca::compute(Query &query,
 
     // Compute Eigen vectors.
     E.compute(product);
-    for (size_t i = 0; i < 3; i++)
+    for (Eigen::MatrixXd::Index i = 0; i < 3; i++)
     {
         eigenVectors.col(i) = E.eigenvectors().col(2 - i);
     }
