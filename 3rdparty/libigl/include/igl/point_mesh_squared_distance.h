@@ -5,6 +5,10 @@
 // This Source Code Form is subject to the terms of the Mozilla Public License
 // v. 2.0. If a copy of the MPL was not distributed with this file, You can
 // obtain one at http://mozilla.org/MPL/2.0/.
+
+// Modifications Copyright 2020-present VUKOZ
+// Add "reenable_warnings.h" to restore compiler warnings
+
 #ifndef IGL_POINT_MESH_SQUARED_DISTANCE_H
 #define IGL_POINT_MESH_SQUARED_DISTANCE_H
 #include "igl_inline.h"
@@ -49,5 +53,7 @@ IGL_INLINE void point_mesh_squared_distance(
 #ifndef IGL_STATIC_LIBRARY
 #  include "point_mesh_squared_distance.cpp"
 #endif
+
+#include "reenable_warnings.h"
 
 #endif
