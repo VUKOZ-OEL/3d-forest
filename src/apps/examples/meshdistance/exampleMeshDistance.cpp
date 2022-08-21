@@ -63,12 +63,12 @@ static void printMesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F)
     }
 }
 
-static void insertPoint(Eigen::MatrixXd &V,
-                        std::vector<double> &XY,
-                        size_t idx,
-                        double x,
-                        double y,
-                        double z)
+static void setPoint(Eigen::MatrixXd &V,
+                     std::vector<double> &XY,
+                     size_t idx,
+                     double x,
+                     double y,
+                     double z)
 {
     V(static_cast<Eigen::Index>(idx), 0) = x;
     V(static_cast<Eigen::Index>(idx), 1) = y;
@@ -89,9 +89,9 @@ static void exampleMeshDistance()
     std::vector<double> XY;
     XY.resize(nPointsMesh * 2);
 
-    insertPoint(V, XY, 0, 0., 0., 0.);
-    insertPoint(V, XY, 1, 1., 0., 0.);
-    insertPoint(V, XY, 2, 0., 1., 0.);
+    setPoint(V, XY, 0, 0., 0., 0.);
+    setPoint(V, XY, 1, 1., 0., 0.);
+    setPoint(V, XY, 2, 0., 1., 0.);
 
     // Create triangle mesh
     delaunator::Delaunator delaunay(XY);

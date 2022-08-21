@@ -7,7 +7,7 @@
 // obtain one at http://mozilla.org/MPL/2.0/.
 
 // Modifications Copyright 2020-present VUKOZ
-// Disabled useful compiler warnings which are present in libigl
+// Add "disable_warnings.h" to disable libigl compiler warnings
 
 // This should *NOT* be contained in a IGL_*_H ifdef, since it may be defined
 // differently based on when it is included
@@ -21,17 +21,4 @@
 #  define IGL_INLINE
 #endif
 
-#ifndef IGL_INLINE_H
-#if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2))
-#pragma GCC diagnostic push
-// The following warnings are unfortunately useful, they can detect bugs and exploits
-#pragma GCC diagnostic ignored "-Wsign-conversion"
-#pragma GCC diagnostic ignored "-Wsign-compare"
-#pragma GCC diagnostic ignored "-Wconversion"
-#pragma GCC diagnostic ignored "-Wfloat-equal"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-// Good practice
-#pragma GCC diagnostic ignored "-Wshadow"
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-#endif
-#endif /* IGL_INLINE_H */
+#include "disable_warnings.h"
