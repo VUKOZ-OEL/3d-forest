@@ -5,6 +5,10 @@
 // This Source Code Form is subject to the terms of the Mozilla Public License
 // v. 2.0. If a copy of the MPL was not distributed with this file, You can
 // obtain one at http://mozilla.org/MPL/2.0/.
+
+// Modifications Copyright 2020-present VUKOZ
+// Add EIGEN_HAS_OPENMP condition to silence warning when used without -fopenmp
+
 #include "project_to_line.h"
 #include <cassert>
 #include <Eigen/Core>
@@ -40,7 +44,9 @@ IGL_INLINE void igl::project_to_line(
   t.resize(np,1);
   sqrD.resize(np,1);
   // loop over points
+#ifdef EIGEN_HAS_OPENMP
 #pragma omp parallel for if (np>10000)
+#endif
   for(int i = 0;i<np;i++)
   {
     const typename DerivedP::ConstRowXpr Pi = P.row(i);
