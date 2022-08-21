@@ -5,6 +5,11 @@
 // This Source Code Form is subject to the terms of the Mozilla Public License
 // v. 2.0. If a copy of the MPL was not distributed with this file, You can
 // obtain one at http://mozilla.org/MPL/2.0/.
+
+// Modifications Copyright 2020-present VUKOZ
+// Change loop from "int" to "Eigen::Index" to remove compiler warnings
+// Add "static_cast<unsigned int>" for "%u" print format
+
 #include "writeOBJ.h"
 
 #include <iostream>
@@ -37,10 +42,10 @@ IGL_INLINE bool igl::writeOBJ(
     return false;
   }
   // Loop over V
-  for(int i = 0;i<(int)V.rows();i++)
+  for(Eigen::Index i = 0;i<V.rows();i++)
   {
     fprintf(obj_file,"v");
-    for(int j = 0;j<(int)V.cols();++j)
+    for(Eigen::Index j = 0;j<V.cols();++j)
     {
       fprintf(obj_file," %0.17g", V(i,j));
     }
@@ -50,7 +55,7 @@ IGL_INLINE bool igl::writeOBJ(
 
   if(write_N)
   {
-    for(int i = 0;i<(int)CN.rows();i++)
+    for(Eigen::Index i = 0;i<CN.rows();i++)
     {
       fprintf(obj_file,"vn %0.17g %0.17g %0.17g\n",
               CN(i,0),
@@ -65,7 +70,7 @@ IGL_INLINE bool igl::writeOBJ(
 
   if(write_texture_coords)
   {
-    for(int i = 0;i<(int)TC.rows();i++)
+    for(Eigen::Index i = 0;i<TC.rows();i++)
     {
       fprintf(obj_file, "vt %0.17g %0.17g\n",TC(i,0),TC(i,1));
     }
@@ -73,22 +78,22 @@ IGL_INLINE bool igl::writeOBJ(
   }
 
   // loop over F
-  for(int i = 0;i<(int)F.rows();++i)
+  for(Eigen::Index i = 0;i<F.rows();++i)
   {
     fprintf(obj_file,"f");
-    for(int j = 0; j<(int)F.cols();++j)
+    for(Eigen::Index j = 0; j<F.cols();++j)
     {
       // OBJ is 1-indexed
-      fprintf(obj_file," %u",F(i,j)+1);
+      fprintf(obj_file," %u",static_cast<unsigned int>(F(i,j)+1));
 
       if(write_texture_coords)
-        fprintf(obj_file,"/%u",FTC(i,j)+1);
+        fprintf(obj_file,"/%u",static_cast<unsigned int>(FTC(i,j)+1));
       if(write_N)
       {
         if (write_texture_coords)
-          fprintf(obj_file,"/%u",FN(i,j)+1);
+          fprintf(obj_file,"/%u",static_cast<unsigned int>(FN(i,j)+1));
         else
-          fprintf(obj_file,"//%u",FN(i,j)+1);
+          fprintf(obj_file,"//%u",static_cast<unsigned int>(FN(i,j)+1));
       }
     }
     fprintf(obj_file,"\n");
