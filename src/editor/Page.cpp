@@ -820,6 +820,23 @@ void Page::runColorModifier()
             setColor(i, classification[i], 15, ColorPalette::Classification);
         }
     }
+
+    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_ELEVATION))
+    {
+        const Dataset &dataset = editor_->datasets().key(datasetId_);
+        double zlen = dataset.boundary().length(2);
+
+        if (zlen > 0.)
+        {
+            for (size_t i = 0; i < n; i++)
+            {
+                double v = 1. - (elevation[i] / zlen);
+                renderColor[i * 3 + 0] *= static_cast<float>(v);
+                renderColor[i * 3 + 1] *= static_cast<float>(v);
+                renderColor[i * 3 + 2] *= static_cast<float>(v);
+            }
+        }
+    }
 }
 
 void Page::setColor(size_t idx,

@@ -19,6 +19,10 @@
 
 /** @file ClassifyGroundPlugin.cpp */
 
+#include <Eigen/Core>
+#include <delaunator.hpp>
+#include <igl/point_mesh_squared_distance.h>
+
 #include <ClassifyGroundPlugin.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
@@ -39,6 +43,7 @@
 
 #define ICON(name) (ThemeIcon(":/classifyground/", name))
 #define CLASSIFY_GROUND_PLUGIN_NAME "Classify Ground"
+#define CLASSIFY_GROUND_BUFFER_SIZE 8192
 
 /** Classify Ground Window. */
 class ClassifyGroundWindow : public QDockWidget
@@ -145,6 +150,18 @@ void ClassifyGroundWindow::slotApply()
     double zMaxGround;
 
     size_t nPointsGroundGrid;
+    size_t nPointsAboveGrid;
+    Eigen::MatrixXd P;      // Points above ground
+    Eigen::MatrixXd V;      // Ground coordinates
+    std::vector<double> XY; // Ground xy coordinates
+    Eigen::MatrixXi F;      // Ground triangles
+    Eigen::MatrixXd D;      // List of smallest squared distances
+    Eigen::MatrixXi I;      // List of indices to smallest distances
+    Eigen::MatrixXd C;      // 3 list of closest points
+
+    P.resize(CLASSIFY_GROUND_BUFFER_SIZE, 3);
+    V.resize(CLASSIFY_GROUND_BUFFER_SIZE, 3);
+    XY.resize(CLASSIFY_GROUND_BUFFER_SIZE * 2);
 
     Query queryPoint(&mainWindow_->editor());
     Query query(&mainWindow_->editor());
@@ -192,6 +209,7 @@ void ClassifyGroundWindow::slotApply()
 
         // Set classification to 'ground' or 'unassigned'.
         nPointsGroundGrid = 0;
+        nPointsAboveGrid = 0;
         query.reset();
         while (query.next())
         {
@@ -221,14 +239,94 @@ void ClassifyGroundWindow::slotApply()
                 {
                     // ground
                     query.classification() = LasFile::CLASS_GROUND;
-
-                    nPointsGroundGrid++;
                 }
             }
 
+            if (query.classification() == LasFile::CLASS_GROUND)
+            {
+                if (static_cast<Eigen::Index>(nPointsGroundGrid) == V.rows())
+                {
+                    V.resize(static_cast<Eigen::Index>(nPointsGroundGrid) * 2,
+                             3);
+                    XY.resize(nPointsGroundGrid * 4);
+                }
+
+                V(static_cast<Eigen::Index>(nPointsGroundGrid), 0) = query.x();
+                V(static_cast<Eigen::Index>(nPointsGroundGrid), 1) = query.y();
+                V(static_cast<Eigen::Index>(nPointsGroundGrid), 2) = query.z();
+
+                XY[2 * nPointsGroundGrid] = query.x();
+                XY[2 * nPointsGroundGrid + 1] = query.y();
+
+                nPointsGroundGrid++;
+            }
+            else
+            {
+                if (static_cast<Eigen::Index>(nPointsAboveGrid) == P.rows())
+                {
+                    P.resize(static_cast<Eigen::Index>(nPointsAboveGrid) * 2,
+                             3);
+                }
+
+                P(static_cast<Eigen::Index>(nPointsAboveGrid), 0) = query.x();
+                P(static_cast<Eigen::Index>(nPointsAboveGrid), 1) = query.y();
+                P(static_cast<Eigen::Index>(nPointsAboveGrid), 2) = query.z();
+
+                nPointsAboveGrid++;
+            }
+
+            query.elevation() = 0;
+
             query.setModified();
         }
-    }
+
+        // Ground surface
+        if (nPointsGroundGrid > 0)
+        {
+            XY.resize(nPointsGroundGrid * 2);
+
+            delaunator::Delaunator delaunay(XY);
+
+            // Convert to igl triangles
+            size_t nTriangles = delaunay.triangles.size() / 3;
+
+            F.resize(static_cast<Eigen::Index>(nTriangles), 3);
+
+            for (size_t iTriangle = 0; iTriangle < nTriangles; iTriangle++)
+            {
+                // Swap the order of the vertices in triangle to 0, 2, 1.
+                // This will affect the direction of the normal to face up
+                // along z.
+                F(static_cast<Eigen::Index>(iTriangle), 0) =
+                    static_cast<int>(delaunay.triangles[iTriangle * 3]);
+                F(static_cast<Eigen::Index>(iTriangle), 1) =
+                    static_cast<int>(delaunay.triangles[iTriangle * 3 + 2]);
+                F(static_cast<Eigen::Index>(iTriangle), 2) =
+                    static_cast<int>(delaunay.triangles[iTriangle * 3 + 1]);
+            }
+
+            // Compute distances from a set of points P to a triangle mesh (V,F)
+            igl::point_mesh_squared_distance(P, V, F, D, I, C);
+
+            // Set elevation
+            Eigen::Index idx = 0;
+            query.reset();
+            while (query.next())
+            {
+                if (query.classification() != LasFile::CLASS_GROUND)
+                {
+                    if (idx < D.rows() && D(idx) > 0.)
+                    {
+                        query.elevation() = ::sqrt(D(idx));
+                    }
+
+                    idx++;
+
+                    query.setModified();
+                }
+            }
+        } // Ground surface
+    }     // Next grid
 
     query.flush();
 
