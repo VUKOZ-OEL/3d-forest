@@ -15,6 +15,27 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-add_subdirectory(classifyground)
-add_subdirectory(icon)
-add_subdirectory(sandbox)
+set(SUB_PROJECT_NAME "3DForestClassifyGround")
+
+add_executable(
+    ${SUB_PROJECT_NAME}
+    classifyGround.cpp
+    ../../../plugins/classifyground/ClassifyGround.cpp
+)
+
+target_include_directories(
+    ${SUB_PROJECT_NAME}
+    PUBLIC
+    ../../../plugins/classifyground
+    ../../../../3rdparty/delaunator
+    ../../../../3rdparty/eigen
+    ../../../../3rdparty/libigl/include
+)
+
+target_link_libraries(
+    ${SUB_PROJECT_NAME}
+    PUBLIC
+    3dforesteditor
+)
+
+install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)
