@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-set(SUB_PROJECT_NAME "3dforestgui")
+set(SUB_PROJECT_NAME "3DForestGui")
 
 if(NOT QT_VERSION_MAJOR)
     message(WARNING "Gui not found - skipping ${SUB_PROJECT_NAME}")
@@ -79,7 +79,7 @@ if(QT_VERSION_MAJOR EQUAL 5)
 
     target_link_libraries(
         ${SUB_PROJECT_NAME}
-        3dforesteditor
+        3DForestEditor
         Qt${QT_VERSION_MAJOR}::Core
         Qt${QT_VERSION_MAJOR}::Gui
         Qt${QT_VERSION_MAJOR}::Widgets
@@ -92,7 +92,7 @@ else()
 
     target_link_libraries(
         ${SUB_PROJECT_NAME}
-        3dforesteditor
+        3DForestEditor
         Qt${QT_VERSION_MAJOR}::Core
         Qt${QT_VERSION_MAJOR}::Gui
         Qt${QT_VERSION_MAJOR}::Widgets

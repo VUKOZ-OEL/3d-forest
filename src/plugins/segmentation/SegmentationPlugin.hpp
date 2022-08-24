@@ -27,7 +27,7 @@
 class SegmentationWindow;
 
 #if defined(_MSC_VER)
-    #if defined(EXPORT_3dforestsegmentation)
+    #if defined(EXPORT_3DForestSegmentationPlugin)
         #define EXPORT_SEGMENTATION __declspec(dllexport)
     #else
         #define EXPORT_SEGMENTATION __declspec(dllimport)

@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-set(SUB_PROJECT_NAME "3dforestclassifyground")
+set(SUB_PROJECT_NAME "3DForestClassifyGroundPlugin")
 
 if(NOT QT_VERSION_MAJOR)
     message(WARNING "Gui not found - skipping ${SUB_PROJECT_NAME}")
@@ -52,7 +52,7 @@ target_compile_definitions(
 target_link_libraries(
     ${SUB_PROJECT_NAME}
     PRIVATE
-    3dforestgui
+    3DForestGui
 )
 
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin/plugins)

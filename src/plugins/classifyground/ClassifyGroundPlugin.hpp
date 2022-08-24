@@ -27,7 +27,7 @@
 class ClassifyGroundWindow;
 
 #if defined(_MSC_VER)
-    #if defined(EXPORT_3dforestclassifyground)
+    #if defined(EXPORT_3DForestClassifyGroundPlugin)
         #define EXPORT_CLASSIFY_GROUND __declspec(dllexport)
     #else
         #define EXPORT_CLASSIFY_GROUND __declspec(dllimport)

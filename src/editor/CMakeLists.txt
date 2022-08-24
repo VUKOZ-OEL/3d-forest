@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-set(SUB_PROJECT_NAME "3dforesteditor")
+set(SUB_PROJECT_NAME "3DForestEditor")
 
 file(GLOB_RECURSE SOURCES "*.cpp")
 
@@ -39,7 +39,7 @@ target_compile_definitions(
 
 target_link_libraries(
     ${SUB_PROJECT_NAME}
-    3dforestcore
+    3DForestCore
 )
 
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)
