@@ -24,7 +24,7 @@
 #include <Error.hpp>
 #include <Log.hpp>
 
-static void classifyGround(const char *inputPath)
+static void classifyGround(const char *inputPath, size_t pointsPerCell)
 {
     // Open input file in editor.
     Editor editor;
@@ -32,7 +32,7 @@ static void classifyGround(const char *inputPath)
 
     // Classify ground by steps.
     ClassifyGround cg(&editor);
-    int n = cg.start();
+    int n = cg.start(pointsPerCell);
     for (int i = 0; i < n; i++)
     {
         std::cout << "Step " << (i + 1) << "/" << n << std::endl;
@@ -44,15 +44,25 @@ static void classifyGround(const char *inputPath)
 int main(int argc, char *argv[])
 {
     const char *inputPath = nullptr;
+    size_t pointsPerCell = 10000;
 
     if (argc > 1)
     {
         inputPath = argv[1];
     }
 
+    if (argc > 2)
+    {
+        int v = atoi(argv[2]);
+        if (v > 0)
+        {
+            pointsPerCell = static_cast<size_t>(v);
+        }
+    }
+
     try
     {
-        classifyGround(inputPath);
+        classifyGround(inputPath, pointsPerCell);
     }
     catch (std::exception &e)
     {

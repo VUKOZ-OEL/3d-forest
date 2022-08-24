@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-set(SUB_PROJECT_NAME "3dforestsandbox")
+set(SUB_PROJECT_NAME "3DForestSandbox")
 
 add_executable(${SUB_PROJECT_NAME} sandbox.cpp)
-target_link_libraries(${SUB_PROJECT_NAME} PUBLIC 3dforesteditor)
+target_link_libraries(${SUB_PROJECT_NAME} PUBLIC 3DForestEditor)
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

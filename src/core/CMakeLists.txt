@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-set(SUB_PROJECT_NAME "3dforestcore")
+set(SUB_PROJECT_NAME "3DForestCore")
 
 file(GLOB_RECURSE SOURCES "*.cpp")
 

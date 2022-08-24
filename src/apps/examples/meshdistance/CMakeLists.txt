@@ -27,5 +27,5 @@ target_include_directories(
     ../../../../3rdparty/libigl/include
 )
 
-target_link_libraries(${SUB_PROJECT_NAME} PUBLIC 3dforestcore)
+target_link_libraries(${SUB_PROJECT_NAME} PUBLIC 3DForestCore)
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

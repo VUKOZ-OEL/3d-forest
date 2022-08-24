@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-set(SUB_PROJECT_NAME "3dforestexamplevector3")
+set(SUB_PROJECT_NAME "3DForestExampleVector3")
 
 add_executable(${SUB_PROJECT_NAME} exampleVector3.cpp)
-target_link_libraries(${SUB_PROJECT_NAME} PUBLIC 3dforestcore)
+target_link_libraries(${SUB_PROJECT_NAME} PUBLIC 3DForestCore)
 
 set_target_properties(
     ${SUB_PROJECT_NAME}

@@ -35,7 +35,7 @@ target_include_directories(
 target_link_libraries(
     ${SUB_PROJECT_NAME}
     PUBLIC
-    3dforesteditor
+    3DForestEditor
 )
 
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)
