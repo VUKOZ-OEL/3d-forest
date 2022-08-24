@@ -29,8 +29,6 @@
 #define LOG_DEBUG_LOCAL(msg)
 //#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("ClassifyGround", msg)
 
-#define CLASSIFY_GROUND_BUFFER_SIZE 8192
-
 ClassifyGround::ClassifyGround(Editor *editor)
     : editor_(editor),
       query_(editor),
@@ -60,10 +58,6 @@ int ClassifyGround::start(size_t pointsPerCell,
 
     // Ground plane angle to inverted angle for selection.
     angleDeg_ = 90.0 - angleDeg;
-
-    P.resize(CLASSIFY_GROUND_BUFFER_SIZE, 3);
-    V.resize(CLASSIFY_GROUND_BUFFER_SIZE, 3);
-    XY.resize(CLASSIFY_GROUND_BUFFER_SIZE * 2);
 
     query_.setGrid(pointsPerCell, cellLengthMinPercent);
 
@@ -118,6 +112,7 @@ void ClassifyGround::step()
         {
             // unassigned (could be a roof)
             query_.classification() = LasFile::CLASS_UNASSIGNED;
+            nPointsAboveGrid++;
         }
         else
         {
@@ -135,54 +130,52 @@ void ClassifyGround::step()
             {
                 // unassigned (has some points below, inside the cone)
                 query_.classification() = LasFile::CLASS_UNASSIGNED;
+                nPointsAboveGrid++;
             }
             else
             {
                 // ground
                 query_.classification() = LasFile::CLASS_GROUND;
+                nPointsGroundGrid++;
             }
-        }
-
-        if (query_.classification() == LasFile::CLASS_GROUND)
-        {
-            if (static_cast<Eigen::Index>(nPointsGroundGrid) == V.rows())
-            {
-                V.resize(static_cast<Eigen::Index>(nPointsGroundGrid) * 2, 3);
-                XY.resize(nPointsGroundGrid * 4);
-            }
-
-            V(static_cast<Eigen::Index>(nPointsGroundGrid), 0) = query_.x();
-            V(static_cast<Eigen::Index>(nPointsGroundGrid), 1) = query_.y();
-            V(static_cast<Eigen::Index>(nPointsGroundGrid), 2) = query_.z();
-
-            XY[2 * nPointsGroundGrid] = query_.x();
-            XY[2 * nPointsGroundGrid + 1] = query_.y();
-
-            nPointsGroundGrid++;
-        }
-        else
-        {
-            if (static_cast<Eigen::Index>(nPointsAboveGrid) == P.rows())
-            {
-                P.resize(static_cast<Eigen::Index>(nPointsAboveGrid) * 2, 3);
-            }
-
-            P(static_cast<Eigen::Index>(nPointsAboveGrid), 0) = query_.x();
-            P(static_cast<Eigen::Index>(nPointsAboveGrid), 1) = query_.y();
-            P(static_cast<Eigen::Index>(nPointsAboveGrid), 2) = query_.z();
-
-            nPointsAboveGrid++;
         }
 
         query_.elevation() = 0;
-
         query_.setModified();
     }
 
     // Ground surface
     if (nPointsGroundGrid > 0)
     {
+        P.resize(static_cast<Eigen::Index>(nPointsAboveGrid), 3);
+        V.resize(static_cast<Eigen::Index>(nPointsGroundGrid), 3);
         XY.resize(nPointsGroundGrid * 2);
+
+        nPointsGroundGrid = 0;
+        nPointsAboveGrid = 0;
+        query_.reset();
+        while (query_.next())
+        {
+            if (query_.classification() == LasFile::CLASS_GROUND)
+            {
+                V(static_cast<Eigen::Index>(nPointsGroundGrid), 0) = query_.x();
+                V(static_cast<Eigen::Index>(nPointsGroundGrid), 1) = query_.y();
+                V(static_cast<Eigen::Index>(nPointsGroundGrid), 2) = query_.z();
+
+                XY[2 * nPointsGroundGrid] = query_.x();
+                XY[2 * nPointsGroundGrid + 1] = query_.y();
+
+                nPointsGroundGrid++;
+            }
+            else
+            {
+                P(static_cast<Eigen::Index>(nPointsAboveGrid), 0) = query_.x();
+                P(static_cast<Eigen::Index>(nPointsAboveGrid), 1) = query_.y();
+                P(static_cast<Eigen::Index>(nPointsAboveGrid), 2) = query_.z();
+
+                nPointsAboveGrid++;
+            }
+        }
 
         delaunator::Delaunator delaunay(XY);
 
@@ -217,11 +210,10 @@ void ClassifyGround::step()
                 if (idx < D.rows() && D(idx) > 0.)
                 {
                     query_.elevation() = ::sqrt(D(idx));
+                    query_.setModified();
                 }
 
                 idx++;
-
-                query_.setModified();
             }
         }
     } // Ground surface
