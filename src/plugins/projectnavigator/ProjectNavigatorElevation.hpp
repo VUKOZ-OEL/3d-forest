@@ -1,5 +1,4 @@
-<!DOCTYPE RCC>
-<!--
+/*
     Copyright 2020 VUKOZ
 
     This file is part of 3D Forest.
@@ -16,31 +15,32 @@
 
     You should have received a copy of the GNU General Public License
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
--->
-<RCC version="1.0">
-<qresource prefix="/projectnavigator">
+*/
 
-<!-- Tool bar -->
-<file>project_24px.png</file>
-<file>project_24px_color.png</file>
+/** @file ProjectNavigatorElevation.hpp */
 
-<!-- Common -->
-<file>eye_24px.png</file>
-<file>hide_24px.png</file>
+#ifndef PROJECT_NAVIGATOR_ELEVATION_HPP
+#define PROJECT_NAVIGATOR_ELEVATION_HPP
 
-<file>select_all_24px.png</file>
-<file>select_all_24px_color.png</file>
-<file>select_invert_24px.png</file>
-<file>select_invert_24px_color.png</file>
-<file>select_none_24px.png</file>
-<file>select_none_24px_color.png</file>
+#include <Classifications.hpp>
 
-<!-- Tabs -->
-<file>file_16px.png</file>
-<file>layers_16px.png</file>
-<file>classification_16px.png</file>
-<file>classification_16px_color.png</file>
-<file>elevation_16px_color.png</file>
+#include <QWidget>
 
-</qresource>
-</RCC>
+class MainWindow;
+
+/** Project Navigator Elevation. */
+class ProjectNavigatorElevation : public QWidget
+{
+    Q_OBJECT
+
+public:
+    ProjectNavigatorElevation(MainWindow *mainWindow);
+
+public slots:
+    void slotUpdate();
+
+protected:
+    MainWindow *mainWindow_;
+};
+
+#endif /* PROJECT_NAVIGATOR_ELEVATION_HPP */
