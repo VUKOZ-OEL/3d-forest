@@ -48,7 +48,7 @@ void ImportPlugin::initialize(MainWindow *mainWindow)
                               "File Import/Export",
                               tr("Import"),
                               tr("Import new point cloud dataset"),
-                              THEME_ICON("plus"),
+                              THEME_ICON("add"),
                               this,
                               SLOT(slotImport()));
 

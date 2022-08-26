@@ -40,7 +40,7 @@ void HelpPlugin::initialize(MainWindow *mainWindow)
                               "",
                               tr("About 3D Forest"),
                               tr("About this application"),
-                              ICON("about"),
+                              THEME_ICON("question"),
                               this,
                               SLOT(slotAbout()));
 }

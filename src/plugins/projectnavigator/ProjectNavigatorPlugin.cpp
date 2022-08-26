@@ -41,7 +41,7 @@ void ProjectNavigatorPlugin::initialize(MainWindow *mainWindow)
                               "File Properties",
                               tr("Project Navigator"),
                               tr("Show project navigator"),
-                              ICON("files"),
+                              ICON("project"),
                               this,
                               SLOT(slotPlugin()));
 }
