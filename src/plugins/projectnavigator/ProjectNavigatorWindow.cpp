@@ -58,11 +58,6 @@ ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
     tabWidget_->setIconSize(
         QSize(MainWindow::ICON_SIZE_TEXT, MainWindow::ICON_SIZE_TEXT));
 
-    connect(tabWidget_,
-            SIGNAL(currentChanged(int)),
-            this,
-            SLOT(slotCurrentChanged(int)));
-
     // Dock
     setWidget(tabWidget_);
     setWindowTitle(tr("Project Navigator"));
