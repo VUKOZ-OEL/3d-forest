@@ -30,9 +30,9 @@
 
 #define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
-static const char *PROJECT_NAVIGATOR_WINDOW_TAB_TEXT[] = {"Files",
-                                                          "Layers",
-                                                          "Classification"};
+static const char *PROJECT_NAVIGATOR_WINDOW_TAB_TEXT[] = {"File",
+                                                          "Layer",
+                                                          "Class"};
 
 ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
     : QDockWidget(mainWindow),
