@@ -39,9 +39,6 @@ class ProjectNavigatorWindow : public QDockWidget
 public:
     ProjectNavigatorWindow(MainWindow *mainWindow);
 
-protected slots:
-    void slotCurrentChanged(int index);
-
 protected:
     MainWindow *mainWindow_;
     QTabWidget *tabWidget_;
