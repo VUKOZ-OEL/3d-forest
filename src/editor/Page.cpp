@@ -284,8 +284,10 @@ void Page::select()
     const Box<double> &clipBox = query_->selectedBox();
     const Cone<double> &clipCone = query_->selectedCone();
     const Sphere<double> &selectedSphere = query_->selectedSphere();
+    const Range<double> &elevationRange = query_->selectedElevationRange();
 
-    if (clipBox.empty() && clipCone.empty() && selectedSphere.empty())
+    if (clipBox.empty() && clipCone.empty() && selectedSphere.empty() &&
+        elevationRange.hasBoundaryValues())
     {
         // Reset selection to mark all points as selected.
         uint32_t n = static_cast<uint32_t>(position.size() / 3);
@@ -301,6 +303,7 @@ void Page::select()
     selectBox();
     selectCone();
     selectSphere();
+    selectElevation();
     selectClassification();
     selectLayer();
 
@@ -677,6 +680,36 @@ void Page::selectSphere()
     selectionSize = nSelected;
 
     query_->addResults(nSelected);
+}
+
+void Page::selectElevation()
+{
+    const Range<double> &elevationRange = query_->selectedElevationRange();
+
+    if (elevationRange.hasBoundaryValues())
+    {
+        return;
+    }
+
+    size_t nSelectedNew = 0;
+
+    for (size_t i = 0; i < selectionSize; i++)
+    {
+        double elev = static_cast<double>(elevation[selection[i]]);
+
+        if (!(elev < elevationRange.minimumValue() ||
+              elev > elevationRange.maximumValue()))
+        {
+            if (nSelectedNew != i)
+            {
+                selection[nSelectedNew] = selection[i];
+            }
+
+            nSelectedNew++;
+        }
+    }
+
+    selectionSize = nSelectedNew;
 }
 
 void Page::selectClassification()

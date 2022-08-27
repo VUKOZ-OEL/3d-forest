@@ -29,6 +29,7 @@ static const char *EDITOR_KEY_LAYER = "layers";
 static const char *EDITOR_KEY_SETTINGS = "settings";
 static const char *EDITOR_KEY_CLASSIFICATIONS = "classifications";
 // static const char *EDITOR_KEY_CLIP_FILTER = "clipFilter";
+// static const char *EDITOR_KEY_ELEVATION_RANGE = "elevationRange";
 
 Editor::Editor()
 {
@@ -42,7 +43,7 @@ Editor::~Editor()
 
 void Editor::close()
 {
-    path_ = File::currentPath() + "\\untitled.json";
+    path_ = File::join(File::currentPath(), "untitled.json");
     projectName_ = "Untitled";
 
     datasets_.clear();
@@ -50,6 +51,9 @@ void Editor::close()
     classifications_.clear();
     voxels_.clear();
     viewports_.clearContent();
+
+    clipFilter_.clear();
+    elevationRange_.clear();
 
     unsavedChanges_ = false;
 }
@@ -130,6 +134,12 @@ void Editor::openProject(const std::string &path)
         // {
         //     clipFilter_.clear();
         // }
+
+        // Elevation range
+        // if (in.contains(EDITOR_KEY_ELEVATION_RANGE))
+        // {
+        //     elevationRange_.read(in[EDITOR_KEY_ELEVATION_RANGE]);
+        // }
     }
     catch (std::exception &e)
     {
@@ -161,6 +171,9 @@ void Editor::save(const std::string &path)
 
     // Clip filter
     // clipFilter_.write(out[EDITOR_KEY_CLIP_FILTER]);
+
+    // Elevation range
+    // elevationRange_.write(out[EDITOR_KEY_ELEVATION_RANGE]);
 
     out.write(path);
 
@@ -220,6 +233,14 @@ Box<double> Editor::clipBoundary() const
     }
 
     return datasets_.boundary();
+}
+
+void Editor::setElevationRange(const Range<double> &elevationRange)
+{
+    elevationRange_ = elevationRange;
+    viewports_.selectElevationRange(elevationRange_);
+
+    // unsavedChanges_ = true;
 }
 
 void Editor::updateAfterRead()

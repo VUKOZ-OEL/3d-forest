@@ -22,11 +22,12 @@
 #ifndef PROJECT_NAVIGATOR_ELEVATION_HPP
 #define PROJECT_NAVIGATOR_ELEVATION_HPP
 
-#include <Classifications.hpp>
+#include <Range.hpp>
 
 #include <QWidget>
 
 class MainWindow;
+class RangeSliderWidget;
 
 /** Project Navigator Elevation. */
 class ProjectNavigatorElevation : public QWidget
@@ -38,9 +39,14 @@ public:
 
 public slots:
     void slotUpdate();
+    void slotRangeFinalValue();
 
 protected:
     MainWindow *mainWindow_;
+    RangeSliderWidget *rangeInput_;
+    Range<double> elevationRange_;
+
+    void filterChanged();
 };
 
 #endif /* PROJECT_NAVIGATOR_ELEVATION_HPP */

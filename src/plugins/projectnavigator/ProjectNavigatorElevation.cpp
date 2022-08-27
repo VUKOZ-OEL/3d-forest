@@ -21,6 +21,7 @@
 
 #include <MainWindow.hpp>
 #include <ProjectNavigatorElevation.hpp>
+#include <RangeSliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
 #include <QHBoxLayout>
@@ -29,20 +30,55 @@
 
 #define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
+//#define LOG_DEBUG_LOCAL(msg)
+#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("ProjectNavigatorElevation", msg)
+
 ProjectNavigatorElevation::ProjectNavigatorElevation(MainWindow *mainWindow)
     : QWidget(),
       mainWindow_(mainWindow)
 {
+    // Input widgets
+    RangeSliderWidget::create(rangeInput_,
+                              this,
+                              nullptr,
+                              SLOT(slotRangeFinalValue()),
+                              tr("Range"),
+                              tr("Min-max Elevation Range"),
+                              tr("pt"),
+                              1,
+                              0,
+                              100,
+                              0);
+
     // Layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->setContentsMargins(1, 1, 1, 1);
-    mainLayout->addWidget(new QLabel("Max"));
+    mainLayout->addWidget(rangeInput_);
+    mainLayout->addStretch();
     setLayout(mainLayout);
 
     // Data
     connect(mainWindow_, SIGNAL(signalUpdate()), this, SLOT(slotUpdate()));
 }
 
+void ProjectNavigatorElevation::slotRangeFinalValue()
+{
+    LOG_DEBUG_LOCAL("maximumValue <" << rangeInput_->maximumValue() << ">");
+}
+
+void ProjectNavigatorElevation::filterChanged()
+{
+    mainWindow_->suspendThreads();
+    mainWindow_->editor().setElevationRange(elevationRange_);
+    mainWindow_->updateFilter();
+}
+
 void ProjectNavigatorElevation::slotUpdate()
 {
+    elevationRange_ = mainWindow_->editor().elevationRange();
+
+    rangeInput_->blockSignals(true);
+    rangeInput_->setMinimum(elevationRange_.minimum());
+    rangeInput_->setMaximum(elevationRange_.maximum());
+    rangeInput_->setMaximumValue(elevationRange_.maximumValue());
+    rangeInput_->blockSignals(false);
 }
