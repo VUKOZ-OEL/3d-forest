@@ -27,6 +27,7 @@
         #define EXPORT_CORE __declspec(dllexport)
     #else
         #define EXPORT_CORE __declspec(dllimport)
+        #define EXPORT_CORE_IMPORT
     #endif
 #else
     #define EXPORT_CORE

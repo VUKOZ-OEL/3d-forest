@@ -65,7 +65,9 @@ typedef unsigned short mode_t;
     #define O_TEXT 0
 #endif
 
+#if !defined(EXPORT_CORE_IMPORT)
 const int File::INVALID_DESCRIPTOR = -1;
+#endif
 
 File::File() : fd_(INVALID_DESCRIPTOR), size_(0), offset_(0), path_()
 {

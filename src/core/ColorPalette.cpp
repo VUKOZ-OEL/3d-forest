@@ -21,6 +21,7 @@
 
 #include <ColorPalette.hpp>
 
+#if !defined(EXPORT_CORE_IMPORT)
 const std::vector<Vector3<float>> ColorPalette::Classification{
     0xffffffU, //  0 : Created, Never classified
     0xb2b2b2U, //  1 : Unassigned - Unclassified
@@ -249,6 +250,7 @@ const std::vector<Vector3<float>> ColorPalette::WindowsXp32 = {
     0x3e9adeU, 0x99ccffU, 0xb4e2ffU, 0xdeffffU, 0xffccffU, 0xccccffU,
     0x9999ffU, 0x6666ccU, 0x9999ccU, 0x666699U, 0x006600U, 0x009900U,
     0x66cc33U, 0x99ff66U, 0xccf4ccU, 0xffffffU};
+#endif /* EXPORT_CORE_IMPORT */
 
 std::vector<Vector3<float>> ColorPalette::blueCyanYellowRed(size_t nColors)
 {
