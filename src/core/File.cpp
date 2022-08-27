@@ -539,6 +539,15 @@ int File::write(int fd, const uint8_t *buffer, uint64_t nbyte)
     return 0;
 }
 
+std::string File::join(const std::string &path1, const std::string &path2)
+{
+#if defined(_MSC_VER) || defined(__MINGW32__)
+    return path1 + "\\" + path2;
+#else
+    return path1 + "/" + path2;
+#endif
+}
+
 std::string File::currentPath()
 {
     char buffer[8192];

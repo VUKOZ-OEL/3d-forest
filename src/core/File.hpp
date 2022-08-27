@@ -53,6 +53,7 @@ public:
     uint64_t offset() const;
     const std::string &path() const;
 
+    static std::string join(const std::string &path1, const std::string &path2);
     static std::string currentPath();
     static bool exists(const std::string &path);
     static bool isAbsolute(const std::string &path);
