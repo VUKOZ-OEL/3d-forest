@@ -58,7 +58,7 @@ ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
                        ICON("classification"),
                        PROJECT_NAVIGATOR_WINDOW_TAB_TEXT[2]);
     tabWidget_->addTab(elevation_,
-                       ICON("elevation"),
+                       ICON("elevation_filter"),
                        PROJECT_NAVIGATOR_WINDOW_TAB_TEXT[3]);
 
     tabWidget_->setIconSize(
