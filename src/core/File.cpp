@@ -546,18 +546,23 @@ std::string File::join(const std::string &path1, const std::string &path2)
 #if defined(_MSC_VER) || defined(__MINGW32__)
     const char *separator = "\\";
     const char *separator2 = "\\\\";
-    const size_t minimalLength = 3;
 #else
     const char *separator = "/";
     const char *separator2 = "//";
-    const size_t minimalLength = 1;
 #endif
 
     std::string result;
 
-    if (path1.size() >= minimalLength)
+    if (path1.size() > 0)
     {
-        result = path1 + separator + path2;
+        if (path2.size() > 0)
+        {
+            result = path1 + separator + path2;
+        }
+        else
+        {
+            result = path1;
+        }
     }
     else
     {
