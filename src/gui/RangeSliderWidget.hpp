@@ -26,8 +26,9 @@
 
 #include <QWidget>
 
+class ctkRangeSlider;
+
 class QSpinBox;
-class QSlider;
 class QVBoxLayout;
 
 /** Range Slider Widget. */
@@ -40,18 +41,22 @@ public:
 
     static void create(RangeSliderWidget *&outputWidget,
                        const QObject *receiver,
-                       const char *memberIntermediateValue,
-                       const char *memberFinalValue,
+                       const char *memberIntermediateMinimumValue,
+                       const char *memberIntermediateMaximumValue,
                        const QString &text,
                        const QString &toolTip,
                        const QString &unitsList,
                        int step,
                        int min,
                        int max,
-                       int value);
+                       int minValue,
+                       int maxValue);
 
     void setMinimum(int min);
     void setMaximum(int max);
+
+    void setMinimumValue(int value);
+    int minimumValue();
 
     void setMaximumValue(int value);
     int maximumValue();
@@ -59,16 +64,17 @@ public:
     void blockSignals(bool block);
 
 signals:
-    void signalIntermediateValue(int v);
-    void signalFinalValue();
+    void signalIntermediateMinimumValue(int v);
+    void signalIntermediateMaximumValue(int v);
 
 protected slots:
-    void slotIntermediateValue(int v);
-    void slotFinalValue();
+    void slotIntermediateMinimumValue(int v);
+    void slotIntermediateMaximumValue(int v);
 
 protected:
-    QSlider *slider_;
-    QSpinBox *spinBox_;
+    ctkRangeSlider *slider_;
+    QSpinBox *minSpinBox_;
+    QSpinBox *maxSpinBox_;
 };
 
 #endif /* RANGE_SLIDER_WIDGET_HPP */

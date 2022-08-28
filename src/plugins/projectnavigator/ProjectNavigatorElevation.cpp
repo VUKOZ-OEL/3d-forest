@@ -42,15 +42,16 @@ ProjectNavigatorElevation::ProjectNavigatorElevation(MainWindow *mainWindow)
     // Input widgets
     RangeSliderWidget::create(rangeInput_,
                               this,
-                              nullptr,
-                              SLOT(slotRangeFinalValue()),
+                              SLOT(slotRangeIntermediateMinimumValue(int)),
+                              SLOT(slotRangeIntermediateMaximumValue(int)),
                               tr("Range"),
-                              tr("Min-max Elevation Range"),
+                              tr("Min-max elevation range filter"),
                               tr("pt"),
                               1,
                               0,
                               100,
-                              0);
+                              0,
+                              100);
 
     // Layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -62,11 +63,22 @@ ProjectNavigatorElevation::ProjectNavigatorElevation(MainWindow *mainWindow)
     connect(mainWindow_, SIGNAL(signalUpdate()), this, SLOT(slotUpdate()));
 }
 
-void ProjectNavigatorElevation::slotRangeFinalValue()
+void ProjectNavigatorElevation::slotRangeIntermediateMinimumValue(int v)
 {
-    LOG_DEBUG_LOCAL("maximumValue <" << rangeInput_->maximumValue() << ">");
+    LOG_DEBUG_LOCAL("minimumValue <" << rangeInput_->minimumValue() << "> v <"
+                                     << v << ">");
 
-    elevationRange_.setMaximumValue(rangeInput_->maximumValue());
+    elevationRange_.setMinimumValue(v);
+
+    filterChanged();
+}
+
+void ProjectNavigatorElevation::slotRangeIntermediateMaximumValue(int v)
+{
+    LOG_DEBUG_LOCAL("maximumValue <" << rangeInput_->maximumValue() << "> v <"
+                                     << v << ">");
+
+    elevationRange_.setMaximumValue(v);
 
     filterChanged();
 }
@@ -88,6 +100,7 @@ void ProjectNavigatorElevation::slotUpdate()
     rangeInput_->blockSignals(true);
     rangeInput_->setMinimum(elevationRange_.minimum());
     rangeInput_->setMaximum(elevationRange_.maximum());
+    rangeInput_->setMinimumValue(elevationRange_.minimumValue());
     rangeInput_->setMaximumValue(elevationRange_.maximumValue());
     rangeInput_->blockSignals(false);
 }

@@ -39,7 +39,8 @@ public:
 
 public slots:
     void slotUpdate();
-    void slotRangeFinalValue();
+    void slotRangeIntermediateMinimumValue(int v);
+    void slotRangeIntermediateMaximumValue(int v);
 
 protected:
     MainWindow *mainWindow_;
