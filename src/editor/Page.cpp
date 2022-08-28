@@ -30,6 +30,9 @@
 #include <Page.hpp>
 #include <Query.hpp>
 
+#define LOG_DEBUG_LOCAL(msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("Page", msg)
+
 Page::Page(Editor *editor, Query *query, uint32_t datasetId, uint32_t pageId)
     : selectionSize(0),
       editor_(editor),
@@ -281,15 +284,17 @@ void Page::transform()
 
 void Page::select()
 {
+    LOG_DEBUG_LOCAL("");
+
     const Box<double> &clipBox = query_->selectedBox();
     const Cone<double> &clipCone = query_->selectedCone();
     const Sphere<double> &selectedSphere = query_->selectedSphere();
-    const Range<double> &elevationRange = query_->selectedElevationRange();
 
-    if (clipBox.empty() && clipCone.empty() && selectedSphere.empty() &&
-        elevationRange.hasBoundaryValues())
+
+    if (clipBox.empty() && clipCone.empty() && selectedSphere.empty())
     {
         // Reset selection to mark all points as selected.
+        LOG_DEBUG_LOCAL("Reset selection");
         uint32_t n = static_cast<uint32_t>(position.size() / 3);
         selection.resize(n);
         selectionSize = n;
@@ -709,6 +714,8 @@ void Page::selectElevation()
         }
     }
 
+    LOG_DEBUG_LOCAL("selectionSize <" << selectionSize << "> nSelectedNew <"
+                                      << nSelectedNew << ">");
     selectionSize = nSelectedNew;
 }
 
