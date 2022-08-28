@@ -520,7 +520,7 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
     contained. It is not necessary to touch any file outside of your plugin
     directory with exception of one cmake file.
     -#  To start, one can copy and modify existing external plugin such as
-        "src/plugins/classifyground" to new directory "src/plugins/myplugin".
+        "src/plugins/classification" to new directory "src/plugins/myplugin".
     -#  Add path to "src/plugins/CMakeLists.txt" to build the new plugin:
         @verbatim
         add_subdirectory(myplugin)
@@ -834,8 +834,9 @@ powershell -C "gci | % {rni $_.Name ($_.Name -replace '24px', '24')}"
             "${workspaceRoot}/src/core",
             "${workspaceRoot}/src/editor",
             "${workspaceRoot}/src/gui",
-            "${workspaceRoot}/src/plugins/classifyground",
+            "${workspaceRoot}/src/plugins/classification",
             "${workspaceRoot}/src/plugins/help",
+            "${workspaceRoot}/src/plugins/elevation",
             "${workspaceRoot}/src/plugins/export",
             "${workspaceRoot}/src/plugins/import",
             "${workspaceRoot}/src/plugins/projectnavigator",
