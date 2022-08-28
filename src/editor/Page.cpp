@@ -290,7 +290,6 @@ void Page::select()
     const Cone<double> &clipCone = query_->selectedCone();
     const Sphere<double> &selectedSphere = query_->selectedSphere();
 
-
     if (clipBox.empty() && clipCone.empty() && selectedSphere.empty())
     {
         // Reset selection to mark all points as selected.
