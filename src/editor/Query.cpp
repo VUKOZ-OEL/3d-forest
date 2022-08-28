@@ -211,6 +211,11 @@ void Query::selectSphere(double x, double y, double z, double radius)
     selectedSphere_.set(x, y, z, radius);
 }
 
+void Query::selectElevationRange(const Range<double> &elevationRange)
+{
+    elevationRange_ = elevationRange;
+}
+
 void Query::selectClassifications(const std::unordered_set<size_t> &list)
 {
     if (list.empty())

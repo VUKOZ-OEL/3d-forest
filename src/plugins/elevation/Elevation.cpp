@@ -17,73 +17,56 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ClassifyGround.cpp */
+/** @file Elevation.cpp */
 
 #include <delaunator.hpp>
 #include <igl/point_mesh_squared_distance.h>
 #include <igl/writeOBJ.h>
 
-#include <ClassifyGround.hpp>
 #include <Editor.hpp>
+#include <Elevation.hpp>
 
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("ClassifyGround", msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("Elevation", msg)
 
-ClassifyGround::ClassifyGround(Editor *editor)
-    : editor_(editor),
-      query_(editor),
-      queryPoint_(editor)
+Elevation::Elevation(Editor *editor) : editor_(editor), query_(editor)
 {
     LOG_DEBUG_LOCAL("");
 }
 
-ClassifyGround::~ClassifyGround()
+Elevation::~Elevation()
 {
     LOG_DEBUG_LOCAL("");
 }
 
-int ClassifyGround::start(size_t pointsPerCell,
-                          double cellLengthMinPercent,
-                          double groundErrorPercent,
-                          double angleDeg)
+int Elevation::start(size_t pointsPerCell, double cellLengthMinPercent)
 {
     // clang-format off
     LOG_DEBUG_LOCAL("pointsPerCell <" << pointsPerCell << "> " <<
-                    "cellLengthMinPercent <" << cellLengthMinPercent << "> " <<
-                    "groundErrorPercent <" << groundErrorPercent << "> " <<
-                    "angleDeg <" << angleDeg << "> ");
+                    "cellLengthMinPercent <" << cellLengthMinPercent << ">");
     // clang-format on
-
-    groundErrorPercent_ = groundErrorPercent;
-
-    // Ground plane angle to inverted angle for selection.
-    angleDeg_ = 90.0 - angleDeg;
 
     query_.setGrid(pointsPerCell, cellLengthMinPercent);
 
     currentStep_ = 0;
     numberOfSteps_ = static_cast<int>(query_.gridSize());
 
-    LOG_DEBUG_LOCAL("numberOfSteps <" << numberOfSteps_ << "> ");
+    LOG_DEBUG_LOCAL("numberOfSteps <" << numberOfSteps_ << ">");
 
     return numberOfSteps_;
 }
 
-void ClassifyGround::step()
+void Elevation::step()
 {
-    LOG_DEBUG_LOCAL("step <" << currentStep_ << "/" << numberOfSteps_ << "> ");
-
-    double zMax = editor_->clipBoundary().max(2);
-    double zMin = editor_->clipBoundary().min(2);
-    double zMinCell;
-    double zMaxGround;
+    LOG_DEBUG_LOCAL("step <" << (currentStep_ + 1) << "> from <"
+                             << numberOfSteps_ << ">");
 
     size_t nPointsGroundGrid;
     size_t nPointsAboveGrid;
 
     if (!query_.nextGrid())
     {
-        // TBD Error.
+        LOG_DEBUG_LOCAL("expected nextGrid");
         return;
     }
 
@@ -91,62 +74,35 @@ void ClassifyGround::step()
     query_.selectBox(query_.gridCell());
     query_.exec();
 
-    // Find local minimum.
-    zMinCell = zMax;
-    while (query_.next())
-    {
-        if (query_.z() < zMinCell)
-        {
-            zMinCell = query_.z();
-        }
-    }
-    zMaxGround = zMinCell + (((zMax - zMin) * 0.01) * groundErrorPercent_);
-
-    // Set classification to 'ground' or 'unassigned'.
+    // Get number of ground and non-ground points. Reset elevation to zero.
     nPointsGroundGrid = 0;
     nPointsAboveGrid = 0;
     query_.reset();
     while (query_.next())
     {
-        if (query_.z() > zMaxGround)
+        if (query_.classification() == LasFile::CLASS_GROUND)
         {
-            // unassigned (could be a roof)
-            query_.classification() = LasFile::CLASS_UNASSIGNED;
-            nPointsAboveGrid++;
+            // ground
+            nPointsGroundGrid++;
         }
         else
         {
-            queryPoint_.setMaximumResults(1);
-
-            queryPoint_.selectCone(query_.x(),
-                                   query_.y(),
-                                   query_.z(),
-                                   zMinCell,
-                                   angleDeg_);
-
-            queryPoint_.exec();
-
-            if (queryPoint_.next())
-            {
-                // unassigned (has some points below, inside the cone)
-                query_.classification() = LasFile::CLASS_UNASSIGNED;
-                nPointsAboveGrid++;
-            }
-            else
-            {
-                // ground
-                query_.classification() = LasFile::CLASS_GROUND;
-                nPointsGroundGrid++;
-            }
+            // above ground
+            nPointsAboveGrid++;
         }
 
         query_.elevation() = 0;
         query_.setModified();
     }
 
-    // Ground surface
-    if (nPointsGroundGrid > 0)
+    // Compute elevation
+    if (nPointsGroundGrid > 2)
     {
+        LOG_DEBUG_LOCAL("number of points as ground <"
+                        << nPointsGroundGrid << "> above ground <"
+                        << nPointsAboveGrid << ">");
+
+        // Collect points
         P.resize(static_cast<Eigen::Index>(nPointsAboveGrid), 3);
         V.resize(static_cast<Eigen::Index>(nPointsGroundGrid), 3);
         XY.resize(nPointsGroundGrid * 2);
@@ -177,6 +133,7 @@ void ClassifyGround::step()
             }
         }
 
+        // Compute ground surface
         delaunator::Delaunator delaunay(XY);
 
         // Convert to igl triangles
@@ -202,6 +159,7 @@ void ClassifyGround::step()
 
         // Set elevation
         Eigen::Index idx = 0;
+        Eigen::Index idxElevation = 0;
         query_.reset();
         while (query_.next())
         {
@@ -211,12 +169,15 @@ void ClassifyGround::step()
                 {
                     query_.elevation() = ::sqrt(D(idx));
                     query_.setModified();
+                    idxElevation++;
                 }
 
                 idx++;
             }
         }
-    } // Ground surface
+
+        LOG_DEBUG_LOCAL("points with elevation <" << idxElevation << ">");
+    }
 
     currentStep_++;
 
@@ -227,7 +188,7 @@ void ClassifyGround::step()
     }
 }
 
-void ClassifyGround::exportGroundMesh(const char *path)
+void Elevation::exportGroundMesh(const char *path)
 {
     std::string fullPath;
     fullPath = path + std::to_string(currentStep_) + ".obj";
@@ -236,12 +197,11 @@ void ClassifyGround::exportGroundMesh(const char *path)
     igl::writeOBJ(fullPath, V, F);
 }
 
-void ClassifyGround::clear()
+void Elevation::clear()
 {
     LOG_DEBUG_LOCAL("");
 
     query_.clear();
-    queryPoint_.clear();
 
     currentStep_ = 0;
     numberOfSteps_ = 0;

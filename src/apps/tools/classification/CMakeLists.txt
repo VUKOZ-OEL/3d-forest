@@ -15,21 +15,18 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-set(SUB_PROJECT_NAME "3DForestClassifyGround")
+set(SUB_PROJECT_NAME "3DForestClassification")
 
 add_executable(
     ${SUB_PROJECT_NAME}
-    classifyGround.cpp
-    ../../../plugins/classifyground/ClassifyGround.cpp
+    classification.cpp
+    ../../../plugins/classification/Classification.cpp
 )
 
 target_include_directories(
     ${SUB_PROJECT_NAME}
     PUBLIC
-    ../../../plugins/classifyground
-    ../../../../3rdparty/delaunator
-    ../../../../3rdparty/eigen
-    ../../../../3rdparty/libigl/include
+    ../../../plugins/classification
 )
 
 target_link_libraries(

@@ -22,16 +22,34 @@
 #ifndef CLASSIFICATION_HPP
 #define CLASSIFICATION_HPP
 
-#include <string>
+#include <Query.hpp>
 
-#include <ExportEditor.hpp>
+class Editor;
 
 /** Classification. */
-class EXPORT_EDITOR Classification
+class Classification
 {
 public:
-    std::string label;
-    bool enabled;
+    Classification(Editor *editor);
+    ~Classification();
+
+    int start(size_t pointsPerCell = 10000,
+              double cellLengthMinPercent = 1.,
+              double groundErrorPercent = 15.,
+              double angleDeg = 60.);
+    void step();
+    void clear();
+
+protected:
+    Editor *editor_;
+    Query query_;
+    Query queryPoint_;
+
+    double groundErrorPercent_;
+    double angleDeg_;
+
+    int currentStep_;
+    int numberOfSteps_;
 };
 
 #endif /* CLASSIFICATION_HPP */

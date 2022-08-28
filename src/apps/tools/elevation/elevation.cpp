@@ -17,27 +17,29 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file classifyGround.cpp */
+/** @file elevation.cpp */
 
-#include <ClassifyGround.hpp>
 #include <Editor.hpp>
+#include <Elevation.hpp>
 #include <Error.hpp>
 #include <Log.hpp>
 
-static void classifyGround(const char *inputPath, size_t pointsPerCell)
+static void elevation(const char *inputPath,
+                      size_t pointsPerCell,
+                      double cellLengthMinPercent)
 {
     // Open input file in editor.
     Editor editor;
     editor.open(inputPath);
 
-    // Classify ground by steps.
-    ClassifyGround cg(&editor);
-    int n = cg.start(pointsPerCell);
+    // Compute elevation by steps.
+    Elevation e(&editor);
+    int n = e.start(pointsPerCell, cellLengthMinPercent);
     for (int i = 0; i < n; i++)
     {
         std::cout << "Step " << (i + 1) << "/" << n << std::endl;
-        cg.step();
-        // cg.exportGroundMesh("ground");
+        e.step();
+        // e.exportGroundMesh("ground");
     }
 }
 
@@ -45,6 +47,7 @@ int main(int argc, char *argv[])
 {
     const char *inputPath = nullptr;
     size_t pointsPerCell = 10000;
+    double cellLengthMinPercent = 5.;
 
     if (argc > 1)
     {
@@ -60,9 +63,18 @@ int main(int argc, char *argv[])
         }
     }
 
+    if (argc > 3)
+    {
+        double v = atof(argv[3]);
+        if (v > 0.)
+        {
+            cellLengthMinPercent = v;
+        }
+    }
+
     try
     {
-        classifyGround(inputPath, pointsPerCell);
+        elevation(inputPath, pointsPerCell, cellLengthMinPercent);
     }
     catch (std::exception &e)
     {

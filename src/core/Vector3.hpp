@@ -249,8 +249,8 @@ template <class T> inline Json &Vector3<T>::write(Json &out) const
 template <class T>
 std::ostream &operator<<(std::ostream &os, const Vector3<T> &obj)
 {
-    return os << std::fixed << "{" << obj[0] << ", " << obj[1] << ", " << obj[2]
-              << "}" << std::defaultfloat;
+    return os << std::fixed << "(" << obj[0] << ", " << obj[1] << ", " << obj[2]
+              << ")" << std::defaultfloat;
 }
 
 #endif /* VECTOR3_HPP */

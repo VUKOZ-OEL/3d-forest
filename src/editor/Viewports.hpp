@@ -38,6 +38,7 @@ public:
     void clearContent();
 
     void selectBox(const Box<double> &box);
+    void selectElevationRange(const Range<double> &elevationRange);
     void selectClassifications(const std::unordered_set<size_t> &list);
     void selectLayers(const std::unordered_set<size_t> &list);
     void selectCamera(size_t viewport, const Camera &camera);

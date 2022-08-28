@@ -26,7 +26,7 @@
 #include <Endian.hpp>
 #include <Error.hpp>
 
-const size_t ChunkFile::CHUNK_HEADER_SIZE = 16;
+#define CHUNK_HEADER_SIZE 16U
 
 ChunkFile::ChunkFile()
 {

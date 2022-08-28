@@ -1,5 +1,4 @@
-<!DOCTYPE RCC>
-<!--
+/*
     Copyright 2020 VUKOZ
 
     This file is part of 3D Forest.
@@ -16,12 +15,23 @@
 
     You should have received a copy of the GNU General Public License
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
--->
-<RCC version="1.0">
-<qresource prefix="/classifyground">
+*/
 
-<!-- Tool bar -->
-<file>soil_24px.png</file>
+/** @file Class.hpp */
 
-</qresource>
-</RCC>
+#ifndef CLASS_HPP
+#define CLASS_HPP
+
+#include <string>
+
+#include <ExportEditor.hpp>
+
+/** Classification Class. */
+class EXPORT_EDITOR Class
+{
+public:
+    std::string label;
+    bool enabled;
+};
+
+#endif /* CLASS_HPP */

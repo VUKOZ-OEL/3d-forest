@@ -174,6 +174,7 @@ protected:
     void selectBox();
     void selectCone();
     void selectSphere();
+    void selectElevation();
     void selectClassification();
     void selectLayer();
 

@@ -22,10 +22,12 @@
 
 <!-- Standard -->
 <file>question_16px.png</file>
-<file>plus_16px.png</file>
-<file>plus_24px.png</file>
-<file>minus_16px.png</file>
-<file>minus_24px.png</file>
+<file>add_16px.png</file>
+<file>add_24px.png</file>
+<file>add_24px_color.png</file>
+<file>remove_16px.png</file>
+<file>remove_24px.png</file>
+<file>remove_24px_color.png</file>
 
 </qresource>
 </RCC>

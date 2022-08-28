@@ -38,8 +38,6 @@
 class EXPORT_CORE ChunkFile
 {
 public:
-    static const size_t CHUNK_HEADER_SIZE;
-
     /** Chunk Header. */
     struct EXPORT_CORE Chunk
     {

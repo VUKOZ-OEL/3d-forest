@@ -28,6 +28,7 @@ class MainWindow;
 class ProjectNavigatorFiles;
 class ProjectNavigatorLayers;
 class ProjectNavigatorClassifications;
+class ProjectNavigatorElevation;
 
 class QTabWidget;
 
@@ -39,15 +40,13 @@ class ProjectNavigatorWindow : public QDockWidget
 public:
     ProjectNavigatorWindow(MainWindow *mainWindow);
 
-protected slots:
-    void slotCurrentChanged(int index);
-
 protected:
     MainWindow *mainWindow_;
     QTabWidget *tabWidget_;
     ProjectNavigatorFiles *datasets_;
     ProjectNavigatorLayers *layers_;
     ProjectNavigatorClassifications *classifications_;
+    ProjectNavigatorElevation *elevation_;
 };
 
 #endif /* PROJECT_NAVIGATOR_WINDOW_HPP */

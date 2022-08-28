@@ -17,10 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ClassifyGround.hpp */
+/** @file Elevation.hpp */
 
-#ifndef CLASSIFY_GROUND_HPP
-#define CLASSIFY_GROUND_HPP
+#ifndef ELEVATION_HPP
+#define ELEVATION_HPP
 
 #include <Eigen/Core>
 
@@ -28,17 +28,14 @@
 
 class Editor;
 
-/** Classify Ground. */
-class ClassifyGround
+/** Elevation. */
+class Elevation
 {
 public:
-    ClassifyGround(Editor *editor);
-    ~ClassifyGround();
+    Elevation(Editor *editor);
+    ~Elevation();
 
-    int start(size_t pointsPerCell = 10000,
-              double cellLengthMinPercent = 1.,
-              double groundErrorPercent = 15.,
-              double angleDeg = 60.);
+    int start(size_t pointsPerCell = 10000, double cellLengthMinPercent = 1.);
     void step();
     void exportGroundMesh(const char *path);
     void clear();
@@ -46,10 +43,6 @@ public:
 protected:
     Editor *editor_;
     Query query_;
-    Query queryPoint_;
-
-    double groundErrorPercent_;
-    double angleDeg_;
 
     int currentStep_;
     int numberOfSteps_;
@@ -63,4 +56,4 @@ protected:
     Eigen::MatrixXd C;      // 3 list of closest points
 };
 
-#endif /* CLASSIFY_GROUND_HPP */
+#endif /* ELEVATION_HPP */

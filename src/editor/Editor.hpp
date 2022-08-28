@@ -62,6 +62,10 @@ public:
     Box<double> clipBoundary() const;
     const Box<double> &boundary() const { return datasets_.boundary(); }
 
+    // Elevation
+    const Range<double> &elevationRange() const { return elevationRange_; }
+    void setElevationRange(const Range<double> &elevationRange);
+
     // Data sets
     const Datasets &datasets() const { return datasets_; }
     void setDatasets(const Datasets &datasets);
@@ -106,6 +110,7 @@ protected:
     Voxels voxels_;
 
     Region clipFilter_;
+    Range<double> elevationRange_;
 
     // Modifiers
     std::vector<ModifierInterface *> modifiers_;

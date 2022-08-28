@@ -28,6 +28,7 @@
 #include <Cone.hpp>
 #include <ExportEditor.hpp>
 #include <Page.hpp>
+#include <Range.hpp>
 #include <Sphere.hpp>
 
 class Editor;
@@ -42,6 +43,7 @@ public:
     void selectBox(const Box<double> &box);
     void selectCone(double x, double y, double z, double z2, double angle);
     void selectSphere(double x, double y, double z, double radius);
+    void selectElevationRange(const Range<double> &elevationRange);
     void selectClassifications(const std::unordered_set<size_t> &list);
     void selectLayers(const std::unordered_set<size_t> &list);
     void selectCamera(const Camera &camera);
@@ -49,6 +51,10 @@ public:
     const Box<double> &selectedBox() const { return selectBox_; }
     const Cone<double> &selectedCone() const { return selectCone_; }
     const Sphere<double> &selectedSphere() const { return selectedSphere_; }
+    const Range<double> &selectedElevationRange() const
+    {
+        return elevationRange_;
+    }
     const std::vector<int> &selectedClassifications() const
     {
         return selectClassifications_;
@@ -157,6 +163,7 @@ protected:
     Box<double> selectBox_;
     Cone<double> selectCone_;
     Sphere<double> selectedSphere_;
+    Range<double> elevationRange_;
     std::vector<int> selectClassifications_;
     std::unordered_set<size_t> selectLayers_;
     size_t maximumResults_;

@@ -26,7 +26,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include <Classification.hpp>
+#include <Class.hpp>
 #include <ExportEditor.hpp>
 #include <Vector3.hpp>
 
@@ -55,7 +55,7 @@ public:
     Json &write(Json &out) const;
 
 protected:
-    std::vector<Classification> classes_;
+    std::vector<Class> classes_;
     bool enabled_;
 };
 

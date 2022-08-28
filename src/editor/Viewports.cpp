@@ -63,6 +63,14 @@ void Viewports::selectBox(const Box<double> &box)
     }
 }
 
+void Viewports::selectElevationRange(const Range<double> &elevationRange)
+{
+    for (auto &it : viewports_)
+    {
+        it->selectElevationRange(elevationRange);
+    }
+}
+
 void Viewports::selectClassifications(const std::unordered_set<size_t> &list)
 {
     for (auto &it : viewports_)

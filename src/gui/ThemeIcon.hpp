@@ -24,6 +24,7 @@
 
 #include <ExportGui.hpp>
 
+#include <QFile>
 #include <QIcon>
 #include <QString>
 
@@ -39,10 +40,21 @@ class EXPORT_GUI ThemeIcon : public QIcon
 public:
     ThemeIcon(const QString &prefix, const QString &name) : QIcon()
     {
-        addFile(prefix + name + "_16px.png", QSize(16, 16));
-        addFile(prefix + name + "_24px.png", QSize(24, 24));
-        // addFile(prefix + name + "_24px_color.png", QSize(24, 24));
-        addFile(prefix + name + "_30px.png", QSize(30, 30));
+        addFileExists(prefix + name + "_16px", QSize(16, 16));
+        addFileExists(prefix + name + "_24px", QSize(24, 24));
+    }
+
+private:
+    void addFileExists(const QString &filename, const QSize &size)
+    {
+        if (QFile(filename + "_color.png").exists())
+        {
+            addFile(filename + "_color.png", size);
+        }
+        else
+        {
+            addFile(filename + ".png", size);
+        }
     }
 };
 
