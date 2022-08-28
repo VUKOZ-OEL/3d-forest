@@ -41,8 +41,8 @@
 #define ICON(name) (ThemeIcon(":/elevation/", name))
 #define ELEVATION_PLUGIN_NAME "Elevation"
 
-//#define LOG_DEBUG_LOCAL(msg)
-#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("ElevationPlugin", msg)
+#define LOG_DEBUG_LOCAL(msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("ElevationPlugin", msg)
 
 /** Elevation Window. */
 class ElevationWindow : public QDockWidget

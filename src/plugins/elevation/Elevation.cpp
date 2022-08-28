@@ -26,8 +26,8 @@
 #include <Editor.hpp>
 #include <Elevation.hpp>
 
-//#define LOG_DEBUG_LOCAL(msg)
-#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("Elevation", msg)
+#define LOG_DEBUG_LOCAL(msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("Elevation", msg)
 
 Elevation::Elevation(Editor *editor) : editor_(editor), query_(editor)
 {

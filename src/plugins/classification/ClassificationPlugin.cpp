@@ -41,8 +41,8 @@
 #define ICON(name) (ThemeIcon(":/classification/", name))
 #define CLASSIFICATION_PLUGIN_NAME "Classification"
 
-//#define LOG_DEBUG_LOCAL(msg)
-#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("ClassificationPlugin", msg)
+#define LOG_DEBUG_LOCAL(msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("ClassificationPlugin", msg)
 
 /** Classification Window. */
 class ClassificationWindow : public QDockWidget
