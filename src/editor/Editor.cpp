@@ -31,6 +31,9 @@ static const char *EDITOR_KEY_CLASSIFICATIONS = "classifications";
 // static const char *EDITOR_KEY_CLIP_FILTER = "clipFilter";
 // static const char *EDITOR_KEY_ELEVATION_RANGE = "elevationRange";
 
+#define LOG_DEBUG_LOCAL(msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("Editor", msg)
+
 Editor::Editor()
 {
     close();
@@ -238,6 +241,7 @@ Box<double> Editor::clipBoundary() const
 void Editor::setElevationRange(const Range<double> &elevationRange)
 {
     elevationRange_ = elevationRange;
+    LOG_DEBUG_LOCAL("elevationRange <" << elevationRange_ << ">");
     viewports_.selectElevationRange(elevationRange_);
 
     // unsavedChanges_ = true;
