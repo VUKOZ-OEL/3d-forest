@@ -30,13 +30,15 @@
 
 #define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
-//#define LOG_DEBUG_LOCAL(msg)
-#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("ProjectNavigatorElevation", msg)
+#define LOG_DEBUG_LOCAL(msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("ProjectNavigatorElevation", msg)
 
 ProjectNavigatorElevation::ProjectNavigatorElevation(MainWindow *mainWindow)
     : QWidget(),
       mainWindow_(mainWindow)
 {
+    LOG_DEBUG_LOCAL("");
+
     // Input widgets
     RangeSliderWidget::create(rangeInput_,
                               this,
@@ -63,10 +65,16 @@ ProjectNavigatorElevation::ProjectNavigatorElevation(MainWindow *mainWindow)
 void ProjectNavigatorElevation::slotRangeFinalValue()
 {
     LOG_DEBUG_LOCAL("maximumValue <" << rangeInput_->maximumValue() << ">");
+
+    elevationRange_.setMaximumValue(rangeInput_->maximumValue());
+
+    filterChanged();
 }
 
 void ProjectNavigatorElevation::filterChanged()
 {
+    LOG_DEBUG_LOCAL("");
+
     mainWindow_->suspendThreads();
     mainWindow_->editor().setElevationRange(elevationRange_);
     mainWindow_->updateFilter();
@@ -75,6 +83,7 @@ void ProjectNavigatorElevation::filterChanged()
 void ProjectNavigatorElevation::slotUpdate()
 {
     elevationRange_ = mainWindow_->editor().elevationRange();
+    LOG_DEBUG_LOCAL("elevationRange <" << elevationRange_ << ">");
 
     rangeInput_->blockSignals(true);
     rangeInput_->setMinimum(elevationRange_.minimum());
