@@ -28,17 +28,17 @@ class SegmentationWindow;
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestSegmentationPlugin)
-        #define EXPORT_SEGMENTATION __declspec(dllexport)
+        #define EXPORT_SEGMENTATION_PLUGIN __declspec(dllexport)
     #else
-        #define EXPORT_SEGMENTATION __declspec(dllimport)
+        #define EXPORT_SEGMENTATION_PLUGIN __declspec(dllimport)
     #endif
 #else
-    #define EXPORT_SEGMENTATION
+    #define EXPORT_SEGMENTATION_PLUGIN
 #endif
 
 /** Segmentation Plugin. */
-class EXPORT_SEGMENTATION SegmentationPlugin : public QObject,
-                                               public PluginInterface
+class EXPORT_SEGMENTATION_PLUGIN SegmentationPlugin : public QObject,
+                                                      public PluginInterface
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID PluginInterface_iid)
