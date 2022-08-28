@@ -137,7 +137,9 @@ void Classification::step()
             }
         }
 
-        query_.elevation() = 0;
+        // New ground level may brake elevation.
+        // TBD query_.elevation() = 0;
+
         query_.setModified();
     }
 
