@@ -17,21 +17,21 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Classification.hpp */
+/** @file Class.hpp */
 
-#ifndef CLASSIFICATION_HPP
-#define CLASSIFICATION_HPP
+#ifndef CLASS_HPP
+#define CLASS_HPP
 
 #include <string>
 
 #include <ExportEditor.hpp>
 
-/** Classification. */
-class EXPORT_EDITOR Classification
+/** Classification Class. */
+class EXPORT_EDITOR Class
 {
 public:
     std::string label;
     bool enabled;
 };
 
-#endif /* CLASSIFICATION_HPP */
+#endif /* CLASS_HPP */
