@@ -64,9 +64,29 @@ ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
     tabWidget_->setIconSize(
         QSize(MainWindow::ICON_SIZE_TEXT, MainWindow::ICON_SIZE_TEXT));
 
+    tabWidget_->setStyleSheet(
+        QString("QTabBar::tab:!selected { width: 40px; }"));
+
+    connect(tabWidget_,
+            SIGNAL(currentChanged(int)),
+            this,
+            SLOT(slotCurrentChanged(int)));
+
+    slotCurrentChanged(0);
+
     // Dock
     setWidget(tabWidget_);
     setWindowTitle(tr("Project Navigator"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     mainWindow_->addDockWidget(Qt::RightDockWidgetArea, this);
+}
+
+void ProjectNavigatorWindow::slotCurrentChanged(int index)
+{
+    for (int i = 0; i < tabWidget_->count(); i++)
+    {
+        tabWidget_->setTabText(i, "");
+    }
+
+    tabWidget_->setTabText(index, PROJECT_NAVIGATOR_WINDOW_TAB_TEXT[index]);
 }

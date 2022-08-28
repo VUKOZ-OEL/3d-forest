@@ -544,10 +544,44 @@ int File::write(int fd, const uint8_t *buffer, uint64_t nbyte)
 std::string File::join(const std::string &path1, const std::string &path2)
 {
 #if defined(_MSC_VER) || defined(__MINGW32__)
-    return path1 + "\\" + path2;
+    const char *separator = "\\";
+    const char *separator2 = "\\\\";
 #else
-    return path1 + "/" + path2;
+    const char *separator = "/";
+    const char *separator2 = "//";
 #endif
+
+    std::string result;
+
+    if (path1.size() > 0)
+    {
+        if (path2.size() > 0)
+        {
+            result = path1 + separator + path2;
+        }
+        else
+        {
+            result = path1;
+        }
+    }
+    else
+    {
+        result = path2;
+    }
+
+    size_t pos = 0;
+    while (true)
+    {
+        pos = result.find(separator2, pos);
+        if (pos == std::string::npos)
+        {
+            break;
+        }
+
+        result.replace(pos, 2, separator);
+    }
+
+    return result;
 }
 
 std::string File::currentPath()

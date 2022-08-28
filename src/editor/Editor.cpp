@@ -29,7 +29,7 @@ static const char *EDITOR_KEY_LAYER = "layers";
 static const char *EDITOR_KEY_SETTINGS = "settings";
 static const char *EDITOR_KEY_CLASSIFICATIONS = "classifications";
 // static const char *EDITOR_KEY_CLIP_FILTER = "clipFilter";
-// static const char *EDITOR_KEY_ELEVATION_RANGE = "elevationRange";
+static const char *EDITOR_KEY_ELEVATION_RANGE = "elevationRange";
 
 #define LOG_DEBUG_LOCAL(msg)
 //#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("Editor", msg)
@@ -139,10 +139,10 @@ void Editor::openProject(const std::string &path)
         // }
 
         // Elevation range
-        // if (in.contains(EDITOR_KEY_ELEVATION_RANGE))
-        // {
-        //     elevationRange_.read(in[EDITOR_KEY_ELEVATION_RANGE]);
-        // }
+        if (in.contains(EDITOR_KEY_ELEVATION_RANGE))
+        {
+            elevationRange_.read(in[EDITOR_KEY_ELEVATION_RANGE]);
+        }
     }
     catch (std::exception &e)
     {
@@ -176,7 +176,7 @@ void Editor::save(const std::string &path)
     // clipFilter_.write(out[EDITOR_KEY_CLIP_FILTER]);
 
     // Elevation range
-    // elevationRange_.write(out[EDITOR_KEY_ELEVATION_RANGE]);
+    elevationRange_.write(out[EDITOR_KEY_ELEVATION_RANGE]);
 
     out.write(path);
 
