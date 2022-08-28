@@ -15,7 +15,27 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-add_subdirectory(classification)
-add_subdirectory(elevation)
-add_subdirectory(icon)
-add_subdirectory(sandbox)
+set(SUB_PROJECT_NAME "3DForestElevation")
+
+add_executable(
+    ${SUB_PROJECT_NAME}
+    elevation.cpp
+    ../../../plugins/elevation/Elevation.cpp
+)
+
+target_include_directories(
+    ${SUB_PROJECT_NAME}
+    PUBLIC
+    ../../../plugins/elevation
+    ../../../../3rdparty/delaunator
+    ../../../../3rdparty/eigen
+    ../../../../3rdparty/libigl/include
+)
+
+target_link_libraries(
+    ${SUB_PROJECT_NAME}
+    PUBLIC
+    3DForestEditor
+)
+
+install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)
