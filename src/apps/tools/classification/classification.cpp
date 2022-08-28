@@ -17,27 +17,26 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file classifyGround.cpp */
+/** @file classification.cpp */
 
-#include <ClassifyGround.hpp>
+#include <Classification.hpp>
 #include <Editor.hpp>
 #include <Error.hpp>
 #include <Log.hpp>
 
-static void classifyGround(const char *inputPath, size_t pointsPerCell)
+static void classification(const char *inputPath, size_t pointsPerCell)
 {
     // Open input file in editor.
     Editor editor;
     editor.open(inputPath);
 
     // Classify ground by steps.
-    ClassifyGround cg(&editor);
+    Classification cg(&editor);
     int n = cg.start(pointsPerCell);
     for (int i = 0; i < n; i++)
     {
         std::cout << "Step " << (i + 1) << "/" << n << std::endl;
         cg.step();
-        // cg.exportGroundMesh("ground");
     }
 }
 
@@ -62,7 +61,7 @@ int main(int argc, char *argv[])
 
     try
     {
-        classifyGround(inputPath, pointsPerCell);
+        classification(inputPath, pointsPerCell);
     }
     catch (std::exception &e)
     {

@@ -17,35 +17,35 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ClassifyGroundPlugin.hpp */
+/** @file ClassificationPlugin.hpp */
 
-#ifndef CLASSIFY_GROUND_PLUGIN_HPP
-#define CLASSIFY_GROUND_PLUGIN_HPP
+#ifndef CLASSIFICATION_PLUGIN_HPP
+#define CLASSIFICATION_PLUGIN_HPP
 
 #include <PluginInterface.hpp>
 
-class ClassifyGroundWindow;
+class ClassificationWindow;
 
 #if defined(_MSC_VER)
-    #if defined(EXPORT_3DForestClassifyGroundPlugin)
-        #define EXPORT_CLASSIFY_GROUND __declspec(dllexport)
+    #if defined(EXPORT_3DForestClassificationPlugin)
+        #define EXPORT_CLASSIFICATION_PLUGIN __declspec(dllexport)
     #else
-        #define EXPORT_CLASSIFY_GROUND __declspec(dllimport)
+        #define EXPORT_CLASSIFICATION_PLUGIN __declspec(dllimport)
     #endif
 #else
-    #define EXPORT_CLASSIFY_GROUND
+    #define EXPORT_CLASSIFICATION_PLUGIN
 #endif
 
-/** Classify Ground Plugin. */
-class EXPORT_CLASSIFY_GROUND ClassifyGroundPlugin : public QObject,
-                                                    public PluginInterface
+/** Classification Plugin. */
+class EXPORT_CLASSIFICATION_PLUGIN ClassificationPlugin : public QObject,
+                                                          public PluginInterface
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID PluginInterface_iid)
     Q_INTERFACES(PluginInterface)
 
 public:
-    ClassifyGroundPlugin();
+    ClassificationPlugin();
 
     virtual void initialize(MainWindow *mainWindow);
 
@@ -54,7 +54,7 @@ public slots:
 
 protected:
     MainWindow *mainWindow_;
-    ClassifyGroundWindow *dockWindow_;
+    ClassificationWindow *dockWindow_;
 };
 
-#endif /* CLASSIFY_GROUND_PLUGIN_HPP */
+#endif /* CLASSIFICATION_PLUGIN_HPP */

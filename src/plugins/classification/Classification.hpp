@@ -1,5 +1,4 @@
-<!DOCTYPE RCC>
-<!--
+/*
     Copyright 2020 VUKOZ
 
     This file is part of 3D Forest.
@@ -16,12 +15,41 @@
 
     You should have received a copy of the GNU General Public License
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
--->
-<RCC version="1.0">
-<qresource prefix="/classifyground">
+*/
 
-<!-- Tool bar -->
-<file>soil_24px.png</file>
+/** @file Classification.hpp */
 
-</qresource>
-</RCC>
+#ifndef CLASSIFICATION_HPP
+#define CLASSIFICATION_HPP
+
+#include <Query.hpp>
+
+class Editor;
+
+/** Classification. */
+class Classification
+{
+public:
+    Classification(Editor *editor);
+    ~Classification();
+
+    int start(size_t pointsPerCell = 10000,
+              double cellLengthMinPercent = 1.,
+              double groundErrorPercent = 15.,
+              double angleDeg = 60.);
+    void step();
+    void clear();
+
+protected:
+    Editor *editor_;
+    Query query_;
+    Query queryPoint_;
+
+    double groundErrorPercent_;
+    double angleDeg_;
+
+    int currentStep_;
+    int numberOfSteps_;
+};
+
+#endif /* CLASSIFICATION_HPP */

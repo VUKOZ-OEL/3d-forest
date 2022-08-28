@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-set(SUB_PROJECT_NAME "3DForestClassifyGroundPlugin")
+set(SUB_PROJECT_NAME "3DForestClassificationPlugin")
 
 if(NOT QT_VERSION_MAJOR)
     message(WARNING "Gui not found - skipping ${SUB_PROJECT_NAME}")
@@ -38,9 +38,6 @@ target_include_directories(
     ${SUB_PROJECT_NAME}
     PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}
-    ../../../3rdparty/delaunator
-    ../../../3rdparty/eigen
-    ../../../3rdparty/libigl/include
 )
 
 target_compile_definitions(

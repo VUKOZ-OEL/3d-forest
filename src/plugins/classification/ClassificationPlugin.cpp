@@ -17,10 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ClassifyGroundPlugin.cpp */
+/** @file ClassificationPlugin.cpp */
 
-#include <ClassifyGround.hpp>
-#include <ClassifyGroundPlugin.hpp>
+#include <Classification.hpp>
+#include <ClassificationPlugin.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
@@ -38,23 +38,26 @@
 #include <QSpinBox>
 #include <QVBoxLayout>
 
-#define ICON(name) (ThemeIcon(":/classifyground/", name))
-#define CLASSIFY_GROUND_PLUGIN_NAME "Classify Ground"
+#define ICON(name) (ThemeIcon(":/classification/", name))
+#define CLASSIFICATION_PLUGIN_NAME "Classification"
 
-/** Classify Ground Window. */
-class ClassifyGroundWindow : public QDockWidget
+//#define LOG_DEBUG_LOCAL(msg)
+#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("ClassificationPlugin", msg)
+
+/** Classification Window. */
+class ClassificationWindow : public QDockWidget
 {
     Q_OBJECT
 
 public:
-    ClassifyGroundWindow(MainWindow *mainWindow);
+    ClassificationWindow(MainWindow *mainWindow);
 
 protected slots:
     void slotApply();
 
 protected:
     MainWindow *mainWindow_;
-    ClassifyGround classifyGround_;
+    Classification classification_;
 
     QWidget *widget_;
     QSpinBox *nPointsSpinBox_;
@@ -65,11 +68,13 @@ protected:
     QPushButton *applyButton_;
 };
 
-ClassifyGroundWindow::ClassifyGroundWindow(MainWindow *mainWindow)
+ClassificationWindow::ClassificationWindow(MainWindow *mainWindow)
     : QDockWidget(mainWindow),
       mainWindow_(mainWindow),
-      classifyGround_(&mainWindow->editor())
+      classification_(&mainWindow->editor())
 {
+    LOG_DEBUG_LOCAL("");
+
     // Widgets
     nPointsSpinBox_ = new QSpinBox;
     nPointsSpinBox_->setRange(1000, 1000000);
@@ -126,14 +131,16 @@ ClassifyGroundWindow::ClassifyGroundWindow(MainWindow *mainWindow)
     widget_->setLayout(vbox);
     widget_->setFixedHeight(180);
     setWidget(widget_);
-    setWindowTitle(QObject::tr(CLASSIFY_GROUND_PLUGIN_NAME));
+    setWindowTitle(QObject::tr(CLASSIFICATION_PLUGIN_NAME));
     setFloating(true);
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     mainWindow_->addDockWidget(Qt::RightDockWidgetArea, this);
 }
 
-void ClassifyGroundWindow::slotApply()
+void ClassificationWindow::slotApply()
 {
+    LOG_DEBUG_LOCAL("");
+
     mainWindow_->suspendThreads();
 
     size_t pointsPerCell = static_cast<size_t>(nPointsSpinBox_->value());
@@ -141,15 +148,17 @@ void ClassifyGroundWindow::slotApply()
     double groundErrorPercent = static_cast<double>(rangeSpinBox_->value());
     double angleDeg = static_cast<double>(angleSpinBox_->value());
 
-    int maximum = classifyGround_.start(pointsPerCell,
+    int maximum = classification_.start(pointsPerCell,
                                         cellLengthMinPercent,
                                         groundErrorPercent,
                                         angleDeg);
 
+    LOG_DEBUG_LOCAL("maximum <" << maximum << ">");
+
     QProgressDialog progressDialog(mainWindow_);
     progressDialog.setCancelButtonText(QObject::tr("&Cancel"));
     progressDialog.setRange(0, maximum);
-    progressDialog.setWindowTitle(QObject::tr(CLASSIFY_GROUND_PLUGIN_NAME));
+    progressDialog.setWindowTitle(QObject::tr(CLASSIFICATION_PLUGIN_NAME));
     progressDialog.setWindowModality(Qt::WindowModal);
     progressDialog.setMinimumDuration(0);
     progressDialog.show();
@@ -157,10 +166,11 @@ void ClassifyGroundWindow::slotApply()
     for (int i = 0; i < maximum; i++)
     {
         // Update progress
-        i++;
-        progressDialog.setValue(i);
+        int p = i + 1;
+        LOG_DEBUG_LOCAL("Processing <" << p << "> from <" << maximum << ">");
+        progressDialog.setValue(p);
         progressDialog.setLabelText(
-            QObject::tr("Processing %1 of %n...", nullptr, maximum).arg(i));
+            QObject::tr("Processing %1 of %n...", nullptr, maximum).arg(p));
 
         QCoreApplication::processEvents();
         if (progressDialog.wasCanceled())
@@ -168,10 +178,10 @@ void ClassifyGroundWindow::slotApply()
             break;
         }
 
-        classifyGround_.step();
+        classification_.step();
     }
 
-    classifyGround_.clear();
+    classification_.clear();
 
     progressDialog.setValue(progressDialog.maximum());
 
@@ -180,32 +190,32 @@ void ClassifyGroundWindow::slotApply()
     mainWindow_->resumeThreads();
 }
 
-ClassifyGroundPlugin::ClassifyGroundPlugin()
+ClassificationPlugin::ClassificationPlugin()
     : mainWindow_(nullptr),
       dockWindow_(nullptr)
 {
 }
 
-void ClassifyGroundPlugin::initialize(MainWindow *mainWindow)
+void ClassificationPlugin::initialize(MainWindow *mainWindow)
 {
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
                               "Utilities",
                               "Utilities",
-                              tr("Classify Ground"),
+                              tr("Classification"),
                               tr("Classify points to ground and unassigned"),
                               ICON("soil"),
                               this,
                               SLOT(slotPlugin()));
 }
 
-void ClassifyGroundPlugin::slotPlugin()
+void ClassificationPlugin::slotPlugin()
 {
     // Create GUI only when this plugin is used for the first time
     if (!dockWindow_)
     {
-        dockWindow_ = new ClassifyGroundWindow(mainWindow_);
+        dockWindow_ = new ClassificationWindow(mainWindow_);
     }
 
     dockWindow_->show();
@@ -214,4 +224,4 @@ void ClassifyGroundPlugin::slotPlugin()
 }
 
 // Q_OBJECT is used in this cpp file
-#include "ClassifyGroundPlugin.moc"
+#include "ClassificationPlugin.moc"
