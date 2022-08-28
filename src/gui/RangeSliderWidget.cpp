@@ -26,79 +26,110 @@
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QSlider>
 #include <QSpinBox>
 #include <QVBoxLayout>
+
+#include <ctkrangeslider.h>
 
 RangeSliderWidget::RangeSliderWidget() : QWidget()
 {
 }
 
-int RangeSliderWidget::maximumValue()
-{
-    return slider_->value();
-}
-
-void RangeSliderWidget::setMaximumValue(int value)
-{
-    spinBox_->setValue(value);
-    slider_->setValue(value);
-}
-
 void RangeSliderWidget::setMinimum(int min)
 {
-    spinBox_->setMinimum(min);
+    minSpinBox_->setMinimum(min);
+    maxSpinBox_->setMinimum(min);
     slider_->setMinimum(min);
 }
 
 void RangeSliderWidget::setMaximum(int max)
 {
-    spinBox_->setMaximum(max);
+    minSpinBox_->setMaximum(max);
+    maxSpinBox_->setMaximum(max);
     slider_->setMaximum(max);
+}
+
+void RangeSliderWidget::setMinimumValue(int value)
+{
+    minSpinBox_->setValue(value);
+    slider_->setMinimumValue(value);
+}
+
+int RangeSliderWidget::minimumValue()
+{
+    return slider_->minimumValue();
+}
+
+void RangeSliderWidget::setMaximumValue(int value)
+{
+    maxSpinBox_->setValue(value);
+    slider_->setMaximumValue(value);
+}
+
+int RangeSliderWidget::maximumValue()
+{
+    return slider_->maximumValue();
 }
 
 void RangeSliderWidget::blockSignals(bool block)
 {
-    spinBox_->blockSignals(block);
+    minSpinBox_->blockSignals(block);
+    maxSpinBox_->blockSignals(block);
     slider_->blockSignals(block);
 }
 
-void RangeSliderWidget::slotFinalValue()
-{
-    emit signalFinalValue();
-}
-
-void RangeSliderWidget::slotIntermediateValue(int v)
+void RangeSliderWidget::slotIntermediateMinimumValue(int v)
 {
     QObject *obj = sender();
 
     if (obj == slider_)
     {
-        spinBox_->blockSignals(true);
-        spinBox_->setValue(v);
-        spinBox_->blockSignals(false);
+        minSpinBox_->blockSignals(true);
+        minSpinBox_->setValue(v);
+        minSpinBox_->blockSignals(false);
     }
-    else if (obj == spinBox_)
+    else if (obj == minSpinBox_)
     {
         slider_->blockSignals(true);
-        slider_->setValue(v);
+        slider_->setMinimumValue(v);
         slider_->blockSignals(false);
     }
 
-    emit signalIntermediateValue(v);
+    emit signalIntermediateMinimumValue(v);
+}
+
+void RangeSliderWidget::slotIntermediateMaximumValue(int v)
+{
+    QObject *obj = sender();
+
+    if (obj == slider_)
+    {
+        maxSpinBox_->blockSignals(true);
+        maxSpinBox_->setValue(v);
+        maxSpinBox_->blockSignals(false);
+    }
+    else if (obj == maxSpinBox_)
+    {
+        slider_->blockSignals(true);
+        slider_->setMaximumValue(v);
+        slider_->blockSignals(false);
+    }
+
+    emit signalIntermediateMaximumValue(v);
 }
 
 void RangeSliderWidget::create(RangeSliderWidget *&outputWidget,
                                const QObject *receiver,
-                               const char *memberIntermediateValue,
-                               const char *memberFinalValue,
+                               const char *memberIntermediateMinimumValue,
+                               const char *memberIntermediateMaximumValue,
                                const QString &text,
                                const QString &toolTip,
                                const QString &unitsList,
                                int step,
                                int min,
                                int max,
-                               int value)
+                               int minValue,
+                               int maxValue)
 {
     outputWidget = new RangeSliderWidget();
 
@@ -123,64 +154,73 @@ void RangeSliderWidget::create(RangeSliderWidget *&outputWidget,
     descriptionLayout->addWidget(units);
 
     // Value Slider
-    outputWidget->slider_ = new QSlider;
-    QSlider *slider = outputWidget->slider_;
+    outputWidget->slider_ = new ctkRangeSlider;
+    ctkRangeSlider *slider = outputWidget->slider_;
     slider->setRange(min, max);
-    slider->setValue(value);
+    slider->setValues(minValue, maxValue);
     slider->setSingleStep(step);
     slider->setOrientation(Qt::Horizontal);
 
     connect(slider,
-            SIGNAL(valueChanged(int)),
+            SIGNAL(minimumPositionChanged(int)),
             outputWidget,
-            SLOT(slotIntermediateValue(int)));
+            SLOT(slotIntermediateMinimumValue(int)));
 
-    connect(slider,
-            SIGNAL(sliderReleased()),
-            outputWidget,
-            SLOT(slotFinalValue()));
-
-    if (memberIntermediateValue)
+    if (memberIntermediateMinimumValue)
     {
         connect(outputWidget,
-                SIGNAL(signalIntermediateValue(int)),
+                SIGNAL(signalIntermediateMinimumValue(int)),
                 receiver,
-                memberIntermediateValue);
+                memberIntermediateMinimumValue);
     }
 
-    if (memberFinalValue)
+    connect(slider,
+            SIGNAL(maximumPositionChanged(int)),
+            outputWidget,
+            SLOT(slotIntermediateMaximumValue(int)));
+
+    if (memberIntermediateMaximumValue)
     {
         connect(outputWidget,
-                SIGNAL(signalFinalValue()),
+                SIGNAL(signalIntermediateMaximumValue(int)),
                 receiver,
-                memberFinalValue);
+                memberIntermediateMaximumValue);
     }
 
     // Value SpinBox
-    outputWidget->spinBox_ = new QSpinBox;
-    QSpinBox *spinBox = outputWidget->spinBox_;
-    spinBox->setRange(min, max);
-    spinBox->setValue(value);
-    spinBox->setSingleStep(step);
+    outputWidget->minSpinBox_ = new QSpinBox;
+    QSpinBox *minSpinBox = outputWidget->minSpinBox_;
+    minSpinBox->setRange(min, max);
+    minSpinBox->setValue(minValue);
+    minSpinBox->setSingleStep(step);
 
-    connect(spinBox,
+    connect(minSpinBox,
             SIGNAL(valueChanged(int)),
             outputWidget,
-            SLOT(slotIntermediateValue(int)));
+            SLOT(slotIntermediateMinimumValue(int)));
 
-    connect(spinBox,
-            SIGNAL(editingFinished()),
+    outputWidget->maxSpinBox_ = new QSpinBox;
+    QSpinBox *maxSpinBox = outputWidget->maxSpinBox_;
+    maxSpinBox->setRange(min, max);
+    maxSpinBox->setValue(maxValue);
+    maxSpinBox->setSingleStep(step);
+
+    connect(maxSpinBox,
+            SIGNAL(valueChanged(int)),
             outputWidget,
-            SLOT(slotFinalValue()));
+            SLOT(slotIntermediateMaximumValue(int)));
 
     // Value Layout
     QHBoxLayout *valueLayout = new QHBoxLayout;
-    valueLayout->addWidget(slider);
-    valueLayout->addWidget(spinBox);
+    valueLayout->addWidget(new QLabel("Min"));
+    valueLayout->addWidget(minSpinBox);
+    valueLayout->addWidget(new QLabel("Max"));
+    valueLayout->addWidget(maxSpinBox);
 
     // Group Description and Value
     QVBoxLayout *groupLayout = new QVBoxLayout;
     groupLayout->addLayout(descriptionLayout);
+    groupLayout->addWidget(slider);
     groupLayout->addLayout(valueLayout);
 
     outputWidget->setLayout(groupLayout);
