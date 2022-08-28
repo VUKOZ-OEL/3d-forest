@@ -46,6 +46,10 @@ int Elevation::start(size_t pointsPerCell, double cellLengthMinPercent)
                     "cellLengthMinPercent <" << cellLengthMinPercent << ">");
     // clang-format on
 
+    elevationPointsCount_ = 0;
+    elevationMinimum_ = 0;
+    elevationMaximum_ = 0;
+
     query_.setGrid(pointsPerCell, cellLengthMinPercent);
 
     currentStep_ = 0;
@@ -167,9 +171,31 @@ void Elevation::step()
             {
                 if (idx < D.rows() && D(idx) > 0.)
                 {
-                    query_.elevation() = ::sqrt(D(idx));
+                    double elevation = ::sqrt(D(idx));
+
+                    query_.elevation() = elevation;
                     query_.setModified();
+
+                    if (elevationPointsCount_ > 0)
+                    {
+                        if (elevation < elevationMinimum_)
+                        {
+                            elevationMinimum_ = elevation;
+                        }
+
+                        if (elevation > elevationMaximum_)
+                        {
+                            elevationMaximum_ = elevation;
+                        }
+                    }
+                    else
+                    {
+                        elevationMinimum_ = elevation;
+                        elevationMaximum_ = elevation;
+                    }
+
                     idxElevation++;
+                    elevationPointsCount_++;
                 }
 
                 idx++;
@@ -185,6 +211,17 @@ void Elevation::step()
     {
         LOG_DEBUG_LOCAL("flush");
         query_.flush();
+
+        if (elevationPointsCount_ > 0)
+        {
+            Range<double> range;
+            range.setMinimum(elevationMinimum_);
+            range.setMinimumValue(elevationMinimum_);
+            range.setMaximum(elevationMaximum_);
+            range.setMaximumValue(elevationMaximum_);
+
+            editor_->setElevationRange(range);
+        }
     }
 }
 
@@ -205,6 +242,10 @@ void Elevation::clear()
 
     currentStep_ = 0;
     numberOfSteps_ = 0;
+
+    elevationPointsCount_ = 0;
+    elevationMinimum_ = 0;
+    elevationMaximum_ = 0;
 
     XY.clear();
 

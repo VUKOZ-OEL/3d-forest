@@ -47,6 +47,10 @@ protected:
     int currentStep_;
     int numberOfSteps_;
 
+    uint64_t elevationPointsCount_;
+    double elevationMinimum_;
+    double elevationMaximum_;
+
     Eigen::MatrixXd P;      // Points above ground
     Eigen::MatrixXd V;      // Ground coordinates
     std::vector<double> XY; // Ground xy coordinates
