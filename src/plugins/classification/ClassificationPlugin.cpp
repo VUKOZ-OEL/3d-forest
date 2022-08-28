@@ -22,20 +22,18 @@
 #include <Classification.hpp>
 #include <ClassificationPlugin.hpp>
 #include <MainWindow.hpp>
+#include <SliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
-#include <QCheckBox>
 #include <QCloseEvent>
 #include <QComboBox>
 #include <QCoreApplication>
 #include <QDockWidget>
-#include <QGridLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QProgressDialog>
 #include <QPushButton>
-#include <QSpinBox>
 #include <QVBoxLayout>
 
 #define ICON(name) (ThemeIcon(":/classification/", name))
@@ -60,11 +58,10 @@ protected:
     Classification classification_;
 
     QWidget *widget_;
-    QSpinBox *nPointsSpinBox_;
-    QSpinBox *lengthSpinBox_;
-    QSpinBox *rangeSpinBox_;
-    QSpinBox *angleSpinBox_;
-    QCheckBox *liveCheckBox_;
+    SliderWidget *nPointsSlider_;
+    SliderWidget *lengthSlider_;
+    SliderWidget *rangeSlider_;
+    SliderWidget *angleSlider_;
     QPushButton *applyButton_;
 };
 
@@ -76,60 +73,83 @@ ClassificationWindow::ClassificationWindow(MainWindow *mainWindow)
     LOG_DEBUG_LOCAL("");
 
     // Widgets
-    nPointsSpinBox_ = new QSpinBox;
-    nPointsSpinBox_->setRange(1000, 1000000);
-    nPointsSpinBox_->setValue(100000);
-    nPointsSpinBox_->setSingleStep(1);
+    SliderWidget::create(nPointsSlider_,
+                         this,
+                         nullptr,
+                         nullptr,
+                         tr("Points per cell"),
+                         tr("Points per cell"),
+                         tr("pt"),
+                         1,
+                         1000,
+                         1000000,
+                         10000);
 
-    lengthSpinBox_ = new QSpinBox;
-    lengthSpinBox_->setRange(1, 100);
-    lengthSpinBox_->setValue(1);
-    lengthSpinBox_->setSingleStep(1);
+    SliderWidget::create(lengthSlider_,
+                         this,
+                         nullptr,
+                         nullptr,
+                         tr("Cell min length"),
+                         tr("Cell min length"),
+                         tr("%"),
+                         1,
+                         1,
+                         100,
+                         5);
 
-    rangeSpinBox_ = new QSpinBox;
-    rangeSpinBox_->setRange(1, 100);
-    rangeSpinBox_->setValue(15);
-    rangeSpinBox_->setSingleStep(1);
+    SliderWidget::create(rangeSlider_,
+                         this,
+                         nullptr,
+                         nullptr,
+                         tr("Ground level"),
+                         tr("Ground level maximum"),
+                         tr("%"),
+                         1,
+                         1,
+                         100,
+                         15);
 
-    angleSpinBox_ = new QSpinBox;
-    angleSpinBox_->setRange(1, 89);
-    angleSpinBox_->setValue(60);
-    angleSpinBox_->setSingleStep(1);
+    SliderWidget::create(angleSlider_,
+                         this,
+                         nullptr,
+                         nullptr,
+                         tr("Ground angle"),
+                         tr("Ground angle"),
+                         tr("deg"),
+                         1,
+                         1,
+                         89,
+                         60);
 
-    liveCheckBox_ = new QCheckBox;
-    liveCheckBox_->setChecked(false);
-    liveCheckBox_->setEnabled(false);
+    // Settings layout
+    QVBoxLayout *settingsLayout = new QVBoxLayout;
+    settingsLayout->addWidget(nPointsSlider_);
+    settingsLayout->addWidget(lengthSlider_);
+    settingsLayout->addWidget(rangeSlider_);
+    settingsLayout->addWidget(angleSlider_);
+    settingsLayout->addStretch();
 
+    // Buttons
     applyButton_ = new QPushButton(tr("Classify"));
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
 
-    // Layout
-    QGridLayout *groupBoxLayout = new QGridLayout;
-    groupBoxLayout->addWidget(new QLabel(tr("Points per cell")), 0, 0);
-    groupBoxLayout->addWidget(nPointsSpinBox_, 0, 1);
-    groupBoxLayout->addWidget(new QLabel(tr("Cell min length (%)")), 1, 0);
-    groupBoxLayout->addWidget(lengthSpinBox_, 1, 1);
-    groupBoxLayout->addWidget(new QLabel(tr("Ground level (%)")), 2, 0);
-    groupBoxLayout->addWidget(rangeSpinBox_, 2, 1);
-    groupBoxLayout->addWidget(new QLabel(tr("Ground angle (deg)")), 3, 0);
-    groupBoxLayout->addWidget(angleSpinBox_, 3, 1);
+    // Buttons layout
+    QHBoxLayout *buttonsLayout = new QHBoxLayout;
+    buttonsLayout->addStretch();
+    buttonsLayout->addWidget(applyButton_);
 
-    QHBoxLayout *hbox = new QHBoxLayout;
-    hbox->addWidget(liveCheckBox_);
-    hbox->addWidget(new QLabel(tr("Live")));
-    hbox->addStretch();
-    hbox->addWidget(applyButton_, 0, Qt::AlignRight);
-
-    QVBoxLayout *vbox = new QVBoxLayout;
-    vbox->addLayout(groupBoxLayout);
-    vbox->addSpacing(10);
-    vbox->addLayout(hbox);
+    // Main layout
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->addLayout(settingsLayout);
+    mainLayout->addSpacing(10);
+    mainLayout->addLayout(buttonsLayout);
+    mainLayout->addStretch();
 
     // Dock
     widget_ = new QWidget;
-    widget_->setLayout(vbox);
-    widget_->setFixedHeight(180);
+    widget_->setLayout(mainLayout);
+    widget_->setFixedHeight(350);
     setWidget(widget_);
     setWindowTitle(QObject::tr(CLASSIFICATION_PLUGIN_NAME));
     setFloating(true);
@@ -143,10 +163,10 @@ void ClassificationWindow::slotApply()
 
     mainWindow_->suspendThreads();
 
-    size_t pointsPerCell = static_cast<size_t>(nPointsSpinBox_->value());
-    double cellLengthMinPercent = static_cast<double>(lengthSpinBox_->value());
-    double groundErrorPercent = static_cast<double>(rangeSpinBox_->value());
-    double angleDeg = static_cast<double>(angleSpinBox_->value());
+    size_t pointsPerCell = static_cast<size_t>(nPointsSlider_->value());
+    double cellLengthMinPercent = static_cast<double>(lengthSlider_->value());
+    double groundErrorPercent = static_cast<double>(rangeSlider_->value());
+    double angleDeg = static_cast<double>(angleSlider_->value());
 
     int maximum = classification_.start(pointsPerCell,
                                         cellLengthMinPercent,
