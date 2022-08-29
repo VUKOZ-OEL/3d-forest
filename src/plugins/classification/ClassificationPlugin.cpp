@@ -149,7 +149,7 @@ ClassificationWindow::ClassificationWindow(MainWindow *mainWindow)
     // Dock
     widget_ = new QWidget;
     widget_->setLayout(mainLayout);
-    widget_->setFixedHeight(350);
+    // TBD dialog? widget_->setFixedHeight(350);
     setWidget(widget_);
     setWindowTitle(QObject::tr(CLASSIFICATION_PLUGIN_NAME));
     setFloating(true);
