@@ -123,7 +123,7 @@ ElevationWindow::ElevationWindow(MainWindow *mainWindow)
     // Dock
     widget_ = new QWidget;
     widget_->setLayout(mainLayout);
-    widget_->setFixedHeight(200);
+    // TBD dialog? widget_->setFixedHeight(200);
     setWidget(widget_);
     setWindowTitle(QObject::tr(ELEVATION_PLUGIN_NAME));
     setFloating(true);
