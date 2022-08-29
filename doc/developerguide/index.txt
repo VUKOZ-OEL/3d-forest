@@ -167,7 +167,7 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
 
 @section build-macos-make Build from Source Code in Mac OS with "Unix Makefiles"
 
-The code uses C++14, CMake, Qt5/Qt6 and OpenGL which will be installed in the
+The code uses C++17, CMake, Qt5/Qt6 and OpenGL which will be installed in the
 following steps. Qt and OpenGL are required only for GUI desktop application.
 
 @image html 3d-forest-macos.png "3D Forest application on macOS 10.13 1.4 GHz Processor, 4 GB Memory, GeForce 320M Graphics"
