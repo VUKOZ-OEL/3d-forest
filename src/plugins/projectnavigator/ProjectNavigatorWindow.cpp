@@ -21,6 +21,7 @@
 
 #include <MainWindow.hpp>
 #include <ProjectNavigatorClassifications.hpp>
+#include <ProjectNavigatorClipping.hpp>
 #include <ProjectNavigatorElevation.hpp>
 #include <ProjectNavigatorFiles.hpp>
 #include <ProjectNavigatorLayers.hpp>
@@ -34,7 +35,8 @@
 static const char *PROJECT_NAVIGATOR_WINDOW_TAB_TEXT[] = {"File",
                                                           "Layer",
                                                           "Class",
-                                                          "Elevation"};
+                                                          "Elevation",
+                                                          "Clip"};
 
 ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
     : QDockWidget(mainWindow),
@@ -45,6 +47,7 @@ ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
     layers_ = new ProjectNavigatorLayers(mainWindow_);
     classifications_ = new ProjectNavigatorClassifications(mainWindow_);
     elevation_ = new ProjectNavigatorElevation(mainWindow_);
+    clipping_ = new ProjectNavigatorClipping(mainWindow_);
 
     // Tabs
     tabWidget_ = new QTabWidget;
@@ -60,6 +63,9 @@ ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
     tabWidget_->addTab(elevation_,
                        ICON("elevation_filter"),
                        PROJECT_NAVIGATOR_WINDOW_TAB_TEXT[3]);
+    tabWidget_->addTab(clipping_,
+                       ICON("clip_filter"),
+                       PROJECT_NAVIGATOR_WINDOW_TAB_TEXT[4]);
 
     tabWidget_->setIconSize(
         QSize(MainWindow::ICON_SIZE_TEXT, MainWindow::ICON_SIZE_TEXT));

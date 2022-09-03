@@ -41,6 +41,7 @@
 <file>classification_16px.png</file>
 <file>classification_16px_color.png</file>
 <file>elevation_filter_16px_color.png</file>
+<file>clip_filter_16px_color.png</file>
 
 </qresource>
 </RCC>
