@@ -32,7 +32,7 @@ class EXPORT_EDITOR ModifierInterface
 public:
     virtual ~ModifierInterface() = default;
     virtual bool isModifierEnabled() = 0;
-    virtual void modifier(Page *page) = 0;
+    virtual void applyModifier(Page *page) = 0;
 };
 
 #endif /* MODIFIER_INTERFACE_HPP */

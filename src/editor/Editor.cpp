@@ -291,7 +291,7 @@ void Editor::runModifiers(Page *page)
         /** @todo Collect enabled modifiers during preprocessing. */
         if (it->isModifierEnabled())
         {
-            it->modifier(page);
+            it->applyModifier(page);
         }
     }
 }
