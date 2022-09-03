@@ -26,7 +26,7 @@
 #include <ExportEditor.hpp>
 
 /** Region. */
-class EXPORT_EDITOR Region
+class EXPORT_CORE Region
 {
 public:
     /** Region Type. */
@@ -90,6 +90,12 @@ inline Json &Region::write(Json &out) const
     }
 
     return out;
+}
+
+inline std::ostream &operator<<(std::ostream &os, const Region &obj)
+{
+    return os << std::fixed << "(" << obj.box << ", " << obj.boxView << ", "
+              << obj.enabled << ")" << std::defaultfloat;
 }
 
 #endif /* REGION_HPP */
