@@ -35,7 +35,7 @@ class QCloseEvent;
 
 /** Height Map Window.
 
-    This class represents Height Map GUI as view-conroller for
+    This class represents Height Map GUI as view-controller for
     HeightMapModifier.
 
     GUI could be provided directly by the top HeightMapPlugin if it was derived

@@ -40,21 +40,22 @@ class HeightMapWindow;
 
 /** Height Map Plugin.
 
-    This class represents Height Map plugin as it is visible to the application.
+    This class represents Height Map plugin.
+    This interface is visible to the application.
 
     This plugin provides on-the-fly interactive preview functionality.
-    Plugins with interactive preview inherit EditorFilter.
+    Plugins with interactive preview inherit ModifierInterface.
     Plugins with interactive preview feature have more complex design
     compared to solutions which use simple modal progress bar. The reason is
     that interactive preview creates concurrent access to memory from multiple
     threads.
 
-    Height Map plugin uses delayed lazy initialization of GUI widgets from
-    show() instead of from initialize() to save plugin loading time and memory.
+    Height Map plugin uses delayed lazy initialization of GUI widgets to
+    save plugin loading time and memory.
 */
-class HeightMapPlugin : public QObject,
-                        public PluginInterface,
-                        public ModifierInterface
+class EXPORT_HEIGHT_MAP_PLUGIN HeightMapPlugin : public QObject,
+                                                 public PluginInterface,
+                                                 public ModifierInterface
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID PluginInterface_iid)
