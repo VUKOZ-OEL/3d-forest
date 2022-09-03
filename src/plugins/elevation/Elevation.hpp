@@ -40,6 +40,9 @@ public:
     void exportGroundMesh(const char *path);
     void clear();
 
+    double minimum() const { return elevationMinimum_; }
+    double maximum() const { return elevationMaximum_; }
+
 protected:
     Editor *editor_;
     Query query_;

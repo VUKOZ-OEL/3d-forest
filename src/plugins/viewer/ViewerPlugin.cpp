@@ -147,8 +147,8 @@ void ViewerPlugin::initialize(MainWindow *mainWindow)
                               this,
                               SLOT(slotViewLayout3RowsRight()));
 
-    mainWindow_->hideToolBar("Viewport Projection");
-    mainWindow_->hideToolBar("Viewport Layout");
+    // mainWindow_->hideToolBar("Viewport Projection");
+    // mainWindow_->hideToolBar("Viewport Layout");
 }
 
 void ViewerPlugin::slotViewOrthographic()

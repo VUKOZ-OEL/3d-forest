@@ -1,4 +1,5 @@
-/*
+<!DOCTYPE RCC>
+<!--
     Copyright 2020 VUKOZ
 
     This file is part of 3D Forest.
@@ -15,24 +16,12 @@
 
     You should have received a copy of the GNU General Public License
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
-*/
+-->
+<RCC version="1.0">
+<qresource prefix="/heightmap">
 
-/** @file ModifierInterface.hpp */
+<!-- Tool bar -->
+<file>height_map_24px_color.png</file>
 
-#ifndef MODIFIER_INTERFACE_HPP
-#define MODIFIER_INTERFACE_HPP
-
-#include <ExportEditor.hpp>
-
-class Page;
-
-/** Modifier Interface. */
-class EXPORT_EDITOR ModifierInterface
-{
-public:
-    virtual ~ModifierInterface() = default;
-    virtual bool isModifierEnabled() = 0;
-    virtual void applyModifier(Page *page) = 0;
-};
-
-#endif /* MODIFIER_INTERFACE_HPP */
+</qresource>
+</RCC>

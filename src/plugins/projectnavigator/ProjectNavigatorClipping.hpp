@@ -17,41 +17,44 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ProjectNavigatorWindow.hpp */
+/** @file ProjectNavigatorClipping.hpp */
 
-#ifndef PROJECT_NAVIGATOR_WINDOW_HPP
-#define PROJECT_NAVIGATOR_WINDOW_HPP
+#ifndef PROJECT_NAVIGATOR_CLIPPING_HPP
+#define PROJECT_NAVIGATOR_CLIPPING_HPP
 
-#include <QDockWidget>
+#include <Range.hpp>
+
+#include <QWidget>
 
 class MainWindow;
-class ProjectNavigatorFiles;
-class ProjectNavigatorLayers;
-class ProjectNavigatorClassifications;
-class ProjectNavigatorClipping;
-class ProjectNavigatorElevation;
+class RangeSliderWidget;
 
-class QTabWidget;
+class QCheckBox;
+class QPushButton;
 
-/** Project Navigator Window. */
-class ProjectNavigatorWindow : public QDockWidget
+/** Project Navigator Clipping. */
+class ProjectNavigatorClipping : public QWidget
 {
     Q_OBJECT
 
 public:
-    ProjectNavigatorWindow(MainWindow *mainWindow);
+    ProjectNavigatorClipping(MainWindow *mainWindow);
 
-protected slots:
-    void slotCurrentChanged(int index);
+public slots:
+    void slotUpdate();
+    void slotRangeIntermediateMinimumValue(int v);
+    void slotRangeIntermediateMaximumValue(int v);
+    void setEnabled(int state);
+    void reset();
 
 protected:
     MainWindow *mainWindow_;
-    QTabWidget *tabWidget_;
-    ProjectNavigatorFiles *datasets_;
-    ProjectNavigatorLayers *layers_;
-    ProjectNavigatorClassifications *classifications_;
-    ProjectNavigatorElevation *elevation_;
-    ProjectNavigatorClipping *clipping_;
+    RangeSliderWidget *rangeInput_[3];
+    QCheckBox *enabledCheckBox_;
+    QPushButton *resetButton_;
+    Range<double> clipRange_[3];
+
+    void filterChanged();
 };
 
-#endif /* PROJECT_NAVIGATOR_WINDOW_HPP */
+#endif /* PROJECT_NAVIGATOR_CLIPPING_HPP */

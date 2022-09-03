@@ -41,6 +41,9 @@ static void elevation(const char *inputPath,
         e.step();
         // e.exportGroundMesh("ground");
     }
+
+    std::cout << "elevation minimum <" << e.minimum() << ">" << std::endl;
+    std::cout << "elevation maximum <" << e.maximum() << ">" << std::endl;
 }
 
 int main(int argc, char *argv[])
