@@ -44,9 +44,17 @@ class QWidget;
 class HeightMapModifier
 {
 public:
+    /** Height Map Modifier Source. */
+    enum Source
+    {
+        SOURCE_Z_POSITION,
+        SOURCE_ELEVATION
+    };
+
     HeightMapModifier();
 
     void initialize(MainWindow *mainWindow);
+    void setSource(Source source);
     void setColormap(const QString &name, int colorCount);
     void setPreviewEnabled(bool enabled,
                            bool update = true,
@@ -59,6 +67,7 @@ protected:
     MainWindow *mainWindow_;
     Editor *editor_;
     bool previewEnabled_;
+    Source source_;
     std::vector<Vector3<float>> colormap_;
     QMutex mutex_;
 

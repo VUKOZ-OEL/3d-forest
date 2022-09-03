@@ -41,7 +41,8 @@
 HeightMapModifier::HeightMapModifier()
     : mainWindow_(nullptr),
       editor_(nullptr),
-      previewEnabled_(false)
+      previewEnabled_(false),
+      source_(SOURCE_Z_POSITION)
 {
 }
 
@@ -51,6 +52,21 @@ void HeightMapModifier::initialize(MainWindow *mainWindow)
     editor_ = &mainWindow->editor();
     colormap_ = createColormap(PLUGIN_HEIGHT_MAP_COLORMAP_DEFAULT,
                                PLUGIN_HEIGHT_MAP_COLORS_DEFAULT);
+}
+
+void HeightMapModifier::setSource(Source source)
+{
+    bool previewEnabled;
+
+    mutex_.lock();
+    source_ = source;
+    previewEnabled = previewEnabled_;
+    mutex_.unlock();
+
+    if (previewEnabled)
+    {
+        setPreviewEnabled(previewEnabled);
+    }
 }
 
 void HeightMapModifier::setColormap(const QString &name, int colorCount)
@@ -113,27 +129,58 @@ void HeightMapModifier::applyModifier(Page *page)
 {
     mutex_.lock();
 
-    double zMin = editor_->clipBoundary().min(2);
-    double zLen = editor_->clipBoundary().max(2) - zMin;
-    double colorDelta = 1.0 / static_cast<double>(colormap_.size() - 1);
+    // Colormap range step in normalized colormap range
+    double colormapStep = 1.0 / static_cast<double>(colormap_.size() - 1);
 
-    double zLenInv = 0;
-    if (zLen > 0)
+    // Minimum and maximum height range
+    double heightMinimum;
+    double heightRange;
+
+    if (source_ == SOURCE_Z_POSITION)
     {
-        zLenInv = 1.0 / zLen;
+        heightMinimum = editor_->clipBoundary().min(2);
+        heightRange = editor_->clipBoundary().max(2) - heightMinimum;
+    }
+    else
+    {
+        heightMinimum = editor_->elevationRange().minimum();
+        heightRange = editor_->elevationRange().maximum() - heightMinimum;
     }
 
+    // Height range step in normalized height range
+    double heightStep = 0;
+
+    if (heightRange > 0)
+    {
+        heightStep = 1.0 / heightRange;
+    }
+
+    // Process selected points in this page
     const std::vector<uint32_t> &selection = page->selection;
 
     for (size_t i = 0; i < page->selectionSize; i++)
     {
+        // Index of next selected point in this page
         size_t row = selection[i];
 
-        double z = page->position[3 * row + 2];
-        double zNorm = (z - zMin) * zLenInv;
+        // Calculate normalized height <0, 1>
+        double height;
 
-        size_t colorIndex = static_cast<size_t>(zNorm / colorDelta);
+        if (source_ == SOURCE_Z_POSITION)
+        {
+            height = page->position[3 * row + 2]; // z position from xyz
+        }
+        else
+        {
+            height = page->elevation[row];
+        }
 
+        double heightNorm = (height - heightMinimum) * heightStep;
+
+        // Get color by mapping height to colormap range
+        size_t colorIndex = static_cast<size_t>(heightNorm / colormapStep);
+
+        // Output
         page->renderColor[row * 3 + 0] *= colormap_[colorIndex][0];
         page->renderColor[row * 3 + 1] *= colormap_[colorIndex][1];
         page->renderColor[row * 3 + 2] *= colormap_[colorIndex][2];

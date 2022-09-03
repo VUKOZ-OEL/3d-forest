@@ -51,6 +51,7 @@ public:
 protected slots:
     void colorCountChanged(int i);
     void colormapChanged(int index);
+    void sourceChanged(int index);
     void previewChanged(int index);
     void apply();
 
@@ -60,6 +61,7 @@ protected:
     QWidget *widget_;
     QSpinBox *colorCountSpinBox_;
     QComboBox *colormapComboBox_;
+    QComboBox *sourceComboBox_;
     QCheckBox *previewCheckBox_;
     QPushButton *applyButton_;
 

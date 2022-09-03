@@ -46,6 +46,9 @@
 #define PLUGIN_HEIGHT_MAP_COLORMAP_DEFAULT PLUGIN_HEIGHT_MAP_COLORMAP_MATLAB_JET
 #define PLUGIN_HEIGHT_MAP_COLORS_MAX 65536
 #define PLUGIN_HEIGHT_MAP_COLORS_DEFAULT 256
+#define PLUGIN_HEIGHT_MAP_SOURCE_Z_POSITION "Z position"
+#define PLUGIN_HEIGHT_MAP_SOURCE_ELEVATION "Elevation"
+#define PLUGIN_HEIGHT_MAP_SOURCE_DEFAULT PLUGIN_HEIGHT_MAP_SOURCE_Z_POSITION
 
 HeightMapWindow::HeightMapWindow(MainWindow *mainWindow,
                                  HeightMapModifier *modifier)
@@ -76,6 +79,16 @@ HeightMapWindow::HeightMapWindow(MainWindow *mainWindow,
             this,
             &HeightMapWindow::colormapChanged);
 
+    sourceComboBox_ = new QComboBox;
+    sourceComboBox_->addItem(PLUGIN_HEIGHT_MAP_SOURCE_Z_POSITION);
+    sourceComboBox_->addItem(PLUGIN_HEIGHT_MAP_SOURCE_ELEVATION);
+    sourceComboBox_->setCurrentText(PLUGIN_HEIGHT_MAP_SOURCE_DEFAULT);
+
+    connect(sourceComboBox_,
+            &QComboBox::activated,
+            this,
+            &HeightMapWindow::sourceChanged);
+
     // Widgets apply
     // connect() with '&' has less features than classic SIGNAL()/SLOT()
     // in the current Qt version but it is easier to write.
@@ -100,6 +113,8 @@ HeightMapWindow::HeightMapWindow(MainWindow *mainWindow,
     groupBoxLayout->addWidget(colorCountSpinBox_, 0, 1);
     groupBoxLayout->addWidget(new QLabel(tr("Colormap")), 1, 0);
     groupBoxLayout->addWidget(colormapComboBox_, 1, 1);
+    groupBoxLayout->addWidget(new QLabel(tr("Source")), 2, 0);
+    groupBoxLayout->addWidget(sourceComboBox_, 2, 1);
     groupBoxLayout->setColumnStretch(1, 1);
 
     QHBoxLayout *hbox = new QHBoxLayout;
@@ -137,6 +152,23 @@ void HeightMapWindow::colormapChanged(int index)
     (void)index;
     modifier_->setColormap(colormapComboBox_->currentText(),
                            colorCountSpinBox_->value());
+}
+
+void HeightMapWindow::sourceChanged(int index)
+{
+    (void)index;
+
+    HeightMapModifier::Source source;
+    if (sourceComboBox_->currentText() == PLUGIN_HEIGHT_MAP_SOURCE_Z_POSITION)
+    {
+        source = HeightMapModifier::SOURCE_Z_POSITION;
+    }
+    else
+    {
+        source = HeightMapModifier::SOURCE_ELEVATION;
+    }
+
+    modifier_->setSource(source);
 }
 
 void HeightMapWindow::previewChanged(int index)
