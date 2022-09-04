@@ -106,11 +106,13 @@ void SegmentationPca::compute(Query &query,
     LOG_DEBUG_LOCAL("mean <" << meanX << "," << meanY << "," << meanZ << ">");
 
     Voxels::Voxel &voxel = voxels.at(index);
-    voxel.x = static_cast<float>(meanX);
-    voxel.y = static_cast<float>(meanY);
-    voxel.z = static_cast<float>(meanZ);
+    voxel.x = meanX;
+    voxel.y = meanY;
+    voxel.z = meanZ;
     voxel.i = 0;
     voxel.state = 0;
+    voxel.element = 0;
+    voxel.cluster = 0;
 
     // Enough points for PCA?
     if (nPoints < 3)
