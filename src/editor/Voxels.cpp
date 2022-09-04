@@ -44,9 +44,28 @@ void Voxels::clear()
     voxelSize_.clear();
 
     data_.clear();
-    occupied_.clear();
+
+    occupiedClear();
+    elementsClear();
+    clustersClear();
 
     stack_.clear();
+}
+
+void Voxels::occupiedClear()
+{
+    occupied_.clear();
+}
+
+void Voxels::elementsClear()
+{
+    elementsOffset_.clear();
+    elementsSize_.clear();
+    elementsIndex_.clear();
+}
+
+void Voxels::clustersClear()
+{
 }
 
 void Voxels::resize(size_t n)

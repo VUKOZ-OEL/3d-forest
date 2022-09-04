@@ -119,6 +119,22 @@ bool SegmentationThread::compute()
         bool finishedState = computeThreshold();
         if (finishedState)
         {
+            setState(STATE_PREPARE_ELEMENTS);
+        }
+    }
+    else if (state_ == STATE_PREPARE_ELEMENTS)
+    {
+        bool finishedState = computePrepareElements();
+        if (finishedState)
+        {
+            setState(STATE_CREATE_ELEMENTS);
+        }
+    }
+    else if (state_ == STATE_CREATE_ELEMENTS)
+    {
+        bool finishedState = computeCreateElements();
+        if (finishedState)
+        {
             setState(STATE_MERGE_CLUSTERS);
         }
     }
@@ -286,6 +302,65 @@ bool SegmentationThread::computeThreshold()
                                   << min << "> max <" << max << "> percent <"
                                   << thresholdPercent_ << ">");
     progressPercent_ = 100;
+    return true;
+}
+
+bool SegmentationThread::computePrepareElements()
+{
+    LOG_DEBUG_LOCAL("");
+
+    // Initialization
+    if (!stateInitialized_)
+    {
+        voxels_.occupiedClear();
+        voxels_.elementsClear();
+        voxels_.clustersClear();
+
+        progressMax_ = voxels_.size();
+        progressValue_ = 0;
+        stateInitialized_ = true;
+    }
+
+    // Next step
+    for (size_t i = 0; i < voxels_.size(); i++)
+    {
+        Voxels::Voxel &voxel = voxels_.at(i);
+        voxel.element = 0;
+        voxel.cluster = 0;
+
+        if (!(voxel.i < thresholdIntensity_))
+        {
+            voxel.state = 1;
+            voxels_.occupiedAdd(i);
+        }
+    }
+
+    LOG_DEBUG_LOCAL("occupied <" << voxels_.occupiedSize() << "> from <"
+                                 << voxels_.size() << ">");
+
+    progressPercent_ = 100;
+
+    return true;
+}
+
+bool SegmentationThread::computeCreateElements()
+{
+    LOG_DEBUG_LOCAL("");
+
+    double timeBegin = getRealTime();
+
+    // Initialization
+    if (!stateInitialized_)
+    {
+        progressMax_ = voxels_.size();
+        progressValue_ = 0;
+        stateInitialized_ = true;
+    }
+
+    // Next step
+
+    progressPercent_ = 100;
+
     return true;
 }
 

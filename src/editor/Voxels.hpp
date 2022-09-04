@@ -31,11 +31,13 @@ class EXPORT_EDITOR Voxels
 public:
     struct EXPORT_EDITOR Voxel
     {
-        float x;
-        float y;
-        float z;
+        double x;
+        double y;
+        double z;
         float i;
         uint32_t state;
+        uint64_t element;
+        uint64_t cluster;
     };
 
     Voxels();
@@ -66,10 +68,17 @@ public:
     Voxel &at(size_t index) { return data_[index]; }
 
     // Occupied
-    void addOccupied(size_t index) { occupied_.push_back(index); }
+    void occupiedClear();
+    void occupiedAdd(size_t index) { occupied_.push_back(index); }
     size_t occupiedSize() const { return occupied_.size(); }
     size_t occupied(size_t index) const { return occupied_[index]; }
     const size_t *occupiedData() const { return occupied_.data(); }
+
+    // Elements
+    void elementsClear();
+
+    // Clusters
+    void clustersClear();
 
 protected:
     Box<double> spaceRegion_;
@@ -82,6 +91,9 @@ protected:
     Vector3<double> voxelSize_;
     std::vector<Voxel> data_;
     std::vector<size_t> occupied_;
+    std::vector<size_t> elementsOffset_;
+    std::vector<size_t> elementsSize_;
+    std::vector<size_t> elementsIndex_;
 
     std::vector<Box<size_t>> stack_;
 

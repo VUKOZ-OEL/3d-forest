@@ -52,6 +52,8 @@ protected:
     {
         STATE_VOXEL_SIZE,
         STATE_THRESHOLD,
+        STATE_PREPARE_ELEMENTS,
+        STATE_CREATE_ELEMENTS,
         STATE_MERGE_CLUSTERS,
         STATE_FINISHED,
     };
@@ -75,9 +77,13 @@ protected:
 
     void setState(State state);
     void updateProgressPercent();
+
     void computeInitializeLayers();
+
     bool computeVoxelSize();
     bool computeThreshold();
+    bool computePrepareElements();
+    bool computeCreateElements();
     bool computeMergeClusters();
 };
 
