@@ -35,10 +35,11 @@ static void save(const Voxels &voxels, const char *path)
         const Voxels::Voxel &voxel = voxels.at(i);
         memset(&points[i], 0, sizeof(LasFile::Point));
         points[i].format = 6;
-        points[i].x = static_cast<uint32_t>(voxel.x);
-        points[i].y = static_cast<uint32_t>(voxel.y);
-        points[i].z = static_cast<uint32_t>(voxel.z);
-        points[i].intensity = static_cast<uint16_t>(voxel.i * 655.35F);
+        points[i].x = static_cast<uint32_t>(voxel.meanX);
+        points[i].y = static_cast<uint32_t>(voxel.meanY);
+        points[i].z = static_cast<uint32_t>(voxel.meanZ);
+        points[i].intensity = static_cast<uint16_t>(voxel.intensity * 65535.0F);
+        points[i].return_number = static_cast<uint8_t>(voxel.intensity * 15.0F);
     }
 
     LasFile::create(path, points, {1, 1, 1}, {0, 0, 0});
