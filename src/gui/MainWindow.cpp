@@ -46,10 +46,12 @@
 #define LOG_LOCAL(msg)
 //#define LOG_LOCAL(msg) LOG_MODULE("MainWindow", msg)
 
+#if !defined(EXPORT_GUI_IMPORT)
 const char *MainWindow::APPLICATION_NAME = "3D Forest";
 const char *MainWindow::APPLICATION_VERSION = "1.0";
 const int MainWindow::ICON_SIZE = 24;
 const int MainWindow::ICON_SIZE_TEXT = 16;
+#endif
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),

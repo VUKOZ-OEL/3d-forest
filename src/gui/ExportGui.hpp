@@ -27,6 +27,7 @@
         #define EXPORT_GUI __declspec(dllexport)
     #else
         #define EXPORT_GUI __declspec(dllimport)
+        #define EXPORT_GUI_IMPORT
     #endif
 #else
     #define EXPORT_GUI
