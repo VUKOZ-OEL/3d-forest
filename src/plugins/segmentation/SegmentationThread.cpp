@@ -26,8 +26,8 @@
 #include <ThreadCallbackInterface.hpp>
 #include <Time.hpp>
 
-#define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("SegmentationThread", msg)
+//#define LOG_DEBUG_LOCAL(msg)
+#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("SegmentationThread", msg)
 
 SegmentationThread::SegmentationThread(Editor *editor)
     : editor_(editor),
@@ -109,6 +109,14 @@ bool SegmentationThread::compute()
     if (state_ == STATE_VOXEL_SIZE)
     {
         bool finishedState = computeVoxelSize();
+        if (finishedState)
+        {
+            setState(STATE_VOXEL_NORMALIZE);
+        }
+    }
+    else if (state_ == STATE_VOXEL_NORMALIZE)
+    {
+        bool finishedState = computeNormalize();
         if (finishedState)
         {
             setState(STATE_THRESHOLD);
@@ -254,20 +262,25 @@ bool SegmentationThread::computeVoxelSize()
 
         voxels_.create(editor_->clipBoundary(), voxelSize_);
 
-        progressMax_ = voxels_.size();
+        progressMax_ = voxels_.indexSize();
         progressValue_ = 0;
         stateInitialized_ = true;
     }
 
     // Next step
+    Voxels::Voxel voxel;
     Box<double> cell;
-    size_t index;
     size_t counter = 0;
 
-    while (voxels_.next(&cell, &index))
+    while (voxels_.next(&voxel, &cell))
     {
-        // Compute one voxel
-        pca_.compute(query_, voxels_, cell, index);
+        // Compute one voxel [meanX, meanY, meanZ, intensity, density]
+        bool computed;
+        computed = pca_.compute(&query_, &voxel, cell);
+        if (computed)
+        {
+            voxels_.append(voxel);
+        }
 
         // Update progress
         progressValue_++;
@@ -276,12 +289,38 @@ bool SegmentationThread::computeVoxelSize()
         {
             counter = 0;
             double timeNow = getRealTime();
-            if (timeNow - timeBegin > 0.1)
+            if (timeNow - timeBegin > 1.0) // 0.1)
             {
                 updateProgressPercent();
                 return false;
             }
         }
+    }
+
+    // Finished
+    progressPercent_ = 100;
+
+    return true;
+}
+
+bool SegmentationThread::computeNormalize()
+{
+    LOG_DEBUG_LOCAL("");
+
+    double timeBegin = getRealTime();
+
+    // Initialization
+    if (!stateInitialized_)
+    {
+        progressMax_ = voxels_.size();
+        progressValue_ = 0;
+        stateInitialized_ = true;
+    }
+
+    // Next step
+    for (size_t i = 0; i < voxels_.size(); i++)
+    {
+        pca_.normalize(&voxels_.at(i));
     }
 
     // Finished
@@ -294,12 +333,10 @@ bool SegmentationThread::computeVoxelSize()
 
 bool SegmentationThread::computeThreshold()
 {
-    float min = pca_.intensityMin();
-    float max = pca_.intensityMax();
-    float thresholdNormalized = static_cast<float>(thresholdPercent_) * 0.01F;
-    thresholdIntensity_ = min + ((max - min) * thresholdNormalized);
+    thresholdIntensity_ = static_cast<float>(thresholdPercent_) * 0.01F;
     LOG_DEBUG_LOCAL("threshold <" << thresholdIntensity_ << "> from min <"
-                                  << min << "> max <" << max << "> percent <"
+                                  << pca_.intensityMin() << "> max <"
+                                  << pca_.intensityMax() << "> percent <"
                                   << thresholdPercent_ << ">");
     progressPercent_ = 100;
     return true;
@@ -312,9 +349,9 @@ bool SegmentationThread::computePrepareElements()
     // Initialization
     if (!stateInitialized_)
     {
-        voxels_.occupiedClear();
-        voxels_.elementsClear();
-        voxels_.clustersClear();
+        // voxels_.occupiedClear();
+        // voxels_.elementsClear();
+        // voxels_.clustersClear();
 
         progressMax_ = voxels_.size();
         progressValue_ = 0;
@@ -328,15 +365,15 @@ bool SegmentationThread::computePrepareElements()
         voxel.element = 0;
         voxel.cluster = 0;
 
-        if (!(voxel.i < thresholdIntensity_))
+        if (!(voxel.intensity < thresholdIntensity_))
         {
-            voxel.state = 1;
-            voxels_.occupiedAdd(i);
+            voxel.status = 1;
+            // voxels_.occupiedAdd(i);
         }
     }
 
-    LOG_DEBUG_LOCAL("occupied <" << voxels_.occupiedSize() << "> from <"
-                                 << voxels_.size() << ">");
+    // LOG_DEBUG_LOCAL("occupied <" << voxels_.occupiedSize() << "> from <"
+    //                              << voxels_.size() << ">");
 
     progressPercent_ = 100;
 
@@ -352,12 +389,22 @@ bool SegmentationThread::computeCreateElements()
     // Initialization
     if (!stateInitialized_)
     {
-        progressMax_ = voxels_.size();
+        // progressMax_ = voxels_.occupiedSize();
         progressValue_ = 0;
         stateInitialized_ = true;
     }
 
     // Next step
+    // for (size_t i = 0; i < voxels_.occupiedSize(); i++)
+    // {
+    //     size_t idx = voxels_.occupied(i);
+    //     Voxels::Voxel &voxel = voxels_.at(idx);
+    //     if (voxel.status & 2U == 0)
+    //     {
+    //         voxel.element = 0;
+    //         voxel.cluster = 0;
+    //     }
+    // }
 
     progressPercent_ = 100;
 

@@ -51,6 +51,7 @@ protected:
     enum State
     {
         STATE_VOXEL_SIZE,
+        STATE_VOXEL_NORMALIZE,
         STATE_THRESHOLD,
         STATE_PREPARE_ELEMENTS,
         STATE_CREATE_ELEMENTS,
@@ -81,6 +82,7 @@ protected:
     void computeInitializeLayers();
 
     bool computeVoxelSize();
+    bool computeNormalize();
     bool computeThreshold();
     bool computePrepareElements();
     bool computeCreateElements();

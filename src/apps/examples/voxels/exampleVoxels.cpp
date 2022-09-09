@@ -33,26 +33,18 @@ static void exampleVoxels()
     Voxels voxels;
 
     voxels.create(spaceRegion, voxelSize);
-    std::cout << "number of voxels is " << voxels.size() << std::endl;
+    std::cout << "number of voxels is " << voxels.indexSize() << std::endl;
 
+    Voxels::Voxel voxel;
     Box<double> cell;
-    size_t x;
-    size_t y;
-    size_t z;
-    size_t index;
 
-    while (voxels.next(&cell, &index, &x, &y, &z))
+    while (voxels.next(&voxel, &cell))
     {
-        std::cout << index + 1 << "/" << voxels.size() << " [" << x << ", " << y
-                  << ", " << z << "] " << cell << std::endl;
-
-        Voxels::Voxel &voxel = voxels.at(x, y, z);
-        voxel.x = 0;
-        voxel.y = 0;
-        voxel.z = 0;
-        voxel.i = 0;
-        voxel.state = 0;
+        std::cout << (voxels.indexOf(voxel) + 1) << "/" << voxels.indexSize()
+                  << ", " << voxel << ", " << cell << std::endl;
     }
+
+    std::cout << "voxel occupancy <" << voxels.size() << ">" << std::endl;
 }
 
 int main()

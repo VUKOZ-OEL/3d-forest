@@ -31,74 +31,114 @@ class EXPORT_EDITOR Voxels
 public:
     struct EXPORT_EDITOR Voxel
     {
-        double x;
-        double y;
-        double z;
-        float i;
-        uint32_t state;
-        uint64_t element;
-        uint64_t cluster;
+        uint32_t status;
+        uint32_t x;
+        uint32_t y;
+        uint32_t z;
+
+        float intensity;
+        float density;
+
+        double meanX;
+        double meanY;
+        double meanZ;
+
+        uint32_t element;
+        uint32_t cluster;
+
+        void clear();
     };
 
     Voxels();
 
     void clear();
-    void create(const Box<double> &spaceRegion, double voxelSize);
-    size_t size() const { return numberOfVoxels_; }
-    bool next(Box<double> *cell = nullptr,
-              size_t *index = nullptr,
-              size_t *x = nullptr,
-              size_t *y = nullptr,
-              size_t *z = nullptr);
 
-    const Voxel *data() const { return data_.data(); }
+    void create(const Box<double> &spaceRegion, double voxelSize);
+
+    bool next(Voxel *voxel, Box<double> *cell = nullptr);
+
+    // Occupancy
+    size_t size() const { return voxels_.size(); }
+
+    void append(const Voxel &voxel);
+
+    const Voxel &at(size_t index) const { return voxels_[index]; }
+
+    Voxel &at(size_t index) { return voxels_[index]; }
 
     const Voxel &at(size_t x, size_t y, size_t z) const
     {
-        return data_[x + y * nx_ + z * nx_ * ny_];
+        return voxels_[find(x, y, z)];
     }
 
-    Voxel &at(size_t x, size_t y, size_t z)
+    Voxel &at(size_t x, size_t y, size_t z) { return voxels_[find(x, y, z)]; }
+
+    // Grid
+    size_t sizeX() const { return nx_; }
+    size_t sizeY() const { return ny_; }
+    size_t sizeZ() const { return nz_; }
+    size_t indexSize() const { return index_.size(); }
+
+    static const size_t npos;
+
+    bool contains(size_t x, size_t y, size_t z) const
     {
-        return data_[x + y * nx_ + z * nx_ * ny_];
+        return find(x, y, z) != npos;
     }
 
-    const Voxel &at(size_t index) const { return data_[index]; }
+    size_t find(size_t x, size_t y, size_t z) const
+    {
+        return index_[indexOf(x, y, z)];
+    }
 
-    Voxel &at(size_t index) { return data_[index]; }
+    size_t indexOf(size_t x, size_t y, size_t z) const
+    {
+        return x + (y * nx_) + (z * nx_ * ny_);
+    }
 
-    // Occupied
-    void occupiedClear();
-    void occupiedAdd(size_t index) { occupied_.push_back(index); }
-    size_t occupiedSize() const { return occupied_.size(); }
-    size_t occupied(size_t index) const { return occupied_[index]; }
-    const size_t *occupiedData() const { return occupied_.data(); }
-
-    // Elements
-    void elementsClear();
-
-    // Clusters
-    void clustersClear();
+    size_t indexOf(const Voxel &voxel) const
+    {
+        return indexOf(voxel.x, voxel.y, voxel.z);
+    }
 
 protected:
+    // Region
     Box<double> spaceRegion_;
     double voxelSizeInput_;
+    Vector3<double> voxelSize_;
 
-    size_t numberOfVoxels_;
+    // Index
     size_t nx_;
     size_t ny_;
     size_t nz_;
-    Vector3<double> voxelSize_;
-    std::vector<Voxel> data_;
-    std::vector<size_t> occupied_;
-    std::vector<size_t> elementsOffset_;
-    std::vector<size_t> elementsSize_;
-    std::vector<size_t> elementsIndex_;
+    std::vector<size_t> index_;
 
+    // Voxels
+    std::vector<Voxel> voxels_;
+
+    // Create
     std::vector<Box<size_t>> stack_;
 
     void push(size_t x1, size_t y1, size_t z1, size_t x2, size_t y2, size_t z2);
-    void resize(size_t n);
+
+    bool next(Box<double> *cell = nullptr,
+              size_t *index = nullptr,
+              uint32_t *x = nullptr,
+              uint32_t *y = nullptr,
+              uint32_t *z = nullptr);
 };
+
+inline std::ostream &operator<<(std::ostream &os, const Voxels::Voxel &obj)
+{
+    // clang-format off
+    return os << std::fixed
+              << "((" << obj.x << ", " << obj.y << ", " << obj.z << "), "
+              << obj.status << ", "
+              << obj.intensity << ", " << obj.density << ", "
+              << obj.element << ", " << obj.cluster << ", ("
+              << obj.meanX << ", " << obj.meanY << ", " << obj.meanZ << "))"
+              << std::defaultfloat;
+    // clang-format on
+}
 
 #endif /* VOXELS_HPP */
