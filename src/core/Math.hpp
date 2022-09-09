@@ -48,4 +48,17 @@ template <class T> inline void clamp(T &value, const T &min, const T &max)
     }
 }
 
+template <class T> inline void normalize(T &value, const T &min, const T &max)
+{
+    T range = max - min;
+    if (range > std::numeric_limits<T>::epsilon())
+    {
+        value = (value - min) / range;
+    }
+    else
+    {
+        value = 0;
+    }
+}
+
 #endif /* MATH_HPP */
