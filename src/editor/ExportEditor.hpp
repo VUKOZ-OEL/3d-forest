@@ -27,6 +27,7 @@
         #define EXPORT_EDITOR __declspec(dllexport)
     #else
         #define EXPORT_EDITOR __declspec(dllimport)
+        #define EXPORT_EDITOR_IMPORT
     #endif
 #else
     #define EXPORT_EDITOR

@@ -31,7 +31,9 @@
 // Use some maximum until the voxels can be streamed from a file.
 #define VOXELS_RESOLUTION_MAX 500
 
+#if !defined(EXPORT_CORE_IMPORT)
 const size_t Voxels::npos = SIZE_MAX;
+#endif
 
 void Voxels::Voxel::clear()
 {

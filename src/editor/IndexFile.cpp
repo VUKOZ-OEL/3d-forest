@@ -26,7 +26,10 @@
 #include <IndexFile.hpp>
 #include <Log.hpp>
 
+#if !defined(EXPORT_CORE_IMPORT)
 const uint32_t IndexFile::CHUNK_TYPE = 0x38584449U; /**< Signature "IDX8" */
+#endif
+
 #define OCTREE_INDEX_CHUNK_MAJOR_VERSION 1
 #define OCTREE_INDEX_CHUNK_MINOR_VERSION 0
 #define OCTREE_INDEX_MAX_LEVEL 17
