@@ -268,7 +268,7 @@ bool SegmentationThread::computeVoxelSize()
     }
 
     // Next step
-    Voxels::Voxel voxel;
+    Voxel voxel;
     Box<double> cell;
     size_t counter = 0;
 
@@ -361,13 +361,14 @@ bool SegmentationThread::computePrepareElements()
     // Next step
     for (size_t i = 0; i < voxels_.size(); i++)
     {
-        Voxels::Voxel &voxel = voxels_.at(i);
-        voxel.element = 0;
-        voxel.cluster = 0;
+        Voxel &voxel = voxels_.at(i);
 
-        if (!(voxel.intensity < thresholdIntensity_))
+        voxel.element_ = 0;
+        voxel.cluster_ = 0;
+
+        if (!(voxel.intensity_ < thresholdIntensity_))
         {
-            voxel.status = 1;
+            // voxel.status_ = 1;
             // voxels_.occupiedAdd(i);
         }
     }
@@ -398,7 +399,7 @@ bool SegmentationThread::computeCreateElements()
     // for (size_t i = 0; i < voxels_.occupiedSize(); i++)
     // {
     //     size_t idx = voxels_.occupied(i);
-    //     Voxels::Voxel &voxel = voxels_.at(idx);
+    //     Voxel &voxel = voxels_.at(idx);
     //     if (voxel.status & 2U == 0)
     //     {
     //         voxel.element = 0;

@@ -47,7 +47,7 @@ void SegmentationPca::clear()
 }
 
 bool SegmentationPca::compute(Query *query,
-                              Voxels::Voxel *voxel,
+                              Voxel *voxel,
                               const Box<double> &cell)
 {
     // Get point coordinates in voxel given by 'cell' and compute their
@@ -111,11 +111,11 @@ bool SegmentationPca::compute(Query *query,
     LOG_DEBUG_LOCAL("nPoints <" << nPoints << ">");
     LOG_DEBUG_LOCAL("mean <" << meanX << "," << meanY << "," << meanZ << ">");
 
-    voxel->meanX = meanX;
-    voxel->meanY = meanY;
-    voxel->meanZ = meanZ;
-    voxel->intensity = 0;
-    voxel->density = 0;
+    voxel->meanX_ = meanX;
+    voxel->meanY_ = meanY;
+    voxel->meanZ_ = meanZ;
+    voxel->intensity_ = 0;
+    voxel->density_ = 0;
 
     // Enough points for PCA?
     if (nPoints < 3)
@@ -198,12 +198,10 @@ bool SegmentationPca::compute(Query *query,
     if (sum > std::numeric_limits<double>::epsilon())
     {
         const double SFFIx = 100. - (eL * 100. / sum);
-        voxel->intensity = static_cast<float>(SFFIx);
-        voxel->density = static_cast<float>(nPoints);
+        LOG_DEBUG_LOCAL("SFFIx <" << SFFIx << ">");
 
-        LOG_DEBUG_LOCAL("intensity <" << voxel->intensity << "> min <"
-                                      << intensityMin_ << "> max <"
-                                      << intensityMax_ << ">");
+        voxel->intensity_ = static_cast<float>(SFFIx);
+        voxel->density_ = static_cast<float>(nPoints);
 
         return true;
     }

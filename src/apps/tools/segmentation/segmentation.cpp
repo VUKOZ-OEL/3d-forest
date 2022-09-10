@@ -68,20 +68,20 @@ static void save(const Voxels &voxels, const char *path)
     points.resize(voxels.size());
     for (size_t i = 0; i < voxels.size(); i++)
     {
-        const Voxels::Voxel &voxel = voxels.at(i);
+        const Voxel &voxel = voxels.at(i);
         memset(&points[i], 0, sizeof(LasFile::Point));
 
         points[i].format = 7;
 
-        points[i].x = static_cast<uint32_t>(voxel.meanX);
-        points[i].y = static_cast<uint32_t>(voxel.meanY);
-        points[i].z = static_cast<uint32_t>(voxel.meanZ);
+        points[i].x = static_cast<uint32_t>(voxel.meanX_);
+        points[i].y = static_cast<uint32_t>(voxel.meanY_);
+        points[i].z = static_cast<uint32_t>(voxel.meanZ_);
 
-        points[i].return_number = static_cast<uint8_t>(voxel.density * 15.0F);
+        points[i].return_number = static_cast<uint8_t>(voxel.density_ * 15.0F);
 
-        points[i].red = static_cast<uint16_t>(voxel.intensity * 65535.0F);
-        points[i].green = static_cast<uint16_t>(voxel.intensity * 65535.0F);
-        points[i].blue = static_cast<uint16_t>(voxel.intensity * 65535.0F);
+        points[i].red = static_cast<uint16_t>(voxel.intensity_ * 65535.0F);
+        points[i].green = static_cast<uint16_t>(voxel.intensity_ * 65535.0F);
+        points[i].blue = static_cast<uint16_t>(voxel.intensity_ * 65535.0F);
     }
 
     LasFile::create(path, points, {0.0001, 0.0001, 0.0001}, {0, 0, 0});

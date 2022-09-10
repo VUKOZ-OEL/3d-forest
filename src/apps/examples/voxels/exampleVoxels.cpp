@@ -35,7 +35,7 @@ static void exampleVoxels()
     voxels.create(spaceRegion, voxelSize);
     std::cout << "number of voxels is " << voxels.indexSize() << std::endl;
 
-    Voxels::Voxel voxel;
+    Voxel voxel;
     Box<double> cell;
 
     while (voxels.next(&voxel, &cell))
@@ -47,11 +47,17 @@ static void exampleVoxels()
     std::cout << "voxel occupancy <" << voxels.size() << ">" << std::endl;
 }
 
+static void exampleVoxelsSegment()
+{
+    Voxels voxels;
+}
+
 int main()
 {
     try
     {
-        exampleVoxels();
+        // exampleVoxels();
+        exampleVoxelsSegment();
     }
     catch (std::exception &e)
     {

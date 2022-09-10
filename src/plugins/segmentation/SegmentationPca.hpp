@@ -36,7 +36,7 @@ public:
 
     void clear();
 
-    bool compute(Query *query, Voxels::Voxel *voxel, const Box<double> &cell);
+    bool compute(Query *query, Voxel *voxel, const Box<double> &cell);
 
 protected:
     Eigen::MatrixXd V;

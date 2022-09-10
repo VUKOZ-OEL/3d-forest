@@ -35,25 +35,6 @@
 const size_t Voxels::npos = SIZE_MAX;
 #endif
 
-void Voxels::Voxel::clear()
-{
-    status = 0;
-
-    x = 0;
-    y = 0;
-    z = 0;
-
-    intensity = 0;
-    density = 0;
-
-    meanX = 0;
-    meanY = 0;
-    meanZ = 0;
-
-    element = 0;
-    cluster = 0;
-}
-
 Voxels::Voxels()
 {
     clear();
@@ -95,14 +76,18 @@ void Voxels::append(const Voxel &voxel)
     index_[indexOf(voxel)] = voxels_.size();
     voxels_.push_back(voxel);
 
-    updateRange(voxel.intensity, intensityMin_, intensityMax_);
-    updateRange(voxel.density, densityMin_, densityMax_);
+    updateRange(voxel.intensity_, intensityMin_, intensityMax_);
+    updateRange(voxel.density_, densityMin_, densityMax_);
+
+    LOG_DEBUG_LOCAL("intensity <" << voxel.intensity_ << "> min <"
+                                  << intensityMin_ << "> max <" << intensityMax_
+                                  << ">");
 }
 
-void Voxels::normalize(Voxels::Voxel *voxel)
+void Voxels::normalize(Voxel *voxel)
 {
-    ::normalize(voxel->intensity, intensityMin_, intensityMax_);
-    ::normalize(voxel->density, densityMin_, densityMax_);
+    ::normalize(voxel->intensity_, intensityMin_, intensityMax_);
+    ::normalize(voxel->density_, densityMin_, densityMax_);
 }
 
 void Voxels::create(const Box<double> &spaceRegion, double voxelSize)
@@ -144,7 +129,7 @@ void Voxels::create(const Box<double> &spaceRegion, double voxelSize)
 bool Voxels::next(Voxel *voxel, Box<double> *cell)
 {
     std::memset(voxel, 0, sizeof(Voxel));
-    return next(cell, nullptr, &voxel->x, &voxel->y, &voxel->z);
+    return next(cell, nullptr, &voxel->x_, &voxel->y_, &voxel->z_);
 }
 
 bool Voxels::next(Box<double> *cell,

@@ -22,38 +22,21 @@
 #ifndef VOXELS_HPP
 #define VOXELS_HPP
 
-#include <Box.hpp>
 #include <ExportEditor.hpp>
+#include <Voxel.hpp>
 
 /** Voxels. */
 class EXPORT_EDITOR Voxels
 {
 public:
-    struct EXPORT_EDITOR Voxel
-    {
-        uint32_t status;
-        uint32_t x;
-        uint32_t y;
-        uint32_t z;
-
-        float intensity;
-        float density;
-
-        double meanX;
-        double meanY;
-        double meanZ;
-
-        uint32_t element;
-        uint32_t cluster;
-
-        void clear();
-    };
-
     Voxels();
 
     void clear();
 
     void create(const Box<double> &spaceRegion, double voxelSize);
+
+    const Box<double> &spaceRegion() const { return spaceRegion_; }
+    const Vector3<double> &voxelSize() const { return voxelSize_; }
 
     bool next(Voxel *voxel, Box<double> *cell = nullptr);
 
@@ -98,7 +81,7 @@ public:
 
     size_t indexOf(const Voxel &voxel) const
     {
-        return indexOf(voxel.x, voxel.y, voxel.z);
+        return indexOf(voxel.x_, voxel.y_, voxel.z_);
     }
 
     // Values
@@ -143,15 +126,17 @@ protected:
               uint32_t *z = nullptr);
 };
 
-inline std::ostream &operator<<(std::ostream &os, const Voxels::Voxel &obj)
+inline std::ostream &operator<<(std::ostream &os, const Voxels &obj)
 {
     // clang-format off
     return os << std::fixed
-              << "((" << obj.x << ", " << obj.y << ", " << obj.z << "), "
-              << obj.status << ", "
-              << obj.intensity << ", " << obj.density << ", "
-              << obj.element << ", " << obj.cluster << ", ("
-              << obj.meanX << ", " << obj.meanY << ", " << obj.meanZ << "))"
+              << "(" << obj.size()
+              << ", (" << obj.sizeX() << " x "
+                       << obj.sizeY() << " x "
+                       << obj.sizeZ()
+              << "), " << obj.voxelSize()
+              << ", " << obj.spaceRegion()
+              << ")"
               << std::defaultfloat;
     // clang-format on
 }
