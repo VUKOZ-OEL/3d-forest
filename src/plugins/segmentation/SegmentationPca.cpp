@@ -35,17 +35,15 @@ SegmentationPca::SegmentationPca()
 
 void SegmentationPca::clear()
 {
-    intensityMin_ = std::numeric_limits<float>::max();
-    intensityMax_ = std::numeric_limits<float>::min();
-
-    densityMin_ = std::numeric_limits<float>::max();
-    densityMax_ = std::numeric_limits<float>::min();
-}
-
-void SegmentationPca::normalize(Voxels::Voxel *voxel)
-{
-    ::normalize(voxel->intensity, intensityMin_, intensityMax_);
-    ::normalize(voxel->density, densityMin_, densityMax_);
+    // V;
+    // product;
+    // eigenVectors;
+    // eigenVectorsT;
+    // in;
+    // out;
+    // min;
+    // max;
+    // E;
 }
 
 bool SegmentationPca::compute(Query *query,
@@ -201,10 +199,7 @@ bool SegmentationPca::compute(Query *query,
     {
         const double SFFIx = 100. - (eL * 100. / sum);
         voxel->intensity = static_cast<float>(SFFIx);
-        updateRange(voxel->intensity, intensityMin_, intensityMax_);
-
         voxel->density = static_cast<float>(nPoints);
-        updateRange(voxel->density, densityMin_, densityMax_);
 
         LOG_DEBUG_LOCAL("intensity <" << voxel->intensity << "> min <"
                                       << intensityMin_ << "> max <"

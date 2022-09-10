@@ -75,6 +75,13 @@ void Voxels::clear()
     // Voxels
     voxels_.clear();
 
+    // Values
+    intensityMin_ = std::numeric_limits<float>::max();
+    intensityMax_ = std::numeric_limits<float>::min();
+
+    densityMin_ = std::numeric_limits<float>::max();
+    densityMax_ = std::numeric_limits<float>::min();
+
     // occupiedClear();
     // elementsClear();
     // clustersClear();
@@ -87,6 +94,15 @@ void Voxels::append(const Voxel &voxel)
 {
     index_[indexOf(voxel)] = voxels_.size();
     voxels_.push_back(voxel);
+
+    updateRange(voxel.intensity, intensityMin_, intensityMax_);
+    updateRange(voxel.density, densityMin_, densityMax_);
+}
+
+void Voxels::normalize(Voxels::Voxel *voxel)
+{
+    ::normalize(voxel->intensity, intensityMin_, intensityMax_);
+    ::normalize(voxel->density, densityMin_, densityMax_);
 }
 
 void Voxels::create(const Box<double> &spaceRegion, double voxelSize)

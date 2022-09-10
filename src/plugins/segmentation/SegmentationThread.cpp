@@ -320,7 +320,7 @@ bool SegmentationThread::computeNormalize()
     // Next step
     for (size_t i = 0; i < voxels_.size(); i++)
     {
-        pca_.normalize(&voxels_.at(i));
+        voxels_.normalize(&voxels_.at(i));
     }
 
     // Finished
@@ -335,8 +335,8 @@ bool SegmentationThread::computeThreshold()
 {
     thresholdIntensity_ = static_cast<float>(thresholdPercent_) * 0.01F;
     LOG_DEBUG_LOCAL("threshold <" << thresholdIntensity_ << "> from min <"
-                                  << pca_.intensityMin() << "> max <"
-                                  << pca_.intensityMax() << "> percent <"
+                                  << voxels_.intensityMin() << "> max <"
+                                  << voxels_.intensityMax() << "> percent <"
                                   << thresholdPercent_ << ">");
     progressPercent_ = 100;
     return true;

@@ -101,6 +101,15 @@ public:
         return indexOf(voxel.x, voxel.y, voxel.z);
     }
 
+    // Values
+    float intensityMin() const { return intensityMin_; }
+    float intensityMax() const { return intensityMax_; }
+
+    float densityMin() const { return densityMin_; }
+    float densityMax() const { return densityMax_; }
+
+    void normalize(Voxel *voxel);
+
 protected:
     // Region
     Box<double> spaceRegion_;
@@ -115,6 +124,12 @@ protected:
 
     // Voxels
     std::vector<Voxel> voxels_;
+
+    // Values
+    float intensityMin_;
+    float intensityMax_;
+    float densityMin_;
+    float densityMax_;
 
     // Create
     std::vector<Box<size_t>> stack_;
