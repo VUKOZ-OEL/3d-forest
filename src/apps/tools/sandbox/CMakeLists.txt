@@ -17,6 +17,11 @@
 
 set(SUB_PROJECT_NAME "3DForestSandbox")
 
+if(NOT BUILD_DEVEL)
+    message(STATUS "BUILD_DEVEL not set - skipping ${SUB_PROJECT_NAME}")
+    return()
+endif()
+
 add_executable(${SUB_PROJECT_NAME} sandbox.cpp)
 target_link_libraries(${SUB_PROJECT_NAME} PUBLIC 3DForestEditor)
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)
