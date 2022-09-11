@@ -93,6 +93,9 @@ public:
 
     void normalize(Voxel *voxel);
 
+    // Debug
+    void dump() const;
+
 protected:
     // Region
     Box<double> spaceRegion_;

@@ -29,7 +29,11 @@
 class EXPORT_EDITOR Voxel
 {
 public:
+    static const uint32_t STATUS_IGNORED;
+    static const uint32_t STATUS_VISITED;
+
     uint32_t status_;
+
     uint32_t x_;
     uint32_t y_;
     uint32_t z_;
@@ -41,8 +45,8 @@ public:
     double meanY_;
     double meanZ_;
 
-    uint32_t element_;
-    uint32_t cluster_;
+    uint32_t elementId_;
+    uint32_t clusterId_;
 
     Voxel() = default;
 
@@ -64,10 +68,11 @@ public:
              float intensity = 1.0,
              float density = 1.0,
              uint32_t status = 0,
-             uint32_t element = 0,
-             uint32_t cluster = 0);
+             uint32_t elementId = 0,
+             uint32_t clusterId = 0);
 
     void clear();
+    void clearState();
 };
 
 inline std::ostream &operator<<(std::ostream &os, const Voxel &obj)
@@ -77,7 +82,7 @@ inline std::ostream &operator<<(std::ostream &os, const Voxel &obj)
               << "((" << obj.x_ << ", " << obj.y_ << ", " << obj.z_ << "), "
               << obj.status_ << ", "
               << obj.intensity_ << ", " << obj.density_ << ", "
-              << obj.element_ << ", " << obj.cluster_ << ", ("
+              << obj.elementId_ << ", " << obj.clusterId_ << ", ("
               << obj.meanX_ << ", " << obj.meanY_ << ", " << obj.meanZ_ << "))"
               << std::defaultfloat;
     // clang-format on

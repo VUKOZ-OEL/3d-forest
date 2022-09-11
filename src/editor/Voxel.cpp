@@ -27,6 +27,11 @@
 #define LOG_DEBUG_LOCAL(msg)
 //#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("Voxel", msg)
 
+#if !defined(EXPORT_EDITOR_IMPORT)
+const uint32_t Voxel::STATUS_IGNORED = 1U << 0;
+const uint32_t Voxel::STATUS_VISITED = 1U << 1;
+#endif
+
 Voxel::Voxel(uint32_t x,
              uint32_t y,
              uint32_t z,
@@ -44,8 +49,8 @@ Voxel::Voxel(uint32_t x,
       meanX_(meanX),
       meanY_(meanY),
       meanZ_(meanZ),
-      element_(0),
-      cluster_(0)
+      elementId_(0),
+      clusterId_(0)
 {
 }
 
@@ -58,8 +63,8 @@ void Voxel::set(uint32_t x,
                 float intensity,
                 float density,
                 uint32_t status,
-                uint32_t element,
-                uint32_t cluster)
+                uint32_t elementId,
+                uint32_t clusterId)
 
 {
     status_ = status;
@@ -75,8 +80,8 @@ void Voxel::set(uint32_t x,
     meanY_ = meanY;
     meanZ_ = meanZ;
 
-    element_ = element;
-    cluster_ = cluster;
+    elementId_ = elementId;
+    clusterId_ = clusterId;
 }
 
 void Voxel::clear()
@@ -94,6 +99,14 @@ void Voxel::clear()
     meanY_ = 0;
     meanZ_ = 0;
 
-    element_ = 0;
-    cluster_ = 0;
+    elementId_ = 0;
+    clusterId_ = 0;
+}
+
+void Voxel::clearState()
+{
+    status_ = 0;
+
+    elementId_ = 0;
+    clusterId_ = 0;
 }

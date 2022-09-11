@@ -19,6 +19,7 @@
 
 /** @file segmentation.cpp @brief Segmentation tool. */
 
+#include <ColorPalette.hpp>
 #include <Editor.hpp>
 #include <Error.hpp>
 #include <Log.hpp>
@@ -64,6 +65,8 @@ static void save(const Voxels &voxels, const char *path)
 {
     LOG("number of voxels <" << voxels.size() << ">");
 
+    const std::vector<Vector3<float>> &pal = ColorPalette::Classification;
+
     std::vector<LasFile::Point> points;
     points.resize(voxels.size());
     for (size_t i = 0; i < voxels.size(); i++)
@@ -87,7 +90,10 @@ static void save(const Voxels &voxels, const char *path)
     LasFile::create(path, points, {0.0001, 0.0001, 0.0001}, {0, 0, 0});
 }
 
-static void segmentation(const char *path, int voxelSize, int threshold)
+static void segmentation(const char *path,
+                         int voxelSize,
+                         int threshold,
+                         int minimumVoxelsInElement)
 {
     // Open the file in editor.
     Editor editor;
@@ -96,7 +102,7 @@ static void segmentation(const char *path, int voxelSize, int threshold)
     // Compute segmentation.
     SegmentationThread segmentationThread(&editor);
     segmentationThread.create();
-    segmentationThread.start(voxelSize, threshold);
+    segmentationThread.start(voxelSize, threshold, minimumVoxelsInElement);
     segmentationThread.wait();
 
     // Export voxels.
@@ -108,6 +114,7 @@ int main(int argc, char *argv[])
     const char *path = nullptr;
     int voxelSize = 10;
     int threshold = 50;
+    int minimumVoxelsInElement = 150;
 
     if (argc > 1)
     {
@@ -119,6 +126,11 @@ int main(int argc, char *argv[])
         voxelSize = atoi(argv[2]);
     }
 
+    if (argc > 3)
+    {
+        minimumVoxelsInElement = atoi(argv[3]);
+    }
+
     try
     {
         if (!path)
@@ -127,7 +139,7 @@ int main(int argc, char *argv[])
             createTestDataset(path);
         }
 
-        segmentation(path, voxelSize, threshold);
+        segmentation(path, voxelSize, threshold, minimumVoxelsInElement);
     }
     catch (std::exception &e)
     {

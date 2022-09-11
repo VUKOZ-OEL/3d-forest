@@ -20,6 +20,7 @@ set(SUB_PROJECT_NAME "3DForestSegmentation")
 add_executable(
     ${SUB_PROJECT_NAME}
     segmentation.cpp
+    ../../../plugins/segmentation/SegmentationElement.cpp
     ../../../plugins/segmentation/SegmentationPca.cpp
     ../../../plugins/segmentation/SegmentationThread.cpp
 )

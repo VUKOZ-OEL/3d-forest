@@ -22,6 +22,7 @@
 #include <Box.hpp>
 #include <Error.hpp>
 #include <Log.hpp>
+#include <SegmentationElement.hpp>
 #include <Time.hpp>
 #include <Voxels.hpp>
 
@@ -47,9 +48,47 @@ static void exampleVoxels()
     std::cout << "voxel occupancy <" << voxels.size() << ">" << std::endl;
 }
 
+static void append(int x, int y, int z, Voxels *voxels)
+{
+    voxels->append(Voxel(static_cast<uint32_t>(x),
+                         static_cast<uint32_t>(y),
+                         static_cast<uint32_t>(z),
+                         static_cast<double>(x) + 0.5,
+                         static_cast<double>(y) + 0.5,
+                         static_cast<double>(z) + 0.5));
+}
+
 static void exampleVoxelsSegment()
 {
     Voxels voxels;
+
+    voxels.create({0.0, 0.0, 0.0, 3.0, 3.0, 3.0}, 1.0);
+
+    append(0, 0, 0, &voxels);
+    append(0, 0, 1, &voxels);
+
+    std::cout << "voxels <" << voxels << ">" << std::endl;
+    voxels.dump();
+
+    SegmentationElement se;
+    for (size_t i = 0; i < voxels.size(); i++)
+    {
+        se.computeStart(i, voxels);
+        (void)se.compute(&voxels);
+        size_t n = se.voxelList().size();
+
+        std::cout << i << " number of voxels <" << n << ">" << std::endl;
+        for (size_t j = 0; j < n; j++)
+        {
+            std::cout << j << " voxel <" << se.voxelList()[j] << ">"
+                      << std::endl;
+        }
+
+        if (n > 0)
+        {
+            se.elementIdNext();
+        }
+    }
 }
 
 int main()

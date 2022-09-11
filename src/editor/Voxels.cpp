@@ -25,13 +25,13 @@
 #include <Math.hpp>
 #include <Voxels.hpp>
 
-//#define LOG_DEBUG_LOCAL(msg)
-#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("Voxels", msg)
+#define LOG_DEBUG_LOCAL(msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("Voxels", msg)
 
 // Use some maximum until the voxels can be streamed from a file.
 #define VOXELS_RESOLUTION_MAX 500
 
-#if !defined(EXPORT_CORE_IMPORT)
+#if !defined(EXPORT_EDITOR_IMPORT)
 const size_t Voxels::npos = SIZE_MAX;
 #endif
 
@@ -259,5 +259,14 @@ void Voxels::push(size_t x1,
     if (x1 != x2 && y1 != y2 && z1 != z2)
     {
         stack_.push_back(Box<size_t>(x1, y1, z1, x2, y2, z2));
+    }
+}
+
+void Voxels::dump() const
+{
+    for (size_t i = 0; i < size(); i++)
+    {
+        const Voxel &voxel = at(i);
+        std::cout << i << " " << voxel << std::endl;
     }
 }

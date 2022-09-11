@@ -50,6 +50,7 @@ signals:
 protected slots:
     void slotVoxelSizeFinalValue();
     void slotThresholdFinalValue();
+    void slotVoxelsInElementFinalValue();
 
     void slotAccept();
     void slotReject();
@@ -60,6 +61,7 @@ protected:
     SliderWidget *previewSizeInput_;
     SliderWidget *voxelSizeInput_;
     SliderWidget *thresholdInput_;
+    SliderWidget *voxelsInElementInput_;
 
     QPushButton *acceptButton_;
     QPushButton *rejectButton_;

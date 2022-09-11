@@ -104,6 +104,20 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
 
     settingsLayout->addWidget(thresholdInput_);
 
+    SliderWidget::create(voxelsInElementInput_,
+                         this,
+                         nullptr,
+                         SLOT(slotVoxelsInElementFinalValue()),
+                         tr("Voxels per element"),
+                         tr("Minimal number of voxels in an element"),
+                         tr("count"),
+                         1,
+                         1,
+                         999,
+                         150);
+
+    settingsLayout->addWidget(voxelsInElementInput_);
+
     settingsLayout->addStretch();
 
     // apply/cancel buttons
@@ -181,6 +195,12 @@ void SegmentationWindow::slotThresholdFinalValue()
     resumeThreads();
 }
 
+void SegmentationWindow::slotVoxelsInElementFinalValue()
+{
+    LOG_DEBUG_LOCAL("value <" << voxelsInElementInput_->value() << ">");
+    resumeThreads();
+}
+
 void SegmentationWindow::slotAccept()
 {
     LOG_DEBUG_LOCAL("");
@@ -241,6 +261,7 @@ void SegmentationWindow::resumeThreads()
     LOG_DEBUG_LOCAL("");
     // in gui thread: start new task in worker thread
     segmentationThread_.start(voxelSizeInput_->value(),
-                              thresholdInput_->value());
+                              thresholdInput_->value(),
+                              voxelsInElementInput_->value());
     mainWindow_->setStatusProgressBarPercent(0);
 }
