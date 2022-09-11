@@ -40,4 +40,7 @@
         std::cout.flush();                                                     \
     } while (false)
 
+#define LOG_UPDATE_VIEW(module, msg)
+//#define LOG_UPDATE_VIEW(module, msg) LOG_MODULE(module, msg)
+
 #endif /* LOG_HPP */

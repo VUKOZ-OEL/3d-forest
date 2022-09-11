@@ -43,8 +43,9 @@
 #include <QToolBar>
 #include <QToolButton>
 
+#define MODULE_NAME "MainWindow"
 #define LOG_LOCAL(msg)
-//#define LOG_LOCAL(msg) LOG_MODULE("MainWindow", msg)
+//#define LOG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 #if !defined(EXPORT_GUI_IMPORT)
 const char *MainWindow::APPLICATION_NAME = "3D Forest";
@@ -369,6 +370,7 @@ void MainWindow::updateEverything()
     LOG_LOCAL("");
 
     suspendThreads();
+    LOG_UPDATE_VIEW(MODULE_NAME, "");
 
     ViewerViewports *viewports = viewerPlugin_->viewports();
 
@@ -387,6 +389,7 @@ void MainWindow::updateEverything()
 void MainWindow::updateData()
 {
     suspendThreads();
+    LOG_UPDATE_VIEW(MODULE_NAME, "");
 
     ViewerViewports *viewports = viewerPlugin_->viewports();
     viewports->resetScene(&editor_, false);
@@ -398,6 +401,7 @@ void MainWindow::updateData()
 void MainWindow::updateFilter()
 {
     suspendThreads();
+    LOG_UPDATE_VIEW(MODULE_NAME, "");
 
     ViewerViewports *viewports = viewerPlugin_->viewports();
     viewports->resetScene(&editor_, false);
@@ -409,14 +413,20 @@ void MainWindow::updateFilter()
 void MainWindow::updateModifiers()
 {
     suspendThreads();
+    LOG_UPDATE_VIEW(MODULE_NAME, "");
+
     editor_.viewports().setState(Page::STATE_RUN_MODIFIERS);
+
     resumeThreads();
 }
 
 void MainWindow::updateRender()
 {
     suspendThreads();
+    LOG_UPDATE_VIEW(MODULE_NAME, "");
+
     editor_.viewports().setState(Page::STATE_RENDER);
+
     resumeThreads();
 }
 
