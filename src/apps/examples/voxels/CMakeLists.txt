@@ -17,6 +17,22 @@
 
 set(SUB_PROJECT_NAME "3DForestExampleVoxels")
 
-add_executable(${SUB_PROJECT_NAME} exampleVoxels.cpp)
-target_link_libraries(${SUB_PROJECT_NAME} PUBLIC 3DForestEditor)
+add_executable(
+    ${SUB_PROJECT_NAME}
+    exampleVoxels.cpp
+    ../../../plugins/segmentation/SegmentationElement.cpp
+)
+
+target_include_directories(
+    ${SUB_PROJECT_NAME}
+    PUBLIC
+    ../../../plugins/segmentation
+)
+
+target_link_libraries(
+    ${SUB_PROJECT_NAME}
+    PUBLIC
+    3DForestEditor
+)
+
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

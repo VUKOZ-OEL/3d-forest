@@ -23,6 +23,7 @@
 #define SEGMENTATION_THREAD_HPP
 
 #include <Query.hpp>
+#include <SegmentationElement.hpp>
 #include <SegmentationPca.hpp>
 #include <Thread.hpp>
 #include <Vector3.hpp>
@@ -39,7 +40,10 @@ public:
 
     void clear();
 
-    void start(int voxelSize, int thresholdPercent);
+    void start(int voxelSize,
+               int thresholdIntensityPercent,
+               int minimumVoxelsInElement);
+
     int progressPercent() const { return progressPercent_; }
 
     virtual bool compute();
@@ -51,10 +55,12 @@ protected:
     enum State
     {
         STATE_VOXEL_SIZE,
-        STATE_THRESHOLD,
-        STATE_PREPARE_ELEMENTS,
+        STATE_VOXEL_NORMALIZE,
+        STATE_THRESHOLD_INTENSITY,
+        STATE_CREATE_ELEMENTS_START,
         STATE_CREATE_ELEMENTS,
         STATE_MERGE_CLUSTERS,
+        STATE_CREATE_LAYERS,
         STATE_FINISHED,
     };
 
@@ -69,11 +75,14 @@ protected:
     int progressPercent_;
 
     int voxelSize_;
-    int thresholdPercent_;
+    int minimumVoxelsInElement_;
+    int thresholdIntensityPercent_;
+    float thresholdIntensityNormalized_;
+
+    SegmentationPca pca_;
+    SegmentationElement elements_;
 
     Voxels voxels_;
-    SegmentationPca pca_;
-    float thresholdIntensity_;
 
     void setState(State state);
     void updateProgressPercent();
@@ -81,10 +90,12 @@ protected:
     void computeInitializeLayers();
 
     bool computeVoxelSize();
-    bool computeThreshold();
-    bool computePrepareElements();
+    bool computeVoxelNormalize();
+    bool computeThresholdIntensity();
+    bool computeCreateElementsStart();
     bool computeCreateElements();
     bool computeMergeClusters();
+    bool computeCreateLayers();
 };
 
 #endif /* SEGMENTATION_THREAD_HPP */

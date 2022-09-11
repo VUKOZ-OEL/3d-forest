@@ -17,37 +17,44 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationPca.hpp */
+/** @file SegmentationElement.hpp */
 
-#ifndef SEGMENTATION_PCA_HPP
-#define SEGMENTATION_PCA_HPP
+#ifndef SEGMENTATION_ELEMENT_HPP
+#define SEGMENTATION_ELEMENT_HPP
 
-#include <Eigen/Core>
-#include <Eigen/Eigenvalues>
+#include <queue>
 
-#include <Query.hpp>
+#include <ExportEditor.hpp>
 #include <Voxels.hpp>
 
-/** Segmentation PCA. */
-class SegmentationPca
+/** Segmentation Element. */
+class EXPORT_EDITOR SegmentationElement
 {
 public:
-    SegmentationPca();
+    SegmentationElement();
 
     void clear();
 
-    bool compute(Query *query, Voxel *voxel, const Box<double> &cell);
+    uint32_t elementId() const { return elementId_; }
+    void elementIdNext() { elementId_++; }
+
+    const std::vector<size_t> &voxelList() const { return voxelList_; }
+
+    void computeStart(size_t voxelIndex, const Voxels &voxels);
+    bool compute(Voxels *voxels);
 
 protected:
-    Eigen::MatrixXd V;
-    Eigen::Matrix3d product;
-    Eigen::Matrix3d eigenVectors;
-    Eigen::Matrix3d eigenVectorsT;
-    Eigen::Vector3d in;
-    Eigen::Vector3d out;
-    Eigen::Vector3d min;
-    Eigen::Vector3d max;
-    Eigen::SelfAdjointEigenSolver<Eigen::Matrix3d> E;
+    uint32_t elementId_;
+    std::vector<size_t> voxelList_;
+
+    struct Key
+    {
+        uint32_t x;
+        uint32_t y;
+        uint32_t z;
+    };
+
+    std::queue<Key> queue;
 };
 
-#endif /* SEGMENTATION_PCA_HPP */
+#endif /* SEGMENTATION_ELEMENT_HPP */

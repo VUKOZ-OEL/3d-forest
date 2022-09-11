@@ -32,6 +32,7 @@ SettingsView::SettingsView()
                           "Return Number",
                           "Number of Returns",
                           "Classification",
+                          "Layer",
                           "Elevation",
                           "User Color"};
 

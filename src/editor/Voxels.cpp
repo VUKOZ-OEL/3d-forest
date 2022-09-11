@@ -19,14 +19,21 @@
 
 /** @file Voxels.cpp */
 
+#include <cstring>
+
 #include <Log.hpp>
 #include <Math.hpp>
 #include <Voxels.hpp>
 
-#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("Voxels", msg)
+#define LOG_DEBUG_LOCAL(msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("Voxels", msg)
 
 // Use some maximum until the voxels can be streamed from a file.
 #define VOXELS_RESOLUTION_MAX 500
+
+#if !defined(EXPORT_EDITOR_IMPORT)
+const size_t Voxels::npos = SIZE_MAX;
+#endif
 
 Voxels::Voxels()
 {
@@ -35,47 +42,75 @@ Voxels::Voxels()
 
 void Voxels::clear()
 {
+    // Region
     spaceRegion_.clear();
     voxelSizeInput_ = 0;
-    numberOfVoxels_ = 0;
+    voxelSize_.clear();
+
+    // Index
     nx_ = 0;
     ny_ = 0;
     nz_ = 0;
-    voxelSize_.clear();
+    index_.clear();
 
-    data_.clear();
+    // Voxels
+    voxels_.clear();
 
-    occupiedClear();
-    elementsClear();
-    clustersClear();
+    // Values
+    intensityMin_ = std::numeric_limits<float>::max();
+    intensityMax_ = std::numeric_limits<float>::min();
 
+    densityMin_ = std::numeric_limits<float>::max();
+    densityMax_ = std::numeric_limits<float>::min();
+
+    // occupiedClear();
+    // elementsClear();
+    // clustersClear();
+
+    // Create
     stack_.clear();
 }
 
-void Voxels::occupiedClear()
+void Voxels::append(const Voxel &voxel)
 {
-    occupied_.clear();
+    index_[indexOf(voxel)] = voxels_.size();
+    voxels_.push_back(voxel);
+
+    updateRange(voxel.intensity_, intensityMin_, intensityMax_);
+    updateRange(voxel.density_, densityMin_, densityMax_);
+
+    LOG_DEBUG_LOCAL("intensity <" << voxel.intensity_ << "> min <"
+                                  << intensityMin_ << "> max <" << intensityMax_
+                                  << ">");
 }
 
-void Voxels::elementsClear()
+void Voxels::box(const Voxel &voxel, Box<double> *box)
 {
-    elementsOffset_.clear();
-    elementsSize_.clear();
-    elementsIndex_.clear();
+    double x1 = static_cast<double>(voxel.x_);
+    double y1 = static_cast<double>(voxel.y_);
+    double z1 = static_cast<double>(voxel.z_);
+    double x2 = static_cast<double>(voxel.x_ + 1);
+    double y2 = static_cast<double>(voxel.y_ + 1);
+    double z2 = static_cast<double>(voxel.z_ + 1);
+
+    box->set(spaceRegion_.min(0) + (voxelSize_[0] * x1),
+             spaceRegion_.min(1) + (voxelSize_[1] * y1),
+             spaceRegion_.min(2) + (voxelSize_[2] * z1),
+             spaceRegion_.min(0) + (voxelSize_[0] * x2),
+             spaceRegion_.min(1) + (voxelSize_[1] * y2),
+             spaceRegion_.min(2) + (voxelSize_[2] * z2));
 }
 
-void Voxels::clustersClear()
+void Voxels::normalize(Voxel *voxel)
 {
-}
-
-void Voxels::resize(size_t n)
-{
-    numberOfVoxels_ = n;
-    data_.resize(n);
+    ::normalize(voxel->intensity_, intensityMin_, intensityMax_);
+    ::normalize(voxel->density_, densityMin_, densityMax_);
 }
 
 void Voxels::create(const Box<double> &spaceRegion, double voxelSize)
 {
+    clear();
+
     spaceRegion_ = spaceRegion;
     voxelSizeInput_ = voxelSize;
 
@@ -95,22 +130,30 @@ void Voxels::create(const Box<double> &spaceRegion, double voxelSize)
     clamp(nz_, min, max);
     voxelSize_[2] = spaceRegion_.length(2) / static_cast<double>(nz_);
 
-    // Create number of voxels.
-    resize(nx_ * ny_ * nz_);
+    // Create voxel index.
+    size_t n = nx_ * ny_ * nz_;
+    index_.resize(n);
+    std::fill(index_.begin(), index_.end(), npos);
 
     // Initialize voxel iterator.
     push(0, 0, 0, nx_, ny_, nz_);
 
-    LOG_DEBUG_LOCAL("numberOfVoxels <" << numberOfVoxels_ << ">");
+    LOG_DEBUG_LOCAL("numberOfVoxels <" << index_.size() << ">");
     LOG_DEBUG_LOCAL("resolution <" << nx_ << "," << ny_ << "," << nz_ << ">");
     LOG_DEBUG_LOCAL("voxelSize <" << voxelSize_ << ">");
 }
 
+bool Voxels::next(Voxel *voxel, Box<double> *cell)
+{
+    std::memset(voxel, 0, sizeof(Voxel));
+    return next(cell, nullptr, &voxel->x_, &voxel->y_, &voxel->z_);
+}
+
 bool Voxels::next(Box<double> *cell,
                   size_t *index,
-                  size_t *x,
-                  size_t *y,
-                  size_t *z)
+                  uint32_t *x,
+                  uint32_t *y,
+                  uint32_t *z)
 {
     // Subdivide grid until next voxel cell 1x1x1 is found.
     while (!stack_.empty())
@@ -154,17 +197,17 @@ bool Voxels::next(Box<double> *cell,
 
             if (x)
             {
-                *x = x1;
+                *x = static_cast<uint32_t>(x1);
             }
 
             if (y)
             {
-                *y = y1;
+                *y = static_cast<uint32_t>(y1);
             }
 
             if (z)
             {
-                *z = z1;
+                *z = static_cast<uint32_t>(z1);
             }
 
             return true;
@@ -233,5 +276,14 @@ void Voxels::push(size_t x1,
     if (x1 != x2 && y1 != y2 && z1 != z2)
     {
         stack_.push_back(Box<size_t>(x1, y1, z1, x2, y2, z2));
+    }
+}
+
+void Voxels::dump() const
+{
+    for (size_t i = 0; i < size(); i++)
+    {
+        const Voxel &voxel = at(i);
+        std::cout << i << " " << voxel << std::endl;
     }
 }

@@ -35,14 +35,20 @@ SegmentationPca::SegmentationPca()
 
 void SegmentationPca::clear()
 {
-    intensityMin_ = std::numeric_limits<float>::max();
-    intensityMax_ = std::numeric_limits<float>::min();
+    // V;
+    // product;
+    // eigenVectors;
+    // eigenVectorsT;
+    // in;
+    // out;
+    // min;
+    // max;
+    // E;
 }
 
-void SegmentationPca::compute(Query &query,
-                              Voxels &voxels,
-                              const Box<double> &cell,
-                              size_t index)
+bool SegmentationPca::compute(Query *query,
+                              Voxel *voxel,
+                              const Box<double> &cell)
 {
     // Get point coordinates in voxel given by 'cell' and compute their
     // centroid.
@@ -61,26 +67,26 @@ void SegmentationPca::compute(Query &query,
     V.resize(3, SEGMENTATION_PCA_POINT_BUFFER_SIZE);
 
     // Select points in 'cell' into point coordinates and centroid.
-    query.selectBox(cell);
-    query.selectClassifications({LasFile::CLASS_UNASSIGNED});
-    query.exec();
+    query->selectBox(cell);
+    query->selectClassifications({LasFile::CLASS_UNASSIGNED});
+    query->exec();
 
-    while (query.next())
+    while (query->next())
     {
         if (nPoints == V.cols())
         {
             V.resize(3, nPoints * 2);
         }
 
-        x = query.x();
+        x = query->x();
         meanX += x;
         V(0, nPoints) = x;
 
-        y = query.y();
+        y = query->y();
         meanY += y;
         V(1, nPoints) = y;
 
-        z = query.z();
+        z = query->z();
         meanZ += z;
         V(2, nPoints) = z;
 
@@ -89,7 +95,7 @@ void SegmentationPca::compute(Query &query,
 
     V.resize(3, nPoints);
 
-    // Create voxel.
+    // Fill voxel.
     if (nPoints > 0)
     {
         const double d = static_cast<double>(nPoints);
@@ -105,19 +111,16 @@ void SegmentationPca::compute(Query &query,
     LOG_DEBUG_LOCAL("nPoints <" << nPoints << ">");
     LOG_DEBUG_LOCAL("mean <" << meanX << "," << meanY << "," << meanZ << ">");
 
-    Voxels::Voxel &voxel = voxels.at(index);
-    voxel.x = meanX;
-    voxel.y = meanY;
-    voxel.z = meanZ;
-    voxel.i = 0;
-    voxel.state = 0;
-    voxel.element = 0;
-    voxel.cluster = 0;
+    voxel->meanX_ = meanX;
+    voxel->meanY_ = meanY;
+    voxel->meanZ_ = meanZ;
+    voxel->intensity_ = 0;
+    voxel->density_ = 0;
 
     // Enough points for PCA?
     if (nPoints < 3)
     {
-        return;
+        return false;
     }
 
     // Shift point coordinates by centroid.
@@ -195,19 +198,13 @@ void SegmentationPca::compute(Query &query,
     if (sum > std::numeric_limits<double>::epsilon())
     {
         const double SFFIx = 100. - (eL * 100. / sum);
-        voxel.i = static_cast<float>(SFFIx);
+        LOG_DEBUG_LOCAL("SFFIx <" << SFFIx << ">");
 
-        if (voxel.i < intensityMin_)
-        {
-            intensityMin_ = voxel.i;
-        }
+        voxel->intensity_ = static_cast<float>(SFFIx);
+        voxel->density_ = static_cast<float>(nPoints);
 
-        if (voxel.i > intensityMax_)
-        {
-            intensityMax_ = voxel.i;
-        }
-
-        LOG_DEBUG_LOCAL("intensity <" << voxel.i << "> min <" << intensityMin_
-                                      << "> max <" << intensityMax_ << ">");
+        return true;
     }
+
+    return false;
 }

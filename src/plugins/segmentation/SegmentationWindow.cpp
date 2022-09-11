@@ -34,8 +34,9 @@
 
 #define ICON(name) (ThemeIcon(":/segmentation/", name))
 
+#define MODULE_NAME "SegmentationWindow"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("SegmentationWindow", msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 #define SEGMENTATION_WINDOW_VOXEL_SIZE_DEFAULT_MIN 1
 #define SEGMENTATION_WINDOW_VOXEL_SIZE_DEFAULT_MAX 100
@@ -103,6 +104,20 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
                          70);
 
     settingsLayout->addWidget(thresholdInput_);
+
+    SliderWidget::create(voxelsInElementInput_,
+                         this,
+                         nullptr,
+                         SLOT(slotVoxelsInElementFinalValue()),
+                         tr("Voxels per element"),
+                         tr("Minimal number of voxels in an element"),
+                         tr("count"),
+                         1,
+                         1,
+                         999,
+                         150);
+
+    settingsLayout->addWidget(voxelsInElementInput_);
 
     settingsLayout->addStretch();
 
@@ -181,6 +196,12 @@ void SegmentationWindow::slotThresholdFinalValue()
     resumeThreads();
 }
 
+void SegmentationWindow::slotVoxelsInElementFinalValue()
+{
+    LOG_DEBUG_LOCAL("value <" << voxelsInElementInput_->value() << ">");
+    resumeThreads();
+}
+
 void SegmentationWindow::slotAccept()
 {
     LOG_DEBUG_LOCAL("");
@@ -226,6 +247,12 @@ void SegmentationWindow::slotThread(bool finished, int progressPercent)
     // in gui thread: update visualization
     mainWindow_->setStatusProgressBarPercent(progressPercent);
     (void)finished;
+    if (finished)
+    {
+        LOG_UPDATE_VIEW(MODULE_NAME, "finished");
+        mainWindow_->updateModifiers();
+        mainWindow_->updateEverything();
+    }
 }
 
 void SegmentationWindow::suspendThreads()
@@ -241,6 +268,7 @@ void SegmentationWindow::resumeThreads()
     LOG_DEBUG_LOCAL("");
     // in gui thread: start new task in worker thread
     segmentationThread_.start(voxelSizeInput_->value(),
-                              thresholdInput_->value());
+                              thresholdInput_->value(),
+                              voxelsInElementInput_->value());
     mainWindow_->setStatusProgressBarPercent(0);
 }

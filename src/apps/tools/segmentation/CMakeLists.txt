@@ -15,11 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-set(SUB_PROJECT_NAME "3DForestExampleSegmentation")
+set(SUB_PROJECT_NAME "3DForestSegmentation")
 
 add_executable(
     ${SUB_PROJECT_NAME}
-    exampleSegmentation.cpp
+    segmentation.cpp
+    ../../../plugins/segmentation/SegmentationElement.cpp
     ../../../plugins/segmentation/SegmentationPca.cpp
     ../../../plugins/segmentation/SegmentationThread.cpp
 )

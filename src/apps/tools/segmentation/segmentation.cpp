@@ -17,48 +17,12 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file exampleSegmentation.cpp @brief Segmentation example. */
+/** @file segmentation.cpp @brief Segmentation tool. */
 
 #include <Editor.hpp>
 #include <Error.hpp>
 #include <Log.hpp>
 #include <SegmentationThread.hpp>
-
-static void save(const Voxels &voxels, const char *path)
-{
-    LOG("number of voxels <" << voxels.size() << ">");
-
-    std::vector<LasFile::Point> points;
-    points.resize(voxels.size());
-    for (size_t i = 0; i < voxels.size(); i++)
-    {
-        const Voxels::Voxel &voxel = voxels.at(i);
-        memset(&points[i], 0, sizeof(LasFile::Point));
-        points[i].format = 6;
-        points[i].x = static_cast<uint32_t>(voxel.x);
-        points[i].y = static_cast<uint32_t>(voxel.y);
-        points[i].z = static_cast<uint32_t>(voxel.z);
-        points[i].intensity = static_cast<uint16_t>(voxel.i * 655.35F);
-    }
-
-    LasFile::create(path, points, {1, 1, 1}, {0, 0, 0});
-}
-
-static void exampleSegmentation(const char *path, int voxelSize, int threshold)
-{
-    // Open the file in editor.
-    Editor editor;
-    editor.open(path);
-
-    // Compute segmentation.
-    SegmentationThread segmentationThread(&editor);
-    segmentationThread.create();
-    segmentationThread.start(voxelSize, threshold);
-    segmentationThread.wait();
-
-    // Export voxels.
-    save(editor.voxels(), "voxels.las");
-}
 
 static void appendPoint(std::vector<LasFile::Point> *points,
                         uint32_t x,
@@ -96,11 +60,67 @@ static void createTestDataset(const char *path)
     IndexFileBuilder::index(path, path, settings);
 }
 
+static void saveVoxels(const Editor &editor, const char *path)
+{
+    const Voxels &voxels = editor.voxels();
+    const Layers &layers = editor.layers();
+
+    LOG("number of voxels <" << voxels.size() << ">");
+
+    std::vector<LasFile::Point> points;
+    points.resize(voxels.size());
+    for (size_t i = 0; i < voxels.size(); i++)
+    {
+        const Voxel &voxel = voxels.at(i);
+        memset(&points[i], 0, sizeof(LasFile::Point));
+
+        points[i].format = 7;
+
+        points[i].x = static_cast<uint32_t>(voxel.meanX_);
+        points[i].y = static_cast<uint32_t>(voxel.meanY_);
+        points[i].z = static_cast<uint32_t>(voxel.meanZ_);
+
+        points[i].intensity = static_cast<uint16_t>(voxel.intensity_ * 511.0F);
+        points[i].return_number = static_cast<uint8_t>(voxel.density_ * 15.0F);
+
+        Vector3<float> c;
+        if (voxel.elementId_ > 0 && voxel.elementId_ < layers.size())
+        {
+            c = layers.color(voxel.elementId_);
+        }
+        points[i].red = static_cast<uint16_t>(c[0] * 65535.0F);
+        points[i].green = static_cast<uint16_t>(c[1] * 65535.0F);
+        points[i].blue = static_cast<uint16_t>(c[2] * 65535.0F);
+    }
+
+    LasFile::create(path, points, {0.0001, 0.0001, 0.0001}, {0, 0, 0});
+}
+
+static void segmentation(const char *path,
+                         int voxelSize,
+                         int threshold,
+                         int minimumVoxelsInElement)
+{
+    // Open the file in editor.
+    Editor editor;
+    editor.open(path);
+
+    // Compute segmentation.
+    SegmentationThread segmentationThread(&editor);
+    segmentationThread.create();
+    segmentationThread.start(voxelSize, threshold, minimumVoxelsInElement);
+    segmentationThread.wait();
+
+    // Export voxels.
+    saveVoxels(editor, "voxels.las");
+}
+
 int main(int argc, char *argv[])
 {
     const char *path = nullptr;
     int voxelSize = 10;
     int threshold = 50;
+    int minimumVoxelsInElement = 150;
 
     if (argc > 1)
     {
@@ -112,6 +132,11 @@ int main(int argc, char *argv[])
         voxelSize = atoi(argv[2]);
     }
 
+    if (argc > 3)
+    {
+        minimumVoxelsInElement = atoi(argv[3]);
+    }
+
     try
     {
         if (!path)
@@ -120,7 +145,7 @@ int main(int argc, char *argv[])
             createTestDataset(path);
         }
 
-        exampleSegmentation(path, voxelSize, threshold);
+        segmentation(path, voxelSize, threshold, minimumVoxelsInElement);
     }
     catch (std::exception &e)
     {
