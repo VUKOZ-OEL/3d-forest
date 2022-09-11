@@ -34,8 +34,9 @@
 
 #define ICON(name) (ThemeIcon(":/segmentation/", name))
 
-//#define LOG_DEBUG_LOCAL(msg)
-#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("SegmentationWindow", msg)
+#define MODULE_NAME "SegmentationWindow"
+#define LOG_DEBUG_LOCAL(msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 #define SEGMENTATION_WINDOW_VOXEL_SIZE_DEFAULT_MIN 1
 #define SEGMENTATION_WINDOW_VOXEL_SIZE_DEFAULT_MAX 100
@@ -248,6 +249,8 @@ void SegmentationWindow::slotThread(bool finished, int progressPercent)
     (void)finished;
     if (finished)
     {
+        LOG_UPDATE_VIEW(MODULE_NAME, "finished");
+        mainWindow_->updateModifiers();
         mainWindow_->updateEverything();
     }
 }
