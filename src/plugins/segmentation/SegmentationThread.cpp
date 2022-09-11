@@ -19,6 +19,7 @@
 
 /** @file SegmentationThread.cpp */
 
+#include <ColorPalette.hpp>
 #include <Editor.hpp>
 #include <Log.hpp>
 #include <SegmentationPca.hpp>
@@ -26,8 +27,8 @@
 #include <ThreadCallbackInterface.hpp>
 #include <Time.hpp>
 
-//#define LOG_DEBUG_LOCAL(msg)
-#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("SegmentationThread", msg)
+#define LOG_DEBUG_LOCAL(msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("SegmentationThread", msg)
 
 SegmentationThread::SegmentationThread(Editor *editor)
     : editor_(editor),
@@ -157,6 +158,14 @@ bool SegmentationThread::compute()
     else if (state_ == STATE_MERGE_CLUSTERS)
     {
         bool finishedState = computeMergeClusters();
+        if (finishedState)
+        {
+            setState(STATE_CREATE_LAYERS);
+        }
+    }
+    else if (state_ == STATE_CREATE_LAYERS)
+    {
+        bool finishedState = computeCreateLayers();
         if (finishedState)
         {
             setState(STATE_FINISHED);
@@ -417,8 +426,6 @@ bool SegmentationThread::computeCreateElements()
 
     progressPercent_ = 100;
 
-    editor_->setVoxels(voxels_);
-
     return true;
 }
 
@@ -438,6 +445,70 @@ bool SegmentationThread::computeMergeClusters()
 
     // Next step
 
+    progressPercent_ = 100;
+
+    return true;
+}
+
+bool SegmentationThread::computeCreateLayers()
+{
+    LOG_DEBUG_LOCAL("");
+
+    // Initialization
+    if (!stateInitialized_)
+    {
+        progressMax_ = voxels_.size();
+        progressValue_ = 0;
+        stateInitialized_ = true;
+    }
+
+    // Next step
+    Box<double> cell;
+
+    // Query
+    for (size_t i = 0; i < voxels_.size(); i++)
+    {
+        Voxel &voxel = voxels_.at(i);
+
+        if ((voxel.status_ & Voxel::STATUS_IGNORED) != 0)
+        {
+            continue;
+        }
+
+        // Set all points to a layer
+        voxels_.box(voxel, &cell);
+        query_.selectBox(cell);
+        query_.exec();
+
+        while (query_.next())
+        {
+            query_.layer() = voxel.elementId_;
+            query_.setModified();
+        }
+    }
+
+    query_.flush();
+
+    // Layers
+    Layers layers;
+    layers.setDefault();
+
+    const std::vector<Vector3<float>> &pal = ColorPalette::WindowsXp32;
+
+    Layer layer;
+    size_t nLayers = elements_.elementId();
+    for (size_t i = 0; i < nLayers; i++)
+    {
+        size_t id = i + 1;
+        layer.set(id, "Layer " + std::to_string(id), true, pal[i % 32]);
+        layers.push_back(layer);
+    }
+
+    // Update
+    editor_->setVoxels(voxels_);
+    editor_->setLayers(layers);
+
+    // Finished
     progressPercent_ = 100;
 
     return true;

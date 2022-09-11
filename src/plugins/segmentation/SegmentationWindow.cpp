@@ -34,8 +34,8 @@
 
 #define ICON(name) (ThemeIcon(":/segmentation/", name))
 
-#define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("SegmentationWindow", msg)
+//#define LOG_DEBUG_LOCAL(msg)
+#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("SegmentationWindow", msg)
 
 #define SEGMENTATION_WINDOW_VOXEL_SIZE_DEFAULT_MIN 1
 #define SEGMENTATION_WINDOW_VOXEL_SIZE_DEFAULT_MAX 100
@@ -246,6 +246,10 @@ void SegmentationWindow::slotThread(bool finished, int progressPercent)
     // in gui thread: update visualization
     mainWindow_->setStatusProgressBarPercent(progressPercent);
     (void)finished;
+    if (finished)
+    {
+        mainWindow_->updateEverything();
+    }
 }
 
 void SegmentationWindow::suspendThreads()

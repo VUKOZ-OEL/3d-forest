@@ -19,7 +19,6 @@
 
 /** @file segmentation.cpp @brief Segmentation tool. */
 
-#include <ColorPalette.hpp>
 #include <Editor.hpp>
 #include <Error.hpp>
 #include <Log.hpp>
@@ -61,11 +60,12 @@ static void createTestDataset(const char *path)
     IndexFileBuilder::index(path, path, settings);
 }
 
-static void save(const Voxels &voxels, const char *path)
+static void saveVoxels(const Editor &editor, const char *path)
 {
-    LOG("number of voxels <" << voxels.size() << ">");
+    const Voxels &voxels = editor.voxels();
+    const Layers &layers = editor.layers();
 
-    const std::vector<Vector3<float>> &pal = ColorPalette::Classification;
+    LOG("number of voxels <" << voxels.size() << ">");
 
     std::vector<LasFile::Point> points;
     points.resize(voxels.size());
@@ -80,11 +80,17 @@ static void save(const Voxels &voxels, const char *path)
         points[i].y = static_cast<uint32_t>(voxel.meanY_);
         points[i].z = static_cast<uint32_t>(voxel.meanZ_);
 
+        points[i].intensity = static_cast<uint16_t>(voxel.intensity_ * 511.0F);
         points[i].return_number = static_cast<uint8_t>(voxel.density_ * 15.0F);
 
-        points[i].red = static_cast<uint16_t>(voxel.intensity_ * 65535.0F);
-        points[i].green = static_cast<uint16_t>(voxel.intensity_ * 65535.0F);
-        points[i].blue = static_cast<uint16_t>(voxel.intensity_ * 65535.0F);
+        Vector3<float> c;
+        if (voxel.elementId_ > 0 && voxel.elementId_ < layers.size())
+        {
+            c = layers.color(voxel.elementId_);
+        }
+        points[i].red = static_cast<uint16_t>(c[0] * 65535.0F);
+        points[i].green = static_cast<uint16_t>(c[1] * 65535.0F);
+        points[i].blue = static_cast<uint16_t>(c[2] * 65535.0F);
     }
 
     LasFile::create(path, points, {0.0001, 0.0001, 0.0001}, {0, 0, 0});
@@ -106,7 +112,7 @@ static void segmentation(const char *path,
     segmentationThread.wait();
 
     // Export voxels.
-    save(editor.voxels(), "voxels.las");
+    saveVoxels(editor, "voxels.las");
 }
 
 int main(int argc, char *argv[])

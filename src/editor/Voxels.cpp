@@ -84,6 +84,23 @@ void Voxels::append(const Voxel &voxel)
                                   << ">");
 }
 
+void Voxels::box(const Voxel &voxel, Box<double> *box)
+{
+    double x1 = static_cast<double>(voxel.x_);
+    double y1 = static_cast<double>(voxel.y_);
+    double z1 = static_cast<double>(voxel.z_);
+    double x2 = static_cast<double>(voxel.x_ + 1);
+    double y2 = static_cast<double>(voxel.y_ + 1);
+    double z2 = static_cast<double>(voxel.z_ + 1);
+
+    box->set(spaceRegion_.min(0) + (voxelSize_[0] * x1),
+             spaceRegion_.min(1) + (voxelSize_[1] * y1),
+             spaceRegion_.min(2) + (voxelSize_[2] * z1),
+             spaceRegion_.min(0) + (voxelSize_[0] * x2),
+             spaceRegion_.min(1) + (voxelSize_[1] * y2),
+             spaceRegion_.min(2) + (voxelSize_[2] * z2));
+}
+
 void Voxels::normalize(Voxel *voxel)
 {
     ::normalize(voxel->intensity_, intensityMin_, intensityMax_);

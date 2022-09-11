@@ -60,6 +60,7 @@ protected:
         STATE_CREATE_ELEMENTS_START,
         STATE_CREATE_ELEMENTS,
         STATE_MERGE_CLUSTERS,
+        STATE_CREATE_LAYERS,
         STATE_FINISHED,
     };
 
@@ -94,6 +95,7 @@ protected:
     bool computeCreateElementsStart();
     bool computeCreateElements();
     bool computeMergeClusters();
+    bool computeCreateLayers();
 };
 
 #endif /* SEGMENTATION_THREAD_HPP */

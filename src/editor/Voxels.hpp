@@ -84,6 +84,8 @@ public:
         return indexOf(voxel.x_, voxel.y_, voxel.z_);
     }
 
+    void box(const Voxel &voxel, Box<double> *box);
+
     // Values
     float intensityMin() const { return intensityMin_; }
     float intensityMax() const { return intensityMax_; }

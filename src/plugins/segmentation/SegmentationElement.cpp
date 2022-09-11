@@ -32,7 +32,7 @@ SegmentationElement::SegmentationElement()
 
 void SegmentationElement::clear()
 {
-    elementId_ = 0;
+    elementId_ = 1U;
     voxelList_.clear();
 }
 
