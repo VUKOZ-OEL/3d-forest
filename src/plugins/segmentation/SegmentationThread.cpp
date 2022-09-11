@@ -403,7 +403,7 @@ bool SegmentationThread::computeCreateElements()
         const std::vector<size_t> &voxelList = elements_.voxelList();
         size_t nVoxels = voxelList.size();
 
-        if (static_cast<int>(nVoxels) > minimumVoxelsInElement_)
+        if (static_cast<int>(nVoxels) >= minimumVoxelsInElement_)
         {
             for (size_t j = 0; j < nVoxels; j++)
             {
