@@ -27,8 +27,9 @@
 #include <ThreadCallbackInterface.hpp>
 #include <Time.hpp>
 
+#define MODULE_NAME "SegmentationThread"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("SegmentationThread", msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 SegmentationThread::SegmentationThread(Editor *editor)
     : editor_(editor),
@@ -411,13 +412,17 @@ bool SegmentationThread::computeCreateElements()
 
         const std::vector<size_t> &voxelList = elements_.voxelList();
         size_t nVoxels = voxelList.size();
+        uint32_t elementId = elements_.elementId();
 
         if (static_cast<int>(nVoxels) >= minimumVoxelsInElement_)
         {
+            LOG_DEBUG_LOCAL("number of voxels in element <"
+                            << elementId << "> is <" << nVoxels << ">");
+
             for (size_t j = 0; j < nVoxels; j++)
             {
                 Voxel &voxel = voxels_.at(voxelList[j]);
-                voxel.elementId_ = elements_.elementId();
+                voxel.elementId_ = elementId;
             }
 
             elements_.elementIdNext();
@@ -493,15 +498,21 @@ bool SegmentationThread::computeCreateLayers()
     Layers layers;
     layers.setDefault();
 
-    const std::vector<Vector3<float>> &pal = ColorPalette::WindowsXp32;
-
-    Layer layer;
     size_t nLayers = elements_.elementId();
-    for (size_t i = 0; i < nLayers; i++)
+    if (nLayers > 1)
     {
-        size_t id = i + 1;
-        layer.set(id, "Layer " + std::to_string(id), true, pal[i % 32]);
-        layers.push_back(layer);
+        nLayers--; // ignore main layer
+        LOG_DEBUG_LOCAL("number of layers <" << nLayers << ">");
+
+        const std::vector<Vector3<float>> &pal = ColorPalette::WindowsXp32;
+        Layer layer;
+
+        for (size_t i = 0; i < nLayers; i++)
+        {
+            size_t id = i + 1;
+            layer.set(id, "Layer " + std::to_string(id), true, pal[i % 32]);
+            layers.push_back(layer);
+        }
     }
 
     // Update
