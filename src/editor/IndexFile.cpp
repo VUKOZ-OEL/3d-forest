@@ -26,7 +26,7 @@
 #include <IndexFile.hpp>
 #include <Log.hpp>
 
-#if !defined(EXPORT_CORE_IMPORT)
+#if !defined(EXPORT_EDITOR_IMPORT)
 const uint32_t IndexFile::CHUNK_TYPE = 0x38584449U; /**< Signature "IDX8" */
 #endif
 
