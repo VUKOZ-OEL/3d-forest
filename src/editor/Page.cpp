@@ -30,8 +30,9 @@
 #include <Page.hpp>
 #include <Query.hpp>
 
+#define MODULE_NAME "Page"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("Page", msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 Page::Page(Editor *editor, Query *query, uint32_t datasetId, uint32_t pageId)
     : selectionSize(0),
@@ -316,6 +317,8 @@ void Page::select()
 
 void Page::runModifiers()
 {
+    LOG_UPDATE_VIEW(MODULE_NAME, "page <" << pageId_ << ">");
+
     runColorModifier();
     editor_->runModifiers(this);
 
@@ -849,6 +852,24 @@ void Page::runColorModifier()
                      numberOfReturns[i],
                      15,
                      ColorPalette::BlueCyanGreenYellowRed16);
+        }
+    }
+
+    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_LAYER))
+    {
+        const Layers &layers = editor_->layers();
+        const size_t max = layers.size();
+        LOG_UPDATE_VIEW(MODULE_NAME, "layers <" << max << ">");
+
+        for (size_t i = 0; i < n; i++)
+        {
+            if (layer[i] < max)
+            {
+                const Vector3<float> &c = layers.color(layer[i]);
+                renderColor[i * 3 + 0] *= c[0];
+                renderColor[i * 3 + 1] *= c[1];
+                renderColor[i * 3 + 2] *= c[2];
+            }
         }
     }
 
