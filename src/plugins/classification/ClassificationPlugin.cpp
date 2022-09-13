@@ -28,7 +28,7 @@
 #include <QCloseEvent>
 #include <QComboBox>
 #include <QCoreApplication>
-#include <QDockWidget>
+#include <QDialog>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -43,7 +43,7 @@
 //#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("ClassificationPlugin", msg)
 
 /** Classification Window. */
-class ClassificationWindow : public QDockWidget
+class ClassificationWindow : public QDialog
 {
     Q_OBJECT
 
@@ -66,7 +66,7 @@ protected:
 };
 
 ClassificationWindow::ClassificationWindow(MainWindow *mainWindow)
-    : QDockWidget(mainWindow),
+    : QDialog(mainWindow),
       mainWindow_(mainWindow),
       classification_(&mainWindow->editor())
 {
@@ -146,15 +146,12 @@ ClassificationWindow::ClassificationWindow(MainWindow *mainWindow)
     mainLayout->addLayout(buttonsLayout);
     mainLayout->addStretch();
 
-    // Dock
-    widget_ = new QWidget;
-    widget_->setLayout(mainLayout);
-    // TBD dialog? widget_->setFixedHeight(350);
-    setWidget(widget_);
-    setWindowTitle(QObject::tr(CLASSIFICATION_PLUGIN_NAME));
-    setFloating(true);
-    setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    mainWindow_->addDockWidget(Qt::RightDockWidgetArea, this);
+    // Dialog
+    setLayout(mainLayout);
+    setWindowTitle(tr(CLASSIFICATION_PLUGIN_NAME));
+    setWindowIcon(ICON("soil"));
+    setMaximumHeight(height());
+    setModal(true);
 }
 
 void ClassificationWindow::slotApply()

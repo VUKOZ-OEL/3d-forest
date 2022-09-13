@@ -571,7 +571,7 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
         ".vscode/settings.json" to contain new directories.
         For example, add "${workspaceRoot}/src/plugins/myaction" to
         "C_Cpp.default.includePath" include paths.
-    -#  Need some icon? Try to look into directory "3rdparty/icons".
+    -#  Need some icon? Try to look into https://github.com/VUKOZ-OEL/3d-forest-icons
 
 
 
