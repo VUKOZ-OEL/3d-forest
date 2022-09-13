@@ -148,7 +148,7 @@ ClassificationWindow::ClassificationWindow(MainWindow *mainWindow)
 
     // Dialog
     setLayout(mainLayout);
-    setWindowTitle(tr("CLASSIFICATION_PLUGIN_NAME"));
+    setWindowTitle(tr(CLASSIFICATION_PLUGIN_NAME));
     setWindowIcon(ICON("soil"));
     setMaximumHeight(height());
     setModal(true);
