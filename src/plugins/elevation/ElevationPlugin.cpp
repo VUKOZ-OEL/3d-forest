@@ -29,7 +29,7 @@
 #include <QCloseEvent>
 #include <QComboBox>
 #include <QCoreApplication>
-#include <QDockWidget>
+#include <QDialog>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -45,7 +45,7 @@
 //#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("ElevationPlugin", msg)
 
 /** Elevation Window. */
-class ElevationWindow : public QDockWidget
+class ElevationWindow : public QDialog
 {
     Q_OBJECT
 
@@ -66,7 +66,7 @@ protected:
 };
 
 ElevationWindow::ElevationWindow(MainWindow *mainWindow)
-    : QDockWidget(mainWindow),
+    : QDialog(mainWindow),
       mainWindow_(mainWindow),
       elevation_(&mainWindow->editor())
 {
@@ -120,15 +120,12 @@ ElevationWindow::ElevationWindow(MainWindow *mainWindow)
     mainLayout->addLayout(buttonsLayout);
     mainLayout->addStretch();
 
-    // Dock
-    widget_ = new QWidget;
-    widget_->setLayout(mainLayout);
-    // TBD dialog? widget_->setFixedHeight(200);
-    setWidget(widget_);
-    setWindowTitle(QObject::tr(ELEVATION_PLUGIN_NAME));
-    setFloating(true);
-    setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    mainWindow_->addDockWidget(Qt::RightDockWidgetArea, this);
+    // Dialog
+    setLayout(mainLayout);
+    setWindowTitle(tr(ELEVATION_PLUGIN_NAME));
+    setWindowIcon(ICON("elevation"));
+    setMaximumHeight(height());
+    setModal(true);
 }
 
 void ElevationWindow::slotApply()
