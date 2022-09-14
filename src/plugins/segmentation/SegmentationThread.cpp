@@ -298,6 +298,13 @@ bool SegmentationThread::computeVoxelSize()
         if (computed)
         {
             voxels_.append(voxel);
+
+            query_.reset();
+            while (query_.next())
+            {
+                query_.voxel() = voxels_.size();
+                query_.setModified();
+            }
         }
 
         // Update progress
@@ -314,6 +321,8 @@ bool SegmentationThread::computeVoxelSize()
             }
         }
     }
+
+    query_.flush();
 
     // Finished
     progressPercent_ = 100;

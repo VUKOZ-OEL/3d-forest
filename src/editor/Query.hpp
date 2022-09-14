@@ -33,7 +33,14 @@
 
 class Editor;
 
-/** Query. */
+/** Data Query.
+
+    A database query is a request for a database’s data so we can retrieve or
+    manipulate it.
+
+    A query may be used to access up to quintillions of point records that meet
+    certain criteria.
+*/
 class EXPORT_EDITOR Query
 {
 public:
@@ -132,6 +139,7 @@ public:
     }
 
     uint32_t &layer() { return layer_[selection_[pagePointIndex_]]; }
+    size_t &voxel() { return voxel_[selection_[pagePointIndex_]]; }
     /**@}*/
 
     bool nextPage();
@@ -192,6 +200,7 @@ protected:
     float *color_;
     float *userColor_;
     uint32_t *layer_;
+    size_t *voxel_;
 
     uint32_t *selection_;
 

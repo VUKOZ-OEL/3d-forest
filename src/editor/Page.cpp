@@ -62,6 +62,7 @@ void Page::clear()
     color.clear();
     userColor.clear();
     layer.clear();
+    voxel.clear();
 
     renderPosition.clear();
     renderColor.clear();
@@ -86,6 +87,7 @@ void Page::resize(size_t n)
     color.resize(n * 3);
     userColor.resize(n * 3);
     layer.resize(n);
+    voxel.resize(n);
 
     renderPosition.resize(n * 3);
     renderColor.resize(n * 3);
@@ -176,6 +178,9 @@ void Page::read()
 
         // layer
         layer[i] = point.user_layer;
+
+        // voxel
+        voxel[i] = static_cast<size_t>(point.user_voxel);
     }
 
     // Index
@@ -222,6 +227,9 @@ void Page::toPoint(uint8_t *ptr, size_t i, uint8_t fmt)
 
     // Elevation
     htol32(ptr + pos + 12, static_cast<uint32_t>(elevation[i]));
+
+    // Voxel
+    htol64(ptr + pos + 16, static_cast<uint64_t>(voxel[i]));
 }
 
 void Page::write()
@@ -855,24 +863,6 @@ void Page::runColorModifier()
         }
     }
 
-    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_LAYER))
-    {
-        const Layers &layers = editor_->layers();
-        const size_t max = layers.size();
-        LOG_UPDATE_VIEW(MODULE_NAME, "layers <" << max << ">");
-
-        for (size_t i = 0; i < n; i++)
-        {
-            if (layer[i] < max)
-            {
-                const Vector3<float> &c = layers.color(layer[i]);
-                renderColor[i * 3 + 0] *= c[0];
-                renderColor[i * 3 + 1] *= c[1];
-                renderColor[i * 3 + 2] *= c[2];
-            }
-        }
-    }
-
     if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_CLASSIFICATION))
     {
         for (size_t i = 0; i < n; i++)
@@ -894,6 +884,42 @@ void Page::runColorModifier()
                 renderColor[i * 3 + 0] *= static_cast<float>(v);
                 renderColor[i * 3 + 1] *= static_cast<float>(v);
                 renderColor[i * 3 + 2] *= static_cast<float>(v);
+            }
+        }
+    }
+
+    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_LAYER))
+    {
+        const Layers &layers = editor_->layers();
+        const size_t max = layers.size();
+        LOG_UPDATE_VIEW(MODULE_NAME, "layers <" << max << ">");
+
+        for (size_t i = 0; i < n; i++)
+        {
+            if (layer[i] < max)
+            {
+                const Vector3<float> &c = layers.color(layer[i]);
+                renderColor[i * 3 + 0] *= c[0];
+                renderColor[i * 3 + 1] *= c[1];
+                renderColor[i * 3 + 2] *= c[2];
+            }
+        }
+    }
+
+    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_VOXEL_INTENSITY))
+    {
+        const Voxels &voxels = editor_->voxels();
+        const size_t max = voxels.size();
+        LOG_UPDATE_VIEW(MODULE_NAME, "voxels <" << max << ">");
+
+        for (size_t i = 0; i < n; i++)
+        {
+            if (voxel[i] > 0 && voxel[i] <= max)
+            {
+                const float c = voxels.at(voxel[i] - 1U).intensity_;
+                renderColor[i * 3 + 0] *= c;
+                renderColor[i * 3 + 1] *= c;
+                renderColor[i * 3 + 2] *= c;
             }
         }
     }
