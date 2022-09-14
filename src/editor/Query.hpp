@@ -139,6 +139,7 @@ public:
     }
 
     uint32_t &layer() { return layer_[selection_[pagePointIndex_]]; }
+    size_t &voxel() { return voxel_[selection_[pagePointIndex_]]; }
     /**@}*/
 
     bool nextPage();
@@ -199,6 +200,7 @@ protected:
     float *color_;
     float *userColor_;
     uint32_t *layer_;
+    size_t *voxel_;
 
     uint32_t *selection_;
 

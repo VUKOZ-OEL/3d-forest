@@ -62,6 +62,7 @@ void Page::clear()
     color.clear();
     userColor.clear();
     layer.clear();
+    voxel.clear();
 
     renderPosition.clear();
     renderColor.clear();
@@ -86,6 +87,7 @@ void Page::resize(size_t n)
     color.resize(n * 3);
     userColor.resize(n * 3);
     layer.resize(n);
+    voxel.resize(n);
 
     renderPosition.resize(n * 3);
     renderColor.resize(n * 3);
@@ -176,6 +178,9 @@ void Page::read()
 
         // layer
         layer[i] = point.user_layer;
+
+        // voxel
+        voxel[i] = static_cast<size_t>(point.user_voxel);
     }
 
     // Index
@@ -222,6 +227,9 @@ void Page::toPoint(uint8_t *ptr, size_t i, uint8_t fmt)
 
     // Elevation
     htol32(ptr + pos + 12, static_cast<uint32_t>(elevation[i]));
+
+    // Voxel
+    htol64(ptr + pos + 16, static_cast<uint64_t>(voxel[i]));
 }
 
 void Page::write()

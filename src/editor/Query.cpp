@@ -142,6 +142,7 @@ bool Query::nextPage()
             color_ = page_->color.data();
             userColor_ = page_->userColor.data();
             layer_ = page_->layer.data();
+            voxel_ = page_->voxel.data();
 
             selection_ = page_->selection.data();
 

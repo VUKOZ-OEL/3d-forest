@@ -89,6 +89,11 @@ public:
         This value is stored in Point Data Record extra bytes.
     */
     std::vector<uint32_t> layer;
+
+    /** Voxel identification numbers.
+        This value is stored in Point Data Record extra bytes.
+    */
+    std::vector<size_t> voxel;
     /**@}*/
 
     /** Index array contains indices to selected points. */

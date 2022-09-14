@@ -158,8 +158,8 @@ public:
         uint16_t user_green; // 10 * 8
         uint16_t user_blue;
         uint16_t user_intensity;
-
         uint32_t user_elevation; // 11 * 8
+        uint64_t user_voxel;     // 12 * 8
 
         Json &write(Json &out) const;
     };
