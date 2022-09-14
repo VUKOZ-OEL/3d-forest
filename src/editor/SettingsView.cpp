@@ -32,8 +32,9 @@ SettingsView::SettingsView()
                           "Return Number",
                           "Number of Returns",
                           "Classification",
-                          "Layer",
                           "Elevation",
+                          "Layer",
+                          "Voxel Intensity",
                           "User Color"};
 
     colorSourceEnabled_.resize(colorSourceString_.size());
