@@ -33,7 +33,14 @@
 
 class Editor;
 
-/** Query. */
+/** Data Query.
+
+    A database query is a request for a database’s data so we can retrieve or
+    manipulate it.
+
+    A query may be used to access up to quintillions of point records that meet
+    certain criteria.
+*/
 class EXPORT_EDITOR Query
 {
 public:
