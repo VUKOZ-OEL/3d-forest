@@ -254,6 +254,9 @@ void SegmentationThread::computeInitializeLayers()
     while (query_.next())
     {
         query_.layer() = 0;
+        query_.descriptor() = 0;
+        query_.density() = 0;
+        query_.value() = 0;
         query_.setModified();
     }
 
@@ -302,7 +305,7 @@ bool SegmentationThread::computeVoxelSize()
             query_.reset();
             while (query_.next())
             {
-                query_.voxel() = voxels_.size();
+                query_.value() = voxels_.size();
                 query_.setModified();
             }
         }
@@ -480,23 +483,21 @@ bool SegmentationThread::computeCreateLayers()
     Box<double> cell;
 
     // Query
-    for (size_t i = 0; i < voxels_.size(); i++)
+    query_.selectBox(editor_->clipBoundary());
+    query_.exec();
+
+    while (query_.next())
     {
-        Voxel &voxel = voxels_.at(i);
+        size_t index = query_.value();
 
-        if ((voxel.status_ & Voxel::STATUS_IGNORED) != 0)
+        if (index > 0)
         {
-            continue;
-        }
+            Voxel &voxel = voxels_.at(index);
 
-        // Set all points to a layer
-        voxels_.box(voxel, &cell);
-        query_.selectBox(cell);
-        query_.exec();
+            query_.layer() = voxel.elementId_ - 1;
+            query_.descriptor() = voxel.intensity_;
+            query_.density() = voxel.density_;
 
-        while (query_.next())
-        {
-            query_.layer() = voxel.elementId_;
             query_.setModified();
         }
     }

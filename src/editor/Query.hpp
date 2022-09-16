@@ -101,7 +101,6 @@ public:
     double &x() { return position_[3 * selection_[pagePointIndex_] + 0]; }
     double &y() { return position_[3 * selection_[pagePointIndex_] + 1]; }
     double &z() { return position_[3 * selection_[pagePointIndex_] + 2]; }
-    double &elevation() { return elevation_[selection_[pagePointIndex_]]; }
 
     float &intensity() { return intensity_[selection_[pagePointIndex_]]; }
 
@@ -128,18 +127,26 @@ public:
     float &green() { return color_[3 * selection_[pagePointIndex_] + 1]; }
     float &blue() { return color_[3 * selection_[pagePointIndex_] + 2]; }
 
-    float &userRed() { return userColor_[3 * selection_[pagePointIndex_] + 0]; }
-    float &userGreen()
-    {
-        return userColor_[3 * selection_[pagePointIndex_] + 1];
-    }
-    float &userBlue()
-    {
-        return userColor_[3 * selection_[pagePointIndex_] + 2];
-    }
-
     uint32_t &layer() { return layer_[selection_[pagePointIndex_]]; }
-    size_t &voxel() { return voxel_[selection_[pagePointIndex_]]; }
+    double &elevation() { return elevation_[selection_[pagePointIndex_]]; }
+    float &customRed()
+    {
+        return customColor_[3 * selection_[pagePointIndex_] + 0];
+    }
+    float &customGreen()
+    {
+        return customColor_[3 * selection_[pagePointIndex_] + 1];
+    }
+    float &customBlue()
+    {
+        return customColor_[3 * selection_[pagePointIndex_] + 2];
+    }
+    float &descriptor() { return descriptor_[selection_[pagePointIndex_]]; }
+    float &density() { return density_[selection_[pagePointIndex_]]; }
+    float &normalX() { return normal_[3 * selection_[pagePointIndex_] + 0]; }
+    float &normalY() { return normal_[3 * selection_[pagePointIndex_] + 1]; }
+    float &normalZ() { return normal_[3 * selection_[pagePointIndex_] + 2]; }
+    size_t &value() { return value_[selection_[pagePointIndex_]]; }
     /**@}*/
 
     bool nextPage();
@@ -190,7 +197,6 @@ protected:
     std::shared_ptr<Page> page_;
 
     double *position_;
-    double *elevation_;
     float *intensity_;
     uint8_t *returnNumber_;
     uint8_t *numberOfReturns_;
@@ -198,9 +204,14 @@ protected:
     uint8_t *userData_;
     double *gpsTime_;
     float *color_;
-    float *userColor_;
+
     uint32_t *layer_;
-    size_t *voxel_;
+    double *elevation_;
+    float *customColor_;
+    float *descriptor_;
+    float *density_;
+    float *normal_;
+    size_t *value_;
 
     uint32_t *selection_;
 

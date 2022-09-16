@@ -38,6 +38,7 @@
 #define LAS_FILE_HEADER_SIZE_V13 235
 #define LAS_FILE_HEADER_SIZE_V14 375
 #define LAS_FILE_FORMAT_COUNT 11
+#define LAS_FILE_USER_BYTE_COUNT 24U
 
 static const size_t LAS_FILE_FORMAT_BYTE_COUNT[LAS_FILE_FORMAT_COUNT] =
     {20, 28, 26, 34, 57, 63, 30, 36, 38, 59, 67};
@@ -84,10 +85,7 @@ size_t LasFile::Header::pointDataRecordLengthFormat() const
 
 size_t LasFile::Header::pointDataRecordLength3dForest() const
 {
-    return pointDataRecordLengthFormat() + sizeof(LasFile::Point::user_layer) +
-           (4 * sizeof(LasFile::Point::user_red)) +
-           sizeof(LasFile::Point::user_elevation) +
-           sizeof(LasFile::Point::user_voxel);
+    return pointDataRecordLengthFormat() + LAS_FILE_USER_BYTE_COUNT;
 }
 
 size_t LasFile::Header::pointDataRecordLengthUser() const
@@ -667,15 +665,19 @@ void LasFile::readPoint(Point &pt, const uint8_t *buffer, uint8_t fmt) const
         pos += 29;
     }
 
-    if (header.point_data_record_length > (pos + 23))
+    if (header.point_data_record_length >= (pos + LAS_FILE_USER_BYTE_COUNT))
     {
         pt.user_layer = ltoh32(&buffer[pos]);
-        pt.user_red = ltoh16(&buffer[pos + 4]);
-        pt.user_green = ltoh16(&buffer[pos + 6]);
-        pt.user_blue = ltoh16(&buffer[pos + 8]);
-        pt.user_intensity = ltoh16(&buffer[pos + 10]);
-        pt.user_elevation = ltoh32(&buffer[pos + 12]);
-        pt.user_voxel = ltoh64(&buffer[pos + 16]);
+        pt.user_elevation = ltoh32(&buffer[pos + 4]);
+        pt.user_red = buffer[pos + 8];
+        pt.user_green = buffer[pos + 9];
+        pt.user_blue = buffer[pos + 10];
+        pt.user_descriptor = buffer[pos + 11];
+        pt.user_density = buffer[pos + 12];
+        pt.user_nx = buffer[pos + 13];
+        pt.user_ny = buffer[pos + 14];
+        pt.user_nz = buffer[pos + 15];
+        pt.user_value = ltoh64(&buffer[pos + 16]);
     }
 }
 
@@ -801,15 +803,19 @@ void LasFile::writePoint(uint8_t *buffer, const Point &pt) const
         pos += 29;
     }
 
-    if (header.point_data_record_length > (pos + 23))
+    if (header.point_data_record_length >= (pos + LAS_FILE_USER_BYTE_COUNT))
     {
         htol32(&buffer[pos], pt.user_layer);
-        htol16(&buffer[pos + 4], pt.user_red);
-        htol16(&buffer[pos + 6], pt.user_green);
-        htol16(&buffer[pos + 8], pt.user_blue);
-        htol16(&buffer[pos + 10], pt.user_intensity);
-        htol32(&buffer[pos + 12], pt.user_elevation);
-        htol64(&buffer[pos + 16], pt.user_voxel);
+        htol32(&buffer[pos + 4], pt.user_elevation);
+        buffer[pos + 8] = pt.user_red;
+        buffer[pos + 9] = pt.user_green;
+        buffer[pos + 10] = pt.user_blue;
+        buffer[pos + 11] = pt.user_descriptor;
+        buffer[pos + 12] = pt.user_density;
+        buffer[pos + 13] = pt.user_nx;
+        buffer[pos + 14] = pt.user_ny;
+        buffer[pos + 15] = pt.user_nz;
+        htol64(&buffer[pos + 16], pt.user_value);
     }
 }
 

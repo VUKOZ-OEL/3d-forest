@@ -52,7 +52,6 @@ Page::~Page()
 void Page::clear()
 {
     position.clear();
-    elevation.clear();
     intensity.clear();
     returnNumber.clear();
     numberOfReturns.clear();
@@ -60,9 +59,14 @@ void Page::clear()
     userData.clear();
     gpsTime.clear();
     color.clear();
-    userColor.clear();
+
     layer.clear();
-    voxel.clear();
+    elevation.clear();
+    customColor.clear();
+    descriptor.clear();
+    density.clear();
+    normal.clear();
+    value.clear();
 
     renderPosition.clear();
     renderColor.clear();
@@ -77,7 +81,6 @@ void Page::clear()
 void Page::resize(size_t n)
 {
     position.resize(n * 3);
-    elevation.resize(n);
     intensity.resize(n);
     returnNumber.resize(n);
     numberOfReturns.resize(n);
@@ -85,9 +88,14 @@ void Page::resize(size_t n)
     userData.resize(n);
     gpsTime.resize(n);
     color.resize(n * 3);
-    userColor.resize(n * 3);
+
     layer.resize(n);
-    voxel.resize(n);
+    elevation.resize(n);
+    customColor.resize(n * 3);
+    descriptor.resize(n);
+    density.resize(n);
+    normal.resize(n * 3);
+    value.resize(n);
 
     renderPosition.resize(n * 3);
     renderColor.resize(n * 3);
@@ -126,6 +134,7 @@ void Page::read()
     // Covert buffer to point data
     uint8_t *ptr = buffer_.data();
     LasFile::Point point;
+    const float s8 = 1.0F / 255.0F;
     const float scaleU16 = 1.0F / 65535.0F;
     bool rgbFlag = las.header.hasRgb();
 
@@ -144,9 +153,6 @@ void Page::read()
         position[3 * i + 1] = positionBase_[3 * i + 1];
         position[3 * i + 2] = positionBase_[3 * i + 2];
 
-        // elevation
-        elevation[i] = static_cast<double>(point.user_elevation);
-
         // intensity and color
         intensity[i] = static_cast<float>(point.intensity) * scaleU16;
 
@@ -163,10 +169,6 @@ void Page::read()
             color[3 * i + 2] = 1.0F;
         }
 
-        userColor[3 * i + 0] = point.user_red * scaleU16;
-        userColor[3 * i + 1] = point.user_green * scaleU16;
-        userColor[3 * i + 2] = point.user_blue * scaleU16;
-
         // attributes
         returnNumber[i] = point.return_number;
         numberOfReturns[i] = point.number_of_returns;
@@ -176,11 +178,18 @@ void Page::read()
         // gps
         gpsTime[i] = point.gps_time;
 
-        // layer
+        // User extra
         layer[i] = point.user_layer;
-
-        // voxel
-        voxel[i] = static_cast<size_t>(point.user_voxel);
+        elevation[i] = static_cast<double>(point.user_elevation);
+        customColor[3 * i + 0] = static_cast<float>(point.user_red) * s8;
+        customColor[3 * i + 1] = static_cast<float>(point.user_green) * s8;
+        customColor[3 * i + 2] = static_cast<float>(point.user_blue) * s8;
+        descriptor[i] = static_cast<float>(point.user_descriptor) * s8;
+        density[i] = static_cast<float>(point.user_density) * s8;
+        normal[3 * i + 0] = static_cast<float>(point.user_nx) * s8;
+        normal[3 * i + 1] = static_cast<float>(point.user_ny) * s8;
+        normal[3 * i + 2] = static_cast<float>(point.user_nz) * s8;
+        value[i] = static_cast<size_t>(point.user_value);
     }
 
     // Index
@@ -206,8 +215,13 @@ static const size_t PAGE_FORMAT_USER[PAGE_FORMAT_COUNT] =
 
 void Page::toPoint(uint8_t *ptr, size_t i, uint8_t fmt)
 {
-    const float s16 = 65535.0F;
+    const float s8 = 255.0F;
     size_t pos = PAGE_FORMAT_USER[fmt];
+
+    // Do not overwrite the other values for now
+    // - return number
+    // - gps time
+    // - etc.
 
     // Classification
     if (fmt > 5)
@@ -218,18 +232,27 @@ void Page::toPoint(uint8_t *ptr, size_t i, uint8_t fmt)
     // Layer
     htol32(ptr + pos, layer[i]);
 
-    // User color
-    htol16(ptr + pos + 4, static_cast<uint16_t>(renderColor[3 * i + 0] * s16));
-    htol16(ptr + pos + 6, static_cast<uint16_t>(renderColor[3 * i + 1] * s16));
-    htol16(ptr + pos + 8, static_cast<uint16_t>(renderColor[3 * i + 2] * s16));
-
-    // User intensity
-
     // Elevation
-    htol32(ptr + pos + 12, static_cast<uint32_t>(elevation[i]));
+    htol32(ptr + pos + 4, static_cast<uint32_t>(elevation[i]));
 
-    // Voxel
-    htol64(ptr + pos + 16, static_cast<uint64_t>(voxel[i]));
+    // Custom color
+    ptr[pos + 8] = static_cast<uint8_t>(customColor[3 * i + 0] * s8);
+    ptr[pos + 9] = static_cast<uint8_t>(customColor[3 * i + 1] * s8);
+    ptr[pos + 10] = static_cast<uint8_t>(customColor[3 * i + 2] * s8);
+
+    // Descriptor
+    ptr[pos + 11] = static_cast<uint8_t>(descriptor[i] * s8);
+
+    // Density
+    ptr[pos + 12] = static_cast<uint8_t>(density[i] * s8);
+
+    // Normal
+    ptr[pos + 13] = static_cast<uint8_t>(normal[3 * i + 0] * s8);
+    ptr[pos + 14] = static_cast<uint8_t>(normal[3 * i + 1] * s8);
+    ptr[pos + 15] = static_cast<uint8_t>(normal[3 * i + 2] * s8);
+
+    // Value
+    htol64(ptr + pos + 16, static_cast<uint64_t>(value[i]));
 }
 
 void Page::write()
@@ -813,16 +836,6 @@ void Page::runColorModifier()
         }
     }
 
-    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_USER_COLOR))
-    {
-        for (size_t i = 0; i < n; i++)
-        {
-            renderColor[i * 3 + 0] *= userColor[i * 3 + 0];
-            renderColor[i * 3 + 1] *= userColor[i * 3 + 1];
-            renderColor[i * 3 + 2] *= userColor[i * 3 + 2];
-        }
-    }
-
     if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_INTENSITY))
     {
         // for (size_t i = 0; i < n; i++)
@@ -871,23 +884,6 @@ void Page::runColorModifier()
         }
     }
 
-    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_ELEVATION))
-    {
-        const Dataset &dataset = editor_->datasets().key(datasetId_);
-        double zlen = dataset.boundary().length(2);
-
-        if (zlen > 0.)
-        {
-            for (size_t i = 0; i < n; i++)
-            {
-                double v = 1. - (elevation[i] / zlen);
-                renderColor[i * 3 + 0] *= static_cast<float>(v);
-                renderColor[i * 3 + 1] *= static_cast<float>(v);
-                renderColor[i * 3 + 2] *= static_cast<float>(v);
-            }
-        }
-    }
-
     if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_LAYER))
     {
         const Layers &layers = editor_->layers();
@@ -906,36 +902,77 @@ void Page::runColorModifier()
         }
     }
 
-    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_VOXEL_INTENSITY))
+    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_ELEVATION))
     {
-        const Voxels &voxels = editor_->voxels();
-        const size_t max = voxels.size();
-        LOG_UPDATE_VIEW(MODULE_NAME, "voxels <" << max << ">");
+        const Dataset &dataset = editor_->datasets().key(datasetId_);
+        double zlen = dataset.boundary().length(2);
 
+        if (zlen > 0.)
+        {
+            for (size_t i = 0; i < n; i++)
+            {
+                double v = 1. - (elevation[i] / zlen);
+                renderColor[i * 3 + 0] *= static_cast<float>(v);
+                renderColor[i * 3 + 1] *= static_cast<float>(v);
+                renderColor[i * 3 + 2] *= static_cast<float>(v);
+            }
+        }
+    }
+
+    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_CUSTOM_COLOR))
+    {
         for (size_t i = 0; i < n; i++)
         {
-            if (voxel[i] > 0 && voxel[i] <= max)
-            {
-                const float c = voxels.at(voxel[i] - 1U).intensity_;
-                renderColor[i * 3 + 0] *= c;
-                renderColor[i * 3 + 1] *= c;
-                renderColor[i * 3 + 2] *= c;
-            }
+            renderColor[i * 3 + 0] *= customColor[i * 3 + 0];
+            renderColor[i * 3 + 1] *= customColor[i * 3 + 1];
+            renderColor[i * 3 + 2] *= customColor[i * 3 + 2];
+        }
+    }
+
+    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_DESCRIPTOR))
+    {
+        for (size_t i = 0; i < n; i++)
+        {
+            const float c = descriptor[i];
+            renderColor[i * 3 + 0] *= c;
+            renderColor[i * 3 + 1] *= c;
+            renderColor[i * 3 + 2] *= c;
+        }
+    }
+
+    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_DENSITY))
+    {
+        for (size_t i = 0; i < n; i++)
+        {
+            setColor(i,
+                     static_cast<size_t>(descriptor[i] * 255.0F),
+                     255,
+                     ColorPalette::BlueCyanYellowRed256);
+        }
+    }
+
+    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_NORMAL))
+    {
+        for (size_t i = 0; i < n; i++)
+        {
+            renderColor[i * 3 + 0] *= normal[i * 3 + 0];
+            renderColor[i * 3 + 1] *= normal[i * 3 + 1];
+            renderColor[i * 3 + 2] *= normal[i * 3 + 2];
         }
     }
 }
 
 void Page::setColor(size_t idx,
-                    size_t value,
-                    size_t max,
+                    size_t colorValue,
+                    size_t colorMax,
                     const std::vector<Vector3<float>> &pal)
 {
-    if (value > max)
+    if (colorValue > colorMax)
     {
-        value = max;
+        colorValue = colorMax;
     }
 
-    renderColor[idx * 3 + 0] *= pal[value][0];
-    renderColor[idx * 3 + 1] *= pal[value][1];
-    renderColor[idx * 3 + 2] *= pal[value][2];
+    renderColor[idx * 3 + 0] *= pal[colorValue][0];
+    renderColor[idx * 3 + 1] *= pal[colorValue][1];
+    renderColor[idx * 3 + 2] *= pal[colorValue][2];
 }
