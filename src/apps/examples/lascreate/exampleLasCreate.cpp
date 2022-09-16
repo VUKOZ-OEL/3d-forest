@@ -105,10 +105,6 @@ static void createGrid(const std::string &path,
             points[idx].green = static_cast<uint16_t>(y * s2_65535);
             points[idx].blue = 0;
 
-            points[idx].user_red = static_cast<uint16_t>(y * s2_65535);
-            points[idx].user_green = 0;
-            points[idx].user_blue = static_cast<uint16_t>(x * s2_65535);
-
             points[idx].intensity = intensity;
             points[idx].return_number = static_cast<uint8_t>(x);
             points[idx].number_of_returns = static_cast<uint8_t>(y);

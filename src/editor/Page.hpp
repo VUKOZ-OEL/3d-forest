@@ -40,11 +40,6 @@ public:
      */
     std::vector<double> position;
 
-    /** Point elevation above ground.
-        The data are stored as [e0, e1, ...].
-     */
-    std::vector<double> elevation;
-
     /** Pulse return magnitude.
         The data are stored as [i0, i1, ...].
         The values are in range from 0 (zero intensity) to 1 (full intensity).
@@ -77,23 +72,52 @@ public:
         are set to full intensity.
     */
     std::vector<float> color;
+    /**@}*/
 
-    /** Red, Green, and Blue output colors.
-        The data are stored as [r0, g0, b0, r1, g1, ...].
-        Color values are in range from 0 (zero intensity) to 1 (full intensity).
-        This value is stored in Point Data Record extra bytes.
-    */
-    std::vector<float> userColor;
-
+    /** @name Point Data Extra Bytes */
+    /**@{*/
     /** Layer identification numbers.
         This value is stored in Point Data Record extra bytes.
     */
     std::vector<uint32_t> layer;
 
-    /** Voxel identification numbers.
+    /** Point elevation above ground.
+        The data are stored as [e0, e1, ...].
+        This value is stored in Point Data Record extra bytes.
+     */
+    std::vector<double> elevation;
+
+    /** Red, Green, and Blue custom colors.
+        The data are stored as [r0, g0, b0, r1, g1, ...].
+        Color values are in range from 0 (zero intensity) to 1 (full intensity).
         This value is stored in Point Data Record extra bytes.
     */
-    std::vector<size_t> voxel;
+    std::vector<float> customColor;
+
+    /** Descriptor values.
+        The data are stored as [d0, d1, ...].
+        The values are in range from 0 (zero) to 1 (full).
+        This value is stored in Point Data Record extra bytes.
+    */
+    std::vector<float> descriptor;
+
+    /** Density values.
+        The data are stored as [d0, d1, ...].
+        The values are in range from 0 (zero) to 1 (full).
+        This value is stored in Point Data Record extra bytes.
+    */
+    std::vector<float> density;
+
+    /** Point normals.
+        The data are stored as [nx0, ny0, nz0, nx1, ny1, ...].
+        This value is stored in Point Data Record extra bytes.
+     */
+    std::vector<float> normal;
+
+    /** User values.
+        This value is stored in Point Data Record extra bytes.
+    */
+    std::vector<size_t> value;
     /**@}*/
 
     /** Index array contains indices to selected points. */
@@ -187,8 +211,8 @@ protected:
     void runColorModifier();
 
     void setColor(size_t idx,
-                  size_t value,
-                  size_t max,
+                  size_t colorValue,
+                  size_t colorMax,
                   const std::vector<Vector3<float>> &pal);
 };
 

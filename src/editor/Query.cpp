@@ -132,7 +132,6 @@ bool Query::nextPage()
 
             // Point to current page data.
             position_ = page_->position.data();
-            elevation_ = page_->elevation.data();
             intensity_ = page_->intensity.data();
             returnNumber_ = page_->returnNumber.data();
             numberOfReturns_ = page_->numberOfReturns.data();
@@ -140,9 +139,14 @@ bool Query::nextPage()
             userData_ = page_->userData.data();
             gpsTime_ = page_->gpsTime.data();
             color_ = page_->color.data();
-            userColor_ = page_->userColor.data();
+
             layer_ = page_->layer.data();
-            voxel_ = page_->voxel.data();
+            elevation_ = page_->elevation.data();
+            customColor_ = page_->customColor.data();
+            descriptor_ = page_->descriptor.data();
+            density_ = page_->density.data();
+            normal_ = page_->normal.data();
+            value_ = page_->value.data();
 
             selection_ = page_->selection.data();
 

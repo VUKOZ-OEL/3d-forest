@@ -254,6 +254,10 @@ void SegmentationThread::computeInitializeLayers()
     while (query_.next())
     {
         query_.layer() = 0;
+        query_.descriptor() = 0;
+        query_.density() = 0;
+        query_.value() = 0;
+
         query_.setModified();
     }
 
@@ -293,19 +297,7 @@ bool SegmentationThread::computeVoxelSize()
     while (voxels_.next(&voxel, &cell))
     {
         // Compute one voxel [meanX, meanY, meanZ, intensity, density]
-        bool computed;
-        computed = pca_.compute(&query_, &voxel, cell);
-        if (computed)
-        {
-            voxels_.append(voxel);
-
-            query_.reset();
-            while (query_.next())
-            {
-                query_.voxel() = voxels_.size();
-                query_.setModified();
-            }
-        }
+        pca_.compute(&query_, &voxels_, &voxel, cell);
 
         // Update progress
         progressValue_++;
@@ -480,23 +472,21 @@ bool SegmentationThread::computeCreateLayers()
     Box<double> cell;
 
     // Query
-    for (size_t i = 0; i < voxels_.size(); i++)
+    query_.selectBox(editor_->clipBoundary());
+    query_.exec();
+
+    while (query_.next())
     {
-        Voxel &voxel = voxels_.at(i);
+        size_t index = query_.value();
 
-        if ((voxel.status_ & Voxel::STATUS_IGNORED) != 0)
+        if (index > 0)
         {
-            continue;
-        }
+            Voxel &voxel = voxels_.at(index - 1);
 
-        // Set all points to a layer
-        voxels_.box(voxel, &cell);
-        query_.selectBox(cell);
-        query_.exec();
+            query_.layer() = voxel.elementId_ - 1;
+            query_.descriptor() = voxel.intensity_;
+            query_.density() = voxel.density_;
 
-        while (query_.next())
-        {
-            query_.layer() = voxel.elementId_;
             query_.setModified();
         }
     }
@@ -523,6 +513,8 @@ bool SegmentationThread::computeCreateLayers()
             layers.push_back(layer);
         }
     }
+
+    layersCreated_ = true;
 
     // Update
     editor_->setVoxels(voxels_);

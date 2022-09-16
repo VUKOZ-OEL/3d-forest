@@ -26,8 +26,6 @@
 #define LOG_DEBUG_LOCAL(msg)
 //#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("SegmentationPca", msg)
 
-#define SEGMENTATION_PCA_POINT_BUFFER_SIZE 8192
-
 SegmentationPca::SegmentationPca()
 {
     clear();
@@ -46,10 +44,34 @@ void SegmentationPca::clear()
     // E;
 }
 
-bool SegmentationPca::compute(Query *query,
+void SegmentationPca::compute(Query *query,
+                              Voxels *voxels,
                               Voxel *voxel,
                               const Box<double> &cell)
 {
+    // The number of points inside this grid cell.
+    Eigen::MatrixXd::Index nPoints = 0;
+
+    // Select points in 'cell' into point coordinates and centroid.
+    query->selectBox(cell);
+    query->selectClassifications({LasFile::CLASS_UNASSIGNED});
+    query->exec();
+
+    while (query->next())
+    {
+        nPoints++;
+    }
+
+    LOG_DEBUG_LOCAL("nPoints <" << nPoints << ">");
+
+    // Enough points for PCA?
+    if (nPoints < 3)
+    {
+        return;
+    }
+
+    size_t voxelId = voxels->size() + 1;
+
     // Get point coordinates in voxel given by 'cell' and compute their
     // centroid.
     double x = 0;
@@ -61,23 +83,12 @@ bool SegmentationPca::compute(Query *query,
     double meanY = 0;
     double meanZ = 0;
 
-    // Initialize point coordinate buffer and reserve memory.
-    Eigen::MatrixXd::Index nPoints = 0;
+    V.resize(3, nPoints);
+    nPoints = 0;
 
-    V.resize(3, SEGMENTATION_PCA_POINT_BUFFER_SIZE);
-
-    // Select points in 'cell' into point coordinates and centroid.
-    query->selectBox(cell);
-    query->selectClassifications({LasFile::CLASS_UNASSIGNED});
-    query->exec();
-
+    query->reset();
     while (query->next())
     {
-        if (nPoints == V.cols())
-        {
-            V.resize(3, nPoints * 2);
-        }
-
         x = query->x();
         meanX += x;
         V(0, nPoints) = x;
@@ -90,38 +101,18 @@ bool SegmentationPca::compute(Query *query,
         meanZ += z;
         V(2, nPoints) = z;
 
+        query->value() = voxelId;
+        query->setModified();
+
         nPoints++;
     }
 
-    V.resize(3, nPoints);
-
     // Fill voxel.
-    if (nPoints > 0)
-    {
-        const double d = static_cast<double>(nPoints);
-        meanX = meanX / d;
-        meanY = meanY / d;
-        meanZ = meanZ / d;
-    }
-    else
-    {
-        cell.getCenter(meanX, meanY, meanZ);
-    }
-
-    LOG_DEBUG_LOCAL("nPoints <" << nPoints << ">");
+    const double d = static_cast<double>(nPoints);
+    meanX = meanX / d;
+    meanY = meanY / d;
+    meanZ = meanZ / d;
     LOG_DEBUG_LOCAL("mean <" << meanX << "," << meanY << "," << meanZ << ">");
-
-    voxel->meanX_ = meanX;
-    voxel->meanY_ = meanY;
-    voxel->meanZ_ = meanZ;
-    voxel->intensity_ = 0;
-    voxel->density_ = 0;
-
-    // Enough points for PCA?
-    if (nPoints < 3)
-    {
-        return false;
-    }
 
     // Shift point coordinates by centroid.
     LOG_DEBUG_LOCAL("V cols <" << V.cols() << "> rows <" << V.rows() << ">");
@@ -202,9 +193,11 @@ bool SegmentationPca::compute(Query *query,
 
         voxel->intensity_ = static_cast<float>(SFFIx);
         voxel->density_ = static_cast<float>(nPoints);
-
-        return true;
     }
 
-    return false;
+    voxel->meanX_ = meanX;
+    voxel->meanY_ = meanY;
+    voxel->meanZ_ = meanZ;
+
+    voxels->append(*voxel);
 }
