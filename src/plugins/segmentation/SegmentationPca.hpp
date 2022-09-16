@@ -36,7 +36,10 @@ public:
 
     void clear();
 
-    bool compute(Query *query, Voxel *voxel, const Box<double> &cell);
+    void compute(Query *query,
+                 Voxels *voxels,
+                 Voxel *voxel,
+                 const Box<double> &cell);
 
 protected:
     Eigen::MatrixXd V;

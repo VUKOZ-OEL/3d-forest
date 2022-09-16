@@ -257,6 +257,7 @@ void SegmentationThread::computeInitializeLayers()
         query_.descriptor() = 0;
         query_.density() = 0;
         query_.value() = 0;
+
         query_.setModified();
     }
 
@@ -296,19 +297,7 @@ bool SegmentationThread::computeVoxelSize()
     while (voxels_.next(&voxel, &cell))
     {
         // Compute one voxel [meanX, meanY, meanZ, intensity, density]
-        bool computed;
-        computed = pca_.compute(&query_, &voxel, cell);
-        if (computed)
-        {
-            voxels_.append(voxel);
-
-            query_.reset();
-            while (query_.next())
-            {
-                query_.value() = voxels_.size();
-                query_.setModified();
-            }
-        }
+        pca_.compute(&query_, &voxels_, &voxel, cell);
 
         // Update progress
         progressValue_++;
@@ -492,7 +481,7 @@ bool SegmentationThread::computeCreateLayers()
 
         if (index > 0)
         {
-            Voxel &voxel = voxels_.at(index);
+            Voxel &voxel = voxels_.at(index - 1);
 
             query_.layer() = voxel.elementId_ - 1;
             query_.descriptor() = voxel.intensity_;
@@ -524,6 +513,8 @@ bool SegmentationThread::computeCreateLayers()
             layers.push_back(layer);
         }
     }
+
+    layersCreated_ = true;
 
     // Update
     editor_->setVoxels(voxels_);
