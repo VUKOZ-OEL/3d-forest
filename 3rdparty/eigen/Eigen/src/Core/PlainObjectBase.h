@@ -9,7 +9,7 @@
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 // Modifications Copyright 2020-present VUKOZ
-// Add reserve(), rowsCapacity(), colsCapacity()
+// Add reserve(), rowsCapacity(), colsCapacity(), clear()
 
 #ifndef EIGEN_DENSESTORAGEBASE_H
 #define EIGEN_DENSESTORAGEBASE_H
@@ -258,6 +258,13 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
     /** \returns a pointer to the data array of this matrix */
     EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar *data()
     { return m_storage.data(); }
+
+    /** Erases all elements from the matrix. After this call, size() returns zero. */
+    EIGEN_DEVICE_FUNC
+    EIGEN_STRONG_INLINE void clear()
+    {
+      m_storage.clear();
+    }
 
     /** Resizes \c *this to a \a rows x \a cols matrix.
       *

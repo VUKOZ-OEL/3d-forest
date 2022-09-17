@@ -10,7 +10,7 @@
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 // Modifications Copyright 2020-present VUKOZ
-// Add reserve(), rowsCapacity(), colsCapacity()
+// Add reserve(), rowsCapacity(), colsCapacity(), clear()
 
 #ifndef EIGEN_MATRIXSTORAGE_H
 #define EIGEN_MATRIXSTORAGE_H
@@ -494,6 +494,15 @@ template<typename T, int _Options> class DenseStorage<T, Dynamic, Dynamic, Dynam
     void conservativeResize(Index size, Index rows, Index cols)
     {
       resize(size, rows, cols);
+    }
+    EIGEN_DEVICE_FUNC void clear()
+    {
+      internal::conditional_aligned_delete_auto<T,(_Options&DontAlign)==0>(m_data, m_rows_reserved*m_cols_reserved);
+      m_data = nullptr;
+      m_rows = 0;
+      m_cols = 0;
+      m_rows_reserved = 0;
+      m_cols_reserved = 0;
     }
     EIGEN_DEVICE_FUNC void resize(Index size, Index rows, Index cols)
     {
