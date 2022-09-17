@@ -101,7 +101,7 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
                          1,
                          0,
                          100,
-                         70);
+                         30);
 
     settingsLayout->addWidget(thresholdInput_);
 

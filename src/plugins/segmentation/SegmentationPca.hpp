@@ -36,13 +36,19 @@ public:
 
     void clear();
 
-    void compute(Query *query,
+    bool compute(Query *query,
                  Voxels *voxels,
                  Voxel *voxel,
                  const Box<double> &cell);
 
+    bool compute(Eigen::MatrixXd &V,
+                 double &meanX,
+                 double &meanY,
+                 double &meanZ,
+                 float &descriptor);
+
 protected:
-    Eigen::MatrixXd V;
+    Eigen::MatrixXd xyz;
     Eigen::Matrix3d product;
     Eigen::Matrix3d eigenVectors;
     Eigen::Matrix3d eigenVectorsT;
