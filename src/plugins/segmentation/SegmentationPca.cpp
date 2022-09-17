@@ -33,10 +33,11 @@ SegmentationPca::SegmentationPca()
 
 void SegmentationPca::clear()
 {
-    // V;
-    // product;
-    // eigenVectors;
-    // eigenVectorsT;
+    xyz.clear();
+
+    // product
+    // eigenVectors
+    // eigenVectorsT
     // in;
     // out;
     // min;
@@ -44,7 +45,7 @@ void SegmentationPca::clear()
     // E;
 }
 
-void SegmentationPca::compute(Query *query,
+bool SegmentationPca::compute(Query *query,
                               Voxels *voxels,
                               Voxel *voxel,
                               const Box<double> &cell)
@@ -52,7 +53,7 @@ void SegmentationPca::compute(Query *query,
     // The number of points inside this grid cell.
     Eigen::MatrixXd::Index nPoints = 0;
 
-    // Select points in 'cell' into point coordinates and centroid.
+    // Select points in 'cell' into point coordinates 'xyz'.
     query->selectBox(cell);
     query->selectClassifications({LasFile::CLASS_UNASSIGNED});
     query->exec();
@@ -67,39 +68,20 @@ void SegmentationPca::compute(Query *query,
     // Enough points for PCA?
     if (nPoints < 3)
     {
-        return;
+        return false;
     }
 
     size_t voxelId = voxels->size() + 1;
 
-    // Get point coordinates in voxel given by 'cell' and compute their
-    // centroid.
-    double x = 0;
-    double y = 0;
-    double z = 0;
-
-    // Initialize centroid.
-    double meanX = 0;
-    double meanY = 0;
-    double meanZ = 0;
-
-    V.resize(3, nPoints);
+    xyz.resize(3, nPoints);
     nPoints = 0;
 
     query->reset();
     while (query->next())
     {
-        x = query->x();
-        meanX += x;
-        V(0, nPoints) = x;
-
-        y = query->y();
-        meanY += y;
-        V(1, nPoints) = y;
-
-        z = query->z();
-        meanZ += z;
-        V(2, nPoints) = z;
+        xyz(0, nPoints) = query->x();
+        xyz(1, nPoints) = query->y();
+        xyz(2, nPoints) = query->z();
 
         query->value() = voxelId;
         query->setModified();
@@ -107,15 +89,58 @@ void SegmentationPca::compute(Query *query,
         nPoints++;
     }
 
-    // Fill voxel.
+    // Compute PCA.
+    bool result;
+    result = compute(xyz,
+                     voxel->meanX_,
+                     voxel->meanY_,
+                     voxel->meanZ_,
+                     voxel->intensity_);
+
+    voxel->density_ = static_cast<float>(nPoints);
+
+    voxels->append(*voxel);
+
+    return result;
+}
+
+bool SegmentationPca::compute(Eigen::MatrixXd &V,
+                              double &meanX,
+                              double &meanY,
+                              double &meanZ,
+                              float &descriptor)
+{
+    // The number of points.
+    Eigen::MatrixXd::Index nPoints = V.cols();
+    LOG_DEBUG_LOCAL("V cols <" << V.cols() << "> rows <" << V.rows() << ">");
+    LOG_DEBUG_LOCAL("nPoints <" << nPoints << ">");
+
+    // Compute centroid.
+    meanX = 0;
+    meanY = 0;
+    meanZ = 0;
+    descriptor = 0;
+
+    for (Eigen::MatrixXd::Index i = 0; i < nPoints; i++)
+    {
+        meanX += V(0, i);
+        meanY += V(1, i);
+        meanZ += V(2, i);
+    }
+
+    if (nPoints < 3)
+    {
+        return false;
+    }
+
     const double d = static_cast<double>(nPoints);
     meanX = meanX / d;
     meanY = meanY / d;
     meanZ = meanZ / d;
-    LOG_DEBUG_LOCAL("mean <" << meanX << "," << meanY << "," << meanZ << ">");
+    LOG_DEBUG_LOCAL("mean x <" << meanX << "> y <" << meanY << "> z <" << meanZ
+                               << ">");
 
     // Shift point coordinates by centroid.
-    LOG_DEBUG_LOCAL("V cols <" << V.cols() << "> rows <" << V.rows() << ">");
     for (Eigen::MatrixXd::Index i = 0; i < nPoints; i++)
     {
         V(0, i) -= meanX;
@@ -124,7 +149,7 @@ void SegmentationPca::compute(Query *query,
     }
 
     // Compute product.
-    const double inv = 1. / static_cast<double>(nPoints - 1);
+    const double inv = 1.0 / static_cast<double>(nPoints - 1);
     product = inv * V.topRows<3>() * V.topRows<3>().transpose();
     LOG_DEBUG_LOCAL("product\n" << product);
 
@@ -137,7 +162,7 @@ void SegmentationPca::compute(Query *query,
     eigenVectors.col(2) = eigenVectors.col(0).cross(eigenVectors.col(1));
     LOG_DEBUG_LOCAL("eigen vectors\n" << eigenVectors);
 
-    // Project point coordinates by eigen vectors.
+    // Project point coordinates by Eigen vectors.
     constexpr double bigNumber = std::numeric_limits<double>::max();
     min[0] = bigNumber;
     min[1] = bigNumber;
@@ -158,8 +183,8 @@ void SegmentationPca::compute(Query *query,
         max = max.cwiseMax(out);
     }
 
-    LOG_DEBUG_LOCAL("min\n" << min);
-    LOG_DEBUG_LOCAL("max\n" << max);
+    LOG_DEBUG_LOCAL("projected minimum\n" << min);
+    LOG_DEBUG_LOCAL("projected maximum\n" << max);
 
     // Compute intensity.
     double eL = std::abs(max[0] - min[0]);
@@ -186,18 +211,14 @@ void SegmentationPca::compute(Query *query,
 
     // Compute intensity index.
     const double sum = eL + eI + eS;
+    LOG_DEBUG_LOCAL("sum <" << sum << ">");
     if (sum > std::numeric_limits<double>::epsilon())
     {
-        const double SFFIx = 100. - (eL * 100. / sum);
-        LOG_DEBUG_LOCAL("SFFIx <" << SFFIx << ">");
-
-        voxel->intensity_ = static_cast<float>(SFFIx);
-        voxel->density_ = static_cast<float>(nPoints);
+        // const double SFFIx = 100. - (eL * 100. / sum);
+        descriptor = static_cast<float>(eL / sum);
     }
 
-    voxel->meanX_ = meanX;
-    voxel->meanY_ = meanY;
-    voxel->meanZ_ = meanZ;
+    LOG_DEBUG_LOCAL("descriptor <" << descriptor << ">");
 
-    voxels->append(*voxel);
+    return true;
 }
