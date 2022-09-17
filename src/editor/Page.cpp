@@ -945,7 +945,7 @@ void Page::runColorModifier()
         for (size_t i = 0; i < n; i++)
         {
             setColor(i,
-                     static_cast<size_t>(descriptor[i] * 255.0F),
+                     static_cast<size_t>(density[i] * 255.0F),
                      255,
                      ColorPalette::BlueCyanYellowRed256);
         }
