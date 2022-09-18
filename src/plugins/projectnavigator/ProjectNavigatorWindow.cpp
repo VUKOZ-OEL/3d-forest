@@ -27,16 +27,9 @@
 #include <ProjectNavigatorLayers.hpp>
 #include <ProjectNavigatorWindow.hpp>
 #include <ThemeIcon.hpp>
-
-#include <QTabWidget>
+#include <ToolTabWidget.hpp>
 
 #define ICON(name) (ThemeIcon(":/projectnavigator/", name))
-
-static const char *PROJECT_NAVIGATOR_WINDOW_TAB_TEXT[] = {"File",
-                                                          "Layer",
-                                                          "Class",
-                                                          "Elevation",
-                                                          "Clip"};
 
 ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
     : QDockWidget(mainWindow),
@@ -50,49 +43,16 @@ ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
     clipping_ = new ProjectNavigatorClipping(mainWindow_);
 
     // Tabs
-    tabWidget_ = new QTabWidget;
-    tabWidget_->addTab(datasets_,
-                       ICON("file"),
-                       PROJECT_NAVIGATOR_WINDOW_TAB_TEXT[0]);
-    tabWidget_->addTab(layers_,
-                       ICON("layers"),
-                       PROJECT_NAVIGATOR_WINDOW_TAB_TEXT[1]);
-    tabWidget_->addTab(classifications_,
-                       ICON("classification"),
-                       PROJECT_NAVIGATOR_WINDOW_TAB_TEXT[2]);
-    tabWidget_->addTab(elevation_,
-                       ICON("elevation_filter"),
-                       PROJECT_NAVIGATOR_WINDOW_TAB_TEXT[3]);
-    tabWidget_->addTab(clipping_,
-                       ICON("clip_filter"),
-                       PROJECT_NAVIGATOR_WINDOW_TAB_TEXT[4]);
-
-    tabWidget_->setIconSize(
-        QSize(MainWindow::ICON_SIZE_TEXT, MainWindow::ICON_SIZE_TEXT));
-
-    tabWidget_->setStyleSheet(
-        QString("QTabBar::tab:!selected { width: 40px; }"));
-
-    connect(tabWidget_,
-            SIGNAL(currentChanged(int)),
-            this,
-            SLOT(slotCurrentChanged(int)));
-
-    slotCurrentChanged(0);
+    tabWidget_ = new ToolTabWidget;
+    tabWidget_->addTab(datasets_, ICON("file"), tr("File"));
+    tabWidget_->addTab(layers_, ICON("layers"), tr("Layer"));
+    tabWidget_->addTab(classifications_, ICON("classification"), tr("Class"));
+    tabWidget_->addTab(elevation_, ICON("elevation_filter"), tr("Elevation"));
+    tabWidget_->addTab(clipping_, ICON("clip_filter"), tr("Clip"));
 
     // Dock
     setWidget(tabWidget_);
     setWindowTitle(tr("Project Navigator"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     mainWindow_->addDockWidget(Qt::RightDockWidgetArea, this);
-}
-
-void ProjectNavigatorWindow::slotCurrentChanged(int index)
-{
-    for (int i = 0; i < tabWidget_->count(); i++)
-    {
-        tabWidget_->setTabText(i, "");
-    }
-
-    tabWidget_->setTabText(index, PROJECT_NAVIGATOR_WINDOW_TAB_TEXT[index]);
 }

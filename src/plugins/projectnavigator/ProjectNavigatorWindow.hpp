@@ -30,8 +30,7 @@ class ProjectNavigatorLayers;
 class ProjectNavigatorClassifications;
 class ProjectNavigatorClipping;
 class ProjectNavigatorElevation;
-
-class QTabWidget;
+class ToolTabWidget;
 
 /** Project Navigator Window. */
 class ProjectNavigatorWindow : public QDockWidget
@@ -41,12 +40,9 @@ class ProjectNavigatorWindow : public QDockWidget
 public:
     ProjectNavigatorWindow(MainWindow *mainWindow);
 
-protected slots:
-    void slotCurrentChanged(int index);
-
 protected:
     MainWindow *mainWindow_;
-    QTabWidget *tabWidget_;
+    ToolTabWidget *tabWidget_;
     ProjectNavigatorFiles *datasets_;
     ProjectNavigatorLayers *layers_;
     ProjectNavigatorClassifications *classifications_;
