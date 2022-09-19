@@ -255,7 +255,6 @@ void SegmentationThread::computeInitializeLayers()
     {
         query_.layer() = 0;
         query_.descriptor() = 0;
-        query_.density() = 0;
         query_.value() = 0;
 
         query_.setModified();
@@ -485,7 +484,6 @@ bool SegmentationThread::computeCreateLayers()
 
             query_.layer() = voxel.elementId_ - 1;
             query_.descriptor() = voxel.intensity_;
-            query_.density() = voxel.density_;
 
             query_.setModified();
         }
