@@ -52,6 +52,9 @@ void ToolTabWidget::addTab(QWidget *widget,
                                  this,
                                  SLOT(slotToolButton()));
 
+    toolButton->setAutoRaise(false);
+    toolButton->setCheckable(true);
+
     toolButtonList_.push_back(toolButton);
 
     tabList_.push_back(widget);
@@ -59,6 +62,7 @@ void ToolTabWidget::addTab(QWidget *widget,
     if (!toolBar_)
     {
         toolButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        toolButton->setChecked(true);
 
         widget->setVisible(true);
 
@@ -77,6 +81,7 @@ void ToolTabWidget::addTab(QWidget *widget,
     else
     {
         toolButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        toolButton->setChecked(false);
         widget->setVisible(false);
         mainLayout_->addWidget(widget);
     }
@@ -93,18 +98,25 @@ void ToolTabWidget::slotToolButton()
 
     for (size_t i = 0; i < toolButtonList_.size(); i++)
     {
+        if (toolButtonList_[i] != obj)
+        {
+            LOG_DEBUG_LOCAL("hide <" << i << ">");
+            toolButtonList_[i]->setToolButtonStyle(Qt::ToolButtonIconOnly);
+            toolButtonList_[i]->setChecked(false);
+            tabList_[i]->setVisible(false);
+        }
+    }
+
+    for (size_t i = 0; i < toolButtonList_.size(); i++)
+    {
         if (toolButtonList_[i] == obj)
         {
             LOG_DEBUG_LOCAL("show <" << i << ">");
             toolButtonList_[i]->setToolButtonStyle(
                 Qt::ToolButtonTextBesideIcon);
+            toolButtonList_[i]->setChecked(true);
             tabList_[i]->setVisible(true);
-        }
-        else
-        {
-            LOG_DEBUG_LOCAL("hide <" << i << ">");
-            toolButtonList_[i]->setToolButtonStyle(Qt::ToolButtonIconOnly);
-            tabList_[i]->setVisible(false);
+            break;
         }
     }
 }
