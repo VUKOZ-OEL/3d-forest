@@ -93,18 +93,23 @@ void ToolTabWidget::slotToolButton()
 
     for (size_t i = 0; i < toolButtonList_.size(); i++)
     {
+        if (toolButtonList_[i] != obj)
+        {
+            LOG_DEBUG_LOCAL("hide <" << i << ">");
+            toolButtonList_[i]->setToolButtonStyle(Qt::ToolButtonIconOnly);
+            tabList_[i]->setVisible(false);
+        }
+    }
+
+    for (size_t i = 0; i < toolButtonList_.size(); i++)
+    {
         if (toolButtonList_[i] == obj)
         {
             LOG_DEBUG_LOCAL("show <" << i << ">");
             toolButtonList_[i]->setToolButtonStyle(
                 Qt::ToolButtonTextBesideIcon);
             tabList_[i]->setVisible(true);
-        }
-        else
-        {
-            LOG_DEBUG_LOCAL("hide <" << i << ">");
-            toolButtonList_[i]->setToolButtonStyle(Qt::ToolButtonIconOnly);
-            tabList_[i]->setVisible(false);
+            break;
         }
     }
 }
