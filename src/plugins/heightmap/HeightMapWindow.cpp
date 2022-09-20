@@ -75,9 +75,9 @@ HeightMapWindow::HeightMapWindow(MainWindow *mainWindow,
     colormapComboBox_->setCurrentText(PLUGIN_HEIGHT_MAP_COLORMAP_DEFAULT);
 
     connect(colormapComboBox_,
-            &QComboBox::activated,
+            SIGNAL(activated(int)),
             this,
-            &HeightMapWindow::colormapChanged);
+            SLOT(colorCountChanged(int)));
 
     sourceComboBox_ = new QComboBox;
     sourceComboBox_->addItem(PLUGIN_HEIGHT_MAP_SOURCE_Z_POSITION);
@@ -85,27 +85,22 @@ HeightMapWindow::HeightMapWindow(MainWindow *mainWindow,
     sourceComboBox_->setCurrentText(PLUGIN_HEIGHT_MAP_SOURCE_DEFAULT);
 
     connect(sourceComboBox_,
-            &QComboBox::activated,
+            SIGNAL(activated(int)),
             this,
-            &HeightMapWindow::sourceChanged);
+            SLOT(sourceChanged(int)));
 
     // Widgets apply
-    // connect() with '&' has less features than classic SIGNAL()/SLOT()
-    // in the current Qt version but it is easier to write.
     previewCheckBox_ = new QCheckBox;
     connect(previewCheckBox_,
-            &QCheckBox::stateChanged,
+            SIGNAL(stateChanged(int)),
             this,
-            &HeightMapWindow::previewChanged);
+            SLOT(previewChanged(int)));
 
     applyButton_ = new QPushButton(tr("Apply and save"));
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     applyButton_->setDisabled(true);
-    connect(applyButton_,
-            &QAbstractButton::clicked,
-            this,
-            &HeightMapWindow::apply);
+    connect(applyButton_, SIGNAL(clicked()), this, SLOT(apply()));
 
     // Layout
     QGridLayout *groupBoxLayout = new QGridLayout;

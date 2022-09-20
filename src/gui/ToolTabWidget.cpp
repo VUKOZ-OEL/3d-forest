@@ -32,7 +32,10 @@
 #define LOG_DEBUG_LOCAL(msg)
 //#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
-ToolTabWidget::ToolTabWidget() : QWidget()
+ToolTabWidget::ToolTabWidget()
+    : QWidget(),
+      toolBar_(nullptr),
+      mainLayout_(nullptr)
 {
     LOG_DEBUG_LOCAL("");
 }
