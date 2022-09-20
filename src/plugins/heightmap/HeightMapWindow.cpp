@@ -100,10 +100,7 @@ HeightMapWindow::HeightMapWindow(MainWindow *mainWindow,
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     applyButton_->setDisabled(true);
-    connect(applyButton_,
-            SIGNAL(clicked()),
-            this,
-            SLOT(apply()));
+    connect(applyButton_, SIGNAL(clicked()), this, SLOT(apply()));
 
     // Layout
     QGridLayout *groupBoxLayout = new QGridLayout;
