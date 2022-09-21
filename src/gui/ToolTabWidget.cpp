@@ -22,6 +22,10 @@
 #include <MainWindow.hpp>
 #include <ToolTabWidget.hpp>
 
+#include <flowlayout.h>
+
+#include <QApplication>
+#include <QFrame>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QToolBar>
@@ -34,7 +38,9 @@
 
 ToolTabWidget::ToolTabWidget()
     : QWidget(),
-      toolBar_(nullptr),
+      toolBox_(nullptr),
+      icon_(nullptr),
+      label_(nullptr),
       mainLayout_(nullptr)
 {
     LOG_DEBUG_LOCAL("");
@@ -46,6 +52,7 @@ void ToolTabWidget::addTab(QWidget *widget,
 {
     LOG_DEBUG_LOCAL(label.toStdString());
 
+    // Create tool button
     QToolButton *toolButton;
 
     MainWindow::createToolButton(&toolButton,
@@ -58,39 +65,58 @@ void ToolTabWidget::addTab(QWidget *widget,
     toolButton->setAutoRaise(false);
     toolButton->setCheckable(true);
 
+    // Register new tab
     toolButtonList_.push_back(toolButton);
-
     tabList_.push_back(widget);
 
-    if (!toolBar_)
+    // Insert new tab
+    if (!toolBox_)
     {
-        toolButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-        toolButton->setChecked(true);
+        // Create widgets
+        toolBox_ = new FlowLayout;
+        toolBox_->addWidget(toolButton);
+        toolBox_->setContentsMargins(1, 1, 1, 1);
 
+        QFrame *toolBoxFrame = new QFrame;
+        toolBoxFrame->setFrameStyle(QFrame::Box | QFrame::Plain);
+        toolBoxFrame->setLineWidth(1);
+        toolBoxFrame->setContentsMargins(1, 1, 1, 1);
+        toolBoxFrame->setLayout(toolBox_);
+
+        // Title
+        icon_ = new QLabel;
+        icon_->setPixmap(icon.pixmap(icon.actualSize(QSize(16, 16))));
+
+        label_ = new QLabel;
+        label_->setText(label);
+
+        QHBoxLayout *titleBar = new QHBoxLayout;
+        titleBar->addWidget(icon_);
+        titleBar->addWidget(label_);
+        titleBar->addStretch();
+
+        // The first tab is on
+        toolButton->setChecked(true);
         widget->setVisible(true);
 
-        toolBar_ = new QToolBar;
-        toolBar_->setIconSize(
-            QSize(MainWindow::ICON_SIZE_TEXT, MainWindow::ICON_SIZE_TEXT));
-        toolBar_->setStyleSheet("QToolBar {border-bottom: 1px solid gray;}");
-
-        // Layout
+        // Create layout
         mainLayout_ = new QVBoxLayout;
         mainLayout_->setContentsMargins(1, 1, 1, 1);
-        mainLayout_->addWidget(toolBar_);
+        mainLayout_->addWidget(toolBoxFrame);
+        mainLayout_->addLayout(titleBar);
         mainLayout_->addWidget(widget);
         setLayout(mainLayout_);
     }
     else
     {
-        toolButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        // The other tabs are off
         toolButton->setChecked(false);
         widget->setVisible(false);
+
+        // Extend layout
+        toolBox_->addWidget(toolButton);
         mainLayout_->addWidget(widget);
     }
-
-    toolBar_->addWidget(toolButton);
-    toolBar_->addSeparator();
 }
 
 void ToolTabWidget::slotToolButton()
@@ -104,7 +130,6 @@ void ToolTabWidget::slotToolButton()
         if (toolButtonList_[i] != obj)
         {
             LOG_DEBUG_LOCAL("hide <" << i << ">");
-            toolButtonList_[i]->setToolButtonStyle(Qt::ToolButtonIconOnly);
             toolButtonList_[i]->setChecked(false);
             tabList_[i]->setVisible(false);
         }
@@ -115,8 +140,9 @@ void ToolTabWidget::slotToolButton()
         if (toolButtonList_[i] == obj)
         {
             LOG_DEBUG_LOCAL("show <" << i << ">");
-            toolButtonList_[i]->setToolButtonStyle(
-                Qt::ToolButtonTextBesideIcon);
+            const QIcon icon = toolButtonList_[i]->icon();
+            icon_->setPixmap(icon.pixmap(icon.actualSize(QSize(16, 16))));
+            label_->setText(toolButtonList_[i]->text());
             toolButtonList_[i]->setChecked(true);
             tabList_[i]->setVisible(true);
             break;

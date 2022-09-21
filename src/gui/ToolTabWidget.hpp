@@ -28,8 +28,11 @@
 
 #include <QWidget>
 
+class FlowLayout;
+
 class QToolButton;
 class QVBoxLayout;
+class QLabel;
 
 /** Tool Tab Widget. */
 class EXPORT_GUI ToolTabWidget : public QWidget
@@ -45,7 +48,9 @@ public slots:
     void slotToolButton();
 
 private:
-    QToolBar *toolBar_;
+    FlowLayout *toolBox_;
+    QLabel *icon_;
+    QLabel *label_;
     QVBoxLayout *mainLayout_;
     std::vector<QWidget *> tabList_;
     std::vector<QToolButton *> toolButtonList_;
