@@ -44,6 +44,7 @@ add_library(
     ${SOURCES_VIEWER}
     ${SOURCES_HELP}
     ../../3rdparty/widgets/ctkrangeslider/ctkrangeslider.cpp
+    ../../3rdparty/widgets/flowlayout/flowlayout.cpp
     resources/resources.qrc
     ../plugins/import/resources/resources.qrc
     ../plugins/projectnavigator/resources/resources.qrc
@@ -58,6 +59,7 @@ target_include_directories(
     PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}
     ../../3rdparty/widgets/ctkrangeslider
+    ../../3rdparty/widgets/flowlayout
     ../plugins/import
     ../plugins/projectnavigator
     ../plugins/projectfile

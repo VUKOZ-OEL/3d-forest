@@ -44,11 +44,15 @@ ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
 
     // Tabs
     tabWidget_ = new ToolTabWidget;
-    tabWidget_->addTab(datasets_, ICON("file"), tr("File"));
-    tabWidget_->addTab(layers_, ICON("layers"), tr("Layer"));
-    tabWidget_->addTab(classifications_, ICON("classification"), tr("Class"));
-    tabWidget_->addTab(elevation_, ICON("elevation_filter"), tr("Elevation"));
-    tabWidget_->addTab(clipping_, ICON("clip_filter"), tr("Clip"));
+    tabWidget_->addTab(datasets_, ICON("file"), tr("Files"));
+    tabWidget_->addTab(layers_, ICON("layers"), tr("Layers"));
+    tabWidget_->addTab(classifications_,
+                       ICON("classification"),
+                       tr("Classifications"));
+    tabWidget_->addTab(elevation_,
+                       ICON("elevation_filter"),
+                       tr("Elevation filter"));
+    tabWidget_->addTab(clipping_, ICON("clip_filter"), tr("Clip filter"));
 
     // Dock
     setWidget(tabWidget_);
