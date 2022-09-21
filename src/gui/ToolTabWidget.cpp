@@ -73,7 +73,7 @@ void ToolTabWidget::addTab(QWidget *widget,
     if (!toolBox_)
     {
         // Create widgets
-        toolBox_ = new FlowLayout;
+        toolBox_ = new FlowLayout(1, 1, 1);
         toolBox_->addWidget(toolButton);
         toolBox_->setContentsMargins(1, 1, 1, 1);
 
@@ -86,14 +86,17 @@ void ToolTabWidget::addTab(QWidget *widget,
         // Title
         icon_ = new QLabel;
         icon_->setPixmap(icon.pixmap(icon.actualSize(QSize(16, 16))));
+        icon_->setContentsMargins(1, 1, 1, 1);
 
         label_ = new QLabel;
         label_->setText(label);
+        label_->setContentsMargins(1, 1, 1, 1);
 
         QHBoxLayout *titleBar = new QHBoxLayout;
         titleBar->addWidget(icon_);
         titleBar->addWidget(label_);
         titleBar->addStretch();
+        titleBar->setContentsMargins(1, 1, 1, 1);
 
         // The first tab is on
         toolButton->setChecked(true);

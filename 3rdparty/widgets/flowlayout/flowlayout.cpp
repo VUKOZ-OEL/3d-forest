@@ -48,6 +48,9 @@
 **
 ****************************************************************************/
 
+// Modifications Copyright 2020-present VUKOZ
+// count(): silence compiler warning with static_cast: long long int to int
+
 #include <QtWidgets>
 
 #include "flowlayout.h"
@@ -104,7 +107,7 @@ int FlowLayout::verticalSpacing() const
 //! [5]
 int FlowLayout::count() const
 {
-    return itemList.size();
+    return static_cast<int>(itemList.size());
 }
 
 QLayoutItem *FlowLayout::itemAt(int index) const
