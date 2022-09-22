@@ -75,13 +75,19 @@ void ToolTabWidget::addTab(QWidget *widget,
         // Create widgets
         toolBox_ = new FlowLayout(1, 1, 1);
         toolBox_->addWidget(toolButton);
-        toolBox_->setContentsMargins(1, 1, 1, 1);
+        toolBox_->setContentsMargins(2, 2, 2, 2);
 
         QFrame *toolBoxFrame = new QFrame;
         toolBoxFrame->setFrameStyle(QFrame::Box | QFrame::Plain);
-        toolBoxFrame->setLineWidth(1);
+        toolBoxFrame->setLineWidth(0);
         toolBoxFrame->setContentsMargins(1, 1, 1, 1);
         toolBoxFrame->setLayout(toolBox_);
+
+        QColor toolBoxBackground = qApp->palette().color(QPalette::Midlight);
+        QPalette toolBoxPalette = palette();
+        toolBoxPalette.setColor(QPalette::Window, toolBoxBackground);
+        toolBoxFrame->setPalette(toolBoxPalette);
+        toolBoxFrame->setAutoFillBackground(true);
 
         // Title
         icon_ = new QLabel;
@@ -98,6 +104,12 @@ void ToolTabWidget::addTab(QWidget *widget,
         titleBar->addStretch();
         titleBar->setContentsMargins(1, 1, 1, 1);
 
+        QFrame *titleFrame = new QFrame;
+        titleFrame->setFrameStyle(QFrame::Box | QFrame::Plain);
+        titleFrame->setLineWidth(0);
+        titleFrame->setContentsMargins(1, 1, 1, 1);
+        titleFrame->setLayout(titleBar);
+
         // The first tab is on
         toolButton->setChecked(true);
         widget->setVisible(true);
@@ -105,8 +117,9 @@ void ToolTabWidget::addTab(QWidget *widget,
         // Create layout
         mainLayout_ = new QVBoxLayout;
         mainLayout_->setContentsMargins(1, 1, 1, 1);
+        mainLayout_->setSpacing(0);
         mainLayout_->addWidget(toolBoxFrame);
-        mainLayout_->addLayout(titleBar);
+        mainLayout_->addWidget(titleFrame);
         mainLayout_->addWidget(widget);
         setLayout(mainLayout_);
     }
