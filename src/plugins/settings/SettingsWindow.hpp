@@ -26,8 +26,7 @@
 
 class MainWindow;
 class SettingsColorWidget;
-
-class QTabWidget;
+class ToolTabWidget;
 
 /** Settings Window. */
 class SettingsWindow : public QDockWidget
@@ -39,7 +38,7 @@ public:
 
 protected:
     MainWindow *mainWindow_;
-    QTabWidget *tabWidget_;
+    ToolTabWidget *tabWidget_;
     SettingsColorWidget *settingsColorWidget_;
 };
 
