@@ -23,6 +23,9 @@
 #define LOG_HPP
 
 #include <iostream>
+#include <iterator>
+#include <set>
+#include <unordered_set>
 
 #define LOG_ENABLE 1
 
@@ -42,5 +45,23 @@
 
 #define LOG_UPDATE_VIEW(module, msg)
 //#define LOG_UPDATE_VIEW(module, msg) LOG_MODULE(module, msg)
+
+template <typename T>
+inline std::ostream &operator<<(std::ostream &os, std::unordered_set<T> vec)
+{
+    os << "{ ";
+    std::copy(vec.begin(), vec.end(), std::ostream_iterator<T>(os, " "));
+    os << "}";
+    return os;
+}
+
+template <typename T>
+inline std::ostream &operator<<(std::ostream &os, std::set<T> vec)
+{
+    os << "{ ";
+    std::copy(vec.begin(), vec.end(), std::ostream_iterator<T>(os, " "));
+    os << "}";
+    return os;
+}
 
 #endif /* LOG_HPP */
