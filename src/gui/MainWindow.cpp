@@ -44,8 +44,8 @@
 #include <QToolButton>
 
 #define MODULE_NAME "MainWindow"
-#define LOG_LOCAL(msg)
-//#define LOG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+#define LOG_DEBUG_LOCAL(msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 #if !defined(EXPORT_GUI_IMPORT)
 const char *MainWindow::APPLICATION_NAME = "3D Forest";
@@ -58,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       threadRender_(&editor_)
 {
-    LOG_LOCAL("");
+    LOG_DEBUG_LOCAL("");
 
     // Status bar
     statusProgressBar_ = new QProgressBar;
@@ -137,7 +137,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    LOG_LOCAL("");
+    LOG_DEBUG_LOCAL("");
     threadRender_.stop();
 }
 
@@ -327,26 +327,26 @@ void MainWindow::loadPlugin(QObject *plugin)
 
 void MainWindow::suspendThreads()
 {
-    LOG_LOCAL("");
+    LOG_DEBUG_LOCAL("");
     threadRender_.cancel();
 }
 
 void MainWindow::resumeThreads()
 {
-    LOG_LOCAL("");
+    LOG_DEBUG_LOCAL("");
     slotRenderViewport();
 }
 
 void MainWindow::threadProgress(bool finished)
 {
     (void)finished;
-    LOG_LOCAL("finished=" << finished);
+    LOG_DEBUG_LOCAL("finished=" << finished);
     emit signalRender();
 }
 
 void MainWindow::slotRender()
 {
-    LOG_LOCAL("");
+    LOG_DEBUG_LOCAL("");
     editor_.lock();
     viewerPlugin_->viewports()->updateScene(&editor_);
     editor_.unlock();
@@ -354,20 +354,46 @@ void MainWindow::slotRender()
 
 void MainWindow::slotRenderViewport()
 {
-    LOG_LOCAL("");
+    LOG_DEBUG_LOCAL("");
     slotRenderViewport(viewerPlugin_->viewports()->selectedViewportId());
 }
 
 void MainWindow::slotRenderViewport(size_t viewportId)
 {
-    LOG_LOCAL("");
+    LOG_DEBUG_LOCAL("");
     ViewerViewports *viewports = viewerPlugin_->viewports();
     threadRender_.render(viewportId, viewports->camera(viewportId));
 }
 
+void MainWindow::update(const QString &target)
+{
+    LOG_DEBUG_LOCAL("");
+    LOG_UPDATE_VIEW(MODULE_NAME, "");
+
+    emit signalUpdate(target);
+}
+
+void MainWindow::update(const std::set<std::string> &target)
+{
+    LOG_DEBUG_LOCAL("target <" << target << ">");
+
+    suspendThreads();
+    LOG_UPDATE_VIEW(MODULE_NAME, "");
+
+    editor_.viewports().setState(Page::STATE_READ);
+    // editor_.viewports().clearContent();
+
+    emit signalUpdate("Test");
+
+    // ViewerViewports *viewports = viewerPlugin_->viewports();
+    // viewports->resetScene(&editor_, false);
+
+    resumeThreads();
+}
+
 void MainWindow::updateEverything()
 {
-    LOG_LOCAL("");
+    LOG_DEBUG_LOCAL("");
 
     suspendThreads();
     LOG_UPDATE_VIEW(MODULE_NAME, "");
@@ -378,7 +404,7 @@ void MainWindow::updateEverything()
     viewports->resetScene(&editor_, true);
     editor_.unlock();
 
-    emit signalUpdate();
+    emit signalUpdate("");
 
     size_t viewportId = viewports->selectedViewportId();
     threadRender_.render(viewportId, viewports->camera(viewportId));

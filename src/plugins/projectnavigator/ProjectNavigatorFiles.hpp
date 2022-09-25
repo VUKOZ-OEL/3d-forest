@@ -51,6 +51,8 @@ public:
     ProjectNavigatorFiles(MainWindow *mainWindow);
 
 public slots:
+    void slotUpdate(QString target);
+
     void slotAdd();
     void slotDelete();
     void slotShow();
@@ -61,8 +63,6 @@ public slots:
 
     void slotItemSelectionChanged();
     void slotItemChanged(QTreeWidgetItem *item, int column);
-
-    void slotUpdate();
 
 protected:
     MainWindow *mainWindow_;

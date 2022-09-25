@@ -43,7 +43,7 @@ public:
     // Occupancy
     size_t size() const { return voxels_.size(); }
 
-    void append(const Voxel &voxel);
+    void addVoxel(const Voxel &voxel);
 
     const Voxel &at(size_t index) const { return voxels_[index]; }
 

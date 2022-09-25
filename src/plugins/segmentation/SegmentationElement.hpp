@@ -31,6 +31,8 @@
 class EXPORT_EDITOR SegmentationElement
 {
 public:
+    static const uint32_t npos;
+
     SegmentationElement();
 
     void clear();

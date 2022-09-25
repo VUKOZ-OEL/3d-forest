@@ -100,10 +100,13 @@ SettingsColorWidget::SettingsColorWidget(MainWindow *mainWindow)
     setLayout(mainLayout);
 
     // Data
-    connect(mainWindow_, SIGNAL(signalUpdate()), this, SLOT(slotUpdate()));
+    connect(mainWindow_,
+            SIGNAL(signalUpdate(QString)),
+            this,
+            SLOT(slotUpdate(QString)));
 }
 
-void SettingsColorWidget::slotUpdate()
+void SettingsColorWidget::slotUpdate(QString target)
 {
     setSettings(mainWindow_->editor().settings().view());
 }

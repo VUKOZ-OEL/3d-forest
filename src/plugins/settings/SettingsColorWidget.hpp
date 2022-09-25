@@ -56,7 +56,8 @@ public:
     SettingsColorWidget(MainWindow *mainWindow);
 
 public slots:
-    void slotUpdate();
+    void slotUpdate(QString target);
+
     void slotSetPointSize(int v);
     void slotSetFogEnabled(int v);
     void slotSetColorFg();

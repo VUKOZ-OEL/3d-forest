@@ -23,8 +23,7 @@
 #include <SettingsColorWidget.hpp>
 #include <SettingsWindow.hpp>
 #include <ThemeIcon.hpp>
-
-#include <QTabWidget>
+#include <ToolTabWidget.hpp>
 
 #define ICON(name) (ThemeIcon(":/settings/", name))
 
@@ -36,11 +35,8 @@ SettingsWindow::SettingsWindow(MainWindow *mainWindow)
     settingsColorWidget_ = new SettingsColorWidget(mainWindow_);
 
     // Tab
-    tabWidget_ = new QTabWidget;
+    tabWidget_ = new ToolTabWidget;
     tabWidget_->addTab(settingsColorWidget_, ICON("brush"), tr("Brush"));
-
-    tabWidget_->setIconSize(
-        QSize(MainWindow::ICON_SIZE_TEXT, MainWindow::ICON_SIZE_TEXT));
 
     // Dock
     setWidget(tabWidget_);

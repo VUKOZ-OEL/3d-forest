@@ -50,6 +50,8 @@ public:
     ProjectNavigatorClassifications(MainWindow *mainWindow);
 
 public slots:
+    void slotUpdate(QString target);
+
     void slotShow();
     void slotHide();
     void slotSelectAll();
@@ -58,8 +60,6 @@ public slots:
 
     void slotItemSelectionChanged();
     void slotItemChanged(QTreeWidgetItem *item, int column);
-
-    void slotUpdate();
 
 protected:
     MainWindow *mainWindow_;

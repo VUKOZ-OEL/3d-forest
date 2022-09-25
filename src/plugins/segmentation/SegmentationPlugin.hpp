@@ -31,6 +31,7 @@ class SegmentationWindow;
         #define EXPORT_SEGMENTATION_PLUGIN __declspec(dllexport)
     #else
         #define EXPORT_SEGMENTATION_PLUGIN __declspec(dllimport)
+        #define EXPORT_SEGMENTATION_PLUGIN_IMPORT
     #endif
 #else
     #define EXPORT_SEGMENTATION_PLUGIN

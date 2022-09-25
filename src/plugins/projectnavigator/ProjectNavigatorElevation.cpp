@@ -60,7 +60,23 @@ ProjectNavigatorElevation::ProjectNavigatorElevation(MainWindow *mainWindow)
     setLayout(mainLayout);
 
     // Data
-    connect(mainWindow_, SIGNAL(signalUpdate()), this, SLOT(slotUpdate()));
+    connect(mainWindow_,
+            SIGNAL(signalUpdate(QString)),
+            this,
+            SLOT(slotUpdate(QString)));
+}
+
+void ProjectNavigatorElevation::slotUpdate(QString target)
+{
+    elevationRange_ = mainWindow_->editor().elevationRange();
+    LOG_DEBUG_LOCAL("elevationRange <" << elevationRange_ << ">");
+
+    rangeInput_->blockSignals(true);
+    rangeInput_->setMinimum(elevationRange_.minimum());
+    rangeInput_->setMaximum(elevationRange_.maximum());
+    rangeInput_->setMinimumValue(elevationRange_.minimumValue());
+    rangeInput_->setMaximumValue(elevationRange_.maximumValue());
+    rangeInput_->blockSignals(false);
 }
 
 void ProjectNavigatorElevation::slotRangeIntermediateMinimumValue(int v)
@@ -90,17 +106,4 @@ void ProjectNavigatorElevation::filterChanged()
     mainWindow_->suspendThreads();
     mainWindow_->editor().setElevationRange(elevationRange_);
     mainWindow_->updateFilter();
-}
-
-void ProjectNavigatorElevation::slotUpdate()
-{
-    elevationRange_ = mainWindow_->editor().elevationRange();
-    LOG_DEBUG_LOCAL("elevationRange <" << elevationRange_ << ">");
-
-    rangeInput_->blockSignals(true);
-    rangeInput_->setMinimum(elevationRange_.minimum());
-    rangeInput_->setMaximum(elevationRange_.maximum());
-    rangeInput_->setMinimumValue(elevationRange_.minimumValue());
-    rangeInput_->setMaximumValue(elevationRange_.maximumValue());
-    rangeInput_->blockSignals(false);
 }

@@ -250,8 +250,7 @@ void SegmentationWindow::slotThread(bool finished, int progressPercent)
     if (finished)
     {
         LOG_UPDATE_VIEW(MODULE_NAME, "finished");
-        mainWindow_->updateModifiers();
-        mainWindow_->updateEverything();
+        mainWindow_->update({"Layers", "Descriptor"});
     }
 }
 

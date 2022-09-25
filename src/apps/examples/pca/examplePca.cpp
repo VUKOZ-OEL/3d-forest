@@ -33,7 +33,7 @@ static void computePca(const Eigen::MatrixXd &points)
     float descriptor;
 
     SegmentationPca pca;
-    (void)pca.compute(V, x, y, z, descriptor);
+    (void)pca.computeDescriptor(V, x, y, z, descriptor);
 
     std::cout << "descriptor <" << descriptor << ">"
               << " mean x <" << x << "> y <" << y << "> z <" << z << ">"
@@ -42,10 +42,10 @@ static void computePca(const Eigen::MatrixXd &points)
 
 static void examplePca()
 {
-    // Cube 0.33
-    Eigen::MatrixXd cube{{0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0},
-                         {0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0},
-                         {0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0}};
+    // Cube 0.33, points:   A    B    C    D    E    F    G    H
+    Eigen::MatrixXd cube{{0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0},  // x
+                         {0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0},  // y
+                         {0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0}}; // z
 
     computePca(cube);
 

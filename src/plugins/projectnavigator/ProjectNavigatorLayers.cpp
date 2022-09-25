@@ -120,7 +120,15 @@ ProjectNavigatorLayers::ProjectNavigatorLayers(MainWindow *mainWindow)
     setLayout(mainLayout);
 
     // Data
-    connect(mainWindow_, SIGNAL(signalUpdate()), this, SLOT(slotUpdate()));
+    connect(mainWindow_,
+            SIGNAL(signalUpdate(QString)),
+            this,
+            SLOT(slotUpdate(QString)));
+}
+
+void ProjectNavigatorLayers::slotUpdate(QString target)
+{
+    setLayers(mainWindow_->editor().layers());
 }
 
 void ProjectNavigatorLayers::dataChanged()
@@ -135,11 +143,6 @@ void ProjectNavigatorLayers::filterChanged()
     mainWindow_->suspendThreads();
     mainWindow_->editor().setLayers(layers_);
     mainWindow_->updateFilter();
-}
-
-void ProjectNavigatorLayers::slotUpdate()
-{
-    setLayers(mainWindow_->editor().layers());
 }
 
 void ProjectNavigatorLayers::slotAdd()

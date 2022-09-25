@@ -48,14 +48,14 @@ static void exampleVoxels()
     std::cout << "voxel occupancy <" << voxels.size() << ">" << std::endl;
 }
 
-static void append(int x, int y, int z, Voxels *voxels)
+static void addVoxel(int x, int y, int z, Voxels &voxels)
 {
-    voxels->append(Voxel(static_cast<uint32_t>(x),
-                         static_cast<uint32_t>(y),
-                         static_cast<uint32_t>(z),
-                         static_cast<double>(x) + 0.5,
-                         static_cast<double>(y) + 0.5,
-                         static_cast<double>(z) + 0.5));
+    voxels.addVoxel(Voxel(static_cast<uint32_t>(x),
+                          static_cast<uint32_t>(y),
+                          static_cast<uint32_t>(z),
+                          static_cast<double>(x) + 0.5,
+                          static_cast<double>(y) + 0.5,
+                          static_cast<double>(z) + 0.5));
 }
 
 static void exampleVoxelsSegment()
@@ -64,8 +64,8 @@ static void exampleVoxelsSegment()
 
     voxels.create({0.0, 0.0, 0.0, 3.0, 3.0, 3.0}, 1.0);
 
-    append(0, 0, 0, &voxels);
-    append(0, 0, 1, &voxels);
+    addVoxel(0, 0, 0, voxels);
+    addVoxel(0, 0, 1, voxels);
 
     std::cout << "voxels <" << voxels << ">" << std::endl;
     voxels.dump();
