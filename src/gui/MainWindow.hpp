@@ -89,6 +89,7 @@ public:
     void resumeThreads();
     virtual void threadProgress(bool finished) override;
 
+    void update(const QString &target);
     void updateEverything();
     void updateData();
     void updateFilter();
@@ -106,7 +107,7 @@ public slots:
 
 signals:
     void signalRender();
-    void signalUpdate();
+    void signalUpdate(QString target);
 
 protected:
     void closeEvent(QCloseEvent *event) override;

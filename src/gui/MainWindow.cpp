@@ -365,6 +365,14 @@ void MainWindow::slotRenderViewport(size_t viewportId)
     threadRender_.render(viewportId, viewports->camera(viewportId));
 }
 
+void MainWindow::update(const QString &target)
+{
+    LOG_LOCAL("");
+    LOG_UPDATE_VIEW(MODULE_NAME, "");
+
+    emit signalUpdate(target);
+}
+
 void MainWindow::updateEverything()
 {
     LOG_LOCAL("");
@@ -378,7 +386,7 @@ void MainWindow::updateEverything()
     viewports->resetScene(&editor_, true);
     editor_.unlock();
 
-    emit signalUpdate();
+    emit signalUpdate("");
 
     size_t viewportId = viewports->selectedViewportId();
     threadRender_.render(viewportId, viewports->camera(viewportId));

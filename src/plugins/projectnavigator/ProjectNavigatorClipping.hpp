@@ -41,7 +41,8 @@ public:
     ProjectNavigatorClipping(MainWindow *mainWindow);
 
 public slots:
-    void slotUpdate();
+    void slotUpdate(QString target);
+
     void slotRangeIntermediateMinimumValue(int v);
     void slotRangeIntermediateMaximumValue(int v);
     void setEnabled(int state);

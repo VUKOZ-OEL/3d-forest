@@ -102,7 +102,15 @@ ProjectNavigatorClassifications::ProjectNavigatorClassifications(
     setLayout(mainLayout);
 
     // Data
-    connect(mainWindow_, SIGNAL(signalUpdate()), this, SLOT(slotUpdate()));
+    connect(mainWindow_,
+            SIGNAL(signalUpdate(QString)),
+            this,
+            SLOT(slotUpdate(QString)));
+}
+
+void ProjectNavigatorClassifications::slotUpdate(QString target)
+{
+    setClassifications(mainWindow_->editor().classifications());
 }
 
 void ProjectNavigatorClassifications::dataChanged()
@@ -117,11 +125,6 @@ void ProjectNavigatorClassifications::filterChanged()
     mainWindow_->suspendThreads();
     mainWindow_->editor().setClassifications(classifications_);
     mainWindow_->updateFilter();
-}
-
-void ProjectNavigatorClassifications::slotUpdate()
-{
-    setClassifications(mainWindow_->editor().classifications());
 }
 
 void ProjectNavigatorClassifications::slotShow()

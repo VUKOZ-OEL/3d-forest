@@ -41,7 +41,7 @@ public:
     void clear();
 
     void start(int voxelSize,
-               int thresholdIntensityPercent,
+               int descriptorThresholdPercent,
                int minimumVoxelsInElement);
 
     int progressPercent() const { return progressPercent_; }
@@ -54,10 +54,11 @@ protected:
     /** Segmentation Thread State. */
     enum State
     {
-        STATE_VOXEL_SIZE,
-        STATE_VOXEL_NORMALIZE,
-        STATE_THRESHOLD_INTENSITY,
-        STATE_CREATE_ELEMENTS_START,
+        STATE_INITIALIZE_VOXELS,
+        STATE_CREATE_VOXELS,
+        STATE_NORMALIZE_VOXELS,
+        STATE_DESCRIPTOR_THRESHOLD,
+        STATE_INITIALIZE_ELEMENTS,
         STATE_CREATE_ELEMENTS,
         STATE_MERGE_CLUSTERS,
         STATE_CREATE_LAYERS,
@@ -76,8 +77,8 @@ protected:
 
     int voxelSize_;
     int minimumVoxelsInElement_;
-    int thresholdIntensityPercent_;
-    float thresholdIntensityNormalized_;
+    int descriptorThresholdPercent_;
+    float descriptorThresholdNormalized_;
 
     SegmentationPca pca_;
     SegmentationElement elements_;
@@ -87,12 +88,13 @@ protected:
     void setState(State state);
     void updateProgressPercent();
 
-    void computeInitializeLayers();
+    void resetLayers();
 
-    bool computeVoxelSize();
-    bool computeVoxelNormalize();
-    bool computeThresholdIntensity();
-    bool computeCreateElementsStart();
+    bool computeInitializeVoxels();
+    bool computeCreateVoxels();
+    bool computeNormalizeVoxels();
+    bool computeDescriptorThreshold();
+    bool computeInitializeElements();
     bool computeCreateElements();
     bool computeMergeClusters();
     bool computeCreateLayers();

@@ -119,7 +119,15 @@ ProjectNavigatorFiles::ProjectNavigatorFiles(MainWindow *mainWindow)
     setLayout(mainLayout);
 
     // Data
-    connect(mainWindow_, SIGNAL(signalUpdate()), this, SLOT(slotUpdate()));
+    connect(mainWindow_,
+            SIGNAL(signalUpdate(QString)),
+            this,
+            SLOT(slotUpdate(QString)));
+}
+
+void ProjectNavigatorFiles::slotUpdate(QString target)
+{
+    setDatasets(mainWindow_->editor().datasets());
 }
 
 void ProjectNavigatorFiles::dataChanged()
@@ -134,11 +142,6 @@ void ProjectNavigatorFiles::filterChanged()
     mainWindow_->suspendThreads();
     mainWindow_->editor().setDatasets(datasets_);
     mainWindow_->updateFilter();
-}
-
-void ProjectNavigatorFiles::slotUpdate()
-{
-    setDatasets(mainWindow_->editor().datasets());
 }
 
 void ProjectNavigatorFiles::slotAdd()

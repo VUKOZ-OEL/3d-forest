@@ -108,7 +108,36 @@ ProjectNavigatorClipping::ProjectNavigatorClipping(MainWindow *mainWindow)
     setLayout(mainLayout);
 
     // Data
-    connect(mainWindow_, SIGNAL(signalUpdate()), this, SLOT(slotUpdate()));
+    connect(mainWindow_,
+            SIGNAL(signalUpdate(QString)),
+            this,
+            SLOT(slotUpdate(QString)));
+}
+
+void ProjectNavigatorClipping::slotUpdate(QString target)
+{
+    LOG_DEBUG_LOCAL("");
+
+    const Box<double> &boundary = mainWindow_->editor().datasets().boundary();
+    LOG_DEBUG_LOCAL("boundary <" << boundary << ">");
+
+    const Region &region = mainWindow_->editor().clipFilter();
+    LOG_DEBUG_LOCAL("region <" << region << ">");
+
+    for (size_t i = 0; i < 3; i++)
+    {
+        clipRange_[i].setMinimum(boundary.min(i));
+        clipRange_[i].setMaximum(boundary.max(i));
+        clipRange_[i].setMinimumValue(region.box.min(i));
+        clipRange_[i].setMaximumValue(region.box.max(i));
+
+        rangeInput_[i]->blockSignals(true);
+        rangeInput_[i]->setMinimum(clipRange_[i].minimum());
+        rangeInput_[i]->setMaximum(clipRange_[i].maximum());
+        rangeInput_[i]->setMinimumValue(clipRange_[i].minimumValue());
+        rangeInput_[i]->setMaximumValue(clipRange_[i].maximumValue());
+        rangeInput_[i]->blockSignals(false);
+    }
 }
 
 void ProjectNavigatorClipping::slotRangeIntermediateMinimumValue(int v)
@@ -171,32 +200,6 @@ void ProjectNavigatorClipping::filterChanged()
     mainWindow_->suspendThreads();
     mainWindow_->editor().setClipFilter(region);
     mainWindow_->updateFilter();
-}
-
-void ProjectNavigatorClipping::slotUpdate()
-{
-    LOG_DEBUG_LOCAL("");
-
-    const Box<double> &boundary = mainWindow_->editor().datasets().boundary();
-    LOG_DEBUG_LOCAL("boundary <" << boundary << ">");
-
-    const Region &region = mainWindow_->editor().clipFilter();
-    LOG_DEBUG_LOCAL("region <" << region << ">");
-
-    for (size_t i = 0; i < 3; i++)
-    {
-        clipRange_[i].setMinimum(boundary.min(i));
-        clipRange_[i].setMaximum(boundary.max(i));
-        clipRange_[i].setMinimumValue(region.box.min(i));
-        clipRange_[i].setMaximumValue(region.box.max(i));
-
-        rangeInput_[i]->blockSignals(true);
-        rangeInput_[i]->setMinimum(clipRange_[i].minimum());
-        rangeInput_[i]->setMaximum(clipRange_[i].maximum());
-        rangeInput_[i]->setMinimumValue(clipRange_[i].minimumValue());
-        rangeInput_[i]->setMaximumValue(clipRange_[i].maximumValue());
-        rangeInput_[i]->blockSignals(false);
-    }
 }
 
 void ProjectNavigatorClipping::setEnabled(int state)

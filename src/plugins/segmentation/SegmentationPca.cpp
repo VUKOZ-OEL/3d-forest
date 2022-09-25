@@ -45,20 +45,21 @@ void SegmentationPca::clear()
     // E;
 }
 
-bool SegmentationPca::compute(Query *query,
-                              Voxels *voxels,
-                              Voxel *voxel,
-                              const Box<double> &cell)
+bool SegmentationPca::computeDescriptor(const Box<double> &cell,
+                                        Query &query,
+                                        Voxels &voxels,
+                                        Voxel &voxel)
 {
     // The number of points inside this grid cell.
     Eigen::MatrixXd::Index nPoints = 0;
 
     // Select points in 'cell' into point coordinates 'xyz'.
-    query->selectBox(cell);
-    query->selectClassifications({LasFile::CLASS_UNASSIGNED});
-    query->exec();
+    // Count the number of points.
+    query.selectBox(cell);
+    query.selectClassifications({LasFile::CLASS_UNASSIGNED});
+    query.exec();
 
-    while (query->next())
+    while (query.next())
     {
         nPoints++;
     }
@@ -71,44 +72,46 @@ bool SegmentationPca::compute(Query *query,
         return false;
     }
 
-    size_t voxelId = voxels->size() + 1;
+    // Get point coordinates into 'xyz'.
+    // Assign points in voxel to the current voxel.
+    size_t voxelIndex = voxels.size();
 
     xyz.resize(3, nPoints);
     nPoints = 0;
 
-    query->reset();
-    while (query->next())
+    query.reset();
+    while (query.next())
     {
-        xyz(0, nPoints) = query->x();
-        xyz(1, nPoints) = query->y();
-        xyz(2, nPoints) = query->z();
+        xyz(0, nPoints) = query.x();
+        xyz(1, nPoints) = query.y();
+        xyz(2, nPoints) = query.z();
 
-        query->value() = voxelId;
-        query->setModified();
+        query.value() = voxelIndex;
+        query.setModified();
 
         nPoints++;
     }
 
     // Compute PCA.
     bool result;
-    result = compute(xyz,
-                     voxel->meanX_,
-                     voxel->meanY_,
-                     voxel->meanZ_,
-                     voxel->intensity_);
+    result = computeDescriptor(xyz,
+                               voxel.meanX_,
+                               voxel.meanY_,
+                               voxel.meanZ_,
+                               voxel.intensity_);
 
-    voxel->density_ = static_cast<float>(nPoints);
+    voxel.density_ = static_cast<float>(nPoints);
 
-    voxels->append(*voxel);
+    voxels.addVoxel(voxel);
 
     return result;
 }
 
-bool SegmentationPca::compute(Eigen::MatrixXd &V,
-                              double &meanX,
-                              double &meanY,
-                              double &meanZ,
-                              float &descriptor)
+bool SegmentationPca::computeDescriptor(Eigen::MatrixXd &V,
+                                        double &meanX,
+                                        double &meanY,
+                                        double &meanZ,
+                                        float &descriptor)
 {
     // The number of points.
     Eigen::MatrixXd::Index nPoints = V.cols();

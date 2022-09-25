@@ -42,8 +42,8 @@ SegmentationThread::SegmentationThread(Editor *editor)
       progressPercent_(0),
       voxelSize_(0),
       minimumVoxelsInElement_(0),
-      thresholdIntensityPercent_(0),
-      thresholdIntensityNormalized_(0)
+      descriptorThresholdPercent_(0),
+      descriptorThresholdNormalized_(0)
 {
     LOG_DEBUG_LOCAL("");
 }
@@ -61,11 +61,11 @@ void SegmentationThread::clear()
 }
 
 void SegmentationThread::start(int voxelSize,
-                               int thresholdIntensityPercent,
+                               int descriptorThresholdPercent,
                                int minimumVoxelsInElement)
 {
     LOG_DEBUG_LOCAL("voxelSize <" << voxelSize << "> threshold <"
-                                  << thresholdIntensityPercent << ">");
+                                  << descriptorThresholdPercent << ">");
 
     // Cancel current computation
     cancel();
@@ -75,15 +75,15 @@ void SegmentationThread::start(int voxelSize,
 
     if (voxelSize != voxelSize_)
     {
-        startState = STATE_VOXEL_SIZE;
+        startState = STATE_INITIALIZE_VOXELS;
     }
-    else if (thresholdIntensityPercent != thresholdIntensityPercent_)
+    else if (descriptorThresholdPercent != descriptorThresholdPercent_)
     {
-        startState = STATE_THRESHOLD_INTENSITY;
+        startState = STATE_DESCRIPTOR_THRESHOLD;
     }
     else if (minimumVoxelsInElement != minimumVoxelsInElement_)
     {
-        startState = STATE_CREATE_ELEMENTS_START;
+        startState = STATE_INITIALIZE_ELEMENTS;
     }
     else
     {
@@ -96,7 +96,7 @@ void SegmentationThread::start(int voxelSize,
         setState(startState);
 
         voxelSize_ = voxelSize;
-        thresholdIntensityPercent_ = thresholdIntensityPercent;
+        descriptorThresholdPercent_ = descriptorThresholdPercent;
         minimumVoxelsInElement_ = minimumVoxelsInElement;
 
         Thread::start();
@@ -110,39 +110,43 @@ bool SegmentationThread::compute()
     // Next step
     double timeBegin = getRealTime();
 
-    if (layersCreated_ && !stateInitialized_)
-    {
-        computeInitializeLayers();
-        layersCreated_ = false;
-    }
+    resetLayers();
 
-    if (state_ == STATE_VOXEL_SIZE)
+    if (state_ == STATE_INITIALIZE_VOXELS)
     {
-        bool finishedState = computeVoxelSize();
+        bool finishedState = computeInitializeVoxels();
         if (finishedState)
         {
-            setState(STATE_VOXEL_NORMALIZE);
+            setState(STATE_CREATE_VOXELS);
         }
     }
-    else if (state_ == STATE_VOXEL_NORMALIZE)
+    else if (state_ == STATE_CREATE_VOXELS)
     {
-        bool finishedState = computeVoxelNormalize();
+        bool finishedState = computeCreateVoxels();
         if (finishedState)
         {
-            setState(STATE_THRESHOLD_INTENSITY);
+            setState(STATE_NORMALIZE_VOXELS);
         }
     }
-    else if (state_ == STATE_THRESHOLD_INTENSITY)
+    else if (state_ == STATE_NORMALIZE_VOXELS)
     {
-        bool finishedState = computeThresholdIntensity();
+        bool finishedState = computeNormalizeVoxels();
         if (finishedState)
         {
-            setState(STATE_CREATE_ELEMENTS_START);
+            setState(STATE_DESCRIPTOR_THRESHOLD);
         }
     }
-    else if (state_ == STATE_CREATE_ELEMENTS_START)
+    else if (state_ == STATE_DESCRIPTOR_THRESHOLD)
     {
-        bool finishedState = computeCreateElementsStart();
+        bool finishedState = computeDescriptorThreshold();
+        if (finishedState)
+        {
+            setState(STATE_INITIALIZE_ELEMENTS);
+        }
+    }
+    else if (state_ == STATE_INITIALIZE_ELEMENTS)
+    {
+        bool finishedState = computeInitializeElements();
         if (finishedState)
         {
             setState(STATE_CREATE_ELEMENTS);
@@ -229,41 +233,81 @@ void SegmentationThread::updateProgressPercent()
     }
 }
 
-void SegmentationThread::computeInitializeLayers()
+void SegmentationThread::resetLayers()
 {
     LOG_DEBUG_LOCAL("");
 
-    // This state has no progress steps - it can not be canceled
+    if (stateInitialized_ || !layersCreated_)
+    {
+        return;
+    }
+
     // Remove all layers, keep default main layer 0
     Layers layers;
     layers.clear();
     layers.setDefault();
     editor_->setLayers(layers);
 
-    const Datasets &datasets = editor_->datasets();
-    LOG_DEBUG_LOCAL("number of points <" << datasets.nPoints() << ">");
-    if (datasets.nPoints() < 1)
+    layersCreated_ = false;
+}
+
+bool SegmentationThread::computeInitializeVoxels()
+{
+    LOG_DEBUG_LOCAL("");
+
+    double timeBegin = getRealTime();
+
+    // Initialization
+    if (!stateInitialized_)
     {
-        return;
+        const Datasets &datasets = editor_->datasets();
+        LOG_DEBUG_LOCAL("number of points <" << datasets.nPoints() << ">");
+        if (datasets.nPoints() < 1)
+        {
+            return true;
+        }
+
+        query_.selectBox(editor_->clipBoundary());
+        query_.exec();
+
+        progressMax_ = datasets.nPoints();
+        progressValue_ = 0;
+        stateInitialized_ = true;
     }
 
-    // Set all points to layer 0
-    query_.selectBox(editor_->clipBoundary());
-    query_.exec();
+    // Next step
+    size_t counter = 0;
 
     while (query_.next())
     {
         query_.layer() = 0;
         query_.descriptor() = 0;
-        query_.value() = 0;
-
+        query_.value() = Voxels::npos;
         query_.setModified();
+
+        // Update progress
+        progressValue_++;
+        counter++;
+        if (counter > 1000)
+        {
+            counter = 0;
+            double timeNow = getRealTime();
+            if (timeNow - timeBegin > 0.5)
+            {
+                updateProgressPercent();
+                return false;
+            }
+        }
     }
 
+    // Finished
     query_.flush();
+    progressPercent_ = 100;
+
+    return true;
 }
 
-bool SegmentationThread::computeVoxelSize()
+bool SegmentationThread::computeCreateVoxels()
 {
     LOG_DEBUG_LOCAL("");
 
@@ -273,14 +317,6 @@ bool SegmentationThread::computeVoxelSize()
     if (!stateInitialized_)
     {
         voxels_.clear();
-
-        const Datasets &datasets = editor_->datasets();
-        LOG_DEBUG_LOCAL("number of points <" << datasets.nPoints() << ">");
-        if (datasets.nPoints() < 1)
-        {
-            return true;
-        }
-
         voxels_.create(editor_->clipBoundary(), voxelSize_);
 
         progressMax_ = voxels_.indexSize();
@@ -296,7 +332,7 @@ bool SegmentationThread::computeVoxelSize()
     while (voxels_.next(&voxel, &cell))
     {
         // Compute one voxel [meanX, meanY, meanZ, intensity, density]
-        pca_.compute(&query_, &voxels_, &voxel, cell);
+        pca_.computeDescriptor(cell, query_, voxels_, voxel);
 
         // Update progress
         progressValue_++;
@@ -305,7 +341,7 @@ bool SegmentationThread::computeVoxelSize()
         {
             counter = 0;
             double timeNow = getRealTime();
-            if (timeNow - timeBegin > 1.0) // 0.1)
+            if (timeNow - timeBegin > 0.5)
             {
                 updateProgressPercent();
                 return false;
@@ -313,15 +349,20 @@ bool SegmentationThread::computeVoxelSize()
         }
     }
 
-    query_.flush();
+    // Out
+    //   Point
+    //     has value to voxel index
+    //   Voxel
+    //     computed descriptor
 
     // Finished
+    query_.flush();
     progressPercent_ = 100;
 
     return true;
 }
 
-bool SegmentationThread::computeVoxelNormalize()
+bool SegmentationThread::computeNormalizeVoxels()
 {
     LOG_DEBUG_LOCAL("");
 
@@ -345,20 +386,20 @@ bool SegmentationThread::computeVoxelNormalize()
     return true;
 }
 
-bool SegmentationThread::computeThresholdIntensity()
+bool SegmentationThread::computeDescriptorThreshold()
 {
-    thresholdIntensityNormalized_ =
-        static_cast<float>(thresholdIntensityPercent_) * 0.01F;
-    LOG_DEBUG_LOCAL("threshold <" << thresholdIntensityNormalized_
+    descriptorThresholdNormalized_ =
+        static_cast<float>(descriptorThresholdPercent_) * 0.01F;
+    LOG_DEBUG_LOCAL("threshold <" << descriptorThresholdNormalized_
                                   << "> from min <" << voxels_.intensityMin()
                                   << "> max <" << voxels_.intensityMax()
-                                  << "> percent <" << thresholdIntensityPercent_
-                                  << ">");
+                                  << "> percent <"
+                                  << descriptorThresholdPercent_ << ">");
     progressPercent_ = 100;
     return true;
 }
 
-bool SegmentationThread::computeCreateElementsStart()
+bool SegmentationThread::computeInitializeElements()
 {
     LOG_DEBUG_LOCAL("");
 
@@ -377,14 +418,17 @@ bool SegmentationThread::computeCreateElementsStart()
     {
         Voxel &voxel = voxels_.at(i);
 
-        voxel.clearState();
+        voxel.status_ = 0;
+        voxel.elementId_ = SegmentationElement::npos;
+        voxel.clusterId_ = SegmentationElement::npos;
 
-        if (voxel.intensity_ < thresholdIntensityNormalized_)
-        {
-            voxel.status_ |= Voxel::STATUS_IGNORED;
-        }
+        // if (voxel.intensity_ < descriptorThresholdNormalized_)
+        // {
+        //     voxel.status_ |= Voxel::STATUS_IGNORED;
+        // }
     }
 
+    // Finished
     progressPercent_ = 100;
 
     return true;
@@ -412,10 +456,11 @@ bool SegmentationThread::computeCreateElements()
 
         const std::vector<size_t> &voxelList = elements_.voxelList();
         size_t nVoxels = voxelList.size();
-        uint32_t elementId = elements_.elementId();
 
         if (static_cast<int>(nVoxels) >= minimumVoxelsInElement_)
         {
+            uint32_t elementId = elements_.elementId();
+
             LOG_DEBUG_LOCAL("number of voxels in element <"
                             << elementId << "> is <" << nVoxels << ">");
 
@@ -478,13 +523,14 @@ bool SegmentationThread::computeCreateLayers()
     {
         size_t index = query_.value();
 
-        if (index > 0)
+        if (index < Voxels::npos)
         {
-            Voxel &voxel = voxels_.at(index - 1);
-
-            query_.layer() = voxel.elementId_ - 1;
+            Voxel &voxel = voxels_.at(index);
+            if (voxel.elementId_ != SegmentationElement::npos)
+            {
+                query_.layer() = voxel.elementId_ + 1;
+            }
             query_.descriptor() = voxel.intensity_;
-
             query_.setModified();
         }
     }

@@ -71,7 +71,7 @@ void Voxels::clear()
     stack_.clear();
 }
 
-void Voxels::append(const Voxel &voxel)
+void Voxels::addVoxel(const Voxel &voxel)
 {
     index_[indexOf(voxel)] = voxels_.size();
     voxels_.push_back(voxel);

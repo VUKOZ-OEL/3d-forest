@@ -36,16 +36,16 @@ public:
 
     void clear();
 
-    bool compute(Query *query,
-                 Voxels *voxels,
-                 Voxel *voxel,
-                 const Box<double> &cell);
+    bool computeDescriptor(const Box<double> &cell,
+                           Query &query,
+                           Voxels &voxels,
+                           Voxel &voxel);
 
-    bool compute(Eigen::MatrixXd &V,
-                 double &meanX,
-                 double &meanY,
-                 double &meanZ,
-                 float &descriptor);
+    bool computeDescriptor(Eigen::MatrixXd &V,
+                           double &meanX,
+                           double &meanY,
+                           double &meanZ,
+                           float &descriptor);
 
 protected:
     Eigen::MatrixXd xyz;
