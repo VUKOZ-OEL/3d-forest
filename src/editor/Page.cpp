@@ -27,12 +27,35 @@
 #include <IndexFileBuilder.hpp>
 #include <LasFile.hpp>
 #include <Log.hpp>
+#include <Math.hpp>
 #include <Page.hpp>
 #include <Query.hpp>
 
 #define MODULE_NAME "Page"
 #define LOG_DEBUG_LOCAL(msg)
 //#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+
+#define LOG_DEBUG_LOCAL_SELECTION(pageId, nselected, npoints)
+#if 0
+    #define LOG_DEBUG_LOCAL_SELECTION(pageId, nselected, npoints)              \
+        do                                                                     \
+        {                                                                      \
+            if (npoints > 0)                                                   \
+            {                                                                  \
+                LOG_MODULE(MODULE_NAME,                                        \
+                           "page <" << pageId << "> selected <"                \
+                                    << ((static_cast<float>(nselected) /       \
+                                         static_cast<float>(npoints)) *        \
+                                        100.0F)                                \
+                                    << "> %");                                 \
+            }                                                                  \
+            else                                                               \
+            {                                                                  \
+                LOG_MODULE(MODULE_NAME,                                        \
+                           "page <" << pageId << "> selected <>");             \
+            }                                                                  \
+        } while (false)
+#endif
 
 Page::Page(Editor *editor, Query *query, uint32_t datasetId, uint32_t pageId)
     : selectionSize(0),
@@ -335,6 +358,8 @@ void Page::select()
         }
     }
 
+    LOG_DEBUG_LOCAL_SELECTION(pageId_, selectionSize, selection.size());
+
     // Apply new selection.
     selectBox();
     selectCone();
@@ -342,6 +367,8 @@ void Page::select()
     selectElevation();
     selectClassification();
     selectLayer();
+
+    LOG_DEBUG_LOCAL_SELECTION(pageId_, selectionSize, selection.size());
 
     state_ = Page::STATE_RUN_MODIFIERS;
 }
@@ -363,6 +390,9 @@ void Page::setModified()
 
 void Page::setState(Page::State state)
 {
+    LOG_UPDATE_VIEW(MODULE_NAME,
+                    "pageId <" << pageId_ << "> to state <" << state << ">");
+
     if ((state < state_) || (state == Page::STATE_RENDERED))
     {
         state_ = state;
@@ -747,8 +777,6 @@ void Page::selectElevation()
         }
     }
 
-    LOG_DEBUG_LOCAL("selectionSize <" << selectionSize << "> nSelectedNew <"
-                                      << nSelectedNew << ">");
     selectionSize = nSelectedNew;
 }
 
@@ -790,6 +818,8 @@ void Page::selectLayer()
         return;
     }
 
+    LOG_DEBUG_LOCAL("query layers <" << layers.size() << ">");
+
     size_t nSelectedNew = 0;
 
     for (size_t i = 0; i < selectionSize; i++)
@@ -806,6 +836,9 @@ void Page::selectLayer()
             nSelectedNew++;
         }
     }
+
+    LOG_DEBUG_LOCAL("selectionSize <" << selectionSize << "> nSelectedNew <"
+                                      << nSelectedNew << ">");
 
     selectionSize = nSelectedNew;
 }
