@@ -22,6 +22,8 @@
 #ifndef MAIN_WINDOW_HPP
 #define MAIN_WINDOW_HPP
 
+#include <set>
+
 #include <Editor.hpp>
 #include <ExportGui.hpp>
 #include <RenderThread.hpp>
@@ -37,6 +39,7 @@ class HelpPlugin;
 #include <QHash>
 #include <QIcon>
 #include <QMainWindow>
+#include <QSet>
 class QToolButton;
 class QProgressBar;
 
@@ -90,6 +93,7 @@ public:
     virtual void threadProgress(bool finished) override;
 
     void update(const QString &target);
+    void update(const std::set<std::string> &target);
     void updateEverything();
     void updateData();
     void updateFilter();
@@ -108,6 +112,7 @@ public slots:
 signals:
     void signalRender();
     void signalUpdate(QString target);
+    // void signalUpdate(const QSet<QString> &target);
 
 protected:
     void closeEvent(QCloseEvent *event) override;
