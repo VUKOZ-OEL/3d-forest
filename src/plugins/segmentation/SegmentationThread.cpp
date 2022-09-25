@@ -528,7 +528,7 @@ bool SegmentationThread::computeCreateLayers()
             Voxel &voxel = voxels_.at(index);
             if (voxel.elementId_ != SegmentationElement::npos)
             {
-                query_.layer() = voxel.elementId_ + 1;
+                // query_.layer() = voxel.elementId_ + 1;
             }
             query_.descriptor() = voxel.intensity_;
             query_.setModified();
