@@ -528,7 +528,7 @@ bool SegmentationThread::computeCreateLayers()
             Voxel &voxel = voxels_.at(index);
             if (voxel.elementId_ != SegmentationElement::npos)
             {
-                // query_.layer() = voxel.elementId_ + 1;
+                query_.layer() = voxel.elementId_ + 1;
             }
             query_.descriptor() = voxel.intensity_;
             query_.setModified();
@@ -542,9 +542,9 @@ bool SegmentationThread::computeCreateLayers()
     layers.setDefault();
 
     size_t nLayers = elements_.elementId();
-    if (nLayers > 1)
+    if (nLayers > 0)
     {
-        nLayers--; // ignore main layer
+        // nLayers--; // ignore main layer
         LOG_DEBUG_LOCAL("number of layers <" << nLayers << ">");
 
         const std::vector<Vector3<float>> &pal = ColorPalette::WindowsXp32;
