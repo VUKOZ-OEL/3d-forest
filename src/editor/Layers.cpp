@@ -20,6 +20,11 @@
 /** @file Layers.cpp */
 
 #include <Layers.hpp>
+#include <Log.hpp>
+
+#define MODULE_NAME "Layers"
+#define LOG_DEBUG_LOCAL(msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 Layers::Layers() : enabled_(false)
 {
@@ -28,6 +33,7 @@ Layers::Layers() : enabled_(false)
 
 void Layers::clear()
 {
+    LOG_DEBUG_LOCAL("");
     layers_.clear();
     hashTableId_.clear();
     hashTableEnabledId_.clear();
@@ -35,6 +41,7 @@ void Layers::clear()
 
 void Layers::setDefault()
 {
+    LOG_DEBUG_LOCAL("");
     size_t id = 0;
     size_t idx = 0;
 
@@ -55,6 +62,7 @@ void Layers::setEnabled(bool b)
 
 void Layers::push_back(const Layer &layer)
 {
+    LOG_DEBUG_LOCAL("layer <" << layer << ">");
     size_t id = layer.id();
     size_t idx = layers_.size();
 
@@ -65,11 +73,14 @@ void Layers::push_back(const Layer &layer)
     if (layer.isEnabled())
     {
         hashTableEnabledId_.insert(id);
+        LOG_DEBUG_LOCAL("enabled <" << hashTableEnabledId_ << ">");
     }
 }
 
 void Layers::erase(size_t i)
 {
+    LOG_DEBUG_LOCAL("");
+
     if (layers_.size() == 0)
     {
         return;
@@ -90,6 +101,7 @@ void Layers::erase(size_t i)
 
 size_t Layers::unusedId() const
 {
+    LOG_DEBUG_LOCAL("");
     // Return minimum available id value
     for (size_t rval = 0; rval < std::numeric_limits<size_t>::max(); rval++)
     {
@@ -102,22 +114,9 @@ size_t Layers::unusedId() const
     THROW("New layer identifier is not available.");
 }
 
-void Layers::setEnabled(size_t i, bool b)
-{
-    layers_[i].setEnabled(b);
-
-    if (b)
-    {
-        hashTableEnabledId_.insert(layers_[i].id());
-    }
-    else
-    {
-        hashTableEnabledId_.erase(layers_[i].id());
-    }
-}
-
 void Layers::setEnabledAll(bool b)
 {
+    LOG_DEBUG_LOCAL("enable <" << b << ">");
     for (size_t i = 0; i < layers_.size(); i++)
     {
         layers_[i].setEnabled(b);
@@ -135,6 +134,7 @@ void Layers::setEnabledAll(bool b)
 
 void Layers::setInvertAll()
 {
+    LOG_DEBUG_LOCAL("");
     hashTableEnabledId_.clear();
     for (size_t i = 0; i < layers_.size(); i++)
     {
@@ -147,18 +147,37 @@ void Layers::setInvertAll()
     }
 }
 
+void Layers::setEnabled(size_t i, bool b)
+{
+    LOG_DEBUG_LOCAL("index <" << i << "> enable <" << b << ">");
+    layers_[i].setEnabled(b);
+
+    if (b)
+    {
+        hashTableEnabledId_.insert(layers_[i].id());
+    }
+    else
+    {
+        hashTableEnabledId_.erase(layers_[i].id());
+    }
+}
+
 void Layers::setLabel(size_t i, const std::string &label)
 {
+    LOG_DEBUG_LOCAL("index <" << i << "> label <" << label << ">");
     layers_[i].setLabel(label);
 }
 
 void Layers::setColor(size_t i, const Vector3<float> &color)
 {
+    LOG_DEBUG_LOCAL("index <" << i << "> color <" << color << ">");
     layers_[i].setColor(color);
 }
 
 void Layers::read(const Json &in)
 {
+    LOG_DEBUG_LOCAL("");
+
     clear();
 
     if (in.contains("enabled"))
@@ -203,6 +222,8 @@ void Layers::read(const Json &in)
 
 Json &Layers::write(Json &out) const
 {
+    LOG_DEBUG_LOCAL("");
+
     out["enabled"] = enabled_;
 
     size_t i = 0;
