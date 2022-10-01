@@ -67,6 +67,7 @@ protected:
 
     Editor *editor_;
     Query query_;
+    Query queryDescriptor_;
 
     State state_;
     bool stateInitialized_;

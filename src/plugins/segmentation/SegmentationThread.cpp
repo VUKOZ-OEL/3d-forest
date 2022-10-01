@@ -34,6 +34,7 @@
 SegmentationThread::SegmentationThread(Editor *editor)
     : editor_(editor),
       query_(editor_),
+      queryDescriptor_(editor_),
       state_(STATE_FINISHED),
       stateInitialized_(false),
       layersCreated_(true),
@@ -312,8 +313,9 @@ bool SegmentationThread::computeCreateVoxels()
     LOG_DEBUG_LOCAL("");
 
     double timeBegin = getRealTime();
+    size_t counter = 0;
 
-    // Initialization
+    // Initialize voxels.
     if (!stateInitialized_)
     {
         voxels_.clear();
@@ -324,17 +326,52 @@ bool SegmentationThread::computeCreateVoxels()
         stateInitialized_ = true;
     }
 
-    // Next step
-    Voxel voxel;
+    // Next step: iterate over all voxels and compute their descriptors.
     Box<double> cell;
-    size_t counter = 0;
+    Voxel voxel;
+    double meanX;
+    double meanY;
+    double meanZ;
+    float descriptor;
+    bool hasDescriptor;
 
     while (voxels_.next(&voxel, &cell))
     {
-        // Compute one voxel [meanX, meanY, meanZ, intensity, density]
-        pca_.computeDescriptor(cell, query_, voxels_, voxel);
+        // Compute PCA descriptor for one voxel.
+        hasDescriptor = pca_.computeDescriptor(cell,
+                                               queryDescriptor_,
+                                               meanX,
+                                               meanY,
+                                               meanZ,
+                                               descriptor);
+        if (hasDescriptor)
+        {
+            // Add reference to voxel item to each point inside this voxel.
+            size_t nPoints = 0;
+            size_t voxelIndex = voxels_.size();
 
-        // Update progress
+            query_.selectBox(cell);
+            query_.exec();
+            while (query_.next())
+            {
+                query_.value() = voxelIndex;
+                query_.setModified();
+                nPoints++;
+            }
+
+            if (nPoints > 0)
+            {
+                // Create new occupied voxel item.
+                voxel.meanX_ = meanX;
+                voxel.meanY_ = meanY;
+                voxel.meanZ_ = meanZ;
+                voxel.intensity_ = descriptor;
+                voxel.density_ = static_cast<float>(nPoints);
+                voxels_.addVoxel(voxel);
+            }
+        }
+
+        // Update progress.
         progressValue_++;
         counter++;
         if (counter > 10)
@@ -343,13 +380,15 @@ bool SegmentationThread::computeCreateVoxels()
             double timeNow = getRealTime();
             if (timeNow - timeBegin > 0.5)
             {
+                // Reached maximum time per one compute step.
+                // Return and continue later in the next call.
                 updateProgressPercent();
                 return false;
             }
         }
     }
 
-    // Out
+    // Output:
     //   Point
     //     has value to voxel index
     //   Voxel

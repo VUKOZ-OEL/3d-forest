@@ -38,8 +38,10 @@ public:
 
     bool computeDescriptor(const Box<double> &cell,
                            Query &query,
-                           Voxels &voxels,
-                           Voxel &voxel);
+                           double &meanX,
+                           double &meanY,
+                           double &meanZ,
+                           float &descriptor);
 
     bool computeDescriptor(Eigen::MatrixXd &V,
                            double &meanX,
