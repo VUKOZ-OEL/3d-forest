@@ -103,7 +103,8 @@ void Voxels::box(const Voxel &voxel, Box<double> *box)
 
 void Voxels::normalize(Voxel *voxel)
 {
-    ::normalize(voxel->intensity_, intensityMin_, intensityMax_);
+    // Minimum intensity is zero to include voxels without computed descriptor.
+    ::normalize(voxel->intensity_, 0.0F, intensityMax_);
     ::normalize(voxel->density_, densityMin_, densityMax_);
 }
 
