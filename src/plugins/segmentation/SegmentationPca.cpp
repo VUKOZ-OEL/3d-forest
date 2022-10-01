@@ -23,8 +23,9 @@
 #include <Log.hpp>
 #include <SegmentationPca.hpp>
 
+#define MODULE_NAME "SegmentationPca"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("SegmentationPca", msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 SegmentationPca::SegmentationPca()
 {
@@ -47,15 +48,20 @@ void SegmentationPca::clear()
 
 bool SegmentationPca::computeDescriptor(const Box<double> &cell,
                                         Query &query,
-                                        Voxels &voxels,
-                                        Voxel &voxel)
+                                        double &meanX,
+                                        double &meanY,
+                                        double &meanZ,
+                                        float &descriptor)
 {
     // The number of points inside this grid cell.
     Eigen::MatrixXd::Index nPoints = 0;
 
     // Select points in 'cell' into point coordinates 'xyz'.
     // Count the number of points.
-    query.selectBox(cell);
+    double x, y, z;
+    cell.getCenter(x, y, z);
+    double r = cell.maximumLength();
+    query.selectSphere(x, y, z, r);
     query.selectClassifications({LasFile::CLASS_UNASSIGNED});
     query.exec();
 
@@ -73,9 +79,6 @@ bool SegmentationPca::computeDescriptor(const Box<double> &cell,
     }
 
     // Get point coordinates into 'xyz'.
-    // Assign points in voxel to the current voxel.
-    size_t voxelIndex = voxels.size();
-
     xyz.resize(3, nPoints);
     nPoints = 0;
 
@@ -86,23 +89,12 @@ bool SegmentationPca::computeDescriptor(const Box<double> &cell,
         xyz(1, nPoints) = query.y();
         xyz(2, nPoints) = query.z();
 
-        query.value() = voxelIndex;
-        query.setModified();
-
         nPoints++;
     }
 
-    // Compute PCA.
+    // Compute PCA descriptor.
     bool result;
-    result = computeDescriptor(xyz,
-                               voxel.meanX_,
-                               voxel.meanY_,
-                               voxel.meanZ_,
-                               voxel.intensity_);
-
-    voxel.density_ = static_cast<float>(nPoints);
-
-    voxels.addVoxel(voxel);
+    result = computeDescriptor(xyz, meanX, meanY, meanZ, descriptor);
 
     return result;
 }

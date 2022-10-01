@@ -35,7 +35,6 @@
 #define LOG_DEBUG_LOCAL(msg)
 //#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
-#define LOG_DEBUG_LOCAL_SELECTION(pageId, nselected, npoints)
 #if 0
     #define LOG_DEBUG_LOCAL_SELECTION(pageId, nselected, npoints)              \
         do                                                                     \
@@ -55,6 +54,8 @@
                            "page <" << pageId << "> selected <>");             \
             }                                                                  \
         } while (false)
+#else
+    #define LOG_DEBUG_LOCAL_SELECTION(pageId, nselected, npoints)
 #endif
 
 Page::Page(Editor *editor, Query *query, uint32_t datasetId, uint32_t pageId)

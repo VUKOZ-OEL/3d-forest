@@ -26,8 +26,9 @@
 #include <Log.hpp>
 #include <Query.hpp>
 
-#define LOG_QUERY(msg)
-//#define LOG_QUERY(msg) LOG_MODULE("Query", msg)
+#define MODULE_NAME "Query"
+#define LOG_DEBUG_LOCAL(msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 Query::Query(Editor *editor) : editor_(editor)
 {
@@ -41,6 +42,7 @@ Query::~Query()
 
 void Query::exec()
 {
+    LOG_DEBUG_LOCAL("");
     selectedPages_.clear();
 
     if (!selectBox_.empty())
@@ -53,6 +55,7 @@ void Query::exec()
     }
     if (!selectedSphere_.empty())
     {
+        LOG_DEBUG_LOCAL("sphere <" << selectedSphere_.box() << ">");
         editor_->datasets().select(selectedPages_, selectedSphere_.box());
     }
 
@@ -103,7 +106,7 @@ void Query::addResults(size_t n)
 
 bool Query::nextPage()
 {
-    LOG_QUERY("");
+    LOG_DEBUG_LOCAL("");
 
     // Reset point index within active page.
     pagePointIndex_ = 0;
@@ -117,7 +120,8 @@ bool Query::nextPage()
     // Find next page in selection.
     while (pageIndex_ < selectedPages_.size())
     {
-        LOG_QUERY("pageIndex " << pageIndex_ << "/" << selectedPages_.size());
+        LOG_DEBUG_LOCAL("pageIndex " << pageIndex_ << "/"
+                                     << selectedPages_.size());
         IndexFile::Selection &selectedPage = selectedPages_[pageIndex_];
         page_ = read(selectedPage.id, selectedPage.idx);
         page_->nextState();
@@ -385,7 +389,7 @@ void Query::setMaximumResults(size_t nPoints)
 
 void Query::setGrid(size_t pointsPerCell, double cellLengthMinPct)
 {
-    LOG_QUERY("");
+    LOG_DEBUG_LOCAL("");
 
     // Calculate grid cell size.
     uint64_t pointsPerArea = editor_->datasets().nPoints();
@@ -398,7 +402,7 @@ void Query::setGrid(size_t pointsPerCell, double cellLengthMinPct)
     double pointsPerAreaClip = static_cast<double>(pointsPerArea) * areaRatio;
     double nCells = pointsPerAreaClip / static_cast<double>(pointsPerCell);
     nCells = ceil(nCells);
-    LOG_QUERY("nCells:" << nCells);
+    LOG_DEBUG_LOCAL("nCells:" << nCells);
 
     double areaPerCell = areaClip / nCells;
     double cellLength = sqrt(areaPerCell);
@@ -416,17 +420,17 @@ void Query::setGrid(size_t pointsPerCell, double cellLengthMinPct)
 
     gridXSize_ =
         static_cast<size_t>(round(boundaryClip.length(0) / cellLength));
-    LOG_QUERY("gridXSize_:" << gridXSize_);
+    LOG_DEBUG_LOCAL("gridXSize_:" << gridXSize_);
     gridYSize_ =
         static_cast<size_t>(round(boundaryClip.length(1) / cellLength));
-    LOG_QUERY("gridYSize_:" << gridYSize_);
+    LOG_DEBUG_LOCAL("gridYSize_:" << gridYSize_);
 
     double cellLengthX =
         boundaryClip.length(0) / static_cast<double>(gridXSize_);
-    LOG_QUERY("cellLengthX:" << cellLengthX);
+    LOG_DEBUG_LOCAL("cellLengthX:" << cellLengthX);
     double cellLengthY =
         boundaryClip.length(1) / static_cast<double>(gridYSize_);
-    LOG_QUERY("cellLengthY:" << cellLengthY);
+    LOG_DEBUG_LOCAL("cellLengthY:" << cellLengthY);
 
     // Set grid cell size.
     gridBoundary_ = boundaryClip;
@@ -448,7 +452,7 @@ bool Query::nextGrid()
         size_t x = grid_[gridIndex_] & 0xfffffU;
         size_t y = (grid_[gridIndex_] >> 20) & 0xfffffU;
 
-        LOG_QUERY("x:" << x << ", y:" << y);
+        LOG_DEBUG_LOCAL("x:" << x << ", y:" << y);
 
         double dx = static_cast<double>(x) * gridCellBase_.max(0);
         double dy = static_cast<double>(y) * gridCellBase_.max(1);

@@ -59,4 +59,11 @@ protected:
     bool enabled_;
 };
 
+inline std::ostream &operator<<(std::ostream &os, const Layer &obj)
+{
+    return os << "id <" << obj.id() << "> label <" << obj.label()
+              << "> enabled <" << obj.isEnabled() << "> color <" << obj.color()
+              << ">";
+}
+
 #endif /* LAYER_HPP */
