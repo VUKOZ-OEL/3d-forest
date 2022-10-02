@@ -23,7 +23,7 @@
 #define EXPORT_CORE_HPP
 
 #if defined(_MSC_VER)
-    #if defined(EXPORT_3dforestcore)
+    #if defined(EXPORT_3DForestCore)
         #define EXPORT_CORE __declspec(dllexport)
     #else
         #define EXPORT_CORE __declspec(dllimport)

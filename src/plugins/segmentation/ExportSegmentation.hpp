@@ -17,20 +17,20 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ExportEditor.hpp */
+/** @file ExportSegmentation.hpp */
 
-#ifndef EXPORT_EDITOR_HPP
-#define EXPORT_EDITOR_HPP
+#ifndef EXPORT_SEGMENTATION_HPP
+#define EXPORT_SEGMENTATION_HPP
 
 #if defined(_MSC_VER)
-    #if defined(EXPORT_3DForestEditor)
-        #define EXPORT_EDITOR __declspec(dllexport)
+    #if defined(EXPORT_3DForestSegmentationPlugin)
+        #define EXPORT_SEGMENTATION_PLUGIN __declspec(dllexport)
     #else
-        #define EXPORT_EDITOR __declspec(dllimport)
-        #define EXPORT_EDITOR_IMPORT
+        #define EXPORT_SEGMENTATION_PLUGIN __declspec(dllimport)
+        #define EXPORT_SEGMENTATION_PLUGIN_IMPORT
     #endif
 #else
-    #define EXPORT_EDITOR
+    #define EXPORT_SEGMENTATION_PLUGIN
 #endif
 
-#endif /* EXPORT_EDITOR_HPP */
+#endif /* EXPORT_SEGMENTATION_HPP */

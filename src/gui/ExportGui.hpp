@@ -23,7 +23,7 @@
 #define EXPORT_GUI_HPP
 
 #if defined(_MSC_VER)
-    #if defined(EXPORT_3dforestgui)
+    #if defined(EXPORT_3DForestGui)
         #define EXPORT_GUI __declspec(dllexport)
     #else
         #define EXPORT_GUI __declspec(dllimport)
