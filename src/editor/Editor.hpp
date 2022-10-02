@@ -38,6 +38,19 @@
 class EXPORT_EDITOR Editor
 {
 public:
+    /** Editor Data Type. */
+    enum Type
+    {
+        TYPE_CLASSIFICATION,
+        TYPE_CLIP_FILTER,
+        TYPE_DATA_SET,
+        TYPE_DESCRIPTOR,
+        TYPE_ELEVATION,
+        TYPE_LAYER,
+        TYPE_PROJECT_NAME,
+        TYPE_SETTINGS,
+    };
+
     Editor();
     ~Editor();
 

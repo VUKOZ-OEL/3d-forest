@@ -50,7 +50,7 @@ public:
     ProjectNavigatorClassifications(MainWindow *mainWindow);
 
 public slots:
-    void slotUpdate(QString target);
+    void slotUpdate(const QSet<Editor::Type> &target);
 
     void slotShow();
     void slotHide();

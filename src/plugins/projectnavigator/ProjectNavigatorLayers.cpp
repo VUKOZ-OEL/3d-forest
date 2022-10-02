@@ -121,13 +121,18 @@ ProjectNavigatorLayers::ProjectNavigatorLayers(MainWindow *mainWindow)
 
     // Data
     connect(mainWindow_,
-            SIGNAL(signalUpdate(QString)),
+            SIGNAL(signalUpdate(const QSet<Editor::Type> &)),
             this,
-            SLOT(slotUpdate(QString)));
+            SLOT(slotUpdate(const QSet<Editor::Type> &)));
 }
 
-void ProjectNavigatorLayers::slotUpdate(QString target)
+void ProjectNavigatorLayers::slotUpdate(const QSet<Editor::Type> &target)
 {
+    if (!target.empty() && !target.contains(Editor::TYPE_LAYER))
+    {
+        return;
+    }
+
     setLayers(mainWindow_->editor().layers());
 }
 

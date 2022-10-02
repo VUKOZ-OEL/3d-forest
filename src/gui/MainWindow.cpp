@@ -365,28 +365,25 @@ void MainWindow::slotRenderViewport(size_t viewportId)
     threadRender_.render(viewportId, viewports->camera(viewportId));
 }
 
-void MainWindow::update(const QString &target)
-{
-    LOG_DEBUG_LOCAL("");
-    LOG_UPDATE_VIEW(MODULE_NAME, "");
-
-    emit signalUpdate(target);
-}
-
-void MainWindow::update(const std::set<std::string> &target)
+void MainWindow::update(const QSet<Editor::Type> &target,
+                        Page::State viewPortsCacheState,
+                        bool resetCamera)
 {
     LOG_DEBUG_LOCAL("target <" << target << ">");
 
     suspendThreads();
     LOG_UPDATE_VIEW(MODULE_NAME, "");
 
-    editor_.viewports().setState(Page::STATE_READ);
+    editor_.viewports().setState(viewPortsCacheState);
     // editor_.viewports().clearContent();
 
-    emit signalUpdate("Test");
+    if (resetCamera)
+    {
+        ViewerViewports *viewports = viewerPlugin_->viewports();
+        viewports->resetScene(&editor_, false);
+    }
 
-    // ViewerViewports *viewports = viewerPlugin_->viewports();
-    // viewports->resetScene(&editor_, false);
+    emit signalUpdate(target);
 
     resumeThreads();
 }
@@ -404,7 +401,7 @@ void MainWindow::updateEverything()
     viewports->resetScene(&editor_, true);
     editor_.unlock();
 
-    emit signalUpdate("");
+    emit signalUpdate({});
 
     size_t viewportId = viewports->selectedViewportId();
     threadRender_.render(viewportId, viewports->camera(viewportId));

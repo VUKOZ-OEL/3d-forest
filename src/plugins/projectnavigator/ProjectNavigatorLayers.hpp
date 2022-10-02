@@ -50,7 +50,7 @@ public:
     ProjectNavigatorLayers(MainWindow *mainWindow);
 
 public slots:
-    void slotUpdate(QString target);
+    void slotUpdate(const QSet<Editor::Type> &target);
 
     void slotAdd();
     void slotDelete();
