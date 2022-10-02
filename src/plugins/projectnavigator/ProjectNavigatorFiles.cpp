@@ -120,13 +120,18 @@ ProjectNavigatorFiles::ProjectNavigatorFiles(MainWindow *mainWindow)
 
     // Data
     connect(mainWindow_,
-            SIGNAL(signalUpdate(QString)),
+            SIGNAL(signalUpdate(const QSet<Editor::Type> &)),
             this,
-            SLOT(slotUpdate(QString)));
+            SLOT(slotUpdate(const QSet<Editor::Type> &)));
 }
 
-void ProjectNavigatorFiles::slotUpdate(QString target)
+void ProjectNavigatorFiles::slotUpdate(const QSet<Editor::Type> &target)
 {
+    if (!target.empty() && !target.contains(Editor::TYPE_DATA_SET))
+    {
+        return;
+    }
+
     setDatasets(mainWindow_->editor().datasets());
 }
 

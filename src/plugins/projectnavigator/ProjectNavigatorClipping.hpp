@@ -41,7 +41,7 @@ public:
     ProjectNavigatorClipping(MainWindow *mainWindow);
 
 public slots:
-    void slotUpdate(QString target);
+    void slotUpdate(const QSet<Editor::Type> &target);
 
     void slotRangeIntermediateMinimumValue(int v);
     void slotRangeIntermediateMaximumValue(int v);

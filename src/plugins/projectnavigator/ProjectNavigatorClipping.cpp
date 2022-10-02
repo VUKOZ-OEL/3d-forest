@@ -109,13 +109,18 @@ ProjectNavigatorClipping::ProjectNavigatorClipping(MainWindow *mainWindow)
 
     // Data
     connect(mainWindow_,
-            SIGNAL(signalUpdate(QString)),
+            SIGNAL(signalUpdate(const QSet<Editor::Type> &)),
             this,
-            SLOT(slotUpdate(QString)));
+            SLOT(slotUpdate(const QSet<Editor::Type> &)));
 }
 
-void ProjectNavigatorClipping::slotUpdate(QString target)
+void ProjectNavigatorClipping::slotUpdate(const QSet<Editor::Type> &target)
 {
+    if (!target.empty() && !target.contains(Editor::TYPE_CLIP_FILTER))
+    {
+        return;
+    }
+
     LOG_DEBUG_LOCAL("");
 
     const Box<double> &boundary = mainWindow_->editor().datasets().boundary();

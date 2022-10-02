@@ -246,11 +246,11 @@ void SegmentationWindow::slotThread(bool finished, int progressPercent)
                                  << progressPercent << ">");
     // in gui thread: update visualization
     mainWindow_->setStatusProgressBarPercent(progressPercent);
-    (void)finished;
+
     if (finished)
     {
         LOG_UPDATE_VIEW(MODULE_NAME, "finished");
-        mainWindow_->update({"Layers", "Descriptor"});
+        mainWindow_->update({Editor::TYPE_LAYER, Editor::TYPE_DESCRIPTOR});
     }
 }
 

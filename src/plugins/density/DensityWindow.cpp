@@ -127,8 +127,5 @@ void DensityWindow::slotApply()
 
     progressDialog.setValue(progressDialog.maximum());
 
-    mainWindow_->editor().viewports().setState(Page::STATE_READ);
-    mainWindow_->resumeThreads();
-
-    // mainWindow_->updateEverything();
+    mainWindow_->update({Editor::TYPE_DENSITY});
 }

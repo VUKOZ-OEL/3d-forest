@@ -103,13 +103,19 @@ ProjectNavigatorClassifications::ProjectNavigatorClassifications(
 
     // Data
     connect(mainWindow_,
-            SIGNAL(signalUpdate(QString)),
+            SIGNAL(signalUpdate(const QSet<Editor::Type> &)),
             this,
-            SLOT(slotUpdate(QString)));
+            SLOT(slotUpdate(const QSet<Editor::Type> &)));
 }
 
-void ProjectNavigatorClassifications::slotUpdate(QString target)
+void ProjectNavigatorClassifications::slotUpdate(
+    const QSet<Editor::Type> &target)
 {
+    if (!target.empty() && !target.contains(Editor::TYPE_CLASSIFICATION))
+    {
+        return;
+    }
+
     setClassifications(mainWindow_->editor().classifications());
 }
 

@@ -170,11 +170,7 @@ void ElevationWindow::slotApply()
 
     progressDialog.setValue(progressDialog.maximum());
 
-    // mainWindow_->editor().viewports().setState(Page::STATE_READ);
-
-    // mainWindow_->resumeThreads();
-
-    mainWindow_->updateEverything();
+    mainWindow_->update({Editor::TYPE_ELEVATION});
 }
 
 ElevationPlugin::ElevationPlugin() : mainWindow_(nullptr), dockWindow_(nullptr)

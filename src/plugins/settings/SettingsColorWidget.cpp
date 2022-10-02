@@ -101,13 +101,18 @@ SettingsColorWidget::SettingsColorWidget(MainWindow *mainWindow)
 
     // Data
     connect(mainWindow_,
-            SIGNAL(signalUpdate(QString)),
+            SIGNAL(signalUpdate(const QSet<Editor::Type> &)),
             this,
-            SLOT(slotUpdate(QString)));
+            SLOT(slotUpdate(const QSet<Editor::Type> &)));
 }
 
-void SettingsColorWidget::slotUpdate(QString target)
+void SettingsColorWidget::slotUpdate(const QSet<Editor::Type> &target)
 {
+    if (!target.empty() && !target.contains(Editor::TYPE_SETTINGS))
+    {
+        return;
+    }
+
     setSettings(mainWindow_->editor().settings().view());
 }
 

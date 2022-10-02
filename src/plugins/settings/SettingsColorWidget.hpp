@@ -56,7 +56,7 @@ public:
     SettingsColorWidget(MainWindow *mainWindow);
 
 public slots:
-    void slotUpdate(QString target);
+    void slotUpdate(const QSet<Editor::Type> &target);
 
     void slotSetPointSize(int v);
     void slotSetFogEnabled(int v);

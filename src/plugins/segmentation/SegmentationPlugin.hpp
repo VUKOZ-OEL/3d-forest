@@ -24,18 +24,9 @@
 
 #include <PluginInterface.hpp>
 
-class SegmentationWindow;
+#include <ExportSegmentation.hpp>
 
-#if defined(_MSC_VER)
-    #if defined(EXPORT_3DForestSegmentationPlugin)
-        #define EXPORT_SEGMENTATION_PLUGIN __declspec(dllexport)
-    #else
-        #define EXPORT_SEGMENTATION_PLUGIN __declspec(dllimport)
-        #define EXPORT_SEGMENTATION_PLUGIN_IMPORT
-    #endif
-#else
-    #define EXPORT_SEGMENTATION_PLUGIN
-#endif
+class SegmentationWindow;
 
 /** Segmentation Plugin. */
 class EXPORT_SEGMENTATION_PLUGIN SegmentationPlugin : public QObject,

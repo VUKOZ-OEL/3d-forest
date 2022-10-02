@@ -61,13 +61,18 @@ ProjectNavigatorElevation::ProjectNavigatorElevation(MainWindow *mainWindow)
 
     // Data
     connect(mainWindow_,
-            SIGNAL(signalUpdate(QString)),
+            SIGNAL(signalUpdate(const QSet<Editor::Type> &)),
             this,
-            SLOT(slotUpdate(QString)));
+            SLOT(slotUpdate(const QSet<Editor::Type> &)));
 }
 
-void ProjectNavigatorElevation::slotUpdate(QString target)
+void ProjectNavigatorElevation::slotUpdate(const QSet<Editor::Type> &target)
 {
+    if (!target.empty() && !target.contains(Editor::TYPE_ELEVATION))
+    {
+        return;
+    }
+
     elevationRange_ = mainWindow_->editor().elevationRange();
     LOG_DEBUG_LOCAL("elevationRange <" << elevationRange_ << ">");
 

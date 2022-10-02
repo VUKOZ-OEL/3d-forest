@@ -25,10 +25,6 @@
 #define LOG_DEBUG_LOCAL(msg)
 //#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("SegmentationElement", msg)
 
-#if !defined(EXPORT_SEGMENTATION_PLUGIN_IMPORT)
-const uint32_t SegmentationElement::npos = UINT32_MAX;
-#endif
-
 SegmentationElement::SegmentationElement()
 {
     clear();

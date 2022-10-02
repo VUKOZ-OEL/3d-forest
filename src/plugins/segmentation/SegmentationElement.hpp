@@ -24,14 +24,13 @@
 
 #include <queue>
 
-#include <ExportEditor.hpp>
 #include <Voxels.hpp>
 
 /** Segmentation Element. */
-class EXPORT_EDITOR SegmentationElement
+class SegmentationElement
 {
 public:
-    static const uint32_t npos;
+    static const uint32_t npos = UINT32_MAX;
 
     SegmentationElement();
 
