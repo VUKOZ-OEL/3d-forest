@@ -44,6 +44,7 @@ public:
         TYPE_CLASSIFICATION,
         TYPE_CLIP_FILTER,
         TYPE_DATA_SET,
+        TYPE_DENSITY,
         TYPE_DESCRIPTOR,
         TYPE_ELEVATION,
         TYPE_LAYER,
