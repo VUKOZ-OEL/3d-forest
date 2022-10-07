@@ -135,6 +135,7 @@ bool SegmentationThread::compute()
         if (finishedState)
         {
             setState(STATE_DESCRIPTOR_THRESHOLD);
+            // setState(STATE_FINISHED);
         }
     }
     else if (state_ == STATE_DESCRIPTOR_THRESHOLD)
@@ -335,7 +336,7 @@ bool SegmentationThread::computeCreateVoxels()
     float descriptor;
     bool hasDescriptor;
 
-    while (voxels_.next(&voxel, &cell))
+    while (voxels_.next(&voxel, &cell, &query_))
     {
         // Compute PCA descriptor for one voxel.
         hasDescriptor = pca_.computeDescriptor(cell,

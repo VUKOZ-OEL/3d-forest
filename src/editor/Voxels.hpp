@@ -25,6 +25,8 @@
 #include <ExportEditor.hpp>
 #include <Voxel.hpp>
 
+class Query;
+
 /** Voxels. */
 class EXPORT_EDITOR Voxels
 {
@@ -38,7 +40,9 @@ public:
     const Box<double> &spaceRegion() const { return spaceRegion_; }
     const Vector3<double> &voxelSize() const { return voxelSize_; }
 
-    bool next(Voxel *voxel, Box<double> *cell = nullptr);
+    bool next(Voxel *voxel,
+              Box<double> *cell = nullptr,
+              Query *query = nullptr);
 
     // Occupancy
     size_t size() const { return voxels_.size(); }
@@ -124,7 +128,8 @@ protected:
 
     void push(size_t x1, size_t y1, size_t z1, size_t x2, size_t y2, size_t z2);
 
-    bool next(Box<double> *cell = nullptr,
+    bool next(Query *query,
+              Box<double> *cell = nullptr,
               size_t *index = nullptr,
               uint32_t *x = nullptr,
               uint32_t *y = nullptr,
