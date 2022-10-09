@@ -30,6 +30,8 @@
 #define MODULE_NAME "SegmentationThread"
 #define LOG_DEBUG_LOCAL(msg)
 //#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+#define LOG_DEBUG_LOCAL_STATE(msg)
+//#define LOG_DEBUG_LOCAL_STATE(msg) LOG_MODULE(MODULE_NAME, msg)
 
 SegmentationThread::SegmentationThread(Editor *editor)
     : editor_(editor),
@@ -38,9 +40,9 @@ SegmentationThread::SegmentationThread(Editor *editor)
       state_(STATE_FINISHED),
       stateInitialized_(false),
       layersCreated_(true),
+      progressPercent_(0),
       progressMax_(0),
       progressValue_(0),
-      progressPercent_(0),
       voxelSize_(0),
       minimumVoxelsInElement_(0),
       descriptorThresholdPercent_(0),
@@ -135,7 +137,6 @@ bool SegmentationThread::compute()
         if (finishedState)
         {
             setState(STATE_DESCRIPTOR_THRESHOLD);
-            // setState(STATE_FINISHED);
         }
     }
     else if (state_ == STATE_DESCRIPTOR_THRESHOLD)
@@ -334,11 +335,15 @@ bool SegmentationThread::computeCreateVoxels()
     double meanY;
     double meanZ;
     float descriptor;
-    bool hasDescriptor;
 
     while (voxels_.next(&voxel, &cell, &query_))
     {
+        size_t nPoints = 0;
+        size_t voxelIndex = voxels_.size();
+
+#if SEGMENTATION_THREAD_USE_PCA
         // Compute PCA descriptor for one voxel.
+        bool hasDescriptor;
         hasDescriptor = pca_.computeDescriptor(cell,
                                                queryDescriptor_,
                                                meanX,
@@ -348,9 +353,6 @@ bool SegmentationThread::computeCreateVoxels()
         if (hasDescriptor)
         {
             // Add reference to voxel item to each point inside this voxel.
-            size_t nPoints = 0;
-            size_t voxelIndex = voxels_.size();
-
             query_.selectBox(cell);
             query_.exec();
             while (query_.next())
@@ -359,21 +361,56 @@ bool SegmentationThread::computeCreateVoxels()
                 query_.setModified();
                 nPoints++;
             }
+        }
+#else
+        meanX = 0;
+        meanY = 0;
+        meanZ = 0;
+        descriptor = 1.0F;
 
-            if (nPoints > 0)
-            {
-                // Create new occupied voxel item.
-                voxel.meanX_ = meanX;
-                voxel.meanY_ = meanY;
-                voxel.meanZ_ = meanZ;
-                voxel.intensity_ = descriptor;
-                voxel.density_ = static_cast<float>(nPoints);
-                voxels_.addVoxel(voxel);
-            }
+        // Add reference to voxel item to each point inside this voxel.
+        query_.selectBox(cell);
+        query_.exec();
+        while (query_.next())
+        {
+            meanX += query_.x();
+            meanY += query_.y();
+            meanZ += query_.z();
+
+            query_.value() = voxelIndex;
+            query_.setModified();
+
+            nPoints++;
+        }
+
+        if (nPoints > 0)
+        {
+            const double d = static_cast<double>(nPoints);
+            meanX = meanX / d;
+            meanY = meanY / d;
+            meanZ = meanZ / d;
+        }
+#endif
+
+        // Create new occupied voxel item.
+        if (nPoints > 0)
+        {
+            voxel.meanX_ = meanX;
+            voxel.meanY_ = meanY;
+            voxel.meanZ_ = meanZ;
+            voxel.intensity_ = descriptor;
+            voxel.density_ = static_cast<float>(nPoints);
+            voxels_.addVoxel(voxel);
         }
 
         // Update progress.
-        progressValue_++;
+        progressValue_ = voxels_.visitedVoxelsCount();
+        if (progressValue_ == progressMax_)
+        {
+            LOG_DEBUG_LOCAL_STATE("visitedVoxelsCount");
+            break;
+        }
+
         counter++;
         if (counter > 10)
         {
