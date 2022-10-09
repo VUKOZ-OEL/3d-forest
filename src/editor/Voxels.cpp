@@ -23,6 +23,7 @@
 
 #include <Log.hpp>
 #include <Math.hpp>
+#include <Query.hpp>
 #include <Voxels.hpp>
 
 #define LOG_DEBUG_LOCAL(msg)
@@ -69,6 +70,7 @@ void Voxels::clear()
 
     // Create
     stack_.clear();
+    visitedVoxelsCount_ = 0;
 }
 
 void Voxels::addVoxel(const Voxel &voxel)
@@ -144,13 +146,14 @@ void Voxels::create(const Box<double> &spaceRegion, double voxelSize)
     LOG_DEBUG_LOCAL("voxelSize <" << voxelSize_ << ">");
 }
 
-bool Voxels::next(Voxel *voxel, Box<double> *cell)
+bool Voxels::next(Voxel *voxel, Box<double> *cell, Query *query)
 {
     std::memset(voxel, 0, sizeof(Voxel));
-    return next(cell, nullptr, &voxel->x_, &voxel->y_, &voxel->z_);
+    return next(query, cell, nullptr, &voxel->x_, &voxel->y_, &voxel->z_);
 }
 
-bool Voxels::next(Box<double> *cell,
+bool Voxels::next(Query *query,
+                  Box<double> *cell,
                   size_t *index,
                   uint32_t *x,
                   uint32_t *y,
@@ -172,25 +175,20 @@ bool Voxels::next(Box<double> *cell,
         size_t dz = z2 - z1;
         stack_.pop_back();
 
+        if (cell)
+        {
+            cell->set(
+                spaceRegion_.min(0) + voxelSize_[0] * static_cast<double>(x1),
+                spaceRegion_.min(1) + voxelSize_[1] * static_cast<double>(y1),
+                spaceRegion_.min(2) + voxelSize_[2] * static_cast<double>(z1),
+                spaceRegion_.min(0) + voxelSize_[0] * static_cast<double>(x2),
+                spaceRegion_.min(1) + voxelSize_[1] * static_cast<double>(y2),
+                spaceRegion_.min(2) + voxelSize_[2] * static_cast<double>(z2));
+        }
+
         // a) Return voxel cell 1x1x1.
         if (dx == 1 && dy == 1 && dz == 1)
         {
-            if (cell)
-            {
-                cell->set(spaceRegion_.min(0) +
-                              voxelSize_[0] * static_cast<double>(x1),
-                          spaceRegion_.min(1) +
-                              voxelSize_[1] * static_cast<double>(y1),
-                          spaceRegion_.min(2) +
-                              voxelSize_[2] * static_cast<double>(z1),
-                          spaceRegion_.min(0) +
-                              voxelSize_[0] * static_cast<double>(x2),
-                          spaceRegion_.min(1) +
-                              voxelSize_[1] * static_cast<double>(y2),
-                          spaceRegion_.min(2) +
-                              voxelSize_[2] * static_cast<double>(z2));
-            }
-
             if (index)
             {
                 *index = x1 + y1 * nx_ + z1 * nx_ * ny_;
@@ -211,7 +209,23 @@ bool Voxels::next(Box<double> *cell,
                 *z = static_cast<uint32_t>(z1);
             }
 
+            visitedVoxelsCount_++;
+
             return true;
+        }
+
+        if (cell && query)
+        {
+            query->selectBox(*cell);
+            query->setMaximumResults(1);
+            query->exec();
+            bool containsPoints = query->next();
+            query->setMaximumResults(0);
+            if (!containsPoints)
+            {
+                visitedVoxelsCount_ += dx * dy * dz;
+                continue;
+            }
         }
 
         // b) Subdivide cell 2x2x2, 2x1x1, etc.

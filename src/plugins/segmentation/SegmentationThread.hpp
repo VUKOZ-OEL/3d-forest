@@ -72,9 +72,10 @@ protected:
     State state_;
     bool stateInitialized_;
     bool layersCreated_;
+    int progressPercent_;
     uint64_t progressMax_;
     uint64_t progressValue_;
-    int progressPercent_;
+    double stateTime_;
 
     int voxelSize_;
     int minimumVoxelsInElement_;
