@@ -44,6 +44,8 @@ public:
               Box<double> *cell = nullptr,
               Query *query = nullptr);
 
+    uint64_t visitedVoxelsCount() const { return visitedVoxelsCount_; }
+
     // Occupancy
     size_t size() const { return voxels_.size(); }
 
@@ -125,6 +127,7 @@ protected:
 
     // Create
     std::vector<Box<size_t>> stack_;
+    uint64_t visitedVoxelsCount_;
 
     void push(size_t x1, size_t y1, size_t z1, size_t x2, size_t y2, size_t z2);
 

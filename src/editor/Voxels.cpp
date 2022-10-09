@@ -70,6 +70,7 @@ void Voxels::clear()
 
     // Create
     stack_.clear();
+    visitedVoxelsCount_ = 0;
 }
 
 void Voxels::addVoxel(const Voxel &voxel)
@@ -208,10 +209,12 @@ bool Voxels::next(Query *query,
                 *z = static_cast<uint32_t>(z1);
             }
 
+            visitedVoxelsCount_++;
+
             return true;
         }
 
-        if ((dx > 1 || dy > 1 || dz > 1) && cell && query)
+        if (cell && query)
         {
             query->selectBox(*cell);
             query->setMaximumResults(1);
@@ -220,6 +223,7 @@ bool Voxels::next(Query *query,
             query->setMaximumResults(0);
             if (!containsPoints)
             {
+                visitedVoxelsCount_ += dx * dy * dz;
                 continue;
             }
         }
