@@ -26,8 +26,9 @@
 #include <Query.hpp>
 #include <Voxels.hpp>
 
+#define MODULE_NAME "Voxels"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("Voxels", msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 // Use some maximum until the voxels can be streamed from a file.
 #define VOXELS_RESOLUTION_MAX 500
@@ -57,16 +58,12 @@ void Voxels::clear()
     // Voxels
     voxels_.clear();
 
+    // Sort
+    sortedVoxels_.clear();
+
     // Values
-    intensityMin_ = std::numeric_limits<float>::max();
-    intensityMax_ = std::numeric_limits<float>::min();
-
-    densityMin_ = std::numeric_limits<float>::max();
-    densityMax_ = std::numeric_limits<float>::min();
-
-    // occupiedClear();
-    // elementsClear();
-    // clustersClear();
+    descriptorMin_ = std::numeric_limits<float>::max();
+    descriptorMax_ = std::numeric_limits<float>::min();
 
     // Create
     stack_.clear();
@@ -75,15 +72,12 @@ void Voxels::clear()
 
 void Voxels::addVoxel(const Voxel &voxel)
 {
-    index_[indexOf(voxel)] = voxels_.size();
+    size_t voxelIndex = voxels_.size();
+
+    index_[indexOf(voxel)] = voxelIndex;
     voxels_.push_back(voxel);
 
-    updateRange(voxel.intensity_, intensityMin_, intensityMax_);
-    updateRange(voxel.density_, densityMin_, densityMax_);
-
-    LOG_DEBUG_LOCAL("intensity <" << voxel.intensity_ << "> min <"
-                                  << intensityMin_ << "> max <" << intensityMax_
-                                  << ">");
+    updateRange(voxel.descriptor_, descriptorMin_, descriptorMax_);
 }
 
 void Voxels::box(const Voxel &voxel, Box<double> *box)
@@ -105,9 +99,48 @@ void Voxels::box(const Voxel &voxel, Box<double> *box)
 
 void Voxels::normalize(Voxel *voxel)
 {
-    // Minimum intensity is zero to include voxels without computed descriptor.
-    ::normalize(voxel->intensity_, 0.0F, intensityMax_);
-    ::normalize(voxel->density_, densityMin_, densityMax_);
+    // Minimum descriptor is zero to include voxels without computed descriptor.
+    ::normalize(voxel->descriptor_, 0.0F, descriptorMax_);
+}
+
+static int VoxelsCompareFunctionZ(const void *a, const void *b)
+{
+    const Voxel *v1 = static_cast<const Voxel *>(a);
+    const Voxel *v2 = static_cast<const Voxel *>(b);
+
+    if (v1->z_ < v2->z_)
+    {
+        return -1;
+    }
+
+    if (v1->z_ > v2->z_)
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
+void Voxels::sort(double elevationMaximum)
+{
+    size_t nVoxels = voxels_.size();
+    size_t nUsed = 0;
+
+    sortedVoxels_.resize(nVoxels);
+    for (size_t i = 0; i < nVoxels; i++)
+    {
+        if (!(voxels_[i].meanElevation_ > elevationMaximum))
+        {
+            sortedVoxels_[nUsed] = &voxels_[i];
+            nUsed++;
+        }
+    }
+    sortedVoxels_.resize(nUsed);
+
+    std::qsort(sortedVoxels_.data(),
+               sortedVoxels_.size(),
+               sizeof(Voxel *),
+               VoxelsCompareFunctionZ);
 }
 
 void Voxels::create(const Box<double> &spaceRegion, double voxelSize)

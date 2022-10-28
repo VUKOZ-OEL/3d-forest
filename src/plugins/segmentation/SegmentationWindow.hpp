@@ -49,19 +49,18 @@ signals:
 
 protected slots:
     void slotVoxelSizeFinalValue();
-    void slotThresholdFinalValue();
-    void slotVoxelsInElementFinalValue();
+    void slotSeedElevationFinalValue();
+    void slotTreeHeightFinalValue();
 
     void slotAccept();
     void slotReject();
 
-protected:
+private:
     MainWindow *mainWindow_;
 
-    SliderWidget *previewSizeInput_;
     SliderWidget *voxelSizeInput_;
-    SliderWidget *thresholdInput_;
-    SliderWidget *voxelsInElementInput_;
+    SliderWidget *seedElevationInput_;
+    SliderWidget *treeHeightInput_;
 
     QPushButton *acceptButton_;
     QPushButton *rejectButton_;

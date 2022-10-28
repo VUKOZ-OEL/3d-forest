@@ -51,33 +51,18 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
     // Settings layout
     QVBoxLayout *settingsLayout = new QVBoxLayout;
 
-    // Input widgets
-    SliderWidget::create(previewSizeInput_,
-                         this,
-                         nullptr,
-                         nullptr,
-                         tr("Preview size"),
-                         tr("Preview size"),
-                         tr("%"),
-                         1,
-                         1,
-                         100,
-                         10);
-
-    settingsLayout->addWidget(previewSizeInput_);
-    previewSizeInput_->setDisabled(true);
-
+    // Input widgets:
+    // Voxel size
     SliderWidget::create(voxelSizeInput_,
                          this,
                          nullptr,
                          SLOT(slotVoxelSizeFinalValue()),
                          tr("Voxel size"),
                          tr("The automated segmentation creates voxel"
-                            " grid through the whole point cloud."
+                            "\ngrid through the whole point cloud."
                             "\nVoxel size should be small enough so that"
-                            " each voxel contains only one characteristic"
-                            "\nthat best fits the data inside voxel volume."
-                            " Each voxel should contain at least 3 points."),
+                            "\nmost voxels contain only points from a"
+                            " single tree."),
                          tr("pt"),
                          1,
                          SEGMENTATION_WINDOW_VOXEL_SIZE_DEFAULT_MIN,
@@ -86,38 +71,37 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
 
     settingsLayout->addWidget(voxelSizeInput_);
 
-    SliderWidget::create(thresholdInput_,
+    // Maximum elevation
+    SliderWidget::create(seedElevationInput_,
                          this,
                          nullptr,
-                         SLOT(slotThresholdFinalValue()),
-                         tr("Use descriptor values above"),
-                         tr("The range represents the lower limit of the"
-                            " used voxels for segmentation."
-                            "\nFor example, if the input threshold value"
-                            " is 70, then only the voxels whose descriptor"
-                            "\nvalue is at 70% of the actual value range"
-                            " or higher are used for the tree extraction."),
+                         SLOT(slotSeedElevationFinalValue()),
+                         tr("Maximum elevation of tree base"),
+                         tr("Maximum elevation of points which"
+                            "\nare used to start segmentation."),
                          tr("%"),
                          1,
-                         0,
+                         1,
                          100,
-                         30);
+                         10);
 
-    settingsLayout->addWidget(thresholdInput_);
+    settingsLayout->addWidget(seedElevationInput_);
 
-    SliderWidget::create(voxelsInElementInput_,
+    // Minimum height of tree
+    SliderWidget::create(treeHeightInput_,
                          this,
                          nullptr,
-                         SLOT(slotVoxelsInElementFinalValue()),
-                         tr("Voxels per element"),
-                         tr("Minimal number of voxels in an element"),
-                         tr("count"),
+                         SLOT(slotTreeHeightFinalValue()),
+                         tr("Minimum height of tree"),
+                         tr("Minimum height of cluster created from"
+                            "\nnearby points to mark it as a new tree"),
+                         tr("%"),
                          1,
                          1,
-                         999,
-                         150);
+                         100,
+                         25);
 
-    settingsLayout->addWidget(voxelsInElementInput_);
+    settingsLayout->addWidget(treeHeightInput_);
 
     settingsLayout->addStretch();
 
@@ -190,15 +174,15 @@ void SegmentationWindow::slotVoxelSizeFinalValue()
     resumeThreads();
 }
 
-void SegmentationWindow::slotThresholdFinalValue()
+void SegmentationWindow::slotSeedElevationFinalValue()
 {
-    LOG_DEBUG_LOCAL("value <" << thresholdInput_->value() << ">");
+    LOG_DEBUG_LOCAL("value <" << seedElevationInput_->value() << ">");
     resumeThreads();
 }
 
-void SegmentationWindow::slotVoxelsInElementFinalValue()
+void SegmentationWindow::slotTreeHeightFinalValue()
 {
-    LOG_DEBUG_LOCAL("value <" << voxelsInElementInput_->value() << ">");
+    LOG_DEBUG_LOCAL("value <" << treeHeightInput_->value() << ">");
     resumeThreads();
 }
 
@@ -267,7 +251,7 @@ void SegmentationWindow::resumeThreads()
     LOG_DEBUG_LOCAL("");
     // in gui thread: start new task in worker thread
     segmentationThread_.start(voxelSizeInput_->value(),
-                              thresholdInput_->value(),
-                              voxelsInElementInput_->value());
+                              seedElevationInput_->value(),
+                              treeHeightInput_->value());
     mainWindow_->setStatusProgressBarPercent(0);
 }

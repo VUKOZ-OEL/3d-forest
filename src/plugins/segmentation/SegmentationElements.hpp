@@ -17,36 +17,36 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationPlugin.hpp */
+/** @file SegmentationElements.hpp */
 
-#ifndef SEGMENTATION_PLUGIN_HPP
-#define SEGMENTATION_PLUGIN_HPP
+#ifndef SEGMENTATION_ELEMENTS_HPP
+#define SEGMENTATION_ELEMENTS_HPP
 
-#include <PluginInterface.hpp>
+#include <SegmentationElement.hpp>
 
-#include <ExportSegmentation.hpp>
-
-class SegmentationWindow;
-
-/** Segmentation Plugin. */
-class EXPORT_SEGMENTATION_PLUGIN SegmentationPlugin : public QObject,
-                                                      public PluginInterface
+/** Segmentation Elements. */
+class SegmentationElements
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
-    SegmentationPlugin();
+    static const uint32_t npos = UINT32_MAX;
 
-    virtual void initialize(MainWindow *mainWindow);
+    SegmentationElements();
 
-public slots:
-    void slotPlugin();
+    void clear();
+
+    uint32_t computeBase(Voxels &voxels,
+                         size_t voxelIndex,
+                         double minimumHeight);
+
+    size_t size() const { return elements_.size(); }
+    const SegmentationElement &operator[](size_t index) const
+    {
+        return *elements_[index];
+    }
 
 private:
-    MainWindow *mainWindow_;
-    SegmentationWindow *dockWindow_;
+    std::vector<std::shared_ptr<SegmentationElement>> elements_;
+    std::shared_ptr<SegmentationElement> newElement_;
 };
 
-#endif /* SEGMENTATION_PLUGIN_HPP */
+#endif /* SEGMENTATION_ELEMENTS_HPP */

@@ -49,7 +49,7 @@ public:
                            double &meanZ,
                            float &descriptor);
 
-protected:
+private:
     Eigen::MatrixXd xyz;
     Eigen::Matrix3d product;
     Eigen::Matrix3d eigenVectors;

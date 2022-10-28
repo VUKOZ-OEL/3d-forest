@@ -30,23 +30,21 @@
 class SegmentationElement
 {
 public:
-    static const uint32_t npos = UINT32_MAX;
-
     SegmentationElement();
 
     void clear();
 
-    uint32_t elementId() const { return elementId_; }
-    void elementIdNext() { elementId_++; }
+    bool computeStart(const Voxels &voxels, size_t voxelIndex);
+    bool computeBase(Voxels &voxels, double minimumHeight);
 
     const std::vector<size_t> &voxelList() const { return voxelList_; }
 
-    void computeStart(size_t voxelIndex, const Voxels &voxels);
-    bool compute(Voxels *voxels);
+    void setElementIndex(uint32_t index) { elementIndex_ = index; }
+    uint32_t elementIndex() const { return elementIndex_; }
 
-protected:
-    uint32_t elementId_;
-    std::vector<size_t> voxelList_;
+private:
+    double baseZ_;
+    double height_;
 
     struct Key
     {
@@ -54,8 +52,11 @@ protected:
         uint32_t y;
         uint32_t z;
     };
+    std::queue<Key> queue_;
 
-    std::queue<Key> queue;
+    std::vector<size_t> voxelList_;
+
+    uint32_t elementIndex_;
 };
 
 #endif /* SEGMENTATION_ELEMENT_HPP */

@@ -51,16 +51,19 @@ public:
 
     void addVoxel(const Voxel &voxel);
 
-    const Voxel &at(size_t index) const { return voxels_[index]; }
-
     Voxel &at(size_t index) { return voxels_[index]; }
-
+    const Voxel &at(size_t index) const { return voxels_[index]; }
+    Voxel &at(size_t x, size_t y, size_t z) { return voxels_[find(x, y, z)]; }
     const Voxel &at(size_t x, size_t y, size_t z) const
     {
         return voxels_[find(x, y, z)];
     }
 
-    Voxel &at(size_t x, size_t y, size_t z) { return voxels_[find(x, y, z)]; }
+    // Sort
+    void sort(double elevationMaximum);
+    size_t sortedSize() const { return sortedVoxels_.size(); }
+    Voxel &sortedAt(size_t index) { return *sortedVoxels_[index]; }
+    const Voxel &sortedAt(size_t index) const { return *sortedVoxels_[index]; }
 
     // Grid
     size_t sizeX() const { return nx_; }
@@ -93,18 +96,15 @@ public:
     void box(const Voxel &voxel, Box<double> *box);
 
     // Values
-    float intensityMin() const { return intensityMin_; }
-    float intensityMax() const { return intensityMax_; }
-
-    float densityMin() const { return densityMin_; }
-    float densityMax() const { return densityMax_; }
+    float descriptorMin() const { return descriptorMin_; }
+    float descriptorMax() const { return descriptorMax_; }
 
     void normalize(Voxel *voxel);
 
     // Debug
     void dump() const;
 
-protected:
+private:
     // Region
     Box<double> spaceRegion_;
     double voxelSizeInput_;
@@ -119,11 +119,12 @@ protected:
     // Voxels
     std::vector<Voxel> voxels_;
 
+    // Sort
+    std::vector<Voxel *> sortedVoxels_;
+
     // Values
-    float intensityMin_;
-    float intensityMax_;
-    float densityMin_;
-    float densityMax_;
+    float descriptorMin_;
+    float descriptorMax_;
 
     // Create
     std::vector<Box<size_t>> stack_;

@@ -22,8 +22,9 @@
 #include <Log.hpp>
 #include <SegmentationElement.hpp>
 
+#define MODULE_NAME "SegmentationElement"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("SegmentationElement", msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 SegmentationElement::SegmentationElement()
 {
@@ -32,68 +33,84 @@ SegmentationElement::SegmentationElement()
 
 void SegmentationElement::clear()
 {
-    elementId_ = 0;
+    baseZ_ = 0.0;
+    height_ = 0.0;
+
+    std::queue<Key> queueEmpty_;
+    std::swap(queue_, queueEmpty_);
+
     voxelList_.clear();
+
+    elementIndex_ = 0;
 }
 
-void SegmentationElement::computeStart(size_t voxelIndex, const Voxels &voxels)
+bool SegmentationElement::computeStart(const Voxels &voxels, size_t voxelIndex)
 {
-    voxelList_.clear();
+    clear();
 
-    const Voxel &v = voxels.at(voxelIndex);
+    const Voxel &v = voxels.sortedAt(voxelIndex);
+
     if (v.status_ == 0)
     {
-        queue.push({v.x_, v.y_, v.z_});
+        queue_.push({v.x_, v.y_, v.z_});
+        baseZ_ = v.meanZ_;
+        return true;
     }
+
+    return false;
 }
 
-bool SegmentationElement::compute(Voxels *voxels)
+bool SegmentationElement::computeBase(Voxels &voxels, double minimumHeight)
 {
-    while (!queue.empty())
+    while (!queue_.empty())
     {
-        Key k = queue.front();
-        queue.pop();
+        // get current voxel
+        Key k = queue_.front();
+        queue_.pop();
 
-        size_t index = voxels->find(k.x, k.y, k.z);
+        size_t index = voxels.find(k.x, k.y, k.z);
         if (index == Voxels::npos)
         {
             continue;
         }
 
-        Voxel &v = voxels->at(index);
+        Voxel &v = voxels.at(index);
         if (v.status_ != 0)
         {
             continue;
         }
 
+        // mark as processed
         v.status_ |= Voxel::STATUS_VISITED;
         voxelList_.push_back(index);
 
-        if (k.x + 1 < voxels->sizeX())
+        // check height
+        height_ = v.meanZ_ - baseZ_;
+        if (!(height_ < minimumHeight))
         {
-            queue.push({k.x + 1, k.y, k.z});
+            return true;
         }
-        if (k.x > 0)
+
+        // next
+        if (k.z + 1 < voxels.sizeZ())
         {
-            queue.push({k.x - 1, k.y, k.z});
-        }
-        if (k.y + 1 < voxels->sizeY())
-        {
-            queue.push({k.x, k.y + 1, k.z});
-        }
-        if (k.y > 0)
-        {
-            queue.push({k.x, k.y - 1, k.z});
-        }
-        if (k.z + 1 < voxels->sizeZ())
-        {
-            queue.push({k.x, k.y, k.z + 1});
-        }
-        if (k.z > 0)
-        {
-            queue.push({k.x, k.y, k.z - 1});
+            if (k.x > 0 && k.x + 1 < voxels.sizeX() && k.y > 0 &&
+                k.y + 1 < voxels.sizeY())
+            {
+                queue_.push({k.x, k.y, k.z + 1});
+
+                queue_.push({k.x + 1, k.y, k.z + 1});
+                queue_.push({k.x - 1, k.y, k.z + 1});
+                queue_.push({k.x, k.y + 1, k.z + 1});
+                queue_.push({k.x, k.y - 1, k.z + 1});
+
+                queue_.push({k.x + 1, k.y + 1, k.z + 1});
+                queue_.push({k.x + 1, k.y - 1, k.z + 1});
+                queue_.push({k.x - 1, k.y + 1, k.z + 1});
+                queue_.push({k.x - 1, k.y - 1, k.z + 1});
+            }
         }
     }
 
-    return true;
+    return false;
 }

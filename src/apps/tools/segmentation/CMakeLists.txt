@@ -21,7 +21,7 @@ add_executable(
     ${SUB_PROJECT_NAME}
     segmentation.cpp
     ../../../plugins/segmentation/SegmentationElement.cpp
-    ../../../plugins/segmentation/SegmentationPca.cpp
+    ../../../plugins/segmentation/SegmentationElements.cpp
     ../../../plugins/segmentation/SegmentationThread.cpp
 )
 

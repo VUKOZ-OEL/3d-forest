@@ -32,21 +32,22 @@ public:
     static const uint32_t STATUS_IGNORED;
     static const uint32_t STATUS_VISITED;
 
+    static const uint32_t npos = UINT32_MAX;
+
     uint32_t status_;
 
     uint32_t x_;
     uint32_t y_;
     uint32_t z_;
 
-    float intensity_; // <0, 1>
-    float density_;   // <0, 1>
-
     double meanX_;
     double meanY_;
     double meanZ_;
+    double meanElevation_;
 
-    uint32_t elementId_;
-    uint32_t clusterId_;
+    float descriptor_; // <0, 1>
+
+    uint32_t elementIndex_;
 
     Voxel() = default;
 
@@ -56,20 +57,7 @@ public:
           double meanX,
           double meanY,
           double meanZ,
-          float intensity = 1.0,
-          float density = 1.0);
-
-    void set(uint32_t x,
-             uint32_t y,
-             uint32_t z,
-             double meanX,
-             double meanY,
-             double meanZ,
-             float intensity = 1.0,
-             float density = 1.0,
-             uint32_t status = 0,
-             uint32_t elementId = 0,
-             uint32_t clusterId = 0);
+          double meanElevation = 0.0);
 
     void clear();
     void clearState();
@@ -81,9 +69,9 @@ inline std::ostream &operator<<(std::ostream &os, const Voxel &obj)
     return os << std::fixed
               << "((" << obj.x_ << ", " << obj.y_ << ", " << obj.z_ << "), "
               << obj.status_ << ", "
-              << obj.intensity_ << ", " << obj.density_ << ", "
-              << obj.elementId_ << ", " << obj.clusterId_ << ", ("
-              << obj.meanX_ << ", " << obj.meanY_ << ", " << obj.meanZ_ << "))"
+              << obj.descriptor_ << ", " << obj.elementIndex_ << ", ("
+              << obj.meanX_ << ", " << obj.meanY_ << ", " << obj.meanZ_ << ", "
+              << obj.meanElevation_ << "))"
               << std::defaultfloat;
     // clang-format on
 }
