@@ -38,6 +38,7 @@
 #define MODULE_NAME "SegmentationWindow"
 #define LOG_DEBUG_LOCAL(msg)
 //#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+#define LOG_DEBUG_LOCAL_THREAD(msg)
 
 #define SEGMENTATION_WINDOW_VOXEL_SIZE_DEFAULT_MIN 1
 #define SEGMENTATION_WINDOW_VOXEL_SIZE_DEFAULT_MAX 100
@@ -84,8 +85,8 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
                               1,
                               1,
                               25,
-                              2,
-                              5);
+                              4,
+                              6);
 
     settingsLayout->addWidget(seedElevationInput_);
 
@@ -227,15 +228,15 @@ void SegmentationWindow::closeEvent(QCloseEvent *event)
 
 void SegmentationWindow::threadProgress(bool finished)
 {
-    LOG_DEBUG_LOCAL("finished <" << finished << ">");
+    LOG_DEBUG_LOCAL_THREAD("finished <" << finished << ">");
     // in worker thread: notify gui thread
     emit signalThread(finished, segmentationThread_.progressPercent());
 }
 
 void SegmentationWindow::slotThread(bool finished, int progressPercent)
 {
-    LOG_DEBUG_LOCAL("finished <" << finished << "> progress <"
-                                 << progressPercent << ">");
+    LOG_DEBUG_LOCAL_THREAD("finished <" << finished << "> progress <"
+                                        << progressPercent << ">");
     // in gui thread: update visualization
     mainWindow_->setStatusProgressBarPercent(progressPercent);
 
@@ -256,11 +257,19 @@ void SegmentationWindow::suspendThreads()
 
 void SegmentationWindow::resumeThreads()
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL("voxelSize <"
+                    << voxelSizeInput_->value() << "> seedElevationMinimum <"
+                    << seedElevationInput_->minimumValue()
+                    << "> seedElevationMaximum <"
+                    << seedElevationInput_->maximumValue()
+                    << "> treeHeightMinimum <" << treeHeightInput_->value()
+                    << ">");
+
     // in gui thread: start new task in worker thread
     segmentationThread_.start(voxelSizeInput_->value(),
                               seedElevationInput_->minimumValue(),
                               seedElevationInput_->maximumValue(),
                               treeHeightInput_->value());
+
     mainWindow_->setStatusProgressBarPercent(0);
 }

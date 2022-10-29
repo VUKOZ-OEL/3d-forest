@@ -108,12 +108,12 @@ static int VoxelsCompareFunctionZ(const void *a, const void *b)
     const Voxel *v1 = static_cast<const Voxel *>(a);
     const Voxel *v2 = static_cast<const Voxel *>(b);
 
-    if (v1->z_ < v2->z_)
+    if (v1->z_ > v2->z_)
     {
         return -1;
     }
 
-    if (v1->z_ > v2->z_)
+    if (v1->z_ < v2->z_)
     {
         return 1;
     }
@@ -142,6 +142,11 @@ void Voxels::sort(double elevationMinimum, double elevationMaximum)
                sortedVoxels_.size(),
                sizeof(Voxel *),
                VoxelsCompareFunctionZ);
+
+    LOG_DEBUG_LOCAL("sortedVoxels <"
+                    << sortedVoxels_.size() << ">"
+                    << " elevationMinimum <" << elevationMinimum << ">"
+                    << " elevationMaximum <" << elevationMaximum << ">");
 }
 
 void Voxels::create(const Box<double> &spaceRegion, double voxelSize)

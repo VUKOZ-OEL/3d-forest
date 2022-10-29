@@ -74,10 +74,10 @@ void SegmentationThread::start(int voxelSize,
 {
     // clang-format off
     LOG_DEBUG_LOCAL(
-        << "voxelSize <" << voxelSize
-        << "> seedElevationMinimumPercent <" << seedElevationMinimumPercent
-        << "> seedElevationMaximumPercent <" << seedElevationMaximumPercent
-        << "> treeHeightMinimumPercent <" << treeHeightMinimumPercent << ">");
+        "voxelSize <" << voxelSize <<
+        "> seedElevationMinimumPercent <" << seedElevationMinimumPercent <<
+        "> seedElevationMaximumPercent <" << seedElevationMaximumPercent <<
+        "> treeHeightMinimumPercent <" << treeHeightMinimumPercent << ">");
     // clang-format on
 
     // Cancel current computation
