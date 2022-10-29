@@ -46,8 +46,8 @@ ProjectNavigatorClipping::ProjectNavigatorClipping(MainWindow *mainWindow)
     // Input widgets
     RangeSliderWidget::create(rangeInput_[0],
                               this,
-                              SLOT(slotRangeIntermediateMinimumValue(int)),
-                              SLOT(slotRangeIntermediateMaximumValue(int)),
+                              SLOT(slotRangeIntermediateMinimumValue()),
+                              SLOT(slotRangeIntermediateMaximumValue()),
                               tr("X range"),
                               tr("Min-max clipping range filter along X axis"),
                               tr("pt"),
@@ -59,8 +59,8 @@ ProjectNavigatorClipping::ProjectNavigatorClipping(MainWindow *mainWindow)
 
     RangeSliderWidget::create(rangeInput_[1],
                               this,
-                              SLOT(slotRangeIntermediateMinimumValue(int)),
-                              SLOT(slotRangeIntermediateMaximumValue(int)),
+                              SLOT(slotRangeIntermediateMinimumValue()),
+                              SLOT(slotRangeIntermediateMaximumValue()),
                               tr("Y range"),
                               tr("Min-max clipping range filter along Y axis"),
                               tr("pt"),
@@ -72,8 +72,8 @@ ProjectNavigatorClipping::ProjectNavigatorClipping(MainWindow *mainWindow)
 
     RangeSliderWidget::create(rangeInput_[2],
                               this,
-                              SLOT(slotRangeIntermediateMinimumValue(int)),
-                              SLOT(slotRangeIntermediateMaximumValue(int)),
+                              SLOT(slotRangeIntermediateMinimumValue()),
+                              SLOT(slotRangeIntermediateMaximumValue()),
                               tr("Z range"),
                               tr("Min-max clipping range filter along Z axis"),
                               tr("pt"),
@@ -145,15 +145,16 @@ void ProjectNavigatorClipping::slotUpdate(const QSet<Editor::Type> &target)
     }
 }
 
-void ProjectNavigatorClipping::slotRangeIntermediateMinimumValue(int v)
+void ProjectNavigatorClipping::slotRangeIntermediateMinimumValue()
 {
-    LOG_DEBUG_LOCAL("minimumValue <" << v << ">");
-
+    LOG_DEBUG_LOCAL("");
     QObject *obj = sender();
     for (int i = 0; i < 3; i++)
     {
         if (obj == rangeInput_[i])
         {
+            int v = rangeInput_[i]->minimumValue();
+            LOG_DEBUG_LOCAL("minimumValue <" << v << ">");
             clipRange_[i].setMinimumValue(v);
         }
     }
@@ -161,15 +162,16 @@ void ProjectNavigatorClipping::slotRangeIntermediateMinimumValue(int v)
     filterChanged();
 }
 
-void ProjectNavigatorClipping::slotRangeIntermediateMaximumValue(int v)
+void ProjectNavigatorClipping::slotRangeIntermediateMaximumValue()
 {
-    LOG_DEBUG_LOCAL("maximumValue <" << v << ">");
-
+    LOG_DEBUG_LOCAL("");
     QObject *obj = sender();
     for (int i = 0; i < 3; i++)
     {
         if (obj == rangeInput_[i])
         {
+            int v = rangeInput_[i]->maximumValue();
+            LOG_DEBUG_LOCAL("maximumValue <" << v << ">");
             clipRange_[i].setMaximumValue(v);
         }
     }

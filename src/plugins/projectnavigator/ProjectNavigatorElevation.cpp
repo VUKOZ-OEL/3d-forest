@@ -42,8 +42,8 @@ ProjectNavigatorElevation::ProjectNavigatorElevation(MainWindow *mainWindow)
     // Input widgets
     RangeSliderWidget::create(rangeInput_,
                               this,
-                              SLOT(slotRangeIntermediateMinimumValue(int)),
-                              SLOT(slotRangeIntermediateMaximumValue(int)),
+                              SLOT(slotRangeIntermediateMinimumValue()),
+                              SLOT(slotRangeIntermediateMaximumValue()),
                               tr("Range"),
                               tr("Min-max elevation range filter"),
                               tr("pt"),
@@ -84,22 +84,20 @@ void ProjectNavigatorElevation::slotUpdate(const QSet<Editor::Type> &target)
     rangeInput_->blockSignals(false);
 }
 
-void ProjectNavigatorElevation::slotRangeIntermediateMinimumValue(int v)
+void ProjectNavigatorElevation::slotRangeIntermediateMinimumValue()
 {
-    LOG_DEBUG_LOCAL("minimumValue <" << rangeInput_->minimumValue() << "> v <"
-                                     << v << ">");
+    LOG_DEBUG_LOCAL("minimumValue <" << rangeInput_->minimumValue() << ">");
 
-    elevationRange_.setMinimumValue(v);
+    elevationRange_.setMinimumValue(rangeInput_->minimumValue());
 
     filterChanged();
 }
 
-void ProjectNavigatorElevation::slotRangeIntermediateMaximumValue(int v)
+void ProjectNavigatorElevation::slotRangeIntermediateMaximumValue()
 {
-    LOG_DEBUG_LOCAL("maximumValue <" << rangeInput_->maximumValue() << "> v <"
-                                     << v << ">");
+    LOG_DEBUG_LOCAL("maximumValue <" << rangeInput_->maximumValue() << ">");
 
-    elevationRange_.setMaximumValue(v);
+    elevationRange_.setMaximumValue(rangeInput_->maximumValue());
 
     filterChanged();
 }

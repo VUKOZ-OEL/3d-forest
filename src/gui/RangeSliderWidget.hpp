@@ -64,8 +64,8 @@ public:
     void blockSignals(bool block);
 
 signals:
-    void signalIntermediateMinimumValue(int v);
-    void signalIntermediateMaximumValue(int v);
+    void signalIntermediateMinimumValue();
+    void signalIntermediateMaximumValue();
 
 protected slots:
     void slotIntermediateMinimumValue(int v);
@@ -75,6 +75,8 @@ protected:
     ctkRangeSlider *slider_;
     QSpinBox *minSpinBox_;
     QSpinBox *maxSpinBox_;
+    int minimumValue_;
+    int maximumValue_;
 };
 
 #endif /* RANGE_SLIDER_WIDGET_HPP */

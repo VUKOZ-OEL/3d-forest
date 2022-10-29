@@ -31,7 +31,13 @@
 
 #include <ctkrangeslider.h>
 
-RangeSliderWidget::RangeSliderWidget() : QWidget()
+RangeSliderWidget::RangeSliderWidget()
+    : QWidget(),
+      slider_(nullptr),
+      minSpinBox_(nullptr),
+      maxSpinBox_(nullptr),
+      minimumValue_(0),
+      maximumValue_(0)
 {
 }
 
@@ -40,6 +46,7 @@ void RangeSliderWidget::setMinimum(int min)
     minSpinBox_->setMinimum(min);
     maxSpinBox_->setMinimum(min);
     slider_->setMinimum(min);
+    minimumValue_ = min;
 }
 
 void RangeSliderWidget::setMaximum(int max)
@@ -47,28 +54,31 @@ void RangeSliderWidget::setMaximum(int max)
     minSpinBox_->setMaximum(max);
     maxSpinBox_->setMaximum(max);
     slider_->setMaximum(max);
+    maximumValue_ = max;
 }
 
 void RangeSliderWidget::setMinimumValue(int value)
 {
     minSpinBox_->setValue(value);
     slider_->setMinimumValue(value);
+    minimumValue_ = value;
 }
 
 int RangeSliderWidget::minimumValue()
 {
-    return slider_->minimumValue();
+    return minimumValue_;
 }
 
 void RangeSliderWidget::setMaximumValue(int value)
 {
     maxSpinBox_->setValue(value);
     slider_->setMaximumValue(value);
+    maximumValue_ = value;
 }
 
 int RangeSliderWidget::maximumValue()
 {
-    return slider_->maximumValue();
+    return maximumValue_;
 }
 
 void RangeSliderWidget::blockSignals(bool block)
@@ -95,7 +105,9 @@ void RangeSliderWidget::slotIntermediateMinimumValue(int v)
         slider_->blockSignals(false);
     }
 
-    emit signalIntermediateMinimumValue(v);
+    minimumValue_ = v;
+
+    emit signalIntermediateMinimumValue();
 }
 
 void RangeSliderWidget::slotIntermediateMaximumValue(int v)
@@ -115,7 +127,9 @@ void RangeSliderWidget::slotIntermediateMaximumValue(int v)
         slider_->blockSignals(false);
     }
 
-    emit signalIntermediateMaximumValue(v);
+    maximumValue_ = v;
+
+    emit signalIntermediateMaximumValue();
 }
 
 void RangeSliderWidget::create(RangeSliderWidget *&outputWidget,
@@ -169,7 +183,7 @@ void RangeSliderWidget::create(RangeSliderWidget *&outputWidget,
     if (memberIntermediateMinimumValue)
     {
         connect(outputWidget,
-                SIGNAL(signalIntermediateMinimumValue(int)),
+                SIGNAL(signalIntermediateMinimumValue()),
                 receiver,
                 memberIntermediateMinimumValue);
     }
@@ -182,7 +196,7 @@ void RangeSliderWidget::create(RangeSliderWidget *&outputWidget,
     if (memberIntermediateMaximumValue)
     {
         connect(outputWidget,
-                SIGNAL(signalIntermediateMaximumValue(int)),
+                SIGNAL(signalIntermediateMaximumValue()),
                 receiver,
                 memberIntermediateMaximumValue);
     }
