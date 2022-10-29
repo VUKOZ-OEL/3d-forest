@@ -99,6 +99,7 @@ static void saveVoxels(const Editor &editor, const char *path)
 
 static void segmentation(const char *path,
                          int voxelSize,
+                         int seedElevationMinimumPercent,
                          int seedElevationMaximumPercent,
                          int treeHeightMinimumPercent)
 {
@@ -110,6 +111,7 @@ static void segmentation(const char *path,
     SegmentationThread segmentationThread(&editor);
     segmentationThread.create();
     segmentationThread.start(voxelSize,
+                             seedElevationMinimumPercent,
                              seedElevationMaximumPercent,
                              treeHeightMinimumPercent);
     segmentationThread.wait();
@@ -122,8 +124,9 @@ int main(int argc, char *argv[])
 {
     const char *path = nullptr;
     int voxelSize = 10;
+    int seedElevationMinimumPercent = 1;
     int seedElevationMaximumPercent = 5;
-    int treeHeightMinimumPercent = 25;
+    int treeHeightMinimumPercent = 10;
 
     if (argc > 1)
     {
@@ -137,12 +140,17 @@ int main(int argc, char *argv[])
 
     if (argc > 3)
     {
-        seedElevationMaximumPercent = atoi(argv[3]);
+        seedElevationMinimumPercent = atoi(argv[3]);
     }
 
     if (argc > 4)
     {
-        treeHeightMinimumPercent = atoi(argv[4]);
+        seedElevationMaximumPercent = atoi(argv[4]);
+    }
+
+    if (argc > 5)
+    {
+        treeHeightMinimumPercent = atoi(argv[5]);
     }
 
     try
@@ -155,6 +163,7 @@ int main(int argc, char *argv[])
 
         segmentation(path,
                      voxelSize,
+                     seedElevationMinimumPercent,
                      seedElevationMaximumPercent,
                      treeHeightMinimumPercent);
     }

@@ -43,8 +43,10 @@ SegmentationThread::SegmentationThread(Editor *editor)
       progressMax_(0),
       progressValue_(0),
       voxelSize_(0),
+      seedElevationMinimumPercent_(0),
       seedElevationMaximumPercent_(0),
       treeHeightMinimumPercent_(0),
+      seedElevationMinimum_(0),
       seedElevationMaximum_(0),
       treeHeightMinimum_(0),
       timeBegin(0),
@@ -66,14 +68,17 @@ void SegmentationThread::clear()
 }
 
 void SegmentationThread::start(int voxelSize,
+                               int seedElevationMinimumPercent,
                                int seedElevationMaximumPercent,
                                int treeHeightMinimumPercent)
 {
+    // clang-format off
     LOG_DEBUG_LOCAL(
-        ""
-        << "voxelSize <" << voxelSize << "> seedElevationMaximumPercent <"
-        << seedElevationMaximumPercent << "> treeHeightMinimumPercent <"
-        << treeHeightMinimumPercent << ">");
+        << "voxelSize <" << voxelSize
+        << "> seedElevationMinimumPercent <" << seedElevationMinimumPercent
+        << "> seedElevationMaximumPercent <" << seedElevationMaximumPercent
+        << "> treeHeightMinimumPercent <" << treeHeightMinimumPercent << ">");
+    // clang-format on
 
     // Cancel current computation
     cancel();
@@ -89,11 +94,16 @@ void SegmentationThread::start(int voxelSize,
         startState = STATE_SORT_VOXELS;
     }
 
-    if (seedElevationMaximumPercent != seedElevationMaximumPercent_)
+    if (seedElevationMinimumPercent != seedElevationMinimumPercent_ ||
+        seedElevationMaximumPercent != seedElevationMaximumPercent_)
     {
+        seedElevationMinimumPercent_ = seedElevationMinimumPercent;
         seedElevationMaximumPercent_ = seedElevationMaximumPercent;
+
         double h = editor_->clipBoundary().length(2);
+        seedElevationMinimum_ = h * (seedElevationMinimumPercent_ / 100.0);
         seedElevationMaximum_ = h * (seedElevationMaximumPercent_ / 100.0);
+
         startState = STATE_SORT_VOXELS;
     }
 
@@ -413,7 +423,7 @@ bool SegmentationThread::computeSortVoxels()
     }
 
     // Next step
-    voxels_.sort(seedElevationMaximum_);
+    voxels_.sort(seedElevationMinimum_, seedElevationMaximum_);
 
     // Finished
     progressPercent_ = 100;

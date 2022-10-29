@@ -40,6 +40,7 @@ public:
     void clear();
 
     void start(int voxelSize,
+               int seedElevationMinimumPercent,
                int seedElevationMaximumPercent,
                int treeHeightMinimumPercent);
 
@@ -76,9 +77,11 @@ private:
     double stateTime_;
 
     int voxelSize_;
+    int seedElevationMinimumPercent_;
     int seedElevationMaximumPercent_;
     int treeHeightMinimumPercent_;
 
+    double seedElevationMinimum_;
     double seedElevationMaximum_;
     double treeHeightMinimum_;
 

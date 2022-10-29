@@ -121,7 +121,7 @@ static int VoxelsCompareFunctionZ(const void *a, const void *b)
     return 0;
 }
 
-void Voxels::sort(double elevationMaximum)
+void Voxels::sort(double elevationMinimum, double elevationMaximum)
 {
     size_t nVoxels = voxels_.size();
     size_t nUsed = 0;
@@ -129,7 +129,8 @@ void Voxels::sort(double elevationMaximum)
     sortedVoxels_.resize(nVoxels);
     for (size_t i = 0; i < nVoxels; i++)
     {
-        if (!(voxels_[i].meanElevation_ > elevationMaximum))
+        if (!(voxels_[i].meanElevation_ < elevationMinimum ||
+              voxels_[i].meanElevation_ > elevationMaximum))
         {
             sortedVoxels_[nUsed] = &voxels_[i];
             nUsed++;

@@ -21,6 +21,7 @@
 
 #include <Log.hpp>
 #include <MainWindow.hpp>
+#include <RangeSliderWidget.hpp>
 #include <SegmentationWindow.hpp>
 #include <SliderWidget.hpp>
 #include <ThemeIcon.hpp>
@@ -72,18 +73,19 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
     settingsLayout->addWidget(voxelSizeInput_);
 
     // Maximum elevation
-    SliderWidget::create(seedElevationInput_,
-                         this,
-                         nullptr,
-                         SLOT(slotSeedElevationFinalValue()),
-                         tr("Maximum elevation of tree base"),
-                         tr("Maximum elevation of points which"
-                            "\nare used to start segmentation."),
-                         tr("%"),
-                         1,
-                         1,
-                         100,
-                         10);
+    RangeSliderWidget::create(seedElevationInput_,
+                              this,
+                              SLOT(slotSeedElevationMinimumValue()),
+                              SLOT(slotSeedElevationMaximumValue()),
+                              tr("Elevation range of tree base"),
+                              tr("Elevation range of points which"
+                                 "\nare used to start segmentation."),
+                              tr("%"),
+                              1,
+                              1,
+                              25,
+                              2,
+                              5);
 
     settingsLayout->addWidget(seedElevationInput_);
 
@@ -99,7 +101,7 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
                          1,
                          1,
                          100,
-                         25);
+                         10);
 
     settingsLayout->addWidget(treeHeightInput_);
 
@@ -174,9 +176,15 @@ void SegmentationWindow::slotVoxelSizeFinalValue()
     resumeThreads();
 }
 
-void SegmentationWindow::slotSeedElevationFinalValue()
+void SegmentationWindow::slotSeedElevationMinimumValue()
 {
-    LOG_DEBUG_LOCAL("value <" << seedElevationInput_->value() << ">");
+    LOG_DEBUG_LOCAL("value <" << seedElevationInput_->minimumValue() << ">");
+    resumeThreads();
+}
+
+void SegmentationWindow::slotSeedElevationMaximumValue()
+{
+    LOG_DEBUG_LOCAL("value <" << seedElevationInput_->maximumValue() << ">");
     resumeThreads();
 }
 
@@ -251,7 +259,8 @@ void SegmentationWindow::resumeThreads()
     LOG_DEBUG_LOCAL("");
     // in gui thread: start new task in worker thread
     segmentationThread_.start(voxelSizeInput_->value(),
-                              seedElevationInput_->value(),
+                              seedElevationInput_->minimumValue(),
+                              seedElevationInput_->maximumValue(),
                               treeHeightInput_->value());
     mainWindow_->setStatusProgressBarPercent(0);
 }

@@ -60,7 +60,7 @@ public:
     }
 
     // Sort
-    void sort(double elevationMaximum);
+    void sort(double elevationMinimum, double elevationMaximum);
     size_t sortedSize() const { return sortedVoxels_.size(); }
     Voxel &sortedAt(size_t index) { return *sortedVoxels_[index]; }
     const Voxel &sortedAt(size_t index) const { return *sortedVoxels_[index]; }
