@@ -837,6 +837,7 @@ powershell -C "gci | % {rni $_.Name ($_.Name -replace '24px', '24')}"
             "${workspaceRoot}/src/gui",
             "${workspaceRoot}/src/plugins/classification",
             "${workspaceRoot}/src/plugins/density",
+            "${workspaceRoot}/src/plugins/descriptor",
             "${workspaceRoot}/src/plugins/elevation",
             "${workspaceRoot}/src/plugins/export",
             "${workspaceRoot}/src/plugins/heightmap",

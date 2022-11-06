@@ -31,44 +31,62 @@
 
 #include <ctkrangeslider.h>
 
-RangeSliderWidget::RangeSliderWidget() : QWidget()
+#define MODULE_NAME "RangeSliderWidget"
+#define LOG_DEBUG_LOCAL(msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+
+RangeSliderWidget::RangeSliderWidget()
+    : QWidget(),
+      slider_(nullptr),
+      minSpinBox_(nullptr),
+      maxSpinBox_(nullptr),
+      minimumValue_(0),
+      maximumValue_(0)
 {
 }
 
 void RangeSliderWidget::setMinimum(int min)
 {
+    LOG_DEBUG_LOCAL("min <" << min << ">");
     minSpinBox_->setMinimum(min);
     maxSpinBox_->setMinimum(min);
     slider_->setMinimum(min);
+    minimumValue_ = min;
 }
 
 void RangeSliderWidget::setMaximum(int max)
 {
+    LOG_DEBUG_LOCAL("min <" << max << ">");
     minSpinBox_->setMaximum(max);
     maxSpinBox_->setMaximum(max);
     slider_->setMaximum(max);
+    maximumValue_ = max;
 }
 
 void RangeSliderWidget::setMinimumValue(int value)
 {
+    LOG_DEBUG_LOCAL("value <" << value << ">");
     minSpinBox_->setValue(value);
     slider_->setMinimumValue(value);
+    minimumValue_ = value;
 }
 
 int RangeSliderWidget::minimumValue()
 {
-    return slider_->minimumValue();
+    return minimumValue_;
 }
 
 void RangeSliderWidget::setMaximumValue(int value)
 {
+    LOG_DEBUG_LOCAL("value <" << value << ">");
     maxSpinBox_->setValue(value);
     slider_->setMaximumValue(value);
+    maximumValue_ = value;
 }
 
 int RangeSliderWidget::maximumValue()
 {
-    return slider_->maximumValue();
+    return maximumValue_;
 }
 
 void RangeSliderWidget::blockSignals(bool block)
@@ -80,6 +98,8 @@ void RangeSliderWidget::blockSignals(bool block)
 
 void RangeSliderWidget::slotIntermediateMinimumValue(int v)
 {
+    LOG_DEBUG_LOCAL("value <" << v << ">");
+
     QObject *obj = sender();
 
     if (obj == slider_)
@@ -95,11 +115,15 @@ void RangeSliderWidget::slotIntermediateMinimumValue(int v)
         slider_->blockSignals(false);
     }
 
-    emit signalIntermediateMinimumValue(v);
+    minimumValue_ = v;
+
+    emit signalIntermediateMinimumValue();
 }
 
 void RangeSliderWidget::slotIntermediateMaximumValue(int v)
 {
+    LOG_DEBUG_LOCAL("value <" << v << ">");
+
     QObject *obj = sender();
 
     if (obj == slider_)
@@ -115,7 +139,9 @@ void RangeSliderWidget::slotIntermediateMaximumValue(int v)
         slider_->blockSignals(false);
     }
 
-    emit signalIntermediateMaximumValue(v);
+    maximumValue_ = v;
+
+    emit signalIntermediateMaximumValue();
 }
 
 void RangeSliderWidget::create(RangeSliderWidget *&outputWidget,
@@ -131,7 +157,15 @@ void RangeSliderWidget::create(RangeSliderWidget *&outputWidget,
                                int minValue,
                                int maxValue)
 {
+    LOG_DEBUG_LOCAL("min <" << min << ">"
+                            << " max <" << max << ">"
+                            << " minValue <" << minValue << ">"
+                            << " maxValue <" << maxValue << ">");
+
     outputWidget = new RangeSliderWidget();
+
+    outputWidget->minimumValue_ = minValue;
+    outputWidget->maximumValue_ = maxValue;
 
     // Description Name
     QLabel *label = new QLabel(text);
@@ -169,7 +203,7 @@ void RangeSliderWidget::create(RangeSliderWidget *&outputWidget,
     if (memberIntermediateMinimumValue)
     {
         connect(outputWidget,
-                SIGNAL(signalIntermediateMinimumValue(int)),
+                SIGNAL(signalIntermediateMinimumValue()),
                 receiver,
                 memberIntermediateMinimumValue);
     }
@@ -182,7 +216,7 @@ void RangeSliderWidget::create(RangeSliderWidget *&outputWidget,
     if (memberIntermediateMaximumValue)
     {
         connect(outputWidget,
-                SIGNAL(signalIntermediateMaximumValue(int)),
+                SIGNAL(signalIntermediateMaximumValue()),
                 receiver,
                 memberIntermediateMaximumValue);
     }

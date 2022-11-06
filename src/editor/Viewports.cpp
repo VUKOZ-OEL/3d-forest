@@ -71,6 +71,14 @@ void Viewports::selectElevationRange(const Range<double> &elevationRange)
     }
 }
 
+void Viewports::selectDescriptorRange(const Range<float> &descriptorRange)
+{
+    for (auto &it : viewports_)
+    {
+        it->selectDescriptorRange(descriptorRange);
+    }
+}
+
 void Viewports::selectClassifications(const std::unordered_set<size_t> &list)
 {
     for (auto &it : viewports_)

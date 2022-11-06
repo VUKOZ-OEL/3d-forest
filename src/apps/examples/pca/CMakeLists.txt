@@ -20,13 +20,13 @@ set(SUB_PROJECT_NAME "3DForestExamplePca")
 add_executable(
     ${SUB_PROJECT_NAME}
     examplePca.cpp
-    ../../../plugins/segmentation/SegmentationPca.cpp
+    ../../../plugins/descriptor/DescriptorPca.cpp
 )
 
 target_include_directories(
     ${SUB_PROJECT_NAME}
     PUBLIC
-    ../../../plugins/segmentation
+    ../../../plugins/descriptor
     ../../../../3rdparty/eigen
 )
 

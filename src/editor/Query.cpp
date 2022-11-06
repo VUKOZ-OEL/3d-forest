@@ -225,6 +225,11 @@ void Query::selectElevationRange(const Range<double> &elevationRange)
     elevationRange_ = elevationRange;
 }
 
+void Query::selectDescriptorRange(const Range<float> &descriptorRange)
+{
+    descriptorRange_ = descriptorRange;
+}
+
 void Query::selectClassifications(const std::unordered_set<size_t> &list)
 {
     if (list.empty())

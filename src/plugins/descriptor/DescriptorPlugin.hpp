@@ -17,36 +17,44 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationPlugin.hpp */
+/** @file DescriptorPlugin.hpp */
 
-#ifndef SEGMENTATION_PLUGIN_HPP
-#define SEGMENTATION_PLUGIN_HPP
+#ifndef DESCRIPTOR_PLUGIN_HPP
+#define DESCRIPTOR_PLUGIN_HPP
 
 #include <PluginInterface.hpp>
 
-#include <ExportSegmentation.hpp>
+class DescriptorWindow;
 
-class SegmentationWindow;
+#if defined(_MSC_VER)
+    #if defined(EXPORT_3DForestDescriptorPlugin)
+        #define EXPORT_DESCRIPTOR_PLUGIN __declspec(dllexport)
+    #else
+        #define EXPORT_DESCRIPTOR_PLUGIN __declspec(dllimport)
+    #endif
+#else
+    #define EXPORT_DESCRIPTOR_PLUGIN
+#endif
 
-/** Segmentation Plugin. */
-class EXPORT_SEGMENTATION_PLUGIN SegmentationPlugin : public QObject,
-                                                      public PluginInterface
+/** Descriptor Plugin. */
+class EXPORT_DESCRIPTOR_PLUGIN DescriptorPlugin : public QObject,
+                                                  public PluginInterface
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID PluginInterface_iid)
     Q_INTERFACES(PluginInterface)
 
 public:
-    SegmentationPlugin();
+    DescriptorPlugin();
 
     virtual void initialize(MainWindow *mainWindow);
 
 public slots:
     void slotPlugin();
 
-private:
+protected:
     MainWindow *mainWindow_;
-    SegmentationWindow *dockWindow_;
+    DescriptorWindow *pluginWindow_;
 };
 
-#endif /* SEGMENTATION_PLUGIN_HPP */
+#endif /* DESCRIPTOR_PLUGIN_HPP */

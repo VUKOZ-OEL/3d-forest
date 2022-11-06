@@ -22,7 +22,7 @@
 #include <Box.hpp>
 #include <Error.hpp>
 #include <Log.hpp>
-#include <SegmentationElement.hpp>
+#include <SegmentationElements.hpp>
 #include <Time.hpp>
 #include <Voxels.hpp>
 
@@ -57,7 +57,7 @@ static void addVoxel(int x, int y, int z, Voxels &voxels)
                           static_cast<double>(y) + 0.5,
                           static_cast<double>(z) + 0.5));
 }
-
+#if 0
 static void exampleVoxelsSegment()
 {
     Voxels voxels;
@@ -90,13 +90,13 @@ static void exampleVoxelsSegment()
         }
     }
 }
-
+#endif
 int main()
 {
     try
     {
-        // exampleVoxels();
-        exampleVoxelsSegment();
+        exampleVoxels();
+        // exampleVoxelsSegment();
     }
     catch (std::exception &e)
     {

@@ -21,6 +21,7 @@
 
 #include <Log.hpp>
 #include <MainWindow.hpp>
+#include <RangeSliderWidget.hpp>
 #include <SegmentationWindow.hpp>
 #include <SliderWidget.hpp>
 #include <ThemeIcon.hpp>
@@ -37,6 +38,7 @@
 #define MODULE_NAME "SegmentationWindow"
 #define LOG_DEBUG_LOCAL(msg)
 //#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+#define LOG_DEBUG_LOCAL_THREAD(msg)
 
 #define SEGMENTATION_WINDOW_VOXEL_SIZE_DEFAULT_MIN 1
 #define SEGMENTATION_WINDOW_VOXEL_SIZE_DEFAULT_MAX 100
@@ -51,33 +53,18 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
     // Settings layout
     QVBoxLayout *settingsLayout = new QVBoxLayout;
 
-    // Input widgets
-    SliderWidget::create(previewSizeInput_,
-                         this,
-                         nullptr,
-                         nullptr,
-                         tr("Preview size"),
-                         tr("Preview size"),
-                         tr("%"),
-                         1,
-                         1,
-                         100,
-                         10);
-
-    settingsLayout->addWidget(previewSizeInput_);
-    previewSizeInput_->setDisabled(true);
-
+    // Input widgets:
+    // Voxel size
     SliderWidget::create(voxelSizeInput_,
                          this,
                          nullptr,
                          SLOT(slotVoxelSizeFinalValue()),
                          tr("Voxel size"),
                          tr("The automated segmentation creates voxel"
-                            " grid through the whole point cloud."
+                            "\ngrid through the whole point cloud."
                             "\nVoxel size should be small enough so that"
-                            " each voxel contains only one characteristic"
-                            "\nthat best fits the data inside voxel volume."
-                            " Each voxel should contain at least 3 points."),
+                            "\nmost voxels contain only points from a"
+                            " single tree."),
                          tr("pt"),
                          1,
                          SEGMENTATION_WINDOW_VOXEL_SIZE_DEFAULT_MIN,
@@ -86,38 +73,53 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
 
     settingsLayout->addWidget(voxelSizeInput_);
 
-    SliderWidget::create(thresholdInput_,
+    // Maximum elevation
+    RangeSliderWidget::create(seedElevationInput_,
+                              this,
+                              SLOT(slotSeedElevationMinimumValue()),
+                              SLOT(slotSeedElevationMaximumValue()),
+                              tr("Elevation range of tree base"),
+                              tr("Elevation range of points which"
+                                 "\nare used to start segmentation."),
+                              tr("%"),
+                              1,
+                              1,
+                              25,
+                              4,
+                              6);
+
+    settingsLayout->addWidget(seedElevationInput_);
+
+    // Minimum height of tree
+    SliderWidget::create(treeHeightInput_,
                          this,
                          nullptr,
-                         SLOT(slotThresholdFinalValue()),
-                         tr("Use descriptor values above"),
-                         tr("The range represents the lower limit of the"
-                            " used voxels for segmentation."
-                            "\nFor example, if the input threshold value"
-                            " is 70, then only the voxels whose descriptor"
-                            "\nvalue is at 70% of the actual value range"
-                            " or higher are used for the tree extraction."),
+                         SLOT(slotTreeHeightFinalValue()),
+                         tr("Minimum height of tree"),
+                         tr("Minimum height of cluster created from"
+                            "\nnearby points to mark it as a new tree"),
                          tr("%"),
                          1,
-                         0,
+                         1,
                          100,
-                         30);
+                         10);
 
-    settingsLayout->addWidget(thresholdInput_);
+    settingsLayout->addWidget(treeHeightInput_);
 
-    SliderWidget::create(voxelsInElementInput_,
+    // Search radius
+    SliderWidget::create(searchRadiusInput_,
                          this,
                          nullptr,
-                         SLOT(slotVoxelsInElementFinalValue()),
-                         tr("Voxels per element"),
-                         tr("Minimal number of voxels in an element"),
-                         tr("count"),
+                         SLOT(slotSearchRadiusSizeFinalValue()),
+                         tr("Search radius"),
+                         tr("Search radius"),
+                         tr("pt"),
                          1,
                          1,
-                         999,
-                         150);
+                         10000,
+                         5000);
 
-    settingsLayout->addWidget(voxelsInElementInput_);
+    settingsLayout->addWidget(searchRadiusInput_);
 
     settingsLayout->addStretch();
 
@@ -190,15 +192,27 @@ void SegmentationWindow::slotVoxelSizeFinalValue()
     resumeThreads();
 }
 
-void SegmentationWindow::slotThresholdFinalValue()
+void SegmentationWindow::slotSeedElevationMinimumValue()
 {
-    LOG_DEBUG_LOCAL("value <" << thresholdInput_->value() << ">");
+    LOG_DEBUG_LOCAL("value <" << seedElevationInput_->minimumValue() << ">");
     resumeThreads();
 }
 
-void SegmentationWindow::slotVoxelsInElementFinalValue()
+void SegmentationWindow::slotSeedElevationMaximumValue()
 {
-    LOG_DEBUG_LOCAL("value <" << voxelsInElementInput_->value() << ">");
+    LOG_DEBUG_LOCAL("value <" << seedElevationInput_->maximumValue() << ">");
+    resumeThreads();
+}
+
+void SegmentationWindow::slotTreeHeightFinalValue()
+{
+    LOG_DEBUG_LOCAL("value <" << treeHeightInput_->value() << ">");
+    resumeThreads();
+}
+
+void SegmentationWindow::slotSearchRadiusSizeFinalValue()
+{
+    LOG_DEBUG_LOCAL("value <" << treeHeightInput_->value() << ">");
     resumeThreads();
 }
 
@@ -235,15 +249,15 @@ void SegmentationWindow::closeEvent(QCloseEvent *event)
 
 void SegmentationWindow::threadProgress(bool finished)
 {
-    LOG_DEBUG_LOCAL("finished <" << finished << ">");
+    LOG_DEBUG_LOCAL_THREAD("finished <" << finished << ">");
     // in worker thread: notify gui thread
     emit signalThread(finished, segmentationThread_.progressPercent());
 }
 
 void SegmentationWindow::slotThread(bool finished, int progressPercent)
 {
-    LOG_DEBUG_LOCAL("finished <" << finished << "> progress <"
-                                 << progressPercent << ">");
+    LOG_DEBUG_LOCAL_THREAD("finished <" << finished << "> progress <"
+                                        << progressPercent << ">");
     // in gui thread: update visualization
     mainWindow_->setStatusProgressBarPercent(progressPercent);
 
@@ -264,10 +278,20 @@ void SegmentationWindow::suspendThreads()
 
 void SegmentationWindow::resumeThreads()
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL("voxelSize <"
+                    << voxelSizeInput_->value() << "> seedElevationMinimum <"
+                    << seedElevationInput_->minimumValue()
+                    << "> seedElevationMaximum <"
+                    << seedElevationInput_->maximumValue()
+                    << "> treeHeightMinimum <" << treeHeightInput_->value()
+                    << ">");
+
     // in gui thread: start new task in worker thread
     segmentationThread_.start(voxelSizeInput_->value(),
-                              thresholdInput_->value(),
-                              voxelsInElementInput_->value());
+                              seedElevationInput_->minimumValue(),
+                              seedElevationInput_->maximumValue(),
+                              treeHeightInput_->value(),
+                              searchRadiusInput_->value());
+
     mainWindow_->setStatusProgressBarPercent(0);
 }

@@ -23,8 +23,7 @@
 #define SEGMENTATION_THREAD_HPP
 
 #include <Query.hpp>
-#include <SegmentationElement.hpp>
-#include <SegmentationPca.hpp>
+#include <SegmentationElements.hpp>
 #include <Thread.hpp>
 #include <Vector3.hpp>
 #include <Voxels.hpp>
@@ -41,8 +40,10 @@ public:
     void clear();
 
     void start(int voxelSize,
-               int descriptorThresholdPercent,
-               int minimumVoxelsInElement);
+               int seedElevationMinimumPercent,
+               int seedElevationMaximumPercent,
+               int treeHeightMinimumPercent,
+               int searchRadius);
 
     int progressPercent() const { return progressPercent_; }
 
@@ -50,55 +51,61 @@ public:
 
     const Editor *editor() const { return editor_; }
 
-protected:
+private:
     /** Segmentation Thread State. */
     enum State
     {
         STATE_INITIALIZE_VOXELS,
         STATE_CREATE_VOXELS,
-        STATE_NORMALIZE_VOXELS,
-        STATE_DESCRIPTOR_THRESHOLD,
+        STATE_SORT_VOXELS,
         STATE_INITIALIZE_ELEMENTS,
         STATE_CREATE_ELEMENTS,
-        STATE_MERGE_CLUSTERS,
+        STATE_MERGE_ELEMENTS,
         STATE_CREATE_LAYERS,
         STATE_FINISHED,
     };
 
     Editor *editor_;
     Query query_;
-    Query queryDescriptor_;
 
     State state_;
     bool stateInitialized_;
     bool layersCreated_;
+    int progressCounter_;
     int progressPercent_;
     uint64_t progressMax_;
     uint64_t progressValue_;
     double stateTime_;
 
     int voxelSize_;
-    int minimumVoxelsInElement_;
-    int descriptorThresholdPercent_;
-    float descriptorThresholdNormalized_;
+    int seedElevationMinimumPercent_;
+    int seedElevationMaximumPercent_;
+    int treeHeightMinimumPercent_;
+    int searchRadius_;
 
-    SegmentationPca pca_;
-    SegmentationElement elements_;
+    double seedElevationMinimum_;
+    double seedElevationMaximum_;
+    double treeHeightMinimum_;
+
+    double timeBegin;
+    double timeNow;
+    double timeElapsed;
 
     Voxels voxels_;
+    SegmentationElements elements_;
 
     void setState(State state);
     void updateProgressPercent();
+    bool hasTimedout(int interleave = 10);
 
     void resetLayers();
 
     bool computeInitializeVoxels();
     bool computeCreateVoxels();
-    bool computeNormalizeVoxels();
-    bool computeDescriptorThreshold();
+    bool computeSortVoxels();
     bool computeInitializeElements();
     bool computeCreateElements();
-    bool computeMergeClusters();
+    bool computeMergeElements();
     bool computeCreateLayers();
 };
 

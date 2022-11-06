@@ -17,22 +17,22 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationPca.cpp */
+/** @file DescriptorPca.cpp */
 
+#include <DescriptorPca.hpp>
 #include <LasFile.hpp>
 #include <Log.hpp>
-#include <SegmentationPca.hpp>
 
-#define MODULE_NAME "SegmentationPca"
+#define MODULE_NAME "DescriptorPca"
 #define LOG_DEBUG_LOCAL(msg)
 //#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
-SegmentationPca::SegmentationPca()
+DescriptorPca::DescriptorPca()
 {
     clear();
 }
 
-void SegmentationPca::clear()
+void DescriptorPca::clear()
 {
     xyz.clear();
 
@@ -46,22 +46,40 @@ void SegmentationPca::clear()
     // E;
 }
 
-bool SegmentationPca::computeDescriptor(const Box<double> &cell,
-                                        Query &query,
-                                        double &meanX,
-                                        double &meanY,
-                                        double &meanZ,
-                                        float &descriptor)
+bool DescriptorPca::computeDescriptor(Query &query,
+                                      const Box<double> &cell,
+                                      double &meanX,
+                                      double &meanY,
+                                      double &meanZ,
+                                      float &descriptor)
+{
+    double x, y, z, r;
+
+    cell.getCenter(x, y, z);
+    r = cell.maximumLength();
+
+    bool c;
+    c = computeDescriptor(query, x, y, z, r, meanX, meanY, meanZ, descriptor);
+
+    return c;
+}
+
+bool DescriptorPca::computeDescriptor(Query &query,
+                                      double x,
+                                      double y,
+                                      double z,
+                                      double radius,
+                                      double &meanX,
+                                      double &meanY,
+                                      double &meanZ,
+                                      float &descriptor)
 {
     // The number of points inside this grid cell.
     Eigen::MatrixXd::Index nPoints = 0;
 
     // Select points in 'cell' into point coordinates 'xyz'.
     // Count the number of points.
-    double x, y, z;
-    cell.getCenter(x, y, z);
-    double r = cell.maximumLength();
-    query.selectSphere(x, y, z, r);
+    query.selectSphere(x, y, z, radius);
     query.selectClassifications({LasFile::CLASS_UNASSIGNED});
     query.exec();
 
@@ -99,11 +117,11 @@ bool SegmentationPca::computeDescriptor(const Box<double> &cell,
     return result;
 }
 
-bool SegmentationPca::computeDescriptor(Eigen::MatrixXd &V,
-                                        double &meanX,
-                                        double &meanY,
-                                        double &meanZ,
-                                        float &descriptor)
+bool DescriptorPca::computeDescriptor(Eigen::MatrixXd &V,
+                                      double &meanX,
+                                      double &meanY,
+                                      double &meanZ,
+                                      float &descriptor)
 {
     // The number of points.
     Eigen::MatrixXd::Index nPoints = V.cols();
@@ -214,6 +232,60 @@ bool SegmentationPca::computeDescriptor(Eigen::MatrixXd &V,
     }
 
     LOG_DEBUG_LOCAL("descriptor <" << descriptor << ">");
+
+    return true;
+}
+
+bool DescriptorPca::computeDistribution(Query &query,
+                                        double x,
+                                        double y,
+                                        double z,
+                                        double radius,
+                                        float &descriptor)
+{
+    const int dim = 8;
+    const int dim2 = dim / 2;
+    const int dimxy = dim * dim;
+    const int dimxyz = dim * dim * dim;
+    size_t acc[dimxyz];
+    std::memset(acc, 0, sizeof(acc));
+    double d = 0.1 + radius / static_cast<double>(dim2);
+
+    Box<double> cell(x, y, z, radius);
+    double px;
+    double py;
+    double pz;
+    int cx;
+    int cy;
+    int cz;
+
+    query.selectBox(cell);
+    // query.selectClassifications({LasFile::CLASS_UNASSIGNED});
+    query.exec();
+
+    while (query.next())
+    {
+        px = query.x() - x;
+        py = query.y() - y;
+        pz = query.z() - z;
+
+        cx = static_cast<int>(px / d) + dim2;
+        cy = static_cast<int>(py / d) + dim2;
+        cz = static_cast<int>(pz / d) + dim2;
+
+        acc[cx + cy * dim + cz * dimxy]++;
+    }
+
+    int used = 0;
+    for (int i = 0; i < dimxyz; i++)
+    {
+        if (acc[i] > 0)
+        {
+            used++;
+        }
+    }
+
+    descriptor = static_cast<float>(used) / static_cast<float>(dimxyz);
 
     return true;
 }

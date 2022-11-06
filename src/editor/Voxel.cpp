@@ -24,8 +24,9 @@
 #include <Log.hpp>
 #include <Voxel.hpp>
 
+#define MODULE_NAME "Voxel"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("Voxel", msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 #if !defined(EXPORT_EDITOR_IMPORT)
 const uint32_t Voxel::STATUS_IGNORED = 1U << 0;
@@ -38,50 +39,18 @@ Voxel::Voxel(uint32_t x,
              double meanX,
              double meanY,
              double meanZ,
-             float intensity,
-             float density)
+             double meanElevation)
     : status_(0),
       x_(x),
       y_(y),
       z_(z),
-      intensity_(intensity),
-      density_(density),
       meanX_(meanX),
       meanY_(meanY),
       meanZ_(meanZ),
-      elementId_(0),
-      clusterId_(0)
+      meanElevation_(meanElevation),
+      descriptor_(0.0F),
+      elementIndex_(Voxel::npos)
 {
-}
-
-void Voxel::set(uint32_t x,
-                uint32_t y,
-                uint32_t z,
-                double meanX,
-                double meanY,
-                double meanZ,
-                float intensity,
-                float density,
-                uint32_t status,
-                uint32_t elementId,
-                uint32_t clusterId)
-
-{
-    status_ = status;
-
-    x_ = x;
-    y_ = y;
-    z_ = z;
-
-    intensity_ = intensity;
-    density_ = density;
-
-    meanX_ = meanX;
-    meanY_ = meanY;
-    meanZ_ = meanZ;
-
-    elementId_ = elementId;
-    clusterId_ = clusterId;
 }
 
 void Voxel::clear()
@@ -92,21 +61,18 @@ void Voxel::clear()
     y_ = 0;
     z_ = 0;
 
-    intensity_ = 0;
-    density_ = 0;
+    meanX_ = 0.0;
+    meanY_ = 0.0;
+    meanZ_ = 0.0;
+    meanElevation_ = 0.0;
 
-    meanX_ = 0;
-    meanY_ = 0;
-    meanZ_ = 0;
+    descriptor_ = 0.0F;
 
-    elementId_ = 0;
-    clusterId_ = 0;
+    elementIndex_ = Voxel::npos;
 }
 
 void Voxel::clearState()
 {
     status_ = 0;
-
-    elementId_ = 0;
-    clusterId_ = 0;
+    elementIndex_ = Voxel::npos;
 }

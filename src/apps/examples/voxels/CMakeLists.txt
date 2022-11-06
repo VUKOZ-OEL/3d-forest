@@ -21,6 +21,7 @@ add_executable(
     ${SUB_PROJECT_NAME}
     exampleVoxels.cpp
     ../../../plugins/segmentation/SegmentationElement.cpp
+    ../../../plugins/segmentation/SegmentationElements.cpp
 )
 
 target_include_directories(

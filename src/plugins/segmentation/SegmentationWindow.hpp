@@ -26,6 +26,7 @@
 #include <ThreadCallbackInterface.hpp>
 class MainWindow;
 class SliderWidget;
+class RangeSliderWidget;
 
 #include <QDialog>
 class QPushButton;
@@ -49,19 +50,21 @@ signals:
 
 protected slots:
     void slotVoxelSizeFinalValue();
-    void slotThresholdFinalValue();
-    void slotVoxelsInElementFinalValue();
+    void slotSeedElevationMinimumValue();
+    void slotSeedElevationMaximumValue();
+    void slotSearchRadiusSizeFinalValue();
+    void slotTreeHeightFinalValue();
 
     void slotAccept();
     void slotReject();
 
-protected:
+private:
     MainWindow *mainWindow_;
 
-    SliderWidget *previewSizeInput_;
     SliderWidget *voxelSizeInput_;
-    SliderWidget *thresholdInput_;
-    SliderWidget *voxelsInElementInput_;
+    RangeSliderWidget *seedElevationInput_;
+    SliderWidget *treeHeightInput_;
+    SliderWidget *searchRadiusInput_;
 
     QPushButton *acceptButton_;
     QPushButton *rejectButton_;

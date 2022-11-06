@@ -17,27 +17,36 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationPca.hpp */
+/** @file DescriptorPca.hpp */
 
-#ifndef SEGMENTATION_PCA_HPP
-#define SEGMENTATION_PCA_HPP
+#ifndef DESCRIPTOR_PCA_HPP
+#define DESCRIPTOR_PCA_HPP
 
 #include <Eigen/Core>
 #include <Eigen/Eigenvalues>
 
 #include <Query.hpp>
-#include <Voxels.hpp>
 
-/** Segmentation PCA. */
-class SegmentationPca
+/** Descriptor PCA. */
+class DescriptorPca
 {
 public:
-    SegmentationPca();
+    DescriptorPca();
 
     void clear();
 
-    bool computeDescriptor(const Box<double> &cell,
-                           Query &query,
+    bool computeDescriptor(Query &query,
+                           const Box<double> &cell,
+                           double &meanX,
+                           double &meanY,
+                           double &meanZ,
+                           float &descriptor);
+
+    bool computeDescriptor(Query &query,
+                           double x,
+                           double y,
+                           double z,
+                           double radius,
                            double &meanX,
                            double &meanY,
                            double &meanZ,
@@ -49,7 +58,14 @@ public:
                            double &meanZ,
                            float &descriptor);
 
-protected:
+    bool computeDistribution(Query &query,
+                             double x,
+                             double y,
+                             double z,
+                             double radius,
+                             float &descriptor);
+
+private:
     Eigen::MatrixXd xyz;
     Eigen::Matrix3d product;
     Eigen::Matrix3d eigenVectors;
@@ -61,4 +77,4 @@ protected:
     Eigen::SelfAdjointEigenSolver<Eigen::Matrix3d> E;
 };
 
-#endif /* SEGMENTATION_PCA_HPP */
+#endif /* DESCRIPTOR_PCA_HPP */

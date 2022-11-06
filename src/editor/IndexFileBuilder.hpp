@@ -120,7 +120,7 @@ protected:
     Box<double> boundary_;
 
     uint32_t rgbMax_;
-    uint32_t intensityMax_;
+    uint32_t descriptorMax_;
 
     uint64_t start_;
     uint64_t current_;

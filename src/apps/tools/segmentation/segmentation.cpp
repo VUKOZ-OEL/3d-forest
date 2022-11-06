@@ -19,6 +19,8 @@
 
 /** @file segmentation.cpp @brief Segmentation tool. */
 
+#include <cstring>
+
 #include <Editor.hpp>
 #include <Error.hpp>
 #include <Log.hpp>
@@ -80,13 +82,12 @@ static void saveVoxels(const Editor &editor, const char *path)
         points[i].y = static_cast<uint32_t>(voxel.meanY_);
         points[i].z = static_cast<uint32_t>(voxel.meanZ_);
 
-        points[i].intensity = static_cast<uint16_t>(voxel.intensity_ * 511.0F);
-        points[i].return_number = static_cast<uint8_t>(voxel.density_ * 15.0F);
+        points[i].intensity = static_cast<uint16_t>(voxel.descriptor_ * 511.0F);
 
         Vector3<float> c;
-        if (voxel.elementId_ > 0 && voxel.elementId_ < layers.size())
+        if (voxel.elementIndex_ > 0 && voxel.elementIndex_ < layers.size())
         {
-            c = layers.color(voxel.elementId_);
+            c = layers.color(voxel.elementIndex_);
         }
         points[i].red = static_cast<uint16_t>(c[0] * 65535.0F);
         points[i].green = static_cast<uint16_t>(c[1] * 65535.0F);
@@ -98,8 +99,10 @@ static void saveVoxels(const Editor &editor, const char *path)
 
 static void segmentation(const char *path,
                          int voxelSize,
-                         int threshold,
-                         int minimumVoxelsInElement)
+                         int seedElevationMinimumPercent,
+                         int seedElevationMaximumPercent,
+                         int treeHeightMinimumPercent,
+                         int searchRadius)
 {
     // Open the file in editor.
     Editor editor;
@@ -108,7 +111,11 @@ static void segmentation(const char *path,
     // Compute segmentation.
     SegmentationThread segmentationThread(&editor);
     segmentationThread.create();
-    segmentationThread.start(voxelSize, threshold, minimumVoxelsInElement);
+    segmentationThread.start(voxelSize,
+                             seedElevationMinimumPercent,
+                             seedElevationMaximumPercent,
+                             treeHeightMinimumPercent,
+                             searchRadius);
     segmentationThread.wait();
 
     // Export voxels.
@@ -119,8 +126,10 @@ int main(int argc, char *argv[])
 {
     const char *path = nullptr;
     int voxelSize = 10;
-    int threshold = 50;
-    int minimumVoxelsInElement = 150;
+    int seedElevationMinimumPercent = 1;
+    int seedElevationMaximumPercent = 5;
+    int treeHeightMinimumPercent = 10;
+    int searchRadius = 1000;
 
     if (argc > 1)
     {
@@ -134,7 +143,22 @@ int main(int argc, char *argv[])
 
     if (argc > 3)
     {
-        minimumVoxelsInElement = atoi(argv[3]);
+        seedElevationMinimumPercent = atoi(argv[3]);
+    }
+
+    if (argc > 4)
+    {
+        seedElevationMaximumPercent = atoi(argv[4]);
+    }
+
+    if (argc > 5)
+    {
+        treeHeightMinimumPercent = atoi(argv[5]);
+    }
+
+    if (argc > 6)
+    {
+        searchRadius = atoi(argv[6]);
     }
 
     try
@@ -145,7 +169,12 @@ int main(int argc, char *argv[])
             createTestDataset(path);
         }
 
-        segmentation(path, voxelSize, threshold, minimumVoxelsInElement);
+        segmentation(path,
+                     voxelSize,
+                     seedElevationMinimumPercent,
+                     seedElevationMaximumPercent,
+                     treeHeightMinimumPercent,
+                     searchRadius);
     }
     catch (std::exception &e)
     {

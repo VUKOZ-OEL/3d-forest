@@ -17,36 +17,36 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationPlugin.hpp */
+/** @file DescriptorWindow.hpp */
 
-#ifndef SEGMENTATION_PLUGIN_HPP
-#define SEGMENTATION_PLUGIN_HPP
+#ifndef DESCRIPTOR_WINDOW_HPP
+#define DESCRIPTOR_WINDOW_HPP
 
-#include <PluginInterface.hpp>
+#include <Descriptor.hpp>
 
-#include <ExportSegmentation.hpp>
+#include <QDialog>
 
-class SegmentationWindow;
+class MainWindow;
 
-/** Segmentation Plugin. */
-class EXPORT_SEGMENTATION_PLUGIN SegmentationPlugin : public QObject,
-                                                      public PluginInterface
+class SliderWidget;
+class QPushButton;
+
+/** Descriptor Window. */
+class DescriptorWindow : public QDialog
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
 
 public:
-    SegmentationPlugin();
+    DescriptorWindow(MainWindow *mainWindow);
 
-    virtual void initialize(MainWindow *mainWindow);
+protected slots:
+    void slotApply();
 
-public slots:
-    void slotPlugin();
-
-private:
+protected:
     MainWindow *mainWindow_;
-    SegmentationWindow *dockWindow_;
+    Descriptor descriptor_;
+    SliderWidget *radius_;
+    QPushButton *applyButton_;
 };
 
-#endif /* SEGMENTATION_PLUGIN_HPP */
+#endif /* DESCRIPTOR_WINDOW_HPP */
