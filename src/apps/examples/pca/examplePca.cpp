@@ -19,10 +19,10 @@
 
 /** @file examplePca.cpp @brief PCA example. */
 
+#include <DescriptorPca.hpp>
 #include <Editor.hpp>
 #include <Error.hpp>
 #include <Log.hpp>
-#include <SegmentationPca.hpp>
 
 static void computePca(const Eigen::MatrixXd &points)
 {
@@ -32,7 +32,7 @@ static void computePca(const Eigen::MatrixXd &points)
     double z;
     float descriptor;
 
-    SegmentationPca pca;
+    DescriptorPca pca;
     (void)pca.computeDescriptor(V, x, y, z, descriptor);
 
     std::cout << "descriptor <" << descriptor << ">"

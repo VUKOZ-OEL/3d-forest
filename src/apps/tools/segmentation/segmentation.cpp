@@ -101,7 +101,8 @@ static void segmentation(const char *path,
                          int voxelSize,
                          int seedElevationMinimumPercent,
                          int seedElevationMaximumPercent,
-                         int treeHeightMinimumPercent)
+                         int treeHeightMinimumPercent,
+                         int searchRadius)
 {
     // Open the file in editor.
     Editor editor;
@@ -113,7 +114,8 @@ static void segmentation(const char *path,
     segmentationThread.start(voxelSize,
                              seedElevationMinimumPercent,
                              seedElevationMaximumPercent,
-                             treeHeightMinimumPercent);
+                             treeHeightMinimumPercent,
+                             searchRadius);
     segmentationThread.wait();
 
     // Export voxels.
@@ -127,6 +129,7 @@ int main(int argc, char *argv[])
     int seedElevationMinimumPercent = 1;
     int seedElevationMaximumPercent = 5;
     int treeHeightMinimumPercent = 10;
+    int searchRadius = 1000;
 
     if (argc > 1)
     {
@@ -153,6 +156,11 @@ int main(int argc, char *argv[])
         treeHeightMinimumPercent = atoi(argv[5]);
     }
 
+    if (argc > 6)
+    {
+        searchRadius = atoi(argv[6]);
+    }
+
     try
     {
         if (!path)
@@ -165,7 +173,8 @@ int main(int argc, char *argv[])
                      voxelSize,
                      seedElevationMinimumPercent,
                      seedElevationMaximumPercent,
-                     treeHeightMinimumPercent);
+                     treeHeightMinimumPercent,
+                     searchRadius);
     }
     catch (std::exception &e)
     {

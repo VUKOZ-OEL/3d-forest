@@ -29,7 +29,6 @@ target_include_directories(
     ${SUB_PROJECT_NAME}
     PUBLIC
     ../../../plugins/segmentation
-    ../../../../3rdparty/eigen
 )
 
 target_link_libraries(
