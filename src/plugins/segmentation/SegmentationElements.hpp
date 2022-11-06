@@ -36,7 +36,8 @@ public:
 
     uint32_t computeBase(Voxels &voxels,
                          size_t voxelIndex,
-                         double minimumHeight);
+                         double minimumHeight,
+                         double radius);
 
     size_t size() const { return elements_.size(); }
     const SegmentationElement &operator[](size_t index) const

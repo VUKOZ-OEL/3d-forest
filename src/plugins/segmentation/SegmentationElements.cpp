@@ -38,14 +38,15 @@ void SegmentationElements::clear()
 
 uint32_t SegmentationElements::computeBase(Voxels &voxels,
                                            size_t voxelIndex,
-                                           double minimumHeight)
+                                           double minimumHeight,
+                                           double radius)
 {
     const Voxel &v = voxels.sortedAt(voxelIndex);
 
     if (v.status_ == 0)
     {
         newElement_ = std::make_shared<SegmentationElement>();
-        (void)newElement_->computeStart(voxels, voxelIndex);
+        (void)newElement_->computeStart(voxels, voxelIndex, radius);
 
         bool isHigh = newElement_->computeBase(voxels, minimumHeight);
 

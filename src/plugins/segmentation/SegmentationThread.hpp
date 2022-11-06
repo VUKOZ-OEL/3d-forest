@@ -42,7 +42,8 @@ public:
     void start(int voxelSize,
                int seedElevationMinimumPercent,
                int seedElevationMaximumPercent,
-               int treeHeightMinimumPercent);
+               int treeHeightMinimumPercent,
+               int searchRadius);
 
     int progressPercent() const { return progressPercent_; }
 
@@ -80,6 +81,7 @@ private:
     int seedElevationMinimumPercent_;
     int seedElevationMaximumPercent_;
     int treeHeightMinimumPercent_;
+    int searchRadius_;
 
     double seedElevationMinimum_;
     double seedElevationMaximum_;

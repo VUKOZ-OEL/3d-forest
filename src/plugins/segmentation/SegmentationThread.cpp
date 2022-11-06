@@ -46,6 +46,7 @@ SegmentationThread::SegmentationThread(Editor *editor)
       seedElevationMinimumPercent_(0),
       seedElevationMaximumPercent_(0),
       treeHeightMinimumPercent_(0),
+      searchRadius_(0),
       seedElevationMinimum_(0),
       seedElevationMaximum_(0),
       treeHeightMinimum_(0),
@@ -70,7 +71,8 @@ void SegmentationThread::clear()
 void SegmentationThread::start(int voxelSize,
                                int seedElevationMinimumPercent,
                                int seedElevationMaximumPercent,
-                               int treeHeightMinimumPercent)
+                               int treeHeightMinimumPercent,
+                               int searchRadius)
 {
     // clang-format off
     LOG_DEBUG_LOCAL(
@@ -104,6 +106,12 @@ void SegmentationThread::start(int voxelSize,
         seedElevationMinimum_ = h * (seedElevationMinimumPercent_ / 100.0);
         seedElevationMaximum_ = h * (seedElevationMaximumPercent_ / 100.0);
 
+        startState = STATE_SORT_VOXELS;
+    }
+
+    if (searchRadius != searchRadius_)
+    {
+        searchRadius_ = searchRadius;
         startState = STATE_SORT_VOXELS;
     }
 
@@ -353,6 +361,7 @@ bool SegmentationThread::computeCreateVoxels()
 
         // Add reference to voxel item to each point inside this voxel.
         query_.selectBox(cell);
+        // query_.selectClassifications({LasFile::CLASS_UNASSIGNED});
         query_.exec();
         while (query_.next())
         {
@@ -472,9 +481,9 @@ bool SegmentationThread::computeCreateElements()
     // Next step
     for (size_t i = 0; i < voxels_.sortedSize(); i++)
     {
-        uint32_t elementIndex;
-
-        elementIndex = elements_.computeBase(voxels_, i, treeHeightMinimum_);
+        double radius = static_cast<double>(searchRadius_);
+        uint32_t elementIndex =
+            elements_.computeBase(voxels_, i, treeHeightMinimum_, radius);
 
         if (elementIndex != SegmentationElements::npos)
         {

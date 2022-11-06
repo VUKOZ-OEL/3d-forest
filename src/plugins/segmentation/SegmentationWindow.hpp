@@ -52,6 +52,7 @@ protected slots:
     void slotVoxelSizeFinalValue();
     void slotSeedElevationMinimumValue();
     void slotSeedElevationMaximumValue();
+    void slotSearchRadiusSizeFinalValue();
     void slotTreeHeightFinalValue();
 
     void slotAccept();
@@ -63,6 +64,7 @@ private:
     SliderWidget *voxelSizeInput_;
     RangeSliderWidget *seedElevationInput_;
     SliderWidget *treeHeightInput_;
+    SliderWidget *searchRadiusInput_;
 
     QPushButton *acceptButton_;
     QPushButton *rejectButton_;

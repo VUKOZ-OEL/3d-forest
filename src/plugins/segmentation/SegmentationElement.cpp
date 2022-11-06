@@ -33,7 +33,10 @@ SegmentationElement::SegmentationElement()
 
 void SegmentationElement::clear()
 {
-    baseZ_ = 0.0;
+    start_.clear();
+    base_.clear();
+
+    radius_ = 0.0;
     height_ = 0.0;
 
     std::queue<Key> queueEmpty_;
@@ -44,7 +47,9 @@ void SegmentationElement::clear()
     elementIndex_ = 0;
 }
 
-bool SegmentationElement::computeStart(const Voxels &voxels, size_t voxelIndex)
+bool SegmentationElement::computeStart(const Voxels &voxels,
+                                       size_t voxelIndex,
+                                       double radius)
 {
     clear();
 
@@ -53,7 +58,9 @@ bool SegmentationElement::computeStart(const Voxels &voxels, size_t voxelIndex)
     if (v.status_ == 0)
     {
         queue_.push({v.x_, v.y_, v.z_});
-        baseZ_ = v.meanZ_;
+        start_.set(v.meanX_, v.meanY_, v.meanZ_);
+        base_ = start_;
+        radius_ = radius;
         return true;
     }
 
@@ -85,32 +92,36 @@ bool SegmentationElement::computeBase(Voxels &voxels, double minimumHeight)
         voxelList_.push_back(index);
 
         // check height
-        height_ = v.meanZ_ - baseZ_;
+        height_ = v.meanZ_ - base_[2];
         if (!(height_ < minimumHeight))
         {
             return true;
         }
 
-        // next
-        if (k.z + 1 < voxels.sizeZ())
-        {
-            if (k.x > 0 && k.x + 1 < voxels.sizeX() && k.y > 0 &&
-                k.y + 1 < voxels.sizeY())
-            {
-                queue_.push({k.x, k.y, k.z + 1});
-
-                queue_.push({k.x + 1, k.y, k.z + 1});
-                queue_.push({k.x - 1, k.y, k.z + 1});
-                queue_.push({k.x, k.y + 1, k.z + 1});
-                queue_.push({k.x, k.y - 1, k.z + 1});
-
-                queue_.push({k.x + 1, k.y + 1, k.z + 1});
-                queue_.push({k.x + 1, k.y - 1, k.z + 1});
-                queue_.push({k.x - 1, k.y + 1, k.z + 1});
-                queue_.push({k.x - 1, k.y - 1, k.z + 1});
-            }
-        }
+        pushNext1(k, voxels);
     }
 
     return false;
+}
+
+void SegmentationElement::pushNext1(const Key &k, const Voxels &voxels)
+{
+    if (k.z + 1 < voxels.sizeZ())
+    {
+        if (k.x > 0 && k.x + 1 < voxels.sizeX() && k.y > 0 &&
+            k.y + 1 < voxels.sizeY())
+        {
+            queue_.push({k.x, k.y, k.z + 1});
+
+            queue_.push({k.x + 1, k.y, k.z + 1});
+            queue_.push({k.x - 1, k.y, k.z + 1});
+            queue_.push({k.x, k.y + 1, k.z + 1});
+            queue_.push({k.x, k.y - 1, k.z + 1});
+
+            queue_.push({k.x + 1, k.y + 1, k.z + 1});
+            queue_.push({k.x + 1, k.y - 1, k.z + 1});
+            queue_.push({k.x - 1, k.y + 1, k.z + 1});
+            queue_.push({k.x - 1, k.y - 1, k.z + 1});
+        }
+    }
 }

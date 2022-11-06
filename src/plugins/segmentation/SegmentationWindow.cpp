@@ -106,6 +106,21 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
 
     settingsLayout->addWidget(treeHeightInput_);
 
+    // Search radius
+    SliderWidget::create(searchRadiusInput_,
+                         this,
+                         nullptr,
+                         SLOT(slotSearchRadiusSizeFinalValue()),
+                         tr("Search radius"),
+                         tr("Search radius"),
+                         tr("pt"),
+                         1,
+                         1,
+                         10000,
+                         5000);
+
+    settingsLayout->addWidget(searchRadiusInput_);
+
     settingsLayout->addStretch();
 
     // apply/cancel buttons
@@ -195,6 +210,12 @@ void SegmentationWindow::slotTreeHeightFinalValue()
     resumeThreads();
 }
 
+void SegmentationWindow::slotSearchRadiusSizeFinalValue()
+{
+    LOG_DEBUG_LOCAL("value <" << treeHeightInput_->value() << ">");
+    resumeThreads();
+}
+
 void SegmentationWindow::slotAccept()
 {
     LOG_DEBUG_LOCAL("");
@@ -269,7 +290,8 @@ void SegmentationWindow::resumeThreads()
     segmentationThread_.start(voxelSizeInput_->value(),
                               seedElevationInput_->minimumValue(),
                               seedElevationInput_->maximumValue(),
-                              treeHeightInput_->value());
+                              treeHeightInput_->value(),
+                              searchRadiusInput_->value());
 
     mainWindow_->setStatusProgressBarPercent(0);
 }

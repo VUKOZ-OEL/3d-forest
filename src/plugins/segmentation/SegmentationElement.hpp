@@ -24,6 +24,7 @@
 
 #include <queue>
 
+#include <Vector3.hpp>
 #include <Voxels.hpp>
 
 /** Segmentation Element. */
@@ -34,7 +35,7 @@ public:
 
     void clear();
 
-    bool computeStart(const Voxels &voxels, size_t voxelIndex);
+    bool computeStart(const Voxels &voxels, size_t voxelIndex, double radius);
     bool computeBase(Voxels &voxels, double minimumHeight);
 
     const std::vector<size_t> &voxelList() const { return voxelList_; }
@@ -43,7 +44,9 @@ public:
     uint32_t elementIndex() const { return elementIndex_; }
 
 private:
-    double baseZ_;
+    Vector3<double> start_;
+    Vector3<double> base_;
+    double radius_;
     double height_;
 
     struct Key
@@ -57,6 +60,8 @@ private:
     std::vector<size_t> voxelList_;
 
     uint32_t elementIndex_;
+
+    void pushNext1(const Key &k, const Voxels &voxels);
 };
 
 #endif /* SEGMENTATION_ELEMENT_HPP */
