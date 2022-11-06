@@ -43,12 +43,20 @@ public slots:
     void slotRangeIntermediateMinimumValue();
     void slotRangeIntermediateMaximumValue();
 
+    void slotDescriptorIntermediateMinimumValue();
+    void slotDescriptorIntermediateMaximumValue();
+
 protected:
     MainWindow *mainWindow_;
+
     RangeSliderWidget *rangeInput_;
     Range<double> elevationRange_;
 
-    void filterChanged();
+    RangeSliderWidget *descriptorInput_;
+    Range<float> descriptorRange_;
+
+    void elevationInputChanged();
+    void descriptorInputChanged();
 };
 
 #endif /* PROJECT_NAVIGATOR_ELEVATION_HPP */

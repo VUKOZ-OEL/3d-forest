@@ -366,6 +366,7 @@ void Page::select()
     selectCone();
     selectSphere();
     selectElevation();
+    selectDescriptor();
     selectClassification();
     selectLayer();
 
@@ -768,6 +769,36 @@ void Page::selectElevation()
 
         if (!(elev < elevationRange.minimumValue() ||
               elev > elevationRange.maximumValue()))
+        {
+            if (nSelectedNew != i)
+            {
+                selection[nSelectedNew] = selection[i];
+            }
+
+            nSelectedNew++;
+        }
+    }
+
+    selectionSize = nSelectedNew;
+}
+
+void Page::selectDescriptor()
+{
+    const Range<float> &descriptorRange = query_->selectedDescriptorRange();
+
+    if (descriptorRange.hasBoundaryValues())
+    {
+        return;
+    }
+
+    size_t nSelectedNew = 0;
+
+    for (size_t i = 0; i < selectionSize; i++)
+    {
+        float v = descriptor[selection[i]];
+
+        if (!(v < descriptorRange.minimumValue() ||
+              v > descriptorRange.maximumValue()))
         {
             if (nSelectedNew != i)
             {

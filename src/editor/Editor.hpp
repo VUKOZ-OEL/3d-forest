@@ -80,6 +80,10 @@ public:
     const Range<double> &elevationRange() const { return elevationRange_; }
     void setElevationRange(const Range<double> &elevationRange);
 
+    // Descriptor
+    const Range<float> &descriptorRange() const { return descriptorRange_; }
+    void setDescriptorRange(const Range<float> &descriptorRange);
+
     // Data sets
     const Datasets &datasets() const { return datasets_; }
     void setDatasets(const Datasets &datasets);
@@ -125,6 +129,7 @@ protected:
 
     Region clipFilter_;
     Range<double> elevationRange_;
+    Range<float> descriptorRange_;
 
     // Modifiers
     std::vector<ModifierInterface *> modifiers_;

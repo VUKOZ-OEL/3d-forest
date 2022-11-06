@@ -31,8 +31,9 @@ static const char *EDITOR_KEY_CLASSIFICATIONS = "classifications";
 // static const char *EDITOR_KEY_CLIP_FILTER = "clipFilter";
 static const char *EDITOR_KEY_ELEVATION_RANGE = "elevationRange";
 
+#define MODULE_NAME "Editor"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("Editor", msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 Editor::Editor()
 {
@@ -57,6 +58,7 @@ void Editor::close()
 
     clipFilter_.clear();
     elevationRange_.clear();
+    descriptorRange_.set(0.0F, 1.0F, 0.0F, 1.0F);
 
     unsavedChanges_ = false;
 }
@@ -243,6 +245,15 @@ void Editor::setElevationRange(const Range<double> &elevationRange)
     elevationRange_ = elevationRange;
     LOG_DEBUG_LOCAL("elevationRange <" << elevationRange_ << ">");
     viewports_.selectElevationRange(elevationRange_);
+
+    // unsavedChanges_ = true;
+}
+
+void Editor::setDescriptorRange(const Range<float> &descriptorRange)
+{
+    descriptorRange_ = descriptorRange;
+    LOG_DEBUG_LOCAL("descriptorRange <" << descriptorRange_ << ">");
+    viewports_.selectDescriptorRange(descriptorRange_);
 
     // unsavedChanges_ = true;
 }

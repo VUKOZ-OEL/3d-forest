@@ -204,6 +204,7 @@ protected:
     void selectCone();
     void selectSphere();
     void selectElevation();
+    void selectDescriptor();
     void selectClassification();
     void selectLayer();
 

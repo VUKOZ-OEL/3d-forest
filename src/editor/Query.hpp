@@ -51,6 +51,7 @@ public:
     void selectCone(double x, double y, double z, double z2, double angle);
     void selectSphere(double x, double y, double z, double radius);
     void selectElevationRange(const Range<double> &elevationRange);
+    void selectDescriptorRange(const Range<float> &descriptorRange);
     void selectClassifications(const std::unordered_set<size_t> &list);
     void selectLayers(const std::unordered_set<size_t> &list);
     void selectCamera(const Camera &camera);
@@ -61,6 +62,10 @@ public:
     const Range<double> &selectedElevationRange() const
     {
         return elevationRange_;
+    }
+    const Range<float> &selectedDescriptorRange() const
+    {
+        return descriptorRange_;
     }
     const std::vector<int> &selectedClassifications() const
     {
@@ -179,6 +184,7 @@ protected:
     Cone<double> selectCone_;
     Sphere<double> selectedSphere_;
     Range<double> elevationRange_;
+    Range<float> descriptorRange_;
     std::vector<int> selectClassifications_;
     std::unordered_set<size_t> selectLayers_;
     size_t maximumResults_;

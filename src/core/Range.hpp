@@ -34,19 +34,27 @@ public:
 
     void clear();
 
-    // Range with lower bound (minimum) and upper bound (maximum).
-    void setMinimum(double v) { this->operator[](0) = v; }
-    void setMaximum(double v) { this->operator[](1) = v; }
+    void set(T min, T max, T minValue, T maxValue)
+    {
+        this->operator[](0) = min;
+        this->operator[](1) = max;
+        this->operator[](2) = minValue;
+        this->operator[](3) = maxValue;
+    }
 
-    double minimum() const { return this->operator[](0); }
-    double maximum() const { return this->operator[](1); }
+    // Range with lower bound (minimum) and upper bound (maximum).
+    void setMinimum(T v) { this->operator[](0) = v; }
+    void setMaximum(T v) { this->operator[](1) = v; }
+
+    T minimum() const { return this->operator[](0); }
+    T maximum() const { return this->operator[](1); }
 
     // Selected part from the range.
-    void setMinimumValue(double v) { this->operator[](2) = v; }
-    void setMaximumValue(double v) { this->operator[](3) = v; }
+    void setMinimumValue(T v) { this->operator[](2) = v; }
+    void setMaximumValue(T v) { this->operator[](3) = v; }
 
-    double minimumValue() const { return this->operator[](2); }
-    double maximumValue() const { return this->operator[](3); }
+    T minimumValue() const { return this->operator[](2); }
+    T maximumValue() const { return this->operator[](3); }
 
     // Is minimumValue at minimum and maximumValue at maximum?
     bool hasBoundaryValues() const;
