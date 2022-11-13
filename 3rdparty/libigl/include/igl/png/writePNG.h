@@ -10,6 +10,7 @@
 #include "../igl_inline.h"
 #include <Eigen/Core>
 #include <string>
+#include <vector>
 
 namespace igl
 {
@@ -29,6 +30,12 @@ namespace igl
       const Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic>& G,
       const Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic>& B,
       const Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic>& A,
+      const std::string png_file
+    );
+
+    IGL_INLINE bool writePNG
+    (
+      const Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic>& I,
       const std::string png_file
     );
   }
