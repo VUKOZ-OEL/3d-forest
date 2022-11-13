@@ -331,12 +331,28 @@ bool ViewerOpenGLViewport::renderScene()
 
     if (firstFrame)
     {
-        ViewerOpenGL::renderClipFilter(editor_->clipFilter());
+        renderFirstFrame();
     }
 
     editor_->unlock();
 
     return firstFrame;
+}
+
+void ViewerOpenGLViewport::renderFirstFrame()
+{
+    ViewerOpenGL::renderClipFilter(editor_->clipFilter());
+    renderLayers();
+}
+
+void ViewerOpenGLViewport::renderLayers()
+{
+    const Layers &layers = editor_->layers();
+    for (size_t i = 0; i < layers.size(); i++)
+    {
+        const Layer &layer = layers.at(i);
+        const LayerData &data = layer.data();
+    }
 }
 
 void ViewerOpenGLViewport::renderSceneSettingsEnable()

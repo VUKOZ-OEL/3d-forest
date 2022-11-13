@@ -24,6 +24,7 @@
 
 #include <ExportEditor.hpp>
 #include <Json.hpp>
+#include <LayerData.hpp>
 #include <Vector3.hpp>
 
 /** Layer. */
@@ -48,6 +49,9 @@ public:
     const Vector3<float> &color() const { return color_; }
     void setColor(const Vector3<float> &color);
 
+    const LayerData &data() const { return data_; }
+    void setData(const LayerData &data) { data_ = data; }
+
     void read(const Json &in);
     Json &write(Json &out) const;
 
@@ -57,6 +61,8 @@ protected:
     Vector3<float> color_;
     size_t id_;
     bool enabled_;
+
+    LayerData data_;
 };
 
 inline std::ostream &operator<<(std::ostream &os, const Layer &obj)
