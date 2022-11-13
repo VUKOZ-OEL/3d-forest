@@ -22,6 +22,9 @@
     // Good practice
     #pragma GCC diagnostic ignored "-Wshadow"
     #pragma GCC diagnostic ignored "-Wunused-parameter"
+    #pragma GCC diagnostic ignored "-Wswitch-default"
+    #pragma GCC diagnostic ignored "-Wcast-qual"
+    #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 #endif /* __GNUC__ */
 
 #endif /* IGL_WARNINGS_DISABLED */
