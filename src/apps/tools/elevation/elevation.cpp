@@ -17,7 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file elevation.cpp */
+/** @file elevation.cpp  @brief Elevation tool.*/
 
 #include <ArgumentParser.hpp>
 #include <Editor.hpp>
@@ -25,9 +25,10 @@
 #include <Error.hpp>
 #include <Log.hpp>
 
-static void elevationCompute(const std::string inputPath,
+static void elevationCompute(const std::string &inputPath,
                              size_t pointsPerCell,
-                             double cellLengthMinPercent)
+                             double cellLengthMinPercent,
+                             const std::string &outputGroundMesh)
 {
     // Open input file in editor.
     Editor editor;
@@ -40,14 +41,18 @@ static void elevationCompute(const std::string inputPath,
     {
         std::cout << "Step " << (i + 1) << "/" << n << std::endl;
         e.step();
-        // e.exportGroundMesh("ground");
+
+        if (!outputGroundMesh.empty())
+        {
+            e.exportGroundMesh(outputGroundMesh);
+        }
     }
 
     std::cout << "elevation minimum <" << e.minimum() << ">" << std::endl;
     std::cout << "elevation maximum <" << e.maximum() << ">" << std::endl;
 }
 
-static void elevationPrint(const std::string inputPath)
+static void elevationPrint(const std::string &inputPath)
 {
     Editor editor;
     editor.open(inputPath);
@@ -81,49 +86,28 @@ static void elevationPrint(const std::string inputPath)
     std::cout << "maximum elevation : " << elevationMaximum << std::endl;
 }
 
-static void elevationPlot(const std::string inputPath,
-                          size_t plotSize,
-                          double elevationMinimum,
-                          double elevationMaximum)
-{
-}
-
 int main(int argc, char *argv[])
 {
-    ArgumentParser arg;
-    arg.add("--input", "");
-    arg.add("--compute", "");
-    arg.add("--cell-points", "10000");
-    arg.add("--cell-size-min", "5");
-    arg.add("--print", "");
-    arg.add("--plot", "");
-    arg.add("--plot-size", "100");
-    arg.add("--plot-min", "0");
-    arg.add("--plot-max", "0");
-    arg.parse(argc, argv);
-
     try
     {
-        if (arg.contains("--compute"))
-        {
-            elevationCompute(arg.toString("--input"),
-                             arg.toSize("--cell-points"),
-                             arg.toDouble("--cell-size-min"));
-        }
-        else if (arg.contains("--print"))
+        ArgumentParser arg;
+        arg.add("--input", "");
+        arg.add("--cell-points", "10000");
+        arg.add("--cell-size-min", "5");
+        arg.add("--output-ground-mesh", "");
+        arg.add("--print", "");
+        arg.parse(argc, argv);
+
+        if (arg.contains("--print"))
         {
             elevationPrint(arg.toString("--input"));
         }
-        else if (arg.contains("--plot"))
-        {
-            elevationPlot(arg.toString("--input"),
-                          arg.toSize("--plot-size"),
-                          arg.toDouble("--plot-min"),
-                          arg.toDouble("--plot-max"));
-        }
         else
         {
-            THROW("Unknown action");
+            elevationCompute(arg.toString("--input"),
+                             arg.toSize("--cell-points"),
+                             arg.toDouble("--cell-size-min"),
+                             arg.toString("--output-ground-mesh"));
         }
     }
     catch (std::exception &e)

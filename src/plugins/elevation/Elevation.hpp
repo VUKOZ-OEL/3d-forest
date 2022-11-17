@@ -37,7 +37,7 @@ public:
 
     int start(size_t pointsPerCell = 10000, double cellLengthMinPercent = 1.);
     void step();
-    void exportGroundMesh(const char *path);
+    void exportGroundMesh(const std::string &path);
     void clear();
 
     double minimum() const { return elevationMinimum_; }
