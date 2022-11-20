@@ -31,10 +31,16 @@ class Editor;
 class Descriptor
 {
 public:
+    enum Method
+    {
+        METHOD_PCA = 0,
+        METHOD_DISTRIBUTION = 1
+    };
+
     Descriptor(Editor *editor);
     ~Descriptor();
 
-    int start(double radius);
+    int start(double radius, double voxelSize, Method method);
     void step();
     void clear();
 
@@ -58,6 +64,8 @@ protected:
     Status status_;
 
     double radius_;
+    double voxelSize_;
+    Method method_;
 
     int currentStep_;
     int numberOfSteps_;

@@ -67,11 +67,13 @@ void Descriptor::clear()
     descriptorMaximum_ = 0;
 }
 
-int Descriptor::start(double radius)
+int Descriptor::start(double radius, double voxelSize, Method method)
 {
     LOG_DEBUG_LOCAL("radius <" << radius << ">");
 
     radius_ = radius;
+    voxelSize_ = voxelSize;
+    method_ = method;
 
     status_ = STATUS_COMPUTE_DESCRIPTOR;
 
@@ -144,28 +146,31 @@ void Descriptor::stepComputeDescriptor()
         float descriptor;
         bool hasDescriptor;
 
-#if 1
-        double meanX;
-        double meanY;
-        double meanZ;
+        if (method_ == Descriptor::METHOD_PCA)
+        {
+            double meanX;
+            double meanY;
+            double meanZ;
 
-        hasDescriptor = pca_.computeDescriptor(queryPoint_,
-                                               queryPoints_.x(),
-                                               queryPoints_.y(),
-                                               queryPoints_.z(),
-                                               radius_,
-                                               meanX,
-                                               meanY,
-                                               meanZ,
-                                               descriptor);
-#else
-        hasDescriptor = pca_.computeDistribution(queryPoint_,
-                                                 queryPoints_.x(),
-                                                 queryPoints_.y(),
-                                                 queryPoints_.z(),
-                                                 radius_,
-                                                 descriptor);
-#endif
+            hasDescriptor = pca_.computeDescriptor(queryPoint_,
+                                                   queryPoints_.x(),
+                                                   queryPoints_.y(),
+                                                   queryPoints_.z(),
+                                                   radius_,
+                                                   meanX,
+                                                   meanY,
+                                                   meanZ,
+                                                   descriptor);
+        }
+        else
+        {
+            hasDescriptor = pca_.computeDistribution(queryPoint_,
+                                                     queryPoints_.x(),
+                                                     queryPoints_.y(),
+                                                     queryPoints_.z(),
+                                                     radius_,
+                                                     descriptor);
+        }
 
         if (hasDescriptor)
         {

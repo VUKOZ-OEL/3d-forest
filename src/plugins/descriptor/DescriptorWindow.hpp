@@ -30,6 +30,7 @@ class MainWindow;
 
 class SliderWidget;
 class QPushButton;
+class QRadioButton;
 
 /** Descriptor Window. */
 class DescriptorWindow : public QDialog
@@ -46,6 +47,8 @@ protected:
     MainWindow *mainWindow_;
     Descriptor descriptor_;
     SliderWidget *radius_;
+    SliderWidget *voxelSize_;
+    QRadioButton *methodRadioButton_[2];
     QPushButton *applyButton_;
 };
 
