@@ -42,7 +42,8 @@
             if (npoints > 0)                                                   \
             {                                                                  \
                 LOG_MODULE(MODULE_NAME,                                        \
-                           "page <" << pageId << "> selected <"                \
+                           "page <" << pageId << "> selected <" << nselected   \
+                                    << "> from <" << npoints << "> percent <"  \
                                     << ((static_cast<float>(nselected) /       \
                                          static_cast<float>(npoints)) *        \
                                         100.0F)                                \
@@ -592,6 +593,7 @@ void Page::selectBox()
     }
 
     selectionSize = nSelected;
+    LOG_DEBUG_LOCAL_SELECTION(pageId_, selectionSize, selection.size());
 }
 
 void Page::selectCone()
@@ -669,6 +671,7 @@ void Page::selectCone()
     }
 
     selectionSize = nSelected;
+    LOG_DEBUG_LOCAL_SELECTION(pageId_, selectionSize, selection.size());
 
     query_->addResults(nSelected);
 }
@@ -748,6 +751,7 @@ void Page::selectSphere()
     }
 
     selectionSize = nSelected;
+    LOG_DEBUG_LOCAL_SELECTION(pageId_, selectionSize, selection.size());
 
     query_->addResults(nSelected);
 }
@@ -780,6 +784,7 @@ void Page::selectElevation()
     }
 
     selectionSize = nSelectedNew;
+    LOG_DEBUG_LOCAL_SELECTION(pageId_, selectionSize, selection.size());
 }
 
 void Page::selectDescriptor()
@@ -810,6 +815,7 @@ void Page::selectDescriptor()
     }
 
     selectionSize = nSelectedNew;
+    LOG_DEBUG_LOCAL_SELECTION(pageId_, selectionSize, selection.size());
 }
 
 void Page::selectClassification()
@@ -821,11 +827,14 @@ void Page::selectClassification()
         return;
     }
 
+    LOG_DEBUG_LOCAL("query classifications <" << classifications << ">");
+
     size_t nSelectedNew = 0;
 
     for (size_t i = 0; i < selectionSize; i++)
     {
         uint32_t id = classification[selection[i]];
+        LOG_DEBUG_LOCAL("query classification <" << id << "> at <" << i << ">");
 
         if (classifications[id])
         {
@@ -839,6 +848,7 @@ void Page::selectClassification()
     }
 
     selectionSize = nSelectedNew;
+    LOG_DEBUG_LOCAL_SELECTION(pageId_, selectionSize, selection.size());
 }
 
 void Page::selectLayer()
@@ -869,10 +879,8 @@ void Page::selectLayer()
         }
     }
 
-    LOG_DEBUG_LOCAL("selectionSize <" << selectionSize << "> nSelectedNew <"
-                                      << nSelectedNew << ">");
-
     selectionSize = nSelectedNew;
+    LOG_DEBUG_LOCAL_SELECTION(pageId_, selectionSize, selection.size());
 }
 
 void Page::runColorModifier()
