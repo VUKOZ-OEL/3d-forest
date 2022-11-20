@@ -361,7 +361,7 @@ bool SegmentationThread::computeCreateVoxels()
 
         // Add reference to voxel item to each point inside this voxel.
         query_.selectBox(cell);
-        // query_.selectClassifications({LasFile::CLASS_UNASSIGNED});
+        query_.selectClassifications({LasFile::CLASS_UNASSIGNED});
         query_.exec();
         while (query_.next())
         {
@@ -375,6 +375,7 @@ bool SegmentationThread::computeCreateVoxels()
 
             nPoints++;
         }
+        query_.selectClassifications({});
 
         if (nPoints > 0)
         {
