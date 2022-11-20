@@ -480,8 +480,9 @@ bool SegmentationThread::computeCreateElements()
     }
 
     // Next step
-    for (size_t i = 0; i < voxels_.sortedSize(); i++)
+    while (progressValue_ < progressMax_)
     {
+        size_t i = static_cast<size_t>(progressValue_);
         double radius = static_cast<double>(searchRadius_);
         uint32_t elementIndex =
             elements_.computeBase(voxels_, i, treeHeightMinimum_, radius);
