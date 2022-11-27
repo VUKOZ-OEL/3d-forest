@@ -47,6 +47,7 @@ SegmentationThread::SegmentationThread(Editor *editor)
       seedElevationMaximumPercent_(0),
       treeHeightMinimumPercent_(0),
       searchRadius_(0),
+      neighborPoints_(0),
       seedElevationMinimum_(0),
       seedElevationMaximum_(0),
       treeHeightMinimum_(0),
@@ -66,20 +67,24 @@ void SegmentationThread::clear()
 {
     query_.clear();
     voxels_.clear();
+    segmentationMap_.clear();
 }
 
 void SegmentationThread::start(int voxelSize,
                                int seedElevationMinimumPercent,
                                int seedElevationMaximumPercent,
                                int treeHeightMinimumPercent,
-                               int searchRadius)
+                               int searchRadius,
+                               int neighborPoints)
 {
     // clang-format off
-    LOG_DEBUG_LOCAL(
-        "voxelSize <" << voxelSize <<
-        "> seedElevationMinimumPercent <" << seedElevationMinimumPercent <<
-        "> seedElevationMaximumPercent <" << seedElevationMaximumPercent <<
-        "> treeHeightMinimumPercent <" << treeHeightMinimumPercent << ">");
+    LOG_DEBUG_LOCAL("voxelSize <" << voxelSize <<
+                    "> seedElevationMinimum <" << seedElevationMinimumPercent <<
+                    "> seedElevationMaximum <" << seedElevationMaximumPercent <<
+                    "> treeHeight <" << treeHeightMinimumPercent <<
+                    "> searchRadius <" << searchRadius <<
+                    "> neighborPoints <" << neighborPoints <<
+                    ">");
     // clang-format on
 
     // Cancel current computation
@@ -88,12 +93,24 @@ void SegmentationThread::start(int voxelSize,
     // Select state to start from
     State startState = STATE_FINISHED;
 
+    if (neighborPoints != neighborPoints_)
+    {
+        neighborPoints_ = neighborPoints;
+        startState = STATE_PROCESS_VOXELS;
+    }
+
+    if (searchRadius != searchRadius_)
+    {
+        searchRadius_ = searchRadius;
+        startState = STATE_PROCESS_VOXELS;
+    }
+
     if (treeHeightMinimumPercent != treeHeightMinimumPercent_)
     {
         treeHeightMinimumPercent_ = treeHeightMinimumPercent;
         double h = editor_->clipBoundary().length(2);
         treeHeightMinimum_ = h * (treeHeightMinimumPercent_ / 100.0);
-        startState = STATE_SORT_VOXELS;
+        startState = STATE_PROCESS_VOXELS;
     }
 
     if (seedElevationMinimumPercent != seedElevationMinimumPercent_ ||
@@ -106,12 +123,6 @@ void SegmentationThread::start(int voxelSize,
         seedElevationMinimum_ = h * (seedElevationMinimumPercent_ / 100.0);
         seedElevationMaximum_ = h * (seedElevationMaximumPercent_ / 100.0);
 
-        startState = STATE_SORT_VOXELS;
-    }
-
-    if (searchRadius != searchRadius_)
-    {
-        searchRadius_ = searchRadius;
         startState = STATE_SORT_VOXELS;
     }
 
@@ -159,6 +170,15 @@ bool SegmentationThread::compute()
         bool finishedState = computeSortVoxels();
         if (finishedState)
         {
+            setState(STATE_PROCESS_VOXELS);
+        }
+    }
+    else if (state_ == STATE_PROCESS_VOXELS)
+    {
+        bool finishedState = computeProcessVoxels();
+        if (finishedState)
+        {
+            //setState(STATE_FINISHED);
             setState(STATE_INITIALIZE_ELEMENTS);
         }
     }
@@ -361,7 +381,7 @@ bool SegmentationThread::computeCreateVoxels()
 
         // Add reference to voxel item to each point inside this voxel.
         query_.selectBox(cell);
-        // query_.selectClassifications({LasFile::CLASS_UNASSIGNED});
+        query_.selectClassifications({LasFile::CLASS_UNASSIGNED});
         query_.exec();
         while (query_.next())
         {
@@ -375,6 +395,7 @@ bool SegmentationThread::computeCreateVoxels()
 
             nPoints++;
         }
+        query_.selectClassifications({});
 
         if (nPoints > 0)
         {
@@ -440,6 +461,29 @@ bool SegmentationThread::computeSortVoxels()
     return true;
 }
 
+bool SegmentationThread::computeProcessVoxels()
+{
+    LOG_DEBUG_LOCAL("");
+
+    // Initialization
+    if (!stateInitialized_)
+    {
+        segmentationMap_.create(voxels_);
+
+        progressMax_ = segmentationMap_.size();
+        progressValue_ = 0;
+        stateInitialized_ = true;
+    }
+
+    // Next step
+    segmentationMap_.process(voxels_);
+
+    // Finished
+    progressPercent_ = 100;
+
+    return true;
+}
+
 bool SegmentationThread::computeInitializeElements()
 {
     LOG_DEBUG_LOCAL("");
@@ -479,8 +523,9 @@ bool SegmentationThread::computeCreateElements()
     }
 
     // Next step
-    for (size_t i = 0; i < voxels_.sortedSize(); i++)
+    while (progressValue_ < progressMax_)
     {
+        size_t i = static_cast<size_t>(progressValue_);
         double radius = static_cast<double>(searchRadius_);
         uint32_t elementIndex =
             elements_.computeBase(voxels_, i, treeHeightMinimum_, radius);

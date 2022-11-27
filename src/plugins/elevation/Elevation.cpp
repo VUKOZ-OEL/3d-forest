@@ -225,7 +225,7 @@ void Elevation::step()
     }
 }
 
-void Elevation::exportGroundMesh(const char *path)
+void Elevation::exportGroundMesh(const std::string &path)
 {
     std::string fullPath;
     fullPath = path + std::to_string(currentStep_) + ".obj";

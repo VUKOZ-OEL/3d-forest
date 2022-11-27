@@ -21,10 +21,18 @@
 
 #include <cstring>
 
+#include <ArgumentParser.hpp>
 #include <Editor.hpp>
 #include <Error.hpp>
 #include <Log.hpp>
 #include <SegmentationThread.hpp>
+
+#include <WarningsOff.h>
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image_write.h>
+
+#include <WarningsOn.h>
 
 static void appendPoint(std::vector<LasFile::Point> *points,
                         uint32_t x,
@@ -43,7 +51,7 @@ static void appendPoint(std::vector<LasFile::Point> *points,
     points->push_back(pt);
 }
 
-static void createTestDataset(const char *path)
+static void createTestDataset(const std::string &path)
 {
     // Create a dataset.
     std::vector<LasFile::Point> points;
@@ -62,7 +70,7 @@ static void createTestDataset(const char *path)
     IndexFileBuilder::index(path, path, settings);
 }
 
-static void saveVoxels(const Editor &editor, const char *path)
+static void saveVoxels(const Editor &editor, const std::string &path)
 {
     const Voxels &voxels = editor.voxels();
     const Layers &layers = editor.layers();
@@ -97,12 +105,28 @@ static void saveVoxels(const Editor &editor, const char *path)
     LasFile::create(path, points, {0.0001, 0.0001, 0.0001}, {0, 0, 0});
 }
 
-static void segmentation(const char *path,
+static void saveMap(const SegmentationThread &st, const std::string &path)
+{
+    int w;
+    int h;
+    int components;
+    int rowBytes;
+    std::vector<unsigned char> image;
+
+    st.segmentationMap().toImage(&w, &h, &components, &rowBytes, &image);
+
+    stbi_write_png(path.c_str(), w, h, components, image.data(), rowBytes);
+}
+
+static void segmentation(const std::string &path,
                          int voxelSize,
                          int seedElevationMinimumPercent,
                          int seedElevationMaximumPercent,
                          int treeHeightMinimumPercent,
-                         int searchRadius)
+                         int searchRadius,
+                         int neighborPoints,
+                         const std::string &outputVoxels,
+                         const std::string &outputMap)
 {
     // Open the file in editor.
     Editor editor;
@@ -115,66 +139,53 @@ static void segmentation(const char *path,
                              seedElevationMinimumPercent,
                              seedElevationMaximumPercent,
                              treeHeightMinimumPercent,
-                             searchRadius);
+                             searchRadius,
+                             neighborPoints);
     segmentationThread.wait();
 
-    // Export voxels.
-    saveVoxels(editor, "voxels.las");
+    // Optional export.
+    if (!outputVoxels.empty())
+    {
+        saveVoxels(editor, outputVoxels);
+    }
+
+    if (!outputMap.empty())
+    {
+        saveMap(segmentationThread, outputMap);
+    }
 }
 
 int main(int argc, char *argv[])
 {
-    const char *path = nullptr;
-    int voxelSize = 10;
-    int seedElevationMinimumPercent = 1;
-    int seedElevationMaximumPercent = 5;
-    int treeHeightMinimumPercent = 10;
-    int searchRadius = 1000;
-
-    if (argc > 1)
-    {
-        path = argv[1];
-    }
-
-    if (argc > 2)
-    {
-        voxelSize = atoi(argv[2]);
-    }
-
-    if (argc > 3)
-    {
-        seedElevationMinimumPercent = atoi(argv[3]);
-    }
-
-    if (argc > 4)
-    {
-        seedElevationMaximumPercent = atoi(argv[4]);
-    }
-
-    if (argc > 5)
-    {
-        treeHeightMinimumPercent = atoi(argv[5]);
-    }
-
-    if (argc > 6)
-    {
-        searchRadius = atoi(argv[6]);
-    }
-
     try
     {
-        if (!path)
+        ArgumentParser arg;
+        arg.add("--input", "");
+        arg.add("--test-data", "");
+        arg.add("--voxel-size", "10");
+        arg.add("--min", "1");
+        arg.add("--max", "5");
+        arg.add("--height", "10");
+        arg.add("--radius", "1000");
+        arg.add("--neighbors", "10");
+        arg.add("--output-voxels", "");
+        arg.add("--output-map", "");
+        arg.parse(argc, argv);
+
+        if (arg.contains("--test-data"))
         {
-            path = "dataset.las";
-            createTestDataset(path);
+            createTestDataset(arg.toString("--input"));
         }
 
-        segmentation(path,
-                     voxelSize,
-                     seedElevationMinimumPercent,
-                     seedElevationMaximumPercent,
-                     treeHeightMinimumPercent,
-                     searchRadius);
+        segmentation(arg.toString("--input"),
+                     arg.toInt("--voxel-size"),
+                     arg.toInt("--min"),
+                     arg.toInt("--max"),
+                     arg.toInt("--height"),
+                     arg.toInt("--radius"),
+                     arg.toInt("--neighbors"),
+                     arg.toString("--output-voxels"),
+                     arg.toString("--output-map"));
     }
     catch (std::exception &e)
     {

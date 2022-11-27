@@ -17,39 +17,30 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file DescriptorWindow.hpp */
+/** @file LayerData.hpp */
 
-#ifndef DESCRIPTOR_WINDOW_HPP
-#define DESCRIPTOR_WINDOW_HPP
+#ifndef LAYER_DATA_HPP
+#define LAYER_DATA_HPP
 
-#include <Descriptor.hpp>
+#include <ExportEditor.hpp>
+#include <Json.hpp>
+#include <Vector3.hpp>
 
-#include <QDialog>
-
-class MainWindow;
-
-class SliderWidget;
-class QPushButton;
-class QRadioButton;
-
-/** Descriptor Window. */
-class DescriptorWindow : public QDialog
+/** LayerData. */
+class EXPORT_EDITOR LayerData
 {
-    Q_OBJECT
-
 public:
-    DescriptorWindow(MainWindow *mainWindow);
+    LayerData();
 
-protected slots:
-    void slotApply();
+    const Vector3<double> &position() const { return position_; }
+    void setPosition(const Vector3<double> &p) { position_ = p; };
+
+    double radius() const { return radius_; }
+    void setRadius(double r) { radius_ = r; }
 
 protected:
-    MainWindow *mainWindow_;
-    Descriptor descriptor_;
-    SliderWidget *radius_;
-    SliderWidget *voxelSize_;
-    QRadioButton *methodRadioButton_[2];
-    QPushButton *applyButton_;
+    Vector3<double> position_;
+    double radius_;
 };
 
-#endif /* DESCRIPTOR_WINDOW_HPP */
+#endif /* LAYER_DATA_HPP */

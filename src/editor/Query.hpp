@@ -163,6 +163,12 @@ public:
     const Box<double> &gridCell() const { return gridCell_; }
     size_t gridSize() const { return grid_.size(); }
 
+    void setVoxels(double voxelSize, const Box<double> &region);
+    bool nextVoxel();
+    const Box<double> &voxelBox() const { return voxelBox_; }
+    uint64_t numberOfVoxels() const { return voxelTotalCount_; }
+    uint64_t numberOfVisitedVoxels() const { return voxelVisitedCount_; }
+
     void setState(Page::State state);
     bool nextState();
 
@@ -198,6 +204,23 @@ protected:
     size_t gridYSize_;
     size_t gridIndex_;
     std::vector<uint64_t> grid_;
+
+    // Voxel
+    Box<double> voxelRegion_;
+    Vector3<double> voxelSize_;
+    uint64_t voxelTotalCount_;
+    std::vector<Box<size_t>> voxelStack_;
+    Box<double> voxelBox_;
+    Vector3<size_t> voxelIndex_;
+    uint64_t voxelVisitedCount_;
+
+    bool nextVoxel(Query *query);
+    void pushVoxel(size_t x1,
+                   size_t y1,
+                   size_t z1,
+                   size_t x2,
+                   size_t y2,
+                   size_t z2);
 
     // Current page
     std::shared_ptr<Page> page_;

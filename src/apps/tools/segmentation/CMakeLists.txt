@@ -22,6 +22,7 @@ add_executable(
     segmentation.cpp
     ../../../plugins/segmentation/SegmentationElement.cpp
     ../../../plugins/segmentation/SegmentationElements.cpp
+    ../../../plugins/segmentation/SegmentationMap.cpp
     ../../../plugins/segmentation/SegmentationThread.cpp
 )
 
@@ -29,6 +30,8 @@ target_include_directories(
     ${SUB_PROJECT_NAME}
     PUBLIC
     ../../../plugins/segmentation
+    ../../../../3rdparty/stb
+    ../../../../3rdparty/warnings
 )
 
 target_link_libraries(

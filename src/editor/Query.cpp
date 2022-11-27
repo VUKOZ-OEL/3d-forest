@@ -477,6 +477,152 @@ bool Query::nextGrid()
     return false;
 }
 
+void Query::setVoxels(double voxelSize, const Box<double> &region)
+{
+    voxelRegion_ = region;
+
+    // Compute grid resolution and actual voxel size.
+    size_t min = 1;
+    size_t max = 999999;
+
+    size_t nx = static_cast<size_t>(round(voxelRegion_.length(0) / voxelSize));
+    clamp(nx, min, max);
+    voxelSize_[0] = voxelRegion_.length(0) / static_cast<double>(nx);
+
+    size_t ny = static_cast<size_t>(round(voxelRegion_.length(1) / voxelSize));
+    clamp(ny, min, max);
+    voxelSize_[1] = voxelRegion_.length(1) / static_cast<double>(ny);
+
+    size_t nz = static_cast<size_t>(round(voxelRegion_.length(2) / voxelSize));
+    clamp(nz, min, max);
+    voxelSize_[2] = voxelRegion_.length(2) / static_cast<double>(nz);
+
+    // Initialize voxel iterator.
+    pushVoxel(0, 0, 0, nx, ny, nz);
+    voxelTotalCount_ = nx * ny * nz;
+    voxelVisitedCount_ = 0;
+}
+
+bool Query::nextVoxel()
+{
+    return nextVoxel(this);
+}
+
+bool Query::nextVoxel(Query *query)
+{
+    // Subdivide grid until next voxel cell 1x1x1 is found.
+    while (!voxelStack_.empty())
+    {
+        // Get next cell to process.
+        const Box<size_t> &c = voxelStack_.back();
+        size_t x1 = c.min(0);
+        size_t y1 = c.min(1);
+        size_t z1 = c.min(2);
+        size_t x2 = c.max(0);
+        size_t y2 = c.max(1);
+        size_t z2 = c.max(2);
+        size_t dx = x2 - x1;
+        size_t dy = y2 - y1;
+        size_t dz = z2 - z1;
+        voxelStack_.pop_back();
+
+        voxelBox_.set(
+            voxelRegion_.min(0) + voxelSize_[0] * static_cast<double>(x1),
+            voxelRegion_.min(1) + voxelSize_[1] * static_cast<double>(y1),
+            voxelRegion_.min(2) + voxelSize_[2] * static_cast<double>(z1),
+            voxelRegion_.min(0) + voxelSize_[0] * static_cast<double>(x2),
+            voxelRegion_.min(1) + voxelSize_[1] * static_cast<double>(y2),
+            voxelRegion_.min(2) + voxelSize_[2] * static_cast<double>(z2));
+
+        // a) Return voxel cell 1x1x1.
+        if (dx == 1 && dy == 1 && dz == 1)
+        {
+            voxelIndex_[0] = x1;
+            voxelIndex_[1] = y1;
+            voxelIndex_[2] = z1;
+
+            voxelVisitedCount_++;
+
+            return true;
+        }
+
+        query->selectBox(voxelBox_);
+        query->setMaximumResults(1);
+        query->exec();
+        bool containsPoints = query->next();
+        query->setMaximumResults(0);
+        if (!containsPoints)
+        {
+            voxelVisitedCount_ += dx * dy * dz;
+            continue;
+        }
+
+        // b) Subdivide cell 2x2x2, 2x1x1, etc.
+        size_t px;
+        size_t py;
+        size_t pz;
+
+        if (dx >= dy && dx >= dz)
+        {
+            px = dx / 2;
+            py = dx / 2;
+            pz = dx / 2;
+        }
+        else if (dy >= dx && dy >= dz)
+        {
+            px = dy / 2;
+            py = dy / 2;
+            pz = dy / 2;
+        }
+        else
+        {
+            px = dz / 2;
+            py = dz / 2;
+            pz = dz / 2;
+        }
+
+        if (x1 + px > x2)
+        {
+            px = dx;
+        }
+        if (y1 + py > y2)
+        {
+            py = dy;
+        }
+        if (z1 + pz > z2)
+        {
+            pz = dz;
+        }
+
+        // Push sub-cells in reverse order to iteration.
+        // Creates linear order of an Octree using Morton space filling curve.
+        pushVoxel(x1 + px, y1 + py, z1 + pz, x2, y2, z2);
+        pushVoxel(x1, y1 + py, z1 + pz, x1 + px, y2, z2);
+        pushVoxel(x1 + px, y1, z1 + pz, x2, y1 + py, z2);
+        pushVoxel(x1, y1, z1 + pz, x1 + px, y1 + py, z2);
+
+        pushVoxel(x1 + px, y1 + py, z1, x2, y2, z1 + pz);
+        pushVoxel(x1, y1 + py, z1, x1 + px, y2, z1 + pz);
+        pushVoxel(x1 + px, y1, z1, x2, y1 + py, z1 + pz);
+        pushVoxel(x1, y1, z1, x1 + px, y1 + py, z1 + pz);
+    }
+
+    return false;
+}
+
+void Query::pushVoxel(size_t x1,
+                      size_t y1,
+                      size_t z1,
+                      size_t x2,
+                      size_t y2,
+                      size_t z2)
+{
+    if (x1 != x2 && y1 != y2 && z1 != z2)
+    {
+        voxelStack_.push_back(Box<size_t>(x1, y1, z1, x2, y2, z2));
+    }
+}
+
 bool Query::Key::operator<(const Key &rhs) const
 {
     return (datasetId < rhs.datasetId) || (pageId < rhs.pageId);

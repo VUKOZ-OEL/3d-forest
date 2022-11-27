@@ -24,6 +24,7 @@
 
 #include <Query.hpp>
 #include <SegmentationElements.hpp>
+#include <SegmentationMap.hpp>
 #include <Thread.hpp>
 #include <Vector3.hpp>
 #include <Voxels.hpp>
@@ -43,13 +44,15 @@ public:
                int seedElevationMinimumPercent,
                int seedElevationMaximumPercent,
                int treeHeightMinimumPercent,
-               int searchRadius);
+               int searchRadius,
+               int neighborPoints);
 
     int progressPercent() const { return progressPercent_; }
 
     virtual bool compute();
 
     const Editor *editor() const { return editor_; }
+    const SegmentationMap &segmentationMap() const { return segmentationMap_; }
 
 private:
     /** Segmentation Thread State. */
@@ -58,6 +61,7 @@ private:
         STATE_INITIALIZE_VOXELS,
         STATE_CREATE_VOXELS,
         STATE_SORT_VOXELS,
+        STATE_PROCESS_VOXELS,
         STATE_INITIALIZE_ELEMENTS,
         STATE_CREATE_ELEMENTS,
         STATE_MERGE_ELEMENTS,
@@ -82,6 +86,7 @@ private:
     int seedElevationMaximumPercent_;
     int treeHeightMinimumPercent_;
     int searchRadius_;
+    int neighborPoints_;
 
     double seedElevationMinimum_;
     double seedElevationMaximum_;
@@ -93,6 +98,7 @@ private:
 
     Voxels voxels_;
     SegmentationElements elements_;
+    SegmentationMap segmentationMap_;
 
     void setState(State state);
     void updateProgressPercent();
@@ -103,6 +109,7 @@ private:
     bool computeInitializeVoxels();
     bool computeCreateVoxels();
     bool computeSortVoxels();
+    bool computeProcessVoxels();
     bool computeInitializeElements();
     bool computeCreateElements();
     bool computeMergeElements();

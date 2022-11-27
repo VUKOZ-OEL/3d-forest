@@ -80,7 +80,7 @@ bool DescriptorPca::computeDescriptor(Query &query,
     // Select points in 'cell' into point coordinates 'xyz'.
     // Count the number of points.
     query.selectSphere(x, y, z, radius);
-    query.selectClassifications({LasFile::CLASS_UNASSIGNED});
+    // query.selectClassifications({LasFile::CLASS_UNASSIGNED});
     query.exec();
 
     while (query.next())
@@ -243,7 +243,7 @@ bool DescriptorPca::computeDistribution(Query &query,
                                         double radius,
                                         float &descriptor)
 {
-    const int dim = 8;
+    const int dim = 4;
     const int dim2 = dim / 2;
     const int dimxy = dim * dim;
     const int dimxyz = dim * dim * dim;

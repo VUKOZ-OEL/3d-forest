@@ -26,6 +26,7 @@
 #include <iterator>
 #include <set>
 #include <unordered_set>
+#include <vector>
 
 #define LOG_ENABLE 1
 
@@ -57,6 +58,15 @@ inline std::ostream &operator<<(std::ostream &os, std::unordered_set<T> vec)
 
 template <typename T>
 inline std::ostream &operator<<(std::ostream &os, std::set<T> vec)
+{
+    os << "{ ";
+    std::copy(vec.begin(), vec.end(), std::ostream_iterator<T>(os, " "));
+    os << "}";
+    return os;
+}
+
+template <typename T>
+inline std::ostream &operator<<(std::ostream &os, std::vector<T> vec)
 {
     os << "{ ";
     std::copy(vec.begin(), vec.end(), std::ostream_iterator<T>(os, " "));

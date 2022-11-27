@@ -50,10 +50,6 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
 {
     LOG_DEBUG_LOCAL("");
 
-    // Settings layout
-    QVBoxLayout *settingsLayout = new QVBoxLayout;
-
-    // Input widgets:
     // Voxel size
     SliderWidget::create(voxelSizeInput_,
                          this,
@@ -71,8 +67,6 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
                          SEGMENTATION_WINDOW_VOXEL_SIZE_DEFAULT_MAX,
                          SEGMENTATION_WINDOW_VOXEL_SIZE_DEFAULT_MAX);
 
-    settingsLayout->addWidget(voxelSizeInput_);
-
     // Maximum elevation
     RangeSliderWidget::create(seedElevationInput_,
                               this,
@@ -88,8 +82,6 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
                               4,
                               6);
 
-    settingsLayout->addWidget(seedElevationInput_);
-
     // Minimum height of tree
     SliderWidget::create(treeHeightInput_,
                          this,
@@ -104,13 +96,11 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
                          100,
                          10);
 
-    settingsLayout->addWidget(treeHeightInput_);
-
     // Search radius
     SliderWidget::create(searchRadiusInput_,
                          this,
                          nullptr,
-                         SLOT(slotSearchRadiusSizeFinalValue()),
+                         SLOT(slotSearchRadiusFinalValue()),
                          tr("Search radius"),
                          tr("Search radius"),
                          tr("pt"),
@@ -119,8 +109,26 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
                          10000,
                          5000);
 
-    settingsLayout->addWidget(searchRadiusInput_);
+    // Neighbor points
+    SliderWidget::create(neighborPointsInput_,
+                         this,
+                         nullptr,
+                         SLOT(slotNeighborPointsFinalValue()),
+                         tr("Neighbor points"),
+                         tr("Neighbor points"),
+                         tr("cnt"),
+                         1,
+                         1,
+                         10000,
+                         10);
 
+    // Settings layout
+    QVBoxLayout *settingsLayout = new QVBoxLayout;
+    settingsLayout->addWidget(voxelSizeInput_);
+    settingsLayout->addWidget(seedElevationInput_);
+    settingsLayout->addWidget(treeHeightInput_);
+    settingsLayout->addWidget(searchRadiusInput_);
+    settingsLayout->addWidget(neighborPointsInput_);
     settingsLayout->addStretch();
 
     // apply/cancel buttons
@@ -210,9 +218,15 @@ void SegmentationWindow::slotTreeHeightFinalValue()
     resumeThreads();
 }
 
-void SegmentationWindow::slotSearchRadiusSizeFinalValue()
+void SegmentationWindow::slotSearchRadiusFinalValue()
 {
     LOG_DEBUG_LOCAL("value <" << treeHeightInput_->value() << ">");
+    resumeThreads();
+}
+
+void SegmentationWindow::slotNeighborPointsFinalValue()
+{
+    LOG_DEBUG_LOCAL("value <" << neighborPointsInput_->value() << ">");
     resumeThreads();
 }
 
@@ -282,16 +296,18 @@ void SegmentationWindow::resumeThreads()
                     << voxelSizeInput_->value() << "> seedElevationMinimum <"
                     << seedElevationInput_->minimumValue()
                     << "> seedElevationMaximum <"
-                    << seedElevationInput_->maximumValue()
-                    << "> treeHeightMinimum <" << treeHeightInput_->value()
-                    << ">");
+                    << seedElevationInput_->maximumValue() << "> treeHeight <"
+                    << treeHeightInput_->value() << "> searchRadius <"
+                    << searchRadiusInput_->value() << "> neighborPoints <"
+                    << neighborPointsInput_->value() << ">");
 
     // in gui thread: start new task in worker thread
     segmentationThread_.start(voxelSizeInput_->value(),
                               seedElevationInput_->minimumValue(),
                               seedElevationInput_->maximumValue(),
                               treeHeightInput_->value(),
-                              searchRadiusInput_->value());
+                              searchRadiusInput_->value(),
+                              neighborPointsInput_->value());
 
     mainWindow_->setStatusProgressBarPercent(0);
 }

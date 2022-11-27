@@ -25,9 +25,11 @@
 #include <ThemeIcon.hpp>
 
 #include <QCoreApplication>
+#include <QGroupBox>
 #include <QHBoxLayout>
 #include <QProgressDialog>
 #include <QPushButton>
+#include <QRadioButton>
 #include <QVBoxLayout>
 
 #define MODULE_NAME "Descriptor"
@@ -57,9 +59,36 @@ DescriptorWindow::DescriptorWindow(MainWindow *mainWindow)
                          1000,
                          1000);
 
+    SliderWidget::create(voxelSize_,
+                         this,
+                         nullptr,
+                         nullptr,
+                         tr("Voxel Size"),
+                         tr("Voxel Size"),
+                         tr("pt"),
+                         1,
+                         1,
+                         1000,
+                         1);
+    voxelSize_->setEnabled(false);
+
+    // Method
+    methodRadioButton_[Descriptor::METHOD_PCA] = new QRadioButton(tr("PCA"));
+    methodRadioButton_[Descriptor::METHOD_DISTRIBUTION] =
+        new QRadioButton(tr("Distribution"));
+    methodRadioButton_[Descriptor::METHOD_PCA]->setChecked(true);
+    QVBoxLayout *methodVBoxLayout = new QVBoxLayout;
+    methodVBoxLayout->addWidget(methodRadioButton_[0]);
+    methodVBoxLayout->addWidget(methodRadioButton_[1]);
+    // methodVBoxLayout->addStretch(1);
+    QGroupBox *methodGroupBox = new QGroupBox(tr("Method"));
+    methodGroupBox->setLayout(methodVBoxLayout);
+
     // Settings layout
     QVBoxLayout *settingsLayout = new QVBoxLayout;
     settingsLayout->addWidget(radius_);
+    settingsLayout->addWidget(voxelSize_);
+    settingsLayout->addWidget(methodGroupBox);
     settingsLayout->addStretch();
 
     // Buttons
@@ -94,8 +123,15 @@ void DescriptorWindow::slotApply()
     mainWindow_->suspendThreads();
 
     double radius = static_cast<double>(radius_->value());
+    double voxelSize = static_cast<double>(voxelSize_->value());
 
-    int maximum = descriptor_.start(radius);
+    Descriptor::Method method = Descriptor::METHOD_PCA;
+    if (methodRadioButton_[Descriptor::METHOD_DISTRIBUTION]->isChecked())
+    {
+        method = Descriptor::METHOD_DISTRIBUTION;
+    }
+
+    int maximum = descriptor_.start(radius, voxelSize, method);
     LOG_DEBUG_LOCAL("maximum <" << maximum << ">");
 
     QProgressDialog progressDialog(mainWindow_);
