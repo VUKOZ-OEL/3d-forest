@@ -27,6 +27,13 @@
 #include <Log.hpp>
 #include <SegmentationThread.hpp>
 
+#include <WarningsOff.h>
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image_write.h>
+
+#include <WarningsOn.h>
+
 static void appendPoint(std::vector<LasFile::Point> *points,
                         uint32_t x,
                         uint32_t y,
@@ -98,13 +105,28 @@ static void saveVoxels(const Editor &editor, const std::string &path)
     LasFile::create(path, points, {0.0001, 0.0001, 0.0001}, {0, 0, 0});
 }
 
+static void saveMap(const SegmentationThread &st, const std::string &path)
+{
+    int w;
+    int h;
+    int components;
+    int rowBytes;
+    std::vector<unsigned char> image;
+
+    st.segmentationMap().toImage(&w, &h, &components, &rowBytes, &image);
+
+    stbi_write_png(path.c_str(), w, h, components, image.data(), rowBytes);
+}
+
 static void segmentation(const std::string &path,
                          int voxelSize,
                          int seedElevationMinimumPercent,
                          int seedElevationMaximumPercent,
                          int treeHeightMinimumPercent,
                          int searchRadius,
-                         const std::string &outputVoxels)
+                         int neighborPoints,
+                         const std::string &outputVoxels,
+                         const std::string &outputMap)
 {
     // Open the file in editor.
     Editor editor;
@@ -117,13 +139,19 @@ static void segmentation(const std::string &path,
                              seedElevationMinimumPercent,
                              seedElevationMaximumPercent,
                              treeHeightMinimumPercent,
-                             searchRadius);
+                             searchRadius,
+                             neighborPoints);
     segmentationThread.wait();
 
-    // Export voxels.
+    // Optional export.
     if (!outputVoxels.empty())
     {
         saveVoxels(editor, outputVoxels);
+    }
+
+    if (!outputMap.empty())
+    {
+        saveMap(segmentationThread, outputMap);
     }
 }
 
@@ -139,9 +167,9 @@ int main(int argc, char *argv[])
         arg.add("--max", "5");
         arg.add("--height", "10");
         arg.add("--radius", "1000");
-        arg.add("--elements", "10");
+        arg.add("--neighbors", "10");
         arg.add("--output-voxels", "");
-        arg.add("--plot", "");
+        arg.add("--output-map", "");
         arg.parse(argc, argv);
 
         if (arg.contains("--test-data"))
@@ -155,7 +183,9 @@ int main(int argc, char *argv[])
                      arg.toInt("--max"),
                      arg.toInt("--height"),
                      arg.toInt("--radius"),
-                     arg.toString("--output-voxels"));
+                     arg.toInt("--neighbors"),
+                     arg.toString("--output-voxels"),
+                     arg.toString("--output-map"));
     }
     catch (std::exception &e)
     {
