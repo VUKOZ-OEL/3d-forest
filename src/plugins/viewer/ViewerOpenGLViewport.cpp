@@ -351,7 +351,7 @@ void ViewerOpenGLViewport::renderLayers()
     for (size_t i = 0; i < layers.size(); i++)
     {
         const Layer &layer = layers.at(i);
-        const LayerData &data = layer.data();
+        const LayerData &layerData = layer.data();
     }
 }
 
