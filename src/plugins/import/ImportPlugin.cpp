@@ -33,7 +33,7 @@
 #include <QProgressDialog>
 
 #define IMPORT_PLUGIN_FILTER "LAS (LASer) File (*.las)"
-//#define ICON(name) (ThemeIcon(":/import/", name))
+#define ICON(name) (ThemeIcon(":/import/", name))
 
 ImportPlugin::ImportPlugin() : mainWindow_(nullptr)
 {
@@ -46,9 +46,9 @@ void ImportPlugin::initialize(MainWindow *mainWindow)
     mainWindow_->createAction(&actionImport_,
                               "File",
                               "File Import/Export",
-                              tr("Import"),
+                              tr("Import..."),
                               tr("Import new point cloud dataset"),
-                              THEME_ICON("add"),
+                              ICON("import"),
                               this,
                               SLOT(slotImport()));
 
