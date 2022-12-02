@@ -178,7 +178,7 @@ bool SegmentationThread::compute()
         bool finishedState = computeProcessVoxels();
         if (finishedState)
         {
-            //setState(STATE_FINISHED);
+            // setState(STATE_FINISHED);
             setState(STATE_INITIALIZE_ELEMENTS);
         }
     }
