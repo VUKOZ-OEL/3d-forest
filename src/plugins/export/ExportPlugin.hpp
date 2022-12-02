@@ -1,5 +1,4 @@
-<!DOCTYPE RCC>
-<!--
+/*
     Copyright 2020 VUKOZ
 
     This file is part of 3D Forest.
@@ -16,12 +15,37 @@
 
     You should have received a copy of the GNU General Public License
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
--->
-<RCC version="1.0">
-<qresource prefix="/export">
+*/
 
-<!-- Tool bar -->
-<file>export_24px.png</file>
+/** @file ExportPlugin.hpp */
 
-</qresource>
-</RCC>
+#ifndef EXPORT_PLUGIN_HPP
+#define EXPORT_PLUGIN_HPP
+
+#include <ExportGui.hpp>
+
+#include <QObject>
+#include <QString>
+
+class MainWindow;
+class QAction;
+
+/** Export Plugin. */
+class EXPORT_GUI ExportPlugin : public QObject
+{
+    Q_OBJECT
+
+public:
+    ExportPlugin();
+
+    void initialize(MainWindow *mainWindow);
+
+public slots:
+    void slotExportFile();
+
+protected:
+    MainWindow *mainWindow_;
+    QAction *exportFile_;
+};
+
+#endif /* EXPORT_PLUGIN_HPP */

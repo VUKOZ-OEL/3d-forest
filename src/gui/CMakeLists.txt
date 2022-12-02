@@ -27,6 +27,7 @@ set(CMAKE_AUTORCC ON)
 
 file(GLOB_RECURSE SOURCES "*.cpp")
 file(GLOB_RECURSE SOURCES_IMPORT "../plugins/import/*.cpp")
+file(GLOB_RECURSE SOURCES_EXPORT "../plugins/export/*.cpp")
 file(GLOB_RECURSE SOURCES_PROJECT "../plugins/projectnavigator/*.cpp")
 file(GLOB_RECURSE SOURCES_PROJECT_FILE "../plugins/projectfile/*.cpp")
 file(GLOB_RECURSE SOURCES_SETTINGS "../plugins/settings/*.cpp")
@@ -38,6 +39,7 @@ add_library(
     SHARED
     ${SOURCES}
     ${SOURCES_IMPORT}
+    ${SOURCES_EXPORT}
     ${SOURCES_PROJECT}
     ${SOURCES_PROJECT_FILE}
     ${SOURCES_SETTINGS}
@@ -47,6 +49,7 @@ add_library(
     ../../3rdparty/widgets/flowlayout/flowlayout.cpp
     resources/resources.qrc
     ../plugins/import/resources/resources.qrc
+    ../plugins/export/resources/resources.qrc
     ../plugins/projectnavigator/resources/resources.qrc
     ../plugins/projectfile/resources/resources.qrc
     ../plugins/settings/resources/resources.qrc
@@ -61,6 +64,7 @@ target_include_directories(
     ../../3rdparty/widgets/ctkrangeslider
     ../../3rdparty/widgets/flowlayout
     ../plugins/import
+    ../plugins/export
     ../plugins/projectnavigator
     ../plugins/projectfile
     ../plugins/settings

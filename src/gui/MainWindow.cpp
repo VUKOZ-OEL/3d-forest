@@ -21,6 +21,7 @@
 
 #include <Log.hpp>
 
+#include <ExportPlugin.hpp>
 #include <HelpPlugin.hpp>
 #include <ImportPlugin.hpp>
 #include <MainWindow.hpp>
@@ -87,6 +88,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     importPlugin_ = new ImportPlugin();
     importPlugin_->initialize(this);
+
+    exportPlugin_ = new ExportPlugin();
+    exportPlugin_->initialize(this);
 
     projectNavigatorPlugin_ = new ProjectNavigatorPlugin();
     projectNavigatorPlugin_->initialize(this);
