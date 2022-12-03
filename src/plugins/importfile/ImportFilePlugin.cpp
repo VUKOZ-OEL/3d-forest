@@ -46,7 +46,7 @@ void ImportFilePlugin::initialize(MainWindow *mainWindow)
     mainWindow_->createAction(&importFileAction_,
                               "File",
                               "File Import/Export",
-                              tr("Import..."),
+                              tr("Import File..."),
                               tr("Import new point cloud dataset"),
                               ICON("import_file"),
                               this,
