@@ -18,10 +18,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 -->
 <RCC version="1.0">
-<qresource prefix="/import">
+<qresource prefix="/exportfile">
 
 <!-- Tool bar -->
-<file>import_24px.png</file>
+<file>export_file_24px.png</file>
 
 </qresource>
 </RCC>

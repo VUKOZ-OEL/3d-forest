@@ -17,10 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ImportDialog.hpp */
+/** @file ImportFileDialog.hpp */
 
-#ifndef IMPORT_DIALOG_HPP
-#define IMPORT_DIALOG_HPP
+#ifndef IMPORT_FILE_DIALOG_HPP
+#define IMPORT_FILE_DIALOG_HPP
 
 #include <SettingsImport.hpp>
 
@@ -30,13 +30,13 @@ class MainWindow;
 class QCheckBox;
 class QPushButton;
 
-/** Import Dialog. */
-class ImportDialog : public QDialog
+/** Import File Dialog. */
+class ImportFileDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    ImportDialog(MainWindow *mainWindow);
+    ImportFileDialog(MainWindow *mainWindow);
 
     SettingsImport getSettings() const;
 
@@ -51,4 +51,4 @@ protected:
     QPushButton *rejectButton_;
 };
 
-#endif /* IMPORT_DIALOG_HPP */
+#endif /* IMPORT_FILE_DIALOG_HPP */

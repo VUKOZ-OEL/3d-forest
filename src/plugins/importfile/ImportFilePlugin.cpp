@@ -17,13 +17,13 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ImportPlugin.cpp */
+/** @file ImportFilePlugin.cpp */
 
 #include <IndexFileBuilder.hpp>
 #include <Log.hpp>
 
-#include <ImportDialog.hpp>
-#include <ImportPlugin.hpp>
+#include <ImportFileDialog.hpp>
+#include <ImportFilePlugin.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
@@ -33,31 +33,31 @@
 #include <QProgressDialog>
 
 #define IMPORT_PLUGIN_FILTER "LAS (LASer) File (*.las)"
-#define ICON(name) (ThemeIcon(":/import/", name))
+#define ICON(name) (ThemeIcon(":/importfile/", name))
 
-ImportPlugin::ImportPlugin() : mainWindow_(nullptr)
+ImportFilePlugin::ImportFilePlugin() : mainWindow_(nullptr)
 {
 }
 
-void ImportPlugin::initialize(MainWindow *mainWindow)
+void ImportFilePlugin::initialize(MainWindow *mainWindow)
 {
     mainWindow_ = mainWindow;
 
-    mainWindow_->createAction(&actionImport_,
+    mainWindow_->createAction(&importFileAction_,
                               "File",
                               "File Import/Export",
                               tr("Import..."),
                               tr("Import new point cloud dataset"),
-                              ICON("import"),
+                              ICON("import_file"),
                               this,
-                              SLOT(slotImport()));
+                              SLOT(slotImportFile()));
 
     mainWindow_->hideToolBar("File Import/Export");
 }
 
-void ImportPlugin::slotImport()
+void ImportFilePlugin::slotImportFile()
 {
-    ImportPlugin::import(mainWindow_);
+    ImportFilePlugin::import(mainWindow_);
 }
 
 static void importPluginDialog(MainWindow *mainWindow);
@@ -68,7 +68,7 @@ static bool importPluginCreateIndex(const QString &path,
                                     const SettingsImport &settings,
                                     MainWindow *mainWindow);
 
-void ImportPlugin::import(MainWindow *mainWindow)
+void ImportFilePlugin::import(MainWindow *mainWindow)
 {
     try
     {
@@ -110,7 +110,7 @@ static void importPluginFile(const QString &path, MainWindow *mainWindow)
 {
     mainWindow->suspendThreads();
 
-    ImportDialog dialog(mainWindow);
+    ImportFileDialog dialog(mainWindow);
 
     if (dialog.exec() == QDialog::Rejected)
     {

@@ -17,11 +17,11 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ExportPlugin.cpp */
+/** @file ExportFilePlugin.cpp */
 
 #include <Log.hpp>
 
-#include <ExportPlugin.hpp>
+#include <ExportFilePlugin.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
@@ -29,27 +29,27 @@
 #include <QMessageBox>
 
 #define EXPORT_PLUGIN_FILTER "LAS (LASer) File (*.las)"
-#define ICON(name) (ThemeIcon(":/export/", name))
+#define ICON(name) (ThemeIcon(":/exportfile/", name))
 
-ExportPlugin::ExportPlugin() : mainWindow_(nullptr)
+ExportFilePlugin::ExportFilePlugin() : mainWindow_(nullptr)
 {
 }
 
-void ExportPlugin::initialize(MainWindow *mainWindow)
+void ExportFilePlugin::initialize(MainWindow *mainWindow)
 {
     mainWindow_ = mainWindow;
 
-    mainWindow_->createAction(&exportFile_,
+    mainWindow_->createAction(&exportFileAction_,
                               "File",
                               "File Import/Export",
                               tr("Export As..."),
                               tr("Export point cloud dataset"),
-                              ICON("export"),
+                              ICON("export_file"),
                               this,
                               SLOT(slotExportFile()));
 }
 
-void ExportPlugin::slotExportFile()
+void ExportFilePlugin::slotExportFile()
 {
     QString fileName;
 

@@ -1,5 +1,4 @@
-<!DOCTYPE RCC>
-<!--
+/*
     Copyright 2020 VUKOZ
 
     This file is part of 3D Forest.
@@ -16,12 +15,39 @@
 
     You should have received a copy of the GNU General Public License
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
--->
-<RCC version="1.0">
-<qresource prefix="/export">
+*/
 
-<!-- Tool bar -->
-<file>export_24px.png</file>
+/** @file ExportFile.hpp */
 
-</qresource>
-</RCC>
+#ifndef EXPORT_FILE_HPP
+#define EXPORT_FILE_HPP
+
+#include <Query.hpp>
+
+class Editor;
+
+/** Export File. */
+class ExportFile
+{
+public:
+    ExportFile(Editor *editor);
+    ~ExportFile();
+
+    int start();
+    void step();
+    void clear();
+
+protected:
+    Editor *editor_;
+    Query queryPoints_;
+
+    int currentStep_;
+    int numberOfSteps_;
+
+    uint64_t nPointsTotal_;
+    uint64_t nPointsPerStep_;
+    uint64_t nPointsProcessed_;
+    float descriptorMaximum_;
+};
+
+#endif /* EXPORT_FILE_HPP */

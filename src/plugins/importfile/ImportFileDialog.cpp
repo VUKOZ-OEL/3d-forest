@@ -17,11 +17,11 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ImportDialog.cpp */
+/** @file ImportFileDialog.cpp */
 
 #include <Log.hpp>
 
-#include <ImportDialog.hpp>
+#include <ImportFileDialog.hpp>
 #include <MainWindow.hpp>
 
 #include <QCheckBox>
@@ -32,7 +32,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-ImportDialog::ImportDialog(MainWindow *mainWindow) : QDialog(mainWindow)
+ImportFileDialog::ImportFileDialog(MainWindow *mainWindow) : QDialog(mainWindow)
 {
     // Widgets
     QLabel *description = new QLabel(tr("This operation may modify"
@@ -89,19 +89,19 @@ ImportDialog::ImportDialog(MainWindow *mainWindow) : QDialog(mainWindow)
     setMaximumHeight(height());
 }
 
-void ImportDialog::slotAccept()
+void ImportFileDialog::slotAccept()
 {
     close();
     setResult(QDialog::Accepted);
 }
 
-void ImportDialog::slotReject()
+void ImportFileDialog::slotReject()
 {
     close();
     setResult(QDialog::Rejected);
 }
 
-SettingsImport ImportDialog::getSettings() const
+SettingsImport ImportFileDialog::getSettings() const
 {
     SettingsImport settings;
 

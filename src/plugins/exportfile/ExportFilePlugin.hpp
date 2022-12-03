@@ -17,10 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ExportPlugin.hpp */
+/** @file ExportFilePlugin.hpp */
 
-#ifndef EXPORT_PLUGIN_HPP
-#define EXPORT_PLUGIN_HPP
+#ifndef EXPORT_FILE_PLUGIN_HPP
+#define EXPORT_FILE_PLUGIN_HPP
 
 #include <ExportGui.hpp>
 
@@ -30,13 +30,13 @@
 class MainWindow;
 class QAction;
 
-/** Export Plugin. */
-class EXPORT_GUI ExportPlugin : public QObject
+/** Export File Plugin. */
+class EXPORT_GUI ExportFilePlugin : public QObject
 {
     Q_OBJECT
 
 public:
-    ExportPlugin();
+    ExportFilePlugin();
 
     void initialize(MainWindow *mainWindow);
 
@@ -45,7 +45,7 @@ public slots:
 
 protected:
     MainWindow *mainWindow_;
-    QAction *exportFile_;
+    QAction *exportFileAction_;
 };
 
-#endif /* EXPORT_PLUGIN_HPP */
+#endif /* EXPORT_FILE_PLUGIN_HPP */

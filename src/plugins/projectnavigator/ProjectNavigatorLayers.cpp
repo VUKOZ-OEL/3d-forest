@@ -19,7 +19,7 @@
 
 /** @file ProjectNavigatorLayers.cpp */
 
-#include <ImportPlugin.hpp>
+#include <ImportFilePlugin.hpp>
 #include <Log.hpp>
 #include <MainWindow.hpp>
 #include <ProjectNavigatorLayers.hpp>

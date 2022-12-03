@@ -19,7 +19,7 @@
 
 /** @file ProjectNavigatorFiles.cpp */
 
-#include <ImportPlugin.hpp>
+#include <ImportFilePlugin.hpp>
 #include <Log.hpp>
 #include <MainWindow.hpp>
 #include <ProjectNavigatorFiles.hpp>
@@ -151,7 +151,7 @@ void ProjectNavigatorFiles::filterChanged()
 
 void ProjectNavigatorFiles::slotAdd()
 {
-    ImportPlugin::import(mainWindow_);
+    ImportFilePlugin::import(mainWindow_);
 }
 
 void ProjectNavigatorFiles::slotDelete()
