@@ -21,8 +21,10 @@
 
 #include <Log.hpp>
 
+#include <ExportFile.hpp>
 #include <ExportFilePlugin.hpp>
 #include <MainWindow.hpp>
+#include <ProgressDialog.hpp>
 #include <ThemeIcon.hpp>
 
 #include <QFileDialog>
@@ -42,8 +44,8 @@ void ExportFilePlugin::initialize(MainWindow *mainWindow)
     mainWindow_->createAction(&exportFileAction_,
                               "File",
                               "File Import/Export",
-                              tr("Export As..."),
-                              tr("Export point cloud dataset"),
+                              tr("Export File As..."),
+                              tr("Export point cloud"),
                               ICON("export_file"),
                               this,
                               SLOT(slotExportFile()));
@@ -54,7 +56,7 @@ void ExportFilePlugin::slotExportFile()
     QString fileName;
 
     fileName = QFileDialog::getSaveFileName(mainWindow_,
-                                            tr("Save File As"),
+                                            tr("Export File As"),
                                             "",
                                             tr(EXPORT_PLUGIN_FILTER));
 
@@ -63,5 +65,12 @@ void ExportFilePlugin::slotExportFile()
         return;
     }
 
-    // (void)projectSave(fileName);
+    mainWindow_->suspendThreads();
+
+    ExportFile exportFile(&mainWindow_->editor());
+    exportFile.initialize(fileName.toStdString());
+
+    ProgressDialog::run(mainWindow_, "Exporting file", &exportFile);
+
+    mainWindow_->resumeThreads();
 }

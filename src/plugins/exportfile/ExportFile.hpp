@@ -22,32 +22,31 @@
 #ifndef EXPORT_FILE_HPP
 #define EXPORT_FILE_HPP
 
+#include <LasFile.hpp>
+#include <ProgressActionInterface.hpp>
 #include <Query.hpp>
 
 class Editor;
 
 /** Export File. */
-class ExportFile
+class ExportFile : public ProgressActionInterface
 {
 public:
     ExportFile(Editor *editor);
-    ~ExportFile();
+    virtual ~ExportFile();
 
-    int start();
-    void step();
+    void initialize(const std::string &path);
     void clear();
 
-protected:
+    virtual void step();
+
+private:
     Editor *editor_;
     Query queryPoints_;
+    std::string path_;
+    LasFile file_;
 
-    int currentStep_;
-    int numberOfSteps_;
-
-    uint64_t nPointsTotal_;
-    uint64_t nPointsPerStep_;
-    uint64_t nPointsProcessed_;
-    float descriptorMaximum_;
+    void createFile(Editor *editor, const std::string path, LasFile &file);
 };
 
 #endif /* EXPORT_FILE_HPP */
