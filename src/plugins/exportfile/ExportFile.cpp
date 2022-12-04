@@ -45,16 +45,13 @@ void ExportFile::initialize(const std::string &path)
     LOG_DEBUG_LOCAL("");
 
     path_ = path;
+    file_.close();
 
-    uint64_t nPointsTotal = 0;
     queryPoints_.selectBox(editor_->clipBoundary());
     queryPoints_.exec();
-    while (queryPoints_.next())
-    {
-        nPointsTotal++;
-    }
+    nPointsTotal_ = 0;
 
-    return ProgressActionInterface::initialize(nPointsTotal, 1000);
+    ProgressActionInterface::initialize(ProgressActionInterface::npos, 1000UL);
 }
 
 void ExportFile::clear()
@@ -65,15 +62,18 @@ void ExportFile::clear()
 
 void ExportFile::step()
 {
+    if (initializing())
+    {
+        determineMaximum();
+        return;
+    }
+
     uint64_t n = process();
     uint64_t i = 0;
 
     startTimer();
 
-    if (processed() == 0)
-    {
-        createFile(editor_, path_, file_);
-    }
+    createFile(editor_, path_, file_);
 
     while (i < n)
     {
@@ -90,9 +90,31 @@ void ExportFile::step()
     increment(i);
 }
 
+void ExportFile::determineMaximum()
+{
+    startTimer();
+
+    while (queryPoints_.next())
+    {
+        nPointsTotal_++;
+
+        if (timedOut())
+        {
+            return;
+        }
+    }
+
+    ProgressActionInterface::initialize(nPointsTotal_, 1000UL);
+}
+
 void ExportFile::createFile(Editor *editor,
                             const std::string path,
                             LasFile &file)
 {
+    if (file.file().isOpen())
+    {
+        return;
+    }
+
     file.create(path);
 }

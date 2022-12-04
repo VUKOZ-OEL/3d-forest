@@ -43,9 +43,11 @@ public:
 private:
     Editor *editor_;
     Query queryPoints_;
+    uint64_t nPointsTotal_;
     std::string path_;
     LasFile file_;
 
+    void determineMaximum();
     void createFile(Editor *editor, const std::string path, LasFile &file);
 };
 
