@@ -19,6 +19,8 @@
 
 /** @file ExportFile.cpp */
 
+#include <cstring>
+
 #include <Editor.hpp>
 #include <ExportFile.hpp>
 #include <Time.hpp>
@@ -30,7 +32,7 @@
 ExportFile::ExportFile(Editor *editor)
     : ProgressActionInterface(),
       editor_(editor),
-      queryPoints_(editor)
+      query_(editor)
 {
     LOG_DEBUG_LOCAL("");
 }
@@ -47,9 +49,19 @@ void ExportFile::initialize(const std::string &path)
     path_ = path;
     file_.close();
 
-    queryPoints_.selectBox(editor_->clipBoundary());
-    queryPoints_.exec();
     nPointsTotal_ = 0;
+    region_.clear();
+
+    query_.selectBox(editor_->clipBoundary());
+    query_.exec();
+
+    if (query_.next())
+    {
+        regionMin_.set(query_.x(), query_.y(), query_.z());
+        regionMax_ = regionMin_;
+
+        nPointsTotal_++;
+    }
 
     ProgressActionInterface::initialize(ProgressActionInterface::npos, 1000UL);
 }
@@ -57,7 +69,7 @@ void ExportFile::initialize(const std::string &path)
 void ExportFile::clear()
 {
     LOG_DEBUG_LOCAL("");
-    queryPoints_.clear();
+    query_.clear();
 }
 
 void ExportFile::step()
@@ -77,7 +89,7 @@ void ExportFile::step()
 
     while (i < n)
     {
-        // TBD
+        writePoint();
 
         i++;
 
@@ -88,14 +100,22 @@ void ExportFile::step()
     }
 
     increment(i);
+
+    if (end())
+    {
+        file_.close();
+    }
 }
 
 void ExportFile::determineMaximum()
 {
     startTimer();
 
-    while (queryPoints_.next())
+    while (query_.next())
     {
+        regionMin_.updateLess(query_.x(), query_.y(), query_.z());
+        regionMax_.updateGreater(query_.x(), query_.y(), query_.z());
+
         nPointsTotal_++;
 
         if (timedOut())
@@ -103,6 +123,10 @@ void ExportFile::determineMaximum()
             return;
         }
     }
+
+    query_.reset();
+
+    region_.set(regionMin_, regionMax_);
 
     ProgressActionInterface::initialize(nPointsTotal_, 1000UL);
 }
@@ -117,4 +141,28 @@ void ExportFile::createFile(Editor *editor,
     }
 
     file.create(path);
+
+    file.header.set(nPointsTotal_, region_, {0.001, 0.001, 0.001});
+
+    file.writeHeader();
+}
+
+void ExportFile::writePoint()
+{
+    if (!query_.next())
+    {
+        return;
+    }
+
+    LasFile::Point point;
+    std::memset(&point, 0, sizeof(point));
+
+    point.x = static_cast<uint32_t>(query_.x());
+    point.y = static_cast<uint32_t>(query_.y());
+    point.z = static_cast<uint32_t>(query_.z());
+
+    point.format = 6;
+    point.intensity = 65535;
+
+    file_.writePoint(point);
 }

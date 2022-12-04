@@ -42,13 +42,19 @@ public:
 
 private:
     Editor *editor_;
-    Query queryPoints_;
+    Query query_;
+
     uint64_t nPointsTotal_;
+    Box<double> region_;
+    Vector3<double> regionMin_;
+    Vector3<double> regionMax_;
+
     std::string path_;
     LasFile file_;
 
     void determineMaximum();
     void createFile(Editor *editor, const std::string path, LasFile &file);
+    void writePoint();
 };
 
 #endif /* EXPORT_FILE_HPP */
