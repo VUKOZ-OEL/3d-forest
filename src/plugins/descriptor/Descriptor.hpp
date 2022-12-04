@@ -23,12 +23,13 @@
 #define DESCRIPTOR_HPP
 
 #include <DescriptorPca.hpp>
+#include <ProgressActionInterface.hpp>
 #include <Query.hpp>
 
 class Editor;
 
 /** Descriptor. */
-class Descriptor
+class Descriptor : public ProgressActionInterface
 {
 public:
     enum Method
