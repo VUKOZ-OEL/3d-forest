@@ -55,7 +55,73 @@ static const uint8_t LAS_FILE_FORMAT_NIR[LAS_FILE_FORMAT_COUNT] =
 static const uint8_t LAS_FILE_FORMAT_WAVE[LAS_FILE_FORMAT_COUNT] =
     {0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1};
 
-static const char *LAS_FILE_GENERATING_SOFTWARE = "3D Forest 1.0";
+static const char *LAS_FILE_GENERATING_SOFTWARE = "3D Forest 2022.12.04";
+
+void LasFile::Header::set(uint64_t numberOfPoints,
+                          const Box<uint32_t> &box,
+                          const std::array<double, 3> scale,
+                          const std::array<double, 3> offset,
+                          uint8_t pointFormat,
+                          uint8_t versionMinor)
+{
+    std::memset(this, 0, sizeof(LasFile::Header));
+
+    file_signature[0] = LAS_FILE_SIGNATURE_0;
+    file_signature[1] = LAS_FILE_SIGNATURE_1;
+    file_signature[2] = LAS_FILE_SIGNATURE_2;
+    file_signature[3] = LAS_FILE_SIGNATURE_3;
+
+    version_major = 1;
+    version_minor = versionMinor;
+    setGeneratingSoftware();
+
+    if (version_minor > 3)
+    {
+        header_size = LAS_FILE_HEADER_SIZE_V14;
+    }
+    else if (version_minor > 2)
+    {
+        header_size = LAS_FILE_HEADER_SIZE_V13;
+    }
+    else
+    {
+        header_size = LAS_FILE_HEADER_SIZE_V10;
+    }
+
+    offset_to_point_data = header_size;
+
+    point_data_record_format = pointFormat;
+    point_data_record_length =
+        static_cast<uint16_t>(pointDataRecordLength3dForest());
+
+    number_of_point_records = numberOfPoints;
+
+    uint32_t maxPoints = std::numeric_limits<uint32_t>::max();
+    if (numberOfPoints > maxPoints)
+    {
+        legacy_number_of_point_records = maxPoints;
+    }
+    else
+    {
+        legacy_number_of_point_records = static_cast<uint32_t>(numberOfPoints);
+    }
+
+    x_scale_factor = scale[0];
+    y_scale_factor = scale[1];
+    z_scale_factor = scale[2];
+
+    x_offset = offset[0];
+    y_offset = offset[1];
+    z_offset = offset[2];
+
+    // Extents of point file data
+    max_x = static_cast<double>(box.max(0)) * scale[0] + offset[0];
+    min_x = static_cast<double>(box.min(0)) * scale[0] + offset[0];
+    max_y = static_cast<double>(box.max(1)) * scale[1] + offset[1];
+    min_y = static_cast<double>(box.min(1)) * scale[1] + offset[1];
+    max_z = static_cast<double>(box.max(2)) * scale[2] + offset[2];
+    min_z = static_cast<double>(box.min(2)) * scale[2] + offset[2];
+}
 
 size_t LasFile::Header::versionHeaderSize() const
 {
@@ -208,64 +274,16 @@ void LasFile::create(const std::string &path,
                      const std::array<double, 3> offset,
                      uint8_t version_minor)
 {
-    // Fill header
-    LasFile::Header hdr;
-    std::memset(&hdr, 0, sizeof(hdr));
-
-    hdr.file_signature[0] = LAS_FILE_SIGNATURE_0;
-    hdr.file_signature[1] = LAS_FILE_SIGNATURE_1;
-    hdr.file_signature[2] = LAS_FILE_SIGNATURE_2;
-    hdr.file_signature[3] = LAS_FILE_SIGNATURE_3;
-
-    hdr.version_major = 1;
-    hdr.version_minor = version_minor;
-    hdr.setGeneratingSoftware();
-
-    if (version_minor > 3)
-    {
-        hdr.header_size = LAS_FILE_HEADER_SIZE_V14;
-    }
-    else if (version_minor > 2)
-    {
-        hdr.header_size = LAS_FILE_HEADER_SIZE_V13;
-    }
-    else
-    {
-        hdr.header_size = LAS_FILE_HEADER_SIZE_V10;
-    }
-
-    hdr.offset_to_point_data = hdr.header_size;
-
+    // Point format
+    uint8_t point_data_record_format;
     if (points.size() > 0)
     {
-        hdr.point_data_record_format = points[0].format;
+        point_data_record_format = points[0].format;
     }
     else
     {
-        hdr.point_data_record_format = 6;
+        point_data_record_format = 6;
     }
-
-    hdr.point_data_record_length =
-        static_cast<uint16_t>(hdr.pointDataRecordLength3dForest());
-
-    uint64_t nPoints = points.size();
-    uint32_t maxPoints = std::numeric_limits<uint32_t>::max();
-    hdr.number_of_point_records = nPoints;
-    if (nPoints > maxPoints)
-    {
-        hdr.legacy_number_of_point_records = maxPoints;
-    }
-    else
-    {
-        hdr.legacy_number_of_point_records = static_cast<uint32_t>(nPoints);
-    }
-
-    hdr.x_scale_factor = scale[0];
-    hdr.y_scale_factor = scale[1];
-    hdr.z_scale_factor = scale[2];
-    hdr.x_offset = offset[0];
-    hdr.y_offset = offset[1];
-    hdr.z_offset = offset[2];
 
     // Extents of point file data
     std::vector<uint32_t> coords;
@@ -276,19 +294,19 @@ void LasFile::create(const std::string &path,
         coords[i * 3 + 1] = points[i].y;
         coords[i * 3 + 2] = points[i].z;
     }
+
     Box<uint32_t> box;
     box.set(coords);
-    hdr.max_x = static_cast<double>(box.max(0)) * scale[0] + offset[0];
-    hdr.min_x = static_cast<double>(box.min(0)) * scale[0] + offset[0];
-    hdr.max_y = static_cast<double>(box.max(1)) * scale[1] + offset[1];
-    hdr.min_y = static_cast<double>(box.min(1)) * scale[1] + offset[1];
-    hdr.max_z = static_cast<double>(box.max(2)) * scale[2] + offset[2];
-    hdr.min_z = static_cast<double>(box.min(2)) * scale[2] + offset[2];
 
     // Create file output
     LasFile las;
     las.create(path);
-    las.header = hdr;
+    las.header.set(points.size(),
+                   box,
+                   scale,
+                   offset,
+                   point_data_record_format,
+                   version_minor);
     las.writeHeader();
 
     for (size_t i = 0; i < points.size(); i++)
