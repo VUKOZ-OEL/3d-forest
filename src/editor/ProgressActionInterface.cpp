@@ -82,6 +82,10 @@ double ProgressActionInterface::percent() const
     {
         p = 100.0;
     }
+    else if (nElements_ == npos)
+    {
+        p = 0.0;
+    }
     else
     {
         p = 100.0 * (static_cast<double>(nElementsProcessed_) /

@@ -30,12 +30,14 @@
 class EXPORT_EDITOR ProgressActionInterface
 {
 public:
+    static const uint64_t npos = UINT64_MAX;
+
     ProgressActionInterface();
     virtual ~ProgressActionInterface() = default;
 
     virtual void step() = 0;
 
-    void initialize(uint64_t nElements,
+    void initialize(uint64_t nElements = npos,
                     uint64_t interleave = 1,
                     double secondsPerStep = 0.25);
     void startTimer();
@@ -46,6 +48,7 @@ public:
     uint64_t processed() const { return nElementsProcessed_; }
     uint64_t process() const { return nElements_ - nElementsProcessed_; }
     uint64_t maximum() const { return nElements_; }
+    bool initializing() const { return nElements_ == npos; }
     void increment(uint64_t nElementsProcessed);
 
 private:
