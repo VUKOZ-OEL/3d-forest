@@ -48,6 +48,7 @@ public:
     void write(const uint8_t *buffer, uint64_t nbyte);
     void write(File &input, uint64_t nbyte);
 
+    bool isOpen() const { return fd_ != INVALID_DESCRIPTOR; }
     bool eof() const;
     uint64_t size() const;
     uint64_t offset() const;
