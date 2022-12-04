@@ -22,6 +22,7 @@
 #ifndef LAS_FILE_HPP
 #define LAS_FILE_HPP
 
+#include <Box.hpp>
 #include <ExportEditor.hpp>
 #include <File.hpp>
 #include <Json.hpp>
@@ -86,6 +87,13 @@ public:
         uint64_t number_of_point_records;
         uint64_t number_of_points_by_return[15];
         // End of 1.4 (375 bytes)
+
+        void set(uint64_t numberOfPoints,
+                 const Box<uint32_t> &box,
+                 const std::array<double, 3> scale = {1, 1, 1},
+                 const std::array<double, 3> offset = {0, 0, 0},
+                 uint8_t pointFormat = 6,
+                 uint8_t versionMinor = 4);
 
         size_t versionHeaderSize() const;
         size_t pointDataRecordLengthFormat() const;

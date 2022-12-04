@@ -21,15 +21,17 @@
 
 #include <Log.hpp>
 
-#include <HelpPlugin.hpp>
-#include <ImportPlugin.hpp>
 #include <MainWindow.hpp>
 #include <PluginInterface.hpp>
+#include <ViewerViewports.hpp>
+
+#include <ExportFilePlugin.hpp>
+#include <HelpPlugin.hpp>
+#include <ImportFilePlugin.hpp>
 #include <ProjectFilePlugin.hpp>
 #include <ProjectNavigatorPlugin.hpp>
 #include <SettingsPlugin.hpp>
 #include <ViewerPlugin.hpp>
-#include <ViewerViewports.hpp>
 
 #include <QCloseEvent>
 #include <QCoreApplication>
@@ -85,8 +87,11 @@ MainWindow::MainWindow(QWidget *parent)
     projectFilePlugin_ = new ProjectFilePlugin();
     projectFilePlugin_->initialize(this);
 
-    importPlugin_ = new ImportPlugin();
-    importPlugin_->initialize(this);
+    importFilePlugin_ = new ImportFilePlugin();
+    importFilePlugin_->initialize(this);
+
+    exportFilePlugin_ = new ExportFilePlugin();
+    exportFilePlugin_->initialize(this);
 
     projectNavigatorPlugin_ = new ProjectNavigatorPlugin();
     projectNavigatorPlugin_->initialize(this);

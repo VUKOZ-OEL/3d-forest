@@ -1,5 +1,4 @@
-<!DOCTYPE RCC>
-<!--
+/*
     Copyright 2020 VUKOZ
 
     This file is part of 3D Forest.
@@ -16,9 +15,40 @@
 
     You should have received a copy of the GNU General Public License
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
--->
-<RCC version="1.0">
-<qresource prefix="/export">
+*/
 
-</qresource>
-</RCC>
+/** @file ImportFileDialog.hpp */
+
+#ifndef IMPORT_FILE_DIALOG_HPP
+#define IMPORT_FILE_DIALOG_HPP
+
+#include <SettingsImport.hpp>
+
+#include <QDialog>
+
+class MainWindow;
+class QCheckBox;
+class QPushButton;
+
+/** Import File Dialog. */
+class ImportFileDialog : public QDialog
+{
+    Q_OBJECT
+
+public:
+    ImportFileDialog(MainWindow *mainWindow);
+
+    SettingsImport getSettings() const;
+
+public slots:
+    void slotAccept();
+    void slotReject();
+
+protected:
+    QCheckBox *centerCheckBox_;
+    QCheckBox *convertCheckBox_;
+    QPushButton *acceptButton_;
+    QPushButton *rejectButton_;
+};
+
+#endif /* IMPORT_FILE_DIALOG_HPP */

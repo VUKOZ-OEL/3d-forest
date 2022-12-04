@@ -26,32 +26,35 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 file(GLOB_RECURSE SOURCES "*.cpp")
-file(GLOB_RECURSE SOURCES_IMPORT "../plugins/import/*.cpp")
-file(GLOB_RECURSE SOURCES_PROJECT "../plugins/projectnavigator/*.cpp")
+file(GLOB_RECURSE SOURCES_EXPORT_FILE "../plugins/exportfile/*.cpp")
+file(GLOB_RECURSE SOURCES_HELP "../plugins/help/*.cpp")
+file(GLOB_RECURSE SOURCES_IMPORT_FILE "../plugins/importfile/*.cpp")
 file(GLOB_RECURSE SOURCES_PROJECT_FILE "../plugins/projectfile/*.cpp")
+file(GLOB_RECURSE SOURCES_PROJECT_NAVIGATOR "../plugins/projectnavigator/*.cpp")
 file(GLOB_RECURSE SOURCES_SETTINGS "../plugins/settings/*.cpp")
 file(GLOB_RECURSE SOURCES_VIEWER "../plugins/viewer/*.cpp")
-file(GLOB_RECURSE SOURCES_HELP "../plugins/help/*.cpp")
 
 add_library(
     ${SUB_PROJECT_NAME}
     SHARED
     ${SOURCES}
-    ${SOURCES_IMPORT}
-    ${SOURCES_PROJECT}
+    ${SOURCES_EXPORT_FILE}
+    ${SOURCES_HELP}
+    ${SOURCES_IMPORT_FILE}
     ${SOURCES_PROJECT_FILE}
+    ${SOURCES_PROJECT_NAVIGATOR}
     ${SOURCES_SETTINGS}
     ${SOURCES_VIEWER}
-    ${SOURCES_HELP}
     ../../3rdparty/widgets/ctkrangeslider/ctkrangeslider.cpp
     ../../3rdparty/widgets/flowlayout/flowlayout.cpp
     resources/resources.qrc
-    ../plugins/import/resources/resources.qrc
-    ../plugins/projectnavigator/resources/resources.qrc
+    ../plugins/exportfile/resources/resources.qrc
+    ../plugins/help/resources/resources.qrc
+    ../plugins/importfile/resources/resources.qrc
     ../plugins/projectfile/resources/resources.qrc
+    ../plugins/projectnavigator/resources/resources.qrc
     ../plugins/settings/resources/resources.qrc
     ../plugins/viewer/resources/resources.qrc
-    ../plugins/help/resources/resources.qrc
 )
 
 target_include_directories(
@@ -60,12 +63,13 @@ target_include_directories(
     ${CMAKE_CURRENT_LIST_DIR}
     ../../3rdparty/widgets/ctkrangeslider
     ../../3rdparty/widgets/flowlayout
-    ../plugins/import
-    ../plugins/projectnavigator
+    ../plugins/exportfile
+    ../plugins/help
+    ../plugins/importfile
     ../plugins/projectfile
+    ../plugins/projectnavigator
     ../plugins/settings
     ../plugins/viewer
-    ../plugins/help
 )
 
 target_compile_definitions(

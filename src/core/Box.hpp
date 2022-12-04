@@ -37,6 +37,7 @@ public:
 
     void set(T x1, T y1, T z1, T x2, T y2, T z2);
     void set(T cx, T cy, T cz, T r);
+    void set(const Vector3<T> &min, const Vector3<T> &max);
     void set(const std::vector<T> &xyz);
     void set(const Box<T> &box);
     void setPercent(const Box<T> &box, const Box<T> &a, const Box<T> &b);
@@ -84,12 +85,13 @@ template <class T> inline Box<T>::~Box()
 
 template <class T> template <class B> inline Box<T>::Box(const Box<B> &box)
 {
-    min_[0] = static_cast<T>(box.min_[0]);
-    min_[1] = static_cast<T>(box.min_[1]);
-    min_[2] = static_cast<T>(box.min_[2]);
-    max_[0] = static_cast<T>(box.max_[0]);
-    max_[1] = static_cast<T>(box.max_[1]);
-    max_[2] = static_cast<T>(box.max_[2]);
+    min_[0] = static_cast<T>(box.min(0));
+    min_[1] = static_cast<T>(box.min(1));
+    min_[2] = static_cast<T>(box.min(2));
+    max_[0] = static_cast<T>(box.max(0));
+    max_[1] = static_cast<T>(box.max(1));
+    max_[2] = static_cast<T>(box.max(2));
+
     validate();
 }
 
@@ -108,6 +110,12 @@ template <class T> template <class B> inline Box<T>::Box(B cx, B cy, B cz, B r)
 template <class T> inline void Box<T>::set(T cx, T cy, T cz, T r)
 {
     set(cx - r, cy - r, cz - r, cx + r, cy + r, cz + r);
+}
+
+template <class T>
+inline void Box<T>::set(const Vector3<T> &min, const Vector3<T> &max)
+{
+    set(min[0], min[1], min[2], max[0], max[1], max[2]);
 }
 
 template <class T> inline void Box<T>::set(T x1, T y1, T z1, T x2, T y2, T z2)

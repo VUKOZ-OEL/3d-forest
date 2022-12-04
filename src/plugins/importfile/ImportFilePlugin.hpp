@@ -17,10 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ImportPlugin.hpp */
+/** @file ImportFilePlugin.hpp */
 
-#ifndef IMPORT_PLUGIN_HPP
-#define IMPORT_PLUGIN_HPP
+#ifndef IMPORT_FILE_PLUGIN_HPP
+#define IMPORT_FILE_PLUGIN_HPP
 
 #include <ExportGui.hpp>
 
@@ -29,24 +29,24 @@
 class MainWindow;
 class QAction;
 
-/** Import Plugin. */
-class EXPORT_GUI ImportPlugin : public QObject
+/** Import File Plugin. */
+class EXPORT_GUI ImportFilePlugin : public QObject
 {
     Q_OBJECT
 
 public:
-    ImportPlugin();
+    ImportFilePlugin();
 
     void initialize(MainWindow *mainWindow);
 
     static void import(MainWindow *mainWindow);
 
 public slots:
-    void slotImport();
+    void slotImportFile();
 
 protected:
     MainWindow *mainWindow_;
-    QAction *actionImport_;
+    QAction *importFileAction_;
 };
 
-#endif /* IMPORT_PLUGIN_HPP */
+#endif /* IMPORT_FILE_PLUGIN_HPP */
