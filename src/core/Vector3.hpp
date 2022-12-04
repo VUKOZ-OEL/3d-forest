@@ -39,6 +39,9 @@ public:
 
     template <class B> void set(B v0, B v1, B v2);
 
+    template <class B> void updateLess(B v0, B v1, B v2);
+    template <class B> void updateGreater(B v0, B v1, B v2);
+
     void clear();
 
     T length() const;
@@ -136,6 +139,46 @@ inline void Vector3<T>::set(B v0, B v1, B v2)
     this->operator[](0) = static_cast<T>(v0);
     this->operator[](1) = static_cast<T>(v1);
     this->operator[](2) = static_cast<T>(v2);
+}
+
+template <class T>
+template <class B>
+inline void Vector3<T>::updateLess(B v0, B v1, B v2)
+{
+    if (static_cast<T>(v0) < this->operator[](0))
+    {
+        this->operator[](0) = static_cast<T>(v0);
+    }
+
+    if (static_cast<T>(v1) < this->operator[](1))
+    {
+        this->operator[](1) = static_cast<T>(v1);
+    }
+
+    if (static_cast<T>(v2) < this->operator[](2))
+    {
+        this->operator[](2) = static_cast<T>(v2);
+    }
+}
+
+template <class T>
+template <class B>
+inline void Vector3<T>::updateGreater(B v0, B v1, B v2)
+{
+    if (static_cast<T>(v0) > this->operator[](0))
+    {
+        this->operator[](0) = static_cast<T>(v0);
+    }
+
+    if (static_cast<T>(v1) > this->operator[](1))
+    {
+        this->operator[](1) = static_cast<T>(v1);
+    }
+
+    if (static_cast<T>(v2) > this->operator[](2))
+    {
+        this->operator[](2) = static_cast<T>(v2);
+    }
 }
 
 template <class T> inline void Vector3<T>::clear()
