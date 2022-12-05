@@ -22,6 +22,7 @@
 #include <Log.hpp>
 
 #include <ExportFile.hpp>
+#include <ExportFileLas.hpp>
 #include <ExportFilePlugin.hpp>
 #include <MainWindow.hpp>
 #include <ProgressDialog.hpp>
@@ -67,10 +68,24 @@ void ExportFilePlugin::slotExportFile()
 
     mainWindow_->suspendThreads();
 
-    ExportFile exportFile(&mainWindow_->editor());
-    exportFile.initialize(fileName.toStdString());
+    try
+    {
+        std::shared_ptr<ExportFileInterface> writer;
+        writer = std::make_shared<ExportFileLas>();
 
-    ProgressDialog::run(mainWindow_, "Exporting file", &exportFile);
+        ExportFile exportFile(&mainWindow_->editor());
+        exportFile.initialize(fileName.toStdString(), writer);
+
+        ProgressDialog::run(mainWindow_, "Exporting file", &exportFile);
+    }
+    catch (std::exception &e)
+    {
+        mainWindow_->showError(e.what());
+    }
+    catch (...)
+    {
+        mainWindow_->showError("Unknown error");
+    }
 
     mainWindow_->resumeThreads();
 }
