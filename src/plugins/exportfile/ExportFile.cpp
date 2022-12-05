@@ -26,8 +26,8 @@
 #include <Time.hpp>
 
 #define MODULE_NAME "ExportFile"
-#define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+//#define LOG_DEBUG_LOCAL(msg)
+#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 ExportFile::ExportFile(Editor *editor)
     : ProgressActionInterface(),
@@ -42,12 +42,13 @@ ExportFile::~ExportFile()
     LOG_DEBUG_LOCAL("");
 }
 
-void ExportFile::initialize(const std::string &path)
+void ExportFile::initialize(const std::string &path,
+                            std::shared_ptr<ExportFileInterface> writer)
 {
     LOG_DEBUG_LOCAL("");
 
     path_ = path;
-    file_.close();
+    writer_ = writer;
 
     nPointsTotal_ = 0;
     region_.clear();
@@ -85,11 +86,17 @@ void ExportFile::step()
 
     startTimer();
 
-    createFile(editor_, path_, file_);
+    if (!writer_->isOpen())
+    {
+        writer_->create(path_, nPointsTotal_, region_);
+    }
 
     while (i < n)
     {
-        writePoint();
+        if (query_.next())
+        {
+            writer_->write(query_);
+        }
 
         i++;
 
@@ -103,7 +110,7 @@ void ExportFile::step()
 
     if (end())
     {
-        file_.close();
+        writer_->close();
     }
 }
 
@@ -129,40 +136,4 @@ void ExportFile::determineMaximum()
     region_.set(regionMin_, regionMax_);
 
     ProgressActionInterface::initialize(nPointsTotal_, 1000UL);
-}
-
-void ExportFile::createFile(Editor *editor,
-                            const std::string path,
-                            LasFile &file)
-{
-    if (file.file().isOpen())
-    {
-        return;
-    }
-
-    file.create(path);
-
-    file.header.set(nPointsTotal_, region_, {0.001, 0.001, 0.001});
-
-    file.writeHeader();
-}
-
-void ExportFile::writePoint()
-{
-    if (!query_.next())
-    {
-        return;
-    }
-
-    LasFile::Point point;
-    std::memset(&point, 0, sizeof(point));
-
-    point.x = static_cast<uint32_t>(query_.x());
-    point.y = static_cast<uint32_t>(query_.y());
-    point.z = static_cast<uint32_t>(query_.z());
-
-    point.format = 6;
-    point.intensity = 65535;
-
-    file_.writePoint(point);
 }

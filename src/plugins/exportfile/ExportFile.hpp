@@ -22,6 +22,7 @@
 #ifndef EXPORT_FILE_HPP
 #define EXPORT_FILE_HPP
 
+#include <ExportFileInterface.hpp>
 #include <LasFile.hpp>
 #include <ProgressActionInterface.hpp>
 #include <Query.hpp>
@@ -35,7 +36,8 @@ public:
     ExportFile(Editor *editor);
     virtual ~ExportFile();
 
-    void initialize(const std::string &path);
+    void initialize(const std::string &path,
+                    std::shared_ptr<ExportFileInterface> writer);
     void clear();
 
     virtual void step();
@@ -50,11 +52,9 @@ private:
     Vector3<double> regionMax_;
 
     std::string path_;
-    LasFile file_;
+    std::shared_ptr<ExportFileInterface> writer_;
 
     void determineMaximum();
-    void createFile(Editor *editor, const std::string path, LasFile &file);
-    void writePoint();
 };
 
 #endif /* EXPORT_FILE_HPP */
