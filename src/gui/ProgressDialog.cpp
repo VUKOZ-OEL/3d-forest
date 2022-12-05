@@ -92,14 +92,7 @@ bool ProgressDialog::run(ProgressActionInterface *progressAction)
         }
 
         // Process the action for few milliseconds.
-        try
-        {
-            progressAction->step();
-        }
-        catch (...)
-        {
-            return false;
-        }
+        progressAction->step();
     }
 
     // Finish the progress dialog.
