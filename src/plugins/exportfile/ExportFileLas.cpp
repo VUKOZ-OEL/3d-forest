@@ -24,8 +24,8 @@
 #include <ExportFileLas.hpp>
 
 #define MODULE_NAME "ExportFileLas"
-//#define LOG_DEBUG_LOCAL(msg)
-#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+#define LOG_DEBUG_LOCAL(msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 ExportFileLas::ExportFileLas()
 {

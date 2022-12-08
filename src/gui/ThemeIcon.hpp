@@ -51,7 +51,7 @@ private:
         {
             addFile(filename + "_color.png", size);
         }
-        else
+        else if (QFile(filename + ".png").exists())
         {
             addFile(filename + ".png", size);
         }

@@ -26,8 +26,8 @@
 #include <Time.hpp>
 
 #define MODULE_NAME "ExportFile"
-//#define LOG_DEBUG_LOCAL(msg)
-#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+#define LOG_DEBUG_LOCAL(msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 ExportFile::ExportFile(Editor *editor)
     : ProgressActionInterface(),
