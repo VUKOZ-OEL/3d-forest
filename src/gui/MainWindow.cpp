@@ -182,6 +182,11 @@ void MainWindow::createAction(QAction **result,
                               const QObject *receiver,
                               const char *member)
 {
+    LOG_DEBUG_LOCAL("menu <" << menu.toStdString() << "> toolBar <"
+                             << toolBar.toStdString() << "> text <"
+                             << text.toStdString() << "> icon sizes <"
+                             << icon.availableSizes().count() << ">");
+
     QAction *action;
 
     // Create action
@@ -374,7 +379,7 @@ void MainWindow::update(const QSet<Editor::Type> &target,
                         Page::State viewPortsCacheState,
                         bool resetCamera)
 {
-    LOG_DEBUG_LOCAL("target <" << target << ">");
+    LOG_DEBUG_LOCAL("targets <" << target.count() << ">");
 
     suspendThreads();
     LOG_UPDATE_VIEW(MODULE_NAME, "");
