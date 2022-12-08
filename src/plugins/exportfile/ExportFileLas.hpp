@@ -41,6 +41,7 @@ public:
     virtual void close();
 
 private:
+    uint8_t pointFormat_;
     LasFile file_;
 };
 
