@@ -43,23 +43,65 @@ void ExportFileLas::create(const std::string &path,
 {
     LOG_DEBUG_LOCAL("");
 
+    // Set point data format LAS v 1.4 + RGB color
+    pointFormat_ = 7;
+
+    // Create new file which is open for writing
     file_.create(path);
-    file_.header.set(nPoints, region, {0.001, 0.001, 0.001});
+
+    // Fill LAS header
+    file_.header.set(nPoints,
+                     region,
+                     {0.01, 0.01, 0.01},
+                     {0.0, 0.0, 0.0},
+                     pointFormat_);
+
+    // Write LAS header
     file_.writeHeader();
 }
 
 void ExportFileLas::write(Query &query)
 {
+    const float f8 = 255.0F;
+    const float f16 = 65535.0F;
+
     LasFile::Point point;
+
+    // Set point data to zeroes
     std::memset(&point, 0, sizeof(point));
 
+    // Set point data format
+    point.format = pointFormat_;
+
+    // Set point data
     point.x = static_cast<uint32_t>(query.x());
     point.y = static_cast<uint32_t>(query.y());
     point.z = static_cast<uint32_t>(query.z());
 
-    point.format = 6;
-    point.intensity = 65535;
+    point.intensity = static_cast<uint16_t>(query.intensity() * f16);
 
+    point.return_number = query.returnNumber();
+    point.number_of_returns = query.numberOfReturns();
+    point.classification = query.classification();
+    point.user_data = query.userData();
+
+    point.gps_time = query.gpsTime();
+
+    point.red = static_cast<uint16_t>(query.red() * f16);
+    point.green = static_cast<uint16_t>(query.green() * f16);
+    point.blue = static_cast<uint16_t>(query.blue() * f16);
+
+    point.user_layer = query.layer();
+    point.user_elevation = static_cast<uint32_t>(query.elevation());
+
+    point.user_red = static_cast<uint8_t>(query.customRed() * f8);
+    point.user_green = static_cast<uint8_t>(query.customGreen() * f8);
+    point.user_blue = static_cast<uint8_t>(query.customBlue() * f8);
+
+    point.user_descriptor = static_cast<uint8_t>(query.descriptor() * f8);
+    point.user_density = static_cast<uint8_t>(query.density() * f8);
+
+    // Write new point to file
     file_.writePoint(point);
 }
 
@@ -67,5 +109,6 @@ void ExportFileLas::close()
 {
     LOG_DEBUG_LOCAL("");
 
+    // Close the file
     file_.close();
 }
