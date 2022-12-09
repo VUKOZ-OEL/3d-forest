@@ -206,7 +206,11 @@ void Editor::setClassifications(const Classifications &classifications)
 {
     classifications_ = classifications;
 
-    viewports_.selectClassifications(classifications_.enabledList());
+    if (viewports_.size() > 0)
+    {
+        viewports_.where().setClassification(classifications_.enabledList());
+        viewports_.applyWhereToAll();
+    }
 
     // viewClearRendered();
     unsavedChanges_ = true;
@@ -219,7 +223,11 @@ void Editor::setClipFilter(const Region &clipFilter)
                                    datasets_.boundary(),
                                    clipFilter_.box);
 
-    viewports_.selectBox(clipBoundary());
+    if (viewports_.size() > 0)
+    {
+        viewports_.where().setBox(clipBoundary());
+        viewports_.applyWhereToAll();
+    }
 
     // unsavedChanges_ = true;
 }
@@ -244,7 +252,12 @@ void Editor::setElevationRange(const Range<double> &elevationRange)
 {
     elevationRange_ = elevationRange;
     LOG_DEBUG_LOCAL("elevationRange <" << elevationRange_ << ">");
-    viewports_.selectElevationRange(elevationRange_);
+
+    if (viewports_.size() > 0)
+    {
+        viewports_.where().setElevation(elevationRange_);
+        viewports_.applyWhereToAll();
+    }
 
     // unsavedChanges_ = true;
 }
@@ -253,7 +266,12 @@ void Editor::setDescriptorRange(const Range<float> &descriptorRange)
 {
     descriptorRange_ = descriptorRange;
     LOG_DEBUG_LOCAL("descriptorRange <" << descriptorRange_ << ">");
-    viewports_.selectDescriptorRange(descriptorRange_);
+
+    if (viewports_.size() > 0)
+    {
+        viewports_.where().setDescriptor(descriptorRange_);
+        viewports_.applyWhereToAll();
+    }
 
     // unsavedChanges_ = true;
 }
@@ -274,7 +292,11 @@ void Editor::setLayers(const Layers &layers)
 {
     layers_ = layers;
 
-    viewports_.selectLayers(layers_.enabledList());
+    if (viewports_.size() > 0)
+    {
+        viewports_.where().setLayer(layers_.enabledList());
+        viewports_.applyWhereToAll();
+    }
 
     unsavedChanges_ = true;
 }

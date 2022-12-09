@@ -255,7 +255,7 @@ bool Voxels::next(Query *query,
 
         if (cell && query)
         {
-            query->selectBox(*cell);
+            query->where().setBox(*cell);
             query->setMaximumResults(1);
             query->exec();
             bool containsPoints = query->next();

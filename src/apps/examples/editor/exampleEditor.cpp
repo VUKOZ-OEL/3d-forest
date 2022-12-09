@@ -62,7 +62,7 @@ static void exampleEditor()
     double zmin = db.clipBoundary().max(2);
 
     Query query(&db);
-    query.selectBox(Box<double>(0., 0., 0., 1.0, 1.0, 2.));
+    query.where().setBox(Box<double>(0., 0., 0., 1.0, 1.0, 2.));
     query.exec();
 
     while (query.next())

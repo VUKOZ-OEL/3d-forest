@@ -62,7 +62,7 @@ static void elevationPrint(const std::string &inputPath)
     double elevationMaximum = 0;
 
     Query query(&editor);
-    query.selectBox(editor.clipBoundary());
+    query.where().setBox(editor.clipBoundary());
     query.exec();
     while (query.next())
     {

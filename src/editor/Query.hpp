@@ -25,11 +25,9 @@
 #include <unordered_set>
 
 #include <Camera.hpp>
-#include <Cone.hpp>
 #include <ExportEditor.hpp>
 #include <Page.hpp>
-#include <Range.hpp>
-#include <Sphere.hpp>
+#include <QueryWhere.hpp>
 
 class Editor;
 
@@ -47,34 +45,11 @@ public:
     Query(Editor *editor);
     ~Query();
 
-    void selectBox(const Box<double> &box);
-    void selectCone(double x, double y, double z, double z2, double angle);
-    void selectSphere(double x, double y, double z, double radius);
-    void selectElevationRange(const Range<double> &elevationRange);
-    void selectDescriptorRange(const Range<float> &descriptorRange);
-    void selectClassifications(const std::unordered_set<size_t> &list);
-    void selectLayers(const std::unordered_set<size_t> &list);
-    void selectCamera(const Camera &camera);
+    void setWhere(const QueryWhere &queryWhere) { where_ = queryWhere; }
+    const QueryWhere &where() const { return where_; }
+    QueryWhere &where() { return where_; }
 
-    const Box<double> &selectedBox() const { return selectBox_; }
-    const Cone<double> &selectedCone() const { return selectCone_; }
-    const Sphere<double> &selectedSphere() const { return selectedSphere_; }
-    const Range<double> &selectedElevationRange() const
-    {
-        return elevationRange_;
-    }
-    const Range<float> &selectedDescriptorRange() const
-    {
-        return descriptorRange_;
-    }
-    const std::vector<int> &selectedClassifications() const
-    {
-        return selectClassifications_;
-    }
-    const std::unordered_set<size_t> &selectedLayers() const
-    {
-        return selectLayers_;
-    }
+    void applyCamera(const Camera &camera);
 
     void setMaximumResults(size_t nPoints);
     size_t maximumResults() const { return maximumResults_; }
@@ -186,13 +161,7 @@ protected:
     Editor *editor_;
 
     // Query
-    Box<double> selectBox_;
-    Cone<double> selectCone_;
-    Sphere<double> selectedSphere_;
-    Range<double> elevationRange_;
-    Range<float> descriptorRange_;
-    std::vector<int> selectClassifications_;
-    std::unordered_set<size_t> selectLayers_;
+    QueryWhere where_;
     size_t maximumResults_;
     size_t nResults_;
 

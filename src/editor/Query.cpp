@@ -45,18 +45,20 @@ void Query::exec()
     LOG_DEBUG_LOCAL("");
     selectedPages_.clear();
 
-    if (!selectBox_.empty())
+    if (!where().box().empty())
     {
-        editor_->datasets().select(selectedPages_, selectBox_);
+        editor_->datasets().select(selectedPages_, where().box());
     }
-    if (!selectCone_.empty())
+
+    if (!where().cone().empty())
     {
-        editor_->datasets().select(selectedPages_, selectCone_.box());
+        editor_->datasets().select(selectedPages_, where().cone().box());
     }
-    if (!selectedSphere_.empty())
+
+    if (!where().sphere().empty())
     {
-        LOG_DEBUG_LOCAL("sphere <" << selectedSphere_.box() << ">");
-        editor_->datasets().select(selectedPages_, selectedSphere_.box());
+        LOG_DEBUG_LOCAL("sphere <" << where().sphere().box() << ">");
+        editor_->datasets().select(selectedPages_, where().sphere().box());
     }
 
     reset();
@@ -205,61 +207,7 @@ bool Query::nextState()
     return true;
 }
 
-void Query::selectBox(const Box<double> &box)
-{
-    selectBox_ = box;
-}
-
-void Query::selectCone(double x, double y, double z, double z2, double angle)
-{
-    selectCone_.set(x, y, z, z2, angle);
-}
-
-void Query::selectSphere(double x, double y, double z, double radius)
-{
-    selectedSphere_.set(x, y, z, radius);
-}
-
-void Query::selectElevationRange(const Range<double> &elevationRange)
-{
-    elevationRange_ = elevationRange;
-}
-
-void Query::selectDescriptorRange(const Range<float> &descriptorRange)
-{
-    descriptorRange_ = descriptorRange;
-}
-
-void Query::selectClassifications(const std::unordered_set<size_t> &list)
-{
-    if (list.empty())
-    {
-        selectClassifications_.clear();
-    }
-    else
-    {
-        size_t n = 256;
-
-        selectClassifications_.resize(n);
-
-        for (size_t i = 0; i < n; i++)
-        {
-            selectClassifications_[i] = 0;
-        }
-
-        for (auto const &it : list)
-        {
-            selectClassifications_[it] = 1;
-        }
-    }
-}
-
-void Query::selectLayers(const std::unordered_set<size_t> &list)
-{
-    selectLayers_ = list;
-}
-
-void Query::selectCamera(const Camera &camera)
+void Query::applyCamera(const Camera &camera)
 {
     double eyeX = camera.eye[0];
     double eyeY = camera.eye[1];
@@ -546,7 +494,7 @@ bool Query::nextVoxel(Query *query)
             return true;
         }
 
-        query->selectBox(voxelBox_);
+        query->where().setBox(voxelBox_);
         query->setMaximumResults(1);
         query->exec();
         bool containsPoints = query->next();

@@ -318,7 +318,7 @@ bool SegmentationThread::computeInitializeVoxels()
             return true;
         }
 
-        query_.selectBox(editor_->clipBoundary());
+        query_.where().setBox(editor_->clipBoundary());
         query_.exec();
 
         progressMax_ = datasets.nPoints();
@@ -380,8 +380,8 @@ bool SegmentationThread::computeCreateVoxels()
         double meanElevation = 0;
 
         // Add reference to voxel item to each point inside this voxel.
-        query_.selectBox(cell);
-        query_.selectClassifications({LasFile::CLASS_UNASSIGNED});
+        query_.where().setBox(cell);
+        query_.where().setClassification({LasFile::CLASS_UNASSIGNED});
         query_.exec();
         while (query_.next())
         {
@@ -395,7 +395,7 @@ bool SegmentationThread::computeCreateVoxels()
 
             nPoints++;
         }
-        query_.selectClassifications({});
+        query_.where().setClassification({});
 
         if (nPoints > 0)
         {
@@ -598,7 +598,7 @@ bool SegmentationThread::computeCreateLayers()
     Box<double> cell;
 
     // Query
-    query_.selectBox(editor_->clipBoundary());
+    query_.where().setBox(editor_->clipBoundary());
     query_.exec();
 
     while (query_.next())

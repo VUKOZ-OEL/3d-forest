@@ -53,7 +53,7 @@ void ExportFile::initialize(const std::string &path,
     nPointsTotal_ = 0;
     region_.clear();
 
-    query_.selectBox(editor_->clipBoundary());
+    query_.where().setBox(editor_->clipBoundary());
     query_.exec();
 
     if (query_.next())

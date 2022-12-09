@@ -85,7 +85,7 @@ void Classification::step()
     }
 
     // Select grid cell.
-    query_.selectBox(query_.gridCell());
+    query_.where().setBox(query_.gridCell());
     query_.exec();
 
     // Find local minimum.
@@ -115,11 +115,11 @@ void Classification::step()
         {
             queryPoint_.setMaximumResults(1);
 
-            queryPoint_.selectCone(query_.x(),
-                                   query_.y(),
-                                   query_.z(),
-                                   zMinCell,
-                                   angleDeg_);
+            queryPoint_.where().setCone(query_.x(),
+                                        query_.y(),
+                                        query_.z(),
+                                        zMinCell,
+                                        angleDeg_);
 
             queryPoint_.exec();
 
