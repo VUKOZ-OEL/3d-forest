@@ -21,6 +21,7 @@
 <qresource prefix="/importfile">
 
 <!-- Tool bar -->
+<file>import_file_16px.png</file>
 <file>import_file_24px.png</file>
 
 </qresource>
