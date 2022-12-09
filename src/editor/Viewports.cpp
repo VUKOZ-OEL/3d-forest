@@ -21,7 +21,7 @@
 
 #include <Viewports.hpp>
 
-Viewports::Viewports()
+Viewports::Viewports() : activeViewport_(0)
 {
 }
 
@@ -55,49 +55,20 @@ void Viewports::clearContent()
     }
 }
 
-void Viewports::selectBox(const Box<double> &box)
+void Viewports::applyWhereToAll()
 {
-    for (auto &it : viewports_)
+    for (size_t i = 0; i < viewports_.size(); i++)
     {
-        it->selectBox(box);
+        if (i != activeViewport_)
+        {
+            viewports_[i]->setWhere(where());
+        }
     }
 }
 
-void Viewports::selectElevationRange(const Range<double> &elevationRange)
+void Viewports::applyCamera(size_t viewport, const Camera &camera)
 {
-    for (auto &it : viewports_)
-    {
-        it->selectElevationRange(elevationRange);
-    }
-}
-
-void Viewports::selectDescriptorRange(const Range<float> &descriptorRange)
-{
-    for (auto &it : viewports_)
-    {
-        it->selectDescriptorRange(descriptorRange);
-    }
-}
-
-void Viewports::selectClassifications(const std::unordered_set<size_t> &list)
-{
-    for (auto &it : viewports_)
-    {
-        it->selectClassifications(list);
-    }
-}
-
-void Viewports::selectLayers(const std::unordered_set<size_t> &list)
-{
-    for (auto &it : viewports_)
-    {
-        it->selectLayers(list);
-    }
-}
-
-void Viewports::selectCamera(size_t viewport, const Camera &camera)
-{
-    viewports_[viewport]->selectCamera(camera);
+    viewports_[viewport]->applyCamera(camera);
 }
 
 void Viewports::setState(Page::State state)

@@ -42,7 +42,7 @@ static void exampleQuery()
     //     0, 0, 0 Layer 0 Start
     //     1, 0, 0 Layer 0 Start
     //     0, 1, 0 Layer 0 Start
-    query.selectBox(db.clipBoundary());
+    query.where().setBox(db.clipBoundary());
     query.exec();
     while (query.next())
     {
@@ -55,7 +55,7 @@ static void exampleQuery()
     // Set first point to layer 1 by using extra region select
     // Output:
     //     0, 0, 0 Layer 1 A
-    query.selectBox(Box<double>(-0.5, -0.5, -0.5, 0.5, 0.5, 0.5));
+    query.where().setBox(Box<double>(-0.5, -0.5, -0.5, 0.5, 0.5, 0.5));
     query.exec();
     while (query.next())
     {
@@ -68,7 +68,7 @@ static void exampleQuery()
     // Set second point to layer 2 by using extra region select
     // Output:
     //     1, 0, 0 Layer 2 B
-    query.selectBox(Box<double>(0.5, -0.5, -0.5, 1.5, 0.5, 0.5));
+    query.where().setBox(Box<double>(0.5, -0.5, -0.5, 1.5, 0.5, 0.5));
     query.exec();
     while (query.next())
     {
@@ -88,7 +88,7 @@ static void exampleQuery()
     //     0, 0, 0 Layer 1 End
     //     1, 0, 0 Layer 2 End
     //     0, 1, 0 Layer 0 End
-    query.selectBox(db.clipBoundary());
+    query.where().setBox(db.clipBoundary());
     query.exec();
     while (query.next())
     {

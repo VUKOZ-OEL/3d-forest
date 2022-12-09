@@ -79,8 +79,8 @@ bool DescriptorPca::computeDescriptor(Query &query,
 
     // Select points in 'cell' into point coordinates 'xyz'.
     // Count the number of points.
-    query.selectSphere(x, y, z, radius);
-    // query.selectClassifications({LasFile::CLASS_UNASSIGNED});
+    query.where().setSphere(x, y, z, radius);
+    // query.where().setClassification({LasFile::CLASS_UNASSIGNED});
     query.exec();
 
     while (query.next())
@@ -259,8 +259,8 @@ bool DescriptorPca::computeDistribution(Query &query,
     int cy;
     int cz;
 
-    query.selectBox(cell);
-    // query.selectClassifications({LasFile::CLASS_UNASSIGNED});
+    query.where().setBox(cell);
+    // query.where().setClassification({LasFile::CLASS_UNASSIGNED});
     query.exec();
 
     while (query.next())

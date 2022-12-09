@@ -198,15 +198,15 @@ protected:
     void toPoint(uint8_t *ptr, size_t i, uint8_t fmt);
 
     void transform();
-    void select();
 
-    void selectBox();
-    void selectCone();
-    void selectSphere();
-    void selectElevation();
-    void selectDescriptor();
-    void selectClassification();
-    void selectLayer();
+    void queryWhere();
+    void queryWhereBox();
+    void queryWhereCone();
+    void queryWhereSphere();
+    void queryWhereElevation();
+    void queryWhereDescriptor();
+    void queryWhereClassification();
+    void queryWhereLayer();
 
     void runModifiers();
     void runColorModifier();

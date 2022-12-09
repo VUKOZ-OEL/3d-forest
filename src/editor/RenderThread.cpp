@@ -55,7 +55,7 @@ bool RenderThread::compute()
     if (!initialized_)
     {
         editor_->lock();
-        editor_->viewports().selectCamera(viewportId_, camera_);
+        editor_->viewports().applyCamera(viewportId_, camera_);
         editor_->unlock();
         initialized_ = true;
         return false;

@@ -34,15 +34,19 @@ public:
     Viewports();
     ~Viewports();
 
+    size_t size() const { return viewports_.size(); }
     void resize(Editor *editor, size_t n);
     void clearContent();
 
-    void selectBox(const Box<double> &box);
-    void selectElevationRange(const Range<double> &elevationRange);
-    void selectDescriptorRange(const Range<float> &descriptorRange);
-    void selectClassifications(const std::unordered_set<size_t> &list);
-    void selectLayers(const std::unordered_set<size_t> &list);
-    void selectCamera(size_t viewport, const Camera &camera);
+    QueryWhere &where() { return viewports_[activeViewport_]->where(); }
+    const QueryWhere &where() const
+    {
+        return viewports_[activeViewport_]->where();
+    }
+
+    void applyWhereToAll();
+
+    void applyCamera(size_t viewport, const Camera &camera);
 
     void setState(Page::State state);
     bool nextState();
@@ -59,6 +63,7 @@ public:
 
 protected:
     std::vector<std::shared_ptr<Query>> viewports_;
+    size_t activeViewport_;
 };
 
 #endif /* VIEWPORTS_HPP */

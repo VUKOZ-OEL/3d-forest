@@ -75,7 +75,7 @@ void Elevation::step()
     }
 
     // Select grid cell.
-    query_.selectBox(query_.gridCell());
+    query_.where().setBox(query_.gridCell());
     query_.exec();
 
     // Get number of ground and non-ground points. Reset elevation to zero.

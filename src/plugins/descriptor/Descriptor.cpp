@@ -81,7 +81,7 @@ int Descriptor::start(double radius, double voxelSize, Method method)
     descriptorMaximum_ = 0;
 
     nPointsTotal_ = 0;
-    queryPoints_.selectBox(editor_->clipBoundary());
+    queryPoints_.where().setBox(editor_->clipBoundary());
     queryPoints_.exec();
     while (queryPoints_.next())
     {

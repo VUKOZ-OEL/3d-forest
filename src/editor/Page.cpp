@@ -229,7 +229,7 @@ void Page::read()
 
     // Apply
     transform();
-    select();
+    queryWhere();
     runModifiers();
 }
 
@@ -339,15 +339,15 @@ void Page::transform()
     state_ = Page::STATE_SELECT;
 }
 
-void Page::select()
+void Page::queryWhere()
 {
     LOG_DEBUG_LOCAL("");
 
-    const Box<double> &clipBox = query_->selectedBox();
-    const Cone<double> &clipCone = query_->selectedCone();
-    const Sphere<double> &selectedSphere = query_->selectedSphere();
+    const Box<double> &clipBox = query_->where().box();
+    const Cone<double> &clipCone = query_->where().cone();
+    const Sphere<double> &clipSphere = query_->where().sphere();
 
-    if (clipBox.empty() && clipCone.empty() && selectedSphere.empty())
+    if (clipBox.empty() && clipCone.empty() && clipSphere.empty())
     {
         // Reset selection to mark all points as selected.
         LOG_DEBUG_LOCAL("Reset selection");
@@ -363,13 +363,13 @@ void Page::select()
     LOG_DEBUG_LOCAL_SELECTION(pageId_, selectionSize, selection.size());
 
     // Apply new selection.
-    selectBox();
-    selectCone();
-    selectSphere();
-    selectElevation();
-    selectDescriptor();
-    selectClassification();
-    selectLayer();
+    queryWhereBox();
+    queryWhereCone();
+    queryWhereSphere();
+    queryWhereElevation();
+    queryWhereDescriptor();
+    queryWhereClassification();
+    queryWhereLayer();
 
     LOG_DEBUG_LOCAL_SELECTION(pageId_, selectionSize, selection.size());
 
@@ -435,7 +435,7 @@ bool Page::nextState()
 
     if (state_ == Page::STATE_SELECT)
     {
-        select();
+        queryWhere();
         return false;
     }
 
@@ -453,9 +453,9 @@ bool Page::nextState()
     return true;
 }
 
-void Page::selectBox()
+void Page::queryWhereBox()
 {
-    const Box<double> &clipBox = query_->selectedBox();
+    const Box<double> &clipBox = query_->where().box();
     if (clipBox.empty())
     {
         return;
@@ -596,9 +596,9 @@ void Page::selectBox()
     LOG_DEBUG_LOCAL_SELECTION(pageId_, selectionSize, selection.size());
 }
 
-void Page::selectCone()
+void Page::queryWhereCone()
 {
-    const Cone<double> &clipCone = query_->selectedCone();
+    const Cone<double> &clipCone = query_->where().cone();
     if (clipCone.empty())
     {
         return;
@@ -676,17 +676,17 @@ void Page::selectCone()
     query_->addResults(nSelected);
 }
 
-void Page::selectSphere()
+void Page::queryWhereSphere()
 {
-    const Sphere<double> &selectedSphere = query_->selectedSphere();
-    if (selectedSphere.empty())
+    const Sphere<double> &clipSphere = query_->where().sphere();
+    if (clipSphere.empty())
     {
         return;
     }
 
     // Select octants
     selectedNodes_.resize(0);
-    octree.selectLeaves(selectedNodes_, selectedSphere.box(), datasetId_);
+    octree.selectLeaves(selectedNodes_, clipSphere.box(), datasetId_);
 
     // Compute upper limit of the number of selected points
     size_t nSelected = 0;
@@ -733,7 +733,7 @@ void Page::selectSphere()
             double y = position[3 * idx + 1];
             double z = position[3 * idx + 2];
 
-            if (selectedSphere.isInside(x, y, z))
+            if (clipSphere.isInside(x, y, z))
             {
                 selection[nSelected++] = idx;
                 if (nSelected == max)
@@ -756,9 +756,9 @@ void Page::selectSphere()
     query_->addResults(nSelected);
 }
 
-void Page::selectElevation()
+void Page::queryWhereElevation()
 {
-    const Range<double> &elevationRange = query_->selectedElevationRange();
+    const Range<double> &elevationRange = query_->where().elevation();
 
     if (elevationRange.hasBoundaryValues())
     {
@@ -787,9 +787,9 @@ void Page::selectElevation()
     LOG_DEBUG_LOCAL_SELECTION(pageId_, selectionSize, selection.size());
 }
 
-void Page::selectDescriptor()
+void Page::queryWhereDescriptor()
 {
-    const Range<float> &descriptorRange = query_->selectedDescriptorRange();
+    const Range<float> &descriptorRange = query_->where().descriptor();
 
     if (descriptorRange.hasBoundaryValues())
     {
@@ -818,9 +818,9 @@ void Page::selectDescriptor()
     LOG_DEBUG_LOCAL_SELECTION(pageId_, selectionSize, selection.size());
 }
 
-void Page::selectClassification()
+void Page::queryWhereClassification()
 {
-    const std::vector<int> &classifications = query_->selectedClassifications();
+    const std::vector<int> &classifications = query_->where().classification();
 
     if (classifications.empty())
     {
@@ -851,9 +851,9 @@ void Page::selectClassification()
     LOG_DEBUG_LOCAL_SELECTION(pageId_, selectionSize, selection.size());
 }
 
-void Page::selectLayer()
+void Page::queryWhereLayer()
 {
-    const std::unordered_set<size_t> &layers = query_->selectedLayers();
+    const std::unordered_set<size_t> &layers = query_->where().layer();
 
     if (layers.empty())
     {

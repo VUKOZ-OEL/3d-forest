@@ -99,7 +99,7 @@ void Density::stepComputeDensity()
 
     if (nPointsProcessed_ == 0)
     {
-        queryPoints_.selectBox(editor_->clipBoundary());
+        queryPoints_.where().setBox(editor_->clipBoundary());
         queryPoints_.exec();
     }
 
@@ -107,10 +107,10 @@ void Density::stepComputeDensity()
 
     while (i < nPointsToProcess && queryPoints_.next())
     {
-        queryPoint_.selectSphere(queryPoints_.x(),
-                                 queryPoints_.y(),
-                                 queryPoints_.z(),
-                                 radius_);
+        queryPoint_.where().setSphere(queryPoints_.x(),
+                                      queryPoints_.y(),
+                                      queryPoints_.z(),
+                                      radius_);
         queryPoint_.exec();
 
         size_t nPointsSphere = 0;

@@ -39,8 +39,8 @@ static void exampleQueryVoxels(const std::string &path, double voxelSize)
 
     while (query.nextVoxel())
     {
-        query.selectBox(query.voxelBox());
-        query.selectClassifications(classifications);
+        query.where().setBox(query.voxelBox());
+        query.where().setClassification(classifications);
         query.exec();
         while (query.next())
         {
@@ -52,7 +52,7 @@ static void exampleQueryVoxels(const std::string &path, double voxelSize)
                       << "]" << std::endl;
             // clang-format on
         }
-        query.selectClassifications({});
+        query.where().setClassification({});
     }
 }
 

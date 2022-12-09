@@ -194,7 +194,7 @@ void HeightMapModifier::apply(QWidget *widget)
     mainWindow_->suspendThreads();
 
     Query query(editor_);
-    query.selectBox(editor_->clipBoundary());
+    query.where().setBox(editor_->clipBoundary());
     query.exec();
 
     int maximum = static_cast<int>(query.pageSizeEstimate());
