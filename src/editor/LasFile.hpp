@@ -116,9 +116,9 @@ public:
     struct EXPORT_EDITOR Point
     {
         // Format 0 to 10
-        uint32_t x;
-        uint32_t y; // 1*8
-        uint32_t z;
+        int32_t x;
+        int32_t y; // 1*8
+        int32_t z;
         uint16_t intensity; // Optional
 
         // Format 0 to 10

@@ -78,9 +78,9 @@ void ExportFileLas::write(Query &query)
     point.format = pointFormat_;
 
     // Set point data
-    point.x = static_cast<uint32_t>(query.x());
-    point.y = static_cast<uint32_t>(query.y());
-    point.z = static_cast<uint32_t>(query.z());
+    point.x = static_cast<int32_t>(query.x());
+    point.y = static_cast<int32_t>(query.y());
+    point.z = static_cast<int32_t>(query.z());
 
     point.intensity = static_cast<uint16_t>(query.intensity() * f16);
 

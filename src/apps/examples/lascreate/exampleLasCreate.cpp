@@ -29,25 +29,25 @@ static void createBox(const std::string &path)
     // Create points
     std::vector<LasFile::Point> points;
 
-    uint32_t nx = 3;
-    uint32_t ny = 4;
-    uint32_t nz = 5;
+    size_t nx = 3;
+    size_t ny = 4;
+    size_t nz = 5;
     points.resize(nx * ny * nz);
 
     // Create points: set all attributes to zero
     std::memset(points.data(), 0, sizeof(LasFile::Point) * points.size());
 
     // Create points: points with resolution 1 point
-    for (uint32_t z = 0; z < nz; z++)
+    for (size_t z = 0; z < nz; z++)
     {
-        for (uint32_t y = 0; y < ny; y++)
+        for (size_t y = 0; y < ny; y++)
         {
-            for (uint32_t x = 0; x < nx; x++)
+            for (size_t x = 0; x < nx; x++)
             {
-                uint32_t idx = (x * ny * nz) + (y * nz) + z;
-                points[idx].x = x;
-                points[idx].y = y;
-                points[idx].z = z;
+                size_t idx = (x * ny * nz) + (y * nz) + z;
+                points[idx].x = static_cast<int32_t>(x);
+                points[idx].y = static_cast<int32_t>(y);
+                points[idx].z = static_cast<int32_t>(z);
                 points[idx].format = 6;
             }
         }
@@ -97,8 +97,8 @@ static void createGrid(const std::string &path,
                 points[idx].format = 7; // rgb
             }
 
-            points[idx].x = static_cast<uint32_t>(x);
-            points[idx].y = static_cast<uint32_t>(y);
+            points[idx].x = static_cast<int32_t>(x);
+            points[idx].y = static_cast<int32_t>(y);
             points[idx].z = 0;
 
             points[idx].red = static_cast<uint16_t>(x * s2_65535);

@@ -291,7 +291,7 @@ void LasFile::create(const std::string &path,
     }
 
     // Extents of point file data
-    std::vector<uint32_t> coords;
+    std::vector<int32_t> coords;
     coords.resize(points.size() * 3);
     for (size_t i = 0; i < points.size(); i++)
     {
@@ -300,7 +300,7 @@ void LasFile::create(const std::string &path,
         coords[i * 3 + 2] = points[i].z;
     }
 
-    Box<uint32_t> box;
+    Box<int32_t> box;
     box.set(coords);
 
     // Create file output
@@ -636,9 +636,9 @@ void LasFile::readPoint(Point &pt, const uint8_t *buffer, uint8_t fmt) const
 
     if (fmt > 5)
     {
-        pt.x = ltoh32(&buffer[0]);
-        pt.y = ltoh32(&buffer[4]);
-        pt.z = ltoh32(&buffer[8]);
+        pt.x = static_cast<int32_t>(ltoh32(&buffer[0]));
+        pt.y = static_cast<int32_t>(ltoh32(&buffer[4]));
+        pt.z = static_cast<int32_t>(ltoh32(&buffer[8]));
         pt.intensity = ltoh16(&buffer[12]);
         uint32_t data14 = static_cast<uint32_t>(buffer[14]);
         pt.return_number = static_cast<uint8_t>(data14 & 15U);
@@ -656,9 +656,9 @@ void LasFile::readPoint(Point &pt, const uint8_t *buffer, uint8_t fmt) const
     }
     else
     {
-        pt.x = ltoh32(&buffer[0]);
-        pt.y = ltoh32(&buffer[4]);
-        pt.z = ltoh32(&buffer[8]);
+        pt.x = static_cast<int32_t>(ltoh32(&buffer[0]));
+        pt.y = static_cast<int32_t>(ltoh32(&buffer[4]));
+        pt.z = static_cast<int32_t>(ltoh32(&buffer[8]));
         pt.intensity = ltoh16(&buffer[12]);
         uint32_t data14 = static_cast<uint32_t>(buffer[14]);
         pt.return_number = static_cast<uint8_t>(data14 & 7U);
@@ -744,9 +744,9 @@ void LasFile::writePoint(uint8_t *buffer, const Point &pt) const
 
     if (fmt > 5)
     {
-        htol32(&buffer[0], pt.x);
-        htol32(&buffer[4], pt.y);
-        htol32(&buffer[8], pt.z);
+        htol32(&buffer[0], static_cast<uint32_t>(pt.x));
+        htol32(&buffer[4], static_cast<uint32_t>(pt.y));
+        htol32(&buffer[8], static_cast<uint32_t>(pt.z));
         htol16(&buffer[12], pt.intensity);
 
         // Return Number        4 bits (bits 0 - 3)
@@ -776,9 +776,9 @@ void LasFile::writePoint(uint8_t *buffer, const Point &pt) const
     }
     else
     {
-        htol32(&buffer[0], pt.x);
-        htol32(&buffer[4], pt.y);
-        htol32(&buffer[8], pt.z);
+        htol32(&buffer[0], static_cast<uint32_t>(pt.x));
+        htol32(&buffer[4], static_cast<uint32_t>(pt.y));
+        htol32(&buffer[8], static_cast<uint32_t>(pt.z));
         htol16(&buffer[12], pt.intensity);
 
         // Return Number        3 bits (bits 0 – 2)
