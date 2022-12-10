@@ -89,7 +89,7 @@ public:
         // End of 1.4 (375 bytes)
 
         void set(uint64_t numberOfPoints,
-                 const Box<uint32_t> &box,
+                 const Box<double> &box,
                  const std::array<double, 3> scale = {1, 1, 1},
                  const std::array<double, 3> offset = {0, 0, 0},
                  uint8_t pointFormat = 6,
