@@ -22,6 +22,7 @@
 #include <Editor.hpp>
 #include <IndexFileBuilder.hpp>
 #include <Log.hpp>
+#include <Util.hpp>
 
 static const char *EDITOR_KEY_PROJECT_NAME = "projectName";
 static const char *EDITOR_KEY_DATA_SET = "datasets";
@@ -66,11 +67,7 @@ void Editor::close()
 void Editor::open(const std::string &path, const SettingsImport &settings)
 {
     // Get filename extension in lower case (no UTF).
-    std::string ext = File::fileExtension(path);
-    for (auto &c : ext)
-    {
-        c = static_cast<char>(std::tolower(c));
-    }
+    std::string ext = tolower(File::fileExtension(path));
 
     if (ext == "json")
     {

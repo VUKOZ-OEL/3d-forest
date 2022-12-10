@@ -22,16 +22,21 @@
 #include <Log.hpp>
 
 #include <ExportFile.hpp>
+#include <ExportFileCsv.hpp>
 #include <ExportFileLas.hpp>
 #include <ExportFilePlugin.hpp>
 #include <MainWindow.hpp>
 #include <ProgressDialog.hpp>
 #include <ThemeIcon.hpp>
+#include <Util.hpp>
 
 #include <QFileDialog>
 #include <QMessageBox>
 
-#define EXPORT_PLUGIN_FILTER "LAS (LASer) File (*.las)"
+#define EXPORT_PLUGIN_FILTER                                                   \
+    "LAS (LASer) File (*.las);;"                                               \
+    "Comma Separated Values (*.csv)"
+
 #define ICON(name) (ThemeIcon(":/exportfile/", name))
 
 ExportFilePlugin::ExportFilePlugin() : mainWindow_(nullptr)
@@ -70,11 +75,22 @@ void ExportFilePlugin::slotExportFile()
 
     try
     {
+        std::string path = fileName.toStdString();
+        std::string ext = tolower(File::fileExtension(path));
+
         std::shared_ptr<ExportFileInterface> writer;
-        writer = std::make_shared<ExportFileLas>();
+
+        if (ext == "csv")
+        {
+            writer = std::make_shared<ExportFileCsv>();
+        }
+        else
+        {
+            writer = std::make_shared<ExportFileLas>();
+        }
 
         ExportFile exportFile(&mainWindow_->editor());
-        exportFile.initialize(fileName.toStdString(), writer);
+        exportFile.initialize(path, writer);
 
         ProgressDialog::run(mainWindow_, "Exporting file", &exportFile);
     }

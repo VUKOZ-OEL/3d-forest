@@ -486,6 +486,12 @@ void File::write(File &input, uint64_t nbyte)
     }
 }
 
+void File::write(const std::string &str)
+{
+    const uint8_t *ptr = reinterpret_cast<const uint8_t *>(str.c_str());
+    write(ptr, str.size());
+}
+
 void File::write(const uint8_t *buffer, uint64_t nbyte)
 {
     ssize_t ret;

@@ -46,6 +46,7 @@ public:
 
     void read(uint8_t *buffer, uint64_t nbyte);
     void write(const uint8_t *buffer, uint64_t nbyte);
+    void write(const std::string &str);
     void write(File &input, uint64_t nbyte);
 
     bool isOpen() const { return fd_ != INVALID_DESCRIPTOR; }
