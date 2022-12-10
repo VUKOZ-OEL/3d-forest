@@ -41,7 +41,8 @@ void ExportFileLas::create(const std::string &path,
                            uint64_t nPoints,
                            const Box<double> &region)
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL("path <" << path << "> nPoints <" << nPoints << "> region <"
+                             << region << ">");
 
     // Set point data format LAS v 1.4 + RGB color
     pointFormat_ = 7;
@@ -50,10 +51,13 @@ void ExportFileLas::create(const std::string &path,
     file_.create(path);
 
     // Fill LAS header
+    const double offset = 0.0;
+    const double scale = 0.0001;
+    std::memset(&file_.header, 0, sizeof(file_.header));
     file_.header.set(nPoints,
                      region,
-                     {0.01, 0.01, 0.01},
-                     {0.0, 0.0, 0.0},
+                     {scale, scale, scale},
+                     {offset, offset, offset},
                      pointFormat_);
 
     // Write LAS header
