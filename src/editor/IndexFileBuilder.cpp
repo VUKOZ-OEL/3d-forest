@@ -116,7 +116,7 @@ void IndexFileBuilder::start(const std::string &outputPath,
 
     boundary_.clear();
     rgbMax_ = 0;
-    descriptorMax_ = 0;
+    intensityMax_ = 0;
 
     indexMain_.clear();
     indexNode_.clear();
@@ -594,9 +594,9 @@ void IndexFileBuilder::stateCopyPoints()
 
         // Find maximums to normalize these values later
         intensity = ltoh16(out + 12);
-        if (intensity > descriptorMax_)
+        if (intensity > intensityMax_)
         {
-            descriptorMax_ = intensity;
+            intensityMax_ = intensity;
         }
 
         if (hasColor)
@@ -756,7 +756,7 @@ void IndexFileBuilder::stateMainSort()
         z = indexFileBuilderCoordinate(point + 8);
 
         // Normalize unscaled values
-        if (descriptorMax_ > 0 && descriptorMax_ < 256)
+        if (intensityMax_ > 0 && intensityMax_ < 256)
         {
             intensity = ltoh16(point + 12);
             intensity = static_cast<uint16_t>(
