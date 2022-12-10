@@ -33,6 +33,10 @@ void ExportFileCsv::create(const std::string &path,
                            uint64_t nPoints,
                            const Box<double> &region)
 {
+    // Unused parameters
+    (void)nPoints;
+    (void)region;
+
     // Create/overwrite new text file which is open for writing
     file_.open(path, "w+t");
 
@@ -48,9 +52,9 @@ void ExportFileCsv::write(Query &query)
     (void)snprintf(text,
                    sizeof(text),
                    "%11d, %11d, %11d\n",
-                   static_cast<int32_t>(query.x()),
-                   static_cast<int32_t>(query.y()),
-                   static_cast<int32_t>(query.z()));
+                   static_cast<int>(query.x()),
+                   static_cast<int>(query.y()),
+                   static_cast<int>(query.z()));
 
     // Write new point into file
     file_.write(text);
