@@ -29,6 +29,9 @@
 // Define to keep the same order of LAS points.
 //#define INDEX_FILE_BUILDER_DEBUG_SAME_ORDER
 
+#define indexFileBuilderCoordinate(ptr)                                        \
+    static_cast<double>(static_cast<int32_t>(ltoh32(ptr)))
+
 IndexFileBuilder::Settings::Settings()
 {
     verbose = false;
@@ -579,9 +582,9 @@ void IndexFileBuilder::stateCopyPoints()
         std::memcpy(out, in, sizePoint_); // sizePointFormat_
 
         // Boundary of points without scaling and offset
-        coords_[i * 3 + 0] = static_cast<double>(ltoh32(out + 0));
-        coords_[i * 3 + 1] = static_cast<double>(ltoh32(out + 4));
-        coords_[i * 3 + 2] = static_cast<double>(ltoh32(out + 8));
+        coords_[i * 3 + 0] = indexFileBuilderCoordinate(out + 0);
+        coords_[i * 3 + 1] = indexFileBuilderCoordinate(out + 4);
+        coords_[i * 3 + 2] = indexFileBuilderCoordinate(out + 8);
 
         // Format
         if (hasDifferentFormat)
@@ -690,9 +693,9 @@ void IndexFileBuilder::stateMainInsert()
     for (uint64_t i = 0; i < stepIdx; i++)
     {
         point = buffer + (i * sizePoint_);
-        x = static_cast<double>(ltoh32(point + 0));
-        y = static_cast<double>(ltoh32(point + 4));
-        z = static_cast<double>(ltoh32(point + 8));
+        x = indexFileBuilderCoordinate(point + 0);
+        y = indexFileBuilderCoordinate(point + 4);
+        z = indexFileBuilderCoordinate(point + 8);
         (void)indexMain_.insert(x, y, z);
     }
 
@@ -748,9 +751,9 @@ void IndexFileBuilder::stateMainSort()
     for (uint64_t i = 0; i < stepIdx; i++)
     {
         point = buffer + (i * sizePoint_);
-        x = static_cast<double>(ltoh32(point + 0));
-        y = static_cast<double>(ltoh32(point + 4));
-        z = static_cast<double>(ltoh32(point + 8));
+        x = indexFileBuilderCoordinate(point + 0);
+        y = indexFileBuilderCoordinate(point + 4);
+        z = indexFileBuilderCoordinate(point + 8);
 
         // Normalize unscaled values
         if (descriptorMax_ > 0 && descriptorMax_ < 256)
@@ -845,9 +848,9 @@ void IndexFileBuilder::stateNodeInsert()
     for (uint64_t i = 0; i < node->size; i++)
     {
         point = buffer + (i * sizePoint_);
-        coords_[i * 3 + 0] = static_cast<double>(ltoh32(point + 0));
-        coords_[i * 3 + 1] = static_cast<double>(ltoh32(point + 4));
-        coords_[i * 3 + 2] = static_cast<double>(ltoh32(point + 8));
+        coords_[i * 3 + 0] = indexFileBuilderCoordinate(point + 0);
+        coords_[i * 3 + 1] = indexFileBuilderCoordinate(point + 4);
+        coords_[i * 3 + 2] = indexFileBuilderCoordinate(point + 8);
     }
 
     Box<double> box;

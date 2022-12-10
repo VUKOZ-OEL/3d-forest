@@ -56,9 +56,9 @@ static void exampleQueryVoxels(const std::string &path, double voxelSize)
     }
 }
 
-static void setPoint(uint32_t x,
-                     uint32_t y,
-                     uint32_t z,
+static void setPoint(int32_t x,
+                     int32_t y,
+                     int32_t z,
                      LasFile::Classification classification,
                      LasFile::Point *point)
 {

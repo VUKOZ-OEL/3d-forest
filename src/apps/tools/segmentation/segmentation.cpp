@@ -35,9 +35,9 @@
 #include <WarningsOn.h>
 
 static void appendPoint(std::vector<LasFile::Point> *points,
-                        uint32_t x,
-                        uint32_t y,
-                        uint32_t z)
+                        int32_t x,
+                        int32_t y,
+                        int32_t z)
 {
     LasFile::Point pt;
 
@@ -86,9 +86,9 @@ static void saveVoxels(const Editor &editor, const std::string &path)
 
         points[i].format = 7;
 
-        points[i].x = static_cast<uint32_t>(voxel.meanX_);
-        points[i].y = static_cast<uint32_t>(voxel.meanY_);
-        points[i].z = static_cast<uint32_t>(voxel.meanZ_);
+        points[i].x = static_cast<int32_t>(voxel.meanX_);
+        points[i].y = static_cast<int32_t>(voxel.meanY_);
+        points[i].z = static_cast<int32_t>(voxel.meanZ_);
 
         points[i].intensity = static_cast<uint16_t>(voxel.descriptor_ * 511.0F);
 
