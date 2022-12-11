@@ -76,7 +76,7 @@ void ExportFilePlugin::slotExportFile()
     try
     {
         std::string path = fileName.toStdString();
-        std::string ext = tolower(File::fileExtension(path));
+        std::string ext = toLower(File::fileExtension(path));
 
         std::shared_ptr<ExportFileInterface> writer;
 

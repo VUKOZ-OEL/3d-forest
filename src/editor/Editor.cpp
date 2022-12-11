@@ -67,7 +67,7 @@ void Editor::close()
 void Editor::open(const std::string &path, const SettingsImport &settings)
 {
     // Get filename extension in lower case (no UTF).
-    std::string ext = tolower(File::fileExtension(path));
+    std::string ext = toLower(File::fileExtension(path));
 
     if (ext == "json")
     {
