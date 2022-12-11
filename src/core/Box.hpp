@@ -34,6 +34,7 @@ public:
     template <class B> Box(const Box<B> &box);
     template <class B> Box(B x1, B y1, B z1, B x2, B y2, B z2);
     template <class B> Box(B cx, B cy, B cz, B r);
+    template <class B> Box(const Vector3<B> &min, const Vector3<B> &max);
 
     void set(T x1, T y1, T z1, T x2, T y2, T z2);
     void set(T cx, T cy, T cz, T r);
@@ -105,6 +106,13 @@ inline Box<T>::Box(B x1, B y1, B z1, B x2, B y2, B z2)
 template <class T> template <class B> inline Box<T>::Box(B cx, B cy, B cz, B r)
 {
     set(cx, cy, cz, r);
+}
+
+template <class T>
+template <class B>
+inline Box<T>::Box(const Vector3<B> &min, const Vector3<B> &max)
+{
+    set(min, max);
 }
 
 template <class T> inline void Box<T>::set(T cx, T cy, T cz, T r)
