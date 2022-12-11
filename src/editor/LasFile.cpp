@@ -62,6 +62,18 @@ static const uint8_t LAS_FILE_FORMAT_WAVE[LAS_FILE_FORMAT_COUNT] =
 
 static const char *LAS_FILE_GENERATING_SOFTWARE = "3D Forest 2022.12.04";
 
+uint8_t LasFile::Format::las() const
+{
+    uint8_t result = 6U;
+
+    if (has(LasFile::FORMAT_RGB))
+    {
+        result = 7U;
+    }
+
+    return result;
+}
+
 void LasFile::Header::set(uint64_t numberOfPoints,
                           const Box<double> &box,
                           const std::array<double, 3> scale,

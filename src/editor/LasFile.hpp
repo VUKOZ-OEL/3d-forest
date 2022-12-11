@@ -32,6 +32,28 @@
 class EXPORT_EDITOR LasFile
 {
 public:
+    /** LAS Attribute. */
+    static const uint32_t FORMAT_INVALID = 0;
+    static const uint32_t FORMAT_XYZ = 1U << 1;
+    static const uint32_t FORMAT_INTENSITY = 1U << 2;
+    static const uint32_t FORMAT_CLASSIFICATION = 1U << 3;
+    static const uint32_t FORMAT_RGB = 1U << 4;
+    static const uint32_t FORMAT_LAYER = 1U << 5;
+
+    /** LAS Format. */
+    class EXPORT_EDITOR Format
+    {
+    public:
+        Format() : flags_(0) {}
+        Format(uint32_t flags) : flags_(flags) {}
+        void set(uint32_t flags) { flags_ = flags; }
+        bool has(uint32_t attr) const { return flags_ & attr; }
+        uint8_t las() const;
+
+    private:
+        uint32_t flags_;
+    };
+
     /** LAS Header. */
     struct EXPORT_EDITOR Header
     {
