@@ -23,6 +23,7 @@
 #define EXPORT_FILE_HPP
 
 #include <ExportFileInterface.hpp>
+#include <ExportFileProperties.hpp>
 #include <LasFile.hpp>
 #include <ProgressActionInterface.hpp>
 #include <Query.hpp>
@@ -47,9 +48,10 @@ private:
     Query query_;
 
     uint64_t nPointsTotal_;
-    Box<double> region_;
     Vector3<double> regionMin_;
     Vector3<double> regionMax_;
+
+    ExportFileProperties properties_;
 
     std::string path_;
     std::shared_ptr<ExportFileInterface> writer_;
