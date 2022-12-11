@@ -17,30 +17,24 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ExportFileInterface.hpp */
-
-#ifndef EXPORT_FILE_INTERFACE_HPP
-#define EXPORT_FILE_INTERFACE_HPP
+/** @file ExportFileProperties.cpp */
 
 #include <ExportFileProperties.hpp>
-#include <Query.hpp>
 
-/** Export File Interface. */
-class ExportFileInterface
+ExportFileProperties::ExportFileProperties()
 {
-public:
-    virtual ~ExportFileInterface() = default;
+    clear();
+}
 
-    virtual bool isOpen() = 0;
-    virtual void create(const std::string &path) = 0;
-    virtual void write(Query &query) = 0;
-    virtual void close() = 0;
+ExportFileProperties::~ExportFileProperties()
+{
+}
 
-    void setProperties(const ExportFileProperties &prop) { properties_ = prop; }
-    const ExportFileProperties &properties() const { return properties_; }
-
-private:
-    ExportFileProperties properties_;
-};
-
-#endif /* EXPORT_FILE_INTERFACE_HPP */
+void ExportFileProperties::clear()
+{
+    numberOfPoints_ = 0;
+    format_.set(LasFile::FORMAT_INVALID);
+    region_.clear();
+    scale_.set(1.0, 1.0, 1.0);
+    offset_.clear();
+}

@@ -34,14 +34,11 @@ public:
     virtual ~ExportFileLas();
 
     virtual bool isOpen() { return file_.file().isOpen(); }
-    virtual void create(const std::string &path,
-                        uint64_t nPoints,
-                        const Box<double> &region);
+    virtual void create(const std::string &path);
     virtual void write(Query &query);
     virtual void close();
 
 private:
-    uint8_t pointFormat_;
     LasFile file_;
 };
 

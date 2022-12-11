@@ -24,7 +24,7 @@
 
 #include <string>
 
-inline std::string tolower(const std::string &str)
+inline std::string toLower(const std::string &str)
 {
     std::string ret = str;
     for (auto &c : ret)

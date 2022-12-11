@@ -20,6 +20,7 @@
 /** @file ExportFileCsv.cpp */
 
 #include <ExportFileCsv.hpp>
+#include <cstring>
 
 ExportFileCsv::ExportFileCsv()
 {
@@ -29,28 +30,66 @@ ExportFileCsv::~ExportFileCsv()
 {
 }
 
-void ExportFileCsv::create(const std::string &path,
-                           uint64_t nPoints,
-                           const Box<double> &region)
+void ExportFileCsv::create(const std::string &path)
 {
     // Create/overwrite new text file which is open for writing
     file_.open(path, "w+t");
 
     // Write CSV header
-    file_.write("x, y, z\n");
+    char text[256];
+    text[0] = 0;
+    (void)strcat(text, "x, y, z");
+    if (properties().format().has(LasFile::FORMAT_INTENSITY))
+    {
+        (void)strcat(text, ", intensity");
+    }
+    if (properties().format().has(LasFile::FORMAT_CLASSIFICATION))
+    {
+        (void)strcat(text, ", classification");
+    }
+    (void)strcat(text, "\n");
+
+    file_.write(text);
 }
 
 void ExportFileCsv::write(Query &query)
 {
     // Format point data into text line
-    char text[256];
+    char text[512];
+    char buffer[32];
 
+    // Format point XYZ coordinates
     (void)snprintf(text,
                    sizeof(text),
-                   "%11d, %11d, %11d\n",
-                   static_cast<int32_t>(query.x()),
-                   static_cast<int32_t>(query.y()),
-                   static_cast<int32_t>(query.z()));
+                   "%d, %d, %d",
+                   static_cast<int>(query.x()),
+                   static_cast<int>(query.y()),
+                   static_cast<int>(query.z()));
+
+    // Format point intensity
+    if (properties().format().has(LasFile::FORMAT_INTENSITY))
+    {
+        (void)snprintf(buffer,
+                       sizeof(buffer),
+                       ", %d",
+                       static_cast<int>(query.intensity() * 65535.0));
+
+        (void)strcat(text, buffer);
+    }
+
+    // Format point classification
+    if (properties().format().has(LasFile::FORMAT_CLASSIFICATION))
+    {
+        (void)snprintf(buffer,
+                       sizeof(buffer),
+                       ", %d",
+                       static_cast<int>(query.classification()));
+
+        (void)strcat(text, buffer);
+    }
+
+    // End line
+    (void)strcat(text, "\n");
 
     // Write new point into file
     file_.write(text);

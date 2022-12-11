@@ -51,7 +51,8 @@ void ExportFile::initialize(const std::string &path,
     writer_ = writer;
 
     nPointsTotal_ = 0;
-    region_.clear();
+    regionMin_.clear();
+    regionMax_.clear();
 
     query_.setWhere(editor_->viewports().where());
     query_.exec();
@@ -88,7 +89,7 @@ void ExportFile::step()
 
     if (!writer_->isOpen())
     {
-        writer_->create(path_, nPointsTotal_, region_);
+        writer_->create(path_);
     }
 
     while (i < n)
@@ -133,7 +134,13 @@ void ExportFile::determineMaximum()
 
     query_.reset();
 
-    region_.set(regionMin_, regionMax_);
+    properties_.setNumberOfPoints(nPointsTotal_);
+    properties_.setFormat(LasFile::FORMAT_XYZ | LasFile::FORMAT_INTENSITY |
+                          LasFile::FORMAT_RGB);
+    properties_.setRegion(Box<double>(regionMin_, regionMax_));
+    properties_.setScale(0.001);
+
+    writer_->setProperties(properties_);
 
     ProgressActionInterface::initialize(nPointsTotal_, 1000UL);
 }
