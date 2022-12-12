@@ -23,6 +23,7 @@
 
 #include <ExportFile.hpp>
 #include <ExportFileCsv.hpp>
+#include <ExportFileDialog.hpp>
 #include <ExportFileLas.hpp>
 #include <ExportFilePlugin.hpp>
 #include <MainWindow.hpp>
@@ -71,6 +72,12 @@ void ExportFilePlugin::slotExportFile()
         return;
     }
 
+    ExportFileDialog dialog(mainWindow_);
+    if (dialog.exec() == QDialog::Rejected)
+    {
+        return;
+    }
+
     mainWindow_->suspendThreads();
 
     try
@@ -90,7 +97,7 @@ void ExportFilePlugin::slotExportFile()
         }
 
         ExportFile exportFile(&mainWindow_->editor());
-        exportFile.initialize(path, writer);
+        exportFile.initialize(path, writer, dialog.properties());
 
         ProgressDialog::run(mainWindow_, "Exporting file", &exportFile);
     }
