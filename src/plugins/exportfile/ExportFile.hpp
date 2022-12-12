@@ -38,7 +38,8 @@ public:
     virtual ~ExportFile();
 
     void initialize(const std::string &path,
-                    std::shared_ptr<ExportFileInterface> writer);
+                    std::shared_ptr<ExportFileInterface> writer,
+                    const ExportFileProperties &properties);
     void clear();
 
     virtual void step();

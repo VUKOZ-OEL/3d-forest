@@ -45,20 +45,30 @@ void Query::exec()
     LOG_DEBUG_LOCAL("");
     selectedPages_.clear();
 
+    bool selected = false;
+
     if (!where().box().empty())
     {
         editor_->datasets().select(selectedPages_, where().box());
+        selected = true;
     }
 
     if (!where().cone().empty())
     {
         editor_->datasets().select(selectedPages_, where().cone().box());
+        selected = true;
     }
 
     if (!where().sphere().empty())
     {
         LOG_DEBUG_LOCAL("sphere <" << where().sphere().box() << ">");
         editor_->datasets().select(selectedPages_, where().sphere().box());
+        selected = true;
+    }
+
+    if (!selected)
+    {
+        editor_->datasets().select(selectedPages_, editor_->clipBoundary());
     }
 
     reset();
