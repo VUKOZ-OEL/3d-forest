@@ -43,12 +43,14 @@ ExportFile::~ExportFile()
 }
 
 void ExportFile::initialize(const std::string &path,
-                            std::shared_ptr<ExportFileInterface> writer)
+                            std::shared_ptr<ExportFileInterface> writer,
+                            const ExportFileProperties &properties)
 {
     LOG_DEBUG_LOCAL("");
 
     path_ = path;
     writer_ = writer;
+    properties_ = properties;
 
     nPointsTotal_ = 0;
     regionMin_.clear();
@@ -135,10 +137,7 @@ void ExportFile::determineMaximum()
     query_.reset();
 
     properties_.setNumberOfPoints(nPointsTotal_);
-    properties_.setFormat(LasFile::FORMAT_XYZ | LasFile::FORMAT_INTENSITY |
-                          LasFile::FORMAT_RGB);
     properties_.setRegion(Box<double>(regionMin_, regionMax_));
-    properties_.setScale(0.001);
 
     writer_->setProperties(properties_);
 
