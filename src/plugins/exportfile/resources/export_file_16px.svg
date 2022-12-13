@@ -33,12 +33,12 @@
      inkscape:document-units="px"
      showgrid="true"
      inkscape:zoom="34.541667"
-     inkscape:cx="10.870929"
-     inkscape:cy="12.057901"
-     inkscape:window-width="2400"
-     inkscape:window-height="1321"
-     inkscape:window-x="2391"
-     inkscape:window-y="-9"
+     inkscape:cx="8.4101326"
+     inkscape:cy="12.072376"
+     inkscape:window-width="1920"
+     inkscape:window-height="1057"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer3"><inkscape:grid
        type="xygrid"
@@ -71,7 +71,7 @@
        id="use388"
        transform="translate(0,11)" /><path
        style="fill:#006600;stroke:#2e3436;stroke-width:1;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:1;stroke-opacity:1;paint-order:fill markers stroke"
-       d="m 5,8.5 h 8"
+       d="m 5,8.5 h 9"
        id="path390"
        sodipodi:nodetypes="cc" /><path
        style="fill:#006600;stroke:#2e3436;stroke-width:1;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:1;stroke-opacity:1;paint-order:fill markers stroke"
@@ -83,7 +83,7 @@
        id="path394"
        sodipodi:nodetypes="cc" /><path
        style="fill:none;stroke:#2e3436;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:1;stroke-opacity:1;paint-order:fill markers stroke"
-       d="m 11.5,6.5 2,2 -2,2"
+       d="m 12.5,6.5 2,2 -2,2"
        id="path396"
        sodipodi:nodetypes="ccc" /></g><metadata
      id="metadata2474"><rdf:RDF><cc:Work
