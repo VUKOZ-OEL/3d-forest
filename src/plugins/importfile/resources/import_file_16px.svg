@@ -33,7 +33,7 @@
      inkscape:document-units="px"
      showgrid="true"
      inkscape:zoom="34.541667"
-     inkscape:cx="8.4101326"
+     inkscape:cx="3.4885404"
      inkscape:cy="12.072376"
      inkscape:window-width="1920"
      inkscape:window-height="1057"
@@ -58,7 +58,7 @@
      id="layer3"
      inkscape:label="Vector"><path
        style="fill:#006600;stroke:#2e3436;stroke-width:1;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:1;stroke-opacity:1;paint-order:fill markers stroke"
-       d="M 12.999979,2.5 H 6.9999793"
+       d="M 12.999979,2.5 H 6"
        id="path421"
        sodipodi:nodetypes="cc" /><path
        style="fill:#006600;stroke:#2e3436;stroke-width:1;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:1;stroke-opacity:1;paint-order:fill markers stroke"
@@ -71,15 +71,15 @@
        id="use388"
        transform="translate(0,11)" /><path
        style="fill:#006600;stroke:#2e3436;stroke-width:1;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:1;stroke-opacity:1;paint-order:fill markers stroke"
-       d="M 9.9999999,8.5 H 2.0000002"
+       d="M 9.9999999,8.5 H 1"
        id="path390"
        sodipodi:nodetypes="cc" /><path
        style="fill:#006600;stroke:#2e3436;stroke-width:1;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:1;stroke-opacity:1;paint-order:fill markers stroke"
-       d="M 6.4999793,3 V 6"
+       d="M 5.5,3 V 6"
        id="path392"
        sodipodi:nodetypes="cc" /><path
        style="fill:#006600;stroke:#2e3436;stroke-width:1;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:1;stroke-opacity:1;paint-order:fill markers stroke"
-       d="m 6.4999793,10 v 3"
+       d="m 5.5,10 v 3"
        id="path394"
        sodipodi:nodetypes="cc" /><path
        style="fill:none;stroke:#2e3436;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:1;stroke-opacity:1;paint-order:fill markers stroke"
