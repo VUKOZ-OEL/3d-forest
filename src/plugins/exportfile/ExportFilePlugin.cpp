@@ -34,10 +34,6 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-#define EXPORT_PLUGIN_FILTER                                                   \
-    "LAS (LASer) File (*.las);;"                                               \
-    "Comma Separated Values (*.csv)"
-
 #define ICON(name) (ThemeIcon(":/exportfile/", name))
 
 ExportFilePlugin::ExportFilePlugin() : mainWindow_(nullptr)
@@ -60,12 +56,12 @@ void ExportFilePlugin::initialize(MainWindow *mainWindow)
 
 void ExportFilePlugin::slotExportFile()
 {
-    QString fileName;
-
-    fileName = QFileDialog::getSaveFileName(mainWindow_,
-                                            tr("Export File As"),
-                                            "",
-                                            tr(EXPORT_PLUGIN_FILTER));
+    QString fileName =
+        QFileDialog::getSaveFileName(mainWindow_,
+                                     tr("Export File As"),
+                                     "",
+                                     tr("LAS (LASer) File (*.las);;"
+                                        "Comma Separated Values (*.csv)"));
 
     if (fileName.isEmpty())
     {
