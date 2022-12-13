@@ -22,6 +22,7 @@
 #include <cstring>
 
 #include <ExportFileLas.hpp>
+#include <IndexFileBuilder.hpp>
 
 #define MODULE_NAME "ExportFileLas"
 #define LOG_DEBUG_LOCAL(msg)
@@ -56,6 +57,13 @@ void ExportFileLas::create(const std::string &path)
 
     // Write LAS header
     file_.writeHeader();
+
+    // Remove index file
+    std::string pathIndex = IndexFileBuilder::extension(path);
+    if (File::exists(pathIndex))
+    {
+        File::remove(pathIndex);
+    }
 }
 
 void ExportFileLas::write(Query &query)
