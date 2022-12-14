@@ -21,18 +21,40 @@
 
 #include <ExportFileDialog.hpp>
 #include <MainWindow.hpp>
+#include <Util.hpp>
+
+#include <ExportFileCsv.hpp>
+#include <ExportFileLas.hpp>
 
 #include <QCheckBox>
 #include <QComboBox>
+#include <QFileDialog>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QVBoxLayout>
 
-ExportFileDialog::ExportFileDialog(MainWindow *mainWindow) : QDialog(mainWindow)
+ExportFileDialog::ExportFileDialog(MainWindow *mainWindow,
+                                   const QString &fileName)
+    : QDialog(mainWindow),
+      mainWindow_(mainWindow)
 {
+    // File name
+    fileNameLineEdit_ = new QLineEdit;
+    fileNameLineEdit_->setText(fileName);
+
+    browseButton_ = new QPushButton(tr("Browse"));
+    connect(browseButton_, SIGNAL(clicked()), this, SLOT(slotBrowse()));
+
+    QHBoxLayout *fileNameLayout = new QHBoxLayout;
+    fileNameLayout->addWidget(new QLabel(tr("File")));
+    fileNameLayout->addWidget(fileNameLineEdit_);
+    fileNameLayout->addWidget(browseButton_);
+
     // Attributes
     attributeCheckBox_.resize(5);
 
@@ -88,6 +110,8 @@ ExportFileDialog::ExportFileDialog(MainWindow *mainWindow) : QDialog(mainWindow)
 
     // Dialog layout
     QVBoxLayout *dialogLayout = new QVBoxLayout;
+    dialogLayout->addLayout(fileNameLayout);
+    dialogLayout->addSpacing(10);
     dialogLayout->addWidget(attributeGroupBox);
     dialogLayout->addLayout(valueGridLayout);
     dialogLayout->addSpacing(10);
@@ -98,12 +122,61 @@ ExportFileDialog::ExportFileDialog(MainWindow *mainWindow) : QDialog(mainWindow)
 
     // Window
     setWindowTitle("Export File Settings");
-    setMaximumWidth(width());
+    setMaximumWidth(600);
     setMaximumHeight(height());
+}
+
+void ExportFileDialog::slotBrowse()
+{
+    QFileDialog::Options options;
+    options = QFlag(QFileDialog::DontConfirmOverwrite);
+
+    QString selectedFilter;
+
+    QString fileName =
+        QFileDialog::getSaveFileName(mainWindow_,
+                                     tr("Export File As"),
+                                     fileNameLineEdit_->text(),
+                                     tr("LAS (LASer) File (*.las);;"
+                                        "Comma Separated Values (*.csv)"),
+                                     &selectedFilter,
+                                     options);
+
+    if (fileName.isEmpty())
+    {
+        return;
+    }
+
+    fileNameLineEdit_->setText(fileName);
 }
 
 void ExportFileDialog::slotAccept()
 {
+    QString path = fileNameLineEdit_->text();
+
+    if (path.isEmpty())
+    {
+        (void)QMessageBox::information(this,
+                                       tr("Export File"),
+                                       tr("Please choose a file name."));
+        return;
+    }
+
+    if (File::exists(path.toStdString()))
+    {
+        QMessageBox::StandardButton reply;
+
+        reply = QMessageBox::question(this,
+                                      tr("Export File"),
+                                      tr("Overwrite existing file?"),
+                                      QMessageBox::Yes | QMessageBox::No);
+
+        if (reply != QMessageBox::Yes)
+        {
+            return;
+        }
+    }
+
     close();
     setResult(QDialog::Accepted);
 }
@@ -114,9 +187,31 @@ void ExportFileDialog::slotReject()
     setResult(QDialog::Rejected);
 }
 
+std::shared_ptr<ExportFileInterface> ExportFileDialog::writer() const
+{
+    std::shared_ptr<ExportFileInterface> result;
+
+    std::string path = fileNameLineEdit_->text().toStdString();
+    std::string ext = toLower(File::fileExtension(path));
+
+    if (ext == "csv")
+    {
+        result = std::make_shared<ExportFileCsv>();
+    }
+    else
+    {
+        result = std::make_shared<ExportFileLas>();
+    }
+
+    return result;
+}
+
 ExportFileProperties ExportFileDialog::properties() const
 {
     ExportFileProperties result;
+
+    // File name
+    result.setFileName(fileNameLineEdit_->text().toStdString());
 
     // Point format
     uint32_t fmt = 0;

@@ -42,13 +42,11 @@ ExportFile::~ExportFile()
     LOG_DEBUG_LOCAL("");
 }
 
-void ExportFile::initialize(const std::string &path,
-                            std::shared_ptr<ExportFileInterface> writer,
+void ExportFile::initialize(std::shared_ptr<ExportFileInterface> writer,
                             const ExportFileProperties &properties)
 {
     LOG_DEBUG_LOCAL("");
 
-    path_ = path;
     writer_ = writer;
     properties_ = properties;
 
@@ -91,7 +89,7 @@ void ExportFile::step()
 
     if (!writer_->isOpen())
     {
-        writer_->create(path_);
+        writer_->create(properties_.fileName());
     }
 
     while (i < n)

@@ -46,6 +46,7 @@ public slots:
 protected:
     MainWindow *mainWindow_;
     QAction *exportFileAction_;
+    QString fileName_;
 };
 
 #endif /* EXPORT_FILE_PLUGIN_HPP */

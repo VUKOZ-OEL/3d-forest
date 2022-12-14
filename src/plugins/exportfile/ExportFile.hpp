@@ -37,8 +37,7 @@ public:
     ExportFile(Editor *editor);
     virtual ~ExportFile();
 
-    void initialize(const std::string &path,
-                    std::shared_ptr<ExportFileInterface> writer,
+    void initialize(std::shared_ptr<ExportFileInterface> writer,
                     const ExportFileProperties &properties);
     void clear();
 
@@ -52,10 +51,8 @@ private:
     Vector3<double> regionMin_;
     Vector3<double> regionMax_;
 
-    ExportFileProperties properties_;
-
-    std::string path_;
     std::shared_ptr<ExportFileInterface> writer_;
+    ExportFileProperties properties_;
 
     void determineMaximum();
 };
