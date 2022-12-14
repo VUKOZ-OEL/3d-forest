@@ -22,16 +22,12 @@
 #include <Log.hpp>
 
 #include <ExportFile.hpp>
-#include <ExportFileCsv.hpp>
 #include <ExportFileDialog.hpp>
-#include <ExportFileLas.hpp>
 #include <ExportFilePlugin.hpp>
 #include <MainWindow.hpp>
 #include <ProgressDialog.hpp>
 #include <ThemeIcon.hpp>
-#include <Util.hpp>
 
-#include <QFileDialog>
 #include <QMessageBox>
 
 #define ICON(name) (ThemeIcon(":/exportfile/", name))
@@ -56,46 +52,20 @@ void ExportFilePlugin::initialize(MainWindow *mainWindow)
 
 void ExportFilePlugin::slotExportFile()
 {
-    QString fileName =
-        QFileDialog::getSaveFileName(mainWindow_,
-                                     tr("Export File As"),
-                                     "",
-                                     tr("LAS (LASer) File (*.las);;"
-                                        "Comma Separated Values (*.csv)"));
-
-    if (fileName.isEmpty())
-    {
-        return;
-    }
-
-    ExportFileDialog dialog(mainWindow_);
-    if (dialog.exec() == QDialog::Rejected)
-    {
-        return;
-    }
-
     mainWindow_->suspendThreads();
 
     try
     {
-        std::string path = fileName.toStdString();
-        std::string ext = toLower(File::fileExtension(path));
+        ExportFileDialog dialog(mainWindow_, fileName_);
 
-        std::shared_ptr<ExportFileInterface> writer;
-
-        if (ext == "csv")
+        if (dialog.exec() == QDialog::Accepted)
         {
-            writer = std::make_shared<ExportFileCsv>();
-        }
-        else
-        {
-            writer = std::make_shared<ExportFileLas>();
-        }
+            ExportFile exportFile(&mainWindow_->editor());
+            exportFile.initialize(dialog.writer(), dialog.properties());
+            fileName_ = QString::fromStdString(dialog.properties().fileName());
 
-        ExportFile exportFile(&mainWindow_->editor());
-        exportFile.initialize(path, writer, dialog.properties());
-
-        ProgressDialog::run(mainWindow_, "Exporting file", &exportFile);
+            ProgressDialog::run(mainWindow_, "Exporting file", &exportFile);
+        }
     }
     catch (std::exception &e)
     {

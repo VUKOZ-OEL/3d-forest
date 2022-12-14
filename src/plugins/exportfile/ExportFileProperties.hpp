@@ -33,6 +33,9 @@ public:
 
     void clear();
 
+    void setFileName(const std::string &fileName) { fileName_ = fileName; }
+    const std::string &fileName() const { return fileName_; }
+
     void setNumberOfPoints(uint64_t n) { numberOfPoints_ = n; }
     uint64_t numberOfPoints() const { return numberOfPoints_; }
 
@@ -50,6 +53,7 @@ public:
     const Vector3<double> &offset() const { return offset_; }
 
 private:
+    std::string fileName_;
     uint64_t numberOfPoints_;
     LasFile::Format format_;
     Box<double> region_;

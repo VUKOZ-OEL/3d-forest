@@ -22,12 +22,15 @@
 #ifndef EXPORT_FILE_DIALOG_HPP
 #define EXPORT_FILE_DIALOG_HPP
 
+#include <ExportFileInterface.hpp>
 #include <ExportFileProperties.hpp>
 
 #include <QDialog>
 
 class MainWindow;
+
 class QCheckBox;
+class QLineEdit;
 class QPushButton;
 class QComboBox;
 
@@ -37,15 +40,21 @@ class ExportFileDialog : public QDialog
     Q_OBJECT
 
 public:
-    ExportFileDialog(MainWindow *mainWindow);
+    ExportFileDialog(MainWindow *mainWindow, const QString &fileName);
 
+    std::shared_ptr<ExportFileInterface> writer() const;
     ExportFileProperties properties() const;
 
 public slots:
+    void slotBrowse();
     void slotAccept();
     void slotReject();
 
 private:
+    MainWindow *mainWindow_;
+
+    QLineEdit *fileNameLineEdit_;
+    QPushButton *browseButton_;
     std::vector<QCheckBox *> attributeCheckBox_;
     QComboBox *scaleComboBox_;
 

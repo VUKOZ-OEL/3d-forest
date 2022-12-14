@@ -30,7 +30,7 @@ list(APPEND SOURCES resources/resources.rc)
 
 add_executable(
     ${SUB_PROJECT_NAME}
-#    WIN32 MACOSX_BUNDLE
+    WIN32 MACOSX_BUNDLE
     ${SOURCES}
     resources/resources.qrc
 )
