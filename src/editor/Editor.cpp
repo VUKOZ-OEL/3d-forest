@@ -277,6 +277,13 @@ void Editor::updateAfterRead()
 {
     clipFilter_.box = datasets_.boundary();
     clipFilter_.boxView = clipFilter_.box;
+
+    if (viewports_.size() > 0)
+    {
+        viewports_.where().setClassification(classifications_.enabledList());
+
+        viewports_.applyWhereToAll();
+    }
 }
 
 void Editor::setDatasets(const Datasets &datasets)
