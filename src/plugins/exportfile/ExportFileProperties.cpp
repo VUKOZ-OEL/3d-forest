@@ -37,4 +37,5 @@ void ExportFileProperties::clear()
     region_.clear();
     scale_.set(1.0, 1.0, 1.0);
     offset_.clear();
+    filterEnabled_ = true;
 }
