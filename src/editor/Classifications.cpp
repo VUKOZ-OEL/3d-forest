@@ -89,11 +89,6 @@ void Classifications::clear()
     // Enable
     for (size_t i = 0; i < classes_.size(); i++)
     {
-        classes_[i].enabled = false;
-    }
-
-    for (size_t i = 2; i < 16; i++)
-    {
         classes_[i].enabled = true;
     }
 }
