@@ -52,6 +52,9 @@ public:
     void setOffset(const Vector3<double> &offset) { offset_ = offset; }
     const Vector3<double> &offset() const { return offset_; }
 
+    void setFilterEnabled(bool b) { filterEnabled_ = b; }
+    bool isFilterEnabled() const { return filterEnabled_; }
+
 private:
     std::string fileName_;
     uint64_t numberOfPoints_;
@@ -59,6 +62,7 @@ private:
     Box<double> region_;
     Vector3<double> scale_;
     Vector3<double> offset_;
+    bool filterEnabled_;
 };
 
 #endif /* EXPORT_FILE_PROPERTIES_HPP */

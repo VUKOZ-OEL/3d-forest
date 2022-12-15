@@ -83,7 +83,7 @@ ExportFileDialog::ExportFileDialog(MainWindow *mainWindow,
     QGroupBox *attributeGroupBox = new QGroupBox(tr("Point attributes"));
     attributeGroupBox->setLayout(attributeVBoxLayout);
 
-    // Scale
+    // Other options
     scaleComboBox_ = new QComboBox;
     scaleComboBox_->addItem("0.0001");
     scaleComboBox_->addItem("0.001");
@@ -92,9 +92,14 @@ ExportFileDialog::ExportFileDialog(MainWindow *mainWindow,
     scaleComboBox_->addItem("1.0");
     scaleComboBox_->setCurrentText("0.001");
 
+    filterEnabledCheckBox_ = new QCheckBox;
+    filterEnabledCheckBox_->setChecked(true);
+
     QGridLayout *valueGridLayout = new QGridLayout;
     valueGridLayout->addWidget(new QLabel(tr("Scale")), 0, 0);
     valueGridLayout->addWidget(scaleComboBox_, 0, 1);
+    valueGridLayout->addWidget(new QLabel(tr("Use current filter")), 1, 0);
+    valueGridLayout->addWidget(filterEnabledCheckBox_, 1, 1);
 
     // Buttons
     acceptButton_ = new QPushButton(tr("Export"));
@@ -228,6 +233,9 @@ ExportFileProperties ExportFileDialog::properties() const
 
     // Scale
     result.setScale(scaleComboBox_->currentText().toDouble());
+
+    // Filter
+    result.setFilterEnabled(filterEnabledCheckBox_->isChecked());
 
     return result;
 }

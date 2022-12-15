@@ -57,6 +57,7 @@ private:
     QPushButton *browseButton_;
     std::vector<QCheckBox *> attributeCheckBox_;
     QComboBox *scaleComboBox_;
+    QCheckBox *filterEnabledCheckBox_;
 
     QPushButton *acceptButton_;
     QPushButton *rejectButton_;

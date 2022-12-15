@@ -54,7 +54,11 @@ void ExportFile::initialize(std::shared_ptr<ExportFileInterface> writer,
     regionMin_.clear();
     regionMax_.clear();
 
-    query_.setWhere(editor_->viewports().where());
+    if (properties_.isFilterEnabled())
+    {
+        query_.setWhere(editor_->viewports().where());
+    }
+
     query_.exec();
 
     if (query_.next())
