@@ -17,10 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ProjectNavigatorItemElevation.hpp */
+/** @file ProjectNavigatorItemDescriptor.hpp */
 
-#ifndef PROJECT_NAVIGATOR_ITEM_ELEVATION_HPP
-#define PROJECT_NAVIGATOR_ITEM_ELEVATION_HPP
+#ifndef PROJECT_NAVIGATOR_ITEM_DESCRIPTOR_HPP
+#define PROJECT_NAVIGATOR_ITEM_DESCRIPTOR_HPP
 
 #include <Editor.hpp>
 #include <ProjectNavigatorItem.hpp>
@@ -29,18 +29,18 @@
 class MainWindow;
 class RangeSliderWidget;
 
-/** Project Navigator Elevation. */
-class ProjectNavigatorItemElevation : public ProjectNavigatorItem
+/** Project Navigator Descriptor. */
+class ProjectNavigatorItemDescriptor : public ProjectNavigatorItem
 {
     Q_OBJECT
 
 public:
-    ProjectNavigatorItemElevation(MainWindow *mainWindow);
+    ProjectNavigatorItemDescriptor(MainWindow *mainWindow);
 
     virtual bool hasColorSource() { return true; }
     virtual SettingsView::ColorSource colorSource()
     {
-        return SettingsView::COLOR_SOURCE_ELEVATION;
+        return SettingsView::COLOR_SOURCE_DESCRIPTOR;
     }
 
 public slots:
@@ -52,10 +52,10 @@ public slots:
 protected:
     MainWindow *mainWindow_;
 
-    RangeSliderWidget *rangeInput_;
-    Range<double> elevationRange_;
+    RangeSliderWidget *descriptorInput_;
+    Range<float> descriptorRange_;
 
-    void elevationInputChanged();
+    void descriptorInputChanged();
 };
 
-#endif /* PROJECT_NAVIGATOR_ITEM_ELEVATION_HPP */
+#endif /* PROJECT_NAVIGATOR_ITEM_DESCRIPTOR_HPP */

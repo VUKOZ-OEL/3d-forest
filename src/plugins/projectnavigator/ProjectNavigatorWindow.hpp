@@ -29,6 +29,7 @@ class ProjectNavigatorItemFiles;
 class ProjectNavigatorItemLayers;
 class ProjectNavigatorItemClassifications;
 class ProjectNavigatorItemClipping;
+class ProjectNavigatorItemDescriptor;
 class ProjectNavigatorItemElevation;
 class ProjectNavigatorTree;
 
@@ -46,6 +47,7 @@ protected:
     ProjectNavigatorItemFiles *datasets_;
     ProjectNavigatorItemLayers *layers_;
     ProjectNavigatorItemClassifications *classifications_;
+    ProjectNavigatorItemDescriptor *descriptor_;
     ProjectNavigatorItemElevation *elevation_;
     ProjectNavigatorItemClipping *clipping_;
 };

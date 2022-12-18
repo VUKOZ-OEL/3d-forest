@@ -22,6 +22,7 @@
 #include <MainWindow.hpp>
 #include <ProjectNavigatorItemClassifications.hpp>
 #include <ProjectNavigatorItemClipping.hpp>
+#include <ProjectNavigatorItemDescriptor.hpp>
 #include <ProjectNavigatorItemElevation.hpp>
 #include <ProjectNavigatorItemFiles.hpp>
 #include <ProjectNavigatorItemLayers.hpp>
@@ -39,8 +40,9 @@ ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
     datasets_ = new ProjectNavigatorItemFiles(mainWindow_);
     layers_ = new ProjectNavigatorItemLayers(mainWindow_);
     classifications_ = new ProjectNavigatorItemClassifications(mainWindow_);
-    elevation_ = new ProjectNavigatorItemElevation(mainWindow_);
     clipping_ = new ProjectNavigatorItemClipping(mainWindow_);
+    descriptor_ = new ProjectNavigatorItemDescriptor(mainWindow_);
+    elevation_ = new ProjectNavigatorItemElevation(mainWindow_);
 
     // Tabs
     menu_ = new ProjectNavigatorTree(mainWindow_);
@@ -50,6 +52,7 @@ ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
                    ICON("classification"),
                    tr("Classifications"));
     menu_->addItem(elevation_, ICON("elevation_filter"), tr("Elevation"));
+    menu_->addItem(descriptor_, ICON("descriptor_filter"), tr("Descriptor"));
     menu_->addItem(clipping_, ICON("clip_filter"), tr("Clip filter"));
 
     // Dock

@@ -17,26 +17,26 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ProjectNavigatorItemElevation.cpp */
+/** @file ProjectNavigatorItemDescriptor.cpp */
 
 #include <MainWindow.hpp>
-#include <ProjectNavigatorItemElevation.hpp>
+#include <ProjectNavigatorItemDescriptor.hpp>
 #include <RangeSliderWidget.hpp>
 
 #include <QVBoxLayout>
 
-ProjectNavigatorItemElevation::ProjectNavigatorItemElevation(
+ProjectNavigatorItemDescriptor::ProjectNavigatorItemDescriptor(
     MainWindow *mainWindow)
     : ProjectNavigatorItem(),
       mainWindow_(mainWindow)
 {
     // Input widgets
-    RangeSliderWidget::create(rangeInput_,
+    RangeSliderWidget::create(descriptorInput_,
                               this,
                               SLOT(slotRangeIntermediateMinimumValue()),
                               SLOT(slotRangeIntermediateMaximumValue()),
-                              tr("Elevation"),
-                              tr("Min-max elevation range filter"),
+                              tr("Descriptor"),
+                              tr("Min-max descriptor range filter"),
                               tr("pt"),
                               1,
                               0,
@@ -46,7 +46,7 @@ ProjectNavigatorItemElevation::ProjectNavigatorItemElevation(
 
     // Layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(rangeInput_);
+    mainLayout->addWidget(descriptorInput_);
     mainLayout->addStretch();
     setLayout(mainLayout);
 
@@ -57,36 +57,41 @@ ProjectNavigatorItemElevation::ProjectNavigatorItemElevation(
             SLOT(slotUpdate(const QSet<Editor::Type> &)));
 }
 
-void ProjectNavigatorItemElevation::slotUpdate(const QSet<Editor::Type> &target)
+void ProjectNavigatorItemDescriptor::slotUpdate(
+    const QSet<Editor::Type> &target)
 {
-    if (target.empty() || target.contains(Editor::TYPE_ELEVATION))
+    if (target.empty() || target.contains(Editor::TYPE_DESCRIPTOR))
     {
-        elevationRange_ = mainWindow_->editor().elevationRange();
+        descriptorRange_ = mainWindow_->editor().descriptorRange();
 
-        rangeInput_->blockSignals(true);
-        rangeInput_->setMinimum(elevationRange_.minimum());
-        rangeInput_->setMaximum(elevationRange_.maximum());
-        rangeInput_->setMinimumValue(elevationRange_.minimumValue());
-        rangeInput_->setMaximumValue(elevationRange_.maximumValue());
-        rangeInput_->blockSignals(false);
+        descriptorInput_->blockSignals(true);
+        descriptorInput_->setMinimum(descriptorRange_.minimum() * 255.0);
+        descriptorInput_->setMaximum(descriptorRange_.maximum() * 255.0);
+        descriptorInput_->setMinimumValue(descriptorRange_.minimumValue() *
+                                          255.0);
+        descriptorInput_->setMaximumValue(descriptorRange_.maximumValue() *
+                                          255.0);
+        descriptorInput_->blockSignals(false);
     }
 }
 
-void ProjectNavigatorItemElevation::slotRangeIntermediateMinimumValue()
+void ProjectNavigatorItemDescriptor::slotRangeIntermediateMinimumValue()
 {
-    elevationRange_.setMinimumValue(rangeInput_->minimumValue());
-    elevationInputChanged();
+    descriptorRange_.setMinimumValue(descriptorInput_->minimumValue() *
+                                     0.0039216F);
+    descriptorInputChanged();
 }
 
-void ProjectNavigatorItemElevation::slotRangeIntermediateMaximumValue()
+void ProjectNavigatorItemDescriptor::slotRangeIntermediateMaximumValue()
 {
-    elevationRange_.setMaximumValue(rangeInput_->maximumValue());
-    elevationInputChanged();
+    descriptorRange_.setMaximumValue(descriptorInput_->maximumValue() *
+                                     0.0039216F);
+    descriptorInputChanged();
 }
 
-void ProjectNavigatorItemElevation::elevationInputChanged()
+void ProjectNavigatorItemDescriptor::descriptorInputChanged()
 {
     mainWindow_->suspendThreads();
-    mainWindow_->editor().setElevationRange(elevationRange_);
+    mainWindow_->editor().setDescriptorRange(descriptorRange_);
     mainWindow_->updateFilter();
 }
