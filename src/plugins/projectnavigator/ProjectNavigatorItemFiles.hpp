@@ -38,7 +38,9 @@ class ProjectNavigatorItemFiles : public ProjectNavigatorItem
     Q_OBJECT
 
 public:
-    ProjectNavigatorItemFiles(MainWindow *mainWindow);
+    ProjectNavigatorItemFiles(MainWindow *mainWindow,
+                              const QIcon &icon,
+                              const QString &text);
 
     virtual bool hasColorSource() const { return false; }
     virtual SettingsView::ColorSource colorSource() const
@@ -73,7 +75,6 @@ protected:
         COLUMN_LAST,
     };
 
-    MainWindow *mainWindow_;
     QTreeWidget *tree_;
     QToolButton *addButton_;
     QToolButton *deleteButton_;

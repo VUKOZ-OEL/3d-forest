@@ -35,7 +35,9 @@ class ProjectNavigatorItemDescriptor : public ProjectNavigatorItem
     Q_OBJECT
 
 public:
-    ProjectNavigatorItemDescriptor(MainWindow *mainWindow);
+    ProjectNavigatorItemDescriptor(MainWindow *mainWindow,
+                                   const QIcon &icon,
+                                   const QString &text);
 
     virtual bool hasColorSource() const { return true; }
     virtual SettingsView::ColorSource colorSource() const
@@ -52,8 +54,6 @@ public slots:
     void slotRangeIntermediateMaximumValue();
 
 protected:
-    MainWindow *mainWindow_;
-
     RangeSliderWidget *descriptorInput_;
     Range<float> descriptorRange_;
 

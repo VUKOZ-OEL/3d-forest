@@ -19,8 +19,39 @@
 
 /** @file ProjectNavigatorItem.cpp */
 
+#include <MainWindow.hpp>
 #include <ProjectNavigatorItem.hpp>
 
-ProjectNavigatorItem::ProjectNavigatorItem() : QWidget(), filterEnabled_(false)
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QVBoxLayout>
+
+ProjectNavigatorItem::ProjectNavigatorItem(MainWindow *mainWindow,
+                                           const QIcon &icon,
+                                           const QString &text)
+    : QWidget(),
+      mainWindow_(mainWindow),
+      icon_(icon),
+      text_(text),
+      titleIcon_(nullptr),
+      titleText_(nullptr),
+      mainLayout_(nullptr),
+      filterEnabled_(false)
 {
+    // Title
+    titleIcon_ = new QLabel;
+    titleIcon_->setPixmap(icon_.pixmap(icon_.actualSize(QSize(16, 16))));
+
+    titleText_ = new QLabel;
+    titleText_->setText(text_);
+
+    QHBoxLayout *titleBar = new QHBoxLayout;
+    titleBar->addWidget(titleIcon_);
+    titleBar->addWidget(titleText_);
+    titleBar->addStretch();
+
+    // Layout
+    mainLayout_ = new QVBoxLayout;
+    mainLayout_->setContentsMargins(0, 0, 0, 0);
+    mainLayout_->addLayout(titleBar);
 }

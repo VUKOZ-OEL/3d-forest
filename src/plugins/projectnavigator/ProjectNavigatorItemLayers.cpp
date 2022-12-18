@@ -37,9 +37,10 @@
 
 #define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
-ProjectNavigatorItemLayers::ProjectNavigatorItemLayers(MainWindow *mainWindow)
-    : ProjectNavigatorItem(),
-      mainWindow_(mainWindow)
+ProjectNavigatorItemLayers::ProjectNavigatorItemLayers(MainWindow *mainWindow,
+                                                       const QIcon &icon,
+                                                       const QString &text)
+    : ProjectNavigatorItem(mainWindow, icon, text)
 {
     // Table
     tree_ = new QTreeWidget();
@@ -114,10 +115,12 @@ ProjectNavigatorItemLayers::ProjectNavigatorItemLayers(MainWindow *mainWindow)
 
     // Layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->setContentsMargins(1, 1, 1, 1);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(toolBar);
     mainLayout->addWidget(tree_);
-    setLayout(mainLayout);
+
+    mainLayout_->addLayout(mainLayout);
+    setLayout(mainLayout_);
 
     // Data
     connect(mainWindow_,

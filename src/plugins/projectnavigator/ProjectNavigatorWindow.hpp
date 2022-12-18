@@ -25,12 +25,12 @@
 #include <QDockWidget>
 
 class MainWindow;
-class ProjectNavigatorItemFiles;
-class ProjectNavigatorItemLayers;
 class ProjectNavigatorItemClassifications;
 class ProjectNavigatorItemClipping;
 class ProjectNavigatorItemDescriptor;
 class ProjectNavigatorItemElevation;
+class ProjectNavigatorItemFiles;
+class ProjectNavigatorItemLayers;
 class ProjectNavigatorTree;
 
 /** Project Navigator Window. */
@@ -44,12 +44,12 @@ public:
 protected:
     MainWindow *mainWindow_;
     ProjectNavigatorTree *menu_;
-    ProjectNavigatorItemFiles *datasets_;
-    ProjectNavigatorItemLayers *layers_;
     ProjectNavigatorItemClassifications *classifications_;
+    ProjectNavigatorItemClipping *clipping_;
     ProjectNavigatorItemDescriptor *descriptor_;
     ProjectNavigatorItemElevation *elevation_;
-    ProjectNavigatorItemClipping *clipping_;
+    ProjectNavigatorItemFiles *files_;
+    ProjectNavigatorItemLayers *layers_;
 };
 
 #endif /* PROJECT_NAVIGATOR_WINDOW_HPP */

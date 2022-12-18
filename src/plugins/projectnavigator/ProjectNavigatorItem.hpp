@@ -24,7 +24,12 @@
 
 #include <SettingsView.hpp>
 
+class MainWindow;
+
 #include <QWidget>
+
+class QLabel;
+class QVBoxLayout;
 
 /** Project Navigator Item. */
 class ProjectNavigatorItem : public QWidget
@@ -32,8 +37,13 @@ class ProjectNavigatorItem : public QWidget
     Q_OBJECT
 
 public:
-    ProjectNavigatorItem();
+    ProjectNavigatorItem(MainWindow *mainWindow,
+                         const QIcon &icon,
+                         const QString &text);
     virtual ~ProjectNavigatorItem() = default;
+
+    const QIcon &icon() { return icon_; }
+    const QString &text() { return text_; }
 
     virtual bool hasColorSource() const = 0;
     virtual SettingsView::ColorSource colorSource() const = 0;
@@ -41,6 +51,15 @@ public:
     virtual bool hasFilter() const = 0;
     virtual bool isFilterEnabled() const { return filterEnabled_; }
     virtual void setFilterEnabled(bool b) { filterEnabled_ = b; }
+
+protected:
+    MainWindow *mainWindow_;
+
+    QIcon icon_;
+    QString text_;
+    QLabel *titleIcon_;
+    QLabel *titleText_;
+    QVBoxLayout *mainLayout_;
 
 private:
     bool filterEnabled_;

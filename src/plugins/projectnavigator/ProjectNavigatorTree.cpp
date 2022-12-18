@@ -40,8 +40,6 @@ ProjectNavigatorTree::ProjectNavigatorTree(MainWindow *mainWindow)
     : QWidget(),
       mainWindow_(mainWindow),
       treeWidget_(nullptr),
-      icon_(nullptr),
-      label_(nullptr),
       tabLayout_(nullptr)
 {
     LOG_DEBUG_LOCAL("");
@@ -62,37 +60,14 @@ ProjectNavigatorTree::ProjectNavigatorTree(MainWindow *mainWindow)
     }
 
     // Tree detail
-    icon_ = new QLabel;
-    // icon_->setPixmap(icon.pixmap(icon.actualSize(QSize(16, 16))));
-    icon_->setContentsMargins(1, 1, 1, 1);
-
-    label_ = new QLabel;
-    label_->setText("label");
-    label_->setContentsMargins(1, 1, 1, 1);
-
-    QHBoxLayout *titleBar = new QHBoxLayout;
-    titleBar->addWidget(icon_);
-    titleBar->addWidget(label_);
-    titleBar->addStretch();
-    titleBar->setContentsMargins(1, 1, 1, 1);
-
-    QFrame *titleFrame = new QFrame;
-    titleFrame->setFrameStyle(QFrame::Box | QFrame::Plain);
-    titleFrame->setLineWidth(0);
-    titleFrame->setContentsMargins(1, 1, 1, 1);
-    titleFrame->setLayout(titleBar);
-
     tabLayout_ = new QVBoxLayout;
-
-    QVBoxLayout *treeDetailLayout = new QVBoxLayout;
-    treeDetailLayout->addWidget(titleFrame);
-    treeDetailLayout->addLayout(tabLayout_);
+    tabLayout_->setContentsMargins(0, 0, 0, 0);
 
     QFrame *treeDetailFrame = new QFrame;
     treeDetailFrame->setFrameStyle(QFrame::Box | QFrame::Plain);
     treeDetailFrame->setLineWidth(0);
-    treeDetailFrame->setContentsMargins(1, 1, 1, 1);
-    treeDetailFrame->setLayout(treeDetailLayout);
+    treeDetailFrame->setContentsMargins(0, 0, 0, 0);
+    treeDetailFrame->setLayout(tabLayout_);
 
     // Layout
     QSplitter *splitter = new QSplitter;
@@ -105,6 +80,7 @@ ProjectNavigatorTree::ProjectNavigatorTree(MainWindow *mainWindow)
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(splitter);
+    mainLayout->setContentsMargins(1, 1, 1, 1);
 
     setLayout(mainLayout);
 
@@ -115,11 +91,9 @@ ProjectNavigatorTree::ProjectNavigatorTree(MainWindow *mainWindow)
             SLOT(slotUpdate(const QSet<Editor::Type> &)));
 }
 
-void ProjectNavigatorTree::addItem(ProjectNavigatorItem *widget,
-                                   const QIcon &icon,
-                                   const QString &label)
+void ProjectNavigatorTree::addItem(ProjectNavigatorItem *widget)
 {
-    LOG_DEBUG_LOCAL(label.toStdString());
+    LOG_DEBUG_LOCAL(widget->text());
 
     block();
 
@@ -134,16 +108,14 @@ void ProjectNavigatorTree::addItem(ProjectNavigatorItem *widget,
     {
         item->setCheckState(COLUMN_FILTER, Qt::Unchecked);
     }
-    item->setIcon(COLUMN_LABEL, icon);
-    item->setText(COLUMN_LABEL, label);
+    item->setIcon(COLUMN_LABEL, widget->icon());
+    item->setText(COLUMN_LABEL, widget->text());
 
     // Register new tab
     tabList_.push_back(widget);
 
     if (tabList_.size() == 1)
     {
-        icon_->setPixmap(icon.pixmap(icon.actualSize(QSize(16, 16))));
-        label_->setText(label);
         widget->setVisible(true);
     }
     else
@@ -240,9 +212,6 @@ void ProjectNavigatorTree::setTabVisible(size_t index, QTreeWidgetItem *item)
     if (index < tabList_.size())
     {
         LOG_DEBUG_LOCAL("show <" << index << ">");
-        const QIcon icon = item->icon(COLUMN_LABEL);
-        icon_->setPixmap(icon.pixmap(icon.actualSize(QSize(16, 16))));
-        label_->setText(item->text(COLUMN_LABEL));
         tabList_[index]->setVisible(true);
     }
 }

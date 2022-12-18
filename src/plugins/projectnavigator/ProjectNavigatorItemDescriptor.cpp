@@ -26,9 +26,10 @@
 #include <QVBoxLayout>
 
 ProjectNavigatorItemDescriptor::ProjectNavigatorItemDescriptor(
-    MainWindow *mainWindow)
-    : ProjectNavigatorItem(),
-      mainWindow_(mainWindow)
+    MainWindow *mainWindow,
+    const QIcon &icon,
+    const QString &text)
+    : ProjectNavigatorItem(mainWindow, icon, text)
 {
     // Input widgets
     RangeSliderWidget::create(descriptorInput_,
@@ -46,9 +47,12 @@ ProjectNavigatorItemDescriptor::ProjectNavigatorItemDescriptor(
 
     // Layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(descriptorInput_);
     mainLayout->addStretch();
-    setLayout(mainLayout);
+
+    mainLayout_->addLayout(mainLayout);
+    setLayout(mainLayout_);
 
     // Data
     connect(mainWindow_,

@@ -36,9 +36,10 @@
 //#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("ProjectNavigatorItemClipping", msg)
 
 ProjectNavigatorItemClipping::ProjectNavigatorItemClipping(
-    MainWindow *mainWindow)
-    : ProjectNavigatorItem(),
-      mainWindow_(mainWindow)
+    MainWindow *mainWindow,
+    const QIcon &icon,
+    const QString &text)
+    : ProjectNavigatorItem(mainWindow, icon, text)
 {
     LOG_DEBUG_LOCAL("");
 
@@ -91,12 +92,15 @@ ProjectNavigatorItemClipping::ProjectNavigatorItemClipping(
     controlLayout->addWidget(resetButton_);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(rangeInput_[0]);
     mainLayout->addWidget(rangeInput_[1]);
     mainLayout->addWidget(rangeInput_[2]);
     mainLayout->addLayout(controlLayout);
     mainLayout->addStretch();
-    setLayout(mainLayout);
+
+    mainLayout_->addLayout(mainLayout);
+    setLayout(mainLayout_);
 
     // Data
     connect(mainWindow_,

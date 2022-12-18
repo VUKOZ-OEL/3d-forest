@@ -37,23 +37,33 @@ ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
       mainWindow_(mainWindow)
 {
     // Tab
-    datasets_ = new ProjectNavigatorItemFiles(mainWindow_);
-    layers_ = new ProjectNavigatorItemLayers(mainWindow_);
-    classifications_ = new ProjectNavigatorItemClassifications(mainWindow_);
-    clipping_ = new ProjectNavigatorItemClipping(mainWindow_);
-    descriptor_ = new ProjectNavigatorItemDescriptor(mainWindow_);
-    elevation_ = new ProjectNavigatorItemElevation(mainWindow_);
+    classifications_ =
+        new ProjectNavigatorItemClassifications(mainWindow_,
+                                                ICON("classification"),
+                                                tr("Classifications"));
+    clipping_ = new ProjectNavigatorItemClipping(mainWindow_,
+                                                 ICON("clip_filter"),
+                                                 tr("Clip filter"));
+    descriptor_ = new ProjectNavigatorItemDescriptor(mainWindow_,
+                                                     ICON("descriptor_filter"),
+                                                     tr("Descriptor"));
+    elevation_ = new ProjectNavigatorItemElevation(mainWindow_,
+                                                   ICON("elevation_filter"),
+                                                   tr("Elevation"));
+    files_ =
+        new ProjectNavigatorItemFiles(mainWindow_, ICON("file"), tr("Files"));
+    layers_ = new ProjectNavigatorItemLayers(mainWindow_,
+                                             ICON("layers"),
+                                             tr("Layers"));
 
     // Tabs
     menu_ = new ProjectNavigatorTree(mainWindow_);
-    menu_->addItem(datasets_, ICON("file"), tr("Files"));
-    menu_->addItem(layers_, ICON("layers"), tr("Layers"));
-    menu_->addItem(classifications_,
-                   ICON("classification"),
-                   tr("Classifications"));
-    menu_->addItem(elevation_, ICON("elevation_filter"), tr("Elevation"));
-    menu_->addItem(descriptor_, ICON("descriptor_filter"), tr("Descriptor"));
-    menu_->addItem(clipping_, ICON("clip_filter"), tr("Clip filter"));
+    menu_->addItem(files_);
+    menu_->addItem(layers_);
+    menu_->addItem(classifications_);
+    menu_->addItem(elevation_);
+    menu_->addItem(descriptor_);
+    menu_->addItem(clipping_);
 
     // Dock
     setWidget(menu_);

@@ -45,9 +45,7 @@ class ProjectNavigatorTree : public QWidget
 public:
     ProjectNavigatorTree(MainWindow *mainWindow);
 
-    void addItem(ProjectNavigatorItem *widget,
-                 const QIcon &icon,
-                 const QString &label);
+    void addItem(ProjectNavigatorItem *widget);
 
 public slots:
     void slotUpdate(const QSet<Editor::Type> &target);
@@ -67,8 +65,6 @@ private:
 
     MainWindow *mainWindow_;
     QTreeWidget *treeWidget_;
-    QLabel *icon_;
-    QLabel *label_;
     QVBoxLayout *tabLayout_;
     std::vector<ProjectNavigatorItem *> tabList_;
     SettingsView settings_;

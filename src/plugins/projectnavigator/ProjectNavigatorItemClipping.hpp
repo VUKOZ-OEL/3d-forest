@@ -37,7 +37,9 @@ class ProjectNavigatorItemClipping : public ProjectNavigatorItem
     Q_OBJECT
 
 public:
-    ProjectNavigatorItemClipping(MainWindow *mainWindow);
+    ProjectNavigatorItemClipping(MainWindow *mainWindow,
+                                 const QIcon &icon,
+                                 const QString &text);
 
     virtual bool hasColorSource() const { return false; }
     virtual SettingsView::ColorSource colorSource() const
@@ -56,7 +58,6 @@ public slots:
     void reset();
 
 protected:
-    MainWindow *mainWindow_;
     RangeSliderWidget *rangeInput_[3];
     QPushButton *resetButton_;
     Range<double> clipRange_[3];

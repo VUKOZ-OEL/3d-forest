@@ -35,7 +35,9 @@ class ProjectNavigatorItemElevation : public ProjectNavigatorItem
     Q_OBJECT
 
 public:
-    ProjectNavigatorItemElevation(MainWindow *mainWindow);
+    ProjectNavigatorItemElevation(MainWindow *mainWindow,
+                                  const QIcon &icon,
+                                  const QString &text);
 
     virtual bool hasColorSource() const { return true; }
     virtual SettingsView::ColorSource colorSource() const
@@ -52,8 +54,6 @@ public slots:
     void slotRangeIntermediateMaximumValue();
 
 protected:
-    MainWindow *mainWindow_;
-
     RangeSliderWidget *rangeInput_;
     Range<double> elevationRange_;
 
