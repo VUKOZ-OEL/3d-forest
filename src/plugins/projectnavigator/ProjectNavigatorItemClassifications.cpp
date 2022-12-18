@@ -136,6 +136,17 @@ void ProjectNavigatorItemClassifications::filterChanged()
     mainWindow_->updateFilter();
 }
 
+bool ProjectNavigatorItemClassifications::isFilterEnabled() const
+{
+    return classifications_.isEnabled();
+}
+
+void ProjectNavigatorItemClassifications::setFilterEnabled(bool b)
+{
+    classifications_.setEnabled(b);
+    filterChanged();
+}
+
 void ProjectNavigatorItemClassifications::slotShow()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();

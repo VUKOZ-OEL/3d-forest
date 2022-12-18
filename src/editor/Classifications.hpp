@@ -63,11 +63,14 @@ inline std::unordered_set<size_t> Classifications::enabledList() const
 {
     std::unordered_set<size_t> list;
 
-    for (size_t i = 0; i < classes_.size(); i++)
+    if (enabled_)
     {
-        if (classes_[i].enabled)
+        for (size_t i = 0; i < classes_.size(); i++)
         {
-            list.insert(i);
+            if (classes_[i].enabled)
+            {
+                list.insert(i);
+            }
         }
     }
 
