@@ -48,7 +48,9 @@ public:
         return SettingsView::COLOR_SOURCE_CLASSIFICATION;
     }
 
-    virtual bool hasFilter() const { return false; }
+    virtual bool hasFilter() const { return true; }
+    virtual bool isFilterEnabled() const;
+    virtual void setFilterEnabled(bool b);
 
 public slots:
     void slotUpdate(const QSet<Editor::Type> &target);
