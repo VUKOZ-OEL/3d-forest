@@ -166,8 +166,7 @@ void ProjectNavigatorTree::slotItemClicked(QTreeWidgetItem *item, int column)
 
     if (column == COLUMN_LABEL)
     {
-        size_t idx = index(item);
-        setTabVisible(idx, item);
+        setTabVisible(index(item));
     }
 }
 
@@ -196,7 +195,7 @@ void ProjectNavigatorTree::unblock()
             SLOT(slotItemClicked(QTreeWidgetItem *, int)));
 }
 
-void ProjectNavigatorTree::setTabVisible(size_t index, QTreeWidgetItem *item)
+void ProjectNavigatorTree::setTabVisible(size_t index)
 {
     LOG_DEBUG_LOCAL("");
 

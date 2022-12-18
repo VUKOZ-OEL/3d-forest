@@ -73,7 +73,7 @@ private:
     void block();
     void unblock();
 
-    void setTabVisible(size_t index, QTreeWidgetItem *item);
+    void setTabVisible(size_t index);
 
     void applySettingsIn(const SettingsView &settings);
     void applySettingsOut();
