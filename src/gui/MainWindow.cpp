@@ -120,7 +120,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Show windows
     projectNavigatorPlugin_->slotPlugin();
-    settingsPlugin_->slotPlugin();
 
     // Rendering
     connect(viewerPlugin_->viewports(),

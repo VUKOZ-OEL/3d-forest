@@ -17,14 +17,14 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ProjectNavigatorClassifications.hpp */
+/** @file ProjectNavigatorItemFiles.hpp */
 
-#ifndef PROJECT_NAVIGATOR_CLASSIFICATIONS_HPP
-#define PROJECT_NAVIGATOR_CLASSIFICATIONS_HPP
+#ifndef PROJECT_NAVIGATOR_ITEM_FILES_HPP
+#define PROJECT_NAVIGATOR_ITEM_FILES_HPP
 
-#include <Classifications.hpp>
-
-#include <QWidget>
+#include <Datasets.hpp>
+#include <Editor.hpp>
+#include <ProjectNavigatorItem.hpp>
 
 class MainWindow;
 
@@ -32,26 +32,29 @@ class QToolButton;
 class QTreeWidget;
 class QTreeWidgetItem;
 
-/** Project Navigator Classifications. */
-class ProjectNavigatorClassifications : public QWidget
+/** Project Navigator Files. */
+class ProjectNavigatorItemFiles : public ProjectNavigatorItem
 {
     Q_OBJECT
 
 public:
-    /** Project Navigator Classifications Column. */
-    enum Column
-    {
-        COLUMN_CHECKED,
-        COLUMN_ID,
-        COLUMN_LABEL,
-        COLUMN_LAST,
-    };
+    ProjectNavigatorItemFiles(MainWindow *mainWindow,
+                              const QIcon &icon,
+                              const QString &text);
 
-    ProjectNavigatorClassifications(MainWindow *mainWindow);
+    virtual bool hasColorSource() const { return false; }
+    virtual SettingsView::ColorSource colorSource() const
+    {
+        return SettingsView::COLOR_SOURCE_LAST;
+    }
+
+    virtual bool hasFilter() const { return false; }
 
 public slots:
     void slotUpdate(const QSet<Editor::Type> &target);
 
+    void slotAdd();
+    void slotDelete();
     void slotShow();
     void slotHide();
     void slotSelectAll();
@@ -62,24 +65,36 @@ public slots:
     void slotItemChanged(QTreeWidgetItem *item, int column);
 
 protected:
-    MainWindow *mainWindow_;
+    /** Project Navigator Files Column. */
+    enum Column
+    {
+        COLUMN_CHECKED,
+        COLUMN_ID,
+        COLUMN_LABEL,
+        COLUMN_DATE_CREATED,
+        COLUMN_LAST,
+    };
+
     QTreeWidget *tree_;
+    QToolButton *addButton_;
+    QToolButton *deleteButton_;
     QToolButton *showButton_;
     QToolButton *hideButton_;
     QToolButton *selectAllButton_;
     QToolButton *selectInvertButton_;
     QToolButton *selectNoneButton_;
-    Classifications classifications_;
+    Datasets datasets_;
 
     void dataChanged();
     void filterChanged();
 
+    size_t index(const QTreeWidgetItem *item);
     void updateTree();
     void block();
     void unblock();
     void addItem(size_t i);
 
-    void setClassifications(const Classifications &classifications);
+    void setDatasets(const Datasets &datasets);
 };
 
-#endif /* PROJECT_NAVIGATOR_CLASSIFICATIONS_HPP */
+#endif /* PROJECT_NAVIGATOR_ITEM_FILES_HPP */

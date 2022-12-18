@@ -32,9 +32,6 @@ class MainWindow;
 
 class QCheckBox;
 class QPushButton;
-class QTabWidget;
-class QTreeWidget;
-class QTreeWidgetItem;
 class QSlider;
 
 /** Settings Color Widget. */
@@ -43,16 +40,6 @@ class SettingsColorWidget : public QWidget
     Q_OBJECT
 
 public:
-    /** Settings Color Widget Column. */
-    enum Column
-    {
-        COLUMN_CHECKED,
-        COLUMN_ID,
-        COLUMN_LABEL,
-        COLUMN_OPACITY,
-        COLUMN_LAST
-    };
-
     SettingsColorWidget(MainWindow *mainWindow);
 
 public slots:
@@ -62,11 +49,9 @@ public slots:
     void slotSetFogEnabled(int v);
     void slotSetColorFg();
     void slotSetColorBg();
-    void slotItemChanged(QTreeWidgetItem *item, int column);
 
 protected:
     MainWindow *mainWindow_;
-    QTreeWidget *treeWidget_;
     QCheckBox *fogCheckBox_;
     QPushButton *colorFgButton_;
     QPushButton *colorBgButton_;
@@ -75,18 +60,13 @@ protected:
 
     void settingsChanged();
     void settingsChangedApply();
-
-    size_t index(const QTreeWidgetItem *item);
-    void updateTree();
-    void block();
-    void unblock();
-    void addItem(size_t i);
-
-    void setColorSource(const SettingsView &settings);
     void setSettings(const SettingsView &settings);
 
     bool colorDialog(Vector3<float> &rgb);
     void setColor(QPushButton *button, const Vector3<float> &rgb);
+
+    void block();
+    void unblock();
 };
 
 #endif /* SETTINGS_COLOR_WIDGET_HPP */

@@ -17,12 +17,12 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ProjectNavigatorLayers.cpp */
+/** @file ProjectNavigatorItemLayers.cpp */
 
 #include <ImportFilePlugin.hpp>
 #include <Log.hpp>
 #include <MainWindow.hpp>
-#include <ProjectNavigatorLayers.hpp>
+#include <ProjectNavigatorItemLayers.hpp>
 #include <ThemeIcon.hpp>
 
 #include <QHBoxLayout>
@@ -37,9 +37,10 @@
 
 #define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
-ProjectNavigatorLayers::ProjectNavigatorLayers(MainWindow *mainWindow)
-    : QWidget(),
-      mainWindow_(mainWindow)
+ProjectNavigatorItemLayers::ProjectNavigatorItemLayers(MainWindow *mainWindow,
+                                                       const QIcon &icon,
+                                                       const QString &text)
+    : ProjectNavigatorItem(mainWindow, icon, text)
 {
     // Table
     tree_ = new QTreeWidget();
@@ -114,10 +115,12 @@ ProjectNavigatorLayers::ProjectNavigatorLayers(MainWindow *mainWindow)
 
     // Layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->setContentsMargins(1, 1, 1, 1);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(toolBar);
     mainLayout->addWidget(tree_);
-    setLayout(mainLayout);
+
+    mainLayout_->addLayout(mainLayout);
+    setLayout(mainLayout_);
 
     // Data
     connect(mainWindow_,
@@ -126,7 +129,7 @@ ProjectNavigatorLayers::ProjectNavigatorLayers(MainWindow *mainWindow)
             SLOT(slotUpdate(const QSet<Editor::Type> &)));
 }
 
-void ProjectNavigatorLayers::slotUpdate(const QSet<Editor::Type> &target)
+void ProjectNavigatorItemLayers::slotUpdate(const QSet<Editor::Type> &target)
 {
     if (!target.empty() && !target.contains(Editor::TYPE_LAYER))
     {
@@ -136,25 +139,25 @@ void ProjectNavigatorLayers::slotUpdate(const QSet<Editor::Type> &target)
     setLayers(mainWindow_->editor().layers());
 }
 
-void ProjectNavigatorLayers::dataChanged()
+void ProjectNavigatorItemLayers::dataChanged()
 {
     mainWindow_->suspendThreads();
     mainWindow_->editor().setLayers(layers_);
     mainWindow_->updateData();
 }
 
-void ProjectNavigatorLayers::filterChanged()
+void ProjectNavigatorItemLayers::filterChanged()
 {
     mainWindow_->suspendThreads();
     mainWindow_->editor().setLayers(layers_);
     mainWindow_->updateFilter();
 }
 
-void ProjectNavigatorLayers::slotAdd()
+void ProjectNavigatorItemLayers::slotAdd()
 {
 }
 
-void ProjectNavigatorLayers::slotDelete()
+void ProjectNavigatorItemLayers::slotDelete()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
@@ -174,7 +177,7 @@ void ProjectNavigatorLayers::slotDelete()
     }
 }
 
-void ProjectNavigatorLayers::slotShow()
+void ProjectNavigatorItemLayers::slotShow()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
@@ -189,7 +192,7 @@ void ProjectNavigatorLayers::slotShow()
     }
 }
 
-void ProjectNavigatorLayers::slotHide()
+void ProjectNavigatorItemLayers::slotHide()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
@@ -204,7 +207,7 @@ void ProjectNavigatorLayers::slotHide()
     }
 }
 
-void ProjectNavigatorLayers::slotSelectAll()
+void ProjectNavigatorItemLayers::slotSelectAll()
 {
     QTreeWidgetItemIterator it(tree_);
 
@@ -217,7 +220,7 @@ void ProjectNavigatorLayers::slotSelectAll()
     slotItemSelectionChanged();
 }
 
-void ProjectNavigatorLayers::slotSelectInvert()
+void ProjectNavigatorItemLayers::slotSelectInvert()
 {
     QTreeWidgetItemIterator it(tree_);
 
@@ -230,7 +233,7 @@ void ProjectNavigatorLayers::slotSelectInvert()
     slotItemSelectionChanged();
 }
 
-void ProjectNavigatorLayers::slotSelectNone()
+void ProjectNavigatorItemLayers::slotSelectNone()
 {
     QTreeWidgetItemIterator it(tree_);
 
@@ -243,7 +246,7 @@ void ProjectNavigatorLayers::slotSelectNone()
     slotItemSelectionChanged();
 }
 
-void ProjectNavigatorLayers::slotItemSelectionChanged()
+void ProjectNavigatorItemLayers::slotItemSelectionChanged()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
@@ -261,7 +264,8 @@ void ProjectNavigatorLayers::slotItemSelectionChanged()
     }
 }
 
-void ProjectNavigatorLayers::slotItemChanged(QTreeWidgetItem *item, int column)
+void ProjectNavigatorItemLayers::slotItemChanged(QTreeWidgetItem *item,
+                                                 int column)
 {
     if (column == COLUMN_CHECKED)
     {
@@ -272,12 +276,12 @@ void ProjectNavigatorLayers::slotItemChanged(QTreeWidgetItem *item, int column)
     }
 }
 
-size_t ProjectNavigatorLayers::index(const QTreeWidgetItem *item)
+size_t ProjectNavigatorItemLayers::index(const QTreeWidgetItem *item)
 {
     return layers_.index(item->text(COLUMN_ID).toULong());
 }
 
-void ProjectNavigatorLayers::updateTree()
+void ProjectNavigatorItemLayers::updateTree()
 {
     block();
 
@@ -302,14 +306,14 @@ void ProjectNavigatorLayers::updateTree()
     unblock();
 }
 
-void ProjectNavigatorLayers::block()
+void ProjectNavigatorItemLayers::block()
 {
     disconnect(tree_, SIGNAL(itemChanged(QTreeWidgetItem *, int)), 0, 0);
     disconnect(tree_, SIGNAL(itemSelectionChanged()), 0, 0);
     (void)blockSignals(true);
 }
 
-void ProjectNavigatorLayers::unblock()
+void ProjectNavigatorItemLayers::unblock()
 {
     (void)blockSignals(false);
     connect(tree_,
@@ -322,7 +326,7 @@ void ProjectNavigatorLayers::unblock()
             SLOT(slotItemSelectionChanged()));
 }
 
-void ProjectNavigatorLayers::addItem(size_t i)
+void ProjectNavigatorItemLayers::addItem(size_t i)
 {
     QTreeWidgetItem *item = new QTreeWidgetItem(tree_);
 
@@ -351,7 +355,7 @@ void ProjectNavigatorLayers::addItem(size_t i)
     item->setBackground(COLUMN_ID, brush);
 }
 
-void ProjectNavigatorLayers::setLayers(const Layers &layers)
+void ProjectNavigatorItemLayers::setLayers(const Layers &layers)
 {
     block();
 

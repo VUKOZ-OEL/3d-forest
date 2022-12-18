@@ -82,19 +82,19 @@ size_t SettingsView::colorSourceSize() const
     return colorSourceString_.size();
 }
 
-const char *SettingsView::colorSourceString(size_t id) const
+const char *SettingsView::colorSourceString(SettingsView::ColorSource id) const
 {
-    return colorSourceString_[id].c_str();
+    return colorSourceString_[static_cast<size_t>(id)].c_str();
 }
 
-bool SettingsView::isColorSourceEnabled(size_t id) const
+bool SettingsView::isColorSourceEnabled(SettingsView::ColorSource id) const
 {
-    return colorSourceEnabled_[id];
+    return colorSourceEnabled_[static_cast<size_t>(id)];
 }
 
-void SettingsView::setColorSourceEnabled(size_t id, bool v)
+void SettingsView::setColorSourceEnabled(SettingsView::ColorSource id, bool v)
 {
-    colorSourceEnabled_[id] = v;
+    colorSourceEnabled_[static_cast<size_t>(id)] = v;
 }
 
 void SettingsView::setColorSourceEnabledAll(bool v)

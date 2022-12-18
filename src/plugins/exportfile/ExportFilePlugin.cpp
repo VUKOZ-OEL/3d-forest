@@ -60,11 +60,15 @@ void ExportFilePlugin::slotExportFile()
 
         if (dialog.exec() == QDialog::Accepted)
         {
+            std::shared_ptr<ExportFileInterface> writer = dialog.writer();
+            ExportFileProperties properties = dialog.properties();
+
             ExportFile exportFile(&mainWindow_->editor());
-            exportFile.initialize(dialog.writer(), dialog.properties());
-            fileName_ = QString::fromStdString(dialog.properties().fileName());
+            exportFile.initialize(writer, properties);
 
             ProgressDialog::run(mainWindow_, "Exporting file", &exportFile);
+
+            fileName_ = QString::fromStdString(properties.fileName());
         }
     }
     catch (std::exception &e)

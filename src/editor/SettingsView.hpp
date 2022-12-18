@@ -44,7 +44,8 @@ public:
         COLOR_SOURCE_CUSTOM_COLOR,
         COLOR_SOURCE_DESCRIPTOR,
         COLOR_SOURCE_DENSITY,
-        COLOR_SOURCE_NORMAL
+        COLOR_SOURCE_NORMAL,
+        COLOR_SOURCE_LAST
     };
 
     SettingsView();
@@ -62,9 +63,9 @@ public:
     const Vector3<float> &backgroundColor() const { return background_; }
 
     size_t colorSourceSize() const;
-    const char *colorSourceString(size_t id) const;
-    bool isColorSourceEnabled(size_t id) const;
-    void setColorSourceEnabled(size_t id, bool v);
+    const char *colorSourceString(SettingsView::ColorSource id) const;
+    bool isColorSourceEnabled(SettingsView::ColorSource id) const;
+    void setColorSourceEnabled(SettingsView::ColorSource id, bool v);
     void setColorSourceEnabledAll(bool v);
 
     void read(const Json &in);

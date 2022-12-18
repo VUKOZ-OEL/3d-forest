@@ -17,16 +17,17 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ProjectNavigatorClassifications.cpp */
+/** @file ProjectNavigatorItemFiles.cpp */
 
-#include <ColorPalette.hpp>
-
+#include <ImportFilePlugin.hpp>
+#include <Log.hpp>
 #include <MainWindow.hpp>
-#include <ProjectNavigatorClassifications.hpp>
+#include <ProjectNavigatorItemFiles.hpp>
 #include <ThemeIcon.hpp>
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QPushButton>
 #include <QToolBar>
 #include <QToolButton>
 #include <QTreeWidget>
@@ -36,10 +37,10 @@
 
 #define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
-ProjectNavigatorClassifications::ProjectNavigatorClassifications(
-    MainWindow *mainWindow)
-    : QWidget(),
-      mainWindow_(mainWindow)
+ProjectNavigatorItemFiles::ProjectNavigatorItemFiles(MainWindow *mainWindow,
+                                                     const QIcon &icon,
+                                                     const QString &text)
+    : ProjectNavigatorItem(mainWindow, icon, text)
 {
     // Table
     tree_ = new QTreeWidget();
@@ -47,9 +48,24 @@ ProjectNavigatorClassifications::ProjectNavigatorClassifications(
     tree_->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     // Tool bar buttons
+    MainWindow::createToolButton(&addButton_,
+                                 tr("Add"),
+                                 tr("Add new data set"),
+                                 THEME_ICON("add"),
+                                 this,
+                                 SLOT(slotAdd()));
+
+    MainWindow::createToolButton(&deleteButton_,
+                                 tr("Remove"),
+                                 tr("Remove selected data set"),
+                                 THEME_ICON("remove"),
+                                 this,
+                                 SLOT(slotDelete()));
+    deleteButton_->setEnabled(false);
+
     MainWindow::createToolButton(&showButton_,
                                  tr("Show"),
-                                 tr("Make selected classifications visible"),
+                                 tr("Make selected data sets visible"),
                                  ICON("eye"),
                                  this,
                                  SLOT(slotShow()));
@@ -57,7 +73,7 @@ ProjectNavigatorClassifications::ProjectNavigatorClassifications(
 
     MainWindow::createToolButton(&hideButton_,
                                  tr("Hide"),
-                                 tr("Hide selected classifications"),
+                                 tr("Hide selected data sets"),
                                  ICON("hide"),
                                  this,
                                  SLOT(slotHide()));
@@ -86,6 +102,8 @@ ProjectNavigatorClassifications::ProjectNavigatorClassifications(
 
     // Tool bar
     QToolBar *toolBar = new QToolBar;
+    toolBar->addWidget(addButton_);
+    toolBar->addWidget(deleteButton_);
     toolBar->addWidget(showButton_);
     toolBar->addWidget(hideButton_);
     toolBar->addSeparator();
@@ -96,10 +114,12 @@ ProjectNavigatorClassifications::ProjectNavigatorClassifications(
 
     // Layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->setContentsMargins(1, 1, 1, 1);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(toolBar);
     mainLayout->addWidget(tree_);
-    setLayout(mainLayout);
+
+    mainLayout_->addLayout(mainLayout);
+    setLayout(mainLayout_);
 
     // Data
     connect(mainWindow_,
@@ -108,32 +128,56 @@ ProjectNavigatorClassifications::ProjectNavigatorClassifications(
             SLOT(slotUpdate(const QSet<Editor::Type> &)));
 }
 
-void ProjectNavigatorClassifications::slotUpdate(
-    const QSet<Editor::Type> &target)
+void ProjectNavigatorItemFiles::slotUpdate(const QSet<Editor::Type> &target)
 {
-    if (!target.empty() && !target.contains(Editor::TYPE_CLASSIFICATION))
+    if (!target.empty() && !target.contains(Editor::TYPE_DATA_SET))
     {
         return;
     }
 
-    setClassifications(mainWindow_->editor().classifications());
+    setDatasets(mainWindow_->editor().datasets());
 }
 
-void ProjectNavigatorClassifications::dataChanged()
+void ProjectNavigatorItemFiles::dataChanged()
 {
     mainWindow_->suspendThreads();
-    mainWindow_->editor().setClassifications(classifications_);
+    mainWindow_->editor().setDatasets(datasets_);
     mainWindow_->updateData();
 }
 
-void ProjectNavigatorClassifications::filterChanged()
+void ProjectNavigatorItemFiles::filterChanged()
 {
     mainWindow_->suspendThreads();
-    mainWindow_->editor().setClassifications(classifications_);
+    mainWindow_->editor().setDatasets(datasets_);
     mainWindow_->updateFilter();
 }
 
-void ProjectNavigatorClassifications::slotShow()
+void ProjectNavigatorItemFiles::slotAdd()
+{
+    ImportFilePlugin::import(mainWindow_);
+}
+
+void ProjectNavigatorItemFiles::slotDelete()
+{
+    QList<QTreeWidgetItem *> items = tree_->selectedItems();
+
+    if (items.count() > 0)
+    {
+        slotSelectNone();
+
+        for (auto &item : items)
+        {
+            size_t idx = index(item);
+            datasets_.erase(idx);
+
+            delete item;
+        }
+
+        dataChanged();
+    }
+}
+
+void ProjectNavigatorItemFiles::slotShow()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
@@ -148,7 +192,7 @@ void ProjectNavigatorClassifications::slotShow()
     }
 }
 
-void ProjectNavigatorClassifications::slotHide()
+void ProjectNavigatorItemFiles::slotHide()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
@@ -163,7 +207,7 @@ void ProjectNavigatorClassifications::slotHide()
     }
 }
 
-void ProjectNavigatorClassifications::slotSelectAll()
+void ProjectNavigatorItemFiles::slotSelectAll()
 {
     QTreeWidgetItemIterator it(tree_);
 
@@ -176,7 +220,7 @@ void ProjectNavigatorClassifications::slotSelectAll()
     slotItemSelectionChanged();
 }
 
-void ProjectNavigatorClassifications::slotSelectInvert()
+void ProjectNavigatorItemFiles::slotSelectInvert()
 {
     QTreeWidgetItemIterator it(tree_);
 
@@ -189,7 +233,7 @@ void ProjectNavigatorClassifications::slotSelectInvert()
     slotItemSelectionChanged();
 }
 
-void ProjectNavigatorClassifications::slotSelectNone()
+void ProjectNavigatorItemFiles::slotSelectNone()
 {
     QTreeWidgetItemIterator it(tree_);
 
@@ -202,45 +246,52 @@ void ProjectNavigatorClassifications::slotSelectNone()
     slotItemSelectionChanged();
 }
 
-void ProjectNavigatorClassifications::slotItemSelectionChanged()
+void ProjectNavigatorItemFiles::slotItemSelectionChanged()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
     if (items.count() > 0)
     {
+        deleteButton_->setEnabled(true);
         showButton_->setEnabled(true);
         hideButton_->setEnabled(true);
     }
     else
     {
+        deleteButton_->setEnabled(false);
         showButton_->setEnabled(false);
         hideButton_->setEnabled(false);
     }
 }
 
-void ProjectNavigatorClassifications::slotItemChanged(QTreeWidgetItem *item,
-                                                      int column)
+void ProjectNavigatorItemFiles::slotItemChanged(QTreeWidgetItem *item,
+                                                int column)
 {
     if (column == COLUMN_CHECKED)
     {
-        size_t id = item->text(COLUMN_ID).toULong();
         bool checked = (item->checkState(COLUMN_CHECKED) == Qt::Checked);
 
-        classifications_.setEnabled(id, checked);
+        datasets_.setEnabled(index(item), checked);
         filterChanged();
     }
 }
 
-void ProjectNavigatorClassifications::updateTree()
+size_t ProjectNavigatorItemFiles::index(const QTreeWidgetItem *item)
+{
+    return datasets_.index(item->text(COLUMN_ID).toULong());
+}
+
+void ProjectNavigatorItemFiles::updateTree()
 {
     block();
 
     QTreeWidgetItemIterator it(tree_);
-    size_t i = 0;
 
     while (*it)
     {
-        if (classifications_.isEnabled(i))
+        size_t idx = index(*it);
+
+        if (datasets_.isEnabled(idx))
         {
             (*it)->setCheckState(COLUMN_CHECKED, Qt::Checked);
         }
@@ -249,21 +300,20 @@ void ProjectNavigatorClassifications::updateTree()
             (*it)->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
         }
 
-        ++i;
         ++it;
     }
 
     unblock();
 }
 
-void ProjectNavigatorClassifications::block()
+void ProjectNavigatorItemFiles::block()
 {
     disconnect(tree_, SIGNAL(itemChanged(QTreeWidgetItem *, int)), 0, 0);
     disconnect(tree_, SIGNAL(itemSelectionChanged()), 0, 0);
     (void)blockSignals(true);
 }
 
-void ProjectNavigatorClassifications::unblock()
+void ProjectNavigatorItemFiles::unblock()
 {
     (void)blockSignals(false);
     connect(tree_,
@@ -276,11 +326,11 @@ void ProjectNavigatorClassifications::unblock()
             SLOT(slotItemSelectionChanged()));
 }
 
-void ProjectNavigatorClassifications::addItem(size_t i)
+void ProjectNavigatorItemFiles::addItem(size_t i)
 {
     QTreeWidgetItem *item = new QTreeWidgetItem(tree_);
 
-    if (classifications_.isEnabled(i))
+    if (datasets_.isEnabled(i))
     {
         item->setCheckState(COLUMN_CHECKED, Qt::Checked);
     }
@@ -289,45 +339,40 @@ void ProjectNavigatorClassifications::addItem(size_t i)
         item->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
     }
 
-    item->setText(COLUMN_ID, QString::number(i));
+    item->setText(COLUMN_ID, QString::number(datasets_.id(i)));
 
-    item->setText(COLUMN_LABEL,
-                  QString::fromStdString(classifications_.label(i)));
+    item->setText(COLUMN_LABEL, QString::fromStdString(datasets_.label(i)));
+    item->setText(COLUMN_DATE_CREATED,
+                  QString::fromStdString(datasets_.dateCreated(i)));
 
     // Color legend
-    if (i < ColorPalette::Classification.size())
-    {
-        const Vector3<float> &rgb = ColorPalette::Classification[i];
+    const Vector3<float> &rgb = datasets_.color(i);
 
-        QColor color;
-        color.setRedF(rgb[0]);
-        color.setGreenF(rgb[1]);
-        color.setBlueF(rgb[2]);
+    QColor color;
+    color.setRedF(rgb[0]);
+    color.setGreenF(rgb[1]);
+    color.setBlueF(rgb[2]);
 
-        QBrush brush(color, Qt::SolidPattern);
-        item->setBackground(COLUMN_ID, brush);
-        // brush.setColor(QColor(0, 0, 0));
-        // item->setForeground(COLUMN_ID, brush);
-    }
+    QBrush brush(color, Qt::SolidPattern);
+    item->setBackground(COLUMN_ID, brush);
 }
 
-void ProjectNavigatorClassifications::setClassifications(
-    const Classifications &classifications)
+void ProjectNavigatorItemFiles::setDatasets(const Datasets &datasets)
 {
     block();
 
-    classifications_ = classifications;
+    datasets_ = datasets;
 
     tree_->clear();
 
     // Header
     tree_->setColumnCount(COLUMN_LAST);
     QStringList labels;
-    labels << tr("Visible") << tr("Class") << tr("Label");
+    labels << tr("Visible") << tr("Id") << tr("Label") << tr("Date");
     tree_->setHeaderLabels(labels);
 
     // Content
-    for (size_t i = 0; i < classifications_.size(); i++)
+    for (size_t i = 0; i < datasets_.size(); i++)
     {
         addItem(i);
     }
@@ -337,6 +382,10 @@ void ProjectNavigatorClassifications::setClassifications(
     {
         tree_->resizeColumnToContents(i);
     }
+
+    // Sort Content
+    tree_->setSortingEnabled(true);
+    tree_->sortItems(COLUMN_ID, Qt::AscendingOrder);
 
     unblock();
 }

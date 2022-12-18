@@ -17,29 +17,29 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ProjectNavigatorClipping.cpp */
+/** @file ProjectNavigatorItemClipping.cpp */
 
 #include <Region.hpp>
 
 #include <MainWindow.hpp>
-#include <ProjectNavigatorClipping.hpp>
+#include <ProjectNavigatorItemClipping.hpp>
 #include <RangeSliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
-#include <QCheckBox>
 #include <QHBoxLayout>
-#include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
 
 #define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("ProjectNavigatorClipping", msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("ProjectNavigatorItemClipping", msg)
 
-ProjectNavigatorClipping::ProjectNavigatorClipping(MainWindow *mainWindow)
-    : QWidget(),
-      mainWindow_(mainWindow)
+ProjectNavigatorItemClipping::ProjectNavigatorItemClipping(
+    MainWindow *mainWindow,
+    const QIcon &icon,
+    const QString &text)
+    : ProjectNavigatorItem(mainWindow, icon, text)
 {
     LOG_DEBUG_LOCAL("");
 
@@ -83,29 +83,24 @@ ProjectNavigatorClipping::ProjectNavigatorClipping(MainWindow *mainWindow)
                               0,
                               100);
 
-    enabledCheckBox_ = new QCheckBox;
-    connect(enabledCheckBox_,
-            SIGNAL(stateChanged(int)),
-            this,
-            SLOT(setEnabled(int)));
-
     resetButton_ = new QPushButton(tr("&Reset"), this);
     connect(resetButton_, SIGNAL(clicked()), this, SLOT(reset()));
 
     // Layout
     QHBoxLayout *controlLayout = new QHBoxLayout;
-    controlLayout->addWidget(new QLabel(tr("Enabled")));
-    controlLayout->addWidget(enabledCheckBox_);
     controlLayout->addStretch();
     controlLayout->addWidget(resetButton_);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(rangeInput_[0]);
     mainLayout->addWidget(rangeInput_[1]);
     mainLayout->addWidget(rangeInput_[2]);
     mainLayout->addLayout(controlLayout);
     mainLayout->addStretch();
-    setLayout(mainLayout);
+
+    mainLayout_->addLayout(mainLayout);
+    setLayout(mainLayout_);
 
     // Data
     connect(mainWindow_,
@@ -114,7 +109,7 @@ ProjectNavigatorClipping::ProjectNavigatorClipping(MainWindow *mainWindow)
             SLOT(slotUpdate(const QSet<Editor::Type> &)));
 }
 
-void ProjectNavigatorClipping::slotUpdate(const QSet<Editor::Type> &target)
+void ProjectNavigatorItemClipping::slotUpdate(const QSet<Editor::Type> &target)
 {
     if (!target.empty() && !target.contains(Editor::TYPE_CLIP_FILTER))
     {
@@ -145,7 +140,7 @@ void ProjectNavigatorClipping::slotUpdate(const QSet<Editor::Type> &target)
     }
 }
 
-void ProjectNavigatorClipping::slotRangeIntermediateMinimumValue()
+void ProjectNavigatorItemClipping::slotRangeIntermediateMinimumValue()
 {
     LOG_DEBUG_LOCAL("");
     QObject *obj = sender();
@@ -162,7 +157,7 @@ void ProjectNavigatorClipping::slotRangeIntermediateMinimumValue()
     filterChanged();
 }
 
-void ProjectNavigatorClipping::slotRangeIntermediateMaximumValue()
+void ProjectNavigatorItemClipping::slotRangeIntermediateMaximumValue()
 {
     LOG_DEBUG_LOCAL("");
     QObject *obj = sender();
@@ -179,7 +174,7 @@ void ProjectNavigatorClipping::slotRangeIntermediateMaximumValue()
     filterChanged();
 }
 
-void ProjectNavigatorClipping::filterChanged()
+void ProjectNavigatorItemClipping::filterChanged()
 {
     LOG_DEBUG_LOCAL("");
 
@@ -194,8 +189,7 @@ void ProjectNavigatorClipping::filterChanged()
 
     region.box.set(x1, y1, z1, x2, y2, z2);
 
-    bool checked = (enabledCheckBox_->checkState() == Qt::Checked);
-    if (checked)
+    if (isFilterEnabled())
     {
         region.enabled = Region::TYPE_BOX;
     }
@@ -209,13 +203,13 @@ void ProjectNavigatorClipping::filterChanged()
     mainWindow_->updateFilter();
 }
 
-void ProjectNavigatorClipping::setEnabled(int state)
+void ProjectNavigatorItemClipping::setFilterEnabled(bool b)
 {
-    (void)state;
+    ProjectNavigatorItem::setFilterEnabled(b);
     filterChanged();
 }
 
-void ProjectNavigatorClipping::reset()
+void ProjectNavigatorItemClipping::reset()
 {
     for (size_t i = 0; i < 3; i++)
     {

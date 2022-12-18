@@ -20,14 +20,15 @@
 /** @file ProjectNavigatorWindow.cpp */
 
 #include <MainWindow.hpp>
-#include <ProjectNavigatorClassifications.hpp>
-#include <ProjectNavigatorClipping.hpp>
-#include <ProjectNavigatorElevation.hpp>
-#include <ProjectNavigatorFiles.hpp>
-#include <ProjectNavigatorLayers.hpp>
+#include <ProjectNavigatorItemClassifications.hpp>
+#include <ProjectNavigatorItemClipping.hpp>
+#include <ProjectNavigatorItemDescriptor.hpp>
+#include <ProjectNavigatorItemElevation.hpp>
+#include <ProjectNavigatorItemFiles.hpp>
+#include <ProjectNavigatorItemLayers.hpp>
+#include <ProjectNavigatorTree.hpp>
 #include <ProjectNavigatorWindow.hpp>
 #include <ThemeIcon.hpp>
-#include <ToolTabWidget.hpp>
 
 #define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
@@ -36,26 +37,36 @@ ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
       mainWindow_(mainWindow)
 {
     // Tab
-    datasets_ = new ProjectNavigatorFiles(mainWindow_);
-    layers_ = new ProjectNavigatorLayers(mainWindow_);
-    classifications_ = new ProjectNavigatorClassifications(mainWindow_);
-    elevation_ = new ProjectNavigatorElevation(mainWindow_);
-    clipping_ = new ProjectNavigatorClipping(mainWindow_);
+    classifications_ =
+        new ProjectNavigatorItemClassifications(mainWindow_,
+                                                ICON("classification"),
+                                                tr("Classifications"));
+    clipping_ = new ProjectNavigatorItemClipping(mainWindow_,
+                                                 ICON("clip_filter"),
+                                                 tr("Clip filter"));
+    descriptor_ = new ProjectNavigatorItemDescriptor(mainWindow_,
+                                                     ICON("descriptor_filter"),
+                                                     tr("Descriptor"));
+    elevation_ = new ProjectNavigatorItemElevation(mainWindow_,
+                                                   ICON("elevation_filter"),
+                                                   tr("Elevation"));
+    files_ =
+        new ProjectNavigatorItemFiles(mainWindow_, ICON("file"), tr("Files"));
+    layers_ = new ProjectNavigatorItemLayers(mainWindow_,
+                                             ICON("layers"),
+                                             tr("Layers"));
 
     // Tabs
-    tabWidget_ = new ToolTabWidget;
-    tabWidget_->addTab(datasets_, ICON("file"), tr("Files"));
-    tabWidget_->addTab(layers_, ICON("layers"), tr("Layers"));
-    tabWidget_->addTab(classifications_,
-                       ICON("classification"),
-                       tr("Classifications"));
-    tabWidget_->addTab(elevation_,
-                       ICON("elevation_filter"),
-                       tr("Elevation filter"));
-    tabWidget_->addTab(clipping_, ICON("clip_filter"), tr("Clip filter"));
+    menu_ = new ProjectNavigatorTree(mainWindow_);
+    menu_->addItem(files_);
+    menu_->addItem(layers_);
+    menu_->addItem(classifications_);
+    menu_->addItem(elevation_);
+    menu_->addItem(descriptor_);
+    menu_->addItem(clipping_);
 
     // Dock
-    setWidget(tabWidget_);
+    setWidget(menu_);
     setWindowTitle(tr("Project Navigator"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     mainWindow_->addDockWidget(Qt::RightDockWidgetArea, this);

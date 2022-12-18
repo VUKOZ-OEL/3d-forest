@@ -17,25 +17,35 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ProjectNavigatorElevation.hpp */
+/** @file ProjectNavigatorItemElevation.hpp */
 
-#ifndef PROJECT_NAVIGATOR_ELEVATION_HPP
-#define PROJECT_NAVIGATOR_ELEVATION_HPP
+#ifndef PROJECT_NAVIGATOR_ITEM_ELEVATION_HPP
+#define PROJECT_NAVIGATOR_ITEM_ELEVATION_HPP
 
+#include <Editor.hpp>
+#include <ProjectNavigatorItem.hpp>
 #include <Range.hpp>
-
-#include <QWidget>
 
 class MainWindow;
 class RangeSliderWidget;
 
 /** Project Navigator Elevation. */
-class ProjectNavigatorElevation : public QWidget
+class ProjectNavigatorItemElevation : public ProjectNavigatorItem
 {
     Q_OBJECT
 
 public:
-    ProjectNavigatorElevation(MainWindow *mainWindow);
+    ProjectNavigatorItemElevation(MainWindow *mainWindow,
+                                  const QIcon &icon,
+                                  const QString &text);
+
+    virtual bool hasColorSource() const { return true; }
+    virtual SettingsView::ColorSource colorSource() const
+    {
+        return SettingsView::COLOR_SOURCE_ELEVATION;
+    }
+
+    virtual bool hasFilter() const { return false; }
 
 public slots:
     void slotUpdate(const QSet<Editor::Type> &target);
@@ -43,20 +53,11 @@ public slots:
     void slotRangeIntermediateMinimumValue();
     void slotRangeIntermediateMaximumValue();
 
-    void slotDescriptorIntermediateMinimumValue();
-    void slotDescriptorIntermediateMaximumValue();
-
 protected:
-    MainWindow *mainWindow_;
-
     RangeSliderWidget *rangeInput_;
     Range<double> elevationRange_;
 
-    RangeSliderWidget *descriptorInput_;
-    Range<float> descriptorRange_;
-
     void elevationInputChanged();
-    void descriptorInputChanged();
 };
 
-#endif /* PROJECT_NAVIGATOR_ELEVATION_HPP */
+#endif /* PROJECT_NAVIGATOR_ITEM_ELEVATION_HPP */

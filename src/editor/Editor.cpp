@@ -281,6 +281,10 @@ void Editor::updateAfterRead()
     if (viewports_.size() > 0)
     {
         viewports_.where().setClassification(classifications_.enabledList());
+        viewports_.where().setBox(clipBoundary());
+        viewports_.where().setElevation(elevationRange_);
+        viewports_.where().setDescriptor(descriptorRange_);
+        viewports_.where().setLayer(layers_.enabledList());
 
         viewports_.applyWhereToAll();
     }
