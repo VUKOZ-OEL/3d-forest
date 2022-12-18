@@ -27,18 +27,11 @@
 #include <QCheckBox>
 #include <QColor>
 #include <QColorDialog>
-#include <QDebug>
-#include <QGridLayout>
-#include <QGroupBox>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPixmap>
 #include <QPushButton>
 #include <QSlider>
-#include <QTabWidget>
-#include <QTreeWidget>
-#include <QTreeWidgetItem>
-#include <QTreeWidgetItemIterator>
 #include <QVBoxLayout>
 
 #define ICON(name) (ThemeIcon(":/settings/", name))
@@ -47,9 +40,6 @@ SettingsColorWidget::SettingsColorWidget(MainWindow *mainWindow)
     : QWidget(mainWindow),
       mainWindow_(mainWindow)
 {
-    // Color source
-    treeWidget_ = new QTreeWidget();
-
     // Fog
     fogCheckBox_ = new QCheckBox;
     fogCheckBox_->setChecked(settings_.isFogEnabled());
@@ -92,7 +82,6 @@ SettingsColorWidget::SettingsColorWidget(MainWindow *mainWindow)
 
     // Layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(treeWidget_);
     mainLayout->addLayout(colorLayout);
     mainLayout->addLayout(pointSizeLayout);
     mainLayout->addStretch();
@@ -201,118 +190,25 @@ void SettingsColorWidget::setColor(QPushButton *button,
     button->setIconSize(QSize(10, 10));
 }
 
-void SettingsColorWidget::slotItemChanged(QTreeWidgetItem *item, int column)
-{
-    if (column == COLUMN_CHECKED)
-    {
-        bool checked = (item->checkState(COLUMN_CHECKED) == Qt::Checked);
-
-        settings_.setColorSourceEnabled(index(item), checked);
-        settingsChangedApply();
-    }
-}
-
-size_t SettingsColorWidget::index(const QTreeWidgetItem *item)
-{
-    return item->text(COLUMN_ID).toULong();
-}
-
-void SettingsColorWidget::updateTree()
-{
-    block();
-
-    QTreeWidgetItemIterator it(treeWidget_);
-
-    while (*it)
-    {
-        size_t idx = index(*it);
-
-        if (settings_.isColorSourceEnabled(idx))
-        {
-            (*it)->setCheckState(COLUMN_CHECKED, Qt::Checked);
-        }
-        else
-        {
-            (*it)->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
-        }
-
-        ++it;
-    }
-
-    unblock();
-}
-
-void SettingsColorWidget::block()
-{
-    disconnect(treeWidget_, SIGNAL(itemChanged(QTreeWidgetItem *, int)), 0, 0);
-    (void)blockSignals(true);
-}
-
-void SettingsColorWidget::unblock()
-{
-    (void)blockSignals(false);
-    connect(treeWidget_,
-            SIGNAL(itemChanged(QTreeWidgetItem *, int)),
-            this,
-            SLOT(slotItemChanged(QTreeWidgetItem *, int)));
-}
-
-void SettingsColorWidget::addItem(size_t i)
-{
-    QTreeWidgetItem *item = new QTreeWidgetItem(treeWidget_);
-
-    if (settings_.isColorSourceEnabled(i))
-    {
-        item->setCheckState(COLUMN_CHECKED, Qt::Checked);
-    }
-    else
-    {
-        item->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
-    }
-
-    item->setText(COLUMN_ID, QString::number(i));
-
-    item->setText(COLUMN_LABEL,
-                  QString::fromStdString(settings_.colorSourceString(i)));
-
-    item->setText(COLUMN_OPACITY, "100%");
-}
-
-void SettingsColorWidget::setColorSource(const SettingsView &settings)
-{
-    treeWidget_->clear();
-
-    // Header
-    treeWidget_->setColumnCount(COLUMN_LAST);
-    QStringList labels;
-    labels << tr("Enabled") << tr("Id") << tr("Source") << tr("Opacity");
-    treeWidget_->setHeaderLabels(labels);
-
-    // Content
-    for (size_t i = 0; i < settings.colorSourceSize(); i++)
-    {
-        addItem(i);
-    }
-
-    // Resize Columns to the minimum space
-    for (int i = 0; i < COLUMN_LAST; i++)
-    {
-        treeWidget_->resizeColumnToContents(i);
-    }
-
-    treeWidget_->setColumnHidden(COLUMN_ID, true);
-}
-
 void SettingsColorWidget::setSettings(const SettingsView &settings)
 {
     block();
 
     settings_ = settings;
 
-    setColorSource(settings_);
     setColor(colorFgButton_, settings_.pointColor());
     setColor(colorBgButton_, settings_.backgroundColor());
     pointSizeSlider_->setValue(static_cast<int>(settings_.pointSize()));
 
     unblock();
+}
+
+void SettingsColorWidget::block()
+{
+    (void)blockSignals(true);
+}
+
+void SettingsColorWidget::unblock()
+{
+    (void)blockSignals(false);
 }

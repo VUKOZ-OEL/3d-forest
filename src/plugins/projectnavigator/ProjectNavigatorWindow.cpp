@@ -20,14 +20,14 @@
 /** @file ProjectNavigatorWindow.cpp */
 
 #include <MainWindow.hpp>
-#include <ProjectNavigatorClassifications.hpp>
-#include <ProjectNavigatorClipping.hpp>
-#include <ProjectNavigatorElevation.hpp>
-#include <ProjectNavigatorFiles.hpp>
-#include <ProjectNavigatorLayers.hpp>
+#include <ProjectNavigatorItemClassifications.hpp>
+#include <ProjectNavigatorItemClipping.hpp>
+#include <ProjectNavigatorItemElevation.hpp>
+#include <ProjectNavigatorItemFiles.hpp>
+#include <ProjectNavigatorItemLayers.hpp>
+#include <ProjectNavigatorTree.hpp>
 #include <ProjectNavigatorWindow.hpp>
 #include <ThemeIcon.hpp>
-#include <ToolTabWidget.hpp>
 
 #define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
@@ -36,26 +36,24 @@ ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
       mainWindow_(mainWindow)
 {
     // Tab
-    datasets_ = new ProjectNavigatorFiles(mainWindow_);
-    layers_ = new ProjectNavigatorLayers(mainWindow_);
-    classifications_ = new ProjectNavigatorClassifications(mainWindow_);
-    elevation_ = new ProjectNavigatorElevation(mainWindow_);
-    clipping_ = new ProjectNavigatorClipping(mainWindow_);
+    datasets_ = new ProjectNavigatorItemFiles(mainWindow_);
+    layers_ = new ProjectNavigatorItemLayers(mainWindow_);
+    classifications_ = new ProjectNavigatorItemClassifications(mainWindow_);
+    elevation_ = new ProjectNavigatorItemElevation(mainWindow_);
+    clipping_ = new ProjectNavigatorItemClipping(mainWindow_);
 
     // Tabs
-    tabWidget_ = new ToolTabWidget;
-    tabWidget_->addTab(datasets_, ICON("file"), tr("Files"));
-    tabWidget_->addTab(layers_, ICON("layers"), tr("Layers"));
-    tabWidget_->addTab(classifications_,
-                       ICON("classification"),
-                       tr("Classifications"));
-    tabWidget_->addTab(elevation_,
-                       ICON("elevation_filter"),
-                       tr("Elevation filter"));
-    tabWidget_->addTab(clipping_, ICON("clip_filter"), tr("Clip filter"));
+    menu_ = new ProjectNavigatorTree(mainWindow_);
+    menu_->addItem(datasets_, ICON("file"), tr("Files"));
+    menu_->addItem(layers_, ICON("layers"), tr("Layers"));
+    menu_->addItem(classifications_,
+                   ICON("classification"),
+                   tr("Classifications"));
+    menu_->addItem(elevation_, ICON("elevation_filter"), tr("Elevation"));
+    menu_->addItem(clipping_, ICON("clip_filter"), tr("Clip filter"));
 
     // Dock
-    setWidget(tabWidget_);
+    setWidget(menu_);
     setWindowTitle(tr("Project Navigator"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     mainWindow_->addDockWidget(Qt::RightDockWidgetArea, this);

@@ -17,14 +17,14 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ProjectNavigatorLayers.hpp */
+/** @file ProjectNavigatorItemLayers.hpp */
 
-#ifndef PROJECT_NAVIGATOR_LAYERS_HPP
-#define PROJECT_NAVIGATOR_LAYERS_HPP
+#ifndef PROJECT_NAVIGATOR_ITEM_LAYERS_HPP
+#define PROJECT_NAVIGATOR_ITEM_LAYERS_HPP
 
+#include <Editor.hpp>
 #include <Layers.hpp>
-
-#include <QWidget>
+#include <ProjectNavigatorItem.hpp>
 
 class MainWindow;
 
@@ -33,21 +33,18 @@ class QTreeWidget;
 class QTreeWidgetItem;
 
 /** Project Navigator Layers. */
-class ProjectNavigatorLayers : public QWidget
+class ProjectNavigatorItemLayers : public ProjectNavigatorItem
 {
     Q_OBJECT
 
 public:
-    /** Project Navigator Layers Column. */
-    enum Column
-    {
-        COLUMN_CHECKED,
-        COLUMN_ID,
-        COLUMN_LABEL,
-        COLUMN_LAST,
-    };
+    ProjectNavigatorItemLayers(MainWindow *mainWindow);
 
-    ProjectNavigatorLayers(MainWindow *mainWindow);
+    virtual bool hasColorSource() { return true; }
+    virtual SettingsView::ColorSource colorSource()
+    {
+        return SettingsView::COLOR_SOURCE_LAYER;
+    }
 
 public slots:
     void slotUpdate(const QSet<Editor::Type> &target);
@@ -64,6 +61,15 @@ public slots:
     void slotItemChanged(QTreeWidgetItem *item, int column);
 
 protected:
+    /** Project Navigator Layers Column. */
+    enum Column
+    {
+        COLUMN_CHECKED,
+        COLUMN_ID,
+        COLUMN_LABEL,
+        COLUMN_LAST,
+    };
+
     MainWindow *mainWindow_;
     QTreeWidget *tree_;
     QToolButton *addButton_;
@@ -87,4 +93,4 @@ protected:
     void setLayers(const Layers &layers);
 };
 
-#endif /* PROJECT_NAVIGATOR_LAYERS_HPP */
+#endif /* PROJECT_NAVIGATOR_ITEM_LAYERS_HPP */

@@ -17,14 +17,14 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ProjectNavigatorFiles.hpp */
+/** @file ProjectNavigatorItemFiles.hpp */
 
-#ifndef PROJECT_NAVIGATOR_FILES_HPP
-#define PROJECT_NAVIGATOR_FILES_HPP
+#ifndef PROJECT_NAVIGATOR_ITEM_FILES_HPP
+#define PROJECT_NAVIGATOR_ITEM_FILES_HPP
 
 #include <Datasets.hpp>
-
-#include <QWidget>
+#include <Editor.hpp>
+#include <ProjectNavigatorItem.hpp>
 
 class MainWindow;
 
@@ -33,22 +33,18 @@ class QTreeWidget;
 class QTreeWidgetItem;
 
 /** Project Navigator Files. */
-class ProjectNavigatorFiles : public QWidget
+class ProjectNavigatorItemFiles : public ProjectNavigatorItem
 {
     Q_OBJECT
 
 public:
-    /** Project Navigator Files Column. */
-    enum Column
-    {
-        COLUMN_CHECKED,
-        COLUMN_ID,
-        COLUMN_LABEL,
-        COLUMN_DATE_CREATED,
-        COLUMN_LAST,
-    };
+    ProjectNavigatorItemFiles(MainWindow *mainWindow);
 
-    ProjectNavigatorFiles(MainWindow *mainWindow);
+    virtual bool hasColorSource() { return false; }
+    virtual SettingsView::ColorSource colorSource()
+    {
+        return SettingsView::COLOR_SOURCE_LAST;
+    }
 
 public slots:
     void slotUpdate(const QSet<Editor::Type> &target);
@@ -65,6 +61,16 @@ public slots:
     void slotItemChanged(QTreeWidgetItem *item, int column);
 
 protected:
+    /** Project Navigator Files Column. */
+    enum Column
+    {
+        COLUMN_CHECKED,
+        COLUMN_ID,
+        COLUMN_LABEL,
+        COLUMN_DATE_CREATED,
+        COLUMN_LAST,
+    };
+
     MainWindow *mainWindow_;
     QTreeWidget *tree_;
     QToolButton *addButton_;
@@ -88,4 +94,4 @@ protected:
     void setDatasets(const Datasets &datasets);
 };
 
-#endif /* PROJECT_NAVIGATOR_FILES_HPP */
+#endif /* PROJECT_NAVIGATOR_ITEM_FILES_HPP */

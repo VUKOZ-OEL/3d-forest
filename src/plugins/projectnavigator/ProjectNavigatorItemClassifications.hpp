@@ -17,14 +17,14 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ProjectNavigatorClassifications.hpp */
+/** @file ProjectNavigatorItemClassifications.hpp */
 
-#ifndef PROJECT_NAVIGATOR_CLASSIFICATIONS_HPP
-#define PROJECT_NAVIGATOR_CLASSIFICATIONS_HPP
+#ifndef PROJECT_NAVIGATOR_ITEM_CLASSIFICATIONS_HPP
+#define PROJECT_NAVIGATOR_ITEM_CLASSIFICATIONS_HPP
 
 #include <Classifications.hpp>
-
-#include <QWidget>
+#include <Editor.hpp>
+#include <ProjectNavigatorItem.hpp>
 
 class MainWindow;
 
@@ -33,21 +33,18 @@ class QTreeWidget;
 class QTreeWidgetItem;
 
 /** Project Navigator Classifications. */
-class ProjectNavigatorClassifications : public QWidget
+class ProjectNavigatorItemClassifications : public ProjectNavigatorItem
 {
     Q_OBJECT
 
 public:
-    /** Project Navigator Classifications Column. */
-    enum Column
-    {
-        COLUMN_CHECKED,
-        COLUMN_ID,
-        COLUMN_LABEL,
-        COLUMN_LAST,
-    };
+    ProjectNavigatorItemClassifications(MainWindow *mainWindow);
 
-    ProjectNavigatorClassifications(MainWindow *mainWindow);
+    virtual bool hasColorSource() { return true; }
+    virtual SettingsView::ColorSource colorSource()
+    {
+        return SettingsView::COLOR_SOURCE_CLASSIFICATION;
+    }
 
 public slots:
     void slotUpdate(const QSet<Editor::Type> &target);
@@ -62,6 +59,15 @@ public slots:
     void slotItemChanged(QTreeWidgetItem *item, int column);
 
 protected:
+    /** Project Navigator Classifications Column. */
+    enum Column
+    {
+        COLUMN_CHECKED,
+        COLUMN_ID,
+        COLUMN_LABEL,
+        COLUMN_LAST,
+    };
+
     MainWindow *mainWindow_;
     QTreeWidget *tree_;
     QToolButton *showButton_;
@@ -82,4 +88,4 @@ protected:
     void setClassifications(const Classifications &classifications);
 };
 
-#endif /* PROJECT_NAVIGATOR_CLASSIFICATIONS_HPP */
+#endif /* PROJECT_NAVIGATOR_ITEM_CLASSIFICATIONS_HPP */

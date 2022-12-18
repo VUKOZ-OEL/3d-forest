@@ -17,45 +17,52 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ProjectNavigatorClipping.hpp */
+/** @file ProjectNavigatorItemElevation.hpp */
 
-#ifndef PROJECT_NAVIGATOR_CLIPPING_HPP
-#define PROJECT_NAVIGATOR_CLIPPING_HPP
+#ifndef PROJECT_NAVIGATOR_ITEM_ELEVATION_HPP
+#define PROJECT_NAVIGATOR_ITEM_ELEVATION_HPP
 
+#include <Editor.hpp>
+#include <ProjectNavigatorItem.hpp>
 #include <Range.hpp>
-
-#include <QWidget>
 
 class MainWindow;
 class RangeSliderWidget;
 
-class QCheckBox;
-class QPushButton;
-
-/** Project Navigator Clipping. */
-class ProjectNavigatorClipping : public QWidget
+/** Project Navigator Elevation. */
+class ProjectNavigatorItemElevation : public ProjectNavigatorItem
 {
     Q_OBJECT
 
 public:
-    ProjectNavigatorClipping(MainWindow *mainWindow);
+    ProjectNavigatorItemElevation(MainWindow *mainWindow);
+
+    virtual bool hasColorSource() { return true; }
+    virtual SettingsView::ColorSource colorSource()
+    {
+        return SettingsView::COLOR_SOURCE_ELEVATION;
+    }
 
 public slots:
     void slotUpdate(const QSet<Editor::Type> &target);
 
     void slotRangeIntermediateMinimumValue();
     void slotRangeIntermediateMaximumValue();
-    void setEnabled(int state);
-    void reset();
+
+    void slotDescriptorIntermediateMinimumValue();
+    void slotDescriptorIntermediateMaximumValue();
 
 protected:
     MainWindow *mainWindow_;
-    RangeSliderWidget *rangeInput_[3];
-    QCheckBox *enabledCheckBox_;
-    QPushButton *resetButton_;
-    Range<double> clipRange_[3];
 
-    void filterChanged();
+    RangeSliderWidget *rangeInput_;
+    Range<double> elevationRange_;
+
+    RangeSliderWidget *descriptorInput_;
+    Range<float> descriptorRange_;
+
+    void elevationInputChanged();
+    void descriptorInputChanged();
 };
 
-#endif /* PROJECT_NAVIGATOR_CLIPPING_HPP */
+#endif /* PROJECT_NAVIGATOR_ITEM_ELEVATION_HPP */

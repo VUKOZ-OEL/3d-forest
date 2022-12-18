@@ -17,12 +17,12 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ProjectNavigatorFiles.cpp */
+/** @file ProjectNavigatorItemFiles.cpp */
 
 #include <ImportFilePlugin.hpp>
 #include <Log.hpp>
 #include <MainWindow.hpp>
-#include <ProjectNavigatorFiles.hpp>
+#include <ProjectNavigatorItemFiles.hpp>
 #include <ThemeIcon.hpp>
 
 #include <QHBoxLayout>
@@ -37,8 +37,8 @@
 
 #define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
-ProjectNavigatorFiles::ProjectNavigatorFiles(MainWindow *mainWindow)
-    : QWidget(),
+ProjectNavigatorItemFiles::ProjectNavigatorItemFiles(MainWindow *mainWindow)
+    : ProjectNavigatorItem(),
       mainWindow_(mainWindow)
 {
     // Table
@@ -125,7 +125,7 @@ ProjectNavigatorFiles::ProjectNavigatorFiles(MainWindow *mainWindow)
             SLOT(slotUpdate(const QSet<Editor::Type> &)));
 }
 
-void ProjectNavigatorFiles::slotUpdate(const QSet<Editor::Type> &target)
+void ProjectNavigatorItemFiles::slotUpdate(const QSet<Editor::Type> &target)
 {
     if (!target.empty() && !target.contains(Editor::TYPE_DATA_SET))
     {
@@ -135,26 +135,26 @@ void ProjectNavigatorFiles::slotUpdate(const QSet<Editor::Type> &target)
     setDatasets(mainWindow_->editor().datasets());
 }
 
-void ProjectNavigatorFiles::dataChanged()
+void ProjectNavigatorItemFiles::dataChanged()
 {
     mainWindow_->suspendThreads();
     mainWindow_->editor().setDatasets(datasets_);
     mainWindow_->updateData();
 }
 
-void ProjectNavigatorFiles::filterChanged()
+void ProjectNavigatorItemFiles::filterChanged()
 {
     mainWindow_->suspendThreads();
     mainWindow_->editor().setDatasets(datasets_);
     mainWindow_->updateFilter();
 }
 
-void ProjectNavigatorFiles::slotAdd()
+void ProjectNavigatorItemFiles::slotAdd()
 {
     ImportFilePlugin::import(mainWindow_);
 }
 
-void ProjectNavigatorFiles::slotDelete()
+void ProjectNavigatorItemFiles::slotDelete()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
@@ -174,7 +174,7 @@ void ProjectNavigatorFiles::slotDelete()
     }
 }
 
-void ProjectNavigatorFiles::slotShow()
+void ProjectNavigatorItemFiles::slotShow()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
@@ -189,7 +189,7 @@ void ProjectNavigatorFiles::slotShow()
     }
 }
 
-void ProjectNavigatorFiles::slotHide()
+void ProjectNavigatorItemFiles::slotHide()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
@@ -204,7 +204,7 @@ void ProjectNavigatorFiles::slotHide()
     }
 }
 
-void ProjectNavigatorFiles::slotSelectAll()
+void ProjectNavigatorItemFiles::slotSelectAll()
 {
     QTreeWidgetItemIterator it(tree_);
 
@@ -217,7 +217,7 @@ void ProjectNavigatorFiles::slotSelectAll()
     slotItemSelectionChanged();
 }
 
-void ProjectNavigatorFiles::slotSelectInvert()
+void ProjectNavigatorItemFiles::slotSelectInvert()
 {
     QTreeWidgetItemIterator it(tree_);
 
@@ -230,7 +230,7 @@ void ProjectNavigatorFiles::slotSelectInvert()
     slotItemSelectionChanged();
 }
 
-void ProjectNavigatorFiles::slotSelectNone()
+void ProjectNavigatorItemFiles::slotSelectNone()
 {
     QTreeWidgetItemIterator it(tree_);
 
@@ -243,7 +243,7 @@ void ProjectNavigatorFiles::slotSelectNone()
     slotItemSelectionChanged();
 }
 
-void ProjectNavigatorFiles::slotItemSelectionChanged()
+void ProjectNavigatorItemFiles::slotItemSelectionChanged()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
@@ -261,7 +261,8 @@ void ProjectNavigatorFiles::slotItemSelectionChanged()
     }
 }
 
-void ProjectNavigatorFiles::slotItemChanged(QTreeWidgetItem *item, int column)
+void ProjectNavigatorItemFiles::slotItemChanged(QTreeWidgetItem *item,
+                                                int column)
 {
     if (column == COLUMN_CHECKED)
     {
@@ -272,12 +273,12 @@ void ProjectNavigatorFiles::slotItemChanged(QTreeWidgetItem *item, int column)
     }
 }
 
-size_t ProjectNavigatorFiles::index(const QTreeWidgetItem *item)
+size_t ProjectNavigatorItemFiles::index(const QTreeWidgetItem *item)
 {
     return datasets_.index(item->text(COLUMN_ID).toULong());
 }
 
-void ProjectNavigatorFiles::updateTree()
+void ProjectNavigatorItemFiles::updateTree()
 {
     block();
 
@@ -302,14 +303,14 @@ void ProjectNavigatorFiles::updateTree()
     unblock();
 }
 
-void ProjectNavigatorFiles::block()
+void ProjectNavigatorItemFiles::block()
 {
     disconnect(tree_, SIGNAL(itemChanged(QTreeWidgetItem *, int)), 0, 0);
     disconnect(tree_, SIGNAL(itemSelectionChanged()), 0, 0);
     (void)blockSignals(true);
 }
 
-void ProjectNavigatorFiles::unblock()
+void ProjectNavigatorItemFiles::unblock()
 {
     (void)blockSignals(false);
     connect(tree_,
@@ -322,7 +323,7 @@ void ProjectNavigatorFiles::unblock()
             SLOT(slotItemSelectionChanged()));
 }
 
-void ProjectNavigatorFiles::addItem(size_t i)
+void ProjectNavigatorItemFiles::addItem(size_t i)
 {
     QTreeWidgetItem *item = new QTreeWidgetItem(tree_);
 
@@ -353,7 +354,7 @@ void ProjectNavigatorFiles::addItem(size_t i)
     item->setBackground(COLUMN_ID, brush);
 }
 
-void ProjectNavigatorFiles::setDatasets(const Datasets &datasets)
+void ProjectNavigatorItemFiles::setDatasets(const Datasets &datasets)
 {
     block();
 

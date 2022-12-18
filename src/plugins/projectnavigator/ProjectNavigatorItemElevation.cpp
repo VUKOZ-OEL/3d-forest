@@ -17,10 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ProjectNavigatorElevation.cpp */
+/** @file ProjectNavigatorItemElevation.cpp */
 
 #include <MainWindow.hpp>
-#include <ProjectNavigatorElevation.hpp>
+#include <ProjectNavigatorItemElevation.hpp>
 #include <RangeSliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
@@ -30,12 +30,13 @@
 
 #define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
-#define MODULE_NAME "ProjectNavigatorElevation"
+#define MODULE_NAME "ProjectNavigatorItemElevation"
 #define LOG_DEBUG_LOCAL(msg)
 //#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
-ProjectNavigatorElevation::ProjectNavigatorElevation(MainWindow *mainWindow)
-    : QWidget(),
+ProjectNavigatorItemElevation::ProjectNavigatorItemElevation(
+    MainWindow *mainWindow)
+    : ProjectNavigatorItem(),
       mainWindow_(mainWindow)
 {
     LOG_DEBUG_LOCAL("");
@@ -81,7 +82,7 @@ ProjectNavigatorElevation::ProjectNavigatorElevation(MainWindow *mainWindow)
             SLOT(slotUpdate(const QSet<Editor::Type> &)));
 }
 
-void ProjectNavigatorElevation::slotUpdate(const QSet<Editor::Type> &target)
+void ProjectNavigatorItemElevation::slotUpdate(const QSet<Editor::Type> &target)
 {
     LOG_DEBUG_LOCAL("");
 
@@ -114,21 +115,21 @@ void ProjectNavigatorElevation::slotUpdate(const QSet<Editor::Type> &target)
     }
 }
 
-void ProjectNavigatorElevation::slotRangeIntermediateMinimumValue()
+void ProjectNavigatorItemElevation::slotRangeIntermediateMinimumValue()
 {
     LOG_DEBUG_LOCAL("minimumValue <" << rangeInput_->minimumValue() << ">");
     elevationRange_.setMinimumValue(rangeInput_->minimumValue());
     elevationInputChanged();
 }
 
-void ProjectNavigatorElevation::slotRangeIntermediateMaximumValue()
+void ProjectNavigatorItemElevation::slotRangeIntermediateMaximumValue()
 {
     LOG_DEBUG_LOCAL("maximumValue <" << rangeInput_->maximumValue() << ">");
     elevationRange_.setMaximumValue(rangeInput_->maximumValue());
     elevationInputChanged();
 }
 
-void ProjectNavigatorElevation::elevationInputChanged()
+void ProjectNavigatorItemElevation::elevationInputChanged()
 {
     LOG_DEBUG_LOCAL("");
     mainWindow_->suspendThreads();
@@ -136,7 +137,7 @@ void ProjectNavigatorElevation::elevationInputChanged()
     mainWindow_->updateFilter();
 }
 
-void ProjectNavigatorElevation::slotDescriptorIntermediateMinimumValue()
+void ProjectNavigatorItemElevation::slotDescriptorIntermediateMinimumValue()
 {
     LOG_DEBUG_LOCAL("minimumValue <" << descriptorInput_->minimumValue()
                                      << ">");
@@ -145,7 +146,7 @@ void ProjectNavigatorElevation::slotDescriptorIntermediateMinimumValue()
     descriptorInputChanged();
 }
 
-void ProjectNavigatorElevation::slotDescriptorIntermediateMaximumValue()
+void ProjectNavigatorItemElevation::slotDescriptorIntermediateMaximumValue()
 {
     LOG_DEBUG_LOCAL("maximumValue <" << descriptorInput_->maximumValue()
                                      << ">");
@@ -154,7 +155,7 @@ void ProjectNavigatorElevation::slotDescriptorIntermediateMaximumValue()
     descriptorInputChanged();
 }
 
-void ProjectNavigatorElevation::descriptorInputChanged()
+void ProjectNavigatorItemElevation::descriptorInputChanged()
 {
     LOG_DEBUG_LOCAL("");
     mainWindow_->suspendThreads();

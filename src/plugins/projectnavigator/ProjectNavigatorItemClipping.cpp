@@ -17,12 +17,12 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ProjectNavigatorClipping.cpp */
+/** @file ProjectNavigatorItemClipping.cpp */
 
 #include <Region.hpp>
 
 #include <MainWindow.hpp>
-#include <ProjectNavigatorClipping.hpp>
+#include <ProjectNavigatorItemClipping.hpp>
 #include <RangeSliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
@@ -35,10 +35,11 @@
 #define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("ProjectNavigatorClipping", msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("ProjectNavigatorItemClipping", msg)
 
-ProjectNavigatorClipping::ProjectNavigatorClipping(MainWindow *mainWindow)
-    : QWidget(),
+ProjectNavigatorItemClipping::ProjectNavigatorItemClipping(
+    MainWindow *mainWindow)
+    : ProjectNavigatorItem(),
       mainWindow_(mainWindow)
 {
     LOG_DEBUG_LOCAL("");
@@ -114,7 +115,7 @@ ProjectNavigatorClipping::ProjectNavigatorClipping(MainWindow *mainWindow)
             SLOT(slotUpdate(const QSet<Editor::Type> &)));
 }
 
-void ProjectNavigatorClipping::slotUpdate(const QSet<Editor::Type> &target)
+void ProjectNavigatorItemClipping::slotUpdate(const QSet<Editor::Type> &target)
 {
     if (!target.empty() && !target.contains(Editor::TYPE_CLIP_FILTER))
     {
@@ -145,7 +146,7 @@ void ProjectNavigatorClipping::slotUpdate(const QSet<Editor::Type> &target)
     }
 }
 
-void ProjectNavigatorClipping::slotRangeIntermediateMinimumValue()
+void ProjectNavigatorItemClipping::slotRangeIntermediateMinimumValue()
 {
     LOG_DEBUG_LOCAL("");
     QObject *obj = sender();
@@ -162,7 +163,7 @@ void ProjectNavigatorClipping::slotRangeIntermediateMinimumValue()
     filterChanged();
 }
 
-void ProjectNavigatorClipping::slotRangeIntermediateMaximumValue()
+void ProjectNavigatorItemClipping::slotRangeIntermediateMaximumValue()
 {
     LOG_DEBUG_LOCAL("");
     QObject *obj = sender();
@@ -179,7 +180,7 @@ void ProjectNavigatorClipping::slotRangeIntermediateMaximumValue()
     filterChanged();
 }
 
-void ProjectNavigatorClipping::filterChanged()
+void ProjectNavigatorItemClipping::filterChanged()
 {
     LOG_DEBUG_LOCAL("");
 
@@ -209,13 +210,13 @@ void ProjectNavigatorClipping::filterChanged()
     mainWindow_->updateFilter();
 }
 
-void ProjectNavigatorClipping::setEnabled(int state)
+void ProjectNavigatorItemClipping::setEnabled(int state)
 {
     (void)state;
     filterChanged();
 }
 
-void ProjectNavigatorClipping::reset()
+void ProjectNavigatorItemClipping::reset()
 {
     for (size_t i = 0; i < 3; i++)
     {

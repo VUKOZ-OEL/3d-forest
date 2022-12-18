@@ -17,12 +17,12 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ProjectNavigatorClassifications.cpp */
+/** @file ProjectNavigatorItemClassifications.cpp */
 
 #include <ColorPalette.hpp>
 
 #include <MainWindow.hpp>
-#include <ProjectNavigatorClassifications.hpp>
+#include <ProjectNavigatorItemClassifications.hpp>
 #include <ThemeIcon.hpp>
 
 #include <QHBoxLayout>
@@ -36,9 +36,9 @@
 
 #define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
-ProjectNavigatorClassifications::ProjectNavigatorClassifications(
+ProjectNavigatorItemClassifications::ProjectNavigatorItemClassifications(
     MainWindow *mainWindow)
-    : QWidget(),
+    : ProjectNavigatorItem(),
       mainWindow_(mainWindow)
 {
     // Table
@@ -108,7 +108,7 @@ ProjectNavigatorClassifications::ProjectNavigatorClassifications(
             SLOT(slotUpdate(const QSet<Editor::Type> &)));
 }
 
-void ProjectNavigatorClassifications::slotUpdate(
+void ProjectNavigatorItemClassifications::slotUpdate(
     const QSet<Editor::Type> &target)
 {
     if (!target.empty() && !target.contains(Editor::TYPE_CLASSIFICATION))
@@ -119,21 +119,21 @@ void ProjectNavigatorClassifications::slotUpdate(
     setClassifications(mainWindow_->editor().classifications());
 }
 
-void ProjectNavigatorClassifications::dataChanged()
+void ProjectNavigatorItemClassifications::dataChanged()
 {
     mainWindow_->suspendThreads();
     mainWindow_->editor().setClassifications(classifications_);
     mainWindow_->updateData();
 }
 
-void ProjectNavigatorClassifications::filterChanged()
+void ProjectNavigatorItemClassifications::filterChanged()
 {
     mainWindow_->suspendThreads();
     mainWindow_->editor().setClassifications(classifications_);
     mainWindow_->updateFilter();
 }
 
-void ProjectNavigatorClassifications::slotShow()
+void ProjectNavigatorItemClassifications::slotShow()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
@@ -148,7 +148,7 @@ void ProjectNavigatorClassifications::slotShow()
     }
 }
 
-void ProjectNavigatorClassifications::slotHide()
+void ProjectNavigatorItemClassifications::slotHide()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
@@ -163,7 +163,7 @@ void ProjectNavigatorClassifications::slotHide()
     }
 }
 
-void ProjectNavigatorClassifications::slotSelectAll()
+void ProjectNavigatorItemClassifications::slotSelectAll()
 {
     QTreeWidgetItemIterator it(tree_);
 
@@ -176,7 +176,7 @@ void ProjectNavigatorClassifications::slotSelectAll()
     slotItemSelectionChanged();
 }
 
-void ProjectNavigatorClassifications::slotSelectInvert()
+void ProjectNavigatorItemClassifications::slotSelectInvert()
 {
     QTreeWidgetItemIterator it(tree_);
 
@@ -189,7 +189,7 @@ void ProjectNavigatorClassifications::slotSelectInvert()
     slotItemSelectionChanged();
 }
 
-void ProjectNavigatorClassifications::slotSelectNone()
+void ProjectNavigatorItemClassifications::slotSelectNone()
 {
     QTreeWidgetItemIterator it(tree_);
 
@@ -202,7 +202,7 @@ void ProjectNavigatorClassifications::slotSelectNone()
     slotItemSelectionChanged();
 }
 
-void ProjectNavigatorClassifications::slotItemSelectionChanged()
+void ProjectNavigatorItemClassifications::slotItemSelectionChanged()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
@@ -218,8 +218,8 @@ void ProjectNavigatorClassifications::slotItemSelectionChanged()
     }
 }
 
-void ProjectNavigatorClassifications::slotItemChanged(QTreeWidgetItem *item,
-                                                      int column)
+void ProjectNavigatorItemClassifications::slotItemChanged(QTreeWidgetItem *item,
+                                                          int column)
 {
     if (column == COLUMN_CHECKED)
     {
@@ -231,7 +231,7 @@ void ProjectNavigatorClassifications::slotItemChanged(QTreeWidgetItem *item,
     }
 }
 
-void ProjectNavigatorClassifications::updateTree()
+void ProjectNavigatorItemClassifications::updateTree()
 {
     block();
 
@@ -256,14 +256,14 @@ void ProjectNavigatorClassifications::updateTree()
     unblock();
 }
 
-void ProjectNavigatorClassifications::block()
+void ProjectNavigatorItemClassifications::block()
 {
     disconnect(tree_, SIGNAL(itemChanged(QTreeWidgetItem *, int)), 0, 0);
     disconnect(tree_, SIGNAL(itemSelectionChanged()), 0, 0);
     (void)blockSignals(true);
 }
 
-void ProjectNavigatorClassifications::unblock()
+void ProjectNavigatorItemClassifications::unblock()
 {
     (void)blockSignals(false);
     connect(tree_,
@@ -276,7 +276,7 @@ void ProjectNavigatorClassifications::unblock()
             SLOT(slotItemSelectionChanged()));
 }
 
-void ProjectNavigatorClassifications::addItem(size_t i)
+void ProjectNavigatorItemClassifications::addItem(size_t i)
 {
     QTreeWidgetItem *item = new QTreeWidgetItem(tree_);
 
@@ -311,7 +311,7 @@ void ProjectNavigatorClassifications::addItem(size_t i)
     }
 }
 
-void ProjectNavigatorClassifications::setClassifications(
+void ProjectNavigatorItemClassifications::setClassifications(
     const Classifications &classifications)
 {
     block();
