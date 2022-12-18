@@ -51,7 +51,7 @@ ProjectNavigatorTree::ProjectNavigatorTree(MainWindow *mainWindow)
 
     treeWidget_->setColumnCount(COLUMN_LAST);
     QStringList labels;
-    labels << tr("Color") << tr("Item") << tr("Id");
+    labels << tr("Color") << tr("Filter") << tr("Item") << tr("Id");
     treeWidget_->setHeaderLabels(labels);
     treeWidget_->setColumnHidden(COLUMN_ID, true);
 
@@ -128,7 +128,11 @@ void ProjectNavigatorTree::addItem(ProjectNavigatorItem *widget,
     item->setText(COLUMN_ID, QString::number(tabList_.size()));
     if (widget->hasColorSource())
     {
-        item->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
+        item->setCheckState(COLUMN_COLOR, Qt::Unchecked);
+    }
+    if (widget->hasFilter())
+    {
+        item->setCheckState(COLUMN_FILTER, Qt::Unchecked);
     }
     item->setIcon(COLUMN_LABEL, icon);
     item->setText(COLUMN_LABEL, label);
@@ -159,15 +163,24 @@ void ProjectNavigatorTree::slotItemChanged(QTreeWidgetItem *item, int column)
         return;
     }
 
-    if (column == COLUMN_CHECKED)
+    if (column == COLUMN_COLOR)
     {
         size_t idx = index(item);
         if (tabList_[idx]->hasColorSource())
         {
             SettingsView::ColorSource csrc = tabList_[idx]->colorSource();
-            bool checked = (item->checkState(COLUMN_CHECKED) == Qt::Checked);
+            bool checked = (item->checkState(COLUMN_COLOR) == Qt::Checked);
             settings_.setColorSourceEnabled(csrc, checked);
             applySettingsOut();
+        }
+    }
+    else if (column == COLUMN_FILTER)
+    {
+        size_t idx = index(item);
+        if (tabList_[idx]->hasFilter())
+        {
+            bool checked = (item->checkState(COLUMN_FILTER) == Qt::Checked);
+            tabList_[idx]->setFilterEnabled(checked);
         }
     }
 }
@@ -261,11 +274,23 @@ void ProjectNavigatorTree::applySettingsIn(const SettingsView &settings)
             SettingsView::ColorSource csrc = tabList_[idx]->colorSource();
             if (settings_.isColorSourceEnabled(csrc))
             {
-                (*it)->setCheckState(COLUMN_CHECKED, Qt::Checked);
+                (*it)->setCheckState(COLUMN_COLOR, Qt::Checked);
             }
             else
             {
-                (*it)->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
+                (*it)->setCheckState(COLUMN_COLOR, Qt::Unchecked);
+            }
+        }
+
+        if (tabList_[idx]->hasFilter())
+        {
+            if (tabList_[idx]->isFilterEnabled())
+            {
+                (*it)->setCheckState(COLUMN_FILTER, Qt::Checked);
+            }
+            else
+            {
+                (*it)->setCheckState(COLUMN_FILTER, Qt::Unchecked);
             }
         }
 

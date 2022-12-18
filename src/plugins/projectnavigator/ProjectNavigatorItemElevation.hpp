@@ -37,11 +37,13 @@ class ProjectNavigatorItemElevation : public ProjectNavigatorItem
 public:
     ProjectNavigatorItemElevation(MainWindow *mainWindow);
 
-    virtual bool hasColorSource() { return true; }
-    virtual SettingsView::ColorSource colorSource()
+    virtual bool hasColorSource() const { return true; }
+    virtual SettingsView::ColorSource colorSource() const
     {
         return SettingsView::COLOR_SOURCE_ELEVATION;
     }
+
+    virtual bool hasFilter() const { return false; }
 
 public slots:
     void slotUpdate(const QSet<Editor::Type> &target);

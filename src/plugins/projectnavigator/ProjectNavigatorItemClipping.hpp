@@ -29,7 +29,6 @@
 class MainWindow;
 class RangeSliderWidget;
 
-class QCheckBox;
 class QPushButton;
 
 /** Project Navigator Clipping. */
@@ -40,24 +39,25 @@ class ProjectNavigatorItemClipping : public ProjectNavigatorItem
 public:
     ProjectNavigatorItemClipping(MainWindow *mainWindow);
 
-    virtual bool hasColorSource() { return false; }
-    virtual SettingsView::ColorSource colorSource()
+    virtual bool hasColorSource() const { return false; }
+    virtual SettingsView::ColorSource colorSource() const
     {
         return SettingsView::COLOR_SOURCE_LAST;
     }
+
+    virtual bool hasFilter() const { return true; }
+    virtual void setFilterEnabled(bool b);
 
 public slots:
     void slotUpdate(const QSet<Editor::Type> &target);
 
     void slotRangeIntermediateMinimumValue();
     void slotRangeIntermediateMaximumValue();
-    void setEnabled(int state);
     void reset();
 
 protected:
     MainWindow *mainWindow_;
     RangeSliderWidget *rangeInput_[3];
-    QCheckBox *enabledCheckBox_;
     QPushButton *resetButton_;
     Range<double> clipRange_[3];
 

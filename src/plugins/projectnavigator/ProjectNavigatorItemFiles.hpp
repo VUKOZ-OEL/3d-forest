@@ -40,11 +40,13 @@ class ProjectNavigatorItemFiles : public ProjectNavigatorItem
 public:
     ProjectNavigatorItemFiles(MainWindow *mainWindow);
 
-    virtual bool hasColorSource() { return false; }
-    virtual SettingsView::ColorSource colorSource()
+    virtual bool hasColorSource() const { return false; }
+    virtual SettingsView::ColorSource colorSource() const
     {
         return SettingsView::COLOR_SOURCE_LAST;
     }
+
+    virtual bool hasFilter() const { return false; }
 
 public slots:
     void slotUpdate(const QSet<Editor::Type> &target);

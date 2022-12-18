@@ -26,9 +26,7 @@
 #include <RangeSliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
-#include <QCheckBox>
 #include <QHBoxLayout>
-#include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
 
@@ -84,19 +82,11 @@ ProjectNavigatorItemClipping::ProjectNavigatorItemClipping(
                               0,
                               100);
 
-    enabledCheckBox_ = new QCheckBox;
-    connect(enabledCheckBox_,
-            SIGNAL(stateChanged(int)),
-            this,
-            SLOT(setEnabled(int)));
-
     resetButton_ = new QPushButton(tr("&Reset"), this);
     connect(resetButton_, SIGNAL(clicked()), this, SLOT(reset()));
 
     // Layout
     QHBoxLayout *controlLayout = new QHBoxLayout;
-    controlLayout->addWidget(new QLabel(tr("Enabled")));
-    controlLayout->addWidget(enabledCheckBox_);
     controlLayout->addStretch();
     controlLayout->addWidget(resetButton_);
 
@@ -195,8 +185,7 @@ void ProjectNavigatorItemClipping::filterChanged()
 
     region.box.set(x1, y1, z1, x2, y2, z2);
 
-    bool checked = (enabledCheckBox_->checkState() == Qt::Checked);
-    if (checked)
+    if (isFilterEnabled())
     {
         region.enabled = Region::TYPE_BOX;
     }
@@ -210,9 +199,9 @@ void ProjectNavigatorItemClipping::filterChanged()
     mainWindow_->updateFilter();
 }
 
-void ProjectNavigatorItemClipping::setEnabled(int state)
+void ProjectNavigatorItemClipping::setFilterEnabled(bool b)
 {
-    (void)state;
+    ProjectNavigatorItem::setFilterEnabled(b);
     filterChanged();
 }
 

@@ -35,8 +35,15 @@ public:
     ProjectNavigatorItem();
     virtual ~ProjectNavigatorItem() = default;
 
-    virtual bool hasColorSource() = 0;
-    virtual SettingsView::ColorSource colorSource() = 0;
+    virtual bool hasColorSource() const = 0;
+    virtual SettingsView::ColorSource colorSource() const = 0;
+
+    virtual bool hasFilter() const = 0;
+    virtual bool isFilterEnabled() const { return filterEnabled_; }
+    virtual void setFilterEnabled(bool b) { filterEnabled_ = b; }
+
+private:
+    bool filterEnabled_;
 };
 
 #endif /* PROJECT_NAVIGATOR_ITEM_HPP */

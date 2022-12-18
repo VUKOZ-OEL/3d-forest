@@ -21,6 +21,6 @@
 
 #include <ProjectNavigatorItem.hpp>
 
-ProjectNavigatorItem::ProjectNavigatorItem() : QWidget()
+ProjectNavigatorItem::ProjectNavigatorItem() : QWidget(), filterEnabled_(false)
 {
 }

@@ -58,7 +58,8 @@ private:
     /** Project Navigator Tree Column. */
     enum Column
     {
-        COLUMN_CHECKED,
+        COLUMN_COLOR,
+        COLUMN_FILTER,
         COLUMN_LABEL,
         COLUMN_ID,
         COLUMN_LAST
