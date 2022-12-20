@@ -36,13 +36,14 @@
 <file>select_none_24px_color.png</file>
 
 <!-- Tabs -->
-<file>file_16px.png</file>
-<file>layers_16px.png</file>
 <file>classification_16px.png</file>
 <file>classification_16px_color.png</file>
+<file>clip_filter_16px_color.png</file>
+<file>color_16px_color.png</file>
 <file>descriptor_filter_16px_color.png</file>
 <file>elevation_filter_16px_color.png</file>
-<file>clip_filter_16px_color.png</file>
+<file>file_16px.png</file>
+<file>layers_16px.png</file>
 
 </qresource>
 </RCC>

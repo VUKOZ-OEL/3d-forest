@@ -17,31 +17,35 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ProjectNavigatorWindow.hpp */
+/** @file ProjectNavigatorItemColor.hpp */
 
-#ifndef PROJECT_NAVIGATOR_WINDOW_HPP
-#define PROJECT_NAVIGATOR_WINDOW_HPP
+#ifndef PROJECT_NAVIGATOR_ITEM_COLOR_HPP
+#define PROJECT_NAVIGATOR_ITEM_COLOR_HPP
 
-#include <vector>
-
-#include <QDockWidget>
+#include <Editor.hpp>
+#include <ProjectNavigatorItem.hpp>
 
 class MainWindow;
-class ProjectNavigatorItem;
-class ProjectNavigatorTree;
 
-/** Project Navigator Window. */
-class ProjectNavigatorWindow : public QDockWidget
+/** Project Navigator Color. */
+class ProjectNavigatorItemColor : public ProjectNavigatorItem
 {
     Q_OBJECT
 
 public:
-    ProjectNavigatorWindow(MainWindow *mainWindow);
+    ProjectNavigatorItemColor(MainWindow *mainWindow,
+                              const QIcon &icon,
+                              const QString &text);
+
+    virtual bool hasColorSource() const { return true; }
+    virtual SettingsView::ColorSource colorSource() const
+    {
+        return SettingsView::COLOR_SOURCE_COLOR;
+    }
+
+    virtual bool hasFilter() const { return false; }
 
 protected:
-    MainWindow *mainWindow_;
-    ProjectNavigatorTree *menu_;
-    std::vector<ProjectNavigatorItem *> items_;
 };
 
-#endif /* PROJECT_NAVIGATOR_WINDOW_HPP */
+#endif /* PROJECT_NAVIGATOR_ITEM_COLOR_HPP */
