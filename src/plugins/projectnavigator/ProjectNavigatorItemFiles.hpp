@@ -48,7 +48,7 @@ public:
         return SettingsView::COLOR_SOURCE_LAST;
     }
 
-    virtual bool hasFilter() const { return false; }
+    virtual bool hasFilter() const { return true; }
 
 public slots:
     void slotUpdate(const QSet<Editor::Type> &target);
