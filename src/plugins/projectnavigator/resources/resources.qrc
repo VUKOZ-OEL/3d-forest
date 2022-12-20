@@ -43,6 +43,7 @@
 <file>descriptor_filter_16px_color.png</file>
 <file>elevation_filter_16px_color.png</file>
 <file>file_16px.png</file>
+<file>intensity_16px_color.png</file>
 <file>layers_16px.png</file>
 
 </qresource>

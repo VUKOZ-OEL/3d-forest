@@ -26,6 +26,7 @@
 #include <ProjectNavigatorItemDescriptor.hpp>
 #include <ProjectNavigatorItemElevation.hpp>
 #include <ProjectNavigatorItemFiles.hpp>
+#include <ProjectNavigatorItemIntensity.hpp>
 #include <ProjectNavigatorItemLayers.hpp>
 #include <ProjectNavigatorTree.hpp>
 #include <ProjectNavigatorWindow.hpp>
@@ -52,6 +53,10 @@ ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
 
     items_.push_back(
         new ProjectNavigatorItemColor(mainWindow_, ICON("color"), tr("Color")));
+
+    items_.push_back(new ProjectNavigatorItemIntensity(mainWindow_,
+                                                       ICON("intensity"),
+                                                       tr("Intensity")));
 
     items_.push_back(new ProjectNavigatorItemElevation(mainWindow_,
                                                        ICON("elevation_filter"),
