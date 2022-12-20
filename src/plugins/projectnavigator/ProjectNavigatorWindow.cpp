@@ -28,6 +28,7 @@
 #include <ProjectNavigatorItemFiles.hpp>
 #include <ProjectNavigatorItemIntensity.hpp>
 #include <ProjectNavigatorItemLayers.hpp>
+#include <ProjectNavigatorItemReturnNumber.hpp>
 #include <ProjectNavigatorTree.hpp>
 #include <ProjectNavigatorWindow.hpp>
 #include <ThemeIcon.hpp>
@@ -57,6 +58,10 @@ ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
     items_.push_back(new ProjectNavigatorItemIntensity(mainWindow_,
                                                        ICON("intensity"),
                                                        tr("Intensity")));
+
+    items_.push_back(new ProjectNavigatorItemReturnNumber(mainWindow_,
+                                                          ICON("return_number"),
+                                                          tr("Return number")));
 
     items_.push_back(new ProjectNavigatorItemElevation(mainWindow_,
                                                        ICON("elevation_filter"),
