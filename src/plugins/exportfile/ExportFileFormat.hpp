@@ -17,29 +17,30 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ExportFileLas.hpp */
+/** @file ExportFileFormat.hpp */
 
-#ifndef EXPORT_FILE_LAS_HPP
-#define EXPORT_FILE_LAS_HPP
+#ifndef EXPORT_FILE_FORMAT_HPP
+#define EXPORT_FILE_FORMAT_HPP
 
-#include <ExportFileInterface.hpp>
-#include <LasFile.hpp>
+#include <ExportFileProperties.hpp>
 #include <Query.hpp>
 
-/** Export File in LAS (LASer) File Format. */
-class ExportFileLas : public ExportFileInterface
+/** Export File Format. */
+class ExportFileFormat
 {
 public:
-    ExportFileLas();
-    virtual ~ExportFileLas();
+    virtual ~ExportFileFormat() = default;
 
-    virtual bool isOpen() { return file_.file().isOpen(); }
-    virtual void create(const std::string &path);
-    virtual void write(Query &query);
-    virtual void close();
+    virtual bool isOpen() = 0;
+    virtual void create(const std::string &path) = 0;
+    virtual void write(Query &query) = 0;
+    virtual void close() = 0;
+
+    void setProperties(const ExportFileProperties &prop) { properties_ = prop; }
+    const ExportFileProperties &properties() const { return properties_; }
 
 private:
-    LasFile file_;
+    ExportFileProperties properties_;
 };
 
-#endif /* EXPORT_FILE_LAS_HPP */
+#endif /* EXPORT_FILE_FORMAT_HPP */

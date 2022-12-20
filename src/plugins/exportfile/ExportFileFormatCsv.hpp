@@ -17,30 +17,29 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ExportFileInterface.hpp */
+/** @file ExportFileFormatCsv.hpp */
 
-#ifndef EXPORT_FILE_INTERFACE_HPP
-#define EXPORT_FILE_INTERFACE_HPP
+#ifndef EXPORT_FILE_FORMAT_CSV_HPP
+#define EXPORT_FILE_FORMAT_CSV_HPP
 
-#include <ExportFileProperties.hpp>
+#include <ExportFileFormat.hpp>
+#include <File.hpp>
 #include <Query.hpp>
 
-/** Export File Interface. */
-class ExportFileInterface
+/** Export File in Comma Separated Values File Format. */
+class ExportFileFormatCsv : public ExportFileFormat
 {
 public:
-    virtual ~ExportFileInterface() = default;
+    ExportFileFormatCsv();
+    virtual ~ExportFileFormatCsv();
 
-    virtual bool isOpen() = 0;
-    virtual void create(const std::string &path) = 0;
-    virtual void write(Query &query) = 0;
-    virtual void close() = 0;
-
-    void setProperties(const ExportFileProperties &prop) { properties_ = prop; }
-    const ExportFileProperties &properties() const { return properties_; }
+    virtual bool isOpen() { return file_.isOpen(); }
+    virtual void create(const std::string &path);
+    virtual void write(Query &query);
+    virtual void close();
 
 private:
-    ExportFileProperties properties_;
+    File file_;
 };
 
-#endif /* EXPORT_FILE_INTERFACE_HPP */
+#endif /* EXPORT_FILE_FORMAT_CSV_HPP */

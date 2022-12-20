@@ -21,9 +21,9 @@
 
 #include <Log.hpp>
 
-#include <ExportFile.hpp>
 #include <ExportFileDialog.hpp>
 #include <ExportFilePlugin.hpp>
+#include <ExportFileProgress.hpp>
 #include <MainWindow.hpp>
 #include <ProgressDialog.hpp>
 #include <ThemeIcon.hpp>
@@ -60,10 +60,10 @@ void ExportFilePlugin::slotExportFile()
 
         if (dialog.exec() == QDialog::Accepted)
         {
-            std::shared_ptr<ExportFileInterface> writer = dialog.writer();
+            std::shared_ptr<ExportFileFormat> writer = dialog.writer();
             ExportFileProperties properties = dialog.properties();
 
-            ExportFile exportFile(&mainWindow_->editor());
+            ExportFileProgress exportFile(&mainWindow_->editor());
             exportFile.initialize(writer, properties);
 
             ProgressDialog::run(mainWindow_, "Exporting file", &exportFile);

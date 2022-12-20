@@ -23,8 +23,8 @@
 #include <MainWindow.hpp>
 #include <Util.hpp>
 
-#include <ExportFileCsv.hpp>
-#include <ExportFileLas.hpp>
+#include <ExportFileFormatCsv.hpp>
+#include <ExportFileFormatLas.hpp>
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -192,20 +192,20 @@ void ExportFileDialog::slotReject()
     setResult(QDialog::Rejected);
 }
 
-std::shared_ptr<ExportFileInterface> ExportFileDialog::writer() const
+std::shared_ptr<ExportFileFormat> ExportFileDialog::writer() const
 {
-    std::shared_ptr<ExportFileInterface> result;
+    std::shared_ptr<ExportFileFormat> result;
 
     std::string path = fileNameLineEdit_->text().toStdString();
     std::string ext = toLower(File::fileExtension(path));
 
     if (ext == "csv")
     {
-        result = std::make_shared<ExportFileCsv>();
+        result = std::make_shared<ExportFileFormatCsv>();
     }
     else
     {
-        result = std::make_shared<ExportFileLas>();
+        result = std::make_shared<ExportFileFormatLas>();
     }
 
     return result;

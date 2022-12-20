@@ -17,20 +17,20 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ExportFileCsv.cpp */
+/** @file ExportFileFormatCsv.cpp */
 
-#include <ExportFileCsv.hpp>
+#include <ExportFileFormatCsv.hpp>
 #include <cstring>
 
-ExportFileCsv::ExportFileCsv()
+ExportFileFormatCsv::ExportFileFormatCsv()
 {
 }
 
-ExportFileCsv::~ExportFileCsv()
+ExportFileFormatCsv::~ExportFileFormatCsv()
 {
 }
 
-void ExportFileCsv::create(const std::string &path)
+void ExportFileFormatCsv::create(const std::string &path)
 {
     // Create/overwrite new text file which is open for writing
     file_.open(path, "w+t");
@@ -60,7 +60,7 @@ void ExportFileCsv::create(const std::string &path)
     file_.write(text);
 }
 
-void ExportFileCsv::write(Query &query)
+void ExportFileFormatCsv::write(Query &query)
 {
     // Format point data into text line
     char text[512];
@@ -140,7 +140,7 @@ void ExportFileCsv::write(Query &query)
     file_.write(text);
 }
 
-void ExportFileCsv::close()
+void ExportFileFormatCsv::close()
 {
     // Close the file
     file_.close();

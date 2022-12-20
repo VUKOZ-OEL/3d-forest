@@ -17,19 +17,19 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ExportFile.cpp */
+/** @file ExportFileProgress.cpp */
 
 #include <cstring>
 
 #include <Editor.hpp>
-#include <ExportFile.hpp>
+#include <ExportFileProgress.hpp>
 #include <Time.hpp>
 
-#define MODULE_NAME "ExportFile"
+#define MODULE_NAME "ExportFileProgress"
 #define LOG_DEBUG_LOCAL(msg)
 //#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
-ExportFile::ExportFile(Editor *editor)
+ExportFileProgress::ExportFileProgress(Editor *editor)
     : ProgressActionInterface(),
       editor_(editor),
       query_(editor)
@@ -37,13 +37,13 @@ ExportFile::ExportFile(Editor *editor)
     LOG_DEBUG_LOCAL("");
 }
 
-ExportFile::~ExportFile()
+ExportFileProgress::~ExportFileProgress()
 {
     LOG_DEBUG_LOCAL("");
 }
 
-void ExportFile::initialize(std::shared_ptr<ExportFileInterface> writer,
-                            const ExportFileProperties &properties)
+void ExportFileProgress::initialize(std::shared_ptr<ExportFileFormat> writer,
+                                    const ExportFileProperties &properties)
 {
     LOG_DEBUG_LOCAL("");
 
@@ -72,13 +72,13 @@ void ExportFile::initialize(std::shared_ptr<ExportFileInterface> writer,
     ProgressActionInterface::initialize(ProgressActionInterface::npos, 1000UL);
 }
 
-void ExportFile::clear()
+void ExportFileProgress::clear()
 {
     LOG_DEBUG_LOCAL("");
     query_.clear();
 }
 
-void ExportFile::step()
+void ExportFileProgress::step()
 {
     if (initializing())
     {
@@ -119,7 +119,7 @@ void ExportFile::step()
     }
 }
 
-void ExportFile::determineMaximum()
+void ExportFileProgress::determineMaximum()
 {
     startTimer();
 

@@ -17,44 +17,29 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ExportFile.hpp */
+/** @file ExportFileFormatLas.hpp */
 
-#ifndef EXPORT_FILE_HPP
-#define EXPORT_FILE_HPP
+#ifndef EXPORT_FILE_FORMAT_LAS_HPP
+#define EXPORT_FILE_FORMAT_LAS_HPP
 
-#include <ExportFileInterface.hpp>
-#include <ExportFileProperties.hpp>
+#include <ExportFileFormat.hpp>
 #include <LasFile.hpp>
-#include <ProgressActionInterface.hpp>
 #include <Query.hpp>
 
-class Editor;
-
-/** Export File. */
-class ExportFile : public ProgressActionInterface
+/** Export File in LAS (LASer) File Format. */
+class ExportFileFormatLas : public ExportFileFormat
 {
 public:
-    ExportFile(Editor *editor);
-    virtual ~ExportFile();
+    ExportFileFormatLas();
+    virtual ~ExportFileFormatLas();
 
-    void initialize(std::shared_ptr<ExportFileInterface> writer,
-                    const ExportFileProperties &properties);
-    void clear();
-
-    virtual void step();
+    virtual bool isOpen() { return file_.file().isOpen(); }
+    virtual void create(const std::string &path);
+    virtual void write(Query &query);
+    virtual void close();
 
 private:
-    Editor *editor_;
-    Query query_;
-
-    uint64_t nPointsTotal_;
-    Vector3<double> regionMin_;
-    Vector3<double> regionMax_;
-
-    std::shared_ptr<ExportFileInterface> writer_;
-    ExportFileProperties properties_;
-
-    void determineMaximum();
+    LasFile file_;
 };
 
-#endif /* EXPORT_FILE_HPP */
+#endif /* EXPORT_FILE_FORMAT_LAS_HPP */
