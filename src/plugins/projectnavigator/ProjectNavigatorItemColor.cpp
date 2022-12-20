@@ -17,29 +17,19 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ExportFileCsv.hpp */
+/** @file ProjectNavigatorItemColor.cpp */
 
-#ifndef EXPORT_FILE_CSV_HPP
-#define EXPORT_FILE_CSV_HPP
+#include <MainWindow.hpp>
+#include <ProjectNavigatorItemColor.hpp>
 
-#include <ExportFileInterface.hpp>
-#include <File.hpp>
-#include <Query.hpp>
+#include <QVBoxLayout>
 
-/** Export File in Comma Separated Values File Format. */
-class ExportFileCsv : public ExportFileInterface
+ProjectNavigatorItemColor::ProjectNavigatorItemColor(MainWindow *mainWindow,
+                                                     const QIcon &icon,
+                                                     const QString &text)
+    : ProjectNavigatorItem(mainWindow, icon, text)
 {
-public:
-    ExportFileCsv();
-    virtual ~ExportFileCsv();
-
-    virtual bool isOpen() { return file_.isOpen(); }
-    virtual void create(const std::string &path);
-    virtual void write(Query &query);
-    virtual void close();
-
-private:
-    File file_;
-};
-
-#endif /* EXPORT_FILE_CSV_HPP */
+    // Layout
+    mainLayout_->addStretch();
+    setLayout(mainLayout_);
+}

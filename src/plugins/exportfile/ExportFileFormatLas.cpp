@@ -17,28 +17,28 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ExportFileLas.cpp */
+/** @file ExportFileFormatLas.cpp */
 
 #include <cstring>
 
-#include <ExportFileLas.hpp>
+#include <ExportFileFormatLas.hpp>
 #include <IndexFileBuilder.hpp>
 
-#define MODULE_NAME "ExportFileLas"
+#define MODULE_NAME "ExportFileFormatLas"
 #define LOG_DEBUG_LOCAL(msg)
 //#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
-ExportFileLas::ExportFileLas()
+ExportFileFormatLas::ExportFileFormatLas()
 {
     LOG_DEBUG_LOCAL("");
 }
 
-ExportFileLas::~ExportFileLas()
+ExportFileFormatLas::~ExportFileFormatLas()
 {
     LOG_DEBUG_LOCAL("");
 }
 
-void ExportFileLas::create(const std::string &path)
+void ExportFileFormatLas::create(const std::string &path)
 {
     LOG_DEBUG_LOCAL("path <" << path << "> nPoints <"
                              << properties().numberOfPoints() << "> region <"
@@ -66,7 +66,7 @@ void ExportFileLas::create(const std::string &path)
     }
 }
 
-void ExportFileLas::write(Query &query)
+void ExportFileFormatLas::write(Query &query)
 {
     const float f8 = 255.0F;
     const float f16 = 65535.0F;
@@ -111,7 +111,7 @@ void ExportFileLas::write(Query &query)
     file_.writePoint(point);
 }
 
-void ExportFileLas::close()
+void ExportFileFormatLas::close()
 {
     LOG_DEBUG_LOCAL("");
 

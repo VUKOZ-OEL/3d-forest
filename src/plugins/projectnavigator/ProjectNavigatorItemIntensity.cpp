@@ -17,31 +17,20 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ProjectNavigatorWindow.hpp */
+/** @file ProjectNavigatorItemIntensity.cpp */
 
-#ifndef PROJECT_NAVIGATOR_WINDOW_HPP
-#define PROJECT_NAVIGATOR_WINDOW_HPP
+#include <MainWindow.hpp>
+#include <ProjectNavigatorItemIntensity.hpp>
 
-#include <vector>
+#include <QVBoxLayout>
 
-#include <QDockWidget>
-
-class MainWindow;
-class ProjectNavigatorItem;
-class ProjectNavigatorTree;
-
-/** Project Navigator Window. */
-class ProjectNavigatorWindow : public QDockWidget
+ProjectNavigatorItemIntensity::ProjectNavigatorItemIntensity(
+    MainWindow *mainWindow,
+    const QIcon &icon,
+    const QString &text)
+    : ProjectNavigatorItem(mainWindow, icon, text)
 {
-    Q_OBJECT
-
-public:
-    ProjectNavigatorWindow(MainWindow *mainWindow);
-
-protected:
-    MainWindow *mainWindow_;
-    ProjectNavigatorTree *menu_;
-    std::vector<ProjectNavigatorItem *> items_;
-};
-
-#endif /* PROJECT_NAVIGATOR_WINDOW_HPP */
+    // Layout
+    mainLayout_->addStretch();
+    setLayout(mainLayout_);
+}

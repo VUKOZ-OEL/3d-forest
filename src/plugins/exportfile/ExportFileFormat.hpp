@@ -17,31 +17,30 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ProjectNavigatorWindow.hpp */
+/** @file ExportFileFormat.hpp */
 
-#ifndef PROJECT_NAVIGATOR_WINDOW_HPP
-#define PROJECT_NAVIGATOR_WINDOW_HPP
+#ifndef EXPORT_FILE_FORMAT_HPP
+#define EXPORT_FILE_FORMAT_HPP
 
-#include <vector>
+#include <ExportFileProperties.hpp>
+#include <Query.hpp>
 
-#include <QDockWidget>
-
-class MainWindow;
-class ProjectNavigatorItem;
-class ProjectNavigatorTree;
-
-/** Project Navigator Window. */
-class ProjectNavigatorWindow : public QDockWidget
+/** Export File Format. */
+class ExportFileFormat
 {
-    Q_OBJECT
-
 public:
-    ProjectNavigatorWindow(MainWindow *mainWindow);
+    virtual ~ExportFileFormat() = default;
 
-protected:
-    MainWindow *mainWindow_;
-    ProjectNavigatorTree *menu_;
-    std::vector<ProjectNavigatorItem *> items_;
+    virtual bool isOpen() = 0;
+    virtual void create(const std::string &path) = 0;
+    virtual void write(Query &query) = 0;
+    virtual void close() = 0;
+
+    void setProperties(const ExportFileProperties &prop) { properties_ = prop; }
+    const ExportFileProperties &properties() const { return properties_; }
+
+private:
+    ExportFileProperties properties_;
 };
 
-#endif /* PROJECT_NAVIGATOR_WINDOW_HPP */
+#endif /* EXPORT_FILE_FORMAT_HPP */

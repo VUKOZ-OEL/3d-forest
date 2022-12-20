@@ -17,47 +17,35 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ProjectNavigatorItemElevation.hpp */
+/** @file ProjectNavigatorItemIntensity.hpp */
 
-#ifndef PROJECT_NAVIGATOR_ITEM_ELEVATION_HPP
-#define PROJECT_NAVIGATOR_ITEM_ELEVATION_HPP
+#ifndef PROJECT_NAVIGATOR_ITEM_INTENSITY_HPP
+#define PROJECT_NAVIGATOR_ITEM_INTENSITY_HPP
 
 #include <Editor.hpp>
 #include <ProjectNavigatorItem.hpp>
-#include <Range.hpp>
 
 class MainWindow;
-class RangeSliderWidget;
 
-/** Project Navigator Elevation. */
-class ProjectNavigatorItemElevation : public ProjectNavigatorItem
+/** Project Navigator Intensity. */
+class ProjectNavigatorItemIntensity : public ProjectNavigatorItem
 {
     Q_OBJECT
 
 public:
-    ProjectNavigatorItemElevation(MainWindow *mainWindow,
+    ProjectNavigatorItemIntensity(MainWindow *mainWindow,
                                   const QIcon &icon,
                                   const QString &text);
 
     virtual bool hasColorSource() const { return true; }
     virtual SettingsView::ColorSource colorSource() const
     {
-        return SettingsView::COLOR_SOURCE_ELEVATION;
+        return SettingsView::COLOR_SOURCE_INTENSITY;
     }
 
-    virtual bool hasFilter() const { return true; }
-
-public slots:
-    void slotUpdate(const QSet<Editor::Type> &target);
-
-    void slotRangeIntermediateMinimumValue();
-    void slotRangeIntermediateMaximumValue();
+    virtual bool hasFilter() const { return false; }
 
 protected:
-    RangeSliderWidget *rangeInput_;
-    Range<double> elevationRange_;
-
-    void elevationInputChanged();
 };
 
-#endif /* PROJECT_NAVIGATOR_ITEM_ELEVATION_HPP */
+#endif /* PROJECT_NAVIGATOR_ITEM_INTENSITY_HPP */

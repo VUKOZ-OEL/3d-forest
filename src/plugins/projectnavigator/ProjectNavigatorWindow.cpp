@@ -22,10 +22,13 @@
 #include <MainWindow.hpp>
 #include <ProjectNavigatorItemClassifications.hpp>
 #include <ProjectNavigatorItemClipping.hpp>
+#include <ProjectNavigatorItemColor.hpp>
 #include <ProjectNavigatorItemDescriptor.hpp>
 #include <ProjectNavigatorItemElevation.hpp>
 #include <ProjectNavigatorItemFiles.hpp>
+#include <ProjectNavigatorItemIntensity.hpp>
 #include <ProjectNavigatorItemLayers.hpp>
+#include <ProjectNavigatorItemReturnNumber.hpp>
 #include <ProjectNavigatorTree.hpp>
 #include <ProjectNavigatorWindow.hpp>
 #include <ThemeIcon.hpp>
@@ -37,33 +40,48 @@ ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
       mainWindow_(mainWindow)
 {
     // Tab
-    classifications_ =
+    items_.push_back(
+        new ProjectNavigatorItemFiles(mainWindow_, ICON("file"), tr("Files")));
+
+    items_.push_back(new ProjectNavigatorItemLayers(mainWindow_,
+                                                    ICON("layers"),
+                                                    tr("Layers")));
+
+    items_.push_back(
         new ProjectNavigatorItemClassifications(mainWindow_,
                                                 ICON("classification"),
-                                                tr("Classifications"));
-    clipping_ = new ProjectNavigatorItemClipping(mainWindow_,
-                                                 ICON("clip_filter"),
-                                                 tr("Clip filter"));
-    descriptor_ = new ProjectNavigatorItemDescriptor(mainWindow_,
-                                                     ICON("descriptor_filter"),
-                                                     tr("Descriptor"));
-    elevation_ = new ProjectNavigatorItemElevation(mainWindow_,
-                                                   ICON("elevation_filter"),
-                                                   tr("Elevation"));
-    files_ =
-        new ProjectNavigatorItemFiles(mainWindow_, ICON("file"), tr("Files"));
-    layers_ = new ProjectNavigatorItemLayers(mainWindow_,
-                                             ICON("layers"),
-                                             tr("Layers"));
+                                                tr("Classifications")));
+
+    items_.push_back(
+        new ProjectNavigatorItemColor(mainWindow_, ICON("color"), tr("Color")));
+
+    items_.push_back(new ProjectNavigatorItemIntensity(mainWindow_,
+                                                       ICON("intensity"),
+                                                       tr("Intensity")));
+
+    items_.push_back(new ProjectNavigatorItemReturnNumber(mainWindow_,
+                                                          ICON("return_number"),
+                                                          tr("Return number")));
+
+    items_.push_back(new ProjectNavigatorItemElevation(mainWindow_,
+                                                       ICON("elevation_filter"),
+                                                       tr("Elevation")));
+
+    items_.push_back(
+        new ProjectNavigatorItemDescriptor(mainWindow_,
+                                           ICON("descriptor_filter"),
+                                           tr("Descriptor")));
+
+    items_.push_back(new ProjectNavigatorItemClipping(mainWindow_,
+                                                      ICON("clip_filter"),
+                                                      tr("Clip filter")));
 
     // Tabs
     menu_ = new ProjectNavigatorTree(mainWindow_);
-    menu_->addItem(files_);
-    menu_->addItem(layers_);
-    menu_->addItem(classifications_);
-    menu_->addItem(elevation_);
-    menu_->addItem(descriptor_);
-    menu_->addItem(clipping_);
+    for (size_t i = 0; i < items_.size(); i++)
+    {
+        menu_->addItem(items_[i]);
+    }
 
     // Dock
     setWidget(menu_);

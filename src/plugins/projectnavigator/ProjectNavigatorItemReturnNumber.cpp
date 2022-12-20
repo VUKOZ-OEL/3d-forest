@@ -17,29 +17,20 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ExportFileLas.hpp */
+/** @file ProjectNavigatorItemReturnNumber.cpp */
 
-#ifndef EXPORT_FILE_LAS_HPP
-#define EXPORT_FILE_LAS_HPP
+#include <MainWindow.hpp>
+#include <ProjectNavigatorItemReturnNumber.hpp>
 
-#include <ExportFileInterface.hpp>
-#include <LasFile.hpp>
-#include <Query.hpp>
+#include <QVBoxLayout>
 
-/** Export File in LAS (LASer) File Format. */
-class ExportFileLas : public ExportFileInterface
+ProjectNavigatorItemReturnNumber::ProjectNavigatorItemReturnNumber(
+    MainWindow *mainWindow,
+    const QIcon &icon,
+    const QString &text)
+    : ProjectNavigatorItem(mainWindow, icon, text)
 {
-public:
-    ExportFileLas();
-    virtual ~ExportFileLas();
-
-    virtual bool isOpen() { return file_.file().isOpen(); }
-    virtual void create(const std::string &path);
-    virtual void write(Query &query);
-    virtual void close();
-
-private:
-    LasFile file_;
-};
-
-#endif /* EXPORT_FILE_LAS_HPP */
+    // Layout
+    mainLayout_->addStretch();
+    setLayout(mainLayout_);
+}
