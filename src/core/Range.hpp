@@ -59,9 +59,15 @@ public:
     // Is minimumValue at minimum and maximumValue at maximum?
     bool hasBoundaryValues() const;
 
+    void setEnabled(bool enabled) { enabled_ = enabled; }
+    bool isEnabled() const { return enabled_; }
+
     // I/O
     void read(const Json &in);
     Json &write(Json &out) const;
+
+private:
+    bool enabled_;
 };
 
 template <class T> inline Range<T>::Range()
@@ -79,6 +85,7 @@ template <class T> inline void Range<T>::clear()
     this->operator[](1) = 0;
     this->operator[](2) = 0;
     this->operator[](3) = 0;
+    enabled_ = true;
 }
 
 template <class T> inline bool Range<T>::hasBoundaryValues() const

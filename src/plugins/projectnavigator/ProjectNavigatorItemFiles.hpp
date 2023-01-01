@@ -49,6 +49,8 @@ public:
     }
 
     virtual bool hasFilter() const { return true; }
+    virtual bool isFilterEnabled() const;
+    virtual void setFilterEnabled(bool b);
 
 public slots:
     void slotUpdate(const QSet<Editor::Type> &target);
@@ -84,15 +86,18 @@ protected:
     QToolButton *selectInvertButton_;
     QToolButton *selectNoneButton_;
     Datasets datasets_;
+    QueryFilterSet filter_;
+    bool updatesEnabled_;
 
     void dataChanged();
     void filterChanged();
 
+    size_t identifier(const QTreeWidgetItem *item);
     size_t index(const QTreeWidgetItem *item);
     void updateTree();
     void block();
     void unblock();
-    void addItem(size_t i);
+    void addTreeItem(size_t index);
 
     void setDatasets(const Datasets &datasets);
 };

@@ -67,6 +67,7 @@ public:
     // Classifications
     const Classifications &classifications() const { return classifications_; }
     void setClassifications(const Classifications &classifications);
+    void setClassificationsFilter(const QueryFilterSet &filter);
 
     // Clip filter
     const Region &clipFilter() const { return clipFilter_; }
@@ -87,10 +88,12 @@ public:
     // Data sets
     const Datasets &datasets() const { return datasets_; }
     void setDatasets(const Datasets &datasets);
+    void setDatasetsFilter(const QueryFilterSet &filter);
 
     // Layers
     const Layers &layers() const { return layers_; }
     void setLayers(const Layers &layers);
+    void setLayersFilter(const QueryFilterSet &filter);
 
     // Voxels
     const Voxels &voxels() const { return voxels_; }

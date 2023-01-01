@@ -19,36 +19,14 @@
 
 /** @file Datasets.cpp */
 
-#include <unordered_set>
-
 #include <Datasets.hpp>
 #include <Log.hpp>
+
+#define MODULE_NAME "Datasets"
 
 Datasets::Datasets()
 {
     clear();
-}
-
-void Datasets::setEnabled(size_t i, bool b)
-{
-    datasets_[i].setEnabled(b);
-}
-
-void Datasets::setEnabledAll(bool b)
-{
-    for (size_t i = 0; i < datasets_.size(); i++)
-    {
-        datasets_[i].setEnabled(b);
-    }
-}
-
-void Datasets::setInvertAll()
-{
-    for (size_t i = 0; i < datasets_.size(); i++)
-    {
-        bool b = !datasets_[i].isEnabled();
-        datasets_[i].setEnabled(b);
-    }
 }
 
 void Datasets::setLabel(size_t i, const std::string &label)
@@ -66,31 +44,79 @@ void Datasets::setTranslation(size_t i, const Vector3<double> &translation)
     datasets_[i].setTranslation(translation);
 }
 
+Box<double> Datasets::boundary(const QueryFilterSet &datasetFilter) const
+{
+    Box<double> box;
+
+    box.clear();
+
+    for (auto const &it : datasets_)
+    {
+        if (datasetFilter.contains(it.id()))
+        {
+            box.extend(it.boundary());
+        }
+    }
+
+    return box;
+}
+
+void Datasets::updateBoundary()
+{
+    boundary_.clear();
+
+    for (auto const &it : datasets_)
+    {
+        boundary_.extend(it.boundary());
+    }
+}
+
+uint64_t Datasets::nPoints() const
+{
+    uint64_t n = 0;
+
+    for (auto const &it : datasets_)
+    {
+        n += it.nPoints();
+    }
+
+    return n;
+}
+
+uint64_t Datasets::nPoints(const QueryFilterSet &datasetFilter) const
+{
+    uint64_t n = 0;
+
+    for (auto const &it : datasets_)
+    {
+        if (datasetFilter.contains(it.id()))
+        {
+            n += it.nPoints();
+        }
+    }
+
+    return n;
+}
+
+void Datasets::selectPages(const QueryFilterSet &datasetFilter,
+                           const Box<double> &box,
+                           std::vector<IndexFile::Selection> &selected) const
+{
+    for (auto const &it : datasets_)
+    {
+        if (datasetFilter.contains(it.id()))
+        {
+            it.index().selectNodes(selected, box, it.id());
+        }
+    }
+}
+
 void Datasets::clear()
 {
     datasets_.resize(0);
     hashTable_.clear();
+    datasetsIds_.clear();
     boundary_.clear();
-}
-
-void Datasets::erase(size_t i)
-{
-    if (datasets_.size() > 0)
-    {
-        size_t n = datasets_.size() - 1;
-        for (size_t pos = i; pos < n; pos++)
-        {
-            datasets_[pos] = datasets_[pos + 1];
-        }
-        datasets_.resize(n);
-
-        hashTable_.clear();
-        n = datasets_.size();
-        for (size_t pos = 0; pos < n; pos++)
-        {
-            hashTable_[datasets_[pos].id()] = pos;
-        }
-    }
 }
 
 size_t Datasets::unusedId() const
@@ -107,43 +133,28 @@ size_t Datasets::unusedId() const
     THROW("New data set identifier is not available.");
 }
 
-void Datasets::updateBoundary()
+void Datasets::erase(size_t i)
 {
-    boundary_.clear();
-
-    for (auto const &it : datasets_)
+    if (datasets_.size() == 0)
     {
-        if (it.isEnabled())
-        {
-            boundary_.extend(it.boundary());
-        }
-    }
-}
-
-uint64_t Datasets::nPoints() const
-{
-    uint64_t n = 0;
-
-    for (auto const &it : datasets_)
-    {
-        if (it.isEnabled())
-        {
-            n += it.nPoints();
-        }
+        return;
     }
 
-    return n;
-}
+    size_t key = id(i);
+    datasetsIds_.erase(key);
 
-void Datasets::select(std::vector<IndexFile::Selection> &selected,
-                      const Box<double> &box) const
-{
-    for (auto const &it : datasets_)
+    size_t n = datasets_.size() - 1;
+    for (size_t pos = i; pos < n; pos++)
     {
-        if (it.isEnabled())
-        {
-            it.index().selectNodes(selected, box, it.id());
-        }
+        datasets_[pos] = datasets_[pos + 1];
+    }
+    datasets_.resize(n);
+
+    hashTable_.clear();
+    n = datasets_.size();
+    for (size_t pos = 0; pos < n; pos++)
+    {
+        hashTable_[datasets_[pos].id()] = pos;
     }
 }
 
@@ -159,6 +170,7 @@ void Datasets::read(const std::string &path,
 
     hashTable_[id] = datasets_.size();
     datasets_.push_back(ds);
+    datasetsIds_.insert(id);
 
     updateBoundary();
 }
@@ -177,6 +189,7 @@ void Datasets::read(const Json &in, const std::string &projectPath)
     {
         datasets_[i].read(it, projectPath);
         hashTable_[datasets_[i].id()] = i;
+        datasetsIds_.insert(datasets_[i].id());
         i++;
     }
 }

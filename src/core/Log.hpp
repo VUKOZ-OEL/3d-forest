@@ -46,6 +46,8 @@
 
 #define LOG_UPDATE_VIEW(module, msg)
 //#define LOG_UPDATE_VIEW(module, msg) LOG_MODULE(module, msg)
+#define LOG_FILTER(module, msg)
+//#define LOG_FILTER(module, msg) LOG_MODULE(module, msg)
 
 template <typename T>
 inline std::ostream &operator<<(std::ostream &os, std::unordered_set<T> vec)

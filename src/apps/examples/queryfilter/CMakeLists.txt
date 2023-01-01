@@ -15,23 +15,17 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-if(NOT BUILD_EXAMPLES)
-    message(STATUS "BUILD_EXAMPLES not set - skipping examples")
-    return()
-endif()
+set(SUB_PROJECT_NAME "3DForestExampleQueryFilter")
 
-add_subdirectory(colorpalette)
-add_subdirectory(editor)
-add_subdirectory(eigen)
-add_subdirectory(file)
-add_subdirectory(filesize)
-add_subdirectory(image)
-add_subdirectory(lascreate)
-add_subdirectory(meshdistance)
-add_subdirectory(pca)
-add_subdirectory(query)
-add_subdirectory(queryfilter)
-add_subdirectory(queryvoxels)
-add_subdirectory(thread)
-add_subdirectory(vector3)
-add_subdirectory(voxels)
+add_executable(
+    ${SUB_PROJECT_NAME}
+    exampleQueryFilter.cpp
+)
+
+target_link_libraries(
+    ${SUB_PROJECT_NAME}
+    PUBLIC
+    3DForestEditor
+)
+
+install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

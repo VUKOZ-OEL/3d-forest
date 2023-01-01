@@ -36,9 +36,6 @@ public:
 
     size_t id() const { return id_; }
 
-    bool isEnabled() const { return enabled_; }
-    void setEnabled(bool b);
-
     const std::string &label() const { return label_; }
     void setLabel(const std::string &label);
 
@@ -74,7 +71,6 @@ protected:
     // Stored
     size_t id_;
     std::string label_; /**< Inconsistent with LAS in shared projects */
-    bool enabled_;
     Vector3<float> color_;
     std::string pathUnresolved_;
     std::string dateCreated_; /**< Inconsistent with LAS in shared projects */

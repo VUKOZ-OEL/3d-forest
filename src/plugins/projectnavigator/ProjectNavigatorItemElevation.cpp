@@ -94,3 +94,14 @@ void ProjectNavigatorItemElevation::elevationInputChanged()
     mainWindow_->editor().setElevationRange(elevationRange_);
     mainWindow_->updateFilter();
 }
+
+bool ProjectNavigatorItemElevation::isFilterEnabled() const
+{
+    return elevationRange_.isEnabled();
+}
+
+void ProjectNavigatorItemElevation::setFilterEnabled(bool b)
+{
+    elevationRange_.setEnabled(b);
+    elevationInputChanged();
+}

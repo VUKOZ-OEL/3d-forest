@@ -23,9 +23,11 @@
 #define DATASETS_HPP
 
 #include <unordered_map>
+#include <unordered_set>
 
 #include <Dataset.hpp>
 #include <ExportEditor.hpp>
+#include <QueryFilterSet.hpp>
 
 /** Dataset List. */
 class EXPORT_EDITOR Datasets
@@ -36,6 +38,9 @@ public:
     void clear();
 
     size_t size() const { return datasets_.size(); }
+
+    const std::unordered_set<size_t> &idList() const { return datasetsIds_; }
+
     const Dataset &at(size_t i) const { return datasets_[i]; }
     const Dataset &key(size_t id) const
     {
@@ -52,11 +57,6 @@ public:
     size_t id(size_t i) const { return datasets_[i].id(); }
     size_t index(size_t id) { return hashTable_[id]; }
     size_t unusedId() const;
-
-    bool isEnabled(size_t i) const { return datasets_[i].isEnabled(); }
-    void setEnabled(size_t i, bool b);
-    void setEnabledAll(bool b);
-    void setInvertAll();
 
     const std::string &label(size_t i) const { return datasets_[i].label(); }
     void setLabel(size_t i, const std::string &label);
@@ -90,12 +90,15 @@ public:
     }
 
     const Box<double> &boundary() const { return boundary_; }
+    Box<double> boundary(const QueryFilterSet &datasetFilter) const;
     void updateBoundary();
 
     uint64_t nPoints() const;
+    uint64_t nPoints(const QueryFilterSet &datasetFilter) const;
 
-    void select(std::vector<IndexFile::Selection> &selected,
-                const Box<double> &box) const;
+    void selectPages(const QueryFilterSet &datasetFilter,
+                     const Box<double> &box,
+                     std::vector<IndexFile::Selection> &selected) const;
 
     void read(const std::string &path,
               const std::string &projectPath,
@@ -106,6 +109,7 @@ public:
 
 protected:
     std::vector<Dataset> datasets_;
+    std::unordered_set<size_t> datasetsIds_;
     std::unordered_map<size_t, size_t> hashTable_;
     Box<double> boundary_;
 };

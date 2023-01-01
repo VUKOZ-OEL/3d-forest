@@ -23,7 +23,6 @@
 #define LAYERS_HPP
 
 #include <unordered_map>
-#include <unordered_set>
 
 #include <ExportEditor.hpp>
 #include <Layer.hpp>
@@ -36,9 +35,6 @@ public:
 
     void clear();
     void setDefault();
-
-    bool isEnabled() const { return enabled_; }
-    void setEnabled(bool b);
 
     size_t size() const { return layers_.size(); }
     const Layer &at(size_t i) const { return layers_[i]; }
@@ -59,19 +55,6 @@ public:
 
     size_t unusedId() const;
 
-    bool isEnabledId(size_t id) const
-    {
-        return hashTableEnabledId_.find(id) != hashTableEnabledId_.end();
-    }
-    bool isEnabled(size_t i) const { return layers_[i].isEnabled(); }
-    const std::unordered_set<size_t> &enabledList() const
-    {
-        return hashTableEnabledId_;
-    }
-    void setEnabled(size_t i, bool b);
-    void setEnabledAll(bool b);
-    void setInvertAll();
-
     const std::string &label(size_t i) const { return layers_[i].label(); }
     void setLabel(size_t i, const std::string &label);
 
@@ -84,8 +67,6 @@ public:
 protected:
     std::vector<Layer> layers_;
     std::unordered_map<size_t, size_t> hashTableId_;
-    std::unordered_set<size_t> hashTableEnabledId_;
-    bool enabled_;
 };
 
 #endif /* LAYERS_HPP */

@@ -22,24 +22,17 @@
 #include <Error.hpp>
 #include <Layer.hpp>
 
-Layer::Layer() : id_(0), enabled_(true)
+Layer::Layer() : id_(0)
 {
 }
 
 void Layer::set(size_t id,
                 const std::string &label,
-                bool enabled,
                 const Vector3<float> &color)
 {
     id_ = id;
     label_ = label;
-    enabled_ = enabled;
     color_ = color;
-}
-
-void Layer::setEnabled(bool b)
-{
-    enabled_ = b;
 }
 
 void Layer::setLabel(const std::string &label)
@@ -62,16 +55,6 @@ void Layer::read(const Json &in)
     // ID
     id_ = in["id"].uint32();
 
-    // Enabled
-    if (in.contains("enabled"))
-    {
-        enabled_ = in["enabled"].isTrue();
-    }
-    else
-    {
-        enabled_ = true;
-    }
-
     // Label
     if (in.contains("label"))
     {
@@ -93,7 +76,6 @@ Json &Layer::write(Json &out) const
 {
     out["id"] = id_;
     out["label"] = label_;
-    out["enabled"] = enabled_;
     color_.write(out["color"]);
 
     return out;

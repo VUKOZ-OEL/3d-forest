@@ -381,7 +381,7 @@ bool SegmentationThread::computeCreateVoxels()
 
         // Add reference to voxel item to each point inside this voxel.
         query_.where().setBox(cell);
-        query_.where().setClassification({LasFile::CLASS_UNASSIGNED});
+        // query_.where().setClassification({LasFile::CLASS_UNASSIGNED});
         query_.exec();
         while (query_.next())
         {
@@ -395,7 +395,7 @@ bool SegmentationThread::computeCreateVoxels()
 
             nPoints++;
         }
-        query_.where().setClassification({});
+        // query_.where().setClassification({});
 
         if (nPoints > 0)
         {
@@ -637,7 +637,7 @@ bool SegmentationThread::computeCreateLayers()
         for (size_t i = 0; i < nLayers; i++)
         {
             size_t id = i + 1; // main layer is id = 0
-            layer.set(id, "Layer " + std::to_string(id), true, pal[i % 32]);
+            layer.set(id, "Layer " + std::to_string(id), pal[i % 32]);
             layers.push_back(layer);
         }
     }

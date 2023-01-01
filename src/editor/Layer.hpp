@@ -33,15 +33,9 @@ class EXPORT_EDITOR Layer
 public:
     Layer();
 
-    void set(size_t id,
-             const std::string &label,
-             bool enabled,
-             const Vector3<float> &color);
+    void set(size_t id, const std::string &label, const Vector3<float> &color);
 
     size_t id() const { return id_; }
-
-    bool isEnabled() const { return enabled_; }
-    void setEnabled(bool b);
 
     const std::string &label() const { return label_; }
     void setLabel(const std::string &label);
@@ -60,16 +54,14 @@ protected:
     std::string label_;
     Vector3<float> color_;
     size_t id_;
-    bool enabled_;
 
     LayerData data_;
 };
 
 inline std::ostream &operator<<(std::ostream &os, const Layer &obj)
 {
-    return os << "id <" << obj.id() << "> label <" << obj.label()
-              << "> enabled <" << obj.isEnabled() << "> color <" << obj.color()
-              << ">";
+    return os << "id <" << obj.id() << "> label <" << obj.label() << "> color <"
+              << obj.color() << ">";
 }
 
 #endif /* LAYER_HPP */

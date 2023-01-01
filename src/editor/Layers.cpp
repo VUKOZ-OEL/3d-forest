@@ -26,7 +26,7 @@
 #define LOG_DEBUG_LOCAL(msg)
 //#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
-Layers::Layers() : enabled_(false)
+Layers::Layers()
 {
     setDefault();
 }
@@ -36,7 +36,6 @@ void Layers::clear()
     LOG_DEBUG_LOCAL("");
     layers_.clear();
     hashTableId_.clear();
-    hashTableEnabledId_.clear();
 }
 
 void Layers::setDefault()
@@ -46,18 +45,10 @@ void Layers::setDefault()
     size_t idx = 0;
 
     layers_.resize(1);
-    layers_[idx].set(id, "main", true, {1.0F, 1.0F, 1.0F});
+    layers_[idx].set(id, "main", {1.0F, 1.0F, 1.0F});
 
     hashTableId_.clear();
     hashTableId_[id] = idx;
-
-    hashTableEnabledId_.clear();
-    hashTableEnabledId_.insert(id);
-}
-
-void Layers::setEnabled(bool b)
-{
-    enabled_ = b;
 }
 
 void Layers::push_back(const Layer &layer)
@@ -69,12 +60,6 @@ void Layers::push_back(const Layer &layer)
     layers_.push_back(layer);
 
     hashTableId_[id] = idx;
-
-    if (layer.isEnabled())
-    {
-        hashTableEnabledId_.insert(id);
-        LOG_DEBUG_LOCAL("enabled <" << hashTableEnabledId_ << ">");
-    }
 }
 
 void Layers::erase(size_t i)
@@ -88,7 +73,6 @@ void Layers::erase(size_t i)
 
     size_t key = id(i);
     hashTableId_.erase(key);
-    hashTableEnabledId_.erase(key);
 
     size_t n = layers_.size() - 1;
     for (size_t pos = i; pos < n; pos++)
@@ -114,54 +98,6 @@ size_t Layers::unusedId() const
     THROW("New layer identifier is not available.");
 }
 
-void Layers::setEnabledAll(bool b)
-{
-    LOG_DEBUG_LOCAL("enable <" << b << ">");
-    for (size_t i = 0; i < layers_.size(); i++)
-    {
-        layers_[i].setEnabled(b);
-    }
-
-    hashTableEnabledId_.clear();
-    if (b)
-    {
-        for (size_t i = 0; i < layers_.size(); i++)
-        {
-            hashTableEnabledId_.insert(layers_[i].id());
-        }
-    }
-}
-
-void Layers::setInvertAll()
-{
-    LOG_DEBUG_LOCAL("");
-    hashTableEnabledId_.clear();
-    for (size_t i = 0; i < layers_.size(); i++)
-    {
-        bool b = !layers_[i].isEnabled();
-        layers_[i].setEnabled(b);
-        if (b)
-        {
-            hashTableEnabledId_.insert(layers_[i].id());
-        }
-    }
-}
-
-void Layers::setEnabled(size_t i, bool b)
-{
-    LOG_DEBUG_LOCAL("index <" << i << "> enable <" << b << ">");
-    layers_[i].setEnabled(b);
-
-    if (b)
-    {
-        hashTableEnabledId_.insert(layers_[i].id());
-    }
-    else
-    {
-        hashTableEnabledId_.erase(layers_[i].id());
-    }
-}
-
 void Layers::setLabel(size_t i, const std::string &label)
 {
     LOG_DEBUG_LOCAL("index <" << i << "> label <" << label << ">");
@@ -180,15 +116,6 @@ void Layers::read(const Json &in)
 
     clear();
 
-    if (in.contains("enabled"))
-    {
-        enabled_ = in["enabled"].isTrue();
-    }
-    else
-    {
-        enabled_ = true;
-    }
-
     if (in.contains("layers"))
     {
         size_t i = 0;
@@ -204,11 +131,6 @@ void Layers::read(const Json &in)
 
             hashTableId_[id] = i;
 
-            if (layers_[i].isEnabled())
-            {
-                hashTableEnabledId_.insert(id);
-            }
-
             i++;
         }
     }
@@ -223,8 +145,6 @@ void Layers::read(const Json &in)
 Json &Layers::write(Json &out) const
 {
     LOG_DEBUG_LOCAL("");
-
-    out["enabled"] = enabled_;
 
     size_t i = 0;
 

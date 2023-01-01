@@ -49,26 +49,34 @@ void Query::exec()
 
     if (!where().box().empty())
     {
-        editor_->datasets().select(selectedPages_, where().box());
+        editor_->datasets().selectPages(where_.dataset(),
+                                        where().box(),
+                                        selectedPages_);
         selected = true;
     }
 
     if (!where().cone().empty())
     {
-        editor_->datasets().select(selectedPages_, where().cone().box());
+        editor_->datasets().selectPages(where_.dataset(),
+                                        where().cone().box(),
+                                        selectedPages_);
         selected = true;
     }
 
     if (!where().sphere().empty())
     {
         LOG_DEBUG_LOCAL("sphere <" << where().sphere().box() << ">");
-        editor_->datasets().select(selectedPages_, where().sphere().box());
+        editor_->datasets().selectPages(where_.dataset(),
+                                        where().sphere().box(),
+                                        selectedPages_);
         selected = true;
     }
 
     if (!selected)
     {
-        editor_->datasets().select(selectedPages_, editor_->clipBoundary());
+        editor_->datasets().selectPages(where_.dataset(),
+                                        editor_->clipBoundary(),
+                                        selectedPages_);
     }
 
     reset();
@@ -119,6 +127,7 @@ void Query::addResults(size_t n)
 bool Query::nextPage()
 {
     LOG_DEBUG_LOCAL("");
+    LOG_FILTER(MODULE_NAME, "pages<" << selectedPages_.size() << ">");
 
     // Reset point index within active page.
     pagePointIndex_ = 0;
@@ -190,7 +199,7 @@ void Query::flush()
     {
         if (lru_[i]->isModified())
         {
-            lru_[i]->write();
+            lru_[i]->writePage();
         }
     }
 }
@@ -205,6 +214,8 @@ void Query::setState(Page::State state)
 
 bool Query::nextState()
 {
+    LOG_FILTER(MODULE_NAME, "lru<" << lru_.size() << ">");
+
     for (size_t i = 0; i < lru_.size(); i++)
     {
         bool finished = lru_[i]->nextState();
@@ -230,12 +241,20 @@ void Query::applyCamera(const Camera &camera)
 
     std::multimap<double, Key> queue;
 
-    for (size_t i = 0; i < editor_->datasets().size(); i++)
+    if (where().dataset().isFilterEnabled())
     {
-        const Dataset &db = editor_->datasets().at(i);
-        if (db.isEnabled())
+        const std::unordered_set<size_t> &idList = where().dataset().filter();
+        for (auto const &it : idList)
         {
-            queue.insert({0, {db.id(), 0}});
+            queue.insert({0, {it, 0}});
+        }
+    }
+    else
+    {
+        const std::unordered_set<size_t> &idList = editor_->datasets().idList();
+        for (auto const &it : idList)
+        {
+            queue.insert({0, {it, 0}});
         }
     }
 
@@ -355,7 +374,7 @@ void Query::setGrid(size_t pointsPerCell, double cellLengthMinPct)
     LOG_DEBUG_LOCAL("");
 
     // Calculate grid cell size.
-    uint64_t pointsPerArea = editor_->datasets().nPoints();
+    uint64_t pointsPerArea = editor_->datasets().nPoints(where().dataset());
     Box<double> boundary = editor_->boundary();
     double area = boundary.length(0) * boundary.length(1);
 
@@ -633,7 +652,7 @@ std::shared_ptr<Page> Query::read(size_t dataset, size_t index)
                 idx = lru_.size() - 1;
                 if (lru_[idx]->isModified())
                 {
-                    lru_[idx]->write();
+                    lru_[idx]->writePage();
                 }
                 Key nkrm = {lru_[idx]->datasetId(), lru_[idx]->pageId()};
                 cache_.erase(nkrm);
@@ -658,7 +677,8 @@ std::shared_ptr<Page> Query::read(size_t dataset, size_t index)
 
         try
         {
-            result->read();
+            LOG_FILTER(MODULE_NAME, "pageId<" << nk.pageId << ">");
+            result->readPage();
         }
         catch (...)
         {

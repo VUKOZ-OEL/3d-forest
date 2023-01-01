@@ -27,13 +27,8 @@
 #include <LasFile.hpp>
 #include <Log.hpp>
 
-Dataset::Dataset() : id_(0), enabled_(true)
+Dataset::Dataset() : id_(0)
 {
-}
-
-void Dataset::setEnabled(bool b)
-{
-    enabled_ = b;
 }
 
 void Dataset::setLabel(const std::string &label)
@@ -63,7 +58,6 @@ void Dataset::read(size_t id,
 
     id_ = id;
     label_ = fileName_;
-    enabled_ = true;
     color_.set(1.0F, 1.0F, 1.0F);
 
     read();
@@ -120,16 +114,6 @@ void Dataset::read(const Json &in, const std::string &projectPath)
         label_ = fileName_;
     }
 
-    // Enabled
-    if (in.contains("enabled"))
-    {
-        enabled_ = in["enabled"].isTrue();
-    }
-    else
-    {
-        enabled_ = true;
-    }
-
     // Color
     if (in.contains("color"))
     {
@@ -161,7 +145,6 @@ Json &Dataset::write(Json &out) const
 {
     out["id"] = id_;
     out["label"] = label_;
-    out["enabled"] = enabled_;
     color_.write(out["color"]);
 
     out["path"] = pathUnresolved_;

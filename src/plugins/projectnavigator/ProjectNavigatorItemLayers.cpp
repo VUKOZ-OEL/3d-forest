@@ -35,6 +35,10 @@
 #include <QTreeWidgetItemIterator>
 #include <QVBoxLayout>
 
+#define MODULE_NAME "ProjectNavigatorItemLayers"
+#define LOG_DEBUG_LOCAL(msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+
 #define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
 ProjectNavigatorItemLayers::ProjectNavigatorItemLayers(MainWindow *mainWindow,
@@ -123,6 +127,7 @@ ProjectNavigatorItemLayers::ProjectNavigatorItemLayers(MainWindow *mainWindow,
     setLayout(mainLayout_);
 
     // Data
+    updatesEnabled_ = true;
     connect(mainWindow_,
             SIGNAL(signalUpdate(const QSet<Editor::Type> &)),
             this,
@@ -131,26 +136,38 @@ ProjectNavigatorItemLayers::ProjectNavigatorItemLayers(MainWindow *mainWindow,
 
 void ProjectNavigatorItemLayers::slotUpdate(const QSet<Editor::Type> &target)
 {
-    if (!target.empty() && !target.contains(Editor::TYPE_LAYER))
-    {
-        return;
-    }
+    LOG_FILTER(MODULE_NAME, "targets<" << target.size() << ">");
 
-    setLayers(mainWindow_->editor().layers());
+    if (target.empty() || target.contains(Editor::TYPE_LAYER))
+    {
+        setLayers(mainWindow_->editor().layers());
+    }
 }
 
 void ProjectNavigatorItemLayers::dataChanged()
 {
     mainWindow_->suspendThreads();
     mainWindow_->editor().setLayers(layers_);
+    mainWindow_->editor().setLayersFilter(filter_);
     mainWindow_->updateData();
 }
 
 void ProjectNavigatorItemLayers::filterChanged()
 {
     mainWindow_->suspendThreads();
-    mainWindow_->editor().setLayers(layers_);
+    mainWindow_->editor().setLayersFilter(filter_);
     mainWindow_->updateFilter();
+}
+
+bool ProjectNavigatorItemLayers::isFilterEnabled() const
+{
+    return filter_.isFilterEnabled();
+}
+
+void ProjectNavigatorItemLayers::setFilterEnabled(bool b)
+{
+    filter_.setFilterEnabled(b);
+    filterChanged();
 }
 
 void ProjectNavigatorItemLayers::slotAdd()
@@ -167,8 +184,8 @@ void ProjectNavigatorItemLayers::slotDelete()
 
         for (auto &item : items)
         {
-            size_t idx = index(item);
-            layers_.erase(idx);
+            layers_.erase(index(item));
+            filter_.erase(identifier(item));
 
             delete item;
         }
@@ -183,10 +200,12 @@ void ProjectNavigatorItemLayers::slotShow()
 
     if (items.count() > 0)
     {
+        updatesEnabled_ = false;
         for (auto &item : items)
         {
             item->setCheckState(COLUMN_CHECKED, Qt::Checked);
         }
+        updatesEnabled_ = true;
 
         filterChanged();
     }
@@ -198,10 +217,12 @@ void ProjectNavigatorItemLayers::slotHide()
 
     if (items.count() > 0)
     {
+        updatesEnabled_ = false;
         for (auto &item : items)
         {
             item->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
         }
+        updatesEnabled_ = true;
 
         filterChanged();
     }
@@ -269,11 +290,21 @@ void ProjectNavigatorItemLayers::slotItemChanged(QTreeWidgetItem *item,
 {
     if (column == COLUMN_CHECKED)
     {
+        size_t id = identifier(item);
         bool checked = (item->checkState(COLUMN_CHECKED) == Qt::Checked);
 
-        layers_.setEnabled(index(item), checked);
-        filterChanged();
+        filter_.setFilter(id, checked);
+
+        if (updatesEnabled_)
+        {
+            filterChanged();
+        }
     }
+}
+
+size_t ProjectNavigatorItemLayers::identifier(const QTreeWidgetItem *item)
+{
+    return static_cast<size_t>(item->text(COLUMN_ID).toULong());
 }
 
 size_t ProjectNavigatorItemLayers::index(const QTreeWidgetItem *item)
@@ -289,9 +320,9 @@ void ProjectNavigatorItemLayers::updateTree()
 
     while (*it)
     {
-        size_t idx = index(*it);
+        size_t id = identifier(*it);
 
-        if (layers_.isEnabled(idx))
+        if (filter_.hasFilter(id))
         {
             (*it)->setCheckState(COLUMN_CHECKED, Qt::Checked);
         }
@@ -326,11 +357,13 @@ void ProjectNavigatorItemLayers::unblock()
             SLOT(slotItemSelectionChanged()));
 }
 
-void ProjectNavigatorItemLayers::addItem(size_t i)
+void ProjectNavigatorItemLayers::addTreeItem(size_t index)
 {
     QTreeWidgetItem *item = new QTreeWidgetItem(tree_);
 
-    if (layers_.isEnabled(i))
+    size_t id = layers_.id(index);
+
+    if (filter_.hasFilter(id))
     {
         item->setCheckState(COLUMN_CHECKED, Qt::Checked);
     }
@@ -339,12 +372,12 @@ void ProjectNavigatorItemLayers::addItem(size_t i)
         item->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
     }
 
-    item->setText(COLUMN_ID, QString::number(layers_.id(i)));
+    item->setText(COLUMN_ID, QString::number(id));
 
-    item->setText(COLUMN_LABEL, QString::fromStdString(layers_.label(i)));
+    item->setText(COLUMN_LABEL, QString::fromStdString(layers_.label(index)));
 
     // Color legend
-    const Vector3<float> &rgb = layers_.color(i);
+    const Vector3<float> &rgb = layers_.color(index);
 
     QColor color;
     color.setRedF(rgb[0]);
@@ -372,7 +405,7 @@ void ProjectNavigatorItemLayers::setLayers(const Layers &layers)
     // Content
     for (size_t i = 0; i < layers_.size(); i++)
     {
-        addItem(i);
+        addTreeItem(i);
     }
 
     // Resize Columns to the minimum space
