@@ -26,6 +26,7 @@
 
 #include <Cone.hpp>
 #include <ExportEditor.hpp>
+#include <QueryFilterSet.hpp>
 #include <Range.hpp>
 #include <Sphere.hpp>
 
@@ -51,20 +52,35 @@ public:
     void setDescriptor(const Range<float> &descriptor);
     const Range<float> &descriptor() const { return descriptor_; }
 
+    void setDataset(const std::unordered_set<size_t> &list);
+    void setDataset(const QueryFilterSet &list);
+    const QueryFilterSet &dataset() const { return dataset_; }
+
     void setClassification(const std::unordered_set<size_t> &list);
-    const std::vector<int> &classification() const { return classification_; }
+    void setClassification(const QueryFilterSet &list);
+    const QueryFilterSet &classification() const { return classification_; }
+    const std::vector<int> &classificationArray() const
+    {
+        return classificationArray_;
+    }
 
     void setLayer(const std::unordered_set<size_t> &list);
-    const std::unordered_set<size_t> &layer() const { return layer_; }
+    void setLayer(const QueryFilterSet &list);
+    const QueryFilterSet &layer() const { return layer_; }
 
 private:
+    uint32_t filters_;
     Box<double> box_;
     Cone<double> cone_;
     Sphere<double> sphere_;
     Range<double> elevation_;
     Range<float> descriptor_;
-    std::vector<int> classification_;
-    std::unordered_set<size_t> layer_;
+    QueryFilterSet dataset_;
+    QueryFilterSet classification_;
+    std::vector<int> classificationArray_;
+    QueryFilterSet layer_;
+
+    void classificationsToArray();
 };
 
 #endif /* QUERY_WHERE_HPP */

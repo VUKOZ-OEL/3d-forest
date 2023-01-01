@@ -17,20 +17,34 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Class.hpp */
+/** @file exampleQueryFilter.cpp @brief Query filter example. */
 
-#ifndef CLASS_HPP
-#define CLASS_HPP
+#include <Editor.hpp>
+#include <Error.hpp>
+#include <Log.hpp>
+#include <QueryFilterSet.hpp>
 
-#include <string>
-
-#include <ExportEditor.hpp>
-
-/** Classification Class. */
-class EXPORT_EDITOR Class
+static void exampleQueryFilter()
 {
-public:
-    std::string label;
-};
+    QueryFilterSet set2({1, 3, 7});
 
-#endif /* CLASS_HPP */
+    for (size_t i = 0; i < 10; i++)
+    {
+        std::cout << i << " : " << set2.hasFilter(i) << std::endl;
+    }
+}
+
+int main()
+{
+    try
+    {
+        exampleQueryFilter();
+    }
+    catch (std::exception &e)
+    {
+        std::cerr << "error: " << e.what() << std::endl;
+        return 1;
+    }
+
+    return 0;
+}

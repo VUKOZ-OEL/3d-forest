@@ -133,8 +133,10 @@ void Page::resize(size_t n)
     selectedNodes_.reserve(64);
 }
 
-void Page::read()
+void Page::readPage()
 {
+    LOG_FILTER(MODULE_NAME, "pageId<" << pageId_ << ">");
+
     const Dataset &dataset = editor_->datasets().key(datasetId_);
     const IndexFile::Node *node = dataset.index().at(pageId_);
 
@@ -280,7 +282,7 @@ void Page::toPoint(uint8_t *ptr, size_t i, uint8_t fmt)
     htol64(ptr + pos + 16, static_cast<uint64_t>(value[i]));
 }
 
-void Page::write()
+void Page::writePage()
 {
     const Dataset &dataset = editor_->datasets().key(datasetId_);
     const IndexFile::Node *node = dataset.index().at(pageId_);
@@ -342,6 +344,7 @@ void Page::transform()
 void Page::queryWhere()
 {
     LOG_DEBUG_LOCAL("");
+    LOG_FILTER(MODULE_NAME, "pageId<" << pageId_ << ">");
 
     const Box<double> &clipBox = query_->where().box();
     const Cone<double> &clipCone = query_->where().cone();
@@ -413,7 +416,9 @@ bool Page::nextState()
     {
         try
         {
-            read();
+            LOG_FILTER(MODULE_NAME,
+                       "pageId<" << pageId_ << "> state<STATE_READ>");
+            readPage();
         }
         catch (std::exception &e)
         {
@@ -435,6 +440,8 @@ bool Page::nextState()
 
     if (state_ == Page::STATE_SELECT)
     {
+        LOG_FILTER(MODULE_NAME,
+                   "pageId<" << pageId_ << "> state<STATE_SELECT>");
         queryWhere();
         return false;
     }
@@ -460,6 +467,8 @@ void Page::queryWhereBox()
     {
         return;
     }
+
+    LOG_FILTER(MODULE_NAME, "pageId<" << pageId_ << ">");
 
     // Select octants
     selectedNodes_.resize(0);
@@ -604,6 +613,8 @@ void Page::queryWhereCone()
         return;
     }
 
+    LOG_FILTER(MODULE_NAME, "pageId<" << pageId_ << ">");
+
     // Select octants
     selectedNodes_.resize(0);
     octree.selectLeaves(selectedNodes_, clipCone.box(), datasetId_);
@@ -684,6 +695,8 @@ void Page::queryWhereSphere()
         return;
     }
 
+    LOG_FILTER(MODULE_NAME, "pageId<" << pageId_ << ">");
+
     // Select octants
     selectedNodes_.resize(0);
     octree.selectLeaves(selectedNodes_, clipSphere.box(), datasetId_);
@@ -760,10 +773,13 @@ void Page::queryWhereElevation()
 {
     const Range<double> &elevationRange = query_->where().elevation();
 
-    if (elevationRange.hasBoundaryValues())
+    if (elevationRange.isEnabled() == false ||
+        elevationRange.hasBoundaryValues())
     {
         return;
     }
+
+    LOG_FILTER(MODULE_NAME, "pageId<" << pageId_ << ">");
 
     size_t nSelectedNew = 0;
 
@@ -791,10 +807,13 @@ void Page::queryWhereDescriptor()
 {
     const Range<float> &descriptorRange = query_->where().descriptor();
 
-    if (descriptorRange.hasBoundaryValues())
+    if (descriptorRange.isEnabled() == false ||
+        descriptorRange.hasBoundaryValues())
     {
         return;
     }
+
+    LOG_FILTER(MODULE_NAME, "pageId<" << pageId_ << ">");
 
     size_t nSelectedNew = 0;
 
@@ -820,13 +839,15 @@ void Page::queryWhereDescriptor()
 
 void Page::queryWhereClassification()
 {
-    const std::vector<int> &classifications = query_->where().classification();
-
-    if (classifications.empty())
+    if (!query_->where().classification().isFilterEnabled())
     {
         return;
     }
 
+    const std::vector<int> &classifications =
+        query_->where().classificationArray();
+
+    LOG_FILTER(MODULE_NAME, "pageId<" << pageId_ << ">");
     LOG_DEBUG_LOCAL("query classifications <" << classifications << ">");
 
     size_t nSelectedNew = 0;
@@ -853,13 +874,14 @@ void Page::queryWhereClassification()
 
 void Page::queryWhereLayer()
 {
-    const std::unordered_set<size_t> &layers = query_->where().layer();
-
-    if (layers.empty())
+    if (!query_->where().layer().isFilterEnabled())
     {
         return;
     }
 
+    const std::unordered_set<size_t> &layers = query_->where().layer().filter();
+
+    LOG_FILTER(MODULE_NAME, "pageId<" << pageId_ << ">");
     LOG_DEBUG_LOCAL("query layers <" << layers.size() << ">");
 
     size_t nSelectedNew = 0;

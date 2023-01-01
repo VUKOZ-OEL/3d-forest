@@ -30,6 +30,7 @@ static void exampleQueryVoxels(const std::string &path, double voxelSize)
 {
     std::unordered_set<size_t> classifications;
     classifications.insert(LasFile::Classification::CLASS_UNASSIGNED);
+    std::unordered_set<size_t> empty;
 
     Editor db;
     db.open(path);
@@ -52,7 +53,7 @@ static void exampleQueryVoxels(const std::string &path, double voxelSize)
                       << "]" << std::endl;
             // clang-format on
         }
-        query.where().setClassification({});
+        query.where().setClassification(empty);
     }
 }
 

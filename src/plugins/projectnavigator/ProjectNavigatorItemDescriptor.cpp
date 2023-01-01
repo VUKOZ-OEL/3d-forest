@@ -99,3 +99,13 @@ void ProjectNavigatorItemDescriptor::descriptorInputChanged()
     mainWindow_->editor().setDescriptorRange(descriptorRange_);
     mainWindow_->updateFilter();
 }
+bool ProjectNavigatorItemDescriptor::isFilterEnabled() const
+{
+    return descriptorRange_.isEnabled();
+}
+
+void ProjectNavigatorItemDescriptor::setFilterEnabled(bool b)
+{
+    descriptorRange_.setEnabled(b);
+    descriptorInputChanged();
+}

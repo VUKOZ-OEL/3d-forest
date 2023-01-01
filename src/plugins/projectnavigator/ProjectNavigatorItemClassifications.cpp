@@ -34,6 +34,10 @@
 #include <QTreeWidgetItemIterator>
 #include <QVBoxLayout>
 
+#define MODULE_NAME "ProjectNavigatorItemClassifications"
+#define LOG_DEBUG_LOCAL(msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+
 #define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
 ProjectNavigatorItemClassifications::ProjectNavigatorItemClassifications(
@@ -105,6 +109,7 @@ ProjectNavigatorItemClassifications::ProjectNavigatorItemClassifications(
     setLayout(mainLayout_);
 
     // Data
+    updatesEnabled_ = true;
     connect(mainWindow_,
             SIGNAL(signalUpdate(const QSet<Editor::Type> &)),
             this,
@@ -114,36 +119,37 @@ ProjectNavigatorItemClassifications::ProjectNavigatorItemClassifications(
 void ProjectNavigatorItemClassifications::slotUpdate(
     const QSet<Editor::Type> &target)
 {
-    if (!target.empty() && !target.contains(Editor::TYPE_CLASSIFICATION))
-    {
-        return;
-    }
+    LOG_FILTER(MODULE_NAME, "targets<" << target.size() << ">");
 
-    setClassifications(mainWindow_->editor().classifications());
+    if (target.empty() || target.contains(Editor::TYPE_CLASSIFICATION))
+    {
+        setClassifications(mainWindow_->editor().classifications());
+    }
 }
 
 void ProjectNavigatorItemClassifications::dataChanged()
 {
     mainWindow_->suspendThreads();
     mainWindow_->editor().setClassifications(classifications_);
+    mainWindow_->editor().setClassificationsFilter(filter_);
     mainWindow_->updateData();
 }
 
 void ProjectNavigatorItemClassifications::filterChanged()
 {
     mainWindow_->suspendThreads();
-    mainWindow_->editor().setClassifications(classifications_);
+    mainWindow_->editor().setClassificationsFilter(filter_);
     mainWindow_->updateFilter();
 }
 
 bool ProjectNavigatorItemClassifications::isFilterEnabled() const
 {
-    return classifications_.isEnabled();
+    return filter_.isFilterEnabled();
 }
 
 void ProjectNavigatorItemClassifications::setFilterEnabled(bool b)
 {
-    classifications_.setEnabled(b);
+    filter_.setFilterEnabled(b);
     filterChanged();
 }
 
@@ -153,10 +159,12 @@ void ProjectNavigatorItemClassifications::slotShow()
 
     if (items.count() > 0)
     {
+        updatesEnabled_ = false;
         for (auto &item : items)
         {
             item->setCheckState(COLUMN_CHECKED, Qt::Checked);
         }
+        updatesEnabled_ = true;
 
         filterChanged();
     }
@@ -168,10 +176,12 @@ void ProjectNavigatorItemClassifications::slotHide()
 
     if (items.count() > 0)
     {
+        updatesEnabled_ = false;
         for (auto &item : items)
         {
             item->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
         }
+        updatesEnabled_ = true;
 
         filterChanged();
     }
@@ -237,12 +247,22 @@ void ProjectNavigatorItemClassifications::slotItemChanged(QTreeWidgetItem *item,
 {
     if (column == COLUMN_CHECKED)
     {
-        size_t id = item->text(COLUMN_ID).toULong();
+        size_t id = identifier(item);
         bool checked = (item->checkState(COLUMN_CHECKED) == Qt::Checked);
 
-        classifications_.setEnabled(id, checked);
-        filterChanged();
+        filter_.setFilter(id, checked);
+
+        if (updatesEnabled_)
+        {
+            filterChanged();
+        }
     }
+}
+
+size_t ProjectNavigatorItemClassifications::identifier(
+    const QTreeWidgetItem *item)
+{
+    return static_cast<size_t>(item->text(COLUMN_ID).toULong());
 }
 
 void ProjectNavigatorItemClassifications::updateTree()
@@ -254,7 +274,7 @@ void ProjectNavigatorItemClassifications::updateTree()
 
     while (*it)
     {
-        if (classifications_.isEnabled(i))
+        if (filter_.hasFilter(i))
         {
             (*it)->setCheckState(COLUMN_CHECKED, Qt::Checked);
         }
@@ -290,11 +310,11 @@ void ProjectNavigatorItemClassifications::unblock()
             SLOT(slotItemSelectionChanged()));
 }
 
-void ProjectNavigatorItemClassifications::addItem(size_t i)
+void ProjectNavigatorItemClassifications::addTreeItem(size_t index)
 {
     QTreeWidgetItem *item = new QTreeWidgetItem(tree_);
 
-    if (classifications_.isEnabled(i))
+    if (filter_.hasFilter(index))
     {
         item->setCheckState(COLUMN_CHECKED, Qt::Checked);
     }
@@ -303,15 +323,15 @@ void ProjectNavigatorItemClassifications::addItem(size_t i)
         item->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
     }
 
-    item->setText(COLUMN_ID, QString::number(i));
+    item->setText(COLUMN_ID, QString::number(index));
 
     item->setText(COLUMN_LABEL,
-                  QString::fromStdString(classifications_.label(i)));
+                  QString::fromStdString(classifications_.label(index)));
 
     // Color legend
-    if (i < ColorPalette::Classification.size())
+    if (index < ColorPalette::Classification.size())
     {
-        const Vector3<float> &rgb = ColorPalette::Classification[i];
+        const Vector3<float> &rgb = ColorPalette::Classification[index];
 
         QColor color;
         color.setRedF(rgb[0]);
@@ -328,6 +348,9 @@ void ProjectNavigatorItemClassifications::addItem(size_t i)
 void ProjectNavigatorItemClassifications::setClassifications(
     const Classifications &classifications)
 {
+    LOG_FILTER(MODULE_NAME,
+               "classifications<" << classifications.size() << ">");
+
     block();
 
     classifications_ = classifications;
@@ -343,7 +366,7 @@ void ProjectNavigatorItemClassifications::setClassifications(
     // Content
     for (size_t i = 0; i < classifications_.size(); i++)
     {
-        addItem(i);
+        addTreeItem(i);
     }
 
     // Resize Columns to the minimum space

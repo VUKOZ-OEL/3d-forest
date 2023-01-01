@@ -54,31 +54,52 @@ void QueryWhere::setDescriptor(const Range<float> &descriptor)
     descriptor_ = descriptor;
 }
 
+void QueryWhere::setDataset(const QueryFilterSet &list)
+{
+    dataset_ = list;
+}
+
+void QueryWhere::setDataset(const std::unordered_set<size_t> &list)
+{
+    dataset_.setFilter(list);
+}
+
+void QueryWhere::setClassification(const QueryFilterSet &list)
+{
+    classification_ = list;
+    classificationsToArray();
+}
+
 void QueryWhere::setClassification(const std::unordered_set<size_t> &list)
 {
-    if (list.empty())
+    classification_.setFilter(list);
+    classificationsToArray();
+}
+
+void QueryWhere::classificationsToArray()
+{
+    classificationArray_.resize(256);
+
+    for (size_t i = 0; i < classificationArray_.size(); i++)
     {
-        classification_.clear();
+        classificationArray_[i] = 0;
     }
-    else
+
+    for (auto const &it : classification_.filter())
     {
-        size_t n = 256;
-
-        classification_.resize(n);
-
-        for (size_t i = 0; i < n; i++)
+        if (it < classificationArray_.size())
         {
-            classification_[i] = 0;
-        }
-
-        for (auto const &it : list)
-        {
-            classification_[it] = 1;
+            classificationArray_[it] = 1;
         }
     }
 }
 
-void QueryWhere::setLayer(const std::unordered_set<size_t> &list)
+void QueryWhere::setLayer(const QueryFilterSet &list)
 {
     layer_ = list;
+}
+
+void QueryWhere::setLayer(const std::unordered_set<size_t> &list)
+{
+    layer_.setFilter(list);
 }

@@ -35,6 +35,10 @@
 #include <QTreeWidgetItemIterator>
 #include <QVBoxLayout>
 
+#define MODULE_NAME "ProjectNavigatorItemFiles"
+#define LOG_DEBUG_LOCAL(msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+
 #define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
 ProjectNavigatorItemFiles::ProjectNavigatorItemFiles(MainWindow *mainWindow,
@@ -122,6 +126,7 @@ ProjectNavigatorItemFiles::ProjectNavigatorItemFiles(MainWindow *mainWindow,
     setLayout(mainLayout_);
 
     // Data
+    updatesEnabled_ = true;
     connect(mainWindow_,
             SIGNAL(signalUpdate(const QSet<Editor::Type> &)),
             this,
@@ -130,26 +135,39 @@ ProjectNavigatorItemFiles::ProjectNavigatorItemFiles(MainWindow *mainWindow,
 
 void ProjectNavigatorItemFiles::slotUpdate(const QSet<Editor::Type> &target)
 {
-    if (!target.empty() && !target.contains(Editor::TYPE_DATA_SET))
-    {
-        return;
-    }
+    LOG_FILTER(MODULE_NAME, "targets<" << target.size() << ">");
 
-    setDatasets(mainWindow_->editor().datasets());
+    if (target.empty() || target.contains(Editor::TYPE_DATA_SET))
+    {
+        setDatasets(mainWindow_->editor().datasets());
+    }
 }
 
 void ProjectNavigatorItemFiles::dataChanged()
 {
     mainWindow_->suspendThreads();
     mainWindow_->editor().setDatasets(datasets_);
+    mainWindow_->editor().setDatasetsFilter(filter_);
     mainWindow_->updateData();
 }
 
 void ProjectNavigatorItemFiles::filterChanged()
 {
+    LOG_DEBUG_LOCAL("");
     mainWindow_->suspendThreads();
-    mainWindow_->editor().setDatasets(datasets_);
+    mainWindow_->editor().setDatasetsFilter(filter_);
     mainWindow_->updateFilter();
+}
+
+bool ProjectNavigatorItemFiles::isFilterEnabled() const
+{
+    return filter_.isFilterEnabled();
+}
+
+void ProjectNavigatorItemFiles::setFilterEnabled(bool b)
+{
+    filter_.setFilterEnabled(b);
+    filterChanged();
 }
 
 void ProjectNavigatorItemFiles::slotAdd()
@@ -167,8 +185,8 @@ void ProjectNavigatorItemFiles::slotDelete()
 
         for (auto &item : items)
         {
-            size_t idx = index(item);
-            datasets_.erase(idx);
+            datasets_.erase(index(item));
+            filter_.erase(identifier(item));
 
             delete item;
         }
@@ -179,14 +197,17 @@ void ProjectNavigatorItemFiles::slotDelete()
 
 void ProjectNavigatorItemFiles::slotShow()
 {
+    LOG_DEBUG_LOCAL("");
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
     if (items.count() > 0)
     {
+        updatesEnabled_ = false;
         for (auto &item : items)
         {
             item->setCheckState(COLUMN_CHECKED, Qt::Checked);
         }
+        updatesEnabled_ = true;
 
         filterChanged();
     }
@@ -198,10 +219,12 @@ void ProjectNavigatorItemFiles::slotHide()
 
     if (items.count() > 0)
     {
+        updatesEnabled_ = false;
         for (auto &item : items)
         {
             item->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
         }
+        updatesEnabled_ = true;
 
         filterChanged();
     }
@@ -269,11 +292,21 @@ void ProjectNavigatorItemFiles::slotItemChanged(QTreeWidgetItem *item,
 {
     if (column == COLUMN_CHECKED)
     {
+        size_t id = identifier(item);
         bool checked = (item->checkState(COLUMN_CHECKED) == Qt::Checked);
 
-        datasets_.setEnabled(index(item), checked);
-        filterChanged();
+        filter_.setFilter(id, checked);
+
+        if (updatesEnabled_)
+        {
+            filterChanged();
+        }
     }
+}
+
+size_t ProjectNavigatorItemFiles::identifier(const QTreeWidgetItem *item)
+{
+    return static_cast<size_t>(item->text(COLUMN_ID).toULong());
 }
 
 size_t ProjectNavigatorItemFiles::index(const QTreeWidgetItem *item)
@@ -289,9 +322,9 @@ void ProjectNavigatorItemFiles::updateTree()
 
     while (*it)
     {
-        size_t idx = index(*it);
+        size_t id = identifier(*it);
 
-        if (datasets_.isEnabled(idx))
+        if (filter_.hasFilter(id))
         {
             (*it)->setCheckState(COLUMN_CHECKED, Qt::Checked);
         }
@@ -326,11 +359,13 @@ void ProjectNavigatorItemFiles::unblock()
             SLOT(slotItemSelectionChanged()));
 }
 
-void ProjectNavigatorItemFiles::addItem(size_t i)
+void ProjectNavigatorItemFiles::addTreeItem(size_t index)
 {
     QTreeWidgetItem *item = new QTreeWidgetItem(tree_);
 
-    if (datasets_.isEnabled(i))
+    size_t id = datasets_.id(index);
+
+    if (filter_.hasFilter(id))
     {
         item->setCheckState(COLUMN_CHECKED, Qt::Checked);
     }
@@ -339,14 +374,14 @@ void ProjectNavigatorItemFiles::addItem(size_t i)
         item->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
     }
 
-    item->setText(COLUMN_ID, QString::number(datasets_.id(i)));
+    item->setText(COLUMN_ID, QString::number(id));
 
-    item->setText(COLUMN_LABEL, QString::fromStdString(datasets_.label(i)));
+    item->setText(COLUMN_LABEL, QString::fromStdString(datasets_.label(index)));
     item->setText(COLUMN_DATE_CREATED,
-                  QString::fromStdString(datasets_.dateCreated(i)));
+                  QString::fromStdString(datasets_.dateCreated(index)));
 
     // Color legend
-    const Vector3<float> &rgb = datasets_.color(i);
+    const Vector3<float> &rgb = datasets_.color(index);
 
     QColor color;
     color.setRedF(rgb[0]);
@@ -374,7 +409,7 @@ void ProjectNavigatorItemFiles::setDatasets(const Datasets &datasets)
     // Content
     for (size_t i = 0; i < datasets_.size(); i++)
     {
-        addItem(i);
+        addTreeItem(i);
     }
 
     // Resize Columns to the minimum space

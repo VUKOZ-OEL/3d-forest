@@ -38,43 +38,19 @@ public:
 
     void clear();
 
-    bool isEnabled() const { return enabled_; }
-    void setEnabled(bool b);
-
     size_t size() const { return classes_.size(); }
+    const std::unordered_set<size_t> &ids() const { return ids_; }
 
-    bool isEnabled(size_t i) const { return classes_[i].enabled; }
-    void setEnabled(size_t i, bool b) { classes_[i].enabled = b; }
-    std::unordered_set<size_t> enabledList() const;
     const std::string &label(size_t i) const { return classes_[i].label; }
-
-    void setEnabledAll(bool b);
-    void setInvertAll();
 
     void read(const Json &in);
     Json &write(Json &out) const;
 
 protected:
     std::vector<Class> classes_;
-    bool enabled_;
+    std::unordered_set<size_t> ids_;
+
+    void resize(size_t n);
 };
-
-inline std::unordered_set<size_t> Classifications::enabledList() const
-{
-    std::unordered_set<size_t> list;
-
-    if (enabled_)
-    {
-        for (size_t i = 0; i < classes_.size(); i++)
-        {
-            if (classes_[i].enabled)
-            {
-                list.insert(i);
-            }
-        }
-    }
-
-    return list;
-}
 
 #endif /* CLASSIFICATIONS_HPP */

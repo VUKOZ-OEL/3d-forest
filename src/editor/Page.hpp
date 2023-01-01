@@ -150,8 +150,8 @@ public:
     uint32_t pageId() const { return pageId_; }
 
     // All states
-    void read();
-    void write();
+    void readPage();
+    void writePage();
 
     // Individual states
     /** Page State. */

@@ -21,35 +21,25 @@
 
 #include <Classifications.hpp>
 
-Classifications::Classifications() : enabled_(false)
+Classifications::Classifications()
 {
     clear();
 }
 
-void Classifications::setEnabled(bool b)
+void Classifications::resize(size_t n)
 {
-    enabled_ = b;
-}
+    classes_.resize(n);
 
-void Classifications::setEnabledAll(bool b)
-{
+    ids_.clear();
     for (size_t i = 0; i < classes_.size(); i++)
     {
-        classes_[i].enabled = b;
-    }
-}
-
-void Classifications::setInvertAll()
-{
-    for (size_t i = 0; i < classes_.size(); i++)
-    {
-        classes_[i].enabled = !classes_[i].enabled;
+        ids_.insert(i);
     }
 }
 
 void Classifications::clear()
 {
-    classes_.resize(256);
+    resize(256);
 
     classes_[0].label = "Never classified";
     classes_[1].label = "Unassigned";
@@ -85,47 +75,23 @@ void Classifications::clear()
     {
         classes_[i].label = "User";
     }
-
-    // Enable
-    for (size_t i = 0; i < classes_.size(); i++)
-    {
-        classes_[i].enabled = true;
-    }
 }
 
 void Classifications::read(const Json &in)
 {
-    if (in.contains("enabled"))
-    {
-        enabled_ = in["enabled"].isTrue();
-    }
-    else
-    {
-        enabled_ = true;
-    }
-
     if (in.contains("classes"))
     {
         size_t i = 0;
         size_t n = in["classes"].array().size();
 
         clear();
-        classes_.resize(n);
+        resize(n);
 
         for (auto const &it : in["classes"].array())
         {
             if (it.contains("label"))
             {
                 classes_[i].label = it["label"].string();
-            }
-
-            if (it.contains("enabled"))
-            {
-                classes_[i].enabled = it["enabled"].isTrue();
-            }
-            else
-            {
-                classes_[i].enabled = true;
             }
 
             i++;
@@ -135,16 +101,12 @@ void Classifications::read(const Json &in)
 
 Json &Classifications::write(Json &out) const
 {
-    out["enabled"] = enabled_;
-
     size_t i = 0;
 
     for (auto const &it : classes_)
     {
         Json &obj = out["classes"][i];
         obj["label"] = it.label;
-        obj["enabled"] = it.enabled;
-
         i++;
     }
 
