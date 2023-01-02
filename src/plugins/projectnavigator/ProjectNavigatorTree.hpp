@@ -48,7 +48,7 @@ public:
     void addItem(ProjectNavigatorItem *widget);
 
 public slots:
-    void slotUpdate(const QSet<Editor::Type> &target);
+    void slotUpdate(void *sender, const QSet<Editor::Type> &target);
     void slotItemChanged(QTreeWidgetItem *item, int column);
     void slotItemClicked(QTreeWidgetItem *item, int column);
 

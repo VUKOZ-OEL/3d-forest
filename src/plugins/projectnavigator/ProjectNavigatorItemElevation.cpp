@@ -56,13 +56,19 @@ ProjectNavigatorItemElevation::ProjectNavigatorItemElevation(
 
     // Data
     connect(mainWindow_,
-            SIGNAL(signalUpdate(const QSet<Editor::Type> &)),
+            SIGNAL(signalUpdate(void *, const QSet<Editor::Type> &)),
             this,
-            SLOT(slotUpdate(const QSet<Editor::Type> &)));
+            SLOT(slotUpdate(void *, const QSet<Editor::Type> &)));
 }
 
-void ProjectNavigatorItemElevation::slotUpdate(const QSet<Editor::Type> &target)
+void ProjectNavigatorItemElevation::slotUpdate(void *sender,
+                                               const QSet<Editor::Type> &target)
 {
+    if (sender == this)
+    {
+        return;
+    }
+
     if (target.empty() || target.contains(Editor::TYPE_ELEVATION))
     {
         elevationRange_ = mainWindow_->editor().elevationRange();

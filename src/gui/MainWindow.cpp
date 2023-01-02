@@ -374,6 +374,11 @@ void MainWindow::slotRenderViewport(size_t viewportId)
     threadRender_.render(viewportId, viewports->camera(viewportId));
 }
 
+void MainWindow::update(void *sender, const QSet<Editor::Type> &target)
+{
+    emit signalUpdate(sender, target);
+}
+
 void MainWindow::update(const QSet<Editor::Type> &target,
                         Page::State viewPortsCacheState,
                         bool resetCamera)
@@ -392,7 +397,7 @@ void MainWindow::update(const QSet<Editor::Type> &target,
         viewports->resetScene(&editor_, false);
     }
 
-    emit signalUpdate(target);
+    update(this, target);
 
     resumeThreads();
 }
@@ -410,7 +415,7 @@ void MainWindow::updateEverything()
     viewports->resetScene(&editor_, true);
     editor_.unlock();
 
-    emit signalUpdate({});
+    emit signalUpdate(this, {});
 
     size_t viewportId = viewports->selectedViewportId();
     threadRender_.render(viewportId, viewports->camera(viewportId));

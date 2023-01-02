@@ -53,7 +53,7 @@ public:
     virtual void setFilterEnabled(bool b);
 
 public slots:
-    void slotUpdate(const QSet<Editor::Type> &target);
+    void slotUpdate(void *sender, const QSet<Editor::Type> &target);
 
     void slotShow();
     void slotHide();

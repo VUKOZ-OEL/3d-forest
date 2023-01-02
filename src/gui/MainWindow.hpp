@@ -93,6 +93,7 @@ public:
     void resumeThreads();
     virtual void threadProgress(bool finished) override;
 
+    void update(void *sender, const QSet<Editor::Type> &target);
     void update(const QSet<Editor::Type> &target,
                 Page::State viewPortsCacheState = Page::STATE_READ,
                 bool resetCamera = false);
@@ -113,7 +114,7 @@ public slots:
 
 signals:
     void signalRender();
-    void signalUpdate(const QSet<Editor::Type> &target);
+    void signalUpdate(void *sender, const QSet<Editor::Type> &target);
 
 protected:
     void closeEvent(QCloseEvent *event) override;
