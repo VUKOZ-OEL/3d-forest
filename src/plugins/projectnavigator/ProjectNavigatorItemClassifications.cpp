@@ -111,15 +111,21 @@ ProjectNavigatorItemClassifications::ProjectNavigatorItemClassifications(
     // Data
     updatesEnabled_ = true;
     connect(mainWindow_,
-            SIGNAL(signalUpdate(const QSet<Editor::Type> &)),
+            SIGNAL(signalUpdate(void *, const QSet<Editor::Type> &)),
             this,
-            SLOT(slotUpdate(const QSet<Editor::Type> &)));
+            SLOT(slotUpdate(void *, const QSet<Editor::Type> &)));
 }
 
 void ProjectNavigatorItemClassifications::slotUpdate(
+    void *sender,
     const QSet<Editor::Type> &target)
 {
     LOG_FILTER(MODULE_NAME, "targets<" << target.size() << ">");
+
+    if (sender == this)
+    {
+        return;
+    }
 
     if (target.empty() || target.contains(Editor::TYPE_CLASSIFICATION))
     {

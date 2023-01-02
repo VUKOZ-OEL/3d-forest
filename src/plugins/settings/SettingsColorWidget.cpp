@@ -90,25 +90,30 @@ SettingsColorWidget::SettingsColorWidget(MainWindow *mainWindow)
 
     // Data
     connect(mainWindow_,
-            SIGNAL(signalUpdate(const QSet<Editor::Type> &)),
+            SIGNAL(signalUpdate(void *, const QSet<Editor::Type> &)),
             this,
-            SLOT(slotUpdate(const QSet<Editor::Type> &)));
+            SLOT(slotUpdate(void *, const QSet<Editor::Type> &)));
 }
 
-void SettingsColorWidget::slotUpdate(const QSet<Editor::Type> &target)
+void SettingsColorWidget::slotUpdate(void *sender,
+                                     const QSet<Editor::Type> &target)
 {
-    if (!target.empty() && !target.contains(Editor::TYPE_SETTINGS))
+    if (sender == this)
     {
         return;
     }
 
-    setSettings(mainWindow_->editor().settings().view());
+    if (target.empty() || target.contains(Editor::TYPE_SETTINGS))
+    {
+        setSettings(mainWindow_->editor().settings().view());
+    }
 }
 
 void SettingsColorWidget::settingsChanged()
 {
     mainWindow_->suspendThreads();
     mainWindow_->editor().setSettingsView(settings_);
+    mainWindow_->update(this, {Editor::TYPE_SETTINGS});
     mainWindow_->updateRender();
 }
 
@@ -116,6 +121,7 @@ void SettingsColorWidget::settingsChangedApply()
 {
     mainWindow_->suspendThreads();
     mainWindow_->editor().setSettingsView(settings_);
+    mainWindow_->update(this, {Editor::TYPE_SETTINGS});
     mainWindow_->updateModifiers();
 }
 
