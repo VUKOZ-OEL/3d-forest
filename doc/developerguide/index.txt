@@ -636,7 +636,7 @@ files     anything
 @section logging Logging
 @verbatim
 #include <Log.hpp>
-LOG("counter=" << counter);
+LOG_MODULE(MODULE_NAME, "counter=" << counter);
 @endverbatim
 
 

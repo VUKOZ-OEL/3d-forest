@@ -21,6 +21,7 @@
 
 //#include <ApplicationLog.hpp>
 
+#include <Log.hpp>
 #include <MainWindow.hpp>
 
 #include <QApplication>
@@ -28,6 +29,7 @@
 
 int main(int argc, char *argv[])
 {
+    globalLogThread = std::make_shared<LogThread>();
     // ApplicationLog::install();
 
     QApplication app(argc, argv);
@@ -45,5 +47,9 @@ int main(int argc, char *argv[])
     window.setWindowIcon(QIcon(":/3dforest_128px.png"));
     window.show();
 
-    return app.exec();
+    int rc = app.exec();
+
+    globalLogThread->stop();
+
+    return rc;
 }
