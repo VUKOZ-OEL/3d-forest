@@ -23,8 +23,8 @@
 #include <QueryFilterSet.hpp>
 
 #define MODULE_NAME "QueryFilterSet"
-//#define LOG_DEBUG_LOCAL(msg)
-#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+#define LOG_DEBUG_LOCAL(msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 QueryFilterSet::QueryFilterSet() : enabled_(false)
 {
