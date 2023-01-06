@@ -34,7 +34,7 @@
 
 #define MODULE_NAME "ToolTabWidget"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 ToolTabWidget::ToolTabWidget()
     : QWidget(),
@@ -43,14 +43,14 @@ ToolTabWidget::ToolTabWidget()
       label_(nullptr),
       mainLayout_(nullptr)
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 }
 
 void ToolTabWidget::addTab(QWidget *widget,
                            const QIcon &icon,
                            const QString &label)
 {
-    LOG_DEBUG_LOCAL(label.toStdString());
+    LOG_DEBUG_LOCAL(<< label.toStdString());
 
     // Create tool button
     QToolButton *toolButton;
@@ -137,7 +137,7 @@ void ToolTabWidget::addTab(QWidget *widget,
 
 void ToolTabWidget::slotToolButton()
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 
     QObject *obj = sender();
 
@@ -145,7 +145,7 @@ void ToolTabWidget::slotToolButton()
     {
         if (toolButtonList_[i] != obj)
         {
-            LOG_DEBUG_LOCAL("hide <" << i << ">");
+            LOG_DEBUG_LOCAL(<< "hide <" << i << ">");
             toolButtonList_[i]->setChecked(false);
             tabList_[i]->setVisible(false);
         }
@@ -155,7 +155,7 @@ void ToolTabWidget::slotToolButton()
     {
         if (toolButtonList_[i] == obj)
         {
-            LOG_DEBUG_LOCAL("show <" << i << ">");
+            LOG_DEBUG_LOCAL(<< "show <" << i << ">");
             const QIcon icon = toolButtonList_[i]->icon();
             icon_->setPixmap(icon.pixmap(icon.actualSize(QSize(16, 16))));
             label_->setText(toolButtonList_[i]->text());

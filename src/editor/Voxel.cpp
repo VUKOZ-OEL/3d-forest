@@ -26,7 +26,7 @@
 
 #define MODULE_NAME "Voxel"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 #if !defined(EXPORT_EDITOR_IMPORT)
 const uint32_t Voxel::STATUS_IGNORED = 1U << 0;

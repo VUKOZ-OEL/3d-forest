@@ -22,20 +22,21 @@
 #include <Classification.hpp>
 #include <Editor.hpp>
 
+#define MODULE_NAME "Classification"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("Classification", msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 Classification::Classification(Editor *editor)
     : editor_(editor),
       query_(editor),
       queryPoint_(editor)
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 }
 
 Classification::~Classification()
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 }
 
 int Classification::start(size_t pointsPerCell,
@@ -43,12 +44,10 @@ int Classification::start(size_t pointsPerCell,
                           double groundErrorPercent,
                           double angleDeg)
 {
-    // clang-format off
-    LOG_DEBUG_LOCAL("pointsPerCell <" << pointsPerCell << "> " <<
-                    "cellLengthMinPercent <" << cellLengthMinPercent << "> " <<
-                    "groundErrorPercent <" << groundErrorPercent << "> " <<
-                    "angleDeg <" << angleDeg << ">");
-    // clang-format on
+    LOG_DEBUG_LOCAL(<< "pointsPerCell <" << pointsPerCell << "> "
+                    << "cellLengthMinPercent <" << cellLengthMinPercent << "> "
+                    << "groundErrorPercent <" << groundErrorPercent << "> "
+                    << "angleDeg <" << angleDeg << ">");
 
     groundErrorPercent_ = groundErrorPercent;
 
@@ -60,15 +59,15 @@ int Classification::start(size_t pointsPerCell,
     currentStep_ = 0;
     numberOfSteps_ = static_cast<int>(query_.gridSize());
 
-    LOG_DEBUG_LOCAL("numberOfSteps <" << numberOfSteps_ << ">");
+    LOG_DEBUG_LOCAL(<< "numberOfSteps <" << numberOfSteps_ << ">");
 
     return numberOfSteps_;
 }
 
 void Classification::step()
 {
-    LOG_DEBUG_LOCAL("step <" << (currentStep_ + 1) << "> from <"
-                             << numberOfSteps_ << ">");
+    LOG_DEBUG_LOCAL(<< "step <" << (currentStep_ + 1) << "> from <"
+                    << numberOfSteps_ << ">");
 
     double zMax = editor_->clipBoundary().max(2);
     double zMin = editor_->clipBoundary().min(2);
@@ -80,7 +79,7 @@ void Classification::step()
 
     if (!query_.nextGrid())
     {
-        LOG_DEBUG_LOCAL("expected nextGrid");
+        LOG_DEBUG_LOCAL(<< "expected nextGrid");
         return;
     }
 
@@ -143,22 +142,21 @@ void Classification::step()
         query_.setModified();
     }
 
-    LOG_DEBUG_LOCAL("number of points as ground <" << nPointsGroundGrid
-                                                   << "> above ground <"
-                                                   << nPointsAboveGrid << ">");
+    LOG_DEBUG_LOCAL(<< "number of points as ground <" << nPointsGroundGrid
+                    << "> above ground <" << nPointsAboveGrid << ">");
 
     currentStep_++;
 
     if (currentStep_ == numberOfSteps_)
     {
-        LOG_DEBUG_LOCAL("flush");
+        LOG_DEBUG_LOCAL(<< "flush");
         query_.flush();
     }
 }
 
 void Classification::clear()
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 
     query_.clear();
     queryPoint_.clear();

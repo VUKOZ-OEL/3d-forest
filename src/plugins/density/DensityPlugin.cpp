@@ -24,8 +24,9 @@
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
+#define MODULE_NAME "DensityPlugin"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("DensityPlugin", msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 #define ICON(name) (ThemeIcon(":/density/", name))
 

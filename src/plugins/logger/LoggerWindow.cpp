@@ -84,7 +84,7 @@ static void loggerWindowQtMessageHandler(QtMsgType type,
         case QtWarningMsg:
         case QtCriticalMsg:
         case QtFatalMsg:
-            LOG_MODULE("Qt", msg.toStdString());
+            LOG_MODULE("Qt", << msg.toStdString());
             break;
         default:
             break;

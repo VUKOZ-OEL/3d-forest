@@ -34,7 +34,7 @@ static const char *EDITOR_KEY_ELEVATION_RANGE = "elevationRange";
 
 #define MODULE_NAME "Editor"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 Editor::Editor()
 {
@@ -187,7 +187,7 @@ void Editor::openDataset(const std::string &path,
 {
     try
     {
-        LOG_FILTER(MODULE_NAME, "path<" << path << ">");
+        LOG_FILTER(MODULE_NAME, << "path<" << path << ">");
         datasets_.read(path, path_, settings, datasets_.boundary());
     }
     catch (std::exception &e)
@@ -211,7 +211,7 @@ void Editor::setClassificationsFilter(const QueryFilterSet &filter)
 {
     if (viewports_.size() > 0)
     {
-        LOG_FILTER(MODULE_NAME, "");
+        LOG_FILTER(MODULE_NAME, << "");
         viewports_.where().setClassification(filter);
         viewports_.applyWhereToAll();
     }
@@ -226,7 +226,7 @@ void Editor::setClipFilter(const Region &clipFilter)
 
     if (viewports_.size() > 0)
     {
-        LOG_FILTER(MODULE_NAME, "");
+        LOG_FILTER(MODULE_NAME, << "");
         viewports_.where().setBox(clipBoundary());
         viewports_.applyWhereToAll();
     }
@@ -253,11 +253,11 @@ Box<double> Editor::clipBoundary() const
 void Editor::setElevationRange(const Range<double> &elevationRange)
 {
     elevationRange_ = elevationRange;
-    LOG_DEBUG_LOCAL("elevationRange <" << elevationRange_ << ">");
+    LOG_DEBUG_LOCAL(<< "elevationRange <" << elevationRange_ << ">");
 
     if (viewports_.size() > 0)
     {
-        LOG_FILTER(MODULE_NAME, "");
+        LOG_FILTER(MODULE_NAME, << "");
         viewports_.where().setElevation(elevationRange_);
         viewports_.applyWhereToAll();
     }
@@ -268,11 +268,11 @@ void Editor::setElevationRange(const Range<double> &elevationRange)
 void Editor::setDescriptorRange(const Range<float> &descriptorRange)
 {
     descriptorRange_ = descriptorRange;
-    LOG_DEBUG_LOCAL("descriptorRange <" << descriptorRange_ << ">");
+    LOG_DEBUG_LOCAL(<< "descriptorRange <" << descriptorRange_ << ">");
 
     if (viewports_.size() > 0)
     {
-        LOG_FILTER(MODULE_NAME, "");
+        LOG_FILTER(MODULE_NAME, << "");
         viewports_.where().setDescriptor(descriptorRange_);
         viewports_.applyWhereToAll();
     }
@@ -287,7 +287,7 @@ void Editor::updateAfterRead()
 
     if (viewports_.size() > 0)
     {
-        LOG_FILTER(MODULE_NAME, "");
+        LOG_FILTER(MODULE_NAME, << "");
         // viewports_.where().setDataset();
         // viewports_.where().setClassification();
         viewports_.where().setBox(clipBoundary());
@@ -301,7 +301,7 @@ void Editor::updateAfterRead()
 
 void Editor::setDatasets(const Datasets &datasets)
 {
-    LOG_FILTER(MODULE_NAME, "");
+    LOG_FILTER(MODULE_NAME, << "");
     datasets_ = datasets;
     unsavedChanges_ = true;
 }
@@ -310,7 +310,7 @@ void Editor::setDatasetsFilter(const QueryFilterSet &filter)
 {
     if (viewports_.size() > 0)
     {
-        LOG_FILTER(MODULE_NAME, "");
+        LOG_FILTER(MODULE_NAME, << "");
         viewports_.where().setDataset(filter);
         viewports_.applyWhereToAll();
     }
@@ -326,7 +326,7 @@ void Editor::setLayersFilter(const QueryFilterSet &filter)
 {
     if (viewports_.size() > 0)
     {
-        LOG_FILTER(MODULE_NAME, "");
+        LOG_FILTER(MODULE_NAME, << "");
         viewports_.where().setLayer(filter);
         viewports_.applyWhereToAll();
     }

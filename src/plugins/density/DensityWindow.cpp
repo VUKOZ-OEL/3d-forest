@@ -30,8 +30,9 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+#define MODULE_NAME "DensityWindow"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("DensityWindow", msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 #define ICON(name) (ThemeIcon(":/density/", name))
 #define DENSITY_PLUGIN_NAME "Density"
@@ -41,7 +42,7 @@ DensityWindow::DensityWindow(MainWindow *mainWindow)
       mainWindow_(mainWindow),
       density_(&mainWindow->editor())
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 
     // Widgets
     SliderWidget::create(radius_,
@@ -88,14 +89,14 @@ DensityWindow::DensityWindow(MainWindow *mainWindow)
 
 void DensityWindow::slotApply()
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 
     mainWindow_->suspendThreads();
 
     double radius = static_cast<double>(radius_->value());
 
     int maximum = density_.start(radius);
-    LOG_DEBUG_LOCAL("maximum <" << maximum << ">");
+    LOG_DEBUG_LOCAL(<< "maximum <" << maximum << ">");
 
     QProgressDialog progressDialog(mainWindow_);
     progressDialog.setCancelButtonText(QObject::tr("&Cancel"));
@@ -109,7 +110,7 @@ void DensityWindow::slotApply()
     {
         // Update progress
         int p = i + 1;
-        LOG_DEBUG_LOCAL("Processing <" << p << "> from <" << maximum << ">");
+        LOG_DEBUG_LOCAL(<< "Processing <" << p << "> from <" << maximum << ">");
         progressDialog.setValue(p);
         progressDialog.setLabelText(
             QObject::tr("Processing %1 of %n...", nullptr, maximum).arg(p));

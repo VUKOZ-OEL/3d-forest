@@ -37,7 +37,7 @@
 
 #define MODULE_NAME "ProjectNavigatorItemFiles"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 #define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
@@ -136,7 +136,7 @@ ProjectNavigatorItemFiles::ProjectNavigatorItemFiles(MainWindow *mainWindow,
 void ProjectNavigatorItemFiles::slotUpdate(void *sender,
                                            const QSet<Editor::Type> &target)
 {
-    LOG_FILTER(MODULE_NAME, "targets<" << target.size() << ">");
+    LOG_FILTER(MODULE_NAME, << "targets<" << target.size() << ">");
 
     if (sender == this)
     {
@@ -159,7 +159,7 @@ void ProjectNavigatorItemFiles::dataChanged()
 
 void ProjectNavigatorItemFiles::filterChanged()
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
     mainWindow_->suspendThreads();
     mainWindow_->editor().setDatasetsFilter(filter_);
     mainWindow_->updateFilter();
@@ -203,7 +203,7 @@ void ProjectNavigatorItemFiles::slotDelete()
 
 void ProjectNavigatorItemFiles::slotShow()
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
     if (items.count() > 0)

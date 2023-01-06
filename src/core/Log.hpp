@@ -86,7 +86,7 @@ extern std::shared_ptr<LogThread> globalLogThread;
     do                                                                         \
     {                                                                          \
         std::stringstream str;                                                 \
-        str << (module) << "::" << __func__ << ": " << msg;                    \
+        str << (module) << "::" << __func__ << ": " msg;                       \
         if (globalLogThread)                                                   \
         {                                                                      \
             globalLogThread->println(str.str());                               \

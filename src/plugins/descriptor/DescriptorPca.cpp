@@ -25,7 +25,7 @@
 
 #define MODULE_NAME "DescriptorPca"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 DescriptorPca::DescriptorPca()
 {
@@ -88,7 +88,7 @@ bool DescriptorPca::computeDescriptor(Query &query,
         nPoints++;
     }
 
-    LOG_DEBUG_LOCAL("nPoints <" << nPoints << ">");
+    LOG_DEBUG_LOCAL(<< "nPoints <" << nPoints << ">");
 
     // Enough points for PCA?
     if (nPoints < 3)
@@ -125,8 +125,8 @@ bool DescriptorPca::computeDescriptor(Eigen::MatrixXd &V,
 {
     // The number of points.
     Eigen::MatrixXd::Index nPoints = V.cols();
-    LOG_DEBUG_LOCAL("V cols <" << V.cols() << "> rows <" << V.rows() << ">");
-    LOG_DEBUG_LOCAL("nPoints <" << nPoints << ">");
+    LOG_DEBUG_LOCAL(<< "V cols <" << V.cols() << "> rows <" << V.rows() << ">");
+    LOG_DEBUG_LOCAL(<< "nPoints <" << nPoints << ">");
 
     // Compute centroid.
     meanX = 0;
@@ -150,8 +150,8 @@ bool DescriptorPca::computeDescriptor(Eigen::MatrixXd &V,
     meanX = meanX / d;
     meanY = meanY / d;
     meanZ = meanZ / d;
-    LOG_DEBUG_LOCAL("mean x <" << meanX << "> y <" << meanY << "> z <" << meanZ
-                               << ">");
+    LOG_DEBUG_LOCAL(<< "mean x <" << meanX << "> y <" << meanY << "> z <"
+                    << meanZ << ">");
 
     // Shift point coordinates by centroid.
     for (Eigen::MatrixXd::Index i = 0; i < nPoints; i++)
@@ -164,7 +164,7 @@ bool DescriptorPca::computeDescriptor(Eigen::MatrixXd &V,
     // Compute product.
     const double inv = 1.0 / static_cast<double>(nPoints - 1);
     product = inv * V.topRows<3>() * V.topRows<3>().transpose();
-    LOG_DEBUG_LOCAL("product\n" << product);
+    LOG_DEBUG_LOCAL(<< "product\n" << product);
 
     // Compute Eigen vectors.
     E.compute(product);
@@ -173,7 +173,7 @@ bool DescriptorPca::computeDescriptor(Eigen::MatrixXd &V,
         eigenVectors.col(i) = E.eigenvectors().col(2 - i);
     }
     eigenVectors.col(2) = eigenVectors.col(0).cross(eigenVectors.col(1));
-    LOG_DEBUG_LOCAL("eigen vectors\n" << eigenVectors);
+    LOG_DEBUG_LOCAL(<< "eigen vectors\n" << eigenVectors);
 
     // Project point coordinates by Eigen vectors.
     constexpr double bigNumber = std::numeric_limits<double>::max();
@@ -196,8 +196,8 @@ bool DescriptorPca::computeDescriptor(Eigen::MatrixXd &V,
         max = max.cwiseMax(out);
     }
 
-    LOG_DEBUG_LOCAL("projected minimum\n" << min);
-    LOG_DEBUG_LOCAL("projected maximum\n" << max);
+    LOG_DEBUG_LOCAL(<< "projected minimum\n" << min);
+    LOG_DEBUG_LOCAL(<< "projected maximum\n" << max);
 
     // Compute intensity.
     double eL = std::abs(max[0] - min[0]);
@@ -205,7 +205,7 @@ bool DescriptorPca::computeDescriptor(Eigen::MatrixXd &V,
     double eS = std::abs(max[2] - min[2]);
 
     // Sort values.
-    LOG_DEBUG_LOCAL("eLIS <" << eL << "," << eI << "," << eS << ">");
+    LOG_DEBUG_LOCAL(<< "eLIS <" << eL << "," << eI << "," << eS << ">");
     if (eI < eS)
     {
         std::swap(eS, eI);
@@ -220,18 +220,18 @@ bool DescriptorPca::computeDescriptor(Eigen::MatrixXd &V,
     {
         std::swap(eS, eI);
     }
-    LOG_DEBUG_LOCAL("eLIS <" << eL << "," << eI << "," << eS << "> sorted");
+    LOG_DEBUG_LOCAL(<< "eLIS <" << eL << "," << eI << "," << eS << "> sorted");
 
     // Compute intensity index.
     const double sum = eL + eI + eS;
-    LOG_DEBUG_LOCAL("sum <" << sum << ">");
+    LOG_DEBUG_LOCAL(<< "sum <" << sum << ">");
     if (sum > std::numeric_limits<double>::epsilon())
     {
         // const double SFFIx = 100. - (eL * 100. / sum);
         descriptor = static_cast<float>(eL / sum);
     }
 
-    LOG_DEBUG_LOCAL("descriptor <" << descriptor << ">");
+    LOG_DEBUG_LOCAL(<< "descriptor <" << descriptor << ">");
 
     return true;
 }

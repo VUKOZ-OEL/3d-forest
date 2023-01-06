@@ -28,7 +28,7 @@
 
 #define MODULE_NAME "Voxels"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 // Use some maximum until the voxels can be streamed from a file.
 #define VOXELS_RESOLUTION_MAX 500
@@ -143,8 +143,7 @@ void Voxels::sort(double elevationMinimum, double elevationMaximum)
                sizeof(Voxel *),
                VoxelsCompareFunctionZ);
 
-    LOG_DEBUG_LOCAL("sortedVoxels <"
-                    << sortedVoxels_.size() << ">"
+    LOG_DEBUG_LOCAL(<< "sortedVoxels <" << sortedVoxels_.size() << ">"
                     << " elevationMinimum <" << elevationMinimum << ">"
                     << " elevationMaximum <" << elevationMaximum << ">");
 }
@@ -180,9 +179,10 @@ void Voxels::create(const Box<double> &spaceRegion, double voxelSize)
     // Initialize voxel iterator.
     push(0, 0, 0, nx_, ny_, nz_);
 
-    LOG_DEBUG_LOCAL("numberOfVoxels <" << index_.size() << ">");
-    LOG_DEBUG_LOCAL("resolution <" << nx_ << "," << ny_ << "," << nz_ << ">");
-    LOG_DEBUG_LOCAL("voxelSize <" << voxelSize_ << ">");
+    LOG_DEBUG_LOCAL(<< "numberOfVoxels <" << index_.size() << ">");
+    LOG_DEBUG_LOCAL(<< "resolution <" << nx_ << "," << ny_ << "," << nz_
+                    << ">");
+    LOG_DEBUG_LOCAL(<< "voxelSize <" << voxelSize_ << ">");
 }
 
 bool Voxels::next(Voxel *voxel, Box<double> *cell, Query *query)

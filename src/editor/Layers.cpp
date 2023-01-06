@@ -24,7 +24,7 @@
 
 #define MODULE_NAME "Layers"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 Layers::Layers()
 {
@@ -33,14 +33,14 @@ Layers::Layers()
 
 void Layers::clear()
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
     layers_.clear();
     hashTableId_.clear();
 }
 
 void Layers::setDefault()
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
     size_t id = 0;
     size_t idx = 0;
 
@@ -53,7 +53,7 @@ void Layers::setDefault()
 
 void Layers::push_back(const Layer &layer)
 {
-    LOG_DEBUG_LOCAL("layer <" << layer << ">");
+    LOG_DEBUG_LOCAL(<< "layer <" << layer << ">");
     size_t id = layer.id();
     size_t idx = layers_.size();
 
@@ -64,7 +64,7 @@ void Layers::push_back(const Layer &layer)
 
 void Layers::erase(size_t i)
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 
     if (layers_.size() == 0)
     {
@@ -85,7 +85,7 @@ void Layers::erase(size_t i)
 
 size_t Layers::unusedId() const
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
     // Return minimum available id value
     for (size_t rval = 0; rval < std::numeric_limits<size_t>::max(); rval++)
     {
@@ -100,19 +100,19 @@ size_t Layers::unusedId() const
 
 void Layers::setLabel(size_t i, const std::string &label)
 {
-    LOG_DEBUG_LOCAL("index <" << i << "> label <" << label << ">");
+    LOG_DEBUG_LOCAL(<< "index <" << i << "> label <" << label << ">");
     layers_[i].setLabel(label);
 }
 
 void Layers::setColor(size_t i, const Vector3<float> &color)
 {
-    LOG_DEBUG_LOCAL("index <" << i << "> color <" << color << ">");
+    LOG_DEBUG_LOCAL(<< "index <" << i << "> color <" << color << ">");
     layers_[i].setColor(color);
 }
 
 void Layers::read(const Json &in)
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 
     clear();
 
@@ -144,7 +144,7 @@ void Layers::read(const Json &in)
 
 Json &Layers::write(Json &out) const
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 
     size_t i = 0;
 
