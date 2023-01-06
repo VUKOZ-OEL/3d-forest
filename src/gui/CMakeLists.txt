@@ -29,6 +29,7 @@ file(GLOB_RECURSE SOURCES "*.cpp")
 file(GLOB_RECURSE SOURCES_EXPORT_FILE "../plugins/exportfile/*.cpp")
 file(GLOB_RECURSE SOURCES_HELP "../plugins/help/*.cpp")
 file(GLOB_RECURSE SOURCES_IMPORT_FILE "../plugins/importfile/*.cpp")
+file(GLOB_RECURSE SOURCES_LOGGER "../plugins/logger/*.cpp")
 file(GLOB_RECURSE SOURCES_PROJECT_FILE "../plugins/projectfile/*.cpp")
 file(GLOB_RECURSE SOURCES_PROJECT_NAVIGATOR "../plugins/projectnavigator/*.cpp")
 file(GLOB_RECURSE SOURCES_SETTINGS "../plugins/settings/*.cpp")
@@ -41,6 +42,7 @@ add_library(
     ${SOURCES_EXPORT_FILE}
     ${SOURCES_HELP}
     ${SOURCES_IMPORT_FILE}
+    ${SOURCES_LOGGER}
     ${SOURCES_PROJECT_FILE}
     ${SOURCES_PROJECT_NAVIGATOR}
     ${SOURCES_SETTINGS}
@@ -51,6 +53,7 @@ add_library(
     ../plugins/exportfile/resources/resources.qrc
     ../plugins/help/resources/resources.qrc
     ../plugins/importfile/resources/resources.qrc
+    ../plugins/logger/resources/resources.qrc
     ../plugins/projectfile/resources/resources.qrc
     ../plugins/projectnavigator/resources/resources.qrc
     ../plugins/settings/resources/resources.qrc
@@ -66,6 +69,7 @@ target_include_directories(
     ../plugins/exportfile
     ../plugins/help
     ../plugins/importfile
+    ../plugins/logger
     ../plugins/projectfile
     ../plugins/projectnavigator
     ../plugins/settings

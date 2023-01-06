@@ -28,6 +28,7 @@
 #include <ExportFilePlugin.hpp>
 #include <HelpPlugin.hpp>
 #include <ImportFilePlugin.hpp>
+#include <LoggerPlugin.hpp>
 #include <ProjectFilePlugin.hpp>
 #include <ProjectNavigatorPlugin.hpp>
 #include <SettingsPlugin.hpp>
@@ -98,6 +99,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     settingsPlugin_ = new SettingsPlugin();
     settingsPlugin_->initialize(this);
+
+    loggerPlugin_ = new LoggerPlugin();
+    loggerPlugin_->initialize(this);
 
     viewerPlugin_ = new ViewerPlugin();
     viewerPlugin_->initialize(this);

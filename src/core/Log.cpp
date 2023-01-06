@@ -24,9 +24,10 @@
 std::shared_ptr<LogThread> globalLogThread;
 
 LogThread::LogThread()
-    : messageQueue_(100),
+    : messageQueue_(10000U),
       messageQueueHead_(0),
       messageQueueTail_(0),
+      callback_(nullptr),
       running_(true),
       received_(false)
 {
@@ -35,6 +36,15 @@ LogThread::LogThread()
 
 LogThread::~LogThread()
 {
+}
+
+void LogThread::setCallback(LogThreadCallbackInterface *callback)
+{
+    {
+        std::unique_lock<std::mutex> mutexlock(mutex_);
+        callback_ = callback;
+    }
+    condition_.notify_one();
 }
 
 void LogThread::stop()
@@ -96,6 +106,7 @@ void LogThread::println(const std::string &msg)
 void LogThread::run()
 {
     bool running;
+    LogThreadCallbackInterface *callback;
     std::vector<std::string> messageQueue;
     size_t messageCount;
     std::unique_lock<std::mutex> mutexlock(mutex_, std::defer_lock);
@@ -105,12 +116,14 @@ void LogThread::run()
         // sync start
         mutexlock.lock();
 
-        while (running_ && messageQueueHead_ == messageQueueTail_)
+        while (running_ && messageQueueHead_ == messageQueueTail_ &&
+               callback == callback_)
         {
             condition_.wait(mutexlock);
         }
 
         running = running_;
+        callback = callback_;
 
         if (!running)
         {
@@ -120,45 +133,52 @@ void LogThread::run()
             conditionCaller_.notify_one();
         }
 
-        if (messageQueue.size() != messageQueue_.size())
+        if (callback)
         {
-            messageQueue.resize(messageQueue_.size());
-        }
-
-        messageCount = 0;
-
-        if (messageQueueTail_ < messageQueueHead_)
-        {
-            for (size_t i = messageQueueTail_; i < messageQueueHead_; i++)
+            if (messageQueue.size() != messageQueue_.size())
             {
-                messageQueue[messageCount++] = messageQueue_[i];
-            }
-        }
-        else if (messageQueueHead_ < messageQueueTail_)
-        {
-            for (size_t i = messageQueueTail_; i < messageQueue_.size(); i++)
-            {
-                messageQueue[messageCount++] = messageQueue_[i];
+                messageQueue.resize(messageQueue_.size());
             }
 
-            for (size_t i = 0; i < messageQueueHead_; i++)
-            {
-                messageQueue[messageCount++] = messageQueue_[i];
-            }
-        }
+            messageCount = 0;
 
-        messageQueueTail_ = messageQueueHead_;
+            if (messageQueueTail_ < messageQueueHead_)
+            {
+                for (size_t i = messageQueueTail_; i < messageQueueHead_; i++)
+                {
+                    messageQueue[messageCount++] = messageQueue_[i];
+                }
+            }
+            else if (messageQueueHead_ < messageQueueTail_)
+            {
+                for (size_t i = messageQueueTail_; i < messageQueue_.size();
+                     i++)
+                {
+                    messageQueue[messageCount++] = messageQueue_[i];
+                }
+
+                for (size_t i = 0; i < messageQueueHead_; i++)
+                {
+                    messageQueue[messageCount++] = messageQueue_[i];
+                }
+            }
+
+            messageQueueTail_ = messageQueueHead_;
+        }
 
         mutexlock.unlock();
         // sync end
 
         try
         {
-            for (size_t i = 0; i < messageCount; i++)
+            if (callback)
             {
-                std::cout << messageQueue[i];
+                for (size_t i = 0; i < messageCount; i++)
+                {
+                    callback->println(messageQueue[i]);
+                }
+                callback->flush();
             }
-            std::cout.flush();
         }
         catch (...)
         {

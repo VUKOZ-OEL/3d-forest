@@ -19,9 +19,8 @@
 
 /** @file 3dforest.cpp */
 
-//#include <ApplicationLog.hpp>
-
 #include <Log.hpp>
+#include <LoggerWindow.hpp>
 #include <MainWindow.hpp>
 
 #include <QApplication>
@@ -29,25 +28,34 @@
 
 int main(int argc, char *argv[])
 {
+    int rc = 1;
+
     globalLogThread = std::make_shared<LogThread>();
-    // ApplicationLog::install();
+    LoggerWindow::install();
 
-    QApplication app(argc, argv);
+    try
+    {
+        QApplication app(argc, argv);
 
-    app.setOrganizationName("VUKOZ v.v.i.");
-    app.setApplicationName(MainWindow::APPLICATION_NAME);
-    app.setApplicationVersion(MainWindow::APPLICATION_VERSION);
-    app.setWindowIcon(QIcon(":/3dforest_128px.png"));
+        app.setOrganizationName("VUKOZ v.v.i.");
+        app.setApplicationName(MainWindow::APPLICATION_NAME);
+        app.setApplicationVersion(MainWindow::APPLICATION_VERSION);
+        app.setWindowIcon(QIcon(":/3dforest_128px.png"));
 
-    QSurfaceFormat format;
-    format.setDepthBufferSize(24);
-    QSurfaceFormat::setDefaultFormat(format);
+        QSurfaceFormat format;
+        format.setDepthBufferSize(24);
+        QSurfaceFormat::setDefaultFormat(format);
 
-    MainWindow window;
-    window.setWindowIcon(QIcon(":/3dforest_128px.png"));
-    window.show();
+        MainWindow window;
+        window.setWindowIcon(QIcon(":/3dforest_128px.png"));
+        window.show();
 
-    int rc = app.exec();
+        rc = app.exec();
+    }
+    catch (...)
+    {
+        // empty
+    }
 
     globalLogThread->stop();
 
