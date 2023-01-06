@@ -19,8 +19,13 @@
 
 /** @file Thread.cpp */
 
+#include <Log.hpp>
 #include <Thread.hpp>
 #include <ThreadCallbackInterface.hpp>
+
+#define MODULE_NAME "Thread"
+#define LOG_DEBUG_LOCAL(msg)
+//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 Thread::Thread()
     : callback_(nullptr),
@@ -29,10 +34,12 @@ Thread::Thread()
       waiting_(false),
       received_(false)
 {
+    LOG_DEBUG_LOCAL("");
 }
 
 Thread::~Thread()
 {
+    LOG_DEBUG_LOCAL("");
 }
 
 void Thread::setCallback(ThreadCallbackInterface *callback)
@@ -42,16 +49,19 @@ void Thread::setCallback(ThreadCallbackInterface *callback)
 
 void Thread::create()
 {
+    LOG_DEBUG_LOCAL("");
     thread_ = std::make_shared<std::thread>(&Thread::runLoop, this);
 }
 
 void Thread::start()
 {
+    LOG_DEBUG_LOCAL("");
     setState(STATE_RUN);
 }
 
 void Thread::cancel()
 {
+    LOG_DEBUG_LOCAL("");
     std::unique_lock mutexlock(mutexCaller_);
     setState(STATE_CANCEL);
     received_ = false;
@@ -63,12 +73,14 @@ void Thread::cancel()
 
 void Thread::stop()
 {
+    LOG_DEBUG_LOCAL("");
     setState(STATE_EXIT);
     thread_->join();
 }
 
 void Thread::wait()
 {
+    LOG_DEBUG_LOCAL("");
     std::unique_lock<std::mutex> mutexlock(mutex_, std::defer_lock);
     mutexlock.lock();
     waiting_ = true;
@@ -79,6 +91,7 @@ void Thread::wait()
 
 void Thread::setState(State state)
 {
+    LOG_DEBUG_LOCAL("state <" << state << ">");
     std::unique_lock<std::mutex> mutexlock(mutex_);
     state_ = state;
     finished_ = false;
@@ -87,6 +100,7 @@ void Thread::setState(State state)
 
 void Thread::runLoop()
 {
+    LOG_DEBUG_LOCAL("");
     State state;
     bool finished = true;
     bool waiting = false;
@@ -97,11 +111,13 @@ void Thread::runLoop()
         mutexlock.lock();
         while (state_ == STATE_RUN && finished_ && finished && !waiting_)
         {
+            LOG_DEBUG_LOCAL("wait");
             condition_.wait(mutexlock);
         }
 
         if (state_ == STATE_RUN)
         {
+            LOG_DEBUG_LOCAL("STATE_RUN");
             state = STATE_RUN;
 
             if (!finished_)
@@ -112,6 +128,7 @@ void Thread::runLoop()
         }
         else if (state_ == STATE_CANCEL)
         {
+            LOG_DEBUG_LOCAL("STATE_CANCEL");
             state_ = STATE_RUN;
             state = STATE_RUN;
             finished_ = true;
@@ -124,32 +141,38 @@ void Thread::runLoop()
         }
         else
         {
+            LOG_DEBUG_LOCAL("STATE_EXIT");
             state = STATE_EXIT;
         }
 
         waiting = waiting_;
+        LOG_DEBUG_LOCAL("waiting <" << waiting << ">");
         mutexlock.unlock();
 
         if (state == STATE_EXIT)
         {
+            LOG_DEBUG_LOCAL("EXIT");
             return;
         }
 
         if (!finished)
         {
+            LOG_DEBUG_LOCAL("compute");
             try
             {
                 finished = compute();
             }
             catch (std::exception &e)
             {
-                // LOG_MODULE("error: " << e.what());
+                LOG_MODULE(MODULE_NAME, "error: " << e.what());
             }
             catch (...)
             {
-                // LOG_MODULE("error: unknown");
+                LOG_MODULE(MODULE_NAME, "error: unknown");
             }
         }
+
+        LOG_DEBUG_LOCAL("finished <" << finished << ">");
 
         if (waiting && finished)
         {
