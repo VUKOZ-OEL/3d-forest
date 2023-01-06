@@ -34,7 +34,7 @@
 
 #define MODULE_NAME "Descriptor"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 #define ICON(name) (ThemeIcon(":/descriptor/", name))
 #define DESCRIPTOR_PLUGIN_NAME "Descriptor"
@@ -44,7 +44,7 @@ DescriptorWindow::DescriptorWindow(MainWindow *mainWindow)
       mainWindow_(mainWindow),
       descriptor_(&mainWindow->editor())
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 
     // Widgets
     SliderWidget::create(radius_,
@@ -118,7 +118,7 @@ DescriptorWindow::DescriptorWindow(MainWindow *mainWindow)
 
 void DescriptorWindow::slotApply()
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 
     mainWindow_->suspendThreads();
 
@@ -132,7 +132,7 @@ void DescriptorWindow::slotApply()
     }
 
     int maximum = descriptor_.start(radius, voxelSize, method);
-    LOG_DEBUG_LOCAL("maximum <" << maximum << ">");
+    LOG_DEBUG_LOCAL(<< "maximum <" << maximum << ">");
 
     QProgressDialog progressDialog(mainWindow_);
     progressDialog.setCancelButtonText(QObject::tr("&Cancel"));
@@ -146,7 +146,7 @@ void DescriptorWindow::slotApply()
     {
         // Update progress
         int p = i + 1;
-        LOG_DEBUG_LOCAL("Processing <" << p << "> from <" << maximum << ">");
+        LOG_DEBUG_LOCAL(<< "Processing <" << p << "> from <" << maximum << ">");
         progressDialog.setValue(p);
         progressDialog.setLabelText(
             QObject::tr("Processing %1 of %n...", nullptr, maximum).arg(p));

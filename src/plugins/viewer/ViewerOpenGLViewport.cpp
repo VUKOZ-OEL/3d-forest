@@ -33,7 +33,7 @@
 
 #define MODULE_NAME "ViewerOpenGLViewport"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 ViewerOpenGLViewport::ViewerOpenGLViewport(QWidget *parent)
     : QOpenGLWidget(parent),
@@ -209,8 +209,8 @@ void ViewerOpenGLViewport::initializeGL()
 void ViewerOpenGLViewport::paintGL()
 {
     LOG_UPDATE_VIEW(MODULE_NAME,
-                    "width <" << camera_.width() << "> height <"
-                              << camera_.height() << ">");
+                    << "width <" << camera_.width() << "> height <"
+                    << camera_.height() << ">");
 
     // Setup camera
     glViewport(0, 0, camera_.width(), camera_.height());
@@ -291,8 +291,8 @@ bool ViewerOpenGLViewport::renderScene()
     }
 
     LOG_UPDATE_VIEW(MODULE_NAME,
-                    "render viewport <" << viewportId_ << "> pageSize <"
-                                        << pageSize << ">");
+                    << "render viewport <" << viewportId_ << "> pageSize <"
+                    << pageSize << ">");
 
     for (size_t pageIndex = 0; pageIndex < pageSize; pageIndex++)
     {
@@ -301,7 +301,7 @@ bool ViewerOpenGLViewport::renderScene()
         if (page.state() == Page::STATE_RENDER)
         {
             LOG_UPDATE_VIEW(MODULE_NAME,
-                            "render pageId <" << page.pageId() << ">");
+                            << "render pageId <" << page.pageId() << ">");
 
             if (pageIndex == 0)
             {

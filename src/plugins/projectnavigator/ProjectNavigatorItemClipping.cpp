@@ -32,8 +32,9 @@
 
 #define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
+#define MODULE_NAME "ProjectNavigatorItemClipping"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("ProjectNavigatorItemClipping", msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 ProjectNavigatorItemClipping::ProjectNavigatorItemClipping(
     MainWindow *mainWindow,
@@ -41,7 +42,7 @@ ProjectNavigatorItemClipping::ProjectNavigatorItemClipping(
     const QString &text)
     : ProjectNavigatorItem(mainWindow, icon, text)
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 
     // Input widgets
     RangeSliderWidget::create(rangeInput_[0],
@@ -122,13 +123,13 @@ void ProjectNavigatorItemClipping::slotUpdate(void *sender,
         return;
     }
 
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 
     const Box<double> &boundary = mainWindow_->editor().datasets().boundary();
-    LOG_DEBUG_LOCAL("boundary <" << boundary << ">");
+    LOG_DEBUG_LOCAL(<< "boundary <" << boundary << ">");
 
     const Region &region = mainWindow_->editor().clipFilter();
-    LOG_DEBUG_LOCAL("region <" << region << ">");
+    LOG_DEBUG_LOCAL(<< "region <" << region << ">");
 
     for (size_t i = 0; i < 3; i++)
     {
@@ -148,14 +149,14 @@ void ProjectNavigatorItemClipping::slotUpdate(void *sender,
 
 void ProjectNavigatorItemClipping::slotRangeIntermediateMinimumValue()
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
     QObject *obj = sender();
     for (int i = 0; i < 3; i++)
     {
         if (obj == rangeInput_[i])
         {
             int v = rangeInput_[i]->minimumValue();
-            LOG_DEBUG_LOCAL("minimumValue <" << v << ">");
+            LOG_DEBUG_LOCAL(<< "minimumValue <" << v << ">");
             clipRange_[i].setMinimumValue(v);
         }
     }
@@ -165,14 +166,14 @@ void ProjectNavigatorItemClipping::slotRangeIntermediateMinimumValue()
 
 void ProjectNavigatorItemClipping::slotRangeIntermediateMaximumValue()
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
     QObject *obj = sender();
     for (int i = 0; i < 3; i++)
     {
         if (obj == rangeInput_[i])
         {
             int v = rangeInput_[i]->maximumValue();
-            LOG_DEBUG_LOCAL("maximumValue <" << v << ">");
+            LOG_DEBUG_LOCAL(<< "maximumValue <" << v << ">");
             clipRange_[i].setMaximumValue(v);
         }
     }
@@ -182,7 +183,7 @@ void ProjectNavigatorItemClipping::slotRangeIntermediateMaximumValue()
 
 void ProjectNavigatorItemClipping::filterChanged()
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 
     Region region;
 

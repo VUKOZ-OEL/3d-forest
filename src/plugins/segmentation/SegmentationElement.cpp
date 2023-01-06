@@ -24,7 +24,7 @@
 
 #define MODULE_NAME "SegmentationElement"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 SegmentationElement::SegmentationElement()
 {

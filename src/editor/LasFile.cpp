@@ -33,7 +33,7 @@
 
 #define MODULE_NAME "LasFile"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 #define LAS_FILE_SIGNATURE_0 0x4C
 #define LAS_FILE_SIGNATURE_1 0x41
@@ -383,8 +383,8 @@ void LasFile::readHeader()
 
 void LasFile::readHeader(Header &hdr)
 {
-    LOG_DEBUG_LOCAL("file <" << file_.path() << "> size <" << file_.size()
-                             << "> bytes");
+    LOG_DEBUG_LOCAL(<< "file <" << file_.path() << "> size <" << file_.size()
+                    << "> bytes");
     uint8_t buffer[256];
 
     if (file_.size() < LAS_FILE_HEADER_SIZE_V10)
@@ -415,10 +415,10 @@ void LasFile::readHeader(Header &hdr)
     // Version
     hdr.version_major = buffer[24];
     hdr.version_minor = buffer[25];
-    LOG_DEBUG_LOCAL("version major <" << static_cast<int>(hdr.version_major)
-                                      << ">");
-    LOG_DEBUG_LOCAL("version minor <" << static_cast<int>(hdr.version_minor)
-                                      << ">");
+    LOG_DEBUG_LOCAL(<< "version major <" << static_cast<int>(hdr.version_major)
+                    << ">");
+    LOG_DEBUG_LOCAL(<< "version minor <" << static_cast<int>(hdr.version_minor)
+                    << ">");
 
     if (hdr.version_major != 1)
     {
@@ -441,10 +441,10 @@ void LasFile::readHeader(Header &hdr)
     // Point format
     hdr.point_data_record_format = buffer[104];
     hdr.point_data_record_length = ltoh16(&buffer[105]);
-    LOG_DEBUG_LOCAL("format <" << static_cast<int>(hdr.point_data_record_format)
-                               << ">");
-    LOG_DEBUG_LOCAL("record length <" << hdr.point_data_record_length
-                                      << "> bytes");
+    LOG_DEBUG_LOCAL(<< "format <"
+                    << static_cast<int>(hdr.point_data_record_format) << ">");
+    LOG_DEBUG_LOCAL(<< "record length <" << hdr.point_data_record_length
+                    << "> bytes");
 
     if (hdr.point_data_record_format >= LAS_FILE_FORMAT_COUNT)
     {
@@ -469,7 +469,8 @@ void LasFile::readHeader(Header &hdr)
         hdr.legacy_number_of_points_by_return[i] = number;
         hdr.number_of_points_by_return[i] = number;
     }
-    LOG_DEBUG_LOCAL("number of points <" << hdr.number_of_point_records << ">");
+    LOG_DEBUG_LOCAL(<< "number of points <" << hdr.number_of_point_records
+                    << ">");
 
     // Scale
     hdr.x_scale_factor = ltohd(&buffer[131 + (0 * 8)]);
@@ -485,15 +486,14 @@ void LasFile::readHeader(Header &hdr)
     hdr.max_z = ltohd(&buffer[131 + (10 * 8)]);
     hdr.min_z = ltohd(&buffer[131 + (11 * 8)]);
 
-    LOG_DEBUG_LOCAL("scale [" << hdr.x_scale_factor << ", "
-                              << hdr.y_scale_factor << ", "
-                              << hdr.z_scale_factor << "]");
-    LOG_DEBUG_LOCAL("offset [" << hdr.x_offset << ", " << hdr.y_offset << ", "
-                               << hdr.z_offset << "]");
-    LOG_DEBUG_LOCAL("min [" << hdr.min_x << ", " << hdr.min_y << ", "
-                            << hdr.min_z << "]");
-    LOG_DEBUG_LOCAL("max [" << hdr.max_x << ", " << hdr.max_y << ", "
-                            << hdr.max_z << "]");
+    LOG_DEBUG_LOCAL(<< "scale [" << hdr.x_scale_factor << ", "
+                    << hdr.y_scale_factor << ", " << hdr.z_scale_factor << "]");
+    LOG_DEBUG_LOCAL(<< "offset [" << hdr.x_offset << ", " << hdr.y_offset
+                    << ", " << hdr.z_offset << "]");
+    LOG_DEBUG_LOCAL(<< "min [" << hdr.min_x << ", " << hdr.min_y << ", "
+                    << hdr.min_z << "]");
+    LOG_DEBUG_LOCAL(<< "max [" << hdr.max_x << ", " << hdr.max_y << ", "
+                    << hdr.max_z << "]");
 
     // Version 1.3
     if (hdr.version_minor > 2)
@@ -542,7 +542,7 @@ void LasFile::writeHeader()
 
 void LasFile::writeHeader(const Header &hdr)
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 
     uint8_t buffer[512];
     uint32_t header_size;

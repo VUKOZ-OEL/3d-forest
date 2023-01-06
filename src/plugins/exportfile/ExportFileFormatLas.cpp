@@ -26,23 +26,23 @@
 
 #define MODULE_NAME "ExportFileFormatLas"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 ExportFileFormatLas::ExportFileFormatLas()
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 }
 
 ExportFileFormatLas::~ExportFileFormatLas()
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 }
 
 void ExportFileFormatLas::create(const std::string &path)
 {
-    LOG_DEBUG_LOCAL("path <" << path << "> nPoints <"
-                             << properties().numberOfPoints() << "> region <"
-                             << properties().region() << ">");
+    LOG_DEBUG_LOCAL(<< "path <" << path << "> nPoints <"
+                    << properties().numberOfPoints() << "> region <"
+                    << properties().region() << ">");
 
     // Create new file which is open for writing
     file_.create(path);
@@ -113,7 +113,7 @@ void ExportFileFormatLas::write(Query &query)
 
 void ExportFileFormatLas::close()
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 
     // Close the file
     file_.close();

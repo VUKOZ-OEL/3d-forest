@@ -39,8 +39,9 @@
 #define ICON(name) (ThemeIcon(":/classification/", name))
 #define CLASSIFICATION_PLUGIN_NAME "Classification"
 
+#define MODULE_NAME "ClassificationPlugin"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("ClassificationPlugin", msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 /** Classification Window. */
 class ClassificationWindow : public QDialog
@@ -70,7 +71,7 @@ ClassificationWindow::ClassificationWindow(MainWindow *mainWindow)
       mainWindow_(mainWindow),
       classification_(&mainWindow->editor())
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 
     // Widgets
     SliderWidget::create(nPointsSlider_,
@@ -156,7 +157,7 @@ ClassificationWindow::ClassificationWindow(MainWindow *mainWindow)
 
 void ClassificationWindow::slotApply()
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 
     mainWindow_->suspendThreads();
 
@@ -170,7 +171,7 @@ void ClassificationWindow::slotApply()
                                         groundErrorPercent,
                                         angleDeg);
 
-    LOG_DEBUG_LOCAL("maximum <" << maximum << ">");
+    LOG_DEBUG_LOCAL(<< "maximum <" << maximum << ">");
 
     QProgressDialog progressDialog(mainWindow_);
     progressDialog.setCancelButtonText(QObject::tr("&Cancel"));
@@ -184,7 +185,7 @@ void ClassificationWindow::slotApply()
     {
         // Update progress
         int p = i + 1;
-        LOG_DEBUG_LOCAL("Processing <" << p << "> from <" << maximum << ">");
+        LOG_DEBUG_LOCAL(<< "Processing <" << p << "> from <" << maximum << ">");
         progressDialog.setValue(p);
         progressDialog.setLabelText(
             QObject::tr("Processing %1 of %n...", nullptr, maximum).arg(p));

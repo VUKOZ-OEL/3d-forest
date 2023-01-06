@@ -75,7 +75,7 @@ static void saveVoxels(const Editor &editor, const std::string &path)
     const Voxels &voxels = editor.voxels();
     const Layers &layers = editor.layers();
 
-    LOG("number of voxels <" << voxels.size() << ">");
+    std::cout << "number of voxels <" << voxels.size() << ">" << std::endl;
 
     std::vector<LasFile::Point> points;
     points.resize(voxels.size());

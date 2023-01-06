@@ -41,8 +41,9 @@
 #define ICON(name) (ThemeIcon(":/elevation/", name))
 #define ELEVATION_PLUGIN_NAME "Elevation"
 
+#define MODULE_NAME "ElevationPlugin"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("ElevationPlugin", msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 /** Elevation Window. */
 class ElevationWindow : public QDialog
@@ -70,7 +71,7 @@ ElevationWindow::ElevationWindow(MainWindow *mainWindow)
       mainWindow_(mainWindow),
       elevation_(&mainWindow->editor())
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 
     // Widgets
     SliderWidget::create(nPointsInput_,
@@ -130,7 +131,7 @@ ElevationWindow::ElevationWindow(MainWindow *mainWindow)
 
 void ElevationWindow::slotApply()
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 
     mainWindow_->suspendThreads();
 
@@ -138,7 +139,7 @@ void ElevationWindow::slotApply()
     double cellLengthMinPercent = static_cast<double>(lengthInput_->value());
 
     int maximum = elevation_.start(pointsPerCell, cellLengthMinPercent);
-    LOG_DEBUG_LOCAL("maximum <" << maximum << ">");
+    LOG_DEBUG_LOCAL(<< "maximum <" << maximum << ">");
 
     QProgressDialog progressDialog(mainWindow_);
     progressDialog.setCancelButtonText(QObject::tr("&Cancel"));
@@ -152,7 +153,7 @@ void ElevationWindow::slotApply()
     {
         // Update progress
         int p = i + 1;
-        LOG_DEBUG_LOCAL("Processing <" << p << "> from <" << maximum << ">");
+        LOG_DEBUG_LOCAL(<< "Processing <" << p << "> from <" << maximum << ">");
         progressDialog.setValue(p);
         progressDialog.setLabelText(
             QObject::tr("Processing %1 of %n...", nullptr, maximum).arg(p));

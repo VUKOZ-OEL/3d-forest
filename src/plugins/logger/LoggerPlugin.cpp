@@ -17,46 +17,46 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file DensityPlugin.cpp */
+/** @file LoggerPlugin.cpp */
 
-#include <DensityPlugin.hpp>
-#include <DensityWindow.hpp>
+#include <LoggerPlugin.hpp>
+#include <LoggerWindow.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
-#define MODULE_NAME "DensityPlugin"
-#define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+#define ICON(name) (ThemeIcon(":/logger/", name))
 
-#define ICON(name) (ThemeIcon(":/density/", name))
-
-DensityPlugin::DensityPlugin() : mainWindow_(nullptr), pluginWindow_(nullptr)
+LoggerPlugin::LoggerPlugin() : mainWindow_(nullptr), loggerWindow_(nullptr)
 {
 }
 
-void DensityPlugin::initialize(MainWindow *mainWindow)
+void LoggerPlugin::initialize(MainWindow *mainWindow)
 {
     mainWindow_ = mainWindow;
 
+    loggerWindow_ = new LoggerWindow(mainWindow_);
+    loggerWindow_->hide();
+    if (globalLogThread)
+    {
+        globalLogThread->setCallback(loggerWindow_);
+    }
+
     mainWindow_->createAction(nullptr,
-                              "Utilities",
-                              "Utilities",
-                              tr("Density"),
-                              tr("Compute density around each point"),
-                              ICON("density"),
+                              "File",
+                              "File Properties",
+                              tr("Logger"),
+                              tr("Show Logger Window"),
+                              ICON("logger"),
                               this,
                               SLOT(slotPlugin()));
 }
 
-void DensityPlugin::slotPlugin()
+void LoggerPlugin::slotPlugin()
 {
-    // Create GUI only when this plugin is used for the first time
-    if (!pluginWindow_)
+    if (loggerWindow_)
     {
-        pluginWindow_ = new DensityWindow(mainWindow_);
+        loggerWindow_->show();
+        loggerWindow_->raise();
+        loggerWindow_->activateWindow();
     }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
 }

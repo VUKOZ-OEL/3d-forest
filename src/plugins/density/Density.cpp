@@ -23,8 +23,9 @@
 #include <Editor.hpp>
 #include <Math.hpp>
 
+#define MODULE_NAME "Density"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE("Density", msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 Density::Density(Editor *editor)
     : editor_(editor),
@@ -32,17 +33,17 @@ Density::Density(Editor *editor)
       queryPoint_(editor),
       status_(STATUS_NEW)
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 }
 
 Density::~Density()
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 }
 
 int Density::start(double radius)
 {
-    LOG_DEBUG_LOCAL("radius <" << radius << ">");
+    LOG_DEBUG_LOCAL(<< "radius <" << radius << ">");
 
     radius_ = radius;
 
@@ -64,15 +65,15 @@ int Density::start(double radius)
     currentStep_ = 0;
     numberOfSteps_ = static_cast<int>(nSteps * 2);
 
-    LOG_DEBUG_LOCAL("numberOfSteps <" << numberOfSteps_ << ">");
+    LOG_DEBUG_LOCAL(<< "numberOfSteps <" << numberOfSteps_ << ">");
 
     return numberOfSteps_;
 }
 
 void Density::step()
 {
-    LOG_DEBUG_LOCAL("step <" << (currentStep_ + 1) << "> from <"
-                             << numberOfSteps_ << ">");
+    LOG_DEBUG_LOCAL(<< "step <" << (currentStep_ + 1) << "> from <"
+                    << numberOfSteps_ << ">");
 
     if (status_ == STATUS_COMPUTE_DENSITY)
     {
@@ -93,9 +94,9 @@ void Density::stepComputeDensity()
     {
         nPointsToProcess = nPointsPerStep_;
     }
-    LOG_DEBUG_LOCAL("points to process <" << nPointsToProcess << "> start <"
-                                          << nPointsProcessed_ << "> total <"
-                                          << nPointsTotal_ << ">");
+    LOG_DEBUG_LOCAL(<< "points to process <" << nPointsToProcess << "> start <"
+                    << nPointsProcessed_ << "> total <" << nPointsTotal_
+                    << ">");
 
     if (nPointsProcessed_ == 0)
     {
@@ -137,8 +138,8 @@ void Density::stepComputeDensity()
     }
 
     nPointsProcessed_ += nPointsToProcess;
-    LOG_DEBUG_LOCAL("points processed <" << nPointsProcessed_ << "> from <"
-                                         << nPointsTotal_ << ">");
+    LOG_DEBUG_LOCAL(<< "points processed <" << nPointsProcessed_ << "> from <"
+                    << nPointsTotal_ << ">");
 
     if (nPointsProcessed_ == nPointsTotal_)
     {
@@ -154,9 +155,9 @@ void Density::stepNormalizeDensity()
     {
         nPointsToProcess = nPointsPerStep_;
     }
-    LOG_DEBUG_LOCAL("points to process <" << nPointsToProcess << "> start <"
-                                          << nPointsProcessed_ << "> total <"
-                                          << nPointsTotal_ << ">");
+    LOG_DEBUG_LOCAL(<< "points to process <" << nPointsToProcess << "> start <"
+                    << nPointsProcessed_ << "> total <" << nPointsTotal_
+                    << ">");
 
     if (nPointsProcessed_ == 0)
     {
@@ -191,8 +192,8 @@ void Density::stepNormalizeDensity()
     }
 
     nPointsProcessed_ += nPointsToProcess;
-    LOG_DEBUG_LOCAL("points processed <" << nPointsProcessed_ << "> from <"
-                                         << nPointsTotal_ << ">");
+    LOG_DEBUG_LOCAL(<< "points processed <" << nPointsProcessed_ << "> from <"
+                    << nPointsTotal_ << ">");
 
     if (nPointsProcessed_ == nPointsTotal_)
     {
@@ -204,7 +205,7 @@ void Density::stepNormalizeDensity()
 
 void Density::clear()
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 
     queryPoints_.clear();
     queryPoint_.clear();

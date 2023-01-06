@@ -28,9 +28,11 @@
 #include <ExportGui.hpp>
 #include <RenderThread.hpp>
 #include <ThreadCallbackInterface.hpp>
+
 class PluginInterface;
 class ExportFilePlugin;
 class ImportFilePlugin;
+class LoggerPlugin;
 class ProjectNavigatorPlugin;
 class ProjectFilePlugin;
 class SettingsPlugin;
@@ -129,6 +131,7 @@ protected:
     // Gui
     ImportFilePlugin *importFilePlugin_;
     ExportFilePlugin *exportFilePlugin_;
+    LoggerPlugin *loggerPlugin_;
     ProjectNavigatorPlugin *projectNavigatorPlugin_;
     ProjectFilePlugin *projectFilePlugin_;
     SettingsPlugin *settingsPlugin_;

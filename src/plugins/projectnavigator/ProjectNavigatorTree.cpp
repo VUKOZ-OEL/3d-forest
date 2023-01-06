@@ -34,7 +34,7 @@
 
 #define MODULE_NAME "ProjectNavigatorTree"
 #define LOG_DEBUG_LOCAL(msg)
-//#define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
 
 ProjectNavigatorTree::ProjectNavigatorTree(MainWindow *mainWindow)
     : QWidget(),
@@ -42,7 +42,7 @@ ProjectNavigatorTree::ProjectNavigatorTree(MainWindow *mainWindow)
       treeWidget_(nullptr),
       tabLayout_(nullptr)
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 
     // Tree
     treeWidget_ = new QTreeWidget();
@@ -93,7 +93,7 @@ ProjectNavigatorTree::ProjectNavigatorTree(MainWindow *mainWindow)
 
 void ProjectNavigatorTree::addItem(ProjectNavigatorItem *widget)
 {
-    LOG_DEBUG_LOCAL(widget->text());
+    LOG_DEBUG_LOCAL(<< widget->text().toStdString());
 
     block();
 
@@ -197,20 +197,20 @@ void ProjectNavigatorTree::unblock()
 
 void ProjectNavigatorTree::setTabVisible(size_t index)
 {
-    LOG_DEBUG_LOCAL("");
+    LOG_DEBUG_LOCAL();
 
     for (size_t i = 0; i < tabList_.size(); i++)
     {
         if (i != index)
         {
-            LOG_DEBUG_LOCAL("hide <" << i << ">");
+            LOG_DEBUG_LOCAL(<< "hide <" << i << ">");
             tabList_[i]->setVisible(false);
         }
     }
 
     if (index < tabList_.size())
     {
-        LOG_DEBUG_LOCAL("show <" << index << ">");
+        LOG_DEBUG_LOCAL(<< "show <" << index << ">");
         tabList_[index]->setVisible(true);
     }
 }

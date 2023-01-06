@@ -24,24 +24,73 @@
 
 #include <iostream>
 #include <iterator>
+#include <memory>
 #include <set>
+#include <sstream>
+#include <string>
 #include <unordered_set>
 #include <vector>
 
+#include <condition_variable>
+#include <mutex>
+#include <thread>
+
+#include <ExportCore.hpp>
+
+/** Log Thread Callback Interface. */
+class EXPORT_CORE LogThreadCallbackInterface
+{
+public:
+    virtual ~LogThreadCallbackInterface() = default;
+    virtual void println(const std::string &msg) = 0;
+    virtual void flush() = 0;
+};
+
+/** Log Thread. */
+class EXPORT_CORE LogThread
+{
+public:
+    LogThread();
+    virtual ~LogThread();
+
+    void println(const std::string &msg);
+    void setCallback(LogThreadCallbackInterface *callback);
+    void stop();
+
+private:
+    std::vector<std::string> messageQueue_;
+    size_t messageQueueHead_;
+    size_t messageQueueTail_;
+
+    std::shared_ptr<std::thread> thread_;
+    std::mutex mutex_;
+    std::condition_variable condition_;
+
+    std::mutex mutexCaller_;
+    std::condition_variable conditionCaller_;
+
+    LogThreadCallbackInterface *callback_;
+
+    bool running_;
+    bool received_;
+
+    void run();
+};
+
+extern std::shared_ptr<LogThread> globalLogThread;
+
 #define LOG_ENABLE 1
 
-#define LOG(msg)                                                               \
-    do                                                                         \
-    {                                                                          \
-        std::cout << __func__ << ": " << msg << "\n";                          \
-        std::cout.flush();                                                     \
-    } while (false)
-
+//#define LOG_MODULE(module, msg)
 #define LOG_MODULE(module, msg)                                                \
     do                                                                         \
     {                                                                          \
-        std::cout << (module) << "::" << __func__ << ": " << msg << "\n";      \
-        std::cout.flush();                                                     \
+        std::stringstream str;                                                 \
+        str << (module) << "::" << __func__ << ": " msg;                       \
+        if (globalLogThread)                                                   \
+        {                                                                      \
+            globalLogThread->println(str.str());                               \
+        }                                                                      \
     } while (false)
 
 #define LOG_UPDATE_VIEW(module, msg)
