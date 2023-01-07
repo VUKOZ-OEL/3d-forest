@@ -21,7 +21,7 @@
 <qresource prefix="/projectnavigator">
 
 <!-- Tool bar -->
-<file>project_24px.png</file>
+<file>project_16px_color.png</file>
 <file>project_24px_color.png</file>
 
 <!-- Common -->
