@@ -55,7 +55,7 @@ ProjectNavigatorItemFiles::ProjectNavigatorItemFiles(MainWindow *mainWindow,
     MainWindow::createToolButton(&addButton_,
                                  tr("Add"),
                                  tr("Add new data set"),
-                                 THEME_ICON("add"),
+                                 THEME_ICON("import_file"),
                                  this,
                                  SLOT(slotAdd()));
 
