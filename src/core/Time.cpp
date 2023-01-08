@@ -27,11 +27,11 @@
     #include <sys/time.h>
 #endif /* _MSC_VER */
 
-#include <time.h>
+#include <ctime>
 
 #include <Time.hpp>
 
-double getRealTime()
+double Time::realTime()
 {
 #if defined(_MSC_VER)
     FILETIME tp;
@@ -49,7 +49,7 @@ double getRealTime()
 #endif /* _MSC_VER */
 }
 
-uint64_t getRealTime64()
+uint64_t Time::realTime64()
 {
 #if defined(_MSC_VER)
     LARGE_INTEGER fq, t;
@@ -66,7 +66,7 @@ uint64_t getRealTime64()
 #endif /* _MSC_VER */
 }
 
-void msleep(long milliseconds)
+void Time::msleep(long milliseconds)
 {
 #if defined(_MSC_VER)
     Sleep(milliseconds);
@@ -78,4 +78,27 @@ void msleep(long milliseconds)
 
     (void)::nanosleep(&request, &request);
 #endif /* _MSC_VER */
+}
+
+std::string Time::strftime(const char *format)
+{
+    // Get and convert a time_t time value to 'timeData' tm structure,
+    // and correct for the local time zone.
+    struct std::tm timeData;
+#if defined(_MSC_VER)
+    __time64_t timeNow = 0;
+    _time64(&timeNow);
+    (void)_localtime64_s(&timeData, &timeNow);
+#else
+    std::time_t timeNow = std::time(nullptr);
+    (void)localtime_s(&timeData, &timeNow);
+    //(void)localtime_r(&timeNow, &timeData);
+#endif /* _MSC_VER */
+
+    // Format tm structure to the string buffer.
+    char buffer[128];
+    (void)std::strftime(buffer, sizeof(buffer), format, &timeData);
+
+    // Return formatted time string.
+    return std::string(buffer);
 }
