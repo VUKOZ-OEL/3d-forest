@@ -34,18 +34,18 @@ ExportFileProgress::ExportFileProgress(Editor *editor)
       editor_(editor),
       query_(editor)
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 }
 
 ExportFileProgress::~ExportFileProgress()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 }
 
 void ExportFileProgress::initialize(std::shared_ptr<ExportFileFormat> writer,
                                     const ExportFileProperties &properties)
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     writer_ = writer;
     properties_ = properties;
@@ -74,7 +74,7 @@ void ExportFileProgress::initialize(std::shared_ptr<ExportFileFormat> writer,
 
 void ExportFileProgress::clear()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     query_.clear();
 }
 

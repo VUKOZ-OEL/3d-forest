@@ -159,7 +159,7 @@ void ProjectNavigatorItemFiles::dataChanged()
 
 void ProjectNavigatorItemFiles::filterChanged()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     mainWindow_->suspendThreads();
     mainWindow_->editor().setDatasetsFilter(filter_);
     mainWindow_->updateFilter();
@@ -203,7 +203,7 @@ void ProjectNavigatorItemFiles::slotDelete()
 
 void ProjectNavigatorItemFiles::slotShow()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
     if (items.count() > 0)

@@ -42,7 +42,7 @@ Query::~Query()
 
 void Query::exec()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     selectedPages_.clear();
 
     bool selected = false;
@@ -126,7 +126,7 @@ void Query::addResults(size_t n)
 
 bool Query::nextPage()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     LOG_DEBUG_FILTER(MODULE_NAME, << "pages<" << selectedPages_.size() << ">");
 
     // Reset point index within active page.
@@ -371,7 +371,7 @@ void Query::setMaximumResults(size_t nPoints)
 
 void Query::setGrid(size_t pointsPerCell, double cellLengthMinPct)
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     // Calculate grid cell size.
     uint64_t pointsPerArea = editor_->datasets().nPoints(where().dataset());

@@ -71,7 +71,7 @@ ClassificationWindow::ClassificationWindow(MainWindow *mainWindow)
       mainWindow_(mainWindow),
       classification_(&mainWindow->editor())
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     // Widgets
     SliderWidget::create(nPointsSlider_,
@@ -157,7 +157,7 @@ ClassificationWindow::ClassificationWindow(MainWindow *mainWindow)
 
 void ClassificationWindow::slotApply()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     mainWindow_->suspendThreads();
 

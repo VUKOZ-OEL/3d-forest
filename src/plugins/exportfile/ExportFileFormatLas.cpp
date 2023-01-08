@@ -30,12 +30,12 @@
 
 ExportFileFormatLas::ExportFileFormatLas()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 }
 
 ExportFileFormatLas::~ExportFileFormatLas()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 }
 
 void ExportFileFormatLas::create(const std::string &path)
@@ -113,7 +113,7 @@ void ExportFileFormatLas::write(Query &query)
 
 void ExportFileFormatLas::close()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     // Close the file
     file_.close();

@@ -31,12 +31,12 @@ Classification::Classification(Editor *editor)
       query_(editor),
       queryPoint_(editor)
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 }
 
 Classification::~Classification()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 }
 
 int Classification::start(size_t pointsPerCell,
@@ -156,7 +156,7 @@ void Classification::step()
 
 void Classification::clear()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     query_.clear();
     queryPoint_.clear();

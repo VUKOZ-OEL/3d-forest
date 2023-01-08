@@ -44,7 +44,7 @@ DescriptorWindow::DescriptorWindow(MainWindow *mainWindow)
       mainWindow_(mainWindow),
       descriptor_(&mainWindow->editor())
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     // Widgets
     SliderWidget::create(radius_,
@@ -118,7 +118,7 @@ DescriptorWindow::DescriptorWindow(MainWindow *mainWindow)
 
 void DescriptorWindow::slotApply()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     mainWindow_->suspendThreads();
 

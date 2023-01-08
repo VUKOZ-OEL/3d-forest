@@ -33,12 +33,12 @@ Density::Density(Editor *editor)
       queryPoint_(editor),
       status_(STATUS_NEW)
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 }
 
 Density::~Density()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 }
 
 int Density::start(double radius)
@@ -205,7 +205,7 @@ void Density::stepNormalizeDensity()
 
 void Density::clear()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     queryPoints_.clear();
     queryPoint_.clear();

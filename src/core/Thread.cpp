@@ -34,12 +34,12 @@ Thread::Thread()
       waiting_(false),
       received_(false)
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 }
 
 Thread::~Thread()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 }
 
 void Thread::setCallback(ThreadCallbackInterface *callback)
@@ -49,19 +49,19 @@ void Thread::setCallback(ThreadCallbackInterface *callback)
 
 void Thread::create()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     thread_ = std::make_shared<std::thread>(&Thread::runLoop, this);
 }
 
 void Thread::start()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     setState(STATE_RUN);
 }
 
 void Thread::cancel()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     std::unique_lock mutexlock(mutexCaller_);
     setState(STATE_CANCEL);
     received_ = false;
@@ -73,14 +73,14 @@ void Thread::cancel()
 
 void Thread::stop()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     setState(STATE_EXIT);
     thread_->join();
 }
 
 void Thread::wait()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     std::unique_lock<std::mutex> mutexlock(mutex_, std::defer_lock);
     mutexlock.lock();
     waiting_ = true;
@@ -100,7 +100,7 @@ void Thread::setState(State state)
 
 void Thread::runLoop()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     State state;
     bool finished = true;
     bool waiting = false;

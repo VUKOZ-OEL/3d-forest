@@ -34,7 +34,7 @@ bool ProgressDialog::run(MainWindow *mainWindow,
                          const char *title,
                          ProgressActionInterface *progressAction)
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     ProgressDialog *progressDialog = new ProgressDialog(mainWindow, title);
     return progressDialog->run(progressAction);
 }
@@ -42,7 +42,7 @@ bool ProgressDialog::run(MainWindow *mainWindow,
 ProgressDialog::ProgressDialog(MainWindow *mainWindow, const char *title)
     : QProgressDialog(mainWindow)
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     // Create modal progress dialog with custom progress bar.
     // Custom progress bar allows to display percentage with fractional part.
@@ -61,7 +61,7 @@ ProgressDialog::ProgressDialog(MainWindow *mainWindow, const char *title)
 
 bool ProgressDialog::run(ProgressActionInterface *progressAction)
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     char buffer[64];
 

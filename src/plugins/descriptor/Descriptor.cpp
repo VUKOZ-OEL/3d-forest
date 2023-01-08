@@ -34,17 +34,17 @@ Descriptor::Descriptor(Editor *editor)
       pca_(),
       status_(STATUS_NEW)
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 }
 
 Descriptor::~Descriptor()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 }
 
 void Descriptor::clear()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     queryPoints_.clear();
     queryPoint_.clear();

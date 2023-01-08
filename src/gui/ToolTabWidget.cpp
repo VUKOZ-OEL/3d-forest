@@ -43,7 +43,7 @@ ToolTabWidget::ToolTabWidget()
       label_(nullptr),
       mainLayout_(nullptr)
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 }
 
 void ToolTabWidget::addTab(QWidget *widget,
@@ -137,7 +137,7 @@ void ToolTabWidget::addTab(QWidget *widget,
 
 void ToolTabWidget::slotToolButton()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     QObject *obj = sender();
 

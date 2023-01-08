@@ -542,7 +542,7 @@ void LasFile::writeHeader()
 
 void LasFile::writeHeader(const Header &hdr)
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     uint8_t buffer[512];
     uint32_t header_size;

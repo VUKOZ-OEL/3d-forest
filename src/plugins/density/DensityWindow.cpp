@@ -42,7 +42,7 @@ DensityWindow::DensityWindow(MainWindow *mainWindow)
       mainWindow_(mainWindow),
       density_(&mainWindow->editor())
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     // Widgets
     SliderWidget::create(radius_,
@@ -89,7 +89,7 @@ DensityWindow::DensityWindow(MainWindow *mainWindow)
 
 void DensityWindow::slotApply()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     mainWindow_->suspendThreads();
 

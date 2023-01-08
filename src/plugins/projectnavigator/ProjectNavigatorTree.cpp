@@ -42,7 +42,7 @@ ProjectNavigatorTree::ProjectNavigatorTree(MainWindow *mainWindow)
       treeWidget_(nullptr),
       tabLayout_(nullptr)
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     // Tree
     treeWidget_ = new QTreeWidget();
@@ -197,7 +197,7 @@ void ProjectNavigatorTree::unblock()
 
 void ProjectNavigatorTree::setTabVisible(size_t index)
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     for (size_t i = 0; i < tabList_.size(); i++)
     {
