@@ -32,7 +32,7 @@
 
 #define MODULE_NAME "DensityWindow"
 #define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
 
 #define ICON(name) (ThemeIcon(":/density/", name))
 #define DENSITY_PLUGIN_NAME "Density"

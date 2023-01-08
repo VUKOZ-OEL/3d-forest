@@ -636,7 +636,7 @@ files     anything
 @section logging Logging
 @verbatim
 #include <Log.hpp>
-LOG_MODULE(MODULE_NAME, << "counter=" << counter);
+LOG_MESSAGE(LOG_DEBUG, "MyClass", << "counter=" << counter);
 @endverbatim
 
 
@@ -667,7 +667,7 @@ void foo(value);
 
 [in], [out], [in,out] for parameters:
 /** @param [in] milliseconds sleep until milliseconds have elapsed. */
-void msleep(long milliseconds);
+void Time::msleep(long milliseconds);
 
 Group 'Point Data' creates hierarchy in generated output:
     /** @name Point Data */

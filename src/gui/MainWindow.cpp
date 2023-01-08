@@ -48,7 +48,7 @@
 
 #define MODULE_NAME "MainWindow"
 #define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
 
 #if !defined(EXPORT_GUI_IMPORT)
 const char *MainWindow::APPLICATION_NAME = "3D Forest";
@@ -390,7 +390,7 @@ void MainWindow::update(const QSet<Editor::Type> &target,
     LOG_DEBUG_LOCAL(<< "targets <" << target.count() << ">");
 
     suspendThreads();
-    LOG_UPDATE_VIEW(MODULE_NAME, << "");
+    LOG_DEBUG_UPDATE_VIEW(MODULE_NAME, << "");
 
     editor_.viewports().setState(viewPortsCacheState);
     // editor_.viewports().clearContent();
@@ -411,7 +411,7 @@ void MainWindow::updateEverything()
     LOG_DEBUG_LOCAL();
 
     suspendThreads();
-    LOG_UPDATE_VIEW(MODULE_NAME, << "");
+    LOG_DEBUG_UPDATE_VIEW(MODULE_NAME, << "");
 
     ViewerViewports *viewports = viewerPlugin_->viewports();
 
@@ -430,7 +430,7 @@ void MainWindow::updateEverything()
 void MainWindow::updateData()
 {
     suspendThreads();
-    LOG_UPDATE_VIEW(MODULE_NAME, << "");
+    LOG_DEBUG_UPDATE_VIEW(MODULE_NAME, << "");
 
     ViewerViewports *viewports = viewerPlugin_->viewports();
     viewports->resetScene(&editor_, false);
@@ -442,7 +442,7 @@ void MainWindow::updateData()
 void MainWindow::updateFilter()
 {
     suspendThreads();
-    LOG_UPDATE_VIEW(MODULE_NAME, << "");
+    LOG_DEBUG_UPDATE_VIEW(MODULE_NAME, << "");
 
     ViewerViewports *viewports = viewerPlugin_->viewports();
     viewports->resetScene(&editor_, false);
@@ -454,7 +454,7 @@ void MainWindow::updateFilter()
 void MainWindow::updateModifiers()
 {
     suspendThreads();
-    LOG_UPDATE_VIEW(MODULE_NAME, << "");
+    LOG_DEBUG_UPDATE_VIEW(MODULE_NAME, << "");
 
     editor_.viewports().setState(Page::STATE_RUN_MODIFIERS);
 
@@ -464,7 +464,7 @@ void MainWindow::updateModifiers()
 void MainWindow::updateRender()
 {
     suspendThreads();
-    LOG_UPDATE_VIEW(MODULE_NAME, << "");
+    LOG_DEBUG_UPDATE_VIEW(MODULE_NAME, << "");
 
     editor_.viewports().setState(Page::STATE_RENDER);
 

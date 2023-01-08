@@ -41,7 +41,7 @@
 
 #define MODULE_NAME "ClassificationPlugin"
 #define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
 
 /** Classification Window. */
 class ClassificationWindow : public QDialog

@@ -37,7 +37,7 @@
 
 #define MODULE_NAME "SegmentationWindow"
 #define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
 #define LOG_DEBUG_LOCAL_THREAD(msg)
 
 #define SEGMENTATION_WINDOW_VOXEL_SIZE_DEFAULT_MIN 1
@@ -277,7 +277,7 @@ void SegmentationWindow::slotThread(bool finished, int progressPercent)
 
     if (finished)
     {
-        LOG_UPDATE_VIEW(MODULE_NAME, << "finished");
+        LOG_DEBUG_UPDATE_VIEW(MODULE_NAME, << "finished");
         mainWindow_->update({Editor::TYPE_LAYER, Editor::TYPE_DESCRIPTOR});
     }
 }

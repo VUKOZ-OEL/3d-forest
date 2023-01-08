@@ -25,7 +25,7 @@
 
 #define MODULE_NAME "Thread"
 #define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
 
 Thread::Thread()
     : callback_(nullptr),
@@ -164,11 +164,11 @@ void Thread::runLoop()
             }
             catch (std::exception &e)
             {
-                LOG_MODULE(MODULE_NAME, << "error: " << e.what());
+                LOG_MESSAGE(LOG_ERROR, MODULE_NAME, << "error: " << e.what());
             }
             catch (...)
             {
-                LOG_MODULE(MODULE_NAME, << "error: unknown");
+                LOG_MESSAGE(LOG_ERROR, MODULE_NAME, << "error: unknown");
             }
         }
 

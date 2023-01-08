@@ -37,7 +37,7 @@
 
 #define MODULE_NAME "ProjectNavigatorItemFiles"
 #define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
 
 #define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
@@ -136,7 +136,7 @@ ProjectNavigatorItemFiles::ProjectNavigatorItemFiles(MainWindow *mainWindow,
 void ProjectNavigatorItemFiles::slotUpdate(void *sender,
                                            const QSet<Editor::Type> &target)
 {
-    LOG_FILTER(MODULE_NAME, << "targets<" << target.size() << ">");
+    LOG_DEBUG_FILTER(MODULE_NAME, << "targets<" << target.size() << ">");
 
     if (sender == this)
     {

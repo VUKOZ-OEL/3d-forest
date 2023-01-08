@@ -36,7 +36,7 @@
 
 #define MODULE_NAME "ProjectNavigatorItemClassifications"
 #define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
 
 #define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
@@ -120,7 +120,7 @@ void ProjectNavigatorItemClassifications::slotUpdate(
     void *sender,
     const QSet<Editor::Type> &target)
 {
-    LOG_FILTER(MODULE_NAME, << "targets<" << target.size() << ">");
+    LOG_DEBUG_FILTER(MODULE_NAME, << "targets<" << target.size() << ">");
 
     if (sender == this)
     {
@@ -354,8 +354,8 @@ void ProjectNavigatorItemClassifications::addTreeItem(size_t index)
 void ProjectNavigatorItemClassifications::setClassifications(
     const Classifications &classifications)
 {
-    LOG_FILTER(MODULE_NAME,
-               << "classifications<" << classifications.size() << ">");
+    LOG_DEBUG_FILTER(MODULE_NAME,
+                     << "classifications<" << classifications.size() << ">");
 
     block();
 

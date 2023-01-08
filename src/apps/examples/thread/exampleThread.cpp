@@ -34,7 +34,7 @@ public:
     {
         std::cout << "MyThread::compute::counter=" << counter_ << std::endl;
 
-        msleep(1000);
+        Time::msleep(1000);
         counter_++;
 
         bool finished = counter_ > 2;
