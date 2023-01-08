@@ -23,6 +23,7 @@
 
 #include <ImportFileDialog.hpp>
 #include <MainWindow.hpp>
+#include <ThemeIcon.hpp>
 
 #include <QCheckBox>
 #include <QGridLayout>
@@ -31,6 +32,8 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
+
+#define ICON(name) (ThemeIcon(":/importfile/", name))
 
 ImportFileDialog::ImportFileDialog(MainWindow *mainWindow) : QDialog(mainWindow)
 {
@@ -84,7 +87,8 @@ ImportFileDialog::ImportFileDialog(MainWindow *mainWindow) : QDialog(mainWindow)
     setLayout(dialogLayout);
 
     // Window
-    setWindowTitle("Import File");
+    setWindowTitle(tr("Import File"));
+    setWindowIcon(ICON("import_file"));
     setMaximumWidth(width());
     setMaximumHeight(height());
 }

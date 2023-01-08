@@ -21,6 +21,7 @@
 
 #include <ExportFileDialog.hpp>
 #include <MainWindow.hpp>
+#include <ThemeIcon.hpp>
 #include <Util.hpp>
 
 #include <ExportFileFormatCsv.hpp>
@@ -37,6 +38,8 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QVBoxLayout>
+
+#define ICON(name) (ThemeIcon(":/exportfile/", name))
 
 ExportFileDialog::ExportFileDialog(MainWindow *mainWindow,
                                    const QString &fileName)
@@ -126,7 +129,8 @@ ExportFileDialog::ExportFileDialog(MainWindow *mainWindow,
     setLayout(dialogLayout);
 
     // Window
-    setWindowTitle("Export File Settings");
+    setWindowTitle(tr("Export File"));
+    setWindowIcon(ICON("export_file"));
     setMaximumWidth(600);
     setMaximumHeight(height());
 }
