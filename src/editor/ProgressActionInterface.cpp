@@ -25,7 +25,7 @@
 
 #define MODULE_NAME "ProgressActionInterface"
 #define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
 
 ProgressActionInterface::ProgressActionInterface()
     : nElements_(0),
@@ -54,7 +54,7 @@ void ProgressActionInterface::initialize(uint64_t nElements,
 
 void ProgressActionInterface::startTimer()
 {
-    timeBegin_ = getRealTime();
+    timeBegin_ = Time::realTime();
 }
 
 bool ProgressActionInterface::timedOut()
@@ -64,7 +64,7 @@ bool ProgressActionInterface::timedOut()
     {
         interleaveCounter_ = 0;
 
-        timeNow_ = getRealTime();
+        timeNow_ = Time::realTime();
         if (timeNow_ - timeBegin_ > secondsPerStep_)
         {
             return true; // timed out

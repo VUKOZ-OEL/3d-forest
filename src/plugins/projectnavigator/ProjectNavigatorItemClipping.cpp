@@ -34,7 +34,7 @@
 
 #define MODULE_NAME "ProjectNavigatorItemClipping"
 #define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
 
 ProjectNavigatorItemClipping::ProjectNavigatorItemClipping(
     MainWindow *mainWindow,

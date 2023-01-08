@@ -42,9 +42,9 @@ LoggerWindow::LoggerWindow(MainWindow *mainWindow)
 
     // signals
     connect(this,
-            SIGNAL(signalPrintln(const QString &)),
+            SIGNAL(signalPrintln(const QString &, const QString &)),
             this,
-            SLOT(slotPrintln(const QString &)),
+            SLOT(slotPrintln(const QString &, const QString &)),
             Qt::QueuedConnection);
 }
 
@@ -56,9 +56,10 @@ LoggerWindow::~LoggerWindow()
     }
 }
 
-void LoggerWindow::println(const std::string &msg)
+void LoggerWindow::println(const LogMessage &message)
 {
-    emit signalPrintln(QString::fromStdString(msg));
+    emit signalPrintln(QString::fromStdString(message.time),
+                       QString::fromStdString(message.text));
 }
 
 void LoggerWindow::flush()
@@ -66,9 +67,9 @@ void LoggerWindow::flush()
     // empty
 }
 
-void LoggerWindow::slotPrintln(const QString &msg)
+void LoggerWindow::slotPrintln(const QString &time, const QString &text)
 {
-    textEdit_->append(msg);
+    textEdit_->append(time + " " + text);
 }
 
 static void loggerWindowQtMessageHandler(QtMsgType type,
@@ -77,18 +78,26 @@ static void loggerWindowQtMessageHandler(QtMsgType type,
 {
     (void)context;
 
+    LogType logType;
     switch (type)
     {
-        case QtInfoMsg:
         case QtDebugMsg:
+            logType = LOG_DEBUG;
+            break;
         case QtWarningMsg:
+            logType = LOG_WARNING;
+            break;
+        case QtInfoMsg:
+            logType = LOG_INFO;
+            break;
         case QtCriticalMsg:
         case QtFatalMsg:
-            LOG_MODULE("Qt", << msg.toStdString());
-            break;
         default:
+            logType = LOG_ERROR;
             break;
     }
+
+    LOG_MESSAGE(logType, "Qt", << msg.toStdString());
 }
 
 void LoggerWindow::install()

@@ -33,7 +33,7 @@
 
 #define MODULE_NAME "LasFile"
 #define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
 
 #define LAS_FILE_SIGNATURE_0 0x4C
 #define LAS_FILE_SIGNATURE_1 0x41

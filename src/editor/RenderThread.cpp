@@ -27,7 +27,7 @@
 
 #define MODULE_NAME "RenderThread"
 #define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
 
 RenderThread::RenderThread(Editor *editor)
     : editor_(editor),
@@ -39,7 +39,7 @@ RenderThread::RenderThread(Editor *editor)
 void RenderThread::render(size_t viewportId, const Camera &camera)
 {
     LOG_DEBUG_LOCAL(<< "viewportId=" << viewportId);
-    LOG_UPDATE_VIEW(MODULE_NAME, << "viewport <" << viewportId << ">");
+    LOG_DEBUG_UPDATE_VIEW(MODULE_NAME, << "viewport <" << viewportId << ">");
     cancel();
 
     viewportId_ = viewportId;
@@ -62,12 +62,12 @@ bool RenderThread::compute()
     }
 
     LOG_DEBUG_LOCAL(<< "nextState");
-    double t1 = getRealTime();
+    double t1 = Time::realTime();
     bool finished;
     editor_->lock();
     finished = editor_->viewports().nextState();
     editor_->unlock();
-    double t2 = getRealTime();
+    double t2 = Time::realTime();
     double msec = (t2 - t1) * 1000.;
 
     if (callback_)
@@ -78,7 +78,7 @@ bool RenderThread::compute()
 
     if (msec < 20.)
     {
-        msleep(1);
+        Time::msleep(1);
     }
 
     return finished;

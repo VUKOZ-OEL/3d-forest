@@ -23,16 +23,25 @@
 #define TIME_HPP
 
 #include <cstdint>
+#include <string>
 
 #include <ExportCore.hpp>
 
-/** Get the number of seconds since the Epoch. */
-double EXPORT_CORE getRealTime();
+class Time
+{
+public:
+    /** Get the number of seconds since the Epoch. */
+    static double EXPORT_CORE realTime();
 
-/** Get the number of seconds since the Epoch. */
-uint64_t EXPORT_CORE getRealTime64();
+    /** Get the number of seconds since the Epoch. */
+    static uint64_t EXPORT_CORE realTime64();
 
-/** Makes the calling thread sleep until milliseconds have elapsed. */
-void EXPORT_CORE msleep(long milliseconds);
+    /** Makes the calling thread sleep until milliseconds have elapsed. */
+    static void EXPORT_CORE msleep(long milliseconds);
+
+    /** Format current local time to string. */
+    static std::string EXPORT_CORE
+    strftime(const char *format = "%Y-%m-%d %H:%M:%S");
+};
 
 #endif /* TIME_HPP */

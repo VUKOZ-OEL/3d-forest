@@ -778,10 +778,10 @@ std::string File::resolvePath(const std::string &path,
 
 std::string File::tmpname(const std::string &path)
 {
-    unsigned long long t = getRealTime64();
+    unsigned long long t = Time::realTime64();
     char buffer[32];
     (void)snprintf(buffer, sizeof(buffer), "%016llX", t);
-    msleep(1);
+    Time::msleep(1);
     return path + "." + std::string(buffer);
 }
 

@@ -28,9 +28,9 @@
 
 #define MODULE_NAME "SegmentationThread"
 #define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
 //#define LOG_DEBUG_LOCAL_STATE(msg)
-#define LOG_DEBUG_LOCAL_STATE(msg) LOG_MODULE(MODULE_NAME, msg)
+#define LOG_DEBUG_LOCAL_STATE(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
 
 SegmentationThread::SegmentationThread(Editor *editor)
     : editor_(editor),
@@ -142,7 +142,7 @@ bool SegmentationThread::compute()
     LOG_DEBUG_LOCAL(<< "state <" << state_ << ">");
 
     // Next step
-    timeBegin = getRealTime();
+    timeBegin = Time::realTime();
 
     resetLayers();
 
@@ -217,7 +217,7 @@ bool SegmentationThread::compute()
         setState(STATE_FINISHED);
     }
 
-    timeElapsed = getRealTime() - timeBegin;
+    timeElapsed = Time::realTime() - timeBegin;
     LOG_DEBUG_LOCAL(<< "time <" << (timeElapsed * 1000.) << "> [ms]");
 
     // Check if the whole task is finished and call callback
@@ -273,7 +273,7 @@ bool SegmentationThread::hasTimedout(int interleave)
     if (progressCounter_ >= interleave)
     {
         progressCounter_ = 0;
-        timeNow = getRealTime();
+        timeNow = Time::realTime();
         if (timeNow - timeBegin > 0.5)
         {
             return true; // timed out

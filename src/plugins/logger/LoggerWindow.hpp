@@ -23,6 +23,7 @@
 #define LOGGER_WINDOW_HPP
 
 #include <Log.hpp>
+#include <ExportGui.hpp>
 
 #include <QDockWidget>
 
@@ -39,16 +40,16 @@ public:
     LoggerWindow(MainWindow *mainWindow);
     virtual ~LoggerWindow();
 
-    virtual void println(const std::string &msg);
+    virtual void println(const LogMessage &message);
     virtual void flush();
 
-    static void install();
+    static void EXPORT_GUI install();
 
 public slots:
-    void slotPrintln(const QString &msg);
+    void slotPrintln(const QString &time, const QString &text);
 
 signals:
-    void signalPrintln(const QString &msg);
+    void signalPrintln(const QString &time, const QString &text);
 
 protected:
     MainWindow *mainWindow_;

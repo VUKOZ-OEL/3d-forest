@@ -28,7 +28,7 @@
 
 #define MODULE_NAME "Query"
 #define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MODULE(MODULE_NAME, msg)
+// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
 
 Query::Query(Editor *editor) : editor_(editor)
 {
@@ -127,7 +127,7 @@ void Query::addResults(size_t n)
 bool Query::nextPage()
 {
     LOG_DEBUG_LOCAL();
-    LOG_FILTER(MODULE_NAME, << "pages<" << selectedPages_.size() << ">");
+    LOG_DEBUG_FILTER(MODULE_NAME, << "pages<" << selectedPages_.size() << ">");
 
     // Reset point index within active page.
     pagePointIndex_ = 0;
@@ -214,7 +214,7 @@ void Query::setState(Page::State state)
 
 bool Query::nextState()
 {
-    LOG_FILTER(MODULE_NAME, << "lru<" << lru_.size() << ">");
+    LOG_DEBUG_FILTER(MODULE_NAME, << "lru<" << lru_.size() << ">");
 
     for (size_t i = 0; i < lru_.size(); i++)
     {
@@ -677,7 +677,7 @@ std::shared_ptr<Page> Query::read(size_t dataset, size_t index)
 
         try
         {
-            LOG_FILTER(MODULE_NAME, << "pageId<" << nk.pageId << ">");
+            LOG_DEBUG_FILTER(MODULE_NAME, << "pageId<" << nk.pageId << ">");
             result->readPage();
         }
         catch (...)

@@ -20,6 +20,7 @@
 /** @file Log.cpp */
 
 #include <Log.hpp>
+#include <Time.hpp>
 
 std::shared_ptr<LogThread> globalLogThread;
 
@@ -49,13 +50,11 @@ void LogThread::setCallback(LogThreadCallbackInterface *callback)
 
 void LogThread::stop()
 {
-    std::unique_lock<std::mutex> mutexlock(mutex_, std::defer_lock);
-    // sync start
-    mutexlock.lock();
-    running_ = false;
-    received_ = false;
-    mutexlock.unlock();
-    // sync end
+    {
+        std::unique_lock<std::mutex> mutexlock(mutex_);
+        running_ = false;
+        received_ = false;
+    }
     condition_.notify_one();
 
     {
@@ -69,45 +68,49 @@ void LogThread::stop()
     thread_->join();
 }
 
-void LogThread::println(const std::string &msg)
+void LogThread::println(LogType type,
+                        const char *module,
+                        const char *function,
+                        const std::string &text)
 {
-    std::unique_lock<std::mutex> mutexlock(mutex_, std::defer_lock);
-    // sync start
-    mutexlock.lock();
+    std::string timeString = Time::strftime();
+    size_t threadId = std::hash<std::thread::id>()(std::this_thread::get_id());
 
-    messageQueue_[messageQueueHead_] = msg;
+    {
+        std::unique_lock<std::mutex> mutexlock(mutex_);
 
-    if (messageQueueHead_ + 1 == messageQueue_.size())
-    {
-        messageQueueHead_ = 0;
-    }
-    else
-    {
-        messageQueueHead_++;
-    }
+        messageQueue_[messageQueueHead_]
+            .set(type, threadId, timeString, module, function, text);
 
-    if (messageQueueHead_ == messageQueueTail_)
-    {
-        if (messageQueueTail_ + 1 == messageQueue_.size())
+        if (messageQueueHead_ + 1 == messageQueue_.size())
         {
-            messageQueueTail_ = 0;
+            messageQueueHead_ = 0;
         }
         else
         {
-            messageQueueTail_++;
+            messageQueueHead_++;
+        }
+
+        if (messageQueueHead_ == messageQueueTail_)
+        {
+            if (messageQueueTail_ + 1 == messageQueue_.size())
+            {
+                messageQueueTail_ = 0;
+            }
+            else
+            {
+                messageQueueTail_++;
+            }
         }
     }
-
-    mutexlock.unlock();
-    // sync end
     condition_.notify_one();
 }
 
 void LogThread::run()
 {
     bool running;
-    LogThreadCallbackInterface *callback;
-    std::vector<std::string> messageQueue;
+    LogThreadCallbackInterface *callback = nullptr;
+    std::vector<LogMessage> messageQueue;
     size_t messageCount;
     std::unique_lock<std::mutex> mutexlock(mutex_, std::defer_lock);
 
