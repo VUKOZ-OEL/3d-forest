@@ -22,8 +22,8 @@
 #ifndef LOGGER_WINDOW_HPP
 #define LOGGER_WINDOW_HPP
 
-#include <Log.hpp>
 #include <ExportGui.hpp>
+#include <Log.hpp>
 
 #include <QDockWidget>
 
