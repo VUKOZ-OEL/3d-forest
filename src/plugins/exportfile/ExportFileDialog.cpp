@@ -21,8 +21,8 @@
 
 #include <ExportFileDialog.hpp>
 #include <MainWindow.hpp>
-#include <Util.hpp>
 #include <ThemeIcon.hpp>
+#include <Util.hpp>
 
 #include <ExportFileFormatCsv.hpp>
 #include <ExportFileFormatLas.hpp>
