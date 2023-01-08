@@ -23,6 +23,7 @@
 #define LOGGER_WINDOW_HPP
 
 #include <Log.hpp>
+#include <ExportGui.hpp>
 
 #include <QDockWidget>
 
@@ -42,7 +43,7 @@ public:
     virtual void println(const LogMessage &message);
     virtual void flush();
 
-    static void install();
+    static void EXPORT_GUI install();
 
 public slots:
     void slotPrintln(const QString &time, const QString &text);

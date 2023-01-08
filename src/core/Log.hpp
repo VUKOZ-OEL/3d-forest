@@ -118,7 +118,7 @@ private:
     void run();
 };
 
-extern std::shared_ptr<LogThread> globalLogThread;
+extern std::shared_ptr<LogThread> EXPORT_CORE globalLogThread;
 
 #define LOG_MESSAGE(type, module, msg)                                         \
     do                                                                         \
