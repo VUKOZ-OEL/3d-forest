@@ -109,7 +109,7 @@ void LogThread::println(LogType type,
 void LogThread::run()
 {
     bool running;
-    LogThreadCallbackInterface *callback;
+    LogThreadCallbackInterface *callback = nullptr;
     std::vector<LogMessage> messageQueue;
     size_t messageCount;
     std::unique_lock<std::mutex> mutexlock(mutex_, std::defer_lock);
