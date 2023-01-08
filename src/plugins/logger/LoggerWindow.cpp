@@ -42,9 +42,17 @@ LoggerWindow::LoggerWindow(MainWindow *mainWindow)
 
     // signals
     connect(this,
-            SIGNAL(signalPrintln(const QString &, const QString &)),
+            SIGNAL(signalPrintln(const QString &,
+                                 int,
+                                 const QString &,
+                                 const QString &,
+                                 const QString &)),
             this,
-            SLOT(slotPrintln(const QString &, const QString &)),
+            SLOT(slotPrintln(const QString &,
+                             int,
+                             const QString &,
+                             const QString &,
+                             const QString &)),
             Qt::QueuedConnection);
 }
 
@@ -59,7 +67,10 @@ LoggerWindow::~LoggerWindow()
 void LoggerWindow::println(const LogMessage &message)
 {
     emit signalPrintln(QString::fromStdString(message.time),
-                       QString::fromStdString(message.text));
+                       message.type,
+                       QString::fromStdString(message.text),
+                       QString::fromStdString(message.module),
+                       QString::fromStdString(message.function));
 }
 
 void LoggerWindow::flush()
@@ -67,9 +78,33 @@ void LoggerWindow::flush()
     // empty
 }
 
-void LoggerWindow::slotPrintln(const QString &time, const QString &text)
+void LoggerWindow::slotPrintln(const QString &time,
+                               int type,
+                               const QString &text,
+                               const QString &module,
+                               const QString &function)
 {
-    textEdit_->append(time + " " + text);
+    const char *messageType = " ";
+    switch (type)
+    {
+        case LOG_DEBUG:
+            messageType = " DBG ";
+            break;
+        case LOG_WARNING:
+            messageType = " WRN ";
+            break;
+        case LOG_ERROR:
+            messageType = " ERR ";
+            break;
+        case LOG_INFO:
+            messageType = " INF ";
+            break;
+        default:
+            break;
+    }
+
+    textEdit_->append(time + messageType + text + " [" + module + ":" +
+                      function + "]");
 }
 
 static void loggerWindowQtMessageHandler(QtMsgType type,
