@@ -28,7 +28,7 @@
 
 QueryFilterSet::QueryFilterSet() : enabled_(false)
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 }
 
 QueryFilterSet::QueryFilterSet(const std::unordered_set<size_t> &list)
@@ -36,7 +36,7 @@ QueryFilterSet::QueryFilterSet(const std::unordered_set<size_t> &list)
       values_(list),
       enabled_(false)
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 }
 
 QueryFilterSet::~QueryFilterSet()

@@ -32,12 +32,12 @@
 
 Elevation::Elevation(Editor *editor) : editor_(editor), query_(editor)
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 }
 
 Elevation::~Elevation()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 }
 
 int Elevation::start(size_t pointsPerCell, double cellLengthMinPercent)
@@ -234,7 +234,7 @@ void Elevation::exportGroundMesh(const std::string &path)
 
 void Elevation::clear()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     query_.clear();
 

@@ -61,7 +61,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       threadRender_(&editor_)
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     // Status bar
     statusProgressBar_ = new QProgressBar;
@@ -145,7 +145,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     threadRender_.stop();
 }
 
@@ -340,13 +340,13 @@ void MainWindow::loadPlugin(QObject *plugin)
 
 void MainWindow::suspendThreads()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     threadRender_.cancel();
 }
 
 void MainWindow::resumeThreads()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     slotRenderViewport();
 }
 
@@ -359,7 +359,7 @@ void MainWindow::threadProgress(bool finished)
 
 void MainWindow::slotRender()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     editor_.lock();
     viewerPlugin_->viewports()->updateScene(&editor_);
     editor_.unlock();
@@ -367,13 +367,13 @@ void MainWindow::slotRender()
 
 void MainWindow::slotRenderViewport()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     slotRenderViewport(viewerPlugin_->viewports()->selectedViewportId());
 }
 
 void MainWindow::slotRenderViewport(size_t viewportId)
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     ViewerViewports *viewports = viewerPlugin_->viewports();
     threadRender_.render(viewportId, viewports->camera(viewportId));
 }
@@ -408,7 +408,7 @@ void MainWindow::update(const QSet<Editor::Type> &target,
 
 void MainWindow::updateEverything()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     suspendThreads();
     LOG_DEBUG_UPDATE_VIEW(MODULE_NAME, << "");

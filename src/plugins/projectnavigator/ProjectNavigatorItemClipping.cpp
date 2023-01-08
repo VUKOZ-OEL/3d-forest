@@ -42,7 +42,7 @@ ProjectNavigatorItemClipping::ProjectNavigatorItemClipping(
     const QString &text)
     : ProjectNavigatorItem(mainWindow, icon, text)
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     // Input widgets
     RangeSliderWidget::create(rangeInput_[0],
@@ -123,7 +123,7 @@ void ProjectNavigatorItemClipping::slotUpdate(void *sender,
         return;
     }
 
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     const Box<double> &boundary = mainWindow_->editor().datasets().boundary();
     LOG_DEBUG_LOCAL(<< "boundary <" << boundary << ">");
@@ -149,7 +149,7 @@ void ProjectNavigatorItemClipping::slotUpdate(void *sender,
 
 void ProjectNavigatorItemClipping::slotRangeIntermediateMinimumValue()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     QObject *obj = sender();
     for (int i = 0; i < 3; i++)
     {
@@ -166,7 +166,7 @@ void ProjectNavigatorItemClipping::slotRangeIntermediateMinimumValue()
 
 void ProjectNavigatorItemClipping::slotRangeIntermediateMaximumValue()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     QObject *obj = sender();
     for (int i = 0; i < 3; i++)
     {
@@ -183,7 +183,7 @@ void ProjectNavigatorItemClipping::slotRangeIntermediateMaximumValue()
 
 void ProjectNavigatorItemClipping::filterChanged()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     Region region;
 

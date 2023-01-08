@@ -71,7 +71,7 @@ ElevationWindow::ElevationWindow(MainWindow *mainWindow)
       mainWindow_(mainWindow),
       elevation_(&mainWindow->editor())
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     // Widgets
     SliderWidget::create(nPointsInput_,
@@ -131,7 +131,7 @@ ElevationWindow::ElevationWindow(MainWindow *mainWindow)
 
 void ElevationWindow::slotApply()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     mainWindow_->suspendThreads();
 

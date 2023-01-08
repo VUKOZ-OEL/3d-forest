@@ -82,22 +82,22 @@ void Time::msleep(long milliseconds)
 
 std::string Time::strftime(const char *format)
 {
-    // Get and convert a time_t time value to 'timeData' tm structure,
+    // Get and convert a time_t time value to 'timeNowData' tm structure,
     // and correct for the local time zone.
-    struct std::tm timeData;
+    struct std::tm timeNowData;
 #if defined(_MSC_VER)
     __time64_t timeNow = 0;
     _time64(&timeNow);
-    (void)_localtime64_s(&timeData, &timeNow);
+    (void)_localtime64_s(&timeNowData, &timeNow);
 #else
     std::time_t timeNow = std::time(nullptr);
-    (void)localtime_s(&timeData, &timeNow);
-    //(void)localtime_r(&timeNow, &timeData);
+    (void)localtime_s(&timeNowData, &timeNow);
+    //(void)localtime_r(&timeNow, &timeNowData);
 #endif /* _MSC_VER */
 
     // Format tm structure to the string buffer.
     char buffer[128];
-    (void)std::strftime(buffer, sizeof(buffer), format, &timeData);
+    (void)std::strftime(buffer, sizeof(buffer), format, &timeNowData);
 
     // Return formatted time string.
     return std::string(buffer);

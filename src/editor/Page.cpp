@@ -346,7 +346,7 @@ void Page::transform()
 
 void Page::queryWhere()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     LOG_DEBUG_FILTER(MODULE_NAME, << "pageId<" << pageId_ << ">");
 
     const Box<double> &clipBox = query_->where().box();

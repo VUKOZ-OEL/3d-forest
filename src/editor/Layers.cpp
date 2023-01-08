@@ -33,14 +33,14 @@ Layers::Layers()
 
 void Layers::clear()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     layers_.clear();
     hashTableId_.clear();
 }
 
 void Layers::setDefault()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     size_t id = 0;
     size_t idx = 0;
 
@@ -64,7 +64,7 @@ void Layers::push_back(const Layer &layer)
 
 void Layers::erase(size_t i)
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     if (layers_.size() == 0)
     {
@@ -85,7 +85,7 @@ void Layers::erase(size_t i)
 
 size_t Layers::unusedId() const
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     // Return minimum available id value
     for (size_t rval = 0; rval < std::numeric_limits<size_t>::max(); rval++)
     {
@@ -112,7 +112,7 @@ void Layers::setColor(size_t i, const Vector3<float> &color)
 
 void Layers::read(const Json &in)
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     clear();
 
@@ -144,7 +144,7 @@ void Layers::read(const Json &in)
 
 Json &Layers::write(Json &out) const
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     size_t i = 0;
 

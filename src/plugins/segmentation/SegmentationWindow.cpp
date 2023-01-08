@@ -48,7 +48,7 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
       mainWindow_(mainWindow),
       segmentationThread_(&mainWindow->editor())
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     // Voxel size
     SliderWidget::create(voxelSizeInput_,
@@ -171,13 +171,13 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
 
 SegmentationWindow::~SegmentationWindow()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     segmentationThread_.stop();
 }
 
 void SegmentationWindow::updateRange()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     const Editor *editor = segmentationThread_.editor();
     Box<double> boundary = editor->clipBoundary();
     double max = boundary.maximumLength() * 0.1;
@@ -232,21 +232,21 @@ void SegmentationWindow::slotNeighborPointsFinalValue()
 
 void SegmentationWindow::slotAccept()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     close();
     setResult(QDialog::Accepted);
 }
 
 void SegmentationWindow::slotReject()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     close();
     setResult(QDialog::Rejected);
 }
 
 void SegmentationWindow::showEvent(QShowEvent *event)
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     QDialog::showEvent(event);
     mainWindow_->suspendThreads();
     updateRange();
@@ -255,7 +255,7 @@ void SegmentationWindow::showEvent(QShowEvent *event)
 
 void SegmentationWindow::closeEvent(QCloseEvent *event)
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     suspendThreads();
     mainWindow_->resumeThreads();
     QDialog::closeEvent(event);
@@ -284,7 +284,7 @@ void SegmentationWindow::slotThread(bool finished, int progressPercent)
 
 void SegmentationWindow::suspendThreads()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
     // in gui thread: cancel task in worker thread
     segmentationThread_.cancel();
     mainWindow_->setStatusProgressBarPercent(0);

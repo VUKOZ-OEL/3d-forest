@@ -55,12 +55,12 @@ SegmentationThread::SegmentationThread(Editor *editor)
       timeNow(0),
       timeElapsed(0)
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 }
 
 SegmentationThread::~SegmentationThread()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 }
 
 void SegmentationThread::clear()
@@ -285,7 +285,7 @@ bool SegmentationThread::hasTimedout(int interleave)
 
 void SegmentationThread::resetLayers()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     if (stateInitialized_ || !layersCreated_)
     {
@@ -303,7 +303,7 @@ void SegmentationThread::resetLayers()
 
 bool SegmentationThread::computeInitializeVoxels()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     // Initialization
     if (!stateInitialized_)
@@ -349,7 +349,7 @@ bool SegmentationThread::computeInitializeVoxels()
 
 bool SegmentationThread::computeCreateVoxels()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     // Initialize voxels.
     if (!stateInitialized_)
@@ -439,7 +439,7 @@ bool SegmentationThread::computeCreateVoxels()
 
 bool SegmentationThread::computeSortVoxels()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     // Initialization
     if (!stateInitialized_)
@@ -460,7 +460,7 @@ bool SegmentationThread::computeSortVoxels()
 
 bool SegmentationThread::computeProcessVoxels()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     // Initialization
     if (!stateInitialized_)
@@ -483,7 +483,7 @@ bool SegmentationThread::computeProcessVoxels()
 
 bool SegmentationThread::computeInitializeElements()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     // Initialization
     if (!stateInitialized_)
@@ -509,7 +509,7 @@ bool SegmentationThread::computeInitializeElements()
 
 bool SegmentationThread::computeCreateElements()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     // Initialization
     if (!stateInitialized_)
@@ -561,7 +561,7 @@ bool SegmentationThread::computeCreateElements()
 
 bool SegmentationThread::computeMergeElements()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     // Initialization
     if (!stateInitialized_)
@@ -581,7 +581,7 @@ bool SegmentationThread::computeMergeElements()
 
 bool SegmentationThread::computeCreateLayers()
 {
-    LOG_DEBUG_LOCAL();
+    LOG_DEBUG_LOCAL(<< "");
 
     // Initialization
     if (!stateInitialized_)
