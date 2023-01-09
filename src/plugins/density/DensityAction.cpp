@@ -67,6 +67,7 @@ void DensityAction::initialize(double radius)
 
     nPointsTotal_ = 0;
     nPointsOneHalf_ = 0;
+    nPointsDone_ = 0;
 
     densityMinimum_ = 0;
     densityMaximum_ = 0;
@@ -126,14 +127,9 @@ void DensityAction::stepComputeDensity()
     uint64_t n = process();
     uint64_t i = 0;
 
-    if (n > nPointsOneHalf_)
-    {
-        n = nPointsOneHalf_;
-    }
-
     startTimer();
 
-    while (i < n)
+    while (i < n && nPointsDone_ < nPointsOneHalf_)
     {
         if (queryPoints_.next())
         {
@@ -165,6 +161,7 @@ void DensityAction::stepComputeDensity()
         }
 
         i++;
+        nPointsDone_++;
 
         if (timedOut())
         {
@@ -174,16 +171,18 @@ void DensityAction::stepComputeDensity()
 
     increment(i);
 
-    if (processed() == nPointsOneHalf_)
+    if (nPointsDone_ == nPointsOneHalf_)
     {
+        LOG_DEBUG_LOCAL(<< "STATUS_NORMALIZE_DENSITY");
         status_ = STATUS_NORMALIZE_DENSITY;
+        queryPoints_.reset();
     }
 }
 
 void DensityAction::stepNormalizeDensity()
 {
     uint64_t n = process();
-    uint64_t i = nPointsOneHalf_;
+    uint64_t i = 0;
 
     startTimer();
 
@@ -194,7 +193,7 @@ void DensityAction::stepNormalizeDensity()
         double d = 1.0 / static_cast<double>(densityRange_);
         double v;
 
-        while (i < n)
+        while (i < n && nPointsDone_ < nPointsTotal_)
         {
             if (queryPoints_.next())
             {
@@ -204,6 +203,7 @@ void DensityAction::stepNormalizeDensity()
             }
 
             i++;
+            nPointsDone_++;
             if (timedOut())
             {
                 break;
@@ -212,7 +212,7 @@ void DensityAction::stepNormalizeDensity()
     }
     else
     {
-        while (i < n)
+        while (i < n && nPointsDone_ < nPointsTotal_)
         {
             if (queryPoints_.next())
             {
@@ -221,6 +221,7 @@ void DensityAction::stepNormalizeDensity()
             }
 
             i++;
+            nPointsDone_++;
             if (timedOut())
             {
                 break;
@@ -230,8 +231,9 @@ void DensityAction::stepNormalizeDensity()
 
     increment(i);
 
-    if (processed() == nPointsTotal_)
+    if (nPointsDone_ == nPointsTotal_)
     {
+        LOG_DEBUG_LOCAL(<< "STATUS_FINISHED");
         status_ = STATUS_FINISHED;
         queryPoints_.flush();
     }

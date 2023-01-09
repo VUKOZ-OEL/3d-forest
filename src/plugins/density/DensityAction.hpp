@@ -60,6 +60,7 @@ protected:
 
     uint64_t nPointsTotal_;
     uint64_t nPointsOneHalf_;
+    uint64_t nPointsDone_;
 
     size_t densityMinimum_;
     size_t densityMaximum_;
