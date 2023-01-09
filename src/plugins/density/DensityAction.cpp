@@ -119,17 +119,16 @@ void DensityAction::determineMaximum()
     nPointsOneHalf_ = nPointsTotal_;
     nPointsTotal_ *= 2U;
 
-    ProgressActionInterface::initialize(nPointsTotal_, 1000UL);
+    ProgressActionInterface::initialize(nPointsTotal_, 25UL);
 }
 
 void DensityAction::stepComputeDensity()
 {
-    uint64_t n = process();
     uint64_t i = 0;
 
     startTimer();
 
-    while (i < n && nPointsDone_ < nPointsOneHalf_)
+    while (nPointsDone_ < nPointsOneHalf_)
     {
         if (queryPoints_.next())
         {
@@ -181,7 +180,6 @@ void DensityAction::stepComputeDensity()
 
 void DensityAction::stepNormalizeDensity()
 {
-    uint64_t n = process();
     uint64_t i = 0;
 
     startTimer();
@@ -193,7 +191,7 @@ void DensityAction::stepNormalizeDensity()
         double d = 1.0 / static_cast<double>(densityRange_);
         double v;
 
-        while (i < n && nPointsDone_ < nPointsTotal_)
+        while (nPointsDone_ < nPointsTotal_)
         {
             if (queryPoints_.next())
             {
@@ -212,7 +210,7 @@ void DensityAction::stepNormalizeDensity()
     }
     else
     {
-        while (i < n && nPointsDone_ < nPointsTotal_)
+        while (nPointsDone_ < nPointsTotal_)
         {
             if (queryPoints_.next())
             {
