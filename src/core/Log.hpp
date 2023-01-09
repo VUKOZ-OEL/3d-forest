@@ -135,6 +135,7 @@ extern std::shared_ptr<LogThread> EXPORT_CORE globalLogThread;
 //#define LOG_DEBUG_UPDATE_VIEW(module, msg) LOG_MESSAGE(LOG_DEBUG, module, msg)
 #define LOG_DEBUG_FILTER(module, msg)
 //#define LOG_DEBUG_FILTER(module, msg) LOG_MESSAGE(LOG_DEBUG, module, msg)
+#define LOG_DEBUG_GUI(module, msg) LOG_MESSAGE(LOG_DEBUG, module, msg)
 
 template <typename T>
 inline std::ostream &operator<<(std::ostream &os, std::unordered_set<T> vec)
