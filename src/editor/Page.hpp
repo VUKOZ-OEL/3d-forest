@@ -204,6 +204,7 @@ protected:
     void queryWhereCone();
     void queryWhereSphere();
     void queryWhereElevation();
+    void queryWhereDensity();
     void queryWhereDescriptor();
     void queryWhereClassification();
     void queryWhereLayer();

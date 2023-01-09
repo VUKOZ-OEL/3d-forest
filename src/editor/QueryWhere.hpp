@@ -49,6 +49,9 @@ public:
     void setElevation(const Range<double> &elevation);
     const Range<double> &elevation() const { return elevation_; }
 
+    void setDensity(const Range<float> &density);
+    const Range<float> &density() const { return density_; }
+
     void setDescriptor(const Range<float> &descriptor);
     const Range<float> &descriptor() const { return descriptor_; }
 
@@ -74,6 +77,7 @@ private:
     Cone<double> cone_;
     Sphere<double> sphere_;
     Range<double> elevation_;
+    Range<float> density_;
     Range<float> descriptor_;
     QueryFilterSet dataset_;
     QueryFilterSet classification_;

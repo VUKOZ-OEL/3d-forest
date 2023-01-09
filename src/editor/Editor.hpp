@@ -81,6 +81,10 @@ public:
     const Range<double> &elevationRange() const { return elevationRange_; }
     void setElevationRange(const Range<double> &elevationRange);
 
+    // Density
+    const Range<float> &densityRange() const { return densityRange_; }
+    void setDensityRange(const Range<float> &densityRange);
+
     // Descriptor
     const Range<float> &descriptorRange() const { return descriptorRange_; }
     void setDescriptorRange(const Range<float> &descriptorRange);
@@ -132,6 +136,7 @@ protected:
 
     Region clipFilter_;
     Range<double> elevationRange_;
+    Range<float> densityRange_;
     Range<float> descriptorRange_;
 
     // Modifiers

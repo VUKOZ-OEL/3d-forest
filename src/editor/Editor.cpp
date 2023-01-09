@@ -59,6 +59,7 @@ void Editor::close()
 
     clipFilter_.clear();
     elevationRange_.clear();
+    densityRange_.set(0.0F, 1.0F, 0.0F, 1.0F);
     descriptorRange_.set(0.0F, 1.0F, 0.0F, 1.0F);
 
     unsavedChanges_ = false;
@@ -265,6 +266,19 @@ void Editor::setElevationRange(const Range<double> &elevationRange)
     // unsavedChanges_ = true;
 }
 
+void Editor::setDensityRange(const Range<float> &densityRange)
+{
+    densityRange_ = densityRange;
+    LOG_DEBUG_LOCAL(<< "densityRange <" << densityRange_ << ">");
+
+    if (viewports_.size() > 0)
+    {
+        LOG_DEBUG_FILTER(MODULE_NAME, << "");
+        viewports_.where().setDensity(densityRange_);
+        viewports_.applyWhereToAll();
+    }
+}
+
 void Editor::setDescriptorRange(const Range<float> &descriptorRange)
 {
     descriptorRange_ = descriptorRange;
@@ -292,6 +306,7 @@ void Editor::updateAfterRead()
         // viewports_.where().setClassification();
         viewports_.where().setBox(clipBoundary());
         viewports_.where().setElevation(elevationRange_);
+        viewports_.where().setDensity(densityRange_);
         viewports_.where().setDescriptor(descriptorRange_);
         // viewports_.where().setLayer();
 
