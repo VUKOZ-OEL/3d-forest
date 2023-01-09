@@ -22,8 +22,6 @@
 #ifndef DENSITY_WINDOW_HPP
 #define DENSITY_WINDOW_HPP
 
-#include <Density.hpp>
-
 #include <QDialog>
 
 class MainWindow;
@@ -44,7 +42,6 @@ protected slots:
 
 protected:
     MainWindow *mainWindow_;
-    Density density_;
     SliderWidget *radius_;
     QPushButton *applyButton_;
 };

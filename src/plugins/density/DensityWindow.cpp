@@ -19,30 +19,25 @@
 
 /** @file DensityWindow.cpp */
 
+#include <DensityAction.hpp>
 #include <DensityWindow.hpp>
 #include <MainWindow.hpp>
+#include <ProgressDialog.hpp>
 #include <SliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
-#include <QCoreApplication>
 #include <QHBoxLayout>
-#include <QProgressDialog>
 #include <QPushButton>
 #include <QVBoxLayout>
 
 #define MODULE_NAME "DensityWindow"
-#define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
-
 #define ICON(name) (ThemeIcon(":/density/", name))
-#define DENSITY_PLUGIN_NAME "Density"
 
 DensityWindow::DensityWindow(MainWindow *mainWindow)
     : QDialog(mainWindow),
-      mainWindow_(mainWindow),
-      density_(&mainWindow->editor())
+      mainWindow_(mainWindow)
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG_GUI(MODULE_NAME, << "Window created.");
 
     // Widgets
     SliderWidget::create(radius_,
@@ -81,7 +76,7 @@ DensityWindow::DensityWindow(MainWindow *mainWindow)
 
     // Dialog
     setLayout(mainLayout);
-    setWindowTitle(tr(DENSITY_PLUGIN_NAME));
+    setWindowTitle(tr("Density"));
     setWindowIcon(ICON("density"));
     setMaximumHeight(height());
     setModal(true);
@@ -89,44 +84,27 @@ DensityWindow::DensityWindow(MainWindow *mainWindow)
 
 void DensityWindow::slotApply()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    double radius = static_cast<double>(radius_->value());
+
+    LOG_DEBUG_GUI(MODULE_NAME,
+                  << "Compute density with radius<" << radius << ">");
 
     mainWindow_->suspendThreads();
 
-    double radius = static_cast<double>(radius_->value());
-
-    int maximum = density_.start(radius);
-    LOG_DEBUG_LOCAL(<< "maximum <" << maximum << ">");
-
-    QProgressDialog progressDialog(mainWindow_);
-    progressDialog.setCancelButtonText(QObject::tr("&Cancel"));
-    progressDialog.setRange(0, maximum);
-    progressDialog.setWindowTitle(QObject::tr(DENSITY_PLUGIN_NAME));
-    progressDialog.setWindowModality(Qt::WindowModal);
-    progressDialog.setMinimumDuration(0);
-    progressDialog.show();
-
-    for (int i = 0; i < maximum; i++)
+    try
     {
-        // Update progress
-        int p = i + 1;
-        LOG_DEBUG_LOCAL(<< "Processing <" << p << "> from <" << maximum << ">");
-        progressDialog.setValue(p);
-        progressDialog.setLabelText(
-            QObject::tr("Processing %1 of %n...", nullptr, maximum).arg(p));
-
-        QCoreApplication::processEvents();
-        if (progressDialog.wasCanceled())
-        {
-            break;
-        }
-
-        density_.step();
+        DensityAction computeDensity(&mainWindow_->editor());
+        computeDensity.initialize(radius);
+        ProgressDialog::run(mainWindow_, "Computing Density", &computeDensity);
     }
-
-    density_.clear();
-
-    progressDialog.setValue(progressDialog.maximum());
+    catch (std::exception &e)
+    {
+        mainWindow_->showError(e.what());
+    }
+    catch (...)
+    {
+        mainWindow_->showError("Unknown error");
+    }
 
     mainWindow_->update({Editor::TYPE_DENSITY});
 }

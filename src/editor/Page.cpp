@@ -373,6 +373,7 @@ void Page::queryWhere()
     queryWhereCone();
     queryWhereSphere();
     queryWhereElevation();
+    queryWhereDensity();
     queryWhereDescriptor();
     queryWhereClassification();
     queryWhereLayer();
@@ -793,6 +794,39 @@ void Page::queryWhereElevation()
 
         if (!(elev < elevationRange.minimumValue() ||
               elev > elevationRange.maximumValue()))
+        {
+            if (nSelectedNew != i)
+            {
+                selection[nSelectedNew] = selection[i];
+            }
+
+            nSelectedNew++;
+        }
+    }
+
+    selectionSize = nSelectedNew;
+    LOG_DEBUG_LOCAL_SELECTION(pageId_, selectionSize, selection.size());
+}
+
+void Page::queryWhereDensity()
+{
+    const Range<float> &densityRange = query_->where().density();
+
+    if (densityRange.isEnabled() == false || densityRange.hasBoundaryValues())
+    {
+        return;
+    }
+
+    LOG_DEBUG_FILTER(MODULE_NAME, << "pageId<" << pageId_ << ">");
+
+    size_t nSelectedNew = 0;
+
+    for (size_t i = 0; i < selectionSize; i++)
+    {
+        float v = density[selection[i]];
+
+        if (!(v < densityRange.minimumValue() ||
+              v > densityRange.maximumValue()))
         {
             if (nSelectedNew != i)
             {

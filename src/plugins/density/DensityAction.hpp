@@ -17,24 +17,25 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Density.hpp */
+/** @file DensityAction.hpp */
 
-#ifndef DENSITY_HPP
-#define DENSITY_HPP
+#ifndef DENSITY_ACTION_HPP
+#define DENSITY_ACTION_HPP
 
+#include <ProgressActionInterface.hpp>
 #include <Query.hpp>
 
 class Editor;
 
-/** Density. */
-class Density
+/** Density Action. */
+class DensityAction : public ProgressActionInterface
 {
 public:
-    Density(Editor *editor);
-    ~Density();
+    DensityAction(Editor *editor);
+    virtual ~DensityAction();
 
-    int start(double radius);
-    void step();
+    void initialize(double radius);
+    virtual void step();
     void clear();
 
     size_t minimum() const { return densityMinimum_; }
@@ -44,6 +45,8 @@ protected:
     Editor *editor_;
     Query queryPoints_;
     Query queryPoint_;
+
+    double radius_;
 
     enum Status
     {
@@ -55,20 +58,17 @@ protected:
 
     Status status_;
 
-    double radius_;
-
-    int currentStep_;
-    int numberOfSteps_;
-
     uint64_t nPointsTotal_;
-    uint64_t nPointsPerStep_;
-    uint64_t nPointsProcessed_;
+    uint64_t nPointsOneHalf_;
+    uint64_t nPointsDone_;
 
     size_t densityMinimum_;
     size_t densityMaximum_;
 
     void stepComputeDensity();
     void stepNormalizeDensity();
+
+    void determineMaximum();
 };
 
-#endif /* DENSITY_HPP */
+#endif /* DENSITY_ACTION_HPP */

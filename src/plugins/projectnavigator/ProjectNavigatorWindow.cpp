@@ -23,6 +23,7 @@
 #include <ProjectNavigatorItemClassifications.hpp>
 #include <ProjectNavigatorItemClipping.hpp>
 #include <ProjectNavigatorItemColor.hpp>
+#include <ProjectNavigatorItemDensity.hpp>
 #include <ProjectNavigatorItemDescriptor.hpp>
 #include <ProjectNavigatorItemElevation.hpp>
 #include <ProjectNavigatorItemFiles.hpp>
@@ -66,6 +67,10 @@ ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
     items_.push_back(new ProjectNavigatorItemElevation(mainWindow_,
                                                        ICON("elevation_filter"),
                                                        tr("Elevation")));
+
+    items_.push_back(new ProjectNavigatorItemDensity(mainWindow_,
+                                                     ICON("descriptor_filter"),
+                                                     tr("Density")));
 
     items_.push_back(
         new ProjectNavigatorItemDescriptor(mainWindow_,
