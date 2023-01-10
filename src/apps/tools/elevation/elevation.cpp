@@ -21,7 +21,7 @@
 
 #include <ArgumentParser.hpp>
 #include <Editor.hpp>
-#include <Elevation.hpp>
+#include <ElevationAction.hpp>
 #include <Error.hpp>
 #include <Log.hpp>
 
@@ -35,21 +35,22 @@ static void elevationCompute(const std::string &inputPath,
     editor.open(inputPath);
 
     // Compute elevation by steps.
-    Elevation e(&editor);
-    int n = e.start(pointsPerCell, cellLengthMinPercent);
-    for (int i = 0; i < n; i++)
+    ElevationAction elevation(&editor);
+    elevation.initialize(pointsPerCell, cellLengthMinPercent);
+    while (!elevation.end())
     {
-        std::cout << "Step " << (i + 1) << "/" << n << std::endl;
-        e.step();
+        elevation.step();
 
         if (!outputGroundMesh.empty())
         {
-            e.exportGroundMesh(outputGroundMesh);
+            elevation.exportGroundMesh(outputGroundMesh);
         }
     }
 
-    std::cout << "elevation minimum <" << e.minimum() << ">" << std::endl;
-    std::cout << "elevation maximum <" << e.maximum() << ">" << std::endl;
+    std::cout << "elevation minimum <" << elevation.minimum() << ">"
+              << std::endl;
+    std::cout << "elevation maximum <" << elevation.maximum() << ">"
+              << std::endl;
 }
 
 static void elevationPrint(const std::string &inputPath)

@@ -17,26 +17,28 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Elevation.hpp */
+/** @file ElevationAction.hpp */
 
-#ifndef ELEVATION_HPP
-#define ELEVATION_HPP
+#ifndef ELEVATION_ACTION_HPP
+#define ELEVATION_ACTION_HPP
 
 #include <Eigen/Core>
 
+#include <ProgressActionInterface.hpp>
 #include <Query.hpp>
 
 class Editor;
 
-/** Elevation. */
-class Elevation
+/** Elevation Action. */
+class ElevationAction : public ProgressActionInterface
 {
 public:
-    Elevation(Editor *editor);
-    ~Elevation();
+    ElevationAction(Editor *editor);
+    virtual ~ElevationAction();
 
-    int start(size_t pointsPerCell = 10000, double cellLengthMinPercent = 1.);
-    void step();
+    void initialize(size_t pointsPerCell = 10000,
+                    double cellLengthMinPercent = 1.);
+    virtual void step();
     void exportGroundMesh(const std::string &path);
     void clear();
 
@@ -47,10 +49,8 @@ protected:
     Editor *editor_;
     Query query_;
 
-    int currentStep_;
-    int numberOfSteps_;
-
     uint64_t elevationPointsCount_;
+
     double elevationMinimum_;
     double elevationMaximum_;
 
@@ -61,6 +61,8 @@ protected:
     Eigen::MatrixXd D;      // List of smallest squared distances
     Eigen::MatrixXi I;      // List of indices to smallest distances
     Eigen::MatrixXd C;      // 3 list of closest points
+
+    void stepGrid();
 };
 
-#endif /* ELEVATION_HPP */
+#endif /* ELEVATION_ACTION_HPP */

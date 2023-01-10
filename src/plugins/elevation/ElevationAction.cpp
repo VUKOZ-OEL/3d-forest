@@ -17,61 +17,102 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Elevation.cpp */
+/** @file ElevationAction.cpp */
 
 #include <delaunator.hpp>
 #include <igl/point_mesh_squared_distance.h>
 #include <igl/writeOBJ.h>
 
 #include <Editor.hpp>
-#include <Elevation.hpp>
+#include <ElevationAction.hpp>
 
-#define MODULE_NAME "Elevation"
+#define MODULE_NAME "ElevationAction"
 #define LOG_DEBUG_LOCAL(msg)
 // #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
 
-Elevation::Elevation(Editor *editor) : editor_(editor), query_(editor)
+ElevationAction::ElevationAction(Editor *editor)
+    : editor_(editor),
+      query_(editor)
 {
     LOG_DEBUG_LOCAL(<< "");
 }
 
-Elevation::~Elevation()
+ElevationAction::~ElevationAction()
 {
     LOG_DEBUG_LOCAL(<< "");
 }
 
-int Elevation::start(size_t pointsPerCell, double cellLengthMinPercent)
+void ElevationAction::clear()
+{
+    LOG_DEBUG_LOCAL(<< "");
+
+    query_.clear();
+
+    elevationPointsCount_ = 0;
+
+    elevationMinimum_ = 0;
+    elevationMaximum_ = 0;
+
+    XY.clear();
+
+    P.reserve(0, 0);
+    V.reserve(0, 0);
+    F.reserve(0, 0);
+    D.reserve(0, 0);
+    I.reserve(0, 0);
+    C.reserve(0, 0);
+}
+
+void ElevationAction::initialize(size_t pointsPerCell,
+                                 double cellLengthMinPercent)
 {
     LOG_DEBUG_LOCAL(<< "pointsPerCell <" << pointsPerCell << "> "
                     << "cellLengthMinPercent <" << cellLengthMinPercent << ">");
 
     elevationPointsCount_ = 0;
+
     elevationMinimum_ = 0;
     elevationMaximum_ = 0;
 
     query_.setGrid(pointsPerCell, cellLengthMinPercent);
 
-    currentStep_ = 0;
-    numberOfSteps_ = static_cast<int>(query_.gridSize());
+    size_t numberOfSteps = query_.gridSize();
+    LOG_DEBUG_LOCAL(<< "numberOfSteps <" << numberOfSteps << ">");
 
-    LOG_DEBUG_LOCAL(<< "numberOfSteps <" << numberOfSteps_ << ">");
-
-    return numberOfSteps_;
+    ProgressActionInterface::initialize(numberOfSteps, 1UL);
 }
 
-void Elevation::step()
+void ElevationAction::step()
 {
-    LOG_DEBUG_LOCAL(<< "step <" << (currentStep_ + 1) << "> from <"
-                    << numberOfSteps_ << ">");
+    if (query_.nextGrid())
+    {
+        stepGrid();
+    }
 
+    increment(1);
+
+    if (end())
+    {
+        LOG_DEBUG_LOCAL(<< "flush");
+        query_.flush();
+
+        if (elevationPointsCount_ > 0)
+        {
+            Range<double> range;
+            range.setMinimum(elevationMinimum_);
+            range.setMinimumValue(elevationMinimum_);
+            range.setMaximum(elevationMaximum_);
+            range.setMaximumValue(elevationMaximum_);
+
+            editor_->setElevationRange(range);
+        }
+    }
+}
+
+void ElevationAction::stepGrid()
+{
     size_t nPointsGroundGrid;
     size_t nPointsAboveGrid;
-
-    if (!query_.nextGrid())
-    {
-        LOG_DEBUG_LOCAL(<< "expected nextGrid");
-        return;
-    }
 
     // Select grid cell.
     query_.where().setBox(query_.gridCell());
@@ -202,55 +243,13 @@ void Elevation::step()
 
         LOG_DEBUG_LOCAL(<< "points with elevation <" << idxElevation << ">");
     }
-
-    currentStep_++;
-
-    if (currentStep_ == numberOfSteps_)
-    {
-        LOG_DEBUG_LOCAL(<< "flush");
-        query_.flush();
-
-        if (elevationPointsCount_ > 0)
-        {
-            Range<double> range;
-            range.setMinimum(elevationMinimum_);
-            range.setMinimumValue(elevationMinimum_);
-            range.setMaximum(elevationMaximum_);
-            range.setMaximumValue(elevationMaximum_);
-
-            editor_->setElevationRange(range);
-        }
-    }
 }
 
-void Elevation::exportGroundMesh(const std::string &path)
+void ElevationAction::exportGroundMesh(const std::string &path)
 {
     std::string fullPath;
-    fullPath = path + std::to_string(currentStep_) + ".obj";
+    fullPath = path + std::to_string(processed()) + ".obj";
     LOG_DEBUG_LOCAL(<< "path <" << fullPath << ">");
 
     igl::writeOBJ(fullPath, V, F);
-}
-
-void Elevation::clear()
-{
-    LOG_DEBUG_LOCAL(<< "");
-
-    query_.clear();
-
-    currentStep_ = 0;
-    numberOfSteps_ = 0;
-
-    elevationPointsCount_ = 0;
-    elevationMinimum_ = 0;
-    elevationMaximum_ = 0;
-
-    XY.clear();
-
-    P.reserve(0, 0);
-    V.reserve(0, 0);
-    F.reserve(0, 0);
-    D.reserve(0, 0);
-    I.reserve(0, 0);
-    C.reserve(0, 0);
 }
