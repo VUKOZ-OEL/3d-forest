@@ -48,6 +48,7 @@ int main(int argc, char *argv[])
         ArgumentParser arg;
         arg.add("--input", "");
         arg.add("--cell-points", "10000");
+        arg.parse(argc, argv);
 
         classificationCompute(arg.toString("--input"),
                               arg.toSize("--cell-points"));
