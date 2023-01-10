@@ -17,10 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ExportFileProgress.hpp */
+/** @file ExportFileAction.hpp */
 
-#ifndef EXPORT_FILE_PROGRESS_HPP
-#define EXPORT_FILE_PROGRESS_HPP
+#ifndef EXPORT_FILE_ACTION_HPP
+#define EXPORT_FILE_ACTION_HPP
 
 #include <ExportFileFormat.hpp>
 #include <ExportFileProperties.hpp>
@@ -30,12 +30,12 @@
 
 class Editor;
 
-/** Export File Progress. */
-class ExportFileProgress : public ProgressActionInterface
+/** Export File Action. */
+class ExportFileAction : public ProgressActionInterface
 {
 public:
-    ExportFileProgress(Editor *editor);
-    virtual ~ExportFileProgress();
+    ExportFileAction(Editor *editor);
+    virtual ~ExportFileAction();
 
     void initialize(std::shared_ptr<ExportFileFormat> writer,
                     const ExportFileProperties &properties);
@@ -57,4 +57,4 @@ private:
     void determineMaximum();
 };
 
-#endif /* EXPORT_FILE_PROGRESS_HPP */
+#endif /* EXPORT_FILE_ACTION_HPP */

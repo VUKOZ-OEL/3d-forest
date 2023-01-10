@@ -17,12 +17,12 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file DescriptorWindow.hpp */
+/** @file ClassificationWindow.hpp */
 
-#ifndef DESCRIPTOR_WINDOW_HPP
-#define DESCRIPTOR_WINDOW_HPP
+#ifndef CLASSIFICATION_WINDOW_HPP
+#define CLASSIFICATION_WINDOW_HPP
 
-#include <DescriptorAction.hpp>
+#include <ClassificationAction.hpp>
 
 #include <QDialog>
 
@@ -30,26 +30,28 @@ class MainWindow;
 
 class SliderWidget;
 class QPushButton;
-class QRadioButton;
 
-/** Descriptor Window. */
-class DescriptorWindow : public QDialog
+/** Classification Window. */
+class ClassificationWindow : public QDialog
 {
     Q_OBJECT
 
 public:
-    DescriptorWindow(MainWindow *mainWindow);
+    ClassificationWindow(MainWindow *mainWindow);
 
 protected slots:
     void slotApply();
 
 protected:
     MainWindow *mainWindow_;
-    DescriptorAction descriptor_;
-    SliderWidget *radius_;
-    SliderWidget *voxelSize_;
-    QRadioButton *methodRadioButton_[2];
+    ClassificationAction classification_;
+
+    QWidget *widget_;
+    SliderWidget *nPointsSlider_;
+    SliderWidget *lengthSlider_;
+    SliderWidget *rangeSlider_;
+    SliderWidget *angleSlider_;
     QPushButton *applyButton_;
 };
 
-#endif /* DESCRIPTOR_WINDOW_HPP */
+#endif /* CLASSIFICATION_WINDOW_HPP */

@@ -21,23 +21,21 @@
 
 #include <DescriptorWindow.hpp>
 #include <MainWindow.hpp>
+#include <ProgressDialog.hpp>
 #include <SliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
-#include <QCoreApplication>
 #include <QGroupBox>
 #include <QHBoxLayout>
-#include <QProgressDialog>
 #include <QPushButton>
 #include <QRadioButton>
 #include <QVBoxLayout>
 
-#define MODULE_NAME "Descriptor"
+#define MODULE_NAME "DescriptorWindow"
 #define LOG_DEBUG_LOCAL(msg)
 // #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
 
 #define ICON(name) (ThemeIcon(":/descriptor/", name))
-#define DESCRIPTOR_PLUGIN_NAME "Descriptor"
 
 DescriptorWindow::DescriptorWindow(MainWindow *mainWindow)
     : QDialog(mainWindow),
@@ -73,10 +71,11 @@ DescriptorWindow::DescriptorWindow(MainWindow *mainWindow)
     voxelSize_->setEnabled(false);
 
     // Method
-    methodRadioButton_[Descriptor::METHOD_PCA] = new QRadioButton(tr("PCA"));
-    methodRadioButton_[Descriptor::METHOD_DISTRIBUTION] =
+    methodRadioButton_[DescriptorAction::METHOD_PCA] =
+        new QRadioButton(tr("PCA"));
+    methodRadioButton_[DescriptorAction::METHOD_DISTRIBUTION] =
         new QRadioButton(tr("Distribution"));
-    methodRadioButton_[Descriptor::METHOD_PCA]->setChecked(true);
+    methodRadioButton_[DescriptorAction::METHOD_PCA]->setChecked(true);
     QVBoxLayout *methodVBoxLayout = new QVBoxLayout;
     methodVBoxLayout->addWidget(methodRadioButton_[0]);
     methodVBoxLayout->addWidget(methodRadioButton_[1]);
@@ -110,7 +109,7 @@ DescriptorWindow::DescriptorWindow(MainWindow *mainWindow)
 
     // Dialog
     setLayout(mainLayout);
-    setWindowTitle(tr(DESCRIPTOR_PLUGIN_NAME));
+    setWindowTitle(tr("Descriptor"));
     setWindowIcon(ICON("descriptor"));
     setMaximumHeight(height());
     setModal(true);
@@ -125,44 +124,27 @@ void DescriptorWindow::slotApply()
     double radius = static_cast<double>(radius_->value());
     double voxelSize = static_cast<double>(voxelSize_->value());
 
-    Descriptor::Method method = Descriptor::METHOD_PCA;
-    if (methodRadioButton_[Descriptor::METHOD_DISTRIBUTION]->isChecked())
+    DescriptorAction::Method method = DescriptorAction::METHOD_PCA;
+    if (methodRadioButton_[DescriptorAction::METHOD_DISTRIBUTION]->isChecked())
     {
-        method = Descriptor::METHOD_DISTRIBUTION;
+        method = DescriptorAction::METHOD_DISTRIBUTION;
     }
 
-    int maximum = descriptor_.start(radius, voxelSize, method);
-    LOG_DEBUG_LOCAL(<< "maximum <" << maximum << ">");
-
-    QProgressDialog progressDialog(mainWindow_);
-    progressDialog.setCancelButtonText(QObject::tr("&Cancel"));
-    progressDialog.setRange(0, maximum);
-    progressDialog.setWindowTitle(QObject::tr(DESCRIPTOR_PLUGIN_NAME));
-    progressDialog.setWindowModality(Qt::WindowModal);
-    progressDialog.setMinimumDuration(0);
-    progressDialog.show();
-
-    for (int i = 0; i < maximum; i++)
+    try
     {
-        // Update progress
-        int p = i + 1;
-        LOG_DEBUG_LOCAL(<< "Processing <" << p << "> from <" << maximum << ">");
-        progressDialog.setValue(p);
-        progressDialog.setLabelText(
-            QObject::tr("Processing %1 of %n...", nullptr, maximum).arg(p));
-
-        QCoreApplication::processEvents();
-        if (progressDialog.wasCanceled())
-        {
-            break;
-        }
-
-        descriptor_.step();
+        descriptor_.initialize(radius, voxelSize, method);
+        ProgressDialog::run(mainWindow_, "Computing Descriptors", &descriptor_);
+    }
+    catch (std::exception &e)
+    {
+        mainWindow_->showError(e.what());
+    }
+    catch (...)
+    {
+        mainWindow_->showError("Unknown error");
     }
 
     descriptor_.clear();
-
-    progressDialog.setValue(progressDialog.maximum());
 
     mainWindow_->update({Editor::TYPE_DESCRIPTOR});
 }

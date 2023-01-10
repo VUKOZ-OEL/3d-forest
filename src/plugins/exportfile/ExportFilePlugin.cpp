@@ -21,9 +21,9 @@
 
 #include <Log.hpp>
 
+#include <ExportFileAction.hpp>
 #include <ExportFileDialog.hpp>
 #include <ExportFilePlugin.hpp>
-#include <ExportFileProgress.hpp>
 #include <MainWindow.hpp>
 #include <ProgressDialog.hpp>
 #include <ThemeIcon.hpp>
@@ -63,7 +63,7 @@ void ExportFilePlugin::slotExportFile()
             std::shared_ptr<ExportFileFormat> writer = dialog.writer();
             ExportFileProperties properties = dialog.properties();
 
-            ExportFileProgress exportFile(&mainWindow_->editor());
+            ExportFileAction exportFile(&mainWindow_->editor());
             exportFile.initialize(writer, properties);
 
             ProgressDialog::run(mainWindow_, "Exporting file", &exportFile);

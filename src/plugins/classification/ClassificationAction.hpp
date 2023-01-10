@@ -17,27 +17,28 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Classification.hpp */
+/** @file ClassificationAction.hpp */
 
-#ifndef CLASSIFICATION_HPP
-#define CLASSIFICATION_HPP
+#ifndef CLASSIFICATION_ACTION_HPP
+#define CLASSIFICATION_ACTION_HPP
 
+#include <ProgressActionInterface.hpp>
 #include <Query.hpp>
 
 class Editor;
 
-/** Classification. */
-class Classification
+/** Classification Action. */
+class ClassificationAction : public ProgressActionInterface
 {
 public:
-    Classification(Editor *editor);
-    ~Classification();
+    ClassificationAction(Editor *editor);
+    virtual ~ClassificationAction();
 
-    int start(size_t pointsPerCell = 10000,
-              double cellLengthMinPercent = 1.,
-              double groundErrorPercent = 15.,
-              double angleDeg = 60.);
-    void step();
+    void initialize(size_t pointsPerCell = 10000,
+                    double cellLengthMinPercent = 1.,
+                    double groundErrorPercent = 15.,
+                    double angleDeg = 60.);
+    virtual void step();
     void clear();
 
 protected:
@@ -48,8 +49,7 @@ protected:
     double groundErrorPercent_;
     double angleDeg_;
 
-    int currentStep_;
-    int numberOfSteps_;
+    void stepGrid();
 };
 
-#endif /* CLASSIFICATION_HPP */
+#endif /* CLASSIFICATION_ACTION_HPP */
