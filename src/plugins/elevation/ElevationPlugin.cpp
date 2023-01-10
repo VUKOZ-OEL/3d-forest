@@ -19,162 +19,20 @@
 
 /** @file ElevationPlugin.cpp */
 
-#include <Elevation.hpp>
 #include <ElevationPlugin.hpp>
+#include <ElevationWindow.hpp>
 #include <MainWindow.hpp>
-#include <SliderWidget.hpp>
 #include <ThemeIcon.hpp>
-
-#include <QCheckBox>
-#include <QCloseEvent>
-#include <QComboBox>
-#include <QCoreApplication>
-#include <QDialog>
-#include <QGridLayout>
-#include <QGroupBox>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QProgressDialog>
-#include <QPushButton>
-#include <QVBoxLayout>
-
-#define ICON(name) (ThemeIcon(":/elevation/", name))
-#define ELEVATION_PLUGIN_NAME "Elevation"
 
 #define MODULE_NAME "ElevationPlugin"
 #define LOG_DEBUG_LOCAL(msg)
 // #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
 
-/** Elevation Window. */
-class ElevationWindow : public QDialog
-{
-    Q_OBJECT
+#define ICON(name) (ThemeIcon(":/elevation/", name))
 
-public:
-    ElevationWindow(MainWindow *mainWindow);
-
-protected slots:
-    void slotApply();
-
-protected:
-    MainWindow *mainWindow_;
-    Elevation elevation_;
-
-    QWidget *widget_;
-    SliderWidget *nPointsInput_;
-    SliderWidget *lengthInput_;
-    QPushButton *applyButton_;
-};
-
-ElevationWindow::ElevationWindow(MainWindow *mainWindow)
-    : QDialog(mainWindow),
-      mainWindow_(mainWindow),
-      elevation_(&mainWindow->editor())
-{
-    LOG_DEBUG_LOCAL(<< "");
-
-    // Widgets
-    SliderWidget::create(nPointsInput_,
-                         this,
-                         nullptr,
-                         nullptr,
-                         tr("Points per cell"),
-                         tr("Points per cell"),
-                         tr("pt"),
-                         1,
-                         1000,
-                         1000000,
-                         10000);
-
-    SliderWidget::create(lengthInput_,
-                         this,
-                         nullptr,
-                         nullptr,
-                         tr("Cell min length"),
-                         tr("Cell min length"),
-                         tr("%"),
-                         1,
-                         1,
-                         100,
-                         5);
-
-    // Settings layout
-    QVBoxLayout *settingsLayout = new QVBoxLayout;
-    settingsLayout->addWidget(nPointsInput_);
-    settingsLayout->addWidget(lengthInput_);
-    settingsLayout->addStretch();
-
-    // Buttons
-    applyButton_ = new QPushButton(tr("Compute"));
-    applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
-
-    // Buttons layout
-    QHBoxLayout *buttonsLayout = new QHBoxLayout;
-    buttonsLayout->addStretch();
-    buttonsLayout->addWidget(applyButton_);
-
-    // Main layout
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addLayout(settingsLayout);
-    mainLayout->addSpacing(10);
-    mainLayout->addLayout(buttonsLayout);
-    mainLayout->addStretch();
-
-    // Dialog
-    setLayout(mainLayout);
-    setWindowTitle(tr(ELEVATION_PLUGIN_NAME));
-    setWindowIcon(ICON("elevation"));
-    setMaximumHeight(height());
-    setModal(true);
-}
-
-void ElevationWindow::slotApply()
-{
-    LOG_DEBUG_LOCAL(<< "");
-
-    mainWindow_->suspendThreads();
-
-    size_t pointsPerCell = static_cast<size_t>(nPointsInput_->value());
-    double cellLengthMinPercent = static_cast<double>(lengthInput_->value());
-
-    int maximum = elevation_.start(pointsPerCell, cellLengthMinPercent);
-    LOG_DEBUG_LOCAL(<< "maximum <" << maximum << ">");
-
-    QProgressDialog progressDialog(mainWindow_);
-    progressDialog.setCancelButtonText(QObject::tr("&Cancel"));
-    progressDialog.setRange(0, maximum);
-    progressDialog.setWindowTitle(QObject::tr(ELEVATION_PLUGIN_NAME));
-    progressDialog.setWindowModality(Qt::WindowModal);
-    progressDialog.setMinimumDuration(0);
-    progressDialog.show();
-
-    for (int i = 0; i < maximum; i++)
-    {
-        // Update progress
-        int p = i + 1;
-        LOG_DEBUG_LOCAL(<< "Processing <" << p << "> from <" << maximum << ">");
-        progressDialog.setValue(p);
-        progressDialog.setLabelText(
-            QObject::tr("Processing %1 of %n...", nullptr, maximum).arg(p));
-
-        QCoreApplication::processEvents();
-        if (progressDialog.wasCanceled())
-        {
-            break;
-        }
-
-        elevation_.step();
-    }
-
-    elevation_.clear();
-
-    progressDialog.setValue(progressDialog.maximum());
-
-    mainWindow_->update({Editor::TYPE_ELEVATION});
-}
-
-ElevationPlugin::ElevationPlugin() : mainWindow_(nullptr), dockWindow_(nullptr)
+ElevationPlugin::ElevationPlugin()
+    : mainWindow_(nullptr),
+      pluginWindow_(nullptr)
 {
 }
 
@@ -196,15 +54,12 @@ void ElevationPlugin::initialize(MainWindow *mainWindow)
 void ElevationPlugin::slotPlugin()
 {
     // Create GUI only when this plugin is used for the first time
-    if (!dockWindow_)
+    if (!pluginWindow_)
     {
-        dockWindow_ = new ElevationWindow(mainWindow_);
+        pluginWindow_ = new ElevationWindow(mainWindow_);
     }
 
-    dockWindow_->show();
-    dockWindow_->raise();
-    dockWindow_->activateWindow();
+    pluginWindow_->show();
+    pluginWindow_->raise();
+    pluginWindow_->activateWindow();
 }
-
-// Q_OBJECT is used in this cpp file
-#include "ElevationPlugin.moc"

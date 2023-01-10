@@ -54,7 +54,7 @@ public slots:
 
 protected:
     MainWindow *mainWindow_;
-    ElevationWindow *dockWindow_;
+    ElevationWindow *pluginWindow_;
 };
 
 #endif /* ELEVATION_PLUGIN_HPP */

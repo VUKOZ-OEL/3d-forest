@@ -20,7 +20,7 @@ set(SUB_PROJECT_NAME "3DForestElevation")
 add_executable(
     ${SUB_PROJECT_NAME}
     elevation.cpp
-    ../../../plugins/elevation/Elevation.cpp
+    ../../../plugins/elevation/ElevationAction.cpp
 )
 
 target_include_directories(
