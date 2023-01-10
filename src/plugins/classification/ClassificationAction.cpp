@@ -17,16 +17,16 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Classification.cpp */
+/** @file ClassificationAction.cpp */
 
-#include <Classification.hpp>
+#include <ClassificationAction.hpp>
 #include <Editor.hpp>
 
-#define MODULE_NAME "Classification"
+#define MODULE_NAME "ClassificationAction"
 #define LOG_DEBUG_LOCAL(msg)
 // #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
 
-Classification::Classification(Editor *editor)
+ClassificationAction::ClassificationAction(Editor *editor)
     : editor_(editor),
       query_(editor),
       queryPoint_(editor)
@@ -34,15 +34,23 @@ Classification::Classification(Editor *editor)
     LOG_DEBUG_LOCAL(<< "");
 }
 
-Classification::~Classification()
+ClassificationAction::~ClassificationAction()
 {
     LOG_DEBUG_LOCAL(<< "");
 }
 
-int Classification::start(size_t pointsPerCell,
-                          double cellLengthMinPercent,
-                          double groundErrorPercent,
-                          double angleDeg)
+void ClassificationAction::clear()
+{
+    LOG_DEBUG_LOCAL(<< "");
+
+    query_.clear();
+    queryPoint_.clear();
+}
+
+void ClassificationAction::initialize(size_t pointsPerCell,
+                                      double cellLengthMinPercent,
+                                      double groundErrorPercent,
+                                      double angleDeg)
 {
     LOG_DEBUG_LOCAL(<< "pointsPerCell <" << pointsPerCell << "> "
                     << "cellLengthMinPercent <" << cellLengthMinPercent << "> "
@@ -56,19 +64,30 @@ int Classification::start(size_t pointsPerCell,
 
     query_.setGrid(pointsPerCell, cellLengthMinPercent);
 
-    currentStep_ = 0;
-    numberOfSteps_ = static_cast<int>(query_.gridSize());
+    size_t numberOfSteps = query_.gridSize();
+    LOG_DEBUG_LOCAL(<< "numberOfSteps <" << numberOfSteps << ">");
 
-    LOG_DEBUG_LOCAL(<< "numberOfSteps <" << numberOfSteps_ << ">");
-
-    return numberOfSteps_;
+    ProgressActionInterface::initialize(numberOfSteps, 1UL);
 }
 
-void Classification::step()
+void ClassificationAction::step()
 {
-    LOG_DEBUG_LOCAL(<< "step <" << (currentStep_ + 1) << "> from <"
-                    << numberOfSteps_ << ">");
+    if (query_.nextGrid())
+    {
+        stepGrid();
+    }
 
+    increment(1);
+
+    if (end())
+    {
+        LOG_DEBUG_LOCAL(<< "flush");
+        query_.flush();
+    }
+}
+
+void ClassificationAction::stepGrid()
+{
     double zMax = editor_->clipBoundary().max(2);
     double zMin = editor_->clipBoundary().min(2);
     double zMinCell;
@@ -76,12 +95,6 @@ void Classification::step()
 
     size_t nPointsGroundGrid;
     size_t nPointsAboveGrid;
-
-    if (!query_.nextGrid())
-    {
-        LOG_DEBUG_LOCAL(<< "expected nextGrid");
-        return;
-    }
 
     // Select grid cell.
     query_.where().setBox(query_.gridCell());
@@ -144,23 +157,4 @@ void Classification::step()
 
     LOG_DEBUG_LOCAL(<< "number of points as ground <" << nPointsGroundGrid
                     << "> above ground <" << nPointsAboveGrid << ">");
-
-    currentStep_++;
-
-    if (currentStep_ == numberOfSteps_)
-    {
-        LOG_DEBUG_LOCAL(<< "flush");
-        query_.flush();
-    }
-}
-
-void Classification::clear()
-{
-    LOG_DEBUG_LOCAL(<< "");
-
-    query_.clear();
-    queryPoint_.clear();
-
-    currentStep_ = 0;
-    numberOfSteps_ = 0;
 }

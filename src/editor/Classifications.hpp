@@ -26,7 +26,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include <Class.hpp>
+#include <Classification.hpp>
 #include <ExportEditor.hpp>
 #include <Vector3.hpp>
 
@@ -47,7 +47,7 @@ public:
     Json &write(Json &out) const;
 
 protected:
-    std::vector<Class> classes_;
+    std::vector<Classification> classes_;
     std::unordered_set<size_t> ids_;
 
     void resize(size_t n);

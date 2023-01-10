@@ -20,7 +20,7 @@ set(SUB_PROJECT_NAME "3DForestClassification")
 add_executable(
     ${SUB_PROJECT_NAME}
     classification.cpp
-    ../../../plugins/classification/Classification.cpp
+    ../../../plugins/classification/ClassificationAction.cpp
 )
 
 target_include_directories(

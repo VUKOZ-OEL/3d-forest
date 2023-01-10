@@ -54,7 +54,7 @@ public slots:
 
 protected:
     MainWindow *mainWindow_;
-    ClassificationWindow *dockWindow_;
+    ClassificationWindow *pluginWindow_;
 };
 
 #endif /* CLASSIFICATION_PLUGIN_HPP */

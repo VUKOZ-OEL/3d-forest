@@ -19,49 +19,38 @@
 
 /** @file classification.cpp */
 
-#include <Classification.hpp>
+#include <ArgumentParser.hpp>
+#include <ClassificationAction.hpp>
 #include <Editor.hpp>
 #include <Error.hpp>
 #include <Log.hpp>
 
-static void classification(const char *inputPath, size_t pointsPerCell)
+static void classificationCompute(const std::string &inputPath,
+                                  size_t pointsPerCell)
 {
     // Open input file in editor.
     Editor editor;
     editor.open(inputPath);
 
     // Classify ground by steps.
-    Classification cg(&editor);
-    int n = cg.start(pointsPerCell);
-    for (int i = 0; i < n; i++)
+    ClassificationAction classification(&editor);
+    classification.initialize(pointsPerCell);
+    while (!classification.end())
     {
-        std::cout << "Step " << (i + 1) << "/" << n << std::endl;
-        cg.step();
+        classification.step();
     }
 }
 
 int main(int argc, char *argv[])
 {
-    const char *inputPath = nullptr;
-    size_t pointsPerCell = 10000;
-
-    if (argc > 1)
-    {
-        inputPath = argv[1];
-    }
-
-    if (argc > 2)
-    {
-        int v = atoi(argv[2]);
-        if (v > 0)
-        {
-            pointsPerCell = static_cast<size_t>(v);
-        }
-    }
-
     try
     {
-        classification(inputPath, pointsPerCell);
+        ArgumentParser arg;
+        arg.add("--input", "");
+        arg.add("--cell-points", "10000");
+
+        classificationCompute(arg.toString("--input"),
+                              arg.toSize("--cell-points"));
     }
     catch (std::exception &e)
     {
