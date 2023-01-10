@@ -93,6 +93,10 @@ SettingsColorWidget::SettingsColorWidget(MainWindow *mainWindow)
             SIGNAL(signalUpdate(void *, const QSet<Editor::Type> &)),
             this,
             SLOT(slotUpdate(void *, const QSet<Editor::Type> &)));
+
+    mainWindow_->suspendThreads();
+    slotUpdate(nullptr, QSet<Editor::Type>());
+    mainWindow_->resumeThreads();
 }
 
 void SettingsColorWidget::slotUpdate(void *sender,
