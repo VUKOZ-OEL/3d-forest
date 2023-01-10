@@ -22,7 +22,7 @@
 #ifndef DESCRIPTOR_WINDOW_HPP
 #define DESCRIPTOR_WINDOW_HPP
 
-#include <Descriptor.hpp>
+#include <DescriptorAction.hpp>
 
 #include <QDialog>
 
@@ -45,7 +45,7 @@ protected slots:
 
 protected:
     MainWindow *mainWindow_;
-    Descriptor descriptor_;
+    DescriptorAction descriptor_;
     SliderWidget *radius_;
     SliderWidget *voxelSize_;
     QRadioButton *methodRadioButton_[2];

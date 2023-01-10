@@ -17,10 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Descriptor.hpp */
+/** @file DescriptorAction.hpp */
 
-#ifndef DESCRIPTOR_HPP
-#define DESCRIPTOR_HPP
+#ifndef DESCRIPTOR_ACTION_HPP
+#define DESCRIPTOR_ACTION_HPP
 
 #include <DescriptorPca.hpp>
 #include <ProgressActionInterface.hpp>
@@ -28,8 +28,8 @@
 
 class Editor;
 
-/** Descriptor. */
-class Descriptor : public ProgressActionInterface
+/** Descriptor Action. */
+class DescriptorAction : public ProgressActionInterface
 {
 public:
     enum Method
@@ -38,11 +38,11 @@ public:
         METHOD_DISTRIBUTION = 1
     };
 
-    Descriptor(Editor *editor);
-    ~Descriptor();
+    DescriptorAction(Editor *editor);
+    virtual ~DescriptorAction();
 
-    int start(double radius, double voxelSize, Method method);
-    void step();
+    void initialize(double radius, double voxelSize, Method method);
+    virtual void step();
     void clear();
 
     float minimum() const { return descriptorMinimum_; }
@@ -68,12 +68,9 @@ protected:
     double voxelSize_;
     Method method_;
 
-    int currentStep_;
-    int numberOfSteps_;
-
     uint64_t nPointsTotal_;
-    uint64_t nPointsPerStep_;
-    uint64_t nPointsProcessed_;
+    uint64_t nPointsOneHalf_;
+    uint64_t nPointsDone_;
     uint64_t nPointsWithDescriptor_;
 
     float descriptorMinimum_;
@@ -81,6 +78,8 @@ protected:
 
     void stepComputeDescriptor();
     void stepNormalizeDescriptor();
+
+    void determineMaximum();
 };
 
-#endif /* DESCRIPTOR_HPP */
+#endif /* DESCRIPTOR_ACTION_HPP */

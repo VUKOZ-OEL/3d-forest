@@ -24,7 +24,7 @@
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
-#define MODULE_NAME "Descriptor"
+#define MODULE_NAME "DescriptorPlugin"
 #define LOG_DEBUG_LOCAL(msg)
 // #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
 
