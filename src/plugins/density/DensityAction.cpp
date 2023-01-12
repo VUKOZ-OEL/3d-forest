@@ -23,26 +23,24 @@
 #include <Editor.hpp>
 #include <Math.hpp>
 
-#define MODULE_NAME "DensityAction"
-#define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
+#define LOG_MODULE_NAME "DensityAction"
 
 DensityAction::DensityAction(Editor *editor)
     : editor_(editor),
       queryPoints_(editor),
       queryPoint_(editor)
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 }
 
 DensityAction::~DensityAction()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 }
 
 void DensityAction::clear()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 
     queryPoints_.clear();
     queryPoint_.clear();
@@ -59,7 +57,7 @@ void DensityAction::clear()
 
 void DensityAction::initialize(double radius)
 {
-    LOG_DEBUG_LOCAL(<< "radius <" << radius << ">");
+    LOG_DEBUG(<< "Called with parameter radius <" << radius << ">.");
 
     radius_ = radius;
 
@@ -172,7 +170,7 @@ void DensityAction::stepComputeDensity()
 
     if (nPointsDone_ == nPointsOneHalf_)
     {
-        LOG_DEBUG_LOCAL(<< "STATUS_NORMALIZE_DENSITY");
+        LOG_DEBUG(<< "Change state to STATUS_NORMALIZE_DENSITY.");
         status_ = STATUS_NORMALIZE_DENSITY;
         queryPoints_.reset();
     }
@@ -231,7 +229,7 @@ void DensityAction::stepNormalizeDensity()
 
     if (nPointsDone_ == nPointsTotal_)
     {
-        LOG_DEBUG_LOCAL(<< "STATUS_FINISHED");
+        LOG_DEBUG(<< "Change state to STATUS_FINISHED.");
         status_ = STATUS_FINISHED;
         queryPoints_.flush();
     }

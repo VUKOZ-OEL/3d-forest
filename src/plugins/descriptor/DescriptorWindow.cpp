@@ -31,10 +31,7 @@
 #include <QRadioButton>
 #include <QVBoxLayout>
 
-#define MODULE_NAME "DescriptorWindow"
-#define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
-
+#define LOG_MODULE_NAME "DescriptorWindow"
 #define ICON(name) (ThemeIcon(":/descriptor/", name))
 
 DescriptorWindow::DescriptorWindow(MainWindow *mainWindow)
@@ -42,7 +39,7 @@ DescriptorWindow::DescriptorWindow(MainWindow *mainWindow)
       mainWindow_(mainWindow),
       descriptor_(&mainWindow->editor())
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 
     // Widgets
     SliderWidget::create(radius_,
@@ -117,7 +114,7 @@ DescriptorWindow::DescriptorWindow(MainWindow *mainWindow)
 
 void DescriptorWindow::slotApply()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 
     mainWindow_->suspendThreads();
 

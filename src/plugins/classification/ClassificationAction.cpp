@@ -22,26 +22,24 @@
 #include <ClassificationAction.hpp>
 #include <Editor.hpp>
 
-#define MODULE_NAME "ClassificationAction"
-#define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
+#define LOG_MODULE_NAME "ClassificationAction"
 
 ClassificationAction::ClassificationAction(Editor *editor)
     : editor_(editor),
       query_(editor),
       queryPoint_(editor)
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 }
 
 ClassificationAction::~ClassificationAction()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 }
 
 void ClassificationAction::clear()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 
     query_.clear();
     queryPoint_.clear();
@@ -52,10 +50,11 @@ void ClassificationAction::initialize(size_t pointsPerCell,
                                       double groundErrorPercent,
                                       double angleDeg)
 {
-    LOG_DEBUG_LOCAL(<< "pointsPerCell <" << pointsPerCell << "> "
-                    << "cellLengthMinPercent <" << cellLengthMinPercent << "> "
-                    << "groundErrorPercent <" << groundErrorPercent << "> "
-                    << "angleDeg <" << angleDeg << ">");
+    LOG_DEBUG(<< "Called with parameter pointsPerCell <" << pointsPerCell
+              << "> "
+              << "cellLengthMinPercent <" << cellLengthMinPercent << "> "
+              << "groundErrorPercent <" << groundErrorPercent << "> "
+              << "angleDeg <" << angleDeg << ">.");
 
     groundErrorPercent_ = groundErrorPercent;
 
@@ -65,7 +64,7 @@ void ClassificationAction::initialize(size_t pointsPerCell,
     query_.setGrid(pointsPerCell, cellLengthMinPercent);
 
     size_t numberOfSteps = query_.gridSize();
-    LOG_DEBUG_LOCAL(<< "numberOfSteps <" << numberOfSteps << ">");
+    LOG_DEBUG(<< "Initialize numberOfSteps <" << numberOfSteps << ">.");
 
     ProgressActionInterface::initialize(numberOfSteps, 1UL);
 }
@@ -81,7 +80,7 @@ void ClassificationAction::step()
 
     if (end())
     {
-        LOG_DEBUG_LOCAL(<< "flush");
+        LOG_DEBUG(<< "Flush modifications.");
         query_.flush();
     }
 }
@@ -155,6 +154,6 @@ void ClassificationAction::stepGrid()
         query_.setModified();
     }
 
-    LOG_DEBUG_LOCAL(<< "number of points as ground <" << nPointsGroundGrid
-                    << "> above ground <" << nPointsAboveGrid << ">");
+    LOG_DEBUG(<< "Number of points as ground <" << nPointsGroundGrid
+              << "> above ground <" << nPointsAboveGrid << ">.");
 }

@@ -25,9 +25,7 @@
 #include <Math.hpp>
 #include <SegmentationMap.hpp>
 
-#define MODULE_NAME "SegmentationMap"
-#define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
+#define LOG_MODULE_NAME "SegmentationMap"
 
 SegmentationMap::SegmentationMap()
 {

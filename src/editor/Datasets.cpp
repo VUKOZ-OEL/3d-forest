@@ -22,7 +22,7 @@
 #include <Datasets.hpp>
 #include <Log.hpp>
 
-#define MODULE_NAME "Datasets"
+#define LOG_MODULE_NAME "Datasets"
 
 Datasets::Datasets()
 {

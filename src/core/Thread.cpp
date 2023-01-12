@@ -23,9 +23,7 @@
 #include <Thread.hpp>
 #include <ThreadCallbackInterface.hpp>
 
-#define MODULE_NAME "Thread"
-#define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
+#define LOG_MODULE_NAME "Thread"
 
 Thread::Thread()
     : callback_(nullptr),
@@ -34,12 +32,12 @@ Thread::Thread()
       waiting_(false),
       received_(false)
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 }
 
 Thread::~Thread()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 }
 
 void Thread::setCallback(ThreadCallbackInterface *callback)
@@ -49,19 +47,19 @@ void Thread::setCallback(ThreadCallbackInterface *callback)
 
 void Thread::create()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
     thread_ = std::make_shared<std::thread>(&Thread::runLoop, this);
 }
 
 void Thread::start()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
     setState(STATE_RUN);
 }
 
 void Thread::cancel()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
     std::unique_lock mutexlock(mutexCaller_);
     setState(STATE_CANCEL);
     received_ = false;
@@ -73,14 +71,14 @@ void Thread::cancel()
 
 void Thread::stop()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
     setState(STATE_EXIT);
     thread_->join();
 }
 
 void Thread::wait()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
     std::unique_lock<std::mutex> mutexlock(mutex_, std::defer_lock);
     mutexlock.lock();
     waiting_ = true;
@@ -91,7 +89,7 @@ void Thread::wait()
 
 void Thread::setState(State state)
 {
-    LOG_DEBUG_LOCAL(<< "state <" << state << ">");
+    LOG_DEBUG(<< "Called with parameter state <" << state << ">.");
     std::unique_lock<std::mutex> mutexlock(mutex_);
     state_ = state;
     finished_ = false;
@@ -100,7 +98,8 @@ void Thread::setState(State state)
 
 void Thread::runLoop()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
+
     State state;
     bool finished = true;
     bool waiting = false;
@@ -111,13 +110,13 @@ void Thread::runLoop()
         mutexlock.lock();
         while (state_ == STATE_RUN && finished_ && finished && !waiting_)
         {
-            LOG_DEBUG_LOCAL(<< "wait");
+            LOG_DEBUG(<< "Thread is waiting for a new signal.");
             condition_.wait(mutexlock);
         }
 
         if (state_ == STATE_RUN)
         {
-            LOG_DEBUG_LOCAL(<< "STATE_RUN");
+            LOG_DEBUG(<< "New signal received. Thread state is STATE_RUN.");
             state = STATE_RUN;
 
             if (!finished_)
@@ -128,7 +127,7 @@ void Thread::runLoop()
         }
         else if (state_ == STATE_CANCEL)
         {
-            LOG_DEBUG_LOCAL(<< "STATE_CANCEL");
+            LOG_DEBUG(<< "New signal received. Thread state is STATE_CANCEL.");
             state_ = STATE_RUN;
             state = STATE_RUN;
             finished_ = true;
@@ -141,41 +140,40 @@ void Thread::runLoop()
         }
         else
         {
-            LOG_DEBUG_LOCAL(<< "STATE_EXIT");
+            LOG_DEBUG(<< "New signal received. Thread state is STATE_EXIT.");
             state = STATE_EXIT;
         }
 
         waiting = waiting_;
-        LOG_DEBUG_LOCAL(<< "waiting <" << waiting << ">");
+        LOG_DEBUG(<< "Thread is waiting <" << waiting << ">.");
         mutexlock.unlock();
 
         if (state == STATE_EXIT)
         {
-            LOG_DEBUG_LOCAL(<< "EXIT");
+            LOG_DEBUG(<< "Stop this thread.");
             return;
         }
 
         if (!finished)
         {
-            LOG_DEBUG_LOCAL(<< "compute");
+            LOG_DEBUG(<< "Call compute function.");
             try
             {
                 finished = compute();
             }
             catch (std::exception &e)
             {
-                LOG_MESSAGE(LOG_ERROR, MODULE_NAME, << "error: " << e.what());
+                LOG_ERROR(<< "Error message <" << e.what() << ">.");
             }
             catch (...)
             {
-                LOG_MESSAGE(LOG_ERROR, MODULE_NAME, << "error: unknown");
+                LOG_ERROR(<< "Unknown error.");
             }
         }
 
-        LOG_DEBUG_LOCAL(<< "finished <" << finished << ">");
-
         if (waiting && finished)
         {
+            LOG_DEBUG(<< "Terminate this thread.");
             return;
         }
     }

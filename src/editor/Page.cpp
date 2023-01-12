@@ -31,36 +31,7 @@
 #include <Page.hpp>
 #include <Query.hpp>
 
-#define MODULE_NAME "Page"
-#define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
-
-#if 0
-    #define LOG_DEBUG_LOCAL_SELECTION(pageId, nselected, npoints)              \
-        do                                                                     \
-        {                                                                      \
-            if (npoints > 0)                                                   \
-            {                                                                  \
-                LOG_MESSAGE(LOG_DEBUG,                                         \
-                            MODULE_NAME,                                       \
-                            << "page <" << pageId << "> selected <"            \
-                            << nselected << "> from <" << npoints              \
-                            << "> percent <"                                   \
-                            << ((static_cast<float>(nselected) /               \
-                                 static_cast<float>(npoints)) *                \
-                                100.0F)                                        \
-                            << "> %");                                         \
-            }                                                                  \
-            else                                                               \
-            {                                                                  \
-                LOG_MESSAGE(LOG_DEBUG,                                         \
-                            MODULE_NAME,                                       \
-                            << "page <" << pageId << "> selected <>");         \
-            }                                                                  \
-        } while (false)
-#else
-    #define LOG_DEBUG_LOCAL_SELECTION(pageId, nselected, npoints)
-#endif
+#define LOG_MODULE_NAME "Page"
 
 Page::Page(Editor *editor, Query *query, uint32_t datasetId, uint32_t pageId)
     : selectionSize(0),
@@ -138,7 +109,7 @@ void Page::resize(size_t n)
 
 void Page::readPage()
 {
-    LOG_DEBUG_FILTER(MODULE_NAME, << "pageId<" << pageId_ << ">");
+    LOG_DEBUG(<< "Page pageId <" << pageId_ << ">.");
 
     const Dataset &dataset = editor_->datasets().key(datasetId_);
     const IndexFile::Node *node = dataset.index().at(pageId_);
@@ -346,8 +317,7 @@ void Page::transform()
 
 void Page::queryWhere()
 {
-    LOG_DEBUG_LOCAL(<< "");
-    LOG_DEBUG_FILTER(MODULE_NAME, << "pageId<" << pageId_ << ">");
+    LOG_DEBUG(<< "Page pageId <" << pageId_ << ">.");
 
     const Box<double> &clipBox = query_->where().box();
     const Cone<double> &clipCone = query_->where().cone();
@@ -356,7 +326,7 @@ void Page::queryWhere()
     if (clipBox.empty() && clipCone.empty() && clipSphere.empty())
     {
         // Reset selection to mark all points as selected.
-        LOG_DEBUG_LOCAL(<< "Reset selection");
+        LOG_DEBUG(<< "Reset selection.");
         uint32_t n = static_cast<uint32_t>(position.size() / 3);
         selection.resize(n);
         selectionSize = n;
@@ -365,8 +335,6 @@ void Page::queryWhere()
             selection[i] = i;
         }
     }
-
-    LOG_DEBUG_LOCAL_SELECTION(pageId_, selectionSize, selection.size());
 
     // Apply new selection.
     queryWhereBox();
@@ -378,14 +346,12 @@ void Page::queryWhere()
     queryWhereClassification();
     queryWhereLayer();
 
-    LOG_DEBUG_LOCAL_SELECTION(pageId_, selectionSize, selection.size());
-
     state_ = Page::STATE_RUN_MODIFIERS;
 }
 
 void Page::runModifiers()
 {
-    LOG_DEBUG_UPDATE_VIEW(MODULE_NAME, << "page <" << pageId_ << ">");
+    LOG_TRACE(<< "Page pageId <" << pageId_ << ">.");
 
     runColorModifier();
     editor_->runModifiers(this);
@@ -400,9 +366,7 @@ void Page::setModified()
 
 void Page::setState(Page::State state)
 {
-    LOG_DEBUG_UPDATE_VIEW(MODULE_NAME,
-                          << "pageId <" << pageId_ << "> to state <" << state
-                          << ">");
+    LOG_TRACE(<< "Page pageId <" << pageId_ << "> to state <" << state << ">.");
 
     if ((state < state_) || (state == Page::STATE_RENDERED))
     {
@@ -421,8 +385,7 @@ bool Page::nextState()
     {
         try
         {
-            LOG_DEBUG_FILTER(MODULE_NAME,
-                             << "pageId<" << pageId_ << "> state<STATE_READ>");
+            LOG_DEBUG(<< "Page pageId <" << pageId_ << "> state <STATE_READ>.");
             readPage();
         }
         catch (std::exception &e)
@@ -445,8 +408,7 @@ bool Page::nextState()
 
     if (state_ == Page::STATE_SELECT)
     {
-        LOG_DEBUG_FILTER(MODULE_NAME,
-                         << "pageId<" << pageId_ << "> state<STATE_SELECT>");
+        LOG_DEBUG(<< "Page pageId <" << pageId_ << "> state <STATE_SELECT>.");
         queryWhere();
         return false;
     }
@@ -473,7 +435,7 @@ void Page::queryWhereBox()
         return;
     }
 
-    LOG_DEBUG_FILTER(MODULE_NAME, << "pageId<" << pageId_ << ">");
+    LOG_DEBUG(<< "Page pageId <" << pageId_ << ">.");
 
     // Select octants
     selectedNodes_.resize(0);
@@ -607,7 +569,6 @@ void Page::queryWhereBox()
     }
 
     selectionSize = nSelected;
-    LOG_DEBUG_LOCAL_SELECTION(pageId_, selectionSize, selection.size());
 }
 
 void Page::queryWhereCone()
@@ -618,7 +579,7 @@ void Page::queryWhereCone()
         return;
     }
 
-    LOG_DEBUG_FILTER(MODULE_NAME, << "pageId<" << pageId_ << ">");
+    LOG_DEBUG(<< "Page pageId <" << pageId_ << ">.");
 
     // Select octants
     selectedNodes_.resize(0);
@@ -687,7 +648,6 @@ void Page::queryWhereCone()
     }
 
     selectionSize = nSelected;
-    LOG_DEBUG_LOCAL_SELECTION(pageId_, selectionSize, selection.size());
 
     query_->addResults(nSelected);
 }
@@ -700,7 +660,7 @@ void Page::queryWhereSphere()
         return;
     }
 
-    LOG_DEBUG_FILTER(MODULE_NAME, << "pageId<" << pageId_ << ">");
+    LOG_DEBUG(<< "Page pageId <" << pageId_ << ">.");
 
     // Select octants
     selectedNodes_.resize(0);
@@ -769,7 +729,6 @@ void Page::queryWhereSphere()
     }
 
     selectionSize = nSelected;
-    LOG_DEBUG_LOCAL_SELECTION(pageId_, selectionSize, selection.size());
 
     query_->addResults(nSelected);
 }
@@ -784,7 +743,7 @@ void Page::queryWhereElevation()
         return;
     }
 
-    LOG_DEBUG_FILTER(MODULE_NAME, << "pageId<" << pageId_ << ">");
+    LOG_DEBUG(<< "Page pageId <" << pageId_ << ">.");
 
     size_t nSelectedNew = 0;
 
@@ -805,7 +764,6 @@ void Page::queryWhereElevation()
     }
 
     selectionSize = nSelectedNew;
-    LOG_DEBUG_LOCAL_SELECTION(pageId_, selectionSize, selection.size());
 }
 
 void Page::queryWhereDensity()
@@ -817,7 +775,7 @@ void Page::queryWhereDensity()
         return;
     }
 
-    LOG_DEBUG_FILTER(MODULE_NAME, << "pageId<" << pageId_ << ">");
+    LOG_DEBUG(<< "Page pageId <" << pageId_ << ">.");
 
     size_t nSelectedNew = 0;
 
@@ -838,7 +796,6 @@ void Page::queryWhereDensity()
     }
 
     selectionSize = nSelectedNew;
-    LOG_DEBUG_LOCAL_SELECTION(pageId_, selectionSize, selection.size());
 }
 
 void Page::queryWhereDescriptor()
@@ -851,7 +808,7 @@ void Page::queryWhereDescriptor()
         return;
     }
 
-    LOG_DEBUG_FILTER(MODULE_NAME, << "pageId<" << pageId_ << ">");
+    LOG_DEBUG(<< "Page pageId <" << pageId_ << ">.");
 
     size_t nSelectedNew = 0;
 
@@ -872,7 +829,6 @@ void Page::queryWhereDescriptor()
     }
 
     selectionSize = nSelectedNew;
-    LOG_DEBUG_LOCAL_SELECTION(pageId_, selectionSize, selection.size());
 }
 
 void Page::queryWhereClassification()
@@ -885,16 +841,15 @@ void Page::queryWhereClassification()
     const std::vector<int> &classifications =
         query_->where().classificationArray();
 
-    LOG_DEBUG_FILTER(MODULE_NAME, << "pageId<" << pageId_ << ">");
-    LOG_DEBUG_LOCAL(<< "query classifications <" << classifications << ">");
+    LOG_DEBUG(<< "Page pageId <" << pageId_ << ">.");
+    LOG_DEBUG(<< "Query classifications <" << classifications << ">.");
 
     size_t nSelectedNew = 0;
 
     for (size_t i = 0; i < selectionSize; i++)
     {
         uint32_t id = classification[selection[i]];
-        LOG_DEBUG_LOCAL(<< "query classification <" << id << "> at <" << i
-                        << ">");
+        LOG_DEBUG(<< "Query classification <" << id << "> at <" << i << ">.");
 
         if (classifications[id])
         {
@@ -908,7 +863,6 @@ void Page::queryWhereClassification()
     }
 
     selectionSize = nSelectedNew;
-    LOG_DEBUG_LOCAL_SELECTION(pageId_, selectionSize, selection.size());
 }
 
 void Page::queryWhereLayer()
@@ -920,8 +874,8 @@ void Page::queryWhereLayer()
 
     const std::unordered_set<size_t> &layers = query_->where().layer().filter();
 
-    LOG_DEBUG_FILTER(MODULE_NAME, << "pageId<" << pageId_ << ">");
-    LOG_DEBUG_LOCAL(<< "query layers <" << layers.size() << ">");
+    LOG_DEBUG(<< "Page pageId <" << pageId_ << ">.");
+    LOG_DEBUG(<< "Number of query layers <" << layers.size() << ">.");
 
     size_t nSelectedNew = 0;
 
@@ -941,7 +895,6 @@ void Page::queryWhereLayer()
     }
 
     selectionSize = nSelectedNew;
-    LOG_DEBUG_LOCAL_SELECTION(pageId_, selectionSize, selection.size());
 }
 
 void Page::runColorModifier()
@@ -1022,7 +975,7 @@ void Page::runColorModifier()
     {
         const Layers &layers = editor_->layers();
         const size_t max = layers.size();
-        LOG_DEBUG_UPDATE_VIEW(MODULE_NAME, << "layers <" << max << ">");
+        LOG_TRACE(<< "Maximum layers <" << max << ">.");
 
         for (size_t i = 0; i < n; i++)
         {

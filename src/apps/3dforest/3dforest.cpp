@@ -26,7 +26,7 @@
 #include <QApplication>
 #include <QSurfaceFormat>
 
-#define MODULE_NAME "3DForest"
+#define LOG_MODULE_NAME "3DForest"
 
 int main(int argc, char *argv[])
 {
@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     globalLogThread = std::make_shared<LogThread>();
     LoggerWindow::install();
 
-    LOG_MESSAGE(LOG_INFO, MODULE_NAME, << "Started");
+    LOG_INFO(<< "3D Forest started.");
 
     try
     {

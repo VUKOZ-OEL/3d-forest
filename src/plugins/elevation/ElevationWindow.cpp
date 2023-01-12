@@ -30,14 +30,14 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-#define MODULE_NAME "ElevationPlugin"
+#define LOG_MODULE_NAME "ElevationPlugin"
 #define ICON(name) (ThemeIcon(":/elevation/", name))
 
 ElevationWindow::ElevationWindow(MainWindow *mainWindow)
     : QDialog(mainWindow),
       mainWindow_(mainWindow)
 {
-    LOG_DEBUG_GUI(MODULE_NAME, << "window created");
+    LOG_DEBUG(<< "Window created.");
 
     // Widgets
     SliderWidget::create(nPointsInput_,
@@ -97,7 +97,7 @@ ElevationWindow::ElevationWindow(MainWindow *mainWindow)
 
 void ElevationWindow::slotApply()
 {
-    LOG_DEBUG_GUI(MODULE_NAME, << "compute elevation");
+    LOG_DEBUG(<< "Compute elevation.");
 
     mainWindow_->suspendThreads();
 

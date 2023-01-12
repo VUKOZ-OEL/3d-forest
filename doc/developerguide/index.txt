@@ -634,9 +634,12 @@ files     anything
 
 
 @section logging Logging
+Example log for file DescriptorPca.cpp
 @verbatim
 #include <Log.hpp>
-LOG_MESSAGE(LOG_DEBUG, "MyClass", << "counter=" << counter);
+#define LOG_MODULE_NAME "DescriptorPca"
+#define LOG_MODULE_ENABLED 1 /* Define to enable all debug log messages from this file. */
+LOG_DEBUG(<< "Found nPoints <" << nPoints << ">.");
 @endverbatim
 
 

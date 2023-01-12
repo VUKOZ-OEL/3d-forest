@@ -34,10 +34,7 @@
 #include <QTreeWidgetItemIterator>
 #include <QVBoxLayout>
 
-#define MODULE_NAME "ProjectNavigatorItemClassifications"
-#define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
-
+#define LOG_MODULE_NAME "ProjectNavigatorItemClassifications"
 #define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
 ProjectNavigatorItemClassifications::ProjectNavigatorItemClassifications(
@@ -120,7 +117,7 @@ void ProjectNavigatorItemClassifications::slotUpdate(
     void *sender,
     const QSet<Editor::Type> &target)
 {
-    LOG_DEBUG_FILTER(MODULE_NAME, << "targets<" << target.size() << ">");
+    LOG_DEBUG(<< "Called with parameter targets<" << target.size() << ">.");
 
     if (sender == this)
     {
@@ -354,8 +351,8 @@ void ProjectNavigatorItemClassifications::addTreeItem(size_t index)
 void ProjectNavigatorItemClassifications::setClassifications(
     const Classifications &classifications)
 {
-    LOG_DEBUG_FILTER(MODULE_NAME,
-                     << "classifications<" << classifications.size() << ">");
+    LOG_DEBUG(<< "Called with parameter classifications <"
+              << classifications.size() << ">.");
 
     block();
 

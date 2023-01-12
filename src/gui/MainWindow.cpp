@@ -46,9 +46,7 @@
 #include <QToolBar>
 #include <QToolButton>
 
-#define MODULE_NAME "MainWindow"
-#define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
+#define LOG_MODULE_NAME "MainWindow"
 
 #if !defined(EXPORT_GUI_IMPORT)
 const char *MainWindow::APPLICATION_NAME = "3D Forest";
@@ -61,7 +59,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       threadRender_(&editor_)
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 
     // Status bar
     statusProgressBar_ = new QProgressBar;
@@ -145,7 +143,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
     threadRender_.stop();
 }
 
@@ -185,10 +183,10 @@ void MainWindow::createAction(QAction **result,
                               const QObject *receiver,
                               const char *member)
 {
-    LOG_DEBUG_LOCAL(<< "menu <" << menu.toStdString() << "> toolBar <"
-                    << toolBar.toStdString() << "> text <" << text.toStdString()
-                    << "> icon sizes <" << icon.availableSizes().count()
-                    << ">");
+    LOG_DEBUG(<< "Called with parameter menu <" << menu.toStdString()
+              << "> toolBar <" << toolBar.toStdString() << "> text <"
+              << text.toStdString() << "> icon sizes <"
+              << icon.availableSizes().count() << ">.");
 
     QAction *action;
 
@@ -340,26 +338,26 @@ void MainWindow::loadPlugin(QObject *plugin)
 
 void MainWindow::suspendThreads()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
     threadRender_.cancel();
 }
 
 void MainWindow::resumeThreads()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
     slotRenderViewport();
 }
 
 void MainWindow::threadProgress(bool finished)
 {
     (void)finished;
-    LOG_DEBUG_LOCAL(<< "finished=" << finished);
+    LOG_DEBUG(<< "Called with parameter finished <" << finished << ">.");
     emit signalRender();
 }
 
 void MainWindow::slotRender()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
     editor_.lock();
     viewerPlugin_->viewports()->updateScene(&editor_);
     editor_.unlock();
@@ -367,13 +365,13 @@ void MainWindow::slotRender()
 
 void MainWindow::slotRenderViewport()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
     slotRenderViewport(viewerPlugin_->viewports()->selectedViewportId());
 }
 
 void MainWindow::slotRenderViewport(size_t viewportId)
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
     ViewerViewports *viewports = viewerPlugin_->viewports();
     threadRender_.render(viewportId, viewports->camera(viewportId));
 }
@@ -387,10 +385,11 @@ void MainWindow::update(const QSet<Editor::Type> &target,
                         Page::State viewPortsCacheState,
                         bool resetCamera)
 {
-    LOG_DEBUG_LOCAL(<< "targets <" << target.count() << ">");
+    LOG_DEBUG(<< "Called with parameter number of targets <" << target.count()
+              << ">.");
 
     suspendThreads();
-    LOG_DEBUG_UPDATE_VIEW(MODULE_NAME, << "");
+    LOG_TRACE(<< "Called.");
 
     editor_.viewports().setState(viewPortsCacheState);
     // editor_.viewports().clearContent();
@@ -408,10 +407,10 @@ void MainWindow::update(const QSet<Editor::Type> &target,
 
 void MainWindow::updateEverything()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 
     suspendThreads();
-    LOG_DEBUG_UPDATE_VIEW(MODULE_NAME, << "");
+    LOG_TRACE(<< "Called.");
 
     ViewerViewports *viewports = viewerPlugin_->viewports();
 
@@ -430,7 +429,7 @@ void MainWindow::updateEverything()
 void MainWindow::updateData()
 {
     suspendThreads();
-    LOG_DEBUG_UPDATE_VIEW(MODULE_NAME, << "");
+    LOG_TRACE(<< "Called.");
 
     ViewerViewports *viewports = viewerPlugin_->viewports();
     viewports->resetScene(&editor_, false);
@@ -442,7 +441,7 @@ void MainWindow::updateData()
 void MainWindow::updateFilter()
 {
     suspendThreads();
-    LOG_DEBUG_UPDATE_VIEW(MODULE_NAME, << "");
+    LOG_TRACE(<< "Called.");
 
     ViewerViewports *viewports = viewerPlugin_->viewports();
     viewports->resetScene(&editor_, false);
@@ -454,7 +453,7 @@ void MainWindow::updateFilter()
 void MainWindow::updateModifiers()
 {
     suspendThreads();
-    LOG_DEBUG_UPDATE_VIEW(MODULE_NAME, << "");
+    LOG_TRACE(<< "Called.");
 
     editor_.viewports().setState(Page::STATE_RUN_MODIFIERS);
 
@@ -464,7 +463,7 @@ void MainWindow::updateModifiers()
 void MainWindow::updateRender()
 {
     suspendThreads();
-    LOG_DEBUG_UPDATE_VIEW(MODULE_NAME, << "");
+    LOG_TRACE(<< "Called.");
 
     editor_.viewports().setState(Page::STATE_RENDER);
 

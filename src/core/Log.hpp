@@ -40,10 +40,10 @@
 /** Log Type. */
 enum EXPORT_CORE LogType
 {
-    LOG_DEBUG,
-    LOG_WARNING,
-    LOG_ERROR,
-    LOG_INFO
+    LOG_TYPE_DEBUG,
+    LOG_TYPE_WARNING,
+    LOG_TYPE_ERROR,
+    LOG_TYPE_INFO
 };
 
 /** Log Message. */
@@ -131,11 +131,21 @@ extern std::shared_ptr<LogThread> EXPORT_CORE globalLogThread;
         }                                                                      \
     } while (false)
 
-#define LOG_DEBUG_UPDATE_VIEW(module, msg)
-//#define LOG_DEBUG_UPDATE_VIEW(module, msg) LOG_MESSAGE(LOG_DEBUG, module, msg)
-#define LOG_DEBUG_FILTER(module, msg)
-//#define LOG_DEBUG_FILTER(module, msg) LOG_MESSAGE(LOG_DEBUG, module, msg)
-#define LOG_DEBUG_GUI(module, msg) LOG_MESSAGE(LOG_DEBUG, module, msg)
+#if defined(LOG_MODULE_ENABLED)
+    #define LOG_DEBUG(msg) LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg)
+#else
+    #define LOG_DEBUG(msg)
+#endif /* LOG_MODULE_ENABLED */
+
+#if defined(LOG_TRACE_X)
+    #define LOG_TRACE(msg) LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg)
+#else
+    #define LOG_TRACE(msg)
+#endif /* LOG_TRACE_X */
+
+#define LOG_WARNING(msg) LOG_MESSAGE(LOG_TYPE_WARNING, LOG_MODULE_NAME, msg)
+#define LOG_ERROR(msg) LOG_MESSAGE(LOG_TYPE_ERROR, LOG_MODULE_NAME, msg)
+#define LOG_INFO(msg) LOG_MESSAGE(LOG_TYPE_INFO, LOG_MODULE_NAME, msg)
 
 template <typename T>
 inline std::ostream &operator<<(std::ostream &os, std::unordered_set<T> vec)

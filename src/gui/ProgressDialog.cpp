@@ -26,15 +26,13 @@
 #include <QCoreApplication>
 #include <QProgressBar>
 
-#define MODULE_NAME "ProgressDialog"
-#define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
+#define LOG_MODULE_NAME "ProgressDialog"
 
 bool ProgressDialog::run(MainWindow *mainWindow,
                          const char *title,
                          ProgressActionInterface *progressAction)
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
     ProgressDialog *progressDialog = new ProgressDialog(mainWindow, title);
     return progressDialog->run(progressAction);
 }
@@ -42,7 +40,7 @@ bool ProgressDialog::run(MainWindow *mainWindow,
 ProgressDialog::ProgressDialog(MainWindow *mainWindow, const char *title)
     : QProgressDialog(mainWindow)
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 
     // Create modal progress dialog with custom progress bar.
     // Custom progress bar allows to display percentage with fractional part.
@@ -61,7 +59,7 @@ ProgressDialog::ProgressDialog(MainWindow *mainWindow, const char *title)
 
 bool ProgressDialog::run(ProgressActionInterface *progressAction)
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 
     char buffer[64];
 

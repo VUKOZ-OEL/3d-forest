@@ -35,10 +35,7 @@
 #include <QTreeWidgetItemIterator>
 #include <QVBoxLayout>
 
-#define MODULE_NAME "ProjectNavigatorItemLayers"
-#define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
-
+#define LOG_MODULE_NAME "ProjectNavigatorItemLayers"
 #define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
 ProjectNavigatorItemLayers::ProjectNavigatorItemLayers(MainWindow *mainWindow,
@@ -137,7 +134,7 @@ ProjectNavigatorItemLayers::ProjectNavigatorItemLayers(MainWindow *mainWindow,
 void ProjectNavigatorItemLayers::slotUpdate(void *sender,
                                             const QSet<Editor::Type> &target)
 {
-    LOG_DEBUG_FILTER(MODULE_NAME, << "targets<" << target.size() << ">");
+    LOG_DEBUG(<< "Called with parameter targets <" << target.size() << ">.");
 
     if (sender == this)
     {

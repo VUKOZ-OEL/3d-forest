@@ -23,9 +23,7 @@
 #include <ProgressActionInterface.hpp>
 #include <Time.hpp>
 
-#define MODULE_NAME "ProgressActionInterface"
-#define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
+#define LOG_MODULE_NAME "ProgressActionInterface"
 
 ProgressActionInterface::ProgressActionInterface()
     : nElements_(0),
@@ -92,8 +90,8 @@ double ProgressActionInterface::percent() const
                      static_cast<double>(nElements_));
     }
 
-    LOG_DEBUG_LOCAL(<< "progress <" << p << "> processed <"
-                    << nElementsProcessed_ << "> from <" << nElements_ << ">");
+    LOG_DEBUG(<< "Action progress <" << p << "> processed <"
+              << nElementsProcessed_ << "> from <" << nElements_ << ">.");
 
     return p;
 }
@@ -102,6 +100,6 @@ void ProgressActionInterface::increment(uint64_t nElementsProcessed)
 {
     nElementsProcessed_ += nElementsProcessed;
 
-    LOG_DEBUG_LOCAL(<< "processed <" << nElementsProcessed_ << "> from <"
-                    << nElements_ << ">");
+    LOG_DEBUG(<< "Action processed <" << nElementsProcessed_ << "> from <"
+              << nElements_ << ">.");
 }
