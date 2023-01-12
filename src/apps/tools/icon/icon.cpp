@@ -21,6 +21,8 @@
 
 #include <iostream>
 
+#include <ArgumentParser.hpp>
+
 #include <QDir>
 #include <QPainter>
 #include <QPixmap>
@@ -29,11 +31,11 @@ static void process(const QString &path, const QString &fileName);
 
 int main(int argc, char *argv[])
 {
-    QString path;
-    if (argc > 1)
-    {
-        path = QString(argv[1]);
-    }
+    ArgumentParser arg;
+    arg.add("--input", "");
+    arg.parse(argc, argv);
+
+    QString path = QString::fromStdString(arg.toString("--input"));
 
     QDir searchDirectory(path);
     QStringList fileList = searchDirectory.entryList(QDir::Files);
