@@ -19,11 +19,12 @@
 
 /** @file exampleFileSize.cpp @brief File size example. */
 
+#include <ArgumentParser.hpp>
 #include <Error.hpp>
 #include <File.hpp>
 #include <Log.hpp>
 
-static void exampleFileSize(const char *path)
+static void exampleFileSize(const std::string &path)
 {
     // Open file.
     File f;
@@ -51,16 +52,13 @@ static void exampleFileSize(const char *path)
 
 int main(int argc, char *argv[])
 {
-    const char *path = nullptr;
-
-    if (argc > 1)
-    {
-        path = argv[1];
-    }
-
     try
     {
-        exampleFileSize(path);
+        ArgumentParser arg;
+        arg.add("--input", "");
+        arg.parse(argc, argv);
+
+        exampleFileSize(arg.toString("--input"));
     }
     catch (std::exception &e)
     {
