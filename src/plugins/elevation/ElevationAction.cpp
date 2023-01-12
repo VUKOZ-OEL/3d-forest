@@ -26,25 +26,23 @@
 #include <Editor.hpp>
 #include <ElevationAction.hpp>
 
-#define MODULE_NAME "ElevationAction"
-#define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
+#define LOG_MODULE_NAME "ElevationAction"
 
 ElevationAction::ElevationAction(Editor *editor)
     : editor_(editor),
       query_(editor)
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 }
 
 ElevationAction::~ElevationAction()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 }
 
 void ElevationAction::clear()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 
     query_.clear();
 
@@ -66,8 +64,9 @@ void ElevationAction::clear()
 void ElevationAction::initialize(size_t pointsPerCell,
                                  double cellLengthMinPercent)
 {
-    LOG_DEBUG_LOCAL(<< "pointsPerCell <" << pointsPerCell << "> "
-                    << "cellLengthMinPercent <" << cellLengthMinPercent << ">");
+    LOG_DEBUG(<< "Called with parameter pointsPerCell <" << pointsPerCell
+              << "> "
+              << "cellLengthMinPercent <" << cellLengthMinPercent << ">.");
 
     elevationPointsCount_ = 0;
 
@@ -77,7 +76,7 @@ void ElevationAction::initialize(size_t pointsPerCell,
     query_.setGrid(pointsPerCell, cellLengthMinPercent);
 
     size_t numberOfSteps = query_.gridSize();
-    LOG_DEBUG_LOCAL(<< "numberOfSteps <" << numberOfSteps << ">");
+    LOG_DEBUG(<< "Initialize numberOfSteps <" << numberOfSteps << ">.");
 
     ProgressActionInterface::initialize(numberOfSteps, 1UL);
 }
@@ -93,7 +92,7 @@ void ElevationAction::step()
 
     if (end())
     {
-        LOG_DEBUG_LOCAL(<< "flush");
+        LOG_DEBUG(<< "Flush modifications.");
         query_.flush();
 
         if (elevationPointsCount_ > 0)
@@ -142,8 +141,8 @@ void ElevationAction::stepGrid()
     // Compute elevation
     if (nPointsGroundGrid > 2)
     {
-        LOG_DEBUG_LOCAL(<< "number of points as ground <" << nPointsGroundGrid
-                        << "> above ground <" << nPointsAboveGrid << ">");
+        LOG_DEBUG(<< "Number of points as ground <" << nPointsGroundGrid
+                  << "> above ground <" << nPointsAboveGrid << ">.");
 
         // Collect points
         P.resize(static_cast<Eigen::Index>(nPointsAboveGrid), 3);
@@ -241,7 +240,7 @@ void ElevationAction::stepGrid()
             }
         }
 
-        LOG_DEBUG_LOCAL(<< "points with elevation <" << idxElevation << ">");
+        LOG_DEBUG(<< "Points with elevation <" << idxElevation << ">.");
     }
 }
 
@@ -249,7 +248,7 @@ void ElevationAction::exportGroundMesh(const std::string &path)
 {
     std::string fullPath;
     fullPath = path + std::to_string(processed()) + ".obj";
-    LOG_DEBUG_LOCAL(<< "path <" << fullPath << ">");
+    LOG_DEBUG(<< "Full path <" << fullPath << ">.");
 
     igl::writeOBJ(fullPath, V, F);
 }

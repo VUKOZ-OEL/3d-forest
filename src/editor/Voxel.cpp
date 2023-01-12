@@ -24,9 +24,7 @@
 #include <Log.hpp>
 #include <Voxel.hpp>
 
-#define MODULE_NAME "Voxel"
-#define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
+#define LOG_MODULE_NAME "Voxel"
 
 #if !defined(EXPORT_EDITOR_IMPORT)
 const uint32_t Voxel::STATUS_IGNORED = 1U << 0;

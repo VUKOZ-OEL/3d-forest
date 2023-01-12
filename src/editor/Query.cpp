@@ -26,9 +26,7 @@
 #include <Log.hpp>
 #include <Query.hpp>
 
-#define MODULE_NAME "Query"
-#define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
+#define LOG_MODULE_NAME "Query"
 
 Query::Query(Editor *editor) : editor_(editor)
 {
@@ -42,7 +40,7 @@ Query::~Query()
 
 void Query::exec()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
     selectedPages_.clear();
 
     bool selected = false;
@@ -65,7 +63,7 @@ void Query::exec()
 
     if (!where().sphere().empty())
     {
-        LOG_DEBUG_LOCAL(<< "sphere <" << where().sphere().box() << ">");
+        LOG_DEBUG(<< "Exec sphere <" << where().sphere().box() << ">.");
         editor_->datasets().selectPages(where_.dataset(),
                                         where().sphere().box(),
                                         selectedPages_);
@@ -126,8 +124,7 @@ void Query::addResults(size_t n)
 
 bool Query::nextPage()
 {
-    LOG_DEBUG_LOCAL(<< "");
-    LOG_DEBUG_FILTER(MODULE_NAME, << "pages<" << selectedPages_.size() << ">");
+    LOG_DEBUG(<< "Number of pages <" << selectedPages_.size() << ">.");
 
     // Reset point index within active page.
     pagePointIndex_ = 0;
@@ -141,8 +138,8 @@ bool Query::nextPage()
     // Find next page in selection.
     while (pageIndex_ < selectedPages_.size())
     {
-        LOG_DEBUG_LOCAL(<< "pageIndex " << pageIndex_ << "/"
-                        << selectedPages_.size());
+        LOG_DEBUG(<< "Current pageIndex <" << pageIndex_ << "/"
+                  << selectedPages_.size() << ">.");
         IndexFile::Selection &selectedPage = selectedPages_[pageIndex_];
         page_ = read(selectedPage.id, selectedPage.idx);
         page_->nextState();
@@ -214,7 +211,7 @@ void Query::setState(Page::State state)
 
 bool Query::nextState()
 {
-    LOG_DEBUG_FILTER(MODULE_NAME, << "lru<" << lru_.size() << ">");
+    LOG_DEBUG(<< "Lru size <" << lru_.size() << ">.");
 
     for (size_t i = 0; i < lru_.size(); i++)
     {
@@ -371,7 +368,7 @@ void Query::setMaximumResults(size_t nPoints)
 
 void Query::setGrid(size_t pointsPerCell, double cellLengthMinPct)
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 
     // Calculate grid cell size.
     uint64_t pointsPerArea = editor_->datasets().nPoints(where().dataset());
@@ -384,7 +381,7 @@ void Query::setGrid(size_t pointsPerCell, double cellLengthMinPct)
     double pointsPerAreaClip = static_cast<double>(pointsPerArea) * areaRatio;
     double nCells = pointsPerAreaClip / static_cast<double>(pointsPerCell);
     nCells = ceil(nCells);
-    LOG_DEBUG_LOCAL(<< "nCells:" << nCells);
+    LOG_DEBUG(<< "Number of cells in grid <" << nCells << ">.");
 
     double areaPerCell = areaClip / nCells;
     double cellLength = sqrt(areaPerCell);
@@ -402,17 +399,17 @@ void Query::setGrid(size_t pointsPerCell, double cellLengthMinPct)
 
     gridXSize_ =
         static_cast<size_t>(round(boundaryClip.length(0) / cellLength));
-    LOG_DEBUG_LOCAL(<< "gridXSize_:" << gridXSize_);
+    LOG_DEBUG(<< "Grid X Size <" << gridXSize_ << ">.");
     gridYSize_ =
         static_cast<size_t>(round(boundaryClip.length(1) / cellLength));
-    LOG_DEBUG_LOCAL(<< "gridYSize_:" << gridYSize_);
+    LOG_DEBUG(<< "Grid Y Size <" << gridYSize_ << ">.");
 
     double cellLengthX =
         boundaryClip.length(0) / static_cast<double>(gridXSize_);
-    LOG_DEBUG_LOCAL(<< "cellLengthX:" << cellLengthX);
+    LOG_DEBUG(<< "Grid CellLengthX <" << cellLengthX << ">.");
     double cellLengthY =
         boundaryClip.length(1) / static_cast<double>(gridYSize_);
-    LOG_DEBUG_LOCAL(<< "cellLengthY:" << cellLengthY);
+    LOG_DEBUG(<< "Grid CellLengthY <" << cellLengthY << ">.");
 
     // Set grid cell size.
     gridBoundary_ = boundaryClip;
@@ -434,7 +431,7 @@ bool Query::nextGrid()
         size_t x = grid_[gridIndex_] & 0xfffffU;
         size_t y = (grid_[gridIndex_] >> 20) & 0xfffffU;
 
-        LOG_DEBUG_LOCAL(<< "x:" << x << ", y:" << y);
+        LOG_DEBUG(<< "Grid x <" << x << "> y <" << y << ">.");
 
         double dx = static_cast<double>(x) * gridCellBase_.max(0);
         double dy = static_cast<double>(y) * gridCellBase_.max(1);
@@ -677,7 +674,7 @@ std::shared_ptr<Page> Query::read(size_t dataset, size_t index)
 
         try
         {
-            LOG_DEBUG_FILTER(MODULE_NAME, << "pageId<" << nk.pageId << ">");
+            LOG_DEBUG(<< "Page pageId <" << nk.pageId << ">.");
             result->readPage();
         }
         catch (...)

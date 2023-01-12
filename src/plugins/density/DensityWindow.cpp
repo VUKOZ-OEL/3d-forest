@@ -30,14 +30,14 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-#define MODULE_NAME "DensityWindow"
+#define LOG_MODULE_NAME "DensityWindow"
 #define ICON(name) (ThemeIcon(":/density/", name))
 
 DensityWindow::DensityWindow(MainWindow *mainWindow)
     : QDialog(mainWindow),
       mainWindow_(mainWindow)
 {
-    LOG_DEBUG_GUI(MODULE_NAME, << "Window created.");
+    LOG_DEBUG(<< "Window created.");
 
     // Widgets
     SliderWidget::create(radius_,
@@ -86,8 +86,7 @@ void DensityWindow::slotApply()
 {
     double radius = static_cast<double>(radius_->value());
 
-    LOG_DEBUG_GUI(MODULE_NAME,
-                  << "Compute density with radius<" << radius << ">");
+    LOG_DEBUG(<< "Compute density with radius <" << radius << ">.");
 
     mainWindow_->suspendThreads();
 

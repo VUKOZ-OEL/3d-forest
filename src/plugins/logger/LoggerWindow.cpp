@@ -87,16 +87,16 @@ void LoggerWindow::slotPrintln(const QString &time,
     const char *messageType = " ";
     switch (type)
     {
-        case LOG_DEBUG:
+        case LOG_TYPE_DEBUG:
             messageType = " DBG ";
             break;
-        case LOG_WARNING:
+        case LOG_TYPE_WARNING:
             messageType = " WRN ";
             break;
-        case LOG_ERROR:
+        case LOG_TYPE_ERROR:
             messageType = " ERR ";
             break;
-        case LOG_INFO:
+        case LOG_TYPE_INFO:
             messageType = " INF ";
             break;
         default:
@@ -117,18 +117,18 @@ static void loggerWindowQtMessageHandler(QtMsgType type,
     switch (type)
     {
         case QtDebugMsg:
-            logType = LOG_DEBUG;
+            logType = LOG_TYPE_DEBUG;
             break;
         case QtWarningMsg:
-            logType = LOG_WARNING;
+            logType = LOG_TYPE_WARNING;
             break;
         case QtInfoMsg:
-            logType = LOG_INFO;
+            logType = LOG_TYPE_INFO;
             break;
         case QtCriticalMsg:
         case QtFatalMsg:
         default:
-            logType = LOG_ERROR;
+            logType = LOG_TYPE_ERROR;
             break;
     }
 

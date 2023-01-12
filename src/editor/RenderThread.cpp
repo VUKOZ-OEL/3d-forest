@@ -25,9 +25,7 @@
 #include <ThreadCallbackInterface.hpp>
 #include <Time.hpp>
 
-#define MODULE_NAME "RenderThread"
-#define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
+#define LOG_MODULE_NAME "RenderThread"
 
 RenderThread::RenderThread(Editor *editor)
     : editor_(editor),
@@ -38,8 +36,8 @@ RenderThread::RenderThread(Editor *editor)
 
 void RenderThread::render(size_t viewportId, const Camera &camera)
 {
-    LOG_DEBUG_LOCAL(<< "viewportId=" << viewportId);
-    LOG_DEBUG_UPDATE_VIEW(MODULE_NAME, << "viewport <" << viewportId << ">");
+    LOG_DEBUG(<< "Called with parameter viewportId <" << viewportId << ">.");
+    LOG_TRACE(<< "Called with parameter viewportId <" << viewportId << ">.");
     cancel();
 
     viewportId_ = viewportId;
@@ -51,7 +49,7 @@ void RenderThread::render(size_t viewportId, const Camera &camera)
 
 bool RenderThread::compute()
 {
-    LOG_DEBUG_LOCAL(<< "initialized=" << initialized_);
+    LOG_DEBUG(<< "Computation is initialized <" << initialized_ << ">.");
     if (!initialized_)
     {
         editor_->lock();
@@ -61,7 +59,7 @@ bool RenderThread::compute()
         return false;
     }
 
-    LOG_DEBUG_LOCAL(<< "nextState");
+    LOG_DEBUG(<< "Compute nextState.");
     double t1 = Time::realTime();
     bool finished;
     editor_->lock();
@@ -72,7 +70,8 @@ bool RenderThread::compute()
 
     if (callback_)
     {
-        LOG_DEBUG_LOCAL(<< "callback finished=" << finished << ", ms=" << msec);
+        LOG_DEBUG(<< "Call callback argument finished <" << finished << "> ms <"
+                  << msec << ">.");
         callback_->threadProgress(finished);
     }
 

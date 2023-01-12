@@ -25,27 +25,25 @@
 #include <ExportFileAction.hpp>
 #include <Time.hpp>
 
-#define MODULE_NAME "ExportFileAction"
-#define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
+#define LOG_MODULE_NAME "ExportFileAction"
 
 ExportFileAction::ExportFileAction(Editor *editor)
     : ProgressActionInterface(),
       editor_(editor),
       query_(editor)
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 }
 
 ExportFileAction::~ExportFileAction()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 }
 
 void ExportFileAction::initialize(std::shared_ptr<ExportFileFormat> writer,
                                   const ExportFileProperties &properties)
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 
     writer_ = writer;
     properties_ = properties;
@@ -74,7 +72,7 @@ void ExportFileAction::initialize(std::shared_ptr<ExportFileFormat> writer,
 
 void ExportFileAction::clear()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
     query_.clear();
 }
 

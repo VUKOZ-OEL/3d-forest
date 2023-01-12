@@ -29,7 +29,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-#define MODULE_NAME "ClassificationWindow"
+#define LOG_MODULE_NAME "ClassificationWindow"
 #define ICON(name) (ThemeIcon(":/classification/", name))
 
 ClassificationWindow::ClassificationWindow(MainWindow *mainWindow)
@@ -37,7 +37,7 @@ ClassificationWindow::ClassificationWindow(MainWindow *mainWindow)
       mainWindow_(mainWindow),
       classification_(&mainWindow->editor())
 {
-    LOG_DEBUG_GUI(MODULE_NAME, << "Window created.");
+    LOG_DEBUG(<< "Window created.");
 
     // Widgets
     SliderWidget::create(nPointsSlider_,
@@ -123,7 +123,7 @@ ClassificationWindow::ClassificationWindow(MainWindow *mainWindow)
 
 void ClassificationWindow::slotApply()
 {
-    LOG_DEBUG_GUI(MODULE_NAME, << "Compute classification");
+    LOG_DEBUG(<< "Compute classification.");
 
     mainWindow_->suspendThreads();
 

@@ -32,9 +32,7 @@ static const char *EDITOR_KEY_CLASSIFICATIONS = "classifications";
 // static const char *EDITOR_KEY_CLIP_FILTER = "clipFilter";
 static const char *EDITOR_KEY_ELEVATION_RANGE = "elevationRange";
 
-#define MODULE_NAME "Editor"
-#define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
+#define LOG_MODULE_NAME "Editor"
 
 Editor::Editor()
 {
@@ -188,7 +186,7 @@ void Editor::openDataset(const std::string &path,
 {
     try
     {
-        LOG_DEBUG_FILTER(MODULE_NAME, << "path<" << path << ">");
+        LOG_DEBUG(<< "Called with parameter path <" << path << ">.");
         datasets_.read(path, path_, settings, datasets_.boundary());
     }
     catch (std::exception &e)
@@ -212,7 +210,7 @@ void Editor::setClassificationsFilter(const QueryFilterSet &filter)
 {
     if (viewports_.size() > 0)
     {
-        LOG_DEBUG_FILTER(MODULE_NAME, << "");
+        LOG_DEBUG(<< "Called.");
         viewports_.where().setClassification(filter);
         viewports_.applyWhereToAll();
     }
@@ -227,7 +225,7 @@ void Editor::setClipFilter(const Region &clipFilter)
 
     if (viewports_.size() > 0)
     {
-        LOG_DEBUG_FILTER(MODULE_NAME, << "");
+        LOG_DEBUG(<< "Called.");
         viewports_.where().setBox(clipBoundary());
         viewports_.applyWhereToAll();
     }
@@ -254,11 +252,12 @@ Box<double> Editor::clipBoundary() const
 void Editor::setElevationRange(const Range<double> &elevationRange)
 {
     elevationRange_ = elevationRange;
-    LOG_DEBUG_LOCAL(<< "elevationRange <" << elevationRange_ << ">");
+    LOG_DEBUG(<< "Called with parameter elevationRange <" << elevationRange_
+              << ">.");
 
     if (viewports_.size() > 0)
     {
-        LOG_DEBUG_FILTER(MODULE_NAME, << "");
+        LOG_DEBUG(<< "Called.");
         viewports_.where().setElevation(elevationRange_);
         viewports_.applyWhereToAll();
     }
@@ -269,11 +268,12 @@ void Editor::setElevationRange(const Range<double> &elevationRange)
 void Editor::setDensityRange(const Range<float> &densityRange)
 {
     densityRange_ = densityRange;
-    LOG_DEBUG_LOCAL(<< "densityRange <" << densityRange_ << ">");
+    LOG_DEBUG(<< "Called with parameter densityRange <" << densityRange_
+              << ">.");
 
     if (viewports_.size() > 0)
     {
-        LOG_DEBUG_FILTER(MODULE_NAME, << "");
+        LOG_DEBUG(<< "Called.");
         viewports_.where().setDensity(densityRange_);
         viewports_.applyWhereToAll();
     }
@@ -282,11 +282,12 @@ void Editor::setDensityRange(const Range<float> &densityRange)
 void Editor::setDescriptorRange(const Range<float> &descriptorRange)
 {
     descriptorRange_ = descriptorRange;
-    LOG_DEBUG_LOCAL(<< "descriptorRange <" << descriptorRange_ << ">");
+    LOG_DEBUG(<< "Called with parameter descriptorRange <" << descriptorRange_
+              << ">.");
 
     if (viewports_.size() > 0)
     {
-        LOG_DEBUG_FILTER(MODULE_NAME, << "");
+        LOG_DEBUG(<< "Called.");
         viewports_.where().setDescriptor(descriptorRange_);
         viewports_.applyWhereToAll();
     }
@@ -301,7 +302,7 @@ void Editor::updateAfterRead()
 
     if (viewports_.size() > 0)
     {
-        LOG_DEBUG_FILTER(MODULE_NAME, << "");
+        LOG_DEBUG(<< "Called.");
         // viewports_.where().setDataset();
         // viewports_.where().setClassification();
         viewports_.where().setBox(clipBoundary());
@@ -316,7 +317,7 @@ void Editor::updateAfterRead()
 
 void Editor::setDatasets(const Datasets &datasets)
 {
-    LOG_DEBUG_FILTER(MODULE_NAME, << "");
+    LOG_DEBUG(<< "Called.");
     datasets_ = datasets;
     unsavedChanges_ = true;
 }
@@ -325,7 +326,7 @@ void Editor::setDatasetsFilter(const QueryFilterSet &filter)
 {
     if (viewports_.size() > 0)
     {
-        LOG_DEBUG_FILTER(MODULE_NAME, << "");
+        LOG_DEBUG(<< "Called.");
         viewports_.where().setDataset(filter);
         viewports_.applyWhereToAll();
     }
@@ -341,7 +342,7 @@ void Editor::setLayersFilter(const QueryFilterSet &filter)
 {
     if (viewports_.size() > 0)
     {
-        LOG_DEBUG_FILTER(MODULE_NAME, << "");
+        LOG_DEBUG(<< "Called.");
         viewports_.where().setLayer(filter);
         viewports_.applyWhereToAll();
     }

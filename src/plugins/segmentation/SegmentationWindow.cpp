@@ -33,12 +33,8 @@
 #include <QShowEvent>
 #include <QVBoxLayout>
 
+#define LOG_MODULE_NAME "SegmentationWindow"
 #define ICON(name) (ThemeIcon(":/segmentation/", name))
-
-#define MODULE_NAME "SegmentationWindow"
-#define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
-#define LOG_DEBUG_LOCAL_THREAD(msg)
 
 #define SEGMENTATION_WINDOW_VOXEL_SIZE_DEFAULT_MIN 1
 #define SEGMENTATION_WINDOW_VOXEL_SIZE_DEFAULT_MAX 100
@@ -48,7 +44,7 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
       mainWindow_(mainWindow),
       segmentationThread_(&mainWindow->editor())
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 
     // Voxel size
     SliderWidget::create(voxelSizeInput_,
@@ -171,13 +167,13 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
 
 SegmentationWindow::~SegmentationWindow()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
     segmentationThread_.stop();
 }
 
 void SegmentationWindow::updateRange()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
     const Editor *editor = segmentationThread_.editor();
     Box<double> boundary = editor->clipBoundary();
     double max = boundary.maximumLength() * 0.1;
@@ -196,57 +192,59 @@ void SegmentationWindow::updateRange()
 
 void SegmentationWindow::slotVoxelSizeFinalValue()
 {
-    LOG_DEBUG_LOCAL(<< "value <" << voxelSizeInput_->value() << ">");
+    LOG_DEBUG(<< "Input value <" << voxelSizeInput_->value() << ">.");
     resumeThreads();
 }
 
 void SegmentationWindow::slotSeedElevationMinimumValue()
 {
-    LOG_DEBUG_LOCAL(<< "value <" << seedElevationInput_->minimumValue() << ">");
+    LOG_DEBUG(<< "Input value <" << seedElevationInput_->minimumValue()
+              << ">.");
     resumeThreads();
 }
 
 void SegmentationWindow::slotSeedElevationMaximumValue()
 {
-    LOG_DEBUG_LOCAL(<< "value <" << seedElevationInput_->maximumValue() << ">");
+    LOG_DEBUG(<< "Input value <" << seedElevationInput_->maximumValue()
+              << ">.");
     resumeThreads();
 }
 
 void SegmentationWindow::slotTreeHeightFinalValue()
 {
-    LOG_DEBUG_LOCAL(<< "value <" << treeHeightInput_->value() << ">");
+    LOG_DEBUG(<< "Input value <" << treeHeightInput_->value() << ">.");
     resumeThreads();
 }
 
 void SegmentationWindow::slotSearchRadiusFinalValue()
 {
-    LOG_DEBUG_LOCAL(<< "value <" << treeHeightInput_->value() << ">");
+    LOG_DEBUG(<< "Input value <" << treeHeightInput_->value() << ">.");
     resumeThreads();
 }
 
 void SegmentationWindow::slotNeighborPointsFinalValue()
 {
-    LOG_DEBUG_LOCAL(<< "value <" << neighborPointsInput_->value() << ">");
+    LOG_DEBUG(<< "Input value <" << neighborPointsInput_->value() << ">.");
     resumeThreads();
 }
 
 void SegmentationWindow::slotAccept()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
     close();
     setResult(QDialog::Accepted);
 }
 
 void SegmentationWindow::slotReject()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
     close();
     setResult(QDialog::Rejected);
 }
 
 void SegmentationWindow::showEvent(QShowEvent *event)
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
     QDialog::showEvent(event);
     mainWindow_->suspendThreads();
     updateRange();
@@ -255,7 +253,7 @@ void SegmentationWindow::showEvent(QShowEvent *event)
 
 void SegmentationWindow::closeEvent(QCloseEvent *event)
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
     suspendThreads();
     mainWindow_->resumeThreads();
     QDialog::closeEvent(event);
@@ -263,28 +261,28 @@ void SegmentationWindow::closeEvent(QCloseEvent *event)
 
 void SegmentationWindow::threadProgress(bool finished)
 {
-    LOG_DEBUG_LOCAL_THREAD(<< "finished <" << finished << ">");
+    LOG_DEBUG(<< "Called with parameter finished <" << finished << ">.");
     // in worker thread: notify gui thread
     emit signalThread(finished, segmentationThread_.progressPercent());
 }
 
 void SegmentationWindow::slotThread(bool finished, int progressPercent)
 {
-    LOG_DEBUG_LOCAL_THREAD(<< "finished <" << finished << "> progress <"
-                           << progressPercent << ">");
+    LOG_DEBUG(<< "Called with parameter finished <" << finished
+              << "> progress <" << progressPercent << ">.");
     // in gui thread: update visualization
     mainWindow_->setStatusProgressBarPercent(progressPercent);
 
     if (finished)
     {
-        LOG_DEBUG_UPDATE_VIEW(MODULE_NAME, << "finished");
+        LOG_TRACE(<< "Thread finished.");
         mainWindow_->update({Editor::TYPE_LAYER, Editor::TYPE_DESCRIPTOR});
     }
 }
 
 void SegmentationWindow::suspendThreads()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
     // in gui thread: cancel task in worker thread
     segmentationThread_.cancel();
     mainWindow_->setStatusProgressBarPercent(0);
@@ -292,14 +290,14 @@ void SegmentationWindow::suspendThreads()
 
 void SegmentationWindow::resumeThreads()
 {
-    LOG_DEBUG_LOCAL(<< "voxelSize <" << voxelSizeInput_->value()
-                    << "> seedElevationMinimum <"
-                    << seedElevationInput_->minimumValue()
-                    << "> seedElevationMaximum <"
-                    << seedElevationInput_->maximumValue() << "> treeHeight <"
-                    << treeHeightInput_->value() << "> searchRadius <"
-                    << searchRadiusInput_->value() << "> neighborPoints <"
-                    << neighborPointsInput_->value() << ">");
+    LOG_DEBUG(<< "Resume thread with parameters voxelSize <"
+              << voxelSizeInput_->value() << "> seedElevationMinimum <"
+              << seedElevationInput_->minimumValue()
+              << "> seedElevationMaximum <"
+              << seedElevationInput_->maximumValue() << "> treeHeight <"
+              << treeHeightInput_->value() << "> searchRadius <"
+              << searchRadiusInput_->value() << "> neighborPoints <"
+              << neighborPointsInput_->value() << ">.");
 
     // in gui thread: start new task in worker thread
     segmentationThread_.start(voxelSizeInput_->value(),

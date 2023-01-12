@@ -24,25 +24,23 @@
 #include <ExportFileFormatLas.hpp>
 #include <IndexFileBuilder.hpp>
 
-#define MODULE_NAME "ExportFileFormatLas"
-#define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
+#define LOG_MODULE_NAME "ExportFileFormatLas"
 
 ExportFileFormatLas::ExportFileFormatLas()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 }
 
 ExportFileFormatLas::~ExportFileFormatLas()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 }
 
 void ExportFileFormatLas::create(const std::string &path)
 {
-    LOG_DEBUG_LOCAL(<< "path <" << path << "> nPoints <"
-                    << properties().numberOfPoints() << "> region <"
-                    << properties().region() << ">");
+    LOG_DEBUG(<< "Called with parameter path <" << path << "> nPoints <"
+              << properties().numberOfPoints() << "> region <"
+              << properties().region() << ">.");
 
     // Create new file which is open for writing
     file_.create(path);
@@ -113,7 +111,7 @@ void ExportFileFormatLas::write(Query &query)
 
 void ExportFileFormatLas::close()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 
     // Close the file
     file_.close();

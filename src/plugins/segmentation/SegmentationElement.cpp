@@ -22,9 +22,7 @@
 #include <Log.hpp>
 #include <SegmentationElement.hpp>
 
-#define MODULE_NAME "SegmentationElement"
-#define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
+#define LOG_MODULE_NAME "SegmentationElement"
 
 SegmentationElement::SegmentationElement()
 {

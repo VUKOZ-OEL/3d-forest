@@ -31,9 +31,7 @@
 
 #include <ctkrangeslider.h>
 
-#define MODULE_NAME "RangeSliderWidget"
-#define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
+#define LOG_MODULE_NAME "RangeSliderWidget"
 
 RangeSliderWidget::RangeSliderWidget()
     : QWidget(),
@@ -47,7 +45,7 @@ RangeSliderWidget::RangeSliderWidget()
 
 void RangeSliderWidget::setMinimum(int min)
 {
-    LOG_DEBUG_LOCAL(<< "min <" << min << ">");
+    LOG_DEBUG(<< "Called with parameter min <" << min << ">.");
     minSpinBox_->setMinimum(min);
     maxSpinBox_->setMinimum(min);
     slider_->setMinimum(min);
@@ -56,7 +54,7 @@ void RangeSliderWidget::setMinimum(int min)
 
 void RangeSliderWidget::setMaximum(int max)
 {
-    LOG_DEBUG_LOCAL(<< "min <" << max << ">");
+    LOG_DEBUG(<< "Called with parameter min <" << max << ">.");
     minSpinBox_->setMaximum(max);
     maxSpinBox_->setMaximum(max);
     slider_->setMaximum(max);
@@ -65,7 +63,7 @@ void RangeSliderWidget::setMaximum(int max)
 
 void RangeSliderWidget::setMinimumValue(int value)
 {
-    LOG_DEBUG_LOCAL(<< "value <" << value << ">");
+    LOG_DEBUG(<< "Called with parameter value <" << value << ">.");
     minSpinBox_->setValue(value);
     slider_->setMinimumValue(value);
     minimumValue_ = value;
@@ -78,7 +76,7 @@ int RangeSliderWidget::minimumValue()
 
 void RangeSliderWidget::setMaximumValue(int value)
 {
-    LOG_DEBUG_LOCAL(<< "value <" << value << ">");
+    LOG_DEBUG(<< "Called with parameter value <" << value << ">.");
     maxSpinBox_->setValue(value);
     slider_->setMaximumValue(value);
     maximumValue_ = value;
@@ -98,7 +96,7 @@ void RangeSliderWidget::blockSignals(bool block)
 
 void RangeSliderWidget::slotIntermediateMinimumValue(int v)
 {
-    LOG_DEBUG_LOCAL(<< "value <" << v << ">");
+    LOG_DEBUG(<< "Called with parameter value <" << v << ">.");
 
     QObject *obj = sender();
 
@@ -122,7 +120,7 @@ void RangeSliderWidget::slotIntermediateMinimumValue(int v)
 
 void RangeSliderWidget::slotIntermediateMaximumValue(int v)
 {
-    LOG_DEBUG_LOCAL(<< "value <" << v << ">");
+    LOG_DEBUG(<< "Called with parameter value <" << v << ">.");
 
     QObject *obj = sender();
 
@@ -157,10 +155,10 @@ void RangeSliderWidget::create(RangeSliderWidget *&outputWidget,
                                int minValue,
                                int maxValue)
 {
-    LOG_DEBUG_LOCAL(<< "min <" << min << ">"
-                    << " max <" << max << ">"
-                    << " minValue <" << minValue << ">"
-                    << " maxValue <" << maxValue << ">");
+    LOG_DEBUG(<< "Called with parameter min <" << min << ">"
+              << " max <" << max << ">"
+              << " minValue <" << minValue << ">"
+              << " maxValue <" << maxValue << ">.");
 
     outputWidget = new RangeSliderWidget();
 

@@ -26,11 +26,7 @@
 #include <ThreadCallbackInterface.hpp>
 #include <Time.hpp>
 
-#define MODULE_NAME "SegmentationThread"
-#define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
-//#define LOG_DEBUG_LOCAL_STATE(msg)
-#define LOG_DEBUG_LOCAL_STATE(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
+#define LOG_MODULE_NAME "SegmentationThread"
 
 SegmentationThread::SegmentationThread(Editor *editor)
     : editor_(editor),
@@ -55,12 +51,12 @@ SegmentationThread::SegmentationThread(Editor *editor)
       timeNow(0),
       timeElapsed(0)
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 }
 
 SegmentationThread::~SegmentationThread()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 }
 
 void SegmentationThread::clear()
@@ -77,12 +73,12 @@ void SegmentationThread::start(int voxelSize,
                                int searchRadius,
                                int neighborPoints)
 {
-    LOG_DEBUG_LOCAL(<< "voxelSize <" << voxelSize << "> seedElevationMinimum <"
-                    << seedElevationMinimumPercent << "> seedElevationMaximum <"
-                    << seedElevationMaximumPercent << "> treeHeight <"
-                    << treeHeightMinimumPercent << "> searchRadius <"
-                    << searchRadius << "> neighborPoints <" << neighborPoints
-                    << ">");
+    LOG_DEBUG(<< "Called with parameter voxelSize <" << voxelSize
+              << "> seedElevationMinimum <" << seedElevationMinimumPercent
+              << "> seedElevationMaximum <" << seedElevationMaximumPercent
+              << "> treeHeight <" << treeHeightMinimumPercent
+              << "> searchRadius <" << searchRadius << "> neighborPoints <"
+              << neighborPoints << ">.");
 
     // Cancel current computation
     cancel();
@@ -139,7 +135,7 @@ void SegmentationThread::start(int voxelSize,
 
 bool SegmentationThread::compute()
 {
-    LOG_DEBUG_LOCAL(<< "state <" << state_ << ">");
+    LOG_DEBUG(<< "Compute state <" << state_ << ">.");
 
     // Next step
     timeBegin = Time::realTime();
@@ -213,12 +209,12 @@ bool SegmentationThread::compute()
     }
     else
     {
-        LOG_DEBUG_LOCAL(<< "nothing to do");
+        LOG_DEBUG(<< "Nothing to do.");
         setState(STATE_FINISHED);
     }
 
     timeElapsed = Time::realTime() - timeBegin;
-    LOG_DEBUG_LOCAL(<< "time <" << (timeElapsed * 1000.) << "> [ms]");
+    LOG_DEBUG(<< "Compute time <" << (timeElapsed * 1000.) << "> [ms].");
 
     // Check if the whole task is finished and call callback
     bool finishedTask;
@@ -234,7 +230,8 @@ bool SegmentationThread::compute()
 
     if (callback_)
     {
-        LOG_DEBUG_LOCAL(<< "callback finished <" << finishedTask << ">");
+        LOG_DEBUG(<< "Call callback with argument finished <" << finishedTask
+                  << ">.");
         callback_->threadProgress(finishedTask);
     }
 
@@ -243,7 +240,7 @@ bool SegmentationThread::compute()
 
 void SegmentationThread::setState(State state)
 {
-    LOG_DEBUG_LOCAL(<< "state <" << state << ">");
+    LOG_DEBUG(<< "Called with parameter state <" << state << ">.");
     state_ = state;
     stateInitialized_ = false;
     progressCounter_ = 0;
@@ -285,7 +282,7 @@ bool SegmentationThread::hasTimedout(int interleave)
 
 void SegmentationThread::resetLayers()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 
     if (stateInitialized_ || !layersCreated_)
     {
@@ -303,13 +300,14 @@ void SegmentationThread::resetLayers()
 
 bool SegmentationThread::computeInitializeVoxels()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 
     // Initialization
     if (!stateInitialized_)
     {
         const Datasets &datasets = editor_->datasets();
-        LOG_DEBUG_LOCAL(<< "number of points <" << datasets.nPoints() << ">");
+        LOG_DEBUG(<< "Initialize number of points <" << datasets.nPoints()
+                  << ">.");
         if (datasets.nPoints() < 1)
         {
             return true;
@@ -349,7 +347,7 @@ bool SegmentationThread::computeInitializeVoxels()
 
 bool SegmentationThread::computeCreateVoxels()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 
     // Initialize voxels.
     if (!stateInitialized_)
@@ -417,7 +415,6 @@ bool SegmentationThread::computeCreateVoxels()
         progressValue_ = voxels_.visitedVoxelsCount();
         if (progressValue_ == progressMax_)
         {
-            LOG_DEBUG_LOCAL_STATE(<< "visitedVoxelsCount");
             break;
         }
 
@@ -439,7 +436,7 @@ bool SegmentationThread::computeCreateVoxels()
 
 bool SegmentationThread::computeSortVoxels()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 
     // Initialization
     if (!stateInitialized_)
@@ -460,7 +457,7 @@ bool SegmentationThread::computeSortVoxels()
 
 bool SegmentationThread::computeProcessVoxels()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 
     // Initialization
     if (!stateInitialized_)
@@ -483,7 +480,7 @@ bool SegmentationThread::computeProcessVoxels()
 
 bool SegmentationThread::computeInitializeElements()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 
     // Initialization
     if (!stateInitialized_)
@@ -509,7 +506,7 @@ bool SegmentationThread::computeInitializeElements()
 
 bool SegmentationThread::computeCreateElements()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 
     // Initialization
     if (!stateInitialized_)
@@ -533,8 +530,8 @@ bool SegmentationThread::computeCreateElements()
             const std::vector<size_t> &voxelList = element.voxelList();
             const size_t nVoxels = voxelList.size();
 
-            LOG_DEBUG_LOCAL(<< "number of voxels in element <" << elementIndex
-                            << "> is <" << nVoxels << ">");
+            LOG_DEBUG(<< "Number of voxels in element <" << elementIndex
+                      << "> is <" << nVoxels << ">.");
 
             for (size_t j = 0; j < nVoxels; j++)
             {
@@ -561,7 +558,7 @@ bool SegmentationThread::computeCreateElements()
 
 bool SegmentationThread::computeMergeElements()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 
     // Initialization
     if (!stateInitialized_)
@@ -581,7 +578,7 @@ bool SegmentationThread::computeMergeElements()
 
 bool SegmentationThread::computeCreateLayers()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 
     // Initialization
     if (!stateInitialized_)
@@ -626,7 +623,7 @@ bool SegmentationThread::computeCreateLayers()
     size_t nLayers = elements_.size();
     if (nLayers > 0)
     {
-        LOG_DEBUG_LOCAL(<< "number of layers <" << nLayers << ">");
+        LOG_DEBUG(<< "Number of layers <" << nLayers << ">.");
 
         const std::vector<Vector3<float>> &pal = ColorPalette::WindowsXp32;
         Layer layer;

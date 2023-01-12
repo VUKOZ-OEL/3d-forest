@@ -23,9 +23,7 @@
 #include <Editor.hpp>
 #include <Math.hpp>
 
-#define MODULE_NAME "DescriptorAction"
-#define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
+#define LOG_MODULE_NAME "DescriptorAction"
 
 DescriptorAction::DescriptorAction(Editor *editor)
     : editor_(editor),
@@ -34,17 +32,17 @@ DescriptorAction::DescriptorAction(Editor *editor)
       pca_(),
       status_(STATUS_NEW)
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 }
 
 DescriptorAction::~DescriptorAction()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 }
 
 void DescriptorAction::clear()
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 
     queryPoints_.clear();
     queryPoint_.clear();
@@ -68,7 +66,7 @@ void DescriptorAction::initialize(double radius,
                                   double voxelSize,
                                   Method method)
 {
-    LOG_DEBUG_LOCAL(<< "radius <" << radius << ">");
+    LOG_DEBUG(<< "Called with parameter radius <" << radius << ">.");
 
     radius_ = radius;
     voxelSize_ = voxelSize;
@@ -205,7 +203,7 @@ void DescriptorAction::stepComputeDescriptor()
 
     if (nPointsDone_ == nPointsOneHalf_)
     {
-        LOG_DEBUG_LOCAL(<< "STATUS_NORMALIZE_DESCRIPTOR");
+        LOG_DEBUG(<< "Change state to STATUS_NORMALIZE_DESCRIPTOR.");
         status_ = STATUS_NORMALIZE_DESCRIPTOR;
         queryPoints_.reset();
     }
@@ -263,7 +261,7 @@ void DescriptorAction::stepNormalizeDescriptor()
 
     if (nPointsDone_ == nPointsTotal_)
     {
-        LOG_DEBUG_LOCAL(<< "STATUS_FINISHED");
+        LOG_DEBUG(<< "Change state to STATUS_FINISHED.");
         status_ = STATUS_FINISHED;
         queryPoints_.flush();
     }

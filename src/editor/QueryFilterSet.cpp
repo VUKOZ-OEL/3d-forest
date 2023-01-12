@@ -22,13 +22,11 @@
 #include <Log.hpp>
 #include <QueryFilterSet.hpp>
 
-#define MODULE_NAME "QueryFilterSet"
-#define LOG_DEBUG_LOCAL(msg)
-// #define LOG_DEBUG_LOCAL(msg) LOG_MESSAGE(LOG_DEBUG, MODULE_NAME, msg)
+#define LOG_MODULE_NAME "QueryFilterSet"
 
 QueryFilterSet::QueryFilterSet() : enabled_(false)
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 }
 
 QueryFilterSet::QueryFilterSet(const std::unordered_set<size_t> &list)
@@ -36,7 +34,7 @@ QueryFilterSet::QueryFilterSet(const std::unordered_set<size_t> &list)
       values_(list),
       enabled_(false)
 {
-    LOG_DEBUG_LOCAL(<< "");
+    LOG_DEBUG(<< "Called.");
 }
 
 QueryFilterSet::~QueryFilterSet()
