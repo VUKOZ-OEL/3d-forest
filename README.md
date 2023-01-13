@@ -41,6 +41,7 @@ third-party libraries **without downloading and installation** of each library.
 - delaunator-cpp (Oct 6, 2018), Delaunay triangulation of 2D points.
 - eigen (3.4.0), Template library for linear algebra.
 - libigl (2.4.0), A simple geometry processing library.
+- stb_image_write (v1.16), stb single-file public domain libraries for C++.
 
 ## Known Issues
 This software is currently in development.
