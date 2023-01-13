@@ -131,11 +131,11 @@ extern std::shared_ptr<LogThread> EXPORT_CORE globalLogThread;
         }                                                                      \
     } while (false)
 
-#if defined(LOG_MODULE_ENABLED)
+#if defined(LOG_MODULE_DEBUG_ENABLED)
     #define LOG_DEBUG(msg) LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg)
 #else
     #define LOG_DEBUG(msg)
-#endif /* LOG_MODULE_ENABLED */
+#endif /* LOG_MODULE_DEBUG_ENABLED */
 
 #if defined(LOG_TRACE_X)
     #define LOG_TRACE(msg) LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg)
