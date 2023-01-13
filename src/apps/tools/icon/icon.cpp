@@ -22,6 +22,8 @@
 #include <iostream>
 
 #include <ArgumentParser.hpp>
+#include <Error.hpp>
+#include <Log.hpp>
 
 #include <QDir>
 #include <QPainter>
@@ -31,23 +33,32 @@ static void process(const QString &path, const QString &fileName);
 
 int main(int argc, char *argv[])
 {
-    ArgumentParser arg;
-    arg.add("--input", "");
-    arg.parse(argc, argv);
-
-    QString path = QString::fromStdString(arg.toString("--input"));
-
-    QDir searchDirectory(path);
-    QStringList fileList = searchDirectory.entryList(QDir::Files);
-
-    std::cout << "directory '" << searchDirectory.absolutePath().toStdString()
-              << "'" << std::endl;
-    std::cout << "contains " << fileList.count() << " files" << std::endl;
-
-    for (const QString &fileName : fileList)
+    try
     {
-        std::cout << "file '" << fileName.toStdString() << "'" << std::endl;
-        process(path, fileName);
+        ArgumentParser arg;
+        arg.add("--input", "");
+        arg.parse(argc, argv);
+
+        QString path = QString::fromStdString(arg.toString("--input"));
+
+        QDir searchDirectory(path);
+        QStringList fileList = searchDirectory.entryList(QDir::Files);
+
+        std::cout << "directory '"
+                  << searchDirectory.absolutePath().toStdString() << "'"
+                  << std::endl;
+        std::cout << "contains " << fileList.count() << " files" << std::endl;
+
+        for (const QString &fileName : fileList)
+        {
+            std::cout << "file '" << fileName.toStdString() << "'" << std::endl;
+            process(path, fileName);
+        }
+    }
+    catch (std::exception &e)
+    {
+        std::cerr << "error: " << e.what() << std::endl;
+        return 1;
     }
 
     return 0;
