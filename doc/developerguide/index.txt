@@ -638,7 +638,7 @@ Example log for file DescriptorPca.cpp
 @verbatim
 #include <Log.hpp>
 #define LOG_MODULE_NAME "DescriptorPca"
-#define LOG_MODULE_ENABLED 1 /* Define to enable all debug log messages from this file. */
+#define LOG_MODULE_DEBUG_ENABLED 1 /* Define to enable all debug log messages from this file. */
 LOG_DEBUG(<< "Found nPoints <" << nPoints << ">.");
 @endverbatim
 
