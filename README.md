@@ -5,7 +5,7 @@
 # 3D Forest
 3D Forest is software for analysis of Lidar data from forest environment.
 
-Copyright 2020-2022 VUKOZ
+Copyright 2020-Present VUKOZ
 Blue Cat team and other authors
 
 ## License
