@@ -1,3 +1,7 @@
+<div align="center">
+<img width="100%" src="https://raw.githubusercontent.com/VUKOZ-OEL/3d-forest/main/doc/images/3d-forest-preview-screenshot.png"></a>
+</div>
+
 # 3D Forest
 3D Forest is software for analysis of Lidar data from forest environment.
 
