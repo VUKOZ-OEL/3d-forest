@@ -137,11 +137,14 @@ extern std::shared_ptr<LogThread> EXPORT_CORE globalLogThread;
     #define LOG_DEBUG(msg)
 #endif /* LOG_MODULE_DEBUG_ENABLED */
 
-#if defined(LOG_TRACE_X)
-    #define LOG_TRACE(msg) LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg)
+#define LOG_TRACE_UNKNOWN(msg)
+
+#if 0
+    #define LOG_TRACE_UPDATE_VIEW(msg)                                         \
+        LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg);
 #else
-    #define LOG_TRACE(msg)
-#endif /* LOG_TRACE_X */
+    #define LOG_TRACE_UPDATE_VIEW(msg)
+#endif
 
 #define LOG_WARNING(msg) LOG_MESSAGE(LOG_TYPE_WARNING, LOG_MODULE_NAME, msg)
 #define LOG_ERROR(msg) LOG_MESSAGE(LOG_TYPE_ERROR, LOG_MODULE_NAME, msg)

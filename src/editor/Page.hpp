@@ -168,6 +168,7 @@ public:
     Page::State state() const { return state_; }
     void setState(Page::State state);
     bool nextState();
+    static std::string stateToString(Page::State state);
 
     void setModified();
     bool isModified() const { return modified_; }

@@ -275,7 +275,7 @@ void SegmentationWindow::slotThread(bool finished, int progressPercent)
 
     if (finished)
     {
-        LOG_TRACE(<< "Thread finished.");
+        LOG_TRACE_UNKNOWN(<< "Thread finished.");
         mainWindow_->update({Editor::TYPE_LAYER, Editor::TYPE_DESCRIPTOR});
     }
 }

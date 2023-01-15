@@ -22,6 +22,7 @@
 #include <iostream>
 
 #include <Editor.hpp>
+#include <Log.hpp>
 
 #include <ViewerOpenGLViewport.hpp>
 #include <ViewerViewports.hpp>
@@ -29,6 +30,8 @@
 #include <QHBoxLayout>
 #include <QSplitter>
 #include <QVBoxLayout>
+
+#define LOG_MODULE_NAME "ViewerViewports"
 
 #define VIEWER_VIEWPORTS_3D 0
 #define VIEWER_VIEWPORTS_TOP 1
@@ -154,6 +157,7 @@ size_t ViewerViewports::selectedViewportId() const
 
 void ViewerViewports::updateScene(Editor *editor)
 {
+    LOG_TRACE_UPDATE_VIEW(<< "Update all viewports.");
     for (size_t i = 0; i < viewports_.size(); i++)
     {
         viewports_[i]->updateScene(editor);
@@ -163,6 +167,7 @@ void ViewerViewports::updateScene(Editor *editor)
 
 void ViewerViewports::resetScene(Editor *editor, bool resetView)
 {
+    LOG_TRACE_UPDATE_VIEW(<< "Reset all viewports.");
     for (size_t i = 0; i < viewports_.size(); i++)
     {
         viewports_[i]->resetScene(editor, resetView);
