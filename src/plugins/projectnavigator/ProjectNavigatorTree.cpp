@@ -73,8 +73,8 @@ ProjectNavigatorTree::ProjectNavigatorTree(MainWindow *mainWindow)
     splitter->addWidget(treeWidget_);
     splitter->addWidget(treeDetailFrame);
 
-    int w = width() / 4;
-    splitter->setSizes(QList<int>({w, w * 3}));
+    int w = width() / 8;
+    splitter->setSizes(QList<int>({w * 3, w * 5}));
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(splitter);
