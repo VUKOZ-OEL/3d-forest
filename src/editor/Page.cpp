@@ -351,7 +351,7 @@ void Page::queryWhere()
 
 void Page::runModifiers()
 {
-    LOG_TRACE(<< "Page pageId <" << pageId_ << ">.");
+    LOG_TRACE_UNKNOWN(<< "Page pageId <" << pageId_ << ">.");
 
     runColorModifier();
     editor_->runModifiers(this);
@@ -366,7 +366,8 @@ void Page::setModified()
 
 void Page::setState(Page::State state)
 {
-    LOG_TRACE(<< "Page pageId <" << pageId_ << "> to state <" << state << ">.");
+    LOG_TRACE_UNKNOWN(<< "Page pageId <" << pageId_ << "> to state <" << state
+                      << ">.");
 
     if ((state < state_) || (state == Page::STATE_RENDERED))
     {
@@ -379,8 +380,23 @@ void Page::setState(Page::State state)
     }
 }
 
+std::string Page::stateToString(Page::State state)
+{
+    const char *stateNames[] =
+        {"read", "transform", "select", "modifiers", "render", "rendered"};
+    if (state < static_cast<int>(sizeof(stateNames)))
+    {
+        return std::string(stateNames[state]);
+    }
+
+    return std::to_string(state);
+}
+
 bool Page::nextState()
 {
+    LOG_TRACE_UPDATE_VIEW(<< "Compute state <" << Page::stateToString(state_)
+                          << ">.");
+
     if (state_ == Page::STATE_READ)
     {
         try
@@ -975,7 +991,7 @@ void Page::runColorModifier()
     {
         const Layers &layers = editor_->layers();
         const size_t max = layers.size();
-        LOG_TRACE(<< "Maximum layers <" << max << ">.");
+        LOG_TRACE_UNKNOWN(<< "Maximum layers <" << max << ">.");
 
         for (size_t i = 0; i < n; i++)
         {

@@ -357,7 +357,7 @@ void MainWindow::threadProgress(bool finished)
 
 void MainWindow::slotRender()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_TRACE_UPDATE_VIEW(<< "Render all viewports.");
     editor_.lock();
     viewerPlugin_->viewports()->updateScene(&editor_);
     editor_.unlock();
@@ -365,7 +365,7 @@ void MainWindow::slotRender()
 
 void MainWindow::slotRenderViewport()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_TRACE_UPDATE_VIEW(<< "Render active viewport.");
     slotRenderViewport(viewerPlugin_->viewports()->selectedViewportId());
 }
 
@@ -387,9 +387,8 @@ void MainWindow::update(const QSet<Editor::Type> &target,
 {
     LOG_DEBUG(<< "Called with parameter number of targets <" << target.count()
               << ">.");
-
+    LOG_TRACE_UPDATE_VIEW(<< "Update targets.");
     suspendThreads();
-    LOG_TRACE(<< "Called.");
 
     editor_.viewports().setState(viewPortsCacheState);
     // editor_.viewports().clearContent();
@@ -407,10 +406,8 @@ void MainWindow::update(const QSet<Editor::Type> &target,
 
 void MainWindow::updateEverything()
 {
-    LOG_DEBUG(<< "Called.");
-
+    LOG_TRACE_UPDATE_VIEW(<< "Update everything.");
     suspendThreads();
-    LOG_TRACE(<< "Called.");
 
     ViewerViewports *viewports = viewerPlugin_->viewports();
 
@@ -428,8 +425,8 @@ void MainWindow::updateEverything()
 
 void MainWindow::updateData()
 {
+    LOG_TRACE_UPDATE_VIEW(<< "Update data.");
     suspendThreads();
-    LOG_TRACE(<< "Called.");
 
     ViewerViewports *viewports = viewerPlugin_->viewports();
     viewports->resetScene(&editor_, false);
@@ -440,8 +437,8 @@ void MainWindow::updateData()
 
 void MainWindow::updateFilter()
 {
+    LOG_TRACE_UPDATE_VIEW(<< "Update filter.");
     suspendThreads();
-    LOG_TRACE(<< "Called.");
 
     ViewerViewports *viewports = viewerPlugin_->viewports();
     viewports->resetScene(&editor_, false);
@@ -452,8 +449,8 @@ void MainWindow::updateFilter()
 
 void MainWindow::updateModifiers()
 {
+    LOG_TRACE_UPDATE_VIEW(<< "Update modifiers.");
     suspendThreads();
-    LOG_TRACE(<< "Called.");
 
     editor_.viewports().setState(Page::STATE_RUN_MODIFIERS);
 
@@ -462,8 +459,8 @@ void MainWindow::updateModifiers()
 
 void MainWindow::updateRender()
 {
+    LOG_TRACE_UPDATE_VIEW(<< "Update render.");
     suspendThreads();
-    LOG_TRACE(<< "Called.");
 
     editor_.viewports().setState(Page::STATE_RENDER);
 

@@ -33,7 +33,7 @@
 #include <stb_image_write.h>
 
 #include <WarningsOn.h>
-
+#if 0
 static void appendPoint(std::vector<LasFile::Point> *points,
                         int32_t x,
                         int32_t y,
@@ -195,3 +195,9 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+#else
+int main()
+{
+    return 0;
+}
+#endif

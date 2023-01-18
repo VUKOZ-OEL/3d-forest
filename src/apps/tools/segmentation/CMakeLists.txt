@@ -24,6 +24,7 @@ add_executable(
     ../../../plugins/segmentation/SegmentationElements.cpp
     ../../../plugins/segmentation/SegmentationMap.cpp
     ../../../plugins/segmentation/SegmentationThread.cpp
+    ../../../plugins/segmentation/SegmentationActionCount.cpp
 )
 
 target_include_directories(

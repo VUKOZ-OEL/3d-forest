@@ -46,88 +46,53 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
 {
     LOG_DEBUG(<< "Called.");
 
-    // Voxel size
-    SliderWidget::create(voxelSizeInput_,
+    // Widgets.
+    SliderWidget::create(initialSamplesCountInput_,
                          this,
                          nullptr,
-                         SLOT(slotVoxelSizeFinalValue()),
-                         tr("Voxel size"),
-                         tr("The automated segmentation creates voxel"
-                            "\ngrid through the whole point cloud."
-                            "\nVoxel size should be small enough so that"
-                            "\nmost voxels contain only points from a"
-                            " single tree."),
-                         tr("pt"),
-                         1,
-                         SEGMENTATION_WINDOW_VOXEL_SIZE_DEFAULT_MIN,
-                         SEGMENTATION_WINDOW_VOXEL_SIZE_DEFAULT_MAX,
-                         SEGMENTATION_WINDOW_VOXEL_SIZE_DEFAULT_MAX);
-
-    // Maximum elevation
-    RangeSliderWidget::create(seedElevationInput_,
-                              this,
-                              SLOT(slotSeedElevationMinimumValue()),
-                              SLOT(slotSeedElevationMaximumValue()),
-                              tr("Elevation range of tree base"),
-                              tr("Elevation range of points which"
-                                 "\nare used to start segmentation."),
-                              tr("%"),
-                              1,
-                              1,
-                              25,
-                              4,
-                              6);
-
-    // Minimum height of tree
-    SliderWidget::create(treeHeightInput_,
-                         this,
-                         nullptr,
-                         SLOT(slotTreeHeightFinalValue()),
-                         tr("Minimum height of tree"),
-                         tr("Minimum height of cluster created from"
-                            "\nnearby points to mark it as a new tree"),
+                         SLOT(slotInitialSamplesCountFinalValue()),
+                         tr("Number of initial samples"),
+                         tr("Number of initial samples"),
                          tr("%"),
                          1,
                          1,
                          100,
-                         10);
+                         parameters_.initialSamplesCount);
 
-    // Search radius
-    SliderWidget::create(searchRadiusInput_,
-                         this,
-                         nullptr,
-                         SLOT(slotSearchRadiusFinalValue()),
-                         tr("Search radius"),
-                         tr("Search radius"),
-                         tr("pt"),
-                         1,
-                         1,
-                         10000,
-                         5000);
+    RangeSliderWidget::create(initialSamplesDensityInput_,
+                              this,
+                              SLOT(slotInitialSamplesDensityMinimumValue()),
+                              SLOT(slotInitialSamplesDensityMaximumValue()),
+                              tr("Density range of initial samples"),
+                              tr("Density range of initial samples"),
+                              tr("%"),
+                              1,
+                              0,
+                              100,
+                              parameters_.initialSamplesDensityMinimum,
+                              parameters_.initialSamplesDensityMaximum);
 
-    // Neighbor points
-    SliderWidget::create(neighborPointsInput_,
-                         this,
-                         nullptr,
-                         SLOT(slotNeighborPointsFinalValue()),
-                         tr("Neighbor points"),
-                         tr("Neighbor points"),
-                         tr("cnt"),
-                         1,
-                         1,
-                         10000,
-                         10);
+    RangeSliderWidget::create(neighborhoodRadiusInput_,
+                              this,
+                              SLOT(slotNeighborhoodRadiusMinimumValue()),
+                              SLOT(slotNeighborhoodRadiusMaximumValue()),
+                              tr("Neighborhood radius range"),
+                              tr("Neighborhood radius range"),
+                              tr("pt"),
+                              1,
+                              1,
+                              10000,
+                              parameters_.neighborhoodRadiusMinimum,
+                              parameters_.neighborhoodRadiusMaximum);
 
-    // Settings layout
+    // Create layout with parameters.
     QVBoxLayout *settingsLayout = new QVBoxLayout;
-    settingsLayout->addWidget(voxelSizeInput_);
-    settingsLayout->addWidget(seedElevationInput_);
-    settingsLayout->addWidget(treeHeightInput_);
-    settingsLayout->addWidget(searchRadiusInput_);
-    settingsLayout->addWidget(neighborPointsInput_);
+    settingsLayout->addWidget(initialSamplesCountInput_);
+    settingsLayout->addWidget(initialSamplesDensityInput_);
+    settingsLayout->addWidget(neighborhoodRadiusInput_);
     settingsLayout->addStretch();
 
-    // apply/cancel buttons
+    // Add apply and cancel buttons.
     acceptButton_ = new QPushButton(tr("Apply"));
     connect(acceptButton_, SIGNAL(clicked()), this, SLOT(slotAccept()));
 
@@ -139,7 +104,7 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
     dialogButtons->addWidget(acceptButton_);
     dialogButtons->addWidget(rejectButton_);
 
-    // Main layout
+    // Create main layout.
     QVBoxLayout *dialogLayout = new QVBoxLayout;
     dialogLayout->addLayout(settingsLayout);
     dialogLayout->addSpacing(10);
@@ -148,13 +113,13 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
 
     setLayout(dialogLayout);
 
-    // Dialog
+    // Create the dialog.
     setWindowTitle(tr("Segmentation"));
     setWindowIcon(ICON("forest"));
     setMaximumHeight(height());
     setModal(true);
 
-    // Connect worker thread to gui thread
+    // Connect worker thread to gui thread.
     connect(this,
             SIGNAL(signalThread(bool, int)),
             this,
@@ -171,60 +136,38 @@ SegmentationWindow::~SegmentationWindow()
     segmentationThread_.stop();
 }
 
-void SegmentationWindow::updateRange()
+void SegmentationWindow::slotInitialSamplesCountFinalValue()
 {
-    LOG_DEBUG(<< "Called.");
-    const Editor *editor = segmentationThread_.editor();
-    Box<double> boundary = editor->clipBoundary();
-    double max = boundary.maximumLength() * 0.1;
-
-    int length = static_cast<int>(max);
-    if (length < SEGMENTATION_WINDOW_VOXEL_SIZE_DEFAULT_MIN)
-    {
-        length = SEGMENTATION_WINDOW_VOXEL_SIZE_DEFAULT_MIN;
-    }
-
-    voxelSizeInput_->blockSignals(true);
-    voxelSizeInput_->setMaximum(length);
-    voxelSizeInput_->setValue(length);
-    voxelSizeInput_->blockSignals(false);
-}
-
-void SegmentationWindow::slotVoxelSizeFinalValue()
-{
-    LOG_DEBUG(<< "Input value <" << voxelSizeInput_->value() << ">.");
+    LOG_DEBUG(<< "New value for the number of initial samples <"
+              << initialSamplesCountInput_->value() << ">.");
     resumeThreads();
 }
 
-void SegmentationWindow::slotSeedElevationMinimumValue()
+void SegmentationWindow::slotInitialSamplesDensityMinimumValue()
 {
-    LOG_DEBUG(<< "Input value <" << seedElevationInput_->minimumValue()
-              << ">.");
+    LOG_DEBUG(<< "New value for minimum density of initial samples <"
+              << initialSamplesDensityInput_->minimumValue() << ">.");
     resumeThreads();
 }
 
-void SegmentationWindow::slotSeedElevationMaximumValue()
+void SegmentationWindow::slotInitialSamplesDensityMaximumValue()
 {
-    LOG_DEBUG(<< "Input value <" << seedElevationInput_->maximumValue()
-              << ">.");
+    LOG_DEBUG(<< "New value for maximum density of initial samples <"
+              << initialSamplesDensityInput_->maximumValue() << ">.");
     resumeThreads();
 }
 
-void SegmentationWindow::slotTreeHeightFinalValue()
+void SegmentationWindow::slotNeighborhoodRadiusMinimumValue()
 {
-    LOG_DEBUG(<< "Input value <" << treeHeightInput_->value() << ">.");
+    LOG_DEBUG(<< "New value for minimum neighborhood radius <"
+              << neighborhoodRadiusInput_->minimumValue() << ">.");
     resumeThreads();
 }
 
-void SegmentationWindow::slotSearchRadiusFinalValue()
+void SegmentationWindow::slotNeighborhoodRadiusMaximumValue()
 {
-    LOG_DEBUG(<< "Input value <" << treeHeightInput_->value() << ">.");
-    resumeThreads();
-}
-
-void SegmentationWindow::slotNeighborPointsFinalValue()
-{
-    LOG_DEBUG(<< "Input value <" << neighborPointsInput_->value() << ">.");
+    LOG_DEBUG(<< "New value for maximum neighborhood radius <"
+              << neighborhoodRadiusInput_->maximumValue() << ">.");
     resumeThreads();
 }
 
@@ -247,7 +190,6 @@ void SegmentationWindow::showEvent(QShowEvent *event)
     LOG_DEBUG(<< "Called.");
     QDialog::showEvent(event);
     mainWindow_->suspendThreads();
-    updateRange();
     resumeThreads();
 }
 
@@ -275,7 +217,7 @@ void SegmentationWindow::slotThread(bool finished, int progressPercent)
 
     if (finished)
     {
-        LOG_TRACE(<< "Thread finished.");
+        LOG_TRACE_UNKNOWN(<< "Thread finished.");
         mainWindow_->update({Editor::TYPE_LAYER, Editor::TYPE_DESCRIPTOR});
     }
 }
@@ -290,22 +232,29 @@ void SegmentationWindow::suspendThreads()
 
 void SegmentationWindow::resumeThreads()
 {
-    LOG_DEBUG(<< "Resume thread with parameters voxelSize <"
-              << voxelSizeInput_->value() << "> seedElevationMinimum <"
-              << seedElevationInput_->minimumValue()
-              << "> seedElevationMaximum <"
-              << seedElevationInput_->maximumValue() << "> treeHeight <"
-              << treeHeightInput_->value() << "> searchRadius <"
-              << searchRadiusInput_->value() << "> neighborPoints <"
-              << neighborPointsInput_->value() << ">.");
+    parameters_.initialSamplesCount = initialSamplesCountInput_->value();
+    parameters_.initialSamplesDensityMinimum =
+        initialSamplesDensityInput_->minimumValue();
+    parameters_.initialSamplesDensityMaximum =
+        initialSamplesDensityInput_->maximumValue();
+    parameters_.neighborhoodRadiusMinimum =
+        neighborhoodRadiusInput_->minimumValue();
+    parameters_.neighborhoodRadiusMaximum =
+        neighborhoodRadiusInput_->maximumValue();
+
+    LOG_DEBUG(<< "Resume thread with parameters initialSamplesCount <"
+              << parameters_.initialSamplesCount
+              << "> initialSamplesDensityMinimum <"
+              << parameters_.initialSamplesDensityMinimum
+              << "> initialSamplesDensityMaximum <"
+              << parameters_.initialSamplesDensityMaximum
+              << "> neighborhoodRadiusMinimum <"
+              << parameters_.neighborhoodRadiusMinimum
+              << "> neighborhoodRadiusMaximum <"
+              << parameters_.neighborhoodRadiusMaximum << ">.");
 
     // in gui thread: start new task in worker thread
-    segmentationThread_.start(voxelSizeInput_->value(),
-                              seedElevationInput_->minimumValue(),
-                              seedElevationInput_->maximumValue(),
-                              treeHeightInput_->value(),
-                              searchRadiusInput_->value(),
-                              neighborPointsInput_->value());
+    segmentationThread_.restart(parameters_);
 
     mainWindow_->setStatusProgressBarPercent(0);
 }

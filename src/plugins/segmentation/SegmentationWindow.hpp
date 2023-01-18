@@ -49,12 +49,11 @@ signals:
     void signalThread(bool finished, int progressPercent);
 
 protected slots:
-    void slotVoxelSizeFinalValue();
-    void slotSeedElevationMinimumValue();
-    void slotSeedElevationMaximumValue();
-    void slotTreeHeightFinalValue();
-    void slotSearchRadiusFinalValue();
-    void slotNeighborPointsFinalValue();
+    void slotInitialSamplesCountFinalValue();
+    void slotInitialSamplesDensityMinimumValue();
+    void slotInitialSamplesDensityMaximumValue();
+    void slotNeighborhoodRadiusMinimumValue();
+    void slotNeighborhoodRadiusMaximumValue();
 
     void slotAccept();
     void slotReject();
@@ -62,15 +61,14 @@ protected slots:
 private:
     MainWindow *mainWindow_;
 
-    SliderWidget *voxelSizeInput_;
-    RangeSliderWidget *seedElevationInput_;
-    SliderWidget *treeHeightInput_;
-    SliderWidget *searchRadiusInput_;
-    SliderWidget *neighborPointsInput_;
+    SliderWidget *initialSamplesCountInput_;
+    RangeSliderWidget *initialSamplesDensityInput_;
+    RangeSliderWidget *neighborhoodRadiusInput_;
 
     QPushButton *acceptButton_;
     QPushButton *rejectButton_;
 
+    SegmentationParameters parameters_;
     SegmentationThread segmentationThread_;
 
     virtual void showEvent(QShowEvent *event);
@@ -78,7 +76,6 @@ private:
 
     void suspendThreads();
     void resumeThreads();
-    void updateRange();
 };
 
 #endif /* SEGMENTATION_WINDOW_HPP */

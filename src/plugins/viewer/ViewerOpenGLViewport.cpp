@@ -72,11 +72,13 @@ bool ViewerOpenGLViewport::isSelected() const
 
 void ViewerOpenGLViewport::updateScene(Editor *editor)
 {
+    LOG_TRACE_UPDATE_VIEW(<< "Update viewport <" << viewportId_ << ">.");
     editor_ = editor;
 }
 
 void ViewerOpenGLViewport::resetScene(Editor *editor, bool resetView)
 {
+    LOG_TRACE_UPDATE_VIEW(<< "Reset viewport <" << viewportId_ << ">.");
     aabb_.set(editor->datasets().boundary());
     if (resetView)
     {
@@ -206,8 +208,8 @@ void ViewerOpenGLViewport::initializeGL()
 
 void ViewerOpenGLViewport::paintGL()
 {
-    LOG_TRACE(<< "Paint width <" << camera_.width() << "> height <"
-              << camera_.height() << ">.");
+    LOG_TRACE_UNKNOWN(<< "Paint width <" << camera_.width() << "> height <"
+                      << camera_.height() << ">.");
 
     // Setup camera
     glViewport(0, 0, camera_.width(), camera_.height());
@@ -287,8 +289,8 @@ bool ViewerOpenGLViewport::renderScene()
         firstFrame = true;
     }
 
-    LOG_TRACE(<< "Render viewport <" << viewportId_ << "> pageSize <"
-              << pageSize << ">.");
+    LOG_TRACE_UNKNOWN(<< "Render viewport <" << viewportId_ << "> pageSize <"
+                      << pageSize << ">.");
 
     for (size_t pageIndex = 0; pageIndex < pageSize; pageIndex++)
     {
@@ -296,7 +298,7 @@ bool ViewerOpenGLViewport::renderScene()
 
         if (page.state() == Page::STATE_RENDER)
         {
-            LOG_TRACE(<< "Render pageId <" << page.pageId() << ">.");
+            LOG_TRACE_UNKNOWN(<< "Render pageId <" << page.pageId() << ">.");
 
             if (pageIndex == 0)
             {
@@ -336,6 +338,9 @@ bool ViewerOpenGLViewport::renderScene()
 
 void ViewerOpenGLViewport::renderFirstFrame()
 {
+    LOG_TRACE_UPDATE_VIEW(<< "Rendered first frame in viewport <" << viewportId_
+                          << ">.");
+
     ViewerOpenGL::renderClipFilter(editor_->clipFilter());
     renderLayers();
 }
