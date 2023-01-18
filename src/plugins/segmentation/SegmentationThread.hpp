@@ -23,8 +23,11 @@
 #define SEGMENTATION_THREAD_HPP
 
 #include <Query.hpp>
+#include <SegmentationActionCount.hpp>
+#include <SegmentationData.hpp>
 #include <SegmentationElements.hpp>
 #include <SegmentationMap.hpp>
+#include <SegmentationParameters.hpp>
 #include <Thread.hpp>
 #include <Vector3.hpp>
 #include <Voxels.hpp>
@@ -39,81 +42,19 @@ public:
     virtual ~SegmentationThread();
 
     void clear();
-
-    void start(int voxelSize,
-               int seedElevationMinimumPercent,
-               int seedElevationMaximumPercent,
-               int treeHeightMinimumPercent,
-               int searchRadius,
-               int neighborPoints);
-
-    int progressPercent() const { return progressPercent_; }
-
+    void restart(const SegmentationParameters &parameters);
     virtual bool compute();
 
-    const Editor *editor() const { return editor_; }
-    const SegmentationMap &segmentationMap() const { return segmentationMap_; }
+    int progressPercent() const;
 
 private:
-    /** Segmentation Thread State. */
-    enum State
-    {
-        STATE_INITIALIZE_VOXELS,
-        STATE_CREATE_VOXELS,
-        STATE_SORT_VOXELS,
-        STATE_PROCESS_VOXELS,
-        STATE_INITIALIZE_ELEMENTS,
-        STATE_CREATE_ELEMENTS,
-        STATE_MERGE_ELEMENTS,
-        STATE_CREATE_LAYERS,
-        STATE_FINISHED,
-    };
-
     Editor *editor_;
     Query query_;
 
-    State state_;
-    bool stateInitialized_;
-    bool layersCreated_;
-    int progressCounter_;
-    int progressPercent_;
-    uint64_t progressMax_;
-    uint64_t progressValue_;
-    double stateTime_;
+    SegmentationParameters parameters_;
+    SegmentationData data_;
 
-    int voxelSize_;
-    int seedElevationMinimumPercent_;
-    int seedElevationMaximumPercent_;
-    int treeHeightMinimumPercent_;
-    int searchRadius_;
-    int neighborPoints_;
-
-    double seedElevationMinimum_;
-    double seedElevationMaximum_;
-    double treeHeightMinimum_;
-
-    double timeBegin;
-    double timeNow;
-    double timeElapsed;
-
-    Voxels voxels_;
-    SegmentationElements elements_;
-    SegmentationMap segmentationMap_;
-
-    void setState(State state);
-    void updateProgressPercent();
-    bool hasTimedout(int interleave = 10);
-
-    void resetLayers();
-
-    bool computeInitializeVoxels();
-    bool computeCreateVoxels();
-    bool computeSortVoxels();
-    bool computeProcessVoxels();
-    bool computeInitializeElements();
-    bool computeCreateElements();
-    bool computeMergeElements();
-    bool computeCreateLayers();
+    SegmentationActionCount actionCount_;
 };
 
 #endif /* SEGMENTATION_THREAD_HPP */
