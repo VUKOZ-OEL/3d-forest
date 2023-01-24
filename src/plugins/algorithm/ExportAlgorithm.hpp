@@ -17,33 +17,20 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationParameters.hpp */
+/** @file ExportAlgorithm.hpp */
 
-#ifndef SEGMENTATION_PARAMETERS_HPP
-#define SEGMENTATION_PARAMETERS_HPP
+#ifndef EXPORT_ALGORITHM_HPP
+#define EXPORT_ALGORITHM_HPP
 
-#include <cstdint>
+#if defined(_MSC_VER)
+    #if defined(EXPORT_3DForestAlgorithmPlugin)
+        #define EXPORT_ALGORITHM_PLUGIN __declspec(dllexport)
+    #else
+        #define EXPORT_ALGORITHM_PLUGIN __declspec(dllimport)
+        #define EXPORT_ALGORITHM_PLUGIN_IMPORT
+    #endif
+#else
+    #define EXPORT_ALGORITHM_PLUGIN
+#endif
 
-/** Segmentation Parameters. */
-class SegmentationParameters
-{
-public:
-    int initialSamplesCount;
-    int initialSamplesDensityMinimum;
-    int initialSamplesDensityMaximum;
-    int neighborhoodRadiusMinimum;
-    int neighborhoodRadiusMaximum;
-
-    SegmentationParameters() { setDefault(); }
-
-    void setDefault()
-    {
-        initialSamplesCount = 5;
-        initialSamplesDensityMinimum = 0;
-        initialSamplesDensityMaximum = 100;
-        neighborhoodRadiusMinimum = 100;
-        neighborhoodRadiusMaximum = 500;
-    }
-};
-
-#endif /* SEGMENTATION_PARAMETERS_HPP */
+#endif /* EXPORT_ALGORITHM_HPP */

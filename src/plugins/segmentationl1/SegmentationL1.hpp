@@ -17,33 +17,28 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationThread.hpp */
+/** @file SegmentationL1.hpp */
 
-#ifndef SEGMENTATION_THREAD_HPP
-#define SEGMENTATION_THREAD_HPP
+#ifndef SEGMENTATION_L1_HPP
+#define SEGMENTATION_L1_HPP
 
 #include <Query.hpp>
-#include <SegmentationActionCount.hpp>
-#include <SegmentationData.hpp>
-#include <SegmentationElements.hpp>
-#include <SegmentationMap.hpp>
-#include <SegmentationParameters.hpp>
-#include <Thread.hpp>
-#include <Vector3.hpp>
-#include <Voxels.hpp>
+#include <SegmentationL1ActionCount.hpp>
+#include <SegmentationL1Data.hpp>
+#include <SegmentationL1Parameters.hpp>
 
 class Editor;
 
-/** Segmentation Thread. */
-class SegmentationThread : public Thread
+/** Segmentation L1. */
+class SegmentationL1
 {
 public:
-    SegmentationThread(Editor *editor);
-    virtual ~SegmentationThread();
+    SegmentationL1(Editor *editor);
+    ~SegmentationL1();
 
     void clear();
-    void restart(const SegmentationParameters &parameters);
-    virtual bool compute();
+    void restart(const SegmentationL1Parameters &parameters);
+    bool compute();
 
     int progressPercent() const;
 
@@ -51,10 +46,10 @@ private:
     Editor *editor_;
     Query query_;
 
-    SegmentationParameters parameters_;
-    SegmentationData data_;
+    SegmentationL1Parameters parameters_;
+    SegmentationL1Data data_;
 
-    SegmentationActionCount actionCount_;
+    SegmentationL1ActionCount actionCount_;
 };
 
-#endif /* SEGMENTATION_THREAD_HPP */
+#endif /* SEGMENTATION_L1_HPP */

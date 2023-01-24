@@ -26,7 +26,9 @@
 
 #define ICON(name) (ThemeIcon(":/heightmap/", name))
 
-HeightMapPlugin::HeightMapPlugin() : mainWindow_(nullptr), dockWindow_(nullptr)
+HeightMapPlugin::HeightMapPlugin()
+    : mainWindow_(nullptr),
+      pluginWindow_(nullptr)
 {
 }
 
@@ -49,14 +51,14 @@ void HeightMapPlugin::initialize(MainWindow *mainWindow)
 void HeightMapPlugin::slotPlugin()
 {
     // Create GUI only when this plugin is used for the first time
-    if (!dockWindow_)
+    if (!pluginWindow_)
     {
-        dockWindow_ = new HeightMapWindow(mainWindow_, &modifier_);
+        pluginWindow_ = new HeightMapWindow(mainWindow_, &modifier_);
     }
 
-    dockWindow_->show();
-    dockWindow_->raise();
-    dockWindow_->activateWindow();
+    pluginWindow_->show();
+    pluginWindow_->raise();
+    pluginWindow_->activateWindow();
 }
 
 bool HeightMapPlugin::isModifierEnabled()

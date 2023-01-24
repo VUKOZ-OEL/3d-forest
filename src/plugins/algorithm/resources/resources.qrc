@@ -18,10 +18,11 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 -->
 <RCC version="1.0">
-<qresource prefix="/segmentation">
+<qresource prefix="/algorithm">
 
 <!-- Tool bar -->
-<file>forest_24px.png</file>
+<file>algorithm_16px_color.png</file>
+<file>algorithm_24px_color.png</file>
 
 </qresource>
 </RCC>

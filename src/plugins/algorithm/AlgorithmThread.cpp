@@ -17,61 +17,60 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationThread.cpp */
+/** @file AlgorithmThread.cpp */
 
-#include <ColorPalette.hpp>
+#include <AlgorithmThread.hpp>
+#include <AlgorithmWidget.hpp>
 #include <Editor.hpp>
 #include <Log.hpp>
-#include <SegmentationThread.hpp>
 #include <ThreadCallbackInterface.hpp>
 #include <Time.hpp>
 
-#define LOG_MODULE_NAME "SegmentationThread"
+#define LOG_MODULE_NAME "AlgorithmThread"
 
-SegmentationThread::SegmentationThread(Editor *editor)
+AlgorithmThread::AlgorithmThread(Editor *editor)
     : editor_(editor),
-      query_(editor_)
+      query_(editor_),
+      algorithm_(nullptr)
 {
     LOG_DEBUG(<< "Called.");
 }
 
-SegmentationThread::~SegmentationThread()
+AlgorithmThread::~AlgorithmThread()
 {
     LOG_DEBUG(<< "Called.");
 }
 
-void SegmentationThread::clear()
+void AlgorithmThread::clear()
 {
     query_.clear();
+    algorithm_ = nullptr;
 }
 
-void SegmentationThread::restart(const SegmentationParameters &parameters)
+void AlgorithmThread::restart(AlgorithmWidget *algorithm)
 {
     LOG_DEBUG(<< "Called.");
-
-    // Cancel current computation
-    cancel();
-
+    algorithm_ = algorithm;
     Thread::start();
 }
 
-bool SegmentationThread::compute()
+bool AlgorithmThread::compute()
 {
     LOG_DEBUG(<< "Compute.");
 
-    bool threadFinished = true;
+    bool finished = algorithm_->step();
 
     if (callback_)
     {
-        LOG_DEBUG(<< "Call callback with argument finished <" << threadFinished
+        LOG_DEBUG(<< "Call callback with argument finished <" << finished
                   << ">.");
-        callback_->threadProgress(threadFinished);
+        callback_->threadProgress(finished);
     }
 
-    return threadFinished;
+    return finished;
 }
 
-int SegmentationThread::progressPercent() const
+int AlgorithmThread::progressPercent() const
 {
     return 100;
 }

@@ -15,9 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
+add_subdirectory(algorithm)
 add_subdirectory(classification)
-add_subdirectory(descriptor)
 add_subdirectory(density)
+add_subdirectory(descriptor)
 add_subdirectory(elevation)
 add_subdirectory(heightmap)
-add_subdirectory(segmentation)
+add_subdirectory(segmentationl1)

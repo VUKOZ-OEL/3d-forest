@@ -25,7 +25,7 @@
 #include <Editor.hpp>
 #include <Error.hpp>
 #include <Log.hpp>
-#include <SegmentationThread.hpp>
+//#include <SegmentationThread.hpp>
 
 #include <WarningsOff.h>
 

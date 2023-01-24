@@ -17,36 +17,33 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationPlugin.hpp */
+/** @file SegmentationL1Plugin.hpp */
 
-#ifndef SEGMENTATION_PLUGIN_HPP
-#define SEGMENTATION_PLUGIN_HPP
+#ifndef SEGMENTATION_L1_PLUGIN_HPP
+#define SEGMENTATION_L1_PLUGIN_HPP
 
-#include <PluginInterface.hpp>
+#include <AlgorithmPluginInterface.hpp>
+#include <ExportSegmentationL1.hpp>
+#include <SegmentationL1Window.hpp>
 
-#include <ExportSegmentation.hpp>
-
-class SegmentationWindow;
-
-/** Segmentation Plugin. */
-class EXPORT_SEGMENTATION_PLUGIN SegmentationPlugin : public QObject,
-                                                      public PluginInterface
+/** Segmentation L1 Plugin. */
+class EXPORT_SEGMENTATION_L1_PLUGIN SegmentationL1Plugin
+    : public QObject,
+      public AlgorithmPluginInterface
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
+    Q_PLUGIN_METADATA(IID AlgorithmPluginInterface_iid)
+    Q_INTERFACES(AlgorithmPluginInterface)
 
 public:
-    SegmentationPlugin();
+    SegmentationL1Plugin();
 
     virtual void initialize(MainWindow *mainWindow);
-
-public slots:
-    void slotPlugin();
+    virtual AlgorithmWidget *widget() { return pluginWindow_; }
 
 private:
     MainWindow *mainWindow_;
-    SegmentationWindow *dockWindow_;
+    SegmentationL1Window *pluginWindow_;
 };
 
-#endif /* SEGMENTATION_PLUGIN_HPP */
+#endif /* SEGMENTATION_L1_PLUGIN_HPP */

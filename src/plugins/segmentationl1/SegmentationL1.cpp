@@ -17,25 +17,45 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationActionCount.hpp */
+/** @file SegmentationL1.cpp */
 
-#ifndef SEGMENTATION_ACTION_COUNT_HPP
-#define SEGMENTATION_ACTION_COUNT_HPP
+#include <ColorPalette.hpp>
+#include <Editor.hpp>
+#include <Log.hpp>
+#include <SegmentationL1.hpp>
+#include <Time.hpp>
 
-#include <ProgressActionInterface.hpp>
+#define LOG_MODULE_NAME "SegmentationL1"
 
-class Editor;
-
-/** Segmentation Action Count. */
-class SegmentationActionCount : public ProgressActionInterface
+SegmentationL1::SegmentationL1(Editor *editor)
+    : editor_(editor),
+      query_(editor_)
 {
-public:
-    SegmentationActionCount();
-    virtual ~SegmentationActionCount();
+    LOG_DEBUG(<< "Called.");
+}
 
-    void initialize();
-    virtual void step();
-    void clear();
-};
+SegmentationL1::~SegmentationL1()
+{
+    LOG_DEBUG(<< "Called.");
+}
 
-#endif /* SEGMENTATION_ACTION_COUNT_HPP */
+void SegmentationL1::clear()
+{
+    query_.clear();
+}
+
+void SegmentationL1::restart(const SegmentationL1Parameters &parameters)
+{
+    LOG_DEBUG(<< "Called.");
+}
+
+bool SegmentationL1::compute()
+{
+    LOG_DEBUG(<< "Compute.");
+    return true;
+}
+
+int SegmentationL1::progressPercent() const
+{
+    return 100;
+}

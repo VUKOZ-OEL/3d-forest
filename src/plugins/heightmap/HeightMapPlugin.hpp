@@ -74,8 +74,8 @@ public slots:
 
 protected:
     MainWindow *mainWindow_;
-    HeightMapWindow *dockWindow_; /**< First time use creates GUI. */
-    HeightMapModifier modifier_;  /**< Must be created from the constructor.*/
+    HeightMapWindow *pluginWindow_; /**< First time use creates GUI. */
+    HeightMapModifier modifier_;    /**< Must be created from the constructor.*/
 };
 
 #endif /* HEIGHT_MAP_PLUGIN_HPP */
