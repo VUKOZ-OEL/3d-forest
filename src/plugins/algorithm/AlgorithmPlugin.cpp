@@ -17,48 +17,48 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationPlugin.cpp */
+/** @file AlgorithmPlugin.cpp */
 
+#include <AlgorithmPlugin.hpp>
+#include <AlgorithmWindow.hpp>
 #include <MainWindow.hpp>
-#include <SegmentationPlugin.hpp>
-#include <SegmentationWindow.hpp>
 #include <ThemeIcon.hpp>
 
-#define ICON(name) (ThemeIcon(":/segmentation/", name))
+#define ICON(name) (ThemeIcon(":/algorithm/", name))
 
-SegmentationPlugin::SegmentationPlugin()
+AlgorithmPlugin::AlgorithmPlugin()
     : mainWindow_(nullptr),
-      dockWindow_(nullptr)
+      pluginWindow_(nullptr)
 {
 }
 
-void SegmentationPlugin::initialize(MainWindow *mainWindow)
+void AlgorithmPlugin::initialize(MainWindow *mainWindow)
 {
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "Utilities",
-                              "Utilities",
-                              tr("Segmentation"),
-                              tr("Segmentation splits forest into trees"),
-                              ICON("forest"),
+                              "File",
+                              "File Properties",
+                              tr("Algorithm"),
+                              tr("Run an algorithm"),
+                              ICON("algorithm"),
                               this,
                               SLOT(slotPlugin()));
 }
 
-void SegmentationPlugin::slotPlugin()
+void AlgorithmPlugin::slotPlugin()
 {
     if (!mainWindow_)
     {
         return;
     }
 
-    if (!dockWindow_)
+    if (!pluginWindow_)
     {
-        dockWindow_ = new SegmentationWindow(mainWindow_);
+        pluginWindow_ = new AlgorithmWindow(mainWindow_);
     }
 
-    dockWindow_->show();
-    dockWindow_->raise();
-    dockWindow_->activateWindow();
+    pluginWindow_->show();
+    pluginWindow_->raise();
+    pluginWindow_->activateWindow();
 }

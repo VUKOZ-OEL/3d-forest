@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-set(SUB_PROJECT_NAME "3DForestSegmentationPlugin")
+set(SUB_PROJECT_NAME "3DForestSegmentationL1Plugin")
 
 if(NOT QT_VERSION_MAJOR)
     message(WARNING "Gui not found - skipping ${SUB_PROJECT_NAME}")
@@ -32,12 +32,14 @@ add_library(
     SHARED
     ${SOURCES}
     resources/resources.qrc
+    ../algorithm/AlgorithmWidget.cpp
 )
 
 target_include_directories(
     ${SUB_PROJECT_NAME}
     PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}
+    ../algorithm
 )
 
 target_compile_definitions(

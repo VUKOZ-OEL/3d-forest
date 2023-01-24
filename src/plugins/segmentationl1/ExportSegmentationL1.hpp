@@ -17,27 +17,20 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationData.hpp */
+/** @file ExportSegmentationL1.hpp */
 
-#ifndef SEGMENTATION_DATA_HPP
-#define SEGMENTATION_DATA_HPP
+#ifndef EXPORT_SEGMENTATION_L1_HPP
+#define EXPORT_SEGMENTATION_L1_HPP
 
-#include <cstdint>
+#if defined(_MSC_VER)
+    #if defined(EXPORT_3DForestSegmentationL1Plugin)
+        #define EXPORT_SEGMENTATION_L1_PLUGIN __declspec(dllexport)
+    #else
+        #define EXPORT_SEGMENTATION_L1_PLUGIN __declspec(dllimport)
+        #define EXPORT_SEGMENTATION_L1_PLUGIN_IMPORT
+    #endif
+#else
+    #define EXPORT_SEGMENTATION_L1_PLUGIN
+#endif
 
-/** Segmentation Data. */
-class SegmentationData
-{
-public:
-    uint64_t totalSamplesCount;
-    uint64_t initialSamplesCount;
-
-    SegmentationData() { clear(); }
-
-    void clear()
-    {
-        totalSamplesCount = 0;
-        initialSamplesCount = 0;
-    }
-};
-
-#endif /* SEGMENTATION_DATA_HPP */
+#endif /* EXPORT_SEGMENTATION_L1_HPP */

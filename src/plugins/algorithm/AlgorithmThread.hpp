@@ -17,38 +17,33 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationMap.hpp */
+/** @file AlgorithmThread.hpp */
 
-#ifndef SEGMENTATION_MAP_HPP
-#define SEGMENTATION_MAP_HPP
+#ifndef ALGORITHM_THREAD_HPP
+#define ALGORITHM_THREAD_HPP
 
-#include <Voxels.hpp>
+#include <Query.hpp>
+#include <Thread.hpp>
+class Editor;
+class AlgorithmWidget;
 
-/** Segmentation Map. */
-class SegmentationMap
+/** Algorithm Thread. */
+class AlgorithmThread : public Thread
 {
 public:
-    SegmentationMap();
+    AlgorithmThread(Editor *editor);
+    virtual ~AlgorithmThread();
 
     void clear();
+    void restart(AlgorithmWidget *algorithm);
+    virtual bool compute();
 
-    size_t size() const { return map_.size(); }
-    size_t pos() const { return pos_; }
-    const std::vector<double> &map() const { return map_; }
-
-    void create(const Voxels &voxels);
-    void process(const Voxels &voxels, size_t nIterations = 0);
-
-    void toImage(int *w,
-                 int *h,
-                 int *components,
-                 int *rowBytes,
-                 std::vector<unsigned char> *image) const;
+    int progressPercent() const;
 
 private:
-    std::vector<double> map_;
-    size_t pos_;
-    Vector3<size_t> dim_;
+    Editor *editor_;
+    Query query_;
+    AlgorithmWidget *algorithm_;
 };
 
-#endif /* SEGMENTATION_MAP_HPP */
+#endif /* ALGORITHM_THREAD_HPP */

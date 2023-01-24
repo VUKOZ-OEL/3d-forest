@@ -1,4 +1,5 @@
-/*
+<!DOCTYPE RCC>
+<!--
     Copyright 2020 VUKOZ
 
     This file is part of 3D Forest.
@@ -15,37 +16,11 @@
 
     You should have received a copy of the GNU General Public License
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
-*/
+-->
+<RCC version="1.0">
+<qresource prefix="/segmentationl1">
 
-/** @file SegmentationActionCount.cpp */
+<file>forest_24px.png</file>
 
-#include <Editor.hpp>
-#include <Log.hpp>
-#include <SegmentationActionCount.hpp>
-
-#define LOG_MODULE_NAME "SegmentationActionCount"
-
-SegmentationActionCount::SegmentationActionCount()
-{
-    LOG_DEBUG(<< "Called.");
-}
-
-SegmentationActionCount::~SegmentationActionCount()
-{
-    LOG_DEBUG(<< "Called.");
-}
-
-void SegmentationActionCount::clear()
-{
-    LOG_DEBUG(<< "Called.");
-}
-
-void SegmentationActionCount::initialize()
-{
-    LOG_DEBUG(<< "Called.");
-}
-
-void SegmentationActionCount::step()
-{
-    LOG_DEBUG(<< "Called.");
-}
+</qresource>
+</RCC>

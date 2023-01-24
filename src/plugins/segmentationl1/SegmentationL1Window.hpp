@@ -17,36 +17,28 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationWindow.hpp */
+/** @file SegmentationL1Window.hpp */
 
-#ifndef SEGMENTATION_WINDOW_HPP
-#define SEGMENTATION_WINDOW_HPP
+#ifndef SEGMENTATION_L1_WINDOW_HPP
+#define SEGMENTATION_L1_WINDOW_HPP
 
-#include <SegmentationThread.hpp>
-#include <ThreadCallbackInterface.hpp>
+#include <AlgorithmWidget.hpp>
+#include <SegmentationL1Parameters.hpp>
 class MainWindow;
 class SliderWidget;
 class RangeSliderWidget;
 
-#include <QDialog>
-class QPushButton;
-
-/** Segmentation Window. */
-class SegmentationWindow : public QDialog, public ThreadCallbackInterface
+/** Segmentation L1 Window. */
+class SegmentationL1Window : public AlgorithmWidget
 {
     Q_OBJECT
 
 public:
-    SegmentationWindow(MainWindow *mainWindow);
-    virtual ~SegmentationWindow();
+    SegmentationL1Window(MainWindow *mainWindow);
+    virtual ~SegmentationL1Window();
 
-    virtual void threadProgress(bool finished);
-
-public slots:
-    void slotThread(bool finished, int progressPercent);
-
-signals:
-    void signalThread(bool finished, int progressPercent);
+    virtual void applyParameters();
+    virtual bool step();
 
 protected slots:
     void slotInitialSamplesCountFinalValue();
@@ -55,9 +47,6 @@ protected slots:
     void slotNeighborhoodRadiusMinimumValue();
     void slotNeighborhoodRadiusMaximumValue();
 
-    void slotAccept();
-    void slotReject();
-
 private:
     MainWindow *mainWindow_;
 
@@ -65,17 +54,7 @@ private:
     RangeSliderWidget *initialSamplesDensityInput_;
     RangeSliderWidget *neighborhoodRadiusInput_;
 
-    QPushButton *acceptButton_;
-    QPushButton *rejectButton_;
-
-    SegmentationParameters parameters_;
-    SegmentationThread segmentationThread_;
-
-    virtual void showEvent(QShowEvent *event);
-    virtual void closeEvent(QCloseEvent *event);
-
-    void suspendThreads();
-    void resumeThreads();
+    SegmentationL1Parameters parameters_;
 };
 
-#endif /* SEGMENTATION_WINDOW_HPP */
+#endif /* SEGMENTATION_L1_WINDOW_HPP */

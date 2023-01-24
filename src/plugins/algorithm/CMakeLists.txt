@@ -15,25 +15,41 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-set(SUB_PROJECT_NAME "3DForestExampleVoxels")
+set(SUB_PROJECT_NAME "3DForestAlgorithmPlugin")
 
-add_executable(
+if(NOT QT_VERSION_MAJOR)
+    message(WARNING "Gui not found - skipping ${SUB_PROJECT_NAME}")
+    return()
+endif()
+
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+file(GLOB_RECURSE SOURCES "*.cpp")
+
+add_library(
     ${SUB_PROJECT_NAME}
-    exampleVoxels.cpp
-#    ../../../plugins/segmentation/SegmentationElement.cpp
-#    ../../../plugins/segmentation/SegmentationElements.cpp
+    SHARED
+    ${SOURCES}
+    resources/resources.qrc
 )
 
 target_include_directories(
     ${SUB_PROJECT_NAME}
     PUBLIC
-    ../../../plugins/segmentationl1
+    ${CMAKE_CURRENT_LIST_DIR}
+)
+
+target_compile_definitions(
+    ${SUB_PROJECT_NAME}
+    PRIVATE
+    EXPORT_${SUB_PROJECT_NAME}=1
 )
 
 target_link_libraries(
     ${SUB_PROJECT_NAME}
-    PUBLIC
-    3DForestEditor
+    PRIVATE
+    3DForestGui
 )
 
-install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)
+install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin/plugins)
