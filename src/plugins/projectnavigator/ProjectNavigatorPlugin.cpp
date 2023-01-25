@@ -39,9 +39,9 @@ void ProjectNavigatorPlugin::initialize(MainWindow *mainWindow)
     mainWindow_->createAction(nullptr,
                               "File",
                               "File Properties",
-                              tr("Project Navigator"),
-                              tr("Show project navigator"),
-                              ICON("project"),
+                              tr("Data Browser"),
+                              tr("Show data browser"),
+                              ICON("data_browser"),
                               this,
                               SLOT(slotPlugin()));
 }
