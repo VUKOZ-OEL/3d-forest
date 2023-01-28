@@ -17,33 +17,11 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file AlgorithmThread.hpp */
+/** @file SegmentationL1Constants.hpp */
 
-#ifndef ALGORITHM_THREAD_HPP
-#define ALGORITHM_THREAD_HPP
+#ifndef SEGMENTATION_L1_CONSTANTS_HPP
+#define SEGMENTATION_L1_CONSTANTS_HPP
 
-#include <Query.hpp>
-#include <Thread.hpp>
-class Editor;
-class AlgorithmWidgetInterface;
+#define SEGMENTATION_L1_NAME "Segmentation L1"
 
-/** Algorithm Thread. */
-class AlgorithmThread : public Thread
-{
-public:
-    AlgorithmThread(Editor *editor);
-    virtual ~AlgorithmThread();
-
-    void clear();
-    void restart(AlgorithmWidgetInterface *algorithm);
-    virtual bool compute();
-    int progressPercent() const;
-    void updateData();
-
-private:
-    Editor *editor_;
-    Query query_;
-    AlgorithmWidgetInterface *algorithm_;
-};
-
-#endif /* ALGORITHM_THREAD_HPP */
+#endif /* SEGMENTATION_L1_CONSTANTS_HPP */

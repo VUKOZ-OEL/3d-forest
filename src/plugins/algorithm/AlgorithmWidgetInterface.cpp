@@ -17,18 +17,18 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file AlgorithmWidget.cpp */
+/** @file AlgorithmWidgetInterface.cpp */
 
-#include <AlgorithmWidget.hpp>
+#include <AlgorithmWidgetInterface.hpp>
 #include <MainWindow.hpp>
 
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QVBoxLayout>
 
-AlgorithmWidget::AlgorithmWidget(MainWindow *mainWindow,
-                                 const QIcon &icon,
-                                 const QString &text)
+AlgorithmWidgetInterface::AlgorithmWidgetInterface(MainWindow *mainWindow,
+                                                   const QIcon &icon,
+                                                   const QString &text)
     : QWidget(),
       mainWindow_(mainWindow),
       icon_(icon),

@@ -17,32 +17,33 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file AlgorithmWidget.hpp */
+/** @file AlgorithmWidgetInterface.hpp */
 
-#ifndef ALGORITHM_WIDGET_HPP
-#define ALGORITHM_WIDGET_HPP
+#ifndef ALGORITHM_WIDGET_INTERFACE_HPP
+#define ALGORITHM_WIDGET_INTERFACE_HPP
 
 class MainWindow;
 
 #include <QWidget>
 class QVBoxLayout;
 
-/** Algorithm Widget. */
-class AlgorithmWidget : public QWidget
+/** Algorithm Widget Interface. */
+class AlgorithmWidgetInterface : public QWidget
 {
     Q_OBJECT
 
 public:
-    AlgorithmWidget(MainWindow *mainWindow,
-                    const QIcon &icon,
-                    const QString &text);
-    virtual ~AlgorithmWidget() = default;
+    AlgorithmWidgetInterface(MainWindow *mainWindow,
+                             const QIcon &icon,
+                             const QString &text);
+    virtual ~AlgorithmWidgetInterface() = default;
 
     const QIcon &icon() { return icon_; }
     const QString &text() { return text_; }
 
     virtual void applyParameters() = 0;
     virtual bool step() = 0;
+    virtual void updateData() = 0;
 
 signals:
     void signalParametersChanged();
@@ -55,4 +56,4 @@ protected:
     QVBoxLayout *mainLayout_;
 };
 
-#endif /* ALGORITHM_WIDGET_HPP */
+#endif /* ALGORITHM_WIDGET_INTERFACE_HPP */

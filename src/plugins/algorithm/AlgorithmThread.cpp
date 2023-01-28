@@ -20,13 +20,13 @@
 /** @file AlgorithmThread.cpp */
 
 #include <AlgorithmThread.hpp>
-#include <AlgorithmWidget.hpp>
+#include <AlgorithmWidgetInterface.hpp>
 #include <Editor.hpp>
-#include <Log.hpp>
 #include <ThreadCallbackInterface.hpp>
 #include <Time.hpp>
 
 #define LOG_MODULE_NAME "AlgorithmThread"
+#include <Log.hpp>
 
 AlgorithmThread::AlgorithmThread(Editor *editor)
     : editor_(editor),
@@ -47,10 +47,16 @@ void AlgorithmThread::clear()
     algorithm_ = nullptr;
 }
 
-void AlgorithmThread::restart(AlgorithmWidget *algorithm)
+void AlgorithmThread::restart(AlgorithmWidgetInterface *algorithm)
 {
     LOG_DEBUG(<< "Called.");
+
     algorithm_ = algorithm;
+    if (algorithm_)
+    {
+        algorithm_->applyParameters();
+    }
+
     Thread::start();
 }
 
@@ -58,7 +64,16 @@ bool AlgorithmThread::compute()
 {
     LOG_DEBUG(<< "Compute.");
 
-    bool finished = algorithm_->step();
+    bool finished;
+
+    if (algorithm_)
+    {
+        finished = algorithm_->step();
+    }
+    else
+    {
+        finished = true;
+    }
 
     if (callback_)
     {
@@ -73,4 +88,13 @@ bool AlgorithmThread::compute()
 int AlgorithmThread::progressPercent() const
 {
     return 100;
+}
+
+void AlgorithmThread::updateData()
+{
+    LOG_DEBUG(<< "Called.");
+    if (algorithm_)
+    {
+        algorithm_->updateData();
+    }
 }

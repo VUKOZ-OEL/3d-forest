@@ -30,6 +30,7 @@
 #include <QVBoxLayout>
 
 #define LOG_MODULE_NAME "AlgorithmMainWidget"
+#include <Log.hpp>
 
 AlgorithmMainWidget::AlgorithmMainWidget(MainWindow *mainWindow)
     : QWidget(),
@@ -81,7 +82,7 @@ AlgorithmMainWidget::AlgorithmMainWidget(MainWindow *mainWindow)
     setLayout(mainLayout);
 }
 
-void AlgorithmMainWidget::addItem(AlgorithmWidget *widget)
+void AlgorithmMainWidget::addItem(AlgorithmWidgetInterface *widget)
 {
     LOG_DEBUG(<< "Add widget text <" << widget->text().toStdString() << ">.");
 
