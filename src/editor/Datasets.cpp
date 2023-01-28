@@ -20,9 +20,9 @@
 /** @file Datasets.cpp */
 
 #include <Datasets.hpp>
-#include <Log.hpp>
 
 #define LOG_MODULE_NAME "Datasets"
+#include <Log.hpp>
 
 Datasets::Datasets()
 {

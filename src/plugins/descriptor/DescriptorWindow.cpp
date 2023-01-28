@@ -31,8 +31,10 @@
 #include <QRadioButton>
 #include <QVBoxLayout>
 
-#define LOG_MODULE_NAME "DescriptorWindow"
 #define ICON(name) (ThemeIcon(":/descriptor/", name))
+
+#define LOG_MODULE_NAME "DescriptorWindow"
+#include <Log.hpp>
 
 DescriptorWindow::DescriptorWindow(MainWindow *mainWindow)
     : QDialog(mainWindow),

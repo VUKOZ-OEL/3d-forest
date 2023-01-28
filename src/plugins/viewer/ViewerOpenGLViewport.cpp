@@ -20,7 +20,6 @@
 /** @file ViewerOpenGLViewport.cpp */
 
 #include <Editor.hpp>
-#include <Log.hpp>
 #include <Time.hpp>
 
 #include <ViewerOpenGL.hpp>
@@ -32,6 +31,7 @@
 #include <QWheelEvent>
 
 #define LOG_MODULE_NAME "ViewerOpenGLViewport"
+#include <Log.hpp>
 
 ViewerOpenGLViewport::ViewerOpenGLViewport(QWidget *parent)
     : QOpenGLWidget(parent),

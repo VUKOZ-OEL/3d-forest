@@ -24,6 +24,7 @@
 #include <Math.hpp>
 
 #define LOG_MODULE_NAME "DensityAction"
+#include <Log.hpp>
 
 DensityAction::DensityAction(Editor *editor)
     : editor_(editor),

@@ -30,7 +30,9 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-#define LOG_MODULE_NAME "ElevationPlugin"
+#define LOG_MODULE_NAME "ElevationWindow"
+#include <Log.hpp>
+
 #define ICON(name) (ThemeIcon(":/elevation/", name))
 
 ElevationWindow::ElevationWindow(MainWindow *mainWindow)

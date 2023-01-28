@@ -21,8 +21,10 @@
 
 #include <Editor.hpp>
 #include <IndexFileBuilder.hpp>
-#include <Log.hpp>
 #include <Util.hpp>
+
+#define LOG_MODULE_NAME "Editor"
+#include <Log.hpp>
 
 static const char *EDITOR_KEY_PROJECT_NAME = "projectName";
 static const char *EDITOR_KEY_DATA_SET = "datasets";
@@ -31,8 +33,6 @@ static const char *EDITOR_KEY_SETTINGS = "settings";
 static const char *EDITOR_KEY_CLASSIFICATIONS = "classifications";
 // static const char *EDITOR_KEY_CLIP_FILTER = "clipFilter";
 static const char *EDITOR_KEY_ELEVATION_RANGE = "elevationRange";
-
-#define LOG_MODULE_NAME "Editor"
 
 Editor::Editor()
 {

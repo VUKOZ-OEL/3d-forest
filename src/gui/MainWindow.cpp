@@ -19,8 +19,6 @@
 
 /** @file MainWindow.cpp */
 
-#include <Log.hpp>
-
 #include <MainWindow.hpp>
 #include <PluginInterface.hpp>
 #include <ViewerViewports.hpp>
@@ -47,6 +45,7 @@
 #include <QToolButton>
 
 #define LOG_MODULE_NAME "MainWindow"
+#include <Log.hpp>
 
 #if !defined(EXPORT_GUI_IMPORT)
 const char *MainWindow::APPLICATION_NAME = "3D Forest";

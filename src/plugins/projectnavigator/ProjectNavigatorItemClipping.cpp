@@ -31,6 +31,8 @@
 #include <QVBoxLayout>
 
 #define LOG_MODULE_NAME "ProjectNavigatorItemClipping"
+#include <Log.hpp>
+
 #define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
 ProjectNavigatorItemClipping::ProjectNavigatorItemClipping(

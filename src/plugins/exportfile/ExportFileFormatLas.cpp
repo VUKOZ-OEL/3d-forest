@@ -25,6 +25,7 @@
 #include <IndexFileBuilder.hpp>
 
 #define LOG_MODULE_NAME "ExportFileFormatLas"
+#include <Log.hpp>
 
 ExportFileFormatLas::ExportFileFormatLas()
 {

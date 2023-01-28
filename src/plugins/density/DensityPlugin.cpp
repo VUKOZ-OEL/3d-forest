@@ -25,6 +25,8 @@
 #include <ThemeIcon.hpp>
 
 #define LOG_MODULE_NAME "DensityPlugin"
+#include <Log.hpp>
+
 #define ICON(name) (ThemeIcon(":/density/", name))
 
 DensityPlugin::DensityPlugin() : mainWindow_(nullptr), pluginWindow_(nullptr)

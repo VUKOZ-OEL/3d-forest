@@ -27,6 +27,7 @@
 #include <ElevationAction.hpp>
 
 #define LOG_MODULE_NAME "ElevationAction"
+#include <Log.hpp>
 
 ElevationAction::ElevationAction(Editor *editor)
     : editor_(editor),

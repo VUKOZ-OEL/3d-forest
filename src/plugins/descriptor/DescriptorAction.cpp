@@ -24,6 +24,7 @@
 #include <Math.hpp>
 
 #define LOG_MODULE_NAME "DescriptorAction"
+#include <Log.hpp>
 
 DescriptorAction::DescriptorAction(Editor *editor)
     : editor_(editor),

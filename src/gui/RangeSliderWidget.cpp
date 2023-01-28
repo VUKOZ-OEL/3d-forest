@@ -32,6 +32,7 @@
 #include <ctkrangeslider.h>
 
 #define LOG_MODULE_NAME "RangeSliderWidget"
+#include <Log.hpp>
 
 RangeSliderWidget::RangeSliderWidget()
     : QWidget(),

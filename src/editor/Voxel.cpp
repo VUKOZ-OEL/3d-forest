@@ -21,10 +21,10 @@
 
 #include <cstring>
 
-#include <Log.hpp>
 #include <Voxel.hpp>
 
 #define LOG_MODULE_NAME "Voxel"
+#include <Log.hpp>
 
 #if !defined(EXPORT_EDITOR_IMPORT)
 const uint32_t Voxel::STATUS_IGNORED = 1U << 0;

@@ -20,9 +20,9 @@
 /** @file Layers.cpp */
 
 #include <Layers.hpp>
-#include <Log.hpp>
 
 #define LOG_MODULE_NAME "Layers"
+#include <Log.hpp>
 
 Layers::Layers()
 {

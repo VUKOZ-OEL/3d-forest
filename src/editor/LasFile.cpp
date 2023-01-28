@@ -29,9 +29,9 @@
 #include <Endian.hpp>
 #include <Error.hpp>
 #include <LasFile.hpp>
-#include <Log.hpp>
 
 #define LOG_MODULE_NAME "LasFile"
+#include <Log.hpp>
 
 #define LAS_FILE_SIGNATURE_0 0x4C
 #define LAS_FILE_SIGNATURE_1 0x41

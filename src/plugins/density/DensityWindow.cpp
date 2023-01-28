@@ -31,6 +31,8 @@
 #include <QVBoxLayout>
 
 #define LOG_MODULE_NAME "DensityWindow"
+#include <Log.hpp>
+
 #define ICON(name) (ThemeIcon(":/density/", name))
 
 DensityWindow::DensityWindow(MainWindow *mainWindow)

@@ -26,6 +26,7 @@
 #include <Time.hpp>
 
 #define LOG_MODULE_NAME "ExportFileAction"
+#include <Log.hpp>
 
 ExportFileAction::ExportFileAction(Editor *editor)
     : ProgressActionInterface(),

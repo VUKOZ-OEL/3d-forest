@@ -27,6 +27,7 @@
 #include <QProgressBar>
 
 #define LOG_MODULE_NAME "ProgressDialog"
+#include <Log.hpp>
 
 bool ProgressDialog::run(MainWindow *mainWindow,
                          const char *title,

@@ -21,12 +21,12 @@
 
 #include <cstring>
 
-#include <Log.hpp>
 #include <Math.hpp>
 #include <Query.hpp>
 #include <Voxels.hpp>
 
 #define LOG_MODULE_NAME "Voxels"
+#include <Log.hpp>
 
 // Use some maximum until the voxels can be streamed from a file.
 #define VOXELS_RESOLUTION_MAX 500

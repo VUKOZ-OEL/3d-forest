@@ -19,7 +19,6 @@
 
 /** @file 3dforest.cpp */
 
-#include <Log.hpp>
 #include <LoggerWindow.hpp>
 #include <MainWindow.hpp>
 
@@ -27,6 +26,7 @@
 #include <QSurfaceFormat>
 
 #define LOG_MODULE_NAME "3DForest"
+#include <Log.hpp>
 
 int main(int argc, char *argv[])
 {

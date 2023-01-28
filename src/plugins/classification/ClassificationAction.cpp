@@ -23,6 +23,7 @@
 #include <Editor.hpp>
 
 #define LOG_MODULE_NAME "ClassificationAction"
+#include <Log.hpp>
 
 ClassificationAction::ClassificationAction(Editor *editor)
     : editor_(editor),

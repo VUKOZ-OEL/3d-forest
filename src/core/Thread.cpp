@@ -19,11 +19,11 @@
 
 /** @file Thread.cpp */
 
-#include <Log.hpp>
 #include <Thread.hpp>
 #include <ThreadCallbackInterface.hpp>
 
 #define LOG_MODULE_NAME "Thread"
+#include <Log.hpp>
 
 Thread::Thread()
     : callback_(nullptr),

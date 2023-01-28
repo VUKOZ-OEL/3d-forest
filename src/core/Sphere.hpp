@@ -23,7 +23,6 @@
 #define SPHERE_HPP
 
 #include <Box.hpp>
-#include <Log.hpp>
 #include <Math.hpp>
 
 /** Sphere. */
