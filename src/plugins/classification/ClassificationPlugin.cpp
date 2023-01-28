@@ -25,6 +25,8 @@
 #include <ThemeIcon.hpp>
 
 #define LOG_MODULE_NAME "ClassificationPlugin"
+#include <Log.hpp>
+
 #define ICON(name) (ThemeIcon(":/classification/", name))
 
 ClassificationPlugin::ClassificationPlugin()

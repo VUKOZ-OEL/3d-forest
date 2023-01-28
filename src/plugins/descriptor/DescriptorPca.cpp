@@ -21,9 +21,9 @@
 
 #include <DescriptorPca.hpp>
 #include <LasFile.hpp>
-#include <Log.hpp>
 
 #define LOG_MODULE_NAME "DescriptorPca"
+#include <Log.hpp>
 
 DescriptorPca::DescriptorPca()
 {

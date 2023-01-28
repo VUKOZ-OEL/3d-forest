@@ -23,10 +23,10 @@
 
 #include <Editor.hpp>
 #include <Error.hpp>
-#include <Log.hpp>
 #include <Query.hpp>
 
 #define LOG_MODULE_NAME "Query"
+#include <Log.hpp>
 
 Query::Query(Editor *editor) : editor_(editor)
 {

@@ -21,11 +21,11 @@
 
 #include <ColorPalette.hpp>
 #include <Editor.hpp>
-#include <Log.hpp>
 #include <SegmentationL1.hpp>
 #include <Time.hpp>
 
 #define LOG_MODULE_NAME "SegmentationL1"
+#include <Log.hpp>
 
 SegmentationL1::SegmentationL1(Editor *editor)
     : editor_(editor),

@@ -21,9 +21,8 @@
 
 #include <AlgorithmMainWidget.hpp>
 #include <AlgorithmPluginInterface.hpp>
-#include <AlgorithmWidget.hpp>
+#include <AlgorithmWidgetInterface.hpp>
 #include <AlgorithmWindow.hpp>
-#include <Log.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
@@ -38,6 +37,9 @@
 #include <QVBoxLayout>
 
 #define LOG_MODULE_NAME "AlgorithmWindow"
+#define LOG_MODULE_DEBUG_ENABLED 1
+#include <Log.hpp>
+
 #define ICON(name) (ThemeIcon(":/algorithm/", name))
 
 AlgorithmWindow::AlgorithmWindow(MainWindow *mainWindow)
@@ -50,7 +52,7 @@ AlgorithmWindow::AlgorithmWindow(MainWindow *mainWindow)
       widgets_(),
       thread_(&mainWindow->editor())
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Create algorithm window.");
 
     // Load algorithm plugins.
     loadPlugins();
@@ -105,27 +107,27 @@ AlgorithmWindow::AlgorithmWindow(MainWindow *mainWindow)
 
 AlgorithmWindow::~AlgorithmWindow()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Destroy algorithm window.");
     thread_.stop();
 }
 
 void AlgorithmWindow::slotAccept()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Accept.");
     close();
     setResult(QDialog::Accepted);
 }
 
 void AlgorithmWindow::slotReject()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Reject.");
     close();
     setResult(QDialog::Rejected);
 }
 
 void AlgorithmWindow::showEvent(QShowEvent *event)
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Show algorithm window.");
     QDialog::showEvent(event);
     mainWindow_->suspendThreads();
     resumeThreads(nullptr);
@@ -133,7 +135,7 @@ void AlgorithmWindow::showEvent(QShowEvent *event)
 
 void AlgorithmWindow::closeEvent(QCloseEvent *event)
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Close algorithm window.");
     suspendThreads();
     mainWindow_->resumeThreads();
     QDialog::closeEvent(event);
@@ -141,6 +143,7 @@ void AlgorithmWindow::closeEvent(QCloseEvent *event)
 
 void AlgorithmWindow::slotParametersChanged()
 {
+    LOG_DEBUG(<< "Plugin widget parameters have been changed.");
     QObject *obj = sender();
 
     for (size_t i = 0; i < widgets_.size(); i++)
@@ -155,72 +158,68 @@ void AlgorithmWindow::slotParametersChanged()
 
 void AlgorithmWindow::threadProgress(bool finished)
 {
-    // In worker thread: notify gui thread through queued connection.
-    LOG_DEBUG(<< "Called with parameter finished <" << finished << ">.");
+    LOG_DEBUG(<< "In worker thread: notify gui thread through queued signal."
+              << " Parameter finished <" << finished << ">.");
     emit signalThread(finished, thread_.progressPercent());
 }
 
 void AlgorithmWindow::slotThread(bool finished, int progressPercent)
 {
-    // In gui thread: update visualization.
-    LOG_DEBUG(<< "Called with parameter finished <" << finished
-              << "> progress <" << progressPercent << ">.");
+    LOG_DEBUG(<< "In gui thread: update progress."
+              << " Parameters finished <" << finished << "> progress <"
+              << progressPercent << ">.");
 
     mainWindow_->setStatusProgressBarPercent(progressPercent);
 
     if (finished)
     {
-        LOG_TRACE_UNKNOWN(<< "Thread finished.");
-        mainWindow_->update({Editor::TYPE_LAYER});
+        LOG_DEBUG(<< "Thread finished.");
+        thread_.updateData();
     }
 }
 
 void AlgorithmWindow::suspendThreads()
 {
-    // In gui thread: cancel task in worker thread.
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "In gui thread: cancel task in worker thread.");
     thread_.cancel();
     mainWindow_->setStatusProgressBarPercent(0);
 }
 
-void AlgorithmWindow::resumeThreads(AlgorithmWidget *algorithm)
+void AlgorithmWindow::resumeThreads(AlgorithmWidgetInterface *algorithm)
 {
-    // In gui thread: start new task in worker thread.
-    if (!algorithm)
-    {
-        return;
-    }
-
+    LOG_DEBUG(<< "In gui thread: start new task in worker thread.");
     thread_.cancel();
-    algorithm->applyParameters();
-    thread_.restart(algorithm);
     mainWindow_->setStatusProgressBarPercent(0);
+    thread_.restart(algorithm);
 }
 
 void AlgorithmWindow::loadPlugins()
 {
-    // Process all files in the application "plugin" directory.
+    LOG_DEBUG(<< "Get list of files in the application plugin directory.");
     QDir pluginsDir(QCoreApplication::applicationDirPath() + "/plugins/");
     const QStringList entries = pluginsDir.entryList(QDir::Files);
 
+    LOG_DEBUG(<< "Try to load <" << entries.count() << "> files as plugins.");
+
     for (const QString &fileName : entries)
     {
-        // Try to load each file as a plugin.
+        LOG_DEBUG(<< "Try to load <" << fileName.toStdString()
+                  << "> as a plugin.");
         QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
         QObject *plugin = pluginLoader.instance();
 
-        loadPlugin(plugin);
+        loadPlugin(fileName, plugin);
     }
 }
 
-void AlgorithmWindow::loadPlugin(QObject *plugin)
+void AlgorithmWindow::loadPlugin(const QString &fileName, QObject *plugin)
 {
     if (!plugin)
     {
         return;
     }
 
-    // Detect and register algorithm plugins by using plugin type.
+    // Use qobject_cast to detect our algorithm plugins by interface type.
 
     AlgorithmPluginInterface *pluginInterface;
     pluginInterface = qobject_cast<AlgorithmPluginInterface *>(plugin);
@@ -229,5 +228,9 @@ void AlgorithmWindow::loadPlugin(QObject *plugin)
         pluginInterface->initialize(mainWindow_);
         plugins_.push_back(pluginInterface);
         widgets_.push_back(pluginInterface->widget());
+        LOG_DEBUG(<< "Loaded plugin <" << fileName.toStdString()
+                  << "> with name <" << pluginInterface->name().toStdString()
+                  << ">.");
+        (void)fileName;
     }
 }

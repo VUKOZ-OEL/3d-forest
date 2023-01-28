@@ -30,6 +30,8 @@
 #include <QVBoxLayout>
 
 #define LOG_MODULE_NAME "ClassificationWindow"
+#include <Log.hpp>
+
 #define ICON(name) (ThemeIcon(":/classification/", name))
 
 ClassificationWindow::ClassificationWindow(MainWindow *mainWindow)

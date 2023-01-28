@@ -20,10 +20,10 @@
 /** @file SegmentationL1ActionCount.cpp */
 
 #include <Editor.hpp>
-#include <Log.hpp>
 #include <SegmentationL1ActionCount.hpp>
 
 #define LOG_MODULE_NAME "SegmentationL1ActionCount"
+#include <Log.hpp>
 
 SegmentationL1ActionCount::SegmentationL1ActionCount()
 {

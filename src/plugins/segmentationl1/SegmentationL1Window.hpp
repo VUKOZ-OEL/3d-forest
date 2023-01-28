@@ -22,14 +22,14 @@
 #ifndef SEGMENTATION_L1_WINDOW_HPP
 #define SEGMENTATION_L1_WINDOW_HPP
 
-#include <AlgorithmWidget.hpp>
+#include <AlgorithmWidgetInterface.hpp>
 #include <SegmentationL1Parameters.hpp>
 class MainWindow;
 class SliderWidget;
 class RangeSliderWidget;
 
 /** Segmentation L1 Window. */
-class SegmentationL1Window : public AlgorithmWidget
+class SegmentationL1Window : public AlgorithmWidgetInterface
 {
     Q_OBJECT
 
@@ -37,8 +37,12 @@ public:
     SegmentationL1Window(MainWindow *mainWindow);
     virtual ~SegmentationL1Window();
 
+    /** @name Algorithm interface. */
+    /**@{*/
     virtual void applyParameters();
     virtual bool step();
+    virtual void updateData();
+    /**@}*/
 
 protected slots:
     void slotInitialSamplesCountFinalValue();

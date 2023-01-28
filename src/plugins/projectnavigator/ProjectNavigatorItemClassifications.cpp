@@ -35,6 +35,8 @@
 #include <QVBoxLayout>
 
 #define LOG_MODULE_NAME "ProjectNavigatorItemClassifications"
+#include <Log.hpp>
+
 #define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
 ProjectNavigatorItemClassifications::ProjectNavigatorItemClassifications(

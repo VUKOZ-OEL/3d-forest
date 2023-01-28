@@ -26,12 +26,12 @@
 #include <File.hpp>
 #include <IndexFileBuilder.hpp>
 #include <LasFile.hpp>
-#include <Log.hpp>
 #include <Math.hpp>
 #include <Page.hpp>
 #include <Query.hpp>
 
 #define LOG_MODULE_NAME "Page"
+#include <Log.hpp>
 
 Page::Page(Editor *editor, Query *query, uint32_t datasetId, uint32_t pageId)
     : selectionSize(0),

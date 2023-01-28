@@ -20,12 +20,12 @@
 /** @file RenderThread.cpp */
 
 #include <Editor.hpp>
-#include <Log.hpp>
 #include <RenderThread.hpp>
 #include <ThreadCallbackInterface.hpp>
 #include <Time.hpp>
 
 #define LOG_MODULE_NAME "RenderThread"
+#include <Log.hpp>
 
 RenderThread::RenderThread(Editor *editor)
     : editor_(editor),

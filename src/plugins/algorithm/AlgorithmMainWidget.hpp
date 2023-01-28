@@ -24,7 +24,7 @@
 
 #include <vector>
 
-#include <AlgorithmWidget.hpp>
+#include <AlgorithmWidgetInterface.hpp>
 #include <Editor.hpp>
 class MainWindow;
 
@@ -42,7 +42,7 @@ class AlgorithmMainWidget : public QWidget
 public:
     AlgorithmMainWidget(MainWindow *mainWindow);
 
-    void addItem(AlgorithmWidget *widget);
+    void addItem(AlgorithmWidgetInterface *widget);
 
 public slots:
     void slotItemClicked(QTreeWidgetItem *item, int column);
@@ -61,7 +61,7 @@ private:
     QTreeWidget *treeWidget_;
     QVBoxLayout *widgetsLayout_;
 
-    std::vector<AlgorithmWidget *> widgets_;
+    std::vector<AlgorithmWidgetInterface *> widgets_;
 
     size_t index(const QTreeWidgetItem *item);
     void block();

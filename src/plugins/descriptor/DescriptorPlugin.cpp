@@ -25,6 +25,8 @@
 #include <ThemeIcon.hpp>
 
 #define LOG_MODULE_NAME "DescriptorPlugin"
+#include <Log.hpp>
+
 #define ICON(name) (ThemeIcon(":/descriptor/", name))
 
 DescriptorPlugin::DescriptorPlugin()

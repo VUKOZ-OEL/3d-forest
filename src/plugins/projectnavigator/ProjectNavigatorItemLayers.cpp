@@ -20,7 +20,6 @@
 /** @file ProjectNavigatorItemLayers.cpp */
 
 #include <ImportFilePlugin.hpp>
-#include <Log.hpp>
 #include <MainWindow.hpp>
 #include <ProjectNavigatorItemLayers.hpp>
 #include <ThemeIcon.hpp>
@@ -36,6 +35,8 @@
 #include <QVBoxLayout>
 
 #define LOG_MODULE_NAME "ProjectNavigatorItemLayers"
+#include <Log.hpp>
+
 #define ICON(name) (ThemeIcon(":/projectnavigator/", name))
 
 ProjectNavigatorItemLayers::ProjectNavigatorItemLayers(MainWindow *mainWindow,

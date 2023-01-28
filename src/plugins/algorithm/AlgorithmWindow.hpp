@@ -26,7 +26,7 @@
 #include <ThreadCallbackInterface.hpp>
 class MainWindow;
 class AlgorithmMainWidget;
-class AlgorithmWidget;
+class AlgorithmWidgetInterface;
 class AlgorithmPluginInterface;
 
 #include <QDialog>
@@ -63,7 +63,7 @@ private:
     QPushButton *rejectButton_;
 
     std::vector<AlgorithmPluginInterface *> plugins_;
-    std::vector<AlgorithmWidget *> widgets_;
+    std::vector<AlgorithmWidgetInterface *> widgets_;
 
     AlgorithmThread thread_;
 
@@ -71,10 +71,10 @@ private:
     virtual void closeEvent(QCloseEvent *event);
 
     void suspendThreads();
-    void resumeThreads(AlgorithmWidget *algorithm);
+    void resumeThreads(AlgorithmWidgetInterface *algorithm);
 
     void loadPlugins();
-    void loadPlugin(QObject *plugin);
+    void loadPlugin(const QString &fileName, QObject *plugin);
 };
 
 #endif /* ALGORITHM_WINDOW_HPP */

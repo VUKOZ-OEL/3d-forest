@@ -22,6 +22,7 @@
 #ifndef QUERY_FILTER_SET_HPP
 #define QUERY_FILTER_SET_HPP
 
+#include <cstdint>
 #include <unordered_set>
 
 #include <ExportEditor.hpp>

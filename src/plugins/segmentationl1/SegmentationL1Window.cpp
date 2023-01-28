@@ -19,9 +19,9 @@
 
 /** @file SegmentationL1Window.cpp */
 
-#include <Log.hpp>
 #include <MainWindow.hpp>
 #include <RangeSliderWidget.hpp>
+#include <SegmentationL1Constants.hpp>
 #include <SegmentationL1Window.hpp>
 #include <SliderWidget.hpp>
 #include <ThemeIcon.hpp>
@@ -34,10 +34,14 @@
 #include <QVBoxLayout>
 
 #define LOG_MODULE_NAME "SegmentationL1Window"
+#include <Log.hpp>
+
 #define ICON(name) (ThemeIcon(":/segmentationl1/", name))
 
 SegmentationL1Window::SegmentationL1Window(MainWindow *mainWindow)
-    : AlgorithmWidget(mainWindow, ICON("forest"), tr("Segmentation L1")),
+    : AlgorithmWidgetInterface(mainWindow,
+                               ICON("forest"),
+                               tr(SEGMENTATION_L1_NAME)),
       mainWindow_(mainWindow)
 {
     LOG_DEBUG(<< "Called.");
@@ -116,6 +120,11 @@ void SegmentationL1Window::applyParameters()
 bool SegmentationL1Window::step()
 {
     return true;
+}
+
+void SegmentationL1Window::updateData()
+{
+    mainWindow_->update({Editor::TYPE_LAYER});
 }
 
 void SegmentationL1Window::slotInitialSamplesCountFinalValue()

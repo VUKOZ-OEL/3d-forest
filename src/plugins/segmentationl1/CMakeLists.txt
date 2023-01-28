@@ -32,7 +32,7 @@ add_library(
     SHARED
     ${SOURCES}
     resources/resources.qrc
-    ../algorithm/AlgorithmWidget.cpp
+    ../algorithm/AlgorithmWidgetInterface.cpp
 )
 
 target_include_directories(

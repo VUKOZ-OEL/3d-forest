@@ -23,7 +23,7 @@
 #define ALGORITHM_PLUGIN_INTERFACE_HPP
 
 #include <ExportGui.hpp>
-class AlgorithmWidget;
+class AlgorithmWidgetInterface;
 
 #include <QtPlugin>
 
@@ -42,7 +42,8 @@ class EXPORT_GUI AlgorithmPluginInterface
 public:
     virtual ~AlgorithmPluginInterface() = default;
     virtual void initialize(MainWindow *mainWindow) = 0;
-    virtual AlgorithmWidget *widget() = 0;
+    virtual AlgorithmWidgetInterface *widget() = 0;
+    virtual QString name() const = 0;
 };
 
 // clang-format off

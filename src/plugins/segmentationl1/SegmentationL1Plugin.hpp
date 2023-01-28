@@ -24,6 +24,7 @@
 
 #include <AlgorithmPluginInterface.hpp>
 #include <ExportSegmentationL1.hpp>
+#include <SegmentationL1Constants.hpp>
 #include <SegmentationL1Window.hpp>
 
 /** Segmentation L1 Plugin. */
@@ -39,7 +40,8 @@ public:
     SegmentationL1Plugin();
 
     virtual void initialize(MainWindow *mainWindow);
-    virtual AlgorithmWidget *widget() { return pluginWindow_; }
+    virtual AlgorithmWidgetInterface *widget() { return pluginWindow_; }
+    virtual QString name() const { return SEGMENTATION_L1_NAME; }
 
 private:
     MainWindow *mainWindow_;

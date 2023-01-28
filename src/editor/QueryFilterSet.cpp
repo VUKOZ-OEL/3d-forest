@@ -19,10 +19,10 @@
 
 /** @file QueryFilterSet.cpp */
 
-#include <Log.hpp>
 #include <QueryFilterSet.hpp>
 
 #define LOG_MODULE_NAME "QueryFilterSet"
+#include <Log.hpp>
 
 QueryFilterSet::QueryFilterSet() : enabled_(false)
 {

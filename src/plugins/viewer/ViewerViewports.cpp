@@ -22,7 +22,6 @@
 #include <iostream>
 
 #include <Editor.hpp>
-#include <Log.hpp>
 
 #include <ViewerOpenGLViewport.hpp>
 #include <ViewerViewports.hpp>
@@ -32,6 +31,7 @@
 #include <QVBoxLayout>
 
 #define LOG_MODULE_NAME "ViewerViewports"
+#include <Log.hpp>
 
 #define VIEWER_VIEWPORTS_3D 0
 #define VIEWER_VIEWPORTS_TOP 1

@@ -25,6 +25,8 @@
 #include <ThemeIcon.hpp>
 
 #define LOG_MODULE_NAME "ElevationPlugin"
+#include <Log.hpp>
+
 #define ICON(name) (ThemeIcon(":/elevation/", name))
 
 ElevationPlugin::ElevationPlugin()

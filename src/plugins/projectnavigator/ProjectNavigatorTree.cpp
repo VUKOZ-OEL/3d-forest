@@ -33,6 +33,7 @@
 #include <QVBoxLayout>
 
 #define LOG_MODULE_NAME "ProjectNavigatorTree"
+#include <Log.hpp>
 
 ProjectNavigatorTree::ProjectNavigatorTree(MainWindow *mainWindow)
     : QWidget(),

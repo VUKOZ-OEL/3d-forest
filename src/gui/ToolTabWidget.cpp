@@ -22,8 +22,6 @@
 #include <MainWindow.hpp>
 #include <ToolTabWidget.hpp>
 
-#include <flowlayout.h>
-
 #include <QApplication>
 #include <QFrame>
 #include <QHBoxLayout>
@@ -32,7 +30,10 @@
 #include <QToolButton>
 #include <QVBoxLayout>
 
+#include <flowlayout.h>
+
 #define LOG_MODULE_NAME "ToolTabWidget"
+#include <Log.hpp>
 
 ToolTabWidget::ToolTabWidget()
     : QWidget(),

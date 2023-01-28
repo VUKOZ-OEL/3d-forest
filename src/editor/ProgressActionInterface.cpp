@@ -19,11 +19,11 @@
 
 /** @file ProgressActionInterface.cpp */
 
-#include <Log.hpp>
 #include <ProgressActionInterface.hpp>
 #include <Time.hpp>
 
 #define LOG_MODULE_NAME "ProgressActionInterface"
+#include <Log.hpp>
 
 ProgressActionInterface::ProgressActionInterface()
     : nElements_(0),
