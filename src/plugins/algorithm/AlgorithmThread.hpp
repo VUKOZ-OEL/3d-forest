@@ -31,7 +31,7 @@ class AlgorithmWidgetInterface;
 class AlgorithmThread : public Thread
 {
 public:
-    AlgorithmThread(Editor *editor);
+    AlgorithmThread();
     virtual ~AlgorithmThread();
 
     void clear();
@@ -41,8 +41,6 @@ public:
     void updateData();
 
 private:
-    Editor *editor_;
-    Query query_;
     AlgorithmWidgetInterface *algorithm_;
 };
 

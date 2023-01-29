@@ -28,10 +28,7 @@
 #define LOG_MODULE_NAME "AlgorithmThread"
 #include <Log.hpp>
 
-AlgorithmThread::AlgorithmThread(Editor *editor)
-    : editor_(editor),
-      query_(editor_),
-      algorithm_(nullptr)
+AlgorithmThread::AlgorithmThread() : algorithm_(nullptr)
 {
     LOG_DEBUG(<< "Create algorithm thread.");
 }
@@ -43,7 +40,6 @@ AlgorithmThread::~AlgorithmThread()
 
 void AlgorithmThread::clear()
 {
-    query_.clear();
     algorithm_ = nullptr;
 }
 

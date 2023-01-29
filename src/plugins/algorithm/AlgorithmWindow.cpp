@@ -49,9 +49,7 @@ AlgorithmWindow::AlgorithmWindow(MainWindow *mainWindow)
       menu_(nullptr),
       acceptButton_(nullptr),
       rejectButton_(nullptr),
-      plugins_(),
-      widgets_(),
-      thread_(&mainWindow->editor())
+      progressBar_(nullptr)
 {
     LOG_DEBUG(<< "Create algorithm window.");
 

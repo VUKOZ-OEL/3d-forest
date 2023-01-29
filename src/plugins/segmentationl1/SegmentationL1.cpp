@@ -31,27 +31,28 @@ SegmentationL1::SegmentationL1(Editor *editor)
     : editor_(editor),
       query_(editor_)
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Create segmentation L1.");
 }
 
 SegmentationL1::~SegmentationL1()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Destroy segmentation L1.");
 }
 
 void SegmentationL1::clear()
 {
+    LOG_DEBUG(<< "Clear work data.");
     query_.clear();
 }
 
-void SegmentationL1::restart(const SegmentationL1Parameters &parameters)
+void SegmentationL1::applyParameters(const SegmentationL1Parameters &parameters)
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Apply parameters <" << parameters << ">.");
 }
 
-bool SegmentationL1::compute()
+bool SegmentationL1::step()
 {
-    LOG_DEBUG(<< "Compute.");
+    LOG_DEBUG(<< "Compute the next step.");
     return true;
 }
 

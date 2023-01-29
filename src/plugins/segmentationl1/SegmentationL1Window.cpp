@@ -26,11 +26,6 @@
 #include <SliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
-#include <QCloseEvent>
-#include <QHBoxLayout>
-#include <QProgressDialog>
-#include <QPushButton>
-#include <QShowEvent>
 #include <QVBoxLayout>
 
 #define LOG_MODULE_NAME "SegmentationL1Window"
@@ -42,9 +37,13 @@ SegmentationL1Window::SegmentationL1Window(MainWindow *mainWindow)
     : AlgorithmWidgetInterface(mainWindow,
                                ICON("forest"),
                                tr(SEGMENTATION_L1_NAME)),
-      mainWindow_(mainWindow)
+      mainWindow_(mainWindow),
+      initialSamplesCountInput_(nullptr),
+      initialSamplesDensityInput_(nullptr),
+      neighborhoodRadiusInput_(nullptr),
+      segmentationL1_(&mainWindow->editor())
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Create segmentation window.");
 
     // Widgets.
     SliderWidget::create(initialSamplesCountInput_,
@@ -102,7 +101,7 @@ SegmentationL1Window::SegmentationL1Window(MainWindow *mainWindow)
 
 SegmentationL1Window::~SegmentationL1Window()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Destroy segmentation window.");
 }
 
 void SegmentationL1Window::applyParameters()
@@ -113,21 +112,25 @@ void SegmentationL1Window::applyParameters()
                     neighborhoodRadiusInput_->minimumValue(),
                     neighborhoodRadiusInput_->maximumValue());
 
-    LOG_DEBUG(<< "Resume thread with parameters <" << parameters_ << ">.");
+    LOG_DEBUG(<< "Apply parameters <" << parameters_ << ">.");
+
+    segmentationL1_.applyParameters(parameters_);
 }
 
 bool SegmentationL1Window::step()
 {
-    return true;
+    LOG_DEBUG(<< "Compute the next step.");
+    return segmentationL1_.step();
 }
 
 int SegmentationL1Window::progressPercent()
 {
-    return 100;
+    return segmentationL1_.progressPercent();
 }
 
 void SegmentationL1Window::updateData()
 {
+    LOG_DEBUG(<< "Update data.");
     mainWindow_->update({Editor::TYPE_LAYER});
 }
 
