@@ -25,7 +25,7 @@
 #include <AlgorithmThread.hpp>
 #include <ThreadCallbackInterface.hpp>
 class MainWindow;
-class AlgorithmMainWidget;
+class AlgorithmTabWidget;
 class AlgorithmWidgetInterface;
 class AlgorithmPluginInterface;
 
@@ -58,7 +58,7 @@ protected slots:
 private:
     MainWindow *mainWindow_;
 
-    AlgorithmMainWidget *menu_;
+    AlgorithmTabWidget *menu_;
 
     QPushButton *acceptButton_;
     QPushButton *rejectButton_;

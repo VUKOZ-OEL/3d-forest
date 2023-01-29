@@ -43,6 +43,7 @@ public:
 
     virtual void applyParameters() = 0;
     virtual bool step() = 0;
+    virtual int progressPercent() = 0;
     virtual void updateData() = 0;
 
 signals:

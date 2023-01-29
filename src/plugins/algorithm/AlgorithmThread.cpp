@@ -33,12 +33,12 @@ AlgorithmThread::AlgorithmThread(Editor *editor)
       query_(editor_),
       algorithm_(nullptr)
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Create algorithm thread.");
 }
 
 AlgorithmThread::~AlgorithmThread()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Destroy algorithm thread.");
 }
 
 void AlgorithmThread::clear()
@@ -49,7 +49,7 @@ void AlgorithmThread::clear()
 
 void AlgorithmThread::restart(AlgorithmWidgetInterface *algorithm)
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Restart the algorithm.");
 
     algorithm_ = algorithm;
     if (algorithm_)
@@ -62,7 +62,7 @@ void AlgorithmThread::restart(AlgorithmWidgetInterface *algorithm)
 
 bool AlgorithmThread::compute()
 {
-    LOG_DEBUG(<< "Compute.");
+    LOG_DEBUG(<< "Compute the next step.");
 
     bool finished;
 
@@ -87,12 +87,17 @@ bool AlgorithmThread::compute()
 
 int AlgorithmThread::progressPercent() const
 {
+    if (algorithm_)
+    {
+        return algorithm_->progressPercent();
+    }
+
     return 100;
 }
 
 void AlgorithmThread::updateData()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Update data.");
     if (algorithm_)
     {
         algorithm_->updateData();

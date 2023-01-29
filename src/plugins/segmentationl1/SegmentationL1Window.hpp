@@ -41,6 +41,7 @@ public:
     /**@{*/
     virtual void applyParameters();
     virtual bool step();
+    virtual int progressPercent();
     virtual void updateData();
     /**@}*/
 

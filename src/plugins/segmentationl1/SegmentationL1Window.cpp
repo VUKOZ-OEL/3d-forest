@@ -122,6 +122,11 @@ bool SegmentationL1Window::step()
     return true;
 }
 
+int SegmentationL1Window::progressPercent()
+{
+    return 100;
+}
+
 void SegmentationL1Window::updateData()
 {
     mainWindow_->update({Editor::TYPE_LAYER});

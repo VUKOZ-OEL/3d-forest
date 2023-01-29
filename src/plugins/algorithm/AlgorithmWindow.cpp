@@ -19,8 +19,8 @@
 
 /** @file AlgorithmWindow.cpp */
 
-#include <AlgorithmMainWidget.hpp>
 #include <AlgorithmPluginInterface.hpp>
+#include <AlgorithmTabWidget.hpp>
 #include <AlgorithmWidgetInterface.hpp>
 #include <AlgorithmWindow.hpp>
 #include <MainWindow.hpp>
@@ -59,7 +59,7 @@ AlgorithmWindow::AlgorithmWindow(MainWindow *mainWindow)
     loadPlugins();
 
     // Create menu for algorithm plugins.
-    menu_ = new AlgorithmMainWidget(mainWindow_);
+    menu_ = new AlgorithmTabWidget(mainWindow_);
     for (size_t i = 0; i < widgets_.size(); i++)
     {
         menu_->addItem(widgets_[i]);
