@@ -22,12 +22,12 @@
 #ifndef EXPORT_FILE_FORMAT_LAS_HPP
 #define EXPORT_FILE_FORMAT_LAS_HPP
 
-#include <ExportFileFormat.hpp>
+#include <ExportFileFormatInterface.hpp>
 #include <LasFile.hpp>
 #include <Query.hpp>
 
 /** Export File in LAS (LASer) File Format. */
-class ExportFileFormatLas : public ExportFileFormat
+class ExportFileFormatLas : public ExportFileFormatInterface
 {
 public:
     ExportFileFormatLas();

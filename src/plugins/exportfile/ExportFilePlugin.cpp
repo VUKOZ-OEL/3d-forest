@@ -60,7 +60,7 @@ void ExportFilePlugin::slotExportFile()
 
         if (dialog.exec() == QDialog::Accepted)
         {
-            std::shared_ptr<ExportFileFormat> writer = dialog.writer();
+            std::shared_ptr<ExportFileFormatInterface> writer = dialog.writer();
             ExportFileProperties properties = dialog.properties();
 
             ExportFileAction exportFile(&mainWindow_->editor());

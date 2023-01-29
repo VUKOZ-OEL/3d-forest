@@ -196,9 +196,9 @@ void ExportFileDialog::slotReject()
     setResult(QDialog::Rejected);
 }
 
-std::shared_ptr<ExportFileFormat> ExportFileDialog::writer() const
+std::shared_ptr<ExportFileFormatInterface> ExportFileDialog::writer() const
 {
-    std::shared_ptr<ExportFileFormat> result;
+    std::shared_ptr<ExportFileFormatInterface> result;
 
     std::string path = fileNameLineEdit_->text().toStdString();
     std::string ext = toLower(File::fileExtension(path));

@@ -17,19 +17,19 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ExportFileFormat.hpp */
+/** @file ExportFileFormatInterface.hpp */
 
-#ifndef EXPORT_FILE_FORMAT_HPP
-#define EXPORT_FILE_FORMAT_HPP
+#ifndef EXPORT_FILE_FORMAT_INTERFACE_HPP
+#define EXPORT_FILE_FORMAT_INTERFACE_HPP
 
 #include <ExportFileProperties.hpp>
 #include <Query.hpp>
 
 /** Export File Format. */
-class ExportFileFormat
+class ExportFileFormatInterface
 {
 public:
-    virtual ~ExportFileFormat() = default;
+    virtual ~ExportFileFormatInterface() = default;
 
     virtual bool isOpen() = 0;
     virtual void create(const std::string &path) = 0;
@@ -43,4 +43,4 @@ private:
     ExportFileProperties properties_;
 };
 
-#endif /* EXPORT_FILE_FORMAT_HPP */
+#endif /* EXPORT_FILE_FORMAT_INTERFACE_HPP */

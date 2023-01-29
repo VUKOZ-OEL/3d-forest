@@ -22,7 +22,7 @@
 #ifndef EXPORT_FILE_ACTION_HPP
 #define EXPORT_FILE_ACTION_HPP
 
-#include <ExportFileFormat.hpp>
+#include <ExportFileFormatInterface.hpp>
 #include <ExportFileProperties.hpp>
 #include <LasFile.hpp>
 #include <ProgressActionInterface.hpp>
@@ -37,7 +37,7 @@ public:
     ExportFileAction(Editor *editor);
     virtual ~ExportFileAction();
 
-    void initialize(std::shared_ptr<ExportFileFormat> writer,
+    void initialize(std::shared_ptr<ExportFileFormatInterface> writer,
                     const ExportFileProperties &properties);
     void clear();
 
@@ -51,7 +51,7 @@ private:
     Vector3<double> regionMin_;
     Vector3<double> regionMax_;
 
-    std::shared_ptr<ExportFileFormat> writer_;
+    std::shared_ptr<ExportFileFormatInterface> writer_;
     ExportFileProperties properties_;
 
     void determineMaximum();
