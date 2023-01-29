@@ -31,13 +31,14 @@
 #include <QDir>
 #include <QHBoxLayout>
 #include <QPluginLoader>
+#include <QProgressBar>
 #include <QProgressDialog>
 #include <QPushButton>
 #include <QShowEvent>
 #include <QVBoxLayout>
 
 #define LOG_MODULE_NAME "AlgorithmWindow"
-#define LOG_MODULE_DEBUG_ENABLED 1
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define ICON(name) (ThemeIcon(":/algorithm/", name))
@@ -68,6 +69,14 @@ AlgorithmWindow::AlgorithmWindow(MainWindow *mainWindow)
                 SLOT(slotParametersChanged()));
     }
 
+    // Create progress bar.
+    progressBar_ = new QProgressBar;
+    progressBar_->setRange(0, 100);
+
+    QHBoxLayout *progressBarLayout = new QHBoxLayout;
+    progressBarLayout->addWidget(progressBar_);
+    progressBarLayout->setContentsMargins(0, 0, 0, 0);
+
     // Add apply and cancel buttons.
     acceptButton_ = new QPushButton(tr("Apply"));
     connect(acceptButton_, SIGNAL(clicked()), this, SLOT(slotAccept()));
@@ -83,6 +92,8 @@ AlgorithmWindow::AlgorithmWindow(MainWindow *mainWindow)
     // Create main layout.
     QVBoxLayout *dialogLayout = new QVBoxLayout;
     dialogLayout->addWidget(menu_);
+    dialogLayout->addSpacing(5);
+    dialogLayout->addLayout(progressBarLayout);
     dialogLayout->addSpacing(10);
     dialogLayout->addLayout(dialogButtons);
     dialogLayout->addStretch();
@@ -169,7 +180,7 @@ void AlgorithmWindow::slotThread(bool finished, int progressPercent)
               << " Parameters finished <" << finished << "> progress <"
               << progressPercent << ">.");
 
-    mainWindow_->setStatusProgressBarPercent(progressPercent);
+    setProgressBarPercent(progressPercent);
 
     if (finished)
     {
@@ -182,14 +193,14 @@ void AlgorithmWindow::suspendThreads()
 {
     LOG_DEBUG(<< "In gui thread: cancel task in worker thread.");
     thread_.cancel();
-    mainWindow_->setStatusProgressBarPercent(0);
+    setProgressBarPercent(0);
 }
 
 void AlgorithmWindow::resumeThreads(AlgorithmWidgetInterface *algorithm)
 {
     LOG_DEBUG(<< "In gui thread: start new task in worker thread.");
     thread_.cancel();
-    mainWindow_->setStatusProgressBarPercent(0);
+    setProgressBarPercent(0);
     thread_.restart(algorithm);
 }
 
@@ -233,4 +244,19 @@ void AlgorithmWindow::loadPlugin(const QString &fileName, QObject *plugin)
                   << ">.");
         (void)fileName;
     }
+}
+
+void AlgorithmWindow::setProgressBarPercent(int percent)
+{
+    progressBar_->setValue(percent);
+#if 0
+    if (percent > 0 && percent < 100)
+    {
+        progressBar_->setVisible(true);
+    }
+    else
+    {
+        progressBar_->setVisible(false);
+    }
+#endif
 }

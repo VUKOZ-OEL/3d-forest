@@ -39,7 +39,6 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPluginLoader>
-#include <QProgressBar>
 #include <QStatusBar>
 #include <QToolBar>
 #include <QToolButton>
@@ -61,24 +60,6 @@ MainWindow::MainWindow(QWidget *parent)
     LOG_DEBUG(<< "Called.");
 
     // Status bar
-    statusProgressBar_ = new QProgressBar;
-    statusProgressBar_->setRange(0, 100);
-    statusProgressBar_->setTextVisible(false);
-    statusProgressBar_->setFixedWidth(100);
-    statusProgressBar_->setFixedHeight(MainWindow::ICON_SIZE_TEXT);
-    setStatusProgressBarPercent(0);
-
-    QHBoxLayout *statusLayout = new QHBoxLayout;
-    statusLayout->addStretch();
-    statusLayout->addWidget(statusProgressBar_);
-    statusLayout->setContentsMargins(0, 0, 0, 0);
-    statusLayout->setSpacing(0);
-
-    QWidget *statusWidget = new QWidget;
-    statusWidget->setLayout(statusLayout);
-    statusWidget->setContentsMargins(0, 0, 0, 0);
-
-    statusBar()->addPermanentWidget(statusWidget);
     statusBar()->showMessage(tr("Ready"));
 
     // Menu
@@ -275,20 +256,6 @@ void MainWindow::hideToolBar(const QString &menu)
     if (toolBar_.contains(menu))
     {
         toolBar_[menu]->close();
-    }
-}
-
-void MainWindow::setStatusProgressBarPercent(int percent)
-{
-    statusProgressBar_->setValue(percent);
-
-    if (percent > 0 && percent < 100)
-    {
-        statusProgressBar_->setVisible(true);
-    }
-    else
-    {
-        statusProgressBar_->setVisible(false);
     }
 }
 

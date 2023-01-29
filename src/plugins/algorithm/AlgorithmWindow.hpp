@@ -31,6 +31,7 @@ class AlgorithmPluginInterface;
 
 #include <QDialog>
 class QPushButton;
+class QProgressBar;
 
 /** Algorithm Window. */
 class AlgorithmWindow : public QDialog, public ThreadCallbackInterface
@@ -61,6 +62,7 @@ private:
 
     QPushButton *acceptButton_;
     QPushButton *rejectButton_;
+    QProgressBar *progressBar_;
 
     std::vector<AlgorithmPluginInterface *> plugins_;
     std::vector<AlgorithmWidgetInterface *> widgets_;
@@ -75,6 +77,8 @@ private:
 
     void loadPlugins();
     void loadPlugin(const QString &fileName, QObject *plugin);
+
+    void setProgressBarPercent(int percent);
 };
 
 #endif /* ALGORITHM_WINDOW_HPP */
