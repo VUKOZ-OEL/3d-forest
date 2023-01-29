@@ -17,10 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file AlgorithmMainWidget.hpp */
+/** @file AlgorithmTabWidget.hpp */
 
-#ifndef ALGORITHM_MAIN_WIDGET_HPP
-#define ALGORITHM_MAIN_WIDGET_HPP
+#ifndef ALGORITHM_TAB_WIDGET_HPP
+#define ALGORITHM_TAB_WIDGET_HPP
 
 #include <vector>
 
@@ -34,13 +34,13 @@ class QLabel;
 class QTreeWidget;
 class QTreeWidgetItem;
 
-/** Algorithm Tree Widget. */
-class AlgorithmMainWidget : public QWidget
+/** Algorithm Tab Widget. */
+class AlgorithmTabWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    AlgorithmMainWidget(MainWindow *mainWindow);
+    AlgorithmTabWidget(MainWindow *mainWindow);
 
     void addItem(AlgorithmWidgetInterface *widget);
 
@@ -48,7 +48,7 @@ public slots:
     void slotItemClicked(QTreeWidgetItem *item, int column);
 
 private:
-    /** Algorithm Tree Column. */
+    /** Algorithm Tab Column. */
     enum Column
     {
         COLUMN_LABEL,
@@ -69,4 +69,4 @@ private:
     void setTabVisible(size_t index);
 };
 
-#endif /* ALGORITHM_MAIN_WIDGET_HPP */
+#endif /* ALGORITHM_TAB_WIDGET_HPP */

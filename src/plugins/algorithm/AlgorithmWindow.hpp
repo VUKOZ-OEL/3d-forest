@@ -25,12 +25,13 @@
 #include <AlgorithmThread.hpp>
 #include <ThreadCallbackInterface.hpp>
 class MainWindow;
-class AlgorithmMainWidget;
+class AlgorithmTabWidget;
 class AlgorithmWidgetInterface;
 class AlgorithmPluginInterface;
 
 #include <QDialog>
 class QPushButton;
+class QProgressBar;
 
 /** Algorithm Window. */
 class AlgorithmWindow : public QDialog, public ThreadCallbackInterface
@@ -57,10 +58,11 @@ protected slots:
 private:
     MainWindow *mainWindow_;
 
-    AlgorithmMainWidget *menu_;
+    AlgorithmTabWidget *menu_;
 
     QPushButton *acceptButton_;
     QPushButton *rejectButton_;
+    QProgressBar *progressBar_;
 
     std::vector<AlgorithmPluginInterface *> plugins_;
     std::vector<AlgorithmWidgetInterface *> widgets_;
@@ -75,6 +77,8 @@ private:
 
     void loadPlugins();
     void loadPlugin(const QString &fileName, QObject *plugin);
+
+    void setProgressBarPercent(int percent);
 };
 
 #endif /* ALGORITHM_WINDOW_HPP */

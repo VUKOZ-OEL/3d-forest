@@ -22,12 +22,12 @@
 #ifndef EXPORT_FILE_FORMAT_CSV_HPP
 #define EXPORT_FILE_FORMAT_CSV_HPP
 
-#include <ExportFileFormat.hpp>
+#include <ExportFileFormatInterface.hpp>
 #include <File.hpp>
 #include <Query.hpp>
 
 /** Export File in Comma Separated Values File Format. */
-class ExportFileFormatCsv : public ExportFileFormat
+class ExportFileFormatCsv : public ExportFileFormatInterface
 {
 public:
     ExportFileFormatCsv();

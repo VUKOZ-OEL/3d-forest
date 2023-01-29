@@ -41,8 +41,9 @@ ExportFileAction::~ExportFileAction()
     LOG_DEBUG(<< "Called.");
 }
 
-void ExportFileAction::initialize(std::shared_ptr<ExportFileFormat> writer,
-                                  const ExportFileProperties &properties)
+void ExportFileAction::initialize(
+    std::shared_ptr<ExportFileFormatInterface> writer,
+    const ExportFileProperties &properties)
 {
     LOG_DEBUG(<< "Called.");
 

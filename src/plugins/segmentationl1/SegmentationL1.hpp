@@ -37,9 +37,8 @@ public:
     ~SegmentationL1();
 
     void clear();
-    void restart(const SegmentationL1Parameters &parameters);
-    bool compute();
-
+    void applyParameters(const SegmentationL1Parameters &parameters);
+    bool step();
     int progressPercent() const;
 
 private:

@@ -23,6 +23,7 @@
 #define SEGMENTATION_L1_WINDOW_HPP
 
 #include <AlgorithmWidgetInterface.hpp>
+#include <SegmentationL1.hpp>
 #include <SegmentationL1Parameters.hpp>
 class MainWindow;
 class SliderWidget;
@@ -41,6 +42,7 @@ public:
     /**@{*/
     virtual void applyParameters();
     virtual bool step();
+    virtual int progressPercent();
     virtual void updateData();
     /**@}*/
 
@@ -58,6 +60,7 @@ private:
     RangeSliderWidget *initialSamplesDensityInput_;
     RangeSliderWidget *neighborhoodRadiusInput_;
 
+    SegmentationL1 segmentationL1_;
     SegmentationL1Parameters parameters_;
 };
 

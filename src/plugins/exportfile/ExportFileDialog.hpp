@@ -22,7 +22,7 @@
 #ifndef EXPORT_FILE_DIALOG_HPP
 #define EXPORT_FILE_DIALOG_HPP
 
-#include <ExportFileFormat.hpp>
+#include <ExportFileFormatInterface.hpp>
 #include <ExportFileProperties.hpp>
 
 #include <QDialog>
@@ -42,7 +42,7 @@ class ExportFileDialog : public QDialog
 public:
     ExportFileDialog(MainWindow *mainWindow, const QString &fileName);
 
-    std::shared_ptr<ExportFileFormat> writer() const;
+    std::shared_ptr<ExportFileFormatInterface> writer() const;
     ExportFileProperties properties() const;
 
 public slots:

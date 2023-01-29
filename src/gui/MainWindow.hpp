@@ -44,7 +44,6 @@ class HelpPlugin;
 #include <QMainWindow>
 #include <QSet>
 class QToolButton;
-class QProgressBar;
 
 #if QT_VERSION_MAJOR == 5
     // Fix for qt5 which has two QAction classes
@@ -107,8 +106,6 @@ public:
 
     Editor &editor() { return editor_; }
 
-    void setStatusProgressBarPercent(int percent);
-
 public slots:
     void slotRender();
     void slotRenderViewport();
@@ -138,9 +135,6 @@ protected:
     ViewerPlugin *viewerPlugin_;
     HelpPlugin *helpPlugin_;
     std::vector<PluginInterface *> plugins_;
-
-    // Window
-    QProgressBar *statusProgressBar_;
 
     // Menu
     QHash<QString, QMenu *> menu_;

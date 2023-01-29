@@ -17,9 +17,9 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file AlgorithmMainWidget.cpp */
+/** @file AlgorithmTabWidget.cpp */
 
-#include <AlgorithmMainWidget.hpp>
+#include <AlgorithmTabWidget.hpp>
 #include <MainWindow.hpp>
 
 #include <QFrame>
@@ -29,16 +29,16 @@
 #include <QTreeWidgetItem>
 #include <QVBoxLayout>
 
-#define LOG_MODULE_NAME "AlgorithmMainWidget"
+#define LOG_MODULE_NAME "AlgorithmTabWidget"
 #include <Log.hpp>
 
-AlgorithmMainWidget::AlgorithmMainWidget(MainWindow *mainWindow)
+AlgorithmTabWidget::AlgorithmTabWidget(MainWindow *mainWindow)
     : QWidget(),
       mainWindow_(mainWindow),
       treeWidget_(nullptr),
       widgetsLayout_(nullptr)
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Create algorithm tab widget.");
 
     // Create the tree widget.
     treeWidget_ = new QTreeWidget();
@@ -71,9 +71,6 @@ AlgorithmMainWidget::AlgorithmMainWidget(MainWindow *mainWindow)
     splitter->addWidget(treeWidget_);
     splitter->addWidget(treeDetailFrame);
 
-    int w = width() / 4;
-    splitter->setSizes(QList<int>({w * 1, w * 3}));
-
     // Setup the main layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(splitter);
@@ -82,7 +79,7 @@ AlgorithmMainWidget::AlgorithmMainWidget(MainWindow *mainWindow)
     setLayout(mainLayout);
 }
 
-void AlgorithmMainWidget::addItem(AlgorithmWidgetInterface *widget)
+void AlgorithmTabWidget::addItem(AlgorithmWidgetInterface *widget)
 {
     LOG_DEBUG(<< "Add widget text <" << widget->text().toStdString() << ">.");
 
@@ -111,7 +108,7 @@ void AlgorithmMainWidget::addItem(AlgorithmWidgetInterface *widget)
     unblock();
 }
 
-void AlgorithmMainWidget::slotItemClicked(QTreeWidgetItem *item, int column)
+void AlgorithmTabWidget::slotItemClicked(QTreeWidgetItem *item, int column)
 {
     if (item == nullptr || column < 0)
     {
@@ -124,18 +121,18 @@ void AlgorithmMainWidget::slotItemClicked(QTreeWidgetItem *item, int column)
     }
 }
 
-size_t AlgorithmMainWidget::index(const QTreeWidgetItem *item)
+size_t AlgorithmTabWidget::index(const QTreeWidgetItem *item)
 {
     return item->text(COLUMN_ID).toULong();
 }
 
-void AlgorithmMainWidget::block()
+void AlgorithmTabWidget::block()
 {
     disconnect(treeWidget_, SIGNAL(itemClicked(QTreeWidgetItem *, int)), 0, 0);
     (void)blockSignals(true);
 }
 
-void AlgorithmMainWidget::unblock()
+void AlgorithmTabWidget::unblock()
 {
     (void)blockSignals(false);
     connect(treeWidget_,
@@ -144,7 +141,7 @@ void AlgorithmMainWidget::unblock()
             SLOT(slotItemClicked(QTreeWidgetItem *, int)));
 }
 
-void AlgorithmMainWidget::setTabVisible(size_t index)
+void AlgorithmTabWidget::setTabVisible(size_t index)
 {
     LOG_DEBUG(<< "Called with index <" << index << ">.");
 

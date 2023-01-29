@@ -19,8 +19,8 @@
 
 /** @file AlgorithmWindow.cpp */
 
-#include <AlgorithmMainWidget.hpp>
 #include <AlgorithmPluginInterface.hpp>
+#include <AlgorithmTabWidget.hpp>
 #include <AlgorithmWidgetInterface.hpp>
 #include <AlgorithmWindow.hpp>
 #include <MainWindow.hpp>
@@ -31,13 +31,14 @@
 #include <QDir>
 #include <QHBoxLayout>
 #include <QPluginLoader>
+#include <QProgressBar>
 #include <QProgressDialog>
 #include <QPushButton>
 #include <QShowEvent>
 #include <QVBoxLayout>
 
 #define LOG_MODULE_NAME "AlgorithmWindow"
-#define LOG_MODULE_DEBUG_ENABLED 1
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define ICON(name) (ThemeIcon(":/algorithm/", name))
@@ -48,9 +49,7 @@ AlgorithmWindow::AlgorithmWindow(MainWindow *mainWindow)
       menu_(nullptr),
       acceptButton_(nullptr),
       rejectButton_(nullptr),
-      plugins_(),
-      widgets_(),
-      thread_(&mainWindow->editor())
+      progressBar_(nullptr)
 {
     LOG_DEBUG(<< "Create algorithm window.");
 
@@ -58,7 +57,7 @@ AlgorithmWindow::AlgorithmWindow(MainWindow *mainWindow)
     loadPlugins();
 
     // Create menu for algorithm plugins.
-    menu_ = new AlgorithmMainWidget(mainWindow_);
+    menu_ = new AlgorithmTabWidget(mainWindow_);
     for (size_t i = 0; i < widgets_.size(); i++)
     {
         menu_->addItem(widgets_[i]);
@@ -67,6 +66,14 @@ AlgorithmWindow::AlgorithmWindow(MainWindow *mainWindow)
                 this,
                 SLOT(slotParametersChanged()));
     }
+
+    // Create progress bar.
+    progressBar_ = new QProgressBar;
+    progressBar_->setRange(0, 100);
+
+    QHBoxLayout *progressBarLayout = new QHBoxLayout;
+    progressBarLayout->addWidget(progressBar_);
+    progressBarLayout->setContentsMargins(0, 0, 0, 0);
 
     // Add apply and cancel buttons.
     acceptButton_ = new QPushButton(tr("Apply"));
@@ -83,9 +90,11 @@ AlgorithmWindow::AlgorithmWindow(MainWindow *mainWindow)
     // Create main layout.
     QVBoxLayout *dialogLayout = new QVBoxLayout;
     dialogLayout->addWidget(menu_);
+    dialogLayout->addStretch();
+    dialogLayout->addSpacing(5);
+    dialogLayout->addLayout(progressBarLayout);
     dialogLayout->addSpacing(10);
     dialogLayout->addLayout(dialogButtons);
-    dialogLayout->addStretch();
 
     setLayout(dialogLayout);
 
@@ -169,7 +178,7 @@ void AlgorithmWindow::slotThread(bool finished, int progressPercent)
               << " Parameters finished <" << finished << "> progress <"
               << progressPercent << ">.");
 
-    mainWindow_->setStatusProgressBarPercent(progressPercent);
+    setProgressBarPercent(progressPercent);
 
     if (finished)
     {
@@ -182,14 +191,14 @@ void AlgorithmWindow::suspendThreads()
 {
     LOG_DEBUG(<< "In gui thread: cancel task in worker thread.");
     thread_.cancel();
-    mainWindow_->setStatusProgressBarPercent(0);
+    setProgressBarPercent(0);
 }
 
 void AlgorithmWindow::resumeThreads(AlgorithmWidgetInterface *algorithm)
 {
     LOG_DEBUG(<< "In gui thread: start new task in worker thread.");
     thread_.cancel();
-    mainWindow_->setStatusProgressBarPercent(0);
+    setProgressBarPercent(0);
     thread_.restart(algorithm);
 }
 
@@ -233,4 +242,19 @@ void AlgorithmWindow::loadPlugin(const QString &fileName, QObject *plugin)
                   << ">.");
         (void)fileName;
     }
+}
+
+void AlgorithmWindow::setProgressBarPercent(int percent)
+{
+    progressBar_->setValue(percent);
+#if 0
+    if (percent > 0 && percent < 100)
+    {
+        progressBar_->setVisible(true);
+    }
+    else
+    {
+        progressBar_->setVisible(false);
+    }
+#endif
 }
