@@ -90,7 +90,6 @@ SegmentationL1Window::SegmentationL1Window(MainWindow *mainWindow)
     settingsLayout->addWidget(initialSamplesCountInput_);
     settingsLayout->addWidget(initialSamplesDensityInput_);
     settingsLayout->addWidget(neighborhoodRadiusInput_);
-    settingsLayout->addStretch();
 
     // Create widget layout.
     QVBoxLayout *widgetLayout = new QVBoxLayout;

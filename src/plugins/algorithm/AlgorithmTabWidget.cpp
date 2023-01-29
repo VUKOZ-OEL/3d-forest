@@ -71,9 +71,6 @@ AlgorithmTabWidget::AlgorithmTabWidget(MainWindow *mainWindow)
     splitter->addWidget(treeWidget_);
     splitter->addWidget(treeDetailFrame);
 
-    int w = width() / 4;
-    splitter->setSizes(QList<int>({w * 1, w * 3}));
-
     // Setup the main layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(splitter);

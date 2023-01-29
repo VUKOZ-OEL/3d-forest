@@ -92,11 +92,11 @@ AlgorithmWindow::AlgorithmWindow(MainWindow *mainWindow)
     // Create main layout.
     QVBoxLayout *dialogLayout = new QVBoxLayout;
     dialogLayout->addWidget(menu_);
+    dialogLayout->addStretch();
     dialogLayout->addSpacing(5);
     dialogLayout->addLayout(progressBarLayout);
     dialogLayout->addSpacing(10);
     dialogLayout->addLayout(dialogButtons);
-    dialogLayout->addStretch();
 
     setLayout(dialogLayout);
 
