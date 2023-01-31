@@ -22,22 +22,58 @@
 #ifndef SEGMENTATION_L1_ACTION_COUNT_HPP
 #define SEGMENTATION_L1_ACTION_COUNT_HPP
 
+#include <Editor.hpp>
 #include <SegmentationL1ActionInterface.hpp>
 
 /** Segmentation L1 Action Count. */
 class SegmentationL1ActionCount : public SegmentationL1ActionInterface
 {
 public:
-    SegmentationL1ActionCount();
-    virtual ~SegmentationL1ActionCount();
+    virtual void initialize(SegmentationL1Context *context)
+    {
+        context_ = context;
 
-    virtual void initialize(SegmentationL1Context *context);
-    virtual void step();
+        context_->reset();
+
+        context_->query.setWhere(context_->editor->viewports().where());
+        context_->query.exec();
+
+        if (context_->query.next())
+        {
+            context_->totalSamplesCount++;
+        }
+
+        ProgressActionInterface::initialize(ProgressActionInterface::npos,
+                                            1000UL);
+    }
+
+    virtual void step()
+    {
+        if (initializing())
+        {
+            startTimer();
+
+            while (context_->query.next())
+            {
+                context_->totalSamplesCount++;
+
+                if (timedOut())
+                {
+                    return;
+                }
+            }
+
+            context_->query.reset();
+
+            ProgressActionInterface::initialize(context_->totalSamplesCount,
+                                                1000UL);
+        }
+
+        increment(process());
+    }
 
 private:
     SegmentationL1Context *context_;
-
-    void determineMaximum();
 };
 
 #endif /* SEGMENTATION_L1_ACTION_COUNT_HPP */
