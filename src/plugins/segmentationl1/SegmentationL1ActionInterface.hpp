@@ -17,38 +17,23 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationL1.hpp */
+/** @file SegmentationL1ActionInterface.hpp */
 
-#ifndef SEGMENTATION_L1_HPP
-#define SEGMENTATION_L1_HPP
+#ifndef SEGMENTATION_L1_ACTION_INTERFACE_HPP
+#define SEGMENTATION_L1_ACTION_INTERFACE_HPP
 
-#include <SegmentationL1ActionCount.hpp>
+#include <ProgressActionInterface.hpp>
 #include <SegmentationL1Context.hpp>
-class Editor;
 
-/** Segmentation L1. */
-class SegmentationL1
+/** Segmentation L1 Action Interface. */
+class SegmentationL1ActionInterface : public ProgressActionInterface
 {
 public:
-    static const size_t npos = SIZE_MAX;
+    SegmentationL1ActionInterface() : ProgressActionInterface(){};
+    virtual ~SegmentationL1ActionInterface() = default;
 
-    SegmentationL1(Editor *editor);
-    ~SegmentationL1();
-
-    void clear();
-    bool applyParameters(const SegmentationL1Parameters &parameters);
-    bool step();
-    int progressPercent() const;
-
-private:
-    SegmentationL1Context context_;
-
-    SegmentationL1ActionCount actionCount_;
-
-    std::vector<SegmentationL1ActionInterface *> actions_;
-    size_t currentAction_;
-
-    void initializeCurrentAction();
+    virtual void initialize(SegmentationL1Context *context) = 0;
+    virtual void step() = 0;
 };
 
-#endif /* SEGMENTATION_L1_HPP */
+#endif /* SEGMENTATION_L1_ACTION_INTERFACE_HPP */

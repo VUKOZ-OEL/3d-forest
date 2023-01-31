@@ -17,38 +17,29 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationL1.hpp */
+/** @file SegmentationL1Point.hpp */
 
-#ifndef SEGMENTATION_L1_HPP
-#define SEGMENTATION_L1_HPP
+#ifndef SEGMENTATION_L1_POINT_HPP
+#define SEGMENTATION_L1_POINT_HPP
 
-#include <SegmentationL1ActionCount.hpp>
-#include <SegmentationL1Context.hpp>
-class Editor;
+#include <cstdint>
+#include <sstream>
 
-/** Segmentation L1. */
-class SegmentationL1
+/** Segmentation L1 Point. */
+class SegmentationL1Point
 {
 public:
-    static const size_t npos = SIZE_MAX;
-
-    SegmentationL1(Editor *editor);
-    ~SegmentationL1();
-
-    void clear();
-    bool applyParameters(const SegmentationL1Parameters &parameters);
-    bool step();
-    int progressPercent() const;
-
-private:
-    SegmentationL1Context context_;
-
-    SegmentationL1ActionCount actionCount_;
-
-    std::vector<SegmentationL1ActionInterface *> actions_;
-    size_t currentAction_;
-
-    void initializeCurrentAction();
+    uint64_t index;
+    double x;
+    double y;
+    double z;
 };
 
-#endif /* SEGMENTATION_L1_HPP */
+inline std::ostream &operator<<(std::ostream &os,
+                                const SegmentationL1Point &obj)
+{
+    return os << "index <" << obj.index << "> x <" << obj.x << "> y <" << obj.y
+              << "> z <" << obj.z << ">";
+}
+
+#endif /* SEGMENTATION_L1_POINT_HPP */

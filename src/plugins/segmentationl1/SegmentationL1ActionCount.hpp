@@ -22,19 +22,22 @@
 #ifndef SEGMENTATION_L1_ACTION_COUNT_HPP
 #define SEGMENTATION_L1_ACTION_COUNT_HPP
 
-#include <ProgressActionInterface.hpp>
-class Editor;
+#include <SegmentationL1ActionInterface.hpp>
 
 /** Segmentation L1 Action Count. */
-class SegmentationL1ActionCount : public ProgressActionInterface
+class SegmentationL1ActionCount : public SegmentationL1ActionInterface
 {
 public:
     SegmentationL1ActionCount();
     virtual ~SegmentationL1ActionCount();
 
-    void initialize();
+    virtual void initialize(SegmentationL1Context *context);
     virtual void step();
-    void clear();
+
+private:
+    SegmentationL1Context *context_;
+
+    void determineMaximum();
 };
 
 #endif /* SEGMENTATION_L1_ACTION_COUNT_HPP */

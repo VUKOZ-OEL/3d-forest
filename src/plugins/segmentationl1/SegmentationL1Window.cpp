@@ -43,7 +43,7 @@ SegmentationL1Window::SegmentationL1Window(MainWindow *mainWindow)
       neighborhoodRadiusInput_(nullptr),
       segmentationL1_(&mainWindow->editor())
 {
-    LOG_DEBUG(<< "Create segmentation window.");
+    LOG_DEBUG(<< "Create.");
 
     // Widgets.
     SliderWidget::create(initialSamplesCountInput_,
@@ -101,10 +101,10 @@ SegmentationL1Window::SegmentationL1Window(MainWindow *mainWindow)
 
 SegmentationL1Window::~SegmentationL1Window()
 {
-    LOG_DEBUG(<< "Destroy segmentation window.");
+    LOG_DEBUG(<< "Destroy.");
 }
 
-void SegmentationL1Window::applyParameters()
+bool SegmentationL1Window::applyParameters()
 {
     parameters_.set(initialSamplesCountInput_->value(),
                     initialSamplesDensityInput_->minimumValue(),
@@ -114,7 +114,7 @@ void SegmentationL1Window::applyParameters()
 
     LOG_DEBUG(<< "Apply parameters <" << parameters_ << ">.");
 
-    segmentationL1_.applyParameters(parameters_);
+    return segmentationL1_.applyParameters(parameters_);
 }
 
 bool SegmentationL1Window::step()

@@ -17,27 +17,34 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationL1Data.hpp */
+/** @file SegmentationL1Context.hpp */
 
-#ifndef SEGMENTATION_L1_DATA_HPP
-#define SEGMENTATION_L1_DATA_HPP
+#ifndef SEGMENTATION_L1_CONTEXT_HPP
+#define SEGMENTATION_L1_CONTEXT_HPP
 
-#include <cstdint>
+#include <Query.hpp>
+#include <SegmentationL1Parameters.hpp>
+#include <SegmentationL1Point.hpp>
+class Editor;
 
-/** Segmentation L1 Data. */
-class SegmentationL1Data
+/** Segmentation L1 Context. */
+class SegmentationL1Context
 {
 public:
+    Editor *editor;
+    Query query;
+
+    SegmentationL1Parameters parameters;
+
     uint64_t totalSamplesCount;
-    uint64_t initialSamplesCount;
+    size_t initialSamplesCount;
 
-    SegmentationL1Data() { clear(); }
+    std::vector<SegmentationL1Point> points;
 
-    void clear()
-    {
-        totalSamplesCount = 0;
-        initialSamplesCount = 0;
-    }
+    SegmentationL1Context(Editor *editor);
+
+    void clear();
+    void reset();
 };
 
-#endif /* SEGMENTATION_L1_DATA_HPP */
+#endif /* SEGMENTATION_L1_CONTEXT_HPP */

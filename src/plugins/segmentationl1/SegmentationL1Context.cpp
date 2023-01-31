@@ -17,38 +17,34 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationL1.hpp */
+/** @file SegmentationL1Context.cpp */
 
-#ifndef SEGMENTATION_L1_HPP
-#define SEGMENTATION_L1_HPP
-
-#include <SegmentationL1ActionCount.hpp>
+#include <Editor.hpp>
 #include <SegmentationL1Context.hpp>
-class Editor;
 
-/** Segmentation L1. */
-class SegmentationL1
+#define LOG_MODULE_NAME "SegmentationL1Context"
+#include <Log.hpp>
+
+SegmentationL1Context::SegmentationL1Context(Editor *editor_)
+    : editor(editor_),
+      query(editor_)
 {
-public:
-    static const size_t npos = SIZE_MAX;
+    clear();
+}
 
-    SegmentationL1(Editor *editor);
-    ~SegmentationL1();
+void SegmentationL1Context::clear()
+{
+    query.clear();
 
-    void clear();
-    bool applyParameters(const SegmentationL1Parameters &parameters);
-    bool step();
-    int progressPercent() const;
+    parameters.clear();
 
-private:
-    SegmentationL1Context context_;
+    reset();
+}
 
-    SegmentationL1ActionCount actionCount_;
+void SegmentationL1Context::reset()
+{
+    totalSamplesCount = 0;
+    initialSamplesCount = 0;
 
-    std::vector<SegmentationL1ActionInterface *> actions_;
-    size_t currentAction_;
-
-    void initializeCurrentAction();
-};
-
-#endif /* SEGMENTATION_L1_HPP */
+    points.clear();
+}

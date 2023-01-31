@@ -37,6 +37,15 @@ public:
 
     SegmentationL1Parameters() { setDefault(); }
 
+    void clear()
+    {
+        initialSamplesCount = 0;
+        initialSamplesDensityMinimum = 0;
+        initialSamplesDensityMaximum = 0;
+        neighborhoodRadiusMinimum = 0;
+        neighborhoodRadiusMaximum = 0;
+    }
+
     void setDefault()
     {
         initialSamplesCount = 5;
