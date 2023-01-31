@@ -23,6 +23,7 @@
 #define SEGMENTATION_L1_HPP
 
 #include <SegmentationL1ActionCount.hpp>
+#include <SegmentationL1ActionRandom.hpp>
 #include <SegmentationL1Context.hpp>
 class Editor;
 
@@ -44,6 +45,7 @@ private:
     SegmentationL1Context context_;
 
     SegmentationL1ActionCount actionCount_;
+    SegmentationL1ActionRandom actionRandom_;
 
     std::vector<SegmentationL1ActionInterface *> actions_;
     size_t currentAction_;

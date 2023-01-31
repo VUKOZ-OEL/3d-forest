@@ -30,6 +30,7 @@ SegmentationL1::SegmentationL1(Editor *editor) : context_(editor)
     LOG_DEBUG(<< "Create.");
 
     actions_.push_back(&actionCount_);
+    actions_.push_back(&actionRandom_);
 
     clear();
 }
