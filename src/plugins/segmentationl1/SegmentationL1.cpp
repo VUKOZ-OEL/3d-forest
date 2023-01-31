@@ -53,9 +53,13 @@ bool SegmentationL1::applyParameters(const SegmentationL1Parameters &parameters)
 
     size_t newAction = SegmentationL1::npos;
 
-    if ((context_.parameters.initialSamplesCount !=
-         parameters.initialSamplesCount) ||
-        (context_.parameters.initialSamplesDensityMinimum !=
+    if (context_.parameters.initialSamplesCount !=
+        parameters.initialSamplesCount)
+    {
+        newAction = 1;
+    }
+
+    if ((context_.parameters.initialSamplesDensityMinimum !=
          parameters.initialSamplesDensityMinimum) ||
         (context_.parameters.initialSamplesDensityMaximum !=
          parameters.initialSamplesDensityMaximum))
