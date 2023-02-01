@@ -41,6 +41,7 @@ class AlgorithmTabWidget : public QWidget
 
 public:
     AlgorithmTabWidget(MainWindow *mainWindow);
+    virtual ~AlgorithmTabWidget();
 
     void addItem(AlgorithmWidgetInterface *widget);
 

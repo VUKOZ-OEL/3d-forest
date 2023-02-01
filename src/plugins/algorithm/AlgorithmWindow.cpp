@@ -51,7 +51,7 @@ AlgorithmWindow::AlgorithmWindow(MainWindow *mainWindow)
       rejectButton_(nullptr),
       progressBar_(nullptr)
 {
-    LOG_DEBUG(<< "Create algorithm window.");
+    LOG_DEBUG(<< "Create.");
 
     // Load algorithm plugins.
     loadPlugins();
@@ -116,7 +116,7 @@ AlgorithmWindow::AlgorithmWindow(MainWindow *mainWindow)
 
 AlgorithmWindow::~AlgorithmWindow()
 {
-    LOG_DEBUG(<< "Destroy algorithm window.");
+    LOG_DEBUG(<< "Destroy.");
     thread_.stop();
 }
 
@@ -136,7 +136,7 @@ void AlgorithmWindow::slotReject()
 
 void AlgorithmWindow::showEvent(QShowEvent *event)
 {
-    LOG_DEBUG(<< "Show algorithm window.");
+    LOG_DEBUG(<< "Show.");
     QDialog::showEvent(event);
     mainWindow_->suspendThreads();
     resumeThreads(nullptr);
@@ -144,7 +144,7 @@ void AlgorithmWindow::showEvent(QShowEvent *event)
 
 void AlgorithmWindow::closeEvent(QCloseEvent *event)
 {
-    LOG_DEBUG(<< "Close algorithm window.");
+    LOG_DEBUG(<< "Close.");
     suspendThreads();
     mainWindow_->resumeThreads();
     QDialog::closeEvent(event);

@@ -38,7 +38,7 @@ AlgorithmTabWidget::AlgorithmTabWidget(MainWindow *mainWindow)
       treeWidget_(nullptr),
       widgetsLayout_(nullptr)
 {
-    LOG_DEBUG(<< "Create algorithm tab widget.");
+    LOG_DEBUG(<< "Create.");
 
     // Create the tree widget.
     treeWidget_ = new QTreeWidget();
@@ -77,6 +77,11 @@ AlgorithmTabWidget::AlgorithmTabWidget(MainWindow *mainWindow)
     mainLayout->setContentsMargins(1, 1, 1, 1);
 
     setLayout(mainLayout);
+}
+
+AlgorithmTabWidget::~AlgorithmTabWidget()
+{
+    LOG_DEBUG(<< "Destroy");
 }
 
 void AlgorithmTabWidget::addItem(AlgorithmWidgetInterface *widget)

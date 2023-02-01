@@ -22,19 +22,51 @@
 #ifndef SEGMENTATION_L1_ACTION_COUNT_HPP
 #define SEGMENTATION_L1_ACTION_COUNT_HPP
 
-#include <ProgressActionInterface.hpp>
-class Editor;
+#include <Editor.hpp>
+#include <SegmentationL1ActionInterface.hpp>
 
 /** Segmentation L1 Action Count. */
-class SegmentationL1ActionCount : public ProgressActionInterface
+class SegmentationL1ActionCount : public SegmentationL1ActionInterface
 {
 public:
-    SegmentationL1ActionCount();
-    virtual ~SegmentationL1ActionCount();
+    virtual void initialize(SegmentationL1Context *context)
+    {
+        context_ = context;
 
-    void initialize();
-    virtual void step();
-    void clear();
+        context_->reset();
+
+        context_->query.setWhere(context_->editor->viewports().where());
+        context_->query.exec();
+
+        if (context_->query.next())
+        {
+            context_->totalSamplesCount++;
+        }
+
+        uint64_t max = context_->editor->datasets().nPoints(
+            context_->query.where().dataset());
+
+        ProgressActionInterface::initialize(max, 1000UL);
+    }
+
+    virtual void step()
+    {
+        startTimer();
+        while (context_->query.next())
+        {
+            context_->totalSamplesCount++;
+            if (timedOut())
+            {
+                return;
+            }
+        }
+
+        context_->query.reset();
+        setProcessed(maximum());
+    }
+
+private:
+    SegmentationL1Context *context_;
 };
 
 #endif /* SEGMENTATION_L1_ACTION_COUNT_HPP */

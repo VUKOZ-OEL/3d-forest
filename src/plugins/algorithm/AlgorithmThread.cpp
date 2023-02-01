@@ -30,12 +30,12 @@
 
 AlgorithmThread::AlgorithmThread() : algorithm_(nullptr)
 {
-    LOG_DEBUG(<< "Create algorithm thread.");
+    LOG_DEBUG(<< "Create.");
 }
 
 AlgorithmThread::~AlgorithmThread()
 {
-    LOG_DEBUG(<< "Destroy algorithm thread.");
+    LOG_DEBUG(<< "Destroy.");
 }
 
 void AlgorithmThread::clear()
@@ -50,10 +50,12 @@ void AlgorithmThread::restart(AlgorithmWidgetInterface *algorithm)
     algorithm_ = algorithm;
     if (algorithm_)
     {
-        algorithm_->applyParameters();
+        bool restartRequired = algorithm_->applyParameters();
+        if (restartRequired)
+        {
+            Thread::start();
+        }
     }
-
-    Thread::start();
 }
 
 bool AlgorithmThread::compute()

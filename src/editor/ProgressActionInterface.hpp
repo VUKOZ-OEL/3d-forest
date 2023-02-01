@@ -45,6 +45,7 @@ public:
     bool end() const { return processed() >= maximum(); }
 
     double percent() const;
+    void setProcessed(uint64_t n) { nElementsProcessed_ = n; }
     uint64_t processed() const { return nElementsProcessed_; }
     uint64_t process() const { return nElements_ - nElementsProcessed_; }
     uint64_t maximum() const { return nElements_; }

@@ -19,44 +19,97 @@
 
 /** @file SegmentationL1.cpp */
 
-#include <ColorPalette.hpp>
 #include <Editor.hpp>
 #include <SegmentationL1.hpp>
-#include <Time.hpp>
 
 #define LOG_MODULE_NAME "SegmentationL1"
 #include <Log.hpp>
 
-SegmentationL1::SegmentationL1(Editor *editor)
-    : editor_(editor),
-      query_(editor_)
+SegmentationL1::SegmentationL1(Editor *editor) : context_(editor)
 {
-    LOG_DEBUG(<< "Create segmentation L1.");
+    LOG_DEBUG(<< "Create.");
+
+    actions_.push_back(&actionCount_);
+    actions_.push_back(&actionRandom_);
+
+    clear();
 }
 
 SegmentationL1::~SegmentationL1()
 {
-    LOG_DEBUG(<< "Destroy segmentation L1.");
+    LOG_DEBUG(<< "Destroy.");
 }
 
 void SegmentationL1::clear()
 {
     LOG_DEBUG(<< "Clear work data.");
-    query_.clear();
+    context_.clear();
+    currentAction_ = SegmentationL1::npos;
 }
 
-void SegmentationL1::applyParameters(const SegmentationL1Parameters &parameters)
+bool SegmentationL1::applyParameters(const SegmentationL1Parameters &parameters)
 {
     LOG_DEBUG(<< "Apply parameters <" << parameters << ">.");
+
+    size_t newAction = SegmentationL1::npos;
+
+    if (context_.parameters.initialSamplesCount !=
+        parameters.initialSamplesCount)
+    {
+        newAction = 1;
+    }
+
+    if ((context_.parameters.initialSamplesDensityMinimum !=
+         parameters.initialSamplesDensityMinimum) ||
+        (context_.parameters.initialSamplesDensityMaximum !=
+         parameters.initialSamplesDensityMaximum))
+    {
+        newAction = 0;
+    }
+
+    if (newAction < actions_.size())
+    {
+        currentAction_ = newAction;
+        context_.parameters = parameters;
+        initializeCurrentAction();
+        return true;
+    }
+
+    return false;
 }
 
 bool SegmentationL1::step()
 {
     LOG_DEBUG(<< "Compute the next step.");
-    return true;
+
+    if (currentAction_ < actions_.size())
+    {
+        actions_[currentAction_]->step();
+        if (actions_[currentAction_]->end())
+        {
+            // Move to the next action.
+            currentAction_++;
+            initializeCurrentAction();
+        }
+    }
+
+    return currentAction_ < actions_.size();
 }
 
 int SegmentationL1::progressPercent() const
 {
+    if (currentAction_ < actions_.size())
+    {
+        return static_cast<int>(actions_[currentAction_]->percent());
+    }
+
     return 100;
+}
+
+void SegmentationL1::initializeCurrentAction()
+{
+    if (currentAction_ < actions_.size())
+    {
+        actions_[currentAction_]->initialize(&context_);
+    }
 }

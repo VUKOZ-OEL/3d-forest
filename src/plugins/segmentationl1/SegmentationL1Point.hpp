@@ -17,35 +17,29 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationL1ActionCount.cpp */
+/** @file SegmentationL1Point.hpp */
 
-#include <Editor.hpp>
-#include <SegmentationL1ActionCount.hpp>
+#ifndef SEGMENTATION_L1_POINT_HPP
+#define SEGMENTATION_L1_POINT_HPP
 
-#define LOG_MODULE_NAME "SegmentationL1ActionCount"
-#include <Log.hpp>
+#include <cstdint>
+#include <sstream>
 
-SegmentationL1ActionCount::SegmentationL1ActionCount()
+/** Segmentation L1 Point. */
+class SegmentationL1Point
 {
-    LOG_DEBUG(<< "Called.");
+public:
+    uint64_t index;
+    double x;
+    double y;
+    double z;
+};
+
+inline std::ostream &operator<<(std::ostream &os,
+                                const SegmentationL1Point &obj)
+{
+    return os << "index <" << obj.index << "> x <" << obj.x << "> y <" << obj.y
+              << "> z <" << obj.z << ">";
 }
 
-SegmentationL1ActionCount::~SegmentationL1ActionCount()
-{
-    LOG_DEBUG(<< "Called.");
-}
-
-void SegmentationL1ActionCount::clear()
-{
-    LOG_DEBUG(<< "Called.");
-}
-
-void SegmentationL1ActionCount::initialize()
-{
-    LOG_DEBUG(<< "Called.");
-}
-
-void SegmentationL1ActionCount::step()
-{
-    LOG_DEBUG(<< "Called.");
-}
+#endif /* SEGMENTATION_L1_POINT_HPP */
