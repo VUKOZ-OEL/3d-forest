@@ -20,17 +20,14 @@ set(SUB_PROJECT_NAME "3DForestSegmentation")
 add_executable(
     ${SUB_PROJECT_NAME}
     segmentation.cpp
-#    ../../../plugins/segmentation/SegmentationElement.cpp
-#    ../../../plugins/segmentation/SegmentationElements.cpp
-#    ../../../plugins/segmentation/SegmentationMap.cpp
-#    ../../../plugins/segmentation/SegmentationThread.cpp
-#    ../../../plugins/segmentation/SegmentationActionCount.cpp
+    ../../../plugins/segmentationl1/SegmentationL1.cpp
+    ../../../plugins/segmentationl1/SegmentationL1Context.cpp
 )
 
 target_include_directories(
     ${SUB_PROJECT_NAME}
     PUBLIC
-#    ../../../plugins/segmentation
+    ../../../plugins/segmentationl1
     ../../../../3rdparty/stb
     ../../../../3rdparty/warnings
 )

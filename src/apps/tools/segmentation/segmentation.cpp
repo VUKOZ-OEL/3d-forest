@@ -24,16 +24,11 @@
 #include <ArgumentParser.hpp>
 #include <Editor.hpp>
 #include <Error.hpp>
+#include <SegmentationL1.hpp>
+
+#define LOG_MODULE_NAME "SegmentationTool"
 #include <Log.hpp>
-//#include <SegmentationThread.hpp>
 
-#include <WarningsOff.h>
-
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <stb_image_write.h>
-
-#include <WarningsOn.h>
-#if 0
 static void appendPoint(std::vector<LasFile::Point> *points,
                         int32_t x,
                         int32_t y,
@@ -70,89 +65,18 @@ static void createTestDataset(const std::string &path)
     IndexFileBuilder::index(path, path, settings);
 }
 
-static void saveVoxels(const Editor &editor, const std::string &path)
-{
-    const Voxels &voxels = editor.voxels();
-    const Layers &layers = editor.layers();
-
-    std::cout << "number of voxels <" << voxels.size() << ">" << std::endl;
-
-    std::vector<LasFile::Point> points;
-    points.resize(voxels.size());
-    for (size_t i = 0; i < voxels.size(); i++)
-    {
-        const Voxel &voxel = voxels.at(i);
-        memset(&points[i], 0, sizeof(LasFile::Point));
-
-        points[i].format = 7;
-
-        points[i].x = static_cast<int32_t>(voxel.meanX_);
-        points[i].y = static_cast<int32_t>(voxel.meanY_);
-        points[i].z = static_cast<int32_t>(voxel.meanZ_);
-
-        points[i].intensity = static_cast<uint16_t>(voxel.descriptor_ * 511.0F);
-
-        Vector3<float> c;
-        if (voxel.elementIndex_ > 0 && voxel.elementIndex_ < layers.size())
-        {
-            c = layers.color(voxel.elementIndex_);
-        }
-        points[i].red = static_cast<uint16_t>(c[0] * 65535.0F);
-        points[i].green = static_cast<uint16_t>(c[1] * 65535.0F);
-        points[i].blue = static_cast<uint16_t>(c[2] * 65535.0F);
-    }
-
-    LasFile::create(path, points, {0.0001, 0.0001, 0.0001}, {0, 0, 0});
-}
-
-static void saveMap(const SegmentationThread &st, const std::string &path)
-{
-    int w;
-    int h;
-    int components;
-    int rowBytes;
-    std::vector<unsigned char> image;
-
-    st.segmentationMap().toImage(&w, &h, &components, &rowBytes, &image);
-
-    stbi_write_png(path.c_str(), w, h, components, image.data(), rowBytes);
-}
-
 static void segmentation(const std::string &path,
-                         int voxelSize,
-                         int seedElevationMinimumPercent,
-                         int seedElevationMaximumPercent,
-                         int treeHeightMinimumPercent,
-                         int searchRadius,
-                         int neighborPoints,
-                         const std::string &outputVoxels,
-                         const std::string &outputMap)
+                         const SegmentationL1Parameters &parameters)
 {
-    // Open the file in editor.
+    // Open the input file in editor.
     Editor editor;
     editor.open(path);
 
     // Compute segmentation.
-    SegmentationThread segmentationThread(&editor);
-    segmentationThread.create();
-    segmentationThread.start(voxelSize,
-                             seedElevationMinimumPercent,
-                             seedElevationMaximumPercent,
-                             treeHeightMinimumPercent,
-                             searchRadius,
-                             neighborPoints);
-    segmentationThread.wait();
-
-    // Optional export.
-    if (!outputVoxels.empty())
-    {
-        saveVoxels(editor, outputVoxels);
-    }
-
-    if (!outputMap.empty())
-    {
-        saveMap(segmentationThread, outputMap);
-    }
+    SegmentationL1 segmentationL1(&editor);
+    segmentationL1.applyParameters(parameters);
+    while (segmentationL1.step())
+        ;
 }
 
 int main(int argc, char *argv[])
@@ -162,30 +86,16 @@ int main(int argc, char *argv[])
         ArgumentParser arg;
         arg.add("--input", "");
         arg.add("--test-data", "");
-        arg.add("--voxel-size", "10");
-        arg.add("--min", "1");
-        arg.add("--max", "5");
-        arg.add("--height", "10");
-        arg.add("--radius", "1000");
-        arg.add("--neighbors", "10");
-        arg.add("--output-voxels", "");
-        arg.add("--output-map", "");
         arg.parse(argc, argv);
+
+        SegmentationL1Parameters parameters;
 
         if (arg.contains("--test-data"))
         {
             createTestDataset(arg.toString("--input"));
         }
 
-        segmentation(arg.toString("--input"),
-                     arg.toInt("--voxel-size"),
-                     arg.toInt("--min"),
-                     arg.toInt("--max"),
-                     arg.toInt("--height"),
-                     arg.toInt("--radius"),
-                     arg.toInt("--neighbors"),
-                     arg.toString("--output-voxels"),
-                     arg.toString("--output-map"));
+        segmentation(arg.toString("--input"), parameters);
     }
     catch (std::exception &e)
     {
@@ -195,9 +105,3 @@ int main(int argc, char *argv[])
 
     return 0;
 }
-#else
-int main()
-{
-    return 0;
-}
-#endif
