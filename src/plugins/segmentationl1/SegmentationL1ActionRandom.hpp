@@ -43,6 +43,7 @@ public:
         }
         context_->initialSamplesCount = n;
         context_->points.resize(n);
+        context_->query.reset();
 
         initialSampleIndex_ = 0;
 

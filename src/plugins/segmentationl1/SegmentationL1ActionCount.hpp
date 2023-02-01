@@ -61,7 +61,6 @@ public:
             }
         }
 
-        context_->query.reset();
         setProcessed(maximum());
     }
 
