@@ -43,33 +43,26 @@ public:
             context_->totalSamplesCount++;
         }
 
-        ProgressActionInterface::initialize(ProgressActionInterface::npos,
-                                            1000UL);
+        uint64_t max = context_->editor->datasets().nPoints(
+            context_->query.where().dataset());
+
+        ProgressActionInterface::initialize(max, 1000UL);
     }
 
     virtual void step()
     {
-        if (initializing())
+        startTimer();
+        while (context_->query.next())
         {
-            startTimer();
-
-            while (context_->query.next())
+            context_->totalSamplesCount++;
+            if (timedOut())
             {
-                context_->totalSamplesCount++;
-
-                if (timedOut())
-                {
-                    return;
-                }
+                return;
             }
-
-            context_->query.reset();
-
-            ProgressActionInterface::initialize(context_->totalSamplesCount,
-                                                1000UL);
         }
 
-        increment(process());
+        context_->query.reset();
+        setProcessed(maximum());
     }
 
 private:
