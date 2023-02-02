@@ -23,6 +23,7 @@
 #define SEGMENTATION_L1_HPP
 
 #include <SegmentationL1ActionCount.hpp>
+#include <SegmentationL1ActionInitializePoints.hpp>
 #include <SegmentationL1ActionRandom.hpp>
 #include <SegmentationL1Context.hpp>
 class Editor;
@@ -41,11 +42,14 @@ public:
     bool step();
     int progressPercent() const;
 
+    const SegmentationL1Context &context() const { return context_; }
+
 private:
     SegmentationL1Context context_;
 
     SegmentationL1ActionCount actionCount_;
     SegmentationL1ActionRandom actionRandom_;
+    SegmentationL1ActionInitializePoints actionInitializePoints_;
 
     std::vector<SegmentationL1ActionInterface *> actions_;
     size_t currentAction_;
