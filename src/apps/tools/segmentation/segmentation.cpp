@@ -68,15 +68,25 @@ static void createTestDataset(const std::string &path)
 static void segmentation(const std::string &path,
                          const SegmentationL1Parameters &parameters)
 {
-    // Open the input file in editor.
+    std::cout << "Open file '" << path << "' in editor" << std::endl;
     Editor editor;
     editor.open(path);
 
-    // Compute segmentation.
+    std::cout << "Compute segmentation" << std::endl;
     SegmentationL1 segmentationL1(&editor);
     segmentationL1.applyParameters(parameters);
     while (segmentationL1.step())
         ;
+
+    std::cout << "Debug information" << std::endl;
+    const SegmentationL1Context &ctx = segmentationL1.context();
+    std::cout << ctx.totalSamplesCount << " total points" << std::endl;
+    std::cout << ctx.points.size() << " initial points" << std::endl;
+    for (size_t i = 0; i < ctx.points.size(); i++)
+    {
+        std::cout << "point[" << i << "] index " << ctx.points[i].index
+                  << std::endl;
+    }
 }
 
 int main(int argc, char *argv[])
