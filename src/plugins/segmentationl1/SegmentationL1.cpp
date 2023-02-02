@@ -29,8 +29,10 @@ SegmentationL1::SegmentationL1(Editor *editor) : context_(editor)
 {
     LOG_DEBUG(<< "Create.");
 
+    // Add individual actions from first to last.
     actions_.push_back(&actionCount_);
     actions_.push_back(&actionRandom_);
+    actions_.push_back(&actionInitializePoints_);
 
     clear();
 }
@@ -53,12 +55,14 @@ bool SegmentationL1::applyParameters(const SegmentationL1Parameters &parameters)
 
     size_t newAction = SegmentationL1::npos;
 
+    // The number of initial samples has been changed.
     if (context_.parameters.initialSamplesCount !=
         parameters.initialSamplesCount)
     {
         newAction = 1;
     }
 
+    // Filter for the number of initial samples has been changed.
     if ((context_.parameters.initialSamplesDensityMinimum !=
          parameters.initialSamplesDensityMinimum) ||
         (context_.parameters.initialSamplesDensityMaximum !=
@@ -69,12 +73,14 @@ bool SegmentationL1::applyParameters(const SegmentationL1Parameters &parameters)
 
     if (newAction < actions_.size())
     {
+        // Restart algorithm calculation from corresponding action.
         currentAction_ = newAction;
         context_.parameters = parameters;
         initializeCurrentAction();
         return true;
     }
 
+    // Nothing changed.
     return false;
 }
 
@@ -84,10 +90,13 @@ bool SegmentationL1::step()
 
     if (currentAction_ < actions_.size())
     {
+        // Compute one step in the current action.
         actions_[currentAction_]->step();
+
+        // Check if the current action is finished.
         if (actions_[currentAction_]->end())
         {
-            // Move to the next action.
+            // Yes, move to the next action.
             currentAction_++;
             initializeCurrentAction();
         }

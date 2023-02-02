@@ -66,7 +66,7 @@ bool AlgorithmThread::compute()
 
     if (algorithm_)
     {
-        finished = algorithm_->step();
+        finished = !algorithm_->step();
     }
     else
     {

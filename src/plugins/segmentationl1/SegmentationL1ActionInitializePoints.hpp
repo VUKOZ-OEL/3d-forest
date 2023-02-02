@@ -17,55 +17,53 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationL1ActionCount.hpp */
+/** @file SegmentationL1ActionInitializePoints.hpp */
 
-#ifndef SEGMENTATION_L1_ACTION_COUNT_HPP
-#define SEGMENTATION_L1_ACTION_COUNT_HPP
+#ifndef SEGMENTATION_L1_ACTION_INITIALIZE_POINTS_HPP
+#define SEGMENTATION_L1_ACTION_INITIALIZE_POINTS_HPP
 
 #include <Editor.hpp>
 #include <SegmentationL1ActionInterface.hpp>
 
-/** Segmentation L1 Action Count. */
-class SegmentationL1ActionCount : public SegmentationL1ActionInterface
+/** Segmentation L1 Initialize Points. */
+class SegmentationL1ActionInitializePoints
+    : public SegmentationL1ActionInterface
 {
 public:
     virtual void initialize(SegmentationL1Context *context)
     {
         context_ = context;
+        context_->query.reset();
+        index_ = 0;
 
-        context_->reset();
-
-        context_->query.setWhere(context_->editor->viewports().where());
-        context_->query.exec();
-
-        if (context_->query.next())
-        {
-            context_->totalSamplesCount++;
-        }
-
-        uint64_t max = context_->editor->datasets().nPoints(
-            context_->query.where().dataset());
-
-        ProgressActionInterface::initialize(max, 1000UL);
+        ProgressActionInterface::initialize(context_->totalSamplesCount,
+                                            1000UL);
     }
 
     virtual void step()
     {
+        uint64_t n = process();
+        uint64_t i = 0;
+
         startTimer();
-        while (context_->query.next())
+
+        while (i < n)
         {
-            context_->totalSamplesCount++;
+            i++;
+            index_++;
+
             if (timedOut())
             {
-                return;
+                break;
             }
         }
 
-        setProcessed(maximum());
+        increment(i);
     }
 
 private:
     SegmentationL1Context *context_;
+    size_t index_;
 };
 
-#endif /* SEGMENTATION_L1_ACTION_COUNT_HPP */
+#endif /* SEGMENTATION_L1_ACTION_INITIALIZE_POINTS_HPP */
