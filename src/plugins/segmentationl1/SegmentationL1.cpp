@@ -84,14 +84,14 @@ bool SegmentationL1::applyParameters(const SegmentationL1Parameters &parameters)
     return false;
 }
 
-bool SegmentationL1::step()
+bool SegmentationL1::next()
 {
     LOG_DEBUG(<< "Compute the next step.");
 
     if (currentAction_ < actions_.size())
     {
         // Compute one step in the current action.
-        actions_[currentAction_]->step();
+        actions_[currentAction_]->next();
 
         // Check if the current action is finished.
         if (actions_[currentAction_]->end())

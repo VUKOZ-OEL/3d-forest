@@ -37,7 +37,7 @@ static void classificationCompute(const std::string &inputPath,
     classification.initialize(pointsPerCell);
     while (!classification.end())
     {
-        classification.step();
+        classification.next();
     }
 }
 

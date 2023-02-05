@@ -45,7 +45,7 @@ public:
     void stop();
     void wait();
 
-    virtual bool compute() = 0;
+    virtual bool next() = 0;
 
 protected:
     std::shared_ptr<std::thread> thread_;

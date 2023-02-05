@@ -70,7 +70,7 @@ void ClassificationAction::initialize(size_t pointsPerCell,
     ProgressActionInterface::initialize(numberOfSteps, 1UL);
 }
 
-void ClassificationAction::step()
+void ClassificationAction::next()
 {
     if (query_.nextGrid())
     {

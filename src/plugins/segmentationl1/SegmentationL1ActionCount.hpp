@@ -49,7 +49,7 @@ public:
         ProgressActionInterface::initialize(max, 1000UL);
     }
 
-    virtual void step()
+    virtual void next()
     {
         startTimer();
         while (context_->query.next())

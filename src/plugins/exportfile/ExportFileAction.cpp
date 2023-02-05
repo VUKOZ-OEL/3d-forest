@@ -78,7 +78,7 @@ void ExportFileAction::clear()
     query_.clear();
 }
 
-void ExportFileAction::step()
+void ExportFileAction::next()
 {
     if (initializing())
     {

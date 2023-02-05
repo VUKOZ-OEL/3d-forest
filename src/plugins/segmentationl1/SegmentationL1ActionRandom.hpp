@@ -50,7 +50,7 @@ public:
                                             1000UL);
     }
 
-    virtual void step()
+    virtual void next()
     {
         uint64_t n = process();
         uint64_t i = 0;

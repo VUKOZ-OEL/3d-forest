@@ -39,7 +39,7 @@ static void elevationCompute(const std::string &inputPath,
     elevation.initialize(pointsPerCell, cellLengthMinPercent);
     while (!elevation.end())
     {
-        elevation.step();
+        elevation.next();
 
         if (!outputGroundMesh.empty())
         {

@@ -117,10 +117,10 @@ bool SegmentationL1Window::applyParameters()
     return segmentationL1_.applyParameters(parameters_);
 }
 
-bool SegmentationL1Window::step()
+bool SegmentationL1Window::next()
 {
     LOG_DEBUG(<< "Compute the next step.");
-    return segmentationL1_.step();
+    return segmentationL1_.next();
 }
 
 int SegmentationL1Window::progressPercent()

@@ -413,34 +413,34 @@ bool Page::nextState()
             // std::cout << "unknown error\n";
         }
 
-        return false;
+        return true;
     }
 
     if (state_ == Page::STATE_TRANSFORM)
     {
         transform();
-        return false;
+        return true;
     }
 
     if (state_ == Page::STATE_SELECT)
     {
         LOG_DEBUG(<< "Page pageId <" << pageId_ << "> state <STATE_SELECT>.");
         queryWhere();
-        return false;
+        return true;
     }
 
     if (state_ == Page::STATE_RUN_MODIFIERS)
     {
         runModifiers();
-        return false;
+        return true;
     }
 
     if (state_ == Page::STATE_RENDER)
     {
-        return false;
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 void Page::queryWhereBox()

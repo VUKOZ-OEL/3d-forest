@@ -36,7 +36,7 @@ public:
 
     void render(size_t viewportId, const Camera &camera);
 
-    virtual bool compute();
+    virtual bool next();
 
 protected:
     Editor *editor_;

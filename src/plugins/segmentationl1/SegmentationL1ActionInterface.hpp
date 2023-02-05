@@ -33,7 +33,7 @@ public:
     virtual ~SegmentationL1ActionInterface() = default;
 
     virtual void initialize(SegmentationL1Context *context) = 0;
-    virtual void step() = 0;
+    virtual void next() = 0;
 };
 
 #endif /* SEGMENTATION_L1_ACTION_INTERFACE_HPP */

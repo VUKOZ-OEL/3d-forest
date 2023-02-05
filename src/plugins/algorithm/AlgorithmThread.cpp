@@ -58,7 +58,7 @@ void AlgorithmThread::restart(AlgorithmWidgetInterface *algorithm)
     }
 }
 
-bool AlgorithmThread::compute()
+bool AlgorithmThread::next()
 {
     LOG_DEBUG(<< "Compute the next step.");
 
@@ -66,7 +66,7 @@ bool AlgorithmThread::compute()
 
     if (algorithm_)
     {
-        finished = !algorithm_->step();
+        finished = !algorithm_->next();
     }
     else
     {
@@ -80,7 +80,7 @@ bool AlgorithmThread::compute()
         callback_->threadProgress(finished);
     }
 
-    return finished;
+    return !finished;
 }
 
 int AlgorithmThread::progressPercent() const

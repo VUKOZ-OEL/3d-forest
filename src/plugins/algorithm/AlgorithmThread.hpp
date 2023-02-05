@@ -36,7 +36,7 @@ public:
 
     void clear();
     void restart(AlgorithmWidgetInterface *algorithm);
-    virtual bool compute();
+    virtual bool next();
     int progressPercent() const;
     void updateData();
 

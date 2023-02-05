@@ -215,14 +215,14 @@ bool Query::nextState()
 
     for (size_t i = 0; i < lru_.size(); i++)
     {
-        bool finished = lru_[i]->nextState();
-        if (!finished)
+        bool continuing = lru_[i]->nextState();
+        if (continuing)
         {
-            return false;
+            return true;
         }
     }
 
-    return true;
+    return false;
 }
 
 void Query::applyCamera(const Camera &camera)

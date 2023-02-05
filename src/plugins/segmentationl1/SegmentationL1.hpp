@@ -39,7 +39,7 @@ public:
 
     void clear();
     bool applyParameters(const SegmentationL1Parameters &parameters);
-    bool step();
+    bool next();
     int progressPercent() const;
 
     const SegmentationL1Context &context() const { return context_; }

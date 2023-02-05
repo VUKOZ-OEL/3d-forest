@@ -81,15 +81,15 @@ void Viewports::setState(Page::State state)
 
 bool Viewports::nextState()
 {
-    bool rval = true;
+    bool continuing = false;
 
     for (auto &it : viewports_)
     {
-        if (!it->nextState())
+        if (it->nextState())
         {
-            rval = false;
+            continuing = true;
         }
     }
 
-    return rval;
+    return continuing;
 }

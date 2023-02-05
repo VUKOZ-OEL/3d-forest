@@ -35,7 +35,7 @@ public:
     virtual ~DensityAction();
 
     void initialize(double radius);
-    virtual void step();
+    virtual void next();
     void clear();
 
     size_t minimum() const { return densityMinimum_; }

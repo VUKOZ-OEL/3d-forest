@@ -38,7 +38,7 @@ public:
                     double cellLengthMinPercent = 1.,
                     double groundErrorPercent = 15.,
                     double angleDeg = 60.);
-    virtual void step();
+    virtual void next();
     void clear();
 
 protected:

@@ -30,9 +30,9 @@ class MyThread : public Thread
 public:
     MyThread() : counter_(0) {}
 
-    virtual bool compute()
+    virtual bool next()
     {
-        std::cout << "MyThread::compute::counter=" << counter_ << std::endl;
+        std::cout << "MyThread::next::counter=" << counter_ << std::endl;
 
         Time::msleep(1000);
         counter_++;
@@ -43,7 +43,7 @@ public:
             callback_->threadProgress(finished);
         }
 
-        return finished;
+        return !finished;
     }
 
 private:

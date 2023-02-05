@@ -42,7 +42,7 @@ public:
     const QString &text() { return text_; }
 
     virtual bool applyParameters() = 0;
-    virtual bool step() = 0;
+    virtual bool next() = 0;
     virtual int progressPercent() = 0;
     virtual void updateData() = 0;
 
