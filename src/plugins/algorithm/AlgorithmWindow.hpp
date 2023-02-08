@@ -46,10 +46,13 @@ public:
 
 public slots:
     void slotParametersChanged();
-    void slotThread(bool finished, int progressPercent);
+    void slotThread(bool finished, size_t nTasks, size_t iTask, double percent);
 
 signals:
-    void signalThread(bool finished, int progressPercent);
+    void signalThread(bool finished,
+                      size_t nTasks,
+                      size_t iTask,
+                      double percent);
 
 protected slots:
     void slotAccept();
@@ -62,6 +65,8 @@ private:
 
     QPushButton *acceptButton_;
     QPushButton *rejectButton_;
+
+    QProgressBar *progressBarTask_;
     QProgressBar *progressBar_;
 
     std::vector<AlgorithmPluginInterface *> plugins_;
@@ -78,7 +83,8 @@ private:
     void loadPlugins();
     void loadPlugin(const QString &fileName, QObject *plugin);
 
-    void setProgressBarPercent(int percent);
+    void setProgressBar(size_t nTasks, size_t iTask, double percent);
+    void resetProgressBar();
 };
 
 #endif /* ALGORITHM_WINDOW_HPP */

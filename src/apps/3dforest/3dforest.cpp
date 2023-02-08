@@ -39,6 +39,8 @@ int main(int argc, char *argv[])
 
     try
     {
+        (void)qRegisterMetaType<size_t>("size_t");
+
         QApplication app(argc, argv);
 
         app.setOrganizationName("VUKOZ v.v.i.");

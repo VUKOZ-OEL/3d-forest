@@ -40,7 +40,7 @@ public:
     void clear();
     bool applyParameters(const SegmentationL1Parameters &parameters);
     bool next();
-    int progressPercent() const;
+    void progress(size_t &nTasks, size_t &iTask, double &percent) const;
 
     const SegmentationL1Context &context() const { return context_; }
 

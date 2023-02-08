@@ -42,7 +42,7 @@ public:
     /**@{*/
     virtual bool applyParameters();
     virtual bool next();
-    virtual int progressPercent();
+    virtual void progress(size_t &nTasks, size_t &iTask, double &percent) const;
     virtual void updateData();
     /**@}*/
 

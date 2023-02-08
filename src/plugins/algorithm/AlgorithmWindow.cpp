@@ -49,6 +49,7 @@ AlgorithmWindow::AlgorithmWindow(MainWindow *mainWindow)
       menu_(nullptr),
       acceptButton_(nullptr),
       rejectButton_(nullptr),
+      progressBarTask_(nullptr),
       progressBar_(nullptr)
 {
     LOG_DEBUG(<< "Create.");
@@ -68,10 +69,14 @@ AlgorithmWindow::AlgorithmWindow(MainWindow *mainWindow)
     }
 
     // Create progress bar.
+    progressBarTask_ = new QProgressBar;
+    progressBarTask_->setRange(0, 100);
+
     progressBar_ = new QProgressBar;
     progressBar_->setRange(0, 100);
 
-    QHBoxLayout *progressBarLayout = new QHBoxLayout;
+    QVBoxLayout *progressBarLayout = new QVBoxLayout;
+    progressBarLayout->addWidget(progressBarTask_);
     progressBarLayout->addWidget(progressBar_);
     progressBarLayout->setContentsMargins(0, 0, 0, 0);
 
@@ -105,9 +110,9 @@ AlgorithmWindow::AlgorithmWindow(MainWindow *mainWindow)
 
     // Connect the worker thread to gui thread.
     connect(this,
-            SIGNAL(signalThread(bool, int)),
+            SIGNAL(signalThread(bool, size_t, size_t, double)),
             this,
-            SLOT(slotThread(bool, int)),
+            SLOT(slotThread(bool, size_t, size_t, double)),
             Qt::QueuedConnection);
 
     thread_.setCallback(this);
@@ -167,18 +172,29 @@ void AlgorithmWindow::slotParametersChanged()
 
 void AlgorithmWindow::threadProgress(bool finished)
 {
+    size_t nTasks = 0;
+    size_t iTask = 0;
+    double percent = 100.0;
+
+    thread_.progress(nTasks, iTask, percent);
+
     LOG_DEBUG(<< "In worker thread: notify gui thread through queued signal."
-              << " Parameter finished <" << finished << ">.");
-    emit signalThread(finished, thread_.progressPercent());
+              << " Parameter finished <" << finished << "> nTasks <" << nTasks
+              << "> iTask <" << iTask << "> percent <" << percent << ">.");
+
+    emit signalThread(finished, nTasks, iTask, percent);
 }
 
-void AlgorithmWindow::slotThread(bool finished, int progressPercent)
+void AlgorithmWindow::slotThread(bool finished,
+                                 size_t nTasks,
+                                 size_t iTask,
+                                 double percent)
 {
     LOG_DEBUG(<< "In gui thread: update progress."
-              << " Parameters finished <" << finished << "> progress <"
-              << progressPercent << ">.");
+              << " Parameters finished <" << finished << "> nTasks <" << nTasks
+              << "> iTask <" << iTask << "> percent <" << percent << ">.");
 
-    setProgressBarPercent(progressPercent);
+    setProgressBar(nTasks, iTask, percent);
 
     if (finished)
     {
@@ -187,18 +203,56 @@ void AlgorithmWindow::slotThread(bool finished, int progressPercent)
     }
 }
 
+void AlgorithmWindow::setProgressBar(size_t nTasks,
+                                     size_t iTask,
+                                     double percent)
+{
+    int progressBarTaskPercent;
+    if (nTasks > 0)
+    {
+        progressBarTaskPercent = static_cast<int>(
+            (static_cast<double>(iTask) / static_cast<double>(nTasks)) * 100.0);
+    }
+    else
+    {
+        progressBarTaskPercent = 100;
+    }
+    LOG_DEBUG(<< "progressBarTaskPercent <" << progressBarTaskPercent << ">.");
+    progressBarTask_->setValue(progressBarTaskPercent);
+
+    int progressBarPercent = static_cast<int>(percent);
+    LOG_DEBUG(<< "progressBarPercent <" << progressBarPercent << ">.");
+    progressBar_->setValue(progressBarPercent);
+#if 0
+    if (percent > 0 && percent < 100)
+    {
+        progressBar_->setVisible(true);
+    }
+    else
+    {
+        progressBar_->setVisible(false);
+    }
+#endif
+}
+
+void AlgorithmWindow::resetProgressBar()
+{
+    progressBarTask_->setValue(0);
+    progressBar_->setValue(0);
+}
+
 void AlgorithmWindow::suspendThreads()
 {
     LOG_DEBUG(<< "In gui thread: cancel task in worker thread.");
     thread_.cancel();
-    setProgressBarPercent(0);
+    resetProgressBar();
 }
 
 void AlgorithmWindow::resumeThreads(AlgorithmWidgetInterface *algorithm)
 {
     LOG_DEBUG(<< "In gui thread: start new task in worker thread.");
     thread_.cancel();
-    setProgressBarPercent(0);
+    resetProgressBar();
     thread_.restart(algorithm);
 }
 
@@ -242,19 +296,4 @@ void AlgorithmWindow::loadPlugin(const QString &fileName, QObject *plugin)
                   << ">.");
         (void)fileName;
     }
-}
-
-void AlgorithmWindow::setProgressBarPercent(int percent)
-{
-    progressBar_->setValue(percent);
-#if 0
-    if (percent > 0 && percent < 100)
-    {
-        progressBar_->setVisible(true);
-    }
-    else
-    {
-        progressBar_->setVisible(false);
-    }
-#endif
 }

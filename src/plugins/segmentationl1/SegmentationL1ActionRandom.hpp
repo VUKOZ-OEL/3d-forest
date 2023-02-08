@@ -43,6 +43,10 @@ public:
             double p = static_cast<double>(c) * 0.01;
             n = static_cast<uint64_t>(static_cast<double>(max) * p);
         }
+        if (n == 0 && max > 0)
+        {
+            n = 1;
+        }
         context_->initialSamplesCount = n;
         context_->points.resize(n);
 

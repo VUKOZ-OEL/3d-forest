@@ -123,9 +123,11 @@ bool SegmentationL1Window::next()
     return segmentationL1_.next();
 }
 
-int SegmentationL1Window::progressPercent()
+void SegmentationL1Window::progress(size_t &nTasks,
+                                    size_t &iTask,
+                                    double &percent) const
 {
-    return segmentationL1_.progressPercent();
+    segmentationL1_.progress(nTasks, iTask, percent);
 }
 
 void SegmentationL1Window::updateData()

@@ -37,7 +37,7 @@ public:
     void clear();
     void restart(AlgorithmWidgetInterface *algorithm);
     virtual bool next();
-    int progressPercent() const;
+    void progress(size_t &nTasks, size_t &iTask, double &percent) const;
     void updateData();
 
 private:

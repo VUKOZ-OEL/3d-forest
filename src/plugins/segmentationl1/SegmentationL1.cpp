@@ -105,14 +105,22 @@ bool SegmentationL1::next()
     return currentAction_ < actions_.size();
 }
 
-int SegmentationL1::progressPercent() const
+void SegmentationL1::progress(size_t &nTasks,
+                              size_t &iTask,
+                              double &percent) const
 {
+    nTasks = actions_.size();
+
     if (currentAction_ < actions_.size())
     {
-        return static_cast<int>(actions_[currentAction_]->percent());
+        iTask = currentAction_;
+        percent = actions_[currentAction_]->percent();
     }
-
-    return 100;
+    else
+    {
+        iTask = nTasks;
+        percent = 100.0;
+    }
 }
 
 void SegmentationL1::initializeCurrentAction()
