@@ -42,7 +42,7 @@ public:
     virtual ~DescriptorAction();
 
     void initialize(double radius, double voxelSize, Method method);
-    virtual void step();
+    virtual void next();
     void clear();
 
     float minimum() const { return descriptorMinimum_; }

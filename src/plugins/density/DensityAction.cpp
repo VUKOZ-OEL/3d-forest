@@ -83,7 +83,7 @@ void DensityAction::initialize(double radius)
     ProgressActionInterface::initialize(ProgressActionInterface::npos, 1000UL);
 }
 
-void DensityAction::step()
+void DensityAction::next()
 {
     if (initializing())
     {

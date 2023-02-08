@@ -82,7 +82,7 @@ void ElevationAction::initialize(size_t pointsPerCell,
     ProgressActionInterface::initialize(numberOfSteps, 1UL);
 }
 
-void ElevationAction::step()
+void ElevationAction::next()
 {
     if (query_.nextGrid())
     {

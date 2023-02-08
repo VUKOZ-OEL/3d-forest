@@ -48,7 +48,7 @@ void RenderThread::render(size_t viewportId, const Camera &camera)
     Thread::start();
 }
 
-bool RenderThread::compute()
+bool RenderThread::next()
 {
     LOG_DEBUG(<< "Computation is initialized <" << initialized_ << ">.");
     if (!initialized_)
@@ -59,7 +59,7 @@ bool RenderThread::compute()
         editor_->viewports().applyCamera(viewportId_, camera_);
         editor_->unlock();
         initialized_ = true;
-        return false;
+        return true;
     }
 
     LOG_DEBUG(<< "Compute nextState.");
@@ -67,7 +67,7 @@ bool RenderThread::compute()
     double t1 = Time::realTime();
     bool finished;
     editor_->lock();
-    finished = editor_->viewports().nextState();
+    finished = !editor_->viewports().nextState();
     editor_->unlock();
     double t2 = Time::realTime();
     double msec = (t2 - t1) * 1000.;
@@ -86,5 +86,5 @@ bool RenderThread::compute()
         Time::msleep(1);
     }
 
-    return finished;
+    return !finished;
 }

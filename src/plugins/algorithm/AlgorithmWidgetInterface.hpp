@@ -42,8 +42,10 @@ public:
     const QString &text() { return text_; }
 
     virtual bool applyParameters() = 0;
-    virtual bool step() = 0;
-    virtual int progressPercent() = 0;
+    virtual bool next() = 0;
+    virtual void progress(size_t &nTasks,
+                          size_t &iTask,
+                          double &percent) const = 0;
     virtual void updateData() = 0;
 
 signals:

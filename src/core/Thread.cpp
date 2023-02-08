@@ -156,10 +156,10 @@ void Thread::runLoop()
 
         if (!finished)
         {
-            LOG_DEBUG(<< "Call compute function.");
+            LOG_DEBUG(<< "Call next function.");
             try
             {
-                finished = compute();
+                finished = !next();
             }
             catch (std::exception &e)
             {

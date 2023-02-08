@@ -93,7 +93,7 @@ void DescriptorAction::initialize(double radius,
     ProgressActionInterface::initialize(ProgressActionInterface::npos, 1000UL);
 }
 
-void DescriptorAction::step()
+void DescriptorAction::next()
 {
     if (initializing())
     {

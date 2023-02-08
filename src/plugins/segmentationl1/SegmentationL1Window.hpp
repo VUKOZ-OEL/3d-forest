@@ -41,8 +41,8 @@ public:
     /** @name Algorithm interface. */
     /**@{*/
     virtual bool applyParameters();
-    virtual bool step();
-    virtual int progressPercent();
+    virtual bool next();
+    virtual void progress(size_t &nTasks, size_t &iTask, double &percent) const;
     virtual void updateData();
     /**@}*/
 

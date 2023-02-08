@@ -84,14 +84,14 @@ bool SegmentationL1::applyParameters(const SegmentationL1Parameters &parameters)
     return false;
 }
 
-bool SegmentationL1::step()
+bool SegmentationL1::next()
 {
     LOG_DEBUG(<< "Compute the next step.");
 
     if (currentAction_ < actions_.size())
     {
         // Compute one step in the current action.
-        actions_[currentAction_]->step();
+        actions_[currentAction_]->next();
 
         // Check if the current action is finished.
         if (actions_[currentAction_]->end())
@@ -105,14 +105,22 @@ bool SegmentationL1::step()
     return currentAction_ < actions_.size();
 }
 
-int SegmentationL1::progressPercent() const
+void SegmentationL1::progress(size_t &nTasks,
+                              size_t &iTask,
+                              double &percent) const
 {
+    nTasks = actions_.size();
+
     if (currentAction_ < actions_.size())
     {
-        return static_cast<int>(actions_[currentAction_]->percent());
+        iTask = currentAction_;
+        percent = actions_[currentAction_]->percent();
     }
-
-    return 100;
+    else
+    {
+        iTask = nTasks;
+        percent = 100.0;
+    }
 }
 
 void SegmentationL1::initializeCurrentAction()

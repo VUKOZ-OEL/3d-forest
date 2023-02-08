@@ -38,7 +38,7 @@ public:
 
     void initialize(size_t pointsPerCell = 10000,
                     double cellLengthMinPercent = 1.);
-    virtual void step();
+    virtual void next();
     void exportGroundMesh(const std::string &path);
     void clear();
 

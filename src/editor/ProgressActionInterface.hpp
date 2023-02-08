@@ -35,7 +35,7 @@ public:
     ProgressActionInterface();
     virtual ~ProgressActionInterface() = default;
 
-    virtual void step() = 0;
+    virtual void next() = 0;
 
     void initialize(uint64_t nElements = npos,
                     uint64_t interleave = 1,

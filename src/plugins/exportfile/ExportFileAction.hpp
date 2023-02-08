@@ -41,7 +41,7 @@ public:
                     const ExportFileProperties &properties);
     void clear();
 
-    virtual void step();
+    virtual void next();
 
 private:
     Editor *editor_;

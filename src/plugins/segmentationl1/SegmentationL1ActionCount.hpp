@@ -36,6 +36,22 @@ public:
         context_->reset();
 
         context_->query.setWhere(context_->editor->viewports().where());
+
+        Range<float> densityFilter;
+        densityFilter.set(
+            0,
+            100,
+            static_cast<float>(
+                context_->parameters.initialSamplesDensityMinimum),
+            static_cast<float>(
+                context_->parameters.initialSamplesDensityMaximum));
+
+        if (!densityFilter.hasBoundaryValues())
+        {
+            densityFilter.setEnabled(true);
+            context_->query.where().setDensity(densityFilter);
+        }
+
         context_->query.exec();
 
         if (context_->query.next())
@@ -49,7 +65,7 @@ public:
         ProgressActionInterface::initialize(max, 1000UL);
     }
 
-    virtual void step()
+    virtual void next()
     {
         startTimer();
         while (context_->query.next())
