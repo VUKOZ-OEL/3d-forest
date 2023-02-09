@@ -102,10 +102,13 @@ int main(int argc, char *argv[])
     {
         ArgumentParser arg;
         arg.add("--input", "");
+        arg.add("--count", "");
         arg.add("--test-data", "");
         arg.parse(argc, argv);
 
         SegmentationL1Parameters parameters;
+
+        (void)arg.read("--count", parameters.initialSamplesCount);
 
         if (arg.contains("--test-data"))
         {
