@@ -19,9 +19,9 @@
 
 /** @file ProjectNavigatorItemDensity.cpp */
 
+#include <DoubleRangeSliderWidget.hpp>
 #include <MainWindow.hpp>
 #include <ProjectNavigatorItemDensity.hpp>
-#include <RangeSliderWidget.hpp>
 
 #include <QVBoxLayout>
 
@@ -31,18 +31,18 @@ ProjectNavigatorItemDensity::ProjectNavigatorItemDensity(MainWindow *mainWindow,
     : ProjectNavigatorItem(mainWindow, icon, text)
 {
     // Input widgets
-    RangeSliderWidget::create(densityInput_,
-                              this,
-                              SLOT(slotRangeIntermediateMinimumValue()),
-                              SLOT(slotRangeIntermediateMaximumValue()),
-                              tr("Density"),
-                              tr("Min-max density range filter"),
-                              tr("pt"),
-                              1,
-                              0,
-                              100,
-                              0,
-                              100);
+    DoubleRangeSliderWidget::create(densityInput_,
+                                    this,
+                                    SLOT(slotRangeIntermediateMinimumValue()),
+                                    SLOT(slotRangeIntermediateMaximumValue()),
+                                    tr("Density"),
+                                    tr("Min-max density range filter"),
+                                    tr("pt"),
+                                    1,
+                                    0,
+                                    100,
+                                    0,
+                                    100);
 
     // Layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -83,13 +83,15 @@ void ProjectNavigatorItemDensity::slotUpdate(void *sender,
 
 void ProjectNavigatorItemDensity::slotRangeIntermediateMinimumValue()
 {
-    densityRange_.setMinimumValue(densityInput_->minimumValue() * 0.0039216F);
+    densityRange_.setMinimumValue(
+        static_cast<float>(densityInput_->minimumValue()) * 0.0039216F);
     densityInputChanged();
 }
 
 void ProjectNavigatorItemDensity::slotRangeIntermediateMaximumValue()
 {
-    densityRange_.setMaximumValue(densityInput_->maximumValue() * 0.0039216F);
+    densityRange_.setMaximumValue(
+        static_cast<float>(densityInput_->maximumValue()) * 0.0039216F);
     densityInputChanged();
 }
 
