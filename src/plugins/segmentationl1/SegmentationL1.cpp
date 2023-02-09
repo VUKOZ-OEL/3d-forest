@@ -23,6 +23,7 @@
 #include <SegmentationL1.hpp>
 
 #define LOG_MODULE_NAME "SegmentationL1"
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 SegmentationL1::SegmentationL1(Editor *editor) : context_(editor)
