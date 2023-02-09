@@ -23,6 +23,7 @@
 #include <SegmentationL1.hpp>
 
 #define LOG_MODULE_NAME "SegmentationL1"
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 SegmentationL1::SegmentationL1(Editor *editor) : context_(editor)
@@ -30,9 +31,10 @@ SegmentationL1::SegmentationL1(Editor *editor) : context_(editor)
     LOG_DEBUG(<< "Create.");
 
     // Add individual actions from first to last.
-    actions_.push_back(&actionCount_);
-    actions_.push_back(&actionRandom_);
-    actions_.push_back(&actionInitializePoints_);
+    tasks_.push_back(&taskCount_);
+    tasks_.push_back(&taskRandom_);
+    tasks_.push_back(&taskSample_);
+    tasks_.push_back(&taskMedian_);
 
     clear();
 }
@@ -71,7 +73,7 @@ bool SegmentationL1::applyParameters(const SegmentationL1Parameters &parameters)
         newAction = 0;
     }
 
-    if (newAction < actions_.size())
+    if (newAction < tasks_.size())
     {
         // Restart algorithm calculation from corresponding action.
         currentAction_ = newAction;
@@ -88,13 +90,13 @@ bool SegmentationL1::next()
 {
     LOG_DEBUG(<< "Compute the next step.");
 
-    if (currentAction_ < actions_.size())
+    if (currentAction_ < tasks_.size())
     {
         // Compute one step in the current action.
-        actions_[currentAction_]->next();
+        tasks_[currentAction_]->next();
 
         // Check if the current action is finished.
-        if (actions_[currentAction_]->end())
+        if (tasks_[currentAction_]->end())
         {
             // Yes, move to the next action.
             currentAction_++;
@@ -102,19 +104,19 @@ bool SegmentationL1::next()
         }
     }
 
-    return currentAction_ < actions_.size();
+    return currentAction_ < tasks_.size();
 }
 
 void SegmentationL1::progress(size_t &nTasks,
                               size_t &iTask,
                               double &percent) const
 {
-    nTasks = actions_.size();
+    nTasks = tasks_.size();
 
-    if (currentAction_ < actions_.size())
+    if (currentAction_ < tasks_.size())
     {
         iTask = currentAction_;
-        percent = actions_[currentAction_]->percent();
+        percent = tasks_[currentAction_]->percent();
     }
     else
     {
@@ -125,8 +127,8 @@ void SegmentationL1::progress(size_t &nTasks,
 
 void SegmentationL1::initializeCurrentAction()
 {
-    if (currentAction_ < actions_.size())
+    if (currentAction_ < tasks_.size())
     {
-        actions_[currentAction_]->initialize(&context_);
+        tasks_[currentAction_]->initialize(&context_);
     }
 }

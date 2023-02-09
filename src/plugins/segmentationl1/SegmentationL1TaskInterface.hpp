@@ -17,23 +17,23 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationL1ActionInterface.hpp */
+/** @file SegmentationL1TaskInterface.hpp */
 
-#ifndef SEGMENTATION_L1_ACTION_INTERFACE_HPP
-#define SEGMENTATION_L1_ACTION_INTERFACE_HPP
+#ifndef SEGMENTATION_L1_TASK_INTERFACE_HPP
+#define SEGMENTATION_L1_TASK_INTERFACE_HPP
 
 #include <ProgressActionInterface.hpp>
 #include <SegmentationL1Context.hpp>
 
-/** Segmentation L1 Action Interface. */
-class SegmentationL1ActionInterface : public ProgressActionInterface
+/** Segmentation L1 Task Interface. */
+class SegmentationL1TaskInterface : public ProgressActionInterface
 {
 public:
-    SegmentationL1ActionInterface() : ProgressActionInterface(){};
-    virtual ~SegmentationL1ActionInterface() = default;
+    SegmentationL1TaskInterface() : ProgressActionInterface(){};
+    virtual ~SegmentationL1TaskInterface() = default;
 
     virtual void initialize(SegmentationL1Context *context) = 0;
     virtual void next() = 0;
 };
 
-#endif /* SEGMENTATION_L1_ACTION_INTERFACE_HPP */
+#endif /* SEGMENTATION_L1_TASK_INTERFACE_HPP */

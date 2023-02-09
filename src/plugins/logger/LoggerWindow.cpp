@@ -84,27 +84,8 @@ void LoggerWindow::slotPrintln(const QString &time,
                                const QString &module,
                                const QString &function)
 {
-    const char *messageType = " ";
-    switch (type)
-    {
-        case LOG_TYPE_DEBUG:
-            messageType = " DBG ";
-            break;
-        case LOG_TYPE_WARNING:
-            messageType = " WRN ";
-            break;
-        case LOG_TYPE_ERROR:
-            messageType = " ERR ";
-            break;
-        case LOG_TYPE_INFO:
-            messageType = " INF ";
-            break;
-        default:
-            break;
-    }
-
-    textEdit_->append(time + messageType + text + " [" + module + ":" +
-                      function + "]");
+    textEdit_->append(time + QString(LogMessage::typeString(type)) + text +
+                      " [" + module + ":" + function + "]");
 }
 
 static void loggerWindowQtMessageHandler(QtMsgType type,

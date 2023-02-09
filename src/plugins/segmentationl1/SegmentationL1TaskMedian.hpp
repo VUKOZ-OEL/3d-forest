@@ -17,38 +17,22 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationL1ActionRandom.hpp */
+/** @file SegmentationL1TaskMedian.hpp */
 
-#ifndef SEGMENTATION_L1_ACTION_RANDOM_HPP
-#define SEGMENTATION_L1_ACTION_RANDOM_HPP
+#ifndef SEGMENTATION_L1_TASK_MEDIAN_HPP
+#define SEGMENTATION_L1_TASK_MEDIAN_HPP
 
 #include <Editor.hpp>
-#include <SegmentationL1ActionInterface.hpp>
+#include <SegmentationL1TaskInterface.hpp>
 
-/** Segmentation L1 Action Random. */
-class SegmentationL1ActionRandom : public SegmentationL1ActionInterface
+/** Segmentation L1 Task Median. */
+class SegmentationL1TaskMedian : public SegmentationL1TaskInterface
 {
 public:
     virtual void initialize(SegmentationL1Context *context)
     {
         context_ = context;
         context_->query.reset();
-        index_ = 0;
-
-        uint64_t max = context_->totalSamplesCount;
-        size_t n = 0;
-        int c = context_->parameters.initialSamplesCount;
-        if (c > 0)
-        {
-            double p = static_cast<double>(c) * 0.01;
-            n = static_cast<uint64_t>(static_cast<double>(max) * p);
-        }
-        if (n == 0 && max > 0)
-        {
-            n = 1;
-        }
-        context_->initialSamplesCount = n;
-        context_->points.resize(n);
 
         ProgressActionInterface::initialize(context_->initialSamplesCount,
                                             1000UL);
@@ -63,13 +47,7 @@ public:
 
         while (i < n)
         {
-            uint64_t r = static_cast<uint64_t>(rand());
-            r %= context_->totalSamplesCount;
-            context_->points[index_].index = r;
-
             i++;
-            index_++;
-
             if (timedOut())
             {
                 break;
@@ -81,7 +59,6 @@ public:
 
 private:
     SegmentationL1Context *context_;
-    size_t index_;
 };
 
-#endif /* SEGMENTATION_L1_ACTION_RANDOM_HPP */
+#endif /* SEGMENTATION_L1_TASK_MEDIAN_HPP */

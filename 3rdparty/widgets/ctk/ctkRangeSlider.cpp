@@ -33,7 +33,7 @@
 #include <QToolTip>
 
 // CTK includes
-#include "ctkrangeslider.h"
+#include "ctkRangeSlider.h"
 
 // Minor cleanup of compiler warnings to include this as 3rdparty source code.
 // Extra ';' after some Qt macros caused by '-Wpedantic' were removed.

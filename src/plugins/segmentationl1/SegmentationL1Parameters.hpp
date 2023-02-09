@@ -34,6 +34,7 @@ public:
     int initialSamplesDensityMaximum;
     int neighborhoodRadiusMinimum;
     int neighborhoodRadiusMaximum;
+    int numberOfIterations;
 
     SegmentationL1Parameters() { setDefault(); }
 
@@ -44,6 +45,7 @@ public:
         initialSamplesDensityMaximum = 0;
         neighborhoodRadiusMinimum = 0;
         neighborhoodRadiusMaximum = 0;
+        numberOfIterations = 0;
     }
 
     void setDefault()
@@ -53,19 +55,22 @@ public:
         initialSamplesDensityMaximum = 100;
         neighborhoodRadiusMinimum = 100;
         neighborhoodRadiusMaximum = 500;
+        numberOfIterations = 1;
     }
 
     void set(int initialSamplesCount_,
              int initialSamplesDensityMinimum_,
              int initialSamplesDensityMaximum_,
              int neighborhoodRadiusMinimum_,
-             int neighborhoodRadiusMaximum_)
+             int neighborhoodRadiusMaximum_,
+             int numberOfIterations_)
     {
         initialSamplesCount = initialSamplesCount_;
         initialSamplesDensityMinimum = initialSamplesDensityMinimum_;
         initialSamplesDensityMaximum = initialSamplesDensityMaximum_;
         neighborhoodRadiusMinimum = neighborhoodRadiusMinimum_;
         neighborhoodRadiusMaximum = neighborhoodRadiusMaximum_;
+        numberOfIterations = numberOfIterations_;
     }
 };
 
@@ -80,7 +85,8 @@ inline std::ostream &operator<<(std::ostream &os,
               << "> neighborhoodRadiusMinimum <"
               << obj.neighborhoodRadiusMinimum
               << "> neighborhoodRadiusMaximum <"
-              << obj.neighborhoodRadiusMaximum << ">";
+              << obj.neighborhoodRadiusMaximum << "> numberOfIterations <"
+              << obj.numberOfIterations << ">";
 }
 
 #endif /* SEGMENTATION_L1_PARAMETERS_HPP */

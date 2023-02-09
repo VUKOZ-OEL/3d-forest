@@ -22,10 +22,11 @@
 #ifndef SEGMENTATION_L1_HPP
 #define SEGMENTATION_L1_HPP
 
-#include <SegmentationL1ActionCount.hpp>
-#include <SegmentationL1ActionInitializePoints.hpp>
-#include <SegmentationL1ActionRandom.hpp>
 #include <SegmentationL1Context.hpp>
+#include <SegmentationL1TaskCount.hpp>
+#include <SegmentationL1TaskMedian.hpp>
+#include <SegmentationL1TaskRandom.hpp>
+#include <SegmentationL1TaskSample.hpp>
 class Editor;
 
 /** Segmentation L1. */
@@ -47,11 +48,12 @@ public:
 private:
     SegmentationL1Context context_;
 
-    SegmentationL1ActionCount actionCount_;
-    SegmentationL1ActionRandom actionRandom_;
-    SegmentationL1ActionInitializePoints actionInitializePoints_;
+    SegmentationL1TaskCount taskCount_;
+    SegmentationL1TaskRandom taskRandom_;
+    SegmentationL1TaskSample taskSample_;
+    SegmentationL1TaskMedian taskMedian_;
 
-    std::vector<SegmentationL1ActionInterface *> actions_;
+    std::vector<SegmentationL1TaskInterface *> tasks_;
     size_t currentAction_;
 
     void initializeCurrentAction();

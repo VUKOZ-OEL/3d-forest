@@ -17,24 +17,24 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file RangeSliderWidget.cpp */
+/** @file DoubleRangeSliderWidget.cpp */
 
+#include <DoubleRangeSliderWidget.hpp>
 #include <MainWindow.hpp>
-#include <RangeSliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
 #include <QComboBox>
+#include <QDoubleSpinBox>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QSpinBox>
 #include <QVBoxLayout>
 
-#include <ctkRangeSlider.h>
+#include <ctkDoubleRangeSlider.h>
 
-#define LOG_MODULE_NAME "RangeSliderWidget"
+#define LOG_MODULE_NAME "DoubleRangeSliderWidget"
 #include <Log.hpp>
 
-RangeSliderWidget::RangeSliderWidget()
+DoubleRangeSliderWidget::DoubleRangeSliderWidget()
     : QWidget(),
       slider_(nullptr),
       minSpinBox_(nullptr),
@@ -44,7 +44,7 @@ RangeSliderWidget::RangeSliderWidget()
 {
 }
 
-void RangeSliderWidget::setMinimum(int min)
+void DoubleRangeSliderWidget::setMinimum(double min)
 {
     LOG_DEBUG(<< "Called with parameter min <" << min << ">.");
     minSpinBox_->setMinimum(min);
@@ -53,7 +53,7 @@ void RangeSliderWidget::setMinimum(int min)
     minimumValue_ = min;
 }
 
-void RangeSliderWidget::setMaximum(int max)
+void DoubleRangeSliderWidget::setMaximum(double max)
 {
     LOG_DEBUG(<< "Called with parameter min <" << max << ">.");
     minSpinBox_->setMaximum(max);
@@ -62,7 +62,7 @@ void RangeSliderWidget::setMaximum(int max)
     maximumValue_ = max;
 }
 
-void RangeSliderWidget::setMinimumValue(int value)
+void DoubleRangeSliderWidget::setMinimumValue(double value)
 {
     LOG_DEBUG(<< "Called with parameter value <" << value << ">.");
     minSpinBox_->setValue(value);
@@ -70,12 +70,12 @@ void RangeSliderWidget::setMinimumValue(int value)
     minimumValue_ = value;
 }
 
-int RangeSliderWidget::minimumValue()
+double DoubleRangeSliderWidget::minimumValue()
 {
     return minimumValue_;
 }
 
-void RangeSliderWidget::setMaximumValue(int value)
+void DoubleRangeSliderWidget::setMaximumValue(double value)
 {
     LOG_DEBUG(<< "Called with parameter value <" << value << ">.");
     maxSpinBox_->setValue(value);
@@ -83,19 +83,19 @@ void RangeSliderWidget::setMaximumValue(int value)
     maximumValue_ = value;
 }
 
-int RangeSliderWidget::maximumValue()
+double DoubleRangeSliderWidget::maximumValue()
 {
     return maximumValue_;
 }
 
-void RangeSliderWidget::blockSignals(bool block)
+void DoubleRangeSliderWidget::blockSignals(bool block)
 {
     minSpinBox_->blockSignals(block);
     maxSpinBox_->blockSignals(block);
     slider_->blockSignals(block);
 }
 
-void RangeSliderWidget::slotIntermediateMinimumValue(int v)
+void DoubleRangeSliderWidget::slotIntermediateMinimumValue(double v)
 {
     LOG_DEBUG(<< "Called with parameter value <" << v << ">.");
 
@@ -119,7 +119,7 @@ void RangeSliderWidget::slotIntermediateMinimumValue(int v)
     emit signalIntermediateMinimumValue();
 }
 
-void RangeSliderWidget::slotIntermediateMaximumValue(int v)
+void DoubleRangeSliderWidget::slotIntermediateMaximumValue(double v)
 {
     LOG_DEBUG(<< "Called with parameter value <" << v << ">.");
 
@@ -143,25 +143,25 @@ void RangeSliderWidget::slotIntermediateMaximumValue(int v)
     emit signalIntermediateMaximumValue();
 }
 
-void RangeSliderWidget::create(RangeSliderWidget *&outputWidget,
-                               const QObject *receiver,
-                               const char *memberIntermediateMinimumValue,
-                               const char *memberIntermediateMaximumValue,
-                               const QString &text,
-                               const QString &toolTip,
-                               const QString &unitsList,
-                               int step,
-                               int min,
-                               int max,
-                               int minValue,
-                               int maxValue)
+void DoubleRangeSliderWidget::create(DoubleRangeSliderWidget *&outputWidget,
+                                     const QObject *receiver,
+                                     const char *memberIntermediateMinimumValue,
+                                     const char *memberIntermediateMaximumValue,
+                                     const QString &text,
+                                     const QString &toolTip,
+                                     const QString &unitsList,
+                                     double step,
+                                     double min,
+                                     double max,
+                                     double minValue,
+                                     double maxValue)
 {
     LOG_DEBUG(<< "Called with parameter min <" << min << ">"
               << " max <" << max << ">"
               << " minValue <" << minValue << ">"
               << " maxValue <" << maxValue << ">.");
 
-    outputWidget = new RangeSliderWidget();
+    outputWidget = new DoubleRangeSliderWidget();
 
     outputWidget->minimumValue_ = minValue;
     outputWidget->maximumValue_ = maxValue;
@@ -187,17 +187,17 @@ void RangeSliderWidget::create(RangeSliderWidget *&outputWidget,
     descriptionLayout->addWidget(units);
 
     // Value Slider
-    outputWidget->slider_ = new ctkRangeSlider;
-    ctkRangeSlider *slider = outputWidget->slider_;
+    outputWidget->slider_ = new ctkDoubleRangeSlider;
+    ctkDoubleRangeSlider *slider = outputWidget->slider_;
     slider->setRange(min, max);
     slider->setValues(minValue, maxValue);
     slider->setSingleStep(step);
     slider->setOrientation(Qt::Horizontal);
 
     connect(slider,
-            SIGNAL(minimumPositionChanged(int)),
+            SIGNAL(minimumPositionChanged(double)),
             outputWidget,
-            SLOT(slotIntermediateMinimumValue(int)));
+            SLOT(slotIntermediateMinimumValue(double)));
 
     if (memberIntermediateMinimumValue)
     {
@@ -208,9 +208,9 @@ void RangeSliderWidget::create(RangeSliderWidget *&outputWidget,
     }
 
     connect(slider,
-            SIGNAL(maximumPositionChanged(int)),
+            SIGNAL(maximumPositionChanged(double)),
             outputWidget,
-            SLOT(slotIntermediateMaximumValue(int)));
+            SLOT(slotIntermediateMaximumValue(double)));
 
     if (memberIntermediateMaximumValue)
     {
@@ -221,27 +221,27 @@ void RangeSliderWidget::create(RangeSliderWidget *&outputWidget,
     }
 
     // Value SpinBox
-    outputWidget->minSpinBox_ = new QSpinBox;
-    QSpinBox *minSpinBox = outputWidget->minSpinBox_;
+    outputWidget->minSpinBox_ = new QDoubleSpinBox;
+    QDoubleSpinBox *minSpinBox = outputWidget->minSpinBox_;
     minSpinBox->setRange(min, max);
     minSpinBox->setValue(minValue);
     minSpinBox->setSingleStep(step);
 
     connect(minSpinBox,
-            SIGNAL(valueChanged(int)),
+            SIGNAL(valueChanged(double)),
             outputWidget,
-            SLOT(slotIntermediateMinimumValue(int)));
+            SLOT(slotIntermediateMinimumValue(double)));
 
-    outputWidget->maxSpinBox_ = new QSpinBox;
-    QSpinBox *maxSpinBox = outputWidget->maxSpinBox_;
+    outputWidget->maxSpinBox_ = new QDoubleSpinBox;
+    QDoubleSpinBox *maxSpinBox = outputWidget->maxSpinBox_;
     maxSpinBox->setRange(min, max);
     maxSpinBox->setValue(maxValue);
     maxSpinBox->setSingleStep(step);
 
     connect(maxSpinBox,
-            SIGNAL(valueChanged(int)),
+            SIGNAL(valueChanged(double)),
             outputWidget,
-            SLOT(slotIntermediateMaximumValue(int)));
+            SLOT(slotIntermediateMaximumValue(double)));
 
     // Value Layout
     QHBoxLayout *valueLayout = new QHBoxLayout;

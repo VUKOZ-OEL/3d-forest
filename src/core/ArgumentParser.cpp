@@ -58,6 +58,17 @@ void ArgumentParser::parse(int argc, char *argv[])
     }
 }
 
+bool ArgumentParser::read(const std::string &name, int &value) const
+{
+    if (contains(name))
+    {
+        value = toInt(name);
+        return true;
+    }
+
+    return false;
+}
+
 float ArgumentParser::toFloat(const std::string &name) const
 {
     return std::stof(toString(name));

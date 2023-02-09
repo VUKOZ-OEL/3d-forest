@@ -84,21 +84,32 @@ static void segmentation(const std::string &path,
     std::cout << ctx.points.size() << " initial points" << std::endl;
     for (size_t i = 0; i < ctx.points.size(); i++)
     {
-        std::cout << "point[" << i << "] index " << ctx.points[i].index
-                  << std::endl;
+        std::cout << "point[" << i << "] is " << ctx.points[i] << std::endl;
     }
 }
 
 int main(int argc, char *argv[])
 {
+    int rc;
+
+    globalLogThread = std::make_shared<LogThread>();
+
+    LoggerStdout logger;
+    globalLogThread->setCallback(&logger);
+
     try
     {
         ArgumentParser arg;
         arg.add("--input", "");
+        arg.add("--iterations", "");
+        arg.add("--count", "");
         arg.add("--test-data", "");
         arg.parse(argc, argv);
 
         SegmentationL1Parameters parameters;
+
+        (void)arg.read("--count", parameters.initialSamplesCount);
+        (void)arg.read("--iterations", parameters.numberOfIterations);
 
         if (arg.contains("--test-data"))
         {
@@ -106,12 +117,22 @@ int main(int argc, char *argv[])
         }
 
         segmentation(arg.toString("--input"), parameters);
+
+        rc = 0;
     }
     catch (std::exception &e)
     {
         std::cerr << "error: " << e.what() << std::endl;
-        return 1;
+        rc = 1;
+    }
+    catch (...)
+    {
+        std::cerr << "error: unknown" << std::endl;
+        rc = 1;
     }
 
-    return 0;
+    globalLogThread->setCallback(nullptr);
+    globalLogThread->stop();
+
+    return rc;
 }

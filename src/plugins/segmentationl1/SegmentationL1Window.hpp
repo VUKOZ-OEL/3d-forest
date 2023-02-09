@@ -47,11 +47,7 @@ public:
     /**@}*/
 
 protected slots:
-    void slotInitialSamplesCountFinalValue();
-    void slotInitialSamplesDensityMinimumValue();
-    void slotInitialSamplesDensityMaximumValue();
-    void slotNeighborhoodRadiusMinimumValue();
-    void slotNeighborhoodRadiusMaximumValue();
+    void slotParametersChanged();
 
 private:
     MainWindow *mainWindow_;
@@ -59,6 +55,7 @@ private:
     SliderWidget *initialSamplesCountInput_;
     RangeSliderWidget *initialSamplesDensityInput_;
     RangeSliderWidget *neighborhoodRadiusInput_;
+    SliderWidget *numberOfIterationsInput_;
 
     SegmentationL1 segmentationL1_;
     SegmentationL1Parameters parameters_;

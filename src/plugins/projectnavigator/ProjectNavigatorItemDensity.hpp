@@ -27,7 +27,7 @@
 #include <Range.hpp>
 
 class MainWindow;
-class RangeSliderWidget;
+class DoubleRangeSliderWidget;
 
 /** Project Navigator Density. */
 class ProjectNavigatorItemDensity : public ProjectNavigatorItem
@@ -56,7 +56,7 @@ public slots:
     void slotRangeIntermediateMaximumValue();
 
 protected:
-    RangeSliderWidget *densityInput_;
+    DoubleRangeSliderWidget *densityInput_;
     Range<float> densityRange_;
 
     void densityInputChanged();

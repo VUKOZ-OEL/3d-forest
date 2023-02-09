@@ -41,6 +41,7 @@ SegmentationL1Window::SegmentationL1Window(MainWindow *mainWindow)
       initialSamplesCountInput_(nullptr),
       initialSamplesDensityInput_(nullptr),
       neighborhoodRadiusInput_(nullptr),
+      numberOfIterationsInput_(nullptr),
       segmentationL1_(&mainWindow->editor())
 {
     LOG_DEBUG(<< "Create.");
@@ -49,7 +50,7 @@ SegmentationL1Window::SegmentationL1Window(MainWindow *mainWindow)
     SliderWidget::create(initialSamplesCountInput_,
                          this,
                          nullptr,
-                         SLOT(slotInitialSamplesCountFinalValue()),
+                         SLOT(slotParametersChanged()),
                          tr("Number of initial samples"),
                          tr("Number of initial samples"),
                          tr("%"),
@@ -60,10 +61,11 @@ SegmentationL1Window::SegmentationL1Window(MainWindow *mainWindow)
 
     RangeSliderWidget::create(initialSamplesDensityInput_,
                               this,
-                              SLOT(slotInitialSamplesDensityMinimumValue()),
-                              SLOT(slotInitialSamplesDensityMaximumValue()),
+                              SLOT(slotParametersChanged()),
+                              SLOT(slotParametersChanged()),
                               tr("Density range of initial samples"),
-                              tr("Density range of initial samples"),
+                              tr("Density range of initial samples"
+                                 " to filter out leaves"),
                               tr("%"),
                               1,
                               0,
@@ -73,8 +75,8 @@ SegmentationL1Window::SegmentationL1Window(MainWindow *mainWindow)
 
     RangeSliderWidget::create(neighborhoodRadiusInput_,
                               this,
-                              SLOT(slotNeighborhoodRadiusMinimumValue()),
-                              SLOT(slotNeighborhoodRadiusMaximumValue()),
+                              SLOT(slotParametersChanged()),
+                              SLOT(slotParametersChanged()),
                               tr("Neighborhood radius range"),
                               tr("Neighborhood radius range"),
                               tr("pt"),
@@ -84,11 +86,24 @@ SegmentationL1Window::SegmentationL1Window(MainWindow *mainWindow)
                               parameters_.neighborhoodRadiusMinimum,
                               parameters_.neighborhoodRadiusMaximum);
 
+    SliderWidget::create(numberOfIterationsInput_,
+                         this,
+                         nullptr,
+                         SLOT(slotParametersChanged()),
+                         tr("Number of iterations"),
+                         tr("Number of iterations"),
+                         tr("cnt"),
+                         1,
+                         1,
+                         100,
+                         parameters_.numberOfIterations);
+
     // Create layout with parameters.
     QVBoxLayout *settingsLayout = new QVBoxLayout;
-    settingsLayout->addWidget(initialSamplesCountInput_);
     settingsLayout->addWidget(initialSamplesDensityInput_);
+    settingsLayout->addWidget(initialSamplesCountInput_);
     settingsLayout->addWidget(neighborhoodRadiusInput_);
+    settingsLayout->addWidget(numberOfIterationsInput_);
 
     // Create widget layout.
     QVBoxLayout *widgetLayout = new QVBoxLayout;
@@ -110,7 +125,8 @@ bool SegmentationL1Window::applyParameters()
                     initialSamplesDensityInput_->minimumValue(),
                     initialSamplesDensityInput_->maximumValue(),
                     neighborhoodRadiusInput_->minimumValue(),
-                    neighborhoodRadiusInput_->maximumValue());
+                    neighborhoodRadiusInput_->maximumValue(),
+                    numberOfIterationsInput_->value());
 
     LOG_DEBUG(<< "Apply parameters <" << parameters_ << ">.");
 
@@ -136,37 +152,8 @@ void SegmentationL1Window::updateData()
     mainWindow_->update({Editor::TYPE_LAYER});
 }
 
-void SegmentationL1Window::slotInitialSamplesCountFinalValue()
+void SegmentationL1Window::slotParametersChanged()
 {
-    LOG_DEBUG(<< "New value for the number of initial samples <"
-              << initialSamplesCountInput_->value() << ">.");
-    emit signalParametersChanged();
-}
-
-void SegmentationL1Window::slotInitialSamplesDensityMinimumValue()
-{
-    LOG_DEBUG(<< "New value for minimum density of initial samples <"
-              << initialSamplesDensityInput_->minimumValue() << ">.");
-    emit signalParametersChanged();
-}
-
-void SegmentationL1Window::slotInitialSamplesDensityMaximumValue()
-{
-    LOG_DEBUG(<< "New value for maximum density of initial samples <"
-              << initialSamplesDensityInput_->maximumValue() << ">.");
-    emit signalParametersChanged();
-}
-
-void SegmentationL1Window::slotNeighborhoodRadiusMinimumValue()
-{
-    LOG_DEBUG(<< "New value for minimum neighborhood radius <"
-              << neighborhoodRadiusInput_->minimumValue() << ">.");
-    emit signalParametersChanged();
-}
-
-void SegmentationL1Window::slotNeighborhoodRadiusMaximumValue()
-{
-    LOG_DEBUG(<< "New value for maximum neighborhood radius <"
-              << neighborhoodRadiusInput_->maximumValue() << ">.");
+    LOG_DEBUG(<< "New value for some input parameter.");
     emit signalParametersChanged();
 }

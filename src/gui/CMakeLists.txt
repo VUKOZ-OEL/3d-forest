@@ -47,7 +47,8 @@ add_library(
     ${SOURCES_PROJECT_NAVIGATOR}
     ${SOURCES_SETTINGS}
     ${SOURCES_VIEWER}
-    ../../3rdparty/widgets/ctkrangeslider/ctkrangeslider.cpp
+    ../../3rdparty/widgets/ctk/ctkRangeSlider.cpp
+    ../../3rdparty/widgets/ctk/ctkDoubleRangeSlider.cpp
     ../../3rdparty/widgets/flowlayout/flowlayout.cpp
     resources/resources.qrc
     ../plugins/exportfile/resources/resources.qrc
@@ -64,7 +65,7 @@ target_include_directories(
     ${SUB_PROJECT_NAME}
     PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}
-    ../../3rdparty/widgets/ctkrangeslider
+    ../../3rdparty/widgets/ctk
     ../../3rdparty/widgets/flowlayout
     ../plugins/exportfile
     ../plugins/help
