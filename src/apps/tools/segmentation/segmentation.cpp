@@ -84,8 +84,7 @@ static void segmentation(const std::string &path,
     std::cout << ctx.points.size() << " initial points" << std::endl;
     for (size_t i = 0; i < ctx.points.size(); i++)
     {
-        std::cout << "point[" << i << "] index " << ctx.points[i].index
-                  << std::endl;
+        std::cout << "point[" << i << "] is " << ctx.points[i] << std::endl;
     }
 }
 
