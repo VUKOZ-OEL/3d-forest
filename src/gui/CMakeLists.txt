@@ -48,6 +48,7 @@ add_library(
     ${SOURCES_SETTINGS}
     ${SOURCES_VIEWER}
     ../../3rdparty/widgets/ctkrangeslider/ctkrangeslider.cpp
+    ../../3rdparty/widgets/ctkrangeslider/ctkDoubleRangeSlider.cpp
     ../../3rdparty/widgets/flowlayout/flowlayout.cpp
     resources/resources.qrc
     ../plugins/exportfile/resources/resources.qrc
