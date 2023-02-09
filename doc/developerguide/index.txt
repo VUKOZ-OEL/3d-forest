@@ -833,7 +833,7 @@ powershell -C "gci | % {rni $_.Name ($_.Name -replace '24px', '24')}"
             "${workspaceRoot}/3rdparty/libigl/include",
             "${workspaceRoot}/3rdparty/stb",
             "${workspaceRoot}/3rdparty/warnings",
-            "${workspaceRoot}/3rdparty/widgets/ctkrangeslider",
+            "${workspaceRoot}/3rdparty/widgets/ctk",
             "${workspaceRoot}/3rdparty/widgets/flowlayout",
             "${workspaceRoot}/src/apps/3dforest",
             "${workspaceRoot}/src/apps/tools/sandbox",
