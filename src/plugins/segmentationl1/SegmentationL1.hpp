@@ -26,6 +26,7 @@
 #include <SegmentationL1ActionInitializePoints.hpp>
 #include <SegmentationL1ActionRandom.hpp>
 #include <SegmentationL1Context.hpp>
+#include <SegmentationL1TaskMedian.hpp>
 class Editor;
 
 /** Segmentation L1. */
@@ -50,6 +51,7 @@ private:
     SegmentationL1ActionCount actionCount_;
     SegmentationL1ActionRandom actionRandom_;
     SegmentationL1ActionInitializePoints actionInitializePoints_;
+    SegmentationL1TaskMedian taskMedian_;
 
     std::vector<SegmentationL1ActionInterface *> actions_;
     size_t currentAction_;

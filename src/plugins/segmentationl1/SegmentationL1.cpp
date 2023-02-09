@@ -34,6 +34,7 @@ SegmentationL1::SegmentationL1(Editor *editor) : context_(editor)
     actions_.push_back(&actionCount_);
     actions_.push_back(&actionRandom_);
     actions_.push_back(&actionInitializePoints_);
+    actions_.push_back(&taskMedian_);
 
     clear();
 }
