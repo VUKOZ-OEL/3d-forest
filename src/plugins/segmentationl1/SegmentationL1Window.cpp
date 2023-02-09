@@ -63,7 +63,8 @@ SegmentationL1Window::SegmentationL1Window(MainWindow *mainWindow)
                               SLOT(slotInitialSamplesDensityMinimumValue()),
                               SLOT(slotInitialSamplesDensityMaximumValue()),
                               tr("Density range of initial samples"),
-                              tr("Density range of initial samples to filter out leaves"),
+                              tr("Density range of initial samples"
+                                 " to filter out leaves"),
                               tr("%"),
                               1,
                               0,
