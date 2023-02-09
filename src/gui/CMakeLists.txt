@@ -47,7 +47,7 @@ add_library(
     ${SOURCES_PROJECT_NAVIGATOR}
     ${SOURCES_SETTINGS}
     ${SOURCES_VIEWER}
-    ../../3rdparty/widgets/ctkrangeslider/ctkrangeslider.cpp
+    ../../3rdparty/widgets/ctkrangeslider/ctkRangeSlider.cpp
     ../../3rdparty/widgets/ctkrangeslider/ctkDoubleRangeSlider.cpp
     ../../3rdparty/widgets/flowlayout/flowlayout.cpp
     resources/resources.qrc

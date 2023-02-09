@@ -29,7 +29,7 @@
 #include <QSpinBox>
 #include <QVBoxLayout>
 
-#include <ctkrangeslider.h>
+#include <ctkRangeSlider.h>
 
 #define LOG_MODULE_NAME "RangeSliderWidget"
 #include <Log.hpp>

@@ -30,7 +30,7 @@
 #include <QVariant>
 
 // CTK includes
-#include "ctkrangeslider.h"
+#include "ctkRangeSlider.h"
 #include "ctkDoubleRangeSlider.h"
 #if defined(HAS_CTK_VALUE_PROXY)
   #include "ctkValueProxy.h"
