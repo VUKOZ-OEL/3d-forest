@@ -71,6 +71,8 @@ public:
         function = function_;
         text = text_;
     }
+
+    const char *typeString() const;
 };
 
 /** Log Thread Callback Interface. */
@@ -80,6 +82,15 @@ public:
     virtual ~LogThreadCallbackInterface() = default;
     virtual void println(const LogMessage &message) = 0;
     virtual void flush() = 0;
+};
+
+/** Logger For Standard Output. */
+class EXPORT_CORE LoggerStdout : public LogThreadCallbackInterface
+{
+public:
+    virtual ~LoggerStdout() = default;
+    virtual void println(const LogMessage &message);
+    virtual void flush();
 };
 
 /** Log Thread. */

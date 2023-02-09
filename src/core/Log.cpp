@@ -194,3 +194,34 @@ void LogThread::run()
         }
     }
 }
+
+const char *LogMessage::typeString() const
+{
+    switch (type)
+    {
+        case LOG_TYPE_DEBUG:
+            return " DBG ";
+        case LOG_TYPE_WARNING:
+            return " WRN ";
+        case LOG_TYPE_ERROR:
+            return " ERR ";
+        case LOG_TYPE_INFO:
+            return " INF ";
+        default:
+            break;
+    }
+
+    return " N/A ";
+}
+
+void LoggerStdout::println(const LogMessage &message)
+{
+    std::cout << message.time << " " << message.typeString() << " "
+              << message.text << " [" << message.module << ":"
+              << message.function << "]" << std::endl;
+}
+
+void LoggerStdout::flush()
+{
+    // empty
+}
