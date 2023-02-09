@@ -44,6 +44,7 @@ public:
     void parse(int argc, char *argv[]);
 
     bool contains(const std::string &name) const;
+    bool read(const std::string &name, int &value) const;
 
     const std::string &toString(const std::string &name) const;
     float toFloat(const std::string &name) const;
