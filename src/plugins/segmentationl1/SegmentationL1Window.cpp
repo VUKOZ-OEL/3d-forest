@@ -63,7 +63,7 @@ SegmentationL1Window::SegmentationL1Window(MainWindow *mainWindow)
                               SLOT(slotInitialSamplesDensityMinimumValue()),
                               SLOT(slotInitialSamplesDensityMaximumValue()),
                               tr("Density range of initial samples"),
-                              tr("Density range of initial samples"),
+                              tr("Density range of initial samples to filter out leaves"),
                               tr("%"),
                               1,
                               0,
@@ -86,8 +86,8 @@ SegmentationL1Window::SegmentationL1Window(MainWindow *mainWindow)
 
     // Create layout with parameters.
     QVBoxLayout *settingsLayout = new QVBoxLayout;
-    settingsLayout->addWidget(initialSamplesCountInput_);
     settingsLayout->addWidget(initialSamplesDensityInput_);
+    settingsLayout->addWidget(initialSamplesCountInput_);
     settingsLayout->addWidget(neighborhoodRadiusInput_);
 
     // Create widget layout.
