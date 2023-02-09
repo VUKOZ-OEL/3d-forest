@@ -17,16 +17,16 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationL1ActionRandom.hpp */
+/** @file SegmentationL1TaskRandom.hpp */
 
-#ifndef SEGMENTATION_L1_ACTION_RANDOM_HPP
-#define SEGMENTATION_L1_ACTION_RANDOM_HPP
+#ifndef SEGMENTATION_L1_TASK_RANDOM_HPP
+#define SEGMENTATION_L1_TASK_RANDOM_HPP
 
 #include <Editor.hpp>
-#include <SegmentationL1ActionInterface.hpp>
+#include <SegmentationL1TaskInterface.hpp>
 
-/** Segmentation L1 Action Random. */
-class SegmentationL1ActionRandom : public SegmentationL1ActionInterface
+/** Segmentation L1 Task Random. */
+class SegmentationL1TaskRandom : public SegmentationL1TaskInterface
 {
 public:
     virtual void initialize(SegmentationL1Context *context)
@@ -94,4 +94,4 @@ private:
     uint64_t dataStep_;
 };
 
-#endif /* SEGMENTATION_L1_ACTION_RANDOM_HPP */
+#endif /* SEGMENTATION_L1_TASK_RANDOM_HPP */

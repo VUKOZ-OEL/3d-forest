@@ -17,16 +17,16 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationL1ActionCount.hpp */
+/** @file SegmentationL1TaskCount.hpp */
 
-#ifndef SEGMENTATION_L1_ACTION_COUNT_HPP
-#define SEGMENTATION_L1_ACTION_COUNT_HPP
+#ifndef SEGMENTATION_L1_TASK_COUNT_HPP
+#define SEGMENTATION_L1_TASK_COUNT_HPP
 
 #include <Editor.hpp>
-#include <SegmentationL1ActionInterface.hpp>
+#include <SegmentationL1TaskInterface.hpp>
 
-/** Segmentation L1 Action Count. */
-class SegmentationL1ActionCount : public SegmentationL1ActionInterface
+/** Segmentation L1 Task Count. */
+class SegmentationL1TaskCount : public SegmentationL1TaskInterface
 {
 public:
     virtual void initialize(SegmentationL1Context *context)
@@ -84,4 +84,4 @@ private:
     SegmentationL1Context *context_;
 };
 
-#endif /* SEGMENTATION_L1_ACTION_COUNT_HPP */
+#endif /* SEGMENTATION_L1_TASK_COUNT_HPP */

@@ -17,17 +17,16 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationL1ActionInitializePoints.hpp */
+/** @file SegmentationL1TaskSample.hpp */
 
-#ifndef SEGMENTATION_L1_ACTION_INITIALIZE_POINTS_HPP
-#define SEGMENTATION_L1_ACTION_INITIALIZE_POINTS_HPP
+#ifndef SEGMENTATION_L1_TASK_SAMPLE_HPP
+#define SEGMENTATION_L1_TASK_SAMPLE_HPP
 
 #include <Editor.hpp>
-#include <SegmentationL1ActionInterface.hpp>
+#include <SegmentationL1TaskInterface.hpp>
 
-/** Segmentation L1 Initialize Points. */
-class SegmentationL1ActionInitializePoints
-    : public SegmentationL1ActionInterface
+/** Segmentation L1 Task Sample. */
+class SegmentationL1TaskSample : public SegmentationL1TaskInterface
 {
 public:
     virtual void initialize(SegmentationL1Context *context)
@@ -78,4 +77,4 @@ private:
     uint64_t dataIndex_;
 };
 
-#endif /* SEGMENTATION_L1_ACTION_INITIALIZE_POINTS_HPP */
+#endif /* SEGMENTATION_L1_TASK_SAMPLE_HPP */

@@ -23,10 +23,10 @@
 #define SEGMENTATION_L1_TASK_MEDIAN_HPP
 
 #include <Editor.hpp>
-#include <SegmentationL1ActionInterface.hpp>
+#include <SegmentationL1TaskInterface.hpp>
 
-/** Segmentation L1 Median Task. */
-class SegmentationL1TaskMedian : public SegmentationL1ActionInterface
+/** Segmentation L1 Task Median. */
+class SegmentationL1TaskMedian : public SegmentationL1TaskInterface
 {
 public:
     virtual void initialize(SegmentationL1Context *context)
