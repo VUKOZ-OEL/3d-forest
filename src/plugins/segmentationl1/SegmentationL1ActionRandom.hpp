@@ -33,7 +33,6 @@ public:
     {
         context_ = context;
         context_->query.reset();
-        index_ = 0;
 
         uint64_t max = context_->totalSamplesCount;
         size_t n = 0;
@@ -50,6 +49,14 @@ public:
         context_->initialSamplesCount = n;
         context_->points.resize(n);
 
+        pointsIndex_ = 0;
+        dataFrom_ = 0;
+        dataStep_ = 0;
+        if (n > 0)
+        {
+            dataStep_ = context_->totalSamplesCount / n;
+        }
+
         ProgressActionInterface::initialize(context_->initialSamplesCount,
                                             1000UL);
     }
@@ -64,12 +71,13 @@ public:
         while (i < n)
         {
             uint64_t r = static_cast<uint64_t>(rand());
-            r %= context_->totalSamplesCount;
-            context_->points[index_].index = r;
+            r = dataFrom_ + (r % dataStep_);
+            context_->points[pointsIndex_].index = r;
+
+            pointsIndex_++;
+            dataFrom_ += dataStep_;
 
             i++;
-            index_++;
-
             if (timedOut())
             {
                 break;
@@ -81,7 +89,9 @@ public:
 
 private:
     SegmentationL1Context *context_;
-    size_t index_;
+    size_t pointsIndex_;
+    uint64_t dataFrom_;
+    uint64_t dataStep_;
 };
 
 #endif /* SEGMENTATION_L1_ACTION_RANDOM_HPP */
