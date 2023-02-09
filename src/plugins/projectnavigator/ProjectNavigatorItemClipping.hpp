@@ -27,7 +27,7 @@
 #include <Range.hpp>
 
 class MainWindow;
-class RangeSliderWidget;
+class DoubleRangeSliderWidget;
 
 class QPushButton;
 
@@ -58,7 +58,7 @@ public slots:
     void reset();
 
 protected:
-    RangeSliderWidget *rangeInput_[3];
+    DoubleRangeSliderWidget *rangeInput_[3];
     QPushButton *resetButton_;
     Range<double> clipRange_[3];
 

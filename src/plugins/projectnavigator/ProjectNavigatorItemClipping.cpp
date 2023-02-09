@@ -21,9 +21,9 @@
 
 #include <Region.hpp>
 
+#include <DoubleRangeSliderWidget.hpp>
 #include <MainWindow.hpp>
 #include <ProjectNavigatorItemClipping.hpp>
-#include <RangeSliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
 #include <QHBoxLayout>
@@ -44,44 +44,47 @@ ProjectNavigatorItemClipping::ProjectNavigatorItemClipping(
     LOG_DEBUG(<< "Called.");
 
     // Input widgets
-    RangeSliderWidget::create(rangeInput_[0],
-                              this,
-                              SLOT(slotRangeIntermediateMinimumValue()),
-                              SLOT(slotRangeIntermediateMaximumValue()),
-                              tr("X range"),
-                              tr("Min-max clipping range filter along X axis"),
-                              tr("pt"),
-                              1,
-                              0,
-                              100,
-                              0,
-                              100);
+    DoubleRangeSliderWidget::create(
+        rangeInput_[0],
+        this,
+        SLOT(slotRangeIntermediateMinimumValue()),
+        SLOT(slotRangeIntermediateMaximumValue()),
+        tr("X range"),
+        tr("Min-max clipping range filter along X axis"),
+        tr("pt"),
+        1,
+        0,
+        100,
+        0,
+        100);
 
-    RangeSliderWidget::create(rangeInput_[1],
-                              this,
-                              SLOT(slotRangeIntermediateMinimumValue()),
-                              SLOT(slotRangeIntermediateMaximumValue()),
-                              tr("Y range"),
-                              tr("Min-max clipping range filter along Y axis"),
-                              tr("pt"),
-                              1,
-                              0,
-                              100,
-                              0,
-                              100);
+    DoubleRangeSliderWidget::create(
+        rangeInput_[1],
+        this,
+        SLOT(slotRangeIntermediateMinimumValue()),
+        SLOT(slotRangeIntermediateMaximumValue()),
+        tr("Y range"),
+        tr("Min-max clipping range filter along Y axis"),
+        tr("pt"),
+        1,
+        0,
+        100,
+        0,
+        100);
 
-    RangeSliderWidget::create(rangeInput_[2],
-                              this,
-                              SLOT(slotRangeIntermediateMinimumValue()),
-                              SLOT(slotRangeIntermediateMaximumValue()),
-                              tr("Z range"),
-                              tr("Min-max clipping range filter along Z axis"),
-                              tr("pt"),
-                              1,
-                              0,
-                              100,
-                              0,
-                              100);
+    DoubleRangeSliderWidget::create(
+        rangeInput_[2],
+        this,
+        SLOT(slotRangeIntermediateMinimumValue()),
+        SLOT(slotRangeIntermediateMaximumValue()),
+        tr("Z range"),
+        tr("Min-max clipping range filter along Z axis"),
+        tr("pt"),
+        1,
+        0,
+        100,
+        0,
+        100);
 
     resetButton_ = new QPushButton(tr("&Reset"), this);
     connect(resetButton_, SIGNAL(clicked()), this, SLOT(reset()));
@@ -154,7 +157,7 @@ void ProjectNavigatorItemClipping::slotRangeIntermediateMinimumValue()
     {
         if (obj == rangeInput_[i])
         {
-            int v = rangeInput_[i]->minimumValue();
+            double v = rangeInput_[i]->minimumValue();
             LOG_DEBUG(<< "Input minimumValue <" << v << ">.");
             clipRange_[i].setMinimumValue(v);
         }
@@ -171,7 +174,7 @@ void ProjectNavigatorItemClipping::slotRangeIntermediateMaximumValue()
     {
         if (obj == rangeInput_[i])
         {
-            int v = rangeInput_[i]->maximumValue();
+            double v = rangeInput_[i]->maximumValue();
             LOG_DEBUG(<< "Input maximumValue <" << v << ">.");
             clipRange_[i].setMaximumValue(v);
         }
