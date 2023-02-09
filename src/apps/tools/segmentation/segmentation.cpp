@@ -91,6 +91,13 @@ static void segmentation(const std::string &path,
 
 int main(int argc, char *argv[])
 {
+    int rc;
+
+    globalLogThread = std::make_shared<LogThread>();
+
+    LoggerStdout logger;
+    globalLogThread->setCallback(&logger);
+
     try
     {
         ArgumentParser arg;
@@ -106,12 +113,22 @@ int main(int argc, char *argv[])
         }
 
         segmentation(arg.toString("--input"), parameters);
+
+        rc = 0;
     }
     catch (std::exception &e)
     {
         std::cerr << "error: " << e.what() << std::endl;
-        return 1;
+        rc = 1;
+    }
+    catch (...)
+    {
+        std::cerr << "error: unknown" << std::endl;
+        rc = 1;
     }
 
-    return 0;
+    globalLogThread->setCallback(nullptr);
+    globalLogThread->stop();
+
+    return rc;
 }
