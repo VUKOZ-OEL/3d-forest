@@ -34,7 +34,8 @@ public:
     {
         context_ = context;
         context_->query.reset();
-        index_ = 0;
+        pointsIndex_ = 0;
+        dataIndex_ = 0;
 
         ProgressActionInterface::initialize(context_->totalSamplesCount,
                                             1000UL);
@@ -49,9 +50,19 @@ public:
 
         while (i < n)
         {
-            i++;
-            index_++;
+            if (pointsIndex_ < context_->points.size() &&
+                context_->query.next() &&
+                context_->points[pointsIndex_].index == dataIndex_)
+            {
+                context_->points[pointsIndex_].x = context_->query.x();
+                context_->points[pointsIndex_].y = context_->query.y();
+                context_->points[pointsIndex_].z = context_->query.z();
+                pointsIndex_++;
+            }
 
+            dataIndex_++;
+
+            i++;
             if (timedOut())
             {
                 break;
@@ -63,7 +74,8 @@ public:
 
 private:
     SegmentationL1Context *context_;
-    size_t index_;
+    size_t pointsIndex_;
+    uint64_t dataIndex_;
 };
 
 #endif /* SEGMENTATION_L1_ACTION_INITIALIZE_POINTS_HPP */
