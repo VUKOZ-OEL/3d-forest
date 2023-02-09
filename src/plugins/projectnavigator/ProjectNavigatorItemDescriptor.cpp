@@ -19,9 +19,9 @@
 
 /** @file ProjectNavigatorItemDescriptor.cpp */
 
+#include <DoubleRangeSliderWidget.hpp>
 #include <MainWindow.hpp>
 #include <ProjectNavigatorItemDescriptor.hpp>
-#include <RangeSliderWidget.hpp>
 
 #include <QVBoxLayout>
 
@@ -32,18 +32,18 @@ ProjectNavigatorItemDescriptor::ProjectNavigatorItemDescriptor(
     : ProjectNavigatorItem(mainWindow, icon, text)
 {
     // Input widgets
-    RangeSliderWidget::create(descriptorInput_,
-                              this,
-                              SLOT(slotRangeIntermediateMinimumValue()),
-                              SLOT(slotRangeIntermediateMaximumValue()),
-                              tr("Descriptor"),
-                              tr("Min-max descriptor range filter"),
-                              tr("pt"),
-                              1,
-                              0,
-                              100,
-                              0,
-                              100);
+    DoubleRangeSliderWidget::create(descriptorInput_,
+                                    this,
+                                    SLOT(slotRangeIntermediateMinimumValue()),
+                                    SLOT(slotRangeIntermediateMaximumValue()),
+                                    tr("Descriptor"),
+                                    tr("Min-max descriptor range filter"),
+                                    tr("pt"),
+                                    1,
+                                    0,
+                                    100,
+                                    0,
+                                    100);
 
     // Layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -87,15 +87,15 @@ void ProjectNavigatorItemDescriptor::slotUpdate(
 
 void ProjectNavigatorItemDescriptor::slotRangeIntermediateMinimumValue()
 {
-    descriptorRange_.setMinimumValue(descriptorInput_->minimumValue() *
-                                     0.0039216F);
+    descriptorRange_.setMinimumValue(
+        static_cast<float>(descriptorInput_->minimumValue()) * 0.0039216F);
     descriptorInputChanged();
 }
 
 void ProjectNavigatorItemDescriptor::slotRangeIntermediateMaximumValue()
 {
-    descriptorRange_.setMaximumValue(descriptorInput_->maximumValue() *
-                                     0.0039216F);
+    descriptorRange_.setMaximumValue(
+        static_cast<float>(descriptorInput_->maximumValue()) * 0.0039216F);
     descriptorInputChanged();
 }
 

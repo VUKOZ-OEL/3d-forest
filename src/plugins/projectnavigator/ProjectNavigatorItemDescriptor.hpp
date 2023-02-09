@@ -27,7 +27,7 @@
 #include <Range.hpp>
 
 class MainWindow;
-class RangeSliderWidget;
+class DoubleRangeSliderWidget;
 
 /** Project Navigator Descriptor. */
 class ProjectNavigatorItemDescriptor : public ProjectNavigatorItem
@@ -56,7 +56,7 @@ public slots:
     void slotRangeIntermediateMaximumValue();
 
 protected:
-    RangeSliderWidget *descriptorInput_;
+    DoubleRangeSliderWidget *descriptorInput_;
     Range<float> descriptorRange_;
 
     void descriptorInputChanged();
