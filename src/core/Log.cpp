@@ -197,7 +197,12 @@ void LogThread::run()
 
 const char *LogMessage::typeString() const
 {
-    switch (type)
+    return typeString(type);
+}
+
+const char *LogMessage::typeString(int type_)
+{
+    switch (type_)
     {
         case LOG_TYPE_DEBUG:
             return " DBG ";

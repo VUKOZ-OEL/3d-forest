@@ -73,6 +73,7 @@ public:
     }
 
     const char *typeString() const;
+    static const char *typeString(int type_);
 };
 
 /** Log Thread Callback Interface. */
