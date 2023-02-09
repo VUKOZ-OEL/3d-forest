@@ -27,7 +27,7 @@
 #include <Range.hpp>
 
 class MainWindow;
-class RangeSliderWidget;
+class DoubleRangeSliderWidget;
 
 /** Project Navigator Elevation. */
 class ProjectNavigatorItemElevation : public ProjectNavigatorItem
@@ -56,7 +56,7 @@ public slots:
     void slotRangeIntermediateMaximumValue();
 
 protected:
-    RangeSliderWidget *rangeInput_;
+    DoubleRangeSliderWidget *rangeInput_;
     Range<double> elevationRange_;
 
     void elevationInputChanged();

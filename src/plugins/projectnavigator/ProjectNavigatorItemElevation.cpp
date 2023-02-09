@@ -19,9 +19,9 @@
 
 /** @file ProjectNavigatorItemElevation.cpp */
 
+#include <DoubleRangeSliderWidget.hpp>
 #include <MainWindow.hpp>
 #include <ProjectNavigatorItemElevation.hpp>
-#include <RangeSliderWidget.hpp>
 
 #include <QVBoxLayout>
 
@@ -32,18 +32,18 @@ ProjectNavigatorItemElevation::ProjectNavigatorItemElevation(
     : ProjectNavigatorItem(mainWindow, icon, text)
 {
     // Input widgets
-    RangeSliderWidget::create(rangeInput_,
-                              this,
-                              SLOT(slotRangeIntermediateMinimumValue()),
-                              SLOT(slotRangeIntermediateMaximumValue()),
-                              tr("Elevation"),
-                              tr("Min-max elevation range filter"),
-                              tr("pt"),
-                              1,
-                              0,
-                              100,
-                              0,
-                              100);
+    DoubleRangeSliderWidget::create(rangeInput_,
+                                    this,
+                                    SLOT(slotRangeIntermediateMinimumValue()),
+                                    SLOT(slotRangeIntermediateMaximumValue()),
+                                    tr("Elevation"),
+                                    tr("Min-max elevation range filter"),
+                                    tr("pt"),
+                                    1,
+                                    0,
+                                    100,
+                                    0,
+                                    100);
 
     // Layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
