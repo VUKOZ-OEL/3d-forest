@@ -81,10 +81,10 @@ static void segmentation(const std::string &path,
     std::cout << "Debug information" << std::endl;
     const SegmentationL1Context &ctx = segmentationL1.context();
     std::cout << ctx.numberOfPoints << " total points" << std::endl;
-    std::cout << ctx.points.size() << " initial points" << std::endl;
-    for (size_t i = 0; i < ctx.points.size(); i++)
+    std::cout << ctx.samples.size() << " sample points" << std::endl;
+    for (size_t i = 0; i < ctx.samples.size(); i++)
     {
-        std::cout << "point[" << i << "] is " << ctx.points[i] << std::endl;
+        std::cout << "point[" << i << "] is " << ctx.samples[i] << std::endl;
     }
 }
 
@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
 
         SegmentationL1Parameters parameters;
 
-        (void)arg.read("--count", parameters.initialSamplesCount);
+        (void)arg.read("--count", parameters.numberOfSamples);
         (void)arg.read("--iterations", parameters.numberOfIterations);
 
         if (arg.contains("--test-data"))

@@ -59,8 +59,7 @@ bool SegmentationL1::applyParameters(const SegmentationL1Parameters &parameters)
     size_t newAction = SegmentationL1::npos;
 
     // The number of initial samples has been changed.
-    if (context_.parameters.initialSamplesCount !=
-        parameters.initialSamplesCount)
+    if (context_.parameters.numberOfSamples != parameters.numberOfSamples)
     {
         newAction = 1;
     }

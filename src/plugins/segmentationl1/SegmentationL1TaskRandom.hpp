@@ -36,7 +36,7 @@ public:
 
         uint64_t max = context_->numberOfPoints;
         size_t n = 0;
-        int c = context_->parameters.initialSamplesCount;
+        int c = context_->parameters.numberOfSamples;
         if (c > 0)
         {
             double p = static_cast<double>(c) * 0.01;
@@ -46,19 +46,18 @@ public:
         {
             n = 1;
         }
-        context_->initialSamplesCount = n;
-        context_->points.resize(n);
+        context_->numberOfSamples = n;
+        context_->samples.resize(n);
 
-        pointsIndex_ = 0;
-        dataFrom_ = 0;
-        dataStep_ = 0;
+        sampleIndex_ = 0;
+        pointsFrom_ = 0;
+        pointsStep_ = 0;
         if (n > 0)
         {
-            dataStep_ = context_->numberOfPoints / n;
+            pointsStep_ = context_->numberOfPoints / n;
         }
 
-        ProgressActionInterface::initialize(context_->initialSamplesCount,
-                                            1000UL);
+        ProgressActionInterface::initialize(context_->numberOfSamples, 1000UL);
     }
 
     virtual void next()
@@ -71,11 +70,11 @@ public:
         while (i < n)
         {
             uint64_t r = static_cast<uint64_t>(rand());
-            r = dataFrom_ + (r % dataStep_);
-            context_->points[pointsIndex_].index = r;
+            r = pointsFrom_ + (r % pointsStep_);
+            context_->samples[sampleIndex_].index = r;
 
-            pointsIndex_++;
-            dataFrom_ += dataStep_;
+            sampleIndex_++;
+            pointsFrom_ += pointsStep_;
 
             i++;
             if (timedOut())
@@ -89,9 +88,9 @@ public:
 
 private:
     SegmentationL1Context *context_;
-    size_t pointsIndex_;
-    uint64_t dataFrom_;
-    uint64_t dataStep_;
+    size_t sampleIndex_;
+    uint64_t pointsFrom_;
+    uint64_t pointsStep_;
 };
 
 #endif /* SEGMENTATION_L1_TASK_RANDOM_HPP */

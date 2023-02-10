@@ -37,9 +37,9 @@ public:
     SegmentationL1Parameters parameters;
 
     uint64_t numberOfPoints;
-    size_t initialSamplesCount;
+    size_t numberOfSamples;
 
-    std::vector<SegmentationL1Point> points;
+    std::vector<SegmentationL1Point> samples;
 
     SegmentationL1Context(Editor *editor);
 

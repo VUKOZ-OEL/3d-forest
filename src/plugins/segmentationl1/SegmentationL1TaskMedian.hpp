@@ -34,8 +34,7 @@ public:
         context_ = context;
         context_->query.reset();
 
-        ProgressActionInterface::initialize(context_->initialSamplesCount,
-                                            1000UL);
+        ProgressActionInterface::initialize(context_->numberOfSamples, 1000UL);
     }
 
     virtual void next()
