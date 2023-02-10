@@ -22,12 +22,14 @@ add_executable(
     segmentation.cpp
     ../../../plugins/segmentationl1/SegmentationL1.cpp
     ../../../plugins/segmentationl1/SegmentationL1Context.cpp
+    ../../../plugins/segmentationl1/SegmentationL1Pca.cpp
 )
 
 target_include_directories(
     ${SUB_PROJECT_NAME}
     PUBLIC
     ../../../plugins/segmentationl1
+    ../../../../3rdparty/eigen
     ../../../../3rdparty/stb
     ../../../../3rdparty/warnings
 )

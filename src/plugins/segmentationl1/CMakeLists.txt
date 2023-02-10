@@ -40,6 +40,7 @@ target_include_directories(
     PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}
     ../algorithm
+    ../../../3rdparty/eigen
 )
 
 target_compile_definitions(
