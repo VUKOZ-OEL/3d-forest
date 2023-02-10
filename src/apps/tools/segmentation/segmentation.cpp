@@ -80,7 +80,7 @@ static void segmentation(const std::string &path,
 
     std::cout << "Debug information" << std::endl;
     const SegmentationL1Context &ctx = segmentationL1.context();
-    std::cout << ctx.totalSamplesCount << " total points" << std::endl;
+    std::cout << ctx.numberOfPoints << " total points" << std::endl;
     std::cout << ctx.points.size() << " initial points" << std::endl;
     for (size_t i = 0; i < ctx.points.size(); i++)
     {

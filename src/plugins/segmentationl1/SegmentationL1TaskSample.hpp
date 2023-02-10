@@ -36,7 +36,7 @@ public:
         pointsIndex_ = 0;
         dataIndex_ = 0;
 
-        ProgressActionInterface::initialize(context_->totalSamplesCount,
+        ProgressActionInterface::initialize(context_->numberOfPoints,
                                             1000UL);
     }
 

@@ -34,7 +34,7 @@ public:
         context_ = context;
         context_->query.reset();
 
-        uint64_t max = context_->totalSamplesCount;
+        uint64_t max = context_->numberOfPoints;
         size_t n = 0;
         int c = context_->parameters.initialSamplesCount;
         if (c > 0)
@@ -54,7 +54,7 @@ public:
         dataStep_ = 0;
         if (n > 0)
         {
-            dataStep_ = context_->totalSamplesCount / n;
+            dataStep_ = context_->numberOfPoints / n;
         }
 
         ProgressActionInterface::initialize(context_->initialSamplesCount,

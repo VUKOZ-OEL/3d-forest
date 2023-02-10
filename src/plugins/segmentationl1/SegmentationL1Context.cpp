@@ -43,7 +43,7 @@ void SegmentationL1Context::clear()
 
 void SegmentationL1Context::reset()
 {
-    totalSamplesCount = 0;
+    numberOfPoints = 0;
     initialSamplesCount = 0;
 
     points.clear();
