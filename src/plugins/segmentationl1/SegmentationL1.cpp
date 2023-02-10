@@ -34,6 +34,7 @@ SegmentationL1::SegmentationL1(Editor *editor) : context_(editor)
     tasks_.push_back(&taskCount_);
     tasks_.push_back(&taskRandom_);
     tasks_.push_back(&taskSample_);
+    tasks_.push_back(&taskNormal_);
     tasks_.push_back(&taskMedian_);
 
     clear();
