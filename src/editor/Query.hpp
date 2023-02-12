@@ -156,6 +156,8 @@ public:
     size_t cacheSize() const { return lru_.size(); }
     Page &cache(size_t index) { return *lru_[index]; }
 
+    bool mean(double &meanX, double &meanY, double &meanZ);
+
 protected:
     // Parent
     Editor *editor_;
