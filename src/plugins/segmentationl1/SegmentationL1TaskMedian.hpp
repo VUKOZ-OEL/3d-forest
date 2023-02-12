@@ -32,9 +32,13 @@ public:
     virtual void initialize(SegmentationL1Context *context)
     {
         context_ = context;
-        context_->query.reset();
+        index_ = 0;
+        r1_ =
+            static_cast<double>(context_->parameters.neighborhoodRadiusMinimum);
+        r2_ =
+            static_cast<double>(context_->parameters.neighborhoodRadiusMaximum);
 
-        ProgressActionInterface::initialize(context_->samples.size(), 1000UL);
+        ProgressActionInterface::initialize(context_->samples.size());
     }
 
     virtual void next()
@@ -46,6 +50,7 @@ public:
 
         while (i < n)
         {
+            step();
             i++;
             if (timedOut())
             {
@@ -56,8 +61,29 @@ public:
         increment(i);
     }
 
+    void step()
+    {
+        SegmentationL1Point &point = context_->samples[index_];
+        double x = point.x - (point.nx * r2_);
+        double y = point.y - (point.ny * r2_);
+        double z = point.z - (point.nz * r2_);
+
+        context_->query.where().setSphere(x, y, z, r2_ + (r2_ * 0.1));
+        context_->query.exec();
+        context_->query.mean(x, y, z);
+
+        point.x = x;
+        point.y = y;
+        point.z = z;
+
+        index_++;
+    }
+
 private:
     SegmentationL1Context *context_;
+    size_t index_;
+    double r1_;
+    double r2_;
 };
 
 #endif /* SEGMENTATION_L1_TASK_MEDIAN_HPP */
