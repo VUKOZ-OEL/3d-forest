@@ -24,6 +24,7 @@
 
 #include <SegmentationL1Context.hpp>
 #include <SegmentationL1TaskCount.hpp>
+#include <SegmentationL1TaskFinish.hpp>
 #include <SegmentationL1TaskMedian.hpp>
 #include <SegmentationL1TaskNormal.hpp>
 #include <SegmentationL1TaskRandom.hpp>
@@ -54,6 +55,7 @@ private:
     SegmentationL1TaskSample taskSample_;
     SegmentationL1TaskNormal taskNormal_;
     SegmentationL1TaskMedian taskMedian_;
+    SegmentationL1TaskFinish taskFinish_;
 
     std::vector<SegmentationL1TaskInterface *> tasks_;
     size_t currentAction_;

@@ -25,6 +25,7 @@
 #include <ExportEditor.hpp>
 #include <Json.hpp>
 #include <LayerData.hpp>
+#include <Mesh.hpp>
 #include <Vector3.hpp>
 
 /** Layer. */
@@ -46,6 +47,9 @@ public:
     const LayerData &data() const { return data_; }
     void setData(const LayerData &data) { data_ = data; }
 
+    const Mesh &mesh() const { return mesh_; }
+    void setMesh(const Mesh &mesh) { mesh_ = mesh; }
+
     void read(const Json &in);
     Json &write(Json &out) const;
 
@@ -56,6 +60,7 @@ protected:
     size_t id_;
 
     LayerData data_;
+    Mesh mesh_;
 };
 
 inline std::ostream &operator<<(std::ostream &os, const Layer &obj)
