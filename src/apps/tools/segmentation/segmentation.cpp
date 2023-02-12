@@ -99,13 +99,13 @@ int main(int argc, char *argv[])
         ArgumentParser arg;
         arg.add("--input", "");
         arg.add("--iterations", "");
-        arg.add("--count", "");
+        arg.add("--samples", "");
         arg.add("--test-data", "");
         arg.parse(argc, argv);
 
         SegmentationL1Parameters parameters;
 
-        (void)arg.read("--count", parameters.numberOfSamples);
+        (void)arg.read("--samples", parameters.numberOfSamples);
         (void)arg.read("--iterations", parameters.numberOfIterations);
 
         if (arg.contains("--test-data"))

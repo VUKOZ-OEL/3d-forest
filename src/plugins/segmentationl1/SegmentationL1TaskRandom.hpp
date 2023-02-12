@@ -46,7 +46,6 @@ public:
         {
             n = 1;
         }
-        context_->numberOfSamples = n;
         context_->samples.resize(n);
 
         sampleIndex_ = 0;
@@ -57,7 +56,7 @@ public:
             pointsStep_ = context_->numberOfPoints / n;
         }
 
-        ProgressActionInterface::initialize(context_->numberOfSamples, 1000UL);
+        ProgressActionInterface::initialize(context_->samples.size(), 1000UL);
     }
 
     virtual void next()

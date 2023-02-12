@@ -37,7 +37,6 @@ public:
     SegmentationL1Parameters parameters;
 
     uint64_t numberOfPoints;
-    size_t numberOfSamples;
 
     std::vector<SegmentationL1Point> samples;
 
