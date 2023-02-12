@@ -47,16 +47,11 @@ public:
     bool normal(Eigen::MatrixXd &V, double &nx, double &ny, double &nz);
 
 private:
-    Eigen::MatrixXd xyz;
-    Eigen::Matrix3d product;
-    Eigen::Matrix3d eigenVectors;
-    Eigen::Matrix3d eigenVectorsT;
-    Eigen::Vector3d eigenValues;
-    Eigen::Vector3d in;
-    Eigen::Vector3d out;
-    Eigen::Vector3d min;
-    Eigen::Vector3d max;
-    Eigen::SelfAdjointEigenSolver<Eigen::Matrix3d> E;
+    Eigen::MatrixXd xyz_;
+    Eigen::Matrix3d product_;
+    Eigen::Matrix3d eigenVectors_;
+    Eigen::Vector3d eigenValues_;
+    Eigen::SelfAdjointEigenSolver<Eigen::Matrix3d> eigenSolver_;
 };
 
 #endif /* SEGMENTATION_L1_PCA_HPP */

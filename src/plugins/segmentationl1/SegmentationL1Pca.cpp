@@ -33,17 +33,12 @@ SegmentationL1Pca::SegmentationL1Pca()
 
 void SegmentationL1Pca::clear()
 {
-    xyz.clear();
+    xyz_.clear();
 
-    // product
-    // eigenVectors
-    // eigenVectorsT
-    // eigenValues
-    // in;
-    // out;
-    // min;
-    // max;
-    // E;
+    // product_
+    // eigenVectors_
+    // eigenValues_
+    // eigenSolver_;
 }
 
 bool SegmentationL1Pca::normal(Query &query,
@@ -58,7 +53,7 @@ bool SegmentationL1Pca::normal(Query &query,
     // The number of points inside sphere[x, y, z, radius].
     Eigen::MatrixXd::Index nPoints = 0;
 
-    // Select points in 'cell' into point coordinates 'xyz'.
+    // Select points in 'cell' into point coordinates 'xyz_'.
     // Count the number of points.
     query.where().setSphere(x, y, z, radius);
     query.exec();
@@ -76,22 +71,22 @@ bool SegmentationL1Pca::normal(Query &query,
         return false;
     }
 
-    // Get point coordinates into 'xyz'.
-    xyz.resize(3, nPoints);
+    // Get point coordinates into 'xyz_'.
+    xyz_.resize(3, nPoints);
     nPoints = 0;
 
     query.reset();
     while (query.next())
     {
-        xyz(0, nPoints) = query.x();
-        xyz(1, nPoints) = query.y();
-        xyz(2, nPoints) = query.z();
+        xyz_(0, nPoints) = query.x();
+        xyz_(1, nPoints) = query.y();
+        xyz_(2, nPoints) = query.z();
 
         nPoints++;
     }
 
     // Compute PCA.
-    bool result = normal(xyz, nx, ny, nz);
+    bool result = normal(xyz_, nx, ny, nz);
 
     return result;
 }
@@ -140,33 +135,33 @@ bool SegmentationL1Pca::normal(Eigen::MatrixXd &V,
 
     // Compute product.
     const double inv = 1.0 / static_cast<double>(nPoints - 1);
-    product = inv * V.topRows<3>() * V.topRows<3>().transpose();
-    LOG_DEBUG(<< "Product\n" << product);
+    product_ = inv * V.topRows<3>() * V.topRows<3>().transpose();
+    LOG_DEBUG(<< "Product\n" << product_);
 
     // Compute Eigen vectors.
-    E.compute(product);
+    eigenSolver_.compute(product_);
 
     // Reorder.
     Eigen::MatrixXd::Index smallest = 0;
-    eigenValues[0] = E.eigenvalues()[2];
-    eigenVectors.col(0) = E.eigenvectors().col(2);
+    eigenValues_[0] = eigenSolver_.eigenvalues()[2];
+    eigenVectors_.col(0) = eigenSolver_.eigenvectors().col(2);
     for (Eigen::MatrixXd::Index i = 1; i < 3; i++)
     {
-        eigenValues[i] = E.eigenvalues()[2 - i];
-        eigenVectors.col(i) = E.eigenvectors().col(2 - i);
+        eigenValues_[i] = eigenSolver_.eigenvalues()[2 - i];
+        eigenVectors_.col(i) = eigenSolver_.eigenvectors().col(2 - i);
 
-        if (eigenValues[i] < eigenValues[smallest])
+        if (eigenValues_[i] < eigenValues_[smallest])
         {
             smallest = i;
         }
     }
-    eigenVectors.col(2) = eigenVectors.col(0).cross(eigenVectors.col(1));
-    LOG_DEBUG(<< "Eigen values\n" << eigenValues);
-    LOG_DEBUG(<< "Eigen vectors\n" << eigenVectors);
+    eigenVectors_.col(2) = eigenVectors_.col(0).cross(eigenVectors_.col(1));
+    LOG_DEBUG(<< "Eigen values\n" << eigenValues_);
+    LOG_DEBUG(<< "Eigen vectors\n" << eigenVectors_);
 
-    nx = eigenVectors(0, smallest);
-    ny = eigenVectors(1, smallest);
-    nz = eigenVectors(2, smallest);
+    nx = eigenVectors_(0, smallest);
+    ny = eigenVectors_(1, smallest);
+    nz = eigenVectors_(2, smallest);
 
     return true;
 }
