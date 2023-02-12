@@ -33,13 +33,20 @@ public:
     double x;
     double y;
     double z;
+    double nx;
+    double ny;
+    double nz;
 };
 
 inline std::ostream &operator<<(std::ostream &os,
                                 const SegmentationL1Point &obj)
 {
-    return os << "index <" << obj.index << "> x <" << obj.x << "> y <" << obj.y
-              << "> z <" << obj.z << ">";
+    // clang-format off
+    return os << "index <" << obj.index
+              << "> x <" << obj.x << "> y <" << obj.y << "> z <" << obj.z
+              << "> nx <" << obj.nx << "> ny <" << obj.ny << "> nz <" << obj.nz
+              << ">";
+    // clang-format on
 }
 
 #endif /* SEGMENTATION_L1_POINT_HPP */
