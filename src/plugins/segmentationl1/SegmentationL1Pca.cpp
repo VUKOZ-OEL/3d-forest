@@ -23,7 +23,7 @@
 #include <SegmentationL1Pca.hpp>
 
 #define LOG_MODULE_NAME "SegmentationL1Pca"
-#define LOG_MODULE_DEBUG_ENABLED 1
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 SegmentationL1Pca::SegmentationL1Pca()
@@ -168,37 +168,5 @@ bool SegmentationL1Pca::normal(Eigen::MatrixXd &V,
     ny = eigenVectors(1, smallest);
     nz = eigenVectors(2, smallest);
 
-#if 0
-    // Project point coordinates by Eigen vectors.
-    constexpr double bigNumber = std::numeric_limits<double>::max();
-    min[0] = bigNumber;
-    min[1] = bigNumber;
-    min[2] = bigNumber;
-    max[0] = -bigNumber;
-    max[1] = -bigNumber;
-    max[2] = -bigNumber;
-    eigenVectorsT = eigenVectors.transpose();
-    for (Eigen::MatrixXd::Index i = 0; i < nPoints; i++)
-    {
-        in[0] = V(0, i);
-        in[1] = V(1, i);
-        in[2] = V(2, i);
-
-        out = eigenVectorsT * in;
-
-        min = min.cwiseMin(out);
-        max = max.cwiseMax(out);
-    }
-
-    LOG_DEBUG(<< "Projected minimum\n" << min);
-    LOG_DEBUG(<< "Projected maximum\n" << max);
-
-    // Compute intensity.
-    double eL = std::abs(max[0] - min[0]);
-    double eI = std::abs(max[1] - min[1]);
-    double eS = std::abs(max[2] - min[2]);
-
-    LOG_DEBUG(<< "Computed eLIS <" << eL << "," << eI << "," << eS << ">.");
-#endif
     return true;
 }
