@@ -685,3 +685,33 @@ std::shared_ptr<Page> Query::read(size_t dataset, size_t index)
         return result;
     }
 }
+
+bool Query::mean(double &meanX, double &meanY, double &meanZ)
+{
+    uint64_t nPoints = 0;
+    meanX = 0;
+    meanY = 0;
+    meanZ = 0;
+
+    reset();
+    while (next())
+    {
+        meanX += x();
+        meanY += y();
+        meanZ += z();
+
+        nPoints++;
+    }
+
+    if (nPoints < 1)
+    {
+        return false;
+    }
+
+    const double d = static_cast<double>(nPoints);
+    meanX = meanX / d;
+    meanY = meanY / d;
+    meanZ = meanZ / d;
+
+    return true;
+}

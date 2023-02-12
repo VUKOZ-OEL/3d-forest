@@ -29,7 +29,7 @@
 class SegmentationL1Parameters
 {
 public:
-    int initialSamplesCount;
+    int numberOfSamples;
     int initialSamplesDensityMinimum;
     int initialSamplesDensityMaximum;
     int neighborhoodRadiusMinimum;
@@ -40,7 +40,7 @@ public:
 
     void clear()
     {
-        initialSamplesCount = 0;
+        numberOfSamples = 0;
         initialSamplesDensityMinimum = 0;
         initialSamplesDensityMaximum = 0;
         neighborhoodRadiusMinimum = 0;
@@ -50,7 +50,7 @@ public:
 
     void setDefault()
     {
-        initialSamplesCount = 5;
+        numberOfSamples = 5;
         initialSamplesDensityMinimum = 0;
         initialSamplesDensityMaximum = 100;
         neighborhoodRadiusMinimum = 100;
@@ -58,14 +58,14 @@ public:
         numberOfIterations = 1;
     }
 
-    void set(int initialSamplesCount_,
+    void set(int numberOfSamples_,
              int initialSamplesDensityMinimum_,
              int initialSamplesDensityMaximum_,
              int neighborhoodRadiusMinimum_,
              int neighborhoodRadiusMaximum_,
              int numberOfIterations_)
     {
-        initialSamplesCount = initialSamplesCount_;
+        numberOfSamples = numberOfSamples_;
         initialSamplesDensityMinimum = initialSamplesDensityMinimum_;
         initialSamplesDensityMaximum = initialSamplesDensityMaximum_;
         neighborhoodRadiusMinimum = neighborhoodRadiusMinimum_;
@@ -77,7 +77,7 @@ public:
 inline std::ostream &operator<<(std::ostream &os,
                                 const SegmentationL1Parameters &obj)
 {
-    return os << "initialSamplesCount <" << obj.initialSamplesCount
+    return os << "numberOfSamples <" << obj.numberOfSamples
               << "> initialSamplesDensityMinimum <"
               << obj.initialSamplesDensityMinimum
               << "> initialSamplesDensityMaximum <"

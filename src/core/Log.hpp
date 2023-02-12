@@ -43,7 +43,8 @@ enum EXPORT_CORE LogType
     LOG_TYPE_DEBUG,
     LOG_TYPE_WARNING,
     LOG_TYPE_ERROR,
-    LOG_TYPE_INFO
+    LOG_TYPE_INFO,
+    LOG_TYPE_PRINT
 };
 
 /** Log Message. */
@@ -89,6 +90,7 @@ public:
 class EXPORT_CORE LoggerStdout : public LogThreadCallbackInterface
 {
 public:
+    LoggerStdout() = default;
     virtual ~LoggerStdout() = default;
     virtual void println(const LogMessage &message);
     virtual void flush();
@@ -131,6 +133,7 @@ private:
 };
 
 extern std::shared_ptr<LogThread> EXPORT_CORE globalLogThread;
+extern std::shared_ptr<LoggerStdout> EXPORT_CORE globalLoggerStdout;
 
 #define LOG_MESSAGE(type, module, msg)                                         \
     do                                                                         \
@@ -161,6 +164,22 @@ extern std::shared_ptr<LogThread> EXPORT_CORE globalLogThread;
 #define LOG_WARNING(msg) LOG_MESSAGE(LOG_TYPE_WARNING, LOG_MODULE_NAME, msg)
 #define LOG_ERROR(msg) LOG_MESSAGE(LOG_TYPE_ERROR, LOG_MODULE_NAME, msg)
 #define LOG_INFO(msg) LOG_MESSAGE(LOG_TYPE_INFO, LOG_MODULE_NAME, msg)
+#define LOG_PRINT(msg) LOG_MESSAGE(LOG_TYPE_PRINT, "", msg)
+
+#define LOGGER_START_STDOUT                                                    \
+    do                                                                         \
+    {                                                                          \
+        globalLogThread = std::make_shared<LogThread>();                       \
+        globalLoggerStdout = std::make_shared<LoggerStdout>();                 \
+        globalLogThread->setCallback(globalLoggerStdout.get());                \
+    } while (false)
+
+#define LOGGER_STOP_STDOUT                                                     \
+    do                                                                         \
+    {                                                                          \
+        globalLogThread->stop();                                               \
+        globalLogThread->setCallback(nullptr);                                 \
+    } while (false)
 
 template <typename T>
 inline std::ostream &operator<<(std::ostream &os, std::unordered_set<T> vec)

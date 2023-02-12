@@ -17,33 +17,22 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationL1Context.cpp */
+/** @file Mesh.cpp */
 
-#include <Editor.hpp>
-#include <SegmentationL1Context.hpp>
+#include <cmath>
 
-#define LOG_MODULE_NAME "SegmentationL1Context"
-#include <Log.hpp>
+#include <Mesh.hpp>
 
-SegmentationL1Context::SegmentationL1Context(Editor *editor_)
-    : editor(editor_),
-      query(editor_)
+Mesh::Mesh()
 {
-    clear();
 }
 
-void SegmentationL1Context::clear()
+Mesh::~Mesh()
 {
-    query.clear();
-
-    parameters.clear();
-
-    reset();
 }
 
-void SegmentationL1Context::reset()
+void Mesh::clear()
 {
-    numberOfPoints = 0;
-
-    samples.clear();
+    xyz.clear();
+    rgb.clear();
 }

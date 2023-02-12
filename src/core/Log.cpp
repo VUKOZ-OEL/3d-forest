@@ -23,6 +23,7 @@
 #include <Time.hpp>
 
 std::shared_ptr<LogThread> globalLogThread;
+std::shared_ptr<LoggerStdout> globalLoggerStdout;
 
 LogThread::LogThread()
     : messageQueue_(10000U),
@@ -221,9 +222,16 @@ const char *LogMessage::typeString(int type_)
 
 void LoggerStdout::println(const LogMessage &message)
 {
-    std::cout << message.time << " " << message.typeString() << " "
-              << message.text << " [" << message.module << ":"
-              << message.function << "]" << std::endl;
+    if (message.type == LOG_TYPE_PRINT)
+    {
+        std::cout << message.text << std::endl;
+    }
+    else
+    {
+        std::cout << message.time << message.typeString() << message.text
+                  << " [" << message.module << ":" << message.function << "]"
+                  << std::endl;
+    }
 }
 
 void LoggerStdout::flush()

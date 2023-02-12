@@ -17,33 +17,34 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationL1Context.cpp */
+/** @file Mesh.hpp */
 
-#include <Editor.hpp>
-#include <SegmentationL1Context.hpp>
+#ifndef MESH_HPP
+#define MESH_HPP
 
-#define LOG_MODULE_NAME "SegmentationL1Context"
-#include <Log.hpp>
+#include <vector>
 
-SegmentationL1Context::SegmentationL1Context(Editor *editor_)
-    : editor(editor_),
-      query(editor_)
+#include <ExportCore.hpp>
+
+/** Mesh. */
+class EXPORT_CORE Mesh
 {
-    clear();
-}
+public:
+    /** Mesh Mode. */
+    enum EXPORT_CORE Mode
+    {
+        MODE_POINTS,
+        MODE_LINES,
+        MODE_QUADS
+    };
 
-void SegmentationL1Context::clear()
-{
-    query.clear();
+    std::vector<float> xyz;
+    std::vector<float> rgb;
 
-    parameters.clear();
+    Mesh();
+    ~Mesh();
 
-    reset();
-}
+    void clear();
+};
 
-void SegmentationL1Context::reset()
-{
-    numberOfPoints = 0;
-
-    samples.clear();
-}
+#endif /* MESH_HPP */

@@ -351,7 +351,8 @@ void ViewerOpenGLViewport::renderLayers()
     for (size_t i = 0; i < layers.size(); i++)
     {
         const Layer &layer = layers.at(i);
-        const LayerData &layerData = layer.data();
+        const Mesh &mesh = layer.mesh();
+        ViewerOpenGL::render(ViewerOpenGL::POINTS, mesh.xyz, mesh.rgb);
     }
 }
 

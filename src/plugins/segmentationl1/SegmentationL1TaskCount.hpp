@@ -56,7 +56,7 @@ public:
 
         if (context_->query.next())
         {
-            context_->totalSamplesCount++;
+            context_->numberOfPoints++;
         }
 
         uint64_t max = context_->editor->datasets().nPoints(
@@ -70,7 +70,7 @@ public:
         startTimer();
         while (context_->query.next())
         {
-            context_->totalSamplesCount++;
+            context_->numberOfPoints++;
             if (timedOut())
             {
                 return;

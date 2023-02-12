@@ -24,6 +24,7 @@
 
 #include <Query.hpp>
 #include <SegmentationL1Parameters.hpp>
+#include <SegmentationL1Pca.hpp>
 #include <SegmentationL1Point.hpp>
 class Editor;
 
@@ -35,11 +36,9 @@ public:
     Query query;
 
     SegmentationL1Parameters parameters;
-
-    uint64_t totalSamplesCount;
-    size_t initialSamplesCount;
-
-    std::vector<SegmentationL1Point> points;
+    uint64_t numberOfPoints;
+    std::vector<SegmentationL1Point> samples;
+    SegmentationL1Pca pca;
 
     SegmentationL1Context(Editor *editor);
 

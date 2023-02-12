@@ -22,6 +22,8 @@
 #include <DescriptorPca.hpp>
 #include <Editor.hpp>
 #include <Error.hpp>
+#include <SegmentationL1Pca.hpp>
+
 #include <Log.hpp>
 
 static void computePca(const Eigen::MatrixXd &points)
@@ -35,9 +37,13 @@ static void computePca(const Eigen::MatrixXd &points)
     DescriptorPca pca;
     (void)pca.computeDescriptor(V, x, y, z, descriptor);
 
-    std::cout << "descriptor <" << descriptor << ">"
-              << " mean x <" << x << "> y <" << y << "> z <" << z << ">"
-              << std::endl;
+    LOG_PRINT(<< "descriptor <" << descriptor << ">"
+              << " mean x <" << x << "> y <" << y << "> z <" << z << ">");
+
+    SegmentationL1Pca pca2;
+    (void)pca2.normal(V, x, y, z);
+
+    LOG_PRINT(<< "normal x <" << x << "> y <" << y << "> z <" << z << ">");
 }
 
 static void examplePca()
@@ -66,6 +72,8 @@ static void examplePca()
 
 int main()
 {
+    int rc = 0;
+    LOGGER_START_STDOUT;
     try
     {
         examplePca();
@@ -73,8 +81,13 @@ int main()
     catch (std::exception &e)
     {
         std::cerr << "error: " << e.what() << std::endl;
-        return 1;
+        rc = 1;
     }
-
-    return 0;
+    catch (...)
+    {
+        std::cerr << "error: unknown" << std::endl;
+        rc = 1;
+    }
+    LOGGER_STOP_STDOUT;
+    return rc;
 }

@@ -68,47 +68,44 @@ static void createTestDataset(const std::string &path)
 static void segmentation(const std::string &path,
                          const SegmentationL1Parameters &parameters)
 {
-    std::cout << "Open file '" << path << "' in editor" << std::endl;
+    LOG_PRINT(<< "Open file '" << path << "' in editor");
     Editor editor;
     editor.open(path);
 
-    std::cout << "Compute segmentation" << std::endl;
+    LOG_PRINT(<< "Compute segmentation");
     SegmentationL1 segmentationL1(&editor);
     segmentationL1.applyParameters(parameters);
     while (segmentationL1.next())
         ;
 
-    std::cout << "Debug information" << std::endl;
+    LOG_PRINT(<< "Debug information");
     const SegmentationL1Context &ctx = segmentationL1.context();
-    std::cout << ctx.totalSamplesCount << " total points" << std::endl;
-    std::cout << ctx.points.size() << " initial points" << std::endl;
-    for (size_t i = 0; i < ctx.points.size(); i++)
+    LOG_PRINT(<< ctx.numberOfPoints << " total points");
+    LOG_PRINT(<< ctx.samples.size() << " sample points");
+    for (size_t i = 0; i < ctx.samples.size(); i++)
     {
-        std::cout << "point[" << i << "] is " << ctx.points[i] << std::endl;
+        LOG_PRINT(<< "point[" << i << "] is " << ctx.samples[i]);
     }
 }
 
 int main(int argc, char *argv[])
 {
-    int rc;
+    int rc = 0;
 
-    globalLogThread = std::make_shared<LogThread>();
-
-    LoggerStdout logger;
-    globalLogThread->setCallback(&logger);
+    LOGGER_START_STDOUT;
 
     try
     {
         ArgumentParser arg;
         arg.add("--input", "");
         arg.add("--iterations", "");
-        arg.add("--count", "");
+        arg.add("--samples", "");
         arg.add("--test-data", "");
         arg.parse(argc, argv);
 
         SegmentationL1Parameters parameters;
 
-        (void)arg.read("--count", parameters.initialSamplesCount);
+        (void)arg.read("--samples", parameters.numberOfSamples);
         (void)arg.read("--iterations", parameters.numberOfIterations);
 
         if (arg.contains("--test-data"))
@@ -117,8 +114,6 @@ int main(int argc, char *argv[])
         }
 
         segmentation(arg.toString("--input"), parameters);
-
-        rc = 0;
     }
     catch (std::exception &e)
     {
@@ -131,8 +126,7 @@ int main(int argc, char *argv[])
         rc = 1;
     }
 
-    globalLogThread->setCallback(nullptr);
-    globalLogThread->stop();
+    LOGGER_STOP_STDOUT;
 
     return rc;
 }

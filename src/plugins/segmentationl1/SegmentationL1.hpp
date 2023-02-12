@@ -24,7 +24,9 @@
 
 #include <SegmentationL1Context.hpp>
 #include <SegmentationL1TaskCount.hpp>
+#include <SegmentationL1TaskFinish.hpp>
 #include <SegmentationL1TaskMedian.hpp>
+#include <SegmentationL1TaskNormal.hpp>
 #include <SegmentationL1TaskRandom.hpp>
 #include <SegmentationL1TaskSample.hpp>
 class Editor;
@@ -51,7 +53,9 @@ private:
     SegmentationL1TaskCount taskCount_;
     SegmentationL1TaskRandom taskRandom_;
     SegmentationL1TaskSample taskSample_;
+    SegmentationL1TaskNormal taskNormal_;
     SegmentationL1TaskMedian taskMedian_;
+    SegmentationL1TaskFinish taskFinish_;
 
     std::vector<SegmentationL1TaskInterface *> tasks_;
     size_t currentAction_;

@@ -57,7 +57,7 @@ SegmentationL1Window::SegmentationL1Window(MainWindow *mainWindow)
                          1,
                          1,
                          100,
-                         parameters_.initialSamplesCount);
+                         parameters_.numberOfSamples);
 
     RangeSliderWidget::create(initialSamplesDensityInput_,
                               this,
