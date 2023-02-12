@@ -23,6 +23,7 @@
 #define SEGMENTATION_L1_TASK_NORMAL_HPP
 
 #include <Editor.hpp>
+#include <SegmentationL1Pca.hpp>
 #include <SegmentationL1TaskInterface.hpp>
 
 /** Segmentation L1 Task Normal. */
@@ -32,10 +33,14 @@ public:
     virtual void initialize(SegmentationL1Context *context)
     {
         context_ = context;
-        context_->query.reset();
-        index_ = 0;
+        context_->query.setWhere(context_->editor->viewports().where());
+        context_->query.exec();
 
-        ProgressActionInterface::initialize(context_->numberOfPoints);
+        index_ = 0;
+        radius_ =
+            static_cast<double>(context_->parameters.neighborhoodRadiusMinimum);
+
+        ProgressActionInterface::initialize(context_->samples.size());
     }
 
     virtual void next()
@@ -47,6 +52,18 @@ public:
 
         while (i < n)
         {
+            SegmentationL1Point &point = context_->samples[index_];
+            pca_.normal(context_->query,
+                        point.x,
+                        point.y,
+                        point.z,
+                        radius_,
+                        point.nx,
+                        point.ny,
+                        point.nz);
+
+            index_++;
+
             i++;
             if (timedOut())
             {
@@ -60,6 +77,8 @@ public:
 private:
     SegmentationL1Context *context_;
     size_t index_;
+    double radius_;
+    SegmentationL1Pca pca_;
 };
 
 #endif /* SEGMENTATION_L1_TASK_NORMAL_HPP */
