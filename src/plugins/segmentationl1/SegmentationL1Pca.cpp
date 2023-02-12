@@ -23,6 +23,7 @@
 #include <SegmentationL1Pca.hpp>
 
 #define LOG_MODULE_NAME "SegmentationL1Pca"
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 SegmentationL1Pca::SegmentationL1Pca()
@@ -37,6 +38,7 @@ void SegmentationL1Pca::clear()
     // product
     // eigenVectors
     // eigenVectorsT
+    // eigenValues
     // in;
     // out;
     // min;
@@ -49,10 +51,9 @@ bool SegmentationL1Pca::normal(Query &query,
                                double y,
                                double z,
                                double radius,
-                               double &meanX,
-                               double &meanY,
-                               double &meanZ,
-                               float &descriptor)
+                               double &nx,
+                               double &ny,
+                               double &nz)
 {
     // The number of points inside sphere[x, y, z, radius].
     Eigen::MatrixXd::Index nPoints = 0;
@@ -89,17 +90,16 @@ bool SegmentationL1Pca::normal(Query &query,
         nPoints++;
     }
 
-    // Compute PCA descriptor.
-    bool result = normal(xyz, meanX, meanY, meanZ, descriptor);
+    // Compute PCA.
+    bool result = normal(xyz, nx, ny, nz);
 
     return result;
 }
 
 bool SegmentationL1Pca::normal(Eigen::MatrixXd &V,
-                               double &meanX,
-                               double &meanY,
-                               double &meanZ,
-                               float &descriptor)
+                               double &nx,
+                               double &ny,
+                               double &nz)
 {
     // The number of points.
     Eigen::MatrixXd::Index nPoints = V.cols();
@@ -107,10 +107,9 @@ bool SegmentationL1Pca::normal(Eigen::MatrixXd &V,
     LOG_DEBUG(<< "Compute nPoints <" << nPoints << ">.");
 
     // Compute centroid.
-    meanX = 0;
-    meanY = 0;
-    meanZ = 0;
-    descriptor = 0;
+    double meanX = 0;
+    double meanY = 0;
+    double meanZ = 0;
 
     for (Eigen::MatrixXd::Index i = 0; i < nPoints; i++)
     {
@@ -146,13 +145,30 @@ bool SegmentationL1Pca::normal(Eigen::MatrixXd &V,
 
     // Compute Eigen vectors.
     E.compute(product);
-    for (Eigen::MatrixXd::Index i = 0; i < 3; i++)
+
+    // Reorder.
+    Eigen::MatrixXd::Index smallest = 0;
+    eigenValues[0] = E.eigenvalues()[2];
+    eigenVectors.col(0) = E.eigenvectors().col(2);
+    for (Eigen::MatrixXd::Index i = 1; i < 3; i++)
     {
+        eigenValues[i] = E.eigenvalues()[2 - i];
         eigenVectors.col(i) = E.eigenvectors().col(2 - i);
+
+        if (eigenValues[i] < eigenValues[smallest])
+        {
+            smallest = i;
+        }
     }
     eigenVectors.col(2) = eigenVectors.col(0).cross(eigenVectors.col(1));
+    LOG_DEBUG(<< "Eigen values\n" << eigenValues);
     LOG_DEBUG(<< "Eigen vectors\n" << eigenVectors);
 
+    nx = eigenVectors(0, smallest);
+    ny = eigenVectors(1, smallest);
+    nz = eigenVectors(2, smallest);
+
+#if 0
     // Project point coordinates by Eigen vectors.
     constexpr double bigNumber = std::numeric_limits<double>::max();
     min[0] = bigNumber;
@@ -183,6 +199,6 @@ bool SegmentationL1Pca::normal(Eigen::MatrixXd &V,
     double eS = std::abs(max[2] - min[2]);
 
     LOG_DEBUG(<< "Computed eLIS <" << eL << "," << eI << "," << eS << ">.");
-
+#endif
     return true;
 }

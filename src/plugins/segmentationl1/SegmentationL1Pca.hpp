@@ -40,22 +40,18 @@ public:
                 double y,
                 double z,
                 double radius,
-                double &meanX,
-                double &meanY,
-                double &meanZ,
-                float &descriptor);
+                double &nx,
+                double &ny,
+                double &nz);
 
-    bool normal(Eigen::MatrixXd &V,
-                double &meanX,
-                double &meanY,
-                double &meanZ,
-                float &descriptor);
+    bool normal(Eigen::MatrixXd &V, double &nx, double &ny, double &nz);
 
 private:
     Eigen::MatrixXd xyz;
     Eigen::Matrix3d product;
     Eigen::Matrix3d eigenVectors;
     Eigen::Matrix3d eigenVectorsT;
+    Eigen::Vector3d eigenValues;
     Eigen::Vector3d in;
     Eigen::Vector3d out;
     Eigen::Vector3d min;

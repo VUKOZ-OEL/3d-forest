@@ -21,12 +21,14 @@ add_executable(
     ${SUB_PROJECT_NAME}
     examplePca.cpp
     ../../../plugins/descriptor/DescriptorPca.cpp
+    ../../../plugins/segmentationl1/SegmentationL1Pca.cpp
 )
 
 target_include_directories(
     ${SUB_PROJECT_NAME}
     PUBLIC
     ../../../plugins/descriptor
+    ../../../plugins/segmentationl1
     ../../../../3rdparty/eigen
 )
 
