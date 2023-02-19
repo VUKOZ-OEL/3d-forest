@@ -351,8 +351,25 @@ void ViewerOpenGLViewport::renderLayers()
     for (size_t i = 0; i < layers.size(); i++)
     {
         const Layer &layer = layers.at(i);
-        const Mesh &mesh = layer.mesh();
-        ViewerOpenGL::render(ViewerOpenGL::POINTS, mesh.xyz, mesh.rgb);
+        for (size_t m = 0; m < layer.meshSize(); m++)
+        {
+            const Mesh &mesh = layer.mesh(m);
+
+            ViewerOpenGL::Mode mode;
+            if (mesh.mode == Mesh::MODE_POINTS)
+            {
+                mode = ViewerOpenGL::POINTS;
+                glPointSize(3.0F);
+            }
+            else
+            {
+                mode = ViewerOpenGL::LINES;
+            }
+
+            ViewerOpenGL::render(mode, mesh.xyz, mesh.rgb);
+
+            glPointSize(1.0F);
+        }
     }
 }
 
