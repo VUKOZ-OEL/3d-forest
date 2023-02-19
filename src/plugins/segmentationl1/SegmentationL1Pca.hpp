@@ -42,15 +42,22 @@ public:
                 double radius,
                 double &nx,
                 double &ny,
-                double &nz);
+                double &nz,
+                double &vx,
+                double &vy,
+                double &vz);
 
-    bool normal(Eigen::MatrixXd &V, double &nx, double &ny, double &nz);
+    bool normal(Eigen::MatrixXd &V,
+                double &nx,
+                double &ny,
+                double &nz,
+                double &vx,
+                double &vy,
+                double &vz);
 
 private:
     Eigen::MatrixXd xyz_;
     Eigen::Matrix3d product_;
-    Eigen::Matrix3d eigenVectors_;
-    Eigen::Vector3d eigenValues_;
     Eigen::SelfAdjointEigenSolver<Eigen::Matrix3d> eigenSolver_;
 };
 
