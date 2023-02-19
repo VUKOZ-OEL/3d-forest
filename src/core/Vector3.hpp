@@ -61,6 +61,11 @@ public:
         return a.crossProduct(b);
     }
 
+    static T dotProduct(const Vector3<T> &a, const Vector3<T> &b)
+    {
+        return (a[0] * b[0]) + (a[1] * b[1]) + (a[2] * b[2]);
+    }
+
     Vector3<T> rotated(const Vector3<T> &axis, double angle) const;
 
     friend Vector3<T> operator+(const Vector3<T> &a, const Vector3<T> &b)
