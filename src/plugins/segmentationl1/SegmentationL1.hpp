@@ -24,6 +24,7 @@
 
 #include <SegmentationL1Context.hpp>
 #include <SegmentationL1TaskFinish.hpp>
+#include <SegmentationL1TaskMedian.hpp>
 #include <SegmentationL1TaskNormal.hpp>
 #include <SegmentationL1TaskSample.hpp>
 #include <SegmentationL1TaskVoxelize.hpp>
@@ -51,6 +52,7 @@ private:
     SegmentationL1TaskVoxelize taskVoxelize_;
     SegmentationL1TaskSample taskSample_;
     SegmentationL1TaskNormal taskNormal_;
+    SegmentationL1TaskMedian taskMedian_;
     SegmentationL1TaskFinish taskFinish_;
 
     std::vector<SegmentationL1TaskInterface *> tasks_;

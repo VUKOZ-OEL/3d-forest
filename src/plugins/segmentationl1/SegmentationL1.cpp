@@ -34,6 +34,7 @@ SegmentationL1::SegmentationL1(Editor *editor) : context_(editor)
     tasks_.push_back(&taskVoxelize_);
     tasks_.push_back(&taskSample_);
     tasks_.push_back(&taskNormal_);
+    tasks_.push_back(&taskMedian_);
     tasks_.push_back(&taskFinish_);
 
     clear();
@@ -56,6 +57,17 @@ bool SegmentationL1::applyParameters(const SegmentationL1Parameters &parameters)
     LOG_DEBUG(<< "Apply parameters <" << parameters << ">.");
 
     size_t newAction = SegmentationL1::npos;
+
+    // Neighborhood Radius or the number of iterations has been changed.
+    if ((context_.parameters.neighborhoodRadiusMinimum !=
+         parameters.neighborhoodRadiusMinimum) ||
+        (context_.parameters.neighborhoodRadiusMaximum !=
+         parameters.neighborhoodRadiusMaximum) ||
+        (context_.parameters.numberOfIterations !=
+         parameters.numberOfIterations))
+    {
+        newAction = 3;
+    }
 
     // Neighborhood Radius has been changed.
     if (context_.parameters.neighborhoodRadiusMinimum !=

@@ -24,6 +24,7 @@ add_executable(
     ../../../plugins/segmentationl1/SegmentationL1Context.cpp
     ../../../plugins/segmentationl1/SegmentationL1TaskVoxelize.cpp
     ../../../plugins/segmentationl1/SegmentationL1TaskSample.cpp
+    ../../../plugins/segmentationl1/SegmentationL1TaskMedian.cpp
     ../../../plugins/segmentationl1/SegmentationL1TaskFinish.cpp
     ../../../plugins/segmentationl1/SegmentationL1Pca.cpp
 )
