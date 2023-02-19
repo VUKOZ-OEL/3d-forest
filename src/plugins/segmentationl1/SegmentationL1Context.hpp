@@ -38,6 +38,7 @@ public:
 
     SegmentationL1Parameters parameters;
     std::vector<SegmentationL1Point> samples;
+    std::vector<SegmentationL1Point> samplesBackup;
     VoxelFile voxelFile;
     SegmentationL1Pca pca;
 

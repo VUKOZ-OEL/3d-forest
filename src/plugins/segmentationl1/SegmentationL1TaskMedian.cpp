@@ -30,6 +30,7 @@ void SegmentationL1TaskMedian::initialize(SegmentationL1Context *context)
 {
     context_ = context;
 
+    context_->samples = context_->samplesBackup;
     context_->query.setWhere(context_->editor->viewports().where());
 
     index_ = 0;

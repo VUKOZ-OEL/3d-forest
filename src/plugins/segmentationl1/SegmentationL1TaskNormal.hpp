@@ -22,74 +22,15 @@
 #ifndef SEGMENTATION_L1_TASK_NORMAL_HPP
 #define SEGMENTATION_L1_TASK_NORMAL_HPP
 
-#include <Editor.hpp>
 #include <SegmentationL1TaskInterface.hpp>
 
 /** Segmentation L1 Task Normal. */
 class SegmentationL1TaskNormal : public SegmentationL1TaskInterface
 {
 public:
-    virtual void initialize(SegmentationL1Context *context)
-    {
-        context_ = context;
-        context_->query.setWhere(context_->editor->viewports().where());
-        context_->query.exec();
-
-        index_ = 0;
-        radius_ =
-            static_cast<double>(context_->parameters.neighborhoodRadiusMinimum);
-
-        ProgressActionInterface::initialize(context_->samples.size());
-    }
-
-    virtual void next()
-    {
-        uint64_t n = process();
-        uint64_t i = 0;
-
-        startTimer();
-
-        while (i < n)
-        {
-            step();
-
-            i++;
-            if (timedOut())
-            {
-                break;
-            }
-        }
-
-        increment(i);
-    }
-
-    void step()
-    {
-        SegmentationL1Point &point = context_->samples[index_];
-        point.hasVectors = context_->pca.normal(context_->query,
-                                                point.x,
-                                                point.y,
-                                                point.z,
-                                                radius_,
-                                                point.nx,
-                                                point.ny,
-                                                point.nz,
-                                                point.vx,
-                                                point.vy,
-                                                point.vz);
-
-        if (!point.hasVectors)
-        {
-            point.nx = 0;
-            point.ny = 0;
-            point.nz = 0;
-            point.vx = 0;
-            point.vy = 0;
-            point.vz = 0;
-        }
-
-        index_++;
-    }
+    virtual void initialize(SegmentationL1Context *context);
+    virtual void next();
+    void step();
 
 private:
     SegmentationL1Context *context_;

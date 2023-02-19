@@ -82,6 +82,11 @@ void SegmentationL1TaskSample::step()
               << context_->samples.size() << "> data <" << voxel << ">.");
 
     sampleIndex_++;
+
+    if (sampleIndex_ == context_->samples.size())
+    {
+        context_->samplesBackup = context_->samples;
+    }
 }
 
 void SegmentationL1TaskSample::setNumberOfSamples()
@@ -102,6 +107,7 @@ void SegmentationL1TaskSample::setNumberOfSamples()
     }
 
     context_->samples.resize(n);
+    context_->samplesBackup.resize(0);
 
     if (n > 0)
     {

@@ -43,4 +43,5 @@ void SegmentationL1Context::clear()
 void SegmentationL1Context::reset()
 {
     samples.clear();
+    samplesBackup.clear();
 }
