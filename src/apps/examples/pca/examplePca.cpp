@@ -40,10 +40,17 @@ static void computePca(const Eigen::MatrixXd &points)
     LOG_PRINT(<< "descriptor <" << descriptor << ">"
               << " mean x <" << x << "> y <" << y << "> z <" << z << ">");
 
+    double nx;
+    double ny;
+    double nz;
+    double vx;
+    double vy;
+    double vz;
     SegmentationL1Pca pca2;
-    (void)pca2.normal(V, x, y, z);
+    (void)pca2.normal(V, nx, ny, nz, vx, vy, vz);
 
-    LOG_PRINT(<< "normal x <" << x << "> y <" << y << "> z <" << z << ">");
+    LOG_PRINT(<< "normal x <" << nx << "> y <" << ny << "> z <" << nz << ">");
+    LOG_PRINT(<< "bigest x <" << vx << "> y <" << vy << "> z <" << vz << ">");
 }
 
 static void examplePca()

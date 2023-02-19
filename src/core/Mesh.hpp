@@ -38,6 +38,8 @@ public:
         MODE_QUADS
     };
 
+    Mode mode;
+
     std::vector<float> xyz;
     std::vector<float> rgb;
 

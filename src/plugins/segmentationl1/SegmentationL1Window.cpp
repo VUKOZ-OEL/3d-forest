@@ -38,16 +38,44 @@ SegmentationL1Window::SegmentationL1Window(MainWindow *mainWindow)
                                ICON("forest"),
                                tr(SEGMENTATION_L1_NAME)),
       mainWindow_(mainWindow),
-      initialSamplesCountInput_(nullptr),
-      initialSamplesDensityInput_(nullptr),
+      voxelSizeInput_(nullptr),
+      sampleDescriptorInput_(nullptr),
+      numberOfSamplesInput_(nullptr),
       neighborhoodRadiusInput_(nullptr),
       numberOfIterationsInput_(nullptr),
-      segmentationL1_(&mainWindow->editor())
+      segmentationL1_(&mainWindow->editor()),
+      parameters_()
 {
     LOG_DEBUG(<< "Create.");
 
     // Widgets.
-    SliderWidget::create(initialSamplesCountInput_,
+    SliderWidget::create(voxelSizeInput_,
+                         this,
+                         nullptr,
+                         SLOT(slotParametersChanged()),
+                         tr("Voxel Size"),
+                         tr("Voxel Size"),
+                         tr("pt"),
+                         1,
+                         1,
+                         1000,
+                         parameters_.voxelSize);
+
+    RangeSliderWidget::create(sampleDescriptorInput_,
+                              this,
+                              SLOT(slotParametersChanged()),
+                              SLOT(slotParametersChanged()),
+                              tr("Descriptor range of initial samples"),
+                              tr("Descriptor range of initial samples"
+                                 " to filter out leaves"),
+                              tr("%"),
+                              1,
+                              0,
+                              100,
+                              parameters_.sampleDescriptorMinimum,
+                              parameters_.sampleDescriptorMaximum);
+
+    SliderWidget::create(numberOfSamplesInput_,
                          this,
                          nullptr,
                          SLOT(slotParametersChanged()),
@@ -58,20 +86,6 @@ SegmentationL1Window::SegmentationL1Window(MainWindow *mainWindow)
                          1,
                          100,
                          parameters_.numberOfSamples);
-
-    RangeSliderWidget::create(initialSamplesDensityInput_,
-                              this,
-                              SLOT(slotParametersChanged()),
-                              SLOT(slotParametersChanged()),
-                              tr("Density range of initial samples"),
-                              tr("Density range of initial samples"
-                                 " to filter out leaves"),
-                              tr("%"),
-                              1,
-                              0,
-                              100,
-                              parameters_.initialSamplesDensityMinimum,
-                              parameters_.initialSamplesDensityMaximum);
 
     RangeSliderWidget::create(neighborhoodRadiusInput_,
                               this,
@@ -100,8 +114,9 @@ SegmentationL1Window::SegmentationL1Window(MainWindow *mainWindow)
 
     // Create layout with parameters.
     QVBoxLayout *settingsLayout = new QVBoxLayout;
-    settingsLayout->addWidget(initialSamplesDensityInput_);
-    settingsLayout->addWidget(initialSamplesCountInput_);
+    settingsLayout->addWidget(voxelSizeInput_);
+    settingsLayout->addWidget(sampleDescriptorInput_);
+    settingsLayout->addWidget(numberOfSamplesInput_);
     settingsLayout->addWidget(neighborhoodRadiusInput_);
     settingsLayout->addWidget(numberOfIterationsInput_);
 
@@ -121,9 +136,10 @@ SegmentationL1Window::~SegmentationL1Window()
 
 bool SegmentationL1Window::applyParameters()
 {
-    parameters_.set(initialSamplesCountInput_->value(),
-                    initialSamplesDensityInput_->minimumValue(),
-                    initialSamplesDensityInput_->maximumValue(),
+    parameters_.set(voxelSizeInput_->value(),
+                    numberOfSamplesInput_->value(),
+                    sampleDescriptorInput_->minimumValue(),
+                    sampleDescriptorInput_->maximumValue(),
                     neighborhoodRadiusInput_->minimumValue(),
                     neighborhoodRadiusInput_->maximumValue(),
                     numberOfIterationsInput_->value());

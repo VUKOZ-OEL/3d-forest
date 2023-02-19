@@ -29,22 +29,29 @@
 class SegmentationL1Point
 {
 public:
-    uint64_t index;
     double x;
     double y;
     double z;
+
     double nx;
     double ny;
     double nz;
+
+    double vx;
+    double vy;
+    double vz;
+
+    bool hasVectors;
 };
 
 inline std::ostream &operator<<(std::ostream &os,
                                 const SegmentationL1Point &obj)
 {
     // clang-format off
-    return os << "index <" << obj.index
-              << "> x <" << obj.x << "> y <" << obj.y << "> z <" << obj.z
+    return os <<    "x <" << obj.x << "> y <" << obj.y << "> z <" << obj.z
               << "> nx <" << obj.nx << "> ny <" << obj.ny << "> nz <" << obj.nz
+              << "> vx <" << obj.vx << "> vy <" << obj.vy << "> vz <" << obj.vz
+              << "> hasVectors <" << obj.hasVectors
               << ">";
     // clang-format on
 }

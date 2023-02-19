@@ -17,16 +17,15 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationL1TaskFinish.hpp */
+/** @file SegmentationL1TaskVoxelize.hpp */
 
-#ifndef SEGMENTATION_L1_TASK_FINISH_HPP
-#define SEGMENTATION_L1_TASK_FINISH_HPP
+#ifndef SEGMENTATION_L1_TASK_VOXELIZE_HPP
+#define SEGMENTATION_L1_TASK_VOXELIZE_HPP
 
-#include <Layer.hpp>
 #include <SegmentationL1TaskInterface.hpp>
 
-/** Segmentation L1 Task Finish. */
-class SegmentationL1TaskFinish : public SegmentationL1TaskInterface
+/** Segmentation L1 Task Voxelize. */
+class SegmentationL1TaskVoxelize : public SegmentationL1TaskInterface
 {
 public:
     virtual void initialize(SegmentationL1Context *context);
@@ -35,9 +34,7 @@ public:
 private:
     SegmentationL1Context *context_;
 
-    void addMeshPoints(Layer &layer);
-    void addMeshNormals(Layer &layer);
-    void addMeshVectors(Layer &layer);
+    void step();
 };
 
-#endif /* SEGMENTATION_L1_TASK_FINISH_HPP */
+#endif /* SEGMENTATION_L1_TASK_VOXELIZE_HPP */

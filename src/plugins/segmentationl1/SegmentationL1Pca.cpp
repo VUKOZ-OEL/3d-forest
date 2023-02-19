@@ -48,7 +48,10 @@ bool SegmentationL1Pca::normal(Query &query,
                                double radius,
                                double &nx,
                                double &ny,
-                               double &nz)
+                               double &nz,
+                               double &vx,
+                               double &vy,
+                               double &vz)
 {
     // The number of points inside sphere[x, y, z, radius].
     Eigen::MatrixXd::Index nPoints = 0;
@@ -86,7 +89,7 @@ bool SegmentationL1Pca::normal(Query &query,
     }
 
     // Compute PCA.
-    bool result = normal(xyz_, nx, ny, nz);
+    bool result = normal(xyz_, nx, ny, nz, vx, vy, vz);
 
     return result;
 }
@@ -94,7 +97,10 @@ bool SegmentationL1Pca::normal(Query &query,
 bool SegmentationL1Pca::normal(Eigen::MatrixXd &V,
                                double &nx,
                                double &ny,
-                               double &nz)
+                               double &nz,
+                               double &vx,
+                               double &vy,
+                               double &vz)
 {
     // The number of points.
     Eigen::MatrixXd::Index nPoints = V.cols();
@@ -141,27 +147,33 @@ bool SegmentationL1Pca::normal(Eigen::MatrixXd &V,
     // Compute Eigen vectors.
     eigenSolver_.compute(product_);
 
-    // Reorder.
+    // Pick the vector with smallest eigenvalue as normal.
+    const Eigen::Matrix3d &eigenVectors = eigenSolver_.eigenvectors();
+    const Eigen::Vector3d &eigenValues = eigenSolver_.eigenvalues();
     Eigen::MatrixXd::Index smallest = 0;
-    eigenValues_[0] = eigenSolver_.eigenvalues()[2];
-    eigenVectors_.col(0) = eigenSolver_.eigenvectors().col(2);
-    for (Eigen::MatrixXd::Index i = 1; i < 3; i++)
+    Eigen::MatrixXd::Index largest = 1;
+    for (Eigen::MatrixXd::Index i = 0; i < 3; i++)
     {
-        eigenValues_[i] = eigenSolver_.eigenvalues()[2 - i];
-        eigenVectors_.col(i) = eigenSolver_.eigenvectors().col(2 - i);
-
-        if (eigenValues_[i] < eigenValues_[smallest])
+        if (eigenValues[i] < eigenValues[smallest])
         {
             smallest = i;
         }
+        if (eigenValues[i] > eigenValues[largest])
+        {
+            largest = i;
+        }
     }
-    eigenVectors_.col(2) = eigenVectors_.col(0).cross(eigenVectors_.col(1));
-    LOG_DEBUG(<< "Eigen values\n" << eigenValues_);
-    LOG_DEBUG(<< "Eigen vectors\n" << eigenVectors_);
 
-    nx = eigenVectors_(0, smallest);
-    ny = eigenVectors_(1, smallest);
-    nz = eigenVectors_(2, smallest);
+    LOG_DEBUG(<< "Eigen values\n" << eigenValues);
+    LOG_DEBUG(<< "Eigen vectors\n" << eigenVectors);
+
+    nx = eigenVectors(0, smallest);
+    ny = eigenVectors(1, smallest);
+    nz = eigenVectors(2, smallest);
+
+    vx = eigenVectors(0, largest);
+    vy = eigenVectors(1, largest);
+    vz = eigenVectors(2, largest);
 
     return true;
 }

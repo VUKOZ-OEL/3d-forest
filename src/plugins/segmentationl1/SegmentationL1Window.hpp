@@ -52,8 +52,9 @@ protected slots:
 private:
     MainWindow *mainWindow_;
 
-    SliderWidget *initialSamplesCountInput_;
-    RangeSliderWidget *initialSamplesDensityInput_;
+    SliderWidget *voxelSizeInput_;
+    RangeSliderWidget *sampleDescriptorInput_;
+    SliderWidget *numberOfSamplesInput_;
     RangeSliderWidget *neighborhoodRadiusInput_;
     SliderWidget *numberOfIterationsInput_;
 

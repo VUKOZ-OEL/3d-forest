@@ -47,8 +47,9 @@ public:
     const LayerData &data() const { return data_; }
     void setData(const LayerData &data) { data_ = data; }
 
-    const Mesh &mesh() const { return mesh_; }
-    void setMesh(const Mesh &mesh) { mesh_ = mesh; }
+    size_t meshSize() const { return meshList_.size(); }
+    const Mesh &mesh(size_t index) const { return meshList_[index]; }
+    void addMesh(const Mesh &mesh) { meshList_.push_back(mesh); }
 
     void read(const Json &in);
     Json &write(Json &out) const;
@@ -60,7 +61,7 @@ protected:
     size_t id_;
 
     LayerData data_;
-    Mesh mesh_;
+    std::vector<Mesh> meshList_;
 };
 
 inline std::ostream &operator<<(std::ostream &os, const Layer &obj)

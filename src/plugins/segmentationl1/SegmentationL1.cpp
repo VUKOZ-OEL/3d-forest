@@ -23,7 +23,7 @@
 #include <SegmentationL1.hpp>
 
 #define LOG_MODULE_NAME "SegmentationL1"
-#define LOG_MODULE_DEBUG_ENABLED 1
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 SegmentationL1::SegmentationL1(Editor *editor) : context_(editor)
@@ -31,8 +31,7 @@ SegmentationL1::SegmentationL1(Editor *editor) : context_(editor)
     LOG_DEBUG(<< "Create.");
 
     // Add individual actions from first to last.
-    tasks_.push_back(&taskCount_);
-    tasks_.push_back(&taskRandom_);
+    tasks_.push_back(&taskVoxelize_);
     tasks_.push_back(&taskSample_);
     tasks_.push_back(&taskNormal_);
     tasks_.push_back(&taskMedian_);
@@ -59,17 +58,32 @@ bool SegmentationL1::applyParameters(const SegmentationL1Parameters &parameters)
 
     size_t newAction = SegmentationL1::npos;
 
+    // Neighborhood Radius or the number of iterations has been changed.
+    if ((context_.parameters.neighborhoodRadiusMinimum !=
+         parameters.neighborhoodRadiusMinimum) ||
+        (context_.parameters.neighborhoodRadiusMaximum !=
+         parameters.neighborhoodRadiusMaximum) ||
+        (context_.parameters.numberOfIterations !=
+         parameters.numberOfIterations))
+    {
+        newAction = 3;
+    }
+
+    // Neighborhood Radius has been changed.
+    if (context_.parameters.neighborhoodRadiusMinimum !=
+        parameters.neighborhoodRadiusMinimum)
+    {
+        newAction = 2;
+    }
+
     // The number of initial samples has been changed.
     if (context_.parameters.numberOfSamples != parameters.numberOfSamples)
     {
         newAction = 1;
     }
 
-    // Filter for the number of initial samples has been changed.
-    if ((context_.parameters.initialSamplesDensityMinimum !=
-         parameters.initialSamplesDensityMinimum) ||
-        (context_.parameters.initialSamplesDensityMaximum !=
-         parameters.initialSamplesDensityMaximum))
+    // The voxel size has been changed.
+    if (context_.parameters.voxelSize != parameters.voxelSize)
     {
         newAction = 0;
     }

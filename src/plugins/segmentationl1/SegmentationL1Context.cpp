@@ -35,7 +35,6 @@ SegmentationL1Context::SegmentationL1Context(Editor *editor_)
 void SegmentationL1Context::clear()
 {
     query.clear();
-
     parameters.clear();
 
     reset();
@@ -43,7 +42,6 @@ void SegmentationL1Context::clear()
 
 void SegmentationL1Context::reset()
 {
-    numberOfPoints = 0;
-
     samples.clear();
+    samplesBackup.clear();
 }

@@ -23,9 +23,11 @@
 #define SEGMENTATION_L1_CONTEXT_HPP
 
 #include <Query.hpp>
+#include <SegmentationL1Median.hpp>
 #include <SegmentationL1Parameters.hpp>
 #include <SegmentationL1Pca.hpp>
 #include <SegmentationL1Point.hpp>
+#include <VoxelFile.hpp>
 class Editor;
 
 /** Segmentation L1 Context. */
@@ -36,9 +38,11 @@ public:
     Query query;
 
     SegmentationL1Parameters parameters;
-    uint64_t numberOfPoints;
     std::vector<SegmentationL1Point> samples;
+    std::vector<SegmentationL1Point> samplesBackup;
+    VoxelFile voxelFile;
     SegmentationL1Pca pca;
+    SegmentationL1Median median;
 
     SegmentationL1Context(Editor *editor);
 

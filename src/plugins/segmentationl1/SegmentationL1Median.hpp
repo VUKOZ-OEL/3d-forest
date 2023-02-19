@@ -17,27 +17,20 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationL1TaskFinish.hpp */
+/** @file SegmentationL1Median.hpp */
 
-#ifndef SEGMENTATION_L1_TASK_FINISH_HPP
-#define SEGMENTATION_L1_TASK_FINISH_HPP
+#ifndef SEGMENTATION_L1_MEDIAN_HPP
+#define SEGMENTATION_L1_MEDIAN_HPP
 
-#include <Layer.hpp>
-#include <SegmentationL1TaskInterface.hpp>
+#include <Eigen/Core>
 
-/** Segmentation L1 Task Finish. */
-class SegmentationL1TaskFinish : public SegmentationL1TaskInterface
+/** Segmentation L1 Median. */
+class SegmentationL1Median
 {
 public:
-    virtual void initialize(SegmentationL1Context *context);
-    virtual void next();
+    void median(Eigen::MatrixXd &V, double &x, double &y, double &z);
 
 private:
-    SegmentationL1Context *context_;
-
-    void addMeshPoints(Layer &layer);
-    void addMeshNormals(Layer &layer);
-    void addMeshVectors(Layer &layer);
 };
 
-#endif /* SEGMENTATION_L1_TASK_FINISH_HPP */
+#endif /* SEGMENTATION_L1_MEDIAN_HPP */

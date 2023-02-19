@@ -22,56 +22,15 @@
 #ifndef SEGMENTATION_L1_TASK_NORMAL_HPP
 #define SEGMENTATION_L1_TASK_NORMAL_HPP
 
-#include <Editor.hpp>
 #include <SegmentationL1TaskInterface.hpp>
 
 /** Segmentation L1 Task Normal. */
 class SegmentationL1TaskNormal : public SegmentationL1TaskInterface
 {
 public:
-    virtual void initialize(SegmentationL1Context *context)
-    {
-        context_ = context;
-        context_->query.setWhere(context_->editor->viewports().where());
-        context_->query.exec();
-
-        index_ = 0;
-        radius_ =
-            static_cast<double>(context_->parameters.neighborhoodRadiusMinimum);
-
-        ProgressActionInterface::initialize(context_->samples.size());
-    }
-
-    virtual void next()
-    {
-        uint64_t n = process();
-        uint64_t i = 0;
-
-        startTimer();
-
-        while (i < n)
-        {
-            SegmentationL1Point &point = context_->samples[index_];
-            context_->pca.normal(context_->query,
-                                 point.x,
-                                 point.y,
-                                 point.z,
-                                 radius_,
-                                 point.nx,
-                                 point.ny,
-                                 point.nz);
-
-            index_++;
-
-            i++;
-            if (timedOut())
-            {
-                break;
-            }
-        }
-
-        increment(i);
-    }
+    virtual void initialize(SegmentationL1Context *context);
+    virtual void next();
+    void step();
 
 private:
     SegmentationL1Context *context_;
