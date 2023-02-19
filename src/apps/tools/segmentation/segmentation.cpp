@@ -80,7 +80,6 @@ static void segmentation(const std::string &path,
 
     LOG_PRINT(<< "Debug information");
     const SegmentationL1Context &ctx = segmentationL1.context();
-    LOG_PRINT(<< ctx.numberOfPoints << " total points");
     LOG_PRINT(<< ctx.samples.size() << " sample points");
     for (size_t i = 0; i < ctx.samples.size(); i++)
     {
@@ -100,15 +99,17 @@ int main(int argc, char *argv[])
         arg.add("--input", "");
         arg.add("--iterations", "");
         arg.add("--samples", "");
-        arg.add("--test-data", "");
+        arg.add("--test", "");
+        arg.add("--voxel", "");
         arg.parse(argc, argv);
 
         SegmentationL1Parameters parameters;
 
-        (void)arg.read("--samples", parameters.numberOfSamples);
         (void)arg.read("--iterations", parameters.numberOfIterations);
+        (void)arg.read("--samples", parameters.numberOfSamples);
+        (void)arg.read("--voxel", parameters.voxelSize);
 
-        if (arg.contains("--test-data"))
+        if (arg.contains("--test"))
         {
             createTestDataset(arg.toString("--input"));
         }
