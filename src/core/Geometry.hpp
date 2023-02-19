@@ -17,17 +17,22 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationL1Median.cpp */
+/** @file Geometry.hpp */
 
-#include <SegmentationL1Median.hpp>
+#ifndef GEOMETRY_HPP
+#define GEOMETRY_HPP
 
-#define LOG_MODULE_NAME "SegmentationL1Median"
-// #define LOG_MODULE_DEBUG_ENABLED 1
-#include <Log.hpp>
+#include <cmath>
 
-void SegmentationL1Median::median(Eigen::MatrixXd &V,
-                                  double &x,
-                                  double &y,
-                                  double &z)
+#include <ExportCore.hpp>
+#include <Vector3.hpp>
+
+template <class T>
+inline T pointPlaneDistance(const Vector3<T> &x,
+                            const Vector3<T> &p,
+                            const Vector3<T> &n)
 {
+    return Vector3<T>::dotProduct(x, n) - Vector3<T>::dotProduct(p, n);
 }
+
+#endif /* GEOMETRY_HPP */
