@@ -23,12 +23,10 @@
 #define SEGMENTATION_L1_HPP
 
 #include <SegmentationL1Context.hpp>
-#include <SegmentationL1TaskCount.hpp>
 #include <SegmentationL1TaskFinish.hpp>
-#include <SegmentationL1TaskMedian.hpp>
 #include <SegmentationL1TaskNormal.hpp>
-#include <SegmentationL1TaskRandom.hpp>
 #include <SegmentationL1TaskSample.hpp>
+#include <SegmentationL1TaskVoxelize.hpp>
 class Editor;
 
 /** Segmentation L1. */
@@ -50,11 +48,9 @@ public:
 private:
     SegmentationL1Context context_;
 
-    SegmentationL1TaskCount taskCount_;
-    SegmentationL1TaskRandom taskRandom_;
+    SegmentationL1TaskVoxelize taskVoxelize_;
     SegmentationL1TaskSample taskSample_;
     SegmentationL1TaskNormal taskNormal_;
-    SegmentationL1TaskMedian taskMedian_;
     SegmentationL1TaskFinish taskFinish_;
 
     std::vector<SegmentationL1TaskInterface *> tasks_;

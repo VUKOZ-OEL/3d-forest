@@ -22,58 +22,22 @@
 #ifndef SEGMENTATION_L1_TASK_SAMPLE_HPP
 #define SEGMENTATION_L1_TASK_SAMPLE_HPP
 
-#include <Editor.hpp>
 #include <SegmentationL1TaskInterface.hpp>
 
 /** Segmentation L1 Task Sample. */
 class SegmentationL1TaskSample : public SegmentationL1TaskInterface
 {
 public:
-    virtual void initialize(SegmentationL1Context *context)
-    {
-        context_ = context;
-        context_->query.reset();
-        sampleIndex_ = 0;
-        pointsIndex_ = 0;
-
-        ProgressActionInterface::initialize(context_->numberOfPoints, 1000UL);
-    }
-
-    virtual void next()
-    {
-        uint64_t n = process();
-        uint64_t i = 0;
-
-        startTimer();
-
-        while (i < n)
-        {
-            if (sampleIndex_ < context_->samples.size() &&
-                context_->query.next() &&
-                context_->samples[sampleIndex_].index == pointsIndex_)
-            {
-                context_->samples[sampleIndex_].x = context_->query.x();
-                context_->samples[sampleIndex_].y = context_->query.y();
-                context_->samples[sampleIndex_].z = context_->query.z();
-                sampleIndex_++;
-            }
-
-            pointsIndex_++;
-
-            i++;
-            if (timedOut())
-            {
-                break;
-            }
-        }
-
-        increment(i);
-    }
+    virtual void initialize(SegmentationL1Context *context);
+    virtual void next();
 
 private:
     SegmentationL1Context *context_;
+    uint64_t voxelsStep_;
     size_t sampleIndex_;
-    uint64_t pointsIndex_;
+
+    void step();
+    void setNumberOfSamples();
 };
 
 #endif /* SEGMENTATION_L1_TASK_SAMPLE_HPP */

@@ -51,17 +51,7 @@ public:
 
         while (i < n)
         {
-            SegmentationL1Point &point = context_->samples[index_];
-            context_->pca.normal(context_->query,
-                                 point.x,
-                                 point.y,
-                                 point.z,
-                                 radius_,
-                                 point.nx,
-                                 point.ny,
-                                 point.nz);
-
-            index_++;
+            step();
 
             i++;
             if (timedOut())
@@ -71,6 +61,34 @@ public:
         }
 
         increment(i);
+    }
+
+    void step()
+    {
+        SegmentationL1Point &point = context_->samples[index_];
+        point.hasVectors = context_->pca.normal(context_->query,
+                                                point.x,
+                                                point.y,
+                                                point.z,
+                                                radius_,
+                                                point.nx,
+                                                point.ny,
+                                                point.nz,
+                                                point.vx,
+                                                point.vy,
+                                                point.vz);
+
+        if (!point.hasVectors)
+        {
+            point.nx = 0;
+            point.ny = 0;
+            point.nz = 0;
+            point.vx = 0;
+            point.vy = 0;
+            point.vz = 0;
+        }
+
+        index_++;
     }
 
 private:
