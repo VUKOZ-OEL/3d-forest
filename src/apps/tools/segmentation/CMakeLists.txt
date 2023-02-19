@@ -28,6 +28,7 @@ add_executable(
     ../../../plugins/segmentationl1/SegmentationL1TaskMedian.cpp
     ../../../plugins/segmentationl1/SegmentationL1TaskFinish.cpp
     ../../../plugins/segmentationl1/SegmentationL1Pca.cpp
+    ../../../plugins/segmentationl1/SegmentationL1Median.cpp
 )
 
 target_include_directories(

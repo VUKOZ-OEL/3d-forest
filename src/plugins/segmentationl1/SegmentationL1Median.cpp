@@ -17,37 +17,17 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationL1Context.hpp */
+/** @file SegmentationL1Median.cpp */
 
-#ifndef SEGMENTATION_L1_CONTEXT_HPP
-#define SEGMENTATION_L1_CONTEXT_HPP
-
-#include <Query.hpp>
 #include <SegmentationL1Median.hpp>
-#include <SegmentationL1Parameters.hpp>
-#include <SegmentationL1Pca.hpp>
-#include <SegmentationL1Point.hpp>
-#include <VoxelFile.hpp>
-class Editor;
 
-/** Segmentation L1 Context. */
-class SegmentationL1Context
+#define LOG_MODULE_NAME "SegmentationL1Median"
+// #define LOG_MODULE_DEBUG_ENABLED 1
+#include <Log.hpp>
+
+void SegmentationL1Median::median(Eigen::MatrixXd &V,
+                double &x,
+                double &y,
+                double &z)
 {
-public:
-    Editor *editor;
-    Query query;
-
-    SegmentationL1Parameters parameters;
-    std::vector<SegmentationL1Point> samples;
-    std::vector<SegmentationL1Point> samplesBackup;
-    VoxelFile voxelFile;
-    SegmentationL1Pca pca;
-    SegmentationL1Median median;
-
-    SegmentationL1Context(Editor *editor);
-
-    void clear();
-    void reset();
-};
-
-#endif /* SEGMENTATION_L1_CONTEXT_HPP */
+}

@@ -88,6 +88,10 @@ void SegmentationL1TaskMedian::step()
     context_->query.exec();
     context_->query.mean(x, y, z);
 
+    // query sphere r = sqrt(r*r + r*r)
+    // points V with max distance r to plane[x,y,z,vx,vy,vz]
+    // context_->median.median(V, x, y, z);
+
     point.x = x;
     point.y = y;
     point.z = z;
