@@ -25,13 +25,17 @@
 #include <cstdint>
 #include <sstream>
 
+#include <QueryWhere.hpp>
+
 /** Segmentation L1 Parameters. */
 class SegmentationL1Parameters
 {
 public:
+    QueryWhere sampleFilter;
+    int voxelSize;
     int numberOfSamples;
-    int initialSamplesDensityMinimum;
-    int initialSamplesDensityMaximum;
+    int sampleDescriptorMinimum;
+    int sampleDescriptorMaximum;
     int neighborhoodRadiusMinimum;
     int neighborhoodRadiusMaximum;
     int numberOfIterations;
@@ -40,9 +44,10 @@ public:
 
     void clear()
     {
+        voxelSize = 0;
         numberOfSamples = 0;
-        initialSamplesDensityMinimum = 0;
-        initialSamplesDensityMaximum = 0;
+        sampleDescriptorMinimum = 0;
+        sampleDescriptorMaximum = 0;
         neighborhoodRadiusMinimum = 0;
         neighborhoodRadiusMaximum = 0;
         numberOfIterations = 0;
@@ -50,24 +55,27 @@ public:
 
     void setDefault()
     {
+        voxelSize = 50;
         numberOfSamples = 5;
-        initialSamplesDensityMinimum = 0;
-        initialSamplesDensityMaximum = 100;
+        sampleDescriptorMinimum = 0;
+        sampleDescriptorMaximum = 100;
         neighborhoodRadiusMinimum = 100;
         neighborhoodRadiusMaximum = 500;
         numberOfIterations = 1;
     }
 
-    void set(int numberOfSamples_,
-             int initialSamplesDensityMinimum_,
-             int initialSamplesDensityMaximum_,
+    void set(int voxelSize_,
+             int numberOfSamples_,
+             int sampleDescriptorMinimum_,
+             int sampleDescriptorMaximum_,
              int neighborhoodRadiusMinimum_,
              int neighborhoodRadiusMaximum_,
              int numberOfIterations_)
     {
+        voxelSize = voxelSize_;
         numberOfSamples = numberOfSamples_;
-        initialSamplesDensityMinimum = initialSamplesDensityMinimum_;
-        initialSamplesDensityMaximum = initialSamplesDensityMaximum_;
+        sampleDescriptorMinimum = sampleDescriptorMinimum_;
+        sampleDescriptorMaximum = sampleDescriptorMaximum_;
         neighborhoodRadiusMinimum = neighborhoodRadiusMinimum_;
         neighborhoodRadiusMaximum = neighborhoodRadiusMaximum_;
         numberOfIterations = numberOfIterations_;
@@ -77,12 +85,10 @@ public:
 inline std::ostream &operator<<(std::ostream &os,
                                 const SegmentationL1Parameters &obj)
 {
-    return os << "numberOfSamples <" << obj.numberOfSamples
-              << "> initialSamplesDensityMinimum <"
-              << obj.initialSamplesDensityMinimum
-              << "> initialSamplesDensityMaximum <"
-              << obj.initialSamplesDensityMaximum
-              << "> neighborhoodRadiusMinimum <"
+    return os << "voxelSize <" << obj.voxelSize << "> numberOfSamples <"
+              << obj.numberOfSamples << "> sampleDescriptorMinimum <"
+              << obj.sampleDescriptorMinimum << "> sampleDescriptorMaximum <"
+              << obj.sampleDescriptorMaximum << "> neighborhoodRadiusMinimum <"
               << obj.neighborhoodRadiusMinimum
               << "> neighborhoodRadiusMaximum <"
               << obj.neighborhoodRadiusMaximum << "> numberOfIterations <"
