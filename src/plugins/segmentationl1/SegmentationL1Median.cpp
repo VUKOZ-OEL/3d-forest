@@ -26,8 +26,8 @@
 #include <Log.hpp>
 
 void SegmentationL1Median::median(Eigen::MatrixXd &V,
-                double &x,
-                double &y,
-                double &z)
+                                  double &x,
+                                  double &y,
+                                  double &z)
 {
 }
