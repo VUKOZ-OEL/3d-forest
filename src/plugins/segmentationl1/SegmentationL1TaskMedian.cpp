@@ -20,6 +20,7 @@
 /** @file SegmentationL1TaskMedian.cpp */
 
 #include <Editor.hpp>
+#include <Geometry.hpp>
 #include <SegmentationL1TaskMedian.hpp>
 
 #define LOG_MODULE_NAME "SegmentationL1TaskMedian"
@@ -79,24 +80,88 @@ void SegmentationL1TaskMedian::step()
     }
 
     SegmentationL1Point &point = context_->samples[index_];
+    index_++;
 
-    double x = point.x;
-    double y = point.y;
-    double z = point.z;
+    // Setup slice parameters.
+    double d;
+    double m = radius_ * 0.5;
+    double r = std::sqrt((radius_ * radius_) + (radius_ * radius_));
 
-    context_->query.where().setSphere(x, y, z, radius_);
+    // Select slice boundary.
+    context_->query.where().setSphere(point.x, point.y, point.z, r);
     context_->query.exec();
-    context_->query.mean(x, y, z);
 
-    // query sphere r = sqrt(r*r + r*r)
-    // points V with max distance r to plane[x,y,z,vx,vy,vz]
-    // context_->median.median(V, x, y, z);
+    // Count points inside slice.
+    Eigen::MatrixXd::Index nPoints = 0;
+    while (context_->query.next())
+    {
+        d = pointPlaneDistance(context_->query.x(),
+                               context_->query.y(),
+                               context_->query.z(),
+                               point.x,
+                               point.y,
+                               point.z,
+                               point.vx,
+                               point.vy,
+                               point.vz);
+        if (d < m)
+        {
+            nPoints++;
+        }
+    }
+
+    if (nPoints < 1)
+    {
+        return;
+    }
+
+    // Copy points inside slice and compute start estimate [x,y,z].
+    Eigen::MatrixXd xyz;
+    xyz.resize(3, nPoints);
+    nPoints = 0;
+
+    double x = 0;
+    double y = 0;
+    double z = 0;
+
+    context_->query.reset();
+    while (context_->query.next())
+    {
+        d = pointPlaneDistance(context_->query.x(),
+                               context_->query.y(),
+                               context_->query.z(),
+                               point.x,
+                               point.y,
+                               point.z,
+                               point.vx,
+                               point.vy,
+                               point.vz);
+
+        if (d < m)
+        {
+            xyz(0, nPoints) = context_->query.x();
+            xyz(1, nPoints) = context_->query.y();
+            xyz(2, nPoints) = context_->query.z();
+
+            x += context_->query.x();
+            y += context_->query.y();
+            z += context_->query.z();
+
+            nPoints++;
+        }
+    }
+
+    const double n = static_cast<double>(nPoints);
+    x = x / n;
+    y = y / n;
+    z = z / n;
+
+    // Compute L1 median.
+    context_->median.median(xyz, x, y, z);
 
     point.x = x;
     point.y = y;
     point.z = z;
-
-    index_++;
 }
 
 void SegmentationL1TaskMedian::setupSearchRadius()
