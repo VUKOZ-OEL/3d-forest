@@ -157,7 +157,7 @@ void SegmentationL1TaskMedian::step()
     z = z / n;
 
     // Compute L1 median.
-    context_->median.median(xyz, x, y, z);
+    SegmentationL1Median::median(xyz, x, y, z);
 
     point.x = x;
     point.y = y;

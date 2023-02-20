@@ -30,20 +30,19 @@ static void computeMedian(const Eigen::MatrixXd &points,
                           double y,
                           double z)
 {
-    SegmentationL1Median median;
-    (void)median.median(points, x, y, z);
+    SegmentationL1Median::median(points, x, y, z);
 
     LOG_PRINT(<< "median x <" << x << "> y <" << y << "> z <" << z << ">");
 }
 
 static void exampleMedian()
 {
-    //                    A    B
-    Eigen::MatrixXd set1{{0.0, 1.0},  // x
-                         {0.0, 0.0},  // y
-                         {0.0, 0.0}}; // z
+    //                    A    B    C
+    Eigen::MatrixXd set1{{0.0, 1.0, 0.0},  // x
+                         {0.0, 0.0, 1.0},  // y
+                         {0.0, 0.0, 0.0}}; // z
 
-    computeMedian(set1, 0.2, 0.0, 0.0);
+    computeMedian(set1, 0.4, 0.0, 0.0);
 }
 
 int main()

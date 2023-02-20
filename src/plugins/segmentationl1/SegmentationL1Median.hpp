@@ -28,9 +28,12 @@
 class SegmentationL1Median
 {
 public:
-    void median(const Eigen::MatrixXd &V, double &x, double &y, double &z);
-
-private:
+    static void median(const Eigen::MatrixXd &V,
+                       double &x,
+                       double &y,
+                       double &z,
+                       size_t iterations = 25,
+                       double eps = 0.1);
 };
 
 #endif /* SEGMENTATION_L1_MEDIAN_HPP */
