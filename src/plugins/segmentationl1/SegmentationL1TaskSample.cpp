@@ -67,7 +67,7 @@ void SegmentationL1TaskSample::step()
         return;
     }
 
-    uint64_t r = static_cast<uint64_t>(rand()) % voxelsStep_;
+    uint64_t r = 0; // static_cast<uint64_t>(rand()) % voxelsStep_;
 
     VoxelFile::Voxel voxel;
     context_->voxelFile.skip(r);

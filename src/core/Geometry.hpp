@@ -35,4 +35,11 @@ inline T pointPlaneDistance(const Vector3<T> &x,
     return Vector3<T>::dotProduct(x, n) - Vector3<T>::dotProduct(p, n);
 }
 
+template <class T>
+inline T pointPlaneDistance(T x, T y, T z, T px, T py, T pz, T nx, T ny, T nz)
+{
+    return ((x * nx) + (y * ny) + (z * nz)) -
+           ((px * nx) + (py * ny) + (pz * nz));
+}
+
 #endif /* GEOMETRY_HPP */
