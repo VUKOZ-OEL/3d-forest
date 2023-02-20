@@ -28,7 +28,7 @@
 class SegmentationL1Median
 {
 public:
-    void median(Eigen::MatrixXd &V, double &x, double &y, double &z);
+    void median(const Eigen::MatrixXd &V, double &x, double &y, double &z);
 
 private:
 };

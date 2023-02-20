@@ -25,7 +25,7 @@
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-void SegmentationL1Median::median(Eigen::MatrixXd &V,
+void SegmentationL1Median::median(const Eigen::MatrixXd &V,
                                   double &x,
                                   double &y,
                                   double &z)
