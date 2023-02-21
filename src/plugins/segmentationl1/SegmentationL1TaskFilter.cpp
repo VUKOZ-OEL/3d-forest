@@ -73,8 +73,6 @@ void SegmentationL1TaskFilter::step()
 
     context_->voxelFile.read(voxel);
 
-    LOG_DEBUG(<< "Voxel descriptor <" << voxel.descriptor << "> min <" << min_
-              << "> max <" << max_ << ">.");
     if (voxel.descriptor < min_ || voxel.descriptor > max_)
     {
         return;

@@ -23,11 +23,14 @@
 #include <SegmentationL1TaskVoxelize.hpp>
 
 #define LOG_MODULE_NAME "SegmentationL1TaskVoxelize"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 void SegmentationL1TaskVoxelize::initialize(SegmentationL1Context *context)
 {
     context_ = context;
+
+    LOG_DEBUG(<< "Reset context.");
     context_->reset();
 
     context_->query.setWhere(context_->editor->viewports().where());
@@ -36,7 +39,10 @@ void SegmentationL1TaskVoxelize::initialize(SegmentationL1Context *context)
 
     context_->voxelFile.create("voxels.bin");
 
-    ProgressActionInterface::initialize(context_->query.numberOfVoxels());
+    uint64_t n = context_->query.numberOfVoxels();
+    LOG_DEBUG(<< "n <" << n << ">.");
+
+    ProgressActionInterface::initialize(n);
 }
 
 void SegmentationL1TaskVoxelize::next()
