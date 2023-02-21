@@ -23,6 +23,7 @@ add_executable(
     ../../../plugins/segmentationl1/SegmentationL1.cpp
     ../../../plugins/segmentationl1/SegmentationL1Context.cpp
     ../../../plugins/segmentationl1/SegmentationL1TaskVoxelize.cpp
+    ../../../plugins/segmentationl1/SegmentationL1TaskFilter.cpp
     ../../../plugins/segmentationl1/SegmentationL1TaskSample.cpp
     ../../../plugins/segmentationl1/SegmentationL1TaskNormal.cpp
     ../../../plugins/segmentationl1/SegmentationL1TaskMedian.cpp

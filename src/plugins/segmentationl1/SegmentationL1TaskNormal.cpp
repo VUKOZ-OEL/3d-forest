@@ -30,7 +30,9 @@ void SegmentationL1TaskNormal::initialize(SegmentationL1Context *context)
 {
     context_ = context;
 
+    LOG_DEBUG(<< "Restore backup.");
     context_->samples = context_->samplesBackup;
+
     context_->query.setWhere(context_->editor->viewports().where());
     context_->query.exec();
 
@@ -38,7 +40,10 @@ void SegmentationL1TaskNormal::initialize(SegmentationL1Context *context)
     radius_ =
         static_cast<double>(context_->parameters.neighborhoodRadiusMinimum);
 
-    ProgressActionInterface::initialize(context_->samples.size());
+    uint64_t n = context_->samples.size();
+    LOG_DEBUG(<< "n <" << n << ">.");
+
+    ProgressActionInterface::initialize(n);
 }
 
 void SegmentationL1TaskNormal::next()
@@ -80,6 +85,7 @@ void SegmentationL1TaskNormal::step()
 
     if (!point.hasVectors)
     {
+        LOG_DEBUG(<< "Point <" << index_ << "> does not have vectors.");
         point.nx = 0;
         point.ny = 0;
         point.nz = 0;
@@ -92,6 +98,7 @@ void SegmentationL1TaskNormal::step()
 
     if (index_ == context_->samples.size())
     {
+        LOG_DEBUG(<< "Create backup.");
         context_->samplesBackup = context_->samples;
     }
 }

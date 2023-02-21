@@ -23,6 +23,7 @@
 #define SEGMENTATION_L1_HPP
 
 #include <SegmentationL1Context.hpp>
+#include <SegmentationL1TaskFilter.hpp>
 #include <SegmentationL1TaskFinish.hpp>
 #include <SegmentationL1TaskMedian.hpp>
 #include <SegmentationL1TaskNormal.hpp>
@@ -50,6 +51,7 @@ private:
     SegmentationL1Context context_;
 
     SegmentationL1TaskVoxelize taskVoxelize_;
+    SegmentationL1TaskFilter taskFilter_;
     SegmentationL1TaskSample taskSample_;
     SegmentationL1TaskNormal taskNormal_;
     SegmentationL1TaskMedian taskMedian_;

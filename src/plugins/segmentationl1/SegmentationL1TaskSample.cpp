@@ -33,10 +33,13 @@ void SegmentationL1TaskSample::initialize(SegmentationL1Context *context)
     voxelsStep_ = 0;
     sampleIndex_ = 0;
 
-    context_->voxelFile.open("voxels.bin");
+    context_->voxelFileFilter.open("voxels_filter.bin");
     setNumberOfSamples();
 
-    ProgressActionInterface::initialize(context_->samples.size(), 1000U);
+    uint64_t n = context_->samples.size();
+    LOG_DEBUG(<< "n <" << n << ">.");
+
+    ProgressActionInterface::initialize(n, 1000U);
 }
 
 void SegmentationL1TaskSample::next()
@@ -45,7 +48,6 @@ void SegmentationL1TaskSample::next()
     uint64_t i = 0;
 
     startTimer();
-
     while (i < n)
     {
         step();
@@ -53,11 +55,14 @@ void SegmentationL1TaskSample::next()
         i++;
         if (timedOut())
         {
-            break;
+            increment(i);
+            return;
         }
     }
 
-    increment(i);
+    context_->voxelFileFilter.close();
+
+    setProcessed(maximum());
 }
 
 void SegmentationL1TaskSample::step()
@@ -67,31 +72,29 @@ void SegmentationL1TaskSample::step()
         return;
     }
 
-    uint64_t r = 0; // static_cast<uint64_t>(rand()) % voxelsStep_;
+    uint64_t r = static_cast<uint64_t>(rand()) % voxelsStep_;
 
     VoxelFile::Voxel voxel;
-    context_->voxelFile.skip(r);
-    context_->voxelFile.read(voxel);
-    context_->voxelFile.skip(voxelsStep_ - (r + 1U));
+    context_->voxelFileFilter.skip(r);
+    context_->voxelFileFilter.read(voxel);
+    context_->voxelFileFilter.skip(voxelsStep_ - (r + 1U));
 
     context_->samples[sampleIndex_].x = voxel.x;
     context_->samples[sampleIndex_].y = voxel.y;
     context_->samples[sampleIndex_].z = voxel.z;
 
-    LOG_DEBUG(<< "Add sample <" << (sampleIndex_ + 1U) << "/"
-              << context_->samples.size() << "> data <" << voxel << ">.");
-
     sampleIndex_++;
 
     if (sampleIndex_ == context_->samples.size())
     {
+        LOG_DEBUG(<< "Create backup.");
         context_->samplesBackup = context_->samples;
     }
 }
 
 void SegmentationL1TaskSample::setNumberOfSamples()
 {
-    uint64_t nVoxels = context_->voxelFile.nVoxels();
+    uint64_t nVoxels = context_->voxelFileFilter.nVoxels();
 
     size_t n = 0;
     int c = context_->parameters.numberOfSamples;
@@ -107,6 +110,8 @@ void SegmentationL1TaskSample::setNumberOfSamples()
     }
 
     context_->samples.resize(n);
+
+    LOG_DEBUG(<< "Clear backup.");
     context_->samplesBackup.resize(0);
 
     if (n > 0)

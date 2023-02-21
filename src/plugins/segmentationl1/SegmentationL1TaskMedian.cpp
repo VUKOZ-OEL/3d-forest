@@ -45,7 +45,10 @@ void SegmentationL1TaskMedian::initialize(SegmentationL1Context *context)
     iteration_ = 0;
     setupSearchRadius();
 
-    ProgressActionInterface::initialize(context_->samples.size() * iterations_);
+    uint64_t n = context_->samples.size() * iterations_;
+    LOG_DEBUG(<< "n <" << n << ">.");
+
+    ProgressActionInterface::initialize(n);
 }
 
 void SegmentationL1TaskMedian::next()

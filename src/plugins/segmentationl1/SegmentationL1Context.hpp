@@ -41,6 +41,7 @@ public:
     std::vector<SegmentationL1Point> samples;
     std::vector<SegmentationL1Point> samplesBackup;
     VoxelFile voxelFile;
+    VoxelFile voxelFileFilter;
     SegmentationL1Pca pca;
     SegmentationL1Median median;
 
