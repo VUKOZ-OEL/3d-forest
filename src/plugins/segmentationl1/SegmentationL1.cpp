@@ -32,6 +32,7 @@ SegmentationL1::SegmentationL1(Editor *editor) : context_(editor)
 
     // Add individual actions from first to last.
     tasks_.push_back(&taskVoxelize_);
+    tasks_.push_back(&taskFilter_);
     tasks_.push_back(&taskSample_);
     tasks_.push_back(&taskNormal_);
     tasks_.push_back(&taskMedian_);
@@ -66,18 +67,27 @@ bool SegmentationL1::applyParameters(const SegmentationL1Parameters &parameters)
         (context_.parameters.numberOfIterations !=
          parameters.numberOfIterations))
     {
-        newAction = 3;
+        newAction = 4;
     }
 
     // Neighborhood Radius has been changed.
     if (context_.parameters.neighborhoodRadiusMinimum !=
         parameters.neighborhoodRadiusMinimum)
     {
-        newAction = 2;
+        newAction = 3;
     }
 
     // The number of initial samples has been changed.
     if (context_.parameters.numberOfSamples != parameters.numberOfSamples)
+    {
+        newAction = 2;
+    }
+
+    // Filter for the initial samples has been changed.
+    if ((context_.parameters.sampleDescriptorMinimum !=
+         parameters.sampleDescriptorMinimum) ||
+        (context_.parameters.sampleDescriptorMaximum !=
+         parameters.sampleDescriptorMaximum))
     {
         newAction = 1;
     }

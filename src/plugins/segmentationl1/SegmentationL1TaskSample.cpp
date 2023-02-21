@@ -33,7 +33,7 @@ void SegmentationL1TaskSample::initialize(SegmentationL1Context *context)
     voxelsStep_ = 0;
     sampleIndex_ = 0;
 
-    context_->voxelFile.open("voxels.bin");
+    context_->voxelFileFilter.open("voxels_filter.bin");
     setNumberOfSamples();
 
     ProgressActionInterface::initialize(context_->samples.size(), 1000U);
@@ -45,7 +45,6 @@ void SegmentationL1TaskSample::next()
     uint64_t i = 0;
 
     startTimer();
-
     while (i < n)
     {
         step();
@@ -53,11 +52,14 @@ void SegmentationL1TaskSample::next()
         i++;
         if (timedOut())
         {
-            break;
+            increment(i);
+            return;
         }
     }
 
-    increment(i);
+    context_->voxelFileFilter.close();
+
+    setProcessed(maximum());
 }
 
 void SegmentationL1TaskSample::step()
@@ -70,9 +72,9 @@ void SegmentationL1TaskSample::step()
     uint64_t r = 0; // static_cast<uint64_t>(rand()) % voxelsStep_;
 
     VoxelFile::Voxel voxel;
-    context_->voxelFile.skip(r);
-    context_->voxelFile.read(voxel);
-    context_->voxelFile.skip(voxelsStep_ - (r + 1U));
+    context_->voxelFileFilter.skip(r);
+    context_->voxelFileFilter.read(voxel);
+    context_->voxelFileFilter.skip(voxelsStep_ - (r + 1U));
 
     context_->samples[sampleIndex_].x = voxel.x;
     context_->samples[sampleIndex_].y = voxel.y;
@@ -91,7 +93,7 @@ void SegmentationL1TaskSample::step()
 
 void SegmentationL1TaskSample::setNumberOfSamples()
 {
-    uint64_t nVoxels = context_->voxelFile.nVoxels();
+    uint64_t nVoxels = context_->voxelFileFilter.nVoxels();
 
     size_t n = 0;
     int c = context_->parameters.numberOfSamples;

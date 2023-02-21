@@ -56,6 +56,8 @@ void SegmentationL1TaskVoxelize::next()
         }
     }
 
+    context_->voxelFile.close();
+
     setProcessed(maximum());
 }
 
@@ -77,7 +79,7 @@ void SegmentationL1TaskVoxelize::step()
     voxel.x = query.x();
     voxel.y = query.y();
     voxel.z = query.z();
-    voxel.descriptor = query.descriptor();
+    voxel.descriptor = query.density();
 
     while (query.next())
     {
