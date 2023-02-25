@@ -141,7 +141,7 @@ void DescriptorAction::stepComputeDescriptor()
     {
         if (queryPoints_.next())
         {
-            float descriptor;
+            double descriptor;
             bool hasDescriptor;
 
             if (method_ == DescriptorAction::METHOD_PCA)
@@ -172,7 +172,7 @@ void DescriptorAction::stepComputeDescriptor()
 
             if (hasDescriptor)
             {
-                queryPoints_.value() = static_cast<size_t>(descriptor * 1e5F);
+                queryPoints_.value() = static_cast<size_t>(descriptor * 1e5);
                 queryPoints_.setModified();
 
                 if (nPointsWithDescriptor_ == 0)
@@ -216,17 +216,17 @@ void DescriptorAction::stepNormalizeDescriptor()
 
     startTimer();
 
-    float descriptorRange_ = descriptorMaximum_ - descriptorMinimum_;
+    double descriptorRange_ = descriptorMaximum_ - descriptorMinimum_;
 
-    if (descriptorRange_ > 0.0F)
+    if (descriptorRange_ > 0.0)
     {
-        float d = 1.0F / descriptorRange_;
+        double d = 1.0 / descriptorRange_;
 
         while (nPointsDone_ < nPointsTotal_)
         {
             if (queryPoints_.next())
             {
-                float v = static_cast<float>(queryPoints_.value()) * 1e-5F;
+                double v = static_cast<double>(queryPoints_.value()) * 1e-5;
                 queryPoints_.descriptor() = (v - descriptorMinimum_) * d;
                 queryPoints_.setModified();
             }

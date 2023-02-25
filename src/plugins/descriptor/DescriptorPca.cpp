@@ -49,7 +49,7 @@ bool DescriptorPca::computeDescriptor(Query &query,
                                       double &meanX,
                                       double &meanY,
                                       double &meanZ,
-                                      float &descriptor)
+                                      double &descriptor)
 {
     double x, y, z, r;
 
@@ -70,7 +70,7 @@ bool DescriptorPca::computeDescriptor(Query &query,
                                       double &meanX,
                                       double &meanY,
                                       double &meanZ,
-                                      float &descriptor)
+                                      double &descriptor)
 {
     // The number of points inside this grid cell.
     Eigen::MatrixXd::Index nPoints = 0;
@@ -119,7 +119,7 @@ bool DescriptorPca::computeDescriptor(Eigen::MatrixXd &V,
                                       double &meanX,
                                       double &meanY,
                                       double &meanZ,
-                                      float &descriptor)
+                                      double &descriptor)
 {
     // The number of points.
     Eigen::MatrixXd::Index nPoints = V.cols();
@@ -226,7 +226,7 @@ bool DescriptorPca::computeDescriptor(Eigen::MatrixXd &V,
     if (sum > std::numeric_limits<double>::epsilon())
     {
         // const double SFFIx = 100. - (eL * 100. / sum);
-        descriptor = static_cast<float>(eL / sum);
+        descriptor = static_cast<double>(eL / sum);
     }
 
     LOG_DEBUG(<< "Descriptor <" << descriptor << ">.");
@@ -239,7 +239,7 @@ bool DescriptorPca::computeDistribution(Query &query,
                                         double y,
                                         double z,
                                         double radius,
-                                        float &descriptor)
+                                        double &descriptor)
 {
     const int dim = 4;
     const int dim2 = dim / 2;
@@ -283,7 +283,7 @@ bool DescriptorPca::computeDistribution(Query &query,
         }
     }
 
-    descriptor = static_cast<float>(used) / static_cast<float>(dimxyz);
+    descriptor = static_cast<double>(used) / static_cast<double>(dimxyz);
 
     return true;
 }

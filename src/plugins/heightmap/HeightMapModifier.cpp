@@ -181,9 +181,12 @@ void HeightMapModifier::applyModifier(Page *page)
         size_t colorIndex = static_cast<size_t>(heightNorm / colormapStep);
 
         // Output
-        page->renderColor[row * 3 + 0] *= colormap_[colorIndex][0];
-        page->renderColor[row * 3 + 1] *= colormap_[colorIndex][1];
-        page->renderColor[row * 3 + 2] *= colormap_[colorIndex][2];
+        page->renderColor[row * 3 + 0] *=
+            static_cast<float>(colormap_[colorIndex][0]);
+        page->renderColor[row * 3 + 1] *=
+            static_cast<float>(colormap_[colorIndex][1]);
+        page->renderColor[row * 3 + 2] *=
+            static_cast<float>(colormap_[colorIndex][2]);
     }
 
     mutex_.unlock();
@@ -234,7 +237,7 @@ void HeightMapModifier::apply(QWidget *widget)
     mainWindow_->resumeThreads();
 }
 
-std::vector<Vector3<float>> HeightMapModifier::createColormap(
+std::vector<Vector3<double>> HeightMapModifier::createColormap(
     const QString &name,
     int colorCount)
 {
@@ -259,12 +262,12 @@ std::vector<Vector3<float>> HeightMapModifier::createColormap(
     else
     {
         // White
-        std::vector<Vector3<float>> colormap;
+        std::vector<Vector3<double>> colormap;
         colormap.resize(n);
 
         for (size_t i = 0; i < n; i++)
         {
-            colormap[i].set(1.0F, 1.0F, 1.0F);
+            colormap[i].set(1.0, 1.0, 1.0);
         }
 
         return colormap;

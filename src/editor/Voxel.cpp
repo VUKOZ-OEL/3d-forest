@@ -46,7 +46,7 @@ Voxel::Voxel(uint32_t x,
       meanY_(meanY),
       meanZ_(meanZ),
       meanElevation_(meanElevation),
-      descriptor_(0.0F),
+      descriptor_(0.0),
       elementIndex_(Voxel::npos)
 {
 }
@@ -64,7 +64,7 @@ void Voxel::clear()
     meanZ_ = 0.0;
     meanElevation_ = 0.0;
 
-    descriptor_ = 0.0F;
+    descriptor_ = 0.0;
 
     elementIndex_ = Voxel::npos;
 }

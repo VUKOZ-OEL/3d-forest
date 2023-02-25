@@ -32,7 +32,7 @@ static void computePca(const Eigen::MatrixXd &points)
     double x;
     double y;
     double z;
-    float descriptor;
+    double descriptor;
 
     DescriptorPca pca;
     (void)pca.computeDescriptor(V, x, y, z, descriptor);

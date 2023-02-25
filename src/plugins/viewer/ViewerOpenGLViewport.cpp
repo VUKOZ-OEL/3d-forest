@@ -379,11 +379,14 @@ void ViewerOpenGLViewport::renderSceneSettingsEnable()
     const SettingsView &opt = settings.view();
 
     // Background
-    const Vector3<float> &rgb = opt.backgroundColor();
-    glClearColor(rgb[0], rgb[1], rgb[2], 0.0F);
+    const Vector3<double> &rgb = opt.backgroundColor();
+    glClearColor(static_cast<float>(rgb[0]),
+                 static_cast<float>(rgb[1]),
+                 static_cast<float>(rgb[2]),
+                 0.0F);
 
     // Point size
-    glPointSize(opt.pointSize());
+    glPointSize(static_cast<float>(opt.pointSize()));
 
     // Fog
     if (opt.isFogEnabled())

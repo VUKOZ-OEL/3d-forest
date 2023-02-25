@@ -57,7 +57,7 @@ public slots:
 
 protected:
     DoubleRangeSliderWidget *descriptorInput_;
-    Range<float> descriptorRange_;
+    Range<double> descriptorRange_;
 
     void descriptorInputChanged();
 };

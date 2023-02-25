@@ -45,7 +45,7 @@ public:
     double meanZ_;
     double meanElevation_;
 
-    float descriptor_; // <0, 1>
+    double descriptor_; // <0, 1>
 
     uint32_t elementIndex_;
 

@@ -96,8 +96,8 @@ public:
     void box(const Voxel &voxel, Box<double> *box);
 
     // Values
-    float descriptorMin() const { return descriptorMin_; }
-    float descriptorMax() const { return descriptorMax_; }
+    double descriptorMin() const { return descriptorMin_; }
+    double descriptorMax() const { return descriptorMax_; }
 
     void normalize(Voxel *voxel);
 
@@ -123,8 +123,8 @@ private:
     std::vector<Voxel *> sortedVoxels_;
 
     // Values
-    float descriptorMin_;
-    float descriptorMax_;
+    double descriptorMin_;
+    double descriptorMax_;
 
     // Create
     std::vector<Box<size_t>> stack_;

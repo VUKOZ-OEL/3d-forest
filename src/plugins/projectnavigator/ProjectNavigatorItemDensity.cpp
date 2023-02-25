@@ -83,15 +83,13 @@ void ProjectNavigatorItemDensity::slotUpdate(void *sender,
 
 void ProjectNavigatorItemDensity::slotRangeIntermediateMinimumValue()
 {
-    densityRange_.setMinimumValue(
-        static_cast<float>(densityInput_->minimumValue()) * 0.0039216F);
+    densityRange_.setMinimumValue(densityInput_->minimumValue() * 0.0039216);
     densityInputChanged();
 }
 
 void ProjectNavigatorItemDensity::slotRangeIntermediateMaximumValue()
 {
-    densityRange_.setMaximumValue(
-        static_cast<float>(densityInput_->maximumValue()) * 0.0039216F);
+    densityRange_.setMaximumValue(densityInput_->maximumValue() * 0.0039216);
     densityInputChanged();
 }
 

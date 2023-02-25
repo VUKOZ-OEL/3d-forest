@@ -336,12 +336,12 @@ void ProjectNavigatorItemClassifications::addTreeItem(size_t index)
     // Color legend
     if (index < ColorPalette::Classification.size())
     {
-        const Vector3<float> &rgb = ColorPalette::Classification[index];
+        const Vector3<double> &rgb = ColorPalette::Classification[index];
 
         QColor color;
-        color.setRedF(rgb[0]);
-        color.setGreenF(rgb[1]);
-        color.setBlueF(rgb[2]);
+        color.setRedF(static_cast<float>(rgb[0]));
+        color.setGreenF(static_cast<float>(rgb[1]));
+        color.setBlueF(static_cast<float>(rgb[2]));
 
         QBrush brush(color, Qt::SolidPattern);
         item->setBackground(COLUMN_ID, brush);

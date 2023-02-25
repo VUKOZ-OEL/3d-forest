@@ -23,7 +23,7 @@
 
 int main()
 {
-    Vector3<float> v1{1, 1, 0};
+    Vector3<double> v1{1, 1, 0};
 
     std::cout << "v1: " << v1 << "\n";
     std::cout << "v1.length: " << v1.length() << "\n";

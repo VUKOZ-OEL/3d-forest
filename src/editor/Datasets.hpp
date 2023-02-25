@@ -61,8 +61,11 @@ public:
     const std::string &label(size_t i) const { return datasets_[i].label(); }
     void setLabel(size_t i, const std::string &label);
 
-    const Vector3<float> &color(size_t i) const { return datasets_[i].color(); }
-    void setColor(size_t i, const Vector3<float> &color);
+    const Vector3<double> &color(size_t i) const
+    {
+        return datasets_[i].color();
+    }
+    void setColor(size_t i, const Vector3<double> &color);
 
     const std::string &fileName(size_t i) const
     {

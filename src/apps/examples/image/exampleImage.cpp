@@ -98,7 +98,7 @@ int main()
 {
     try
     {
-        exampleImageGrayscale();
+        exampleImage();
     }
     catch (std::exception &e)
     {

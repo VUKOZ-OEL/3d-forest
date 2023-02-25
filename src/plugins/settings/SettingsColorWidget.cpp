@@ -129,7 +129,7 @@ void SettingsColorWidget::settingsChangedApply()
 
 void SettingsColorWidget::slotSetPointSize(int v)
 {
-    settings_.setPointSize(static_cast<float>(v));
+    settings_.setPointSize(static_cast<double>(v));
     settingsChanged();
 }
 
@@ -142,7 +142,7 @@ void SettingsColorWidget::slotSetFogEnabled(int v)
 
 void SettingsColorWidget::slotSetColorFg()
 {
-    Vector3<float> rgb = settings_.pointColor();
+    Vector3<double> rgb = settings_.pointColor();
 
     if (colorDialog(rgb))
     {
@@ -154,7 +154,7 @@ void SettingsColorWidget::slotSetColorFg()
 
 void SettingsColorWidget::slotSetColorBg()
 {
-    Vector3<float> rgb = settings_.backgroundColor();
+    Vector3<double> rgb = settings_.backgroundColor();
 
     if (colorDialog(rgb))
     {
@@ -164,10 +164,12 @@ void SettingsColorWidget::slotSetColorBg()
     }
 }
 
-bool SettingsColorWidget::colorDialog(Vector3<float> &rgb)
+bool SettingsColorWidget::colorDialog(Vector3<double> &rgb)
 {
     QColor color;
-    color.setRgbF(rgb[0], rgb[1], rgb[2]);
+    color.setRgbF(static_cast<float>(rgb[0]),
+                  static_cast<float>(rgb[1]),
+                  static_cast<float>(rgb[2]));
 
     QColorDialog dialog(color, this);
     if (dialog.exec() == QDialog::Rejected)
@@ -176,18 +178,20 @@ bool SettingsColorWidget::colorDialog(Vector3<float> &rgb)
     }
 
     color = dialog.selectedColor();
-    rgb[0] = static_cast<float>(color.redF());
-    rgb[1] = static_cast<float>(color.greenF());
-    rgb[2] = static_cast<float>(color.blueF());
+    rgb[0] = static_cast<double>(color.redF());
+    rgb[1] = static_cast<double>(color.greenF());
+    rgb[2] = static_cast<double>(color.blueF());
 
     return true;
 }
 
 void SettingsColorWidget::setColor(QPushButton *button,
-                                   const Vector3<float> &rgb)
+                                   const Vector3<double> &rgb)
 {
     QColor color;
-    color.setRgbF(rgb[0], rgb[1], rgb[2]);
+    color.setRgbF(static_cast<float>(rgb[0]),
+                  static_cast<float>(rgb[1]),
+                  static_cast<float>(rgb[2]));
 
     QPixmap pixmap(24, 24);
     pixmap.fill(color);

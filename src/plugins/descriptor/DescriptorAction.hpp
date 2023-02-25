@@ -45,8 +45,8 @@ public:
     virtual void next();
     void clear();
 
-    float minimum() const { return descriptorMinimum_; }
-    float maximum() const { return descriptorMaximum_; }
+    double minimum() const { return descriptorMinimum_; }
+    double maximum() const { return descriptorMaximum_; }
 
 protected:
     Editor *editor_;
@@ -73,8 +73,8 @@ protected:
     uint64_t nPointsDone_;
     uint64_t nPointsWithDescriptor_;
 
-    float descriptorMinimum_;
-    float descriptorMaximum_;
+    double descriptorMinimum_;
+    double descriptorMaximum_;
 
     void stepComputeDescriptor();
     void stepNormalizeDescriptor();

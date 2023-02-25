@@ -21,7 +21,7 @@
 
 #include <Camera.hpp>
 
-Camera::Camera() : fov(60.0F)
+Camera::Camera() : fov(60.0)
 {
 }
 

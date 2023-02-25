@@ -82,7 +82,7 @@ public:
     double &y() { return position_[3 * selection_[pagePointIndex_] + 1]; }
     double &z() { return position_[3 * selection_[pagePointIndex_] + 2]; }
 
-    float &intensity() { return intensity_[selection_[pagePointIndex_]]; }
+    double &intensity() { return intensity_[selection_[pagePointIndex_]]; }
 
     uint8_t &returnNumber()
     {
@@ -103,29 +103,29 @@ public:
 
     double &gpsTime() { return gpsTime_[selection_[pagePointIndex_]]; }
 
-    float &red() { return color_[3 * selection_[pagePointIndex_] + 0]; }
-    float &green() { return color_[3 * selection_[pagePointIndex_] + 1]; }
-    float &blue() { return color_[3 * selection_[pagePointIndex_] + 2]; }
+    double &red() { return color_[3 * selection_[pagePointIndex_] + 0]; }
+    double &green() { return color_[3 * selection_[pagePointIndex_] + 1]; }
+    double &blue() { return color_[3 * selection_[pagePointIndex_] + 2]; }
 
-    uint32_t &layer() { return layer_[selection_[pagePointIndex_]]; }
+    size_t &layer() { return layer_[selection_[pagePointIndex_]]; }
     double &elevation() { return elevation_[selection_[pagePointIndex_]]; }
-    float &customRed()
+    double &customRed()
     {
         return customColor_[3 * selection_[pagePointIndex_] + 0];
     }
-    float &customGreen()
+    double &customGreen()
     {
         return customColor_[3 * selection_[pagePointIndex_] + 1];
     }
-    float &customBlue()
+    double &customBlue()
     {
         return customColor_[3 * selection_[pagePointIndex_] + 2];
     }
-    float &descriptor() { return descriptor_[selection_[pagePointIndex_]]; }
-    float &density() { return density_[selection_[pagePointIndex_]]; }
-    float &normalX() { return normal_[3 * selection_[pagePointIndex_] + 0]; }
-    float &normalY() { return normal_[3 * selection_[pagePointIndex_] + 1]; }
-    float &normalZ() { return normal_[3 * selection_[pagePointIndex_] + 2]; }
+    double &descriptor() { return descriptor_[selection_[pagePointIndex_]]; }
+    double &density() { return density_[selection_[pagePointIndex_]]; }
+    double &normalX() { return normal_[3 * selection_[pagePointIndex_] + 0]; }
+    double &normalY() { return normal_[3 * selection_[pagePointIndex_] + 1]; }
+    double &normalZ() { return normal_[3 * selection_[pagePointIndex_] + 2]; }
     size_t &value() { return value_[selection_[pagePointIndex_]]; }
     /**@}*/
 
@@ -197,20 +197,20 @@ protected:
     std::shared_ptr<Page> page_;
 
     double *position_;
-    float *intensity_;
+    double *intensity_;
     uint8_t *returnNumber_;
     uint8_t *numberOfReturns_;
     uint8_t *classification_;
     uint8_t *userData_;
     double *gpsTime_;
-    float *color_;
+    double *color_;
 
-    uint32_t *layer_;
+    size_t *layer_;
     double *elevation_;
-    float *customColor_;
-    float *descriptor_;
-    float *density_;
-    float *normal_;
+    double *customColor_;
+    double *descriptor_;
+    double *density_;
+    double *normal_;
     size_t *value_;
 
     uint32_t *selection_;

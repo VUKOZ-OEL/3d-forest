@@ -67,8 +67,8 @@ void ExportFileFormatLas::create(const std::string &path)
 
 void ExportFileFormatLas::write(Query &query)
 {
-    const float f8 = 255.0F;
-    const float f16 = 65535.0F;
+    const double f8 = 255.0;
+    const double f16 = 65535.0;
 
     LasFile::Point point;
 
@@ -96,7 +96,7 @@ void ExportFileFormatLas::write(Query &query)
     point.green = static_cast<uint16_t>(query.green() * f16);
     point.blue = static_cast<uint16_t>(query.blue() * f16);
 
-    point.user_layer = query.layer();
+    point.user_layer = static_cast<uint32_t>(query.layer());
     point.user_elevation = static_cast<uint32_t>(query.elevation());
 
     point.user_red = static_cast<uint8_t>(query.customRed() * f8);

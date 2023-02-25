@@ -34,7 +34,7 @@ void Datasets::setLabel(size_t i, const std::string &label)
     datasets_[i].setLabel(label);
 }
 
-void Datasets::setColor(size_t i, const Vector3<float> &color)
+void Datasets::setColor(size_t i, const Vector3<double> &color)
 {
     datasets_[i].setColor(color);
 }

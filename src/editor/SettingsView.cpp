@@ -22,10 +22,10 @@
 #include <SettingsView.hpp>
 
 SettingsView::SettingsView()
-    : pointSize_(1.0F),
+    : pointSize_(1.0),
       fogEnabled_(false),
-      pointColor_(1.0F, 1.0F, 1.0F),
-      background_(0.2F, 0.2F, 0.2F)
+      pointColor_(1.0, 1.0, 1.0),
+      background_(0.2, 0.2, 0.2)
 {
     colorSourceString_ = {"Color",
                           "Intensity",
@@ -47,12 +47,12 @@ SettingsView::SettingsView()
     colorSourceEnabled_[0] = true;
 }
 
-float SettingsView::pointSize() const
+double SettingsView::pointSize() const
 {
     return pointSize_;
 }
 
-void SettingsView::setPointSize(float size)
+void SettingsView::setPointSize(double size)
 {
     pointSize_ = size;
 }
@@ -67,12 +67,12 @@ void SettingsView::setFogEnabled(bool b)
     fogEnabled_ = b;
 }
 
-void SettingsView::setPointColor(const Vector3<float> &rgb)
+void SettingsView::setPointColor(const Vector3<double> &rgb)
 {
     pointColor_ = rgb;
 }
 
-void SettingsView::setBackgroundColor(const Vector3<float> &rgb)
+void SettingsView::setBackgroundColor(const Vector3<double> &rgb)
 {
     background_ = rgb;
 }
@@ -109,7 +109,7 @@ void SettingsView::read(const Json &in)
 {
     if (in.contains("pointSize"))
     {
-        pointSize_ = static_cast<float>(in["pointSize"].number());
+        pointSize_ = static_cast<double>(in["pointSize"].number());
     }
 
     if (in.contains("fog") && in["fog"].contains("enabled"))

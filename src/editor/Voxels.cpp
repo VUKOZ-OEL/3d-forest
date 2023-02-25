@@ -60,8 +60,8 @@ void Voxels::clear()
     sortedVoxels_.clear();
 
     // Values
-    descriptorMin_ = std::numeric_limits<float>::max();
-    descriptorMax_ = std::numeric_limits<float>::min();
+    descriptorMin_ = std::numeric_limits<double>::max();
+    descriptorMax_ = std::numeric_limits<double>::min();
 
     // Create
     stack_.clear();
@@ -98,7 +98,7 @@ void Voxels::box(const Voxel &voxel, Box<double> *box)
 void Voxels::normalize(Voxel *voxel)
 {
     // Minimum descriptor is zero to include voxels without computed descriptor.
-    ::normalize(voxel->descriptor_, 0.0F, descriptorMax_);
+    ::normalize(voxel->descriptor_, 0.0, descriptorMax_);
 }
 
 static int VoxelsCompareFunctionZ(const void *a, const void *b)

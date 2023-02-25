@@ -44,7 +44,7 @@ public:
         The data are stored as [i0, i1, ...].
         The values are in range from 0 (zero intensity) to 1 (full intensity).
     */
-    std::vector<float> intensity;
+    std::vector<double> intensity;
 
     /** Return number.
         Contains values from 0 to 15.
@@ -71,7 +71,7 @@ public:
         When the input data set has no colors, then the colors in this vector
         are set to full intensity.
     */
-    std::vector<float> color;
+    std::vector<double> color;
     /**@}*/
 
     /** @name Point Data Extra Bytes */
@@ -79,7 +79,7 @@ public:
     /** Layer identification numbers.
         This value is stored in Point Data Record extra bytes.
     */
-    std::vector<uint32_t> layer;
+    std::vector<size_t> layer;
 
     /** Point elevation above ground.
         The data are stored as [e0, e1, ...].
@@ -92,27 +92,27 @@ public:
         Color values are in range from 0 (zero intensity) to 1 (full intensity).
         This value is stored in Point Data Record extra bytes.
     */
-    std::vector<float> customColor;
+    std::vector<double> customColor;
 
     /** Descriptor values.
         The data are stored as [d0, d1, ...].
         The values are in range from 0 (zero) to 1 (full).
         This value is stored in Point Data Record extra bytes.
     */
-    std::vector<float> descriptor;
+    std::vector<double> descriptor;
 
     /** Density values.
         The data are stored as [d0, d1, ...].
         The values are in range from 0 (zero) to 1 (full).
         This value is stored in Point Data Record extra bytes.
     */
-    std::vector<float> density;
+    std::vector<double> density;
 
     /** Point normals.
         The data are stored as [nx0, ny0, nz0, nx1, ny1, ...].
         This value is stored in Point Data Record extra bytes.
      */
-    std::vector<float> normal;
+    std::vector<double> normal;
 
     /** User values.
         This value is stored in Point Data Record extra bytes.
@@ -216,7 +216,7 @@ protected:
     void setColor(size_t idx,
                   size_t colorValue,
                   size_t colorMax,
-                  const std::vector<Vector3<float>> &pal);
+                  const std::vector<Vector3<double>> &pal);
 };
 
 #endif /* PAGE_HPP */

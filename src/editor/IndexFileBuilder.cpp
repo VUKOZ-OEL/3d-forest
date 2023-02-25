@@ -760,25 +760,25 @@ void IndexFileBuilder::stateMainSort()
         {
             intensity = ltoh16(point + 12);
             intensity = static_cast<uint16_t>(
-                (static_cast<float>(intensity) / 255.0F) * 65535.0F);
+                (static_cast<double>(intensity) / 255.0) * 65535.0);
             htol16(point + 12, intensity);
         }
 
         if (rgbMax_ > 0 && rgbMax_ < 766)
         {
             color = ltoh16(point + 30);
-            color = static_cast<uint16_t>((static_cast<float>(color) / 255.0F) *
-                                          65535.0F);
+            color = static_cast<uint16_t>((static_cast<double>(color) / 255.0) *
+                                          65535.0);
             htol16(point + 30, color);
 
             color = ltoh16(point + 32);
-            color = static_cast<uint16_t>((static_cast<float>(color) / 255.0F) *
-                                          65535.0F);
+            color = static_cast<uint16_t>((static_cast<double>(color) / 255.0) *
+                                          65535.0);
             htol16(point + 32, color);
 
             color = ltoh16(point + 34);
-            color = static_cast<uint16_t>((static_cast<float>(color) / 255.0F) *
-                                          65535.0F);
+            color = static_cast<uint16_t>((static_cast<double>(color) / 255.0) *
+                                          65535.0);
             htol16(point + 34, color);
         }
 
