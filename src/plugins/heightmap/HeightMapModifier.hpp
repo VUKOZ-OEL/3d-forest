@@ -68,11 +68,11 @@ protected:
     Editor *editor_;
     bool previewEnabled_;
     Source source_;
-    std::vector<Vector3<float>> colormap_;
+    std::vector<Vector3<double>> colormap_;
     QMutex mutex_;
 
-    std::vector<Vector3<float>> createColormap(const QString &name,
-                                               int colorCount);
+    std::vector<Vector3<double>> createColormap(const QString &name,
+                                                int colorCount);
 };
 
 #endif /* HEIGHT_MAP_MODIFIER_HPP */

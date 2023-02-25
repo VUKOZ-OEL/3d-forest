@@ -49,11 +49,11 @@ public:
     void setElevation(const Range<double> &elevation);
     const Range<double> &elevation() const { return elevation_; }
 
-    void setDensity(const Range<float> &density);
-    const Range<float> &density() const { return density_; }
+    void setDensity(const Range<double> &density);
+    const Range<double> &density() const { return density_; }
 
-    void setDescriptor(const Range<float> &descriptor);
-    const Range<float> &descriptor() const { return descriptor_; }
+    void setDescriptor(const Range<double> &descriptor);
+    const Range<double> &descriptor() const { return descriptor_; }
 
     void setDataset(const std::unordered_set<size_t> &list);
     void setDataset(const QueryFilterSet &list);
@@ -77,8 +77,8 @@ private:
     Cone<double> cone_;
     Sphere<double> sphere_;
     Range<double> elevation_;
-    Range<float> density_;
-    Range<float> descriptor_;
+    Range<double> density_;
+    Range<double> descriptor_;
     QueryFilterSet dataset_;
     QueryFilterSet classification_;
     std::vector<int> classificationArray_;

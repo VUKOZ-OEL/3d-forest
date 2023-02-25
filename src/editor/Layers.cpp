@@ -43,7 +43,7 @@ void Layers::setDefault()
     size_t idx = 0;
 
     layers_.resize(1);
-    layers_[idx].set(id, "main", {1.0F, 1.0F, 1.0F});
+    layers_[idx].set(id, "main", {1.0, 1.0, 1.0});
 
     hashTableId_.clear();
     hashTableId_[id] = idx;
@@ -103,7 +103,7 @@ void Layers::setLabel(size_t i, const std::string &label)
     layers_[i].setLabel(label);
 }
 
-void Layers::setColor(size_t i, const Vector3<float> &color)
+void Layers::setColor(size_t i, const Vector3<double> &color)
 {
     LOG_DEBUG(<< "Called with parameter index <" << i << "> color <" << color
               << ">.");

@@ -57,8 +57,8 @@ void Editor::close()
 
     clipFilter_.clear();
     elevationRange_.clear();
-    densityRange_.set(0.0F, 1.0F, 0.0F, 1.0F);
-    descriptorRange_.set(0.0F, 1.0F, 0.0F, 1.0F);
+    densityRange_.set(0.0, 1.0, 0.0, 1.0);
+    descriptorRange_.set(0.0, 1.0, 0.0, 1.0);
 
     unsavedChanges_ = false;
 }
@@ -265,7 +265,7 @@ void Editor::setElevationRange(const Range<double> &elevationRange)
     // unsavedChanges_ = true;
 }
 
-void Editor::setDensityRange(const Range<float> &densityRange)
+void Editor::setDensityRange(const Range<double> &densityRange)
 {
     densityRange_ = densityRange;
     LOG_DEBUG(<< "Called with parameter densityRange <" << densityRange_
@@ -279,7 +279,7 @@ void Editor::setDensityRange(const Range<float> &densityRange)
     }
 }
 
-void Editor::setDescriptorRange(const Range<float> &descriptorRange)
+void Editor::setDescriptorRange(const Range<double> &descriptorRange)
 {
     descriptorRange_ = descriptorRange;
     LOG_DEBUG(<< "Called with parameter descriptorRange <" << descriptorRange_

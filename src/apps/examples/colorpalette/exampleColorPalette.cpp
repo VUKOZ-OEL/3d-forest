@@ -21,16 +21,16 @@
 
 #include <ColorPalette.hpp>
 
-static void print(const std::vector<Vector3<float>> &pal)
+static void print(const std::vector<Vector3<double>> &pal)
 {
     char buffer[32];
     uint32_t rgb;
 
     for (size_t i = 0; i < pal.size(); i++)
     {
-        rgb = ((static_cast<uint32_t>(pal[i][0] * 255.0F) & 0xffU) << 16) |
-              ((static_cast<uint32_t>(pal[i][1] * 255.0F) & 0xffU) << 8) |
-              (static_cast<uint32_t>(pal[i][2] * 255.0F) & 0xffU);
+        rgb = ((static_cast<uint32_t>(pal[i][0] * 255.0) & 0xffU) << 16) |
+              ((static_cast<uint32_t>(pal[i][1] * 255.0) & 0xffU) << 8) |
+              (static_cast<uint32_t>(pal[i][2] * 255.0) & 0xffU);
 
         (void)snprintf(buffer, sizeof(buffer), "0x%06x", rgb);
 

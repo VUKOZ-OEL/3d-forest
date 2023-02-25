@@ -34,15 +34,15 @@ class EXPORT_EDITOR Layer
 public:
     Layer();
 
-    void set(size_t id, const std::string &label, const Vector3<float> &color);
+    void set(size_t id, const std::string &label, const Vector3<double> &color);
 
     size_t id() const { return id_; }
 
     const std::string &label() const { return label_; }
     void setLabel(const std::string &label);
 
-    const Vector3<float> &color() const { return color_; }
-    void setColor(const Vector3<float> &color);
+    const Vector3<double> &color() const { return color_; }
+    void setColor(const Vector3<double> &color);
 
     const LayerData &data() const { return data_; }
     void setData(const LayerData &data) { data_ = data; }
@@ -57,7 +57,7 @@ public:
 protected:
     // Stored
     std::string label_;
-    Vector3<float> color_;
+    Vector3<double> color_;
     size_t id_;
 
     LayerData data_;

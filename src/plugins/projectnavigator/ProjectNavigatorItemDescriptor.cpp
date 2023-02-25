@@ -87,15 +87,15 @@ void ProjectNavigatorItemDescriptor::slotUpdate(
 
 void ProjectNavigatorItemDescriptor::slotRangeIntermediateMinimumValue()
 {
-    descriptorRange_.setMinimumValue(
-        static_cast<float>(descriptorInput_->minimumValue()) * 0.0039216F);
+    descriptorRange_.setMinimumValue(descriptorInput_->minimumValue() *
+                                     0.0039216);
     descriptorInputChanged();
 }
 
 void ProjectNavigatorItemDescriptor::slotRangeIntermediateMaximumValue()
 {
-    descriptorRange_.setMaximumValue(
-        static_cast<float>(descriptorInput_->maximumValue()) * 0.0039216F);
+    descriptorRange_.setMaximumValue(descriptorInput_->maximumValue() *
+                                     0.0039216);
     descriptorInputChanged();
 }
 

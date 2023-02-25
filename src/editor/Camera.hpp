@@ -30,10 +30,10 @@
 class EXPORT_EDITOR Camera
 {
 public:
-    Vector3<float> eye;
-    Vector3<float> center;
-    Vector3<float> up;
-    float fov;
+    Vector3<double> eye;
+    Vector3<double> center;
+    Vector3<double> up;
+    double fov;
 
     Camera();
     ~Camera();

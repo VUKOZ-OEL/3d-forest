@@ -58,8 +58,8 @@ public:
     const std::string &label(size_t i) const { return layers_[i].label(); }
     void setLabel(size_t i, const std::string &label);
 
-    const Vector3<float> &color(size_t i) const { return layers_[i].color(); }
-    void setColor(size_t i, const Vector3<float> &color);
+    const Vector3<double> &color(size_t i) const { return layers_[i].color(); }
+    void setColor(size_t i, const Vector3<double> &color);
 
     void read(const Json &in);
     Json &write(Json &out) const;

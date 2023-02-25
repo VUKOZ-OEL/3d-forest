@@ -36,7 +36,7 @@ void Dataset::setLabel(const std::string &label)
     label_ = label;
 }
 
-void Dataset::setColor(const Vector3<float> &color)
+void Dataset::setColor(const Vector3<double> &color)
 {
     color_ = color;
 }
@@ -58,7 +58,7 @@ void Dataset::read(size_t id,
 
     id_ = id;
     label_ = fileName_;
-    color_.set(1.0F, 1.0F, 1.0F);
+    color_.set(1.0, 1.0, 1.0);
 
     read();
 
@@ -121,7 +121,7 @@ void Dataset::read(const Json &in, const std::string &projectPath)
     }
     else
     {
-        color_.set(1.0F, 1.0F, 1.0F);
+        color_.set(1.0, 1.0, 1.0);
     }
 
     // Read

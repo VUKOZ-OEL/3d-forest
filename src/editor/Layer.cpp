@@ -28,7 +28,7 @@ Layer::Layer() : id_(0)
 
 void Layer::set(size_t id,
                 const std::string &label,
-                const Vector3<float> &color)
+                const Vector3<double> &color)
 {
     id_ = id;
     label_ = label;
@@ -40,7 +40,7 @@ void Layer::setLabel(const std::string &label)
     label_ = label;
 }
 
-void Layer::setColor(const Vector3<float> &color)
+void Layer::setColor(const Vector3<double> &color)
 {
     color_ = color;
 }

@@ -195,7 +195,7 @@ void DensityAction::stepNormalizeDensity()
             if (queryPoints_.next())
             {
                 v = static_cast<double>(queryPoints_.value() - densityMinimum_);
-                queryPoints_.density() = static_cast<float>(v * d);
+                queryPoints_.density() = v * d;
                 queryPoints_.setModified();
             }
 

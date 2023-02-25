@@ -31,21 +31,21 @@
 class EXPORT_CORE ColorPalette
 {
 public:
-    static const std::vector<Vector3<float>> Classification;
-    static const std::vector<Vector3<float>> BlackRed16;
-    static const std::vector<Vector3<float>> BlackGreen16;
-    static const std::vector<Vector3<float>> RedBlack16;
-    static const std::vector<Vector3<float>> RedGreen16;
-    static const std::vector<Vector3<float>> RedYellow16;
-    static const std::vector<Vector3<float>> BlueYellow16;
-    static const std::vector<Vector3<float>> BlueCyanYellowRed16;
-    static const std::vector<Vector3<float>> BlueCyanYellowRed256;
-    static const std::vector<Vector3<float>> BlueCyanGreenYellowRed16;
-    static const std::vector<Vector3<float>> WindowsXp32;
+    static const std::vector<Vector3<double>> Classification;
+    static const std::vector<Vector3<double>> BlackRed16;
+    static const std::vector<Vector3<double>> BlackGreen16;
+    static const std::vector<Vector3<double>> RedBlack16;
+    static const std::vector<Vector3<double>> RedGreen16;
+    static const std::vector<Vector3<double>> RedYellow16;
+    static const std::vector<Vector3<double>> BlueYellow16;
+    static const std::vector<Vector3<double>> BlueCyanYellowRed16;
+    static const std::vector<Vector3<double>> BlueCyanYellowRed256;
+    static const std::vector<Vector3<double>> BlueCyanGreenYellowRed16;
+    static const std::vector<Vector3<double>> WindowsXp32;
 
-    static std::vector<Vector3<float>> blueCyanYellowRed(size_t nColors);
-    static std::vector<Vector3<float>> blueCyanGreenYellowRed(size_t nColors);
-    static std::vector<Vector3<float>> gray(size_t nColors);
+    static std::vector<Vector3<double>> blueCyanYellowRed(size_t nColors);
+    static std::vector<Vector3<double>> blueCyanGreenYellowRed(size_t nColors);
+    static std::vector<Vector3<double>> gray(size_t nColors);
 };
 
 #endif /* COLOR_PALETTE_HPP */

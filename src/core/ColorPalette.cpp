@@ -22,7 +22,7 @@
 #include <ColorPalette.hpp>
 
 #if !defined(EXPORT_CORE_IMPORT)
-const std::vector<Vector3<float>> ColorPalette::Classification{
+const std::vector<Vector3<double>> ColorPalette::Classification{
     0xffffffU, //  0 : Created, Never classified
     0xb2b2b2U, //  1 : Unassigned - Unclassified
     0xa87102U, //  2 : Ground
@@ -50,140 +50,140 @@ const std::vector<Vector3<float>> ColorPalette::Classification{
                // 64 - 255 : User Definable
 };
 
-const std::vector<Vector3<float>> ColorPalette::BlackRed16 = {
-    {0x0 * (1.0F / 15), 0.0F, 0.0F},
-    {0x1 * (1.0F / 15), 0.0F, 0.0F},
-    {0x2 * (1.0F / 15), 0.0F, 0.0F},
-    {0x3 * (1.0F / 15), 0.0F, 0.0F},
-    {0x4 * (1.0F / 15), 0.0F, 0.0F},
-    {0x5 * (1.0F / 15), 0.0F, 0.0F},
-    {0x6 * (1.0F / 15), 0.0F, 0.0F},
-    {0x7 * (1.0F / 15), 0.0F, 0.0F},
-    {0x8 * (1.0F / 15), 0.0F, 0.0F},
-    {0x9 * (1.0F / 15), 0.0F, 0.0F},
-    {0xa * (1.0F / 15), 0.0F, 0.0F},
-    {0xb * (1.0F / 15), 0.0F, 0.0F},
-    {0xc * (1.0F / 15), 0.0F, 0.0F},
-    {0xd * (1.0F / 15), 0.0F, 0.0F},
-    {0xe * (1.0F / 15), 0.0F, 0.0F},
-    {0xf * (1.0F / 15), 0.0F, 0.0F},
+const std::vector<Vector3<double>> ColorPalette::BlackRed16 = {
+    {0x0 * (1.0 / 15), 0.0, 0.0},
+    {0x1 * (1.0 / 15), 0.0, 0.0},
+    {0x2 * (1.0 / 15), 0.0, 0.0},
+    {0x3 * (1.0 / 15), 0.0, 0.0},
+    {0x4 * (1.0 / 15), 0.0, 0.0},
+    {0x5 * (1.0 / 15), 0.0, 0.0},
+    {0x6 * (1.0 / 15), 0.0, 0.0},
+    {0x7 * (1.0 / 15), 0.0, 0.0},
+    {0x8 * (1.0 / 15), 0.0, 0.0},
+    {0x9 * (1.0 / 15), 0.0, 0.0},
+    {0xa * (1.0 / 15), 0.0, 0.0},
+    {0xb * (1.0 / 15), 0.0, 0.0},
+    {0xc * (1.0 / 15), 0.0, 0.0},
+    {0xd * (1.0 / 15), 0.0, 0.0},
+    {0xe * (1.0 / 15), 0.0, 0.0},
+    {0xf * (1.0 / 15), 0.0, 0.0},
 };
 
-const std::vector<Vector3<float>> ColorPalette::BlackGreen16 = {
-    {0.0F, 0x0 * (1.0F / 15), 0.0F},
-    {0.0F, 0x1 * (1.0F / 15), 0.0F},
-    {0.0F, 0x2 * (1.0F / 15), 0.0F},
-    {0.0F, 0x3 * (1.0F / 15), 0.0F},
-    {0.0F, 0x4 * (1.0F / 15), 0.0F},
-    {0.0F, 0x5 * (1.0F / 15), 0.0F},
-    {0.0F, 0x6 * (1.0F / 15), 0.0F},
-    {0.0F, 0x7 * (1.0F / 15), 0.0F},
-    {0.0F, 0x8 * (1.0F / 15), 0.0F},
-    {0.0F, 0x9 * (1.0F / 15), 0.0F},
-    {0.0F, 0xa * (1.0F / 15), 0.0F},
-    {0.0F, 0xb * (1.0F / 15), 0.0F},
-    {0.0F, 0xc * (1.0F / 15), 0.0F},
-    {0.0F, 0xd * (1.0F / 15), 0.0F},
-    {0.0F, 0xe * (1.0F / 15), 0.0F},
-    {0.0F, 0xf * (1.0F / 15), 0.0F},
+const std::vector<Vector3<double>> ColorPalette::BlackGreen16 = {
+    {0.0, 0x0 * (1.0 / 15), 0.0},
+    {0.0, 0x1 * (1.0 / 15), 0.0},
+    {0.0, 0x2 * (1.0 / 15), 0.0},
+    {0.0, 0x3 * (1.0 / 15), 0.0},
+    {0.0, 0x4 * (1.0 / 15), 0.0},
+    {0.0, 0x5 * (1.0 / 15), 0.0},
+    {0.0, 0x6 * (1.0 / 15), 0.0},
+    {0.0, 0x7 * (1.0 / 15), 0.0},
+    {0.0, 0x8 * (1.0 / 15), 0.0},
+    {0.0, 0x9 * (1.0 / 15), 0.0},
+    {0.0, 0xa * (1.0 / 15), 0.0},
+    {0.0, 0xb * (1.0 / 15), 0.0},
+    {0.0, 0xc * (1.0 / 15), 0.0},
+    {0.0, 0xd * (1.0 / 15), 0.0},
+    {0.0, 0xe * (1.0 / 15), 0.0},
+    {0.0, 0xf * (1.0 / 15), 0.0},
 };
 
-const std::vector<Vector3<float>> ColorPalette::RedBlack16 = {
-    {1.0F - 0x0 * (1.0F / 15), 0.0F, 0.0F},
-    {1.0F - 0x1 * (1.0F / 15), 0.0F, 0.0F},
-    {1.0F - 0x2 * (1.0F / 15), 0.0F, 0.0F},
-    {1.0F - 0x3 * (1.0F / 15), 0.0F, 0.0F},
-    {1.0F - 0x4 * (1.0F / 15), 0.0F, 0.0F},
-    {1.0F - 0x5 * (1.0F / 15), 0.0F, 0.0F},
-    {1.0F - 0x6 * (1.0F / 15), 0.0F, 0.0F},
-    {1.0F - 0x7 * (1.0F / 15), 0.0F, 0.0F},
-    {1.0F - 0x8 * (1.0F / 15), 0.0F, 0.0F},
-    {1.0F - 0x9 * (1.0F / 15), 0.0F, 0.0F},
-    {1.0F - 0xa * (1.0F / 15), 0.0F, 0.0F},
-    {1.0F - 0xb * (1.0F / 15), 0.0F, 0.0F},
-    {1.0F - 0xc * (1.0F / 15), 0.0F, 0.0F},
-    {1.0F - 0xd * (1.0F / 15), 0.0F, 0.0F},
-    {1.0F - 0xe * (1.0F / 15), 0.0F, 0.0F},
-    {1.0F - 0xf * (1.0F / 15), 0.0F, 0.0F},
+const std::vector<Vector3<double>> ColorPalette::RedBlack16 = {
+    {1.0 - 0x0 * (1.0 / 15), 0.0, 0.0},
+    {1.0 - 0x1 * (1.0 / 15), 0.0, 0.0},
+    {1.0 - 0x2 * (1.0 / 15), 0.0, 0.0},
+    {1.0 - 0x3 * (1.0 / 15), 0.0, 0.0},
+    {1.0 - 0x4 * (1.0 / 15), 0.0, 0.0},
+    {1.0 - 0x5 * (1.0 / 15), 0.0, 0.0},
+    {1.0 - 0x6 * (1.0 / 15), 0.0, 0.0},
+    {1.0 - 0x7 * (1.0 / 15), 0.0, 0.0},
+    {1.0 - 0x8 * (1.0 / 15), 0.0, 0.0},
+    {1.0 - 0x9 * (1.0 / 15), 0.0, 0.0},
+    {1.0 - 0xa * (1.0 / 15), 0.0, 0.0},
+    {1.0 - 0xb * (1.0 / 15), 0.0, 0.0},
+    {1.0 - 0xc * (1.0 / 15), 0.0, 0.0},
+    {1.0 - 0xd * (1.0 / 15), 0.0, 0.0},
+    {1.0 - 0xe * (1.0 / 15), 0.0, 0.0},
+    {1.0 - 0xf * (1.0 / 15), 0.0, 0.0},
 };
 
-const std::vector<Vector3<float>> ColorPalette::RedGreen16 = {
-    {1.0F - 0x0 * (1.0F / 15), 0x0 * (1.0F / 15), 0.0F},
-    {1.0F - 0x1 * (1.0F / 15), 0x1 * (1.0F / 15), 0.0F},
-    {1.0F - 0x2 * (1.0F / 15), 0x2 * (1.0F / 15), 0.0F},
-    {1.0F - 0x3 * (1.0F / 15), 0x3 * (1.0F / 15), 0.0F},
-    {1.0F - 0x4 * (1.0F / 15), 0x4 * (1.0F / 15), 0.0F},
-    {1.0F - 0x5 * (1.0F / 15), 0x5 * (1.0F / 15), 0.0F},
-    {1.0F - 0x6 * (1.0F / 15), 0x6 * (1.0F / 15), 0.0F},
-    {1.0F - 0x7 * (1.0F / 15), 0x7 * (1.0F / 15), 0.0F},
-    {1.0F - 0x8 * (1.0F / 15), 0x8 * (1.0F / 15), 0.0F},
-    {1.0F - 0x9 * (1.0F / 15), 0x9 * (1.0F / 15), 0.0F},
-    {1.0F - 0xa * (1.0F / 15), 0xa * (1.0F / 15), 0.0F},
-    {1.0F - 0xb * (1.0F / 15), 0xb * (1.0F / 15), 0.0F},
-    {1.0F - 0xc * (1.0F / 15), 0xc * (1.0F / 15), 0.0F},
-    {1.0F - 0xd * (1.0F / 15), 0xd * (1.0F / 15), 0.0F},
-    {1.0F - 0xe * (1.0F / 15), 0xe * (1.0F / 15), 0.0F},
-    {1.0F - 0xf * (1.0F / 15), 0xf * (1.0F / 15), 0.0F},
+const std::vector<Vector3<double>> ColorPalette::RedGreen16 = {
+    {1.0 - 0x0 * (1.0 / 15), 0x0 * (1.0 / 15), 0.0},
+    {1.0 - 0x1 * (1.0 / 15), 0x1 * (1.0 / 15), 0.0},
+    {1.0 - 0x2 * (1.0 / 15), 0x2 * (1.0 / 15), 0.0},
+    {1.0 - 0x3 * (1.0 / 15), 0x3 * (1.0 / 15), 0.0},
+    {1.0 - 0x4 * (1.0 / 15), 0x4 * (1.0 / 15), 0.0},
+    {1.0 - 0x5 * (1.0 / 15), 0x5 * (1.0 / 15), 0.0},
+    {1.0 - 0x6 * (1.0 / 15), 0x6 * (1.0 / 15), 0.0},
+    {1.0 - 0x7 * (1.0 / 15), 0x7 * (1.0 / 15), 0.0},
+    {1.0 - 0x8 * (1.0 / 15), 0x8 * (1.0 / 15), 0.0},
+    {1.0 - 0x9 * (1.0 / 15), 0x9 * (1.0 / 15), 0.0},
+    {1.0 - 0xa * (1.0 / 15), 0xa * (1.0 / 15), 0.0},
+    {1.0 - 0xb * (1.0 / 15), 0xb * (1.0 / 15), 0.0},
+    {1.0 - 0xc * (1.0 / 15), 0xc * (1.0 / 15), 0.0},
+    {1.0 - 0xd * (1.0 / 15), 0xd * (1.0 / 15), 0.0},
+    {1.0 - 0xe * (1.0 / 15), 0xe * (1.0 / 15), 0.0},
+    {1.0 - 0xf * (1.0 / 15), 0xf * (1.0 / 15), 0.0},
 };
 
-const std::vector<Vector3<float>> ColorPalette::RedYellow16 = {
-    {1.0F, 0x0 * (1.0F / 15), 0.0F},
-    {1.0F, 0x1 * (1.0F / 15), 0.0F},
-    {1.0F, 0x2 * (1.0F / 15), 0.0F},
-    {1.0F, 0x3 * (1.0F / 15), 0.0F},
-    {1.0F, 0x4 * (1.0F / 15), 0.0F},
-    {1.0F, 0x5 * (1.0F / 15), 0.0F},
-    {1.0F, 0x6 * (1.0F / 15), 0.0F},
-    {1.0F, 0x7 * (1.0F / 15), 0.0F},
-    {1.0F, 0x8 * (1.0F / 15), 0.0F},
-    {1.0F, 0x9 * (1.0F / 15), 0.0F},
-    {1.0F, 0xa * (1.0F / 15), 0.0F},
-    {1.0F, 0xb * (1.0F / 15), 0.0F},
-    {1.0F, 0xc * (1.0F / 15), 0.0F},
-    {1.0F, 0xd * (1.0F / 15), 0.0F},
-    {1.0F, 0xe * (1.0F / 15), 0.0F},
-    {1.0F, 0xf * (1.0F / 15), 0.0F},
+const std::vector<Vector3<double>> ColorPalette::RedYellow16 = {
+    {1.0, 0x0 * (1.0 / 15), 0.0},
+    {1.0, 0x1 * (1.0 / 15), 0.0},
+    {1.0, 0x2 * (1.0 / 15), 0.0},
+    {1.0, 0x3 * (1.0 / 15), 0.0},
+    {1.0, 0x4 * (1.0 / 15), 0.0},
+    {1.0, 0x5 * (1.0 / 15), 0.0},
+    {1.0, 0x6 * (1.0 / 15), 0.0},
+    {1.0, 0x7 * (1.0 / 15), 0.0},
+    {1.0, 0x8 * (1.0 / 15), 0.0},
+    {1.0, 0x9 * (1.0 / 15), 0.0},
+    {1.0, 0xa * (1.0 / 15), 0.0},
+    {1.0, 0xb * (1.0 / 15), 0.0},
+    {1.0, 0xc * (1.0 / 15), 0.0},
+    {1.0, 0xd * (1.0 / 15), 0.0},
+    {1.0, 0xe * (1.0 / 15), 0.0},
+    {1.0, 0xf * (1.0 / 15), 0.0},
 };
 
-const std::vector<Vector3<float>> ColorPalette::BlueYellow16 = {
-    {0x0 * (1.0F / 15), 1.0F, 1.0F - 0x0 * (1.0F / 15)},
-    {0x1 * (1.0F / 15), 1.0F, 1.0F - 0x1 * (1.0F / 15)},
-    {0x2 * (1.0F / 15), 1.0F, 1.0F - 0x2 * (1.0F / 15)},
-    {0x3 * (1.0F / 15), 1.0F, 1.0F - 0x3 * (1.0F / 15)},
-    {0x4 * (1.0F / 15), 1.0F, 1.0F - 0x4 * (1.0F / 15)},
-    {0x5 * (1.0F / 15), 1.0F, 1.0F - 0x5 * (1.0F / 15)},
-    {0x6 * (1.0F / 15), 1.0F, 1.0F - 0x6 * (1.0F / 15)},
-    {0x7 * (1.0F / 15), 1.0F, 1.0F - 0x7 * (1.0F / 15)},
-    {0x8 * (1.0F / 15), 1.0F, 1.0F - 0x8 * (1.0F / 15)},
-    {0x9 * (1.0F / 15), 1.0F, 1.0F - 0x9 * (1.0F / 15)},
-    {0xa * (1.0F / 15), 1.0F, 1.0F - 0xa * (1.0F / 15)},
-    {0xb * (1.0F / 15), 1.0F, 1.0F - 0xb * (1.0F / 15)},
-    {0xc * (1.0F / 15), 1.0F, 1.0F - 0xc * (1.0F / 15)},
-    {0xd * (1.0F / 15), 1.0F, 1.0F - 0xd * (1.0F / 15)},
-    {0xe * (1.0F / 15), 1.0F, 1.0F - 0xe * (1.0F / 15)},
-    {0xf * (1.0F / 15), 1.0F, 1.0F - 0xf * (1.0F / 15)},
+const std::vector<Vector3<double>> ColorPalette::BlueYellow16 = {
+    {0x0 * (1.0 / 15), 1.0, 1.0 - 0x0 * (1.0 / 15)},
+    {0x1 * (1.0 / 15), 1.0, 1.0 - 0x1 * (1.0 / 15)},
+    {0x2 * (1.0 / 15), 1.0, 1.0 - 0x2 * (1.0 / 15)},
+    {0x3 * (1.0 / 15), 1.0, 1.0 - 0x3 * (1.0 / 15)},
+    {0x4 * (1.0 / 15), 1.0, 1.0 - 0x4 * (1.0 / 15)},
+    {0x5 * (1.0 / 15), 1.0, 1.0 - 0x5 * (1.0 / 15)},
+    {0x6 * (1.0 / 15), 1.0, 1.0 - 0x6 * (1.0 / 15)},
+    {0x7 * (1.0 / 15), 1.0, 1.0 - 0x7 * (1.0 / 15)},
+    {0x8 * (1.0 / 15), 1.0, 1.0 - 0x8 * (1.0 / 15)},
+    {0x9 * (1.0 / 15), 1.0, 1.0 - 0x9 * (1.0 / 15)},
+    {0xa * (1.0 / 15), 1.0, 1.0 - 0xa * (1.0 / 15)},
+    {0xb * (1.0 / 15), 1.0, 1.0 - 0xb * (1.0 / 15)},
+    {0xc * (1.0 / 15), 1.0, 1.0 - 0xc * (1.0 / 15)},
+    {0xd * (1.0 / 15), 1.0, 1.0 - 0xd * (1.0 / 15)},
+    {0xe * (1.0 / 15), 1.0, 1.0 - 0xe * (1.0 / 15)},
+    {0xf * (1.0 / 15), 1.0, 1.0 - 0xf * (1.0 / 15)},
 };
 
-const std::vector<Vector3<float>> ColorPalette::BlueCyanYellowRed16 = {
-    {0.000000F, 0.000000F, 0.500000F},
-    {0.000000F, 0.000000F, 0.750000F},
-    {0.000000F, 0.000000F, 1.000000F},
-    {0.000000F, 0.250000F, 1.000000F},
-    {0.000000F, 0.500000F, 1.000000F},
-    {0.000000F, 0.750000F, 1.000000F},
-    {0.000000F, 1.000000F, 1.000000F},
-    {0.250000F, 1.000000F, 0.750000F},
-    {0.500000F, 1.000000F, 0.500000F},
-    {0.750000F, 1.000000F, 0.250000F},
-    {1.000000F, 1.000000F, 0.000000F},
-    {1.000000F, 0.750000F, 0.000000F},
-    {1.000000F, 0.500000F, 0.000000F},
-    {1.000000F, 0.250000F, 0.000000F},
-    {1.000000F, 0.000000F, 0.000000F},
-    {0.500000F, 0.000000F, 0.000000F},
+const std::vector<Vector3<double>> ColorPalette::BlueCyanYellowRed16 = {
+    {0.000000, 0.000000, 0.500000},
+    {0.000000, 0.000000, 0.750000},
+    {0.000000, 0.000000, 1.000000},
+    {0.000000, 0.250000, 1.000000},
+    {0.000000, 0.500000, 1.000000},
+    {0.000000, 0.750000, 1.000000},
+    {0.000000, 1.000000, 1.000000},
+    {0.250000, 1.000000, 0.750000},
+    {0.500000, 1.000000, 0.500000},
+    {0.750000, 1.000000, 0.250000},
+    {1.000000, 1.000000, 0.000000},
+    {1.000000, 0.750000, 0.000000},
+    {1.000000, 0.500000, 0.000000},
+    {1.000000, 0.250000, 0.000000},
+    {1.000000, 0.000000, 0.000000},
+    {0.500000, 0.000000, 0.000000},
 };
 
-const std::vector<Vector3<float>> ColorPalette::BlueCyanYellowRed256 = {
+const std::vector<Vector3<double>> ColorPalette::BlueCyanYellowRed256 = {
     0x00007fU, 0x000083U, 0x000087U, 0x00008bU, 0x00008fU, 0x000093U, 0x000097U,
     0x00009bU, 0x00009fU, 0x0000a3U, 0x0000a7U, 0x0000abU, 0x0000afU, 0x0000b3U,
     0x0000b7U, 0x0000bbU, 0x0000bfU, 0x0000c3U, 0x0000c7U, 0x0000cbU, 0x0000cfU,
@@ -223,26 +223,26 @@ const std::vector<Vector3<float>> ColorPalette::BlueCyanYellowRed256 = {
     0x8b0000U, 0x870000U, 0x830000U, 0x7f0000U,
 };
 
-const std::vector<Vector3<float>> ColorPalette::BlueCyanGreenYellowRed16 = {
-    {0.000000F, 0.000000F, 1.000000F},
-    {0.000000F, 0.333333F, 1.000000F},
-    {0.000000F, 0.666667F, 1.000000F},
-    {0.000000F, 1.000000F, 1.000000F},
-    {0.000000F, 1.000000F, 0.666667F},
-    {0.000000F, 1.000000F, 0.333333F},
-    {0.000000F, 1.000000F, 0.000000F},
-    {0.333333F, 1.000000F, 0.000000F},
-    {0.666667F, 1.000000F, 0.000000F},
-    {1.000000F, 1.000000F, 0.000000F},
-    {1.000000F, 0.833333F, 0.000000F},
-    {1.000000F, 0.666667F, 0.000000F},
-    {1.000000F, 0.500000F, 0.000000F},
-    {1.000000F, 0.333333F, 0.000000F},
-    {1.000000F, 0.166667F, 0.000000F},
-    {1.000000F, 0.000000F, 0.000000F},
+const std::vector<Vector3<double>> ColorPalette::BlueCyanGreenYellowRed16 = {
+    {0.000000, 0.000000, 1.000000},
+    {0.000000, 0.333333, 1.000000},
+    {0.000000, 0.666667, 1.000000},
+    {0.000000, 1.000000, 1.000000},
+    {0.000000, 1.000000, 0.666667},
+    {0.000000, 1.000000, 0.333333},
+    {0.000000, 1.000000, 0.000000},
+    {0.333333, 1.000000, 0.000000},
+    {0.666667, 1.000000, 0.000000},
+    {1.000000, 1.000000, 0.000000},
+    {1.000000, 0.833333, 0.000000},
+    {1.000000, 0.666667, 0.000000},
+    {1.000000, 0.500000, 0.000000},
+    {1.000000, 0.333333, 0.000000},
+    {1.000000, 0.166667, 0.000000},
+    {1.000000, 0.000000, 0.000000},
 };
 
-const std::vector<Vector3<float>> ColorPalette::WindowsXp32 = {
+const std::vector<Vector3<double>> ColorPalette::WindowsXp32 = {
     0x996600U, 0xcc9900U, 0xffcc00U, 0xffff00U, 0xffff99U, 0xffdb9dU,
     0xffcc66U, 0xff9933U, 0xff794bU, 0xff3300U, 0x990000U, 0x333366U,
     0x003399U, 0x0066ccU, 0x0083d7U, 0x0099ffU,
@@ -252,110 +252,111 @@ const std::vector<Vector3<float>> ColorPalette::WindowsXp32 = {
     0x66cc33U, 0x99ff66U, 0xccf4ccU, 0xffffffU};
 #endif /* EXPORT_CORE_IMPORT */
 
-std::vector<Vector3<float>> ColorPalette::blueCyanYellowRed(size_t nColors)
+std::vector<Vector3<double>> ColorPalette::blueCyanYellowRed(size_t nColors)
 {
-    std::vector<Vector3<float>> colormap;
+    std::vector<Vector3<double>> colormap;
     colormap.resize(nColors);
 
     // Blue
     size_t i1 = nColors / 8;
-    float delta = 0.5F / static_cast<float>(i1);
+    double delta = 0.5 / static_cast<double>(i1);
     for (size_t i = 0; i < i1; i++)
     {
-        float v = delta * static_cast<float>(i);
-        colormap[i].set(0.0F, 0.0F, 0.5F + v);
+        double v = delta * static_cast<double>(i);
+        colormap[i].set(0.0, 0.0, 0.5 + v);
     }
 
     // Blue to Cyan
     size_t i2 = i1 + nColors / 4;
-    delta = 1.0F / static_cast<float>(i2 - i1);
+    delta = 1.0 / static_cast<double>(i2 - i1);
     for (size_t i = i1; i < i2; i++)
     {
-        float v = delta * static_cast<float>(i - i1);
-        colormap[i].set(0.0F, v, 1.0F);
+        double v = delta * static_cast<double>(i - i1);
+        colormap[i].set(0.0, v, 1.0);
     }
 
     // Cyan to Yellow
     size_t i3 = i2 + nColors / 4;
-    delta = 1.0F / static_cast<float>(i3 - i2);
+    delta = 1.0 / static_cast<double>(i3 - i2);
     for (size_t i = i2; i < i3; i++)
     {
-        float v = delta * static_cast<float>(i - i2);
-        colormap[i].set(v, 1.0F, 1.0F - v);
+        double v = delta * static_cast<double>(i - i2);
+        colormap[i].set(v, 1.0, 1.0 - v);
     }
 
     // Yellow to Red
     size_t i4 = i3 + nColors / 4;
-    delta = 1.0F / static_cast<float>(i4 - i3);
+    delta = 1.0 / static_cast<double>(i4 - i3);
     for (size_t i = i3; i < i4; i++)
     {
-        float v = delta * static_cast<float>(i - i3);
-        colormap[i].set(1.0F, 1.0F - v, 0.0F);
+        double v = delta * static_cast<double>(i - i3);
+        colormap[i].set(1.0, 1.0 - v, 0.0);
     }
 
     // Red
-    delta = 0.5F / static_cast<float>(nColors - i4 - 1);
+    delta = 0.5 / static_cast<double>(nColors - i4 - 1);
     for (size_t i = i4; i < nColors; i++)
     {
-        float v = delta * static_cast<float>(i - i4);
-        colormap[i].set(1.0F - v, 0.0F, 0.0F);
+        double v = delta * static_cast<double>(i - i4);
+        colormap[i].set(1.0 - v, 0.0, 0.0);
     }
 
     return colormap;
 }
 
-std::vector<Vector3<float>> ColorPalette::blueCyanGreenYellowRed(size_t nColors)
+std::vector<Vector3<double>> ColorPalette::blueCyanGreenYellowRed(
+    size_t nColors)
 {
-    std::vector<Vector3<float>> colormap;
+    std::vector<Vector3<double>> colormap;
     colormap.resize(nColors);
 
     // Blue to Cyan
     size_t i1 = nColors / 5;
-    float delta = 1.0F / static_cast<float>(i1);
+    double delta = 1.0 / static_cast<double>(i1);
     for (size_t i = 0; i < i1; i++)
     {
-        float v = delta * static_cast<float>(i);
-        colormap[i].set(0.0F, v, 1.0F);
+        double v = delta * static_cast<double>(i);
+        colormap[i].set(0.0, v, 1.0);
     }
 
     // Cyan to Green
     size_t i2 = i1 + nColors / 5;
-    delta = 1.0F / static_cast<float>(i2 - i1);
+    delta = 1.0 / static_cast<double>(i2 - i1);
     for (size_t i = i1; i < i2; i++)
     {
-        float v = delta * static_cast<float>(i - i1);
-        colormap[i].set(0.0F, 1.0F, 1.0F - v);
+        double v = delta * static_cast<double>(i - i1);
+        colormap[i].set(0.0, 1.0, 1.0 - v);
     }
 
     // Green to Yellow
     size_t i3 = i2 + nColors / 7;
-    delta = 1.0F / static_cast<float>(i3 - i2);
+    delta = 1.0 / static_cast<double>(i3 - i2);
     for (size_t i = i2; i < i3; i++)
     {
-        float v = delta * static_cast<float>(i - i2);
-        colormap[i].set(v, 1.0F, 0.0F);
+        double v = delta * static_cast<double>(i - i2);
+        colormap[i].set(v, 1.0, 0.0);
     }
 
     // Yellow to Red
-    delta = 1.0F / static_cast<float>(nColors - i3 - 1);
+    delta = 1.0 / static_cast<double>(nColors - i3 - 1);
     for (size_t i = i3; i < nColors; i++)
     {
-        float v = delta * static_cast<float>(i - i3);
-        colormap[i].set(1.0F, 1.0F - v, 0.0F);
+        double v = delta * static_cast<double>(i - i3);
+        colormap[i].set(1.0, 1.0 - v, 0.0);
     }
 
     return colormap;
 }
 
-std::vector<Vector3<float>> ColorPalette::gray(size_t nColors)
+std::vector<Vector3<double>> ColorPalette::gray(size_t nColors)
 {
-    std::vector<Vector3<float>> colormap;
+    std::vector<Vector3<double>> colormap;
     colormap.resize(nColors);
 
-    float delta = 1.0F / static_cast<float>(nColors - 1);
+    double delta = 1.0 / static_cast<double>(nColors - 1);
     for (size_t i = 0; i < nColors; i++)
     {
-        float v = delta * static_cast<float>(i);
+        double v = delta * static_cast<double>(i);
         colormap[i].set(v, v, v);
     }
 

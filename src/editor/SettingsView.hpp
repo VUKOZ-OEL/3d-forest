@@ -50,17 +50,17 @@ public:
 
     SettingsView();
 
-    float pointSize() const;
-    void setPointSize(float size);
+    double pointSize() const;
+    void setPointSize(double size);
 
     bool isFogEnabled() const;
     void setFogEnabled(bool b);
 
-    void setPointColor(const Vector3<float> &rgb);
-    const Vector3<float> &pointColor() const { return pointColor_; }
+    void setPointColor(const Vector3<double> &rgb);
+    const Vector3<double> &pointColor() const { return pointColor_; }
 
-    void setBackgroundColor(const Vector3<float> &rgb);
-    const Vector3<float> &backgroundColor() const { return background_; }
+    void setBackgroundColor(const Vector3<double> &rgb);
+    const Vector3<double> &backgroundColor() const { return background_; }
 
     size_t colorSourceSize() const;
     const char *colorSourceString(SettingsView::ColorSource id) const;
@@ -72,10 +72,10 @@ public:
     Json &write(Json &out) const;
 
 protected:
-    float pointSize_;
+    double pointSize_;
     bool fogEnabled_;
-    Vector3<float> pointColor_;
-    Vector3<float> background_;
+    Vector3<double> pointColor_;
+    Vector3<double> background_;
     std::vector<std::string> colorSourceString_;
     std::vector<bool> colorSourceEnabled_;
 };

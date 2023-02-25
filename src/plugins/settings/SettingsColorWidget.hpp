@@ -62,8 +62,8 @@ protected:
     void settingsChangedApply();
     void setSettings(const SettingsView &settings);
 
-    bool colorDialog(Vector3<float> &rgb);
-    void setColor(QPushButton *button, const Vector3<float> &rgb);
+    bool colorDialog(Vector3<double> &rgb);
+    void setColor(QPushButton *button, const Vector3<double> &rgb);
 
     void block();
     void unblock();

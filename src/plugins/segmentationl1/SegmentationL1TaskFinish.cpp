@@ -36,7 +36,7 @@ void SegmentationL1TaskFinish::initialize(SegmentationL1Context *context)
 void SegmentationL1TaskFinish::next()
 {
     Layer layer;
-    layer.set(1, "Points", Vector3<float>(1.0F, 0.0F, 0.0F));
+    layer.set(1, "Points", Vector3<double>(1.0, 0.0, 0.0));
     addMeshPoints(layer);
     addMeshNormals(layer);
     addMeshVectors(layer);

@@ -39,8 +39,8 @@ public:
     const std::string &label() const { return label_; }
     void setLabel(const std::string &label);
 
-    const Vector3<float> &color() const { return color_; }
-    void setColor(const Vector3<float> &color);
+    const Vector3<double> &color() const { return color_; }
+    void setColor(const Vector3<double> &color);
 
     const std::string &path() const { return path_; }
     const std::string &fileName() const { return fileName_; }
@@ -71,7 +71,7 @@ protected:
     // Stored
     size_t id_;
     std::string label_; /**< Inconsistent with LAS in shared projects */
-    Vector3<float> color_;
+    Vector3<double> color_;
     std::string pathUnresolved_;
     std::string dateCreated_; /**< Inconsistent with LAS in shared projects */
     Vector3<double> translation_;

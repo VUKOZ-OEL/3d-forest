@@ -135,8 +135,8 @@ void Page::readPage()
     // Covert buffer to point data
     uint8_t *ptr = buffer_.data();
     LasFile::Point point;
-    const float s8 = 1.0F / 255.0F;
-    const float scaleU16 = 1.0F / 65535.0F;
+    const double s8 = 1.0 / 255.0;
+    const double scaleU16 = 1.0 / 65535.0;
     bool rgbFlag = las.header.hasRgb();
 
     for (size_t i = 0; i < nPagePoints; i++)
@@ -155,7 +155,7 @@ void Page::readPage()
         position[3 * i + 2] = positionBase_[3 * i + 2];
 
         // intensity and color
-        intensity[i] = static_cast<float>(point.intensity) * scaleU16;
+        intensity[i] = static_cast<double>(point.intensity) * scaleU16;
 
         if (rgbFlag)
         {
@@ -165,9 +165,9 @@ void Page::readPage()
         }
         else
         {
-            color[3 * i + 0] = 1.0F;
-            color[3 * i + 1] = 1.0F;
-            color[3 * i + 2] = 1.0F;
+            color[3 * i + 0] = 1.0;
+            color[3 * i + 1] = 1.0;
+            color[3 * i + 2] = 1.0;
         }
 
         // attributes
@@ -182,14 +182,14 @@ void Page::readPage()
         // User extra
         layer[i] = point.user_layer;
         elevation[i] = static_cast<double>(point.user_elevation);
-        customColor[3 * i + 0] = static_cast<float>(point.user_red) * s8;
-        customColor[3 * i + 1] = static_cast<float>(point.user_green) * s8;
-        customColor[3 * i + 2] = static_cast<float>(point.user_blue) * s8;
-        descriptor[i] = static_cast<float>(point.user_descriptor) * s8;
-        density[i] = static_cast<float>(point.user_density) * s8;
-        normal[3 * i + 0] = static_cast<float>(point.user_nx) * s8;
-        normal[3 * i + 1] = static_cast<float>(point.user_ny) * s8;
-        normal[3 * i + 2] = static_cast<float>(point.user_nz) * s8;
+        customColor[3 * i + 0] = static_cast<double>(point.user_red) * s8;
+        customColor[3 * i + 1] = static_cast<double>(point.user_green) * s8;
+        customColor[3 * i + 2] = static_cast<double>(point.user_blue) * s8;
+        descriptor[i] = static_cast<double>(point.user_descriptor) * s8;
+        density[i] = static_cast<double>(point.user_density) * s8;
+        normal[3 * i + 0] = static_cast<double>(point.user_nx) * s8;
+        normal[3 * i + 1] = static_cast<double>(point.user_ny) * s8;
+        normal[3 * i + 2] = static_cast<double>(point.user_nz) * s8;
         value[i] = static_cast<size_t>(point.user_value);
     }
 
@@ -216,7 +216,7 @@ static const size_t PAGE_FORMAT_USER[PAGE_FORMAT_COUNT] =
 
 void Page::toPoint(uint8_t *ptr, size_t i, uint8_t fmt)
 {
-    const float s8 = 255.0F;
+    const double s8 = 255.0;
     size_t pos = PAGE_FORMAT_USER[fmt];
 
     // Do not overwrite the other values for now
@@ -231,7 +231,7 @@ void Page::toPoint(uint8_t *ptr, size_t i, uint8_t fmt)
     }
 
     // Layer
-    htol32(ptr + pos, layer[i]);
+    htol32(ptr + pos, static_cast<uint32_t>(layer[i]));
 
     // Elevation
     htol32(ptr + pos + 4, static_cast<uint32_t>(elevation[i]));
@@ -784,7 +784,7 @@ void Page::queryWhereElevation()
 
 void Page::queryWhereDensity()
 {
-    const Range<float> &densityRange = query_->where().density();
+    const Range<double> &densityRange = query_->where().density();
 
     if (densityRange.isEnabled() == false || densityRange.hasBoundaryValues())
     {
@@ -797,7 +797,7 @@ void Page::queryWhereDensity()
 
     for (size_t i = 0; i < selectionSize; i++)
     {
-        float v = density[selection[i]];
+        double v = density[selection[i]];
 
         if (!(v < densityRange.minimumValue() ||
               v > densityRange.maximumValue()))
@@ -816,7 +816,7 @@ void Page::queryWhereDensity()
 
 void Page::queryWhereDescriptor()
 {
-    const Range<float> &descriptorRange = query_->where().descriptor();
+    const Range<double> &descriptorRange = query_->where().descriptor();
 
     if (descriptorRange.isEnabled() == false ||
         descriptorRange.hasBoundaryValues())
@@ -830,7 +830,7 @@ void Page::queryWhereDescriptor()
 
     for (size_t i = 0; i < selectionSize; i++)
     {
-        float v = descriptor[selection[i]];
+        double v = descriptor[selection[i]];
 
         if (!(v < descriptorRange.minimumValue() ||
               v > descriptorRange.maximumValue()))
@@ -897,7 +897,7 @@ void Page::queryWhereLayer()
 
     for (size_t i = 0; i < selectionSize; i++)
     {
-        uint32_t id = layer[selection[i]];
+        size_t id = layer[selection[i]];
 
         if (layers.find(id) != layers.end())
         {
@@ -916,26 +916,26 @@ void Page::queryWhereLayer()
 void Page::runColorModifier()
 {
     const SettingsView &opt = editor_->settings().view();
-    float r = opt.pointColor()[0];
-    float g = opt.pointColor()[1];
-    float b = opt.pointColor()[2];
+    double r = opt.pointColor()[0];
+    double g = opt.pointColor()[1];
+    double b = opt.pointColor()[2];
 
     size_t n = position.size() / 3;
 
     for (size_t i = 0; i < n; i++)
     {
-        renderColor[i * 3 + 0] = r;
-        renderColor[i * 3 + 1] = g;
-        renderColor[i * 3 + 2] = b;
+        renderColor[i * 3 + 0] = static_cast<float>(r);
+        renderColor[i * 3 + 1] = static_cast<float>(g);
+        renderColor[i * 3 + 2] = static_cast<float>(b);
     }
 
     if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_COLOR))
     {
         for (size_t i = 0; i < n; i++)
         {
-            renderColor[i * 3 + 0] *= color[i * 3 + 0];
-            renderColor[i * 3 + 1] *= color[i * 3 + 1];
-            renderColor[i * 3 + 2] *= color[i * 3 + 2];
+            renderColor[i * 3 + 0] *= static_cast<float>(color[i * 3 + 0]);
+            renderColor[i * 3 + 1] *= static_cast<float>(color[i * 3 + 1]);
+            renderColor[i * 3 + 2] *= static_cast<float>(color[i * 3 + 2]);
         }
     }
 
@@ -951,7 +951,7 @@ void Page::runColorModifier()
         for (size_t i = 0; i < n; i++)
         {
             setColor(i,
-                     static_cast<size_t>(intensity[i] * 255.0F),
+                     static_cast<size_t>(intensity[i] * 255.0),
                      255,
                      ColorPalette::BlueCyanYellowRed256);
         }
@@ -997,10 +997,10 @@ void Page::runColorModifier()
         {
             if (layer[i] < max)
             {
-                const Vector3<float> &c = layers.color(layer[i]);
-                renderColor[i * 3 + 0] *= c[0];
-                renderColor[i * 3 + 1] *= c[1];
-                renderColor[i * 3 + 2] *= c[2];
+                const Vector3<double> &c = layers.color(layer[i]);
+                renderColor[i * 3 + 0] *= static_cast<float>(c[0]);
+                renderColor[i * 3 + 1] *= static_cast<float>(c[1]);
+                renderColor[i * 3 + 2] *= static_cast<float>(c[2]);
             }
         }
     }
@@ -1010,14 +1010,14 @@ void Page::runColorModifier()
         const Dataset &dataset = editor_->datasets().key(datasetId_);
         double zlen = dataset.boundary().length(2);
 
-        if (zlen > 0.)
+        if (zlen > 1e-6)
         {
             for (size_t i = 0; i < n; i++)
             {
-                double v = 1. - (elevation[i] / zlen);
-                renderColor[i * 3 + 0] *= static_cast<float>(v);
-                renderColor[i * 3 + 1] *= static_cast<float>(v);
-                renderColor[i * 3 + 2] *= static_cast<float>(v);
+                const float v = static_cast<float>(1. - (elevation[i] / zlen));
+                renderColor[i * 3 + 0] *= v;
+                renderColor[i * 3 + 1] *= v;
+                renderColor[i * 3 + 2] *= v;
             }
         }
     }
@@ -1026,9 +1026,12 @@ void Page::runColorModifier()
     {
         for (size_t i = 0; i < n; i++)
         {
-            renderColor[i * 3 + 0] *= customColor[i * 3 + 0];
-            renderColor[i * 3 + 1] *= customColor[i * 3 + 1];
-            renderColor[i * 3 + 2] *= customColor[i * 3 + 2];
+            renderColor[i * 3 + 0] *=
+                static_cast<float>(customColor[i * 3 + 0]);
+            renderColor[i * 3 + 1] *=
+                static_cast<float>(customColor[i * 3 + 1]);
+            renderColor[i * 3 + 2] *=
+                static_cast<float>(customColor[i * 3 + 2]);
         }
     }
 
@@ -1036,10 +1039,9 @@ void Page::runColorModifier()
     {
         for (size_t i = 0; i < n; i++)
         {
-            const float c = descriptor[i];
-            renderColor[i * 3 + 0] *= c;
-            renderColor[i * 3 + 1] *= c;
-            renderColor[i * 3 + 2] *= c;
+            renderColor[i * 3 + 0] *= static_cast<float>(descriptor[i]);
+            renderColor[i * 3 + 1] *= static_cast<float>(descriptor[i]);
+            renderColor[i * 3 + 2] *= static_cast<float>(descriptor[i]);
         }
     }
 
@@ -1048,7 +1050,7 @@ void Page::runColorModifier()
         for (size_t i = 0; i < n; i++)
         {
             setColor(i,
-                     static_cast<size_t>(density[i] * 255.0F),
+                     static_cast<size_t>(density[i] * 255.0),
                      255,
                      ColorPalette::BlueCyanYellowRed256);
         }
@@ -1058,9 +1060,9 @@ void Page::runColorModifier()
     {
         for (size_t i = 0; i < n; i++)
         {
-            renderColor[i * 3 + 0] *= normal[i * 3 + 0];
-            renderColor[i * 3 + 1] *= normal[i * 3 + 1];
-            renderColor[i * 3 + 2] *= normal[i * 3 + 2];
+            renderColor[i * 3 + 0] *= static_cast<float>(normal[i * 3 + 0]);
+            renderColor[i * 3 + 1] *= static_cast<float>(normal[i * 3 + 1]);
+            renderColor[i * 3 + 2] *= static_cast<float>(normal[i * 3 + 2]);
         }
     }
 }
@@ -1068,14 +1070,14 @@ void Page::runColorModifier()
 void Page::setColor(size_t idx,
                     size_t colorValue,
                     size_t colorMax,
-                    const std::vector<Vector3<float>> &pal)
+                    const std::vector<Vector3<double>> &pal)
 {
     if (colorValue > colorMax)
     {
         colorValue = colorMax;
     }
 
-    renderColor[idx * 3 + 0] *= pal[colorValue][0];
-    renderColor[idx * 3 + 1] *= pal[colorValue][1];
-    renderColor[idx * 3 + 2] *= pal[colorValue][2];
+    renderColor[idx * 3 + 0] *= static_cast<float>(pal[colorValue][0]);
+    renderColor[idx * 3 + 1] *= static_cast<float>(pal[colorValue][1]);
+    renderColor[idx * 3 + 2] *= static_cast<float>(pal[colorValue][2]);
 }

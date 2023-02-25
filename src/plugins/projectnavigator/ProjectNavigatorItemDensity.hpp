@@ -57,7 +57,7 @@ public slots:
 
 protected:
     DoubleRangeSliderWidget *densityInput_;
-    Range<float> densityRange_;
+    Range<double> densityRange_;
 
     void densityInputChanged();
 };

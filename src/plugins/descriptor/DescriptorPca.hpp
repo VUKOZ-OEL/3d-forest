@@ -40,7 +40,7 @@ public:
                            double &meanX,
                            double &meanY,
                            double &meanZ,
-                           float &descriptor);
+                           double &descriptor);
 
     bool computeDescriptor(Query &query,
                            double x,
@@ -50,20 +50,20 @@ public:
                            double &meanX,
                            double &meanY,
                            double &meanZ,
-                           float &descriptor);
+                           double &descriptor);
 
     bool computeDescriptor(Eigen::MatrixXd &V,
                            double &meanX,
                            double &meanY,
                            double &meanZ,
-                           float &descriptor);
+                           double &descriptor);
 
     bool computeDistribution(Query &query,
                              double x,
                              double y,
                              double z,
                              double radius,
-                             float &descriptor);
+                             double &descriptor);
 
 private:
     Eigen::MatrixXd xyz;

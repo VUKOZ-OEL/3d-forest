@@ -385,12 +385,12 @@ void ProjectNavigatorItemFiles::addTreeItem(size_t index)
                   QString::fromStdString(datasets_.dateCreated(index)));
 
     // Color legend
-    const Vector3<float> &rgb = datasets_.color(index);
+    const Vector3<double> &rgb = datasets_.color(index);
 
     QColor color;
-    color.setRedF(rgb[0]);
-    color.setGreenF(rgb[1]);
-    color.setBlueF(rgb[2]);
+    color.setRedF(static_cast<float>(rgb[0]));
+    color.setGreenF(static_cast<float>(rgb[1]));
+    color.setBlueF(static_cast<float>(rgb[2]));
 
     QBrush brush(color, Qt::SolidPattern);
     item->setBackground(COLUMN_ID, brush);

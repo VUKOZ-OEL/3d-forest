@@ -82,12 +82,12 @@ public:
     void setElevationRange(const Range<double> &elevationRange);
 
     // Density
-    const Range<float> &densityRange() const { return densityRange_; }
-    void setDensityRange(const Range<float> &densityRange);
+    const Range<double> &densityRange() const { return densityRange_; }
+    void setDensityRange(const Range<double> &densityRange);
 
     // Descriptor
-    const Range<float> &descriptorRange() const { return descriptorRange_; }
-    void setDescriptorRange(const Range<float> &descriptorRange);
+    const Range<double> &descriptorRange() const { return descriptorRange_; }
+    void setDescriptorRange(const Range<double> &descriptorRange);
 
     // Data sets
     const Datasets &datasets() const { return datasets_; }
@@ -136,8 +136,8 @@ protected:
 
     Region clipFilter_;
     Range<double> elevationRange_;
-    Range<float> densityRange_;
-    Range<float> descriptorRange_;
+    Range<double> densityRange_;
+    Range<double> descriptorRange_;
 
     // Modifiers
     std::vector<ModifierInterface *> modifiers_;
