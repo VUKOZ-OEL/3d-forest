@@ -28,6 +28,20 @@
 #include <Vector3.hpp>
 
 template <class T>
+inline T pointLineDistance(T x, T y, T z, T ax, T ay, T az, T nx, T ny, T nz)
+{
+    T bx = ax + nx;
+    T by = ay + ny;
+    T bz = az + nz;
+
+    T dx = (y - ay) * (z - bz) - (z - az) * (y - by);
+    T dy = (z - az) * (x - bx) - (x - ax) * (z - bz);
+    T dz = (x - ax) * (y - by) - (y - ay) * (x - bx);
+
+    return static_cast<T>(std::sqrt((dx * dx) + (dy * dy) + (dz * dz)));
+}
+
+template <class T>
 inline T pointPlaneDistance(const Vector3<T> &x,
                             const Vector3<T> &p,
                             const Vector3<T> &n)
