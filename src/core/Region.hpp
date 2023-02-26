@@ -37,7 +37,7 @@ public:
     };
 
     Box<double> box;
-    Box<double> boxView;
+
     Type enabled;
 
     Region();
@@ -94,8 +94,8 @@ inline Json &Region::write(Json &out) const
 
 inline std::ostream &operator<<(std::ostream &os, const Region &obj)
 {
-    return os << std::fixed << "(" << obj.box << ", " << obj.boxView << ", "
-              << obj.enabled << ")" << std::defaultfloat;
+    return os << std::fixed << "{" << obj.box << ", " << obj.enabled << "}"
+              << std::defaultfloat;
 }
 
 #endif /* REGION_HPP */

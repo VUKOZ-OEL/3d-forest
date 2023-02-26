@@ -219,9 +219,6 @@ void Editor::setClassificationsFilter(const QueryFilterSet &filter)
 void Editor::setClipFilter(const Region &clipFilter)
 {
     clipFilter_ = clipFilter;
-    clipFilter_.boxView.setPercent(datasets_.boundary(),
-                                   datasets_.boundary(),
-                                   clipFilter_.box);
 
     if (viewports_.size() > 0)
     {
@@ -298,7 +295,6 @@ void Editor::setDescriptorRange(const Range<double> &descriptorRange)
 void Editor::updateAfterRead()
 {
     clipFilter_.box = datasets_.boundary();
-    clipFilter_.boxView = clipFilter_.box;
 
     if (viewports_.size() > 0)
     {

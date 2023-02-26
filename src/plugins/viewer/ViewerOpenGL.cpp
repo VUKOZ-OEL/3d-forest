@@ -129,7 +129,7 @@ void ViewerOpenGL::renderClipFilter(const Region &clipFilter)
     }
 
     ViewerAabb box;
-    box.set(clipFilter.boxView);
+    box.set(clipFilter.box);
 
     glColor3f(0.0F, 0.75F, 0.0F);
     glDepthMask(GL_FALSE);

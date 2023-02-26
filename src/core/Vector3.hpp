@@ -66,6 +66,20 @@ public:
         return (a[0] * b[0]) + (a[1] * b[1]) + (a[2] * b[2]);
     }
 
+    static Vector3<T> min(const Vector3<T> &a, const Vector3<T> &b)
+    {
+        return Vector3<T>((a[0] < b[0]) ? a[0] : b[0],
+                          (a[1] < b[1]) ? a[1] : b[1],
+                          (a[2] < b[2]) ? a[2] : b[2]);
+    }
+
+    static Vector3<T> max(const Vector3<T> &a, const Vector3<T> &b)
+    {
+        return Vector3<T>((a[0] > b[0]) ? a[0] : b[0],
+                          (a[1] > b[1]) ? a[1] : b[1],
+                          (a[2] > b[2]) ? a[2] : b[2]);
+    }
+
     Vector3<T> rotated(const Vector3<T> &axis, double angle) const;
 
     friend Vector3<T> operator+(const Vector3<T> &a, const Vector3<T> &b)
