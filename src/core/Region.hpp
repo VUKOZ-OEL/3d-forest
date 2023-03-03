@@ -23,6 +23,7 @@
 #define REGION_HPP
 
 #include <Box.hpp>
+#include <Cylinder.hpp>
 #include <ExportCore.hpp>
 
 /** Region. */
@@ -33,10 +34,13 @@ public:
     enum Type
     {
         TYPE_NONE,
-        TYPE_BOX
+        TYPE_BOX,
+        TYPE_CYLINDER
     };
 
     Box<double> box;
+    Cylinder<double> cylinder;
+    Box<double> boundary;
 
     Type enabled;
 
