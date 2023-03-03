@@ -24,6 +24,7 @@
 #include <Util.hpp>
 
 #define LOG_MODULE_NAME "Editor"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 static const char *EDITOR_KEY_PROJECT_NAME = "projectName";
@@ -218,11 +219,11 @@ void Editor::setClassificationsFilter(const QueryFilterSet &filter)
 
 void Editor::setClipFilter(const Region &clipFilter)
 {
+    LOG_DEBUG(<< "Set region <" << clipFilter << ">.");
     clipFilter_ = clipFilter;
 
     if (viewports_.size() > 0)
     {
-        LOG_DEBUG(<< "Called.");
         viewports_.where().setBox(clipBoundary());
         viewports_.applyWhereToAll();
     }
@@ -232,7 +233,7 @@ void Editor::setClipFilter(const Region &clipFilter)
 
 void Editor::resetClipFilter()
 {
-    clipFilter_.box = datasets_.boundary();
+    clipFilter_.box = clipFilter_.boundary;
     setClipFilter(clipFilter_);
 }
 
@@ -243,7 +244,7 @@ Box<double> Editor::clipBoundary() const
         return clipFilter_.box;
     }
 
-    return datasets_.boundary();
+    return clipFilter_.boundary;
 }
 
 void Editor::setElevationRange(const Range<double> &elevationRange)
@@ -294,7 +295,8 @@ void Editor::setDescriptorRange(const Range<double> &descriptorRange)
 
 void Editor::updateAfterRead()
 {
-    clipFilter_.box = datasets_.boundary();
+    clipFilter_.boundary = datasets_.boundary();
+    clipFilter_.box = clipFilter_.boundary;
 
     if (viewports_.size() > 0)
     {
