@@ -24,12 +24,9 @@
 
 #include <Editor.hpp>
 #include <ProjectNavigatorItem.hpp>
-#include <Range.hpp>
-
-class MainWindow;
-class DoubleRangeSliderWidget;
-
-class QPushButton;
+#include <Region.hpp>
+class ProjectNavigatorItemClippingBox;
+class ToolTabWidget;
 
 /** Project Navigator Clipping. */
 class ProjectNavigatorItemClipping : public ProjectNavigatorItem
@@ -52,15 +49,12 @@ public:
 
 public slots:
     void slotUpdate(void *sender, const QSet<Editor::Type> &target);
-
-    void slotRangeIntermediateMinimumValue();
-    void slotRangeIntermediateMaximumValue();
-    void reset();
+    void slotRegionChanged(const Region &region);
 
 protected:
-    DoubleRangeSliderWidget *rangeInput_[3];
-    QPushButton *resetButton_;
-    Range<double> clipRange_[3];
+    ToolTabWidget *tabWidget_;
+    ProjectNavigatorItemClippingBox *boxWidget_;
+    Region region_;
 
     void filterChanged();
 };
