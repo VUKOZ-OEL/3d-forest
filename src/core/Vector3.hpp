@@ -128,6 +128,15 @@ template <class T> inline Vector3<T>::Vector3()
     clear();
 }
 
+template <class T>
+template <class B>
+inline Vector3<T>::Vector3(const Vector3<B> &v)
+{
+    this->operator[](0) = static_cast<T>(v[0]);
+    this->operator[](1) = static_cast<T>(v[1]);
+    this->operator[](2) = static_cast<T>(v[2]);
+}
+
 template <class T> inline Vector3<T>::Vector3(T v0, T v1, T v2)
 {
     this->operator[](0) = v0;
