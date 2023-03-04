@@ -50,9 +50,12 @@ public:
                        int max,
                        int value);
 
-    int value();
+    int value() const;
+    int minimum() const;
+    int maximum() const;
 
     void setValue(int value);
+    void setMinimum(int min);
     void setMaximum(int max);
 
     void blockSignals(bool block);
