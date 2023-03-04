@@ -111,7 +111,8 @@ void DoubleSliderWidget::create(DoubleSliderWidget *&outputWidget,
                                 double step,
                                 double min,
                                 double max,
-                                double value)
+                                double value,
+                                bool singleLine)
 {
     outputWidget = new DoubleSliderWidget();
 
@@ -127,13 +128,6 @@ void DoubleSliderWidget::create(DoubleSliderWidget *&outputWidget,
     // Description Units
     QComboBox *units = new QComboBox;
     units->addItem(unitsList);
-
-    // Description Layout
-    QHBoxLayout *descriptionLayout = new QHBoxLayout;
-    descriptionLayout->addWidget(label);
-    descriptionLayout->addWidget(help);
-    descriptionLayout->addStretch();
-    descriptionLayout->addWidget(units);
 
     // Value Slider
     int stepInt = static_cast<int>(step);
@@ -191,15 +185,38 @@ void DoubleSliderWidget::create(DoubleSliderWidget *&outputWidget,
             outputWidget,
             SLOT(slotFinalValue()));
 
-    // Value Layout
-    QHBoxLayout *valueLayout = new QHBoxLayout;
-    valueLayout->addWidget(slider);
-    valueLayout->addWidget(spinBox);
+    // Create widget layout.
+    if (singleLine)
+    {
+        // Put everything on single line.
+        QHBoxLayout *groupLayout = new QHBoxLayout;
+        groupLayout->addWidget(label);
+        groupLayout->addWidget(help);
+        groupLayout->addWidget(slider);
+        groupLayout->addWidget(spinBox);
+        groupLayout->addWidget(units);
 
-    // Group Description and Value
-    QVBoxLayout *groupLayout = new QVBoxLayout;
-    groupLayout->addLayout(descriptionLayout);
-    groupLayout->addLayout(valueLayout);
+        outputWidget->setLayout(groupLayout);
+    }
+    else
+    {
+        // Create description layout.
+        QHBoxLayout *descriptionLayout = new QHBoxLayout;
+        descriptionLayout->addWidget(label);
+        descriptionLayout->addWidget(help);
+        descriptionLayout->addStretch();
+        descriptionLayout->addWidget(units);
 
-    outputWidget->setLayout(groupLayout);
+        // Create value layout.
+        QHBoxLayout *valueLayout = new QHBoxLayout;
+        valueLayout->addWidget(slider);
+        valueLayout->addWidget(spinBox);
+
+        // Group description and value layouts.
+        QVBoxLayout *groupLayout = new QVBoxLayout;
+        groupLayout->addLayout(descriptionLayout);
+        groupLayout->addLayout(valueLayout);
+
+        outputWidget->setLayout(groupLayout);
+    }
 }

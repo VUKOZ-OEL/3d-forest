@@ -48,7 +48,8 @@ public:
                        double step,
                        double min,
                        double max,
-                       double value);
+                       double value,
+                       bool singleLine = false);
 
     double value() const;
     double minimum() const;

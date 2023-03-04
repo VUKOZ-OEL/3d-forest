@@ -49,7 +49,8 @@ ProjectNavigatorItemClippingCylinder::ProjectNavigatorItemClippingCylinder(
                                    1.0,
                                    1.0,
                                    100.0,
-                                   1.0);
+                                   1.0,
+                                   true);
 
         DoubleSliderWidget::create(pointBInput_[i],
                                    this,
@@ -61,7 +62,8 @@ ProjectNavigatorItemClippingCylinder::ProjectNavigatorItemClippingCylinder(
                                    1.0,
                                    1.0,
                                    100.0,
-                                   1.0);
+                                   1.0,
+                                   true);
     }
 
     DoubleSliderWidget::create(radiusInput_,
@@ -74,7 +76,8 @@ ProjectNavigatorItemClippingCylinder::ProjectNavigatorItemClippingCylinder(
                                1.0,
                                1.0,
                                100.0,
-                               1.0);
+                               1.0,
+                               true);
 
     // Layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
