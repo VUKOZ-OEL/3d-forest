@@ -26,6 +26,7 @@
 #include <ProjectNavigatorItem.hpp>
 #include <Region.hpp>
 class ProjectNavigatorItemClippingBox;
+class ProjectNavigatorItemClippingCylinder;
 class ToolTabWidget;
 
 /** Project Navigator Clipping. */
@@ -54,6 +55,7 @@ public slots:
 protected:
     ToolTabWidget *tabWidget_;
     ProjectNavigatorItemClippingBox *boxWidget_;
+    ProjectNavigatorItemClippingCylinder *cylinderWidget_;
     Region region_;
 
     void filterChanged();

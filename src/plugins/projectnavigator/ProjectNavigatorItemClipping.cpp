@@ -22,6 +22,7 @@
 #include <MainWindow.hpp>
 #include <ProjectNavigatorItemClipping.hpp>
 #include <ProjectNavigatorItemClippingBox.hpp>
+#include <ProjectNavigatorItemClippingCylinder.hpp>
 #include <ThemeIcon.hpp>
 #include <ToolTabWidget.hpp>
 
@@ -30,7 +31,7 @@
 #include <QVBoxLayout>
 
 #define LOG_MODULE_NAME "ProjectNavigatorItemClipping"
-// #define LOG_MODULE_DEBUG_ENABLED 1
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define ICON(name) (ThemeIcon(":/projectnavigator/", name))
@@ -45,10 +46,12 @@ ProjectNavigatorItemClipping::ProjectNavigatorItemClipping(
 
     // Tabs
     boxWidget_ = new ProjectNavigatorItemClippingBox(mainWindow_);
+    cylinderWidget_ = new ProjectNavigatorItemClippingCylinder(mainWindow_);
 
     // Tab
     tabWidget_ = new ToolTabWidget;
     tabWidget_->addTab(boxWidget_, ICON("clip_filter"), tr("Box"));
+    tabWidget_->addTab(cylinderWidget_, ICON("cylinder"), tr("Cylinder"));
 
     // Layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -66,6 +69,11 @@ ProjectNavigatorItemClipping::ProjectNavigatorItemClipping(
             SLOT(slotUpdate(void *, const QSet<Editor::Type> &)));
 
     connect(boxWidget_,
+            SIGNAL(signalRegionChanged(const Region &)),
+            this,
+            SLOT(slotRegionChanged(const Region &)));
+
+    connect(cylinderWidget_,
             SIGNAL(signalRegionChanged(const Region &)),
             this,
             SLOT(slotRegionChanged(const Region &)));
@@ -88,6 +96,7 @@ void ProjectNavigatorItemClipping::slotUpdate(void *sender,
     LOG_DEBUG(<< "Update region <" << region_ << ">.");
 
     boxWidget_->setRegion(region_);
+    cylinderWidget_->setRegion(region_);
 }
 
 void ProjectNavigatorItemClipping::slotRegionChanged(const Region &region)
@@ -97,6 +106,11 @@ void ProjectNavigatorItemClipping::slotRegionChanged(const Region &region)
     if (region.enabled == Region::TYPE_BOX)
     {
         region_.box = region.box;
+        region_.enabled = region.enabled;
+    }
+    else if (region.enabled == Region::TYPE_CYLINDER)
+    {
+        region_.cylinder = region.cylinder;
         region_.enabled = region.enabled;
     }
 
