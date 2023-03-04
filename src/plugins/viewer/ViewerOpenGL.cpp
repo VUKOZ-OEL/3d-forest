@@ -19,6 +19,7 @@
 
 /** @file ViewerOpenGL.cpp */
 
+#include <Math.hpp>
 #include <ViewerOpenGL.hpp>
 
 #include <QOpenGLFunctions>
@@ -128,15 +129,34 @@ void ViewerOpenGL::renderClipFilter(const Region &clipFilter)
         return;
     }
 
-    ViewerAabb box;
-    box.set(clipFilter.box);
-
     glColor3f(0.0F, 0.75F, 0.0F);
     glDepthMask(GL_FALSE);
     glEnable(GL_LINE_STIPPLE);
     glLineStipple(1, 0xff);
 
-    ViewerOpenGL::renderAabb(box);
+    if (clipFilter.enabled == Region::TYPE_CYLINDER)
+    {
+        Vector3<float> a(clipFilter.cylinder.a());
+        Vector3<float> b(clipFilter.cylinder.b());
+        float radius = static_cast<float>((clipFilter.cylinder.radius()));
+
+        ViewerOpenGL::renderCylinder(a, b, radius, 10);
+    }
+    else
+    {
+        ViewerAabb box;
+
+        if (clipFilter.enabled == Region::TYPE_BOX)
+        {
+            box.set(clipFilter.box);
+        }
+        else
+        {
+            box.set(clipFilter.boundary);
+        }
+
+        ViewerOpenGL::renderAabb(box);
+    }
 
     glDisable(GL_LINE_STIPPLE);
     glDepthMask(GL_TRUE);
@@ -164,6 +184,70 @@ void ViewerOpenGL::renderAabb(const ViewerAabb &box)
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, static_cast<GLvoid *>(&v[0]));
     glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, indices);
+    glDisableClientState(GL_VERTEX_ARRAY);
+}
+
+void ViewerOpenGL::renderCylinder(const Vector3<float> &a,
+                                  const Vector3<float> &b,
+                                  float radius,
+                                  size_t slices)
+{
+    // Create wire-frame cylinder.
+    Vector3<float> ab = b - a;
+    float length = ab.length();
+
+    if (length < 1e-6F || slices < 3)
+    {
+        return;
+    }
+
+    Vector3<float> n1 = ab.normalized();
+    Vector3<float> n2 = n1.perpendicular();
+
+    double sliceAngle = 6.283185307 / static_cast<double>(slices);
+
+    GLuint nSlices = static_cast<GLuint>(slices);
+    std::vector<Vector3<float>> xyz;
+    std::vector<GLuint> indices;
+
+    xyz.resize(slices * 2);
+    indices.resize(slices * 6);
+
+    for (GLuint i = 0; i < nSlices; i++)
+    {
+        n2.normalize();
+
+        xyz[i * 2 + 0] = a + (radius * n2);
+        xyz[i * 2 + 1] = b + (radius * n2);
+
+        indices[i * 6 + 0] = i * 2;
+        indices[i * 6 + 1] = i * 2 + 1;
+
+        if (i + 1 == nSlices)
+        {
+            indices[i * 6 + 2] = i * 2;
+            indices[i * 6 + 3] = 0;
+
+            indices[i * 6 + 4] = i * 2 + 1;
+            indices[i * 6 + 5] = 1;
+        }
+        else
+        {
+            indices[i * 6 + 2] = i * 2;
+            indices[i * 6 + 3] = i * 2 + 2;
+
+            indices[i * 6 + 4] = i * 2 + 1;
+            indices[i * 6 + 5] = i * 2 + 3;
+        }
+
+        n2 = n2.rotated(n1, sliceAngle);
+    }
+
+    // Render the vertex array.
+    GLsizei indicesCount = static_cast<GLsizei>(indices.size());
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, static_cast<GLvoid *>(xyz.data()));
+    glDrawElements(GL_LINES, indicesCount, GL_UNSIGNED_INT, indices.data());
     glDisableClientState(GL_VERTEX_ARRAY);
 }
 

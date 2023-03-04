@@ -34,15 +34,31 @@ SliderWidget::SliderWidget() : QWidget()
 {
 }
 
-int SliderWidget::value()
+int SliderWidget::value() const
 {
     return slider_->value();
+}
+
+int SliderWidget::minimum() const
+{
+    return slider_->minimum();
+}
+
+int SliderWidget::maximum() const
+{
+    return slider_->maximum();
 }
 
 void SliderWidget::setValue(int value)
 {
     spinBox_->setValue(value);
     slider_->setValue(value);
+}
+
+void SliderWidget::setMinimum(int min)
+{
+    spinBox_->setMinimum(min);
+    slider_->setMinimum(min);
 }
 
 void SliderWidget::setMaximum(int max)

@@ -80,6 +80,7 @@ public:
                           (a[2] > b[2]) ? a[2] : b[2]);
     }
 
+    Vector3<T> perpendicular() const;
     Vector3<T> rotated(const Vector3<T> &axis, double angle) const;
 
     friend Vector3<T> operator+(const Vector3<T> &a, const Vector3<T> &b)
@@ -126,6 +127,15 @@ public:
 template <class T> inline Vector3<T>::Vector3()
 {
     clear();
+}
+
+template <class T>
+template <class B>
+inline Vector3<T>::Vector3(const Vector3<B> &v)
+{
+    this->operator[](0) = static_cast<T>(v[0]);
+    this->operator[](1) = static_cast<T>(v[1]);
+    this->operator[](2) = static_cast<T>(v[2]);
 }
 
 template <class T> inline Vector3<T>::Vector3(T v0, T v1, T v2)
@@ -274,6 +284,23 @@ inline Vector3<T> Vector3<T>::crossProduct(const Vector3<T> &v) const
     return Vector3<T>(this->operator[](1) * v[2] - this->operator[](2) * v[1],
                       this->operator[](2) * v[0] - this->operator[](0) * v[2],
                       this->operator[](0) * v[1] - this->operator[](1) * v[0]);
+}
+
+template <class T> inline Vector3<T> Vector3<T>::perpendicular() const
+{
+    Vector3<T> a = normalized();
+    Vector3<T> b;
+
+    if (a[0] > a[1])
+    {
+        b.set(0, 1, 0);
+    }
+    else
+    {
+        b.set(1, 0, 0);
+    }
+
+    return a.crossProduct(b);
 }
 
 template <class T>

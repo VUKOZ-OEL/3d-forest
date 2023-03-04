@@ -17,10 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SliderWidget.hpp */
+/** @file DoubleSliderWidget.hpp */
 
-#ifndef SLIDER_WIDGET_HPP
-#define SLIDER_WIDGET_HPP
+#ifndef DOUBLE_SLIDER_WIDGET_HPP
+#define DOUBLE_SLIDER_WIDGET_HPP
 
 #include <ExportGui.hpp>
 
@@ -30,33 +30,34 @@ class QSpinBox;
 class QSlider;
 class QVBoxLayout;
 
-/** Slider Widget. */
-class EXPORT_GUI SliderWidget : public QWidget
+/** Slider Widget with values in double. */
+class EXPORT_GUI DoubleSliderWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    SliderWidget();
+    DoubleSliderWidget();
 
-    static void create(SliderWidget *&outputWidget,
+    static void create(DoubleSliderWidget *&outputWidget,
                        const QObject *receiver,
                        const char *memberIntermediateValue,
                        const char *memberFinalValue,
                        const QString &text,
                        const QString &toolTip,
                        const QString &unitsList,
-                       int step,
-                       int min,
-                       int max,
-                       int value);
+                       double step,
+                       double min,
+                       double max,
+                       double value,
+                       bool singleLine = false);
 
-    int value() const;
-    int minimum() const;
-    int maximum() const;
+    double value() const;
+    double minimum() const;
+    double maximum() const;
 
-    void setValue(int value);
-    void setMinimum(int min);
-    void setMaximum(int max);
+    void setValue(double value);
+    void setMinimum(double min);
+    void setMaximum(double max);
 
     void blockSignals(bool block);
 
@@ -73,4 +74,4 @@ protected:
     QSpinBox *spinBox_;
 };
 
-#endif /* SLIDER_WIDGET_HPP */
+#endif /* DOUBLE_SLIDER_WIDGET_HPP */
