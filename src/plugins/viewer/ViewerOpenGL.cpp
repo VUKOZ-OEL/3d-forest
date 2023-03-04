@@ -204,7 +204,7 @@ void ViewerOpenGL::renderCylinder(const Vector3<float> &a,
     Vector3<float> n1 = ab.normalized();
     Vector3<float> n2 = n1.perpendicular();
 
-    float sliceAngle = 6.283185307F / static_cast<float>(slices);
+    double sliceAngle = 6.283185307 / static_cast<double>(slices);
 
     GLuint nSlices = static_cast<GLuint>(slices);
     std::vector<Vector3<float>> xyz;
