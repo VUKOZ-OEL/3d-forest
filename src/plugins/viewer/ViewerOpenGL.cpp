@@ -140,7 +140,7 @@ void ViewerOpenGL::renderClipFilter(const Region &clipFilter)
         Vector3<float> b(clipFilter.cylinder.b());
         float radius = static_cast<float>((clipFilter.cylinder.radius()));
 
-        ViewerOpenGL::renderCylinder(a, b, radius, 8);
+        ViewerOpenGL::renderCylinder(a, b, radius, 10);
     }
     else
     {
@@ -216,12 +216,9 @@ void ViewerOpenGL::renderCylinder(const Vector3<float> &a,
     for (GLuint i = 0; i < nSlices; i++)
     {
         n2.normalize();
-        float x = radius * n2[0];
-        float y = radius * n2[1];
-        float z = radius * n2[2];
 
-        xyz[i * 2 + 0].set(a[0] + x, a[1] + y, a[2] + z);
-        xyz[i * 2 + 1].set(b[0] + x, b[1] + y, b[2] + z);
+        xyz[i * 2 + 0] = a + (radius * n2);
+        xyz[i * 2 + 1] = b + (radius * n2);
 
         indices[i * 6 + 0] = i * 2;
         indices[i * 6 + 1] = i * 2 + 1;
