@@ -154,13 +154,15 @@ template <class T> inline bool Cylinder<T>::isInside(T x, T y, T z) const
         return false;
     }
 
-    T dp = pointPlaneDistance(x, y, z, a[0], a[1], a[2], n[0], n[1], n[2]);
+    T dp;
+    dp = pointPlaneDistance(x, y, z, a_[0], a_[1], a_[2], n_[0], n_[1], n_[2]);
     if (dp < 0 || dp > length_)
     {
         return false;
     }
 
-    T dl = pointLineDistance(x, y, z, a[0], a[1], a[2], n[0], n[1], n[2]);
+    T dl;
+    dl = pointLineDistance(x, y, z, a_[0], a_[1], a_[2], n_[0], n_[1], n_[2]);
     if (dl > radius_)
     {
         return false;

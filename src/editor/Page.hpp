@@ -203,6 +203,7 @@ protected:
     void queryWhere();
     void queryWhereBox();
     void queryWhereCone();
+    void queryWhereCylinder();
     void queryWhereSphere();
     void queryWhereElevation();
     void queryWhereDensity();

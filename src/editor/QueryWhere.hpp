@@ -24,11 +24,10 @@
 
 #include <unordered_set>
 
-#include <Cone.hpp>
 #include <ExportEditor.hpp>
 #include <QueryFilterSet.hpp>
 #include <Range.hpp>
-#include <Sphere.hpp>
+#include <Region.hpp>
 
 /** Data Query Where. */
 class EXPORT_EDITOR QueryWhere
@@ -37,14 +36,26 @@ public:
     QueryWhere();
     ~QueryWhere();
 
+    void setRegion(const Region &region);
+    const Region &region() const { return region_; }
+
     void setBox(const Box<double> &box);
-    const Box<double> &box() const { return box_; }
+    const Box<double> &box() const { return region_.box; }
 
     void setCone(double x, double y, double z, double z2, double angle);
-    const Cone<double> &cone() const { return cone_; }
+    const Cone<double> &cone() const { return region_.cone; }
+
+    void setCylinder(double ax,
+                     double ay,
+                     double az,
+                     double bx,
+                     double by,
+                     double bz,
+                     double radius);
+    const Cylinder<double> &cylinder() const { return region_.cylinder; }
 
     void setSphere(double x, double y, double z, double radius);
-    const Sphere<double> &sphere() const { return sphere_; }
+    const Sphere<double> &sphere() const { return region_.sphere; }
 
     void setElevation(const Range<double> &elevation);
     const Range<double> &elevation() const { return elevation_; }
@@ -73,9 +84,7 @@ public:
 
 private:
     uint32_t filters_;
-    Box<double> box_;
-    Cone<double> cone_;
-    Sphere<double> sphere_;
+    Region region_;
     Range<double> elevation_;
     Range<double> density_;
     Range<double> descriptor_;

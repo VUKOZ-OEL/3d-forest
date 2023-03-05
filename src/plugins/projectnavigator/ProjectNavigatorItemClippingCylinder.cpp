@@ -39,31 +39,33 @@ ProjectNavigatorItemClippingCylinder::ProjectNavigatorItemClippingCylinder(
     // Widgets
     for (size_t i = 0; i < 3; i++)
     {
-        DoubleSliderWidget::create(pointAInput_[i],
-                                   this,
-                                   nullptr,
-                                   SLOT(slotInputChanged()),
-                                   tr("A"),
-                                   tr("A"),
-                                   tr("pt"),
-                                   1.0,
-                                   1.0,
-                                   100.0,
-                                   1.0,
-                                   true);
+        DoubleSliderWidget::create(
+            pointAInput_[i],
+            this,
+            nullptr,
+            SLOT(slotInputChanged()),
+            tr("A"),
+            tr("A"),
+            tr("pt"),
+            1.0,
+            1.0,
+            100.0,
+            1.0,
+            DoubleSliderWidget::LAYOUT_SLIDER_BESIDE_LABEL);
 
-        DoubleSliderWidget::create(pointBInput_[i],
-                                   this,
-                                   nullptr,
-                                   SLOT(slotInputChanged()),
-                                   tr("B"),
-                                   tr("B"),
-                                   tr("pt"),
-                                   1.0,
-                                   1.0,
-                                   100.0,
-                                   1.0,
-                                   true);
+        DoubleSliderWidget::create(
+            pointBInput_[i],
+            this,
+            nullptr,
+            SLOT(slotInputChanged()),
+            tr("B"),
+            tr("B"),
+            tr("pt"),
+            1.0,
+            1.0,
+            100.0,
+            1.0,
+            DoubleSliderWidget::LAYOUT_SLIDER_BESIDE_LABEL);
     }
 
     DoubleSliderWidget::create(radiusInput_,
@@ -77,7 +79,7 @@ ProjectNavigatorItemClippingCylinder::ProjectNavigatorItemClippingCylinder(
                                1.0,
                                100.0,
                                1.0,
-                               true);
+                               DoubleSliderWidget::LAYOUT_SLIDER_BESIDE_LABEL);
 
     // Layout
     QVBoxLayout *mainLayout = new QVBoxLayout;

@@ -112,7 +112,7 @@ void DoubleSliderWidget::create(DoubleSliderWidget *&outputWidget,
                                 double min,
                                 double max,
                                 double value,
-                                bool singleLine)
+                                Layout layout)
 {
     outputWidget = new DoubleSliderWidget();
 
@@ -186,7 +186,7 @@ void DoubleSliderWidget::create(DoubleSliderWidget *&outputWidget,
             SLOT(slotFinalValue()));
 
     // Create widget layout.
-    if (singleLine)
+    if (layout == LAYOUT_SLIDER_BESIDE_LABEL)
     {
         // Put everything on single line.
         QHBoxLayout *groupLayout = new QHBoxLayout;

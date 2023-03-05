@@ -22,18 +22,32 @@
 #ifndef SEGMENTATION_L1_MEDIAN_HPP
 #define SEGMENTATION_L1_MEDIAN_HPP
 
+#include <Query.hpp>
+
 #include <Eigen/Core>
 
 /** Segmentation L1 Median. */
 class SegmentationL1Median
 {
 public:
+    void clear();
+
+    void median(Query &query,
+                double &x,
+                double &y,
+                double &z,
+                size_t iterations = 25,
+                double eps = 0.1);
+
     static void median(const Eigen::MatrixXd &V,
                        double &x,
                        double &y,
                        double &z,
                        size_t iterations = 25,
                        double eps = 0.1);
+
+private:
+    Eigen::MatrixXd xyz_;
 };
 
 #endif /* SEGMENTATION_L1_MEDIAN_HPP */

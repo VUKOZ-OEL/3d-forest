@@ -22,8 +22,66 @@
 #include <SegmentationL1Median.hpp>
 
 #define LOG_MODULE_NAME "SegmentationL1Median"
-// #define LOG_MODULE_DEBUG_ENABLED 1
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
+
+void SegmentationL1Median::clear()
+{
+    xyz_.clear();
+}
+
+void SegmentationL1Median::median(Query &query,
+                                  double &x,
+                                  double &y,
+                                  double &z,
+                                  size_t iterations,
+                                  double eps)
+{
+    // Reserve space in xyz buffer.
+    if (xyz_.cols() < 1)
+    {
+        xyz_.resize(3, 1000);
+    }
+
+    // Collect all points inside selection.
+    double mx = 0;
+    double my = 0;
+    double mz = 0;
+    Eigen::MatrixXd::Index nPoints = 0;
+    while (query.next())
+    {
+        if (nPoints == xyz_.cols())
+        {
+            xyz_.resize(3, xyz_.cols() * 2);
+        }
+
+        xyz_(0, nPoints) = query.x();
+        xyz_(1, nPoints) = query.y();
+        xyz_(2, nPoints) = query.z();
+
+        mx += query.x();
+        my += query.y();
+        mz += query.z();
+
+        nPoints++;
+    }
+
+    if (nPoints < 1)
+    {
+        return;
+    }
+
+    xyz_.resize(3, nPoints);
+
+    // Set first estimate as mean.
+    const double nf = static_cast<double>(nPoints);
+    x = mx / nf;
+    y = my / nf;
+    z = mz / nf;
+
+    // Compute median.
+    median(xyz_, x, y, z, iterations, eps);
+}
 
 void SegmentationL1Median::median(const Eigen::MatrixXd &V,
                                   double &x,

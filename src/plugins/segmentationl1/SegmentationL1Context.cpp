@@ -36,6 +36,7 @@ void SegmentationL1Context::clear()
 {
     query.clear();
     parameters.clear();
+    median.clear();
 
     reset();
 }

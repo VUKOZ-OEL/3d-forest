@@ -23,8 +23,10 @@
 #define REGION_HPP
 
 #include <Box.hpp>
+#include <Cone.hpp>
 #include <Cylinder.hpp>
 #include <ExportCore.hpp>
+#include <Sphere.hpp>
 
 /** Region. */
 class Region
@@ -35,11 +37,16 @@ public:
     {
         TYPE_NONE,
         TYPE_BOX,
-        TYPE_CYLINDER
+        TYPE_CONE,
+        TYPE_CYLINDER,
+        TYPE_SPHERE
     };
 
     Box<double> box;
+    Cone<double> cone;
     Cylinder<double> cylinder;
+    Sphere<double> sphere;
+
     Box<double> boundary;
 
     Type enabled;

@@ -319,11 +319,9 @@ void Page::queryWhere()
 {
     LOG_DEBUG(<< "Page pageId <" << pageId_ << ">.");
 
-    const Box<double> &clipBox = query_->where().box();
-    const Cone<double> &clipCone = query_->where().cone();
-    const Sphere<double> &clipSphere = query_->where().sphere();
+    const Region &region = query_->where().region();
 
-    if (clipBox.empty() && clipCone.empty() && clipSphere.empty())
+    if (region.enabled == Region::TYPE_NONE)
     {
         // Reset selection to mark all points as selected.
         LOG_DEBUG(<< "Reset selection.");
@@ -339,6 +337,7 @@ void Page::queryWhere()
     // Apply new selection.
     queryWhereBox();
     queryWhereCone();
+    queryWhereCylinder();
     queryWhereSphere();
     queryWhereElevation();
     queryWhereDensity();
@@ -445,8 +444,9 @@ bool Page::nextState()
 
 void Page::queryWhereBox()
 {
-    const Box<double> &clipBox = query_->where().box();
-    if (clipBox.empty())
+    const Region &region = query_->where().region();
+    const Box<double> &clipBox = region.box;
+    if (region.enabled != Region::TYPE_BOX || clipBox.empty())
     {
         return;
     }
@@ -589,8 +589,9 @@ void Page::queryWhereBox()
 
 void Page::queryWhereCone()
 {
-    const Cone<double> &clipCone = query_->where().cone();
-    if (clipCone.empty())
+    const Region &region = query_->where().region();
+    const Cone<double> &clipCone = region.cone;
+    if (region.enabled != Region::TYPE_CONE || clipCone.empty())
     {
         return;
     }
@@ -668,10 +669,93 @@ void Page::queryWhereCone()
     query_->addResults(nSelected);
 }
 
+void Page::queryWhereCylinder()
+{
+    const Region &region = query_->where().region();
+    const Cylinder<double> &clipCylinder = region.cylinder;
+    if (region.enabled != Region::TYPE_CYLINDER || clipCylinder.empty())
+    {
+        return;
+    }
+
+    LOG_DEBUG(<< "Page pageId <" << pageId_ << ">.");
+
+    // Select octants
+    selectedNodes_.resize(0);
+    octree.selectLeaves(selectedNodes_, clipCylinder.box(), datasetId_);
+
+    // Compute upper limit of the number of selected points
+    size_t nSelected = 0;
+
+    for (size_t i = 0; i < selectedNodes_.size(); i++)
+    {
+        const IndexFile::Node *nodeL2 = octree.at(selectedNodes_[i].idx);
+        if (!nodeL2)
+        {
+            continue;
+        }
+
+        nSelected += static_cast<size_t>(nodeL2->size);
+    }
+
+    selectionSize = nSelected;
+    if (selection.size() < selectionSize)
+    {
+        selection.resize(selectionSize);
+    }
+
+    // Select points
+    nSelected = 0;
+
+    size_t max = query_->maximumResults() - query_->resultSize();
+    bool maxReached = false;
+
+    for (size_t i = 0; i < selectedNodes_.size(); i++)
+    {
+        const IndexFile::Node *nodeL2 = octree.at(selectedNodes_[i].idx);
+        if (!nodeL2)
+        {
+            continue;
+        }
+
+        uint32_t nNodePoints = static_cast<uint32_t>(nodeL2->size);
+        uint32_t from = static_cast<uint32_t>(nodeL2->from);
+
+        // Partial/Whole selection, apply clip filter
+        for (uint32_t j = 0; j < nNodePoints; j++)
+        {
+            uint32_t idx = from + j;
+            double x = position[3 * idx + 0];
+            double y = position[3 * idx + 1];
+            double z = position[3 * idx + 2];
+
+            if (clipCylinder.isInside(x, y, z))
+            {
+                selection[nSelected++] = idx;
+                if (nSelected == max)
+                {
+                    maxReached = true;
+                    break;
+                }
+            }
+        }
+
+        if (maxReached)
+        {
+            break;
+        }
+    }
+
+    selectionSize = nSelected;
+
+    query_->addResults(nSelected);
+}
+
 void Page::queryWhereSphere()
 {
-    const Sphere<double> &clipSphere = query_->where().sphere();
-    if (clipSphere.empty())
+    const Region &region = query_->where().region();
+    const Sphere<double> &clipSphere = region.sphere;
+    if (region.enabled != Region::TYPE_SPHERE || clipSphere.empty())
     {
         return;
     }
