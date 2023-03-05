@@ -29,19 +29,39 @@ QueryWhere::~QueryWhere()
 {
 }
 
+void QueryWhere::setRegion(const Region &region)
+{
+    region_ = region;
+}
+
 void QueryWhere::setBox(const Box<double> &box)
 {
-    box_ = box;
+    region_.box = box;
+    region_.enabled = Region::TYPE_BOX;
 }
 
 void QueryWhere::setCone(double x, double y, double z, double z2, double angle)
 {
-    cone_.set(x, y, z, z2, angle);
+    region_.cone.set(x, y, z, z2, angle);
+    region_.enabled = Region::TYPE_CONE;
+}
+
+void QueryWhere::setCylinder(double ax,
+                             double ay,
+                             double az,
+                             double bx,
+                             double by,
+                             double bz,
+                             double radius)
+{
+    region_.cylinder.set(ax, ay, az, bx, by, bz, radius);
+    region_.enabled = Region::TYPE_CYLINDER;
 }
 
 void QueryWhere::setSphere(double x, double y, double z, double radius)
 {
-    sphere_.set(x, y, z, radius);
+    region_.sphere.set(x, y, z, radius);
+    region_.enabled = Region::TYPE_SPHERE;
 }
 
 void QueryWhere::setElevation(const Range<double> &elevation)

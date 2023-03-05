@@ -45,27 +45,36 @@ void Query::exec()
 
     bool selected = false;
 
-    if (!where().box().empty())
+    const Region &region = where().region();
+
+    if (region.enabled == Region::TYPE_BOX)
     {
         editor_->datasets().selectPages(where_.dataset(),
-                                        where().box(),
+                                        region.box,
                                         selectedPages_);
         selected = true;
     }
 
-    if (!where().cone().empty())
+    if (region.enabled == Region::TYPE_CONE)
     {
         editor_->datasets().selectPages(where_.dataset(),
-                                        where().cone().box(),
+                                        region.cone.box(),
                                         selectedPages_);
         selected = true;
     }
 
-    if (!where().sphere().empty())
+    if (region.enabled == Region::TYPE_CYLINDER)
     {
-        LOG_DEBUG(<< "Exec sphere <" << where().sphere().box() << ">.");
         editor_->datasets().selectPages(where_.dataset(),
-                                        where().sphere().box(),
+                                        region.cylinder.box(),
+                                        selectedPages_);
+        selected = true;
+    }
+
+    if (region.enabled == Region::TYPE_SPHERE)
+    {
+        editor_->datasets().selectPages(where_.dataset(),
+                                        region.sphere.box(),
                                         selectedPages_);
         selected = true;
     }

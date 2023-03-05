@@ -224,7 +224,7 @@ void Editor::setClipFilter(const Region &clipFilter)
 
     if (viewports_.size() > 0)
     {
-        viewports_.where().setBox(clipBoundary());
+        viewports_.where().setRegion(clipFilter_);
         viewports_.applyWhereToAll();
     }
 
@@ -303,7 +303,7 @@ void Editor::updateAfterRead()
         LOG_DEBUG(<< "Called.");
         // viewports_.where().setDataset();
         // viewports_.where().setClassification();
-        viewports_.where().setBox(clipBoundary());
+        viewports_.where().setRegion(clipFilter_);
         viewports_.where().setElevation(elevationRange_);
         viewports_.where().setDensity(densityRange_);
         viewports_.where().setDescriptor(descriptorRange_);
