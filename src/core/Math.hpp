@@ -23,6 +23,7 @@
 #define MATH_HPP
 
 #include <cmath>
+#include <limits>
 
 #define MATH_PI_4 (3.1415926535897932384626433832795 / 4.0)
 
