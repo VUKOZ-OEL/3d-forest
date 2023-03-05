@@ -36,6 +36,13 @@ class EXPORT_GUI DoubleSliderWidget : public QWidget
     Q_OBJECT
 
 public:
+    /** Slider layout. */
+    enum Layout
+    {
+        LAYOUT_SLIDER_BESIDE_LABEL,
+        LAYOUT_SLIDER_UNDER_LABEL
+    };
+
     DoubleSliderWidget();
 
     static void create(DoubleSliderWidget *&outputWidget,
@@ -49,7 +56,7 @@ public:
                        double min,
                        double max,
                        double value,
-                       bool singleLine = false);
+                       Layout layout = LAYOUT_SLIDER_UNDER_LABEL);
 
     double value() const;
     double minimum() const;
