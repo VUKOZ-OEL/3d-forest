@@ -22,7 +22,7 @@
 #ifndef ALGORITHM_PLUGIN_INTERFACE_HPP
 #define ALGORITHM_PLUGIN_INTERFACE_HPP
 
-#include <ExportGui.hpp>
+class MainWindow;
 class AlgorithmWidgetInterface;
 
 #include <QtPlugin>
@@ -34,12 +34,11 @@ class AlgorithmWidgetInterface;
     #include <QAction>
 #endif
 
-class MainWindow;
-
 /** Algorithm Plugin Interface. */
-class EXPORT_GUI AlgorithmPluginInterface
+class AlgorithmPluginInterface
 {
 public:
+    AlgorithmPluginInterface() = default;
     virtual ~AlgorithmPluginInterface() = default;
     virtual void initialize(MainWindow *mainWindow) = 0;
     virtual AlgorithmWidgetInterface *widget() = 0;
