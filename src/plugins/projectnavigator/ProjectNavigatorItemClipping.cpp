@@ -50,8 +50,10 @@ ProjectNavigatorItemClipping::ProjectNavigatorItemClipping(
 
     // Tab
     tabWidget_ = new ToolTabWidget;
-    tabWidget_->addTab(boxWidget_, ICON("clip_filter"), tr("Box"));
-    tabWidget_->addTab(cylinderWidget_, ICON("cylinder"), tr("Cylinder"));
+    tabWidget_->addTab(boxWidget_, ICON("selection_box"), tr("Box"));
+    tabWidget_->addTab(cylinderWidget_,
+                       ICON("selection_cylinder"),
+                       tr("Cylinder"));
 
     // Layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
