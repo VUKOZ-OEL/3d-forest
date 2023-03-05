@@ -29,16 +29,49 @@ static void print(const Eigen::MatrixXd &V)
     std::cout << "matrix " << V.rows() << " x " << V.cols() << " ("
               << V.rowsCapacity() << " x " << V.colsCapacity() << ") data "
               << V.data() << std::endl;
+
+    for (Eigen::MatrixXd::Index c = 0; c < V.cols(); c++)
+    {
+        std::cout << " column[" << c << "] = ";
+        for (Eigen::MatrixXd::Index r = 0; r < V.rows(); r++)
+        {
+            std::cout << "row[" << r << "] = " << V(r, c);
+            if (r + 1 < V.rows())
+            {
+                std::cout << ", ";
+            }
+        }
+        std::cout << std::endl;
+    }
 }
 
 static void exampleEigenMatrixResize()
 {
     Eigen::MatrixXd V;
 
-    V.resize(3, 4);
+    V.resize(3, 1);
+    V(0, 0) = 1.0;
+    V(1, 0) = 2.0;
+    V(2, 0) = 3.0;
     print(V);
-    V.resize(3, 8);
+
+    V.resize(3, 2);
+    V(0, 1) = 4.0;
+    V(1, 1) = 5.0;
+    V(2, 1) = 6.0;
     print(V);
+
+    V.resize(3, 1);
+    print(V);
+
+    // Output:
+    // matrix 3 x 1 (3 x 1) data 0x20332a31740
+    //  column[0] = row[0] = 1, row[1] = 2, row[2] = 3
+    // matrix 3 x 2 (3 x 2) data 0x20332a31740
+    //  column[0] = row[0] = 1, row[1] = 2, row[2] = 3
+    //  column[1] = row[0] = 4, row[1] = 5, row[2] = 6
+    // matrix 3 x 1 (3 x 2) data 0x20332a31740
+    //  column[0] = row[0] = 1, row[1] = 2, row[2] = 3
 }
 
 int main()
