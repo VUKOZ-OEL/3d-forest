@@ -23,6 +23,7 @@
 #define LOGGER_WINDOW_HPP
 
 #include <ExportGui.hpp>
+#include <File.hpp>
 #include <Log.hpp>
 
 #include <QDockWidget>
@@ -62,6 +63,7 @@ signals:
 protected:
     MainWindow *mainWindow_;
     QTextEdit *textEdit_;
+    File file_;
 };
 
 #endif /* LOGGER_WINDOW_HPP */

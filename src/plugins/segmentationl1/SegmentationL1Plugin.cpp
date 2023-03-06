@@ -21,10 +21,6 @@
 
 #include <MainWindow.hpp>
 #include <SegmentationL1Plugin.hpp>
-#include <SegmentationL1Window.hpp>
-#include <ThemeIcon.hpp>
-
-#define ICON(name) (ThemeIcon(":/segmentationl1/", name))
 
 SegmentationL1Plugin::SegmentationL1Plugin()
     : mainWindow_(nullptr),

@@ -22,7 +22,7 @@
 #include <SegmentationL1Median.hpp>
 
 #define LOG_MODULE_NAME "SegmentationL1Median"
-#define LOG_MODULE_DEBUG_ENABLED 1
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 void SegmentationL1Median::clear()
@@ -66,6 +66,8 @@ void SegmentationL1Median::median(Query &query,
         nPoints++;
     }
 
+    LOG_DEBUG(<< "Found <" << nPoints << "> points.");
+
     if (nPoints < 1)
     {
         return;
@@ -93,8 +95,8 @@ void SegmentationL1Median::median(const Eigen::MatrixXd &V,
     double previous = 0;
     for (size_t iteration = 0; iteration < iterations; iteration++)
     {
-        LOG_DEBUG(<< "Iteration <" << (iteration + 1) << "/" << iterations
-                  << ">.");
+        // LOG_DEBUG(<< "Iteration <" << (iteration + 1) << "/" << iterations <<
+        // ">.");
         double mx = 0;
         double my = 0;
         double mz = 0;
@@ -111,7 +113,7 @@ void SegmentationL1Median::median(const Eigen::MatrixXd &V,
             double dz = pz - z;
 
             double d = std::sqrt((dx * dx) + (dy * dy) + (dz * dz));
-            LOG_DEBUG(<< "d <" << d << ">.");
+            // LOG_DEBUG(<< "d <" << d << ">.");
             if (d < 1e-6)
             {
                 continue;
@@ -132,7 +134,7 @@ void SegmentationL1Median::median(const Eigen::MatrixXd &V,
         x = mx / denumerator;
         y = my / denumerator;
         z = mz / denumerator;
-        LOG_DEBUG(<< "x <" << x << "> y <" << y << "> z <" << z << ">.");
+        // LOG_DEBUG(<< "x <" << x << "> y <" << y << "> z <" << z << ">.");
 
         if (iteration > 0 && std::abs(current - previous) < eps)
         {

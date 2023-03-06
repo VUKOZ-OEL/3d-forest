@@ -33,6 +33,9 @@ LoggerWindow::LoggerWindow(MainWindow *mainWindow)
     textEdit_ = new QTextEdit;
     textEdit_->setReadOnly(true);
 
+    // file
+    file_.open("log.txt", "w+t");
+
     // Dock
     setWidget(textEdit_);
     setWindowTitle(tr("Logger"));
@@ -84,8 +87,11 @@ void LoggerWindow::slotPrintln(const QString &time,
                                const QString &module,
                                const QString &function)
 {
-    textEdit_->append(time + QString(LogMessage::typeString(type)) + text +
-                      " [" + module + ":" + function + "]");
+    QString line = time + QString(LogMessage::typeString(type)) + text + " [" +
+                   module + ":" + function + "]";
+
+    textEdit_->append(line);
+    file_.write(line.toStdString() + "\n");
 }
 
 static void loggerWindowQtMessageHandler(QtMsgType type,

@@ -46,7 +46,7 @@ void SegmentationL1TaskMedian::initialize(SegmentationL1Context *context)
     setupSearchRadius();
 
     uint64_t n = context_->samples.size() * iterations_;
-    LOG_DEBUG(<< "n <" << n << ">.");
+    LOG_DEBUG(<< "Process <" << n << "> samples.");
 
     ProgressActionInterface::initialize(n);
 }
@@ -84,6 +84,8 @@ void SegmentationL1TaskMedian::step()
 
     SegmentationL1Point &point = context_->samples[index_];
     index_++;
+    LOG_DEBUG(<< "Process sample <" << index_ << "> from <"
+              << context_->samples.size() << "> samples.");
 
     // Setup slice parameters.
     Vector3<double> u(point.x, point.y, point.z);
