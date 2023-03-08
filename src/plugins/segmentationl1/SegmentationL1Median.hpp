@@ -36,15 +36,15 @@ public:
                 double &x,
                 double &y,
                 double &z,
-                size_t iterations = 25,
-                double eps = 0.1);
+                size_t iterations = 100,
+                double eps = 1e-6);
 
     static void median(const Eigen::MatrixXd &V,
                        double &x,
                        double &y,
                        double &z,
-                       size_t iterations = 25,
-                       double eps = 0.1);
+                       size_t iterations = 100,
+                       double eps = 1e-6);
 
     static void mean(const Eigen::MatrixXd &V, double &x, double &y, double &z);
 
