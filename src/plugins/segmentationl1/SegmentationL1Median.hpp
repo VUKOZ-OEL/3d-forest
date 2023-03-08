@@ -46,6 +46,8 @@ public:
                        size_t iterations = 25,
                        double eps = 0.1);
 
+    static void mean(const Eigen::MatrixXd &V, double &x, double &y, double &z);
+
 private:
     Eigen::MatrixXd xyz_;
 };

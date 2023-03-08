@@ -144,3 +144,30 @@ void SegmentationL1Median::median(const Eigen::MatrixXd &V,
         previous = current;
     }
 }
+
+void SegmentationL1Median::mean(const Eigen::MatrixXd &V,
+                                double &x,
+                                double &y,
+                                double &z)
+{
+    if (V.cols() < 1)
+    {
+        return;
+    }
+
+    x = 0;
+    y = 0;
+    z = 0;
+
+    for (Eigen::MatrixXd::Index c = 0; c < V.cols(); c++)
+    {
+        x += V(0, c);
+        y += V(1, c);
+        z += V(2, c);
+    }
+
+    const double n = static_cast<double>(V.cols());
+    x = x / n;
+    y = y / n;
+    z = z / n;
+}
