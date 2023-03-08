@@ -19,6 +19,7 @@
 
 /** @file exampleMedian.cpp @brief Median example. */
 
+#include <ArgumentParser.hpp>
 #include <Editor.hpp>
 #include <Error.hpp>
 #include <SegmentationL1Median.hpp>
@@ -26,32 +27,49 @@
 #include <Log.hpp>
 
 static void computeMedian(const Eigen::MatrixXd &points,
-                          double x,
-                          double y,
-                          double z)
+                          size_t iterations,
+                          double eps)
 {
-    SegmentationL1Median::median(points, x, y, z);
+    double x;
+    double y;
+    double z;
 
+    SegmentationL1Median::mean(points, x, y, z);
+    LOG_PRINT(<< "mean x <" << x << "> y <" << y << "> z <" << z << ">");
+
+    SegmentationL1Median::median(points, x, y, z, iterations, eps);
     LOG_PRINT(<< "median x <" << x << "> y <" << y << "> z <" << z << ">");
 }
 
-static void exampleMedian()
+static void exampleMedian(size_t iterations, double eps)
 {
-    //                    A    B    C
-    Eigen::MatrixXd set1{{0.0, 1.0, 0.0},  // x
-                         {0.0, 0.0, 1.0},  // y
-                         {0.0, 0.0, 0.0}}; // z
+    //                    A    B    C    D
+    Eigen::MatrixXd set1{{1.0, 7.0, 9.0, 4.0},  // x
+                         {3.0, 1.0, 3.0, 5.0},  // y
+                         {5.0, 2.0, 1.0, 6.0}}; // z
 
-    computeMedian(set1, 0.4, 0.0, 0.0);
+    computeMedian(set1, iterations, eps);
+
+    // Output:
+    //   mean   x <5.25>    y <3>       z <3.5>
+    //   median x <5.39402> y <2.90189> z <3.47224> -n 10 -e 0.1
+    //   median x <5.59192> y <2.785>   z <3.30639> -n 10 -e 0.01
+    //   median x <5.65338> y <2.74789> z <3.25515> -n 25 -e 0.000001
+    //   median x <5.65837> y <2.74486> z <3.251>   -n 70 -e 0.000001 reference
 }
 
-int main()
+int main(int argc, char *argv[])
 {
     int rc = 0;
     LOGGER_START_STDOUT;
     try
     {
-        exampleMedian();
+        ArgumentParser arg;
+        arg.add("-n", "100");
+        arg.add("-e", "0.000001");
+        arg.parse(argc, argv);
+
+        exampleMedian(arg.toSize("-n"), arg.toDouble("-e"));
     }
     catch (std::exception &e)
     {
