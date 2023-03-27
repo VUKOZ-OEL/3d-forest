@@ -122,10 +122,6 @@ public:
         return customColor_[3 * selection_[pagePointIndex_] + 2];
     }
     double &descriptor() { return descriptor_[selection_[pagePointIndex_]]; }
-    double &density() { return density_[selection_[pagePointIndex_]]; }
-    double &normalX() { return normal_[3 * selection_[pagePointIndex_] + 0]; }
-    double &normalY() { return normal_[3 * selection_[pagePointIndex_] + 1]; }
-    double &normalZ() { return normal_[3 * selection_[pagePointIndex_] + 2]; }
     size_t &value() { return value_[selection_[pagePointIndex_]]; }
     /**@}*/
 
@@ -209,8 +205,6 @@ protected:
     double *elevation_;
     double *customColor_;
     double *descriptor_;
-    double *density_;
-    double *normal_;
     size_t *value_;
 
     uint32_t *selection_;

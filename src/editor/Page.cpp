@@ -63,8 +63,6 @@ void Page::clear()
     elevation.clear();
     customColor.clear();
     descriptor.clear();
-    density.clear();
-    normal.clear();
     value.clear();
 
     renderPosition.clear();
@@ -92,8 +90,6 @@ void Page::resize(size_t n)
     elevation.resize(n);
     customColor.resize(n * 3);
     descriptor.resize(n);
-    density.resize(n);
-    normal.resize(n * 3);
     value.resize(n);
 
     renderPosition.resize(n * 3);
@@ -135,8 +131,7 @@ void Page::readPage()
     // Covert buffer to point data
     uint8_t *ptr = buffer_.data();
     LasFile::Point point;
-    const double s8 = 1.0 / 255.0;
-    const double scaleU16 = 1.0 / 65535.0;
+    const double s16 = 1.0 / 65535.0;
     bool rgbFlag = las.header.hasRgb();
 
     for (size_t i = 0; i < nPagePoints; i++)
@@ -155,13 +150,13 @@ void Page::readPage()
         position[3 * i + 2] = positionBase_[3 * i + 2];
 
         // intensity and color
-        intensity[i] = static_cast<double>(point.intensity) * scaleU16;
+        intensity[i] = static_cast<double>(point.intensity) * s16;
 
         if (rgbFlag)
         {
-            color[3 * i + 0] = point.red * scaleU16;
-            color[3 * i + 1] = point.green * scaleU16;
-            color[3 * i + 2] = point.blue * scaleU16;
+            color[3 * i + 0] = point.red * s16;
+            color[3 * i + 1] = point.green * s16;
+            color[3 * i + 2] = point.blue * s16;
         }
         else
         {
@@ -182,14 +177,10 @@ void Page::readPage()
         // User extra
         layer[i] = point.user_layer;
         elevation[i] = static_cast<double>(point.user_elevation);
-        customColor[3 * i + 0] = static_cast<double>(point.user_red) * s8;
-        customColor[3 * i + 1] = static_cast<double>(point.user_green) * s8;
-        customColor[3 * i + 2] = static_cast<double>(point.user_blue) * s8;
-        descriptor[i] = static_cast<double>(point.user_descriptor) * s8;
-        density[i] = static_cast<double>(point.user_density) * s8;
-        normal[3 * i + 0] = static_cast<double>(point.user_nx) * s8;
-        normal[3 * i + 1] = static_cast<double>(point.user_ny) * s8;
-        normal[3 * i + 2] = static_cast<double>(point.user_nz) * s8;
+        customColor[3 * i + 0] = static_cast<double>(point.user_red) * s16;
+        customColor[3 * i + 1] = static_cast<double>(point.user_green) * s16;
+        customColor[3 * i + 2] = static_cast<double>(point.user_blue) * s16;
+        descriptor[i] = point.user_descriptor;
         value[i] = static_cast<size_t>(point.user_value);
     }
 
@@ -216,7 +207,7 @@ static const size_t PAGE_FORMAT_USER[PAGE_FORMAT_COUNT] =
 
 void Page::toPoint(uint8_t *ptr, size_t i, uint8_t fmt)
 {
-    const double s8 = 255.0;
+    const double s16 = 65535.0;
     size_t pos = PAGE_FORMAT_USER[fmt];
 
     // Do not overwrite the other values for now
@@ -237,23 +228,15 @@ void Page::toPoint(uint8_t *ptr, size_t i, uint8_t fmt)
     htol32(ptr + pos + 4, static_cast<uint32_t>(elevation[i]));
 
     // Custom color
-    ptr[pos + 8] = static_cast<uint8_t>(customColor[3 * i + 0] * s8);
-    ptr[pos + 9] = static_cast<uint8_t>(customColor[3 * i + 1] * s8);
-    ptr[pos + 10] = static_cast<uint8_t>(customColor[3 * i + 2] * s8);
+    ptr[pos + 8] = static_cast<uint16_t>(customColor[3 * i + 0] * s16);
+    ptr[pos + 10] = static_cast<uint16_t>(customColor[3 * i + 1] * s16);
+    ptr[pos + 12] = static_cast<uint16_t>(customColor[3 * i + 2] * s16);
 
     // Descriptor
-    ptr[pos + 11] = static_cast<uint8_t>(descriptor[i] * s8);
-
-    // Density
-    ptr[pos + 12] = static_cast<uint8_t>(density[i] * s8);
-
-    // Normal
-    ptr[pos + 13] = static_cast<uint8_t>(normal[3 * i + 0] * s8);
-    ptr[pos + 14] = static_cast<uint8_t>(normal[3 * i + 1] * s8);
-    ptr[pos + 15] = static_cast<uint8_t>(normal[3 * i + 2] * s8);
+    htold(ptr + pos + 16, descriptor[i]);
 
     // Value
-    htol64(ptr + pos + 16, static_cast<uint64_t>(value[i]));
+    htol64(ptr + pos + 24, static_cast<uint64_t>(value[i]));
 }
 
 void Page::writePage()
@@ -340,7 +323,6 @@ void Page::queryWhere()
     queryWhereCylinder();
     queryWhereSphere();
     queryWhereElevation();
-    queryWhereDensity();
     queryWhereDescriptor();
     queryWhereClassification();
     queryWhereLayer();
@@ -866,38 +848,6 @@ void Page::queryWhereElevation()
     selectionSize = nSelectedNew;
 }
 
-void Page::queryWhereDensity()
-{
-    const Range<double> &densityRange = query_->where().density();
-
-    if (densityRange.isEnabled() == false || densityRange.hasBoundaryValues())
-    {
-        return;
-    }
-
-    LOG_DEBUG(<< "Page pageId <" << pageId_ << ">.");
-
-    size_t nSelectedNew = 0;
-
-    for (size_t i = 0; i < selectionSize; i++)
-    {
-        double v = density[selection[i]];
-
-        if (!(v < densityRange.minimumValue() ||
-              v > densityRange.maximumValue()))
-        {
-            if (nSelectedNew != i)
-            {
-                selection[nSelectedNew] = selection[i];
-            }
-
-            nSelectedNew++;
-        }
-    }
-
-    selectionSize = nSelectedNew;
-}
-
 void Page::queryWhereDescriptor()
 {
     const Range<double> &descriptorRange = query_->where().descriptor();
@@ -1126,27 +1076,6 @@ void Page::runColorModifier()
             renderColor[i * 3 + 0] *= static_cast<float>(descriptor[i]);
             renderColor[i * 3 + 1] *= static_cast<float>(descriptor[i]);
             renderColor[i * 3 + 2] *= static_cast<float>(descriptor[i]);
-        }
-    }
-
-    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_DENSITY))
-    {
-        for (size_t i = 0; i < n; i++)
-        {
-            setColor(i,
-                     static_cast<size_t>(density[i] * 255.0),
-                     255,
-                     ColorPalette::BlueCyanYellowRed256);
-        }
-    }
-
-    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_NORMAL))
-    {
-        for (size_t i = 0; i < n; i++)
-        {
-            renderColor[i * 3 + 0] *= static_cast<float>(normal[i * 3 + 0]);
-            renderColor[i * 3 + 1] *= static_cast<float>(normal[i * 3 + 1]);
-            renderColor[i * 3 + 2] *= static_cast<float>(normal[i * 3 + 2]);
         }
     }
 }

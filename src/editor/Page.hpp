@@ -101,19 +101,6 @@ public:
     */
     std::vector<double> descriptor;
 
-    /** Density values.
-        The data are stored as [d0, d1, ...].
-        The values are in range from 0 (zero) to 1 (full).
-        This value is stored in Point Data Record extra bytes.
-    */
-    std::vector<double> density;
-
-    /** Point normals.
-        The data are stored as [nx0, ny0, nz0, nx1, ny1, ...].
-        This value is stored in Point Data Record extra bytes.
-     */
-    std::vector<double> normal;
-
     /** User values.
         This value is stored in Point Data Record extra bytes.
     */
@@ -206,7 +193,6 @@ protected:
     void queryWhereCylinder();
     void queryWhereSphere();
     void queryWhereElevation();
-    void queryWhereDensity();
     void queryWhereDescriptor();
     void queryWhereClassification();
     void queryWhereLayer();

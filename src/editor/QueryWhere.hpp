@@ -60,9 +60,6 @@ public:
     void setElevation(const Range<double> &elevation);
     const Range<double> &elevation() const { return elevation_; }
 
-    void setDensity(const Range<double> &density);
-    const Range<double> &density() const { return density_; }
-
     void setDescriptor(const Range<double> &descriptor);
     const Range<double> &descriptor() const { return descriptor_; }
 
@@ -86,7 +83,6 @@ private:
     uint32_t filters_;
     Region region_;
     Range<double> elevation_;
-    Range<double> density_;
     Range<double> descriptor_;
     QueryFilterSet dataset_;
     QueryFilterSet classification_;

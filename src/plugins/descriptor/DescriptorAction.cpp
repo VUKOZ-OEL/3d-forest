@@ -172,8 +172,7 @@ void DescriptorAction::stepComputeDescriptor()
 
             if (hasDescriptor)
             {
-                queryPoints_.value() = static_cast<size_t>(descriptor * 1e5);
-                queryPoints_.setModified();
+                queryPoints_.descriptor() = descriptor;
 
                 if (nPointsWithDescriptor_ == 0)
                 {
@@ -189,6 +188,12 @@ void DescriptorAction::stepComputeDescriptor()
 
                 nPointsWithDescriptor_++;
             }
+            else
+            {
+                queryPoints_.descriptor() = std::numeric_limits<double>::max();
+            }
+
+            queryPoints_.setModified();
         }
 
         i++;
@@ -226,8 +231,17 @@ void DescriptorAction::stepNormalizeDescriptor()
         {
             if (queryPoints_.next())
             {
-                double v = static_cast<double>(queryPoints_.value()) * 1e-5;
-                queryPoints_.descriptor() = (v - descriptorMinimum_) * d;
+                double value = queryPoints_.descriptor();
+                if (value < std::numeric_limits<double>::max())
+                {
+                    value = (value - descriptorMinimum_) * d;
+                }
+                else
+                {
+                    value = 0;
+                }
+
+                queryPoints_.descriptor() = value;
                 queryPoints_.setModified();
             }
 

@@ -85,7 +85,7 @@ void SegmentationL1TaskVoxelize::step()
     voxel.x = query.x();
     voxel.y = query.y();
     voxel.z = query.z();
-    voxel.descriptor = query.density();
+    voxel.descriptor = query.descriptor();
 
     while (query.next())
     {

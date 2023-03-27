@@ -41,7 +41,7 @@
 #define LAS_FILE_HEADER_SIZE_V13 235
 #define LAS_FILE_HEADER_SIZE_V14 375
 #define LAS_FILE_FORMAT_COUNT 11
-#define LAS_FILE_USER_BYTE_COUNT 24U
+#define LAS_FILE_USER_BYTE_COUNT 32U
 
 static const size_t LAS_FILE_FORMAT_BYTE_COUNT[LAS_FILE_FORMAT_COUNT] =
     {20, 28, 26, 34, 57, 63, 30, 36, 38, 59, 67};
@@ -58,7 +58,7 @@ static const uint8_t LAS_FILE_FORMAT_NIR[LAS_FILE_FORMAT_COUNT] =
 static const uint8_t LAS_FILE_FORMAT_WAVE[LAS_FILE_FORMAT_COUNT] =
     {0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1};
 
-static const char *LAS_FILE_GENERATING_SOFTWARE = "3D Forest 2022.12.04";
+static const char *LAS_FILE_GENERATING_SOFTWARE = "3D Forest 2023.03.25";
 
 uint8_t LasFile::Format::las() const
 {
@@ -724,15 +724,12 @@ void LasFile::readPoint(Point &pt, const uint8_t *buffer, uint8_t fmt) const
     {
         pt.user_layer = ltoh32(&buffer[pos]);
         pt.user_elevation = ltoh32(&buffer[pos + 4]);
-        pt.user_red = buffer[pos + 8];
-        pt.user_green = buffer[pos + 9];
-        pt.user_blue = buffer[pos + 10];
-        pt.user_descriptor = buffer[pos + 11];
-        pt.user_density = buffer[pos + 12];
-        pt.user_nx = buffer[pos + 13];
-        pt.user_ny = buffer[pos + 14];
-        pt.user_nz = buffer[pos + 15];
-        pt.user_value = ltoh64(&buffer[pos + 16]);
+        pt.user_red = ltoh16(&buffer[pos + 8]);
+        pt.user_green = ltoh16(&buffer[pos + 10]);
+        pt.user_blue = ltoh16(&buffer[pos + 12]);
+        pt.user_intensity = ltoh16(&buffer[pos + 14]);
+        pt.user_descriptor = ltohd(&buffer[pos + 16]);
+        pt.user_value = ltoh64(&buffer[pos + 24]);
     }
 }
 
@@ -862,15 +859,12 @@ void LasFile::writePoint(uint8_t *buffer, const Point &pt) const
     {
         htol32(&buffer[pos], pt.user_layer);
         htol32(&buffer[pos + 4], pt.user_elevation);
-        buffer[pos + 8] = pt.user_red;
-        buffer[pos + 9] = pt.user_green;
-        buffer[pos + 10] = pt.user_blue;
-        buffer[pos + 11] = pt.user_descriptor;
-        buffer[pos + 12] = pt.user_density;
-        buffer[pos + 13] = pt.user_nx;
-        buffer[pos + 14] = pt.user_ny;
-        buffer[pos + 15] = pt.user_nz;
-        htol64(&buffer[pos + 16], pt.user_value);
+        htol16(&buffer[pos + 8], pt.user_red);
+        htol16(&buffer[pos + 10], pt.user_green);
+        htol16(&buffer[pos + 12], pt.user_blue);
+        htol16(&buffer[pos + 14], pt.user_intensity);
+        htold(&buffer[pos + 16], pt.gps_time);
+        htol64(&buffer[pos + 24], pt.user_value);
     }
 }
 

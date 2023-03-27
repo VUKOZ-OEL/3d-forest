@@ -75,27 +75,25 @@ void ProjectNavigatorItemDescriptor::slotUpdate(
         descriptorRange_ = mainWindow_->editor().descriptorRange();
 
         descriptorInput_->blockSignals(true);
-        descriptorInput_->setMinimum(descriptorRange_.minimum() * 255.0);
-        descriptorInput_->setMaximum(descriptorRange_.maximum() * 255.0);
-        descriptorInput_->setMinimumValue(descriptorRange_.minimumValue() *
-                                          255.0);
-        descriptorInput_->setMaximumValue(descriptorRange_.maximumValue() *
-                                          255.0);
+        double min = descriptorRange_.minimum() * 1000.0;
+        double max = descriptorRange_.maximum() * 1000.0;
+        descriptorInput_->setMinimum(min);
+        descriptorInput_->setMaximum(max);
+        descriptorInput_->setMinimumValue(min);
+        descriptorInput_->setMaximumValue(max);
         descriptorInput_->blockSignals(false);
     }
 }
 
 void ProjectNavigatorItemDescriptor::slotRangeIntermediateMinimumValue()
 {
-    descriptorRange_.setMinimumValue(descriptorInput_->minimumValue() *
-                                     0.0039216);
+    descriptorRange_.setMinimumValue(descriptorInput_->minimumValue() * 0.001);
     descriptorInputChanged();
 }
 
 void ProjectNavigatorItemDescriptor::slotRangeIntermediateMaximumValue()
 {
-    descriptorRange_.setMaximumValue(descriptorInput_->maximumValue() *
-                                     0.0039216);
+    descriptorRange_.setMaximumValue(descriptorInput_->maximumValue() * 0.001);
     descriptorInputChanged();
 }
 
