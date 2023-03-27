@@ -185,15 +185,12 @@ public:
         // User-specific extra bytes
         uint32_t user_layer;
         uint32_t user_elevation; // 10 * 8
-        uint8_t user_red;
-        uint8_t user_green;
-        uint8_t user_blue;
-        uint8_t user_descriptor;
-        uint8_t user_density;
-        uint8_t user_nx;
-        uint8_t user_ny;
-        uint8_t user_nz;     // 11 * 8
-        uint64_t user_value; // 12 * 8
+        uint16_t user_red;
+        uint16_t user_green;
+        uint16_t user_blue;
+        uint16_t user_intensity; // 11 * 8
+        double user_descriptor;  // 12 * 8
+        uint64_t user_value;     // 13 * 8
 
         Json &write(Json &out) const;
     };

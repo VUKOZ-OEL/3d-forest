@@ -44,7 +44,6 @@ public:
         TYPE_CLASSIFICATION,
         TYPE_CLIP_FILTER,
         TYPE_DATA_SET,
-        TYPE_DENSITY,
         TYPE_DESCRIPTOR,
         TYPE_ELEVATION,
         TYPE_LAYER,
@@ -80,10 +79,6 @@ public:
     // Elevation
     const Range<double> &elevationRange() const { return elevationRange_; }
     void setElevationRange(const Range<double> &elevationRange);
-
-    // Density
-    const Range<double> &densityRange() const { return densityRange_; }
-    void setDensityRange(const Range<double> &densityRange);
 
     // Descriptor
     const Range<double> &descriptorRange() const { return descriptorRange_; }
@@ -136,7 +131,6 @@ protected:
 
     Region clipFilter_;
     Range<double> elevationRange_;
-    Range<double> densityRange_;
     Range<double> descriptorRange_;
 
     // Modifiers

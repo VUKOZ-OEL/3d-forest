@@ -35,9 +35,7 @@ SettingsView::SettingsView()
                           "Layer",
                           "Elevation",
                           "Custom Color",
-                          "Descriptor",
-                          "Density",
-                          "Normal"};
+                          "Descriptor"};
 
     colorSourceEnabled_.resize(colorSourceString_.size());
     for (auto &&it : colorSourceEnabled_)

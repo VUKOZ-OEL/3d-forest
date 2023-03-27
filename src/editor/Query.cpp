@@ -175,8 +175,6 @@ bool Query::nextPage()
             elevation_ = page_->elevation.data();
             customColor_ = page_->customColor.data();
             descriptor_ = page_->descriptor.data();
-            density_ = page_->density.data();
-            normal_ = page_->normal.data();
             value_ = page_->value.data();
 
             selection_ = page_->selection.data();

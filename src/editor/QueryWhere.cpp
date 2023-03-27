@@ -69,11 +69,6 @@ void QueryWhere::setElevation(const Range<double> &elevation)
     elevation_ = elevation;
 }
 
-void QueryWhere::setDensity(const Range<double> &density)
-{
-    density_ = density;
-}
-
 void QueryWhere::setDescriptor(const Range<double> &descriptor)
 {
     descriptor_ = descriptor;
