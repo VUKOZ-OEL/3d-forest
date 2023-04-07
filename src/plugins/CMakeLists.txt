@@ -17,6 +17,7 @@
 
 add_subdirectory(algorithm)
 add_subdirectory(classification)
+add_subdirectory(density)
 add_subdirectory(descriptor)
 add_subdirectory(elevation)
 add_subdirectory(heightmap)
