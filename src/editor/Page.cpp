@@ -228,9 +228,9 @@ void Page::toPoint(uint8_t *ptr, size_t i, uint8_t fmt)
     htol32(ptr + pos + 4, static_cast<uint32_t>(elevation[i]));
 
     // Custom color
-    ptr[pos + 8] = static_cast<uint16_t>(customColor[3 * i + 0] * s16);
-    ptr[pos + 10] = static_cast<uint16_t>(customColor[3 * i + 1] * s16);
-    ptr[pos + 12] = static_cast<uint16_t>(customColor[3 * i + 2] * s16);
+    htol16(ptr + pos + 8, static_cast<uint16_t>(customColor[3 * i + 0] * s16));
+    htol16(ptr + pos + 10, static_cast<uint16_t>(customColor[3 * i + 1] * s16));
+    htol16(ptr + pos + 12, static_cast<uint16_t>(customColor[3 * i + 2] * s16));
 
     // Descriptor
     htold(ptr + pos + 16, descriptor[i]);
