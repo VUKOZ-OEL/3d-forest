@@ -17,19 +17,22 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file DescriptorPlugin.cpp */
+/** @file DescriptorAlgorithmTaskCount.hpp */
 
-#include <DescriptorPlugin.hpp>
-#include <MainWindow.hpp>
+#ifndef DESCRIPTOR_ALGORITHM_TASK_COUNT_HPP
+#define DESCRIPTOR_ALGORITHM_TASK_COUNT_HPP
 
-DescriptorPlugin::DescriptorPlugin()
-    : mainWindow_(nullptr),
-      pluginWindow_(nullptr)
+#include <DescriptorAlgorithmTaskInterface.hpp>
+
+/** Descriptor Algorithm Task Count. */
+class DescriptorAlgorithmTaskCount : public DescriptorAlgorithmTaskInterface
 {
-}
+public:
+    virtual void initialize(DescriptorAlgorithmContext *context);
+    virtual void next();
 
-void DescriptorPlugin::initialize(MainWindow *mainWindow)
-{
-    mainWindow_ = mainWindow;
-    pluginWindow_ = new DescriptorPluginWindow(mainWindow_);
-}
+private:
+    DescriptorAlgorithmContext *context_;
+};
+
+#endif /* DESCRIPTOR_ALGORITHM_TASK_COUNT_HPP */

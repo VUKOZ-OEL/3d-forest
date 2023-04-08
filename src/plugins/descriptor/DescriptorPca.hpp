@@ -58,13 +58,6 @@ public:
                            double &meanZ,
                            double &descriptor);
 
-    bool computeDistribution(Query &query,
-                             double x,
-                             double y,
-                             double z,
-                             double radius,
-                             double &descriptor);
-
 private:
     Eigen::MatrixXd xyz;
     Eigen::Matrix3d product;

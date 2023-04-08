@@ -17,19 +17,33 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file DescriptorPlugin.cpp */
+/** @file DescriptorAlgorithmContext.hpp */
 
-#include <DescriptorPlugin.hpp>
-#include <MainWindow.hpp>
+#ifndef DESCRIPTOR_ALGORITHM_CONTEXT_HPP
+#define DESCRIPTOR_ALGORITHM_CONTEXT_HPP
 
-DescriptorPlugin::DescriptorPlugin()
-    : mainWindow_(nullptr),
-      pluginWindow_(nullptr)
+#include <DescriptorAlgorithmParameters.hpp>
+#include <Query.hpp>
+class Editor;
+
+/** Descriptor Algorithm Context. */
+class DescriptorAlgorithmContext
 {
-}
+public:
+    Editor *editor;
 
-void DescriptorPlugin::initialize(MainWindow *mainWindow)
-{
-    mainWindow_ = mainWindow;
-    pluginWindow_ = new DescriptorPluginWindow(mainWindow_);
-}
+    Query query;
+    Query queryPoint;
+
+    DescriptorAlgorithmParameters parameters;
+
+    uint64_t nPoints;
+    double descriptorMinimum;
+    double descriptorMaximum;
+
+    DescriptorAlgorithmContext(Editor *editor);
+
+    void clear();
+};
+
+#endif /* DESCRIPTOR_ALGORITHM_CONTEXT_HPP */

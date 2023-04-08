@@ -17,19 +17,20 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file DescriptorPlugin.cpp */
+/** @file DescriptorPluginExport.hpp */
 
-#include <DescriptorPlugin.hpp>
-#include <MainWindow.hpp>
+#ifndef DESCRIPTOR_PLUGIN_EXPORT_HPP
+#define DESCRIPTOR_PLUGIN_EXPORT_HPP
 
-DescriptorPlugin::DescriptorPlugin()
-    : mainWindow_(nullptr),
-      pluginWindow_(nullptr)
-{
-}
+#if defined(_MSC_VER)
+    #if defined(EXPORT_3DForestDescriptorPlugin)
+        #define DESCRIPTOR_PLUGIN_EXPORT __declspec(dllexport)
+    #else
+        #define DESCRIPTOR_PLUGIN_EXPORT __declspec(dllimport)
+        #define DESCRIPTOR_PLUGIN_EXPORT_IMPORT
+    #endif
+#else
+    #define DESCRIPTOR_PLUGIN_EXPORT
+#endif
 
-void DescriptorPlugin::initialize(MainWindow *mainWindow)
-{
-    mainWindow_ = mainWindow;
-    pluginWindow_ = new DescriptorPluginWindow(mainWindow_);
-}
+#endif /* DESCRIPTOR_PLUGIN_EXPORT_HPP */

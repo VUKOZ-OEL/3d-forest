@@ -17,19 +17,11 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file DescriptorPlugin.cpp */
+/** @file DescriptorPluginConstants.hpp */
 
-#include <DescriptorPlugin.hpp>
-#include <MainWindow.hpp>
+#ifndef DESCRIPTOR_PLUGIN_CONSTANTS_HPP
+#define DESCRIPTOR_PLUGIN_CONSTANTS_HPP
 
-DescriptorPlugin::DescriptorPlugin()
-    : mainWindow_(nullptr),
-      pluginWindow_(nullptr)
-{
-}
+#define DESCRIPTOR_PLUGIN_NAME "Descriptor"
 
-void DescriptorPlugin::initialize(MainWindow *mainWindow)
-{
-    mainWindow_ = mainWindow;
-    pluginWindow_ = new DescriptorPluginWindow(mainWindow_);
-}
+#endif /* DESCRIPTOR_PLUGIN_CONSTANTS_HPP */
