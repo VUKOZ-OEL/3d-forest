@@ -31,5 +31,5 @@ SegmentationL1Plugin::SegmentationL1Plugin()
 void SegmentationL1Plugin::initialize(MainWindow *mainWindow)
 {
     mainWindow_ = mainWindow;
-    pluginWindow_ = new SegmentationL1Window(mainWindow_);
+    pluginWindow_ = new SegmentationL1PluginWindow(mainWindow_);
 }

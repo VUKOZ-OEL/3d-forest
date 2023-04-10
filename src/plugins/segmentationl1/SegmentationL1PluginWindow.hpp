@@ -17,10 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationL1Window.hpp */
+/** @file SegmentationL1PluginWindow.hpp */
 
-#ifndef SEGMENTATION_L1_WINDOW_HPP
-#define SEGMENTATION_L1_WINDOW_HPP
+#ifndef SEGMENTATION_L1_PLUGIN_WINDOW_HPP
+#define SEGMENTATION_L1_PLUGIN_WINDOW_HPP
 
 #include <AlgorithmWidgetInterface.hpp>
 #include <SegmentationL1.hpp>
@@ -29,14 +29,14 @@ class MainWindow;
 class SliderWidget;
 class RangeSliderWidget;
 
-/** Segmentation L1 Window. */
-class SegmentationL1Window : public AlgorithmWidgetInterface
+/** Segmentation L1 Plugin Window. */
+class SegmentationL1PluginWindow : public AlgorithmWidgetInterface
 {
     Q_OBJECT
 
 public:
-    SegmentationL1Window(MainWindow *mainWindow);
-    virtual ~SegmentationL1Window();
+    SegmentationL1PluginWindow(MainWindow *mainWindow);
+    virtual ~SegmentationL1PluginWindow();
 
     /** @name Algorithm interface. */
     /**@{*/
@@ -62,4 +62,4 @@ private:
     SegmentationL1Parameters parameters_;
 };
 
-#endif /* SEGMENTATION_L1_WINDOW_HPP */
+#endif /* SEGMENTATION_L1_PLUGIN_WINDOW_HPP */

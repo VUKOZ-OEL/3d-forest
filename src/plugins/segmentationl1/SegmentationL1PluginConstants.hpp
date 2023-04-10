@@ -17,11 +17,11 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationL1Constants.hpp */
+/** @file SegmentationL1PluginConstants.hpp */
 
-#ifndef SEGMENTATION_L1_CONSTANTS_HPP
-#define SEGMENTATION_L1_CONSTANTS_HPP
+#ifndef SEGMENTATION_L1_PLUGIN_CONSTANTS_HPP
+#define SEGMENTATION_L1_PLUGIN_CONSTANTS_HPP
 
-#define SEGMENTATION_L1_NAME "Segmentation L1"
+#define SEGMENTATION_L1_PLUGIN_NAME "Segmentation L1"
 
-#endif /* SEGMENTATION_L1_CONSTANTS_HPP */
+#endif /* SEGMENTATION_L1_PLUGIN_CONSTANTS_HPP */

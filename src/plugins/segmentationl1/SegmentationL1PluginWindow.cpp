@@ -17,26 +17,26 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationL1Window.cpp */
+/** @file SegmentationL1PluginWindow.cpp */
 
 #include <MainWindow.hpp>
 #include <RangeSliderWidget.hpp>
-#include <SegmentationL1Constants.hpp>
-#include <SegmentationL1Window.hpp>
+#include <SegmentationL1PluginConstants.hpp>
+#include <SegmentationL1PluginWindow.hpp>
 #include <SliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
 #include <QVBoxLayout>
 
-#define LOG_MODULE_NAME "SegmentationL1Window"
+#define LOG_MODULE_NAME "SegmentationL1PluginWindow"
 #include <Log.hpp>
 
 #define ICON(name) (ThemeIcon(":/segmentationl1/", name))
 
-SegmentationL1Window::SegmentationL1Window(MainWindow *mainWindow)
+SegmentationL1PluginWindow::SegmentationL1PluginWindow(MainWindow *mainWindow)
     : AlgorithmWidgetInterface(mainWindow,
                                ICON("forest"),
-                               tr(SEGMENTATION_L1_NAME)),
+                               tr(SEGMENTATION_L1_PLUGIN_NAME)),
       mainWindow_(mainWindow),
       voxelSizeInput_(nullptr),
       sampleDescriptorInput_(nullptr),
@@ -129,12 +129,12 @@ SegmentationL1Window::SegmentationL1Window(MainWindow *mainWindow)
     setLayout(mainLayout_);
 }
 
-SegmentationL1Window::~SegmentationL1Window()
+SegmentationL1PluginWindow::~SegmentationL1PluginWindow()
 {
     LOG_DEBUG(<< "Destroy.");
 }
 
-bool SegmentationL1Window::applyParameters()
+bool SegmentationL1PluginWindow::applyParameters()
 {
     parameters_.set(voxelSizeInput_->value(),
                     numberOfSamplesInput_->value(),
@@ -149,26 +149,26 @@ bool SegmentationL1Window::applyParameters()
     return segmentationL1_.applyParameters(parameters_);
 }
 
-bool SegmentationL1Window::next()
+bool SegmentationL1PluginWindow::next()
 {
     LOG_DEBUG(<< "Compute the next step.");
     return segmentationL1_.next();
 }
 
-void SegmentationL1Window::progress(size_t &nTasks,
-                                    size_t &iTask,
-                                    double &percent) const
+void SegmentationL1PluginWindow::progress(size_t &nTasks,
+                                          size_t &iTask,
+                                          double &percent) const
 {
     segmentationL1_.progress(nTasks, iTask, percent);
 }
 
-void SegmentationL1Window::updateData()
+void SegmentationL1PluginWindow::updateData()
 {
     LOG_DEBUG(<< "Update data.");
     mainWindow_->update({Editor::TYPE_LAYER});
 }
 
-void SegmentationL1Window::slotParametersChanged()
+void SegmentationL1PluginWindow::slotParametersChanged()
 {
     LOG_DEBUG(<< "New value for some input parameter.");
     emit signalParametersChanged();
