@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
     try
     {
         (void)qRegisterMetaType<size_t>("size_t");
+        (void)qRegisterMetaType<LogMessage>("LogMessage");
 
         QApplication app(argc, argv);
 
