@@ -65,7 +65,7 @@ private:
 
     AlgorithmTabWidget *menu_;
 
-    QCheckBox *autoRunCheckBox_;
+    QCheckBox *autoStartCheckBox_;
     QPushButton *acceptButton_;
     QPushButton *rejectButton_;
 

@@ -74,7 +74,7 @@ static void segmentation(const std::string &path,
 
     LOG_PRINT(<< "Compute segmentation");
     SegmentationL1 segmentationL1(&editor);
-    segmentationL1.applyParameters(parameters);
+    segmentationL1.applyParameters(parameters, false);
     while (segmentationL1.next())
         ;
 

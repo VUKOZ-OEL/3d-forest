@@ -135,7 +135,7 @@ SegmentationL1PluginWindow::~SegmentationL1PluginWindow()
     LOG_DEBUG(<< "Destroy.");
 }
 
-bool SegmentationL1PluginWindow::applyParameters()
+bool SegmentationL1PluginWindow::applyParameters(bool autoStart)
 {
     parameters_.set(sampleDescriptorInput_->minimumValue(),
                     sampleDescriptorInput_->maximumValue(),
@@ -147,7 +147,7 @@ bool SegmentationL1PluginWindow::applyParameters()
 
     LOG_DEBUG(<< "Apply parameters <" << parameters_ << ">.");
 
-    return segmentationL1_.applyParameters(parameters_);
+    return segmentationL1_.applyParameters(parameters_, autoStart);
 }
 
 bool SegmentationL1PluginWindow::next()

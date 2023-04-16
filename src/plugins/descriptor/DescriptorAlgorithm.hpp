@@ -38,7 +38,8 @@ public:
     ~DescriptorAlgorithm();
 
     void clear();
-    bool applyParameters(const DescriptorAlgorithmParameters &parameters);
+    bool applyParameters(const DescriptorAlgorithmParameters &parameters,
+                         bool autoStart);
     bool next();
     void progress(size_t &nTasks, size_t &iTask, double &percent) const;
 

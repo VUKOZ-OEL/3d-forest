@@ -99,7 +99,7 @@ DescriptorPluginWindow::~DescriptorPluginWindow()
     LOG_DEBUG(<< "Destroy.");
 }
 
-bool DescriptorPluginWindow::applyParameters()
+bool DescriptorPluginWindow::applyParameters(bool autoStart)
 {
     DescriptorAlgorithmParameters::Method method;
     if (methodPcaRadioButton_->isChecked())
@@ -115,7 +115,7 @@ bool DescriptorPluginWindow::applyParameters()
 
     LOG_DEBUG(<< "Apply parameters <" << parameters_ << ">.");
 
-    return densityAlgorithm_.applyParameters(parameters_);
+    return densityAlgorithm_.applyParameters(parameters_, autoStart);
 }
 
 bool DescriptorPluginWindow::next()

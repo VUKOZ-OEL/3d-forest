@@ -35,7 +35,7 @@ public:
     virtual ~AlgorithmThread();
 
     void clear();
-    void restart(AlgorithmWidgetInterface *algorithm);
+    void restart(AlgorithmWidgetInterface *algorithm, bool autoStart);
     virtual bool next();
     void progress(size_t &nTasks, size_t &iTask, double &percent) const;
     void updateData();

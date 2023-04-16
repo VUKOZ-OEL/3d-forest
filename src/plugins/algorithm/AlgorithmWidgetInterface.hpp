@@ -41,7 +41,7 @@ public:
     const QIcon &icon() { return icon_; }
     const QString &text() { return text_; }
 
-    virtual bool applyParameters() = 0;
+    virtual bool applyParameters(bool autoStart) = 0;
     virtual bool next() = 0;
     virtual void progress(size_t &nTasks,
                           size_t &iTask,

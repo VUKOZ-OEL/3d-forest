@@ -52,7 +52,8 @@ void SegmentationL1::clear()
     currentAction_ = SegmentationL1::npos;
 }
 
-bool SegmentationL1::applyParameters(const SegmentationL1Parameters &parameters)
+bool SegmentationL1::applyParameters(const SegmentationL1Parameters &parameters,
+                                     bool autoStart)
 {
     LOG_DEBUG(<< "Apply parameters <" << parameters << ">.");
 
@@ -88,6 +89,11 @@ bool SegmentationL1::applyParameters(const SegmentationL1Parameters &parameters)
         (context_.parameters.sampleDescriptorMaximum !=
          parameters.sampleDescriptorMaximum) ||
         (context_.nPoints == 0))
+    {
+        newAction = 0;
+    }
+
+    if (!autoStart)
     {
         newAction = 0;
     }

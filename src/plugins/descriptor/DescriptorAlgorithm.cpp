@@ -51,7 +51,8 @@ void DescriptorAlgorithm::clear()
 }
 
 bool DescriptorAlgorithm::applyParameters(
-    const DescriptorAlgorithmParameters &parameters)
+    const DescriptorAlgorithmParameters &parameters,
+    bool autoStart)
 {
     LOG_DEBUG(<< "Apply parameters <" << parameters << ">.");
 
@@ -60,6 +61,11 @@ bool DescriptorAlgorithm::applyParameters(
     if ((context_.parameters.method != parameters.method) ||
         (context_.parameters.neighborhoodRadius !=
          parameters.neighborhoodRadius))
+    {
+        newAction = 0;
+    }
+
+    if (!autoStart)
     {
         newAction = 0;
     }

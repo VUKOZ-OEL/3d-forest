@@ -40,7 +40,8 @@ public:
     ~SegmentationL1();
 
     void clear();
-    bool applyParameters(const SegmentationL1Parameters &parameters);
+    bool applyParameters(const SegmentationL1Parameters &parameters,
+                         bool autoStart);
     bool next();
     void progress(size_t &nTasks, size_t &iTask, double &percent) const;
 
