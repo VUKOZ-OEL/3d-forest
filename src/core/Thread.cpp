@@ -23,6 +23,7 @@
 #include <ThreadCallbackInterface.hpp>
 
 #define LOG_MODULE_NAME "Thread"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 Thread::Thread()
@@ -69,6 +70,17 @@ void Thread::cancel()
     }
 }
 
+bool Thread::isRunning()
+{
+    State state;
+    {
+        std::unique_lock<std::mutex> mutexlock(mutex_);
+        state = state_;
+    }
+    LOG_DEBUG(<< "Current state <" << state << ">.");
+    return state == STATE_RUN;
+}
+
 void Thread::stop()
 {
     LOG_DEBUG(<< "Called.");
@@ -92,6 +104,7 @@ void Thread::setState(State state)
     LOG_DEBUG(<< "Called with parameter state <" << state << ">.");
     std::unique_lock<std::mutex> mutexlock(mutex_);
     state_ = state;
+    LOG_DEBUG(<< "State <" << state << "> is set.");
     finished_ = false;
     condition_.notify_one();
 }

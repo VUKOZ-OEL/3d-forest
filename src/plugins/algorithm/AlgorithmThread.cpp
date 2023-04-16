@@ -26,6 +26,7 @@
 #include <Time.hpp>
 
 #define LOG_MODULE_NAME "AlgorithmThread"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 AlgorithmThread::AlgorithmThread() : algorithm_(nullptr)
@@ -73,7 +74,7 @@ bool AlgorithmThread::next()
         finished = true;
     }
 
-    if (callback_)
+    if (callback_ && isRunning())
     {
         LOG_DEBUG(<< "Call callback with argument finished <" << finished
                   << ">.");

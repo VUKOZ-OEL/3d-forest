@@ -45,6 +45,8 @@ public:
     void stop();
     void wait();
 
+    bool isRunning();
+
     virtual bool next() = 0;
 
 protected:
