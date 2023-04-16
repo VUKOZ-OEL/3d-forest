@@ -26,6 +26,7 @@
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
+#include <QCheckBox>
 #include <QCloseEvent>
 #include <QCoreApplication>
 #include <QDir>
@@ -47,6 +48,7 @@ AlgorithmWindow::AlgorithmWindow(MainWindow *mainWindow)
     : QDialog(mainWindow),
       mainWindow_(mainWindow),
       menu_(nullptr),
+      autoRunCheckBox_(nullptr),
       acceptButton_(nullptr),
       rejectButton_(nullptr),
       progressBarTask_(nullptr),
@@ -81,13 +83,20 @@ AlgorithmWindow::AlgorithmWindow(MainWindow *mainWindow)
     progressBarLayout->setContentsMargins(0, 0, 0, 0);
 
     // Add apply and cancel buttons.
-    acceptButton_ = new QPushButton(tr("Apply"));
+    autoRunCheckBox_ = new QCheckBox(tr("Auto Run"));
+    connect(autoRunCheckBox_,
+            SIGNAL(stateChanged(int)),
+            this,
+            SLOT(autoRunChanged(int)));
+
+    acceptButton_ = new QPushButton(tr("Run"));
     connect(acceptButton_, SIGNAL(clicked()), this, SLOT(slotAccept()));
 
-    rejectButton_ = new QPushButton(tr("Cancel"));
+    rejectButton_ = new QPushButton(tr("Stop"));
     connect(rejectButton_, SIGNAL(clicked()), this, SLOT(slotReject()));
 
     QHBoxLayout *dialogButtons = new QHBoxLayout;
+    dialogButtons->addWidget(autoRunCheckBox_);
     dialogButtons->addStretch();
     dialogButtons->addWidget(acceptButton_);
     dialogButtons->addWidget(rejectButton_);
@@ -125,18 +134,37 @@ AlgorithmWindow::~AlgorithmWindow()
     thread_.stop();
 }
 
+void AlgorithmWindow::autoRunChanged(int index)
+{
+    LOG_DEBUG(<< "Auto Run.");
+    (void)index;
+
+    acceptButton_->setDisabled(autoRunCheckBox_->isChecked());
+}
+
 void AlgorithmWindow::slotAccept()
 {
     LOG_DEBUG(<< "Accept.");
-    close();
-    setResult(QDialog::Accepted);
+    // close();
+    // setResult(QDialog::Accepted);
+
+    for (size_t i = 0; i < widgets_.size(); i++)
+    {
+        if (widgets_[i]->isVisible())
+        {
+            resumeThreads(widgets_[i]);
+            break;
+        }
+    }
 }
 
 void AlgorithmWindow::slotReject()
 {
     LOG_DEBUG(<< "Reject.");
-    close();
-    setResult(QDialog::Rejected);
+    // close();
+    // setResult(QDialog::Rejected);
+
+    suspendThreads();
 }
 
 void AlgorithmWindow::showEvent(QShowEvent *event)
@@ -158,6 +186,12 @@ void AlgorithmWindow::closeEvent(QCloseEvent *event)
 void AlgorithmWindow::slotParametersChanged()
 {
     LOG_DEBUG(<< "Plugin widget parameters have been changed.");
+
+    if (!autoRunCheckBox_->isChecked())
+    {
+        return;
+    }
+
     QObject *obj = sender();
 
     for (size_t i = 0; i < widgets_.size(); i++)
