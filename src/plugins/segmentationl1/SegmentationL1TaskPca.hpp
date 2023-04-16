@@ -17,24 +17,24 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationL1TaskVoxelize.hpp */
+/** @file SegmentationL1TaskPca.hpp */
 
-#ifndef SEGMENTATION_L1_TASK_VOXELIZE_HPP
-#define SEGMENTATION_L1_TASK_VOXELIZE_HPP
+#ifndef SEGMENTATION_L1_TASK_PCA_HPP
+#define SEGMENTATION_L1_TASK_PCA_HPP
 
 #include <SegmentationL1TaskInterface.hpp>
 
-/** Segmentation L1 Task Voxelize. */
-class SegmentationL1TaskVoxelize : public SegmentationL1TaskInterface
+/** Segmentation L1 Task PCA. */
+class SegmentationL1TaskPca : public SegmentationL1TaskInterface
 {
 public:
     virtual void initialize(SegmentationL1Context *context);
     virtual void next();
+    void step();
 
 private:
     SegmentationL1Context *context_;
-
-    void step();
+    size_t index_;
 };
 
-#endif /* SEGMENTATION_L1_TASK_VOXELIZE_HPP */
+#endif /* SEGMENTATION_L1_TASK_PCA_HPP */

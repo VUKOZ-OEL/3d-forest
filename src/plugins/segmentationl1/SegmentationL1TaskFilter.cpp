@@ -29,29 +29,24 @@
 void SegmentationL1TaskFilter::initialize(SegmentationL1Context *context)
 {
     context_ = context;
+    context_->nPoints = 0;
+    context_->samples.resize(0);
+    context_->samplesBackup = context_->samples;
 
-    min_ = static_cast<double>(context_->parameters.sampleDescriptorMinimum);
-    min_ *= 0.01;
-    max_ = static_cast<double>(context_->parameters.sampleDescriptorMaximum);
-    max_ *= 0.01;
+    context_->execInitialSamplesQuery();
 
-    context_->voxelFile.open("voxels.bin");
-    context_->voxelFileFilter.create("voxels_filter.bin");
-
-    LOG_DEBUG(<< "Number of voxels <" << context_->voxelFile.nVoxels() << ">.");
-
-    ProgressActionInterface::initialize(context_->voxelFile.nVoxels(), 100U);
+    ProgressActionInterface::initialize(context_->editor->datasets().nPoints(),
+                                        1000U);
 }
 
 void SegmentationL1TaskFilter::next()
 {
-    uint64_t n = process();
     uint64_t i = 0;
 
     startTimer();
-    while (i < n)
+    while (context_->query.next())
     {
-        step();
+        context_->nPoints++;
 
         i++;
         if (timedOut())
@@ -61,22 +56,5 @@ void SegmentationL1TaskFilter::next()
         }
     }
 
-    context_->voxelFile.close();
-    context_->voxelFileFilter.close();
-
     setProcessed(maximum());
-}
-
-void SegmentationL1TaskFilter::step()
-{
-    VoxelFile::Voxel voxel;
-
-    context_->voxelFile.read(voxel);
-
-    if (voxel.descriptor < min_ || voxel.descriptor > max_)
-    {
-        return;
-    }
-
-    context_->voxelFileFilter.write(voxel);
 }

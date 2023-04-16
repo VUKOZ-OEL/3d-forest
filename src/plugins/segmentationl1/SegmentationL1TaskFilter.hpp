@@ -33,11 +33,6 @@ public:
 
 private:
     SegmentationL1Context *context_;
-
-    double min_;
-    double max_;
-
-    void step();
 };
 
 #endif /* SEGMENTATION_L1_TASK_FILTER_HPP */

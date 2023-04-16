@@ -30,7 +30,6 @@
 void SegmentationL1TaskMedian::initialize(SegmentationL1Context *context)
 {
     context_ = context;
-
     context_->samples = context_->samplesBackup;
     context_->query.setWhere(context_->editor->viewports().where());
 
@@ -42,6 +41,7 @@ void SegmentationL1TaskMedian::initialize(SegmentationL1Context *context)
         numberOfIterations = 1;
     }
     iterations_ = static_cast<size_t>(numberOfIterations);
+
     iteration_ = 0;
     setupSearchRadius();
 
@@ -57,7 +57,6 @@ void SegmentationL1TaskMedian::next()
     uint64_t i = 0;
 
     startTimer();
-
     while (i < n)
     {
         step();

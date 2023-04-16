@@ -38,17 +38,19 @@ public:
     Query query;
 
     SegmentationL1Parameters parameters;
+
+    uint64_t nPoints;
     std::vector<SegmentationL1Point> samples;
     std::vector<SegmentationL1Point> samplesBackup;
-    VoxelFile voxelFile;
-    VoxelFile voxelFileFilter;
+
     SegmentationL1Pca pca;
     SegmentationL1Median median;
 
     SegmentationL1Context(Editor *editor);
 
     void clear();
-    void reset();
+
+    void execInitialSamplesQuery();
 };
 
 #endif /* SEGMENTATION_L1_CONTEXT_HPP */

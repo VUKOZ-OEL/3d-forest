@@ -33,8 +33,8 @@ public:
 
 private:
     SegmentationL1Context *context_;
-    uint64_t voxelsStep_;
-    size_t sampleIndex_;
+    uint64_t interval_;
+    size_t index_;
 
     void step();
     void setNumberOfSamples();

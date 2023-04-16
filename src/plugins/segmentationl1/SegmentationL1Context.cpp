@@ -36,13 +36,23 @@ void SegmentationL1Context::clear()
 {
     query.clear();
     parameters.clear();
-    median.clear();
-
-    reset();
-}
-
-void SegmentationL1Context::reset()
-{
+    nPoints = 0;
     samples.clear();
     samplesBackup.clear();
+    median.clear();
+}
+
+void SegmentationL1Context::execInitialSamplesQuery()
+{
+    // Create descriptor filter for initial samples.
+    double min = static_cast<double>(parameters.sampleDescriptorMinimum);
+    double max = static_cast<double>(parameters.sampleDescriptorMaximum);
+
+    Range<double> descriptor;
+    descriptor.set(0.0, 1.0, min * 0.01, max * 0.01);
+
+    // Setup the query.
+    query.setWhere(editor->viewports().where());
+    query.where().setDescriptor(descriptor);
+    query.exec();
 }
