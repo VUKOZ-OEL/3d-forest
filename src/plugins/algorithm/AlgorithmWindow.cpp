@@ -188,6 +188,11 @@ void AlgorithmWindow::slotParametersChanged()
 {
     LOG_DEBUG(<< "Plugin widget parameters have been changed.");
 
+    if (!autoStartCheckBox_->isChecked())
+    {
+        return;
+    }
+
     QObject *obj = sender();
 
     for (size_t i = 0; i < widgets_.size(); i++)
