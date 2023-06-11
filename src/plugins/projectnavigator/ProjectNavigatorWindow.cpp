@@ -90,7 +90,7 @@ ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
 
     // Dock
     setWidget(menu_);
-    setWindowTitle(tr("Data Browser"));
+    setWindowTitle(tr("Project Explorer"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     mainWindow_->addDockWidget(Qt::RightDockWidgetArea, this);
 }
