@@ -329,7 +329,9 @@ template <class T> inline Vector3<T> Box<T>::getCenter() const
 
 template <class T> inline T Box<T>::distance(T x, T y, T z) const
 {
-    T u, v, w;
+    T u = 0;
+    T v = 0;
+    T w = 0;
     T ret;
 
     getCenter(u, v, w);
