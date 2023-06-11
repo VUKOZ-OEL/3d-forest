@@ -60,7 +60,8 @@ private:
     {
     public:
         std::string text;
-        int count;
+        int count = 0;
+        Value() : count(0) {}
     };
 
     std::map<std::string, Value> args_;
