@@ -25,6 +25,9 @@
 #include <Box.hpp>
 #include <Math.hpp>
 
+#include <ExportCore.hpp>
+#include <WarningsDisable.hpp>
+
 /** Cone. */
 template <class T> class Cone
 {
@@ -114,5 +117,7 @@ template <class T> inline bool Cone<T>::isInside(T x, T y, T z) const
 
     return false;
 }
+
+#include <WarningsEnable.hpp>
 
 #endif /* CONE_HPP */

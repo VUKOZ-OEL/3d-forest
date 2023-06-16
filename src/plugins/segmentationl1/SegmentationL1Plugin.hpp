@@ -23,12 +23,12 @@
 #define SEGMENTATION_L1_PLUGIN_HPP
 
 #include <AlgorithmPluginInterface.hpp>
-#include <ExportSegmentationL1.hpp>
-#include <SegmentationL1Constants.hpp>
-#include <SegmentationL1Window.hpp>
+#include <SegmentationL1PluginConstants.hpp>
+#include <SegmentationL1PluginExport.hpp>
+#include <SegmentationL1PluginWindow.hpp>
 
 /** Segmentation L1 Plugin. */
-class EXPORT_SEGMENTATION_L1_PLUGIN SegmentationL1Plugin
+class SEGMENTATION_L1_PLUGIN_EXPORT SegmentationL1Plugin
     : public QObject,
       public AlgorithmPluginInterface
 {
@@ -41,11 +41,11 @@ public:
 
     virtual void initialize(MainWindow *mainWindow);
     virtual AlgorithmWidgetInterface *widget() { return pluginWindow_; }
-    virtual QString name() const { return SEGMENTATION_L1_NAME; }
+    virtual QString name() const { return SEGMENTATION_L1_PLUGIN_NAME; }
 
 private:
     MainWindow *mainWindow_;
-    SegmentationL1Window *pluginWindow_;
+    SegmentationL1PluginWindow *pluginWindow_;
 };
 
 #endif /* SEGMENTATION_L1_PLUGIN_HPP */

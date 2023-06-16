@@ -29,6 +29,7 @@
 #include <Endian.hpp>
 #include <Error.hpp>
 #include <LasFile.hpp>
+#include <Util.hpp>
 
 #define LOG_MODULE_NAME "LasFile"
 #include <Log.hpp>
@@ -111,7 +112,7 @@ void LasFile::Header::set(uint64_t numberOfPoints,
 
     number_of_point_records = numberOfPoints;
 
-    uint32_t maxPoints = std::numeric_limits<uint32_t>::max();
+    constexpr uint32_t maxPoints = std::numeric_limits<uint32_t>::max();
     if (numberOfPoints > maxPoints)
     {
         legacy_number_of_point_records = maxPoints;
@@ -231,8 +232,8 @@ std::string LasFile::Header::dateCreated() const
 void LasFile::Header::setGeneratingSoftware()
 {
     std::memset(generating_software, 0, sizeof(generating_software));
-    std::strcpy(static_cast<char *>(generating_software),
-                LAS_FILE_GENERATING_SOFTWARE);
+    ustrcpy(static_cast<char *>(generating_software),
+            LAS_FILE_GENERATING_SOFTWARE);
 }
 
 void LasFile::Header::addOffsetPointData(uint64_t increment)
@@ -542,7 +543,7 @@ void LasFile::writeHeader(const Header &hdr)
     LOG_DEBUG(<< "Called.");
 
     uint8_t buffer[512];
-    uint32_t header_size;
+    size_t header_size;
 
     // Signature
     std::memcpy(buffer, hdr.file_signature, 4);

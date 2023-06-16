@@ -27,8 +27,10 @@
 #include <vector>
 
 #include <Classification.hpp>
-#include <ExportEditor.hpp>
 #include <Vector3.hpp>
+
+#include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
 
 /** Classification List. */
 class EXPORT_EDITOR Classifications
@@ -52,5 +54,7 @@ protected:
 
     void resize(size_t n);
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* CLASSIFICATIONS_HPP */

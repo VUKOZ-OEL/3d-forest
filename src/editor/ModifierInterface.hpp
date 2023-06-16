@@ -22,9 +22,10 @@
 #ifndef MODIFIER_INTERFACE_HPP
 #define MODIFIER_INTERFACE_HPP
 
-#include <ExportEditor.hpp>
-
 class Page;
+
+#include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
 
 /** Modifier Interface. */
 class EXPORT_EDITOR ModifierInterface
@@ -34,5 +35,7 @@ public:
     virtual bool isModifierEnabled() = 0;
     virtual void applyModifier(Page *page) = 0;
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* MODIFIER_INTERFACE_HPP */

@@ -17,11 +17,22 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationL1Constants.hpp */
+/** @file DescriptorAlgorithmTaskCount.hpp */
 
-#ifndef SEGMENTATION_L1_CONSTANTS_HPP
-#define SEGMENTATION_L1_CONSTANTS_HPP
+#ifndef DESCRIPTOR_ALGORITHM_TASK_COUNT_HPP
+#define DESCRIPTOR_ALGORITHM_TASK_COUNT_HPP
 
-#define SEGMENTATION_L1_NAME "Segmentation L1"
+#include <DescriptorAlgorithmTaskInterface.hpp>
 
-#endif /* SEGMENTATION_L1_CONSTANTS_HPP */
+/** Descriptor Algorithm Task Count. */
+class DescriptorAlgorithmTaskCount : public DescriptorAlgorithmTaskInterface
+{
+public:
+    virtual void initialize(DescriptorAlgorithmContext *context);
+    virtual void next();
+
+private:
+    DescriptorAlgorithmContext *context_;
+};
+
+#endif /* DESCRIPTOR_ALGORITHM_TASK_COUNT_HPP */

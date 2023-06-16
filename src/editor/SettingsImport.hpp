@@ -22,8 +22,10 @@
 #ifndef SETTINGS_IMPORT_HPP
 #define SETTINGS_IMPORT_HPP
 
-#include <ExportEditor.hpp>
 #include <IndexFileBuilder.hpp>
+
+#include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
 
 /** Settings Import. */
 class EXPORT_EDITOR SettingsImport
@@ -43,5 +45,7 @@ protected:
     bool centerEnabled_;
     IndexFileBuilder::Settings indexSettings_;
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* SETTINGS_IMPORT_HPP */

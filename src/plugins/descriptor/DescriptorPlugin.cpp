@@ -20,14 +20,7 @@
 /** @file DescriptorPlugin.cpp */
 
 #include <DescriptorPlugin.hpp>
-#include <DescriptorWindow.hpp>
 #include <MainWindow.hpp>
-#include <ThemeIcon.hpp>
-
-#define LOG_MODULE_NAME "DescriptorPlugin"
-#include <Log.hpp>
-
-#define ICON(name) (ThemeIcon(":/descriptor/", name))
 
 DescriptorPlugin::DescriptorPlugin()
     : mainWindow_(nullptr),
@@ -38,26 +31,5 @@ DescriptorPlugin::DescriptorPlugin()
 void DescriptorPlugin::initialize(MainWindow *mainWindow)
 {
     mainWindow_ = mainWindow;
-
-    mainWindow_->createAction(nullptr,
-                              "Utilities",
-                              "Utilities",
-                              tr("Descriptor"),
-                              tr("Compute descriptor of each point"),
-                              ICON("descriptor"),
-                              this,
-                              SLOT(slotPlugin()));
-}
-
-void DescriptorPlugin::slotPlugin()
-{
-    // Create GUI only when this plugin is used for the first time
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new DescriptorWindow(mainWindow_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    pluginWindow_ = new DescriptorPluginWindow(mainWindow_);
 }

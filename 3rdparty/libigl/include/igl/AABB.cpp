@@ -392,7 +392,7 @@ igl::AABB<DerivedV,DIM>::squared_distance(
     bool looked_right = false;
     const auto & look_left = [&]()
     {
-      int i_left;
+      int i_left = 0;
       RowVectorDIMS c_left = c;
       Scalar sqr_d_left =
         m_left->squared_distance(V,Ele,p,low_sqr_d,sqr_d,i_left,c_left);
@@ -401,7 +401,7 @@ igl::AABB<DerivedV,DIM>::squared_distance(
     };
     const auto & look_right = [&]()
     {
-      int i_right;
+      int i_right = 0;
       RowVectorDIMS c_right = c;
       Scalar sqr_d_right =
         m_right->squared_distance(V,Ele,p,low_sqr_d,sqr_d,i_right,c_right);
@@ -487,7 +487,7 @@ IGL_INLINE void igl::AABB<DerivedV,DIM>::squared_distance(
   igl::parallel_for(P.rows(),[&](int p)
     {
       RowVectorDIMS Pp = P.row(p), c;
-      int Ip;
+      int Ip = 0;
       sqrD(p) = squared_distance(V,Ele,Pp,Ip,c);
       I(p) = Ip;
       C.row(p).head(DIM) = c;
@@ -782,7 +782,7 @@ IGL_INLINE void igl::AABB<DerivedV,DIM>::leaf_squared_distance(
     return;
   }
   RowVectorDIMS c_candidate;
-  Scalar sqr_d_candidate;
+  Scalar sqr_d_candidate = 0;
   igl::point_simplex_squared_distance<DIM>(
     p,V,Ele,m_primitive,sqr_d_candidate,c_candidate);
   set_min(p,sqr_d_candidate,m_primitive,c_candidate,sqr_d,i,c);
@@ -846,7 +846,7 @@ igl::AABB<DerivedV,DIM>::intersect_ray(
   const Scalar t0 = 0;
   const Scalar t1 = std::numeric_limits<Scalar>::infinity();
   {
-    Scalar _1,_2;
+    Scalar _1 = 0,_2 = 0;
     if(!ray_box_intersect(origin,dir,m_box,t0,t1,_1,_2))
     {
       return false;
@@ -958,7 +958,7 @@ igl::AABB<DerivedV,DIM>::intersect_ray(
   Scalar min_t = _min_t;
   const Scalar t0 = 0;
   {
-    Scalar _1,_2;
+    Scalar _1 = 0,_2 = 0;
     if(!ray_box_intersect(origin,dir,m_box,t0,min_t,_1,_2))
     {
       return false;
@@ -976,8 +976,8 @@ igl::AABB<DerivedV,DIM>::intersect_ray(
 
   // Doesn't seem like smartly choosing left before/after right makes a
   // differnce
-  igl::Hit left_hit;
-  igl::Hit right_hit;
+  igl::Hit left_hit{};
+  igl::Hit right_hit{};
   bool left_ret = m_left->intersect_ray(V,Ele,origin,dir,min_t,left_hit);
   if(left_ret && left_hit.t<min_t)
   {

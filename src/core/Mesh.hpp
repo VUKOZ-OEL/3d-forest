@@ -25,6 +25,7 @@
 #include <vector>
 
 #include <ExportCore.hpp>
+#include <WarningsDisable.hpp>
 
 /** Mesh. */
 class EXPORT_CORE Mesh
@@ -48,5 +49,7 @@ public:
 
     void clear();
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* MESH_HPP */

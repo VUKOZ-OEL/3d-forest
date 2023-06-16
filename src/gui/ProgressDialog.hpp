@@ -22,12 +22,13 @@
 #ifndef PROGRESS_DIALOG_HPP
 #define PROGRESS_DIALOG_HPP
 
-#include <ExportGui.hpp>
-
 class MainWindow;
 class ProgressActionInterface;
 
 #include <QProgressDialog>
+
+#include <ExportGui.hpp>
+#include <WarningsDisable.hpp>
 
 /** Progress Dialog. */
 class EXPORT_GUI ProgressDialog : public QProgressDialog
@@ -43,5 +44,7 @@ public:
                     const char *title,
                     ProgressActionInterface *progressAction);
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* PROGRESS_DIALOG_HPP */

@@ -11,7 +11,9 @@
 #ifdef IGL_WARNINGS_DISABLED
 #undef IGL_WARNINGS_DISABLED
 
-#if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2))
+#ifdef _MSC_VER
+    #pragma warning( pop )
+#elif (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2))
     #pragma GCC diagnostic pop
 #endif /* __GNUC__ */
 

@@ -22,14 +22,14 @@
 #ifndef RANGE_SLIDER_WIDGET_HPP
 #define RANGE_SLIDER_WIDGET_HPP
 
-#include <ExportGui.hpp>
-
 #include <QWidget>
 
 class ctkRangeSlider;
-
 class QSpinBox;
 class QVBoxLayout;
+
+#include <ExportGui.hpp>
+#include <WarningsDisable.hpp>
 
 /** Range Slider Widget. */
 class EXPORT_GUI RangeSliderWidget : public QWidget
@@ -78,5 +78,7 @@ protected:
     int minimumValue_;
     int maximumValue_;
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* RANGE_SLIDER_WIDGET_HPP */

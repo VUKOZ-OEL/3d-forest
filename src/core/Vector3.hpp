@@ -27,6 +27,9 @@
 
 #include <Json.hpp>
 
+#include <ExportCore.hpp>
+#include <WarningsDisable.hpp>
+
 /** Vector 3D. */
 template <class T> class Vector3 : public std::array<T, 3>
 {
@@ -351,5 +354,7 @@ std::ostream &operator<<(std::ostream &os, const Vector3<T> &obj)
     return os << std::fixed << "(" << obj[0] << ", " << obj[1] << ", " << obj[2]
               << ")" << std::defaultfloat;
 }
+
+#include <WarningsEnable.hpp>
 
 #endif /* VECTOR3_HPP */

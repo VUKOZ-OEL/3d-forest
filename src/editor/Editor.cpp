@@ -142,7 +142,7 @@ void Editor::openProject(const std::string &path)
             elevationRange_.read(in[EDITOR_KEY_ELEVATION_RANGE]);
         }
     }
-    catch (std::exception &e)
+    catch (...)
     {
         close();
         throw;
@@ -189,7 +189,7 @@ void Editor::openDataset(const std::string &path,
         LOG_DEBUG(<< "Called with parameter path <" << path << ">.");
         datasets_.read(path, path_, settings, datasets_.boundary());
     }
-    catch (std::exception &e)
+    catch (...)
     {
         throw;
     }

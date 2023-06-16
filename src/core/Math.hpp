@@ -25,6 +25,9 @@
 #include <cmath>
 #include <limits>
 
+#include <ExportCore.hpp>
+#include <WarningsDisable.hpp>
+
 #define MATH_PI_4 (3.1415926535897932384626433832795 / 4.0)
 
 #define MATH_ATAN_A 0.0776509570923569
@@ -74,5 +77,7 @@ template <class T> inline void normalize(T &value, const T &min, const T &max)
         value = 0;
     }
 }
+
+#include <WarningsEnable.hpp>
 
 #endif /* MATH_HPP */

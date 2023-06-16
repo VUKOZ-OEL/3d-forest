@@ -17,25 +17,14 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationL1TaskNormal.hpp */
+/** @file WarningsDisable.hpp */
 
-#ifndef SEGMENTATION_L1_TASK_NORMAL_HPP
-#define SEGMENTATION_L1_TASK_NORMAL_HPP
+#ifndef WARNINGS_DISABLE_HPP
+#define WARNINGS_DISABLE_HPP
 
-#include <SegmentationL1TaskInterface.hpp>
+#if defined(_MSC_VER)
+    #pragma warning(push)
+    #pragma warning(disable : 4251)
+#endif
 
-/** Segmentation L1 Task Normal. */
-class SegmentationL1TaskNormal : public SegmentationL1TaskInterface
-{
-public:
-    virtual void initialize(SegmentationL1Context *context);
-    virtual void next();
-    void step();
-
-private:
-    SegmentationL1Context *context_;
-    size_t index_;
-    double radius_;
-};
-
-#endif /* SEGMENTATION_L1_TASK_NORMAL_HPP */
+#endif /* WARNINGS_DISABLE_HPP */

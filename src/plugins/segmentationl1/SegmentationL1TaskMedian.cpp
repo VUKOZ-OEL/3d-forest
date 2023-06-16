@@ -30,7 +30,6 @@
 void SegmentationL1TaskMedian::initialize(SegmentationL1Context *context)
 {
     context_ = context;
-
     context_->samples = context_->samplesBackup;
     context_->query.setWhere(context_->editor->viewports().where());
 
@@ -42,6 +41,7 @@ void SegmentationL1TaskMedian::initialize(SegmentationL1Context *context)
         numberOfIterations = 1;
     }
     iterations_ = static_cast<size_t>(numberOfIterations);
+
     iteration_ = 0;
     setupSearchRadius();
 
@@ -57,7 +57,6 @@ void SegmentationL1TaskMedian::next()
     uint64_t i = 0;
 
     startTimer();
-
     while (i < n)
     {
         step();
@@ -65,11 +64,14 @@ void SegmentationL1TaskMedian::next()
         i++;
         if (timedOut())
         {
-            break;
+            increment(i);
+            return;
         }
     }
 
-    increment(i);
+    // context_->query.flush();
+
+    setProcessed(maximum());
 }
 
 void SegmentationL1TaskMedian::step()
@@ -93,12 +95,14 @@ void SegmentationL1TaskMedian::step()
     Vector3<double> d(point.vx, point.vy, point.vz);
 
     double r = radius_;
-    double h = radius_ * 0.25;
-    Vector3<double> a = u - (d * h);
-    Vector3<double> b = u + (d * h);
+    // double h = radius_ * 0.25;
+    // Vector3<double> a = u - (d * h);
+    // Vector3<double> b = u + (d * h);
 
     // Select slice boundary.
-    context_->query.where().setCylinder(a[0], a[1], a[2], b[0], b[1], b[2], r);
+    // context_->query.where().setCylinder(a[0], a[1], a[2], b[0], b[1], b[2],
+    // r);
+    context_->query.where().setSphere(point.x, point.y, point.z, r);
     context_->query.exec();
 
     // Compute L1 median.

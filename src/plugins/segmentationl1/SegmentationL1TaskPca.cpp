@@ -17,42 +17,33 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationL1TaskNormal.cpp */
+/** @file SegmentationL1TaskPca.cpp */
 
 #include <Editor.hpp>
-#include <SegmentationL1TaskNormal.hpp>
+#include <SegmentationL1TaskPca.hpp>
 
-#define LOG_MODULE_NAME "SegmentationL1TaskNormal"
+#define LOG_MODULE_NAME "SegmentationL1TaskPca"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-void SegmentationL1TaskNormal::initialize(SegmentationL1Context *context)
+void SegmentationL1TaskPca::initialize(SegmentationL1Context *context)
 {
     context_ = context;
-
-    LOG_DEBUG(<< "Restore backup.");
     context_->samples = context_->samplesBackup;
-
     context_->query.setWhere(context_->editor->viewports().where());
     context_->query.exec();
 
     index_ = 0;
-    radius_ =
-        static_cast<double>(context_->parameters.neighborhoodRadiusMinimum);
 
-    uint64_t n = context_->samples.size();
-    LOG_DEBUG(<< "n <" << n << ">.");
-
-    ProgressActionInterface::initialize(n);
+    ProgressActionInterface::initialize(context_->samples.size());
 }
 
-void SegmentationL1TaskNormal::next()
+void SegmentationL1TaskPca::next()
 {
     uint64_t n = process();
     uint64_t i = 0;
 
     startTimer();
-
     while (i < n)
     {
         step();
@@ -60,22 +51,27 @@ void SegmentationL1TaskNormal::next()
         i++;
         if (timedOut())
         {
-            break;
+            increment(i);
+            return;
         }
     }
 
-    increment(i);
+    context_->samplesBackup = context_->samples;
+
+    setProcessed(maximum());
 }
 
-void SegmentationL1TaskNormal::step()
+void SegmentationL1TaskPca::step()
 {
     SegmentationL1Point &point = context_->samples[index_];
+
+    double r = static_cast<double>(context_->parameters.neighborhoodRadiusPca);
 
     point.hasVectors = context_->pca.normal(context_->query,
                                             point.x,
                                             point.y,
                                             point.z,
-                                            radius_,
+                                            r,
                                             point.nx,
                                             point.ny,
                                             point.nz,
@@ -85,7 +81,6 @@ void SegmentationL1TaskNormal::step()
 
     if (!point.hasVectors)
     {
-        LOG_DEBUG(<< "Point <" << index_ << "> does not have vectors.");
         point.nx = 0;
         point.ny = 0;
         point.nz = 0;
@@ -95,10 +90,4 @@ void SegmentationL1TaskNormal::step()
     }
 
     index_++;
-
-    if (index_ == context_->samples.size())
-    {
-        LOG_DEBUG(<< "Create backup.");
-        context_->samplesBackup = context_->samples;
-    }
 }

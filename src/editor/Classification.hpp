@@ -25,6 +25,7 @@
 #include <string>
 
 #include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
 
 /** Classification. */
 class EXPORT_EDITOR Classification
@@ -32,5 +33,7 @@ class EXPORT_EDITOR Classification
 public:
     std::string label;
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* CLASSIFICATION_HPP */

@@ -47,23 +47,16 @@ public:
     static void EXPORT_GUI install();
 
 public slots:
-    void slotPrintln(const QString &time,
-                     int type,
-                     const QString &text,
-                     const QString &module,
-                     const QString &function);
+    void slotPrintln(const LogMessage &message);
 
 signals:
-    void signalPrintln(const QString &time,
-                       int type,
-                       const QString &text,
-                       const QString &module,
-                       const QString &function);
+    void signalPrintln(const LogMessage &message);
 
 protected:
     MainWindow *mainWindow_;
     QTextEdit *textEdit_;
     File file_;
+    size_t previousThreadId_;
 };
 
 #endif /* LOGGER_WINDOW_HPP */

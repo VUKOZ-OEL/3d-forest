@@ -26,6 +26,7 @@
 #include <string>
 
 #include <ExportCore.hpp>
+#include <WarningsDisable.hpp>
 
 /** File. */
 class EXPORT_CORE File
@@ -94,7 +95,7 @@ public:
 
     static void remove(const std::string &path);
 
-protected:
+private:
     int fd_;
     uint64_t size_;
     uint64_t offset_;
@@ -107,5 +108,7 @@ protected:
     static int read(int fd, uint8_t *buffer, uint64_t nbyte);
     static int write(int fd, const uint8_t *buffer, uint64_t nbyte);
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* FILE_HPP */

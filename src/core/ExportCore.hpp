@@ -25,9 +25,11 @@
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestCore)
         #define EXPORT_CORE __declspec(dllexport)
+        #define EXPORT_CORE_T
     #else
         #define EXPORT_CORE __declspec(dllimport)
         #define EXPORT_CORE_IMPORT
+        #define EXPORT_CORE_T extern
     #endif
 #else
     #define EXPORT_CORE

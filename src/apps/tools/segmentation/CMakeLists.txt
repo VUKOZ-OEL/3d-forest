@@ -22,14 +22,14 @@ add_executable(
     segmentation.cpp
     ../../../plugins/segmentationl1/SegmentationL1.cpp
     ../../../plugins/segmentationl1/SegmentationL1Context.cpp
-    ../../../plugins/segmentationl1/SegmentationL1TaskVoxelize.cpp
+    ../../../plugins/segmentationl1/SegmentationL1Median.cpp
+    ../../../plugins/segmentationl1/SegmentationL1Parameters.cpp
+    ../../../plugins/segmentationl1/SegmentationL1Pca.cpp
     ../../../plugins/segmentationl1/SegmentationL1TaskFilter.cpp
     ../../../plugins/segmentationl1/SegmentationL1TaskSample.cpp
-    ../../../plugins/segmentationl1/SegmentationL1TaskNormal.cpp
+    ../../../plugins/segmentationl1/SegmentationL1TaskPca.cpp
     ../../../plugins/segmentationl1/SegmentationL1TaskMedian.cpp
     ../../../plugins/segmentationl1/SegmentationL1TaskFinish.cpp
-    ../../../plugins/segmentationl1/SegmentationL1Pca.cpp
-    ../../../plugins/segmentationl1/SegmentationL1Median.cpp
 )
 
 target_include_directories(

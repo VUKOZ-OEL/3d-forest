@@ -17,39 +17,23 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file DescriptorWindow.hpp */
+/** @file DescriptorAlgorithmTaskNormalize.hpp */
 
-#ifndef DESCRIPTOR_WINDOW_HPP
-#define DESCRIPTOR_WINDOW_HPP
+#ifndef DESCRIPTOR_ALGORITHM_TASK_NORMALIZE_HPP
+#define DESCRIPTOR_ALGORITHM_TASK_NORMALIZE_HPP
 
-#include <DescriptorAction.hpp>
+#include <DescriptorAlgorithmTaskInterface.hpp>
 
-#include <QDialog>
-
-class MainWindow;
-
-class SliderWidget;
-class QPushButton;
-class QRadioButton;
-
-/** Descriptor Window. */
-class DescriptorWindow : public QDialog
+/** Descriptor Algorithm Task Normalize. */
+class DescriptorAlgorithmTaskNormalize : public DescriptorAlgorithmTaskInterface
 {
-    Q_OBJECT
-
 public:
-    DescriptorWindow(MainWindow *mainWindow);
+    virtual void initialize(DescriptorAlgorithmContext *context);
+    virtual void next();
 
-protected slots:
-    void slotApply();
-
-protected:
-    MainWindow *mainWindow_;
-    DescriptorAction descriptor_;
-    SliderWidget *radius_;
-    SliderWidget *voxelSize_;
-    QRadioButton *methodRadioButton_[2];
-    QPushButton *applyButton_;
+private:
+    DescriptorAlgorithmContext *context_;
+    void step();
 };
 
-#endif /* DESCRIPTOR_WINDOW_HPP */
+#endif /* DESCRIPTOR_ALGORITHM_TASK_NORMALIZE_HPP */

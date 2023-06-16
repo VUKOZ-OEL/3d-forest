@@ -24,8 +24,10 @@
 
 #include <unordered_map>
 
-#include <ExportEditor.hpp>
 #include <Layer.hpp>
+
+#include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
 
 /** Layer List. */
 class EXPORT_EDITOR Layers
@@ -68,5 +70,7 @@ protected:
     std::vector<Layer> layers_;
     std::unordered_map<size_t, size_t> hashTableId_;
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* LAYERS_HPP */

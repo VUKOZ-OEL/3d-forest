@@ -22,13 +22,14 @@
 #ifndef SLIDER_WIDGET_HPP
 #define SLIDER_WIDGET_HPP
 
-#include <ExportGui.hpp>
-
 #include <QWidget>
 
 class QSpinBox;
 class QSlider;
 class QVBoxLayout;
+
+#include <ExportGui.hpp>
+#include <WarningsDisable.hpp>
 
 /** Slider Widget. */
 class EXPORT_GUI SliderWidget : public QWidget
@@ -72,5 +73,7 @@ protected:
     QSlider *slider_;
     QSpinBox *spinBox_;
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* SLIDER_WIDGET_HPP */

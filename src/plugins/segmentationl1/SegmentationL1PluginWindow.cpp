@@ -17,30 +17,31 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationL1Window.cpp */
+/** @file SegmentationL1PluginWindow.cpp */
 
 #include <MainWindow.hpp>
 #include <RangeSliderWidget.hpp>
-#include <SegmentationL1Constants.hpp>
-#include <SegmentationL1Window.hpp>
+#include <SegmentationL1PluginConstants.hpp>
+#include <SegmentationL1PluginWindow.hpp>
 #include <SliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
 #include <QVBoxLayout>
 
-#define LOG_MODULE_NAME "SegmentationL1Window"
+#define LOG_MODULE_NAME "SegmentationL1PluginWindow"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define ICON(name) (ThemeIcon(":/segmentationl1/", name))
 
-SegmentationL1Window::SegmentationL1Window(MainWindow *mainWindow)
+SegmentationL1PluginWindow::SegmentationL1PluginWindow(MainWindow *mainWindow)
     : AlgorithmWidgetInterface(mainWindow,
                                ICON("forest"),
-                               tr(SEGMENTATION_L1_NAME)),
+                               tr(SEGMENTATION_L1_PLUGIN_NAME)),
       mainWindow_(mainWindow),
-      voxelSizeInput_(nullptr),
       sampleDescriptorInput_(nullptr),
       numberOfSamplesInput_(nullptr),
+      neighborhoodRadiusPcaInput_(nullptr),
       neighborhoodRadiusInput_(nullptr),
       numberOfIterationsInput_(nullptr),
       segmentationL1_(&mainWindow->editor()),
@@ -49,18 +50,6 @@ SegmentationL1Window::SegmentationL1Window(MainWindow *mainWindow)
     LOG_DEBUG(<< "Create.");
 
     // Widgets.
-    SliderWidget::create(voxelSizeInput_,
-                         this,
-                         nullptr,
-                         SLOT(slotParametersChanged()),
-                         tr("Voxel Size"),
-                         tr("Voxel Size"),
-                         tr("pt"),
-                         1,
-                         1,
-                         1000,
-                         parameters_.voxelSize);
-
     RangeSliderWidget::create(sampleDescriptorInput_,
                               this,
                               SLOT(slotParametersChanged()),
@@ -81,11 +70,23 @@ SegmentationL1Window::SegmentationL1Window(MainWindow *mainWindow)
                          SLOT(slotParametersChanged()),
                          tr("Number of initial samples"),
                          tr("Number of initial samples"),
-                         tr("%"),
+                         tr("count"),
                          1,
                          1,
-                         100,
+                         1000,
                          parameters_.numberOfSamples);
+
+    SliderWidget::create(neighborhoodRadiusPcaInput_,
+                         this,
+                         nullptr,
+                         SLOT(slotParametersChanged()),
+                         tr("Neighborhood radius for PCA"),
+                         tr("Neighborhood radius for PCA"),
+                         tr("pt"),
+                         1,
+                         1,
+                         10000,
+                         parameters_.neighborhoodRadiusPca);
 
     RangeSliderWidget::create(neighborhoodRadiusInput_,
                               this,
@@ -114,9 +115,9 @@ SegmentationL1Window::SegmentationL1Window(MainWindow *mainWindow)
 
     // Create layout with parameters.
     QVBoxLayout *settingsLayout = new QVBoxLayout;
-    settingsLayout->addWidget(voxelSizeInput_);
     settingsLayout->addWidget(sampleDescriptorInput_);
     settingsLayout->addWidget(numberOfSamplesInput_);
+    settingsLayout->addWidget(neighborhoodRadiusPcaInput_);
     settingsLayout->addWidget(neighborhoodRadiusInput_);
     settingsLayout->addWidget(numberOfIterationsInput_);
 
@@ -129,46 +130,46 @@ SegmentationL1Window::SegmentationL1Window(MainWindow *mainWindow)
     setLayout(mainLayout_);
 }
 
-SegmentationL1Window::~SegmentationL1Window()
+SegmentationL1PluginWindow::~SegmentationL1PluginWindow()
 {
     LOG_DEBUG(<< "Destroy.");
 }
 
-bool SegmentationL1Window::applyParameters()
+bool SegmentationL1PluginWindow::applyParameters(bool autoStart)
 {
-    parameters_.set(voxelSizeInput_->value(),
-                    numberOfSamplesInput_->value(),
-                    sampleDescriptorInput_->minimumValue(),
+    parameters_.set(sampleDescriptorInput_->minimumValue(),
                     sampleDescriptorInput_->maximumValue(),
+                    numberOfSamplesInput_->value(),
+                    neighborhoodRadiusPcaInput_->value(),
                     neighborhoodRadiusInput_->minimumValue(),
                     neighborhoodRadiusInput_->maximumValue(),
                     numberOfIterationsInput_->value());
 
     LOG_DEBUG(<< "Apply parameters <" << parameters_ << ">.");
 
-    return segmentationL1_.applyParameters(parameters_);
+    return segmentationL1_.applyParameters(parameters_, autoStart);
 }
 
-bool SegmentationL1Window::next()
+bool SegmentationL1PluginWindow::next()
 {
     LOG_DEBUG(<< "Compute the next step.");
     return segmentationL1_.next();
 }
 
-void SegmentationL1Window::progress(size_t &nTasks,
-                                    size_t &iTask,
-                                    double &percent) const
+void SegmentationL1PluginWindow::progress(size_t &nTasks,
+                                          size_t &iTask,
+                                          double &percent) const
 {
     segmentationL1_.progress(nTasks, iTask, percent);
 }
 
-void SegmentationL1Window::updateData()
+void SegmentationL1PluginWindow::updateData()
 {
     LOG_DEBUG(<< "Update data.");
     mainWindow_->update({Editor::TYPE_LAYER});
 }
 
-void SegmentationL1Window::slotParametersChanged()
+void SegmentationL1PluginWindow::slotParametersChanged()
 {
     LOG_DEBUG(<< "New value for some input parameter.");
     emit signalParametersChanged();

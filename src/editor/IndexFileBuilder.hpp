@@ -27,9 +27,11 @@
 #include <vector>
 
 #include <ChunkFile.hpp>
-#include <ExportEditor.hpp>
 #include <IndexFile.hpp>
 #include <LasFile.hpp>
+
+#include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
 
 /** Index File Builder. */
 class EXPORT_EDITOR IndexFileBuilder
@@ -164,5 +166,7 @@ protected:
 
     void formatPoint(uint8_t *pout, const uint8_t *pin) const;
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* INDEX_FILE_BUILDER_HPP */

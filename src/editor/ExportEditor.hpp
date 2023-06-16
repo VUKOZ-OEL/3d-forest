@@ -25,9 +25,11 @@
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestEditor)
         #define EXPORT_EDITOR __declspec(dllexport)
+        #define EXPORT_EDITOR_T
     #else
         #define EXPORT_EDITOR __declspec(dllimport)
         #define EXPORT_EDITOR_IMPORT
+        #define EXPORT_EDITOR_T extern
     #endif
 #else
     #define EXPORT_EDITOR

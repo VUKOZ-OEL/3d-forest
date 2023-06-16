@@ -20,12 +20,12 @@
 /** @file exampleThread.cpp @brief Thread example. */
 
 #include <Log.hpp>
-#include <Thread.hpp>
 #include <ThreadCallbackInterface.hpp>
+#include <ThreadLoop.hpp>
 #include <Time.hpp>
 
 /** Custom thread. */
-class MyThread : public Thread
+class MyThread : public ThreadLoop
 {
 public:
     MyThread() : counter_(0) {}

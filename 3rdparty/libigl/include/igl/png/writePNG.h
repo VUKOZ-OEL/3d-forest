@@ -45,4 +45,6 @@ namespace igl
 #  include "writePNG.cpp"
 #endif
 
+#include "../reenable_warnings.h"
+
 #endif

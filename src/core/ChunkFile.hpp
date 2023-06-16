@@ -22,9 +22,11 @@
 #ifndef CHUNK_FILE_HPP
 #define CHUNK_FILE_HPP
 
-#include <ExportCore.hpp>
 #include <File.hpp>
 #include <Json.hpp>
+
+#include <ExportCore.hpp>
+#include <WarningsDisable.hpp>
 
 /** Chunk File.
     Simplified PNG/IFF like binary file format. It contains series of chunks.
@@ -75,10 +77,12 @@ public:
     uint64_t offset() const;
     const std::string &path() const;
 
-protected:
+private:
     File file_;
 
     std::string status() const;
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* CHUNK_FILE_HPP */

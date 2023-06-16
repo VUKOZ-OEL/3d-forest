@@ -26,8 +26,10 @@
 #include <unordered_set>
 
 #include <Dataset.hpp>
-#include <ExportEditor.hpp>
 #include <QueryFilterSet.hpp>
+
+#include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
 
 /** Dataset List. */
 class EXPORT_EDITOR Datasets
@@ -118,5 +120,7 @@ protected:
 };
 
 std::ostream &operator<<(std::ostream &os, const Datasets &obj);
+
+#include <WarningsEnable.hpp>
 
 #endif /* DATASETS_HPP */

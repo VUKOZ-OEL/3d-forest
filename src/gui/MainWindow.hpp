@@ -25,7 +25,6 @@
 #include <set>
 
 #include <Editor.hpp>
-#include <ExportGui.hpp>
 #include <RenderThread.hpp>
 #include <ThreadCallbackInterface.hpp>
 
@@ -43,7 +42,6 @@ class HelpPlugin;
 #include <QIcon>
 #include <QMainWindow>
 #include <QSet>
-class QToolButton;
 
 #if QT_VERSION_MAJOR == 5
     // Fix for qt5 which has two QAction classes
@@ -51,6 +49,11 @@ class QToolButton;
 #else
     #include <QAction>
 #endif
+
+class QToolButton;
+
+#include <ExportGui.hpp>
+#include <WarningsDisable.hpp>
 
 /** Main Window. */
 class EXPORT_GUI MainWindow : public QMainWindow, public ThreadCallbackInterface
@@ -142,5 +145,7 @@ protected:
 
     QAction *actionExit_;
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* MAIN_WINDOW_HPP */

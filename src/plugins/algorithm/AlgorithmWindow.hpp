@@ -30,6 +30,7 @@ class AlgorithmWidgetInterface;
 class AlgorithmPluginInterface;
 
 #include <QDialog>
+class QCheckBox;
 class QPushButton;
 class QProgressBar;
 
@@ -55,6 +56,7 @@ signals:
                       double percent);
 
 protected slots:
+    void autoRunChanged(int index);
     void slotAccept();
     void slotReject();
 
@@ -63,6 +65,7 @@ private:
 
     AlgorithmTabWidget *menu_;
 
+    QCheckBox *autoStartCheckBox_;
     QPushButton *acceptButton_;
     QPushButton *rejectButton_;
 

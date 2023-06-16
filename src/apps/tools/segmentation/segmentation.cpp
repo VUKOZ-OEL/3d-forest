@@ -74,7 +74,7 @@ static void segmentation(const std::string &path,
 
     LOG_PRINT(<< "Compute segmentation");
     SegmentationL1 segmentationL1(&editor);
-    segmentationL1.applyParameters(parameters);
+    segmentationL1.applyParameters(parameters, false);
     while (segmentationL1.next())
         ;
 
@@ -97,17 +97,25 @@ int main(int argc, char *argv[])
     {
         ArgumentParser arg;
         arg.add("--input", "");
-        arg.add("--iterations", "");
-        arg.add("--samples", "");
         arg.add("--test", "");
-        arg.add("--voxel", "");
+        arg.add("--samples-percent", "");
+        arg.add("--descriptor-min", "");
+        arg.add("--descriptor-max", "");
+        arg.add("--radius-pca", "");
+        arg.add("--radius-min", "");
+        arg.add("--radius-max", "");
+        arg.add("--iterations", "");
         arg.parse(argc, argv);
 
         SegmentationL1Parameters parameters;
 
+        (void)arg.read("--samples-percent", parameters.numberOfSamples);
+        (void)arg.read("--descriptor-min", parameters.sampleDescriptorMinimum);
+        (void)arg.read("--descriptor-max", parameters.sampleDescriptorMaximum);
+        (void)arg.read("--radius-pca", parameters.neighborhoodRadiusPca);
+        (void)arg.read("--radius-min", parameters.neighborhoodRadiusMinimum);
+        (void)arg.read("--radius-max", parameters.neighborhoodRadiusMaximum);
         (void)arg.read("--iterations", parameters.numberOfIterations);
-        (void)arg.read("--samples", parameters.numberOfSamples);
-        (void)arg.read("--voxel", parameters.voxelSize);
 
         if (arg.contains("--test"))
         {

@@ -23,13 +23,15 @@
 #define RENDER_THREAD_HPP
 
 #include <Camera.hpp>
-#include <ExportEditor.hpp>
-#include <Thread.hpp>
+#include <ThreadLoop.hpp>
 
 class Editor;
 
+#include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
+
 /** Render Thread. */
-class EXPORT_EDITOR RenderThread : public Thread
+class EXPORT_EDITOR RenderThread : public ThreadLoop
 {
 public:
     RenderThread(Editor *editor);
@@ -44,5 +46,7 @@ protected:
     Camera camera_;
     bool initialized_;
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* RENDER_THREAD_HPP */

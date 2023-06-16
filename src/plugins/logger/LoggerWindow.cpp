@@ -27,7 +27,8 @@
 
 LoggerWindow::LoggerWindow(MainWindow *mainWindow)
     : QDockWidget(mainWindow),
-      mainWindow_(mainWindow)
+      mainWindow_(mainWindow),
+      previousThreadId_(0)
 {
     // widget
     textEdit_ = new QTextEdit;
@@ -45,17 +46,9 @@ LoggerWindow::LoggerWindow(MainWindow *mainWindow)
 
     // signals
     connect(this,
-            SIGNAL(signalPrintln(const QString &,
-                                 int,
-                                 const QString &,
-                                 const QString &,
-                                 const QString &)),
+            SIGNAL(signalPrintln(const LogMessage &)),
             this,
-            SLOT(slotPrintln(const QString &,
-                             int,
-                             const QString &,
-                             const QString &,
-                             const QString &)),
+            SLOT(slotPrintln(const LogMessage &)),
             Qt::QueuedConnection);
 }
 
@@ -69,11 +62,7 @@ LoggerWindow::~LoggerWindow()
 
 void LoggerWindow::println(const LogMessage &message)
 {
-    emit signalPrintln(QString::fromStdString(message.time),
-                       message.type,
-                       QString::fromStdString(message.text),
-                       QString::fromStdString(message.module),
-                       QString::fromStdString(message.function));
+    emit signalPrintln(message);
 }
 
 void LoggerWindow::flush()
@@ -81,17 +70,19 @@ void LoggerWindow::flush()
     // empty
 }
 
-void LoggerWindow::slotPrintln(const QString &time,
-                               int type,
-                               const QString &text,
-                               const QString &module,
-                               const QString &function)
+void LoggerWindow::slotPrintln(const LogMessage &message)
 {
-    QString line = time + QString(LogMessage::typeString(type)) + text + " [" +
-                   module + ":" + function + "]";
+    QString line = QString::number(message.threadId) + " " +
+                   QString::fromStdString(message.time) +
+                   QString(LogMessage::typeString(message.type)) +
+                   QString::fromStdString(message.text) + " [" +
+                   QString::fromStdString(message.module) + ":" +
+                   QString::fromStdString(message.function) + "]";
 
     textEdit_->append(line);
     file_.write(line.toStdString() + "\n");
+
+    previousThreadId_ = message.threadId;
 }
 
 static void loggerWindowQtMessageHandler(QtMsgType type,

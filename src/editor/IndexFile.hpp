@@ -28,7 +28,9 @@
 
 #include <Box.hpp>
 #include <ChunkFile.hpp>
+
 #include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
 
 /** Index File. */
 class EXPORT_EDITOR IndexFile
@@ -197,5 +199,7 @@ protected:
 };
 
 std::ostream &operator<<(std::ostream &os, const IndexFile &obj);
+
+#include <WarningsEnable.hpp>
 
 #endif /* INDEX_FILE_HPP */

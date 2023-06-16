@@ -22,8 +22,10 @@
 #ifndef RANGE_HPP
 #define RANGE_HPP
 
-#include <ExportCore.hpp>
 #include <Json.hpp>
+
+#include <ExportCore.hpp>
+#include <WarningsDisable.hpp>
 
 /** Range as [ minimum, maximum, minimumValue, maximumValue ]. */
 template <class T> class Range : public std::array<T, 4>
@@ -125,5 +127,7 @@ std::ostream &operator<<(std::ostream &os, const Range<T> &obj)
     return os << std::fixed << "(" << obj[0] << ", " << obj[1] << ", " << obj[2]
               << ", " << obj[3] << ")" << std::defaultfloat;
 }
+
+#include <WarningsEnable.hpp>
 
 #endif /* RANGE_HPP */

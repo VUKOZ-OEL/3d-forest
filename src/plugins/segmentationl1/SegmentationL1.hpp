@@ -26,9 +26,8 @@
 #include <SegmentationL1TaskFilter.hpp>
 #include <SegmentationL1TaskFinish.hpp>
 #include <SegmentationL1TaskMedian.hpp>
-#include <SegmentationL1TaskNormal.hpp>
+#include <SegmentationL1TaskPca.hpp>
 #include <SegmentationL1TaskSample.hpp>
-#include <SegmentationL1TaskVoxelize.hpp>
 class Editor;
 
 /** Segmentation L1. */
@@ -41,7 +40,8 @@ public:
     ~SegmentationL1();
 
     void clear();
-    bool applyParameters(const SegmentationL1Parameters &parameters);
+    bool applyParameters(const SegmentationL1Parameters &parameters,
+                         bool autoStart);
     bool next();
     void progress(size_t &nTasks, size_t &iTask, double &percent) const;
 
@@ -50,10 +50,9 @@ public:
 private:
     SegmentationL1Context context_;
 
-    SegmentationL1TaskVoxelize taskVoxelize_;
     SegmentationL1TaskFilter taskFilter_;
     SegmentationL1TaskSample taskSample_;
-    SegmentationL1TaskNormal taskNormal_;
+    SegmentationL1TaskPca taskPca_;
     SegmentationL1TaskMedian taskMedian_;
     SegmentationL1TaskFinish taskFinish_;
 

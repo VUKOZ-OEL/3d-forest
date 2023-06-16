@@ -26,6 +26,7 @@
 #include <Time.hpp>
 
 #define LOG_MODULE_NAME "AlgorithmThread"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 AlgorithmThread::AlgorithmThread() : algorithm_(nullptr)
@@ -43,17 +44,18 @@ void AlgorithmThread::clear()
     algorithm_ = nullptr;
 }
 
-void AlgorithmThread::restart(AlgorithmWidgetInterface *algorithm)
+void AlgorithmThread::restart(AlgorithmWidgetInterface *algorithm,
+                              bool autoStart)
 {
     LOG_DEBUG(<< "Restart the algorithm.");
 
     algorithm_ = algorithm;
     if (algorithm_)
     {
-        bool restartRequired = algorithm_->applyParameters();
+        bool restartRequired = algorithm_->applyParameters(autoStart);
         if (restartRequired)
         {
-            Thread::start();
+            ThreadLoop::start();
         }
     }
 }
@@ -73,7 +75,7 @@ bool AlgorithmThread::next()
         finished = true;
     }
 
-    if (callback_)
+    if (callback_ && isRunning())
     {
         LOG_DEBUG(<< "Call callback with argument finished <" << finished
                   << ">.");

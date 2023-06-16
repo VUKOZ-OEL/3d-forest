@@ -22,9 +22,11 @@
 #ifndef CAMERA_HPP
 #define CAMERA_HPP
 
-#include <ExportEditor.hpp>
 #include <Matrix4.hpp>
 #include <Vector3.hpp>
+
+#include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
 
 /** Camera. */
 class EXPORT_EDITOR Camera
@@ -38,5 +40,7 @@ public:
     Camera();
     ~Camera();
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* CAMERA_HPP */

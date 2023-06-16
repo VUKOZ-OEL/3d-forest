@@ -24,8 +24,10 @@
 
 #include <cmath>
 
-#include <ExportCore.hpp>
 #include <Vector3.hpp>
+
+#include <ExportCore.hpp>
+#include <WarningsDisable.hpp>
 
 template <class T>
 inline T pointLineDistance(T x, T y, T z, T ax, T ay, T az, T nx, T ny, T nz)
@@ -55,5 +57,7 @@ inline T pointPlaneDistance(T x, T y, T z, T px, T py, T pz, T nx, T ny, T nz)
     return ((x * nx) + (y * ny) + (z * nz)) -
            ((px * nx) + (py * ny) + (pz * nz));
 }
+
+#include <WarningsEnable.hpp>
 
 #endif /* GEOMETRY_HPP */

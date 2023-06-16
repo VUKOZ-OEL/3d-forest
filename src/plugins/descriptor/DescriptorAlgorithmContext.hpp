@@ -17,24 +17,33 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentationL1TaskVoxelize.hpp */
+/** @file DescriptorAlgorithmContext.hpp */
 
-#ifndef SEGMENTATION_L1_TASK_VOXELIZE_HPP
-#define SEGMENTATION_L1_TASK_VOXELIZE_HPP
+#ifndef DESCRIPTOR_ALGORITHM_CONTEXT_HPP
+#define DESCRIPTOR_ALGORITHM_CONTEXT_HPP
 
-#include <SegmentationL1TaskInterface.hpp>
+#include <DescriptorAlgorithmParameters.hpp>
+#include <Query.hpp>
+class Editor;
 
-/** Segmentation L1 Task Voxelize. */
-class SegmentationL1TaskVoxelize : public SegmentationL1TaskInterface
+/** Descriptor Algorithm Context. */
+class DescriptorAlgorithmContext
 {
 public:
-    virtual void initialize(SegmentationL1Context *context);
-    virtual void next();
+    Editor *editor;
 
-private:
-    SegmentationL1Context *context_;
+    Query query;
+    Query queryPoint;
 
-    void step();
+    DescriptorAlgorithmParameters parameters;
+
+    uint64_t nPoints;
+    double descriptorMinimum;
+    double descriptorMaximum;
+
+    DescriptorAlgorithmContext(Editor *editor);
+
+    void clear();
 };
 
-#endif /* SEGMENTATION_L1_TASK_VOXELIZE_HPP */
+#endif /* DESCRIPTOR_ALGORITHM_CONTEXT_HPP */

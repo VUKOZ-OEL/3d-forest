@@ -32,67 +32,50 @@ class SegmentationL1Parameters
 {
 public:
     QueryWhere sampleFilter;
-    int voxelSize;
-    int numberOfSamples;
+
     int sampleDescriptorMinimum;
     int sampleDescriptorMaximum;
+    int numberOfSamples;
+    int neighborhoodRadiusPca;
     int neighborhoodRadiusMinimum;
     int neighborhoodRadiusMaximum;
     int numberOfIterations;
 
-    SegmentationL1Parameters() { setDefault(); }
+    SegmentationL1Parameters();
 
-    void clear()
-    {
-        voxelSize = 0;
-        numberOfSamples = 0;
-        sampleDescriptorMinimum = 0;
-        sampleDescriptorMaximum = 0;
-        neighborhoodRadiusMinimum = 0;
-        neighborhoodRadiusMaximum = 0;
-        numberOfIterations = 0;
-    }
+    void clear();
 
-    void setDefault()
-    {
-        voxelSize = 50;
-        numberOfSamples = 5;
-        sampleDescriptorMinimum = 0;
-        sampleDescriptorMaximum = 100;
-        neighborhoodRadiusMinimum = 100;
-        neighborhoodRadiusMaximum = 500;
-        numberOfIterations = 1;
-    }
+    void setDefault();
 
-    void set(int voxelSize_,
-             int numberOfSamples_,
-             int sampleDescriptorMinimum_,
+    void set(int sampleDescriptorMinimum_,
              int sampleDescriptorMaximum_,
+             int numberOfSamples_,
+             int neighborhoodRadiusPca_,
              int neighborhoodRadiusMinimum_,
              int neighborhoodRadiusMaximum_,
-             int numberOfIterations_)
-    {
-        voxelSize = voxelSize_;
-        numberOfSamples = numberOfSamples_;
-        sampleDescriptorMinimum = sampleDescriptorMinimum_;
-        sampleDescriptorMaximum = sampleDescriptorMaximum_;
-        neighborhoodRadiusMinimum = neighborhoodRadiusMinimum_;
-        neighborhoodRadiusMaximum = neighborhoodRadiusMaximum_;
-        numberOfIterations = numberOfIterations_;
-    }
+             int numberOfIterations_);
 };
 
 inline std::ostream &operator<<(std::ostream &os,
                                 const SegmentationL1Parameters &obj)
 {
-    return os << "voxelSize <" << obj.voxelSize << "> numberOfSamples <"
-              << obj.numberOfSamples << "> sampleDescriptorMinimum <"
-              << obj.sampleDescriptorMinimum << "> sampleDescriptorMaximum <"
-              << obj.sampleDescriptorMaximum << "> neighborhoodRadiusMinimum <"
+    // clang-format off
+    return os << "sampleDescriptorMinimum <"
+              << obj.sampleDescriptorMinimum
+              << "> sampleDescriptorMaximum <"
+              << obj.sampleDescriptorMaximum
+              << "> numberOfSamples <"
+              << obj.numberOfSamples
+              << "> neighborhoodRadiusPca <"
+              << obj.neighborhoodRadiusPca
+              << "> neighborhoodRadiusMinimum <"
               << obj.neighborhoodRadiusMinimum
               << "> neighborhoodRadiusMaximum <"
-              << obj.neighborhoodRadiusMaximum << "> numberOfIterations <"
-              << obj.numberOfIterations << ">";
+              << obj.neighborhoodRadiusMaximum
+              << "> numberOfIterations <"
+              << obj.numberOfIterations
+              << ">";
+    // clang-format on
 }
 
 #endif /* SEGMENTATION_L1_PARAMETERS_HPP */

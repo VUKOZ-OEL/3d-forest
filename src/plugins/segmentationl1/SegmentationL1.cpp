@@ -31,10 +31,9 @@ SegmentationL1::SegmentationL1(Editor *editor) : context_(editor)
     LOG_DEBUG(<< "Create.");
 
     // Add individual actions from first to last.
-    tasks_.push_back(&taskVoxelize_);
     tasks_.push_back(&taskFilter_);
     tasks_.push_back(&taskSample_);
-    tasks_.push_back(&taskNormal_);
+    tasks_.push_back(&taskPca_);
     tasks_.push_back(&taskMedian_);
     tasks_.push_back(&taskFinish_);
 
@@ -53,7 +52,8 @@ void SegmentationL1::clear()
     currentAction_ = SegmentationL1::npos;
 }
 
-bool SegmentationL1::applyParameters(const SegmentationL1Parameters &parameters)
+bool SegmentationL1::applyParameters(const SegmentationL1Parameters &parameters,
+                                     bool autoStart)
 {
     LOG_DEBUG(<< "Apply parameters <" << parameters << ">.");
 
@@ -67,33 +67,33 @@ bool SegmentationL1::applyParameters(const SegmentationL1Parameters &parameters)
         (context_.parameters.numberOfIterations !=
          parameters.numberOfIterations))
     {
-        newAction = 4;
+        newAction = 3;
     }
 
-    // Neighborhood Radius has been changed.
-    if (context_.parameters.neighborhoodRadiusMinimum !=
-        parameters.neighborhoodRadiusMinimum)
+    // Neighborhood PCA Radius has been changed.
+    if (context_.parameters.neighborhoodRadiusPca !=
+        parameters.neighborhoodRadiusPca)
     {
-        newAction = 3;
+        newAction = 2;
     }
 
     // The number of initial samples has been changed.
     if (context_.parameters.numberOfSamples != parameters.numberOfSamples)
     {
-        newAction = 2;
+        newAction = 1;
     }
 
     // Filter for the initial samples has been changed.
     if ((context_.parameters.sampleDescriptorMinimum !=
          parameters.sampleDescriptorMinimum) ||
         (context_.parameters.sampleDescriptorMaximum !=
-         parameters.sampleDescriptorMaximum))
+         parameters.sampleDescriptorMaximum) ||
+        (context_.nPoints == 0))
     {
-        newAction = 1;
+        newAction = 0;
     }
 
-    // The voxel size has been changed.
-    if (context_.parameters.voxelSize != parameters.voxelSize)
+    if (!autoStart)
     {
         newAction = 0;
     }

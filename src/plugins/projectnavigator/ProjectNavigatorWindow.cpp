@@ -23,6 +23,7 @@
 #include <ProjectNavigatorItemClassifications.hpp>
 #include <ProjectNavigatorItemClipping.hpp>
 #include <ProjectNavigatorItemColor.hpp>
+#include <ProjectNavigatorItemCustomColor.hpp>
 #include <ProjectNavigatorItemDescriptor.hpp>
 #include <ProjectNavigatorItemElevation.hpp>
 #include <ProjectNavigatorItemFiles.hpp>
@@ -55,6 +56,10 @@ ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
     items_.push_back(
         new ProjectNavigatorItemColor(mainWindow_, ICON("color"), tr("Color")));
 
+    items_.push_back(new ProjectNavigatorItemCustomColor(mainWindow_,
+                                                         ICON("color"),
+                                                         tr("Custom Color")));
+
     items_.push_back(new ProjectNavigatorItemIntensity(mainWindow_,
                                                        ICON("intensity"),
                                                        tr("Intensity")));
@@ -85,7 +90,7 @@ ProjectNavigatorWindow::ProjectNavigatorWindow(MainWindow *mainWindow)
 
     // Dock
     setWidget(menu_);
-    setWindowTitle(tr("Data Browser"));
+    setWindowTitle(tr("Project Explorer"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     mainWindow_->addDockWidget(Qt::RightDockWidgetArea, this);
 }

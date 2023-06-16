@@ -23,19 +23,19 @@
 #define ALGORITHM_THREAD_HPP
 
 #include <Query.hpp>
-#include <Thread.hpp>
+#include <ThreadLoop.hpp>
 class Editor;
 class AlgorithmWidgetInterface;
 
 /** Algorithm Thread. */
-class AlgorithmThread : public Thread
+class AlgorithmThread : public ThreadLoop
 {
 public:
     AlgorithmThread();
     virtual ~AlgorithmThread();
 
     void clear();
-    void restart(AlgorithmWidgetInterface *algorithm);
+    void restart(AlgorithmWidgetInterface *algorithm, bool autoStart);
     virtual bool next();
     void progress(size_t &nTasks, size_t &iTask, double &percent) const;
     void updateData();

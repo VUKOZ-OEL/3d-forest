@@ -25,6 +25,9 @@
 #include <Box.hpp>
 #include <Math.hpp>
 
+#include <ExportCore.hpp>
+#include <WarningsDisable.hpp>
+
 /** Sphere. */
 template <class T> class Sphere
 {
@@ -109,5 +112,7 @@ template <class T> inline bool Sphere<T>::isInside(T x, T y, T z) const
 
     return false;
 }
+
+#include <WarningsEnable.hpp>
 
 #endif /* SPHERE_HPP */

@@ -31,7 +31,9 @@
 #include <vector>
 
 #include <Error.hpp>
+
 #include <ExportCore.hpp>
+#include <WarningsDisable.hpp>
 
 /** JSON.
 
@@ -149,7 +151,7 @@ public:
     void read(const std::string &fileName);
     void write(const std::string &fileName, size_t indent = DEFAULT_INDENT);
 
-protected:
+private:
     /** JSON Data Type. */
     enum Type
     {
@@ -169,7 +171,8 @@ protected:
         std::shared_ptr<std::map<std::string, Json>> object;
         std::shared_ptr<std::vector<Json>> array;
         std::shared_ptr<std::string> string;
-        double number;
+        double number = 0.0;
+        Data() : number(0.0) {}
     };
 
     Type type_;
@@ -503,5 +506,7 @@ inline std::ostream &operator<<(std::ostream &os, const Json &obj)
 {
     return os << obj.serialize();
 }
+
+#include <WarningsEnable.hpp>
 
 #endif /* JSON_HPP */

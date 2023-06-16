@@ -22,9 +22,11 @@
 #ifndef SETTINGS_HPP
 #define SETTINGS_HPP
 
-#include <ExportEditor.hpp>
 #include <SettingsImport.hpp>
 #include <SettingsView.hpp>
+
+#include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
 
 /** Settings. */
 class EXPORT_EDITOR Settings
@@ -39,5 +41,7 @@ public:
 protected:
     SettingsView view_;
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* SETTINGS_HPP */
