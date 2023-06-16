@@ -20,7 +20,7 @@
 /** @file ExportFileFormatCsv.cpp */
 
 #include <ExportFileFormatCsv.hpp>
-#include <cstring>
+#include <Util.hpp>
 
 ExportFileFormatCsv::ExportFileFormatCsv()
 {
@@ -36,26 +36,26 @@ void ExportFileFormatCsv::create(const std::string &path)
     file_.open(path, "w+t");
 
     // Write CSV header
-    char text[256];
+    char text[256] = {};
     text[0] = 0;
-    (void)strcat(text, "x, y, z");
+    (void)ustrcat(text, "x, y, z");
     if (properties().format().has(LasFile::FORMAT_INTENSITY))
     {
-        (void)strcat(text, ", intensity");
+        (void)ustrcat(text, ", intensity");
     }
     if (properties().format().has(LasFile::FORMAT_CLASSIFICATION))
     {
-        (void)strcat(text, ", classification");
+        (void)ustrcat(text, ", classification");
     }
     if (properties().format().has(LasFile::FORMAT_RGB))
     {
-        (void)strcat(text, ", red, green, blue");
+        (void)ustrcat(text, ", red, green, blue");
     }
     if (properties().format().has(LasFile::FORMAT_LAYER))
     {
-        (void)strcat(text, ", layer");
+        (void)ustrcat(text, ", layer");
     }
-    (void)strcat(text, "\n");
+    (void)ustrcat(text, "\n");
 
     file_.write(text);
 }
@@ -95,7 +95,7 @@ void ExportFileFormatCsv::write(Query &query)
                        ", %d",
                        static_cast<int>(query.intensity() * 65535.0));
 
-        (void)strcat(text, buffer);
+        (void)ustrcat(text, buffer);
     }
 
     // Format point classification
@@ -106,7 +106,7 @@ void ExportFileFormatCsv::write(Query &query)
                        ", %d",
                        static_cast<int>(query.classification()));
 
-        (void)strcat(text, buffer);
+        (void)ustrcat(text, buffer);
     }
 
     // Color
@@ -119,7 +119,7 @@ void ExportFileFormatCsv::write(Query &query)
                        static_cast<int>(query.green() * 65535.0),
                        static_cast<int>(query.blue() * 65535.0));
 
-        (void)strcat(text, buffer);
+        (void)ustrcat(text, buffer);
     }
 
     // Layer
@@ -130,11 +130,11 @@ void ExportFileFormatCsv::write(Query &query)
                        ", %u",
                        static_cast<unsigned int>(query.layer()));
 
-        (void)strcat(text, buffer);
+        (void)ustrcat(text, buffer);
     }
 
     // End line
-    (void)strcat(text, "\n");
+    (void)ustrcat(text, "\n");
 
     // Write new point into file
     file_.write(text);

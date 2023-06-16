@@ -77,7 +77,11 @@ File::~File()
 {
     if (fd_ != INVALID_DESCRIPTOR)
     {
+#if defined(_MSC_VER)
+        (void)::_close(fd_);
+#else
         (void)::close(fd_);
+#endif
     }
 }
 
@@ -106,17 +110,30 @@ void File::create()
     // Close
     if (fd_ != INVALID_DESCRIPTOR)
     {
+#if defined(_MSC_VER)
+        (void)::_close(fd_);
+#else
         (void)::close(fd_);
+#endif
     }
 
     // Temporary file with a unique auto-generated fileName, "wb+"
-    std::FILE *tmpf = std::tmpfile();
+    std::FILE *tmpf = nullptr;
+#if defined(_MSC_VER)
+    (void)tmpfile_s(&tmpf);
+#else
+    tmpf = std::tmpfile();
+#endif
     if (!tmpf)
     {
         THROW("Can't create temporary file");
     }
 
-    fd_ = fileno(tmpf);
+#if defined(_MSC_VER)
+    fd_ = ::_fileno(tmpf);
+#else
+    fd_ = ::fileno(tmpf);
+#endif
     size_ = 0;
     offset_ = 0;
     path_ = "temporary";
@@ -155,7 +172,11 @@ void File::open(const std::string &path, const std::string &mode)
     // Close
     if (fd_ != INVALID_DESCRIPTOR)
     {
+#if defined(_MSC_VER)
+        (void)::_close(fd_);
+#else
         (void)::close(fd_);
+#endif
     }
 
     // Open
@@ -166,15 +187,30 @@ void File::open(const std::string &path, const std::string &mode)
         if (mode.find("+") != std::string::npos)
         {
             oflag |= O_RDWR;
+#if defined(_MSC_VER)
+            omode = _S_IREAD | _S_IWRITE;
+#endif
         }
         else
         {
             oflag |= O_RDONLY;
+#if defined(_MSC_VER)
+            omode = _S_IREAD;
+#endif
         }
 
         oflag |= O_BINARY;
 
+#if defined(_MSC_VER)
+        fd_ = INVALID_DESCRIPTOR;
+        errno_t err = _sopen_s(&fd_, path.c_str(), oflag, _SH_DENYNO, omode);
+        if (err != 0)
+        {
+            THROW("Can't open file '" + path + "': " + getErrorString(err));
+        }
+#else
         fd_ = ::open(path.c_str(), oflag);
+#endif
     }
     else if (mode.find("w") != std::string::npos ||
              mode.find("a") != std::string::npos)
@@ -202,7 +238,20 @@ void File::open(const std::string &path, const std::string &mode)
 
         omode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
 
+#if defined(_MSC_VER)
+        fd_ = INVALID_DESCRIPTOR;
+        errno_t err = _sopen_s(&fd_,
+                               path.c_str(),
+                               oflag,
+                               _SH_DENYNO,
+                               _S_IREAD | _S_IWRITE);
+        if (err != 0)
+        {
+            THROW("Can't open file '" + path + "': " + getErrorString(err));
+        }
+#else
         fd_ = ::open(path.c_str(), oflag, omode);
+#endif
     }
 
     if (fd_ == INVALID_DESCRIPTOR)
@@ -234,7 +283,11 @@ void File::close()
 
     if (fd_ != INVALID_DESCRIPTOR)
     {
+#if defined(_MSC_VER)
+        ret = ::_close(fd_);
+#else
         ret = ::close(fd_);
+#endif
         if (ret != 0)
         {
             THROW_ERRNO("Can't close file '" + path_ + "'");
@@ -331,7 +384,21 @@ void File::read(uint8_t *buffer,
         return;
     }
 
+#if defined(_MSC_VER)
+    fd = INVALID_DESCRIPTOR;
+    errno_t err = ::_sopen_s(&fd,
+                             path.c_str(),
+                             O_RDONLY | O_BINARY,
+                             _SH_DENYNO,
+                             _S_IREAD);
+    if (err != 0)
+    {
+        THROW("Can't open file '" + path + "': " + getErrorString(err));
+    }
+#else
     fd = ::open(path.c_str(), O_RDONLY | O_BINARY);
+#endif
+
     if (fd == INVALID_DESCRIPTOR)
     {
         THROW_ERRNO("Can't open file '" + path + "'");
@@ -352,7 +419,11 @@ void File::read(uint8_t *buffer,
         THROW_ERRNO("Can't read file '" + path + "'");
     }
 
+#if defined(_MSC_VER)
+    ret = ::_close(fd);
+#else
     ret = ::close(fd);
+#endif
     if (ret != 0)
     {
         THROW_ERRNO("Can't close file '" + path + "'");
@@ -393,7 +464,13 @@ int File::read(int fd, uint8_t *buffer, uint64_t nbyte)
         {
             nread = UINT_MAX;
         }
+
+#if defined(_MSC_VER)
+        ret = ::_read(fd, buffer + total, static_cast<unsigned int>(nread));
+#else
         ret = ::read(fd, buffer + total, static_cast<unsigned int>(nread));
+#endif
+
         if (ret == 0)
         {
             nbyte = 0;
@@ -435,7 +512,21 @@ void File::write(const uint8_t *buffer,
         return;
     }
 
+#if defined(_MSC_VER)
+    fd = INVALID_DESCRIPTOR;
+    errno_t err = ::_sopen_s(&fd,
+                             path.c_str(),
+                             O_WRONLY | O_BINARY,
+                             _SH_DENYNO,
+                             _S_IREAD | _S_IWRITE);
+    if (err != 0)
+    {
+        THROW("Can't open file '" + path + "': " + getErrorString(err));
+    }
+#else
     fd = ::open(path.c_str(), O_WRONLY | O_BINARY);
+#endif
+
     if (fd == INVALID_DESCRIPTOR)
     {
         THROW_ERRNO("Can't open file '" + path + "'");
@@ -456,7 +547,11 @@ void File::write(const uint8_t *buffer,
         THROW_ERRNO("Can't write file '" + path + "'");
     }
 
+#if defined(_MSC_VER)
+    ret = ::_close(fd);
+#else
     ret = ::close(fd);
+#endif
     if (ret != 0)
     {
         THROW_ERRNO("Can't close file '" + path + "'");
@@ -530,7 +625,13 @@ int File::write(int fd, const uint8_t *buffer, uint64_t nbyte)
         {
             nwrite = UINT_MAX;
         }
+
+#if defined(_MSC_VER)
+        ret = ::_write(fd, buffer + total, static_cast<unsigned int>(nwrite));
+#else
         ret = ::write(fd, buffer + total, static_cast<unsigned int>(nwrite));
+#endif
+
         if (ret == -1)
         {
             if (errno != EINTR)
@@ -847,7 +948,12 @@ void File::remove(const std::string &path)
         return;
     }
 
+#if defined(_MSC_VER)
+    int error = ::_unlink(path.c_str());
+#else
     int error = ::unlink(path.c_str());
+#endif
+
     if (error != 0)
     {
         THROW_ERRNO("Cannot remove file '" + path + "'");

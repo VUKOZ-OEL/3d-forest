@@ -26,6 +26,9 @@
 #include <Geometry.hpp>
 #include <Math.hpp>
 
+#include <ExportCore.hpp>
+#include <WarningsDisable.hpp>
+
 /** Cylinder. */
 template <class T> class Cylinder
 {
@@ -50,7 +53,7 @@ public:
     bool empty() const { return box_.empty(); }
     bool isInside(T x, T y, T z) const;
 
-protected:
+private:
     Vector3<T> a_;
     Vector3<T> b_;
     Vector3<T> n_;
@@ -170,5 +173,7 @@ template <class T> inline bool Cylinder<T>::isInside(T x, T y, T z) const
 
     return true;
 }
+
+#include <WarningsEnable.hpp>
 
 #endif /* CYLINDER_HPP */

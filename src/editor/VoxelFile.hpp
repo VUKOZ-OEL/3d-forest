@@ -24,8 +24,10 @@
 
 #include <sstream>
 
-#include <ExportEditor.hpp>
 #include <File.hpp>
+
+#include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
 
 /** Voxel File. */
 class EXPORT_EDITOR VoxelFile
@@ -66,5 +68,7 @@ inline std::ostream &operator<<(std::ostream &os, const VoxelFile::Voxel &obj)
     return os << "x <" << obj.x << "> y <" << obj.y << "> z <" << obj.z
               << "> descriptor <" << obj.descriptor << ">";
 }
+
+#include <WarningsEnable.hpp>
 
 #endif /* VOXEL_FILE_HPP */

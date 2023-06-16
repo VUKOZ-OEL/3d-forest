@@ -22,9 +22,11 @@
 #ifndef LAYER_DATA_HPP
 #define LAYER_DATA_HPP
 
-#include <ExportEditor.hpp>
 #include <Json.hpp>
 #include <Vector3.hpp>
+
+#include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
 
 /** LayerData. */
 class EXPORT_EDITOR LayerData
@@ -42,5 +44,7 @@ protected:
     Vector3<double> position_;
     double radius_;
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* LAYER_DATA_HPP */

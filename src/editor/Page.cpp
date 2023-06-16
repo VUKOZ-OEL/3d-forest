@@ -363,9 +363,10 @@ void Page::setState(Page::State state)
 
 std::string Page::stateToString(Page::State state)
 {
-    const char *stateNames[] =
+    const int stateNamesCount = 6;
+    const char *stateNames[stateNamesCount] =
         {"read", "transform", "select", "modifiers", "render", "rendered"};
-    if (state < static_cast<int>(sizeof(stateNames)))
+    if (state >= 0 && state < stateNamesCount)
     {
         return std::string(stateNames[state]);
     }
@@ -384,10 +385,6 @@ bool Page::nextState()
         {
             LOG_DEBUG(<< "Page pageId <" << pageId_ << "> state <STATE_READ>.");
             readPage();
-        }
-        catch (std::exception &e)
-        {
-            // std::cout << e.what() << "\n";
         }
         catch (...)
         {
@@ -475,31 +472,31 @@ void Page::queryWhereBox()
                 continue;
             }
 
-            uint32_t nNodePoints = static_cast<uint32_t>(nodeL2->size);
-            uint32_t from = static_cast<uint32_t>(nodeL2->from);
+            size_t nNodePoints = static_cast<size_t>(nodeL2->size);
+            size_t from = static_cast<size_t>(nodeL2->from);
 
             if (selectedNodes_[i].partial)
             {
                 // Partial selection, apply clip filter
-                for (uint32_t j = 0; j < nNodePoints; j++)
+                for (size_t j = 0; j < nNodePoints; j++)
                 {
-                    uint32_t idx = from + j;
+                    size_t idx = from + j;
                     double x = position[3 * idx + 0];
                     double y = position[3 * idx + 1];
                     double z = position[3 * idx + 2];
 
                     if (clipBox.isInside(x, y, z))
                     {
-                        selection[nSelected++] = idx;
+                        selection[nSelected++] = static_cast<uint32_t>(idx);
                     }
                 }
             }
             else
             {
                 // Everything
-                for (uint32_t j = 0; j < nNodePoints; j++)
+                for (size_t j = 0; j < nNodePoints; j++)
                 {
-                    selection[nSelected++] = from + j;
+                    selection[nSelected++] = static_cast<uint32_t>(from + j);
                 }
             }
         }
@@ -518,22 +515,22 @@ void Page::queryWhereBox()
                 continue;
             }
 
-            uint32_t nNodePoints = static_cast<uint32_t>(nodeL2->size);
-            uint32_t from = static_cast<uint32_t>(nodeL2->from);
+            size_t nNodePoints = static_cast<size_t>(nodeL2->size);
+            size_t from = static_cast<size_t>(nodeL2->from);
 
             if (selectedNodes_[i].partial)
             {
                 // Partial selection, apply clip filter
-                for (uint32_t j = 0; j < nNodePoints; j++)
+                for (size_t j = 0; j < nNodePoints; j++)
                 {
-                    uint32_t idx = from + j;
+                    size_t idx = from + j;
                     double x = position[3 * idx + 0];
                     double y = position[3 * idx + 1];
                     double z = position[3 * idx + 2];
 
                     if (clipBox.isInside(x, y, z))
                     {
-                        selection[nSelected++] = idx;
+                        selection[nSelected++] = static_cast<uint32_t>(idx);
                         if (nSelected == max)
                         {
                             maxReached = true;
@@ -547,13 +544,13 @@ void Page::queryWhereBox()
                 // Everything
                 if (nNodePoints > max)
                 {
-                    nNodePoints = static_cast<uint32_t>(max);
+                    nNodePoints = max;
                     maxReached = true;
                 }
 
-                for (uint32_t j = 0; j < nNodePoints; j++)
+                for (size_t j = 0; j < nNodePoints; j++)
                 {
-                    selection[nSelected++] = from + j;
+                    selection[nSelected++] = static_cast<uint32_t>(from + j);
                 }
             }
 
@@ -618,20 +615,20 @@ void Page::queryWhereCone()
             continue;
         }
 
-        uint32_t nNodePoints = static_cast<uint32_t>(nodeL2->size);
-        uint32_t from = static_cast<uint32_t>(nodeL2->from);
+        size_t nNodePoints = static_cast<size_t>(nodeL2->size);
+        size_t from = static_cast<size_t>(nodeL2->from);
 
         // Partial/Whole selection, apply clip filter
-        for (uint32_t j = 0; j < nNodePoints; j++)
+        for (size_t j = 0; j < nNodePoints; j++)
         {
-            uint32_t idx = from + j;
+            size_t idx = from + j;
             double x = position[3 * idx + 0];
             double y = position[3 * idx + 1];
             double z = position[3 * idx + 2];
 
             if (clipCone.isInside(x, y, z))
             {
-                selection[nSelected++] = idx;
+                selection[nSelected++] = static_cast<uint32_t>(idx);
                 if (nSelected == max)
                 {
                     maxReached = true;
@@ -700,20 +697,20 @@ void Page::queryWhereCylinder()
             continue;
         }
 
-        uint32_t nNodePoints = static_cast<uint32_t>(nodeL2->size);
-        uint32_t from = static_cast<uint32_t>(nodeL2->from);
+        size_t nNodePoints = static_cast<size_t>(nodeL2->size);
+        size_t from = static_cast<size_t>(nodeL2->from);
 
         // Partial/Whole selection, apply clip filter
-        for (uint32_t j = 0; j < nNodePoints; j++)
+        for (size_t j = 0; j < nNodePoints; j++)
         {
-            uint32_t idx = from + j;
+            size_t idx = from + j;
             double x = position[3 * idx + 0];
             double y = position[3 * idx + 1];
             double z = position[3 * idx + 2];
 
             if (clipCylinder.isInside(x, y, z))
             {
-                selection[nSelected++] = idx;
+                selection[nSelected++] = static_cast<uint32_t>(idx);
                 if (nSelected == max)
                 {
                     maxReached = true;
@@ -782,20 +779,20 @@ void Page::queryWhereSphere()
             continue;
         }
 
-        uint32_t nNodePoints = static_cast<uint32_t>(nodeL2->size);
-        uint32_t from = static_cast<uint32_t>(nodeL2->from);
+        size_t nNodePoints = static_cast<size_t>(nodeL2->size);
+        size_t from = static_cast<size_t>(nodeL2->from);
 
         // Partial/Whole selection, apply clip filter
-        for (uint32_t j = 0; j < nNodePoints; j++)
+        for (size_t j = 0; j < nNodePoints; j++)
         {
-            uint32_t idx = from + j;
+            size_t idx = from + j;
             double x = position[3 * idx + 0];
             double y = position[3 * idx + 1];
             double z = position[3 * idx + 2];
 
             if (clipSphere.isInside(x, y, z))
             {
-                selection[nSelected++] = idx;
+                selection[nSelected++] = static_cast<uint32_t>(idx);
                 if (nSelected == max)
                 {
                     maxReached = true;

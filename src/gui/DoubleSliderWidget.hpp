@@ -22,13 +22,14 @@
 #ifndef DOUBLE_SLIDER_WIDGET_HPP
 #define DOUBLE_SLIDER_WIDGET_HPP
 
-#include <ExportGui.hpp>
-
 #include <QWidget>
 
 class QSpinBox;
 class QSlider;
 class QVBoxLayout;
+
+#include <ExportGui.hpp>
+#include <WarningsDisable.hpp>
 
 /** Slider Widget with values in double. */
 class EXPORT_GUI DoubleSliderWidget : public QWidget
@@ -80,5 +81,7 @@ protected:
     QSlider *slider_;
     QSpinBox *spinBox_;
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* DOUBLE_SLIDER_WIDGET_HPP */

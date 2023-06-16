@@ -24,6 +24,9 @@
 
 #include <Vector3.hpp>
 
+#include <ExportCore.hpp>
+#include <WarningsDisable.hpp>
+
 /** Matrix 4x4. */
 template <class T> class Matrix4
 {
@@ -549,5 +552,7 @@ template <class T> Vector3<T> Matrix4<T>::unproject(const Vector3<T> &v)
 
     return Vector3<T>(x, y, z);
 }
+
+#include <WarningsEnable.hpp>
 
 #endif /* MATRIX4_HPP */

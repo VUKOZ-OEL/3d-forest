@@ -22,14 +22,14 @@
 #ifndef DOUBLE_RANGE_SLIDER_WIDGET_HPP
 #define DOUBLE_RANGE_SLIDER_WIDGET_HPP
 
-#include <ExportGui.hpp>
-
 #include <QWidget>
 
 class ctkDoubleRangeSlider;
-
 class QDoubleSpinBox;
 class QVBoxLayout;
+
+#include <ExportGui.hpp>
+#include <WarningsDisable.hpp>
 
 /** Range Slider Widget with values in double. */
 class EXPORT_GUI DoubleRangeSliderWidget : public QWidget
@@ -78,5 +78,7 @@ protected:
     double minimumValue_;
     double maximumValue_;
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* DOUBLE_RANGE_SLIDER_WIDGET_HPP */

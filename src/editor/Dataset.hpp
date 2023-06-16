@@ -23,10 +23,12 @@
 #define DATASET_HPP
 
 #include <Box.hpp>
-#include <ExportEditor.hpp>
 #include <IndexFile.hpp>
 #include <Json.hpp>
 #include <SettingsImport.hpp>
+
+#include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
 
 /** Dataset. */
 class EXPORT_EDITOR Dataset
@@ -93,5 +95,7 @@ protected:
     void read();
     void updateBoundary();
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* DATASET_HPP */

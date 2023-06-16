@@ -55,7 +55,7 @@ void AlgorithmThread::restart(AlgorithmWidgetInterface *algorithm,
         bool restartRequired = algorithm_->applyParameters(autoStart);
         if (restartRequired)
         {
-            Thread::start();
+            ThreadLoop::start();
         }
     }
 }

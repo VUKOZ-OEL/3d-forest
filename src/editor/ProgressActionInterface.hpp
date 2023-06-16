@@ -25,6 +25,7 @@
 #include <cstdint>
 
 #include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
 
 /** Progress Action Interface. */
 class EXPORT_EDITOR ProgressActionInterface
@@ -62,5 +63,7 @@ private:
     double timeNow_;
     uint64_t interleaveCounter_;
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* PROGRESS_ACTION_INTERFACE_HPP */

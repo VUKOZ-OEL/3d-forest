@@ -28,6 +28,8 @@
 #define LOG_MODULE_NAME "3DForest"
 #include <Log.hpp>
 
+#include <WarningsDisable.hpp>
+
 int main(int argc, char *argv[])
 {
     int rc = 1;
@@ -68,3 +70,5 @@ int main(int argc, char *argv[])
 
     return rc;
 }
+
+#include <WarningsEnable.hpp>

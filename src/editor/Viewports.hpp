@@ -22,10 +22,12 @@
 #ifndef VIEWPORTS_HPP
 #define VIEWPORTS_HPP
 
-#include <ExportEditor.hpp>
 #include <Query.hpp>
 
 class Editor;
+
+#include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
 
 /** Viewports. */
 class EXPORT_EDITOR Viewports
@@ -65,5 +67,7 @@ protected:
     std::vector<std::shared_ptr<Query>> viewports_;
     size_t activeViewport_;
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* VIEWPORTS_HPP */

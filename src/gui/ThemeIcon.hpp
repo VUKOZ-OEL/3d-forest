@@ -22,11 +22,12 @@
 #ifndef THEME_ICON_HPP
 #define THEME_ICON_HPP
 
-#include <ExportGui.hpp>
-
 #include <QFile>
 #include <QIcon>
 #include <QString>
+
+#include <ExportGui.hpp>
+#include <WarningsDisable.hpp>
 
 #define THEME_ICON(name) (ThemeIcon(":/gui/", name))
 
@@ -57,5 +58,7 @@ private:
         }
     }
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* THEME_ICON_HPP */

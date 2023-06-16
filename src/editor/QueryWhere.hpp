@@ -24,10 +24,12 @@
 
 #include <unordered_set>
 
-#include <ExportEditor.hpp>
 #include <QueryFilterSet.hpp>
 #include <Range.hpp>
 #include <Region.hpp>
+
+#include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
 
 /** Data Query Where. */
 class EXPORT_EDITOR QueryWhere
@@ -91,5 +93,7 @@ private:
 
     void classificationsToArray();
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* QUERY_WHERE_HPP */

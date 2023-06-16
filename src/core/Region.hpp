@@ -28,6 +28,9 @@
 #include <ExportCore.hpp>
 #include <Sphere.hpp>
 
+#include <ExportCore.hpp>
+#include <WarningsDisable.hpp>
+
 /** Region. */
 class Region
 {
@@ -108,5 +111,7 @@ inline std::ostream &operator<<(std::ostream &os, const Region &obj)
     return os << std::fixed << "{" << obj.box << ", " << obj.enabled << "}"
               << std::defaultfloat;
 }
+
+#include <WarningsEnable.hpp>
 
 #endif /* REGION_HPP */

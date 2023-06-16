@@ -26,6 +26,7 @@
 #include <unordered_set>
 
 #include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
 
 /** Data Query Filter Set. */
 class EXPORT_EDITOR QueryFilterSet
@@ -62,5 +63,7 @@ private:
     std::unordered_set<size_t> values_;
     bool enabled_;
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* QUERY_FILTER_SET_HPP */

@@ -36,6 +36,7 @@
 #include <vector>
 
 #include <ExportCore.hpp>
+#include <WarningsDisable.hpp>
 
 /** Log Type. */
 enum EXPORT_CORE LogType
@@ -207,5 +208,7 @@ inline std::ostream &operator<<(std::ostream &os, std::vector<T> vec)
     os << "}";
     return os;
 }
+
+#include <WarningsEnable.hpp>
 
 #endif /* LOG_HPP */

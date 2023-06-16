@@ -22,8 +22,6 @@
 #ifndef PLUGIN_INTERFACE_HPP
 #define PLUGIN_INTERFACE_HPP
 
-#include <ExportGui.hpp>
-
 #include <QtPlugin>
 
 #if QT_VERSION_MAJOR == 5
@@ -32,6 +30,9 @@
 #else
     #include <QAction>
 #endif
+
+#include <ExportGui.hpp>
+#include <WarningsDisable.hpp>
 
 class MainWindow;
 
@@ -45,5 +46,7 @@ public:
 
 #define PluginInterface_iid "vukoz.3dforest.qt.PluginInterface/1.0"
 Q_DECLARE_INTERFACE(PluginInterface, PluginInterface_iid)
+
+#include <WarningsEnable.hpp>
 
 #endif /* PLUGIN_INTERFACE_HPP */

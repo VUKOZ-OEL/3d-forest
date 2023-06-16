@@ -23,7 +23,9 @@
 #define VOXEL_HPP
 
 #include <Box.hpp>
+
 #include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
 
 /** Voxel. */
 class EXPORT_EDITOR Voxel
@@ -75,5 +77,7 @@ inline std::ostream &operator<<(std::ostream &os, const Voxel &obj)
               << std::defaultfloat;
     // clang-format on
 }
+
+#include <WarningsEnable.hpp>
 
 #endif /* VOXEL_HPP */

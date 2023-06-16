@@ -24,8 +24,10 @@
 
 #include <vector>
 
-#include <ExportCore.hpp>
 #include <Vector3.hpp>
+
+#include <ExportCore.hpp>
+#include <WarningsDisable.hpp>
 
 /** Color Palette. */
 class EXPORT_CORE ColorPalette
@@ -47,5 +49,7 @@ public:
     static std::vector<Vector3<double>> blueCyanGreenYellowRed(size_t nColors);
     static std::vector<Vector3<double>> gray(size_t nColors);
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* COLOR_PALETTE_HPP */

@@ -17,16 +17,16 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Thread.cpp */
+/** @file ThreadLoop.cpp */
 
-#include <Thread.hpp>
 #include <ThreadCallbackInterface.hpp>
+#include <ThreadLoop.hpp>
 
-#define LOG_MODULE_NAME "Thread"
+#define LOG_MODULE_NAME "ThreadLoop"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-Thread::Thread()
+ThreadLoop::ThreadLoop()
     : callback_(nullptr),
       state_(STATE_RUN),
       finished_(true),
@@ -36,29 +36,29 @@ Thread::Thread()
     LOG_DEBUG(<< "Called.");
 }
 
-Thread::~Thread()
+ThreadLoop::~ThreadLoop()
 {
     LOG_DEBUG(<< "Called.");
 }
 
-void Thread::setCallback(ThreadCallbackInterface *callback)
+void ThreadLoop::setCallback(ThreadCallbackInterface *callback)
 {
     callback_ = callback;
 }
 
-void Thread::create()
+void ThreadLoop::create()
 {
     LOG_DEBUG(<< "Called.");
-    thread_ = std::make_shared<std::thread>(&Thread::runLoop, this);
+    thread_ = std::make_shared<std::thread>(&ThreadLoop::runLoop, this);
 }
 
-void Thread::start()
+void ThreadLoop::start()
 {
     LOG_DEBUG(<< "Called.");
     setState(STATE_RUN);
 }
 
-void Thread::cancel()
+void ThreadLoop::cancel()
 {
     LOG_DEBUG(<< "Called.");
     std::unique_lock mutexlock(mutexCaller_);
@@ -70,7 +70,7 @@ void Thread::cancel()
     }
 }
 
-bool Thread::isRunning()
+bool ThreadLoop::isRunning()
 {
     State state;
     {
@@ -81,14 +81,14 @@ bool Thread::isRunning()
     return state == STATE_RUN;
 }
 
-void Thread::stop()
+void ThreadLoop::stop()
 {
     LOG_DEBUG(<< "Called.");
     setState(STATE_EXIT);
     thread_->join();
 }
 
-void Thread::wait()
+void ThreadLoop::wait()
 {
     LOG_DEBUG(<< "Called.");
     std::unique_lock<std::mutex> mutexlock(mutex_, std::defer_lock);
@@ -99,7 +99,7 @@ void Thread::wait()
     thread_->join();
 }
 
-void Thread::setState(State state)
+void ThreadLoop::setState(State state)
 {
     LOG_DEBUG(<< "Called with parameter state <" << state << ">.");
     std::unique_lock<std::mutex> mutexlock(mutex_);
@@ -109,7 +109,7 @@ void Thread::setState(State state)
     condition_.notify_one();
 }
 
-void Thread::runLoop()
+void ThreadLoop::runLoop()
 {
     LOG_DEBUG(<< "Called.");
 

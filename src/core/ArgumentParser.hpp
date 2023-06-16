@@ -31,7 +31,9 @@
 #include <vector>
 
 #include <Error.hpp>
+
 #include <ExportCore.hpp>
+#include <WarningsDisable.hpp>
 
 /** Argument Parser. */
 class EXPORT_CORE ArgumentParser
@@ -77,5 +79,7 @@ inline const std::string &ArgumentParser::toString(
 {
     return args_.at(name).text;
 }
+
+#include <WarningsEnable.hpp>
 
 #endif /* ARGUMENT_PARSER_HPP */

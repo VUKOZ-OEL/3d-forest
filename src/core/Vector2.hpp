@@ -27,6 +27,9 @@
 
 #include <Json.hpp>
 
+#include <ExportCore.hpp>
+#include <WarningsDisable.hpp>
+
 /** Vector 2D. */
 template <class T> class Vector2 : public std::array<T, 2>
 {
@@ -189,5 +192,7 @@ std::ostream &operator<<(std::ostream &os, const Vector2<T> &obj)
     return os << std::fixed << "(" << obj[0] << ", " << obj[1] << ")"
               << std::defaultfloat;
 }
+
+#include <WarningsEnable.hpp>
 
 #endif /* VECTOR2_HPP */

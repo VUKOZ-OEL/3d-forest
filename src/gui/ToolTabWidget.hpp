@@ -24,15 +24,15 @@
 
 #include <vector>
 
-#include <ExportGui.hpp>
-
 #include <QWidget>
 
 class FlowLayout;
-
 class QToolButton;
 class QVBoxLayout;
 class QLabel;
+
+#include <ExportGui.hpp>
+#include <WarningsDisable.hpp>
 
 /** Tool Tab Widget. */
 class EXPORT_GUI ToolTabWidget : public QWidget
@@ -55,5 +55,7 @@ private:
     std::vector<QWidget *> tabList_;
     std::vector<QToolButton *> toolButtonList_;
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* TOOL_TAB_WIDGET_HPP */

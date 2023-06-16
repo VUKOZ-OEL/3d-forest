@@ -25,11 +25,13 @@
 #include <unordered_set>
 
 #include <Camera.hpp>
-#include <ExportEditor.hpp>
 #include <Page.hpp>
 #include <QueryWhere.hpp>
 
 class Editor;
+
+#include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
 
 /** Data Query.
 
@@ -231,5 +233,7 @@ protected:
 
     std::shared_ptr<Page> read(size_t dataset, size_t index);
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* QUERY_HPP */

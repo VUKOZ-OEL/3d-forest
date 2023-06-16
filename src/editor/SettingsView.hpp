@@ -25,8 +25,10 @@
 #include <string>
 #include <vector>
 
-#include <ExportEditor.hpp>
 #include <Vector3.hpp>
+
+#include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
 
 /** Settings View. */
 class EXPORT_EDITOR SettingsView
@@ -77,5 +79,7 @@ protected:
     std::vector<std::string> colorSourceString_;
     std::vector<bool> colorSourceEnabled_;
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* SETTINGS_VIEW_HPP */

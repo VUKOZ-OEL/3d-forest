@@ -23,6 +23,7 @@
 #define THREAD_CALLBACK_INTERFACE_HPP
 
 #include <ExportCore.hpp>
+#include <WarningsDisable.hpp>
 
 /** Thread Callback Interface. */
 class EXPORT_CORE ThreadCallbackInterface
@@ -31,5 +32,7 @@ public:
     virtual ~ThreadCallbackInterface() = default;
     virtual void threadProgress(bool finished) = 0;
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* THREAD_CALLBACK_INTERFACE_HPP */

@@ -17,23 +17,13 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Classification.hpp */
+/** @file WarningsEnable.hpp */
 
-#ifndef CLASSIFICATION_HPP
-#define CLASSIFICATION_HPP
+#ifdef WARNINGS_DISABLE_HPP
+    #undef WARNINGS_DISABLE_HPP
 
-#include <string>
+    #if defined(_MSC_VER)
+        #pragma warning(pop)
+    #endif
 
-#include <ExportEditor.hpp>
-#include <WarningsDisable.hpp>
-
-/** Classification. */
-class EXPORT_EDITOR Classification
-{
-public:
-    std::string label;
-};
-
-#include <WarningsEnable.hpp>
-
-#endif /* CLASSIFICATION_HPP */
+#endif /* WARNINGS_DISABLE_HPP */

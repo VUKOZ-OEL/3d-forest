@@ -26,6 +26,7 @@
 #include <string>
 
 #include <ExportCore.hpp>
+#include <WarningsDisable.hpp>
 
 class Time
 {
@@ -43,5 +44,7 @@ public:
     static std::string EXPORT_CORE
     strftime(const char *format = "%Y-%m-%d %H:%M:%S");
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* TIME_HPP */

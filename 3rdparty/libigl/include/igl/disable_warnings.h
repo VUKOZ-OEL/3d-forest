@@ -11,7 +11,14 @@
 #ifndef IGL_WARNINGS_DISABLED
 #define IGL_WARNINGS_DISABLED
 
-#if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2))
+#ifdef _MSC_VER
+    // 4018	- signed/unsigned mismatch
+    // 4244 - conversion from 'type1' to 'type2', possible loss of data
+    // 4267	- conversion from 'size_t' to 'int', possible loss of data
+    #pragma warning( push )
+    #pragma warning( disable : 4018 4244 4267 )
+
+#elif (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2))
     #pragma GCC diagnostic push
     // The following warnings are unfortunately useful, they can detect bugs and exploits
     #pragma GCC diagnostic ignored "-Wsign-conversion"

@@ -22,11 +22,13 @@
 #ifndef PAGE_HPP
 #define PAGE_HPP
 
-#include <ExportEditor.hpp>
 #include <IndexFile.hpp>
 
 class Editor;
 class Query;
+
+#include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
 
 /** Page. */
 class EXPORT_EDITOR Page
@@ -205,5 +207,7 @@ protected:
                   size_t colorMax,
                   const std::vector<Vector3<double>> &pal);
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* PAGE_HPP */

@@ -25,6 +25,7 @@
 #include <cstdint>
 
 #include <ExportCore.hpp>
+#include <WarningsDisable.hpp>
 
 /** Copy 2 bytes. */
 inline void EXPORT_CORE copy16(uint8_t *dst, const uint8_t *src)
@@ -195,5 +196,7 @@ inline void EXPORT_CORE htold(uint8_t *dst, double src)
     swap64(dst, src8);
 #endif
 }
+
+#include <WarningsEnable.hpp>
 
 #endif /* ENDIAN_HPP */

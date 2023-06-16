@@ -24,6 +24,9 @@
 
 #include <Vector3.hpp>
 
+#include <ExportCore.hpp>
+#include <WarningsDisable.hpp>
+
 /** Axis-Aligned Bounding Box. */
 template <class T> class Box
 {
@@ -67,7 +70,7 @@ public:
     void read(const Json &in);
     Json &write(Json &out) const;
 
-protected:
+private:
     T min_[3];
     T max_[3];
     bool empty_;
@@ -404,5 +407,7 @@ template <class T> std::ostream &operator<<(std::ostream &os, const Box<T> &obj)
               << obj.max(0) << ", " << obj.max(1) << ", " << obj.max(2) << "}"
               << "}" << std::defaultfloat;
 }
+
+#include <WarningsEnable.hpp>
 
 #endif /* BOX_HPP */

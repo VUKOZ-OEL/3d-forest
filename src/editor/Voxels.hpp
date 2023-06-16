@@ -22,10 +22,12 @@
 #ifndef VOXELS_HPP
 #define VOXELS_HPP
 
-#include <ExportEditor.hpp>
 #include <Voxel.hpp>
 
 class Query;
+
+#include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
 
 /** Voxels. */
 class EXPORT_EDITOR Voxels
@@ -154,5 +156,7 @@ inline std::ostream &operator<<(std::ostream &os, const Voxels &obj)
               << std::defaultfloat;
     // clang-format on
 }
+
+#include <WarningsEnable.hpp>
 
 #endif /* VOXELS_HPP */

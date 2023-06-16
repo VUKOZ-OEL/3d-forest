@@ -17,25 +17,26 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Thread.hpp */
+/** @file ThreadLoop.hpp */
 
-#ifndef THREAD_HPP
-#define THREAD_HPP
+#ifndef THREAD_LOOP_HPP
+#define THREAD_LOOP_HPP
 
 #include <condition_variable>
 #include <mutex>
 #include <thread>
 
-#include <ExportCore.hpp>
-
 class ThreadCallbackInterface;
 
-/** Thread. */
-class EXPORT_CORE Thread
+#include <ExportCore.hpp>
+#include <WarningsDisable.hpp>
+
+/** Thread Loop. */
+class EXPORT_CORE ThreadLoop
 {
 public:
-    Thread();
-    virtual ~Thread();
+    ThreadLoop();
+    virtual ~ThreadLoop();
 
     void setCallback(ThreadCallbackInterface *callback);
 
@@ -77,4 +78,6 @@ protected:
     void runLoop();
 };
 
-#endif /* THREAD_HPP */
+#include <WarningsEnable.hpp>
+
+#endif /* THREAD_LOOP_HPP */

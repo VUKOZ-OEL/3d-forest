@@ -45,7 +45,7 @@ void RenderThread::render(size_t viewportId, const Camera &camera)
     camera_ = camera;
     initialized_ = false;
 
-    Thread::start();
+    ThreadLoop::start();
 }
 
 bool RenderThread::next()

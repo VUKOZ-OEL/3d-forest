@@ -26,13 +26,15 @@
 
 #include <Classifications.hpp>
 #include <Datasets.hpp>
-#include <ExportEditor.hpp>
 #include <Layers.hpp>
 #include <ModifierInterface.hpp>
 #include <Region.hpp>
 #include <Settings.hpp>
 #include <Viewports.hpp>
 #include <Voxels.hpp>
+
+#include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
 
 /** Editor. */
 class EXPORT_EDITOR Editor
@@ -146,5 +148,7 @@ protected:
 
     void updateAfterRead();
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* EDITOR_HPP */

@@ -22,11 +22,13 @@
 #ifndef LAYER_HPP
 #define LAYER_HPP
 
-#include <ExportEditor.hpp>
 #include <Json.hpp>
 #include <LayerData.hpp>
 #include <Mesh.hpp>
 #include <Vector3.hpp>
+
+#include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
 
 /** Layer. */
 class EXPORT_EDITOR Layer
@@ -69,5 +71,7 @@ inline std::ostream &operator<<(std::ostream &os, const Layer &obj)
     return os << "id <" << obj.id() << "> label <" << obj.label() << "> color <"
               << obj.color() << ">";
 }
+
+#include <WarningsEnable.hpp>
 
 #endif /* LAYER_HPP */

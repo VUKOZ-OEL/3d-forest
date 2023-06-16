@@ -26,6 +26,7 @@
 #include <string>
 
 #include <ExportCore.hpp>
+#include <WarningsDisable.hpp>
 
 /** Throw std exception. */
 #define THROW(msg) throw std::runtime_error(msg)
@@ -47,5 +48,7 @@ std::string EXPORT_CORE getErrorString(const std::string &message);
 
 /** Get the last error string with extra description for Windows functions. */
 std::string EXPORT_CORE getErrorStringWin(const std::string &message);
+
+#include <WarningsEnable.hpp>
 
 #endif /* ERROR_HPP */

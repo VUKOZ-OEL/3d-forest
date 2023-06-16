@@ -23,12 +23,12 @@
 #define ALGORITHM_THREAD_HPP
 
 #include <Query.hpp>
-#include <Thread.hpp>
+#include <ThreadLoop.hpp>
 class Editor;
 class AlgorithmWidgetInterface;
 
 /** Algorithm Thread. */
-class AlgorithmThread : public Thread
+class AlgorithmThread : public ThreadLoop
 {
 public:
     AlgorithmThread();
