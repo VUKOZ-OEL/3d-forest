@@ -25,12 +25,12 @@
 #include <vector>
 
 #include <Camera.hpp>
-#include <ExportGui.hpp>
+class Editor;
+class ViewerOpenGLViewport;
 
 #include <QWidget>
 
-class Editor;
-class ViewerOpenGLViewport;
+#include <ExportGui.hpp>
 
 /** Viewer Viewports. */
 class EXPORT_GUI ViewerViewports : public QWidget

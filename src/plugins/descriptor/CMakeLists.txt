@@ -32,14 +32,12 @@ add_library(
     SHARED
     ${SOURCES}
     resources/resources.qrc
-    ../algorithm/AlgorithmWidgetInterface.cpp
 )
 
 target_include_directories(
     ${SUB_PROJECT_NAME}
     PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}
-    ../algorithm
     ../../../3rdparty/eigen
 )
 

@@ -22,12 +22,12 @@
 #ifndef IMPORT_FILE_PLUGIN_HPP
 #define IMPORT_FILE_PLUGIN_HPP
 
-#include <ExportGui.hpp>
+class MainWindow;
 
 #include <QObject>
-
-class MainWindow;
 class QAction;
+
+#include <ExportGui.hpp>
 
 /** Import File Plugin. */
 class EXPORT_GUI ImportFilePlugin : public QObject

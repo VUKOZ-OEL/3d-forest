@@ -34,71 +34,91 @@
 #include <Log.hpp>
 
 Page::Page(Editor *editor, Query *query, uint32_t datasetId, uint32_t pageId)
-    : selectionSize(0),
+    : position(nullptr),
+      intensity(nullptr),
+      returnNumber(nullptr),
+      numberOfReturns(nullptr),
+      classification(nullptr),
+      userData(nullptr),
+      gpsTime(nullptr),
+      color(nullptr),
+      layer(nullptr),
+      elevation(nullptr),
+      customColor(nullptr),
+      descriptor(nullptr),
+      value(nullptr),
+      renderPosition(nullptr),
+      selectionSize(0),
       editor_(editor),
       query_(query),
       datasetId_(datasetId),
       pageId_(pageId),
-      state_(Page::STATE_READ),
-      modified_(false)
+      state_(Page::STATE_READ)
 {
 }
 
 Page::~Page()
 {
+    if (editor_ && pageData_)
+    {
+        pageData_.reset();
+        editor_->erasePage(datasetId_, pageId_);
+    }
 }
 
-void Page::clear()
+size_t Page::size() const
 {
-    position.clear();
-    intensity.clear();
-    returnNumber.clear();
-    numberOfReturns.clear();
-    classification.clear();
-    userData.clear();
-    gpsTime.clear();
-    color.clear();
+    if (pageData_)
+    {
+        return pageData_->size();
+    }
 
-    layer.clear();
-    elevation.clear();
-    customColor.clear();
-    descriptor.clear();
-    value.clear();
+    return 0;
+}
 
-    renderPosition.clear();
-    renderColor.clear();
+void Page::setModified()
+{
+    if (pageData_)
+    {
+        pageData_->setModified();
+    }
+}
 
-    selection.clear();
-    selectionSize = 0;
+bool Page::isModified() const
+{
+    if (pageData_)
+    {
+        return pageData_->isModified();
+    }
 
-    box.clear();
-    octree.clear();
+    return false;
 }
 
 void Page::resize(size_t n)
 {
-    position.resize(n * 3);
-    intensity.resize(n);
-    returnNumber.resize(n);
-    numberOfReturns.resize(n);
-    classification.resize(n);
-    userData.resize(n);
-    gpsTime.resize(n);
-    color.resize(n * 3);
+    position = pageData_->position.data();
+    intensity = pageData_->intensity.data();
+    returnNumber = pageData_->returnNumber.data();
+    numberOfReturns = pageData_->numberOfReturns.data();
+    classification = pageData_->classification.data();
+    userData = pageData_->userData.data();
+    gpsTime = pageData_->gpsTime.data();
+    color = pageData_->color.data();
+    layer = pageData_->layer.data();
+    elevation = pageData_->elevation.data();
+    customColor = pageData_->customColor.data();
+    descriptor = pageData_->descriptor.data();
+    value = pageData_->value.data();
+    renderPosition = pageData_->renderPosition.data();
 
-    layer.resize(n);
-    elevation.resize(n);
-    customColor.resize(n * 3);
-    descriptor.resize(n);
-    value.resize(n);
-
-    renderPosition.resize(n * 3);
     renderColor.resize(n * 3);
 
     selection.resize(n);
     selectionSize = n;
-
-    positionBase_.resize(n * 3);
+    for (size_t i = 0; i < n; i++)
+    {
+        selection[i] = static_cast<uint32_t>(i);
+    }
 
     selectedNodes_.reserve(64);
 }
@@ -107,92 +127,12 @@ void Page::readPage()
 {
     LOG_DEBUG(<< "Page pageId <" << pageId_ << ">.");
 
-    const Dataset &dataset = editor_->datasets().key(datasetId_);
-    const IndexFile::Node *node = dataset.index().at(pageId_);
+    pageData_ = editor_->readPage(datasetId_, pageId_);
 
-    // Read page buffer from LAS file
-    LasFile las;
-    las.open(dataset.path());
-    las.readHeader();
-
-    size_t pointSize = las.header.point_data_record_length;
-    uint64_t start = node->from * pointSize;
-    las.seek(start + las.header.offset_to_point_data);
-
-    size_t nPagePoints = static_cast<size_t>(node->size);
-    size_t bufferSize = pointSize * nPagePoints;
-    uint8_t fmt = las.header.point_data_record_format;
-    buffer_.resize(bufferSize);
-    las.file().read(buffer_.data(), bufferSize);
-
-    // Create point data
-    resize(nPagePoints);
-
-    // Covert buffer to point data
-    uint8_t *ptr = buffer_.data();
-    LasFile::Point point;
-    const double s16 = 1.0 / 65535.0;
-    bool rgbFlag = las.header.hasRgb();
-
-    for (size_t i = 0; i < nPagePoints; i++)
-    {
-        selection[i] = static_cast<uint32_t>(i);
-
-        las.readPoint(point, ptr + (pointSize * i), fmt);
-
-        // xyz
-        positionBase_[3 * i + 0] = static_cast<double>(point.x);
-        positionBase_[3 * i + 1] = static_cast<double>(point.y);
-        positionBase_[3 * i + 2] = static_cast<double>(point.z);
-
-        position[3 * i + 0] = positionBase_[3 * i + 0];
-        position[3 * i + 1] = positionBase_[3 * i + 1];
-        position[3 * i + 2] = positionBase_[3 * i + 2];
-
-        // intensity and color
-        intensity[i] = static_cast<double>(point.intensity) * s16;
-
-        if (rgbFlag)
-        {
-            color[3 * i + 0] = point.red * s16;
-            color[3 * i + 1] = point.green * s16;
-            color[3 * i + 2] = point.blue * s16;
-        }
-        else
-        {
-            color[3 * i + 0] = 1.0;
-            color[3 * i + 1] = 1.0;
-            color[3 * i + 2] = 1.0;
-        }
-
-        // attributes
-        returnNumber[i] = point.return_number;
-        numberOfReturns[i] = point.number_of_returns;
-        classification[i] = point.classification;
-        userData[i] = point.user_data;
-
-        // gps
-        gpsTime[i] = point.gps_time;
-
-        // User extra
-        layer[i] = point.user_layer;
-        elevation[i] = static_cast<double>(point.user_elevation);
-        customColor[3 * i + 0] = static_cast<double>(point.user_red) * s16;
-        customColor[3 * i + 1] = static_cast<double>(point.user_green) * s16;
-        customColor[3 * i + 2] = static_cast<double>(point.user_blue) * s16;
-        descriptor[i] = point.user_descriptor;
-        value[i] = static_cast<size_t>(point.user_value);
-    }
-
-    // Index
-    std::string pathIndex;
-    pathIndex = IndexFileBuilder::extension(dataset.path());
-    octree.read(pathIndex, node->offset);
-    octree.translate(dataset.translation());
+    resize(pageData_->size());
 
     // Loaded
     state_ = Page::STATE_TRANSFORM;
-    modified_ = false;
 
     // Apply
     transform();
@@ -200,101 +140,99 @@ void Page::readPage()
     runModifiers();
 }
 
-#define PAGE_FORMAT_COUNT 11
-
-static const size_t PAGE_FORMAT_USER[PAGE_FORMAT_COUNT] =
-    {20, 28, 26, 34, 57, 63, 30, 36, 38, 59, 67};
-
-void Page::toPoint(uint8_t *ptr, size_t i, uint8_t fmt)
-{
-    const double s16 = 65535.0;
-    size_t pos = PAGE_FORMAT_USER[fmt];
-
-    // Do not overwrite the other values for now
-    // - return number
-    // - gps time
-    // - etc.
-
-    // Classification
-    if (fmt > 5)
-    {
-        ptr[16] = classification[i];
-    }
-
-    // Layer
-    htol32(ptr + pos, static_cast<uint32_t>(layer[i]));
-
-    // Elevation
-    htol32(ptr + pos + 4, static_cast<uint32_t>(elevation[i]));
-
-    // Custom color
-    htol16(ptr + pos + 8, static_cast<uint16_t>(customColor[3 * i + 0] * s16));
-    htol16(ptr + pos + 10, static_cast<uint16_t>(customColor[3 * i + 1] * s16));
-    htol16(ptr + pos + 12, static_cast<uint16_t>(customColor[3 * i + 2] * s16));
-
-    // Descriptor
-    htold(ptr + pos + 16, descriptor[i]);
-
-    // Value
-    htol64(ptr + pos + 24, static_cast<uint64_t>(value[i]));
-}
-
 void Page::writePage()
 {
-    const Dataset &dataset = editor_->datasets().key(datasetId_);
-    const IndexFile::Node *node = dataset.index().at(pageId_);
-
-    LasFile las;
-    las.open(dataset.path());
-    las.readHeader();
-
-    size_t pointSize = las.header.point_data_record_length;
-    uint64_t start = node->from * pointSize;
-    las.seek(start + las.header.offset_to_point_data);
-
-    size_t n = static_cast<size_t>(node->size);
-    uint8_t fmt = las.header.point_data_record_format;
-
-    uint8_t *ptr = buffer_.data();
-
-    for (size_t i = 0; i < n; i++)
+    if (pageData_ && pageData_->isModified())
     {
-        toPoint(ptr + (pointSize * i), i, fmt);
+        pageData_->write(editor_);
+    }
+}
+
+void Page::setState(Page::State state)
+{
+    LOG_TRACE_UNKNOWN(<< "Page pageId <" << pageId_ << "> to state <" << state
+                      << ">.");
+
+    if ((state < state_) || (state == Page::STATE_RENDERED))
+    {
+        state_ = state;
     }
 
-    las.file().write(buffer_.data(), buffer_.size());
+    if (state == Page::STATE_READ)
+    {
+        // modified_ = false;
+    }
+}
 
-    modified_ = false;
+bool Page::nextState()
+{
+    LOG_TRACE_UPDATE_VIEW(<< "Compute state <" << Page::stateToString(state_)
+                          << ">.");
+
+    if (state_ == Page::STATE_READ)
+    {
+        try
+        {
+            readPage();
+        }
+        catch (...)
+        {
+            // std::cout << "unknown error\n";
+        }
+
+        return true;
+    }
+
+    if (state_ == Page::STATE_TRANSFORM)
+    {
+        if (pageData_)
+        {
+            transform();
+        }
+        return true;
+    }
+
+    if (state_ == Page::STATE_SELECT)
+    {
+        if (pageData_)
+        {
+            queryWhere();
+        }
+        return true;
+    }
+
+    if (state_ == Page::STATE_RUN_MODIFIERS)
+    {
+        if (pageData_)
+        {
+            runModifiers();
+        }
+        return true;
+    }
+
+    if (state_ == Page::STATE_RENDER)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+std::string Page::stateToString(Page::State state)
+{
+    const int stateNamesCount = 6;
+    const char *stateNames[stateNamesCount] =
+        {"read", "transform", "select", "modifiers", "render", "rendered"};
+    if (state >= 0 && state < stateNamesCount)
+    {
+        return std::string(stateNames[state]);
+    }
+
+    return std::to_string(state);
 }
 
 void Page::transform()
 {
-    const Dataset &dataset = editor_->datasets().key(datasetId_);
-    size_t n = positionBase_.size() / 3;
-    double x;
-    double y;
-    double z;
-    double tx = dataset.translation()[0];
-    double ty = dataset.translation()[1];
-    double tz = dataset.translation()[2];
-
-    for (size_t i = 0; i < n; i++)
-    {
-        x = positionBase_[3 * i + 0] + tx;
-        y = positionBase_[3 * i + 1] + ty;
-        z = positionBase_[3 * i + 2] + tz;
-
-        renderPosition[3 * i + 0] = static_cast<float>(x);
-        renderPosition[3 * i + 1] = static_cast<float>(y);
-        renderPosition[3 * i + 2] = static_cast<float>(z);
-
-        position[3 * i + 0] = x;
-        position[3 * i + 1] = y;
-        position[3 * i + 2] = z;
-    }
-
-    box.set(position);
-
     state_ = Page::STATE_SELECT;
 }
 
@@ -308,7 +246,7 @@ void Page::queryWhere()
     {
         // Reset selection to mark all points as selected.
         LOG_DEBUG(<< "Reset selection.");
-        uint32_t n = static_cast<uint32_t>(position.size() / 3);
+        uint32_t n = static_cast<uint32_t>(size());
         selection.resize(n);
         selectionSize = n;
         for (uint32_t i = 0; i < n; i++)
@@ -330,97 +268,6 @@ void Page::queryWhere()
     state_ = Page::STATE_RUN_MODIFIERS;
 }
 
-void Page::runModifiers()
-{
-    LOG_TRACE_UNKNOWN(<< "Page pageId <" << pageId_ << ">.");
-
-    runColorModifier();
-    editor_->runModifiers(this);
-
-    state_ = Page::STATE_RENDER;
-}
-
-void Page::setModified()
-{
-    modified_ = true;
-}
-
-void Page::setState(Page::State state)
-{
-    LOG_TRACE_UNKNOWN(<< "Page pageId <" << pageId_ << "> to state <" << state
-                      << ">.");
-
-    if ((state < state_) || (state == Page::STATE_RENDERED))
-    {
-        state_ = state;
-    }
-
-    if (state == Page::STATE_READ)
-    {
-        modified_ = false;
-    }
-}
-
-std::string Page::stateToString(Page::State state)
-{
-    const int stateNamesCount = 6;
-    const char *stateNames[stateNamesCount] =
-        {"read", "transform", "select", "modifiers", "render", "rendered"};
-    if (state >= 0 && state < stateNamesCount)
-    {
-        return std::string(stateNames[state]);
-    }
-
-    return std::to_string(state);
-}
-
-bool Page::nextState()
-{
-    LOG_TRACE_UPDATE_VIEW(<< "Compute state <" << Page::stateToString(state_)
-                          << ">.");
-
-    if (state_ == Page::STATE_READ)
-    {
-        try
-        {
-            LOG_DEBUG(<< "Page pageId <" << pageId_ << "> state <STATE_READ>.");
-            readPage();
-        }
-        catch (...)
-        {
-            // std::cout << "unknown error\n";
-        }
-
-        return true;
-    }
-
-    if (state_ == Page::STATE_TRANSFORM)
-    {
-        transform();
-        return true;
-    }
-
-    if (state_ == Page::STATE_SELECT)
-    {
-        LOG_DEBUG(<< "Page pageId <" << pageId_ << "> state <STATE_SELECT>.");
-        queryWhere();
-        return true;
-    }
-
-    if (state_ == Page::STATE_RUN_MODIFIERS)
-    {
-        runModifiers();
-        return true;
-    }
-
-    if (state_ == Page::STATE_RENDER)
-    {
-        return true;
-    }
-
-    return false;
-}
-
 void Page::queryWhereBox()
 {
     const Region &region = query_->where().region();
@@ -434,6 +281,7 @@ void Page::queryWhereBox()
 
     // Select octants
     selectedNodes_.resize(0);
+    IndexFile &octree = pageData_->octree;
     octree.selectLeaves(selectedNodes_, clipBox, datasetId_);
 
     // Compute upper limit of the number of selected points
@@ -579,6 +427,7 @@ void Page::queryWhereCone()
 
     // Select octants
     selectedNodes_.resize(0);
+    IndexFile &octree = pageData_->octree;
     octree.selectLeaves(selectedNodes_, clipCone.box(), datasetId_);
 
     // Compute upper limit of the number of selected points
@@ -661,6 +510,7 @@ void Page::queryWhereCylinder()
 
     // Select octants
     selectedNodes_.resize(0);
+    IndexFile &octree = pageData_->octree;
     octree.selectLeaves(selectedNodes_, clipCylinder.box(), datasetId_);
 
     // Compute upper limit of the number of selected points
@@ -743,6 +593,7 @@ void Page::queryWhereSphere()
 
     // Select octants
     selectedNodes_.resize(0);
+    IndexFile &octree = pageData_->octree;
     octree.selectLeaves(selectedNodes_, clipSphere.box(), datasetId_);
 
     // Compute upper limit of the number of selected points
@@ -898,7 +749,7 @@ void Page::queryWhereClassification()
         uint32_t id = classification[selection[i]];
         LOG_DEBUG(<< "Query classification <" << id << "> at <" << i << ">.");
 
-        if (classifications[id])
+        if (id < classifications.size() && classifications[id])
         {
             if (nSelectedNew != i)
             {
@@ -919,10 +770,12 @@ void Page::queryWhereLayer()
         return;
     }
 
-    const std::unordered_set<size_t> &layers = query_->where().layer().filter();
+    const std::unordered_set<size_t> &layerFilter =
+        query_->where().layer().filter();
+    const Layers &layers = editor_->layers();
 
     LOG_DEBUG(<< "Page pageId <" << pageId_ << ">.");
-    LOG_DEBUG(<< "Number of query layers <" << layers.size() << ">.");
+    LOG_DEBUG(<< "Number of query layers <" << layerFilter.size() << ">.");
 
     size_t nSelectedNew = 0;
 
@@ -930,7 +783,7 @@ void Page::queryWhereLayer()
     {
         size_t id = layer[selection[i]];
 
-        if (layers.find(id) != layers.end())
+        if (layerFilter.find(id) != layerFilter.end() || !layers.contains(id))
         {
             if (nSelectedNew != i)
             {
@@ -944,6 +797,16 @@ void Page::queryWhereLayer()
     selectionSize = nSelectedNew;
 }
 
+void Page::runModifiers()
+{
+    LOG_TRACE_UNKNOWN(<< "Page pageId <" << pageId_ << ">.");
+
+    runColorModifier();
+    editor_->runModifiers(this);
+
+    state_ = Page::STATE_RENDER;
+}
+
 void Page::runColorModifier()
 {
     const SettingsView &opt = editor_->settings().view();
@@ -951,7 +814,7 @@ void Page::runColorModifier()
     double g = opt.pointColor()[1];
     double b = opt.pointColor()[2];
 
-    size_t n = position.size() / 3;
+    size_t n = size();
 
     for (size_t i = 0; i < n; i++)
     {

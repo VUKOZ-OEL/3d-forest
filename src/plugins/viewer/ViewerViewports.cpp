@@ -22,7 +22,6 @@
 #include <iostream>
 
 #include <Editor.hpp>
-
 #include <ViewerOpenGLViewport.hpp>
 #include <ViewerViewports.hpp>
 

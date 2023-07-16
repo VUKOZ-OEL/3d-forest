@@ -22,6 +22,8 @@
 #include <Eigen/Core>
 
 #include <Error.hpp>
+
+#define LOG_MODULE_NAME "exampleEigen"
 #include <Log.hpp>
 
 static void print(const Eigen::MatrixXd &V)

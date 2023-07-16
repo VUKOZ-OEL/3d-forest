@@ -19,20 +19,22 @@
 
 /** @file SettingsColorWidget.cpp */
 
+#include <ColorSwitchWidget.hpp>
 #include <MainWindow.hpp>
 #include <SettingsColorWidget.hpp>
 #include <ThemeIcon.hpp>
 
-#include <QBrush>
 #include <QCheckBox>
 #include <QColor>
-#include <QColorDialog>
-#include <QHBoxLayout>
+#include <QComboBox>
+#include <QGridLayout>
+#include <QGroupBox>
 #include <QLabel>
-#include <QPixmap>
-#include <QPushButton>
 #include <QSlider>
 #include <QVBoxLayout>
+
+#define LOG_MODULE_NAME "SettingsColorWidget"
+#include <Log.hpp>
 
 #define ICON(name) (ThemeIcon(":/settings/", name))
 
@@ -40,28 +42,49 @@ SettingsColorWidget::SettingsColorWidget(MainWindow *mainWindow)
     : QWidget(mainWindow),
       mainWindow_(mainWindow)
 {
+    // Color
+    colorSwitchWidget_ = new ColorSwitchWidget;
+    connect(colorSwitchWidget_,
+            SIGNAL(colorChanged()),
+            this,
+            SLOT(slotSetColor()));
+
     // Fog
     fogCheckBox_ = new QCheckBox;
     fogCheckBox_->setChecked(settings_.isFogEnabled());
     fogCheckBox_->setToolTip(tr("Reduce intensity with increasing distance"));
-    fogCheckBox_->setText(tr("Fog"));
+    fogCheckBox_->setText(tr("Show Depth"));
     connect(fogCheckBox_,
             SIGNAL(stateChanged(int)),
             this,
             SLOT(slotSetFogEnabled(int)));
 
-    // Color
-    colorFgButton_ = new QPushButton(tr("Foreground"));
-    connect(colorFgButton_, SIGNAL(clicked()), this, SLOT(slotSetColorFg()));
+    QVBoxLayout *optionsVBoxLayout = new QVBoxLayout;
+    optionsVBoxLayout->addWidget(fogCheckBox_);
 
-    colorBgButton_ = new QPushButton(tr("Background"));
-    connect(colorBgButton_, SIGNAL(clicked()), this, SLOT(slotSetColorBg()));
+    QGroupBox *optionsGroupBox = new QGroupBox(tr("Options"));
+    optionsGroupBox->setLayout(optionsVBoxLayout);
 
-    QHBoxLayout *colorLayout = new QHBoxLayout;
-    colorLayout->addWidget(colorFgButton_);
-    colorLayout->addWidget(colorBgButton_);
-    colorLayout->addWidget(fogCheckBox_);
-    colorLayout->addStretch();
+    // Color source
+    colorSourceComboBox_ = new QComboBox;
+    for (size_t i = 0; i < settings_.colorSourceSize(); i++)
+    {
+        colorSourceComboBox_->addItem(settings_.colorSourceString(i));
+    }
+    for (size_t i = 0; i < settings_.colorSourceSize(); i++)
+    {
+        if (settings_.isColorSourceEnabled(i))
+        {
+            colorSourceComboBox_->setCurrentText(
+                settings_.colorSourceString(i));
+            break;
+        }
+    }
+
+    connect(colorSourceComboBox_,
+            SIGNAL(activated(int)),
+            this,
+            SLOT(slotColorSourceChanged(int)));
 
     // Point size
     pointSizeSlider_ = new QSlider;
@@ -76,14 +99,23 @@ SettingsColorWidget::SettingsColorWidget(MainWindow *mainWindow)
             this,
             SLOT(slotSetPointSize(int)));
 
-    QHBoxLayout *pointSizeLayout = new QHBoxLayout;
-    pointSizeLayout->addWidget(new QLabel(tr("Point Size")));
-    pointSizeLayout->addWidget(pointSizeSlider_);
-
     // Layout
+    QGridLayout *groupBoxLayout = new QGridLayout;
+
+    groupBoxLayout->addWidget(colorSwitchWidget_,
+                              0,
+                              0,
+                              Qt::AlignHCenter | Qt::AlignVCenter);
+    groupBoxLayout->addWidget(optionsGroupBox, 0, 1);
+
+    groupBoxLayout->addWidget(new QLabel(tr("Color Mode:")), 1, 0);
+    groupBoxLayout->addWidget(colorSourceComboBox_, 1, 1);
+
+    groupBoxLayout->addWidget(new QLabel(tr("Point Size:")), 2, 0);
+    groupBoxLayout->addWidget(pointSizeSlider_, 2, 1);
+
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addLayout(colorLayout);
-    mainLayout->addLayout(pointSizeLayout);
+    mainLayout->addLayout(groupBoxLayout);
     mainLayout->addStretch();
 
     setLayout(mainLayout);
@@ -107,109 +139,86 @@ void SettingsColorWidget::slotUpdate(void *sender,
 
     if (target.empty() || target.contains(Editor::TYPE_SETTINGS))
     {
-        setSettings(mainWindow_->editor().settings().view());
+        setSettingsIn(mainWindow_->editor().settings().view());
     }
 }
 
-void SettingsColorWidget::settingsChanged()
+void SettingsColorWidget::setSettingsOut(bool modifiers)
 {
     mainWindow_->suspendThreads();
     mainWindow_->editor().setSettingsView(settings_);
     mainWindow_->update(this, {Editor::TYPE_SETTINGS});
-    mainWindow_->updateRender();
+
+    if (modifiers)
+    {
+        mainWindow_->updateModifiers();
+    }
+    else
+    {
+        mainWindow_->updateRender();
+    }
 }
 
-void SettingsColorWidget::settingsChangedApply()
+void SettingsColorWidget::slotColorSourceChanged(int index)
 {
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setSettingsView(settings_);
-    mainWindow_->update(this, {Editor::TYPE_SETTINGS});
-    mainWindow_->updateModifiers();
+    LOG_DEBUG(<< "Set color source to <" << index << ">.");
+    if (index < 0)
+    {
+        return;
+    }
+    size_t i = static_cast<size_t>(index);
+    settings_.setColorSourceEnabledAll(false);
+    settings_.setColorSourceEnabled(i, true);
+    setSettingsOut(true);
 }
 
 void SettingsColorWidget::slotSetPointSize(int v)
 {
     settings_.setPointSize(static_cast<double>(v));
-    settingsChanged();
+    setSettingsOut();
 }
 
 void SettingsColorWidget::slotSetFogEnabled(int v)
 {
     (void)v;
     settings_.setFogEnabled(fogCheckBox_->isChecked());
-    settingsChanged();
+    setSettingsOut();
 }
 
-void SettingsColorWidget::slotSetColorFg()
+void SettingsColorWidget::slotSetColor()
 {
-    Vector3<double> rgb = settings_.pointColor();
+    QColor fg = colorSwitchWidget_->foregroundColor();
+    settings_.setPointColor({fg.redF(), fg.greenF(), fg.blueF()});
 
-    if (colorDialog(rgb))
-    {
-        settings_.setPointColor(rgb);
-        setColor(colorFgButton_, rgb);
-        settingsChangedApply();
-    }
+    QColor bg = colorSwitchWidget_->backgroundColor();
+    settings_.setBackgroundColor({bg.redF(), bg.greenF(), bg.blueF()});
+
+    setSettingsOut(true);
 }
 
-void SettingsColorWidget::slotSetColorBg()
-{
-    Vector3<double> rgb = settings_.backgroundColor();
-
-    if (colorDialog(rgb))
-    {
-        settings_.setBackgroundColor(rgb);
-        setColor(colorBgButton_, rgb);
-        settingsChangedApply();
-    }
-}
-
-bool SettingsColorWidget::colorDialog(Vector3<double> &rgb)
-{
-    QColor color;
-    color.setRgbF(static_cast<float>(rgb[0]),
-                  static_cast<float>(rgb[1]),
-                  static_cast<float>(rgb[2]));
-
-    QColorDialog dialog(color, this);
-    if (dialog.exec() == QDialog::Rejected)
-    {
-        return false;
-    }
-
-    color = dialog.selectedColor();
-    rgb[0] = static_cast<double>(color.redF());
-    rgb[1] = static_cast<double>(color.greenF());
-    rgb[2] = static_cast<double>(color.blueF());
-
-    return true;
-}
-
-void SettingsColorWidget::setColor(QPushButton *button,
-                                   const Vector3<double> &rgb)
-{
-    QColor color;
-    color.setRgbF(static_cast<float>(rgb[0]),
-                  static_cast<float>(rgb[1]),
-                  static_cast<float>(rgb[2]));
-
-    QPixmap pixmap(24, 24);
-    pixmap.fill(color);
-
-    QIcon icon(pixmap);
-
-    button->setIcon(icon);
-    button->setIconSize(QSize(10, 10));
-}
-
-void SettingsColorWidget::setSettings(const SettingsView &settings)
+void SettingsColorWidget::setSettingsIn(const SettingsView &settings)
 {
     block();
 
     settings_ = settings;
 
-    setColor(colorFgButton_, settings_.pointColor());
-    setColor(colorBgButton_, settings_.backgroundColor());
+    // Foreground color
+    auto fgv = settings_.pointColor();
+    QColor fg;
+    fg.setRgbF(static_cast<float>(fgv[0]),
+               static_cast<float>(fgv[1]),
+               static_cast<float>(fgv[2]));
+    colorSwitchWidget_->setForegroundColor(fg);
+
+    // Background color
+    auto bgv = settings_.backgroundColor();
+    QColor bg;
+    bg.setRgbF(static_cast<float>(bgv[0]),
+               static_cast<float>(bgv[1]),
+               static_cast<float>(bgv[2]));
+    colorSwitchWidget_->setBackgroundColor(bg);
+
+    // Point size
     pointSizeSlider_->setValue(static_cast<int>(settings_.pointSize()));
 
     unblock();

@@ -24,6 +24,9 @@
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
+#define LOG_MODULE_NAME "HeightMapPlugin"
+#include <Log.hpp>
+
 #define ICON(name) (ThemeIcon(":/heightmap/", name))
 
 HeightMapPlugin::HeightMapPlugin()
@@ -37,8 +40,8 @@ void HeightMapPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "Modifiers",
-                              "Modifiers",
+                              "Tools",
+                              "Tools",
                               tr("Height Map"),
                               tr("Compute height map"),
                               ICON("height_map"),

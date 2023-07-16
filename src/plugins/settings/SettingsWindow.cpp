@@ -25,6 +25,9 @@
 #include <ThemeIcon.hpp>
 #include <ToolTabWidget.hpp>
 
+#define LOG_MODULE_NAME "SettingsWindow"
+#include <Log.hpp>
+
 #define ICON(name) (ThemeIcon(":/settings/", name))
 
 SettingsWindow::SettingsWindow(MainWindow *mainWindow)

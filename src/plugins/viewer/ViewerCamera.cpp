@@ -28,6 +28,9 @@
 #include <QWheelEvent>
 #include <QtMath>
 
+#define LOG_MODULE_NAME "ViewerCamera"
+#include <Log.hpp>
+
 ViewerCamera::ViewerCamera()
     : eye_(0.0F, 0.0F, 1.0F),
       center_(0.0F, 0.0F, 0.0F),

@@ -32,7 +32,7 @@
      inkscape:document-units="px"
      showgrid="true"
      inkscape:zoom="34.541667"
-     inkscape:cx="5.3558504"
+     inkscape:cx="0.60796139"
      inkscape:cy="9.0904704"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
@@ -56,15 +56,15 @@
      inkscape:groupmode="layer"
      id="layer3"
      inkscape:label="Vector"><path
-       style="fill:none;stroke:#2e3436;stroke-width:0.7;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:1;paint-order:fill markers stroke"
+       style="fill:none;stroke:#2e3436;stroke-width:1;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:1;paint-order:fill markers stroke"
        d="m 2.5,4.5 6,-3 6,3 v 7 l -6,3"
        id="path466"
        sodipodi:nodetypes="ccccc" /><path
-       style="fill:none;stroke:#2e3436;stroke-width:0.7;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:1;paint-order:fill markers stroke"
+       style="fill:none;stroke:#2e3436;stroke-width:1;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:1;paint-order:fill markers stroke"
        d="m 14.5,4.5 -6,3"
        id="path468"
        sodipodi:nodetypes="cc" /><path
-       style="fill:none;fill-opacity:1;stroke:#2e3436;stroke-width:0.7;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:1;paint-order:fill markers stroke"
+       style="fill:none;fill-opacity:1;stroke:#2e3436;stroke-width:1;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:1;paint-order:fill markers stroke"
        d="m 8.5,14.5 -6,-3 v -7 l 6,3 z"
        id="path368"
        sodipodi:nodetypes="ccccc" /></g><metadata

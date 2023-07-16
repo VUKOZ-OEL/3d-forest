@@ -46,7 +46,7 @@ DoubleRangeSliderWidget::DoubleRangeSliderWidget()
 
 void DoubleRangeSliderWidget::setMinimum(double min)
 {
-    LOG_DEBUG(<< "Called with parameter min <" << min << ">.");
+    LOG_DEBUG(<< "Set minimum <" << min << ">.");
     minSpinBox_->setMinimum(min);
     maxSpinBox_->setMinimum(min);
     slider_->setMinimum(min);
@@ -55,7 +55,7 @@ void DoubleRangeSliderWidget::setMinimum(double min)
 
 void DoubleRangeSliderWidget::setMaximum(double max)
 {
-    LOG_DEBUG(<< "Called with parameter min <" << max << ">.");
+    LOG_DEBUG(<< "Set maximum <" << max << ">.");
     minSpinBox_->setMaximum(max);
     maxSpinBox_->setMaximum(max);
     slider_->setMaximum(max);
@@ -64,7 +64,7 @@ void DoubleRangeSliderWidget::setMaximum(double max)
 
 void DoubleRangeSliderWidget::setMinimumValue(double value)
 {
-    LOG_DEBUG(<< "Called with parameter value <" << value << ">.");
+    LOG_DEBUG(<< "Set minimum value <" << value << ">.");
     minSpinBox_->setValue(value);
     slider_->setMinimumValue(value);
     minimumValue_ = value;
@@ -77,7 +77,7 @@ double DoubleRangeSliderWidget::minimumValue()
 
 void DoubleRangeSliderWidget::setMaximumValue(double value)
 {
-    LOG_DEBUG(<< "Called with parameter value <" << value << ">.");
+    LOG_DEBUG(<< "Set maximum value <" << value << ">.");
     maxSpinBox_->setValue(value);
     slider_->setMaximumValue(value);
     maximumValue_ = value;
@@ -97,7 +97,7 @@ void DoubleRangeSliderWidget::blockSignals(bool block)
 
 void DoubleRangeSliderWidget::slotIntermediateMinimumValue(double v)
 {
-    LOG_DEBUG(<< "Called with parameter value <" << v << ">.");
+    LOG_DEBUG(<< "Update minimum value <" << v << ">.");
 
     QObject *obj = sender();
 
@@ -121,7 +121,7 @@ void DoubleRangeSliderWidget::slotIntermediateMinimumValue(double v)
 
 void DoubleRangeSliderWidget::slotIntermediateMaximumValue(double v)
 {
-    LOG_DEBUG(<< "Called with parameter value <" << v << ">.");
+    LOG_DEBUG(<< "Update maximum value <" << v << ">.");
 
     QObject *obj = sender();
 
@@ -156,7 +156,7 @@ void DoubleRangeSliderWidget::create(DoubleRangeSliderWidget *&outputWidget,
                                      double minValue,
                                      double maxValue)
 {
-    LOG_DEBUG(<< "Called with parameter min <" << min << ">"
+    LOG_DEBUG(<< "Create with parameter min <" << min << ">"
               << " max <" << max << ">"
               << " minValue <" << minValue << ">"
               << " maxValue <" << maxValue << ">.");

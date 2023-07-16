@@ -161,7 +161,8 @@ void Datasets::erase(size_t i)
 void Datasets::read(const std::string &path,
                     const std::string &projectPath,
                     const SettingsImport &settings,
-                    const Box<double> &projectBoundary)
+                    const Box<double> &projectBoundary,
+                    QueryFilterSet &filter)
 {
     Dataset ds;
     size_t id = unusedId();
@@ -172,10 +173,14 @@ void Datasets::read(const std::string &path,
     datasets_.push_back(ds);
     datasetsIds_.insert(id);
 
+    filter.setFilter(id, true);
+
     updateBoundary();
 }
 
-void Datasets::read(const Json &in, const std::string &projectPath)
+void Datasets::read(const Json &in,
+                    const std::string &projectPath,
+                    QueryFilterSet &filter)
 {
     size_t i;
     size_t n;
@@ -190,6 +195,7 @@ void Datasets::read(const Json &in, const std::string &projectPath)
         datasets_[i].read(it, projectPath);
         hashTable_[datasets_[i].id()] = i;
         datasetsIds_.insert(datasets_[i].id());
+        filter.setFilter(datasets_[i].id(), true);
         i++;
     }
 }

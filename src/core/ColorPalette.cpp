@@ -21,6 +21,9 @@
 
 #include <ColorPalette.hpp>
 
+#define LOG_MODULE_NAME "ColorPalette"
+#include <Log.hpp>
+
 #if !defined(EXPORT_CORE_IMPORT)
 const std::vector<Vector3<double>> ColorPalette::Classification{
     0xffffffU, //  0 : Created, Never classified

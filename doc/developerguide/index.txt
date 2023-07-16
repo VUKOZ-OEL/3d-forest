@@ -209,7 +209,7 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
         - Click "Finish"
 
 @subsection build-macos-make-3d-forest Build 3D Forest
-    - Open "Terminal" utility from "Applications"
+    - Open "Terminal" tool from "Applications"
     - First clone the repository for example into "Documents/devel" as follows:
       @verbatim
         cd Documents/devel/
@@ -836,6 +836,7 @@ powershell -C "gci | % {rni $_.Name ($_.Name -replace '24px', '24')}"
             "${workspaceRoot}/3rdparty/widgets/ctk",
             "${workspaceRoot}/3rdparty/widgets/flowlayout",
             "${workspaceRoot}/src/apps/3dforest",
+            "${workspaceRoot}/src/apps/tests",
             "${workspaceRoot}/src/apps/tools/sandbox",
             "${workspaceRoot}/src/core",
             "${workspaceRoot}/src/editor",
@@ -844,14 +845,14 @@ powershell -C "gci | % {rni $_.Name ($_.Name -replace '24px', '24')}"
             "${workspaceRoot}/src/plugins/classification",
             "${workspaceRoot}/src/plugins/descriptor",
             "${workspaceRoot}/src/plugins/elevation",
+            "${workspaceRoot}/src/plugins/explorer",
             "${workspaceRoot}/src/plugins/exportfile",
             "${workspaceRoot}/src/plugins/heightmap",
             "${workspaceRoot}/src/plugins/help",
             "${workspaceRoot}/src/plugins/importfile",
-            "${workspaceRoot}/src/plugins/logger",
+            "${workspaceRoot}/src/plugins/messagelog",
             "${workspaceRoot}/src/plugins/projectfile",
-            "${workspaceRoot}/src/plugins/projectnavigator",
-            "${workspaceRoot}/src/plugins/segmentationl1",
+            "${workspaceRoot}/src/plugins/segmentation",
             "${workspaceRoot}/src/plugins/settings",
             "${workspaceRoot}/src/plugins/viewer"]
     }

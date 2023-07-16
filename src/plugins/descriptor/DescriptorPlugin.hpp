@@ -22,30 +22,38 @@
 #ifndef DESCRIPTOR_PLUGIN_HPP
 #define DESCRIPTOR_PLUGIN_HPP
 
-#include <AlgorithmPluginInterface.hpp>
-#include <DescriptorPluginConstants.hpp>
-#include <DescriptorPluginExport.hpp>
-#include <DescriptorPluginWindow.hpp>
+#include <PluginInterface.hpp>
+class DescriptorWindow;
+
+#if defined(_MSC_VER)
+    #if defined(EXPORT_3DForestDescriptorPlugin)
+        #define EXPORT_DESCRIPTOR_PLUGIN __declspec(dllexport)
+    #else
+        #define EXPORT_DESCRIPTOR_PLUGIN __declspec(dllimport)
+    #endif
+#else
+    #define EXPORT_DESCRIPTOR_PLUGIN
+#endif
 
 /** Descriptor Plugin. */
-class DESCRIPTOR_PLUGIN_EXPORT DescriptorPlugin
-    : public QObject,
-      public AlgorithmPluginInterface
+class EXPORT_DESCRIPTOR_PLUGIN DescriptorPlugin : public QObject,
+                                                  public PluginInterface
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID AlgorithmPluginInterface_iid)
-    Q_INTERFACES(AlgorithmPluginInterface)
+    Q_PLUGIN_METADATA(IID PluginInterface_iid)
+    Q_INTERFACES(PluginInterface)
 
 public:
     DescriptorPlugin();
 
     virtual void initialize(MainWindow *mainWindow);
-    virtual AlgorithmWidgetInterface *widget() { return pluginWindow_; }
-    virtual QString name() const { return DESCRIPTOR_PLUGIN_NAME; }
 
-private:
+public slots:
+    void slotPlugin();
+
+protected:
     MainWindow *mainWindow_;
-    DescriptorPluginWindow *pluginWindow_;
+    DescriptorWindow *pluginWindow_;
 };
 
 #endif /* DESCRIPTOR_PLUGIN_HPP */

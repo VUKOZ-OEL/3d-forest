@@ -22,6 +22,8 @@
 #include <ArgumentParser.hpp>
 #include <Error.hpp>
 #include <File.hpp>
+
+#define LOG_MODULE_NAME "exampleFileSize"
 #include <Log.hpp>
 
 static void exampleFileSize(const std::string &path)

@@ -28,7 +28,7 @@ The code uses C++17, CMake, Qt5 or Qt6 and OpenGL.
 
 ## Build Instructions
 The code uses C++17 and CMake. Qt5 or Qt6 and OpenGL are required to build desktop application.
-The build process generates desktop application with graphical user interface and command line utilities.
+The build process generates desktop application with graphical user interface and command line tools.
 See [INSTALL](INSTALL) for more information.
 
 - [Windows MinGW](https://vukoz-oel.github.io/3d-forest-documentation/3d-forest-developer-guide.html#build-windows-make) build from source code
@@ -46,6 +46,7 @@ third-party libraries **without downloading and installation** of each library.
 - eigen (3.4.0), Template library for linear algebra.
 - libigl (2.4.0), A simple geometry processing library.
 - stb_image_write (v1.16), stb single-file public domain libraries for C++.
+- octree (0.1-icra), Index-based Octree implementation.
 
 ## Known Issues
 This software is currently in development.

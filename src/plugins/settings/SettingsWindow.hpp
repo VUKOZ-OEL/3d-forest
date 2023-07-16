@@ -22,11 +22,11 @@
 #ifndef SETTINGS_WINDOW_HPP
 #define SETTINGS_WINDOW_HPP
 
-#include <QDockWidget>
-
 class MainWindow;
 class SettingsColorWidget;
 class ToolTabWidget;
+
+#include <QDockWidget>
 
 /** Settings Window. */
 class SettingsWindow : public QDockWidget

@@ -24,6 +24,8 @@
 
 #include <Endian.hpp>
 #include <IndexFile.hpp>
+
+#define LOG_MODULE_NAME "IndexFile"
 #include <Log.hpp>
 
 #if !defined(EXPORT_EDITOR_IMPORT)

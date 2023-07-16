@@ -25,13 +25,17 @@
 class MainWindow;
 class ProgressActionInterface;
 
-#include <QProgressDialog>
+#include <QDialog>
+class QCloseEvent;
+class QLabel;
+class QProgressBar;
+class QPushButton;
 
 #include <ExportGui.hpp>
 #include <WarningsDisable.hpp>
 
 /** Progress Dialog. */
-class EXPORT_GUI ProgressDialog : public QProgressDialog
+class EXPORT_GUI ProgressDialog : public QDialog
 {
     Q_OBJECT
 
@@ -43,6 +47,23 @@ public:
     static bool run(MainWindow *mainWindow,
                     const char *title,
                     ProgressActionInterface *progressAction);
+
+public slots:
+    void slotCancel();
+
+private:
+    bool canceledFlag_;
+    double etaStartTime_;
+    double etaStartPercent_;
+    QLabel *progressStepsLabel_;
+    QLabel *progressStepLabel_;
+    QLabel *etaLabel_;
+    QProgressBar *progressBar_;
+    QPushButton *cancelButton_;
+
+    void closeEvent(QCloseEvent *event) override;
+    void initializeLabels(ProgressActionInterface *progressAction);
+    void updateLabels(ProgressActionInterface *progressAction);
 };
 
 #include <WarningsEnable.hpp>

@@ -21,6 +21,9 @@
 
 #include <SettingsView.hpp>
 
+#define LOG_MODULE_NAME "SettingsView"
+#include <Log.hpp>
+
 SettingsView::SettingsView()
     : pointSize_(1.0),
       fogEnabled_(false),
@@ -85,14 +88,42 @@ const char *SettingsView::colorSourceString(SettingsView::ColorSource id) const
     return colorSourceString_[static_cast<size_t>(id)].c_str();
 }
 
+const char *SettingsView::colorSourceString(size_t id) const
+{
+    if (id < static_cast<size_t>(SettingsView::COLOR_SOURCE_LAST))
+    {
+        return colorSourceString_[id].c_str();
+    }
+
+    return "";
+}
+
 bool SettingsView::isColorSourceEnabled(SettingsView::ColorSource id) const
 {
     return colorSourceEnabled_[static_cast<size_t>(id)];
 }
 
+bool SettingsView::isColorSourceEnabled(size_t id) const
+{
+    if (id < static_cast<size_t>(SettingsView::COLOR_SOURCE_LAST))
+    {
+        return colorSourceEnabled_[id];
+    }
+
+    return false;
+}
+
 void SettingsView::setColorSourceEnabled(SettingsView::ColorSource id, bool v)
 {
     colorSourceEnabled_[static_cast<size_t>(id)] = v;
+}
+
+void SettingsView::setColorSourceEnabled(size_t id, bool v)
+{
+    if (id < static_cast<size_t>(SettingsView::COLOR_SOURCE_LAST))
+    {
+        colorSourceEnabled_[id] = v;
+    }
 }
 
 void SettingsView::setColorSourceEnabledAll(bool v)

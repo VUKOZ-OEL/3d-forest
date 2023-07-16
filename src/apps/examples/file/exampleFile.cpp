@@ -21,6 +21,8 @@
 
 #include <Error.hpp>
 #include <File.hpp>
+
+#define LOG_MODULE_NAME "exampleFile"
 #include <Log.hpp>
 
 #define TEST(cmd) std::cout << #cmd << " <" << (cmd) << ">" << std::endl;

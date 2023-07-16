@@ -22,13 +22,13 @@
 #ifndef EXPORT_FILE_PLUGIN_HPP
 #define EXPORT_FILE_PLUGIN_HPP
 
-#include <ExportGui.hpp>
+class MainWindow;
 
 #include <QObject>
 #include <QString>
-
-class MainWindow;
 class QAction;
+
+#include <ExportGui.hpp>
 
 /** Export File Plugin. */
 class EXPORT_GUI ExportFilePlugin : public QObject

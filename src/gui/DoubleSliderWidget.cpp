@@ -30,6 +30,9 @@
 #include <QSpinBox>
 #include <QVBoxLayout>
 
+#define LOG_MODULE_NAME "DoubleSliderWidget"
+#include <Log.hpp>
+
 DoubleSliderWidget::DoubleSliderWidget() : QWidget()
 {
 }

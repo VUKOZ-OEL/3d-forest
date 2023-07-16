@@ -23,11 +23,13 @@
 
 #include <ArgumentParser.hpp>
 #include <Error.hpp>
-#include <Log.hpp>
 
 #include <QDir>
 #include <QPainter>
 #include <QPixmap>
+
+#define LOG_MODULE_NAME "icon"
+#include <Log.hpp>
 
 static void process(const QString &path, const QString &fileName);
 

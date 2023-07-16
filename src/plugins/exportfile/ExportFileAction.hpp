@@ -27,7 +27,6 @@
 #include <LasFile.hpp>
 #include <ProgressActionInterface.hpp>
 #include <Query.hpp>
-
 class Editor;
 
 /** Export File Action. */

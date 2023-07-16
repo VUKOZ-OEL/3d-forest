@@ -23,10 +23,10 @@
 #define DOUBLE_RANGE_SLIDER_WIDGET_HPP
 
 #include <QWidget>
-
-class ctkDoubleRangeSlider;
 class QDoubleSpinBox;
 class QVBoxLayout;
+
+class ctkDoubleRangeSlider;
 
 #include <ExportGui.hpp>
 #include <WarningsDisable.hpp>

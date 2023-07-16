@@ -19,14 +19,15 @@
 
 /** @file ProjectFilePlugin.cpp */
 
-#include <Log.hpp>
-
 #include <MainWindow.hpp>
 #include <ProjectFilePlugin.hpp>
 #include <ThemeIcon.hpp>
 
 #include <QFileDialog>
 #include <QMessageBox>
+
+#define LOG_MODULE_NAME "ProjectFilePlugin"
+#include <Log.hpp>
 
 #define PROJECT_FILE_PLUGIN_FILTER_PRJ "3DForest Project (*.json)"
 #define ICON(name) (ThemeIcon(":/projectfile/", name))
@@ -241,7 +242,7 @@ bool ProjectFilePlugin::projectSave(const QString &path)
     // Write
     try
     {
-        mainWindow_->editor().save(writePath);
+        mainWindow_->editor().saveProject(writePath);
     }
     catch (std::exception &e)
     {

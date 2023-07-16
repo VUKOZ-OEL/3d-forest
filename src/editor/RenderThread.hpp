@@ -24,7 +24,6 @@
 
 #include <Camera.hpp>
 #include <ThreadLoop.hpp>
-
 class Editor;
 
 #include <ExportEditor.hpp>

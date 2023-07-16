@@ -21,6 +21,9 @@
 
 #include <ViewerAabb.hpp>
 
+#define LOG_MODULE_NAME "ViewerAabb"
+#include <Log.hpp>
+
 ViewerAabb::ViewerAabb() : valid_(false)
 {
 }

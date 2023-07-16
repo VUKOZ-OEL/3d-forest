@@ -48,6 +48,7 @@ public:
     void translate(const Vector3<T> &v);
 
     void extend(const Box<T> &box);
+    void extend(T x, T y, T z);
     void clear();
 
     bool empty() const { return empty_; }
@@ -172,34 +173,63 @@ template <class T> inline void Box<T>::set(const std::vector<T> &xyz)
     size_t n = xyz.size() / 3;
     if (n > 0)
     {
-        T min_x = xyz[0];
-        T min_y = xyz[1];
-        T min_z = xyz[2];
-        T max_x = xyz[0];
-        T max_y = xyz[1];
-        T max_z = xyz[2];
+        min_[0] = xyz[0];
+        min_[1] = xyz[1];
+        min_[2] = xyz[2];
+        max_[0] = xyz[0];
+        max_[1] = xyz[1];
+        max_[2] = xyz[2];
 
         for (size_t i = 1; i < n; i++)
         {
-            if (xyz[3 * i + 0] < min_x)
-                min_x = xyz[3 * i + 0];
-            else if (xyz[3 * i + 0] > max_x)
-                max_x = xyz[3 * i + 0];
-            if (xyz[3 * i + 1] < min_y)
-                min_y = xyz[3 * i + 1];
-            else if (xyz[3 * i + 1] > max_y)
-                max_y = xyz[3 * i + 1];
-            if (xyz[3 * i + 2] < min_z)
-                min_z = xyz[3 * i + 2];
-            else if (xyz[3 * i + 2] > max_z)
-                max_z = xyz[3 * i + 2];
+            if (xyz[3 * i + 0] < min_[0])
+                min_[0] = xyz[3 * i + 0];
+            else if (xyz[3 * i + 0] > max_[0])
+                max_[0] = xyz[3 * i + 0];
+            if (xyz[3 * i + 1] < min_[1])
+                min_[1] = xyz[3 * i + 1];
+            else if (xyz[3 * i + 1] > max_[1])
+                max_[1] = xyz[3 * i + 1];
+            if (xyz[3 * i + 2] < min_[2])
+                min_[2] = xyz[3 * i + 2];
+            else if (xyz[3 * i + 2] > max_[2])
+                max_[2] = xyz[3 * i + 2];
         }
 
-        set(min_x, min_y, min_z, max_x, max_y, max_z);
+        empty_ = false;
     }
     else
     {
         clear();
+    }
+}
+
+template <class T> inline void Box<T>::extend(T x, T y, T z)
+{
+    if (empty_)
+    {
+        min_[0] = x;
+        min_[1] = y;
+        min_[2] = z;
+        max_[0] = x;
+        max_[1] = y;
+        max_[2] = z;
+        empty_ = false;
+    }
+    else
+    {
+        if (x < min_[0])
+            min_[0] = x;
+        else if (x > max_[0])
+            max_[0] = x;
+        if (y < min_[1])
+            min_[1] = y;
+        else if (y > max_[1])
+            max_[1] = y;
+        if (z < min_[2])
+            min_[2] = z;
+        else if (z > max_[2])
+            max_[2] = z;
     }
 }
 

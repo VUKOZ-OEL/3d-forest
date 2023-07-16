@@ -31,8 +31,8 @@
 class PluginInterface;
 class ExportFilePlugin;
 class ImportFilePlugin;
-class LoggerPlugin;
-class ProjectNavigatorPlugin;
+class MessageLogPlugin;
+class ExplorerPlugin;
 class ProjectFilePlugin;
 class SettingsPlugin;
 class ViewerPlugin;
@@ -119,7 +119,11 @@ signals:
     void signalUpdate(void *sender, const QSet<Editor::Type> &target);
 
 protected:
+    void showEvent(QShowEvent *event) override;
+    void hideEvent(QHideEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
+
+private:
     void loadPlugins();
     void loadPlugin(QObject *plugin);
     void createMenuSeparator(const QString &menu);
@@ -131,8 +135,8 @@ protected:
     // Gui
     ImportFilePlugin *importFilePlugin_;
     ExportFilePlugin *exportFilePlugin_;
-    LoggerPlugin *loggerPlugin_;
-    ProjectNavigatorPlugin *projectNavigatorPlugin_;
+    MessageLogPlugin *messageLogPlugin_;
+    ExplorerPlugin *explorerPlugin_;
     ProjectFilePlugin *projectFilePlugin_;
     SettingsPlugin *settingsPlugin_;
     ViewerPlugin *viewerPlugin_;

@@ -64,8 +64,11 @@ public:
 
     size_t colorSourceSize() const;
     const char *colorSourceString(SettingsView::ColorSource id) const;
+    const char *colorSourceString(size_t id) const;
     bool isColorSourceEnabled(SettingsView::ColorSource id) const;
+    bool isColorSourceEnabled(size_t id) const;
     void setColorSourceEnabled(SettingsView::ColorSource id, bool v);
+    void setColorSourceEnabled(size_t id, bool v);
     void setColorSourceEnabledAll(bool v);
 
     void read(const Json &in);

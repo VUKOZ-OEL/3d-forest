@@ -16,5 +16,6 @@
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
 add_subdirectory(3dforest)
-add_subdirectory(tools)
 add_subdirectory(examples)
+add_subdirectory(tests)
+add_subdirectory(tools)

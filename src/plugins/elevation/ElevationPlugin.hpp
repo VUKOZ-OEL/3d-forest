@@ -23,7 +23,6 @@
 #define ELEVATION_PLUGIN_HPP
 
 #include <PluginInterface.hpp>
-
 class ElevationWindow;
 
 #if defined(_MSC_VER)

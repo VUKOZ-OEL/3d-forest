@@ -22,12 +22,13 @@
 #ifndef SETTINGS_PLUGIN_HPP
 #define SETTINGS_PLUGIN_HPP
 
-#include <ExportGui.hpp>
-
-#include <QObject>
-
 class MainWindow;
 class SettingsWindow;
+
+#include <QObject>
+class QDockWidget;
+
+#include <ExportGui.hpp>
 
 /** Settings Plugin. */
 class EXPORT_GUI SettingsPlugin : public QObject
@@ -38,6 +39,7 @@ public:
     SettingsPlugin();
 
     void initialize(MainWindow *mainWindow);
+    QDockWidget *window() const;
 
 public slots:
     void slotPlugin();

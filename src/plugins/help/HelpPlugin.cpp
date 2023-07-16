@@ -25,6 +25,9 @@
 
 #include <QMessageBox>
 
+#define LOG_MODULE_NAME "HelpPlugin"
+#include <Log.hpp>
+
 #define ICON(name) (ThemeIcon(":/help/", name))
 
 HelpPlugin::HelpPlugin() : mainWindow_(nullptr)
@@ -50,25 +53,26 @@ void HelpPlugin::slotAbout()
     QMessageBox::about(
         mainWindow_,
         tr("About 3D Forest, version ") + MainWindow::APPLICATION_VERSION,
-        tr("3D Forest is software for analysis of Lidar data from forest"
-           " environment.\n"
+        tr("3D Forest is software for analysis, processing, and visualization"
+           " of Lidar point clouds, mainly focused on forest environment.\n"
            "\n"
            "Copyright 2020-present VUKOZ\n"
            "Blue Cat team and other authors\n"
            "https://www.3dforest.eu\n"
            "\n"
            "Uses delaunator-cpp, modified eigen, modified libigl, stb\n"
+           "Uses modified octree, (c) University of Bonn\n"
            "Uses modified ctkRangeSlider, (c) Kitware Inc.\n"
            "\n"
            "3D Forest software license:\n"
            "This program is free software and is distributed under the GNU\n"
            "General Public License, version 3. In short, this means you are\n"
-           "free to use and distribute 3D Forest for any purpose, commercial\n"
-           "or non-commercial, without any restrictions. You are also free to\n"
-           "modify the program as you wish, with the only restriction that if\n"
-           "you distribute the modified version, you must provide access to\n"
-           "its source code.\n"
-           "For more details about the license, read the file LICENSE inside\n"
-           "the 3D Forest installation folder or see\n"
+           "free to use 3D Forest for any purpose,"
+           " commercial or non-commercial\n"
+           "without any restrictions. You are also free to modify the program"
+           "\nas you wish. If you distribute software which uses any part of\n"
+           "3D Forest, you must provide access to the software's source code."
+           "\nFor more details about the license, read the file LICENSE inside"
+           "\nthe 3D Forest installation or source folder or see\n"
            "https://www.gnu.org/licenses/gpl-3.0.txt"));
 }

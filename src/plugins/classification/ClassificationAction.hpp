@@ -24,7 +24,6 @@
 
 #include <ProgressActionInterface.hpp>
 #include <Query.hpp>
-
 class Editor;
 
 /** Classification Action. */

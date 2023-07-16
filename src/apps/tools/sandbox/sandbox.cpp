@@ -33,6 +33,9 @@
 #include <Time.hpp>
 #include <Vector3.hpp>
 
+#define LOG_MODULE_NAME "sandbox"
+#include <Log.hpp>
+
 int main(int argc, char *argv[])
 {
     (void)argc;

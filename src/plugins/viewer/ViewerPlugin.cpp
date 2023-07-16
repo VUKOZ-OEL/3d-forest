@@ -19,12 +19,13 @@
 
 /** @file ViewerPlugin.cpp */
 
-#include <Log.hpp>
-
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 #include <ViewerPlugin.hpp>
 #include <ViewerViewports.hpp>
+
+#define LOG_MODULE_NAME "ViewerPlugin"
+#include <Log.hpp>
 
 #define ICON(name) (ThemeIcon(":/viewer/", name))
 
@@ -148,7 +149,7 @@ void ViewerPlugin::initialize(MainWindow *mainWindow)
                               SLOT(slotViewLayout3RowsRight()));
 
     // mainWindow_->hideToolBar("Viewport Projection");
-    // mainWindow_->hideToolBar("Viewport Layout");
+    mainWindow_->hideToolBar("Viewport Layout");
 }
 
 void ViewerPlugin::slotViewOrthographic()

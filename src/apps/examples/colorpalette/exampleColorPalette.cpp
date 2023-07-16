@@ -21,6 +21,9 @@
 
 #include <ColorPalette.hpp>
 
+#define LOG_MODULE_NAME "exampleColorPalette"
+#include <Log.hpp>
+
 static void print(const std::vector<Vector3<double>> &pal)
 {
     char buffer[32];

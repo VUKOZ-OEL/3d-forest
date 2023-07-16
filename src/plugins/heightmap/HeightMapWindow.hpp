@@ -22,50 +22,25 @@
 #ifndef HEIGHT_MAP_WINDOW_HPP
 #define HEIGHT_MAP_WINDOW_HPP
 
-#include <QDockWidget>
-
 class MainWindow;
-class HeightMapModifier;
+class HeightMapWidget;
 
-class QSpinBox;
-class QComboBox;
-class QCheckBox;
-class QPushButton;
+#include <QDialog>
 class QCloseEvent;
 
-/** Height Map Window.
-
-    This class represents Height Map GUI as view-controller for
-    HeightMapModifier.
-
-    GUI could be provided directly by the top HeightMapPlugin if it was derived
-    from QDialog instead of QObject.
-*/
-class HeightMapWindow : public QDockWidget
+/** Height Map Window. */
+class HeightMapWindow : public QDialog
 {
     Q_OBJECT
 
 public:
     HeightMapWindow(MainWindow *mainWindow, HeightMapModifier *modifier);
 
-protected slots:
-    void colorCountChanged(int i);
-    void colormapChanged(int index);
-    void sourceChanged(int index);
-    void previewChanged(int index);
-    void apply();
-
 protected:
-    MainWindow *mainWindow_;
-    HeightMapModifier *modifier_;
-    QWidget *widget_;
-    QSpinBox *colorCountSpinBox_;
-    QComboBox *colormapComboBox_;
-    QComboBox *sourceComboBox_;
-    QCheckBox *previewCheckBox_;
-    QPushButton *applyButton_;
-
     void closeEvent(QCloseEvent *event) override;
+
+private:
+    HeightMapWidget *widget_;
 };
 
 #endif /* HEIGHT_MAP_WINDOW_HPP */

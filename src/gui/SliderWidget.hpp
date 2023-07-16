@@ -23,7 +23,6 @@
 #define SLIDER_WIDGET_HPP
 
 #include <QWidget>
-
 class QSpinBox;
 class QSlider;
 class QVBoxLayout;

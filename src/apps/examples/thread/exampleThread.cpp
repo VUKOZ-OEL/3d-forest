@@ -19,10 +19,12 @@
 
 /** @file exampleThread.cpp @brief Thread example. */
 
-#include <Log.hpp>
 #include <ThreadCallbackInterface.hpp>
 #include <ThreadLoop.hpp>
 #include <Time.hpp>
+
+#define LOG_MODULE_NAME "exampleThread"
+#include <Log.hpp>
 
 /** Custom thread. */
 class MyThread : public ThreadLoop

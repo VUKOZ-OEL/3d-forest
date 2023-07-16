@@ -30,6 +30,9 @@
 
 #include <Error.hpp>
 
+#define LOG_MODULE_NAME "Error"
+#include <Log.hpp>
+
 std::string getErrorString(int errnum)
 {
     const char *msg = nullptr;

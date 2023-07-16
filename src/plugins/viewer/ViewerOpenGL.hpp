@@ -25,7 +25,6 @@
 #include <vector>
 
 #include <Region.hpp>
-
 #include <ViewerAabb.hpp>
 
 #include <QVector3D>
@@ -45,14 +44,18 @@ public:
     ~ViewerOpenGL();
 
     static void render(Mode mode,
-                       const std::vector<float> &xyz,
-                       const std::vector<float> &rgb);
+                       const float *xyz,
+                       size_t xyzSize,
+                       const float *rgb,
+                       size_t rgbSize);
 
     static void render(Mode mode,
-                       const std::vector<float> &xyz,
-                       const std::vector<float> &rgb,
-                       const std::vector<unsigned int> &indices,
-                       size_t count);
+                       const float *xyz,
+                       size_t xyzSize,
+                       const float *rgb,
+                       size_t rgbSize,
+                       const unsigned int *indices,
+                       size_t indicesSize);
 
     static void renderClipFilter(const Region &clipFilter);
     static void renderAabb(const ViewerAabb &box);

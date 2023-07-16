@@ -22,6 +22,9 @@
 #include <Error.hpp>
 #include <Layer.hpp>
 
+#define LOG_MODULE_NAME "Layer"
+#include <Log.hpp>
+
 Layer::Layer() : id_(0)
 {
 }

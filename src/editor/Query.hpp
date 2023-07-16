@@ -27,7 +27,6 @@
 #include <Camera.hpp>
 #include <Page.hpp>
 #include <QueryWhere.hpp>
-
 class Editor;
 
 #include <ExportEditor.hpp>

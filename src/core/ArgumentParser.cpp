@@ -23,6 +23,9 @@
 
 #include <ArgumentParser.hpp>
 
+#define LOG_MODULE_NAME "ArgumentParser"
+#include <Log.hpp>
+
 ArgumentParser::ArgumentParser()
 {
 }

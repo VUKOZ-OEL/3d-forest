@@ -21,6 +21,9 @@
 
 #include <Settings.hpp>
 
+#define LOG_MODULE_NAME "Settings"
+#include <Log.hpp>
+
 void Settings::setView(const SettingsView &view)
 {
     view_ = view;

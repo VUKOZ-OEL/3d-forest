@@ -23,12 +23,12 @@
 #include <PluginInterface.hpp>
 #include <ViewerViewports.hpp>
 
+#include <ExplorerPlugin.hpp>
 #include <ExportFilePlugin.hpp>
 #include <HelpPlugin.hpp>
 #include <ImportFilePlugin.hpp>
-#include <LoggerPlugin.hpp>
+#include <MessageLogPlugin.hpp>
 #include <ProjectFilePlugin.hpp>
-#include <ProjectNavigatorPlugin.hpp>
 #include <SettingsPlugin.hpp>
 #include <ViewerPlugin.hpp>
 
@@ -57,7 +57,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       threadRender_(&editor_)
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Create.");
 
     // Status bar
     statusBar()->showMessage(tr("Ready"));
@@ -72,14 +72,14 @@ MainWindow::MainWindow(QWidget *parent)
     exportFilePlugin_ = new ExportFilePlugin();
     exportFilePlugin_->initialize(this);
 
-    projectNavigatorPlugin_ = new ProjectNavigatorPlugin();
-    projectNavigatorPlugin_->initialize(this);
+    explorerPlugin_ = new ExplorerPlugin();
+    explorerPlugin_->initialize(this);
 
     settingsPlugin_ = new SettingsPlugin();
     settingsPlugin_->initialize(this);
 
-    loggerPlugin_ = new LoggerPlugin();
-    loggerPlugin_->initialize(this);
+    messageLogPlugin_ = new MessageLogPlugin();
+    messageLogPlugin_->initialize(this);
 
     viewerPlugin_ = new ViewerPlugin();
     viewerPlugin_->initialize(this);
@@ -101,7 +101,8 @@ MainWindow::MainWindow(QWidget *parent)
     actionExit_->setShortcuts(QKeySequence::Quit);
 
     // Show windows
-    projectNavigatorPlugin_->slotPlugin();
+    explorerPlugin_->slotPlugin();
+    settingsPlugin_->slotPlugin();
 
     // Rendering
     connect(viewerPlugin_->viewports(),
@@ -123,7 +124,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Destroy.");
     threadRender_.stop();
 }
 
@@ -135,6 +136,35 @@ QSize MainWindow::minimumSizeHint() const
 QSize MainWindow::sizeHint() const
 {
     return QSize(1024, 768);
+}
+
+void MainWindow::showEvent(QShowEvent *event)
+{
+    LOG_DEBUG(<< "Show.");
+
+    resizeDocks({explorerPlugin_->window(), settingsPlugin_->window()},
+                {80, 20},
+                Qt::Vertical);
+
+    QWidget::showEvent(event);
+}
+
+void MainWindow::hideEvent(QHideEvent *event)
+{
+    LOG_DEBUG(<< "Hide.");
+    QWidget::hideEvent(event);
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    if (projectFilePlugin_->projectClose())
+    {
+        event->accept();
+    }
+    else
+    {
+        event->ignore();
+    }
 }
 
 void MainWindow::showError(const char *message)
@@ -163,10 +193,9 @@ void MainWindow::createAction(QAction **result,
                               const QObject *receiver,
                               const char *member)
 {
-    LOG_DEBUG(<< "Called with parameter menu <" << menu.toStdString()
-              << "> toolBar <" << toolBar.toStdString() << "> text <"
-              << text.toStdString() << "> icon sizes <"
-              << icon.availableSizes().count() << ">.");
+    LOG_DEBUG(<< "Create action menu <" << menu.toStdString() << "> toolBar <"
+              << toolBar.toStdString() << "> text <" << text.toStdString()
+              << "> icon sizes <" << icon.availableSizes().count() << ">.");
 
     QAction *action;
 
@@ -304,20 +333,20 @@ void MainWindow::loadPlugin(QObject *plugin)
 
 void MainWindow::suspendThreads()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_TRACE_THREAD(<< "Suspend threads.");
     threadRender_.cancel();
 }
 
 void MainWindow::resumeThreads()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_TRACE_THREAD(<< "Resume threads.");
     slotRenderViewport();
 }
 
 void MainWindow::threadProgress(bool finished)
 {
     (void)finished;
-    LOG_DEBUG(<< "Called with parameter finished <" << finished << ">.");
+    LOG_TRACE_THREAD(<< "Thread progress finished <" << finished << ">.");
     emit signalRender();
 }
 
@@ -337,7 +366,7 @@ void MainWindow::slotRenderViewport()
 
 void MainWindow::slotRenderViewport(size_t viewportId)
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_TRACE_UPDATE_VIEW(<< "Render viewport <" << viewportId << ">.");
     ViewerViewports *viewports = viewerPlugin_->viewports();
     threadRender_.render(viewportId, viewports->camera(viewportId));
 }
@@ -351,9 +380,7 @@ void MainWindow::update(const QSet<Editor::Type> &target,
                         Page::State viewPortsCacheState,
                         bool resetCamera)
 {
-    LOG_DEBUG(<< "Called with parameter number of targets <" << target.count()
-              << ">.");
-    LOG_TRACE_UPDATE_VIEW(<< "Update targets.");
+    LOG_TRACE_UPDATE(<< "Update number of targets <" << target.count() << ">.");
     suspendThreads();
 
     editor_.viewports().setState(viewPortsCacheState);
@@ -372,7 +399,7 @@ void MainWindow::update(const QSet<Editor::Type> &target,
 
 void MainWindow::updateEverything()
 {
-    LOG_TRACE_UPDATE_VIEW(<< "Update everything.");
+    LOG_TRACE_UPDATE(<< "Update everything.");
     suspendThreads();
 
     ViewerViewports *viewports = viewerPlugin_->viewports();
@@ -391,7 +418,7 @@ void MainWindow::updateEverything()
 
 void MainWindow::updateData()
 {
-    LOG_TRACE_UPDATE_VIEW(<< "Update data.");
+    LOG_TRACE_UPDATE(<< "Update data.");
     suspendThreads();
 
     ViewerViewports *viewports = viewerPlugin_->viewports();
@@ -403,7 +430,7 @@ void MainWindow::updateData()
 
 void MainWindow::updateFilter()
 {
-    LOG_TRACE_UPDATE_VIEW(<< "Update filter.");
+    LOG_TRACE_UPDATE(<< "Update filter.");
     suspendThreads();
 
     ViewerViewports *viewports = viewerPlugin_->viewports();
@@ -415,7 +442,7 @@ void MainWindow::updateFilter()
 
 void MainWindow::updateModifiers()
 {
-    LOG_TRACE_UPDATE_VIEW(<< "Update modifiers.");
+    LOG_TRACE_UPDATE(<< "Update modifiers.");
     suspendThreads();
 
     editor_.viewports().setState(Page::STATE_RUN_MODIFIERS);
@@ -425,22 +452,10 @@ void MainWindow::updateModifiers()
 
 void MainWindow::updateRender()
 {
-    LOG_TRACE_UPDATE_VIEW(<< "Update render.");
+    LOG_TRACE_UPDATE(<< "Update render.");
     suspendThreads();
 
     editor_.viewports().setState(Page::STATE_RENDER);
 
     resumeThreads();
-}
-
-void MainWindow::closeEvent(QCloseEvent *event)
-{
-    if (projectFilePlugin_->projectClose())
-    {
-        event->accept();
-    }
-    else
-    {
-        event->ignore();
-    }
 }

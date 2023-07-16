@@ -21,7 +21,6 @@
 
 #include <Editor.hpp>
 #include <Time.hpp>
-
 #include <ViewerOpenGL.hpp>
 #include <ViewerOpenGLViewport.hpp>
 #include <ViewerViewports.hpp>
@@ -308,8 +307,10 @@ bool ViewerOpenGLViewport::renderScene()
 
             ViewerOpenGL::render(ViewerOpenGL::POINTS,
                                  page.renderPosition,
-                                 page.renderColor,
-                                 page.selection,
+                                 page.size(),
+                                 page.renderColor.data(),
+                                 page.renderColor.size(),
+                                 page.selection.data(),
                                  page.selectionSize);
 
             glFlush();
@@ -366,7 +367,11 @@ void ViewerOpenGLViewport::renderLayers()
                 mode = ViewerOpenGL::LINES;
             }
 
-            ViewerOpenGL::render(mode, mesh.xyz, mesh.rgb);
+            ViewerOpenGL::render(mode,
+                                 mesh.xyz.data(),
+                                 mesh.xyz.size(),
+                                 mesh.rgb.data(),
+                                 mesh.rgb.size());
 
             glPointSize(1.0F);
         }

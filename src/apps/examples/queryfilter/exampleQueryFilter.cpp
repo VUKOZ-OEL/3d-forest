@@ -21,8 +21,10 @@
 
 #include <Editor.hpp>
 #include <Error.hpp>
-#include <Log.hpp>
 #include <QueryFilterSet.hpp>
+
+#define LOG_MODULE_NAME "exampleQueryFilter"
+#include <Log.hpp>
 
 static void exampleQueryFilter()
 {

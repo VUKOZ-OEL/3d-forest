@@ -26,19 +26,28 @@
 
 QueryFilterSet::QueryFilterSet() : enabled_(false)
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Create.");
 }
 
-QueryFilterSet::QueryFilterSet(const std::unordered_set<size_t> &list)
+QueryFilterSet::QueryFilterSet(const std::unordered_set<size_t> &list,
+                               bool enabled)
     : filter_(list),
       values_(list),
-      enabled_(false)
+      enabled_(enabled)
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Create.");
 }
 
 QueryFilterSet::~QueryFilterSet()
 {
+    LOG_DEBUG(<< "Destroy.");
+}
+
+void QueryFilterSet::clear()
+{
+    filter_.clear();
+    values_.clear();
+    enabled_ = false;
 }
 
 void QueryFilterSet::setFilter(const std::unordered_set<size_t> &list)

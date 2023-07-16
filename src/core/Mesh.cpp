@@ -23,6 +23,9 @@
 
 #include <Mesh.hpp>
 
+#define LOG_MODULE_NAME "Mesh"
+#include <Log.hpp>
+
 Mesh::Mesh()
 {
 }
