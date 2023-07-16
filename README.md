@@ -1,5 +1,5 @@
 <div align="center">
-<img width="100%" src="https://raw.githubusercontent.com/VUKOZ-OEL/3d-forest/main/doc/images/3d-forest-preview-screenshot.png"></a>
+<img width="100%" src="https://raw.githubusercontent.com/VUKOZ-OEL/3d-forest/main/doc/images/3d-forest.png"></a>
 </div>
 
 # 3D Forest
