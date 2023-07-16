@@ -25,8 +25,10 @@
 #include <igl/writeOBJ.h>
 
 #include <Error.hpp>
-#include <Log.hpp>
 #include <Vector3.hpp>
+
+#define LOG_MODULE_NAME "exampleMeshDistance"
+#include <Log.hpp>
 
 static void printMesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F)
 {

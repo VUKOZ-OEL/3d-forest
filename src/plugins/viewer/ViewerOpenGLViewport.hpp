@@ -23,15 +23,13 @@
 #define VIEWER_OPENGL_VIEWPORT_HPP
 
 #include <Camera.hpp>
-
 #include <ViewerAabb.hpp>
 #include <ViewerCamera.hpp>
+class Editor;
+class ViewerViewports;
 
 #include <QOpenGLFunctions>
 #include <QOpenGLWidget>
-
-class Editor;
-class ViewerViewports;
 class QMouseEvent;
 class QWheelEvent;
 

@@ -22,7 +22,7 @@
 #ifndef PROGRESS_ACTION_INTERFACE_HPP
 #define PROGRESS_ACTION_INTERFACE_HPP
 
-#include <cstdint>
+#include <ProgressCounter.hpp>
 
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
@@ -31,37 +31,21 @@
 class EXPORT_EDITOR ProgressActionInterface
 {
 public:
-    static const uint64_t npos = UINT64_MAX;
-
     ProgressActionInterface();
     virtual ~ProgressActionInterface() = default;
 
     virtual void next() = 0;
 
-    void initialize(uint64_t nElements = npos,
-                    uint64_t interleave = 1,
-                    double secondsPerStep = 0.25);
-    void startTimer();
-    bool timedOut();
-    bool end() const { return processed() >= maximum(); }
+    bool end() const { return progress_.end(); }
 
-    double percent() const;
-    void setProcessed(uint64_t n) { nElementsProcessed_ = n; }
-    uint64_t processed() const { return nElementsProcessed_; }
-    uint64_t process() const { return nElements_ - nElementsProcessed_; }
-    uint64_t maximum() const { return nElements_; }
-    bool initializing() const { return nElements_ == npos; }
-    void increment(uint64_t nElementsProcessed);
+    size_t progressMaximumSteps() const { return progress_.maximumSteps(); }
+    size_t progressValueSteps() const { return progress_.valueSteps(); }
+    uint64_t progressMaximumStep() const { return progress_.maximumStep(); }
+    uint64_t progressValueStep() const { return progress_.valueStep(); }
+    double progressPercent() const { return progress_.percent(); }
 
-private:
-    uint64_t nElements_;
-    uint64_t nElementsProcessed_;
-    uint64_t interleave_;
-    double secondsPerStep_;
-
-    double timeBegin_;
-    double timeNow_;
-    uint64_t interleaveCounter_;
+protected:
+    ProgressCounter progress_;
 };
 
 #include <WarningsEnable.hpp>

@@ -19,8 +19,6 @@
 
 /** @file ExportFilePlugin.cpp */
 
-#include <Log.hpp>
-
 #include <ExportFileAction.hpp>
 #include <ExportFileDialog.hpp>
 #include <ExportFilePlugin.hpp>
@@ -29,6 +27,9 @@
 #include <ThemeIcon.hpp>
 
 #include <QMessageBox>
+
+#define LOG_MODULE_NAME "ExportFilePlugin"
+#include <Log.hpp>
 
 #define ICON(name) (ThemeIcon(":/exportfile/", name))
 

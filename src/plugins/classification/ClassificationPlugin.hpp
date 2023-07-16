@@ -23,7 +23,6 @@
 #define CLASSIFICATION_PLUGIN_HPP
 
 #include <PluginInterface.hpp>
-
 class ClassificationWindow;
 
 #if defined(_MSC_VER)

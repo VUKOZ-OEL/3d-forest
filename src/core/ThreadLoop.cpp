@@ -33,12 +33,12 @@ ThreadLoop::ThreadLoop()
       waiting_(false),
       received_(false)
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Create.");
 }
 
 ThreadLoop::~ThreadLoop()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Destroy.");
 }
 
 void ThreadLoop::setCallback(ThreadCallbackInterface *callback)
@@ -48,19 +48,19 @@ void ThreadLoop::setCallback(ThreadCallbackInterface *callback)
 
 void ThreadLoop::create()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Create thread.");
     thread_ = std::make_shared<std::thread>(&ThreadLoop::runLoop, this);
 }
 
 void ThreadLoop::start()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Start thread.");
     setState(STATE_RUN);
 }
 
 void ThreadLoop::cancel()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Cancel thread.");
     std::unique_lock mutexlock(mutexCaller_);
     setState(STATE_CANCEL);
     received_ = false;
@@ -83,14 +83,14 @@ bool ThreadLoop::isRunning()
 
 void ThreadLoop::stop()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Stop thread.");
     setState(STATE_EXIT);
     thread_->join();
 }
 
 void ThreadLoop::wait()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Wait for thread.");
     std::unique_lock<std::mutex> mutexlock(mutex_, std::defer_lock);
     mutexlock.lock();
     waiting_ = true;
@@ -101,7 +101,7 @@ void ThreadLoop::wait()
 
 void ThreadLoop::setState(State state)
 {
-    LOG_DEBUG(<< "Called with parameter state <" << state << ">.");
+    LOG_DEBUG(<< "Set state <" << state << ">.");
     std::unique_lock<std::mutex> mutexlock(mutex_);
     state_ = state;
     LOG_DEBUG(<< "State <" << state << "> is set.");
@@ -111,7 +111,7 @@ void ThreadLoop::setState(State state)
 
 void ThreadLoop::runLoop()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Run.");
 
     State state;
     bool finished = true;

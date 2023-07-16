@@ -23,6 +23,8 @@
 #include <ClassificationAction.hpp>
 #include <Editor.hpp>
 #include <Error.hpp>
+
+#define LOG_MODULE_NAME "classification"
 #include <Log.hpp>
 
 static void classificationCompute(const std::string &inputPath,

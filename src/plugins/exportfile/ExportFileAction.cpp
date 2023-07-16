@@ -33,19 +33,19 @@ ExportFileAction::ExportFileAction(Editor *editor)
       editor_(editor),
       query_(editor)
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Create.");
 }
 
 ExportFileAction::~ExportFileAction()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Destroy.");
 }
 
 void ExportFileAction::initialize(
     std::shared_ptr<ExportFileFormatInterface> writer,
     const ExportFileProperties &properties)
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Initialize.");
 
     writer_ = writer;
     properties_ = properties;
@@ -69,59 +69,49 @@ void ExportFileAction::initialize(
         nPointsTotal_++;
     }
 
-    ProgressActionInterface::initialize(ProgressActionInterface::npos, 1000UL);
+    progress_.setMaximumStep(ProgressCounter::npos, 1000UL);
 }
 
 void ExportFileAction::clear()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Clear.");
     query_.clear();
 }
 
 void ExportFileAction::next()
 {
-    if (initializing())
+    if (progress_.initializing())
     {
         determineMaximum();
         return;
     }
 
-    uint64_t n = process();
-    uint64_t i = 0;
-
-    startTimer();
+    progress_.startTimer();
 
     if (!writer_->isOpen())
     {
         writer_->create(properties_.fileName());
     }
 
-    while (i < n)
+    while (query_.next())
     {
-        if (query_.next())
-        {
-            writer_->write(query_);
-        }
+        writer_->write(query_);
 
-        i++;
-
-        if (timedOut())
+        progress_.addValueStep(1);
+        if (progress_.timedOut())
         {
-            break;
+            return;
         }
     }
 
-    increment(i);
+    writer_->close();
 
-    if (end())
-    {
-        writer_->close();
-    }
+    progress_.setValueStep(progress_.maximumStep());
 }
 
 void ExportFileAction::determineMaximum()
 {
-    startTimer();
+    progress_.startTimer();
 
     while (query_.next())
     {
@@ -130,7 +120,7 @@ void ExportFileAction::determineMaximum()
 
         nPointsTotal_++;
 
-        if (timedOut())
+        if (progress_.timedOut())
         {
             return;
         }
@@ -143,5 +133,5 @@ void ExportFileAction::determineMaximum()
 
     writer_->setProperties(properties_);
 
-    ProgressActionInterface::initialize(nPointsTotal_, 1000UL);
+    progress_.setMaximumStep(nPointsTotal_, 1000UL);
 }

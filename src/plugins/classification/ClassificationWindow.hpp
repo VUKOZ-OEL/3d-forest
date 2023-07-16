@@ -22,14 +22,10 @@
 #ifndef CLASSIFICATION_WINDOW_HPP
 #define CLASSIFICATION_WINDOW_HPP
 
-#include <ClassificationAction.hpp>
+class MainWindow;
+class ClassificationWidget;
 
 #include <QDialog>
-
-class MainWindow;
-
-class SliderWidget;
-class QPushButton;
 
 /** Classification Window. */
 class ClassificationWindow : public QDialog
@@ -39,19 +35,8 @@ class ClassificationWindow : public QDialog
 public:
     ClassificationWindow(MainWindow *mainWindow);
 
-protected slots:
-    void slotApply();
-
-protected:
-    MainWindow *mainWindow_;
-    ClassificationAction classification_;
-
-    QWidget *widget_;
-    SliderWidget *nPointsSlider_;
-    SliderWidget *lengthSlider_;
-    SliderWidget *rangeSlider_;
-    SliderWidget *angleSlider_;
-    QPushButton *applyButton_;
+private:
+    ClassificationWidget *widget_;
 };
 
 #endif /* CLASSIFICATION_WINDOW_HPP */

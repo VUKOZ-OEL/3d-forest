@@ -23,7 +23,6 @@
 #define VIEWPORTS_HPP
 
 #include <Query.hpp>
-
 class Editor;
 
 #include <ExportEditor.hpp>

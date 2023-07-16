@@ -31,6 +31,9 @@
 
 #include <Time.hpp>
 
+#define LOG_MODULE_NAME "Time"
+#include <Log.hpp>
+
 double Time::realTime()
 {
 #if defined(_MSC_VER)

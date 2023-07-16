@@ -33,8 +33,10 @@ class EXPORT_EDITOR QueryFilterSet
 {
 public:
     QueryFilterSet();
-    QueryFilterSet(const std::unordered_set<size_t> &list);
+    QueryFilterSet(const std::unordered_set<size_t> &list, bool enabled = true);
     ~QueryFilterSet();
+
+    void clear();
 
     void setFilterEnabled(bool enabled) { enabled_ = enabled; }
     bool isFilterEnabled() const { return enabled_; }

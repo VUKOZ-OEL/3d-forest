@@ -26,6 +26,9 @@
 #include <IndexFileBuilder.hpp>
 #include <Time.hpp>
 
+#define LOG_MODULE_NAME "exampleEditor"
+#include <Log.hpp>
+
 #define PATH_1 "dataset1.las"
 
 static void createDataSet()

@@ -108,8 +108,11 @@ public:
     void read(const std::string &path,
               const std::string &projectPath,
               const SettingsImport &settings,
-              const Box<double> &projectBoundary);
-    void read(const Json &in, const std::string &projectPath);
+              const Box<double> &projectBoundary,
+              QueryFilterSet &filter);
+    void read(const Json &in,
+              const std::string &projectPath,
+              QueryFilterSet &filter);
     Json &write(Json &out) const;
 
 protected:

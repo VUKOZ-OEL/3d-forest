@@ -36,9 +36,8 @@ RenderThread::RenderThread(Editor *editor)
 
 void RenderThread::render(size_t viewportId, const Camera &camera)
 {
-    LOG_DEBUG(<< "Called with parameter viewportId <" << viewportId << ">.");
-    LOG_TRACE_UPDATE_VIEW(<< "Called with parameter viewportId <" << viewportId
-                          << ">.");
+    LOG_DEBUG(<< "Render viewportId <" << viewportId << ">.");
+    LOG_TRACE_UPDATE_VIEW(<< "Render viewportId <" << viewportId << ">.");
     cancel();
 
     viewportId_ = viewportId;
@@ -62,8 +61,8 @@ bool RenderThread::next()
         return true;
     }
 
-    LOG_DEBUG(<< "Compute nextState.");
-    LOG_TRACE_UPDATE_VIEW(<< "Compute nextState.");
+    LOG_DEBUG(<< "Compute next state.");
+    LOG_TRACE_UPDATE_VIEW(<< "Compute next state.");
     double t1 = Time::realTime();
     bool finished;
     editor_->lock();

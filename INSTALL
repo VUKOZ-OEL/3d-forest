@@ -124,7 +124,7 @@ Build Using "MinGW Makefiles" on Windows
         > mingw32-make format
 
 6.  Optional: create batch file "build\build.bat" with the following content:
-    - cmake -G "MinGW Makefiles" .. -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug -DBUILD_EXAMPLES=1
+    - cmake -G "MinGW Makefiles" .. -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON -DBUILD_DEVEL=ON
     - mingw32-make format
     - mingw32-make
     - mingw32-make install

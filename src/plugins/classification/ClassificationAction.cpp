@@ -30,17 +30,17 @@ ClassificationAction::ClassificationAction(Editor *editor)
       query_(editor),
       queryPoint_(editor)
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Create.");
 }
 
 ClassificationAction::~ClassificationAction()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Destroy.");
 }
 
 void ClassificationAction::clear()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Clear.");
 
     query_.clear();
     queryPoint_.clear();
@@ -51,7 +51,7 @@ void ClassificationAction::initialize(size_t pointsPerCell,
                                       double groundErrorPercent,
                                       double angleDeg)
 {
-    LOG_DEBUG(<< "Called with parameter pointsPerCell <" << pointsPerCell
+    LOG_DEBUG(<< "Initialize with parameter pointsPerCell <" << pointsPerCell
               << "> "
               << "cellLengthMinPercent <" << cellLengthMinPercent << "> "
               << "groundErrorPercent <" << groundErrorPercent << "> "
@@ -67,7 +67,7 @@ void ClassificationAction::initialize(size_t pointsPerCell,
     size_t numberOfSteps = query_.gridSize();
     LOG_DEBUG(<< "Initialize numberOfSteps <" << numberOfSteps << ">.");
 
-    ProgressActionInterface::initialize(numberOfSteps, 1UL);
+    progress_.setMaximumStep(numberOfSteps, 1UL);
 }
 
 void ClassificationAction::next()
@@ -77,7 +77,7 @@ void ClassificationAction::next()
         stepGrid();
     }
 
-    increment(1);
+    progress_.addValueStep(1);
 
     if (end())
     {

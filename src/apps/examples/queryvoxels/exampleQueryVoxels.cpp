@@ -23,8 +23,10 @@
 
 #include <Editor.hpp>
 #include <Error.hpp>
-#include <Log.hpp>
 #include <Time.hpp>
+
+#define LOG_MODULE_NAME "exampleQueryVoxels"
+#include <Log.hpp>
 
 static void exampleQueryVoxels(const std::string &path, double voxelSize)
 {

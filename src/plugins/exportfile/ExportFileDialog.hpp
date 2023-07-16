@@ -24,11 +24,9 @@
 
 #include <ExportFileFormatInterface.hpp>
 #include <ExportFileProperties.hpp>
-
-#include <QDialog>
-
 class MainWindow;
 
+#include <QDialog>
 class QCheckBox;
 class QLineEdit;
 class QPushButton;

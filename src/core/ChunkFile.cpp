@@ -26,6 +26,9 @@
 #include <Endian.hpp>
 #include <Error.hpp>
 
+#define LOG_MODULE_NAME "ChunkFile"
+#include <Log.hpp>
+
 #define CHUNK_HEADER_SIZE 16U
 
 ChunkFile::ChunkFile()

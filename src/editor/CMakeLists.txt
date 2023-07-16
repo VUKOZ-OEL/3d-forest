@@ -29,6 +29,7 @@ target_include_directories(
     ${SUB_PROJECT_NAME}
     PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}
+    ../../3rdparty/unibnoctree
 )
 
 target_compile_definitions(

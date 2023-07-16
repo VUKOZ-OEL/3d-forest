@@ -21,6 +21,9 @@
 
 #include <Viewports.hpp>
 
+#define LOG_MODULE_NAME "Viewports"
+#include <Log.hpp>
+
 Viewports::Viewports() : activeViewport_(0)
 {
 }

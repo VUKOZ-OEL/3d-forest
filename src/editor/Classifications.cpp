@@ -21,6 +21,9 @@
 
 #include <Classifications.hpp>
 
+#define LOG_MODULE_NAME "Classifications"
+#include <Log.hpp>
+
 Classifications::Classifications()
 {
     clear();

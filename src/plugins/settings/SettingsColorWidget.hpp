@@ -25,13 +25,12 @@
 #include <vector>
 
 #include <Settings.hpp>
+class MainWindow;
+class ColorSwitchWidget;
 
 #include <QWidget>
-
-class MainWindow;
-
 class QCheckBox;
-class QPushButton;
+class QComboBox;
 class QSlider;
 
 /** Settings Color Widget. */
@@ -44,27 +43,23 @@ public:
 
 public slots:
     void slotUpdate(void *sender, const QSet<Editor::Type> &target);
-
+    void slotColorSourceChanged(int index);
     void slotSetPointSize(int v);
     void slotSetFogEnabled(int v);
-    void slotSetColorFg();
-    void slotSetColorBg();
+    void slotSetColor();
 
-protected:
+private:
     MainWindow *mainWindow_;
+
+    ColorSwitchWidget *colorSwitchWidget_;
     QCheckBox *fogCheckBox_;
-    QPushButton *colorFgButton_;
-    QPushButton *colorBgButton_;
+    QComboBox *colorSourceComboBox_;
     QSlider *pointSizeSlider_;
+
     SettingsView settings_;
 
-    void settingsChanged();
-    void settingsChangedApply();
-    void setSettings(const SettingsView &settings);
-
-    bool colorDialog(Vector3<double> &rgb);
-    void setColor(QPushButton *button, const Vector3<double> &rgb);
-
+    void setSettingsOut(bool modifiers = false);
+    void setSettingsIn(const SettingsView &settings);
     void block();
     void unblock();
 };

@@ -30,6 +30,9 @@
 #include <QString>
 #include <QWidget>
 
+#define LOG_MODULE_NAME "HeightMapModifier"
+#include <Log.hpp>
+
 #define PLUGIN_HEIGHT_MAP_NAME "Heightmap"
 #define PLUGIN_HEIGHT_MAP_COLORMAP_MATLAB_JET "Matlab Jet"
 #define PLUGIN_HEIGHT_MAP_COLORMAP_VTK "VTK"
@@ -143,8 +146,8 @@ void HeightMapModifier::applyModifier(Page *page)
     }
     else
     {
-        heightMinimum = editor_->elevationRange().minimum();
-        heightRange = editor_->elevationRange().maximum() - heightMinimum;
+        heightMinimum = editor_->elevationFilter().minimum();
+        heightRange = editor_->elevationFilter().maximum() - heightMinimum;
     }
 
     // Height range step in normalized height range

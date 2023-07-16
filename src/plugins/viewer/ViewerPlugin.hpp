@@ -22,13 +22,13 @@
 #ifndef VIEWER_PLUGIN_HPP
 #define VIEWER_PLUGIN_HPP
 
-#include <ExportGui.hpp>
 #include <ViewerViewports.hpp>
+class MainWindow;
 
 #include <QObject>
-
-class MainWindow;
 class QAction;
+
+#include <ExportGui.hpp>
 
 /** Viewer Plugin. */
 class EXPORT_GUI ViewerPlugin : public QObject

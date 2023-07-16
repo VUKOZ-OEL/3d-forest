@@ -40,23 +40,31 @@ ToolTabWidget::ToolTabWidget()
       toolBox_(nullptr),
       icon_(nullptr),
       label_(nullptr),
-      mainLayout_(nullptr)
+      mainLayout_(nullptr),
+      showTextBesideIcon_(false)
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Create.");
 }
 
 void ToolTabWidget::addTab(QWidget *widget,
                            const QIcon &icon,
-                           const QString &label)
+                           const QString &label,
+                           const QString &toolTip)
 {
     LOG_DEBUG(<< "Tab text <" << label.toStdString() << ">.");
+
+    QString toolTipCopy(toolTip);
+    if (toolTipCopy.length() < 1)
+    {
+        toolTipCopy = label;
+    }
 
     // Create tool button
     QToolButton *toolButton;
 
     MainWindow::createToolButton(&toolButton,
                                  label,
-                                 label,
+                                 toolTipCopy,
                                  icon,
                                  this,
                                  SLOT(slotToolButton()));
@@ -100,7 +108,15 @@ void ToolTabWidget::addTab(QWidget *widget,
         QHBoxLayout *titleBar = new QHBoxLayout;
         titleBar->addWidget(icon_);
         titleBar->addWidget(label_);
-        titleBar->addStretch();
+        if (showTextBesideIcon_)
+        {
+            icon_->setVisible(false);
+            label_->setVisible(false);
+        }
+        else
+        {
+            titleBar->addStretch();
+        }
         titleBar->setContentsMargins(1, 1, 1, 1);
 
         QFrame *titleFrame = new QFrame;
@@ -110,7 +126,15 @@ void ToolTabWidget::addTab(QWidget *widget,
         titleFrame->setLayout(titleBar);
 
         // The first tab is on
-        toolButton->setChecked(true);
+        if (showTextBesideIcon_)
+        {
+            toolButton->setChecked(false);
+            toolButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        }
+        else
+        {
+            toolButton->setChecked(true);
+        }
         widget->setVisible(true);
 
         // Create layout
@@ -136,7 +160,7 @@ void ToolTabWidget::addTab(QWidget *widget,
 
 void ToolTabWidget::slotToolButton()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Tool button.");
 
     QObject *obj = sender();
 
@@ -146,6 +170,7 @@ void ToolTabWidget::slotToolButton()
         {
             LOG_DEBUG(<< "Hide widget <" << i << ">.");
             toolButtonList_[i]->setChecked(false);
+            toolButtonList_[i]->setToolButtonStyle(Qt::ToolButtonIconOnly);
             tabList_[i]->setVisible(false);
         }
     }
@@ -158,7 +183,16 @@ void ToolTabWidget::slotToolButton()
             const QIcon icon = toolButtonList_[i]->icon();
             icon_->setPixmap(icon.pixmap(icon.actualSize(QSize(16, 16))));
             label_->setText(toolButtonList_[i]->text());
-            toolButtonList_[i]->setChecked(true);
+            if (showTextBesideIcon_)
+            {
+                toolButtonList_[i]->setChecked(false);
+                toolButtonList_[i]->setToolButtonStyle(
+                    Qt::ToolButtonTextBesideIcon);
+            }
+            else
+            {
+                toolButtonList_[i]->setChecked(true);
+            }
             tabList_[i]->setVisible(true);
             break;
         }

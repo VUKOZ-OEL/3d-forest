@@ -29,17 +29,17 @@
 
 ExportFileFormatLas::ExportFileFormatLas()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Create.");
 }
 
 ExportFileFormatLas::~ExportFileFormatLas()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Destroy.");
 }
 
 void ExportFileFormatLas::create(const std::string &path)
 {
-    LOG_DEBUG(<< "Called with parameter path <" << path << "> nPoints <"
+    LOG_DEBUG(<< "Create file path <" << path << "> nPoints <"
               << properties().numberOfPoints() << "> region <"
               << properties().region() << ">.");
 
@@ -110,7 +110,7 @@ void ExportFileFormatLas::write(Query &query)
 
 void ExportFileFormatLas::close()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Close.");
 
     // Close the file
     file_.close();

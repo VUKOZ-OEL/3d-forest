@@ -35,6 +35,8 @@
 #include <unordered_set>
 #include <vector>
 
+#include <File.hpp>
+
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>
 
@@ -97,6 +99,19 @@ public:
     virtual void flush();
 };
 
+/** Logger For File Output. */
+class LoggerFile : public LogThreadCallbackInterface
+{
+public:
+    LoggerFile(const std::string &fileName);
+    virtual ~LoggerFile() = default;
+    virtual void println(const LogMessage &message);
+    virtual void flush();
+
+private:
+    File file_;
+};
+
 /** Log Thread. */
 class EXPORT_CORE LogThread
 {
@@ -135,6 +150,7 @@ private:
 
 extern std::shared_ptr<LogThread> EXPORT_CORE globalLogThread;
 extern std::shared_ptr<LoggerStdout> EXPORT_CORE globalLoggerStdout;
+extern std::shared_ptr<LoggerFile> EXPORT_CORE globalLoggerFile;
 
 #define LOG_MESSAGE(type, module, msg)                                         \
     do                                                                         \
@@ -156,11 +172,20 @@ extern std::shared_ptr<LoggerStdout> EXPORT_CORE globalLoggerStdout;
 #define LOG_TRACE_UNKNOWN(msg)
 
 #if 0
+    #define LOG_TRACE_UPDATE(msg)                                              \
+        LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg);
+#else
+    #define LOG_TRACE_UPDATE(msg)
+#endif
+
+#if 0
     #define LOG_TRACE_UPDATE_VIEW(msg)                                         \
         LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg);
 #else
     #define LOG_TRACE_UPDATE_VIEW(msg)
 #endif
+
+#define LOG_TRACE_THREAD(msg)
 
 #define LOG_WARNING(msg) LOG_MESSAGE(LOG_TYPE_WARNING, LOG_MODULE_NAME, msg)
 #define LOG_ERROR(msg) LOG_MESSAGE(LOG_TYPE_ERROR, LOG_MODULE_NAME, msg)
@@ -176,6 +201,21 @@ extern std::shared_ptr<LoggerStdout> EXPORT_CORE globalLoggerStdout;
     } while (false)
 
 #define LOGGER_STOP_STDOUT                                                     \
+    do                                                                         \
+    {                                                                          \
+        globalLogThread->stop();                                               \
+        globalLogThread->setCallback(nullptr);                                 \
+    } while (false)
+
+#define LOGGER_START_FILE(fileName)                                            \
+    do                                                                         \
+    {                                                                          \
+        globalLogThread = std::make_shared<LogThread>();                       \
+        globalLoggerFile = std::make_shared<LoggerFile>(fileName);             \
+        globalLogThread->setCallback(globalLoggerFile.get());                  \
+    } while (false)
+
+#define LOGGER_STOP_FILE                                                       \
     do                                                                         \
     {                                                                          \
         globalLogThread->stop();                                               \

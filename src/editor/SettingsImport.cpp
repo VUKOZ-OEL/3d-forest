@@ -21,6 +21,9 @@
 
 #include <SettingsImport.hpp>
 
+#define LOG_MODULE_NAME "SettingsImport"
+#include <Log.hpp>
+
 SettingsImport::SettingsImport() : centerEnabled_(false)
 {
 }

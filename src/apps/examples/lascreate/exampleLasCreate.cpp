@@ -24,6 +24,9 @@
 #include <IndexFileBuilder.hpp>
 #include <Vector3.hpp>
 
+#define LOG_MODULE_NAME "exampleLasCreate"
+#include <Log.hpp>
+
 static void createBox(const std::string &path)
 {
     // Create points

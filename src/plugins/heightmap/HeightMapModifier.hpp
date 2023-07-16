@@ -22,14 +22,14 @@
 #ifndef HEIGHT_MAP_MODIFIER_HPP
 #define HEIGHT_MAP_MODIFIER_HPP
 
-#include <QMutex>
-#include <Vector3.hpp>
 #include <vector>
 
+#include <Vector3.hpp>
 class Editor;
 class Page;
 class MainWindow;
 
+#include <QMutex>
 class QWidget;
 
 /** Height Map Modifier.

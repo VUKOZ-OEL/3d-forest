@@ -19,8 +19,6 @@
 
 /** @file ImportFileDialog.cpp */
 
-#include <Log.hpp>
-
 #include <ImportFileDialog.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
@@ -32,6 +30,9 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
+
+#define LOG_MODULE_NAME "ImportFileDialog"
+#include <Log.hpp>
 
 #define ICON(name) (ThemeIcon(":/importfile/", name))
 

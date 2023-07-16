@@ -25,6 +25,8 @@
 #include <IndexFile.hpp>
 #include <IndexFileBuilder.hpp>
 #include <LasFile.hpp>
+
+#define LOG_MODULE_NAME "Dataset"
 #include <Log.hpp>
 
 Dataset::Dataset() : id_(0)

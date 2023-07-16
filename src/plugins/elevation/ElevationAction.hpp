@@ -26,7 +26,6 @@
 
 #include <ProgressActionInterface.hpp>
 #include <Query.hpp>
-
 class Editor;
 
 /** Elevation Action. */

@@ -28,10 +28,10 @@
 #include <Datasets.hpp>
 #include <Layers.hpp>
 #include <ModifierInterface.hpp>
+#include <PageManager.hpp>
 #include <Region.hpp>
 #include <Settings.hpp>
 #include <Viewports.hpp>
-#include <Voxels.hpp>
 
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
@@ -59,7 +59,7 @@ public:
     // File
     void open(const std::string &path,
               const SettingsImport &settings = SettingsImport());
-    void save(const std::string &path);
+    void saveProject(const std::string &path);
     const std::string &projectPath() const { return path_; }
     const std::string &projectName() const { return projectName_; }
     bool hasUnsavedChanges() const { return unsavedChanges_; }
@@ -68,6 +68,10 @@ public:
     // Classifications
     const Classifications &classifications() const { return classifications_; }
     void setClassifications(const Classifications &classifications);
+    const QueryFilterSet &classificationsFilter() const
+    {
+        return classificationsFilter_;
+    }
     void setClassificationsFilter(const QueryFilterSet &filter);
 
     // Clip filter
@@ -79,26 +83,24 @@ public:
     const Box<double> &boundary() const { return datasets_.boundary(); }
 
     // Elevation
-    const Range<double> &elevationRange() const { return elevationRange_; }
-    void setElevationRange(const Range<double> &elevationRange);
+    const Range<double> &elevationFilter() const { return elevationFilter_; }
+    void setElevationFilter(const Range<double> &elevationFilter);
 
     // Descriptor
-    const Range<double> &descriptorRange() const { return descriptorRange_; }
-    void setDescriptorRange(const Range<double> &descriptorRange);
+    const Range<double> &descriptorFilter() const { return descriptorFilter_; }
+    void setDescriptorFilter(const Range<double> &descriptorFilter);
 
     // Data sets
     const Datasets &datasets() const { return datasets_; }
     void setDatasets(const Datasets &datasets);
+    const QueryFilterSet &datasetsFilter() const { return datasetsFilter_; }
     void setDatasetsFilter(const QueryFilterSet &filter);
 
     // Layers
     const Layers &layers() const { return layers_; }
     void setLayers(const Layers &layers);
+    const QueryFilterSet &layersFilter() const { return layersFilter_; }
     void setLayersFilter(const QueryFilterSet &filter);
-
-    // Voxels
-    const Voxels &voxels() const { return voxels_; }
-    void setVoxels(const Voxels &voxels);
 
     // Settings
     const Settings &settings() const { return settings_; }
@@ -112,6 +114,10 @@ public:
     void viewportsResize(size_t n);
     Viewports &viewports() { return viewports_; }
     const Viewports &viewports() const { return viewports_; }
+
+    // Page
+    std::shared_ptr<PageData> readPage(size_t dataset, size_t index);
+    void erasePage(size_t dataset, size_t index);
 
     // Lock
     void lock();
@@ -129,17 +135,22 @@ protected:
     Layers layers_;
     Settings settings_;
     Classifications classifications_;
-    Voxels voxels_;
 
     Region clipFilter_;
-    Range<double> elevationRange_;
-    Range<double> descriptorRange_;
+    Range<double> elevationFilter_;
+    Range<double> descriptorFilter_;
+    QueryFilterSet classificationsFilter_;
+    QueryFilterSet datasetsFilter_;
+    QueryFilterSet layersFilter_;
 
     // Modifiers
     std::vector<ModifierInterface *> modifiers_;
 
     // Viewports
     Viewports viewports_;
+
+    // Data
+    PageManager pageManager_;
 
     void openProject(const std::string &path);
 

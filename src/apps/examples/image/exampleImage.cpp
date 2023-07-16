@@ -25,6 +25,8 @@
 #include <igl/png/writePNG.h>
 
 #include <Error.hpp>
+
+#define LOG_MODULE_NAME "exampleImage"
 #include <Log.hpp>
 
 static void exampleImageRGB()

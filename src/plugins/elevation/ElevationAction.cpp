@@ -33,17 +33,17 @@ ElevationAction::ElevationAction(Editor *editor)
     : editor_(editor),
       query_(editor)
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Create.");
 }
 
 ElevationAction::~ElevationAction()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Destroy.");
 }
 
 void ElevationAction::clear()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Clear.");
 
     query_.clear();
 
@@ -65,7 +65,7 @@ void ElevationAction::clear()
 void ElevationAction::initialize(size_t pointsPerCell,
                                  double cellLengthMinPercent)
 {
-    LOG_DEBUG(<< "Called with parameter pointsPerCell <" << pointsPerCell
+    LOG_DEBUG(<< "Initialize with parameters pointsPerCell <" << pointsPerCell
               << "> "
               << "cellLengthMinPercent <" << cellLengthMinPercent << ">.");
 
@@ -79,7 +79,7 @@ void ElevationAction::initialize(size_t pointsPerCell,
     size_t numberOfSteps = query_.gridSize();
     LOG_DEBUG(<< "Initialize numberOfSteps <" << numberOfSteps << ">.");
 
-    ProgressActionInterface::initialize(numberOfSteps, 1UL);
+    progress_.setMaximumStep(numberOfSteps, 1UL);
 }
 
 void ElevationAction::next()
@@ -89,7 +89,7 @@ void ElevationAction::next()
         stepGrid();
     }
 
-    increment(1);
+    progress_.addValueStep(1);
 
     if (end())
     {
@@ -104,7 +104,7 @@ void ElevationAction::next()
             range.setMaximum(elevationMaximum_);
             range.setMaximumValue(elevationMaximum_);
 
-            editor_->setElevationRange(range);
+            editor_->setElevationFilter(range);
         }
     }
 }
@@ -248,7 +248,7 @@ void ElevationAction::stepGrid()
 void ElevationAction::exportGroundMesh(const std::string &path)
 {
     std::string fullPath;
-    fullPath = path + std::to_string(processed()) + ".obj";
+    fullPath = path + std::to_string(progress_.valueStep()) + ".obj";
     LOG_DEBUG(<< "Full path <" << fullPath << ">.");
 
     igl::writeOBJ(fullPath, V, F);

@@ -23,10 +23,10 @@
 #define RANGE_SLIDER_WIDGET_HPP
 
 #include <QWidget>
-
-class ctkRangeSlider;
 class QSpinBox;
 class QVBoxLayout;
+
+class ctkRangeSlider;
 
 #include <ExportGui.hpp>
 #include <WarningsDisable.hpp>

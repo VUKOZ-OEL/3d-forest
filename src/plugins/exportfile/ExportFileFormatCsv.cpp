@@ -22,6 +22,9 @@
 #include <ExportFileFormatCsv.hpp>
 #include <Util.hpp>
 
+#define LOG_MODULE_NAME "ExportFileFormatCsv"
+#include <Log.hpp>
+
 ExportFileFormatCsv::ExportFileFormatCsv()
 {
 }

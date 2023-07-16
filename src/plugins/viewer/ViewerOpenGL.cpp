@@ -24,6 +24,9 @@
 
 #include <QOpenGLFunctions>
 
+#define LOG_MODULE_NAME "ViewerOpenGL"
+#include <Log.hpp>
+
 ViewerOpenGL::ViewerOpenGL()
 {
 }
@@ -33,8 +36,10 @@ ViewerOpenGL::~ViewerOpenGL()
 }
 
 void ViewerOpenGL::render(Mode mode,
-                          const std::vector<float> &xyz,
-                          const std::vector<float> &rgb)
+                          const float *xyz,
+                          size_t xyzSize,
+                          const float *rgb,
+                          size_t rgbSize)
 {
     // Specify what kind of primitives to render
     GLenum glmode;
@@ -53,23 +58,23 @@ void ViewerOpenGL::render(Mode mode,
     }
 
     // Render
-    GLsizei n = static_cast<GLsizei>(xyz.size());
-    if (n > 0)
+    if (xyzSize > 0)
     {
         glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(3, GL_FLOAT, 0, xyz.data());
+        glVertexPointer(3, GL_FLOAT, 0, xyz);
 
-        if (!rgb.empty())
+        if (rgbSize > 0)
         {
             glEnableClientState(GL_COLOR_ARRAY);
-            glColorPointer(3, GL_FLOAT, 0, rgb.data());
+            glColorPointer(3, GL_FLOAT, 0, rgb);
         }
         else
         {
             glColor3f(1.0F, 1.0F, 1.0F);
         }
 
-        glDrawArrays(glmode, 0, n / 3);
+        GLsizei n = static_cast<GLsizei>(xyzSize / 3);
+        glDrawArrays(glmode, 0, n);
 
         glDisableClientState(GL_VERTEX_ARRAY);
         glDisableClientState(GL_COLOR_ARRAY);
@@ -77,10 +82,12 @@ void ViewerOpenGL::render(Mode mode,
 }
 
 void ViewerOpenGL::render(Mode mode,
-                          const std::vector<float> &xyz,
-                          const std::vector<float> &rgb,
-                          const std::vector<unsigned int> &indices,
-                          size_t count)
+                          const float *xyz,
+                          size_t xyzSize,
+                          const float *rgb,
+                          size_t rgbSize,
+                          const unsigned int *indices,
+                          size_t indicesSize)
 {
     // Specify what kind of primitives to render
     GLenum glmode;
@@ -99,23 +106,23 @@ void ViewerOpenGL::render(Mode mode,
     }
 
     // Render
-    GLsizei n = static_cast<GLsizei>(count);
-    if (n > 0)
+    if (indicesSize > 0 && xyzSize > 0)
     {
         glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(3, GL_FLOAT, 0, xyz.data());
+        glVertexPointer(3, GL_FLOAT, 0, xyz);
 
-        if (!rgb.empty())
+        if (rgbSize > 0)
         {
             glEnableClientState(GL_COLOR_ARRAY);
-            glColorPointer(3, GL_FLOAT, 0, rgb.data());
+            glColorPointer(3, GL_FLOAT, 0, rgb);
         }
         else
         {
             glColor3f(1.0F, 1.0F, 1.0F);
         }
 
-        glDrawElements(glmode, n, GL_UNSIGNED_INT, indices.data());
+        GLsizei n = static_cast<GLsizei>(indicesSize);
+        glDrawElements(glmode, n, GL_UNSIGNED_INT, indices);
 
         glDisableClientState(GL_VERTEX_ARRAY);
         glDisableClientState(GL_COLOR_ARRAY);

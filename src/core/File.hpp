@@ -34,8 +34,8 @@ class EXPORT_CORE File
 public:
     File();
     ~File();
-    File(const File &) = delete;
-    File &operator=(const File &) = delete;
+    File(const File &other);
+    File &operator=(const File &other);
 
     void create(const std::string &path);
     void open(const std::string &path);

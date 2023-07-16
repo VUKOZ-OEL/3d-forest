@@ -23,8 +23,10 @@
 
 #include <Endian.hpp>
 #include <IndexFileBuilder.hpp>
-#include <Log.hpp>
 #include <Vector3.hpp>
+
+#define LOG_MODULE_NAME "IndexFileBuilder"
+#include <Log.hpp>
 
 // Define to keep the same order of LAS points.
 //#define INDEX_FILE_BUILDER_DEBUG_SAME_ORDER

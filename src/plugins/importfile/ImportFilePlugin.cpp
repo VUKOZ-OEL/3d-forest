@@ -19,11 +19,9 @@
 
 /** @file ImportFilePlugin.cpp */
 
-#include <IndexFileBuilder.hpp>
-#include <Log.hpp>
-
 #include <ImportFileDialog.hpp>
 #include <ImportFilePlugin.hpp>
+#include <IndexFileBuilder.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
@@ -31,6 +29,9 @@
 #include <QFileDialog>
 #include <QProgressBar>
 #include <QProgressDialog>
+
+#define LOG_MODULE_NAME "ImportFilePlugin"
+#include <Log.hpp>
 
 #define IMPORT_PLUGIN_FILTER "LAS (LASer) File (*.las)"
 #define ICON(name) (ThemeIcon(":/importfile/", name))

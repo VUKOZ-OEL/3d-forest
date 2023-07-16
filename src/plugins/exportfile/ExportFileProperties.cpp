@@ -21,6 +21,9 @@
 
 #include <ExportFileProperties.hpp>
 
+#define LOG_MODULE_NAME "ExportFileProperties"
+#include <Log.hpp>
+
 ExportFileProperties::ExportFileProperties()
 {
     clear();

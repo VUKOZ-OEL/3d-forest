@@ -40,7 +40,7 @@ Query::~Query()
 
 void Query::exec()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Exec.");
     selectedPages_.clear();
 
     bool selected = false;
@@ -149,6 +149,7 @@ bool Query::nextPage()
     {
         LOG_DEBUG(<< "Current pageIndex <" << pageIndex_ << "/"
                   << selectedPages_.size() << ">.");
+
         IndexFile::Selection &selectedPage = selectedPages_[pageIndex_];
         page_ = read(selectedPage.id, selectedPage.idx);
         page_->nextState();
@@ -162,20 +163,20 @@ bool Query::nextPage()
             pagePointIndexMax_ = page_->selectionSize - 1;
 
             // Point to current page data.
-            position_ = page_->position.data();
-            intensity_ = page_->intensity.data();
-            returnNumber_ = page_->returnNumber.data();
-            numberOfReturns_ = page_->numberOfReturns.data();
-            classification_ = page_->classification.data();
-            userData_ = page_->userData.data();
-            gpsTime_ = page_->gpsTime.data();
-            color_ = page_->color.data();
+            position_ = page_->position;
+            intensity_ = page_->intensity;
+            returnNumber_ = page_->returnNumber;
+            numberOfReturns_ = page_->numberOfReturns;
+            classification_ = page_->classification;
+            userData_ = page_->userData;
+            gpsTime_ = page_->gpsTime;
+            color_ = page_->color;
 
-            layer_ = page_->layer.data();
-            elevation_ = page_->elevation.data();
-            customColor_ = page_->customColor.data();
-            descriptor_ = page_->descriptor.data();
-            value_ = page_->value.data();
+            layer_ = page_->layer;
+            elevation_ = page_->elevation;
+            customColor_ = page_->customColor;
+            descriptor_ = page_->descriptor;
+            value_ = page_->value;
 
             selection_ = page_->selection.data();
 
@@ -375,7 +376,7 @@ void Query::setMaximumResults(size_t nPoints)
 
 void Query::setGrid(size_t pointsPerCell, double cellLengthMinPct)
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Set grid.");
 
     // Calculate grid cell size.
     uint64_t pointsPerArea = editor_->datasets().nPoints(where().dataset());
@@ -606,7 +607,12 @@ void Query::pushVoxel(size_t x1,
 
 bool Query::Key::operator<(const Key &rhs) const
 {
-    return (datasetId < rhs.datasetId) || (pageId < rhs.pageId);
+    if (datasetId != rhs.datasetId)
+    {
+        return datasetId < rhs.datasetId;
+    }
+
+    return pageId < rhs.pageId;
 }
 
 std::shared_ptr<Page> Query::read(size_t dataset, size_t index)

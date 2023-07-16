@@ -22,12 +22,10 @@
 #ifndef ELEVATION_WINDOW_HPP
 #define ELEVATION_WINDOW_HPP
 
-#include <QDialog>
-
 class MainWindow;
+class ElevationWidget;
 
-class SliderWidget;
-class QPushButton;
+#include <QDialog>
 
 /** Elevation Window. */
 class ElevationWindow : public QDialog
@@ -37,16 +35,8 @@ class ElevationWindow : public QDialog
 public:
     ElevationWindow(MainWindow *mainWindow);
 
-protected slots:
-    void slotApply();
-
-protected:
-    MainWindow *mainWindow_;
-
-    QWidget *widget_;
-    SliderWidget *nPointsInput_;
-    SliderWidget *lengthInput_;
-    QPushButton *applyButton_;
+private:
+    ElevationWidget *widget_;
 };
 
 #endif /* ELEVATION_WINDOW_HPP */

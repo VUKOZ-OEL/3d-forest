@@ -24,6 +24,9 @@
 #include <SettingsWindow.hpp>
 #include <ThemeIcon.hpp>
 
+#define LOG_MODULE_NAME "SettingsPlugin"
+#include <Log.hpp>
+
 #define ICON(name) (ThemeIcon(":/settings/", name))
 
 SettingsPlugin::SettingsPlugin()
@@ -41,7 +44,7 @@ void SettingsPlugin::initialize(MainWindow *mainWindow)
                               "File Properties",
                               tr("Settings"),
                               tr("Show settings"),
-                              ICON("settings"),
+                              ICON("settings_clog"),
                               this,
                               SLOT(slotPlugin()));
 }
@@ -61,4 +64,9 @@ void SettingsPlugin::slotPlugin()
     settingsWindow_->show();
     settingsWindow_->raise();
     settingsWindow_->activateWindow();
+}
+
+QDockWidget *SettingsPlugin::window() const
+{
+    return settingsWindow_;
 }

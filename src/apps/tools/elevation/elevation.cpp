@@ -23,6 +23,8 @@
 #include <Editor.hpp>
 #include <ElevationAction.hpp>
 #include <Error.hpp>
+
+#define LOG_MODULE_NAME "elevation"
 #include <Log.hpp>
 
 static void elevationCompute(const std::string &inputPath,

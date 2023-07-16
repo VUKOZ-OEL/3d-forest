@@ -23,6 +23,8 @@
 <!-- Tool bar -->
 <file>settings_16px.png</file>
 <file>settings_24px.png</file>
+<file>settings_clog_16px.png</file>
+<file>settings_clog_24px.png</file>
 
 <!-- Tabs -->
 <file>brush_16px.png</file>

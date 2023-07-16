@@ -20,12 +20,11 @@
 /** @file ExportFileDialog.cpp */
 
 #include <ExportFileDialog.hpp>
+#include <ExportFileFormatCsv.hpp>
+#include <ExportFileFormatLas.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 #include <Util.hpp>
-
-#include <ExportFileFormatCsv.hpp>
-#include <ExportFileFormatLas.hpp>
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -38,6 +37,9 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QVBoxLayout>
+
+#define LOG_MODULE_NAME "ExportFileDialog"
+#include <Log.hpp>
 
 #define ICON(name) (ThemeIcon(":/exportfile/", name))
 

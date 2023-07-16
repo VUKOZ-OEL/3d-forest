@@ -23,6 +23,7 @@
 #include <LasFile.hpp>
 
 #define LOG_MODULE_NAME "DescriptorPca"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 DescriptorPca::DescriptorPca()
@@ -229,7 +230,61 @@ bool DescriptorPca::computeDescriptor(Eigen::MatrixXd &V,
         descriptor = static_cast<double>(eL / sum);
     }
 
-    LOG_DEBUG(<< "DescriptorPca <" << descriptor << ">.");
+    LOG_DEBUG(<< "Descriptor <" << descriptor << ">.");
+
+    return true;
+}
+
+bool DescriptorPca::computeDistribution(Query &query,
+                                        double x,
+                                        double y,
+                                        double z,
+                                        double radius,
+                                        double &descriptor)
+{
+    const int dim = 4;
+    const int dim2 = dim / 2;
+    const int dimxy = dim * dim;
+    const int dimxyz = dim * dim * dim;
+    size_t acc[dimxyz];
+    std::memset(acc, 0, sizeof(acc));
+    double d = 0.1 + radius / static_cast<double>(dim2);
+
+    Box<double> cell(x, y, z, radius);
+    double px;
+    double py;
+    double pz;
+    int cx;
+    int cy;
+    int cz;
+
+    query.where().setBox(cell);
+    // query.where().setClassification({LasFile::CLASS_UNASSIGNED});
+    query.exec();
+
+    while (query.next())
+    {
+        px = query.x() - x;
+        py = query.y() - y;
+        pz = query.z() - z;
+
+        cx = static_cast<int>(px / d) + dim2;
+        cy = static_cast<int>(py / d) + dim2;
+        cz = static_cast<int>(pz / d) + dim2;
+
+        acc[cx + cy * dim + cz * dimxy]++;
+    }
+
+    int used = 0;
+    for (int i = 0; i < dimxyz; i++)
+    {
+        if (acc[i] > 0)
+        {
+            used++;
+        }
+    }
+
+    descriptor = static_cast<double>(used) / static_cast<double>(dimxyz);
 
     return true;
 }

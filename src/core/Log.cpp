@@ -19,11 +19,14 @@
 
 /** @file Log.cpp */
 
-#include <Log.hpp>
 #include <Time.hpp>
+
+#define LOG_MODULE_NAME "Log"
+#include <Log.hpp>
 
 std::shared_ptr<LogThread> globalLogThread;
 std::shared_ptr<LoggerStdout> globalLoggerStdout;
+std::shared_ptr<LoggerFile> globalLoggerFile;
 
 LogThread::LogThread()
     : messageQueue_(10000U),
@@ -235,6 +238,26 @@ void LoggerStdout::println(const LogMessage &message)
 }
 
 void LoggerStdout::flush()
+{
+    // empty
+}
+
+LoggerFile::LoggerFile(const std::string &fileName)
+{
+    file_.open(fileName, "w+t");
+};
+
+void LoggerFile::println(const LogMessage &message)
+{
+    std::string line =
+        message.time + std::string(LogMessage::typeString(message.type)) +
+        message.text + " [" + message.module + ":" + message.function + "] " +
+        std::to_string(message.threadId);
+
+    file_.write(line + "\n");
+};
+
+void LoggerFile::flush()
 {
     // empty
 }

@@ -25,7 +25,6 @@
 #include <HeightMapModifier.hpp>
 #include <ModifierInterface.hpp>
 #include <PluginInterface.hpp>
-
 class HeightMapWindow;
 
 #if defined(_MSC_VER)

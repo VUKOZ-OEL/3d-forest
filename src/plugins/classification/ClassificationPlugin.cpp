@@ -40,8 +40,8 @@ void ClassificationPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "Utilities",
-                              "Utilities",
+                              "Tools",
+                              "Tools",
                               tr("Classification"),
                               tr("Classify points to ground and unassigned"),
                               ICON("soil"),

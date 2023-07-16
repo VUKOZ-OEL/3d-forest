@@ -21,6 +21,9 @@
 
 #include <Vector3.hpp>
 
+#define LOG_MODULE_NAME "exampleVector3"
+#include <Log.hpp>
+
 int main()
 {
     Vector3<double> v1{1, 1, 0};

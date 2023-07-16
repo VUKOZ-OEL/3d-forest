@@ -31,14 +31,14 @@ Layers::Layers()
 
 void Layers::clear()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Clear.");
     layers_.clear();
     hashTableId_.clear();
 }
 
 void Layers::setDefault()
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Set default.");
     size_t id = 0;
     size_t idx = 0;
 
@@ -62,7 +62,7 @@ void Layers::push_back(const Layer &layer)
 
 void Layers::erase(size_t i)
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Erase item <" << i << ">.");
 
     if (layers_.size() == 0)
     {
@@ -83,7 +83,7 @@ void Layers::erase(size_t i)
 
 size_t Layers::unusedId() const
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Obtain unused id.");
     // Return minimum available id value
     for (size_t rval = 0; rval < std::numeric_limits<size_t>::max(); rval++)
     {
@@ -98,21 +98,19 @@ size_t Layers::unusedId() const
 
 void Layers::setLabel(size_t i, const std::string &label)
 {
-    LOG_DEBUG(<< "Called with parameter index <" << i << "> label <" << label
-              << ">.");
+    LOG_DEBUG(<< "Set label index <" << i << "> label <" << label << ">.");
     layers_[i].setLabel(label);
 }
 
 void Layers::setColor(size_t i, const Vector3<double> &color)
 {
-    LOG_DEBUG(<< "Called with parameter index <" << i << "> color <" << color
-              << ">.");
+    LOG_DEBUG(<< "Set color index <" << i << "> color <" << color << ">.");
     layers_[i].setColor(color);
 }
 
 void Layers::read(const Json &in)
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Read.");
 
     clear();
 
@@ -144,7 +142,7 @@ void Layers::read(const Json &in)
 
 Json &Layers::write(Json &out) const
 {
-    LOG_DEBUG(<< "Called.");
+    LOG_DEBUG(<< "Write.");
 
     size_t i = 0;
 

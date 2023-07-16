@@ -21,6 +21,9 @@
 
 #include <QueryWhere.hpp>
 
+#define LOG_MODULE_NAME "QueryWhere"
+#include <Log.hpp>
+
 QueryWhere::QueryWhere()
 {
 }

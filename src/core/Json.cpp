@@ -24,6 +24,9 @@
 #include <File.hpp>
 #include <Json.hpp>
 
+#define LOG_MODULE_NAME "Json"
+#include <Log.hpp>
+
 void Json::clear()
 {
     type_ = TYPE_NULL;

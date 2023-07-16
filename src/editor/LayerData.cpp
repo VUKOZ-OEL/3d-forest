@@ -22,6 +22,9 @@
 #include <Error.hpp>
 #include <LayerData.hpp>
 
+#define LOG_MODULE_NAME "LayerData"
+#include <Log.hpp>
+
 LayerData::LayerData() : position_(), radius_(0)
 {
 }

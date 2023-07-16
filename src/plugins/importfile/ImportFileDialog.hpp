@@ -23,10 +23,9 @@
 #define IMPORT_FILE_DIALOG_HPP
 
 #include <SettingsImport.hpp>
+class MainWindow;
 
 #include <QDialog>
-
-class MainWindow;
 class QCheckBox;
 class QPushButton;
 
@@ -47,6 +46,7 @@ public slots:
 protected:
     QCheckBox *centerCheckBox_;
     QCheckBox *convertCheckBox_;
+
     QPushButton *acceptButton_;
     QPushButton *rejectButton_;
 };

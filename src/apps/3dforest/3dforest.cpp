@@ -19,13 +19,13 @@
 
 /** @file 3dforest.cpp */
 
-#include <LoggerWindow.hpp>
 #include <MainWindow.hpp>
+#include <MessageLogWindow.hpp>
 
 #include <QApplication>
 #include <QSurfaceFormat>
 
-#define LOG_MODULE_NAME "3DForest"
+#define LOG_MODULE_NAME "3dforest"
 #include <Log.hpp>
 
 #include <WarningsDisable.hpp>
@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     int rc = 1;
 
     globalLogThread = std::make_shared<LogThread>();
-    LoggerWindow::install();
+    MessageLogWindow::install();
 
     LOG_INFO(<< "3D Forest started.");
 

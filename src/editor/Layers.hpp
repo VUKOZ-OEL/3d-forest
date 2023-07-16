@@ -55,6 +55,16 @@ public:
         THROW("Invalid layer id");
     }
 
+    bool contains(size_t id) const
+    {
+        const auto &it = hashTableId_.find(id);
+        if (it != hashTableId_.end())
+        {
+            return true;
+        }
+        return false;
+    }
+
     size_t unusedId() const;
 
     const std::string &label(size_t i) const { return layers_[i].label(); }

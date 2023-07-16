@@ -19,15 +19,11 @@
 
 /** @file ElevationWindow.cpp */
 
-#include <ElevationAction.hpp>
+#include <ElevationWidget.hpp>
 #include <ElevationWindow.hpp>
 #include <MainWindow.hpp>
-#include <ProgressDialog.hpp>
-#include <SliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
-#include <QHBoxLayout>
-#include <QPushButton>
 #include <QVBoxLayout>
 
 #define LOG_MODULE_NAME "ElevationWindow"
@@ -37,56 +33,16 @@
 
 ElevationWindow::ElevationWindow(MainWindow *mainWindow)
     : QDialog(mainWindow),
-      mainWindow_(mainWindow)
+      widget_(nullptr)
 {
-    LOG_DEBUG(<< "Window created.");
+    LOG_DEBUG(<< "Create.");
 
-    // Widgets
-    SliderWidget::create(nPointsInput_,
-                         this,
-                         nullptr,
-                         nullptr,
-                         tr("Points per cell"),
-                         tr("Points per cell"),
-                         tr("pt"),
-                         1,
-                         1000,
-                         1000000,
-                         10000);
-
-    SliderWidget::create(lengthInput_,
-                         this,
-                         nullptr,
-                         nullptr,
-                         tr("Cell min length"),
-                         tr("Cell min length"),
-                         tr("%"),
-                         1,
-                         1,
-                         100,
-                         5);
-
-    // Settings layout
-    QVBoxLayout *settingsLayout = new QVBoxLayout;
-    settingsLayout->addWidget(nPointsInput_);
-    settingsLayout->addWidget(lengthInput_);
-    settingsLayout->addStretch();
-
-    // Buttons
-    applyButton_ = new QPushButton(tr("Compute"));
-    applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
-
-    // Buttons layout
-    QHBoxLayout *buttonsLayout = new QHBoxLayout;
-    buttonsLayout->addStretch();
-    buttonsLayout->addWidget(applyButton_);
+    // Widget
+    widget_ = new ElevationWidget(mainWindow);
 
     // Main layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addLayout(settingsLayout);
-    mainLayout->addSpacing(10);
-    mainLayout->addLayout(buttonsLayout);
+    mainLayout->addWidget(widget_);
     mainLayout->addStretch();
 
     // Dialog
@@ -94,32 +50,5 @@ ElevationWindow::ElevationWindow(MainWindow *mainWindow)
     setWindowTitle(tr("Elevation"));
     setWindowIcon(ICON("elevation"));
     setMaximumHeight(height());
-    setModal(true);
-}
-
-void ElevationWindow::slotApply()
-{
-    LOG_DEBUG(<< "Compute elevation.");
-
-    mainWindow_->suspendThreads();
-
-    size_t pointsPerCell = static_cast<size_t>(nPointsInput_->value());
-    double cellLengthMinPercent = static_cast<double>(lengthInput_->value());
-
-    try
-    {
-        ElevationAction elevation(&mainWindow_->editor());
-        elevation.initialize(pointsPerCell, cellLengthMinPercent);
-        ProgressDialog::run(mainWindow_, "Computing Elevation", &elevation);
-    }
-    catch (std::exception &e)
-    {
-        mainWindow_->showError(e.what());
-    }
-    catch (...)
-    {
-        mainWindow_->showError("Unknown error");
-    }
-
-    mainWindow_->update({Editor::TYPE_ELEVATION});
+    setModal(false);
 }

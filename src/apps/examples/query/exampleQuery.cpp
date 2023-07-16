@@ -23,8 +23,10 @@
 
 #include <Editor.hpp>
 #include <Error.hpp>
-#include <Log.hpp>
 #include <Time.hpp>
+
+#define LOG_MODULE_NAME "exampleQuery"
+#include <Log.hpp>
 
 #define SCALE 0.001
 #define DATA_PATH "exampledataset.las"

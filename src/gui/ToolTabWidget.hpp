@@ -25,11 +25,11 @@
 #include <vector>
 
 #include <QWidget>
-
-class FlowLayout;
 class QToolButton;
 class QVBoxLayout;
 class QLabel;
+
+class FlowLayout;
 
 #include <ExportGui.hpp>
 #include <WarningsDisable.hpp>
@@ -42,7 +42,10 @@ class EXPORT_GUI ToolTabWidget : public QWidget
 public:
     ToolTabWidget();
 
-    void addTab(QWidget *widget, const QIcon &icon, const QString &label);
+    void addTab(QWidget *widget,
+                const QIcon &icon,
+                const QString &label,
+                const QString &toolTip = "");
 
 public slots:
     void slotToolButton();
@@ -52,6 +55,7 @@ private:
     QLabel *icon_;
     QLabel *label_;
     QVBoxLayout *mainLayout_;
+    bool showTextBesideIcon_;
     std::vector<QWidget *> tabList_;
     std::vector<QToolButton *> toolButtonList_;
 };

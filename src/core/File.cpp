@@ -60,6 +60,9 @@ typedef unsigned short mode_t;
 #include <File.hpp>
 #include <Time.hpp>
 
+#define LOG_MODULE_NAME "File"
+#include <Log.hpp>
+
 #ifndef O_BINARY
     #define O_BINARY 0
     #define O_TEXT 0
@@ -83,6 +86,22 @@ File::~File()
         (void)::close(fd_);
 #endif
     }
+}
+
+File::File(const File &)
+    : fd_(INVALID_DESCRIPTOR),
+      size_(0),
+      offset_(0),
+      path_()
+{
+    // TBD
+}
+
+File &File::operator=(const File &)
+{
+    close();
+    // TBD
+    return *this;
 }
 
 bool File::eof() const

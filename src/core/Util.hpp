@@ -45,6 +45,17 @@ extern void assertionFailure(const char *file, int line, const char *assertion);
     #define ASSERT(cond) ((void)0)
 #endif
 
+template <typename T> inline bool isEqual(T a, T b)
+{
+    return std::abs(a - b) <= (std::max(std::abs(a), std::abs(b)) *
+                               std::numeric_limits<T>::epsilon());
+}
+
+template <typename T> inline bool isInRange(T v, T a, T b)
+{
+    return v > a && v < b;
+}
+
 inline char *ustrcpy(char *dst, const char *src)
 {
     while (*src)
