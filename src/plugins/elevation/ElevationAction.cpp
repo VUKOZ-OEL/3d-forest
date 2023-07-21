@@ -19,19 +19,23 @@
 
 /** @file ElevationAction.cpp */
 
-#include <delaunator.hpp>
-#include <igl/point_mesh_squared_distance.h>
-#include <igl/writeOBJ.h>
-
 #include <Editor.hpp>
 #include <ElevationAction.hpp>
 
 #define LOG_MODULE_NAME "ElevationAction"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
+
+#define ELEVATION_STEP_RESET_POINTS 0
+#define ELEVATION_STEP_COUNT_POINTS 1
+#define ELEVATION_STEP_CREATE_GROUND 2
+#define ELEVATION_STEP_CREATE_INDEX 3
+#define ELEVATION_STEP_COMPUTE_ELEVATION 4
 
 ElevationAction::ElevationAction(Editor *editor)
     : editor_(editor),
-      query_(editor)
+      query_(editor),
+      queryPoint_(editor)
 {
     LOG_DEBUG(<< "Create.");
 }
@@ -46,210 +50,300 @@ void ElevationAction::clear()
     LOG_DEBUG(<< "Clear.");
 
     query_.clear();
+    queryPoint_.clear();
 
-    elevationPointsCount_ = 0;
+    voxelSize_ = 0;
+
+    numberOfPoints_ = 0;
+    numberOfGroundPoints_ = 0;
+    numberOfNonGroundPoints_ = 0;
+    pointIndex_ = 0;
 
     elevationMinimum_ = 0;
     elevationMaximum_ = 0;
 
-    XY.clear();
-
-    P.reserve(0, 0);
-    V.reserve(0, 0);
-    F.reserve(0, 0);
-    D.reserve(0, 0);
-    I.reserve(0, 0);
-    C.reserve(0, 0);
+    points_.clear();
 }
 
-void ElevationAction::initialize(size_t pointsPerCell,
-                                 double cellLengthMinPercent)
+void ElevationAction::start(double voxelSize)
 {
-    LOG_DEBUG(<< "Initialize with parameters pointsPerCell <" << pointsPerCell
-              << "> "
-              << "cellLengthMinPercent <" << cellLengthMinPercent << ">.");
+    LOG_DEBUG(<< "Start voxelSize <" << voxelSize << ">.");
 
-    elevationPointsCount_ = 0;
+    voxelSize_ = voxelSize;
+
+    numberOfPoints_ = editor_->datasets().nPoints();
+    numberOfGroundPoints_ = 0;
+    numberOfNonGroundPoints_ = 0;
+    pointIndex_ = 0;
+    LOG_DEBUG(<< "Total number of points <" << numberOfPoints_ << ">.");
 
     elevationMinimum_ = 0;
     elevationMaximum_ = 0;
 
-    query_.setGrid(pointsPerCell, cellLengthMinPercent);
+    points_.clear();
 
-    size_t numberOfSteps = query_.gridSize();
-    LOG_DEBUG(<< "Initialize numberOfSteps <" << numberOfSteps << ">.");
-
-    progress_.setMaximumStep(numberOfSteps, 1UL);
+    progress_.setMaximumStep(numberOfPoints_, 1000);
+    progress_.setMaximumSteps({5.0, 5.0, 25.0, 5.0, 60.0});
+    progress_.setValueSteps(ELEVATION_STEP_RESET_POINTS);
 }
 
 void ElevationAction::next()
 {
-    if (query_.nextGrid())
+    switch (progress_.valueSteps())
     {
-        stepGrid();
-    }
+        case ELEVATION_STEP_RESET_POINTS:
+            stepResetPoints();
+            break;
 
-    progress_.addValueStep(1);
+        case ELEVATION_STEP_COUNT_POINTS:
+            stepCountPoints();
+            break;
 
-    if (end())
-    {
-        LOG_DEBUG(<< "Flush modifications.");
-        query_.flush();
+        case ELEVATION_STEP_CREATE_GROUND:
+            stepCreateGround();
+            break;
 
-        if (elevationPointsCount_ > 0)
-        {
-            Range<double> range;
-            range.setMinimum(elevationMinimum_);
-            range.setMinimumValue(elevationMinimum_);
-            range.setMaximum(elevationMaximum_);
-            range.setMaximumValue(elevationMaximum_);
+        case ELEVATION_STEP_CREATE_INDEX:
+            stepCreateIndex();
+            break;
 
-            editor_->setElevationFilter(range);
-        }
+        case ELEVATION_STEP_COMPUTE_ELEVATION:
+            stepComputeElevation();
+            break;
+
+        default:
+            // empty
+            break;
     }
 }
 
-void ElevationAction::stepGrid()
+void ElevationAction::stepResetPoints()
 {
-    size_t nPointsGroundGrid;
-    size_t nPointsAboveGrid;
+    progress_.startTimer();
 
-    // Select grid cell.
-    query_.where().setBox(query_.gridCell());
-    query_.exec();
+    // Initialize.
+    if (progress_.valueStep() == 0)
+    {
+        // Reset elevation range.
+        Range<double> range;
+        editor_->setElevationFilter(range);
 
-    // Get number of ground and non-ground points. Reset elevation to zero.
-    nPointsGroundGrid = 0;
-    nPointsAboveGrid = 0;
-    query_.reset();
+        // Set query to iterate all points. The active filter is ignored.
+        query_.setWhere(QueryWhere());
+        query_.exec();
+    }
+
+    // Clear each point in all datasets.
+    while (query_.next())
+    {
+        query_.value() = 0;
+        query_.elevation() = 0;
+        query_.setModified();
+
+        progress_.addValueStep(1);
+        if (progress_.timedOut())
+        {
+            return;
+        }
+    }
+
+    // Next.
+    progress_.setMaximumStep(numberOfPoints_, 1000);
+    progress_.setValueSteps(ELEVATION_STEP_COUNT_POINTS);
+}
+
+void ElevationAction::stepCountPoints()
+{
+    progress_.startTimer();
+
+    // Initialize.
+    if (progress_.valueStep() == 0)
+    {
+        // Set query to use the active filter.
+        query_.setWhere(editor_->viewports().where());
+        query_.exec();
+    }
+
+    // Iterate all filtered points.
     while (query_.next())
     {
         if (query_.classification() == LasFile::CLASS_GROUND)
         {
-            // ground
-            nPointsGroundGrid++;
+            numberOfGroundPoints_++;
         }
         else
         {
-            // above ground
-            nPointsAboveGrid++;
+            numberOfNonGroundPoints_++;
         }
 
-        query_.elevation() = 0;
-        query_.setModified();
+        progress_.addValueStep(1);
+        if (progress_.timedOut())
+        {
+            return;
+        }
     }
 
-    // Compute elevation
-    if (nPointsGroundGrid > 2)
-    {
-        LOG_DEBUG(<< "Number of points as ground <" << nPointsGroundGrid
-                  << "> above ground <" << nPointsAboveGrid << ">.");
-
-        // Collect points
-        P.resize(static_cast<Eigen::Index>(nPointsAboveGrid), 3);
-        V.resize(static_cast<Eigen::Index>(nPointsGroundGrid), 3);
-        XY.resize(nPointsGroundGrid * 2);
-
-        nPointsGroundGrid = 0;
-        nPointsAboveGrid = 0;
-        query_.reset();
-        while (query_.next())
-        {
-            if (query_.classification() == LasFile::CLASS_GROUND)
-            {
-                V(static_cast<Eigen::Index>(nPointsGroundGrid), 0) = query_.x();
-                V(static_cast<Eigen::Index>(nPointsGroundGrid), 1) = query_.y();
-                V(static_cast<Eigen::Index>(nPointsGroundGrid), 2) = query_.z();
-
-                XY[2 * nPointsGroundGrid] = query_.x();
-                XY[2 * nPointsGroundGrid + 1] = query_.y();
-
-                nPointsGroundGrid++;
-            }
-            else
-            {
-                P(static_cast<Eigen::Index>(nPointsAboveGrid), 0) = query_.x();
-                P(static_cast<Eigen::Index>(nPointsAboveGrid), 1) = query_.y();
-                P(static_cast<Eigen::Index>(nPointsAboveGrid), 2) = query_.z();
-
-                nPointsAboveGrid++;
-            }
-        }
-
-        // Compute ground surface
-        delaunator::Delaunator delaunay(XY);
-
-        // Convert to igl triangles
-        size_t nTriangles = delaunay.triangles.size() / 3;
-
-        F.resize(static_cast<Eigen::Index>(nTriangles), 3);
-
-        for (size_t iTriangle = 0; iTriangle < nTriangles; iTriangle++)
-        {
-            // Swap the order of the vertices in triangle to 0, 2, 1.
-            // This will affect the direction of the normal to face up
-            // along z.
-            F(static_cast<Eigen::Index>(iTriangle), 0) =
-                static_cast<int>(delaunay.triangles[iTriangle * 3]);
-            F(static_cast<Eigen::Index>(iTriangle), 1) =
-                static_cast<int>(delaunay.triangles[iTriangle * 3 + 2]);
-            F(static_cast<Eigen::Index>(iTriangle), 2) =
-                static_cast<int>(delaunay.triangles[iTriangle * 3 + 1]);
-        }
-
-        // Compute distances from a set of points P to a triangle mesh (V,F)
-        igl::point_mesh_squared_distance(P, V, F, D, I, C);
-
-        // Set elevation
-        Eigen::Index idx = 0;
-        Eigen::Index idxElevation = 0;
-        query_.reset();
-        while (query_.next())
-        {
-            if (query_.classification() != LasFile::CLASS_GROUND)
-            {
-                if (idx < D.rows() && D(idx) > 0.)
-                {
-                    double elevation = ::sqrt(D(idx));
-
-                    query_.elevation() = elevation;
-                    query_.setModified();
-
-                    if (elevationPointsCount_ > 0)
-                    {
-                        if (elevation < elevationMinimum_)
-                        {
-                            elevationMinimum_ = elevation;
-                        }
-
-                        if (elevation > elevationMaximum_)
-                        {
-                            elevationMaximum_ = elevation;
-                        }
-                    }
-                    else
-                    {
-                        elevationMinimum_ = elevation;
-                        elevationMaximum_ = elevation;
-                    }
-
-                    idxElevation++;
-                    elevationPointsCount_++;
-                }
-
-                idx++;
-            }
-        }
-
-        LOG_DEBUG(<< "Points with elevation <" << idxElevation << ">.");
-    }
+    // Next.
+    query_.reset();
+    progress_.setMaximumStep(numberOfGroundPoints_, 100);
+    progress_.setValueSteps(ELEVATION_STEP_CREATE_GROUND);
 }
 
-void ElevationAction::exportGroundMesh(const std::string &path)
+void ElevationAction::stepCreateGround()
 {
-    std::string fullPath;
-    fullPath = path + std::to_string(progress_.valueStep()) + ".obj";
-    LOG_DEBUG(<< "Full path <" << fullPath << ">.");
+    progress_.startTimer();
 
-    igl::writeOBJ(fullPath, V, F);
+    // Iterate all points:
+    while (query_.next())
+    {
+        if (query_.classification() == LasFile::CLASS_GROUND)
+        {
+            // If the current point is classified as ground,
+            // then add it as new ground point.
+            createGroundPoint();
+            progress_.addValueStep(1);
+        }
+
+        if (progress_.timedOut())
+        {
+            return;
+        }
+    }
+
+    // Next.
+    progress_.setMaximumStep();
+    progress_.setValueSteps(ELEVATION_STEP_CREATE_INDEX);
+}
+
+void ElevationAction::stepCreateIndex()
+{
+    // Create ground index.
+    points_.createIndex();
+
+    // Next.
+    query_.reset();
+    progress_.setMaximumStep(numberOfNonGroundPoints_, 100);
+    progress_.setValueSteps(ELEVATION_STEP_COMPUTE_ELEVATION);
+}
+
+void ElevationAction::stepComputeElevation()
+{
+    progress_.startTimer();
+
+    // Iterate all points:
+    while (query_.next())
+    {
+        // If the current point is not classified as ground:
+        if (query_.classification() != LasFile::CLASS_GROUND)
+        {
+            // Find nearest neighbour in ground projection:
+            size_t idx = points_.findNN(query_.x(), query_.y(), 0.0);
+            if (idx < points_.size())
+            {
+                // Compute elevation to this nearest neighbour.
+                double d = query_.z() - points_[idx].elevation;
+                if (d < 0.0)
+                {
+                    d = 0.0;
+                }
+
+                // Update min and max elevation.
+                if (pointIndex_ == 0)
+                {
+                    elevationMinimum_ = d;
+                    elevationMaximum_ = d;
+                }
+                else if (d < elevationMinimum_)
+                {
+                    elevationMinimum_ = d;
+                }
+                else if (d > elevationMaximum_)
+                {
+                    elevationMaximum_ = d;
+                }
+                pointIndex_++;
+
+                // Set computed elevation.
+                query_.elevation() = d;
+            }
+
+            progress_.addValueStep(1);
+        }
+
+        if (progress_.timedOut())
+        {
+            return;
+        }
+    }
+
+    // Flush all modifications.
+    query_.flush();
+
+    // Set new elevation range.
+    Range<double> range;
+    range.set(elevationMinimum_, elevationMaximum_);
+    editor_->setElevationFilter(range);
+
+    // All steps are now complete.
+    progress_.setValueStep(progress_.maximumStep());
+    progress_.setValueSteps(progress_.maximumSteps());
+}
+
+void ElevationAction::createGroundPoint()
+{
+    // If this ground point was already processed, then do nothing.
+    if (query_.value() != 0)
+    {
+        return;
+    }
+
+    // Initialize new ground point.
+    Point p;
+    p.x = 0;
+    p.y = 0;
+    p.z = 0;
+    p.elevation = 0;
+
+    // Compute point coordinates as average from all neighbour points:
+    size_t n = 0;
+
+    queryPoint_.where().setSphere(query_.x(),
+                                  query_.y(),
+                                  query_.z(),
+                                  voxelSize_);
+    queryPoint_.exec();
+
+    while (queryPoint_.next())
+    {
+        // Compute only with ground points:
+        if (queryPoint_.classification() == LasFile::CLASS_GROUND)
+        {
+            // Set only x and y point coordinates for 2D ground projection.
+            p.x += queryPoint_.x();
+            p.y += queryPoint_.y();
+
+            // Store maximal z coordinate from all neighbors into elevation.
+            if (queryPoint_.z() > p.elevation)
+            {
+                p.elevation = queryPoint_.z();
+            }
+
+            n++;
+
+            // Mark all used points as processed.
+            queryPoint_.value() = 1;
+            queryPoint_.setModified();
+        }
+    }
+
+    if (n < 1)
+    {
+        return;
+    }
+
+    p.x = p.x / static_cast<double>(n);
+    p.y = p.y / static_cast<double>(n);
+
+    // Append new point.
+    points_.push_back(std::move(p));
 }

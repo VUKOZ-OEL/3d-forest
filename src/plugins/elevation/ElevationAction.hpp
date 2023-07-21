@@ -22,8 +22,7 @@
 #ifndef ELEVATION_ACTION_HPP
 #define ELEVATION_ACTION_HPP
 
-#include <Eigen/Core>
-
+#include <Points.hpp>
 #include <ProgressActionInterface.hpp>
 #include <Query.hpp>
 class Editor;
@@ -35,10 +34,8 @@ public:
     ElevationAction(Editor *editor);
     virtual ~ElevationAction();
 
-    void initialize(size_t pointsPerCell = 10000,
-                    double cellLengthMinPercent = 1.);
+    void start(double voxelSize);
     virtual void next();
-    void exportGroundMesh(const std::string &path);
     void clear();
 
     double minimum() const { return elevationMinimum_; }
@@ -47,21 +44,27 @@ public:
 protected:
     Editor *editor_;
     Query query_;
+    Query queryPoint_;
 
-    uint64_t elevationPointsCount_;
+    double voxelSize_;
+
+    uint64_t numberOfPoints_;
+    uint64_t numberOfGroundPoints_;
+    uint64_t numberOfNonGroundPoints_;
+    size_t pointIndex_;
 
     double elevationMinimum_;
     double elevationMaximum_;
 
-    Eigen::MatrixXd P;      // Points above ground
-    Eigen::MatrixXd V;      // Ground coordinates
-    std::vector<double> XY; // Ground xy coordinates
-    Eigen::MatrixXi F;      // Ground triangles
-    Eigen::MatrixXd D;      // List of smallest squared distances
-    Eigen::MatrixXi I;      // List of indices to smallest distances
-    Eigen::MatrixXd C;      // 3 list of closest points
+    Points points_;
 
-    void stepGrid();
+    void stepResetPoints();
+    void stepCountPoints();
+    void stepCreateGround();
+    void stepCreateIndex();
+    void stepComputeElevation();
+
+    void createGroundPoint();
 };
 
 #endif /* ELEVATION_ACTION_HPP */

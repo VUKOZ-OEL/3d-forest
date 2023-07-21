@@ -39,6 +39,15 @@ TEST_CASE(TestPointsCreate)
     TEST(result.size() == 1 && isEqual(pc[result[0]].x, 1.0));
 }
 
+TEST_CASE(TestPointsFindNN)
+{
+    Points p;
+    p.push_back({0.0, 0.0, 0.0});
+    p.createIndex();
+
+    TEST(p.findNN(0.0, 0.0, 1.0) == 0);
+}
+
 class TestPoint3f
 {
 public:

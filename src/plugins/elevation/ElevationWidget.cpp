@@ -19,7 +19,6 @@
 
 /** @file ElevationWidget.cpp */
 
-#include <ElevationAction.hpp>
 #include <ElevationWidget.hpp>
 #include <MainWindow.hpp>
 #include <ProgressDialog.hpp>
@@ -27,6 +26,7 @@
 #include <ThemeIcon.hpp>
 
 #include <QHBoxLayout>
+#include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
 
@@ -37,43 +37,31 @@
 
 ElevationWidget::ElevationWidget(MainWindow *mainWindow)
     : QWidget(),
-      mainWindow_(mainWindow)
+      mainWindow_(mainWindow),
+      elevation_(&mainWindow->editor())
 {
     LOG_DEBUG(<< "Create.");
 
     // Widgets
-    SliderWidget::create(nPointsSlider_,
+    SliderWidget::create(voxelSizeSlider_,
                          this,
                          nullptr,
                          nullptr,
-                         tr("Points per cell"),
-                         tr("Points per cell"),
+                         tr("Voxel radius"),
+                         tr("Voxel radius"),
                          tr("pt"),
                          1,
+                         1,
                          1000,
-                         1000000,
-                         10000);
-
-    SliderWidget::create(lengthSlider_,
-                         this,
-                         nullptr,
-                         nullptr,
-                         tr("Cell min length"),
-                         tr("Cell min length"),
-                         tr("%"),
-                         1,
-                         1,
-                         100,
-                         5);
+                         100);
 
     // Settings layout
     QVBoxLayout *settingsLayout = new QVBoxLayout;
-    settingsLayout->addWidget(nPointsSlider_);
-    settingsLayout->addWidget(lengthSlider_);
+    settingsLayout->addWidget(voxelSizeSlider_);
     settingsLayout->addStretch();
 
     // Buttons
-    applyButton_ = new QPushButton(tr("Compute"));
+    applyButton_ = new QPushButton(tr("Run"));
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
 
@@ -84,6 +72,8 @@ ElevationWidget::ElevationWidget(MainWindow *mainWindow)
 
     // Main layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(new QLabel(tr("This tool requires pre-computed"
+                                        " \nground classification.")));
     mainLayout->addLayout(settingsLayout);
     mainLayout->addSpacing(10);
     mainLayout->addLayout(buttonsLayout);
@@ -93,20 +83,25 @@ ElevationWidget::ElevationWidget(MainWindow *mainWindow)
     setLayout(mainLayout);
 }
 
+void ElevationWidget::hideEvent(QHideEvent *event)
+{
+    LOG_DEBUG(<< "Hide.");
+    elevation_.clear();
+    QWidget::hideEvent(event);
+}
+
 void ElevationWidget::slotApply()
 {
     LOG_DEBUG(<< "Compute elevation.");
 
     mainWindow_->suspendThreads();
 
-    size_t pointsPerCell = static_cast<size_t>(nPointsSlider_->value());
-    double cellLengthMinPercent = static_cast<double>(lengthSlider_->value());
+    double voxelSize = static_cast<double>(voxelSizeSlider_->value());
 
     try
     {
-        ElevationAction elevation(&mainWindow_->editor());
-        elevation.initialize(pointsPerCell, cellLengthMinPercent);
-        ProgressDialog::run(mainWindow_, "Computing Elevation", &elevation);
+        elevation_.start(voxelSize);
+        ProgressDialog::run(mainWindow_, "Computing Elevation", &elevation_);
     }
     catch (std::exception &e)
     {

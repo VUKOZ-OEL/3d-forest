@@ -71,3 +71,14 @@ void Points::findRadius(double x,
                                                       r,
                                                       resultIndices);
 }
+
+size_t Points::findNN(double x, double y, double z)
+{
+    int32_t r = octree_.findNeighbor<unibn::L2Distance<Point>>({x, y, z});
+    if (r >= 0)
+    {
+        return static_cast<size_t>(r);
+    }
+
+    return SIZE_MAX;
+}

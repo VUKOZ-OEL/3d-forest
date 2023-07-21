@@ -60,6 +60,7 @@ public:
                     double z,
                     double r,
                     std::vector<size_t> &resultIndices);
+    size_t findNN(double x, double y, double z);
 
 private:
     VectorFile<Point, Point::IO> points_;
