@@ -85,10 +85,12 @@ void ExplorerElevationWidget::setElevation(const Range<double> &elevationRange)
     rangeInput_->blockSignals(true);
 
     elevationRange_ = elevationRange;
+
     rangeInput_->setMinimum(elevationRange_.minimum());
     rangeInput_->setMaximum(elevationRange_.maximum());
     rangeInput_->setMinimumValue(elevationRange_.minimumValue());
     rangeInput_->setMaximumValue(elevationRange_.maximumValue());
+    rangeInput_->setDisabled(elevationRange_.empty());
 
     rangeInput_->blockSignals(false);
 }

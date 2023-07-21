@@ -23,54 +23,81 @@
 #define RANGE_HPP
 
 #include <Json.hpp>
+#include <Util.hpp>
 
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>
 
-/** Range as [ minimum, maximum, minimumValue, maximumValue ]. */
+/** Range as [ minimum, minimumValue, maximumValue, maximum ]. */
 template <class T> class Range : public std::array<T, 4>
 {
 public:
+    // construct/copy/destroy
     Range();
-    ~Range();
 
-    void clear();
-
-    void set(T min, T max, T minValue, T maxValue)
+    Range(T min, T max)
     {
         this->operator[](0) = min;
-        this->operator[](1) = max;
-        this->operator[](2) = minValue;
-        this->operator[](3) = maxValue;
+        this->operator[](1) = min;
+        this->operator[](2) = max;
+        this->operator[](3) = max;
+        enabled_ = true;
     }
+
+    Range(T min, T minValue, T maxValue, T max)
+    {
+        this->operator[](0) = min;
+        this->operator[](1) = minValue;
+        this->operator[](2) = maxValue;
+        this->operator[](3) = max;
+        enabled_ = true;
+    }
+
+    ~Range();
+
+    // enabled
+    void setEnabled(bool enabled) { enabled_ = enabled; }
+    bool isEnabled() const { return enabled_; }
+
+    // access
+    bool empty() const;
+    bool full() const;
+
+    // Range with lower bound (minimum) and upper bound (maximum).
+    void setMinimum(T v) { this->operator[](0) = v; }
+    void setMaximum(T v) { this->operator[](3) = v; }
+
+    T minimum() const { return this->operator[](0); }
+    T maximum() const { return this->operator[](3); }
+
+    // Selected part from the range.
+    void setMinimumValue(T v) { this->operator[](1) = v; }
+    void setMaximumValue(T v) { this->operator[](2) = v; }
+
+    T minimumValue() const { return this->operator[](1); }
+    T maximumValue() const { return this->operator[](2); }
+
+    // modifiers
+    void clear();
 
     void set(T min, T max)
     {
         this->operator[](0) = min;
-        this->operator[](1) = max;
-        this->operator[](2) = min;
+        this->operator[](1) = min;
+        this->operator[](2) = max;
         this->operator[](3) = max;
     }
 
-    // Range with lower bound (minimum) and upper bound (maximum).
-    void setMinimum(T v) { this->operator[](0) = v; }
-    void setMaximum(T v) { this->operator[](1) = v; }
+    void set(T min, T minValue, T maxValue, T max)
+    {
+        this->operator[](0) = min;
+        this->operator[](1) = minValue;
+        this->operator[](2) = maxValue;
+        this->operator[](3) = max;
+    }
 
-    T minimum() const { return this->operator[](0); }
-    T maximum() const { return this->operator[](1); }
-
-    // Selected part from the range.
-    void setMinimumValue(T v) { this->operator[](2) = v; }
-    void setMaximumValue(T v) { this->operator[](3) = v; }
-
-    T minimumValue() const { return this->operator[](2); }
-    T maximumValue() const { return this->operator[](3); }
-
-    // Is minimumValue at minimum and maximumValue at maximum?
-    bool hasBoundaryValues() const;
-
-    void setEnabled(bool enabled) { enabled_ = enabled; }
-    bool isEnabled() const { return enabled_; }
+    // operations
+    bool contains(T v) const;
 
     // I/O
     void read(const Json &in);
@@ -98,12 +125,17 @@ template <class T> inline void Range<T>::clear()
     enabled_ = true;
 }
 
-template <class T> inline bool Range<T>::hasBoundaryValues() const
+template <class T> inline bool Range<T>::empty() const
+{
+    return isEqual(minimum(), maximum());
+}
+
+template <class T> inline bool Range<T>::full() const
 {
     constexpr T e = std::numeric_limits<T>::epsilon();
 
-    if (this->operator[](2) - this->operator[](0) > e ||
-        this->operator[](1) - this->operator[](3) > e)
+    if (this->operator[](1) - this->operator[](0) > e ||
+        this->operator[](3) - this->operator[](2) > e)
     {
         return false;
     }
@@ -111,20 +143,25 @@ template <class T> inline bool Range<T>::hasBoundaryValues() const
     return true;
 }
 
+template <class T> inline bool Range<T>::contains(T v) const
+{
+    return !(v < minimumValue() || v > maximumValue());
+}
+
 template <class T> inline void Range<T>::read(const Json &in)
 {
     this->operator[](0) = static_cast<T>(in["minimum"].number());
-    this->operator[](1) = static_cast<T>(in["maximum"].number());
-    this->operator[](2) = static_cast<T>(in["minimumValue"].number());
-    this->operator[](3) = static_cast<T>(in["maximumValue"].number());
+    this->operator[](1) = static_cast<T>(in["minimumValue"].number());
+    this->operator[](2) = static_cast<T>(in["maximumValue"].number());
+    this->operator[](3) = static_cast<T>(in["maximum"].number());
 }
 
 template <class T> inline Json &Range<T>::write(Json &out) const
 {
     out["minimum"] = this->operator[](0);
-    out["maximum"] = this->operator[](1);
-    out["minimumValue"] = this->operator[](2);
-    out["maximumValue"] = this->operator[](3);
+    out["minimumValue"] = this->operator[](1);
+    out["maximumValue"] = this->operator[](2);
+    out["maximum"] = this->operator[](3);
 
     return out;
 }
