@@ -27,10 +27,7 @@
 #define LOG_MODULE_NAME "elevation"
 #include <Log.hpp>
 
-static void elevationCompute(const std::string &inputPath,
-                             size_t pointsPerCell,
-                             double cellLengthMinPercent,
-                             const std::string &outputGroundMesh)
+static void elevationCompute(const std::string &inputPath, double voxelSize)
 {
     // Open input file in editor.
     Editor editor;
@@ -38,21 +35,11 @@ static void elevationCompute(const std::string &inputPath,
 
     // Compute elevation by steps.
     ElevationAction elevation(&editor);
-    elevation.initialize(pointsPerCell, cellLengthMinPercent);
+    elevation.start(voxelSize);
     while (!elevation.end())
     {
         elevation.next();
-
-        if (!outputGroundMesh.empty())
-        {
-            elevation.exportGroundMesh(outputGroundMesh);
-        }
     }
-
-    std::cout << "elevation minimum <" << elevation.minimum() << ">"
-              << std::endl;
-    std::cout << "elevation maximum <" << elevation.maximum() << ">"
-              << std::endl;
 }
 
 static void elevationPrint(const std::string &inputPath)
@@ -91,13 +78,15 @@ static void elevationPrint(const std::string &inputPath)
 
 int main(int argc, char *argv[])
 {
+    int rc = 1;
+
+    LOGGER_START_FILE("log_elevation.txt");
+
     try
     {
         ArgumentParser arg;
         arg.add("--input", "");
-        arg.add("--cell-points", "10000");
-        arg.add("--cell-size-min", "5");
-        arg.add("--output-ground-mesh", "");
+        arg.add("--voxel-size", "100");
         arg.add("--print", "");
         arg.parse(argc, argv);
 
@@ -108,16 +97,17 @@ int main(int argc, char *argv[])
         else
         {
             elevationCompute(arg.toString("--input"),
-                             arg.toSize("--cell-points"),
-                             arg.toDouble("--cell-size-min"),
-                             arg.toString("--output-ground-mesh"));
+                             arg.toDouble("--voxel-size"));
         }
+
+        rc = 0;
     }
     catch (std::exception &e)
     {
         std::cerr << "error: " << e.what() << std::endl;
-        return 1;
     }
 
-    return 0;
+    LOGGER_STOP_FILE;
+
+    return rc;
 }

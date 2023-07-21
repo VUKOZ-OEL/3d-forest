@@ -22,6 +22,7 @@
 #ifndef ELEVATION_WIDGET_HPP
 #define ELEVATION_WIDGET_HPP
 
+#include <ElevationAction.hpp>
 class MainWindow;
 class SliderWidget;
 
@@ -39,11 +40,14 @@ public:
 protected slots:
     void slotApply();
 
+protected:
+    void hideEvent(QHideEvent *event) override;
+
 private:
     MainWindow *mainWindow_;
+    ElevationAction elevation_;
 
-    SliderWidget *nPointsSlider_;
-    SliderWidget *lengthSlider_;
+    SliderWidget *voxelSizeSlider_;
 
     QPushButton *applyButton_;
 };

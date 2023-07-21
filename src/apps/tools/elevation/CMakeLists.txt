@@ -27,9 +27,6 @@ target_include_directories(
     ${SUB_PROJECT_NAME}
     PUBLIC
     ../../../plugins/elevation
-    ../../../../3rdparty/delaunator
-    ../../../../3rdparty/eigen
-    ../../../../3rdparty/libigl/include
 )
 
 target_link_libraries(

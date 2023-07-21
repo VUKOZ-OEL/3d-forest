@@ -44,6 +44,14 @@ public:
         this->operator[](3) = maxValue;
     }
 
+    void set(T min, T max)
+    {
+        this->operator[](0) = min;
+        this->operator[](1) = max;
+        this->operator[](2) = min;
+        this->operator[](3) = max;
+    }
+
     // Range with lower bound (minimum) and upper bound (maximum).
     void setMinimum(T v) { this->operator[](0) = v; }
     void setMaximum(T v) { this->operator[](1) = v; }

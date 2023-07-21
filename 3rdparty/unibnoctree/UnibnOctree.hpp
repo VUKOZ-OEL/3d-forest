@@ -799,7 +799,7 @@ bool Octree<PointT, ContainerT>::findNeighbor(const Octant* octant, const PointT
       typename PointT::Type dist = Distance::compute(query, p);
       if (dist > sqrMinDistance && dist < sqrMaxDistance)
       {
-        resultIndex = idx;
+        resultIndex = static_cast<int32_t>(idx);
         sqrMaxDistance = dist;
       }
       idx = successors_[idx];
