@@ -20,10 +20,22 @@
 /** @file ClassificationAction.cpp */
 
 #include <ClassificationAction.hpp>
+#include <Cone.hpp>
 #include <Editor.hpp>
 
 #define LOG_MODULE_NAME "ClassificationAction"
 #include <Log.hpp>
+
+#define CLASSIFICATION_STEP_RESET_POINTS 0
+#define CLASSIFICATION_STEP_COUNT_POINTS 1
+#define CLASSIFICATION_STEP_POINTS_TO_VOXELS 2
+#define CLASSIFICATION_STEP_CREATE_VOXEL_INDEX 3
+#define CLASSIFICATION_STEP_CLASSIFY_GROUND 4
+#define CLASSIFICATION_STEP_VOXELS_TO_POINTS 5
+
+#define CLASSIFICATION_PROCESS 0
+#define CLASSIFICATION_NOT_FOUND 1
+#define CLASSIFICATION_FOUND 2
 
 ClassificationAction::ClassificationAction(Editor *editor)
     : editor_(editor),
@@ -44,117 +56,380 @@ void ClassificationAction::clear()
 
     query_.clear();
     queryPoint_.clear();
+
+    voxelRadius_ = 0;
+    searchRadius_ = 0;
+    angle_ = 0;
+
+    nPointsTotal_ = 0;
+    nPointsInFilter_ = 0;
+
+    voxels_.clear();
+    group_.clear();
+    path_.clear();
+    searchNext_.clear();
+    searchGround_.clear();
+
+    minimumIndex_ = 0;
+    minimumValue_ = 0;
 }
 
-void ClassificationAction::initialize(size_t pointsPerCell,
-                                      double cellLengthMinPercent,
-                                      double groundErrorPercent,
-                                      double angleDeg)
+void ClassificationAction::start(double voxelRadius,
+                                 double radius,
+                                 double angle)
 {
-    LOG_DEBUG(<< "Initialize with parameter pointsPerCell <" << pointsPerCell
-              << "> "
-              << "cellLengthMinPercent <" << cellLengthMinPercent << "> "
-              << "groundErrorPercent <" << groundErrorPercent << "> "
-              << "angleDeg <" << angleDeg << ">.");
+    LOG_DEBUG(<< "Start.");
 
-    groundErrorPercent_ = groundErrorPercent;
+    voxelRadius_ = voxelRadius;
+    searchRadius_ = radius;
+    angle_ = angle;
 
-    // Ground plane angle to inverted angle for selection.
-    angleDeg_ = 90.0 - angleDeg;
+    nPointsTotal_ = editor_->datasets().nPoints();
+    nPointsInFilter_ = 0;
 
-    query_.setGrid(pointsPerCell, cellLengthMinPercent);
+    voxels_.clear();
+    group_.clear();
+    path_.clear();
+    searchNext_.clear();
+    searchGround_.clear();
 
-    size_t numberOfSteps = query_.gridSize();
-    LOG_DEBUG(<< "Initialize numberOfSteps <" << numberOfSteps << ">.");
+    minimumIndex_ = SIZE_MAX;
+    minimumValue_ = std::numeric_limits<double>::max();
 
-    progress_.setMaximumStep(numberOfSteps, 1UL);
+    // Plan the steps.
+    progress_.setMaximumStep(nPointsTotal_, 1000);
+    progress_.setMaximumSteps({20.0, 10.0, 20.0, 20.0, 10.0, 20.0});
+    progress_.setValueSteps(CLASSIFICATION_STEP_RESET_POINTS);
 }
 
 void ClassificationAction::next()
 {
-    if (query_.nextGrid())
+    switch (progress_.valueSteps())
     {
-        stepGrid();
-    }
+        case CLASSIFICATION_STEP_RESET_POINTS:
+            stepResetPoints();
+            break;
 
-    progress_.addValueStep(1);
+        case CLASSIFICATION_STEP_COUNT_POINTS:
+            stepCountPoints();
+            break;
 
-    if (end())
-    {
-        LOG_DEBUG(<< "Flush modifications.");
-        query_.flush();
+        case CLASSIFICATION_STEP_POINTS_TO_VOXELS:
+            stepPointsToVoxels();
+            break;
+
+        case CLASSIFICATION_STEP_CREATE_VOXEL_INDEX:
+            stepCreateVoxelIndex();
+            break;
+
+        case CLASSIFICATION_STEP_CLASSIFY_GROUND:
+            stepClassifyGround();
+            break;
+
+        case CLASSIFICATION_STEP_VOXELS_TO_POINTS:
+            stepVoxelsToPoints();
+            break;
+
+        default:
+            // empty
+            break;
     }
 }
 
-void ClassificationAction::stepGrid()
+void ClassificationAction::stepResetPoints()
 {
-    double zMax = editor_->clipBoundary().max(2);
-    double zMin = editor_->clipBoundary().min(2);
-    double zMinCell;
-    double zMaxGround;
+    progress_.startTimer();
 
-    size_t nPointsGroundGrid;
-    size_t nPointsAboveGrid;
-
-    // Select grid cell.
-    query_.where().setBox(query_.gridCell());
-    query_.exec();
-
-    // Find local minimum.
-    zMinCell = zMax;
-    while (query_.next())
+    // Initialize:
+    if (progress_.valueStep() == 0)
     {
-        if (query_.z() < zMinCell)
-        {
-            zMinCell = query_.z();
-        }
+        // Reset elevation range.
+        Range<double> range;
+        editor_->setElevationFilter(range);
+
+        // Set query to iterate all points. The active filter is ignored.
+        query_.setWhere(QueryWhere());
+        query_.exec();
     }
-    zMaxGround = zMinCell + (((zMax - zMin) * 0.01) * groundErrorPercent_);
 
-    // Set classification to 'ground' or 'unassigned'.
-    nPointsGroundGrid = 0;
-    nPointsAboveGrid = 0;
-    query_.reset();
+    // For each point in all datasets:
     while (query_.next())
     {
-        if (query_.z() > zMaxGround)
+        // Set point index to voxel to none.
+        query_.value() = SIZE_MAX;
+
+        // Reset point classification of ground points to unassigned.
+        if (query_.classification() == LasFile::CLASS_GROUND)
         {
-            // unassigned (could be a roof)
             query_.classification() = LasFile::CLASS_UNASSIGNED;
-            nPointsAboveGrid++;
-        }
-        else
-        {
-            queryPoint_.setMaximumResults(1);
-
-            queryPoint_.where().setCone(query_.x(),
-                                        query_.y(),
-                                        query_.z(),
-                                        zMinCell,
-                                        angleDeg_);
-
-            queryPoint_.exec();
-
-            if (queryPoint_.next())
-            {
-                // unassigned (has some points below, inside the cone)
-                query_.classification() = LasFile::CLASS_UNASSIGNED;
-                nPointsAboveGrid++;
-            }
-            else
-            {
-                // ground
-                query_.classification() = LasFile::CLASS_GROUND;
-                nPointsGroundGrid++;
-            }
         }
 
-        // New ground level may brake elevation.
-        // TBD query_.elevation() = 0;
+        // Reset point elevation to zero.
+        query_.elevation() = 0;
 
         query_.setModified();
+
+        progress_.addValueStep(1);
+        if (progress_.timedOut())
+        {
+            return;
+        }
     }
 
-    LOG_DEBUG(<< "Number of points as ground <" << nPointsGroundGrid
-              << "> above ground <" << nPointsAboveGrid << ">.");
+    // Next.
+    progress_.setMaximumStep(nPointsTotal_, 1000);
+    progress_.setValueSteps(CLASSIFICATION_STEP_COUNT_POINTS);
+}
+
+void ClassificationAction::stepCountPoints()
+{
+    progress_.startTimer();
+
+    // Initialize:
+    if (progress_.valueStep() == 0)
+    {
+        // Set query to use the active filter.
+        query_.setWhere(editor_->viewports().where());
+        query_.exec();
+    }
+
+    // Count the number of filtered points.
+    // This can be the same value as nPointsTotal.
+    while (query_.next())
+    {
+        nPointsInFilter_++;
+
+        progress_.addValueStep(1);
+        if (progress_.timedOut())
+        {
+            return;
+        }
+    }
+
+    LOG_DEBUG(<< "Counted <" << nPointsInFilter_ << "> points.");
+
+    // Next.
+    query_.reset();
+    progress_.setMaximumStep(nPointsInFilter_, 1000);
+    progress_.setValueSteps(CLASSIFICATION_STEP_POINTS_TO_VOXELS);
+}
+
+void ClassificationAction::stepPointsToVoxels()
+{
+    progress_.startTimer();
+
+    // For each point in filtered datasets:
+    while (query_.next())
+    {
+        // If point index to voxel is none:
+        if (query_.value() == SIZE_MAX)
+        {
+            // Create new voxel.
+            createVoxel();
+        }
+
+        progress_.addValueStep(1);
+
+        if (progress_.timedOut())
+        {
+            return;
+        }
+    }
+
+    LOG_DEBUG(<< "Created <" << voxels_.size() << "> voxels.");
+
+    // Next.
+    query_.reset();
+    progress_.setMaximumStep(voxels_.size(), 100);
+    progress_.setValueSteps(CLASSIFICATION_STEP_CREATE_VOXEL_INDEX);
+}
+
+void ClassificationAction::stepCreateVoxelIndex()
+{
+    // Create voxel index.
+    voxels_.createIndex();
+
+    LOG_DEBUG(<< "Created index.");
+
+    // Next.
+    progress_.setMaximumStep(voxels_.size(), 10);
+    progress_.setValueSteps(CLASSIFICATION_STEP_CLASSIFY_GROUND);
+}
+
+void ClassificationAction::stepClassifyGround()
+{
+    progress_.startTimer();
+
+    // Initialize:
+    if (progress_.valueStep() == 0)
+    {
+        // If there is at least one voxel:
+        if (minimumIndex_ < voxels_.size())
+        {
+            // Append this voxel into ground path.
+            voxels_[minimumIndex_].group = CLASSIFICATION_FOUND;
+            path_.push_back(minimumIndex_);
+        }
+
+        progress_.addValueStep(1);
+    }
+
+    // While the path is not empty:
+    while (path_.size() > 0)
+    {
+        // Add the path to the current group.
+        size_t idx = group_.size();
+        for (size_t i = 0; i < path_.size(); i++)
+        {
+            group_.push_back(path_[i]);
+        }
+
+        // Set the path empty.
+        path_.resize(0);
+
+        // Try to expand the current group with neighbor voxels.
+        for (size_t i = idx; i < group_.size(); i++)
+        {
+            Point &a = voxels_[group_[i]];
+            progress_.addValueStep(1);
+
+            voxels_.findRadius(a.x, a.y, a.z, searchRadius_, searchNext_);
+            for (size_t j = 0; j < searchNext_.size(); j++)
+            {
+                // If a neighbor voxel is not yet processed:
+                Point &b = voxels_[searchNext_[j]];
+                if (b.group == CLASSIFICATION_PROCESS)
+                {
+                    bool ground = true;
+
+                    // Select cone below this neighbor voxel.
+                    Cone<double> cone;
+                    cone.set(b.x, b.y, b.z, minimumValue_, 90.0 - angle_);
+                    Vector3<double> p = cone.box().getCenter();
+                    double r = cone.box().radius();
+
+                    voxels_.findRadius(p[0], p[1], p[2], r, searchGround_);
+                    for (size_t k = 0; k < searchGround_.size(); k++)
+                    {
+                        Point &c = voxels_[searchGround_[k]];
+                        if (cone.isInside(c.x, c.y, c.z))
+                        {
+                            ground = false;
+                            break;
+                        }
+                    }
+
+                    // If the selection cone is empty:
+                    if (ground)
+                    {
+                        // Mark this neighbor voxel as ground.
+                        b.group = CLASSIFICATION_FOUND;
+
+                        // Append this voxel into path.
+                        path_.push_back(searchNext_[j]);
+                    }
+                    // Otherwise, mark this voxel as processed.
+                    else
+                    {
+                        b.group = CLASSIFICATION_NOT_FOUND;
+                    }
+                }
+            }
+        }
+    }
+
+    // Next.
+    progress_.setMaximumStep(nPointsInFilter_, 1000);
+    progress_.setValueSteps(CLASSIFICATION_STEP_VOXELS_TO_POINTS);
+}
+
+void ClassificationAction::stepVoxelsToPoints()
+{
+    progress_.startTimer();
+
+    // For each point in filtered datasets:
+    while (query_.next())
+    {
+        // If a point belongs to some voxel:
+        size_t pointIndex = query_.value();
+        if (pointIndex < voxels_.size())
+        {
+            // If this voxel is marked as ground:
+            if (voxels_[pointIndex].group == CLASSIFICATION_FOUND)
+            {
+                // Set classification of this point as ground.
+                query_.classification() = LasFile::CLASS_GROUND;
+                query_.setModified();
+            }
+        }
+
+        progress_.addValueStep(1);
+        if (progress_.timedOut())
+        {
+            return;
+        }
+    }
+
+    LOG_DEBUG(<< "Done.");
+
+    // Flush all modifications.
+    query_.flush();
+
+    // All steps are now complete.
+    progress_.setValueStep(progress_.maximumStep());
+    progress_.setValueSteps(progress_.maximumSteps());
+}
+
+void ClassificationAction::createVoxel()
+{
+    // Mark index of new voxel in voxel array.
+    size_t idx = voxels_.size();
+
+    // Initialize new voxel point.
+    Point p;
+    p.x = 0;
+    p.y = 0;
+    p.z = 0;
+    p.group = CLASSIFICATION_PROCESS;
+
+    // Compute point coordinates as average from all neighbour points.
+    // Set value of each neighbour point to index of new voxel.
+    size_t n = 0;
+
+    queryPoint_.where().setSphere(query_.x(),
+                                  query_.y(),
+                                  query_.z(),
+                                  voxelRadius_);
+    queryPoint_.exec();
+
+    while (queryPoint_.next())
+    {
+        p.x += queryPoint_.x();
+        p.y += queryPoint_.y();
+        p.z += queryPoint_.z();
+
+        queryPoint_.value() = idx;
+        queryPoint_.setModified();
+
+        n++;
+    }
+
+    if (n < 1)
+    {
+        return;
+    }
+
+    p.x = p.x / static_cast<double>(n);
+    p.y = p.y / static_cast<double>(n);
+    p.z = p.z / static_cast<double>(n);
+
+    // Update minimum height.
+    if (p.z < minimumValue_)
+    {
+        minimumIndex_ = idx;
+        minimumValue_ = p.z;
+    }
+
+    // Append new voxel to voxel array.
+    voxels_.push_back(std::move(p));
 }

@@ -22,6 +22,7 @@
 #ifndef CLASSIFICATION_ACTION_HPP
 #define CLASSIFICATION_ACTION_HPP
 
+#include <Points.hpp>
 #include <ProgressActionInterface.hpp>
 #include <Query.hpp>
 class Editor;
@@ -33,10 +34,7 @@ public:
     ClassificationAction(Editor *editor);
     virtual ~ClassificationAction();
 
-    void initialize(size_t pointsPerCell = 10000,
-                    double cellLengthMinPercent = 1.,
-                    double groundErrorPercent = 15.,
-                    double angleDeg = 60.);
+    void start(double voxelRadius, double searchRadius, double angle = 60.);
     virtual void next();
     void clear();
 
@@ -45,10 +43,30 @@ protected:
     Query query_;
     Query queryPoint_;
 
-    double groundErrorPercent_;
-    double angleDeg_;
+    double voxelRadius_;
+    double searchRadius_;
+    double angle_;
 
-    void stepGrid();
+    uint64_t nPointsTotal_;
+    uint64_t nPointsInFilter_;
+
+    void stepResetPoints();
+    void stepCountPoints();
+    void stepPointsToVoxels();
+    void stepCreateVoxelIndex();
+    void stepClassifyGround();
+    void stepVoxelsToPoints();
+
+    void createVoxel();
+
+    Points voxels_;
+    std::vector<size_t> group_;
+    std::vector<size_t> path_;
+    std::vector<size_t> searchNext_;
+    std::vector<size_t> searchGround_;
+
+    size_t minimumIndex_;
+    double minimumValue_;
 };
 
 #endif /* CLASSIFICATION_ACTION_HPP */

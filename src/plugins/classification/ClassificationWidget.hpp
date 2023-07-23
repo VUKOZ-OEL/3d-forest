@@ -47,9 +47,8 @@ private:
     MainWindow *mainWindow_;
     ClassificationAction classification_;
 
-    SliderWidget *nPointsSlider_;
-    SliderWidget *lengthSlider_;
-    SliderWidget *rangeSlider_;
+    SliderWidget *voxelSlider_;
+    SliderWidget *radiusSlider_;
     SliderWidget *angleSlider_;
 
     QPushButton *applyButton_;

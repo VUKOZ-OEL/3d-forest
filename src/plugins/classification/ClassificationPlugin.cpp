@@ -44,7 +44,7 @@ void ClassificationPlugin::initialize(MainWindow *mainWindow)
                               "Tools",
                               tr("Classification"),
                               tr("Classify points to ground and unassigned"),
-                              ICON("soil"),
+                              ICON("soil_b"),
                               this,
                               SLOT(slotPlugin()));
 }

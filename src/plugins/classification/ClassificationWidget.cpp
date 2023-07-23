@@ -42,48 +42,36 @@ ClassificationWidget::ClassificationWidget(MainWindow *mainWindow)
     LOG_DEBUG(<< "Create.");
 
     // Widgets
-    SliderWidget::create(nPointsSlider_,
+    SliderWidget::create(voxelSlider_,
                          this,
                          nullptr,
                          nullptr,
-                         tr("Points per cell"),
-                         tr("Points per cell"),
+                         tr("Voxel radius"),
+                         tr("Voxel radius."),
                          tr("pt"),
                          1,
+                         1,
                          1000,
-                         1000000,
-                         10000);
+                         100);
 
-    SliderWidget::create(lengthSlider_,
+    SliderWidget::create(radiusSlider_,
                          this,
                          nullptr,
                          nullptr,
-                         tr("Cell min length"),
-                         tr("Cell min length"),
-                         tr("%"),
+                         tr("Search radius"),
+                         tr("Search radius."),
+                         tr("pt"),
                          1,
                          1,
-                         100,
-                         5);
-
-    SliderWidget::create(rangeSlider_,
-                         this,
-                         nullptr,
-                         nullptr,
-                         tr("Ground level"),
-                         tr("Ground level maximum"),
-                         tr("%"),
-                         1,
-                         1,
-                         100,
-                         15);
+                         1000,
+                         400);
 
     SliderWidget::create(angleSlider_,
                          this,
                          nullptr,
                          nullptr,
-                         tr("Ground angle"),
-                         tr("Ground angle"),
+                         tr("Maximum ground angle"),
+                         tr("Maximum ground angle"),
                          tr("deg"),
                          1,
                          1,
@@ -92,14 +80,13 @@ ClassificationWidget::ClassificationWidget(MainWindow *mainWindow)
 
     // Settings layout
     QVBoxLayout *settingsLayout = new QVBoxLayout;
-    settingsLayout->addWidget(nPointsSlider_);
-    settingsLayout->addWidget(lengthSlider_);
-    settingsLayout->addWidget(rangeSlider_);
+    settingsLayout->addWidget(voxelSlider_);
+    settingsLayout->addWidget(radiusSlider_);
     settingsLayout->addWidget(angleSlider_);
     settingsLayout->addStretch();
 
     // Buttons
-    applyButton_ = new QPushButton(tr("Classify"));
+    applyButton_ = new QPushButton(tr("Run"));
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
 
@@ -132,17 +119,13 @@ void ClassificationWidget::slotApply()
 
     mainWindow_->suspendThreads();
 
-    size_t pointsPerCell = static_cast<size_t>(nPointsSlider_->value());
-    double cellLengthMinPercent = static_cast<double>(lengthSlider_->value());
-    double groundErrorPercent = static_cast<double>(rangeSlider_->value());
-    double angleDeg = static_cast<double>(angleSlider_->value());
+    double voxel = static_cast<double>(voxelSlider_->value());
+    double radius = static_cast<double>(radiusSlider_->value());
+    double angle = static_cast<double>(angleSlider_->value());
 
     try
     {
-        classification_.initialize(pointsPerCell,
-                                   cellLengthMinPercent,
-                                   groundErrorPercent,
-                                   angleDeg);
+        classification_.start(voxel, radius, angle);
         ProgressDialog::run(mainWindow_,
                             "Computing Classification",
                             &classification_);
@@ -156,9 +139,5 @@ void ClassificationWidget::slotApply()
         mainWindow_->showError("Unknown error");
     }
 
-    classification_.clear();
-
-    mainWindow_->editor().viewports().setState(Page::STATE_READ);
-
-    mainWindow_->resumeThreads();
+    mainWindow_->update({Editor::TYPE_CLASSIFICATION, Editor::TYPE_ELEVATION});
 }

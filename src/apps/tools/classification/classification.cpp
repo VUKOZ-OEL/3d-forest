@@ -28,7 +28,9 @@
 #include <Log.hpp>
 
 static void classificationCompute(const std::string &inputPath,
-                                  size_t pointsPerCell)
+                                  double voxel,
+                                  double radius,
+                                  double angle)
 {
     // Open input file in editor.
     Editor editor;
@@ -36,7 +38,7 @@ static void classificationCompute(const std::string &inputPath,
 
     // Classify ground by steps.
     ClassificationAction classification(&editor);
-    classification.initialize(pointsPerCell);
+    classification.start(voxel, radius, angle);
     while (!classification.end())
     {
         classification.next();
@@ -45,21 +47,32 @@ static void classificationCompute(const std::string &inputPath,
 
 int main(int argc, char *argv[])
 {
+    int rc = 1;
+
+    LOGGER_START_FILE("log_classification.txt");
+
     try
     {
         ArgumentParser arg;
         arg.add("--input", "");
-        arg.add("--cell-points", "10000");
+        arg.add("--voxel", "100");
+        arg.add("--radius", "200");
+        arg.add("--angle", "60");
         arg.parse(argc, argv);
 
         classificationCompute(arg.toString("--input"),
-                              arg.toSize("--cell-points"));
+                              arg.toDouble("--voxel"),
+                              arg.toDouble("--radius"),
+                              arg.toDouble("--angle"));
+
+        rc = 0;
     }
     catch (std::exception &e)
     {
         std::cerr << "error: " << e.what() << std::endl;
-        return 1;
     }
 
-    return 0;
+    LOGGER_STOP_FILE;
+
+    return rc;
 }
