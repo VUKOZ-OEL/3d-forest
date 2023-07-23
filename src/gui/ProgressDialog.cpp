@@ -219,17 +219,17 @@ void ProgressDialog::updateLabels(ProgressActionInterface *progressAction)
 
     if (etaTimeH > 0)
     {
-        std::snprintf(buffer, sizeof(buffer), "%d h", etaTimeH);
+        std::snprintf(buffer, sizeof(buffer), "(%d h)", etaTimeH);
     }
     else if (etaTimeM > 0)
     {
-        std::snprintf(buffer, sizeof(buffer), "%d m", etaTimeM);
+        std::snprintf(buffer, sizeof(buffer), "(%d m)", etaTimeM);
     }
     else
     {
         if (hasEtaTime)
         {
-            std::snprintf(buffer, sizeof(buffer), "%d s", etaTimeS);
+            std::snprintf(buffer, sizeof(buffer), "(%d s)", etaTimeS);
         }
         else
         {
