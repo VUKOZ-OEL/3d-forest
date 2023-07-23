@@ -25,6 +25,7 @@
 #include <SliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
+#include <QCheckBox>
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QVBoxLayout>
@@ -78,11 +79,16 @@ ClassificationWidget::ClassificationWidget(MainWindow *mainWindow)
                          89,
                          60);
 
+    cleanAllCheckBox_ = new QCheckBox;
+    cleanAllCheckBox_->setText(tr("Clean all classifications at start"));
+    cleanAllCheckBox_->setChecked(false);
+
     // Settings layout
     QVBoxLayout *settingsLayout = new QVBoxLayout;
     settingsLayout->addWidget(voxelSlider_);
     settingsLayout->addWidget(radiusSlider_);
     settingsLayout->addWidget(angleSlider_);
+    settingsLayout->addWidget(cleanAllCheckBox_);
     settingsLayout->addStretch();
 
     // Buttons
@@ -122,10 +128,11 @@ void ClassificationWidget::slotApply()
     double voxel = static_cast<double>(voxelSlider_->value());
     double radius = static_cast<double>(radiusSlider_->value());
     double angle = static_cast<double>(angleSlider_->value());
+    bool cleanAll = cleanAllCheckBox_->isChecked();
 
     try
     {
-        classification_.start(voxel, radius, angle);
+        classification_.start(voxel, radius, angle, cleanAll);
         ProgressDialog::run(mainWindow_,
                             "Computing Classification",
                             &classification_);

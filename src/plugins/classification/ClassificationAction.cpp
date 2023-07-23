@@ -60,6 +60,7 @@ void ClassificationAction::clear()
     voxelRadius_ = 0;
     searchRadius_ = 0;
     angle_ = 0;
+    cleanAllClassifications_ = false;
 
     nPointsTotal_ = 0;
     nPointsInFilter_ = 0;
@@ -76,13 +77,15 @@ void ClassificationAction::clear()
 
 void ClassificationAction::start(double voxelRadius,
                                  double radius,
-                                 double angle)
+                                 double angle,
+                                 bool cleanAllClassifications)
 {
     LOG_DEBUG(<< "Start.");
 
     voxelRadius_ = voxelRadius;
     searchRadius_ = radius;
     angle_ = angle;
+    cleanAllClassifications_ = cleanAllClassifications;
 
     nPointsTotal_ = editor_->datasets().nPoints();
     nPointsInFilter_ = 0;
@@ -159,7 +162,8 @@ void ClassificationAction::stepResetPoints()
         query_.value() = SIZE_MAX;
 
         // Reset point classification of ground points to unassigned.
-        if (query_.classification() == LasFile::CLASS_GROUND)
+        if (cleanAllClassifications_ ||
+            query_.classification() == LasFile::CLASS_GROUND)
         {
             query_.classification() = LasFile::CLASS_UNASSIGNED;
         }

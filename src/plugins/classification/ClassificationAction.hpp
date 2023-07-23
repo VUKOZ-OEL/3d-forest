@@ -34,7 +34,10 @@ public:
     ClassificationAction(Editor *editor);
     virtual ~ClassificationAction();
 
-    void start(double voxelRadius, double searchRadius, double angle = 60.);
+    void start(double voxelRadius,
+               double searchRadius,
+               double angle = 60.,
+               bool cleanAllClassifications = false);
     virtual void next();
     void clear();
 
@@ -46,6 +49,7 @@ protected:
     double voxelRadius_;
     double searchRadius_;
     double angle_;
+    bool cleanAllClassifications_;
 
     uint64_t nPointsTotal_;
     uint64_t nPointsInFilter_;
