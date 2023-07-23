@@ -34,14 +34,16 @@ public:
     enum Method
     {
         METHOD_DENSITY = 0,
-        METHOD_PCA,
-        METHOD_DISTRIBUTION
+        METHOD_PCA_INTENSITY
     };
 
     DescriptorAction(Editor *editor);
     virtual ~DescriptorAction();
 
-    void start(double radius, double voxelSize, Method method);
+    void start(double radius,
+               double voxelSize,
+               Method method,
+               bool includeGround);
     virtual void next();
     void clear();
 
@@ -50,25 +52,29 @@ public:
 
 protected:
     Editor *editor_;
-    Query queryPoints_;
+    Query query_;
     Query queryPoint_;
+
     DescriptorPca pca_;
 
     double radius_;
     double voxelSize_;
     Method method_;
+    bool includeGround_;
 
-    uint64_t nPointsTotal_;
-    uint64_t nPointsWithDescriptor_;
+    uint64_t numberOfPoints_;
+    uint64_t numberOfPointsInFilter_;
+    uint64_t numberOfPointsWithDescriptor_;
 
     double descriptorMinimum_;
     double descriptorMaximum_;
 
-    void stepCount();
-    void stepClear();
+    void stepResetPoints();
+    void stepCountPoints();
     void stepCompute();
-    void computePoint();
     void stepNormalize();
+
+    void computePoint();
 };
 
 #endif /* DESCRIPTOR_ACTION_HPP */

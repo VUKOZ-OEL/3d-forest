@@ -28,6 +28,7 @@
 
 #include <QCloseEvent>
 #include <QCoreApplication>
+#include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QProgressBar>
@@ -60,19 +61,22 @@ ProgressDialog::ProgressDialog(MainWindow *mainWindow, const char *title)
     setWindowTitle(QObject::tr(title));
     setWindowModality(Qt::WindowModal);
 
+    // Progress info labels
     progressStepsLabel_ = new QLabel(tr(" "));
     progressStepLabel_ = new QLabel(tr(" "));
     etaLabel_ = new QLabel(tr(" "));
 
-    QHBoxLayout *progressLabelsLayout = new QHBoxLayout;
-    progressLabelsLayout->addWidget(progressStepsLabel_);
-    progressLabelsLayout->addStretch();
-    progressLabelsLayout->addWidget(progressStepLabel_);
+    QGridLayout *progressLabelsLayout = new QGridLayout;
+    progressLabelsLayout->addWidget(progressStepsLabel_, 0, 0);
+    progressLabelsLayout->addWidget(etaLabel_, 0, 1);
+    progressLabelsLayout->addWidget(progressStepLabel_, 0, 2);
 
+    // Progress bar
     progressBar_ = new QProgressBar;
     progressBar_->setRange(0, 100);
     progressBar_->setValue(progressBar_->minimum());
 
+    // Buttons
     cancelButton_ = new QPushButton(tr("Cancel"));
     connect(cancelButton_, SIGNAL(clicked()), this, SLOT(slotCancel()));
 
@@ -80,9 +84,9 @@ ProgressDialog::ProgressDialog(MainWindow *mainWindow, const char *title)
     buttonsLayout->addStretch();
     buttonsLayout->addWidget(cancelButton_);
 
+    // Main layout
     QVBoxLayout *dialogLayout = new QVBoxLayout;
     dialogLayout->addLayout(progressLabelsLayout);
-    dialogLayout->addWidget(etaLabel_);
     dialogLayout->addWidget(progressBar_);
     dialogLayout->addSpacing(10);
     dialogLayout->addLayout(buttonsLayout);
@@ -215,33 +219,21 @@ void ProgressDialog::updateLabels(ProgressActionInterface *progressAction)
 
     if (etaTimeH > 0)
     {
-        std::snprintf(buffer,
-                      sizeof(buffer),
-                      "Remaining time %02d:%02d:%02d",
-                      etaTimeH,
-                      etaTimeM,
-                      etaTimeS);
+        std::snprintf(buffer, sizeof(buffer), "(%d h)", etaTimeH);
     }
     else if (etaTimeM > 0)
     {
-        std::snprintf(buffer,
-                      sizeof(buffer),
-                      "Remaining time %d minutes %d seconds",
-                      etaTimeM,
-                      etaTimeS);
+        std::snprintf(buffer, sizeof(buffer), "(%d m)", etaTimeM);
     }
     else
     {
         if (hasEtaTime)
         {
-            std::snprintf(buffer,
-                          sizeof(buffer),
-                          "Remaining time %d seconds",
-                          etaTimeS);
+            std::snprintf(buffer, sizeof(buffer), "(%d s)", etaTimeS);
         }
         else
         {
-            std::snprintf(buffer, sizeof(buffer), "Remaining time estimation");
+            buffer[0] = 0;
         }
     }
 

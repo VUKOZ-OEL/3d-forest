@@ -21,7 +21,7 @@
 <qresource prefix="/classification">
 
 <!-- Tool bar -->
-<file>soil_24px.png</file>
+<file>soil_b_24px.png</file>
 
 </qresource>
 </RCC>

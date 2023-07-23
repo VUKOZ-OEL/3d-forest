@@ -667,8 +667,7 @@ void Page::queryWhereElevation()
 {
     const Range<double> &elevationRange = query_->where().elevation();
 
-    if (elevationRange.isEnabled() == false ||
-        elevationRange.hasBoundaryValues())
+    if (elevationRange.isEnabled() == false || elevationRange.full())
     {
         return;
     }
@@ -700,8 +699,7 @@ void Page::queryWhereDescriptor()
 {
     const Range<double> &descriptorRange = query_->where().descriptor();
 
-    if (descriptorRange.isEnabled() == false ||
-        descriptorRange.hasBoundaryValues())
+    if (descriptorRange.isEnabled() == false || descriptorRange.full())
     {
         return;
     }

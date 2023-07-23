@@ -28,6 +28,7 @@ class SliderWidget;
 
 #include <QWidget>
 class QPushButton;
+class QCheckBox;
 
 /** Classification Widget. */
 class ClassificationWidget : public QWidget
@@ -47,10 +48,10 @@ private:
     MainWindow *mainWindow_;
     ClassificationAction classification_;
 
-    SliderWidget *nPointsSlider_;
-    SliderWidget *lengthSlider_;
-    SliderWidget *rangeSlider_;
+    SliderWidget *voxelSlider_;
+    SliderWidget *radiusSlider_;
     SliderWidget *angleSlider_;
+    QCheckBox *cleanAllCheckBox_;
 
     QPushButton *applyButton_;
 };

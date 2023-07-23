@@ -38,7 +38,8 @@ public:
     void start(double voxelSize,
                double descriptor,
                double radius,
-               double elevation,
+               double elevationMin,
+               double elevationMax,
                size_t groupSize);
 
     virtual void next();
@@ -53,9 +54,11 @@ private:
     double voxelSize_;
     double descriptor_;
     double radius_;
-    double elevation_;
+    double elevationMin_;
+    double elevationMax_;
     size_t groupSize_;
 
+    uint64_t nPointsTotal_;
     uint64_t nPointsInFilter_;
 
     void stepResetPoints();

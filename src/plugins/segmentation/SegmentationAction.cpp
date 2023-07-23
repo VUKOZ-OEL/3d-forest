@@ -25,7 +25,7 @@
 #include <SegmentationAction.hpp>
 
 #define LOG_MODULE_NAME "SegmentationAction"
-// #define LOG_MODULE_DEBUG_ENABLED 1
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define SEGMENTATION_STEP_RESET_POINTS 0
@@ -60,7 +60,8 @@ void SegmentationAction::clear()
     voxelSize_ = 0;
     descriptor_ = 0;
     radius_ = 0;
-    elevation_ = 0;
+    elevationMin_ = 0;
+    elevationMax_ = 0;
     groupSize_ = 0;
 
     nPointsInFilter_ = 0;
@@ -73,33 +74,40 @@ void SegmentationAction::clear()
 void SegmentationAction::start(double voxelSize,
                                double descriptor,
                                double radius,
-                               double elevation,
+                               double elevationMin,
+                               double elevationMax,
                                size_t groupSize)
 {
     LOG_DEBUG(<< "Start.");
+
+    Range<double> elevationRange = editor_->elevationFilter();
+    double elevationDelta =
+        elevationRange.maximumValue() - elevationRange.minimumValue();
 
     // Set input parameters.
     voxelSize_ = voxelSize;
     descriptor_ = descriptor;
     radius_ = radius;
-    elevation_ = elevation;
+    elevationMin_ =
+        elevationRange.minimumValue() + (elevationMin * elevationDelta);
+    elevationMax_ =
+        elevationRange.minimumValue() + (elevationMax * elevationDelta);
     groupSize_ = groupSize;
 
+    LOG_DEBUG(<< "elevationRange <" << elevationRange << ">.");
+    LOG_DEBUG(<< "elevationDelta <" << elevationDelta << ">.");
+    LOG_DEBUG(<< "elevationMin_ <" << elevationMin_ << ">.");
+    LOG_DEBUG(<< "elevationMax_ <" << elevationMax_ << ">.");
+
     // Clear work data.
+    nPointsTotal_ = editor_->datasets().nPoints();
     nPointsInFilter_ = 0;
 
     voxels_.clear();
     groups_.clear();
     path_.clear();
 
-    // Set query to iterate all points. Active filter is ignored.
-    query_.setWhere(QueryWhere());
-    query_.exec();
-
-    size_t totalNumberOfPoints = editor_->datasets().nPoints();
-    LOG_DEBUG(<< "Total number of points <" << totalNumberOfPoints << ">.");
-
-    progress_.setMaximumStep(totalNumberOfPoints, 1000);
+    progress_.setMaximumStep(nPointsTotal_, 1000);
     progress_.setMaximumSteps({4.0, 1.0, 24.0, 1.0, 25.0, 35.0, 1.0, 9.0});
     progress_.setValueSteps(SEGMENTATION_STEP_RESET_POINTS);
 }
@@ -163,6 +171,10 @@ void SegmentationAction::stepResetPoints()
 
         editor_->setLayers(layers);
         editor_->setLayersFilter(layersFilter);
+
+        // Set query to iterate all points. Active filter is ignored.
+        query_.setWhere(QueryWhere());
+        query_.exec();
     }
 
     // For each point in all datasets:
@@ -183,11 +195,7 @@ void SegmentationAction::stepResetPoints()
         }
     }
 
-    // Set query to use active filter.
-    query_.setWhere(editor_->viewports().where());
-    query_.exec();
-
-    progress_.setMaximumStep(ProgressCounter::npos, 25);
+    progress_.setMaximumStep(nPointsTotal_, 1000);
     progress_.setValueSteps(SEGMENTATION_STEP_COUNT_POINTS);
 }
 
@@ -195,11 +203,20 @@ void SegmentationAction::stepCountPoints()
 {
     progress_.startTimer();
 
+    // Initialize.
+    if (progress_.valueStep() == 0)
+    {
+        // Set query to use active filter.
+        query_.setWhere(editor_->viewports().where());
+        query_.exec();
+    }
+
     // Count the number of filtered points.
     while (query_.next())
     {
         nPointsInFilter_++;
 
+        progress_.addValueStep(1);
         if (progress_.timedOut())
         {
             return;
@@ -222,7 +239,7 @@ void SegmentationAction::stepPointsToVoxels()
     while (query_.next())
     {
         // If point index to voxel is none:
-        if (query_.value() == SIZE_MAX)
+        if (query_.value() == SIZE_MAX && !(query_.elevation() < elevationMin_))
         {
             // Create new voxel.
             createVoxel();
@@ -282,7 +299,7 @@ void SegmentationAction::stepCreateTrees()
             if (voxels_[pointIndex_].group == SIZE_MAX &&
                 !(voxels_[pointIndex_].descriptor < descriptor_))
             {
-                groupMinimum_ = voxels_[pointIndex_].z;
+                groupMinimum_ = voxels_[pointIndex_].elevation;
                 voxels_[pointIndex_].group = groupId_;
                 path_.push_back(pointIndex_);
             }
@@ -316,9 +333,9 @@ void SegmentationAction::stepCreateTrees()
                     if (b.group == SIZE_MAX && !(b.descriptor < descriptor_))
                     {
                         b.group = groupId_;
-                        if (b.z < groupMinimum_)
+                        if (b.elevation < groupMinimum_)
                         {
-                            groupMinimum_ = b.z;
+                            groupMinimum_ = b.elevation;
                         }
                         path_.push_back(search_[j]);
                     }
@@ -328,13 +345,9 @@ void SegmentationAction::stepCreateTrees()
             // If there are no other voxels for group expansion:
             if (path_.empty())
             {
-                // TBD: To use elevation values instead of z coordinates.
-                const Box<double> &extent = editor_->boundary();
-                double h1 = groupMinimum_;
-                double h2 = extent.min(2) + (extent.length(2) * elevation_);
-
                 // If the current group meets some criteria:
-                if (group_.size() >= groupSize_ && h1 < h2)
+                if (group_.size() >= groupSize_ &&
+                    groupMinimum_ < elevationMax_)
                 {
                     // Mark this group as future layer.
                     groups_[groupId_] = 0;

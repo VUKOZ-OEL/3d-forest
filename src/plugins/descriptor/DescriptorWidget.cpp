@@ -25,6 +25,7 @@
 #include <SliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
+#include <QCheckBox>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QPushButton>
@@ -70,8 +71,7 @@ DescriptorWidget::DescriptorWidget(MainWindow *mainWindow)
 
     // Method
     methodRadioButton_.push_back(new QRadioButton(tr("Density")));
-    methodRadioButton_.push_back(new QRadioButton(tr("PCA")));
-    methodRadioButton_.push_back(new QRadioButton(tr("Distribution")));
+    methodRadioButton_.push_back(new QRadioButton(tr("PCA intensity")));
 
     methodRadioButton_[0]->setChecked(true);
 
@@ -84,11 +84,17 @@ DescriptorWidget::DescriptorWidget(MainWindow *mainWindow)
     QGroupBox *methodGroupBox = new QGroupBox(tr("Method"));
     methodGroupBox->setLayout(methodVBoxLayout);
 
+    // Options
+    groundCheckBox_ = new QCheckBox;
+    groundCheckBox_->setText(tr("Include ground points"));
+    groundCheckBox_->setChecked(false);
+
     // Settings layout
     QVBoxLayout *settingsLayout = new QVBoxLayout;
     settingsLayout->addWidget(radiusSlider_);
     settingsLayout->addWidget(voxelSizeSlider_);
     settingsLayout->addWidget(methodGroupBox);
+    settingsLayout->addWidget(groundCheckBox_);
     settingsLayout->addStretch();
 
     // Buttons
@@ -129,18 +135,16 @@ void DescriptorWidget::slotApply()
     double voxelSize = static_cast<double>(voxelSizeSlider_->value());
 
     DescriptorAction::Method method = DescriptorAction::METHOD_DENSITY;
-    if (methodRadioButton_[DescriptorAction::METHOD_PCA]->isChecked())
+    if (methodRadioButton_[DescriptorAction::METHOD_PCA_INTENSITY]->isChecked())
     {
-        method = DescriptorAction::METHOD_PCA;
+        method = DescriptorAction::METHOD_PCA_INTENSITY;
     }
-    if (methodRadioButton_[DescriptorAction::METHOD_DISTRIBUTION]->isChecked())
-    {
-        method = DescriptorAction::METHOD_DISTRIBUTION;
-    }
+
+    bool includeGround = groundCheckBox_->isChecked();
 
     try
     {
-        descriptor_.start(radius, voxelSize, method);
+        descriptor_.start(radius, voxelSize, method, includeGround);
         ProgressDialog::run(mainWindow_, "Computing Descriptors", &descriptor_);
     }
     catch (std::exception &e)

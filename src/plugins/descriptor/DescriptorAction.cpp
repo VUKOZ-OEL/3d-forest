@@ -26,14 +26,19 @@
 #define LOG_MODULE_NAME "DescriptorAction"
 #include <Log.hpp>
 
-#define DESCRIPTOR_STEP_COUNT 0
-#define DESCRIPTOR_STEP_CLEAR 1
+#define DESCRIPTOR_STEP_RESET_POINTS 0
+#define DESCRIPTOR_STEP_COUNT_POINTS 1
 #define DESCRIPTOR_STEP_COMPUTE 2
 #define DESCRIPTOR_STEP_NORMALIZE 3
 
+#define DESCRIPTOR_IGNORE 0
+#define DESCRIPTOR_PROCESS 1
+#define DESCRIPTOR_NOT_FOUND 2
+#define DESCRIPTOR_FOUND 3
+
 DescriptorAction::DescriptorAction(Editor *editor)
     : editor_(editor),
-      queryPoints_(editor),
+      query_(editor),
       queryPoint_(editor),
       pca_()
 {
@@ -49,7 +54,7 @@ void DescriptorAction::clear()
 {
     LOG_DEBUG(<< "Clear.");
 
-    queryPoints_.clear();
+    query_.clear();
     queryPoint_.clear();
 
     pca_.clear();
@@ -57,15 +62,20 @@ void DescriptorAction::clear()
     radius_ = 0;
     voxelSize_ = 0;
     method_ = DescriptorAction::METHOD_DENSITY;
+    includeGround_ = false;
 
     descriptorMinimum_ = 0;
     descriptorMaximum_ = 0;
 
-    nPointsTotal_ = 0;
-    nPointsWithDescriptor_ = 0;
+    numberOfPoints_ = 0;
+    numberOfPointsInFilter_ = 0;
+    numberOfPointsWithDescriptor_ = 0;
 }
 
-void DescriptorAction::start(double radius, double voxelSize, Method method)
+void DescriptorAction::start(double radius,
+                             double voxelSize,
+                             Method method,
+                             bool includeGround)
 {
     LOG_DEBUG(<< "Start with parameter radius <" << radius << "> voxelSize <"
               << voxelSize << "> method <" << static_cast<int>(method) << ">.");
@@ -73,69 +83,72 @@ void DescriptorAction::start(double radius, double voxelSize, Method method)
     radius_ = radius;
     voxelSize_ = voxelSize;
     method_ = method;
+    includeGround_ = includeGround;
 
     descriptorMinimum_ = 0;
     descriptorMaximum_ = 0;
 
-    nPointsTotal_ = 0;
-    nPointsWithDescriptor_ = 0;
+    numberOfPoints_ = editor_->datasets().nPoints();
+    numberOfPointsInFilter_ = 0;
+    numberOfPointsWithDescriptor_ = 0;
 
-    queryPoints_.setWhere(editor_->viewports().where());
-    queryPoints_.exec();
-
-    progress_.setMaximumStep(ProgressCounter::npos, 1000UL);
-    progress_.setMaximumSteps({1.0, 2.0, 93.0, 4.0});
-    progress_.setValueSteps(DESCRIPTOR_STEP_COUNT);
+    progress_.setMaximumStep(numberOfPoints_, 1000);
+    progress_.setMaximumSteps({5.0, 5.0, 85.0, 5.0});
+    progress_.setValueSteps(DESCRIPTOR_STEP_RESET_POINTS);
 }
 
 void DescriptorAction::next()
 {
-    if (progress_.valueSteps() == DESCRIPTOR_STEP_COUNT)
+    switch (progress_.valueSteps())
     {
-        stepCount();
-    }
-    else if (progress_.valueSteps() == DESCRIPTOR_STEP_CLEAR)
-    {
-        stepClear();
-    }
-    else if (progress_.valueSteps() == DESCRIPTOR_STEP_COMPUTE)
-    {
-        stepCompute();
-    }
-    else if (progress_.valueSteps() == DESCRIPTOR_STEP_NORMALIZE)
-    {
-        stepNormalize();
+        case DESCRIPTOR_STEP_RESET_POINTS:
+            stepResetPoints();
+            break;
+
+        case DESCRIPTOR_STEP_COUNT_POINTS:
+            stepCountPoints();
+            break;
+
+        case DESCRIPTOR_STEP_COMPUTE:
+            stepCompute();
+            break;
+
+        case DESCRIPTOR_STEP_NORMALIZE:
+            stepNormalize();
+            break;
+
+        default:
+            // empty
+            break;
     }
 }
 
-void DescriptorAction::stepCount()
+void DescriptorAction::stepResetPoints()
 {
     progress_.startTimer();
 
-    while (queryPoints_.next())
+    // Initialize:
+    if (progress_.valueStep() == 0)
     {
-        nPointsTotal_++;
+        // Set query to iterate all points. The active filter is ignored.
+        query_.setWhere(QueryWhere());
+        query_.exec();
+    }
 
-        if (progress_.timedOut())
+    // Clear each point in all datasets.
+    while (query_.next())
+    {
+        if (includeGround_ || query_.classification() != LasFile::CLASS_GROUND)
         {
-            return;
+            query_.value() = DESCRIPTOR_PROCESS;
         }
-    }
+        else
+        {
+            query_.value() = DESCRIPTOR_IGNORE;
+        }
 
-    queryPoints_.reset();
-
-    progress_.setMaximumStep(nPointsTotal_, 1000U);
-    progress_.setValueSteps(DESCRIPTOR_STEP_CLEAR);
-}
-
-void DescriptorAction::stepClear()
-{
-    progress_.startTimer();
-
-    while (queryPoints_.next())
-    {
-        queryPoints_.value() = 0;
-        queryPoints_.setModified();
+        query_.descriptor() = 0;
+        query_.setModified();
 
         progress_.addValueStep(1);
         if (progress_.timedOut())
@@ -144,9 +157,38 @@ void DescriptorAction::stepClear()
         }
     }
 
-    queryPoints_.reset();
+    // Next.
+    progress_.setMaximumStep(numberOfPoints_, 1000);
+    progress_.setValueSteps(DESCRIPTOR_STEP_COUNT_POINTS);
+}
 
-    progress_.setMaximumStep(nPointsTotal_, 25U);
+void DescriptorAction::stepCountPoints()
+{
+    progress_.startTimer();
+
+    // Initialize:
+    if (progress_.valueStep() == 0)
+    {
+        // Set query to use the active filter.
+        query_.setWhere(editor_->viewports().where());
+        query_.exec();
+    }
+
+    // Iterate all filtered points.
+    while (query_.next())
+    {
+        numberOfPointsInFilter_++;
+
+        progress_.addValueStep(1);
+        if (progress_.timedOut())
+        {
+            return;
+        }
+    }
+
+    // Next.
+    query_.reset();
+    progress_.setMaximumStep(numberOfPointsInFilter_, 25);
     progress_.setValueSteps(DESCRIPTOR_STEP_COMPUTE);
 }
 
@@ -154,12 +196,10 @@ void DescriptorAction::stepCompute()
 {
     progress_.startTimer();
 
-    while (queryPoints_.next())
+    // Iterate and compute all filtered points.
+    while (query_.next())
     {
-        if (queryPoints_.value() == 0)
-        {
-            computePoint();
-        }
+        computePoint();
 
         progress_.addValueStep(1);
         if (progress_.timedOut())
@@ -168,22 +208,67 @@ void DescriptorAction::stepCompute()
         }
     }
 
-    queryPoints_.reset();
-
-    progress_.setMaximumStep(nPointsTotal_, 1000U);
+    // Next.
+    query_.reset();
+    progress_.setMaximumStep(numberOfPointsInFilter_, 1000);
     progress_.setValueSteps(DESCRIPTOR_STEP_NORMALIZE);
+}
+
+void DescriptorAction::stepNormalize()
+{
+    progress_.startTimer();
+
+    // If descriptor range is greater than zero:
+    double descriptorRange_ = descriptorMaximum_ - descriptorMinimum_;
+    if (descriptorRange_ > 0.0)
+    {
+        double d = 1.0 / descriptorRange_;
+
+        // Iterate all filtered points:
+        while (query_.next())
+        {
+            // If a point is in state finished, then normalize its descriptor.
+            if (query_.value() == DESCRIPTOR_FOUND)
+            {
+                double descriptor = query_.descriptor();
+                descriptor = (descriptor - descriptorMinimum_) * d;
+                query_.descriptor() = descriptor;
+                query_.setModified();
+            }
+
+            progress_.addValueStep(1);
+            if (progress_.timedOut())
+            {
+                return;
+            }
+        }
+    }
+
+    // Flush all modifications.
+    query_.flush();
+
+    // All steps are now complete.
+    progress_.setValueStep(progress_.maximumStep());
+    progress_.setValueSteps(progress_.maximumSteps());
 }
 
 void DescriptorAction::computePoint()
 {
+    // Do nothing when this point is not marked for processing.
+    if (query_.value() != DESCRIPTOR_PROCESS)
+    {
+        return;
+    }
+
+    // Compute descriptor value.
     double descriptor;
     bool hasDescriptor;
 
     if (method_ == DescriptorAction::METHOD_DENSITY)
     {
-        queryPoint_.where().setSphere(queryPoints_.x(),
-                                      queryPoints_.y(),
-                                      queryPoints_.z(),
+        queryPoint_.where().setSphere(query_.x(),
+                                      query_.y(),
+                                      query_.z(),
                                       radius_);
         queryPoint_.exec();
 
@@ -191,19 +276,22 @@ void DescriptorAction::computePoint()
         hasDescriptor = true;
         while (queryPoint_.next())
         {
-            descriptor += 1.0;
+            if (query_.value() != DESCRIPTOR_IGNORE)
+            {
+                descriptor += 1.0;
+            }
         }
     }
-    else if (method_ == DescriptorAction::METHOD_PCA)
+    else if (method_ == DescriptorAction::METHOD_PCA_INTENSITY)
     {
         double meanX;
         double meanY;
         double meanZ;
 
         hasDescriptor = pca_.computeDescriptor(queryPoint_,
-                                               queryPoints_.x(),
-                                               queryPoints_.y(),
-                                               queryPoints_.z(),
+                                               query_.x(),
+                                               query_.y(),
+                                               query_.z(),
                                                radius_,
                                                meanX,
                                                meanY,
@@ -212,17 +300,14 @@ void DescriptorAction::computePoint()
     }
     else
     {
-        hasDescriptor = pca_.computeDistribution(queryPoint_,
-                                                 queryPoints_.x(),
-                                                 queryPoints_.y(),
-                                                 queryPoints_.z(),
-                                                 radius_,
-                                                 descriptor);
+        hasDescriptor = false;
     }
 
+    // Update descriptor minimum and maximum values.
+    size_t newValue;
     if (hasDescriptor)
     {
-        if (nPointsWithDescriptor_ == 0)
+        if (numberOfPointsWithDescriptor_ == 0)
         {
             descriptorMinimum_ = descriptor;
             descriptorMaximum_ = descriptor;
@@ -232,84 +317,46 @@ void DescriptorAction::computePoint()
             updateRange(descriptor, descriptorMinimum_, descriptorMaximum_);
         }
 
-        nPointsWithDescriptor_++;
+        numberOfPointsWithDescriptor_++;
+        newValue = DESCRIPTOR_FOUND;
     }
     else
     {
-        descriptor = std::numeric_limits<double>::max();
+        newValue = DESCRIPTOR_NOT_FOUND;
     }
 
-    queryPoints_.value() = 1;
-    queryPoints_.descriptor() = descriptor;
-
+    // Distribute computed descriptor value to neighbors.
     if (voxelSize_ > 1.0)
     {
-        queryPoint_.where().setSphere(queryPoints_.x(),
-                                      queryPoints_.y(),
-                                      queryPoints_.z(),
+        queryPoint_.where().setSphere(query_.x(),
+                                      query_.y(),
+                                      query_.z(),
                                       voxelSize_);
         queryPoint_.exec();
 
         while (queryPoint_.next())
         {
-            queryPoint_.value() = 1;
-            queryPoint_.descriptor() = descriptor;
-            queryPoint_.setModified();
-        }
-    }
-
-    queryPoints_.setModified();
-}
-
-void DescriptorAction::stepNormalize()
-{
-    progress_.startTimer();
-
-    double descriptorRange_ = descriptorMaximum_ - descriptorMinimum_;
-
-    if (descriptorRange_ > 0.0)
-    {
-        double d = 1.0 / descriptorRange_;
-
-        while (queryPoints_.next())
-        {
-            double descriptor = queryPoints_.descriptor();
-            if (descriptor < std::numeric_limits<double>::max())
+            size_t oldValue = queryPoint_.value();
+            if ((oldValue == DESCRIPTOR_PROCESS) ||
+                (oldValue == DESCRIPTOR_NOT_FOUND &&
+                 newValue == DESCRIPTOR_FOUND))
             {
-                descriptor = (descriptor - descriptorMinimum_) * d;
-            }
-            else
-            {
-                descriptor = 0;
-            }
-
-            queryPoints_.descriptor() = descriptor;
-            queryPoints_.setModified();
-
-            progress_.addValueStep(1);
-            if (progress_.timedOut())
-            {
-                return;
+                queryPoint_.value() = newValue;
+                if (newValue == DESCRIPTOR_FOUND)
+                {
+                    queryPoint_.descriptor() = descriptor;
+                }
+                queryPoint_.setModified();
             }
         }
     }
     else
     {
-        while (queryPoints_.next())
+        query_.value() = newValue;
+        if (newValue == DESCRIPTOR_FOUND)
         {
-            queryPoints_.descriptor() = 0;
-            queryPoints_.setModified();
-
-            progress_.addValueStep(1);
-            if (progress_.timedOut())
-            {
-                return;
-            }
+            query_.descriptor() = descriptor;
         }
+        query_.setModified();
     }
-
-    queryPoints_.flush();
-
-    progress_.setValueStep(progress_.maximumStep());
-    progress_.setValueSteps(progress_.maximumSteps());
 }

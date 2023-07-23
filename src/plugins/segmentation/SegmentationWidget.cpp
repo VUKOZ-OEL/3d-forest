@@ -21,6 +21,7 @@
 
 #include <MainWindow.hpp>
 #include <ProgressDialog.hpp>
+#include <RangeSliderWidget.hpp>
 #include <SegmentationWidget.hpp>
 #include <SliderWidget.hpp>
 #include <ThemeIcon.hpp>
@@ -81,18 +82,19 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
                          1000,
                          250);
 
-    SliderWidget::create(elevationSlider_,
-                         this,
-                         nullptr,
-                         nullptr,
-                         tr("Minimal tree elevation"),
-                         tr("Ignore all trees which start below this"
-                            " elevation threshold."),
-                         tr("%"),
-                         1,
-                         0,
-                         100,
-                         20);
+    RangeSliderWidget::create(elevationSlider_,
+                              this,
+                              nullptr,
+                              nullptr,
+                              tr("Minimal tree elevation"),
+                              tr("Ignore all trees which are only outside"
+                                 " of this elevation threshold."),
+                              tr("%"),
+                              1,
+                              0,
+                              100,
+                              5,
+                              20);
 
     SliderWidget::create(groupSizeSlider_,
                          this,
@@ -112,8 +114,8 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
                                             " elevation and\ndescriptor values"
                                             " to get the best results.")));
     settingsLayout->addWidget(voxelSizeSlider_);
-    settingsLayout->addWidget(descriptorSlider_);
     settingsLayout->addWidget(radiusSlider_);
+    settingsLayout->addWidget(descriptorSlider_);
     settingsLayout->addWidget(elevationSlider_);
     settingsLayout->addWidget(groupSizeSlider_);
     settingsLayout->addStretch();
@@ -155,7 +157,8 @@ void SegmentationWidget::slotApply()
     double voxelSize = static_cast<double>(voxelSizeSlider_->value());
     double descriptor = static_cast<double>(descriptorSlider_->value()) * 0.01;
     double radius = static_cast<double>(radiusSlider_->value());
-    double elevation = static_cast<double>(elevationSlider_->value()) * 0.01;
+    double elevationMin = static_cast<double>(elevationSlider_->minimumValue());
+    double elevationMax = static_cast<double>(elevationSlider_->maximumValue());
     size_t groupSize = static_cast<size_t>(groupSizeSlider_->value());
 
     try
@@ -163,7 +166,8 @@ void SegmentationWidget::slotApply()
         segmentation_.start(voxelSize,
                             descriptor,
                             radius,
-                            elevation,
+                            elevationMin * 0.01,
+                            elevationMax * 0.01,
                             groupSize);
 
         ProgressDialog::run(mainWindow_,

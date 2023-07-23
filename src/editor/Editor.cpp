@@ -75,7 +75,7 @@ void Editor::close()
 
     clipFilter_.clear();
     elevationFilter_.clear();
-    descriptorFilter_.set(0.0, 1.0, 0.0, 1.0);
+    descriptorFilter_.set(0.0, 1.0);
 
     unsavedChanges_ = false;
 }
