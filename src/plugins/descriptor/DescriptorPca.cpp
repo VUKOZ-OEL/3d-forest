@@ -84,7 +84,10 @@ bool DescriptorPca::computeDescriptor(Query &query,
 
     while (query.next())
     {
-        nPoints++;
+        if (query.value() != 0)
+        {
+            nPoints++;
+        }
     }
 
     LOG_DEBUG(<< "Found nPoints <" << nPoints << ">.");
@@ -102,11 +105,13 @@ bool DescriptorPca::computeDescriptor(Query &query,
     query.reset();
     while (query.next())
     {
-        xyz(0, nPoints) = query.x();
-        xyz(1, nPoints) = query.y();
-        xyz(2, nPoints) = query.z();
-
-        nPoints++;
+        if (query.value() != 0)
+        {
+            xyz(0, nPoints) = query.x();
+            xyz(1, nPoints) = query.y();
+            xyz(2, nPoints) = query.z();
+            nPoints++;
+        }
     }
 
     // Compute PCA descriptor.
@@ -264,6 +269,11 @@ bool DescriptorPca::computeDistribution(Query &query,
 
     while (query.next())
     {
+        if (query.value() == 0)
+        {
+            continue;
+        }
+
         px = query.x() - x;
         py = query.y() - y;
         pz = query.z() - z;

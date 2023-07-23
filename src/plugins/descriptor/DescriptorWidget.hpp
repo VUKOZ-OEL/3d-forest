@@ -29,6 +29,7 @@ class SliderWidget;
 #include <QWidget>
 class QPushButton;
 class QRadioButton;
+class QCheckBox;
 
 /** Descriptor Widget. */
 class DescriptorWidget : public QWidget
@@ -50,6 +51,7 @@ private:
 
     SliderWidget *radiusSlider_;
     SliderWidget *voxelSizeSlider_;
+    QCheckBox *groundCheckBox_;
     std::vector<QRadioButton *> methodRadioButton_;
 
     QPushButton *applyButton_;
