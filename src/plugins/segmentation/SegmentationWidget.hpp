@@ -25,6 +25,7 @@
 #include <SegmentationAction.hpp>
 class MainWindow;
 class SliderWidget;
+class RangeSliderWidget;
 
 #include <QWidget>
 class QPushButton;
@@ -50,7 +51,7 @@ private:
     SliderWidget *voxelSizeSlider_;
     SliderWidget *descriptorSlider_;
     SliderWidget *radiusSlider_;
-    SliderWidget *elevationSlider_;
+    RangeSliderWidget *elevationSlider_;
     SliderWidget *groupSizeSlider_;
 
     QPushButton *applyButton_;
