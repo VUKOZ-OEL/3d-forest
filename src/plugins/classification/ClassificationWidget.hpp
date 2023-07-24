@@ -51,6 +51,7 @@ private:
     SliderWidget *voxelSlider_;
     SliderWidget *radiusSlider_;
     SliderWidget *angleSlider_;
+    QCheckBox *cleanGroundCheckBox_;
     QCheckBox *cleanAllCheckBox_;
 
     QPushButton *applyButton_;

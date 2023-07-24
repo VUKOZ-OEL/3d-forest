@@ -79,6 +79,10 @@ ClassificationWidget::ClassificationWidget(MainWindow *mainWindow)
                          89,
                          60);
 
+    cleanGroundCheckBox_ = new QCheckBox;
+    cleanGroundCheckBox_->setText(tr("Clean ground classifications at start"));
+    cleanGroundCheckBox_->setChecked(true);
+
     cleanAllCheckBox_ = new QCheckBox;
     cleanAllCheckBox_->setText(tr("Clean all classifications at start"));
     cleanAllCheckBox_->setChecked(false);
@@ -88,6 +92,7 @@ ClassificationWidget::ClassificationWidget(MainWindow *mainWindow)
     settingsLayout->addWidget(voxelSlider_);
     settingsLayout->addWidget(radiusSlider_);
     settingsLayout->addWidget(angleSlider_);
+    settingsLayout->addWidget(cleanGroundCheckBox_);
     settingsLayout->addWidget(cleanAllCheckBox_);
     settingsLayout->addStretch();
 
@@ -128,11 +133,12 @@ void ClassificationWidget::slotApply()
     double voxel = static_cast<double>(voxelSlider_->value());
     double radius = static_cast<double>(radiusSlider_->value());
     double angle = static_cast<double>(angleSlider_->value());
+    bool cleanGround = cleanGroundCheckBox_->isChecked();
     bool cleanAll = cleanAllCheckBox_->isChecked();
 
     try
     {
-        classification_.start(voxel, radius, angle, cleanAll);
+        classification_.start(voxel, radius, angle, cleanGround, cleanAll);
         ProgressDialog::run(mainWindow_,
                             "Computing Classification",
                             &classification_);

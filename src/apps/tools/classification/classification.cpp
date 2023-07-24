@@ -30,7 +30,9 @@
 static void classificationCompute(const std::string &inputPath,
                                   double voxel,
                                   double radius,
-                                  double angle)
+                                  double angle,
+                                  bool cleanGround,
+                                  bool cleanAll)
 {
     // Open input file in editor.
     Editor editor;
@@ -38,7 +40,7 @@ static void classificationCompute(const std::string &inputPath,
 
     // Classify ground by steps.
     ClassificationAction classification(&editor);
-    classification.start(voxel, radius, angle);
+    classification.start(voxel, radius, angle, cleanGround, cleanAll);
     while (!classification.end())
     {
         classification.next();
@@ -58,12 +60,16 @@ int main(int argc, char *argv[])
         arg.add("--voxel", "100");
         arg.add("--radius", "200");
         arg.add("--angle", "60");
+        arg.add("--clean", "true");
+        arg.add("--clean-all", "false");
         arg.parse(argc, argv);
 
         classificationCompute(arg.toString("--input"),
                               arg.toDouble("--voxel"),
                               arg.toDouble("--radius"),
-                              arg.toDouble("--angle"));
+                              arg.toDouble("--angle"),
+                              arg.toBool("--clean"),
+                              arg.toBool("--clean-all"));
 
         rc = 0;
     }

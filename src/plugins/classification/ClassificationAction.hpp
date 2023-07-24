@@ -36,8 +36,9 @@ public:
 
     void start(double voxelRadius,
                double searchRadius,
-               double angle = 60.,
-               bool cleanAllClassifications = false);
+               double angle,
+               bool cleanGround,
+               bool cleanAll);
     virtual void next();
     void clear();
 
@@ -49,7 +50,8 @@ protected:
     double voxelRadius_;
     double searchRadius_;
     double angle_;
-    bool cleanAllClassifications_;
+    bool cleanGround_;
+    bool cleanAll_;
 
     uint64_t nPointsTotal_;
     uint64_t nPointsInFilter_;
