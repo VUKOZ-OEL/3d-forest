@@ -72,6 +72,11 @@ bool ArgumentParser::read(const std::string &name, int &value) const
     return false;
 }
 
+bool ArgumentParser::toBool(const std::string &name) const
+{
+    return toString(name) == "true";
+}
+
 float ArgumentParser::toFloat(const std::string &name) const
 {
     return std::stof(toString(name));

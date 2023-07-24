@@ -49,6 +49,7 @@ public:
     bool read(const std::string &name, int &value) const;
 
     const std::string &toString(const std::string &name) const;
+    bool toBool(const std::string &name) const;
     float toFloat(const std::string &name) const;
     double toDouble(const std::string &name) const;
     int toInt(const std::string &name) const;
