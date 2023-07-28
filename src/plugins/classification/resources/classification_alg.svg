@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2 (dc2aedaf03, 2022-05-15)"
+   sodipodi:docname="classification_alg.svg"
+   inkscape:export-filename="classification_alg.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <title
+     id="title412">Classification Algorithm</title>
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="0.76078844"
+     inkscape:cx="364.75318"
+     inkscape:cy="561.25984"
+     inkscape:window-width="1783"
+     inkscape:window-height="1041"
+     inkscape:window-x="1972"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2">
+    <rect
+       x="297.06024"
+       y="402.21431"
+       width="153.78778"
+       height="57.834738"
+       id="rect1065" />
+    <rect
+       x="297.06024"
+       y="402.21431"
+       width="153.78778"
+       height="57.834738"
+       id="rect1281" />
+    <rect
+       x="297.06024"
+       y="402.21431"
+       width="153.78778"
+       height="57.834738"
+       id="rect1389" />
+    <rect
+       x="297.06024"
+       y="402.21431"
+       width="153.78778"
+       height="57.834738"
+       id="rect1581" />
+    <rect
+       x="297.06024"
+       y="402.21431"
+       width="153.78778"
+       height="57.834738"
+       id="rect1587" />
+    <rect
+       x="297.06024"
+       y="402.21431"
+       width="153.78778"
+       height="57.834738"
+       id="rect1734" />
+    <rect
+       x="297.06024"
+       y="402.21431"
+       width="74.922227"
+       height="57.834738"
+       id="rect1911" />
+    <rect
+       x="297.06024"
+       y="402.21431"
+       width="132.75697"
+       height="99.896366"
+       id="rect2075" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke"
+       id="rect2067"
+       width="130.41568"
+       height="100.15927"
+       x="34.08197"
+       y="50.079624"
+       inkscape:export-filename="classification_alg.png"
+       inkscape:export-xdpi="68.166649"
+       inkscape:export-ydpi="68.166649" />
+    <path
+       style="fill:#729fcf;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke"
+       id="path1905"
+       sodipodi:type="arc"
+       sodipodi:cx="127.8074"
+       sodipodi:cy="91.986526"
+       sodipodi:rx="21.040398"
+       sodipodi:ry="21.040398"
+       sodipodi:start="0"
+       sodipodi:end="1.1644745"
+       sodipodi:arc-type="slice"
+       d="M 148.8478,91.986526 A 21.040398,21.040398 0 0 1 136.12327,111.31383 L 127.8074,91.986526 Z" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#888a85;stroke-width:2;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dasharray:4, 4;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke"
+       d="M 101.69614,72.163354 65.875304,142.58782 130.90926,142.9356 Z"
+       id="path1589"
+       sodipodi:nodetypes="cccc" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#ce5c00;stroke-width:2;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dasharray:4, 4;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke"
+       d="M 122.91043,88.856562 98.913946,142.9356 146.55915,143.28338 Z"
+       id="path1479"
+       sodipodi:nodetypes="cccc" />
+    <path
+       style="fill:#888a85;fill-opacity:1;stroke:#888a85;stroke-width:2;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke"
+       d="m 122.76464,89.37822 33.73419,-0.347776"
+       id="path1851" />
+    <circle
+       style="fill:none;fill-opacity:1;stroke:#4e9a06;stroke-width:2;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dasharray:none;stroke-dashoffset:0.32;stroke-opacity:1;paint-order:fill markers stroke"
+       id="path1171"
+       cx="96.507607"
+       cy="97.898712"
+       r="34.951405" />
+    <circle
+       style="fill:#cc0000;stroke:none;stroke-width:0.264583;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"
+       id="path188"
+       cx="96.507607"
+       cy="97.898712"
+       r="3.303864" />
+    <circle
+       style="fill:#cc0000;stroke:none;stroke-width:0.264583;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"
+       id="circle1007"
+       cx="122.59074"
+       cy="89.552109"
+       r="3.303864" />
+    <circle
+       style="fill:#715b5b;fill-opacity:1;stroke:none;stroke-width:0.264583;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"
+       id="circle1009"
+       cx="101.69614"
+       cy="71.293915"
+       r="3.303864" />
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,30.61738,-34.01863)"
+       id="text1279"
+       style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect1281);display:inline;fill:#cc0000;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
+         x="297.06055"
+         y="421.43091"
+         id="tspan512">New
+</tspan><tspan
+         x="297.06055"
+         y="448.09753"
+         id="tspan514">ground</tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,0.47956005,-53.558092)"
+       id="text1387"
+       style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect1389);display:inline;fill:#4e9a06;fill-opacity:1;stroke:#4e9a06;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
+         x="297.06055"
+         y="421.43091"
+         id="tspan516">Search radius</tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,8.5507173,-3.0666388)"
+       id="text1579"
+       style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect1581);display:inline;fill:#cc0000;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
+         x="297.06055"
+         y="421.43091"
+         id="tspan518">Ground</tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,0.25931822,-38.363364)"
+       id="text1585"
+       style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect1587);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
+         x="297.06055"
+         y="421.43091"
+         id="tspan520">Not
+</tspan><tspan
+         x="297.06055"
+         y="448.09753"
+         id="tspan522">ground</tspan></text>
+    <circle
+       style="fill:#babdb6;fill-opacity:1;stroke:none;stroke-width:0.264583;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"
+       id="circle1726"
+       cx="67.614166"
+       cy="63.990635"
+       r="3.303864" />
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,-41.685737,24.4076)"
+       id="text1732"
+       style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect1734);display:inline;fill:#2e3436;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
+         x="297.06055"
+         y="421.43091"
+         id="tspan524">Global
+</tspan><tspan
+         x="297.06055"
+         y="448.09753"
+         id="tspan526">minimum</tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,64.194746,0.41111248)"
+       id="text1909"
+       style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect1911);display:inline;fill:#3465a4;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
+         x="297.06055"
+         y="421.43091"
+         id="tspan528">Ground
+</tspan><tspan
+         x="297.06055"
+         y="448.09753"
+         id="tspan530">angle</tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,-41.43769,-45.147436)"
+       id="text2073"
+       style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect2075);display:inline;fill:#888a85;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
+         x="297.06055"
+         y="421.43091"
+         id="tspan532">Far away
+</tspan><tspan
+         x="297.06055"
+         y="448.09753"
+         id="tspan534">from ground
+</tspan><tspan
+         x="297.06055"
+         y="474.76416"
+         id="tspan536">points</tspan></text>
+  </g>
+  <metadata
+     id="metadata410">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>Classification Algorithm</dc:title>
+        <dc:date>28 July 2023</dc:date>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Vaclav Bubnik Copyright 2020-present VUKOZ Licence GNU GPL version 3 www.gnu.org/licenses/gpl-3.0.html</dc:title>
+          </cc:Agent>
+        </dc:creator>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>
