@@ -26,6 +26,7 @@
 class MainWindow;
 class SliderWidget;
 class RangeSliderWidget;
+class InfoDialog;
 
 #include <QWidget>
 class QPushButton;
@@ -40,12 +41,15 @@ public:
 
 protected slots:
     void slotApply();
+    void slotHelp();
 
 protected:
     void hideEvent(QHideEvent *event) override;
 
 private:
     MainWindow *mainWindow_;
+    InfoDialog *infoDialog_;
+
     SegmentationAction segmentation_;
 
     SliderWidget *voxelSizeSlider_;
@@ -54,6 +58,7 @@ private:
     RangeSliderWidget *elevationSlider_;
     SliderWidget *groupSizeSlider_;
 
+    QPushButton *helpButton_;
     QPushButton *applyButton_;
 };
 

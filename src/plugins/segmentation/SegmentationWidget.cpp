@@ -19,6 +19,7 @@
 
 /** @file SegmentationWidget.cpp */
 
+#include <InfoDialog.hpp>
 #include <MainWindow.hpp>
 #include <ProgressDialog.hpp>
 #include <RangeSliderWidget.hpp>
@@ -40,6 +41,7 @@
 SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
     : QWidget(),
       mainWindow_(mainWindow),
+      infoDialog_(nullptr),
       segmentation_(&mainWindow->editor())
 {
     LOG_DEBUG(<< "Create.");
@@ -121,12 +123,18 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
     settingsLayout->addStretch();
 
     // Buttons
+    helpButton_ = new QPushButton(tr("Help"));
+    helpButton_->setIcon(THEME_ICON("question"));
+    connect(helpButton_, SIGNAL(clicked()), this, SLOT(slotHelp()));
+
     applyButton_ = new QPushButton(tr("Run"));
+    applyButton_->setIcon(THEME_ICON("run"));
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
 
     // Buttons layout
     QHBoxLayout *buttonsLayout = new QHBoxLayout;
+    buttonsLayout->addWidget(helpButton_);
     buttonsLayout->addStretch();
     buttonsLayout->addWidget(applyButton_);
 
@@ -184,4 +192,53 @@ void SegmentationWidget::slotApply()
     }
 
     mainWindow_->update({Editor::TYPE_LAYER});
+}
+
+void SegmentationWidget::slotHelp()
+{
+    QString t = "<h3>Segmentation Tool</h3>"
+                "This tool identifies trees in point cloud. "
+                "It uses updated algorithm which is specialized to classify "
+                "LiDAR point clouds of complex natural forest environments. "
+                "<br><br>"
+                "<img src=':/segmentation/segmentation.png'/>"
+                "<div>Example dataset with calculated segmentation.</div>"
+                ""
+                "<h3>Algorithm</h3>"
+                "<ol>"
+                "<li>Voxelize the dataset.</li>"
+                "<li>Detect individual trunks by using search radius"
+                " to connect voxels which have descriptor values above"
+                " user provided threshold. Assign a unique layer value"
+                " to each detected trunk.</li>"
+                "<li>Repeat the following for all remaining voxels:"
+                "<ol>"
+                "<li>Start at the next unprocessed voxel. The position"
+                " of this voxel is random because the voxels are ordered"
+                " by multi-layer octal-tree. This voxel creates new"
+                " voxel group.</li>"
+                "<li>Find spanning tree of this voxel until a voxel with"
+                " existing layer value is reached."
+                " The spanning tree is calculated by iteratively appending"
+                " the next nearest neighbor to the current voxel group.</li>"
+                "<li>Set layer value of all voxels in this voxel group"
+                " to layer value from terminating voxel. This connects"
+                " spanning trees to trunks. Connected voxels are marked"
+                " as processed.</li>"
+                "</ol>"
+                "</li>"
+                "<li>Layer values from voxels are applied back to the"
+                " dataset.</li>"
+                "</ol>";
+
+    if (!infoDialog_)
+    {
+        infoDialog_ = new InfoDialog(mainWindow_, 450, 450);
+        infoDialog_->setWindowTitle(tr("Segmentation Help"));
+        infoDialog_->setText(t);
+    }
+
+    infoDialog_->show();
+    infoDialog_->raise();
+    infoDialog_->activateWindow();
 }
