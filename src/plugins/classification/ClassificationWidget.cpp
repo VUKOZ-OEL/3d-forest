@@ -190,7 +190,9 @@ void ClassificationWidget::slotHelp()
                 " when it searched for its neighbors.</li>"
                 "<li>All voxels in W are classified as ground points.</li>"
                 "<li>Voxel values are applied back to the dataset.</li>"
-                "</ol>";
+                "</ol>"
+                "<br>"
+                "<img src=':/classification/classification_alg.png' />";
 
     if (!infoDialog_)
     {
