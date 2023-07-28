@@ -1,5 +1,4 @@
-<!DOCTYPE RCC>
-<!--
+/*
     Copyright 2020 VUKOZ
 
     This file is part of 3D Forest.
@@ -16,15 +15,43 @@
 
     You should have received a copy of the GNU General Public License
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
--->
-<RCC version="1.0">
-<qresource prefix="/classification">
+*/
 
-<!-- Tool bar -->
-<file>soil_b_24px.png</file>
+/** @file InfoDialog.hpp */
 
-<!-- Images -->
-<file>classification.png</file>
+#ifndef INFO_DIALOG_HPP
+#define INFO_DIALOG_HPP
 
-</qresource>
-</RCC>
+#include <QDialog>
+class QTextEdit;
+class QPushButton;
+
+#include <ExportGui.hpp>
+#include <WarningsDisable.hpp>
+
+/** Info Dialog. */
+class EXPORT_GUI InfoDialog : public QDialog
+{
+    Q_OBJECT
+
+public:
+    InfoDialog(QWidget *parent = nullptr, int w = 0, int h = 0);
+
+    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override;
+
+    void setText(const QString &text);
+
+public slots:
+    void slotClose();
+
+private:
+    int defaultWidth_;
+    int defaultHeight_;
+    QTextEdit *textEdit_;
+    QPushButton *closeButton_;
+};
+
+#include <WarningsEnable.hpp>
+
+#endif /* INFO_DIALOG_HPP */

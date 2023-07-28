@@ -1,5 +1,4 @@
-<!DOCTYPE RCC>
-<!--
+/*
     Copyright 2020 VUKOZ
 
     This file is part of 3D Forest.
@@ -16,15 +15,33 @@
 
     You should have received a copy of the GNU General Public License
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
--->
-<RCC version="1.0">
-<qresource prefix="/classification">
+*/
 
-<!-- Tool bar -->
-<file>soil_b_24px.png</file>
+/** @file ShowDetailsWidget.hpp */
 
-<!-- Images -->
-<file>classification.png</file>
+#ifndef SHOW_DETAILS_WIDGET_HPP
+#define SHOW_DETAILS_WIDGET_HPP
 
-</qresource>
-</RCC>
+#include <QWidget>
+class QTextEdit;
+
+#include <ExportGui.hpp>
+#include <WarningsDisable.hpp>
+
+/** Show Details Widget. */
+class EXPORT_GUI ShowDetailsWidget : public QWidget
+{
+    Q_OBJECT
+
+public:
+    ShowDetailsWidget(const QString &text);
+
+    static void create(ShowDetailsWidget *&outputWidget, const QString &text);
+
+protected:
+    QTextEdit *textEdit_;
+};
+
+#include <WarningsEnable.hpp>
+
+#endif /* SHOW_DETAILS_WIDGET_HPP */

@@ -29,6 +29,7 @@
 <file>remove_16px.png</file>
 <file>remove_24px.png</file>
 <file>remove_24px_color.png</file>
+<file>run_16px.png</file>
 
 </qresource>
 </RCC>
