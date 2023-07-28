@@ -20,6 +20,7 @@
 /** @file ClassificationWidget.cpp */
 
 #include <ClassificationWidget.hpp>
+#include <InfoDialog.hpp>
 #include <MainWindow.hpp>
 #include <ProgressDialog.hpp>
 #include <SliderWidget.hpp>
@@ -28,6 +29,7 @@
 #include <QCheckBox>
 #include <QHBoxLayout>
 #include <QPushButton>
+#include <QTextEdit>
 #include <QVBoxLayout>
 
 #define LOG_MODULE_NAME "ClassificationWidget"
@@ -38,6 +40,7 @@
 ClassificationWidget::ClassificationWidget(MainWindow *mainWindow)
     : QWidget(),
       mainWindow_(mainWindow),
+      infoDialog_(nullptr),
       classification_(&mainWindow->editor())
 {
     LOG_DEBUG(<< "Create.");
@@ -59,8 +62,8 @@ ClassificationWidget::ClassificationWidget(MainWindow *mainWindow)
                          this,
                          nullptr,
                          nullptr,
-                         tr("Search radius"),
-                         tr("Search radius."),
+                         tr("Neighborhood search radius"),
+                         tr("Neighborhood search radius."),
                          tr("pt"),
                          1,
                          1,
@@ -72,7 +75,7 @@ ClassificationWidget::ClassificationWidget(MainWindow *mainWindow)
                          nullptr,
                          nullptr,
                          tr("Maximum ground angle"),
-                         tr("Maximum ground angle"),
+                         tr("Maximum ground angle."),
                          tr("deg"),
                          1,
                          1,
@@ -97,12 +100,18 @@ ClassificationWidget::ClassificationWidget(MainWindow *mainWindow)
     settingsLayout->addStretch();
 
     // Buttons
+    helpButton_ = new QPushButton(tr("Help"));
+    helpButton_->setIcon(THEME_ICON("question"));
+    connect(helpButton_, SIGNAL(clicked()), this, SLOT(slotHelp()));
+
     applyButton_ = new QPushButton(tr("Run"));
+    applyButton_->setIcon(THEME_ICON("run"));
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
 
     // Buttons layout
     QHBoxLayout *buttonsLayout = new QHBoxLayout;
+    buttonsLayout->addWidget(helpButton_);
     buttonsLayout->addStretch();
     buttonsLayout->addWidget(applyButton_);
 
@@ -153,4 +162,44 @@ void ClassificationWidget::slotApply()
     }
 
     mainWindow_->update({Editor::TYPE_CLASSIFICATION, Editor::TYPE_ELEVATION});
+}
+
+void ClassificationWidget::slotHelp()
+{
+    QString t = "<h3>Classification</h3>"
+                "This tool calculates classification of ground points. "
+                "It uses new algorithm which is specialized to classify "
+                "LiDAR point clouds of complex natural forest environments. "
+                "The algorithm is based on global minimum to deal with "
+                "missing data in non scanned or obstructed parts. "
+                "<br><br>"
+                "<img src=':/classification/classification.png' "
+                "width='362' height='388'/>"
+                "<div>Example dataset with classified ground.</div>"
+                ""
+                "<h3>Algorithm</h3>"
+                "<ol>"
+                "<li>Voxelize the dataset.</li>"
+                "<li>Find voxel with minimal z coordinate and append"
+                " this voxel to working set W.</li>"
+                "<li>While W is not processed, append other"
+                " voxels in search radius from each new voxel in W, if"
+                " selection cone given by maximal ground angle and"
+                " their position does not contain any voxels, eg."
+                " there is nothing below. Voxel is marked as processed"
+                " when it searched for its neighbors.</li>"
+                "<li>All voxels in W are classified as ground points.</li>"
+                "<li>Voxel values are applied back to the dataset.</li>"
+                "</ol>";
+
+    if (!infoDialog_)
+    {
+        infoDialog_ = new InfoDialog(mainWindow_, 450, 450);
+        infoDialog_->setWindowTitle(tr("Classification Help"));
+        infoDialog_->setText(t);
+    }
+
+    infoDialog_->show();
+    infoDialog_->raise();
+    infoDialog_->activateWindow();
 }

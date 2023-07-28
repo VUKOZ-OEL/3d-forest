@@ -25,6 +25,7 @@
 #include <ClassificationAction.hpp>
 class MainWindow;
 class SliderWidget;
+class InfoDialog;
 
 #include <QWidget>
 class QPushButton;
@@ -40,12 +41,15 @@ public:
 
 protected slots:
     void slotApply();
+    void slotHelp();
 
 protected:
     void hideEvent(QHideEvent *event) override;
 
 private:
     MainWindow *mainWindow_;
+    InfoDialog *infoDialog_;
+
     ClassificationAction classification_;
 
     SliderWidget *voxelSlider_;
@@ -54,6 +58,7 @@ private:
     QCheckBox *cleanGroundCheckBox_;
     QCheckBox *cleanAllCheckBox_;
 
+    QPushButton *helpButton_;
     QPushButton *applyButton_;
 };
 
