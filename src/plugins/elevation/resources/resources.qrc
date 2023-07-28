@@ -23,5 +23,8 @@
 <!-- Tool bar -->
 <file>elevation_24px_color.png</file>
 
+<!-- Images -->
+<file>elevation.png</file>
+
 </qresource>
 </RCC>

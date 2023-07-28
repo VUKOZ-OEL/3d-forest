@@ -20,6 +20,7 @@
 /** @file ElevationWidget.cpp */
 
 #include <ElevationWidget.hpp>
+#include <InfoDialog.hpp>
 #include <MainWindow.hpp>
 #include <ProgressDialog.hpp>
 #include <SliderWidget.hpp>
@@ -38,6 +39,7 @@
 ElevationWidget::ElevationWidget(MainWindow *mainWindow)
     : QWidget(),
       mainWindow_(mainWindow),
+      infoDialog_(nullptr),
       elevation_(&mainWindow->editor())
 {
     LOG_DEBUG(<< "Create.");
@@ -61,12 +63,18 @@ ElevationWidget::ElevationWidget(MainWindow *mainWindow)
     settingsLayout->addStretch();
 
     // Buttons
+    helpButton_ = new QPushButton(tr("Help"));
+    helpButton_->setIcon(THEME_ICON("question"));
+    connect(helpButton_, SIGNAL(clicked()), this, SLOT(slotHelp()));
+
     applyButton_ = new QPushButton(tr("Run"));
+    applyButton_->setIcon(THEME_ICON("run"));
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
 
     // Buttons layout
     QHBoxLayout *buttonsLayout = new QHBoxLayout;
+    buttonsLayout->addWidget(helpButton_);
     buttonsLayout->addStretch();
     buttonsLayout->addWidget(applyButton_);
 
@@ -113,4 +121,41 @@ void ElevationWidget::slotApply()
     }
 
     mainWindow_->update({Editor::TYPE_ELEVATION});
+}
+
+void ElevationWidget::slotHelp()
+{
+    QString t = "<h3>Elevation Tool</h3>"
+                "This tool calculates elevation of points above ground. "
+                "It uses new algorithm which is specialized to classify "
+                "LiDAR point clouds of complex natural forest environments. "
+                "The algorithm uses 2D projection to deal with "
+                "missing ground data in non scanned or obstructed parts. "
+                "Elevation is additional point attribute added by 3D Forest. "
+                "<br><br>"
+                "<img src=':/elevation/elevation.png'/>"
+                "<div>Example dataset with calculated elevation.</div>"
+                ""
+                "<h3>Algorithm</h3>"
+                "<ol>"
+                "<li>Voxelize all ground points from the dataset.</li>"
+                "<li>Create 2D quad-tree spatial index from 3D voxels."
+                " Two dimensional quad-tree is created by ignoring"
+                " z coordinates.</li>"
+                "<li>Iterate all non-ground points, use their (x, y)"
+                " coordinates to find nearest neighbor in the ground"
+                " quad-tree and set elevation as difference between z"
+                " coordinates of nearest ground voxel and iterated point.</li>"
+                "</ol>";
+
+    if (!infoDialog_)
+    {
+        infoDialog_ = new InfoDialog(mainWindow_, 450, 450);
+        infoDialog_->setWindowTitle(tr("Elevation Help"));
+        infoDialog_->setText(t);
+    }
+
+    infoDialog_->show();
+    infoDialog_->raise();
+    infoDialog_->activateWindow();
 }

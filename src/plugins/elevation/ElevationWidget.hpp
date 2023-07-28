@@ -25,6 +25,7 @@
 #include <ElevationAction.hpp>
 class MainWindow;
 class SliderWidget;
+class InfoDialog;
 
 #include <QWidget>
 class QPushButton;
@@ -39,16 +40,20 @@ public:
 
 protected slots:
     void slotApply();
+    void slotHelp();
 
 protected:
     void hideEvent(QHideEvent *event) override;
 
 private:
     MainWindow *mainWindow_;
+    InfoDialog *infoDialog_;
+
     ElevationAction elevation_;
 
     SliderWidget *voxelSizeSlider_;
 
+    QPushButton *helpButton_;
     QPushButton *applyButton_;
 };
 

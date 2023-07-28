@@ -23,5 +23,8 @@
 <!-- Tool bar -->
 <file>forest_24px_color.png</file>
 
+<!-- Images -->
+<file>segmentation.png</file>
+
 </qresource>
 </RCC>
