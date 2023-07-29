@@ -20,6 +20,7 @@
 /** @file DescriptorWidget.cpp */
 
 #include <DescriptorWidget.hpp>
+#include <InfoDialog.hpp>
 #include <MainWindow.hpp>
 #include <ProgressDialog.hpp>
 #include <SliderWidget.hpp>
@@ -40,6 +41,7 @@
 DescriptorWidget::DescriptorWidget(MainWindow *mainWindow)
     : QWidget(),
       mainWindow_(mainWindow),
+      infoDialog_(nullptr),
       descriptor_(&mainWindow->editor())
 {
     LOG_DEBUG(<< "Create.");
@@ -98,12 +100,18 @@ DescriptorWidget::DescriptorWidget(MainWindow *mainWindow)
     settingsLayout->addStretch();
 
     // Buttons
+    helpButton_ = new QPushButton(tr("Help"));
+    helpButton_->setIcon(THEME_ICON("question"));
+    connect(helpButton_, SIGNAL(clicked()), this, SLOT(slotHelp()));
+
     applyButton_ = new QPushButton(tr("Run"));
+    applyButton_->setIcon(THEME_ICON("run"));
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
 
     // Buttons layout
     QHBoxLayout *buttonsLayout = new QHBoxLayout;
+    buttonsLayout->addWidget(helpButton_);
     buttonsLayout->addStretch();
     buttonsLayout->addWidget(applyButton_);
 
@@ -159,4 +167,41 @@ void DescriptorWidget::slotApply()
     descriptor_.clear();
 
     mainWindow_->update({Editor::TYPE_DESCRIPTOR});
+}
+
+void DescriptorWidget::slotHelp()
+{
+    QString t;
+    t = "<h3>Descriptor Tool</h3>"
+        "This tool calculates point descriptor values. "
+        "Descriptors are calculated from <i>Neighborhood Radius</i> "
+        "of each point. The point cloud can be voxelized to speed up "
+        "the calculation. There are several methods to choose from. "
+        "Basic <i>Density Method</i> calculates global density of each "
+        "voxel. Calculated descriptors are normalized to range from "
+        "zero (global minimum) to one (global maximum). "
+        "Descriptor is additional point attribute added by 3D Forest. "
+        "<br><br>"
+        "<img src=':/descriptor/descriptor_density.png'/>"
+        "<div>Example dataset (Before) with calculated density"
+        " descriptors (After).</div>"
+        ""
+        "<h3>Algorithm for Density</h3>"
+        "Count the number of points in <i>Neighborhood Radius</i>."
+        ""
+        "<h3>Algorithm for PCA Intensity</h3>"
+        "Calculate PCA of points in <i>Neighborhood Radius</i>. "
+        "Descriptor value is ratio between length of longest projected "
+        "eigen vector to sum of lengths of all projected eigen vectors.";
+
+    if (!infoDialog_)
+    {
+        infoDialog_ = new InfoDialog(mainWindow_, 450, 450);
+        infoDialog_->setWindowTitle(tr("Descriptor Help"));
+        infoDialog_->setText(t);
+    }
+
+    infoDialog_->show();
+    infoDialog_->raise();
+    infoDialog_->activateWindow();
 }
