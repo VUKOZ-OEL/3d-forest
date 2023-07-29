@@ -25,6 +25,7 @@
 
 <!-- Images -->
 <file>segmentation.png</file>
+<file>segmentation_alg.png</file>
 
 </qresource>
 </RCC>

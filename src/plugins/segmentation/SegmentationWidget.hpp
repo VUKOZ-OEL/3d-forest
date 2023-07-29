@@ -54,9 +54,10 @@ private:
 
     SliderWidget *voxelSizeSlider_;
     SliderWidget *descriptorSlider_;
-    SliderWidget *radiusSlider_;
+    SliderWidget *trunkRadiusSlider_;
+    SliderWidget *leafRadiusSlider_;
     RangeSliderWidget *elevationSlider_;
-    SliderWidget *groupSizeSlider_;
+    SliderWidget *treeHeightSlider_;
 
     QPushButton *helpButton_;
     QPushButton *applyButton_;

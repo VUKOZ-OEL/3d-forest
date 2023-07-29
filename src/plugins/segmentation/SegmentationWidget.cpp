@@ -28,7 +28,6 @@
 #include <ThemeIcon.hpp>
 
 #include <QHBoxLayout>
-#include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
 
@@ -64,20 +63,33 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
                          nullptr,
                          nullptr,
                          tr("Wood descriptor threshold"),
-                         tr("Wood descriptor threshold"),
+                         tr("Wood descriptor threshold."),
                          tr("%"),
                          1,
                          0,
                          100,
                          25);
 
-    SliderWidget::create(radiusSlider_,
+    SliderWidget::create(trunkRadiusSlider_,
                          this,
                          nullptr,
                          nullptr,
-                         tr("Neighborhood radius"),
+                         tr("Maximal distance to connect trunk points"),
                          tr("Neighborhood radius to search for"
-                            " points which belong to the same tree."),
+                            " voxels which belong to the same tree."),
+                         tr("pt"),
+                         1,
+                         1,
+                         1000,
+                         250);
+
+    SliderWidget::create(leafRadiusSlider_,
+                         this,
+                         nullptr,
+                         nullptr,
+                         tr("Maximal distance to connect leaf points"),
+                         tr("Neighborhood radius to search for"
+                            " voxels which belong to the same tree."),
                          tr("pt"),
                          1,
                          1,
@@ -88,9 +100,9 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
                               this,
                               nullptr,
                               nullptr,
-                              tr("Minimal tree elevation"),
+                              tr("Look for trunks in elevation range"),
                               tr("Ignore all trees which are only outside"
-                                 " of this elevation threshold."),
+                                 " \nof this elevation threshold."),
                               tr("%"),
                               1,
                               0,
@@ -98,28 +110,27 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
                               5,
                               20);
 
-    SliderWidget::create(groupSizeSlider_,
+    SliderWidget::create(treeHeightSlider_,
                          this,
                          nullptr,
                          nullptr,
-                         tr("Minimal points in tree"),
-                         tr("Minimal number of points in tree"),
-                         tr("count"),
+                         tr("Minimal height of tree"),
+                         tr("Minimal height of detected voxel group to"
+                            " \ndetect it as a new tree."),
+                         tr("pt"),
                          1,
                          1,
-                         1000,
-                         10);
+                         5000,
+                         1000);
 
     // Settings layout
     QVBoxLayout *settingsLayout = new QVBoxLayout;
-    settingsLayout->addWidget(new QLabel(tr("This tool requires pre-computed"
-                                            " elevation and\ndescriptor values"
-                                            " to get the best results.")));
     settingsLayout->addWidget(voxelSizeSlider_);
-    settingsLayout->addWidget(radiusSlider_);
     settingsLayout->addWidget(descriptorSlider_);
+    settingsLayout->addWidget(trunkRadiusSlider_);
+    settingsLayout->addWidget(leafRadiusSlider_);
     settingsLayout->addWidget(elevationSlider_);
-    settingsLayout->addWidget(groupSizeSlider_);
+    settingsLayout->addWidget(treeHeightSlider_);
     settingsLayout->addStretch();
 
     // Buttons
@@ -163,20 +174,22 @@ void SegmentationWidget::slotApply()
     mainWindow_->suspendThreads();
 
     double voxelSize = static_cast<double>(voxelSizeSlider_->value());
-    double descriptor = static_cast<double>(descriptorSlider_->value()) * 0.01;
-    double radius = static_cast<double>(radiusSlider_->value());
+    double descriptor = static_cast<double>(descriptorSlider_->value());
+    double trunkRadius = static_cast<double>(trunkRadiusSlider_->value());
+    double leafRadius = static_cast<double>(leafRadiusSlider_->value());
     double elevationMin = static_cast<double>(elevationSlider_->minimumValue());
     double elevationMax = static_cast<double>(elevationSlider_->maximumValue());
-    size_t groupSize = static_cast<size_t>(groupSizeSlider_->value());
+    double treeHeight = static_cast<double>(treeHeightSlider_->value());
 
     try
     {
         segmentation_.start(voxelSize,
-                            descriptor,
-                            radius,
+                            descriptor * 0.01,
+                            trunkRadius,
+                            leafRadius,
                             elevationMin * 0.01,
                             elevationMax * 0.01,
-                            groupSize);
+                            treeHeight);
 
         ProgressDialog::run(mainWindow_,
                             "Computing Segmentation",
@@ -196,44 +209,54 @@ void SegmentationWidget::slotApply()
 
 void SegmentationWidget::slotHelp()
 {
-    QString t = "<h3>Segmentation Tool</h3>"
-                "This tool identifies trees in point cloud. "
-                "It uses updated algorithm which is specialized to classify "
-                "LiDAR point clouds of complex natural forest environments. "
-                "<br><br>"
-                "<img src=':/segmentation/segmentation.png'/>"
-                "<div>Example dataset with calculated segmentation.</div>"
-                ""
-                "<h3>Algorithm</h3>"
-                "<ol>"
-                "<li>Voxelize the dataset.</li>"
-                "<li>Detect individual trunks by using search radius"
-                " to connect voxels which have descriptor values above"
-                " user provided threshold. Assign a unique layer value"
-                " to each detected trunk.</li>"
-                "<li>Repeat the following for all remaining voxels:"
-                "<ol>"
-                "<li>Start at the next unprocessed voxel. The position"
-                " of this voxel is random because the voxels are ordered"
-                " by multi-layer octal-tree. This voxel creates new"
-                " voxel group.</li>"
-                "<li>Find spanning tree of this voxel until a voxel with"
-                " existing layer value is reached."
-                " The spanning tree is calculated by iteratively appending"
-                " the next nearest neighbor to the current voxel group.</li>"
-                "<li>Set layer value of all voxels in this voxel group"
-                " to layer value from terminating voxel. This connects"
-                " spanning trees to trunks. Connected voxels are marked"
-                " as processed.</li>"
-                "</ol>"
-                "</li>"
-                "<li>Layer values from voxels are applied back to the"
-                " dataset.</li>"
-                "</ol>";
+    QString t;
+    t = "<h3>Segmentation Tool</h3>"
+        "This tool identifies trees in point cloud. "
+        "It uses updated algorithm which is specialized to classify "
+        "LiDAR point clouds of complex natural forest environments. "
+        "<br>"
+        "This tool requires pre-computed "
+        "ground classification, point elevation and descriptor values."
+        "<br><br>"
+        "<img src=':/segmentation/segmentation.png'/>"
+        "<div>Example dataset with calculated segmentation.</div>"
+        ""
+        "<h3>Algorithm</h3>"
+        "<ol>"
+        "<li>Voxelize the dataset.</li>"
+        "<li>Detect individual trunks by using search radius"
+        " to connect voxels which have descriptor values above"
+        " user provided threshold. Assign a unique layer value"
+        " to each detected trunk.</li>"
+        "<li>Repeat the following for all remaining voxels:"
+        "<ol>"
+        "<li>Start at the next unprocessed voxel. The position"
+        " of this voxel is random because the voxels are ordered"
+        " by multi-layer octal-tree. This voxel creates new"
+        " voxel group.</li>"
+        "<li>Find spanning tree of this voxel until a voxel with"
+        " existing layer value is reached."
+        " The spanning tree is calculated by iteratively appending"
+        " the next nearest neighbor to the current voxel group.</li>"
+        "<li>Set layer value of all voxels in this voxel group"
+        " to layer value from terminating voxel. This connects"
+        " spanning trees to trunks. Connected voxels are marked"
+        " as processed.</li>"
+        "</ol>"
+        "</li>"
+        "<li>Layer values from voxels are applied back to the"
+        " dataset.</li>"
+        "</ol>"
+        "<br>"
+        "<img src=':/segmentation/segmentation_alg.png' />"
+        "<div>Top: The first step is segmentation of trunks."
+        " <i>Descriptor threshold</i> is set to 0.5 (50 %)."
+        " Bottom: The second step is segmentation of leaves and"
+        " small branches which are connected to some trunk.</div>";
 
     if (!infoDialog_)
     {
-        infoDialog_ = new InfoDialog(mainWindow_, 450, 450);
+        infoDialog_ = new InfoDialog(mainWindow_, 550, 450);
         infoDialog_->setWindowTitle(tr("Segmentation Help"));
         infoDialog_->setText(t);
     }

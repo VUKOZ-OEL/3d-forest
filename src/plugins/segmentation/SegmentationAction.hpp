@@ -37,10 +37,11 @@ public:
 
     void start(double voxelSize,
                double descriptor,
-               double radius,
+               double trunkRadius,
+               double leafRadius,
                double elevationMin,
                double elevationMax,
-               size_t groupSize);
+               double treeHeight);
 
     virtual void next();
 
@@ -53,10 +54,11 @@ private:
 
     double voxelSize_;
     double descriptor_;
-    double radius_;
+    double trunkRadius_;
+    double leafRadius_;
     double elevationMin_;
     double elevationMax_;
-    size_t groupSize_;
+    double treeHeight_;
 
     uint64_t nPointsTotal_;
     uint64_t nPointsInFilter_;
@@ -81,6 +83,7 @@ private:
     size_t pointIndex_;
     size_t groupId_;
     double groupMinimum_;
+    double groupMaximum_;
 };
 
 #endif /* SEGMENTATION_ACTION_HPP */

@@ -25,7 +25,7 @@
 #include <SegmentationAction.hpp>
 
 #define LOG_MODULE_NAME "SegmentationAction"
-#define LOG_MODULE_DEBUG_ENABLED 1
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define SEGMENTATION_STEP_RESET_POINTS 0
@@ -59,11 +59,13 @@ void SegmentationAction::clear()
 
     voxelSize_ = 0;
     descriptor_ = 0;
-    radius_ = 0;
+    trunkRadius_ = 0;
+    leafRadius_ = 0;
     elevationMin_ = 0;
     elevationMax_ = 0;
-    groupSize_ = 0;
+    treeHeight_ = 0;
 
+    nPointsTotal_ = 0;
     nPointsInFilter_ = 0;
 
     voxels_.clear();
@@ -73,26 +75,29 @@ void SegmentationAction::clear()
 
 void SegmentationAction::start(double voxelSize,
                                double descriptor,
-                               double radius,
+                               double trunkRadius,
+                               double leafRadius,
                                double elevationMin,
                                double elevationMax,
-                               size_t groupSize)
+                               double treeHeight)
 {
     LOG_DEBUG(<< "Start.");
-
-    Range<double> elevationRange = editor_->elevationFilter();
-    double elevationDelta =
-        elevationRange.maximumValue() - elevationRange.minimumValue();
 
     // Set input parameters.
     voxelSize_ = voxelSize;
     descriptor_ = descriptor;
-    radius_ = radius;
-    elevationMin_ =
-        elevationRange.minimumValue() + (elevationMin * elevationDelta);
-    elevationMax_ =
-        elevationRange.minimumValue() + (elevationMax * elevationDelta);
-    groupSize_ = groupSize;
+    trunkRadius_ = trunkRadius;
+    leafRadius_ = leafRadius;
+    treeHeight_ = treeHeight;
+
+    // Elevation parameters.
+    Range<double> elevationRange = editor_->elevationFilter();
+    double elevationFilterMin = elevationRange.minimumValue();
+    double elevationFilterMax = elevationRange.maximumValue();
+    double elevationDelta = elevationFilterMax - elevationFilterMin;
+
+    elevationMin_ = elevationFilterMin + (elevationMin * elevationDelta);
+    elevationMax_ = elevationFilterMin + (elevationMax * elevationDelta);
 
     LOG_DEBUG(<< "elevationRange <" << elevationRange << ">.");
     LOG_DEBUG(<< "elevationDelta <" << elevationDelta << ">.");
@@ -300,6 +305,7 @@ void SegmentationAction::stepCreateTrees()
                 !(voxels_[pointIndex_].descriptor < descriptor_))
             {
                 groupMinimum_ = voxels_[pointIndex_].elevation;
+                groupMaximum_ = groupMinimum_;
                 voxels_[pointIndex_].group = groupId_;
                 path_.push_back(pointIndex_);
             }
@@ -324,7 +330,7 @@ void SegmentationAction::stepCreateTrees()
             for (size_t i = idx; i < group_.size(); i++)
             {
                 Point &a = voxels_[group_[i]];
-                voxels_.findRadius(a.x, a.y, a.z, radius_, search_);
+                voxels_.findRadius(a.x, a.y, a.z, trunkRadius_, search_);
                 for (size_t j = 0; j < search_.size(); j++)
                 {
                     Point &b = voxels_[search_[j]];
@@ -346,7 +352,8 @@ void SegmentationAction::stepCreateTrees()
             if (path_.empty())
             {
                 // If the current group meets some criteria:
-                if (group_.size() >= groupSize_ &&
+                double groupHeight = groupMaximum_ - groupMinimum_;
+                if (!(groupHeight < treeHeight_) &&
                     groupMinimum_ < elevationMax_)
                 {
                     // Mark this group as future layer.
@@ -642,7 +649,7 @@ void SegmentationAction::findNearestNeighbor(Point &a)
     a.dist = std::numeric_limits<double>::max();
     a.next = SIZE_MAX;
 
-    voxels_.findRadius(a.x, a.y, a.z, radius_, search_);
+    voxels_.findRadius(a.x, a.y, a.z, leafRadius_, search_);
 
     for (size_t j = 0; j < search_.size(); j++)
     {
