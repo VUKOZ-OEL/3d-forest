@@ -27,6 +27,43 @@ These documents describe how to use 3D Forest application.
 
 @section tools Tools
 
+@subsection tools-classification Classification Tool
+
+@subsubsection tools-classification-overview Classification Overview
+
+This tool calculates classification of ground points.
+It uses new algorithm which is specialized to classify
+LiDAR point clouds of complex natural forest environments.
+The algorithm is based on global minimum to deal with
+missing data in non scanned or obstructed parts.
+<br>
+
+@image html 3d-forest-classification.png "3D Forest Classification: Example dataset with classified ground."
+
+@subsubsection tools-classification-gui Classification GUI
+
+@image html 3d-forest-classification-gui.png "3D Forest Classification GUI"
+
+@subsubsection tools-classification-algorithm Classification Algorithm
+
+<ol>
+<li>Voxelize the dataset.</li>
+<li>Find voxel with minimal z coordinate and append
+this voxel to working set W.</li>
+<li>While W is not processed, append other
+voxels in search radius from each new voxel in W, if
+selection cone given by maximal ground angle and
+their position does not contain any voxels, eg.
+there is nothing below. Voxel is marked as processed
+when it searched for its neighbors.</li>
+<li>All voxels in W are classified as ground points.</li>
+<li>Voxel values are applied back to the dataset.</li>
+</ol>
+<br>
+
+@image html 3d-forest-classification-algorithm.png "3D Forest Classification Algorithm"
+
+
 @subsection tools-segmentation Automatic Segmentation Tool
 
 @subsubsection tools-segmentation-overview Segmentation Overview
@@ -88,6 +125,6 @@ dataset.</li>
 </ol>
 <br>
 
-@image html 3d-forest-segmentation-alg.png "3D Forest: Top: The first step is segmentation of trunks. 'Descriptor threshold' is set to 0.5 (50 %). Bottom: The second step is segmentation of leaves and small branches which are connected to some trunk."
+@image html 3d-forest-segmentation-algorithm.png "3D Forest: Top: The first step is segmentation of trunks. 'Descriptor threshold' is set to 0.5 (50 %). Bottom: The second step is segmentation of leaves and small branches which are connected to some trunk."
 
 */
