@@ -125,7 +125,7 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
                          1000);
 
     useZCheckBox_ = new QCheckBox;
-    useZCheckBox_->setText(tr("Use Z instead of ground elevation"));
+    useZCheckBox_->setText(tr("Use z-coordinate instead of ground elevation"));
     useZCheckBox_->setChecked(false);
 
     onlyTrunksCheckBox_ = new QCheckBox;
@@ -225,22 +225,26 @@ void SegmentationWidget::slotApply()
 void SegmentationWidget::slotHelp()
 {
     QString t;
-    t = "<h3>Segmentation Tool</h3>"
+    t = "<h3>Automatic Segmentation Tool</h3>"
         "This tool identifies trees in point cloud. "
-        "It uses updated algorithm which is specialized to classify "
-        "LiDAR point clouds of complex natural forest environments. "
-        "The algorithm works by connecting nearest neighbors. "
+        "The basic idea of used segmentation algorithm is the same as in "
+        "the original 3D Forest paper. "
+        "The algorithm is based on point descriptors and connections "
+        "between nearest neighbors. "
+        "Both algorithms are specialized to classify LiDAR point clouds "
+        "of complex natural forest environments."
         "<br>"
         "This tool requires either pre-computed "
-        "ground classification and point elevation "
-        "or to enable option <i>'Use Z instead of ground elevation'</i>."
+        "ground classification and point elevation values "
+        "or to use enabled option "
+        "<i>'Use z-coordinate instead of ground elevation'</i>. "
         "Pre-computed descriptor values are always required."
         "<br><br>"
         "<img src=':/segmentation/segmentation.png'/>"
         "<div>Example dataset with calculated segmentation.</div>"
         ""
         "<h3>Segmentation Steps</h3>"
-        "Segmentation Steps are described on the image below."
+        "Segmentation steps are described on the image below."
         "<br>"
         "<img src=':/segmentation/segmentation_steps.png'/>"
         "<div>On the image:"
@@ -268,7 +272,7 @@ void SegmentationWidget::slotHelp()
         " of this voxel is random because the voxels are ordered"
         " by multi-layer octal-tree. This voxel creates new"
         " voxel group.</li>"
-        "<li>Find spanning tree of this voxel until a voxel with"
+        "<li>Find minimum spanning tree from this voxel until a voxel with"
         " existing layer value is reached."
         " The spanning tree is calculated by iteratively appending"
         " the next nearest neighbor to the current voxel group.</li>"
