@@ -27,6 +27,7 @@
 #include <SliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
+#include <QCheckBox>
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QVBoxLayout>
@@ -123,6 +124,14 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
                          5000,
                          1000);
 
+    useZCheckBox_ = new QCheckBox;
+    useZCheckBox_->setText(tr("Use Z instead of ground elevation"));
+    useZCheckBox_->setChecked(false);
+
+    onlyTrunksCheckBox_ = new QCheckBox;
+    onlyTrunksCheckBox_->setText(tr("Find only trunks (fast preview)"));
+    onlyTrunksCheckBox_->setChecked(false);
+
     // Settings layout
     QVBoxLayout *settingsLayout = new QVBoxLayout;
     settingsLayout->addWidget(voxelSizeSlider_);
@@ -131,6 +140,8 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
     settingsLayout->addWidget(leafRadiusSlider_);
     settingsLayout->addWidget(elevationSlider_);
     settingsLayout->addWidget(treeHeightSlider_);
+    settingsLayout->addWidget(useZCheckBox_);
+    settingsLayout->addWidget(onlyTrunksCheckBox_);
     settingsLayout->addStretch();
 
     // Buttons
@@ -180,6 +191,8 @@ void SegmentationWidget::slotApply()
     double elevationMin = static_cast<double>(elevationSlider_->minimumValue());
     double elevationMax = static_cast<double>(elevationSlider_->maximumValue());
     double treeHeight = static_cast<double>(treeHeightSlider_->value());
+    bool useZ = useZCheckBox_->isChecked();
+    bool onlyTrunks = onlyTrunksCheckBox_->isChecked();
 
     try
     {
@@ -189,7 +202,9 @@ void SegmentationWidget::slotApply()
                             leafRadius,
                             elevationMin * 0.01,
                             elevationMax * 0.01,
-                            treeHeight);
+                            treeHeight,
+                            useZ,
+                            onlyTrunks);
 
         ProgressDialog::run(mainWindow_,
                             "Computing Segmentation",
@@ -214,12 +229,31 @@ void SegmentationWidget::slotHelp()
         "This tool identifies trees in point cloud. "
         "It uses updated algorithm which is specialized to classify "
         "LiDAR point clouds of complex natural forest environments. "
+        "The algorithm works by connecting nearest neighbors. "
         "<br>"
-        "This tool requires pre-computed "
-        "ground classification, point elevation and descriptor values."
+        "This tool requires either pre-computed "
+        "ground classification and point elevation "
+        "or to enable option <i>'Use Z instead of ground elevation'</i>."
+        "Pre-computed descriptor values are always required."
         "<br><br>"
         "<img src=':/segmentation/segmentation.png'/>"
         "<div>Example dataset with calculated segmentation.</div>"
+        ""
+        "<h3>Segmentation Steps</h3>"
+        "Segmentation Steps are described on the image below."
+        "<br>"
+        "<img src=':/segmentation/segmentation_steps.png'/>"
+        "<div>On the image:"
+        " a) Original unsegmented dataset."
+        " b) Shows pre-calculated descriptors from black (low)"
+        " to white (high). Descriptors with high value should"
+        " describe trunks."
+        " c) Shows the effect of option <i>'Find only trunks'</i>."
+        " 3 trunks are identified."
+        " d) Shows the final result of segmented dataset."
+        " Unsegmented (disconnected and ground) points are hidden."
+        " These points are assigned to main layer."
+        "</div>"
         ""
         "<h3>Algorithm</h3>"
         "<ol>"

@@ -41,7 +41,9 @@ public:
                double leafRadius,
                double elevationMin,
                double elevationMax,
-               double treeHeight);
+               double treeHeight,
+               bool useZ,
+               bool onlyTrunks);
 
     virtual void next();
 
@@ -59,6 +61,8 @@ private:
     double elevationMin_;
     double elevationMax_;
     double treeHeight_;
+    bool useZ_;
+    bool onlyTrunks_;
 
     uint64_t nPointsTotal_;
     uint64_t nPointsInFilter_;
@@ -74,6 +78,9 @@ private:
 
     void createVoxel();
     void findNearestNeighbor(Point &a);
+    bool isTrunkVoxel(const Point &a);
+    void startGroup(const Point &a);
+    void continueGroup(const Point &a);
 
     Points voxels_;
     std::map<size_t, size_t> groups_;
