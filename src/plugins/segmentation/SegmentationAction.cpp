@@ -25,7 +25,7 @@
 #include <SegmentationAction.hpp>
 
 #define LOG_MODULE_NAME "SegmentationAction"
-#define LOG_MODULE_DEBUG_ENABLED 1
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define SEGMENTATION_STEP_RESET_POINTS 0
@@ -59,11 +59,15 @@ void SegmentationAction::clear()
 
     voxelSize_ = 0;
     descriptor_ = 0;
-    radius_ = 0;
+    trunkRadius_ = 0;
+    leafRadius_ = 0;
     elevationMin_ = 0;
     elevationMax_ = 0;
-    groupSize_ = 0;
+    treeHeight_ = 0;
+    useZ_ = false;
+    onlyTrunks_ = false;
 
+    nPointsTotal_ = 0;
     nPointsInFilter_ = 0;
 
     voxels_.clear();
@@ -73,31 +77,52 @@ void SegmentationAction::clear()
 
 void SegmentationAction::start(double voxelSize,
                                double descriptor,
-                               double radius,
+                               double trunkRadius,
+                               double leafRadius,
                                double elevationMin,
                                double elevationMax,
-                               size_t groupSize)
+                               double treeHeight,
+                               bool useZ,
+                               bool onlyTrunks)
 {
     LOG_DEBUG(<< "Start.");
-
-    Range<double> elevationRange = editor_->elevationFilter();
-    double elevationDelta =
-        elevationRange.maximumValue() - elevationRange.minimumValue();
 
     // Set input parameters.
     voxelSize_ = voxelSize;
     descriptor_ = descriptor;
-    radius_ = radius;
-    elevationMin_ =
-        elevationRange.minimumValue() + (elevationMin * elevationDelta);
-    elevationMax_ =
-        elevationRange.minimumValue() + (elevationMax * elevationDelta);
-    groupSize_ = groupSize;
+    trunkRadius_ = trunkRadius;
+    leafRadius_ = leafRadius;
+    treeHeight_ = treeHeight;
+    useZ_ = useZ;
+    onlyTrunks_ = onlyTrunks;
 
-    LOG_DEBUG(<< "elevationRange <" << elevationRange << ">.");
+    // Elevation parameters.
+    double elevationFilterMin;
+    double elevationFilterMax;
+
+    if (useZ_)
+    {
+        Box<double> extent = editor_->boundary();
+        LOG_DEBUG(<< "extent <" << extent << ">.");
+        elevationFilterMin = extent.min(2);
+        elevationFilterMax = extent.max(2);
+    }
+    else
+    {
+        Range<double> elevationRange = editor_->elevationFilter();
+        LOG_DEBUG(<< "elevationRange <" << elevationRange << ">.");
+        elevationFilterMin = elevationRange.minimumValue();
+        elevationFilterMax = elevationRange.maximumValue();
+    }
+
+    double elevationDelta = elevationFilterMax - elevationFilterMin;
+
+    elevationMin_ = elevationFilterMin + (elevationMin * elevationDelta);
+    elevationMax_ = elevationFilterMin + (elevationMax * elevationDelta);
+
     LOG_DEBUG(<< "elevationDelta <" << elevationDelta << ">.");
-    LOG_DEBUG(<< "elevationMin_ <" << elevationMin_ << ">.");
-    LOG_DEBUG(<< "elevationMax_ <" << elevationMax_ << ">.");
+    LOG_DEBUG(<< "elevationMin <" << elevationMin_ << ">.");
+    LOG_DEBUG(<< "elevationMax <" << elevationMax_ << ">.");
 
     // Clear work data.
     nPointsTotal_ = editor_->datasets().nPoints();
@@ -296,10 +321,9 @@ void SegmentationAction::stepCreateTrees()
         {
             // If a voxel is not processed and meets
             // criteria (for wood), add it to the path.
-            if (voxels_[pointIndex_].group == SIZE_MAX &&
-                !(voxels_[pointIndex_].descriptor < descriptor_))
+            if (isTrunkVoxel(voxels_[pointIndex_]))
             {
-                groupMinimum_ = voxels_[pointIndex_].elevation;
+                startGroup(voxels_[pointIndex_]);
                 voxels_[pointIndex_].group = groupId_;
                 path_.push_back(pointIndex_);
             }
@@ -324,19 +348,16 @@ void SegmentationAction::stepCreateTrees()
             for (size_t i = idx; i < group_.size(); i++)
             {
                 Point &a = voxels_[group_[i]];
-                voxels_.findRadius(a.x, a.y, a.z, radius_, search_);
+                voxels_.findRadius(a.x, a.y, a.z, trunkRadius_, search_);
                 for (size_t j = 0; j < search_.size(); j++)
                 {
                     Point &b = voxels_[search_[j]];
                     // If a voxel in search radius is not processed and meets
                     // criteria (for wood), add it to group expansion.
-                    if (b.group == SIZE_MAX && !(b.descriptor < descriptor_))
+                    if (isTrunkVoxel(b))
                     {
+                        continueGroup(b);
                         b.group = groupId_;
-                        if (b.elevation < groupMinimum_)
-                        {
-                            groupMinimum_ = b.elevation;
-                        }
                         path_.push_back(search_[j]);
                     }
                 }
@@ -346,7 +367,8 @@ void SegmentationAction::stepCreateTrees()
             if (path_.empty())
             {
                 // If the current group meets some criteria:
-                if (group_.size() >= groupSize_ &&
+                double groupHeight = groupMaximum_ - groupMinimum_;
+                if (!(groupHeight < treeHeight_) &&
                     groupMinimum_ < elevationMax_)
                 {
                     // Mark this group as future layer.
@@ -377,6 +399,12 @@ void SegmentationAction::stepCreateTrees()
 
     progress_.setMaximumStep(voxels_.size(), 10);
     progress_.setValueSteps(SEGMENTATION_STEP_CONNECT_VOXELS);
+
+    if (onlyTrunks_)
+    {
+        progress_.setMaximumStep();
+        progress_.setValueSteps(SEGMENTATION_STEP_CREATE_LAYERS);
+    }
 }
 
 void SegmentationAction::stepConnectVoxels()
@@ -642,7 +670,7 @@ void SegmentationAction::findNearestNeighbor(Point &a)
     a.dist = std::numeric_limits<double>::max();
     a.next = SIZE_MAX;
 
-    voxels_.findRadius(a.x, a.y, a.z, radius_, search_);
+    voxels_.findRadius(a.x, a.y, a.z, leafRadius_, search_);
 
     for (size_t j = 0; j < search_.size(); j++)
     {
@@ -660,6 +688,51 @@ void SegmentationAction::findNearestNeighbor(Point &a)
                 a.dist = d;
                 a.next = search_[j];
             }
+        }
+    }
+}
+
+bool SegmentationAction::isTrunkVoxel(const Point &a)
+{
+    return a.group == SIZE_MAX && !(a.descriptor < descriptor_);
+}
+
+void SegmentationAction::startGroup(const Point &a)
+{
+    if (useZ_)
+    {
+        groupMinimum_ = a.z;
+    }
+    else
+    {
+        groupMinimum_ = a.elevation;
+    }
+
+    groupMaximum_ = groupMinimum_;
+}
+
+void SegmentationAction::continueGroup(const Point &a)
+{
+    if (useZ_)
+    {
+        if (a.z < groupMinimum_)
+        {
+            groupMinimum_ = a.z;
+        }
+        else if (a.z > groupMaximum_)
+        {
+            groupMaximum_ = a.z;
+        }
+    }
+    else
+    {
+        if (a.elevation < groupMinimum_)
+        {
+            groupMinimum_ = a.elevation;
+        }
+        else if (a.elevation > groupMaximum_)
+        {
+            groupMaximum_ = a.elevation;
         }
     }
 }

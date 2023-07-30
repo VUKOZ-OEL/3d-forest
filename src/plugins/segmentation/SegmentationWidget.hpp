@@ -30,6 +30,7 @@ class InfoDialog;
 
 #include <QWidget>
 class QPushButton;
+class QCheckBox;
 
 /** Segmentation Widget. */
 class SegmentationWidget : public QWidget
@@ -54,9 +55,12 @@ private:
 
     SliderWidget *voxelSizeSlider_;
     SliderWidget *descriptorSlider_;
-    SliderWidget *radiusSlider_;
+    SliderWidget *trunkRadiusSlider_;
+    SliderWidget *leafRadiusSlider_;
     RangeSliderWidget *elevationSlider_;
-    SliderWidget *groupSizeSlider_;
+    SliderWidget *treeHeightSlider_;
+    QCheckBox *useZCheckBox_;
+    QCheckBox *onlyTrunksCheckBox_;
 
     QPushButton *helpButton_;
     QPushButton *applyButton_;

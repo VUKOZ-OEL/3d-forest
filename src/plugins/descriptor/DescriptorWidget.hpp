@@ -25,6 +25,7 @@
 #include <DescriptorAction.hpp>
 class MainWindow;
 class SliderWidget;
+class InfoDialog;
 
 #include <QWidget>
 class QPushButton;
@@ -41,12 +42,15 @@ public:
 
 protected slots:
     void slotApply();
+    void slotHelp();
 
 protected:
     void hideEvent(QHideEvent *event) override;
 
 private:
     MainWindow *mainWindow_;
+    InfoDialog *infoDialog_;
+
     DescriptorAction descriptor_;
 
     SliderWidget *radiusSlider_;
@@ -54,6 +58,7 @@ private:
     QCheckBox *groundCheckBox_;
     std::vector<QRadioButton *> methodRadioButton_;
 
+    QPushButton *helpButton_;
     QPushButton *applyButton_;
 };
 

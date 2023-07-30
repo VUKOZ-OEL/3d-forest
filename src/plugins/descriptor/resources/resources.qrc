@@ -23,5 +23,8 @@
 <!-- Tool bar -->
 <file>descriptor_24px_color.png</file>
 
+<!-- Images -->
+<file>descriptor_density.png</file>
+
 </qresource>
 </RCC>

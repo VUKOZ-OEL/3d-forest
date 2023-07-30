@@ -37,10 +37,13 @@ public:
 
     void start(double voxelSize,
                double descriptor,
-               double radius,
+               double trunkRadius,
+               double leafRadius,
                double elevationMin,
                double elevationMax,
-               size_t groupSize);
+               double treeHeight,
+               bool useZ,
+               bool onlyTrunks);
 
     virtual void next();
 
@@ -53,10 +56,13 @@ private:
 
     double voxelSize_;
     double descriptor_;
-    double radius_;
+    double trunkRadius_;
+    double leafRadius_;
     double elevationMin_;
     double elevationMax_;
-    size_t groupSize_;
+    double treeHeight_;
+    bool useZ_;
+    bool onlyTrunks_;
 
     uint64_t nPointsTotal_;
     uint64_t nPointsInFilter_;
@@ -72,6 +78,9 @@ private:
 
     void createVoxel();
     void findNearestNeighbor(Point &a);
+    bool isTrunkVoxel(const Point &a);
+    void startGroup(const Point &a);
+    void continueGroup(const Point &a);
 
     Points voxels_;
     std::map<size_t, size_t> groups_;
@@ -81,6 +90,7 @@ private:
     size_t pointIndex_;
     size_t groupId_;
     double groupMinimum_;
+    double groupMaximum_;
 };
 
 #endif /* SEGMENTATION_ACTION_HPP */
