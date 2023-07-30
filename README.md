@@ -16,6 +16,9 @@ See [LICENSE](LICENSE) for more information.
 HTML [Documentation](https://vukoz-oel.github.io/3d-forest-documentation/3d-forest-user-manual.html)
 with User Manual and Developer Guide.
 
+## Algorithms
+- [Segmentation](https://vukoz-oel.github.io/3d-forest-documentation/3d-forest-user-manual.html#tools-segmentation)
+
 ## Build
 The code uses C++17, CMake, Qt5 or Qt6 and OpenGL.
 ```

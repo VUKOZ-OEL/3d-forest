@@ -328,7 +328,7 @@ OPTIMIZE_OUTPUT_VHDL   = NO
 #
 # newflag
 
-# MARKDOWN_SUPPORT       = YES
+MARKDOWN_SUPPORT       = YES
 
 # When enabled doxygen tries to link words that correspond to documented
 # classes, or namespaces to their corresponding documentation. Such a link can
