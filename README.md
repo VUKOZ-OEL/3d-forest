@@ -17,6 +17,7 @@ HTML [Documentation](https://vukoz-oel.github.io/3d-forest-documentation/3d-fore
 with User Manual and Developer Guide.
 
 ## Algorithms
+- [Classification](https://vukoz-oel.github.io/3d-forest-documentation/3d-forest-user-manual.html#tools-classification)
 - [Segmentation](https://vukoz-oel.github.io/3d-forest-documentation/3d-forest-user-manual.html#tools-segmentation)
 
 ## Build
