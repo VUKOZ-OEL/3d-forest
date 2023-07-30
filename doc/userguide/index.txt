@@ -25,4 +25,69 @@ These documents describe how to use 3D Forest application.
 3D Forest Screenshot:
 @image html 3d-forest.png "3D Forest application"
 
+@section tools Tools
+
+@subsection tools-segmentation Automatic Segmentation Tool
+
+@subsubsection tools-segmentation-overview Segmentation Overview
+
+This tool identifies trees in point cloud.
+The basic idea of used segmentation algorithm is the same as in
+the original 3D Forest paper.
+The algorithm is based on point descriptors and connections
+between nearest neighbors.
+Both algorithms are specialized to classify LiDAR point clouds
+of complex natural forest environments.
+<br>
+
+This tool requires either pre-computed
+ground classification and point elevation values
+or to use enabled option
+<i>'Use z-coordinate instead of ground elevation'</i>.
+Pre-computed descriptor values are always required.
+<br><br>
+@image html 3d-forest-segmentation.png "3D Forest: Example dataset with calculated segmentation"
+
+
+@subsubsection tools-segmentation-steps Segmentation Steps
+
+Segmentation steps are described on the image below.
+<br>
+@image html 3d-forest-segmentation-steps.png "3D Forest: a) Original unsegmented dataset. b) Shows pre-calculated descriptors from black (low) to white (high). Descriptors with high value should describe trunks. c) Shows the effect of option 'Find only trunks'. 3 trunks are identified. d) Shows the final result of segmented dataset. Unsegmented (disconnected and ground) points are hidden. These points are assigned to main layer."
+
+@subsubsection tools-segmentation-gui Segmentation GUI
+
+@image html 3d-forest-segmentation-gui.png "3D Forest Segmentation GUI"
+
+@subsubsection tools-segmentation-algorithm Segmentation Algorithm
+
+<ol>
+<li>Voxelize the dataset.</li>
+<li>Detect individual trunks by using search radius
+to connect voxels which have descriptor values above
+user provided threshold. Assign a unique layer value
+to each detected trunk.</li>
+<li>Repeat the following for all remaining voxels:
+<ol>
+<li>Start at the next unprocessed voxel. The position
+of this voxel is random because the voxels are ordered
+by multi-layer octal-tree. This voxel creates new
+voxel group.</li>
+<li>Find minimum spanning tree from this voxel until a voxel with
+existing layer value is reached.
+The spanning tree is calculated by iteratively appending
+the next nearest neighbor to the current voxel group.</li>
+<li>Set layer value of all voxels in this voxel group
+to layer value from terminating voxel. This connects
+spanning trees to trunks. Connected voxels are marked
+as processed.</li>
+</ol>
+</li>
+<li>Layer values from voxels are applied back to the
+dataset.</li>
+</ol>
+<br>
+
+@image html 3d-forest-segmentation-alg.png "3D Forest: Top: The first step is segmentation of trunks. 'Descriptor threshold' is set to 0.5 (50 %). Bottom: The second step is segmentation of leaves and small branches which are connected to some trunk."
+
 */
