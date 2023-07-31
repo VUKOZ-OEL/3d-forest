@@ -119,7 +119,7 @@ Build Using "MinGW Makefiles" on Windows
     - Run
         executables can be found in directory bin
     - Extra command: Generate API documentation
-        > mingw32-make doxygen
+        > mingw32-make doc
     - Extra command: Reformat all source files
         > mingw32-make format
 

@@ -27,7 +27,6 @@
 #include <ThemeIcon.hpp>
 
 #include <QHBoxLayout>
-#include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
 
@@ -80,8 +79,6 @@ ElevationWidget::ElevationWidget(MainWindow *mainWindow)
 
     // Main layout
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(new QLabel(tr("This tool requires pre-computed"
-                                        " \nground classification.")));
     mainLayout->addLayout(settingsLayout);
     mainLayout->addSpacing(10);
     mainLayout->addLayout(buttonsLayout);
@@ -125,28 +122,31 @@ void ElevationWidget::slotApply()
 
 void ElevationWidget::slotHelp()
 {
-    QString t = "<h3>Elevation Tool</h3>"
-                "This tool calculates elevation of points above ground. "
-                "It uses new algorithm which is specialized to classify "
-                "LiDAR point clouds of complex natural forest environments. "
-                "The algorithm uses 2D projection to deal with "
-                "missing ground data in non scanned or obstructed parts. "
-                "Elevation is additional point attribute added by 3D Forest. "
-                "<br><br>"
-                "<img src=':/elevation/elevation.png'/>"
-                "<div>Example dataset with calculated elevation.</div>"
-                ""
-                "<h3>Algorithm</h3>"
-                "<ol>"
-                "<li>Voxelize all ground points from the dataset.</li>"
-                "<li>Create 2D quad-tree spatial index from 3D voxels."
-                " Two dimensional quad-tree is created by ignoring"
-                " z coordinates.</li>"
-                "<li>Iterate all non-ground points, use their (x, y)"
-                " coordinates to find nearest neighbor in the ground"
-                " quad-tree and set elevation as difference between z"
-                " coordinates of nearest ground voxel and iterated point.</li>"
-                "</ol>";
+    QString t;
+    t = "<h3>Elevation Tool</h3>"
+        "This tool calculates elevation of points above ground. "
+        "It uses new algorithm which is specialized to classify "
+        "LiDAR point clouds of complex natural forest environments. "
+        "The algorithm uses 2D projection to deal with "
+        "missing ground data in non scanned or obstructed parts. "
+        "Elevation is additional point attribute added by 3D Forest. "
+        "<br>"
+        "This tool requires pre-computed ground classification."
+        "<br><br>"
+        "<img src=':/elevation/elevation.png'/>"
+        "<div>Example dataset with calculated elevation.</div>"
+        ""
+        "<h3>Elevation Algorithm</h3>"
+        "<ol>"
+        "<li>Voxelize all ground points from the dataset.</li>"
+        "<li>Create 2D quad-tree spatial index from 3D voxels."
+        " Two dimensional quad-tree is created by ignoring"
+        " z coordinates.</li>"
+        "<li>Iterate all non-ground points, use their (x, y)"
+        " coordinates to find nearest neighbor in the ground"
+        " quad-tree and set elevation as difference between z"
+        " coordinates of nearest ground voxel and iterated point.</li>"
+        "</ol>";
 
     if (!infoDialog_)
     {

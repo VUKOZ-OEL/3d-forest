@@ -27,24 +27,27 @@ These documents describe how to use 3D Forest application.
 
 @section tools Tools
 
+<!-- ======================================================================= -->
+<!-- ======================================================================= -->
 @subsection tools-classification Classification Tool
 
 @subsubsection tools-classification-overview Classification Overview
 
-This tool calculates classification of ground points.
+Classification tool calculates classification of ground points.
 It uses new algorithm which is specialized to classify
 LiDAR point clouds of complex natural forest environments.
 The algorithm is based on global minimum to deal with
 missing data in non scanned or obstructed parts.
-<br>
 
 @image html 3d-forest-classification.png "3D Forest Classification: Example dataset with classified ground."
 
+<!-- ======================================================================= -->
 @subsubsection tools-classification-gui Classification GUI
 
 @image html 3d-forest-classification-gui.png "3D Forest Classification GUI"
 
-@subsubsection tools-classification-algorithm Classification Algorithm
+<!-- ======================================================================= -->
+@subsubsection tools-classification-algorithm Ground Classification Algorithm
 
 <ol>
 <li>Voxelize the dataset.</li>
@@ -59,44 +62,116 @@ when it searched for its neighbors.</li>
 <li>All voxels in W are classified as ground points.</li>
 <li>Voxel values are applied back to the dataset.</li>
 </ol>
-<br>
 
-@image html 3d-forest-classification-algorithm.png "3D Forest Classification Algorithm"
+@image html 3d-forest-classification-algorithm.png "3D Forest Ground Classification Algorithm"
 
+<!-- ======================================================================= -->
+<!-- ======================================================================= -->
+@subsection tools-descriptor Descriptor Tool
 
+@subsubsection tools-descriptor-overview Descriptor Tool Overview
+
+Descriptor tool calculates point descriptor values.
+Descriptors are calculated from <i>'Neighborhood Radius'</i>
+of each point. The point cloud can be voxelized to speed up
+the calculation. There are several methods to choose from.
+Basic <i>'Density Method'</i> calculates global density of each
+voxel. Calculated descriptors are normalized to range from
+zero (global minimum) to one (global maximum).
+
+Descriptor is additional point attribute added by 3D Forest.
+
+@image html 3d-forest-descriptor-density.png "3D Forest Descriptor Tool: Example dataset (Before) with calculated density descriptors (After)."
+
+<!-- ======================================================================= -->
+@subsubsection tools-descriptor-gui Descriptor Tool GUI
+
+@image html 3d-forest-descriptor-gui.png "3D Forest Descriptor Tool GUI"
+
+<!-- ======================================================================= -->
+@subsubsection tools-descriptor-algorithm-density Density Descriptor Algorithm
+
+Count the number of points in <i>'Neighborhood Radius'</i>.
+
+<!-- ======================================================================= -->
+@subsubsection tools-descriptor-algorithm-pca-intensity PCA Intensity Descriptor Algorithm
+
+Calculate PCA of points in <i>'Neighborhood Radius'</i>.
+Descriptor value is ratio between length of longest projected
+eigen vector to sum of lengths of all projected eigen vectors.
+
+<!-- ======================================================================= -->
+<!-- ======================================================================= -->
+@subsection tools-elevation Elevation Tool
+
+@subsubsection tools-elevation-overview Elevation Overview
+
+Elevation tool calculates elevation of points above ground.
+It uses new algorithm which is specialized to classify
+LiDAR point clouds of complex natural forest environments.
+The algorithm uses 2D projection to deal with
+missing ground data in non scanned or obstructed parts.
+Elevation is additional point attribute added by 3D Forest.
+
+Elevation tool requires pre-computed ground classification.
+
+@image html 3d-forest-elevation.png "3D Forest Elevation Tool: Example dataset with calculated elevation."
+
+<!-- ======================================================================= -->
+@subsubsection tools-elevation-gui Elevation Tool GUI
+
+@image html 3d-forest-elevation-gui.png "3D Forest Elevation Tool GUI"
+
+<!-- ======================================================================= -->
+@subsubsection tools-elevation-algorithm 3D Point Elevation Algorithm Above Ground
+
+<ol>
+<li>Voxelize all ground points from the dataset.</li>
+<li>Create 2D quad-tree spatial index from 3D voxels.
+Two dimensional quad-tree is created by ignoring
+z coordinates.</li>
+<li>Iterate all non-ground points, use their (x, y)
+coordinates to find nearest neighbor in the ground
+quad-tree and set elevation as difference between z
+coordinates of nearest ground voxel and iterated point.</li>
+</ol>
+
+<!-- ======================================================================= -->
+<!-- ======================================================================= -->
 @subsection tools-segmentation Automatic Segmentation Tool
 
 @subsubsection tools-segmentation-overview Segmentation Overview
 
-This tool identifies trees in point cloud.
+Segmentation tool identifies trees in point cloud.
 The basic idea of used segmentation algorithm is the same as in
 the original 3D Forest paper.
 The algorithm is based on point descriptors and connections
 between nearest neighbors.
 Both algorithms are specialized to classify LiDAR point clouds
 of complex natural forest environments.
-<br>
 
-This tool requires either pre-computed
+Segmentation tool requires either pre-computed
 ground classification and point elevation values
 or to use enabled option
 <i>'Use z-coordinate instead of ground elevation'</i>.
 Pre-computed descriptor values are always required.
-<br><br>
-@image html 3d-forest-segmentation.png "3D Forest: Example dataset with calculated segmentation"
 
+@image html 3d-forest-segmentation.png "3D Forest Segmentation: Example dataset with calculated segmentation"
 
+<!-- ======================================================================= -->
 @subsubsection tools-segmentation-steps Segmentation Steps
 
 Segmentation steps are described on the image below.
-<br>
-@image html 3d-forest-segmentation-steps.png "3D Forest: a) Original unsegmented dataset. b) Shows pre-calculated descriptors from black (low) to white (high). Descriptors with high value should describe trunks. c) Shows the effect of option 'Find only trunks'. 3 trunks are identified. d) Shows the final result of segmented dataset. Unsegmented (disconnected and ground) points are hidden. These points are assigned to main layer."
 
+@image html 3d-forest-segmentation-steps.png "3D Forest Segmentation Steps: a) Original unsegmented dataset. b) Shows pre-calculated descriptors from black (low) to white (high). Descriptors with high value should describe trunks. c) Shows the effect of option 'Find only trunks'. 3 trunks are identified. d) Shows the final result of segmented dataset. Unsegmented (disconnected and ground) points are hidden. These points are assigned to main layer."
+
+<!-- ======================================================================= -->
 @subsubsection tools-segmentation-gui Segmentation GUI
 
 @image html 3d-forest-segmentation-gui.png "3D Forest Segmentation GUI"
 
-@subsubsection tools-segmentation-algorithm Segmentation Algorithm
+<!-- ======================================================================= -->
+@subsubsection tools-segmentation-algorithm Tree Segmentation Algorithm
 
 <ol>
 <li>Voxelize the dataset.</li>
@@ -123,8 +198,8 @@ as processed.</li>
 <li>Layer values from voxels are applied back to the
 dataset.</li>
 </ol>
-<br>
 
-@image html 3d-forest-segmentation-algorithm.png "3D Forest: Top: The first step is segmentation of trunks. 'Descriptor threshold' is set to 0.5 (50 %). Bottom: The second step is segmentation of leaves and small branches which are connected to some trunk."
+@image html 3d-forest-segmentation-algorithm.png "3D Forest Tree Segmentation Algorithm: Top: The first step is segmentation of trunks. 'Descriptor threshold' is set to 0.5 (50 %). Bottom: The second step is segmentation of leaves and small branches which are connected to some trunk."
 
+<!-- ======================================================================= -->
 */
