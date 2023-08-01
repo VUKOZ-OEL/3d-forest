@@ -33,11 +33,11 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="0.53795867"
-     inkscape:cx="361.55194"
-     inkscape:cy="568.81694"
+     inkscape:cx="423.82438"
+     inkscape:cy="544.65151"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
-     inkscape:window-x="-8"
+     inkscape:window-x="1912"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1" />
@@ -458,8 +458,8 @@
     <rect
        x="297.06024"
        y="402.21431"
-       width="135.38582"
-       height="130.12816"
+       width="132.75697"
+       height="78.208338"
        id="rect3204" />
     <rect
        x="297.06024"
@@ -524,7 +524,7 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect1281);display:inline;fill:#cc0000;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18372">Trunk 2</tspan></text>
+         id="tspan1851">Trunk 2</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,-27.570001,29.82238)"
@@ -532,7 +532,7 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect1389);display:inline;fill:#3465a4;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18374">Trunk max distance dT</tspan></text>
+         id="tspan1853">Trunk max distance dT</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,-42.542264,-57.752913)"
@@ -540,7 +540,7 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect1734);display:inline;fill:#2e3436;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18376">0.4</tspan></text>
+         id="tspan1855">0.4</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,-15.286196,-0.61143218)"
@@ -548,7 +548,7 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect1911);display:inline;fill:#3465a4;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18378">Trunk 1</tspan></text>
+         id="tspan1857">Trunk 1</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,23.610192,70.49999)"
@@ -556,11 +556,11 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect2075);display:inline;fill:#888a85;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18380">dist (A, B)
+         id="tspan1859">dist (A, B)
 </tspan><tspan
          x="297.06055"
          y="448.09753"
-         id="tspan18382">&gt; dist (A, C)</tspan></text>
+         id="tspan1861">&gt; dist (A, C)</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,-20.734289,-49.388832)"
@@ -568,7 +568,7 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect436);display:inline;fill:#2e3436;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18384">0.6</tspan></text>
+         id="tspan1863">0.6</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,-24.80573,-29.930899)"
@@ -576,7 +576,7 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect444);display:inline;fill:#2e3436;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18386">0.7</tspan></text>
+         id="tspan1865">0.7</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,-22.023529,-65.056192)"
@@ -584,7 +584,7 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect502);display:inline;fill:#2e3436;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18388">0.8</tspan></text>
+         id="tspan1867">0.8</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,-19.936877,-10.803264)"
@@ -592,7 +592,7 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect510);display:inline;fill:#2e3436;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18390">0.6</tspan></text>
+         id="tspan1869">0.6</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,72.59567,-47.941344)"
@@ -600,7 +600,7 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect537);display:inline;fill:#2e3436;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18392">0.8</tspan></text>
+         id="tspan1871">0.8</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,69.729084,-34.01286)"
@@ -608,7 +608,7 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect539);display:inline;fill:#2e3436;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18394">0.6</tspan></text>
+         id="tspan1873">0.6</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,74.597936,-65.660401)"
@@ -616,15 +616,15 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect541);display:inline;fill:#2e3436;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18396">0.7</tspan></text>
+         id="tspan1875">0.7</tspan></text>
     <text
        xml:space="preserve"
-       transform="matrix(0.26458333,0,0,0.26458333,64.860232,-16.971876)"
+       transform="matrix(0.26458333,0,0,0.26458333,82.811967,-16.725962)"
        id="text535"
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect543);display:inline;fill:#2e3436;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18398">0.9</tspan></text>
+         id="tspan1877">0.9</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,56.861402,-56.966022)"
@@ -632,7 +632,7 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect653);display:inline;fill:#2e3436;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18400">0.2</tspan></text>
+         id="tspan1879">0.2</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,42.950395,-67.217885)"
@@ -640,7 +640,7 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect661);display:inline;fill:#2e3436;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18402">0.1</tspan></text>
+         id="tspan1881">0.1</tspan></text>
     <circle
        style="fill:#cc0000;fill-opacity:1;stroke:none;stroke-width:0.264583;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"
        id="circle512"
@@ -684,7 +684,7 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect669);display:inline;fill:#2e3436;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18404">0.3</tspan></text>
+         id="tspan1883">0.3</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,7.1895858,-51.49296)"
@@ -692,7 +692,7 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect677);display:inline;fill:#2e3436;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18406">0.2</tspan></text>
+         id="tspan1885">0.2</tspan></text>
     <circle
        style="fill:none;fill-opacity:1;stroke:#4e9a06;stroke-width:1;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dasharray:none;stroke-dashoffset:0.32;stroke-opacity:1;paint-order:fill markers stroke"
        id="circle781"
@@ -706,7 +706,7 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect869);display:inline;fill:#cc0000;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18408">Trunk 2</tspan></text>
+         id="tspan1887">Trunk 2</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,9.5377891,125.65697)"
@@ -714,7 +714,7 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect871);display:inline;fill:#4e9a06;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18410">Leaf max distance dL</tspan></text>
+         id="tspan1889">Leaf max distance dL</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,-17.025072,148.70421)"
@@ -722,7 +722,7 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect875);display:inline;fill:#3465a4;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18412">Trunk 1</tspan></text>
+         id="tspan1891">Trunk 1</tspan></text>
     <circle
        style="fill:#3465a4;fill-opacity:1;stroke:none;stroke-width:0.264583;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"
        id="circle797"
@@ -772,7 +772,7 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect907);display:inline;fill:#2e3436;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18414">0.2</tspan></text>
+         id="tspan1893">0.2</tspan></text>
     <circle
        style="fill:#babdb6;fill-opacity:1;stroke:none;stroke-width:0.264583;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"
        id="circle428"
@@ -885,7 +885,7 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect1962);display:inline;fill:#2e3436;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18416">B</tspan></text>
+         id="tspan1895">B</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,30.649301,96.050178)"
@@ -893,7 +893,7 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect1968);display:inline;fill:#2e3436;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18418">A</tspan></text>
+         id="tspan1897">A</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,16.871421,106.74748)"
@@ -901,7 +901,7 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect1974);display:inline;fill:#2e3436;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18420">C</tspan></text>
+         id="tspan1899">C</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,16.296604,89.314813)"
@@ -909,7 +909,7 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect1980);display:inline;fill:#3465a4;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18422">NN</tspan></text>
+         id="tspan1901">NN</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,6.1631918,96.755527)"
@@ -917,7 +917,7 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect1986);display:inline;fill:#3465a4;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18424">NN</tspan></text>
+         id="tspan1903">NN</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,-55.728182,108.43475)"
@@ -925,14 +925,14 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect1992);display:inline;fill:#3465a4;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18426">NN from D connects </tspan><tspan
+         id="tspan1905">NN from D connects </tspan><tspan
          x="297.06055"
          y="448.09753"
-         id="tspan18428">(A,C,D) group to
+         id="tspan1907">(A,C,D) group to
 </tspan><tspan
          x="297.06055"
          y="474.76416"
-         id="tspan18430">trunk 1</tspan></text>
+         id="tspan1909">trunk 1</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,2.9218253,114.95217)"
@@ -940,7 +940,7 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect1998);display:inline;fill:#2e3436;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18432">D</tspan></text>
+         id="tspan1911">D</tspan></text>
     <path
        style="fill:none;fill-opacity:1;stroke:#babdb6;stroke-width:1;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dasharray:3, 3;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke"
        d="M 22.628,149.58625 H 187.372"
@@ -953,8 +953,8 @@
        cy="92.347588"
        r="34.951405" />
     <path
-       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:1;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke;marker-end:url(#Arrow1);marker-start:url(#marker1618)"
-       d="m 108.82616,95.286347 11.42587,-0.660084"
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:1;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-start:url(#marker1618);marker-end:url(#Arrow1);paint-order:fill markers stroke"
+       d="M 76.830844,98.068548 152.59849,93.456361"
        id="path1534"
        sodipodi:nodetypes="cc" />
     <text
@@ -964,27 +964,24 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect3166);display:inline;fill:#ef2929;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18434">Trunk max distance dT</tspan></text>
+         id="tspan1913">Trunk max distance dT</tspan></text>
     <text
        xml:space="preserve"
-       transform="matrix(0.26458333,0,0,0.26458333,-2.125171,-34.474294)"
+       transform="matrix(0.26458333,0,0,0.26458333,-7.3417986,-34.300406)"
        id="text3202"
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect3204);display:inline;fill:#888a85;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18436">below
+         id="tspan1915">0.3 below
 </tspan><tspan
          x="297.06055"
          y="448.09753"
-         id="tspan18438">descriptor
+         id="tspan1917">descriptor
 </tspan><tspan
          x="297.06055"
          y="474.76416"
-         id="tspan18440">threshold
-</tspan><tspan
-         x="297.06055"
-         y="501.43079"
-         id="tspan18442">  0.3 &lt; 0.5</tspan></text>
+         id="tspan1919">threshold 0.5
+</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,30.463428,-6.8679011)"
@@ -992,19 +989,19 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect1918);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18444">Not
+         id="tspan1921">Not
 </tspan><tspan
          x="297.06055"
          y="448.09753"
-         id="tspan18446">same
+         id="tspan1923">same
 </tspan><tspan
          x="297.06055"
          y="474.76416"
-         id="tspan18448">trunk
+         id="tspan1925">trunk
 </tspan><tspan
          x="297.06055"
          y="501.43079"
-         id="tspan18450">d &gt; 0</tspan></text>
+         id="tspan1927">d &gt; dT</tspan></text>
     <circle
        style="fill:#babdb6;fill-opacity:1;stroke:none;stroke-width:0.264583;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"
        id="circle8648"
@@ -1018,15 +1015,15 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect8652);display:inline;fill:#888a85;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18452">Outside max
+         id="tspan1929">Outside max
 </tspan><tspan
          x="297.06055"
          y="448.09753"
-         id="tspan18454">leaf distance,
+         id="tspan1931">leaf distance,
 </tspan><tspan
          x="297.06055"
          y="474.76416"
-         id="tspan18456">dist NN (E) &gt; dL</tspan></text>
+         id="tspan1933">dist NN (E) &gt; dL</tspan></text>
     <circle
        style="fill:#babdb6;fill-opacity:1;stroke:none;stroke-width:0.264583;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"
        id="circle10846"
@@ -1046,7 +1043,7 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect10854);display:inline;fill:#2e3436;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18458">0.9</tspan></text>
+         id="tspan1935">0.9</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,38.216749,-92.900524)"
@@ -1054,11 +1051,11 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect10888);display:inline;fill:#888a85;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18460">Not trunk, outside trunk
+         id="tspan1937">Not trunk, outside trunk
 </tspan><tspan
          x="297.06055"
          y="448.09753"
-         id="tspan18462">elevation range</tspan></text>
+         id="tspan1939">elevation range</tspan></text>
     <circle
        style="fill:#babdb6;fill-opacity:1;stroke:none;stroke-width:0.264583;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"
        id="circle10924"
@@ -1072,7 +1069,7 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect12852);display:inline;fill:#888a85;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18464">E</tspan></text>
+         id="tspan1941">E</tspan></text>
     <path
        style="fill:#000000;fill-opacity:1;stroke:#73d216;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:1;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-start:url(#Stop);marker-end:url(#marker13608);paint-order:fill markers stroke"
        d="m 32.351967,69.537384 0.297064,50.115086"
@@ -1085,15 +1082,15 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect13716);display:inline;fill:#4e9a06;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan18466">Trunk
+         id="tspan1943">Trunk
 </tspan><tspan
          x="297.06055"
          y="448.09753"
-         id="tspan18468">elevation
+         id="tspan1945">elevation
 </tspan><tspan
          x="297.06055"
          y="474.76416"
-         id="tspan18470">range</tspan></text>
+         id="tspan1947">range</tspan></text>
   </g>
   <metadata
      id="metadata410">
