@@ -21,6 +21,8 @@
 
 #include <cstdio>
 
+#define _POSIX_THREAD_SAFE_FUNCTIONS
+
 #if defined(_MSC_VER)
     #include <windows.h>
 #else
@@ -85,23 +87,54 @@ void Time::msleep(long milliseconds)
 
 std::string Time::strftime(const char *format)
 {
-    // Get and convert a time_t time value to 'timeNowData' tm structure,
-    // and correct for the local time zone.
-    struct std::tm timeNowData;
 #if defined(_MSC_VER)
-    __time64_t timeNow = 0;
-    _time64(&timeNow);
-    (void)_localtime64_s(&timeNowData, &timeNow);
-#else
-    std::time_t timeNow = std::time(nullptr);
-    (void)localtime_s(&timeNowData, &timeNow);
-    //(void)localtime_r(&timeNow, &timeNowData);
-#endif /* _MSC_VER */
+    // Get the current system date and time in UTC format.
+    FILETIME utp;
+    GetSystemTimeAsFileTime(&utp);
 
-    // Format tm structure to the string buffer.
+    // Convert UTC-based time into a local time.
+    FILETIME ltp;
+    FileTimeToLocalFileTime(&utp, &ltp);
+
+    // Convert Epoch time into a month, day, year, weekday, hour, etc.
+    SYSTEMTIME stp;
+    FileTimeToSystemTime(&ltp, &stp);
+
+    // Format date and time structure to a character string.
     char buffer[128];
-    (void)std::strftime(buffer, sizeof(buffer), format, &timeNowData);
+    (void)std::snprintf(buffer,
+                        sizeof(buffer),
+                        "%04d-%02d-%02d %02d:%02d:%02d.%03d",
+                        static_cast<int>(stp.wYear),
+                        static_cast<int>(stp.wMonth),
+                        static_cast<int>(stp.wDay),
+                        static_cast<int>(stp.wHour),
+                        static_cast<int>(stp.wMinute),
+                        static_cast<int>(stp.wSecond),
+                        static_cast<int>(stp.wMilliseconds));
 
     // Return formatted time string.
     return std::string(buffer);
+#else
+    // Get the number of seconds and microseconds since the Epoch.
+    struct timeval tp;
+    (void)::gettimeofday(&tp, nullptr);
+
+    // Convert the number of seconds since the Epoch into local calendar time.
+    std::time_t seconds = static_cast<std::time_t>(tp.tv_sec);
+    struct std::tm calendarTime;
+    (void)localtime_r(&seconds, &calendarTime);
+
+    // Convert calendar time to a character string like '2020-06-05 08:20:35'.
+    char timeString[128];
+    (void)std::strftime(timeString, sizeof(timeString), format, &calendarTime);
+
+    // Append milliseconds. Example result '2020-06-05 08:20:35.037'.
+    char buffer[160];
+    int ms = static_cast<int>(tp.tv_usec / 1000);
+    (void)std::snprintf(buffer, sizeof(buffer), "%s.%03d", timeString, ms);
+
+    // Return formatted time string.
+    return std::string(buffer);
+#endif /* _MSC_VER */
 }
