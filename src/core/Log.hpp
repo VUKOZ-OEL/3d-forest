@@ -100,7 +100,7 @@ public:
 };
 
 /** Logger For File Output. */
-class LoggerFile : public LogThreadCallbackInterface
+class EXPORT_CORE LoggerFile : public LogThreadCallbackInterface
 {
 public:
     LoggerFile(const std::string &fileName);
