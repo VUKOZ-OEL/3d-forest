@@ -22,6 +22,8 @@
 #ifndef RANGE_HPP
 #define RANGE_HPP
 
+#include <array>
+
 #include <Json.hpp>
 #include <Util.hpp>
 
