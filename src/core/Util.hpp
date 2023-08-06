@@ -22,8 +22,8 @@
 #ifndef UTIL_HPP
 #define UTIL_HPP
 
-#include <string>
 #include <climits>
+#include <string>
 
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>
