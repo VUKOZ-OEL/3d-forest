@@ -22,6 +22,7 @@
 #ifndef PROGRESS_COUNTER_HPP
 #define PROGRESS_COUNTER_HPP
 
+#include <cstddef>
 #include <cstdint>
 #include <vector>
 

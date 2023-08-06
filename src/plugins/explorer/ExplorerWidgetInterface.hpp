@@ -25,6 +25,7 @@
 #include <SettingsView.hpp>
 class MainWindow;
 
+#include <QIcon>
 #include <QWidget>
 class QLabel;
 class QVBoxLayout;

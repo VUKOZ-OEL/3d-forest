@@ -22,6 +22,7 @@
 #ifndef UTIL_HPP
 #define UTIL_HPP
 
+#include <climits>
 #include <string>
 
 #include <ExportCore.hpp>
