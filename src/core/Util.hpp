@@ -23,6 +23,7 @@
 #define UTIL_HPP
 
 #include <string>
+#include <climits>
 
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>

@@ -26,6 +26,7 @@
 class MainWindow;
 
 #include <QWidget>
+#include <QIcon>
 class QLabel;
 class QVBoxLayout;
 

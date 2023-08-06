@@ -23,6 +23,7 @@
 #define QUERY_FILTER_SET_HPP
 
 #include <cstdint>
+#include <cstddef>
 #include <unordered_set>
 
 #include <ExportEditor.hpp>

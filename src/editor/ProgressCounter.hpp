@@ -23,6 +23,7 @@
 #define PROGRESS_COUNTER_HPP
 
 #include <cstdint>
+#include <cstddef>
 #include <vector>
 
 #include <ExportEditor.hpp>
