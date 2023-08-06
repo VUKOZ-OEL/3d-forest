@@ -101,16 +101,18 @@ using APIs in 3D Forest and other libraries.
 The code uses C++17, CMake, Qt5/Qt6 and OpenGL which will be installed in the
 following steps. Qt and OpenGL are required only for GUI desktop application.
 
+@image html 3d-forest-linux.png "3D Forest application on Debian 12 (with LXQt desktop)"
+
 @subsection build-linux-make-qt Install Qt
     - Download Qt installer from https://www.qt.io/download
         - Clicked "Downloads for open source users" button in "Go open source"
         - Clicked "Download the Qt Online Installer" button in bottom section
           of the page "Looking for Qt binaries"
         - Recommended download was "Qt Online Installer for Linux (64-bit)"
-        - "Download" button saved file "qt-unified-linux-x64-4.1.1-online.run"
+        - "Download" button saved file "qt-unified-linux-x64-4.6.0-online.run"
     - Run the installer
         - Checked "make file executable" in file properties of downloaded file
-        - Open "qt-unified-linux-x64-4.1.1-online.run", shows "Qt Setup" window
+        - Open "qt-unified-linux-x64-4.6.0-online.run", shows "Qt Setup" window
         - Entered Qt Account Email and Password, "Next"
         - Checked "I have read" and "I am an individual person", "Next", "Next"
         - "/home/user/Qt" is directory where Qt will be installed, default
@@ -118,17 +120,19 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
         - Additionally checked: Qt - Qt 5.15.2 - Desktop gcc 64-bit
         - Additionally checked: Qt - Qt 5.15.2 - Sources
         - "Next", "Install", the installation took 13 minutes
+        - Qt installation will use 5.74 GB of disk space
 
 @subsection build-linux-make-opengl Installation of other tools: OpenGL and CMake from a terminal
     @verbatim
     $ sudo apt-get update
     $ sudo apt install mesa-common-dev libglu1-mesa-dev
     $ sudo apt install cmake
+    $ sudo apt install git
     @endverbatim
 
 @subsection build-linux-make-gcc Installation of other tools: gcc, g++, make, libc6-dev, etc.
     @verbatim
-    $ sudo apt-get install build-essential
+    $ sudo apt install build-essential
     @endverbatim
 
 @subsection build-linux-make-3dforest Build 3D Forest
@@ -152,7 +156,7 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
 -#  Start 3D Forest application
     @verbatim
     $ cd /home/user/3d-forest/bin
-    $ LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/3d-forest/bin:/home/user/Qt/5.15.2/gcc_64/lib ./3dforest
+    $ LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/3d-forest/bin:/home/user/Qt/5.15.2/gcc_64/lib ./3DForest
     @endverbatim
 
 -#  We can open example project "project.json" from directory
