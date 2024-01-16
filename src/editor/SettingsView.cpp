@@ -35,9 +35,8 @@ SettingsView::SettingsView()
                           "Return Number",
                           "Number of Returns",
                           "Classification",
-                          "Layer",
+                          "Segment",
                           "Elevation",
-                          "Custom Color",
                           "Descriptor"};
 
     colorSourceEnabled_.resize(colorSourceString_.size());

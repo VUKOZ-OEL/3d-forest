@@ -22,11 +22,14 @@
 #ifndef DATASET_HPP
 #define DATASET_HPP
 
+// 3D Forest
 #include <Box.hpp>
 #include <IndexFile.hpp>
 #include <Json.hpp>
+#include <LasFile.hpp>
 #include <SettingsImport.hpp>
 
+// Local
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 
@@ -58,7 +61,10 @@ public:
 
     uint64_t nPoints() const { return nPoints_; }
 
-    const IndexFile &index() const { return index_; }
+    const IndexFile &index() const { return *index_; }
+
+    const LasFile &las() const { return *las_; }
+    LasFile &las() { return *las_; }
 
     // I/O
     void read(size_t id,
@@ -89,7 +95,9 @@ protected:
     Vector3<double> scalingFile_;
     Box<double> boundaryFile_;
     Box<double> boundary_;
-    IndexFile index_;
+
+    std::shared_ptr<IndexFile> index_;
+    std::shared_ptr<LasFile> las_;
 
     void setPath(const std::string &path, const std::string &projectPath);
     void read();

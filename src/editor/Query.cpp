@@ -172,11 +172,10 @@ bool Query::nextPage()
             gpsTime_ = page_->gpsTime;
             color_ = page_->color;
 
-            layer_ = page_->layer;
+            segment_ = page_->segment;
             elevation_ = page_->elevation;
-            customColor_ = page_->customColor;
             descriptor_ = page_->descriptor;
-            value_ = page_->value;
+            voxel_ = page_->voxel;
 
             selection_ = page_->selection.data();
 

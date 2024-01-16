@@ -17,34 +17,34 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Layers.hpp */
+/** @file Segments.hpp */
 
-#ifndef LAYERS_HPP
-#define LAYERS_HPP
+#ifndef SEGMENTS_HPP
+#define SEGMENTS_HPP
 
 #include <unordered_map>
 
-#include <Layer.hpp>
+#include <Segment.hpp>
 
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 
-/** Layer List. */
-class EXPORT_EDITOR Layers
+/** Segment List. */
+class EXPORT_EDITOR Segments
 {
 public:
-    Layers();
+    Segments();
 
     void clear();
     void setDefault();
 
-    size_t size() const { return layers_.size(); }
-    const Layer &at(size_t i) const { return layers_[i]; }
+    size_t size() const { return segments_.size(); }
+    const Segment &at(size_t i) const { return segments_[i]; }
 
-    void push_back(const Layer &layer);
+    void push_back(const Segment &segment);
     void erase(size_t i);
 
-    size_t id(size_t i) const { return layers_[i].id(); }
+    size_t id(size_t i) const { return segments_[i].id(); }
     size_t index(size_t id) const
     {
         const auto &it = hashTableId_.find(id);
@@ -52,7 +52,7 @@ public:
         {
             return it->second;
         }
-        THROW("Invalid layer id");
+        THROW("Invalid segment id");
     }
 
     bool contains(size_t id) const
@@ -67,20 +67,23 @@ public:
 
     size_t unusedId() const;
 
-    const std::string &label(size_t i) const { return layers_[i].label(); }
+    const std::string &label(size_t i) const { return segments_[i].label(); }
     void setLabel(size_t i, const std::string &label);
 
-    const Vector3<double> &color(size_t i) const { return layers_[i].color(); }
+    const Vector3<double> &color(size_t i) const
+    {
+        return segments_[i].color();
+    }
     void setColor(size_t i, const Vector3<double> &color);
 
     void read(const Json &in);
     Json &write(Json &out) const;
 
 protected:
-    std::vector<Layer> layers_;
+    std::vector<Segment> segments_;
     std::unordered_map<size_t, size_t> hashTableId_;
 };
 
 #include <WarningsEnable.hpp>
 
-#endif /* LAYERS_HPP */
+#endif /* SEGMENTS_HPP */

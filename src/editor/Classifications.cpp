@@ -45,18 +45,19 @@ void Classifications::clear()
     resize(256);
 
     classes_[0].label = "Never classified";
-    classes_[1].label = "Unassigned";
+    classes_[1].label = "Unassigned"; // classified without a class
     classes_[2].label = "Ground";
     classes_[3].label = "Low Vegetation";
     classes_[4].label = "Medium Vegetation";
     classes_[5].label = "High Vegetation";
     classes_[6].label = "Building";
     classes_[7].label = "Low Point (Noise)";
-    classes_[8].label = "Reserved";
+    classes_[8].label = "Reserved"; // 1.1 Model Key-point (mass point)
     classes_[9].label = "Water";
     classes_[10].label = "Rail";
     classes_[11].label = "Road Surface";
-    classes_[12].label = "Reserved";
+    classes_[12].label = "Reserved"; // 1.1 Overlap Points, should set Withheld
+
     classes_[13].label = "Wire - Guard";
     classes_[14].label = "Wire - Conductor";
     classes_[15].label = "Transmission Tower";
@@ -68,6 +69,9 @@ void Classifications::clear()
     classes_[20].label = "Ignored Ground";
     classes_[21].label = "Snow";
     classes_[22].label = "Temporal Exclusion";
+
+    // Point formats 0 to 5 end with class 31, upper 3 bits are flags.
+    // Point formats starting from 6 end with class 255.
 
     for (size_t i = 23; i < 64; i++)
     {

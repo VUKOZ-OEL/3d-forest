@@ -1050,9 +1050,9 @@
       "translation": [-7.500000,-7.500000,0]
     }
   ],
-  "layers": {
+  "segments": {
     "enabled": false,
-    "layers": [
+    "segments": [
       {
         "color": [1,1,1],
         "enabled": true,

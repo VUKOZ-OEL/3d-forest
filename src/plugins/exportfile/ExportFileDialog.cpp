@@ -76,7 +76,7 @@ ExportFileDialog::ExportFileDialog(MainWindow *mainWindow,
     attributeCheckBox_[3] = new QCheckBox(tr("Color"));
     attributeCheckBox_[3]->setChecked(true);
 
-    attributeCheckBox_[4] = new QCheckBox(tr("Layer"));
+    attributeCheckBox_[4] = new QCheckBox(tr("Segment"));
     attributeCheckBox_[4]->setChecked(true);
 
     QVBoxLayout *attributeVBoxLayout = new QVBoxLayout;

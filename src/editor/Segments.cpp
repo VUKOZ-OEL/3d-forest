@@ -17,54 +17,54 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Layers.cpp */
+/** @file Segments.cpp */
 
-#include <Layers.hpp>
+#include <Segments.hpp>
 
-#define LOG_MODULE_NAME "Layers"
+#define LOG_MODULE_NAME "Segments"
 #include <Log.hpp>
 
-Layers::Layers()
+Segments::Segments()
 {
     setDefault();
 }
 
-void Layers::clear()
+void Segments::clear()
 {
     LOG_DEBUG(<< "Clear.");
-    layers_.clear();
+    segments_.clear();
     hashTableId_.clear();
 }
 
-void Layers::setDefault()
+void Segments::setDefault()
 {
     LOG_DEBUG(<< "Set default.");
     size_t id = 0;
     size_t idx = 0;
 
-    layers_.resize(1);
-    layers_[idx].set(id, "main", {1.0, 1.0, 1.0});
+    segments_.resize(1);
+    segments_[idx].set(id, "main", {1.0, 1.0, 1.0});
 
     hashTableId_.clear();
     hashTableId_[id] = idx;
 }
 
-void Layers::push_back(const Layer &layer)
+void Segments::push_back(const Segment &segment)
 {
-    LOG_DEBUG(<< "Append layer <" << layer << ">.");
-    size_t id = layer.id();
-    size_t idx = layers_.size();
+    LOG_DEBUG(<< "Append segment <" << segment << ">.");
+    size_t id = segment.id();
+    size_t idx = segments_.size();
 
-    layers_.push_back(layer);
+    segments_.push_back(segment);
 
     hashTableId_[id] = idx;
 }
 
-void Layers::erase(size_t i)
+void Segments::erase(size_t i)
 {
     LOG_DEBUG(<< "Erase item <" << i << ">.");
 
-    if (layers_.size() == 0)
+    if (segments_.size() == 0)
     {
         return;
     }
@@ -72,16 +72,16 @@ void Layers::erase(size_t i)
     size_t key = id(i);
     hashTableId_.erase(key);
 
-    size_t n = layers_.size() - 1;
+    size_t n = segments_.size() - 1;
     for (size_t pos = i; pos < n; pos++)
     {
-        layers_[pos] = layers_[pos + 1];
-        hashTableId_[layers_[pos].id()] = pos;
+        segments_[pos] = segments_[pos + 1];
+        hashTableId_[segments_[pos].id()] = pos;
     }
-    layers_.resize(n);
+    segments_.resize(n);
 }
 
-size_t Layers::unusedId() const
+size_t Segments::unusedId() const
 {
     LOG_DEBUG(<< "Obtain unused id.");
     // Return minimum available id value
@@ -93,39 +93,39 @@ size_t Layers::unusedId() const
         }
     }
 
-    THROW("New layer identifier is not available.");
+    THROW("New segment identifier is not available.");
 }
 
-void Layers::setLabel(size_t i, const std::string &label)
+void Segments::setLabel(size_t i, const std::string &label)
 {
     LOG_DEBUG(<< "Set label index <" << i << "> label <" << label << ">.");
-    layers_[i].setLabel(label);
+    segments_[i].setLabel(label);
 }
 
-void Layers::setColor(size_t i, const Vector3<double> &color)
+void Segments::setColor(size_t i, const Vector3<double> &color)
 {
     LOG_DEBUG(<< "Set color index <" << i << "> color <" << color << ">.");
-    layers_[i].setColor(color);
+    segments_[i].setColor(color);
 }
 
-void Layers::read(const Json &in)
+void Segments::read(const Json &in)
 {
     LOG_DEBUG(<< "Read.");
 
     clear();
 
-    if (in.contains("layers"))
+    if (in.contains("segments"))
     {
         size_t i = 0;
-        size_t n = in["layers"].array().size();
+        size_t n = in["segments"].array().size();
 
-        layers_.resize(n);
+        segments_.resize(n);
 
-        for (auto const &it : in["layers"].array())
+        for (auto const &it : in["segments"].array())
         {
-            layers_[i].read(it);
+            segments_[i].read(it);
 
-            size_t id = layers_[i].id();
+            size_t id = segments_[i].id();
 
             hashTableId_[id] = i;
 
@@ -134,21 +134,21 @@ void Layers::read(const Json &in)
     }
 
     // Default
-    if (layers_.size() == 0)
+    if (segments_.size() == 0)
     {
         setDefault();
     }
 }
 
-Json &Layers::write(Json &out) const
+Json &Segments::write(Json &out) const
 {
     LOG_DEBUG(<< "Write.");
 
     size_t i = 0;
 
-    for (auto const &it : layers_)
+    for (auto const &it : segments_)
     {
-        Json &obj = out["layers"][i];
+        Json &obj = out["segments"][i];
         it.write(obj);
         i++;
     }

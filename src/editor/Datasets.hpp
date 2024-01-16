@@ -44,7 +44,18 @@ public:
     const std::unordered_set<size_t> &idList() const { return datasetsIds_; }
 
     const Dataset &at(size_t i) const { return datasets_[i]; }
+
     const Dataset &key(size_t id) const
+    {
+        const auto &it = hashTable_.find(id);
+        if (it != hashTable_.end())
+        {
+            return datasets_[it->second];
+        }
+        THROW("Invalid dataset id");
+    }
+
+    Dataset &key(size_t id)
     {
         const auto &it = hashTable_.find(id);
         if (it != hashTable_.end())

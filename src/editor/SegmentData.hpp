@@ -17,10 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file LayerData.hpp */
+/** @file SegmentData.hpp */
 
-#ifndef LAYER_DATA_HPP
-#define LAYER_DATA_HPP
+#ifndef SEGMENT_DATA_HPP
+#define SEGMENT_DATA_HPP
 
 #include <Json.hpp>
 #include <Vector3.hpp>
@@ -28,11 +28,11 @@
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 
-/** LayerData. */
-class EXPORT_EDITOR LayerData
+/** SegmentData. */
+class EXPORT_EDITOR SegmentData
 {
 public:
-    LayerData();
+    SegmentData();
 
     const Vector3<double> &position() const { return position_; }
     void setPosition(const Vector3<double> &p) { position_ = p; };
@@ -47,4 +47,4 @@ protected:
 
 #include <WarningsEnable.hpp>
 
-#endif /* LAYER_DATA_HPP */
+#endif /* SEGMENT_DATA_HPP */

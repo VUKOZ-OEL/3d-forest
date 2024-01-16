@@ -86,7 +86,7 @@ protected:
     void clearScreen();
     bool renderScene();
     void renderFirstFrame();
-    void renderLayers();
+    void renderSegments();
     void renderGuides();
     void renderSceneSettingsEnable();
     void renderSceneSettingsDisable();

@@ -17,14 +17,14 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file LayerData.cpp */
+/** @file SegmentData.cpp */
 
 #include <Error.hpp>
-#include <LayerData.hpp>
+#include <SegmentData.hpp>
 
-#define LOG_MODULE_NAME "LayerData"
+#define LOG_MODULE_NAME "SegmentData"
 #include <Log.hpp>
 
-LayerData::LayerData() : position_(), radius_(0)
+SegmentData::SegmentData() : position_(), radius_(0)
 {
 }

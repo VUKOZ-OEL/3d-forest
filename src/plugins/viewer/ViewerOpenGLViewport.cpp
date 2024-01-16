@@ -343,18 +343,18 @@ void ViewerOpenGLViewport::renderFirstFrame()
                           << ">.");
 
     ViewerOpenGL::renderClipFilter(editor_->clipFilter());
-    renderLayers();
+    renderSegments();
 }
 
-void ViewerOpenGLViewport::renderLayers()
+void ViewerOpenGLViewport::renderSegments()
 {
-    const Layers &layers = editor_->layers();
-    for (size_t i = 0; i < layers.size(); i++)
+    const Segments &segments = editor_->segments();
+    for (size_t i = 0; i < segments.size(); i++)
     {
-        const Layer &layer = layers.at(i);
-        for (size_t m = 0; m < layer.meshSize(); m++)
+        const Segment &segment = segments.at(i);
+        for (size_t m = 0; m < segment.meshSize(); m++)
         {
-            const Mesh &mesh = layer.mesh(m);
+            const Mesh &mesh = segment.mesh(m);
 
             ViewerOpenGL::Mode mode;
             if (mesh.mode == Mesh::MODE_POINTS)

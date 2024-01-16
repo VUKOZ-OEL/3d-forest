@@ -108,22 +108,10 @@ public:
     double &green() { return color_[3 * selection_[pagePointIndex_] + 1]; }
     double &blue() { return color_[3 * selection_[pagePointIndex_] + 2]; }
 
-    size_t &layer() { return layer_[selection_[pagePointIndex_]]; }
+    size_t &segment() { return segment_[selection_[pagePointIndex_]]; }
     double &elevation() { return elevation_[selection_[pagePointIndex_]]; }
-    double &customRed()
-    {
-        return customColor_[3 * selection_[pagePointIndex_] + 0];
-    }
-    double &customGreen()
-    {
-        return customColor_[3 * selection_[pagePointIndex_] + 1];
-    }
-    double &customBlue()
-    {
-        return customColor_[3 * selection_[pagePointIndex_] + 2];
-    }
     double &descriptor() { return descriptor_[selection_[pagePointIndex_]]; }
-    size_t &value() { return value_[selection_[pagePointIndex_]]; }
+    size_t &voxel() { return voxel_[selection_[pagePointIndex_]]; }
     /**@}*/
 
     bool nextPage();
@@ -202,11 +190,10 @@ protected:
     double *gpsTime_;
     double *color_;
 
-    size_t *layer_;
+    size_t *segment_;
     double *elevation_;
-    double *customColor_;
     double *descriptor_;
-    size_t *value_;
+    size_t *voxel_;
 
     uint32_t *selection_;
 

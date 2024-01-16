@@ -219,7 +219,7 @@ void SegmentationWidget::slotApply()
         mainWindow_->showError("Unknown error");
     }
 
-    mainWindow_->update({Editor::TYPE_LAYER});
+    mainWindow_->update({Editor::TYPE_SEGMENT});
 }
 
 void SegmentationWidget::slotHelp()
@@ -256,7 +256,7 @@ void SegmentationWidget::slotHelp()
         " 3 trunks are identified."
         " d) Shows the final result of segmented dataset."
         " Unsegmented (disconnected and ground) points are hidden."
-        " These points are assigned to main layer."
+        " These points are assigned to main segment."
         "</div>"
         ""
         "<h3>Algorithm</h3>"
@@ -264,25 +264,25 @@ void SegmentationWidget::slotHelp()
         "<li>Voxelize the dataset.</li>"
         "<li>Detect individual trunks by using search radius"
         " to connect voxels which have descriptor values above"
-        " user provided threshold. Assign a unique layer value"
+        " user provided threshold. Assign a unique segment value"
         " to each detected trunk.</li>"
         "<li>Repeat the following for all remaining voxels:"
         "<ol>"
         "<li>Start at the next unprocessed voxel. The position"
         " of this voxel is random because the voxels are ordered"
-        " by multi-layer octal-tree. This voxel creates new"
+        " by multi-segment octal-tree. This voxel creates new"
         " voxel group.</li>"
         "<li>Find minimum spanning tree from this voxel until a voxel with"
-        " existing layer value is reached."
+        " existing segment value is reached."
         " The spanning tree is calculated by iteratively appending"
         " the next nearest neighbor to the current voxel group.</li>"
-        "<li>Set layer value of all voxels in this voxel group"
-        " to layer value from terminating voxel. This connects"
+        "<li>Set segment value of all voxels in this voxel group"
+        " to segment value from terminating voxel. This connects"
         " spanning trees to trunks. Connected voxels are marked"
         " as processed.</li>"
         "</ol>"
         "</li>"
-        "<li>Layer values from voxels are applied back to the"
+        "<li>Segment values from voxels are applied back to the"
         " dataset.</li>"
         "</ol>"
         "<br>"

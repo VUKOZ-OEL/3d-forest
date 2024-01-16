@@ -22,12 +22,16 @@
 #ifndef LAS_FILE_HPP
 #define LAS_FILE_HPP
 
+// Std
 #include <array>
 
+// 3D Forest
 #include <Box.hpp>
 #include <File.hpp>
 #include <Json.hpp>
+#include <RecordFile.hpp>
 
+// Local
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 
@@ -41,7 +45,7 @@ public:
     static const uint32_t FORMAT_INTENSITY = 1U << 2;
     static const uint32_t FORMAT_CLASSIFICATION = 1U << 3;
     static const uint32_t FORMAT_RGB = 1U << 4;
-    static const uint32_t FORMAT_LAYER = 1U << 5;
+    static const uint32_t FORMAT_SEGMENT = 1U << 5;
 
     /** LAS Format. */
     class EXPORT_EDITOR Format
@@ -122,7 +126,6 @@ public:
 
         size_t versionHeaderSize() const;
         size_t pointDataRecordLengthFormat() const;
-        size_t pointDataRecordLength3dForest() const;
         size_t pointDataRecordLengthUser() const;
         uint64_t pointDataSize() const;
         std::string dateCreated() const;
@@ -185,17 +188,19 @@ public:
         float wave_y;
         float wave_z; // 9 * 8
 
-        // User-specific extra bytes
-        uint32_t user_layer;
-        uint32_t user_elevation; // 10 * 8
-        uint16_t user_red;
-        uint16_t user_green;
-        uint16_t user_blue;
-        uint16_t user_intensity; // 11 * 8
-        double user_descriptor;  // 12 * 8
-        uint64_t user_value;     // 13 * 8
+        // Attributes
+        uint32_t segment;
+        uint32_t elevation;
+        double descriptor;
+        uint64_t voxel;
 
         Json &write(Json &out) const;
+    };
+
+    /** LAS Attribute Buffer. */
+    struct EXPORT_EDITOR Attributes
+    {
+        std::map<std::string, RecordFile::Buffer> attributes;
     };
 
     /** LAS Classification. */
@@ -215,15 +220,25 @@ public:
     LasFile();
     ~LasFile();
 
+    void open(const std::string &path);
+    void create(const std::string &path);
+    void close();
+    bool isOpen() const;
+
+    // Point I/O
     static void create(const std::string &path,
                        const std::vector<LasFile::Point> &points,
                        const std::array<double, 3> scale = {1, 1, 1},
                        const std::array<double, 3> offset = {0, 0, 0},
                        uint8_t version_minor = 4);
 
-    void open(const std::string &path);
-    void create(const std::string &path);
-    void close();
+    void seekPoint(uint64_t index);
+    void readPoint(Point &pt);
+    void writePoint(const Point &pt);
+
+    // Format
+    uint64_t size() const;
+    uint64_t offset() const;
 
     void seek(uint64_t offset);
     void seekHeader();
@@ -234,11 +249,32 @@ public:
     void readHeader();
     void writeHeader();
 
-    void readPoint(Point &pt);
-    void readPoint(Point &pt, const uint8_t *buffer, uint8_t fmt) const;
-    void writePoint(const Point &pt);
-    void writePoint(uint8_t *buffer, const Point &pt) const;
+    void readBuffer(uint8_t *buffer, uint64_t nbyte);
+    void writeBuffer(const uint8_t *buffer, uint64_t nbyte);
 
+    void formatBytesToPoint(Point &pt, const uint8_t *buffer) const;
+    void formatPointToBytes(uint8_t *buffer, const Point &pt) const;
+
+    // Attributes
+    void readAttributes(Attributes &buffer, uint64_t n);
+    void writeAttributes(const Attributes &buffer);
+
+    void readAttribute(const Attributes &buffer,
+                       const std::string &name,
+                       std::vector<size_t> &data);
+    void readAttribute(const Attributes &buffer,
+                       const std::string &name,
+                       std::vector<double> &data);
+
+    bool createAttribute(Attributes &buffer, const std::string &name, size_t n);
+    void writeAttribute(Attributes &buffer,
+                        const std::string &name,
+                        const std::vector<size_t> &data);
+    void writeAttribute(Attributes &buffer,
+                        const std::string &name,
+                        const std::vector<double> &data);
+
+    // Util
     void transform(double &x, double &y, double &z, const Point &pt) const;
     void transform(double &x,
                    double &y,
@@ -246,14 +282,14 @@ public:
                    const uint8_t *buffer) const;
     void transformInvert(double &x, double &y, double &z) const;
 
-    File &file() { return file_; }
-
 protected:
     File file_;
+    std::vector<RecordFile> attributeFiles_;
 
     void readHeader(Header &hdr);
     void writeHeader(const Header &hdr);
-    void readPoint(uint8_t *buffer);
+
+    void openAttributeFiles(const std::string &path, bool truncate);
 };
 
 std::ostream &operator<<(std::ostream &os, const LasFile::Header &obj);

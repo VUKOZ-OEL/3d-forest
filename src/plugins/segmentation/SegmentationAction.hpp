@@ -73,7 +73,7 @@ private:
     void stepCreateVoxelIndex();
     void stepCreateTrees();
     void stepConnectVoxels();
-    void stepCreateLayers();
+    void stepCreateSegments();
     void stepVoxelsToPoints();
 
     void createVoxel();

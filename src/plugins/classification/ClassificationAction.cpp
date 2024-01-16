@@ -162,7 +162,7 @@ void ClassificationAction::stepResetPoints()
     while (query_.next())
     {
         // Set point index to voxel to none.
-        query_.value() = SIZE_MAX;
+        query_.voxel() = SIZE_MAX;
 
         // Reset point classification of ground points to never classified.
         if (cleanAll_ ||
@@ -229,7 +229,7 @@ void ClassificationAction::stepPointsToVoxels()
     while (query_.next())
     {
         // If point index to voxel is none:
-        if (query_.value() == SIZE_MAX)
+        if (query_.voxel() == SIZE_MAX)
         {
             // Create new voxel.
             createVoxel();
@@ -357,7 +357,7 @@ void ClassificationAction::stepVoxelsToPoints()
     while (query_.next())
     {
         // If a point belongs to some voxel:
-        size_t pointIndex = query_.value();
+        size_t pointIndex = query_.voxel();
         if (pointIndex < voxels_.size())
         {
             // If this voxel is marked as ground:
@@ -414,7 +414,7 @@ void ClassificationAction::createVoxel()
         p.y += queryPoint_.y();
         p.z += queryPoint_.z();
 
-        queryPoint_.value() = idx;
+        queryPoint_.voxel() = idx;
         queryPoint_.setModified();
 
         n++;

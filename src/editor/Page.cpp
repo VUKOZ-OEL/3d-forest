@@ -42,11 +42,10 @@ Page::Page(Editor *editor, Query *query, uint32_t datasetId, uint32_t pageId)
       userData(nullptr),
       gpsTime(nullptr),
       color(nullptr),
-      layer(nullptr),
+      segment(nullptr),
       elevation(nullptr),
-      customColor(nullptr),
       descriptor(nullptr),
-      value(nullptr),
+      voxel(nullptr),
       renderPosition(nullptr),
       selectionSize(0),
       editor_(editor),
@@ -104,11 +103,10 @@ void Page::resize(size_t n)
     userData = pageData_->userData.data();
     gpsTime = pageData_->gpsTime.data();
     color = pageData_->color.data();
-    layer = pageData_->layer.data();
+    segment = pageData_->segment.data();
     elevation = pageData_->elevation.data();
-    customColor = pageData_->customColor.data();
     descriptor = pageData_->descriptor.data();
-    value = pageData_->value.data();
+    voxel = pageData_->voxel.data();
     renderPosition = pageData_->renderPosition.data();
 
     renderColor.resize(n * 3);
@@ -144,7 +142,7 @@ void Page::writePage()
 {
     if (pageData_ && pageData_->isModified())
     {
-        pageData_->write(editor_);
+        pageData_->writePage(editor_);
     }
 }
 
@@ -263,7 +261,7 @@ void Page::queryWhere()
     queryWhereElevation();
     queryWhereDescriptor();
     queryWhereClassification();
-    queryWhereLayer();
+    queryWhereSegment();
 
     state_ = Page::STATE_RUN_MODIFIERS;
 }
@@ -761,27 +759,28 @@ void Page::queryWhereClassification()
     selectionSize = nSelectedNew;
 }
 
-void Page::queryWhereLayer()
+void Page::queryWhereSegment()
 {
-    if (!query_->where().layer().isFilterEnabled())
+    if (!query_->where().segment().isFilterEnabled())
     {
         return;
     }
 
-    const std::unordered_set<size_t> &layerFilter =
-        query_->where().layer().filter();
-    const Layers &layers = editor_->layers();
+    const std::unordered_set<size_t> &segmentFilter =
+        query_->where().segment().filter();
+    const Segments &segments = editor_->segments();
 
     LOG_DEBUG(<< "Page pageId <" << pageId_ << ">.");
-    LOG_DEBUG(<< "Number of query layers <" << layerFilter.size() << ">.");
+    LOG_DEBUG(<< "Number of query segments <" << segmentFilter.size() << ">.");
 
     size_t nSelectedNew = 0;
 
     for (size_t i = 0; i < selectionSize; i++)
     {
-        size_t id = layer[selection[i]];
+        size_t id = segment[selection[i]];
 
-        if (layerFilter.find(id) != layerFilter.end() || !layers.contains(id))
+        if (segmentFilter.find(id) != segmentFilter.end() ||
+            !segments.contains(id))
         {
             if (nSelectedNew != i)
             {
@@ -879,17 +878,17 @@ void Page::runColorModifier()
         }
     }
 
-    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_LAYER))
+    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_SEGMENT))
     {
-        const Layers &layers = editor_->layers();
-        const size_t max = layers.size();
-        LOG_TRACE_UNKNOWN(<< "Maximum layers <" << max << ">.");
+        const Segments &segments = editor_->segments();
+        const size_t max = segments.size();
+        LOG_TRACE_UNKNOWN(<< "Maximum segments <" << max << ">.");
 
         for (size_t i = 0; i < n; i++)
         {
-            if (layer[i] < max)
+            if (segment[i] < max)
             {
-                const Vector3<double> &c = layers.color(layer[i]);
+                const Vector3<double> &c = segments.color(segment[i]);
                 renderColor[i * 3 + 0] *= static_cast<float>(c[0]);
                 renderColor[i * 3 + 1] *= static_cast<float>(c[1]);
                 renderColor[i * 3 + 2] *= static_cast<float>(c[2]);
@@ -911,19 +910,6 @@ void Page::runColorModifier()
                 renderColor[i * 3 + 1] *= v;
                 renderColor[i * 3 + 2] *= v;
             }
-        }
-    }
-
-    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_CUSTOM_COLOR))
-    {
-        for (size_t i = 0; i < n; i++)
-        {
-            renderColor[i * 3 + 0] *=
-                static_cast<float>(customColor[i * 3 + 0]);
-            renderColor[i * 3 + 1] *=
-                static_cast<float>(customColor[i * 3 + 1]);
-            renderColor[i * 3 + 2] *=
-                static_cast<float>(customColor[i * 3 + 2]);
         }
     }
 

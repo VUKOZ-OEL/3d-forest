@@ -54,9 +54,9 @@ void ExportFileFormatCsv::create(const std::string &path)
     {
         (void)ustrcat(text, ", red, green, blue");
     }
-    if (properties().format().has(LasFile::FORMAT_LAYER))
+    if (properties().format().has(LasFile::FORMAT_SEGMENT))
     {
-        (void)ustrcat(text, ", layer");
+        (void)ustrcat(text, ", segment");
     }
     (void)ustrcat(text, "\n");
 
@@ -125,13 +125,13 @@ void ExportFileFormatCsv::write(Query &query)
         (void)ustrcat(text, buffer);
     }
 
-    // Layer
-    if (properties().format().has(LasFile::FORMAT_LAYER))
+    // Segment
+    if (properties().format().has(LasFile::FORMAT_SEGMENT))
     {
         (void)snprintf(buffer,
                        sizeof(buffer),
                        ", %u",
-                       static_cast<unsigned int>(query.layer()));
+                       static_cast<unsigned int>(query.segment()));
 
         (void)ustrcat(text, buffer);
     }

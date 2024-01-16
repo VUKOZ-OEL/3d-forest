@@ -158,9 +158,9 @@ void IndexFileBuilder::openFiles()
     sizePointFormat_ = inputLas_.header.pointDataRecordLengthFormat();
     sizePoint_ = inputLas_.header.point_data_record_length;
     sizePoints_ = inputLas_.header.pointDataSize();
-    sizeFile_ = inputLas_.file().size();
+    sizeFile_ = inputLas_.size();
 
-    offsetHeaderEnd_ = inputLas_.file().offset();
+    offsetHeaderEnd_ = inputLas_.offset();
     offsetPointsStart_ = inputLas_.header.offset_to_point_data;
     offsetPointsEnd_ = offsetPointsStart_ + sizePoints_;
 
@@ -213,7 +213,7 @@ void IndexFileBuilder::openFiles()
     outputLas_.header.addOffsetEvlr(offsetPointsStartDiff);
 
     // Format
-    sizePointOut_ = outputLas_.header.pointDataRecordLength3dForest();
+    sizePointOut_ = outputLas_.header.pointDataRecordLengthFormat();
     outputLas_.header.point_data_record_length =
         static_cast<uint16_t>(sizePointOut_);
     sizePointsOut_ = outputLas_.header.pointDataSize();
@@ -244,6 +244,7 @@ void IndexFileBuilder::next()
     // Continue
     switch (state_)
     {
+        // Copy file
         case STATE_COPY_VLR:
             stateCopy();
             break;
@@ -416,8 +417,8 @@ void IndexFileBuilder::stateCopy()
     }
 
     // Copy
-    inputLas_.file().read(buffer_.data(), step);
-    outputLas_.file().write(buffer_.data(), step);
+    inputLas_.readBuffer(buffer_.data(), step);
+    outputLas_.writeBuffer(buffer_.data(), step);
 
     // Next
     value_ += step;
@@ -577,7 +578,7 @@ void IndexFileBuilder::stateCopyPoints()
         }
 
         // Read input
-        inputLas_.file().read(in, sizePoint_);
+        inputLas_.readBuffer(in, sizePoint_);
         out = bufferOut + (i * sizePointOut_);
 
         // Copy
@@ -615,7 +616,7 @@ void IndexFileBuilder::stateCopyPoints()
     }
 
     // Write this step to the output
-    outputLas_.file().write(bufferOut, sizePointOut_ * stepIdx);
+    outputLas_.writeBuffer(bufferOut, sizePointOut_ * stepIdx);
 
     // Boundary without scaling
     Box<double> box;
@@ -686,7 +687,7 @@ void IndexFileBuilder::stateMainInsert()
     // Points
     uint8_t *buffer = buffer_.data();
     uint8_t *point;
-    inputLas_.file().read(buffer, step);
+    inputLas_.readBuffer(buffer, step);
 
     double x;
     double y;
@@ -741,7 +742,7 @@ void IndexFileBuilder::stateMainSort()
     uint64_t start = outputLas_.header.offset_to_point_data;
     uint64_t pos;
 
-    inputLas_.file().read(buffer, step);
+    inputLas_.readBuffer(buffer, step);
 
     double x;
     double y;
@@ -791,7 +792,7 @@ void IndexFileBuilder::stateMainSort()
             pos = indexMainUsed_[node]++;
             pos += node->from;
             outputLas_.seek(start + (pos * sizePoint_));
-            outputLas_.file().write(point, sizePoint_);
+            outputLas_.writeBuffer(point, sizePoint_);
         }
     }
 
@@ -843,7 +844,7 @@ void IndexFileBuilder::stateNodeInsert()
     uint8_t *point;
 
     outputLas_.seek(start + (node->from * sizePoint_));
-    outputLas_.file().read(buffer, step);
+    outputLas_.readBuffer(buffer, step);
 
     // Actual boundary of this page
     coords_.resize(node->size * 3);
@@ -899,7 +900,7 @@ void IndexFileBuilder::stateNodeInsert()
 
     // Write sorted points
     outputLas_.seek(start + (node->from * sizePoint_));
-    outputLas_.file().write(bufferOut, step);
+    outputLas_.writeBuffer(bufferOut, step);
 
     // Next
     value_ += step;

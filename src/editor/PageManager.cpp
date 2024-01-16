@@ -65,7 +65,7 @@ std::shared_ptr<PageData> PageManager::get(Editor *editor,
 
     try
     {
-        result->read(editor);
+        result->readPage(editor);
     }
     catch (...)
     {
@@ -88,7 +88,7 @@ void PageManager::erase(Editor *editor, size_t dataset, size_t index)
         {
             if (it->second->isModified())
             {
-                it->second->write(editor);
+                it->second->writePage(editor);
             }
 
             cache_.erase(it);

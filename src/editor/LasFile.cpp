@@ -19,18 +19,21 @@
 
 /** @file LasFile.cpp */
 
+// Std
 #include <cstdio>
 #include <cstring>
 #include <iostream>
 #include <sstream>
 #include <vector>
 
+// 3D Forest
 #include <Box.hpp>
 #include <Endian.hpp>
 #include <Error.hpp>
 #include <LasFile.hpp>
 #include <Util.hpp>
 
+// Local
 #define LOG_MODULE_NAME "LasFile"
 #include <Log.hpp>
 
@@ -42,7 +45,6 @@
 #define LAS_FILE_HEADER_SIZE_V13 235
 #define LAS_FILE_HEADER_SIZE_V14 375
 #define LAS_FILE_FORMAT_COUNT 11
-#define LAS_FILE_USER_BYTE_COUNT 32U
 
 static const size_t LAS_FILE_FORMAT_BYTE_COUNT[LAS_FILE_FORMAT_COUNT] =
     {20, 28, 26, 34, 57, 63, 30, 36, 38, 59, 67};
@@ -59,7 +61,7 @@ static const uint8_t LAS_FILE_FORMAT_NIR[LAS_FILE_FORMAT_COUNT] =
 static const uint8_t LAS_FILE_FORMAT_WAVE[LAS_FILE_FORMAT_COUNT] =
     {0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1};
 
-static const char *LAS_FILE_GENERATING_SOFTWARE = "3D Forest 2023.03.25";
+static const char *LAS_FILE_GENERATING_SOFTWARE = "3D Forest 2024.01.01";
 
 uint8_t LasFile::Format::las() const
 {
@@ -108,7 +110,7 @@ void LasFile::Header::set(uint64_t numberOfPoints,
 
     point_data_record_format = pointFormat;
     point_data_record_length =
-        static_cast<uint16_t>(pointDataRecordLength3dForest());
+        static_cast<uint16_t>(pointDataRecordLengthFormat());
 
     number_of_point_records = numberOfPoints;
 
@@ -163,11 +165,6 @@ size_t LasFile::Header::versionHeaderSize() const
 size_t LasFile::Header::pointDataRecordLengthFormat() const
 {
     return LAS_FILE_FORMAT_BYTE_COUNT[point_data_record_format];
-}
-
-size_t LasFile::Header::pointDataRecordLength3dForest() const
-{
-    return pointDataRecordLengthFormat() + LAS_FILE_USER_BYTE_COUNT;
 }
 
 size_t LasFile::Header::pointDataRecordLengthUser() const
@@ -323,6 +320,7 @@ void LasFile::create(const std::string &path,
                    offset,
                    point_data_record_format,
                    version_minor);
+
     las.writeHeader();
 
     for (size_t i = 0; i < points.size(); i++)
@@ -333,21 +331,67 @@ void LasFile::create(const std::string &path,
     las.close();
 }
 
+void LasFile::openAttributeFiles(const std::string &path, bool truncate)
+{
+    attributeFiles_.resize(4);
+
+    attributeFiles_[0].open(truncate,
+                            path + ".segment",
+                            "segment",
+                            RecordFile::TYPE_U32);
+    attributeFiles_[1].open(truncate,
+                            path + ".elevation",
+                            "elevation",
+                            RecordFile::TYPE_U32);
+    attributeFiles_[2].open(truncate,
+                            path + ".descriptor",
+                            "descriptor",
+                            RecordFile::TYPE_F64);
+    attributeFiles_[3].open(truncate,
+                            path + ".voxel",
+                            "voxel",
+                            RecordFile::TYPE_U64);
+}
+
 void LasFile::open(const std::string &path)
 {
     std::memset(&header, 0, sizeof(header));
     file_.open(path);
+
+    openAttributeFiles(path, false);
 }
 
 void LasFile::create(const std::string &path)
 {
     std::memset(&header, 0, sizeof(header));
     file_.create(path);
+
+    openAttributeFiles(path, true);
 }
 
 void LasFile::close()
 {
     file_.close();
+
+    for (auto &it : attributeFiles_)
+    {
+        it.close();
+    }
+}
+
+bool LasFile::isOpen() const
+{
+    return file_.isOpen();
+}
+
+uint64_t LasFile::size() const
+{
+    return file_.size();
+}
+
+uint64_t LasFile::offset() const
+{
+    return file_.offset();
 }
 
 void LasFile::seek(uint64_t offset)
@@ -373,6 +417,30 @@ void LasFile::seekPointData()
 void LasFile::seekExtendedVlr()
 {
     file_.seek(header.offset_to_evlr);
+}
+
+void LasFile::readBuffer(uint8_t *buffer, uint64_t nbyte)
+{
+    file_.read(buffer, nbyte);
+}
+
+void LasFile::writeBuffer(const uint8_t *buffer, uint64_t nbyte)
+{
+    file_.write(buffer, nbyte);
+}
+
+void LasFile::seekPoint(uint64_t index)
+{
+    // Seek las.
+    uint64_t pointSize = header.point_data_record_length;
+    uint64_t offset = header.offset_to_point_data + (index * pointSize);
+    file_.seek(offset);
+
+    // Seek attributes.
+    for (auto &it : attributeFiles_)
+    {
+        it.setIndex(index);
+    }
 }
 
 void LasFile::readHeader()
@@ -626,22 +694,22 @@ void LasFile::writeHeader(const Header &hdr)
 void LasFile::readPoint(Point &pt)
 {
     uint8_t buffer[256];
-
-    readPoint(buffer);
-    readPoint(pt, buffer, header.point_data_record_format);
-}
-
-void LasFile::readPoint(uint8_t *buffer)
-{
     file_.read(buffer, header.point_data_record_length);
+    formatBytesToPoint(pt, buffer);
+
+    attributeFiles_[0].read(pt.segment);
+    attributeFiles_[1].read(pt.elevation);
+    attributeFiles_[2].read(pt.descriptor);
+    attributeFiles_[3].read(pt.voxel);
 }
 
-void LasFile::readPoint(Point &pt, const uint8_t *buffer, uint8_t fmt) const
+void LasFile::formatBytesToPoint(Point &pt, const uint8_t *buffer) const
 {
     size_t pos;
 
     /** @todo Optimization, all points have the same format 'fmt'. */
 
+    uint8_t fmt = header.point_data_record_format;
     pt.format = fmt;
 
     if (fmt > 5)
@@ -720,29 +788,21 @@ void LasFile::readPoint(Point &pt, const uint8_t *buffer, uint8_t fmt) const
         pt.wave_z = ltohf(&buffer[pos + 25]);
         pos += 29;
     }
-
-    if (header.point_data_record_length >= (pos + LAS_FILE_USER_BYTE_COUNT))
-    {
-        pt.user_layer = ltoh32(&buffer[pos]);
-        pt.user_elevation = ltoh32(&buffer[pos + 4]);
-        pt.user_red = ltoh16(&buffer[pos + 8]);
-        pt.user_green = ltoh16(&buffer[pos + 10]);
-        pt.user_blue = ltoh16(&buffer[pos + 12]);
-        pt.user_intensity = ltoh16(&buffer[pos + 14]);
-        pt.user_descriptor = ltohd(&buffer[pos + 16]);
-        pt.user_value = ltoh64(&buffer[pos + 24]);
-    }
 }
 
 void LasFile::writePoint(const Point &pt)
 {
     uint8_t buffer[256];
-
-    writePoint(buffer, pt);
+    formatPointToBytes(buffer, pt);
     file_.write(buffer, header.point_data_record_length);
+
+    attributeFiles_[0].write(pt.segment);
+    attributeFiles_[1].write(pt.elevation);
+    attributeFiles_[2].write(pt.descriptor);
+    attributeFiles_[3].write(pt.voxel);
 }
 
-void LasFile::writePoint(uint8_t *buffer, const Point &pt) const
+void LasFile::formatPointToBytes(uint8_t *buffer, const Point &pt) const
 {
     const uint8_t fmt = pt.format;
     size_t pos;
@@ -855,17 +915,89 @@ void LasFile::writePoint(uint8_t *buffer, const Point &pt) const
         htolf(&buffer[pos + 25], pt.wave_z);
         pos += 29;
     }
+}
 
-    if (header.point_data_record_length >= (pos + LAS_FILE_USER_BYTE_COUNT))
+void LasFile::readAttributes(Attributes &buffer, uint64_t n)
+{
+    for (size_t i = 0; i < attributeFiles_.size(); i++)
     {
-        htol32(&buffer[pos], pt.user_layer);
-        htol32(&buffer[pos + 4], pt.user_elevation);
-        htol16(&buffer[pos + 8], pt.user_red);
-        htol16(&buffer[pos + 10], pt.user_green);
-        htol16(&buffer[pos + 12], pt.user_blue);
-        htol16(&buffer[pos + 14], pt.user_intensity);
-        htold(&buffer[pos + 16], pt.gps_time);
-        htol64(&buffer[pos + 24], pt.user_value);
+        const std::string &name = attributeFiles_[i].name();
+        if (buffer.attributes.count(name) < 1)
+        {
+            buffer.attributes[name] = RecordFile::Buffer();
+        }
+        attributeFiles_[i].readBuffer(buffer.attributes[name], n);
+    }
+}
+
+void LasFile::writeAttributes(const Attributes &buffer)
+{
+    for (size_t i = 0; i < attributeFiles_.size(); i++)
+    {
+        const std::string &name = attributeFiles_[i].name();
+        if (buffer.attributes.count(name) > 0)
+        {
+            attributeFiles_[i].writeBuffer(buffer.attributes.at(name));
+        }
+    }
+}
+
+void LasFile::readAttribute(const Attributes &buffer,
+                            const std::string &name,
+                            std::vector<size_t> &data)
+{
+    if (buffer.attributes.count(name) < 1)
+    {
+        return;
+    }
+
+    buffer.attributes.at(name).read(data);
+}
+
+void LasFile::readAttribute(const Attributes &buffer,
+                            const std::string &name,
+                            std::vector<double> &data)
+{
+    if (buffer.attributes.count(name) < 1)
+    {
+        return;
+    }
+
+    buffer.attributes.at(name).read(data);
+}
+
+bool LasFile::createAttribute(Attributes &buffer,
+                              const std::string &name,
+                              size_t n)
+{
+    for (const auto &it : attributeFiles_)
+    {
+        if (it.name() == name)
+        {
+            it.createBuffer(buffer.attributes[name], n);
+            return true;
+        }
+    }
+    return false;
+}
+
+void LasFile::writeAttribute(Attributes &buffer,
+                             const std::string &name,
+                             const std::vector<size_t> &data)
+{
+    if (createAttribute(buffer, name, data.size()))
+    {
+        buffer.attributes.at(name).write(data);
+    }
+}
+
+void LasFile::writeAttribute(Attributes &buffer,
+                             const std::string &name,
+                             const std::vector<double> &data)
+{
+    if (createAttribute(buffer, name, data.size()))
+    {
+        buffer.attributes.at(name).write(data);
     }
 }
 
@@ -948,6 +1080,11 @@ Json &LasFile::Point::write(Json &out) const
         out["wave"][2] = wave_z;
     }
 
+    out["segment"] = segment;
+    out["elevation"] = elevation;
+    out["descriptor"] = descriptor;
+    out["voxel"] = voxel;
+
     return out;
 }
 
@@ -1004,24 +1141,38 @@ Point Data Record Format Table:
 
 @verbatim
 v1.0 : formats 0, 1
+       15 classification        8 bits, user defined classifications
        16 angle                 8 bits signed (-90 to +90)
-       17 file marker           8 bits
-       18 user_data            16 bits
+       17 file marker           8 bits, replaced to user_data in 1.1
+       18 user_data            16 bits, replaced to source_id in 1.1
 
 v1.1 : formats 0, 1
-v1.2 : formats 0, 1, 2, 3
-v1.3 : formats 0, 1, 2, 3, 4, 5
+       15 classification        8 bits, standard classifications
+                                        upper 3 bits are flags:
+                                        [0:Synthetic, 1:Key-point, 2:Withheld]
        17 user_data             8 bits
        18 source_id            16 bits
 
+v1.2 : formats 0, 1, 2, 3
+
+v1.3 : formats 0, 1, 2, 3, 4, 5
+
 v1.4 : formats 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+       From format 6 up:
        14 return_number         4 bits (new 1 bit)
        14 number_of_returns     4 bits (new 1 bit)
-       15 classification_flags  4 bits (new 1 bit) *
+       15 classification_flags  4 bits (new 1 bit) * adds bit flag [3:Overlap]
        15 scanner_channel       2 bits (new)
-       16 classification        8 bits class (new 3 bits)
+       16 classification        8 bits class (new 3 bits from 31 to 255 classes)
        18 angle                16 bits signed (by 0.006 degrees)
 
+|-------------------------------------------------------------------|
+| v1.1 up                         | v1.4                            |
+|-------------------------------------------------------------------|
+|  5 bit classification 0 to 31   |  8 bit classification 0 to 255  |
+|                                 |    More bits for return_number  |
+|                                 |    number_of_returns, angle.    |
+|                                 |    Always with gps_time.        |
 |-------------------------------------------------------------------|
 |    0, 20 bytes                  |    6, 30 bytes                  |
 |  0 x                    32 bits |  0 x                    32 bits |

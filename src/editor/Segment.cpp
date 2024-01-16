@@ -17,42 +17,42 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Layer.cpp */
+/** @file Segment.cpp */
 
 #include <Error.hpp>
-#include <Layer.hpp>
+#include <Segment.hpp>
 
-#define LOG_MODULE_NAME "Layer"
+#define LOG_MODULE_NAME "Segment"
 #include <Log.hpp>
 
-Layer::Layer() : id_(0)
+Segment::Segment() : id_(0)
 {
 }
 
-void Layer::set(size_t id,
-                const std::string &label,
-                const Vector3<double> &color)
+void Segment::set(size_t id,
+                  const std::string &label,
+                  const Vector3<double> &color)
 {
     id_ = id;
     label_ = label;
     color_ = color;
 }
 
-void Layer::setLabel(const std::string &label)
+void Segment::setLabel(const std::string &label)
 {
     label_ = label;
 }
 
-void Layer::setColor(const Vector3<double> &color)
+void Segment::setColor(const Vector3<double> &color)
 {
     color_ = color;
 }
 
-void Layer::read(const Json &in)
+void Segment::read(const Json &in)
 {
     if (!in.isObject())
     {
-        THROW("Layer is not JSON object");
+        THROW("Segment is not JSON object");
     }
 
     // ID
@@ -75,7 +75,7 @@ void Layer::read(const Json &in)
     }
 }
 
-Json &Layer::write(Json &out) const
+Json &Segment::write(Json &out) const
 {
     out["id"] = id_;
     out["label"] = label_;

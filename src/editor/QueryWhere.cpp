@@ -117,12 +117,12 @@ void QueryWhere::classificationsToArray()
     }
 }
 
-void QueryWhere::setLayer(const QueryFilterSet &list)
+void QueryWhere::setSegment(const QueryFilterSet &list)
 {
-    layer_ = list;
+    segment_ = list;
 }
 
-void QueryWhere::setLayer(const std::unordered_set<size_t> &list)
+void QueryWhere::setSegment(const std::unordered_set<size_t> &list)
 {
-    layer_.setFilter(list);
+    segment_.setFilter(list);
 }

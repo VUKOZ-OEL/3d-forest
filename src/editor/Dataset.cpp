@@ -19,13 +19,13 @@
 
 /** @file Dataset.cpp */
 
+// 3D Forest
 #include <Dataset.hpp>
 #include <Error.hpp>
 #include <File.hpp>
-#include <IndexFile.hpp>
 #include <IndexFileBuilder.hpp>
-#include <LasFile.hpp>
 
+// Local
 #define LOG_MODULE_NAME "Dataset"
 #include <Log.hpp>
 
@@ -169,40 +169,41 @@ void Dataset::setPath(const std::string &path, const std::string &projectPath)
 
 void Dataset::read()
 {
-    LasFile las;
-    las.open(path_);
-    las.readHeader();
+    las_ = std::make_shared<LasFile>();
+    las_->open(path_);
+    las_->readHeader();
 
     if (dateCreated_.empty())
     {
-        dateCreated_ = las.header.dateCreated();
+        dateCreated_ = las_->header.dateCreated();
     }
 
-    translationFile_.set(las.header.x_offset,
-                         las.header.y_offset,
-                         las.header.z_offset);
+    translationFile_.set(las_->header.x_offset,
+                         las_->header.y_offset,
+                         las_->header.z_offset);
 
     translation_ = translationFile_;
 
-    scalingFile_.set(las.header.x_scale_factor,
-                     las.header.y_scale_factor,
-                     las.header.z_scale_factor);
+    scalingFile_.set(las_->header.x_scale_factor,
+                     las_->header.y_scale_factor,
+                     las_->header.z_scale_factor);
 
     scaling_.set(1.0, 1.0, 1.0);
 
     // Boundary
     const std::string pathIndex = IndexFileBuilder::extension(path_);
-    index_.read(pathIndex);
+    index_ = std::make_shared<IndexFile>();
+    index_->read(pathIndex);
 
-    boundaryFile_ = index_.boundaryPoints();
+    boundaryFile_ = index_->boundaryPoints();
     updateBoundary();
 
-    nPoints_ = las.header.number_of_point_records;
+    nPoints_ = las_->header.number_of_point_records;
 }
 
 void Dataset::updateBoundary()
 {
     boundary_ = boundaryFile_;
     boundary_.translate(translation_);
-    index_.translate(translation_);
+    index_->translate(translation_);
 }

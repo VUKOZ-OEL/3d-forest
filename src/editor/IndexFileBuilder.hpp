@@ -79,11 +79,17 @@ protected:
     /** Index File Builder State. */
     enum State
     {
+        // Clean state. All files are open.
         STATE_NONE,
+
+        // Files are open. Output file has header. Buffers are configured.
         STATE_BEGIN,
+
+        // Copy file data.
         STATE_COPY_VLR,
         STATE_COPY_POINTS,
         STATE_COPY_EVLR,
+
         STATE_MOVE,
         STATE_COPY,
         STATE_MAIN_BEGIN,
@@ -147,6 +153,7 @@ protected:
     // Buffers
     std::vector<uint8_t> buffer_;
     std::vector<uint8_t> bufferOut_;
+    LasFile::Attributes attributes_;
     std::vector<double> coords_;
 
     void openFiles();

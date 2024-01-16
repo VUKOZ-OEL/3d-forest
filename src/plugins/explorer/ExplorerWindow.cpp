@@ -24,7 +24,7 @@
 #include <ExplorerDescriptorWidget.hpp>
 #include <ExplorerElevationWidget.hpp>
 #include <ExplorerFilesWidget.hpp>
-#include <ExplorerLayersWidget.hpp>
+#include <ExplorerSegmentsWidget.hpp>
 #include <ExplorerWindow.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
@@ -43,8 +43,9 @@ ExplorerWindow::ExplorerWindow(MainWindow *mainWindow)
     items_.push_back(
         new ExplorerFilesWidget(mainWindow_, ICON("file"), tr("Files")));
 
-    items_.push_back(
-        new ExplorerLayersWidget(mainWindow_, ICON("layers"), tr("Layers")));
+    items_.push_back(new ExplorerSegmentsWidget(mainWindow_,
+                                                ICON("segments"),
+                                                tr("Segments")));
 
     items_.push_back(new ExplorerClassificationsWidget(mainWindow_,
                                                        ICON("classification"),

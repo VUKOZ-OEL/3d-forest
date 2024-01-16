@@ -26,10 +26,10 @@
 
 #include <Classifications.hpp>
 #include <Datasets.hpp>
-#include <Layers.hpp>
 #include <ModifierInterface.hpp>
 #include <PageManager.hpp>
 #include <Region.hpp>
+#include <Segments.hpp>
 #include <Settings.hpp>
 #include <Viewports.hpp>
 
@@ -48,7 +48,7 @@ public:
         TYPE_DATA_SET,
         TYPE_DESCRIPTOR,
         TYPE_ELEVATION,
-        TYPE_LAYER,
+        TYPE_SEGMENT,
         TYPE_PROJECT_NAME,
         TYPE_SETTINGS,
     };
@@ -92,15 +92,16 @@ public:
 
     // Data sets
     const Datasets &datasets() const { return datasets_; }
+    Datasets &datasets() { return datasets_; }
     void setDatasets(const Datasets &datasets);
     const QueryFilterSet &datasetsFilter() const { return datasetsFilter_; }
     void setDatasetsFilter(const QueryFilterSet &filter);
 
-    // Layers
-    const Layers &layers() const { return layers_; }
-    void setLayers(const Layers &layers);
-    const QueryFilterSet &layersFilter() const { return layersFilter_; }
-    void setLayersFilter(const QueryFilterSet &filter);
+    // Segments
+    const Segments &segments() const { return segments_; }
+    void setSegments(const Segments &segments);
+    const QueryFilterSet &segmentsFilter() const { return segmentsFilter_; }
+    void setSegmentsFilter(const QueryFilterSet &filter);
 
     // Settings
     const Settings &settings() const { return settings_; }
@@ -132,7 +133,7 @@ protected:
     bool unsavedChanges_;
 
     Datasets datasets_;
-    Layers layers_;
+    Segments segments_;
     Settings settings_;
     Classifications classifications_;
 
@@ -141,7 +142,7 @@ protected:
     Range<double> descriptorFilter_;
     QueryFilterSet classificationsFilter_;
     QueryFilterSet datasetsFilter_;
-    QueryFilterSet layersFilter_;
+    QueryFilterSet segmentsFilter_;
 
     // Modifiers
     std::vector<ModifierInterface *> modifiers_;

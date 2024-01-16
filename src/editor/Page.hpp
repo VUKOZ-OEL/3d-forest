@@ -77,23 +77,16 @@ public:
 
     /** @name Point Data Extra Bytes */
     /**@{*/
-    /** Layer identification numbers.
+    /** Segment identification numbers.
         This value is stored in Point Data Record extra bytes.
     */
-    size_t *layer;
+    size_t *segment;
 
     /** Point elevation above ground.
         The data are stored as [e0, e1, ...].
         This value is stored in Point Data Record extra bytes.
      */
     double *elevation;
-
-    /** Red, Green, and Blue custom colors.
-        The data are stored as [r0, g0, b0, r1, g1, ...].
-        Color values are in range from 0 (zero intensity) to 1 (full intensity).
-        This value is stored in Point Data Record extra bytes.
-    */
-    double *customColor;
 
     /** Descriptor values.
         The data are stored as [d0, d1, ...].
@@ -102,10 +95,10 @@ public:
     */
     double *descriptor;
 
-    /** User values.
+    /** Voxel values.
         This value is stored in Point Data Record extra bytes.
     */
-    size_t *value;
+    size_t *voxel;
     /**@}*/
 
     /** @name Rendering */
@@ -186,7 +179,7 @@ private:
     void queryWhereElevation();
     void queryWhereDescriptor();
     void queryWhereClassification();
-    void queryWhereLayer();
+    void queryWhereSegment();
 
     void runModifiers();
     void runColorModifier();

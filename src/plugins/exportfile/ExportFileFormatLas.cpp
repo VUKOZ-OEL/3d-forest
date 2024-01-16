@@ -95,14 +95,9 @@ void ExportFileFormatLas::write(Query &query)
     point.green = static_cast<uint16_t>(query.green() * f16);
     point.blue = static_cast<uint16_t>(query.blue() * f16);
 
-    point.user_layer = static_cast<uint32_t>(query.layer());
-    point.user_elevation = static_cast<uint32_t>(query.elevation());
-
-    point.user_red = static_cast<uint16_t>(query.customRed() * f16);
-    point.user_green = static_cast<uint16_t>(query.customGreen() * f16);
-    point.user_blue = static_cast<uint16_t>(query.customBlue() * f16);
-
-    point.user_descriptor = query.descriptor();
+    point.segment = static_cast<uint32_t>(query.segment());
+    point.elevation = static_cast<uint32_t>(query.elevation());
+    point.descriptor = query.descriptor();
 
     // Write new point to file
     file_.writePoint(point);
