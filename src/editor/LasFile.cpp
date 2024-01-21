@@ -335,22 +335,46 @@ void LasFile::openAttributeFiles(const std::string &path, bool truncate)
 {
     attributeFiles_.resize(4);
 
-    attributeFiles_[0].open(truncate,
-                            path + ".segment",
-                            "segment",
-                            RecordFile::TYPE_U32);
-    attributeFiles_[1].open(truncate,
-                            path + ".elevation",
-                            "elevation",
-                            RecordFile::TYPE_U32);
-    attributeFiles_[2].open(truncate,
-                            path + ".descriptor",
-                            "descriptor",
-                            RecordFile::TYPE_F64);
-    attributeFiles_[3].open(truncate,
-                            path + ".voxel",
-                            "voxel",
-                            RecordFile::TYPE_U64);
+    openAttributeFile(attributeFiles_[0],
+                      path + ".segment",
+                      "segment",
+                      RecordFile::TYPE_U32,
+                      truncate);
+    openAttributeFile(attributeFiles_[1],
+                      path + ".elevation",
+                      "elevation",
+                      RecordFile::TYPE_U32,
+                      truncate);
+    openAttributeFile(attributeFiles_[2],
+                      path + ".descriptor",
+                      "descriptor",
+                      RecordFile::TYPE_F64,
+                      truncate);
+    openAttributeFile(attributeFiles_[3],
+                      path + ".voxel",
+                      "voxel",
+                      RecordFile::TYPE_U64,
+                      truncate);
+}
+
+void LasFile::openAttributeFile(RecordFile &file,
+                                const std::string &path,
+                                const std::string &name,
+                                RecordFile::Type recordType,
+                                bool truncate)
+{
+    if (truncate)
+    {
+        file.create(path, name, recordType);
+    }
+    else if (!File::exists(path))
+    {
+        file.create(path, name, recordType);
+    }
+    else
+    {
+        file.open(path);
+    }
 }
 
 void LasFile::open(const std::string &path)
@@ -917,7 +941,22 @@ void LasFile::formatPointToBytes(uint8_t *buffer, const Point &pt) const
     }
 }
 
-void LasFile::readAttributes(Attributes &buffer, uint64_t n)
+void LasFile::createAttributesBuffer(AttributesBuffer &buffer,
+                                     uint64_t n,
+                                     bool setZero)
+{
+    for (size_t i = 0; i < attributeFiles_.size(); i++)
+    {
+        const std::string &name = attributeFiles_[i].name();
+        if (buffer.attributes.count(name) < 1)
+        {
+            buffer.attributes[name] = RecordFile::Buffer();
+        }
+        attributeFiles_[i].createBuffer(buffer.attributes[name], n, setZero);
+    }
+}
+
+void LasFile::readAttributesBuffer(AttributesBuffer &buffer, uint64_t n)
 {
     for (size_t i = 0; i < attributeFiles_.size(); i++)
     {
@@ -930,19 +969,49 @@ void LasFile::readAttributes(Attributes &buffer, uint64_t n)
     }
 }
 
-void LasFile::writeAttributes(const Attributes &buffer)
+void LasFile::writeAttributesBuffer(const AttributesBuffer &buffer,
+                                    uint64_t n,
+                                    uint64_t from)
 {
     for (size_t i = 0; i < attributeFiles_.size(); i++)
     {
         const std::string &name = attributeFiles_[i].name();
         if (buffer.attributes.count(name) > 0)
         {
-            attributeFiles_[i].writeBuffer(buffer.attributes.at(name));
+            attributeFiles_[i].writeBuffer(buffer.attributes.at(name), n, from);
         }
     }
 }
 
-void LasFile::readAttribute(const Attributes &buffer,
+void LasFile::copyAttributesBuffer(AttributesBuffer &dst,
+                                   const AttributesBuffer &src,
+                                   uint64_t n,
+                                   uint64_t to,
+                                   uint64_t from)
+{
+    for (const auto &s : src.attributes)
+    {
+        auto d = dst.attributes.find(s.first);
+        if (d != dst.attributes.end())
+        {
+            d->second.copy(s.second, n, to, from);
+        }
+    }
+}
+
+size_t LasFile::sizeOfAttributesPerPoint() const
+{
+    size_t nbyte = 0;
+
+    for (const auto &it : attributeFiles_)
+    {
+        nbyte += it.recordSize();
+    }
+
+    return nbyte;
+}
+
+void LasFile::readAttribute(const AttributesBuffer &buffer,
                             const std::string &name,
                             std::vector<size_t> &data)
 {
@@ -954,7 +1023,7 @@ void LasFile::readAttribute(const Attributes &buffer,
     buffer.attributes.at(name).read(data);
 }
 
-void LasFile::readAttribute(const Attributes &buffer,
+void LasFile::readAttribute(const AttributesBuffer &buffer,
                             const std::string &name,
                             std::vector<double> &data)
 {
@@ -966,7 +1035,7 @@ void LasFile::readAttribute(const Attributes &buffer,
     buffer.attributes.at(name).read(data);
 }
 
-bool LasFile::createAttribute(Attributes &buffer,
+bool LasFile::createAttribute(AttributesBuffer &buffer,
                               const std::string &name,
                               size_t n)
 {
@@ -981,7 +1050,7 @@ bool LasFile::createAttribute(Attributes &buffer,
     return false;
 }
 
-void LasFile::writeAttribute(Attributes &buffer,
+void LasFile::writeAttribute(AttributesBuffer &buffer,
                              const std::string &name,
                              const std::vector<size_t> &data)
 {
@@ -991,7 +1060,7 @@ void LasFile::writeAttribute(Attributes &buffer,
     }
 }
 
-void LasFile::writeAttribute(Attributes &buffer,
+void LasFile::writeAttribute(AttributesBuffer &buffer,
                              const std::string &name,
                              const std::vector<double> &data)
 {

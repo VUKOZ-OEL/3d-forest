@@ -198,7 +198,7 @@ public:
     };
 
     /** LAS Attribute Buffer. */
-    struct EXPORT_EDITOR Attributes
+    struct EXPORT_EDITOR AttributesBuffer
     {
         std::map<std::string, RecordFile::Buffer> attributes;
     };
@@ -256,21 +256,35 @@ public:
     void formatPointToBytes(uint8_t *buffer, const Point &pt) const;
 
     // Attributes
-    void readAttributes(Attributes &buffer, uint64_t n);
-    void writeAttributes(const Attributes &buffer);
+    void createAttributesBuffer(AttributesBuffer &buffer,
+                                uint64_t n,
+                                bool setZero = false);
+    void readAttributesBuffer(AttributesBuffer &buffer, uint64_t n);
+    void writeAttributesBuffer(const AttributesBuffer &buffer,
+                               uint64_t n,
+                               uint64_t from = 0);
+    void copyAttributesBuffer(AttributesBuffer &dst,
+                              const AttributesBuffer &src,
+                              uint64_t n,
+                              uint64_t to,
+                              uint64_t from);
 
-    void readAttribute(const Attributes &buffer,
+    size_t sizeOfAttributesPerPoint() const;
+
+    void readAttribute(const AttributesBuffer &buffer,
                        const std::string &name,
                        std::vector<size_t> &data);
-    void readAttribute(const Attributes &buffer,
+    void readAttribute(const AttributesBuffer &buffer,
                        const std::string &name,
                        std::vector<double> &data);
 
-    bool createAttribute(Attributes &buffer, const std::string &name, size_t n);
-    void writeAttribute(Attributes &buffer,
+    bool createAttribute(AttributesBuffer &buffer,
+                         const std::string &name,
+                         size_t n);
+    void writeAttribute(AttributesBuffer &buffer,
                         const std::string &name,
                         const std::vector<size_t> &data);
-    void writeAttribute(Attributes &buffer,
+    void writeAttribute(AttributesBuffer &buffer,
                         const std::string &name,
                         const std::vector<double> &data);
 
@@ -290,6 +304,11 @@ protected:
     void writeHeader(const Header &hdr);
 
     void openAttributeFiles(const std::string &path, bool truncate);
+    void openAttributeFile(RecordFile &file,
+                           const std::string &path,
+                           const std::string &name,
+                           RecordFile::Type recordType,
+                           bool truncate);
 };
 
 std::ostream &operator<<(std::ostream &os, const LasFile::Header &obj);

@@ -133,8 +133,8 @@ void PageData::readPage(Editor *editor)
     }
 
     // Attributes
-    LasFile::Attributes attributes;
-    las.readAttributes(attributes, numberOfPointsInPage);
+    LasFile::AttributesBuffer attributes;
+    las.readAttributesBuffer(attributes, numberOfPointsInPage);
     las.readAttribute(attributes, "segment", segment);
     las.readAttribute(attributes, "elevation", elevation);
     las.readAttribute(attributes, "descriptor", descriptor);
@@ -196,12 +196,13 @@ void PageData::writePage(Editor *editor)
     las.writeBuffer(pointDataBuffer_.data(), pointDataBuffer_.size());
 
     // Attributes
-    LasFile::Attributes attributes;
+    LasFile::AttributesBuffer attributes;
+    las.createAttributesBuffer(attributes, numberOfPointsInPage);
     las.writeAttribute(attributes, "segment", segment);
     las.writeAttribute(attributes, "elevation", elevation);
     las.writeAttribute(attributes, "descriptor", descriptor);
     las.writeAttribute(attributes, "voxel", voxel);
-    las.writeAttributes(attributes);
+    las.writeAttributesBuffer(attributes, numberOfPointsInPage);
 
     // Clear 'modified' flag
     modified_ = false;

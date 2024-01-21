@@ -85,6 +85,9 @@ protected:
         // Files are open. Output file has header. Buffers are configured.
         STATE_BEGIN,
 
+        // Prepare initial attributes.
+        STATE_CREATE_ATTRIBUTES,
+
         // Copy file data.
         STATE_COPY_VLR,
         STATE_COPY_POINTS,
@@ -92,6 +95,7 @@ protected:
 
         STATE_MOVE,
         STATE_COPY,
+        STATE_COPY_ATTRIBUTES,
         STATE_MAIN_BEGIN,
         STATE_MAIN_INSERT,
         STATE_MAIN_END,
@@ -125,15 +129,17 @@ protected:
     size_t sizePointOut_;
     size_t sizePointFormat_;
 
+    uint64_t sizeOfAttributesPerPoint_;
+    uint64_t sizeOfAttributes_;
+
     Box<double> boundary_;
 
     uint32_t rgbMax_;
     uint32_t intensityMax_;
 
-    uint64_t start_;
-    uint64_t current_;
-    uint64_t max_;
-    uint64_t step_;
+    uint64_t copyPointsRestartIndex_;
+    uint64_t copyPointsCurrentIndex_;
+    uint64_t copyPointsSkipCount_;
 
     IndexFile indexMain_;
     IndexFile indexNode_;
@@ -153,14 +159,17 @@ protected:
     // Buffers
     std::vector<uint8_t> buffer_;
     std::vector<uint8_t> bufferOut_;
-    LasFile::Attributes attributes_;
+    LasFile::AttributesBuffer attributes_;
+    LasFile::AttributesBuffer attributesOut_;
     std::vector<double> coords_;
 
     void openFiles();
 
     void nextState();
+    void stateCreateAttributes();
     void stateCopy();
     void stateCopyPoints();
+    void stateCopyAttributes();
     void stateMove();
     void stateMainBegin();
     void stateMainInsert();

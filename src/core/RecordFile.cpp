@@ -54,29 +54,14 @@ RecordFile::~RecordFile()
 {
 }
 
-void RecordFile::open(bool truncate,
-                      const std::string &path,
-                      const std::string &name,
-                      RecordFile::Type recordType,
-                      size_t recordSize)
+void RecordFile::create(const std::string &path,
+                        const std::string &name,
+                        RecordFile::Type recordType,
+                        size_t recordSize)
 {
     init();
-
-    if (truncate)
-    {
-        file_.create(path);
-        writeHeader(name, recordType, recordSize);
-    }
-    else if (!File::exists(path))
-    {
-        file_.open(path);
-        writeHeader(name, recordType, recordSize);
-    }
-    else
-    {
-        file_.open(path);
-        readHeader();
-    }
+    file_.create(path);
+    writeHeader(name, recordType, recordSize);
 }
 
 void RecordFile::open(const std::string &path)
@@ -207,6 +192,12 @@ uint64_t RecordFile::index() const
 
 void RecordFile::setIndex(uint64_t index)
 {
+    uint64_t max = size();
+    if (index > max)
+    {
+        fill(index - max);
+    }
+
     file_.seek(headerSize_ + (index * recordSize_));
 }
 
@@ -216,18 +207,18 @@ void RecordFile::fill(uint64_t n)
     buffer.resize(1000 * 1000);
     std::memset(buffer.data(), 0, buffer.size());
 
-    uint64_t i = 0;
-    uint64_t s = n * recordSize_;
+    uint64_t written = 0;
+    uint64_t totalBytes = n * recordSize_;
 
-    while (i < s)
+    while (written < totalBytes)
     {
-        uint64_t step = s - i;
-        if (step > buffer.size())
+        uint64_t nbyte = totalBytes - written;
+        if (nbyte > buffer.size())
         {
-            step = buffer.size();
+            nbyte = buffer.size();
         }
-        file_.write(buffer.data(), step);
-        i += step;
+        file_.write(buffer.data(), nbyte);
+        written += nbyte;
     }
 }
 
@@ -290,7 +281,9 @@ void RecordFile::writeBuffer(const uint8_t *buffer, uint64_t nbyte)
     file_.write(buffer, nbyte);
 }
 
-void RecordFile::createBuffer(RecordFile::Buffer &buffer, uint64_t n) const
+void RecordFile::createBuffer(RecordFile::Buffer &buffer,
+                              uint64_t n,
+                              bool setZero) const
 {
     buffer.recordType = recordType_;
     buffer.recordSize = recordSize_;
@@ -302,19 +295,30 @@ void RecordFile::createBuffer(RecordFile::Buffer &buffer, uint64_t n) const
     {
         buffer.data.resize(nbyte);
     }
+
+    if (setZero)
+    {
+        std::memset(buffer.data.data(), 0, nbyte);
+    }
 }
 
 void RecordFile::readBuffer(RecordFile::Buffer &buffer, uint64_t n)
 {
     createBuffer(buffer, n);
-    size_t nbyte = buffer.size * recordSize_;
+    uint64_t nbyte = n * recordSize_;
     readBuffer(buffer.data.data(), nbyte);
 }
 
-void RecordFile::writeBuffer(const RecordFile::Buffer &buffer)
+void RecordFile::writeBuffer(const RecordFile::Buffer &buffer,
+                             uint64_t n,
+                             uint64_t from)
 {
-    size_t nbyte = buffer.size * recordSize_;
-    writeBuffer(buffer.data.data(), nbyte);
+    size_t offset = static_cast<size_t>(from) * buffer.recordSize;
+    uint64_t nbyte = n * buffer.recordSize;
+    if (offset + nbyte <= buffer.data.size())
+    {
+        writeBuffer(buffer.data.data() + offset, nbyte);
+    }
 }
 
 template <class T>
@@ -395,4 +399,16 @@ void RecordFile::Buffer::read(std::vector<size_t> &v) const
 void RecordFile::Buffer::read(std::vector<double> &v) const
 {
     recordFileBufferRead(v, data, recordType, size);
+}
+
+void RecordFile::Buffer::copy(const RecordFile::Buffer &src,
+                              uint64_t n,
+                              uint64_t to,
+                              uint64_t from)
+{
+    size_t dstOffset = static_cast<size_t>(to) * recordSize;
+    size_t srcOffset = static_cast<size_t>(from) * src.recordSize;
+    size_t nbyte = static_cast<size_t>(n) * src.recordSize;
+
+    std::memcpy(data.data() + dstOffset, src.data.data() + srcOffset, nbyte);
 }

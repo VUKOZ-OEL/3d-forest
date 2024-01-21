@@ -72,16 +72,20 @@ public:
 
         void read(std::vector<size_t> &v) const;
         void read(std::vector<double> &v) const;
+
+        void copy(const RecordFile::Buffer &src,
+                  uint64_t n,
+                  uint64_t to,
+                  uint64_t from);
     };
 
     RecordFile();
     ~RecordFile();
 
-    void open(bool truncate,
-              const std::string &path,
-              const std::string &name,
-              RecordFile::Type recordType,
-              size_t recordSize = 0);
+    void create(const std::string &path,
+                const std::string &name,
+                RecordFile::Type recordType,
+                size_t recordSize = 0);
     void open(const std::string &path);
     void close();
     bool isOpen() const { return file_.isOpen(); }
@@ -108,9 +112,13 @@ public:
     void readBuffer(uint8_t *buffer, uint64_t nbyte);
     void writeBuffer(const uint8_t *buffer, uint64_t nbyte);
 
-    void createBuffer(RecordFile::Buffer &buffer, uint64_t n) const;
+    void createBuffer(RecordFile::Buffer &buffer,
+                      uint64_t n,
+                      bool setZero = false) const;
     void readBuffer(RecordFile::Buffer &buffer, uint64_t n);
-    void writeBuffer(const RecordFile::Buffer &buffer);
+    void writeBuffer(const RecordFile::Buffer &buffer,
+                     uint64_t n,
+                     uint64_t from = 0);
 
 protected:
     RecordFile::Type recordType_;

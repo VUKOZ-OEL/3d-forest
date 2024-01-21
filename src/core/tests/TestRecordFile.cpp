@@ -29,7 +29,7 @@ TEST_CASE(TestRecordFileCreate1U32)
     // write
     RecordFile w;
     uint32_t wU32 = UINT32_MAX;
-    w.open(true, TEST_RECORD_FILE_PATH, "foo", RecordFile::TYPE_U32);
+    w.create(TEST_RECORD_FILE_PATH, "foo", RecordFile::TYPE_U32);
     w.write(wU32);
     TEST(w.size() == 1);
     TEST(w.index() == 1);

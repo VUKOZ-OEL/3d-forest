@@ -164,6 +164,12 @@ void IndexFileBuilder::openFiles()
     offsetPointsStart_ = inputLas_.header.offset_to_point_data;
     offsetPointsEnd_ = offsetPointsStart_ + sizePoints_;
 
+    // Input attributes
+    sizeOfAttributesPerPoint_ = inputLas_.sizeOfAttributesPerPoint();
+    sizeOfAttributes_ =
+        sizeOfAttributesPerPoint_ * inputLas_.header.number_of_point_records;
+    inputLas_.createAttributesBuffer(attributes_, settings_.bufferSize, true);
+
     // Output
     outputLas_.create(writePath_);
     outputLas_.header = inputLas_.header;
@@ -245,6 +251,10 @@ void IndexFileBuilder::next()
     switch (state_)
     {
         // Copy file
+        case STATE_CREATE_ATTRIBUTES:
+            stateCreateAttributes();
+            break;
+
         case STATE_COPY_VLR:
             stateCopy();
             break;
@@ -263,6 +273,10 @@ void IndexFileBuilder::next()
 
         case STATE_COPY:
             stateCopy();
+            break;
+
+        case STATE_COPY_ATTRIBUTES:
+            stateCopyAttributes();
             break;
 
         case STATE_MAIN_BEGIN:
@@ -319,6 +333,12 @@ void IndexFileBuilder::nextState()
     switch (state_)
     {
         case STATE_BEGIN:
+            state_ = STATE_CREATE_ATTRIBUTES;
+            maximum_ = sizeOfAttributes_;
+            maximumIdx_ = outputLas_.header.number_of_point_records;
+            break;
+
+        case STATE_CREATE_ATTRIBUTES:
             state_ = STATE_COPY_VLR;
             maximum_ = offsetPointsStart_ - offsetHeaderEnd_;
             break;
@@ -327,17 +347,16 @@ void IndexFileBuilder::nextState()
             state_ = STATE_COPY_POINTS;
             maximum_ = sizePoints_;
             maximumIdx_ = inputLas_.header.number_of_point_records;
-            start_ = 0;
-            current_ = 0;
-            max_ = maximumIdx_;
+            copyPointsRestartIndex_ = 0;
+            copyPointsCurrentIndex_ = 0;
 #ifndef INDEX_FILE_BUILDER_DEBUG_SAME_ORDER
-            step_ = max_ / settings_.maxSize1;
-            if (max_ % settings_.maxSize1 > 0)
+            copyPointsSkipCount_ = maximumIdx_ / settings_.maxSize1;
+            if (maximumIdx_ % settings_.maxSize1 > 0)
             {
-                step_++;
+                copyPointsSkipCount_++;
             }
 #else
-            step_ = 1;
+            copyPointsSkipCount_ = 1;
 #endif /* INDEX_FILE_BUILDER_DEBUG_SAME_ORDER */
             break;
 
@@ -356,6 +375,12 @@ void IndexFileBuilder::nextState()
             break;
 
         case STATE_COPY:
+            state_ = STATE_COPY_ATTRIBUTES;
+            maximum_ = sizeOfAttributes_;
+            maximumIdx_ = inputLas_.header.number_of_point_records;
+            break;
+
+        case STATE_COPY_ATTRIBUTES:
             state_ = STATE_MAIN_BEGIN;
             break;
 
@@ -403,6 +428,30 @@ void IndexFileBuilder::nextState()
     }
 }
 
+void IndexFileBuilder::stateCreateAttributes()
+{
+    // Step
+    uint64_t numberOfBytesPerStep;
+    uint64_t remainingNumberOfPoints;
+    uint64_t numberOfPointsPerStep;
+
+    numberOfPointsPerStep = settings_.bufferSize;
+    remainingNumberOfPoints = maximumIdx_ - valueIdx_;
+    if (remainingNumberOfPoints < numberOfPointsPerStep)
+    {
+        numberOfPointsPerStep = remainingNumberOfPoints;
+    }
+    numberOfBytesPerStep = numberOfPointsPerStep * sizeOfAttributesPerPoint_;
+
+    // Write
+    outputLas_.writeAttributesBuffer(attributes_, numberOfPointsPerStep);
+
+    // Next
+    value_ += numberOfBytesPerStep;
+    valueIdx_ += numberOfPointsPerStep;
+    valueTotal_ += numberOfBytesPerStep;
+}
+
 void IndexFileBuilder::stateCopy()
 {
     // Step
@@ -423,6 +472,27 @@ void IndexFileBuilder::stateCopy()
     // Next
     value_ += step;
     valueTotal_ += step;
+}
+
+void IndexFileBuilder::stateCopyAttributes()
+{
+    // Step
+    uint64_t step = settings_.bufferSize;
+    uint64_t remain = maximumIdx_ - valueIdx_;
+
+    if (remain < step)
+    {
+        step = remain;
+    }
+
+    // Copy
+    inputLas_.readAttributesBuffer(attributes_, step);
+    outputLas_.writeAttributesBuffer(attributes_, step);
+
+    // Next
+    value_ += (step * sizeOfAttributesPerPoint_);
+    valueIdx_ += step;
+    valueTotal_ += (step * sizeOfAttributesPerPoint_);
 }
 
 void IndexFileBuilder::formatPoint(uint8_t *pout, const uint8_t *pin) const
@@ -508,34 +578,35 @@ void IndexFileBuilder::formatPoint(uint8_t *pout, const uint8_t *pin) const
 void IndexFileBuilder::stateCopyPoints()
 {
     // Step
-    uint64_t step;
-    uint64_t remainIdx;
-    size_t stepIdx;
+    uint64_t numberOfBytesPerStep;
+    uint64_t remainingNumberOfPoints;
+    size_t numberOfPointsPerStep;
 
-    stepIdx = buffer_.size() / sizePoint_;
-    remainIdx = maximumIdx_ - valueIdx_;
-    if (remainIdx < static_cast<uint64_t>(stepIdx))
+    numberOfPointsPerStep = buffer_.size() / sizePoint_;
+    remainingNumberOfPoints = maximumIdx_ - valueIdx_;
+    if (remainingNumberOfPoints < static_cast<uint64_t>(numberOfPointsPerStep))
     {
-        stepIdx = static_cast<size_t>(remainIdx);
+        numberOfPointsPerStep = static_cast<size_t>(remainingNumberOfPoints);
     }
-    step = stepIdx * sizePoint_;
+    numberOfBytesPerStep = numberOfPointsPerStep * sizePoint_;
 
     // Buffers
-    if (bufferOut_.size() < sizePointOut_ * stepIdx)
+    if (bufferOut_.size() < sizePointOut_ * numberOfPointsPerStep)
     {
-        bufferOut_.resize(sizePointOut_ * stepIdx);
+        bufferOut_.resize(sizePointOut_ * numberOfPointsPerStep);
     }
 
-    uint64_t start = inputLas_.header.offset_to_point_data;
+    outputLas_.createAttributesBuffer(attributesOut_, numberOfPointsPerStep);
+
     uint8_t *in = buffer_.data();
     uint8_t *bufferOut = bufferOut_.data();
     uint8_t *out;
 
     // Clear the output buffer
-    std::memset(bufferOut, 0, sizePointOut_ * stepIdx);
+    std::memset(bufferOut, 0, sizePointOut_ * numberOfPointsPerStep);
 
     // Coordinates without scaling
-    coords_.resize(stepIdx * 3);
+    coords_.resize(numberOfPointsPerStep * 3);
 
     // Point formatting
     bool hasDifferentFormat;
@@ -566,15 +637,15 @@ void IndexFileBuilder::stateCopyPoints()
     }
 
     // Process one step of the input
-    for (size_t i = 0; i < stepIdx; i++)
+    for (size_t i = 0; i < numberOfPointsPerStep; i++)
     {
         // Reorder
-        inputLas_.seek(start + (current_ * sizePoint_));
-        current_ += step_;
-        if (current_ >= max_)
+        inputLas_.seekPoint(copyPointsCurrentIndex_);
+        copyPointsCurrentIndex_ += copyPointsSkipCount_;
+        if (copyPointsCurrentIndex_ >= maximumIdx_)
         {
-            start_++;
-            current_ = start_;
+            copyPointsRestartIndex_++;
+            copyPointsCurrentIndex_ = copyPointsRestartIndex_;
         }
 
         // Read input
@@ -613,10 +684,15 @@ void IndexFileBuilder::stateCopyPoints()
                 rgbMax_ = rgb;
             }
         }
+
+        // Attributes
+        inputLas_.readAttributesBuffer(attributes_, 1);
+        outputLas_.copyAttributesBuffer(attributesOut_, attributes_, 1, i, 0);
     }
 
     // Write this step to the output
-    outputLas_.writeBuffer(bufferOut, sizePointOut_ * stepIdx);
+    outputLas_.writeBuffer(bufferOut, sizePointOut_ * numberOfPointsPerStep);
+    outputLas_.writeAttributesBuffer(attributesOut_, numberOfPointsPerStep);
 
     // Boundary without scaling
     Box<double> box;
@@ -624,9 +700,9 @@ void IndexFileBuilder::stateCopyPoints()
     boundary_.extend(box);
 
     // Next
-    value_ += step;
-    valueIdx_ += stepIdx;
-    valueTotal_ += step;
+    value_ += numberOfBytesPerStep;
+    valueIdx_ += numberOfPointsPerStep;
+    valueTotal_ += numberOfBytesPerStep;
 }
 
 void IndexFileBuilder::stateMove()
@@ -666,7 +742,7 @@ void IndexFileBuilder::stateMainBegin()
                            settings_.maxLevel1);
 
     // Initial file offset
-    inputLas_.seekPointData();
+    inputLas_.seekPoint(0);
 }
 
 void IndexFileBuilder::stateMainInsert()
@@ -718,7 +794,7 @@ void IndexFileBuilder::stateMainEnd()
     indexMain_.write(indexFile_);
 
     // Next initial file offset
-    inputLas_.seekPointData();
+    inputLas_.seekPoint(0);
 }
 
 void IndexFileBuilder::stateMainSort()
@@ -739,10 +815,9 @@ void IndexFileBuilder::stateMainSort()
     // Points
     uint8_t *buffer = buffer_.data();
     uint8_t *point;
-    uint64_t start = outputLas_.header.offset_to_point_data;
-    uint64_t pos;
 
     inputLas_.readBuffer(buffer, step);
+    inputLas_.readAttributesBuffer(attributes_, stepIdx);
 
     double x;
     double y;
@@ -789,10 +864,11 @@ void IndexFileBuilder::stateMainSort()
         node = indexMain_.selectNode(indexMainUsed_, x, y, z);
         if (node)
         {
-            pos = indexMainUsed_[node]++;
+            uint64_t pos = indexMainUsed_[node]++;
             pos += node->from;
-            outputLas_.seek(start + (pos * sizePoint_));
+            outputLas_.seekPoint(pos);
             outputLas_.writeBuffer(point, sizePoint_);
+            outputLas_.writeAttributesBuffer(attributes_, 1, pos);
         }
     }
 
@@ -839,12 +915,13 @@ void IndexFileBuilder::stateNodeInsert()
     std::vector<uint64_t> bufferCodes;
     bufferCodes.resize(node->size * 2); // pair { code, index }
 
-    uint64_t start = outputLas_.header.offset_to_point_data;
     uint8_t *buffer = bufferNode.data();
     uint8_t *point;
 
-    outputLas_.seek(start + (node->from * sizePoint_));
+    outputLas_.seekPoint(node->from);
     outputLas_.readBuffer(buffer, step);
+    outputLas_.readAttributesBuffer(attributes_, node->size);
+    outputLas_.createAttributesBuffer(attributesOut_, node->size);
 
     // Actual boundary of this page
     coords_.resize(node->size * 3);
@@ -898,9 +975,19 @@ void IndexFileBuilder::stateNodeInsert()
         std::memcpy(pointOut, point, sizePoint_);
     }
 
+    for (uint64_t i = 0; i < node->size; i++)
+    {
+        outputLas_.copyAttributesBuffer(attributesOut_,
+                                        attributes_,
+                                        1,
+                                        i,
+                                        bufferCodes[i * 2 + 1]);
+    }
+
     // Write sorted points
-    outputLas_.seek(start + (node->from * sizePoint_));
+    outputLas_.seekPoint(node->from);
     outputLas_.writeBuffer(bufferOut, step);
+    outputLas_.writeAttributesBuffer(attributesOut_, node->size);
 
     // Next
     value_ += step;
