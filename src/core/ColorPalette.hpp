@@ -22,10 +22,13 @@
 #ifndef COLOR_PALETTE_HPP
 #define COLOR_PALETTE_HPP
 
+// Include std.
 #include <vector>
 
+// Include 3D Forest.
 #include <Vector3.hpp>
 
+// Include local.
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>
 

@@ -19,10 +19,12 @@
 
 /** @file MainWindow.cpp */
 
+// Include 3D Forest.
 #include <MainWindow.hpp>
 #include <PluginInterface.hpp>
 #include <ViewerViewports.hpp>
 
+// Include 3D Forest plugins.
 #include <ExplorerPlugin.hpp>
 #include <ExportFilePlugin.hpp>
 #include <HelpPlugin.hpp>
@@ -32,6 +34,7 @@
 #include <SettingsPlugin.hpp>
 #include <ViewerPlugin.hpp>
 
+// Include Qt.
 #include <QCloseEvent>
 #include <QCoreApplication>
 #include <QDir>
@@ -43,6 +46,7 @@
 #include <QToolBar>
 #include <QToolButton>
 
+// Include local.
 #define LOG_MODULE_NAME "MainWindow"
 #include <Log.hpp>
 
@@ -59,10 +63,10 @@ MainWindow::MainWindow(QWidget *parent)
 {
     LOG_DEBUG(<< "Create.");
 
-    // Status bar
+    // Status bar.
     statusBar()->showMessage(tr("Ready"));
 
-    // Menu
+    // Menu.
     projectFilePlugin_ = new ProjectFilePlugin();
     projectFilePlugin_->initialize(this);
 
@@ -89,7 +93,7 @@ MainWindow::MainWindow(QWidget *parent)
     helpPlugin_ = new HelpPlugin();
     helpPlugin_->initialize(this);
 
-    // Exit
+    // Exit.
     createAction(&actionExit_,
                  "File",
                  "",
@@ -100,11 +104,11 @@ MainWindow::MainWindow(QWidget *parent)
                  SLOT(close()));
     actionExit_->setShortcuts(QKeySequence::Quit);
 
-    // Show windows
+    // Show windows.
     explorerPlugin_->slotPlugin();
     settingsPlugin_->slotPlugin();
 
-    // Rendering
+    // Rendering.
     connect(viewerPlugin_->viewports(),
             SIGNAL(cameraChanged(size_t)),
             this,
@@ -199,7 +203,7 @@ void MainWindow::createAction(QAction **result,
 
     QAction *action;
 
-    // Create action
+    // Create action.
     action = new QAction(text, this);
 
     if (!toolTip.isEmpty())
@@ -213,13 +217,13 @@ void MainWindow::createAction(QAction **result,
         action->setIcon(icon);
     }
 
-    // Connect action
+    // Connect action.
     if (receiver && member)
     {
         connect(action, SIGNAL(triggered()), receiver, member);
     }
 
-    // Add action to menu
+    // Add action to menu.
     if (!menu_.contains(menu))
     {
         menu_[menu] = menuBar()->addMenu(menu);
@@ -240,7 +244,7 @@ void MainWindow::createAction(QAction **result,
         toolBar_[toolBar]->addAction(action);
     }
 
-    // Optional return value for further customization of new action
+    // Optional return value for further customization of new action.
     if (result)
     {
         *result = action;
@@ -256,7 +260,7 @@ void MainWindow::createToolButton(QToolButton **result,
 {
     QToolButton *button;
 
-    // Create button
+    // Create button.
     button = new QToolButton;
     button->setText(text);
     button->setToolTip(toolTip);
@@ -265,13 +269,13 @@ void MainWindow::createToolButton(QToolButton **result,
     button->setEnabled(true);
     button->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
-    // Connect button
+    // Connect button.
     if (receiver && member)
     {
         connect(button, SIGNAL(clicked()), receiver, member);
     }
 
-    // Return value
+    // Return value.
     *result = button;
 }
 
@@ -290,13 +294,13 @@ void MainWindow::hideToolBar(const QString &menu)
 
 void MainWindow::loadPlugins()
 {
-    // Process all files in the application "exe" directory
+    // Process all files in the application "exe" directory.
     QDir pluginsDir(QCoreApplication::applicationDirPath() + "/plugins/");
     const QStringList entries = pluginsDir.entryList(QDir::Files);
 
     for (const QString &fileName : entries)
     {
-        // Try to load the file as a plugin
+        // Try to load the file as a plugin.
         QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
         QObject *plugin = pluginLoader.instance();
 
@@ -311,7 +315,7 @@ void MainWindow::loadPlugin(QObject *plugin)
         return;
     }
 
-    // Detect and register various plugins
+    // Detect and register various plugins.
 
     PluginInterface *pluginInterface;
     pluginInterface = qobject_cast<PluginInterface *>(plugin);

@@ -19,10 +19,12 @@
 
 /** @file SliderWidget.cpp */
 
+// Include 3D Forest.
 #include <MainWindow.hpp>
 #include <SliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
+// Include Qt.
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -30,6 +32,7 @@
 #include <QSpinBox>
 #include <QVBoxLayout>
 
+// Include local.
 #define LOG_MODULE_NAME "SliderWidget"
 #include <Log.hpp>
 
@@ -115,27 +118,27 @@ void SliderWidget::create(SliderWidget *&outputWidget,
 {
     outputWidget = new SliderWidget();
 
-    // Description Name
+    // Description Name.
     QLabel *label = new QLabel(text);
 
-    // Description Tool Tip
+    // Description Tool Tip.
     QLabel *help = new QLabel;
     help->setToolTip(toolTip);
     ThemeIcon helpIcon(":/gui/", "question");
     help->setPixmap(helpIcon.pixmap(MainWindow::ICON_SIZE_TEXT));
 
-    // Description Units
+    // Description Units.
     QComboBox *units = new QComboBox;
     units->addItem(unitsList);
 
-    // Description Layout
+    // Description Layout.
     QHBoxLayout *descriptionLayout = new QHBoxLayout;
     descriptionLayout->addWidget(label);
     descriptionLayout->addWidget(help);
     descriptionLayout->addStretch();
     descriptionLayout->addWidget(units);
 
-    // Value Slider
+    // Value Slider.
     outputWidget->slider_ = new QSlider;
     QSlider *slider = outputWidget->slider_;
     slider->setRange(min, max);
@@ -169,7 +172,7 @@ void SliderWidget::create(SliderWidget *&outputWidget,
                 memberFinalValue);
     }
 
-    // Value SpinBox
+    // Value SpinBox.
     outputWidget->spinBox_ = new QSpinBox;
     QSpinBox *spinBox = outputWidget->spinBox_;
     spinBox->setRange(min, max);
@@ -186,12 +189,12 @@ void SliderWidget::create(SliderWidget *&outputWidget,
             outputWidget,
             SLOT(slotFinalValue()));
 
-    // Value Layout
+    // Value Layout.
     QHBoxLayout *valueLayout = new QHBoxLayout;
     valueLayout->addWidget(slider);
     valueLayout->addWidget(spinBox);
 
-    // Group Description and Value
+    // Group Description and Value.
     QVBoxLayout *groupLayout = new QVBoxLayout;
     groupLayout->addLayout(descriptionLayout);
     groupLayout->addLayout(valueLayout);

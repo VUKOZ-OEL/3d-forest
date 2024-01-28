@@ -22,9 +22,11 @@
 #ifndef SEGMENT_DATA_HPP
 #define SEGMENT_DATA_HPP
 
+// Include 3D Forest.
 #include <Json.hpp>
 #include <Vector3.hpp>
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 

@@ -19,12 +19,14 @@
 
 /** @file PageData.cpp */
 
+// Include 3D Forest.
 #include <Editor.hpp>
 #include <Endian.hpp>
 #include <File.hpp>
 #include <LasFile.hpp>
 #include <PageData.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "PageData"
 #include <Log.hpp>
 
@@ -72,7 +74,7 @@ void PageData::readPage(Editor *editor)
     const IndexFile::Node *node = dataset.index().at(pageId_);
     LasFile &las = dataset.las();
 
-    // Read page buffer from LAS file
+    // Read page buffer from LAS file.
     las.seekPoint(node->from);
 
     size_t numberOfPointsInPage = static_cast<size_t>(node->size);
@@ -82,10 +84,10 @@ void PageData::readPage(Editor *editor)
     pointDataBuffer_.resize(bufferLasPageSize);
     las.readBuffer(pointDataBuffer_.data(), bufferLasPageSize);
 
-    // Create point data
+    // Create point data.
     resize(numberOfPointsInPage);
 
-    // Covert buffer to point data
+    // Covert buffer to point data.
     uint8_t *ptrPointData = pointDataBuffer_.data();
 
     LasFile::Point point;
@@ -97,7 +99,7 @@ void PageData::readPage(Editor *editor)
     {
         las.formatBytesToPoint(point, ptrPointData + (pointSize * i));
 
-        // xyz
+        // XYZ coordinates.
         positionBase_[3 * i + 0] = static_cast<double>(point.x);
         positionBase_[3 * i + 1] = static_cast<double>(point.y);
         positionBase_[3 * i + 2] = static_cast<double>(point.z);
@@ -106,7 +108,7 @@ void PageData::readPage(Editor *editor)
         position[3 * i + 1] = positionBase_[3 * i + 1];
         position[3 * i + 2] = positionBase_[3 * i + 2];
 
-        // intensity and color
+        // Intensity and color.
         intensity[i] = static_cast<double>(point.intensity) * s16;
 
         if (rgbFlag)
@@ -122,45 +124,45 @@ void PageData::readPage(Editor *editor)
             color[3 * i + 2] = 1.0;
         }
 
-        // attributes
+        // Attributes.
         returnNumber[i] = point.return_number;
         numberOfReturns[i] = point.number_of_returns;
         classification[i] = point.classification;
         userData[i] = point.user_data;
 
-        // gps
+        // GPS.
         gpsTime[i] = point.gps_time;
     }
 
-    // Attributes
+    // 3D Forest attributes.
     LasFile::AttributesBuffer attributes;
     las.readAttributesBuffer(attributes, numberOfPointsInPage);
-    las.readAttribute(attributes, "segment", segment);
-    las.readAttribute(attributes, "elevation", elevation);
-    las.readAttribute(attributes, "descriptor", descriptor);
-    las.readAttribute(attributes, "voxel", voxel);
+    attributes.attributes[0].read(segment);
+    attributes.attributes[1].read(elevation);
+    attributes.attributes[2].read(descriptor);
+    attributes.attributes[3].read(voxel);
 
-    // Index
+    // Read page index.
     std::string pathIndex;
     pathIndex = IndexFileBuilder::extension(dataset.path());
     octree.read(pathIndex, node->offset);
     octree.translate(dataset.translation());
 
-    // Loaded
+    // Loaded.
     modified_ = false;
 
-    // Apply
+    // Apply transformation.
     transform(editor);
 }
 
 void PageData::updatePoint(uint8_t *ptr, size_t i, uint8_t fmt)
 {
-    // Do not overwrite the other values for now
+    // Do not overwrite the other values for now:
     // - return number
     // - gps time
     // - etc.
 
-    // Classification
+    // Update classification.
     if (fmt > 5)
     {
         ptr[16] = classification[i];
@@ -195,16 +197,16 @@ void PageData::writePage(Editor *editor)
     las.seekPoint(node->from);
     las.writeBuffer(pointDataBuffer_.data(), pointDataBuffer_.size());
 
-    // Attributes
+    // Attributes.
     LasFile::AttributesBuffer attributes;
     las.createAttributesBuffer(attributes, numberOfPointsInPage);
-    las.writeAttribute(attributes, "segment", segment);
-    las.writeAttribute(attributes, "elevation", elevation);
-    las.writeAttribute(attributes, "descriptor", descriptor);
-    las.writeAttribute(attributes, "voxel", voxel);
+    attributes.attributes[0].write(segment);
+    attributes.attributes[1].write(elevation);
+    attributes.attributes[2].write(descriptor);
+    attributes.attributes[3].write(voxel);
     las.writeAttributesBuffer(attributes, numberOfPointsInPage);
 
-    // Clear 'modified' flag
+    // Clear 'modified' flag.
     modified_ = false;
 }
 

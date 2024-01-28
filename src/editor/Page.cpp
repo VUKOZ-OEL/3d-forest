@@ -19,6 +19,7 @@
 
 /** @file Page.cpp */
 
+// Include 3D Forest.
 #include <ColorPalette.hpp>
 #include <Dataset.hpp>
 #include <Editor.hpp>
@@ -30,6 +31,7 @@
 #include <Page.hpp>
 #include <Query.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "Page"
 #include <Log.hpp>
 
@@ -129,10 +131,10 @@ void Page::readPage()
 
     resize(pageData_->size());
 
-    // Loaded
+    // Loaded.
     state_ = Page::STATE_TRANSFORM;
 
-    // Apply
+    // Apply.
     transform();
     queryWhere();
     runModifiers();
@@ -277,12 +279,12 @@ void Page::queryWhereBox()
 
     LOG_DEBUG(<< "Page pageId <" << pageId_ << ">.");
 
-    // Select octants
+    // Select octants.
     selectedNodes_.resize(0);
     IndexFile &octree = pageData_->octree;
     octree.selectLeaves(selectedNodes_, clipBox, datasetId_);
 
-    // Compute upper limit of the number of selected points
+    // Compute upper limit of the number of selected points.
     size_t nSelected = 0;
 
     for (size_t i = 0; i < selectedNodes_.size(); i++)
@@ -302,14 +304,14 @@ void Page::queryWhereBox()
         selection.resize(selectionSize);
     }
 
-    // Select points
+    // Select points.
     nSelected = 0;
 
     size_t max = query_->maximumResults();
 
     if (max == 0)
     {
-        // Unlimited number of results
+        // Unlimited number of results.
         for (size_t i = 0; i < selectedNodes_.size(); i++)
         {
             const IndexFile::Node *nodeL2 = octree.at(selectedNodes_[i].idx);
@@ -323,7 +325,7 @@ void Page::queryWhereBox()
 
             if (selectedNodes_[i].partial)
             {
-                // Partial selection, apply clip filter
+                // Partial selection, apply clip filter.
                 for (size_t j = 0; j < nNodePoints; j++)
                 {
                     size_t idx = from + j;
@@ -339,7 +341,7 @@ void Page::queryWhereBox()
             }
             else
             {
-                // Everything
+                // Everything.
                 for (size_t j = 0; j < nNodePoints; j++)
                 {
                     selection[nSelected++] = static_cast<uint32_t>(from + j);
@@ -349,7 +351,7 @@ void Page::queryWhereBox()
     }
     else
     {
-        // Limited number of results
+        // Limited number of results.
         max = max - query_->resultSize();
         bool maxReached = false;
 
@@ -366,7 +368,7 @@ void Page::queryWhereBox()
 
             if (selectedNodes_[i].partial)
             {
-                // Partial selection, apply clip filter
+                // Partial selection, apply clip filter.
                 for (size_t j = 0; j < nNodePoints; j++)
                 {
                     size_t idx = from + j;
@@ -387,7 +389,7 @@ void Page::queryWhereBox()
             }
             else
             {
-                // Everything
+                // Everything.
                 if (nNodePoints > max)
                 {
                     nNodePoints = max;
@@ -423,12 +425,12 @@ void Page::queryWhereCone()
 
     LOG_DEBUG(<< "Page pageId <" << pageId_ << ">.");
 
-    // Select octants
+    // Select octants.
     selectedNodes_.resize(0);
     IndexFile &octree = pageData_->octree;
     octree.selectLeaves(selectedNodes_, clipCone.box(), datasetId_);
 
-    // Compute upper limit of the number of selected points
+    // Compute upper limit of the number of selected points.
     size_t nSelected = 0;
 
     for (size_t i = 0; i < selectedNodes_.size(); i++)
@@ -448,7 +450,7 @@ void Page::queryWhereCone()
         selection.resize(selectionSize);
     }
 
-    // Select points
+    // Select points.
     nSelected = 0;
 
     size_t max = query_->maximumResults() - query_->resultSize();
@@ -465,7 +467,7 @@ void Page::queryWhereCone()
         size_t nNodePoints = static_cast<size_t>(nodeL2->size);
         size_t from = static_cast<size_t>(nodeL2->from);
 
-        // Partial/Whole selection, apply clip filter
+        // Partial/Whole selection, apply clip filter.
         for (size_t j = 0; j < nNodePoints; j++)
         {
             size_t idx = from + j;
@@ -506,12 +508,12 @@ void Page::queryWhereCylinder()
 
     LOG_DEBUG(<< "Page pageId <" << pageId_ << ">.");
 
-    // Select octants
+    // Select octants.
     selectedNodes_.resize(0);
     IndexFile &octree = pageData_->octree;
     octree.selectLeaves(selectedNodes_, clipCylinder.box(), datasetId_);
 
-    // Compute upper limit of the number of selected points
+    // Compute upper limit of the number of selected points.
     size_t nSelected = 0;
 
     for (size_t i = 0; i < selectedNodes_.size(); i++)
@@ -531,7 +533,7 @@ void Page::queryWhereCylinder()
         selection.resize(selectionSize);
     }
 
-    // Select points
+    // Select points.
     nSelected = 0;
 
     size_t max = query_->maximumResults() - query_->resultSize();
@@ -548,7 +550,7 @@ void Page::queryWhereCylinder()
         size_t nNodePoints = static_cast<size_t>(nodeL2->size);
         size_t from = static_cast<size_t>(nodeL2->from);
 
-        // Partial/Whole selection, apply clip filter
+        // Partial/Whole selection, apply clip filter.
         for (size_t j = 0; j < nNodePoints; j++)
         {
             size_t idx = from + j;
@@ -589,12 +591,12 @@ void Page::queryWhereSphere()
 
     LOG_DEBUG(<< "Page pageId <" << pageId_ << ">.");
 
-    // Select octants
+    // Select octants.
     selectedNodes_.resize(0);
     IndexFile &octree = pageData_->octree;
     octree.selectLeaves(selectedNodes_, clipSphere.box(), datasetId_);
 
-    // Compute upper limit of the number of selected points
+    // Compute upper limit of the number of selected points.
     size_t nSelected = 0;
 
     for (size_t i = 0; i < selectedNodes_.size(); i++)
@@ -614,7 +616,7 @@ void Page::queryWhereSphere()
         selection.resize(selectionSize);
     }
 
-    // Select points
+    // Select points.
     nSelected = 0;
 
     size_t max = query_->maximumResults() - query_->resultSize();
@@ -631,7 +633,7 @@ void Page::queryWhereSphere()
         size_t nNodePoints = static_cast<size_t>(nodeL2->size);
         size_t from = static_cast<size_t>(nodeL2->from);
 
-        // Partial/Whole selection, apply clip filter
+        // Partial/Whole selection, apply clip filter.
         for (size_t j = 0; j < nNodePoints; j++)
         {
             size_t idx = from + j;

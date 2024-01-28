@@ -22,11 +22,14 @@
 #ifndef POINTS_HPP
 #define POINTS_HPP
 
+// 3rd party.
 #include <UnibnOctree.hpp>
 
+// Include 3D Forest.
 #include <Point.hpp>
 #include <VectorFile.hpp>
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 
@@ -34,26 +37,26 @@
 class EXPORT_EDITOR Points
 {
 public:
-    // construct/copy/destroy
+    // Construct/Copy/Destroy.
     Points();
     ~Points();
 
-    // capacity
+    // Capacity.
     bool empty() const { return points_.size() > 0; }
     size_t size() const { return points_.size(); }
 
-    // element access
+    // Element access.
     Point &operator[](size_t pos) { return points_.at(pos); }
     const Point &operator[](size_t pos) const { return points_.at(pos); }
     Point &at(size_t pos) { return points_.at(pos); }
     const Point &at(size_t pos) const { return points_.at(pos); }
 
-    // modifiers
+    // Modifiers.
     void push_back(const Point &point);
     void push_back(Point &&point);
     void clear();
 
-    // search
+    // Search.
     void createIndex();
     void findRadius(double x,
                     double y,

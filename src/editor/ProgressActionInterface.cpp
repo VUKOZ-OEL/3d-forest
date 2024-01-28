@@ -19,9 +19,11 @@
 
 /** @file ProgressActionInterface.cpp */
 
+// Include 3D Forest.
 #include <ProgressActionInterface.hpp>
 #include <Time.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "ProgressActionInterface"
 #include <Log.hpp>
 

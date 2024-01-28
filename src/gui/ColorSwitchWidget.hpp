@@ -22,10 +22,13 @@
 #ifndef COLOR_SWITCH_WIDGET_HPP
 #define COLOR_SWITCH_WIDGET_HPP
 
+// Include 3D Forest.
 #include <Vector3.hpp>
 
+// Include Qt.
 #include <QWidget>
 
+// Include local.
 #include <ExportGui.hpp>
 #include <WarningsDisable.hpp>
 

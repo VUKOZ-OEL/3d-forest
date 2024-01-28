@@ -22,12 +22,15 @@
 #ifndef MAIN_WINDOW_HPP
 #define MAIN_WINDOW_HPP
 
+// Include std.
 #include <set>
 
+// Include 3D Forest.
 #include <Editor.hpp>
 #include <RenderThread.hpp>
 #include <ThreadCallbackInterface.hpp>
 
+// Include 3D Forest plugins.
 class PluginInterface;
 class ExportFilePlugin;
 class ImportFilePlugin;
@@ -38,13 +41,14 @@ class SettingsPlugin;
 class ViewerPlugin;
 class HelpPlugin;
 
+// Include Qt.
 #include <QHash>
 #include <QIcon>
 #include <QMainWindow>
 #include <QSet>
 
 #if QT_VERSION_MAJOR == 5
-    // Fix for qt5 which has two QAction classes
+    // Fix for qt5 which has two QAction classes.
     #include <QtWidgets/QAction>
 #else
     #include <QAction>
@@ -52,6 +56,7 @@ class HelpPlugin;
 
 class QToolButton;
 
+// Include local.
 #include <ExportGui.hpp>
 #include <WarningsDisable.hpp>
 
@@ -128,11 +133,11 @@ private:
     void loadPlugin(QObject *plugin);
     void createMenuSeparator(const QString &menu);
 
-    // Editor
+    // Editor.
     Editor editor_;
     RenderThread threadRender_;
 
-    // Gui
+    // Gui.
     ImportFilePlugin *importFilePlugin_;
     ExportFilePlugin *exportFilePlugin_;
     MessageLogPlugin *messageLogPlugin_;
@@ -143,7 +148,7 @@ private:
     HelpPlugin *helpPlugin_;
     std::vector<PluginInterface *> plugins_;
 
-    // Menu
+    // Menu.
     QHash<QString, QMenu *> menu_;
     QHash<QString, QToolBar *> toolBar_;
 

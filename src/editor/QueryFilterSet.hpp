@@ -22,10 +22,12 @@
 #ifndef QUERY_FILTER_SET_HPP
 #define QUERY_FILTER_SET_HPP
 
+// Include std.
 #include <cstddef>
 #include <cstdint>
 #include <unordered_set>
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 

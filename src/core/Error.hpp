@@ -22,9 +22,11 @@
 #ifndef ERROR_HPP
 #define ERROR_HPP
 
+// Include std.
 #include <stdexcept>
 #include <string>
 
+// Include local.
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>
 

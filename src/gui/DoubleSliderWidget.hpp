@@ -22,12 +22,13 @@
 #ifndef DOUBLE_SLIDER_WIDGET_HPP
 #define DOUBLE_SLIDER_WIDGET_HPP
 
+// Include Qt.
 #include <QWidget>
-
 class QSpinBox;
 class QSlider;
 class QVBoxLayout;
 
+// Include local.
 #include <ExportGui.hpp>
 #include <WarningsDisable.hpp>
 

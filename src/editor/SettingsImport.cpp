@@ -19,8 +19,10 @@
 
 /** @file SettingsImport.cpp */
 
+// Include 3D Forest.
 #include <SettingsImport.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "SettingsImport"
 #include <Log.hpp>
 

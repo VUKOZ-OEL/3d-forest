@@ -19,11 +19,13 @@
 
 /** @file RenderThread.cpp */
 
+// Include 3D Forest.
 #include <Editor.hpp>
 #include <RenderThread.hpp>
 #include <ThreadCallbackInterface.hpp>
 #include <Time.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "RenderThread"
 #include <Log.hpp>
 

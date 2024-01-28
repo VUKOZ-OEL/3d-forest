@@ -19,8 +19,10 @@
 
 /** @file Datasets.cpp */
 
+// Include 3D Forest.
 #include <Datasets.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "Datasets"
 #include <Log.hpp>
 
@@ -121,7 +123,7 @@ void Datasets::clear()
 
 size_t Datasets::unusedId() const
 {
-    // Return minimum available id value
+    // Return minimum available id value.
     for (size_t rval = 0; rval < std::numeric_limits<size_t>::max(); rval++)
     {
         if (hashTable_.find(rval) == hashTable_.end())

@@ -19,23 +19,23 @@
 
 /** @file RecordFile.cpp */
 
-// Std
+// Include std.
 #include <cstring>
 
-// 3D Forest
+// Include 3D Forest.
 #include <Endian.hpp>
 #include <Error.hpp>
 #include <RecordFile.hpp>
 #include <Util.hpp>
 
-// Local
+// Include local.
 #define LOG_MODULE_NAME "RecordFile"
 #include <Log.hpp>
 
 #define RECORD_FILE_SIGNATURE_0 0x52
 #define RECORD_FILE_SIGNATURE_1 0x45
 #define RECORD_FILE_SIGNATURE_2 0x43
-#define RECORD_FILE_SIGNATURE_3 0x44
+#define RECORD_FILE_SIGNATURE_3 0x46
 
 RecordFile::RecordFile()
 {
@@ -91,8 +91,8 @@ void RecordFile::writeHeader(const std::string &name,
     buffer[1] = RECORD_FILE_SIGNATURE_1;
     buffer[2] = RECORD_FILE_SIGNATURE_2;
     buffer[3] = RECORD_FILE_SIGNATURE_3;
-    buffer[4] = 1; // major
-    buffer[5] = 0; // minor
+    buffer[4] = 1; // Major.
+    buffer[5] = 0; // Minor.
     htol16(&buffer[6], static_cast<uint16_t>(headerSize_));
     htol32(&buffer[8], static_cast<uint32_t>(recordType_));
     htol32(&buffer[12], static_cast<uint32_t>(recordSize_));

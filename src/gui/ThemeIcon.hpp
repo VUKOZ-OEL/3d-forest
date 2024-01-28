@@ -22,10 +22,12 @@
 #ifndef THEME_ICON_HPP
 #define THEME_ICON_HPP
 
+// Include Qt.
 #include <QFile>
 #include <QIcon>
 #include <QString>
 
+// Include local.
 #include <ExportGui.hpp>
 #include <WarningsDisable.hpp>
 

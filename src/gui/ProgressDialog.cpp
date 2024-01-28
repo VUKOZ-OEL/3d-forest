@@ -19,13 +19,16 @@
 
 /** @file ProgressDialog.cpp */
 
+// Include std.
 #include <cinttypes>
 
+// Include 3D Forest.
 #include <MainWindow.hpp>
 #include <ProgressActionInterface.hpp>
 #include <ProgressDialog.hpp>
 #include <Time.hpp>
 
+// Include Qt.
 #include <QCloseEvent>
 #include <QCoreApplication>
 #include <QGridLayout>
@@ -35,6 +38,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+// Include local.
 #define LOG_MODULE_NAME "ProgressDialog"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
@@ -61,7 +65,7 @@ ProgressDialog::ProgressDialog(MainWindow *mainWindow, const char *title)
     setWindowTitle(QObject::tr(title));
     setWindowModality(Qt::WindowModal);
 
-    // Progress info labels
+    // Progress info labels.
     progressStepsLabel_ = new QLabel(tr(" "));
     progressStepLabel_ = new QLabel(tr(" "));
     etaLabel_ = new QLabel(tr(" "));
@@ -71,12 +75,12 @@ ProgressDialog::ProgressDialog(MainWindow *mainWindow, const char *title)
     progressLabelsLayout->addWidget(etaLabel_, 0, 1);
     progressLabelsLayout->addWidget(progressStepLabel_, 0, 2);
 
-    // Progress bar
+    // Progress bar.
     progressBar_ = new QProgressBar;
     progressBar_->setRange(0, 100);
     progressBar_->setValue(progressBar_->minimum());
 
-    // Buttons
+    // Buttons.
     cancelButton_ = new QPushButton(tr("Cancel"));
     connect(cancelButton_, SIGNAL(clicked()), this, SLOT(slotCancel()));
 
@@ -84,7 +88,7 @@ ProgressDialog::ProgressDialog(MainWindow *mainWindow, const char *title)
     buttonsLayout->addStretch();
     buttonsLayout->addWidget(cancelButton_);
 
-    // Main layout
+    // Main layout.
     QVBoxLayout *dialogLayout = new QVBoxLayout;
     dialogLayout->addLayout(progressLabelsLayout);
     dialogLayout->addWidget(progressBar_);
@@ -164,10 +168,10 @@ void ProgressDialog::updateLabels(ProgressActionInterface *progressAction)
 
     double progressPercent = progressAction->progressPercent();
 
-    // Progress bar
+    // Progress bar.
     progressBar_->setValue(static_cast<int>(progressPercent));
 
-    // Steps
+    // Steps.
     if (progressAction->progressMaximumSteps() > 1)
     {
         std::snprintf(buffer,
@@ -179,7 +183,7 @@ void ProgressDialog::updateLabels(ProgressActionInterface *progressAction)
         progressStepsLabel_->setText(buffer);
     }
 
-    // Current step
+    // Current step.
     if (progressAction->progressMaximumStep() != ProgressCounter::npos)
     {
         std::snprintf(buffer,
@@ -191,7 +195,7 @@ void ProgressDialog::updateLabels(ProgressActionInterface *progressAction)
         progressStepLabel_->setText(buffer);
     }
 
-    // ETA
+    // ETA.
     double etaCurrentTime = Time::realTime();
     double etaTimeDiff = etaCurrentTime - etaStartTime_;
     double etaProgressDiff = progressPercent - etaStartPercent_;

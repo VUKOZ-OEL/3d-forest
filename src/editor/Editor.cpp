@@ -19,10 +19,12 @@
 
 /** @file Editor.cpp */
 
+// Include 3D Forest.
 #include <Editor.hpp>
 #include <IndexFileBuilder.hpp>
 #include <Util.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "Editor"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
@@ -117,37 +119,37 @@ void Editor::openProject(const std::string &path)
     {
         path_ = path;
 
-        // Project name
+        // Project name.
         if (in.contains(EDITOR_KEY_PROJECT_NAME))
         {
             projectName_ = in[EDITOR_KEY_PROJECT_NAME].string();
         }
 
-        // Data sets
+        // Data sets.
         if (in.contains(EDITOR_KEY_DATA_SET))
         {
             datasets_.read(in[EDITOR_KEY_DATA_SET], path_, datasetsFilter_);
         }
 
-        // Segments
+        // Segments.
         if (in.contains(EDITOR_KEY_SEGMENT))
         {
             segments_.read(in[EDITOR_KEY_SEGMENT]);
         }
 
-        // Classifications
+        // Classifications.
         if (in.contains(EDITOR_KEY_CLASSIFICATIONS))
         {
             classifications_.read(in[EDITOR_KEY_CLASSIFICATIONS]);
         }
 
-        // Settings
+        // Settings.
         if (in.contains(EDITOR_KEY_SETTINGS))
         {
             settings_.read(in[EDITOR_KEY_SETTINGS]);
         }
 
-        // Clip filter
+        // Clip filter.
         // if (in.contains(EDITOR_KEY_CLIP_FILTER))
         // {
         //     clipFilter_.read(in[EDITOR_KEY_CLIP_FILTER]);
@@ -157,7 +159,7 @@ void Editor::openProject(const std::string &path)
         //     clipFilter_.clear();
         // }
 
-        // Elevation range
+        // Elevation range.
         if (in.contains(EDITOR_KEY_ELEVATION_RANGE))
         {
             elevationFilter_.read(in[EDITOR_KEY_ELEVATION_RANGE]);
@@ -178,25 +180,25 @@ void Editor::saveProject(const std::string &path)
 
     Json out;
 
-    // Project name
+    // Project name.
     out[EDITOR_KEY_PROJECT_NAME] = projectName_;
 
-    // Data sets
+    // Data sets.
     datasets_.write(out[EDITOR_KEY_DATA_SET]);
 
-    // Segments
+    // Segments.
     segments_.write(out[EDITOR_KEY_SEGMENT]);
 
-    // Classifications
+    // Classifications.
     classifications_.write(out[EDITOR_KEY_CLASSIFICATIONS]);
 
-    // Settings
+    // Settings.
     settings_.write(out[EDITOR_KEY_SETTINGS]);
 
-    // Clip filter
+    // Clip filter.
     // clipFilter_.write(out[EDITOR_KEY_CLIP_FILTER]);
 
-    // Elevation range
+    // Elevation range.
     elevationFilter_.write(out[EDITOR_KEY_ELEVATION_RANGE]);
 
     out.write(path);

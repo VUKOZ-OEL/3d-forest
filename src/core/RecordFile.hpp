@@ -22,14 +22,14 @@
 #ifndef RECORD_FILE_HPP
 #define RECORD_FILE_HPP
 
-// Std
+// Include std.
 #include <string>
 #include <vector>
 
-// 3D Forest
+// Include 3D Forest.
 #include <File.hpp>
 
-// Local
+// Include local.
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>
 

@@ -22,9 +22,11 @@
 #ifndef CHUNK_FILE_HPP
 #define CHUNK_FILE_HPP
 
+// Include 3D Forest.
 #include <File.hpp>
 #include <Json.hpp>
 
+// Include local.
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>
 

@@ -22,12 +22,15 @@
 #ifndef QUERY_WHERE_HPP
 #define QUERY_WHERE_HPP
 
+// Include std.
 #include <unordered_set>
 
+// Include 3D Forest.
 #include <QueryFilterSet.hpp>
 #include <Range.hpp>
 #include <Region.hpp>
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 

@@ -19,9 +19,11 @@
 
 /** @file PageManager.cpp */
 
+// Include 3D Forest.
 #include <Editor.hpp>
 #include <PageManager.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "PageManager"
 #include <Log.hpp>
 
@@ -69,7 +71,7 @@ std::shared_ptr<PageData> PageManager::get(Editor *editor,
     }
     catch (...)
     {
-        // error
+        // Some error.
     }
 
     return result;

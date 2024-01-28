@@ -22,13 +22,16 @@
 #ifndef VECTOR_FILE_HPP
 #define VECTOR_FILE_HPP
 
+// Include std.
 #include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
 
+// Include 3D Forest.
 #include <File.hpp>
 
+// Include local.
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>
 
@@ -38,11 +41,11 @@ template <class T, class F> class VectorFile
 public:
     static const size_t npos{SIZE_MAX};
 
-    // construct/copy/destroy
+    // Construct/Copy/Destroy.
     VectorFile();
     ~VectorFile();
 
-    // storage
+    // Storage.
     void create(const std::string &path,
                 size_t pageSize = 1000,
                 size_t cacheSize = 1000);
@@ -52,22 +55,22 @@ public:
     void close();
     void flush();
 
-    // capacity
+    // Capacity.
     bool empty() const { return size_ == 0; }
     size_t size() const { return size_; }
 
-    // element access
+    // Element access.
     T &operator[](size_t pos) { return at(pos); }
     const T &operator[](size_t pos) const { return at(pos); }
     T &at(size_t pos, bool modify = true);
     const T &at(size_t pos) const;
 
-    // modifiers
+    // Modifiers.
     void push_back(const T &e);
     void push_back(T &&e);
     void clear();
 
-    // other
+    // Other.
     std::string dumpToString() const;
 
 private:

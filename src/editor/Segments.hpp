@@ -22,10 +22,13 @@
 #ifndef SEGMENTS_HPP
 #define SEGMENTS_HPP
 
+// Include std.
 #include <unordered_map>
 
+// Include 3D Forest.
 #include <Segment.hpp>
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 

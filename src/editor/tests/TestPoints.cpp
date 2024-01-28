@@ -19,6 +19,7 @@
 
 /** @file TestPoints.cpp */
 
+// Include 3D Forest.
 #include <Points.hpp>
 #include <Test.hpp>
 #include <Util.hpp>

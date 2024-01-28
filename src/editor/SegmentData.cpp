@@ -19,9 +19,11 @@
 
 /** @file SegmentData.cpp */
 
+// Include 3D Forest.
 #include <Error.hpp>
 #include <SegmentData.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "SegmentData"
 #include <Log.hpp>
 

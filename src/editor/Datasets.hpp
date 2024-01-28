@@ -22,12 +22,15 @@
 #ifndef DATASETS_HPP
 #define DATASETS_HPP
 
+// Include std.
 #include <unordered_map>
 #include <unordered_set>
 
+// Include 3D Forest.
 #include <Dataset.hpp>
 #include <QueryFilterSet.hpp>
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 

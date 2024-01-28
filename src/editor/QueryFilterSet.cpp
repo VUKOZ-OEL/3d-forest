@@ -19,8 +19,10 @@
 
 /** @file QueryFilterSet.cpp */
 
+// Include 3D Forest.
 #include <QueryFilterSet.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "QueryFilterSet"
 #include <Log.hpp>
 

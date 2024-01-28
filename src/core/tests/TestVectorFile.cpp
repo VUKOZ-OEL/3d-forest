@@ -19,6 +19,7 @@
 
 /** @file TestVectorFile.cpp */
 
+// Include 3D Forest.
 #include <Endian.hpp>
 #include <Test.hpp>
 #include <VectorFile.hpp>
@@ -58,7 +59,7 @@ TEST_CASE(TestVectorFileCache)
     const size_t cacheSize = 3;
     const uint32_t n = 7;
 
-    // write
+    // Write.
     VectorFile<uint32_t, IOUint32> w;
     w.create(TEST_VECTOR_FILE_PATH, pageSize, cacheSize);
 
@@ -70,7 +71,7 @@ TEST_CASE(TestVectorFileCache)
 
     w.close();
 
-    // read
+    // Read.
     VectorFile<uint32_t, IOUint32> r;
     r.open(TEST_VECTOR_FILE_PATH, pageSize, cacheSize);
     TEST(r.size() == n);
@@ -79,7 +80,7 @@ TEST_CASE(TestVectorFileCache)
         TEST(r.at(e) == e);
     }
 
-    // read
+    // Read.
     VectorFile<uint32_t, IOUint32> r2;
     r2.open(TEST_VECTOR_FILE_PATH);
     TEST(r2.size() == n);

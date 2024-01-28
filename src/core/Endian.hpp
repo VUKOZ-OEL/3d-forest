@@ -22,8 +22,10 @@
 #ifndef ENDIAN_HPP
 #define ENDIAN_HPP
 
+// Include std.
 #include <cstdint>
 
+// Include local.
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>
 

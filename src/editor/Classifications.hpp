@@ -22,13 +22,16 @@
 #ifndef CLASSIFICATIONS_HPP
 #define CLASSIFICATIONS_HPP
 
+// Include std.
 #include <string>
 #include <unordered_set>
 #include <vector>
 
+// Include 3D Forest.
 #include <Classification.hpp>
 #include <Vector3.hpp>
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 

@@ -22,8 +22,10 @@
 #ifndef MATRIX4_HPP
 #define MATRIX4_HPP
 
+// Include 3D Forest.
 #include <Vector3.hpp>
 
+// Include local.
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>
 
@@ -75,10 +77,10 @@ public:
     Vector3<T> map(const Vector3<T> &v);
     Vector3<T> mapVector(const Vector3<T> &v);
 
-    // This is ModelViewProjection matrix
+    // This is ModelViewProjection matrix.
     Vector3<T> project(const Vector3<T> &v);
 
-    // This is inverted ModelViewProjection matrix
+    // This is inverted ModelViewProjection matrix.
     Vector3<T> unproject(const Vector3<T> &v);
 
     void multiply(T &x, T &y, T &z, T &w);

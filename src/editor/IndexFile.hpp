@@ -22,13 +22,16 @@
 #ifndef INDEX_FILE_HPP
 #define INDEX_FILE_HPP
 
+// Include std.
 #include <limits>
 #include <map>
 #include <vector>
 
+// Include 3D Forest.
 #include <Box.hpp>
 #include <ChunkFile.hpp>
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 
@@ -79,7 +82,7 @@ public:
     size_t size() const { return nodes_.size(); }
     bool empty() const { return (nodes_.empty() || nodes_[0].size == 0); }
 
-    // Select
+    // Select.
     void selectLeaves(std::vector<SelectionTile> &selection,
                       const Box<double> &window,
                       size_t datasetId,
@@ -100,7 +103,7 @@ public:
 
     const Node *selectLeaf(double x, double y, double z) const;
 
-    // Node
+    // Node.
     const Node *root() const;
     const Node *next(const Node *node, size_t idx) const;
     const Node *prev(const Node *node) const;
@@ -108,7 +111,7 @@ public:
     Node *at(size_t idx) { return &nodes_[idx]; }
     Box<double> boundary(const Node *node, const Box<double> &box) const;
 
-    // IO
+    // IO.
     void read(const std::string &path);
     void read(const std::string &path, uint64_t offset);
     void read(ChunkFile &file);
@@ -117,7 +120,7 @@ public:
     void write(ChunkFile &file) const;
     Json &write(Json &out) const;
 
-    // Build tree
+    // Build tree.
     void insertBegin(const Box<double> &boundary,
                      const Box<double> &boundaryPoints,
                      size_t maxSize,
@@ -173,7 +176,7 @@ protected:
 
     Json &write(Json &out, const Node *data, size_t idx) const;
 
-    // Build tree
+    // Build tree.
     /** Index File Build Node. */
     struct BuildNode
     {
@@ -184,7 +187,7 @@ protected:
 
     std::shared_ptr<BuildNode> root_;
 
-    // Build tree settings
+    // Build tree settings.
     size_t maxSize_;
     size_t maxLevel_;
     bool insertOnlyToLeaves_;

@@ -22,11 +22,13 @@
 #ifndef SEGMENT_HPP
 #define SEGMENT_HPP
 
+// Include 3D Forest.
 #include <Json.hpp>
 #include <Mesh.hpp>
 #include <SegmentData.hpp>
 #include <Vector3.hpp>
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 
@@ -57,7 +59,7 @@ public:
     Json &write(Json &out) const;
 
 protected:
-    // Stored
+    // Stored.
     std::string label_;
     Vector3<double> color_;
     size_t id_;

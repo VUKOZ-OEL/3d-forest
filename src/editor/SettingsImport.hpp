@@ -22,8 +22,10 @@
 #ifndef SETTINGS_IMPORT_HPP
 #define SETTINGS_IMPORT_HPP
 
+// Include 3D Forest.
 #include <IndexFileBuilder.hpp>
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 

@@ -22,15 +22,17 @@
 #ifndef PLUGIN_INTERFACE_HPP
 #define PLUGIN_INTERFACE_HPP
 
+// Include Qt.
 #include <QtPlugin>
 
 #if QT_VERSION_MAJOR == 5
-    // Fix for qt5 which has two QAction classes
+    // Fix for qt5 which has two QAction classes.
     #include <QtWidgets/QAction>
 #else
     #include <QAction>
 #endif
 
+// Include local.
 #include <ExportGui.hpp>
 #include <WarningsDisable.hpp>
 

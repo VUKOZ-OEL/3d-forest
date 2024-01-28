@@ -22,16 +22,16 @@
 #ifndef LAS_FILE_HPP
 #define LAS_FILE_HPP
 
-// Std
+// Include std.
 #include <array>
 
-// 3D Forest
+// Include 3D Forest.
 #include <Box.hpp>
 #include <File.hpp>
 #include <Json.hpp>
 #include <RecordFile.hpp>
 
-// Local
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 
@@ -66,32 +66,32 @@ public:
     {
         char file_signature[4];
 
-        // Offset 4, size 20
-        uint16_t file_source_id;  // 1.1
-        uint16_t global_encoding; // 1.2
-        uint32_t project_id_1;    // Optional
-        uint16_t project_id_2;    // Optional
-        uint16_t project_id_3;    // Optional
-        uint8_t project_id_4[8];  // Optional
+        // Offset 4, size 20.
+        uint16_t file_source_id;  // 1.1.
+        uint16_t global_encoding; // 1.2.
+        uint32_t project_id_1;    // Optional.
+        uint16_t project_id_2;    // Optional.
+        uint16_t project_id_3;    // Optional.
+        uint8_t project_id_4[8];  // Optional.
 
-        // Offset 24, size 70
+        // Offset 24, size 70.
         uint8_t version_major;
         uint8_t version_minor;
         char system_identifier[32];
         char generating_software[32];
-        uint16_t file_creation_day_of_year; // Optional, 1.3 required
-        uint16_t file_creation_year;        // Optional 4 digits, 1.3 required
+        uint16_t file_creation_day_of_year; // Optional, 1.3 required.
+        uint16_t file_creation_year;        // Optional 4 digits, 1.3 required.
 
-        // Offset 94, size 37
+        // Offset 94, size 37.
         uint16_t header_size;
         uint32_t offset_to_point_data;
         uint32_t number_of_vlr;
         uint8_t point_data_record_format;
-        uint16_t point_data_record_length; // Bytes per point (extra data)
+        uint16_t point_data_record_length; // Bytes per point (extra data).
         uint32_t legacy_number_of_point_records;
         uint32_t legacy_number_of_points_by_return[5];
 
-        // Offset 131, size 96
+        // Offset 131, size 96.
         double x_scale_factor;
         double y_scale_factor;
         double z_scale_factor;
@@ -104,18 +104,18 @@ public:
         double min_y;
         double max_z;
         double min_z;
-        // End of v 1.0, 1.1, 1.2 (227 bytes)
+        // End of v 1.0, 1.1, 1.2 (227 bytes).
 
-        // Offset 227, size 8
+        // Offset 227, size 8.
         uint64_t offset_to_wdpr;
-        // End of 1.3 (235 bytes)
+        // End of 1.3 (235 bytes).
 
-        // Offset 235, size 140
+        // Offset 235, size 140.
         uint64_t offset_to_evlr;
         uint32_t number_of_evlr;
         uint64_t number_of_point_records;
         uint64_t number_of_points_by_return[15];
-        // End of 1.4 (375 bytes)
+        // End of 1.4 (375 bytes).
 
         void set(uint64_t numberOfPoints,
                  const Box<double> &box,
@@ -143,52 +143,52 @@ public:
     /** LAS Point. */
     struct EXPORT_EDITOR Point
     {
-        // Format 0 to 10
+        // Format 0 to 10.
         int32_t x;
-        int32_t y; // 1*8
+        int32_t y; // 1*8.
         int32_t z;
-        uint16_t intensity; // Optional
+        uint16_t intensity; // Optional.
 
-        // Format 0 to 10
-        uint8_t return_number;        // 0 to 7 or 0 to 15
-        uint8_t number_of_returns;    // 0 to 7 or 0 to 15, 2 * 8
-        uint8_t scan_direction_flag;  // 0 or 1
-        uint8_t edge_of_flight_line;  // 0 or 1
-        uint8_t classification_flags; // 3 or 4 bit bitmask
+        // Format 0 to 10.
+        uint8_t return_number;        // 0 to 7 or 0 to 15.
+        uint8_t number_of_returns;    // 0 to 7 or 0 to 15, 2 * 8.
+        uint8_t scan_direction_flag;  // 0 or 1.
+        uint8_t edge_of_flight_line;  // 0 or 1.
+        uint8_t classification_flags; // 3 or 4 bit bitmask.
 
-        // Format 6 to 10
-        uint8_t scanner_channel; // 0 to 3
+        // Format 6 to 10.
+        uint8_t scanner_channel; // 0 to 3.
 
-        // Format 0 to 10
+        // Format 0 to 10.
         int16_t angle;
-        uint16_t source_id;     // v1.0 user_data, 3 * 8
-        uint8_t classification; // 0 to 31 or 0 to 255, Sometimes optional
-        uint8_t user_data;      // Optional, v1.0 file_marker
-        uint8_t format;         // Copy of Header::point_data_record_format
+        uint16_t source_id;     // v1.0 user_data, 3 * 8.
+        uint8_t classification; // 0 to 31 or 0 to 255, Sometimes optional.
+        uint8_t user_data;      // Optional, v1.0 file_marker.
+        uint8_t format;         // Copy of Header::point_data_record_format.
 
-        // Format 4, 5, 9, 10
+        // Format 4, 5, 9, 10.
         uint8_t wave_index;
-        uint32_t wave_size; // 4 * 8
+        uint32_t wave_size; // 4 * 8.
 
-        // Format 1, 3, 4, 5, 6, 7, 8, 9, 10
-        double gps_time; // 5 * 8
+        // Format 1, 3, 4, 5, 6, 7, 8, 9, 10.
+        double gps_time; // 5 * 8.
 
-        // Format 2, 3, 5, 7, 8, 10
+        // Format 2, 3, 5, 7, 8, 10.
         uint16_t red;
         uint16_t green;
         uint16_t blue;
 
-        // Format 8, 10
-        uint16_t nir; // 6 * 8
+        // Format 8, 10.
+        uint16_t nir; // 6 * 8.
 
-        // Format 4, 5, 9, 10
-        uint64_t wave_offset; // 7 * 8
+        // Format 4, 5, 9, 10.
+        uint64_t wave_offset; // 7 * 8.
         float wave_return;
-        float wave_x; // 8 * 8
+        float wave_x; // 8 * 8.
         float wave_y;
-        float wave_z; // 9 * 8
+        float wave_z; // 9 * 8.
 
-        // Attributes
+        // Attributes.
         uint32_t segment;
         uint32_t elevation;
         double descriptor;
@@ -200,7 +200,7 @@ public:
     /** LAS Attribute Buffer. */
     struct EXPORT_EDITOR AttributesBuffer
     {
-        std::map<std::string, RecordFile::Buffer> attributes;
+        std::vector<RecordFile::Buffer> attributes;
     };
 
     /** LAS Classification. */
@@ -225,7 +225,7 @@ public:
     void close();
     bool isOpen() const;
 
-    // Point I/O
+    // Point I/O.
     static void create(const std::string &path,
                        const std::vector<LasFile::Point> &points,
                        const std::array<double, 3> scale = {1, 1, 1},
@@ -236,7 +236,7 @@ public:
     void readPoint(Point &pt);
     void writePoint(const Point &pt);
 
-    // Format
+    // Format.
     uint64_t size() const;
     uint64_t offset() const;
 
@@ -255,7 +255,7 @@ public:
     void formatBytesToPoint(Point &pt, const uint8_t *buffer) const;
     void formatPointToBytes(uint8_t *buffer, const Point &pt) const;
 
-    // Attributes
+    // Attributes.
     void createAttributesBuffer(AttributesBuffer &buffer,
                                 uint64_t n,
                                 bool setZero = false);
@@ -269,26 +269,12 @@ public:
                               uint64_t to,
                               uint64_t from);
 
-    size_t sizeOfAttributesPerPoint() const;
+    const std::vector<RecordFile> &attributeFiles() const
+    {
+        return attributeFiles_;
+    }
 
-    void readAttribute(const AttributesBuffer &buffer,
-                       const std::string &name,
-                       std::vector<size_t> &data);
-    void readAttribute(const AttributesBuffer &buffer,
-                       const std::string &name,
-                       std::vector<double> &data);
-
-    bool createAttribute(AttributesBuffer &buffer,
-                         const std::string &name,
-                         size_t n);
-    void writeAttribute(AttributesBuffer &buffer,
-                        const std::string &name,
-                        const std::vector<size_t> &data);
-    void writeAttribute(AttributesBuffer &buffer,
-                        const std::string &name,
-                        const std::vector<double> &data);
-
-    // Util
+    // Util.
     void transform(double &x, double &y, double &z, const Point &pt) const;
     void transform(double &x,
                    double &y,

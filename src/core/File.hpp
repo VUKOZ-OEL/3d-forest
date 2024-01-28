@@ -22,9 +22,11 @@
 #ifndef FILE_HPP
 #define FILE_HPP
 
+// Include std.
 #include <cstdint>
 #include <string>
 
+// Include local.
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>
 

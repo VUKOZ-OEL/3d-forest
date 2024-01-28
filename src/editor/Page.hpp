@@ -22,10 +22,12 @@
 #ifndef PAGE_HPP
 #define PAGE_HPP
 
+// Include 3D Forest.
 #include <PageData.hpp>
 class Editor;
 class Query;
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 
@@ -33,7 +35,7 @@ class Query;
 class EXPORT_EDITOR Page
 {
 public:
-    /** @name Point Data */
+    /** @name LAS Point Data. */
     /**@{*/
     /** Point coordinates.
         The data are stored as [x0, y0, z0, x1, y1, ...].
@@ -75,7 +77,7 @@ public:
     double *color;
     /**@}*/
 
-    /** @name Point Data Extra Bytes */
+    /** @name 3D Forest Attributes. */
     /**@{*/
     /** Segment identification numbers.
         This value is stored in Point Data Record extra bytes.
@@ -101,7 +103,7 @@ public:
     size_t *voxel;
     /**@}*/
 
-    /** @name Rendering */
+    /** @name Rendering Data. */
     /**@{*/
     /** Rendering Point Coordinates.
         The data are stored as [x0, y0, z0, x1, y1, ...].
@@ -132,7 +134,6 @@ public:
     void setModified();
     bool isModified() const;
 
-    // Individual states
     /** Page State. */
     enum State
     {
@@ -150,21 +151,21 @@ public:
     static std::string stateToString(Page::State state);
 
 private:
-    // Parent
+    // Parent.
     Editor *editor_;
     Query *query_;
 
-    // Identifier
+    // Identifier.
     uint32_t datasetId_;
     uint32_t pageId_;
 
-    // State
+    // State.
     Page::State state_;
 
-    // Data
+    // Data.
     std::shared_ptr<PageData> pageData_;
 
-    // Buffer
+    // Buffer.
     std::vector<IndexFile::Selection> selectedNodes_;
 
     void resize(size_t n);

@@ -19,21 +19,21 @@
 
 /** @file LasFile.cpp */
 
-// Std
+// Include std.
 #include <cstdio>
 #include <cstring>
 #include <iostream>
 #include <sstream>
 #include <vector>
 
-// 3D Forest
+// Include 3D Forest.
 #include <Box.hpp>
 #include <Endian.hpp>
 #include <Error.hpp>
 #include <LasFile.hpp>
 #include <Util.hpp>
 
-// Local
+// Include local.
 #define LOG_MODULE_NAME "LasFile"
 #include <Log.hpp>
 
@@ -132,7 +132,7 @@ void LasFile::Header::set(uint64_t numberOfPoints,
     y_offset = offset[1];
     z_offset = offset[2];
 
-    // Extents of point file data
+    // Extents of point file data.
     max_x = static_cast<double>(box.max(0)) * scale[0] + offset[0];
     min_x = static_cast<double>(box.min(0)) * scale[0] + offset[0];
     max_y = static_cast<double>(box.max(1)) * scale[1] + offset[1];
@@ -186,25 +186,25 @@ bool LasFile::Header::hasRgb() const
 
 std::string LasFile::Header::dateCreated() const
 {
-    // GMT day
+    // Get GMT day.
     int day = file_creation_day_of_year;
     if (day < 1)
     {
         day = 1;
     }
 
-    // Not a leap year
+    // Not a leap year.
     if (!((file_creation_year % 400 == 0) ||
           ((file_creation_year % 4 == 0) && (file_creation_year % 100 != 0))))
     {
-        // Has 29th February
+        // Has 29th February.
         if (day > 31 + 28)
         {
             day++;
         }
     }
 
-    // Find month
+    // Return formatted date.
     int daysInMonth[] = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     for (int i = 0; i < 12; i++)
     {
@@ -222,7 +222,7 @@ std::string LasFile::Header::dateCreated() const
         day -= daysInMonth[i];
     }
 
-    // Default UNIX Epoch time
+    // Return default UNIX Epoch time for invalid or empty inputs.
     return "1970-01-01 00:00:00";
 }
 
@@ -287,7 +287,7 @@ void LasFile::create(const std::string &path,
                      const std::array<double, 3> offset,
                      uint8_t version_minor)
 {
-    // Point format
+    // Point format.
     uint8_t point_data_record_format;
     if (points.size() > 0)
     {
@@ -298,7 +298,7 @@ void LasFile::create(const std::string &path,
         point_data_record_format = 6;
     }
 
-    // Extents of point file data
+    // Extents of point file data.
     std::vector<int32_t> coords;
     coords.resize(points.size() * 3);
     for (size_t i = 0; i < points.size(); i++)
@@ -311,7 +311,7 @@ void LasFile::create(const std::string &path,
     Box<int32_t> box;
     box.set(coords);
 
-    // Create file output
+    // Create file output.
     LasFile las;
     las.create(path);
     las.header.set(points.size(),
@@ -485,7 +485,7 @@ void LasFile::readHeader(Header &hdr)
 
     file_.read(buffer, LAS_FILE_HEADER_SIZE_V10);
 
-    // Signature "LASF"
+    // Signature "LASF".
     std::memcpy(hdr.file_signature, buffer, 4);
     if ((hdr.file_signature[0] != LAS_FILE_SIGNATURE_0) ||
         (hdr.file_signature[1] != LAS_FILE_SIGNATURE_1) ||
@@ -495,7 +495,7 @@ void LasFile::readHeader(Header &hdr)
         THROW("LAS '" + file_.path() + "' has invalid signature");
     }
 
-    // File info
+    // File info.
     hdr.file_source_id = ltoh16(&buffer[4]);
     hdr.global_encoding = ltoh16(&buffer[6]);
     hdr.project_id_1 = ltoh32(&buffer[8]);
@@ -503,7 +503,7 @@ void LasFile::readHeader(Header &hdr)
     hdr.project_id_3 = ltoh16(&buffer[14]);
     std::memcpy(hdr.project_id_4, buffer + 16, 8);
 
-    // Version
+    // Version.
     hdr.version_major = buffer[24];
     hdr.version_minor = buffer[25];
     LOG_DEBUG(<< "Version major <" << static_cast<int>(hdr.version_major)
@@ -516,20 +516,20 @@ void LasFile::readHeader(Header &hdr)
         THROW("LAS '" + file_.path() + "' has incompatible major version");
     }
 
-    // Software/hardware generated
+    // Software/hardware generated.
     std::memcpy(hdr.system_identifier, buffer + 26, 32);
     std::memcpy(hdr.generating_software, buffer + 58, 32);
 
-    // Time
+    // Time.
     hdr.file_creation_day_of_year = ltoh16(&buffer[90]);
     hdr.file_creation_year = ltoh16(&buffer[92]);
 
-    // Header
+    // Header.
     hdr.header_size = ltoh16(&buffer[94]);
     hdr.offset_to_point_data = ltoh32(&buffer[96]);
     hdr.number_of_vlr = ltoh32(&buffer[100]);
 
-    // Point format
+    // Point format.
     hdr.point_data_record_format = buffer[104];
     hdr.point_data_record_length = ltoh16(&buffer[105]);
     LOG_DEBUG(<< "Format <" << static_cast<int>(hdr.point_data_record_format)
@@ -550,8 +550,8 @@ void LasFile::readHeader(Header &hdr)
               "per record format");
     }
 
-    // Number of point records
-    // Fill both 32-bit (1.0+) and 64-bit (1.4+) values
+    // Number of point records.
+    // Fill both 32-bit (1.0+) and 64-bit (1.4+) values.
     hdr.legacy_number_of_point_records = ltoh32(&buffer[107]);
     hdr.number_of_point_records = hdr.legacy_number_of_point_records;
     for (int i = 0; i < 5; i++)
@@ -562,7 +562,7 @@ void LasFile::readHeader(Header &hdr)
     }
     LOG_DEBUG(<< "Number of points <" << hdr.number_of_point_records << ">.");
 
-    // Scale
+    // Scale.
     hdr.x_scale_factor = ltohd(&buffer[131 + (0 * 8)]);
     hdr.y_scale_factor = ltohd(&buffer[131 + (1 * 8)]);
     hdr.z_scale_factor = ltohd(&buffer[131 + (2 * 8)]);
@@ -585,7 +585,7 @@ void LasFile::readHeader(Header &hdr)
     LOG_DEBUG(<< "Max <[" << hdr.max_x << ", " << hdr.max_y << ", " << hdr.max_z
               << "]>.");
 
-    // Version 1.3
+    // Version 1.3.
     if (hdr.version_minor > 2)
     {
         if (file_.size() < LAS_FILE_HEADER_SIZE_V13)
@@ -601,7 +601,7 @@ void LasFile::readHeader(Header &hdr)
         hdr.offset_to_wdpr = 0;
     }
 
-    // Version 1.4
+    // Version 1.4.
     if (hdr.version_minor > 3)
     {
         if (file_.size() < LAS_FILE_HEADER_SIZE_V14)
@@ -637,10 +637,10 @@ void LasFile::writeHeader(const Header &hdr)
     uint8_t buffer[512];
     size_t header_size;
 
-    // Signature
+    // Signature.
     std::memcpy(buffer, hdr.file_signature, 4);
 
-    // File info
+    // File info.
     htol16(&buffer[4], hdr.file_source_id);
     htol16(&buffer[6], hdr.global_encoding);
     htol32(&buffer[8], hdr.project_id_1);
@@ -648,33 +648,33 @@ void LasFile::writeHeader(const Header &hdr)
     htol16(&buffer[14], hdr.project_id_3);
     std::memcpy(buffer + 16, hdr.project_id_4, 8);
 
-    // Version
+    // Version.
     buffer[24] = hdr.version_major;
     buffer[25] = hdr.version_minor;
 
-    // Software/hardware generated
+    // Software/hardware generated.
     std::memcpy(buffer + 26, hdr.system_identifier, 32);
     std::memcpy(buffer + 58, hdr.generating_software, 32);
 
-    // Time
+    // Time.
     htol16(&buffer[90], hdr.file_creation_day_of_year);
     htol16(&buffer[92], hdr.file_creation_year);
 
-    // Header
+    // Header.
     htol16(&buffer[94], hdr.header_size);
     htol32(&buffer[96], hdr.offset_to_point_data);
     htol32(&buffer[100], hdr.number_of_vlr);
     buffer[104] = hdr.point_data_record_format;
     htol16(&buffer[105], hdr.point_data_record_length);
 
-    // Number of point records
+    // Number of point records.
     htol32(&buffer[107], hdr.legacy_number_of_point_records);
     for (int i = 0; i < 5; i++)
     {
         htol32(&buffer[111 + i * 4], hdr.legacy_number_of_points_by_return[i]);
     }
 
-    // Scale
+    // Scale.
     htold(&buffer[131 + (0 * 8)], hdr.x_scale_factor);
     htold(&buffer[131 + (1 * 8)], hdr.y_scale_factor);
     htold(&buffer[131 + (2 * 8)], hdr.z_scale_factor);
@@ -690,14 +690,14 @@ void LasFile::writeHeader(const Header &hdr)
 
     header_size = LAS_FILE_HEADER_SIZE_V10;
 
-    // Version 1.3
+    // Version 1.3.
     if (hdr.version_minor > 2)
     {
         htol64(&buffer[header_size + 0], hdr.offset_to_wdpr);
         header_size = LAS_FILE_HEADER_SIZE_V13;
     }
 
-    // Version 1.4
+    // Version 1.4.
     if (hdr.version_minor > 3)
     {
         htol64(&buffer[header_size + 0], hdr.offset_to_evlr);
@@ -711,7 +711,7 @@ void LasFile::writeHeader(const Header &hdr)
         header_size = LAS_FILE_HEADER_SIZE_V14;
     }
 
-    // Write
+    // Write.
     file_.write(buffer, header_size);
 }
 
@@ -771,7 +771,7 @@ void LasFile::formatBytesToPoint(Point &pt, const uint8_t *buffer) const
         pt.classification_flags =
             static_cast<uint8_t>(static_cast<uint32_t>(buffer[15]) >> 5);
 
-        // Read as -15000 to 15000 from -90 to 90
+        // Read as -15000 to 15000 from -90 to 90.
         int8_t angle = static_cast<int8_t>(buffer[16]);
         double angled = 166.666667 * static_cast<double>(angle);
         pt.angle = static_cast<int16_t>(angled);
@@ -840,17 +840,17 @@ void LasFile::formatPointToBytes(uint8_t *buffer, const Point &pt) const
         htol32(&buffer[8], static_cast<uint32_t>(pt.z));
         htol16(&buffer[12], pt.intensity);
 
-        // Return Number        4 bits (bits 0 - 3)
-        // Number of Returns    4 bits (bits 4 - 7)
+        // Return Number        4 bits (bits 0 - 3).
+        // Number of Returns    4 bits (bits 4 - 7).
         uint32_t data14 =
             (static_cast<uint32_t>(pt.return_number) & 15U) |
             ((static_cast<uint32_t>(pt.number_of_returns) & 15U) << 4);
         buffer[14] = static_cast<uint8_t>(data14);
 
-        // Classification Flags 4 bits (bits 0 - 3)
-        // Scanner Channel      2 bits (bits 4 - 5)
-        // Scan Direction Flag  1 bit (bit 6)
-        // Edge of Flight Line  1 bit (bit 7)
+        // Classification Flags 4 bits (bits 0 - 3).
+        // Scanner Channel      2 bits (bits 4 - 5).
+        // Scan Direction Flag  1 bit (bit 6).
+        // Edge of Flight Line  1 bit (bit 7).
         uint32_t data15 =
             (static_cast<uint32_t>(pt.classification_flags) & 15U) |
             ((static_cast<uint32_t>(pt.scanner_channel) & 3U) << 4) |
@@ -872,10 +872,10 @@ void LasFile::formatPointToBytes(uint8_t *buffer, const Point &pt) const
         htol32(&buffer[8], static_cast<uint32_t>(pt.z));
         htol16(&buffer[12], pt.intensity);
 
-        // Return Number        3 bits (bits 0 – 2)
-        // Number of Returns    3 bits (bits 3 – 5)
-        // Scan Direction Flag  1 bit  (bit 6)
-        // Edge of Flight Line  1 bit  (bit 7)
+        // Return Number        3 bits (bits 0 – 2).
+        // Number of Returns    3 bits (bits 3 – 5).
+        // Scan Direction Flag  1 bit  (bit 6).
+        // Edge of Flight Line  1 bit  (bit 7).
         uint32_t data14 =
             (static_cast<uint32_t>(pt.return_number) & 7U) |
             ((static_cast<uint32_t>(pt.number_of_returns) & 7U) << 3) |
@@ -883,13 +883,13 @@ void LasFile::formatPointToBytes(uint8_t *buffer, const Point &pt) const
             ((static_cast<uint32_t>(pt.edge_of_flight_line) & 1U) << 7);
         buffer[14] = static_cast<uint8_t>(data14);
 
-        // Classification       5 bits (bits 0 - 4)
-        // Classification Flags 3 bits (bits 5 - 7)
+        // Classification       5 bits (bits 0 - 4).
+        // Classification Flags 3 bits (bits 5 - 7).
         uint32_t data15 = (pt.classification & 0x1fU) |
                           (static_cast<uint32_t>(pt.classification_flags) << 5);
         buffer[15] = static_cast<uint8_t>(data15);
 
-        // Write as -90 to 90 from -15000 to 15000
+        // Write as -90 to 90 from -15000 to 15000.
         double angled = static_cast<double>(pt.angle) / 166.666667;
         if (angled < -90.0)
         {
@@ -945,14 +945,10 @@ void LasFile::createAttributesBuffer(AttributesBuffer &buffer,
                                      uint64_t n,
                                      bool setZero)
 {
+    buffer.attributes.resize(attributeFiles_.size());
     for (size_t i = 0; i < attributeFiles_.size(); i++)
     {
-        const std::string &name = attributeFiles_[i].name();
-        if (buffer.attributes.count(name) < 1)
-        {
-            buffer.attributes[name] = RecordFile::Buffer();
-        }
-        attributeFiles_[i].createBuffer(buffer.attributes[name], n, setZero);
+        attributeFiles_[i].createBuffer(buffer.attributes[i], n, setZero);
     }
 }
 
@@ -960,12 +956,7 @@ void LasFile::readAttributesBuffer(AttributesBuffer &buffer, uint64_t n)
 {
     for (size_t i = 0; i < attributeFiles_.size(); i++)
     {
-        const std::string &name = attributeFiles_[i].name();
-        if (buffer.attributes.count(name) < 1)
-        {
-            buffer.attributes[name] = RecordFile::Buffer();
-        }
-        attributeFiles_[i].readBuffer(buffer.attributes[name], n);
+        attributeFiles_[i].readBuffer(buffer.attributes[i], n);
     }
 }
 
@@ -975,11 +966,7 @@ void LasFile::writeAttributesBuffer(const AttributesBuffer &buffer,
 {
     for (size_t i = 0; i < attributeFiles_.size(); i++)
     {
-        const std::string &name = attributeFiles_[i].name();
-        if (buffer.attributes.count(name) > 0)
-        {
-            attributeFiles_[i].writeBuffer(buffer.attributes.at(name), n, from);
-        }
+        attributeFiles_[i].writeBuffer(buffer.attributes[i], n, from);
     }
 }
 
@@ -989,84 +976,9 @@ void LasFile::copyAttributesBuffer(AttributesBuffer &dst,
                                    uint64_t to,
                                    uint64_t from)
 {
-    for (const auto &s : src.attributes)
+    for (size_t i = 0; i < src.attributes.size(); i++)
     {
-        auto d = dst.attributes.find(s.first);
-        if (d != dst.attributes.end())
-        {
-            d->second.copy(s.second, n, to, from);
-        }
-    }
-}
-
-size_t LasFile::sizeOfAttributesPerPoint() const
-{
-    size_t nbyte = 0;
-
-    for (const auto &it : attributeFiles_)
-    {
-        nbyte += it.recordSize();
-    }
-
-    return nbyte;
-}
-
-void LasFile::readAttribute(const AttributesBuffer &buffer,
-                            const std::string &name,
-                            std::vector<size_t> &data)
-{
-    if (buffer.attributes.count(name) < 1)
-    {
-        return;
-    }
-
-    buffer.attributes.at(name).read(data);
-}
-
-void LasFile::readAttribute(const AttributesBuffer &buffer,
-                            const std::string &name,
-                            std::vector<double> &data)
-{
-    if (buffer.attributes.count(name) < 1)
-    {
-        return;
-    }
-
-    buffer.attributes.at(name).read(data);
-}
-
-bool LasFile::createAttribute(AttributesBuffer &buffer,
-                              const std::string &name,
-                              size_t n)
-{
-    for (const auto &it : attributeFiles_)
-    {
-        if (it.name() == name)
-        {
-            it.createBuffer(buffer.attributes[name], n);
-            return true;
-        }
-    }
-    return false;
-}
-
-void LasFile::writeAttribute(AttributesBuffer &buffer,
-                             const std::string &name,
-                             const std::vector<size_t> &data)
-{
-    if (createAttribute(buffer, name, data.size()))
-    {
-        buffer.attributes.at(name).write(data);
-    }
-}
-
-void LasFile::writeAttribute(AttributesBuffer &buffer,
-                             const std::string &name,
-                             const std::vector<double> &data)
-{
-    if (createAttribute(buffer, name, data.size()))
-    {
-        buffer.attributes.at(name).write(data);
+        dst.attributes[i].copy(src.attributes[i], n, to, from);
     }
 }
 

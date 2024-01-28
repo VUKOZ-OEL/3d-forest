@@ -22,6 +22,7 @@
 #ifndef LOG_HPP
 #define LOG_HPP
 
+// Include std.
 #include <condition_variable>
 #include <functional>
 #include <iostream>
@@ -35,8 +36,10 @@
 #include <unordered_set>
 #include <vector>
 
+// Include 3D Forest.
 #include <File.hpp>
 
+// Include local.
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>
 

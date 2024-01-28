@@ -19,8 +19,10 @@
 
 /** @file SettingsView.cpp */
 
+// Include 3D Forest.
 #include <SettingsView.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "SettingsView"
 #include <Log.hpp>
 

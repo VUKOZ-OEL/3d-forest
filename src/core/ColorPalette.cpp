@@ -19,38 +19,40 @@
 
 /** @file ColorPalette.cpp */
 
+// Include 3D Forest.
 #include <ColorPalette.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "ColorPalette"
 #include <Log.hpp>
 
 #if !defined(EXPORT_CORE_IMPORT)
 const std::vector<Vector3<double>> ColorPalette::Classification{
-    0xffffffU, //  0 : Created, Never classified
-    0xb2b2b2U, //  1 : Unassigned - Unclassified
-    0xa87102U, //  2 : Ground
-    0x407d00U, //  3 : Low Vegetation
-    0x5cb200U, //  4 : Medium Vegetation
-    0x85ff00U, //  5 : High Vegetation
-    0xe64d43U, //  6 : Building
-    0xe60101U, //  7 : Low Point (Noise)
-    0xff55ffU, //  8 :   Reserved
-    0x035ee6U, //  9 : Water
-    0x8504a9U, // 10 : Rail
-    0xffff03U, // 11 : Road Surface
-    0xee4feeU, // 12 :   Reserved
-    0xaaffffU, // 13 : Wire - Guard (Shield)
-    0x00ffffU, // 14 : Wire - Conductor (Phase)
-    0xb3b300U, // 15 : Transmission Tower
-    0xaaaaffU, // 16 : Wire-Structure Connector (Insulator)
-    0xe6e6e6U, // 17 : Bridge Deck
-    0xff0000U, // 18 : High Noise
-               // 19 - 63 : Reserved
-               // 19 : Overhead Structure (mining equipment, traffic lights)
-               // 20 : Ignored Ground (breakline proximity)
-               // 21 : Snow
-               // 22 : Temporal Exclusion (water levels, landslides, permafrost)
-               // 64 - 255 : User Definable
+    0xffffffU, //  0 : Created, Never classified.
+    0xb2b2b2U, //  1 : Unassigned - Unclassified.
+    0xa87102U, //  2 : Ground.
+    0x407d00U, //  3 : Low Vegetation.
+    0x5cb200U, //  4 : Medium Vegetation.
+    0x85ff00U, //  5 : High Vegetation.
+    0xe64d43U, //  6 : Building.
+    0xe60101U, //  7 : Low Point (Noise).
+    0xff55ffU, //  8 :   Reserved.
+    0x035ee6U, //  9 : Water.
+    0x8504a9U, // 10 : Rail.
+    0xffff03U, // 11 : Road Surface.
+    0xee4feeU, // 12 :   Reserved.
+    0xaaffffU, // 13 : Wire - Guard (Shield).
+    0x00ffffU, // 14 : Wire - Conductor (Phase).
+    0xb3b300U, // 15 : Transmission Tower.
+    0xaaaaffU, // 16 : Wire-Structure Connector (Insulator).
+    0xe6e6e6U, // 17 : Bridge Deck.
+    0xff0000U, // 18 : High Noise.
+               // 19 - 63 : Reserved.
+               // 19 : Overhead Structure (mining equipment, traffic lights).
+               // 20 : Ignored Ground (break line proximity).
+               // 21 : Snow.
+               // 22 : Temporal Exclusion (water levels, permafrost).
+               // 64 - 255 : User Definable.
 };
 
 const std::vector<Vector3<double>> ColorPalette::BlackRed16 = {
@@ -260,7 +262,7 @@ std::vector<Vector3<double>> ColorPalette::blueCyanYellowRed(size_t nColors)
     std::vector<Vector3<double>> colormap;
     colormap.resize(nColors);
 
-    // Blue
+    // Blue.
     size_t i1 = nColors / 8;
     double delta = 0.5 / static_cast<double>(i1);
     for (size_t i = 0; i < i1; i++)
@@ -269,7 +271,7 @@ std::vector<Vector3<double>> ColorPalette::blueCyanYellowRed(size_t nColors)
         colormap[i].set(0.0, 0.0, 0.5 + v);
     }
 
-    // Blue to Cyan
+    // Blue to Cyan.
     size_t i2 = i1 + nColors / 4;
     delta = 1.0 / static_cast<double>(i2 - i1);
     for (size_t i = i1; i < i2; i++)
@@ -278,7 +280,7 @@ std::vector<Vector3<double>> ColorPalette::blueCyanYellowRed(size_t nColors)
         colormap[i].set(0.0, v, 1.0);
     }
 
-    // Cyan to Yellow
+    // Cyan to Yellow.
     size_t i3 = i2 + nColors / 4;
     delta = 1.0 / static_cast<double>(i3 - i2);
     for (size_t i = i2; i < i3; i++)
@@ -287,7 +289,7 @@ std::vector<Vector3<double>> ColorPalette::blueCyanYellowRed(size_t nColors)
         colormap[i].set(v, 1.0, 1.0 - v);
     }
 
-    // Yellow to Red
+    // Yellow to Red.
     size_t i4 = i3 + nColors / 4;
     delta = 1.0 / static_cast<double>(i4 - i3);
     for (size_t i = i3; i < i4; i++)
@@ -296,7 +298,7 @@ std::vector<Vector3<double>> ColorPalette::blueCyanYellowRed(size_t nColors)
         colormap[i].set(1.0, 1.0 - v, 0.0);
     }
 
-    // Red
+    // Red.
     delta = 0.5 / static_cast<double>(nColors - i4 - 1);
     for (size_t i = i4; i < nColors; i++)
     {
@@ -313,7 +315,7 @@ std::vector<Vector3<double>> ColorPalette::blueCyanGreenYellowRed(
     std::vector<Vector3<double>> colormap;
     colormap.resize(nColors);
 
-    // Blue to Cyan
+    // Blue to Cyan.
     size_t i1 = nColors / 5;
     double delta = 1.0 / static_cast<double>(i1);
     for (size_t i = 0; i < i1; i++)
@@ -322,7 +324,7 @@ std::vector<Vector3<double>> ColorPalette::blueCyanGreenYellowRed(
         colormap[i].set(0.0, v, 1.0);
     }
 
-    // Cyan to Green
+    // Cyan to Green.
     size_t i2 = i1 + nColors / 5;
     delta = 1.0 / static_cast<double>(i2 - i1);
     for (size_t i = i1; i < i2; i++)
@@ -331,7 +333,7 @@ std::vector<Vector3<double>> ColorPalette::blueCyanGreenYellowRed(
         colormap[i].set(0.0, 1.0, 1.0 - v);
     }
 
-    // Green to Yellow
+    // Green to Yellow.
     size_t i3 = i2 + nColors / 7;
     delta = 1.0 / static_cast<double>(i3 - i2);
     for (size_t i = i2; i < i3; i++)
@@ -340,7 +342,7 @@ std::vector<Vector3<double>> ColorPalette::blueCyanGreenYellowRed(
         colormap[i].set(v, 1.0, 0.0);
     }
 
-    // Yellow to Red
+    // Yellow to Red.
     delta = 1.0 / static_cast<double>(nColors - i3 - 1);
     for (size_t i = i3; i < nColors; i++)
     {

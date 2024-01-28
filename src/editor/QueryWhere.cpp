@@ -19,8 +19,10 @@
 
 /** @file QueryWhere.cpp */
 
+// Include 3D Forest.
 #include <QueryWhere.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "QueryWhere"
 #include <Log.hpp>
 

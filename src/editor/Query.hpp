@@ -22,13 +22,16 @@
 #ifndef QUERY_HPP
 #define QUERY_HPP
 
+// Include std.
 #include <unordered_set>
 
+// Include 3D Forest.
 #include <Camera.hpp>
 #include <Page.hpp>
 #include <QueryWhere.hpp>
 class Editor;
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 
@@ -144,15 +147,15 @@ public:
     bool mean(double &meanX, double &meanY, double &meanZ);
 
 protected:
-    // Parent
+    // Parent.
     Editor *editor_;
 
-    // Query
+    // Query.
     QueryWhere where_;
     size_t maximumResults_;
     size_t nResults_;
 
-    // Grid
+    // Grid.
     Box<double> gridCell_;
     Box<double> gridCellBase_;
     Box<double> gridBoundary_;
@@ -161,7 +164,7 @@ protected:
     size_t gridIndex_;
     std::vector<uint64_t> grid_;
 
-    // Voxel
+    // Voxel.
     Box<double> voxelRegion_;
     Vector3<double> voxelSize_;
     uint64_t voxelTotalCount_;
@@ -178,7 +181,7 @@ protected:
                    size_t y2,
                    size_t z2);
 
-    // Current page
+    // Current page.
     std::shared_ptr<Page> page_;
 
     double *position_;
@@ -197,13 +200,13 @@ protected:
 
     uint32_t *selection_;
 
-    // Iterator
+    // Iterator.
     size_t pageIndex_;
     size_t pagePointIndex_;
     size_t pagePointIndexMax_;
     std::vector<IndexFile::Selection> selectedPages_;
 
-    // Cache
+    // Cache.
     struct Key
     {
         size_t datasetId;
@@ -214,7 +217,7 @@ protected:
     size_t cacheSizeMax_;
     std::map<Key, std::shared_ptr<Page>> cache_;
 
-    // Last Recently Used (LRU) for Cache
+    // Last Recently Used (LRU) for Cache.
     std::vector<std::shared_ptr<Page>> lru_;
 
     std::shared_ptr<Page> read(size_t dataset, size_t index);

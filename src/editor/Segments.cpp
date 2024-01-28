@@ -19,8 +19,10 @@
 
 /** @file Segments.cpp */
 
+// Include 3D Forest.
 #include <Segments.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "Segments"
 #include <Log.hpp>
 
@@ -84,7 +86,7 @@ void Segments::erase(size_t i)
 size_t Segments::unusedId() const
 {
     LOG_DEBUG(<< "Obtain unused id.");
-    // Return minimum available id value
+    // Return minimum available id value.
     for (size_t rval = 0; rval < std::numeric_limits<size_t>::max(); rval++)
     {
         if (hashTableId_.find(rval) == hashTableId_.end())
@@ -133,7 +135,7 @@ void Segments::read(const Json &in)
         }
     }
 
-    // Default
+    // Set default.
     if (segments_.size() == 0)
     {
         setDefault();

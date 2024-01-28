@@ -19,11 +19,14 @@
 
 /** @file Point.cpp */
 
+// Include std.
 #include <cstring>
 
+// Include 3D Forest.
 #include <Endian.hpp>
 #include <Point.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "Point"
 #include <Log.hpp>
 

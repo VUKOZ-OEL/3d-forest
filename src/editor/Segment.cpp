@@ -19,9 +19,11 @@
 
 /** @file Segment.cpp */
 
+// Include 3D Forest.
 #include <Error.hpp>
 #include <Segment.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "Segment"
 #include <Log.hpp>
 
@@ -55,10 +57,10 @@ void Segment::read(const Json &in)
         THROW("Segment is not JSON object");
     }
 
-    // ID
+    // ID.
     id_ = in["id"].uint32();
 
-    // Label
+    // Label.
     if (in.contains("label"))
     {
         label_ = in["label"].string();
@@ -68,7 +70,7 @@ void Segment::read(const Json &in)
         label_ = "";
     }
 
-    // Color
+    // Color.
     if (in.contains("color"))
     {
         color_.read(in["color"]);

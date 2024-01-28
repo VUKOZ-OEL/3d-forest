@@ -22,6 +22,7 @@
 #ifndef POINT_HPP
 #define POINT_HPP
 
+// Include 3D Forest.
 #include <Box.hpp>
 
 /** Point. */
@@ -36,10 +37,10 @@ public:
         static void write(const Point &point, uint8_t *buffer);
     };
 
-    // class
+    // Class.
     typedef double Type;
 
-    // data
+    // Data.
     double x;
     double y;
     double z;
@@ -52,7 +53,7 @@ public:
     size_t group;
     uint32_t status;
 
-    // construct/copy/destroy
+    // Construct/Copy/Destroy.
     Point() = default;
     Point(double x_, double y_, double z_);
 };

@@ -22,14 +22,14 @@
 #ifndef DATASET_HPP
 #define DATASET_HPP
 
-// 3D Forest
+// Include 3D Forest.
 #include <Box.hpp>
 #include <IndexFile.hpp>
 #include <Json.hpp>
 #include <LasFile.hpp>
 #include <SettingsImport.hpp>
 
-// Local
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 
@@ -66,7 +66,7 @@ public:
     const LasFile &las() const { return *las_; }
     LasFile &las() { return *las_; }
 
-    // I/O
+    // I/O.
     void read(size_t id,
               const std::string &path,
               const std::string &projectPath,
@@ -76,20 +76,20 @@ public:
     Json &write(Json &out) const;
 
 protected:
-    // Stored
+    // Stored.
     size_t id_;
-    std::string label_; /**< Inconsistent with LAS in shared projects */
+    std::string label_; /**< Inconsistent with LAS in shared projects. */
     Vector3<double> color_;
     std::string pathUnresolved_;
-    std::string dateCreated_; /**< Inconsistent with LAS in shared projects */
+    std::string dateCreated_; /**< Inconsistent with LAS in shared projects. */
     Vector3<double> translation_;
     Vector3<double> scaling_;
 
-    // Derived
+    // Derived.
     std::string path_;
     std::string fileName_;
 
-    // Data
+    // Data.
     uint64_t nPoints_;
     Vector3<double> translationFile_;
     Vector3<double> scalingFile_;

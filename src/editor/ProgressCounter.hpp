@@ -22,10 +22,12 @@
 #ifndef PROGRESS_COUNTER_HPP
 #define PROGRESS_COUNTER_HPP
 
+// Include std.
 #include <cstddef>
 #include <cstdint>
 #include <vector>
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 

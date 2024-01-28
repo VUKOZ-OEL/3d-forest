@@ -19,14 +19,15 @@
 
 /** @file TestRecordFile.cpp */
 
+// Include 3D Forest.
 #include <RecordFile.hpp>
 #include <Test.hpp>
 
 #define TEST_RECORD_FILE_PATH "test.bin"
 
-TEST_CASE(TestRecordFileCreate1U32)
+TEST_CASE(TestRecordFileCreateU32)
 {
-    // write
+    // Write 1 integer value.
     RecordFile w;
     uint32_t wU32 = UINT32_MAX;
     w.create(TEST_RECORD_FILE_PATH, "foo", RecordFile::TYPE_U32);
@@ -35,7 +36,7 @@ TEST_CASE(TestRecordFileCreate1U32)
     TEST(w.index() == 1);
     w.close();
 
-    // read back
+    // Read the integer value back.
     RecordFile r;
     uint32_t rU32 = 0;
     r.open(TEST_RECORD_FILE_PATH);

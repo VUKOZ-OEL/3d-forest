@@ -22,11 +22,14 @@
 #ifndef RANGE_HPP
 #define RANGE_HPP
 
+// Include std.
 #include <array>
 
+// Include 3D Forest.
 #include <Json.hpp>
 #include <Util.hpp>
 
+// Include local.
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>
 
@@ -34,7 +37,7 @@
 template <class T> class Range : public std::array<T, 4>
 {
 public:
-    // construct/copy/destroy
+    // Construct/Copy/Destroy.
     Range();
 
     Range(T min, T max)
@@ -57,11 +60,11 @@ public:
 
     ~Range();
 
-    // enabled
+    // Enabled.
     void setEnabled(bool enabled) { enabled_ = enabled; }
     bool isEnabled() const { return enabled_; }
 
-    // access
+    // Access.
     bool empty() const;
     bool full() const;
 
@@ -79,7 +82,7 @@ public:
     T minimumValue() const { return this->operator[](1); }
     T maximumValue() const { return this->operator[](2); }
 
-    // modifiers
+    // Modifiers.
     void clear();
 
     void set(T min, T max)
@@ -98,10 +101,10 @@ public:
         this->operator[](3) = max;
     }
 
-    // operations
+    // Operations.
     bool contains(T v) const;
 
-    // I/O
+    // I/O.
     void read(const Json &in);
     Json &write(Json &out) const;
 

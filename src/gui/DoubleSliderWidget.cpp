@@ -19,10 +19,12 @@
 
 /** @file DoubleSliderWidget.cpp */
 
+// Include 3D Forest.
 #include <DoubleSliderWidget.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
+// Include Qt.
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -30,6 +32,7 @@
 #include <QSpinBox>
 #include <QVBoxLayout>
 
+// Include local.
 #define LOG_MODULE_NAME "DoubleSliderWidget"
 #include <Log.hpp>
 
@@ -119,20 +122,20 @@ void DoubleSliderWidget::create(DoubleSliderWidget *&outputWidget,
 {
     outputWidget = new DoubleSliderWidget();
 
-    // Description Name
+    // Description Name.
     QLabel *label = new QLabel(text);
 
-    // Description Tool Tip
+    // Description Tool Tip.
     QLabel *help = new QLabel;
     help->setToolTip(toolTip);
     ThemeIcon helpIcon(":/gui/", "question");
     help->setPixmap(helpIcon.pixmap(MainWindow::ICON_SIZE_TEXT));
 
-    // Description Units
+    // Description Units.
     QComboBox *units = new QComboBox;
     units->addItem(unitsList);
 
-    // Value Slider
+    // Value Slider.
     int stepInt = static_cast<int>(step);
     int minInt = static_cast<int>(min);
     int maxInt = static_cast<int>(max);
@@ -171,7 +174,7 @@ void DoubleSliderWidget::create(DoubleSliderWidget *&outputWidget,
                 memberFinalValue);
     }
 
-    // Value SpinBox
+    // Value SpinBox.
     outputWidget->spinBox_ = new QSpinBox;
     QSpinBox *spinBox = outputWidget->spinBox_;
     spinBox->setRange(minInt, maxInt);

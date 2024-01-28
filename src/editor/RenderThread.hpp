@@ -22,10 +22,12 @@
 #ifndef RENDER_THREAD_HPP
 #define RENDER_THREAD_HPP
 
+// Include 3D Forest.
 #include <Camera.hpp>
 #include <ThreadLoop.hpp>
 class Editor;
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 

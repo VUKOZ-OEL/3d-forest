@@ -22,9 +22,11 @@
 #ifndef PAGE_MANAGER_HPP
 #define PAGE_MANAGER_HPP
 
+// Include 3D Forest.
 #include <PageData.hpp>
 class Editor;
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 

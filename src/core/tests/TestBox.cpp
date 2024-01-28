@@ -19,6 +19,7 @@
 
 /** @file TestBox.cpp */
 
+// Include 3D Forest.
 #include <Box.hpp>
 #include <Test.hpp>
 #include <Util.hpp>

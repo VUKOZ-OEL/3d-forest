@@ -22,9 +22,11 @@
 #ifndef VIEWPORTS_HPP
 #define VIEWPORTS_HPP
 
+// Include 3D Forest.
 #include <Query.hpp>
 class Editor;
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 

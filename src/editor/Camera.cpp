@@ -19,8 +19,10 @@
 
 /** @file Camera.cpp */
 
+// Include 3D Forest.
 #include <Camera.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "Camera"
 #include <Log.hpp>
 

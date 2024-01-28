@@ -19,8 +19,10 @@
 
 /** @file Classifications.cpp */
 
+// Include 3D Forest.
 #include <Classifications.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "Classifications"
 #include <Log.hpp>
 
@@ -45,18 +47,18 @@ void Classifications::clear()
     resize(256);
 
     classes_[0].label = "Never classified";
-    classes_[1].label = "Unassigned"; // classified without a class
+    classes_[1].label = "Unassigned"; // Classified without a class.
     classes_[2].label = "Ground";
     classes_[3].label = "Low Vegetation";
     classes_[4].label = "Medium Vegetation";
     classes_[5].label = "High Vegetation";
     classes_[6].label = "Building";
     classes_[7].label = "Low Point (Noise)";
-    classes_[8].label = "Reserved"; // 1.1 Model Key-point (mass point)
+    classes_[8].label = "Reserved"; // 1.1 Model Key-point (mass point).
     classes_[9].label = "Water";
     classes_[10].label = "Rail";
     classes_[11].label = "Road Surface";
-    classes_[12].label = "Reserved"; // 1.1 Overlap Points, should set Withheld
+    classes_[12].label = "Reserved"; // 1.1 Overlap Points, should be Withheld.
 
     classes_[13].label = "Wire - Guard";
     classes_[14].label = "Wire - Conductor";

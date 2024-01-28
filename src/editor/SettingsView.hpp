@@ -22,11 +22,14 @@
 #ifndef SETTINGS_VIEW_HPP
 #define SETTINGS_VIEW_HPP
 
+// Include std.
 #include <string>
 #include <vector>
 
+// Include 3D Forest.
 #include <Vector3.hpp>
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 

@@ -19,13 +19,13 @@
 
 /** @file Dataset.cpp */
 
-// 3D Forest
+// Include 3D Forest.
 #include <Dataset.hpp>
 #include <Error.hpp>
 #include <File.hpp>
 #include <IndexFileBuilder.hpp>
 
-// Local
+// Include local.
 #define LOG_MODULE_NAME "Dataset"
 #include <Log.hpp>
 
@@ -88,7 +88,7 @@ void Dataset::read(const Json &in, const std::string &projectPath)
         THROW("Data set is not JSON object");
     }
 
-    // Data set path
+    // Data set path.
     if (!in.containsString("path"))
     {
         THROW("Can't find string 'path' in JSON object");
@@ -97,16 +97,16 @@ void Dataset::read(const Json &in, const std::string &projectPath)
     pathUnresolved_ = in["path"].string();
     setPath(pathUnresolved_, projectPath);
 
-    // Date Created
+    // Date Created.
     if (in.contains("dateCreated"))
     {
         dateCreated_ = in["dateCreated"].string();
     }
 
-    // ID
+    // ID.
     id_ = in["id"].uint32();
 
-    // Label
+    // Label.
     if (in.contains("label"))
     {
         label_ = in["label"].string();
@@ -116,7 +116,7 @@ void Dataset::read(const Json &in, const std::string &projectPath)
         label_ = fileName_;
     }
 
-    // Color
+    // Color.
     if (in.contains("color"))
     {
         color_.read(in["color"]);
@@ -126,10 +126,10 @@ void Dataset::read(const Json &in, const std::string &projectPath)
         color_.set(1.0, 1.0, 1.0);
     }
 
-    // Read
+    // Read.
     read();
 
-    // Transformation
+    // Transformation.
     if (in.contains("translation"))
     {
         translation_.read(in["translation"]);
@@ -160,10 +160,10 @@ Json &Dataset::write(Json &out) const
 
 void Dataset::setPath(const std::string &path, const std::string &projectPath)
 {
-    // Data set absolute path
+    // Data set absolute path.
     path_ = File::resolvePath(path, projectPath);
 
-    // Data set file name
+    // Data set file name.
     fileName_ = File::fileName(path_);
 }
 
@@ -190,7 +190,7 @@ void Dataset::read()
 
     scaling_.set(1.0, 1.0, 1.0);
 
-    // Boundary
+    // Boundary.
     const std::string pathIndex = IndexFileBuilder::extension(path_);
     index_ = std::make_shared<IndexFile>();
     index_->read(pathIndex);

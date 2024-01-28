@@ -22,9 +22,11 @@
 #ifndef PAGE_DATA_HPP
 #define PAGE_DATA_HPP
 
+// Include 3D Forest.
 #include <IndexFile.hpp>
 class Editor;
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 
@@ -140,7 +142,7 @@ private:
     /** When true, this page should be written back to hard drive. */
     bool modified_;
 
-    /** File buffer to preserve untouched LAS data on updates. */
+    /** File buffer to preserve untouched LAS data for updates. */
     std::vector<uint8_t> pointDataBuffer_;
 
     /** Original xyz position of each point for translations. */
