@@ -22,9 +22,11 @@
 #ifndef SEGMENTATION_WINDOW_HPP
 #define SEGMENTATION_WINDOW_HPP
 
+// Include 3D Forest.
 class MainWindow;
 class SegmentationWidget;
 
+// Include Qt.
 #include <QDialog>
 
 /** Segmentation Window. */

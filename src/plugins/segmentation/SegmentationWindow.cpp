@@ -19,13 +19,16 @@
 
 /** @file SegmentationWindow.cpp */
 
+// Include 3D Forest.
 #include <MainWindow.hpp>
 #include <SegmentationWidget.hpp>
 #include <SegmentationWindow.hpp>
 #include <ThemeIcon.hpp>
 
+// Include Qt.
 #include <QVBoxLayout>
 
+// Include local.
 #define LOG_MODULE_NAME "SegmentationWindow"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
@@ -38,15 +41,15 @@ SegmentationWindow::SegmentationWindow(MainWindow *mainWindow)
 {
     LOG_DEBUG(<< "Create.");
 
-    // Widget
+    // Widget.
     widget_ = new SegmentationWidget(mainWindow);
 
-    // Main layout
+    // Main layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(widget_);
     mainLayout->addStretch();
 
-    // Dialog
+    // Dialog.
     setLayout(mainLayout);
     setWindowTitle(tr("Segmentation"));
     setWindowIcon(ICON("forest"));

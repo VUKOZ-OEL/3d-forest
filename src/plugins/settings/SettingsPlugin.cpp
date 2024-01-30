@@ -19,11 +19,13 @@
 
 /** @file SettingsPlugin.cpp */
 
+// Include 3D Forest.
 #include <MainWindow.hpp>
 #include <SettingsPlugin.hpp>
 #include <SettingsWindow.hpp>
 #include <ThemeIcon.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "SettingsPlugin"
 #include <Log.hpp>
 

@@ -22,12 +22,15 @@
 #ifndef PROJECT_FILE_PLUGIN_HPP
 #define PROJECT_FILE_PLUGIN_HPP
 
+// Include 3D Forest.
 class MainWindow;
 
+// Include Qt.
 #include <QObject>
 #include <QString>
 class QAction;
 
+// Include local.
 #include <ExportGui.hpp>
 
 /** Project File Plugin. */

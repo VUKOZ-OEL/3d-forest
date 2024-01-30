@@ -22,10 +22,13 @@
 #ifndef VIEWER_CAMERA_HPP
 #define VIEWER_CAMERA_HPP
 
+// Include std.
 #include <vector>
 
+// Include 3D Forest.
 #include <Camera.hpp>
 
+// Include Qt.
 #include <QMatrix4x4>
 #include <QPoint>
 #include <QQuaternion>
@@ -42,19 +45,19 @@ public:
     ViewerCamera();
     ~ViewerCamera();
 
-    // Viewport
+    // Viewport.
     void setViewport(int x, int y, int width, int height);
     int width() const { return viewport_.width(); }
     int height() const { return viewport_.height(); }
 
-    // Projection
+    // Projection.
     void updateProjection();
     void setPerspective();
     void setOrthographic();
     void setPerspective(float fovy, float zNear, float zFar);
     void setPerspective(float fovy, float aspect, float zNear, float zFar);
 
-    // Model-view
+    // Model-view.
     void setLookAt(const QVector3D &center, float distance);
 
     void setLookAt(const QVector3D &eye,
@@ -63,7 +66,7 @@ public:
 
     void setDistance(float distance);
 
-    // Camera
+    // Camera.
     float getDistance() const { return distance_; }
     const QVector3D &getEye() const { return eye_; }
     const QVector3D &getCenter() const { return center_; }
@@ -74,12 +77,12 @@ public:
 
     Camera toCamera() const;
 
-    // Transform
+    // Transform.
     QVector3D project(const QVector3D &world) const;
     QVector3D unproject(const QVector3D &window) const;
     void getRay(int x, int y, QVector3D *base, QVector3D *direction);
 
-    // Interaction
+    // Interaction.
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
@@ -87,7 +90,7 @@ public:
     void pan(int dx, int dy);
     void zoom(int dy);
 
-    // Matrix
+    // Matrix.
     const QMatrix4x4 &getModelView() const { return modelView_; }
     const QMatrix4x4 &getProjection() const { return projection_; }
     const QMatrix4x4 &getModelViewProjection() const
@@ -103,7 +106,7 @@ public:
     }
 
 protected:
-    // Camera
+    // Camera.
     QVector3D eye_;
     QVector3D center_;
     QVector3D right_;
@@ -116,10 +119,10 @@ protected:
     float zFar_;
     bool perspective_;
 
-    // Viewport
+    // Viewport.
     QRect viewport_;
 
-    // Matrix
+    // Matrix.
     QMatrix4x4 projection_;
     QMatrix4x4 projectionInv_;
     QMatrix4x4 modelView_;
@@ -127,10 +130,10 @@ protected:
     QMatrix4x4 modelViewProjection_;
     QMatrix4x4 modelViewProjectionInv_;
 
-    // Camera frustrum
+    // Camera frustum.
     std::vector<float> frustrumPlanes_;
 
-    // Interaction
+    // Interaction.
     QPoint mouseLastPosition_;
     float sensitivityX_;
     float sensitivityY_;

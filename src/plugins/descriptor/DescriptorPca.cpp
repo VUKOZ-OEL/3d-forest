@@ -19,9 +19,11 @@
 
 /** @file DescriptorPca.cpp */
 
+// Include 3D Forest.
 #include <DescriptorPca.hpp>
 #include <LasFile.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "DescriptorPca"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>

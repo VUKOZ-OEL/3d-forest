@@ -22,11 +22,13 @@
 #ifndef EXPLORER_SEGMENTS_WIDGET_HPP
 #define EXPLORER_SEGMENTS_WIDGET_HPP
 
+// Include 3D Forest.
 #include <Editor.hpp>
 #include <ExplorerWidgetInterface.hpp>
 #include <Segments.hpp>
 class MainWindow;
 
+// Include Qt.
 class QToolButton;
 class QTreeWidget;
 class QTreeWidgetItem;

@@ -19,12 +19,14 @@
 
 /** @file SettingsWindow.cpp */
 
+// Include 3D Forest.
 #include <MainWindow.hpp>
 #include <SettingsColorWidget.hpp>
 #include <SettingsWindow.hpp>
 #include <ThemeIcon.hpp>
 #include <ToolTabWidget.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "SettingsWindow"
 #include <Log.hpp>
 
@@ -34,14 +36,14 @@ SettingsWindow::SettingsWindow(MainWindow *mainWindow)
     : QDockWidget(mainWindow),
       mainWindow_(mainWindow)
 {
-    // Tabs
+    // Tabs.
     settingsColorWidget_ = new SettingsColorWidget(mainWindow_);
 
-    // Tab
+    // Tab.
     tabWidget_ = new ToolTabWidget;
     tabWidget_->addTab(settingsColorWidget_, ICON("brush"), tr("Brush"));
 
-    // Dock
+    // Dock.
     setWidget(tabWidget_);
     setWindowTitle(tr("Settings"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);

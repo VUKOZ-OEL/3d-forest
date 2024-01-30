@@ -22,10 +22,12 @@
 #ifndef SETTINGS_WINDOW_HPP
 #define SETTINGS_WINDOW_HPP
 
+// Include 3D Forest.
 class MainWindow;
 class SettingsColorWidget;
 class ToolTabWidget;
 
+// Include Qt.
 #include <QDockWidget>
 
 /** Settings Window. */

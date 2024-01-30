@@ -22,12 +22,15 @@
 #ifndef VIEWER_PLUGIN_HPP
 #define VIEWER_PLUGIN_HPP
 
+// Include 3D Forest.
 #include <ViewerViewports.hpp>
 class MainWindow;
 
+// Include Qt.
 #include <QObject>
 class QAction;
 
+// Include local.
 #include <ExportGui.hpp>
 
 /** Viewer Plugin. */

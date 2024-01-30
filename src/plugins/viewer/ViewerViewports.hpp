@@ -22,14 +22,18 @@
 #ifndef VIEWER_VIEWPORTS_HPP
 #define VIEWER_VIEWPORTS_HPP
 
+// Include std.
 #include <vector>
 
+// Include 3D Forest.
 #include <Camera.hpp>
 class Editor;
 class ViewerOpenGLViewport;
 
+// Include Qt.
 #include <QWidget>
 
+// Include local.
 #include <ExportGui.hpp>
 
 /** Viewer Viewports. */

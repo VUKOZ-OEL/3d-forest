@@ -19,6 +19,7 @@
 
 /** @file ExportFileDialog.cpp */
 
+// Include 3D Forest.
 #include <ExportFileDialog.hpp>
 #include <ExportFileFormatCsv.hpp>
 #include <ExportFileFormatLas.hpp>
@@ -26,6 +27,7 @@
 #include <ThemeIcon.hpp>
 #include <Util.hpp>
 
+// Include Qt.
 #include <QCheckBox>
 #include <QComboBox>
 #include <QFileDialog>
@@ -38,6 +40,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+// Include local.
 #define LOG_MODULE_NAME "ExportFileDialog"
 #include <Log.hpp>
 
@@ -48,7 +51,7 @@ ExportFileDialog::ExportFileDialog(MainWindow *mainWindow,
     : QDialog(mainWindow),
       mainWindow_(mainWindow)
 {
-    // File name
+    // File name.
     fileNameLineEdit_ = new QLineEdit;
     fileNameLineEdit_->setText(fileName);
 
@@ -60,7 +63,7 @@ ExportFileDialog::ExportFileDialog(MainWindow *mainWindow,
     fileNameLayout->addWidget(fileNameLineEdit_);
     fileNameLayout->addWidget(browseButton_);
 
-    // Attributes
+    // Attributes.
     attributeCheckBox_.resize(5);
 
     attributeCheckBox_[0] = new QCheckBox(tr("XYZ coordinates"));
@@ -88,7 +91,7 @@ ExportFileDialog::ExportFileDialog(MainWindow *mainWindow,
     QGroupBox *attributeGroupBox = new QGroupBox(tr("Point attributes"));
     attributeGroupBox->setLayout(attributeVBoxLayout);
 
-    // Other options
+    // Other options.
     scaleComboBox_ = new QComboBox;
     scaleComboBox_->addItem("0.0001");
     scaleComboBox_->addItem("0.001");
@@ -106,7 +109,7 @@ ExportFileDialog::ExportFileDialog(MainWindow *mainWindow,
     valueGridLayout->addWidget(new QLabel(tr("Use current filter")), 1, 0);
     valueGridLayout->addWidget(filterEnabledCheckBox_, 1, 1);
 
-    // Buttons
+    // Buttons.
     acceptButton_ = new QPushButton(tr("Export"));
     connect(acceptButton_, SIGNAL(clicked()), this, SLOT(slotAccept()));
 
@@ -118,7 +121,7 @@ ExportFileDialog::ExportFileDialog(MainWindow *mainWindow,
     dialogButtons->addWidget(acceptButton_);
     dialogButtons->addWidget(rejectButton_);
 
-    // Dialog layout
+    // Dialog layout.
     QVBoxLayout *dialogLayout = new QVBoxLayout;
     dialogLayout->addLayout(fileNameLayout);
     dialogLayout->addSpacing(10);
@@ -130,7 +133,7 @@ ExportFileDialog::ExportFileDialog(MainWindow *mainWindow,
 
     setLayout(dialogLayout);
 
-    // Window
+    // Window.
     setWindowTitle(tr("Export File"));
     setWindowIcon(ICON("export_file"));
     setMaximumWidth(600);
@@ -221,10 +224,10 @@ ExportFileProperties ExportFileDialog::properties() const
 {
     ExportFileProperties result;
 
-    // File name
+    // File name.
     result.setFileName(fileNameLineEdit_->text().toStdString());
 
-    // Point format
+    // Point format.
     uint32_t fmt = 0;
 
     for (size_t i = 0; i < attributeCheckBox_.size(); i++)
@@ -237,10 +240,10 @@ ExportFileProperties ExportFileDialog::properties() const
 
     result.setFormat(fmt);
 
-    // Scale
+    // Scale.
     result.setScale(scaleComboBox_->currentText().toDouble());
 
-    // Filter
+    // Filter.
     result.setFilterEnabled(filterEnabledCheckBox_->isChecked());
 
     return result;

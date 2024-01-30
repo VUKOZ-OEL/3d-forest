@@ -19,11 +19,14 @@
 
 /** @file ExportFileFormatLas.cpp */
 
+// Include std.
 #include <cstring>
 
+// Include 3D Forest.
 #include <ExportFileFormatLas.hpp>
 #include <IndexFileBuilder.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "ExportFileFormatLas"
 #include <Log.hpp>
 
@@ -43,10 +46,10 @@ void ExportFileFormatLas::create(const std::string &path)
               << properties().numberOfPoints() << "> region <"
               << properties().region() << ">.");
 
-    // Create new file which is open for writing
+    // Create new file which is open for writing.
     file_.create(path);
 
-    // Fill LAS header
+    // Fill LAS header.
     std::memset(&file_.header, 0, sizeof(file_.header));
     file_.header.set(properties().numberOfPoints(),
                      properties().region(),
@@ -54,10 +57,10 @@ void ExportFileFormatLas::create(const std::string &path)
                      properties().offset(),
                      properties().format().las());
 
-    // Write LAS header
+    // Write LAS header.
     file_.writeHeader();
 
-    // Remove index file
+    // Remove index file.
     std::string pathIndex = IndexFileBuilder::extension(path);
     if (File::exists(pathIndex))
     {
@@ -71,13 +74,13 @@ void ExportFileFormatLas::write(Query &query)
 
     LasFile::Point point;
 
-    // Set point data to zeroes
+    // Set point data to zeroes.
     std::memset(&point, 0, sizeof(point));
 
-    // Set point data format
+    // Set point data format.
     point.format = properties().format().las();
 
-    // Set point data
+    // Set point data.
     point.x = static_cast<int32_t>(query.x());
     point.y = static_cast<int32_t>(query.y());
     point.z = static_cast<int32_t>(query.z());
@@ -99,7 +102,7 @@ void ExportFileFormatLas::write(Query &query)
     point.elevation = static_cast<uint32_t>(query.elevation());
     point.descriptor = query.descriptor();
 
-    // Write new point to file
+    // Write new point to file.
     file_.writePoint(point);
 }
 
@@ -107,6 +110,6 @@ void ExportFileFormatLas::close()
 {
     LOG_DEBUG(<< "Close.");
 
-    // Close the file
+    // Close the file.
     file_.close();
 }

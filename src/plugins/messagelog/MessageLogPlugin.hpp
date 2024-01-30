@@ -22,11 +22,14 @@
 #ifndef MESSAGE_LOG_PLUGIN_HPP
 #define MESSAGE_LOG_PLUGIN_HPP
 
+// Include 3D Forest.
 class MainWindow;
 class MessageLogWindow;
 
+// Include Qt.
 #include <QObject>
 
+// Include local.
 #include <ExportGui.hpp>
 
 /** Message Log Plugin. */

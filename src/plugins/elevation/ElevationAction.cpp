@@ -19,9 +19,11 @@
 
 /** @file ElevationAction.cpp */
 
+// Include 3D Forest.
 #include <Editor.hpp>
 #include <ElevationAction.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "ElevationAction"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
@@ -112,7 +114,7 @@ void ElevationAction::next()
             break;
 
         default:
-            // empty
+            // Empty.
             break;
     }
 }

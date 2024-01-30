@@ -22,12 +22,15 @@
 #ifndef SETTINGS_PLUGIN_HPP
 #define SETTINGS_PLUGIN_HPP
 
+// Include 3D Forest.
 class MainWindow;
 class SettingsWindow;
 
+// Include Qt.
 #include <QObject>
 class QDockWidget;
 
+// Include local.
 #include <ExportGui.hpp>
 
 /** Settings Plugin. */

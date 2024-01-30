@@ -19,6 +19,7 @@
 
 /** @file ExplorerWindow.cpp */
 
+// Include 3D Forest.
 #include <ExplorerClassificationsWidget.hpp>
 #include <ExplorerClippingWidget.hpp>
 #include <ExplorerDescriptorWidget.hpp>
@@ -30,6 +31,7 @@
 #include <ThemeIcon.hpp>
 #include <ToolTabWidget.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "ExplorerWindow"
 #include <Log.hpp>
 
@@ -39,7 +41,7 @@ ExplorerWindow::ExplorerWindow(MainWindow *mainWindow)
     : QDockWidget(mainWindow),
       mainWindow_(mainWindow)
 {
-    // Tab
+    // Tab.
     items_.push_back(
         new ExplorerFilesWidget(mainWindow_, ICON("file"), tr("Files")));
 
@@ -63,14 +65,14 @@ ExplorerWindow::ExplorerWindow(MainWindow *mainWindow)
                                                 ICON("clip_filter"),
                                                 tr("Clip filter")));
 
-    // Tabs
+    // Tabs.
     tabWidget_ = new ToolTabWidget;
     for (size_t i = 0; i < items_.size(); i++)
     {
         tabWidget_->addTab(items_[i], items_[i]->icon(), items_[i]->text());
     }
 
-    // Dock
+    // Dock.
     setWidget(tabWidget_);
     setWindowTitle(tr("Explorer"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);

@@ -19,16 +19,20 @@
 
 /** @file ViewerViewports.cpp */
 
+// Include std.
 #include <iostream>
 
+// Include 3D Forest.
 #include <Editor.hpp>
 #include <ViewerOpenGLViewport.hpp>
 #include <ViewerViewports.hpp>
 
+// Include Qt.
 #include <QHBoxLayout>
 #include <QSplitter>
 #include <QVBoxLayout>
 
+// Include local.
 #define LOG_MODULE_NAME "ViewerViewports"
 #include <Log.hpp>
 
@@ -212,7 +216,7 @@ Camera ViewerViewports::camera(size_t viewportId) const
 
 void ViewerViewports::setLayout(ViewLayout viewLayout)
 {
-    // Remove the current layout
+    // Remove the current layout.
     QLayout *oldLayout = layout();
     if (oldLayout)
     {
@@ -229,14 +233,14 @@ void ViewerViewports::setLayout(ViewLayout viewLayout)
             QSplitter *splitter = dynamic_cast<QSplitter *>(item->widget());
             if (splitter)
             {
-                // Delete extra viewports
+                // Delete extra viewports.
                 for (size_t i = 1; i < viewports_.size(); i++)
                 {
                     viewports_[i]->hide();
                     viewports_[i]->deleteLater();
                 }
 
-                // Delete layout content
+                // Delete layout content.
                 viewports_[0]->setParent(this);
                 delete splitter;
                 viewports_.resize(1);
@@ -250,7 +254,7 @@ void ViewerViewports::setLayout(ViewLayout viewLayout)
         delete oldLayout;
     }
 
-    // Create the first viewport
+    // Create the first viewport.
     if (viewports_.size() == 0)
     {
         viewports_.resize(1);
@@ -258,11 +262,11 @@ void ViewerViewports::setLayout(ViewLayout viewLayout)
         viewports_[0]->setSelected(true);
     }
 
-    // Create new layout
+    // Create new layout.
     QHBoxLayout *newLayout = new QHBoxLayout;
     newLayout->setContentsMargins(1, 1, 1, 1);
 
-    // Set layout
+    // Set layout.
     if (viewLayout == ViewLayout::VIEW_LAYOUT_SINGLE)
     {
         newLayout->addWidget(viewports_[0]);
@@ -270,11 +274,11 @@ void ViewerViewports::setLayout(ViewLayout viewLayout)
     }
     else if (viewLayout == ViewLayout::VIEW_LAYOUT_TWO_COLUMNS)
     {
-        // Create viewports
+        // Create viewports.
         viewports_.resize(2);
         viewports_[1] = createViewport(VIEWER_VIEWPORTS_TOP);
 
-        // Create new layout
+        // Create new layout.
         QSplitter *splitter = new QSplitter;
         splitter->addWidget(viewports_[0]);
         splitter->addWidget(viewports_[1]);
@@ -285,13 +289,13 @@ void ViewerViewports::setLayout(ViewLayout viewLayout)
     }
     else if (viewLayout == ViewLayout::VIEW_LAYOUT_GRID)
     {
-        // Create viewports
+        // Create viewports.
         viewports_.resize(4);
         viewports_[1] = createViewport(VIEWER_VIEWPORTS_TOP);
         viewports_[2] = createViewport(VIEWER_VIEWPORTS_FRONT);
         viewports_[3] = createViewport(VIEWER_VIEWPORTS_RIGHT);
 
-        // Create new layout
+        // Create new layout.
         int w = width() / 2;
         int h = height() / 2;
 
@@ -316,13 +320,13 @@ void ViewerViewports::setLayout(ViewLayout viewLayout)
     }
     else if (viewLayout == ViewLayout::VIEW_LAYOUT_THREE_ROWS_RIGHT)
     {
-        // Create viewports
+        // Create viewports.
         viewports_.resize(4);
         viewports_[1] = createViewport(VIEWER_VIEWPORTS_TOP);
         viewports_[2] = createViewport(VIEWER_VIEWPORTS_FRONT);
         viewports_[3] = createViewport(VIEWER_VIEWPORTS_RIGHT);
 
-        // Create new layout
+        // Create new layout.
         int w = width() / 3;
         int h = height() / 3;
 
@@ -345,6 +349,6 @@ void ViewerViewports::setLayout(ViewLayout viewLayout)
         Q_UNREACHABLE();
     }
 
-    // Set new layout
+    // Set new layout.
     QWidget::setLayout(newLayout);
 }

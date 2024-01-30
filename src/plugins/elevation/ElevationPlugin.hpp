@@ -22,6 +22,7 @@
 #ifndef ELEVATION_PLUGIN_HPP
 #define ELEVATION_PLUGIN_HPP
 
+// Include 3D Forest.
 #include <PluginInterface.hpp>
 class ElevationWindow;
 

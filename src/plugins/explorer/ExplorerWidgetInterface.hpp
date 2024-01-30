@@ -22,9 +22,11 @@
 #ifndef EXPLORER_WIDGET_INTERFACE_HPP
 #define EXPLORER_WIDGET_INTERFACE_HPP
 
+// Include 3D Forest.
 #include <SettingsView.hpp>
 class MainWindow;
 
+// Include Qt.
 #include <QIcon>
 #include <QWidget>
 class QLabel;

@@ -19,6 +19,7 @@
 
 /** @file MessageLogPlugin.cpp */
 
+// Include 3D Forest.
 #include <MainWindow.hpp>
 #include <MessageLogPlugin.hpp>
 #include <MessageLogWindow.hpp>

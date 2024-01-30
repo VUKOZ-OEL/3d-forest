@@ -19,17 +19,20 @@
 
 /** @file ImportFilePlugin.cpp */
 
+// Include 3D Forest.
 #include <ImportFileDialog.hpp>
 #include <ImportFilePlugin.hpp>
 #include <IndexFileBuilder.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
+// Include Qt.
 #include <QCoreApplication>
 #include <QFileDialog>
 #include <QProgressBar>
 #include <QProgressDialog>
 
+// Include local.
 #define LOG_MODULE_NAME "ImportFilePlugin"
 #include <Log.hpp>
 

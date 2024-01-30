@@ -22,6 +22,7 @@
 #ifndef EXPORT_FILE_FORMAT_LAS_HPP
 #define EXPORT_FILE_FORMAT_LAS_HPP
 
+// Include 3D Forest.
 #include <ExportFileFormatInterface.hpp>
 #include <LasFile.hpp>
 #include <Query.hpp>

@@ -19,13 +19,16 @@
 
 /** @file ProjectFilePlugin.cpp */
 
+// Include 3D Forest.
 #include <MainWindow.hpp>
 #include <ProjectFilePlugin.hpp>
 #include <ThemeIcon.hpp>
 
+// Include Qt.
 #include <QFileDialog>
 #include <QMessageBox>
 
+// Include local.
 #define LOG_MODULE_NAME "ProjectFilePlugin"
 #include <Log.hpp>
 
@@ -128,13 +131,13 @@ void ProjectFilePlugin::slotProjectSaveAs()
 
 bool ProjectFilePlugin::projectOpen(const QString &path)
 {
-    // Close the current project
+    // Close the current project.
     if (!projectClose())
     {
         return false;
     }
 
-    // Open new project
+    // Open new project.
     try
     {
         mainWindow_->editor().open(path.toStdString());
@@ -154,7 +157,7 @@ bool ProjectFilePlugin::projectClose()
 {
     mainWindow_->suspendThreads();
 
-    // Save changes
+    // Save changes.
     if (mainWindow_->editor().hasUnsavedChanges())
     {
         QMessageBox msgBox;
@@ -169,18 +172,18 @@ bool ProjectFilePlugin::projectClose()
         switch (ret)
         {
             case QMessageBox::Save:
-                // Save was clicked
+                // Save was clicked.
                 canClose = projectSave();
                 break;
             case QMessageBox::Discard:
-                // Don't Save was clicked
+                // Don't Save was clicked.
                 break;
             case QMessageBox::Cancel:
-                // Cancel was clicked
+                // Cancel was clicked.
                 canClose = false;
                 break;
             default:
-                // should never be reached
+                // Should never be reached.
                 Q_UNREACHABLE();
                 break;
         }
@@ -191,7 +194,7 @@ bool ProjectFilePlugin::projectClose()
         }
     }
 
-    // Close
+    // Close.
     try
     {
         mainWindow_->editor().close();
@@ -201,7 +204,7 @@ bool ProjectFilePlugin::projectClose()
         mainWindow_->showError(e.what());
     }
 
-    return true; // Closed
+    return true; // Closed.
 }
 
 bool ProjectFilePlugin::projectSave(const QString &path)
@@ -212,11 +215,11 @@ bool ProjectFilePlugin::projectSave(const QString &path)
 
     if (path.isEmpty())
     {
-        // Save
+        // Save.
         writePath = mainWindow_->editor().projectPath();
         if (writePath.empty())
         {
-            // First time save
+            // First time save.
             QString fileName;
 
             fileName = QFileDialog::getSaveFileName(
@@ -235,11 +238,11 @@ bool ProjectFilePlugin::projectSave(const QString &path)
     }
     else
     {
-        // Save As
+        // Save As.
         writePath = path.toStdString();
     }
 
-    // Write
+    // Write.
     try
     {
         mainWindow_->editor().saveProject(writePath);
@@ -250,5 +253,5 @@ bool ProjectFilePlugin::projectSave(const QString &path)
         return false;
     }
 
-    return true; // Saved
+    return true; // Saved.
 }

@@ -19,11 +19,13 @@
 
 /** @file ViewerPlugin.cpp */
 
+// Include 3D Forest.
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 #include <ViewerPlugin.hpp>
 #include <ViewerViewports.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "ViewerPlugin"
 #include <Log.hpp>
 

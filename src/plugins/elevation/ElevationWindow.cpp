@@ -19,13 +19,16 @@
 
 /** @file ElevationWindow.cpp */
 
+// Include 3D Forest.
 #include <ElevationWidget.hpp>
 #include <ElevationWindow.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
+// Include Qt.
 #include <QVBoxLayout>
 
+// Include local.
 #define LOG_MODULE_NAME "ElevationWindow"
 #include <Log.hpp>
 
@@ -37,15 +40,15 @@ ElevationWindow::ElevationWindow(MainWindow *mainWindow)
 {
     LOG_DEBUG(<< "Create.");
 
-    // Widget
+    // Widget.
     widget_ = new ElevationWidget(mainWindow);
 
-    // Main layout
+    // Main layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(widget_);
     mainLayout->addStretch();
 
-    // Dialog
+    // Dialog.
     setLayout(mainLayout);
     setWindowTitle(tr("Elevation"));
     setWindowIcon(ICON("elevation"));

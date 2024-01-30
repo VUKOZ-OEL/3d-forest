@@ -22,12 +22,14 @@
 #ifndef VIEWER_OPENGL_VIEWPORT_HPP
 #define VIEWER_OPENGL_VIEWPORT_HPP
 
+// Include 3D Forest.
 #include <Camera.hpp>
 #include <ViewerAabb.hpp>
 #include <ViewerCamera.hpp>
 class Editor;
 class ViewerViewports;
 
+// Include Qt.
 #include <QOpenGLFunctions>
 #include <QOpenGLWidget>
 class QMouseEvent;
@@ -63,7 +65,7 @@ public:
     void setViewResetCenter();
 
 protected:
-    // Qt
+    // Qt.
     void initializeGL() override;
     void paintGL() override;
     void resizeGL(int w, int h) override;
@@ -72,12 +74,12 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
 
-    // Window Viewports
+    // Window Viewports.
     ViewerViewports *windowViewports_;
     size_t viewportId_;
     bool selected_;
 
-    // Data
+    // Data.
     Editor *editor_;
     ViewerAabb aabb_;
     ViewerCamera camera_;

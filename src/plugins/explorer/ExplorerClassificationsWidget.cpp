@@ -19,11 +19,13 @@
 
 /** @file ExplorerClassificationsWidget.cpp */
 
+// Include 3D Forest.
 #include <ColorPalette.hpp>
 #include <ExplorerClassificationsWidget.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
+// Include Qt.
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QToolBar>
@@ -33,6 +35,7 @@
 #include <QTreeWidgetItemIterator>
 #include <QVBoxLayout>
 
+// Include local.
 #define LOG_MODULE_NAME "ExplorerClassificationsWidget"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
@@ -45,12 +48,12 @@ ExplorerClassificationsWidget::ExplorerClassificationsWidget(
     const QString &text)
     : ExplorerWidgetInterface(mainWindow, icon, text)
 {
-    // Table
+    // Table.
     tree_ = new QTreeWidget();
     tree_->setSelectionMode(QAbstractItemView::ExtendedSelection);
     tree_->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-    // Tool bar buttons
+    // Tool bar buttons.
     MainWindow::createToolButton(&showButton_,
                                  tr("Show"),
                                  tr("Make selected classifications visible"),
@@ -88,7 +91,7 @@ ExplorerClassificationsWidget::ExplorerClassificationsWidget(
                                  this,
                                  SLOT(slotSelectNone()));
 
-    // Tool bar
+    // Tool bar.
     QToolBar *toolBar = new QToolBar;
     toolBar->addWidget(showButton_);
     toolBar->addWidget(hideButton_);
@@ -98,7 +101,7 @@ ExplorerClassificationsWidget::ExplorerClassificationsWidget(
     toolBar->addWidget(selectNoneButton_);
     toolBar->setIconSize(QSize(MainWindow::ICON_SIZE, MainWindow::ICON_SIZE));
 
-    // Layout
+    // Layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(toolBar);
@@ -107,7 +110,7 @@ ExplorerClassificationsWidget::ExplorerClassificationsWidget(
     mainLayout_->addLayout(mainLayout);
     setLayout(mainLayout_);
 
-    // Data
+    // Data.
     updatesEnabled_ = true;
     connect(mainWindow_,
             SIGNAL(signalUpdate(void *, const QSet<Editor::Type> &)),
@@ -143,19 +146,19 @@ void ExplorerClassificationsWidget::setClassifications(
 
     tree_->clear();
 
-    // Header
+    // Header.
     tree_->setColumnCount(COLUMN_LAST);
     QStringList labels;
     labels << tr("Visible") << tr("Class") << tr("Label");
     tree_->setHeaderLabels(labels);
 
-    // Content
+    // Content.
     for (size_t i = 0; i < classifications_.size(); i++)
     {
         addTreeItem(i);
     }
 
-    // Resize Columns to the minimum space
+    // Resize Columns to the minimum space.
     for (int i = 0; i < COLUMN_LAST; i++)
     {
         tree_->resizeColumnToContents(i);
@@ -371,7 +374,7 @@ void ExplorerClassificationsWidget::addTreeItem(size_t index)
     item->setText(COLUMN_LABEL,
                   QString::fromStdString(classifications_.label(index)));
 
-    // Color legend
+    // Color legend.
     if (index < ColorPalette::Classification.size())
     {
         const Vector3<double> &rgb = ColorPalette::Classification[index];

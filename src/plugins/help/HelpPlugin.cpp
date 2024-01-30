@@ -19,12 +19,15 @@
 
 /** @file HelpPlugin.cpp */
 
+// Include 3D Forest.
 #include <HelpPlugin.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
+// Include Qt.
 #include <QMessageBox>
 
+// Include local.
 #define LOG_MODULE_NAME "HelpPlugin"
 #include <Log.hpp>
 

@@ -474,9 +474,10 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
 
 @subsection build-windows-visual-studio-ide Install Visual Studio 
     - Open https://visualstudio.microsoft.com/downloads/
-    - Click "Free download" in Visual Studio 2022 Cummunity 
+    - Click "Free download" in Visual Studio 2022 Community 
     - Run VisualStudioSetup.exe
-    - Select "Desktop development with C++", Total size is 8 GB
+    - Select "Desktop development with C++", Total size is 8 GB or 10 GB
+      depending on installer version.
 
 @subsection build-windows-visual-studio-qt Install Qt
     - Download Qt installer from https://www.qt.io/download

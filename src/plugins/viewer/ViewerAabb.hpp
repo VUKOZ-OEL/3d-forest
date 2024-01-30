@@ -22,10 +22,13 @@
 #ifndef VIEWER_AABB_HPP
 #define VIEWER_AABB_HPP
 
+// Include std.
 #include <vector>
 
+// Include 3D Forest.
 #include <Box.hpp>
 
+// Include Qt.
 #include <QVector3D>
 
 /** Viewer Axis-Aligned Bounding Box. */

@@ -22,11 +22,14 @@
 #ifndef HELP_PLUGIN_HPP
 #define HELP_PLUGIN_HPP
 
+// Include 3D Forest.
 class MainWindow;
 
+// Include Qt.
 #include <QObject>
 class QAction;
 
+// Include local.
 #include <ExportGui.hpp>
 
 /** Help Plugin. */

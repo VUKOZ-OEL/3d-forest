@@ -19,13 +19,16 @@
 
 /** @file DescriptorWindow.cpp */
 
+// Include 3D Forest.
 #include <DescriptorWidget.hpp>
 #include <DescriptorWindow.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
+// Include Qt.
 #include <QVBoxLayout>
 
+// Include local.
 #define LOG_MODULE_NAME "DescriptorWindow"
 #include <Log.hpp>
 

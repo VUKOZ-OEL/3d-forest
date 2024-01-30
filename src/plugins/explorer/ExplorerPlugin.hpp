@@ -22,12 +22,15 @@
 #ifndef EXPLORER_PLUGIN_HPP
 #define EXPLORER_PLUGIN_HPP
 
+// Include 3D Forest.
 class MainWindow;
 class ExplorerWindow;
 
+// Include Qt.
 #include <QObject>
 class QDockWidget;
 
+// Include local.
 #include <ExportGui.hpp>
 
 /** Explorer Plugin. */

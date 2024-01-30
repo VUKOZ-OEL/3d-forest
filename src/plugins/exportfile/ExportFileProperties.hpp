@@ -22,6 +22,7 @@
 #ifndef EXPORT_FILE_PROPERTIES_HPP
 #define EXPORT_FILE_PROPERTIES_HPP
 
+// Include 3D Forest.
 #include <LasFile.hpp>
 
 /** Export File Properties. */

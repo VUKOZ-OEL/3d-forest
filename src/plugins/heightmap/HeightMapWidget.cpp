@@ -19,10 +19,12 @@
 
 /** @file HeightMapWidget.cpp */
 
+// Include 3D Forest.
 #include <HeightMapModifier.hpp>
 #include <HeightMapWidget.hpp>
 #include <MainWindow.hpp>
 
+// Include Qt.
 #include <QCheckBox>
 #include <QCloseEvent>
 #include <QComboBox>
@@ -38,6 +40,7 @@
 #include <QSpinBox>
 #include <QVBoxLayout>
 
+// Include local.
 #define LOG_MODULE_NAME "HeightMapWidget"
 #include <Log.hpp>
 
@@ -59,7 +62,7 @@ HeightMapWidget::HeightMapWidget(MainWindow *mainWindow,
       mainWindow_(mainWindow),
       modifier_(modifier)
 {
-    // Widgets colormap
+    // Widgets colormap.
     colorCountSpinBox_ = new QSpinBox;
     colorCountSpinBox_->setRange(1, PLUGIN_HEIGHT_MAP_COLORS_MAX);
     colorCountSpinBox_->setValue(PLUGIN_HEIGHT_MAP_COLORS_DEFAULT);
@@ -92,7 +95,7 @@ HeightMapWidget::HeightMapWidget(MainWindow *mainWindow,
             this,
             SLOT(sourceChanged(int)));
 
-    // Widgets apply
+    // Widgets apply.
     previewCheckBox_ = new QCheckBox;
     connect(previewCheckBox_,
             SIGNAL(stateChanged(int)),
@@ -106,7 +109,7 @@ HeightMapWidget::HeightMapWidget(MainWindow *mainWindow,
     applyButton_->setDisabled(true);
     connect(applyButton_, SIGNAL(clicked()), this, SLOT(apply()));
 
-    // Layout
+    // Layout.
     QGridLayout *groupBoxLayout = new QGridLayout;
     groupBoxLayout->addWidget(new QLabel(tr("N colors")), 0, 0);
     groupBoxLayout->addWidget(colorCountSpinBox_, 0, 1);
@@ -128,7 +131,7 @@ HeightMapWidget::HeightMapWidget(MainWindow *mainWindow,
     mainLayout->addLayout(hbox);
     mainLayout->addStretch();
 
-    // Widget
+    // Widget.
     setLayout(mainLayout);
 }
 
@@ -171,7 +174,7 @@ void HeightMapWidget::previewChanged(int index)
 
 void HeightMapWidget::apply()
 {
-    // Filter is active during processing
+    // Filter is active during processing.
     modifier_->setPreviewEnabled(true, false);
     modifier_->apply(mainWindow_);
     modifier_->setPreviewEnabled(previewCheckBox_->isChecked(), true, true);

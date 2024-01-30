@@ -19,16 +19,19 @@
 
 /** @file ViewerOpenGLViewport.cpp */
 
+// Include 3D Forest.
 #include <Editor.hpp>
 #include <Time.hpp>
 #include <ViewerOpenGL.hpp>
 #include <ViewerOpenGLViewport.hpp>
 #include <ViewerViewports.hpp>
 
+// Include Qt.
 #include <QDebug>
 #include <QMouseEvent>
 #include <QWheelEvent>
 
+// Include local.
 #define LOG_MODULE_NAME "ViewerOpenGLViewport"
 #include <Log.hpp>
 
@@ -210,7 +213,7 @@ void ViewerOpenGLViewport::paintGL()
     LOG_TRACE_UNKNOWN(<< "Paint width <" << camera_.width() << "> height <"
                       << camera_.height() << ">.");
 
-    // Setup camera
+    // Setup camera.
     glViewport(0, 0, camera_.width(), camera_.height());
 
     glMatrixMode(GL_PROJECTION);
@@ -219,7 +222,7 @@ void ViewerOpenGLViewport::paintGL()
     glMatrixMode(GL_MODELVIEW);
     glLoadMatrixf(camera_.getModelView().data());
 
-    // Render
+    // Render.
     bool firstFrame = renderScene();
 
     if (firstFrame)
@@ -230,11 +233,11 @@ void ViewerOpenGLViewport::paintGL()
 
 void ViewerOpenGLViewport::renderGuides()
 {
-    // Bounding box
+    // Bounding box.
     glColor3f(0.25F, 0.25F, 0.25F);
     ViewerOpenGL::renderAabb(aabb_);
 
-    // Overlay
+    // Overlay.
     QMatrix4x4 m;
     float w = static_cast<float>(camera_.width());
     float h = static_cast<float>(camera_.height());
@@ -243,7 +246,7 @@ void ViewerOpenGLViewport::renderGuides()
     glMatrixMode(GL_PROJECTION);
     glLoadMatrixf(m.data());
 
-    // Overlay: rotated
+    // Overlay: rotated.
     float axesSize = 30.0F;
     m.setToIdentity();
     m.translate(-w * 0.5F + axesSize + 2.0F, -h * 0.5F + axesSize + 2.0F);
@@ -383,17 +386,17 @@ void ViewerOpenGLViewport::renderSceneSettingsEnable()
     const Settings &settings = editor_->settings();
     const SettingsView &opt = settings.view();
 
-    // Background
+    // Background.
     const Vector3<double> &rgb = opt.backgroundColor();
     glClearColor(static_cast<float>(rgb[0]),
                  static_cast<float>(rgb[1]),
                  static_cast<float>(rgb[2]),
                  0.0F);
 
-    // Point size
+    // Point size.
     glPointSize(static_cast<float>(opt.pointSize()));
 
-    // Fog
+    // Fog.
     if (opt.isFogEnabled())
     {
         QVector3D eye = camera_.getEye();

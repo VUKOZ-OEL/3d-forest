@@ -22,12 +22,15 @@
 #ifndef EXPORT_FILE_PLUGIN_HPP
 #define EXPORT_FILE_PLUGIN_HPP
 
+// Include 3D Forest.
 class MainWindow;
 
+// Include Qt.
 #include <QObject>
 #include <QString>
 class QAction;
 
+// Include local.
 #include <ExportGui.hpp>
 
 /** Export File Plugin. */

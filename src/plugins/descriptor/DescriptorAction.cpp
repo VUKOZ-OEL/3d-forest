@@ -19,10 +19,12 @@
 
 /** @file DescriptorAction.cpp */
 
+// Include 3D Forest.
 #include <DescriptorAction.hpp>
 #include <Editor.hpp>
 #include <Math.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "DescriptorAction"
 #include <Log.hpp>
 
@@ -118,7 +120,7 @@ void DescriptorAction::next()
             break;
 
         default:
-            // empty
+            // Empty.
             break;
     }
 }

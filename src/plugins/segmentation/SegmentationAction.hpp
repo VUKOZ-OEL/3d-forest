@@ -22,6 +22,7 @@
 #ifndef SEGMENTATION_ACTION_HPP
 #define SEGMENTATION_ACTION_HPP
 
+// Include 3D Forest.
 #include <Point.hpp>
 #include <Points.hpp>
 #include <ProgressActionInterface.hpp>

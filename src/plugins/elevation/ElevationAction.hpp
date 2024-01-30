@@ -22,6 +22,7 @@
 #ifndef ELEVATION_ACTION_HPP
 #define ELEVATION_ACTION_HPP
 
+// Include 3D Forest.
 #include <Points.hpp>
 #include <ProgressActionInterface.hpp>
 #include <Query.hpp>

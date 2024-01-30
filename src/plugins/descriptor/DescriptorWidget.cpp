@@ -19,6 +19,7 @@
 
 /** @file DescriptorWidget.cpp */
 
+// Include 3D Forest.
 #include <DescriptorWidget.hpp>
 #include <InfoDialog.hpp>
 #include <MainWindow.hpp>
@@ -26,6 +27,7 @@
 #include <SliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
+// Include Qt.
 #include <QCheckBox>
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -33,6 +35,7 @@
 #include <QRadioButton>
 #include <QVBoxLayout>
 
+// Include local.
 #define LOG_MODULE_NAME "DescriptorWidget"
 #include <Log.hpp>
 
@@ -46,7 +49,7 @@ DescriptorWidget::DescriptorWidget(MainWindow *mainWindow)
 {
     LOG_DEBUG(<< "Create.");
 
-    // Widgets
+    // Widgets.
     SliderWidget::create(radiusSlider_,
                          this,
                          nullptr,
@@ -71,7 +74,7 @@ DescriptorWidget::DescriptorWidget(MainWindow *mainWindow)
                          1000,
                          100);
 
-    // Method
+    // Method.
     methodRadioButton_.push_back(new QRadioButton(tr("Density")));
     methodRadioButton_.push_back(new QRadioButton(tr("PCA intensity")));
 
@@ -86,12 +89,12 @@ DescriptorWidget::DescriptorWidget(MainWindow *mainWindow)
     QGroupBox *methodGroupBox = new QGroupBox(tr("Method"));
     methodGroupBox->setLayout(methodVBoxLayout);
 
-    // Options
+    // Options.
     groundCheckBox_ = new QCheckBox;
     groundCheckBox_->setText(tr("Include ground points"));
     groundCheckBox_->setChecked(false);
 
-    // Settings layout
+    // Settings layout.
     QVBoxLayout *settingsLayout = new QVBoxLayout;
     settingsLayout->addWidget(radiusSlider_);
     settingsLayout->addWidget(voxelSizeSlider_);
@@ -99,7 +102,7 @@ DescriptorWidget::DescriptorWidget(MainWindow *mainWindow)
     settingsLayout->addWidget(groundCheckBox_);
     settingsLayout->addStretch();
 
-    // Buttons
+    // Buttons.
     helpButton_ = new QPushButton(tr("Help"));
     helpButton_->setIcon(THEME_ICON("question"));
     connect(helpButton_, SIGNAL(clicked()), this, SLOT(slotHelp()));
@@ -109,20 +112,20 @@ DescriptorWidget::DescriptorWidget(MainWindow *mainWindow)
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
 
-    // Buttons layout
+    // Buttons layout.
     QHBoxLayout *buttonsLayout = new QHBoxLayout;
     buttonsLayout->addWidget(helpButton_);
     buttonsLayout->addStretch();
     buttonsLayout->addWidget(applyButton_);
 
-    // Main layout
+    // Main layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(settingsLayout);
     mainLayout->addSpacing(10);
     mainLayout->addLayout(buttonsLayout);
     mainLayout->addStretch();
 
-    // Widget
+    // Widget.
     setLayout(mainLayout);
 }
 

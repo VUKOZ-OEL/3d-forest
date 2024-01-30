@@ -22,11 +22,13 @@
 #ifndef DESCRIPTOR_WIDGET_HPP
 #define DESCRIPTOR_WIDGET_HPP
 
+// Include 3D Forest.
 #include <DescriptorAction.hpp>
 class MainWindow;
 class SliderWidget;
 class InfoDialog;
 
+// Include Qt.
 #include <QWidget>
 class QPushButton;
 class QRadioButton;

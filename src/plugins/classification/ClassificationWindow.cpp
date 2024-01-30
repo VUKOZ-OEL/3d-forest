@@ -19,13 +19,16 @@
 
 /** @file ClassificationWindow.cpp */
 
+// Include 3D Forest.
 #include <ClassificationWidget.hpp>
 #include <ClassificationWindow.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
+// Include Qt.
 #include <QVBoxLayout>
 
+// Include local.
 #define LOG_MODULE_NAME "ClassificationWindow"
 #include <Log.hpp>
 
@@ -37,15 +40,15 @@ ClassificationWindow::ClassificationWindow(MainWindow *mainWindow)
 {
     LOG_DEBUG(<< "Create.");
 
-    // Widget
+    // Widget.
     widget_ = new ClassificationWidget(mainWindow);
 
-    // Main layout
+    // Main layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(widget_);
     mainLayout->addStretch();
 
-    // Dialog
+    // Dialog.
     setLayout(mainLayout);
     setWindowTitle(tr("Classification"));
     setWindowIcon(ICON("soil_b"));

@@ -19,14 +19,17 @@
 
 /** @file ExplorerClippingCylinderWidget.cpp */
 
+// Include 3D Forest.
 #include <DoubleSliderWidget.hpp>
 #include <ExplorerClippingCylinderWidget.hpp>
 #include <MainWindow.hpp>
 
+// Include Qt.
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QVBoxLayout>
 
+// Include local.
 #define LOG_MODULE_NAME "ExplorerClippingCylinderWidget"
 #include <Log.hpp>
 
@@ -36,7 +39,7 @@ ExplorerClippingCylinderWidget::ExplorerClippingCylinderWidget(
 {
     LOG_DEBUG(<< "Create.");
 
-    // Widgets
+    // Widgets.
     for (size_t i = 0; i < 3; i++)
     {
         DoubleSliderWidget::create(
@@ -81,7 +84,7 @@ ExplorerClippingCylinderWidget::ExplorerClippingCylinderWidget(
                                1.0,
                                DoubleSliderWidget::LAYOUT_SLIDER_BESIDE_LABEL);
 
-    // Layout
+    // Layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
     for (size_t i = 0; i < 3; i++)

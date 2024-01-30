@@ -19,12 +19,15 @@
 
 /** @file ExplorerElevationWidget.cpp */
 
+// Include 3D Forest.
 #include <DoubleRangeSliderWidget.hpp>
 #include <ExplorerElevationWidget.hpp>
 #include <MainWindow.hpp>
 
+// Include Qt.
 #include <QVBoxLayout>
 
+// Include local.
 #define LOG_MODULE_NAME "ExplorerElevationWidget"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
@@ -34,7 +37,7 @@ ExplorerElevationWidget::ExplorerElevationWidget(MainWindow *mainWindow,
                                                  const QString &text)
     : ExplorerWidgetInterface(mainWindow, icon, text)
 {
-    // Input widgets
+    // Input widgets.
     DoubleRangeSliderWidget::create(rangeInput_,
                                     this,
                                     SLOT(slotRangeIntermediateMinimumValue()),
@@ -48,7 +51,7 @@ ExplorerElevationWidget::ExplorerElevationWidget(MainWindow *mainWindow,
                                     0,
                                     100);
 
-    // Layout
+    // Layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(rangeInput_);
@@ -57,7 +60,7 @@ ExplorerElevationWidget::ExplorerElevationWidget(MainWindow *mainWindow,
     mainLayout_->addLayout(mainLayout);
     setLayout(mainLayout_);
 
-    // Data
+    // Data.
     connect(mainWindow_,
             SIGNAL(signalUpdate(void *, const QSet<Editor::Type> &)),
             this,

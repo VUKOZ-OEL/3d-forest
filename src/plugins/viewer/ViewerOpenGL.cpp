@@ -19,11 +19,14 @@
 
 /** @file ViewerOpenGL.cpp */
 
+// Include 3D Forest.
 #include <Math.hpp>
 #include <ViewerOpenGL.hpp>
 
+// Include Qt.
 #include <QOpenGLFunctions>
 
+// Include local.
 #define LOG_MODULE_NAME "ViewerOpenGL"
 #include <Log.hpp>
 
@@ -41,7 +44,7 @@ void ViewerOpenGL::render(Mode mode,
                           const float *rgb,
                           size_t rgbSize)
 {
-    // Specify what kind of primitives to render
+    // Specify what kind of primitives to render.
     GLenum glmode;
     switch (mode)
     {
@@ -57,7 +60,7 @@ void ViewerOpenGL::render(Mode mode,
             break;
     }
 
-    // Render
+    // Render.
     if (xyzSize > 0)
     {
         glEnableClientState(GL_VERTEX_ARRAY);
@@ -89,7 +92,7 @@ void ViewerOpenGL::render(Mode mode,
                           const unsigned int *indices,
                           size_t indicesSize)
 {
-    // Specify what kind of primitives to render
+    // Specify what kind of primitives to render.
     GLenum glmode;
     switch (mode)
     {
@@ -105,7 +108,7 @@ void ViewerOpenGL::render(Mode mode,
             break;
     }
 
-    // Render
+    // Render.
     if (indicesSize > 0 && xyzSize > 0)
     {
         glEnableClientState(GL_VERTEX_ARRAY);
@@ -171,7 +174,7 @@ void ViewerOpenGL::renderClipFilter(const Region &clipFilter)
 
 void ViewerOpenGL::renderAabb(const ViewerAabb &box)
 {
-    // Render wireframe cuboid
+    // Render wireframe cuboid.
     QVector3D v[8];
     QVector3D min = box.getMin();
     QVector3D max = box.getMax();

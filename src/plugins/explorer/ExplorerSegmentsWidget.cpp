@@ -19,11 +19,13 @@
 
 /** @file ExplorerSegmentsWidget.cpp */
 
+// Include 3D Forest.
 #include <ExplorerSegmentsWidget.hpp>
 #include <ImportFilePlugin.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
+// Include Qt.
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
@@ -34,6 +36,7 @@
 #include <QTreeWidgetItemIterator>
 #include <QVBoxLayout>
 
+// Include local.
 #define LOG_MODULE_NAME "ExplorerSegmentsWidget"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
@@ -45,12 +48,12 @@ ExplorerSegmentsWidget::ExplorerSegmentsWidget(MainWindow *mainWindow,
                                                const QString &text)
     : ExplorerWidgetInterface(mainWindow, icon, text)
 {
-    // Table
+    // Table.
     tree_ = new QTreeWidget();
     tree_->setSelectionMode(QAbstractItemView::ExtendedSelection);
     tree_->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-    // Tool bar buttons
+    // Tool bar buttons.
     MainWindow::createToolButton(&addButton_,
                                  tr("Add"),
                                  tr("Add new segments"),
@@ -104,7 +107,7 @@ ExplorerSegmentsWidget::ExplorerSegmentsWidget(MainWindow *mainWindow,
                                  this,
                                  SLOT(slotSelectNone()));
 
-    // Tool bar
+    // Tool bar.
     QToolBar *toolBar = new QToolBar;
     toolBar->addWidget(addButton_);
     toolBar->addWidget(deleteButton_);
@@ -116,7 +119,7 @@ ExplorerSegmentsWidget::ExplorerSegmentsWidget(MainWindow *mainWindow,
     toolBar->addWidget(selectNoneButton_);
     toolBar->setIconSize(QSize(MainWindow::ICON_SIZE, MainWindow::ICON_SIZE));
 
-    // Layout
+    // Layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(toolBar);
@@ -125,7 +128,7 @@ ExplorerSegmentsWidget::ExplorerSegmentsWidget(MainWindow *mainWindow,
     mainLayout_->addLayout(mainLayout);
     setLayout(mainLayout_);
 
-    // Data
+    // Data.
     updatesEnabled_ = true;
     connect(mainWindow_,
             SIGNAL(signalUpdate(void *, const QSet<Editor::Type> &)),
@@ -160,25 +163,25 @@ void ExplorerSegmentsWidget::setSegments(const Segments &segments,
 
     tree_->clear();
 
-    // Header
+    // Header.
     tree_->setColumnCount(COLUMN_LAST);
     QStringList labels;
     labels << tr("Visible") << tr("Id") << tr("Label");
     tree_->setHeaderLabels(labels);
 
-    // Content
+    // Content.
     for (size_t i = 0; i < segments_.size(); i++)
     {
         addTreeItem(i);
     }
 
-    // Resize Columns to the minimum space
+    // Resize Columns to the minimum space.
     for (int i = 0; i < COLUMN_LAST; i++)
     {
         tree_->resizeColumnToContents(i);
     }
 
-    // Sort Content
+    // Sort Content.
     tree_->setSortingEnabled(true);
     tree_->sortItems(COLUMN_ID, Qt::AscendingOrder);
 
@@ -423,7 +426,7 @@ void ExplorerSegmentsWidget::addTreeItem(size_t index)
 
     item->setText(COLUMN_LABEL, QString::fromStdString(segments_.label(index)));
 
-    // Color legend
+    // Color legend.
     const Vector3<double> &rgb = segments_.color(index);
 
     QColor color;

@@ -19,10 +19,12 @@
 
 /** @file ClassificationAction.cpp */
 
+// Include 3D Forest.
 #include <ClassificationAction.hpp>
 #include <Cone.hpp>
 #include <Editor.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "ClassificationAction"
 #include <Log.hpp>
 
@@ -137,7 +139,7 @@ void ClassificationAction::next()
             break;
 
         default:
-            // empty
+            // Empty.
             break;
     }
 }

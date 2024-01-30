@@ -19,6 +19,7 @@
 
 /** @file SegmentationWidget.cpp */
 
+// Include 3D Forest.
 #include <InfoDialog.hpp>
 #include <MainWindow.hpp>
 #include <ProgressDialog.hpp>
@@ -27,11 +28,13 @@
 #include <SliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
+// Include Qt.
 #include <QCheckBox>
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QVBoxLayout>
 
+// Include local.
 #define LOG_MODULE_NAME "SegmentationWidget"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
@@ -46,7 +49,7 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
 {
     LOG_DEBUG(<< "Create.");
 
-    // Widgets
+    // Widgets.
     SliderWidget::create(voxelSizeSlider_,
                          this,
                          nullptr,
@@ -132,7 +135,7 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
     onlyTrunksCheckBox_->setText(tr("Find only trunks (fast preview)"));
     onlyTrunksCheckBox_->setChecked(false);
 
-    // Settings layout
+    // Settings layout.
     QVBoxLayout *settingsLayout = new QVBoxLayout;
     settingsLayout->addWidget(voxelSizeSlider_);
     settingsLayout->addWidget(descriptorSlider_);
@@ -144,7 +147,7 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
     settingsLayout->addWidget(onlyTrunksCheckBox_);
     settingsLayout->addStretch();
 
-    // Buttons
+    // Buttons.
     helpButton_ = new QPushButton(tr("Help"));
     helpButton_->setIcon(THEME_ICON("question"));
     connect(helpButton_, SIGNAL(clicked()), this, SLOT(slotHelp()));
@@ -154,20 +157,20 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
 
-    // Buttons layout
+    // Buttons layout.
     QHBoxLayout *buttonsLayout = new QHBoxLayout;
     buttonsLayout->addWidget(helpButton_);
     buttonsLayout->addStretch();
     buttonsLayout->addWidget(applyButton_);
 
-    // Main layout
+    // Main layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(settingsLayout);
     mainLayout->addSpacing(10);
     mainLayout->addLayout(buttonsLayout);
     mainLayout->addStretch();
 
-    // Widget
+    // Widget.
     setLayout(mainLayout);
 }
 

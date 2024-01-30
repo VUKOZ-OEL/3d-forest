@@ -19,14 +19,17 @@
 
 /** @file HeightMapWindow.cpp */
 
+// Include 3D Forest.
 #include <HeightMapWidget.hpp>
 #include <HeightMapWindow.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
+// Include Qt.
 #include <QCloseEvent>
 #include <QVBoxLayout>
 
+// Include local.
 #define LOG_MODULE_NAME "HeightMapWindow"
 #include <Log.hpp>
 
@@ -39,15 +42,15 @@ HeightMapWindow::HeightMapWindow(MainWindow *mainWindow,
 {
     LOG_DEBUG(<< "Create.");
 
-    // Widget
+    // Widget.
     widget_ = new HeightMapWidget(mainWindow, modifier);
 
-    // Main layout
+    // Main layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(widget_);
     mainLayout->addStretch();
 
-    // Dialog
+    // Dialog.
     setLayout(mainLayout);
     setWindowTitle(tr("Height Map"));
     setWindowIcon(ICON("height_map"));

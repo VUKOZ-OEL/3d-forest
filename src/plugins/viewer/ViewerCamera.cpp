@@ -19,15 +19,19 @@
 
 /** @file ViewerCamera.cpp */
 
+// Include std.
 #include <cmath>
 
+// Include 3D Forest.
 #include <ViewerCamera.hpp>
 
+// Include Qt.
 #include <QDebug>
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QtMath>
 
+// Include local.
 #define LOG_MODULE_NAME "ViewerCamera"
 #include <Log.hpp>
 
@@ -97,12 +101,12 @@ void ViewerCamera::setOrthographic()
 {
     perspective_ = false;
 
-    // Aspect ratio
+    // Aspect ratio.
     float w = static_cast<float>(viewport_.width());
     float h = static_cast<float>(viewport_.height());
     float aspect = w / h;
 
-    // Orthographic arguments
+    // Orthographic arguments.
     float zNear = zNear_ * distance_;
     float zFar = zFar_ * distance_;
 
@@ -116,7 +120,7 @@ void ViewerCamera::setOrthographic()
 
     zNear = -zFar_ * distance_;
 
-    // Projection matrix
+    // Projection matrix.
     m.setToIdentity();
     m.ortho(left, right, bottom, top, zNear, zFar);
     setProjection(m);
@@ -366,7 +370,7 @@ void ViewerCamera::updateFrustrum()
 {
     const float *m = modelViewProjection_.data();
 
-    // Extract the planes
+    // Extract the planes.
     frustrumPlanes_[0] = m[3] - m[0];
     frustrumPlanes_[1] = m[7] - m[4];
     frustrumPlanes_[2] = m[11] - m[8];
@@ -397,7 +401,7 @@ void ViewerCamera::updateFrustrum()
     frustrumPlanes_[22] = m[11] + m[10];
     frustrumPlanes_[23] = m[15] + m[14];
 
-    // Normalize
+    // Normalize.
     size_t n = 0;
     float norm;
     for (size_t i = 0; i < 6; i++)

@@ -19,11 +19,13 @@
 
 /** @file SegmentationPlugin.cpp */
 
+// Include 3D Forest.
 #include <MainWindow.hpp>
 #include <SegmentationPlugin.hpp>
 #include <SegmentationWindow.hpp>
 #include <ThemeIcon.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "SegmentationPlugin"
 #include <Log.hpp>
 

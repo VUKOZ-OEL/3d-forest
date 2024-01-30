@@ -22,6 +22,7 @@
 #ifndef SEGMENTATION_PLUGIN_HPP
 #define SEGMENTATION_PLUGIN_HPP
 
+// Include 3D Forest.
 #include <PluginInterface.hpp>
 class SegmentationWindow;
 

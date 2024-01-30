@@ -22,6 +22,7 @@
 #ifndef DESCRIPTOR_PLUGIN_HPP
 #define DESCRIPTOR_PLUGIN_HPP
 
+// Include 3D Forest.
 #include <PluginInterface.hpp>
 class DescriptorWindow;
 

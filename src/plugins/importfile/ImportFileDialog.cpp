@@ -19,10 +19,12 @@
 
 /** @file ImportFileDialog.cpp */
 
+// Include 3D Forest.
 #include <ImportFileDialog.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
+// Include Qt.
 #include <QCheckBox>
 #include <QGridLayout>
 #include <QGroupBox>
@@ -31,6 +33,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+// Include local.
 #define LOG_MODULE_NAME "ImportFileDialog"
 #include <Log.hpp>
 
@@ -38,7 +41,7 @@
 
 ImportFileDialog::ImportFileDialog(MainWindow *mainWindow) : QDialog(mainWindow)
 {
-    // Widgets
+    // Widgets.
     QLabel *description = new QLabel(tr("This operation may modify"
                                         " the input file."));
 
@@ -61,7 +64,7 @@ ImportFileDialog::ImportFileDialog(MainWindow *mainWindow) : QDialog(mainWindow)
     rejectButton_ = new QPushButton(tr("Cancel"));
     connect(rejectButton_, SIGNAL(clicked()), this, SLOT(slotReject()));
 
-    // Layout
+    // Layout.
     QGridLayout *optionsLayout = new QGridLayout;
     int row = 0;
     optionsLayout->addWidget(new QLabel(tr("Center offset")), row, 0);
@@ -87,7 +90,7 @@ ImportFileDialog::ImportFileDialog(MainWindow *mainWindow) : QDialog(mainWindow)
 
     setLayout(dialogLayout);
 
-    // Window
+    // Window.
     setWindowTitle(tr("Import File"));
     setWindowIcon(ICON("import_file"));
     setMaximumWidth(width());

@@ -19,6 +19,7 @@
 
 /** @file ExplorerClippingWidget.cpp */
 
+// Include 3D Forest.
 #include <ExplorerClippingBoxWidget.hpp>
 #include <ExplorerClippingCylinderWidget.hpp>
 #include <ExplorerClippingWidget.hpp>
@@ -26,10 +27,12 @@
 #include <ThemeIcon.hpp>
 #include <ToolTabWidget.hpp>
 
+// Include Qt.
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QVBoxLayout>
 
+// Include local.
 #define LOG_MODULE_NAME "ExplorerClippingWidget"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
@@ -43,11 +46,11 @@ ExplorerClippingWidget::ExplorerClippingWidget(MainWindow *mainWindow,
 {
     LOG_DEBUG(<< "Create.");
 
-    // Tabs
+    // Tabs.
     boxWidget_ = new ExplorerClippingBoxWidget(mainWindow_);
     cylinderWidget_ = new ExplorerClippingCylinderWidget(mainWindow_);
 
-    // Tab
+    // Tab.
     tabWidget_ = new ToolTabWidget;
     tabWidget_->addTab(boxWidget_,
                        ICON("selection_box"),
@@ -58,7 +61,7 @@ ExplorerClippingWidget::ExplorerClippingWidget(MainWindow *mainWindow,
                        tr("Cylinder"),
                        tr("Cylinder clip filter"));
 
-    // Layout
+    // Layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(tabWidget_);
@@ -67,7 +70,7 @@ ExplorerClippingWidget::ExplorerClippingWidget(MainWindow *mainWindow,
     mainLayout_->addLayout(mainLayout);
     setLayout(mainLayout_);
 
-    // Data
+    // Data.
     connect(mainWindow_,
             SIGNAL(signalUpdate(void *, const QSet<Editor::Type> &)),
             this,

@@ -22,6 +22,7 @@
 #ifndef CLASSIFICATION_PLUGIN_HPP
 #define CLASSIFICATION_PLUGIN_HPP
 
+// Include 3D Forest.
 #include <PluginInterface.hpp>
 class ClassificationWindow;
 

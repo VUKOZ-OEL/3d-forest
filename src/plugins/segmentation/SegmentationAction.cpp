@@ -19,11 +19,13 @@
 
 /** @file SegmentationAction.cpp */
 
+// Include 3D Forest.
 #include <ColorPalette.hpp>
 #include <Editor.hpp>
 #include <Math.hpp>
 #include <SegmentationAction.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "SegmentationAction"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
@@ -174,7 +176,7 @@ void SegmentationAction::next()
             break;
 
         default:
-            // empty
+            // Empty.
             break;
     }
 }

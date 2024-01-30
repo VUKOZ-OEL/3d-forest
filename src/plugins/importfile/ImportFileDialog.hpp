@@ -22,9 +22,11 @@
 #ifndef IMPORT_FILE_DIALOG_HPP
 #define IMPORT_FILE_DIALOG_HPP
 
+// Include 3D Forest.
 #include <SettingsImport.hpp>
 class MainWindow;
 
+// Include Qt.
 #include <QDialog>
 class QCheckBox;
 class QPushButton;
