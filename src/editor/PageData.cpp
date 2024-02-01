@@ -136,6 +136,7 @@ void PageData::readPage(Editor *editor)
 
     // 3D Forest attributes.
     LasFile::AttributesBuffer attributes;
+    las.createAttributesBuffer(attributes, numberOfPointsInPage);
     las.readAttributesBuffer(attributes, numberOfPointsInPage);
     attributes.attributes[0].read(segment);
     attributes.attributes[1].read(elevation);
