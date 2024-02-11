@@ -29,31 +29,14 @@
 
 // Include local.
 #define LOG_MODULE_NAME "IndexFileBuilder"
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 // Define to keep the same order of LAS points.
-//#define INDEX_FILE_BUILDER_DEBUG_SAME_ORDER
+// #define INDEX_FILE_BUILDER_DEBUG_SAME_ORDER
 
 #define indexFileBuilderCoordinate(ptr)                                        \
     static_cast<double>(static_cast<int32_t>(ltoh32(ptr)))
-
-IndexFileBuilder::Settings::Settings()
-{
-    verbose = false;
-
-    maxSize1 = 100000;
-    maxLevel1 = 0; // The limit is maxSize1.
-
-    maxSize2 = 32;
-    maxLevel2 = 5;
-    // maxLevel2 = 2;
-
-    bufferSize = 5 * 1024 * 1024;
-}
-
-IndexFileBuilder::Settings::~Settings()
-{
-}
 
 IndexFileBuilder::IndexFileBuilder()
     : state_(STATE_NONE),
@@ -73,7 +56,7 @@ std::string IndexFileBuilder::extension(const std::string &path)
 
 void IndexFileBuilder::index(const std::string &outputPath,
                              const std::string &inputPath,
-                             const IndexFileBuilder::Settings &settings)
+                             const SettingsImport &settings)
 {
     char buffer[80];
     IndexFileBuilder builder;
@@ -84,14 +67,14 @@ void IndexFileBuilder::index(const std::string &outputPath,
     {
         builder.next();
 
-        if (settings.verbose)
+        if (settings.terminalOutput)
         {
             std::snprintf(buffer, sizeof(buffer), "%6.2f%%", builder.percent());
             std::cout << "\r" << buffer << std::flush;
         }
     }
 
-    if (settings.verbose)
+    if (settings.terminalOutput)
     {
         std::cout << std::endl;
     }
@@ -112,8 +95,10 @@ double IndexFileBuilder::percent() const
 
 void IndexFileBuilder::start(const std::string &outputPath,
                              const std::string &inputPath,
-                             const IndexFileBuilder::Settings &settings)
+                             const SettingsImport &settings)
 {
+    LOG_INFO(<< "Start creating index for file <" << inputPath << ">.");
+
     // Initialize.
     state_ = STATE_NONE;
     valueTotal_ = 0;
@@ -128,8 +113,8 @@ void IndexFileBuilder::start(const std::string &outputPath,
     indexMainUsed_.clear();
 
     settings_ = settings;
-    buffer_.resize(settings.bufferSize);
-    bufferOut_.resize(settings.bufferSize);
+    buffer_.resize(settings_.bufferSize);
+    bufferOut_.resize(settings_.bufferSize);
 
     // Open files.
     inputPath_ = inputPath;
@@ -158,7 +143,7 @@ void IndexFileBuilder::openFiles()
     inputLas_.open(readPath_);
     inputLas_.readHeader();
 
-    sizePointFormat_ = inputLas_.header.pointDataRecordLengthFormat();
+    size_t sizePointUser = inputLas_.header.pointDataRecordLengthUser();
     sizePoint_ = inputLas_.header.point_data_record_length;
     sizePoints_ = inputLas_.header.pointDataSize();
     sizeFile_ = inputLas_.size();
@@ -190,10 +175,11 @@ void IndexFileBuilder::openFiles()
     // Output.
     outputLas_.create(writePath_);
     outputLas_.header = inputLas_.header;
-    outputLas_.header.setGeneratingSoftware();
+    // outputLas_.header.setGeneratingSoftware();
 
     // Convert to LAS 1.4+.
-    if ((outputLas_.header.version_major == 1) &&
+    if ((settings_.convertToVersion1Dot4) &&
+        (outputLas_.header.version_major == 1) &&
         (outputLas_.header.version_minor < 4))
     {
         outputLas_.header.version_minor = 4;
@@ -237,6 +223,10 @@ void IndexFileBuilder::openFiles()
 
     // Format.
     sizePointOut_ = outputLas_.header.pointDataRecordLengthFormat();
+    if (settings_.copyExtraBytes)
+    {
+        sizePointOut_ += sizePointUser;
+    }
     outputLas_.header.point_data_record_length =
         static_cast<uint16_t>(sizePointOut_);
     sizePointsOut_ = outputLas_.header.pointDataSize();
@@ -362,8 +352,8 @@ void IndexFileBuilder::nextState()
             copyPointsRestartIndex_ = 0;
             copyPointsCurrentIndex_ = 0;
 #ifndef INDEX_FILE_BUILDER_DEBUG_SAME_ORDER
-            copyPointsSkipCount_ = maximumIndex_ / settings_.maxSize1;
-            if (maximumIndex_ % settings_.maxSize1 > 0)
+            copyPointsSkipCount_ = maximumIndex_ / settings_.maxIndexLevel1Size;
+            if (maximumIndex_ % settings_.maxIndexLevel1Size > 0)
             {
                 copyPointsSkipCount_++;
             }
@@ -733,8 +723,8 @@ void IndexFileBuilder::stateMainBegin()
     // Insert begin.
     indexMain_.insertBegin(box,
                            boundary_,
-                           settings_.maxSize1,
-                           settings_.maxLevel1);
+                           settings_.maxIndexLevel1Size,
+                           settings_.maxIndexLevel1);
 
     // Initial file offset.
     inputLas_.seekPoint(0);
@@ -921,8 +911,8 @@ void IndexFileBuilder::stateNodeInsert()
     indexNode_.clear();
     indexNode_.insertBegin(box,
                            box,
-                           settings_.maxSize2,
-                           settings_.maxLevel2,
+                           settings_.maxIndexLevel2Size,
+                           settings_.maxIndexLevel2,
                            true);
 
     std::vector<uint64_t> bufferCodes;
@@ -995,8 +985,8 @@ void IndexFileBuilder::stateEnd()
 
     if (readPath_ != inputPath_)
     {
-        File::remove(readPath_);
+        LasFile::remove(readPath_);
     }
 
-    File::move(outputPath_, writePath_);
+    LasFile::move(outputPath_, writePath_);
 }

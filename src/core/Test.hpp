@@ -117,7 +117,10 @@ private:
     class TEST_CASE_CLASS_NAME(name) : public Test::TestCase                   \
     {                                                                          \
     public:                                                                    \
-        TEST_CASE_CLASS_NAME(name)() { Test::instance()->addTestCase(this); }  \
+        TEST_CASE_CLASS_NAME(name)()                                           \
+        {                                                                      \
+            Test::instance()->addTestCase(this);                               \
+        }                                                                      \
         virtual void run();                                                    \
     };                                                                         \
     static TEST_CASE_CLASS_NAME(name) TEST_CASE_NAME(name);                    \

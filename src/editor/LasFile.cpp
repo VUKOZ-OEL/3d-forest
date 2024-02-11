@@ -408,6 +408,24 @@ bool LasFile::isOpen() const
     return file_.isOpen();
 }
 
+void LasFile::move(const std::string &outputPath, const std::string &inputPath)
+{
+    File::move(outputPath, inputPath);
+    File::move(outputPath + ".segment", inputPath + ".segment");
+    File::move(outputPath + ".elevation", inputPath + ".elevation");
+    File::move(outputPath + ".descriptor", inputPath + ".descriptor");
+    File::move(outputPath + ".voxel", inputPath + ".voxel");
+}
+
+void LasFile::remove(const std::string &path)
+{
+    File::remove(path);
+    File::remove(path + ".segment");
+    File::remove(path + ".elevation");
+    File::remove(path + ".descriptor");
+    File::remove(path + ".voxel");
+}
+
 uint64_t LasFile::size() const
 {
     return file_.size();

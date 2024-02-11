@@ -39,15 +39,16 @@ class ImportFileDialog : public QDialog
 public:
     ImportFileDialog(MainWindow *mainWindow);
 
-    SettingsImport getSettings() const;
+    SettingsImport settings() const;
 
 public slots:
     void slotAccept();
     void slotReject();
 
 protected:
-    QCheckBox *centerCheckBox_;
     QCheckBox *convertCheckBox_;
+    QCheckBox *centerCheckBox_;
+    QCheckBox *copyExtraBytesCheckBox_;
 
     QPushButton *acceptButton_;
     QPushButton *rejectButton_;

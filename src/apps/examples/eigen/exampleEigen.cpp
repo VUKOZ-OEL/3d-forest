@@ -19,10 +19,13 @@
 
 /** @file exampleEigen.cpp @brief Eigen matrix example. */
 
+// Include 3rd party.
 #include <Eigen/Core>
 
+// Include 3D Forest.
 #include <Error.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "exampleEigen"
 #include <Log.hpp>
 

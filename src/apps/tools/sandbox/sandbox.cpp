@@ -19,12 +19,14 @@
 
 /** @file sandbox.cpp */
 
+// Include std.
 #include <cstring>
 #include <iostream>
 #include <queue>
 #include <stdexcept>
 #include <vector>
 
+// Include 3D Forest.
 #include <Editor.hpp>
 #include <File.hpp>
 #include <IndexFile.hpp>
@@ -33,6 +35,7 @@
 #include <Time.hpp>
 #include <Vector3.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "sandbox"
 #include <Log.hpp>
 

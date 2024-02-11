@@ -42,22 +42,29 @@
 ImportFileDialog::ImportFileDialog(MainWindow *mainWindow) : QDialog(mainWindow)
 {
     // Widgets.
-    QLabel *description = new QLabel(tr("This operation may modify"
-                                        " the input file."));
+    QLabel *description = new QLabel(tr("Import action will modify "
+                                        "the original input file."));
 
-    description->setToolTip(tr("The file size may get bigger.\n"
-                               "Unknown User data will be lost.\n"
-                               "Some values will be normalized."));
+    description->setToolTip(tr("The points will be sorted by 3D spatial index "
+                               "for fast access.\n"
+                               "Some point data values will be normalized "
+                               "(fixed) to match LAS specification.\n"
+                               "Nonstandard application specific extra bytes "
+                               "can be optionally removed from point data."));
 
     QGroupBox *options = new QGroupBox(tr("Options"));
+
+    // Widgets with options.
+    convertCheckBox_ = new QCheckBox;
+    convertCheckBox_->setChecked(false);
 
     centerCheckBox_ = new QCheckBox;
     centerCheckBox_->setChecked(true);
 
-    convertCheckBox_ = new QCheckBox;
-    convertCheckBox_->setChecked(true);
-    convertCheckBox_->setEnabled(false);
+    copyExtraBytesCheckBox_ = new QCheckBox;
+    copyExtraBytesCheckBox_->setChecked(true);
 
+    // Dialog buttons.
     acceptButton_ = new QPushButton(tr("Import"));
     connect(acceptButton_, SIGNAL(clicked()), this, SLOT(slotAccept()));
 
@@ -67,11 +74,14 @@ ImportFileDialog::ImportFileDialog(MainWindow *mainWindow) : QDialog(mainWindow)
     // Layout.
     QGridLayout *optionsLayout = new QGridLayout;
     int row = 0;
-    optionsLayout->addWidget(new QLabel(tr("Center offset")), row, 0);
-    optionsLayout->addWidget(centerCheckBox_, row, 1);
-    row++;
     optionsLayout->addWidget(new QLabel(tr("Convert to v1.4+")), row, 0);
     optionsLayout->addWidget(convertCheckBox_, row, 1);
+    row++;
+    optionsLayout->addWidget(new QLabel(tr("Center on screen")), row, 0);
+    optionsLayout->addWidget(centerCheckBox_, row, 1);
+    row++;
+    optionsLayout->addWidget(new QLabel(tr("Copy extra bytes")), row, 0);
+    optionsLayout->addWidget(copyExtraBytesCheckBox_, row, 1);
     row++;
     options->setLayout(optionsLayout);
 
@@ -109,11 +119,13 @@ void ImportFileDialog::slotReject()
     setResult(QDialog::Rejected);
 }
 
-SettingsImport ImportFileDialog::getSettings() const
+SettingsImport ImportFileDialog::settings() const
 {
-    SettingsImport settings;
+    SettingsImport settingsImport;
 
-    settings.setCenterEnabled(centerCheckBox_->isChecked());
+    settingsImport.convertToVersion1Dot4 = convertCheckBox_->isChecked();
+    settingsImport.centerPointsOnScreen = centerCheckBox_->isChecked();
+    settingsImport.copyExtraBytes = copyExtraBytesCheckBox_->isChecked();
 
-    return settings;
+    return settingsImport;
 }

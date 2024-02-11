@@ -19,12 +19,15 @@
 
 /** @file 3dforest.cpp */
 
+// Include 3D Forest.
 #include <MainWindow.hpp>
 #include <MessageLogWindow.hpp>
 
+// Include Qt.
 #include <QApplication>
 #include <QSurfaceFormat>
 
+// Include local.
 #define LOG_MODULE_NAME "3dforest"
 #include <Log.hpp>
 

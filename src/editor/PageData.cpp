@@ -23,6 +23,7 @@
 #include <Editor.hpp>
 #include <Endian.hpp>
 #include <File.hpp>
+#include <IndexFileBuilder.hpp>
 #include <LasFile.hpp>
 #include <PageData.hpp>
 

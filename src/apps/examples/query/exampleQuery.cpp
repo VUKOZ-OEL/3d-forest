@@ -19,12 +19,16 @@
 
 /** @file exampleQuery.cpp @brief Query example. */
 
+// Include std.
 #include <cstring>
 
+// Include 3D Forest.
 #include <Editor.hpp>
 #include <Error.hpp>
+#include <IndexFileBuilder.hpp>
 #include <Time.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "exampleQuery"
 #include <Log.hpp>
 
@@ -122,8 +126,8 @@ static void createDataSet()
     LasFile::create(DATA_PATH, points, {SCALE, SCALE, SCALE}, {0, 0, 0});
 
     // Index
-    IndexFileBuilder::Settings settings;
-    settings.maxSize1 = 1;
+    SettingsImport settings;
+    settings.maxIndexLevel1Size = 1;
 
     IndexFileBuilder::index(DATA_PATH, DATA_PATH, settings);
 }

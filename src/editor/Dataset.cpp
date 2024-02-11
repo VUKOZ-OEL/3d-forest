@@ -27,6 +27,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "Dataset"
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 Dataset::Dataset() : id_(0)
@@ -64,19 +65,21 @@ void Dataset::read(size_t id,
 
     read();
 
-    if (settings.isCenterEnabled())
+    if (settings.centerPointsOnScreen)
     {
         Vector3<double> c1 = projectBoundary.getCenter();
         Vector3<double> c2 = boundaryFile_.getCenter();
         c1[2] = projectBoundary.min(2);
         c2[2] = boundaryFile_.min(2);
         translation_ = c1 - c2;
+        LOG_DEBUG(<< "Centered translation <" << translation_ << ">.");
         updateBoundary();
     }
     else
     {
         Vector3<double> s = 1.0 / scalingFile_;
         translation_ = translationFile_ * s;
+        LOG_DEBUG(<< "Scaled translation <" << translation_ << ">.");
         updateBoundary();
     }
 }
@@ -169,6 +172,8 @@ void Dataset::setPath(const std::string &path, const std::string &projectPath)
 
 void Dataset::read()
 {
+    LOG_INFO(<< "Read dataset <" << path_ << ">.");
+
     las_ = std::make_shared<LasFile>();
     las_->open(path_);
     las_->readHeader();
@@ -183,6 +188,8 @@ void Dataset::read()
                          las_->header.z_offset);
 
     translation_ = translationFile_;
+
+    LOG_DEBUG(<< "Translation <" << translation_ << ">.");
 
     scalingFile_.set(las_->header.x_scale_factor,
                      las_->header.y_scale_factor,
@@ -199,6 +206,8 @@ void Dataset::read()
     updateBoundary();
 
     nPoints_ = las_->header.number_of_point_records;
+
+    LOG_DEBUG(<< "Number of points <" << nPoints_ << ">.");
 }
 
 void Dataset::updateBoundary()
@@ -206,4 +215,6 @@ void Dataset::updateBoundary()
     boundary_ = boundaryFile_;
     boundary_.translate(translation_);
     index_->translate(translation_);
+
+    LOG_DEBUG(<< "Boundary <" << boundary_ << ">.");
 }

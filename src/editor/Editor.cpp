@@ -21,7 +21,6 @@
 
 // Include 3D Forest.
 #include <Editor.hpp>
-#include <IndexFileBuilder.hpp>
 #include <Util.hpp>
 
 // Include local.

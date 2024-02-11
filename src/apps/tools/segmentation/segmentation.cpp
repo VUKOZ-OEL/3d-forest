@@ -19,12 +19,15 @@
 
 /** @file segmentation.cpp @brief Segmentation tool. */
 
+// Include std.
 #include <cstring>
 
+// Include 3D Forest.
 #include <ArgumentParser.hpp>
 #include <Editor.hpp>
 #include <Error.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "segmentation"
 #include <Log.hpp>
 

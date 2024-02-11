@@ -121,7 +121,7 @@ static void importPluginFile(const QString &path, MainWindow *mainWindow)
         return;
     }
 
-    SettingsImport settings = dialog.getSettings();
+    SettingsImport settings = dialog.settings();
 
     if (importPluginCreateIndex(path, settings, mainWindow))
     {
@@ -165,7 +165,7 @@ static bool importPluginCreateIndex(const QString &path,
 
     // Initialize index builder.
     IndexFileBuilder builder;
-    builder.start(pathStd, pathStd, settings.indexSettings());
+    builder.start(pathStd, pathStd, settings);
 
     char buffer[80];
 

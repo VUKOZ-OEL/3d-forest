@@ -19,10 +19,12 @@
 
 /** @file exampleFileSize.cpp @brief File size example. */
 
+// Include 3D Forest.
 #include <ArgumentParser.hpp>
 #include <Error.hpp>
 #include <File.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "exampleFileSize"
 #include <Log.hpp>
 

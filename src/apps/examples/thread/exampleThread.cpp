@@ -19,10 +19,12 @@
 
 /** @file exampleThread.cpp @brief Thread example. */
 
+// Include 3D Forest.
 #include <ThreadCallbackInterface.hpp>
 #include <ThreadLoop.hpp>
 #include <Time.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "exampleThread"
 #include <Log.hpp>
 

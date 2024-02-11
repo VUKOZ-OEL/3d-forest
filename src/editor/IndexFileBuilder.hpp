@@ -31,6 +31,7 @@
 #include <ChunkFile.hpp>
 #include <IndexFile.hpp>
 #include <LasFile.hpp>
+#include <SettingsImport.hpp>
 
 // Include local.
 #include <ExportEditor.hpp>
@@ -40,30 +41,12 @@
 class EXPORT_EDITOR IndexFileBuilder
 {
 public:
-    /** Index File Builder Settings. */
-    class EXPORT_EDITOR Settings
-    {
-    public:
-        bool verbose;
-
-        size_t maxSize1;
-        size_t maxSize2;
-
-        size_t maxLevel1;
-        size_t maxLevel2;
-
-        size_t bufferSize;
-
-        Settings();
-        ~Settings();
-    };
-
     IndexFileBuilder();
     ~IndexFileBuilder();
 
     void start(const std::string &outputPath,
                const std::string &inputPath,
-               const IndexFileBuilder::Settings &settings);
+               const SettingsImport &settings);
 
     void next();
 
@@ -75,11 +58,11 @@ public:
 
     static void index(const std::string &outputPath,
                       const std::string &inputPath,
-                      const IndexFileBuilder::Settings &settings);
+                      const SettingsImport &settings);
 
 protected:
     // Settings.
-    IndexFileBuilder::Settings settings_;
+    SettingsImport settings_;
 
     /** Index File Builder State. */
     enum State
@@ -177,7 +160,6 @@ protected:
 
     size_t sizePoint_;
     size_t sizePointOut_;
-    size_t sizePointFormat_;
 
     uint64_t copyPointsRestartIndex_;
     uint64_t copyPointsCurrentIndex_;

@@ -19,13 +19,16 @@
 
 /** @file exampleImage.cpp @brief Mesh distance example. */
 
+// Include 3rd party.
 #include <Eigen/Core>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <igl/png/writePNG.h>
 
+// Include 3D Forest.
 #include <Error.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "exampleImage"
 #include <Log.hpp>
 

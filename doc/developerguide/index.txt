@@ -259,13 +259,15 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
     - Download installer Git-2.36.1-64-bit.exe
     - Run the installer
     - Choose all the options as default recommended values with the following suggestions:
+        - You may enable "(NEW!) Add a Git Bash Profile to Windows Terminal".
         - You may prefer to choose default editor used by Git to "Notepad".
         - You may choose default branch name as "main".
         - Choose "Checkout as-is, commit as-is" eg. do not convert CRLF/LF
           (autocrlf = false in global config). This project uses LF line endings.
           Windows can handle LF just fine at least since version 10.
     - Git installer creates global config in
-      "C:/Users/user/AppData/Local/Programs/Git/etc/gitconfig".
+      "C:/Users/user/AppData/Local/Programs/Git/etc/gitconfig" or
+      "C:/Program Files/Git/etc/".
       @verbatim
         [diff "astextplain"]
             textconv = astextplain
@@ -285,7 +287,7 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
         [pull]
             rebase = false
         [credential]
-            helper = manager-core
+            helper = manager
         [credential "https://dev.azure.com"]
             useHttpPath = true
         [init]
@@ -359,10 +361,13 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
 @subsection build-windows-make-qt Install Qt
     - Download Qt installer from https://www.qt.io/download
         - Click "Downloads for open source users" button in "Go open source"
+          or simply click "Download open source" in "Open source user?" section.
         - Click "Download the Qt Online Installer" button in bottom section
           of the page "Looking for Qt binaries"
         - Recommended download was "Qt Online Installer for Windows"
         - Click "Download" button to save file "qt-unified-windows-x86-4.3.0-1-online.exe"
+          or "qt-unified-windows-x64-4.6.1-online.exe" if you are doing this in 2024.
+        - You may need to download an offline installer in a case of network error.
     - Run the installer
         - Run "qt-unified-windows-x86-4.3.0-1-online.exe", it shows "Qt Setup" window
         - Enter your Qt Account Email and Password, "Next"
@@ -413,6 +418,9 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
       @endverbatim
     - Run 3dforest.exe from directory "Documents\3d-forest\bin"
 
+@subsection build-windows-make-vscode-devel Development with Visual Studio Code
+    - See section Edit Source Code with Visual Studio Code
+    - See section Build and Debug in Visual Studio Code
 
 
 @section build-windows-visual-studio Build from Source Code in Windows with Visual Studio

@@ -225,6 +225,11 @@ public:
     void close();
     bool isOpen() const;
 
+    static void move(const std::string &outputPath,
+                     const std::string &inputPath);
+
+    static void remove(const std::string &path);
+
     // Point I/O.
     static void create(const std::string &path,
                        const std::vector<LasFile::Point> &points,

@@ -19,12 +19,16 @@
 
 /** @file exampleQueryVoxels.cpp @brief Query voxels example. */
 
+// Include std.
 #include <cstring>
 
+// Include 3D Forest.
 #include <Editor.hpp>
 #include <Error.hpp>
+#include <IndexFileBuilder.hpp>
 #include <Time.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "exampleQueryVoxels"
 #include <Log.hpp>
 
@@ -86,8 +90,8 @@ static void createDataSet(const std::string &path, double scale)
     LasFile::create(path, points, {scale, scale, scale}, {0, 0, 0});
 
     // Index
-    IndexFileBuilder::Settings settings;
-    settings.maxSize1 = 100;
+    SettingsImport settings;
+    settings.maxIndexLevel1Size = 100;
 
     IndexFileBuilder::index(path, path, settings);
 }

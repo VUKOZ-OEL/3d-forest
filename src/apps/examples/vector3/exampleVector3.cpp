@@ -19,8 +19,10 @@
 
 /** @file exampleVector3.cpp @brief Vector3 example. */
 
+// Include 3D Forest.
 #include <Vector3.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "exampleVector3"
 #include <Log.hpp>
 
