@@ -271,8 +271,8 @@ public:
     void copyAttributesBuffer(AttributesBuffer &dst,
                               const AttributesBuffer &src,
                               uint64_t n,
-                              uint64_t to,
-                              uint64_t from);
+                              uint64_t to = 0,
+                              uint64_t from = 0);
 
     const std::vector<RecordFile> &attributeFiles() const
     {

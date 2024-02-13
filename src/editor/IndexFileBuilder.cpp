@@ -29,7 +29,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "IndexFileBuilder"
-#define LOG_MODULE_DEBUG_ENABLED 1
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 // Define to keep the same order of LAS points.
@@ -254,6 +254,10 @@ void IndexFileBuilder::openFiles()
 
 void IndexFileBuilder::next()
 {
+    LOG_DEBUG(<< "Start state <" << state_ << "> size <" << value_ << "/"
+              << maximum_ << "> n <" << valueIndex_ << "/" << maximumIndex_
+              << ">.");
+
     // Continue.
     switch (state_)
     {
@@ -318,6 +322,10 @@ void IndexFileBuilder::next()
         case STATE_BEGIN:
             break;
     }
+
+    LOG_DEBUG(<< "End state <" << state_ << "> size <" << value_ << "/"
+              << maximum_ << "> n <" << valueIndex_ << "/" << maximumIndex_
+              << ">.");
 
     // Next.
     if (value_ == maximum_)
@@ -424,6 +432,9 @@ void IndexFileBuilder::nextState()
         case STATE_NONE:
             break;
     }
+
+    LOG_DEBUG(<< "Setup next state <" << state_ << "> total size <" << maximum_
+              << "> n <" << maximumIndex_ << ">.");
 }
 
 void IndexFileBuilder::stateCreateAttributes()
@@ -580,9 +591,10 @@ void IndexFileBuilder::stateCopyPoints()
         bufferOut_.resize(sizePointOut_ * nPoints);
     }
 
-    outputLas_.createAttributesBuffer(attributesOut_, nPoints);
+    outputLas_.createAttributesBuffer(attributesOut_, nPoints, true);
 
-    uint8_t *in = buffer_.data();
+    uint8_t *bufferIn = buffer_.data();
+    uint8_t *in = bufferIn;
     uint8_t *bufferOut = bufferOut_.data();
     uint8_t *out;
 
@@ -592,74 +604,96 @@ void IndexFileBuilder::stateCopyPoints()
     // Coordinates without scaling.
     coords_.resize(nPoints * 3);
 
-    // Point formatting.
-    bool hasDifferentFormat;
-    if ((inputLas_.header.point_data_record_format < 6) &&
-        (outputLas_.header.point_data_record_format >= 6))
+    if (settings_.randomizePoints)
     {
-        hasDifferentFormat = true;
-    }
-    else
-    {
-        hasDifferentFormat = false;
-    }
-
-    // To find maximums to normalize these values.
-    uint32_t intensity;
-    uint32_t rgb;
-
-    bool hasColor;
-    if ((outputLas_.header.point_data_record_format == 7) ||
-        (outputLas_.header.point_data_record_format == 8) ||
-        (outputLas_.header.point_data_record_format == 10))
-    {
-        hasColor = true;
-    }
-    else
-    {
-        hasColor = false;
-    }
-
-    // Process one step of the input.
-    for (size_t i = 0; i < nPoints; i++)
-    {
-        // Reorder.
-        inputLas_.seekPoint(copyPointsCurrentIndex_);
-        copyPointsCurrentIndex_ += copyPointsSkipCount_;
-        if (copyPointsCurrentIndex_ >= maximumIndex_)
+        // Process one step of the input.
+        for (size_t i = 0; i < nPoints; i++)
         {
-            copyPointsRestartIndex_++;
-            copyPointsCurrentIndex_ = copyPointsRestartIndex_;
+            // Reorder.
+            inputLas_.seekPoint(copyPointsCurrentIndex_);
+            copyPointsCurrentIndex_ += copyPointsSkipCount_;
+            if (copyPointsCurrentIndex_ >= maximumIndex_)
+            {
+                copyPointsRestartIndex_++;
+                copyPointsCurrentIndex_ = copyPointsRestartIndex_;
+            }
+
+            // Read input.
+            inputLas_.readBuffer(in, sizePoint_);
+
+            // Copy.
+            out = bufferOut + (i * sizePointOut_);
+            std::memcpy(out, in, sizePoint_);
+
+            // Format point data to a different LAS version.
+            if ((inputLas_.header.point_data_record_format < 6) &&
+                (outputLas_.header.point_data_record_format >= 6))
+            {
+                formatPoint(out, in);
+            }
+
+            // Attributes.
+            inputLas_.readAttributesBuffer(attributes_, 1);
+            outputLas_.copyAttributesBuffer(attributesOut_, attributes_, 1, i);
+        }
+    }
+    else
+    {
+        // Read point data.
+        inputLas_.seekPoint(valueIndex_);
+        inputLas_.readBuffer(bufferIn, sizePoint_ * nPoints);
+
+        // Format/Copy point data.
+        if ((inputLas_.header.point_data_record_format < 6) &&
+            (outputLas_.header.point_data_record_format >= 6))
+        {
+            // Format point data to a different LAS version.
+            for (size_t i = 0; i < nPoints; i++)
+            {
+                in = bufferIn + (i * sizePoint_);
+                out = bufferOut + (i * sizePointOut_);
+                std::memcpy(out, in, sizePoint_);
+                formatPoint(out, in);
+            }
+        }
+        else
+        {
+            // Copy point data.
+            for (size_t i = 0; i < nPoints; i++)
+            {
+                in = bufferIn + (i * sizePoint_);
+                out = bufferOut + (i * sizePointOut_);
+                std::memcpy(out, in, sizePoint_);
+            }
         }
 
-        // Read input.
-        inputLas_.readBuffer(in, sizePoint_);
+        // Read attributes.
+        inputLas_.readAttributesBuffer(attributes_, nPoints);
+        outputLas_.copyAttributesBuffer(attributesOut_, attributes_, nPoints);
+    }
 
-        // Copy.
+    // Scan point data.
+    for (size_t i = 0; i < nPoints; i++)
+    {
         out = bufferOut + (i * sizePointOut_);
-        std::memcpy(out, in, sizePoint_); // sizePointFormat_
 
         // Boundary of points without scaling and offset.
         coords_[i * 3 + 0] = indexFileBuilderCoordinate(out + 0);
         coords_[i * 3 + 1] = indexFileBuilderCoordinate(out + 4);
         coords_[i * 3 + 2] = indexFileBuilderCoordinate(out + 8);
 
-        // Format.
-        if (hasDifferentFormat)
-        {
-            formatPoint(out, in);
-        }
-
         // Find maximums to normalize these values later.
-        intensity = ltoh16(out + 12);
+        uint32_t intensity = ltoh16(out + 12);
         if (intensity > intensityMax_)
         {
             intensityMax_ = intensity;
         }
 
-        if (hasColor)
+        if ((outputLas_.header.point_data_record_format == 7) ||
+            (outputLas_.header.point_data_record_format == 8) ||
+            (outputLas_.header.point_data_record_format == 10))
         {
-            rgb = ltoh16(out + 30);
+            uint32_t rgb = ltoh16(out + 30);
             rgb += ltoh16(out + 32);
             rgb += ltoh16(out + 34);
 
@@ -668,10 +702,6 @@ void IndexFileBuilder::stateCopyPoints()
                 rgbMax_ = rgb;
             }
         }
-
-        // Attributes.
-        inputLas_.readAttributesBuffer(attributes_, 1);
-        outputLas_.copyAttributesBuffer(attributesOut_, attributes_, 1, i, 0);
     }
 
     // Write this step to the output.

@@ -48,6 +48,7 @@ public slots:
 protected:
     QCheckBox *convertCheckBox_;
     QCheckBox *centerCheckBox_;
+    QCheckBox *randomizeCheckBox_;
     QCheckBox *copyExtraBytesCheckBox_;
 
     QPushButton *acceptButton_;

@@ -61,6 +61,9 @@ ImportFileDialog::ImportFileDialog(MainWindow *mainWindow) : QDialog(mainWindow)
     centerCheckBox_ = new QCheckBox;
     centerCheckBox_->setChecked(true);
 
+    randomizeCheckBox_ = new QCheckBox;
+    randomizeCheckBox_->setChecked(true);
+
     copyExtraBytesCheckBox_ = new QCheckBox;
     copyExtraBytesCheckBox_->setChecked(true);
 
@@ -79,6 +82,9 @@ ImportFileDialog::ImportFileDialog(MainWindow *mainWindow) : QDialog(mainWindow)
     row++;
     optionsLayout->addWidget(new QLabel(tr("Center on screen")), row, 0);
     optionsLayout->addWidget(centerCheckBox_, row, 1);
+    row++;
+    optionsLayout->addWidget(new QLabel(tr("Randomize points")), row, 0);
+    optionsLayout->addWidget(randomizeCheckBox_, row, 1);
     row++;
     optionsLayout->addWidget(new QLabel(tr("Copy extra bytes")), row, 0);
     optionsLayout->addWidget(copyExtraBytesCheckBox_, row, 1);
@@ -125,6 +131,7 @@ SettingsImport ImportFileDialog::settings() const
 
     settingsImport.convertToVersion1Dot4 = convertCheckBox_->isChecked();
     settingsImport.centerPointsOnScreen = centerCheckBox_->isChecked();
+    settingsImport.randomizePoints = randomizeCheckBox_->isChecked();
     settingsImport.copyExtraBytes = copyExtraBytesCheckBox_->isChecked();
 
     return settingsImport;
