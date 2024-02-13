@@ -22,11 +22,14 @@
 #ifndef VECTOR3_HPP
 #define VECTOR3_HPP
 
+// Include std.
 #include <array>
 #include <cmath>
 
+// Include 3D Forest.
 #include <Json.hpp>
 
+// Include local.
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>
 

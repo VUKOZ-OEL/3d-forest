@@ -22,10 +22,12 @@
 #ifndef INFO_DIALOG_HPP
 #define INFO_DIALOG_HPP
 
+// Include Qt.
 #include <QDialog>
 class QTextEdit;
 class QPushButton;
 
+// Include local.
 #include <ExportGui.hpp>
 #include <WarningsDisable.hpp>
 

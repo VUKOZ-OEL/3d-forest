@@ -22,12 +22,14 @@
 #ifndef REGION_HPP
 #define REGION_HPP
 
+// Include 3D Forest.
 #include <Box.hpp>
 #include <Cone.hpp>
 #include <Cylinder.hpp>
 #include <ExportCore.hpp>
 #include <Sphere.hpp>
 
+// Include local.
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>
 

@@ -22,6 +22,7 @@
 #ifndef CLASSIFICATION_ACTION_HPP
 #define CLASSIFICATION_ACTION_HPP
 
+// Include 3D Forest.
 #include <Points.hpp>
 #include <ProgressActionInterface.hpp>
 #include <Query.hpp>

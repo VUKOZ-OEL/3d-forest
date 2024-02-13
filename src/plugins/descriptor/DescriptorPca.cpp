@@ -19,9 +19,11 @@
 
 /** @file DescriptorPca.cpp */
 
+// Include 3D Forest.
 #include <DescriptorPca.hpp>
 #include <LasFile.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "DescriptorPca"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
@@ -84,7 +86,7 @@ bool DescriptorPca::computeDescriptor(Query &query,
 
     while (query.next())
     {
-        if (query.value() != 0)
+        if (query.voxel() != 0)
         {
             nPoints++;
         }
@@ -105,7 +107,7 @@ bool DescriptorPca::computeDescriptor(Query &query,
     query.reset();
     while (query.next())
     {
-        if (query.value() != 0)
+        if (query.voxel() != 0)
         {
             xyz(0, nPoints) = query.x();
             xyz(1, nPoints) = query.y();
@@ -269,7 +271,7 @@ bool DescriptorPca::computeDistribution(Query &query,
 
     while (query.next())
     {
-        if (query.value() == 0)
+        if (query.voxel() == 0)
         {
             continue;
         }

@@ -19,10 +19,12 @@
 
 /** @file exampleQueryFilter.cpp @brief Query filter example. */
 
+// Include 3D Forest.
 #include <Editor.hpp>
 #include <Error.hpp>
 #include <QueryFilterSet.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "exampleQueryFilter"
 #include <Log.hpp>
 

@@ -22,9 +22,11 @@
 #ifndef SETTINGS_HPP
 #define SETTINGS_HPP
 
+// Include 3D Forest.
 #include <SettingsImport.hpp>
 #include <SettingsView.hpp>
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 

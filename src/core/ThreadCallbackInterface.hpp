@@ -22,6 +22,7 @@
 #ifndef THREAD_CALLBACK_INTERFACE_HPP
 #define THREAD_CALLBACK_INTERFACE_HPP
 
+// Include local.
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>
 

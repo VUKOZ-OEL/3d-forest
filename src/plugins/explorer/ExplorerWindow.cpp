@@ -19,17 +19,19 @@
 
 /** @file ExplorerWindow.cpp */
 
+// Include 3D Forest.
 #include <ExplorerClassificationsWidget.hpp>
 #include <ExplorerClippingWidget.hpp>
 #include <ExplorerDescriptorWidget.hpp>
 #include <ExplorerElevationWidget.hpp>
 #include <ExplorerFilesWidget.hpp>
-#include <ExplorerLayersWidget.hpp>
+#include <ExplorerSegmentsWidget.hpp>
 #include <ExplorerWindow.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 #include <ToolTabWidget.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "ExplorerWindow"
 #include <Log.hpp>
 
@@ -39,12 +41,13 @@ ExplorerWindow::ExplorerWindow(MainWindow *mainWindow)
     : QDockWidget(mainWindow),
       mainWindow_(mainWindow)
 {
-    // Tab
+    // Tab.
     items_.push_back(
         new ExplorerFilesWidget(mainWindow_, ICON("file"), tr("Files")));
 
-    items_.push_back(
-        new ExplorerLayersWidget(mainWindow_, ICON("layers"), tr("Layers")));
+    items_.push_back(new ExplorerSegmentsWidget(mainWindow_,
+                                                ICON("segments"),
+                                                tr("Segments")));
 
     items_.push_back(new ExplorerClassificationsWidget(mainWindow_,
                                                        ICON("classification"),
@@ -62,14 +65,14 @@ ExplorerWindow::ExplorerWindow(MainWindow *mainWindow)
                                                 ICON("clip_filter"),
                                                 tr("Clip filter")));
 
-    // Tabs
+    // Tabs.
     tabWidget_ = new ToolTabWidget;
     for (size_t i = 0; i < items_.size(); i++)
     {
         tabWidget_->addTab(items_[i], items_[i]->icon(), items_[i]->text());
     }
 
-    // Dock
+    // Dock.
     setWidget(tabWidget_);
     setWindowTitle(tr("Explorer"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);

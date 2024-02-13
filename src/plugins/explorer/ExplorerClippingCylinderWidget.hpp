@@ -22,10 +22,12 @@
 #ifndef EXPLORER_CLIPPING_CYLINDER_WIDGET_HPP
 #define EXPLORER_CLIPPING_CYLINDER_WIDGET_HPP
 
+// Include 3D Forest.
 #include <Region.hpp>
 class DoubleSliderWidget;
 class MainWindow;
 
+// Include Qt.
 #include <QWidget>
 
 /** Explorer Clipping Cylinder Widget. */

@@ -22,12 +22,14 @@
 #ifndef SEGMENTATION_WIDGET_HPP
 #define SEGMENTATION_WIDGET_HPP
 
+// Include 3D Forest.
 #include <SegmentationAction.hpp>
 class MainWindow;
 class SliderWidget;
 class RangeSliderWidget;
 class InfoDialog;
 
+// Include Qt.
 #include <QWidget>
 class QPushButton;
 class QCheckBox;

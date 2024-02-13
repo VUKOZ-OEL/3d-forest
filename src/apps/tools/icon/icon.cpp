@@ -19,15 +19,19 @@
 
 /** @file icon.cpp */
 
+// Include std.
 #include <iostream>
 
+// Include 3D Forest.
 #include <ArgumentParser.hpp>
 #include <Error.hpp>
 
+// Include Qt.
 #include <QDir>
 #include <QPainter>
 #include <QPixmap>
 
+// Include local.
 #define LOG_MODULE_NAME "icon"
 #include <Log.hpp>
 

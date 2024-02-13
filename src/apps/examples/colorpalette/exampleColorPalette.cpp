@@ -19,8 +19,10 @@
 
 /** @file exampleColorPalette.cpp @brief Color palette example. */
 
+// Include 3D Forest.
 #include <ColorPalette.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "exampleColorPalette"
 #include <Log.hpp>
 

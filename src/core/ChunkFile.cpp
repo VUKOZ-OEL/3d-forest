@@ -19,13 +19,16 @@
 
 /** @file ChunkFile.cpp */
 
+// Include std.
 #include <cassert>
 #include <sstream>
 
+// Include 3D Forest.
 #include <ChunkFile.hpp>
 #include <Endian.hpp>
 #include <Error.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "ChunkFile"
 #include <Log.hpp>
 

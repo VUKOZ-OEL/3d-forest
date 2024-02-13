@@ -19,12 +19,15 @@
 
 /** @file IndexFile.cpp */
 
+// Include std.
 #include <cstring>
 #include <queue>
 
+// Include 3D Forest.
 #include <Endian.hpp>
 #include <IndexFile.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "IndexFile"
 #include <Log.hpp>
 
@@ -128,20 +131,20 @@ void IndexFile::selectLeaves(std::vector<SelectionTile> &selection,
 {
     const Node *node = &nodes_[idx];
 
-    // Select all
+    // Select all.
     if (boundary.isInside(window))
     {
         selection.push_back({datasetId, tileId, node->from, node->size, false});
         return;
     }
 
-    // Outside
+    // Outside.
     if (!boundary.intersects(window))
     {
         return;
     }
 
-    // Octants
+    // Octants.
     double px;
     double py;
     double pz;
@@ -166,7 +169,7 @@ void IndexFile::selectLeaves(std::vector<SelectionTile> &selection,
         }
     }
 
-    // Partial
+    // Partial selection.
     if (leaf)
     {
         selection.push_back({datasetId, tileId, node->from, node->size, true});
@@ -179,20 +182,20 @@ void IndexFile::selectLeaves(std::vector<Selection> &selection,
                              size_t idx,
                              size_t id) const
 {
-    // Select all
+    // Select all.
     if (boundary.isInside(window))
     {
         selection.push_back({id, idx, false});
         return;
     }
 
-    // Outside
+    // Outside.
     if (!boundary.intersects(window))
     {
         return;
     }
 
-    // Octants
+    // Octants.
     double px;
     double py;
     double pz;
@@ -213,7 +216,7 @@ void IndexFile::selectLeaves(std::vector<Selection> &selection,
         }
     }
 
-    // Partial
+    // Partial selection.
     if (leaf)
     {
         selection.push_back({id, idx, true});
@@ -226,13 +229,13 @@ void IndexFile::selectNodes(std::vector<Selection> &selection,
                             size_t idx,
                             size_t id) const
 {
-    // Outside
+    // Outside.
     if (!boundary.intersects(window))
     {
         return;
     }
 
-    // Select all or partial
+    // Select all or partial.
     if (boundary.isInside(window))
     {
         selection.push_back({id, idx, false});
@@ -242,7 +245,7 @@ void IndexFile::selectNodes(std::vector<Selection> &selection,
         selection.push_back({id, idx, true});
     }
 
-    // Octants
+    // Octants.
     double px;
     double py;
     double pz;
@@ -270,7 +273,7 @@ const IndexFile::Node *IndexFile::selectNode(
     const Box<double> &boundary,
     size_t idx) const
 {
-    // Outside
+    // Outside.
     if (!boundary.isInside(x, y, z))
     {
         return nullptr;
@@ -282,7 +285,7 @@ const IndexFile::Node *IndexFile::selectNode(
         return node;
     }
 
-    // Octants
+    // Octants.
     double px;
     double py;
     double pz;
@@ -305,7 +308,7 @@ const IndexFile::Node *IndexFile::selectNode(
         }
     }
 
-    // Leaf
+    // Leaf.
     return node;
 }
 
@@ -315,13 +318,13 @@ const IndexFile::Node *IndexFile::selectLeaf(double x,
                                              const Box<double> &boundary,
                                              size_t idx) const
 {
-    // Outside
+    // Outside.
     if (!boundary.isInside(x, y, z))
     {
         return nullptr;
     }
 
-    // Octants
+    // Octants.
     double px;
     double py;
     double pz;
@@ -345,7 +348,7 @@ const IndexFile::Node *IndexFile::selectLeaf(double x,
         }
     }
 
-    // Leaf
+    // Leaf.
     return node;
 }
 
@@ -420,7 +423,7 @@ const IndexFile::Node *IndexFile::prev(const Node *node) const
 
 Box<double> IndexFile::boundary(const Node *node, const Box<double> &box) const
 {
-    // Top
+    // Top.
     const Node *data = nodes_.data();
     const Node *prev;
     const Node *next;
@@ -444,7 +447,7 @@ Box<double> IndexFile::boundary(const Node *node, const Box<double> &box) const
         }
     }
 
-    // Down
+    // Down.
     Box<double> boundary = box;
     double px;
     double py;
@@ -467,7 +470,7 @@ void IndexFile::insertBegin(const Box<double> &boundary,
                             size_t maxLevel,
                             bool insertOnlyToLeaves)
 {
-    // Initialization
+    // Initialization.
     clear();
     boundary_ = boundary;
     boundaryFile_ = boundary_;
@@ -475,7 +478,7 @@ void IndexFile::insertBegin(const Box<double> &boundary,
     boundaryPointsFile_ = boundaryPoints_;
     root_ = std::make_shared<BuildNode>();
 
-    // Build tree settings
+    // Build tree settings.
     maxSize_ = maxSize;
     maxLevel_ = maxLevel;
     insertOnlyToLeaves_ = insertOnlyToLeaves;
@@ -495,11 +498,11 @@ void IndexFile::insertEnd()
 {
     if (root_)
     {
-        // Create 1d array tree representation
+        // Create 1d array tree representation.
         size_t nodes = countNodes();
         nodes_.resize(nodes);
 
-        // Build tree to array
+        // Build tree to array.
         uint32_t idx = 0;
         uint64_t from = 0;
         Node *data = nodes_.data();
@@ -530,7 +533,7 @@ void IndexFile::insertEnd()
                 data[idx].size = node->size;
                 data[idx].prev = prev;
 
-                // Continue
+                // Continue.
                 for (size_t i = 0; i < 8; i++)
                 {
                     if (node->next[i])
@@ -547,7 +550,7 @@ void IndexFile::insertEnd()
             }
         }
 
-        // Cleanup
+        // Cleanup.
         root_.reset();
     }
 }
@@ -717,11 +720,11 @@ void IndexFile::read(const std::string &path, uint64_t offset)
 
 void IndexFile::read(ChunkFile &file)
 {
-    // Chunk header
+    // Read chunk header.
     ChunkFile::Chunk chunk;
     file.read(chunk);
 
-    // Chunk payload
+    // Read chunk payload.
     readPayload(file, chunk);
 }
 
@@ -736,7 +739,7 @@ void IndexFile::readPayload(ChunkFile &file, const ChunkFile::Chunk &chunk)
     buffer.resize(chunk.headerLength + chunk.dataLength);
     uint8_t *ptr = buffer.data();
 
-    // Header
+    // Read header.
     file.read(ptr, chunk.headerLength);
 
     size_t n = static_cast<size_t>(ltoh64(&ptr[0]));
@@ -758,7 +761,7 @@ void IndexFile::readPayload(ChunkFile &file, const ChunkFile::Chunk &chunk)
     boundaryPointsFile_.set(wx1, wy1, wz1, wx2, wy2, wz2);
     boundaryPoints_ = boundaryPointsFile_;
 
-    // Data
+    // Read data.
     nodes_.resize(n);
     std::memset(nodes_.data(), 0, sizeof(Node) * n);
 
@@ -803,14 +806,14 @@ void IndexFile::write(const std::string &path) const
 
 void IndexFile::write(ChunkFile &file) const
 {
-    // Chunk
+    // Chunk.
     ChunkFile::Chunk chunk;
     chunk.type = CHUNK_TYPE;
     chunk.majorVersion = OCTREE_INDEX_CHUNK_MAJOR_VERSION;
     chunk.minorVersion = OCTREE_INDEX_CHUNK_MINOR_VERSION;
     chunk.headerLength = OCTREE_INDEX_HEADER_SIZE_1_0;
 
-    // Chunk size
+    // Chunk size.
     chunk.dataLength = 0;
     std::vector<uint32_t> headers;
     headers.resize(nodes_.size());
@@ -836,10 +839,10 @@ void IndexFile::write(ChunkFile &file) const
     chunk.dataLength *= 4;
     chunk.dataLength += nodes_.size() * 32;
 
-    // Chunk write
+    // Chunk write.
     file.write(chunk);
 
-    // Header
+    // Header.
     std::vector<uint8_t> buffer;
     buffer.resize(chunk.headerLength + chunk.dataLength);
     uint8_t *ptr = buffer.data();
@@ -859,7 +862,7 @@ void IndexFile::write(ChunkFile &file) const
     htold(&ptr[8 + (11 * 8)], boundaryPointsFile_.max(2));
     file.write(buffer.data(), chunk.headerLength);
 
-    // Data
+    // Data.
     for (size_t i = 0; i < nodes_.size(); i++)
     {
         htol32(ptr, headers[i]);

@@ -22,12 +22,15 @@
 #ifndef DOUBLE_RANGE_SLIDER_WIDGET_HPP
 #define DOUBLE_RANGE_SLIDER_WIDGET_HPP
 
+// Include Qt.
 #include <QWidget>
 class QDoubleSpinBox;
 class QVBoxLayout;
 
+// Include 3rd party.
 class ctkDoubleRangeSlider;
 
+// Include local.
 #include <ExportGui.hpp>
 #include <WarningsDisable.hpp>
 

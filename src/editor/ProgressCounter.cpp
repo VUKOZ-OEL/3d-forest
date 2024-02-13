@@ -19,11 +19,13 @@
 
 /** @file ProgressCounter.cpp */
 
+// Include 3D Forest.
 #include <ProgressCounter.hpp>
 #include <Time.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "ProgressCounter"
-//#define LOG_MODULE_DEBUG_ENABLED 1
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 ProgressCounter::ProgressCounter()
@@ -83,7 +85,7 @@ bool ProgressCounter::timedOut()
         timeNow_ = Time::realTime();
         if (timeNow_ - timeBegin_ > timeout_)
         {
-            return true; // timed out
+            return true; // Timed out.
         }
     }
 
@@ -96,17 +98,17 @@ double ProgressCounter::percent() const
 
     if (maximumSteps_ < 2)
     {
-        // progress in one step
+        // Progress in one step.
         p = percentStep();
     }
     else if (valueSteps_ >= maximumSteps_)
     {
-        // all steps are finished
+        // All steps are finished.
         p = 100.0;
     }
     else
     {
-        // progress in multiple steps
+        // Progress in multiple steps.
         p = 0.0;
         double prest = 100.0;
 

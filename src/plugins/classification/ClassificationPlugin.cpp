@@ -19,11 +19,13 @@
 
 /** @file ClassificationPlugin.cpp */
 
+// Include 3D Forest.
 #include <ClassificationPlugin.hpp>
 #include <ClassificationWindow.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "ClassificationPlugin"
 #include <Log.hpp>
 
@@ -51,7 +53,7 @@ void ClassificationPlugin::initialize(MainWindow *mainWindow)
 
 void ClassificationPlugin::slotPlugin()
 {
-    // Create GUI only when this plugin is used for the first time
+    // Create GUI only when this plugin is used for the first time.
     if (!pluginWindow_)
     {
         pluginWindow_ = new ClassificationWindow(mainWindow_);

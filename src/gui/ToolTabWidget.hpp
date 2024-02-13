@@ -22,15 +22,19 @@
 #ifndef TOOL_TAB_WIDGET_HPP
 #define TOOL_TAB_WIDGET_HPP
 
+// Include std.
 #include <vector>
 
+// Include Qt.
 #include <QWidget>
 class QToolButton;
 class QVBoxLayout;
 class QLabel;
 
+// Include 3rd party.
 class FlowLayout;
 
+// Include local.
 #include <ExportGui.hpp>
 #include <WarningsDisable.hpp>
 

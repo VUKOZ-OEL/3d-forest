@@ -19,10 +19,13 @@
 
 /** @file ArgumentParser.cpp */
 
+// Include std.
 #include <cmath>
 
+// Include 3D Forest.
 #include <ArgumentParser.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "ArgumentParser"
 #include <Log.hpp>
 

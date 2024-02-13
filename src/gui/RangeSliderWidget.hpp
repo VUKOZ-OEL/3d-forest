@@ -22,12 +22,15 @@
 #ifndef RANGE_SLIDER_WIDGET_HPP
 #define RANGE_SLIDER_WIDGET_HPP
 
+// Include Qt.
 #include <QWidget>
 class QSpinBox;
 class QVBoxLayout;
 
+// Include 3rd party.
 class ctkRangeSlider;
 
+// Include local.
 #include <ExportGui.hpp>
 #include <WarningsDisable.hpp>
 

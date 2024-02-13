@@ -19,8 +19,10 @@
 
 /** @file Points.cpp */
 
+// Include 3D Forest.
 #include <Points.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "Points"
 #include <Log.hpp>
 
@@ -37,7 +39,7 @@ Points::~Points()
     }
     catch (...)
     {
-        // empty
+        // Empty.
     }
 }
 

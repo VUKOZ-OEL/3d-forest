@@ -19,12 +19,15 @@
 
 /** @file PageData.cpp */
 
+// Include 3D Forest.
 #include <Editor.hpp>
 #include <Endian.hpp>
 #include <File.hpp>
+#include <IndexFileBuilder.hpp>
 #include <LasFile.hpp>
 #include <PageData.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "PageData"
 #include <Log.hpp>
 
@@ -54,53 +57,50 @@ void PageData::resize(size_t n)
     gpsTime.resize(n);
     color.resize(n * 3);
 
-    layer.resize(n);
+    segment.resize(n);
     elevation.resize(n);
-    customColor.resize(n * 3);
     descriptor.resize(n);
-    value.resize(n);
+    voxel.resize(n);
 
     renderPosition.resize(n * 3);
     positionBase_.resize(n * 3);
 }
 
-void PageData::read(Editor *editor)
+void PageData::readPage(Editor *editor)
 {
     LOG_DEBUG(<< "Read page <" << pageId_ << "> dataset <" << datasetId_
               << ">.");
 
-    const Dataset &dataset = editor->datasets().key(datasetId_);
+    Dataset &dataset = editor->datasets().key(datasetId_);
     const IndexFile::Node *node = dataset.index().at(pageId_);
+    LasFile &las = dataset.las();
 
-    // Read page buffer from LAS file
-    LasFile las;
-    las.open(dataset.path());
-    las.readHeader();
+    // Read page buffer from LAS file.
+    las.seekPoint(node->from);
 
+    size_t numberOfPointsInPage = static_cast<size_t>(node->size);
     size_t pointSize = las.header.point_data_record_length;
-    uint64_t start = node->from * pointSize;
-    las.seek(start + las.header.offset_to_point_data);
+    size_t bufferLasPageSize = pointSize * numberOfPointsInPage;
+    // uint8_t fmt = las.header.point_data_record_format;
+    pointDataBuffer_.resize(bufferLasPageSize);
+    las.readBuffer(pointDataBuffer_.data(), bufferLasPageSize);
 
-    size_t nPagePoints = static_cast<size_t>(node->size);
-    size_t bufferSize = pointSize * nPagePoints;
-    uint8_t fmt = las.header.point_data_record_format;
-    buffer_.resize(bufferSize);
-    las.file().read(buffer_.data(), bufferSize);
+    // Create point data.
+    resize(numberOfPointsInPage);
 
-    // Create point data
-    resize(nPagePoints);
+    // Covert buffer to point data.
+    uint8_t *ptrPointData = pointDataBuffer_.data();
 
-    // Covert buffer to point data
-    uint8_t *ptr = buffer_.data();
     LasFile::Point point;
+
     const double s16 = 1.0 / 65535.0;
     bool rgbFlag = las.header.hasRgb();
 
-    for (size_t i = 0; i < nPagePoints; i++)
+    for (size_t i = 0; i < numberOfPointsInPage; i++)
     {
-        las.readPoint(point, ptr + (pointSize * i), fmt);
+        las.formatBytesToPoint(point, ptrPointData + (pointSize * i));
 
-        // xyz
+        // XYZ coordinates.
         positionBase_[3 * i + 0] = static_cast<double>(point.x);
         positionBase_[3 * i + 1] = static_cast<double>(point.y);
         positionBase_[3 * i + 2] = static_cast<double>(point.z);
@@ -109,7 +109,7 @@ void PageData::read(Editor *editor)
         position[3 * i + 1] = positionBase_[3 * i + 1];
         position[3 * i + 2] = positionBase_[3 * i + 2];
 
-        // intensity and color
+        // Intensity and color.
         intensity[i] = static_cast<double>(point.intensity) * s16;
 
         if (rgbFlag)
@@ -125,105 +125,90 @@ void PageData::read(Editor *editor)
             color[3 * i + 2] = 1.0;
         }
 
-        // attributes
+        // Attributes.
         returnNumber[i] = point.return_number;
         numberOfReturns[i] = point.number_of_returns;
         classification[i] = point.classification;
         userData[i] = point.user_data;
 
-        // gps
+        // GPS.
         gpsTime[i] = point.gps_time;
-
-        // User extra
-        layer[i] = point.user_layer;
-        elevation[i] = static_cast<double>(point.user_elevation);
-        customColor[3 * i + 0] = static_cast<double>(point.user_red) * s16;
-        customColor[3 * i + 1] = static_cast<double>(point.user_green) * s16;
-        customColor[3 * i + 2] = static_cast<double>(point.user_blue) * s16;
-        descriptor[i] = point.user_descriptor;
-        value[i] = static_cast<size_t>(point.user_value);
     }
 
-    // Index
+    // 3D Forest attributes.
+    LasFile::AttributesBuffer attributes;
+    las.createAttributesBuffer(attributes, numberOfPointsInPage);
+    las.readAttributesBuffer(attributes, numberOfPointsInPage);
+    attributes.attributes[0].read(segment);
+    attributes.attributes[1].read(elevation);
+    attributes.attributes[2].read(descriptor);
+    attributes.attributes[3].read(voxel);
+
+    // Read page index.
     std::string pathIndex;
     pathIndex = IndexFileBuilder::extension(dataset.path());
     octree.read(pathIndex, node->offset);
     octree.translate(dataset.translation());
 
-    // Loaded
+    // Loaded.
     modified_ = false;
 
-    // Apply
+    // Apply transformation.
     transform(editor);
 }
 
-#define PAGE_FORMAT_COUNT 11
-
-static const size_t PAGE_FORMAT_USER[PAGE_FORMAT_COUNT] =
-    {20, 28, 26, 34, 57, 63, 30, 36, 38, 59, 67};
-
-void PageData::toPoint(uint8_t *ptr, size_t i, uint8_t fmt)
+void PageData::updatePoint(uint8_t *ptr, size_t i, uint8_t fmt)
 {
-    const double s16 = 65535.0;
-    size_t pos = PAGE_FORMAT_USER[fmt];
-
-    // Do not overwrite the other values for now
+    // Do not overwrite the other values for now:
     // - return number
     // - gps time
     // - etc.
 
-    // Classification
+    // Update classification.
     if (fmt > 5)
     {
         ptr[16] = classification[i];
     }
-
-    // Layer
-    htol32(ptr + pos, static_cast<uint32_t>(layer[i]));
-
-    // Elevation
-    htol32(ptr + pos + 4, static_cast<uint32_t>(elevation[i]));
-
-    // Custom color
-    htol16(ptr + pos + 8, static_cast<uint16_t>(customColor[3 * i + 0] * s16));
-    htol16(ptr + pos + 10, static_cast<uint16_t>(customColor[3 * i + 1] * s16));
-    htol16(ptr + pos + 12, static_cast<uint16_t>(customColor[3 * i + 2] * s16));
-
-    // Descriptor
-    htold(ptr + pos + 16, descriptor[i]);
-
-    // Value
-    htol64(ptr + pos + 24, static_cast<uint64_t>(value[i]));
+    else
+    {
+        ptr[15] = static_cast<uint8_t>(
+            static_cast<unsigned int>(classification[i]) & 0x1fU);
+    }
 }
 
-void PageData::write(Editor *editor)
+void PageData::writePage(Editor *editor)
 {
     LOG_DEBUG(<< "Write page <" << pageId_ << "> dataset <" << datasetId_
               << ">.");
 
-    const Dataset &dataset = editor->datasets().key(datasetId_);
+    Dataset &dataset = editor->datasets().key(datasetId_);
     const IndexFile::Node *node = dataset.index().at(pageId_);
-
-    LasFile las;
-    las.open(dataset.path());
-    las.readHeader();
+    LasFile &las = dataset.las();
 
     size_t pointSize = las.header.point_data_record_length;
-    uint64_t start = node->from * pointSize;
-    las.seek(start + las.header.offset_to_point_data);
-
-    size_t n = static_cast<size_t>(node->size);
     uint8_t fmt = las.header.point_data_record_format;
 
-    uint8_t *ptr = buffer_.data();
+    size_t numberOfPointsInPage = static_cast<size_t>(node->size);
+    uint8_t *ptrPointData = pointDataBuffer_.data();
 
-    for (size_t i = 0; i < n; i++)
+    for (size_t i = 0; i < numberOfPointsInPage; i++)
     {
-        toPoint(ptr + (pointSize * i), i, fmt);
+        updatePoint(ptrPointData + (pointSize * i), i, fmt);
     }
 
-    las.file().write(buffer_.data(), buffer_.size());
+    las.seekPoint(node->from);
+    las.writeBuffer(pointDataBuffer_.data(), pointDataBuffer_.size());
 
+    // Attributes.
+    LasFile::AttributesBuffer attributes;
+    las.createAttributesBuffer(attributes, numberOfPointsInPage);
+    attributes.attributes[0].write(segment);
+    attributes.attributes[1].write(elevation);
+    attributes.attributes[2].write(descriptor);
+    attributes.attributes[3].write(voxel);
+    las.writeAttributesBuffer(attributes, numberOfPointsInPage);
+
+    // Clear 'modified' flag.
     modified_ = false;
 }
 

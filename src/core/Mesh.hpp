@@ -22,8 +22,10 @@
 #ifndef MESH_HPP
 #define MESH_HPP
 
+// Include std.
 #include <vector>
 
+// Include local.
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>
 

@@ -22,12 +22,15 @@
 #ifndef SETTINGS_COLOR_WIDGET_HPP
 #define SETTINGS_COLOR_WIDGET_HPP
 
+// Include std.
 #include <vector>
 
+// Include 3D Forest.
 #include <Settings.hpp>
 class MainWindow;
 class ColorSwitchWidget;
 
+// Include Qt.
 #include <QWidget>
 class QCheckBox;
 class QComboBox;

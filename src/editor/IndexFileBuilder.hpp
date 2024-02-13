@@ -22,14 +22,18 @@
 #ifndef INDEX_FILE_BUILDER_HPP
 #define INDEX_FILE_BUILDER_HPP
 
+// Include std.
 #include <map>
 #include <string>
 #include <vector>
 
+// Include 3D Forest.
 #include <ChunkFile.hpp>
 #include <IndexFile.hpp>
 #include <LasFile.hpp>
+#include <SettingsImport.hpp>
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 
@@ -37,30 +41,12 @@
 class EXPORT_EDITOR IndexFileBuilder
 {
 public:
-    /** Index File Builder Settings. */
-    class EXPORT_EDITOR Settings
-    {
-    public:
-        bool verbose;
-
-        size_t maxSize1;
-        size_t maxSize2;
-
-        size_t maxLevel1;
-        size_t maxLevel2;
-
-        size_t bufferSize;
-
-        Settings();
-        ~Settings();
-    };
-
     IndexFileBuilder();
     ~IndexFileBuilder();
 
     void start(const std::string &outputPath,
                const std::string &inputPath,
-               const IndexFileBuilder::Settings &settings);
+               const SettingsImport &settings);
 
     void next();
 
@@ -72,94 +58,138 @@ public:
 
     static void index(const std::string &outputPath,
                       const std::string &inputPath,
-                      const IndexFileBuilder::Settings &settings);
+                      const SettingsImport &settings);
 
 protected:
-    // State
+    // Settings.
+    SettingsImport settings_;
+
     /** Index File Builder State. */
     enum State
     {
+        // Clean state. All files are open.
         STATE_NONE,
+
+        // Files are open. Output file has header. Buffers are configured.
         STATE_BEGIN,
+
+        // Prepare initial attributes.
+        STATE_CREATE_ATTRIBUTES,
+
+        // Copy VLR file data.
         STATE_COPY_VLR,
+
+        // Copy point and attribute file data.
         STATE_COPY_POINTS,
+
+        // Copy EVLR file data.
         STATE_COPY_EVLR,
+
+        // Swap input and output files.
         STATE_MOVE,
+
+        // Copy whole Las file.
         STATE_COPY,
+
+        // Copy all attributes file.
+        STATE_COPY_ATTRIBUTES,
+
+        // Prepare index.
         STATE_MAIN_BEGIN,
+
+        // Insert points to index.
         STATE_MAIN_INSERT,
+
+        // Write main index.
         STATE_MAIN_END,
+
+        // Distribute points to nodes.
         STATE_MAIN_SORT,
-        STATE_NODE_BEGIN,
+
+        // Sort points in each index page.
         STATE_NODE_INSERT,
+
+        // Write index file.
         STATE_NODE_END,
+
+        // Cleanup and create the final output file.
         STATE_END
     };
 
+    // State.
     State state_;
 
     uint64_t value_;
     uint64_t maximum_;
-    uint64_t valueIdx_;
-    uint64_t maximumIdx_;
+    uint64_t valueIndex_;
+    uint64_t maximumIndex_;
     uint64_t valueTotal_;
     uint64_t maximumTotal_;
 
-    uint64_t offsetHeaderEnd_;    // From version major.minor
-    uint64_t offsetHeaderEndOut_; // From version major.minor
-    uint64_t offsetPointsStart_;
-    uint64_t offsetPointsStartOut_;
-    uint64_t offsetPointsEnd_;
-    uint64_t offsetPointsEndOut_;
-    uint64_t sizePoints_;
-    uint64_t sizePointsOut_;
-    uint64_t sizeFile_;
-    uint64_t sizeFileOut_;
-    size_t sizePoint_;
-    size_t sizePointOut_;
-    size_t sizePointFormat_;
-
-    Box<double> boundary_;
-
-    uint32_t rgbMax_;
-    uint32_t intensityMax_;
-
-    uint64_t start_;
-    uint64_t current_;
-    uint64_t max_;
-    uint64_t step_;
-
-    IndexFile indexMain_;
-    IndexFile indexNode_;
-    std::map<const IndexFile::Node *, uint64_t> indexMainUsed_;
-    ChunkFile indexFile_;
-
+    // Las files.
     LasFile inputLas_;
     LasFile outputLas_;
+
     std::string inputPath_;
     std::string outputPath_;
     std::string readPath_;
     std::string writePath_;
 
-    // Settings
-    IndexFileBuilder::Settings settings_;
-
-    // Buffers
+    // Las file buffers.
     std::vector<uint8_t> buffer_;
     std::vector<uint8_t> bufferOut_;
+
+    // Las data.
+    Box<double> boundary_;
+    uint32_t rgbMax_;
+    uint32_t intensityMax_;
+
+    // File and point data.
+    uint64_t offsetHeaderEnd_;
+    uint64_t offsetHeaderEndOut_;
+    uint64_t offsetPointsStart_;
+    uint64_t offsetPointsStartOut_;
+    uint64_t offsetPointsEnd_;
+    uint64_t offsetPointsEndOut_;
+
+    uint64_t nPoints_;
+    uint64_t sizePoints_;
+    uint64_t sizePointsOut_;
+    uint64_t sizeFile_;
+    uint64_t sizeFileOut_;
+
+    size_t sizePoint_;
+    size_t sizePointOut_;
+
+    uint64_t copyPointsRestartIndex_;
+    uint64_t copyPointsCurrentIndex_;
+    uint64_t copyPointsSkipCount_;
+
+    // Attributes.
+    uint64_t sizeOfAttributesPerPoint_;
+    uint64_t sizeOfAttributes_;
+    LasFile::AttributesBuffer attributes_;
+    LasFile::AttributesBuffer attributesOut_;
+
+    // Index.
+    IndexFile indexMain_;
+    IndexFile indexNode_;
+    ChunkFile indexFile_;
+    std::map<const IndexFile::Node *, uint64_t> indexMainUsed_;
     std::vector<double> coords_;
 
     void openFiles();
 
     void nextState();
+    void stateCreateAttributes();
     void stateCopy();
     void stateCopyPoints();
+    void stateCopyAttributes();
     void stateMove();
     void stateMainBegin();
     void stateMainInsert();
     void stateMainEnd();
     void stateMainSort();
-    void stateNodeBegin();
     void stateNodeInsert();
     void stateNodeEnd();
     void stateEnd();

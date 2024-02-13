@@ -19,14 +19,15 @@
 
 /** @file Dataset.cpp */
 
+// Include 3D Forest.
 #include <Dataset.hpp>
 #include <Error.hpp>
 #include <File.hpp>
-#include <IndexFile.hpp>
 #include <IndexFileBuilder.hpp>
-#include <LasFile.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "Dataset"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 Dataset::Dataset() : id_(0)
@@ -64,19 +65,21 @@ void Dataset::read(size_t id,
 
     read();
 
-    if (settings.isCenterEnabled())
+    if (settings.centerPointsOnScreen)
     {
         Vector3<double> c1 = projectBoundary.getCenter();
         Vector3<double> c2 = boundaryFile_.getCenter();
         c1[2] = projectBoundary.min(2);
         c2[2] = boundaryFile_.min(2);
         translation_ = c1 - c2;
+        LOG_DEBUG(<< "Centered translation <" << translation_ << ">.");
         updateBoundary();
     }
     else
     {
         Vector3<double> s = 1.0 / scalingFile_;
         translation_ = translationFile_ * s;
+        LOG_DEBUG(<< "Scaled translation <" << translation_ << ">.");
         updateBoundary();
     }
 }
@@ -88,7 +91,7 @@ void Dataset::read(const Json &in, const std::string &projectPath)
         THROW("Data set is not JSON object");
     }
 
-    // Data set path
+    // Data set path.
     if (!in.containsString("path"))
     {
         THROW("Can't find string 'path' in JSON object");
@@ -97,16 +100,16 @@ void Dataset::read(const Json &in, const std::string &projectPath)
     pathUnresolved_ = in["path"].string();
     setPath(pathUnresolved_, projectPath);
 
-    // Date Created
+    // Date Created.
     if (in.contains("dateCreated"))
     {
         dateCreated_ = in["dateCreated"].string();
     }
 
-    // ID
+    // ID.
     id_ = in["id"].uint32();
 
-    // Label
+    // Label.
     if (in.contains("label"))
     {
         label_ = in["label"].string();
@@ -116,7 +119,7 @@ void Dataset::read(const Json &in, const std::string &projectPath)
         label_ = fileName_;
     }
 
-    // Color
+    // Color.
     if (in.contains("color"))
     {
         color_.read(in["color"]);
@@ -126,10 +129,10 @@ void Dataset::read(const Json &in, const std::string &projectPath)
         color_.set(1.0, 1.0, 1.0);
     }
 
-    // Read
+    // Read.
     read();
 
-    // Transformation
+    // Transformation.
     if (in.contains("translation"))
     {
         translation_.read(in["translation"]);
@@ -160,49 +163,58 @@ Json &Dataset::write(Json &out) const
 
 void Dataset::setPath(const std::string &path, const std::string &projectPath)
 {
-    // Data set absolute path
+    // Data set absolute path.
     path_ = File::resolvePath(path, projectPath);
 
-    // Data set file name
+    // Data set file name.
     fileName_ = File::fileName(path_);
 }
 
 void Dataset::read()
 {
-    LasFile las;
-    las.open(path_);
-    las.readHeader();
+    LOG_INFO(<< "Read dataset <" << path_ << ">.");
+
+    las_ = std::make_shared<LasFile>();
+    las_->open(path_);
+    las_->readHeader();
 
     if (dateCreated_.empty())
     {
-        dateCreated_ = las.header.dateCreated();
+        dateCreated_ = las_->header.dateCreated();
     }
 
-    translationFile_.set(las.header.x_offset,
-                         las.header.y_offset,
-                         las.header.z_offset);
+    translationFile_.set(las_->header.x_offset,
+                         las_->header.y_offset,
+                         las_->header.z_offset);
 
     translation_ = translationFile_;
 
-    scalingFile_.set(las.header.x_scale_factor,
-                     las.header.y_scale_factor,
-                     las.header.z_scale_factor);
+    LOG_DEBUG(<< "Translation <" << translation_ << ">.");
+
+    scalingFile_.set(las_->header.x_scale_factor,
+                     las_->header.y_scale_factor,
+                     las_->header.z_scale_factor);
 
     scaling_.set(1.0, 1.0, 1.0);
 
-    // Boundary
+    // Boundary.
     const std::string pathIndex = IndexFileBuilder::extension(path_);
-    index_.read(pathIndex);
+    index_ = std::make_shared<IndexFile>();
+    index_->read(pathIndex);
 
-    boundaryFile_ = index_.boundaryPoints();
+    boundaryFile_ = index_->boundaryPoints();
     updateBoundary();
 
-    nPoints_ = las.header.number_of_point_records;
+    nPoints_ = las_->header.number_of_point_records;
+
+    LOG_DEBUG(<< "Number of points <" << nPoints_ << ">.");
 }
 
 void Dataset::updateBoundary()
 {
     boundary_ = boundaryFile_;
     boundary_.translate(translation_);
-    index_.translate(translation_);
+    index_->translate(translation_);
+
+    LOG_DEBUG(<< "Boundary <" << boundary_ << ">.");
 }

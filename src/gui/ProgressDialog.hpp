@@ -22,15 +22,18 @@
 #ifndef PROGRESS_DIALOG_HPP
 #define PROGRESS_DIALOG_HPP
 
+// Include 3D Forest.
 class MainWindow;
 class ProgressActionInterface;
 
+// Include Qt.
 #include <QDialog>
 class QCloseEvent;
 class QLabel;
 class QProgressBar;
 class QPushButton;
 
+// Include local.
 #include <ExportGui.hpp>
 #include <WarningsDisable.hpp>
 

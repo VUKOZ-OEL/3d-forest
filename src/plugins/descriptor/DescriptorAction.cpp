@@ -19,10 +19,12 @@
 
 /** @file DescriptorAction.cpp */
 
+// Include 3D Forest.
 #include <DescriptorAction.hpp>
 #include <Editor.hpp>
 #include <Math.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "DescriptorAction"
 #include <Log.hpp>
 
@@ -118,7 +120,7 @@ void DescriptorAction::next()
             break;
 
         default:
-            // empty
+            // Empty.
             break;
     }
 }
@@ -140,11 +142,11 @@ void DescriptorAction::stepResetPoints()
     {
         if (includeGround_ || query_.classification() != LasFile::CLASS_GROUND)
         {
-            query_.value() = DESCRIPTOR_PROCESS;
+            query_.voxel() = DESCRIPTOR_PROCESS;
         }
         else
         {
-            query_.value() = DESCRIPTOR_IGNORE;
+            query_.voxel() = DESCRIPTOR_IGNORE;
         }
 
         query_.descriptor() = 0;
@@ -228,7 +230,7 @@ void DescriptorAction::stepNormalize()
         while (query_.next())
         {
             // If a point is in state finished, then normalize its descriptor.
-            if (query_.value() == DESCRIPTOR_FOUND)
+            if (query_.voxel() == DESCRIPTOR_FOUND)
             {
                 double descriptor = query_.descriptor();
                 descriptor = (descriptor - descriptorMinimum_) * d;
@@ -255,7 +257,7 @@ void DescriptorAction::stepNormalize()
 void DescriptorAction::computePoint()
 {
     // Do nothing when this point is not marked for processing.
-    if (query_.value() != DESCRIPTOR_PROCESS)
+    if (query_.voxel() != DESCRIPTOR_PROCESS)
     {
         return;
     }
@@ -276,7 +278,7 @@ void DescriptorAction::computePoint()
         hasDescriptor = true;
         while (queryPoint_.next())
         {
-            if (query_.value() != DESCRIPTOR_IGNORE)
+            if (query_.voxel() != DESCRIPTOR_IGNORE)
             {
                 descriptor += 1.0;
             }
@@ -336,12 +338,12 @@ void DescriptorAction::computePoint()
 
         while (queryPoint_.next())
         {
-            size_t oldValue = queryPoint_.value();
+            size_t oldValue = queryPoint_.voxel();
             if ((oldValue == DESCRIPTOR_PROCESS) ||
                 (oldValue == DESCRIPTOR_NOT_FOUND &&
                  newValue == DESCRIPTOR_FOUND))
             {
-                queryPoint_.value() = newValue;
+                queryPoint_.voxel() = newValue;
                 if (newValue == DESCRIPTOR_FOUND)
                 {
                     queryPoint_.descriptor() = descriptor;
@@ -352,7 +354,7 @@ void DescriptorAction::computePoint()
     }
     else
     {
-        query_.value() = newValue;
+        query_.voxel() = newValue;
         if (newValue == DESCRIPTOR_FOUND)
         {
             query_.descriptor() = descriptor;

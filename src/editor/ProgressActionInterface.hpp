@@ -22,8 +22,10 @@
 #ifndef PROGRESS_ACTION_INTERFACE_HPP
 #define PROGRESS_ACTION_INTERFACE_HPP
 
+// Include 3D Forest.
 #include <ProgressCounter.hpp>
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 

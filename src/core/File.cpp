@@ -19,6 +19,7 @@
 
 /** @file File.cpp */
 
+// Include std.
 #include <cassert>
 #include <climits>
 #include <cstdio>
@@ -33,11 +34,11 @@
     #include <sys/stat.h>
 
     #if !defined(S_ISREG) && defined(S_IFMT) && defined(S_IFREG)
-        #define S_ISREG(m) (((m)&S_IFMT) == S_IFREG)
+        #define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
     #endif
 
     #if !defined(S_ISDIR) && defined(S_IFMT) && defined(S_IFDIR)
-        #define S_ISDIR(m) (((m)&S_IFMT) == S_IFDIR)
+        #define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
     #endif
 
     #define S_IRUSR 0400
@@ -54,19 +55,21 @@ typedef unsigned short mode_t;
     #include <unistd.h>
 #endif /* _MSC_VER */
 
-#include <vector>
-
-#include <Error.hpp>
-#include <File.hpp>
-#include <Time.hpp>
-
-#define LOG_MODULE_NAME "File"
-#include <Log.hpp>
-
 #ifndef O_BINARY
     #define O_BINARY 0
     #define O_TEXT 0
 #endif
+
+#include <vector>
+
+// Include 3D Forest.
+#include <Error.hpp>
+#include <File.hpp>
+#include <Time.hpp>
+
+// Include local.
+#define LOG_MODULE_NAME "File"
+#include <Log.hpp>
 
 #if !defined(EXPORT_CORE_IMPORT)
 const int File::INVALID_DESCRIPTOR = -1;
@@ -94,13 +97,13 @@ File::File(const File &)
       offset_(0),
       path_()
 {
-    // TBD
+    // TBD.
 }
 
 File &File::operator=(const File &)
 {
     close();
-    // TBD
+    // TBD.
     return *this;
 }
 
@@ -126,7 +129,7 @@ const std::string &File::path() const
 
 void File::create()
 {
-    // Close
+    // Close.
     if (fd_ != INVALID_DESCRIPTOR)
     {
 #if defined(_MSC_VER)
@@ -136,7 +139,7 @@ void File::create()
 #endif
     }
 
-    // Temporary file with a unique auto-generated fileName, "wb+"
+    // Temporary file with a unique auto-generated fileName, "wb+".
     std::FILE *tmpf = nullptr;
 #if defined(_MSC_VER)
     (void)tmpfile_s(&tmpf);
@@ -188,7 +191,7 @@ void File::open(const std::string &path, const std::string &mode)
     int oflag;
     mode_t omode;
 
-    // Close
+    // Close.
     if (fd_ != INVALID_DESCRIPTOR)
     {
 #if defined(_MSC_VER)
@@ -198,7 +201,7 @@ void File::open(const std::string &path, const std::string &mode)
 #endif
     }
 
-    // Open
+    // Open.
     oflag = 0;
 
     if (mode.find("r") != std::string::npos)
@@ -781,7 +784,7 @@ std::string File::fileName(const std::string &path)
     {
         i--;
 
-        // Find last '/'
+        // Find last '/'.
         while (i > 0)
         {
             if (path[i] == '/' || path[i] == '\\')
@@ -805,7 +808,7 @@ std::string File::fileExtension(const std::string &path)
     {
         i--;
 
-        // Find last '.'
+        // Find last '.'.
         while (i > 0)
         {
             if (path[i] == '/' || path[i] == '\\')
@@ -833,7 +836,7 @@ std::string File::replaceFileName(const std::string &path,
     {
         i--;
 
-        // Find last '/'
+        // Find last '/'.
         while (i > 0)
         {
             if (path[i] == '/' || path[i] == '\\')
@@ -856,7 +859,7 @@ std::string File::replaceExtension(const std::string &path,
     {
         i--;
 
-        // Find last '.'
+        // Find last '.'.
         while (i > 0)
         {
             if (path[i] == '/' || path[i] == '\\')
@@ -884,7 +887,7 @@ std::string File::resolvePath(const std::string &path,
     rval = path;
     if (!File::isAbsolute(rval))
     {
-        // Resolve path
+        // Resolve path.
         rval = File::replaceFileName(basePath, rval);
     }
 
@@ -963,7 +966,7 @@ void File::remove(const std::string &path)
 {
     if (!File::exists(path))
     {
-        // Nothing to remove
+        // Nothing to remove.
         return;
     }
 

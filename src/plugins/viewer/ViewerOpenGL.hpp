@@ -22,11 +22,14 @@
 #ifndef VIEWER_OPENGL_HPP
 #define VIEWER_OPENGL_HPP
 
+// Include std.
 #include <vector>
 
+// Include 3D Forest.
 #include <Region.hpp>
 #include <ViewerAabb.hpp>
 
+// Include Qt.
 #include <QVector3D>
 
 /** Viewer OpenGL. */

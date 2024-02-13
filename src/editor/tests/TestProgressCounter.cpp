@@ -19,6 +19,7 @@
 
 /** @file TestProgressCounter.cpp */
 
+// Include 3D Forest.
 #include <ProgressCounter.hpp>
 #include <Test.hpp>
 

@@ -19,18 +19,22 @@
 
 /** @file RangeSliderWidget.cpp */
 
+// Include 3D Forest.
 #include <MainWindow.hpp>
 #include <RangeSliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
+// Include Qt.
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QSpinBox>
 #include <QVBoxLayout>
 
+// Include 3rd party.
 #include <ctkRangeSlider.h>
 
+// Include local.
 #define LOG_MODULE_NAME "RangeSliderWidget"
 #include <Log.hpp>
 
@@ -166,27 +170,27 @@ void RangeSliderWidget::create(RangeSliderWidget *&outputWidget,
     outputWidget->minimumValue_ = minValue;
     outputWidget->maximumValue_ = maxValue;
 
-    // Description Name
+    // Description Name.
     QLabel *label = new QLabel(text);
 
-    // Description Tool Tip
+    // Description Tool Tip.
     QLabel *help = new QLabel;
     help->setToolTip(toolTip);
     ThemeIcon helpIcon(":/gui/", "question");
     help->setPixmap(helpIcon.pixmap(MainWindow::ICON_SIZE_TEXT));
 
-    // Description Units
+    // Description Units.
     QComboBox *units = new QComboBox;
     units->addItem(unitsList);
 
-    // Description Layout
+    // Description Layout.
     QHBoxLayout *descriptionLayout = new QHBoxLayout;
     descriptionLayout->addWidget(label);
     descriptionLayout->addWidget(help);
     descriptionLayout->addStretch();
     descriptionLayout->addWidget(units);
 
-    // Value Slider
+    // Value Slider.
     outputWidget->slider_ = new ctkRangeSlider;
     ctkRangeSlider *slider = outputWidget->slider_;
     slider->setRange(min, max);
@@ -220,7 +224,7 @@ void RangeSliderWidget::create(RangeSliderWidget *&outputWidget,
                 memberIntermediateMaximumValue);
     }
 
-    // Value SpinBox
+    // Value SpinBox.
     outputWidget->minSpinBox_ = new QSpinBox;
     QSpinBox *minSpinBox = outputWidget->minSpinBox_;
     minSpinBox->setRange(min, max);
@@ -243,14 +247,14 @@ void RangeSliderWidget::create(RangeSliderWidget *&outputWidget,
             outputWidget,
             SLOT(slotIntermediateMaximumValue(int)));
 
-    // Value Layout
+    // Value Layout.
     QHBoxLayout *valueLayout = new QHBoxLayout;
     valueLayout->addWidget(new QLabel("Min"));
     valueLayout->addWidget(minSpinBox);
     valueLayout->addWidget(new QLabel("Max"));
     valueLayout->addWidget(maxSpinBox);
 
-    // Group Description and Value
+    // Group Description and Value.
     QVBoxLayout *groupLayout = new QVBoxLayout;
     groupLayout->addLayout(descriptionLayout);
     groupLayout->addWidget(slider);

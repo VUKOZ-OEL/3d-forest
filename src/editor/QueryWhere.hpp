@@ -22,12 +22,15 @@
 #ifndef QUERY_WHERE_HPP
 #define QUERY_WHERE_HPP
 
+// Include std.
 #include <unordered_set>
 
+// Include 3D Forest.
 #include <QueryFilterSet.hpp>
 #include <Range.hpp>
 #include <Region.hpp>
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 
@@ -77,9 +80,9 @@ public:
         return classificationArray_;
     }
 
-    void setLayer(const std::unordered_set<size_t> &list);
-    void setLayer(const QueryFilterSet &list);
-    const QueryFilterSet &layer() const { return layer_; }
+    void setSegment(const std::unordered_set<size_t> &list);
+    void setSegment(const QueryFilterSet &list);
+    const QueryFilterSet &segment() const { return segment_; }
 
 private:
     uint32_t filters_;
@@ -89,7 +92,7 @@ private:
     QueryFilterSet dataset_;
     QueryFilterSet classification_;
     std::vector<int> classificationArray_;
-    QueryFilterSet layer_;
+    QueryFilterSet segment_;
 
     void classificationsToArray();
 };

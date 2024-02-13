@@ -22,9 +22,11 @@
 #ifndef SPHERE_HPP
 #define SPHERE_HPP
 
+// Include 3D Forest.
 #include <Box.hpp>
 #include <Math.hpp>
 
+// Include local.
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>
 

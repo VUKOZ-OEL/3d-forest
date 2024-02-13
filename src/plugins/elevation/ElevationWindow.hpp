@@ -22,9 +22,11 @@
 #ifndef ELEVATION_WINDOW_HPP
 #define ELEVATION_WINDOW_HPP
 
+// Include 3D Forest.
 class MainWindow;
 class ElevationWidget;
 
+// Include Qt.
 #include <QDialog>
 
 /** Elevation Window. */

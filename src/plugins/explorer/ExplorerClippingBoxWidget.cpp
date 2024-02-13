@@ -19,14 +19,17 @@
 
 /** @file ExplorerClippingBoxWidget.cpp */
 
+// Include 3D Forest.
 #include <DoubleRangeSliderWidget.hpp>
 #include <ExplorerClippingBoxWidget.hpp>
 #include <MainWindow.hpp>
 
+// Include Qt.
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QVBoxLayout>
 
+// Include local.
 #define LOG_MODULE_NAME "ExplorerClippingBoxWidget"
 #include <Log.hpp>
 
@@ -35,7 +38,7 @@ ExplorerClippingBoxWidget::ExplorerClippingBoxWidget(MainWindow *mainWindow)
 {
     LOG_DEBUG(<< "Create.");
 
-    // Widgets
+    // Widgets.
     DoubleRangeSliderWidget::create(
         rangeInput_[0],
         this,
@@ -78,7 +81,7 @@ ExplorerClippingBoxWidget::ExplorerClippingBoxWidget(MainWindow *mainWindow)
         0,
         100);
 
-    // Layout
+    // Layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(rangeInput_[0]);

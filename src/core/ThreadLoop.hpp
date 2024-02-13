@@ -22,12 +22,15 @@
 #ifndef THREAD_LOOP_HPP
 #define THREAD_LOOP_HPP
 
+// Include std.
 #include <condition_variable>
 #include <mutex>
 #include <thread>
 
+// Include 3D Forest.
 class ThreadCallbackInterface;
 
+// Include local.
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>
 
@@ -62,14 +65,14 @@ protected:
         STATE_EXIT
     };
 
-    // Thread state
+    // Thread state.
     std::mutex mutex_;
     std::condition_variable condition_;
     State state_;
     bool finished_;
     bool waiting_;
 
-    // Synchronization to caller
+    // Synchronization to caller.
     std::mutex mutexCaller_;
     std::condition_variable conditionCaller_;
     bool received_;

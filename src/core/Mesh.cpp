@@ -19,10 +19,13 @@
 
 /** @file Mesh.cpp */
 
+// Include std.
 #include <cmath>
 
+// Include 3D Forest.
 #include <Mesh.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "Mesh"
 #include <Log.hpp>
 

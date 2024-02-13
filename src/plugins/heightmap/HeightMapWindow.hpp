@@ -22,9 +22,11 @@
 #ifndef HEIGHT_MAP_WINDOW_HPP
 #define HEIGHT_MAP_WINDOW_HPP
 
+// Include 3D Forest.
 class MainWindow;
 class HeightMapWidget;
 
+// Include Qt.
 #include <QDialog>
 class QCloseEvent;
 

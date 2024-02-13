@@ -19,11 +19,13 @@
 
 /** @file SegmentationAction.cpp */
 
+// Include 3D Forest.
 #include <ColorPalette.hpp>
 #include <Editor.hpp>
 #include <Math.hpp>
 #include <SegmentationAction.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "SegmentationAction"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
@@ -34,7 +36,7 @@
 #define SEGMENTATION_STEP_CREATE_VOXEL_INDEX 3
 #define SEGMENTATION_STEP_CREATE_TREES 4
 #define SEGMENTATION_STEP_CONNECT_VOXELS 5
-#define SEGMENTATION_STEP_CREATE_LAYERS 6
+#define SEGMENTATION_STEP_CREATE_SEGMENTS 6
 #define SEGMENTATION_STEP_VOXELS_TO_POINTS 7
 
 SegmentationAction::SegmentationAction(Editor *editor)
@@ -165,8 +167,8 @@ void SegmentationAction::next()
             stepConnectVoxels();
             break;
 
-        case SEGMENTATION_STEP_CREATE_LAYERS:
-            stepCreateLayers();
+        case SEGMENTATION_STEP_CREATE_SEGMENTS:
+            stepCreateSegments();
             break;
 
         case SEGMENTATION_STEP_VOXELS_TO_POINTS:
@@ -174,7 +176,7 @@ void SegmentationAction::next()
             break;
 
         default:
-            // empty
+            // Empty.
             break;
     }
 }
@@ -185,17 +187,17 @@ void SegmentationAction::stepResetPoints()
 
     if (progress_.valueStep() == 0)
     {
-        // Initialize. Remove all layers and create default main layer.
-        Layers layers;
-        layers.setDefault();
+        // Initialize. Remove all segments and create default main segment.
+        Segments segments;
+        segments.setDefault();
 
-        QueryFilterSet layersFilter;
-        layersFilter.clear();
-        layersFilter.setFilter(0, true);
-        layersFilter.setFilterEnabled(true);
+        QueryFilterSet segmentsFilter;
+        segmentsFilter.clear();
+        segmentsFilter.setFilter(0, true);
+        segmentsFilter.setFilterEnabled(true);
 
-        editor_->setLayers(layers);
-        editor_->setLayersFilter(layersFilter);
+        editor_->setSegments(segments);
+        editor_->setSegmentsFilter(segmentsFilter);
 
         // Set query to iterate all points. Active filter is ignored.
         query_.setWhere(QueryWhere());
@@ -206,10 +208,10 @@ void SegmentationAction::stepResetPoints()
     while (query_.next())
     {
         // Set point index to voxel to none.
-        query_.value() = SIZE_MAX;
+        query_.voxel() = SIZE_MAX;
 
-        // Set point layer to main layer.
-        query_.layer() = 0;
+        // Set point segment to main segment.
+        query_.segment() = 0;
 
         query_.setModified();
 
@@ -264,7 +266,7 @@ void SegmentationAction::stepPointsToVoxels()
     while (query_.next())
     {
         // If point index to voxel is none:
-        if (query_.value() == SIZE_MAX && !(query_.elevation() < elevationMin_))
+        if (query_.voxel() == SIZE_MAX && !(query_.elevation() < elevationMin_))
         {
             // Create new voxel.
             createVoxel();
@@ -371,7 +373,7 @@ void SegmentationAction::stepCreateTrees()
                 if (!(groupHeight < treeHeight_) &&
                     groupMinimum_ < elevationMax_)
                 {
-                    // Mark this group as future layer.
+                    // Mark this group as future segment.
                     groups_[groupId_] = 0;
                     // Increment group id by one.
                     groupId_++;
@@ -403,7 +405,7 @@ void SegmentationAction::stepCreateTrees()
     if (onlyTrunks_)
     {
         progress_.setMaximumStep();
-        progress_.setValueSteps(SEGMENTATION_STEP_CREATE_LAYERS);
+        progress_.setValueSteps(SEGMENTATION_STEP_CREATE_SEGMENTS);
     }
 }
 
@@ -525,46 +527,46 @@ void SegmentationAction::stepConnectVoxels()
     }
 
     progress_.setMaximumStep();
-    progress_.setValueSteps(SEGMENTATION_STEP_CREATE_LAYERS);
+    progress_.setValueSteps(SEGMENTATION_STEP_CREATE_SEGMENTS);
 }
 
-void SegmentationAction::stepCreateLayers()
+void SegmentationAction::stepCreateSegments()
 {
-    // Initialize new layers.
-    Layers layers;
-    layers.setDefault();
+    // Initialize new segments.
+    Segments segments;
+    segments.setDefault();
 
-    QueryFilterSet layersFilter;
-    layersFilter.setFilter(0, true);
-    layersFilter.setFilterEnabled(true);
+    QueryFilterSet segmentsFilter;
+    segmentsFilter.setFilter(0, true);
+    segmentsFilter.setFilterEnabled(true);
 
-    Layer layer;
-    std::string layerLabel;
-    Vector3<double> layerColor;
+    Segment segment;
+    std::string segmentLabel;
+    Vector3<double> segmentColor;
 
     // For each final group, perform the following:
-    size_t layerId = 1;
+    size_t segmentId = 1;
     for (auto &it : groups_)
     {
-        // Create new layer.
-        layerLabel = "Layer " + std::to_string(layerId);
-        layerColor =
-            ColorPalette::WindowsXp32[layerId %
+        // Create new segment.
+        segmentLabel = "Segment " + std::to_string(segmentId);
+        segmentColor =
+            ColorPalette::WindowsXp32[segmentId %
                                       ColorPalette::WindowsXp32.size()];
-        layer.set(layerId, layerLabel, layerColor);
+        segment.set(segmentId, segmentLabel, segmentColor);
 
-        // Append new layer to layers.
-        layers.push_back(layer);
-        layersFilter.setFilter(layerId, true);
+        // Append new segment to segments.
+        segments.push_back(segment);
+        segmentsFilter.setFilter(segmentId, true);
 
-        // Set layer id to this group.
-        it.second = layerId;
-        layerId++;
+        // Set segment id to this group.
+        it.second = segmentId;
+        segmentId++;
     }
 
-    // Set new layers to editor.
-    editor_->setLayers(layers);
-    editor_->setLayersFilter(layersFilter);
+    // Set new segments to editor.
+    editor_->setSegments(segments);
+    editor_->setSegmentsFilter(segmentsFilter);
 
     progress_.setMaximumStep(nPointsInFilter_, 1000);
     progress_.setValueSteps(SEGMENTATION_STEP_VOXELS_TO_POINTS);
@@ -578,15 +580,15 @@ void SegmentationAction::stepVoxelsToPoints()
     while (query_.next())
     {
         // If point belongs to some voxel:
-        size_t pointIndex = query_.value();
+        size_t pointIndex = query_.voxel();
         if (pointIndex < voxels_.size())
         {
-            // If voxel's group belongs to a layer:
+            // If voxel's group belongs to a segment:
             size_t groupIndex = voxels_[pointIndex].group;
             if (groups_.count(groupIndex) > 0)
             {
-                // Set point layer to the same value as voxel layer.
-                query_.layer() = groups_.at(groupIndex);
+                // Set point segment to the same value as voxel segment.
+                query_.segment() = groups_.at(groupIndex);
                 query_.setModified();
             }
         }
@@ -647,7 +649,7 @@ void SegmentationAction::createVoxel()
 
         n++;
 
-        queryPoint_.value() = idx;
+        queryPoint_.voxel() = idx;
         queryPoint_.setModified();
     }
 

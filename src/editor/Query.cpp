@@ -19,12 +19,15 @@
 
 /** @file Query.cpp */
 
+// Include std.
 #include <queue>
 
+// Include 3D Forest.
 #include <Editor.hpp>
 #include <Error.hpp>
 #include <Query.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "Query"
 #include <Log.hpp>
 
@@ -172,11 +175,10 @@ bool Query::nextPage()
             gpsTime_ = page_->gpsTime;
             color_ = page_->color;
 
-            layer_ = page_->layer;
+            segment_ = page_->segment;
             elevation_ = page_->elevation;
-            customColor_ = page_->customColor;
             descriptor_ = page_->descriptor;
-            value_ = page_->value;
+            voxel_ = page_->voxel;
 
             selection_ = page_->selection.data();
 
@@ -622,7 +624,7 @@ std::shared_ptr<Page> Query::read(size_t dataset, size_t index)
     auto search = cache_.find(nk);
     if (search != cache_.end())
     {
-        // Move found page to top
+        // Move found page to top.
         for (size_t i = 0; i < lru_.size(); i++)
         {
             if (lru_[i] == search->second)
@@ -645,20 +647,20 @@ std::shared_ptr<Page> Query::read(size_t dataset, size_t index)
     }
     else
     {
-        // LRU
+        // LRU.
         if (lru_.size() > 0)
         {
             size_t idx;
 
             if (lru_.size() < cacheSizeMax_)
             {
-                // Make room for new page
+                // Make room for new page.
                 lru_.resize(lru_.size() + 1);
                 idx = lru_.size() - 1;
             }
             else
             {
-                // Drop oldest page
+                // Drop oldest page.
                 idx = lru_.size() - 1;
                 if (lru_[idx]->isModified())
                 {
@@ -668,7 +670,7 @@ std::shared_ptr<Page> Query::read(size_t dataset, size_t index)
                 cache_.erase(nkrm);
             }
 
-            // New page is on top
+            // New page is on top.
             for (size_t j = idx; j > 0; j--)
             {
                 lru_[j] = lru_[j - 1];
@@ -676,7 +678,7 @@ std::shared_ptr<Page> Query::read(size_t dataset, size_t index)
         }
         else
         {
-            // First page is on top
+            // First page is on top.
             lru_.resize(1);
         }
 
@@ -692,7 +694,7 @@ std::shared_ptr<Page> Query::read(size_t dataset, size_t index)
         }
         catch (...)
         {
-            // error
+            // Error.
         }
 
         return result;

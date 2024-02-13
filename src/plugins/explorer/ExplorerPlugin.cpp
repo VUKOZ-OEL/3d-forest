@@ -19,11 +19,13 @@
 
 /** @file ExplorerPlugin.cpp */
 
+// Include 3D Forest.
 #include <ExplorerPlugin.hpp>
 #include <ExplorerWindow.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "ExplorerPlugin"
 #include <Log.hpp>
 

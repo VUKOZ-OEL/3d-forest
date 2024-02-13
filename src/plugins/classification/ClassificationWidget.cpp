@@ -19,6 +19,7 @@
 
 /** @file ClassificationWidget.cpp */
 
+// Include 3D Forest.
 #include <ClassificationWidget.hpp>
 #include <InfoDialog.hpp>
 #include <MainWindow.hpp>
@@ -26,12 +27,14 @@
 #include <SliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
+// Include Qt.
 #include <QCheckBox>
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QTextEdit>
 #include <QVBoxLayout>
 
+// Include local.
 #define LOG_MODULE_NAME "ClassificationWidget"
 #include <Log.hpp>
 
@@ -45,7 +48,7 @@ ClassificationWidget::ClassificationWidget(MainWindow *mainWindow)
 {
     LOG_DEBUG(<< "Create.");
 
-    // Widgets
+    // Widgets.
     SliderWidget::create(voxelSlider_,
                          this,
                          nullptr,
@@ -90,7 +93,7 @@ ClassificationWidget::ClassificationWidget(MainWindow *mainWindow)
     cleanAllCheckBox_->setText(tr("Clean all classifications at start"));
     cleanAllCheckBox_->setChecked(false);
 
-    // Settings layout
+    // Settings layout.
     QVBoxLayout *settingsLayout = new QVBoxLayout;
     settingsLayout->addWidget(voxelSlider_);
     settingsLayout->addWidget(radiusSlider_);
@@ -99,7 +102,7 @@ ClassificationWidget::ClassificationWidget(MainWindow *mainWindow)
     settingsLayout->addWidget(cleanAllCheckBox_);
     settingsLayout->addStretch();
 
-    // Buttons
+    // Buttons.
     helpButton_ = new QPushButton(tr("Help"));
     helpButton_->setIcon(THEME_ICON("question"));
     connect(helpButton_, SIGNAL(clicked()), this, SLOT(slotHelp()));
@@ -109,20 +112,20 @@ ClassificationWidget::ClassificationWidget(MainWindow *mainWindow)
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
 
-    // Buttons layout
+    // Buttons layout.
     QHBoxLayout *buttonsLayout = new QHBoxLayout;
     buttonsLayout->addWidget(helpButton_);
     buttonsLayout->addStretch();
     buttonsLayout->addWidget(applyButton_);
 
-    // Main layout
+    // Main layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(settingsLayout);
     mainLayout->addSpacing(10);
     mainLayout->addLayout(buttonsLayout);
     mainLayout->addStretch();
 
-    // Widget
+    // Widget.
     setLayout(mainLayout);
 }
 

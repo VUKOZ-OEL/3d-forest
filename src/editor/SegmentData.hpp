@@ -17,14 +17,36 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file LayerData.cpp */
+/** @file SegmentData.hpp */
 
-#include <Error.hpp>
-#include <LayerData.hpp>
+#ifndef SEGMENT_DATA_HPP
+#define SEGMENT_DATA_HPP
 
-#define LOG_MODULE_NAME "LayerData"
-#include <Log.hpp>
+// Include 3D Forest.
+#include <Json.hpp>
+#include <Vector3.hpp>
 
-LayerData::LayerData() : position_(), radius_(0)
+// Include local.
+#include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
+
+/** SegmentData. */
+class EXPORT_EDITOR SegmentData
 {
-}
+public:
+    SegmentData();
+
+    const Vector3<double> &position() const { return position_; }
+    void setPosition(const Vector3<double> &p) { position_ = p; };
+
+    double radius() const { return radius_; }
+    void setRadius(double r) { radius_ = r; }
+
+protected:
+    Vector3<double> position_;
+    double radius_;
+};
+
+#include <WarningsEnable.hpp>
+
+#endif /* SEGMENT_DATA_HPP */

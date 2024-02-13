@@ -22,11 +22,14 @@
 #ifndef IMPORT_FILE_PLUGIN_HPP
 #define IMPORT_FILE_PLUGIN_HPP
 
+// Include 3D Forest.
 class MainWindow;
 
+// Include Qt.
 #include <QObject>
 class QAction;
 
+// Include local.
 #include <ExportGui.hpp>
 
 /** Import File Plugin. */

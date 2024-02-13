@@ -22,9 +22,12 @@
 #ifndef UTIL_HPP
 #define UTIL_HPP
 
+// Include std.
 #include <climits>
+#include <limits>
 #include <string>
 
+// Include local.
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>
 

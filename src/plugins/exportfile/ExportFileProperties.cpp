@@ -19,8 +19,10 @@
 
 /** @file ExportFileProperties.cpp */
 
+// Include 3D Forest.
 #include <ExportFileProperties.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "ExportFileProperties"
 #include <Log.hpp>
 

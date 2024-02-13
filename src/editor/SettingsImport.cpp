@@ -19,21 +19,23 @@
 
 /** @file SettingsImport.cpp */
 
+// Include 3D Forest.
 #include <SettingsImport.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "SettingsImport"
 #include <Log.hpp>
 
-SettingsImport::SettingsImport() : centerEnabled_(false)
+SettingsImport::SettingsImport()
+    : convertToVersion1Dot4(false),
+      centerPointsOnScreen(false),
+      randomizePoints(true),
+      copyExtraBytes(true),
+      terminalOutput(false),
+      maxIndexLevel1(0),
+      maxIndexLevel1Size(100 * 1000),
+      maxIndexLevel2(5),
+      maxIndexLevel2Size(32),
+      bufferSize(5 * 1024 * 1024)
 {
-}
-
-bool SettingsImport::isCenterEnabled() const
-{
-    return centerEnabled_;
-}
-
-void SettingsImport::setCenterEnabled(bool b)
-{
-    centerEnabled_ = b;
 }

@@ -22,9 +22,11 @@
 #ifndef CLASSIFICATION_WINDOW_HPP
 #define CLASSIFICATION_WINDOW_HPP
 
+// Include 3D Forest.
 class MainWindow;
 class ClassificationWidget;
 
+// Include Qt.
 #include <QDialog>
 
 /** Classification Window. */

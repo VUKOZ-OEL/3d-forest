@@ -19,9 +19,11 @@
 
 /** @file ToolTabWidget.cpp */
 
+// Include 3D Forest.
 #include <MainWindow.hpp>
 #include <ToolTabWidget.hpp>
 
+// Include Qt.
 #include <QApplication>
 #include <QFrame>
 #include <QHBoxLayout>
@@ -30,8 +32,10 @@
 #include <QToolButton>
 #include <QVBoxLayout>
 
+// Include 3rd party.
 #include <flowlayout.h>
 
+// Include local.
 #define LOG_MODULE_NAME "ToolTabWidget"
 #include <Log.hpp>
 
@@ -59,7 +63,7 @@ void ToolTabWidget::addTab(QWidget *widget,
         toolTipCopy = label;
     }
 
-    // Create tool button
+    // Create tool button.
     QToolButton *toolButton;
 
     MainWindow::createToolButton(&toolButton,
@@ -72,14 +76,14 @@ void ToolTabWidget::addTab(QWidget *widget,
     toolButton->setAutoRaise(false);
     toolButton->setCheckable(true);
 
-    // Register new tab
+    // Register new tab.
     toolButtonList_.push_back(toolButton);
     tabList_.push_back(widget);
 
-    // Insert new tab
+    // Insert new tab.
     if (!toolBox_)
     {
-        // Create widgets
+        // Create widgets.
         toolBox_ = new FlowLayout(1, 1, 1);
         toolBox_->addWidget(toolButton);
         toolBox_->setContentsMargins(2, 2, 2, 2);
@@ -96,7 +100,7 @@ void ToolTabWidget::addTab(QWidget *widget,
         toolBoxFrame->setPalette(toolBoxPalette);
         toolBoxFrame->setAutoFillBackground(true);
 
-        // Title
+        // Title.
         icon_ = new QLabel;
         icon_->setPixmap(icon.pixmap(icon.actualSize(QSize(16, 16))));
         icon_->setContentsMargins(1, 1, 1, 1);
@@ -125,7 +129,7 @@ void ToolTabWidget::addTab(QWidget *widget,
         titleFrame->setContentsMargins(1, 1, 1, 1);
         titleFrame->setLayout(titleBar);
 
-        // The first tab is on
+        // The first tab is on.
         if (showTextBesideIcon_)
         {
             toolButton->setChecked(false);
@@ -137,7 +141,7 @@ void ToolTabWidget::addTab(QWidget *widget,
         }
         widget->setVisible(true);
 
-        // Create layout
+        // Create layout.
         mainLayout_ = new QVBoxLayout;
         mainLayout_->setContentsMargins(1, 1, 1, 1);
         mainLayout_->setSpacing(0);
@@ -148,11 +152,11 @@ void ToolTabWidget::addTab(QWidget *widget,
     }
     else
     {
-        // The other tabs are off
+        // The other tabs are off.
         toolButton->setChecked(false);
         widget->setVisible(false);
 
-        // Extend layout
+        // Extend layout.
         toolBox_->addWidget(toolButton);
         mainLayout_->addWidget(widget);
     }

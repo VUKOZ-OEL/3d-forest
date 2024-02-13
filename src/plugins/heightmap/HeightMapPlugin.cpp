@@ -19,11 +19,13 @@
 
 /** @file HeightMapPlugin.cpp */
 
+// Include 3D Forest.
 #include <HeightMapPlugin.hpp>
 #include <HeightMapWindow.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "HeightMapPlugin"
 #include <Log.hpp>
 
@@ -53,7 +55,7 @@ void HeightMapPlugin::initialize(MainWindow *mainWindow)
 
 void HeightMapPlugin::slotPlugin()
 {
-    // Create GUI only when this plugin is used for the first time
+    // Create GUI only when this plugin is used for the first time.
     if (!pluginWindow_)
     {
         pluginWindow_ = new HeightMapWindow(mainWindow_, &modifier_);

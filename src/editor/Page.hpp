@@ -22,10 +22,12 @@
 #ifndef PAGE_HPP
 #define PAGE_HPP
 
+// Include 3D Forest.
 #include <PageData.hpp>
 class Editor;
 class Query;
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 
@@ -33,7 +35,7 @@ class Query;
 class EXPORT_EDITOR Page
 {
 public:
-    /** @name Point Data */
+    /** @name LAS Point Data. */
     /**@{*/
     /** Point coordinates.
         The data are stored as [x0, y0, z0, x1, y1, ...].
@@ -75,25 +77,18 @@ public:
     double *color;
     /**@}*/
 
-    /** @name Point Data Extra Bytes */
+    /** @name 3D Forest Attributes. */
     /**@{*/
-    /** Layer identification numbers.
+    /** Segment identification numbers.
         This value is stored in Point Data Record extra bytes.
     */
-    size_t *layer;
+    size_t *segment;
 
     /** Point elevation above ground.
         The data are stored as [e0, e1, ...].
         This value is stored in Point Data Record extra bytes.
      */
     double *elevation;
-
-    /** Red, Green, and Blue custom colors.
-        The data are stored as [r0, g0, b0, r1, g1, ...].
-        Color values are in range from 0 (zero intensity) to 1 (full intensity).
-        This value is stored in Point Data Record extra bytes.
-    */
-    double *customColor;
 
     /** Descriptor values.
         The data are stored as [d0, d1, ...].
@@ -102,13 +97,13 @@ public:
     */
     double *descriptor;
 
-    /** User values.
+    /** Voxel values.
         This value is stored in Point Data Record extra bytes.
     */
-    size_t *value;
+    size_t *voxel;
     /**@}*/
 
-    /** @name Rendering */
+    /** @name Rendering Data. */
     /**@{*/
     /** Rendering Point Coordinates.
         The data are stored as [x0, y0, z0, x1, y1, ...].
@@ -139,7 +134,6 @@ public:
     void setModified();
     bool isModified() const;
 
-    // Individual states
     /** Page State. */
     enum State
     {
@@ -157,21 +151,21 @@ public:
     static std::string stateToString(Page::State state);
 
 private:
-    // Parent
+    // Parent.
     Editor *editor_;
     Query *query_;
 
-    // Identifier
+    // Identifier.
     uint32_t datasetId_;
     uint32_t pageId_;
 
-    // State
+    // State.
     Page::State state_;
 
-    // Data
+    // Data.
     std::shared_ptr<PageData> pageData_;
 
-    // Buffer
+    // Buffer.
     std::vector<IndexFile::Selection> selectedNodes_;
 
     void resize(size_t n);
@@ -186,7 +180,7 @@ private:
     void queryWhereElevation();
     void queryWhereDescriptor();
     void queryWhereClassification();
-    void queryWhereLayer();
+    void queryWhereSegment();
 
     void runModifiers();
     void runColorModifier();

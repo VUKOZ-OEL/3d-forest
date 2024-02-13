@@ -19,13 +19,16 @@
 
 /** @file ColorSwitchWidget.cpp */
 
+// Include 3D Forest.
 #include <ColorSwitchWidget.hpp>
 #include <MainWindow.hpp>
 
+// Include Qt.
 #include <QColorDialog>
 #include <QMouseEvent>
 #include <QPainter>
 
+// Include local.
 #define LOG_MODULE_NAME "ColorSwitchWidget"
 #include <Log.hpp>
 
@@ -76,7 +79,7 @@ void ColorSwitchWidget::paintEvent(QPaintEvent *)
 
     painter.setPen(QColor(0, 0, 0));
 
-    // Foreground/Background color
+    // Foreground/Background color.
     int w = (defaultWidth_ / 2) + 2;
     int h = (defaultHeight_ / 2) + 2;
     int x1 = 1;
@@ -90,7 +93,7 @@ void ColorSwitchWidget::paintEvent(QPaintEvent *)
     painter.fillRect(x1, y1, w, h, foregroundColor_);
     painter.drawRect(x1, y1, w, h);
 
-    // Default colors
+    // Default colors.
     w = 5;
     h = 5;
     x1 = 1;
@@ -104,7 +107,7 @@ void ColorSwitchWidget::paintEvent(QPaintEvent *)
     painter.fillRect(x1, y1, w, h, foregroundColorDefault_);
     painter.drawRect(x1, y1, w, h);
 
-    // Swap
+    // Swap.
     x1 = defaultWidth_ - (w + 1);
     y1 = 1;
 
@@ -127,7 +130,7 @@ void ColorSwitchWidget::mousePressEvent(QMouseEvent *event)
 
     if (x < w && y < h)
     {
-        // Foreground
+        // Foreground.
         if (colorDialog(foregroundColor_))
         {
             emit colorChanged();
@@ -135,7 +138,7 @@ void ColorSwitchWidget::mousePressEvent(QMouseEvent *event)
     }
     else if (x >= x2 && y >= y2)
     {
-        // Background
+        // Background.
         if (colorDialog(backgroundColor_))
         {
             emit colorChanged();
@@ -143,7 +146,7 @@ void ColorSwitchWidget::mousePressEvent(QMouseEvent *event)
     }
     else if (x < x2 && y >= y2)
     {
-        // Default
+        // Default.
         foregroundColor_ = foregroundColorDefault_;
         backgroundColor_ = backgroundColorDefault_;
         repaint();
@@ -151,7 +154,7 @@ void ColorSwitchWidget::mousePressEvent(QMouseEvent *event)
     }
     else
     {
-        // Swap
+        // Swap.
         QColor tmp = foregroundColor_;
         foregroundColor_ = backgroundColor_;
         backgroundColor_ = tmp;

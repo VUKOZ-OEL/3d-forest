@@ -22,10 +22,12 @@
 #ifndef CYLINDER_HPP
 #define CYLINDER_HPP
 
+// Include 3D Forest.
 #include <Box.hpp>
 #include <Geometry.hpp>
 #include <Math.hpp>
 
+// Include local.
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>
 

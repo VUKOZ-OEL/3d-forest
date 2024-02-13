@@ -19,6 +19,7 @@
 
 /** @file Error.cpp */
 
+// Include std.
 #include <cerrno>
 #include <cstdio>
 
@@ -28,8 +29,10 @@
     #include <windows.h>
 #endif
 
+// Include 3D Forest.
 #include <Error.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "Error"
 #include <Log.hpp>
 

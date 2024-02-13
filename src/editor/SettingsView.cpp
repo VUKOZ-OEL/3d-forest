@@ -19,8 +19,10 @@
 
 /** @file SettingsView.cpp */
 
+// Include 3D Forest.
 #include <SettingsView.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "SettingsView"
 #include <Log.hpp>
 
@@ -35,9 +37,8 @@ SettingsView::SettingsView()
                           "Return Number",
                           "Number of Returns",
                           "Classification",
-                          "Layer",
+                          "Segment",
                           "Elevation",
-                          "Custom Color",
                           "Descriptor"};
 
     colorSourceEnabled_.resize(colorSourceString_.size());

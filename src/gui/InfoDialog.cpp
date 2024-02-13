@@ -19,12 +19,15 @@
 
 /** @file InfoDialog.cpp */
 
+// Include 3D Forest.
 #include <InfoDialog.hpp>
 
+// Include Qt.
 #include <QPushButton>
 #include <QTextEdit>
 #include <QVBoxLayout>
 
+// Include local.
 #define LOG_MODULE_NAME "InfoDialog"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
@@ -37,12 +40,12 @@ InfoDialog::InfoDialog(QWidget *parent, int w, int h)
 {
     LOG_DEBUG(<< "Create.");
 
-    // Text
+    // Text.
     textEdit_ = new QTextEdit;
     textEdit_->setFocusPolicy(Qt::NoFocus);
     textEdit_->setReadOnly(true);
 
-    // Buttons
+    // Buttons.
     closeButton_ = new QPushButton(tr("Close"));
     connect(closeButton_, SIGNAL(clicked()), this, SLOT(slotClose()));
 
@@ -50,7 +53,7 @@ InfoDialog::InfoDialog(QWidget *parent, int w, int h)
     buttonsLayout->addStretch();
     buttonsLayout->addWidget(closeButton_);
 
-    // Dialog layout
+    // Dialog layout.
     QVBoxLayout *dialogLayout = new QVBoxLayout;
     dialogLayout->addWidget(textEdit_);
     dialogLayout->addSpacing(10);

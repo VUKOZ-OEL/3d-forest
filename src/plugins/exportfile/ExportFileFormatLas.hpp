@@ -22,6 +22,7 @@
 #ifndef EXPORT_FILE_FORMAT_LAS_HPP
 #define EXPORT_FILE_FORMAT_LAS_HPP
 
+// Include 3D Forest.
 #include <ExportFileFormatInterface.hpp>
 #include <LasFile.hpp>
 #include <Query.hpp>
@@ -33,7 +34,7 @@ public:
     ExportFileFormatLas();
     virtual ~ExportFileFormatLas();
 
-    virtual bool isOpen() { return file_.file().isOpen(); }
+    virtual bool isOpen() { return file_.isOpen(); }
     virtual void create(const std::string &path);
     virtual void write(Query &query);
     virtual void close();

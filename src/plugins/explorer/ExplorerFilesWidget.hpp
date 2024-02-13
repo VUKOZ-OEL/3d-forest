@@ -22,11 +22,13 @@
 #ifndef EXPLORER_FILES_WIDGET_HPP
 #define EXPLORER_FILES_WIDGET_HPP
 
+// Include 3D Forest.
 #include <Datasets.hpp>
 #include <Editor.hpp>
 #include <ExplorerWidgetInterface.hpp>
 class MainWindow;
 
+// Include Qt.
 class QToolButton;
 class QTreeWidget;
 class QTreeWidgetItem;

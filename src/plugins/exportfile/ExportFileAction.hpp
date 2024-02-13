@@ -22,6 +22,7 @@
 #ifndef EXPORT_FILE_ACTION_HPP
 #define EXPORT_FILE_ACTION_HPP
 
+// Include 3D Forest.
 #include <ExportFileFormatInterface.hpp>
 #include <ExportFileProperties.hpp>
 #include <LasFile.hpp>

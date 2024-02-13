@@ -19,12 +19,16 @@
 
 /** @file exampleQuery.cpp @brief Query example. */
 
+// Include std.
 #include <cstring>
 
+// Include 3D Forest.
 #include <Editor.hpp>
 #include <Error.hpp>
+#include <IndexFileBuilder.hpp>
 #include <Time.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "exampleQuery"
 #include <Log.hpp>
 
@@ -39,45 +43,45 @@ static void exampleQuery()
 
     Query query(&db);
 
-    // Set all 3 points to layer 0
+    // Set all 3 points to segment 0
     // Output:
-    //     0, 0, 0 Layer 0 Start
-    //     1, 0, 0 Layer 0 Start
-    //     0, 1, 0 Layer 0 Start
+    //     0, 0, 0 Segment 0 Start
+    //     1, 0, 0 Segment 0 Start
+    //     0, 1, 0 Segment 0 Start
     query.where().setBox(db.clipBoundary());
     query.exec();
     while (query.next())
     {
-        query.layer() = 0;   // Update
+        query.segment() = 0; // Update
         query.setModified(); // Mark update
         std::cout << query.x() << ", " << query.y() << ", " << query.z()
-                  << " Layer " << query.layer() << " Start" << std::endl;
+                  << " Segment " << query.segment() << " Start" << std::endl;
     }
 
-    // Set first point to layer 1 by using extra region select
+    // Set first point to segment 1 by using extra region select
     // Output:
-    //     0, 0, 0 Layer 1 A
+    //     0, 0, 0 Segment 1 A
     query.where().setBox(Box<double>(-0.5, -0.5, -0.5, 0.5, 0.5, 0.5));
     query.exec();
     while (query.next())
     {
-        query.layer() = 1;   // Update
+        query.segment() = 1; // Update
         query.setModified(); // Mark update
         std::cout << query.x() << ", " << query.y() << ", " << query.z()
-                  << " Layer " << query.layer() << " A" << std::endl;
+                  << " Segment " << query.segment() << " A" << std::endl;
     }
 
-    // Set second point to layer 2 by using extra region select
+    // Set second point to segment 2 by using extra region select
     // Output:
-    //     1, 0, 0 Layer 2 B
+    //     1, 0, 0 Segment 2 B
     query.where().setBox(Box<double>(0.5, -0.5, -0.5, 1.5, 0.5, 0.5));
     query.exec();
     while (query.next())
     {
-        query.layer() = 2;   // Update
+        query.segment() = 2; // Update
         query.setModified(); // Mark update
         std::cout << query.x() << ", " << query.y() << ", " << query.z()
-                  << " Layer " << query.layer() << " B" << std::endl;
+                  << " Segment " << query.segment() << " B" << std::endl;
     }
 
     // Skip the third point
@@ -85,17 +89,17 @@ static void exampleQuery()
     // Flush query cache
     query.flush();
 
-    // Print layers of all points
+    // Print segments of all points
     // Output:
-    //     0, 0, 0 Layer 1 End
-    //     1, 0, 0 Layer 2 End
-    //     0, 1, 0 Layer 0 End
+    //     0, 0, 0 Segment 1 End
+    //     1, 0, 0 Segment 2 End
+    //     0, 1, 0 Segment 0 End
     query.where().setBox(db.clipBoundary());
     query.exec();
     while (query.next())
     {
         std::cout << query.x() << ", " << query.y() << ", " << query.z()
-                  << " Layer " << query.layer() << " End" << std::endl;
+                  << " Segment " << query.segment() << " End" << std::endl;
     }
 }
 
@@ -122,8 +126,8 @@ static void createDataSet()
     LasFile::create(DATA_PATH, points, {SCALE, SCALE, SCALE}, {0, 0, 0});
 
     // Index
-    IndexFileBuilder::Settings settings;
-    settings.maxSize1 = 1;
+    SettingsImport settings;
+    settings.maxIndexLevel1Size = 1;
 
     IndexFileBuilder::index(DATA_PATH, DATA_PATH, settings);
 }

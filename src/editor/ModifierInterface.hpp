@@ -22,8 +22,10 @@
 #ifndef MODIFIER_INTERFACE_HPP
 #define MODIFIER_INTERFACE_HPP
 
+// Include 3D Forest.
 class Page;
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 

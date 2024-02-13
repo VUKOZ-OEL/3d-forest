@@ -22,10 +22,13 @@
 #ifndef GEOMETRY_HPP
 #define GEOMETRY_HPP
 
+// Include std.
 #include <cmath>
 
+// Include 3D Forest.
 #include <Vector3.hpp>
 
+// Include local.
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>
 

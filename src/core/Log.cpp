@@ -19,8 +19,10 @@
 
 /** @file Log.cpp */
 
+// Include 3D Forest.
 #include <Time.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "Log"
 #include <Log.hpp>
 
@@ -120,7 +122,7 @@ void LogThread::run()
 
     while (1)
     {
-        // sync start
+        // Sync start.
         mutexlock.lock();
 
         while (running_ && messageQueueHead_ == messageQueueTail_ &&
@@ -174,7 +176,7 @@ void LogThread::run()
         }
 
         mutexlock.unlock();
-        // sync end
+        // Sync end.
 
         try
         {
@@ -189,7 +191,7 @@ void LogThread::run()
         }
         catch (...)
         {
-            // empty
+            // Empty.
         }
 
         if (!running)
@@ -239,7 +241,7 @@ void LoggerStdout::println(const LogMessage &message)
 
 void LoggerStdout::flush()
 {
-    // empty
+    // Empty.
 }
 
 LoggerFile::LoggerFile(const std::string &fileName)
@@ -259,5 +261,5 @@ void LoggerFile::println(const LogMessage &message)
 
 void LoggerFile::flush()
 {
-    // empty
+    // Empty.
 }

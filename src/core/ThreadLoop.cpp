@@ -19,9 +19,11 @@
 
 /** @file ThreadLoop.cpp */
 
+// Include 3D Forest.
 #include <ThreadCallbackInterface.hpp>
 #include <ThreadLoop.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "ThreadLoop"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>

@@ -22,11 +22,13 @@
 #ifndef EXPLORER_CLASSIFICATIONS_WIDGET_HPP
 #define EXPLORER_CLASSIFICATIONS_WIDGET_HPP
 
+// Include 3D Forest.
 #include <Classifications.hpp>
 #include <Editor.hpp>
 #include <ExplorerWidgetInterface.hpp>
 class MainWindow;
 
+// Include Qt.
 class QToolButton;
 class QTreeWidget;
 class QTreeWidgetItem;

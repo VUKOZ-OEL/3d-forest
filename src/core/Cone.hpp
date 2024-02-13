@@ -22,9 +22,11 @@
 #ifndef CONE_HPP
 #define CONE_HPP
 
+// Include 3D Forest.
 #include <Box.hpp>
 #include <Math.hpp>
 
+// Include local.
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>
 

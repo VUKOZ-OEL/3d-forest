@@ -22,9 +22,11 @@
 #ifndef HEIGHT_MAP_WIDGET_HPP
 #define HEIGHT_MAP_WIDGET_HPP
 
+// Include 3D Forest.
 class MainWindow;
 class HeightMapModifier;
 
+// Include Qt.
 #include <QWidget>
 class QSpinBox;
 class QComboBox;

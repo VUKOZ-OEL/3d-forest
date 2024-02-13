@@ -17,34 +17,36 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ExplorerLayersWidget.hpp */
+/** @file ExplorerSegmentsWidget.hpp */
 
-#ifndef EXPLORER_LAYERS_WIDGET_HPP
-#define EXPLORER_LAYERS_WIDGET_HPP
+#ifndef EXPLORER_SEGMENTS_WIDGET_HPP
+#define EXPLORER_SEGMENTS_WIDGET_HPP
 
+// Include 3D Forest.
 #include <Editor.hpp>
 #include <ExplorerWidgetInterface.hpp>
-#include <Layers.hpp>
+#include <Segments.hpp>
 class MainWindow;
 
+// Include Qt.
 class QToolButton;
 class QTreeWidget;
 class QTreeWidgetItem;
 
-/** Explorer Layers Widget. */
-class ExplorerLayersWidget : public ExplorerWidgetInterface
+/** Explorer Segments Widget. */
+class ExplorerSegmentsWidget : public ExplorerWidgetInterface
 {
     Q_OBJECT
 
 public:
-    ExplorerLayersWidget(MainWindow *mainWindow,
-                         const QIcon &icon,
-                         const QString &text);
+    ExplorerSegmentsWidget(MainWindow *mainWindow,
+                           const QIcon &icon,
+                           const QString &text);
 
     virtual bool hasColorSource() const { return true; }
     virtual SettingsView::ColorSource colorSource() const
     {
-        return SettingsView::COLOR_SOURCE_LAYER;
+        return SettingsView::COLOR_SOURCE_SEGMENT;
     }
 
     virtual bool hasFilter() const { return true; }
@@ -66,7 +68,7 @@ public slots:
     void slotItemChanged(QTreeWidgetItem *item, int column);
 
 protected:
-    /** Explorer Layers Column. */
+    /** Explorer Segments Column. */
     enum Column
     {
         COLUMN_CHECKED,
@@ -83,11 +85,11 @@ protected:
     QToolButton *selectAllButton_;
     QToolButton *selectInvertButton_;
     QToolButton *selectNoneButton_;
-    Layers layers_;
+    Segments segments_;
     QueryFilterSet filter_;
     bool updatesEnabled_;
 
-    void setLayers(const Layers &layers, const QueryFilterSet &filter);
+    void setSegments(const Segments &segments, const QueryFilterSet &filter);
     void dataChanged();
     void filterChanged();
 
@@ -99,4 +101,4 @@ protected:
     void addTreeItem(size_t index);
 };
 
-#endif /* EXPLORER_LAYERS_WIDGET_HPP */
+#endif /* EXPLORER_SEGMENTS_WIDGET_HPP */

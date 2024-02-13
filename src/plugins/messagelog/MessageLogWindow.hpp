@@ -22,10 +22,12 @@
 #ifndef MESSAGE_LOG_WINDOW_HPP
 #define MESSAGE_LOG_WINDOW_HPP
 
+// Include 3D Forest.
 #include <File.hpp>
 #include <Log.hpp>
 class MainWindow;
 
+// Include Qt.
 #include <QDockWidget>
 class QTextEdit;
 

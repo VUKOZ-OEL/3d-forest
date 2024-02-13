@@ -22,13 +22,16 @@
 #ifndef HEIGHT_MAP_MODIFIER_HPP
 #define HEIGHT_MAP_MODIFIER_HPP
 
+// Include std.
 #include <vector>
 
+// Include 3D Forest.
 #include <Vector3.hpp>
 class Editor;
 class Page;
 class MainWindow;
 
+// Include Qt.
 #include <QMutex>
 class QWidget;
 

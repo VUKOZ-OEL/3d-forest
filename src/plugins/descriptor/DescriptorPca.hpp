@@ -22,9 +22,11 @@
 #ifndef DESCRIPTOR_PCA_HPP
 #define DESCRIPTOR_PCA_HPP
 
+// Include 3rd party.
 #include <Eigen/Core>
 #include <Eigen/Eigenvalues>
 
+// Include 3D Forest.
 #include <Query.hpp>
 
 /** Descriptor PCA. */

@@ -19,30 +19,32 @@
 
 /** @file MessageLogWindow.cpp */
 
+// Include 3D Forest.
 #include <MainWindow.hpp>
 #include <MessageLogWindow.hpp>
 
+// Include Qt.
 #include <QTextEdit>
 
 MessageLogWindow::MessageLogWindow(MainWindow *mainWindow)
     : QDockWidget(mainWindow),
       mainWindow_(mainWindow)
 {
-    // widget
+    // Widget.
     textEdit_ = new QTextEdit;
     textEdit_->setReadOnly(true);
 
-    // file
+    // File.
     file_.open("log.txt", "w+t");
 
-    // Dock
+    // Dock.
     setWidget(textEdit_);
     setWindowTitle(tr("Message Log"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea |
                     Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
     mainWindow_->addDockWidget(Qt::BottomDockWidgetArea, this);
 
-    // signals
+    // Signals.
     connect(this,
             SIGNAL(signalPrintln(const LogMessage &)),
             this,
@@ -65,7 +67,7 @@ void MessageLogWindow::println(const LogMessage &message)
 
 void MessageLogWindow::flush()
 {
-    // empty
+    // Empty.
 }
 
 void MessageLogWindow::slotPrintln(const LogMessage &message)

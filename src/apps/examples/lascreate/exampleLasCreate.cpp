@@ -19,11 +19,14 @@
 
 /** @file exampleLasCreate.cpp @brief Create LAS file. */
 
+// Include std.
 #include <cstring>
 
+// Include 3D Forest.
 #include <IndexFileBuilder.hpp>
 #include <Vector3.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "exampleLasCreate"
 #include <Log.hpp>
 
@@ -125,7 +128,7 @@ static void createGrid(const std::string &path,
             }
             points[idx].source_id = intensity;
 
-            points[idx].user_layer = static_cast<uint32_t>(x);
+            points[idx].segment = static_cast<uint32_t>(x);
 
             idx++;
         }
@@ -164,7 +167,7 @@ static void createLine(const std::string &path)
 static void createIndex(const std::string &path)
 {
     // Create LAS file index
-    IndexFileBuilder::Settings settings;
+    SettingsImport settings;
     IndexFileBuilder::index(path, path, settings);
 }
 #endif

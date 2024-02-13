@@ -19,17 +19,20 @@
 
 /** @file HeightMapModifier.cpp */
 
+// Include 3D Forest.
 #include <ColorPalette.hpp>
 #include <Editor.hpp>
 #include <HeightMapModifier.hpp>
 #include <MainWindow.hpp>
 #include <Time.hpp>
 
+// Include Qt.
 #include <QCoreApplication>
 #include <QProgressDialog>
 #include <QString>
 #include <QWidget>
 
+// Include local.
 #define LOG_MODULE_NAME "HeightMapModifier"
 #include <Log.hpp>
 
@@ -132,10 +135,10 @@ void HeightMapModifier::applyModifier(Page *page)
 {
     mutex_.lock();
 
-    // Colormap range step in normalized colormap range
+    // Colormap range step in normalized colormap range.
     double colormapStep = 1.0 / static_cast<double>(colormap_.size() - 1);
 
-    // Minimum and maximum height range
+    // Minimum and maximum height range.
     double heightMinimum;
     double heightRange;
 
@@ -150,7 +153,7 @@ void HeightMapModifier::applyModifier(Page *page)
         heightRange = editor_->elevationFilter().maximum() - heightMinimum;
     }
 
-    // Height range step in normalized height range
+    // Height range step in normalized height range.
     double heightStep = 0;
 
     if (heightRange > 0)
@@ -158,20 +161,20 @@ void HeightMapModifier::applyModifier(Page *page)
         heightStep = 1.0 / heightRange;
     }
 
-    // Process selected points in this page
+    // Process selected points in this page.
     const std::vector<uint32_t> &selection = page->selection;
 
     for (size_t i = 0; i < page->selectionSize; i++)
     {
-        // Index of next selected point in this page
+        // Index of next selected point in this page.
         size_t row = selection[i];
 
-        // Calculate normalized height <0, 1>
+        // Calculate normalized height <0, 1>.
         double height;
 
         if (source_ == SOURCE_Z_POSITION)
         {
-            height = page->position[3 * row + 2]; // z position from xyz
+            height = page->position[3 * row + 2]; // z position from xyz.
         }
         else
         {
@@ -180,10 +183,10 @@ void HeightMapModifier::applyModifier(Page *page)
 
         double heightNorm = (height - heightMinimum) * heightStep;
 
-        // Get color by mapping height to colormap range
+        // Get color by mapping height to colormap range.
         size_t colorIndex = static_cast<size_t>(heightNorm / colormapStep);
 
-        // Output
+        // Output.
         page->renderColor[row * 3 + 0] *=
             static_cast<float>(colormap_[colorIndex][0]);
         page->renderColor[row * 3 + 1] *=
@@ -226,7 +229,7 @@ void HeightMapModifier::apply(QWidget *widget)
             break;
         }
 
-        // Process step i
+        // Process step i.
         editor_->lock();
         if (query.nextPage())
         {
@@ -264,7 +267,7 @@ std::vector<Vector3<double>> HeightMapModifier::createColormap(
     }
     else
     {
-        // White
+        // White.
         std::vector<Vector3<double>> colormap;
         colormap.resize(n);
 

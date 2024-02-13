@@ -19,14 +19,17 @@
 
 /** @file exampleMeshDistance.cpp @brief Mesh distance example. */
 
+// Include 3rd party.
 #include <Eigen/Core>
 #include <delaunator.hpp>
 #include <igl/point_mesh_squared_distance.h>
 #include <igl/writeOBJ.h>
 
+// Include 3D Forest.
 #include <Error.hpp>
 #include <Vector3.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "exampleMeshDistance"
 #include <Log.hpp>
 
@@ -59,7 +62,7 @@ static void printMesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F)
         // clang-format off
         std::cout << "F " << i
                   << " {" << p1 << ", " << p2 << ", " << p3 << "}"
-                  << " n " << n 
+                  << " n " << n
                   << std::endl;
         // clang-format on
     }

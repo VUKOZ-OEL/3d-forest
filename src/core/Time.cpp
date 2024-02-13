@@ -19,6 +19,7 @@
 
 /** @file Time.cpp */
 
+// Include std.
 #include <cstdio>
 
 #define _POSIX_THREAD_SAFE_FUNCTIONS
@@ -31,8 +32,10 @@
 
 #include <ctime>
 
+// Include 3D Forest.
 #include <Time.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "Time"
 #include <Log.hpp>
 
@@ -43,7 +46,7 @@ double Time::realTime()
     GetSystemTimeAsFileTime(&tp);
     uint64_t t =
         (static_cast<uint64_t>(tp.dwHighDateTime) << 32) + tp.dwLowDateTime;
-    return (static_cast<double>(t) * 1e-7) - 11644473600.; // sec 1 Jan 1970
+    return (static_cast<double>(t) * 1e-7) - 11644473600.; // sec 1 Jan 1970.
 #else
     struct timeval tp;
 

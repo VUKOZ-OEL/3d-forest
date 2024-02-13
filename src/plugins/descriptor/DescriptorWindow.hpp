@@ -22,9 +22,11 @@
 #ifndef DESCRIPTOR_WINDOW_HPP
 #define DESCRIPTOR_WINDOW_HPP
 
+// Include 3D Forest.
 class MainWindow;
 class DescriptorWidget;
 
+// Include Qt.
 #include <QDialog>
 
 /** Descriptor Window. */

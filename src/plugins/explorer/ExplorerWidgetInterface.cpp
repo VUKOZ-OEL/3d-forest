@@ -19,13 +19,16 @@
 
 /** @file ExplorerWidgetInterface.cpp */
 
+// Include 3D Forest.
 #include <ExplorerWidgetInterface.hpp>
 #include <MainWindow.hpp>
 
+// Include Qt.
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QVBoxLayout>
 
+// Include local.
 #define LOG_MODULE_NAME "ExplorerWidgetInterface"
 #include <Log.hpp>
 
@@ -42,7 +45,7 @@ ExplorerWidgetInterface::ExplorerWidgetInterface(MainWindow *mainWindow,
       filterEnabled_(true)
 {
 #if 0
-    // Title
+    // Title.
     titleIcon_ = new QLabel;
     titleIcon_->setPixmap(icon_.pixmap(icon_.actualSize(QSize(16, 16))));
 
@@ -54,12 +57,12 @@ ExplorerWidgetInterface::ExplorerWidgetInterface(MainWindow *mainWindow,
     titleBar->addWidget(titleText_);
     titleBar->addStretch();
 
-    // Layout
+    // Layout.
     mainLayout_ = new QVBoxLayout;
     mainLayout_->setContentsMargins(0, 0, 0, 0);
     mainLayout_->addLayout(titleBar);
 #else
-    // Layout
+    // Layout.
     mainLayout_ = new QVBoxLayout;
     mainLayout_->setContentsMargins(0, 0, 0, 0);
 #endif

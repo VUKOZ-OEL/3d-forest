@@ -19,9 +19,11 @@
 
 /** @file ElevationAction.cpp */
 
+// Include 3D Forest.
 #include <Editor.hpp>
 #include <ElevationAction.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "ElevationAction"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
@@ -112,7 +114,7 @@ void ElevationAction::next()
             break;
 
         default:
-            // empty
+            // Empty.
             break;
     }
 }
@@ -136,7 +138,7 @@ void ElevationAction::stepResetPoints()
     // Clear each point in all datasets.
     while (query_.next())
     {
-        query_.value() = 0;
+        query_.voxel() = 0;
         query_.elevation() = 0;
         query_.setModified();
 
@@ -292,7 +294,7 @@ void ElevationAction::stepComputeElevation()
 void ElevationAction::createGroundPoint()
 {
     // If this ground point was already processed, then do nothing.
-    if (query_.value() != 0)
+    if (query_.voxel() != 0)
     {
         return;
     }
@@ -331,7 +333,7 @@ void ElevationAction::createGroundPoint()
             n++;
 
             // Mark all used points as processed.
-            queryPoint_.value() = 1;
+            queryPoint_.voxel() = 1;
             queryPoint_.setModified();
         }
     }

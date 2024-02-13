@@ -19,8 +19,10 @@
 
 /** @file tests.cpp */
 
+// Include 3D Forest.
 #include <Test.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "tests"
 #include <Log.hpp>
 

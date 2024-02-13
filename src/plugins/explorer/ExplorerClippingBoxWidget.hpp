@@ -22,11 +22,13 @@
 #ifndef EXPLORER_CLIPPING_BOX_WIDGET_HPP
 #define EXPLORER_CLIPPING_BOX_WIDGET_HPP
 
+// Include 3D Forest.
 #include <Range.hpp>
 #include <Region.hpp>
 class DoubleRangeSliderWidget;
 class MainWindow;
 
+// Include Qt.
 #include <QWidget>
 
 /** Explorer Clipping Box Widget. */

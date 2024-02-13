@@ -17,24 +17,26 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Layer.hpp */
+/** @file Segment.hpp */
 
-#ifndef LAYER_HPP
-#define LAYER_HPP
+#ifndef SEGMENT_HPP
+#define SEGMENT_HPP
 
+// Include 3D Forest.
 #include <Json.hpp>
-#include <LayerData.hpp>
 #include <Mesh.hpp>
+#include <SegmentData.hpp>
 #include <Vector3.hpp>
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 
-/** Layer. */
-class EXPORT_EDITOR Layer
+/** Segment. */
+class EXPORT_EDITOR Segment
 {
 public:
-    Layer();
+    Segment();
 
     void set(size_t id, const std::string &label, const Vector3<double> &color);
 
@@ -46,8 +48,8 @@ public:
     const Vector3<double> &color() const { return color_; }
     void setColor(const Vector3<double> &color);
 
-    const LayerData &data() const { return data_; }
-    void setData(const LayerData &data) { data_ = data; }
+    const SegmentData &data() const { return data_; }
+    void setData(const SegmentData &data) { data_ = data; }
 
     size_t meshSize() const { return meshList_.size(); }
     const Mesh &mesh(size_t index) const { return meshList_[index]; }
@@ -57,16 +59,16 @@ public:
     Json &write(Json &out) const;
 
 protected:
-    // Stored
+    // Stored.
     std::string label_;
     Vector3<double> color_;
     size_t id_;
 
-    LayerData data_;
+    SegmentData data_;
     std::vector<Mesh> meshList_;
 };
 
-inline std::ostream &operator<<(std::ostream &os, const Layer &obj)
+inline std::ostream &operator<<(std::ostream &os, const Segment &obj)
 {
     return os << "id <" << obj.id() << "> label <" << obj.label() << "> color <"
               << obj.color() << ">";
@@ -74,4 +76,4 @@ inline std::ostream &operator<<(std::ostream &os, const Layer &obj)
 
 #include <WarningsEnable.hpp>
 
-#endif /* LAYER_HPP */
+#endif /* SEGMENT_HPP */

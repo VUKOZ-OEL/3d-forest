@@ -19,9 +19,11 @@
 
 /** @file exampleFile.cpp @brief File example. */
 
+// Include 3D Forest.
 #include <Error.hpp>
 #include <File.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "exampleFile"
 #include <Log.hpp>
 

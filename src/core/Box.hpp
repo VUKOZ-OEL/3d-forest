@@ -22,8 +22,10 @@
 #ifndef BOX_HPP
 #define BOX_HPP
 
+// Include 3D Forest.
 #include <Vector3.hpp>
 
+// Include local.
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>
 
@@ -321,7 +323,7 @@ template <class T> inline void Box<T>::validate()
     if ((max_[0] - min_[0] > e) || (max_[1] - min_[1] > e) ||
         (max_[2] - min_[2] > e))
     {
-        empty_ = false; // Line/Plane/Cuboid
+        empty_ = false; // Line/Plane/Cuboid.
     }
     else
     {

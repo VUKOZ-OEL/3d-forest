@@ -19,17 +19,20 @@
 
 /** @file ImportFilePlugin.cpp */
 
+// Include 3D Forest.
 #include <ImportFileDialog.hpp>
 #include <ImportFilePlugin.hpp>
 #include <IndexFileBuilder.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
+// Include Qt.
 #include <QCoreApplication>
 #include <QFileDialog>
 #include <QProgressBar>
 #include <QProgressDialog>
 
+// Include local.
 #define LOG_MODULE_NAME "ImportFilePlugin"
 #include <Log.hpp>
 
@@ -118,7 +121,7 @@ static void importPluginFile(const QString &path, MainWindow *mainWindow)
         return;
     }
 
-    SettingsImport settings = dialog.getSettings();
+    SettingsImport settings = dialog.settings();
 
     if (importPluginCreateIndex(path, settings, mainWindow))
     {
@@ -162,7 +165,7 @@ static bool importPluginCreateIndex(const QString &path,
 
     // Initialize index builder.
     IndexFileBuilder builder;
-    builder.start(pathStd, pathStd, settings.indexSettings());
+    builder.start(pathStd, pathStd, settings);
 
     char buffer[80];
 

@@ -19,17 +19,18 @@
 
 /** @file Editor.cpp */
 
+// Include 3D Forest.
 #include <Editor.hpp>
-#include <IndexFileBuilder.hpp>
 #include <Util.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "Editor"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 static const char *EDITOR_KEY_PROJECT_NAME = "projectName";
 static const char *EDITOR_KEY_DATA_SET = "datasets";
-static const char *EDITOR_KEY_LAYER = "layers";
+static const char *EDITOR_KEY_SEGMENT = "segments";
 static const char *EDITOR_KEY_SETTINGS = "settings";
 static const char *EDITOR_KEY_CLASSIFICATIONS = "classifications";
 // static const char *EDITOR_KEY_CLIP_FILTER = "clipFilter";
@@ -58,10 +59,10 @@ void Editor::close()
     datasetsFilter_.clear();
     datasetsFilter_.setFilterEnabled(true);
 
-    layers_.setDefault();
-    layersFilter_.clear();
-    layersFilter_.setFilter(0, true);
-    layersFilter_.setFilterEnabled(true);
+    segments_.setDefault();
+    segmentsFilter_.clear();
+    segmentsFilter_.setFilter(0, true);
+    segmentsFilter_.setFilterEnabled(true);
 
     classifications_.clear();
     classificationsFilter_.clear();
@@ -117,37 +118,37 @@ void Editor::openProject(const std::string &path)
     {
         path_ = path;
 
-        // Project name
+        // Project name.
         if (in.contains(EDITOR_KEY_PROJECT_NAME))
         {
             projectName_ = in[EDITOR_KEY_PROJECT_NAME].string();
         }
 
-        // Data sets
+        // Data sets.
         if (in.contains(EDITOR_KEY_DATA_SET))
         {
             datasets_.read(in[EDITOR_KEY_DATA_SET], path_, datasetsFilter_);
         }
 
-        // Layers
-        if (in.contains(EDITOR_KEY_LAYER))
+        // Segments.
+        if (in.contains(EDITOR_KEY_SEGMENT))
         {
-            layers_.read(in[EDITOR_KEY_LAYER]);
+            segments_.read(in[EDITOR_KEY_SEGMENT]);
         }
 
-        // Classifications
+        // Classifications.
         if (in.contains(EDITOR_KEY_CLASSIFICATIONS))
         {
             classifications_.read(in[EDITOR_KEY_CLASSIFICATIONS]);
         }
 
-        // Settings
+        // Settings.
         if (in.contains(EDITOR_KEY_SETTINGS))
         {
             settings_.read(in[EDITOR_KEY_SETTINGS]);
         }
 
-        // Clip filter
+        // Clip filter.
         // if (in.contains(EDITOR_KEY_CLIP_FILTER))
         // {
         //     clipFilter_.read(in[EDITOR_KEY_CLIP_FILTER]);
@@ -157,7 +158,7 @@ void Editor::openProject(const std::string &path)
         //     clipFilter_.clear();
         // }
 
-        // Elevation range
+        // Elevation range.
         if (in.contains(EDITOR_KEY_ELEVATION_RANGE))
         {
             elevationFilter_.read(in[EDITOR_KEY_ELEVATION_RANGE]);
@@ -178,25 +179,25 @@ void Editor::saveProject(const std::string &path)
 
     Json out;
 
-    // Project name
+    // Project name.
     out[EDITOR_KEY_PROJECT_NAME] = projectName_;
 
-    // Data sets
+    // Data sets.
     datasets_.write(out[EDITOR_KEY_DATA_SET]);
 
-    // Layers
-    layers_.write(out[EDITOR_KEY_LAYER]);
+    // Segments.
+    segments_.write(out[EDITOR_KEY_SEGMENT]);
 
-    // Classifications
+    // Classifications.
     classifications_.write(out[EDITOR_KEY_CLASSIFICATIONS]);
 
-    // Settings
+    // Settings.
     settings_.write(out[EDITOR_KEY_SETTINGS]);
 
-    // Clip filter
+    // Clip filter.
     // clipFilter_.write(out[EDITOR_KEY_CLIP_FILTER]);
 
-    // Elevation range
+    // Elevation range.
     elevationFilter_.write(out[EDITOR_KEY_ELEVATION_RANGE]);
 
     out.write(path);
@@ -325,21 +326,21 @@ void Editor::setDatasetsFilter(const QueryFilterSet &filter)
     }
 }
 
-void Editor::setLayers(const Layers &layers)
+void Editor::setSegments(const Segments &segments)
 {
-    LOG_DEBUG(<< "Set layers.");
-    layers_ = layers;
+    LOG_DEBUG(<< "Set segments.");
+    segments_ = segments;
     unsavedChanges_ = true;
 }
 
-void Editor::setLayersFilter(const QueryFilterSet &filter)
+void Editor::setSegmentsFilter(const QueryFilterSet &filter)
 {
-    LOG_DEBUG(<< "Set layers filter.");
-    layersFilter_ = filter;
+    LOG_DEBUG(<< "Set segments filter.");
+    segmentsFilter_ = filter;
 
     if (viewports_.size() > 0)
     {
-        viewports_.where().setLayer(filter);
+        viewports_.where().setSegment(filter);
         viewports_.applyWhereToAll();
     }
 }
@@ -359,7 +360,7 @@ void Editor::updateAfterRead()
         viewports_.where().setRegion(clipFilter_);
         viewports_.where().setElevation(elevationFilter_);
         viewports_.where().setDescriptor(descriptorFilter_);
-        viewports_.where().setLayer(layersFilter_);
+        viewports_.where().setSegment(segmentsFilter_);
 
         viewports_.applyWhereToAll();
     }

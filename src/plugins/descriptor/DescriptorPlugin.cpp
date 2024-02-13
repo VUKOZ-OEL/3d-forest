@@ -19,11 +19,13 @@
 
 /** @file DescriptorPlugin.cpp */
 
+// Include 3D Forest.
 #include <DescriptorPlugin.hpp>
 #include <DescriptorWindow.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "DescriptorPlugin"
 #include <Log.hpp>
 

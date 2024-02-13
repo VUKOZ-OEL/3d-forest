@@ -19,6 +19,7 @@
 
 /** @file TestRange.cpp */
 
+// Include 3D Forest.
 #include <Range.hpp>
 #include <Test.hpp>
 #include <Util.hpp>

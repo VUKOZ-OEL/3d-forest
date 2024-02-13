@@ -19,9 +19,11 @@
 
 /** @file PageManager.cpp */
 
+// Include 3D Forest.
 #include <Editor.hpp>
 #include <PageManager.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "PageManager"
 #include <Log.hpp>
 
@@ -65,11 +67,11 @@ std::shared_ptr<PageData> PageManager::get(Editor *editor,
 
     try
     {
-        result->read(editor);
+        result->readPage(editor);
     }
     catch (...)
     {
-        // error
+        // Some error.
     }
 
     return result;
@@ -88,7 +90,7 @@ void PageManager::erase(Editor *editor, size_t dataset, size_t index)
         {
             if (it->second->isModified())
             {
-                it->second->write(editor);
+                it->second->writePage(editor);
             }
 
             cache_.erase(it);

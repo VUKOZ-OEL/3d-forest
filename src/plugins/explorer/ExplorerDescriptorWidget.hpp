@@ -22,6 +22,7 @@
 #ifndef EXPLORER_DESCRIPTOR_WIDGET_HPP
 #define EXPLORER_DESCRIPTOR_WIDGET_HPP
 
+// Include 3D Forest.
 #include <Editor.hpp>
 #include <ExplorerWidgetInterface.hpp>
 #include <Range.hpp>

@@ -19,12 +19,15 @@
 
 /** @file ExportFileAction.cpp */
 
+// Include std.
 #include <cstring>
 
+// Include 3D Forest.
 #include <Editor.hpp>
 #include <ExportFileAction.hpp>
 #include <Time.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "ExportFileAction"
 #include <Log.hpp>
 

@@ -19,11 +19,13 @@
 
 /** @file SettingsColorWidget.cpp */
 
+// Include 3D Forest.
 #include <ColorSwitchWidget.hpp>
 #include <MainWindow.hpp>
 #include <SettingsColorWidget.hpp>
 #include <ThemeIcon.hpp>
 
+// Include Qt.
 #include <QCheckBox>
 #include <QColor>
 #include <QComboBox>
@@ -33,6 +35,7 @@
 #include <QSlider>
 #include <QVBoxLayout>
 
+// Include local.
 #define LOG_MODULE_NAME "SettingsColorWidget"
 #include <Log.hpp>
 
@@ -42,14 +45,14 @@ SettingsColorWidget::SettingsColorWidget(MainWindow *mainWindow)
     : QWidget(mainWindow),
       mainWindow_(mainWindow)
 {
-    // Color
+    // Color.
     colorSwitchWidget_ = new ColorSwitchWidget;
     connect(colorSwitchWidget_,
             SIGNAL(colorChanged()),
             this,
             SLOT(slotSetColor()));
 
-    // Fog
+    // Fog.
     fogCheckBox_ = new QCheckBox;
     fogCheckBox_->setChecked(settings_.isFogEnabled());
     fogCheckBox_->setToolTip(tr("Reduce intensity with increasing distance"));
@@ -65,7 +68,7 @@ SettingsColorWidget::SettingsColorWidget(MainWindow *mainWindow)
     QGroupBox *optionsGroupBox = new QGroupBox(tr("Options"));
     optionsGroupBox->setLayout(optionsVBoxLayout);
 
-    // Color source
+    // Color source.
     colorSourceComboBox_ = new QComboBox;
     for (size_t i = 0; i < settings_.colorSourceSize(); i++)
     {
@@ -86,7 +89,7 @@ SettingsColorWidget::SettingsColorWidget(MainWindow *mainWindow)
             this,
             SLOT(slotColorSourceChanged(int)));
 
-    // Point size
+    // Point size.
     pointSizeSlider_ = new QSlider;
     pointSizeSlider_->setMinimum(1);
     pointSizeSlider_->setMaximum(5);
@@ -99,7 +102,7 @@ SettingsColorWidget::SettingsColorWidget(MainWindow *mainWindow)
             this,
             SLOT(slotSetPointSize(int)));
 
-    // Layout
+    // Layout.
     QGridLayout *groupBoxLayout = new QGridLayout;
 
     groupBoxLayout->addWidget(colorSwitchWidget_,
@@ -120,7 +123,7 @@ SettingsColorWidget::SettingsColorWidget(MainWindow *mainWindow)
 
     setLayout(mainLayout);
 
-    // Data
+    // Data.
     connect(mainWindow_,
             SIGNAL(signalUpdate(void *, const QSet<Editor::Type> &)),
             this,
@@ -202,7 +205,7 @@ void SettingsColorWidget::setSettingsIn(const SettingsView &settings)
 
     settings_ = settings;
 
-    // Foreground color
+    // Foreground color.
     auto fgv = settings_.pointColor();
     QColor fg;
     fg.setRgbF(static_cast<float>(fgv[0]),
@@ -210,7 +213,7 @@ void SettingsColorWidget::setSettingsIn(const SettingsView &settings)
                static_cast<float>(fgv[2]));
     colorSwitchWidget_->setForegroundColor(fg);
 
-    // Background color
+    // Background color.
     auto bgv = settings_.backgroundColor();
     QColor bg;
     bg.setRgbF(static_cast<float>(bgv[0]),
@@ -218,7 +221,7 @@ void SettingsColorWidget::setSettingsIn(const SettingsView &settings)
                static_cast<float>(bgv[2]));
     colorSwitchWidget_->setBackgroundColor(bg);
 
-    // Point size
+    // Point size.
     pointSizeSlider_->setValue(static_cast<int>(settings_.pointSize()));
 
     unblock();

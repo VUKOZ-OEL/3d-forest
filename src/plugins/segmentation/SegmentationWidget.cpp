@@ -19,6 +19,7 @@
 
 /** @file SegmentationWidget.cpp */
 
+// Include 3D Forest.
 #include <InfoDialog.hpp>
 #include <MainWindow.hpp>
 #include <ProgressDialog.hpp>
@@ -27,11 +28,13 @@
 #include <SliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
+// Include Qt.
 #include <QCheckBox>
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QVBoxLayout>
 
+// Include local.
 #define LOG_MODULE_NAME "SegmentationWidget"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
@@ -46,7 +49,7 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
 {
     LOG_DEBUG(<< "Create.");
 
-    // Widgets
+    // Widgets.
     SliderWidget::create(voxelSizeSlider_,
                          this,
                          nullptr,
@@ -132,7 +135,7 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
     onlyTrunksCheckBox_->setText(tr("Find only trunks (fast preview)"));
     onlyTrunksCheckBox_->setChecked(false);
 
-    // Settings layout
+    // Settings layout.
     QVBoxLayout *settingsLayout = new QVBoxLayout;
     settingsLayout->addWidget(voxelSizeSlider_);
     settingsLayout->addWidget(descriptorSlider_);
@@ -144,7 +147,7 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
     settingsLayout->addWidget(onlyTrunksCheckBox_);
     settingsLayout->addStretch();
 
-    // Buttons
+    // Buttons.
     helpButton_ = new QPushButton(tr("Help"));
     helpButton_->setIcon(THEME_ICON("question"));
     connect(helpButton_, SIGNAL(clicked()), this, SLOT(slotHelp()));
@@ -154,20 +157,20 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
 
-    // Buttons layout
+    // Buttons layout.
     QHBoxLayout *buttonsLayout = new QHBoxLayout;
     buttonsLayout->addWidget(helpButton_);
     buttonsLayout->addStretch();
     buttonsLayout->addWidget(applyButton_);
 
-    // Main layout
+    // Main layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(settingsLayout);
     mainLayout->addSpacing(10);
     mainLayout->addLayout(buttonsLayout);
     mainLayout->addStretch();
 
-    // Widget
+    // Widget.
     setLayout(mainLayout);
 }
 
@@ -219,7 +222,7 @@ void SegmentationWidget::slotApply()
         mainWindow_->showError("Unknown error");
     }
 
-    mainWindow_->update({Editor::TYPE_LAYER});
+    mainWindow_->update({Editor::TYPE_SEGMENT});
 }
 
 void SegmentationWidget::slotHelp()
@@ -256,7 +259,7 @@ void SegmentationWidget::slotHelp()
         " 3 trunks are identified."
         " d) Shows the final result of segmented dataset."
         " Unsegmented (disconnected and ground) points are hidden."
-        " These points are assigned to main layer."
+        " These points are assigned to main segment."
         "</div>"
         ""
         "<h3>Algorithm</h3>"
@@ -264,25 +267,25 @@ void SegmentationWidget::slotHelp()
         "<li>Voxelize the dataset.</li>"
         "<li>Detect individual trunks by using search radius"
         " to connect voxels which have descriptor values above"
-        " user provided threshold. Assign a unique layer value"
+        " user provided threshold. Assign a unique segment value"
         " to each detected trunk.</li>"
         "<li>Repeat the following for all remaining voxels:"
         "<ol>"
         "<li>Start at the next unprocessed voxel. The position"
         " of this voxel is random because the voxels are ordered"
-        " by multi-layer octal-tree. This voxel creates new"
+        " by multi-segment octal-tree. This voxel creates new"
         " voxel group.</li>"
         "<li>Find minimum spanning tree from this voxel until a voxel with"
-        " existing layer value is reached."
+        " existing segment value is reached."
         " The spanning tree is calculated by iteratively appending"
         " the next nearest neighbor to the current voxel group.</li>"
-        "<li>Set layer value of all voxels in this voxel group"
-        " to layer value from terminating voxel. This connects"
+        "<li>Set segment value of all voxels in this voxel group"
+        " to segment value from terminating voxel. This connects"
         " spanning trees to trunks. Connected voxels are marked"
         " as processed.</li>"
         "</ol>"
         "</li>"
-        "<li>Layer values from voxels are applied back to the"
+        "<li>Segment values from voxels are applied back to the"
         " dataset.</li>"
         "</ol>"
         "<br>"

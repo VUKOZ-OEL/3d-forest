@@ -19,11 +19,13 @@
 
 /** @file ElevationPlugin.cpp */
 
+// Include 3D Forest.
 #include <ElevationPlugin.hpp>
 #include <ElevationWindow.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "ElevationPlugin"
 #include <Log.hpp>
 
@@ -52,7 +54,7 @@ void ElevationPlugin::initialize(MainWindow *mainWindow)
 
 void ElevationPlugin::slotPlugin()
 {
-    // Create GUI only when this plugin is used for the first time
+    // Create GUI only when this plugin is used for the first time.
     if (!pluginWindow_)
     {
         pluginWindow_ = new ElevationWindow(mainWindow_);

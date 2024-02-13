@@ -22,8 +22,10 @@
 #ifndef SETTINGS_IMPORT_HPP
 #define SETTINGS_IMPORT_HPP
 
-#include <IndexFileBuilder.hpp>
+// Include std.
+#include <cstddef>
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 
@@ -31,19 +33,20 @@
 class EXPORT_EDITOR SettingsImport
 {
 public:
+    bool convertToVersion1Dot4;
+    bool centerPointsOnScreen;
+    bool randomizePoints;
+    bool copyExtraBytes;
+    bool terminalOutput;
+
+    size_t maxIndexLevel1;
+    size_t maxIndexLevel1Size;
+    size_t maxIndexLevel2;
+    size_t maxIndexLevel2Size;
+
+    size_t bufferSize;
+
     SettingsImport();
-
-    bool isCenterEnabled() const;
-    void setCenterEnabled(bool b);
-
-    const IndexFileBuilder::Settings &indexSettings() const
-    {
-        return indexSettings_;
-    }
-
-protected:
-    bool centerEnabled_;
-    IndexFileBuilder::Settings indexSettings_;
 };
 
 #include <WarningsEnable.hpp>

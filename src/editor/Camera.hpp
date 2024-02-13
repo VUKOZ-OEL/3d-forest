@@ -22,9 +22,11 @@
 #ifndef CAMERA_HPP
 #define CAMERA_HPP
 
+// Include 3D Forest.
 #include <Matrix4.hpp>
 #include <Vector3.hpp>
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 

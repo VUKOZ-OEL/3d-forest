@@ -19,13 +19,16 @@
 
 /** @file exampleEditor.cpp @brief Editor example. */
 
+// Include std.
 #include <cstring>
 
+// Include 3D Forest.
 #include <Editor.hpp>
 #include <Error.hpp>
 #include <IndexFileBuilder.hpp>
 #include <Time.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "exampleEditor"
 #include <Log.hpp>
 
@@ -33,8 +36,8 @@
 
 static void createDataSet()
 {
-    IndexFileBuilder::Settings settings;
-    settings.maxSize1 = 2;
+    SettingsImport settings;
+    settings.maxIndexLevel1Size = 2;
 
     std::vector<LasFile::Point> points;
 

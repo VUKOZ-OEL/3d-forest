@@ -22,9 +22,11 @@
 #ifndef PAGE_DATA_HPP
 #define PAGE_DATA_HPP
 
+// Include 3D Forest.
 #include <IndexFile.hpp>
 class Editor;
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 
@@ -76,23 +78,16 @@ public:
 
     /** @name Point Data Extra Bytes */
     /**@{*/
-    /** Layer identification numbers.
+    /** Segment identification numbers.
         This value is stored in Point Data Record extra bytes.
     */
-    std::vector<size_t> layer;
+    std::vector<size_t> segment;
 
     /** Point elevation above ground.
         The data are stored as [e0, e1, ...].
         This value is stored in Point Data Record extra bytes.
      */
     std::vector<double> elevation;
-
-    /** Red, Green, and Blue custom colors.
-        The data are stored as [r0, g0, b0, r1, g1, ...].
-        Color values are in range from 0 (zero intensity) to 1 (full intensity).
-        This value is stored in Point Data Record extra bytes.
-    */
-    std::vector<double> customColor;
 
     /** Descriptor values.
         The data are stored as [d0, d1, ...].
@@ -101,10 +96,10 @@ public:
     */
     std::vector<double> descriptor;
 
-    /** User values.
+    /** Voxel values.
         This value is stored in Point Data Record extra bytes.
     */
-    std::vector<size_t> value;
+    std::vector<size_t> voxel;
     /**@}*/
 
     /** @name Rendering */
@@ -127,8 +122,9 @@ public:
     uint32_t datasetId() const { return datasetId_; }
     uint32_t pageId() const { return pageId_; }
 
-    void read(Editor *editor);
-    void write(Editor *editor);
+    void readPage(Editor *editor);
+    void writePage(Editor *editor);
+
     void transform(Editor *editor);
 
     size_t size() const { return intensity.size(); }
@@ -137,19 +133,23 @@ public:
     bool isModified() const { return modified_; }
 
 private:
-    // Identifier
+    /** Dataset identifier. */
     uint32_t datasetId_;
+
+    /** Page identifier in a dataset. */
     uint32_t pageId_;
 
-    // State
+    /** When true, this page should be written back to hard drive. */
     bool modified_;
 
-    // File data
-    std::vector<uint8_t> buffer_;
+    /** File buffer to preserve untouched LAS data for updates. */
+    std::vector<uint8_t> pointDataBuffer_;
+
+    /** Original xyz position of each point for translations. */
     std::vector<double> positionBase_;
 
     void resize(size_t n);
-    void toPoint(uint8_t *ptr, size_t i, uint8_t fmt);
+    void updatePoint(uint8_t *ptr, size_t i, uint8_t fmt);
 };
 
 #include <WarningsEnable.hpp>

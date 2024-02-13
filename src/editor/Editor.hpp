@@ -22,17 +22,20 @@
 #ifndef EDITOR_HPP
 #define EDITOR_HPP
 
+// Include std.
 #include <mutex>
 
+// Include 3D Forest.
 #include <Classifications.hpp>
 #include <Datasets.hpp>
-#include <Layers.hpp>
 #include <ModifierInterface.hpp>
 #include <PageManager.hpp>
 #include <Region.hpp>
+#include <Segments.hpp>
 #include <Settings.hpp>
 #include <Viewports.hpp>
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 
@@ -48,7 +51,7 @@ public:
         TYPE_DATA_SET,
         TYPE_DESCRIPTOR,
         TYPE_ELEVATION,
-        TYPE_LAYER,
+        TYPE_SEGMENT,
         TYPE_PROJECT_NAME,
         TYPE_SETTINGS,
     };
@@ -56,7 +59,7 @@ public:
     Editor();
     ~Editor();
 
-    // File
+    // File.
     void open(const std::string &path,
               const SettingsImport &settings = SettingsImport());
     void saveProject(const std::string &path);
@@ -65,7 +68,7 @@ public:
     bool hasUnsavedChanges() const { return unsavedChanges_; }
     void close();
 
-    // Classifications
+    // Classifications.
     const Classifications &classifications() const { return classifications_; }
     void setClassifications(const Classifications &classifications);
     const QueryFilterSet &classificationsFilter() const
@@ -74,7 +77,7 @@ public:
     }
     void setClassificationsFilter(const QueryFilterSet &filter);
 
-    // Clip filter
+    // Clip filter.
     const Region &clipFilter() const { return clipFilter_; }
     void setClipFilter(const Region &clipFilter);
     void resetClipFilter();
@@ -82,57 +85,58 @@ public:
     Box<double> clipBoundary() const;
     const Box<double> &boundary() const { return datasets_.boundary(); }
 
-    // Elevation
+    // Elevation.
     const Range<double> &elevationFilter() const { return elevationFilter_; }
     void setElevationFilter(const Range<double> &elevationFilter);
 
-    // Descriptor
+    // Descriptor.
     const Range<double> &descriptorFilter() const { return descriptorFilter_; }
     void setDescriptorFilter(const Range<double> &descriptorFilter);
 
-    // Data sets
+    // Data sets.
     const Datasets &datasets() const { return datasets_; }
+    Datasets &datasets() { return datasets_; }
     void setDatasets(const Datasets &datasets);
     const QueryFilterSet &datasetsFilter() const { return datasetsFilter_; }
     void setDatasetsFilter(const QueryFilterSet &filter);
 
-    // Layers
-    const Layers &layers() const { return layers_; }
-    void setLayers(const Layers &layers);
-    const QueryFilterSet &layersFilter() const { return layersFilter_; }
-    void setLayersFilter(const QueryFilterSet &filter);
+    // Segments.
+    const Segments &segments() const { return segments_; }
+    void setSegments(const Segments &segments);
+    const QueryFilterSet &segmentsFilter() const { return segmentsFilter_; }
+    void setSegmentsFilter(const QueryFilterSet &filter);
 
-    // Settings
+    // Settings.
     const Settings &settings() const { return settings_; }
     void setSettingsView(const SettingsView &settings);
 
-    // Modifiers
+    // Modifiers.
     void addModifier(ModifierInterface *modifier);
     void runModifiers(Page *page);
 
-    // View
+    // View.
     void viewportsResize(size_t n);
     Viewports &viewports() { return viewports_; }
     const Viewports &viewports() const { return viewports_; }
 
-    // Page
+    // Page.
     std::shared_ptr<PageData> readPage(size_t dataset, size_t index);
     void erasePage(size_t dataset, size_t index);
 
-    // Lock
+    // Lock.
     void lock();
     void unlock();
 
 protected:
     std::mutex mutex_;
 
-    // Project data
+    // Project data.
     std::string path_;
     std::string projectName_;
     bool unsavedChanges_;
 
     Datasets datasets_;
-    Layers layers_;
+    Segments segments_;
     Settings settings_;
     Classifications classifications_;
 
@@ -141,15 +145,15 @@ protected:
     Range<double> descriptorFilter_;
     QueryFilterSet classificationsFilter_;
     QueryFilterSet datasetsFilter_;
-    QueryFilterSet layersFilter_;
+    QueryFilterSet segmentsFilter_;
 
-    // Modifiers
+    // Modifiers.
     std::vector<ModifierInterface *> modifiers_;
 
-    // Viewports
+    // Viewports.
     Viewports viewports_;
 
-    // Data
+    // Data.
     PageManager pageManager_;
 
     void openProject(const std::string &path);

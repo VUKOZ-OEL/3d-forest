@@ -22,6 +22,7 @@
 #ifndef DESCRIPTOR_ACTION_HPP
 #define DESCRIPTOR_ACTION_HPP
 
+// Include 3D Forest.
 #include <DescriptorPca.hpp>
 #include <ProgressActionInterface.hpp>
 #include <Query.hpp>

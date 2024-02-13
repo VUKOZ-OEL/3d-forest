@@ -22,10 +22,12 @@
 #ifndef EXPORT_FILE_DIALOG_HPP
 #define EXPORT_FILE_DIALOG_HPP
 
+// Include 3D Forest.
 #include <ExportFileFormatInterface.hpp>
 #include <ExportFileProperties.hpp>
 class MainWindow;
 
+// Include Qt.
 #include <QDialog>
 class QCheckBox;
 class QLineEdit;

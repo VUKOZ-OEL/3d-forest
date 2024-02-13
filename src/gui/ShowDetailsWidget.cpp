@@ -19,12 +19,15 @@
 
 /** @file ShowDetailsWidget.cpp */
 
+// Include 3D Forest.
 #include <ShowDetailsWidget.hpp>
 
+// Include Qt.
 #include <QFrame>
 #include <QTextEdit>
 #include <QVBoxLayout>
 
+// Include local.
 #define LOG_MODULE_NAME "ShowDetailsWidget"
 #include <Log.hpp>
 

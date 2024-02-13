@@ -22,12 +22,15 @@
 #ifndef EXPLORER_WINDOW_HPP
 #define EXPLORER_WINDOW_HPP
 
+// Include std.
 #include <vector>
 
+// Include 3D Forest.
 class MainWindow;
 class ExplorerWidgetInterface;
 class ToolTabWidget;
 
+// Include Qt.
 #include <QDockWidget>
 
 /** Explorer Window. */

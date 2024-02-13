@@ -22,6 +22,7 @@
 #ifndef EXPORT_FILE_FORMAT_INTERFACE_HPP
 #define EXPORT_FILE_FORMAT_INTERFACE_HPP
 
+// Include 3D Forest.
 #include <ExportFileProperties.hpp>
 #include <Query.hpp>
 

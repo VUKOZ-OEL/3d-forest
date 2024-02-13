@@ -22,11 +22,14 @@
 #ifndef SETTINGS_VIEW_HPP
 #define SETTINGS_VIEW_HPP
 
+// Include std.
 #include <string>
 #include <vector>
 
+// Include 3D Forest.
 #include <Vector3.hpp>
 
+// Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 
@@ -41,9 +44,8 @@ public:
         COLOR_SOURCE_RETURN_NUMBER,
         COLOR_SOURCE_NUMBER_OF_RETURNS,
         COLOR_SOURCE_CLASSIFICATION,
-        COLOR_SOURCE_LAYER,
+        COLOR_SOURCE_SEGMENT,
         COLOR_SOURCE_ELEVATION,
-        COLOR_SOURCE_CUSTOM_COLOR,
         COLOR_SOURCE_DESCRIPTOR,
         COLOR_SOURCE_LAST
     };

@@ -22,9 +22,11 @@
 #ifndef SHOW_DETAILS_WIDGET_HPP
 #define SHOW_DETAILS_WIDGET_HPP
 
+// Include Qt.
 #include <QWidget>
 class QTextEdit;
 
+// Include local.
 #include <ExportGui.hpp>
 #include <WarningsDisable.hpp>
 

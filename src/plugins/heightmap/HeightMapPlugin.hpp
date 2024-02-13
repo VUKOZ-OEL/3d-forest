@@ -22,6 +22,7 @@
 #ifndef HEIGHT_MAP_PLUGIN_HPP
 #define HEIGHT_MAP_PLUGIN_HPP
 
+// Include 3D Forest.
 #include <HeightMapModifier.hpp>
 #include <ModifierInterface.hpp>
 #include <PluginInterface.hpp>

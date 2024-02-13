@@ -19,6 +19,7 @@
 
 /** @file ExportFilePlugin.cpp */
 
+// Include 3D Forest.
 #include <ExportFileAction.hpp>
 #include <ExportFileDialog.hpp>
 #include <ExportFilePlugin.hpp>
@@ -26,8 +27,10 @@
 #include <ProgressDialog.hpp>
 #include <ThemeIcon.hpp>
 
+// Include Qt.
 #include <QMessageBox>
 
+// Include local.
 #define LOG_MODULE_NAME "ExportFilePlugin"
 #include <Log.hpp>
 

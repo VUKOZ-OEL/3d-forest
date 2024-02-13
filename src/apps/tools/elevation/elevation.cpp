@@ -19,11 +19,13 @@
 
 /** @file elevation.cpp  @brief Elevation tool.*/
 
+// Include 3D Forest.
 #include <ArgumentParser.hpp>
 #include <Editor.hpp>
 #include <ElevationAction.hpp>
 #include <Error.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "elevation"
 #include <Log.hpp>
 

@@ -19,9 +19,11 @@
 
 /** @file ExportFileFormatCsv.cpp */
 
+// Include 3D Forest.
 #include <ExportFileFormatCsv.hpp>
 #include <Util.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "ExportFileFormatCsv"
 #include <Log.hpp>
 
@@ -35,10 +37,10 @@ ExportFileFormatCsv::~ExportFileFormatCsv()
 
 void ExportFileFormatCsv::create(const std::string &path)
 {
-    // Create/overwrite new text file which is open for writing
+    // Create/overwrite new text file which is open for writing.
     file_.open(path, "w+t");
 
-    // Write CSV header
+    // Write CSV header.
     char text[256] = {};
     text[0] = 0;
     (void)ustrcat(text, "x, y, z");
@@ -54,9 +56,9 @@ void ExportFileFormatCsv::create(const std::string &path)
     {
         (void)ustrcat(text, ", red, green, blue");
     }
-    if (properties().format().has(LasFile::FORMAT_LAYER))
+    if (properties().format().has(LasFile::FORMAT_SEGMENT))
     {
-        (void)ustrcat(text, ", layer");
+        (void)ustrcat(text, ", segment");
     }
     (void)ustrcat(text, "\n");
 
@@ -65,11 +67,11 @@ void ExportFileFormatCsv::create(const std::string &path)
 
 void ExportFileFormatCsv::write(Query &query)
 {
-    // Format point data into text line
+    // Format point data into text line.
     char text[512];
     char buffer[32];
 
-    // Format point XYZ coordinates
+    // Format point XYZ coordinates.
     const Vector3<double> &scale = properties().scale();
     if (scale[0] < 1.0 || scale[1] < 1.0 || scale[2] < 1.0)
     {
@@ -90,7 +92,7 @@ void ExportFileFormatCsv::write(Query &query)
                        static_cast<int>(query.z()));
     }
 
-    // Format point intensity
+    // Format point intensity.
     if (properties().format().has(LasFile::FORMAT_INTENSITY))
     {
         (void)snprintf(buffer,
@@ -101,7 +103,7 @@ void ExportFileFormatCsv::write(Query &query)
         (void)ustrcat(text, buffer);
     }
 
-    // Format point classification
+    // Format point classification.
     if (properties().format().has(LasFile::FORMAT_CLASSIFICATION))
     {
         (void)snprintf(buffer,
@@ -112,7 +114,7 @@ void ExportFileFormatCsv::write(Query &query)
         (void)ustrcat(text, buffer);
     }
 
-    // Color
+    // Color.
     if (properties().format().has(LasFile::FORMAT_RGB))
     {
         (void)snprintf(buffer,
@@ -125,26 +127,26 @@ void ExportFileFormatCsv::write(Query &query)
         (void)ustrcat(text, buffer);
     }
 
-    // Layer
-    if (properties().format().has(LasFile::FORMAT_LAYER))
+    // Segment.
+    if (properties().format().has(LasFile::FORMAT_SEGMENT))
     {
         (void)snprintf(buffer,
                        sizeof(buffer),
                        ", %u",
-                       static_cast<unsigned int>(query.layer()));
+                       static_cast<unsigned int>(query.segment()));
 
         (void)ustrcat(text, buffer);
     }
 
-    // End line
+    // End line.
     (void)ustrcat(text, "\n");
 
-    // Write new point into file
+    // Write new point into file.
     file_.write(text);
 }
 
 void ExportFileFormatCsv::close()
 {
-    // Close the file
+    // Close the file.
     file_.close();
 }

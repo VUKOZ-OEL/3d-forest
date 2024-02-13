@@ -19,8 +19,10 @@
 
 /** @file ViewerAabb.cpp */
 
+// Include 3D Forest.
 #include <ViewerAabb.hpp>
 
+// Include local.
 #define LOG_MODULE_NAME "ViewerAabb"
 #include <Log.hpp>
 

@@ -17,13 +17,15 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ExplorerLayersWidget.cpp */
+/** @file ExplorerSegmentsWidget.cpp */
 
-#include <ExplorerLayersWidget.hpp>
+// Include 3D Forest.
+#include <ExplorerSegmentsWidget.hpp>
 #include <ImportFilePlugin.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
+// Include Qt.
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
@@ -34,26 +36,27 @@
 #include <QTreeWidgetItemIterator>
 #include <QVBoxLayout>
 
-#define LOG_MODULE_NAME "ExplorerLayersWidget"
+// Include local.
+#define LOG_MODULE_NAME "ExplorerSegmentsWidget"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define ICON(name) (ThemeIcon(":/explorer/", name))
 
-ExplorerLayersWidget::ExplorerLayersWidget(MainWindow *mainWindow,
-                                           const QIcon &icon,
-                                           const QString &text)
+ExplorerSegmentsWidget::ExplorerSegmentsWidget(MainWindow *mainWindow,
+                                               const QIcon &icon,
+                                               const QString &text)
     : ExplorerWidgetInterface(mainWindow, icon, text)
 {
-    // Table
+    // Table.
     tree_ = new QTreeWidget();
     tree_->setSelectionMode(QAbstractItemView::ExtendedSelection);
     tree_->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-    // Tool bar buttons
+    // Tool bar buttons.
     MainWindow::createToolButton(&addButton_,
                                  tr("Add"),
-                                 tr("Add new layers"),
+                                 tr("Add new segments"),
                                  THEME_ICON("add"),
                                  this,
                                  SLOT(slotAdd()));
@@ -61,7 +64,7 @@ ExplorerLayersWidget::ExplorerLayersWidget(MainWindow *mainWindow,
 
     MainWindow::createToolButton(&deleteButton_,
                                  tr("Remove"),
-                                 tr("Remove selected layers"),
+                                 tr("Remove selected segments"),
                                  THEME_ICON("remove"),
                                  this,
                                  SLOT(slotDelete()));
@@ -69,7 +72,7 @@ ExplorerLayersWidget::ExplorerLayersWidget(MainWindow *mainWindow,
 
     MainWindow::createToolButton(&showButton_,
                                  tr("Show"),
-                                 tr("Make selected layers visible"),
+                                 tr("Make selected segments visible"),
                                  ICON("eye"),
                                  this,
                                  SLOT(slotShow()));
@@ -77,7 +80,7 @@ ExplorerLayersWidget::ExplorerLayersWidget(MainWindow *mainWindow,
 
     MainWindow::createToolButton(&hideButton_,
                                  tr("Hide"),
-                                 tr("Hide selected layers"),
+                                 tr("Hide selected segments"),
                                  ICON("hide"),
                                  this,
                                  SLOT(slotHide()));
@@ -104,7 +107,7 @@ ExplorerLayersWidget::ExplorerLayersWidget(MainWindow *mainWindow,
                                  this,
                                  SLOT(slotSelectNone()));
 
-    // Tool bar
+    // Tool bar.
     QToolBar *toolBar = new QToolBar;
     toolBar->addWidget(addButton_);
     toolBar->addWidget(deleteButton_);
@@ -116,7 +119,7 @@ ExplorerLayersWidget::ExplorerLayersWidget(MainWindow *mainWindow,
     toolBar->addWidget(selectNoneButton_);
     toolBar->setIconSize(QSize(MainWindow::ICON_SIZE, MainWindow::ICON_SIZE));
 
-    // Layout
+    // Layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(toolBar);
@@ -125,7 +128,7 @@ ExplorerLayersWidget::ExplorerLayersWidget(MainWindow *mainWindow,
     mainLayout_->addLayout(mainLayout);
     setLayout(mainLayout_);
 
-    // Data
+    // Data.
     updatesEnabled_ = true;
     connect(mainWindow_,
             SIGNAL(signalUpdate(void *, const QSet<Editor::Type> &)),
@@ -133,94 +136,96 @@ ExplorerLayersWidget::ExplorerLayersWidget(MainWindow *mainWindow,
             SLOT(slotUpdate(void *, const QSet<Editor::Type> &)));
 }
 
-void ExplorerLayersWidget::slotUpdate(void *sender,
-                                      const QSet<Editor::Type> &target)
+void ExplorerSegmentsWidget::slotUpdate(void *sender,
+                                        const QSet<Editor::Type> &target)
 {
     if (sender == this)
     {
         return;
     }
 
-    if (target.empty() || target.contains(Editor::TYPE_LAYER))
+    if (target.empty() || target.contains(Editor::TYPE_SEGMENT))
     {
-        setLayers(mainWindow_->editor().layers(),
-                  mainWindow_->editor().layersFilter());
+        setSegments(mainWindow_->editor().segments(),
+                    mainWindow_->editor().segmentsFilter());
     }
 }
 
-void ExplorerLayersWidget::setLayers(const Layers &layers,
-                                     const QueryFilterSet &filter)
+void ExplorerSegmentsWidget::setSegments(const Segments &segments,
+                                         const QueryFilterSet &filter)
 {
-    LOG_DEBUG(<< "Input layers <" << layers.size() << ">.");
+    LOG_DEBUG(<< "Input segments <" << segments.size() << ">.");
 
     block();
 
-    layers_ = layers;
+    segments_ = segments;
     filter_ = filter;
 
     tree_->clear();
 
-    // Header
+    // Header.
     tree_->setColumnCount(COLUMN_LAST);
     QStringList labels;
     labels << tr("Visible") << tr("Id") << tr("Label");
     tree_->setHeaderLabels(labels);
 
-    // Content
-    for (size_t i = 0; i < layers_.size(); i++)
+    // Content.
+    for (size_t i = 0; i < segments_.size(); i++)
     {
         addTreeItem(i);
     }
 
-    // Resize Columns to the minimum space
+    // Resize Columns to the minimum space.
     for (int i = 0; i < COLUMN_LAST; i++)
     {
         tree_->resizeColumnToContents(i);
     }
 
-    // Sort Content
+    // Sort Content.
     tree_->setSortingEnabled(true);
     tree_->sortItems(COLUMN_ID, Qt::AscendingOrder);
 
     unblock();
 }
 
-void ExplorerLayersWidget::dataChanged()
+void ExplorerSegmentsWidget::dataChanged()
 {
-    LOG_DEBUG(<< "Output layers <" << layers_.size() << ">.");
-    LOG_DEBUG(<< "Output layers filter <" << filter_.isFilterEnabled() << ">.");
+    LOG_DEBUG(<< "Output segments <" << segments_.size() << ">.");
+    LOG_DEBUG(<< "Output segments filter <" << filter_.isFilterEnabled()
+              << ">.");
 
     mainWindow_->suspendThreads();
-    mainWindow_->editor().setLayers(layers_);
-    mainWindow_->editor().setLayersFilter(filter_);
+    mainWindow_->editor().setSegments(segments_);
+    mainWindow_->editor().setSegmentsFilter(filter_);
     mainWindow_->updateData();
 }
 
-void ExplorerLayersWidget::filterChanged()
+void ExplorerSegmentsWidget::filterChanged()
 {
-    LOG_DEBUG(<< "Output layers filter <" << filter_.isFilterEnabled() << ">.");
+    LOG_DEBUG(<< "Output segments filter <" << filter_.isFilterEnabled()
+              << ">.");
 
     mainWindow_->suspendThreads();
-    mainWindow_->editor().setLayersFilter(filter_);
+    mainWindow_->editor().setSegmentsFilter(filter_);
     mainWindow_->updateFilter();
 }
 
-bool ExplorerLayersWidget::isFilterEnabled() const
+bool ExplorerSegmentsWidget::isFilterEnabled() const
 {
     return filter_.isFilterEnabled();
 }
 
-void ExplorerLayersWidget::setFilterEnabled(bool b)
+void ExplorerSegmentsWidget::setFilterEnabled(bool b)
 {
     filter_.setFilterEnabled(b);
     filterChanged();
 }
 
-void ExplorerLayersWidget::slotAdd()
+void ExplorerSegmentsWidget::slotAdd()
 {
 }
 
-void ExplorerLayersWidget::slotDelete()
+void ExplorerSegmentsWidget::slotDelete()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
@@ -230,7 +235,7 @@ void ExplorerLayersWidget::slotDelete()
 
         for (auto &item : items)
         {
-            layers_.erase(index(item));
+            segments_.erase(index(item));
             filter_.erase(identifier(item));
 
             delete item;
@@ -240,7 +245,7 @@ void ExplorerLayersWidget::slotDelete()
     }
 }
 
-void ExplorerLayersWidget::slotShow()
+void ExplorerSegmentsWidget::slotShow()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
@@ -257,7 +262,7 @@ void ExplorerLayersWidget::slotShow()
     }
 }
 
-void ExplorerLayersWidget::slotHide()
+void ExplorerSegmentsWidget::slotHide()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
@@ -274,7 +279,7 @@ void ExplorerLayersWidget::slotHide()
     }
 }
 
-void ExplorerLayersWidget::slotSelectAll()
+void ExplorerSegmentsWidget::slotSelectAll()
 {
     QTreeWidgetItemIterator it(tree_);
 
@@ -287,7 +292,7 @@ void ExplorerLayersWidget::slotSelectAll()
     slotItemSelectionChanged();
 }
 
-void ExplorerLayersWidget::slotSelectInvert()
+void ExplorerSegmentsWidget::slotSelectInvert()
 {
     QTreeWidgetItemIterator it(tree_);
 
@@ -300,7 +305,7 @@ void ExplorerLayersWidget::slotSelectInvert()
     slotItemSelectionChanged();
 }
 
-void ExplorerLayersWidget::slotSelectNone()
+void ExplorerSegmentsWidget::slotSelectNone()
 {
     QTreeWidgetItemIterator it(tree_);
 
@@ -313,7 +318,7 @@ void ExplorerLayersWidget::slotSelectNone()
     slotItemSelectionChanged();
 }
 
-void ExplorerLayersWidget::slotItemSelectionChanged()
+void ExplorerSegmentsWidget::slotItemSelectionChanged()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
@@ -331,7 +336,7 @@ void ExplorerLayersWidget::slotItemSelectionChanged()
     }
 }
 
-void ExplorerLayersWidget::slotItemChanged(QTreeWidgetItem *item, int column)
+void ExplorerSegmentsWidget::slotItemChanged(QTreeWidgetItem *item, int column)
 {
     if (column == COLUMN_CHECKED)
     {
@@ -347,17 +352,17 @@ void ExplorerLayersWidget::slotItemChanged(QTreeWidgetItem *item, int column)
     }
 }
 
-size_t ExplorerLayersWidget::identifier(const QTreeWidgetItem *item)
+size_t ExplorerSegmentsWidget::identifier(const QTreeWidgetItem *item)
 {
     return static_cast<size_t>(item->text(COLUMN_ID).toULong());
 }
 
-size_t ExplorerLayersWidget::index(const QTreeWidgetItem *item)
+size_t ExplorerSegmentsWidget::index(const QTreeWidgetItem *item)
 {
-    return layers_.index(item->text(COLUMN_ID).toULong());
+    return segments_.index(item->text(COLUMN_ID).toULong());
 }
 
-void ExplorerLayersWidget::updateTree()
+void ExplorerSegmentsWidget::updateTree()
 {
     block();
 
@@ -382,14 +387,14 @@ void ExplorerLayersWidget::updateTree()
     unblock();
 }
 
-void ExplorerLayersWidget::block()
+void ExplorerSegmentsWidget::block()
 {
     disconnect(tree_, SIGNAL(itemChanged(QTreeWidgetItem *, int)), 0, 0);
     disconnect(tree_, SIGNAL(itemSelectionChanged()), 0, 0);
     (void)blockSignals(true);
 }
 
-void ExplorerLayersWidget::unblock()
+void ExplorerSegmentsWidget::unblock()
 {
     (void)blockSignals(false);
     connect(tree_,
@@ -402,11 +407,11 @@ void ExplorerLayersWidget::unblock()
             SLOT(slotItemSelectionChanged()));
 }
 
-void ExplorerLayersWidget::addTreeItem(size_t index)
+void ExplorerSegmentsWidget::addTreeItem(size_t index)
 {
     QTreeWidgetItem *item = new QTreeWidgetItem(tree_);
 
-    size_t id = layers_.id(index);
+    size_t id = segments_.id(index);
 
     if (filter_.hasFilter(id))
     {
@@ -419,10 +424,10 @@ void ExplorerLayersWidget::addTreeItem(size_t index)
 
     item->setText(COLUMN_ID, QString::number(id));
 
-    item->setText(COLUMN_LABEL, QString::fromStdString(layers_.label(index)));
+    item->setText(COLUMN_LABEL, QString::fromStdString(segments_.label(index)));
 
-    // Color legend
-    const Vector3<double> &rgb = layers_.color(index);
+    // Color legend.
+    const Vector3<double> &rgb = segments_.color(index);
 
     QColor color;
     color.setRedF(static_cast<float>(rgb[0]));
