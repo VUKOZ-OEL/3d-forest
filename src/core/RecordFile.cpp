@@ -30,6 +30,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "RecordFile"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define RECORD_FILE_SIGNATURE_0 0x52
@@ -193,6 +194,8 @@ uint64_t RecordFile::index() const
 void RecordFile::setIndex(uint64_t index)
 {
     uint64_t max = size();
+    LOG_DEBUG(<< "Seek record <" << index << "> from <" << size()
+              << "> records in file <" << file_ << ">.");
     if (index > max)
     {
         fill(index - max);
@@ -203,6 +206,8 @@ void RecordFile::setIndex(uint64_t index)
 
 void RecordFile::fill(uint64_t n)
 {
+    LOG_DEBUG(<< "Fill <" << n << "> records in file <" << file_ << ">.");
+
     std::vector<uint8_t> buffer;
     buffer.resize(1000 * 1000);
     std::memset(buffer.data(), 0, buffer.size());
@@ -266,18 +271,24 @@ void RecordFile::read(double &data)
 
 void RecordFile::readBuffer(uint8_t *buffer, uint64_t nbyte)
 {
-    if (file_.size() - headerSize_ - file_.offset() < nbyte)
+    if (file_.size() - file_.offset() < nbyte)
     {
+        LOG_DEBUG(<< "Clear <" << nbyte
+                  << "> bytes in buffer instead of reading from file <" << file_
+                  << ">.");
         std::memset(buffer, 0, nbyte);
     }
     else
     {
+        LOG_DEBUG(<< "Read <" << nbyte << "> bytes from file <" << file_
+                  << ">.");
         file_.read(buffer, nbyte);
     }
 }
 
 void RecordFile::writeBuffer(const uint8_t *buffer, uint64_t nbyte)
 {
+    LOG_DEBUG(<< "Write <" << nbyte << "> bytes to file <" << file_ << ">.");
     file_.write(buffer, nbyte);
 }
 
@@ -285,6 +296,9 @@ void RecordFile::createBuffer(RecordFile::Buffer &buffer,
                               uint64_t n,
                               bool setZero) const
 {
+    LOG_DEBUG(<< "Create buffer with <" << n << "> records for file <" << file_
+              << ">.");
+
     buffer.recordType = recordType_;
     buffer.recordSize = recordSize_;
     buffer.size = static_cast<size_t>(n);
@@ -304,6 +318,9 @@ void RecordFile::createBuffer(RecordFile::Buffer &buffer,
 
 void RecordFile::readBuffer(RecordFile::Buffer &buffer, uint64_t n)
 {
+    LOG_DEBUG(<< "Read <" << n << "> records to buffer from file <" << file_
+              << ">.");
+
     createBuffer(buffer, n);
     uint64_t nbyte = n * recordSize_;
     readBuffer(buffer.data.data(), nbyte);
@@ -313,6 +330,9 @@ void RecordFile::writeBuffer(const RecordFile::Buffer &buffer,
                              uint64_t n,
                              uint64_t from)
 {
+    LOG_DEBUG(<< "Write <" << n << "> records from buffer position <" << from
+              << "> to file <" << file_ << ">.");
+
     size_t offset = static_cast<size_t>(from) * buffer.recordSize;
     uint64_t nbyte = n * buffer.recordSize;
     if (offset + nbyte <= buffer.data.size())
