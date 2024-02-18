@@ -981,3 +981,11 @@ void File::remove(const std::string &path)
         THROW_ERRNO("Cannot remove file '" + path + "'");
     }
 }
+
+std::ostream &operator<<(std::ostream &os, const File &obj)
+{
+    os << "path <" << obj.path() << "> offset <" << obj.offset() << "> size <"
+       << obj.size() << ">";
+
+    return os;
+}

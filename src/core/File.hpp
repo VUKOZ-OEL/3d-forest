@@ -111,6 +111,8 @@ private:
     static int write(int fd, const uint8_t *buffer, uint64_t nbyte);
 };
 
+std::ostream &operator<<(std::ostream &os, const File &obj);
+
 #include <WarningsEnable.hpp>
 
 #endif /* FILE_HPP */

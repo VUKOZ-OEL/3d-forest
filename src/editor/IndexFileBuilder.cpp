@@ -448,12 +448,20 @@ void IndexFileBuilder::stateCreateAttributes()
     }
 
     // Write.
-    outputLas_.writeAttributesBuffer(attributes_, nPoints);
+    inputLas_.writeAttributesBuffer(attributes_, nPoints);
 
     // Next.
     value_ += (nPoints * sizeOfAttributesPerPoint_);
     valueTotal_ += (nPoints * sizeOfAttributesPerPoint_);
     valueIndex_ += nPoints;
+
+    // Reopen the input when it is finished.
+    if (valueIndex_ == maximumIndex_)
+    {
+        inputLas_.close();
+        inputLas_.open(readPath_);
+        inputLas_.readHeader();
+    }
 }
 
 void IndexFileBuilder::stateCopy()
