@@ -25,6 +25,7 @@
 // Include 3D Forest.
 #include <SettingsImport.hpp>
 class MainWindow;
+class InfoDialog;
 
 // Include Qt.
 #include <QDialog>
@@ -42,15 +43,19 @@ public:
     SettingsImport settings() const;
 
 public slots:
+    void slotHelp();
     void slotAccept();
     void slotReject();
 
 protected:
+    InfoDialog *helpDialog_;
+
     QCheckBox *convertCheckBox_;
     QCheckBox *centerCheckBox_;
     QCheckBox *randomizeCheckBox_;
     QCheckBox *copyExtraBytesCheckBox_;
 
+    QPushButton *helpButton_;
     QPushButton *acceptButton_;
     QPushButton *rejectButton_;
 };

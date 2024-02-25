@@ -686,10 +686,22 @@ void LasFile::writeHeader(const Header &hdr)
     htol16(&buffer[105], hdr.point_data_record_length);
 
     // Number of point records.
-    htol32(&buffer[107], hdr.legacy_number_of_point_records);
-    for (int i = 0; i < 5; i++)
+    if ((hdr.number_of_point_records <= UINT32_MAX) &&
+        (hdr.point_data_record_format < 6))
     {
-        htol32(&buffer[111 + i * 4], hdr.legacy_number_of_points_by_return[i]);
+        // Maintaining legacy compatibility.
+        htol32(&buffer[107],
+               static_cast<uint32_t>(hdr.number_of_point_records));
+
+        for (int i = 0; i < 5; i++)
+        {
+            htol32(&buffer[111 + i * 4],
+                   static_cast<uint32_t>(hdr.number_of_points_by_return[i]));
+        }
+    }
+    else
+    {
+        std::memset(&buffer[107], 0, sizeof(uint32_t) * 6);
     }
 
     // Scale.
