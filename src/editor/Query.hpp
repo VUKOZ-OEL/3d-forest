@@ -146,6 +146,8 @@ public:
 
     bool mean(double &meanX, double &meanY, double &meanZ);
 
+    Json &write(Json &out);
+
 protected:
     // Parent.
     Editor *editor_;
@@ -222,6 +224,8 @@ protected:
 
     std::shared_ptr<Page> read(size_t dataset, size_t index);
 };
+
+std::ostream &operator<<(std::ostream &os, Query &obj);
 
 #include <WarningsEnable.hpp>
 

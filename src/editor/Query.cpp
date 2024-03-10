@@ -730,3 +730,26 @@ bool Query::mean(double &meanX, double &meanY, double &meanZ)
 
     return true;
 }
+
+Json &Query::write(Json &out)
+{
+    out["coordinates"][0] = x();
+    out["coordinates"][1] = y();
+    out["coordinates"][2] = z();
+
+    out["intensity"] = intensity();
+
+    out["classification"] = classification();
+    out["segment"] = segment();
+    out["elevation"] = elevation();
+    out["descriptor"] = descriptor();
+
+    return out;
+}
+
+std::ostream &operator<<(std::ostream &os, Query &obj)
+{
+    Json json;
+    os << obj.write(json).serialize();
+    return os;
+}
