@@ -37,12 +37,15 @@ public:
     const SettingsView &view() const { return view_; }
     void setView(const SettingsView &view);
 
-    void read(const Json &in);
-    Json &write(Json &out) const;
-
 protected:
     SettingsView view_;
+
+    friend void fromJson(Settings &out, const Json &in);
+    friend void toJson(Json &out, const Settings &in);
 };
+
+void fromJson(Settings &out, const Json &in);
+void toJson(Json &out, const Settings &in);
 
 #include <WarningsEnable.hpp>
 

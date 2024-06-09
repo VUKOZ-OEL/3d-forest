@@ -42,12 +42,13 @@ public:
     void setDefault();
 
     size_t size() const { return segments_.size(); }
-    const Segment &at(size_t i) const { return segments_[i]; }
+    Segment &operator[](size_t index) { return segments_[index]; }
+    const Segment &operator[](size_t index) const { return segments_[index]; }
 
     void push_back(const Segment &segment);
-    void erase(size_t i);
+    void erase(size_t pos);
 
-    size_t id(size_t i) const { return segments_[i].id(); }
+    size_t id(size_t pos) const { return segments_[pos].id; }
     size_t index(size_t id) const
     {
         const auto &it = hashTableId_.find(id);
@@ -70,22 +71,16 @@ public:
 
     size_t unusedId() const;
 
-    const std::string &label(size_t i) const { return segments_[i].label(); }
-    void setLabel(size_t i, const std::string &label);
-
-    const Vector3<double> &color(size_t i) const
-    {
-        return segments_[i].color();
-    }
-    void setColor(size_t i, const Vector3<double> &color);
-
-    void read(const Json &in);
-    Json &write(Json &out) const;
-
 protected:
     std::vector<Segment> segments_;
     std::unordered_map<size_t, size_t> hashTableId_;
+
+    friend void fromJson(Segments &out, const Json &in);
+    friend void toJson(Json &out, const Segments &in);
 };
+
+void fromJson(Segments &out, const Json &in);
+void toJson(Json &out, const Segments &in);
 
 #include <WarningsEnable.hpp>
 

@@ -982,10 +982,9 @@ void File::remove(const std::string &path)
     }
 }
 
-std::ostream &operator<<(std::ostream &os, const File &obj)
+std::ostream &operator<<(std::ostream &out, const File &in)
 {
-    os << "path <" << obj.path() << "> offset <" << obj.offset() << "> size <"
-       << obj.size() << ">";
-
-    return os;
+    return out << "{ \"path\"=\"" << in.path()
+               << "\", \"offset\"=" << in.offset() << ", \"size\"=" << in.size()
+               << "}";
 }

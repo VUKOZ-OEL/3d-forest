@@ -38,17 +38,17 @@
 // Use the same query to issue multiple data requests.
 static void exampleQuery()
 {
-    Editor db;
-    db.open(DATA_PATH);
+    Editor editor;
+    editor.open(DATA_PATH);
 
-    Query query(&db);
+    Query query(&editor);
 
     // Set all 3 points to segment 0
     // Output:
     //     0, 0, 0 Segment 0 Start
     //     1, 0, 0 Segment 0 Start
     //     0, 1, 0 Segment 0 Start
-    query.where().setBox(db.clipBoundary());
+    query.where().setBox(editor.clipBoundary());
     query.exec();
     while (query.next())
     {
@@ -94,7 +94,7 @@ static void exampleQuery()
     //     0, 0, 0 Segment 1 End
     //     1, 0, 0 Segment 2 End
     //     0, 1, 0 Segment 0 End
-    query.where().setBox(db.clipBoundary());
+    query.where().setBox(editor.clipBoundary());
     query.exec();
     while (query.next())
     {

@@ -38,11 +38,11 @@ static void exampleQueryVoxels(const std::string &path, double voxelSize)
     classifications.insert(LasFile::Classification::CLASS_UNASSIGNED);
     std::unordered_set<size_t> empty;
 
-    Editor db;
-    db.open(path);
+    Editor editor;
+    editor.open(path);
 
-    Query query(&db);
-    query.setVoxels(voxelSize, db.clipBoundary());
+    Query query(&editor);
+    query.setVoxels(voxelSize, editor.clipBoundary());
 
     while (query.nextVoxel())
     {

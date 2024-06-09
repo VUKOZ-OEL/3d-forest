@@ -111,15 +111,15 @@ void ExplorerClippingWidget::slotRegionChanged(const Region &region)
 {
     LOG_DEBUG(<< "Output region <" << region << ">.");
 
-    if (region.enabled == Region::TYPE_BOX)
+    if (region.shape == Region::SHAPE_BOX)
     {
         region_.box = region.box;
-        region_.enabled = region.enabled;
+        region_.shape = region.shape;
     }
-    else if (region.enabled == Region::TYPE_CYLINDER)
+    else if (region.shape == Region::SHAPE_CYLINDER)
     {
         region_.cylinder = region.cylinder;
-        region_.enabled = region.enabled;
+        region_.shape = region.shape;
     }
 
     filterChanged();
@@ -133,7 +133,7 @@ void ExplorerClippingWidget::filterChanged()
 
     if (!isFilterEnabled())
     {
-        filter.enabled = Region::TYPE_NONE;
+        filter.shape = Region::SHAPE_NONE;
     }
 
     mainWindow_->suspendThreads();

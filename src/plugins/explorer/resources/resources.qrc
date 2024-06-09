@@ -26,6 +26,7 @@
 
 <!-- Common -->
 <file>eye_24px.png</file>
+<file>eye_30px.png</file>
 <file>hide_24px.png</file>
 
 <file>select_all_24px.png</file>
@@ -35,15 +36,33 @@
 <!-- Tabs -->
 <file>classification_16px.png</file>
 <file>classification_16px_color.png</file>
+<file>classification_20px_color.png</file>
+
 <file>clip_filter_16px_color.png</file>
+<file>clip_filter_20px_color.png</file>
+
 <file>selection_box_16px.png</file>
+<file>selection_box_20px.png</file>
+
 <file>selection_cylinder_16px.png</file>
+<file>selection_cylinder_20px.png</file>
+
 <file>color_16px_color.png</file>
+
 <file>descriptor_filter_16px_color.png</file>
+<file>descriptor_filter_20px_color.png</file>
+
 <file>elevation_filter_16px_color.png</file>
+<file>elevation_filter_20px_color.png</file>
+
 <file>file_16px.png</file>
+<file>file_20px.png</file>
+
 <file>intensity_16px_color.png</file>
-<file>segments_16px.png</file>
+
+<file>segments_16px_color.png</file>
+<file>segments_20px_color.png</file>
+
 <file>return_number_16px_color.png</file>
 
 </qresource>

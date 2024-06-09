@@ -241,7 +241,7 @@ void Page::queryWhere()
 
     const Region &region = query_->where().region();
 
-    if (region.enabled == Region::TYPE_NONE)
+    if (region.shape == Region::SHAPE_NONE)
     {
         // Reset selection to mark all points as selected.
         LOG_DEBUG(<< "Reset selection.");
@@ -271,7 +271,7 @@ void Page::queryWhereBox()
 {
     const Region &region = query_->where().region();
     const Box<double> &clipBox = region.box;
-    if (region.enabled != Region::TYPE_BOX || clipBox.empty())
+    if (region.shape != Region::SHAPE_BOX || clipBox.empty())
     {
         return;
     }
@@ -417,7 +417,7 @@ void Page::queryWhereCone()
 {
     const Region &region = query_->where().region();
     const Cone<double> &clipCone = region.cone;
-    if (region.enabled != Region::TYPE_CONE || clipCone.empty())
+    if (region.shape != Region::SHAPE_CONE || clipCone.empty())
     {
         return;
     }
@@ -500,7 +500,7 @@ void Page::queryWhereCylinder()
 {
     const Region &region = query_->where().region();
     const Cylinder<double> &clipCylinder = region.cylinder;
-    if (region.enabled != Region::TYPE_CYLINDER || clipCylinder.empty())
+    if (region.shape != Region::SHAPE_CYLINDER || clipCylinder.empty())
     {
         return;
     }
@@ -583,7 +583,7 @@ void Page::queryWhereSphere()
 {
     const Region &region = query_->where().region();
     const Sphere<double> &clipSphere = region.sphere;
-    if (region.enabled != Region::TYPE_SPHERE || clipSphere.empty())
+    if (region.shape != Region::SHAPE_SPHERE || clipSphere.empty())
     {
         return;
     }
@@ -889,7 +889,7 @@ void Page::runColorModifier()
         {
             if (segment[i] < max)
             {
-                const Vector3<double> &c = segments.color(segment[i]);
+                const Vector3<double> &c = segments[segment[i]].color;
                 renderColor[i * 3 + 0] *= static_cast<float>(c[0]);
                 renderColor[i * 3 + 1] *= static_cast<float>(c[1]);
                 renderColor[i * 3 + 2] *= static_cast<float>(c[2]);

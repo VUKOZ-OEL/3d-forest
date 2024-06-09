@@ -135,39 +135,18 @@ void SettingsView::setColorSourceEnabledAll(bool v)
     }
 }
 
-void SettingsView::read(const Json &in)
+void fromJson(SettingsView &out, const Json &in)
 {
-    if (in.contains("pointSize"))
-    {
-        pointSize_ = static_cast<double>(in["pointSize"].number());
-    }
-
-    if (in.contains("fog") && in["fog"].contains("enabled"))
-    {
-        fogEnabled_ = in["fog"]["enabled"].isTrue();
-    }
-    else
-    {
-        fogEnabled_ = false;
-    }
-
-    if (in.contains("pointColor"))
-    {
-        pointColor_.read(in["pointColor"]);
-    }
-
-    if (in.contains("background"))
-    {
-        background_.read(in["background"]);
-    }
+    fromJson(out.pointSize_, in["pointSize"]);
+    fromJson(out.fogEnabled_, in["fogEnabled"]);
+    fromJson(out.pointColor_, in["pointColor"]);
+    fromJson(out.background_, in["background"]);
 }
 
-Json &SettingsView::write(Json &out) const
+void toJson(Json &out, const SettingsView &in)
 {
-    out["pointSize"] = pointSize_;
-    out["fog"]["enabled"] = fogEnabled_;
-    pointColor_.write(out["pointColor"]);
-    background_.write(out["background"]);
-
-    return out;
+    toJson(out["pointSize"], in.pointSize_);
+    toJson(out["fogEnabled"], in.fogEnabled_);
+    toJson(out["pointColor"], in.pointColor_);
+    toJson(out["background"], in.background_);
 }

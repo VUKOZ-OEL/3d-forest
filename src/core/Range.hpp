@@ -37,6 +37,8 @@
 template <class T> class Range : public std::array<T, 4>
 {
 public:
+    bool enabled;
+
     // Construct/Copy/Destroy.
     Range();
 
@@ -46,7 +48,7 @@ public:
         this->operator[](1) = min;
         this->operator[](2) = max;
         this->operator[](3) = max;
-        enabled_ = true;
+        enabled = true;
     }
 
     Range(T min, T minValue, T maxValue, T max)
@@ -55,14 +57,14 @@ public:
         this->operator[](1) = minValue;
         this->operator[](2) = maxValue;
         this->operator[](3) = max;
-        enabled_ = true;
+        enabled = true;
     }
 
     ~Range();
 
     // Enabled.
-    void setEnabled(bool enabled) { enabled_ = enabled; }
-    bool isEnabled() const { return enabled_; }
+    void setEnabled(bool enabled_) { enabled = enabled_; }
+    bool isEnabled() const { return enabled; }
 
     // Access.
     bool empty() const;
@@ -103,13 +105,6 @@ public:
 
     // Operations.
     bool contains(T v) const;
-
-    // I/O.
-    void read(const Json &in);
-    Json &write(Json &out) const;
-
-private:
-    bool enabled_;
 };
 
 template <class T> inline Range<T>::Range()
@@ -127,7 +122,7 @@ template <class T> inline void Range<T>::clear()
     this->operator[](1) = 0;
     this->operator[](2) = 0;
     this->operator[](3) = 0;
-    enabled_ = true;
+    enabled = true;
 }
 
 template <class T> inline bool Range<T>::empty() const
@@ -153,29 +148,35 @@ template <class T> inline bool Range<T>::contains(T v) const
     return !(v < minimumValue() || v > maximumValue());
 }
 
-template <class T> inline void Range<T>::read(const Json &in)
+template <class T> inline void fromJson(Range<T> &out, const Json &in)
 {
-    this->operator[](0) = static_cast<T>(in["minimum"].number());
-    this->operator[](1) = static_cast<T>(in["minimumValue"].number());
-    this->operator[](2) = static_cast<T>(in["maximumValue"].number());
-    this->operator[](3) = static_cast<T>(in["maximum"].number());
+    fromJson(out[0], in["minimum"]);
+    fromJson(out[1], in["minimumValue"]);
+    fromJson(out[2], in["maximumValue"]);
+    fromJson(out[3], in["maximum"]);
+    fromJson(out.enabled, in["enabled"]);
 }
 
-template <class T> inline Json &Range<T>::write(Json &out) const
+template <class T> inline void toJson(Json &out, const Range<T> &in)
 {
-    out["minimum"] = this->operator[](0);
-    out["minimumValue"] = this->operator[](1);
-    out["maximumValue"] = this->operator[](2);
-    out["maximum"] = this->operator[](3);
+    toJson(out["minimum"], in[0]);
+    toJson(out["minimumValue"], in[1]);
+    toJson(out["maximumValue"], in[2]);
+    toJson(out["maximum"], in[3]);
+    toJson(out["enabled"], in.enabled);
+}
 
-    return out;
+template <class T> inline std::string toString(const Range<T> &in)
+{
+    Json json;
+    toJson(json, in);
+    return json.serialize(0);
 }
 
 template <class T>
-std::ostream &operator<<(std::ostream &os, const Range<T> &obj)
+std::ostream &operator<<(std::ostream &out, const Range<T> &in)
 {
-    return os << std::fixed << "(" << obj[0] << ", " << obj[1] << ", " << obj[2]
-              << ", " << obj[3] << ")" << std::defaultfloat;
+    return out << toString(in);
 }
 
 #include <WarningsEnable.hpp>

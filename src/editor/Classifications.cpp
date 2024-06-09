@@ -86,38 +86,33 @@ void Classifications::clear()
     }
 }
 
-void Classifications::read(const Json &in)
+void fromJson(Classifications &out, const Json &in)
 {
-    if (in.contains("classes"))
+    size_t i = 0;
+    size_t n = in["classes"].array().size();
+
+    out.clear();
+    out.resize(n);
+
+    for (auto const &it : in["classes"].array())
     {
-        size_t i = 0;
-        size_t n = in["classes"].array().size();
-
-        clear();
-        resize(n);
-
-        for (auto const &it : in["classes"].array())
+        if (it.contains("label"))
         {
-            if (it.contains("label"))
-            {
-                classes_[i].label = it["label"].string();
-            }
-
-            i++;
+            fromJson(out.classes_[i].label, it["label"]);
         }
+
+        i++;
     }
 }
 
-Json &Classifications::write(Json &out) const
+void toJson(Json &out, const Classifications &in)
 {
     size_t i = 0;
 
-    for (auto const &it : classes_)
+    for (auto const &it : in.classes_)
     {
         Json &obj = out["classes"][i];
         obj["label"] = it.label;
         i++;
     }
-
-    return out;
 }

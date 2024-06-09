@@ -37,7 +37,7 @@ class Editor;
 
 /** Data Query.
 
-    A database query is a request for a database’s data so we can retrieve or
+    A editor query is a request for a editor’s data so we can retrieve or
     manipulate it.
 
     A query may be used to access up to quintillions of point records that meet
@@ -222,6 +222,10 @@ protected:
 
     std::shared_ptr<Page> read(size_t dataset, size_t index);
 };
+
+void toJson(Json &out, Query &in);
+
+std::ostream &operator<<(std::ostream &out, Query &in);
 
 #include <WarningsEnable.hpp>
 

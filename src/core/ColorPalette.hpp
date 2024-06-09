@@ -46,7 +46,9 @@ public:
     static const std::vector<Vector3<double>> BlueCyanYellowRed16;
     static const std::vector<Vector3<double>> BlueCyanYellowRed256;
     static const std::vector<Vector3<double>> BlueCyanGreenYellowRed16;
+
     static const std::vector<Vector3<double>> WindowsXp32;
+    static const std::vector<Vector3<double>> MPN65;
 
     static std::vector<Vector3<double>> blueCyanYellowRed(size_t nColors);
     static std::vector<Vector3<double>> blueCyanGreenYellowRed(size_t nColors);

@@ -1039,111 +1039,107 @@ void LasFile::transformInvert(double &x, double &y, double &z) const
     z = (z - header.z_offset) / header.z_scale_factor;
 }
 
-Json &LasFile::Point::write(Json &out) const
+void toJson(Json &out, const LasFile::Header &in)
 {
-    out["coordinates"][0] = x;
-    out["coordinates"][1] = y;
-    out["coordinates"][2] = z;
+    out["version"][0] = in.version_major;
+    out["version"][1] = in.version_minor;
+    out["generating_software"] = std::string(in.generating_software);
+    out["file_creation"] = in.dateCreated();
 
-    out["intensity"] = intensity;
+    out["header_size"] = in.header_size;
+    out["offset_to_point_data"] = in.offset_to_point_data;
+    out["offset_to_wdpr"] = in.offset_to_wdpr;
+    out["offset_to_evlr"] = in.offset_to_evlr;
 
-    out["return_number"] = return_number;
-    out["number_of_returns"] = number_of_returns;
-    out["scan_direction_flag"] = scan_direction_flag;
-    out["edge_of_flight_line"] = edge_of_flight_line;
-    out["classification_flags"] = classification_flags;
+    out["point_data_record_format"] = in.point_data_record_format;
+    out["point_data_record_length"] = in.point_data_record_length;
+    out["point_data_record_user_length"] = in.pointDataRecordLengthUser();
+    out["number_of_point_records"] = in.number_of_point_records;
 
-    if (format > 5)
-    {
-        out["scanner_channel"] = scanner_channel;
-    }
-
-    out["angle"] = angle;
-    out["source_id"] = source_id;
-    out["classification"] = classification;
-    out["user_data"] = user_data;
-
-    if (LAS_FILE_FORMAT_GPS_TIME[format])
-    {
-        out["gps_time"] = gps_time;
-    }
-
-    if (LAS_FILE_FORMAT_RGB[format])
-    {
-        out["rgb"][0] = red;
-        out["rgb"][1] = green;
-        out["rgb"][2] = blue;
-    }
-
-    if (LAS_FILE_FORMAT_NIR[format])
-    {
-        out["nir"] = nir;
-    }
-
-    if (LAS_FILE_FORMAT_WAVE[format])
-    {
-        out["wave_index"] = wave_index;
-        out["wave_size"] = wave_size;
-        out["wave_offset"] = wave_offset;
-        out["wave_return"] = wave_return;
-        out["wave"][0] = wave_x;
-        out["wave"][1] = wave_y;
-        out["wave"][2] = wave_z;
-    }
-
-    out["segment"] = segment;
-    out["elevation"] = elevation;
-    out["descriptor"] = descriptor;
-    out["voxel"] = voxel;
-
-    return out;
+    out["scale"][0] = in.x_scale_factor;
+    out["scale"][1] = in.y_scale_factor;
+    out["scale"][2] = in.z_scale_factor;
+    out["offset"][0] = in.x_offset;
+    out["offset"][1] = in.y_offset;
+    out["offset"][2] = in.z_offset;
+    out["max"][0] = in.max_x;
+    out["max"][1] = in.max_y;
+    out["max"][2] = in.max_z;
+    out["min"][0] = in.min_x;
+    out["min"][1] = in.min_y;
+    out["min"][2] = in.min_z;
 }
 
-Json &LasFile::Header::write(Json &out) const
+void toJson(Json &out, const LasFile::Point &in)
 {
-    out["version"][0] = version_major;
-    out["version"][1] = version_minor;
-    out["generating_software"] = std::string(generating_software);
-    out["file_creation"] = dateCreated();
+    out["coordinates"][0] = in.x;
+    out["coordinates"][1] = in.y;
+    out["coordinates"][2] = in.z;
 
-    out["header_size"] = header_size;
-    out["offset_to_point_data"] = offset_to_point_data;
-    out["offset_to_wdpr"] = offset_to_wdpr;
-    out["offset_to_evlr"] = offset_to_evlr;
+    out["intensity"] = in.intensity;
 
-    out["point_data_record_format"] = point_data_record_format;
-    out["point_data_record_length"] = point_data_record_length;
-    out["point_data_record_user_length"] = pointDataRecordLengthUser();
-    out["number_of_point_records"] = number_of_point_records;
+    out["return_number"] = in.return_number;
+    out["number_of_returns"] = in.number_of_returns;
+    out["scan_direction_flag"] = in.scan_direction_flag;
+    out["edge_of_flight_line"] = in.edge_of_flight_line;
+    out["classification_flags"] = in.classification_flags;
 
-    out["scale"][0] = x_scale_factor;
-    out["scale"][1] = y_scale_factor;
-    out["scale"][2] = z_scale_factor;
-    out["offset"][0] = x_offset;
-    out["offset"][1] = y_offset;
-    out["offset"][2] = z_offset;
-    out["max"][0] = max_x;
-    out["max"][1] = max_y;
-    out["max"][2] = max_z;
-    out["min"][0] = min_x;
-    out["min"][1] = min_y;
-    out["min"][2] = min_z;
+    if (in.format > 5)
+    {
+        out["scanner_channel"] = in.scanner_channel;
+    }
 
-    return out;
+    out["angle"] = in.angle;
+    out["source_id"] = in.source_id;
+    out["classification"] = in.classification;
+    out["user_data"] = in.user_data;
+
+    if (LAS_FILE_FORMAT_GPS_TIME[in.format])
+    {
+        out["gps_time"] = in.gps_time;
+    }
+
+    if (LAS_FILE_FORMAT_RGB[in.format])
+    {
+        out["rgb"][0] = in.red;
+        out["rgb"][1] = in.green;
+        out["rgb"][2] = in.blue;
+    }
+
+    if (LAS_FILE_FORMAT_NIR[in.format])
+    {
+        out["nir"] = in.nir;
+    }
+
+    if (LAS_FILE_FORMAT_WAVE[in.format])
+    {
+        out["wave_index"] = in.wave_index;
+        out["wave_size"] = in.wave_size;
+        out["wave_offset"] = in.wave_offset;
+        out["wave_return"] = in.wave_return;
+        out["wave"][0] = in.wave_x;
+        out["wave"][1] = in.wave_y;
+        out["wave"][2] = in.wave_z;
+    }
+
+    out["segment"] = in.segment;
+    out["elevation"] = in.elevation;
+    out["descriptor"] = in.descriptor;
+    out["voxel"] = in.voxel;
 }
 
-std::ostream &operator<<(std::ostream &os, const LasFile::Header &obj)
+std::ostream &operator<<(std::ostream &out, const LasFile::Header &in)
 {
     Json json;
-    os << obj.write(json).serialize();
-    return os;
+    toJson(json, in);
+    return out << json.serialize();
 }
 
-std::ostream &operator<<(std::ostream &os, const LasFile::Point &obj)
+std::ostream &operator<<(std::ostream &out, const LasFile::Point &in)
 {
     Json json;
-    os << obj.write(json).serialize();
-    return os;
+    toJson(json, in);
+    return out << json.serialize();
 }
 
 /** @class LasFile.cpp::LasFile

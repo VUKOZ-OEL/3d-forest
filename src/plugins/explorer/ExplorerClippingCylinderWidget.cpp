@@ -148,7 +148,7 @@ void ExplorerClippingCylinderWidget::slotInputChanged()
 
     Region region;
     region.cylinder.set(x1, y1, z1, x2, y2, z2, r);
-    region.enabled = Region::TYPE_CYLINDER;
+    region.shape = Region::SHAPE_CYLINDER;
 
     emit signalRegionChanged(region);
 }

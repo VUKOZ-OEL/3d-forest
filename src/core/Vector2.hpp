@@ -54,9 +54,6 @@ public:
     void normalize();
     Vector2<T> normalized() const;
 
-    void read(const Json &in);
-    Json &write(Json &out) const;
-
     friend Vector2<T> operator+(const Vector2<T> &a, const Vector2<T> &b)
     {
         return Vector2<T>(a[0] + b[0], a[1] + b[1]);
@@ -175,25 +172,27 @@ template <class T> inline Vector2<T> Vector2<T>::normalized() const
     return v;
 }
 
-template <class T> inline void Vector2<T>::read(const Json &in)
+template <class T> inline void fromJson(Vector2<T> &out, const Json &in)
 {
-    this->operator[](0) = static_cast<T>(in[0].number());
-    this->operator[](1) = static_cast<T>(in[1].number());
+    fromJson(out(0), in[0]);
+    fromJson(out(1), in[1]);
 }
 
-template <class T> inline Json &Vector2<T>::write(Json &out) const
+template <class T> inline void toJson(Json &out, const Vector2<T> &in)
 {
-    out[0] = this->operator[](0);
-    out[1] = this->operator[](1);
+    toJson(out[0], in(0));
+    toJson(out[1], in(1));
+}
 
-    return out;
+template <class T> inline std::string toString(const Vector2<T> &in)
+{
+    return "(" + std::to_string(in[0]) + ", " + std::to_string(in[1]) + ")";
 }
 
 template <class T>
-std::ostream &operator<<(std::ostream &os, const Vector2<T> &obj)
+std::ostream &operator<<(std::ostream &out, const Vector2<T> &in)
 {
-    return os << std::fixed << "(" << obj[0] << ", " << obj[1] << ")"
-              << std::defaultfloat;
+    return out << toString(in);
 }
 
 #include <WarningsEnable.hpp>

@@ -226,30 +226,30 @@ extern std::shared_ptr<LoggerFile> EXPORT_CORE globalLoggerFile;
     } while (false)
 
 template <typename T>
-inline std::ostream &operator<<(std::ostream &os, std::unordered_set<T> vec)
+inline std::ostream &operator<<(std::ostream &out, std::unordered_set<T> in)
 {
-    os << "{ ";
-    std::copy(vec.begin(), vec.end(), std::ostream_iterator<T>(os, " "));
-    os << "}";
-    return os;
+    out << "{ ";
+    std::copy(in.begin(), in.end(), std::ostream_iterator<T>(out, " "));
+    out << "}";
+    return out;
 }
 
 template <typename T>
-inline std::ostream &operator<<(std::ostream &os, std::set<T> vec)
+inline std::ostream &operator<<(std::ostream &out, std::set<T> in)
 {
-    os << "{ ";
-    std::copy(vec.begin(), vec.end(), std::ostream_iterator<T>(os, " "));
-    os << "}";
-    return os;
+    out << "{ ";
+    std::copy(in.begin(), in.end(), std::ostream_iterator<T>(out, " "));
+    out << "}";
+    return out;
 }
 
 template <typename T>
-inline std::ostream &operator<<(std::ostream &os, std::vector<T> vec)
+inline std::ostream &operator<<(std::ostream &out, std::vector<T> in)
 {
-    os << "{ ";
-    std::copy(vec.begin(), vec.end(), std::ostream_iterator<T>(os, " "));
-    os << "}";
-    return os;
+    out << "( ";
+    std::copy(in.begin(), in.end(), std::ostream_iterator<T>(out, " "));
+    out << ")";
+    return out;
 }
 
 #include <WarningsEnable.hpp>

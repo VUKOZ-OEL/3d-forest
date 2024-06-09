@@ -45,7 +45,9 @@ void Segments::setDefault()
     size_t idx = 0;
 
     segments_.resize(1);
-    segments_[idx].set(id, "main", {1.0, 1.0, 1.0});
+    segments_[idx].id = id;
+    segments_[idx].label = "unsegmented";
+    segments_[idx].color = {1.0, 1.0, 1.0};
 
     hashTableId_.clear();
     hashTableId_[id] = idx;
@@ -54,7 +56,7 @@ void Segments::setDefault()
 void Segments::push_back(const Segment &segment)
 {
     LOG_DEBUG(<< "Append segment <" << segment << ">.");
-    size_t id = segment.id();
+    size_t id = segment.id;
     size_t idx = segments_.size();
 
     segments_.push_back(segment);
@@ -62,23 +64,23 @@ void Segments::push_back(const Segment &segment)
     hashTableId_[id] = idx;
 }
 
-void Segments::erase(size_t i)
+void Segments::erase(size_t pos)
 {
-    LOG_DEBUG(<< "Erase item <" << i << ">.");
+    LOG_DEBUG(<< "Erase item <" << pos << ">.");
 
     if (segments_.size() == 0)
     {
         return;
     }
 
-    size_t key = id(i);
+    size_t key = id(pos);
     hashTableId_.erase(key);
 
     size_t n = segments_.size() - 1;
-    for (size_t pos = i; pos < n; pos++)
+    for (size_t i = pos; i < n; i++)
     {
-        segments_[pos] = segments_[pos + 1];
-        hashTableId_[segments_[pos].id()] = pos;
+        segments_[i] = segments_[i + 1];
+        hashTableId_[segments_[i].id] = i;
     }
     segments_.resize(n);
 }
@@ -98,62 +100,40 @@ size_t Segments::unusedId() const
     THROW("New segment identifier is not available.");
 }
 
-void Segments::setLabel(size_t i, const std::string &label)
+void fromJson(Segments &out, const Json &in)
 {
-    LOG_DEBUG(<< "Set label index <" << i << "> label <" << label << ">.");
-    segments_[i].setLabel(label);
-}
-
-void Segments::setColor(size_t i, const Vector3<double> &color)
-{
-    LOG_DEBUG(<< "Set color index <" << i << "> color <" << color << ">.");
-    segments_[i].setColor(color);
-}
-
-void Segments::read(const Json &in)
-{
-    LOG_DEBUG(<< "Read.");
-
-    clear();
+    out.clear();
 
     if (in.contains("segments"))
     {
         size_t i = 0;
         size_t n = in["segments"].array().size();
 
-        segments_.resize(n);
+        out.segments_.resize(n);
 
         for (auto const &it : in["segments"].array())
         {
-            segments_[i].read(it);
-
-            size_t id = segments_[i].id();
-
-            hashTableId_[id] = i;
-
+            fromJson(out.segments_[i], it);
+            size_t id = out.segments_[i].id;
+            out.hashTableId_[id] = i;
             i++;
         }
     }
 
     // Set default.
-    if (segments_.size() == 0)
+    if (out.segments_.size() == 0)
     {
-        setDefault();
+        out.setDefault();
     }
 }
 
-Json &Segments::write(Json &out) const
+void toJson(Json &out, const Segments &in)
 {
-    LOG_DEBUG(<< "Write.");
-
     size_t i = 0;
 
-    for (auto const &it : segments_)
+    for (auto const &it : in.segments_)
     {
-        Json &obj = out["segments"][i];
-        it.write(obj);
+        toJson(out["segments"][i], it);
         i++;
     }
-
-    return out;
 }

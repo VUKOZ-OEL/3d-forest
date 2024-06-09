@@ -29,6 +29,7 @@
 
 // Include 3D Forest.
 #include <Classification.hpp>
+#include <Json.hpp>
 #include <Vector3.hpp>
 
 // Include local.
@@ -48,15 +49,18 @@ public:
 
     const std::string &label(size_t i) const { return classes_[i].label; }
 
-    void read(const Json &in);
-    Json &write(Json &out) const;
-
 protected:
     std::vector<Classification> classes_;
     std::unordered_set<size_t> ids_;
 
     void resize(size_t n);
+
+    friend void fromJson(Classifications &out, const Json &in);
+    friend void toJson(Json &out, const Classifications &in);
 };
+
+void fromJson(Classifications &out, const Json &in);
+void toJson(Json &out, const Classifications &in);
 
 #include <WarningsEnable.hpp>
 

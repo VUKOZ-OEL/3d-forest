@@ -149,14 +149,7 @@ class Numeric
 public:
     template <class T> static T min() { return 0; }
     template <class T> static T max() { return 0; }
-
-    template <class T> static T min(const T &, const T &);
 };
-
-template <class T> inline T Numeric::min(const T &a, const T &b)
-{
-    return (a < b) ? a : b;
-}
 
 template <> inline signed char Numeric::min<signed char>()
 {

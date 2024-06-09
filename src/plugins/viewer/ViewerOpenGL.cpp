@@ -134,7 +134,7 @@ void ViewerOpenGL::render(Mode mode,
 
 void ViewerOpenGL::renderClipFilter(const Region &clipFilter)
 {
-    if (!clipFilter.enabled)
+    if (clipFilter.shape == Region::SHAPE_NONE)
     {
         return;
     }
@@ -144,7 +144,7 @@ void ViewerOpenGL::renderClipFilter(const Region &clipFilter)
     glEnable(GL_LINE_STIPPLE);
     glLineStipple(1, 0xff);
 
-    if (clipFilter.enabled == Region::TYPE_CYLINDER)
+    if (clipFilter.shape == Region::SHAPE_CYLINDER)
     {
         Vector3<float> a(clipFilter.cylinder.a());
         Vector3<float> b(clipFilter.cylinder.b());
@@ -156,7 +156,7 @@ void ViewerOpenGL::renderClipFilter(const Region &clipFilter)
     {
         ViewerAabb box;
 
-        if (clipFilter.enabled == Region::TYPE_BOX)
+        if (clipFilter.shape == Region::SHAPE_BOX)
         {
             box.set(clipFilter.box);
         }
@@ -280,6 +280,39 @@ void ViewerOpenGL::renderAxis()
     c[3] = QVector3D(0.0F, 1.0F, 0.0F);
     c[4] = QVector3D(0.0F, 0.3F, 1.0F);
     c[5] = QVector3D(0.0F, 0.3F, 1.0F);
+
+    GLuint indices[6] = {0, 1, 2, 3, 4, 5};
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, static_cast<GLvoid *>(&v[0]));
+    glColorPointer(3, GL_FLOAT, 0, static_cast<GLvoid *>(&c[0]));
+    glDrawElements(GL_LINES, 6, GL_UNSIGNED_INT, indices);
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_COLOR_ARRAY);
+}
+
+void ViewerOpenGL::renderCross(const Vector3<float> &p,
+                               const ViewerAabb &box,
+                               const Vector3<float> &color)
+{
+    QVector3D v[6];
+    QVector3D min = box.getMin();
+    QVector3D max = box.getMax();
+    v[0] = QVector3D(p[0] - (p[0] - min[0]), p[1], p[2]);
+    v[1] = QVector3D(p[0] + (max[0] - p[0]), p[1], p[2]);
+    v[2] = QVector3D(p[0], p[1] - (p[1] - min[1]), p[2]);
+    v[3] = QVector3D(p[0], p[1] + (max[1] - p[1]), p[2]);
+    v[4] = QVector3D(p[0], p[1], p[2] - (p[2] - min[2]));
+    v[5] = QVector3D(p[0], p[1], p[2] + (max[2] - p[2]));
+
+    QVector3D c[6];
+    c[0] = QVector3D(color[0], color[1], color[2]);
+    c[1] = QVector3D(color[0], color[1], color[2]);
+    c[2] = QVector3D(color[0], color[1], color[2]);
+    c[3] = QVector3D(color[0], color[1], color[2]);
+    c[4] = QVector3D(color[0], color[1], color[2]);
+    c[5] = QVector3D(color[0], color[1], color[2]);
 
     GLuint indices[6] = {0, 1, 2, 3, 4, 5};
 

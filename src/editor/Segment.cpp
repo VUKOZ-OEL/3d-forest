@@ -27,61 +27,39 @@
 #define LOG_MODULE_NAME "Segment"
 #include <Log.hpp>
 
-Segment::Segment() : id_(0)
+Segment::Segment()
 {
 }
 
-void Segment::set(size_t id,
-                  const std::string &label,
-                  const Vector3<double> &color)
+void fromJson(Segment &out, const Json &in)
 {
-    id_ = id;
-    label_ = label;
-    color_ = color;
+    fromJson(out.id, in["id"]);
+    fromJson(out.label, in["label"]);
+    fromJson(out.color, in["color"]);
+
+    fromJson(out.position, in["position"]);
+    fromJson(out.boundary, in["boundary"]);
+
+    fromJson(out.height, in["height"]);
+    fromJson(out.radius, in["radius"]);
 }
 
-void Segment::setLabel(const std::string &label)
+void toJson(Json &out, const Segment &in)
 {
-    label_ = label;
+    toJson(out["id"], in.id);
+    toJson(out["label"], in.label);
+    toJson(out["color"], in.color);
+
+    toJson(out["position"], in.position);
+    toJson(out["boundary"], in.boundary);
+
+    toJson(out["height"], in.height);
+    toJson(out["radius"], in.radius);
 }
 
-void Segment::setColor(const Vector3<double> &color)
+std::ostream &operator<<(std::ostream &out, const Segment &in)
 {
-    color_ = color;
-}
-
-void Segment::read(const Json &in)
-{
-    if (!in.isObject())
-    {
-        THROW("Segment is not JSON object");
-    }
-
-    // ID.
-    id_ = in["id"].uint32();
-
-    // Label.
-    if (in.contains("label"))
-    {
-        label_ = in["label"].string();
-    }
-    else
-    {
-        label_ = "";
-    }
-
-    // Color.
-    if (in.contains("color"))
-    {
-        color_.read(in["color"]);
-    }
-}
-
-Json &Segment::write(Json &out) const
-{
-    out["id"] = id_;
-    out["label"] = label_;
-    color_.write(out["color"]);
-
-    return out;
+    Json json;
+    toJson(json, in);
+    return out << json.serialize();
 }

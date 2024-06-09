@@ -893,38 +893,34 @@ void IndexFile::write(ChunkFile &file) const
     file.write(buffer.data(), chunk.dataLength);
 }
 
-Json &IndexFile::write(Json &out) const
+static void toJson(Json &out, const IndexFile::Node *data, size_t idx)
 {
-    if (size() > 0)
-    {
-        return write(out["root"], nodes_.data(), 0);
-    }
-
-    return out;
-}
-
-Json &IndexFile::write(Json &out, const Node *data, size_t idx) const
-{
-    out["from"] = data[idx].from;
-    out["count"] = data[idx].size;
+    toJson(out["from"], data[idx].from);
+    toJson(out["count"], data[idx].size);
 
     size_t used = 0;
     for (size_t i = 0; i < 8; i++)
     {
         if (data[idx].next[i])
         {
-            out["nodes"][used]["octant"] = i;
-            write(out["nodes"][used], data, data[idx].next[i]);
+            toJson(out["nodes"][used]["octant"], i);
+            toJson(out["nodes"][used], data, data[idx].next[i]);
             used++;
         }
     }
-
-    return out;
 }
 
-std::ostream &operator<<(std::ostream &os, const IndexFile &obj)
+void toJson(Json &out, const IndexFile &in)
+{
+    if (in.size() > 0)
+    {
+        toJson(out["root"], in.nodes_.data(), 0);
+    }
+}
+
+std::ostream &operator<<(std::ostream &out, const IndexFile &in)
 {
     Json json;
-    os << obj.write(json).serialize();
-    return os;
+    toJson(json, in);
+    return out << json.serialize();
 }

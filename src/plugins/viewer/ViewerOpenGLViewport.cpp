@@ -354,10 +354,28 @@ void ViewerOpenGLViewport::renderSegments()
     const Segments &segments = editor_->segments();
     for (size_t i = 0; i < segments.size(); i++)
     {
-        const Segment &segment = segments.at(i);
-        for (size_t m = 0; m < segment.meshSize(); m++)
+        const Segment &segment = segments[i];
+
+        // Render segment boundary.
+        if (segment.selected)
         {
-            const Mesh &mesh = segment.mesh(m);
+            glColor3f(static_cast<float>(segment.color[0]),
+                      static_cast<float>(segment.color[1]),
+                      static_cast<float>(segment.color[2]));
+            ViewerAabb boundary;
+            boundary.set(segment.boundary);
+            ViewerOpenGL::renderAabb(boundary);
+
+            Vector3<float> p(segment.position);
+            // Vector3<float> d(segment.boundary.length());
+            Vector3<float> color{1.0F, 1.0F, 0.0F};
+            ViewerOpenGL::renderCross(p, boundary, color);
+        }
+
+        // Render segment meshes.
+        for (size_t m = 0; m < segment.meshList.size(); m++)
+        {
+            const Mesh &mesh = segment.meshList[m];
 
             ViewerOpenGL::Mode mode;
             if (mesh.mode == Mesh::MODE_POINTS)
