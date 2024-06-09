@@ -20,6 +20,7 @@
 /** @file ExplorerSegmentsWidget.cpp */
 
 // Include 3D Forest.
+#include <ExplorerSegmentWidget.hpp>
 #include <ExplorerSegmentsWidget.hpp>
 #include <ImportFilePlugin.hpp>
 #include <MainWindow.hpp>
@@ -29,6 +30,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
+#include <QSplitter>
 #include <QToolBar>
 #include <QToolButton>
 #include <QTreeWidget>
@@ -38,7 +40,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "ExplorerSegmentsWidget"
-// #define LOG_MODULE_DEBUG_ENABLED 1
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define ICON(name) (ThemeIcon(":/explorer/", name))
@@ -119,11 +121,21 @@ ExplorerSegmentsWidget::ExplorerSegmentsWidget(MainWindow *mainWindow,
     toolBar->addWidget(selectNoneButton_);
     toolBar->setIconSize(QSize(MainWindow::ICON_SIZE, MainWindow::ICON_SIZE));
 
+    // Segment.
+    segmentWidget_ = new ExplorerSegmentWidget;
+
+    // Splitter.
+    splitter_ = new QSplitter;
+    splitter_->addWidget(tree_);
+    splitter_->addWidget(segmentWidget_);
+    splitter_->setOrientation(Qt::Vertical);
+    splitter_->setSizes(QList<int>({1, 1}));
+
     // Layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(toolBar);
-    mainLayout->addWidget(tree_);
+    mainLayout->addWidget(splitter_);
 
     mainLayout_->addLayout(mainLayout);
     setLayout(mainLayout_);
@@ -168,6 +180,15 @@ void ExplorerSegmentsWidget::setSegments(const Segments &segments,
     QStringList labels;
     labels << tr("Visible") << tr("Id") << tr("Label");
     tree_->setHeaderLabels(labels);
+
+    if (segments_.size() > 0)
+    {
+        segmentWidget_->setSegment(segments_[0]);
+    }
+    else
+    {
+        segmentWidget_->clear();
+    }
 
     // Content.
     for (size_t i = 0; i < segments_.size(); i++)
@@ -336,11 +357,20 @@ void ExplorerSegmentsWidget::slotItemSelectionChanged()
     }
 }
 
-void ExplorerSegmentsWidget::slotItemChanged(QTreeWidgetItem *item, int column)
+void ExplorerSegmentsWidget::slotItemClicked(QTreeWidgetItem *item, int column)
 {
+    if (!item)
+    {
+        return;
+    }
+
+    size_t id = identifier(item);
+    size_t index = segments_.index(id);
+    LOG_DEBUG(<< "item ID <" << id << "> index <" << index << "> column <"
+              << column << ">.");
+
     if (column == COLUMN_CHECKED)
     {
-        size_t id = identifier(item);
         bool checked = (item->checkState(COLUMN_CHECKED) == Qt::Checked);
 
         filter_.setFilter(id, checked);
@@ -349,7 +379,32 @@ void ExplorerSegmentsWidget::slotItemChanged(QTreeWidgetItem *item, int column)
         {
             filterChanged();
         }
+
+        return;
     }
+
+    segmentWidget_->setSegment(segments_[index]);
+
+    for (size_t i = 0; i < segments_.size(); i++)
+    {
+        segments_[i].selected = false;
+    }
+    segments_[index].selected = true;
+
+    if (updatesEnabled_)
+    {
+        dataChanged();
+    }
+}
+
+void ExplorerSegmentsWidget::slotItemChanged(QTreeWidgetItem *item, int column)
+{
+    if (!item)
+    {
+        return;
+    }
+
+    (void)column;
 }
 
 size_t ExplorerSegmentsWidget::identifier(const QTreeWidgetItem *item)
@@ -389,8 +444,9 @@ void ExplorerSegmentsWidget::updateTree()
 
 void ExplorerSegmentsWidget::block()
 {
-    disconnect(tree_, SIGNAL(itemChanged(QTreeWidgetItem *, int)), 0, 0);
     disconnect(tree_, SIGNAL(itemSelectionChanged()), 0, 0);
+    disconnect(tree_, SIGNAL(itemClicked(QTreeWidgetItem *, int)), 0, 0);
+    disconnect(tree_, SIGNAL(itemChanged(QTreeWidgetItem *, int)), 0, 0);
     (void)blockSignals(true);
 }
 
@@ -398,13 +454,17 @@ void ExplorerSegmentsWidget::unblock()
 {
     (void)blockSignals(false);
     connect(tree_,
-            SIGNAL(itemChanged(QTreeWidgetItem *, int)),
-            this,
-            SLOT(slotItemChanged(QTreeWidgetItem *, int)));
-    connect(tree_,
             SIGNAL(itemSelectionChanged()),
             this,
             SLOT(slotItemSelectionChanged()));
+    connect(tree_,
+            SIGNAL(itemClicked(QTreeWidgetItem *, int)),
+            this,
+            SLOT(slotItemClicked(QTreeWidgetItem *, int)));
+    connect(tree_,
+            SIGNAL(itemChanged(QTreeWidgetItem *, int)),
+            this,
+            SLOT(slotItemChanged(QTreeWidgetItem *, int)));
 }
 
 void ExplorerSegmentsWidget::addTreeItem(size_t index)
@@ -424,10 +484,10 @@ void ExplorerSegmentsWidget::addTreeItem(size_t index)
 
     item->setText(COLUMN_ID, QString::number(id));
 
-    item->setText(COLUMN_LABEL, QString::fromStdString(segments_.label(index)));
+    item->setText(COLUMN_LABEL, QString::fromStdString(segments_[index].label));
 
     // Color legend.
-    const Vector3<double> &rgb = segments_.color(index);
+    const Vector3<double> &rgb = segments_[index].color;
 
     QColor color;
     color.setRedF(static_cast<float>(rgb[0]));

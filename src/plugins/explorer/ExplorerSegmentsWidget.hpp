@@ -27,8 +27,10 @@
 #include <ExplorerWidgetInterface.hpp>
 #include <Segments.hpp>
 class MainWindow;
+class ExplorerSegmentWidget;
 
 // Include Qt.
+class QSplitter;
 class QToolButton;
 class QTreeWidget;
 class QTreeWidgetItem;
@@ -65,6 +67,7 @@ public slots:
     void slotSelectNone();
 
     void slotItemSelectionChanged();
+    void slotItemClicked(QTreeWidgetItem *item, int column);
     void slotItemChanged(QTreeWidgetItem *item, int column);
 
 protected:
@@ -85,6 +88,11 @@ protected:
     QToolButton *selectAllButton_;
     QToolButton *selectInvertButton_;
     QToolButton *selectNoneButton_;
+
+    QSplitter *splitter_;
+
+    ExplorerSegmentWidget *segmentWidget_;
+
     Segments segments_;
     QueryFilterSet filter_;
     bool updatesEnabled_;

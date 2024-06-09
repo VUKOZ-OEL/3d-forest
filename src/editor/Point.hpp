@@ -58,11 +58,25 @@ public:
     Point(double x_, double y_, double z_);
 };
 
-inline std::ostream &operator<<(std::ostream &os, const Point &obj)
+inline void toJson(Json &out, const Point &in)
 {
-    return os << std::fixed << "<" << obj.status << ", " << obj.group << ", "
-              << obj.x << ", " << obj.y << ", " << obj.z << ">"
-              << std::defaultfloat;
+    toJson(out["status"], in.status);
+    toJson(out["group"], in.group);
+    toJson(out["position"][0], in.x);
+    toJson(out["position"][1], in.y);
+    toJson(out["position"][2], in.z);
+}
+
+inline std::string toString(const Point &in)
+{
+    Json json;
+    toJson(json, in);
+    return json.serialize();
+}
+
+inline std::ostream &operator<<(std::ostream &out, const Point &in)
+{
+    return out << toString(in);
 }
 
 #endif /* POINT_HPP */

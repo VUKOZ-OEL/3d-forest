@@ -22,6 +22,9 @@
 #ifndef BOX_HPP
 #define BOX_HPP
 
+// Include std.
+#include <vector>
+
 // Include 3D Forest.
 #include <Vector3.hpp>
 
@@ -60,6 +63,7 @@ public:
     const T &min(size_t idx) const { return min_[idx]; }
     const T &max(size_t idx) const { return max_[idx]; }
 
+    Vector3<T> length() const;
     T length(size_t idx) const { return max_[idx] - min_[idx]; }
     T maximumLength() const;
 
@@ -71,9 +75,6 @@ public:
     bool intersects(const Box<T> &box) const;
     bool isInside(const Box<T> &box) const;
     bool isInside(T x, T y, T z) const;
-
-    void read(const Json &in);
-    Json &write(Json &out) const;
 
 private:
     T min_[3];
@@ -343,6 +344,11 @@ template <class T> inline void Box<T>::validate()
     }
 }
 
+template <class T> inline Vector3<T> Box<T>::length() const
+{
+    return Vector3<T>(length(0), length(1), length(2));
+}
+
 template <class T> inline T Box<T>::maximumLength() const
 {
     T max = length(0);
@@ -420,36 +426,42 @@ template <class T> inline bool Box<T>::isInside(T x, T y, T z) const
              (z < min_[2] || z > max_[2]));
 }
 
-template <class T> inline void Box<T>::read(const Json &in)
+template <class T> inline void fromJson(Box<T> &out, const Json &in)
 {
-    min_[0] = in["min"][0].number();
-    min_[1] = in["min"][1].number();
-    min_[2] = in["min"][2].number();
-    max_[0] = in["max"][0].number();
-    max_[1] = in["max"][1].number();
-    max_[2] = in["max"][2].number();
+    T min[3];
+    fromJson(min[0], in["min"][0]);
+    fromJson(min[1], in["min"][1]);
+    fromJson(min[2], in["min"][2]);
+
+    T max[3];
+    fromJson(max[0], in["max"][0]);
+    fromJson(max[1], in["max"][1]);
+    fromJson(max[2], in["max"][2]);
+
+    out.set(min[0], min[1], min[2], max[0], max[1], max[2]);
 }
 
-template <class T> inline Json &Box<T>::write(Json &out) const
+template <class T> inline void toJson(Json &out, const Box<T> &in)
 {
-    out["min"][0] = min_[0];
-    out["min"][1] = min_[1];
-    out["min"][2] = min_[2];
-    out["max"][0] = max_[0];
-    out["max"][1] = max_[1];
-    out["max"][2] = max_[2];
+    toJson(out["min"][0], in.min(0));
+    toJson(out["min"][1], in.min(1));
+    toJson(out["min"][2], in.min(2));
 
-    return out;
+    toJson(out["max"][0], in.max(0));
+    toJson(out["max"][1], in.max(1));
+    toJson(out["max"][2], in.max(2));
 }
 
-template <class T> std::ostream &operator<<(std::ostream &os, const Box<T> &obj)
+template <class T> inline std::string toString(const Box<T> &in)
 {
-    return os << std::fixed << "{{" << obj.min(0) << ", " << obj.min(1) << ", "
-              << obj.min(2)
-              << "}, "
-                 "{"
-              << obj.max(0) << ", " << obj.max(1) << ", " << obj.max(2) << "}"
-              << "}" << std::defaultfloat;
+    Json json;
+    toJson(json, in);
+    return json.serialize(0);
+}
+
+template <class T> std::ostream &operator<<(std::ostream &out, const Box<T> &in)
+{
+    return out << toString(in);
 }
 
 #include <WarningsEnable.hpp>

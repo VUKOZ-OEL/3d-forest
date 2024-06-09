@@ -138,22 +138,3 @@ void ChunkFile::write(const ChunkFile::Chunk &chunk)
 
     file_.write(buffer, CHUNK_HEADER_SIZE);
 }
-
-Json &ChunkFile::Chunk::write(Json &out) const
-{
-    std::string str;
-
-    str.resize(4);
-    str[0] = static_cast<char>((type >> 24) & 0xFFU);
-    str[1] = static_cast<char>((type >> 16) & 0xFFU);
-    str[2] = static_cast<char>((type >> 8) & 0xFFU);
-    str[3] = static_cast<char>(type & 0xFFU);
-
-    out["type"] = str;
-    out["majorVersion"] = majorVersion;
-    out["minorVersion"] = minorVersion;
-    out["headerLength"] = headerLength;
-    out["dataLength"] = dataLength;
-
-    return out;
-}

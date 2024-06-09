@@ -27,6 +27,7 @@
 #include <vector>
 
 // Include 3D Forest.
+#include <Json.hpp>
 #include <Vector3.hpp>
 
 // Include local.
@@ -73,9 +74,6 @@ public:
     void setColorSourceEnabled(size_t id, bool v);
     void setColorSourceEnabledAll(bool v);
 
-    void read(const Json &in);
-    Json &write(Json &out) const;
-
 protected:
     double pointSize_;
     bool fogEnabled_;
@@ -83,7 +81,13 @@ protected:
     Vector3<double> background_;
     std::vector<std::string> colorSourceString_;
     std::vector<bool> colorSourceEnabled_;
+
+    friend void fromJson(SettingsView &out, const Json &in);
+    friend void toJson(Json &out, const SettingsView &in);
 };
+
+void fromJson(SettingsView &out, const Json &in);
+void toJson(Json &out, const SettingsView &in);
 
 #include <WarningsEnable.hpp>
 

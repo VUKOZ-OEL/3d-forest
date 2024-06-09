@@ -67,6 +67,9 @@ public:
                                float radius,
                                size_t slices = 16);
     static void renderAxis();
+    static void renderCross(const Vector3<float> &p,
+                            const ViewerAabb &box,
+                            const Vector3<float> &color);
 
 protected:
 };

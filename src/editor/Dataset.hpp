@@ -72,8 +72,6 @@ public:
               const std::string &projectPath,
               const SettingsImport &settings,
               const Box<double> &projectBoundary);
-    void read(const Json &in, const std::string &projectPath);
-    Json &write(Json &out) const;
 
 protected:
     // Stored.
@@ -102,7 +100,15 @@ protected:
     void setPath(const std::string &path, const std::string &projectPath);
     void read();
     void updateBoundary();
+
+    friend void fromJson(Dataset &out,
+                         const Json &in,
+                         const std::string &projectPath);
+    friend void toJson(Json &out, const Dataset &in);
 };
+
+void fromJson(Dataset &out, const Json &in, const std::string &projectPath);
+void toJson(Json &out, const Dataset &in);
 
 #include <WarningsEnable.hpp>
 

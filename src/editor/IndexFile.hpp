@@ -118,7 +118,6 @@ public:
     void readPayload(ChunkFile &file, const ChunkFile::Chunk &chunk);
     void write(const std::string &path) const;
     void write(ChunkFile &file) const;
-    Json &write(Json &out) const;
 
     // Build tree.
     void insertBegin(const Box<double> &boundary,
@@ -174,8 +173,6 @@ protected:
                 double z,
                 uint64_t code) const;
 
-    Json &write(Json &out, const Node *data, size_t idx) const;
-
     // Build tree.
     /** Index File Build Node. */
     struct BuildNode
@@ -199,9 +196,13 @@ protected:
                                uint64_t &from);
     size_t countNodes() const;
     size_t countNodes(BuildNode *node) const;
+
+    friend void toJson(Json &out, const IndexFile &in);
 };
 
-std::ostream &operator<<(std::ostream &os, const IndexFile &obj);
+void toJson(Json &out, const IndexFile &in);
+
+std::ostream &operator<<(std::ostream &out, const IndexFile &in);
 
 #include <WarningsEnable.hpp>
 

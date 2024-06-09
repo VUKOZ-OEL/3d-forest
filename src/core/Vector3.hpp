@@ -55,11 +55,10 @@ public:
     T min() const;
     T max() const;
 
+    void random(T min, T max);
+
     void normalize();
     Vector3<T> normalized() const;
-
-    void read(const Json &in);
-    Json &write(Json &out) const;
 
     Vector3<T> crossProduct(const Vector3<T> &v) const;
     static Vector3<T> crossProduct(const Vector3<T> &a, const Vector3<T> &b)
@@ -263,6 +262,17 @@ template <class T> inline T Vector3<T>::length() const
                   (this->operator[](2) * this->operator[](2))));
 }
 
+template <class T> inline void Vector3<T>::random(T min, T max)
+{
+    for (size_t i = 0; i < 3; i++)
+    {
+        this->operator[](i) =
+            min + static_cast<T>(static_cast<double>(max - min) *
+                                 (static_cast<double>(rand()) /
+                                  static_cast<double>(RAND_MAX)));
+    }
+}
+
 template <class T> inline void Vector3<T>::normalize()
 {
     constexpr T e = std::numeric_limits<T>::epsilon();
@@ -335,27 +345,30 @@ inline Vector3<T> Vector3<T>::rotated(const Vector3<T> &axis,
                           this->operator[](2) * (w2 - x2 - y2 + z2));
 }
 
-template <class T> inline void Vector3<T>::read(const Json &in)
+template <class T> inline void fromJson(Vector3<T> &out, const Json &in)
 {
-    this->operator[](0) = static_cast<T>(in[0].number());
-    this->operator[](1) = static_cast<T>(in[1].number());
-    this->operator[](2) = static_cast<T>(in[2].number());
+    fromJson(out[0], in[0]);
+    fromJson(out[1], in[1]);
+    fromJson(out[2], in[2]);
 }
 
-template <class T> inline Json &Vector3<T>::write(Json &out) const
+template <class T> inline void toJson(Json &out, const Vector3<T> &in)
 {
-    out[0] = this->operator[](0);
-    out[1] = this->operator[](1);
-    out[2] = this->operator[](2);
+    toJson(out[0], in[0]);
+    toJson(out[1], in[1]);
+    toJson(out[2], in[2]);
+}
 
-    return out;
+template <class T> inline std::string toString(const Vector3<T> &in)
+{
+    return "(" + std::to_string(in[0]) + ", " + std::to_string(in[1]) + ", " +
+           std::to_string(in[2]) + ")";
 }
 
 template <class T>
-std::ostream &operator<<(std::ostream &os, const Vector3<T> &obj)
+std::ostream &operator<<(std::ostream &out, const Vector3<T> &in)
 {
-    return os << std::fixed << "(" << obj[0] << ", " << obj[1] << ", " << obj[2]
-              << ")" << std::defaultfloat;
+    return out << toString(in);
 }
 
 #include <WarningsEnable.hpp>

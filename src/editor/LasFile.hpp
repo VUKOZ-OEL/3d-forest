@@ -137,7 +137,6 @@ public:
         void subOffsetWdpr(uint64_t decrement);
         void addOffsetEvlr(uint64_t increment);
         void subOffsetEvlr(uint64_t decrement);
-        Json &write(Json &out) const;
     };
 
     /** LAS Point. */
@@ -193,8 +192,6 @@ public:
         uint32_t elevation;
         double descriptor;
         uint64_t voxel;
-
-        Json &write(Json &out) const;
     };
 
     /** LAS Attribute Buffer. */
@@ -302,7 +299,10 @@ protected:
                            bool truncate);
 };
 
-std::ostream &operator<<(std::ostream &os, const LasFile::Header &obj);
-std::ostream &operator<<(std::ostream &os, const LasFile::Point &obj);
+void toJson(Json &out, const LasFile::Header &in);
+void toJson(Json &out, const LasFile::Point &in);
+
+std::ostream &operator<<(std::ostream &out, const LasFile::Header &in);
+std::ostream &operator<<(std::ostream &out, const LasFile::Point &in);
 
 #endif /* LAS_FILE_HPP */

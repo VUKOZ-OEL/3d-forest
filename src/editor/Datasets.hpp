@@ -124,19 +124,27 @@ public:
               const SettingsImport &settings,
               const Box<double> &projectBoundary,
               QueryFilterSet &filter);
-    void read(const Json &in,
-              const std::string &projectPath,
-              QueryFilterSet &filter);
-    Json &write(Json &out) const;
 
 protected:
     std::vector<Dataset> datasets_;
     std::unordered_set<size_t> datasetsIds_;
     std::unordered_map<size_t, size_t> hashTable_;
     Box<double> boundary_;
+
+    friend void fromJson(Datasets &out,
+                         const Json &in,
+                         const std::string &projectPath,
+                         QueryFilterSet &filter);
+    friend void toJson(Json &out, const Datasets &in);
 };
 
-std::ostream &operator<<(std::ostream &os, const Datasets &obj);
+void fromJson(Datasets &out,
+              const Json &in,
+              const std::string &projectPath,
+              QueryFilterSet &filter);
+void toJson(Json &out, const Datasets &in);
+
+std::ostream &operator<<(std::ostream &out, const Datasets &in);
 
 #include <WarningsEnable.hpp>
 

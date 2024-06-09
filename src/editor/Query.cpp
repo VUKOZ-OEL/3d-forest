@@ -50,7 +50,7 @@ void Query::exec()
 
     const Region &region = where().region();
 
-    if (region.enabled == Region::TYPE_BOX)
+    if (region.shape == Region::SHAPE_BOX)
     {
         editor_->datasets().selectPages(where_.dataset(),
                                         region.box,
@@ -58,7 +58,7 @@ void Query::exec()
         selected = true;
     }
 
-    if (region.enabled == Region::TYPE_CONE)
+    if (region.shape == Region::SHAPE_CONE)
     {
         editor_->datasets().selectPages(where_.dataset(),
                                         region.cone.box(),
@@ -66,7 +66,7 @@ void Query::exec()
         selected = true;
     }
 
-    if (region.enabled == Region::TYPE_CYLINDER)
+    if (region.shape == Region::SHAPE_CYLINDER)
     {
         editor_->datasets().selectPages(where_.dataset(),
                                         region.cylinder.box(),
@@ -74,7 +74,7 @@ void Query::exec()
         selected = true;
     }
 
-    if (region.enabled == Region::TYPE_SPHERE)
+    if (region.shape == Region::SHAPE_SPHERE)
     {
         editor_->datasets().selectPages(where_.dataset(),
                                         region.sphere.box(),
@@ -271,12 +271,12 @@ void Query::applyCamera(const Camera &camera)
         Key nk = it->second;
         queue.erase(it);
 
-        const Dataset &db = editor_->datasets().key(nk.datasetId);
+        const Dataset &editor = editor_->datasets().key(nk.datasetId);
         const IndexFile::Node *node;
-        const IndexFile &index = db.index();
+        const IndexFile &index = editor.index();
         node = index.at(nk.pageId);
 
-        if (editor_->clipFilter().enabled)
+        if (editor_->clipFilter().shape != Region::SHAPE_NONE)
         {
             Box<double> box = index.boundary(node, index.boundary());
             if (!editor_->clipFilter().box.intersects(box))
@@ -731,25 +731,21 @@ bool Query::mean(double &meanX, double &meanY, double &meanZ)
     return true;
 }
 
-Json &Query::write(Json &out)
+void toJson(Json &out, Query &in)
 {
-    out["coordinates"][0] = x();
-    out["coordinates"][1] = y();
-    out["coordinates"][2] = z();
-
-    out["intensity"] = intensity();
-
-    out["classification"] = classification();
-    out["segment"] = segment();
-    out["elevation"] = elevation();
-    out["descriptor"] = descriptor();
-
-    return out;
+    toJson(out["coordinates"][0], in.x());
+    toJson(out["coordinates"][1], in.y());
+    toJson(out["coordinates"][2], in.z());
+    toJson(out["intensity"], in.intensity());
+    toJson(out["classification"], in.classification());
+    toJson(out["segment"], in.segment());
+    toJson(out["elevation"], in.elevation());
+    toJson(out["descriptor"], in.descriptor());
 }
 
-std::ostream &operator<<(std::ostream &os, Query &obj)
+std::ostream &operator<<(std::ostream &out, Query &in)
 {
     Json json;
-    os << obj.write(json).serialize();
-    return os;
+    toJson(json, in);
+    return out << json.serialize();
 }

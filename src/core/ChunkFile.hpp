@@ -24,7 +24,6 @@
 
 // Include 3D Forest.
 #include <File.hpp>
-#include <Json.hpp>
 
 // Include local.
 #include <ExportCore.hpp>
@@ -50,8 +49,6 @@ public:
         uint8_t minorVersion;
         uint16_t headerLength;
         uint64_t dataLength;
-
-        Json &write(Json &out) const;
     };
 
     ChunkFile();

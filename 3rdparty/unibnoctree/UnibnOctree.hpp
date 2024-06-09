@@ -391,6 +391,12 @@ template <typename PointT, typename ContainerT>
 void Octree<PointT, ContainerT>::initialize(const ContainerT& pts, const OctreeParams<typename PointT::Type>& params)
 {
   clear();
+
+  if (pts.size() < 1)
+  {
+    return;
+  }
+
   params_ = params;
 
   if (params_.copyPoints)
@@ -774,7 +780,7 @@ int32_t Octree<PointT, ContainerT>::findNeighbor(const PointT& query, typename P
   typename PointT::Type maxDistance = std::numeric_limits<typename PointT::Type>::infinity();
   int32_t resultIndex = -1;
   if(root_ == 0) return resultIndex;
-  
+
   findNeighbor<Distance>(root_, query, minDistance, maxDistance, resultIndex);
 
   return resultIndex;

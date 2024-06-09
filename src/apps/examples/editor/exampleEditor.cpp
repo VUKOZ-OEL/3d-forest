@@ -62,12 +62,12 @@ static void createDataSet()
 
 static void exampleEditor()
 {
-    Editor db;
-    db.open(PATH_1);
+    Editor editor;
+    editor.open(PATH_1);
 
-    double zmin = db.clipBoundary().max(2);
+    double zmin = editor.clipBoundary().max(2);
 
-    Query query(&db);
+    Query query(&editor);
     query.where().setBox(Box<double>(0., 0., 0., 1.0, 1.0, 2.));
     query.exec();
 

@@ -17,36 +17,36 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SegmentData.hpp */
+/** @file ExplorerSegmentWidget.hpp */
 
-#ifndef SEGMENT_DATA_HPP
-#define SEGMENT_DATA_HPP
+#ifndef EXPLORER_SEGMENT_WIDGET_HPP
+#define EXPLORER_SEGMENT_WIDGET_HPP
 
 // Include 3D Forest.
-#include <Json.hpp>
-#include <Vector3.hpp>
+#include <Segment.hpp>
 
-// Include local.
-#include <ExportEditor.hpp>
-#include <WarningsDisable.hpp>
+// Include Qt.
+#include <QWidget>
+class QTableWidget;
 
-/** SegmentData. */
-class EXPORT_EDITOR SegmentData
+/** Explorer Segment Widget. */
+class ExplorerSegmentWidget : public QWidget
 {
+    Q_OBJECT
+
 public:
-    SegmentData();
+    ExplorerSegmentWidget(QWidget *parent = nullptr);
 
-    const Vector3<double> &position() const { return position_; }
-    void setPosition(const Vector3<double> &p) { position_ = p; };
-
-    double radius() const { return radius_; }
-    void setRadius(double r) { radius_ = r; }
+    void setSegment(const Segment &segment);
+    void clear();
 
 protected:
-    Vector3<double> position_;
-    double radius_;
+    QTableWidget *table_;
+    Segment segment_;
+
+    void setRow(int row, const std::string &key, const std::string &value);
+    void setRow(int row, const std::string &key, const Vector3<double> &value);
+    void setRow(int row, const std::string &key, double value);
 };
 
-#include <WarningsEnable.hpp>
-
-#endif /* SEGMENT_DATA_HPP */
+#endif /* EXPLORER_SEGMENT_WIDGET_HPP */

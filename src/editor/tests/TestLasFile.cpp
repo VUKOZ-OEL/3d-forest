@@ -47,6 +47,7 @@ TEST_CASE(TestLasFileCreateV10)
     points[0].segment = 0;
     points[0].elevation = 0;
     points[0].descriptor = 0;
+    points[0].voxel = 0;
 
     points[1].format = 0;
     points[1].x = 200;
@@ -57,6 +58,7 @@ TEST_CASE(TestLasFileCreateV10)
     points[1].segment = 0;
     points[1].elevation = 0;
     points[1].descriptor = 0;
+    points[1].voxel = 1;
 
     points[2].format = 0;
     points[2].x = 0;
@@ -67,6 +69,7 @@ TEST_CASE(TestLasFileCreateV10)
     points[2].segment = 1;
     points[2].elevation = 90;
     points[2].descriptor = 0.25;
+    points[2].voxel = SIZE_MAX;
 
     LasFile::create(TEST_LAS_FILE_PATH, points, {1, 1, 1}, {0, 0, 0}, 0);
 
@@ -77,31 +80,34 @@ TEST_CASE(TestLasFileCreateV10)
     // Read the test file.
     // Expected : obtain the same values which were used to create the file.
     {
-        Editor db;
-        db.open(TEST_LAS_FILE_PATH);
+        Editor editor;
+        editor.open(TEST_LAS_FILE_PATH);
 
-        Query query(&db);
+        Query query(&editor);
         query.where().setBox(Box<double>(-500., 500.));
         query.exec();
 
-        TEST(query.next() && query.classification() == 0);
-        TEST(query.next() && query.classification() == 2);
-        TEST(query.next() && query.classification() == 3);
+        TEST(query.next() && query.classification() == 0 && query.voxel() == 0);
+        TEST(query.next() && query.classification() == 2 && query.voxel() == 1);
+        TEST(query.next() && query.classification() == 3 &&
+             query.voxel() == SIZE_MAX);
     }
 
     // Modify the test file.
     // Expected : it is possible to modify the file.
     {
-        Editor db;
-        db.open(TEST_LAS_FILE_PATH);
+        Editor editor;
+        editor.open(TEST_LAS_FILE_PATH);
 
-        Query query(&db);
+        Query query(&editor);
         query.where().setBox(Box<double>(-500., 500.));
         query.exec();
 
-        TEST(query.next() && (query.classification() = 6));
+        TEST(query.next() && (query.classification() = 6) &&
+             (query.voxel() = SIZE_MAX));
         TEST(query.next());
-        TEST(query.next() && (query.classification() = 5));
+        TEST(query.next() && (query.classification() = 5) &&
+             (query.voxel() = 2));
 
         query.setModified();
         query.flush();
@@ -110,15 +116,16 @@ TEST_CASE(TestLasFileCreateV10)
     // Read modified values.
     // Expected : it is possible to update the file with new values.
     {
-        Editor db;
-        db.open(TEST_LAS_FILE_PATH);
+        Editor editor;
+        editor.open(TEST_LAS_FILE_PATH);
 
-        Query query(&db);
+        Query query(&editor);
         query.where().setBox(Box<double>(-500., 500.));
         query.exec();
 
-        TEST(query.next() && query.classification() == 6);
-        TEST(query.next() && query.classification() == 2);
-        TEST(query.next() && query.classification() == 5);
+        TEST(query.next() && query.classification() == 6 &&
+             query.voxel() == SIZE_MAX);
+        TEST(query.next() && query.classification() == 2 && query.voxel() == 1);
+        TEST(query.next() && query.classification() == 5 && query.voxel() == 2);
     }
 }

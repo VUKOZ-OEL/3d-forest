@@ -37,32 +37,29 @@
 class Region
 {
 public:
-    /** Region Type. */
-    enum Type
+    /** Region Shape. */
+    enum Shape
     {
-        TYPE_NONE,
-        TYPE_BOX,
-        TYPE_CONE,
-        TYPE_CYLINDER,
-        TYPE_SPHERE
+        SHAPE_NONE,
+        SHAPE_BOX,
+        SHAPE_CONE,
+        SHAPE_CYLINDER,
+        SHAPE_SPHERE
     };
+
+    Shape shape;
 
     Box<double> box;
     Cone<double> cone;
     Cylinder<double> cylinder;
     Sphere<double> sphere;
 
-    Box<double> boundary;
-
-    Type enabled;
+    Box<double> boundary; /// Maximum extent.
 
     Region();
     ~Region();
 
     void clear();
-
-    void read(const Json &in);
-    Json &write(Json &out) const;
 };
 
 inline Region::Region()
@@ -77,41 +74,59 @@ inline Region::~Region()
 inline void Region::clear()
 {
     box.clear();
-    enabled = TYPE_NONE;
+    shape = SHAPE_NONE;
 }
 
-inline void Region::read(const Json &in)
+inline void fromJson(Region &out, const Json &in)
 {
-    box.read(in["box"]);
-    if (in["enabled"].string() == "box")
+    std::string shape;
+    fromJson(shape, in["shape"]);
+    if (shape == "box")
     {
-        enabled = TYPE_BOX;
+        out.shape = Region::SHAPE_BOX;
+        fromJson(out.box, in["box"]);
     }
     else
     {
-        enabled = TYPE_NONE;
+        out.shape = Region::SHAPE_NONE;
     }
 }
 
-inline Json &Region::write(Json &out) const
+inline void toJson(Json &out, const Region &in)
 {
-    box.write(out["box"]);
-    if (enabled == TYPE_BOX)
+    if (in.shape == Region::SHAPE_BOX)
     {
-        out["enabled"] = "box";
+        toJson(out["shape"], "box");
+        toJson(out["box"], in.box);
     }
     else
     {
-        out["enabled"] = "none";
+        toJson(out["shape"], "none");
     }
-
-    return out;
 }
 
-inline std::ostream &operator<<(std::ostream &os, const Region &obj)
+inline std::string toString(const Region::Shape &in)
 {
-    return os << std::fixed << "{" << obj.box << ", " << obj.enabled << "}"
-              << std::defaultfloat;
+    if (in == Region::SHAPE_BOX)
+    {
+        return "box";
+    }
+    else
+    {
+        return "none";
+    }
+}
+
+inline std::string toString(const Region &in)
+{
+    Json json;
+    toJson(json, in);
+    return json.serialize(0);
+}
+
+inline std::ostream &operator<<(std::ostream &out, const Region &in)
+{
+    return out << toString(in);
 }
 
 #include <WarningsEnable.hpp>

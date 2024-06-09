@@ -180,44 +180,43 @@ void Datasets::read(const std::string &path,
     updateBoundary();
 }
 
-void Datasets::read(const Json &in,
-                    const std::string &projectPath,
-                    QueryFilterSet &filter)
+void fromJson(Datasets &out,
+              const Json &in,
+              const std::string &projectPath,
+              QueryFilterSet &filter)
 {
     size_t i;
     size_t n;
 
     i = 0;
     n = in.array().size();
-    datasets_.resize(n);
-    hashTable_.clear();
+    out.datasets_.resize(n);
+    out.hashTable_.clear();
 
     for (auto const &it : in.array())
     {
-        datasets_[i].read(it, projectPath);
-        hashTable_[datasets_[i].id()] = i;
-        datasetsIds_.insert(datasets_[i].id());
-        filter.setFilter(datasets_[i].id(), true);
+        fromJson(out.datasets_[i], it, projectPath);
+        out.hashTable_[out.datasets_[i].id()] = i;
+        out.datasetsIds_.insert(out.datasets_[i].id());
+        filter.setFilter(out.datasets_[i].id(), true);
         i++;
     }
 }
 
-Json &Datasets::write(Json &out) const
+void toJson(Json &out, const Datasets &in)
 {
     size_t i = 0;
 
-    for (auto const &it : datasets_)
+    for (auto const &it : in.datasets_)
     {
-        it.write(out[i]);
+        toJson(out[i], it);
         i++;
     }
-
-    return out;
 }
 
-std::ostream &operator<<(std::ostream &os, const Datasets &obj)
+std::ostream &operator<<(std::ostream &out, const Datasets &in)
 {
     Json json;
-    os << obj.write(json).serialize();
-    return os;
+    toJson(json, in);
+    return out << json.serialize();
 }

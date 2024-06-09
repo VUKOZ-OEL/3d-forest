@@ -121,37 +121,40 @@ void Editor::openProject(const std::string &path)
         // Project name.
         if (in.contains(EDITOR_KEY_PROJECT_NAME))
         {
-            projectName_ = in[EDITOR_KEY_PROJECT_NAME].string();
+            fromJson(projectName_, in[EDITOR_KEY_PROJECT_NAME]);
         }
 
         // Data sets.
         if (in.contains(EDITOR_KEY_DATA_SET))
         {
-            datasets_.read(in[EDITOR_KEY_DATA_SET], path_, datasetsFilter_);
+            fromJson(datasets_,
+                     in[EDITOR_KEY_DATA_SET],
+                     path_,
+                     datasetsFilter_);
         }
 
         // Segments.
         if (in.contains(EDITOR_KEY_SEGMENT))
         {
-            segments_.read(in[EDITOR_KEY_SEGMENT]);
+            fromJson(segments_, in[EDITOR_KEY_SEGMENT]);
         }
 
         // Classifications.
         if (in.contains(EDITOR_KEY_CLASSIFICATIONS))
         {
-            classifications_.read(in[EDITOR_KEY_CLASSIFICATIONS]);
+            fromJson(classifications_, in[EDITOR_KEY_CLASSIFICATIONS]);
         }
 
         // Settings.
         if (in.contains(EDITOR_KEY_SETTINGS))
         {
-            settings_.read(in[EDITOR_KEY_SETTINGS]);
+            fromJson(settings_, in[EDITOR_KEY_SETTINGS]);
         }
 
         // Clip filter.
         // if (in.contains(EDITOR_KEY_CLIP_FILTER))
         // {
-        //     clipFilter_.read(in[EDITOR_KEY_CLIP_FILTER]);
+        //     fromJson(clipFilter_, in[EDITOR_KEY_CLIP_FILTER]);
         // }
         // else
         // {
@@ -161,7 +164,7 @@ void Editor::openProject(const std::string &path)
         // Elevation range.
         if (in.contains(EDITOR_KEY_ELEVATION_RANGE))
         {
-            elevationFilter_.read(in[EDITOR_KEY_ELEVATION_RANGE]);
+            fromJson(elevationFilter_, in[EDITOR_KEY_ELEVATION_RANGE]);
         }
     }
     catch (...)
@@ -179,26 +182,13 @@ void Editor::saveProject(const std::string &path)
 
     Json out;
 
-    // Project name.
-    out[EDITOR_KEY_PROJECT_NAME] = projectName_;
-
-    // Data sets.
-    datasets_.write(out[EDITOR_KEY_DATA_SET]);
-
-    // Segments.
-    segments_.write(out[EDITOR_KEY_SEGMENT]);
-
-    // Classifications.
-    classifications_.write(out[EDITOR_KEY_CLASSIFICATIONS]);
-
-    // Settings.
-    settings_.write(out[EDITOR_KEY_SETTINGS]);
-
-    // Clip filter.
-    // clipFilter_.write(out[EDITOR_KEY_CLIP_FILTER]);
-
-    // Elevation range.
-    elevationFilter_.write(out[EDITOR_KEY_ELEVATION_RANGE]);
+    toJson(out[EDITOR_KEY_PROJECT_NAME], projectName_);
+    toJson(out[EDITOR_KEY_DATA_SET], datasets_);
+    toJson(out[EDITOR_KEY_SEGMENT], segments_);
+    toJson(out[EDITOR_KEY_CLASSIFICATIONS], classifications_);
+    toJson(out[EDITOR_KEY_SETTINGS], settings_);
+    // toJson(out[EDITOR_KEY_CLIP_FILTER], clipFilter_);
+    toJson(out[EDITOR_KEY_ELEVATION_RANGE], elevationFilter_);
 
     out.write(path);
 
@@ -271,7 +261,7 @@ void Editor::resetClipFilter()
 
 Box<double> Editor::clipBoundary() const
 {
-    if (clipFilter_.enabled)
+    if (clipFilter_.shape == Region::SHAPE_BOX)
     {
         return clipFilter_.box;
     }
@@ -351,7 +341,7 @@ void Editor::updateAfterRead()
 
     clipFilter_.boundary = datasets_.boundary();
     clipFilter_.box = clipFilter_.boundary;
-    // clipFilter_.enabled = Region::TYPE_BOX;
+    // clipFilter_.enabled = Region::SHAPE_BOX;
 
     if (viewports_.size() > 0)
     {

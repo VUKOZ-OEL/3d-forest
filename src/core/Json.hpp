@@ -151,6 +151,26 @@ public:
     void deserialize(const std::string &in);
     void deserialize(const char *in, size_t n);
 
+    friend void fromJson(bool &out, const Json &in);
+    friend void fromJson(int &out, const Json &in);
+    friend void fromJson(unsigned int &out, const Json &in);
+    friend void fromJson(double &out, const Json &in);
+    friend void fromJson(long &out, const Json &in);
+    friend void fromJson(unsigned long &out, const Json &in);
+    friend void fromJson(long long &out, const Json &in);
+    friend void fromJson(unsigned long long &out, const Json &in);
+    friend void fromJson(std::string &out, const Json &in);
+
+    friend void toJson(Json &out, bool in);
+    friend void toJson(Json &out, int in);
+    friend void toJson(Json &out, unsigned int in);
+    friend void toJson(Json &out, double in);
+    friend void toJson(Json &out, long in);
+    friend void toJson(Json &out, unsigned long in);
+    friend void toJson(Json &out, long long in);
+    friend void toJson(Json &out, unsigned long long in);
+    friend void toJson(Json &out, const std::string &in);
+
     void read(const std::string &fileName);
     void write(const std::string &fileName, size_t indent = DEFAULT_INDENT);
 
@@ -505,9 +525,99 @@ inline uint64_t Json::uint64() const
     return static_cast<uint64_t>(data_.number);
 }
 
-inline std::ostream &operator<<(std::ostream &os, const Json &obj)
+inline std::ostream &operator<<(std::ostream &out, const Json &in)
 {
-    return os << obj.serialize();
+    return out << in.serialize();
+}
+
+inline void fromJson(bool &out, const Json &in)
+{
+    out = in.isTrue();
+}
+
+inline void fromJson(int &out, const Json &in)
+{
+    out = static_cast<int>(in.number());
+}
+
+inline void fromJson(unsigned int &out, const Json &in)
+{
+    out = static_cast<unsigned int>(in.number());
+}
+
+inline void fromJson(double &out, const Json &in)
+{
+    out = in.number();
+}
+
+inline void fromJson(long &out, const Json &in)
+{
+    out = static_cast<long>(in.number());
+}
+
+inline void fromJson(unsigned long &out, const Json &in)
+{
+    out = static_cast<unsigned long>(in.number());
+}
+
+inline void fromJson(long long &out, const Json &in)
+{
+    out = static_cast<long long>(in.number());
+}
+
+inline void fromJson(unsigned long long &out, const Json &in)
+{
+    out = static_cast<unsigned long long>(in.number());
+}
+
+inline void fromJson(std::string &out, const Json &in)
+{
+    out = in.string();
+}
+
+inline void toJson(Json &out, bool in)
+{
+    out = in;
+}
+
+inline void toJson(Json &out, int in)
+{
+    out = in;
+}
+
+inline void toJson(Json &out, unsigned int in)
+{
+    out = in;
+}
+
+inline void toJson(Json &out, double in)
+{
+    out = in;
+}
+
+inline void toJson(Json &out, long in)
+{
+    out = in;
+}
+
+inline void toJson(Json &out, unsigned long in)
+{
+    out = in;
+}
+
+inline void toJson(Json &out, long long in)
+{
+    out = in;
+}
+
+inline void toJson(Json &out, unsigned long long in)
+{
+    out = in;
+}
+
+inline void toJson(Json &out, const std::string &in)
+{
+    out = in;
 }
 
 #include <WarningsEnable.hpp>

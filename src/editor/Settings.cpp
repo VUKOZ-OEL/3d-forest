@@ -31,17 +31,15 @@ void Settings::setView(const SettingsView &view)
     view_ = view;
 }
 
-void Settings::read(const Json &in)
+void fromJson(Settings &out, const Json &in)
 {
     if (in.contains("view"))
     {
-        view_.read(in["view"]);
+        fromJson(out.view_, in["view"]);
     }
 }
 
-Json &Settings::write(Json &out) const
+void toJson(Json &out, const Settings &in)
 {
-    view_.write(out["view"]);
-
-    return out;
+    toJson(out["view"], in.view_);
 }

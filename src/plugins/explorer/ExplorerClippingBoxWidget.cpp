@@ -159,7 +159,7 @@ void ExplorerClippingBoxWidget::updateRegion()
 
     Region region;
     region.box.set(x1, y1, z1, x2, y2, z2);
-    region.enabled = Region::TYPE_BOX;
+    region.shape = Region::SHAPE_BOX;
 
     emit signalRegionChanged(region);
 }

@@ -28,6 +28,7 @@
 #include <ProgressActionInterface.hpp>
 #include <Query.hpp>
 class Editor;
+class Segment;
 
 /** Segmentation Action. */
 class SegmentationAction : public ProgressActionInterface
@@ -72,26 +73,47 @@ private:
     void stepCountPoints();
     void stepPointsToVoxels();
     void stepCreateVoxelIndex();
-    void stepCreateTrees();
-    void stepConnectVoxels();
+    void stepCreateTrunks();
+    void stepCreateBranches();
     void stepCreateSegments();
     void stepVoxelsToPoints();
 
     void createVoxel();
     void findNearestNeighbor(Point &a);
     bool isTrunkVoxel(const Point &a);
-    void startGroup(const Point &a);
-    void continueGroup(const Point &a);
 
     Points voxels_;
-    std::map<size_t, size_t> groups_;
     std::vector<size_t> path_;
-    std::vector<size_t> group_;
+    std::vector<size_t> groupPath_;
     std::vector<size_t> search_;
     size_t pointIndex_;
     size_t groupId_;
     double groupMinimum_;
     double groupMaximum_;
+
+    /** Segmentation Group. */
+    class Group
+    {
+    public:
+        size_t segmentId = 0;
+        size_t nPoints = 0;
+        Box<double> boundary;
+        Vector3<double> averagePoint;
+
+        void clear();
+    };
+
+    Group group_;
+    Group groupUnsegmented_;
+    std::map<size_t, Group> groups_;
+
+    void startGroup(const Point &a, bool isTrunk = false);
+    void continueGroup(const Point &a, bool isTrunk = false);
+    void mergeToGroup(Group &dst, const Group &src);
+
+    void createSegmentFromGroup(size_t segmentId,
+                                Segment &segment,
+                                const Group &group);
 };
 
 #endif /* SEGMENTATION_ACTION_HPP */

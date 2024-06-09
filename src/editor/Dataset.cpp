@@ -84,7 +84,7 @@ void Dataset::read(size_t id,
     }
 }
 
-void Dataset::read(const Json &in, const std::string &projectPath)
+void fromJson(Dataset &out, const Json &in, const std::string &projectPath)
 {
     if (!in.isObject())
     {
@@ -92,73 +92,64 @@ void Dataset::read(const Json &in, const std::string &projectPath)
     }
 
     // Data set path.
-    if (!in.containsString("path"))
-    {
-        THROW("Can't find string 'path' in JSON object");
-    }
-
-    pathUnresolved_ = in["path"].string();
-    setPath(pathUnresolved_, projectPath);
+    fromJson(out.pathUnresolved_, in["path"]);
+    out.setPath(out.pathUnresolved_, projectPath);
 
     // Date Created.
     if (in.contains("dateCreated"))
     {
-        dateCreated_ = in["dateCreated"].string();
+        fromJson(out.dateCreated_, in["dateCreated"]);
     }
 
     // ID.
-    id_ = in["id"].uint32();
+    fromJson(out.id_, in["id"]);
 
     // Label.
     if (in.contains("label"))
     {
-        label_ = in["label"].string();
+        fromJson(out.label_, in["label"]);
     }
     else
     {
-        label_ = fileName_;
+        out.label_ = out.fileName_;
     }
 
     // Color.
     if (in.contains("color"))
     {
-        color_.read(in["color"]);
+        fromJson(out.color_, in["color"]);
     }
     else
     {
-        color_.set(1.0, 1.0, 1.0);
+        out.color_.set(1.0, 1.0, 1.0);
     }
 
     // Read.
-    read();
+    out.read();
 
     // Transformation.
     if (in.contains("translation"))
     {
-        translation_.read(in["translation"]);
+        fromJson(out.translation_, in["translation"]);
     }
 
     if (in.contains("scaling"))
     {
-        scaling_.read(in["scaling"]);
+        fromJson(out.scaling_, in["scaling"]);
     }
 
-    updateBoundary();
+    out.updateBoundary();
 }
 
-Json &Dataset::write(Json &out) const
+void toJson(Json &out, const Dataset &in)
 {
-    out["id"] = id_;
-    out["label"] = label_;
-    color_.write(out["color"]);
-
-    out["path"] = pathUnresolved_;
-    out["dateCreated"] = dateCreated_;
-
-    translation_.write(out["translation"]);
-    scaling_.write(out["scaling"]);
-
-    return out;
+    toJson(out["id"], in.id_);
+    toJson(out["label"], in.label_);
+    toJson(out["color"], in.color_);
+    toJson(out["path"], in.pathUnresolved_);
+    toJson(out["dateCreated"], in.dateCreated_);
+    toJson(out["translation"], in.translation_);
+    toJson(out["scaling"], in.scaling_);
 }
 
 void Dataset::setPath(const std::string &path, const std::string &projectPath)

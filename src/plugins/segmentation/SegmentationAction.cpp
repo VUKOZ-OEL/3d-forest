@@ -34,8 +34,8 @@
 #define SEGMENTATION_STEP_COUNT_POINTS 1
 #define SEGMENTATION_STEP_POINTS_TO_VOXELS 2
 #define SEGMENTATION_STEP_CREATE_VOXEL_INDEX 3
-#define SEGMENTATION_STEP_CREATE_TREES 4
-#define SEGMENTATION_STEP_CONNECT_VOXELS 5
+#define SEGMENTATION_STEP_CREATE_TRUNKS 4
+#define SEGMENTATION_STEP_CREATE_BRANCHES 5
 #define SEGMENTATION_STEP_CREATE_SEGMENTS 6
 #define SEGMENTATION_STEP_VOXELS_TO_POINTS 7
 
@@ -75,6 +75,14 @@ void SegmentationAction::clear()
     voxels_.clear();
     groups_.clear();
     path_.clear();
+}
+
+void SegmentationAction::Group::clear()
+{
+    segmentId = 0;
+    nPoints = 0;
+    boundary.clear();
+    averagePoint.clear();
 }
 
 void SegmentationAction::start(double voxelSize,
@@ -159,12 +167,12 @@ void SegmentationAction::next()
             stepCreateVoxelIndex();
             break;
 
-        case SEGMENTATION_STEP_CREATE_TREES:
-            stepCreateTrees();
+        case SEGMENTATION_STEP_CREATE_TRUNKS:
+            stepCreateTrunks();
             break;
 
-        case SEGMENTATION_STEP_CONNECT_VOXELS:
-            stepConnectVoxels();
+        case SEGMENTATION_STEP_CREATE_BRANCHES:
+            stepCreateBranches();
             break;
 
         case SEGMENTATION_STEP_CREATE_SEGMENTS:
@@ -266,7 +274,8 @@ void SegmentationAction::stepPointsToVoxels()
     while (query_.next())
     {
         // If point index to voxel is none:
-        if (query_.voxel() == SIZE_MAX && !(query_.elevation() < elevationMin_))
+        if (query_.voxel() == SIZE_MAX &&
+            (useZ_ || !(query_.elevation() < elevationMin_)))
         {
             // Create new voxel.
             createVoxel();
@@ -296,10 +305,10 @@ void SegmentationAction::stepCreateVoxelIndex()
     LOG_DEBUG(<< "Created index.");
 
     progress_.setMaximumStep(voxels_.size(), 10);
-    progress_.setValueSteps(SEGMENTATION_STEP_CREATE_TREES);
+    progress_.setValueSteps(SEGMENTATION_STEP_CREATE_TRUNKS);
 }
 
-void SegmentationAction::stepCreateTrees()
+void SegmentationAction::stepCreateTrunks()
 {
     progress_.startTimer();
 
@@ -310,9 +319,10 @@ void SegmentationAction::stepCreateTrees()
         pointIndex_ = 0;
         // Set group id to zero.
         groupId_ = 0;
+        group_.clear();
         // Set the path and the group empty.
         path_.resize(0);
-        group_.resize(0);
+        groupPath_.resize(0);
     }
 
     // Repeat until all voxels and the last path are processed:
@@ -325,11 +335,12 @@ void SegmentationAction::stepCreateTrees()
             // criteria (for wood), add it to the path.
             if (isTrunkVoxel(voxels_[pointIndex_]))
             {
-                startGroup(voxels_[pointIndex_]);
+                startGroup(voxels_[pointIndex_], true);
                 voxels_[pointIndex_].group = groupId_;
                 path_.push_back(pointIndex_);
             }
 
+            // Move to the next voxel.
             pointIndex_++;
             progress_.addValueStep(1);
         }
@@ -337,19 +348,19 @@ void SegmentationAction::stepCreateTrees()
         else
         {
             // Add the path to the current group.
-            size_t idx = group_.size();
+            size_t idx = groupPath_.size();
             for (size_t i = 0; i < path_.size(); i++)
             {
-                group_.push_back(path_[i]);
+                groupPath_.push_back(path_[i]);
             }
 
             // Set the path empty.
             path_.resize(0);
 
             // Try to expand the current group with neighbor voxels:
-            for (size_t i = idx; i < group_.size(); i++)
+            for (size_t i = idx; i < groupPath_.size(); i++)
             {
-                Point &a = voxels_[group_[i]];
+                Point &a = voxels_[groupPath_[i]];
                 voxels_.findRadius(a.x, a.y, a.z, trunkRadius_, search_);
                 for (size_t j = 0; j < search_.size(); j++)
                 {
@@ -358,7 +369,7 @@ void SegmentationAction::stepCreateTrees()
                     // criteria (for wood), add it to group expansion.
                     if (isTrunkVoxel(b))
                     {
-                        continueGroup(b);
+                        continueGroup(b, true);
                         b.group = groupId_;
                         path_.push_back(search_[j]);
                     }
@@ -374,7 +385,8 @@ void SegmentationAction::stepCreateTrees()
                     groupMinimum_ < elevationMax_)
                 {
                     // Mark this group as future segment.
-                    groups_[groupId_] = 0;
+                    groups_[groupId_] = group_;
+                    group_.clear();
                     // Increment group id by one.
                     groupId_++;
                 }
@@ -382,14 +394,14 @@ void SegmentationAction::stepCreateTrees()
                 else
                 {
                     // Set all voxels from the group as not processed.
-                    for (size_t i = 0; i < group_.size(); i++)
+                    for (size_t i = 0; i < groupPath_.size(); i++)
                     {
-                        voxels_[group_[i]].group = SIZE_MAX;
+                        voxels_[groupPath_[i]].group = SIZE_MAX;
                     }
                 }
 
                 // Prepare start of the next group. Set the group empty.
-                group_.resize(0);
+                groupPath_.resize(0);
             }
         }
 
@@ -400,7 +412,7 @@ void SegmentationAction::stepCreateTrees()
     }
 
     progress_.setMaximumStep(voxels_.size(), 10);
-    progress_.setValueSteps(SEGMENTATION_STEP_CONNECT_VOXELS);
+    progress_.setValueSteps(SEGMENTATION_STEP_CREATE_BRANCHES);
 
     if (onlyTrunks_)
     {
@@ -409,15 +421,19 @@ void SegmentationAction::stepCreateTrees()
     }
 }
 
-void SegmentationAction::stepConnectVoxels()
+void SegmentationAction::stepCreateBranches()
 {
     progress_.startTimer();
 
     if (progress_.valueStep() == 0)
     {
-        // Initialize the current path as finished.
-        // Group id is the next unused group id value.
+        // Start from the first voxel.
         pointIndex_ = 0;
+        // Reset group.
+        // Group id is the next unused group id value.
+        group_.clear();
+        groupUnsegmented_.clear();
+        // Set the path empty.
         path_.resize(0);
     }
 
@@ -432,9 +448,9 @@ void SegmentationAction::stepConnectVoxels()
             {
                 // Find nearest unprocessed point U from V. Set V.next to U.
                 // Set group of V to group id.
-                Point &a = voxels_[pointIndex_];
-                a.group = groupId_;
-                findNearestNeighbor(a);
+                startGroup(voxels_[pointIndex_]);
+                voxels_[pointIndex_].group = groupId_;
+                findNearestNeighbor(voxels_[pointIndex_]);
 
                 // Append V into the current path.
                 path_.push_back(pointIndex_);
@@ -464,9 +480,12 @@ void SegmentationAction::stepConnectVoxels()
             // If the next nearest neighbor U is not found, terminate the path:
             if (nextIdx == SIZE_MAX)
             {
+                // It was not possible to connect this path.
+                // Merge the path to unsegmented group.
                 // Set the path as finished.
-                // (It was not possible to connect this path.)
+                mergeToGroup(groupUnsegmented_, group_);
                 path_.resize(0);
+                group_.clear();
 
                 // Increment group id for the next path by one.
                 groupId_++;
@@ -486,8 +505,12 @@ void SegmentationAction::stepConnectVoxels()
                         b.group = a.group;
                     }
 
+                    // Merge current group to group of U.
+                    mergeToGroup(groups_[a.group], group_);
+
                     // Set the path as finished.
                     path_.resize(0);
+                    group_.clear();
 
                     // Increment group id for the next path by one.
                     groupId_++;
@@ -496,10 +519,9 @@ void SegmentationAction::stepConnectVoxels()
                 // expand the path with new voxel U:
                 else
                 {
-                    // Set group of U to the same group as voxels in the path.
-                    a.group = voxels_[path_[0]].group;
-
                     // Append U into the path.
+                    continueGroup(a);
+                    a.group = voxels_[path_[0]].group;
                     path_.push_back(nextIdx);
 
                     // Find nearest unprocessed point W from U. Set U.next to W.
@@ -534,7 +556,11 @@ void SegmentationAction::stepCreateSegments()
 {
     // Initialize new segments.
     Segments segments;
+
     segments.setDefault();
+    segments[0].boundary = groupUnsegmented_.boundary;
+    segments[0].position = groupUnsegmented_.boundary.getCenter();
+    segments[0].height = groupUnsegmented_.boundary.length(2);
 
     QueryFilterSet segmentsFilter;
     segmentsFilter.setFilter(0, true);
@@ -549,18 +575,14 @@ void SegmentationAction::stepCreateSegments()
     for (auto &it : groups_)
     {
         // Create new segment.
-        segmentLabel = "Segment " + std::to_string(segmentId);
-        segmentColor =
-            ColorPalette::WindowsXp32[segmentId %
-                                      ColorPalette::WindowsXp32.size()];
-        segment.set(segmentId, segmentLabel, segmentColor);
+        createSegmentFromGroup(segmentId, segment, it.second);
 
         // Append new segment to segments.
         segments.push_back(segment);
         segmentsFilter.setFilter(segmentId, true);
 
         // Set segment id to this group.
-        it.second = segmentId;
+        it.second.segmentId = segmentId;
         segmentId++;
     }
 
@@ -570,6 +592,26 @@ void SegmentationAction::stepCreateSegments()
 
     progress_.setMaximumStep(nPointsInFilter_, 1000);
     progress_.setValueSteps(SEGMENTATION_STEP_VOXELS_TO_POINTS);
+}
+
+void SegmentationAction::createSegmentFromGroup(size_t segmentId,
+                                                Segment &segment,
+                                                const Group &group)
+{
+    segment.id = segmentId;
+
+    segment.label = "Segment " + std::to_string(segment.id);
+    segment.color =
+        ColorPalette::MPN65[segment.id % ColorPalette::MPN65.size()];
+
+    double n = static_cast<double>(group.nPoints);
+    segment.position = group.averagePoint / n;
+
+    segment.boundary = group.boundary;
+    segment.height = segment.boundary.length(2);
+
+    segment.radius =
+        0.5 * max(segment.boundary.length(0), segment.boundary.length(1));
 }
 
 void SegmentationAction::stepVoxelsToPoints()
@@ -588,7 +630,7 @@ void SegmentationAction::stepVoxelsToPoints()
             if (groups_.count(groupIndex) > 0)
             {
                 // Set point segment to the same value as voxel segment.
-                query_.segment() = groups_.at(groupIndex);
+                query_.segment() = groups_.at(groupIndex).segmentId;
                 query_.setModified();
             }
         }
@@ -699,42 +741,69 @@ bool SegmentationAction::isTrunkVoxel(const Point &a)
     return a.group == SIZE_MAX && !(a.descriptor < descriptor_);
 }
 
-void SegmentationAction::startGroup(const Point &a)
+void SegmentationAction::startGroup(const Point &a, bool isTrunk)
 {
-    if (useZ_)
+    if (isTrunk)
     {
-        groupMinimum_ = a.z;
-    }
-    else
-    {
-        groupMinimum_ = a.elevation;
-    }
-
-    groupMaximum_ = groupMinimum_;
-}
-
-void SegmentationAction::continueGroup(const Point &a)
-{
-    if (useZ_)
-    {
-        if (a.z < groupMinimum_)
+        if (useZ_)
         {
             groupMinimum_ = a.z;
         }
-        else if (a.z > groupMaximum_)
-        {
-            groupMaximum_ = a.z;
-        }
-    }
-    else
-    {
-        if (a.elevation < groupMinimum_)
+        else
         {
             groupMinimum_ = a.elevation;
         }
-        else if (a.elevation > groupMaximum_)
+    }
+
+    groupMaximum_ = groupMinimum_;
+
+    group_.nPoints++;
+    group_.boundary.extend(a.x, a.y, a.z);
+    group_.averagePoint[0] += a.x;
+    group_.averagePoint[1] += a.y;
+    group_.averagePoint[2] += a.z;
+}
+
+void SegmentationAction::continueGroup(const Point &a, bool isTrunk)
+{
+    if (isTrunk)
+    {
+        if (useZ_)
         {
-            groupMaximum_ = a.elevation;
+            if (a.z < groupMinimum_)
+            {
+                groupMinimum_ = a.z;
+            }
+            else if (a.z > groupMaximum_)
+            {
+                groupMaximum_ = a.z;
+            }
+        }
+        else
+        {
+            if (a.elevation < groupMinimum_)
+            {
+                groupMinimum_ = a.elevation;
+            }
+            else if (a.elevation > groupMaximum_)
+            {
+                groupMaximum_ = a.elevation;
+            }
         }
     }
+
+    group_.nPoints++;
+    group_.boundary.extend(a.x, a.y, a.z);
+    group_.averagePoint[0] += a.x;
+    group_.averagePoint[1] += a.y;
+    group_.averagePoint[2] += a.z;
+}
+
+void SegmentationAction::mergeToGroup(Group &dst, const Group &src)
+{
+    dst.nPoints += src.nPoints;
+    dst.boundary.extend(src.boundary);
+    dst.averagePoint[0] += src.averagePoint[0];
+    dst.averagePoint[1] += src.averagePoint[1];
+    dst.averagePoint[2] += src.averagePoint[2];
 }
