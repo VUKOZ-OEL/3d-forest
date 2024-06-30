@@ -221,6 +221,46 @@ inline std::string toLower(const std::string &str)
     return ret;
 }
 
+inline std::string toString(bool in)
+{
+    return (in) ? "true" : "false";
+}
+
+inline std::string toString(int in)
+{
+    return std::to_string(in);
+}
+
+inline std::string toString(unsigned int in)
+{
+    return std::to_string(in);
+}
+
+inline std::string toString(double in)
+{
+    return std::to_string(in);
+}
+
+inline std::string toString(long in)
+{
+    return std::to_string(in);
+}
+
+inline std::string toString(unsigned long in)
+{
+    return std::to_string(in);
+}
+
+inline std::string toString(long long in)
+{
+    return std::to_string(in);
+}
+
+inline std::string toString(unsigned long long in)
+{
+    return std::to_string(in);
+}
+
 #include <WarningsEnable.hpp>
 
 #endif /* UTIL_HPP */
