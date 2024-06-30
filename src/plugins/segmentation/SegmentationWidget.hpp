@@ -24,9 +24,10 @@
 
 // Include 3D Forest.
 #include <SegmentationAction.hpp>
+#include <SegmentationParameters.hpp>
 class MainWindow;
-class SliderWidget;
-class RangeSliderWidget;
+class DoubleSliderWidget;
+class DoubleRangeSliderWidget;
 class InfoDialog;
 
 // Include Qt.
@@ -53,14 +54,17 @@ private:
     MainWindow *mainWindow_;
     InfoDialog *infoDialog_;
 
+    SegmentationParameters defaultParameters_;
+    SegmentationParameters parameters_;
+
     SegmentationAction segmentation_;
 
-    SliderWidget *voxelSizeSlider_;
-    SliderWidget *descriptorSlider_;
-    SliderWidget *trunkRadiusSlider_;
-    SliderWidget *leafRadiusSlider_;
-    RangeSliderWidget *elevationSlider_;
-    SliderWidget *treeHeightSlider_;
+    DoubleSliderWidget *voxelSizeSlider_;
+    DoubleSliderWidget *descriptorSlider_;
+    DoubleSliderWidget *trunkRadiusSlider_;
+    DoubleSliderWidget *leafRadiusSlider_;
+    DoubleRangeSliderWidget *elevationSlider_;
+    DoubleSliderWidget *treeHeightSlider_;
     QCheckBox *useZCheckBox_;
     QCheckBox *onlyTrunksCheckBox_;
 

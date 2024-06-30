@@ -20,12 +20,12 @@
 /** @file SegmentationWidget.cpp */
 
 // Include 3D Forest.
+#include <DoubleRangeSliderWidget.hpp>
+#include <DoubleSliderWidget.hpp>
 #include <InfoDialog.hpp>
 #include <MainWindow.hpp>
 #include <ProgressDialog.hpp>
-#include <RangeSliderWidget.hpp>
 #include <SegmentationWidget.hpp>
-#include <SliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
@@ -49,91 +49,93 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
 {
     LOG_DEBUG(<< "Create.");
 
+    parameters_ = defaultParameters_;
+
     // Widgets.
-    SliderWidget::create(voxelSizeSlider_,
-                         this,
-                         nullptr,
-                         nullptr,
-                         tr("Voxel radius"),
-                         tr("Voxel radius to speed up computation."),
-                         tr("pt"),
-                         1,
-                         1,
-                         1000,
-                         100);
+    DoubleSliderWidget::create(voxelSizeSlider_,
+                               this,
+                               nullptr,
+                               nullptr,
+                               tr("Voxel radius"),
+                               tr("Voxel radius to speed up computation."),
+                               tr("m"),
+                               0.01,
+                               0.01,
+                               1.0,
+                               parameters_.voxelSize);
 
-    SliderWidget::create(descriptorSlider_,
-                         this,
-                         nullptr,
-                         nullptr,
-                         tr("Wood descriptor threshold"),
-                         tr("Wood descriptor threshold."),
-                         tr("%"),
-                         1,
-                         0,
-                         100,
-                         25);
+    DoubleSliderWidget::create(descriptorSlider_,
+                               this,
+                               nullptr,
+                               nullptr,
+                               tr("Wood descriptor threshold"),
+                               tr("Wood descriptor threshold."),
+                               tr("%"),
+                               1.0,
+                               0,
+                               100.0,
+                               parameters_.descriptor);
 
-    SliderWidget::create(trunkRadiusSlider_,
-                         this,
-                         nullptr,
-                         nullptr,
-                         tr("Maximal distance to connect trunk points"),
-                         tr("Neighborhood radius to search for"
-                            " voxels which belong to the same tree."),
-                         tr("pt"),
-                         1,
-                         1,
-                         1000,
-                         250);
+    DoubleSliderWidget::create(trunkRadiusSlider_,
+                               this,
+                               nullptr,
+                               nullptr,
+                               tr("Maximal distance to connect trunk points"),
+                               tr("Neighborhood radius to search for"
+                                  " voxels which belong to the same tree."),
+                               tr("m"),
+                               0.01,
+                               0.01,
+                               1.0,
+                               parameters_.trunkRadius);
 
-    SliderWidget::create(leafRadiusSlider_,
-                         this,
-                         nullptr,
-                         nullptr,
-                         tr("Maximal distance to connect leaf points"),
-                         tr("Neighborhood radius to search for"
-                            " voxels which belong to the same tree."),
-                         tr("pt"),
-                         1,
-                         1,
-                         1000,
-                         250);
+    DoubleSliderWidget::create(leafRadiusSlider_,
+                               this,
+                               nullptr,
+                               nullptr,
+                               tr("Maximal distance to connect leaf points"),
+                               tr("Neighborhood radius to search for"
+                                  " voxels which belong to the same tree."),
+                               tr("m"),
+                               0.01,
+                               0.01,
+                               1.0,
+                               parameters_.leafRadius);
 
-    RangeSliderWidget::create(elevationSlider_,
-                              this,
-                              nullptr,
-                              nullptr,
-                              tr("Look for trunks in elevation range"),
-                              tr("Ignore all trees which are only outside"
-                                 " \nof this elevation threshold."),
-                              tr("%"),
-                              1,
-                              0,
-                              100,
-                              5,
-                              20);
+    DoubleRangeSliderWidget::create(elevationSlider_,
+                                    this,
+                                    nullptr,
+                                    nullptr,
+                                    tr("Look for trunks in elevation range"),
+                                    tr("Ignore all trees which are only outside"
+                                       " \nof this elevation threshold."),
+                                    tr("m"),
+                                    0.01,
+                                    0,
+                                    10.0,
+                                    parameters_.elevationMin,
+                                    parameters_.elevationMax);
 
-    SliderWidget::create(treeHeightSlider_,
-                         this,
-                         nullptr,
-                         nullptr,
-                         tr("Minimal height of tree"),
-                         tr("Minimal height of detected voxel group to"
-                            " \ndetect it as a new tree."),
-                         tr("pt"),
-                         1,
-                         1,
-                         5000,
-                         1000);
+    DoubleSliderWidget::create(treeHeightSlider_,
+                               this,
+                               nullptr,
+                               nullptr,
+                               tr("Minimal height of tree"),
+                               tr("Minimal height of detected voxel group to"
+                                  " \ndetect it as a new tree."),
+                               tr("m"),
+                               0.01,
+                               0,
+                               10.0,
+                               parameters_.treeHeight);
 
     useZCheckBox_ = new QCheckBox;
     useZCheckBox_->setText(tr("Use z-coordinate instead of ground elevation"));
-    useZCheckBox_->setChecked(false);
+    useZCheckBox_->setChecked(parameters_.zCoordinatesAsElevation);
 
     onlyTrunksCheckBox_ = new QCheckBox;
     onlyTrunksCheckBox_->setText(tr("Find only trunks (fast preview)"));
-    onlyTrunksCheckBox_->setChecked(false);
+    onlyTrunksCheckBox_->setChecked(parameters_.segmentOnlyTrunks);
 
     // Settings layout.
     QVBoxLayout *settingsLayout = new QVBoxLayout;
@@ -187,27 +189,19 @@ void SegmentationWidget::slotApply()
 
     mainWindow_->suspendThreads();
 
-    double voxelSize = static_cast<double>(voxelSizeSlider_->value());
-    double descriptor = static_cast<double>(descriptorSlider_->value());
-    double trunkRadius = static_cast<double>(trunkRadiusSlider_->value());
-    double leafRadius = static_cast<double>(leafRadiusSlider_->value());
-    double elevationMin = static_cast<double>(elevationSlider_->minimumValue());
-    double elevationMax = static_cast<double>(elevationSlider_->maximumValue());
-    double treeHeight = static_cast<double>(treeHeightSlider_->value());
-    bool useZ = useZCheckBox_->isChecked();
-    bool onlyTrunks = onlyTrunksCheckBox_->isChecked();
+    parameters_.voxelSize = voxelSizeSlider_->value();
+    parameters_.descriptor = descriptorSlider_->value();
+    parameters_.trunkRadius = trunkRadiusSlider_->value();
+    parameters_.leafRadius = leafRadiusSlider_->value();
+    parameters_.elevationMin = elevationSlider_->minimumValue();
+    parameters_.elevationMax = elevationSlider_->maximumValue();
+    parameters_.treeHeight = treeHeightSlider_->value();
+    parameters_.zCoordinatesAsElevation = useZCheckBox_->isChecked();
+    parameters_.segmentOnlyTrunks = onlyTrunksCheckBox_->isChecked();
 
     try
     {
-        segmentation_.start(voxelSize,
-                            descriptor * 0.01,
-                            trunkRadius,
-                            leafRadius,
-                            elevationMin * 0.01,
-                            elevationMax * 0.01,
-                            treeHeight,
-                            useZ,
-                            onlyTrunks);
+        segmentation_.start(parameters_);
 
         ProgressDialog::run(mainWindow_,
                             "Computing Segmentation",
