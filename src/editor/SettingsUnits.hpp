@@ -17,39 +17,30 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Settings.hpp */
+/** @file SettingsUnits.hpp */
 
-#ifndef SETTINGS_HPP
-#define SETTINGS_HPP
+#ifndef SETTINGS_UNITS_HPP
+#define SETTINGS_UNITS_HPP
+
+// Include std.
+#include <string>
+#include <vector>
 
 // Include 3D Forest.
-#include <SettingsImport.hpp>
-#include <SettingsUnits.hpp>
-#include <SettingsView.hpp>
+#include <Json.hpp>
+#include <Vector3.hpp>
 
 // Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 
-/** Settings. */
-class EXPORT_EDITOR Settings
+/** Settings Units. */
+class EXPORT_EDITOR SettingsUnits
 {
 public:
-    SettingsUnits units;
-
-    const SettingsView &view() const { return view_; }
-    void setView(const SettingsView &view);
-
-protected:
-    SettingsView view_;
-
-    friend void fromJson(Settings &out, const Json &in);
-    friend void toJson(Json &out, const Settings &in);
+    Vector3<double> pointsPerMeter{1000.0, 1000.0, 1000.0};
 };
-
-void fromJson(Settings &out, const Json &in);
-void toJson(Json &out, const Settings &in);
 
 #include <WarningsEnable.hpp>
 
-#endif /* SETTINGS_HPP */
+#endif /* SETTINGS_UNITS_HPP */
