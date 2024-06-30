@@ -17,7 +17,9 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file segmentation.cpp @brief Segmentation tool. */
+/** @file segmentation.cpp
+    @brief Tree segmentation command line tool.
+*/
 
 // Include std.
 #include <cstring>
@@ -26,12 +28,71 @@
 #include <ArgumentParser.hpp>
 #include <Editor.hpp>
 #include <Error.hpp>
+#include <SegmentationAction.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "segmentation"
 #include <Log.hpp>
 
-int main()
+static void segmentationCompute(const std::string &inputPath,
+                                const SegmentationParameters &parameters)
 {
-    return 0;
+    // Open input file in editor.
+    Editor editor;
+    editor.open(inputPath);
+
+    // Repeatedly call tree segmentation until it is complete.
+    SegmentationAction segmentation(&editor);
+    segmentation.start(parameters);
+    while (!segmentation.end())
+    {
+        segmentation.next();
+    }
+}
+
+int main(int argc, char *argv[])
+{
+    int rc = 1;
+
+    LOGGER_START_FILE("log_segmentation.txt");
+
+    try
+    {
+        SegmentationParameters parameters;
+
+        ArgumentParser arg;
+        arg.add("--input", "");
+        arg.add("--voxel", toString(parameters.voxelSize));
+        arg.add("--descriptor", toString(parameters.descriptor));
+        arg.add("--trunk-radius", toString(parameters.trunkRadius));
+        arg.add("--leaf-radius", toString(parameters.leafRadius));
+        arg.add("--elevation-min", toString(parameters.elevationMin));
+        arg.add("--elevation-max", toString(parameters.elevationMax));
+        arg.add("--tree-height", toString(parameters.treeHeight));
+        arg.add("--z", toString(parameters.zCoordinatesAsElevation));
+        arg.add("--trunks", toString(parameters.segmentOnlyTrunks));
+        arg.parse(argc, argv);
+
+        parameters.voxelSize = arg.toDouble("--voxel");
+        parameters.descriptor = arg.toDouble("--descriptor");
+        parameters.trunkRadius = arg.toDouble("--trunk-radius");
+        parameters.leafRadius = arg.toDouble("--leaf-radius");
+        parameters.elevationMin = arg.toDouble("--elevation-min");
+        parameters.elevationMax = arg.toDouble("--elevation-max");
+        parameters.treeHeight = arg.toDouble("--tree-height");
+        parameters.zCoordinatesAsElevation = arg.toBool("--z");
+        parameters.segmentOnlyTrunks = arg.toBool("--trunks");
+
+        segmentationCompute(arg.toString("--input"), parameters);
+
+        rc = 0;
+    }
+    catch (std::exception &e)
+    {
+        std::cerr << "error: " << e.what() << std::endl;
+    }
+
+    LOGGER_STOP_FILE;
+
+    return rc;
 }
