@@ -17,7 +17,9 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file classification.cpp */
+/** @file classification.cpp
+    @brief Ground classification command line tool.
+*/
 
 // Include 3D Forest.
 #include <ArgumentParser.hpp>
