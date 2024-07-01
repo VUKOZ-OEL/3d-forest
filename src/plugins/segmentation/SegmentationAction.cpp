@@ -27,7 +27,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "SegmentationAction"
-// #define LOG_MODULE_DEBUG_ENABLED 1
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define SEGMENTATION_STEP_RESET_POINTS 0
@@ -87,7 +87,7 @@ void SegmentationAction::Group::clear()
 
 void SegmentationAction::start(const SegmentationParameters &parameters)
 {
-    LOG_DEBUG(<< "Start.");
+    LOG_DEBUG(<< "Start with parameters<" << toString(parameters) << ">.");
 
     double pointsPerMeter = editor_->settings().units.pointsPerMeter[0];
 
