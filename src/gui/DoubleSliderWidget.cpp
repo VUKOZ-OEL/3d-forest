@@ -26,54 +26,61 @@
 
 // Include Qt.
 #include <QComboBox>
+#include <QDoubleSpinBox>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QSlider>
-#include <QSpinBox>
 #include <QVBoxLayout>
 
 // Include local.
 #define LOG_MODULE_NAME "DoubleSliderWidget"
 #include <Log.hpp>
 
-DoubleSliderWidget::DoubleSliderWidget() : QWidget()
+DoubleSliderWidget::DoubleSliderWidget()
+    : QWidget(),
+      slider_(nullptr),
+      spinBox_(nullptr),
+      minimumValue_(0),
+      maximumValue_(0)
 {
 }
 
 double DoubleSliderWidget::value() const
 {
-    return static_cast<double>(slider_->value());
+    return spinBox_->value();
 }
 
 double DoubleSliderWidget::minimum() const
 {
-    return static_cast<double>(slider_->minimum());
+    return maximumValue_;
 }
 
 double DoubleSliderWidget::maximum() const
 {
-    return static_cast<double>(slider_->maximum());
+    return maximumValue_;
 }
 
 void DoubleSliderWidget::setValue(double value)
 {
-    int v = static_cast<int>(value);
-    spinBox_->setValue(v);
-    slider_->setValue(v);
+    spinBox_->setValue(value);
+
+    int valueInt = static_cast<int>(
+        ((value - minimumValue_) / (maximumValue_ - minimumValue_)) * 1000);
+    slider_->setValue(valueInt);
 }
 
 void DoubleSliderWidget::setMinimum(double min)
 {
-    int v = static_cast<int>(min);
-    spinBox_->setMinimum(v);
-    slider_->setMinimum(v);
+    spinBox_->setMinimum(min);
+    slider_->setMinimum(0);
+    minimumValue_ = min;
 }
 
 void DoubleSliderWidget::setMaximum(double max)
 {
-    int v = static_cast<int>(max);
-    spinBox_->setMaximum(v);
-    slider_->setMaximum(v);
+    spinBox_->setMaximum(max);
+    slider_->setMaximum(1000);
+    maximumValue_ = max;
 }
 
 void DoubleSliderWidget::blockSignals(bool block)
@@ -91,16 +98,30 @@ void DoubleSliderWidget::slotIntermediateValue(int v)
 {
     QObject *obj = sender();
 
+    double value = minimumValue_ + (static_cast<double>(v) * 0.001 *
+                                    (maximumValue_ - minimumValue_));
+
     if (obj == slider_)
     {
         spinBox_->blockSignals(true);
-        spinBox_->setValue(v);
+        spinBox_->setValue(value);
         spinBox_->blockSignals(false);
     }
-    else if (obj == spinBox_)
+
+    emit signalIntermediateValue(value);
+}
+
+void DoubleSliderWidget::slotIntermediateValue(double v)
+{
+    QObject *obj = sender();
+
+    int valueInt = static_cast<int>(
+        ((v - minimumValue_) / (maximumValue_ - minimumValue_)) * 1000);
+
+    if (obj == spinBox_)
     {
         slider_->blockSignals(true);
-        slider_->setValue(v);
+        slider_->setValue(valueInt);
         slider_->blockSignals(false);
     }
 
@@ -122,6 +143,9 @@ void DoubleSliderWidget::create(DoubleSliderWidget *&outputWidget,
 {
     outputWidget = new DoubleSliderWidget();
 
+    outputWidget->minimumValue_ = min;
+    outputWidget->maximumValue_ = max;
+
     // Description Name.
     QLabel *label = new QLabel(text);
 
@@ -136,10 +160,10 @@ void DoubleSliderWidget::create(DoubleSliderWidget *&outputWidget,
     units->addItem(unitsList);
 
     // Value Slider.
-    int stepInt = static_cast<int>(step);
-    int minInt = static_cast<int>(min);
-    int maxInt = static_cast<int>(max);
-    int valueInt = static_cast<int>(value);
+    int stepInt = 1;
+    int minInt = 0;
+    int maxInt = 1000;
+    int valueInt = static_cast<int>(((value - min) / (max - min)) * 1000);
 
     outputWidget->slider_ = new QSlider;
     QSlider *slider = outputWidget->slider_;
@@ -161,7 +185,7 @@ void DoubleSliderWidget::create(DoubleSliderWidget *&outputWidget,
     if (memberIntermediateValue)
     {
         connect(outputWidget,
-                SIGNAL(signalIntermediateValue(int)),
+                SIGNAL(signalIntermediateValue(double)),
                 receiver,
                 memberIntermediateValue);
     }
@@ -175,16 +199,16 @@ void DoubleSliderWidget::create(DoubleSliderWidget *&outputWidget,
     }
 
     // Value SpinBox.
-    outputWidget->spinBox_ = new QSpinBox;
-    QSpinBox *spinBox = outputWidget->spinBox_;
-    spinBox->setRange(minInt, maxInt);
-    spinBox->setValue(valueInt);
-    spinBox->setSingleStep(stepInt);
+    outputWidget->spinBox_ = new QDoubleSpinBox;
+    QDoubleSpinBox *spinBox = outputWidget->spinBox_;
+    spinBox->setRange(min, max);
+    spinBox->setValue(value);
+    spinBox->setSingleStep(step);
 
     connect(spinBox,
-            SIGNAL(valueChanged(int)),
+            SIGNAL(valueChanged(double)),
             outputWidget,
-            SLOT(slotIntermediateValue(int)));
+            SLOT(slotIntermediateValue(double)));
 
     connect(spinBox,
             SIGNAL(editingFinished()),

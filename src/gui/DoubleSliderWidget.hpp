@@ -24,7 +24,7 @@
 
 // Include Qt.
 #include <QWidget>
-class QSpinBox;
+class QDoubleSpinBox;
 class QSlider;
 class QVBoxLayout;
 
@@ -71,16 +71,19 @@ public:
     void blockSignals(bool block);
 
 signals:
-    void signalIntermediateValue(int v);
+    void signalIntermediateValue(double v);
     void signalFinalValue();
 
 protected slots:
     void slotIntermediateValue(int v);
+    void slotIntermediateValue(double v);
     void slotFinalValue();
 
 protected:
     QSlider *slider_;
-    QSpinBox *spinBox_;
+    QDoubleSpinBox *spinBox_;
+    double minimumValue_;
+    double maximumValue_;
 };
 
 #include <WarningsEnable.hpp>
