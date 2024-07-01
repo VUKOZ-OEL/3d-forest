@@ -41,4 +41,24 @@ public:
     bool segmentOnlyTrunks{false};
 };
 
+inline void toJson(Json &out, const SegmentationParameters &in)
+{
+    toJson(out["voxelSize"], in.voxelSize);
+    toJson(out["descriptor"], in.descriptor);
+    toJson(out["trunkRadius"], in.trunkRadius);
+    toJson(out["leafRadius"], in.leafRadius);
+    toJson(out["elevationMin"], in.elevationMin);
+    toJson(out["elevationMax"], in.elevationMax);
+    toJson(out["treeHeight"], in.treeHeight);
+    toJson(out["zCoordinatesAsElevation"], in.zCoordinatesAsElevation);
+    toJson(out["segmentOnlyTrunks"], in.segmentOnlyTrunks);
+}
+
+inline std::string toString(const SegmentationParameters &in)
+{
+    Json json;
+    toJson(json, in);
+    return json.serialize(0);
+}
+
 #endif /* SEGMENTATION_PARAMETERS_HPP */
