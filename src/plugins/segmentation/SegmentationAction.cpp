@@ -27,7 +27,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "SegmentationAction"
-#define LOG_MODULE_DEBUG_ENABLED 1
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define SEGMENTATION_STEP_RESET_POINTS 0
