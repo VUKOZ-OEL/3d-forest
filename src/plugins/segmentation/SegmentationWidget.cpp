@@ -52,31 +52,33 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
     parameters_ = defaultParameters_;
 
     // Widgets.
-    DoubleSliderWidget::create(voxelSizeSlider_,
-                               this,
-                               nullptr,
-                               nullptr,
-                               tr("Voxel radius"),
-                               tr("Voxel radius to speed up computation."),
-                               tr("m"),
-                               0.01,
-                               0.01,
-                               1.0,
-                               parameters_.voxelSize);
+    DoubleSliderWidget::create(
+        voxelRadiusSlider_,
+        this,
+        nullptr,
+        nullptr,
+        tr("Voxel radius"),
+        tr("Higher voxel radius values affect the quality of the results but "
+           "speed up computation and reduce disk space usage."),
+        tr("m"),
+        0.01,
+        0.01,
+        1.0,
+        parameters_.voxelRadius);
 
-    DoubleSliderWidget::create(descriptorSlider_,
+    DoubleSliderWidget::create(trunkDescriptorMinSlider_,
                                this,
                                nullptr,
                                nullptr,
-                               tr("Wood descriptor threshold"),
-                               tr("Wood descriptor threshold."),
+                               tr("Minimal descriptor value for wood"),
+                               tr("Minimal descriptor value for wood."),
                                tr("%"),
                                1.0,
                                0,
                                100.0,
-                               parameters_.descriptor);
+                               parameters_.trunkDescriptorMin);
 
-    DoubleSliderWidget::create(trunkRadiusSlider_,
+    DoubleSliderWidget::create(searchRadiusForTrunkPointsSlider_,
                                this,
                                nullptr,
                                nullptr,
@@ -87,9 +89,9 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
                                0.01,
                                0.01,
                                1.0,
-                               parameters_.trunkRadius);
+                               parameters_.searchRadiusForTrunkPoints);
 
-    DoubleSliderWidget::create(leafRadiusSlider_,
+    DoubleSliderWidget::create(searchRadiusForLeafPointsSlider_,
                                this,
                                nullptr,
                                nullptr,
@@ -100,21 +102,22 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
                                0.01,
                                0.01,
                                1.0,
-                               parameters_.leafRadius);
+                               parameters_.searchRadiusForLeafPoints);
 
-    DoubleRangeSliderWidget::create(elevationSlider_,
-                                    this,
-                                    nullptr,
-                                    nullptr,
-                                    tr("Look for trunks in elevation range"),
-                                    tr("Ignore all trees which are only outside"
-                                       " \nof this elevation threshold."),
-                                    tr("m"),
-                                    0.01,
-                                    0,
-                                    10.0,
-                                    parameters_.elevationMin,
-                                    parameters_.elevationMax);
+    DoubleRangeSliderWidget::create(
+        treeBaseElevationSlider_,
+        this,
+        nullptr,
+        nullptr,
+        tr("Look for tree base in elevation range"),
+        tr("The values allow to cut off flying trees and prevent connecting "
+           "trees by ground wood."),
+        tr("m"),
+        0.01,
+        0,
+        10.0,
+        parameters_.treeBaseElevationMin,
+        parameters_.treeBaseElevationMax);
 
     DoubleSliderWidget::create(treeHeightSlider_,
                                this,
@@ -127,26 +130,29 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
                                0.01,
                                0,
                                10.0,
-                               parameters_.treeHeight);
+                               parameters_.treeHeightMin);
 
-    useZCheckBox_ = new QCheckBox;
-    useZCheckBox_->setText(tr("Use z-coordinate instead of ground elevation"));
-    useZCheckBox_->setChecked(parameters_.zCoordinatesAsElevation);
+    zCoordinatesAsElevationCheckBox_ = new QCheckBox;
+    zCoordinatesAsElevationCheckBox_->setText(tr("Use z-coordinates instead of"
+                                                 " ground elevation"));
+    zCoordinatesAsElevationCheckBox_->setChecked(
+        parameters_.zCoordinatesAsElevation);
 
-    onlyTrunksCheckBox_ = new QCheckBox;
-    onlyTrunksCheckBox_->setText(tr("Find only trunks (fast preview)"));
-    onlyTrunksCheckBox_->setChecked(parameters_.segmentOnlyTrunks);
+    segmentOnlyTrunksCheckBox_ = new QCheckBox;
+    segmentOnlyTrunksCheckBox_->setText(tr("Segment only trunks"
+                                           " (fast preview)"));
+    segmentOnlyTrunksCheckBox_->setChecked(parameters_.segmentOnlyTrunks);
 
     // Settings layout.
     QVBoxLayout *settingsLayout = new QVBoxLayout;
-    settingsLayout->addWidget(voxelSizeSlider_);
-    settingsLayout->addWidget(descriptorSlider_);
-    settingsLayout->addWidget(trunkRadiusSlider_);
-    settingsLayout->addWidget(leafRadiusSlider_);
-    settingsLayout->addWidget(elevationSlider_);
+    settingsLayout->addWidget(voxelRadiusSlider_);
+    settingsLayout->addWidget(trunkDescriptorMinSlider_);
+    settingsLayout->addWidget(searchRadiusForTrunkPointsSlider_);
+    settingsLayout->addWidget(searchRadiusForLeafPointsSlider_);
+    settingsLayout->addWidget(treeBaseElevationSlider_);
     settingsLayout->addWidget(treeHeightSlider_);
-    settingsLayout->addWidget(useZCheckBox_);
-    settingsLayout->addWidget(onlyTrunksCheckBox_);
+    settingsLayout->addWidget(zCoordinatesAsElevationCheckBox_);
+    settingsLayout->addWidget(segmentOnlyTrunksCheckBox_);
     settingsLayout->addStretch();
 
     // Buttons.
@@ -189,15 +195,18 @@ void SegmentationWidget::slotApply()
 
     mainWindow_->suspendThreads();
 
-    parameters_.voxelSize = voxelSizeSlider_->value();
-    parameters_.descriptor = descriptorSlider_->value();
-    parameters_.trunkRadius = trunkRadiusSlider_->value();
-    parameters_.leafRadius = leafRadiusSlider_->value();
-    parameters_.elevationMin = elevationSlider_->minimumValue();
-    parameters_.elevationMax = elevationSlider_->maximumValue();
-    parameters_.treeHeight = treeHeightSlider_->value();
-    parameters_.zCoordinatesAsElevation = useZCheckBox_->isChecked();
-    parameters_.segmentOnlyTrunks = onlyTrunksCheckBox_->isChecked();
+    parameters_.voxelRadius = voxelRadiusSlider_->value();
+    parameters_.trunkDescriptorMin = trunkDescriptorMinSlider_->value();
+    parameters_.searchRadiusForTrunkPoints =
+        searchRadiusForTrunkPointsSlider_->value();
+    parameters_.searchRadiusForLeafPoints =
+        searchRadiusForLeafPointsSlider_->value();
+    parameters_.treeBaseElevationMin = treeBaseElevationSlider_->minimumValue();
+    parameters_.treeBaseElevationMax = treeBaseElevationSlider_->maximumValue();
+    parameters_.treeHeightMin = treeHeightSlider_->value();
+    parameters_.zCoordinatesAsElevation =
+        zCoordinatesAsElevationCheckBox_->isChecked();
+    parameters_.segmentOnlyTrunks = segmentOnlyTrunksCheckBox_->isChecked();
 
     try
     {

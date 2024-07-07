@@ -58,8 +58,12 @@ int main(int argc, char *argv[])
 {
     try
     {
-        ArgumentParser arg;
-        arg.add("--input", "");
+        ArgumentParser arg("file size example");
+        arg.add("-i",
+                "--input",
+                "",
+                "Path to the input file to be processed.",
+                true);
         arg.parse(argc, argv);
 
         exampleFileSize(arg.toString("--input"));

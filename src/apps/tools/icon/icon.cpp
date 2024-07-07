@@ -41,8 +41,12 @@ int main(int argc, char *argv[])
 {
     try
     {
-        ArgumentParser arg;
-        arg.add("--input", "");
+        ArgumentParser arg("format icons");
+        arg.add("-i",
+                "--input",
+                "",
+                "Path to the input file to be processed.",
+                true);
         arg.parse(argc, argv);
 
         QString path = QString::fromStdString(arg.toString("--input"));

@@ -59,21 +59,34 @@ int main(int argc, char *argv[])
 
     try
     {
-        ArgumentParser arg;
-        arg.add("--input", "");
-        arg.add("--voxel", "100");
-        arg.add("--radius", "200");
-        arg.add("--angle", "60");
-        arg.add("--clean", "true");
-        arg.add("--clean-all", "false");
+        ArgumentParser arg("classify ground points");
+        arg.add("-h", "--help", "", "Show this help message and exit.");
+        arg.add("-i",
+                "--input",
+                "",
+                "Path to the input file to be processed. Accepted formats "
+                "include .las.",
+                true);
+        arg.add("-v", "--voxel", "100");
+        arg.add("-r", "--radius", "200");
+        arg.add("-a", "--angle", "60");
+        arg.add("-c", "--clean", "true");
+        arg.add("-ca", "--clean-all", "false");
         arg.parse(argc, argv);
 
-        classificationCompute(arg.toString("--input"),
-                              arg.toDouble("--voxel"),
-                              arg.toDouble("--radius"),
-                              arg.toDouble("--angle"),
-                              arg.toBool("--clean"),
-                              arg.toBool("--clean-all"));
+        if (arg.contains("--help"))
+        {
+            arg.help();
+        }
+        else
+        {
+            classificationCompute(arg.toString("--input"),
+                                  arg.toDouble("--voxel"),
+                                  arg.toDouble("--radius"),
+                                  arg.toDouble("--angle"),
+                                  arg.toBool("--clean"),
+                                  arg.toBool("--clean-all"));
+        }
 
         rc = 0;
     }

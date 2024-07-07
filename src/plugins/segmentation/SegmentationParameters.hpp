@@ -29,13 +29,13 @@
 class SegmentationParameters
 {
 public:
-    double voxelSize{0.1};
-    double descriptor{25.0};
-    double trunkRadius{0.25};
-    double leafRadius{0.25};
-    double elevationMin{1.0};
-    double elevationMax{2.0};
-    double treeHeight{1.0};
+    double voxelRadius{0.1};
+    double trunkDescriptorMin{25.0};
+    double searchRadiusForTrunkPoints{0.25};
+    double searchRadiusForLeafPoints{0.25};
+    double treeBaseElevationMin{1.0};
+    double treeBaseElevationMax{2.0};
+    double treeHeightMin{1.0};
 
     bool zCoordinatesAsElevation{false};
     bool segmentOnlyTrunks{false};
@@ -43,13 +43,13 @@ public:
 
 inline void toJson(Json &out, const SegmentationParameters &in)
 {
-    toJson(out["voxelSize"], in.voxelSize);
-    toJson(out["descriptor"], in.descriptor);
-    toJson(out["trunkRadius"], in.trunkRadius);
-    toJson(out["leafRadius"], in.leafRadius);
-    toJson(out["elevationMin"], in.elevationMin);
-    toJson(out["elevationMax"], in.elevationMax);
-    toJson(out["treeHeight"], in.treeHeight);
+    toJson(out["voxelRadius"], in.voxelRadius);
+    toJson(out["trunkDescriptorMin"], in.trunkDescriptorMin);
+    toJson(out["searchRadiusForTrunkPoints"], in.searchRadiusForTrunkPoints);
+    toJson(out["searchRadiusForLeafPoints"], in.searchRadiusForLeafPoints);
+    toJson(out["treeBaseElevationMin"], in.treeBaseElevationMin);
+    toJson(out["treeBaseElevationMax"], in.treeBaseElevationMax);
+    toJson(out["treeHeightMin"], in.treeHeightMin);
     toJson(out["zCoordinatesAsElevation"], in.zCoordinatesAsElevation);
     toJson(out["segmentOnlyTrunks"], in.segmentOnlyTrunks);
 }

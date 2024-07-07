@@ -86,10 +86,15 @@ int main(int argc, char *argv[])
 
     try
     {
-        ArgumentParser arg;
-        arg.add("--input", "");
-        arg.add("--voxel-size", "100");
-        arg.add("--print", "");
+        ArgumentParser arg("compute elevation of points above ground");
+        arg.add("-i",
+                "--input",
+                "",
+                "Path to the input file to be processed. Accepted formats "
+                "include .las.",
+                true);
+        arg.add("-v", "--voxel", "100");
+        arg.add("-p", "--print");
         arg.parse(argc, argv);
 
         if (arg.contains("--print"))
@@ -98,8 +103,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-            elevationCompute(arg.toString("--input"),
-                             arg.toDouble("--voxel-size"));
+            elevationCompute(arg.toString("--input"), arg.toDouble("--voxel"));
         }
 
         rc = 0;

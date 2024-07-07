@@ -27,7 +27,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "SegmentationAction"
-// #define LOG_MODULE_DEBUG_ENABLED 1
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define SEGMENTATION_STEP_RESET_POINTS 0
@@ -59,16 +59,6 @@ void SegmentationAction::clear()
     query_.clear();
     queryPoint_.clear();
 
-    parameters_.voxelSize = 0;
-    parameters_.descriptor = 0;
-    parameters_.trunkRadius = 0;
-    parameters_.leafRadius = 0;
-    parameters_.elevationMin = 0;
-    parameters_.elevationMax = 0;
-    parameters_.treeHeight = 0;
-    parameters_.zCoordinatesAsElevation = false;
-    parameters_.segmentOnlyTrunks = false;
-
     nPointsTotal_ = 0;
     nPointsInFilter_ = 0;
 
@@ -87,18 +77,22 @@ void SegmentationAction::Group::clear()
 
 void SegmentationAction::start(const SegmentationParameters &parameters)
 {
-    LOG_DEBUG(<< "Start with parameters<" << toString(parameters) << ">.");
+    LOG_DEBUG(<< "Start with parameters <" << toString(parameters) << ">.");
 
     double pointsPerMeter = editor_->settings().units.pointsPerMeter[0];
 
     // Set input parameters.
-    parameters_.voxelSize = parameters.voxelSize * pointsPerMeter;
-    parameters_.descriptor = parameters.descriptor;
-    parameters_.trunkRadius = parameters.trunkRadius * pointsPerMeter;
-    parameters_.leafRadius = parameters.leafRadius * pointsPerMeter;
-    parameters_.elevationMin = parameters.elevationMin * pointsPerMeter;
-    parameters_.elevationMax = parameters.elevationMax * pointsPerMeter;
-    parameters_.treeHeight = parameters.treeHeight * pointsPerMeter;
+    parameters_.voxelRadius = parameters.voxelRadius * pointsPerMeter;
+    parameters_.trunkDescriptorMin = parameters.trunkDescriptorMin;
+    parameters_.searchRadiusForTrunkPoints =
+        parameters.searchRadiusForTrunkPoints * pointsPerMeter;
+    parameters_.searchRadiusForLeafPoints =
+        parameters.searchRadiusForLeafPoints * pointsPerMeter;
+    parameters_.treeBaseElevationMin =
+        parameters.treeBaseElevationMin * pointsPerMeter;
+    parameters_.treeBaseElevationMax =
+        parameters.treeBaseElevationMax * pointsPerMeter;
+    parameters_.treeHeightMin = parameters.treeHeightMin * pointsPerMeter;
     parameters_.zCoordinatesAsElevation = parameters.zCoordinatesAsElevation;
     parameters_.segmentOnlyTrunks = parameters.segmentOnlyTrunks;
 
@@ -244,7 +238,7 @@ void SegmentationAction::stepPointsToVoxels()
         // If point index to voxel is none:
         if (query_.voxel() == SIZE_MAX &&
             (parameters_.zCoordinatesAsElevation ||
-             !(query_.elevation() < parameters_.elevationMin)))
+             !(query_.elevation() < parameters_.treeBaseElevationMin)))
         {
             // Create new voxel.
             createVoxel();
@@ -333,7 +327,7 @@ void SegmentationAction::stepCreateTrunks()
                 voxels_.findRadius(a.x,
                                    a.y,
                                    a.z,
-                                   parameters_.trunkRadius,
+                                   parameters_.searchRadiusForTrunkPoints,
                                    search_);
                 for (size_t j = 0; j < search_.size(); j++)
                 {
@@ -354,8 +348,8 @@ void SegmentationAction::stepCreateTrunks()
             {
                 // If the current group meets some criteria:
                 double groupHeight = groupMaximum_ - groupMinimum_;
-                if (!(groupHeight < parameters_.treeHeight) &&
-                    groupMinimum_ < parameters_.elevationMax)
+                if (!(groupHeight < parameters_.treeHeightMin) &&
+                    groupMinimum_ < parameters_.treeBaseElevationMax)
                 {
                     // Mark this group as future segment.
                     groups_[groupId_] = group_;
@@ -647,7 +641,7 @@ void SegmentationAction::createVoxel()
     queryPoint_.where().setSphere(query_.x(),
                                   query_.y(),
                                   query_.z(),
-                                  parameters_.voxelSize);
+                                  parameters_.voxelRadius);
     queryPoint_.exec();
 
     while (queryPoint_.next())
@@ -687,7 +681,11 @@ void SegmentationAction::findNearestNeighbor(Point &a)
     a.dist = std::numeric_limits<double>::max();
     a.next = SIZE_MAX;
 
-    voxels_.findRadius(a.x, a.y, a.z, parameters_.leafRadius, search_);
+    voxels_.findRadius(a.x,
+                       a.y,
+                       a.z,
+                       parameters_.searchRadiusForLeafPoints,
+                       search_);
 
     for (size_t j = 0; j < search_.size(); j++)
     {
@@ -711,7 +709,8 @@ void SegmentationAction::findNearestNeighbor(Point &a)
 
 bool SegmentationAction::isTrunkVoxel(const Point &a)
 {
-    return a.group == SIZE_MAX && !(a.descriptor < parameters_.descriptor);
+    return a.group == SIZE_MAX &&
+           !(a.descriptor < parameters_.trunkDescriptorMin);
 }
 
 void SegmentationAction::startGroup(const Point &a, bool isTrunk)

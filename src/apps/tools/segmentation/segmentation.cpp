@@ -58,32 +58,47 @@ int main(int argc, char *argv[])
 
     try
     {
-        SegmentationParameters parameters;
+        SegmentationParameters p;
 
-        ArgumentParser arg;
-        arg.add("--input", "");
-        arg.add("--voxel", toString(parameters.voxelSize));
-        arg.add("--descriptor", toString(parameters.descriptor));
-        arg.add("--trunk-radius", toString(parameters.trunkRadius));
-        arg.add("--leaf-radius", toString(parameters.leafRadius));
-        arg.add("--elevation-min", toString(parameters.elevationMin));
-        arg.add("--elevation-max", toString(parameters.elevationMax));
-        arg.add("--tree-height", toString(parameters.treeHeight));
-        arg.add("--z", toString(parameters.zCoordinatesAsElevation));
-        arg.add("--trunks", toString(parameters.segmentOnlyTrunks));
+        ArgumentParser arg("computes point segmentation to trees");
+        arg.add("-h", "--help", "", "Show this help message and exit.");
+        arg.add("-i",
+                "--input",
+                "",
+                "Path to the input file to be processed. Accepted formats "
+                "include .las.",
+                true);
+        arg.add("-v", "--voxel", toString(p.voxelRadius));
+        arg.add("-d", "--descriptor", toString(p.trunkDescriptorMin));
+        arg.add("-tr",
+                "--trunk-radius",
+                toString(p.searchRadiusForTrunkPoints));
+        arg.add("-lr", "--leaf-radius", toString(p.searchRadiusForLeafPoints));
+        arg.add("-e1", "--elevation-min", toString(p.treeBaseElevationMin));
+        arg.add("-e2", "--elevation-max", toString(p.treeBaseElevationMax));
+        arg.add("-th", "--tree-height", toString(p.treeHeightMin));
+        arg.add("-z", "--z-elevation", toString(p.zCoordinatesAsElevation));
+        arg.add("-t", "--trunks", toString(p.segmentOnlyTrunks));
         arg.parse(argc, argv);
 
-        parameters.voxelSize = arg.toDouble("--voxel");
-        parameters.descriptor = arg.toDouble("--descriptor");
-        parameters.trunkRadius = arg.toDouble("--trunk-radius");
-        parameters.leafRadius = arg.toDouble("--leaf-radius");
-        parameters.elevationMin = arg.toDouble("--elevation-min");
-        parameters.elevationMax = arg.toDouble("--elevation-max");
-        parameters.treeHeight = arg.toDouble("--tree-height");
-        parameters.zCoordinatesAsElevation = arg.toBool("--z");
-        parameters.segmentOnlyTrunks = arg.toBool("--trunks");
+        if (arg.contains("--help"))
+        {
+            arg.help();
+        }
+        else
+        {
+            p.voxelRadius = arg.toDouble("--voxel");
+            p.trunkDescriptorMin = arg.toDouble("--descriptor");
+            p.searchRadiusForTrunkPoints = arg.toDouble("--trunk-radius");
+            p.searchRadiusForLeafPoints = arg.toDouble("--leaf-radius");
+            p.treeBaseElevationMin = arg.toDouble("--elevation-min");
+            p.treeBaseElevationMax = arg.toDouble("--elevation-max");
+            p.treeHeightMin = arg.toDouble("--tree-height");
+            p.zCoordinatesAsElevation = arg.toBool("--z-elevation");
+            p.segmentOnlyTrunks = arg.toBool("--trunks");
 
-        segmentationCompute(arg.toString("--input"), parameters);
+            segmentationCompute(arg.toString("--input"), p);
+        }
 
         rc = 0;
     }

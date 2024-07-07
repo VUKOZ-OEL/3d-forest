@@ -59,14 +59,14 @@ private:
 
     SegmentationAction segmentation_;
 
-    DoubleSliderWidget *voxelSizeSlider_;
-    DoubleSliderWidget *descriptorSlider_;
-    DoubleSliderWidget *trunkRadiusSlider_;
-    DoubleSliderWidget *leafRadiusSlider_;
-    DoubleRangeSliderWidget *elevationSlider_;
+    DoubleSliderWidget *voxelRadiusSlider_;
+    DoubleSliderWidget *trunkDescriptorMinSlider_;
+    DoubleSliderWidget *searchRadiusForTrunkPointsSlider_;
+    DoubleSliderWidget *searchRadiusForLeafPointsSlider_;
+    DoubleRangeSliderWidget *treeBaseElevationSlider_;
     DoubleSliderWidget *treeHeightSlider_;
-    QCheckBox *useZCheckBox_;
-    QCheckBox *onlyTrunksCheckBox_;
+    QCheckBox *zCoordinatesAsElevationCheckBox_;
+    QCheckBox *segmentOnlyTrunksCheckBox_;
 
     QPushButton *helpButton_;
     QPushButton *applyButton_;
