@@ -26,20 +26,15 @@
 #define LOG_MODULE_NAME "Settings"
 #include <Log.hpp>
 
-void Settings::setView(const SettingsView &view)
-{
-    view_ = view;
-}
-
 void fromJson(Settings &out, const Json &in)
 {
     if (in.contains("view"))
     {
-        fromJson(out.view_, in["view"]);
+        fromJson(out.view, in["view"]);
     }
 }
 
 void toJson(Json &out, const Settings &in)
 {
-    toJson(out["view"], in.view_);
+    toJson(out["view"], in.view);
 }

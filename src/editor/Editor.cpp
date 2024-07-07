@@ -343,6 +343,19 @@ void Editor::updateAfterRead()
     clipFilter_.box = clipFilter_.boundary;
     // clipFilter_.enabled = Region::SHAPE_BOX;
 
+    if (datasets_.size() > 0)
+    {
+        Vector3<double> scaling = datasets_.at(0).scalingFile();
+
+        SettingsUnits settingsUnits = settings_.units;
+        settingsUnits.pointsPerMeter = 1.0 / scaling;
+
+        LOG_DEBUG(<< "Dataset scaling <" << scaling << "> sets points/m <"
+                  << settingsUnits.pointsPerMeter << ">.");
+
+        setSettingsUnits(settingsUnits);
+    }
+
     if (viewports_.size() > 0)
     {
         viewports_.where().setDataset(datasetsFilter_);
@@ -356,9 +369,15 @@ void Editor::updateAfterRead()
     }
 }
 
-void Editor::setSettingsView(const SettingsView &settings)
+void Editor::setSettingsView(const SettingsView &settingsView)
 {
-    settings_.setView(settings);
+    settings_.view = settingsView;
+    unsavedChanges_ = true;
+}
+
+void Editor::setSettingsUnits(const SettingsUnits &settingsUnits)
+{
+    settings_.units = settingsUnits;
     unsavedChanges_ = true;
 }
 

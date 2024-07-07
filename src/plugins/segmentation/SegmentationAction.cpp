@@ -80,6 +80,7 @@ void SegmentationAction::start(const SegmentationParameters &parameters)
     LOG_DEBUG(<< "Start with parameters <" << toString(parameters) << ">.");
 
     double pointsPerMeter = editor_->settings().units.pointsPerMeter[0];
+    LOG_DEBUG(<< "pointsPerMeter <" << pointsPerMeter << ">.");
 
     // Set input parameters.
     parameters_.voxelRadius = parameters.voxelRadius * pointsPerMeter;
@@ -95,6 +96,9 @@ void SegmentationAction::start(const SegmentationParameters &parameters)
     parameters_.treeHeightMin = parameters.treeHeightMin * pointsPerMeter;
     parameters_.zCoordinatesAsElevation = parameters.zCoordinatesAsElevation;
     parameters_.segmentOnlyTrunks = parameters.segmentOnlyTrunks;
+
+    LOG_DEBUG(<< "searchRadiusForTrunkPoints <"
+              << parameters_.searchRadiusForTrunkPoints << "> pt.");
 
     // Clear work data.
     nPointsTotal_ = editor_->datasets().nPoints();

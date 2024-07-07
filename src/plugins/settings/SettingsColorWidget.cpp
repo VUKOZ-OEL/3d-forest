@@ -142,7 +142,7 @@ void SettingsColorWidget::slotUpdate(void *sender,
 
     if (target.empty() || target.contains(Editor::TYPE_SETTINGS))
     {
-        setSettingsIn(mainWindow_->editor().settings().view());
+        setSettingsIn(mainWindow_->editor().settings().view);
     }
 }
 

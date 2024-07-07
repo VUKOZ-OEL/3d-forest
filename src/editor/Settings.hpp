@@ -35,16 +35,8 @@
 class EXPORT_EDITOR Settings
 {
 public:
+    SettingsView view;
     SettingsUnits units;
-
-    const SettingsView &view() const { return view_; }
-    void setView(const SettingsView &view);
-
-protected:
-    SettingsView view_;
-
-    friend void fromJson(Settings &out, const Json &in);
-    friend void toJson(Json &out, const Settings &in);
 };
 
 void fromJson(Settings &out, const Json &in);

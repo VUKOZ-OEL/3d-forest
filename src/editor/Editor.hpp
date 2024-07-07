@@ -108,7 +108,8 @@ public:
 
     // Settings.
     const Settings &settings() const { return settings_; }
-    void setSettingsView(const SettingsView &settings);
+    void setSettingsView(const SettingsView &settingsView);
+    void setSettingsUnits(const SettingsUnits &settingsUnits);
 
     // Modifiers.
     void addModifier(ModifierInterface *modifier);
