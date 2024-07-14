@@ -26,9 +26,9 @@
 #include <Endian.hpp>
 #include <File.hpp>
 #include <LasFile.hpp>
-#include <Math.hpp>
 #include <Page.hpp>
 #include <Query.hpp>
+#include <Util.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "Page"

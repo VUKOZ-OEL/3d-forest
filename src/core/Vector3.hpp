@@ -28,6 +28,7 @@
 
 // Include 3D Forest.
 #include <Json.hpp>
+#include <Util.hpp>
 
 // Include local.
 #include <ExportCore.hpp>
@@ -343,6 +344,14 @@ inline Vector3<T> Vector3<T>::rotated(const Vector3<T> &axis,
                       this->operator[](0) * 2 * (xr * zr + w * yr) +
                           this->operator[](1) * 2 * (yr * zr - w * xr) +
                           this->operator[](2) * (w2 - x2 - y2 + z2));
+}
+
+inline Vector3<double> safeDivide(double numerator,
+                                  const Vector3<double> &denominator)
+{
+    return Vector3<double>(safeDivide(numerator, denominator[0]),
+                           safeDivide(numerator, denominator[1]),
+                           safeDivide(numerator, denominator[2]));
 }
 
 template <class T> inline void fromJson(Vector3<T> &out, const Json &in)

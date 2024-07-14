@@ -95,15 +95,18 @@ int main(int argc, char *argv[])
                 true);
         arg.add("-v", "--voxel", "100");
         arg.add("-p", "--print");
-        arg.parse(argc, argv);
 
-        if (arg.contains("--print"))
+        if (arg.parse(argc, argv))
         {
-            elevationPrint(arg.toString("--input"));
-        }
-        else
-        {
-            elevationCompute(arg.toString("--input"), arg.toDouble("--voxel"));
+            if (arg.contains("--print"))
+            {
+                elevationPrint(arg.toString("--input"));
+            }
+            else
+            {
+                elevationCompute(arg.toString("--input"),
+                                 arg.toDouble("--voxel"));
+            }
         }
 
         rc = 0;

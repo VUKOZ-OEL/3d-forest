@@ -52,7 +52,7 @@ void Editor::close()
 {
     LOG_DEBUG(<< "Close.");
 
-    path_ = File::join(File::currentPath(), "untitled.json");
+    setProjectPath(File::join(File::currentPath(), "untitled.json"));
     projectName_ = "Untitled";
 
     datasets_.clear();
@@ -116,7 +116,7 @@ void Editor::openProject(const std::string &path)
 
     try
     {
-        path_ = path;
+        setProjectPath(path);
 
         // Project name.
         if (in.contains(EDITOR_KEY_PROJECT_NAME))
@@ -129,7 +129,7 @@ void Editor::openProject(const std::string &path)
         {
             fromJson(datasets_,
                      in[EDITOR_KEY_DATA_SET],
-                     path_,
+                     projectPath_,
                      datasetsFilter_);
         }
 
@@ -202,11 +202,20 @@ void Editor::openDataset(const std::string &path,
 
     try
     {
+        std::string projectPath = projectPath_;
+        if (File::fileName(projectPath) == "untitled.json")
+        {
+            projectPath = File::resolvePath(path, File::currentPath());
+            projectPath = File::replaceExtension(projectPath, ".json");
+        }
+
         datasets_.read(path,
-                       path_,
+                       projectPath,
                        settings,
                        datasets_.boundary(),
                        datasetsFilter_);
+
+        setProjectPath(projectPath);
     }
     catch (...)
     {
@@ -216,6 +225,12 @@ void Editor::openDataset(const std::string &path,
     updateAfterRead();
 
     unsavedChanges_ = true;
+}
+
+void Editor::setProjectPath(const std::string &projectPath)
+{
+    LOG_DEBUG(<< "Set project path to <" << projectPath << ">.");
+    projectPath_ = projectPath;
 }
 
 void Editor::setClassifications(const Classifications &classifications)
@@ -345,13 +360,8 @@ void Editor::updateAfterRead()
 
     if (datasets_.size() > 0)
     {
-        Vector3<double> scaling = datasets_.at(0).scalingFile();
-
         SettingsUnits settingsUnits = settings_.units;
-        settingsUnits.pointsPerMeter = 1.0 / scaling;
-
-        LOG_DEBUG(<< "Dataset scaling <" << scaling << "> sets points/m <"
-                  << settingsUnits.pointsPerMeter << ">.");
+        settingsUnits.setLasFileScaling(datasets_.at(0).scalingFile());
 
         setSettingsUnits(settingsUnits);
     }
@@ -377,8 +387,7 @@ void Editor::setSettingsView(const SettingsView &settingsView)
 
 void Editor::setSettingsUnits(const SettingsUnits &settingsUnits)
 {
-    settings_.units = settingsUnits;
-    unsavedChanges_ = true;
+    unsavedChanges_ = settings_.units.apply(settingsUnits);
 }
 
 void Editor::addModifier(ModifierInterface *modifier)

@@ -32,6 +32,7 @@
 ArgumentParser::ArgumentParser(const std::string &description)
     : description_(description)
 {
+    add("-h", "--help", "", "Show this help message and exit.");
 }
 
 void ArgumentParser::add(const std::string &shortOption,
@@ -40,15 +41,17 @@ void ArgumentParser::add(const std::string &shortOption,
                          const std::string &help,
                          bool required)
 {
-    args_[longOption].shortOption = shortOption;
-    args_[longOption].longOption = longOption;
-    args_[longOption].text = defaultValue;
-    args_[longOption].help = help;
-    args_[longOption].required = required;
-    args_[longOption].count = 0;
+    options_[longOption].shortOption = shortOption;
+    options_[longOption].longOption = longOption;
+    options_[longOption].text = defaultValue;
+    options_[longOption].help = help;
+    options_[longOption].required = required;
+    options_[longOption].count = 0;
+
+    insertOrder.push_back(longOption);
 }
 
-void ArgumentParser::parse(int argc, char *argv[])
+bool ArgumentParser::parse(int argc, char *argv[])
 {
     int i = 1;
 
@@ -57,18 +60,19 @@ void ArgumentParser::parse(int argc, char *argv[])
         programName_ = argv[0];
     }
 
+    // Find matching options.
     while (i < argc)
     {
         std::string option(argv[i]);
 
         // Try to find option by long option name.
-        auto search = args_.find(option);
+        auto search = options_.find(option);
 
         // Try to find option by short option name.
-        if (search == args_.end())
+        if (search == options_.end())
         {
-            search = args_.begin();
-            while (search != args_.end())
+            search = options_.begin();
+            while (search != options_.end())
             {
                 if (option == search->second.shortOption)
                 {
@@ -80,9 +84,9 @@ void ArgumentParser::parse(int argc, char *argv[])
         }
 
         // Option found.
-        if (search != args_.end())
+        if (search != options_.end())
         {
-            if (i + 1 < argc && args_.count(argv[i + 1]) == 0)
+            if (i + 1 < argc && options_.count(argv[i + 1]) == 0)
             {
                 search->second.text = argv[i + 1];
                 i++;
@@ -90,9 +94,33 @@ void ArgumentParser::parse(int argc, char *argv[])
 
             search->second.count++;
         }
+        else
+        {
+            invalidOption(option);
+            return false;
+        }
 
         i++;
     }
+
+    // Show help.
+    if (contains("--help"))
+    {
+        help();
+        return false;
+    }
+
+    // Check required options.
+    for (auto const &arg : options_)
+    {
+        if (arg.second.required && arg.second.count < 1)
+        {
+            missingOption(arg.second);
+            return false;
+        }
+    }
+
+    return true;
 }
 
 bool ArgumentParser::read(const std::string &longOption, int &value) const
@@ -141,7 +169,7 @@ uint64_t ArgumentParser::toUint64(const std::string &longOption) const
     return static_cast<uint64_t>(std::stoull(toString(longOption)));
 }
 
-void ArgumentParser::help()
+void ArgumentParser::help() const
 {
     std::string indent{"    "};
 
@@ -151,27 +179,51 @@ void ArgumentParser::help()
     std::cout << std::endl;
 
     std::cout << "options:" << std::endl;
-    for (auto const &arg : args_)
+    for (auto const &it : insertOrder)
     {
+        auto const &option = options_.at(it);
+
         std::cout << indent;
 
-        if (arg.second.shortOption.empty())
+        if (option.shortOption.empty())
         {
             std::cout << "     ";
         }
         else
         {
-            std::cout << arg.second.shortOption << ", ";
-            if (arg.second.shortOption.size() < 3)
+            std::cout << option.shortOption << ", ";
+            if (option.shortOption.size() < 3)
             {
                 std::cout << " ";
             }
         }
 
-        std::cout << arg.second.longOption;
+        std::cout << option.longOption;
 
-        std::cout << " ... " << arg.second.help;
+        std::cout << " ... " << option.help;
+
+        if (!option.text.empty())
+        {
+            std::cout << ", default " << option.text;
+        }
 
         std::cout << std::endl;
     }
+}
+
+void ArgumentParser::error(const std::string &message) const
+{
+    std::cout << programName_ << ": " << message << std::endl;
+    std::cout << "Try '" << programName_ << " --help' for more information."
+              << std::endl;
+}
+
+void ArgumentParser::invalidOption(const std::string &option) const
+{
+    error("invalid option '" + option + "'");
+}
+
+void ArgumentParser::missingOption(const Option &option) const
+{
+    error("missing required option '" + option.longOption + "'");
 }

@@ -50,7 +50,8 @@ public:
              const std::string &defaultValue = "",
              const std::string &help = "",
              bool required = false);
-    void parse(int argc, char *argv[]);
+
+    bool parse(int argc, char *argv[]);
 
     bool contains(const std::string &longOption) const;
     bool read(const std::string &longOption, int &value) const;
@@ -64,37 +65,40 @@ public:
     uint32_t toUint32(const std::string &longOption) const;
     uint64_t toUint64(const std::string &longOption) const;
 
-    void help();
-
 private:
     std::string programName_;
     std::string description_;
 
-    /** Argument Parser Value. */
-    class Value
+    /** Argument Parser Option. */
+    class Option
     {
     public:
         std::string shortOption;
         std::string longOption;
         std::string text;
         std::string help;
-        bool required;
+        bool required{false};
         int count{0};
-        Value() : count(0) {}
     };
 
-    std::map<std::string, Value> args_;
+    std::map<std::string, Option> options_;
+    std::vector<std::string> insertOrder;
+
+    void help() const;
+    void error(const std::string &message) const;
+    void invalidOption(const std::string &option) const;
+    void missingOption(const Option &option) const;
 };
 
 inline bool ArgumentParser::contains(const std::string &longOption) const
 {
-    return args_.at(longOption).count > 0;
+    return options_.at(longOption).count > 0;
 }
 
 inline const std::string &ArgumentParser::toString(
     const std::string &longOption) const
 {
-    return args_.at(longOption).text;
+    return options_.at(longOption).text;
 }
 
 #include <WarningsEnable.hpp>

@@ -45,24 +45,28 @@ int main(int argc, char *argv[])
         arg.add("-i",
                 "--input",
                 "",
-                "Path to the input file to be processed.",
+                "Path to directory with icons to be processed.",
                 true);
-        arg.parse(argc, argv);
 
-        QString path = QString::fromStdString(arg.toString("--input"));
-
-        QDir searchDirectory(path);
-        QStringList fileList = searchDirectory.entryList(QDir::Files);
-
-        std::cout << "directory '"
-                  << searchDirectory.absolutePath().toStdString() << "'"
-                  << std::endl;
-        std::cout << "contains " << fileList.count() << " files" << std::endl;
-
-        for (const QString &fileName : fileList)
+        if (arg.parse(argc, argv))
         {
-            std::cout << "file '" << fileName.toStdString() << "'" << std::endl;
-            process(path, fileName);
+            QString path = QString::fromStdString(arg.toString("--input"));
+
+            QDir searchDirectory(path);
+            QStringList fileList = searchDirectory.entryList(QDir::Files);
+
+            std::cout << "directory '"
+                      << searchDirectory.absolutePath().toStdString() << "'"
+                      << std::endl;
+            std::cout << "contains " << fileList.count() << " files"
+                      << std::endl;
+
+            for (const QString &fileName : fileList)
+            {
+                std::cout << "file '" << fileName.toStdString() << "'"
+                          << std::endl;
+                process(path, fileName);
+            }
         }
     }
     catch (std::exception &e)

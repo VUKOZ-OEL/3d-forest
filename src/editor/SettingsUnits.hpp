@@ -23,8 +23,6 @@
 #define SETTINGS_UNITS_HPP
 
 // Include std.
-#include <string>
-#include <vector>
 
 // Include 3D Forest.
 #include <Json.hpp>
@@ -38,8 +36,19 @@
 class EXPORT_EDITOR SettingsUnits
 {
 public:
-    Vector3<double> pointsPerMeter{1000.0, 1000.0, 1000.0};
+    Vector3<double> pointsPerMeterLas;
+    Vector3<double> pointsPerMeterUser;
+    bool userDefined;
+
+    SettingsUnits();
+
+    void setLasFileScaling(const Vector3<double> &scaling);
+    const Vector3<double> &pointsPerMeter() const;
+    bool apply(const SettingsUnits &newSettings);
 };
+
+void fromJson(SettingsUnits &out, const Json &in);
+void toJson(Json &out, const SettingsUnits &in);
 
 #include <WarningsEnable.hpp>
 

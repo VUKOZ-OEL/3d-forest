@@ -64,9 +64,11 @@ int main(int argc, char *argv[])
                 "",
                 "Path to the input file to be processed.",
                 true);
-        arg.parse(argc, argv);
 
-        exampleFileSize(arg.toString("--input"));
+        if (arg.parse(argc, argv))
+        {
+            exampleFileSize(arg.toString("--input"));
+        }
     }
     catch (std::exception &e)
     {

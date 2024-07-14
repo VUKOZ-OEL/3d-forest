@@ -32,9 +32,15 @@ void fromJson(Settings &out, const Json &in)
     {
         fromJson(out.view, in["view"]);
     }
+
+    if (in.contains("units"))
+    {
+        fromJson(out.units, in["units"]);
+    }
 }
 
 void toJson(Json &out, const Settings &in)
 {
     toJson(out["view"], in.view);
+    toJson(out["units"], in.units);
 }

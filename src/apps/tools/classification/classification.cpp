@@ -60,7 +60,6 @@ int main(int argc, char *argv[])
     try
     {
         ArgumentParser arg("classify ground points");
-        arg.add("-h", "--help", "", "Show this help message and exit.");
         arg.add("-i",
                 "--input",
                 "",
@@ -72,13 +71,8 @@ int main(int argc, char *argv[])
         arg.add("-a", "--angle", "60");
         arg.add("-c", "--clean", "true");
         arg.add("-ca", "--clean-all", "false");
-        arg.parse(argc, argv);
 
-        if (arg.contains("--help"))
-        {
-            arg.help();
-        }
-        else
+        if (arg.parse(argc, argv))
         {
             classificationCompute(arg.toString("--input"),
                                   arg.toDouble("--voxel"),

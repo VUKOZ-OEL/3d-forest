@@ -24,12 +24,22 @@
 
 // Include std.
 #include <climits>
+#include <cmath>
+#include <iomanip>
 #include <limits>
+#include <sstream>
+#include <stdexcept>
 #include <string>
 
 // Include local.
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>
+
+#define MATH_PI_4 (3.1415926535897932384626433832795 / 4.0)
+
+#define MATH_ATAN_A 0.0776509570923569
+#define MATH_ATAN_B -0.287434475393028
+#define MATH_ATAN_C (MATH_PI_4 - MATH_ATAN_A - MATH_ATAN_B)
 
 extern void assertionFailure(const char *file, int line, const char *assertion);
 
@@ -48,6 +58,83 @@ extern void assertionFailure(const char *file, int line, const char *assertion);
 #else
     #define ASSERT(cond) ((void)0)
 #endif
+
+inline double fastatan(double arg)
+{
+    const double arg2 = arg * arg;
+    return ((MATH_ATAN_A * arg2 + MATH_ATAN_B) * arg2 + MATH_ATAN_C) * arg;
+}
+
+template <class T> inline T min(const T &a, const T &b)
+{
+    return (a < b) ? a : b;
+}
+
+template <class T> inline T max(const T &a, const T &b)
+{
+    return (a > b) ? a : b;
+}
+
+template <class T> inline void clamp(T &value, const T &min, const T &max)
+{
+    if (value < min)
+    {
+        value = min;
+    }
+    else if (value > max)
+    {
+        value = max;
+    }
+}
+
+template <class T> inline void updateRange(const T &value, T &min, T &max)
+{
+    if (value < min)
+    {
+        min = value;
+    }
+
+    if (value > max)
+    {
+        max = value;
+    }
+}
+
+template <class T> inline void normalize(T &value, const T &min, const T &max)
+{
+    T range = max - min;
+    if (range > std::numeric_limits<T>::epsilon())
+    {
+        value = (value - min) / range;
+    }
+    else
+    {
+        value = 0;
+    }
+}
+
+inline double safeDivide(double numerator, double denominator)
+{
+    if (std::fabs(denominator) < std::numeric_limits<double>::epsilon())
+    {
+        if (std::fabs(numerator) < std::numeric_limits<double>::epsilon())
+        {
+            throw std::runtime_error("Division undefined (0 / 0).");
+        }
+        else
+        {
+            return (numerator > 0.0 ? std::numeric_limits<double>::max()
+                                    : -std::numeric_limits<double>::max());
+        }
+    }
+
+    return numerator / denominator;
+}
+
+inline bool isZero(double number)
+{
+    return std::fabs(number) < std::numeric_limits<double>::epsilon();
+}
 
 template <typename T> inline bool isEqual(T a, T b)
 {
@@ -238,7 +325,23 @@ inline std::string toString(unsigned int in)
 
 inline std::string toString(double in)
 {
-    return std::to_string(in);
+    std::ostringstream oss;
+    oss << std::fixed << std::setprecision(15) << in;
+    std::string str = oss.str();
+
+    size_t end = str.find_last_not_of('0');
+    if (str[end] == '.')
+    {
+        end--;
+    }
+    str.erase(end + 1, std::string::npos);
+
+    if (str.find('.') == std::string::npos)
+    {
+        str += ".0";
+    }
+
+    return str;
 }
 
 inline std::string toString(long in)
