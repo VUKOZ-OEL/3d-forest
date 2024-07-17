@@ -71,6 +71,16 @@ SettingsUnitsWidget::SettingsUnitsWidget(MainWindow *mainWindow)
             this,
             SLOT(slotUserDefined(int)));
 
+    QLabel *help = new QLabel;
+    help->setToolTip(tr("The values are in points per meter.\n"
+                        "Example: las scaling 0.01 is 100 points per meter, "
+                        "two points have integer x coordinates 5 and 7 "
+                        "which is x length 2 cm.\n"
+                        "The user is able to override input file las scaling "
+                        "to user defined value."));
+    ThemeIcon helpIcon(":/gui/", "question");
+    help->setPixmap(helpIcon.pixmap(MainWindow::ICON_SIZE_TEXT));
+
     // Layout.
     QGridLayout *groupBoxLayout = new QGridLayout;
 
@@ -80,6 +90,7 @@ SettingsUnitsWidget::SettingsUnitsWidget(MainWindow *mainWindow)
     groupBoxLayout->addWidget(new QLabel(tr("User scaling:")), 1, 0);
     groupBoxLayout->addWidget(ppmUserSpinBox_, 1, 1);
 
+    groupBoxLayout->addWidget(help, 2, 0);
     groupBoxLayout->addWidget(userDefinedCheckBox_, 2, 1);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
