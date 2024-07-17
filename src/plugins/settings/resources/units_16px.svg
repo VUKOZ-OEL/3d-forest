@@ -33,10 +33,10 @@
      inkscape:document-units="px"
      showgrid="true"
      inkscape:zoom="34.541667"
-     inkscape:cx="9.9424863"
-     inkscape:cy="15.430486"
+     inkscape:cx="5.0498446"
+     inkscape:cy="11.956421"
      inkscape:window-width="1920"
-     inkscape:window-height="1080"
+     inkscape:window-height="1271"
      inkscape:window-x="1943"
      inkscape:window-y="15"
      inkscape:window-maximized="0"
@@ -86,11 +86,11 @@
    ry="0"
    inkscape:label="bar_1_selection" /><path
    style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-   d="m 1.5,13.5 h 13"
+   d="m 1.5,12.5 h 13"
    id="path822"
    inkscape:connector-curvature="0" /><path
    style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-   d="M 3,15 1.5,13.5 3,12"
+   d="M 3,14 1.5,12.5 3,11"
    id="path1132"
    inkscape:connector-curvature="0"
    sodipodi:nodetypes="ccc" /><use
@@ -102,16 +102,17 @@
    width="100%"
    height="100%" /><text
    xml:space="preserve"
-   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.62770748px;line-height:0;font-family:Arial;-inkscape-font-specification:Arial;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1"
-   x="1.268841"
-   y="9.4420147"
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.43967533px;line-height:0;font-family:Arial;-inkscape-font-specification:Arial;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1"
+   x="1.773048"
+   y="8.3441372"
    id="text4845"
-   transform="scale(0.9475885,1.0553104)"><tspan
+   transform="scale(0.93082319,1.0743179)"><tspan
      sodipodi:role="line"
      id="tspan4843"
-     x="1.268841"
-     y="9.4420147"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.62770748px;font-family:Arial;-inkscape-font-specification:Arial;stroke-width:1">cm</tspan></text>
+     x="1.773048"
+     y="8.3441372"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.43967533px;font-family:Arial;-inkscape-font-specification:Arial;stroke-width:1">cm</tspan></text>
+
 
 </g><metadata
      id="metadata2474"><rdf:RDF><cc:Work
