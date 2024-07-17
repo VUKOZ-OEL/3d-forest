@@ -31,6 +31,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "ExplorerClippingBoxWidget"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 ExplorerClippingBoxWidget::ExplorerClippingBoxWidget(MainWindow *mainWindow)

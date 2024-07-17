@@ -89,6 +89,8 @@ protected:
 void fromJson(SettingsView &out, const Json &in);
 void toJson(Json &out, const SettingsView &in);
 
+std::string toString(const SettingsView &in);
+
 #include <WarningsEnable.hpp>
 
 #endif /* SETTINGS_VIEW_HPP */

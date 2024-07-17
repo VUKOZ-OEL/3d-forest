@@ -25,7 +25,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "SettingsUnits"
-#define LOG_MODULE_DEBUG_ENABLED 1
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 SettingsUnits::SettingsUnits()
@@ -84,4 +84,11 @@ void toJson(Json &out, const SettingsUnits &in)
 {
     toJson(out["userDefined"], in.userDefined);
     toJson(out["pointsPerMeterUser"], in.pointsPerMeterUser);
+}
+
+std::string toString(const SettingsUnits &in)
+{
+    return "{\"pointsPerMeterLas\": " + toString(in.pointsPerMeterLas) +
+           ",\"pointsPerMeterUser\": " + toString(in.pointsPerMeterUser) +
+           ",\"userDefined\": " + toString(in.userDefined) + "}";
 }

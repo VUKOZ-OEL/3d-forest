@@ -50,6 +50,8 @@ public:
 void fromJson(SettingsUnits &out, const Json &in);
 void toJson(Json &out, const SettingsUnits &in);
 
+std::string toString(const SettingsUnits &in);
+
 #include <WarningsEnable.hpp>
 
 #endif /* SETTINGS_UNITS_HPP */

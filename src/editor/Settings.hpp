@@ -42,6 +42,8 @@ public:
 void fromJson(Settings &out, const Json &in);
 void toJson(Json &out, const Settings &in);
 
+std::string toString(const Settings &in);
+
 #include <WarningsEnable.hpp>
 
 #endif /* SETTINGS_HPP */

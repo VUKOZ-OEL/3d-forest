@@ -186,7 +186,7 @@ template <class T> inline void toJson(Json &out, const Vector2<T> &in)
 
 template <class T> inline std::string toString(const Vector2<T> &in)
 {
-    return "(" + std::to_string(in[0]) + ", " + std::to_string(in[1]) + ")";
+    return "[" + std::to_string(in[0]) + "," + std::to_string(in[1]) + "]";
 }
 
 template <class T>

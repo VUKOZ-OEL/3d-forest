@@ -42,12 +42,12 @@ static void segmentationCompute(const std::string &inputPath,
     editor.open(inputPath);
 
     // Repeatedly call tree segmentation until it is complete.
-    // SegmentationAction segmentation(&editor);
-    // segmentation.start(parameters);
-    // while (!segmentation.end())
-    //{
-    //    segmentation.next();
-    //}
+    SegmentationAction segmentation(&editor);
+    segmentation.start(parameters);
+    while (!segmentation.end())
+    {
+        segmentation.next();
+    }
 
     editor.saveProject(editor.projectPath());
 }

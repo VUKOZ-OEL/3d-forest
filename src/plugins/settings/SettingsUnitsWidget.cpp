@@ -33,6 +33,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "SettingsUnitsWidget"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define ICON(name) (ThemeIcon(":/settings/", name))
@@ -48,9 +49,9 @@ SettingsUnitsWidget::SettingsUnitsWidget(MainWindow *mainWindow)
     ppmLasSpinBox_->setSingleStep(1);
     ppmLasSpinBox_->setEnabled(false);
     connect(ppmLasSpinBox_,
-            SIGNAL(valueChanged(int)),
+            SIGNAL(valueChanged(double)),
             this,
-            SLOT(slotIntermediateLas(int)));
+            SLOT(slotIntermediateLas(double)));
 
     ppmUserSpinBox_ = new QDoubleSpinBox;
     ppmUserSpinBox_->setRange(1, 10000);
@@ -58,9 +59,9 @@ SettingsUnitsWidget::SettingsUnitsWidget(MainWindow *mainWindow)
     ppmUserSpinBox_->setSingleStep(1);
     ppmUserSpinBox_->setEnabled(settings_.userDefined);
     connect(ppmUserSpinBox_,
-            SIGNAL(valueChanged(int)),
+            SIGNAL(valueChanged(double)),
             this,
-            SLOT(slotIntermediateUser(int)));
+            SLOT(slotIntermediateUser(double)));
 
     userDefinedCheckBox_ = new QCheckBox;
     userDefinedCheckBox_->setChecked(settings_.userDefined);
@@ -112,6 +113,8 @@ void SettingsUnitsWidget::slotUpdate(void *sender,
 
 void SettingsUnitsWidget::setSettingsOut()
 {
+    LOG_DEBUG(<< "Apply settings <" << toString(settings_) << ">.");
+
     mainWindow_->suspendThreads();
     mainWindow_->editor().setSettingsUnits(settings_);
     mainWindow_->update(this, {Editor::TYPE_SETTINGS});
@@ -119,6 +122,7 @@ void SettingsUnitsWidget::setSettingsOut()
 
 void SettingsUnitsWidget::slotIntermediateLas(double v)
 {
+    LOG_DEBUG(<< "New pointsPerMeterLas value <" << toString(v) << ">.");
     settings_.pointsPerMeterLas[0] = v;
     settings_.pointsPerMeterLas[1] = v;
     settings_.pointsPerMeterLas[2] = v;
@@ -127,6 +131,7 @@ void SettingsUnitsWidget::slotIntermediateLas(double v)
 
 void SettingsUnitsWidget::slotIntermediateUser(double v)
 {
+    LOG_DEBUG(<< "New pointsPerMeterUser value <" << toString(v) << ">.");
     settings_.pointsPerMeterUser[0] = v;
     settings_.pointsPerMeterUser[1] = v;
     settings_.pointsPerMeterUser[2] = v;

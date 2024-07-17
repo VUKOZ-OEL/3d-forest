@@ -44,3 +44,9 @@ void toJson(Json &out, const Settings &in)
     toJson(out["view"], in.view);
     toJson(out["units"], in.units);
 }
+
+std::string toString(const Settings &in)
+{
+    return "{\"view\": " + toString(in.view) +
+           ",\"units\": " + toString(in.units) + "}";
+}

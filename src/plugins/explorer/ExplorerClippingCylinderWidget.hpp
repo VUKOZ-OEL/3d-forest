@@ -47,6 +47,7 @@ protected slots:
     void slotInputChanged();
 
 protected:
+    MainWindow *mainWindow_;
     DoubleSliderWidget *pointAInput_[3];
     DoubleSliderWidget *pointBInput_[3];
     DoubleSliderWidget *radiusInput_;
