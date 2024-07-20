@@ -47,11 +47,11 @@ inline void toJson(Json &out, const DescriptorParameters &in)
 {
     if (in.method == DescriptorParameters::METHOD_DENSITY)
     {
-        toJson(out["method"], "density");
+        toJson(out["method"], std::string("density"));
     }
     else if (in.method == DescriptorParameters::METHOD_PCA_INTENSITY)
     {
-        toJson(out["method"], "pca");
+        toJson(out["method"], std::string("pca"));
     }
     else
     {
