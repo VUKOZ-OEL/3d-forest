@@ -29,7 +29,7 @@
 #define LOG_MODULE_NAME "elevation"
 #include <Log.hpp>
 
-static void elevationCompute(const std::string &inputPath, double voxelSize)
+static void elevationCompute(const std::string &inputPath, double voxelRadius)
 {
     // Open input file in editor.
     Editor editor;
@@ -37,11 +37,13 @@ static void elevationCompute(const std::string &inputPath, double voxelSize)
 
     // Compute elevation by steps.
     ElevationAction elevation(&editor);
-    elevation.start(voxelSize);
+    elevation.start(voxelRadius);
     while (!elevation.end())
     {
         elevation.next();
     }
+
+    editor.saveProject(editor.projectPath());
 }
 
 static void elevationPrint(const std::string &inputPath)
@@ -86,15 +88,18 @@ int main(int argc, char *argv[])
 
     try
     {
-        ArgumentParser arg("compute elevation of points above ground");
+        ArgumentParser arg("computes elevation of points above ground");
         arg.add("-i",
                 "--input",
                 "",
                 "Path to the input file to be processed. Accepted formats "
-                "include .las.",
+                "include .las, and .json project file.",
                 true);
-        arg.add("-v", "--voxel", "100");
-        arg.add("-p", "--print");
+        arg.add("-v", "--voxel", toString("0.1"), "Voxel radius [m]");
+        arg.add("-p",
+                "--print",
+                "false",
+                "Print minimal and maximal elevation {true, false}");
 
         if (arg.parse(argc, argv))
         {

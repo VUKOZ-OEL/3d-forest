@@ -49,8 +49,6 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
 {
     LOG_DEBUG(<< "Create.");
 
-    parameters_ = defaultParameters_;
-
     // Widgets.
     DoubleSliderWidget::create(
         voxelRadiusSlider_,

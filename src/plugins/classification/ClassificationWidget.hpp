@@ -24,8 +24,9 @@
 
 // Include 3D Forest.
 #include <ClassificationAction.hpp>
+#include <ClassificationParameters.hpp>
 class MainWindow;
-class SliderWidget;
+class DoubleSliderWidget;
 class InfoDialog;
 
 // Include Qt.
@@ -52,11 +53,12 @@ private:
     MainWindow *mainWindow_;
     InfoDialog *infoDialog_;
 
+    ClassificationParameters parameters_;
     ClassificationAction classification_;
 
-    SliderWidget *voxelSlider_;
-    SliderWidget *radiusSlider_;
-    SliderWidget *angleSlider_;
+    DoubleSliderWidget *voxelSlider_;
+    DoubleSliderWidget *radiusSlider_;
+    DoubleSliderWidget *angleSlider_;
     QCheckBox *cleanGroundCheckBox_;
     QCheckBox *cleanAllCheckBox_;
 

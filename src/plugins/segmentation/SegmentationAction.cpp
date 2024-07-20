@@ -79,26 +79,18 @@ void SegmentationAction::start(const SegmentationParameters &parameters)
 {
     LOG_DEBUG(<< "Start with parameters <" << toString(parameters) << ">.");
 
-    double pointsPerMeter = editor_->settings().units.pointsPerMeter()[0];
-    LOG_DEBUG(<< "pointsPerMeter <" << pointsPerMeter << ">.");
-
     // Set input parameters.
-    parameters_.voxelRadius = parameters.voxelRadius * pointsPerMeter;
-    parameters_.trunkDescriptorMin = parameters.trunkDescriptorMin;
-    parameters_.searchRadiusForTrunkPoints =
-        parameters.searchRadiusForTrunkPoints * pointsPerMeter;
-    parameters_.searchRadiusForLeafPoints =
-        parameters.searchRadiusForLeafPoints * pointsPerMeter;
-    parameters_.treeBaseElevationMin =
-        parameters.treeBaseElevationMin * pointsPerMeter;
-    parameters_.treeBaseElevationMax =
-        parameters.treeBaseElevationMax * pointsPerMeter;
-    parameters_.treeHeightMin = parameters.treeHeightMin * pointsPerMeter;
-    parameters_.zCoordinatesAsElevation = parameters.zCoordinatesAsElevation;
-    parameters_.segmentOnlyTrunks = parameters.segmentOnlyTrunks;
+    double ppm = editor_->settings().units.pointsPerMeter()[0];
+    LOG_DEBUG(<< "Units pointsPerMeter <" << ppm << ">.");
 
-    LOG_DEBUG(<< "searchRadiusForTrunkPoints <"
-              << parameters_.searchRadiusForTrunkPoints << "> pt.");
+    parameters_ = parameters;
+
+    parameters_.voxelRadius *= ppm;
+    parameters_.searchRadiusForTrunkPoints *= ppm;
+    parameters_.searchRadiusForLeafPoints *= ppm;
+    parameters_.treeBaseElevationMin *= ppm;
+    parameters_.treeBaseElevationMax *= ppm;
+    parameters_.treeHeightMin *= ppm;
 
     // Clear work data.
     nPointsTotal_ = editor_->datasets().nPoints();

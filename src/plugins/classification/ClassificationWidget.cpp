@@ -21,10 +21,10 @@
 
 // Include 3D Forest.
 #include <ClassificationWidget.hpp>
+#include <DoubleSliderWidget.hpp>
 #include <InfoDialog.hpp>
 #include <MainWindow.hpp>
 #include <ProgressDialog.hpp>
-#include <SliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
@@ -49,49 +49,49 @@ ClassificationWidget::ClassificationWidget(MainWindow *mainWindow)
     LOG_DEBUG(<< "Create.");
 
     // Widgets.
-    SliderWidget::create(voxelSlider_,
-                         this,
-                         nullptr,
-                         nullptr,
-                         tr("Voxel radius"),
-                         tr("Voxel radius."),
-                         tr("pt"),
-                         1,
-                         1,
-                         1000,
-                         100);
+    DoubleSliderWidget::create(voxelSlider_,
+                               this,
+                               nullptr,
+                               nullptr,
+                               tr("Voxel radius"),
+                               tr("Voxel radius."),
+                               tr("m"),
+                               0.01,
+                               0.01,
+                               1.0,
+                               parameters_.voxelRadius);
 
-    SliderWidget::create(radiusSlider_,
-                         this,
-                         nullptr,
-                         nullptr,
-                         tr("Neighborhood search radius"),
-                         tr("Neighborhood search radius."),
-                         tr("pt"),
-                         1,
-                         1,
-                         1000,
-                         400);
+    DoubleSliderWidget::create(radiusSlider_,
+                               this,
+                               nullptr,
+                               nullptr,
+                               tr("Neighborhood search radius"),
+                               tr("Neighborhood search radius."),
+                               tr("m"),
+                               0.01,
+                               0.01,
+                               1.0,
+                               parameters_.searchRadius);
 
-    SliderWidget::create(angleSlider_,
-                         this,
-                         nullptr,
-                         nullptr,
-                         tr("Maximum ground angle"),
-                         tr("Maximum ground angle."),
-                         tr("deg"),
-                         1,
-                         1,
-                         89,
-                         60);
+    DoubleSliderWidget::create(angleSlider_,
+                               this,
+                               nullptr,
+                               nullptr,
+                               tr("Maximum ground angle"),
+                               tr("Maximum ground angle."),
+                               tr("deg"),
+                               1.0,
+                               1.0,
+                               89.0,
+                               parameters_.angle);
 
     cleanGroundCheckBox_ = new QCheckBox;
     cleanGroundCheckBox_->setText(tr("Clean ground classifications at start"));
-    cleanGroundCheckBox_->setChecked(true);
+    cleanGroundCheckBox_->setChecked(parameters_.cleanGroundClassifications);
 
     cleanAllCheckBox_ = new QCheckBox;
     cleanAllCheckBox_->setText(tr("Clean all classifications at start"));
-    cleanAllCheckBox_->setChecked(false);
+    cleanAllCheckBox_->setChecked(parameters_.cleanAllClassifications);
 
     // Settings layout.
     QVBoxLayout *settingsLayout = new QVBoxLayout;
@@ -142,15 +142,15 @@ void ClassificationWidget::slotApply()
 
     mainWindow_->suspendThreads();
 
-    double voxel = static_cast<double>(voxelSlider_->value());
-    double radius = static_cast<double>(radiusSlider_->value());
-    double angle = static_cast<double>(angleSlider_->value());
-    bool cleanGround = cleanGroundCheckBox_->isChecked();
-    bool cleanAll = cleanAllCheckBox_->isChecked();
+    parameters_.voxelRadius = voxelSlider_->value();
+    parameters_.searchRadius = static_cast<double>(radiusSlider_->value());
+    parameters_.angle = static_cast<double>(angleSlider_->value());
+    parameters_.cleanGroundClassifications = cleanGroundCheckBox_->isChecked();
+    parameters_.cleanAllClassifications = cleanAllCheckBox_->isChecked();
 
     try
     {
-        classification_.start(voxel, radius, angle, cleanGround, cleanAll);
+        classification_.start(parameters_);
         ProgressDialog::run(mainWindow_,
                             "Computing Classification",
                             &classification_);

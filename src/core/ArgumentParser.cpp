@@ -207,6 +207,11 @@ void ArgumentParser::help() const
             std::cout << ", default " << option.text;
         }
 
+        if (option.required)
+        {
+            std::cout << ", required " << option.text;
+        }
+
         std::cout << std::endl;
     }
 }

@@ -15,9 +15,26 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-add_subdirectory(classification)
-add_subdirectory(descriptor)
-add_subdirectory(elevation)
-add_subdirectory(icon)
-add_subdirectory(sandbox)
-add_subdirectory(segmentation)
+set(SUB_PROJECT_NAME "3DForestDescriptor")
+
+add_executable(
+    ${SUB_PROJECT_NAME}
+    descriptor.cpp
+    ../../../plugins/descriptor/DescriptorAction.cpp
+    ../../../plugins/descriptor/DescriptorPca.cpp
+)
+
+target_include_directories(
+    ${SUB_PROJECT_NAME}
+    PUBLIC
+    ../../../plugins/descriptor
+    ../../../../3rdparty/eigen
+)
+
+target_link_libraries(
+    ${SUB_PROJECT_NAME}
+    PUBLIC
+    3DForestEditor
+)
+
+install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

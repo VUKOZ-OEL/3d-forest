@@ -23,6 +23,7 @@
 #define DESCRIPTOR_ACTION_HPP
 
 // Include 3D Forest.
+#include <DescriptorParameters.hpp>
 #include <DescriptorPca.hpp>
 #include <ProgressActionInterface.hpp>
 #include <Query.hpp>
@@ -32,19 +33,10 @@ class Editor;
 class DescriptorAction : public ProgressActionInterface
 {
 public:
-    enum Method
-    {
-        METHOD_DENSITY = 0,
-        METHOD_PCA_INTENSITY
-    };
-
     DescriptorAction(Editor *editor);
     virtual ~DescriptorAction();
 
-    void start(double radius,
-               double voxelSize,
-               Method method,
-               bool includeGround);
+    void start(const DescriptorParameters &parameters);
     virtual void next();
     void clear();
 
@@ -56,12 +48,8 @@ protected:
     Query query_;
     Query queryPoint_;
 
+    DescriptorParameters parameters_;
     DescriptorPca pca_;
-
-    double radius_;
-    double voxelSize_;
-    Method method_;
-    bool includeGround_;
 
     uint64_t numberOfPoints_;
     uint64_t numberOfPointsInFilter_;

@@ -39,9 +39,7 @@ public:
     virtual ~SegmentationAction();
 
     void start(const SegmentationParameters &parameters);
-
     virtual void next();
-
     void clear();
 
 private:

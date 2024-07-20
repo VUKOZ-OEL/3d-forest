@@ -24,8 +24,9 @@
 
 // Include 3D Forest.
 #include <DescriptorAction.hpp>
+#include <DescriptorParameters.hpp>
 class MainWindow;
-class SliderWidget;
+class DoubleSliderWidget;
 class InfoDialog;
 
 // Include Qt.
@@ -53,12 +54,13 @@ private:
     MainWindow *mainWindow_;
     InfoDialog *infoDialog_;
 
+    DescriptorParameters parameters_;
     DescriptorAction descriptor_;
 
-    SliderWidget *radiusSlider_;
-    SliderWidget *voxelSizeSlider_;
-    QCheckBox *groundCheckBox_;
     std::vector<QRadioButton *> methodRadioButton_;
+    DoubleSliderWidget *voxelRadiusSlider_;
+    DoubleSliderWidget *searchRadiusSlider_;
+    QCheckBox *includeGroundPointsCheckBox_;
 
     QPushButton *helpButton_;
     QPushButton *applyButton_;

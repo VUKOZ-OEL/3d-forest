@@ -17,34 +17,34 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file classification.cpp
-    @brief Ground classification command line tool.
+/** @file descriptor.cpp
+    @brief Descriptor calculation command line tool.
 */
 
 // Include 3D Forest.
 #include <ArgumentParser.hpp>
-#include <ClassificationAction.hpp>
-#include <ClassificationParameters.hpp>
+#include <DescriptorAction.hpp>
+#include <DescriptorParameters.hpp>
 #include <Editor.hpp>
 #include <Error.hpp>
 
 // Include local.
-#define LOG_MODULE_NAME "classification"
+#define LOG_MODULE_NAME "descriptor"
 #include <Log.hpp>
 
-static void classificationCompute(const std::string &inputPath,
-                                  const ClassificationParameters &parameters)
+static void descriptorCompute(const std::string &inputPath,
+                              const DescriptorParameters &parameters)
 {
     // Open input file in editor.
     Editor editor;
     editor.open(inputPath);
 
-    // Classify ground by steps.
-    ClassificationAction classification(&editor);
-    classification.start(parameters);
-    while (!classification.end())
+    // Calculate descriptors by steps.
+    DescriptorAction descriptor(&editor);
+    descriptor.start(parameters);
+    while (!descriptor.end())
     {
-        classification.next();
+        descriptor.next();
     }
 
     editor.saveProject(editor.projectPath());
@@ -54,46 +54,51 @@ int main(int argc, char *argv[])
 {
     int rc = 1;
 
-    LOGGER_START_FILE("log_classification.txt");
+    LOGGER_START_FILE("log_descriptor.txt");
 
     try
     {
-        ClassificationParameters p;
+        DescriptorParameters p;
 
-        ArgumentParser arg("classifies ground points");
+        ArgumentParser arg("calculates descriptor values for points");
         arg.add("-i",
                 "--input",
                 "",
                 "Path to the input file to be processed. Accepted formats "
                 "include .las, and .json project file.",
                 true);
+        arg.add("-m", "--method", "density", "Method {density,pca}");
         arg.add("-v", "--voxel", toString(p.voxelRadius), "Voxel radius [m]");
         arg.add("-r",
                 "--search-radius",
                 toString(p.searchRadius),
                 "Neighborhood search radius [m]");
-        arg.add("-a",
-                "--angle",
-                toString(p.angle),
-                "Maximum ground angle [deg]");
-        arg.add("-c",
-                "--clean",
-                toString(p.cleanGroundClassifications),
-                "Clean ground classifications at start {true, false}");
-        arg.add("-ca",
-                "--clean-all",
-                toString(p.cleanAllClassifications),
-                "Clean all classifications at start {true, false}");
+        arg.add("-g",
+                "--include-ground",
+                toString(p.includeGroundPoints),
+                "Include ground points {true, false}");
 
         if (arg.parse(argc, argv))
         {
+            if (arg.toString("--method") == "density")
+            {
+                p.method = DescriptorParameters::METHOD_DENSITY;
+            }
+            else if (arg.toString("--method") == "pca")
+            {
+                p.method = DescriptorParameters::METHOD_PCA_INTENSITY;
+            }
+            else
+            {
+                THROW("Invalid method option. Try '--help' for more "
+                      "information.");
+            }
+
             p.voxelRadius = arg.toDouble("--voxel");
             p.searchRadius = arg.toDouble("--search-radius");
-            p.angle = arg.toDouble("--angle");
-            p.cleanGroundClassifications = arg.toBool("--clean");
-            p.cleanAllClassifications = arg.toBool("--clean-all");
+            p.includeGroundPoints = arg.toBool("--include-ground");
 
-            classificationCompute(arg.toString("--input"), p);
+            descriptorCompute(arg.toString("--input"), p);
         }
 
         rc = 0;

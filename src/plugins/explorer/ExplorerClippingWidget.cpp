@@ -95,11 +95,6 @@ void ExplorerClippingWidget::slotUpdate(void *sender,
         return;
     }
 
-    if (target.contains(Editor::TYPE_SETTINGS))
-    {
-        LOG_DEBUG(<< "Update target <TYPE_SETTINGS>.");
-    }
-
     if (target.empty() || target.contains(Editor::TYPE_CLIP_FILTER) ||
         target.contains(Editor::TYPE_SETTINGS))
     {

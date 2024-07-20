@@ -54,9 +54,7 @@ private:
     MainWindow *mainWindow_;
     InfoDialog *infoDialog_;
 
-    SegmentationParameters defaultParameters_;
     SegmentationParameters parameters_;
-
     SegmentationAction segmentation_;
 
     DoubleSliderWidget *voxelRadiusSlider_;

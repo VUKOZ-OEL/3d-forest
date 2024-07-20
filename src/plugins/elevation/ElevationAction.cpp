@@ -54,7 +54,7 @@ void ElevationAction::clear()
     query_.clear();
     queryPoint_.clear();
 
-    voxelSize_ = 0;
+    voxelRadius_ = 0;
 
     numberOfPoints_ = 0;
     numberOfGroundPoints_ = 0;
@@ -67,12 +67,16 @@ void ElevationAction::clear()
     points_.clear();
 }
 
-void ElevationAction::start(double voxelSize)
+void ElevationAction::start(double voxelRadius)
 {
-    LOG_DEBUG(<< "Start voxelSize <" << voxelSize << ">.");
+    LOG_DEBUG(<< "Start with voxelRadius <" << voxelRadius << ">.");
 
-    voxelSize_ = voxelSize;
+    // Set input parameters.
+    double ppm = editor_->settings().units.pointsPerMeter()[0];
 
+    voxelRadius_ = voxelRadius * ppm;
+
+    // Clear work data.
     numberOfPoints_ = editor_->datasets().nPoints();
     numberOfGroundPoints_ = 0;
     numberOfNonGroundPoints_ = 0;
@@ -84,6 +88,7 @@ void ElevationAction::start(double voxelSize)
 
     points_.clear();
 
+    // Plan the steps.
     progress_.setMaximumStep(numberOfPoints_, 1000);
     progress_.setMaximumSteps({5.0, 5.0, 25.0, 5.0, 60.0});
     progress_.setValueSteps(ELEVATION_STEP_RESET_POINTS);
@@ -312,7 +317,7 @@ void ElevationAction::createGroundPoint()
     queryPoint_.where().setSphere(query_.x(),
                                   query_.y(),
                                   query_.z(),
-                                  voxelSize_);
+                                  voxelRadius_);
     queryPoint_.exec();
 
     while (queryPoint_.next())

@@ -21,10 +21,10 @@
 
 // Include 3D Forest.
 #include <DescriptorWidget.hpp>
+#include <DoubleSliderWidget.hpp>
 #include <InfoDialog.hpp>
 #include <MainWindow.hpp>
 #include <ProgressDialog.hpp>
-#include <SliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
@@ -37,6 +37,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "DescriptorWidget"
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define ICON(name) (ThemeIcon(":/descriptor/", name))
@@ -49,36 +50,22 @@ DescriptorWidget::DescriptorWidget(MainWindow *mainWindow)
 {
     LOG_DEBUG(<< "Create.");
 
-    // Widgets.
-    SliderWidget::create(radiusSlider_,
-                         this,
-                         nullptr,
-                         nullptr,
-                         tr("Neighborhood Radius"),
-                         tr("Neighborhood Radius"),
-                         tr("pt"),
-                         1,
-                         1,
-                         1000,
-                         100);
-
-    SliderWidget::create(voxelSizeSlider_,
-                         this,
-                         nullptr,
-                         nullptr,
-                         tr("Voxel radius"),
-                         tr("Voxel radius"),
-                         tr("pt"),
-                         1,
-                         1,
-                         1000,
-                         100);
-
     // Method.
     methodRadioButton_.push_back(new QRadioButton(tr("Density")));
     methodRadioButton_.push_back(new QRadioButton(tr("PCA intensity")));
 
-    methodRadioButton_[0]->setChecked(true);
+    if (parameters_.method == DescriptorParameters::METHOD_DENSITY)
+    {
+        methodRadioButton_[0]->setChecked(true);
+    }
+    else if (parameters_.method == DescriptorParameters::METHOD_PCA_INTENSITY)
+    {
+        methodRadioButton_[1]->setChecked(true);
+    }
+    else
+    {
+        THROW("DescriptorParameters method not implemented.");
+    }
 
     QVBoxLayout *methodVBoxLayout = new QVBoxLayout;
     for (size_t i = 0; i < methodRadioButton_.size(); i++)
@@ -89,17 +76,42 @@ DescriptorWidget::DescriptorWidget(MainWindow *mainWindow)
     QGroupBox *methodGroupBox = new QGroupBox(tr("Method"));
     methodGroupBox->setLayout(methodVBoxLayout);
 
+    // Widgets.
+    DoubleSliderWidget::create(voxelRadiusSlider_,
+                               this,
+                               nullptr,
+                               nullptr,
+                               tr("Voxel radius"),
+                               tr("Voxel radius"),
+                               tr("m"),
+                               0.01,
+                               0.01,
+                               1.0,
+                               parameters_.voxelRadius);
+
+    DoubleSliderWidget::create(searchRadiusSlider_,
+                               this,
+                               nullptr,
+                               nullptr,
+                               tr("Neighborhood search radius"),
+                               tr("Neighborhood search radius"),
+                               tr("m"),
+                               0.01,
+                               0.01,
+                               2.0,
+                               parameters_.searchRadius);
+
     // Options.
-    groundCheckBox_ = new QCheckBox;
-    groundCheckBox_->setText(tr("Include ground points"));
-    groundCheckBox_->setChecked(false);
+    includeGroundPointsCheckBox_ = new QCheckBox;
+    includeGroundPointsCheckBox_->setText(tr("Include ground points"));
+    includeGroundPointsCheckBox_->setChecked(parameters_.includeGroundPoints);
 
     // Settings layout.
     QVBoxLayout *settingsLayout = new QVBoxLayout;
-    settingsLayout->addWidget(radiusSlider_);
-    settingsLayout->addWidget(voxelSizeSlider_);
     settingsLayout->addWidget(methodGroupBox);
-    settingsLayout->addWidget(groundCheckBox_);
+    settingsLayout->addWidget(voxelRadiusSlider_);
+    settingsLayout->addWidget(searchRadiusSlider_);
+    settingsLayout->addWidget(includeGroundPointsCheckBox_);
     settingsLayout->addStretch();
 
     // Buttons.
@@ -142,20 +154,21 @@ void DescriptorWidget::slotApply()
 
     mainWindow_->suspendThreads();
 
-    double radius = static_cast<double>(radiusSlider_->value());
-    double voxelSize = static_cast<double>(voxelSizeSlider_->value());
-
-    DescriptorAction::Method method = DescriptorAction::METHOD_DENSITY;
-    if (methodRadioButton_[DescriptorAction::METHOD_PCA_INTENSITY]->isChecked())
+    parameters_.method = DescriptorParameters::METHOD_DENSITY;
+    if (methodRadioButton_[DescriptorParameters::METHOD_PCA_INTENSITY]
+            ->isChecked())
     {
-        method = DescriptorAction::METHOD_PCA_INTENSITY;
+        parameters_.method = DescriptorParameters::METHOD_PCA_INTENSITY;
     }
 
-    bool includeGround = groundCheckBox_->isChecked();
+    parameters_.voxelRadius = voxelRadiusSlider_->value();
+    parameters_.searchRadius = searchRadiusSlider_->value();
+
+    parameters_.includeGroundPoints = includeGroundPointsCheckBox_->isChecked();
 
     try
     {
-        descriptor_.start(radius, voxelSize, method, includeGround);
+        descriptor_.start(parameters_);
         ProgressDialog::run(mainWindow_, "Computing Descriptors", &descriptor_);
     }
     catch (std::exception &e)
