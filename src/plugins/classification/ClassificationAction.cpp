@@ -26,7 +26,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "ClassificationAction"
-#define LOG_MODULE_DEBUG_ENABLED 1
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define CLASSIFICATION_STEP_RESET_POINTS 0
