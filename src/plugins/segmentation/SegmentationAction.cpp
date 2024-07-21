@@ -100,6 +100,7 @@ void SegmentationAction::start(const SegmentationParameters &parameters)
     groups_.clear();
     path_.clear();
 
+    // Plan the steps.
     progress_.setMaximumStep(nPointsTotal_, 1000);
     progress_.setMaximumSteps({4.0, 1.0, 24.0, 1.0, 25.0, 35.0, 1.0, 9.0});
     progress_.setValueSteps(SEGMENTATION_STEP_RESET_POINTS);

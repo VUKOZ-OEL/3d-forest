@@ -393,7 +393,7 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
     - Click "Environment Variables"
     - In "System variables" select Variable "Path" and click "Edit..."
     - Click "New" and add
-      "C:\Qt\5.15.0\mingw81_64\bin" or 
+      "C:\Qt\5.15.0\mingw81_64\bin" or
       "C:\Qt\6.3.0\mingw_64\bin" depending on your installed qt version
 
 @subsection build-windows-make-3dforest Build 3D Forest
@@ -401,7 +401,7 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
     - Use "cd" command to navigate to local git repository folder
       @verbatim
         cd Documents\3d-forest
-      @endverbatim    
+      @endverbatim
       or first clone the repository to "Documents" as follows:
       @verbatim
         cd Documents
@@ -480,9 +480,9 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
                 name = Vaclav Bubnik
           @endverbatim
 
-@subsection build-windows-visual-studio-ide Install Visual Studio 
+@subsection build-windows-visual-studio-ide Install Visual Studio
     - Open https://visualstudio.microsoft.com/downloads/
-    - Click "Free download" in Visual Studio 2022 Community 
+    - Click "Free download" in Visual Studio 2022 Community
     - Run VisualStudioSetup.exe
     - Select "Desktop development with C++", Total size is 8 GB or 10 GB
       depending on installer version.
@@ -518,7 +518,7 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
     - Click "New" and add "C:\Qt\6.3.0\msvc2019_64\bin"
 
 @subsection build-windows-visual-studio-3dforest Build 3D Forest
-    - Open directory "3d-forest" in Visual Studio. This will automatically 
+    - Open directory "3d-forest" in Visual Studio. This will automatically
       create Visual Studio solution from CMake files.
     - Change "Select Startup Item" to "3dforest.exe (install) (bin\3dforest.exe)" from the tool bar.
     - Click on "3dforest.exe (install) (bin\3dforest.exe)" to build and start 3d Forest.
@@ -856,6 +856,7 @@ powershell -C "gci | % {rni $_.Name ($_.Name -replace '24px', '24')}"
             "${workspaceRoot}/src/editor",
             "${workspaceRoot}/src/gui",
             "${workspaceRoot}/src/plugins/classification",
+            "${workspaceRoot}/src/plugins/dbh",
             "${workspaceRoot}/src/plugins/descriptor",
             "${workspaceRoot}/src/plugins/elevation",
             "${workspaceRoot}/src/plugins/explorer",
