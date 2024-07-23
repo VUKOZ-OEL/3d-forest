@@ -70,7 +70,7 @@ ClassificationWidget::ClassificationWidget(MainWindow *mainWindow)
                                tr("m"),
                                0.01,
                                0.01,
-                               1.0,
+                               2.0,
                                parameters_.searchRadius);
 
     DoubleSliderWidget::create(angleSlider_,

@@ -30,7 +30,7 @@ class ClassificationParameters
 {
 public:
     double voxelRadius{0.1};
-    double searchRadius{0.4};
+    double searchRadius{1.0};
     double angle{60.0};
 
     bool cleanGroundClassifications{true};
