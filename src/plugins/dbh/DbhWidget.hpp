@@ -26,7 +26,7 @@
 #include <DbhAction.hpp>
 #include <DbhParameters.hpp>
 class MainWindow;
-class DoubleRangeSliderWidget;
+class DoubleSliderWidget;
 
 // Include Qt.
 #include <QWidget>
@@ -52,7 +52,8 @@ private:
     DbhParameters parameters_;
     DbhAction dbh_;
 
-    DoubleRangeSliderWidget *elevationSlider_;
+    DoubleSliderWidget *elevationSlider_;
+    DoubleSliderWidget *elevationToleranceSlider_;
 
     QPushButton *applyButton_;
 };

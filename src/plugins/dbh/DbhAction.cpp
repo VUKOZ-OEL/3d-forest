@@ -60,8 +60,8 @@ void DbhAction::start(const DbhParameters &parameters)
 
     parameters_ = parameters;
 
-    parameters_.elevationMin *= ppm;
-    parameters_.elevationMax *= ppm;
+    parameters_.elevation *= ppm;
+    parameters_.elevationTolerance *= ppm;
 
     // Clear work data.
     groups_.clear();
@@ -100,8 +100,9 @@ void DbhAction::stepPointsToGroups()
     // For each point in all datasets:
     while (query_.next())
     {
-        if (query_.z() > parameters_.elevationMin &&
-            query_.z() < parameters_.elevationMax)
+        if (query_.z() >
+                parameters_.elevation - parameters_.elevationTolerance &&
+            query_.z() < parameters_.elevation + parameters_.elevationTolerance)
         {
             size_t segmentId = query_.segment();
 

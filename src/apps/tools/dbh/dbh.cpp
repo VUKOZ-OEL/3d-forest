@@ -68,19 +68,19 @@ int main(int argc, char *argv[])
                 "Path to the input file to be processed. Accepted formats "
                 "include .las, and .json project file.",
                 true);
-        arg.add("-e1",
-                "--elevation-min",
-                toString(p.elevationMin),
-                "Calculate DBH from elevation minimum range [m]");
-        arg.add("-e2",
-                "--elevation-max",
-                toString(p.elevationMax),
-                "Calculate DBH from elevation maximum range [m]");
+        arg.add("-e",
+                "--elevation",
+                toString(p.elevation),
+                "Calculate DBH at given elevation [m]");
+        arg.add("-t",
+                "--tolerance",
+                toString(p.elevationTolerance),
+                "DBH elevation elevationTolerance +- [m]");
 
         if (arg.parse(argc, argv))
         {
-            p.elevationMin = arg.toDouble("--elevation-min");
-            p.elevationMax = arg.toDouble("--elevation-max");
+            p.elevation = arg.toDouble("--elevation");
+            p.elevationTolerance = arg.toDouble("--tolerance");
 
             dbhCompute(arg.toString("--input"), p);
         }

@@ -29,16 +29,16 @@
 class DbhParameters
 {
 public:
-    double elevationMin{1.25};
-    double elevationMax{1.35};
+    double elevation{1.3};
+    double elevationTolerance{0.05};
     size_t taubinFitIterationsMax{20};
     size_t geometricCircleIterationsMax{500};
 };
 
 inline void toJson(Json &out, const DbhParameters &in)
 {
-    toJson(out["elevationMin"], in.elevationMin);
-    toJson(out["elevationMax"], in.elevationMax);
+    toJson(out["elevation"], in.elevation);
+    toJson(out["elevationTolerance"], in.elevationTolerance);
     toJson(out["taubinFitIterationsMax"], in.taubinFitIterationsMax);
     toJson(out["geometricCircleIterationsMax"],
            in.geometricCircleIterationsMax);

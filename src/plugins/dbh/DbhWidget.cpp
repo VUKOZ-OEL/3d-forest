@@ -21,7 +21,6 @@
 
 // Include 3D Forest.
 #include <DbhWidget.hpp>
-#include <DoubleRangeSliderWidget.hpp>
 #include <DoubleSliderWidget.hpp>
 #include <InfoDialog.hpp>
 #include <MainWindow.hpp>
@@ -49,22 +48,34 @@ DbhWidget::DbhWidget(MainWindow *mainWindow)
     LOG_DEBUG(<< "Create.");
 
     // Widgets.
-    DoubleRangeSliderWidget::create(elevationSlider_,
-                                    this,
-                                    nullptr,
-                                    nullptr,
-                                    tr("Look for DBH in elevation range"),
-                                    tr("Look for DBH in elevation range"),
-                                    tr("m"),
-                                    0.01,
-                                    0,
-                                    5.0,
-                                    parameters_.elevationMin,
-                                    parameters_.elevationMax);
+    DoubleSliderWidget::create(elevationSlider_,
+                               this,
+                               nullptr,
+                               nullptr,
+                               tr("Look for DBH in elevation"),
+                               tr("Look for DBH in elevation"),
+                               tr("m"),
+                               0.01,
+                               0.5,
+                               1.5,
+                               parameters_.elevation);
+
+    DoubleSliderWidget::create(elevationToleranceSlider_,
+                               this,
+                               nullptr,
+                               nullptr,
+                               tr("DBH elevation tolerance"),
+                               tr("DBH elevation tolerance"),
+                               tr("m"),
+                               0.01,
+                               0.01,
+                               0.5,
+                               parameters_.elevationTolerance);
 
     // Settings layout.
     QVBoxLayout *settingsLayout = new QVBoxLayout;
     settingsLayout->addWidget(elevationSlider_);
+    settingsLayout->addWidget(elevationToleranceSlider_);
     settingsLayout->addStretch();
 
     // Buttons.
@@ -102,8 +113,8 @@ void DbhWidget::slotApply()
 
     mainWindow_->suspendThreads();
 
-    parameters_.elevationMin = elevationSlider_->minimumValue();
-    parameters_.elevationMax = elevationSlider_->maximumValue();
+    parameters_.elevation = elevationSlider_->value();
+    parameters_.elevationTolerance = elevationToleranceSlider_->value();
 
     try
     {

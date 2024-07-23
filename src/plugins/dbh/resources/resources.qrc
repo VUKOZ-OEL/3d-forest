@@ -21,6 +21,7 @@
 <qresource prefix="/dbh">
 
 <!-- Tool bar -->
+<file>dbh_20px.png</file>
 <file>dbh_24px.png</file>
 
 <!-- Images -->
