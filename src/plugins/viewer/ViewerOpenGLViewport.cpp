@@ -402,7 +402,7 @@ void ViewerOpenGLViewport::renderSegments()
 void ViewerOpenGLViewport::renderSceneSettingsEnable()
 {
     const Settings &settings = editor_->settings();
-    const SettingsView &opt = settings.view();
+    const SettingsView &opt = settings.view;
 
     // Background.
     const Vector3<double> &rgb = opt.backgroundColor();
@@ -441,7 +441,7 @@ void ViewerOpenGLViewport::renderSceneSettingsDisable()
     const Settings &settings = editor_->settings();
     glPointSize(1.0F);
 
-    if (settings.view().isFogEnabled())
+    if (settings.view.isFogEnabled())
     {
         glDisable(GL_FOG);
     }

@@ -65,10 +65,18 @@ public:
                     std::vector<size_t> &resultIndices);
     size_t findNN(double x, double y, double z);
 
+    // I/O
+    void exportToFile(const std::string &path) const;
+
 private:
     VectorFile<Point, Point::IO> points_;
     unibn::Octree<Point, VectorFile<Point, Point::IO>> octree_;
+
+    // I/O
+    friend void toJson(Json &out, const Points &in);
 };
+
+void toJson(Json &out, const Points &in);
 
 #include <WarningsEnable.hpp>
 

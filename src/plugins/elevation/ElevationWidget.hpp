@@ -25,7 +25,7 @@
 // Include 3D Forest.
 #include <ElevationAction.hpp>
 class MainWindow;
-class SliderWidget;
+class DoubleSliderWidget;
 class InfoDialog;
 
 // Include Qt.
@@ -53,7 +53,7 @@ private:
 
     ElevationAction elevation_;
 
-    SliderWidget *voxelSizeSlider_;
+    DoubleSliderWidget *voxelRadiusSlider_;
 
     QPushButton *helpButton_;
     QPushButton *applyButton_;

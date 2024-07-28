@@ -26,9 +26,9 @@
 #include <Endian.hpp>
 #include <File.hpp>
 #include <LasFile.hpp>
-#include <Math.hpp>
 #include <Page.hpp>
 #include <Query.hpp>
+#include <Util.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "Page"
@@ -807,7 +807,7 @@ void Page::runModifiers()
 
 void Page::runColorModifier()
 {
-    const SettingsView &opt = editor_->settings().view();
+    const SettingsView &opt = editor_->settings().view;
     double r = opt.pointColor()[0];
     double g = opt.pointColor()[1];
     double b = opt.pointColor()[2];

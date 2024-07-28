@@ -20,7 +20,7 @@
 /** @file ViewerOpenGL.cpp */
 
 // Include 3D Forest.
-#include <Math.hpp>
+#include <Util.hpp>
 #include <ViewerOpenGL.hpp>
 
 // Include Qt.

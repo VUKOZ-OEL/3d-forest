@@ -52,7 +52,7 @@ void Editor::close()
 {
     LOG_DEBUG(<< "Close.");
 
-    path_ = File::join(File::currentPath(), "untitled.json");
+    setProjectPath(File::join(File::currentPath(), "untitled.json"));
     projectName_ = "Untitled";
 
     datasets_.clear();
@@ -116,7 +116,7 @@ void Editor::openProject(const std::string &path)
 
     try
     {
-        path_ = path;
+        setProjectPath(path);
 
         // Project name.
         if (in.contains(EDITOR_KEY_PROJECT_NAME))
@@ -129,7 +129,7 @@ void Editor::openProject(const std::string &path)
         {
             fromJson(datasets_,
                      in[EDITOR_KEY_DATA_SET],
-                     path_,
+                     projectPath_,
                      datasetsFilter_);
         }
 
@@ -202,11 +202,20 @@ void Editor::openDataset(const std::string &path,
 
     try
     {
+        std::string projectPath = projectPath_;
+        if (File::fileName(projectPath) == "untitled.json")
+        {
+            projectPath = File::resolvePath(path, File::currentPath());
+            projectPath = File::replaceExtension(projectPath, ".json");
+        }
+
         datasets_.read(path,
-                       path_,
+                       projectPath,
                        settings,
                        datasets_.boundary(),
                        datasetsFilter_);
+
+        setProjectPath(projectPath);
     }
     catch (...)
     {
@@ -216,6 +225,12 @@ void Editor::openDataset(const std::string &path,
     updateAfterRead();
 
     unsavedChanges_ = true;
+}
+
+void Editor::setProjectPath(const std::string &projectPath)
+{
+    LOG_DEBUG(<< "Set project path to <" << projectPath << ">.");
+    projectPath_ = projectPath;
 }
 
 void Editor::setClassifications(const Classifications &classifications)
@@ -343,6 +358,14 @@ void Editor::updateAfterRead()
     clipFilter_.box = clipFilter_.boundary;
     // clipFilter_.enabled = Region::SHAPE_BOX;
 
+    if (datasets_.size() > 0)
+    {
+        SettingsUnits settingsUnits = settings_.units;
+        settingsUnits.setLasFileScaling(datasets_.at(0).scalingFile());
+
+        setSettingsUnits(settingsUnits);
+    }
+
     if (viewports_.size() > 0)
     {
         viewports_.where().setDataset(datasetsFilter_);
@@ -356,10 +379,15 @@ void Editor::updateAfterRead()
     }
 }
 
-void Editor::setSettingsView(const SettingsView &settings)
+void Editor::setSettingsView(const SettingsView &settingsView)
 {
-    settings_.setView(settings);
+    settings_.view = settingsView;
     unsavedChanges_ = true;
+}
+
+void Editor::setSettingsUnits(const SettingsUnits &settingsUnits)
+{
+    unsavedChanges_ = settings_.units.apply(settingsUnits);
 }
 
 void Editor::addModifier(ModifierInterface *modifier)

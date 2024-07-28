@@ -35,7 +35,7 @@ public:
     ElevationAction(Editor *editor);
     virtual ~ElevationAction();
 
-    void start(double voxelSize);
+    void start(double voxelRadius);
     virtual void next();
     void clear();
 
@@ -47,7 +47,7 @@ protected:
     Query query_;
     Query queryPoint_;
 
-    double voxelSize_;
+    double voxelRadius_;
 
     uint64_t numberOfPoints_;
     uint64_t numberOfGroundPoints_;

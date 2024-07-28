@@ -31,11 +31,13 @@
 
 // Include local.
 #define LOG_MODULE_NAME "ExplorerClippingCylinderWidget"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 ExplorerClippingCylinderWidget::ExplorerClippingCylinderWidget(
     MainWindow *mainWindow)
-    : QWidget(mainWindow)
+    : QWidget(mainWindow),
+      mainWindow_(mainWindow)
 {
     LOG_DEBUG(<< "Create.");
 
@@ -49,7 +51,7 @@ ExplorerClippingCylinderWidget::ExplorerClippingCylinderWidget(
             SLOT(slotInputChanged()),
             tr("A"),
             tr("A"),
-            tr("pt"),
+            tr("m"),
             1.0,
             1.0,
             100.0,
@@ -63,7 +65,7 @@ ExplorerClippingCylinderWidget::ExplorerClippingCylinderWidget(
             SLOT(slotInputChanged()),
             tr("B"),
             tr("B"),
-            tr("pt"),
+            tr("m"),
             1.0,
             1.0,
             100.0,
@@ -77,7 +79,7 @@ ExplorerClippingCylinderWidget::ExplorerClippingCylinderWidget(
                                SLOT(slotInputChanged()),
                                tr("Radius"),
                                tr("Radius"),
-                               tr("pt"),
+                               tr("m"),
                                1.0,
                                1.0,
                                100.0,
@@ -105,11 +107,13 @@ void ExplorerClippingCylinderWidget::setRegion(const Region &region)
 {
     LOG_DEBUG(<< "Set region <" << region << ">.");
 
+    double ppm = mainWindow_->editor().settings().units.pointsPerMeter()[0];
+
     for (size_t i = 0; i < 3; i++)
     {
-        double min = region.boundary.min(i);
-        double max = region.boundary.max(i);
-        double value = min + (0.5 * (max - min));
+        double min = region.boundary.min(i) / ppm;
+        double max = region.boundary.max(i) / ppm;
+        double value = (min + (0.5 * (max - min))) / ppm;
 
         pointAInput_[i]->blockSignals(true);
         pointAInput_[i]->setMinimum(min);
@@ -128,8 +132,8 @@ void ExplorerClippingCylinderWidget::setRegion(const Region &region)
     pointBInput_[2]->setValue(pointBInput_[2]->maximum());
 
     radiusInput_->blockSignals(true);
-    radiusInput_->setMinimum(1);
-    radiusInput_->setMaximum(region.boundary.length(0));
+    radiusInput_->setMinimum(0.001);
+    radiusInput_->setMaximum(region.boundary.length(0) / ppm);
     radiusInput_->setValue(radiusInput_->maximum());
     radiusInput_->blockSignals(false);
 }
@@ -138,13 +142,15 @@ void ExplorerClippingCylinderWidget::slotInputChanged()
 {
     LOG_DEBUG(<< "Input changed.");
 
-    double x1 = pointAInput_[0]->value();
-    double y1 = pointAInput_[1]->value();
-    double z1 = pointAInput_[2]->value();
-    double x2 = pointBInput_[0]->value();
-    double y2 = pointBInput_[1]->value();
-    double z2 = pointBInput_[2]->value();
-    double r = radiusInput_->value();
+    double ppm = mainWindow_->editor().settings().units.pointsPerMeter()[0];
+
+    double x1 = pointAInput_[0]->value() * ppm;
+    double y1 = pointAInput_[1]->value() * ppm;
+    double z1 = pointAInput_[2]->value() * ppm;
+    double x2 = pointBInput_[0]->value() * ppm;
+    double y2 = pointBInput_[1]->value() * ppm;
+    double z2 = pointBInput_[2]->value() * ppm;
+    double r = radiusInput_->value() * ppm;
 
     Region region;
     region.cylinder.set(x1, y1, z1, x2, y2, z2, r);

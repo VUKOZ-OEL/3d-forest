@@ -25,6 +25,7 @@
 // Include 3D Forest.
 class MainWindow;
 class SettingsColorWidget;
+class SettingsUnitsWidget;
 class ToolTabWidget;
 
 // Include Qt.
@@ -42,6 +43,7 @@ protected:
     MainWindow *mainWindow_;
     ToolTabWidget *tabWidget_;
     SettingsColorWidget *settingsColorWidget_;
+    SettingsUnitsWidget *settingsUnitsWidget_;
 };
 
 #endif /* SETTINGS_WINDOW_HPP */

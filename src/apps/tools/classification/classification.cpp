@@ -17,11 +17,14 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file classification.cpp */
+/** @file classification.cpp
+    @brief Ground classification command line tool.
+*/
 
 // Include 3D Forest.
 #include <ArgumentParser.hpp>
 #include <ClassificationAction.hpp>
+#include <ClassificationParameters.hpp>
 #include <Editor.hpp>
 #include <Error.hpp>
 
@@ -30,11 +33,7 @@
 #include <Log.hpp>
 
 static void classificationCompute(const std::string &inputPath,
-                                  double voxel,
-                                  double radius,
-                                  double angle,
-                                  bool cleanGround,
-                                  bool cleanAll)
+                                  const ClassificationParameters &parameters)
 {
     // Open input file in editor.
     Editor editor;
@@ -42,11 +41,13 @@ static void classificationCompute(const std::string &inputPath,
 
     // Classify ground by steps.
     ClassificationAction classification(&editor);
-    classification.start(voxel, radius, angle, cleanGround, cleanAll);
+    classification.start(parameters);
     while (!classification.end())
     {
         classification.next();
     }
+
+    editor.saveProject(editor.projectPath());
 }
 
 int main(int argc, char *argv[])
@@ -57,21 +58,43 @@ int main(int argc, char *argv[])
 
     try
     {
-        ArgumentParser arg;
-        arg.add("--input", "");
-        arg.add("--voxel", "100");
-        arg.add("--radius", "200");
-        arg.add("--angle", "60");
-        arg.add("--clean", "true");
-        arg.add("--clean-all", "false");
-        arg.parse(argc, argv);
+        ClassificationParameters p;
 
-        classificationCompute(arg.toString("--input"),
-                              arg.toDouble("--voxel"),
-                              arg.toDouble("--radius"),
-                              arg.toDouble("--angle"),
-                              arg.toBool("--clean"),
-                              arg.toBool("--clean-all"));
+        ArgumentParser arg("classifies ground points");
+        arg.add("-i",
+                "--input",
+                "",
+                "Path to the input file to be processed. Accepted formats "
+                "include .las, and .json project file.",
+                true);
+        arg.add("-v", "--voxel", toString(p.voxelRadius), "Voxel radius [m]");
+        arg.add("-r",
+                "--search-radius",
+                toString(p.searchRadius),
+                "Neighborhood search radius [m]");
+        arg.add("-a",
+                "--angle",
+                toString(p.angle),
+                "Maximum ground angle [deg]");
+        arg.add("-c",
+                "--clean",
+                toString(p.cleanGroundClassifications),
+                "Clean ground classifications at start {true, false}");
+        arg.add("-ca",
+                "--clean-all",
+                toString(p.cleanAllClassifications),
+                "Clean all classifications at start {true, false}");
+
+        if (arg.parse(argc, argv))
+        {
+            p.voxelRadius = arg.toDouble("--voxel");
+            p.searchRadius = arg.toDouble("--search-radius");
+            p.angle = arg.toDouble("--angle");
+            p.cleanGroundClassifications = arg.toBool("--clean");
+            p.cleanAllClassifications = arg.toBool("--clean-all");
+
+            classificationCompute(arg.toString("--input"), p);
+        }
 
         rc = 0;
     }

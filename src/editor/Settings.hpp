@@ -24,6 +24,7 @@
 
 // Include 3D Forest.
 #include <SettingsImport.hpp>
+#include <SettingsUnits.hpp>
 #include <SettingsView.hpp>
 
 // Include local.
@@ -34,18 +35,14 @@
 class EXPORT_EDITOR Settings
 {
 public:
-    const SettingsView &view() const { return view_; }
-    void setView(const SettingsView &view);
-
-protected:
-    SettingsView view_;
-
-    friend void fromJson(Settings &out, const Json &in);
-    friend void toJson(Json &out, const Settings &in);
+    SettingsView view;
+    SettingsUnits units;
 };
 
 void fromJson(Settings &out, const Json &in);
 void toJson(Json &out, const Settings &in);
+
+std::string toString(const Settings &in);
 
 #include <WarningsEnable.hpp>
 

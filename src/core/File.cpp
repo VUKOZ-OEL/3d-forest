@@ -69,6 +69,7 @@ typedef unsigned short mode_t;
 
 // Include local.
 #define LOG_MODULE_NAME "File"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #if !defined(EXPORT_CORE_IMPORT)
@@ -889,6 +890,8 @@ std::string File::resolvePath(const std::string &path,
     {
         // Resolve path.
         rval = File::replaceFileName(basePath, rval);
+        LOG_DEBUG(<< "Resolved path <" << path << "> basePath <" << basePath
+                  << "> to <" << rval << ">.");
     }
 
     if (!File::exists(rval))

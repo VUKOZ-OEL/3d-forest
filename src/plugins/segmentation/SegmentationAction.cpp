@@ -22,8 +22,8 @@
 // Include 3D Forest.
 #include <ColorPalette.hpp>
 #include <Editor.hpp>
-#include <Math.hpp>
 #include <SegmentationAction.hpp>
+#include <Util.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "SegmentationAction"
@@ -59,16 +59,6 @@ void SegmentationAction::clear()
     query_.clear();
     queryPoint_.clear();
 
-    voxelSize_ = 0;
-    descriptor_ = 0;
-    trunkRadius_ = 0;
-    leafRadius_ = 0;
-    elevationMin_ = 0;
-    elevationMax_ = 0;
-    treeHeight_ = 0;
-    useZ_ = false;
-    onlyTrunks_ = false;
-
     nPointsTotal_ = 0;
     nPointsInFilter_ = 0;
 
@@ -85,54 +75,23 @@ void SegmentationAction::Group::clear()
     averagePoint.clear();
 }
 
-void SegmentationAction::start(double voxelSize,
-                               double descriptor,
-                               double trunkRadius,
-                               double leafRadius,
-                               double elevationMin,
-                               double elevationMax,
-                               double treeHeight,
-                               bool useZ,
-                               bool onlyTrunks)
+void SegmentationAction::start(const SegmentationParameters &parameters)
 {
-    LOG_DEBUG(<< "Start.");
+    LOG_DEBUG(<< "Start with parameters <" << toString(parameters) << ">.");
 
     // Set input parameters.
-    voxelSize_ = voxelSize;
-    descriptor_ = descriptor;
-    trunkRadius_ = trunkRadius;
-    leafRadius_ = leafRadius;
-    treeHeight_ = treeHeight;
-    useZ_ = useZ;
-    onlyTrunks_ = onlyTrunks;
+    double ppm = editor_->settings().units.pointsPerMeter()[0];
+    LOG_DEBUG(<< "Units pointsPerMeter <" << ppm << ">.");
 
-    // Elevation parameters.
-    double elevationFilterMin;
-    double elevationFilterMax;
+    parameters_ = parameters;
 
-    if (useZ_)
-    {
-        Box<double> extent = editor_->boundary();
-        LOG_DEBUG(<< "extent <" << extent << ">.");
-        elevationFilterMin = extent.min(2);
-        elevationFilterMax = extent.max(2);
-    }
-    else
-    {
-        Range<double> elevationRange = editor_->elevationFilter();
-        LOG_DEBUG(<< "elevationRange <" << elevationRange << ">.");
-        elevationFilterMin = elevationRange.minimumValue();
-        elevationFilterMax = elevationRange.maximumValue();
-    }
-
-    double elevationDelta = elevationFilterMax - elevationFilterMin;
-
-    elevationMin_ = elevationFilterMin + (elevationMin * elevationDelta);
-    elevationMax_ = elevationFilterMin + (elevationMax * elevationDelta);
-
-    LOG_DEBUG(<< "elevationDelta <" << elevationDelta << ">.");
-    LOG_DEBUG(<< "elevationMin <" << elevationMin_ << ">.");
-    LOG_DEBUG(<< "elevationMax <" << elevationMax_ << ">.");
+    parameters_.voxelRadius *= ppm;
+    parameters_.trunkDescriptorMin *= 0.01; // %
+    parameters_.searchRadiusForTrunkPoints *= ppm;
+    parameters_.searchRadiusForLeafPoints *= ppm;
+    parameters_.treeBaseElevationMin *= ppm;
+    parameters_.treeBaseElevationMax *= ppm;
+    parameters_.treeHeightMin *= ppm;
 
     // Clear work data.
     nPointsTotal_ = editor_->datasets().nPoints();
@@ -142,6 +101,7 @@ void SegmentationAction::start(double voxelSize,
     groups_.clear();
     path_.clear();
 
+    // Plan the steps.
     progress_.setMaximumStep(nPointsTotal_, 1000);
     progress_.setMaximumSteps({4.0, 1.0, 24.0, 1.0, 25.0, 35.0, 1.0, 9.0});
     progress_.setValueSteps(SEGMENTATION_STEP_RESET_POINTS);
@@ -195,6 +155,8 @@ void SegmentationAction::stepResetPoints()
 
     if (progress_.valueStep() == 0)
     {
+        LOG_DEBUG(<< "Reset all <" << nPointsTotal_ << "> points.");
+
         // Initialize. Remove all segments and create default main segment.
         Segments segments;
         segments.setDefault();
@@ -258,7 +220,7 @@ void SegmentationAction::stepCountPoints()
         }
     }
 
-    LOG_DEBUG(<< "Counted <" << nPointsInFilter_ << "> points.");
+    LOG_DEBUG(<< "Counted <" << nPointsInFilter_ << "> points in filter.");
 
     query_.reset();
 
@@ -275,7 +237,8 @@ void SegmentationAction::stepPointsToVoxels()
     {
         // If point index to voxel is none:
         if (query_.voxel() == SIZE_MAX &&
-            (useZ_ || !(query_.elevation() < elevationMin_)))
+            (parameters_.zCoordinatesAsElevation ||
+             !(query_.elevation() < parameters_.treeBaseElevationMin)))
         {
             // Create new voxel.
             createVoxel();
@@ -288,7 +251,8 @@ void SegmentationAction::stepPointsToVoxels()
         }
     }
 
-    LOG_DEBUG(<< "Created <" << voxels_.size() << "> points.");
+    LOG_DEBUG(<< "Created <" << voxels_.size() << "> voxels.");
+    // voxels_.exportToFile("voxels.json");
 
     query_.reset();
 
@@ -302,7 +266,7 @@ void SegmentationAction::stepCreateVoxelIndex()
     // TBD: Use some iterative algorithm with increasing progress.
     voxels_.createIndex();
 
-    LOG_DEBUG(<< "Created index.");
+    LOG_DEBUG(<< "Created voxel index.");
 
     progress_.setMaximumStep(voxels_.size(), 10);
     progress_.setValueSteps(SEGMENTATION_STEP_CREATE_TRUNKS);
@@ -331,10 +295,12 @@ void SegmentationAction::stepCreateTrunks()
         // If the path is empty, try to start new path:
         if (path_.empty())
         {
+            LOG_DEBUG(<< "Start next path.");
             // If a voxel is not processed and meets
             // criteria (for wood), add it to the path.
             if (isTrunkVoxel(voxels_[pointIndex_]))
             {
+                LOG_DEBUG(<< "Start next trunk group.");
                 startGroup(voxels_[pointIndex_], true);
                 voxels_[pointIndex_].group = groupId_;
                 path_.push_back(pointIndex_);
@@ -348,6 +314,7 @@ void SegmentationAction::stepCreateTrunks()
         else
         {
             // Add the path to the current group.
+            LOG_DEBUG(<< "Add path with <" << path_.size() << "> points.");
             size_t idx = groupPath_.size();
             for (size_t i = 0; i < path_.size(); i++)
             {
@@ -361,7 +328,11 @@ void SegmentationAction::stepCreateTrunks()
             for (size_t i = idx; i < groupPath_.size(); i++)
             {
                 Point &a = voxels_[groupPath_[i]];
-                voxels_.findRadius(a.x, a.y, a.z, trunkRadius_, search_);
+                voxels_.findRadius(a.x,
+                                   a.y,
+                                   a.z,
+                                   parameters_.searchRadiusForTrunkPoints,
+                                   search_);
                 for (size_t j = 0; j < search_.size(); j++)
                 {
                     Point &b = voxels_[search_[j]];
@@ -381,8 +352,8 @@ void SegmentationAction::stepCreateTrunks()
             {
                 // If the current group meets some criteria:
                 double groupHeight = groupMaximum_ - groupMinimum_;
-                if (!(groupHeight < treeHeight_) &&
-                    groupMinimum_ < elevationMax_)
+                if (!(groupHeight < parameters_.treeHeightMin) &&
+                    groupMinimum_ < parameters_.treeBaseElevationMax)
                 {
                     // Mark this group as future segment.
                     groups_[groupId_] = group_;
@@ -414,7 +385,7 @@ void SegmentationAction::stepCreateTrunks()
     progress_.setMaximumStep(voxels_.size(), 10);
     progress_.setValueSteps(SEGMENTATION_STEP_CREATE_BRANCHES);
 
-    if (onlyTrunks_)
+    if (parameters_.segmentOnlyTrunks)
     {
         progress_.setMaximumStep();
         progress_.setValueSteps(SEGMENTATION_STEP_CREATE_SEGMENTS);
@@ -554,6 +525,8 @@ void SegmentationAction::stepCreateBranches()
 
 void SegmentationAction::stepCreateSegments()
 {
+    LOG_DEBUG(<< "Create <" << groups_.size() << "> segments.");
+
     // Initialize new segments.
     Segments segments;
 
@@ -674,7 +647,7 @@ void SegmentationAction::createVoxel()
     queryPoint_.where().setSphere(query_.x(),
                                   query_.y(),
                                   query_.z(),
-                                  voxelSize_);
+                                  parameters_.voxelRadius);
     queryPoint_.exec();
 
     while (queryPoint_.next())
@@ -684,9 +657,26 @@ void SegmentationAction::createVoxel()
         p.z += queryPoint_.z();
         p.elevation += queryPoint_.elevation();
 
-        if (queryPoint_.descriptor() > p.descriptor)
+        if (parameters_.trunkDescriptorChannel ==
+            SegmentationParameters::CHANNEL_DESCRIPTOR)
         {
-            p.descriptor = queryPoint_.descriptor();
+            if (queryPoint_.descriptor() > p.descriptor)
+            {
+                p.descriptor = queryPoint_.descriptor();
+            }
+        }
+        else if (parameters_.trunkDescriptorChannel ==
+                 SegmentationParameters::CHANNEL_INTENSITY)
+        {
+            if (queryPoint_.intensity() > p.descriptor)
+            {
+                p.descriptor = queryPoint_.intensity();
+            }
+        }
+        else
+        {
+            THROW("SegmentationParameters trunkDescriptorChannel not "
+                  "implemented.");
         }
 
         n++;
@@ -714,7 +704,11 @@ void SegmentationAction::findNearestNeighbor(Point &a)
     a.dist = std::numeric_limits<double>::max();
     a.next = SIZE_MAX;
 
-    voxels_.findRadius(a.x, a.y, a.z, leafRadius_, search_);
+    voxels_.findRadius(a.x,
+                       a.y,
+                       a.z,
+                       parameters_.searchRadiusForLeafPoints,
+                       search_);
 
     for (size_t j = 0; j < search_.size(); j++)
     {
@@ -738,14 +732,15 @@ void SegmentationAction::findNearestNeighbor(Point &a)
 
 bool SegmentationAction::isTrunkVoxel(const Point &a)
 {
-    return a.group == SIZE_MAX && !(a.descriptor < descriptor_);
+    return a.group == SIZE_MAX &&
+           !(a.descriptor < parameters_.trunkDescriptorMin);
 }
 
 void SegmentationAction::startGroup(const Point &a, bool isTrunk)
 {
     if (isTrunk)
     {
-        if (useZ_)
+        if (parameters_.zCoordinatesAsElevation)
         {
             groupMinimum_ = a.z;
         }
@@ -768,7 +763,7 @@ void SegmentationAction::continueGroup(const Point &a, bool isTrunk)
 {
     if (isTrunk)
     {
-        if (useZ_)
+        if (parameters_.zCoordinatesAsElevation)
         {
             if (a.z < groupMinimum_)
             {

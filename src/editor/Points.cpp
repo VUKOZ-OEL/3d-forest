@@ -84,3 +84,18 @@ size_t Points::findNN(double x, double y, double z)
 
     return SIZE_MAX;
 }
+
+void Points::exportToFile(const std::string &path) const
+{
+    Json json;
+    toJson(json, *this);
+    json.write(path);
+}
+
+void toJson(Json &out, const Points &in)
+{
+    for (size_t i = 0; i < in.points_.size(); i++)
+    {
+        toJson(out[i], in.points_[i]);
+    }
+}

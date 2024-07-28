@@ -60,11 +60,14 @@ public:
 
 inline void toJson(Json &out, const Point &in)
 {
-    toJson(out["status"], in.status);
-    toJson(out["group"], in.group);
     toJson(out["position"][0], in.x);
     toJson(out["position"][1], in.y);
     toJson(out["position"][2], in.z);
+    toJson(out["elevation"], in.elevation);
+    toJson(out["descriptor"], in.descriptor);
+
+    toJson(out["group"], in.group);
+    toJson(out["status"], in.status);
 }
 
 inline std::string toString(const Point &in)

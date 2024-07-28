@@ -23,6 +23,7 @@
 #define CLASSIFICATION_ACTION_HPP
 
 // Include 3D Forest.
+#include <ClassificationParameters.hpp>
 #include <Points.hpp>
 #include <ProgressActionInterface.hpp>
 #include <Query.hpp>
@@ -35,11 +36,7 @@ public:
     ClassificationAction(Editor *editor);
     virtual ~ClassificationAction();
 
-    void start(double voxelRadius,
-               double searchRadius,
-               double angle,
-               bool cleanGround,
-               bool cleanAll);
+    void start(const ClassificationParameters &parameters);
     virtual void next();
     void clear();
 
@@ -48,11 +45,7 @@ protected:
     Query query_;
     Query queryPoint_;
 
-    double voxelRadius_;
-    double searchRadius_;
-    double angle_;
-    bool cleanGround_;
-    bool cleanAll_;
+    ClassificationParameters parameters_;
 
     uint64_t nPointsTotal_;
     uint64_t nPointsInFilter_;

@@ -26,6 +26,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "ClassificationAction"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define CLASSIFICATION_STEP_RESET_POINTS 0
@@ -59,12 +60,6 @@ void ClassificationAction::clear()
     query_.clear();
     queryPoint_.clear();
 
-    voxelRadius_ = 0;
-    searchRadius_ = 0;
-    angle_ = 0;
-    cleanGround_ = true;
-    cleanAll_ = false;
-
     nPointsTotal_ = 0;
     nPointsInFilter_ = 0;
 
@@ -78,20 +73,20 @@ void ClassificationAction::clear()
     minimumValue_ = 0;
 }
 
-void ClassificationAction::start(double voxelRadius,
-                                 double radius,
-                                 double angle,
-                                 bool cleanGround,
-                                 bool cleanAll)
+void ClassificationAction::start(const ClassificationParameters &parameters)
 {
-    LOG_DEBUG(<< "Start.");
+    LOG_DEBUG(<< "Start with parameters <" << toString(parameters) << ">.");
 
-    voxelRadius_ = voxelRadius;
-    searchRadius_ = radius;
-    angle_ = angle;
-    cleanGround_ = cleanGround;
-    cleanAll_ = cleanAll;
+    // Set input parameters.
+    double ppm = editor_->settings().units.pointsPerMeter()[0];
+    LOG_DEBUG(<< "Units pointsPerMeter <" << ppm << ">.");
 
+    parameters_ = parameters;
+
+    parameters_.voxelRadius *= ppm;
+    parameters_.searchRadius *= ppm;
+
+    // Clear work data.
     nPointsTotal_ = editor_->datasets().nPoints();
     nPointsInFilter_ = 0;
 
@@ -167,8 +162,9 @@ void ClassificationAction::stepResetPoints()
         query_.voxel() = SIZE_MAX;
 
         // Reset point classification of ground points to never classified.
-        if (cleanAll_ ||
-            (cleanGround_ && query_.classification() == LasFile::CLASS_GROUND))
+        if (parameters_.cleanAllClassifications ||
+            (parameters_.cleanGroundClassifications &&
+             query_.classification() == LasFile::CLASS_GROUND))
         {
             query_.classification() = LasFile::CLASS_NEVER_CLASSIFIED;
         }
@@ -301,7 +297,11 @@ void ClassificationAction::stepClassifyGround()
             Point &a = voxels_[group_[i]];
             progress_.addValueStep(1);
 
-            voxels_.findRadius(a.x, a.y, a.z, searchRadius_, searchNext_);
+            voxels_.findRadius(a.x,
+                               a.y,
+                               a.z,
+                               parameters_.searchRadius,
+                               searchNext_);
             for (size_t j = 0; j < searchNext_.size(); j++)
             {
                 // If a neighbor voxel is not yet processed:
@@ -312,7 +312,11 @@ void ClassificationAction::stepClassifyGround()
 
                     // Select cone below this neighbor voxel.
                     Cone<double> cone;
-                    cone.set(b.x, b.y, b.z, minimumValue_, 90.0 - angle_);
+                    cone.set(b.x,
+                             b.y,
+                             b.z,
+                             minimumValue_,
+                             90.0 - parameters_.angle);
                     Vector3<double> p = cone.box().getCenter();
                     double r = cone.box().radius();
 
@@ -407,7 +411,7 @@ void ClassificationAction::createVoxel()
     queryPoint_.where().setSphere(query_.x(),
                                   query_.y(),
                                   query_.z(),
-                                  voxelRadius_);
+                                  parameters_.voxelRadius);
     queryPoint_.exec();
 
     while (queryPoint_.next())

@@ -95,16 +95,15 @@ void ExplorerClippingWidget::slotUpdate(void *sender,
         return;
     }
 
-    if (!target.empty() && !target.contains(Editor::TYPE_CLIP_FILTER))
+    if (target.empty() || target.contains(Editor::TYPE_CLIP_FILTER) ||
+        target.contains(Editor::TYPE_SETTINGS))
     {
-        return;
+        region_ = mainWindow_->editor().clipFilter();
+        LOG_DEBUG(<< "Input region <" << region_ << ">.");
+
+        boxWidget_->setRegion(region_);
+        cylinderWidget_->setRegion(region_);
     }
-
-    region_ = mainWindow_->editor().clipFilter();
-    LOG_DEBUG(<< "Input region <" << region_ << ">.");
-
-    boxWidget_->setRegion(region_);
-    cylinderWidget_->setRegion(region_);
 }
 
 void ExplorerClippingWidget::slotRegionChanged(const Region &region)

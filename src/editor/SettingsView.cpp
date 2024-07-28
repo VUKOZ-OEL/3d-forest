@@ -150,3 +150,10 @@ void toJson(Json &out, const SettingsView &in)
     toJson(out["pointColor"], in.pointColor_);
     toJson(out["background"], in.background_);
 }
+
+std::string toString(const SettingsView &in)
+{
+    Json json;
+    toJson(json, in);
+    return json.serialize(0);
+}

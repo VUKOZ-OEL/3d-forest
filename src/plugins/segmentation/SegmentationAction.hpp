@@ -27,6 +27,7 @@
 #include <Points.hpp>
 #include <ProgressActionInterface.hpp>
 #include <Query.hpp>
+#include <SegmentationParameters.hpp>
 class Editor;
 class Segment;
 
@@ -37,18 +38,8 @@ public:
     SegmentationAction(Editor *editor);
     virtual ~SegmentationAction();
 
-    void start(double voxelSize,
-               double descriptor,
-               double trunkRadius,
-               double leafRadius,
-               double elevationMin,
-               double elevationMax,
-               double treeHeight,
-               bool useZ,
-               bool onlyTrunks);
-
+    void start(const SegmentationParameters &parameters);
     virtual void next();
-
     void clear();
 
 private:
@@ -56,15 +47,7 @@ private:
     Query query_;
     Query queryPoint_;
 
-    double voxelSize_;
-    double descriptor_;
-    double trunkRadius_;
-    double leafRadius_;
-    double elevationMin_;
-    double elevationMax_;
-    double treeHeight_;
-    bool useZ_;
-    bool onlyTrunks_;
+    SegmentationParameters parameters_;
 
     uint64_t nPointsTotal_;
     uint64_t nPointsInFilter_;

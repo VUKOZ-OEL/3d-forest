@@ -20,18 +20,20 @@
 /** @file SegmentationWidget.cpp */
 
 // Include 3D Forest.
+#include <DoubleRangeSliderWidget.hpp>
+#include <DoubleSliderWidget.hpp>
 #include <InfoDialog.hpp>
 #include <MainWindow.hpp>
 #include <ProgressDialog.hpp>
-#include <RangeSliderWidget.hpp>
 #include <SegmentationWidget.hpp>
-#include <SliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
 #include <QCheckBox>
+#include <QGroupBox>
 #include <QHBoxLayout>
 #include <QPushButton>
+#include <QRadioButton>
 #include <QVBoxLayout>
 
 // Include local.
@@ -49,102 +51,144 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
 {
     LOG_DEBUG(<< "Create.");
 
-    // Widgets.
-    SliderWidget::create(voxelSizeSlider_,
-                         this,
-                         nullptr,
-                         nullptr,
-                         tr("Voxel radius"),
-                         tr("Voxel radius to speed up computation."),
-                         tr("pt"),
-                         1,
-                         1,
-                         1000,
-                         100);
+    // Voxel radius.
+    DoubleSliderWidget::create(
+        voxelRadiusSlider_,
+        this,
+        nullptr,
+        nullptr,
+        tr("Voxel radius"),
+        tr("Higher voxel radius values affect the quality of the results but "
+           "speed up computation and reduce disk space usage."),
+        tr("m"),
+        0.01,
+        0.01,
+        1.0,
+        parameters_.voxelRadius);
 
-    SliderWidget::create(descriptorSlider_,
-                         this,
-                         nullptr,
-                         nullptr,
-                         tr("Wood descriptor threshold"),
-                         tr("Wood descriptor threshold."),
-                         tr("%"),
-                         1,
-                         0,
-                         100,
-                         25);
+    // Descriptor.
+    trunkDescriptorChannelRadioButton_.push_back(
+        new QRadioButton(tr("descriptor")));
+    trunkDescriptorChannelRadioButton_.push_back(
+        new QRadioButton(tr("intensity")));
 
-    SliderWidget::create(trunkRadiusSlider_,
-                         this,
-                         nullptr,
-                         nullptr,
-                         tr("Maximal distance to connect trunk points"),
-                         tr("Neighborhood radius to search for"
-                            " voxels which belong to the same tree."),
-                         tr("pt"),
-                         1,
-                         1,
-                         1000,
-                         250);
+    if (parameters_.trunkDescriptorChannel ==
+        SegmentationParameters::CHANNEL_DESCRIPTOR)
+    {
+        trunkDescriptorChannelRadioButton_[0]->setChecked(true);
+    }
+    else if (parameters_.trunkDescriptorChannel ==
+             SegmentationParameters::CHANNEL_INTENSITY)
+    {
+        trunkDescriptorChannelRadioButton_[1]->setChecked(true);
+    }
+    else
+    {
+        THROW("SegmentationParameters trunkDescriptorChannel not implemented.");
+    }
 
-    SliderWidget::create(leafRadiusSlider_,
-                         this,
-                         nullptr,
-                         nullptr,
-                         tr("Maximal distance to connect leaf points"),
-                         tr("Neighborhood radius to search for"
-                            " voxels which belong to the same tree."),
-                         tr("pt"),
-                         1,
-                         1,
-                         1000,
-                         250);
+    QVBoxLayout *trunkDescriptorChannelVBoxLayout = new QVBoxLayout;
+    for (size_t i = 0; i < trunkDescriptorChannelRadioButton_.size(); i++)
+    {
+        trunkDescriptorChannelVBoxLayout->addWidget(
+            trunkDescriptorChannelRadioButton_[i]);
+    }
 
-    RangeSliderWidget::create(elevationSlider_,
-                              this,
-                              nullptr,
-                              nullptr,
-                              tr("Look for trunks in elevation range"),
-                              tr("Ignore all trees which are only outside"
-                                 " \nof this elevation threshold."),
-                              tr("%"),
-                              1,
-                              0,
-                              100,
-                              5,
-                              20);
+    QGroupBox *trunkDescriptorChannelGroupBox =
+        new QGroupBox(tr("Descriptor channel"));
+    trunkDescriptorChannelGroupBox->setLayout(trunkDescriptorChannelVBoxLayout);
 
-    SliderWidget::create(treeHeightSlider_,
-                         this,
-                         nullptr,
-                         nullptr,
-                         tr("Minimal height of tree"),
-                         tr("Minimal height of detected voxel group to"
-                            " \ndetect it as a new tree."),
-                         tr("pt"),
-                         1,
-                         1,
-                         5000,
-                         1000);
+    DoubleSliderWidget::create(trunkDescriptorMinSlider_,
+                               this,
+                               nullptr,
+                               nullptr,
+                               tr("Minimal descriptor value for wood"),
+                               tr("Minimal descriptor value for wood."),
+                               tr("%"),
+                               1.0,
+                               0,
+                               100.0,
+                               parameters_.trunkDescriptorMin);
 
-    useZCheckBox_ = new QCheckBox;
-    useZCheckBox_->setText(tr("Use z-coordinate instead of ground elevation"));
-    useZCheckBox_->setChecked(false);
+    // Search radius.
+    DoubleSliderWidget::create(searchRadiusForTrunkPointsSlider_,
+                               this,
+                               nullptr,
+                               nullptr,
+                               tr("Maximal distance to connect trunk points"),
+                               tr("Neighborhood radius to search for"
+                                  " voxels which belong to the same tree."),
+                               tr("m"),
+                               0.01,
+                               0.01,
+                               1.0,
+                               parameters_.searchRadiusForTrunkPoints);
 
-    onlyTrunksCheckBox_ = new QCheckBox;
-    onlyTrunksCheckBox_->setText(tr("Find only trunks (fast preview)"));
-    onlyTrunksCheckBox_->setChecked(false);
+    DoubleSliderWidget::create(searchRadiusForLeafPointsSlider_,
+                               this,
+                               nullptr,
+                               nullptr,
+                               tr("Maximal distance to connect leaf points"),
+                               tr("Neighborhood radius to search for"
+                                  " voxels which belong to the same tree."),
+                               tr("m"),
+                               0.01,
+                               0.01,
+                               1.0,
+                               parameters_.searchRadiusForLeafPoints);
+
+    // Tree.
+    DoubleRangeSliderWidget::create(
+        treeBaseElevationSlider_,
+        this,
+        nullptr,
+        nullptr,
+        tr("Look for tree base in elevation range"),
+        tr("The values allow to cut off flying trees and prevent connecting "
+           "trees by ground wood."),
+        tr("m"),
+        0.01,
+        0,
+        10.0,
+        parameters_.treeBaseElevationMin,
+        parameters_.treeBaseElevationMax);
+
+    DoubleSliderWidget::create(treeHeightSlider_,
+                               this,
+                               nullptr,
+                               nullptr,
+                               tr("Minimal height of tree"),
+                               tr("Minimal height of detected voxel group to"
+                                  " \ndetect it as a new tree."),
+                               tr("m"),
+                               0.01,
+                               0,
+                               10.0,
+                               parameters_.treeHeightMin);
+
+    // Options.
+    zCoordinatesAsElevationCheckBox_ = new QCheckBox;
+    zCoordinatesAsElevationCheckBox_->setText(tr("Use z-coordinates instead of"
+                                                 " ground elevation"));
+    zCoordinatesAsElevationCheckBox_->setChecked(
+        parameters_.zCoordinatesAsElevation);
+
+    segmentOnlyTrunksCheckBox_ = new QCheckBox;
+    segmentOnlyTrunksCheckBox_->setText(tr("Segment only trunks"
+                                           " (fast preview)"));
+    segmentOnlyTrunksCheckBox_->setChecked(parameters_.segmentOnlyTrunks);
 
     // Settings layout.
     QVBoxLayout *settingsLayout = new QVBoxLayout;
-    settingsLayout->addWidget(voxelSizeSlider_);
-    settingsLayout->addWidget(descriptorSlider_);
-    settingsLayout->addWidget(trunkRadiusSlider_);
-    settingsLayout->addWidget(leafRadiusSlider_);
-    settingsLayout->addWidget(elevationSlider_);
+    settingsLayout->addWidget(voxelRadiusSlider_);
+    settingsLayout->addWidget(trunkDescriptorChannelGroupBox);
+    settingsLayout->addWidget(trunkDescriptorMinSlider_);
+    settingsLayout->addWidget(searchRadiusForTrunkPointsSlider_);
+    settingsLayout->addWidget(searchRadiusForLeafPointsSlider_);
+    settingsLayout->addWidget(treeBaseElevationSlider_);
     settingsLayout->addWidget(treeHeightSlider_);
-    settingsLayout->addWidget(useZCheckBox_);
-    settingsLayout->addWidget(onlyTrunksCheckBox_);
+    settingsLayout->addWidget(zCoordinatesAsElevationCheckBox_);
+    settingsLayout->addWidget(segmentOnlyTrunksCheckBox_);
     settingsLayout->addStretch();
 
     // Buttons.
@@ -187,27 +231,33 @@ void SegmentationWidget::slotApply()
 
     mainWindow_->suspendThreads();
 
-    double voxelSize = static_cast<double>(voxelSizeSlider_->value());
-    double descriptor = static_cast<double>(descriptorSlider_->value());
-    double trunkRadius = static_cast<double>(trunkRadiusSlider_->value());
-    double leafRadius = static_cast<double>(leafRadiusSlider_->value());
-    double elevationMin = static_cast<double>(elevationSlider_->minimumValue());
-    double elevationMax = static_cast<double>(elevationSlider_->maximumValue());
-    double treeHeight = static_cast<double>(treeHeightSlider_->value());
-    bool useZ = useZCheckBox_->isChecked();
-    bool onlyTrunks = onlyTrunksCheckBox_->isChecked();
+    parameters_.trunkDescriptorChannel =
+        SegmentationParameters::CHANNEL_DESCRIPTOR;
+    if (trunkDescriptorChannelRadioButton_
+            [SegmentationParameters::CHANNEL_INTENSITY]
+                ->isChecked())
+    {
+        parameters_.trunkDescriptorChannel =
+            SegmentationParameters::CHANNEL_INTENSITY;
+    }
+
+    parameters_.voxelRadius = voxelRadiusSlider_->value();
+    parameters_.trunkDescriptorMin = trunkDescriptorMinSlider_->value();
+    parameters_.searchRadiusForTrunkPoints =
+        searchRadiusForTrunkPointsSlider_->value();
+    parameters_.searchRadiusForLeafPoints =
+        searchRadiusForLeafPointsSlider_->value();
+    parameters_.treeBaseElevationMin = treeBaseElevationSlider_->minimumValue();
+    parameters_.treeBaseElevationMax = treeBaseElevationSlider_->maximumValue();
+    parameters_.treeHeightMin = treeHeightSlider_->value();
+
+    parameters_.zCoordinatesAsElevation =
+        zCoordinatesAsElevationCheckBox_->isChecked();
+    parameters_.segmentOnlyTrunks = segmentOnlyTrunksCheckBox_->isChecked();
 
     try
     {
-        segmentation_.start(voxelSize,
-                            descriptor * 0.01,
-                            trunkRadius,
-                            leafRadius,
-                            elevationMin * 0.01,
-                            elevationMax * 0.01,
-                            treeHeight,
-                            useZ,
-                            onlyTrunks);
+        segmentation_.start(parameters_);
 
         ProgressDialog::run(mainWindow_,
                             "Computing Segmentation",

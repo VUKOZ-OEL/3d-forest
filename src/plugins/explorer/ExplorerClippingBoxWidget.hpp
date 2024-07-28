@@ -49,6 +49,7 @@ public slots:
     void slotRangeIntermediateMaximumValue();
 
 protected:
+    MainWindow *mainWindow_;
     DoubleRangeSliderWidget *rangeInput_[3];
     Range<double> clipRange_[3];
 

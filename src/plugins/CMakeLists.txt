@@ -16,6 +16,7 @@
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
 add_subdirectory(classification)
+add_subdirectory(dbh)
 add_subdirectory(descriptor)
 add_subdirectory(elevation)
 add_subdirectory(heightmap)

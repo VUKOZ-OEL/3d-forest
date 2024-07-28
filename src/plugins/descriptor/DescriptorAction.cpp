@@ -22,10 +22,11 @@
 // Include 3D Forest.
 #include <DescriptorAction.hpp>
 #include <Editor.hpp>
-#include <Math.hpp>
+#include <Util.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "DescriptorAction"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define DESCRIPTOR_STEP_RESET_POINTS 0
@@ -61,11 +62,6 @@ void DescriptorAction::clear()
 
     pca_.clear();
 
-    radius_ = 0;
-    voxelSize_ = 0;
-    method_ = DescriptorAction::METHOD_DENSITY;
-    includeGround_ = false;
-
     descriptorMinimum_ = 0;
     descriptorMaximum_ = 0;
 
@@ -74,19 +70,20 @@ void DescriptorAction::clear()
     numberOfPointsWithDescriptor_ = 0;
 }
 
-void DescriptorAction::start(double radius,
-                             double voxelSize,
-                             Method method,
-                             bool includeGround)
+void DescriptorAction::start(const DescriptorParameters &parameters)
 {
-    LOG_DEBUG(<< "Start with parameter radius <" << radius << "> voxelSize <"
-              << voxelSize << "> method <" << static_cast<int>(method) << ">.");
+    LOG_DEBUG(<< "Start with parameters <" << toString(parameters) << ">.");
 
-    radius_ = radius;
-    voxelSize_ = voxelSize;
-    method_ = method;
-    includeGround_ = includeGround;
+    // Set input parameters.
+    double ppm = editor_->settings().units.pointsPerMeter()[0];
+    LOG_DEBUG(<< "Units pointsPerMeter <" << ppm << ">.");
 
+    parameters_ = parameters;
+
+    parameters_.voxelRadius *= ppm;
+    parameters_.searchRadius *= ppm;
+
+    // Clear work data.
     descriptorMinimum_ = 0;
     descriptorMaximum_ = 0;
 
@@ -94,6 +91,7 @@ void DescriptorAction::start(double radius,
     numberOfPointsInFilter_ = 0;
     numberOfPointsWithDescriptor_ = 0;
 
+    // Plan the steps.
     progress_.setMaximumStep(numberOfPoints_, 1000);
     progress_.setMaximumSteps({5.0, 5.0, 85.0, 5.0});
     progress_.setValueSteps(DESCRIPTOR_STEP_RESET_POINTS);
@@ -140,7 +138,8 @@ void DescriptorAction::stepResetPoints()
     // Clear each point in all datasets.
     while (query_.next())
     {
-        if (includeGround_ || query_.classification() != LasFile::CLASS_GROUND)
+        if (parameters_.includeGroundPoints ||
+            query_.classification() != LasFile::CLASS_GROUND)
         {
             query_.voxel() = DESCRIPTOR_PROCESS;
         }
@@ -266,12 +265,12 @@ void DescriptorAction::computePoint()
     double descriptor;
     bool hasDescriptor;
 
-    if (method_ == DescriptorAction::METHOD_DENSITY)
+    if (parameters_.method == DescriptorParameters::METHOD_DENSITY)
     {
         queryPoint_.where().setSphere(query_.x(),
                                       query_.y(),
                                       query_.z(),
-                                      radius_);
+                                      parameters_.searchRadius);
         queryPoint_.exec();
 
         descriptor = 0.0;
@@ -284,7 +283,7 @@ void DescriptorAction::computePoint()
             }
         }
     }
-    else if (method_ == DescriptorAction::METHOD_PCA_INTENSITY)
+    else if (parameters_.method == DescriptorParameters::METHOD_PCA_INTENSITY)
     {
         double meanX;
         double meanY;
@@ -294,7 +293,7 @@ void DescriptorAction::computePoint()
                                                query_.x(),
                                                query_.y(),
                                                query_.z(),
-                                               radius_,
+                                               parameters_.searchRadius,
                                                meanX,
                                                meanY,
                                                meanZ,
@@ -328,12 +327,12 @@ void DescriptorAction::computePoint()
     }
 
     // Distribute computed descriptor value to neighbors.
-    if (voxelSize_ > 1.0)
+    if (parameters_.voxelRadius > 1.0)
     {
         queryPoint_.where().setSphere(query_.x(),
                                       query_.y(),
                                       query_.z(),
-                                      voxelSize_);
+                                      parameters_.voxelRadius);
         queryPoint_.exec();
 
         while (queryPoint_.next())

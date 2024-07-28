@@ -20,11 +20,11 @@
 /** @file ElevationWidget.cpp */
 
 // Include 3D Forest.
+#include <DoubleSliderWidget.hpp>
 #include <ElevationWidget.hpp>
 #include <InfoDialog.hpp>
 #include <MainWindow.hpp>
 #include <ProgressDialog.hpp>
-#include <SliderWidget.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
@@ -47,21 +47,21 @@ ElevationWidget::ElevationWidget(MainWindow *mainWindow)
     LOG_DEBUG(<< "Create.");
 
     // Widgets.
-    SliderWidget::create(voxelSizeSlider_,
-                         this,
-                         nullptr,
-                         nullptr,
-                         tr("Voxel radius"),
-                         tr("Voxel radius"),
-                         tr("pt"),
-                         1,
-                         1,
-                         1000,
-                         100);
+    DoubleSliderWidget::create(voxelRadiusSlider_,
+                               this,
+                               nullptr,
+                               nullptr,
+                               tr("Voxel radius"),
+                               tr("Voxel radius"),
+                               tr("m"),
+                               0.01,
+                               0.01,
+                               1.0,
+                               0.1);
 
     // Settings layout.
     QVBoxLayout *settingsLayout = new QVBoxLayout;
-    settingsLayout->addWidget(voxelSizeSlider_);
+    settingsLayout->addWidget(voxelRadiusSlider_);
     settingsLayout->addStretch();
 
     // Buttons.
@@ -104,11 +104,11 @@ void ElevationWidget::slotApply()
 
     mainWindow_->suspendThreads();
 
-    double voxelSize = static_cast<double>(voxelSizeSlider_->value());
+    double voxelRadius = voxelRadiusSlider_->value();
 
     try
     {
-        elevation_.start(voxelSize);
+        elevation_.start(voxelRadius);
         ProgressDialog::run(mainWindow_, "Computing Elevation", &elevation_);
     }
     catch (std::exception &e)

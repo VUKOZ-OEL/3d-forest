@@ -42,46 +42,63 @@
 class EXPORT_CORE ArgumentParser
 {
 public:
-    ArgumentParser();
+    ArgumentParser(const std::string &description = "");
     ~ArgumentParser() = default;
 
-    void add(const std::string &name, const std::string &defaultValue);
-    void parse(int argc, char *argv[]);
+    void add(const std::string &shortOption,
+             const std::string &longOption,
+             const std::string &defaultValue = "",
+             const std::string &help = "",
+             bool required = false);
 
-    bool contains(const std::string &name) const;
-    bool read(const std::string &name, int &value) const;
+    bool parse(int argc, char *argv[]);
 
-    const std::string &toString(const std::string &name) const;
-    bool toBool(const std::string &name) const;
-    float toFloat(const std::string &name) const;
-    double toDouble(const std::string &name) const;
-    int toInt(const std::string &name) const;
-    size_t toSize(const std::string &name) const;
-    uint32_t toUint32(const std::string &name) const;
-    uint64_t toUint64(const std::string &name) const;
+    bool contains(const std::string &longOption) const;
+    bool read(const std::string &longOption, int &value) const;
+
+    const std::string &toString(const std::string &longOption) const;
+    bool toBool(const std::string &longOption) const;
+    float toFloat(const std::string &longOption) const;
+    double toDouble(const std::string &longOption) const;
+    int toInt(const std::string &longOption) const;
+    size_t toSize(const std::string &longOption) const;
+    uint32_t toUint32(const std::string &longOption) const;
+    uint64_t toUint64(const std::string &longOption) const;
 
 private:
-    /** Argument Parser Value. */
-    class Value
+    std::string programName_;
+    std::string description_;
+
+    /** Argument Parser Option. */
+    class Option
     {
     public:
+        std::string shortOption;
+        std::string longOption;
         std::string text;
-        int count = 0;
-        Value() : count(0) {}
+        std::string help;
+        bool required{false};
+        int count{0};
     };
 
-    std::map<std::string, Value> args_;
+    std::map<std::string, Option> options_;
+    std::vector<std::string> insertOrder;
+
+    void help() const;
+    void error(const std::string &message) const;
+    void invalidOption(const std::string &option) const;
+    void missingOption(const Option &option) const;
 };
 
-inline bool ArgumentParser::contains(const std::string &name) const
+inline bool ArgumentParser::contains(const std::string &longOption) const
 {
-    return args_.at(name).count > 0;
+    return options_.at(longOption).count > 0;
 }
 
 inline const std::string &ArgumentParser::toString(
-    const std::string &name) const
+    const std::string &longOption) const
 {
-    return args_.at(name).text;
+    return options_.at(longOption).text;
 }
 
 #include <WarningsEnable.hpp>

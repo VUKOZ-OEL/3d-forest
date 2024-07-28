@@ -63,7 +63,7 @@ public:
     void open(const std::string &path,
               const SettingsImport &settings = SettingsImport());
     void saveProject(const std::string &path);
-    const std::string &projectPath() const { return path_; }
+    const std::string &projectPath() const { return projectPath_; }
     const std::string &projectName() const { return projectName_; }
     bool hasUnsavedChanges() const { return unsavedChanges_; }
     void close();
@@ -108,7 +108,8 @@ public:
 
     // Settings.
     const Settings &settings() const { return settings_; }
-    void setSettingsView(const SettingsView &settings);
+    void setSettingsView(const SettingsView &settingsView);
+    void setSettingsUnits(const SettingsUnits &settingsUnits);
 
     // Modifiers.
     void addModifier(ModifierInterface *modifier);
@@ -131,7 +132,7 @@ protected:
     std::mutex mutex_;
 
     // Project data.
-    std::string path_;
+    std::string projectPath_;
     std::string projectName_;
     bool unsavedChanges_;
 
@@ -160,6 +161,8 @@ protected:
 
     void openDataset(const std::string &path,
                      const SettingsImport &settings = SettingsImport());
+
+    void setProjectPath(const std::string &projectPath);
 
     void updateAfterRead();
 };

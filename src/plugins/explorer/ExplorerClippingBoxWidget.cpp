@@ -31,10 +31,12 @@
 
 // Include local.
 #define LOG_MODULE_NAME "ExplorerClippingBoxWidget"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 ExplorerClippingBoxWidget::ExplorerClippingBoxWidget(MainWindow *mainWindow)
-    : QWidget(mainWindow)
+    : QWidget(mainWindow),
+      mainWindow_(mainWindow)
 {
     LOG_DEBUG(<< "Create.");
 
@@ -46,7 +48,7 @@ ExplorerClippingBoxWidget::ExplorerClippingBoxWidget(MainWindow *mainWindow)
         SLOT(slotRangeIntermediateMaximumValue()),
         tr("X range"),
         tr("Min-max clipping range filter along X axis"),
-        tr("pt"),
+        tr("m"),
         1,
         0,
         100,
@@ -60,7 +62,7 @@ ExplorerClippingBoxWidget::ExplorerClippingBoxWidget(MainWindow *mainWindow)
         SLOT(slotRangeIntermediateMaximumValue()),
         tr("Y range"),
         tr("Min-max clipping range filter along Y axis"),
-        tr("pt"),
+        tr("m"),
         1,
         0,
         100,
@@ -74,7 +76,7 @@ ExplorerClippingBoxWidget::ExplorerClippingBoxWidget(MainWindow *mainWindow)
         SLOT(slotRangeIntermediateMaximumValue()),
         tr("Z range"),
         tr("Min-max clipping range filter along Z axis"),
-        tr("pt"),
+        tr("m"),
         1,
         0,
         100,
@@ -96,6 +98,8 @@ void ExplorerClippingBoxWidget::setRegion(const Region &region)
 {
     LOG_DEBUG(<< "Set region <" << region << ">.");
 
+    double ppm = mainWindow_->editor().settings().units.pointsPerMeter()[0];
+
     for (size_t i = 0; i < 3; i++)
     {
         clipRange_[i].setMinimum(region.boundary.min(i));
@@ -104,10 +108,10 @@ void ExplorerClippingBoxWidget::setRegion(const Region &region)
         clipRange_[i].setMaximumValue(region.box.max(i));
 
         rangeInput_[i]->blockSignals(true);
-        rangeInput_[i]->setMinimum(clipRange_[i].minimum());
-        rangeInput_[i]->setMaximum(clipRange_[i].maximum());
-        rangeInput_[i]->setMinimumValue(clipRange_[i].minimumValue());
-        rangeInput_[i]->setMaximumValue(clipRange_[i].maximumValue());
+        rangeInput_[i]->setMinimum(clipRange_[i].minimum() / ppm);
+        rangeInput_[i]->setMaximum(clipRange_[i].maximum() / ppm);
+        rangeInput_[i]->setMinimumValue(clipRange_[i].minimumValue() / ppm);
+        rangeInput_[i]->setMaximumValue(clipRange_[i].maximumValue() / ppm);
         rangeInput_[i]->blockSignals(false);
     }
 }
@@ -115,6 +119,9 @@ void ExplorerClippingBoxWidget::setRegion(const Region &region)
 void ExplorerClippingBoxWidget::slotRangeIntermediateMinimumValue()
 {
     LOG_DEBUG(<< "Minimum value changed.");
+
+    double ppm = mainWindow_->editor().settings().units.pointsPerMeter()[0];
+
     QObject *obj = sender();
     for (int i = 0; i < 3; i++)
     {
@@ -122,7 +129,7 @@ void ExplorerClippingBoxWidget::slotRangeIntermediateMinimumValue()
         {
             double v = rangeInput_[i]->minimumValue();
             LOG_DEBUG(<< "Input minimumValue <" << v << ">.");
-            clipRange_[i].setMinimumValue(v);
+            clipRange_[i].setMinimumValue(v * ppm);
         }
     }
 
@@ -132,6 +139,9 @@ void ExplorerClippingBoxWidget::slotRangeIntermediateMinimumValue()
 void ExplorerClippingBoxWidget::slotRangeIntermediateMaximumValue()
 {
     LOG_DEBUG(<< "Maximum value changed.");
+
+    double ppm = mainWindow_->editor().settings().units.pointsPerMeter()[0];
+
     QObject *obj = sender();
     for (int i = 0; i < 3; i++)
     {
@@ -139,7 +149,7 @@ void ExplorerClippingBoxWidget::slotRangeIntermediateMaximumValue()
         {
             double v = rangeInput_[i]->maximumValue();
             LOG_DEBUG(<< "Input maximumValue <" << v << ">.");
-            clipRange_[i].setMaximumValue(v);
+            clipRange_[i].setMaximumValue(v * ppm);
         }
     }
 
