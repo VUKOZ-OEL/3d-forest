@@ -33,6 +33,7 @@ class InfoDialog;
 // Include Qt.
 #include <QWidget>
 class QPushButton;
+class QRadioButton;
 class QCheckBox;
 
 /** Segmentation Widget. */
@@ -59,6 +60,7 @@ private:
 
     DoubleSliderWidget *voxelRadiusSlider_;
     DoubleSliderWidget *trunkDescriptorMinSlider_;
+    std::vector<QRadioButton *> trunkDescriptorChannelRadioButton_;
     DoubleSliderWidget *searchRadiusForTrunkPointsSlider_;
     DoubleSliderWidget *searchRadiusForLeafPointsSlider_;
     DoubleRangeSliderWidget *treeBaseElevationSlider_;

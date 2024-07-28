@@ -29,6 +29,14 @@
 class SegmentationParameters
 {
 public:
+    enum Channel
+    {
+        CHANNEL_DESCRIPTOR = 0,
+        CHANNEL_INTENSITY
+    };
+
+    Channel trunkDescriptorChannel{CHANNEL_DESCRIPTOR};
+
     double voxelRadius{0.1};
     double trunkDescriptorMin{25.0};
     double searchRadiusForTrunkPoints{0.25};
@@ -43,6 +51,20 @@ public:
 
 inline void toJson(Json &out, const SegmentationParameters &in)
 {
+    if (in.trunkDescriptorChannel == SegmentationParameters::CHANNEL_DESCRIPTOR)
+    {
+        toJson(out["trunkDescriptorChannel"], std::string("descriptor"));
+    }
+    else if (in.trunkDescriptorChannel ==
+             SegmentationParameters::CHANNEL_INTENSITY)
+    {
+        toJson(out["trunkDescriptorChannel"], std::string("intensity"));
+    }
+    else
+    {
+        THROW("SegmentationParameters trunkDescriptorChannel not implemented.");
+    }
+
     toJson(out["voxelRadius"], in.voxelRadius);
     toJson(out["trunkDescriptorMin"], in.trunkDescriptorMin);
     toJson(out["searchRadiusForTrunkPoints"], in.searchRadiusForTrunkPoints);

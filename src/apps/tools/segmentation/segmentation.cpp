@@ -74,6 +74,10 @@ int main(int argc, char *argv[])
                 "--descriptor",
                 toString(p.trunkDescriptorMin),
                 "Minimal descriptor value for wood [%]");
+        arg.add("-ch",
+                "--descriptor-channel",
+                "descriptor",
+                "Descriptor channel {descriptor,intensity}");
         arg.add("-tr",
                 "--trunk-radius",
                 toString(p.searchRadiusForTrunkPoints),
@@ -105,6 +109,22 @@ int main(int argc, char *argv[])
 
         if (arg.parse(argc, argv))
         {
+            if (arg.toString("--descriptor-channel") == "descriptor")
+            {
+                p.trunkDescriptorChannel =
+                    SegmentationParameters::CHANNEL_DESCRIPTOR;
+            }
+            else if (arg.toString("--descriptor-channel") == "intensity")
+            {
+                p.trunkDescriptorChannel =
+                    SegmentationParameters::CHANNEL_INTENSITY;
+            }
+            else
+            {
+                THROW("Invalid descriptor channel option. "
+                      "Try '--help' for more information.");
+            }
+
             p.voxelRadius = arg.toDouble("--voxel");
             p.trunkDescriptorMin = arg.toDouble("--descriptor");
             p.searchRadiusForTrunkPoints = arg.toDouble("--trunk-radius");

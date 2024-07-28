@@ -90,8 +90,8 @@ int main(int argc, char *argv[])
             }
             else
             {
-                THROW("Invalid method option. Try '--help' for more "
-                      "information.");
+                THROW("Invalid method option. "
+                      "Try '--help' for more information.");
             }
 
             p.voxelRadius = arg.toDouble("--voxel");

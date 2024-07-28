@@ -86,6 +86,7 @@ void SegmentationAction::start(const SegmentationParameters &parameters)
     parameters_ = parameters;
 
     parameters_.voxelRadius *= ppm;
+    parameters_.trunkDescriptorMin *= 0.01; // %
     parameters_.searchRadiusForTrunkPoints *= ppm;
     parameters_.searchRadiusForLeafPoints *= ppm;
     parameters_.treeBaseElevationMin *= ppm;
@@ -154,6 +155,8 @@ void SegmentationAction::stepResetPoints()
 
     if (progress_.valueStep() == 0)
     {
+        LOG_DEBUG(<< "Reset all <" << nPointsTotal_ << "> points.");
+
         // Initialize. Remove all segments and create default main segment.
         Segments segments;
         segments.setDefault();
@@ -217,7 +220,7 @@ void SegmentationAction::stepCountPoints()
         }
     }
 
-    LOG_DEBUG(<< "Counted <" << nPointsInFilter_ << "> points.");
+    LOG_DEBUG(<< "Counted <" << nPointsInFilter_ << "> points in filter.");
 
     query_.reset();
 
@@ -248,7 +251,8 @@ void SegmentationAction::stepPointsToVoxels()
         }
     }
 
-    LOG_DEBUG(<< "Created <" << voxels_.size() << "> points.");
+    LOG_DEBUG(<< "Created <" << voxels_.size() << "> voxels.");
+    // voxels_.exportToFile("voxels.json");
 
     query_.reset();
 
@@ -262,7 +266,7 @@ void SegmentationAction::stepCreateVoxelIndex()
     // TBD: Use some iterative algorithm with increasing progress.
     voxels_.createIndex();
 
-    LOG_DEBUG(<< "Created index.");
+    LOG_DEBUG(<< "Created voxel index.");
 
     progress_.setMaximumStep(voxels_.size(), 10);
     progress_.setValueSteps(SEGMENTATION_STEP_CREATE_TRUNKS);
@@ -291,10 +295,12 @@ void SegmentationAction::stepCreateTrunks()
         // If the path is empty, try to start new path:
         if (path_.empty())
         {
+            LOG_DEBUG(<< "Start next path.");
             // If a voxel is not processed and meets
             // criteria (for wood), add it to the path.
             if (isTrunkVoxel(voxels_[pointIndex_]))
             {
+                LOG_DEBUG(<< "Start next trunk group.");
                 startGroup(voxels_[pointIndex_], true);
                 voxels_[pointIndex_].group = groupId_;
                 path_.push_back(pointIndex_);
@@ -308,6 +314,7 @@ void SegmentationAction::stepCreateTrunks()
         else
         {
             // Add the path to the current group.
+            LOG_DEBUG(<< "Add path with <" << path_.size() << "> points.");
             size_t idx = groupPath_.size();
             for (size_t i = 0; i < path_.size(); i++)
             {
@@ -518,6 +525,8 @@ void SegmentationAction::stepCreateBranches()
 
 void SegmentationAction::stepCreateSegments()
 {
+    LOG_DEBUG(<< "Create <" << groups_.size() << "> segments.");
+
     // Initialize new segments.
     Segments segments;
 
@@ -648,9 +657,26 @@ void SegmentationAction::createVoxel()
         p.z += queryPoint_.z();
         p.elevation += queryPoint_.elevation();
 
-        if (queryPoint_.descriptor() > p.descriptor)
+        if (parameters_.trunkDescriptorChannel ==
+            SegmentationParameters::CHANNEL_DESCRIPTOR)
         {
-            p.descriptor = queryPoint_.descriptor();
+            if (queryPoint_.descriptor() > p.descriptor)
+            {
+                p.descriptor = queryPoint_.descriptor();
+            }
+        }
+        else if (parameters_.trunkDescriptorChannel ==
+                 SegmentationParameters::CHANNEL_INTENSITY)
+        {
+            if (queryPoint_.intensity() > p.descriptor)
+            {
+                p.descriptor = queryPoint_.intensity();
+            }
+        }
+        else
+        {
+            THROW("SegmentationParameters trunkDescriptorChannel not "
+                  "implemented.");
         }
 
         n++;

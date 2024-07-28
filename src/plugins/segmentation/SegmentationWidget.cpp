@@ -30,8 +30,10 @@
 
 // Include Qt.
 #include <QCheckBox>
+#include <QGroupBox>
 #include <QHBoxLayout>
 #include <QPushButton>
+#include <QRadioButton>
 #include <QVBoxLayout>
 
 // Include local.
@@ -49,7 +51,7 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
 {
     LOG_DEBUG(<< "Create.");
 
-    // Widgets.
+    // Voxel radius.
     DoubleSliderWidget::create(
         voxelRadiusSlider_,
         this,
@@ -64,6 +66,38 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
         1.0,
         parameters_.voxelRadius);
 
+    // Descriptor.
+    trunkDescriptorChannelRadioButton_.push_back(
+        new QRadioButton(tr("descriptor")));
+    trunkDescriptorChannelRadioButton_.push_back(
+        new QRadioButton(tr("intensity")));
+
+    if (parameters_.trunkDescriptorChannel ==
+        SegmentationParameters::CHANNEL_DESCRIPTOR)
+    {
+        trunkDescriptorChannelRadioButton_[0]->setChecked(true);
+    }
+    else if (parameters_.trunkDescriptorChannel ==
+             SegmentationParameters::CHANNEL_INTENSITY)
+    {
+        trunkDescriptorChannelRadioButton_[1]->setChecked(true);
+    }
+    else
+    {
+        THROW("SegmentationParameters trunkDescriptorChannel not implemented.");
+    }
+
+    QVBoxLayout *trunkDescriptorChannelVBoxLayout = new QVBoxLayout;
+    for (size_t i = 0; i < trunkDescriptorChannelRadioButton_.size(); i++)
+    {
+        trunkDescriptorChannelVBoxLayout->addWidget(
+            trunkDescriptorChannelRadioButton_[i]);
+    }
+
+    QGroupBox *trunkDescriptorChannelGroupBox =
+        new QGroupBox(tr("Descriptor channel"));
+    trunkDescriptorChannelGroupBox->setLayout(trunkDescriptorChannelVBoxLayout);
+
     DoubleSliderWidget::create(trunkDescriptorMinSlider_,
                                this,
                                nullptr,
@@ -76,6 +110,7 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
                                100.0,
                                parameters_.trunkDescriptorMin);
 
+    // Search radius.
     DoubleSliderWidget::create(searchRadiusForTrunkPointsSlider_,
                                this,
                                nullptr,
@@ -102,6 +137,7 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
                                1.0,
                                parameters_.searchRadiusForLeafPoints);
 
+    // Tree.
     DoubleRangeSliderWidget::create(
         treeBaseElevationSlider_,
         this,
@@ -130,6 +166,7 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
                                10.0,
                                parameters_.treeHeightMin);
 
+    // Options.
     zCoordinatesAsElevationCheckBox_ = new QCheckBox;
     zCoordinatesAsElevationCheckBox_->setText(tr("Use z-coordinates instead of"
                                                  " ground elevation"));
@@ -144,6 +181,7 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
     // Settings layout.
     QVBoxLayout *settingsLayout = new QVBoxLayout;
     settingsLayout->addWidget(voxelRadiusSlider_);
+    settingsLayout->addWidget(trunkDescriptorChannelGroupBox);
     settingsLayout->addWidget(trunkDescriptorMinSlider_);
     settingsLayout->addWidget(searchRadiusForTrunkPointsSlider_);
     settingsLayout->addWidget(searchRadiusForLeafPointsSlider_);
@@ -193,6 +231,16 @@ void SegmentationWidget::slotApply()
 
     mainWindow_->suspendThreads();
 
+    parameters_.trunkDescriptorChannel =
+        SegmentationParameters::CHANNEL_DESCRIPTOR;
+    if (trunkDescriptorChannelRadioButton_
+            [SegmentationParameters::CHANNEL_INTENSITY]
+                ->isChecked())
+    {
+        parameters_.trunkDescriptorChannel =
+            SegmentationParameters::CHANNEL_INTENSITY;
+    }
+
     parameters_.voxelRadius = voxelRadiusSlider_->value();
     parameters_.trunkDescriptorMin = trunkDescriptorMinSlider_->value();
     parameters_.searchRadiusForTrunkPoints =
@@ -202,6 +250,7 @@ void SegmentationWidget::slotApply()
     parameters_.treeBaseElevationMin = treeBaseElevationSlider_->minimumValue();
     parameters_.treeBaseElevationMax = treeBaseElevationSlider_->maximumValue();
     parameters_.treeHeightMin = treeHeightSlider_->value();
+
     parameters_.zCoordinatesAsElevation =
         zCoordinatesAsElevationCheckBox_->isChecked();
     parameters_.segmentOnlyTrunks = segmentOnlyTrunksCheckBox_->isChecked();
