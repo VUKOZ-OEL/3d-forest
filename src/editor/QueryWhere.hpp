@@ -41,6 +41,10 @@ public:
     QueryWhere();
     ~QueryWhere();
 
+    void setDataset(const std::unordered_set<size_t> &list);
+    void setDataset(const QueryFilterSet &list);
+    const QueryFilterSet &dataset() const { return dataset_; }
+
     void setRegion(const Region &region);
     const Region &region() const { return region_; }
 
@@ -68,9 +72,8 @@ public:
     void setDescriptor(const Range<double> &descriptor);
     const Range<double> &descriptor() const { return descriptor_; }
 
-    void setDataset(const std::unordered_set<size_t> &list);
-    void setDataset(const QueryFilterSet &list);
-    const QueryFilterSet &dataset() const { return dataset_; }
+    void setIntensity(const Range<double> &intensity);
+    const Range<double> &intensity() const { return intensity_; }
 
     void setClassification(const std::unordered_set<size_t> &list);
     void setClassification(const QueryFilterSet &list);
@@ -89,6 +92,7 @@ private:
     Region region_;
     Range<double> elevation_;
     Range<double> descriptor_;
+    Range<double> intensity_;
     QueryFilterSet dataset_;
     QueryFilterSet classification_;
     std::vector<int> classificationArray_;

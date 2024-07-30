@@ -34,6 +34,16 @@ QueryWhere::~QueryWhere()
 {
 }
 
+void QueryWhere::setDataset(const QueryFilterSet &list)
+{
+    dataset_ = list;
+}
+
+void QueryWhere::setDataset(const std::unordered_set<size_t> &list)
+{
+    dataset_.setFilter(list);
+}
+
 void QueryWhere::setRegion(const Region &region)
 {
     region_ = region;
@@ -79,14 +89,9 @@ void QueryWhere::setDescriptor(const Range<double> &descriptor)
     descriptor_ = descriptor;
 }
 
-void QueryWhere::setDataset(const QueryFilterSet &list)
+void QueryWhere::setIntensity(const Range<double> &intensity)
 {
-    dataset_ = list;
-}
-
-void QueryWhere::setDataset(const std::unordered_set<size_t> &list)
-{
-    dataset_.setFilter(list);
+    intensity_ = intensity;
 }
 
 void QueryWhere::setClassification(const QueryFilterSet &list)

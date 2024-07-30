@@ -260,6 +260,7 @@ void Page::queryWhere()
     queryWhereCylinder();
     queryWhereSphere();
     queryWhereElevation();
+    queryWhereIntensity();
     queryWhereDescriptor();
     queryWhereClassification();
     queryWhereSegment();
@@ -713,6 +714,38 @@ void Page::queryWhereDescriptor()
 
         if (!(v < descriptorRange.minimumValue() ||
               v > descriptorRange.maximumValue()))
+        {
+            if (nSelectedNew != i)
+            {
+                selection[nSelectedNew] = selection[i];
+            }
+
+            nSelectedNew++;
+        }
+    }
+
+    selectionSize = nSelectedNew;
+}
+
+void Page::queryWhereIntensity()
+{
+    const Range<double> &intensityRange = query_->where().intensity();
+
+    if (intensityRange.isEnabled() == false || intensityRange.full())
+    {
+        return;
+    }
+
+    LOG_DEBUG(<< "Page pageId <" << pageId_ << ">.");
+
+    size_t nSelectedNew = 0;
+
+    for (size_t i = 0; i < selectionSize; i++)
+    {
+        double v = intensity[selection[i]];
+
+        if (!(v < intensityRange.minimumValue() ||
+              v > intensityRange.maximumValue()))
         {
             if (nSelectedNew != i)
             {
