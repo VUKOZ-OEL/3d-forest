@@ -17,37 +17,39 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file DbhCircle.hpp */
+/** @file DbhGroup.hpp */
 
-#ifndef DBH_CIRCLE_HPP
-#define DBH_CIRCLE_HPP
+#ifndef DBH_GROUP_HPP
+#define DBH_GROUP_HPP
 
 // Include 3D Forest.
 #include <Json.hpp>
+#include <Vector3.hpp>
 
-/** DBH (Diameter at Breast Height) Circle. */
-class DbhCircle
+/** DBH (Diameter at Breast Height) Group. */
+class DbhGroup
 {
 public:
-    double x{0.0};
-    double y{0.0};
-    double z{0.0};
+    size_t segmentId{0};
+    std::vector<double> points; // x0, y0, z0, x1, y1, z1, ...
+
+    Vector3<double> center;
     double radius{0.0};
 };
 
-inline void toJson(Json &out, const DbhCircle &in)
+inline void toJson(Json &out, const DbhGroup &in)
 {
-    toJson(out["x"], in.x);
-    toJson(out["y"], in.y);
-    toJson(out["z"], in.z);
+    toJson(out["segmentId"], in.segmentId);
+    toJson(out["pointCount"], in.points.size() / 3);
+    toJson(out["center"], in.center);
     toJson(out["radius"], in.radius);
 }
 
-inline std::string toString(const DbhCircle &in)
+inline std::string toString(const DbhGroup &in)
 {
     Json json;
     toJson(json, in);
     return json.serialize(0);
 }
 
-#endif /* DBH_CIRCLE_HPP */
+#endif /* DBH_GROUP_HPP */

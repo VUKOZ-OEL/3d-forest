@@ -23,6 +23,7 @@
 #define DBH_ACTION_HPP
 
 // Include 3D Forest.
+#include <DbhGroup.hpp>
 #include <DbhParameters.hpp>
 #include <Point.hpp>
 #include <Points.hpp>
@@ -48,17 +49,14 @@ private:
 
     DbhParameters parameters_;
 
-    /** DBH Group. */
-    class Group
-    {
-    public:
-        size_t segmentId{0};
-        std::vector<double> points; // x0, y0, z0, x1, y1, z1, ...
-    };
-
-    std::map<size_t, Group> groups_;
+    std::map<size_t, DbhGroup> groups_; // [segmentId:group]
+    size_t currentGroup_;
 
     void stepPointsToGroups();
+    void stepCalculateDbh();
+    void stepUpdateSegments();
+
+    void dumpGroups();
 };
 
 #endif /* DBH_ACTION_HPP */
