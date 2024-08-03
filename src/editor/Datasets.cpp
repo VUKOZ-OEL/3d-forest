@@ -24,6 +24,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "Datasets"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 Datasets::Datasets()
@@ -185,22 +186,28 @@ void fromJson(Datasets &out,
               const std::string &projectPath,
               QueryFilterSet &filter)
 {
+    LOG_DEBUG(<< "Open from json. Project path <" << projectPath << ">.");
+
     size_t i;
     size_t n;
 
     i = 0;
     n = in.array().size();
+    LOG_DEBUG(<< "Json contains <" << n << "> datasets.");
     out.datasets_.resize(n);
     out.hashTable_.clear();
 
     for (auto const &it : in.array())
     {
+        LOG_DEBUG(<< "Open dataset number <" << i << ">.");
         fromJson(out.datasets_[i], it, projectPath);
         out.hashTable_[out.datasets_[i].id()] = i;
         out.datasetsIds_.insert(out.datasets_[i].id());
         filter.setFilter(out.datasets_[i].id(), true);
         i++;
     }
+
+    out.updateBoundary();
 }
 
 void toJson(Json &out, const Datasets &in)

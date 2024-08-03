@@ -103,7 +103,7 @@ void Editor::open(const std::string &path, const SettingsImport &settings)
 
 void Editor::openProject(const std::string &path)
 {
-    LOG_DEBUG(<< "Open project path <" << path << ">.");
+    LOG_DEBUG(<< "Open project from path <" << path << ">.");
 
     close();
 
@@ -179,7 +179,7 @@ void Editor::openProject(const std::string &path)
 
 void Editor::saveProject(const std::string &path)
 {
-    LOG_DEBUG(<< "Save project path <" << path << ">.");
+    LOG_DEBUG(<< "Save project to path <" << path << ">.");
 
     Json out;
 
@@ -379,6 +379,11 @@ void Editor::updateAfterRead()
         settingsUnits.setLasFileScaling(datasets_.at(0).scalingFile());
 
         setSettingsUnits(settingsUnits);
+    }
+
+    for (size_t i = 0; i < segments_.size(); i++)
+    {
+        segmentsFilter_.setFilter(segments_[i].id, true);
     }
 
     if (viewports_.size() > 0)
