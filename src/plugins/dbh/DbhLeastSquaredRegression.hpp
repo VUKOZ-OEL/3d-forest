@@ -30,6 +30,7 @@
 class DbhLeastSquaredRegression
 {
 public:
+    /** DBH Least Squared Regression Fitting Circle. */
     class FittingCircle
     {
     public:
@@ -43,6 +44,18 @@ public:
         double g{0.0};
         size_t i{0}; /**< Total number of outer iterations. */
         size_t j{0}; /**< Total number of inner iterations (lambda). */
+
+        /** DBH Least Squared Regression Fitting Circle Result. */
+        enum Result
+        {
+            RESULT_INVALID,
+            RESULT_OK,
+            RESULT_MAX_ITERATIONS_REACHED,
+            RESULT_MAX_INNER_ITERATIONS_REACHED,
+            RESULT_PARAMETER_LIMIT_REACHED
+        };
+
+        Result result{RESULT_INVALID}; /**< Calculation result. */
 
         bool operator<(const FittingCircle &obj) const { return i < obj.i; }
     };
