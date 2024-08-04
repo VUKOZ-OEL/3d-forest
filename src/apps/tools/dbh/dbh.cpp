@@ -60,18 +60,21 @@ int main(int argc, char *argv[])
     {
         DbhParameters p;
 
-        ArgumentParser arg(
-            "calculates DBH (Diameter at Breast Height) for trees");
+        ArgumentParser arg("calculates DBH (Diameter at Breast Height) "
+                           "for trees");
+
         arg.add("-i",
                 "--input",
                 "",
                 "Path to the input file to be processed. Accepted formats "
                 "include .las, and .json project file.",
                 true);
+
         arg.add("-e",
                 "--elevation",
                 toString(p.elevation),
                 "Calculate DBH at given elevation [m]");
+
         arg.add("-t",
                 "--tolerance",
                 toString(p.elevationTolerance),

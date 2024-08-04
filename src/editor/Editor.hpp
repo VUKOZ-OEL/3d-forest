@@ -51,6 +51,7 @@ public:
         TYPE_DATA_SET,
         TYPE_DESCRIPTOR,
         TYPE_ELEVATION,
+        TYPE_INTENSITY,
         TYPE_SEGMENT,
         TYPE_PROJECT_NAME,
         TYPE_SETTINGS,
@@ -68,14 +69,12 @@ public:
     bool hasUnsavedChanges() const { return unsavedChanges_; }
     void close();
 
-    // Classifications.
-    const Classifications &classifications() const { return classifications_; }
-    void setClassifications(const Classifications &classifications);
-    const QueryFilterSet &classificationsFilter() const
-    {
-        return classificationsFilter_;
-    }
-    void setClassificationsFilter(const QueryFilterSet &filter);
+    // Data sets.
+    const Datasets &datasets() const { return datasets_; }
+    Datasets &datasets() { return datasets_; }
+    void setDatasets(const Datasets &datasets);
+    const QueryFilterSet &datasetsFilter() const { return datasetsFilter_; }
+    void setDatasetsFilter(const QueryFilterSet &filter);
 
     // Clip filter.
     const Region &clipFilter() const { return clipFilter_; }
@@ -93,12 +92,18 @@ public:
     const Range<double> &descriptorFilter() const { return descriptorFilter_; }
     void setDescriptorFilter(const Range<double> &descriptorFilter);
 
-    // Data sets.
-    const Datasets &datasets() const { return datasets_; }
-    Datasets &datasets() { return datasets_; }
-    void setDatasets(const Datasets &datasets);
-    const QueryFilterSet &datasetsFilter() const { return datasetsFilter_; }
-    void setDatasetsFilter(const QueryFilterSet &filter);
+    // Intensity.
+    const Range<double> &intensityFilter() const { return intensityFilter_; }
+    void setIntensityFilter(const Range<double> &intensityFilter);
+
+    // Classifications.
+    const Classifications &classifications() const { return classifications_; }
+    void setClassifications(const Classifications &classifications);
+    const QueryFilterSet &classificationsFilter() const
+    {
+        return classificationsFilter_;
+    }
+    void setClassificationsFilter(const QueryFilterSet &filter);
 
     // Segments.
     const Segments &segments() const { return segments_; }
@@ -144,6 +149,7 @@ protected:
     Region clipFilter_;
     Range<double> elevationFilter_;
     Range<double> descriptorFilter_;
+    Range<double> intensityFilter_;
     QueryFilterSet classificationsFilter_;
     QueryFilterSet datasetsFilter_;
     QueryFilterSet segmentsFilter_;

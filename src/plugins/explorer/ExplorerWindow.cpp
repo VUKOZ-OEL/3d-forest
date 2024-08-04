@@ -25,6 +25,7 @@
 #include <ExplorerDescriptorWidget.hpp>
 #include <ExplorerElevationWidget.hpp>
 #include <ExplorerFilesWidget.hpp>
+#include <ExplorerIntensityWidget.hpp>
 #include <ExplorerSegmentsWidget.hpp>
 #include <ExplorerWindow.hpp>
 #include <MainWindow.hpp>
@@ -52,6 +53,10 @@ ExplorerWindow::ExplorerWindow(MainWindow *mainWindow)
     items_.push_back(new ExplorerClassificationsWidget(mainWindow_,
                                                        ICON("classification"),
                                                        tr("Classifications")));
+
+    items_.push_back(new ExplorerIntensityWidget(mainWindow_,
+                                                 ICON("intensity"),
+                                                 tr("Intensity")));
 
     items_.push_back(new ExplorerElevationWidget(mainWindow_,
                                                  ICON("elevation_filter"),

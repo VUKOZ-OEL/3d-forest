@@ -179,6 +179,7 @@ private:
     void queryWhereSphere();
     void queryWhereElevation();
     void queryWhereDescriptor();
+    void queryWhereIntensity();
     void queryWhereClassification();
     void queryWhereSegment();
 

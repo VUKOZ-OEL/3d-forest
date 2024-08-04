@@ -30,6 +30,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "ProjectFilePlugin"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define PROJECT_FILE_PLUGIN_FILTER_PRJ "3DForest Project (*.json)"
@@ -84,14 +85,23 @@ void ProjectFilePlugin::initialize(MainWindow *mainWindow)
 
 void ProjectFilePlugin::slotProjectNew()
 {
-    if (projectClose())
+    LOG_DEBUG(<< "Create new project.");
+
+    // Close the current project.
+    if (!projectClose())
     {
-        mainWindow_->updateEverything();
+        LOG_DEBUG(<< "Cancelled, the current project can not be closed.");
+        return;
     }
+
+    // Update.
+    mainWindow_->updateEverything();
 }
 
 void ProjectFilePlugin::slotProjectOpen()
 {
+    LOG_DEBUG(<< "Open project.");
+
     QString fileName;
 
     fileName = QFileDialog::getOpenFileName(mainWindow_,
@@ -101,6 +111,7 @@ void ProjectFilePlugin::slotProjectOpen()
 
     if (fileName.isEmpty())
     {
+        LOG_DEBUG(<< "Cancelled, the filename is empty.");
         return;
     }
 
@@ -109,11 +120,15 @@ void ProjectFilePlugin::slotProjectOpen()
 
 void ProjectFilePlugin::slotProjectSave()
 {
+    LOG_DEBUG(<< "Save project.");
+
     (void)projectSave();
 }
 
 void ProjectFilePlugin::slotProjectSaveAs()
 {
+    LOG_DEBUG(<< "Save project as.");
+
     QString fileName;
 
     fileName = QFileDialog::getSaveFileName(mainWindow_,
@@ -123,6 +138,7 @@ void ProjectFilePlugin::slotProjectSaveAs()
 
     if (fileName.isEmpty())
     {
+        LOG_DEBUG(<< "Cancelled, the filename is empty.");
         return;
     }
 
@@ -131,9 +147,12 @@ void ProjectFilePlugin::slotProjectSaveAs()
 
 bool ProjectFilePlugin::projectOpen(const QString &path)
 {
+    LOG_DEBUG(<< "Open project <" << path.toStdString() << ">.");
+
     // Close the current project.
     if (!projectClose())
     {
+        LOG_DEBUG(<< "Cancelled, the current project can not be closed.");
         return false;
     }
 
@@ -144,22 +163,29 @@ bool ProjectFilePlugin::projectOpen(const QString &path)
     }
     catch (std::exception &e)
     {
+        LOG_DEBUG(<< "Cancelled, show error <" << e.what() << ">.");
         mainWindow_->showError(e.what());
         return false;
     }
 
     mainWindow_->updateEverything();
 
+    LOG_DEBUG(<< "The project has been opened.");
+
     return true; // Opened
 }
 
 bool ProjectFilePlugin::projectClose()
 {
+    LOG_DEBUG(<< "Close project.");
+
     mainWindow_->suspendThreads();
 
     // Save changes.
     if (mainWindow_->editor().hasUnsavedChanges())
     {
+        LOG_DEBUG(<< "Project has unsaved changes.");
+
         QMessageBox msgBox;
         msgBox.setText("The document has been modified.");
         msgBox.setInformativeText("Do you want to save your changes?");
@@ -190,6 +216,7 @@ bool ProjectFilePlugin::projectClose()
 
         if (canClose == false)
         {
+            LOG_DEBUG(<< "Cancelled, the project should not be closed yet.");
             return false;
         }
     }
@@ -201,14 +228,19 @@ bool ProjectFilePlugin::projectClose()
     }
     catch (std::exception &e)
     {
+        LOG_DEBUG(<< "Cancelled, show error <" << e.what() << ">.");
         mainWindow_->showError(e.what());
     }
+
+    LOG_DEBUG(<< "The project has been closed.");
 
     return true; // Closed.
 }
 
 bool ProjectFilePlugin::projectSave(const QString &path)
 {
+    LOG_DEBUG(<< "Save project to path <" << path.toStdString() << ">.");
+
     std::string writePath;
 
     mainWindow_->suspendThreads();
@@ -216,8 +248,7 @@ bool ProjectFilePlugin::projectSave(const QString &path)
     if (path.isEmpty())
     {
         // Save.
-        writePath = mainWindow_->editor().projectPath();
-        if (writePath.empty())
+        if (mainWindow_->editor().projectPath().empty())
         {
             // First time save.
             QString fileName;
@@ -230,16 +261,24 @@ bool ProjectFilePlugin::projectSave(const QString &path)
 
             if (fileName.isEmpty())
             {
+                LOG_DEBUG(<< "Cancelled, the filename is empty.");
                 return false;
             }
 
             writePath = fileName.toStdString();
+            LOG_DEBUG(<< "Save project to <" << writePath << ">.");
+        }
+        else
+        {
+            writePath = mainWindow_->editor().projectPath();
+            LOG_DEBUG(<< "Save project to <" << writePath << ">.");
         }
     }
     else
     {
         // Save As.
         writePath = path.toStdString();
+        LOG_DEBUG(<< "Save project to <" << writePath << ">.");
     }
 
     // Write.
@@ -249,9 +288,12 @@ bool ProjectFilePlugin::projectSave(const QString &path)
     }
     catch (std::exception &e)
     {
+        LOG_DEBUG(<< "Cancelled, show error <" << e.what() << ">.");
         mainWindow_->showError(e.what());
         return false;
     }
+
+    LOG_DEBUG(<< "The project has been saved to <" << writePath << ">.");
 
     return true; // Saved.
 }

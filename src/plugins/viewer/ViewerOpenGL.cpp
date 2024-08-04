@@ -324,3 +324,34 @@ void ViewerOpenGL::renderCross(const Vector3<float> &p,
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_COLOR_ARRAY);
 }
+
+void ViewerOpenGL::renderCircle(const Vector3<float> &p,
+                                float radius,
+                                size_t pointCount)
+{
+    GLuint pointCountGL = static_cast<GLuint>(pointCount);
+    std::vector<float> xyz;
+    std::vector<GLuint> indices;
+
+    xyz.resize(pointCount * 3);
+    indices.resize(pointCount);
+
+    for (GLuint i = 0; i < pointCountGL; i++)
+    {
+        double angle = (static_cast<double>(i) * 2.0 * 3.14) /
+                       static_cast<double>(pointCountGL);
+
+        xyz[i * 3 + 0] = p[0] + (radius * static_cast<float>(cos(angle)));
+        xyz[i * 3 + 1] = p[1] + (radius * static_cast<float>(sin(angle)));
+        xyz[i * 3 + 2] = p[2];
+
+        indices[i] = i;
+    }
+
+    // Render the vertex array.
+    GLsizei indicesCount = static_cast<GLsizei>(indices.size());
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, static_cast<GLvoid *>(xyz.data()));
+    glDrawElements(GL_LINE_LOOP, indicesCount, GL_UNSIGNED_INT, indices.data());
+    glDisableClientState(GL_VERTEX_ARRAY);
+}

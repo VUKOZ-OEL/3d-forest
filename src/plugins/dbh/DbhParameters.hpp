@@ -31,8 +31,11 @@ class DbhParameters
 public:
     double elevation{1.3};
     double elevationTolerance{0.05};
-    size_t taubinFitIterationsMax{20};
+    size_t taubinFitIterationsMax{20}; // Usually, 4-6 iterations are enough.
     size_t geometricCircleIterationsMax{500};
+    double geometricCircleFactorUp{1.0};
+    double geometricCircleFactorDown{0.004};
+    double geometricCircleParameterLimit{1e6};
 };
 
 inline void toJson(Json &out, const DbhParameters &in)
@@ -42,6 +45,10 @@ inline void toJson(Json &out, const DbhParameters &in)
     toJson(out["taubinFitIterationsMax"], in.taubinFitIterationsMax);
     toJson(out["geometricCircleIterationsMax"],
            in.geometricCircleIterationsMax);
+    toJson(out["geometricCircleFactorUp"], in.geometricCircleFactorUp);
+    toJson(out["geometricCircleFactorDown"], in.geometricCircleFactorDown);
+    toJson(out["geometricCircleParameterLimit"],
+           in.geometricCircleParameterLimit);
 }
 
 inline std::string toString(const DbhParameters &in)

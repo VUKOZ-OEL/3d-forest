@@ -86,6 +86,8 @@ void Dataset::read(size_t id,
 
 void fromJson(Dataset &out, const Json &in, const std::string &projectPath)
 {
+    LOG_DEBUG(<< "Open from json. Project path <" << projectPath << ">.");
+
     if (!in.isObject())
     {
         THROW("Data set is not JSON object");
@@ -133,10 +135,10 @@ void fromJson(Dataset &out, const Json &in, const std::string &projectPath)
         fromJson(out.translation_, in["translation"]);
     }
 
-    if (in.contains("scaling"))
-    {
-        fromJson(out.scaling_, in["scaling"]);
-    }
+    // if (in.contains("scaling"))
+    // {
+    //     fromJson(out.scaling_, in["scaling"]);
+    // }
 
     out.updateBoundary();
 }

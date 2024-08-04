@@ -77,6 +77,7 @@ void Editor::close()
     clipFilter_.clear();
     elevationFilter_.clear();
     descriptorFilter_.set(0.0, 1.0);
+    intensityFilter_.set(0.0, 1.0);
 
     unsavedChanges_ = false;
 }
@@ -102,7 +103,7 @@ void Editor::open(const std::string &path, const SettingsImport &settings)
 
 void Editor::openProject(const std::string &path)
 {
-    LOG_DEBUG(<< "Open project path <" << path << ">.");
+    LOG_DEBUG(<< "Open project from path <" << path << ">.");
 
     close();
 
@@ -178,7 +179,7 @@ void Editor::openProject(const std::string &path)
 
 void Editor::saveProject(const std::string &path)
 {
-    LOG_DEBUG(<< "Save project path <" << path << ">.");
+    LOG_DEBUG(<< "Save project to path <" << path << ">.");
 
     Json out;
 
@@ -312,6 +313,20 @@ void Editor::setDescriptorFilter(const Range<double> &descriptorFilter)
     // unsavedChanges_ = true;
 }
 
+void Editor::setIntensityFilter(const Range<double> &intensityFilter)
+{
+    LOG_DEBUG(<< "Set intensity filter <" << intensityFilter << ">.");
+    intensityFilter_ = intensityFilter;
+
+    if (viewports_.size() > 0)
+    {
+        viewports_.where().setIntensity(intensityFilter_);
+        viewports_.applyWhereToAll();
+    }
+
+    // unsavedChanges_ = true;
+}
+
 void Editor::setDatasets(const Datasets &datasets)
 {
     LOG_DEBUG(<< "Set datasets.");
@@ -366,13 +381,19 @@ void Editor::updateAfterRead()
         setSettingsUnits(settingsUnits);
     }
 
+    for (size_t i = 0; i < segments_.size(); i++)
+    {
+        segmentsFilter_.setFilter(segments_[i].id, true);
+    }
+
     if (viewports_.size() > 0)
     {
         viewports_.where().setDataset(datasetsFilter_);
-        viewports_.where().setClassification(classificationsFilter_);
         viewports_.where().setRegion(clipFilter_);
         viewports_.where().setElevation(elevationFilter_);
         viewports_.where().setDescriptor(descriptorFilter_);
+        viewports_.where().setIntensity(intensityFilter_);
+        viewports_.where().setClassification(classificationsFilter_);
         viewports_.where().setSegment(segmentsFilter_);
 
         viewports_.applyWhereToAll();

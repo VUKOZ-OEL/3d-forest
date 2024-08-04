@@ -21,6 +21,7 @@ add_executable(
     ${SUB_PROJECT_NAME}
     dbh.cpp
     ../../../plugins/dbh/DbhAction.cpp
+    ../../../plugins/dbh/DbhLeastSquaredRegression.cpp
 )
 
 target_include_directories(
