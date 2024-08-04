@@ -24,6 +24,7 @@
 
 // Include 3D Forest.
 #include <Segment.hpp>
+class MainWindow;
 
 // Include Qt.
 #include <QWidget>
@@ -35,18 +36,22 @@ class ExplorerSegmentWidget : public QWidget
     Q_OBJECT
 
 public:
-    ExplorerSegmentWidget(QWidget *parent = nullptr);
+    ExplorerSegmentWidget(MainWindow *mainWindow);
 
     void setSegment(const Segment &segment);
     void clear();
 
 protected:
+    MainWindow *mainWindow_;
     QTableWidget *table_;
     Segment segment_;
 
     void setRow(int row, const std::string &key, const std::string &value);
     void setRow(int row, const std::string &key, const Vector3<double> &value);
-    void setRow(int row, const std::string &key, double value);
+    void setRow(int row,
+                const std::string &key,
+                double value,
+                const std::string &comment = "");
 };
 
 #endif /* EXPLORER_SEGMENT_WIDGET_HPP */

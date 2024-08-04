@@ -122,7 +122,7 @@ ExplorerSegmentsWidget::ExplorerSegmentsWidget(MainWindow *mainWindow,
     toolBar->setIconSize(QSize(MainWindow::ICON_SIZE, MainWindow::ICON_SIZE));
 
     // Segment.
-    segmentWidget_ = new ExplorerSegmentWidget;
+    segmentWidget_ = new ExplorerSegmentWidget(mainWindow_);
 
     // Splitter.
     splitter_ = new QSplitter;

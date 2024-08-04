@@ -21,6 +21,7 @@
 
 // Include 3D Forest.
 #include <ExplorerSegmentWidget.hpp>
+#include <MainWindow.hpp>
 
 // Include Qt.
 #include <QTableWidget>
@@ -31,7 +32,9 @@
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-ExplorerSegmentWidget::ExplorerSegmentWidget(QWidget *parent) : QWidget(parent)
+ExplorerSegmentWidget::ExplorerSegmentWidget(MainWindow *mainWindow)
+    : QWidget(mainWindow),
+      mainWindow_(mainWindow)
 {
     LOG_DEBUG(<< "Create.");
 
@@ -61,12 +64,14 @@ void ExplorerSegmentWidget::setSegment(const Segment &segment)
     table_->setColumnCount(2);
     table_->setHorizontalHeaderLabels({"Property", "Value"});
 
+    double ppm = mainWindow_->editor().settings().units.pointsPerMeter()[0];
+
     setRow(0, "label", segment_.label);
-    setRow(1, "x", segment_.position[0]);
-    setRow(2, "y", segment_.position[1]);
-    setRow(3, "z", segment_.position[2]);
-    setRow(4, "height", segment_.height);
-    setRow(5, "radius", segment_.radius);
+    setRow(1, "x", segment_.position[0] / ppm, "m");
+    setRow(2, "y", segment_.position[1] / ppm, "m");
+    setRow(3, "z", segment_.position[2] / ppm, "m");
+    setRow(4, "height", segment_.height / ppm, "m");
+    setRow(5, "radius", segment_.radius / ppm, "m");
 }
 
 void ExplorerSegmentWidget::clear()
@@ -87,11 +92,20 @@ void ExplorerSegmentWidget::setRow(int row,
 
 void ExplorerSegmentWidget::setRow(int row,
                                    const std::string &key,
-                                   double value)
+                                   double value,
+                                   const std::string &comment)
 {
+    QString valueText;
+    if (comment.empty())
+    {
+        valueText = QString::fromStdString(std::to_string(value));
+    }
+    else
+    {
+        valueText =
+            QString::fromStdString(std::to_string(value) + " " + comment);
+    }
+
     table_->setItem(row, 0, new QTableWidgetItem(QString::fromStdString(key)));
-    table_->setItem(
-        row,
-        1,
-        new QTableWidgetItem(QString::fromStdString(std::to_string(value))));
+    table_->setItem(row, 1, new QTableWidgetItem(valueText));
 }
