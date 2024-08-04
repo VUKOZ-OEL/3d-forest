@@ -144,7 +144,7 @@ void DbhAction::stepPointsToGroups()
         }
     }
 
-    dumpGroups();
+    // dumpGroups();
 
     // Next Step.
     if (groups_.size() > 0)

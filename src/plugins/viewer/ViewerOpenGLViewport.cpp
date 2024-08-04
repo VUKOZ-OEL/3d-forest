@@ -367,9 +367,9 @@ void ViewerOpenGLViewport::renderSegments()
             ViewerOpenGL::renderAabb(boundary);
 
             Vector3<float> p(segment.position);
-            // Vector3<float> d(segment.boundary.length());
-            Vector3<float> color{1.0F, 1.0F, 0.0F};
-            ViewerOpenGL::renderCross(p, boundary, color);
+            float radius = static_cast<float>(segment.radius);
+            glColor3f(1.0F, 1.0F, 0.0F);
+            ViewerOpenGL::renderCircle(p, radius * 1.0F);
         }
 
         // Render segment meshes.

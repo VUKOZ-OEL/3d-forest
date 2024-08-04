@@ -70,6 +70,9 @@ public:
     static void renderCross(const Vector3<float> &p,
                             const ViewerAabb &box,
                             const Vector3<float> &color);
+    static void renderCircle(const Vector3<float> &p,
+                             float radius,
+                             size_t pointCount = 16);
 
 protected:
 };

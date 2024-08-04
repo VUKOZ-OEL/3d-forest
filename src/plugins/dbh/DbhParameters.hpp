@@ -45,6 +45,10 @@ inline void toJson(Json &out, const DbhParameters &in)
     toJson(out["taubinFitIterationsMax"], in.taubinFitIterationsMax);
     toJson(out["geometricCircleIterationsMax"],
            in.geometricCircleIterationsMax);
+    toJson(out["geometricCircleFactorUp"], in.geometricCircleFactorUp);
+    toJson(out["geometricCircleFactorDown"], in.geometricCircleFactorDown);
+    toJson(out["geometricCircleParameterLimit"],
+           in.geometricCircleParameterLimit);
 }
 
 inline std::string toString(const DbhParameters &in)
