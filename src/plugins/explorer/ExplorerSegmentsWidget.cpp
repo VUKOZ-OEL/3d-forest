@@ -156,7 +156,8 @@ void ExplorerSegmentsWidget::slotUpdate(void *sender,
         return;
     }
 
-    if (target.empty() || target.contains(Editor::TYPE_SEGMENT))
+    if (target.empty() || target.contains(Editor::TYPE_SEGMENT) ||
+        target.contains(Editor::TYPE_SETTINGS))
     {
         setSegments(mainWindow_->editor().segments(),
                     mainWindow_->editor().segmentsFilter());
