@@ -71,7 +71,7 @@ void ExplorerSegmentWidget::setSegment(const Segment &segment)
     setRow(2, "y", segment_.position[1] / ppm, "m");
     setRow(3, "z", segment_.position[2] / ppm, "m");
     setRow(4, "height", segment_.height / ppm, "m");
-    setRow(5, "radius", segment_.radius / ppm, "m");
+    setRow(5, "DBH", (segment_.radius * 2.0) / ppm, "m");
 }
 
 void ExplorerSegmentWidget::clear()
