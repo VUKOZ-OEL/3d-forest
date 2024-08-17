@@ -222,7 +222,7 @@ void DbhAction::stepUpdateSegments()
         segment.position.set(it.second.center[0],
                              it.second.center[1],
                              it.second.center[2]);
-        segment.radius = it.second.radius;
+        segment.dbh = it.second.radius * 2.0;
     }
 
     // Set new segments to editor.

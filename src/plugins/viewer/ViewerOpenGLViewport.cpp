@@ -367,7 +367,7 @@ void ViewerOpenGLViewport::renderSegments()
             ViewerOpenGL::renderAabb(boundary);
 
             Vector3<float> p(segment.position);
-            float radius = static_cast<float>(segment.radius);
+            float radius = static_cast<float>(segment.dbh) * 0.5F;
             glColor3f(1.0F, 1.0F, 0.0F);
             ViewerOpenGL::renderCircle(p, radius * 1.0F);
         }

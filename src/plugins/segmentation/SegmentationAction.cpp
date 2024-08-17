@@ -582,9 +582,6 @@ void SegmentationAction::createSegmentFromGroup(size_t segmentId,
 
     segment.boundary = group.boundary;
     segment.height = segment.boundary.length(2);
-
-    segment.radius =
-        0.5 * max(segment.boundary.length(0), segment.boundary.length(1));
 }
 
 void SegmentationAction::stepVoxelsToPoints()
