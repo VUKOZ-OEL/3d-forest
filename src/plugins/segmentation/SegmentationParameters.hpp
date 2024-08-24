@@ -39,8 +39,8 @@ public:
 
     double voxelRadius{0.1};
     double woodThresholdMin{25.0};
-    double searchRadiusForTrunkPoints{0.25};
-    double searchRadiusForLeafPoints{0.25};
+    double searchRadiusTrunkPoints{0.25};
+    double searchRadiusLeafPoints{0.25};
     double treeBaseElevationMin{0.1};
     double treeBaseElevationMax{2.0};
     double treeHeightMin{1.0};
@@ -66,8 +66,8 @@ inline void toJson(Json &out, const SegmentationParameters &in)
 
     toJson(out["voxelRadius"], in.voxelRadius);
     toJson(out["woodThresholdMin"], in.woodThresholdMin);
-    toJson(out["searchRadiusForTrunkPoints"], in.searchRadiusForTrunkPoints);
-    toJson(out["searchRadiusForLeafPoints"], in.searchRadiusForLeafPoints);
+    toJson(out["searchRadiusTrunkPoints"], in.searchRadiusTrunkPoints);
+    toJson(out["searchRadiusLeafPoints"], in.searchRadiusLeafPoints);
     toJson(out["treeBaseElevationMin"], in.treeBaseElevationMin);
     toJson(out["treeBaseElevationMax"], in.treeBaseElevationMax);
     toJson(out["treeHeightMin"], in.treeHeightMin);

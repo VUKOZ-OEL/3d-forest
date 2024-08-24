@@ -42,15 +42,15 @@ int main(int argc, char *argv[])
     try
     {
         ArgumentParser arg("format icons");
-        arg.add("-i",
-                "--input",
+        arg.add("-d",
+                "--directory",
                 "",
                 "Path to directory with icons to be processed.",
                 true);
 
         if (arg.parse(argc, argv))
         {
-            QString path = QString::fromStdString(arg.toString("--input"));
+            QString path = QString::fromStdString(arg.toString("--directory"));
 
             QDir searchDirectory(path);
             QStringList fileList = searchDirectory.entryList(QDir::Files);

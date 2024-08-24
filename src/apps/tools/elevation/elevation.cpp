@@ -89,8 +89,8 @@ int main(int argc, char *argv[])
     try
     {
         ArgumentParser arg("computes elevation of points above ground");
-        arg.add("-i",
-                "--input",
+        arg.add("-f",
+                "--file",
                 "",
                 "Path to the input file to be processed. Accepted formats "
                 "include .las, and .json project file.",
@@ -105,11 +105,11 @@ int main(int argc, char *argv[])
         {
             if (arg.contains("--print"))
             {
-                elevationPrint(arg.toString("--input"));
+                elevationPrint(arg.toString("--file"));
             }
             else
             {
-                elevationCompute(arg.toString("--input"),
+                elevationCompute(arg.toString("--file"),
                                  arg.toDouble("--voxel"));
             }
         }

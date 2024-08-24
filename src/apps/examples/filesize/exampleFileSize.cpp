@@ -59,15 +59,15 @@ int main(int argc, char *argv[])
     try
     {
         ArgumentParser arg("file size example");
-        arg.add("-i",
-                "--input",
+        arg.add("-f",
+                "--file",
                 "",
                 "Path to the input file to be processed.",
                 true);
 
         if (arg.parse(argc, argv))
         {
-            exampleFileSize(arg.toString("--input"));
+            exampleFileSize(arg.toString("--file"));
         }
     }
     catch (std::exception &e)

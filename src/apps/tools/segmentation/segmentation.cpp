@@ -79,12 +79,12 @@ int main(int argc, char *argv[])
                 "descriptor",
                 "Leaf-to-wood channel {descriptor,intensity}");
         arg.add("-t",
-                "--trunk-radius",
-                toString(p.searchRadiusForTrunkPoints),
+                "--trunk-search-radius",
+                toString(p.searchRadiusTrunkPoints),
                 "Maximal distance to connect trunk points [m]");
         arg.add("-l",
-                "--leaf-radius",
-                toString(p.searchRadiusForLeafPoints),
+                "--leaf-search-radius",
+                toString(p.searchRadiusLeafPoints),
                 "Maximal distance to connect leaf points [m]");
         arg.add("-e",
                 "--elevation-min",
@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
                 toString(p.treeBaseElevationMax),
                 "Look for tree base in elevation range - maximum [m]");
         arg.add("-H",
-                "--tree-height",
+                "--tree-height-min",
                 toString(p.treeHeightMin),
                 "Minimal height of tree [m]");
         arg.add("-z",
@@ -126,11 +126,11 @@ int main(int argc, char *argv[])
 
             p.voxelRadius = arg.toDouble("--voxel");
             p.woodThresholdMin = arg.toDouble("--wood");
-            p.searchRadiusForTrunkPoints = arg.toDouble("--trunk-radius");
-            p.searchRadiusForLeafPoints = arg.toDouble("--leaf-radius");
+            p.searchRadiusTrunkPoints = arg.toDouble("--trunk-search-radius");
+            p.searchRadiusLeafPoints = arg.toDouble("--leaf-search-radius");
             p.treeBaseElevationMin = arg.toDouble("--elevation-min");
             p.treeBaseElevationMax = arg.toDouble("--elevation-max");
-            p.treeHeightMin = arg.toDouble("--tree-height");
+            p.treeHeightMin = arg.toDouble("--tree-height-min");
             p.zCoordinatesAsElevation = arg.toBool("--z-elevation");
             p.segmentOnlyTrunks = arg.toBool("--trunks");
 

@@ -120,7 +120,7 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
                                0.01,
                                0.01,
                                1.0,
-                               parameters_.searchRadiusForTrunkPoints);
+                               parameters_.searchRadiusTrunkPoints);
 
     DoubleSliderWidget::create(searchRadiusForLeafPointsSlider_,
                                this,
@@ -133,7 +133,7 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
                                0.01,
                                0.01,
                                1.0,
-                               parameters_.searchRadiusForLeafPoints);
+                               parameters_.searchRadiusLeafPoints);
 
     // Tree.
     DoubleRangeSliderWidget::create(
@@ -239,9 +239,9 @@ void SegmentationWidget::slotApply()
 
     parameters_.voxelRadius = voxelRadiusSlider_->value();
     parameters_.woodThresholdMin = woodThresholdMinMinSlider_->value();
-    parameters_.searchRadiusForTrunkPoints =
+    parameters_.searchRadiusTrunkPoints =
         searchRadiusForTrunkPointsSlider_->value();
-    parameters_.searchRadiusForLeafPoints =
+    parameters_.searchRadiusLeafPoints =
         searchRadiusForLeafPointsSlider_->value();
     parameters_.treeBaseElevationMin = treeBaseElevationSlider_->minimumValue();
     parameters_.treeBaseElevationMax = treeBaseElevationSlider_->maximumValue();

@@ -61,8 +61,8 @@ int main(int argc, char *argv[])
         ClassificationParameters p;
 
         ArgumentParser arg("classifies ground points");
-        arg.add("-i",
-                "--input",
+        arg.add("-f",
+                "--file",
                 "",
                 "Path to the input file to be processed. Accepted formats "
                 "include .las, and .json project file.",
@@ -71,16 +71,16 @@ int main(int argc, char *argv[])
         arg.add("-r",
                 "--search-radius",
                 toString(p.searchRadius),
-                "Neighborhood search radius [m]");
+                "Point neighborhood search radius [m]");
         arg.add("-a",
                 "--angle",
                 toString(p.angle),
                 "Maximum ground angle [deg]");
-        arg.add("-c",
-                "--clean",
+        arg.add("-g",
+                "--clean-ground",
                 toString(p.cleanGroundClassifications),
                 "Clean ground classifications at start {true, false}");
-        arg.add("-ca",
+        arg.add("-c",
                 "--clean-all",
                 toString(p.cleanAllClassifications),
                 "Clean all classifications at start {true, false}");
@@ -90,10 +90,10 @@ int main(int argc, char *argv[])
             p.voxelRadius = arg.toDouble("--voxel");
             p.searchRadius = arg.toDouble("--search-radius");
             p.angle = arg.toDouble("--angle");
-            p.cleanGroundClassifications = arg.toBool("--clean");
+            p.cleanGroundClassifications = arg.toBool("--clean-ground");
             p.cleanAllClassifications = arg.toBool("--clean-all");
 
-            classificationCompute(arg.toString("--input"), p);
+            classificationCompute(arg.toString("--file"), p);
         }
 
         rc = 0;

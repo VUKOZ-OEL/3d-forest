@@ -87,8 +87,8 @@ void SegmentationAction::start(const SegmentationParameters &parameters)
 
     parameters_.voxelRadius *= ppm;
     parameters_.woodThresholdMin *= 0.01; // %
-    parameters_.searchRadiusForTrunkPoints *= ppm;
-    parameters_.searchRadiusForLeafPoints *= ppm;
+    parameters_.searchRadiusTrunkPoints *= ppm;
+    parameters_.searchRadiusLeafPoints *= ppm;
     parameters_.treeBaseElevationMin *= ppm;
     parameters_.treeBaseElevationMax *= ppm;
     parameters_.treeHeightMin *= ppm;
@@ -331,7 +331,7 @@ void SegmentationAction::stepCreateTrunks()
                 voxels_.findRadius(a.x,
                                    a.y,
                                    a.z,
-                                   parameters_.searchRadiusForTrunkPoints,
+                                   parameters_.searchRadiusTrunkPoints,
                                    search_);
                 for (size_t j = 0; j < search_.size(); j++)
                 {
@@ -705,7 +705,7 @@ void SegmentationAction::findNearestNeighbor(Point &a)
     voxels_.findRadius(a.x,
                        a.y,
                        a.z,
-                       parameters_.searchRadiusForLeafPoints,
+                       parameters_.searchRadiusLeafPoints,
                        search_);
 
     for (size_t j = 0; j < search_.size(); j++)
