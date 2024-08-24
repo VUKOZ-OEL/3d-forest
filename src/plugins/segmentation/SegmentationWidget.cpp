@@ -93,15 +93,17 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
     }
 
     QGroupBox *trunkDescriptorChannelGroupBox =
-        new QGroupBox(tr("Leaf-to-wood channel"));
+        new QGroupBox(tr("Leaf-to-wood gradient channel"));
     trunkDescriptorChannelGroupBox->setLayout(trunkDescriptorChannelVBoxLayout);
 
     DoubleSliderWidget::create(woodThresholdMinMinSlider_,
                                this,
                                nullptr,
                                nullptr,
-                               tr("Minimal leaf-to-wood threshold value"),
-                               tr("Minimal leaf-to-wood threshold value"),
+                               tr("Minimal leaf-to-wood gradient threshold"
+                                  " value"),
+                               tr("Minimal leaf-to-wood gradient threshold"
+                                  " value"),
                                tr("%"),
                                1.0,
                                0,
@@ -146,7 +148,7 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
            "trees by ground wood."),
         tr("m"),
         0.01,
-        0.01,
+        0.0,
         10.0,
         parameters_.treeBaseElevationMin,
         parameters_.treeBaseElevationMax);

@@ -41,7 +41,7 @@ public:
     double woodThresholdMin{25.0};
     double searchRadiusTrunkPoints{0.25};
     double searchRadiusLeafPoints{0.25};
-    double treeBaseElevationMin{0.1};
+    double treeBaseElevationMin{0.0};
     double treeBaseElevationMax{2.0};
     double treeHeightMin{1.0};
 

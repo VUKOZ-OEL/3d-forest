@@ -237,6 +237,7 @@ void SegmentationAction::stepPointsToVoxels()
     {
         // If point index to voxel is none:
         if (query_.voxel() == SIZE_MAX &&
+            query_.classification() != LasFile::CLASS_GROUND &&
             (parameters_.zCoordinatesAsElevation ||
              !(query_.elevation() < parameters_.treeBaseElevationMin)))
         {
@@ -383,13 +384,15 @@ void SegmentationAction::stepCreateTrunks()
         }
     }
 
-    progress_.setMaximumStep(voxels_.size(), 10);
-    progress_.setValueSteps(SEGMENTATION_STEP_CREATE_BRANCHES);
-
     if (parameters_.segmentOnlyTrunks)
     {
         progress_.setMaximumStep();
         progress_.setValueSteps(SEGMENTATION_STEP_CREATE_SEGMENTS);
+    }
+    else
+    {
+        progress_.setMaximumStep(voxels_.size(), 10);
+        progress_.setValueSteps(SEGMENTATION_STEP_CREATE_BRANCHES);
     }
 }
 
@@ -650,6 +653,11 @@ void SegmentationAction::createVoxel()
 
     while (queryPoint_.next())
     {
+        if (query_.classification() == LasFile::CLASS_GROUND)
+        {
+            return;
+        }
+
         p.x += queryPoint_.x();
         p.y += queryPoint_.y();
         p.z += queryPoint_.z();

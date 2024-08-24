@@ -73,11 +73,11 @@ int main(int argc, char *argv[])
         arg.add("-w",
                 "--wood",
                 toString(p.woodThresholdMin),
-                "Minimal leaf-to-wood threshold value [%]");
+                "Minimal leaf-to-wood gradient threshold value [%]");
         arg.add("-c",
                 "--wood-channel",
-                "descriptor",
-                "Leaf-to-wood channel {descriptor,intensity}");
+                "intensity",
+                "Leaf-to-wood gradient channel {descriptor,intensity}");
         arg.add("-t",
                 "--trunk-search-radius",
                 toString(p.searchRadiusTrunkPoints),
