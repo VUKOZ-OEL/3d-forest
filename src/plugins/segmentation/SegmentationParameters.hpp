@@ -35,13 +35,13 @@ public:
         CHANNEL_INTENSITY
     };
 
-    Channel trunkDescriptorChannel{CHANNEL_DESCRIPTOR};
+    Channel leafToWoodChannel{CHANNEL_INTENSITY};
 
     double voxelRadius{0.1};
-    double trunkDescriptorMin{25.0};
+    double woodThresholdMin{25.0};
     double searchRadiusForTrunkPoints{0.25};
     double searchRadiusForLeafPoints{0.25};
-    double treeBaseElevationMin{1.0};
+    double treeBaseElevationMin{0.1};
     double treeBaseElevationMax{2.0};
     double treeHeightMin{1.0};
 
@@ -51,22 +51,21 @@ public:
 
 inline void toJson(Json &out, const SegmentationParameters &in)
 {
-    if (in.trunkDescriptorChannel == SegmentationParameters::CHANNEL_DESCRIPTOR)
+    if (in.leafToWoodChannel == SegmentationParameters::CHANNEL_DESCRIPTOR)
     {
-        toJson(out["trunkDescriptorChannel"], std::string("descriptor"));
+        toJson(out["leafToWoodChannel"], std::string("descriptor"));
     }
-    else if (in.trunkDescriptorChannel ==
-             SegmentationParameters::CHANNEL_INTENSITY)
+    else if (in.leafToWoodChannel == SegmentationParameters::CHANNEL_INTENSITY)
     {
-        toJson(out["trunkDescriptorChannel"], std::string("intensity"));
+        toJson(out["leafToWoodChannel"], std::string("intensity"));
     }
     else
     {
-        THROW("SegmentationParameters trunkDescriptorChannel not implemented.");
+        THROW("SegmentationParameters leafToWoodChannel not implemented.");
     }
 
     toJson(out["voxelRadius"], in.voxelRadius);
-    toJson(out["trunkDescriptorMin"], in.trunkDescriptorMin);
+    toJson(out["woodThresholdMin"], in.woodThresholdMin);
     toJson(out["searchRadiusForTrunkPoints"], in.searchRadiusForTrunkPoints);
     toJson(out["searchRadiusForLeafPoints"], in.searchRadiusForLeafPoints);
     toJson(out["treeBaseElevationMin"], in.treeBaseElevationMin);

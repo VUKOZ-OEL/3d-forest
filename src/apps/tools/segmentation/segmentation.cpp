@@ -63,61 +63,60 @@ int main(int argc, char *argv[])
         SegmentationParameters p;
 
         ArgumentParser arg("computes point segmentation to trees");
-        arg.add("-i",
-                "--input",
+        arg.add("-f",
+                "--file",
                 "",
                 "Path to the input file to be processed. Accepted formats "
-                "include .las, and .json project file.",
+                "include .las, and .json project file",
                 true);
         arg.add("-v", "--voxel", toString(p.voxelRadius), "Voxel radius [m]");
-        arg.add("-d",
-                "--descriptor",
-                toString(p.trunkDescriptorMin),
-                "Minimal descriptor value for wood [%]");
-        arg.add("-ch",
-                "--descriptor-channel",
+        arg.add("-w",
+                "--wood",
+                toString(p.woodThresholdMin),
+                "Minimal leaf-to-wood threshold value [%]");
+        arg.add("-c",
+                "--wood-channel",
                 "descriptor",
-                "Descriptor channel {descriptor,intensity}");
-        arg.add("-tr",
+                "Leaf-to-wood channel {descriptor,intensity}");
+        arg.add("-t",
                 "--trunk-radius",
                 toString(p.searchRadiusForTrunkPoints),
                 "Maximal distance to connect trunk points [m]");
-        arg.add("-lr",
+        arg.add("-l",
                 "--leaf-radius",
                 toString(p.searchRadiusForLeafPoints),
                 "Maximal distance to connect leaf points [m]");
-        arg.add("-e1",
+        arg.add("-e",
                 "--elevation-min",
                 toString(p.treeBaseElevationMin),
                 "Look for tree base in elevation range - minimum [m]");
-        arg.add("-e2",
+        arg.add("-E",
                 "--elevation-max",
                 toString(p.treeBaseElevationMax),
                 "Look for tree base in elevation range - maximum [m]");
-        arg.add("-th",
+        arg.add("-H",
                 "--tree-height",
                 toString(p.treeHeightMin),
                 "Minimal height of tree [m]");
         arg.add("-z",
                 "--z-elevation",
                 toString(p.zCoordinatesAsElevation),
-                "Use z-coordinates instead of  ground elevation {true, false}");
-        arg.add("-t",
+                "Use z-coordinates instead of ground elevation {true, false}");
+        arg.add("-s",
                 "--trunks",
                 toString(p.segmentOnlyTrunks),
                 "Segment only trunks (fast preview) {true, false}");
 
         if (arg.parse(argc, argv))
         {
-            if (arg.toString("--descriptor-channel") == "descriptor")
+            if (arg.toString("--wood-channel") == "descriptor")
             {
-                p.trunkDescriptorChannel =
+                p.leafToWoodChannel =
                     SegmentationParameters::CHANNEL_DESCRIPTOR;
             }
-            else if (arg.toString("--descriptor-channel") == "intensity")
+            else if (arg.toString("--wood-channel") == "intensity")
             {
-                p.trunkDescriptorChannel =
-                    SegmentationParameters::CHANNEL_INTENSITY;
+                p.leafToWoodChannel = SegmentationParameters::CHANNEL_INTENSITY;
             }
             else
             {
@@ -126,7 +125,7 @@ int main(int argc, char *argv[])
             }
 
             p.voxelRadius = arg.toDouble("--voxel");
-            p.trunkDescriptorMin = arg.toDouble("--descriptor");
+            p.woodThresholdMin = arg.toDouble("--wood");
             p.searchRadiusForTrunkPoints = arg.toDouble("--trunk-radius");
             p.searchRadiusForLeafPoints = arg.toDouble("--leaf-radius");
             p.treeBaseElevationMin = arg.toDouble("--elevation-min");
@@ -135,7 +134,7 @@ int main(int argc, char *argv[])
             p.zCoordinatesAsElevation = arg.toBool("--z-elevation");
             p.segmentOnlyTrunks = arg.toBool("--trunks");
 
-            segmentationCompute(arg.toString("--input"), p);
+            segmentationCompute(arg.toString("--file"), p);
         }
 
         rc = 0;
