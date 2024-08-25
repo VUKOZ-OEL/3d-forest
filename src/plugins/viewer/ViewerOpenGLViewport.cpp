@@ -210,8 +210,8 @@ void ViewerOpenGLViewport::initializeGL()
 
 void ViewerOpenGLViewport::paintGL()
 {
-    LOG_TRACE_UNKNOWN(<< "Paint width <" << camera_.width() << "> height <"
-                      << camera_.height() << ">.");
+    LOG_TRACE_RENDER(<< "Paint width <" << camera_.width() << "> height <"
+                     << camera_.height() << ">.");
 
     // Setup camera.
     glViewport(0, 0, camera_.width(), camera_.height());
@@ -277,7 +277,7 @@ bool ViewerOpenGLViewport::renderScene()
 
     bool firstFrame = false;
 
-    editor_->lock();
+    editor_->lock("ViewerOpenGLViewport renderScene");
 
     renderSceneSettingsEnable();
 
@@ -291,8 +291,8 @@ bool ViewerOpenGLViewport::renderScene()
         firstFrame = true;
     }
 
-    LOG_TRACE_UNKNOWN(<< "Render viewport <" << viewportId_ << "> pageSize <"
-                      << pageSize << ">.");
+    LOG_TRACE_RENDER(<< "Render viewport <" << viewportId_ << "> pageSize <"
+                     << pageSize << ">.");
 
     for (size_t pageIndex = 0; pageIndex < pageSize; pageIndex++)
     {
@@ -300,7 +300,7 @@ bool ViewerOpenGLViewport::renderScene()
 
         if (page.state() == Page::STATE_RENDER)
         {
-            LOG_TRACE_UNKNOWN(<< "Render pageId <" << page.pageId() << ">.");
+            LOG_TRACE_RENDER(<< "Render pageId <" << page.pageId() << ">.");
 
             if (pageIndex == 0)
             {
@@ -335,7 +335,7 @@ bool ViewerOpenGLViewport::renderScene()
         renderFirstFrame();
     }
 
-    editor_->unlock();
+    editor_->unlock("ViewerOpenGLViewport renderScene");
 
     return firstFrame;
 }
@@ -367,7 +367,7 @@ void ViewerOpenGLViewport::renderSegments()
             ViewerOpenGL::renderAabb(boundary);
 
             Vector3<float> p(segment.position);
-            float radius = static_cast<float>(segment.radius);
+            float radius = static_cast<float>(segment.dbh) * 0.5F;
             glColor3f(1.0F, 1.0F, 0.0F);
             ViewerOpenGL::renderCircle(p, radius * 1.0F);
         }

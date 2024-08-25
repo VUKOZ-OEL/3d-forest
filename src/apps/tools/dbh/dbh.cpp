@@ -63,8 +63,8 @@ int main(int argc, char *argv[])
         ArgumentParser arg("calculates DBH (Diameter at Breast Height) "
                            "for trees");
 
-        arg.add("-i",
-                "--input",
+        arg.add("-f",
+                "--file",
                 "",
                 "Path to the input file to be processed. Accepted formats "
                 "include .las, and .json project file.",
@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
             p.elevation = arg.toDouble("--elevation");
             p.elevationTolerance = arg.toDouble("--tolerance");
 
-            dbhCompute(arg.toString("--input"), p);
+            dbhCompute(arg.toString("--file"), p);
         }
 
         rc = 0;

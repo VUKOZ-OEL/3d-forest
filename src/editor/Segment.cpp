@@ -41,7 +41,7 @@ void fromJson(Segment &out, const Json &in)
     fromJson(out.boundary, in["boundary"]);
 
     fromJson(out.height, in["height"]);
-    fromJson(out.radius, in["radius"]);
+    fromJson(out.dbh, in["dbh"]);
 }
 
 void toJson(Json &out, const Segment &in)
@@ -54,7 +54,7 @@ void toJson(Json &out, const Segment &in)
     toJson(out["boundary"], in.boundary);
 
     toJson(out["height"], in.height);
-    toJson(out["radius"], in.radius);
+    toJson(out["dbh"], in.dbh);
 }
 
 std::ostream &operator<<(std::ostream &out, const Segment &in)

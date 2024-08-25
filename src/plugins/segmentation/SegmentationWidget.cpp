@@ -67,48 +67,48 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
         parameters_.voxelRadius);
 
     // Descriptor.
-    trunkDescriptorChannelRadioButton_.push_back(
-        new QRadioButton(tr("descriptor")));
-    trunkDescriptorChannelRadioButton_.push_back(
-        new QRadioButton(tr("intensity")));
+    leafToWoodChannelRadioButton_.push_back(new QRadioButton(tr("descriptor")));
+    leafToWoodChannelRadioButton_.push_back(new QRadioButton(tr("intensity")));
 
-    if (parameters_.trunkDescriptorChannel ==
+    if (parameters_.leafToWoodChannel ==
         SegmentationParameters::CHANNEL_DESCRIPTOR)
     {
-        trunkDescriptorChannelRadioButton_[0]->setChecked(true);
+        leafToWoodChannelRadioButton_[0]->setChecked(true);
     }
-    else if (parameters_.trunkDescriptorChannel ==
+    else if (parameters_.leafToWoodChannel ==
              SegmentationParameters::CHANNEL_INTENSITY)
     {
-        trunkDescriptorChannelRadioButton_[1]->setChecked(true);
+        leafToWoodChannelRadioButton_[1]->setChecked(true);
     }
     else
     {
-        THROW("SegmentationParameters trunkDescriptorChannel not implemented.");
+        THROW("SegmentationParameters leafToWoodChannel not implemented.");
     }
 
     QVBoxLayout *trunkDescriptorChannelVBoxLayout = new QVBoxLayout;
-    for (size_t i = 0; i < trunkDescriptorChannelRadioButton_.size(); i++)
+    for (size_t i = 0; i < leafToWoodChannelRadioButton_.size(); i++)
     {
         trunkDescriptorChannelVBoxLayout->addWidget(
-            trunkDescriptorChannelRadioButton_[i]);
+            leafToWoodChannelRadioButton_[i]);
     }
 
     QGroupBox *trunkDescriptorChannelGroupBox =
-        new QGroupBox(tr("Descriptor channel"));
+        new QGroupBox(tr("Leaf-to-wood gradient channel"));
     trunkDescriptorChannelGroupBox->setLayout(trunkDescriptorChannelVBoxLayout);
 
-    DoubleSliderWidget::create(trunkDescriptorMinSlider_,
+    DoubleSliderWidget::create(woodThresholdMinMinSlider_,
                                this,
                                nullptr,
                                nullptr,
-                               tr("Minimal descriptor value for wood"),
-                               tr("Minimal descriptor value for wood."),
+                               tr("Minimal leaf-to-wood gradient threshold"
+                                  " value"),
+                               tr("Minimal leaf-to-wood gradient threshold"
+                                  " value"),
                                tr("%"),
                                1.0,
                                0,
                                100.0,
-                               parameters_.trunkDescriptorMin);
+                               parameters_.woodThresholdMin);
 
     // Search radius.
     DoubleSliderWidget::create(searchRadiusForTrunkPointsSlider_,
@@ -122,7 +122,7 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
                                0.01,
                                0.01,
                                1.0,
-                               parameters_.searchRadiusForTrunkPoints);
+                               parameters_.searchRadiusTrunkPoints);
 
     DoubleSliderWidget::create(searchRadiusForLeafPointsSlider_,
                                this,
@@ -135,7 +135,7 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
                                0.01,
                                0.01,
                                1.0,
-                               parameters_.searchRadiusForLeafPoints);
+                               parameters_.searchRadiusLeafPoints);
 
     // Tree.
     DoubleRangeSliderWidget::create(
@@ -148,7 +148,7 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
            "trees by ground wood."),
         tr("m"),
         0.01,
-        0,
+        0.0,
         10.0,
         parameters_.treeBaseElevationMin,
         parameters_.treeBaseElevationMax);
@@ -182,7 +182,7 @@ SegmentationWidget::SegmentationWidget(MainWindow *mainWindow)
     QVBoxLayout *settingsLayout = new QVBoxLayout;
     settingsLayout->addWidget(voxelRadiusSlider_);
     settingsLayout->addWidget(trunkDescriptorChannelGroupBox);
-    settingsLayout->addWidget(trunkDescriptorMinSlider_);
+    settingsLayout->addWidget(woodThresholdMinMinSlider_);
     settingsLayout->addWidget(searchRadiusForTrunkPointsSlider_);
     settingsLayout->addWidget(searchRadiusForLeafPointsSlider_);
     settingsLayout->addWidget(treeBaseElevationSlider_);
@@ -231,21 +231,19 @@ void SegmentationWidget::slotApply()
 
     mainWindow_->suspendThreads();
 
-    parameters_.trunkDescriptorChannel =
-        SegmentationParameters::CHANNEL_DESCRIPTOR;
-    if (trunkDescriptorChannelRadioButton_
-            [SegmentationParameters::CHANNEL_INTENSITY]
-                ->isChecked())
+    parameters_.leafToWoodChannel = SegmentationParameters::CHANNEL_DESCRIPTOR;
+    if (leafToWoodChannelRadioButton_[SegmentationParameters::CHANNEL_INTENSITY]
+            ->isChecked())
     {
-        parameters_.trunkDescriptorChannel =
+        parameters_.leafToWoodChannel =
             SegmentationParameters::CHANNEL_INTENSITY;
     }
 
     parameters_.voxelRadius = voxelRadiusSlider_->value();
-    parameters_.trunkDescriptorMin = trunkDescriptorMinSlider_->value();
-    parameters_.searchRadiusForTrunkPoints =
+    parameters_.woodThresholdMin = woodThresholdMinMinSlider_->value();
+    parameters_.searchRadiusTrunkPoints =
         searchRadiusForTrunkPointsSlider_->value();
-    parameters_.searchRadiusForLeafPoints =
+    parameters_.searchRadiusLeafPoints =
         searchRadiusForLeafPointsSlider_->value();
     parameters_.treeBaseElevationMin = treeBaseElevationSlider_->minimumValue();
     parameters_.treeBaseElevationMax = treeBaseElevationSlider_->maximumValue();

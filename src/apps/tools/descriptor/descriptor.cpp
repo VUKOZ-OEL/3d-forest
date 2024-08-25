@@ -61,8 +61,8 @@ int main(int argc, char *argv[])
         DescriptorParameters p;
 
         ArgumentParser arg("calculates descriptor values for points");
-        arg.add("-i",
-                "--input",
+        arg.add("-f",
+                "--file",
                 "",
                 "Path to the input file to be processed. Accepted formats "
                 "include .las, and .json project file.",
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
             p.searchRadius = arg.toDouble("--search-radius");
             p.includeGroundPoints = arg.toBool("--include-ground");
 
-            descriptorCompute(arg.toString("--input"), p);
+            descriptorCompute(arg.toString("--file"), p);
         }
 
         rc = 0;

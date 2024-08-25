@@ -129,6 +129,7 @@ static void importPluginFile(const QString &path, MainWindow *mainWindow)
     }
 
     mainWindow->updateEverything();
+    mainWindow->slotRenderViewports();
 }
 
 static bool importPluginCreateIndex(const QString &path,

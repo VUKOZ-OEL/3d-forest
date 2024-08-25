@@ -73,7 +73,10 @@ void Viewports::applyWhereToAll()
 
 void Viewports::applyCamera(size_t viewport, const Camera &camera)
 {
-    viewports_[viewport]->applyCamera(camera);
+    if (viewport < viewports_.size())
+    {
+        viewports_[viewport]->applyCamera(camera);
+    }
 }
 
 void Viewports::setState(Page::State state)

@@ -122,7 +122,7 @@ ExplorerSegmentsWidget::ExplorerSegmentsWidget(MainWindow *mainWindow,
     toolBar->setIconSize(QSize(MainWindow::ICON_SIZE, MainWindow::ICON_SIZE));
 
     // Segment.
-    segmentWidget_ = new ExplorerSegmentWidget;
+    segmentWidget_ = new ExplorerSegmentWidget(mainWindow_);
 
     // Splitter.
     splitter_ = new QSplitter;
@@ -156,7 +156,8 @@ void ExplorerSegmentsWidget::slotUpdate(void *sender,
         return;
     }
 
-    if (target.empty() || target.contains(Editor::TYPE_SEGMENT))
+    if (target.empty() || target.contains(Editor::TYPE_SEGMENT) ||
+        target.contains(Editor::TYPE_SETTINGS))
     {
         setSegments(mainWindow_->editor().segments(),
                     mainWindow_->editor().segmentsFilter());

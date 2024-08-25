@@ -59,8 +59,8 @@ private:
     SegmentationAction segmentation_;
 
     DoubleSliderWidget *voxelRadiusSlider_;
-    DoubleSliderWidget *trunkDescriptorMinSlider_;
-    std::vector<QRadioButton *> trunkDescriptorChannelRadioButton_;
+    DoubleSliderWidget *woodThresholdMinMinSlider_;
+    std::vector<QRadioButton *> leafToWoodChannelRadioButton_;
     DoubleSliderWidget *searchRadiusForTrunkPointsSlider_;
     DoubleSliderWidget *searchRadiusForLeafPointsSlider_;
     DoubleRangeSliderWidget *treeBaseElevationSlider_;

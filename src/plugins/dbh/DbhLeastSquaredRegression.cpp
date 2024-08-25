@@ -78,6 +78,8 @@ void DbhLeastSquaredRegression::taubinFit(FittingCircle &circle,
                                           const DbhGroup &group,
                                           const DbhParameters &parameters)
 {
+    circle.result = FittingCircle::RESULT_INVALID;
+
     size_t n = group.points.size() / 3;
     if (n < 1)
     {
@@ -180,12 +182,15 @@ void DbhLeastSquaredRegression::taubinFit(FittingCircle &circle,
     circle.b = Ycenter + meanY;
     circle.z = meanZ;
     circle.r = std::sqrt(Xcenter * Xcenter + Ycenter * Ycenter + Mz);
+    circle.result = FittingCircle::RESULT_OK;
 }
 
 void DbhLeastSquaredRegression::geometricCircle(FittingCircle &circle,
                                                 const DbhGroup &group,
                                                 const DbhParameters &parameters)
 {
+    circle.result = FittingCircle::RESULT_INVALID;
+
     size_t n = group.points.size() / 3;
     if (n < 1)
     {
@@ -224,22 +229,11 @@ void DbhLeastSquaredRegression::geometricCircle(FittingCircle &circle,
     meanY /= static_cast<double>(n);
     meanZ /= static_cast<double>(n);
 
-    // Starting with the given initial circle (initial guess).
-    FittingCircle New;
-    New.a = circle.a;
-    New.b = circle.b;
-    New.r = circle.r;
-
-    // Calculate the root-mean-square error.
-    New.s = sigma(New, group);
-
     // Initialize iterations.
     double lambda = 1e-4;
-    size_t iter = 0;
-    size_t inner = 0;
-    // size_t code = 0;
+    size_t nIterations = 0;
+    size_t nInnerIterations = 0;
 
-    // Iterations.
     FittingCircle Old;
 
     double Mu, Mv, Muu, Mvv, Muv, Mr;
@@ -249,14 +243,21 @@ void DbhLeastSquaredRegression::geometricCircle(FittingCircle &circle,
     double D1, D2, D3;
     double dR, dY, dX;
 
-NextIteration:
+    // Starting with the given initial circle (initial guess).
+    FittingCircle New;
+    New.a = circle.a;
+    New.b = circle.b;
+    New.r = circle.r;
+    New.s = sigma(New, group);
+
+nextIteration:
 
     Old = New;
 
-    iter++;
-    if (iter > parameters.geometricCircleIterationsMax)
+    nIterations++;
+    if (nIterations > parameters.geometricCircleIterationsMax)
     {
-        // code = 1;
+        circle.result = FittingCircle::RESULT_MAX_ITERATIONS_REACHED;
         goto enough;
     }
 
@@ -307,7 +308,7 @@ NextIteration:
 
     Old.g = New.g = std::sqrt(F1 * F1 + F2 * F2 + F3 * F3);
 
-try_again:
+tryAgain:
 
     UUl = Muu + lambda;
     VVl = Mvv + lambda;
@@ -331,6 +332,7 @@ try_again:
 
     if ((std::abs(dR) + std::abs(dX) + std::abs(dY)) / (1.0 + Old.r) < 3e-8)
     {
+        circle.result = FittingCircle::RESULT_OK;
         goto enough;
     }
 
@@ -342,7 +344,7 @@ try_again:
     if (std::abs(New.a) > parameters.geometricCircleParameterLimit ||
         std::abs(New.b) > parameters.geometricCircleParameterLimit)
     {
-        // code = 3;
+        circle.result = FittingCircle::RESULT_PARAMETER_LIMIT_REACHED;
         goto enough;
     }
 
@@ -352,13 +354,13 @@ try_again:
     {
         lambda *= parameters.geometricCircleFactorUp;
 
-        if (++inner > parameters.geometricCircleIterationsMax)
+        if (++nInnerIterations > parameters.geometricCircleIterationsMax)
         {
-            // code = 2;
+            circle.result = FittingCircle::RESULT_MAX_INNER_ITERATIONS_REACHED;
             goto enough;
         }
 
-        goto try_again;
+        goto tryAgain;
     }
 
     // Calculate the root-mean-square error.
@@ -367,37 +369,32 @@ try_again:
     // Check if improvement is gained.
     if (New.s < Old.s)
     {
-        // yes, improvement
+        // Yes, improvement.
         lambda *= parameters.geometricCircleFactorDown;
-        goto NextIteration;
+        goto nextIteration;
     }
     else
     {
-        // no improvement
-        if (++inner > parameters.geometricCircleIterationsMax)
+        // No improvement.
+        if (++nInnerIterations > parameters.geometricCircleIterationsMax)
         {
-            // code = 2;
+            circle.result = FittingCircle::RESULT_MAX_INNER_ITERATIONS_REACHED;
             goto enough;
         }
 
         lambda *= parameters.geometricCircleFactorUp;
-        goto try_again;
+        goto tryAgain;
     }
 
-    // Exit.
+    // Set the output and exit.
 enough:
 
     circle.a = Old.a;
     circle.b = Old.b;
     circle.z = meanZ;
-
-    // float r = static_cast<float>(Old.r) * 100000.0F;
-    // double rr = static_cast<double>(std::ceil(r)) / 1000.0;
-    // circle.r = rr;
     circle.r = Old.r;
-
-    circle.i = iter;
-    circle.j = inner;
+    circle.i = nIterations;
+    circle.j = nInnerIterations;
 }
 
 double DbhLeastSquaredRegression::sigma(FittingCircle &circle,

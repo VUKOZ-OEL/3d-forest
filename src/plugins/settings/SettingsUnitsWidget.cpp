@@ -65,7 +65,7 @@ SettingsUnitsWidget::SettingsUnitsWidget(MainWindow *mainWindow)
 
     userDefinedCheckBox_ = new QCheckBox;
     userDefinedCheckBox_->setChecked(settings_.userDefined);
-    userDefinedCheckBox_->setText(tr("Enabled"));
+    // userDefinedCheckBox_->setText(tr("Enabled"));
     connect(userDefinedCheckBox_,
             SIGNAL(stateChanged(int)),
             this,
@@ -90,8 +90,10 @@ SettingsUnitsWidget::SettingsUnitsWidget(MainWindow *mainWindow)
     groupBoxLayout->addWidget(new QLabel(tr("User scaling:")), 1, 0);
     groupBoxLayout->addWidget(ppmUserSpinBox_, 1, 1);
 
-    groupBoxLayout->addWidget(help, 2, 0);
+    groupBoxLayout->addWidget(new QLabel(tr("User scaling enabled:")), 2, 0);
     groupBoxLayout->addWidget(userDefinedCheckBox_, 2, 1);
+
+    groupBoxLayout->addWidget(help, 3, 0);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(groupBoxLayout);

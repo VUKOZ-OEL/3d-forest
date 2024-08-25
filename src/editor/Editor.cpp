@@ -445,12 +445,20 @@ void Editor::erasePage(size_t dataset, size_t index)
     pageManager_.erase(this, dataset, index);
 }
 
-void Editor::lock()
+void Editor::lock(const std::string &message)
 {
+    LOG_DEBUG(<< "Mutex lock <" << message << "> thread ID <" << threadId()
+              << ">.");
     mutex_.lock();
+    LOG_DEBUG(<< "Mutex locked <" << message << "> thread ID <" << threadId()
+              << ">.");
 }
 
-void Editor::unlock()
+void Editor::unlock(const std::string &message)
 {
+    LOG_DEBUG(<< "Mutex unlock <" << message << "> thread ID <" << threadId()
+              << ">.");
     mutex_.unlock();
+    LOG_DEBUG(<< "Mutex unlocked <" << message << "> thread ID <" << threadId()
+              << ">.");
 }

@@ -86,9 +86,9 @@ void SegmentationAction::start(const SegmentationParameters &parameters)
     parameters_ = parameters;
 
     parameters_.voxelRadius *= ppm;
-    parameters_.trunkDescriptorMin *= 0.01; // %
-    parameters_.searchRadiusForTrunkPoints *= ppm;
-    parameters_.searchRadiusForLeafPoints *= ppm;
+    parameters_.woodThresholdMin *= 0.01; // %
+    parameters_.searchRadiusTrunkPoints *= ppm;
+    parameters_.searchRadiusLeafPoints *= ppm;
     parameters_.treeBaseElevationMin *= ppm;
     parameters_.treeBaseElevationMax *= ppm;
     parameters_.treeHeightMin *= ppm;
@@ -237,6 +237,7 @@ void SegmentationAction::stepPointsToVoxels()
     {
         // If point index to voxel is none:
         if (query_.voxel() == SIZE_MAX &&
+            query_.classification() != LasFile::CLASS_GROUND &&
             (parameters_.zCoordinatesAsElevation ||
              !(query_.elevation() < parameters_.treeBaseElevationMin)))
         {
@@ -331,7 +332,7 @@ void SegmentationAction::stepCreateTrunks()
                 voxels_.findRadius(a.x,
                                    a.y,
                                    a.z,
-                                   parameters_.searchRadiusForTrunkPoints,
+                                   parameters_.searchRadiusTrunkPoints,
                                    search_);
                 for (size_t j = 0; j < search_.size(); j++)
                 {
@@ -357,7 +358,7 @@ void SegmentationAction::stepCreateTrunks()
                 {
                     // Mark this group as future segment.
                     groups_[groupId_] = group_;
-                    group_.clear();
+
                     // Increment group id by one.
                     groupId_++;
                 }
@@ -372,6 +373,7 @@ void SegmentationAction::stepCreateTrunks()
                 }
 
                 // Prepare start of the next group. Set the group empty.
+                group_.clear();
                 groupPath_.resize(0);
             }
         }
@@ -382,13 +384,15 @@ void SegmentationAction::stepCreateTrunks()
         }
     }
 
-    progress_.setMaximumStep(voxels_.size(), 10);
-    progress_.setValueSteps(SEGMENTATION_STEP_CREATE_BRANCHES);
-
     if (parameters_.segmentOnlyTrunks)
     {
         progress_.setMaximumStep();
         progress_.setValueSteps(SEGMENTATION_STEP_CREATE_SEGMENTS);
+    }
+    else
+    {
+        progress_.setMaximumStep(voxels_.size(), 10);
+        progress_.setValueSteps(SEGMENTATION_STEP_CREATE_BRANCHES);
     }
 }
 
@@ -582,9 +586,6 @@ void SegmentationAction::createSegmentFromGroup(size_t segmentId,
 
     segment.boundary = group.boundary;
     segment.height = segment.boundary.length(2);
-
-    segment.radius =
-        0.5 * max(segment.boundary.length(0), segment.boundary.length(1));
 }
 
 void SegmentationAction::stepVoxelsToPoints()
@@ -652,12 +653,17 @@ void SegmentationAction::createVoxel()
 
     while (queryPoint_.next())
     {
+        if (query_.classification() == LasFile::CLASS_GROUND)
+        {
+            return;
+        }
+
         p.x += queryPoint_.x();
         p.y += queryPoint_.y();
         p.z += queryPoint_.z();
         p.elevation += queryPoint_.elevation();
 
-        if (parameters_.trunkDescriptorChannel ==
+        if (parameters_.leafToWoodChannel ==
             SegmentationParameters::CHANNEL_DESCRIPTOR)
         {
             if (queryPoint_.descriptor() > p.descriptor)
@@ -665,7 +671,7 @@ void SegmentationAction::createVoxel()
                 p.descriptor = queryPoint_.descriptor();
             }
         }
-        else if (parameters_.trunkDescriptorChannel ==
+        else if (parameters_.leafToWoodChannel ==
                  SegmentationParameters::CHANNEL_INTENSITY)
         {
             if (queryPoint_.intensity() > p.descriptor)
@@ -675,7 +681,7 @@ void SegmentationAction::createVoxel()
         }
         else
         {
-            THROW("SegmentationParameters trunkDescriptorChannel not "
+            THROW("SegmentationParameters leafToWoodChannel not "
                   "implemented.");
         }
 
@@ -707,7 +713,7 @@ void SegmentationAction::findNearestNeighbor(Point &a)
     voxels_.findRadius(a.x,
                        a.y,
                        a.z,
-                       parameters_.searchRadiusForLeafPoints,
+                       parameters_.searchRadiusLeafPoints,
                        search_);
 
     for (size_t j = 0; j < search_.size(); j++)
@@ -733,7 +739,7 @@ void SegmentationAction::findNearestNeighbor(Point &a)
 bool SegmentationAction::isTrunkVoxel(const Point &a)
 {
     return a.group == SIZE_MAX &&
-           !(a.descriptor < parameters_.trunkDescriptorMin);
+           !(a.descriptor < parameters_.woodThresholdMin);
 }
 
 void SegmentationAction::startGroup(const Point &a, bool isTrunk)

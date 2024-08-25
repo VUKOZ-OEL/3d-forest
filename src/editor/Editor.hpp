@@ -130,10 +130,11 @@ public:
     void erasePage(size_t dataset, size_t index);
 
     // Lock.
-    void lock();
-    void unlock();
+    void lock(const std::string &message = "");
+    void unlock(const std::string &message = "");
 
 protected:
+    // std::mutex mutex_;
     std::mutex mutex_;
 
     // Project data.

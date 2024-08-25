@@ -170,7 +170,7 @@ void ViewerViewports::updateScene(Editor *editor)
 
 void ViewerViewports::resetScene(Editor *editor, bool resetView)
 {
-    LOG_TRACE_UPDATE_VIEW(<< "Reset all viewports.");
+    LOG_TRACE_UPDATE_VIEW(<< "Reset all viewports <" << resetView << ">.");
     for (size_t i = 0; i < viewports_.size(); i++)
     {
         viewports_[i]->resetScene(editor, resetView);

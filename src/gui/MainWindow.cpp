@@ -356,10 +356,9 @@ void MainWindow::threadProgress(bool finished)
 
 void MainWindow::slotRender()
 {
-    LOG_TRACE_UPDATE_VIEW(<< "Render all viewports.");
-    editor_.lock();
+    editor_.lock("MainWindow render all viewports");
     viewerPlugin_->viewports()->updateScene(&editor_);
-    editor_.unlock();
+    editor_.unlock("MainWindow render all viewports");
 }
 
 void MainWindow::slotRenderViewport()
@@ -373,6 +372,14 @@ void MainWindow::slotRenderViewport(size_t viewportId)
     LOG_TRACE_UPDATE_VIEW(<< "Render viewport <" << viewportId << ">.");
     ViewerViewports *viewports = viewerPlugin_->viewports();
     threadRender_.render(viewportId, viewports->camera(viewportId));
+}
+
+void MainWindow::slotRenderViewports()
+{
+    LOG_TRACE_UPDATE_VIEW(<< "Render viewports.");
+    ViewerViewports *viewports = viewerPlugin_->viewports();
+    threadRender_.render(0, viewports->camera(0));
+    // viewerPlugin_->viewports()->update();
 }
 
 void MainWindow::update(void *sender, const QSet<Editor::Type> &target)
@@ -406,18 +413,19 @@ void MainWindow::updateEverything()
     LOG_TRACE_UPDATE(<< "Update everything.");
     suspendThreads();
 
+    setWindowTitle(QString::fromStdString(editor_.projectPath()));
+
     ViewerViewports *viewports = viewerPlugin_->viewports();
 
-    editor_.lock();
+    editor_.lock("MainWindow resetScene");
     viewports->resetScene(&editor_, true);
-    editor_.unlock();
+    editor_.unlock("MainWindow resetScene");
 
+    LOG_TRACE_UPDATE(<< "Emit update.");
     emit signalUpdate(this, {});
 
-    size_t viewportId = viewports->selectedViewportId();
-    threadRender_.render(viewportId, viewports->camera(viewportId));
-
-    setWindowTitle(QString::fromStdString(editor_.projectPath()));
+    //    size_t viewportId = viewports->selectedViewportId();
+    //    threadRender_.render(viewportId, viewports->camera(viewportId));
 }
 
 void MainWindow::updateData()
