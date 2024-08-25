@@ -70,6 +70,7 @@ void ThreadLoop::cancel()
     {
         conditionCaller_.wait(mutexlock);
     }
+    LOG_DEBUG(<< "Thread cancelled.");
 }
 
 bool ThreadLoop::isRunning()

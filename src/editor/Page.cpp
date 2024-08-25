@@ -149,8 +149,9 @@ void Page::writePage()
 
 void Page::setState(Page::State state)
 {
-    LOG_TRACE_UNKNOWN(<< "Page pageId <" << pageId_ << "> to state <" << state
-                      << ">.");
+    // LOG_TRACE_UNKNOWN(<< "Page pageId <" << pageId_ << "> to state <" <<
+    // state
+    //                   << ">.");
 
     if ((state < state_) || (state == Page::STATE_RENDERED))
     {
@@ -777,7 +778,8 @@ void Page::queryWhereClassification()
     for (size_t i = 0; i < selectionSize; i++)
     {
         uint32_t id = classification[selection[i]];
-        LOG_DEBUG(<< "Query classification <" << id << "> at <" << i << ">.");
+        // LOG_DEBUG(<< "Query classification <" << id << "> at <" << i <<
+        // ">.");
 
         if (id < classifications.size() && classifications[id])
         {
@@ -830,7 +832,7 @@ void Page::queryWhereSegment()
 
 void Page::runModifiers()
 {
-    LOG_TRACE_UNKNOWN(<< "Page pageId <" << pageId_ << ">.");
+    // LOG_TRACE_UNKNOWN(<< "Page pageId <" << pageId_ << ">.");
 
     runColorModifier();
     editor_->runModifiers(this);
@@ -916,7 +918,7 @@ void Page::runColorModifier()
     {
         const Segments &segments = editor_->segments();
         const size_t max = segments.size();
-        LOG_TRACE_UNKNOWN(<< "Maximum segments <" << max << ">.");
+        // LOG_TRACE_UNKNOWN(<< "Maximum segments <" << max << ">.");
 
         for (size_t i = 0; i < n; i++)
         {

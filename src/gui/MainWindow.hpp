@@ -118,6 +118,7 @@ public slots:
     void slotRender();
     void slotRenderViewport();
     void slotRenderViewport(size_t viewportId);
+    void slotRenderViewports();
 
 signals:
     void signalRender();

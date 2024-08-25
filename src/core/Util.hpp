@@ -30,6 +30,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <thread>
 
 // Include local.
 #include <ExportCore.hpp>
@@ -164,6 +165,11 @@ inline char *ustrcat(char *dst, const char *src)
         dst++;
     }
     return ustrcpy(dst, src);
+}
+
+inline size_t threadId()
+{
+    return std::hash<std::thread::id>()(std::this_thread::get_id());
 }
 
 class Null

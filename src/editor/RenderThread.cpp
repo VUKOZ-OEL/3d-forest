@@ -56,9 +56,9 @@ bool RenderThread::next()
     {
         LOG_TRACE_UPDATE_VIEW(<< "Apply camera to viewportId <" << viewportId_
                               << ">.");
-        editor_->lock();
+        editor_->lock("RenderThread applyCamera");
         editor_->viewports().applyCamera(viewportId_, camera_);
-        editor_->unlock();
+        editor_->unlock("RenderThread applyCamera");
         initialized_ = true;
         return true;
     }
@@ -67,9 +67,9 @@ bool RenderThread::next()
     LOG_TRACE_UPDATE_VIEW(<< "Compute next state.");
     double t1 = Time::realTime();
     bool finished;
-    editor_->lock();
+    editor_->lock("RenderThread nextState");
     finished = !editor_->viewports().nextState();
-    editor_->unlock();
+    editor_->unlock("RenderThread nextState");
     double t2 = Time::realTime();
     double msec = (t2 - t1) * 1000.;
 
