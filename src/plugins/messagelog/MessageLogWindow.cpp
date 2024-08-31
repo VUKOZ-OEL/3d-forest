@@ -72,14 +72,29 @@ void MessageLogWindow::flush()
 
 void MessageLogWindow::slotPrintln(const LogMessage &message)
 {
+#if 0
     QString line = QString::fromStdString(message.time) +
                    QString(LogMessage::typeString(message.type)) +
                    QString::fromStdString(message.text) + " [" +
                    QString::fromStdString(message.module) + ":" +
                    QString::fromStdString(message.function) + "] " +
                    QString::number(message.threadId);
+#else
+    QString line = QString::number(message.threadId) + " " +
+                   QString::fromStdString(message.time) +
+                   QString(LogMessage::typeString(message.type)) +
+                   QString::fromStdString(message.text) + " [" +
+                   QString::fromStdString(message.module) + ":" +
+                   QString::fromStdString(message.function) + "]";
+#endif
 
     textEdit_->append(line);
+
+    if (threadId_ != 0 && threadId_ != message.threadId)
+    {
+        file_.write("\n");
+    }
+    threadId_ = message.threadId;
 
     file_.write(line.toStdString() + "\n");
 }

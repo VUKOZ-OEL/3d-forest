@@ -21,8 +21,8 @@
 
 // Include 3D Forest.
 #include <MainWindow.hpp>
-#include <SettingsColorWidget.hpp>
 #include <SettingsUnitsWidget.hpp>
+#include <SettingsViewWidget.hpp>
 #include <SettingsWindow.hpp>
 #include <ThemeIcon.hpp>
 #include <ToolTabWidget.hpp>
@@ -38,12 +38,12 @@ SettingsWindow::SettingsWindow(MainWindow *mainWindow)
       mainWindow_(mainWindow)
 {
     // Tabs.
-    settingsColorWidget_ = new SettingsColorWidget(mainWindow_);
+    settingsViewWidget_ = new SettingsViewWidget(mainWindow_);
     settingsUnitsWidget_ = new SettingsUnitsWidget(mainWindow_);
 
     // Tab.
     tabWidget_ = new ToolTabWidget;
-    tabWidget_->addTab(settingsColorWidget_, ICON("brush"), tr("Brush"));
+    tabWidget_->addTab(settingsViewWidget_, ICON("brush"), tr("View"));
     tabWidget_->addTab(settingsUnitsWidget_, ICON("units"), tr("Units"));
 
     // Dock.

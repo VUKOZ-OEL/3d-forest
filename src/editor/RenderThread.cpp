@@ -39,7 +39,7 @@ RenderThread::RenderThread(Editor *editor)
 void RenderThread::render(size_t viewportId, const Camera &camera)
 {
     LOG_DEBUG(<< "Render viewportId <" << viewportId << ">.");
-    LOG_TRACE_UPDATE_VIEW(<< "Render viewportId <" << viewportId << ">.");
+
     cancel();
 
     viewportId_ = viewportId;
@@ -51,11 +51,11 @@ void RenderThread::render(size_t viewportId, const Camera &camera)
 
 bool RenderThread::next()
 {
-    LOG_DEBUG(<< "Computation is initialized <" << initialized_ << ">.");
+    LOG_DEBUG(<< "Render next step, initialized <" << initialized_ << ">.");
+
     if (!initialized_)
     {
-        LOG_TRACE_UPDATE_VIEW(<< "Apply camera to viewportId <" << viewportId_
-                              << ">.");
+        LOG_DEBUG(<< "Apply camera to viewportId <" << viewportId_ << ">.");
         editor_->lock("RenderThread applyCamera");
         editor_->viewports().applyCamera(viewportId_, camera_);
         editor_->unlock("RenderThread applyCamera");
@@ -64,7 +64,7 @@ bool RenderThread::next()
     }
 
     LOG_DEBUG(<< "Compute next state.");
-    LOG_TRACE_UPDATE_VIEW(<< "Compute next state.");
+
     double t1 = Time::realTime();
     bool finished;
     editor_->lock("RenderThread nextState");
@@ -77,8 +77,6 @@ bool RenderThread::next()
     {
         LOG_DEBUG(<< "Call callback argument finished <" << finished << "> ms <"
                   << msec << ">.");
-        LOG_TRACE_UPDATE_VIEW(<< "Call callback with argument finished <"
-                              << finished << ">.");
         callback_->threadProgress(finished);
     }
 

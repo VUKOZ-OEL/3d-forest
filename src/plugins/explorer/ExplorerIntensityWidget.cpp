@@ -77,13 +77,24 @@ void ExplorerIntensityWidget::slotUpdate(void *sender,
 
     if (target.empty() || target.contains(Editor::TYPE_INTENSITY))
     {
+        LOG_TRACE_UPDATE(<< "Input intensity filter.");
+
         setIntensity(mainWindow_->editor().intensityFilter());
     }
 }
 
+void ExplorerIntensityWidget::filterChanged()
+{
+    LOG_TRACE_UPDATE(<< "Output intensity filter <" << intensityRange_ << ">.");
+
+    mainWindow_->suspendThreads();
+    mainWindow_->editor().setIntensityFilter(intensityRange_);
+    mainWindow_->updateFilter();
+}
+
 void ExplorerIntensityWidget::setIntensity(const Range<double> &intensityRange)
 {
-    LOG_DEBUG(<< "Input intensity <" << intensityRange << ">.");
+    LOG_DEBUG(<< "Set intensity <" << intensityRange << ">.");
 
     intensityInput_->blockSignals(true);
 
@@ -96,15 +107,6 @@ void ExplorerIntensityWidget::setIntensity(const Range<double> &intensityRange)
     intensityInput_->setMaximumValue(max);
 
     intensityInput_->blockSignals(false);
-}
-
-void ExplorerIntensityWidget::filterChanged()
-{
-    LOG_DEBUG(<< "Output intensity <" << intensityRange_ << ">.");
-
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setIntensityFilter(intensityRange_);
-    mainWindow_->updateFilter();
 }
 
 void ExplorerIntensityWidget::slotRangeIntermediateMinimumValue()

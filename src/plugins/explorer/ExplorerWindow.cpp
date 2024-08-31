@@ -22,9 +22,9 @@
 // Include 3D Forest.
 #include <ExplorerClassificationsWidget.hpp>
 #include <ExplorerClippingWidget.hpp>
+#include <ExplorerDatasetsWidget.hpp>
 #include <ExplorerDescriptorWidget.hpp>
 #include <ExplorerElevationWidget.hpp>
-#include <ExplorerFilesWidget.hpp>
 #include <ExplorerIntensityWidget.hpp>
 #include <ExplorerSegmentsWidget.hpp>
 #include <ExplorerWindow.hpp>
@@ -44,7 +44,7 @@ ExplorerWindow::ExplorerWindow(MainWindow *mainWindow)
 {
     // Tab.
     items_.push_back(
-        new ExplorerFilesWidget(mainWindow_, ICON("file"), tr("Files")));
+        new ExplorerDatasetsWidget(mainWindow_, ICON("file"), tr("Datasets")));
 
     items_.push_back(new ExplorerSegmentsWidget(mainWindow_,
                                                 ICON("segments"),

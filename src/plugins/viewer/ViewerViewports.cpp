@@ -50,6 +50,30 @@ ViewerViewports::~ViewerViewports()
 {
 }
 
+void ViewerViewports::paintEvent(QPaintEvent *event)
+{
+    LOG_DEBUG(<< "Paint event.");
+    QWidget::paintEvent(event);
+}
+
+void ViewerViewports::resizeEvent(QResizeEvent *event)
+{
+    LOG_DEBUG(<< "Resize event.");
+    QWidget::resizeEvent(event);
+}
+
+void ViewerViewports::showEvent(QShowEvent *event)
+{
+    LOG_DEBUG(<< "Show event.");
+    QWidget::showEvent(event);
+}
+
+void ViewerViewports::hideEvent(QHideEvent *event)
+{
+    LOG_DEBUG(<< "Hide.");
+    QWidget::hideEvent(event);
+}
+
 void ViewerViewports::initializeViewer()
 {
     setLayout(ViewLayout::VIEW_LAYOUT_SINGLE);
@@ -58,7 +82,7 @@ void ViewerViewports::initializeViewer()
 ViewerOpenGLViewport *ViewerViewports::createViewport(size_t viewportId)
 {
     ViewerOpenGLViewport *viewport = new ViewerOpenGLViewport(this);
-    viewport->setWindowViewports(this, viewportId);
+    viewport->setViewports(this, viewportId);
     viewport->setSelected(false);
 
     return viewport;
@@ -160,7 +184,7 @@ size_t ViewerViewports::selectedViewportId() const
 
 void ViewerViewports::updateScene(Editor *editor)
 {
-    LOG_TRACE_UPDATE_VIEW(<< "Update all viewports.");
+    LOG_DEBUG(<< "Update all viewports.");
     for (size_t i = 0; i < viewports_.size(); i++)
     {
         viewports_[i]->updateScene(editor);
@@ -170,7 +194,7 @@ void ViewerViewports::updateScene(Editor *editor)
 
 void ViewerViewports::resetScene(Editor *editor, bool resetView)
 {
-    LOG_TRACE_UPDATE_VIEW(<< "Reset all viewports <" << resetView << ">.");
+    LOG_DEBUG(<< "Reset all viewports <" << resetView << ">.");
     for (size_t i = 0; i < viewports_.size(); i++)
     {
         viewports_[i]->resetScene(editor, resetView);

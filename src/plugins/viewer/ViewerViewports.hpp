@@ -76,6 +76,11 @@ signals:
     void cameraChanged(size_t viewportId);
 
 protected:
+    void paintEvent(QPaintEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
+    void showEvent(QShowEvent *event) override;
+    void hideEvent(QHideEvent *event) override;
+
     std::vector<ViewerOpenGLViewport *> viewports_;
 
     void initializeViewer();

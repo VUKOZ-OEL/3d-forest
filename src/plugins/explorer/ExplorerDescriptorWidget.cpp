@@ -77,14 +77,26 @@ void ExplorerDescriptorWidget::slotUpdate(void *sender,
 
     if (target.empty() || target.contains(Editor::TYPE_DESCRIPTOR))
     {
+        LOG_TRACE_UPDATE(<< "Input descriptor filter.");
+
         setDescriptor(mainWindow_->editor().descriptorFilter());
     }
+}
+
+void ExplorerDescriptorWidget::filterChanged()
+{
+    LOG_TRACE_UPDATE(<< "Output descriptor filter <" << descriptorRange_
+                     << ">.");
+
+    mainWindow_->suspendThreads();
+    mainWindow_->editor().setDescriptorFilter(descriptorRange_);
+    mainWindow_->updateFilter();
 }
 
 void ExplorerDescriptorWidget::setDescriptor(
     const Range<double> &descriptorRange)
 {
-    LOG_DEBUG(<< "Input descriptor <" << descriptorRange << ">.");
+    LOG_DEBUG(<< "Set descriptor <" << descriptorRange << ">.");
 
     descriptorInput_->blockSignals(true);
 
@@ -97,15 +109,6 @@ void ExplorerDescriptorWidget::setDescriptor(
     descriptorInput_->setMaximumValue(max);
 
     descriptorInput_->blockSignals(false);
-}
-
-void ExplorerDescriptorWidget::filterChanged()
-{
-    LOG_DEBUG(<< "Output descriptor <" << descriptorRange_ << ">.");
-
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setDescriptorFilter(descriptorRange_);
-    mainWindow_->updateFilter();
 }
 
 void ExplorerDescriptorWidget::slotRangeIntermediateMinimumValue()

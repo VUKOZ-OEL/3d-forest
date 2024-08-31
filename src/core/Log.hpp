@@ -166,13 +166,11 @@ extern std::shared_ptr<LoggerFile> EXPORT_CORE globalLoggerFile;
         }                                                                      \
     } while (false)
 
-#if 0
+#if 1
     #define LOG_DEBUG(msg) LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg)
     #define LOG_TRACE_RENDER(msg)                                              \
         LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg);
     #define LOG_TRACE_UPDATE(msg)                                              \
-        LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg);
-    #define LOG_TRACE_UPDATE_VIEW(msg)                                         \
         LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg);
     #define LOG_TRACE_THREAD(msg)                                              \
         LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg);
@@ -190,13 +188,6 @@ extern std::shared_ptr<LoggerFile> EXPORT_CORE globalLoggerFile;
             LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg);
     #else
         #define LOG_TRACE_UPDATE(msg)
-    #endif
-
-    #if 0
-        #define LOG_TRACE_UPDATE_VIEW(msg)                                     \
-            LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg);
-    #else
-        #define LOG_TRACE_UPDATE_VIEW(msg)
     #endif
 
     #define LOG_TRACE_THREAD(msg)

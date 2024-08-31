@@ -192,6 +192,36 @@ private:
                   const std::vector<Vector3<double>> &pal);
 };
 
+inline std::ostream &operator<<(std::ostream &out, const Page::State &in)
+{
+    switch (in)
+    {
+        case Page::STATE_READ:
+            out << "READ";
+            break;
+        case Page::STATE_TRANSFORM:
+            out << "TRANSFORM";
+            break;
+        case Page::STATE_SELECT:
+            out << "SELECT";
+            break;
+        case Page::STATE_RUN_MODIFIERS:
+            out << "RUN_MODIFIERS";
+            break;
+        case Page::STATE_RENDER:
+            out << "RENDER";
+            break;
+        case Page::STATE_RENDERED:
+            out << "RENDERED";
+            break;
+        default:
+            out << "UNKNOWN";
+            break;
+    }
+
+    return out;
+}
+
 #include <WarningsEnable.hpp>
 
 #endif /* PAGE_HPP */

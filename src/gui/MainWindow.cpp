@@ -20,6 +20,7 @@
 /** @file MainWindow.cpp */
 
 // Include 3D Forest.
+#include <GuiUtil.hpp>
 #include <MainWindow.hpp>
 #include <PluginInterface.hpp>
 #include <ViewerViewports.hpp>
@@ -123,7 +124,15 @@ MainWindow::MainWindow(QWidget *parent)
     threadRender_.setCallback(this);
     threadRender_.create();
 
-    updateEverything();
+    // updateEverything();
+    setWindowTitle(QString::fromStdString(editor_.projectPath()));
+
+    LOG_TRACE_UPDATE(<< "Emit update.");
+    emit signalUpdate(this, {});
+
+    viewerPlugin_->viewports()->resetScene(&editor_, true);
+
+    LOG_DEBUG(<< "Created.");
 }
 
 MainWindow::~MainWindow()
@@ -142,9 +151,21 @@ QSize MainWindow::sizeHint() const
     return QSize(1024, 768);
 }
 
+void MainWindow::paintEvent(QPaintEvent *event)
+{
+    LOG_DEBUG(<< "Paint event.");
+    QWidget::paintEvent(event);
+}
+
+void MainWindow::resizeEvent(QResizeEvent *event)
+{
+    LOG_DEBUG(<< "Resize event.");
+    QWidget::resizeEvent(event);
+}
+
 void MainWindow::showEvent(QShowEvent *event)
 {
-    LOG_DEBUG(<< "Show.");
+    LOG_DEBUG(<< "Show event.");
 
     resizeDocks({explorerPlugin_->window(), settingsPlugin_->window()},
                 {80, 20},
@@ -363,20 +384,20 @@ void MainWindow::slotRender()
 
 void MainWindow::slotRenderViewport()
 {
-    LOG_TRACE_UPDATE_VIEW(<< "Render active viewport.");
+    LOG_DEBUG(<< "Render active viewport.");
     slotRenderViewport(viewerPlugin_->viewports()->selectedViewportId());
 }
 
 void MainWindow::slotRenderViewport(size_t viewportId)
 {
-    LOG_TRACE_UPDATE_VIEW(<< "Render viewport <" << viewportId << ">.");
+    LOG_DEBUG(<< "Render viewport <" << viewportId << ">.");
     ViewerViewports *viewports = viewerPlugin_->viewports();
     threadRender_.render(viewportId, viewports->camera(viewportId));
 }
 
 void MainWindow::slotRenderViewports()
 {
-    LOG_TRACE_UPDATE_VIEW(<< "Render viewports.");
+    LOG_DEBUG(<< "Render viewports.");
     ViewerViewports *viewports = viewerPlugin_->viewports();
     threadRender_.render(0, viewports->camera(0));
     // viewerPlugin_->viewports()->update();
@@ -384,6 +405,7 @@ void MainWindow::slotRenderViewports()
 
 void MainWindow::update(void *sender, const QSet<Editor::Type> &target)
 {
+    LOG_TRACE_UPDATE(<< "Update target <" << target << "> emit.");
     emit signalUpdate(sender, target);
 }
 
@@ -391,7 +413,9 @@ void MainWindow::update(const QSet<Editor::Type> &target,
                         Page::State viewPortsCacheState,
                         bool resetCamera)
 {
-    LOG_TRACE_UPDATE(<< "Update number of targets <" << target.count() << ">.");
+    LOG_TRACE_UPDATE(<< "Update target <" << target << "> set page state <"
+                     << viewPortsCacheState << "> reset camera <"
+                     << static_cast<int>(resetCamera) << ">.");
     suspendThreads();
 
     editor_.viewports().setState(viewPortsCacheState);

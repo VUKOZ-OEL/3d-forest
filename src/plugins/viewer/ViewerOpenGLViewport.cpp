@@ -50,8 +50,123 @@ ViewerOpenGLViewport::~ViewerOpenGLViewport()
 {
 }
 
-void ViewerOpenGLViewport::setWindowViewports(ViewerViewports *viewer,
-                                              size_t viewportId)
+void ViewerOpenGLViewport::paintEvent(QPaintEvent *event)
+{
+    LOG_TRACE_RENDER(<< "Paint event.");
+    QOpenGLWidget::paintEvent(event);
+}
+
+void ViewerOpenGLViewport::resizeEvent(QResizeEvent *event)
+{
+    LOG_TRACE_RENDER(<< "Resize event.");
+    QOpenGLWidget::resizeEvent(event);
+}
+
+void ViewerOpenGLViewport::showEvent(QShowEvent *event)
+{
+    LOG_TRACE_RENDER(<< "Show event.");
+    QOpenGLWidget::showEvent(event);
+}
+
+void ViewerOpenGLViewport::hideEvent(QHideEvent *event)
+{
+    LOG_TRACE_RENDER(<< "Hide.");
+    QOpenGLWidget::hideEvent(event);
+}
+
+void ViewerOpenGLViewport::initializeGL()
+{
+    LOG_TRACE_RENDER(<< "Initialize OpenGL.");
+
+    initializeOpenGLFunctions();
+
+    setUpdateBehavior(QOpenGLWidget::PartialUpdate);
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+    glClearDepth(1.0F);
+}
+
+void ViewerOpenGLViewport::resizeGL(int w, int h)
+{
+    LOG_TRACE_RENDER(<< "Resize w <" << w << "> h <" << h << ">.");
+
+    w = static_cast<int>(parentWidget()->devicePixelRatio() * w);
+    h = static_cast<int>(parentWidget()->devicePixelRatio() * h);
+    camera_.setViewport(0, 0, w, h);
+    camera_.updateProjection();
+    // cameraChanged();
+}
+
+void ViewerOpenGLViewport::paintGL()
+{
+    LOG_TRACE_RENDER(<< "Paint width <" << camera_.width() << "> height <"
+                     << camera_.height() << ">.");
+
+    // Setup camera.
+    glViewport(0, 0, camera_.width(), camera_.height());
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixf(camera_.getProjection().data());
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixf(camera_.getModelView().data());
+
+    // Render.
+    bool firstFrame = renderScene();
+
+    if (firstFrame)
+    {
+        renderGuides();
+    }
+}
+
+void ViewerOpenGLViewport::mouseReleaseEvent(QMouseEvent *event)
+{
+    (void)event;
+}
+
+void ViewerOpenGLViewport::mousePressEvent(QMouseEvent *event)
+{
+    camera_.mousePressEvent(event);
+    setFocus();
+}
+
+void ViewerOpenGLViewport::mouseMoveEvent(QMouseEvent *event)
+{
+    camera_.mouseMoveEvent(event);
+    cameraChanged();
+}
+
+void ViewerOpenGLViewport::wheelEvent(QWheelEvent *event)
+{
+    camera_.wheelEvent(event);
+    setFocus();
+    cameraChanged();
+}
+
+void ViewerOpenGLViewport::setFocus()
+{
+    if (!isSelected())
+    {
+        if (windowViewports_)
+        {
+            windowViewports_->selectViewport(this);
+        }
+    }
+}
+
+void ViewerOpenGLViewport::cameraChanged()
+{
+    if (windowViewports_)
+    {
+        LOG_TRACE_RENDER(<< "Emit camera changed.");
+        emit windowViewports_->cameraChanged(viewportId_);
+    }
+}
+
+void ViewerOpenGLViewport::setViewports(ViewerViewports *viewer,
+                                        size_t viewportId)
 {
     windowViewports_ = viewer;
     viewportId_ = viewportId;
@@ -74,13 +189,14 @@ bool ViewerOpenGLViewport::isSelected() const
 
 void ViewerOpenGLViewport::updateScene(Editor *editor)
 {
-    LOG_TRACE_UPDATE_VIEW(<< "Update viewport <" << viewportId_ << ">.");
+    LOG_TRACE_RENDER(<< "Update viewport <" << viewportId_ << ">.");
     editor_ = editor;
 }
 
 void ViewerOpenGLViewport::resetScene(Editor *editor, bool resetView)
 {
-    LOG_TRACE_UPDATE_VIEW(<< "Reset viewport <" << viewportId_ << ">.");
+    LOG_TRACE_RENDER(<< "Reset viewport <" << viewportId_ << ">.");
+    editor_ = editor;
     aabb_.set(editor->datasets().boundary());
     if (resetView)
     {
@@ -197,72 +313,6 @@ void ViewerOpenGLViewport::setViewResetCenter()
     camera_.setLookAt(eye, center, up);
 }
 
-void ViewerOpenGLViewport::initializeGL()
-{
-    initializeOpenGLFunctions();
-
-    setUpdateBehavior(QOpenGLWidget::PartialUpdate);
-
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
-    glClearDepth(1.0F);
-}
-
-void ViewerOpenGLViewport::paintGL()
-{
-    LOG_TRACE_RENDER(<< "Paint width <" << camera_.width() << "> height <"
-                     << camera_.height() << ">.");
-
-    // Setup camera.
-    glViewport(0, 0, camera_.width(), camera_.height());
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadMatrixf(camera_.getProjection().data());
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixf(camera_.getModelView().data());
-
-    // Render.
-    bool firstFrame = renderScene();
-
-    if (firstFrame)
-    {
-        renderGuides();
-    }
-}
-
-void ViewerOpenGLViewport::renderGuides()
-{
-    // Bounding box.
-    glColor3f(0.25F, 0.25F, 0.25F);
-    ViewerOpenGL::renderAabb(aabb_);
-
-    // Overlay.
-    QMatrix4x4 m;
-    float w = static_cast<float>(camera_.width());
-    float h = static_cast<float>(camera_.height());
-
-    m.ortho(-w * 0.5F, w * 0.5F, -h * 0.5F, h * 0.5F, -50.0F, 50.0F);
-    glMatrixMode(GL_PROJECTION);
-    glLoadMatrixf(m.data());
-
-    // Overlay: rotated.
-    float axesSize = 30.0F;
-    m.setToIdentity();
-    m.translate(-w * 0.5F + axesSize + 2.0F, -h * 0.5F + axesSize + 2.0F);
-    m.scale(axesSize);
-    m = m * camera_.rotation();
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixf(m.data());
-
-    glDisable(GL_DEPTH_TEST);
-    glLineWidth(2.0F);
-    ViewerOpenGL::renderAxis();
-    glLineWidth(1.0F);
-    glEnable(GL_DEPTH_TEST);
-}
-
 void ViewerOpenGLViewport::clearScreen()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -270,6 +320,8 @@ void ViewerOpenGLViewport::clearScreen()
 
 bool ViewerOpenGLViewport::renderScene()
 {
+    LOG_TRACE_RENDER(<< "Render scene viewport <" << viewportId_ << ">.");
+
     if (!editor_)
     {
         return true;
@@ -285,22 +337,22 @@ bool ViewerOpenGLViewport::renderScene()
 
     size_t pageSize = editor_->viewports().pageSize(viewportId_);
 
+    LOG_TRACE_RENDER(<< "Render pages n <" << pageSize << ">.");
+
     if (pageSize == 0)
     {
         clearScreen();
         firstFrame = true;
     }
 
-    LOG_TRACE_RENDER(<< "Render viewport <" << viewportId_ << "> pageSize <"
-                     << pageSize << ">.");
-
     for (size_t pageIndex = 0; pageIndex < pageSize; pageIndex++)
     {
         Page &page = editor_->viewports().page(viewportId_, pageIndex);
 
-        if (page.state() == Page::STATE_RENDER)
+        if (page.state() == Page::STATE_RENDER ||
+            page.state() == Page::STATE_RENDERED)
         {
-            LOG_TRACE_RENDER(<< "Render pageId <" << page.pageId() << ">.");
+            // LOG_TRACE_RENDER(<< "Render pageId <" << page.pageId() << ">.");
 
             if (pageIndex == 0)
             {
@@ -342,8 +394,8 @@ bool ViewerOpenGLViewport::renderScene()
 
 void ViewerOpenGLViewport::renderFirstFrame()
 {
-    LOG_TRACE_UPDATE_VIEW(<< "Rendered first frame in viewport <" << viewportId_
-                          << ">.");
+    LOG_TRACE_RENDER(<< "Rendered first frame in viewport <" << viewportId_
+                     << ">.");
 
     ViewerOpenGL::renderClipFilter(editor_->clipFilter());
     renderSegments();
@@ -399,6 +451,38 @@ void ViewerOpenGLViewport::renderSegments()
     }
 }
 
+void ViewerOpenGLViewport::renderGuides()
+{
+    // Bounding box.
+    glColor3f(0.25F, 0.25F, 0.25F);
+    ViewerOpenGL::renderAabb(aabb_);
+
+    // Overlay.
+    QMatrix4x4 m;
+    float w = static_cast<float>(camera_.width());
+    float h = static_cast<float>(camera_.height());
+
+    m.ortho(-w * 0.5F, w * 0.5F, -h * 0.5F, h * 0.5F, -50.0F, 50.0F);
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixf(m.data());
+
+    // Overlay: rotated.
+    float axesSize = 30.0F;
+    m.setToIdentity();
+    m.translate(-w * 0.5F + axesSize + 2.0F, -h * 0.5F + axesSize + 2.0F);
+    m.scale(axesSize);
+    m = m * camera_.rotation();
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixf(m.data());
+
+    glDisable(GL_DEPTH_TEST);
+    glLineWidth(2.0F);
+    ViewerOpenGL::renderAxis();
+    glLineWidth(1.0F);
+    glEnable(GL_DEPTH_TEST);
+}
+
 void ViewerOpenGLViewport::renderSceneSettingsEnable()
 {
     const Settings &settings = editor_->settings();
@@ -444,57 +528,5 @@ void ViewerOpenGLViewport::renderSceneSettingsDisable()
     if (settings.view.isFogEnabled())
     {
         glDisable(GL_FOG);
-    }
-}
-
-void ViewerOpenGLViewport::resizeGL(int w, int h)
-{
-    w = static_cast<int>(parentWidget()->devicePixelRatio() * w);
-    h = static_cast<int>(parentWidget()->devicePixelRatio() * h);
-    camera_.setViewport(0, 0, w, h);
-    camera_.updateProjection();
-    cameraChanged();
-}
-
-void ViewerOpenGLViewport::mouseReleaseEvent(QMouseEvent *event)
-{
-    (void)event;
-}
-
-void ViewerOpenGLViewport::mousePressEvent(QMouseEvent *event)
-{
-    camera_.mousePressEvent(event);
-    setFocus();
-}
-
-void ViewerOpenGLViewport::mouseMoveEvent(QMouseEvent *event)
-{
-    camera_.mouseMoveEvent(event);
-    cameraChanged();
-}
-
-void ViewerOpenGLViewport::wheelEvent(QWheelEvent *event)
-{
-    camera_.wheelEvent(event);
-    setFocus();
-    cameraChanged();
-}
-
-void ViewerOpenGLViewport::setFocus()
-{
-    if (!isSelected())
-    {
-        if (windowViewports_)
-        {
-            windowViewports_->selectViewport(this);
-        }
-    }
-}
-
-void ViewerOpenGLViewport::cameraChanged()
-{
-    if (windowViewports_)
-    {
-        emit windowViewports_->cameraChanged(viewportId_);
     }
 }

@@ -17,10 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ExplorerFilesWidget.cpp */
+/** @file ExplorerDatasetsWidget.cpp */
 
 // Include 3D Forest.
-#include <ExplorerFilesWidget.hpp>
+#include <ExplorerDatasetsWidget.hpp>
 #include <ImportFilePlugin.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
@@ -37,15 +37,15 @@
 #include <QVBoxLayout>
 
 // Include local.
-#define LOG_MODULE_NAME "ExplorerFilesWidget"
+#define LOG_MODULE_NAME "ExplorerDatasetsWidget"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define ICON(name) (ThemeIcon(":/explorer/", name))
 
-ExplorerFilesWidget::ExplorerFilesWidget(MainWindow *mainWindow,
-                                         const QIcon &icon,
-                                         const QString &text)
+ExplorerDatasetsWidget::ExplorerDatasetsWidget(MainWindow *mainWindow,
+                                               const QIcon &icon,
+                                               const QString &text)
     : ExplorerWidgetInterface(mainWindow, icon, text)
 {
     // Table.
@@ -135,8 +135,8 @@ ExplorerFilesWidget::ExplorerFilesWidget(MainWindow *mainWindow,
             SLOT(slotUpdate(void *, const QSet<Editor::Type> &)));
 }
 
-void ExplorerFilesWidget::slotUpdate(void *sender,
-                                     const QSet<Editor::Type> &target)
+void ExplorerDatasetsWidget::slotUpdate(void *sender,
+                                        const QSet<Editor::Type> &target)
 {
     if (sender == this)
     {
@@ -145,15 +145,37 @@ void ExplorerFilesWidget::slotUpdate(void *sender,
 
     if (target.empty() || target.contains(Editor::TYPE_DATA_SET))
     {
+        LOG_TRACE_UPDATE(<< "Input datasets.");
+
         setDatasets(mainWindow_->editor().datasets(),
                     mainWindow_->editor().datasetsFilter());
     }
 }
 
-void ExplorerFilesWidget::setDatasets(const Datasets &datasets,
-                                      const QueryFilterSet &filter)
+void ExplorerDatasetsWidget::dataChanged()
 {
-    LOG_DEBUG(<< "Input datasets <" << datasets.size() << ">.");
+    LOG_TRACE_UPDATE(<< "Output datasets.");
+
+    mainWindow_->suspendThreads();
+    mainWindow_->editor().setDatasets(datasets_);
+    mainWindow_->editor().setDatasetsFilter(filter_);
+    mainWindow_->updateData();
+}
+
+void ExplorerDatasetsWidget::filterChanged()
+{
+    LOG_TRACE_UPDATE(<< "Output datasets filter <" << filter_.isFilterEnabled()
+                     << ">.");
+
+    mainWindow_->suspendThreads();
+    mainWindow_->editor().setDatasetsFilter(filter_);
+    mainWindow_->updateFilter();
+}
+
+void ExplorerDatasetsWidget::setDatasets(const Datasets &datasets,
+                                         const QueryFilterSet &filter)
+{
+    LOG_DEBUG(<< "Set datasets n <" << datasets.size() << ">.");
 
     block();
 
@@ -187,45 +209,23 @@ void ExplorerFilesWidget::setDatasets(const Datasets &datasets,
     unblock();
 }
 
-void ExplorerFilesWidget::dataChanged()
-{
-    LOG_DEBUG(<< "Output datasets <" << datasets_.size() << ">.");
-    LOG_DEBUG(<< "Output datasets filter <" << filter_.isFilterEnabled()
-              << ">.");
-
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setDatasets(datasets_);
-    mainWindow_->editor().setDatasetsFilter(filter_);
-    mainWindow_->updateData();
-}
-
-void ExplorerFilesWidget::filterChanged()
-{
-    LOG_DEBUG(<< "Output datasets filter <" << filter_.isFilterEnabled()
-              << ">.");
-
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setDatasetsFilter(filter_);
-    mainWindow_->updateFilter();
-}
-
-bool ExplorerFilesWidget::isFilterEnabled() const
+bool ExplorerDatasetsWidget::isFilterEnabled() const
 {
     return filter_.isFilterEnabled();
 }
 
-void ExplorerFilesWidget::setFilterEnabled(bool b)
+void ExplorerDatasetsWidget::setFilterEnabled(bool b)
 {
     filter_.setFilterEnabled(b);
     filterChanged();
 }
 
-void ExplorerFilesWidget::slotAdd()
+void ExplorerDatasetsWidget::slotAdd()
 {
     ImportFilePlugin::import(mainWindow_);
 }
 
-void ExplorerFilesWidget::slotDelete()
+void ExplorerDatasetsWidget::slotDelete()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
@@ -245,7 +245,7 @@ void ExplorerFilesWidget::slotDelete()
     }
 }
 
-void ExplorerFilesWidget::slotShow()
+void ExplorerDatasetsWidget::slotShow()
 {
     LOG_DEBUG(<< "Show.");
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
@@ -263,7 +263,7 @@ void ExplorerFilesWidget::slotShow()
     }
 }
 
-void ExplorerFilesWidget::slotHide()
+void ExplorerDatasetsWidget::slotHide()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
@@ -280,7 +280,7 @@ void ExplorerFilesWidget::slotHide()
     }
 }
 
-void ExplorerFilesWidget::slotSelectAll()
+void ExplorerDatasetsWidget::slotSelectAll()
 {
     QTreeWidgetItemIterator it(tree_);
 
@@ -293,7 +293,7 @@ void ExplorerFilesWidget::slotSelectAll()
     slotItemSelectionChanged();
 }
 
-void ExplorerFilesWidget::slotSelectInvert()
+void ExplorerDatasetsWidget::slotSelectInvert()
 {
     QTreeWidgetItemIterator it(tree_);
 
@@ -306,7 +306,7 @@ void ExplorerFilesWidget::slotSelectInvert()
     slotItemSelectionChanged();
 }
 
-void ExplorerFilesWidget::slotSelectNone()
+void ExplorerDatasetsWidget::slotSelectNone()
 {
     QTreeWidgetItemIterator it(tree_);
 
@@ -319,7 +319,7 @@ void ExplorerFilesWidget::slotSelectNone()
     slotItemSelectionChanged();
 }
 
-void ExplorerFilesWidget::slotItemSelectionChanged()
+void ExplorerDatasetsWidget::slotItemSelectionChanged()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
@@ -337,7 +337,7 @@ void ExplorerFilesWidget::slotItemSelectionChanged()
     }
 }
 
-void ExplorerFilesWidget::slotItemChanged(QTreeWidgetItem *item, int column)
+void ExplorerDatasetsWidget::slotItemChanged(QTreeWidgetItem *item, int column)
 {
     if (column == COLUMN_CHECKED)
     {
@@ -353,17 +353,17 @@ void ExplorerFilesWidget::slotItemChanged(QTreeWidgetItem *item, int column)
     }
 }
 
-size_t ExplorerFilesWidget::identifier(const QTreeWidgetItem *item)
+size_t ExplorerDatasetsWidget::identifier(const QTreeWidgetItem *item)
 {
     return static_cast<size_t>(item->text(COLUMN_ID).toULong());
 }
 
-size_t ExplorerFilesWidget::index(const QTreeWidgetItem *item)
+size_t ExplorerDatasetsWidget::index(const QTreeWidgetItem *item)
 {
     return datasets_.index(item->text(COLUMN_ID).toULong());
 }
 
-void ExplorerFilesWidget::updateTree()
+void ExplorerDatasetsWidget::updateTree()
 {
     block();
 
@@ -388,14 +388,14 @@ void ExplorerFilesWidget::updateTree()
     unblock();
 }
 
-void ExplorerFilesWidget::block()
+void ExplorerDatasetsWidget::block()
 {
     disconnect(tree_, SIGNAL(itemChanged(QTreeWidgetItem *, int)), 0, 0);
     disconnect(tree_, SIGNAL(itemSelectionChanged()), 0, 0);
     (void)blockSignals(true);
 }
 
-void ExplorerFilesWidget::unblock()
+void ExplorerDatasetsWidget::unblock()
 {
     (void)blockSignals(false);
     connect(tree_,
@@ -408,7 +408,7 @@ void ExplorerFilesWidget::unblock()
             SLOT(slotItemSelectionChanged()));
 }
 
-void ExplorerFilesWidget::addTreeItem(size_t index)
+void ExplorerDatasetsWidget::addTreeItem(size_t index)
 {
     QTreeWidgetItem *item = new QTreeWidgetItem(tree_);
 

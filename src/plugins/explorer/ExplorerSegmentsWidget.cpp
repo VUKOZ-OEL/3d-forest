@@ -159,15 +159,36 @@ void ExplorerSegmentsWidget::slotUpdate(void *sender,
     if (target.empty() || target.contains(Editor::TYPE_SEGMENT) ||
         target.contains(Editor::TYPE_SETTINGS))
     {
+        LOG_TRACE_UPDATE(<< "Input segments.");
+
         setSegments(mainWindow_->editor().segments(),
                     mainWindow_->editor().segmentsFilter());
     }
 }
 
+void ExplorerSegmentsWidget::dataChanged()
+{
+    LOG_TRACE_UPDATE(<< "Output segments.");
+
+    mainWindow_->suspendThreads();
+    mainWindow_->editor().setSegments(segments_);
+    mainWindow_->editor().setSegmentsFilter(filter_);
+    mainWindow_->updateData();
+}
+
+void ExplorerSegmentsWidget::filterChanged()
+{
+    LOG_TRACE_UPDATE(<< "Output segments filter.");
+
+    mainWindow_->suspendThreads();
+    mainWindow_->editor().setSegmentsFilter(filter_);
+    mainWindow_->updateFilter();
+}
+
 void ExplorerSegmentsWidget::setSegments(const Segments &segments,
                                          const QueryFilterSet &filter)
 {
-    LOG_DEBUG(<< "Input segments <" << segments.size() << ">.");
+    LOG_DEBUG(<< "Set segments n <" << segments.size() << ">.");
 
     block();
 
@@ -208,28 +229,6 @@ void ExplorerSegmentsWidget::setSegments(const Segments &segments,
     tree_->sortItems(COLUMN_ID, Qt::AscendingOrder);
 
     unblock();
-}
-
-void ExplorerSegmentsWidget::dataChanged()
-{
-    LOG_DEBUG(<< "Output segments <" << segments_.size() << ">.");
-    LOG_DEBUG(<< "Output segments filter <" << filter_.isFilterEnabled()
-              << ">.");
-
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setSegments(segments_);
-    mainWindow_->editor().setSegmentsFilter(filter_);
-    mainWindow_->updateData();
-}
-
-void ExplorerSegmentsWidget::filterChanged()
-{
-    LOG_DEBUG(<< "Output segments filter <" << filter_.isFilterEnabled()
-              << ">.");
-
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setSegmentsFilter(filter_);
-    mainWindow_->updateFilter();
 }
 
 bool ExplorerSegmentsWidget::isFilterEnabled() const

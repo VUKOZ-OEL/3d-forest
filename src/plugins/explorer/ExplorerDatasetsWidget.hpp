@@ -17,10 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ExplorerFilesWidget.hpp */
+/** @file ExplorerDatasetsWidget.hpp */
 
-#ifndef EXPLORER_FILES_WIDGET_HPP
-#define EXPLORER_FILES_WIDGET_HPP
+#ifndef EXPLORER_DATASETS_WIDGET_HPP
+#define EXPLORER_DATASETS_WIDGET_HPP
 
 // Include 3D Forest.
 #include <Datasets.hpp>
@@ -33,15 +33,15 @@ class QToolButton;
 class QTreeWidget;
 class QTreeWidgetItem;
 
-/** Explorer Files Widget. */
-class ExplorerFilesWidget : public ExplorerWidgetInterface
+/** Explorer Datasets Widget. */
+class ExplorerDatasetsWidget : public ExplorerWidgetInterface
 {
     Q_OBJECT
 
 public:
-    ExplorerFilesWidget(MainWindow *mainWindow,
-                        const QIcon &icon,
-                        const QString &text);
+    ExplorerDatasetsWidget(MainWindow *mainWindow,
+                           const QIcon &icon,
+                           const QString &text);
 
     virtual bool hasColorSource() const { return false; }
     virtual SettingsView::ColorSource colorSource() const
@@ -102,4 +102,4 @@ protected:
     void addTreeItem(size_t index);
 };
 
-#endif /* EXPLORER_FILES_WIDGET_HPP */
+#endif /* EXPLORER_DATASETS_WIDGET_HPP */

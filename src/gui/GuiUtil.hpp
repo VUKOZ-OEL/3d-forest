@@ -17,33 +17,40 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SettingsWindow.hpp */
+/** @file GuiUtil.hpp */
 
-#ifndef SETTINGS_WINDOW_HPP
-#define SETTINGS_WINDOW_HPP
+#ifndef GUI_UTIL_HPP
+#define GUI_UTIL_HPP
 
 // Include 3D Forest.
-class MainWindow;
-class SettingsViewWidget;
-class SettingsUnitsWidget;
-class ToolTabWidget;
+#include <Editor.hpp>
 
 // Include Qt.
-#include <QDockWidget>
+#include <QSet>
+#include <QString>
 
-/** Settings Window. */
-class SettingsWindow : public QDockWidget
+// Include local.
+#include <ExportGui.hpp>
+#include <WarningsDisable.hpp>
+
+inline std::ostream &operator<<(std::ostream &out, const QSet<Editor::Type> in)
 {
-    Q_OBJECT
+    out << "{";
+    int c = 0;
+    for (auto &it : in)
+    {
+        if (c > 0)
+        {
+            out << ", ";
+        }
+        c++;
 
-public:
-    SettingsWindow(MainWindow *mainWindow);
+        out << it;
+    }
+    out << "}";
+    return out;
+}
 
-protected:
-    MainWindow *mainWindow_;
-    ToolTabWidget *tabWidget_;
-    SettingsViewWidget *settingsViewWidget_;
-    SettingsUnitsWidget *settingsUnitsWidget_;
-};
+#include <WarningsEnable.hpp>
 
-#endif /* SETTINGS_WINDOW_HPP */
+#endif /* GUI_UTIL_HPP */

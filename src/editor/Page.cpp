@@ -166,8 +166,7 @@ void Page::setState(Page::State state)
 
 bool Page::nextState()
 {
-    LOG_TRACE_UPDATE_VIEW(<< "Compute state <" << Page::stateToString(state_)
-                          << ">.");
+    LOG_DEBUG(<< "Compute state <" << Page::stateToString(state_) << ">.");
 
     if (state_ == Page::STATE_READ)
     {
