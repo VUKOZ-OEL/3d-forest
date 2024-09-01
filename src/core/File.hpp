@@ -51,6 +51,7 @@ public:
     void write(const uint8_t *buffer, uint64_t nbyte);
     void write(const std::string &str);
     void write(File &input, uint64_t nbyte);
+    void truncate(uint64_t newSize = 0);
 
     bool isOpen() const { return fd_ != INVALID_DESCRIPTOR; }
     bool eof() const;

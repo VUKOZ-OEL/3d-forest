@@ -224,6 +224,8 @@ void ViewerPlugin::slotViewLayout3RowsRight()
 
 void ViewerPlugin::slotViewLayout(ViewerViewports::ViewLayout layout)
 {
+    LOG_DEBUG(<< "Set layout <" << layout << ">.");
+
     mainWindow_->suspendThreads();
 
     if (layout == ViewerViewports::VIEW_LAYOUT_SINGLE)
@@ -252,5 +254,5 @@ void ViewerPlugin::slotViewLayout(ViewerViewports::ViewLayout layout)
 
 void ViewerPlugin::updateViewer()
 {
-    mainWindow_->slotRenderViewport();
+    mainWindow_->slotRenderViewports();
 }

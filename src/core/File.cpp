@@ -380,6 +380,22 @@ void File::seek(uint64_t offset)
     offset_ = offset;
 }
 
+void File::truncate(uint64_t newSize)
+{
+    int ret;
+
+#if defined(_MSC_VER)
+    ret = ::_chsize_s(fd_, static_cast<__int64>(newSize));
+#else
+    ret = ::ftruncate(fd_, static_cast<off_t>(newSize));
+#endif
+
+    if (ret == -1)
+    {
+        THROW_ERRNO("Can't truncate file '" + path_ + "'");
+    }
+}
+
 std::string File::read(const std::string &path)
 {
     File f;

@@ -77,7 +77,7 @@ void ExplorerDescriptorWidget::slotUpdate(void *sender,
 
     if (target.empty() || target.contains(Editor::TYPE_DESCRIPTOR))
     {
-        LOG_TRACE_UPDATE(<< "Input descriptor filter.");
+        LOG_DEBUG_UPDATE(<< "Input descriptor filter.");
 
         setDescriptor(mainWindow_->editor().descriptorFilter());
     }
@@ -85,7 +85,7 @@ void ExplorerDescriptorWidget::slotUpdate(void *sender,
 
 void ExplorerDescriptorWidget::filterChanged()
 {
-    LOG_TRACE_UPDATE(<< "Output descriptor filter <" << descriptorRange_
+    LOG_DEBUG_UPDATE(<< "Output descriptor filter <" << descriptorRange_
                      << ">.");
 
     mainWindow_->suspendThreads();

@@ -120,7 +120,7 @@ void SettingsUnitsWidget::slotUpdate(void *sender,
 
     if (target.empty() || target.contains(Editor::TYPE_SETTINGS))
     {
-        LOG_TRACE_UPDATE(<< "Input units settings.");
+        LOG_DEBUG_UPDATE(<< "Input units settings.");
 
         setUnitsSettings(mainWindow_->editor().settings().units);
     }
@@ -128,7 +128,7 @@ void SettingsUnitsWidget::slotUpdate(void *sender,
 
 void SettingsUnitsWidget::dataChanged()
 {
-    LOG_TRACE_UPDATE(<< "Output units settings <" << toString(settings_)
+    LOG_DEBUG_UPDATE(<< "Output units settings <" << toString(settings_)
                      << ">.");
 
     mainWindow_->suspendThreads();

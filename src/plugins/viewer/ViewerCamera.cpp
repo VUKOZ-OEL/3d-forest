@@ -47,6 +47,7 @@ ViewerCamera::ViewerCamera()
       zNear_(0.01F),
       zFar_(100000.0F),
       perspective_(true),
+      viewportId_(0),
       viewport_(0, 0, 100, 100),
       sensitivityX_(1.0F),
       sensitivityY_(1.0F),
@@ -59,6 +60,11 @@ ViewerCamera::ViewerCamera()
 
 ViewerCamera::~ViewerCamera()
 {
+}
+
+void ViewerCamera::setViewportId(size_t id)
+{
+    viewportId_ = id;
 }
 
 void ViewerCamera::setViewport(int x, int y, int width, int height)
@@ -202,6 +208,7 @@ Camera ViewerCamera::toCamera() const
     ret.center.set(center_.x(), center_.y(), center_.z());
     ret.up.set(up_.x(), up_.y(), up_.z());
     ret.fov = fov_;
+    ret.viewportId = viewportId_;
 
     return ret;
 }

@@ -31,19 +31,17 @@
 
 RenderThread::RenderThread(Editor *editor)
     : editor_(editor),
-      viewportId_(0),
       initialized_(false)
 {
 }
 
-void RenderThread::render(size_t viewportId, const Camera &camera)
+void RenderThread::render(const std::vector<Camera> &cameraList)
 {
-    LOG_DEBUG(<< "Render viewportId <" << viewportId << ">.");
+    LOG_DEBUG(<< "Render viewports n <" << cameraList.size() << ">.");
 
     cancel();
 
-    viewportId_ = viewportId;
-    camera_ = camera;
+    cameraList_ = cameraList;
     initialized_ = false;
 
     ThreadLoop::start();
@@ -55,9 +53,9 @@ bool RenderThread::next()
 
     if (!initialized_)
     {
-        LOG_DEBUG(<< "Apply camera to viewportId <" << viewportId_ << ">.");
+        LOG_DEBUG(<< "Apply camera to viewports.");
         editor_->lock("RenderThread applyCamera");
-        editor_->viewports().applyCamera(viewportId_, camera_);
+        editor_->viewports().applyCamera(cameraList_);
         editor_->unlock("RenderThread applyCamera");
         initialized_ = true;
         return true;

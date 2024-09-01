@@ -25,7 +25,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "Editor"
-// #define LOG_MODULE_DEBUG_ENABLED 1
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 static const char *EDITOR_KEY_PROJECT_NAME = "projectName";
@@ -38,9 +38,10 @@ static const char *EDITOR_KEY_ELEVATION_RANGE = "elevationRange";
 
 Editor::Editor()
 {
-    LOG_DEBUG(<< "Create.");
+    LOG_DEBUG(<< "Start creating the editor.");
     close();
     viewportsResize(1);
+    LOG_DEBUG(<< "Finished creating the editor.");
 }
 
 Editor::~Editor()
@@ -50,7 +51,7 @@ Editor::~Editor()
 
 void Editor::close()
 {
-    LOG_DEBUG(<< "Close.");
+    LOG_DEBUG(<< "Start closing the editor.");
 
     setProjectPath(File::join(File::currentPath(), "untitled.json"));
     projectName_ = "Untitled";
@@ -80,11 +81,13 @@ void Editor::close()
     intensityFilter_.set(0.0, 1.0);
 
     unsavedChanges_ = false;
+
+    LOG_DEBUG(<< "Finished closing the editor.");
 }
 
 void Editor::open(const std::string &path, const SettingsImport &settings)
 {
-    LOG_DEBUG(<< "Open path <" << path << ">.");
+    LOG_DEBUG(<< "Start opening new project/dataset path <" << path << ">.");
 
     // Get filename extension in lower case (no UTF).
     std::string ext = toLower(File::fileExtension(path));
@@ -99,11 +102,13 @@ void Editor::open(const std::string &path, const SettingsImport &settings)
         // Add new dataset to existing project.
         openDataset(path, settings);
     }
+
+    LOG_DEBUG(<< "Finished opening the project/dataset.");
 }
 
 void Editor::openProject(const std::string &path)
 {
-    LOG_DEBUG(<< "Open project from path <" << path << ">.");
+    LOG_DEBUG(<< "Start opening project from path <" << path << ">.");
 
     close();
 
@@ -112,6 +117,7 @@ void Editor::openProject(const std::string &path)
 
     if (!in.isObject())
     {
+        LOG_DEBUG(<< "Cancel opening new project, exception is raised.");
         THROW("Project file '" + path + "' is not in JSON object");
     }
 
@@ -170,16 +176,19 @@ void Editor::openProject(const std::string &path)
     }
     catch (...)
     {
+        LOG_DEBUG(<< "Cancel opening new project, exception is raised.");
         close();
         throw;
     }
 
     updateAfterRead();
+
+    LOG_DEBUG(<< "Finished opening project.");
 }
 
 void Editor::saveProject(const std::string &path)
 {
-    LOG_DEBUG(<< "Save project to path <" << path << ">.");
+    LOG_DEBUG(<< "Start saving the project to path <" << path << ">.");
 
     Json out;
 
@@ -194,12 +203,14 @@ void Editor::saveProject(const std::string &path)
     out.write(path);
 
     unsavedChanges_ = false;
+
+    LOG_DEBUG(<< "Finished saving the project.");
 }
 
 void Editor::openDataset(const std::string &path,
                          const SettingsImport &settings)
 {
-    LOG_DEBUG(<< "Open dataset path <" << path << ">.");
+    LOG_DEBUG(<< "Start opening new dataset from path <" << path << ">.");
 
     try
     {
@@ -220,12 +231,15 @@ void Editor::openDataset(const std::string &path,
     }
     catch (...)
     {
+        LOG_DEBUG(<< "Cancel opening new dataset, exception is raised.");
         throw;
     }
 
     updateAfterRead();
 
     unsavedChanges_ = true;
+
+    LOG_DEBUG(<< "Finished opening the dataset.");
 }
 
 void Editor::setProjectPath(const std::string &projectPath)
@@ -447,18 +461,12 @@ void Editor::erasePage(size_t dataset, size_t index)
 
 void Editor::lock(const std::string &message)
 {
-    LOG_DEBUG(<< "Mutex lock <" << message << "> thread ID <" << threadId()
-              << ">.");
     mutex_.lock();
-    LOG_DEBUG(<< "Mutex locked <" << message << "> thread ID <" << threadId()
-              << ">.");
+    (void)message;
 }
 
 void Editor::unlock(const std::string &message)
 {
-    LOG_DEBUG(<< "Mutex unlock <" << message << "> thread ID <" << threadId()
-              << ">.");
     mutex_.unlock();
-    LOG_DEBUG(<< "Mutex unlocked <" << message << "> thread ID <" << threadId()
-              << ">.");
+    (void)message;
 }

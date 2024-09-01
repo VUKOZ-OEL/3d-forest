@@ -98,7 +98,7 @@ void ExplorerClippingWidget::slotUpdate(void *sender,
     if (target.empty() || target.contains(Editor::TYPE_CLIP_FILTER) ||
         target.contains(Editor::TYPE_SETTINGS))
     {
-        LOG_TRACE_UPDATE(<< "Input clip filter.");
+        LOG_DEBUG_UPDATE(<< "Input clip filter.");
 
         region_ = mainWindow_->editor().clipFilter();
         LOG_DEBUG(<< "Set region <" << region_ << ">.");
@@ -110,7 +110,7 @@ void ExplorerClippingWidget::slotUpdate(void *sender,
 
 void ExplorerClippingWidget::filterChanged()
 {
-    LOG_TRACE_UPDATE(<< "Output clip filter.");
+    LOG_DEBUG_UPDATE(<< "Output clip filter.");
 
     Region filter = region_;
 

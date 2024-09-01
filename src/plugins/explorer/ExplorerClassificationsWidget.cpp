@@ -128,7 +128,7 @@ void ExplorerClassificationsWidget::slotUpdate(void *sender,
 
     if (target.empty() || target.contains(Editor::TYPE_CLASSIFICATION))
     {
-        LOG_TRACE_UPDATE(<< "Input classifications.");
+        LOG_DEBUG_UPDATE(<< "Input classifications.");
 
         setClassifications(mainWindow_->editor().classifications(),
                            mainWindow_->editor().classificationsFilter());
@@ -137,7 +137,7 @@ void ExplorerClassificationsWidget::slotUpdate(void *sender,
 
 void ExplorerClassificationsWidget::dataChanged()
 {
-    LOG_TRACE_UPDATE(<< "Output classifications.");
+    LOG_DEBUG_UPDATE(<< "Output classifications.");
 
     mainWindow_->suspendThreads();
     mainWindow_->editor().setClassifications(classifications_);
@@ -147,7 +147,7 @@ void ExplorerClassificationsWidget::dataChanged()
 
 void ExplorerClassificationsWidget::filterChanged()
 {
-    LOG_TRACE_UPDATE(<< "Output classifications filter.");
+    LOG_DEBUG_UPDATE(<< "Output classifications filter.");
 
     mainWindow_->suspendThreads();
     mainWindow_->editor().setClassificationsFilter(filter_);

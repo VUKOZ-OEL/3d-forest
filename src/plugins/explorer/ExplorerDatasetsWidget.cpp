@@ -145,7 +145,7 @@ void ExplorerDatasetsWidget::slotUpdate(void *sender,
 
     if (target.empty() || target.contains(Editor::TYPE_DATA_SET))
     {
-        LOG_TRACE_UPDATE(<< "Input datasets.");
+        LOG_DEBUG_UPDATE(<< "Input datasets.");
 
         setDatasets(mainWindow_->editor().datasets(),
                     mainWindow_->editor().datasetsFilter());
@@ -154,7 +154,7 @@ void ExplorerDatasetsWidget::slotUpdate(void *sender,
 
 void ExplorerDatasetsWidget::dataChanged()
 {
-    LOG_TRACE_UPDATE(<< "Output datasets.");
+    LOG_DEBUG_UPDATE(<< "Output datasets.");
 
     mainWindow_->suspendThreads();
     mainWindow_->editor().setDatasets(datasets_);
@@ -164,7 +164,7 @@ void ExplorerDatasetsWidget::dataChanged()
 
 void ExplorerDatasetsWidget::filterChanged()
 {
-    LOG_TRACE_UPDATE(<< "Output datasets filter <" << filter_.isFilterEnabled()
+    LOG_DEBUG_UPDATE(<< "Output datasets filter <" << filter_.isFilterEnabled()
                      << ">.");
 
     mainWindow_->suspendThreads();

@@ -106,7 +106,7 @@ public:
     void update(const QSet<Editor::Type> &target,
                 Page::State viewPortsCacheState = Page::STATE_READ,
                 bool resetCamera = false);
-    void updateEverything();
+    void updateNewProject();
     void updateData();
     void updateFilter();
     void updateModifiers();

@@ -60,6 +60,7 @@ private:
     QLabel *label_;
     QVBoxLayout *mainLayout_;
     bool showTextBesideIcon_;
+    bool showTextInAllTabs_;
     std::vector<QWidget *> tabList_;
     std::vector<QToolButton *> toolButtonList_;
 };

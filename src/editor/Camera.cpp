@@ -26,7 +26,7 @@
 #define LOG_MODULE_NAME "Camera"
 #include <Log.hpp>
 
-Camera::Camera() : fov(60.0)
+Camera::Camera() : fov(60.0), viewportId(0)
 {
 }
 

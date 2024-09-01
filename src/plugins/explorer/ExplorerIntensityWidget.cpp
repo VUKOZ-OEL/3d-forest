@@ -77,7 +77,7 @@ void ExplorerIntensityWidget::slotUpdate(void *sender,
 
     if (target.empty() || target.contains(Editor::TYPE_INTENSITY))
     {
-        LOG_TRACE_UPDATE(<< "Input intensity filter.");
+        LOG_DEBUG_UPDATE(<< "Input intensity filter.");
 
         setIntensity(mainWindow_->editor().intensityFilter());
     }
@@ -85,7 +85,7 @@ void ExplorerIntensityWidget::slotUpdate(void *sender,
 
 void ExplorerIntensityWidget::filterChanged()
 {
-    LOG_TRACE_UPDATE(<< "Output intensity filter <" << intensityRange_ << ">.");
+    LOG_DEBUG_UPDATE(<< "Output intensity filter <" << intensityRange_ << ">.");
 
     mainWindow_->suspendThreads();
     mainWindow_->editor().setIntensityFilter(intensityRange_);

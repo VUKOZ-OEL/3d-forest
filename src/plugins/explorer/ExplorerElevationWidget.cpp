@@ -78,7 +78,7 @@ void ExplorerElevationWidget::slotUpdate(void *sender,
     if (target.empty() || target.contains(Editor::TYPE_ELEVATION) ||
         target.contains(Editor::TYPE_SETTINGS))
     {
-        LOG_TRACE_UPDATE(<< "Input elevation filter.");
+        LOG_DEBUG_UPDATE(<< "Input elevation filter.");
 
         setElevation(mainWindow_->editor().elevationFilter());
     }
@@ -86,7 +86,7 @@ void ExplorerElevationWidget::slotUpdate(void *sender,
 
 void ExplorerElevationWidget::filterChanged()
 {
-    LOG_TRACE_UPDATE(<< "Output elevation filter <" << elevationRange_ << ">.");
+    LOG_DEBUG_UPDATE(<< "Output elevation filter <" << elevationRange_ << ">.");
 
     mainWindow_->suspendThreads();
     mainWindow_->editor().setElevationFilter(elevationRange_);

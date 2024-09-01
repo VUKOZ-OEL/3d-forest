@@ -43,7 +43,7 @@ ViewerOpenGLViewport::ViewerOpenGLViewport(QWidget *parent)
       editor_(nullptr)
 
 {
-    resetCamera();
+    setViewDefault();
 }
 
 ViewerOpenGLViewport::~ViewerOpenGLViewport()
@@ -52,31 +52,31 @@ ViewerOpenGLViewport::~ViewerOpenGLViewport()
 
 void ViewerOpenGLViewport::paintEvent(QPaintEvent *event)
 {
-    LOG_TRACE_RENDER(<< "Paint event.");
+    LOG_DEBUG_RENDER(<< "Paint event.");
     QOpenGLWidget::paintEvent(event);
 }
 
 void ViewerOpenGLViewport::resizeEvent(QResizeEvent *event)
 {
-    LOG_TRACE_RENDER(<< "Resize event.");
+    LOG_DEBUG_RENDER(<< "Resize event.");
     QOpenGLWidget::resizeEvent(event);
 }
 
 void ViewerOpenGLViewport::showEvent(QShowEvent *event)
 {
-    LOG_TRACE_RENDER(<< "Show event.");
+    LOG_DEBUG_RENDER(<< "Show event.");
     QOpenGLWidget::showEvent(event);
 }
 
 void ViewerOpenGLViewport::hideEvent(QHideEvent *event)
 {
-    LOG_TRACE_RENDER(<< "Hide.");
+    LOG_DEBUG_RENDER(<< "Hide.");
     QOpenGLWidget::hideEvent(event);
 }
 
 void ViewerOpenGLViewport::initializeGL()
 {
-    LOG_TRACE_RENDER(<< "Initialize OpenGL.");
+    LOG_DEBUG_RENDER(<< "Initialize OpenGL.");
 
     initializeOpenGLFunctions();
 
@@ -89,7 +89,7 @@ void ViewerOpenGLViewport::initializeGL()
 
 void ViewerOpenGLViewport::resizeGL(int w, int h)
 {
-    LOG_TRACE_RENDER(<< "Resize w <" << w << "> h <" << h << ">.");
+    LOG_DEBUG_RENDER(<< "Resize w <" << w << "> h <" << h << ">.");
 
     w = static_cast<int>(parentWidget()->devicePixelRatio() * w);
     h = static_cast<int>(parentWidget()->devicePixelRatio() * h);
@@ -100,7 +100,7 @@ void ViewerOpenGLViewport::resizeGL(int w, int h)
 
 void ViewerOpenGLViewport::paintGL()
 {
-    LOG_TRACE_RENDER(<< "Paint width <" << camera_.width() << "> height <"
+    LOG_DEBUG_RENDER(<< "Paint width <" << camera_.width() << "> height <"
                      << camera_.height() << ">.");
 
     // Setup camera.
@@ -160,7 +160,7 @@ void ViewerOpenGLViewport::cameraChanged()
 {
     if (windowViewports_)
     {
-        LOG_TRACE_RENDER(<< "Emit camera changed.");
+        LOG_DEBUG_RENDER(<< "Emit camera changed.");
         emit windowViewports_->cameraChanged(viewportId_);
     }
 }
@@ -170,6 +170,7 @@ void ViewerOpenGLViewport::setViewports(ViewerViewports *viewer,
 {
     windowViewports_ = viewer;
     viewportId_ = viewportId;
+    camera_.setViewportId(viewportId_);
 }
 
 size_t ViewerOpenGLViewport::viewportId() const
@@ -189,18 +190,24 @@ bool ViewerOpenGLViewport::isSelected() const
 
 void ViewerOpenGLViewport::updateScene(Editor *editor)
 {
-    LOG_TRACE_RENDER(<< "Update viewport <" << viewportId_ << ">.");
+    LOG_DEBUG(<< "Update viewport <" << viewportId_ << ">.");
+
     editor_ = editor;
 }
 
 void ViewerOpenGLViewport::resetScene(Editor *editor, bool resetView)
 {
-    LOG_TRACE_RENDER(<< "Reset viewport <" << viewportId_ << ">.");
+    LOG_DEBUG(<< "Reset viewport <" << viewportId_ << "> reset view <"
+              << static_cast<int>(resetView) << ">.");
+
     editor_ = editor;
+
     aabb_.set(editor->datasets().boundary());
+
     if (resetView)
     {
-        resetCamera();
+        setViewResetCenter();
+        setViewResetDistance();
     }
 }
 
@@ -231,6 +238,8 @@ void ViewerOpenGLViewport::setViewDirection(const QVector3D &dir,
 
 void ViewerOpenGLViewport::setViewTop()
 {
+    LOG_DEBUG(<< "Set top view in viewport <" << viewportId_ << ">.");
+
     QVector3D dir(0.0F, 0.0F, 1.0F);
     QVector3D up(0.0F, 1.0F, 0.0F);
     setViewDirection(dir, up);
@@ -238,6 +247,8 @@ void ViewerOpenGLViewport::setViewTop()
 
 void ViewerOpenGLViewport::setViewFront()
 {
+    LOG_DEBUG(<< "Set front view in viewport <" << viewportId_ << ">.");
+
     QVector3D dir(0.0F, -1.0F, 0.0F);
     QVector3D up(0.0F, 0.0F, 1.0F);
     setViewDirection(dir, up);
@@ -245,6 +256,8 @@ void ViewerOpenGLViewport::setViewFront()
 
 void ViewerOpenGLViewport::setViewRight()
 {
+    LOG_DEBUG(<< "Set right view in viewport <" << viewportId_ << ">.");
+
     QVector3D dir(1.0F, 0.0F, 0.0F);
     QVector3D up(0.0F, 0.0F, 1.0F);
     setViewDirection(dir, up);
@@ -252,6 +265,7 @@ void ViewerOpenGLViewport::setViewRight()
 
 void ViewerOpenGLViewport::setView3d()
 {
+    LOG_DEBUG(<< "Set 3D view in viewport <" << viewportId_ << ">.");
     QVector3D dir(1.0F, -1.0F, 1.0F);
     QVector3D up(-1.065F, 1.0F, 1.0F);
     dir.normalize();
@@ -259,8 +273,10 @@ void ViewerOpenGLViewport::setView3d()
     setViewDirection(dir, up);
 }
 
-void ViewerOpenGLViewport::resetCamera()
+void ViewerOpenGLViewport::setViewDefault()
 {
+    LOG_DEBUG(<< "Set default view in viewport <" << viewportId_ << ">.");
+
     QVector3D center(0.0F, 0.0F, 0.0F);
     float distance = 1.0F;
 
@@ -282,6 +298,9 @@ void ViewerOpenGLViewport::resetCamera()
 
 void ViewerOpenGLViewport::setViewResetDistance()
 {
+    LOG_DEBUG(<< "Reset distance in viewport <" << viewportId_ << "> camera <"
+              << camera() << ">.");
+
     QVector3D center = camera_.getCenter();
     QVector3D up = camera_.getUp();
     QVector3D dir = camera_.getDirection();
@@ -291,6 +310,10 @@ void ViewerOpenGLViewport::setViewResetDistance()
     {
         distance = aabb_.getRadius() * 2.0F;
     }
+    if (distance < 1e-6)
+    {
+        distance = 1.0F;
+    }
 
     QVector3D eye = (dir * distance) + center;
     camera_.setLookAt(eye, center, up);
@@ -298,6 +321,9 @@ void ViewerOpenGLViewport::setViewResetDistance()
 
 void ViewerOpenGLViewport::setViewResetCenter()
 {
+    LOG_DEBUG(<< "Reset center in viewport <" << viewportId_ << "> camera <"
+              << camera() << ">.");
+
     QVector3D dir = camera_.getDirection();
     QVector3D up = camera_.getUp();
     float distance = camera_.getDistance();
@@ -320,7 +346,7 @@ void ViewerOpenGLViewport::clearScreen()
 
 bool ViewerOpenGLViewport::renderScene()
 {
-    LOG_TRACE_RENDER(<< "Render scene viewport <" << viewportId_ << ">.");
+    LOG_DEBUG_RENDER(<< "Render scene viewport <" << viewportId_ << ">.");
 
     if (!editor_)
     {
@@ -337,7 +363,7 @@ bool ViewerOpenGLViewport::renderScene()
 
     size_t pageSize = editor_->viewports().pageSize(viewportId_);
 
-    LOG_TRACE_RENDER(<< "Render pages n <" << pageSize << ">.");
+    LOG_DEBUG_RENDER(<< "Render pages n <" << pageSize << ">.");
 
     if (pageSize == 0)
     {
@@ -352,7 +378,7 @@ bool ViewerOpenGLViewport::renderScene()
         if (page.state() == Page::STATE_RENDER ||
             page.state() == Page::STATE_RENDERED)
         {
-            // LOG_TRACE_RENDER(<< "Render pageId <" << page.pageId() << ">.");
+            // LOG_DEBUG_RENDER(<< "Render pageId <" << page.pageId() << ">.");
 
             if (pageIndex == 0)
             {
@@ -394,7 +420,7 @@ bool ViewerOpenGLViewport::renderScene()
 
 void ViewerOpenGLViewport::renderFirstFrame()
 {
-    LOG_TRACE_RENDER(<< "Rendered first frame in viewport <" << viewportId_
+    LOG_DEBUG_RENDER(<< "Rendered first frame in viewport <" << viewportId_
                      << ">.");
 
     ViewerOpenGL::renderClipFilter(editor_->clipFilter());

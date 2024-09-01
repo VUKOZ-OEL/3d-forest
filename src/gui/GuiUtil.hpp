@@ -33,7 +33,13 @@
 #include <ExportGui.hpp>
 #include <WarningsDisable.hpp>
 
-inline std::ostream &operator<<(std::ostream &out, const QSet<Editor::Type> in)
+inline std::ostream &operator<<(std::ostream &out, const QString &in)
+{
+    out << in.toStdString();
+    return out;
+}
+
+inline std::ostream &operator<<(std::ostream &out, const QSet<Editor::Type> &in)
 {
     out << "{";
     int c = 0;

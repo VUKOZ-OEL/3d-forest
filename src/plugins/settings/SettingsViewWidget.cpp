@@ -142,7 +142,7 @@ void SettingsViewWidget::slotUpdate(void *sender,
 
     if (target.empty() || target.contains(Editor::TYPE_SETTINGS))
     {
-        LOG_TRACE_UPDATE(<< "Input view settings.");
+        LOG_DEBUG_UPDATE(<< "Input view settings.");
 
         setViewSettings(mainWindow_->editor().settings().view);
     }
@@ -150,7 +150,7 @@ void SettingsViewWidget::slotUpdate(void *sender,
 
 void SettingsViewWidget::dataChanged(bool modifiers)
 {
-    LOG_TRACE_UPDATE(<< "Output view settings.");
+    LOG_DEBUG_UPDATE(<< "Output view settings.");
 
     mainWindow_->suspendThreads();
     mainWindow_->editor().setSettingsView(settings_);

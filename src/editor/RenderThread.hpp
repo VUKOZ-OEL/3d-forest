@@ -37,14 +37,13 @@ class EXPORT_EDITOR RenderThread : public ThreadLoop
 public:
     RenderThread(Editor *editor);
 
-    void render(size_t viewportId, const Camera &camera);
+    void render(const std::vector<Camera> &cameraList);
 
     virtual bool next();
 
 protected:
     Editor *editor_;
-    size_t viewportId_;
-    Camera camera_;
+    std::vector<Camera> cameraList_;
     bool initialized_;
 };
 

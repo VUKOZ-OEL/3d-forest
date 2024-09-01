@@ -89,7 +89,7 @@ protected:
     ViewerAabb aabb_;
     ViewerCamera camera_;
 
-    void resetCamera();
+    void setViewDefault();
     void clearScreen();
     bool renderScene();
     void renderFirstFrame();

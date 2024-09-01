@@ -49,7 +49,7 @@ public:
 
     void applyWhereToAll();
 
-    void applyCamera(size_t viewport, const Camera &camera);
+    void applyCamera(const std::vector<Camera> &cameraList);
 
     void setState(Page::State state);
     bool nextState();

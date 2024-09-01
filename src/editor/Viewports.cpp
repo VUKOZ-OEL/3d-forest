@@ -71,11 +71,19 @@ void Viewports::applyWhereToAll()
     }
 }
 
-void Viewports::applyCamera(size_t viewport, const Camera &camera)
+void Viewports::applyCamera(const std::vector<Camera> &cameraList)
 {
-    if (viewport < viewports_.size())
+    for (size_t i = 0; i < cameraList.size(); i++)
     {
-        viewports_[viewport]->applyCamera(camera);
+        if (cameraList[i].viewportId < viewports_.size())
+        {
+            LOG_DEBUG(<< "Apply camera <" << cameraList[i] << ">.");
+            viewports_[cameraList[i].viewportId]->applyCamera(cameraList[i]);
+        }
+        else
+        {
+            LOG_DEBUG(<< "Skip camera <" << cameraList[i] << ">.");
+        }
     }
 }
 

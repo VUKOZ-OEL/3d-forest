@@ -76,6 +76,7 @@ ExplorerWindow::ExplorerWindow(MainWindow *mainWindow)
     {
         tabWidget_->addTab(items_[i], items_[i]->icon(), items_[i]->text());
     }
+    tabWidget_->setMinimumWidth(300);
 
     // Dock.
     setWidget(tabWidget_);

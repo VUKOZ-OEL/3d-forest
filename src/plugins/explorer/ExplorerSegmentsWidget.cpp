@@ -159,7 +159,7 @@ void ExplorerSegmentsWidget::slotUpdate(void *sender,
     if (target.empty() || target.contains(Editor::TYPE_SEGMENT) ||
         target.contains(Editor::TYPE_SETTINGS))
     {
-        LOG_TRACE_UPDATE(<< "Input segments.");
+        LOG_DEBUG_UPDATE(<< "Input segments.");
 
         setSegments(mainWindow_->editor().segments(),
                     mainWindow_->editor().segmentsFilter());
@@ -168,7 +168,7 @@ void ExplorerSegmentsWidget::slotUpdate(void *sender,
 
 void ExplorerSegmentsWidget::dataChanged()
 {
-    LOG_TRACE_UPDATE(<< "Output segments.");
+    LOG_DEBUG_UPDATE(<< "Output segments.");
 
     mainWindow_->suspendThreads();
     mainWindow_->editor().setSegments(segments_);
@@ -178,7 +178,7 @@ void ExplorerSegmentsWidget::dataChanged()
 
 void ExplorerSegmentsWidget::filterChanged()
 {
-    LOG_TRACE_UPDATE(<< "Output segments filter.");
+    LOG_DEBUG_UPDATE(<< "Output segments filter.");
 
     mainWindow_->suspendThreads();
     mainWindow_->editor().setSegmentsFilter(filter_);
