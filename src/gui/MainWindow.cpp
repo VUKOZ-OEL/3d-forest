@@ -384,12 +384,6 @@ void MainWindow::slotRender()
     viewerPlugin_->viewports()->updateScene(&editor_);
 }
 
-void MainWindow::slotRenderViewport()
-{
-    LOG_DEBUG_RENDER(<< "Render active viewport.");
-    slotRenderViewport(viewerPlugin_->viewports()->selectedViewportId());
-}
-
 void MainWindow::slotRenderViewport(size_t viewportId)
 {
     LOG_DEBUG_RENDER(<< "Render viewport <" << viewportId << ">.");

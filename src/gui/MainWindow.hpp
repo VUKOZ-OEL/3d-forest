@@ -106,22 +106,39 @@ public:
     void update(const QSet<Editor::Type> &target,
                 Page::State viewPortsCacheState = Page::STATE_READ,
                 bool resetCamera = false);
+
+    /// Call when the whole project was opened or closed.
     void updateNewProject();
+
+    /// Clear cached point data and start new rendering.
     void updateData();
+
+    /// Reset selection of cached point data and start new rendering.
     void updateFilter();
+
+    /// Reset modifiers of cached point data and start new rendering.
     void updateModifiers();
+
+    /// Reset rendered state of cached point data and start new rendering.
     void updateRender();
 
     Editor &editor() { return editor_; }
 
 public slots:
+    /// Calls paint() on all viewports.
     void slotRender();
-    void slotRenderViewport();
+
+    /// Updates new data in specified viewport.
     void slotRenderViewport(size_t viewportId);
+
+    /// Updates new data in all viewports.
     void slotRenderViewports();
 
 signals:
+    /// Call rendering from another thread.
     void signalRender();
+
+    /// Connect to this signal in your plugin to be notified about data changes.
     void signalUpdate(void *sender, const QSet<Editor::Type> &target);
 
 protected:
