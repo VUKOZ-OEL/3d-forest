@@ -380,9 +380,8 @@ void MainWindow::threadProgress(bool finished)
 
 void MainWindow::slotRender()
 {
-    editor_.lock("MainWindow render all viewports");
+    std::unique_lock<std::mutex> mutexlock(editor_.mutex_);
     viewerPlugin_->viewports()->updateScene(&editor_);
-    editor_.unlock("MainWindow render all viewports");
 }
 
 void MainWindow::slotRenderViewport()
@@ -442,10 +441,10 @@ void MainWindow::updateNewProject()
     setWindowTitle(QString::fromStdString(editor_.projectPath()));
 
     ViewerViewports *viewports = viewerPlugin_->viewports();
-
-    editor_.lock("MainWindow resetScene");
-    viewports->resetScene(&editor_, true);
-    editor_.unlock("MainWindow resetScene");
+    {
+        std::unique_lock<std::mutex> mutexlock(editor_.mutex_);
+        viewports->resetScene(&editor_, true);
+    }
 
     LOG_DEBUG(<< "Emit update.");
     emit signalUpdate(this, {});

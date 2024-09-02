@@ -346,7 +346,7 @@ void ViewerOpenGLViewport::clearScreen()
 
 bool ViewerOpenGLViewport::renderScene()
 {
-    LOG_DEBUG_RENDER(<< "Render scene viewport <" << viewportId_ << ">.");
+    LOG_DEBUG_RENDER(<< "Start rendering viewport <" << viewportId_ << ">.");
 
     if (!editor_)
     {
@@ -355,7 +355,7 @@ bool ViewerOpenGLViewport::renderScene()
 
     bool firstFrame = false;
 
-    editor_->lock("ViewerOpenGLViewport renderScene");
+    std::unique_lock<std::mutex> mutexlock(editor_->mutex_);
 
     renderSceneSettingsEnable();
 
@@ -413,7 +413,7 @@ bool ViewerOpenGLViewport::renderScene()
         renderFirstFrame();
     }
 
-    editor_->unlock("ViewerOpenGLViewport renderScene");
+    LOG_DEBUG_RENDER(<< "Finished rendering viewport <" << viewportId_ << ">.");
 
     return firstFrame;
 }

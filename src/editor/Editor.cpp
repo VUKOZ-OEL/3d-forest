@@ -458,15 +458,3 @@ void Editor::erasePage(size_t dataset, size_t index)
 {
     pageManager_.erase(this, dataset, index);
 }
-
-void Editor::lock(const std::string &message)
-{
-    mutex_.lock();
-    (void)message;
-}
-
-void Editor::unlock(const std::string &message)
-{
-    mutex_.unlock();
-    (void)message;
-}

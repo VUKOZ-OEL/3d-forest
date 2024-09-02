@@ -101,16 +101,17 @@ void HeightMapModifier::setPreviewEnabled(bool enabled,
         previewEnabled_ = enabled;
         mutex_.unlock();
 
-        editor_->lock();
-        if (reload)
         {
-            editor_->viewports().setState(Page::STATE_READ);
+            std::unique_lock<std::mutex> mutexlock(editor_->mutex_);
+            if (reload)
+            {
+                editor_->viewports().setState(Page::STATE_READ);
+            }
+            else
+            {
+                editor_->viewports().setState(Page::STATE_RUN_MODIFIERS);
+            }
         }
-        else
-        {
-            editor_->viewports().setState(Page::STATE_RUN_MODIFIERS);
-        }
-        editor_->unlock();
 
         mainWindow_->resumeThreads();
     }
@@ -230,13 +231,14 @@ void HeightMapModifier::apply(QWidget *widget)
         }
 
         // Process step i.
-        editor_->lock();
-        if (query.nextPage())
         {
-            // editor_->applyFilters(query.page());
-            // editor_->flush(query.page());
+            std::unique_lock<std::mutex> mutexlock(editor_->mutex_);
+            if (query.nextPage())
+            {
+                // editor_->applyFilters(query.page());
+                // editor_->flush(query.page());
+            }
         }
-        editor_->unlock();
     }
     progressDialog.setValue(progressDialog.maximum());
 

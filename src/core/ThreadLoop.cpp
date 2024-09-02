@@ -180,10 +180,16 @@ void ThreadLoop::runLoop()
             catch (std::exception &e)
             {
                 LOG_ERROR(<< "Error message <" << e.what() << ">.");
+                mutexlock.lock();
+                state_ = STATE_CANCEL;
+                mutexlock.unlock();
             }
             catch (...)
             {
                 LOG_ERROR(<< "Unknown error.");
+                mutexlock.lock();
+                state_ = STATE_CANCEL;
+                mutexlock.unlock();
             }
         }
 
