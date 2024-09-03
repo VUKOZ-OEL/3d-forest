@@ -47,7 +47,7 @@ void Segments::setDefault()
     segments_.resize(1);
     segments_[idx].id = id;
     segments_[idx].label = "unsegmented";
-    segments_[idx].color = {1.0, 1.0, 1.0};
+    segments_[idx].color = {0.6, 0.6, 0.6};
 
     hashTableId_.clear();
     hashTableId_[id] = idx;
