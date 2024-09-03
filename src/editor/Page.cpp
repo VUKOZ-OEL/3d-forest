@@ -928,6 +928,12 @@ void Page::runColorModifier()
                 renderColor[i * 3 + 1] *= static_cast<float>(c[1]);
                 renderColor[i * 3 + 2] *= static_cast<float>(c[2]);
             }
+            else
+            {
+                renderColor[i * 3 + 0] = 0.8F;
+                renderColor[i * 3 + 1] = 0.8F;
+                renderColor[i * 3 + 2] = 0.8F;
+            }
         }
     }
 
@@ -941,9 +947,10 @@ void Page::runColorModifier()
             for (size_t i = 0; i < n; i++)
             {
                 const float v = static_cast<float>(1. - (elevation[i] / zlen));
-                renderColor[i * 3 + 0] *= v;
-                renderColor[i * 3 + 1] *= v;
-                renderColor[i * 3 + 2] *= v;
+                setColor(i,
+                         static_cast<size_t>(v * 255.0),
+                         255,
+                         ColorPalette::BlueCyanYellowRed256);
             }
         }
     }
@@ -952,9 +959,10 @@ void Page::runColorModifier()
     {
         for (size_t i = 0; i < n; i++)
         {
-            renderColor[i * 3 + 0] *= static_cast<float>(descriptor[i]);
-            renderColor[i * 3 + 1] *= static_cast<float>(descriptor[i]);
-            renderColor[i * 3 + 2] *= static_cast<float>(descriptor[i]);
+            setColor(i,
+                     static_cast<size_t>(descriptor[i] * 255.0),
+                     255,
+                     ColorPalette::BlueCyanYellowRed256);
         }
     }
 }
