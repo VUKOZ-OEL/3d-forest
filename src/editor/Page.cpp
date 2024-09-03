@@ -842,9 +842,9 @@ void Page::runModifiers()
 void Page::runColorModifier()
 {
     const SettingsView &opt = editor_->settings().view;
-    double r = opt.pointColor()[0];
-    double g = opt.pointColor()[1];
-    double b = opt.pointColor()[2];
+    double r = 1.0; // opt.pointColor()[0];
+    double g = 1.0; // opt.pointColor()[1];
+    double b = 1.0; // opt.pointColor()[2];
 
     size_t n = size();
 
