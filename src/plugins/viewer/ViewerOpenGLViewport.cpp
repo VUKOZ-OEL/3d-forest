@@ -52,25 +52,25 @@ ViewerOpenGLViewport::~ViewerOpenGLViewport()
 
 void ViewerOpenGLViewport::paintEvent(QPaintEvent *event)
 {
-    LOG_DEBUG_RENDER(<< "Paint event.");
+    LOG_DEBUG_QT_EVENT(<< "Paint event.");
     QOpenGLWidget::paintEvent(event);
 }
 
 void ViewerOpenGLViewport::resizeEvent(QResizeEvent *event)
 {
-    LOG_DEBUG_RENDER(<< "Resize event.");
+    LOG_DEBUG_QT_EVENT(<< "Resize event.");
     QOpenGLWidget::resizeEvent(event);
 }
 
 void ViewerOpenGLViewport::showEvent(QShowEvent *event)
 {
-    LOG_DEBUG_RENDER(<< "Show event.");
+    LOG_DEBUG_QT_EVENT(<< "Show event.");
     QOpenGLWidget::showEvent(event);
 }
 
 void ViewerOpenGLViewport::hideEvent(QHideEvent *event)
 {
-    LOG_DEBUG_RENDER(<< "Hide.");
+    LOG_DEBUG_QT_EVENT(<< "Hide.");
     QOpenGLWidget::hideEvent(event);
 }
 
@@ -190,15 +190,15 @@ bool ViewerOpenGLViewport::isSelected() const
 
 void ViewerOpenGLViewport::updateScene(Editor *editor)
 {
-    LOG_DEBUG(<< "Update viewport <" << viewportId_ << ">.");
+    LOG_DEBUG_RENDER(<< "Update viewport <" << viewportId_ << ">.");
 
     editor_ = editor;
 }
 
 void ViewerOpenGLViewport::resetScene(Editor *editor, bool resetView)
 {
-    LOG_DEBUG(<< "Reset viewport <" << viewportId_ << "> reset view <"
-              << static_cast<int>(resetView) << ">.");
+    LOG_DEBUG_RENDER(<< "Reset viewport <" << viewportId_ << "> reset view <"
+                     << static_cast<int>(resetView) << ">.");
 
     editor_ = editor;
 

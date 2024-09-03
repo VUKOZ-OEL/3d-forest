@@ -37,7 +37,7 @@ RenderThread::RenderThread(Editor *editor)
 
 void RenderThread::render(const std::vector<Camera> &cameraList)
 {
-    LOG_DEBUG(<< "Render viewports n <" << cameraList.size() << ">.");
+    LOG_DEBUG_RENDER(<< "Render viewports n <" << cameraList.size() << ">.");
 
     cancel();
 
@@ -49,11 +49,12 @@ void RenderThread::render(const std::vector<Camera> &cameraList)
 
 bool RenderThread::next()
 {
-    LOG_DEBUG(<< "Render next step, initialized <" << initialized_ << ">.");
+    LOG_DEBUG_RENDER(<< "Render next step, initialized <" << initialized_
+                     << ">.");
 
     if (!initialized_)
     {
-        LOG_DEBUG(<< "Apply camera to viewports.");
+        LOG_DEBUG_RENDER(<< "Apply camera to viewports.");
         {
             std::unique_lock<std::mutex> mutexlock(editor_->mutex_);
             editor_->viewports().applyCamera(cameraList_);
@@ -62,7 +63,7 @@ bool RenderThread::next()
         return true;
     }
 
-    LOG_DEBUG(<< "Compute next state.");
+    LOG_DEBUG_RENDER(<< "Compute next state.");
 
     double t1 = Time::realTime();
     bool finished = false;
@@ -75,8 +76,8 @@ bool RenderThread::next()
 
     if (callback_)
     {
-        LOG_DEBUG(<< "Call callback argument finished <" << finished << "> ms <"
-                  << msec << ">.");
+        LOG_DEBUG_RENDER(<< "Call callback argument finished <" << finished
+                         << "> ms <" << msec << ">.");
         callback_->threadProgress(finished);
     }
 

@@ -26,7 +26,7 @@
 // Include Qt.
 #include <QTextEdit>
 
-#define MESSAGE_LOG_WINDOW_DEBUG_PRINT 1
+// #define MESSAGE_LOG_WINDOW_DEBUG_PRINT 1
 #define MESSAGE_LOG_WINDOW_FILE_NAME "log.txt"
 #define MESSAGE_LOG_WINDOW_FILE_SIZE_MAX (100 * 1024 * 1024)
 

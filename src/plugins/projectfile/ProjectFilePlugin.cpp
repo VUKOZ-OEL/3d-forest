@@ -98,7 +98,7 @@ void ProjectFilePlugin::slotProjectNew()
     // Update.
     mainWindow_->updateNewProject();
 
-    LOG_DEBUG(<< "Finished creating the new project.");
+    LOG_DEBUG(<< "Finished creating new project.");
 }
 
 void ProjectFilePlugin::slotProjectOpen()

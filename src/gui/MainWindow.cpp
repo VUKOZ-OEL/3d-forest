@@ -134,7 +134,7 @@ MainWindow::MainWindow(QWidget *parent)
     viewerPlugin_->viewports()->resetScene(&editor_, true);
     viewerPlugin_->viewports()->setView3d();
 
-    LOG_DEBUG(<< "Finish creating the main window.");
+    LOG_DEBUG(<< "Finished creating the main window.");
 }
 
 MainWindow::~MainWindow()
@@ -156,19 +156,19 @@ QSize MainWindow::sizeHint() const
 
 void MainWindow::paintEvent(QPaintEvent *event)
 {
-    LOG_DEBUG(<< "Paint event.");
+    LOG_DEBUG_QT_EVENT(<< "Paint event.");
     QWidget::paintEvent(event);
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event)
 {
-    LOG_DEBUG(<< "Resize event.");
+    LOG_DEBUG_QT_EVENT(<< "Resize event.");
     QWidget::resizeEvent(event);
 }
 
 void MainWindow::showEvent(QShowEvent *event)
 {
-    LOG_DEBUG(<< "Show event.");
+    LOG_DEBUG_QT_EVENT(<< "Show event.");
 
     resizeDocks({explorerPlugin_->window(), settingsPlugin_->window()},
                 {80, 20},
@@ -179,7 +179,7 @@ void MainWindow::showEvent(QShowEvent *event)
 
 void MainWindow::hideEvent(QHideEvent *event)
 {
-    LOG_DEBUG(<< "Hide.");
+    LOG_DEBUG_QT_EVENT(<< "Hide.");
     QWidget::hideEvent(event);
 }
 

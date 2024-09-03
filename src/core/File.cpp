@@ -69,7 +69,7 @@ typedef unsigned short mode_t;
 
 // Include local.
 #define LOG_MODULE_NAME "File"
-// #define LOG_MODULE_DEBUG_ENABLED 1
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #if !defined(EXPORT_CORE_IMPORT)

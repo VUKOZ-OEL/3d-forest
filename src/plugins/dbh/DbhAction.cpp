@@ -28,7 +28,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "DbhAction"
-#define LOG_MODULE_DEBUG_ENABLED 1
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define DBH_STEP_POINTS_TO_GROUPS 0

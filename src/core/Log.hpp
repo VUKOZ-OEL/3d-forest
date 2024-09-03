@@ -166,7 +166,7 @@ extern std::shared_ptr<LoggerFile> EXPORT_CORE globalLoggerFile;
         }                                                                      \
     } while (false)
 
-#if 1
+#if 0
     #define LOG_DEBUG(msg) LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg)
 #else
     #if defined(LOG_MODULE_DEBUG_ENABLED)
@@ -177,17 +177,24 @@ extern std::shared_ptr<LoggerFile> EXPORT_CORE globalLoggerFile;
 #endif
 
 #if 1
+    #define LOG_DEBUG_UPDATE(msg)                                              \
+        LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg);
+#else
+    #define LOG_DEBUG_UPDATE(msg)
+#endif
+
+#if 0
     #define LOG_DEBUG_RENDER(msg)                                              \
         LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg);
 #else
     #define LOG_DEBUG_RENDER(msg)
 #endif
 
-#if 1
-    #define LOG_DEBUG_UPDATE(msg)                                              \
+#if 0
+    #define LOG_DEBUG_QT_EVENT(msg)                                            \
         LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg);
 #else
-    #define LOG_DEBUG_RENDER(msg)
+    #define LOG_DEBUG_QT_EVENT(msg)
 #endif
 
 #define LOG_WARNING(msg) LOG_MESSAGE(LOG_TYPE_WARNING, LOG_MODULE_NAME, msg)
