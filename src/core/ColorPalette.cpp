@@ -28,7 +28,7 @@
 
 #if !defined(EXPORT_CORE_IMPORT)
 const std::vector<Vector3<double>> ColorPalette::Classification{
-    0xffffffU, //  0 : Created, Never classified.
+    0xaaaaaaU, //  0 : Created, Never classified.
     0xb2b2b2U, //  1 : Unassigned - Unclassified.
     0xa87102U, //  2 : Ground.
     0x407d00U, //  3 : Low Vegetation.
