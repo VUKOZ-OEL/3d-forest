@@ -17,39 +17,44 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file DbhGroup.hpp */
+/** @file TreeAttributesGroup.hpp */
 
-#ifndef DBH_GROUP_HPP
-#define DBH_GROUP_HPP
+#ifndef TREE_ATTRIBUTES_GROUP_HPP
+#define TREE_ATTRIBUTES_GROUP_HPP
 
 // Include 3D Forest.
 #include <Json.hpp>
 #include <Vector3.hpp>
 
-/** DBH (Diameter at Breast Height) Group. */
-class DbhGroup
+/** Tree Attributes Group. */
+class TreeAttributesGroup
 {
 public:
     size_t segmentId{0};
-    std::vector<double> points; // x0, y0, z0, x1, y1, z1, ...
 
-    Vector3<double> center;
-    double radius{0.0};
+    std::vector<double> xCoordinates;
+    std::vector<double> yCoordinates;
+    std::vector<double> dbhPoints; // x0, y0, z0, x1, y1, z1, ...
+    double zCoordinateMin{Numeric::max<double>()};
+
+    Vector3<double> position;
+    Vector3<double> dbhCenter;
+    double dbh{0.0};
 };
 
-inline void toJson(Json &out, const DbhGroup &in)
+inline void toJson(Json &out, const TreeAttributesGroup &in)
 {
     toJson(out["segmentId"], in.segmentId);
-    toJson(out["pointCount"], in.points.size() / 3);
-    toJson(out["center"], in.center);
-    toJson(out["radius"], in.radius);
+    toJson(out["dbhPointCount"], in.dbhPoints.size() / 3);
+    toJson(out["dbhCenter"], in.dbhCenter);
+    toJson(out["dbh"], in.dbh);
 }
 
-inline std::string toString(const DbhGroup &in)
+inline std::string toString(const TreeAttributesGroup &in)
 {
     Json json;
     toJson(json, in);
     return json.serialize(0);
 }
 
-#endif /* DBH_GROUP_HPP */
+#endif /* TREE_ATTRIBUTES_GROUP_HPP */

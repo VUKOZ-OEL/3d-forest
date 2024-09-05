@@ -17,43 +17,45 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file DbhPlugin.cpp */
+/** @file TreeAttributesPlugin.cpp */
 
 // Include 3D Forest.
-#include <DbhPlugin.hpp>
-#include <DbhWindow.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
+#include <TreeAttributesPlugin.hpp>
+#include <TreeAttributesWindow.hpp>
 
 // Include local.
-#define LOG_MODULE_NAME "DbhPlugin"
+#define LOG_MODULE_NAME "TreeAttributesPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/dbh/", name))
+#define ICON(name) (ThemeIcon(":/tree_attributes/", name))
 
-DbhPlugin::DbhPlugin() : mainWindow_(nullptr), pluginWindow_(nullptr)
+TreeAttributesPlugin::TreeAttributesPlugin()
+    : mainWindow_(nullptr),
+      pluginWindow_(nullptr)
 {
 }
 
-void DbhPlugin::initialize(MainWindow *mainWindow)
+void TreeAttributesPlugin::initialize(MainWindow *mainWindow)
 {
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
                               "Tools",
                               "Tools",
-                              tr("Dbh"),
-                              tr("Compute dbh"),
-                              ICON("dbh"),
+                              tr("Tree Attributes"),
+                              tr("Compute tree attributes"),
+                              ICON("tree_attributes"),
                               this,
                               SLOT(slotPlugin()));
 }
 
-void DbhPlugin::slotPlugin()
+void TreeAttributesPlugin::slotPlugin()
 {
     if (!pluginWindow_)
     {
-        pluginWindow_ = new DbhWindow(mainWindow_);
+        pluginWindow_ = new TreeAttributesWindow(mainWindow_);
     }
 
     pluginWindow_->show();

@@ -17,20 +17,20 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file DbhLeastSquaredRegression.hpp */
+/** @file TreeAttributesLeastSquaredRegression.hpp */
 
-#ifndef DBH_LEAST_SQUARED_REGRESSION_HPP
-#define DBH_LEAST_SQUARED_REGRESSION_HPP
+#ifndef TREE_ATTRIBUTES_LEAST_SQUARED_REGRESSION_HPP
+#define TREE_ATTRIBUTES_LEAST_SQUARED_REGRESSION_HPP
 
 // Include 3D Forest.
-#include <DbhGroup.hpp>
-#include <DbhParameters.hpp>
+#include <TreeAttributesGroup.hpp>
+#include <TreeAttributesParameters.hpp>
 
-/** DBH (Diameter at Breast Height) Least Squared Regression. */
-class DbhLeastSquaredRegression
+/** Tree Attributes Least Squared Regression. */
+class TreeAttributesLeastSquaredRegression
 {
 public:
-    /** DBH Least Squared Regression Fitting Circle. */
+    /** Tree Attributes Least Squared Regression Fitting Circle. */
     class FittingCircle
     {
     public:
@@ -45,7 +45,7 @@ public:
         size_t i{0}; /**< Total number of outer iterations. */
         size_t j{0}; /**< Total number of inner iterations (lambda). */
 
-        /** DBH Least Squared Regression Fitting Circle Result. */
+        /** Tree Attributes Least Squared Regression Fitting Circle Result. */
         enum Result
         {
             RESULT_INVALID,
@@ -61,14 +61,15 @@ public:
     };
 
     static void taubinFit(FittingCircle &circle,
-                          const DbhGroup &group,
-                          const DbhParameters &parameters);
+                          const TreeAttributesGroup &group,
+                          const TreeAttributesParameters &parameters);
 
     static void geometricCircle(FittingCircle &circle,
-                                const DbhGroup &group,
-                                const DbhParameters &parameters);
+                                const TreeAttributesGroup &group,
+                                const TreeAttributesParameters &parameters);
 
-    static double sigma(FittingCircle &circle, const DbhGroup &group);
+    static double sigma(FittingCircle &circle,
+                        const TreeAttributesGroup &group);
 };
 
-#endif /* DBH_LEAST_SQUARED_REGRESSION_HPP */
+#endif /* TREE_ATTRIBUTES_LEAST_SQUARED_REGRESSION_HPP */

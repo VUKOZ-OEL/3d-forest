@@ -23,6 +23,7 @@
 #define UTIL_HPP
 
 // Include std.
+#include <cfloat>
 #include <climits>
 #include <cmath>
 #include <iomanip>
@@ -302,6 +303,26 @@ template <> inline long long Numeric::max<long long>()
 template <> inline unsigned long long Numeric::max<unsigned long long>()
 {
     return ULLONG_MAX;
+}
+
+template <> inline float Numeric::min<float>()
+{
+    return -FLT_MAX;
+}
+
+template <> inline float Numeric::max<float>()
+{
+    return FLT_MAX;
+}
+
+template <> inline double Numeric::min<double>()
+{
+    return -DBL_MAX;
+}
+
+template <> inline double Numeric::max<double>()
+{
+    return DBL_MAX;
 }
 
 inline std::string toLower(const std::string &str)

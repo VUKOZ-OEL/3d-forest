@@ -17,43 +17,45 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file DbhPlugin.hpp */
+/** @file TreeAttributesWidget.hpp */
 
-#ifndef DBH_PLUGIN_HPP
-#define DBH_PLUGIN_HPP
+#ifndef TREE_ATTRIBUTES_WIDGET_HPP
+#define TREE_ATTRIBUTES_WIDGET_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
-class DbhWindow;
+#include <TreeAttributesAction.hpp>
+#include <TreeAttributesParameters.hpp>
+class MainWindow;
+class DoubleSliderWidget;
 
-#if defined(_MSC_VER)
-    #if defined(EXPORT_3DForestDbhPlugin)
-        #define EXPORT_DBH_PLUGIN __declspec(dllexport)
-    #else
-        #define EXPORT_DBH_PLUGIN __declspec(dllimport)
-    #endif
-#else
-    #define EXPORT_DBH_PLUGIN
-#endif
+// Include Qt.
+#include <QWidget>
+class QPushButton;
 
-/** DBH (Diameter at Breast Height) Plugin. */
-class EXPORT_DBH_PLUGIN DbhPlugin : public QObject, public PluginInterface
+/** Tree Attributes Widget. */
+class TreeAttributesWidget : public QWidget
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
 
 public:
-    DbhPlugin();
+    TreeAttributesWidget(MainWindow *mainWindow);
 
-    virtual void initialize(MainWindow *mainWindow);
+protected slots:
+    void slotApply();
 
-public slots:
-    void slotPlugin();
+protected:
+    void hideEvent(QHideEvent *event) override;
 
 private:
     MainWindow *mainWindow_;
-    DbhWindow *pluginWindow_;
+
+    TreeAttributesParameters parameters_;
+    TreeAttributesAction treeAttributes_;
+
+    DoubleSliderWidget *dbhElevationSlider_;
+    DoubleSliderWidget *dbhElevationToleranceSlider_;
+
+    QPushButton *applyButton_;
 };
 
-#endif /* DBH_PLUGIN_HPP */
+#endif /* TREE_ATTRIBUTES_WIDGET_HPP */
