@@ -43,39 +43,56 @@
 TreeAttributesWidget::TreeAttributesWidget(MainWindow *mainWindow)
     : QWidget(),
       mainWindow_(mainWindow),
-      treeAttributes_(&mainWindow->editor())
+      treeAttributesAction_(&mainWindow->editor())
 {
     LOG_DEBUG(<< "Create.");
 
     // Widgets.
+    DoubleSliderWidget::create(treePositionHeightRangeSlider_,
+                               this,
+                               nullptr,
+                               nullptr,
+                               tr("Tree position height range"),
+                               tr("Tree position height range to include more "
+                                  "neighboring points above the lowest tree "
+                                  "point"),
+                               tr("m"),
+                               0.01,
+                               0.01,
+                               1.0,
+                               parameters_.treePositionHeightRange);
+
     DoubleSliderWidget::create(dbhElevationSlider_,
                                this,
                                nullptr,
                                nullptr,
-                               tr("Look for DBH in elevation"),
-                               tr("Look for DBH in elevation"),
+                               tr("Calculate DBH at given elevation"),
+                               tr("Calculate DBH at given elevation"),
                                tr("m"),
                                0.01,
                                0.5,
                                1.5,
                                parameters_.dbhElevation);
 
-    DoubleSliderWidget::create(dbhElevationToleranceSlider_,
+    DoubleSliderWidget::create(dbhElevationRangeSlider_,
                                this,
                                nullptr,
                                nullptr,
-                               tr("DBH elevation tolerance"),
-                               tr("DBH elevation tolerance"),
+                               tr("DBH elevation range"),
+                               tr("DBH elevation range to include more "
+                                  "neighboring points above and below "
+                                  "the DBH elevation value"),
                                tr("m"),
                                0.01,
                                0.01,
                                0.5,
-                               parameters_.dbhElevationTolerance);
+                               parameters_.dbhElevationRange);
 
     // Settings layout.
     QVBoxLayout *settingsLayout = new QVBoxLayout;
+    settingsLayout->addWidget(treePositionHeightRangeSlider_);
     settingsLayout->addWidget(dbhElevationSlider_);
-    settingsLayout->addWidget(dbhElevationToleranceSlider_);
+    settingsLayout->addWidget(dbhElevationRangeSlider_);
     settingsLayout->addStretch();
 
     // Buttons.
@@ -103,7 +120,7 @@ TreeAttributesWidget::TreeAttributesWidget(MainWindow *mainWindow)
 void TreeAttributesWidget::hideEvent(QHideEvent *event)
 {
     LOG_DEBUG(<< "Hide.");
-    treeAttributes_.clear();
+    treeAttributesAction_.clear();
     QWidget::hideEvent(event);
 }
 
@@ -113,16 +130,18 @@ void TreeAttributesWidget::slotApply()
 
     mainWindow_->suspendThreads();
 
+    parameters_.treePositionHeightRange =
+        treePositionHeightRangeSlider_->value();
     parameters_.dbhElevation = dbhElevationSlider_->value();
-    parameters_.dbhElevationTolerance = dbhElevationToleranceSlider_->value();
+    parameters_.dbhElevationRange = dbhElevationRangeSlider_->value();
 
     try
     {
-        treeAttributes_.start(parameters_);
+        treeAttributesAction_.start(parameters_);
 
         ProgressDialog::run(mainWindow_,
                             "Computing Tree Attributes",
-                            &treeAttributes_);
+                            &treeAttributesAction_);
     }
     catch (std::exception &e)
     {

@@ -29,9 +29,15 @@
 class TreeAttributesParameters
 {
 public:
-    double treePositionZTolerance{0.2};
+    // Tree position parameters.
+    double treePositionHeightRange{0.6};
+    double treeTipHeightRange{0.1};
+
+    // DBH parameters.
     double dbhElevation{1.3};
-    double dbhElevationTolerance{0.05};
+    double dbhElevationRange{0.05};
+
+    // Least Squared Regression parameters.
     size_t taubinFitIterationsMax{20}; // Usually, 4-6 iterations are enough.
     size_t geometricCircleIterationsMax{500};
     double geometricCircleFactorUp{1.0};
@@ -41,9 +47,9 @@ public:
 
 inline void toJson(Json &out, const TreeAttributesParameters &in)
 {
-    toJson(out["treePositionZTolerance"], in.treePositionZTolerance);
+    toJson(out["treePositionHeightRange"], in.treePositionHeightRange);
     toJson(out["dbhElevation"], in.dbhElevation);
-    toJson(out["dbhElevationTolerance"], in.dbhElevationTolerance);
+    toJson(out["dbhElevationRange"], in.dbhElevationRange);
     toJson(out["taubinFitIterationsMax"], in.taubinFitIterationsMax);
     toJson(out["geometricCircleIterationsMax"],
            in.geometricCircleIterationsMax);

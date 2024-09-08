@@ -443,11 +443,31 @@ void ViewerOpenGLViewport::renderSegments()
             ViewerAabb boundary;
             boundary.set(segment.boundary);
             ViewerOpenGL::renderAabb(boundary);
+        }
 
-            Vector3<float> p(segment.position);
-            float radius = static_cast<float>(segment.dbh) * 0.5F;
+        if (segment.id == 0)
+        {
+            continue;
+        }
+
+        {
             glColor3f(1.0F, 1.0F, 0.0F);
-            ViewerOpenGL::renderCircle(p, radius * 1.0F);
+
+            Vector3<float> treeDbhPosition(segment.dbhPosition);
+            float treeDbhRadius = static_cast<float>(segment.dbh) * 0.5F;
+            ViewerOpenGL::renderCircle(treeDbhPosition, treeDbhRadius * 1.0F);
+
+            Vector3<float> treePosition(segment.position);
+            ViewerOpenGL::renderCross(
+                treePosition,
+                static_cast<float>(segment.boundary.length(0)),
+                static_cast<float>(segment.boundary.length(1)));
+
+            Vector3<float> treeTip(treePosition[0],
+                                   treePosition[1],
+                                   treePosition[2] +
+                                       static_cast<float>(segment.height));
+            ViewerOpenGL::renderLine(treePosition, treeTip);
         }
 
         // Render segment meshes.

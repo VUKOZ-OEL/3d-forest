@@ -536,8 +536,8 @@ void SegmentationAction::stepCreateSegments()
 
     segments.setDefault();
     segments[0].boundary = groupUnsegmented_.boundary;
-    segments[0].position = groupUnsegmented_.boundary.getCenter();
-    segments[0].height = groupUnsegmented_.boundary.length(2);
+    // segments[0].position = groupUnsegmented_.boundary.getCenter();
+    // segments[0].height = groupUnsegmented_.boundary.length(2);
 
     QueryFilterSet segmentsFilter;
     segmentsFilter.setFilter(0, true);
@@ -581,11 +581,11 @@ void SegmentationAction::createSegmentFromGroup(size_t segmentId,
     segment.color =
         ColorPalette::MPN65[segment.id % ColorPalette::MPN65.size()];
 
-    double n = static_cast<double>(group.nPoints);
-    segment.position = group.averagePoint / n;
+    // double n = static_cast<double>(group.nPoints);
+    // segment.position = group.averagePoint / n;
 
     segment.boundary = group.boundary;
-    segment.height = segment.boundary.length(2);
+    // segment.height = segment.boundary.length(2);
 }
 
 void SegmentationAction::stepVoxelsToPoints()

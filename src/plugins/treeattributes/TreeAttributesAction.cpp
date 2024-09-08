@@ -34,9 +34,9 @@
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define TREE_ATTRIBUTES_STEP_POINTS_TO_GROUPS 0
+#define TREE_ATTRIBUTES_STEP_POINTS_TO_TREES 0
 #define TREE_ATTRIBUTES_STEP_CALCULATE_TREE_ATTRIBUTES 1
-#define TREE_ATTRIBUTES_STEP_UPDATE_SEGMENTS 2
+#define TREE_ATTRIBUTES_STEP_UPDATE_TREE_ATTRIBUTES 2
 
 TreeAttributesAction::TreeAttributesAction(Editor *editor)
     : editor_(editor),
@@ -55,8 +55,8 @@ void TreeAttributesAction::clear()
     LOG_DEBUG(<< "Clear.");
 
     query_.clear();
-
-    groups_.clear();
+    treesMap_.clear();
+    trees_.clear();
 }
 
 void TreeAttributesAction::start(const TreeAttributesParameters &parameters)
@@ -68,33 +68,35 @@ void TreeAttributesAction::start(const TreeAttributesParameters &parameters)
 
     parameters_ = parameters;
 
-    parameters_.treePositionZTolerance *= ppm;
+    parameters_.treePositionHeightRange *= ppm;
+    parameters_.treeTipHeightRange *= ppm;
     parameters_.dbhElevation *= ppm;
-    parameters_.dbhElevationTolerance *= ppm;
+    parameters_.dbhElevationRange *= ppm;
 
     // Clear work data.
-    groups_.clear();
+    treesMap_.clear();
+    trees_.clear();
 
     // Plan the steps.
     progress_.setMaximumStep(ProgressCounter::npos, 1000);
     progress_.setMaximumSteps(1);
-    progress_.setValueSteps(TREE_ATTRIBUTES_STEP_POINTS_TO_GROUPS);
+    progress_.setValueSteps(TREE_ATTRIBUTES_STEP_POINTS_TO_TREES);
 }
 
 void TreeAttributesAction::next()
 {
     switch (progress_.valueSteps())
     {
-        case TREE_ATTRIBUTES_STEP_POINTS_TO_GROUPS:
-            stepPointsToGroups();
+        case TREE_ATTRIBUTES_STEP_POINTS_TO_TREES:
+            stepPointsToTrees();
             break;
 
         case TREE_ATTRIBUTES_STEP_CALCULATE_TREE_ATTRIBUTES:
             stepCalculateTreeAttributes();
             break;
 
-        case TREE_ATTRIBUTES_STEP_UPDATE_SEGMENTS:
-            stepUpdateSegments();
+        case TREE_ATTRIBUTES_STEP_UPDATE_TREE_ATTRIBUTES:
+            stepUpdateTreeAttributes();
             break;
 
         default:
@@ -103,7 +105,24 @@ void TreeAttributesAction::next()
     }
 }
 
-void TreeAttributesAction::stepPointsToGroups()
+size_t TreeAttributesAction::getTreeIndex(size_t treeId)
+{
+    auto it = treesMap_.find(treeId);
+
+    if (it == treesMap_.end())
+    {
+        size_t index = trees_.size();
+        treesMap_[treeId] = index;
+        trees_.push_back(TreeAttributesData());
+        trees_[index].treeId = treeId;
+        trees_[index].dbhPoints.reserve(100);
+        return index;
+    }
+
+    return it->second;
+}
+
+void TreeAttributesAction::stepPointsToTrees()
 {
     progress_.startTimer();
 
@@ -111,7 +130,7 @@ void TreeAttributesAction::stepPointsToGroups()
     if (progress_.valueStep() == 0)
     {
         // Set query to iterate all points. Active filter is ignored.
-        LOG_DEBUG(<< "Start dividing points to groups.");
+        LOG_DEBUG(<< "Start dividing points to trees.");
         query_.setWhere(QueryWhere());
         query_.exec();
     }
@@ -121,63 +140,57 @@ void TreeAttributesAction::stepPointsToGroups()
     // For each point in all datasets:
     while (query_.next())
     {
-        size_t segmentId = query_.segment();
+        size_t treeId = query_.segment();
 
-        bool pointIsInTreeBaseRange = false;
-        if (segmentId > 0 && segmentId < segments.size())
+        if (treeId > 0 && treeId < segments.size())
         {
-            const Segment &segment = segments[segmentId];
-            if ((query_.z() - segment.boundary.min(2)) <
-                parameters_.treePositionZTolerance)
-            {
-                LOG_DEBUG(<< "Point z <" << query_.z()
-                          << "> is in base range of segment id <" << segmentId
-                          << ">.");
-                pointIsInTreeBaseRange = true;
-            }
-        }
+            const Segment &segment = segments[treeId];
 
-        bool pointIsInDbhRange =
-            query_.elevation() >
-                parameters_.dbhElevation - parameters_.dbhElevationTolerance &&
-            query_.elevation() <
-                parameters_.dbhElevation + parameters_.dbhElevationTolerance;
-
-        // When
-        // point z distance from
-        // or
-        // point elevation is within elevation +- elevation tolerance:
-        if (pointIsInTreeBaseRange || pointIsInDbhRange)
-        {
-            // Find existing group by segmentId of the current point.
-            auto it = groups_.find(segmentId);
-            if (it == groups_.end())
+            // When point Z distance from the minimal tree boundary Z value
+            // is within tree position range, then:
+            if ((query_.z() - segment.boundary.min(2)) <=
+                parameters_.treePositionHeightRange)
             {
-                // Add new group when it does not exist.
-                auto result =
-                    groups_.insert({segmentId, TreeAttributesGroup()});
-                it = result.first;
-                it->second.segmentId = segmentId;
-                it->second.dbhPoints.reserve(100);
+                TreeAttributesData &tree = trees_[getTreeIndex(treeId)];
+
+                // Add point X and Y coordinates to X and Y coordinates lists.
+                tree.xCoordinates.push_back(query_.x());
+                tree.yCoordinates.push_back(query_.y());
+
+                // When point Z coordinate has new lowest value, then
+                // set the value as new Z minimum.
+                if (query_.z() < tree.zCoordinateMin)
+                {
+                    tree.zCoordinateMin = query_.z();
+                }
             }
 
             // When point elevation is within DBH elevation range, then
-            // add point XYZ coordinates to DBH point set.
-            if (pointIsInDbhRange)
+            // add point XYZ coordinates to DBH point list.
+            if (query_.elevation() >=
+                    parameters_.dbhElevation - parameters_.dbhElevationRange &&
+                query_.elevation() <=
+                    parameters_.dbhElevation + parameters_.dbhElevationRange)
             {
-                it->second.dbhPoints.push_back(query_.x());
-                it->second.dbhPoints.push_back(query_.y());
-                it->second.dbhPoints.push_back(query_.z());
+                TreeAttributesData &tree = trees_[getTreeIndex(treeId)];
+
+                tree.dbhPoints.push_back(query_.x());
+                tree.dbhPoints.push_back(query_.y());
+                tree.dbhPoints.push_back(query_.z());
             }
 
-            if (pointIsInTreeBaseRange)
+            // When point Z distance from the maximal tree boundary Z value
+            // is within tree tip range, then:
+            if ((segment.boundary.max(2) - query_.z()) <=
+                parameters_.treeTipHeightRange)
             {
-                it->second.xCoordinates.push_back(query_.x());
-                it->second.yCoordinates.push_back(query_.y());
+                TreeAttributesData &tree = trees_[getTreeIndex(treeId)];
 
-                if (query_.z() < it->second.zCoordinateMin)
+                // When point elevation has new highest value, then
+                // set the value as new elevation maximum.
+                if (query_.elevation() > tree.elevationMax)
                 {
-                    it->second.zCoordinateMin = query_.z();
+                    tree.elevationMax = query_.elevation();
                 }
             }
         }
@@ -189,19 +202,18 @@ void TreeAttributesAction::stepPointsToGroups()
         }
     }
 
-    // dumpGroups();
-
     // Next Step.
-    if (groups_.size() > 0)
+    if (trees_.size() > 0)
     {
         // Continue.
-        progress_.setMaximumStep(groups_.size(), 1);
+        LOG_DEBUG(<< "Found <" << trees_.size() << "> trees from points.");
+        progress_.setMaximumStep(trees_.size(), 1);
         progress_.setValueSteps(TREE_ATTRIBUTES_STEP_CALCULATE_TREE_ATTRIBUTES);
     }
     else
     {
         // Finish.
-        LOG_DEBUG(<< "No segments were found.");
+        LOG_DEBUG(<< "No trees were found.");
         progress_.setValueStep(progress_.maximumStep());
         progress_.setValueSteps(progress_.maximumSteps());
     }
@@ -214,24 +226,30 @@ void TreeAttributesAction::stepCalculateTreeAttributes()
     // Initialize.
     if (progress_.valueStep() == 0)
     {
-        LOG_DEBUG(<< "Calculating tree attributes for each group.");
-        currentGroup_ = 0;
+        LOG_DEBUG(<< "Calculating tree attributes for <" << trees_.size()
+                  << "> trees.");
+
+        currentTreeIndex_ = 0;
     }
 
-    // For each group:
-    while (currentGroup_ < groups_.size())
+    // For each tree:
+    while (currentTreeIndex_ < trees_.size())
     {
-        LOG_DEBUG(<< "Calculating tree attributes for group <" << currentGroup_
-                  << ">.");
+        LOG_DEBUG(<< "Calculating tree attributes for tree index <"
+                  << (currentTreeIndex_ + 1) << "/" << trees_.size()
+                  << "> tree ID <" << trees_[currentTreeIndex_].treeId << ">.");
 
         // Calculate DBH.
-        calculateDbh(groups_[currentGroup_]);
+        calculateDbh(trees_[currentTreeIndex_]);
 
-        // Calculate tree base.
-        calculateTreeBase(groups_[currentGroup_]);
+        // Calculate tree position.
+        calculateTreePosition(trees_[currentTreeIndex_]);
 
-        // Next group.
-        currentGroup_++;
+        // Calculate tree height.
+        calculateTreeHeight(trees_[currentTreeIndex_]);
+
+        // Next tree.
+        currentTreeIndex_++;
         progress_.addValueStep(1);
         if (progress_.timedOut())
         {
@@ -239,61 +257,105 @@ void TreeAttributesAction::stepCalculateTreeAttributes()
         }
     }
 
-    dumpGroups();
-
     // Next Step.
     progress_.setMaximumStep();
-    progress_.setValueSteps(TREE_ATTRIBUTES_STEP_UPDATE_SEGMENTS);
+    progress_.setValueSteps(TREE_ATTRIBUTES_STEP_UPDATE_TREE_ATTRIBUTES);
 }
 
-void TreeAttributesAction::calculateDbh(TreeAttributesGroup &group)
+void TreeAttributesAction::calculateDbh(TreeAttributesData &tree)
 {
     TreeAttributesLeastSquaredRegression::FittingCircle circle;
 
-    TreeAttributesLeastSquaredRegression::taubinFit(circle, group, parameters_);
+    TreeAttributesLeastSquaredRegression::taubinFit(circle,
+                                                    tree.dbhPoints,
+                                                    parameters_);
 
     TreeAttributesLeastSquaredRegression::geometricCircle(circle,
-                                                          group,
+                                                          tree.dbhPoints,
                                                           parameters_);
 
-    group.dbhCenter.set(circle.a, circle.b, circle.z);
-    group.dbh = circle.r * 2.0;
+    tree.dbhPosition.set(circle.a, circle.b, circle.z);
+    tree.dbh = circle.r * 2.0;
 }
 
-void TreeAttributesAction::calculateTreeBase(TreeAttributesGroup &group)
+void TreeAttributesAction::calculateTreePosition(TreeAttributesData &tree)
 {
-    std::sort(group.xCoordinates.begin(), group.xCoordinates.end());
-    std::sort(group.yCoordinates.begin(), group.yCoordinates.end());
+    LOG_DEBUG(<< "Tree position x coordinates size <"
+              << tree.xCoordinates.size() << ">.");
+    LOG_DEBUG(<< "Tree position y coordinates size <"
+              << tree.yCoordinates.size() << ">.");
+    LOG_DEBUG(<< "Tree position z coordinate min <" << tree.zCoordinateMin
+              << ">.");
 
-    LOG_DEBUG(<< "Group size x <" << group.xCoordinates.size() << "> size y <"
-              << group.yCoordinates.size() << ">.");
+    std::sort(tree.xCoordinates.begin(), tree.xCoordinates.end());
+    std::sort(tree.yCoordinates.begin(), tree.yCoordinates.end());
 
-    if (group.xCoordinates.size() > 1 && group.yCoordinates.size() > 1)
+    double x;
+    if (tree.xCoordinates.size() > 0)
     {
-        group.position.set(group.xCoordinates.at(group.xCoordinates.size() / 2),
-                           group.yCoordinates.at(group.yCoordinates.size() / 2),
-                           group.zCoordinateMin);
+        x = tree.xCoordinates.at(tree.xCoordinates.size() / 2);
+    }
+    else
+    {
+        x = 0.0;
+    }
+
+    double y;
+    if (tree.yCoordinates.size() > 0)
+    {
+        y = tree.yCoordinates.at(tree.yCoordinates.size() / 2);
+    }
+    else
+    {
+        y = 0.0;
+    }
+
+    double z;
+    if (tree.zCoordinateMin < Numeric::max<double>())
+    {
+        z = tree.zCoordinateMin;
+    }
+    else
+    {
+        z = 0.0;
+    }
+
+    tree.position.set(x, y, z);
+}
+
+void TreeAttributesAction::calculateTreeHeight(TreeAttributesData &tree)
+{
+    if (tree.elevationMax > Numeric::min<double>())
+    {
+        tree.height = tree.elevationMax;
+    }
+    else
+    {
+        tree.height = 0.0;
     }
 }
 
-void TreeAttributesAction::stepUpdateSegments()
+void TreeAttributesAction::stepUpdateTreeAttributes()
 {
-    LOG_DEBUG(<< "Update <" << groups_.size() << "> segments.");
+    LOG_DEBUG(<< "Update <" << trees_.size() << "> trees.");
 
     // Get copy of current segments.
     Segments segments = editor_->segments();
 
     // Iterate all groups:
-    for (auto &it : groups_)
+    for (auto &it : trees_)
     {
-        Segment &segment = segments[segments.index(it.second.segmentId)];
-        segment.position.set(it.second.position[0],
-                             it.second.position[1],
-                             it.second.position[2]);
-        segment.dbh = it.second.dbh;
+        Segment &segment = segments[segments.index(it.treeId)];
 
-        LOG_DEBUG(<< "Segment position <" << segment.position << "> DBH <"
-                  << segment.dbh << ">.");
+        segment.position.set(it.position[0], it.position[1], it.position[2]);
+
+        segment.height = it.height;
+
+        segment.dbhPosition = it.dbhPosition;
+        segment.dbh = it.dbh;
+
+        LOG_DEBUG(<< "Tree position <" << segment.position << "> height <"
+                  << segment.height << "> DBH <" << segment.dbh << ">.");
     }
 
     // Set new segments to editor.
@@ -302,13 +364,4 @@ void TreeAttributesAction::stepUpdateSegments()
     // Finish.
     progress_.setValueStep(progress_.maximumStep());
     progress_.setValueSteps(progress_.maximumSteps());
-}
-
-void TreeAttributesAction::dumpGroups()
-{
-    LOG_DEBUG(<< "Group count <" << groups_.size() << ">.");
-    for (auto const &it : groups_)
-    {
-        LOG_DEBUG(<< "Group <" << toString(it.second) << ">.");
-    }
 }

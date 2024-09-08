@@ -50,10 +50,11 @@ private:
     MainWindow *mainWindow_;
 
     TreeAttributesParameters parameters_;
-    TreeAttributesAction treeAttributes_;
+    TreeAttributesAction treeAttributesAction_;
 
+    DoubleSliderWidget *treePositionHeightRangeSlider_;
     DoubleSliderWidget *dbhElevationSlider_;
-    DoubleSliderWidget *dbhElevationToleranceSlider_;
+    DoubleSliderWidget *dbhElevationRangeSlider_;
 
     QPushButton *applyButton_;
 };

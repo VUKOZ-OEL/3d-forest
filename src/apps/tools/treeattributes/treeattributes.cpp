@@ -70,19 +70,25 @@ int main(int argc, char *argv[])
                 true);
 
         arg.add("",
+                "--position-height-range",
+                toString(p.treePositionHeightRange),
+                "Tree position height range [m]");
+
+        arg.add("",
                 "--dbh-elevation",
                 toString(p.dbhElevation),
                 "Calculate DBH at given elevation [m]");
 
         arg.add("",
-                "--dbh-tolerance",
-                toString(p.dbhElevationTolerance),
-                "DBH elevation tolerance +- [m]");
+                "--dbh-range",
+                toString(p.dbhElevationRange),
+                "DBH elevation range +- [m]");
 
         if (arg.parse(argc, argv))
         {
+            p.treePositionHeightRange = arg.toDouble("--position-height-range");
             p.dbhElevation = arg.toDouble("--dbh-elevation");
-            p.dbhElevationTolerance = arg.toDouble("--dbh-tolerance");
+            p.dbhElevationRange = arg.toDouble("--dbh-range");
 
             compute(arg.toString("--file"), p);
         }

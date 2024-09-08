@@ -23,7 +23,7 @@
 #define TREE_ATTRIBUTES_LEAST_SQUARED_REGRESSION_HPP
 
 // Include 3D Forest.
-#include <TreeAttributesGroup.hpp>
+#include <TreeAttributesData.hpp>
 #include <TreeAttributesParameters.hpp>
 
 /** Tree Attributes Least Squared Regression. */
@@ -61,15 +61,15 @@ public:
     };
 
     static void taubinFit(FittingCircle &circle,
-                          const TreeAttributesGroup &group,
+                          const std::vector<double> &points,
                           const TreeAttributesParameters &parameters);
 
     static void geometricCircle(FittingCircle &circle,
-                                const TreeAttributesGroup &group,
+                                const std::vector<double> &points,
                                 const TreeAttributesParameters &parameters);
 
     static double sigma(FittingCircle &circle,
-                        const TreeAttributesGroup &group);
+                        const std::vector<double> &points);
 };
 
 #endif /* TREE_ATTRIBUTES_LEAST_SQUARED_REGRESSION_HPP */

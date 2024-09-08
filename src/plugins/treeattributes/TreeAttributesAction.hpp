@@ -27,7 +27,7 @@
 #include <Points.hpp>
 #include <ProgressActionInterface.hpp>
 #include <Query.hpp>
-#include <TreeAttributesGroup.hpp>
+#include <TreeAttributesData.hpp>
 #include <TreeAttributesParameters.hpp>
 class Editor;
 class Segment;
@@ -49,17 +49,20 @@ private:
 
     TreeAttributesParameters parameters_;
 
-    std::map<size_t, TreeAttributesGroup> groups_; // [segmentId:group]
-    size_t currentGroup_;
+    std::map<size_t, size_t> treesMap_; // [tree ID : tree index]
+    std::vector<TreeAttributesData> trees_;
 
-    void stepPointsToGroups();
+    size_t currentTreeIndex_;
+
+    void stepPointsToTrees();
     void stepCalculateTreeAttributes();
-    void stepUpdateSegments();
+    void stepUpdateTreeAttributes();
 
-    void calculateDbh(TreeAttributesGroup &group);
-    void calculateTreeBase(TreeAttributesGroup &group);
+    void calculateDbh(TreeAttributesData &tree);
+    void calculateTreePosition(TreeAttributesData &tree);
+    void calculateTreeHeight(TreeAttributesData &tree);
 
-    void dumpGroups();
+    size_t getTreeIndex(size_t treeId);
 };
 
 #endif /* TREE_ATTRIBUTES_ACTION_HPP */

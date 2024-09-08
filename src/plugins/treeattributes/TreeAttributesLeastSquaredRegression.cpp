@@ -25,7 +25,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "TreeAttributesLeastSquaredRegression"
-// #define LOG_MODULE_DEBUG_ENABLED 1
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 /*
@@ -76,12 +76,12 @@
 */
 void TreeAttributesLeastSquaredRegression::taubinFit(
     FittingCircle &circle,
-    const TreeAttributesGroup &group,
+    const std::vector<double> &points,
     const TreeAttributesParameters &parameters)
 {
     circle.result = FittingCircle::RESULT_INVALID;
 
-    size_t n = group.dbhPoints.size() / 3;
+    size_t n = points.size() / 3;
     if (n < 1)
     {
         LOG_DEBUG(<< "Not enough points.");
@@ -95,9 +95,9 @@ void TreeAttributesLeastSquaredRegression::taubinFit(
 
     for (size_t i = 0; i < n; i++)
     {
-        meanX += group.dbhPoints[(i * 3) + 0];
-        meanY += group.dbhPoints[(i * 3) + 1];
-        meanZ += group.dbhPoints[(i * 3) + 2];
+        meanX += points[(i * 3) + 0];
+        meanY += points[(i * 3) + 1];
+        meanZ += points[(i * 3) + 2];
     }
 
     meanX /= static_cast<double>(n);
@@ -114,10 +114,8 @@ void TreeAttributesLeastSquaredRegression::taubinFit(
 
     for (size_t i = 0; i < n; i++)
     {
-        double Xi =
-            group.dbhPoints[(i * 3) + 0] - meanX; // Centered x-coordinates.
-        double Yi =
-            group.dbhPoints[(i * 3) + 1] - meanY; // Centered y-coordinates.
+        double Xi = points[(i * 3) + 0] - meanX; // Centered x-coordinates.
+        double Yi = points[(i * 3) + 1] - meanY; // Centered y-coordinates.
         double Zi = (Xi * Xi) + (Yi * Yi);
 
         Mxy += Xi * Yi;
@@ -188,12 +186,12 @@ void TreeAttributesLeastSquaredRegression::taubinFit(
 
 void TreeAttributesLeastSquaredRegression::geometricCircle(
     FittingCircle &circle,
-    const TreeAttributesGroup &group,
+    const std::vector<double> &points,
     const TreeAttributesParameters &parameters)
 {
     circle.result = FittingCircle::RESULT_INVALID;
 
-    size_t n = group.dbhPoints.size() / 3;
+    size_t n = points.size() / 3;
     if (n < 1)
     {
         LOG_DEBUG(<< "Not enough points.");
@@ -207,9 +205,9 @@ void TreeAttributesLeastSquaredRegression::geometricCircle(
 
     for (size_t i = 0; i < n; i++)
     {
-        meanX += group.dbhPoints[(i * 3) + 0];
-        meanY += group.dbhPoints[(i * 3) + 1];
-        meanZ += group.dbhPoints[(i * 3) + 2];
+        meanX += points[(i * 3) + 0];
+        meanY += points[(i * 3) + 1];
+        meanZ += points[(i * 3) + 2];
     }
 
     if (isZero(meanX))
@@ -250,7 +248,7 @@ void TreeAttributesLeastSquaredRegression::geometricCircle(
     New.a = circle.a;
     New.b = circle.b;
     New.r = circle.r;
-    New.s = sigma(New, group);
+    New.s = sigma(New, points);
 
 nextIteration:
 
@@ -273,13 +271,13 @@ nextIteration:
 
     for (size_t i = 0; i < n; i++)
     {
-        double dx = group.dbhPoints[(i * 3) + 0] - Old.a;
+        double dx = points[(i * 3) + 0] - Old.a;
         if (isZero(dx))
         {
             dx = 1e-10;
         }
 
-        double dy = group.dbhPoints[(i * 3) + 1] - Old.b;
+        double dy = points[(i * 3) + 1] - Old.b;
         if (isZero(dy))
         {
             dy = 1e-10;
@@ -366,7 +364,7 @@ tryAgain:
     }
 
     // Calculate the root-mean-square error.
-    New.s = sigma(New, group);
+    New.s = sigma(New, points);
 
     // Check if improvement is gained.
     if (New.s < Old.s)
@@ -401,15 +399,15 @@ enough:
 
 double TreeAttributesLeastSquaredRegression::sigma(
     FittingCircle &circle,
-    const TreeAttributesGroup &group)
+    const std::vector<double> &points)
 {
     double sum{0.0};
 
-    size_t n = group.dbhPoints.size() / 3;
+    size_t n = points.size() / 3;
     for (size_t i = 0; i < n; i++)
     {
-        double dx = group.dbhPoints[(i * 3) + 0] - circle.a;
-        double dy = group.dbhPoints[(i * 3) + 1] - circle.b;
+        double dx = points[(i * 3) + 0] - circle.a;
+        double dy = points[(i * 3) + 1] - circle.b;
 
         sum += ((std::sqrt(dx * dx + dy * dy) - circle.r) *
                 (std::sqrt(dx * dx + dy * dy) - circle.r));

@@ -293,36 +293,35 @@ void ViewerOpenGL::renderAxis()
 }
 
 void ViewerOpenGL::renderCross(const Vector3<float> &p,
-                               const ViewerAabb &box,
-                               const Vector3<float> &color)
+                               float lengthX,
+                               float lengthY)
 {
-    QVector3D v[6];
-    QVector3D min = box.getMin();
-    QVector3D max = box.getMax();
-    v[0] = QVector3D(p[0] - (p[0] - min[0]), p[1], p[2]);
-    v[1] = QVector3D(p[0] + (max[0] - p[0]), p[1], p[2]);
-    v[2] = QVector3D(p[0], p[1] - (p[1] - min[1]), p[2]);
-    v[3] = QVector3D(p[0], p[1] + (max[1] - p[1]), p[2]);
-    v[4] = QVector3D(p[0], p[1], p[2] - (p[2] - min[2]));
-    v[5] = QVector3D(p[0], p[1], p[2] + (max[2] - p[2]));
+    QVector3D v[4];
+    v[0] = QVector3D(p[0] - (lengthX * 0.5F), p[1], p[2]);
+    v[1] = QVector3D(p[0] + (lengthX * 0.5F), p[1], p[2]);
+    v[2] = QVector3D(p[0], p[1] - (lengthY * 0.5F), p[2]);
+    v[3] = QVector3D(p[0], p[1] + (lengthY * 0.5F), p[2]);
 
-    QVector3D c[6];
-    c[0] = QVector3D(color[0], color[1], color[2]);
-    c[1] = QVector3D(color[0], color[1], color[2]);
-    c[2] = QVector3D(color[0], color[1], color[2]);
-    c[3] = QVector3D(color[0], color[1], color[2]);
-    c[4] = QVector3D(color[0], color[1], color[2]);
-    c[5] = QVector3D(color[0], color[1], color[2]);
-
-    GLuint indices[6] = {0, 1, 2, 3, 4, 5};
+    GLuint indices[4] = {0, 1, 2, 3};
 
     glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_COLOR_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, static_cast<GLvoid *>(&v[0]));
-    glColorPointer(3, GL_FLOAT, 0, static_cast<GLvoid *>(&c[0]));
-    glDrawElements(GL_LINES, 6, GL_UNSIGNED_INT, indices);
+    glDrawElements(GL_LINES, 4, GL_UNSIGNED_INT, indices);
     glDisableClientState(GL_VERTEX_ARRAY);
-    glDisableClientState(GL_COLOR_ARRAY);
+}
+
+void ViewerOpenGL::renderLine(const Vector3<float> &a, const Vector3<float> &b)
+{
+    QVector3D v[2];
+    v[0] = QVector3D(a[0], a[1], a[2]);
+    v[1] = QVector3D(b[0], b[1], b[2]);
+
+    GLuint indices[2] = {0, 1};
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, static_cast<GLvoid *>(&v[0]));
+    glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, indices);
+    glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void ViewerOpenGL::renderCircle(const Vector3<float> &p,
