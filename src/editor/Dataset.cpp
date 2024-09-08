@@ -27,7 +27,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "Dataset"
-// #define LOG_MODULE_DEBUG_ENABLED 1
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 Dataset::Dataset() : id_(0)

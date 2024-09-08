@@ -17,10 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SettingsColorWidget.hpp */
+/** @file SettingsViewWidget.hpp */
 
-#ifndef SETTINGS_COLOR_WIDGET_HPP
-#define SETTINGS_COLOR_WIDGET_HPP
+#ifndef SETTINGS_VIEW_WIDGET_HPP
+#define SETTINGS_VIEW_WIDGET_HPP
 
 // Include std.
 #include <vector>
@@ -36,13 +36,13 @@ class QCheckBox;
 class QComboBox;
 class QSlider;
 
-/** Settings Color Widget. */
-class SettingsColorWidget : public QWidget
+/** Settings View Widget. */
+class SettingsViewWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    SettingsColorWidget(MainWindow *mainWindow);
+    SettingsViewWidget(MainWindow *mainWindow);
 
 public slots:
     void slotUpdate(void *sender, const QSet<Editor::Type> &target);
@@ -61,10 +61,10 @@ private:
 
     SettingsView settings_;
 
-    void setSettingsOut(bool modifiers = false);
-    void setSettingsIn(const SettingsView &settings);
+    void dataChanged(bool modifiers = false);
+    void setViewSettings(const SettingsView &settings);
     void block();
     void unblock();
 };
 
-#endif /* SETTINGS_COLOR_WIDGET_HPP */
+#endif /* SETTINGS_VIEW_WIDGET_HPP */

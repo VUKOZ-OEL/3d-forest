@@ -20,6 +20,7 @@
 /** @file MainWindow.cpp */
 
 // Include 3D Forest.
+#include <GuiUtil.hpp>
 #include <MainWindow.hpp>
 #include <PluginInterface.hpp>
 #include <ViewerViewports.hpp>
@@ -48,6 +49,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "MainWindow"
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #if !defined(EXPORT_GUI_IMPORT)
@@ -61,7 +63,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       threadRender_(&editor_)
 {
-    LOG_DEBUG(<< "Create.");
+    LOG_DEBUG(<< "Start creating the main window.");
 
     // Status bar.
     statusBar()->showMessage(tr("Ready"));
@@ -123,13 +125,23 @@ MainWindow::MainWindow(QWidget *parent)
     threadRender_.setCallback(this);
     threadRender_.create();
 
-    updateEverything();
+    // Update.
+    setWindowTitle(QString::fromStdString(editor_.projectPath()));
+
+    LOG_DEBUG_UPDATE(<< "Emit update.");
+    emit signalUpdate(this, {});
+
+    viewerPlugin_->viewports()->resetScene(&editor_, true);
+    viewerPlugin_->viewports()->setView3d();
+
+    LOG_DEBUG(<< "Finished creating the main window.");
 }
 
 MainWindow::~MainWindow()
 {
-    LOG_DEBUG(<< "Destroy.");
+    LOG_DEBUG(<< "Start destroying the main window.");
     threadRender_.stop();
+    LOG_DEBUG(<< "Finished destroying the main window.");
 }
 
 QSize MainWindow::minimumSizeHint() const
@@ -142,9 +154,21 @@ QSize MainWindow::sizeHint() const
     return QSize(1024, 768);
 }
 
+void MainWindow::paintEvent(QPaintEvent *event)
+{
+    LOG_DEBUG_QT_EVENT(<< "Paint event.");
+    QWidget::paintEvent(event);
+}
+
+void MainWindow::resizeEvent(QResizeEvent *event)
+{
+    LOG_DEBUG_QT_EVENT(<< "Resize event.");
+    QWidget::resizeEvent(event);
+}
+
 void MainWindow::showEvent(QShowEvent *event)
 {
-    LOG_DEBUG(<< "Show.");
+    LOG_DEBUG_QT_EVENT(<< "Show event.");
 
     resizeDocks({explorerPlugin_->window(), settingsPlugin_->window()},
                 {80, 20},
@@ -155,7 +179,7 @@ void MainWindow::showEvent(QShowEvent *event)
 
 void MainWindow::hideEvent(QHideEvent *event)
 {
-    LOG_DEBUG(<< "Hide.");
+    LOG_DEBUG_QT_EVENT(<< "Hide.");
     QWidget::hideEvent(event);
 }
 
@@ -337,53 +361,46 @@ void MainWindow::loadPlugin(QObject *plugin)
 
 void MainWindow::suspendThreads()
 {
-    LOG_TRACE_THREAD(<< "Suspend threads.");
+    LOG_DEBUG_RENDER(<< "Suspend threads.");
     threadRender_.cancel();
 }
 
 void MainWindow::resumeThreads()
 {
-    LOG_TRACE_THREAD(<< "Resume threads.");
-    slotRenderViewport();
+    LOG_DEBUG_RENDER(<< "Resume threads.");
+    slotRenderViewports();
 }
 
 void MainWindow::threadProgress(bool finished)
 {
     (void)finished;
-    LOG_TRACE_THREAD(<< "Thread progress finished <" << finished << ">.");
+    LOG_DEBUG_RENDER(<< "Thread progress finished <" << finished << ">.");
     emit signalRender();
 }
 
 void MainWindow::slotRender()
 {
-    editor_.lock("MainWindow render all viewports");
+    std::unique_lock<std::mutex> mutexlock(editor_.mutex_);
     viewerPlugin_->viewports()->updateScene(&editor_);
-    editor_.unlock("MainWindow render all viewports");
-}
-
-void MainWindow::slotRenderViewport()
-{
-    LOG_TRACE_UPDATE_VIEW(<< "Render active viewport.");
-    slotRenderViewport(viewerPlugin_->viewports()->selectedViewportId());
 }
 
 void MainWindow::slotRenderViewport(size_t viewportId)
 {
-    LOG_TRACE_UPDATE_VIEW(<< "Render viewport <" << viewportId << ">.");
+    LOG_DEBUG_RENDER(<< "Render viewport <" << viewportId << ">.");
     ViewerViewports *viewports = viewerPlugin_->viewports();
-    threadRender_.render(viewportId, viewports->camera(viewportId));
+    threadRender_.render(viewports->camera(viewportId));
 }
 
 void MainWindow::slotRenderViewports()
 {
-    LOG_TRACE_UPDATE_VIEW(<< "Render viewports.");
-    ViewerViewports *viewports = viewerPlugin_->viewports();
-    threadRender_.render(0, viewports->camera(0));
+    LOG_DEBUG_RENDER(<< "Render viewports.");
+    threadRender_.render(viewerPlugin_->viewports()->camera());
     // viewerPlugin_->viewports()->update();
 }
 
 void MainWindow::update(void *sender, const QSet<Editor::Type> &target)
 {
+    LOG_DEBUG_UPDATE(<< "Update target <" << target << "> emit.");
     emit signalUpdate(sender, target);
 }
 
@@ -391,7 +408,9 @@ void MainWindow::update(const QSet<Editor::Type> &target,
                         Page::State viewPortsCacheState,
                         bool resetCamera)
 {
-    LOG_TRACE_UPDATE(<< "Update number of targets <" << target.count() << ">.");
+    LOG_DEBUG_UPDATE(<< "Update target <" << target << "> set page state <"
+                     << viewPortsCacheState << "> reset camera <"
+                     << static_cast<int>(resetCamera) << ">.");
     suspendThreads();
 
     editor_.viewports().setState(viewPortsCacheState);
@@ -408,29 +427,31 @@ void MainWindow::update(const QSet<Editor::Type> &target,
     resumeThreads();
 }
 
-void MainWindow::updateEverything()
+void MainWindow::updateNewProject()
 {
-    LOG_TRACE_UPDATE(<< "Update everything.");
-    suspendThreads();
+    LOG_DEBUG(<< "Start updating new project.");
+    // suspendThreads();
 
     setWindowTitle(QString::fromStdString(editor_.projectPath()));
 
     ViewerViewports *viewports = viewerPlugin_->viewports();
+    {
+        std::unique_lock<std::mutex> mutexlock(editor_.mutex_);
+        viewports->resetScene(&editor_, true);
+    }
 
-    editor_.lock("MainWindow resetScene");
-    viewports->resetScene(&editor_, true);
-    editor_.unlock("MainWindow resetScene");
-
-    LOG_TRACE_UPDATE(<< "Emit update.");
+    LOG_DEBUG(<< "Emit update.");
     emit signalUpdate(this, {});
 
     //    size_t viewportId = viewports->selectedViewportId();
     //    threadRender_.render(viewportId, viewports->camera(viewportId));
+
+    LOG_DEBUG(<< "Finished updating new project.");
 }
 
 void MainWindow::updateData()
 {
-    LOG_TRACE_UPDATE(<< "Update data.");
+    LOG_DEBUG_UPDATE(<< "Update data.");
     suspendThreads();
 
     ViewerViewports *viewports = viewerPlugin_->viewports();
@@ -442,7 +463,7 @@ void MainWindow::updateData()
 
 void MainWindow::updateFilter()
 {
-    LOG_TRACE_UPDATE(<< "Update filter.");
+    LOG_DEBUG_UPDATE(<< "Update filter.");
     suspendThreads();
 
     ViewerViewports *viewports = viewerPlugin_->viewports();
@@ -454,7 +475,7 @@ void MainWindow::updateFilter()
 
 void MainWindow::updateModifiers()
 {
-    LOG_TRACE_UPDATE(<< "Update modifiers.");
+    LOG_DEBUG_UPDATE(<< "Update modifiers.");
     suspendThreads();
 
     editor_.viewports().setState(Page::STATE_RUN_MODIFIERS);
@@ -464,7 +485,7 @@ void MainWindow::updateModifiers()
 
 void MainWindow::updateRender()
 {
-    LOG_TRACE_UPDATE(<< "Update render.");
+    LOG_DEBUG_UPDATE(<< "Update render.");
     suspendThreads();
 
     editor_.viewports().setState(Page::STATE_RENDER);

@@ -38,10 +38,32 @@ public:
     Vector3<double> center;
     Vector3<double> up;
     double fov;
+    size_t viewportId;
 
     Camera();
     ~Camera();
 };
+
+inline void toJson(Json &out, const Camera &in)
+{
+    toJson(out["eye"], in.eye);
+    toJson(out["center"], in.center);
+    toJson(out["up"], in.up);
+    toJson(out["fov"], in.fov);
+    toJson(out["viewportId"], in.viewportId);
+}
+
+inline std::string toString(const Camera &in)
+{
+    Json json;
+    toJson(json, in);
+    return json.serialize(0);
+}
+
+inline std::ostream &operator<<(std::ostream &out, const Camera &in)
+{
+    return out << toString(in);
+}
 
 #include <WarningsEnable.hpp>
 

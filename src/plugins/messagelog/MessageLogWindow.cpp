@@ -26,6 +26,10 @@
 // Include Qt.
 #include <QTextEdit>
 
+// #define MESSAGE_LOG_WINDOW_DEBUG_PRINT 1
+#define MESSAGE_LOG_WINDOW_FILE_NAME "log.txt"
+#define MESSAGE_LOG_WINDOW_FILE_SIZE_MAX (100 * 1024 * 1024)
+
 MessageLogWindow::MessageLogWindow(MainWindow *mainWindow)
     : QDockWidget(mainWindow),
       mainWindow_(mainWindow)
@@ -35,7 +39,7 @@ MessageLogWindow::MessageLogWindow(MainWindow *mainWindow)
     textEdit_->setReadOnly(true);
 
     // File.
-    file_.open("log.txt", "w+t");
+    file_.open(MESSAGE_LOG_WINDOW_FILE_NAME, "w+t");
 
     // Dock.
     setWidget(textEdit_);
@@ -72,15 +76,36 @@ void MessageLogWindow::flush()
 
 void MessageLogWindow::slotPrintln(const LogMessage &message)
 {
+    if (file_.size() > MESSAGE_LOG_WINDOW_FILE_SIZE_MAX)
+    {
+        textEdit_->clear();
+        file_.open(MESSAGE_LOG_WINDOW_FILE_NAME, "w+t");
+    }
+
+#if defined(MESSAGE_LOG_WINDOW_DEBUG_PRINT)
+    QString line = QString::number(message.threadId) + " " +
+                   QString::fromStdString(message.time) +
+                   QString(LogMessage::typeString(message.type)) +
+                   QString::fromStdString(message.text) + " [" +
+                   QString::fromStdString(message.module) + ":" +
+                   QString::fromStdString(message.function) + "] " +
+                   QString::number(file_.size());
+
+    if (threadId_ != 0 && threadId_ != message.threadId)
+    {
+        file_.write("\n");
+    }
+    threadId_ = message.threadId;
+#else
     QString line = QString::fromStdString(message.time) +
                    QString(LogMessage::typeString(message.type)) +
                    QString::fromStdString(message.text) + " [" +
                    QString::fromStdString(message.module) + ":" +
                    QString::fromStdString(message.function) + "] " +
                    QString::number(message.threadId);
+#endif
 
     textEdit_->append(line);
-
     file_.write(line.toStdString() + "\n");
 }
 

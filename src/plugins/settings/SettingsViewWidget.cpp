@@ -17,12 +17,12 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SettingsColorWidget.cpp */
+/** @file SettingsViewWidget.cpp */
 
 // Include 3D Forest.
 #include <ColorSwitchWidget.hpp>
 #include <MainWindow.hpp>
-#include <SettingsColorWidget.hpp>
+#include <SettingsViewWidget.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
@@ -36,12 +36,12 @@
 #include <QVBoxLayout>
 
 // Include local.
-#define LOG_MODULE_NAME "SettingsColorWidget"
+#define LOG_MODULE_NAME "SettingsViewWidget"
 #include <Log.hpp>
 
 #define ICON(name) (ThemeIcon(":/settings/", name))
 
-SettingsColorWidget::SettingsColorWidget(MainWindow *mainWindow)
+SettingsViewWidget::SettingsViewWidget(MainWindow *mainWindow)
     : QWidget(mainWindow),
       mainWindow_(mainWindow)
 {
@@ -132,8 +132,8 @@ SettingsColorWidget::SettingsColorWidget(MainWindow *mainWindow)
     slotUpdate(nullptr, QSet<Editor::Type>());
 }
 
-void SettingsColorWidget::slotUpdate(void *sender,
-                                     const QSet<Editor::Type> &target)
+void SettingsViewWidget::slotUpdate(void *sender,
+                                    const QSet<Editor::Type> &target)
 {
     if (sender == this)
     {
@@ -142,12 +142,16 @@ void SettingsColorWidget::slotUpdate(void *sender,
 
     if (target.empty() || target.contains(Editor::TYPE_SETTINGS))
     {
-        setSettingsIn(mainWindow_->editor().settings().view);
+        LOG_DEBUG_UPDATE(<< "Input view settings.");
+
+        setViewSettings(mainWindow_->editor().settings().view);
     }
 }
 
-void SettingsColorWidget::setSettingsOut(bool modifiers)
+void SettingsViewWidget::dataChanged(bool modifiers)
 {
+    LOG_DEBUG_UPDATE(<< "Output view settings.");
+
     mainWindow_->suspendThreads();
     mainWindow_->editor().setSettingsView(settings_);
     mainWindow_->update(this, {Editor::TYPE_SETTINGS});
@@ -162,45 +166,10 @@ void SettingsColorWidget::setSettingsOut(bool modifiers)
     }
 }
 
-void SettingsColorWidget::slotColorSourceChanged(int index)
+void SettingsViewWidget::setViewSettings(const SettingsView &settings)
 {
-    LOG_DEBUG(<< "Set color source to <" << index << ">.");
-    if (index < 0)
-    {
-        return;
-    }
-    size_t i = static_cast<size_t>(index);
-    settings_.setColorSourceEnabledAll(false);
-    settings_.setColorSourceEnabled(i, true);
-    setSettingsOut(true);
-}
+    LOG_DEBUG(<< "Set view settings.");
 
-void SettingsColorWidget::slotSetPointSize(int v)
-{
-    settings_.setPointSize(static_cast<double>(v));
-    setSettingsOut();
-}
-
-void SettingsColorWidget::slotSetFogEnabled(int v)
-{
-    (void)v;
-    settings_.setFogEnabled(fogCheckBox_->isChecked());
-    setSettingsOut();
-}
-
-void SettingsColorWidget::slotSetColor()
-{
-    QColor fg = colorSwitchWidget_->foregroundColor();
-    settings_.setPointColor({fg.redF(), fg.greenF(), fg.blueF()});
-
-    QColor bg = colorSwitchWidget_->backgroundColor();
-    settings_.setBackgroundColor({bg.redF(), bg.greenF(), bg.blueF()});
-
-    setSettingsOut(true);
-}
-
-void SettingsColorWidget::setSettingsIn(const SettingsView &settings)
-{
     block();
 
     settings_ = settings;
@@ -227,12 +196,50 @@ void SettingsColorWidget::setSettingsIn(const SettingsView &settings)
     unblock();
 }
 
-void SettingsColorWidget::block()
+void SettingsViewWidget::slotColorSourceChanged(int index)
+{
+    LOG_DEBUG(<< "Set color source to <" << index << ">.");
+
+    if (index < 0)
+    {
+        return;
+    }
+    size_t i = static_cast<size_t>(index);
+    settings_.setColorSourceEnabledAll(false);
+    settings_.setColorSourceEnabled(i, true);
+    dataChanged(true);
+}
+
+void SettingsViewWidget::slotSetPointSize(int v)
+{
+    settings_.setPointSize(static_cast<double>(v));
+    dataChanged();
+}
+
+void SettingsViewWidget::slotSetFogEnabled(int v)
+{
+    (void)v;
+    settings_.setFogEnabled(fogCheckBox_->isChecked());
+    dataChanged();
+}
+
+void SettingsViewWidget::slotSetColor()
+{
+    QColor fg = colorSwitchWidget_->foregroundColor();
+    settings_.setPointColor({fg.redF(), fg.greenF(), fg.blueF()});
+
+    QColor bg = colorSwitchWidget_->backgroundColor();
+    settings_.setBackgroundColor({bg.redF(), bg.greenF(), bg.blueF()});
+
+    dataChanged(true);
+}
+
+void SettingsViewWidget::block()
 {
     (void)blockSignals(true);
 }
 
-void SettingsColorWidget::unblock()
+void SettingsViewWidget::unblock()
 {
     (void)blockSignals(false);
 }

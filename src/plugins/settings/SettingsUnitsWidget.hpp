@@ -61,8 +61,8 @@ private:
 
     SettingsUnits settings_;
 
-    void setSettingsOut();
-    void setSettingsIn(const SettingsUnits &settings);
+    void dataChanged();
+    void setUnitsSettings(const SettingsUnits &settings);
     void block();
     void unblock();
 };

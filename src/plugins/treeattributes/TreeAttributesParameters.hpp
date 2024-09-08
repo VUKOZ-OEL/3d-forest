@@ -17,20 +17,27 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file DbhParameters.hpp */
+/** @file TreeAttributesParameters.hpp */
 
-#ifndef DBH_PARAMETERS_HPP
-#define DBH_PARAMETERS_HPP
+#ifndef TREE_ATTRIBUTES_PARAMETERS_HPP
+#define TREE_ATTRIBUTES_PARAMETERS_HPP
 
 // Include 3D Forest.
 #include <Json.hpp>
 
-/** DBH (Diameter at Breast Height) Parameters. */
-class DbhParameters
+/** Tree Attributes Parameters. */
+class TreeAttributesParameters
 {
 public:
-    double elevation{1.3};
-    double elevationTolerance{0.05};
+    // Tree position parameters.
+    double treePositionHeightRange{0.6};
+    double treeTipHeightRange{0.1};
+
+    // DBH parameters.
+    double dbhElevation{1.3};
+    double dbhElevationRange{0.05};
+
+    // Least Squared Regression parameters.
     size_t taubinFitIterationsMax{20}; // Usually, 4-6 iterations are enough.
     size_t geometricCircleIterationsMax{500};
     double geometricCircleFactorUp{1.0};
@@ -38,10 +45,11 @@ public:
     double geometricCircleParameterLimit{1e6};
 };
 
-inline void toJson(Json &out, const DbhParameters &in)
+inline void toJson(Json &out, const TreeAttributesParameters &in)
 {
-    toJson(out["elevation"], in.elevation);
-    toJson(out["elevationTolerance"], in.elevationTolerance);
+    toJson(out["treePositionHeightRange"], in.treePositionHeightRange);
+    toJson(out["dbhElevation"], in.dbhElevation);
+    toJson(out["dbhElevationRange"], in.dbhElevationRange);
     toJson(out["taubinFitIterationsMax"], in.taubinFitIterationsMax);
     toJson(out["geometricCircleIterationsMax"],
            in.geometricCircleIterationsMax);
@@ -51,11 +59,11 @@ inline void toJson(Json &out, const DbhParameters &in)
            in.geometricCircleParameterLimit);
 }
 
-inline std::string toString(const DbhParameters &in)
+inline std::string toString(const TreeAttributesParameters &in)
 {
     Json json;
     toJson(json, in);
     return json.serialize(0);
 }
 
-#endif /* DBH_PARAMETERS_HPP */
+#endif /* TREE_ATTRIBUTES_PARAMETERS_HPP */

@@ -128,7 +128,7 @@ static void importPluginFile(const QString &path, MainWindow *mainWindow)
         mainWindow->editor().open(path.toStdString(), settings);
     }
 
-    mainWindow->updateEverything();
+    mainWindow->updateNewProject();
     mainWindow->slotRenderViewports();
 }
 

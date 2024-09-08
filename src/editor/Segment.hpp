@@ -43,6 +43,8 @@ public:
     Box<double> boundary;
 
     double height{0.0};
+
+    Vector3<double> dbhPosition;
     double dbh{0.0};
 
     std::vector<Mesh> meshList;

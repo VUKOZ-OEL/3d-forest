@@ -45,7 +45,8 @@ ToolTabWidget::ToolTabWidget()
       icon_(nullptr),
       label_(nullptr),
       mainLayout_(nullptr),
-      showTextBesideIcon_(false)
+      showTextBesideIcon_(false),
+      showTextInAllTabs_(false)
 {
     LOG_DEBUG(<< "Create.");
 }
@@ -132,7 +133,7 @@ void ToolTabWidget::addTab(QWidget *widget,
         // The first tab is on.
         if (showTextBesideIcon_)
         {
-            toolButton->setChecked(false);
+            toolButton->setChecked(showTextInAllTabs_);
             toolButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         }
         else
@@ -154,6 +155,11 @@ void ToolTabWidget::addTab(QWidget *widget,
     {
         // The other tabs are off.
         toolButton->setChecked(false);
+        if (showTextInAllTabs_)
+        {
+            toolButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        }
+
         widget->setVisible(false);
 
         // Extend layout.
@@ -174,7 +180,10 @@ void ToolTabWidget::slotToolButton()
         {
             LOG_DEBUG(<< "Hide widget <" << i << ">.");
             toolButtonList_[i]->setChecked(false);
-            toolButtonList_[i]->setToolButtonStyle(Qt::ToolButtonIconOnly);
+            if (!showTextInAllTabs_)
+            {
+                toolButtonList_[i]->setToolButtonStyle(Qt::ToolButtonIconOnly);
+            }
             tabList_[i]->setVisible(false);
         }
     }
@@ -189,7 +198,7 @@ void ToolTabWidget::slotToolButton()
             label_->setText(toolButtonList_[i]->text());
             if (showTextBesideIcon_)
             {
-                toolButtonList_[i]->setChecked(false);
+                toolButtonList_[i]->setChecked(showTextInAllTabs_);
                 toolButtonList_[i]->setToolButtonStyle(
                     Qt::ToolButtonTextBesideIcon);
             }

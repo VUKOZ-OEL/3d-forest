@@ -34,6 +34,18 @@ QueryWhere::~QueryWhere()
 {
 }
 
+void QueryWhere::clear()
+{
+    region_.clear();
+    elevation_.clear();
+    descriptor_.clear();
+    intensity_.clear();
+    dataset_.clear();
+    classification_.clear();
+    classificationArray_.clear();
+    segment_.clear();
+}
+
 void QueryWhere::setDataset(const QueryFilterSet &list)
 {
     dataset_ = list;

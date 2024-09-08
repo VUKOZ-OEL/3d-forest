@@ -68,8 +68,9 @@ public:
                                size_t slices = 16);
     static void renderAxis();
     static void renderCross(const Vector3<float> &p,
-                            const ViewerAabb &box,
-                            const Vector3<float> &color);
+                            float lengthX,
+                            float lengthY);
+    static void renderLine(const Vector3<float> &a, const Vector3<float> &b);
     static void renderCircle(const Vector3<float> &p,
                              float radius,
                              size_t pointCount = 16);

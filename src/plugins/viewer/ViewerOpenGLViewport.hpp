@@ -44,7 +44,7 @@ public:
     explicit ViewerOpenGLViewport(QWidget *parent = nullptr);
     ~ViewerOpenGLViewport();
 
-    void setWindowViewports(ViewerViewports *viewer, size_t viewportId);
+    void setViewports(ViewerViewports *viewer, size_t viewportId);
     size_t viewportId() const;
 
     void setSelected(bool selected);
@@ -66,6 +66,11 @@ public:
 
 protected:
     // Qt.
+    void paintEvent(QPaintEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
+    void showEvent(QShowEvent *event) override;
+    void hideEvent(QHideEvent *event) override;
+
     void initializeGL() override;
     void paintGL() override;
     void resizeGL(int w, int h) override;
@@ -84,7 +89,7 @@ protected:
     ViewerAabb aabb_;
     ViewerCamera camera_;
 
-    void resetCamera();
+    void setViewDefault();
     void clearScreen();
     bool renderScene();
     void renderFirstFrame();

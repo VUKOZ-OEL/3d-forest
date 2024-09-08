@@ -31,19 +31,17 @@
 
 RenderThread::RenderThread(Editor *editor)
     : editor_(editor),
-      viewportId_(0),
       initialized_(false)
 {
 }
 
-void RenderThread::render(size_t viewportId, const Camera &camera)
+void RenderThread::render(const std::vector<Camera> &cameraList)
 {
-    LOG_DEBUG(<< "Render viewportId <" << viewportId << ">.");
-    LOG_TRACE_UPDATE_VIEW(<< "Render viewportId <" << viewportId << ">.");
+    LOG_DEBUG_RENDER(<< "Render viewports n <" << cameraList.size() << ">.");
+
     cancel();
 
-    viewportId_ = viewportId;
-    camera_ = camera;
+    cameraList_ = cameraList;
     initialized_ = false;
 
     ThreadLoop::start();
@@ -51,34 +49,35 @@ void RenderThread::render(size_t viewportId, const Camera &camera)
 
 bool RenderThread::next()
 {
-    LOG_DEBUG(<< "Computation is initialized <" << initialized_ << ">.");
+    LOG_DEBUG_RENDER(<< "Render next step, initialized <" << initialized_
+                     << ">.");
+
     if (!initialized_)
     {
-        LOG_TRACE_UPDATE_VIEW(<< "Apply camera to viewportId <" << viewportId_
-                              << ">.");
-        editor_->lock("RenderThread applyCamera");
-        editor_->viewports().applyCamera(viewportId_, camera_);
-        editor_->unlock("RenderThread applyCamera");
+        LOG_DEBUG_RENDER(<< "Apply camera to viewports.");
+        {
+            std::unique_lock<std::mutex> mutexlock(editor_->mutex_);
+            editor_->viewports().applyCamera(cameraList_);
+        }
         initialized_ = true;
         return true;
     }
 
-    LOG_DEBUG(<< "Compute next state.");
-    LOG_TRACE_UPDATE_VIEW(<< "Compute next state.");
+    LOG_DEBUG_RENDER(<< "Compute next state.");
+
     double t1 = Time::realTime();
-    bool finished;
-    editor_->lock("RenderThread nextState");
-    finished = !editor_->viewports().nextState();
-    editor_->unlock("RenderThread nextState");
+    bool finished = false;
+    {
+        std::unique_lock<std::mutex> mutexlock(editor_->mutex_);
+        finished = !editor_->viewports().nextState();
+    }
     double t2 = Time::realTime();
     double msec = (t2 - t1) * 1000.;
 
     if (callback_)
     {
-        LOG_DEBUG(<< "Call callback argument finished <" << finished << "> ms <"
-                  << msec << ">.");
-        LOG_TRACE_UPDATE_VIEW(<< "Call callback with argument finished <"
-                              << finished << ">.");
+        LOG_DEBUG_RENDER(<< "Call callback argument finished <" << finished
+                         << "> ms <" << msec << ">.");
         callback_->threadProgress(finished);
     }
 

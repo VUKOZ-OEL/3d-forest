@@ -41,6 +41,8 @@ public:
     QueryWhere();
     ~QueryWhere();
 
+    void clear();
+
     void setDataset(const std::unordered_set<size_t> &list);
     void setDataset(const QueryFilterSet &list);
     const QueryFilterSet &dataset() const { return dataset_; }

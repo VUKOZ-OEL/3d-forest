@@ -55,6 +55,7 @@ protected:
     MainWindow *mainWindow_;
     QTextEdit *textEdit_;
     File file_;
+    size_t threadId_{0};
 };
 
 #endif /* MESSAGE_LOG_WINDOW_HPP */

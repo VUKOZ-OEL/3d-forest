@@ -15,19 +15,19 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-set(SUB_PROJECT_NAME "3DForestDbh")
+set(SUB_PROJECT_NAME "3DForestTreeAttributes")
 
 add_executable(
     ${SUB_PROJECT_NAME}
-    dbh.cpp
-    ../../../plugins/dbh/DbhAction.cpp
-    ../../../plugins/dbh/DbhLeastSquaredRegression.cpp
+    treeattributes.cpp
+    ../../../plugins/treeattributes/TreeAttributesAction.cpp
+    ../../../plugins/treeattributes/TreeAttributesLeastSquaredRegression.cpp
 )
 
 target_include_directories(
     ${SUB_PROJECT_NAME}
     PUBLIC
-    ../../../plugins/dbh
+    ../../../plugins/treeattributes
     ../../../../3rdparty/eigen
 )
 

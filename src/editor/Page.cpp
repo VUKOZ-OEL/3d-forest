@@ -166,8 +166,7 @@ void Page::setState(Page::State state)
 
 bool Page::nextState()
 {
-    LOG_TRACE_UPDATE_VIEW(<< "Compute state <" << Page::stateToString(state_)
-                          << ">.");
+    LOG_DEBUG(<< "Compute state <" << Page::stateToString(state_) << ">.");
 
     if (state_ == Page::STATE_READ)
     {
@@ -843,9 +842,9 @@ void Page::runModifiers()
 void Page::runColorModifier()
 {
     const SettingsView &opt = editor_->settings().view;
-    double r = opt.pointColor()[0];
-    double g = opt.pointColor()[1];
-    double b = opt.pointColor()[2];
+    double r = 1.0; // opt.pointColor()[0];
+    double g = 1.0; // opt.pointColor()[1];
+    double b = 1.0; // opt.pointColor()[2];
 
     size_t n = size();
 
@@ -929,6 +928,12 @@ void Page::runColorModifier()
                 renderColor[i * 3 + 1] *= static_cast<float>(c[1]);
                 renderColor[i * 3 + 2] *= static_cast<float>(c[2]);
             }
+            else
+            {
+                renderColor[i * 3 + 0] = 0.8F;
+                renderColor[i * 3 + 1] = 0.8F;
+                renderColor[i * 3 + 2] = 0.8F;
+            }
         }
     }
 
@@ -942,9 +947,10 @@ void Page::runColorModifier()
             for (size_t i = 0; i < n; i++)
             {
                 const float v = static_cast<float>(1. - (elevation[i] / zlen));
-                renderColor[i * 3 + 0] *= v;
-                renderColor[i * 3 + 1] *= v;
-                renderColor[i * 3 + 2] *= v;
+                setColor(i,
+                         static_cast<size_t>(v * 255.0),
+                         255,
+                         ColorPalette::BlueCyanYellowRed256);
             }
         }
     }
@@ -953,9 +959,10 @@ void Page::runColorModifier()
     {
         for (size_t i = 0; i < n; i++)
         {
-            renderColor[i * 3 + 0] *= static_cast<float>(descriptor[i]);
-            renderColor[i * 3 + 1] *= static_cast<float>(descriptor[i]);
-            renderColor[i * 3 + 2] *= static_cast<float>(descriptor[i]);
+            setColor(i,
+                     static_cast<size_t>(descriptor[i] * 255.0),
+                     255,
+                     ColorPalette::BlueCyanYellowRed256);
         }
     }
 }

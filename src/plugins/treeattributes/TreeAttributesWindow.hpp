@@ -17,43 +17,29 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file DbhPlugin.hpp */
+/** @file TreeAttributesWindow.hpp */
 
-#ifndef DBH_PLUGIN_HPP
-#define DBH_PLUGIN_HPP
+#ifndef TREE_ATTRIBUTES_WINDOW_HPP
+#define TREE_ATTRIBUTES_WINDOW_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
-class DbhWindow;
+class MainWindow;
+class TreeAttributesWidget;
 
-#if defined(_MSC_VER)
-    #if defined(EXPORT_3DForestDbhPlugin)
-        #define EXPORT_DBH_PLUGIN __declspec(dllexport)
-    #else
-        #define EXPORT_DBH_PLUGIN __declspec(dllimport)
-    #endif
-#else
-    #define EXPORT_DBH_PLUGIN
-#endif
+// Include Qt.
+#include <QDialog>
 
-/** DBH (Diameter at Breast Height) Plugin. */
-class EXPORT_DBH_PLUGIN DbhPlugin : public QObject, public PluginInterface
+/** Tree Attributes Window. */
+class TreeAttributesWindow : public QDialog
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
 
 public:
-    DbhPlugin();
-
-    virtual void initialize(MainWindow *mainWindow);
-
-public slots:
-    void slotPlugin();
+    TreeAttributesWindow(MainWindow *mainWindow);
+    ~TreeAttributesWindow();
 
 private:
-    MainWindow *mainWindow_;
-    DbhWindow *pluginWindow_;
+    TreeAttributesWidget *widget_;
 };
 
-#endif /* DBH_PLUGIN_HPP */
+#endif /* TREE_ATTRIBUTES_WINDOW_HPP */

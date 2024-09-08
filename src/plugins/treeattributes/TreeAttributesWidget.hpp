@@ -17,14 +17,14 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file DbhWidget.hpp */
+/** @file TreeAttributesWidget.hpp */
 
-#ifndef DBH_WIDGET_HPP
-#define DBH_WIDGET_HPP
+#ifndef TREE_ATTRIBUTES_WIDGET_HPP
+#define TREE_ATTRIBUTES_WIDGET_HPP
 
 // Include 3D Forest.
-#include <DbhAction.hpp>
-#include <DbhParameters.hpp>
+#include <TreeAttributesAction.hpp>
+#include <TreeAttributesParameters.hpp>
 class MainWindow;
 class DoubleSliderWidget;
 
@@ -32,13 +32,13 @@ class DoubleSliderWidget;
 #include <QWidget>
 class QPushButton;
 
-/** DBH (Diameter at Breast Height) Widget. */
-class DbhWidget : public QWidget
+/** Tree Attributes Widget. */
+class TreeAttributesWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    DbhWidget(MainWindow *mainWindow);
+    TreeAttributesWidget(MainWindow *mainWindow);
 
 protected slots:
     void slotApply();
@@ -49,13 +49,14 @@ protected:
 private:
     MainWindow *mainWindow_;
 
-    DbhParameters parameters_;
-    DbhAction dbh_;
+    TreeAttributesParameters parameters_;
+    TreeAttributesAction treeAttributesAction_;
 
-    DoubleSliderWidget *elevationSlider_;
-    DoubleSliderWidget *elevationToleranceSlider_;
+    DoubleSliderWidget *treePositionHeightRangeSlider_;
+    DoubleSliderWidget *dbhElevationSlider_;
+    DoubleSliderWidget *dbhElevationRangeSlider_;
 
     QPushButton *applyButton_;
 };
 
-#endif /* DBH_WIDGET_HPP */
+#endif /* TREE_ATTRIBUTES_WIDGET_HPP */

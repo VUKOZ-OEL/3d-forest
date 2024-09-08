@@ -98,17 +98,35 @@ void ExplorerClippingWidget::slotUpdate(void *sender,
     if (target.empty() || target.contains(Editor::TYPE_CLIP_FILTER) ||
         target.contains(Editor::TYPE_SETTINGS))
     {
+        LOG_DEBUG_UPDATE(<< "Input clip filter.");
+
         region_ = mainWindow_->editor().clipFilter();
-        LOG_DEBUG(<< "Input region <" << region_ << ">.");
+        LOG_DEBUG(<< "Set region <" << region_ << ">.");
 
         boxWidget_->setRegion(region_);
         cylinderWidget_->setRegion(region_);
     }
 }
 
+void ExplorerClippingWidget::filterChanged()
+{
+    LOG_DEBUG_UPDATE(<< "Output clip filter.");
+
+    Region filter = region_;
+
+    if (!isFilterEnabled())
+    {
+        filter.shape = Region::SHAPE_NONE;
+    }
+
+    mainWindow_->suspendThreads();
+    mainWindow_->editor().setClipFilter(filter);
+    mainWindow_->updateFilter();
+}
+
 void ExplorerClippingWidget::slotRegionChanged(const Region &region)
 {
-    LOG_DEBUG(<< "Output region <" << region << ">.");
+    LOG_DEBUG(<< "Set clip region <" << region << ">.");
 
     if (region.shape == Region::SHAPE_BOX)
     {
@@ -122,22 +140,6 @@ void ExplorerClippingWidget::slotRegionChanged(const Region &region)
     }
 
     filterChanged();
-}
-
-void ExplorerClippingWidget::filterChanged()
-{
-    LOG_DEBUG(<< "Filter changed.");
-
-    Region filter = region_;
-
-    if (!isFilterEnabled())
-    {
-        filter.shape = Region::SHAPE_NONE;
-    }
-
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setClipFilter(filter);
-    mainWindow_->updateFilter();
 }
 
 void ExplorerClippingWidget::setFilterEnabled(bool b)

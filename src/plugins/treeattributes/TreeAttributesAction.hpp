@@ -17,29 +17,29 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file DbhAction.hpp */
+/** @file TreeAttributesAction.hpp */
 
-#ifndef DBH_ACTION_HPP
-#define DBH_ACTION_HPP
+#ifndef TREE_ATTRIBUTES_ACTION_HPP
+#define TREE_ATTRIBUTES_ACTION_HPP
 
 // Include 3D Forest.
-#include <DbhGroup.hpp>
-#include <DbhParameters.hpp>
 #include <Point.hpp>
 #include <Points.hpp>
 #include <ProgressActionInterface.hpp>
 #include <Query.hpp>
+#include <TreeAttributesData.hpp>
+#include <TreeAttributesParameters.hpp>
 class Editor;
 class Segment;
 
-/** DBH (Diameter at Breast Height) Action. */
-class DbhAction : public ProgressActionInterface
+/** Tree Attributes Action. */
+class TreeAttributesAction : public ProgressActionInterface
 {
 public:
-    DbhAction(Editor *editor);
-    virtual ~DbhAction();
+    TreeAttributesAction(Editor *editor);
+    virtual ~TreeAttributesAction();
 
-    void start(const DbhParameters &parameters);
+    void start(const TreeAttributesParameters &parameters);
     virtual void next();
     void clear();
 
@@ -47,16 +47,22 @@ private:
     Editor *editor_;
     Query query_;
 
-    DbhParameters parameters_;
+    TreeAttributesParameters parameters_;
 
-    std::map<size_t, DbhGroup> groups_; // [segmentId:group]
-    size_t currentGroup_;
+    std::map<size_t, size_t> treesMap_; // [tree ID : tree index]
+    std::vector<TreeAttributesData> trees_;
 
-    void stepPointsToGroups();
-    void stepCalculateDbh();
-    void stepUpdateSegments();
+    size_t currentTreeIndex_;
 
-    void dumpGroups();
+    void stepPointsToTrees();
+    void stepCalculateTreeAttributes();
+    void stepUpdateTreeAttributes();
+
+    void calculateDbh(TreeAttributesData &tree);
+    void calculateTreePosition(TreeAttributesData &tree);
+    void calculateTreeHeight(TreeAttributesData &tree);
+
+    size_t getTreeIndex(size_t treeId);
 };
 
-#endif /* DBH_ACTION_HPP */
+#endif /* TREE_ATTRIBUTES_ACTION_HPP */

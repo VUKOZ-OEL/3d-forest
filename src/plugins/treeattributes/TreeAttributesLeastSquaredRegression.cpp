@@ -17,14 +17,14 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file DbhLeastSquaredRegression.cpp */
+/** @file TreeAttributesLeastSquaredRegression.cpp */
 
 // Include 3D Forest.
-#include <DbhLeastSquaredRegression.hpp>
+#include <TreeAttributesLeastSquaredRegression.hpp>
 #include <Util.hpp>
 
 // Include local.
-#define LOG_MODULE_NAME "DbhLeastSquaredRegression"
+#define LOG_MODULE_NAME "TreeAttributesLeastSquaredRegression"
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
@@ -74,13 +74,14 @@
 
     Nikolai Chernov (September 2012)
 */
-void DbhLeastSquaredRegression::taubinFit(FittingCircle &circle,
-                                          const DbhGroup &group,
-                                          const DbhParameters &parameters)
+void TreeAttributesLeastSquaredRegression::taubinFit(
+    FittingCircle &circle,
+    const std::vector<double> &points,
+    const TreeAttributesParameters &parameters)
 {
     circle.result = FittingCircle::RESULT_INVALID;
 
-    size_t n = group.points.size() / 3;
+    size_t n = points.size() / 3;
     if (n < 1)
     {
         LOG_DEBUG(<< "Not enough points.");
@@ -94,9 +95,9 @@ void DbhLeastSquaredRegression::taubinFit(FittingCircle &circle,
 
     for (size_t i = 0; i < n; i++)
     {
-        meanX += group.points[(i * 3) + 0];
-        meanY += group.points[(i * 3) + 1];
-        meanZ += group.points[(i * 3) + 2];
+        meanX += points[(i * 3) + 0];
+        meanY += points[(i * 3) + 1];
+        meanZ += points[(i * 3) + 2];
     }
 
     meanX /= static_cast<double>(n);
@@ -113,10 +114,8 @@ void DbhLeastSquaredRegression::taubinFit(FittingCircle &circle,
 
     for (size_t i = 0; i < n; i++)
     {
-        double Xi =
-            group.points[(i * 3) + 0] - meanX; // Centered x-coordinates.
-        double Yi =
-            group.points[(i * 3) + 1] - meanY; // Centered y-coordinates.
+        double Xi = points[(i * 3) + 0] - meanX; // Centered x-coordinates.
+        double Yi = points[(i * 3) + 1] - meanY; // Centered y-coordinates.
         double Zi = (Xi * Xi) + (Yi * Yi);
 
         Mxy += Xi * Yi;
@@ -185,13 +184,14 @@ void DbhLeastSquaredRegression::taubinFit(FittingCircle &circle,
     circle.result = FittingCircle::RESULT_OK;
 }
 
-void DbhLeastSquaredRegression::geometricCircle(FittingCircle &circle,
-                                                const DbhGroup &group,
-                                                const DbhParameters &parameters)
+void TreeAttributesLeastSquaredRegression::geometricCircle(
+    FittingCircle &circle,
+    const std::vector<double> &points,
+    const TreeAttributesParameters &parameters)
 {
     circle.result = FittingCircle::RESULT_INVALID;
 
-    size_t n = group.points.size() / 3;
+    size_t n = points.size() / 3;
     if (n < 1)
     {
         LOG_DEBUG(<< "Not enough points.");
@@ -205,9 +205,9 @@ void DbhLeastSquaredRegression::geometricCircle(FittingCircle &circle,
 
     for (size_t i = 0; i < n; i++)
     {
-        meanX += group.points[(i * 3) + 0];
-        meanY += group.points[(i * 3) + 1];
-        meanZ += group.points[(i * 3) + 2];
+        meanX += points[(i * 3) + 0];
+        meanY += points[(i * 3) + 1];
+        meanZ += points[(i * 3) + 2];
     }
 
     if (isZero(meanX))
@@ -248,7 +248,7 @@ void DbhLeastSquaredRegression::geometricCircle(FittingCircle &circle,
     New.a = circle.a;
     New.b = circle.b;
     New.r = circle.r;
-    New.s = sigma(New, group);
+    New.s = sigma(New, points);
 
 nextIteration:
 
@@ -271,13 +271,13 @@ nextIteration:
 
     for (size_t i = 0; i < n; i++)
     {
-        double dx = group.points[(i * 3) + 0] - Old.a;
+        double dx = points[(i * 3) + 0] - Old.a;
         if (isZero(dx))
         {
             dx = 1e-10;
         }
 
-        double dy = group.points[(i * 3) + 1] - Old.b;
+        double dy = points[(i * 3) + 1] - Old.b;
         if (isZero(dy))
         {
             dy = 1e-10;
@@ -364,7 +364,7 @@ tryAgain:
     }
 
     // Calculate the root-mean-square error.
-    New.s = sigma(New, group);
+    New.s = sigma(New, points);
 
     // Check if improvement is gained.
     if (New.s < Old.s)
@@ -397,16 +397,17 @@ enough:
     circle.j = nInnerIterations;
 }
 
-double DbhLeastSquaredRegression::sigma(FittingCircle &circle,
-                                        const DbhGroup &group)
+double TreeAttributesLeastSquaredRegression::sigma(
+    FittingCircle &circle,
+    const std::vector<double> &points)
 {
     double sum{0.0};
 
-    size_t n = group.points.size() / 3;
+    size_t n = points.size() / 3;
     for (size_t i = 0; i < n; i++)
     {
-        double dx = group.points[(i * 3) + 0] - circle.a;
-        double dy = group.points[(i * 3) + 1] - circle.b;
+        double dx = points[(i * 3) + 0] - circle.a;
+        double dy = points[(i * 3) + 1] - circle.b;
 
         sum += ((std::sqrt(dx * dx + dy * dy) - circle.r) *
                 (std::sqrt(dx * dx + dy * dy) - circle.r));

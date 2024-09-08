@@ -43,18 +43,134 @@ ViewerOpenGLViewport::ViewerOpenGLViewport(QWidget *parent)
       editor_(nullptr)
 
 {
-    resetCamera();
+    setViewDefault();
 }
 
 ViewerOpenGLViewport::~ViewerOpenGLViewport()
 {
 }
 
-void ViewerOpenGLViewport::setWindowViewports(ViewerViewports *viewer,
-                                              size_t viewportId)
+void ViewerOpenGLViewport::paintEvent(QPaintEvent *event)
+{
+    LOG_DEBUG_QT_EVENT(<< "Paint event.");
+    QOpenGLWidget::paintEvent(event);
+}
+
+void ViewerOpenGLViewport::resizeEvent(QResizeEvent *event)
+{
+    LOG_DEBUG_QT_EVENT(<< "Resize event.");
+    QOpenGLWidget::resizeEvent(event);
+}
+
+void ViewerOpenGLViewport::showEvent(QShowEvent *event)
+{
+    LOG_DEBUG_QT_EVENT(<< "Show event.");
+    QOpenGLWidget::showEvent(event);
+}
+
+void ViewerOpenGLViewport::hideEvent(QHideEvent *event)
+{
+    LOG_DEBUG_QT_EVENT(<< "Hide.");
+    QOpenGLWidget::hideEvent(event);
+}
+
+void ViewerOpenGLViewport::initializeGL()
+{
+    LOG_DEBUG_RENDER(<< "Initialize OpenGL.");
+
+    initializeOpenGLFunctions();
+
+    setUpdateBehavior(QOpenGLWidget::PartialUpdate);
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+    glClearDepth(1.0F);
+}
+
+void ViewerOpenGLViewport::resizeGL(int w, int h)
+{
+    LOG_DEBUG_RENDER(<< "Resize w <" << w << "> h <" << h << ">.");
+
+    w = static_cast<int>(parentWidget()->devicePixelRatio() * w);
+    h = static_cast<int>(parentWidget()->devicePixelRatio() * h);
+    camera_.setViewport(0, 0, w, h);
+    camera_.updateProjection();
+    // cameraChanged();
+}
+
+void ViewerOpenGLViewport::paintGL()
+{
+    LOG_DEBUG_RENDER(<< "Paint width <" << camera_.width() << "> height <"
+                     << camera_.height() << ">.");
+
+    // Setup camera.
+    glViewport(0, 0, camera_.width(), camera_.height());
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixf(camera_.getProjection().data());
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixf(camera_.getModelView().data());
+
+    // Render.
+    bool firstFrame = renderScene();
+
+    if (firstFrame)
+    {
+        renderGuides();
+    }
+}
+
+void ViewerOpenGLViewport::mouseReleaseEvent(QMouseEvent *event)
+{
+    (void)event;
+}
+
+void ViewerOpenGLViewport::mousePressEvent(QMouseEvent *event)
+{
+    camera_.mousePressEvent(event);
+    setFocus();
+}
+
+void ViewerOpenGLViewport::mouseMoveEvent(QMouseEvent *event)
+{
+    camera_.mouseMoveEvent(event);
+    cameraChanged();
+}
+
+void ViewerOpenGLViewport::wheelEvent(QWheelEvent *event)
+{
+    camera_.wheelEvent(event);
+    setFocus();
+    cameraChanged();
+}
+
+void ViewerOpenGLViewport::setFocus()
+{
+    if (!isSelected())
+    {
+        if (windowViewports_)
+        {
+            windowViewports_->selectViewport(this);
+        }
+    }
+}
+
+void ViewerOpenGLViewport::cameraChanged()
+{
+    if (windowViewports_)
+    {
+        LOG_DEBUG_RENDER(<< "Emit camera changed.");
+        emit windowViewports_->cameraChanged(viewportId_);
+    }
+}
+
+void ViewerOpenGLViewport::setViewports(ViewerViewports *viewer,
+                                        size_t viewportId)
 {
     windowViewports_ = viewer;
     viewportId_ = viewportId;
+    camera_.setViewportId(viewportId_);
 }
 
 size_t ViewerOpenGLViewport::viewportId() const
@@ -74,17 +190,24 @@ bool ViewerOpenGLViewport::isSelected() const
 
 void ViewerOpenGLViewport::updateScene(Editor *editor)
 {
-    LOG_TRACE_UPDATE_VIEW(<< "Update viewport <" << viewportId_ << ">.");
+    LOG_DEBUG_RENDER(<< "Update viewport <" << viewportId_ << ">.");
+
     editor_ = editor;
 }
 
 void ViewerOpenGLViewport::resetScene(Editor *editor, bool resetView)
 {
-    LOG_TRACE_UPDATE_VIEW(<< "Reset viewport <" << viewportId_ << ">.");
+    LOG_DEBUG_RENDER(<< "Reset viewport <" << viewportId_ << "> reset view <"
+                     << static_cast<int>(resetView) << ">.");
+
+    editor_ = editor;
+
     aabb_.set(editor->datasets().boundary());
+
     if (resetView)
     {
-        resetCamera();
+        setViewResetCenter();
+        setViewResetDistance();
     }
 }
 
@@ -115,6 +238,8 @@ void ViewerOpenGLViewport::setViewDirection(const QVector3D &dir,
 
 void ViewerOpenGLViewport::setViewTop()
 {
+    LOG_DEBUG(<< "Set top view in viewport <" << viewportId_ << ">.");
+
     QVector3D dir(0.0F, 0.0F, 1.0F);
     QVector3D up(0.0F, 1.0F, 0.0F);
     setViewDirection(dir, up);
@@ -122,6 +247,8 @@ void ViewerOpenGLViewport::setViewTop()
 
 void ViewerOpenGLViewport::setViewFront()
 {
+    LOG_DEBUG(<< "Set front view in viewport <" << viewportId_ << ">.");
+
     QVector3D dir(0.0F, -1.0F, 0.0F);
     QVector3D up(0.0F, 0.0F, 1.0F);
     setViewDirection(dir, up);
@@ -129,6 +256,8 @@ void ViewerOpenGLViewport::setViewFront()
 
 void ViewerOpenGLViewport::setViewRight()
 {
+    LOG_DEBUG(<< "Set right view in viewport <" << viewportId_ << ">.");
+
     QVector3D dir(1.0F, 0.0F, 0.0F);
     QVector3D up(0.0F, 0.0F, 1.0F);
     setViewDirection(dir, up);
@@ -136,6 +265,7 @@ void ViewerOpenGLViewport::setViewRight()
 
 void ViewerOpenGLViewport::setView3d()
 {
+    LOG_DEBUG(<< "Set 3D view in viewport <" << viewportId_ << ">.");
     QVector3D dir(1.0F, -1.0F, 1.0F);
     QVector3D up(-1.065F, 1.0F, 1.0F);
     dir.normalize();
@@ -143,8 +273,10 @@ void ViewerOpenGLViewport::setView3d()
     setViewDirection(dir, up);
 }
 
-void ViewerOpenGLViewport::resetCamera()
+void ViewerOpenGLViewport::setViewDefault()
 {
+    LOG_DEBUG(<< "Set default view in viewport <" << viewportId_ << ">.");
+
     QVector3D center(0.0F, 0.0F, 0.0F);
     float distance = 1.0F;
 
@@ -166,6 +298,9 @@ void ViewerOpenGLViewport::resetCamera()
 
 void ViewerOpenGLViewport::setViewResetDistance()
 {
+    LOG_DEBUG(<< "Reset distance in viewport <" << viewportId_ << "> camera <"
+              << camera() << ">.");
+
     QVector3D center = camera_.getCenter();
     QVector3D up = camera_.getUp();
     QVector3D dir = camera_.getDirection();
@@ -175,6 +310,10 @@ void ViewerOpenGLViewport::setViewResetDistance()
     {
         distance = aabb_.getRadius() * 2.0F;
     }
+    if (distance < 1e-6)
+    {
+        distance = 1.0F;
+    }
 
     QVector3D eye = (dir * distance) + center;
     camera_.setLookAt(eye, center, up);
@@ -182,6 +321,9 @@ void ViewerOpenGLViewport::setViewResetDistance()
 
 void ViewerOpenGLViewport::setViewResetCenter()
 {
+    LOG_DEBUG(<< "Reset center in viewport <" << viewportId_ << "> camera <"
+              << camera() << ">.");
+
     QVector3D dir = camera_.getDirection();
     QVector3D up = camera_.getUp();
     float distance = camera_.getDistance();
@@ -197,72 +339,6 @@ void ViewerOpenGLViewport::setViewResetCenter()
     camera_.setLookAt(eye, center, up);
 }
 
-void ViewerOpenGLViewport::initializeGL()
-{
-    initializeOpenGLFunctions();
-
-    setUpdateBehavior(QOpenGLWidget::PartialUpdate);
-
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
-    glClearDepth(1.0F);
-}
-
-void ViewerOpenGLViewport::paintGL()
-{
-    LOG_TRACE_RENDER(<< "Paint width <" << camera_.width() << "> height <"
-                     << camera_.height() << ">.");
-
-    // Setup camera.
-    glViewport(0, 0, camera_.width(), camera_.height());
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadMatrixf(camera_.getProjection().data());
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixf(camera_.getModelView().data());
-
-    // Render.
-    bool firstFrame = renderScene();
-
-    if (firstFrame)
-    {
-        renderGuides();
-    }
-}
-
-void ViewerOpenGLViewport::renderGuides()
-{
-    // Bounding box.
-    glColor3f(0.25F, 0.25F, 0.25F);
-    ViewerOpenGL::renderAabb(aabb_);
-
-    // Overlay.
-    QMatrix4x4 m;
-    float w = static_cast<float>(camera_.width());
-    float h = static_cast<float>(camera_.height());
-
-    m.ortho(-w * 0.5F, w * 0.5F, -h * 0.5F, h * 0.5F, -50.0F, 50.0F);
-    glMatrixMode(GL_PROJECTION);
-    glLoadMatrixf(m.data());
-
-    // Overlay: rotated.
-    float axesSize = 30.0F;
-    m.setToIdentity();
-    m.translate(-w * 0.5F + axesSize + 2.0F, -h * 0.5F + axesSize + 2.0F);
-    m.scale(axesSize);
-    m = m * camera_.rotation();
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixf(m.data());
-
-    glDisable(GL_DEPTH_TEST);
-    glLineWidth(2.0F);
-    ViewerOpenGL::renderAxis();
-    glLineWidth(1.0F);
-    glEnable(GL_DEPTH_TEST);
-}
-
 void ViewerOpenGLViewport::clearScreen()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -270,6 +346,8 @@ void ViewerOpenGLViewport::clearScreen()
 
 bool ViewerOpenGLViewport::renderScene()
 {
+    LOG_DEBUG_RENDER(<< "Start rendering viewport <" << viewportId_ << ">.");
+
     if (!editor_)
     {
         return true;
@@ -277,7 +355,7 @@ bool ViewerOpenGLViewport::renderScene()
 
     bool firstFrame = false;
 
-    editor_->lock("ViewerOpenGLViewport renderScene");
+    std::unique_lock<std::mutex> mutexlock(editor_->mutex_);
 
     renderSceneSettingsEnable();
 
@@ -285,22 +363,22 @@ bool ViewerOpenGLViewport::renderScene()
 
     size_t pageSize = editor_->viewports().pageSize(viewportId_);
 
+    LOG_DEBUG_RENDER(<< "Render pages n <" << pageSize << ">.");
+
     if (pageSize == 0)
     {
         clearScreen();
         firstFrame = true;
     }
 
-    LOG_TRACE_RENDER(<< "Render viewport <" << viewportId_ << "> pageSize <"
-                     << pageSize << ">.");
-
     for (size_t pageIndex = 0; pageIndex < pageSize; pageIndex++)
     {
         Page &page = editor_->viewports().page(viewportId_, pageIndex);
 
-        if (page.state() == Page::STATE_RENDER)
+        if (page.state() == Page::STATE_RENDER ||
+            page.state() == Page::STATE_RENDERED)
         {
-            LOG_TRACE_RENDER(<< "Render pageId <" << page.pageId() << ">.");
+            // LOG_DEBUG_RENDER(<< "Render pageId <" << page.pageId() << ">.");
 
             if (pageIndex == 0)
             {
@@ -335,15 +413,15 @@ bool ViewerOpenGLViewport::renderScene()
         renderFirstFrame();
     }
 
-    editor_->unlock("ViewerOpenGLViewport renderScene");
+    LOG_DEBUG_RENDER(<< "Finished rendering viewport <" << viewportId_ << ">.");
 
     return firstFrame;
 }
 
 void ViewerOpenGLViewport::renderFirstFrame()
 {
-    LOG_TRACE_UPDATE_VIEW(<< "Rendered first frame in viewport <" << viewportId_
-                          << ">.");
+    LOG_DEBUG_RENDER(<< "Rendered first frame in viewport <" << viewportId_
+                     << ">.");
 
     ViewerOpenGL::renderClipFilter(editor_->clipFilter());
     renderSegments();
@@ -365,11 +443,31 @@ void ViewerOpenGLViewport::renderSegments()
             ViewerAabb boundary;
             boundary.set(segment.boundary);
             ViewerOpenGL::renderAabb(boundary);
+        }
 
-            Vector3<float> p(segment.position);
-            float radius = static_cast<float>(segment.dbh) * 0.5F;
+        if (segment.id == 0)
+        {
+            continue;
+        }
+
+        {
             glColor3f(1.0F, 1.0F, 0.0F);
-            ViewerOpenGL::renderCircle(p, radius * 1.0F);
+
+            Vector3<float> treeDbhPosition(segment.dbhPosition);
+            float treeDbhRadius = static_cast<float>(segment.dbh) * 0.5F;
+            ViewerOpenGL::renderCircle(treeDbhPosition, treeDbhRadius * 1.0F);
+
+            Vector3<float> treePosition(segment.position);
+            ViewerOpenGL::renderCross(
+                treePosition,
+                static_cast<float>(segment.boundary.length(0)),
+                static_cast<float>(segment.boundary.length(1)));
+
+            Vector3<float> treeTip(treePosition[0],
+                                   treePosition[1],
+                                   treePosition[2] +
+                                       static_cast<float>(segment.height));
+            ViewerOpenGL::renderLine(treePosition, treeTip);
         }
 
         // Render segment meshes.
@@ -397,6 +495,38 @@ void ViewerOpenGLViewport::renderSegments()
             glPointSize(1.0F);
         }
     }
+}
+
+void ViewerOpenGLViewport::renderGuides()
+{
+    // Bounding box.
+    glColor3f(0.25F, 0.25F, 0.25F);
+    ViewerOpenGL::renderAabb(aabb_);
+
+    // Overlay.
+    QMatrix4x4 m;
+    float w = static_cast<float>(camera_.width());
+    float h = static_cast<float>(camera_.height());
+
+    m.ortho(-w * 0.5F, w * 0.5F, -h * 0.5F, h * 0.5F, -50.0F, 50.0F);
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixf(m.data());
+
+    // Overlay: rotated.
+    float axesSize = 30.0F;
+    m.setToIdentity();
+    m.translate(-w * 0.5F + axesSize + 2.0F, -h * 0.5F + axesSize + 2.0F);
+    m.scale(axesSize);
+    m = m * camera_.rotation();
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixf(m.data());
+
+    glDisable(GL_DEPTH_TEST);
+    glLineWidth(2.0F);
+    ViewerOpenGL::renderAxis();
+    glLineWidth(1.0F);
+    glEnable(GL_DEPTH_TEST);
 }
 
 void ViewerOpenGLViewport::renderSceneSettingsEnable()
@@ -444,57 +574,5 @@ void ViewerOpenGLViewport::renderSceneSettingsDisable()
     if (settings.view.isFogEnabled())
     {
         glDisable(GL_FOG);
-    }
-}
-
-void ViewerOpenGLViewport::resizeGL(int w, int h)
-{
-    w = static_cast<int>(parentWidget()->devicePixelRatio() * w);
-    h = static_cast<int>(parentWidget()->devicePixelRatio() * h);
-    camera_.setViewport(0, 0, w, h);
-    camera_.updateProjection();
-    cameraChanged();
-}
-
-void ViewerOpenGLViewport::mouseReleaseEvent(QMouseEvent *event)
-{
-    (void)event;
-}
-
-void ViewerOpenGLViewport::mousePressEvent(QMouseEvent *event)
-{
-    camera_.mousePressEvent(event);
-    setFocus();
-}
-
-void ViewerOpenGLViewport::mouseMoveEvent(QMouseEvent *event)
-{
-    camera_.mouseMoveEvent(event);
-    cameraChanged();
-}
-
-void ViewerOpenGLViewport::wheelEvent(QWheelEvent *event)
-{
-    camera_.wheelEvent(event);
-    setFocus();
-    cameraChanged();
-}
-
-void ViewerOpenGLViewport::setFocus()
-{
-    if (!isSelected())
-    {
-        if (windowViewports_)
-        {
-            windowViewports_->selectViewport(this);
-        }
-    }
-}
-
-void ViewerOpenGLViewport::cameraChanged()
-{
-    if (windowViewports_)
-    {
-        emit windowViewports_->cameraChanged(viewportId_);
     }
 }

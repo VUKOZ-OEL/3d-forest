@@ -25,6 +25,7 @@
 // Include std.
 #include <condition_variable>
 #include <mutex>
+#include <sstream>
 #include <thread>
 
 // Include 3D Forest.
@@ -79,7 +80,31 @@ protected:
 
     void setState(State state);
     void runLoop();
+
+    friend std::ostream &operator<<(std::ostream &out,
+                                    const ThreadLoop::State &in);
 };
+
+inline std::ostream &operator<<(std::ostream &out, const ThreadLoop::State &in)
+{
+    switch (in)
+    {
+        case ThreadLoop::STATE_RUN:
+            out << "RUN";
+            break;
+        case ThreadLoop::STATE_CANCEL:
+            out << "CANCEL";
+            break;
+        case ThreadLoop::STATE_EXIT:
+            out << "EXIT";
+            break;
+        default:
+            out << "UNKNOWN";
+            break;
+    }
+
+    return out;
+}
 
 #include <WarningsEnable.hpp>
 

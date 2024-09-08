@@ -46,6 +46,7 @@ public:
     ~ViewerCamera();
 
     // Viewport.
+    void setViewportId(size_t id);
     void setViewport(int x, int y, int width, int height);
     int width() const { return viewport_.width(); }
     int height() const { return viewport_.height(); }
@@ -120,6 +121,7 @@ protected:
     bool perspective_;
 
     // Viewport.
+    size_t viewportId_;
     QRect viewport_;
 
     // Matrix.

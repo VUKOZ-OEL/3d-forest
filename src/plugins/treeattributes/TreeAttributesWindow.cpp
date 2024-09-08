@@ -17,32 +17,32 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file DbhWindow.cpp */
+/** @file TreeAttributesWindow.cpp */
 
 // Include 3D Forest.
-#include <DbhWidget.hpp>
-#include <DbhWindow.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
+#include <TreeAttributesWidget.hpp>
+#include <TreeAttributesWindow.hpp>
 
 // Include Qt.
 #include <QVBoxLayout>
 
 // Include local.
-#define LOG_MODULE_NAME "DbhWindow"
+#define LOG_MODULE_NAME "TreeAttributesWindow"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/dbh/", name))
+#define ICON(name) (ThemeIcon(":/tree_attributes/", name))
 
-DbhWindow::DbhWindow(MainWindow *mainWindow)
+TreeAttributesWindow::TreeAttributesWindow(MainWindow *mainWindow)
     : QDialog(mainWindow),
       widget_(nullptr)
 {
     LOG_DEBUG(<< "Create.");
 
     // Widget.
-    widget_ = new DbhWidget(mainWindow);
+    widget_ = new TreeAttributesWidget(mainWindow);
 
     // Main layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -51,13 +51,13 @@ DbhWindow::DbhWindow(MainWindow *mainWindow)
 
     // Dialog.
     setLayout(mainLayout);
-    setWindowTitle(tr("Dbh"));
-    setWindowIcon(ICON("dbh"));
+    setWindowTitle(tr("Tree Attributes"));
+    setWindowIcon(ICON("tree_attributes"));
     setMaximumHeight(height());
     setModal(false);
 }
 
-DbhWindow::~DbhWindow()
+TreeAttributesWindow::~TreeAttributesWindow()
 {
     LOG_DEBUG(<< "Destroy.");
 }

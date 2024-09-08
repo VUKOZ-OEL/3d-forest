@@ -24,7 +24,7 @@
 
 // Include 3D Forest.
 class MainWindow;
-class SettingsColorWidget;
+class SettingsViewWidget;
 class SettingsUnitsWidget;
 class ToolTabWidget;
 
@@ -42,7 +42,7 @@ public:
 protected:
     MainWindow *mainWindow_;
     ToolTabWidget *tabWidget_;
-    SettingsColorWidget *settingsColorWidget_;
+    SettingsViewWidget *settingsViewWidget_;
     SettingsUnitsWidget *settingsUnitsWidget_;
 };
 

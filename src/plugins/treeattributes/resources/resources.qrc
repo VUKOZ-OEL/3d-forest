@@ -18,11 +18,12 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 -->
 <RCC version="1.0">
-<qresource prefix="/dbh">
+<qresource prefix="/tree_attributes">
 
 <!-- Tool bar -->
 <file>dbh_20px.png</file>
 <file>dbh_24px.png</file>
+<file>tree_attributes_24px_color.png</file>
 
 <!-- Images -->
 

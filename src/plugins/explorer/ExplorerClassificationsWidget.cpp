@@ -128,16 +128,37 @@ void ExplorerClassificationsWidget::slotUpdate(void *sender,
 
     if (target.empty() || target.contains(Editor::TYPE_CLASSIFICATION))
     {
+        LOG_DEBUG_UPDATE(<< "Input classifications.");
+
         setClassifications(mainWindow_->editor().classifications(),
                            mainWindow_->editor().classificationsFilter());
     }
+}
+
+void ExplorerClassificationsWidget::dataChanged()
+{
+    LOG_DEBUG_UPDATE(<< "Output classifications.");
+
+    mainWindow_->suspendThreads();
+    mainWindow_->editor().setClassifications(classifications_);
+    mainWindow_->editor().setClassificationsFilter(filter_);
+    mainWindow_->updateData();
+}
+
+void ExplorerClassificationsWidget::filterChanged()
+{
+    LOG_DEBUG_UPDATE(<< "Output classifications filter.");
+
+    mainWindow_->suspendThreads();
+    mainWindow_->editor().setClassificationsFilter(filter_);
+    mainWindow_->updateFilter();
 }
 
 void ExplorerClassificationsWidget::setClassifications(
     const Classifications &classifications,
     const QueryFilterSet &filter)
 {
-    LOG_DEBUG(<< "Input classifications <" << classifications.size() << ">.");
+    LOG_DEBUG(<< "Set classifications n <" << classifications.size() << ">.");
 
     block();
 
@@ -165,28 +186,6 @@ void ExplorerClassificationsWidget::setClassifications(
     }
 
     unblock();
-}
-
-void ExplorerClassificationsWidget::dataChanged()
-{
-    LOG_DEBUG(<< "Output classifications <" << classifications_.size() << ">.");
-    LOG_DEBUG(<< "Output classifications filter <" << filter_.isFilterEnabled()
-              << ">.");
-
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setClassifications(classifications_);
-    mainWindow_->editor().setClassificationsFilter(filter_);
-    mainWindow_->updateData();
-}
-
-void ExplorerClassificationsWidget::filterChanged()
-{
-    LOG_DEBUG(<< "Output classifications filter <" << filter_.isFilterEnabled()
-              << ">.");
-
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setClassificationsFilter(filter_);
-    mainWindow_->updateFilter();
 }
 
 bool ExplorerClassificationsWidget::isFilterEnabled() const

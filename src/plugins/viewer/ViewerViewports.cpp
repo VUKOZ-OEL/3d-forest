@@ -50,6 +50,30 @@ ViewerViewports::~ViewerViewports()
 {
 }
 
+void ViewerViewports::paintEvent(QPaintEvent *event)
+{
+    LOG_DEBUG_QT_EVENT(<< "Paint event.");
+    QWidget::paintEvent(event);
+}
+
+void ViewerViewports::resizeEvent(QResizeEvent *event)
+{
+    LOG_DEBUG_QT_EVENT(<< "Resize event.");
+    QWidget::resizeEvent(event);
+}
+
+void ViewerViewports::showEvent(QShowEvent *event)
+{
+    LOG_DEBUG_QT_EVENT(<< "Show event.");
+    QWidget::showEvent(event);
+}
+
+void ViewerViewports::hideEvent(QHideEvent *event)
+{
+    LOG_DEBUG_QT_EVENT(<< "Hide.");
+    QWidget::hideEvent(event);
+}
+
 void ViewerViewports::initializeViewer()
 {
     setLayout(ViewLayout::VIEW_LAYOUT_SINGLE);
@@ -58,7 +82,7 @@ void ViewerViewports::initializeViewer()
 ViewerOpenGLViewport *ViewerViewports::createViewport(size_t viewportId)
 {
     ViewerOpenGLViewport *viewport = new ViewerOpenGLViewport(this);
-    viewport->setWindowViewports(this, viewportId);
+    viewport->setViewports(this, viewportId);
     viewport->setSelected(false);
 
     return viewport;
@@ -160,7 +184,7 @@ size_t ViewerViewports::selectedViewportId() const
 
 void ViewerViewports::updateScene(Editor *editor)
 {
-    LOG_TRACE_UPDATE_VIEW(<< "Update all viewports.");
+    LOG_DEBUG_RENDER(<< "Update all viewports.");
     for (size_t i = 0; i < viewports_.size(); i++)
     {
         viewports_[i]->updateScene(editor);
@@ -170,7 +194,9 @@ void ViewerViewports::updateScene(Editor *editor)
 
 void ViewerViewports::resetScene(Editor *editor, bool resetView)
 {
-    LOG_TRACE_UPDATE_VIEW(<< "Reset all viewports <" << resetView << ">.");
+    LOG_DEBUG_RENDER(<< "Reset all viewports, reset view <"
+                     << static_cast<int>(resetView) << ">.");
+
     for (size_t i = 0; i < viewports_.size(); i++)
     {
         viewports_[i]->resetScene(editor, resetView);
@@ -181,7 +207,16 @@ void ViewerViewports::resetScene(Editor *editor,
                                  size_t viewportId,
                                  bool resetView)
 {
-    if (viewportId == VIEWER_VIEWPORTS_TOP)
+    LOG_DEBUG_RENDER(<< "Setup viewport <" << viewportId << "> reset view <"
+                     << static_cast<int>(resetView) << ">.");
+
+    if (viewportId == VIEWER_VIEWPORTS_3D)
+    {
+        viewports_[VIEWER_VIEWPORTS_3D]->resetScene(editor, resetView);
+        viewports_[VIEWER_VIEWPORTS_3D]->setViewOrthographic();
+        viewports_[VIEWER_VIEWPORTS_3D]->setView3d();
+    }
+    else if (viewportId == VIEWER_VIEWPORTS_TOP)
     {
         viewports_[VIEWER_VIEWPORTS_TOP]->resetScene(editor, resetView);
         viewports_[VIEWER_VIEWPORTS_TOP]->setViewOrthographic();
@@ -201,41 +236,88 @@ void ViewerViewports::resetScene(Editor *editor,
     }
 }
 
-Camera ViewerViewports::camera(size_t viewportId) const
+std::vector<Camera> ViewerViewports::camera(size_t viewportId) const
 {
+    std::vector<Camera> cameraList;
+
     for (size_t i = 0; i < viewports_.size(); i++)
     {
         if (viewports_[i]->viewportId() == viewportId)
         {
-            return viewports_[i]->camera();
+            Camera c = viewports_[i]->camera();
+            LOG_DEBUG_RENDER(<< "Append camera <" << c << "> by viewportId <"
+                             << viewportId << "> from viewport index <" << i
+                             << ">.");
+            cameraList.push_back(std::move(c));
+            break;
         }
     }
 
-    return Camera();
+    if (cameraList.empty())
+    {
+        Camera c;
+        LOG_DEBUG_RENDER(<< "Append default camera <" << c
+                         << "> by viewportId <" << viewportId << ">.");
+        cameraList.push_back(std::move(c));
+    }
+
+    return cameraList;
+}
+
+std::vector<Camera> ViewerViewports::camera() const
+{
+    std::vector<Camera> cameraList;
+
+    for (size_t i = 0; i < viewports_.size(); i++)
+    {
+        Camera c = viewports_[i]->camera();
+        LOG_DEBUG_RENDER(<< "Append camera <" << c << "> from viewport index <"
+                         << i << ">.");
+        cameraList.push_back(std::move(c));
+    }
+
+    if (cameraList.empty())
+    {
+        Camera c;
+        LOG_DEBUG_RENDER(<< "Append default camera <" << c << ">.");
+        cameraList.push_back(std::move(c));
+    }
+
+    return cameraList;
 }
 
 void ViewerViewports::setLayout(ViewLayout viewLayout)
 {
+    LOG_DEBUG_RENDER(<< "Start setting layout <" << viewLayout << ">.");
+
     // Remove the current layout.
     QLayout *oldLayout = layout();
     if (oldLayout)
     {
+        LOG_DEBUG_RENDER(<< "Remove old layout.");
+
         Q_ASSERT(oldLayout->count() == 1);
         QLayoutItem *item = oldLayout->itemAt(0);
         ViewerOpenGLViewport *viewport =
             dynamic_cast<ViewerOpenGLViewport *>(item->widget());
+
         if (viewport)
         {
+            LOG_DEBUG_RENDER(<< "Remove widget from old layout.");
             oldLayout->removeWidget(viewport);
         }
         else
         {
             QSplitter *splitter = dynamic_cast<QSplitter *>(item->widget());
+
             if (splitter)
             {
+                LOG_DEBUG_RENDER(<< "Remove n viewports from old layout.");
+
                 // Delete extra viewports.
                 for (size_t i = 1; i < viewports_.size(); i++)
                 {
+                    LOG_DEBUG_RENDER(<< "Remove viewport <" << i << ">.");
                     viewports_[i]->hide();
                     viewports_[i]->deleteLater();
                 }
@@ -257,6 +339,7 @@ void ViewerViewports::setLayout(ViewLayout viewLayout)
     // Create the first viewport.
     if (viewports_.size() == 0)
     {
+        LOG_DEBUG_RENDER(<< "Create the first viewport.");
         viewports_.resize(1);
         viewports_[0] = createViewport(VIEWER_VIEWPORTS_3D);
         viewports_[0]->setSelected(true);
@@ -351,4 +434,6 @@ void ViewerViewports::setLayout(ViewLayout viewLayout)
 
     // Set new layout.
     QWidget::setLayout(newLayout);
+
+    LOG_DEBUG_RENDER(<< "Finished setting layout.");
 }

@@ -112,15 +112,50 @@ void Query::reset()
     pageIndex_ = 0;
     pagePointIndex_ = 0;
     pagePointIndexMax_ = 0;
+
+    position_ = nullptr;
+    intensity_ = nullptr;
+    returnNumber_ = nullptr;
+    numberOfReturns_ = nullptr;
+    classification_ = nullptr;
+    userData_ = nullptr;
+    gpsTime_ = nullptr;
+    color_ = nullptr;
+
+    segment_ = nullptr;
+    elevation_ = nullptr;
+    descriptor_ = nullptr;
+    voxel_ = nullptr;
+
+    selection_ = nullptr;
 }
 
 void Query::clear()
 {
+    where_.clear();
+    maximumResults_ = 0;
+    nResults_ = 0;
+
+    gridCell_.clear();
+    gridCellBase_.clear();
+    gridBoundary_.clear();
+    gridXSize_ = 0;
+    gridYSize_ = 0;
+    gridIndex_ = 0;
+    grid_.clear();
+
+    voxelRegion_.clear();
+    voxelSize_.clear();
+    voxelTotalCount_ = 0;
+    voxelStack_.clear();
+    voxelBox_.clear();
+    voxelIndex_.clear();
+    voxelVisitedCount_ = 0;
+
     cache_.clear();
     lru_.clear();
 
     page_.reset();
-
     selectedPages_.clear();
 
     reset();

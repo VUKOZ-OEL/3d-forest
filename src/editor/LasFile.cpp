@@ -35,6 +35,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "LasFile"
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define LAS_FILE_SIGNATURE_0 0x4C

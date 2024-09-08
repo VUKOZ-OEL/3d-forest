@@ -25,7 +25,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "SettingsUnits"
-// #define LOG_MODULE_DEBUG_ENABLED 1
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 SettingsUnits::SettingsUnits()

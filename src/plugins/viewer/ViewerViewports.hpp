@@ -66,7 +66,8 @@ public:
 
     void selectViewport(ViewerOpenGLViewport *viewport);
     size_t selectedViewportId() const;
-    Camera camera(size_t viewportId) const;
+    std::vector<Camera> camera(size_t viewportId) const;
+    std::vector<Camera> camera() const;
 
     void updateScene(Editor *editor);
     void resetScene(Editor *editor, bool resetView);
@@ -76,6 +77,11 @@ signals:
     void cameraChanged(size_t viewportId);
 
 protected:
+    void paintEvent(QPaintEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
+    void showEvent(QShowEvent *event) override;
+    void hideEvent(QHideEvent *event) override;
+
     std::vector<ViewerOpenGLViewport *> viewports_;
 
     void initializeViewer();
@@ -83,5 +89,30 @@ protected:
     ViewerOpenGLViewport *selectedViewport();
     const ViewerOpenGLViewport *selectedViewport() const;
 };
+
+inline std::ostream &operator<<(std::ostream &out,
+                                const ViewerViewports::ViewLayout &in)
+{
+    switch (in)
+    {
+        case ViewerViewports::VIEW_LAYOUT_SINGLE:
+            out << "SINGLE";
+            break;
+        case ViewerViewports::VIEW_LAYOUT_TWO_COLUMNS:
+            out << "TWO_COLUMNS";
+            break;
+        case ViewerViewports::VIEW_LAYOUT_GRID:
+            out << "GRID";
+            break;
+        case ViewerViewports::VIEW_LAYOUT_THREE_ROWS_RIGHT:
+            out << "THREE_ROWS_RIGHT";
+            break;
+        default:
+            out << "UNKNOWN";
+            break;
+    }
+
+    return out;
+}
 
 #endif /* VIEWER_VIEWPORTS_HPP */

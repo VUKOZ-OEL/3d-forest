@@ -168,38 +168,33 @@ extern std::shared_ptr<LoggerFile> EXPORT_CORE globalLoggerFile;
 
 #if 0
     #define LOG_DEBUG(msg) LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg)
-    #define LOG_TRACE_RENDER(msg)                                              \
-        LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg);
-    #define LOG_TRACE_UPDATE(msg)                                              \
-        LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg);
-    #define LOG_TRACE_UPDATE_VIEW(msg)                                         \
-        LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg);
-    #define LOG_TRACE_THREAD(msg)                                              \
-        LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg);
 #else
     #if defined(LOG_MODULE_DEBUG_ENABLED)
         #define LOG_DEBUG(msg) LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg)
     #else
         #define LOG_DEBUG(msg)
     #endif /* LOG_MODULE_DEBUG_ENABLED */
+#endif
 
-    #define LOG_TRACE_RENDER(msg)
+#if 1
+    #define LOG_DEBUG_UPDATE(msg)                                              \
+        LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg);
+#else
+    #define LOG_DEBUG_UPDATE(msg)
+#endif
 
-    #if 0
-        #define LOG_TRACE_UPDATE(msg)                                          \
-            LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg);
-    #else
-        #define LOG_TRACE_UPDATE(msg)
-    #endif
+#if 0
+    #define LOG_DEBUG_RENDER(msg)                                              \
+        LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg);
+#else
+    #define LOG_DEBUG_RENDER(msg)
+#endif
 
-    #if 0
-        #define LOG_TRACE_UPDATE_VIEW(msg)                                     \
-            LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg);
-    #else
-        #define LOG_TRACE_UPDATE_VIEW(msg)
-    #endif
-
-    #define LOG_TRACE_THREAD(msg)
+#if 0
+    #define LOG_DEBUG_QT_EVENT(msg)                                            \
+        LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg);
+#else
+    #define LOG_DEBUG_QT_EVENT(msg)
 #endif
 
 #define LOG_WARNING(msg) LOG_MESSAGE(LOG_TYPE_WARNING, LOG_MODULE_NAME, msg)

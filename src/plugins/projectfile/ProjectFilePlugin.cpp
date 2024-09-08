@@ -20,6 +20,7 @@
 /** @file ProjectFilePlugin.cpp */
 
 // Include 3D Forest.
+#include <GuiUtil.hpp>
 #include <MainWindow.hpp>
 #include <ProjectFilePlugin.hpp>
 #include <ThemeIcon.hpp>
@@ -85,7 +86,7 @@ void ProjectFilePlugin::initialize(MainWindow *mainWindow)
 
 void ProjectFilePlugin::slotProjectNew()
 {
-    LOG_DEBUG(<< "Create new project.");
+    LOG_DEBUG(<< "Start creating a new project.");
 
     // Close the current project.
     if (!projectClose())
@@ -95,12 +96,14 @@ void ProjectFilePlugin::slotProjectNew()
     }
 
     // Update.
-    mainWindow_->updateEverything();
+    mainWindow_->updateNewProject();
+
+    LOG_DEBUG(<< "Finished creating new project.");
 }
 
 void ProjectFilePlugin::slotProjectOpen()
 {
-    LOG_DEBUG(<< "Open project.");
+    LOG_DEBUG(<< "Start opening a new project.");
 
     QString fileName;
 
@@ -116,18 +119,22 @@ void ProjectFilePlugin::slotProjectOpen()
     }
 
     (void)projectOpen(fileName);
+
+    LOG_DEBUG(<< "Finished opening new project <" << fileName << ">.");
 }
 
 void ProjectFilePlugin::slotProjectSave()
 {
-    LOG_DEBUG(<< "Save project.");
+    LOG_DEBUG(<< "Start saving the project.");
 
     (void)projectSave();
+
+    LOG_DEBUG(<< "Finished saving the project.");
 }
 
 void ProjectFilePlugin::slotProjectSaveAs()
 {
-    LOG_DEBUG(<< "Save project as.");
+    LOG_DEBUG(<< "Start saving the project as.");
 
     QString fileName;
 
@@ -143,11 +150,13 @@ void ProjectFilePlugin::slotProjectSaveAs()
     }
 
     (void)projectSave(fileName);
+
+    LOG_DEBUG(<< "Finished saving the project as <" << fileName << ">.");
 }
 
 bool ProjectFilePlugin::projectOpen(const QString &path)
 {
-    LOG_DEBUG(<< "Open project <" << path.toStdString() << ">.");
+    LOG_DEBUG(<< "Start opening new project <" << path << ">.");
 
     // Close the current project.
     if (!projectClose())
@@ -168,16 +177,18 @@ bool ProjectFilePlugin::projectOpen(const QString &path)
         return false;
     }
 
-    mainWindow_->updateEverything();
+    // Update.
+    mainWindow_->updateNewProject();
+    mainWindow_->slotRenderViewports();
 
-    LOG_DEBUG(<< "The project has been opened.");
+    LOG_DEBUG(<< "Finished opening new project.");
 
     return true; // Opened
 }
 
 bool ProjectFilePlugin::projectClose()
 {
-    LOG_DEBUG(<< "Close project.");
+    LOG_DEBUG(<< "Start closing the project.");
 
     mainWindow_->suspendThreads();
 
@@ -232,14 +243,14 @@ bool ProjectFilePlugin::projectClose()
         mainWindow_->showError(e.what());
     }
 
-    LOG_DEBUG(<< "The project has been closed.");
+    LOG_DEBUG(<< "Finished closing the project.");
 
     return true; // Closed.
 }
 
 bool ProjectFilePlugin::projectSave(const QString &path)
 {
-    LOG_DEBUG(<< "Save project to path <" << path.toStdString() << ">.");
+    LOG_DEBUG(<< "Start saving the project to path <" << path << ">.");
 
     std::string writePath;
 
@@ -266,19 +277,19 @@ bool ProjectFilePlugin::projectSave(const QString &path)
             }
 
             writePath = fileName.toStdString();
-            LOG_DEBUG(<< "Save project to <" << writePath << ">.");
+            LOG_DEBUG(<< "Set project path to <" << writePath << ">.");
         }
         else
         {
             writePath = mainWindow_->editor().projectPath();
-            LOG_DEBUG(<< "Save project to <" << writePath << ">.");
+            LOG_DEBUG(<< "Set project path to <" << writePath << ">.");
         }
     }
     else
     {
         // Save As.
         writePath = path.toStdString();
-        LOG_DEBUG(<< "Save project to <" << writePath << ">.");
+        LOG_DEBUG(<< "Set project path to <" << writePath << ">.");
     }
 
     // Write.
@@ -293,7 +304,7 @@ bool ProjectFilePlugin::projectSave(const QString &path)
         return false;
     }
 
-    LOG_DEBUG(<< "The project has been saved to <" << writePath << ">.");
+    LOG_DEBUG(<< "Finished saving the project to <" << writePath << ">.");
 
     return true; // Saved.
 }

@@ -78,13 +78,24 @@ void ExplorerElevationWidget::slotUpdate(void *sender,
     if (target.empty() || target.contains(Editor::TYPE_ELEVATION) ||
         target.contains(Editor::TYPE_SETTINGS))
     {
+        LOG_DEBUG_UPDATE(<< "Input elevation filter.");
+
         setElevation(mainWindow_->editor().elevationFilter());
     }
 }
 
+void ExplorerElevationWidget::filterChanged()
+{
+    LOG_DEBUG_UPDATE(<< "Output elevation filter <" << elevationRange_ << ">.");
+
+    mainWindow_->suspendThreads();
+    mainWindow_->editor().setElevationFilter(elevationRange_);
+    mainWindow_->updateFilter();
+}
+
 void ExplorerElevationWidget::setElevation(const Range<double> &elevationRange)
 {
-    LOG_DEBUG(<< "Input elevation <" << elevationRange << ">.");
+    LOG_DEBUG(<< "Set elevation <" << elevationRange << ">.");
 
     double ppm = mainWindow_->editor().settings().units.pointsPerMeter()[0];
 
@@ -101,17 +112,10 @@ void ExplorerElevationWidget::setElevation(const Range<double> &elevationRange)
     rangeInput_->blockSignals(false);
 }
 
-void ExplorerElevationWidget::filterChanged()
-{
-    LOG_DEBUG(<< "Output elevation <" << elevationRange_ << ">.");
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setElevationFilter(elevationRange_);
-    mainWindow_->updateFilter();
-}
-
 void ExplorerElevationWidget::slotRangeIntermediateMinimumValue()
 {
     LOG_DEBUG(<< "Minimum value changed.");
+
     double ppm = mainWindow_->editor().settings().units.pointsPerMeter()[0];
     elevationRange_.setMinimumValue(rangeInput_->minimumValue() * ppm);
     filterChanged();
@@ -120,6 +124,7 @@ void ExplorerElevationWidget::slotRangeIntermediateMinimumValue()
 void ExplorerElevationWidget::slotRangeIntermediateMaximumValue()
 {
     LOG_DEBUG(<< "Maximum value changed.");
+
     double ppm = mainWindow_->editor().settings().units.pointsPerMeter()[0];
     elevationRange_.setMaximumValue(rangeInput_->maximumValue() * ppm);
     filterChanged();

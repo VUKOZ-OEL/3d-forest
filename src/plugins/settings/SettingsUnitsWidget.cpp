@@ -120,47 +120,26 @@ void SettingsUnitsWidget::slotUpdate(void *sender,
 
     if (target.empty() || target.contains(Editor::TYPE_SETTINGS))
     {
-        setSettingsIn(mainWindow_->editor().settings().units);
+        LOG_DEBUG_UPDATE(<< "Input units settings.");
+
+        setUnitsSettings(mainWindow_->editor().settings().units);
     }
 }
 
-void SettingsUnitsWidget::setSettingsOut()
+void SettingsUnitsWidget::dataChanged()
 {
-    LOG_DEBUG(<< "Apply settings <" << toString(settings_) << ">.");
+    LOG_DEBUG_UPDATE(<< "Output units settings <" << toString(settings_)
+                     << ">.");
 
     mainWindow_->suspendThreads();
     mainWindow_->editor().setSettingsUnits(settings_);
     mainWindow_->update(this, {Editor::TYPE_SETTINGS});
 }
 
-void SettingsUnitsWidget::slotIntermediateLas(double v)
+void SettingsUnitsWidget::setUnitsSettings(const SettingsUnits &settings)
 {
-    LOG_DEBUG(<< "New pointsPerMeterLas value <" << toString(v) << ">.");
-    settings_.pointsPerMeterLas[0] = v;
-    settings_.pointsPerMeterLas[1] = v;
-    settings_.pointsPerMeterLas[2] = v;
-    setSettingsOut();
-}
+    LOG_DEBUG(<< "Set units settings <" << toString(settings) << ">.");
 
-void SettingsUnitsWidget::slotIntermediateUser(double v)
-{
-    LOG_DEBUG(<< "New pointsPerMeterUser value <" << toString(v) << ">.");
-    settings_.pointsPerMeterUser[0] = v;
-    settings_.pointsPerMeterUser[1] = v;
-    settings_.pointsPerMeterUser[2] = v;
-    setSettingsOut();
-}
-
-void SettingsUnitsWidget::slotUserDefined(int v)
-{
-    (void)v;
-    settings_.userDefined = userDefinedCheckBox_->isChecked();
-    ppmUserSpinBox_->setEnabled(settings_.userDefined);
-    setSettingsOut();
-}
-
-void SettingsUnitsWidget::setSettingsIn(const SettingsUnits &settings)
-{
     block();
 
     settings_ = settings;
@@ -171,6 +150,34 @@ void SettingsUnitsWidget::setSettingsIn(const SettingsUnits &settings)
     userDefinedCheckBox_->setChecked(settings_.userDefined);
 
     unblock();
+}
+
+void SettingsUnitsWidget::slotIntermediateLas(double v)
+{
+    LOG_DEBUG(<< "New pointsPerMeterLas value <" << toString(v) << ">.");
+
+    settings_.pointsPerMeterLas[0] = v;
+    settings_.pointsPerMeterLas[1] = v;
+    settings_.pointsPerMeterLas[2] = v;
+    dataChanged();
+}
+
+void SettingsUnitsWidget::slotIntermediateUser(double v)
+{
+    LOG_DEBUG(<< "New pointsPerMeterUser value <" << toString(v) << ">.");
+
+    settings_.pointsPerMeterUser[0] = v;
+    settings_.pointsPerMeterUser[1] = v;
+    settings_.pointsPerMeterUser[2] = v;
+    dataChanged();
+}
+
+void SettingsUnitsWidget::slotUserDefined(int v)
+{
+    (void)v;
+    settings_.userDefined = userDefinedCheckBox_->isChecked();
+    ppmUserSpinBox_->setEnabled(settings_.userDefined);
+    dataChanged();
 }
 
 void SettingsUnitsWidget::block()
