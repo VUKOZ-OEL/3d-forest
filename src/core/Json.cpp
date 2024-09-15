@@ -21,6 +21,7 @@
 
 // Include std.
 #include <cmath>
+#include <iomanip>
 
 // Include 3D Forest.
 #include <File.hpp>
@@ -90,6 +91,10 @@ void Json::serialize(std::ostringstream &out) const
     size_t i = 0;
     size_t n;
 
+    uint64_t num;
+    double numd;
+    constexpr double e = std::numeric_limits<double>::epsilon();
+
     switch (type_)
     {
         case TYPE_OBJECT:
@@ -128,7 +133,17 @@ void Json::serialize(std::ostringstream &out) const
             break;
 
         case TYPE_NUMBER:
-            out << data_.number;
+            num = static_cast<uint64_t>(data_.number);
+            numd = static_cast<double>(num);
+            if (::fabs(data_.number - numd) > e)
+            {
+                out << std::fixed << std::setprecision(15) << data_.number
+                    << std::defaultfloat;
+            }
+            else
+            {
+                out << num;
+            }
             break;
 
         case TYPE_TRUE:
@@ -220,7 +235,8 @@ void Json::serialize(std::ostringstream &out,
             numd = static_cast<double>(num);
             if (::fabs(data_.number - numd) > e)
             {
-                out << std::fixed << data_.number << std::defaultfloat;
+                out << std::fixed << std::setprecision(15) << data_.number
+                    << std::defaultfloat;
             }
             else
             {
