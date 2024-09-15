@@ -96,7 +96,16 @@ void DoubleRangeSliderWidget::blockSignals(bool block)
 {
     minSpinBox_->blockSignals(block);
     maxSpinBox_->blockSignals(block);
-    slider_->blockSignals(block);
+
+    // slider_->blockSignals(block);
+    if (block)
+    {
+        slider_->disconnectSlider();
+    }
+    else
+    {
+        slider_->connectSlider();
+    }
 }
 
 void DoubleRangeSliderWidget::slotIntermediateMinimumValue(double v)
