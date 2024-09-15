@@ -54,9 +54,9 @@ public slots:
     void slotRegionChanged(const Region &region);
 
 protected:
-    ToolTabWidget *tabWidget_;
-    ExplorerClippingBoxWidget *boxWidget_;
-    ExplorerClippingCylinderWidget *cylinderWidget_;
+    ToolTabWidget *tabWidget_{nullptr};
+    ExplorerClippingBoxWidget *boxWidget_{nullptr};
+    ExplorerClippingCylinderWidget *cylinderWidget_{nullptr};
     Region region_;
 
     void filterChanged();

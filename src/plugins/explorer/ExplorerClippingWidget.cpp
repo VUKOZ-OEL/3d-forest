@@ -39,6 +39,8 @@
 
 #define ICON(name) (ThemeIcon(":/explorer/", name))
 
+// #define EXPLORER_CLIPPING_WIDGET_HAS_CYLINDER 1
+
 ExplorerClippingWidget::ExplorerClippingWidget(MainWindow *mainWindow,
                                                const QIcon &icon,
                                                const QString &text)
@@ -48,7 +50,10 @@ ExplorerClippingWidget::ExplorerClippingWidget(MainWindow *mainWindow,
 
     // Tabs.
     boxWidget_ = new ExplorerClippingBoxWidget(mainWindow_);
+
+#ifdef EXPLORER_CLIPPING_WIDGET_HAS_CYLINDER
     cylinderWidget_ = new ExplorerClippingCylinderWidget(mainWindow_);
+#endif
 
     // Tab.
     tabWidget_ = new ToolTabWidget;
@@ -56,10 +61,13 @@ ExplorerClippingWidget::ExplorerClippingWidget(MainWindow *mainWindow,
                        ICON("selection_box"),
                        tr("Box"),
                        tr("Box clip filter"));
+
+#ifdef EXPLORER_CLIPPING_WIDGET_HAS_CYLINDER
     tabWidget_->addTab(cylinderWidget_,
                        ICON("selection_cylinder"),
                        tr("Cylinder"),
                        tr("Cylinder clip filter"));
+#endif
 
     // Layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -81,10 +89,12 @@ ExplorerClippingWidget::ExplorerClippingWidget(MainWindow *mainWindow,
             this,
             SLOT(slotRegionChanged(const Region &)));
 
+#ifdef EXPLORER_CLIPPING_WIDGET_HAS_CYLINDER
     connect(cylinderWidget_,
             SIGNAL(signalRegionChanged(const Region &)),
             this,
             SLOT(slotRegionChanged(const Region &)));
+#endif
 }
 
 void ExplorerClippingWidget::slotUpdate(void *sender,
@@ -104,7 +114,10 @@ void ExplorerClippingWidget::slotUpdate(void *sender,
         LOG_DEBUG(<< "Set region <" << region_ << ">.");
 
         boxWidget_->setRegion(region_);
+
+#ifdef EXPLORER_CLIPPING_WIDGET_HAS_CYLINDER
         cylinderWidget_->setRegion(region_);
+#endif
     }
 }
 
