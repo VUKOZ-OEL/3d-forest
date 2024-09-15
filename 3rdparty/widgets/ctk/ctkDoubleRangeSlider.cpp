@@ -22,6 +22,7 @@
 // Extra ';' after some Qt macros were removed. Caused '-Wpedantic' warnings.
 // Added conditional compilation HAS_CTK_VALUE_PROXY.
 // Minor cleanup of compiler warnings to include this as 3rdparty source code.
+// Add connectSlider() and disconnectSlider().
 
 // Qt includes
 #include <QDebug>
@@ -47,15 +48,16 @@ protected:
   ctkDoubleRangeSlider* const q_ptr;
 public:
   ctkDoubleRangeSliderPrivate(ctkDoubleRangeSlider& object);
-  
+
   int toInt(double _value)const;
   double minFromInt(int _value)const;
   double maxFromInt(int _value)const;
   double safeMinFromInt(int _value)const;
   double safeMaxFromInt(int _value)const;
-  
+
   void init();
   void connectSlider();
+  void disconnectSlider();
   void updateMinOffset(double value);
   void updateMaxOffset(double value);
 
@@ -96,7 +98,7 @@ ctkDoubleRangeSliderPrivate::ctkDoubleRangeSliderPrivate(ctkDoubleRangeSlider& o
   this->MinValue = 0.;
   this->MaxValue = 99.;
 }
- 
+
 // --------------------------------------------------------------------------
 void ctkDoubleRangeSliderPrivate::init()
 {
@@ -105,7 +107,7 @@ void ctkDoubleRangeSliderPrivate::init()
   QHBoxLayout* l = new QHBoxLayout(q);
   l->addWidget(this->Slider);
   l->setContentsMargins(0,0,0,0);
-  
+
   this->Minimum = this->Slider->minimum();
   this->Maximum = this->Slider->maximum();
   this->MinValue = this->Slider->minimumValue();
@@ -138,6 +140,28 @@ void ctkDoubleRangeSliderPrivate::connectSlider()
              q, SIGNAL(sliderReleased()));
   q->connect(this->Slider, SIGNAL(rangeChanged(int,int)),
              q, SLOT(onRangeChanged(int,int)));
+}
+
+// --------------------------------------------------------------------------
+void ctkDoubleRangeSliderPrivate::disconnectSlider()
+{
+  Q_Q(ctkDoubleRangeSlider);
+  q->disconnect(this->Slider, SIGNAL(valuesChanged(int,int)),
+                q, SLOT(onValuesChanged(int,int)));
+
+  q->disconnect(this->Slider, SIGNAL(minimumPositionChanged(int)),
+                q, SLOT(onMinPosChanged(int)));
+  q->disconnect(this->Slider, SIGNAL(maximumPositionChanged(int)),
+                q, SLOT(onMaxPosChanged(int)));
+  q->disconnect(this->Slider, SIGNAL(positionsChanged(int,int)),
+                q, SLOT(onPositionsChanged(int,int)));
+
+  q->disconnect(this->Slider, SIGNAL(sliderPressed()),
+                q, SIGNAL(sliderPressed()));
+  q->disconnect(this->Slider, SIGNAL(sliderReleased()),
+                q, SIGNAL(sliderReleased()));
+  q->disconnect(this->Slider, SIGNAL(rangeChanged(int,int)),
+                q, SLOT(onRangeChanged(int,int)));
 }
 
 // --------------------------------------------------------------------------
@@ -223,6 +247,20 @@ ctkDoubleRangeSlider::ctkDoubleRangeSlider(Qt::Orientation _orientation, QWidget
 // --------------------------------------------------------------------------
 ctkDoubleRangeSlider::~ctkDoubleRangeSlider()
 {
+}
+
+// --------------------------------------------------------------------------
+void ctkDoubleRangeSlider::connectSlider()
+{
+  Q_D(ctkDoubleRangeSlider);
+  d->connectSlider();
+}
+
+// --------------------------------------------------------------------------
+void ctkDoubleRangeSlider::disconnectSlider()
+{
+  Q_D(ctkDoubleRangeSlider);
+  d->disconnectSlider();
 }
 
 // --------------------------------------------------------------------------
@@ -482,7 +520,7 @@ void ctkDoubleRangeSlider::setMinimumValue(double newMinValue)
     {
     double oldValue = d->MinValue;
     d->MinValue = newMinValue;
-    // don't emit a valuechanged signal if the new value is quite 
+    // don't emit a valuechanged signal if the new value is quite
     // similar to the old value.
     if (qAbs(newMinValue - oldValue) > (d->SingleStep * 0.000000001))
       {
@@ -535,7 +573,7 @@ void ctkDoubleRangeSlider::setMaximumValue(double newMaxValue)
     {
     double oldValue = d->MaxValue;
     d->MaxValue = newMaxValue;
-    // don't emit a valuechanged signal if the new value is quite 
+    // don't emit a valuechanged signal if the new value is quite
     // similar to the old value.
     if (qAbs(newMaxValue - oldValue) > (d->SingleStep * 0.000000001))
       {
