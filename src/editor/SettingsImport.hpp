@@ -34,7 +34,7 @@ class EXPORT_EDITOR SettingsImport
 {
 public:
     bool convertToVersion1Dot4;
-    bool centerPointsOnScreen;
+    bool translateToOrigin;
     bool randomizePoints;
     bool copyExtraBytes;
     bool terminalOutput;

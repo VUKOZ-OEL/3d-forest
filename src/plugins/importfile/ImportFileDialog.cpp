@@ -61,8 +61,8 @@ ImportFileDialog::ImportFileDialog(MainWindow *mainWindow)
     convertCheckBox_ = new QCheckBox;
     convertCheckBox_->setChecked(false);
 
-    centerCheckBox_ = new QCheckBox;
-    centerCheckBox_->setChecked(true);
+    translateToOriginCheckBox_ = new QCheckBox;
+    translateToOriginCheckBox_->setChecked(false);
 
     randomizeCheckBox_ = new QCheckBox;
     randomizeCheckBox_->setChecked(true);
@@ -88,8 +88,8 @@ ImportFileDialog::ImportFileDialog(MainWindow *mainWindow)
     optionsLayout->addWidget(new QLabel(tr("Convert to v1.4+")), row, 0);
     optionsLayout->addWidget(convertCheckBox_, row, 1);
     row++;
-    optionsLayout->addWidget(new QLabel(tr("Center on screen")), row, 0);
-    optionsLayout->addWidget(centerCheckBox_, row, 1);
+    optionsLayout->addWidget(new QLabel(tr("Translate to the origin")), row, 0);
+    optionsLayout->addWidget(translateToOriginCheckBox_, row, 1);
     row++;
     optionsLayout->addWidget(new QLabel(tr("Randomize points")), row, 0);
     optionsLayout->addWidget(randomizeCheckBox_, row, 1);
@@ -139,7 +139,7 @@ SettingsImport ImportFileDialog::settings() const
     SettingsImport settingsImport;
 
     settingsImport.convertToVersion1Dot4 = convertCheckBox_->isChecked();
-    settingsImport.centerPointsOnScreen = centerCheckBox_->isChecked();
+    settingsImport.translateToOrigin = translateToOriginCheckBox_->isChecked();
     settingsImport.randomizePoints = randomizeCheckBox_->isChecked();
     settingsImport.copyExtraBytes = copyExtraBytesCheckBox_->isChecked();
 
@@ -157,8 +157,9 @@ void ImportFileDialog::slotHelp()
         " Convert LAS file to version 1.4 if it is in lower version."
         " Version 1.4 allows to use more classifications, GPS coordinates,"
         " etc.</li>"
-        "<li><b>Center on screen</b> -"
-        " Center imported data set in the middle of screen.</li>"
+        "<li><b>Translate to the origin</b> -"
+        " The coordinates will be translated to the origin of the coordinate"
+        " system.</li>"
         "<li><b>Randomize points</b> -"
         " It is suggested to randomize the order of points in LAS files"
         " to prevent eye popping artifacts caused displaying subsets"

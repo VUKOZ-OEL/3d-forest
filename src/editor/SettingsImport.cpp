@@ -28,7 +28,7 @@
 
 SettingsImport::SettingsImport()
     : convertToVersion1Dot4(false),
-      centerPointsOnScreen(false),
+      translateToOrigin(false),
       randomizePoints(true),
       copyExtraBytes(true),
       terminalOutput(false),

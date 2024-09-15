@@ -51,7 +51,7 @@ protected:
     InfoDialog *helpDialog_;
 
     QCheckBox *convertCheckBox_;
-    QCheckBox *centerCheckBox_;
+    QCheckBox *translateToOriginCheckBox_;
     QCheckBox *randomizeCheckBox_;
     QCheckBox *copyExtraBytesCheckBox_;
 

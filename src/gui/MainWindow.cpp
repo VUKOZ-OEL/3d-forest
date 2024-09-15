@@ -132,7 +132,6 @@ MainWindow::MainWindow(QWidget *parent)
     emit signalUpdate(this, {});
 
     viewerPlugin_->viewports()->resetScene(&editor_, true);
-    viewerPlugin_->viewports()->setView3d();
 
     LOG_DEBUG(<< "Finished creating the main window.");
 }
