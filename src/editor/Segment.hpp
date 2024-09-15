@@ -38,6 +38,11 @@ public:
     size_t id{0};
     std::string label;
     Vector3<double> color;
+    bool selected{false};
+
+    std::vector<Mesh> meshList;
+
+    bool hasCalculatedAttributes{false};
 
     Vector3<double> position;
     Box<double> boundary;
@@ -46,10 +51,6 @@ public:
 
     Vector3<double> dbhPosition;
     double dbh{0.0};
-
-    std::vector<Mesh> meshList;
-
-    bool selected{false};
 
     Segment();
 };
