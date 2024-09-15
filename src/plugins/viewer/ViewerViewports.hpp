@@ -71,7 +71,7 @@ public:
 
     void updateScene(Editor *editor);
     void resetScene(Editor *editor, bool resetView);
-    void resetScene(Editor *editor, size_t viewportId, bool resetView);
+    void resetViewport(Editor *editor, size_t viewportId, bool resetView);
 
 signals:
     void cameraChanged(size_t viewportId);
@@ -84,7 +84,7 @@ protected:
 
     std::vector<ViewerOpenGLViewport *> viewports_;
 
-    void initializeViewer();
+    void initializeViewports();
     ViewerOpenGLViewport *createViewport(size_t viewportId);
     ViewerOpenGLViewport *selectedViewport();
     const ViewerOpenGLViewport *selectedViewport() const;

@@ -62,7 +62,16 @@ SettingsViewWidget::SettingsViewWidget(MainWindow *mainWindow)
             this,
             SLOT(slotSetFogEnabled(int)));
 
+    showAttributesCheckBox_ = new QCheckBox;
+    showAttributesCheckBox_->setChecked(settings_.isShowAttributesEnabled());
+    showAttributesCheckBox_->setText(tr("Show Tree Attributes"));
+    connect(showAttributesCheckBox_,
+            SIGNAL(stateChanged(int)),
+            this,
+            SLOT(slotSetShowAttributesEnabled(int)));
+
     QVBoxLayout *optionsVBoxLayout = new QVBoxLayout;
+    optionsVBoxLayout->addWidget(showAttributesCheckBox_);
     optionsVBoxLayout->addWidget(fogCheckBox_);
 
     QGroupBox *optionsGroupBox = new QGroupBox(tr("Options"));
@@ -220,6 +229,13 @@ void SettingsViewWidget::slotSetFogEnabled(int v)
 {
     (void)v;
     settings_.setFogEnabled(fogCheckBox_->isChecked());
+    dataChanged();
+}
+
+void SettingsViewWidget::slotSetShowAttributesEnabled(int v)
+{
+    (void)v;
+    settings_.setShowAttributesEnabled(showAttributesCheckBox_->isChecked());
     dataChanged();
 }
 

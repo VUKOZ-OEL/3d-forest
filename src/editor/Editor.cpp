@@ -239,7 +239,7 @@ void Editor::openDataset(const std::string &path,
 
     unsavedChanges_ = true;
 
-    LOG_DEBUG(<< "Finished opening the dataset.");
+    LOG_DEBUG(<< "Finished opening new dataset.");
 }
 
 void Editor::setProjectPath(const std::string &projectPath)

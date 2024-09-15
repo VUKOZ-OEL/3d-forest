@@ -543,15 +543,12 @@ void SegmentationAction::stepCreateSegments()
     segmentsFilter.setFilter(0, true);
     segmentsFilter.setFilterEnabled(true);
 
-    Segment segment;
-    std::string segmentLabel;
-    Vector3<double> segmentColor;
-
     // For each final group, perform the following:
     size_t segmentId = 1;
     for (auto &it : groups_)
     {
         // Create new segment.
+        Segment segment;
         createSegmentFromGroup(segmentId, segment, it.second);
 
         // Append new segment to segments.

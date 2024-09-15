@@ -33,6 +33,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "ViewerOpenGLViewport"
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 ViewerOpenGLViewport::ViewerOpenGLViewport(QWidget *parent)
@@ -197,18 +198,22 @@ void ViewerOpenGLViewport::updateScene(Editor *editor)
 
 void ViewerOpenGLViewport::resetScene(Editor *editor, bool resetView)
 {
-    LOG_DEBUG_RENDER(<< "Reset viewport <" << viewportId_ << "> reset view <"
-                     << static_cast<int>(resetView) << ">.");
+    LOG_DEBUG_RENDER(<< "Start reseting viewport <" << viewportId_
+                     << "> reset view <" << (resetView ? "true" : "false")
+                     << ">.");
 
     editor_ = editor;
 
     aabb_.set(editor->datasets().boundary());
+    LOG_DEBUG_RENDER(<< "Set aabb <" << aabb_ << ">.");
 
     if (resetView)
     {
         setViewResetCenter();
         setViewResetDistance();
     }
+
+    LOG_DEBUG_RENDER(<< "Finished reseting viewport.");
 }
 
 Camera ViewerOpenGLViewport::camera() const
@@ -229,11 +234,11 @@ void ViewerOpenGLViewport::setViewPerspective()
 void ViewerOpenGLViewport::setViewDirection(const QVector3D &dir,
                                             const QVector3D &up)
 {
-    QVector3D center = camera_.getCenter();
-    float distance = camera_.getDistance();
+    camera_.setLookAt(dir, camera_.getDistance(), camera_.getCenter(), up);
 
-    QVector3D eye = (dir * distance) + center;
-    camera_.setLookAt(eye, center, up);
+    LOG_DEBUG(<< "Updated view direction in viewport <" << viewportId_
+              << "> to camera <" << camera_ << "> from dir <" << dir << "> up <"
+              << up << ">.");
 }
 
 void ViewerOpenGLViewport::setViewTop()
@@ -266,8 +271,9 @@ void ViewerOpenGLViewport::setViewRight()
 void ViewerOpenGLViewport::setView3d()
 {
     LOG_DEBUG(<< "Set 3D view in viewport <" << viewportId_ << ">.");
-    QVector3D dir(1.0F, -1.0F, 1.0F);
-    QVector3D up(-1.065F, 1.0F, 1.0F);
+
+    QVector3D dir(-1.0F, -1.0F, -1.0F);
+    QVector3D up(-1.0F, -1.0F, 1.0F);
     dir.normalize();
     up.normalize();
     setViewDirection(dir, up);
@@ -277,33 +283,20 @@ void ViewerOpenGLViewport::setViewDefault()
 {
     LOG_DEBUG(<< "Set default view in viewport <" << viewportId_ << ">.");
 
+    QVector3D dir(-1.0F, -1.0F, -1.0F);
+    QVector3D up(-1.0F, -1.0F, 1.0F);
     QVector3D center(0.0F, 0.0F, 0.0F);
     float distance = 1.0F;
 
-    if (aabb_.isValid())
-    {
-        center = aabb_.getCenter();
-        // center[2] = aabb_.getMin().z();
-        distance = aabb_.getRadius() * 2.0F;
-    }
-
-    QVector3D eye(1.0F, -1.0F, 1.0F);
-    QVector3D up(-1.065F, 1.0F, 1.0F);
-    eye.normalize();
+    dir.normalize();
     up.normalize();
 
-    eye = (eye * distance) + center;
-    camera_.setLookAt(eye, center, up);
+    camera_.setLookAt(dir, distance, center, up);
 }
 
 void ViewerOpenGLViewport::setViewResetDistance()
 {
-    LOG_DEBUG(<< "Reset distance in viewport <" << viewportId_ << "> camera <"
-              << camera() << ">.");
-
-    QVector3D center = camera_.getCenter();
-    QVector3D up = camera_.getUp();
-    QVector3D dir = camera_.getDirection();
+    LOG_DEBUG(<< "Reset view distance in viewport <" << viewportId_ << ">.");
 
     float distance = 1.0F;
     if (aabb_.isValid())
@@ -315,18 +308,19 @@ void ViewerOpenGLViewport::setViewResetDistance()
         distance = 1.0F;
     }
 
-    QVector3D eye = (dir * distance) + center;
-    camera_.setLookAt(eye, center, up);
+    camera_.setLookAt(camera_.getDirection(),
+                      distance,
+                      camera_.getCenter(),
+                      camera_.getUp());
+
+    LOG_DEBUG(<< "Updated view distance in viewport <" << viewportId_
+              << "> to camera <" << camera_ << "> from distance <" << distance
+              << "> aabb <" << aabb_ << ">.");
 }
 
 void ViewerOpenGLViewport::setViewResetCenter()
 {
-    LOG_DEBUG(<< "Reset center in viewport <" << viewportId_ << "> camera <"
-              << camera() << ">.");
-
-    QVector3D dir = camera_.getDirection();
-    QVector3D up = camera_.getUp();
-    float distance = camera_.getDistance();
+    LOG_DEBUG(<< "Reset view center in viewport <" << viewportId_ << ">.");
 
     QVector3D center = camera_.getCenter();
     if (aabb_.isValid())
@@ -335,8 +329,14 @@ void ViewerOpenGLViewport::setViewResetCenter()
         // center[2] = aabb_.getMin().z();
     }
 
-    QVector3D eye = (dir * distance) + center;
-    camera_.setLookAt(eye, center, up);
+    camera_.setLookAt(camera_.getDirection(),
+                      camera_.getDistance(),
+                      center,
+                      camera_.getUp());
+
+    LOG_DEBUG(<< "Updated view center in viewport <" << viewportId_
+              << "> to camera <" << camera_ << "> from aabb <" << aabb_
+              << ">.");
 }
 
 void ViewerOpenGLViewport::clearScreen()
@@ -450,6 +450,8 @@ void ViewerOpenGLViewport::renderSegments()
             continue;
         }
 
+        if (editor_->settings().view.isShowAttributesEnabled() &&
+            segment.hasCalculatedAttributes)
         {
             glColor3f(1.0F, 1.0F, 0.0F);
 

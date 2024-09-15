@@ -49,6 +49,7 @@ public slots:
     void slotColorSourceChanged(int index);
     void slotSetPointSize(int v);
     void slotSetFogEnabled(int v);
+    void slotSetShowAttributesEnabled(int v);
     void slotSetColor();
 
 private:
@@ -56,6 +57,7 @@ private:
 
     ColorSwitchWidget *colorSwitchWidget_;
     QCheckBox *fogCheckBox_;
+    QCheckBox *showAttributesCheckBox_;
     QComboBox *colorSourceComboBox_;
     QSlider *pointSizeSlider_;
 

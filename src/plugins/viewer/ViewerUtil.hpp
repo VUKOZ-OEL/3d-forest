@@ -17,25 +17,39 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SettingsImport.cpp */
+/** @file ViewerUtil.hpp */
+
+#ifndef VIEWER_UTIL_HPP
+#define VIEWER_UTIL_HPP
 
 // Include 3D Forest.
-#include <SettingsImport.hpp>
+#include <Json.hpp>
+
+// Include Qt.
+#include <QVector3D>
 
 // Include local.
-#define LOG_MODULE_NAME "SettingsImport"
-#include <Log.hpp>
+#include <WarningsDisable.hpp>
 
-SettingsImport::SettingsImport()
-    : convertToVersion1Dot4(false),
-      translateToOrigin(false),
-      randomizePoints(true),
-      copyExtraBytes(true),
-      terminalOutput(false),
-      maxIndexLevel1(0),
-      maxIndexLevel1Size(100 * 1000),
-      maxIndexLevel2(5),
-      maxIndexLevel2Size(32),
-      bufferSize(5 * 1024 * 1024)
+inline void toJson(Json &out, const QVector3D &in)
 {
+    toJson(out[0], in[0]);
+    toJson(out[1], in[1]);
+    toJson(out[2], in[2]);
 }
+
+inline std::string toString(const QVector3D &in)
+{
+    return "[" + toString(in[0]) + "," + toString(in[1]) + "," +
+           toString(in[2]) + "]";
+}
+
+inline std::ostream &operator<<(std::ostream &out, const QVector3D &in)
+{
+    return out << std::fixed << std::setprecision(15) << "[" << in[0] << ","
+               << in[1] << "," << in[2] << "]" << std::defaultfloat;
+}
+
+#include <WarningsEnable.hpp>
+
+#endif /* VIEWER_UTIL_HPP */

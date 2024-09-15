@@ -113,7 +113,7 @@ void ExplorerClippingCylinderWidget::setRegion(const Region &region)
     {
         double min = region.boundary.min(i) / ppm;
         double max = region.boundary.max(i) / ppm;
-        double value = (min + (0.5 * (max - min))) / ppm;
+        double value = min + (0.5 * (max - min));
 
         pointAInput_[i]->blockSignals(true);
         pointAInput_[i]->setMinimum(min);
@@ -128,13 +128,13 @@ void ExplorerClippingCylinderWidget::setRegion(const Region &region)
         pointBInput_[i]->blockSignals(false);
     }
 
-    pointAInput_[2]->setValue(pointAInput_[2]->minimum());
-    pointBInput_[2]->setValue(pointBInput_[2]->maximum());
+    pointAInput_[2]->setValue(region.boundary.max(2) / ppm);
+    pointBInput_[2]->setValue(region.boundary.min(2) / ppm);
 
     radiusInput_->blockSignals(true);
     radiusInput_->setMinimum(0.001);
     radiusInput_->setMaximum(region.boundary.length(0) / ppm);
-    radiusInput_->setValue(radiusInput_->maximum());
+    radiusInput_->setValue(region.boundary.length(0) / ppm);
     radiusInput_->blockSignals(false);
 }
 

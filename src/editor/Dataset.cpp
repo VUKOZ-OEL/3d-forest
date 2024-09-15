@@ -56,6 +56,9 @@ void Dataset::read(size_t id,
                    const SettingsImport &settings,
                    const Box<double> &projectBoundary)
 {
+    LOG_DEBUG(<< "Read dataset from path <" << path << "> project path <"
+              << projectPath << ".");
+
     pathUnresolved_ = path;
     setPath(pathUnresolved_, projectPath);
 
@@ -65,23 +68,17 @@ void Dataset::read(size_t id,
 
     read();
 
-    if (settings.centerPointsOnScreen)
+    if (settings.translateToOrigin)
     {
         Vector3<double> c1 = projectBoundary.getCenter();
         Vector3<double> c2 = boundaryFile_.getCenter();
         c1[2] = projectBoundary.min(2);
         c2[2] = boundaryFile_.min(2);
         translation_ = c1 - c2;
-        LOG_DEBUG(<< "Centered translation <" << translation_ << ">.");
-        updateBoundary();
+        LOG_DEBUG(<< "Translation to the origin <" << translation_ << ">.");
     }
-    else
-    {
-        Vector3<double> s = 1.0 / scalingFile_;
-        translation_ = translationFile_ * s;
-        LOG_DEBUG(<< "Scaled translation <" << translation_ << ">.");
-        updateBoundary();
-    }
+
+    updateBoundary();
 }
 
 void fromJson(Dataset &out, const Json &in, const std::string &projectPath)
@@ -182,13 +179,18 @@ void Dataset::read()
 
     translation_ = translationFile_;
 
+    LOG_DEBUG(<< "File translation <" << translationFile_ << ">.");
     LOG_DEBUG(<< "Translation <" << translation_ << ">.");
 
     scalingFile_.set(las_->header.x_scale_factor,
                      las_->header.y_scale_factor,
                      las_->header.z_scale_factor);
 
+    LOG_DEBUG(<< "File scaling <" << scalingFile_ << ">.");
+
     scaling_.set(1.0, 1.0, 1.0);
+
+    LOG_DEBUG(<< "Scaling <" << scaling_ << ">.");
 
     // Boundary.
     const std::string pathIndex = IndexFileBuilder::extension(path_);
@@ -209,5 +211,6 @@ void Dataset::updateBoundary()
     boundary_.translate(translation_);
     index_->translate(translation_);
 
+    LOG_DEBUG(<< "File boundary <" << boundaryFile_ << ">.");
     LOG_DEBUG(<< "Boundary <" << boundary_ << ">.");
 }

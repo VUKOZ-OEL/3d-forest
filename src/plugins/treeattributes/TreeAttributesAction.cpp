@@ -354,6 +354,8 @@ void TreeAttributesAction::stepUpdateTreeAttributes()
         segment.dbhPosition = it.dbhPosition;
         segment.dbh = it.dbh;
 
+        segment.hasCalculatedAttributes = true;
+
         LOG_DEBUG(<< "Tree position <" << segment.position << "> height <"
                   << segment.height << "> DBH <" << segment.dbh << ">.");
     }

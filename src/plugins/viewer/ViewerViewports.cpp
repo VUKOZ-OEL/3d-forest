@@ -34,6 +34,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "ViewerViewports"
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define VIEWER_VIEWPORTS_3D 0
@@ -43,11 +44,14 @@
 
 ViewerViewports::ViewerViewports(QWidget *parent) : QWidget(parent)
 {
-    initializeViewer();
+    LOG_DEBUG(<< "The viewports are being created.");
+    initializeViewports();
+    LOG_DEBUG(<< "Finished creating the viewports.");
 }
 
 ViewerViewports::~ViewerViewports()
 {
+    LOG_DEBUG(<< "The viewports are being destroyed.");
 }
 
 void ViewerViewports::paintEvent(QPaintEvent *event)
@@ -74,13 +78,15 @@ void ViewerViewports::hideEvent(QHideEvent *event)
     QWidget::hideEvent(event);
 }
 
-void ViewerViewports::initializeViewer()
+void ViewerViewports::initializeViewports()
 {
+    LOG_DEBUG(<< "Initialize viewports.");
     setLayout(ViewLayout::VIEW_LAYOUT_SINGLE);
 }
 
 ViewerOpenGLViewport *ViewerViewports::createViewport(size_t viewportId)
 {
+    LOG_DEBUG(<< "Create viewport <" << viewportId << ">.");
     ViewerOpenGLViewport *viewport = new ViewerOpenGLViewport(this);
     viewport->setViewports(this, viewportId);
     viewport->setSelected(false);
@@ -116,46 +122,55 @@ const ViewerOpenGLViewport *ViewerViewports::selectedViewport() const
 
 void ViewerViewports::setViewOrthographic()
 {
+    LOG_DEBUG(<< "Set orthographic view to the active viewport.");
     selectedViewport()->setViewOrthographic();
 }
 
 void ViewerViewports::setViewPerspective()
 {
+    LOG_DEBUG(<< "Set perspective view to the active viewport.");
     selectedViewport()->setViewPerspective();
 }
 
 void ViewerViewports::setViewTop()
 {
+    LOG_DEBUG(<< "Set top view to the active viewport.");
     selectedViewport()->setViewTop();
 }
 
 void ViewerViewports::setViewFront()
 {
+    LOG_DEBUG(<< "Set front view to the active viewport.");
     selectedViewport()->setViewFront();
 }
 
 void ViewerViewports::setViewRight()
 {
+    LOG_DEBUG(<< "Set right view to the active viewport.");
     selectedViewport()->setViewRight();
 }
 
 void ViewerViewports::setView3d()
 {
+    LOG_DEBUG(<< "Set 3d view to the active viewport.");
     selectedViewport()->setView3d();
 }
 
 void ViewerViewports::setViewResetDistance()
 {
+    LOG_DEBUG(<< "Reset distance in the active viewport.");
     selectedViewport()->setViewResetDistance();
 }
 
 void ViewerViewports::setViewResetCenter()
 {
+    LOG_DEBUG(<< "Reset center in the active viewport.");
     selectedViewport()->setViewResetCenter();
 }
 
 void ViewerViewports::selectViewport(ViewerOpenGLViewport *viewport)
 {
+    LOG_DEBUG(<< "Start selecting viewport <" << viewport->viewportId() << ".");
     for (size_t i = 0; i < viewports_.size(); i++)
     {
         if (viewports_[i] == viewport)
@@ -168,6 +183,7 @@ void ViewerViewports::selectViewport(ViewerOpenGLViewport *viewport)
         }
         viewports_[i]->update();
     }
+    LOG_DEBUG(<< "Finished selecting viewport.");
 }
 
 size_t ViewerViewports::selectedViewportId() const
@@ -184,31 +200,35 @@ size_t ViewerViewports::selectedViewportId() const
 
 void ViewerViewports::updateScene(Editor *editor)
 {
-    LOG_DEBUG_RENDER(<< "Update all viewports.");
+    LOG_DEBUG_RENDER(<< "Start updating all viewports.");
     for (size_t i = 0; i < viewports_.size(); i++)
     {
         viewports_[i]->updateScene(editor);
         viewports_[i]->update();
     }
+    LOG_DEBUG_RENDER(<< "Finished updating all viewports.");
 }
 
 void ViewerViewports::resetScene(Editor *editor, bool resetView)
 {
-    LOG_DEBUG_RENDER(<< "Reset all viewports, reset view <"
+    LOG_DEBUG_RENDER(<< "Start reseting all viewports, reset view <"
                      << static_cast<int>(resetView) << ">.");
 
     for (size_t i = 0; i < viewports_.size(); i++)
     {
         viewports_[i]->resetScene(editor, resetView);
     }
+
+    LOG_DEBUG_RENDER(<< "Finished reseting all viewports.");
 }
 
-void ViewerViewports::resetScene(Editor *editor,
-                                 size_t viewportId,
-                                 bool resetView)
+void ViewerViewports::resetViewport(Editor *editor,
+                                    size_t viewportId,
+                                    bool resetView)
 {
-    LOG_DEBUG_RENDER(<< "Setup viewport <" << viewportId << "> reset view <"
-                     << static_cast<int>(resetView) << ">.");
+    LOG_DEBUG_RENDER(<< "Start reseting viewport <" << viewportId
+                     << "> reset view <" << static_cast<int>(resetView)
+                     << ">.");
 
     if (viewportId == VIEWER_VIEWPORTS_3D)
     {
@@ -234,6 +254,8 @@ void ViewerViewports::resetScene(Editor *editor,
         viewports_[VIEWER_VIEWPORTS_RIGHT]->setViewOrthographic();
         viewports_[VIEWER_VIEWPORTS_RIGHT]->setViewRight();
     }
+
+    LOG_DEBUG_RENDER(<< "Finished reseting viewport.");
 }
 
 std::vector<Camera> ViewerViewports::camera(size_t viewportId) const
