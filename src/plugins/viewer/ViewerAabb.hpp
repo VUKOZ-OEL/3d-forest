@@ -27,6 +27,7 @@
 
 // Include 3D Forest.
 #include <Box.hpp>
+#include <ViewerUtil.hpp>
 
 // Include Qt.
 #include <QVector3D>
@@ -73,6 +74,31 @@ protected:
     bool valid_;
 
     void setValid();
+
+    friend void toJson(Json &out, const ViewerAabb &in);
+    friend std::string toString(const ViewerAabb &in);
+    friend std::ostream &operator<<(std::ostream &out, const ViewerAabb &in);
 };
+
+inline void toJson(Json &out, const ViewerAabb &in)
+{
+    toJson(out["min"], in.min_);
+    toJson(out["max"], in.max_);
+    toJson(out["center"], in.center_);
+    toJson(out["radius"], in.radius_);
+    toJson(out["valid"], in.valid_);
+}
+
+inline std::string toString(const ViewerAabb &in)
+{
+    Json json;
+    toJson(json, in);
+    return json.serialize(0);
+}
+
+inline std::ostream &operator<<(std::ostream &out, const ViewerAabb &in)
+{
+    return out << toString(in);
+}
 
 #endif /* VIEWER_AABB_HPP */
