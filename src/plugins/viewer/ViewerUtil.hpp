@@ -17,7 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file GuiUtil.hpp */
+/** @file ViewerUtil.hpp */
 
 #ifndef VIEWER_UTIL_HPP
 #define VIEWER_UTIL_HPP
