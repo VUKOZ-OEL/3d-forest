@@ -450,7 +450,8 @@ void ViewerOpenGLViewport::renderSegments()
             continue;
         }
 
-        if (segment.hasCalculatedAttributes)
+        if (editor_->settings().view.isShowAttributesEnabled() &&
+            segment.hasCalculatedAttributes)
         {
             glColor3f(1.0F, 1.0F, 0.0F);
 

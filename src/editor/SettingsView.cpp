@@ -29,6 +29,7 @@
 SettingsView::SettingsView()
     : pointSize_(1.0),
       fogEnabled_(false),
+      showAttributesEnabled_(true),
       pointColor_(1.0, 1.0, 1.0),
       background_(0.2, 0.2, 0.2)
 {
@@ -67,6 +68,16 @@ bool SettingsView::isFogEnabled() const
 void SettingsView::setFogEnabled(bool b)
 {
     fogEnabled_ = b;
+}
+
+bool SettingsView::isShowAttributesEnabled() const
+{
+    return showAttributesEnabled_;
+}
+
+void SettingsView::setShowAttributesEnabled(bool b)
+{
+    showAttributesEnabled_ = b;
 }
 
 void SettingsView::setPointColor(const Vector3<double> &rgb)
