@@ -27,6 +27,7 @@
 
 // Include 3D Forest.
 #include <Camera.hpp>
+#include <ViewerUtil.hpp>
 
 // Include Qt.
 #include <QMatrix4x4>
@@ -62,6 +63,11 @@ public:
     void setLookAt(const QVector3D &center, float distance);
 
     void setLookAt(const QVector3D &eye,
+                   const QVector3D &center,
+                   const QVector3D &up);
+
+    void setLookAt(const QVector3D &dir,
+                   float distance,
                    const QVector3D &center,
                    const QVector3D &up);
 
@@ -146,6 +152,32 @@ protected:
     void setProjection(const QMatrix4x4 &m);
     void setModelViewProjection(const QMatrix4x4 &m);
     void updateFrustrum();
+
+    friend void toJson(Json &out, const ViewerCamera &in);
+    friend std::string toString(const ViewerCamera &in);
+    friend std::ostream &operator<<(std::ostream &out, const ViewerCamera &in);
 };
+
+inline void toJson(Json &out, const ViewerCamera &in)
+{
+    toJson(out["eye"], in.eye_);
+    toJson(out["center"], in.center_);
+    toJson(out["right"], in.right_);
+    toJson(out["up"], in.up_);
+    toJson(out["direction"], in.direction_);
+    toJson(out["distance"], in.distance_);
+}
+
+inline std::string toString(const ViewerCamera &in)
+{
+    Json json;
+    toJson(json, in);
+    return json.serialize(0);
+}
+
+inline std::ostream &operator<<(std::ostream &out, const ViewerCamera &in)
+{
+    return out << toString(in);
+}
 
 #endif /* VIEWER_CAMERA_HPP */

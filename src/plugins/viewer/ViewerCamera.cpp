@@ -33,6 +33,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "ViewerCamera"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 ViewerCamera::ViewerCamera()
@@ -162,14 +163,32 @@ void ViewerCamera::setLookAt(const QVector3D &eye,
                              const QVector3D &center,
                              const QVector3D &up)
 {
-    center_ = center;
+    LOG_DEBUG(<< "Look at eye <" << eye << "> center <" << center << "> up <"
+              << up << ">.");
 
-    QVector3D dir = center_ - eye;
-    distance_ = dir.length();
+    QVector3D dir = center - eye;
+    float distance = dir.length();
     dir.normalize();
+
+    setLookAt(dir, distance, center, up);
+}
+
+void ViewerCamera::setLookAt(const QVector3D &dir,
+                             float distance,
+                             const QVector3D &center,
+                             const QVector3D &up)
+{
+    LOG_DEBUG(<< "Look at dir <" << dir << "> distance <" << distance
+              << "> center <" << center << "> up <" << up << ">.");
+
+    distance_ = distance;
+    center_ = center;
 
     QVector3D right = QVector3D::crossProduct(dir, up);
     QVector3D u = QVector3D::crossProduct(right, dir);
+
+    LOG_DEBUG(<< "Calculated right <" << right << ">.");
+    LOG_DEBUG(<< "Calculated new up <" << u << ">.");
 
     QMatrix3x3 m;
     m(0, 0) = right.x();
@@ -348,8 +367,13 @@ void ViewerCamera::updateMatrix()
 
     up_ = QVector3D(m(1, 0), m(1, 1), m(1, 2));
     right_ = QVector3D(m(0, 0), m(0, 1), m(0, 2));
-    direction_ = QVector3D(m(2, 0), m(2, 1), m(2, 2));
+    direction_ = QVector3D(-m(2, 0), -m(2, 1), -m(2, 2));
     eye_ = center_ + (direction_ * distance_);
+
+    LOG_DEBUG(<< "Update up <" << up_ << "> right <" << right_
+              << "> direction <" << direction_ << "> eye <" << eye_
+              << "> used center <" << center_ << "> distance <" << distance_
+              << ">.");
 }
 
 void ViewerCamera::setModelView(const QMatrix4x4 &m)

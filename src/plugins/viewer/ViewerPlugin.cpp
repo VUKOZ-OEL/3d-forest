@@ -27,6 +27,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "ViewerPlugin"
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define ICON(name) (ThemeIcon(":/viewer/", name))
@@ -237,16 +238,16 @@ void ViewerPlugin::slotViewLayout(ViewerViewports::ViewLayout layout)
     {
         mainWindow_->editor().viewportsResize(2);
         viewports_->setLayout(layout);
-        viewports_->resetScene(&mainWindow_->editor(), 1, true);
+        viewports_->resetViewport(&mainWindow_->editor(), 1, true);
     }
     else if ((layout == ViewerViewports::VIEW_LAYOUT_GRID) ||
              (layout == ViewerViewports::VIEW_LAYOUT_THREE_ROWS_RIGHT))
     {
         mainWindow_->editor().viewportsResize(4);
         viewports_->setLayout(layout);
-        viewports_->resetScene(&mainWindow_->editor(), 1, true);
-        viewports_->resetScene(&mainWindow_->editor(), 2, true);
-        viewports_->resetScene(&mainWindow_->editor(), 3, true);
+        viewports_->resetViewport(&mainWindow_->editor(), 1, true);
+        viewports_->resetViewport(&mainWindow_->editor(), 2, true);
+        viewports_->resetViewport(&mainWindow_->editor(), 3, true);
     }
 
     updateViewer();
