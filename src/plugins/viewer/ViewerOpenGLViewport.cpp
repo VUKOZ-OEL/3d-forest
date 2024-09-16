@@ -41,6 +41,7 @@ ViewerOpenGLViewport::ViewerOpenGLViewport(QWidget *parent)
       windowViewports_(nullptr),
       viewportId_(0),
       selected_(false),
+      resized_(false),
       editor_(nullptr)
 
 {
@@ -60,6 +61,7 @@ void ViewerOpenGLViewport::paintEvent(QPaintEvent *event)
 void ViewerOpenGLViewport::resizeEvent(QResizeEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Resize event.");
+    resized_ = true;
     QOpenGLWidget::resizeEvent(event);
 }
 
@@ -371,12 +373,27 @@ bool ViewerOpenGLViewport::renderScene()
         firstFrame = true;
     }
 
+    if (resized_)
+    {
+        LOG_DEBUG_RENDER(<< "Reset render state after resize event.");
+
+        for (size_t pageIndex = 0; pageIndex < pageSize; pageIndex++)
+        {
+            Page &page = editor_->viewports().page(viewportId_, pageIndex);
+            if (page.state() == Page::STATE_RENDERED)
+            {
+                page.setState(Page::STATE_RENDER);
+            }
+        }
+
+        resized_ = false;
+    }
+
     for (size_t pageIndex = 0; pageIndex < pageSize; pageIndex++)
     {
         Page &page = editor_->viewports().page(viewportId_, pageIndex);
 
-        if (page.state() == Page::STATE_RENDER ||
-            page.state() == Page::STATE_RENDERED)
+        if (page.state() == Page::STATE_RENDER)
         {
             // LOG_DEBUG_RENDER(<< "Render pageId <" << page.pageId() << ">.");
 

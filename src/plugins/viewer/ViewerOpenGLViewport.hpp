@@ -83,6 +83,7 @@ protected:
     ViewerViewports *windowViewports_;
     size_t viewportId_;
     bool selected_;
+    bool resized_;
 
     // Data.
     Editor *editor_;
