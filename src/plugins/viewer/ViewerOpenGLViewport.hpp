@@ -92,7 +92,7 @@ protected:
 
     void setViewDefault();
     void clearScreen();
-    bool renderScene();
+    void renderScene();
     void renderFirstFrame();
     void renderSegments();
     void renderGuides();

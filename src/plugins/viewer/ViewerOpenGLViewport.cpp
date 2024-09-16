@@ -101,29 +101,6 @@ void ViewerOpenGLViewport::resizeGL(int w, int h)
     // cameraChanged();
 }
 
-void ViewerOpenGLViewport::paintGL()
-{
-    LOG_DEBUG_RENDER(<< "Paint width <" << camera_.width() << "> height <"
-                     << camera_.height() << ">.");
-
-    // Setup camera.
-    glViewport(0, 0, camera_.width(), camera_.height());
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadMatrixf(camera_.getProjection().data());
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixf(camera_.getModelView().data());
-
-    // Render.
-    bool firstFrame = renderScene();
-
-    if (firstFrame)
-    {
-        renderGuides();
-    }
-}
-
 void ViewerOpenGLViewport::mouseReleaseEvent(QMouseEvent *event)
 {
     (void)event;
@@ -346,16 +323,32 @@ void ViewerOpenGLViewport::clearScreen()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-bool ViewerOpenGLViewport::renderScene()
+void ViewerOpenGLViewport::paintGL()
+{
+    LOG_DEBUG_RENDER(<< "Paint width <" << camera_.width() << "> height <"
+                     << camera_.height() << ">.");
+
+    // Setup camera.
+    glViewport(0, 0, camera_.width(), camera_.height());
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixf(camera_.getProjection().data());
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixf(camera_.getModelView().data());
+
+    // Render.
+    renderScene();
+}
+
+void ViewerOpenGLViewport::renderScene()
 {
     LOG_DEBUG_RENDER(<< "Start rendering viewport <" << viewportId_ << ">.");
 
     if (!editor_)
     {
-        return true;
+        return;
     }
-
-    bool firstFrame = false;
 
     std::unique_lock<std::mutex> mutexlock(editor_->mutex_);
 
@@ -369,8 +362,7 @@ bool ViewerOpenGLViewport::renderScene()
 
     if (pageSize == 0)
     {
-        clearScreen();
-        firstFrame = true;
+        renderFirstFrame();
     }
 
     if (resized_)
@@ -395,12 +387,13 @@ bool ViewerOpenGLViewport::renderScene()
 
         if (page.state() == Page::STATE_RENDER)
         {
-            // LOG_DEBUG_RENDER(<< "Render pageId <" << page.pageId() << ">.");
+            LOG_DEBUG_RENDER(<< "Render page <" << (pageIndex + 1) << "/"
+                             << pageSize << "> page id <" << page.pageId()
+                             << ">.");
 
             if (pageIndex == 0)
             {
-                clearScreen();
-                firstFrame = true;
+                renderFirstFrame();
             }
 
             ViewerOpenGL::render(ViewerOpenGL::POINTS,
@@ -418,21 +411,22 @@ bool ViewerOpenGLViewport::renderScene()
             double t2 = Time::realTime();
             if (t2 - t1 > 0.02)
             {
+                LOG_DEBUG_RENDER(<< "Terminate rendering after <" << (t2 - t1)
+                                 << "> seconds.");
                 break;
             }
+        }
+        else
+        {
+            LOG_DEBUG_RENDER(<< "Skip rendering of page <" << (pageIndex + 1)
+                             << "/" << pageSize << "> page id <"
+                             << page.pageId() << ">.");
         }
     }
 
     renderSceneSettingsDisable();
 
-    if (firstFrame)
-    {
-        renderFirstFrame();
-    }
-
     LOG_DEBUG_RENDER(<< "Finished rendering viewport <" << viewportId_ << ">.");
-
-    return firstFrame;
 }
 
 void ViewerOpenGLViewport::renderFirstFrame()
@@ -440,8 +434,16 @@ void ViewerOpenGLViewport::renderFirstFrame()
     LOG_DEBUG_RENDER(<< "Rendered first frame in viewport <" << viewportId_
                      << ">.");
 
+    clearScreen();
+
     ViewerOpenGL::renderClipFilter(editor_->clipFilter());
     renderSegments();
+    renderGuides();
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixf(camera_.getProjection().data());
+    glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixf(camera_.getModelView().data());
 }
 
 void ViewerOpenGLViewport::renderSegments()
