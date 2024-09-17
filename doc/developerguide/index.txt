@@ -661,7 +661,7 @@ LOG_DEBUG(<< "Found <" << nPoints << "> points.");
 
 Example command to generate documentation:
 @verbatim
-mingw32-make doxygen
+mingw32-make doc
 @endverbatim
 
 Your favorite syntax of documentation comments.
