@@ -389,7 +389,7 @@ void Editor::updateAfterRead()
 
     if (datasets_.size() > 0)
     {
-        SettingsUnits settingsUnits = settings_.units;
+        SettingsUnits settingsUnits = settings_.units();
         settingsUnits.setLasFileScaling(datasets_.at(0).scalingFile());
 
         setSettingsUnits(settingsUnits);
@@ -416,13 +416,13 @@ void Editor::updateAfterRead()
 
 void Editor::setSettingsView(const SettingsView &settingsView)
 {
-    settings_.view = settingsView;
+    settings_.view(settingsView);
     unsavedChanges_ = true;
 }
 
 void Editor::setSettingsUnits(const SettingsUnits &settingsUnits)
 {
-    unsavedChanges_ = settings_.units.apply(settingsUnits);
+    unsavedChanges_ = settings_.units(settingsUnits);
 }
 
 void Editor::addModifier(ModifierInterface *modifier)

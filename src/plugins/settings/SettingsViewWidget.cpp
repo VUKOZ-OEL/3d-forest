@@ -153,7 +153,7 @@ void SettingsViewWidget::slotUpdate(void *sender,
     {
         LOG_DEBUG_UPDATE(<< "Input view settings.");
 
-        setViewSettings(mainWindow_->editor().settings().view);
+        setViewSettings(mainWindow_->editor().settings().view());
     }
 }
 

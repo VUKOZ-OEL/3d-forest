@@ -107,7 +107,7 @@ void ExplorerClippingCylinderWidget::setRegion(const Region &region)
 {
     LOG_DEBUG(<< "Set region <" << region << ">.");
 
-    double ppm = mainWindow_->editor().settings().units.pointsPerMeter()[0];
+    double ppm = mainWindow_->editor().settings().units().pointsPerMeter()[0];
 
     for (size_t i = 0; i < 3; i++)
     {
@@ -142,7 +142,7 @@ void ExplorerClippingCylinderWidget::slotInputChanged()
 {
     LOG_DEBUG(<< "Input changed.");
 
-    double ppm = mainWindow_->editor().settings().units.pointsPerMeter()[0];
+    double ppm = mainWindow_->editor().settings().units().pointsPerMeter()[0];
 
     double x1 = pointAInput_[0]->value() * ppm;
     double y1 = pointAInput_[1]->value() * ppm;

@@ -64,7 +64,7 @@ void ExplorerSegmentWidget::setSegment(const Segment &segment)
     table_->setColumnCount(2);
     table_->setHorizontalHeaderLabels({"Property", "Value"});
 
-    double ppm = mainWindow_->editor().settings().units.pointsPerMeter()[0];
+    double ppm = mainWindow_->editor().settings().units().pointsPerMeter()[0];
 
     setRow(0, "label", segment_.label);
     setRow(1, "x", segment_.position[0] / ppm, "m");

@@ -98,7 +98,7 @@ void ExplorerClippingBoxWidget::setRegion(const Region &region)
 {
     LOG_DEBUG(<< "Set region <" << region << ">.");
 
-    double ppm = mainWindow_->editor().settings().units.pointsPerMeter()[0];
+    double ppm = mainWindow_->editor().settings().units().pointsPerMeter()[0];
 
     for (size_t i = 0; i < 3; i++)
     {
@@ -120,7 +120,7 @@ void ExplorerClippingBoxWidget::slotRangeIntermediateMinimumValue()
 {
     LOG_DEBUG(<< "Minimum value changed.");
 
-    double ppm = mainWindow_->editor().settings().units.pointsPerMeter()[0];
+    double ppm = mainWindow_->editor().settings().units().pointsPerMeter()[0];
 
     QObject *obj = sender();
     for (int i = 0; i < 3; i++)
@@ -140,7 +140,7 @@ void ExplorerClippingBoxWidget::slotRangeIntermediateMaximumValue()
 {
     LOG_DEBUG(<< "Maximum value changed.");
 
-    double ppm = mainWindow_->editor().settings().units.pointsPerMeter()[0];
+    double ppm = mainWindow_->editor().settings().units().pointsPerMeter()[0];
 
     QObject *obj = sender();
     for (int i = 0; i < 3; i++)

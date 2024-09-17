@@ -64,7 +64,7 @@ void TreeAttributesAction::start(const TreeAttributesParameters &parameters)
     LOG_DEBUG(<< "Start with parameters <" << toString(parameters) << ">.");
 
     // Set input parameters.
-    double ppm = editor_->settings().units.pointsPerMeter()[0];
+    double ppm = editor_->settings().units().pointsPerMeter()[0];
 
     parameters_ = parameters;
 

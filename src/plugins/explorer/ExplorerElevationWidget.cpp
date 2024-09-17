@@ -97,7 +97,7 @@ void ExplorerElevationWidget::setElevation(const Range<double> &elevationRange)
 {
     LOG_DEBUG(<< "Set elevation <" << elevationRange << ">.");
 
-    double ppm = mainWindow_->editor().settings().units.pointsPerMeter()[0];
+    double ppm = mainWindow_->editor().settings().units().pointsPerMeter()[0];
 
     rangeInput_->blockSignals(true);
 
@@ -116,7 +116,7 @@ void ExplorerElevationWidget::slotRangeIntermediateMinimumValue()
 {
     LOG_DEBUG(<< "Minimum value changed.");
 
-    double ppm = mainWindow_->editor().settings().units.pointsPerMeter()[0];
+    double ppm = mainWindow_->editor().settings().units().pointsPerMeter()[0];
     elevationRange_.setMinimumValue(rangeInput_->minimumValue() * ppm);
     filterChanged();
 }
@@ -125,7 +125,7 @@ void ExplorerElevationWidget::slotRangeIntermediateMaximumValue()
 {
     LOG_DEBUG(<< "Maximum value changed.");
 
-    double ppm = mainWindow_->editor().settings().units.pointsPerMeter()[0];
+    double ppm = mainWindow_->editor().settings().units().pointsPerMeter()[0];
     elevationRange_.setMaximumValue(rangeInput_->maximumValue() * ppm);
     filterChanged();
 }

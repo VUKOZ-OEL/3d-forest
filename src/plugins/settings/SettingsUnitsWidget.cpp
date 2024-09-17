@@ -122,7 +122,7 @@ void SettingsUnitsWidget::slotUpdate(void *sender,
     {
         LOG_DEBUG_UPDATE(<< "Input units settings.");
 
-        setUnitsSettings(mainWindow_->editor().settings().units);
+        setUnitsSettings(mainWindow_->editor().settings().units());
     }
 }
 

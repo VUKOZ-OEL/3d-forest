@@ -469,7 +469,7 @@ void ViewerOpenGLViewport::renderSegments()
             continue;
         }
 
-        if (editor_->settings().view.isShowAttributesEnabled() &&
+        if (editor_->settings().view().isShowAttributesEnabled() &&
             segment.hasCalculatedAttributes)
         {
             glColor3f(1.0F, 1.0F, 0.0F);
@@ -552,8 +552,7 @@ void ViewerOpenGLViewport::renderGuides()
 
 void ViewerOpenGLViewport::renderSceneSettingsEnable()
 {
-    const Settings &settings = editor_->settings();
-    const SettingsView &opt = settings.view;
+    const SettingsView &opt = editor_->settings().view();
 
     // Background.
     const Vector3<double> &rgb = opt.backgroundColor();
@@ -589,10 +588,9 @@ void ViewerOpenGLViewport::renderSceneSettingsEnable()
 
 void ViewerOpenGLViewport::renderSceneSettingsDisable()
 {
-    const Settings &settings = editor_->settings();
     glPointSize(1.0F);
 
-    if (settings.view.isFogEnabled())
+    if (editor_->settings().view().isFogEnabled())
     {
         glDisable(GL_FOG);
     }
