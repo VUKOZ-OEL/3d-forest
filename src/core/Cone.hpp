@@ -40,9 +40,10 @@ public:
     void set(T x, T y, T z1, T z2, T angle);
     void clear();
     bool empty() const { return box_.empty(); }
+
     const Box<T> &box() const { return box_; }
 
-    bool isInside(T x, T y, T z) const;
+    bool contains(T x, T y, T z) const;
 
 protected:
     T x_;
@@ -106,9 +107,9 @@ template <class T> inline void Cone<T>::validate()
     box_.set(x_ - radius_, y_ - radius_, z_, x_ + radius_, y_ + radius_, z2_);
 }
 
-template <class T> inline bool Cone<T>::isInside(T x, T y, T z) const
+template <class T> inline bool Cone<T>::contains(T x, T y, T z) const
 {
-    if (box_.isInside(x, y, z))
+    if (box_.contains(x, y, z))
     {
         // Slow
         T d = std::sqrt(((x_ - x) * (x_ - x)) + ((y_ - y) * (y_ - y)));

@@ -62,7 +62,7 @@ private:
     void calculateTreePosition(TreeAttributesData &tree);
     void calculateTreeHeight(TreeAttributesData &tree);
 
-    size_t getTreeIndex(size_t treeId);
+    size_t treeIndex(size_t treeId);
 };
 
 #endif /* TREE_ATTRIBUTES_ACTION_HPP */

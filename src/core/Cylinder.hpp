@@ -49,11 +49,12 @@ public:
     const Vector3<T> &n() const { return n_; }
     T radius() const { return radius_; }
     T length() const { return length_; }
+
     const Box<T> &box() const { return box_; }
 
     void clear();
     bool empty() const { return box_.empty(); }
-    bool isInside(T x, T y, T z) const;
+    bool contains(T x, T y, T z) const;
 
 private:
     Vector3<T> a_;
@@ -152,9 +153,9 @@ template <class T> inline void Cylinder<T>::validate()
     box_.set(Vector3<T>::min(a_, b_) - c, Vector3<T>::max(a_, b_) + c);
 }
 
-template <class T> inline bool Cylinder<T>::isInside(T x, T y, T z) const
+template <class T> inline bool Cylinder<T>::contains(T x, T y, T z) const
 {
-    if (!box_.isInside(x, y, z))
+    if (!box_.contains(x, y, z))
     {
         return false;
     }

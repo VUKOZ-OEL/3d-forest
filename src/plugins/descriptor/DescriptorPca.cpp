@@ -56,7 +56,7 @@ bool DescriptorPca::computeDescriptor(Query &query,
 {
     double x, y, z, r;
 
-    cell.getCenter(x, y, z);
+    cell.center(x, y, z);
     r = cell.maximumLength();
 
     bool c;

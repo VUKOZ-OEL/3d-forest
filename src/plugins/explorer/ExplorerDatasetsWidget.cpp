@@ -164,7 +164,7 @@ void ExplorerDatasetsWidget::dataChanged()
 
 void ExplorerDatasetsWidget::filterChanged()
 {
-    LOG_DEBUG_UPDATE(<< "Output datasets filter <" << filter_.isFilterEnabled()
+    LOG_DEBUG_UPDATE(<< "Output datasets filter <" << filter_.filterEnabled()
                      << ">.");
 
     mainWindow_->suspendThreads();
@@ -209,9 +209,9 @@ void ExplorerDatasetsWidget::setDatasets(const Datasets &datasets,
     unblock();
 }
 
-bool ExplorerDatasetsWidget::isFilterEnabled() const
+bool ExplorerDatasetsWidget::filterEnabled() const
 {
-    return filter_.isFilterEnabled();
+    return filter_.filterEnabled();
 }
 
 void ExplorerDatasetsWidget::setFilterEnabled(bool b)
@@ -373,7 +373,7 @@ void ExplorerDatasetsWidget::updateTree()
     {
         size_t id = identifier(*it);
 
-        if (filter_.hasFilter(id))
+        if (filter_.filterEnabled(id))
         {
             (*it)->setCheckState(COLUMN_CHECKED, Qt::Checked);
         }
@@ -414,7 +414,7 @@ void ExplorerDatasetsWidget::addTreeItem(size_t index)
 
     size_t id = datasets_.id(index);
 
-    if (filter_.hasFilter(id))
+    if (filter_.filterEnabled(id))
     {
         item->setCheckState(COLUMN_CHECKED, Qt::Checked);
     }

@@ -188,9 +188,9 @@ void ExplorerClassificationsWidget::setClassifications(
     unblock();
 }
 
-bool ExplorerClassificationsWidget::isFilterEnabled() const
+bool ExplorerClassificationsWidget::filterEnabled() const
 {
-    return filter_.isFilterEnabled();
+    return filter_.filterEnabled();
 }
 
 void ExplorerClassificationsWidget::setFilterEnabled(bool b)
@@ -319,7 +319,7 @@ void ExplorerClassificationsWidget::updateTree()
 
     while (*it)
     {
-        if (filter_.hasFilter(i))
+        if (filter_.filterEnabled(i))
         {
             (*it)->setCheckState(COLUMN_CHECKED, Qt::Checked);
         }
@@ -359,7 +359,7 @@ void ExplorerClassificationsWidget::addTreeItem(size_t index)
 {
     QTreeWidgetItem *item = new QTreeWidgetItem(tree_);
 
-    if (filter_.hasFilter(index))
+    if (filter_.filterEnabled(index))
     {
         item->setCheckState(COLUMN_CHECKED, Qt::Checked);
     }

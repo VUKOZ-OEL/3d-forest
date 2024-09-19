@@ -70,8 +70,8 @@ void Dataset::read(size_t id,
 
     if (settings.translateToOrigin)
     {
-        Vector3<double> c1 = projectBoundary.getCenter();
-        Vector3<double> c2 = boundaryFile_.getCenter();
+        Vector3<double> c1 = projectBoundary.center();
+        Vector3<double> c2 = boundaryFile_.center();
         c1[2] = projectBoundary.min(2);
         c2[2] = boundaryFile_.min(2);
         translation_ = c1 - c2;
@@ -85,7 +85,7 @@ void fromJson(Dataset &out, const Json &in, const std::string &projectPath)
 {
     LOG_DEBUG(<< "Open from json. Project path <" << projectPath << ">.");
 
-    if (!in.isObject())
+    if (!in.typeObject())
     {
         THROW("Data set is not JSON object");
     }

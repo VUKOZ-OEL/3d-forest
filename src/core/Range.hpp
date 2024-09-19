@@ -37,8 +37,6 @@
 template <class T> class Range : public std::array<T, 4>
 {
 public:
-    bool enabled;
-
     // Construct/Copy/Destroy.
     Range();
 
@@ -48,7 +46,7 @@ public:
         this->operator[](1) = min;
         this->operator[](2) = max;
         this->operator[](3) = max;
-        enabled = true;
+        enabled_ = true;
     }
 
     Range(T min, T minValue, T maxValue, T max)
@@ -57,14 +55,14 @@ public:
         this->operator[](1) = minValue;
         this->operator[](2) = maxValue;
         this->operator[](3) = max;
-        enabled = true;
+        enabled_ = true;
     }
 
     ~Range();
 
     // Enabled.
-    void setEnabled(bool enabled_) { enabled = enabled_; }
-    bool isEnabled() const { return enabled; }
+    void setEnabled(bool enabled) { enabled_ = enabled; }
+    bool enabled() const { return enabled_; }
 
     // Access.
     bool empty() const;
@@ -105,6 +103,18 @@ public:
 
     // Operations.
     bool contains(T v) const;
+
+protected:
+    bool enabled_;
+
+    template <class U> friend void fromJson(Range<U> &out, const Json &in);
+
+    template <class U> friend void toJson(Json &out, const Range<U> &in);
+
+    template <class U> friend std::string toString(const Range<U> &in);
+
+    template <class U>
+    friend std::ostream &operator<<(std::ostream &out, const Range<U> &in);
 };
 
 template <class T> inline Range<T>::Range()
@@ -122,12 +132,12 @@ template <class T> inline void Range<T>::clear()
     this->operator[](1) = 0;
     this->operator[](2) = 0;
     this->operator[](3) = 0;
-    enabled = true;
+    enabled_ = true;
 }
 
 template <class T> inline bool Range<T>::empty() const
 {
-    return isEqual(minimum(), maximum());
+    return equal(minimum(), maximum());
 }
 
 template <class T> inline bool Range<T>::full() const
@@ -148,33 +158,33 @@ template <class T> inline bool Range<T>::contains(T v) const
     return !(v < minimumValue() || v > maximumValue());
 }
 
-template <class T> inline void fromJson(Range<T> &out, const Json &in)
+template <class U> inline void fromJson(Range<U> &out, const Json &in)
 {
     fromJson(out[0], in["minimum"]);
     fromJson(out[1], in["minimumValue"]);
     fromJson(out[2], in["maximumValue"]);
     fromJson(out[3], in["maximum"]);
-    fromJson(out.enabled, in["enabled"]);
+    fromJson(out.enabled_, in["enabled"]);
 }
 
-template <class T> inline void toJson(Json &out, const Range<T> &in)
+template <class U> inline void toJson(Json &out, const Range<U> &in)
 {
     toJson(out["minimum"], in[0]);
     toJson(out["minimumValue"], in[1]);
     toJson(out["maximumValue"], in[2]);
     toJson(out["maximum"], in[3]);
-    toJson(out["enabled"], in.enabled);
+    toJson(out["enabled"], in.enabled_);
 }
 
-template <class T> inline std::string toString(const Range<T> &in)
+template <class U> inline std::string toString(const Range<U> &in)
 {
     Json json;
     toJson(json, in);
     return json.serialize(0);
 }
 
-template <class T>
-std::ostream &operator<<(std::ostream &out, const Range<T> &in)
+template <class U>
+std::ostream &operator<<(std::ostream &out, const Range<U> &in)
 {
     return out << toString(in);
 }

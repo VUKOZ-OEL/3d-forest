@@ -176,8 +176,8 @@ void ViewerOpenGL::renderAabb(const ViewerAabb &box)
 {
     // Render wireframe cuboid.
     QVector3D v[8];
-    QVector3D min = box.getMin();
-    QVector3D max = box.getMax();
+    QVector3D min = box.min();
+    QVector3D max = box.max();
 
     v[0] = QVector3D(min[0], min[1], min[2]);
     v[1] = QVector3D(max[0], min[1], min[2]);

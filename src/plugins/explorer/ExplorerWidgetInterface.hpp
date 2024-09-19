@@ -49,8 +49,8 @@ public:
     virtual bool hasColorSource() const = 0;
     virtual SettingsView::ColorSource colorSource() const = 0;
 
-    virtual bool hasFilter() const = 0;
-    virtual bool isFilterEnabled() const { return filterEnabled_; }
+    virtual bool filterAvailable() const = 0;
+    virtual bool filterEnabled() const { return filterEnabled_; }
     virtual void setFilterEnabled(bool b) { filterEnabled_ = b; }
 
 protected:

@@ -54,7 +54,7 @@ SettingsViewWidget::SettingsViewWidget(MainWindow *mainWindow)
 
     // Fog.
     fogCheckBox_ = new QCheckBox;
-    fogCheckBox_->setChecked(settings_.isFogEnabled());
+    fogCheckBox_->setChecked(settings_.fogEnabled());
     fogCheckBox_->setToolTip(tr("Reduce intensity with increasing distance"));
     fogCheckBox_->setText(tr("Show Depth"));
     connect(fogCheckBox_,
@@ -63,7 +63,7 @@ SettingsViewWidget::SettingsViewWidget(MainWindow *mainWindow)
             SLOT(slotSetFogEnabled(int)));
 
     showAttributesCheckBox_ = new QCheckBox;
-    showAttributesCheckBox_->setChecked(settings_.isShowAttributesEnabled());
+    showAttributesCheckBox_->setChecked(settings_.showAttributesEnabled());
     showAttributesCheckBox_->setText(tr("Show Tree Attributes"));
     connect(showAttributesCheckBox_,
             SIGNAL(stateChanged(int)),
@@ -85,7 +85,7 @@ SettingsViewWidget::SettingsViewWidget(MainWindow *mainWindow)
     }
     for (size_t i = 0; i < settings_.colorSourceSize(); i++)
     {
-        if (settings_.isColorSourceEnabled(i))
+        if (settings_.colorSourceEnabled(i))
         {
             colorSourceComboBox_->setCurrentText(
                 settings_.colorSourceString(i));

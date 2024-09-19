@@ -47,11 +47,11 @@ bool PageManager::Key::operator<(const Key &rhs) const
     return pageId < rhs.pageId;
 }
 
-std::shared_ptr<PageData> PageManager::get(Editor *editor,
-                                           size_t dataset,
-                                           size_t index)
+std::shared_ptr<PageData> PageManager::readPage(Editor *editor,
+                                                size_t dataset,
+                                                size_t index)
 {
-    LOG_DEBUG(<< "Get page <" << index << "> dataset <" << dataset << ">.");
+    LOG_DEBUG(<< "Read page <" << index << "> dataset <" << dataset << ">.");
 
     Key nk = {dataset, index};
 
@@ -77,7 +77,7 @@ std::shared_ptr<PageData> PageManager::get(Editor *editor,
     return result;
 }
 
-void PageManager::erase(Editor *editor, size_t dataset, size_t index)
+void PageManager::erasePage(Editor *editor, size_t dataset, size_t index)
 {
     LOG_DEBUG(<< "Erase page <" << index << "> dataset <" << dataset << ">.");
 
@@ -88,7 +88,7 @@ void PageManager::erase(Editor *editor, size_t dataset, size_t index)
     {
         if (it->second.use_count() == 1)
         {
-            if (it->second->isModified())
+            if (it->second->modified())
             {
                 it->second->writePage(editor);
             }

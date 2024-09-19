@@ -88,7 +88,7 @@ public:
                 size_t recordSize = 0);
     void open(const std::string &path);
     void close();
-    bool isOpen() const { return file_.isOpen(); }
+    bool open() const { return file_.open(); }
 
     RecordFile::Type recordType() const { return recordType_; }
     size_t recordSize() const { return recordSize_; }

@@ -47,7 +47,7 @@ TEST_CASE(TestDescriptorPcaCube)
                          {0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0},  // y
                          {0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0}}; // z
 
-    TEST(isInRange(testDescriptorPcaCompute(cube), 0.32, 0.34)); // 0.33
+    TEST(between(testDescriptorPcaCompute(cube), 0.32, 0.34)); // 0.33
 }
 
 TEST_CASE(TestDescriptorPcaPlane)
@@ -57,7 +57,7 @@ TEST_CASE(TestDescriptorPcaPlane)
                           {0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0},  // y
                           {0.0, 0.0, 0.0, 0.0, 0.1, 0.1, 0.1, 0.1}}; // z
 
-    TEST(isInRange(testDescriptorPcaCompute(plane), 0.47, 0.49)); // 0.48
+    TEST(between(testDescriptorPcaCompute(plane), 0.47, 0.49)); // 0.48
 }
 
 TEST_CASE(TestDescriptorPcaLine)
@@ -67,5 +67,5 @@ TEST_CASE(TestDescriptorPcaLine)
                          {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // y
                          {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0}}; // z
 
-    TEST(isInRange(testDescriptorPcaCompute(line), 0.99, 1.01)); // 1.0
+    TEST(between(testDescriptorPcaCompute(line), 0.99, 1.01)); // 1.0
 }

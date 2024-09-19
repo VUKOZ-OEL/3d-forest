@@ -32,7 +32,7 @@ class ExportFileFormatInterface
 public:
     virtual ~ExportFileFormatInterface() = default;
 
-    virtual bool isOpen() = 0;
+    virtual bool open() = 0;
     virtual void create(const std::string &path) = 0;
     virtual void write(Query &query) = 0;
     virtual void close() = 0;

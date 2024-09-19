@@ -404,9 +404,9 @@ void LasFile::close()
     }
 }
 
-bool LasFile::isOpen() const
+bool LasFile::open() const
 {
-    return file_.isOpen();
+    return file_.open();
 }
 
 void LasFile::move(const std::string &outputPath, const std::string &inputPath)

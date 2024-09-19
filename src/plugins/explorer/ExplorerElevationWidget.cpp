@@ -130,9 +130,9 @@ void ExplorerElevationWidget::slotRangeIntermediateMaximumValue()
     filterChanged();
 }
 
-bool ExplorerElevationWidget::isFilterEnabled() const
+bool ExplorerElevationWidget::filterEnabled() const
 {
-    return elevationRange_.isEnabled();
+    return elevationRange_.enabled();
 }
 
 void ExplorerElevationWidget::setFilterEnabled(bool b)

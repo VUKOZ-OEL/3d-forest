@@ -127,7 +127,7 @@ void ViewerOpenGLViewport::wheelEvent(QWheelEvent *event)
 
 void ViewerOpenGLViewport::setFocus()
 {
-    if (!isSelected())
+    if (!selected())
     {
         if (windowViewports_)
         {
@@ -163,7 +163,7 @@ void ViewerOpenGLViewport::setSelected(bool selected)
     selected_ = selected;
 }
 
-bool ViewerOpenGLViewport::isSelected() const
+bool ViewerOpenGLViewport::selected() const
 {
     return selected_;
 }
@@ -213,7 +213,7 @@ void ViewerOpenGLViewport::setViewPerspective()
 void ViewerOpenGLViewport::setViewDirection(const QVector3D &dir,
                                             const QVector3D &up)
 {
-    camera_.setLookAt(dir, camera_.getDistance(), camera_.getCenter(), up);
+    camera_.setLookAt(dir, camera_.distance(), camera_.center(), up);
 
     LOG_DEBUG(<< "Updated view direction in viewport <" << viewportId_
               << "> to camera <" << camera_ << "> from dir <" << dir << "> up <"
@@ -278,19 +278,19 @@ void ViewerOpenGLViewport::setViewResetDistance()
     LOG_DEBUG(<< "Reset view distance in viewport <" << viewportId_ << ">.");
 
     float distance = 1.0F;
-    if (aabb_.isValid())
+    if (aabb_.valid())
     {
-        distance = aabb_.getRadius() * 2.0F;
+        distance = aabb_.radius() * 2.0F;
     }
     if (distance < 1e-6)
     {
         distance = 1.0F;
     }
 
-    camera_.setLookAt(camera_.getDirection(),
+    camera_.setLookAt(camera_.direction(),
                       distance,
-                      camera_.getCenter(),
-                      camera_.getUp());
+                      camera_.center(),
+                      camera_.up());
 
     LOG_DEBUG(<< "Updated view distance in viewport <" << viewportId_
               << "> to camera <" << camera_ << "> from distance <" << distance
@@ -301,17 +301,17 @@ void ViewerOpenGLViewport::setViewResetCenter()
 {
     LOG_DEBUG(<< "Reset view center in viewport <" << viewportId_ << ">.");
 
-    QVector3D center = camera_.getCenter();
-    if (aabb_.isValid())
+    QVector3D center = camera_.center();
+    if (aabb_.valid())
     {
-        center = aabb_.getCenter();
-        // center[2] = aabb_.getMin().z();
+        center = aabb_.center();
+        // center[2] = aabb_.min().z();
     }
 
-    camera_.setLookAt(camera_.getDirection(),
-                      camera_.getDistance(),
+    camera_.setLookAt(camera_.direction(),
+                      camera_.distance(),
                       center,
-                      camera_.getUp());
+                      camera_.up());
 
     LOG_DEBUG(<< "Updated view center in viewport <" << viewportId_
               << "> to camera <" << camera_ << "> from aabb <" << aabb_
@@ -332,10 +332,10 @@ void ViewerOpenGLViewport::paintGL()
     glViewport(0, 0, camera_.width(), camera_.height());
 
     glMatrixMode(GL_PROJECTION);
-    glLoadMatrixf(camera_.getProjection().data());
+    glLoadMatrixf(camera_.projection().data());
 
     glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixf(camera_.getModelView().data());
+    glLoadMatrixf(camera_.modelView().data());
 
     // Render.
     renderScene();
@@ -441,9 +441,9 @@ void ViewerOpenGLViewport::renderFirstFrame()
     renderGuides();
 
     glMatrixMode(GL_PROJECTION);
-    glLoadMatrixf(camera_.getProjection().data());
+    glLoadMatrixf(camera_.projection().data());
     glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixf(camera_.getModelView().data());
+    glLoadMatrixf(camera_.modelView().data());
 }
 
 void ViewerOpenGLViewport::renderSegments()
@@ -469,8 +469,8 @@ void ViewerOpenGLViewport::renderSegments()
             continue;
         }
 
-        if (editor_->settings().view().isShowAttributesEnabled() &&
-            segment.hasCalculatedAttributes)
+        if (editor_->settings().view().showAttributesEnabled() &&
+            segment.attributesCalculated)
         {
             glColor3f(1.0F, 1.0F, 0.0F);
 
@@ -565,15 +565,15 @@ void ViewerOpenGLViewport::renderSceneSettingsEnable()
     glPointSize(static_cast<float>(opt.pointSize()));
 
     // Fog.
-    if (opt.isFogEnabled())
+    if (opt.fogEnabled())
     {
-        QVector3D eye = camera_.getEye();
-        QVector3D direction = -camera_.getDirection();
+        QVector3D eye = camera_.eye();
+        QVector3D direction = -camera_.direction();
         direction.normalize();
 
         float min;
         float max;
-        aabb_.getRange(eye, direction, &min, &max);
+        aabb_.range(eye, direction, &min, &max);
         float d = max - min;
 
         GLfloat colorFog[4]{0.0F, 0.0F, 0.0F, 0.0F};
@@ -590,7 +590,7 @@ void ViewerOpenGLViewport::renderSceneSettingsDisable()
 {
     glPointSize(1.0F);
 
-    if (editor_->settings().view().isFogEnabled())
+    if (editor_->settings().view().fogEnabled())
     {
         glDisable(GL_FOG);
     }

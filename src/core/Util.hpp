@@ -133,20 +133,20 @@ inline double safeDivide(double numerator, double denominator)
     return numerator / denominator;
 }
 
-inline bool isZero(double number)
+inline bool zero(double number)
 {
     return std::fabs(number) < std::numeric_limits<double>::epsilon();
 }
 
-template <typename T> inline bool isEqual(T a, T b)
+template <typename T> inline bool equal(T a, T b)
 {
     return std::abs(a - b) <= (std::max(std::abs(a), std::abs(b)) *
                                std::numeric_limits<T>::epsilon());
 }
 
-template <typename T> inline bool isInRange(T v, T a, T b)
+template <typename T> inline bool between(T v, T a, T b)
 {
-    return v > a && v < b;
+    return a <= v && v <= b;
 }
 
 inline char *ustrcpy(char *dst, const char *src)

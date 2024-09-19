@@ -231,9 +231,9 @@ void ExplorerSegmentsWidget::setSegments(const Segments &segments,
     unblock();
 }
 
-bool ExplorerSegmentsWidget::isFilterEnabled() const
+bool ExplorerSegmentsWidget::filterEnabled() const
 {
-    return filter_.isFilterEnabled();
+    return filter_.filterEnabled();
 }
 
 void ExplorerSegmentsWidget::setFilterEnabled(bool b)
@@ -427,7 +427,7 @@ void ExplorerSegmentsWidget::updateTree()
     {
         size_t id = identifier(*it);
 
-        if (filter_.hasFilter(id))
+        if (filter_.filterEnabled(id))
         {
             (*it)->setCheckState(COLUMN_CHECKED, Qt::Checked);
         }
@@ -473,7 +473,7 @@ void ExplorerSegmentsWidget::addTreeItem(size_t index)
 
     size_t id = segments_.id(index);
 
-    if (filter_.hasFilter(id))
+    if (filter_.filterEnabled(id))
     {
         item->setCheckState(COLUMN_CHECKED, Qt::Checked);
     }

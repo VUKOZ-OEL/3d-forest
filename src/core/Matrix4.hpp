@@ -62,7 +62,7 @@ public:
     T &operator()(size_t r, size_t c) { return data_[c][r]; }
     const T *data() const { return &data_[0][0]; }
 
-    void setToIdentity();
+    void identity();
     void invert();
     Matrix4<T> inverted() const;
 
@@ -131,7 +131,7 @@ protected:
 
 template <class T> inline Matrix4<T>::Matrix4()
 {
-    setToIdentity();
+    identity();
 }
 
 template <class T> inline Matrix4<T>::~Matrix4()
@@ -227,7 +227,7 @@ inline Matrix4<T>::Matrix4(T m00,
     data_[3][3] = m33;
 }
 
-template <class T> inline void Matrix4<T>::setToIdentity()
+template <class T> inline void Matrix4<T>::identity()
 {
     data_[0][0] = data_[1][1] = data_[2][2] = data_[3][3] = 1;
 

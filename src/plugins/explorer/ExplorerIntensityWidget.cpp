@@ -121,9 +121,9 @@ void ExplorerIntensityWidget::slotRangeIntermediateMaximumValue()
     filterChanged();
 }
 
-bool ExplorerIntensityWidget::isFilterEnabled() const
+bool ExplorerIntensityWidget::filterEnabled() const
 {
-    return intensityRange_.isEnabled();
+    return intensityRange_.enabled();
 }
 
 void ExplorerIntensityWidget::setFilterEnabled(bool b)

@@ -66,7 +66,7 @@ public:
 
     virtual void initialize(MainWindow *mainWindow);
 
-    virtual bool isModifierEnabled();
+    virtual bool modifierEnabled();
     virtual void applyModifier(Page *page);
 
 public slots:

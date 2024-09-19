@@ -123,9 +123,9 @@ void ExplorerDescriptorWidget::slotRangeIntermediateMaximumValue()
     filterChanged();
 }
 
-bool ExplorerDescriptorWidget::isFilterEnabled() const
+bool ExplorerDescriptorWidget::filterEnabled() const
 {
-    return descriptorRange_.isEnabled();
+    return descriptorRange_.enabled();
 }
 
 void ExplorerDescriptorWidget::setFilterEnabled(bool b)

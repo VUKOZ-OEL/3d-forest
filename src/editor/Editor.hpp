@@ -66,7 +66,7 @@ public:
     void saveProject(const std::string &path);
     const std::string &projectPath() const { return projectPath_; }
     const std::string &projectName() const { return projectName_; }
-    bool hasUnsavedChanges() const { return unsavedChanges_; }
+    bool unsavedChanges() const { return unsavedChanges_; }
     void close();
 
     // Data sets.

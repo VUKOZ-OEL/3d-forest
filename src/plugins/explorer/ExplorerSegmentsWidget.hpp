@@ -51,8 +51,8 @@ public:
         return SettingsView::COLOR_SOURCE_SEGMENT;
     }
 
-    virtual bool hasFilter() const { return true; }
-    virtual bool isFilterEnabled() const;
+    virtual bool filterAvailable() const { return true; }
+    virtual bool filterEnabled() const;
     virtual void setFilterEnabled(bool b);
 
 public slots:

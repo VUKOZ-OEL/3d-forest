@@ -44,7 +44,7 @@
 @code
     Json obj;
     obj.deserialize("{\"a\":5}");
-    std::cout << obj["a"].isNumber() << "\n"; // 1
+    std::cout << obj["a"].typeNumber() << "\n"; // 1
     std::cout << obj["a"].number() << "\n"; // 5
 @endcode
 
@@ -61,7 +61,7 @@
     Json obj;
     obj["name"] = "John";
 
-    std::cout << obj["name"].isString() << "\n"; // 1
+    std::cout << obj["name"].typeString() << "\n"; // 1
     std::cout << obj["name"].string() << "\n"; // John
     std::cout << obj.serialize(0) << "\n"; // {"name":"John"}
 @endcode
@@ -73,8 +73,8 @@
     obj["dim"][1] = 20;
     obj["scale"] = std::vector<double>{ 1, 2, 3 };
 
-    std::cout << obj.isObject() << "\n"; // 1
-    std::cout << obj["dim"].isArray() << "\n"; // 1
+    std::cout << obj.typeObject() << "\n"; // 1
+    std::cout << obj["dim"].typeArray() << "\n"; // 1
     std::cout << obj["dim"].size() << "\n"; // 2
     std::cout << obj["dim"][0].number() << "\n"; // 10
     std::cout << obj["dim"][1].number() << "\n"; // 20
@@ -138,13 +138,13 @@ public:
     uint64_t uint64() const;
 
     // Type.
-    bool isObject() const { return type_ == TYPE_OBJECT; }
-    bool isArray() const { return type_ == TYPE_ARRAY; }
-    bool isString() const { return type_ == TYPE_STRING; }
-    bool isNumber() const { return type_ == TYPE_NUMBER; }
-    bool isTrue() const { return type_ == TYPE_TRUE; }
-    bool isFalse() const { return type_ == TYPE_FALSE; }
-    bool isNull() const { return type_ == TYPE_NULL; }
+    bool typeObject() const { return type_ == TYPE_OBJECT; }
+    bool typeArray() const { return type_ == TYPE_ARRAY; }
+    bool typeString() const { return type_ == TYPE_STRING; }
+    bool typeNumber() const { return type_ == TYPE_NUMBER; }
+    bool typeTrue() const { return type_ == TYPE_TRUE; }
+    bool typeFalse() const { return type_ == TYPE_FALSE; }
+    bool typeNull() const { return type_ == TYPE_NULL; }
 
     // Serialization.
     std::string serialize(size_t indent = DEFAULT_INDENT) const;
@@ -315,17 +315,17 @@ inline void Json::createType(Type t)
 
 inline bool Json::contains(const std::string &key) const
 {
-    return isObject() && data_.object->find(key) != data_.object->end();
+    return typeObject() && data_.object->find(key) != data_.object->end();
 }
 
 inline bool Json::containsObject(const std::string &key) const
 {
-    if (isObject())
+    if (typeObject())
     {
         auto search = data_.object->find(key);
         if (search != data_.object->end())
         {
-            return search->second.isObject();
+            return search->second.typeObject();
         }
     }
     return false;
@@ -333,12 +333,12 @@ inline bool Json::containsObject(const std::string &key) const
 
 inline bool Json::containsArray(const std::string &key) const
 {
-    if (isObject())
+    if (typeObject())
     {
         auto search = data_.object->find(key);
         if (search != data_.object->end())
         {
-            return search->second.isArray();
+            return search->second.typeArray();
         }
     }
     return false;
@@ -346,12 +346,12 @@ inline bool Json::containsArray(const std::string &key) const
 
 inline bool Json::containsString(const std::string &key) const
 {
-    if (isObject())
+    if (typeObject())
     {
         auto search = data_.object->find(key);
         if (search != data_.object->end())
         {
-            return search->second.isString();
+            return search->second.typeString();
         }
     }
     return false;
@@ -359,12 +359,12 @@ inline bool Json::containsString(const std::string &key) const
 
 inline bool Json::containsNumber(const std::string &key) const
 {
-    if (isObject())
+    if (typeObject())
     {
         auto search = data_.object->find(key);
         if (search != data_.object->end())
         {
-            return search->second.isNumber();
+            return search->second.typeNumber();
         }
     }
     return false;
@@ -372,12 +372,12 @@ inline bool Json::containsNumber(const std::string &key) const
 
 inline bool Json::containsBool(const std::string &key) const
 {
-    if (isObject())
+    if (typeObject())
     {
         auto search = data_.object->find(key);
         if (search != data_.object->end())
         {
-            return search->second.isTrue() || search->second.isFalse();
+            return search->second.typeTrue() || search->second.typeFalse();
         }
     }
     return false;
@@ -385,7 +385,7 @@ inline bool Json::containsBool(const std::string &key) const
 
 inline Json &Json::operator[](const std::string &key)
 {
-    if (!isObject())
+    if (!typeObject())
     {
         createObject();
     }
@@ -401,7 +401,7 @@ inline Json &Json::operator[](const std::string &key)
 
 inline const Json &Json::operator[](const std::string &key) const
 {
-    if (!isObject())
+    if (!typeObject())
     {
         THROW("JSON value is not object");
     }
@@ -417,7 +417,7 @@ inline const Json &Json::operator[](const std::string &key) const
 
 inline size_t Json::size() const
 {
-    if (!isArray())
+    if (!typeArray())
     {
         THROW("JSON value is not array");
     }
@@ -427,7 +427,7 @@ inline size_t Json::size() const
 
 inline Json &Json::operator[](size_t index)
 {
-    if (!isArray())
+    if (!typeArray())
     {
         createArray();
     }
@@ -442,7 +442,7 @@ inline Json &Json::operator[](size_t index)
 
 inline const Json &Json::operator[](size_t index) const
 {
-    if (!isArray())
+    if (!typeArray())
     {
         THROW("JSON value is not array");
     }
@@ -457,7 +457,7 @@ inline const Json &Json::operator[](size_t index) const
 
 inline const std::map<std::string, Json> &Json::object() const
 {
-    if (!isObject())
+    if (!typeObject())
     {
         THROW("JSON value is not object");
     }
@@ -467,7 +467,7 @@ inline const std::map<std::string, Json> &Json::object() const
 
 inline const std::vector<Json> &Json::array() const
 {
-    if (!isArray())
+    if (!typeArray())
     {
         THROW("JSON value is not array");
     }
@@ -477,7 +477,7 @@ inline const std::vector<Json> &Json::array() const
 
 inline const std::string &Json::string() const
 {
-    if (!isString())
+    if (!typeString())
     {
         THROW("JSON value is not string");
     }
@@ -487,7 +487,7 @@ inline const std::string &Json::string() const
 
 inline double Json::number() const
 {
-    if (!isNumber())
+    if (!typeNumber())
     {
         THROW("JSON value is not number");
     }
@@ -497,7 +497,7 @@ inline double Json::number() const
 
 inline uint32_t Json::uint32() const
 {
-    if (!isNumber())
+    if (!typeNumber())
     {
         THROW("JSON value is not number");
     }
@@ -512,7 +512,7 @@ inline uint32_t Json::uint32() const
 
 inline uint64_t Json::uint64() const
 {
-    if (!isNumber())
+    if (!typeNumber())
     {
         THROW("JSON value is not number");
     }
@@ -532,7 +532,7 @@ inline std::ostream &operator<<(std::ostream &out, const Json &in)
 
 inline void fromJson(bool &out, const Json &in)
 {
-    out = in.isTrue();
+    out = in.typeTrue();
 }
 
 inline void fromJson(int &out, const Json &in)

@@ -30,7 +30,7 @@ TEST_CASE(TestJsonString)
     obj["name"] = "John";
 
     TEST(obj.contains("name"));
-    TEST(obj["name"].isString());
+    TEST(obj["name"].typeString());
     TEST(obj["name"].string() == "John");
 }
 
@@ -40,8 +40,8 @@ TEST_CASE(TestJsonNumber)
     obj["width"] = 5;
 
     TEST(obj.contains("width"));
-    TEST(obj["width"].isNumber());
-    TEST(isEqual(obj["width"].number(), 5.0));
+    TEST(obj["width"].typeNumber());
+    TEST(equal(obj["width"].number(), 5.0));
 }
 
 TEST_CASE(TestJsonSerialize)
@@ -50,13 +50,13 @@ TEST_CASE(TestJsonSerialize)
     a.deserialize("{\"width\":5}");
 
     TEST(a.contains("width"));
-    TEST(a["width"].isNumber());
-    TEST(isEqual(a["width"].number(), 5.0));
+    TEST(a["width"].typeNumber());
+    TEST(equal(a["width"].number(), 5.0));
 
     Json b;
     b.deserialize(a.serialize());
 
     TEST(b.contains("width"));
-    TEST(b["width"].isNumber());
-    TEST(isEqual(b["width"].number(), 5.0));
+    TEST(b["width"].typeNumber());
+    TEST(equal(b["width"].number(), 5.0));
 }

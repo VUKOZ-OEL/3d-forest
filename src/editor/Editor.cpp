@@ -115,7 +115,7 @@ void Editor::openProject(const std::string &path)
     Json in;
     in.read(path);
 
-    if (!in.isObject())
+    if (!in.typeObject())
     {
         LOG_DEBUG(<< "Cancel opening new project, exception is raised.");
         THROW("Project file '" + path + "' is not in JSON object");
@@ -435,7 +435,7 @@ void Editor::runModifiers(Page *page)
     for (auto &it : modifiers_)
     {
         /** @todo Collect enabled modifiers during preprocessing. */
-        if (it->isModifierEnabled())
+        if (it->modifierEnabled())
         {
             it->applyModifier(page);
         }
@@ -451,10 +451,10 @@ void Editor::viewportsResize(size_t n)
 
 std::shared_ptr<PageData> Editor::readPage(size_t dataset, size_t index)
 {
-    return pageManager_.get(this, dataset, index);
+    return pageManager_.readPage(this, dataset, index);
 }
 
 void Editor::erasePage(size_t dataset, size_t index)
 {
-    pageManager_.erase(this, dataset, index);
+    pageManager_.erasePage(this, dataset, index);
 }

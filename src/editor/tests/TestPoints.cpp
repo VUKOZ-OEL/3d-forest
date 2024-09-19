@@ -32,12 +32,12 @@ TEST_CASE(TestPointsCreate)
     p.push_back({1.0, 0.0, 0.0});
 
     TEST(pc.size() == 1);
-    TEST(isEqual(pc[0].x, 1.0));
+    TEST(equal(pc[0].x, 1.0));
 
     std::vector<size_t> result;
     p.createIndex();
     p.findRadius(0.0, 0.0, 0.0, 1.1, result);
-    TEST(result.size() == 1 && isEqual(pc[result[0]].x, 1.0));
+    TEST(result.size() == 1 && equal(pc[result[0]].x, 1.0));
 }
 
 TEST_CASE(TestPointsFindNN)
@@ -71,8 +71,8 @@ TEST_CASE(TestPointsOctreeRadiusFloat)
     octree.radiusNeighbors<unibn::L2Distance<TestPoint3f>>({0.0F, 0.0F, 0.0F},
                                                            0.2F,
                                                            results);
-    TEST(results.size() == 2 && isEqual(points[results[0]].x, 0.0F));
-    TEST(results.size() == 2 && isEqual(points[results[1]].x, 0.1F));
+    TEST(results.size() == 2 && equal(points[results[0]].x, 0.0F));
+    TEST(results.size() == 2 && equal(points[results[1]].x, 0.1F));
 }
 
 class TestPoint3d
@@ -97,6 +97,6 @@ TEST_CASE(TestPointsOctreeRadiusDouble)
     octree.radiusNeighbors<unibn::L2Distance<TestPoint3d>>({0.0, 0.0, 0.0},
                                                            0.2,
                                                            results);
-    TEST(results.size() == 2 && isEqual(points[results[0]].x, 0.0));
-    TEST(results.size() == 2 && isEqual(points[results[1]].x, 0.1));
+    TEST(results.size() == 2 && equal(points[results[0]].x, 0.0));
+    TEST(results.size() == 2 && equal(points[results[1]].x, 0.1));
 }

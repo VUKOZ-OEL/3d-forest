@@ -239,7 +239,7 @@ void Query::flush()
 {
     for (size_t i = 0; i < lru_.size(); i++)
     {
-        if (lru_[i]->isModified())
+        if (lru_[i]->modified())
         {
             lru_[i]->writePage();
         }
@@ -283,7 +283,7 @@ void Query::applyCamera(const Camera &camera)
 
     std::multimap<double, Key> queue;
 
-    if (where().dataset().isFilterEnabled())
+    if (where().dataset().filterEnabled())
     {
         const std::unordered_set<size_t> &idList = where().dataset().filter();
         for (auto const &it : idList)
@@ -697,7 +697,7 @@ std::shared_ptr<Page> Query::read(size_t dataset, size_t index)
             {
                 // Drop oldest page.
                 idx = lru_.size() - 1;
-                if (lru_[idx]->isModified())
+                if (lru_[idx]->modified())
                 {
                     lru_[idx]->writePage();
                 }

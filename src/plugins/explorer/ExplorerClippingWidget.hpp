@@ -46,7 +46,7 @@ public:
         return SettingsView::COLOR_SOURCE_LAST;
     }
 
-    virtual bool hasFilter() const { return true; }
+    virtual bool filterAvailable() const { return true; }
     virtual void setFilterEnabled(bool b);
 
 public slots:

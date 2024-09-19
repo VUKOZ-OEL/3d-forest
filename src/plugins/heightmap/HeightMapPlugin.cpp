@@ -66,9 +66,9 @@ void HeightMapPlugin::slotPlugin()
     pluginWindow_->activateWindow();
 }
 
-bool HeightMapPlugin::isModifierEnabled()
+bool HeightMapPlugin::modifierEnabled()
 {
-    return modifier_.isPreviewEnabled();
+    return modifier_.previewEnabled();
 }
 
 void HeightMapPlugin::applyModifier(Page *page)

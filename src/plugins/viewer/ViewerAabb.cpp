@@ -114,10 +114,10 @@ void ViewerAabb::set(const Box<double> &box)
 
 void ViewerAabb::extend(const ViewerAabb &box)
 {
-    QVector3D min = box.getMin();
-    QVector3D max = box.getMax();
+    QVector3D min = box.min();
+    QVector3D max = box.max();
 
-    if (isValid())
+    if (valid())
     {
         if (min[0] < min_[0])
             min_[0] = min[0];
@@ -154,10 +154,10 @@ void ViewerAabb::setValid()
     valid_ = true;
 }
 
-void ViewerAabb::getRange(const QVector3D &eye,
-                          const QVector3D &direction,
-                          float *min,
-                          float *max)
+void ViewerAabb::range(const QVector3D &eye,
+                       const QVector3D &direction,
+                       float *min,
+                       float *max)
 {
     QVector3D v[8];
     v[0] = QVector3D(min_[0], min_[1], min_[2]);
@@ -171,7 +171,7 @@ void ViewerAabb::getRange(const QVector3D &eye,
 
     float d;
     float offset = -QVector3D::dotProduct(eye, direction);
-    *min = QVector3D::dotProduct(getCenter(), direction) + offset;
+    *min = QVector3D::dotProduct(center(), direction) + offset;
     *max = *min;
 
     for (int i = 0; i < 8; i++)

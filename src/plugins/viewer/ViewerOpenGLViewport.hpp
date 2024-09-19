@@ -48,7 +48,7 @@ public:
     size_t viewportId() const;
 
     void setSelected(bool selected);
-    bool isSelected() const;
+    bool selected() const;
 
     void updateScene(Editor *editor);
     void resetScene(Editor *editor, bool resetView);

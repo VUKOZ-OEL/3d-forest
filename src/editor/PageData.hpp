@@ -130,7 +130,7 @@ public:
     size_t size() const { return intensity.size(); }
 
     void setModified() { modified_ = true; }
-    bool isModified() const { return modified_; }
+    bool modified() const { return modified_; }
 
 private:
     /** Dataset identifier. */

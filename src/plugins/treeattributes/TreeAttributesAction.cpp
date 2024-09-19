@@ -105,7 +105,7 @@ void TreeAttributesAction::next()
     }
 }
 
-size_t TreeAttributesAction::getTreeIndex(size_t treeId)
+size_t TreeAttributesAction::treeIndex(size_t treeId)
 {
     auto it = treesMap_.find(treeId);
 
@@ -151,7 +151,7 @@ void TreeAttributesAction::stepPointsToTrees()
             if ((query_.z() - segment.boundary.min(2)) <=
                 parameters_.treePositionHeightRange)
             {
-                TreeAttributesData &tree = trees_[getTreeIndex(treeId)];
+                TreeAttributesData &tree = trees_[treeIndex(treeId)];
 
                 // Add point X and Y coordinates to X and Y coordinates lists.
                 tree.xCoordinates.push_back(query_.x());
@@ -172,7 +172,7 @@ void TreeAttributesAction::stepPointsToTrees()
                 query_.elevation() <=
                     parameters_.dbhElevation + parameters_.dbhElevationRange)
             {
-                TreeAttributesData &tree = trees_[getTreeIndex(treeId)];
+                TreeAttributesData &tree = trees_[treeIndex(treeId)];
 
                 tree.dbhPoints.push_back(query_.x());
                 tree.dbhPoints.push_back(query_.y());
@@ -184,7 +184,7 @@ void TreeAttributesAction::stepPointsToTrees()
             if ((segment.boundary.max(2) - query_.z()) <=
                 parameters_.treeTipHeightRange)
             {
-                TreeAttributesData &tree = trees_[getTreeIndex(treeId)];
+                TreeAttributesData &tree = trees_[treeIndex(treeId)];
 
                 // When point elevation has new highest value, then
                 // set the value as new elevation maximum.
@@ -354,7 +354,7 @@ void TreeAttributesAction::stepUpdateTreeAttributes()
         segment.dbhPosition = it.dbhPosition;
         segment.dbh = it.dbh;
 
-        segment.hasCalculatedAttributes = true;
+        segment.attributesCalculated = true;
 
         LOG_DEBUG(<< "Tree position <" << segment.position << "> height <"
                   << segment.height << "> DBH <" << segment.dbh << ">.");

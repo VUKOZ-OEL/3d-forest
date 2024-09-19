@@ -50,7 +50,7 @@ public:
     void stop();
     void wait();
 
-    bool isRunning();
+    bool running();
 
     virtual bool next() = 0;
 

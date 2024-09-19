@@ -56,23 +56,23 @@ public:
     double pointSize() const;
     void setPointSize(double size);
 
-    bool isFogEnabled() const;
+    bool fogEnabled() const;
     void setFogEnabled(bool b);
 
-    bool isShowAttributesEnabled() const;
+    bool showAttributesEnabled() const;
     void setShowAttributesEnabled(bool b);
 
-    void setPointColor(const Vector3<double> &rgb);
     const Vector3<double> &pointColor() const { return pointColor_; }
+    void setPointColor(const Vector3<double> &rgb);
 
-    void setBackgroundColor(const Vector3<double> &rgb);
     const Vector3<double> &backgroundColor() const { return background_; }
+    void setBackgroundColor(const Vector3<double> &rgb);
 
     size_t colorSourceSize() const;
     const char *colorSourceString(SettingsView::ColorSource id) const;
     const char *colorSourceString(size_t id) const;
-    bool isColorSourceEnabled(SettingsView::ColorSource id) const;
-    bool isColorSourceEnabled(size_t id) const;
+    bool colorSourceEnabled(SettingsView::ColorSource id) const;
+    bool colorSourceEnabled(size_t id) const;
     void setColorSourceEnabled(SettingsView::ColorSource id, bool v);
     void setColorSourceEnabled(size_t id, bool v);
     void setColorSourceEnabledAll(bool v);

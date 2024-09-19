@@ -299,7 +299,7 @@ void SegmentationAction::stepCreateTrunks()
             LOG_DEBUG(<< "Start next path.");
             // If a voxel is not processed and meets
             // criteria (for wood), add it to the path.
-            if (isTrunkVoxel(voxels_[pointIndex_]))
+            if (trunkVoxel(voxels_[pointIndex_]))
             {
                 LOG_DEBUG(<< "Start next trunk group.");
                 startGroup(voxels_[pointIndex_], true);
@@ -339,7 +339,7 @@ void SegmentationAction::stepCreateTrunks()
                     Point &b = voxels_[search_[j]];
                     // If a voxel in search radius is not processed and meets
                     // criteria (for wood), add it to group expansion.
-                    if (isTrunkVoxel(b))
+                    if (trunkVoxel(b))
                     {
                         continueGroup(b, true);
                         b.group = groupId_;
@@ -536,7 +536,7 @@ void SegmentationAction::stepCreateSegments()
 
     segments.setDefault();
     segments[0].boundary = groupUnsegmented_.boundary;
-    // segments[0].position = groupUnsegmented_.boundary.getCenter();
+    // segments[0].position = groupUnsegmented_.boundary.center();
     // segments[0].height = groupUnsegmented_.boundary.length(2);
 
     QueryFilterSet segmentsFilter;
@@ -733,15 +733,15 @@ void SegmentationAction::findNearestNeighbor(Point &a)
     }
 }
 
-bool SegmentationAction::isTrunkVoxel(const Point &a)
+bool SegmentationAction::trunkVoxel(const Point &a)
 {
     return a.group == SIZE_MAX &&
            !(a.descriptor < parameters_.woodThresholdMin);
 }
 
-void SegmentationAction::startGroup(const Point &a, bool isTrunk)
+void SegmentationAction::startGroup(const Point &a, bool trunk)
 {
-    if (isTrunk)
+    if (trunk)
     {
         if (parameters_.zCoordinatesAsElevation)
         {
@@ -762,9 +762,9 @@ void SegmentationAction::startGroup(const Point &a, bool isTrunk)
     group_.averagePoint[2] += a.z;
 }
 
-void SegmentationAction::continueGroup(const Point &a, bool isTrunk)
+void SegmentationAction::continueGroup(const Point &a, bool trunk)
 {
-    if (isTrunk)
+    if (trunk)
     {
         if (parameters_.zCoordinatesAsElevation)
         {

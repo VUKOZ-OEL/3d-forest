@@ -127,7 +127,7 @@ void ExplorerClippingWidget::filterChanged()
 
     Region filter = region_;
 
-    if (!isFilterEnabled())
+    if (!filterEnabled())
     {
         filter.shape = Region::SHAPE_NONE;
     }

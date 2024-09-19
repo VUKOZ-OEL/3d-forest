@@ -37,8 +37,11 @@ public:
     PageManager();
     ~PageManager();
 
-    std::shared_ptr<PageData> get(Editor *editor, size_t dataset, size_t index);
-    void erase(Editor *editor, size_t dataset, size_t index);
+    std::shared_ptr<PageData> readPage(Editor *editor,
+                                       size_t dataset,
+                                       size_t index);
+
+    void erasePage(Editor *editor, size_t dataset, size_t index);
 
 private:
     struct Key

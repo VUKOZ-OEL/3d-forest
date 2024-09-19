@@ -42,9 +42,10 @@ public:
     void set(T x, T y, T z, T radius);
     void clear();
     bool empty() const { return box_.empty(); }
+
     const Box<T> &box() const { return box_; }
 
-    bool isInside(T x, T y, T z) const;
+    bool contains(T x, T y, T z) const;
 
 protected:
     T x_;
@@ -102,9 +103,9 @@ template <class T> inline void Sphere<T>::validate()
              z_ + radius_);
 }
 
-template <class T> inline bool Sphere<T>::isInside(T x, T y, T z) const
+template <class T> inline bool Sphere<T>::contains(T x, T y, T z) const
 {
-    if (box_.isInside(x, y, z))
+    if (box_.contains(x, y, z))
     {
         T distance = std::sqrt(((x_ - x) * (x_ - x)) + ((y_ - y) * (y_ - y)) +
                                ((z_ - z) * (z_ - z)));
