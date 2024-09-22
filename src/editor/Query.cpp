@@ -50,7 +50,7 @@ void Query::exec()
 
     const Region &region = where().region();
 
-    if (region.shape == Region::SHAPE_BOX)
+    if (region.shape == Region::Shape::BOX)
     {
         editor_->datasets().selectPages(where_.dataset(),
                                         region.box,
@@ -58,7 +58,7 @@ void Query::exec()
         selected = true;
     }
 
-    if (region.shape == Region::SHAPE_CONE)
+    if (region.shape == Region::Shape::CONE)
     {
         editor_->datasets().selectPages(where_.dataset(),
                                         region.cone.box(),
@@ -66,7 +66,7 @@ void Query::exec()
         selected = true;
     }
 
-    if (region.shape == Region::SHAPE_CYLINDER)
+    if (region.shape == Region::Shape::CYLINDER)
     {
         editor_->datasets().selectPages(where_.dataset(),
                                         region.cylinder.box(),
@@ -74,7 +74,7 @@ void Query::exec()
         selected = true;
     }
 
-    if (region.shape == Region::SHAPE_SPHERE)
+    if (region.shape == Region::Shape::SPHERE)
     {
         editor_->datasets().selectPages(where_.dataset(),
                                         region.sphere.box(),
@@ -311,7 +311,7 @@ void Query::applyCamera(const Camera &camera)
         const IndexFile &index = editor.index();
         node = index.at(nk.pageId);
 
-        if (editor_->clipFilter().shape != Region::SHAPE_NONE)
+        if (editor_->clipFilter().shape != Region::Shape::NONE)
         {
             Box<double> box = index.boundary(node, index.boundary());
             if (!editor_->clipFilter().box.intersects(box))

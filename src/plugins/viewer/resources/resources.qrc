@@ -40,6 +40,8 @@
 
 <file>portraits_16px.png</file>
 <file>portraits_24px.png</file>
+<file>portraits_fill_16px.png</file>
+<file>portraits_fill_24px.png</file>
 
 <file>fit_to_page_16px.png</file>
 <file>fit_to_page_24px.png</file>

@@ -16,8 +16,17 @@
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
 add_subdirectory(classification)
+add_subdirectory(classifications)
+add_subdirectory(clipfilter)
 add_subdirectory(descriptor)
+add_subdirectory(descriptorfilter)
 add_subdirectory(elevation)
+add_subdirectory(elevationfilter)
+add_subdirectory(files)
 add_subdirectory(heightmap)
+add_subdirectory(intensityfilter)
 add_subdirectory(segmentation)
+add_subdirectory(settingsunits)
+add_subdirectory(settingsview)
 add_subdirectory(treeattributes)
+add_subdirectory(trees)

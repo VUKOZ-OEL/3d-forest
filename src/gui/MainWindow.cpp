@@ -26,13 +26,11 @@
 #include <ViewerViewports.hpp>
 
 // Include 3D Forest plugins.
-#include <ExplorerPlugin.hpp>
 #include <ExportFilePlugin.hpp>
 #include <HelpPlugin.hpp>
 #include <ImportFilePlugin.hpp>
 #include <MessageLogPlugin.hpp>
 #include <ProjectFilePlugin.hpp>
-#include <SettingsPlugin.hpp>
 #include <ViewerPlugin.hpp>
 
 // Include Qt.
@@ -78,12 +76,6 @@ MainWindow::MainWindow(QWidget *parent)
     exportFilePlugin_ = new ExportFilePlugin();
     exportFilePlugin_->initialize(this);
 
-    explorerPlugin_ = new ExplorerPlugin();
-    explorerPlugin_->initialize(this);
-
-    settingsPlugin_ = new SettingsPlugin();
-    settingsPlugin_->initialize(this);
-
     messageLogPlugin_ = new MessageLogPlugin();
     messageLogPlugin_->initialize(this);
 
@@ -105,10 +97,6 @@ MainWindow::MainWindow(QWidget *parent)
                  this,
                  SLOT(close()));
     actionExit_->setShortcuts(QKeySequence::Quit);
-
-    // Show windows.
-    explorerPlugin_->slotPlugin();
-    settingsPlugin_->slotPlugin();
 
     // Rendering.
     connect(viewerPlugin_->viewports(),
@@ -168,11 +156,6 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 void MainWindow::showEvent(QShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
-
-    resizeDocks({explorerPlugin_->window(), settingsPlugin_->window()},
-                {80, 20},
-                Qt::Vertical);
-
     QWidget::showEvent(event);
 }
 

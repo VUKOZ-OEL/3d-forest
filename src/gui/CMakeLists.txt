@@ -26,26 +26,22 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 file(GLOB_RECURSE SOURCES "*.cpp")
-file(GLOB_RECURSE SOURCES_EXPLORER "../plugins/explorer/*.cpp")
 file(GLOB_RECURSE SOURCES_EXPORT_FILE "../plugins/exportfile/*.cpp")
 file(GLOB_RECURSE SOURCES_HELP "../plugins/help/*.cpp")
 file(GLOB_RECURSE SOURCES_IMPORT_FILE "../plugins/importfile/*.cpp")
 file(GLOB_RECURSE SOURCES_MESSAGE_LOG "../plugins/messagelog/*.cpp")
 file(GLOB_RECURSE SOURCES_PROJECT_FILE "../plugins/projectfile/*.cpp")
-file(GLOB_RECURSE SOURCES_SETTINGS "../plugins/settings/*.cpp")
 file(GLOB_RECURSE SOURCES_VIEWER "../plugins/viewer/*.cpp")
 
 add_library(
     ${SUB_PROJECT_NAME}
     SHARED
     ${SOURCES}
-    ${SOURCES_EXPLORER}
     ${SOURCES_EXPORT_FILE}
     ${SOURCES_HELP}
     ${SOURCES_IMPORT_FILE}
     ${SOURCES_MESSAGE_LOG}
     ${SOURCES_PROJECT_FILE}
-    ${SOURCES_SETTINGS}
     ${SOURCES_VIEWER}
     ../../3rdparty/widgets/ctk/ctkRangeSlider.cpp
     ../../3rdparty/widgets/ctk/ctkDoubleRangeSlider.cpp
@@ -56,8 +52,6 @@ add_library(
     ../plugins/importfile/resources/resources.qrc
     ../plugins/messagelog/resources/resources.qrc
     ../plugins/projectfile/resources/resources.qrc
-    ../plugins/explorer/resources/resources.qrc
-    ../plugins/settings/resources/resources.qrc
     ../plugins/viewer/resources/resources.qrc
 )
 
@@ -72,8 +66,6 @@ target_include_directories(
     ../plugins/importfile
     ../plugins/messagelog
     ../plugins/projectfile
-    ../plugins/explorer
-    ../plugins/settings
     ../plugins/viewer
 )
 

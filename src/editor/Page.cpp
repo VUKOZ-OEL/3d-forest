@@ -241,7 +241,7 @@ void Page::queryWhere()
 
     const Region &region = query_->where().region();
 
-    if (region.shape == Region::SHAPE_NONE)
+    if (region.shape == Region::Shape::NONE)
     {
         // Reset selection to mark all points as selected.
         LOG_DEBUG(<< "Reset selection.");
@@ -272,7 +272,7 @@ void Page::queryWhereBox()
 {
     const Region &region = query_->where().region();
     const Box<double> &clipBox = region.box;
-    if (region.shape != Region::SHAPE_BOX || clipBox.empty())
+    if (region.shape != Region::Shape::BOX || clipBox.empty())
     {
         return;
     }
@@ -418,7 +418,7 @@ void Page::queryWhereCone()
 {
     const Region &region = query_->where().region();
     const Cone<double> &clipCone = region.cone;
-    if (region.shape != Region::SHAPE_CONE || clipCone.empty())
+    if (region.shape != Region::Shape::CONE || clipCone.empty())
     {
         return;
     }
@@ -501,7 +501,7 @@ void Page::queryWhereCylinder()
 {
     const Region &region = query_->where().region();
     const Cylinder<double> &clipCylinder = region.cylinder;
-    if (region.shape != Region::SHAPE_CYLINDER || clipCylinder.empty())
+    if (region.shape != Region::Shape::CYLINDER || clipCylinder.empty())
     {
         return;
     }
@@ -584,7 +584,7 @@ void Page::queryWhereSphere()
 {
     const Region &region = query_->where().region();
     const Sphere<double> &clipSphere = region.sphere;
-    if (region.shape != Region::SHAPE_SPHERE || clipSphere.empty())
+    if (region.shape != Region::Shape::SPHERE || clipSphere.empty())
     {
         return;
     }

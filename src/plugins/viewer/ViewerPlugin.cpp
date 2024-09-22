@@ -61,6 +61,15 @@ void ViewerPlugin::initialize(MainWindow *mainWindow)
                               this,
                               SLOT(slotViewPerspective()));
 
+    mainWindow_->createAction(&actionView3d_,
+                              "Viewport",
+                              "Viewport",
+                              tr("3d view"),
+                              tr("3d view"),
+                              ICON("portraits_fill"),
+                              this,
+                              SLOT(slotView3d()));
+
     mainWindow_->createAction(&actionViewTop_,
                               "Viewport",
                               "Viewport",
@@ -87,15 +96,6 @@ void ViewerPlugin::initialize(MainWindow *mainWindow)
                               ICON("view_right"),
                               this,
                               SLOT(slotViewRight()));
-
-    mainWindow_->createAction(&actionView3d_,
-                              "Viewport",
-                              "Viewport",
-                              tr("3d view"),
-                              tr("3d view"),
-                              ICON("portraits"),
-                              this,
-                              SLOT(slotView3d()));
 
     mainWindow_->createAction(&actionViewResetDistance_,
                               "Viewport",

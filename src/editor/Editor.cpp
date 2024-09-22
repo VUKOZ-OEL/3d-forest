@@ -270,7 +270,7 @@ void Editor::setClassificationsFilter(const QueryFilterSet &filter)
 
 void Editor::setClipFilter(const Region &clipFilter)
 {
-    LOG_DEBUG(<< "Set region filter <" << clipFilter << ">.");
+    LOG_DEBUG(<< "Set clip filter <" << clipFilter << ">.");
     clipFilter_ = clipFilter;
 
     if (viewports_.size() > 0)
@@ -284,14 +284,14 @@ void Editor::setClipFilter(const Region &clipFilter)
 
 void Editor::resetClipFilter()
 {
-    LOG_DEBUG(<< "Reset region filter.");
+    LOG_DEBUG(<< "Reset clip filter.");
     clipFilter_.box = clipFilter_.boundary;
     setClipFilter(clipFilter_);
 }
 
 Box<double> Editor::clipBoundary() const
 {
-    if (clipFilter_.shape == Region::SHAPE_BOX)
+    if (clipFilter_.shape == Region::Shape::BOX)
     {
         return clipFilter_.box;
     }
@@ -385,7 +385,7 @@ void Editor::updateAfterRead()
 
     clipFilter_.boundary = datasets_.boundary();
     clipFilter_.box = clipFilter_.boundary;
-    // clipFilter_.enabled = Region::SHAPE_BOX;
+    // clipFilter_.enabled = Region::Shape::BOX;
 
     if (datasets_.size() > 0)
     {
