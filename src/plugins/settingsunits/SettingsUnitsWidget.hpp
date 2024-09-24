@@ -44,6 +44,8 @@ class SettingsUnitsWidget : public QWidget
 public:
     SettingsUnitsWidget(MainWindow *mainWindow);
 
+    QSize sizeHint() const override { return QSize(300, 150); }
+
 public slots:
     void slotUpdate(void *sender, const QSet<Editor::Type> &target);
 

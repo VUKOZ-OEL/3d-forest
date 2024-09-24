@@ -39,6 +39,7 @@ SettingsViewWindow::SettingsViewWindow(MainWindow *mainWindow)
 
     // Dock.
     setWidget(widget);
+    setFixedHeight(widget->sizeHint().height());
     setWindowTitle(tr("View Settings"));
     setWindowIcon(ICON("brush"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);

@@ -45,6 +45,8 @@ class SettingsViewWidget : public QWidget
 public:
     SettingsViewWidget(MainWindow *mainWindow);
 
+    QSize sizeHint() const override { return QSize(300, 200); }
+
 public slots:
     void slotUpdate(void *sender, const QSet<Editor::Type> &target);
     void slotColorSourceChanged(int index);

@@ -44,6 +44,7 @@ ClipFilterWindow::ClipFilterWindow(MainWindow *mainWindow)
 
     // Dock.
     setWidget(widget_);
+    setFixedHeight(widget()->sizeHint().height());
     setWindowTitle(tr("Clip Filter"));
     setWindowIcon(ICON("clip_filter"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);

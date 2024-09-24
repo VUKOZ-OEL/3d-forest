@@ -39,6 +39,7 @@ SettingsUnitsWindow::SettingsUnitsWindow(MainWindow *mainWindow)
 
     // Dock.
     setWidget(widget);
+    setFixedHeight(widget->sizeHint().height());
     setWindowTitle(tr("Units Settings"));
     setWindowIcon(ICON("units"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
