@@ -42,6 +42,8 @@ public:
 
     void setFilterEnabled(bool b);
 
+    QSize sizeHint() const override { return QSize(300, 120); }
+
 public slots:
     void slotUpdate(void *sender, const QSet<Editor::Type> &target);
 

@@ -44,6 +44,7 @@ ElevationFilterWindow::ElevationFilterWindow(MainWindow *mainWindow)
 
     // Dock.
     setWidget(widget_);
+    setFixedHeight(widget()->sizeHint().height());
     setWindowTitle(tr("Elevation Filter"));
     setWindowIcon(ICON("elevation_filter"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);

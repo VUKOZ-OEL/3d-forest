@@ -44,6 +44,7 @@ IntensityFilterWindow::IntensityFilterWindow(MainWindow *mainWindow)
 
     // Dock.
     setWidget(widget_);
+    setFixedHeight(widget()->sizeHint().height());
     setWindowTitle(tr("Intensity Filter"));
     setWindowIcon(ICON("intensity"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);

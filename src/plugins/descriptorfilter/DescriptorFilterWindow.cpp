@@ -44,6 +44,7 @@ DescriptorFilterWindow::DescriptorFilterWindow(MainWindow *mainWindow)
 
     // Dock.
     setWidget(widget_);
+    setFixedHeight(widget()->sizeHint().height());
     setWindowTitle(tr("Descriptor Filter"));
     setWindowIcon(ICON("descriptor_filter"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
