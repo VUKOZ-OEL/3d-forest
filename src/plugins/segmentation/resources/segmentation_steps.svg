@@ -2,25 +2,25 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="210mm"
    height="297mm"
    viewBox="0 0 210 297"
    version="1.1"
    id="svg5"
-   inkscape:version="1.2 (dc2aedaf03, 2022-05-15)"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
    sodipodi:docname="segmentation_steps.svg"
    inkscape:export-filename="classification_alg.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
-   xml:space="preserve"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:dc="http://purl.org/dc/elements/1.1/"><title
+   xml:space="preserve"><title
      id="title412">Segmentation Steps</title><sodipodi:namedview
      id="namedview7"
      pagecolor="#ffffff"
@@ -33,12 +33,12 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="0.76078844"
-     inkscape:cx="113.04062"
+     inkscape:cx="-109.09735"
      inkscape:cy="561.25984"
-     inkscape:window-width="1920"
-     inkscape:window-height="1009"
-     inkscape:window-x="1912"
-     inkscape:window-y="-8"
+     inkscape:window-width="2400"
+     inkscape:window-height="1261"
+     inkscape:window-x="2391"
+     inkscape:window-y="-9"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1" /><defs
      id="defs2"><rect
@@ -80,7 +80,8 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect1587);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan276">a)</tspan></text><image
+         id="tspan276">a)</tspan></text>
+<image
        width="36.715691"
        height="80.934151"
        preserveAspectRatio="none"
@@ -119,20 +120,24 @@
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect1046);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan278">b)</tspan></text><text
+         id="tspan278">b)</tspan></text>
+<text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,43.091713,71.814855)"
        id="text1050"
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect1052);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan280">c)</tspan></text><text
+         id="tspan280">c)</tspan></text>
+<text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,81.618151,71.814855)"
        id="text1056"
        style="font-size:21.3333px;font-family:Arial;-inkscape-font-specification:Arial;white-space:pre;shape-inside:url(#rect1058);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1;stroke-dashoffset:0.32;paint-order:fill markers stroke"><tspan
          x="297.06055"
          y="421.43091"
-         id="tspan282">d)</tspan></text></g><metadata
+         id="tspan282">d)</tspan></text>
+</g><metadata
      id="metadata410"><rdf:RDF><cc:Work
-         rdf:about=""><dc:title>Segmentation Steps</dc:title><dc:date>30 July 2023</dc:date><dc:creator><cc:Agent><dc:title>Vaclav Bubnik Copyright 2020-present VUKOZ Licence GNU GPL version 3 www.gnu.org/licenses/gpl-3.0.html</dc:title></cc:Agent></dc:creator></cc:Work></rdf:RDF></metadata></svg>
+         rdf:about=""><dc:title>Segmentation Steps</dc:title><dc:date></dc:date><dc:creator><cc:Agent><dc:title>Vaclav Bubnik Copyright 2020-present VUKOZ Licence GNU GPL version 3 www.gnu.org/licenses/gpl-3.0.html</dc:title></cc:Agent></dc:creator><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata></svg>

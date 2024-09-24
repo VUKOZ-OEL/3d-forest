@@ -21,8 +21,6 @@
 <qresource prefix="/tree_attributes">
 
 <!-- Tool bar -->
-<file>dbh_20px.png</file>
-<file>dbh_24px.png</file>
 <file>tree_attributes_24px_color.png</file>
 
 <!-- Images -->
