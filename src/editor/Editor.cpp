@@ -381,11 +381,16 @@ void Editor::setSegmentsFilter(const QueryFilterSet &filter)
 
 void Editor::updateAfterRead()
 {
-    LOG_DEBUG(<< "Update after read.");
+    LOG_DEBUG(<< "Start editor update after read.");
 
     clipFilter_.boundary = datasets_.boundary();
     clipFilter_.box = clipFilter_.boundary;
     // clipFilter_.enabled = Region::Shape::BOX;
+
+    LOG_DEBUG(<< "Use clip box filter region <" << clipFilter_ << ">.");
+    LOG_DEBUG(<< "Use elevation filter range <" << elevationFilter_ << ">.");
+    LOG_DEBUG(<< "Use descriptor filter range <" << descriptorFilter_ << ">.");
+    LOG_DEBUG(<< "Use intensity filter range <" << intensityFilter_ << ">.");
 
     if (datasets_.size() > 0)
     {
@@ -412,6 +417,8 @@ void Editor::updateAfterRead()
 
         viewports_.applyWhereToAll();
     }
+
+    LOG_DEBUG(<< "Finished editor update after read.");
 }
 
 void Editor::setSettingsView(const SettingsView &settingsView)

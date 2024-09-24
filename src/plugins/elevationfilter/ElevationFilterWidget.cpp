@@ -47,8 +47,8 @@ ElevationFilterWidget::ElevationFilterWidget(MainWindow *mainWindow)
                                     SLOT(slotRangeIntermediateMaximumValue()),
                                     tr("Elevation"),
                                     tr("Min-max elevation range filter"),
-                                    tr("%"),
-                                    1,
+                                    tr("m"),
+                                    0.01,
                                     0,
                                     100,
                                     0,
@@ -94,8 +94,10 @@ void ElevationFilterWidget::setElevation(const Range<double> &range)
     LOG_DEBUG(<< "Set elevation filter range <" << range << ">.");
 
     elevationRange_ = range;
-    double min = elevationRange_.minimum() * 100.0;
-    double max = elevationRange_.maximum() * 100.0;
+
+    double ppm = mainWindow_->editor().settings().units().pointsPerMeter()[0];
+    double min = elevationRange_.minimum() / ppm;
+    double max = elevationRange_.maximum() / ppm;
 
     elevationInput_->blockSignals(true);
     elevationInput_->setMinimum(min);
@@ -126,7 +128,9 @@ void ElevationFilterWidget::slotRangeIntermediateMinimumValue()
 {
     LOG_DEBUG(<< "Minimum value changed.");
 
-    elevationRange_.setMinimumValue(elevationInput_->minimumValue() * 0.01);
+    double ppm = mainWindow_->editor().settings().units().pointsPerMeter()[0];
+
+    elevationRange_.setMinimumValue(elevationInput_->minimumValue() * ppm);
     filterChanged();
 }
 
@@ -134,6 +138,8 @@ void ElevationFilterWidget::slotRangeIntermediateMaximumValue()
 {
     LOG_DEBUG(<< "Maximum value changed.");
 
-    elevationRange_.setMaximumValue(elevationInput_->maximumValue() * 0.01);
+    double ppm = mainWindow_->editor().settings().units().pointsPerMeter()[0];
+
+    elevationRange_.setMaximumValue(elevationInput_->maximumValue() * ppm);
     filterChanged();
 }
