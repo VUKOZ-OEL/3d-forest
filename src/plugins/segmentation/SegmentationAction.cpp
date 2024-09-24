@@ -574,7 +574,7 @@ void SegmentationAction::createSegmentFromGroup(size_t segmentId,
 {
     segment.id = segmentId;
 
-    segment.label = "Segment " + std::to_string(segment.id);
+    segment.label = "Tree " + std::to_string(segment.id);
     segment.color =
         ColorPalette::MPN65[segment.id % ColorPalette::MPN65.size()];
 
