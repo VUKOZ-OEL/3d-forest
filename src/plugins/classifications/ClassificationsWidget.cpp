@@ -152,6 +152,14 @@ void ClassificationsWidget::filterChanged()
     mainWindow_->updateFilter();
 }
 
+void ClassificationsWidget::setFilterEnabled(bool b)
+{
+    LOG_DEBUG(<< "Set classifications filer enabled <" << toString(b) << ">.");
+
+    filter_.setFilterEnabled(b);
+    filterChanged();
+}
+
 void ClassificationsWidget::setClassifications(
     const Classifications &classifications,
     const QueryFilterSet &filter)

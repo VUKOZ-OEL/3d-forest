@@ -41,6 +41,8 @@ class ClassificationsWidget : public QWidget
 public:
     ClassificationsWidget(MainWindow *mainWindow);
 
+    void setFilterEnabled(bool b);
+
     QSize sizeHint() const override { return QSize(300, 200); }
 
 public slots:
@@ -73,9 +75,10 @@ protected:
     QToolButton *selectAllButton_;
     QToolButton *selectInvertButton_;
     QToolButton *selectNoneButton_;
+    bool updatesEnabled_;
+
     Classifications classifications_;
     QueryFilterSet filter_;
-    bool updatesEnabled_;
 
     void setClassifications(const Classifications &classifications,
                             const QueryFilterSet &filter);

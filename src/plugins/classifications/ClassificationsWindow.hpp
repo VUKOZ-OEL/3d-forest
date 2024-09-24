@@ -24,9 +24,11 @@
 
 // Include 3D Forest.
 class MainWindow;
+class ClassificationsWidget;
 
 // Include Qt.
 #include <QDockWidget>
+class QCloseEvent;
 
 /** Classifications Window. */
 class ClassificationsWindow : public QDockWidget
@@ -35,6 +37,13 @@ class ClassificationsWindow : public QDockWidget
 
 public:
     ClassificationsWindow(MainWindow *mainWindow);
+
+protected:
+    ClassificationsWidget *widget_;
+
+    void showEvent(QShowEvent *event) override;
+    void hideEvent(QHideEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
 };
 
 #endif /* CLASSIFICATIONS_WINDOW_HPP */

@@ -25,6 +25,9 @@
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
+// Include Qt.
+#include <QCloseEvent>
+
 // Include local.
 #define LOG_MODULE_NAME "ClassificationsWindow"
 #include <Log.hpp>
@@ -34,13 +37,37 @@
 ClassificationsWindow::ClassificationsWindow(MainWindow *mainWindow)
     : QDockWidget(mainWindow)
 {
+    LOG_DEBUG(<< "Start creating classifications window.");
+
     // Widget.
-    ClassificationsWidget *widget = new ClassificationsWidget(mainWindow);
+    widget_ = new ClassificationsWidget(mainWindow);
 
     // Dock.
-    setWidget(widget);
+    setWidget(widget_);
     setWindowTitle(tr("Classifications"));
     setWindowIcon(ICON("classification"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
+
+    LOG_DEBUG(<< "Finished creating classifications window.");
+}
+
+void ClassificationsWindow::showEvent(QShowEvent *event)
+{
+    LOG_DEBUG_QT_EVENT(<< "Show event.");
+    widget_->setFilterEnabled(true);
+    QWidget::showEvent(event);
+}
+
+void ClassificationsWindow::hideEvent(QHideEvent *event)
+{
+    LOG_DEBUG_QT_EVENT(<< "Hide event.");
+    QWidget::hideEvent(event);
+}
+
+void ClassificationsWindow::closeEvent(QCloseEvent *event)
+{
+    LOG_DEBUG_QT_EVENT(<< "Close event.");
+    widget_->setFilterEnabled(false);
+    event->accept();
 }
