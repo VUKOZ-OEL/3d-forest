@@ -25,6 +25,9 @@
 #include <TreesWidget.hpp>
 #include <TreesWindow.hpp>
 
+// Include Qt.
+#include <QCloseEvent>
+
 // Include local.
 #define LOG_MODULE_NAME "TreesWindow"
 #include <Log.hpp>
@@ -34,12 +37,32 @@
 TreesWindow::TreesWindow(MainWindow *mainWindow) : QDockWidget(mainWindow)
 {
     // Widget.
-    TreesWidget *widget = new TreesWidget(mainWindow);
+    widget_ = new TreesWidget(mainWindow);
 
     // Dock.
-    setWidget(widget);
+    setWidget(widget_);
     setWindowTitle(tr("Trees"));
     setWindowIcon(ICON("trees"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
+}
+
+void TreesWindow::showEvent(QShowEvent *event)
+{
+    LOG_DEBUG_QT_EVENT(<< "Show event.");
+    widget_->setFilterEnabled(true);
+    QWidget::showEvent(event);
+}
+
+void TreesWindow::hideEvent(QHideEvent *event)
+{
+    LOG_DEBUG_QT_EVENT(<< "Hide event.");
+    QWidget::hideEvent(event);
+}
+
+void TreesWindow::closeEvent(QCloseEvent *event)
+{
+    LOG_DEBUG_QT_EVENT(<< "Close event.");
+    widget_->setFilterEnabled(false);
+    event->accept();
 }

@@ -43,6 +43,8 @@ class TreesWidget : public QWidget
 public:
     TreesWidget(MainWindow *mainWindow);
 
+    void setFilterEnabled(bool b);
+
     QSize sizeHint() const override { return QSize(300, 200); }
 
 public slots:

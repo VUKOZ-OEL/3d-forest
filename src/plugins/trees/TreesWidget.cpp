@@ -181,6 +181,14 @@ void TreesWidget::filterChanged()
     mainWindow_->updateFilter();
 }
 
+void TreesWidget::setFilterEnabled(bool b)
+{
+    LOG_DEBUG(<< "Set segments filer enabled <" << toString(b) << ">.");
+
+    filter_.setEnabled(b);
+    filterChanged();
+}
+
 void TreesWidget::setSegments(const Segments &segments,
                               const QueryFilterSet &filter)
 {

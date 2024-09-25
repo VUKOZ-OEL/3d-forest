@@ -24,9 +24,11 @@
 
 // Include 3D Forest.
 class MainWindow;
+class TreesWidget;
 
 // Include Qt.
 #include <QDockWidget>
+class QCloseEvent;
 
 /** Trees Window. */
 class TreesWindow : public QDockWidget
@@ -35,6 +37,13 @@ class TreesWindow : public QDockWidget
 
 public:
     TreesWindow(MainWindow *mainWindow);
+
+protected:
+    TreesWidget *widget_;
+
+    void showEvent(QShowEvent *event) override;
+    void hideEvent(QHideEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
 };
 
 #endif /* TREES_WINDOW_HPP */
