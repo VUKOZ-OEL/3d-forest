@@ -118,12 +118,12 @@ TreesWidget::TreesWidget(MainWindow *mainWindow) : mainWindow_(mainWindow)
     toolBar->setIconSize(QSize(MainWindow::ICON_SIZE, MainWindow::ICON_SIZE));
 
     // Segment.
-    segmentWidget_ = new TreeWidget(mainWindow_);
+    treeWidget_ = new TreeWidget(mainWindow_);
 
     // Splitter.
     splitter_ = new QSplitter;
     splitter_->addWidget(tree_);
-    splitter_->addWidget(segmentWidget_);
+    splitter_->addWidget(treeWidget_);
     splitter_->setOrientation(Qt::Vertical);
     splitter_->setSizes(QList<int>({1, 1}));
 
@@ -201,11 +201,11 @@ void TreesWidget::setSegments(const Segments &segments,
 
     if (segments_.size() > 0)
     {
-        segmentWidget_->setSegment(segments_[0]);
+        treeWidget_->setSegment(segments_[0]);
     }
     else
     {
-        segmentWidget_->clear();
+        treeWidget_->clear();
     }
 
     // Content.
@@ -368,7 +368,7 @@ void TreesWidget::slotItemClicked(QTreeWidgetItem *item, int column)
         return;
     }
 
-    segmentWidget_->setSegment(segments_[index]);
+    treeWidget_->setSegment(segments_[index]);
 
     for (size_t i = 0; i < segments_.size(); i++)
     {

@@ -61,7 +61,7 @@ public slots:
     void slotItemChanged(QTreeWidgetItem *item, int column);
 
 protected:
-    /** Trees Segments Column. */
+    /** Trees Column. */
     enum Column
     {
         COLUMN_CHECKED,
@@ -83,7 +83,7 @@ protected:
 
     QSplitter *splitter_;
 
-    TreeWidget *segmentWidget_;
+    TreeWidget *treeWidget_;
 
     Segments segments_;
     QueryFilterSet filter_;
