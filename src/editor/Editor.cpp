@@ -58,20 +58,20 @@ void Editor::close()
 
     datasets_.clear();
     datasetsFilter_.clear();
-    datasetsFilter_.setFilterEnabled(true);
+    datasetsFilter_.setEnabled(true);
 
     segments_.setDefault();
     segmentsFilter_.clear();
-    segmentsFilter_.setFilter(0, true);
-    segmentsFilter_.setFilterEnabled(true);
+    segmentsFilter_.setEnabled(0, true);
+    segmentsFilter_.setEnabled(true);
 
     classifications_.clear();
     classificationsFilter_.clear();
     for (size_t i = 0; i < classifications_.size(); i++)
     {
-        classificationsFilter_.setFilter(i, true);
+        classificationsFilter_.setEnabled(i, true);
     }
-    classificationsFilter_.setFilterEnabled(true);
+    classificationsFilter_.setEnabled(true);
 
     viewports_.clearContent();
 
@@ -402,7 +402,7 @@ void Editor::updateAfterRead()
 
     for (size_t i = 0; i < segments_.size(); i++)
     {
-        segmentsFilter_.setFilter(segments_[i].id, true);
+        segmentsFilter_.setEnabled(segments_[i].id, true);
     }
 
     if (viewports_.size() > 0)

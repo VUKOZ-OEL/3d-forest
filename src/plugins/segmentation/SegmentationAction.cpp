@@ -163,8 +163,8 @@ void SegmentationAction::stepResetPoints()
 
         QueryFilterSet segmentsFilter;
         segmentsFilter.clear();
-        segmentsFilter.setFilter(0, true);
-        segmentsFilter.setFilterEnabled(true);
+        segmentsFilter.setEnabled(0, true);
+        segmentsFilter.setEnabled(true);
 
         editor_->setSegments(segments);
         editor_->setSegmentsFilter(segmentsFilter);
@@ -540,8 +540,8 @@ void SegmentationAction::stepCreateSegments()
     // segments[0].height = groupUnsegmented_.boundary.length(2);
 
     QueryFilterSet segmentsFilter;
-    segmentsFilter.setFilter(0, true);
-    segmentsFilter.setFilterEnabled(true);
+    segmentsFilter.setEnabled(0, true);
+    segmentsFilter.setEnabled(true);
 
     // For each final group, perform the following:
     size_t segmentId = 1;
@@ -553,7 +553,7 @@ void SegmentationAction::stepCreateSegments()
 
         // Append new segment to segments.
         segments.push_back(segment);
-        segmentsFilter.setFilter(segmentId, true);
+        segmentsFilter.setEnabled(segmentId, true);
 
         // Set segment id to this group.
         it.second.segmentId = segmentId;

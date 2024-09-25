@@ -156,7 +156,7 @@ void ClassificationsWidget::setFilterEnabled(bool b)
 {
     LOG_DEBUG(<< "Set classifications filer enabled <" << toString(b) << ">.");
 
-    filter_.setFilterEnabled(b);
+    filter_.setEnabled(b);
     filterChanged();
 }
 
@@ -290,7 +290,7 @@ void ClassificationsWidget::slotItemChanged(QTreeWidgetItem *item, int column)
         size_t id = identifier(item);
         bool checked = (item->checkState(COLUMN_CHECKED) == Qt::Checked);
 
-        filter_.setFilter(id, checked);
+        filter_.setEnabled(id, checked);
 
         if (updatesEnabled_)
         {
@@ -313,7 +313,7 @@ void ClassificationsWidget::updateTree()
 
     while (*it)
     {
-        if (filter_.filterEnabled(i))
+        if (filter_.enabled(i))
         {
             (*it)->setCheckState(COLUMN_CHECKED, Qt::Checked);
         }
@@ -353,7 +353,7 @@ void ClassificationsWidget::addTreeItem(size_t index)
 {
     QTreeWidgetItem *item = new QTreeWidgetItem(tree_);
 
-    if (filter_.filterEnabled(index))
+    if (filter_.enabled(index))
     {
         item->setCheckState(COLUMN_CHECKED, Qt::Checked);
     }

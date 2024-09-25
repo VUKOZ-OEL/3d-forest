@@ -112,7 +112,7 @@ void QueryFilterSet::erase(size_t id)
     }
 }
 
-void QueryFilterSet::setFilter(size_t id, bool enabled)
+void QueryFilterSet::setEnabled(size_t id, bool enabled)
 {
     if (enabled)
     {

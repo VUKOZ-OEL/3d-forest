@@ -761,7 +761,7 @@ void Page::queryWhereIntensity()
 
 void Page::queryWhereClassification()
 {
-    if (!query_->where().classification().filterEnabled())
+    if (!query_->where().classification().enabled())
     {
         return;
     }
@@ -796,7 +796,7 @@ void Page::queryWhereClassification()
 
 void Page::queryWhereSegment()
 {
-    if (!query_->where().segment().filterEnabled())
+    if (!query_->where().segment().enabled())
     {
         return;
     }

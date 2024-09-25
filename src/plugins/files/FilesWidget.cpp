@@ -161,7 +161,7 @@ void FilesWidget::dataChanged()
 
 void FilesWidget::filterChanged()
 {
-    LOG_DEBUG_UPDATE(<< "Output datasets filter <" << filter_.filterEnabled()
+    LOG_DEBUG_UPDATE(<< "Output datasets filter <" << filter_.enabled()
                      << ">.");
 
     mainWindow_->suspendThreads();
@@ -330,7 +330,7 @@ void FilesWidget::slotItemChanged(QTreeWidgetItem *item, int column)
         size_t id = identifier(item);
         bool checked = (item->checkState(COLUMN_CHECKED) == Qt::Checked);
 
-        filter_.setFilter(id, checked);
+        filter_.setEnabled(id, checked);
 
         if (updatesEnabled_)
         {
@@ -359,7 +359,7 @@ void FilesWidget::updateTree()
     {
         size_t id = identifier(*it);
 
-        if (filter_.filterEnabled(id))
+        if (filter_.enabled(id))
         {
             (*it)->setCheckState(COLUMN_CHECKED, Qt::Checked);
         }
@@ -400,7 +400,7 @@ void FilesWidget::addTreeItem(size_t index)
 
     size_t id = datasets_.id(index);
 
-    if (filter_.filterEnabled(id))
+    if (filter_.enabled(id))
     {
         item->setCheckState(COLUMN_CHECKED, Qt::Checked);
     }

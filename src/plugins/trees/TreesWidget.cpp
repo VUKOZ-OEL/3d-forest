@@ -358,7 +358,7 @@ void TreesWidget::slotItemClicked(QTreeWidgetItem *item, int column)
     {
         bool checked = (item->checkState(COLUMN_CHECKED) == Qt::Checked);
 
-        filter_.setFilter(id, checked);
+        filter_.setEnabled(id, checked);
 
         if (updatesEnabled_)
         {
@@ -412,7 +412,7 @@ void TreesWidget::updateTree()
     {
         size_t id = identifier(*it);
 
-        if (filter_.filterEnabled(id))
+        if (filter_.enabled(id))
         {
             (*it)->setCheckState(COLUMN_CHECKED, Qt::Checked);
         }
@@ -458,7 +458,7 @@ void TreesWidget::addTreeItem(size_t index)
 
     size_t id = segments_.id(index);
 
-    if (filter_.filterEnabled(id))
+    if (filter_.enabled(id))
     {
         item->setCheckState(COLUMN_CHECKED, Qt::Checked);
     }

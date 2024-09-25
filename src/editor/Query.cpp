@@ -283,7 +283,7 @@ void Query::applyCamera(const Camera &camera)
 
     std::multimap<double, Key> queue;
 
-    if (where().dataset().filterEnabled())
+    if (where().dataset().enabled())
     {
         const std::unordered_set<size_t> &idList = where().dataset().filter();
         for (auto const &it : idList)

@@ -41,8 +41,11 @@ public:
 
     void clear();
 
-    void setFilterEnabled(bool enabled) { enabled_ = enabled; }
-    bool filterEnabled() const { return enabled_; }
+    void setEnabled(bool enabled) { enabled_ = enabled; }
+    bool enabled() const { return enabled_; }
+
+    void setEnabled(size_t id, bool enabled);
+    bool enabled(size_t id) const { return filter_.count(id) > 0; }
 
     bool contains(size_t value) const
     {
@@ -59,9 +62,6 @@ public:
     void invert();
 
     void erase(size_t id);
-
-    void setFilter(size_t id, bool enabled);
-    bool filterEnabled(size_t id) const { return filter_.count(id) > 0; }
 
 private:
     std::unordered_set<size_t> filter_;

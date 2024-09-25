@@ -34,7 +34,7 @@ static void exampleQueryFilter()
 
     for (size_t i = 0; i < 10; i++)
     {
-        std::cout << i << " : " << set2.filterEnabled(i) << std::endl;
+        std::cout << i << " : " << set2.enabled(i) << std::endl;
     }
 }
 
