@@ -169,6 +169,14 @@ void FilesWidget::filterChanged()
     mainWindow_->updateFilter();
 }
 
+void FilesWidget::setFilterEnabled(bool b)
+{
+    LOG_DEBUG(<< "Set datasets filer enabled <" << toString(b) << ">.");
+
+    filter_.setEnabled(b);
+    filterChanged();
+}
+
 void FilesWidget::setDatasets(const Datasets &datasets,
                               const QueryFilterSet &filter)
 {

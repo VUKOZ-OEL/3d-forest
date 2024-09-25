@@ -24,9 +24,11 @@
 
 // Include 3D Forest.
 class MainWindow;
+class FilesWidget;
 
 // Include Qt.
 #include <QDockWidget>
+class QCloseEvent;
 
 /** Files Window. */
 class FilesWindow : public QDockWidget
@@ -35,6 +37,13 @@ class FilesWindow : public QDockWidget
 
 public:
     FilesWindow(MainWindow *mainWindow);
+
+protected:
+    FilesWidget *widget_;
+
+    void showEvent(QShowEvent *event) override;
+    void hideEvent(QHideEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
 };
 
 #endif /* FILES_WINDOW_HPP */

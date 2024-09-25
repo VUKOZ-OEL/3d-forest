@@ -41,6 +41,8 @@ class FilesWidget : public QWidget
 public:
     FilesWidget(MainWindow *mainWindow);
 
+    void setFilterEnabled(bool b);
+
     QSize sizeHint() const override { return QSize(300, 200); }
 
 public slots:

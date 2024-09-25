@@ -25,6 +25,9 @@
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
+// Include Qt.
+#include <QCloseEvent>
+
 // Include local.
 #define LOG_MODULE_NAME "FilesWindow"
 #include <Log.hpp>
@@ -34,12 +37,32 @@
 FilesWindow::FilesWindow(MainWindow *mainWindow) : QDockWidget(mainWindow)
 {
     // Widget.
-    FilesWidget *widget = new FilesWidget(mainWindow);
+    widget_ = new FilesWidget(mainWindow);
 
     // Dock.
-    setWidget(widget);
+    setWidget(widget_);
     setWindowTitle(tr("Files"));
     setWindowIcon(ICON("files"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
+}
+
+void FilesWindow::showEvent(QShowEvent *event)
+{
+    LOG_DEBUG_QT_EVENT(<< "Show event.");
+    widget_->setFilterEnabled(true);
+    QWidget::showEvent(event);
+}
+
+void FilesWindow::hideEvent(QHideEvent *event)
+{
+    LOG_DEBUG_QT_EVENT(<< "Hide event.");
+    QWidget::hideEvent(event);
+}
+
+void FilesWindow::closeEvent(QCloseEvent *event)
+{
+    LOG_DEBUG_QT_EVENT(<< "Close event.");
+    widget_->setFilterEnabled(false);
+    event->accept();
 }
