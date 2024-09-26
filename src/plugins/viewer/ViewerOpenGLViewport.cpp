@@ -436,9 +436,19 @@ void ViewerOpenGLViewport::renderFirstFrame()
 
     clearScreen();
 
+    if (editor_->settings().view().fogEnabled())
+    {
+        glDisable(GL_FOG);
+    }
+
     ViewerOpenGL::renderClipFilter(editor_->clipFilter());
     renderSegments();
     renderGuides();
+
+    if (editor_->settings().view().fogEnabled())
+    {
+        glEnable(GL_FOG);
+    }
 
     glMatrixMode(GL_PROJECTION);
     glLoadMatrixf(camera_.projection().data());
