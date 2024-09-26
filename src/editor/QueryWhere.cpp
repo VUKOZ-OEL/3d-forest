@@ -24,6 +24,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "QueryWhere"
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 QueryWhere::QueryWhere()
@@ -36,6 +37,8 @@ QueryWhere::~QueryWhere()
 
 void QueryWhere::clear()
 {
+    LOG_DEBUG_UPDATE(<< "Clear.");
+
     region_.clear();
     elevation_.clear();
     descriptor_.clear();

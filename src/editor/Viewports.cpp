@@ -24,6 +24,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "Viewports"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 Viewports::Viewports() : activeViewport_(0)
@@ -54,6 +55,8 @@ void Viewports::resize(Editor *editor, size_t n)
 
 void Viewports::clearContent()
 {
+    LOG_DEBUG(<< "Clear content.");
+
     for (auto &it : viewports_)
     {
         it->clear();

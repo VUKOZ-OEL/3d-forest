@@ -69,6 +69,9 @@ public:
     bool unsavedChanges() const { return unsavedChanges_; }
     void close();
 
+    // Filters.
+    void applyFilters();
+
     // Data sets.
     const Datasets &datasets() const { return datasets_; }
     Datasets &datasets() { return datasets_; }

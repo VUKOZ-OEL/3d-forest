@@ -405,6 +405,13 @@ void Editor::updateAfterRead()
         segmentsFilter_.setEnabled(segments_[i].id, true);
     }
 
+    applyFilters();
+
+    LOG_DEBUG(<< "Finished editor update after read.");
+}
+
+void Editor::applyFilters()
+{
     if (viewports_.size() > 0)
     {
         viewports_.where().setDataset(datasetsFilter_);
@@ -417,8 +424,6 @@ void Editor::updateAfterRead()
 
         viewports_.applyWhereToAll();
     }
-
-    LOG_DEBUG(<< "Finished editor update after read.");
 }
 
 void Editor::setSettingsView(const SettingsView &settingsView)

@@ -39,7 +39,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "TreesWidget"
-// #define LOG_MODULE_DEBUG_ENABLED 1
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define ICON(name) (ThemeIcon(":/trees/", name))
@@ -261,6 +261,8 @@ void TreesWidget::slotDelete()
 
 void TreesWidget::slotShow()
 {
+    LOG_DEBUG(<< "Show.");
+
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
     if (items.count() > 0)
@@ -278,6 +280,8 @@ void TreesWidget::slotShow()
 
 void TreesWidget::slotHide()
 {
+    LOG_DEBUG(<< "Hide.");
+
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
     if (items.count() > 0)
@@ -295,6 +299,8 @@ void TreesWidget::slotHide()
 
 void TreesWidget::slotSelectAll()
 {
+    LOG_DEBUG(<< "Select all.");
+
     QTreeWidgetItemIterator it(tree_);
 
     while (*it)
@@ -308,6 +314,8 @@ void TreesWidget::slotSelectAll()
 
 void TreesWidget::slotSelectInvert()
 {
+    LOG_DEBUG(<< "Invert selection.");
+
     QTreeWidgetItemIterator it(tree_);
 
     while (*it)
@@ -321,6 +329,8 @@ void TreesWidget::slotSelectInvert()
 
 void TreesWidget::slotSelectNone()
 {
+    LOG_DEBUG(<< "Select none.");
+
     QTreeWidgetItemIterator it(tree_);
 
     while (*it)
@@ -334,6 +344,8 @@ void TreesWidget::slotSelectNone()
 
 void TreesWidget::slotItemSelectionChanged()
 {
+    LOG_DEBUG(<< "Selection changed.");
+
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
     if (items.count() > 0)
@@ -352,6 +364,8 @@ void TreesWidget::slotItemSelectionChanged()
 
 void TreesWidget::slotItemClicked(QTreeWidgetItem *item, int column)
 {
+    LOG_DEBUG(<< "Start item clicked in column <" << column << ">.");
+
     if (!item)
     {
         return;
@@ -359,13 +373,15 @@ void TreesWidget::slotItemClicked(QTreeWidgetItem *item, int column)
 
     size_t id = identifier(item);
     size_t index = segments_.index(id);
-    LOG_DEBUG(<< "item ID <" << id << "> index <" << index << "> column <"
+    LOG_DEBUG(<< "Item ID <" << id << "> index <" << index << "> column <"
               << column << ">.");
 
     if (column == COLUMN_CHECKED)
     {
         bool checked = (item->checkState(COLUMN_CHECKED) == Qt::Checked);
 
+        LOG_DEBUG(<< "Set filter ID <" << id << "> enabled <"
+                  << toString(checked) << ">.");
         filter_.setEnabled(id, checked);
 
         if (updatesEnabled_)
@@ -388,6 +404,8 @@ void TreesWidget::slotItemClicked(QTreeWidgetItem *item, int column)
     {
         dataChanged();
     }
+
+    LOG_DEBUG(<< "Finished item clicked.");
 }
 
 void TreesWidget::slotItemChanged(QTreeWidgetItem *item, int column)
@@ -412,6 +430,8 @@ size_t TreesWidget::index(const QTreeWidgetItem *item)
 
 void TreesWidget::updateTree()
 {
+    LOG_DEBUG(<< "Update list.");
+
     block();
 
     QTreeWidgetItemIterator it(tree_);
@@ -462,6 +482,8 @@ void TreesWidget::unblock()
 
 void TreesWidget::addTreeItem(size_t index)
 {
+    LOG_DEBUG(<< "Add tree item to index <" << index << ">.");
+
     QTreeWidgetItem *item = new QTreeWidgetItem(tree_);
 
     size_t id = segments_.id(index);

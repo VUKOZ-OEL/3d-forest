@@ -29,6 +29,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "Query"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 Query::Query(Editor *editor) : editor_(editor)
@@ -132,6 +133,8 @@ void Query::reset()
 
 void Query::clear()
 {
+    LOG_DEBUG_UPDATE(<< "Clear.");
+
     where_.clear();
     maximumResults_ = 0;
     nResults_ = 0;

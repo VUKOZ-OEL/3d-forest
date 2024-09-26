@@ -439,6 +439,7 @@ void MainWindow::updateData()
     ViewerViewports *viewports = viewerPlugin_->viewports();
     viewports->resetScene(&editor_, false);
     editor_.viewports().clearContent();
+    editor_.applyFilters();
 
     resumeThreads();
 }
