@@ -38,7 +38,7 @@ SettingsView::SettingsView()
                           "Return Number",
                           "Number of Returns",
                           "Classification",
-                          "Segment",
+                          "Tree",
                           "Elevation",
                           "Descriptor"};
 
