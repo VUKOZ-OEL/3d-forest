@@ -46,7 +46,7 @@ void IntensityFilterPlugin::initialize(MainWindow *mainWindow)
                               "View",
                               tr("Intensity Filter"),
                               tr("Show intensity filter"),
-                              ICON("intensity"),
+                              ICON("intensity_filter"),
                               this,
                               SLOT(slotPlugin()));
 }

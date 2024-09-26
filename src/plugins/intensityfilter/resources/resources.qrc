@@ -21,8 +21,7 @@
 <qresource prefix="/intensityfilter">
 
 <!-- Plugin -->
-<file>intensity_16px_color.png</file>
-<file>intensity_20px_color.png</file>
+<file>intensity_filter_20px.png</file>
 
 </qresource>
 </RCC>

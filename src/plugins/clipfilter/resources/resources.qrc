@@ -21,8 +21,8 @@
 <qresource prefix="/clipfilter">
 
 <!-- Plugin -->
-<file>clip_filter_16px_color.png</file>
-<file>clip_filter_20px_color.png</file>
+<file>clip_filter_16px.png</file>
+<file>clip_filter_20px.png</file>
 
 </qresource>
 </RCC>

@@ -45,7 +45,7 @@ ClassificationsWindow::ClassificationsWindow(MainWindow *mainWindow)
     // Dock.
     setWidget(widget_);
     setWindowTitle(tr("Classifications"));
-    setWindowIcon(ICON("classification"));
+    setWindowIcon(ICON("classifications"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
 

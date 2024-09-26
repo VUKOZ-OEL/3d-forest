@@ -21,8 +21,8 @@
 <qresource prefix="/elevationfilter">
 
 <!-- Plugin -->
-<file>elevation_filter_16px_color.png</file>
-<file>elevation_filter_20px_color.png</file>
+<file>elevation_filter_20px.png</file>
+<file>elevation_filter_24px.png</file>
 
 </qresource>
 </RCC>

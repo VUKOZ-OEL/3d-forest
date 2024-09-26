@@ -46,7 +46,7 @@ void ClassificationsPlugin::initialize(MainWindow *mainWindow)
                               "View",
                               tr("Classifications"),
                               tr("Show classifications explorer"),
-                              ICON("classification"),
+                              ICON("classifications"),
                               this,
                               SLOT(slotPlugin()));
 }

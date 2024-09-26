@@ -21,8 +21,7 @@
 <qresource prefix="/trees">
 
 <!-- Plugin -->
-<file>trees_16px_color.png</file>
-<file>trees_20px_color.png</file>
+<file>trees_20px.png</file>
 
 </qresource>
 </RCC>
