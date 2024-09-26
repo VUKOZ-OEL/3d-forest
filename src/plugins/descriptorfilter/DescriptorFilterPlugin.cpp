@@ -42,8 +42,8 @@ void DescriptorFilterPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "View",
-                              "View",
+                              "Filters",
+                              "View Filter",
                               tr("Descriptor Filter"),
                               tr("Show descriptor filter"),
                               ICON("descriptor_filter"),

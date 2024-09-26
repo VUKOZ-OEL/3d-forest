@@ -40,8 +40,8 @@ void TreesPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "View",
-                              "View",
+                              "Data",
+                              "View Data",
                               tr("Trees"),
                               tr("Show tree explorer"),
                               ICON("trees"),

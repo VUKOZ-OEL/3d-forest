@@ -42,8 +42,8 @@ void ClassificationsPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "View",
-                              "View",
+                              "Filters",
+                              "View Filter",
                               tr("Classifications"),
                               tr("Show classifications explorer"),
                               ICON("classifications"),

@@ -40,8 +40,8 @@ void FilesPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "View",
-                              "View",
+                              "Data",
+                              "View Data",
                               tr("Files"),
                               tr("Show file explorer"),
                               ICON("files"),
