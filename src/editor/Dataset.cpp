@@ -129,13 +129,14 @@ void fromJson(Dataset &out, const Json &in, const std::string &projectPath)
     // Transformation.
     if (in.contains("translation"))
     {
-        fromJson(out.translation_, in["translation"]);
+        fromJson(out.translationFile_, in["translation"]);
+        out.translation_ = out.translationFile_;
     }
 
-    // if (in.contains("scaling"))
-    // {
-    //     fromJson(out.scaling_, in["scaling"]);
-    // }
+    if (in.contains("scaling"))
+    {
+        fromJson(out.scalingFile_, in["scaling"]);
+    }
 
     out.updateBoundary();
 }
@@ -147,8 +148,8 @@ void toJson(Json &out, const Dataset &in)
     toJson(out["color"], in.color_);
     toJson(out["path"], in.pathUnresolved_);
     toJson(out["dateCreated"], in.dateCreated_);
-    toJson(out["translation"], in.translation_);
-    toJson(out["scaling"], in.scaling_);
+    toJson(out["translation"], in.translationFile_);
+    toJson(out["scaling"], in.scalingFile_);
 }
 
 void Dataset::setPath(const std::string &path, const std::string &projectPath)
