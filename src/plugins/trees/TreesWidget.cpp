@@ -360,6 +360,17 @@ void TreesWidget::slotItemSelectionChanged()
         showButton_->setEnabled(false);
         hideButton_->setEnabled(false);
     }
+
+    // Unselect all trees.
+    for (size_t i = 0; i < segments_.size(); i++)
+    {
+        segments_[i].selected = false;
+    }
+
+    if (updatesEnabled_)
+    {
+        dataChanged();
+    }
 }
 
 void TreesWidget::slotItemClicked(QTreeWidgetItem *item, int column)
