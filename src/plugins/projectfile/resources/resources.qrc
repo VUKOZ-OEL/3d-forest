@@ -22,12 +22,16 @@
 
 <!-- Tool bar -->
 <file>create_16px.png</file>
+<file>create_20px.png</file>
 <file>create_24px.png</file>
 <file>opened_folder_16px.png</file>
+<file>opened_folder_20px.png</file>
 <file>opened_folder_24px.png</file>
 <file>save_16px.png</file>
+<file>save_20px.png</file>
 <file>save_24px.png</file>
 <file>save_as_16px.png</file>
+<file>save_as_20px.png</file>
 <file>save_as_24px.png</file>
 
 </qresource>
