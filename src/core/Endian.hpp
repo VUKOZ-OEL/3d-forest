@@ -23,8 +23,8 @@
 #define ENDIAN_HPP
 
 // Include std.
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
 
 // Include local.
 #include <ExportCore.hpp>
