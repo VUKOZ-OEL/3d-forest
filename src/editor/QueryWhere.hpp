@@ -90,7 +90,6 @@ public:
     const QueryFilterSet &segment() const { return segment_; }
 
 private:
-    uint32_t filters_;
     Region region_;
     Range<double> elevation_;
     Range<double> descriptor_;
