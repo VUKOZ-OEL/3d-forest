@@ -24,6 +24,7 @@
 
 // Include std.
 #include <cstdint>
+#include <cstddef>
 
 // Include local.
 #include <ExportCore.hpp>
