@@ -234,7 +234,18 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
         > cd /Users/user/Documents/devel/3d-forest/bin
         > DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/Users/user/Documents/devel/3d-forest/bin ./3DForestExampleFile
       @endverbatim
-    - Run 3d Forest (by changing rpath to abs path):
+    - The following run.sh scrip can be written to run generated 3DForest.app:
+      @verbatim
+        > install_name_tool -change @rpath/lib3DForestGui.dylib /Users/user/Documents/devel/3d-forest/bin/lib3DForestGui.dylib 3DForest.app/Contents/MacOS/3DForest
+        > install_name_tool -change @rpath/lib3DForestEditor.dylib /Users/user/Documents/devel/3d-forest/bin/lib3DForestEditor.dylib 3DForest.app/Contents/MacOS/3DForest
+        > install_name_tool -change @rpath/lib3DForestCore.dylib /Users/user/Documents/devel/3d-forest/bin/lib3DForestCore.dylib 3DForest.app/Contents/MacOS/3DForest
+        > install_name_tool -change @rpath/QtOpenGL.framework/Versions/5/QtOpenGL /Users/user/Qt/5.15.2/clang_64/lib/QtOpenGL.framework/Versions/5/QtOpenGL 3DForest.app/Contents/MacOS/3DForest
+        > install_name_tool -change @rpath/QtWidgets.framework/Versions/5/QtWidgets /Users/user/Qt/5.15.2/clang_64/lib/QtWidgets.framework/Versions/5/QtWidgets 3DForest.app/Contents/MacOS/3DForest
+        > install_name_tool -change @rpath/QtGui.framework/Versions/5/QtGui /Users/user/Qt/5.15.2/clang_64/lib/QtGui.framework/Versions/5/QtGui 3DForest.app/Contents/MacOS/3DForest
+        > install_name_tool -change @rpath/QtCore.framework/Versions/5/QtCore /Users/user/Qt/5.15.2/clang_64/lib/QtCore.framework/Versions/5/QtCore 3DForest.app/Contents/MacOS/3DForest
+        > 3DForest.app/Contents/MacOS/3DForest
+      @verbatim
+    - Or to run generated executable 3DForest (by changing rpath to abs path):
       @verbatim
         > cd /Users/user/Documents/devel/3d-forest/bin
         > install_name_tool -change @rpath/lib3DForestGui.dylib /Users/user/Documents/devel/3d-forest/bin/lib3DForestGui.dylib 3DForest
