@@ -42,7 +42,7 @@ TreesWindow::TreesWindow(MainWindow *mainWindow) : QDockWidget(mainWindow)
     // Dock.
     setWidget(widget_);
     setWindowTitle(tr("Trees"));
-    setWindowIcon(ICON("trees"));
+    setWindowIcon(ICON("tree"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
 }
