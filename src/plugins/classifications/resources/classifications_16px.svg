@@ -32,7 +32,7 @@
      inkscape:document-units="px"
      showgrid="true"
      inkscape:zoom="27.649587"
-     inkscape:cx="-8.0839008"
+     inkscape:cx="-4.0041544"
      inkscape:cy="10.520184"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
@@ -75,12 +75,12 @@
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cccc" /><path
        style="fill:none;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 1.5,14.5 5,-5"
+       d="M 1,15 7,9"
        id="path822"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" /><path
        style="fill:none;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 1.5,9.5 5,5"
+       d="m 1,9 6,6"
        id="path824"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" /></g><metadata
