@@ -22,6 +22,7 @@
 
 <!-- Plugin -->
 <file>brush_16px_color.png</file>
+<file>brush_20px_color.png</file>
 
 </qresource>
 </RCC>
