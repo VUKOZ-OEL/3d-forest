@@ -22,6 +22,7 @@
 
 <!-- Plugin -->
 <file>files_16px.png</file>
+<file>files_20px.png</file>
 <file>files_24px.png</file>
 
 </qresource>
