@@ -138,7 +138,7 @@ void ViewerPlugin::initialize(MainWindow *mainWindow)
                               "Viewport Layout",
                               tr("Grid layout"),
                               tr("Grid layout"),
-                              ICON("layout_grid_2"),
+                              ICON("layout_grid"),
                               this,
                               SLOT(slotViewLayoutGrid()));
 
