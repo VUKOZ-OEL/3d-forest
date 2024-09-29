@@ -43,7 +43,7 @@ void ClassificationFilterPlugin::initialize(MainWindow *mainWindow)
 
     mainWindow_->createAction(nullptr,
                               "Filters",
-                              "View Filter",
+                              "Filters",
                               tr("Classification Filter"),
                               tr("Show classification filter"),
                               ICON("classification_filter"),

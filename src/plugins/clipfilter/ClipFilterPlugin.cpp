@@ -43,7 +43,7 @@ void ClipFilterPlugin::initialize(MainWindow *mainWindow)
 
     mainWindow_->createAction(nullptr,
                               "Filters",
-                              "View Filter",
+                              "Filters",
                               tr("Clip Filter"),
                               tr("Show clip filter"),
                               ICON("clip_filter"),

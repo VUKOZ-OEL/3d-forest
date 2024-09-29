@@ -41,9 +41,9 @@ void FilesPlugin::initialize(MainWindow *mainWindow)
 
     mainWindow_->createAction(nullptr,
                               "Data",
-                              "View Data",
+                              "Data",
                               tr("Files"),
-                              tr("Show file explorer"),
+                              tr("Show file data"),
                               ICON("files"),
                               this,
                               SLOT(slotPlugin()));

@@ -42,8 +42,8 @@ void HeightMapPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "Tools",
-                              "Tools",
+                              "Computation",
+                              "Computation",
                               tr("Height Map"),
                               tr("Compute height map"),
                               ICON("height_map"),

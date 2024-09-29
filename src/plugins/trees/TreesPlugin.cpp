@@ -41,9 +41,9 @@ void TreesPlugin::initialize(MainWindow *mainWindow)
 
     mainWindow_->createAction(nullptr,
                               "Data",
-                              "View Data",
+                              "Data",
                               tr("Trees"),
-                              tr("Show tree explorer"),
+                              tr("Show tree data"),
                               ICON("tree"),
                               this,
                               SLOT(slotPlugin()));
