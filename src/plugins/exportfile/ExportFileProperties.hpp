@@ -54,7 +54,7 @@ public:
     const Vector3<double> &offset() const { return offset_; }
 
     void setFilterEnabled(bool b) { filterEnabled_ = b; }
-    bool isFilterEnabled() const { return filterEnabled_; }
+    bool filterEnabled() const { return filterEnabled_; }
 
 private:
     std::string fileName_;

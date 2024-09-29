@@ -75,7 +75,7 @@ void DescriptorAction::start(const DescriptorParameters &parameters)
     LOG_DEBUG(<< "Start with parameters <" << toString(parameters) << ">.");
 
     // Set input parameters.
-    double ppm = editor_->settings().units.pointsPerMeter()[0];
+    double ppm = editor_->settings().units().pointsPerMeter()[0];
     LOG_DEBUG(<< "Units pointsPerMeter <" << ppm << ">.");
 
     parameters_ = parameters;
@@ -263,7 +263,7 @@ void DescriptorAction::computePoint()
 
     // Compute descriptor value.
     double descriptor;
-    bool hasDescriptor;
+    bool descriptorCalculated;
 
     if (parameters_.method == DescriptorParameters::METHOD_DENSITY)
     {
@@ -274,7 +274,7 @@ void DescriptorAction::computePoint()
         queryPoint_.exec();
 
         descriptor = 0.0;
-        hasDescriptor = true;
+        descriptorCalculated = true;
         while (queryPoint_.next())
         {
             if (query_.voxel() != DESCRIPTOR_IGNORE)
@@ -289,24 +289,24 @@ void DescriptorAction::computePoint()
         double meanY;
         double meanZ;
 
-        hasDescriptor = pca_.computeDescriptor(queryPoint_,
-                                               query_.x(),
-                                               query_.y(),
-                                               query_.z(),
-                                               parameters_.searchRadius,
-                                               meanX,
-                                               meanY,
-                                               meanZ,
-                                               descriptor);
+        descriptorCalculated = pca_.computeDescriptor(queryPoint_,
+                                                      query_.x(),
+                                                      query_.y(),
+                                                      query_.z(),
+                                                      parameters_.searchRadius,
+                                                      meanX,
+                                                      meanY,
+                                                      meanZ,
+                                                      descriptor);
     }
     else
     {
-        hasDescriptor = false;
+        descriptorCalculated = false;
     }
 
     // Update descriptor minimum and maximum values.
     size_t newValue;
-    if (hasDescriptor)
+    if (descriptorCalculated)
     {
         if (numberOfPointsWithDescriptor_ == 0)
         {

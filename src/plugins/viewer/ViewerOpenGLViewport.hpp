@@ -48,7 +48,7 @@ public:
     size_t viewportId() const;
 
     void setSelected(bool selected);
-    bool isSelected() const;
+    bool selected() const;
 
     void updateScene(Editor *editor);
     void resetScene(Editor *editor, bool resetView);
@@ -83,6 +83,7 @@ protected:
     ViewerViewports *windowViewports_;
     size_t viewportId_;
     bool selected_;
+    bool resized_;
 
     // Data.
     Editor *editor_;
@@ -91,7 +92,7 @@ protected:
 
     void setViewDefault();
     void clearScreen();
-    bool renderScene();
+    void renderScene();
     void renderFirstFrame();
     void renderSegments();
     void renderGuides();

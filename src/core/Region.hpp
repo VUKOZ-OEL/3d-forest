@@ -38,13 +38,13 @@ class Region
 {
 public:
     /** Region Shape. */
-    enum Shape
+    enum class Shape
     {
-        SHAPE_NONE,
-        SHAPE_BOX,
-        SHAPE_CONE,
-        SHAPE_CYLINDER,
-        SHAPE_SPHERE
+        NONE,
+        BOX,
+        CONE,
+        CYLINDER,
+        SPHERE
     };
 
     Shape shape;
@@ -74,7 +74,25 @@ inline Region::~Region()
 inline void Region::clear()
 {
     box.clear();
-    shape = SHAPE_NONE;
+    shape = Region::Shape::NONE;
+}
+
+inline std::string toString(const Region::Shape &in)
+{
+    switch (in)
+    {
+        case Region::Shape::BOX:
+            return "box";
+        case Region::Shape::CONE:
+            return "cone";
+        case Region::Shape::CYLINDER:
+            return "cylinder";
+        case Region::Shape::SPHERE:
+            return "sphere";
+        case Region::Shape::NONE:
+        default:
+            return "none";
+    }
 }
 
 inline void fromJson(Region &out, const Json &in)
@@ -83,38 +101,23 @@ inline void fromJson(Region &out, const Json &in)
     fromJson(shape, in["shape"]);
     if (shape == "box")
     {
-        out.shape = Region::SHAPE_BOX;
+        out.shape = Region::Shape::BOX;
         fromJson(out.box, in["box"]);
     }
     else
     {
-        out.shape = Region::SHAPE_NONE;
+        out.shape = Region::Shape::NONE;
     }
 }
 
 inline void toJson(Json &out, const Region &in)
 {
-    if (in.shape == Region::SHAPE_BOX)
+    if (in.shape == Region::Shape::BOX)
     {
-        toJson(out["shape"], "box");
         toJson(out["box"], in.box);
     }
-    else
-    {
-        toJson(out["shape"], "none");
-    }
-}
 
-inline std::string toString(const Region::Shape &in)
-{
-    if (in == Region::SHAPE_BOX)
-    {
-        return "box";
-    }
-    else
-    {
-        return "none";
-    }
+    toJson(out["shape"], toString(in.shape));
 }
 
 inline std::string toString(const Region &in)

@@ -53,18 +53,18 @@ public:
     void extend(const ViewerAabb &box);
 
     void invalidate();
-    bool isValid() const { return valid_; }
+    bool valid() const { return valid_; }
 
-    const QVector3D &getMin() const { return min_; }
-    const QVector3D &getMax() const { return max_; }
+    const QVector3D &min() const { return min_; }
+    const QVector3D &max() const { return max_; }
 
-    const QVector3D &getCenter() const { return center_; }
-    float getRadius() const { return radius_; }
+    const QVector3D &center() const { return center_; }
+    float radius() const { return radius_; }
 
-    void getRange(const QVector3D &eye,
-                  const QVector3D &direction,
-                  float *min,
-                  float *max);
+    void range(const QVector3D &eye,
+               const QVector3D &direction,
+               float *min,
+               float *max);
 
 protected:
     QVector3D min_;

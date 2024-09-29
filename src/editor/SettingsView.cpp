@@ -38,7 +38,7 @@ SettingsView::SettingsView()
                           "Return Number",
                           "Number of Returns",
                           "Classification",
-                          "Segment",
+                          "Tree",
                           "Elevation",
                           "Descriptor"};
 
@@ -60,7 +60,7 @@ void SettingsView::setPointSize(double size)
     pointSize_ = size;
 }
 
-bool SettingsView::isFogEnabled() const
+bool SettingsView::fogEnabled() const
 {
     return fogEnabled_;
 }
@@ -70,7 +70,7 @@ void SettingsView::setFogEnabled(bool b)
     fogEnabled_ = b;
 }
 
-bool SettingsView::isShowAttributesEnabled() const
+bool SettingsView::showAttributesEnabled() const
 {
     return showAttributesEnabled_;
 }
@@ -110,12 +110,12 @@ const char *SettingsView::colorSourceString(size_t id) const
     return "";
 }
 
-bool SettingsView::isColorSourceEnabled(SettingsView::ColorSource id) const
+bool SettingsView::colorSourceEnabled(SettingsView::ColorSource id) const
 {
     return colorSourceEnabled_[static_cast<size_t>(id)];
 }
 
-bool SettingsView::isColorSourceEnabled(size_t id) const
+bool SettingsView::colorSourceEnabled(size_t id) const
 {
     if (id < static_cast<size_t>(SettingsView::COLOR_SOURCE_LAST))
     {

@@ -156,7 +156,7 @@ void TreeAttributesLeastSquaredRegression::taubinFit(
         double Dy = A1 + x * (A22 + A33 * x);
 
         double xnew = x - y / Dy;
-        if (isEqual(xnew, x) || (!std::isfinite(xnew)))
+        if (equal(xnew, x) || (!std::isfinite(xnew)))
         {
             break;
         }
@@ -210,17 +210,17 @@ void TreeAttributesLeastSquaredRegression::geometricCircle(
         meanZ += points[(i * 3) + 2];
     }
 
-    if (isZero(meanX))
+    if (zero(meanX))
     {
         meanX = 1e-10;
     }
 
-    if (isZero(meanY))
+    if (zero(meanY))
     {
         meanY = 1e-10;
     }
 
-    if (isZero(meanZ))
+    if (zero(meanZ))
     {
         meanZ = 1e-10;
     }
@@ -272,13 +272,13 @@ nextIteration:
     for (size_t i = 0; i < n; i++)
     {
         double dx = points[(i * 3) + 0] - Old.a;
-        if (isZero(dx))
+        if (zero(dx))
         {
             dx = 1e-10;
         }
 
         double dy = points[(i * 3) + 1] - Old.b;
-        if (isZero(dy))
+        if (zero(dy))
         {
             dy = 1e-10;
         }
@@ -413,7 +413,7 @@ double TreeAttributesLeastSquaredRegression::sigma(
                 (std::sqrt(dx * dx + dy * dy) - circle.r));
     }
 
-    if (isZero(sum))
+    if (zero(sum))
     {
         sum = 1e-10;
     }

@@ -80,7 +80,7 @@ void SegmentationAction::start(const SegmentationParameters &parameters)
     LOG_DEBUG(<< "Start with parameters <" << toString(parameters) << ">.");
 
     // Set input parameters.
-    double ppm = editor_->settings().units.pointsPerMeter()[0];
+    double ppm = editor_->settings().units().pointsPerMeter()[0];
     LOG_DEBUG(<< "Units pointsPerMeter <" << ppm << ">.");
 
     parameters_ = parameters;
@@ -163,8 +163,8 @@ void SegmentationAction::stepResetPoints()
 
         QueryFilterSet segmentsFilter;
         segmentsFilter.clear();
-        segmentsFilter.setFilter(0, true);
-        segmentsFilter.setFilterEnabled(true);
+        segmentsFilter.setEnabled(0, true);
+        segmentsFilter.setEnabled(true);
 
         editor_->setSegments(segments);
         editor_->setSegmentsFilter(segmentsFilter);
@@ -299,7 +299,7 @@ void SegmentationAction::stepCreateTrunks()
             LOG_DEBUG(<< "Start next path.");
             // If a voxel is not processed and meets
             // criteria (for wood), add it to the path.
-            if (isTrunkVoxel(voxels_[pointIndex_]))
+            if (trunkVoxel(voxels_[pointIndex_]))
             {
                 LOG_DEBUG(<< "Start next trunk group.");
                 startGroup(voxels_[pointIndex_], true);
@@ -339,7 +339,7 @@ void SegmentationAction::stepCreateTrunks()
                     Point &b = voxels_[search_[j]];
                     // If a voxel in search radius is not processed and meets
                     // criteria (for wood), add it to group expansion.
-                    if (isTrunkVoxel(b))
+                    if (trunkVoxel(b))
                     {
                         continueGroup(b, true);
                         b.group = groupId_;
@@ -536,12 +536,12 @@ void SegmentationAction::stepCreateSegments()
 
     segments.setDefault();
     segments[0].boundary = groupUnsegmented_.boundary;
-    // segments[0].position = groupUnsegmented_.boundary.getCenter();
+    // segments[0].position = groupUnsegmented_.boundary.center();
     // segments[0].height = groupUnsegmented_.boundary.length(2);
 
     QueryFilterSet segmentsFilter;
-    segmentsFilter.setFilter(0, true);
-    segmentsFilter.setFilterEnabled(true);
+    segmentsFilter.setEnabled(0, true);
+    segmentsFilter.setEnabled(true);
 
     // For each final group, perform the following:
     size_t segmentId = 1;
@@ -553,7 +553,7 @@ void SegmentationAction::stepCreateSegments()
 
         // Append new segment to segments.
         segments.push_back(segment);
-        segmentsFilter.setFilter(segmentId, true);
+        segmentsFilter.setEnabled(segmentId, true);
 
         // Set segment id to this group.
         it.second.segmentId = segmentId;
@@ -574,7 +574,7 @@ void SegmentationAction::createSegmentFromGroup(size_t segmentId,
 {
     segment.id = segmentId;
 
-    segment.label = "Segment " + std::to_string(segment.id);
+    segment.label = "Tree " + std::to_string(segment.id);
     segment.color =
         ColorPalette::MPN65[segment.id % ColorPalette::MPN65.size()];
 
@@ -733,15 +733,15 @@ void SegmentationAction::findNearestNeighbor(Point &a)
     }
 }
 
-bool SegmentationAction::isTrunkVoxel(const Point &a)
+bool SegmentationAction::trunkVoxel(const Point &a)
 {
     return a.group == SIZE_MAX &&
            !(a.descriptor < parameters_.woodThresholdMin);
 }
 
-void SegmentationAction::startGroup(const Point &a, bool isTrunk)
+void SegmentationAction::startGroup(const Point &a, bool trunk)
 {
-    if (isTrunk)
+    if (trunk)
     {
         if (parameters_.zCoordinatesAsElevation)
         {
@@ -762,9 +762,9 @@ void SegmentationAction::startGroup(const Point &a, bool isTrunk)
     group_.averagePoint[2] += a.z;
 }
 
-void SegmentationAction::continueGroup(const Point &a, bool isTrunk)
+void SegmentationAction::continueGroup(const Point &a, bool trunk)
 {
-    if (isTrunk)
+    if (trunk)
     {
         if (parameters_.zCoordinatesAsElevation)
         {

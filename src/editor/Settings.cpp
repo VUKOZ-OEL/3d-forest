@@ -26,27 +26,37 @@
 #define LOG_MODULE_NAME "Settings"
 #include <Log.hpp>
 
+void Settings::view(const SettingsView &view)
+{
+    view_ = view;
+}
+
+bool Settings::units(const SettingsUnits &units)
+{
+    return units_.apply(units);
+}
+
 void fromJson(Settings &out, const Json &in)
 {
     if (in.contains("view"))
     {
-        fromJson(out.view, in["view"]);
+        fromJson(out.view_, in["view"]);
     }
 
     if (in.contains("units"))
     {
-        fromJson(out.units, in["units"]);
+        fromJson(out.units_, in["units"]);
     }
 }
 
 void toJson(Json &out, const Settings &in)
 {
-    toJson(out["view"], in.view);
-    toJson(out["units"], in.units);
+    toJson(out["view"], in.view_);
+    toJson(out["units"], in.units_);
 }
 
 std::string toString(const Settings &in)
 {
-    return "{\"view\": " + toString(in.view) +
-           ",\"units\": " + toString(in.units) + "}";
+    return "{\"view\": " + toString(in.view_) +
+           ",\"units\": " + toString(in.units_) + "}";
 }

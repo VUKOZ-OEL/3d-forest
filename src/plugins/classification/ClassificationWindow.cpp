@@ -51,7 +51,7 @@ ClassificationWindow::ClassificationWindow(MainWindow *mainWindow)
     // Dialog.
     setLayout(mainLayout);
     setWindowTitle(tr("Classification"));
-    setWindowIcon(ICON("soil_b"));
+    setWindowIcon(ICON("ground"));
     setMaximumHeight(height());
     setModal(false);
 }

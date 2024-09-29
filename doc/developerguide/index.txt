@@ -234,7 +234,18 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
         > cd /Users/user/Documents/devel/3d-forest/bin
         > DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/Users/user/Documents/devel/3d-forest/bin ./3DForestExampleFile
       @endverbatim
-    - Run 3d Forest (by changing rpath to abs path):
+    - The following run.sh scrip can be written to run generated 3DForest.app:
+      @verbatim
+        > install_name_tool -change @rpath/lib3DForestGui.dylib /Users/user/Documents/devel/3d-forest/bin/lib3DForestGui.dylib 3DForest.app/Contents/MacOS/3DForest
+        > install_name_tool -change @rpath/lib3DForestEditor.dylib /Users/user/Documents/devel/3d-forest/bin/lib3DForestEditor.dylib 3DForest.app/Contents/MacOS/3DForest
+        > install_name_tool -change @rpath/lib3DForestCore.dylib /Users/user/Documents/devel/3d-forest/bin/lib3DForestCore.dylib 3DForest.app/Contents/MacOS/3DForest
+        > install_name_tool -change @rpath/QtOpenGL.framework/Versions/5/QtOpenGL /Users/user/Qt/5.15.2/clang_64/lib/QtOpenGL.framework/Versions/5/QtOpenGL 3DForest.app/Contents/MacOS/3DForest
+        > install_name_tool -change @rpath/QtWidgets.framework/Versions/5/QtWidgets /Users/user/Qt/5.15.2/clang_64/lib/QtWidgets.framework/Versions/5/QtWidgets 3DForest.app/Contents/MacOS/3DForest
+        > install_name_tool -change @rpath/QtGui.framework/Versions/5/QtGui /Users/user/Qt/5.15.2/clang_64/lib/QtGui.framework/Versions/5/QtGui 3DForest.app/Contents/MacOS/3DForest
+        > install_name_tool -change @rpath/QtCore.framework/Versions/5/QtCore /Users/user/Qt/5.15.2/clang_64/lib/QtCore.framework/Versions/5/QtCore 3DForest.app/Contents/MacOS/3DForest
+        > 3DForest.app/Contents/MacOS/3DForest
+      @verbatim
+    - Or to run generated executable 3DForest (by changing rpath to abs path):
       @verbatim
         > cd /Users/user/Documents/devel/3d-forest/bin
         > install_name_tool -change @rpath/lib3DForestGui.dylib /Users/user/Documents/devel/3d-forest/bin/lib3DForestGui.dylib 3DForest
@@ -661,7 +672,7 @@ LOG_DEBUG(<< "Found <" << nPoints << "> points.");
 
 Example command to generate documentation:
 @verbatim
-mingw32-make doxygen
+mingw32-make doc
 @endverbatim
 
 Your favorite syntax of documentation comments.
@@ -838,37 +849,45 @@ powershell -C "gci | % {rni $_.Name ($_.Name -replace '24px', '24')}"
     (compiler path and IntelliSense settings):
     @verbatim
     {
-        "files.eol": "\n",
-        "C_Cpp.default.includePath":[
-            "C:/Qt/6.3.0/mingw_64/include/**",
-            "${workspaceRoot}/3rdparty/delaunator",
-            "${workspaceRoot}/3rdparty/eigen",
-            "${workspaceRoot}/3rdparty/libigl/include",
-            "${workspaceRoot}/3rdparty/stb",
-            "${workspaceRoot}/3rdparty/unibnoctree",
-            "${workspaceRoot}/3rdparty/warnings",
-            "${workspaceRoot}/3rdparty/widgets/ctk",
-            "${workspaceRoot}/3rdparty/widgets/flowlayout",
-            "${workspaceRoot}/src/apps/3dforest",
-            "${workspaceRoot}/src/apps/tests",
-            "${workspaceRoot}/src/apps/tools/sandbox",
-            "${workspaceRoot}/src/core",
-            "${workspaceRoot}/src/editor",
-            "${workspaceRoot}/src/gui",
-            "${workspaceRoot}/src/plugins/classification",
-            "${workspaceRoot}/src/plugins/dbh",
-            "${workspaceRoot}/src/plugins/descriptor",
-            "${workspaceRoot}/src/plugins/elevation",
-            "${workspaceRoot}/src/plugins/explorer",
-            "${workspaceRoot}/src/plugins/exportfile",
-            "${workspaceRoot}/src/plugins/heightmap",
-            "${workspaceRoot}/src/plugins/help",
-            "${workspaceRoot}/src/plugins/importfile",
-            "${workspaceRoot}/src/plugins/messagelog",
-            "${workspaceRoot}/src/plugins/projectfile",
-            "${workspaceRoot}/src/plugins/segmentation",
-            "${workspaceRoot}/src/plugins/settings",
-            "${workspaceRoot}/src/plugins/viewer"]
+      "files.eol": "\n",
+      "C_Cpp.default.includePath":[
+        "C:/Qt/6.3.0/mingw_64/include/**",
+        "${workspaceRoot}/3rdparty/delaunator",
+        "${workspaceRoot}/3rdparty/eigen",
+        "${workspaceRoot}/3rdparty/libigl/include",
+        "${workspaceRoot}/3rdparty/stb",
+        "${workspaceRoot}/3rdparty/unibnoctree",
+        "${workspaceRoot}/3rdparty/warnings",
+        "${workspaceRoot}/3rdparty/widgets/ctk",
+        "${workspaceRoot}/3rdparty/widgets/flowlayout",
+        "${workspaceRoot}/src/apps/3dforest",
+        "${workspaceRoot}/src/apps/tests",
+        "${workspaceRoot}/src/apps/tools/sandbox",
+        "${workspaceRoot}/src/core",
+        "${workspaceRoot}/src/editor",
+        "${workspaceRoot}/src/gui",
+        "${workspaceRoot}/src/plugins/classification",
+        "${workspaceRoot}/src/plugins/classificationfilter",
+        "${workspaceRoot}/src/plugins/clipfilter",
+        "${workspaceRoot}/src/plugins/descriptor",
+        "${workspaceRoot}/src/plugins/descriptorfilter",
+        "${workspaceRoot}/src/plugins/elevation",
+        "${workspaceRoot}/src/plugins/elevationfilter",
+        "${workspaceRoot}/src/plugins/exportfile",
+        "${workspaceRoot}/src/plugins/files",
+        "${workspaceRoot}/src/plugins/heightmap",
+        "${workspaceRoot}/src/plugins/help",
+        "${workspaceRoot}/src/plugins/importfile",
+        "${workspaceRoot}/src/plugins/intensityfilter",
+        "${workspaceRoot}/src/plugins/messagelog",
+        "${workspaceRoot}/src/plugins/projectfile",
+        "${workspaceRoot}/src/plugins/segmentation",
+        "${workspaceRoot}/src/plugins/settingsunits",
+        "${workspaceRoot}/src/plugins/settingsview",
+        "${workspaceRoot}/src/plugins/treeattributes",
+        "${workspaceRoot}/src/plugins/trees",
+        "${workspaceRoot}/src/plugins/viewer"
+      ]
     }
     @endverbatim
 

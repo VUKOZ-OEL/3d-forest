@@ -84,11 +84,11 @@ void Page::setModified()
     }
 }
 
-bool Page::isModified() const
+bool Page::modified() const
 {
     if (pageData_)
     {
-        return pageData_->isModified();
+        return pageData_->modified();
     }
 
     return false;
@@ -141,7 +141,7 @@ void Page::readPage()
 
 void Page::writePage()
 {
-    if (pageData_ && pageData_->isModified())
+    if (pageData_ && pageData_->modified())
     {
         pageData_->writePage(editor_);
     }
@@ -241,7 +241,7 @@ void Page::queryWhere()
 
     const Region &region = query_->where().region();
 
-    if (region.shape == Region::SHAPE_NONE)
+    if (region.shape == Region::Shape::NONE)
     {
         // Reset selection to mark all points as selected.
         LOG_DEBUG(<< "Reset selection.");
@@ -272,7 +272,7 @@ void Page::queryWhereBox()
 {
     const Region &region = query_->where().region();
     const Box<double> &clipBox = region.box;
-    if (region.shape != Region::SHAPE_BOX || clipBox.empty())
+    if (region.shape != Region::Shape::BOX || clipBox.empty())
     {
         return;
     }
@@ -333,7 +333,7 @@ void Page::queryWhereBox()
                     double y = position[3 * idx + 1];
                     double z = position[3 * idx + 2];
 
-                    if (clipBox.isInside(x, y, z))
+                    if (clipBox.contains(x, y, z))
                     {
                         selection[nSelected++] = static_cast<uint32_t>(idx);
                     }
@@ -376,7 +376,7 @@ void Page::queryWhereBox()
                     double y = position[3 * idx + 1];
                     double z = position[3 * idx + 2];
 
-                    if (clipBox.isInside(x, y, z))
+                    if (clipBox.contains(x, y, z))
                     {
                         selection[nSelected++] = static_cast<uint32_t>(idx);
                         if (nSelected == max)
@@ -418,7 +418,7 @@ void Page::queryWhereCone()
 {
     const Region &region = query_->where().region();
     const Cone<double> &clipCone = region.cone;
-    if (region.shape != Region::SHAPE_CONE || clipCone.empty())
+    if (region.shape != Region::Shape::CONE || clipCone.empty())
     {
         return;
     }
@@ -475,7 +475,7 @@ void Page::queryWhereCone()
             double y = position[3 * idx + 1];
             double z = position[3 * idx + 2];
 
-            if (clipCone.isInside(x, y, z))
+            if (clipCone.contains(x, y, z))
             {
                 selection[nSelected++] = static_cast<uint32_t>(idx);
                 if (nSelected == max)
@@ -501,7 +501,7 @@ void Page::queryWhereCylinder()
 {
     const Region &region = query_->where().region();
     const Cylinder<double> &clipCylinder = region.cylinder;
-    if (region.shape != Region::SHAPE_CYLINDER || clipCylinder.empty())
+    if (region.shape != Region::Shape::CYLINDER || clipCylinder.empty())
     {
         return;
     }
@@ -558,7 +558,7 @@ void Page::queryWhereCylinder()
             double y = position[3 * idx + 1];
             double z = position[3 * idx + 2];
 
-            if (clipCylinder.isInside(x, y, z))
+            if (clipCylinder.contains(x, y, z))
             {
                 selection[nSelected++] = static_cast<uint32_t>(idx);
                 if (nSelected == max)
@@ -584,7 +584,7 @@ void Page::queryWhereSphere()
 {
     const Region &region = query_->where().region();
     const Sphere<double> &clipSphere = region.sphere;
-    if (region.shape != Region::SHAPE_SPHERE || clipSphere.empty())
+    if (region.shape != Region::Shape::SPHERE || clipSphere.empty())
     {
         return;
     }
@@ -641,7 +641,7 @@ void Page::queryWhereSphere()
             double y = position[3 * idx + 1];
             double z = position[3 * idx + 2];
 
-            if (clipSphere.isInside(x, y, z))
+            if (clipSphere.contains(x, y, z))
             {
                 selection[nSelected++] = static_cast<uint32_t>(idx);
                 if (nSelected == max)
@@ -667,7 +667,7 @@ void Page::queryWhereElevation()
 {
     const Range<double> &elevationRange = query_->where().elevation();
 
-    if (elevationRange.isEnabled() == false || elevationRange.full())
+    if (elevationRange.enabled() == false || elevationRange.full())
     {
         return;
     }
@@ -699,7 +699,7 @@ void Page::queryWhereDescriptor()
 {
     const Range<double> &descriptorRange = query_->where().descriptor();
 
-    if (descriptorRange.isEnabled() == false || descriptorRange.full())
+    if (descriptorRange.enabled() == false || descriptorRange.full())
     {
         return;
     }
@@ -731,7 +731,7 @@ void Page::queryWhereIntensity()
 {
     const Range<double> &intensityRange = query_->where().intensity();
 
-    if (intensityRange.isEnabled() == false || intensityRange.full())
+    if (intensityRange.enabled() == false || intensityRange.full())
     {
         return;
     }
@@ -761,7 +761,7 @@ void Page::queryWhereIntensity()
 
 void Page::queryWhereClassification()
 {
-    if (!query_->where().classification().isFilterEnabled())
+    if (!query_->where().classification().enabled())
     {
         return;
     }
@@ -796,7 +796,7 @@ void Page::queryWhereClassification()
 
 void Page::queryWhereSegment()
 {
-    if (!query_->where().segment().isFilterEnabled())
+    if (!query_->where().segment().enabled())
     {
         return;
     }
@@ -841,7 +841,7 @@ void Page::runModifiers()
 
 void Page::runColorModifier()
 {
-    const SettingsView &opt = editor_->settings().view;
+    const SettingsView &opt = editor_->settings().view();
     double r = 1.0; // opt.pointColor()[0];
     double g = 1.0; // opt.pointColor()[1];
     double b = 1.0; // opt.pointColor()[2];
@@ -855,7 +855,7 @@ void Page::runColorModifier()
         renderColor[i * 3 + 2] = static_cast<float>(b);
     }
 
-    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_COLOR))
+    if (opt.colorSourceEnabled(opt.COLOR_SOURCE_COLOR))
     {
         for (size_t i = 0; i < n; i++)
         {
@@ -865,7 +865,7 @@ void Page::runColorModifier()
         }
     }
 
-    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_INTENSITY))
+    if (opt.colorSourceEnabled(opt.COLOR_SOURCE_INTENSITY))
     {
         // for (size_t i = 0; i < n; i++)
         // {
@@ -883,7 +883,7 @@ void Page::runColorModifier()
         }
     }
 
-    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_RETURN_NUMBER))
+    if (opt.colorSourceEnabled(opt.COLOR_SOURCE_RETURN_NUMBER))
     {
         for (size_t i = 0; i < n; i++)
         {
@@ -894,7 +894,7 @@ void Page::runColorModifier()
         }
     }
 
-    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_NUMBER_OF_RETURNS))
+    if (opt.colorSourceEnabled(opt.COLOR_SOURCE_NUMBER_OF_RETURNS))
     {
         for (size_t i = 0; i < n; i++)
         {
@@ -905,7 +905,7 @@ void Page::runColorModifier()
         }
     }
 
-    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_CLASSIFICATION))
+    if (opt.colorSourceEnabled(opt.COLOR_SOURCE_CLASSIFICATION))
     {
         for (size_t i = 0; i < n; i++)
         {
@@ -913,7 +913,7 @@ void Page::runColorModifier()
         }
     }
 
-    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_SEGMENT))
+    if (opt.colorSourceEnabled(opt.COLOR_SOURCE_SEGMENT))
     {
         const Segments &segments = editor_->segments();
         const size_t max = segments.size();
@@ -937,7 +937,7 @@ void Page::runColorModifier()
         }
     }
 
-    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_ELEVATION))
+    if (opt.colorSourceEnabled(opt.COLOR_SOURCE_ELEVATION))
     {
         const Dataset &dataset = editor_->datasets().key(datasetId_);
         double zlen = dataset.boundary().length(2);
@@ -955,7 +955,7 @@ void Page::runColorModifier()
         }
     }
 
-    if (opt.isColorSourceEnabled(opt.COLOR_SOURCE_DESCRIPTOR))
+    if (opt.colorSourceEnabled(opt.COLOR_SOURCE_DESCRIPTOR))
     {
         for (size_t i = 0; i < n; i++)
         {

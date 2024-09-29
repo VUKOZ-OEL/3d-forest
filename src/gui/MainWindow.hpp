@@ -35,9 +35,7 @@ class PluginInterface;
 class ExportFilePlugin;
 class ImportFilePlugin;
 class MessageLogPlugin;
-class ExplorerPlugin;
 class ProjectFilePlugin;
-class SettingsPlugin;
 class ViewerPlugin;
 class HelpPlugin;
 
@@ -161,9 +159,7 @@ private:
     ImportFilePlugin *importFilePlugin_;
     ExportFilePlugin *exportFilePlugin_;
     MessageLogPlugin *messageLogPlugin_;
-    ExplorerPlugin *explorerPlugin_;
     ProjectFilePlugin *projectFilePlugin_;
-    SettingsPlugin *settingsPlugin_;
     ViewerPlugin *viewerPlugin_;
     HelpPlugin *helpPlugin_;
     std::vector<PluginInterface *> plugins_;

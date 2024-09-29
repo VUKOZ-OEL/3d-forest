@@ -23,6 +23,7 @@
 #define ENDIAN_HPP
 
 // Include std.
+#include <cstddef>
 #include <cstdint>
 
 // Include local.

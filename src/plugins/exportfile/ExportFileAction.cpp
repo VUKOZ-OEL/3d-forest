@@ -57,7 +57,7 @@ void ExportFileAction::initialize(
     regionMin_.clear();
     regionMax_.clear();
 
-    if (properties_.isFilterEnabled())
+    if (properties_.filterEnabled())
     {
         query_.setWhere(editor_->viewports().where());
     }
@@ -91,7 +91,7 @@ void ExportFileAction::next()
 
     progress_.startTimer();
 
-    if (!writer_->isOpen())
+    if (!writer_->open())
     {
         writer_->create(properties_.fileName());
     }

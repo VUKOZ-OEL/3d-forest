@@ -220,7 +220,7 @@ public:
     void open(const std::string &path);
     void create(const std::string &path);
     void close();
-    bool isOpen() const;
+    bool open() const;
 
     static void move(const std::string &outputPath,
                      const std::string &inputPath);

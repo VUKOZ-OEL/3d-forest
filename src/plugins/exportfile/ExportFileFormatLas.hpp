@@ -34,7 +34,7 @@ public:
     ExportFileFormatLas();
     virtual ~ExportFileFormatLas();
 
-    virtual bool isOpen() { return file_.isOpen(); }
+    virtual bool open() { return file_.open(); }
     virtual void create(const std::string &path);
     virtual void write(Query &query);
     virtual void close();

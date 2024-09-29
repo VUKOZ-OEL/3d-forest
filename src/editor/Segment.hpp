@@ -42,7 +42,7 @@ public:
 
     std::vector<Mesh> meshList;
 
-    bool hasCalculatedAttributes{false};
+    bool attributesCalculated{false};
 
     Vector3<double> position;
     Box<double> boundary;

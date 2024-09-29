@@ -62,7 +62,7 @@ public:
     void setPreviewEnabled(bool enabled,
                            bool update = true,
                            bool reload = false);
-    bool isPreviewEnabled();
+    bool previewEnabled();
     void applyModifier(Page *page);
     void apply(QWidget *widget);
 

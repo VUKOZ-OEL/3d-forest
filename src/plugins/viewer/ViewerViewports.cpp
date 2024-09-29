@@ -98,7 +98,7 @@ ViewerOpenGLViewport *ViewerViewports::selectedViewport()
 {
     for (size_t i = 0; i < viewports_.size(); i++)
     {
-        if (viewports_[i]->isSelected())
+        if (viewports_[i]->selected())
         {
             return viewports_[i];
         }
@@ -111,7 +111,7 @@ const ViewerOpenGLViewport *ViewerViewports::selectedViewport() const
 {
     for (size_t i = 0; i < viewports_.size(); i++)
     {
-        if (viewports_[i]->isSelected())
+        if (viewports_[i]->selected())
         {
             return viewports_[i];
         }
@@ -190,7 +190,7 @@ size_t ViewerViewports::selectedViewportId() const
 {
     for (size_t i = 0; i < viewports_.size(); i++)
     {
-        if (viewports_[i]->isSelected())
+        if (viewports_[i]->selected())
         {
             return i;
         }

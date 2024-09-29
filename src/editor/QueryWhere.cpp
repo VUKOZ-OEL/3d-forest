@@ -24,6 +24,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "QueryWhere"
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 QueryWhere::QueryWhere()
@@ -36,6 +37,8 @@ QueryWhere::~QueryWhere()
 
 void QueryWhere::clear()
 {
+    LOG_DEBUG_UPDATE(<< "Clear.");
+
     region_.clear();
     elevation_.clear();
     descriptor_.clear();
@@ -64,13 +67,13 @@ void QueryWhere::setRegion(const Region &region)
 void QueryWhere::setBox(const Box<double> &box)
 {
     region_.box = box;
-    region_.shape = Region::SHAPE_BOX;
+    region_.shape = Region::Shape::BOX;
 }
 
 void QueryWhere::setCone(double x, double y, double z, double z2, double angle)
 {
     region_.cone.set(x, y, z, z2, angle);
-    region_.shape = Region::SHAPE_CONE;
+    region_.shape = Region::Shape::CONE;
 }
 
 void QueryWhere::setCylinder(double ax,
@@ -82,13 +85,13 @@ void QueryWhere::setCylinder(double ax,
                              double radius)
 {
     region_.cylinder.set(ax, ay, az, bx, by, bz, radius);
-    region_.shape = Region::SHAPE_CYLINDER;
+    region_.shape = Region::Shape::CYLINDER;
 }
 
 void QueryWhere::setSphere(double x, double y, double z, double radius)
 {
     region_.sphere.set(x, y, z, radius);
-    region_.shape = Region::SHAPE_SPHERE;
+    region_.shape = Region::Shape::SPHERE;
 }
 
 void QueryWhere::setElevation(const Range<double> &elevation)

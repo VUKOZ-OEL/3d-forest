@@ -72,7 +72,7 @@ void ElevationAction::start(double voxelRadius)
     LOG_DEBUG(<< "Start with voxelRadius <" << voxelRadius << ">.");
 
     // Set input parameters.
-    double ppm = editor_->settings().units.pointsPerMeter()[0];
+    double ppm = editor_->settings().units().pointsPerMeter()[0];
 
     voxelRadius_ = voxelRadius * ppm;
 

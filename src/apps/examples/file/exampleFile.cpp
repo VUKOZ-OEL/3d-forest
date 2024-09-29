@@ -39,9 +39,9 @@ static void exampleFile()
 
     TEST(File::currentPath());
 
-    TEST(File::isAbsolute("../Documents/file.txt"));
-    TEST(File::isAbsolute("/tmp/file.txt"));
-    TEST(File::isAbsolute("C:\\tmp\\file.txt"));
+    TEST(File::absolute("../Documents/file.txt"));
+    TEST(File::absolute("/tmp/file.txt"));
+    TEST(File::absolute("C:\\tmp\\file.txt"));
 
     TEST(File::fileName("file.txt"));
     TEST(File::fileName("/tmp/file.txt"));

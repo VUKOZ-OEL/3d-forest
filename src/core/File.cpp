@@ -229,7 +229,7 @@ void File::open(const std::string &path, const std::string &mode)
         errno_t err = _sopen_s(&fd_, path.c_str(), oflag, _SH_DENYNO, omode);
         if (err != 0)
         {
-            THROW("Can't open file '" + path + "': " + getErrorString(err));
+            THROW("Can't open file '" + path + "': " + errorString(err));
         }
 #else
         fd_ = ::open(path.c_str(), oflag);
@@ -270,7 +270,7 @@ void File::open(const std::string &path, const std::string &mode)
                                _S_IREAD | _S_IWRITE);
         if (err != 0)
         {
-            THROW("Can't open file '" + path + "': " + getErrorString(err));
+            THROW("Can't open file '" + path + "': " + errorString(err));
         }
 #else
         fd_ = ::open(path.c_str(), oflag, omode);
@@ -432,7 +432,7 @@ void File::read(uint8_t *buffer,
                              _S_IREAD);
     if (err != 0)
     {
-        THROW("Can't open file '" + path + "': " + getErrorString(err));
+        THROW("Can't open file '" + path + "': " + errorString(err));
     }
 #else
     fd = ::open(path.c_str(), O_RDONLY | O_BINARY);
@@ -560,7 +560,7 @@ void File::write(const uint8_t *buffer,
                              _S_IREAD | _S_IWRITE);
     if (err != 0)
     {
-        THROW("Can't open file '" + path + "': " + getErrorString(err));
+        THROW("Can't open file '" + path + "': " + errorString(err));
     }
 #else
     fd = ::open(path.c_str(), O_WRONLY | O_BINARY);
@@ -777,7 +777,7 @@ bool File::exists(const std::string &path)
     return ret == 0;
 }
 
-bool File::isAbsolute(const std::string &path)
+bool File::absolute(const std::string &path)
 {
 #if defined(_MSC_VER) || defined(__MINGW32__)
     if (path.size() > 2)
@@ -902,7 +902,7 @@ std::string File::resolvePath(const std::string &path,
     std::string rval;
 
     rval = path;
-    if (!File::isAbsolute(rval))
+    if (!File::absolute(rval))
     {
         // Resolve path.
         rval = File::replaceFileName(basePath, rval);

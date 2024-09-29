@@ -132,7 +132,7 @@ void IndexFile::selectLeaves(std::vector<SelectionTile> &selection,
     const Node *node = &nodes_[idx];
 
     // Select all.
-    if (boundary.isInside(window))
+    if (window.contains(boundary))
     {
         selection.push_back({datasetId, tileId, node->from, node->size, false});
         return;
@@ -151,7 +151,7 @@ void IndexFile::selectLeaves(std::vector<SelectionTile> &selection,
     Box<double> octant;
     bool leaf = true;
 
-    boundary.getCenter(px, py, pz);
+    boundary.center(px, py, pz);
 
     for (size_t i = 0; i < 8; i++)
     {
@@ -183,7 +183,7 @@ void IndexFile::selectLeaves(std::vector<Selection> &selection,
                              size_t id) const
 {
     // Select all.
-    if (boundary.isInside(window))
+    if (window.contains(boundary))
     {
         selection.push_back({id, idx, false});
         return;
@@ -203,7 +203,7 @@ void IndexFile::selectLeaves(std::vector<Selection> &selection,
     const Node *node = &nodes_[idx];
     bool leaf = true;
 
-    boundary.getCenter(px, py, pz);
+    boundary.center(px, py, pz);
 
     for (size_t i = 0; i < 8; i++)
     {
@@ -236,7 +236,7 @@ void IndexFile::selectNodes(std::vector<Selection> &selection,
     }
 
     // Select all or partial.
-    if (boundary.isInside(window))
+    if (window.contains(boundary))
     {
         selection.push_back({id, idx, false});
     }
@@ -252,7 +252,7 @@ void IndexFile::selectNodes(std::vector<Selection> &selection,
     Box<double> octant;
     const Node *node = &nodes_[idx];
 
-    boundary.getCenter(px, py, pz);
+    boundary.center(px, py, pz);
 
     for (size_t i = 0; i < 8; i++)
     {
@@ -274,7 +274,7 @@ const IndexFile::Node *IndexFile::selectNode(
     size_t idx) const
 {
     // Outside.
-    if (!boundary.isInside(x, y, z))
+    if (!boundary.contains(x, y, z))
     {
         return nullptr;
     }
@@ -292,7 +292,7 @@ const IndexFile::Node *IndexFile::selectNode(
     Box<double> octant;
     const Node *ret;
 
-    boundary.getCenter(px, py, pz);
+    boundary.center(px, py, pz);
 
     for (size_t i = 0; i < 8; i++)
     {
@@ -319,7 +319,7 @@ const IndexFile::Node *IndexFile::selectLeaf(double x,
                                              size_t idx) const
 {
     // Outside.
-    if (!boundary.isInside(x, y, z))
+    if (!boundary.contains(x, y, z))
     {
         return nullptr;
     }
@@ -332,7 +332,7 @@ const IndexFile::Node *IndexFile::selectLeaf(double x,
     const Node *node = &nodes_[idx];
     const Node *ret;
 
-    boundary.getCenter(px, py, pz);
+    boundary.center(px, py, pz);
 
     for (size_t i = 0; i < 8; i++)
     {
@@ -455,7 +455,7 @@ Box<double> IndexFile::boundary(const Node *node, const Box<double> &box) const
 
     while (levels)
     {
-        boundary.getCenter(px, py, pz);
+        boundary.center(px, py, pz);
         divide(boundary, px, py, pz, code & 7ULL);
         code = code >> 3;
         levels--;
@@ -630,7 +630,7 @@ uint64_t IndexFile::insert(double x, double y, double z)
             return ecode;
         }
 
-        octant.getCenter(px, py, pz);
+        octant.center(px, py, pz);
 
         code = code << 3;
 

@@ -104,20 +104,17 @@ void fromJson(Segments &out, const Json &in)
 {
     out.clear();
 
-    if (in.contains("segments"))
+    size_t i = 0;
+    size_t n = in.array().size();
+
+    out.segments_.resize(n);
+
+    for (auto const &it : in.array())
     {
-        size_t i = 0;
-        size_t n = in["segments"].array().size();
-
-        out.segments_.resize(n);
-
-        for (auto const &it : in["segments"].array())
-        {
-            fromJson(out.segments_[i], it);
-            size_t id = out.segments_[i].id;
-            out.hashTableId_[id] = i;
-            i++;
-        }
+        fromJson(out.segments_[i], it);
+        size_t id = out.segments_[i].id;
+        out.hashTableId_[id] = i;
+        i++;
     }
 
     // Set default.
@@ -133,7 +130,7 @@ void toJson(Json &out, const Segments &in)
 
     for (auto const &it : in.segments_)
     {
-        toJson(out["segments"][i], it);
+        toJson(out[i], it);
         i++;
     }
 }

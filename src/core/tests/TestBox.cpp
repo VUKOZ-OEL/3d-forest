@@ -29,8 +29,8 @@ TEST_CASE(TestBoxDefault)
     Box<double> box;
 
     TEST(box.empty());
-    TEST(isEqual(box.radius(), 0.0));
-    TEST(isEqual(box.distance(0.0, 0.0, 1.0), 1.0));
+    TEST(equal(box.radius(), 0.0));
+    TEST(equal(box.distance(0.0, 0.0, 1.0), 1.0));
 }
 
 TEST_CASE(TestBoxOnePointFromVector)
@@ -41,9 +41,9 @@ TEST_CASE(TestBoxOnePointFromVector)
     box.set(xyz);
 
     TEST(!box.empty());
-    TEST(isEqual(box.radius(), 0.0));
-    TEST(isEqual(box.distance(0.0, 0.0, 1.0), 0.0));
-    TEST(isEqual(box.distance(0.0, 0.0, 0.0), 1.0));
+    TEST(equal(box.radius(), 0.0));
+    TEST(equal(box.distance(0.0, 0.0, 1.0), 0.0));
+    TEST(equal(box.distance(0.0, 0.0, 0.0), 1.0));
 }
 
 TEST_CASE(TestBoxOnePointExtend)
@@ -52,9 +52,9 @@ TEST_CASE(TestBoxOnePointExtend)
     box.extend(0.0, 0.0, 1.0);
 
     TEST(!box.empty());
-    TEST(isEqual(box.radius(), 0.0));
-    TEST(isEqual(box.distance(0.0, 0.0, 1.0), 0.0));
-    TEST(isEqual(box.distance(0.0, 0.0, 0.0), 1.0));
+    TEST(equal(box.radius(), 0.0));
+    TEST(equal(box.distance(0.0, 0.0, 1.0), 0.0));
+    TEST(equal(box.distance(0.0, 0.0, 0.0), 1.0));
 }
 
 TEST_CASE(TestBoxTwoPointsExtend)
@@ -64,7 +64,21 @@ TEST_CASE(TestBoxTwoPointsExtend)
     box.extend(0.0, 0.0, 2.0);
 
     TEST(!box.empty());
-    TEST(isEqual(box.radius(), 0.5));
-    TEST(isEqual(box.distance(0.0, 0.0, 1.0), 0.5));
-    TEST(isEqual(box.distance(0.0, 0.0, 0.0), 1.5));
+    TEST(equal(box.radius(), 0.5));
+    TEST(equal(box.distance(0.0, 0.0, 1.0), 0.5));
+    TEST(equal(box.distance(0.0, 0.0, 0.0), 1.5));
+}
+
+TEST_CASE(TestBoxInsideBox)
+{
+    Box<double> a(0.0, 0.0, 0.0, 1.0, 1.0, 1.0);
+    Box<double> b(0.2, 0.2, 0.2, 0.3, 0.3, 0.3);
+
+    TEST(a.contains(b));
+
+    Box<double> c(0.0, 0.2, 0.2, 0.3, 0.3, 0.3);
+    TEST(a.contains(c));
+
+    Box<double> d(-0.2, 0.2, 0.2, 0.3, 0.3, 0.3);
+    TEST(!a.contains(d));
 }

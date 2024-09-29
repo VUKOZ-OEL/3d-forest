@@ -202,18 +202,18 @@ void ProgressDialog::updateLabels(ProgressActionInterface *progressAction)
     double etaProgressRemains = 100.0 - progressPercent;
 
     int etaTime;
-    bool hasEtaTime;
+    bool etaTimeAvailable;
 
     if (etaTimeDiff > PROGRESS_DIALOG_ETA_MIN && etaProgressDiff > 0.0 &&
         etaProgressRemains > 0.0)
     {
-        hasEtaTime = true;
+        etaTimeAvailable = true;
         etaTime = static_cast<int>((etaTimeDiff / etaProgressDiff) *
                                    etaProgressRemains);
     }
     else
     {
-        hasEtaTime = false;
+        etaTimeAvailable = false;
         etaTime = 0;
     }
 
@@ -231,7 +231,7 @@ void ProgressDialog::updateLabels(ProgressActionInterface *progressAction)
     }
     else
     {
-        if (hasEtaTime)
+        if (etaTimeAvailable)
         {
             std::snprintf(buffer, sizeof(buffer), "(%d s)", etaTimeS);
         }

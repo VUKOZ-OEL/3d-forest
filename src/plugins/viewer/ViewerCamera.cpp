@@ -246,7 +246,7 @@ QVector3D ViewerCamera::unproject(const QVector3D &window) const
     return p.unproject(modelView_, projection_, viewport_);
 }
 
-void ViewerCamera::getRay(int x, int y, QVector3D *base, QVector3D *direction)
+void ViewerCamera::ray(int x, int y, QVector3D *base, QVector3D *direction)
 {
     QVector3D pt;
     int w = viewport_.right();

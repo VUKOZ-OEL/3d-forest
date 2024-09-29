@@ -193,7 +193,7 @@ bool ProjectFilePlugin::projectClose()
     mainWindow_->suspendThreads();
 
     // Save changes.
-    if (mainWindow_->editor().hasUnsavedChanges())
+    if (mainWindow_->editor().unsavedChanges())
     {
         LOG_DEBUG(<< "Project has unsaved changes.");
 

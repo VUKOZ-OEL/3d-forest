@@ -30,53 +30,53 @@ TEST_CASE(TestRangeDefault)
 
     TEST(r.empty());
     TEST(r.full());
-    TEST(r.isEnabled());
+    TEST(r.enabled());
 }
 
 TEST_CASE(TestRangeConstructor2)
 {
     Range<double> r{0.0, 1.0};
 
-    TEST(isEqual(r.minimum(), 0.0));
-    TEST(isEqual(r.minimumValue(), 0.0));
-    TEST(isEqual(r.maximumValue(), 1.0));
-    TEST(isEqual(r.maximum(), 1.0));
+    TEST(equal(r.minimum(), 0.0));
+    TEST(equal(r.minimumValue(), 0.0));
+    TEST(equal(r.maximumValue(), 1.0));
+    TEST(equal(r.maximum(), 1.0));
     TEST(!r.contains(-0.1));
     TEST(r.contains(0.5));
     TEST(!r.contains(1.1));
     TEST(!r.empty());
     TEST(r.full());
-    TEST(r.isEnabled());
+    TEST(r.enabled());
 }
 
 TEST_CASE(TestRangeLow)
 {
     Range<double> r{0.3, 0.5, 1.0, 1.0};
 
-    TEST(isEqual(r.minimum(), 0.3));
-    TEST(isEqual(r.minimumValue(), 0.5));
-    TEST(isEqual(r.maximumValue(), 1.0));
-    TEST(isEqual(r.maximum(), 1.0));
+    TEST(equal(r.minimum(), 0.3));
+    TEST(equal(r.minimumValue(), 0.5));
+    TEST(equal(r.maximumValue(), 1.0));
+    TEST(equal(r.maximum(), 1.0));
     TEST(!r.contains(0.4));
     TEST(r.contains(0.5));
     TEST(!r.contains(1.1));
     TEST(!r.empty());
     TEST(!r.full());
-    TEST(r.isEnabled());
+    TEST(r.enabled());
 }
 
 TEST_CASE(TestRangeHigh)
 {
     Range<double> r{0.3, 0.3, 0.8, 1.0};
 
-    TEST(isEqual(r.minimum(), 0.3));
-    TEST(isEqual(r.minimumValue(), 0.3));
-    TEST(isEqual(r.maximumValue(), 0.8));
-    TEST(isEqual(r.maximum(), 1.0));
+    TEST(equal(r.minimum(), 0.3));
+    TEST(equal(r.minimumValue(), 0.3));
+    TEST(equal(r.maximumValue(), 0.8));
+    TEST(equal(r.maximum(), 1.0));
     TEST(!r.contains(0.2));
     TEST(r.contains(0.8));
     TEST(!r.contains(0.9));
     TEST(!r.empty());
     TEST(!r.full());
-    TEST(r.isEnabled());
+    TEST(r.enabled());
 }

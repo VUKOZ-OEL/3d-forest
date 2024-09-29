@@ -123,7 +123,7 @@ void HeightMapModifier::setPreviewEnabled(bool enabled,
     }
 }
 
-bool HeightMapModifier::isPreviewEnabled()
+bool HeightMapModifier::previewEnabled()
 {
     bool ret;
     mutex_.lock();

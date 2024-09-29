@@ -73,7 +73,7 @@ void ThreadLoop::cancel()
     LOG_DEBUG(<< "Thread cancelled.");
 }
 
-bool ThreadLoop::isRunning()
+bool ThreadLoop::running()
 {
     State state;
     {

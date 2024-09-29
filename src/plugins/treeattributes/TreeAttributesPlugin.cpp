@@ -42,8 +42,8 @@ void TreeAttributesPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "Tools",
-                              "Tools",
+                              "Computation",
+                              "Computation",
                               tr("Tree Attributes"),
                               tr("Compute tree attributes"),
                               ICON("tree_attributes"),

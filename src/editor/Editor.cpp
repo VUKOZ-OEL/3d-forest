@@ -32,7 +32,7 @@ static const char *EDITOR_KEY_PROJECT_NAME = "projectName";
 static const char *EDITOR_KEY_DATA_SET = "datasets";
 static const char *EDITOR_KEY_SEGMENT = "segments";
 static const char *EDITOR_KEY_SETTINGS = "settings";
-static const char *EDITOR_KEY_CLASSIFICATIONS = "classifications";
+// static const char *EDITOR_KEY_CLASSIFICATIONS = "classifications";
 // static const char *EDITOR_KEY_CLIP_FILTER = "clipFilter";
 static const char *EDITOR_KEY_ELEVATION_RANGE = "elevationRange";
 
@@ -58,20 +58,20 @@ void Editor::close()
 
     datasets_.clear();
     datasetsFilter_.clear();
-    datasetsFilter_.setFilterEnabled(true);
+    datasetsFilter_.setEnabled(true);
 
     segments_.setDefault();
     segmentsFilter_.clear();
-    segmentsFilter_.setFilter(0, true);
-    segmentsFilter_.setFilterEnabled(true);
+    segmentsFilter_.setEnabled(0, true);
+    segmentsFilter_.setEnabled(true);
 
     classifications_.clear();
     classificationsFilter_.clear();
     for (size_t i = 0; i < classifications_.size(); i++)
     {
-        classificationsFilter_.setFilter(i, true);
+        classificationsFilter_.setEnabled(i, true);
     }
-    classificationsFilter_.setFilterEnabled(true);
+    classificationsFilter_.setEnabled(true);
 
     viewports_.clearContent();
 
@@ -115,7 +115,7 @@ void Editor::openProject(const std::string &path)
     Json in;
     in.read(path);
 
-    if (!in.isObject())
+    if (!in.typeObject())
     {
         LOG_DEBUG(<< "Cancel opening new project, exception is raised.");
         THROW("Project file '" + path + "' is not in JSON object");
@@ -147,10 +147,10 @@ void Editor::openProject(const std::string &path)
         }
 
         // Classifications.
-        if (in.contains(EDITOR_KEY_CLASSIFICATIONS))
-        {
-            fromJson(classifications_, in[EDITOR_KEY_CLASSIFICATIONS]);
-        }
+        // if (in.contains(EDITOR_KEY_CLASSIFICATIONS))
+        // {
+        //     fromJson(classifications_, in[EDITOR_KEY_CLASSIFICATIONS]);
+        // }
 
         // Settings.
         if (in.contains(EDITOR_KEY_SETTINGS))
@@ -195,7 +195,7 @@ void Editor::saveProject(const std::string &path)
     toJson(out[EDITOR_KEY_PROJECT_NAME], projectName_);
     toJson(out[EDITOR_KEY_DATA_SET], datasets_);
     toJson(out[EDITOR_KEY_SEGMENT], segments_);
-    toJson(out[EDITOR_KEY_CLASSIFICATIONS], classifications_);
+    // toJson(out[EDITOR_KEY_CLASSIFICATIONS], classifications_);
     toJson(out[EDITOR_KEY_SETTINGS], settings_);
     // toJson(out[EDITOR_KEY_CLIP_FILTER], clipFilter_);
     toJson(out[EDITOR_KEY_ELEVATION_RANGE], elevationFilter_);
@@ -270,7 +270,7 @@ void Editor::setClassificationsFilter(const QueryFilterSet &filter)
 
 void Editor::setClipFilter(const Region &clipFilter)
 {
-    LOG_DEBUG(<< "Set region filter <" << clipFilter << ">.");
+    LOG_DEBUG(<< "Set clip filter <" << clipFilter << ">.");
     clipFilter_ = clipFilter;
 
     if (viewports_.size() > 0)
@@ -284,14 +284,14 @@ void Editor::setClipFilter(const Region &clipFilter)
 
 void Editor::resetClipFilter()
 {
-    LOG_DEBUG(<< "Reset region filter.");
+    LOG_DEBUG(<< "Reset clip filter.");
     clipFilter_.box = clipFilter_.boundary;
     setClipFilter(clipFilter_);
 }
 
 Box<double> Editor::clipBoundary() const
 {
-    if (clipFilter_.shape == Region::SHAPE_BOX)
+    if (clipFilter_.shape == Region::Shape::BOX)
     {
         return clipFilter_.box;
     }
@@ -381,15 +381,20 @@ void Editor::setSegmentsFilter(const QueryFilterSet &filter)
 
 void Editor::updateAfterRead()
 {
-    LOG_DEBUG(<< "Update after read.");
+    LOG_DEBUG(<< "Start editor update after read.");
 
     clipFilter_.boundary = datasets_.boundary();
     clipFilter_.box = clipFilter_.boundary;
-    // clipFilter_.enabled = Region::SHAPE_BOX;
+    // clipFilter_.enabled = Region::Shape::BOX;
+
+    LOG_DEBUG(<< "Use clip box filter region <" << clipFilter_ << ">.");
+    LOG_DEBUG(<< "Use elevation filter range <" << elevationFilter_ << ">.");
+    LOG_DEBUG(<< "Use descriptor filter range <" << descriptorFilter_ << ">.");
+    LOG_DEBUG(<< "Use intensity filter range <" << intensityFilter_ << ">.");
 
     if (datasets_.size() > 0)
     {
-        SettingsUnits settingsUnits = settings_.units;
+        SettingsUnits settingsUnits = settings_.units();
         settingsUnits.setLasFileScaling(datasets_.at(0).scalingFile());
 
         setSettingsUnits(settingsUnits);
@@ -397,9 +402,16 @@ void Editor::updateAfterRead()
 
     for (size_t i = 0; i < segments_.size(); i++)
     {
-        segmentsFilter_.setFilter(segments_[i].id, true);
+        segmentsFilter_.setEnabled(segments_[i].id, true);
     }
 
+    applyFilters();
+
+    LOG_DEBUG(<< "Finished editor update after read.");
+}
+
+void Editor::applyFilters()
+{
     if (viewports_.size() > 0)
     {
         viewports_.where().setDataset(datasetsFilter_);
@@ -416,13 +428,13 @@ void Editor::updateAfterRead()
 
 void Editor::setSettingsView(const SettingsView &settingsView)
 {
-    settings_.view = settingsView;
+    settings_.view(settingsView);
     unsavedChanges_ = true;
 }
 
 void Editor::setSettingsUnits(const SettingsUnits &settingsUnits)
 {
-    unsavedChanges_ = settings_.units.apply(settingsUnits);
+    unsavedChanges_ = settings_.units(settingsUnits);
 }
 
 void Editor::addModifier(ModifierInterface *modifier)
@@ -435,7 +447,7 @@ void Editor::runModifiers(Page *page)
     for (auto &it : modifiers_)
     {
         /** @todo Collect enabled modifiers during preprocessing. */
-        if (it->isModifierEnabled())
+        if (it->modifierEnabled())
         {
             it->applyModifier(page);
         }
@@ -451,10 +463,10 @@ void Editor::viewportsResize(size_t n)
 
 std::shared_ptr<PageData> Editor::readPage(size_t dataset, size_t index)
 {
-    return pageManager_.get(this, dataset, index);
+    return pageManager_.readPage(this, dataset, index);
 }
 
 void Editor::erasePage(size_t dataset, size_t index)
 {
-    pageManager_.erase(this, dataset, index);
+    pageManager_.erasePage(this, dataset, index);
 }

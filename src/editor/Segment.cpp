@@ -37,6 +37,8 @@ void fromJson(Segment &out, const Json &in)
     fromJson(out.label, in["label"]);
     fromJson(out.color, in["color"]);
 
+    fromJson(out.attributesCalculated, in["attributesCalculated"]);
+
     fromJson(out.position, in["position"]);
     fromJson(out.boundary, in["boundary"]);
 
@@ -51,6 +53,8 @@ void toJson(Json &out, const Segment &in)
     toJson(out["id"], in.id);
     toJson(out["label"], in.label);
     toJson(out["color"], in.color);
+
+    toJson(out["attributesCalculated"], in.attributesCalculated);
 
     toJson(out["position"], in.position);
     toJson(out["boundary"], in.boundary);

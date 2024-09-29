@@ -36,7 +36,7 @@
 #define LOG_MODULE_NAME "Error"
 #include <Log.hpp>
 
-std::string getErrorString(int errnum)
+std::string errorString(int errnum)
 {
     const char *msg = nullptr;
 
@@ -590,17 +590,17 @@ std::string getErrorString(int errnum)
     return std::string("Unknown error ") + std::to_string(errnum);
 }
 
-std::string getErrorString()
+std::string errorString()
 {
-    return getErrorString(errno);
+    return errorString(errno);
 }
 
-std::string getErrorString(const std::string &message)
+std::string errorString(const std::string &message)
 {
-    return message + ": " + getErrorString();
+    return message + ": " + errorString();
 }
 
-std::string getErrorStringWin(const std::string &message)
+std::string errorStringWin(const std::string &message)
 {
 #if defined(_MSC_VER)
     LPTSTR errorText = NULL;

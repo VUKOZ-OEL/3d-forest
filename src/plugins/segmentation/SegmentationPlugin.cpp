@@ -42,8 +42,8 @@ void SegmentationPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "Tools",
-                              "Tools",
+                              "Computation",
+                              "Computation",
                               tr("Segmentation"),
                               tr("Compute segmentation"),
                               ICON("forest"),

@@ -29,6 +29,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "Query"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 Query::Query(Editor *editor) : editor_(editor)
@@ -50,7 +51,7 @@ void Query::exec()
 
     const Region &region = where().region();
 
-    if (region.shape == Region::SHAPE_BOX)
+    if (region.shape == Region::Shape::BOX)
     {
         editor_->datasets().selectPages(where_.dataset(),
                                         region.box,
@@ -58,7 +59,7 @@ void Query::exec()
         selected = true;
     }
 
-    if (region.shape == Region::SHAPE_CONE)
+    if (region.shape == Region::Shape::CONE)
     {
         editor_->datasets().selectPages(where_.dataset(),
                                         region.cone.box(),
@@ -66,7 +67,7 @@ void Query::exec()
         selected = true;
     }
 
-    if (region.shape == Region::SHAPE_CYLINDER)
+    if (region.shape == Region::Shape::CYLINDER)
     {
         editor_->datasets().selectPages(where_.dataset(),
                                         region.cylinder.box(),
@@ -74,7 +75,7 @@ void Query::exec()
         selected = true;
     }
 
-    if (region.shape == Region::SHAPE_SPHERE)
+    if (region.shape == Region::Shape::SPHERE)
     {
         editor_->datasets().selectPages(where_.dataset(),
                                         region.sphere.box(),
@@ -132,6 +133,8 @@ void Query::reset()
 
 void Query::clear()
 {
+    LOG_DEBUG_UPDATE(<< "Clear.");
+
     where_.clear();
     maximumResults_ = 0;
     nResults_ = 0;
@@ -239,7 +242,7 @@ void Query::flush()
 {
     for (size_t i = 0; i < lru_.size(); i++)
     {
-        if (lru_[i]->isModified())
+        if (lru_[i]->modified())
         {
             lru_[i]->writePage();
         }
@@ -283,7 +286,7 @@ void Query::applyCamera(const Camera &camera)
 
     std::multimap<double, Key> queue;
 
-    if (where().dataset().isFilterEnabled())
+    if (where().dataset().enabled())
     {
         const std::unordered_set<size_t> &idList = where().dataset().filter();
         for (auto const &it : idList)
@@ -311,7 +314,7 @@ void Query::applyCamera(const Camera &camera)
         const IndexFile &index = editor.index();
         node = index.at(nk.pageId);
 
-        if (editor_->clipFilter().shape != Region::SHAPE_NONE)
+        if (editor_->clipFilter().shape != Region::Shape::NONE)
         {
             Box<double> box = index.boundary(node, index.boundary());
             if (!editor_->clipFilter().box.intersects(box))
@@ -697,7 +700,7 @@ std::shared_ptr<Page> Query::read(size_t dataset, size_t index)
             {
                 // Drop oldest page.
                 idx = lru_.size() - 1;
-                if (lru_[idx]->isModified())
+                if (lru_[idx]->modified())
                 {
                     lru_[idx]->writePage();
                 }

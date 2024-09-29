@@ -41,6 +41,7 @@ ViewerOpenGLViewport::ViewerOpenGLViewport(QWidget *parent)
       windowViewports_(nullptr),
       viewportId_(0),
       selected_(false),
+      resized_(false),
       editor_(nullptr)
 
 {
@@ -60,6 +61,7 @@ void ViewerOpenGLViewport::paintEvent(QPaintEvent *event)
 void ViewerOpenGLViewport::resizeEvent(QResizeEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Resize event.");
+    resized_ = true;
     QOpenGLWidget::resizeEvent(event);
 }
 
@@ -99,29 +101,6 @@ void ViewerOpenGLViewport::resizeGL(int w, int h)
     // cameraChanged();
 }
 
-void ViewerOpenGLViewport::paintGL()
-{
-    LOG_DEBUG_RENDER(<< "Paint width <" << camera_.width() << "> height <"
-                     << camera_.height() << ">.");
-
-    // Setup camera.
-    glViewport(0, 0, camera_.width(), camera_.height());
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadMatrixf(camera_.getProjection().data());
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixf(camera_.getModelView().data());
-
-    // Render.
-    bool firstFrame = renderScene();
-
-    if (firstFrame)
-    {
-        renderGuides();
-    }
-}
-
 void ViewerOpenGLViewport::mouseReleaseEvent(QMouseEvent *event)
 {
     (void)event;
@@ -148,7 +127,7 @@ void ViewerOpenGLViewport::wheelEvent(QWheelEvent *event)
 
 void ViewerOpenGLViewport::setFocus()
 {
-    if (!isSelected())
+    if (!selected())
     {
         if (windowViewports_)
         {
@@ -184,7 +163,7 @@ void ViewerOpenGLViewport::setSelected(bool selected)
     selected_ = selected;
 }
 
-bool ViewerOpenGLViewport::isSelected() const
+bool ViewerOpenGLViewport::selected() const
 {
     return selected_;
 }
@@ -234,7 +213,7 @@ void ViewerOpenGLViewport::setViewPerspective()
 void ViewerOpenGLViewport::setViewDirection(const QVector3D &dir,
                                             const QVector3D &up)
 {
-    camera_.setLookAt(dir, camera_.getDistance(), camera_.getCenter(), up);
+    camera_.setLookAt(dir, camera_.distance(), camera_.center(), up);
 
     LOG_DEBUG(<< "Updated view direction in viewport <" << viewportId_
               << "> to camera <" << camera_ << "> from dir <" << dir << "> up <"
@@ -299,19 +278,19 @@ void ViewerOpenGLViewport::setViewResetDistance()
     LOG_DEBUG(<< "Reset view distance in viewport <" << viewportId_ << ">.");
 
     float distance = 1.0F;
-    if (aabb_.isValid())
+    if (aabb_.valid())
     {
-        distance = aabb_.getRadius() * 2.0F;
+        distance = aabb_.radius() * 2.0F;
     }
     if (distance < 1e-6)
     {
         distance = 1.0F;
     }
 
-    camera_.setLookAt(camera_.getDirection(),
+    camera_.setLookAt(camera_.direction(),
                       distance,
-                      camera_.getCenter(),
-                      camera_.getUp());
+                      camera_.center(),
+                      camera_.up());
 
     LOG_DEBUG(<< "Updated view distance in viewport <" << viewportId_
               << "> to camera <" << camera_ << "> from distance <" << distance
@@ -322,17 +301,17 @@ void ViewerOpenGLViewport::setViewResetCenter()
 {
     LOG_DEBUG(<< "Reset view center in viewport <" << viewportId_ << ">.");
 
-    QVector3D center = camera_.getCenter();
-    if (aabb_.isValid())
+    QVector3D center = camera_.center();
+    if (aabb_.valid())
     {
-        center = aabb_.getCenter();
-        // center[2] = aabb_.getMin().z();
+        center = aabb_.center();
+        // center[2] = aabb_.min().z();
     }
 
-    camera_.setLookAt(camera_.getDirection(),
-                      camera_.getDistance(),
+    camera_.setLookAt(camera_.direction(),
+                      camera_.distance(),
                       center,
-                      camera_.getUp());
+                      camera_.up());
 
     LOG_DEBUG(<< "Updated view center in viewport <" << viewportId_
               << "> to camera <" << camera_ << "> from aabb <" << aabb_
@@ -344,16 +323,32 @@ void ViewerOpenGLViewport::clearScreen()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-bool ViewerOpenGLViewport::renderScene()
+void ViewerOpenGLViewport::paintGL()
+{
+    LOG_DEBUG_RENDER(<< "Paint width <" << camera_.width() << "> height <"
+                     << camera_.height() << ">.");
+
+    // Setup camera.
+    glViewport(0, 0, camera_.width(), camera_.height());
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixf(camera_.projection().data());
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixf(camera_.modelView().data());
+
+    // Render.
+    renderScene();
+}
+
+void ViewerOpenGLViewport::renderScene()
 {
     LOG_DEBUG_RENDER(<< "Start rendering viewport <" << viewportId_ << ">.");
 
     if (!editor_)
     {
-        return true;
+        return;
     }
-
-    bool firstFrame = false;
 
     std::unique_lock<std::mutex> mutexlock(editor_->mutex_);
 
@@ -367,23 +362,38 @@ bool ViewerOpenGLViewport::renderScene()
 
     if (pageSize == 0)
     {
-        clearScreen();
-        firstFrame = true;
+        renderFirstFrame();
+    }
+
+    if (resized_)
+    {
+        LOG_DEBUG_RENDER(<< "Reset render state after resize event.");
+
+        for (size_t pageIndex = 0; pageIndex < pageSize; pageIndex++)
+        {
+            Page &page = editor_->viewports().page(viewportId_, pageIndex);
+            if (page.state() == Page::STATE_RENDERED)
+            {
+                page.setState(Page::STATE_RENDER);
+            }
+        }
+
+        resized_ = false;
     }
 
     for (size_t pageIndex = 0; pageIndex < pageSize; pageIndex++)
     {
         Page &page = editor_->viewports().page(viewportId_, pageIndex);
 
-        if (page.state() == Page::STATE_RENDER ||
-            page.state() == Page::STATE_RENDERED)
+        if (page.state() == Page::STATE_RENDER)
         {
-            // LOG_DEBUG_RENDER(<< "Render pageId <" << page.pageId() << ">.");
+            LOG_DEBUG_RENDER(<< "Render page <" << (pageIndex + 1) << "/"
+                             << pageSize << "> page id <" << page.pageId()
+                             << ">.");
 
             if (pageIndex == 0)
             {
-                clearScreen();
-                firstFrame = true;
+                renderFirstFrame();
             }
 
             ViewerOpenGL::render(ViewerOpenGL::POINTS,
@@ -401,21 +411,22 @@ bool ViewerOpenGLViewport::renderScene()
             double t2 = Time::realTime();
             if (t2 - t1 > 0.02)
             {
+                LOG_DEBUG_RENDER(<< "Terminate rendering after <" << (t2 - t1)
+                                 << "> seconds.");
                 break;
             }
+        }
+        else
+        {
+            LOG_DEBUG_RENDER(<< "Skip rendering of page <" << (pageIndex + 1)
+                             << "/" << pageSize << "> page id <"
+                             << page.pageId() << ">.");
         }
     }
 
     renderSceneSettingsDisable();
 
-    if (firstFrame)
-    {
-        renderFirstFrame();
-    }
-
     LOG_DEBUG_RENDER(<< "Finished rendering viewport <" << viewportId_ << ">.");
-
-    return firstFrame;
 }
 
 void ViewerOpenGLViewport::renderFirstFrame()
@@ -423,8 +434,26 @@ void ViewerOpenGLViewport::renderFirstFrame()
     LOG_DEBUG_RENDER(<< "Rendered first frame in viewport <" << viewportId_
                      << ">.");
 
+    clearScreen();
+
+    if (editor_->settings().view().fogEnabled())
+    {
+        glDisable(GL_FOG);
+    }
+
     ViewerOpenGL::renderClipFilter(editor_->clipFilter());
     renderSegments();
+    renderGuides();
+
+    if (editor_->settings().view().fogEnabled())
+    {
+        glEnable(GL_FOG);
+    }
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixf(camera_.projection().data());
+    glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixf(camera_.modelView().data());
 }
 
 void ViewerOpenGLViewport::renderSegments()
@@ -450,8 +479,8 @@ void ViewerOpenGLViewport::renderSegments()
             continue;
         }
 
-        if (editor_->settings().view.isShowAttributesEnabled() &&
-            segment.hasCalculatedAttributes)
+        if (editor_->settings().view().showAttributesEnabled() &&
+            segment.attributesCalculated)
         {
             glColor3f(1.0F, 1.0F, 0.0F);
 
@@ -533,8 +562,7 @@ void ViewerOpenGLViewport::renderGuides()
 
 void ViewerOpenGLViewport::renderSceneSettingsEnable()
 {
-    const Settings &settings = editor_->settings();
-    const SettingsView &opt = settings.view;
+    const SettingsView &opt = editor_->settings().view();
 
     // Background.
     const Vector3<double> &rgb = opt.backgroundColor();
@@ -547,15 +575,15 @@ void ViewerOpenGLViewport::renderSceneSettingsEnable()
     glPointSize(static_cast<float>(opt.pointSize()));
 
     // Fog.
-    if (opt.isFogEnabled())
+    if (opt.fogEnabled())
     {
-        QVector3D eye = camera_.getEye();
-        QVector3D direction = -camera_.getDirection();
+        QVector3D eye = camera_.eye();
+        QVector3D direction = -camera_.direction();
         direction.normalize();
 
         float min;
         float max;
-        aabb_.getRange(eye, direction, &min, &max);
+        aabb_.range(eye, direction, &min, &max);
         float d = max - min;
 
         GLfloat colorFog[4]{0.0F, 0.0F, 0.0F, 0.0F};
@@ -570,10 +598,9 @@ void ViewerOpenGLViewport::renderSceneSettingsEnable()
 
 void ViewerOpenGLViewport::renderSceneSettingsDisable()
 {
-    const Settings &settings = editor_->settings();
     glPointSize(1.0F);
 
-    if (settings.view.isFogEnabled())
+    if (editor_->settings().view().fogEnabled())
     {
         glDisable(GL_FOG);
     }

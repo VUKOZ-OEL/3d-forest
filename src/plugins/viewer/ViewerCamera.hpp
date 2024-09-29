@@ -74,12 +74,12 @@ public:
     void setDistance(float distance);
 
     // Camera.
-    float getDistance() const { return distance_; }
-    const QVector3D &getEye() const { return eye_; }
-    const QVector3D &getCenter() const { return center_; }
-    const QVector3D &getUp() const { return up_; }
-    const QVector3D &getRight() const { return right_; }
-    const QVector3D &getDirection() const { return direction_; }
+    float distance() const { return distance_; }
+    const QVector3D &eye() const { return eye_; }
+    const QVector3D &center() const { return center_; }
+    const QVector3D &up() const { return up_; }
+    const QVector3D &right() const { return right_; }
+    const QVector3D &direction() const { return direction_; }
     QMatrix4x4 rotation() const;
 
     Camera toCamera() const;
@@ -87,7 +87,7 @@ public:
     // Transform.
     QVector3D project(const QVector3D &world) const;
     QVector3D unproject(const QVector3D &window) const;
-    void getRay(int x, int y, QVector3D *base, QVector3D *direction);
+    void ray(int x, int y, QVector3D *base, QVector3D *direction);
 
     // Interaction.
     void mousePressEvent(QMouseEvent *event);
@@ -98,16 +98,16 @@ public:
     void zoom(int dy);
 
     // Matrix.
-    const QMatrix4x4 &getModelView() const { return modelView_; }
-    const QMatrix4x4 &getProjection() const { return projection_; }
-    const QMatrix4x4 &getModelViewProjection() const
+    const QMatrix4x4 &modelView() const { return modelView_; }
+    const QMatrix4x4 &projection() const { return projection_; }
+    const QMatrix4x4 &modelViewProjection() const
     {
         return modelViewProjection_;
     }
 
-    const QMatrix4x4 &getModelViewInv() const { return modelViewInv_; }
-    const QMatrix4x4 &getProjectionInv() const { return projectionInv_; }
-    const QMatrix4x4 &getModelViewProjectionInv() const
+    const QMatrix4x4 &modelViewInv() const { return modelViewInv_; }
+    const QMatrix4x4 &projectionInv() const { return projectionInv_; }
+    const QMatrix4x4 &modelViewProjectionInv() const
     {
         return modelViewProjectionInv_;
     }

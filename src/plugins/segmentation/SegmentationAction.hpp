@@ -63,7 +63,7 @@ private:
 
     void createVoxel();
     void findNearestNeighbor(Point &a);
-    bool isTrunkVoxel(const Point &a);
+    bool trunkVoxel(const Point &a);
 
     Points voxels_;
     std::vector<size_t> path_;
@@ -90,8 +90,8 @@ private:
     Group groupUnsegmented_;
     std::map<size_t, Group> groups_;
 
-    void startGroup(const Point &a, bool isTrunk = false);
-    void continueGroup(const Point &a, bool isTrunk = false);
+    void startGroup(const Point &a, bool trunk = false);
+    void continueGroup(const Point &a, bool trunk = false);
     void mergeToGroup(Group &dst, const Group &src);
 
     void createSegmentFromGroup(size_t segmentId,

@@ -132,7 +132,7 @@ public:
     size_t size() const;
 
     void setModified();
-    bool isModified() const;
+    bool modified() const;
 
     /** Page State. */
     enum State

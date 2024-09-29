@@ -34,7 +34,7 @@ class EXPORT_EDITOR ModifierInterface
 {
 public:
     virtual ~ModifierInterface() = default;
-    virtual bool isModifierEnabled() = 0;
+    virtual bool modifierEnabled() = 0;
     virtual void applyModifier(Page *page) = 0;
 };
 

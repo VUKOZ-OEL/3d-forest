@@ -78,7 +78,7 @@ void ClassificationAction::start(const ClassificationParameters &parameters)
     LOG_DEBUG(<< "Start with parameters <" << toString(parameters) << ">.");
 
     // Set input parameters.
-    double ppm = editor_->settings().units.pointsPerMeter()[0];
+    double ppm = editor_->settings().units().pointsPerMeter()[0];
     LOG_DEBUG(<< "Units pointsPerMeter <" << ppm << ">.");
 
     parameters_ = parameters;
@@ -317,14 +317,14 @@ void ClassificationAction::stepClassifyGround()
                              b.z,
                              minimumValue_,
                              90.0 - parameters_.angle);
-                    Vector3<double> p = cone.box().getCenter();
+                    Vector3<double> p = cone.box().center();
                     double r = cone.box().radius();
 
                     voxels_.findRadius(p[0], p[1], p[2], r, searchGround_);
                     for (size_t k = 0; k < searchGround_.size(); k++)
                     {
                         Point &c = voxels_[searchGround_[k]];
-                        if (cone.isInside(c.x, c.y, c.z))
+                        if (cone.contains(c.x, c.y, c.z))
                         {
                             ground = false;
                             break;

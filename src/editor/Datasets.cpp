@@ -176,7 +176,7 @@ void Datasets::read(const std::string &path,
     datasets_.push_back(ds);
     datasetsIds_.insert(id);
 
-    filter.setFilter(id, true);
+    filter.setEnabled(id, true);
 
     updateBoundary();
 }
@@ -203,7 +203,7 @@ void fromJson(Datasets &out,
         fromJson(out.datasets_[i], it, projectPath);
         out.hashTable_[out.datasets_[i].id()] = i;
         out.datasetsIds_.insert(out.datasets_[i].id());
-        filter.setFilter(out.datasets_[i].id(), true);
+        filter.setEnabled(out.datasets_[i].id(), true);
         i++;
     }
 

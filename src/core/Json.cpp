@@ -195,8 +195,8 @@ void Json::serialize(std::ostringstream &out,
         case TYPE_ARRAY:
             out << "[";
             n = data_.array->size();
-            if ((n > 0) && ((data_.array->at(0).isObject()) ||
-                            (data_.array->at(0).isArray())))
+            if ((n > 0) && ((data_.array->at(0).typeObject()) ||
+                            (data_.array->at(0).typeArray())))
             {
                 indent2 = indent + indentPlus;
                 out << "\n" << indent2;

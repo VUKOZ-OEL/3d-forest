@@ -52,10 +52,12 @@ public:
     void set(const std::vector<T> &xyz);
     void set(const Box<T> &box);
     void setPercent(const Box<T> &box, const Box<T> &a, const Box<T> &b);
+
     void translate(const Vector3<T> &v);
 
     void extend(const Box<T> &box);
     void extend(T x, T y, T z);
+
     void clear();
 
     bool empty() const { return empty_; }
@@ -67,14 +69,14 @@ public:
     T length(size_t idx) const { return max_[idx] - min_[idx]; }
     T maximumLength() const;
 
-    void getCenter(T &x, T &y, T &z) const;
-    Vector3<T> getCenter() const;
+    void center(T &x, T &y, T &z) const;
+    Vector3<T> center() const;
     T distance(T x, T y, T z) const;
     T radius() const;
 
     bool intersects(const Box<T> &box) const;
-    bool isInside(const Box<T> &box) const;
-    bool isInside(T x, T y, T z) const;
+    bool contains(const Box<T> &box) const;
+    bool contains(T x, T y, T z) const;
 
 private:
     T min_[3];
@@ -366,14 +368,14 @@ template <class T> inline T Box<T>::maximumLength() const
     return max;
 }
 
-template <class T> inline void Box<T>::getCenter(T &x, T &y, T &z) const
+template <class T> inline void Box<T>::center(T &x, T &y, T &z) const
 {
     x = min_[0] + ((max_[0] - min_[0]) / 2);
     y = min_[1] + ((max_[1] - min_[1]) / 2);
     z = min_[2] + ((max_[2] - min_[2]) / 2);
 }
 
-template <class T> inline Vector3<T> Box<T>::getCenter() const
+template <class T> inline Vector3<T> Box<T>::center() const
 {
     return Vector3<T>(min_[0] + ((max_[0] - min_[0]) / 2),
                       min_[1] + ((max_[1] - min_[1]) / 2),
@@ -387,7 +389,7 @@ template <class T> inline T Box<T>::distance(T x, T y, T z) const
     T w = 0;
     T ret;
 
-    getCenter(u, v, w);
+    center(u, v, w);
     ret = std::sqrt((u - x) * (u - x) + (v - y) * (v - y) + (w - z) * (w - z));
 
     return ret;
@@ -413,14 +415,14 @@ template <class T> inline bool Box<T>::intersects(const Box &box) const
              (min_[2] > box.max_[2] || max_[2] < box.min_[2]));
 }
 
-template <class T> inline bool Box<T>::isInside(const Box &box) const
+template <class T> inline bool Box<T>::contains(const Box &box) const
 {
-    return !((max_[0] > box.max_[0] || min_[0] < box.min_[0]) ||
-             (max_[1] > box.max_[1] || min_[1] < box.min_[1]) ||
-             (max_[2] > box.max_[2] || min_[2] < box.min_[2]));
+    return !((box.max_[0] > max_[0] || box.min_[0] < min_[0]) ||
+             (box.max_[1] > max_[1] || box.min_[1] < min_[1]) ||
+             (box.max_[2] > max_[2] || box.min_[2] < min_[2]));
 }
 
-template <class T> inline bool Box<T>::isInside(T x, T y, T z) const
+template <class T> inline bool Box<T>::contains(T x, T y, T z) const
 {
     return !((x < min_[0] || x > max_[0]) || (y < min_[1] || y > max_[1]) ||
              (z < min_[2] || z > max_[2]));

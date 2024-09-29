@@ -42,8 +42,8 @@ void HeightMapPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "Tools",
-                              "Tools",
+                              "Computation",
+                              "Computation",
                               tr("Height Map"),
                               tr("Compute height map"),
                               ICON("height_map"),
@@ -66,9 +66,9 @@ void HeightMapPlugin::slotPlugin()
     pluginWindow_->activateWindow();
 }
 
-bool HeightMapPlugin::isModifierEnabled()
+bool HeightMapPlugin::modifierEnabled()
 {
-    return modifier_.isPreviewEnabled();
+    return modifier_.previewEnabled();
 }
 
 void HeightMapPlugin::applyModifier(Page *page)

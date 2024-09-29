@@ -134,7 +134,7 @@ void ViewerOpenGL::render(Mode mode,
 
 void ViewerOpenGL::renderClipFilter(const Region &clipFilter)
 {
-    if (clipFilter.shape == Region::SHAPE_NONE)
+    if (clipFilter.shape == Region::Shape::NONE)
     {
         return;
     }
@@ -144,7 +144,7 @@ void ViewerOpenGL::renderClipFilter(const Region &clipFilter)
     glEnable(GL_LINE_STIPPLE);
     glLineStipple(1, 0xff);
 
-    if (clipFilter.shape == Region::SHAPE_CYLINDER)
+    if (clipFilter.shape == Region::Shape::CYLINDER)
     {
         Vector3<float> a(clipFilter.cylinder.a());
         Vector3<float> b(clipFilter.cylinder.b());
@@ -156,7 +156,7 @@ void ViewerOpenGL::renderClipFilter(const Region &clipFilter)
     {
         ViewerAabb box;
 
-        if (clipFilter.shape == Region::SHAPE_BOX)
+        if (clipFilter.shape == Region::Shape::BOX)
         {
             box.set(clipFilter.box);
         }
@@ -176,8 +176,8 @@ void ViewerOpenGL::renderAabb(const ViewerAabb &box)
 {
     // Render wireframe cuboid.
     QVector3D v[8];
-    QVector3D min = box.getMin();
-    QVector3D max = box.getMax();
+    QVector3D min = box.min();
+    QVector3D max = box.max();
 
     v[0] = QVector3D(min[0], min[1], min[2]);
     v[1] = QVector3D(max[0], min[1], min[2]);
