@@ -21,6 +21,7 @@
 <qresource prefix="/descriptorfilter">
 
 <!-- Plugin -->
+<file>descriptor_filter_16px.png</file>
 <file>descriptor_filter_20px.png</file>
 
 </qresource>
