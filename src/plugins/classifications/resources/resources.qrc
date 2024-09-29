@@ -21,6 +21,7 @@
 <qresource prefix="/classifications">
 
 <!-- Plugin -->
+<file>classifications_16px.png</file>
 <file>classifications_20px.png</file>
 
 </qresource>
