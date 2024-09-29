@@ -867,7 +867,7 @@ powershell -C "gci | % {rni $_.Name ($_.Name -replace '24px', '24')}"
         "${workspaceRoot}/src/editor",
         "${workspaceRoot}/src/gui",
         "${workspaceRoot}/src/plugins/classification",
-        "${workspaceRoot}/src/plugins/classifications",
+        "${workspaceRoot}/src/plugins/classificationfilter",
         "${workspaceRoot}/src/plugins/clipfilter",
         "${workspaceRoot}/src/plugins/descriptor",
         "${workspaceRoot}/src/plugins/descriptorfilter",

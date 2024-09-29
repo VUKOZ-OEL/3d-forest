@@ -17,10 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ClassificationsWidget.hpp */
+/** @file ClassificationFilterWidget.hpp */
 
-#ifndef CLASSIFICATIONS_WIDGET_HPP
-#define CLASSIFICATIONS_WIDGET_HPP
+#ifndef CLASSIFICATION_FILTER_WIDGET_HPP
+#define CLASSIFICATION_FILTER_WIDGET_HPP
 
 // Include 3D Forest.
 #include <Classifications.hpp>
@@ -33,13 +33,13 @@ class QToolButton;
 class QTreeWidget;
 class QTreeWidgetItem;
 
-/** Classifications Widget. */
-class ClassificationsWidget : public QWidget
+/** Classification Filter Widget. */
+class ClassificationFilterWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    ClassificationsWidget(MainWindow *mainWindow);
+    ClassificationFilterWidget(MainWindow *mainWindow);
 
     void setFilterEnabled(bool b);
 
@@ -58,7 +58,7 @@ public slots:
     void slotItemChanged(QTreeWidgetItem *item, int column);
 
 protected:
-    /** Classifications Column. */
+    /** Classification Filter Column. */
     enum Column
     {
         COLUMN_CHECKED,
@@ -92,4 +92,4 @@ protected:
     void addTreeItem(size_t index);
 };
 
-#endif /* CLASSIFICATIONS_WIDGET_HPP */
+#endif /* CLASSIFICATION_FILTER_WIDGET_HPP */

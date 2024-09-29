@@ -17,41 +17,41 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ClassificationsPlugin.cpp */
+/** @file ClassificationFilterPlugin.cpp */
 
 // Include 3D Forest.
-#include <ClassificationsPlugin.hpp>
-#include <ClassificationsWindow.hpp>
+#include <ClassificationFilterPlugin.hpp>
+#include <ClassificationFilterWindow.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
-#define LOG_MODULE_NAME "ClassificationsPlugin"
+#define LOG_MODULE_NAME "ClassificationFilterPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/classifications/", name))
+#define ICON(name) (ThemeIcon(":/classificationfilter/", name))
 
-ClassificationsPlugin::ClassificationsPlugin()
+ClassificationFilterPlugin::ClassificationFilterPlugin()
     : mainWindow_(nullptr),
       pluginWindow_(nullptr)
 {
 }
 
-void ClassificationsPlugin::initialize(MainWindow *mainWindow)
+void ClassificationFilterPlugin::initialize(MainWindow *mainWindow)
 {
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
                               "Filters",
                               "View Filter",
-                              tr("Classifications"),
-                              tr("Show classifications explorer"),
-                              ICON("classifications"),
+                              tr("Classification Filter"),
+                              tr("Show classification filter"),
+                              ICON("classification_filter"),
                               this,
                               SLOT(slotPlugin()));
 }
 
-void ClassificationsPlugin::slotPlugin()
+void ClassificationFilterPlugin::slotPlugin()
 {
     if (!mainWindow_)
     {
@@ -60,7 +60,7 @@ void ClassificationsPlugin::slotPlugin()
 
     if (!pluginWindow_)
     {
-        pluginWindow_ = new ClassificationsWindow(mainWindow_);
+        pluginWindow_ = new ClassificationFilterWindow(mainWindow_);
     }
 
     pluginWindow_->show();

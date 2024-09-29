@@ -18,11 +18,11 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 -->
 <RCC version="1.0">
-<qresource prefix="/classifications">
+<qresource prefix="/classificationfilter">
 
 <!-- Plugin -->
-<file>classifications_16px.png</file>
-<file>classifications_20px.png</file>
+<file>classification_filter_16px.png</file>
+<file>classification_filter_20px.png</file>
 
 </qresource>
 </RCC>

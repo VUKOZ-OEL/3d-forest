@@ -17,33 +17,33 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ClassificationsWindow.hpp */
+/** @file ClassificationFilterWindow.hpp */
 
-#ifndef CLASSIFICATIONS_WINDOW_HPP
-#define CLASSIFICATIONS_WINDOW_HPP
+#ifndef CLASSIFICATION_FILTER_WINDOW_HPP
+#define CLASSIFICATION_FILTER_WINDOW_HPP
 
 // Include 3D Forest.
 class MainWindow;
-class ClassificationsWidget;
+class ClassificationFilterWidget;
 
 // Include Qt.
 #include <QDockWidget>
 class QCloseEvent;
 
-/** Classifications Window. */
-class ClassificationsWindow : public QDockWidget
+/** Classification Filter Window. */
+class ClassificationFilterWindow : public QDockWidget
 {
     Q_OBJECT
 
 public:
-    ClassificationsWindow(MainWindow *mainWindow);
+    ClassificationFilterWindow(MainWindow *mainWindow);
 
 protected:
-    ClassificationsWidget *widget_;
+    ClassificationFilterWidget *widget_;
 
     void showEvent(QShowEvent *event) override;
     void hideEvent(QHideEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
 };
 
-#endif /* CLASSIFICATIONS_WINDOW_HPP */
+#endif /* CLASSIFICATION_FILTER_WINDOW_HPP */

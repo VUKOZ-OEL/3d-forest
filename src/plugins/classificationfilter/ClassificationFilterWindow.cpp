@@ -17,11 +17,11 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ClassificationsWindow.cpp */
+/** @file ClassificationFilterWindow.cpp */
 
 // Include 3D Forest.
-#include <ClassificationsWidget.hpp>
-#include <ClassificationsWindow.hpp>
+#include <ClassificationFilterWidget.hpp>
+#include <ClassificationFilterWindow.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
@@ -29,43 +29,43 @@
 #include <QCloseEvent>
 
 // Include local.
-#define LOG_MODULE_NAME "ClassificationsWindow"
+#define LOG_MODULE_NAME "ClassificationFilterWindow"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/classifications/", name))
+#define ICON(name) (ThemeIcon(":/classificationfilter/", name))
 
-ClassificationsWindow::ClassificationsWindow(MainWindow *mainWindow)
+ClassificationFilterWindow::ClassificationFilterWindow(MainWindow *mainWindow)
     : QDockWidget(mainWindow)
 {
     LOG_DEBUG(<< "Start creating classifications window.");
 
     // Widget.
-    widget_ = new ClassificationsWidget(mainWindow);
+    widget_ = new ClassificationFilterWidget(mainWindow);
 
     // Dock.
     setWidget(widget_);
-    setWindowTitle(tr("Classifications"));
-    setWindowIcon(ICON("classifications"));
+    setWindowTitle(tr("Classification Filter"));
+    setWindowIcon(ICON("classification_filter"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
 
     LOG_DEBUG(<< "Finished creating classifications window.");
 }
 
-void ClassificationsWindow::showEvent(QShowEvent *event)
+void ClassificationFilterWindow::showEvent(QShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
     widget_->setFilterEnabled(true);
     QWidget::showEvent(event);
 }
 
-void ClassificationsWindow::hideEvent(QHideEvent *event)
+void ClassificationFilterWindow::hideEvent(QHideEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Hide event.");
     QWidget::hideEvent(event);
 }
 
-void ClassificationsWindow::closeEvent(QCloseEvent *event)
+void ClassificationFilterWindow::closeEvent(QCloseEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Close event.");
     widget_->setFilterEnabled(false);

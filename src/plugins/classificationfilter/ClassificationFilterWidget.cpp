@@ -17,10 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ClassificationsWidget.cpp */
+/** @file ClassificationFilterWidget.cpp */
 
 // Include 3D Forest.
-#include <ClassificationsWidget.hpp>
+#include <ClassificationFilterWidget.hpp>
 #include <ColorPalette.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
@@ -36,13 +36,13 @@
 #include <QVBoxLayout>
 
 // Include local.
-#define LOG_MODULE_NAME "ClassificationsWidget"
+#define LOG_MODULE_NAME "ClassificationFilterWidget"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/classifications/", name))
+#define ICON(name) (ThemeIcon(":/classificationfilter/", name))
 
-ClassificationsWidget::ClassificationsWidget(MainWindow *mainWindow)
+ClassificationFilterWidget::ClassificationFilterWidget(MainWindow *mainWindow)
     : mainWindow_(mainWindow)
 {
     // Table.
@@ -116,8 +116,8 @@ ClassificationsWidget::ClassificationsWidget(MainWindow *mainWindow)
     slotUpdate(nullptr, QSet<Editor::Type>());
 }
 
-void ClassificationsWidget::slotUpdate(void *sender,
-                                       const QSet<Editor::Type> &target)
+void ClassificationFilterWidget::slotUpdate(void *sender,
+                                            const QSet<Editor::Type> &target)
 {
     if (sender == this)
     {
@@ -133,7 +133,7 @@ void ClassificationsWidget::slotUpdate(void *sender,
     }
 }
 
-void ClassificationsWidget::dataChanged()
+void ClassificationFilterWidget::dataChanged()
 {
     LOG_DEBUG_UPDATE(<< "Output classifications.");
 
@@ -143,7 +143,7 @@ void ClassificationsWidget::dataChanged()
     mainWindow_->updateData();
 }
 
-void ClassificationsWidget::filterChanged()
+void ClassificationFilterWidget::filterChanged()
 {
     LOG_DEBUG_UPDATE(<< "Output classifications filter.");
 
@@ -152,7 +152,7 @@ void ClassificationsWidget::filterChanged()
     mainWindow_->updateFilter();
 }
 
-void ClassificationsWidget::setFilterEnabled(bool b)
+void ClassificationFilterWidget::setFilterEnabled(bool b)
 {
     LOG_DEBUG(<< "Set classifications filer enabled <" << toString(b) << ">.");
 
@@ -160,7 +160,7 @@ void ClassificationsWidget::setFilterEnabled(bool b)
     filterChanged();
 }
 
-void ClassificationsWidget::setClassifications(
+void ClassificationFilterWidget::setClassifications(
     const Classifications &classifications,
     const QueryFilterSet &filter)
 {
@@ -194,7 +194,7 @@ void ClassificationsWidget::setClassifications(
     unblock();
 }
 
-void ClassificationsWidget::slotShow()
+void ClassificationFilterWidget::slotShow()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
@@ -211,7 +211,7 @@ void ClassificationsWidget::slotShow()
     }
 }
 
-void ClassificationsWidget::slotHide()
+void ClassificationFilterWidget::slotHide()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
@@ -228,7 +228,7 @@ void ClassificationsWidget::slotHide()
     }
 }
 
-void ClassificationsWidget::slotSelectAll()
+void ClassificationFilterWidget::slotSelectAll()
 {
     QTreeWidgetItemIterator it(tree_);
 
@@ -241,7 +241,7 @@ void ClassificationsWidget::slotSelectAll()
     slotItemSelectionChanged();
 }
 
-void ClassificationsWidget::slotSelectInvert()
+void ClassificationFilterWidget::slotSelectInvert()
 {
     QTreeWidgetItemIterator it(tree_);
 
@@ -254,7 +254,7 @@ void ClassificationsWidget::slotSelectInvert()
     slotItemSelectionChanged();
 }
 
-void ClassificationsWidget::slotSelectNone()
+void ClassificationFilterWidget::slotSelectNone()
 {
     QTreeWidgetItemIterator it(tree_);
 
@@ -267,7 +267,7 @@ void ClassificationsWidget::slotSelectNone()
     slotItemSelectionChanged();
 }
 
-void ClassificationsWidget::slotItemSelectionChanged()
+void ClassificationFilterWidget::slotItemSelectionChanged()
 {
     QList<QTreeWidgetItem *> items = tree_->selectedItems();
 
@@ -283,7 +283,8 @@ void ClassificationsWidget::slotItemSelectionChanged()
     }
 }
 
-void ClassificationsWidget::slotItemChanged(QTreeWidgetItem *item, int column)
+void ClassificationFilterWidget::slotItemChanged(QTreeWidgetItem *item,
+                                                 int column)
 {
     if (column == COLUMN_CHECKED)
     {
@@ -299,12 +300,12 @@ void ClassificationsWidget::slotItemChanged(QTreeWidgetItem *item, int column)
     }
 }
 
-size_t ClassificationsWidget::identifier(const QTreeWidgetItem *item)
+size_t ClassificationFilterWidget::identifier(const QTreeWidgetItem *item)
 {
     return static_cast<size_t>(item->text(COLUMN_ID).toULong());
 }
 
-void ClassificationsWidget::updateTree()
+void ClassificationFilterWidget::updateTree()
 {
     block();
 
@@ -329,14 +330,14 @@ void ClassificationsWidget::updateTree()
     unblock();
 }
 
-void ClassificationsWidget::block()
+void ClassificationFilterWidget::block()
 {
     disconnect(tree_, SIGNAL(itemChanged(QTreeWidgetItem *, int)), 0, 0);
     disconnect(tree_, SIGNAL(itemSelectionChanged()), 0, 0);
     (void)blockSignals(true);
 }
 
-void ClassificationsWidget::unblock()
+void ClassificationFilterWidget::unblock()
 {
     (void)blockSignals(false);
     connect(tree_,
@@ -349,7 +350,7 @@ void ClassificationsWidget::unblock()
             SLOT(slotItemSelectionChanged()));
 }
 
-void ClassificationsWidget::addTreeItem(size_t index)
+void ClassificationFilterWidget::addTreeItem(size_t index)
 {
     QTreeWidgetItem *item = new QTreeWidgetItem(tree_);
 

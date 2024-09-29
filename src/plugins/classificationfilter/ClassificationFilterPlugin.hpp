@@ -17,27 +17,27 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ClassificationsPlugin.hpp */
+/** @file ClassificationFilterPlugin.hpp */
 
-#ifndef CLASSIFICATIONS_PLUGIN_HPP
-#define CLASSIFICATIONS_PLUGIN_HPP
+#ifndef CLASSIFICATION_FILTER_PLUGIN_HPP
+#define CLASSIFICATION_FILTER_PLUGIN_HPP
 
 // Include 3D Forest.
 #include <PluginInterface.hpp>
-class ClassificationsWindow;
+class ClassificationFilterWindow;
 
 #if defined(_MSC_VER)
-    #if defined(EXPORT_3DForestClassificationsPlugin)
-        #define EXPORT_CLASSIFICATIONS_PLUGIN __declspec(dllexport)
+    #if defined(EXPORT_3DForestClassificationFilterPlugin)
+        #define EXPORT_CLASSIFICATION_FILTER_PLUGIN __declspec(dllexport)
     #else
-        #define EXPORT_CLASSIFICATIONS_PLUGIN __declspec(dllimport)
+        #define EXPORT_CLASSIFICATION_FILTER_PLUGIN __declspec(dllimport)
     #endif
 #else
-    #define EXPORT_CLASSIFICATIONS_PLUGIN
+    #define EXPORT_CLASSIFICATION_FILTER_PLUGIN
 #endif
 
-/** Classifications Plugin. */
-class EXPORT_CLASSIFICATIONS_PLUGIN ClassificationsPlugin
+/** Classification Filter Plugin. */
+class EXPORT_CLASSIFICATION_FILTER_PLUGIN ClassificationFilterPlugin
     : public QObject,
       public PluginInterface
 {
@@ -46,7 +46,7 @@ class EXPORT_CLASSIFICATIONS_PLUGIN ClassificationsPlugin
     Q_INTERFACES(PluginInterface)
 
 public:
-    ClassificationsPlugin();
+    ClassificationFilterPlugin();
 
     virtual void initialize(MainWindow *mainWindow);
 
@@ -55,7 +55,7 @@ public slots:
 
 protected:
     MainWindow *mainWindow_;
-    ClassificationsWindow *pluginWindow_;
+    ClassificationFilterWindow *pluginWindow_;
 };
 
-#endif /* CLASSIFICATIONS_PLUGIN_HPP */
+#endif /* CLASSIFICATION_FILTER_PLUGIN_HPP */

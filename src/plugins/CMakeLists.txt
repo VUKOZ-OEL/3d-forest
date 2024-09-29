@@ -16,7 +16,7 @@
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
 add_subdirectory(classification)
-add_subdirectory(classifications)
+add_subdirectory(classificationfilter)
 add_subdirectory(clipfilter)
 add_subdirectory(descriptor)
 add_subdirectory(descriptorfilter)
