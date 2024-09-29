@@ -32,7 +32,7 @@ static const char *EDITOR_KEY_PROJECT_NAME = "projectName";
 static const char *EDITOR_KEY_DATA_SET = "datasets";
 static const char *EDITOR_KEY_SEGMENT = "segments";
 static const char *EDITOR_KEY_SETTINGS = "settings";
-static const char *EDITOR_KEY_CLASSIFICATIONS = "classifications";
+// static const char *EDITOR_KEY_CLASSIFICATIONS = "classifications";
 // static const char *EDITOR_KEY_CLIP_FILTER = "clipFilter";
 static const char *EDITOR_KEY_ELEVATION_RANGE = "elevationRange";
 
@@ -147,10 +147,10 @@ void Editor::openProject(const std::string &path)
         }
 
         // Classifications.
-        if (in.contains(EDITOR_KEY_CLASSIFICATIONS))
-        {
-            fromJson(classifications_, in[EDITOR_KEY_CLASSIFICATIONS]);
-        }
+        // if (in.contains(EDITOR_KEY_CLASSIFICATIONS))
+        // {
+        //     fromJson(classifications_, in[EDITOR_KEY_CLASSIFICATIONS]);
+        // }
 
         // Settings.
         if (in.contains(EDITOR_KEY_SETTINGS))
@@ -195,7 +195,7 @@ void Editor::saveProject(const std::string &path)
     toJson(out[EDITOR_KEY_PROJECT_NAME], projectName_);
     toJson(out[EDITOR_KEY_DATA_SET], datasets_);
     toJson(out[EDITOR_KEY_SEGMENT], segments_);
-    toJson(out[EDITOR_KEY_CLASSIFICATIONS], classifications_);
+    // toJson(out[EDITOR_KEY_CLASSIFICATIONS], classifications_);
     toJson(out[EDITOR_KEY_SETTINGS], settings_);
     // toJson(out[EDITOR_KEY_CLIP_FILTER], clipFilter_);
     toJson(out[EDITOR_KEY_ELEVATION_RANGE], elevationFilter_);
