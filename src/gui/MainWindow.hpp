@@ -79,8 +79,8 @@ public:
     void setWindowTitle(const QString &path);
 
     void createAction(QAction **result,
-                      const QString &menu,
-                      const QString &toolBar,
+                      const QString &menuTitle,
+                      const QString &toolBarTitle,
                       const QString &text,
                       const QString &toolTip,
                       const QIcon &icon,
@@ -149,7 +149,6 @@ protected:
 private:
     void loadPlugins();
     void loadPlugin(QObject *plugin);
-    void createMenuSeparator(const QString &menu);
 
     // Editor.
     Editor editor_;
@@ -165,10 +164,30 @@ private:
     std::vector<PluginInterface *> plugins_;
 
     // Menu.
-    QHash<QString, QMenu *> menu_;
-    QHash<QString, QToolBar *> toolBar_;
+    /** Main Window Menu Item. */
+    class MenuItem
+    {
+    public:
+        QAction *action;
+        QString title;
+        QString toolBarTitle;
+    };
+
+    /** Main Window Menu. */
+    class Menu
+    {
+    public:
+        QMenu *menu;
+        QString title;
+        std::vector<MenuItem> items;
+    };
+
+    QHash<QString, MainWindow::Menu> menus_;
+    QHash<QString, QToolBar *> toolBars_;
 
     QAction *actionExit_;
+
+    void createMenu();
 };
 
 #include <WarningsEnable.hpp>

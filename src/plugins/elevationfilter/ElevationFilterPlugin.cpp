@@ -42,7 +42,7 @@ void ElevationFilterPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "Filters",
+                              "Tools", // "Filters",
                               "Filters",
                               tr("Elevation Filter"),
                               tr("Show elevation filter"),

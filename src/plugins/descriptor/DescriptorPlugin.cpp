@@ -42,7 +42,7 @@ void DescriptorPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "Computation",
+                              "Tools", // "Computation",
                               "Computation",
                               tr("Descriptor"),
                               tr("Compute descriptor of each point"),

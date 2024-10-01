@@ -42,7 +42,7 @@ void ElevationPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "Computation",
+                              "Tools", // "Computation",
                               "Computation",
                               tr("Elevation"),
                               tr("Compute elevation above ground"

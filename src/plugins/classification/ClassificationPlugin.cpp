@@ -42,7 +42,7 @@ void ClassificationPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "Computation",
+                              "Tools", // "Computation",
                               "Computation",
                               tr("Classification"),
                               tr("Classify points to ground and unassigned"),

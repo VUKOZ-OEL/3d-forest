@@ -42,7 +42,7 @@ void IntensityFilterPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "Filters",
+                              "Tools", // "Filters",
                               "Filters",
                               tr("Intensity Filter"),
                               tr("Show intensity filter"),

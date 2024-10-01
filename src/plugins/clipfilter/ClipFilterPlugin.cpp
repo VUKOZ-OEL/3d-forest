@@ -42,7 +42,7 @@ void ClipFilterPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "Filters",
+                              "Tools", // "Filters",
                               "Filters",
                               tr("Clip Filter"),
                               tr("Show clip filter"),
