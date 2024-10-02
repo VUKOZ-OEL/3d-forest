@@ -49,7 +49,8 @@ void ElevationPlugin::initialize(MainWindow *mainWindow)
                                  " for each point"),
                               ICON("elevation"),
                               this,
-                              SLOT(slotPlugin()));
+                              SLOT(slotPlugin()),
+                              10);
 }
 
 void ElevationPlugin::slotPlugin()

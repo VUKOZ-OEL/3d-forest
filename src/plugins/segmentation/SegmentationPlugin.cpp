@@ -48,7 +48,8 @@ void SegmentationPlugin::initialize(MainWindow *mainWindow)
                               tr("Compute segmentation"),
                               ICON("forest"),
                               this,
-                              SLOT(slotPlugin()));
+                              SLOT(slotPlugin()),
+                              10);
 }
 
 void SegmentationPlugin::slotPlugin()

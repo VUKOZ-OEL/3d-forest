@@ -48,7 +48,8 @@ void DescriptorFilterPlugin::initialize(MainWindow *mainWindow)
                               tr("Show descriptor filter"),
                               ICON("descriptor_filter"),
                               this,
-                              SLOT(slotPlugin()));
+                              SLOT(slotPlugin()),
+                              20);
 }
 
 void DescriptorFilterPlugin::slotPlugin()

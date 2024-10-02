@@ -48,7 +48,8 @@ void ClassificationPlugin::initialize(MainWindow *mainWindow)
                               tr("Classify points to ground and unassigned"),
                               ICON("ground"),
                               this,
-                              SLOT(slotPlugin()));
+                              SLOT(slotPlugin()),
+                              10);
 }
 
 void ClassificationPlugin::slotPlugin()

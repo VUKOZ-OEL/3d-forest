@@ -48,7 +48,8 @@ void ClipFilterPlugin::initialize(MainWindow *mainWindow)
                               tr("Show clip filter"),
                               ICON("clip_filter"),
                               this,
-                              SLOT(slotPlugin()));
+                              SLOT(slotPlugin()),
+                              20);
 }
 
 void ClipFilterPlugin::slotPlugin()

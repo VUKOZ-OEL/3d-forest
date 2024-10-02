@@ -204,12 +204,13 @@ void MainWindow::createAction(QAction **result,
                               const QString &toolTip,
                               const QIcon &icon,
                               const QObject *receiver,
-                              const char *member)
+                              const char *member,
+                              int menuItemPriority)
 {
     LOG_DEBUG(<< "Create action menu <" << menuTitle.toStdString()
               << "> toolBar <" << toolBarTitle.toStdString() << "> text <"
-              << text.toStdString() << "> icon sizes <"
-              << icon.availableSizes().count() << ">.");
+              << text.toStdString() << "> priority <" << menuItemPriority
+              << "> icon sizes <" << icon.availableSizes().count() << ">.");
 
     QAction *action;
 
@@ -238,19 +239,33 @@ void MainWindow::createAction(QAction **result,
     menuItem.action = action;
     menuItem.title = text;
     menuItem.toolBarTitle = toolBarTitle;
+    menuItem.priority = menuItemPriority;
 
-    if (!menus_.contains(menuTitle))
+    if (!menuIndex_.contains(menuTitle))
     {
         MainWindow::Menu menu;
         menu.menu = nullptr;
         menu.title = menuTitle;
         menu.items.push_back(std::move(menuItem));
 
-        menus_[menuTitle] = menu;
+        if (menuItem.priority < 0)
+        {
+            menuItem.priority = 0;
+        }
+
+        menuIndex_[menuTitle] = menus_.size();
+        menus_.push_back(std::move(menu));
     }
     else
     {
-        menus_[menuTitle].items.push_back(std::move(menuItem));
+        MainWindow::Menu &menu = menus_[menuIndex_[menuTitle]];
+
+        if (menuItem.priority < 0)
+        {
+            menuItem.priority = static_cast<int>(menu.items.size()) * 10;
+        }
+
+        menu.items.push_back(std::move(menuItem));
     }
 
     // Optional return value for further customization of new action.
@@ -269,7 +284,13 @@ void MainWindow::createMenu()
             menu.items.begin(),
             menu.items.end(),
             [](const MainWindow::MenuItem &a, const MainWindow::MenuItem &b)
-            { return a.toolBarTitle < b.toolBarTitle; });
+            {
+                return (a.priority < b.priority) ||
+                       ((a.priority == b.priority) &&
+                        ((a.toolBarTitle < b.toolBarTitle) ||
+                         (a.toolBarTitle == b.toolBarTitle &&
+                          a.title < b.title)));
+            });
     }
 
     // Create menu.

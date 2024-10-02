@@ -85,7 +85,8 @@ public:
                       const QString &toolTip,
                       const QIcon &icon,
                       const QObject *receiver,
-                      const char *member);
+                      const char *member,
+                      int menuItemPriority = -1);
 
     static void createToolButton(QToolButton **result,
                                  const QString &text,
@@ -171,6 +172,7 @@ private:
         QAction *action;
         QString title;
         QString toolBarTitle;
+        int priority;
     };
 
     /** Main Window Menu. */
@@ -182,7 +184,8 @@ private:
         std::vector<MenuItem> items;
     };
 
-    QHash<QString, MainWindow::Menu> menus_;
+    std::vector<MainWindow::Menu> menus_;
+    QHash<QString, size_t> menuIndex_;
     QHash<QString, QToolBar *> toolBars_;
 
     QAction *actionExit_;

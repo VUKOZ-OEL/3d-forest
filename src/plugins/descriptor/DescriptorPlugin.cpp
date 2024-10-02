@@ -48,7 +48,8 @@ void DescriptorPlugin::initialize(MainWindow *mainWindow)
                               tr("Compute descriptor of each point"),
                               ICON("descriptor"),
                               this,
-                              SLOT(slotPlugin()));
+                              SLOT(slotPlugin()),
+                              10);
 }
 
 void DescriptorPlugin::slotPlugin()

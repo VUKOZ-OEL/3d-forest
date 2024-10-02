@@ -48,7 +48,8 @@ void TreeAttributesPlugin::initialize(MainWindow *mainWindow)
                               tr("Compute tree attributes"),
                               ICON("tree_attributes"),
                               this,
-                              SLOT(slotPlugin()));
+                              SLOT(slotPlugin()),
+                              10);
 }
 
 void TreeAttributesPlugin::slotPlugin()

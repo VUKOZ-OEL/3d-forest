@@ -48,7 +48,8 @@ void HeightMapPlugin::initialize(MainWindow *mainWindow)
                               tr("Compute height map"),
                               ICON("height_map"),
                               this,
-                              SLOT(slotPlugin()));
+                              SLOT(slotPlugin()),
+                              10);
 
     modifier_.initialize(mainWindow_);
 }

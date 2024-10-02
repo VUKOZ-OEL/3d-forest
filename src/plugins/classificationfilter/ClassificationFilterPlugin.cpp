@@ -48,7 +48,8 @@ void ClassificationFilterPlugin::initialize(MainWindow *mainWindow)
                               tr("Show classification filter"),
                               ICON("classification_filter"),
                               this,
-                              SLOT(slotPlugin()));
+                              SLOT(slotPlugin()),
+                              20);
 }
 
 void ClassificationFilterPlugin::slotPlugin()

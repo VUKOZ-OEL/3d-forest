@@ -46,7 +46,8 @@ void TreesPlugin::initialize(MainWindow *mainWindow)
                               tr("Show tree data"),
                               ICON("tree"),
                               this,
-                              SLOT(slotPlugin()));
+                              SLOT(slotPlugin()),
+                              30);
 }
 
 void TreesPlugin::slotPlugin()

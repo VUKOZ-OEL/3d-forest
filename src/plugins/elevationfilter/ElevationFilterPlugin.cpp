@@ -48,7 +48,8 @@ void ElevationFilterPlugin::initialize(MainWindow *mainWindow)
                               tr("Show elevation filter"),
                               ICON("elevation_filter"),
                               this,
-                              SLOT(slotPlugin()));
+                              SLOT(slotPlugin()),
+                              20);
 }
 
 void ElevationFilterPlugin::slotPlugin()
