@@ -41,22 +41,26 @@ static void createDataSet()
 
     std::vector<LasFile::Point> points;
 
-    points.resize(3);
+    points.resize(4);
     std::memset(points.data(), 0, sizeof(LasFile::Point) * points.size());
 
     points[0].x = 0;
     points[0].y = 0;
     points[0].z = 0;
 
-    points[1].x = 1;
-    points[1].y = 1;
+    points[1].x = 0;
+    points[1].y = 10;
     points[1].z = 0;
 
-    points[2].x = 0;
-    points[2].y = 1;
+    points[2].x = 10;
+    points[2].y = 10;
     points[2].z = 0;
 
-    LasFile::create(PATH_1, points, {1, 1, 1}, {0, 0, 0});
+    points[3].x = 10;
+    points[3].y = 10;
+    points[3].z = 10;
+
+    LasFile::create(PATH_1, points, {0.1, 0.1, 0.1}, {0, 0, 0});
     IndexFileBuilder::index(PATH_1, PATH_1, settings);
 }
 
