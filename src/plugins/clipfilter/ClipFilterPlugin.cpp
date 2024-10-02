@@ -42,13 +42,14 @@ void ClipFilterPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "Filters",
+                              "Tools", // "Filters",
                               "Filters",
                               tr("Clip Filter"),
                               tr("Show clip filter"),
                               ICON("clip_filter"),
                               this,
-                              SLOT(slotPlugin()));
+                              SLOT(slotPlugin()),
+                              20);
 }
 
 void ClipFilterPlugin::slotPlugin()

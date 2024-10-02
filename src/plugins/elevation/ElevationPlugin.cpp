@@ -42,14 +42,15 @@ void ElevationPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "Computation",
+                              "Tools", // "Computation",
                               "Computation",
                               tr("Elevation"),
                               tr("Compute elevation above ground"
                                  " for each point"),
                               ICON("elevation"),
                               this,
-                              SLOT(slotPlugin()));
+                              SLOT(slotPlugin()),
+                              10);
 }
 
 void ElevationPlugin::slotPlugin()

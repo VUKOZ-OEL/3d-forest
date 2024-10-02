@@ -42,13 +42,14 @@ void DescriptorFilterPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "Filters",
+                              "Tools", // "Filters",
                               "Filters",
                               tr("Descriptor Filter"),
                               tr("Show descriptor filter"),
                               ICON("descriptor_filter"),
                               this,
-                              SLOT(slotPlugin()));
+                              SLOT(slotPlugin()),
+                              20);
 }
 
 void DescriptorFilterPlugin::slotPlugin()

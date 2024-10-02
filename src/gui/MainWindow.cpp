@@ -98,6 +98,9 @@ MainWindow::MainWindow(QWidget *parent)
                  SLOT(close()));
     actionExit_->setShortcuts(QKeySequence::Quit);
 
+    // Menu.
+    createMenu();
+
     // Rendering.
     connect(viewerPlugin_->viewports(),
             SIGNAL(cameraChanged(size_t)),
@@ -195,16 +198,18 @@ void MainWindow::setWindowTitle(const QString &path)
 }
 
 void MainWindow::createAction(QAction **result,
-                              const QString &menu,
-                              const QString &toolBar,
+                              const QString &menuTitle,
+                              const QString &toolBarTitle,
                               const QString &text,
                               const QString &toolTip,
                               const QIcon &icon,
                               const QObject *receiver,
-                              const char *member)
+                              const char *member,
+                              int menuItemPriority)
 {
-    LOG_DEBUG(<< "Create action menu <" << menu.toStdString() << "> toolBar <"
-              << toolBar.toStdString() << "> text <" << text.toStdString()
+    LOG_DEBUG(<< "Create action menu <" << menuTitle.toStdString()
+              << "> toolBar <" << toolBarTitle.toStdString() << "> text <"
+              << text.toStdString() << "> priority <" << menuItemPriority
               << "> icon sizes <" << icon.availableSizes().count() << ">.");
 
     QAction *action;
@@ -230,30 +235,95 @@ void MainWindow::createAction(QAction **result,
     }
 
     // Add action to menu.
-    if (!menu_.contains(menu))
-    {
-        menu_[menu] = menuBar()->addMenu(menu);
-    }
-    else if (!toolBar_.contains(toolBar))
-    {
-        createMenuSeparator(menu);
-    }
-    menu_[menu]->addAction(action);
+    MainWindow::MenuItem menuItem;
+    menuItem.action = action;
+    menuItem.title = text;
+    menuItem.toolBarTitle = toolBarTitle;
+    menuItem.priority = menuItemPriority;
 
-    if (!toolBar.isEmpty() && !icon.isNull())
+    if (!menuIndex_.contains(menuTitle))
     {
-        if (!toolBar_.contains(toolBar))
+        MainWindow::Menu menu;
+        menu.menu = nullptr;
+        menu.title = menuTitle;
+        menu.items.push_back(std::move(menuItem));
+
+        if (menuItem.priority < 0)
         {
-            toolBar_[toolBar] = addToolBar(toolBar);
-            toolBar_[toolBar]->setIconSize(QSize(ICON_SIZE, ICON_SIZE));
+            menuItem.priority = 0;
         }
-        toolBar_[toolBar]->addAction(action);
+
+        menuIndex_[menuTitle] = menus_.size();
+        menus_.push_back(std::move(menu));
+    }
+    else
+    {
+        MainWindow::Menu &menu = menus_[menuIndex_[menuTitle]];
+
+        if (menuItem.priority < 0)
+        {
+            menuItem.priority = static_cast<int>(menu.items.size()) * 10;
+        }
+
+        menu.items.push_back(std::move(menuItem));
     }
 
     // Optional return value for further customization of new action.
     if (result)
     {
         *result = action;
+    }
+}
+
+void MainWindow::createMenu()
+{
+    // Sort menu.
+    for (auto &menu : menus_)
+    {
+        std::sort(
+            menu.items.begin(),
+            menu.items.end(),
+            [](const MainWindow::MenuItem &a, const MainWindow::MenuItem &b)
+            {
+                return (a.priority < b.priority) ||
+                       ((a.priority == b.priority) &&
+                        ((a.toolBarTitle < b.toolBarTitle) ||
+                         (a.toolBarTitle == b.toolBarTitle &&
+                          a.title < b.title)));
+            });
+    }
+
+    // Create menu.
+    for (auto &menu : menus_)
+    {
+        menu.menu = menuBar()->addMenu(menu.title);
+
+        QString previousToolBarTitle;
+        size_t i = 0;
+        for (const auto &item : menu.items)
+        {
+            if (i > 0 && item.toolBarTitle != previousToolBarTitle)
+            {
+                menu.menu->addSeparator();
+            }
+
+            menu.menu->addAction(item.action);
+
+            if (!item.toolBarTitle.isEmpty() && !item.action->icon().isNull())
+            {
+                if (!toolBars_.contains(item.toolBarTitle))
+                {
+                    toolBars_[item.toolBarTitle] =
+                        addToolBar(item.toolBarTitle);
+                    toolBars_[item.toolBarTitle]->setIconSize(
+                        QSize(ICON_SIZE, ICON_SIZE));
+                }
+                toolBars_[item.toolBarTitle]->addAction(item.action);
+            }
+
+            previousToolBarTitle = menu.items[i].toolBarTitle;
+            i++;
+        }
     }
 }
 
@@ -285,42 +355,59 @@ void MainWindow::createToolButton(QToolButton **result,
     *result = button;
 }
 
-void MainWindow::createMenuSeparator(const QString &menu)
-{
-    menu_[menu]->addSeparator();
-}
-
 void MainWindow::hideToolBar(const QString &menu)
 {
-    if (toolBar_.contains(menu))
+    if (toolBars_.contains(menu))
     {
-        toolBar_[menu]->close();
+        toolBars_[menu]->close();
     }
 }
 
 void MainWindow::loadPlugins()
 {
+    LOG_DEBUG(<< "Start loading all plugins.");
+
+    QString pluginsDirPath =
+        QCoreApplication::applicationDirPath() + "/plugins/";
+    LOG_DEBUG(<< "Load plugins from directory <" << pluginsDirPath.toStdString()
+              << ">.");
+
     // Process all files in the application "exe" directory.
-    QDir pluginsDir(QCoreApplication::applicationDirPath() + "/plugins/");
+    QDir pluginsDir(pluginsDirPath);
     const QStringList entries = pluginsDir.entryList(QDir::Files);
 
+    qsizetype n = entries.count();
+    LOG_DEBUG(<< "Found number of plugins <" << n << ">.");
+
+    qsizetype i = 0;
     for (const QString &fileName : entries)
     {
         // Try to load the file as a plugin.
-        QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
+        QString pluginPath = pluginsDir.absoluteFilePath(fileName);
+        LOG_DEBUG(<< "Load plugin <" << (i + 1) << "/" << n << "> path <"
+                  << pluginPath.toStdString() << ">.");
+
+        QPluginLoader pluginLoader(pluginPath);
         QObject *plugin = pluginLoader.instance();
 
-        loadPlugin(plugin);
+        if (plugin)
+        {
+            loadPlugin(plugin);
+        }
+        else
+        {
+            LOG_ERROR(<< "Unable to get instance of plugin <"
+                      << pluginPath.toStdString() << ">.");
+        }
+
+        i++;
     }
+
+    LOG_DEBUG(<< "Finished loading all plugins.");
 }
 
 void MainWindow::loadPlugin(QObject *plugin)
 {
-    if (!plugin)
-    {
-        return;
-    }
-
     // Detect and register various plugins.
 
     PluginInterface *pluginInterface;

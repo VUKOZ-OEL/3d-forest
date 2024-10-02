@@ -42,13 +42,14 @@ void TreeAttributesPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "Computation",
+                              "Tools", // "Computation",
                               "Computation",
                               tr("Tree Attributes"),
                               tr("Compute tree attributes"),
                               ICON("tree_attributes"),
                               this,
-                              SLOT(slotPlugin()));
+                              SLOT(slotPlugin()),
+                              10);
 }
 
 void TreeAttributesPlugin::slotPlugin()

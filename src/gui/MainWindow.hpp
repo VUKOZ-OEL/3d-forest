@@ -79,13 +79,14 @@ public:
     void setWindowTitle(const QString &path);
 
     void createAction(QAction **result,
-                      const QString &menu,
-                      const QString &toolBar,
+                      const QString &menuTitle,
+                      const QString &toolBarTitle,
                       const QString &text,
                       const QString &toolTip,
                       const QIcon &icon,
                       const QObject *receiver,
-                      const char *member);
+                      const char *member,
+                      int menuItemPriority = -1);
 
     static void createToolButton(QToolButton **result,
                                  const QString &text,
@@ -149,7 +150,6 @@ protected:
 private:
     void loadPlugins();
     void loadPlugin(QObject *plugin);
-    void createMenuSeparator(const QString &menu);
 
     // Editor.
     Editor editor_;
@@ -165,10 +165,32 @@ private:
     std::vector<PluginInterface *> plugins_;
 
     // Menu.
-    QHash<QString, QMenu *> menu_;
-    QHash<QString, QToolBar *> toolBar_;
+    /** Main Window Menu Item. */
+    class MenuItem
+    {
+    public:
+        QAction *action;
+        QString title;
+        QString toolBarTitle;
+        int priority;
+    };
+
+    /** Main Window Menu. */
+    class Menu
+    {
+    public:
+        QMenu *menu;
+        QString title;
+        std::vector<MenuItem> items;
+    };
+
+    std::vector<MainWindow::Menu> menus_;
+    QHash<QString, size_t> menuIndex_;
+    QHash<QString, QToolBar *> toolBars_;
 
     QAction *actionExit_;
+
+    void createMenu();
 };
 
 #include <WarningsEnable.hpp>

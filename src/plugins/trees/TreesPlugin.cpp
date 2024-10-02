@@ -40,13 +40,14 @@ void TreesPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "Data",
+                              "Tools", // "Data",
                               "Data",
                               tr("Trees"),
                               tr("Show tree data"),
                               ICON("tree"),
                               this,
-                              SLOT(slotPlugin()));
+                              SLOT(slotPlugin()),
+                              30);
 }
 
 void TreesPlugin::slotPlugin()

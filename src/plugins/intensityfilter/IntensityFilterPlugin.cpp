@@ -42,13 +42,14 @@ void IntensityFilterPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "Filters",
+                              "Tools", // "Filters",
                               "Filters",
                               tr("Intensity Filter"),
                               tr("Show intensity filter"),
                               ICON("intensity_filter"),
                               this,
-                              SLOT(slotPlugin()));
+                              SLOT(slotPlugin()),
+                              20);
 }
 
 void IntensityFilterPlugin::slotPlugin()

@@ -250,6 +250,7 @@ void FilesWidget::slotShow()
         for (auto &item : items)
         {
             item->setCheckState(COLUMN_CHECKED, Qt::Checked);
+            filter_.setEnabled(index(item), true);
         }
         updatesEnabled_ = true;
 
@@ -267,6 +268,7 @@ void FilesWidget::slotHide()
         for (auto &item : items)
         {
             item->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
+            filter_.setEnabled(index(item), false);
         }
         updatesEnabled_ = true;
 

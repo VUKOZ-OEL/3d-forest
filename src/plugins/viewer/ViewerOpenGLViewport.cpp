@@ -459,11 +459,19 @@ void ViewerOpenGLViewport::renderFirstFrame()
 void ViewerOpenGLViewport::renderSegments()
 {
     const Segments &segments = editor_->segments();
+    const QueryFilterSet &filter = editor_->segmentsFilter();
+
     for (size_t i = 0; i < segments.size(); i++)
     {
         const Segment &segment = segments[i];
 
-        // Render segment boundary.
+        // Ignore hidden segments.
+        if (!filter.enabled(segment.id))
+        {
+            continue;
+        }
+
+        // Render boundary.
         if (segment.selected)
         {
             glColor3f(static_cast<float>(segment.color[0]),
@@ -474,11 +482,13 @@ void ViewerOpenGLViewport::renderSegments()
             ViewerOpenGL::renderAabb(boundary);
         }
 
+        // Ignore "unsegmented".
         if (segment.id == 0)
         {
             continue;
         }
 
+        // Render attributes.
         if (editor_->settings().view().showAttributesEnabled() &&
             segment.attributesCalculated)
         {
@@ -501,7 +511,7 @@ void ViewerOpenGLViewport::renderSegments()
             ViewerOpenGL::renderLine(treePosition, treeTip);
         }
 
-        // Render segment meshes.
+        // Render meshes.
         for (size_t m = 0; m < segment.meshList.size(); m++)
         {
             const Mesh &mesh = segment.meshList[m];

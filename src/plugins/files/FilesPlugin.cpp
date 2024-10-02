@@ -40,13 +40,14 @@ void FilesPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "Data",
+                              "Tools", // "Data",
                               "Data",
                               tr("Files"),
                               tr("Show file data"),
                               ICON("files"),
                               this,
-                              SLOT(slotPlugin()));
+                              SLOT(slotPlugin()),
+                              30);
 }
 
 void FilesPlugin::slotPlugin()

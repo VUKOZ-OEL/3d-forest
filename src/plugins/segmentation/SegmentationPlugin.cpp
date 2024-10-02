@@ -42,13 +42,14 @@ void SegmentationPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "Computation",
+                              "Tools", // "Computation",
                               "Computation",
                               tr("Segmentation"),
                               tr("Compute segmentation"),
                               ICON("forest"),
                               this,
-                              SLOT(slotPlugin()));
+                              SLOT(slotPlugin()),
+                              10);
 }
 
 void SegmentationPlugin::slotPlugin()

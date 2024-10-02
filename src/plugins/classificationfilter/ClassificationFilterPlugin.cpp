@@ -42,13 +42,14 @@ void ClassificationFilterPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "Filters",
+                              "Tools", // "Filters",
                               "Filters",
                               tr("Classification Filter"),
                               tr("Show classification filter"),
                               ICON("classification_filter"),
                               this,
-                              SLOT(slotPlugin()));
+                              SLOT(slotPlugin()),
+                              20);
 }
 
 void ClassificationFilterPlugin::slotPlugin()

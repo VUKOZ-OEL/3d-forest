@@ -42,13 +42,14 @@ void ElevationFilterPlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "Filters",
+                              "Tools", // "Filters",
                               "Filters",
                               tr("Elevation Filter"),
                               tr("Show elevation filter"),
                               ICON("elevation_filter"),
                               this,
-                              SLOT(slotPlugin()));
+                              SLOT(slotPlugin()),
+                              20);
 }
 
 void ElevationFilterPlugin::slotPlugin()
