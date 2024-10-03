@@ -224,8 +224,8 @@ void ViewerOpenGLViewport::setViewTop()
 {
     LOG_DEBUG(<< "Set top view in viewport <" << viewportId_ << ">.");
 
-    QVector3D dir(0.0F, 0.0F, 1.0F);
-    QVector3D up(0.0F, 1.0F, 0.0F);
+    QVector3D dir(0.0F, 0.0F, -1.0F);
+    QVector3D up(0.0F, -1.0F, 0.0F);
     setViewDirection(dir, up);
 }
 
