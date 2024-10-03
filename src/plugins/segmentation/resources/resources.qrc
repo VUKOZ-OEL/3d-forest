@@ -21,6 +21,7 @@
 <qresource prefix="/segmentation">
 
 <!-- Tool bar -->
+<file>forest_16px_color.png</file>
 <file>forest_24px_color.png</file>
 
 <!-- Images -->

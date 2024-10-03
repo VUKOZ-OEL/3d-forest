@@ -62,16 +62,28 @@ SettingsViewWidget::SettingsViewWidget(MainWindow *mainWindow)
             this,
             SLOT(slotSetFogEnabled(int)));
 
-    showAttributesCheckBox_ = new QCheckBox;
-    showAttributesCheckBox_->setChecked(settings_.showAttributesEnabled());
-    showAttributesCheckBox_->setText(tr("Show Tree Attributes"));
-    connect(showAttributesCheckBox_,
+    // Bounding Box.
+    sceneBoundingBoxVisibleCheckBox_ = new QCheckBox;
+    sceneBoundingBoxVisibleCheckBox_->setChecked(
+        settings_.sceneBoundingBoxVisible());
+    sceneBoundingBoxVisibleCheckBox_->setText(tr("Show Scene Bounding Box"));
+    connect(sceneBoundingBoxVisibleCheckBox_,
             SIGNAL(stateChanged(int)),
             this,
-            SLOT(slotSetShowAttributesEnabled(int)));
+            SLOT(slotSetSceneBoundingBoxVisible(int)));
+
+    // Attributes.
+    attributesVisibleCheckBox_ = new QCheckBox;
+    attributesVisibleCheckBox_->setChecked(settings_.attributesVisible());
+    attributesVisibleCheckBox_->setText(tr("Show Tree Attributes"));
+    connect(attributesVisibleCheckBox_,
+            SIGNAL(stateChanged(int)),
+            this,
+            SLOT(slotSetAttributesVisible(int)));
 
     QVBoxLayout *optionsVBoxLayout = new QVBoxLayout;
-    optionsVBoxLayout->addWidget(showAttributesCheckBox_);
+    optionsVBoxLayout->addWidget(attributesVisibleCheckBox_);
+    optionsVBoxLayout->addWidget(sceneBoundingBoxVisibleCheckBox_);
     optionsVBoxLayout->addWidget(fogCheckBox_);
 
     QGroupBox *optionsGroupBox = new QGroupBox(tr("Options"));
@@ -232,10 +244,18 @@ void SettingsViewWidget::slotSetFogEnabled(int v)
     dataChanged();
 }
 
-void SettingsViewWidget::slotSetShowAttributesEnabled(int v)
+void SettingsViewWidget::slotSetSceneBoundingBoxVisible(int v)
 {
     (void)v;
-    settings_.setShowAttributesEnabled(showAttributesCheckBox_->isChecked());
+    settings_.setSceneBoundingBoxVisible(
+        sceneBoundingBoxVisibleCheckBox_->isChecked());
+    dataChanged();
+}
+
+void SettingsViewWidget::slotSetAttributesVisible(int v)
+{
+    (void)v;
+    settings_.setAttributesVisible(attributesVisibleCheckBox_->isChecked());
     dataChanged();
 }
 

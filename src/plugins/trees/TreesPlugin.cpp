@@ -47,7 +47,7 @@ void TreesPlugin::initialize(MainWindow *mainWindow)
                               ICON("tree"),
                               this,
                               SLOT(slotPlugin()),
-                              30);
+                              3);
 }
 
 void TreesPlugin::slotPlugin()
