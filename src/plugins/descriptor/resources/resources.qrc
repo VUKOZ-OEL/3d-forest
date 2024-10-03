@@ -21,6 +21,7 @@
 <qresource prefix="/descriptor">
 
 <!-- Tool bar -->
+<file>descriptor_16px_color.png</file>
 <file>descriptor_24px_color.png</file>
 
 <!-- Images -->

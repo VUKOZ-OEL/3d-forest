@@ -21,6 +21,7 @@
 <qresource prefix="/elevation">
 
 <!-- Tool bar -->
+<file>elevation_16px_color.png</file>
 <file>elevation_24px_color.png</file>
 
 <!-- Images -->
