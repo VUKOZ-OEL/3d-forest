@@ -537,6 +537,7 @@ void SegmentationAction::stepVoxelsToPoints()
         size_t segmentId = 1;
         for (auto &it : groups_)
         {
+            it.second.boundary.clear();
             it.second.segmentId = segmentId;
             segmentId++;
         }
