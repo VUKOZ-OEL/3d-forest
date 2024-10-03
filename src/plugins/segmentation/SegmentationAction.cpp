@@ -527,6 +527,57 @@ void SegmentationAction::stepCreateBranches()
     progress_.setValueSteps(SEGMENTATION_STEP_VOXELS_TO_POINTS);
 }
 
+void SegmentationAction::stepVoxelsToPoints()
+{
+    progress_.startTimer();
+
+    if (progress_.valueStep() == 0)
+    {
+        // Set segment id to all final groups.
+        size_t segmentId = 1;
+        for (auto &it : groups_)
+        {
+            it.second.segmentId = segmentId;
+            segmentId++;
+        }
+    }
+
+    // For each point in filtered datasets:
+    while (query_.next())
+    {
+        // If point belongs to some voxel:
+        size_t pointIndex = query_.voxel();
+        if (pointIndex < voxels_.size())
+        {
+            // If voxel's group belongs to a segment:
+            size_t groupIndex = voxels_[pointIndex].group;
+            auto it = groups_.find(groupIndex);
+            if (it != groups_.end())
+            {
+                // Set point segment to the same value as voxel segment.
+                query_.segment() = it->second.segmentId;
+                query_.setModified();
+
+                // Extend group boundary.
+                it->second.boundary.extend(query_.x(), query_.y(), query_.z());
+            }
+        }
+
+        progress_.addValueStep(1);
+        if (progress_.timedOut())
+        {
+            return;
+        }
+    }
+
+    LOG_DEBUG(<< "Done.");
+
+    query_.flush();
+
+    progress_.setMaximumStep();
+    progress_.setValueSteps(SEGMENTATION_STEP_CREATE_SEGMENTS);
+}
+
 void SegmentationAction::stepCreateSegments()
 {
     LOG_DEBUG(<< "Create <" << groups_.size() << "> segments.");
@@ -580,57 +631,6 @@ void SegmentationAction::createSegmentFromGroup(size_t segmentId,
 
     segment.boundary = group.boundary;
     // segment.height = segment.boundary.length(2);
-}
-
-void SegmentationAction::stepVoxelsToPoints()
-{
-    progress_.startTimer();
-
-    if (progress_.valueStep() == 0)
-    {
-        // Set segment id to all final groups.
-        size_t segmentId = 1;
-        for (auto &it : groups_)
-        {
-            it.second.segmentId = segmentId;
-            segmentId++;
-        }
-    }
-
-    // For each point in filtered datasets:
-    while (query_.next())
-    {
-        // If point belongs to some voxel:
-        size_t pointIndex = query_.voxel();
-        if (pointIndex < voxels_.size())
-        {
-            // If voxel's group belongs to a segment:
-            size_t groupIndex = voxels_[pointIndex].group;
-            auto it = groups_.find(groupIndex);
-            if (it != groups_.end())
-            {
-                // Set point segment to the same value as voxel segment.
-                query_.segment() = it->second.segmentId;
-                query_.setModified();
-
-                // Extend group boundary.
-                it->second.boundary.extend(query_.x(), query_.y(), query_.z());
-            }
-        }
-
-        progress_.addValueStep(1);
-        if (progress_.timedOut())
-        {
-            return;
-        }
-    }
-
-    LOG_DEBUG(<< "Done.");
-
-    query_.flush();
-
-    progress_.setMaximumStep();
-    progress_.setValueSteps(SEGMENTATION_STEP_CREATE_SEGMENTS);
 }
 
 void SegmentationAction::createVoxel()
