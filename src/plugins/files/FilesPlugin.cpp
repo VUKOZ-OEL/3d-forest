@@ -47,7 +47,7 @@ void FilesPlugin::initialize(MainWindow *mainWindow)
                               ICON("files"),
                               this,
                               SLOT(slotPlugin()),
-                              30);
+                              1);
 }
 
 void FilesPlugin::slotPlugin()
