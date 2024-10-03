@@ -356,6 +356,7 @@ void ViewerOpenGLViewport::renderScene()
 
     double t1 = Time::realTime();
 
+    size_t pageIndex = 0;
     size_t pageSize = editor_->viewports().pageSize(viewportId_);
 
     LOG_DEBUG_RENDER(<< "Render pages n <" << pageSize << ">.");
@@ -369,9 +370,9 @@ void ViewerOpenGLViewport::renderScene()
     {
         LOG_DEBUG_RENDER(<< "Reset render state after resize event.");
 
-        for (size_t pageIndex = 0; pageIndex < pageSize; pageIndex++)
+        for (size_t i = 0; i < pageSize; i++)
         {
-            Page &page = editor_->viewports().page(viewportId_, pageIndex);
+            Page &page = editor_->viewports().page(viewportId_, i);
             if (page.state() == Page::STATE_RENDERED)
             {
                 page.setState(Page::STATE_RENDER);
@@ -381,7 +382,7 @@ void ViewerOpenGLViewport::renderScene()
         resized_ = false;
     }
 
-    for (size_t pageIndex = 0; pageIndex < pageSize; pageIndex++)
+    while (pageIndex < pageSize)
     {
         Page &page = editor_->viewports().page(viewportId_, pageIndex);
 
@@ -422,9 +423,16 @@ void ViewerOpenGLViewport::renderScene()
                              << "/" << pageSize << "> page id <"
                              << page.pageId() << ">.");
         }
+
+        pageIndex++;
     }
 
     renderSceneSettingsDisable();
+
+    if (pageIndex == pageSize)
+    {
+        renderLastFrame();
+    }
 
     LOG_DEBUG_RENDER(<< "Finished rendering viewport <" << viewportId_ << ">.");
 }
@@ -442,6 +450,7 @@ void ViewerOpenGLViewport::renderFirstFrame()
     }
 
     ViewerOpenGL::renderClipFilter(editor_->clipFilter());
+    renderAttributes();
     renderSegments();
     renderGuides();
 
@@ -454,6 +463,15 @@ void ViewerOpenGLViewport::renderFirstFrame()
     glLoadMatrixf(camera_.projection().data());
     glMatrixMode(GL_MODELVIEW);
     glLoadMatrixf(camera_.modelView().data());
+}
+
+void ViewerOpenGLViewport::renderLastFrame()
+{
+    glLineWidth(2.0F);
+    glDisable(GL_DEPTH_TEST);
+    renderAttributes();
+    glEnable(GL_DEPTH_TEST);
+    glLineWidth(1.0F);
 }
 
 void ViewerOpenGLViewport::renderSegments()
@@ -488,29 +506,6 @@ void ViewerOpenGLViewport::renderSegments()
             continue;
         }
 
-        // Render attributes.
-        if (editor_->settings().view().showAttributesEnabled() &&
-            segment.attributesCalculated)
-        {
-            glColor3f(1.0F, 1.0F, 0.0F);
-
-            Vector3<float> treeDbhPosition(segment.dbhPosition);
-            float treeDbhRadius = static_cast<float>(segment.dbh) * 0.5F;
-            ViewerOpenGL::renderCircle(treeDbhPosition, treeDbhRadius * 1.0F);
-
-            Vector3<float> treePosition(segment.position);
-            ViewerOpenGL::renderCross(
-                treePosition,
-                static_cast<float>(segment.boundary.length(0)),
-                static_cast<float>(segment.boundary.length(1)));
-
-            Vector3<float> treeTip(treePosition[0],
-                                   treePosition[1],
-                                   treePosition[2] +
-                                       static_cast<float>(segment.height));
-            ViewerOpenGL::renderLine(treePosition, treeTip);
-        }
-
         // Render meshes.
         for (size_t m = 0; m < segment.meshList.size(); m++)
         {
@@ -535,6 +530,58 @@ void ViewerOpenGLViewport::renderSegments()
 
             glPointSize(1.0F);
         }
+    }
+}
+
+void ViewerOpenGLViewport::renderAttributes()
+{
+    if (!editor_->settings().view().showAttributesEnabled())
+    {
+        return;
+    }
+
+    const Segments &segments = editor_->segments();
+    const QueryFilterSet &filter = editor_->segmentsFilter();
+
+    for (size_t i = 0; i < segments.size(); i++)
+    {
+        const Segment &segment = segments[i];
+
+        if (!segment.attributesCalculated)
+        {
+            continue;
+        }
+
+        // Ignore hidden segments.
+        if (!filter.enabled(segment.id))
+        {
+            continue;
+        }
+
+        // Ignore "unsegmented".
+        if (segment.id == 0)
+        {
+            continue;
+        }
+
+        // Render attributes.
+        glColor3f(1.0F, 1.0F, 0.0F);
+
+        Vector3<float> treeDbhPosition(segment.dbhPosition);
+        float treeDbhRadius = static_cast<float>(segment.dbh) * 0.5F;
+        ViewerOpenGL::renderCircle(treeDbhPosition, treeDbhRadius);
+
+        Vector3<float> treePosition(segment.position);
+        ViewerOpenGL::renderCross(
+            treePosition,
+            static_cast<float>(segment.boundary.length(0)),
+            static_cast<float>(segment.boundary.length(1)));
+
+        Vector3<float> treeTip(treePosition[0],
+                               treePosition[1],
+                               treePosition[2] +
+                                   static_cast<float>(segment.height));
+        ViewerOpenGL::renderLine(treePosition, treeTip);
     }
 }
 

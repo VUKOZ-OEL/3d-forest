@@ -94,7 +94,9 @@ protected:
     void clearScreen();
     void renderScene();
     void renderFirstFrame();
+    void renderLastFrame();
     void renderSegments();
+    void renderAttributes();
     void renderGuides();
     void renderSceneSettingsEnable();
     void renderSceneSettingsDisable();
