@@ -29,7 +29,8 @@
 SettingsView::SettingsView()
     : pointSize_(1.0),
       fogEnabled_(false),
-      showAttributesEnabled_(true),
+      sceneBoundingBoxVisible_(true),
+      attributesVisible_(true),
       pointColor_(1.0, 1.0, 1.0),
       background_(0.2, 0.2, 0.2)
 {
@@ -70,14 +71,24 @@ void SettingsView::setFogEnabled(bool b)
     fogEnabled_ = b;
 }
 
-bool SettingsView::showAttributesEnabled() const
+bool SettingsView::sceneBoundingBoxVisible() const
 {
-    return showAttributesEnabled_;
+    return sceneBoundingBoxVisible_;
 }
 
-void SettingsView::setShowAttributesEnabled(bool b)
+void SettingsView::setSceneBoundingBoxVisible(bool b)
 {
-    showAttributesEnabled_ = b;
+    sceneBoundingBoxVisible_ = b;
+}
+
+bool SettingsView::attributesVisible() const
+{
+    return attributesVisible_;
+}
+
+void SettingsView::setAttributesVisible(bool b)
+{
+    attributesVisible_ = b;
 }
 
 void SettingsView::setPointColor(const Vector3<double> &rgb)
@@ -150,6 +161,8 @@ void fromJson(SettingsView &out, const Json &in)
 {
     fromJson(out.pointSize_, in["pointSize"]);
     fromJson(out.fogEnabled_, in["fogEnabled"]);
+    fromJson(out.sceneBoundingBoxVisible_, in["sceneBoundingBoxVisible"]);
+    fromJson(out.attributesVisible_, in["attributesVisible"]);
     fromJson(out.pointColor_, in["pointColor"]);
     fromJson(out.background_, in["background"]);
 }
@@ -158,6 +171,8 @@ void toJson(Json &out, const SettingsView &in)
 {
     toJson(out["pointSize"], in.pointSize_);
     toJson(out["fogEnabled"], in.fogEnabled_);
+    toJson(out["sceneBoundingBoxVisible"], in.sceneBoundingBoxVisible_);
+    toJson(out["attributesVisible"], in.attributesVisible_);
     toJson(out["pointColor"], in.pointColor_);
     toJson(out["background"], in.background_);
 }

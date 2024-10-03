@@ -535,7 +535,7 @@ void ViewerOpenGLViewport::renderSegments()
 
 void ViewerOpenGLViewport::renderAttributes()
 {
-    if (!editor_->settings().view().showAttributesEnabled())
+    if (!editor_->settings().view().attributesVisible())
     {
         return;
     }
@@ -588,8 +588,11 @@ void ViewerOpenGLViewport::renderAttributes()
 void ViewerOpenGLViewport::renderGuides()
 {
     // Bounding box.
-    glColor3f(0.25F, 0.25F, 0.25F);
-    ViewerOpenGL::renderAabb(aabb_);
+    if (editor_->settings().view().sceneBoundingBoxVisible())
+    {
+        glColor3f(0.25F, 0.25F, 0.25F);
+        ViewerOpenGL::renderAabb(aabb_);
+    }
 
     // Overlay.
     QMatrix4x4 m;

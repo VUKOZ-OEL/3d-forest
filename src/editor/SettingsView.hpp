@@ -59,8 +59,11 @@ public:
     bool fogEnabled() const;
     void setFogEnabled(bool b);
 
-    bool showAttributesEnabled() const;
-    void setShowAttributesEnabled(bool b);
+    bool sceneBoundingBoxVisible() const;
+    void setSceneBoundingBoxVisible(bool b);
+
+    bool attributesVisible() const;
+    void setAttributesVisible(bool b);
 
     const Vector3<double> &pointColor() const { return pointColor_; }
     void setPointColor(const Vector3<double> &rgb);
@@ -80,7 +83,8 @@ public:
 protected:
     double pointSize_;
     bool fogEnabled_;
-    bool showAttributesEnabled_;
+    bool sceneBoundingBoxVisible_;
+    bool attributesVisible_;
     Vector3<double> pointColor_;
     Vector3<double> background_;
     std::vector<std::string> colorSourceString_;
