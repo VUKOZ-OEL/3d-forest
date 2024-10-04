@@ -535,7 +535,7 @@ void ViewerOpenGLViewport::renderSegments()
 
 void ViewerOpenGLViewport::renderAttributes()
 {
-    if (!editor_->settings().view().attributesVisible())
+    if (!editor_->settings().view().showAttributesEnabled())
     {
         return;
     }
@@ -588,7 +588,7 @@ void ViewerOpenGLViewport::renderAttributes()
 void ViewerOpenGLViewport::renderGuides()
 {
     // Bounding box.
-    if (editor_->settings().view().sceneBoundingBoxVisible())
+    if (editor_->settings().view().showSceneBoundingBoxEnabled())
     {
         glColor3f(0.25F, 0.25F, 0.25F);
         ViewerOpenGL::renderAabb(aabb_);

@@ -29,8 +29,8 @@
 SettingsView::SettingsView()
     : pointSize_(1.0),
       fogEnabled_(false),
-      sceneBoundingBoxVisible_(true),
-      attributesVisible_(true),
+      showSceneBoundingBoxEnabled_(true),
+      showAttributesEnabled_(true),
       pointColor_(1.0, 1.0, 1.0),
       background_(0.2, 0.2, 0.2)
 {
@@ -71,24 +71,24 @@ void SettingsView::setFogEnabled(bool b)
     fogEnabled_ = b;
 }
 
-bool SettingsView::sceneBoundingBoxVisible() const
+bool SettingsView::showSceneBoundingBoxEnabled() const
 {
-    return sceneBoundingBoxVisible_;
+    return showSceneBoundingBoxEnabled_;
 }
 
-void SettingsView::setSceneBoundingBoxVisible(bool b)
+void SettingsView::setShowSceneBoundingBoxEnabled(bool b)
 {
-    sceneBoundingBoxVisible_ = b;
+    showSceneBoundingBoxEnabled_ = b;
 }
 
-bool SettingsView::attributesVisible() const
+bool SettingsView::showAttributesEnabled() const
 {
-    return attributesVisible_;
+    return showAttributesEnabled_;
 }
 
-void SettingsView::setAttributesVisible(bool b)
+void SettingsView::setShowAttributesEnabled(bool b)
 {
-    attributesVisible_ = b;
+    showAttributesEnabled_ = b;
 }
 
 void SettingsView::setPointColor(const Vector3<double> &rgb)
@@ -161,8 +161,9 @@ void fromJson(SettingsView &out, const Json &in)
 {
     fromJson(out.pointSize_, in["pointSize"]);
     fromJson(out.fogEnabled_, in["fogEnabled"]);
-    fromJson(out.sceneBoundingBoxVisible_, in["sceneBoundingBoxVisible"]);
-    fromJson(out.attributesVisible_, in["attributesVisible"]);
+    fromJson(out.showSceneBoundingBoxEnabled_,
+             in["showSceneBoundingBoxEnabled"]);
+    fromJson(out.showAttributesEnabled_, in["showAttributesEnabled"]);
     fromJson(out.pointColor_, in["pointColor"]);
     fromJson(out.background_, in["background"]);
 }
@@ -171,8 +172,8 @@ void toJson(Json &out, const SettingsView &in)
 {
     toJson(out["pointSize"], in.pointSize_);
     toJson(out["fogEnabled"], in.fogEnabled_);
-    toJson(out["sceneBoundingBoxVisible"], in.sceneBoundingBoxVisible_);
-    toJson(out["attributesVisible"], in.attributesVisible_);
+    toJson(out["showSceneBoundingBoxEnabled"], in.showSceneBoundingBoxEnabled_);
+    toJson(out["showAttributesEnabled"], in.showAttributesEnabled_);
     toJson(out["pointColor"], in.pointColor_);
     toJson(out["background"], in.background_);
 }

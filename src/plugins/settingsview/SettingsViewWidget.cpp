@@ -53,38 +53,41 @@ SettingsViewWidget::SettingsViewWidget(MainWindow *mainWindow)
             SLOT(slotSetColor()));
 
     // Fog.
-    fogCheckBox_ = new QCheckBox;
-    fogCheckBox_->setChecked(settings_.fogEnabled());
-    fogCheckBox_->setToolTip(tr("Reduce intensity with increasing distance"));
-    fogCheckBox_->setText(tr("Show Depth"));
-    connect(fogCheckBox_,
+    fogEnabledCheckBox_ = new QCheckBox;
+    fogEnabledCheckBox_->setChecked(settings_.fogEnabled());
+    fogEnabledCheckBox_->setToolTip(
+        tr("Reduce intensity with increasing distance"));
+    fogEnabledCheckBox_->setText(tr("Show Depth"));
+    connect(fogEnabledCheckBox_,
             SIGNAL(stateChanged(int)),
             this,
             SLOT(slotSetFogEnabled(int)));
 
     // Bounding Box.
-    sceneBoundingBoxVisibleCheckBox_ = new QCheckBox;
-    sceneBoundingBoxVisibleCheckBox_->setChecked(
-        settings_.sceneBoundingBoxVisible());
-    sceneBoundingBoxVisibleCheckBox_->setText(tr("Show Scene Bounding Box"));
-    connect(sceneBoundingBoxVisibleCheckBox_,
+    showSceneBoundingBoxEnabledCheckBox_ = new QCheckBox;
+    showSceneBoundingBoxEnabledCheckBox_->setChecked(
+        settings_.showSceneBoundingBoxEnabled());
+    showSceneBoundingBoxEnabledCheckBox_->setText(
+        tr("Show Scene Bounding Box"));
+    connect(showSceneBoundingBoxEnabledCheckBox_,
             SIGNAL(stateChanged(int)),
             this,
-            SLOT(slotSetSceneBoundingBoxVisible(int)));
+            SLOT(slotSetShowSceneBoundingBoxEnabled(int)));
 
     // Attributes.
-    attributesVisibleCheckBox_ = new QCheckBox;
-    attributesVisibleCheckBox_->setChecked(settings_.attributesVisible());
-    attributesVisibleCheckBox_->setText(tr("Show Tree Attributes"));
-    connect(attributesVisibleCheckBox_,
+    showAttributesEnabledCheckBox_ = new QCheckBox;
+    showAttributesEnabledCheckBox_->setChecked(
+        settings_.showAttributesEnabled());
+    showAttributesEnabledCheckBox_->setText(tr("Show Tree Attributes"));
+    connect(showAttributesEnabledCheckBox_,
             SIGNAL(stateChanged(int)),
             this,
-            SLOT(slotSetAttributesVisible(int)));
+            SLOT(slotSetShowAttributesEnabled(int)));
 
     QVBoxLayout *optionsVBoxLayout = new QVBoxLayout;
-    optionsVBoxLayout->addWidget(attributesVisibleCheckBox_);
-    optionsVBoxLayout->addWidget(sceneBoundingBoxVisibleCheckBox_);
-    optionsVBoxLayout->addWidget(fogCheckBox_);
+    optionsVBoxLayout->addWidget(showAttributesEnabledCheckBox_);
+    optionsVBoxLayout->addWidget(showSceneBoundingBoxEnabledCheckBox_);
+    optionsVBoxLayout->addWidget(fogEnabledCheckBox_);
 
     QGroupBox *optionsGroupBox = new QGroupBox(tr("Options"));
     optionsGroupBox->setLayout(optionsVBoxLayout);
@@ -240,22 +243,23 @@ void SettingsViewWidget::slotSetPointSize(int v)
 void SettingsViewWidget::slotSetFogEnabled(int v)
 {
     (void)v;
-    settings_.setFogEnabled(fogCheckBox_->isChecked());
+    settings_.setFogEnabled(fogEnabledCheckBox_->isChecked());
     dataChanged();
 }
 
-void SettingsViewWidget::slotSetSceneBoundingBoxVisible(int v)
+void SettingsViewWidget::slotSetShowSceneBoundingBoxEnabled(int v)
 {
     (void)v;
-    settings_.setSceneBoundingBoxVisible(
-        sceneBoundingBoxVisibleCheckBox_->isChecked());
+    settings_.setShowSceneBoundingBoxEnabled(
+        showSceneBoundingBoxEnabledCheckBox_->isChecked());
     dataChanged();
 }
 
-void SettingsViewWidget::slotSetAttributesVisible(int v)
+void SettingsViewWidget::slotSetShowAttributesEnabled(int v)
 {
     (void)v;
-    settings_.setAttributesVisible(attributesVisibleCheckBox_->isChecked());
+    settings_.setShowAttributesEnabled(
+        showAttributesEnabledCheckBox_->isChecked());
     dataChanged();
 }
 

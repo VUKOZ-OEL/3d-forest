@@ -52,17 +52,17 @@ public slots:
     void slotColorSourceChanged(int index);
     void slotSetPointSize(int v);
     void slotSetFogEnabled(int v);
-    void slotSetSceneBoundingBoxVisible(int v);
-    void slotSetAttributesVisible(int v);
+    void slotSetShowSceneBoundingBoxEnabled(int v);
+    void slotSetShowAttributesEnabled(int v);
     void slotSetColor();
 
 private:
     MainWindow *mainWindow_;
 
     ColorSwitchWidget *colorSwitchWidget_;
-    QCheckBox *fogCheckBox_;
-    QCheckBox *sceneBoundingBoxVisibleCheckBox_;
-    QCheckBox *attributesVisibleCheckBox_;
+    QCheckBox *fogEnabledCheckBox_;
+    QCheckBox *showSceneBoundingBoxEnabledCheckBox_;
+    QCheckBox *showAttributesEnabledCheckBox_;
     QComboBox *colorSourceComboBox_;
     QSlider *pointSizeSlider_;
 
