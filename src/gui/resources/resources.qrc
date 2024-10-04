@@ -24,24 +24,30 @@
 <file>question_16px.png</file>
 <file>question_20px.png</file>
 <file>add_16px.png</file>
+<file>add_20px.png</file>
 <file>add_24px.png</file>
-<file>add_24px_color.png</file>
 <file>remove_16px.png</file>
+<file>remove_20px.png</file>
 <file>remove_24px.png</file>
-<file>remove_24px_color.png</file>
 <file>run_16px.png</file>
+<file>run_20px.png</file>
 
 <!-- Common -->
 <file>eye_16px.png</file>
+<file>eye_20px.png</file>
 <file>eye_24px.png</file>
 <file>hide_16px.png</file>
+<file>hide_20px.png</file>
 <file>hide_24px.png</file>
 
 <file>select_all_16px.png</file>
+<file>select_all_20px.png</file>
 <file>select_all_24px.png</file>
 <file>select_invert_16px.png</file>
+<file>select_invert_20px.png</file>
 <file>select_invert_24px.png</file>
 <file>select_none_16px.png</file>
+<file>select_none_20px.png</file>
 <file>select_none_24px.png</file>
 
 </qresource>
