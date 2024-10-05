@@ -29,12 +29,12 @@
 
 SettingsView::SettingsView()
     : pointSize_(1.0),
-      showDistanceBasedFadingEnabled_(false),
-      showSceneBoundingBoxEnabled_(true),
-      showAttributesEnabled_(true),
       pointColor_(1.0, 1.0, 1.0),
-      background_(0.2, 0.2, 0.2),
-      colorSource_(SettingsView::ColorSource::COLOR)
+      backgroundColor_(0.2, 0.2, 0.2),
+      colorSource_(SettingsView::ColorSource::COLOR),
+      distanceBasedFadingVisible_(false),
+      sceneBoundingBoxVisible_(true),
+      treeAttributesVisible_(true)
 {
     colorSourceString_ = {"Color",
                           "Intensity",
@@ -56,36 +56,6 @@ void SettingsView::setPointSize(double size)
     pointSize_ = size;
 }
 
-bool SettingsView::showDistanceBasedFadingEnabled() const
-{
-    return showDistanceBasedFadingEnabled_;
-}
-
-void SettingsView::setShowDistanceBasedFadingEnabled(bool b)
-{
-    showDistanceBasedFadingEnabled_ = b;
-}
-
-bool SettingsView::showSceneBoundingBoxEnabled() const
-{
-    return showSceneBoundingBoxEnabled_;
-}
-
-void SettingsView::setShowSceneBoundingBoxEnabled(bool b)
-{
-    showSceneBoundingBoxEnabled_ = b;
-}
-
-bool SettingsView::showAttributesEnabled() const
-{
-    return showAttributesEnabled_;
-}
-
-void SettingsView::setShowAttributesEnabled(bool b)
-{
-    showAttributesEnabled_ = b;
-}
-
 void SettingsView::setPointColor(const Vector3<double> &rgb)
 {
     pointColor_ = rgb;
@@ -93,7 +63,7 @@ void SettingsView::setPointColor(const Vector3<double> &rgb)
 
 void SettingsView::setBackgroundColor(const Vector3<double> &rgb)
 {
-    background_ = rgb;
+    backgroundColor_ = rgb;
 }
 
 SettingsView::ColorSource SettingsView::colorSource() const
@@ -121,29 +91,58 @@ const char *SettingsView::colorSourceString(size_t idx) const
     return "Unknown";
 }
 
+bool SettingsView::distanceBasedFadingVisible() const
+{
+    return distanceBasedFadingVisible_;
+}
+
+void SettingsView::setDistanceBasedFadingVisible(bool b)
+{
+    distanceBasedFadingVisible_ = b;
+}
+
+bool SettingsView::sceneBoundingBoxVisible() const
+{
+    return sceneBoundingBoxVisible_;
+}
+
+void SettingsView::setSceneBoundingBoxVisible(bool b)
+{
+    sceneBoundingBoxVisible_ = b;
+}
+
+bool SettingsView::treeAttributesVisible() const
+{
+    return treeAttributesVisible_;
+}
+
+void SettingsView::setTreeAttributesVisible(bool b)
+{
+    treeAttributesVisible_ = b;
+}
+
 void fromJson(SettingsView &out, const Json &in)
 {
     fromJson(out.pointSize_, in["pointSize"]);
-    fromJson(out.showDistanceBasedFadingEnabled_,
-             in["showDistanceBasedFadingEnabled"]);
-    fromJson(out.showSceneBoundingBoxEnabled_,
-             in["showSceneBoundingBoxEnabled"]);
-    fromJson(out.showAttributesEnabled_, in["showAttributesEnabled"]);
     fromJson(out.pointColor_, in["pointColor"]);
-    fromJson(out.background_, in["background"]);
+    fromJson(out.backgroundColor_, in["backgroundColor"]);
     fromJson(out.colorSource_, in["colorSource"]);
+
+    fromJson(out.distanceBasedFadingVisible_, in["distanceBasedFadingVisible"]);
+    fromJson(out.sceneBoundingBoxVisible_, in["sceneBoundingBoxVisible"]);
+    fromJson(out.treeAttributesVisible_, in["treeAttributesVisible"]);
 }
 
 void toJson(Json &out, const SettingsView &in)
 {
     toJson(out["pointSize"], in.pointSize_);
-    toJson(out["showDistanceBasedFadingEnabled"],
-           in.showDistanceBasedFadingEnabled_);
-    toJson(out["showSceneBoundingBoxEnabled"], in.showSceneBoundingBoxEnabled_);
-    toJson(out["showAttributesEnabled"], in.showAttributesEnabled_);
     toJson(out["pointColor"], in.pointColor_);
-    toJson(out["background"], in.background_);
+    toJson(out["backgroundColor"], in.backgroundColor_);
     toJson(out["colorSource"], in.colorSource_);
+
+    toJson(out["distanceBasedFadingVisible"], in.distanceBasedFadingVisible_);
+    toJson(out["sceneBoundingBoxVisible"], in.sceneBoundingBoxVisible_);
+    toJson(out["treeAttributesVisible"], in.treeAttributesVisible_);
 }
 
 std::string toString(const SettingsView &in)

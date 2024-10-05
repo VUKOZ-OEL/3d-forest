@@ -46,7 +46,20 @@ SettingsViewWidget::SettingsViewWidget(MainWindow *mainWindow)
     : QWidget(mainWindow),
       mainWindow_(mainWindow)
 {
-    LOG_DEBUG(<< "Create settings view widget.");
+    LOG_DEBUG(<< "Start creating settings view widget.");
+
+    // Point size.
+    pointSizeSlider_ = new QSlider;
+    pointSizeSlider_->setMinimum(1);
+    pointSizeSlider_->setMaximum(5);
+    pointSizeSlider_->setSingleStep(1);
+    pointSizeSlider_->setTickInterval(1);
+    pointSizeSlider_->setTickPosition(QSlider::TicksAbove);
+    pointSizeSlider_->setOrientation(Qt::Horizontal);
+    connect(pointSizeSlider_,
+            SIGNAL(valueChanged(int)),
+            this,
+            SLOT(slotSetPointSize(int)));
 
     // Color.
     colorSwitchWidget_ = new ColorSwitchWidget;
@@ -54,48 +67,6 @@ SettingsViewWidget::SettingsViewWidget(MainWindow *mainWindow)
             SIGNAL(colorChanged()),
             this,
             SLOT(slotSetColor()));
-
-    // Distance-based fading.
-    showDistanceBasedFadingEnabledCheckBox_ = new QCheckBox;
-    showDistanceBasedFadingEnabledCheckBox_->setChecked(
-        settings_.showDistanceBasedFadingEnabled());
-    showDistanceBasedFadingEnabledCheckBox_->setToolTip(
-        tr("Reduce intensity with increasing distance"));
-    showDistanceBasedFadingEnabledCheckBox_->setText(
-        tr("Show distance-based fading"));
-    connect(showDistanceBasedFadingEnabledCheckBox_,
-            SIGNAL(stateChanged(int)),
-            this,
-            SLOT(slotSetShowDistanceBasedFadingEnabled(int)));
-
-    // Bounding Box.
-    showSceneBoundingBoxEnabledCheckBox_ = new QCheckBox;
-    showSceneBoundingBoxEnabledCheckBox_->setChecked(
-        settings_.showSceneBoundingBoxEnabled());
-    showSceneBoundingBoxEnabledCheckBox_->setText(
-        tr("Show Scene Bounding Box"));
-    connect(showSceneBoundingBoxEnabledCheckBox_,
-            SIGNAL(stateChanged(int)),
-            this,
-            SLOT(slotSetShowSceneBoundingBoxEnabled(int)));
-
-    // Attributes.
-    showAttributesEnabledCheckBox_ = new QCheckBox;
-    showAttributesEnabledCheckBox_->setChecked(
-        settings_.showAttributesEnabled());
-    showAttributesEnabledCheckBox_->setText(tr("Show Tree Attributes"));
-    connect(showAttributesEnabledCheckBox_,
-            SIGNAL(stateChanged(int)),
-            this,
-            SLOT(slotSetShowAttributesEnabled(int)));
-
-    QVBoxLayout *optionsVBoxLayout = new QVBoxLayout;
-    optionsVBoxLayout->addWidget(showAttributesEnabledCheckBox_);
-    optionsVBoxLayout->addWidget(showSceneBoundingBoxEnabledCheckBox_);
-    optionsVBoxLayout->addWidget(showDistanceBasedFadingEnabledCheckBox_);
-
-    QGroupBox *optionsGroupBox = new QGroupBox(tr("Options"));
-    optionsGroupBox->setLayout(optionsVBoxLayout);
 
     // Color source.
     colorSourceComboBox_ = new QComboBox;
@@ -111,18 +82,46 @@ SettingsViewWidget::SettingsViewWidget(MainWindow *mainWindow)
             this,
             SLOT(slotColorSourceChanged(int)));
 
-    // Point size.
-    pointSizeSlider_ = new QSlider;
-    pointSizeSlider_->setMinimum(1);
-    pointSizeSlider_->setMaximum(5);
-    pointSizeSlider_->setSingleStep(1);
-    pointSizeSlider_->setTickInterval(1);
-    pointSizeSlider_->setTickPosition(QSlider::TicksAbove);
-    pointSizeSlider_->setOrientation(Qt::Horizontal);
-    connect(pointSizeSlider_,
-            SIGNAL(valueChanged(int)),
+    // Distance-based fading.
+    distanceBasedFadingVisibleCheckBox_ = new QCheckBox;
+    distanceBasedFadingVisibleCheckBox_->setChecked(
+        settings_.distanceBasedFadingVisible());
+    distanceBasedFadingVisibleCheckBox_->setToolTip(
+        tr("Reduce intensity with increasing distance"));
+    distanceBasedFadingVisibleCheckBox_->setText(
+        tr("Show Distance-based Fading"));
+    connect(distanceBasedFadingVisibleCheckBox_,
+            SIGNAL(stateChanged(int)),
             this,
-            SLOT(slotSetPointSize(int)));
+            SLOT(slotSetDistanceBasedFadingVisible(int)));
+
+    // Bounding box.
+    sceneBoundingBoxVisibleCheckBox_ = new QCheckBox;
+    sceneBoundingBoxVisibleCheckBox_->setChecked(
+        settings_.sceneBoundingBoxVisible());
+    sceneBoundingBoxVisibleCheckBox_->setText(tr("Show Scene Bounding Box"));
+    connect(sceneBoundingBoxVisibleCheckBox_,
+            SIGNAL(stateChanged(int)),
+            this,
+            SLOT(slotSetSceneBoundingBoxVisible(int)));
+
+    // Tree attributes.
+    treeAttributesVisibleCheckBox_ = new QCheckBox;
+    treeAttributesVisibleCheckBox_->setChecked(
+        settings_.treeAttributesVisible());
+    treeAttributesVisibleCheckBox_->setText(tr("Show Tree Attributes"));
+    connect(treeAttributesVisibleCheckBox_,
+            SIGNAL(stateChanged(int)),
+            this,
+            SLOT(slotSetTreeAttributesVisible(int)));
+
+    QVBoxLayout *optionsVBoxLayout = new QVBoxLayout;
+    optionsVBoxLayout->addWidget(distanceBasedFadingVisibleCheckBox_);
+    optionsVBoxLayout->addWidget(sceneBoundingBoxVisibleCheckBox_);
+    optionsVBoxLayout->addWidget(treeAttributesVisibleCheckBox_);
+
+    QGroupBox *optionsGroupBox = new QGroupBox(tr("Options"));
+    optionsGroupBox->setLayout(optionsVBoxLayout);
 
     // Layout.
     QGridLayout *groupBoxLayout = new QGridLayout;
@@ -152,6 +151,8 @@ SettingsViewWidget::SettingsViewWidget(MainWindow *mainWindow)
             SLOT(slotUpdate(void *, const QSet<Editor::Type> &)));
 
     slotUpdate(nullptr, QSet<Editor::Type>());
+
+    LOG_DEBUG(<< "Finished creating settings view widget.");
 }
 
 void SettingsViewWidget::slotUpdate(void *sender,
@@ -222,6 +223,23 @@ void SettingsViewWidget::setViewSettings(const SettingsView &settings)
     unblock();
 }
 
+void SettingsViewWidget::slotSetPointSize(int v)
+{
+    settings_.setPointSize(static_cast<double>(v));
+    dataChanged();
+}
+
+void SettingsViewWidget::slotSetColor()
+{
+    QColor fg = colorSwitchWidget_->foregroundColor();
+    settings_.setPointColor({fg.redF(), fg.greenF(), fg.blueF()});
+
+    QColor bg = colorSwitchWidget_->backgroundColor();
+    settings_.setBackgroundColor({bg.redF(), bg.greenF(), bg.blueF()});
+
+    dataChanged(true);
+}
+
 void SettingsViewWidget::slotColorSourceChanged(int index)
 {
     LOG_DEBUG(<< "Set color source to index <" << index << ">.");
@@ -238,45 +256,28 @@ void SettingsViewWidget::slotColorSourceChanged(int index)
     dataChanged(true);
 }
 
-void SettingsViewWidget::slotSetPointSize(int v)
-{
-    settings_.setPointSize(static_cast<double>(v));
-    dataChanged();
-}
-
-void SettingsViewWidget::slotSetShowDistanceBasedFadingEnabled(int v)
+void SettingsViewWidget::slotSetDistanceBasedFadingVisible(int v)
 {
     (void)v;
-    settings_.setShowDistanceBasedFadingEnabled(
-        showDistanceBasedFadingEnabledCheckBox_->isChecked());
+    settings_.setDistanceBasedFadingVisible(
+        distanceBasedFadingVisibleCheckBox_->isChecked());
     dataChanged();
 }
 
-void SettingsViewWidget::slotSetShowSceneBoundingBoxEnabled(int v)
+void SettingsViewWidget::slotSetSceneBoundingBoxVisible(int v)
 {
     (void)v;
-    settings_.setShowSceneBoundingBoxEnabled(
-        showSceneBoundingBoxEnabledCheckBox_->isChecked());
+    settings_.setSceneBoundingBoxVisible(
+        sceneBoundingBoxVisibleCheckBox_->isChecked());
     dataChanged();
 }
 
-void SettingsViewWidget::slotSetShowAttributesEnabled(int v)
+void SettingsViewWidget::slotSetTreeAttributesVisible(int v)
 {
     (void)v;
-    settings_.setShowAttributesEnabled(
-        showAttributesEnabledCheckBox_->isChecked());
+    settings_.setTreeAttributesVisible(
+        treeAttributesVisibleCheckBox_->isChecked());
     dataChanged();
-}
-
-void SettingsViewWidget::slotSetColor()
-{
-    QColor fg = colorSwitchWidget_->foregroundColor();
-    settings_.setPointColor({fg.redF(), fg.greenF(), fg.blueF()});
-
-    QColor bg = colorSwitchWidget_->backgroundColor();
-    settings_.setBackgroundColor({bg.redF(), bg.greenF(), bg.blueF()});
-
-    dataChanged(true);
 }
 
 void SettingsViewWidget::block()

@@ -56,19 +56,10 @@ public:
     double pointSize() const;
     void setPointSize(double size);
 
-    bool showDistanceBasedFadingEnabled() const;
-    void setShowDistanceBasedFadingEnabled(bool b);
-
-    bool showSceneBoundingBoxEnabled() const;
-    void setShowSceneBoundingBoxEnabled(bool b);
-
-    bool showAttributesEnabled() const;
-    void setShowAttributesEnabled(bool b);
-
     const Vector3<double> &pointColor() const { return pointColor_; }
     void setPointColor(const Vector3<double> &rgb);
 
-    const Vector3<double> &backgroundColor() const { return background_; }
+    const Vector3<double> &backgroundColor() const { return backgroundColor_; }
     void setBackgroundColor(const Vector3<double> &rgb);
 
     SettingsView::ColorSource colorSource() const;
@@ -77,14 +68,24 @@ public:
     size_t colorSourceSize() const;
     const char *colorSourceString(size_t idx) const;
 
+    bool distanceBasedFadingVisible() const;
+    void setDistanceBasedFadingVisible(bool b);
+
+    bool sceneBoundingBoxVisible() const;
+    void setSceneBoundingBoxVisible(bool b);
+
+    bool treeAttributesVisible() const;
+    void setTreeAttributesVisible(bool b);
+
 protected:
     double pointSize_;
-    bool showDistanceBasedFadingEnabled_;
-    bool showSceneBoundingBoxEnabled_;
-    bool showAttributesEnabled_;
     Vector3<double> pointColor_;
-    Vector3<double> background_;
+    Vector3<double> backgroundColor_;
     SettingsView::ColorSource colorSource_;
+
+    bool distanceBasedFadingVisible_;
+    bool sceneBoundingBoxVisible_;
+    bool treeAttributesVisible_;
 
     std::vector<std::string> colorSourceString_;
 
