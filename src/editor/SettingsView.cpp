@@ -28,7 +28,7 @@
 
 SettingsView::SettingsView()
     : pointSize_(1.0),
-      fogEnabled_(false),
+      showDistanceBasedFadingEnabled_(false),
       showSceneBoundingBoxEnabled_(true),
       showAttributesEnabled_(true),
       pointColor_(1.0, 1.0, 1.0),
@@ -55,14 +55,14 @@ void SettingsView::setPointSize(double size)
     pointSize_ = size;
 }
 
-bool SettingsView::fogEnabled() const
+bool SettingsView::showDistanceBasedFadingEnabled() const
 {
-    return fogEnabled_;
+    return showDistanceBasedFadingEnabled_;
 }
 
-void SettingsView::setFogEnabled(bool b)
+void SettingsView::setShowDistanceBasedFadingEnabled(bool b)
 {
-    fogEnabled_ = b;
+    showDistanceBasedFadingEnabled_ = b;
 }
 
 bool SettingsView::showSceneBoundingBoxEnabled() const
@@ -123,7 +123,8 @@ const char *SettingsView::colorSourceString(size_t idx) const
 void fromJson(SettingsView &out, const Json &in)
 {
     fromJson(out.pointSize_, in["pointSize"]);
-    fromJson(out.fogEnabled_, in["fogEnabled"]);
+    fromJson(out.showDistanceBasedFadingEnabled_,
+             in["showDistanceBasedFadingEnabled"]);
     fromJson(out.showSceneBoundingBoxEnabled_,
              in["showSceneBoundingBoxEnabled"]);
     fromJson(out.showAttributesEnabled_, in["showAttributesEnabled"]);
@@ -135,7 +136,8 @@ void fromJson(SettingsView &out, const Json &in)
 void toJson(Json &out, const SettingsView &in)
 {
     toJson(out["pointSize"], in.pointSize_);
-    toJson(out["fogEnabled"], in.fogEnabled_);
+    toJson(out["showDistanceBasedFadingEnabled"],
+           in.showDistanceBasedFadingEnabled_);
     toJson(out["showSceneBoundingBoxEnabled"], in.showSceneBoundingBoxEnabled_);
     toJson(out["showAttributesEnabled"], in.showAttributesEnabled_);
     toJson(out["pointColor"], in.pointColor_);

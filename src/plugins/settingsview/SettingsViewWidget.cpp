@@ -55,16 +55,18 @@ SettingsViewWidget::SettingsViewWidget(MainWindow *mainWindow)
             this,
             SLOT(slotSetColor()));
 
-    // Fog.
-    fogEnabledCheckBox_ = new QCheckBox;
-    fogEnabledCheckBox_->setChecked(settings_.fogEnabled());
-    fogEnabledCheckBox_->setToolTip(
+    // Distance-based fading.
+    showDistanceBasedFadingEnabledCheckBox_ = new QCheckBox;
+    showDistanceBasedFadingEnabledCheckBox_->setChecked(
+        settings_.showDistanceBasedFadingEnabled());
+    showDistanceBasedFadingEnabledCheckBox_->setToolTip(
         tr("Reduce intensity with increasing distance"));
-    fogEnabledCheckBox_->setText(tr("Show Depth"));
-    connect(fogEnabledCheckBox_,
+    showDistanceBasedFadingEnabledCheckBox_->setText(
+        tr("Show distance-based fading"));
+    connect(showDistanceBasedFadingEnabledCheckBox_,
             SIGNAL(stateChanged(int)),
             this,
-            SLOT(slotSetFogEnabled(int)));
+            SLOT(slotSetShowDistanceBasedFadingEnabled(int)));
 
     // Bounding Box.
     showSceneBoundingBoxEnabledCheckBox_ = new QCheckBox;
@@ -90,7 +92,7 @@ SettingsViewWidget::SettingsViewWidget(MainWindow *mainWindow)
     QVBoxLayout *optionsVBoxLayout = new QVBoxLayout;
     optionsVBoxLayout->addWidget(showAttributesEnabledCheckBox_);
     optionsVBoxLayout->addWidget(showSceneBoundingBoxEnabledCheckBox_);
-    optionsVBoxLayout->addWidget(fogEnabledCheckBox_);
+    optionsVBoxLayout->addWidget(showDistanceBasedFadingEnabledCheckBox_);
 
     QGroupBox *optionsGroupBox = new QGroupBox(tr("Options"));
     optionsGroupBox->setLayout(optionsVBoxLayout);
@@ -242,10 +244,11 @@ void SettingsViewWidget::slotSetPointSize(int v)
     dataChanged();
 }
 
-void SettingsViewWidget::slotSetFogEnabled(int v)
+void SettingsViewWidget::slotSetShowDistanceBasedFadingEnabled(int v)
 {
     (void)v;
-    settings_.setFogEnabled(fogEnabledCheckBox_->isChecked());
+    settings_.setShowDistanceBasedFadingEnabled(
+        showDistanceBasedFadingEnabledCheckBox_->isChecked());
     dataChanged();
 }
 

@@ -56,8 +56,8 @@ public:
     double pointSize() const;
     void setPointSize(double size);
 
-    bool fogEnabled() const;
-    void setFogEnabled(bool b);
+    bool showDistanceBasedFadingEnabled() const;
+    void setShowDistanceBasedFadingEnabled(bool b);
 
     bool showSceneBoundingBoxEnabled() const;
     void setShowSceneBoundingBoxEnabled(bool b);
@@ -79,7 +79,7 @@ public:
 
 protected:
     double pointSize_;
-    bool fogEnabled_;
+    bool showDistanceBasedFadingEnabled_;
     bool showSceneBoundingBoxEnabled_;
     bool showAttributesEnabled_;
     Vector3<double> pointColor_;

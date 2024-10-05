@@ -444,7 +444,7 @@ void ViewerOpenGLViewport::renderFirstFrame()
 
     clearScreen();
 
-    if (editor_->settings().view().fogEnabled())
+    if (editor_->settings().view().showDistanceBasedFadingEnabled())
     {
         glDisable(GL_FOG);
     }
@@ -454,7 +454,7 @@ void ViewerOpenGLViewport::renderFirstFrame()
     renderSegments();
     renderGuides();
 
-    if (editor_->settings().view().fogEnabled())
+    if (editor_->settings().view().showDistanceBasedFadingEnabled())
     {
         glEnable(GL_FOG);
     }
@@ -635,7 +635,7 @@ void ViewerOpenGLViewport::renderSceneSettingsEnable()
     glPointSize(static_cast<float>(opt.pointSize()));
 
     // Fog.
-    if (opt.fogEnabled())
+    if (opt.showDistanceBasedFadingEnabled())
     {
         QVector3D eye = camera_.eye();
         QVector3D direction = -camera_.direction();
@@ -660,7 +660,7 @@ void ViewerOpenGLViewport::renderSceneSettingsDisable()
 {
     glPointSize(1.0F);
 
-    if (editor_->settings().view().fogEnabled())
+    if (editor_->settings().view().showDistanceBasedFadingEnabled())
     {
         glDisable(GL_FOG);
     }
