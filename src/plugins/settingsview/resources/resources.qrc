@@ -21,7 +21,9 @@
 <qresource prefix="/settingsview">
 
 <!-- Plugin -->
+<file>brush_16px.png</file>
 <file>brush_16px_color.png</file>
+<file>brush_20px.png</file>
 <file>brush_20px_color.png</file>
 
 </qresource>

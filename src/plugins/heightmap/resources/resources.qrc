@@ -21,7 +21,9 @@
 <qresource prefix="/heightmap">
 
 <!-- Tool bar -->
+<file>height_map_16px.png</file>
 <file>height_map_16px_color.png</file>
+<file>height_map_20px.png</file>
 <file>height_map_20px_color.png</file>
 <file>height_map_24px_color.png</file>
 
