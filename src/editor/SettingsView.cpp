@@ -24,6 +24,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "SettingsView"
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 SettingsView::SettingsView()
@@ -200,7 +201,8 @@ void fromString(SettingsView::ColorSource &out, const std::string &in)
     }
     else
     {
-        out = SettingsView::ColorSource::UNKNOWN;
+        LOG_ERROR(<< "Fix unknown color source <" << in << "> to <Color>.");
+        out = SettingsView::ColorSource::COLOR;
     }
 }
 
