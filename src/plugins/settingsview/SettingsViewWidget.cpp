@@ -89,7 +89,7 @@ SettingsViewWidget::SettingsViewWidget(MainWindow *mainWindow)
     distanceBasedFadingVisibleCheckBox_->setToolTip(
         tr("Reduce intensity with increasing distance"));
     distanceBasedFadingVisibleCheckBox_->setText(
-        tr("Show Distance-based Fading"));
+        tr("Show distance-based fading"));
     connect(distanceBasedFadingVisibleCheckBox_,
             SIGNAL(stateChanged(int)),
             this,
@@ -99,7 +99,7 @@ SettingsViewWidget::SettingsViewWidget(MainWindow *mainWindow)
     sceneBoundingBoxVisibleCheckBox_ = new QCheckBox;
     sceneBoundingBoxVisibleCheckBox_->setChecked(
         settings_.sceneBoundingBoxVisible());
-    sceneBoundingBoxVisibleCheckBox_->setText(tr("Show Scene Bounding Box"));
+    sceneBoundingBoxVisibleCheckBox_->setText(tr("Show scene bounding box"));
     connect(sceneBoundingBoxVisibleCheckBox_,
             SIGNAL(stateChanged(int)),
             this,
@@ -109,7 +109,7 @@ SettingsViewWidget::SettingsViewWidget(MainWindow *mainWindow)
     treeAttributesVisibleCheckBox_ = new QCheckBox;
     treeAttributesVisibleCheckBox_->setChecked(
         settings_.treeAttributesVisible());
-    treeAttributesVisibleCheckBox_->setText(tr("Show Tree Attributes"));
+    treeAttributesVisibleCheckBox_->setText(tr("Show tree attributes"));
     connect(treeAttributesVisibleCheckBox_,
             SIGNAL(stateChanged(int)),
             this,
@@ -132,10 +132,10 @@ SettingsViewWidget::SettingsViewWidget(MainWindow *mainWindow)
                               Qt::AlignHCenter | Qt::AlignVCenter);
     groupBoxLayout->addWidget(optionsGroupBox, 0, 1);
 
-    groupBoxLayout->addWidget(new QLabel(tr("Color Mode:")), 1, 0);
+    groupBoxLayout->addWidget(new QLabel(tr("Color mode:")), 1, 0);
     groupBoxLayout->addWidget(colorSourceComboBox_, 1, 1);
 
-    groupBoxLayout->addWidget(new QLabel(tr("Point Size:")), 2, 0);
+    groupBoxLayout->addWidget(new QLabel(tr("Point size:")), 2, 0);
     groupBoxLayout->addWidget(pointSizeSlider_, 2, 1);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
