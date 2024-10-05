@@ -38,17 +38,17 @@
 class EXPORT_EDITOR SettingsView
 {
 public:
-    enum ColorSource
+    enum class ColorSource
     {
-        COLOR_SOURCE_COLOR,
-        COLOR_SOURCE_INTENSITY,
-        COLOR_SOURCE_RETURN_NUMBER,
-        COLOR_SOURCE_NUMBER_OF_RETURNS,
-        COLOR_SOURCE_CLASSIFICATION,
-        COLOR_SOURCE_SEGMENT,
-        COLOR_SOURCE_ELEVATION,
-        COLOR_SOURCE_DESCRIPTOR,
-        COLOR_SOURCE_LAST
+        COLOR,
+        INTENSITY,
+        RETURN_NUMBER,
+        NUMBER_OF_RETURNS,
+        CLASSIFICATION,
+        SEGMENT,
+        ELEVATION,
+        DESCRIPTOR,
+        UNKNOWN
     };
 
     SettingsView();
@@ -71,14 +71,11 @@ public:
     const Vector3<double> &backgroundColor() const { return background_; }
     void setBackgroundColor(const Vector3<double> &rgb);
 
+    SettingsView::ColorSource colorSource() const;
+    void setColorSource(SettingsView::ColorSource colorSource);
+
     size_t colorSourceSize() const;
-    const char *colorSourceString(SettingsView::ColorSource id) const;
-    const char *colorSourceString(size_t id) const;
-    bool colorSourceEnabled(SettingsView::ColorSource id) const;
-    bool colorSourceEnabled(size_t id) const;
-    void setColorSourceEnabled(SettingsView::ColorSource id, bool v);
-    void setColorSourceEnabled(size_t id, bool v);
-    void setColorSourceEnabledAll(bool v);
+    const char *colorSourceString(size_t idx) const;
 
 protected:
     double pointSize_;
@@ -87,8 +84,9 @@ protected:
     bool showAttributesEnabled_;
     Vector3<double> pointColor_;
     Vector3<double> background_;
+    SettingsView::ColorSource colorSource_;
+
     std::vector<std::string> colorSourceString_;
-    std::vector<bool> colorSourceEnabled_;
 
     friend void fromJson(SettingsView &out, const Json &in);
     friend void toJson(Json &out, const SettingsView &in);
@@ -98,6 +96,12 @@ void fromJson(SettingsView &out, const Json &in);
 void toJson(Json &out, const SettingsView &in);
 
 std::string toString(const SettingsView &in);
+
+void fromJson(SettingsView::ColorSource &out, const Json &in);
+void toJson(Json &out, const SettingsView::ColorSource &in);
+
+void fromString(SettingsView::ColorSource &out, const std::string &in);
+std::string toString(const SettingsView::ColorSource &in);
 
 #include <WarningsEnable.hpp>
 

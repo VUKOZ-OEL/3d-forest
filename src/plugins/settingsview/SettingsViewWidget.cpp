@@ -37,6 +37,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "SettingsViewWidget"
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define ICON(name) (ThemeIcon(":/settingsview/", name))
@@ -45,6 +46,8 @@ SettingsViewWidget::SettingsViewWidget(MainWindow *mainWindow)
     : QWidget(mainWindow),
       mainWindow_(mainWindow)
 {
+    LOG_DEBUG(<< "Create settings view widget.");
+
     // Color.
     colorSwitchWidget_ = new ColorSwitchWidget;
     connect(colorSwitchWidget_,
@@ -98,15 +101,8 @@ SettingsViewWidget::SettingsViewWidget(MainWindow *mainWindow)
     {
         colorSourceComboBox_->addItem(settings_.colorSourceString(i));
     }
-    for (size_t i = 0; i < settings_.colorSourceSize(); i++)
-    {
-        if (settings_.colorSourceEnabled(i))
-        {
-            colorSourceComboBox_->setCurrentText(
-                settings_.colorSourceString(i));
-            break;
-        }
-    }
+    colorSourceComboBox_->setCurrentText(
+        toString(settings_.colorSource()).c_str());
 
     connect(colorSourceComboBox_,
             SIGNAL(activated(int)),
@@ -217,20 +213,26 @@ void SettingsViewWidget::setViewSettings(const SettingsView &settings)
     // Point size.
     pointSizeSlider_->setValue(static_cast<int>(settings_.pointSize()));
 
+    // Color source.
+    colorSourceComboBox_->setCurrentText(
+        toString(settings_.colorSource()).c_str());
+
     unblock();
 }
 
 void SettingsViewWidget::slotColorSourceChanged(int index)
 {
-    LOG_DEBUG(<< "Set color source to <" << index << ">.");
+    LOG_DEBUG(<< "Set color source to index <" << index << ">.");
 
     if (index < 0)
     {
         return;
     }
-    size_t i = static_cast<size_t>(index);
-    settings_.setColorSourceEnabledAll(false);
-    settings_.setColorSourceEnabled(i, true);
+
+    SettingsView::ColorSource colorSource;
+    fromString(colorSource,
+               colorSourceComboBox_->itemText(index).toStdString());
+    settings_.setColorSource(colorSource);
     dataChanged(true);
 }
 

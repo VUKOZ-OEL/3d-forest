@@ -32,7 +32,8 @@ SettingsView::SettingsView()
       showSceneBoundingBoxEnabled_(true),
       showAttributesEnabled_(true),
       pointColor_(1.0, 1.0, 1.0),
-      background_(0.2, 0.2, 0.2)
+      background_(0.2, 0.2, 0.2),
+      colorSource_(SettingsView::ColorSource::COLOR)
 {
     colorSourceString_ = {"Color",
                           "Intensity",
@@ -42,13 +43,6 @@ SettingsView::SettingsView()
                           "Tree",
                           "Elevation",
                           "Descriptor"};
-
-    colorSourceEnabled_.resize(colorSourceString_.size());
-    for (auto &&it : colorSourceEnabled_)
-    {
-        it = false;
-    }
-    colorSourceEnabled_[0] = true;
 }
 
 double SettingsView::pointSize() const
@@ -101,60 +95,29 @@ void SettingsView::setBackgroundColor(const Vector3<double> &rgb)
     background_ = rgb;
 }
 
+SettingsView::ColorSource SettingsView::colorSource() const
+{
+    return colorSource_;
+}
+
+void SettingsView::setColorSource(SettingsView::ColorSource colorSource)
+{
+    colorSource_ = colorSource;
+}
+
 size_t SettingsView::colorSourceSize() const
 {
     return colorSourceString_.size();
 }
 
-const char *SettingsView::colorSourceString(SettingsView::ColorSource id) const
+const char *SettingsView::colorSourceString(size_t idx) const
 {
-    return colorSourceString_[static_cast<size_t>(id)].c_str();
-}
-
-const char *SettingsView::colorSourceString(size_t id) const
-{
-    if (id < static_cast<size_t>(SettingsView::COLOR_SOURCE_LAST))
+    if (idx < colorSourceString_.size())
     {
-        return colorSourceString_[id].c_str();
+        return colorSourceString_[idx].c_str();
     }
 
-    return "";
-}
-
-bool SettingsView::colorSourceEnabled(SettingsView::ColorSource id) const
-{
-    return colorSourceEnabled_[static_cast<size_t>(id)];
-}
-
-bool SettingsView::colorSourceEnabled(size_t id) const
-{
-    if (id < static_cast<size_t>(SettingsView::COLOR_SOURCE_LAST))
-    {
-        return colorSourceEnabled_[id];
-    }
-
-    return false;
-}
-
-void SettingsView::setColorSourceEnabled(SettingsView::ColorSource id, bool v)
-{
-    colorSourceEnabled_[static_cast<size_t>(id)] = v;
-}
-
-void SettingsView::setColorSourceEnabled(size_t id, bool v)
-{
-    if (id < static_cast<size_t>(SettingsView::COLOR_SOURCE_LAST))
-    {
-        colorSourceEnabled_[id] = v;
-    }
-}
-
-void SettingsView::setColorSourceEnabledAll(bool v)
-{
-    for (auto &&it : colorSourceEnabled_)
-    {
-        it = v;
-    }
+    return "Unknown";
 }
 
 void fromJson(SettingsView &out, const Json &in)
@@ -166,6 +129,7 @@ void fromJson(SettingsView &out, const Json &in)
     fromJson(out.showAttributesEnabled_, in["showAttributesEnabled"]);
     fromJson(out.pointColor_, in["pointColor"]);
     fromJson(out.background_, in["background"]);
+    fromJson(out.colorSource_, in["colorSource"]);
 }
 
 void toJson(Json &out, const SettingsView &in)
@@ -176,6 +140,7 @@ void toJson(Json &out, const SettingsView &in)
     toJson(out["showAttributesEnabled"], in.showAttributesEnabled_);
     toJson(out["pointColor"], in.pointColor_);
     toJson(out["background"], in.background_);
+    toJson(out["colorSource"], in.colorSource_);
 }
 
 std::string toString(const SettingsView &in)
@@ -183,4 +148,82 @@ std::string toString(const SettingsView &in)
     Json json;
     toJson(json, in);
     return json.serialize(0);
+}
+
+void fromJson(SettingsView::ColorSource &out, const Json &in)
+{
+    std::string colorSourceString;
+    fromJson(colorSourceString, in);
+    fromString(out, colorSourceString);
+}
+
+void toJson(Json &out, const SettingsView::ColorSource &in)
+{
+    toJson(out, toString(in));
+}
+
+void fromString(SettingsView::ColorSource &out, const std::string &in)
+{
+    if (in == "Color")
+    {
+        out = SettingsView::ColorSource::COLOR;
+    }
+    else if (in == "Intensity")
+    {
+        out = SettingsView::ColorSource::INTENSITY;
+    }
+    else if (in == "Return Number")
+    {
+        out = SettingsView::ColorSource::RETURN_NUMBER;
+    }
+    else if (in == "Number of Returns")
+    {
+        out = SettingsView::ColorSource::NUMBER_OF_RETURNS;
+    }
+    else if (in == "Classification")
+    {
+        out = SettingsView::ColorSource::CLASSIFICATION;
+    }
+    else if (in == "Tree")
+    {
+        out = SettingsView::ColorSource::SEGMENT;
+    }
+    else if (in == "Elevation")
+    {
+        out = SettingsView::ColorSource::ELEVATION;
+    }
+    else if (in == "Descriptor")
+    {
+        out = SettingsView::ColorSource::DESCRIPTOR;
+    }
+    else
+    {
+        out = SettingsView::ColorSource::UNKNOWN;
+    }
+}
+
+std::string toString(const SettingsView::ColorSource &in)
+{
+    switch (in)
+    {
+        case SettingsView::ColorSource::COLOR:
+            return "Color";
+        case SettingsView::ColorSource::INTENSITY:
+            return "Intensity";
+        case SettingsView::ColorSource::RETURN_NUMBER:
+            return "Return Number";
+        case SettingsView::ColorSource::NUMBER_OF_RETURNS:
+            return "Number of Returns";
+        case SettingsView::ColorSource::CLASSIFICATION:
+            return "Classification";
+        case SettingsView::ColorSource::SEGMENT:
+            return "Tree";
+        case SettingsView::ColorSource::ELEVATION:
+            return "Elevation";
+        case SettingsView::ColorSource::DESCRIPTOR:
+            return "Descriptor";
+        case SettingsView::ColorSource::UNKNOWN:
+        default:
+            return "Unknown";
+    }
 }
