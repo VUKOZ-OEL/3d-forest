@@ -22,10 +22,7 @@
 
 <!-- Tool bar -->
 <file>elevation_16px.png</file>
-<file>elevation_16px_color.png</file>
 <file>elevation_20px.png</file>
-<file>elevation_20px_color.png</file>
-<file>elevation_24px_color.png</file>
 
 <!-- Images -->
 <file>elevation.png</file>

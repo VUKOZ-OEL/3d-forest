@@ -45,22 +45,18 @@ public:
     {
         addFileExists(prefix + name + "_16px", QSize(16, 16));
         addFileExists(prefix + name + "_20px", QSize(20, 20));
-        // addFileExists(prefix + name + "_24px", QSize(24, 24));
+        addFileExists(prefix + name + "_24px", QSize(24, 24));
         // addFileExists(prefix + name + "_30px", QSize(30, 30));
     }
 
 private:
     void addFileExists(const QString &filename, const QSize &size)
     {
-        // if (QFile(filename + "_color.png").exists())
-        // {
-        //     addFile(filename + "_color.png", size);
-        // }
-        // else if (QFile(filename + ".png").exists())
-        // {
-        //     addFile(filename + ".png", size);
-        // }
-        if (QFile(filename + ".png").exists())
+        if (QFile(filename + "_color.png").exists())
+        {
+            addFile(filename + "_color.png", size);
+        }
+        else if (QFile(filename + ".png").exists())
         {
             addFile(filename + ".png", size);
         }
