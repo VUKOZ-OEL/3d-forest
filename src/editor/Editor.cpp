@@ -34,7 +34,7 @@ static const char *EDITOR_KEY_SEGMENT = "segments";
 static const char *EDITOR_KEY_SETTINGS = "settings";
 // static const char *EDITOR_KEY_CLASSIFICATIONS = "classifications";
 // static const char *EDITOR_KEY_CLIP_FILTER = "clipFilter";
-static const char *EDITOR_KEY_ELEVATION_RANGE = "elevationRange";
+// static const char *EDITOR_KEY_ELEVATION_RANGE = "elevationRange";
 
 Editor::Editor()
 {
@@ -169,10 +169,10 @@ void Editor::openProject(const std::string &path)
         // }
 
         // Elevation range.
-        if (in.contains(EDITOR_KEY_ELEVATION_RANGE))
-        {
-            fromJson(elevationFilter_, in[EDITOR_KEY_ELEVATION_RANGE]);
-        }
+        // if (in.contains(EDITOR_KEY_ELEVATION_RANGE))
+        // {
+        //     fromJson(elevationFilter_, in[EDITOR_KEY_ELEVATION_RANGE]);
+        // }
     }
     catch (...)
     {
@@ -198,7 +198,7 @@ void Editor::saveProject(const std::string &path)
     // toJson(out[EDITOR_KEY_CLASSIFICATIONS], classifications_);
     toJson(out[EDITOR_KEY_SETTINGS], settings_);
     // toJson(out[EDITOR_KEY_CLIP_FILTER], clipFilter_);
-    toJson(out[EDITOR_KEY_ELEVATION_RANGE], elevationFilter_);
+    // toJson(out[EDITOR_KEY_ELEVATION_RANGE], elevationFilter_);
 
     out.write(path);
 
@@ -382,6 +382,13 @@ void Editor::setSegmentsFilter(const QueryFilterSet &filter)
 void Editor::updateAfterRead()
 {
     LOG_DEBUG(<< "Start editor update after read.");
+
+    datasetsRange_ = datasets_.range();
+    LOG_DEBUG(<< "Datasets range <" << toString(datasetsRange_) << ">.");
+
+    elevationFilter_.set(static_cast<double>(datasetsRange_.elevationMin),
+                         static_cast<double>(datasetsRange_.elevationMax));
+    // elevationFilter_.set(0.0, datasets_.boundary().length(2));
 
     clipFilter_.boundary = datasets_.boundary();
     clipFilter_.box = clipFilter_.boundary;

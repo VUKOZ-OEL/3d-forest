@@ -341,6 +341,29 @@ void RecordFile::writeBuffer(const RecordFile::Buffer &buffer,
     }
 }
 
+void RecordFile::range(uint32_t &min, uint32_t &max, uint64_t n, uint64_t from)
+{
+    // std::vector<uint32_t> data;
+    uint32_t data;
+
+    setIndex(from);
+
+    for (uint64_t i = 0; i < n; i++)
+    {
+        read(data);
+
+        if (data < min)
+        {
+            min = data;
+        }
+
+        if (data > max)
+        {
+            max = data;
+        }
+    }
+}
+
 template <class T>
 static void recordFileBufferWrite(std::vector<uint8_t> &dst,
                                   const std::vector<T> &src,

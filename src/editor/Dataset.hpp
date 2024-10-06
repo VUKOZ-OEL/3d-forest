@@ -37,6 +37,16 @@
 class EXPORT_EDITOR Dataset
 {
 public:
+    /** Dataset Range. */
+    class EXPORT_EDITOR Range
+    {
+    public:
+        uint32_t elevationMin{UINT32_MAX};
+        uint32_t elevationMax{0};
+
+        void extend(const Dataset::Range &range);
+    };
+
     Dataset();
 
     size_t id() const { return id_; }
@@ -66,6 +76,8 @@ public:
     const LasFile &las() const { return *las_; }
     LasFile &las() { return *las_; }
 
+    const Dataset::Range &range() const { return range_; }
+
     // I/O.
     void read(size_t id,
               const std::string &path,
@@ -93,6 +105,7 @@ protected:
     Vector3<double> scalingFile_;
     Box<double> boundaryFile_;
     Box<double> boundary_;
+    Dataset::Range range_;
 
     std::shared_ptr<IndexFile> index_;
     std::shared_ptr<LasFile> las_;
@@ -109,6 +122,12 @@ protected:
 
 void fromJson(Dataset &out, const Json &in, const std::string &projectPath);
 void toJson(Json &out, const Dataset &in);
+
+inline std::string toString(const Dataset::Range &in)
+{
+    return "[" + std::to_string(in.elevationMin) + "," +
+           std::to_string(in.elevationMax) + "]";
+}
 
 #include <WarningsEnable.hpp>
 

@@ -142,6 +142,8 @@ protected:
     bool unsavedChanges_;
 
     Datasets datasets_;
+    Dataset::Range datasetsRange_;
+
     Segments segments_;
     Settings settings_;
     Classifications classifications_;

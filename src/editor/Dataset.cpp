@@ -168,6 +168,7 @@ void Dataset::read()
     las_ = std::make_shared<LasFile>();
     las_->open(path_);
     las_->readHeader();
+    las_->range(1, range_.elevationMin, range_.elevationMax);
 
     if (dateCreated_.empty())
     {
@@ -214,4 +215,17 @@ void Dataset::updateBoundary()
 
     LOG_DEBUG(<< "File boundary <" << boundaryFile_ << ">.");
     LOG_DEBUG(<< "Boundary <" << boundary_ << ">.");
+}
+
+void Dataset::Range::extend(const Dataset::Range &range)
+{
+    if (range.elevationMin < elevationMin)
+    {
+        elevationMin = range.elevationMin;
+    }
+
+    if (range.elevationMax > elevationMax)
+    {
+        elevationMax = range.elevationMax;
+    }
 }

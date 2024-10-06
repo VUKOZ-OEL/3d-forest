@@ -120,6 +120,8 @@ public:
                      uint64_t n,
                      uint64_t from = 0);
 
+    void range(uint32_t &min, uint32_t &max, uint64_t n, uint64_t from = 0);
+
 protected:
     RecordFile::Type recordType_;
     size_t recordSize_;

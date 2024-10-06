@@ -1013,6 +1013,12 @@ void LasFile::copyAttributesBuffer(AttributesBuffer &dst,
     }
 }
 
+void LasFile::range(size_t id, uint32_t &min, uint32_t &max)
+{
+    LOG_DEBUG(<< "Read range <" << id << ">.");
+    attributeFiles_[id].range(min, max, header.number_of_point_records);
+}
+
 void LasFile::transform(double &x, double &y, double &z, const Point &pt) const
 {
     x = (static_cast<double>(pt.x) * header.x_scale_factor) + header.x_offset;

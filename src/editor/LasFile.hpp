@@ -276,6 +276,8 @@ public:
         return attributeFiles_;
     }
 
+    void range(size_t id, uint32_t &min, uint32_t &max);
+
     // Util.
     void transform(double &x, double &y, double &z, const Point &pt) const;
     void transform(double &x,

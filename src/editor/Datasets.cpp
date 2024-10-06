@@ -74,6 +74,18 @@ void Datasets::updateBoundary()
     }
 }
 
+Dataset::Range Datasets::range()
+{
+    Dataset::Range range;
+
+    for (auto const &it : datasets_)
+    {
+        range.extend(it.range());
+    }
+
+    return range;
+}
+
 uint64_t Datasets::nPoints() const
 {
     uint64_t n = 0;
