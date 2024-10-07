@@ -344,8 +344,16 @@ void Editor::setIntensityFilter(const Range<double> &intensityFilter)
 void Editor::setDatasets(const Datasets &datasets)
 {
     LOG_DEBUG(<< "Set datasets.");
+
+    size_t datasetsSizeOld = datasets_.size();
+
     datasets_ = datasets;
-    unsavedChanges_ = true;
+
+    if (datasetsSizeOld != datasets_.size())
+    {
+        updateAfterSet();
+        unsavedChanges_ = true;
+    }
 }
 
 void Editor::setDatasetsFilter(const QueryFilterSet &filter)
@@ -379,20 +387,24 @@ void Editor::setSegmentsFilter(const QueryFilterSet &filter)
     }
 }
 
-void Editor::updateAfterRead()
+void Editor::updateAfterSet()
 {
-    LOG_DEBUG(<< "Start editor update after read.");
-
     datasetsRange_ = datasets_.range();
     LOG_DEBUG(<< "Datasets range <" << toString(datasetsRange_) << ">.");
 
     elevationFilter_.set(static_cast<double>(datasetsRange_.elevationMin),
                          static_cast<double>(datasetsRange_.elevationMax));
-    // elevationFilter_.set(0.0, datasets_.boundary().length(2));
 
     clipFilter_.boundary = datasets_.boundary();
     clipFilter_.box = clipFilter_.boundary;
     // clipFilter_.enabled = Region::Shape::BOX;
+}
+
+void Editor::updateAfterRead()
+{
+    LOG_DEBUG(<< "Start editor update after read.");
+
+    updateAfterSet();
 
     LOG_DEBUG(<< "Use clip box filter region <" << clipFilter_ << ">.");
     LOG_DEBUG(<< "Use elevation filter range <" << elevationFilter_ << ">.");

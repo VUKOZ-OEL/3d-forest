@@ -81,77 +81,6 @@ void Dataset::read(size_t id,
     updateBoundary();
 }
 
-void fromJson(Dataset &out, const Json &in, const std::string &projectPath)
-{
-    LOG_DEBUG(<< "Open from json. Project path <" << projectPath << ">.");
-
-    if (!in.typeObject())
-    {
-        THROW("Data set is not JSON object");
-    }
-
-    // Data set path.
-    fromJson(out.pathUnresolved_, in["path"]);
-    out.setPath(out.pathUnresolved_, projectPath);
-
-    // Date Created.
-    if (in.contains("dateCreated"))
-    {
-        fromJson(out.dateCreated_, in["dateCreated"]);
-    }
-
-    // ID.
-    fromJson(out.id_, in["id"]);
-
-    // Label.
-    if (in.contains("label"))
-    {
-        fromJson(out.label_, in["label"]);
-    }
-    else
-    {
-        out.label_ = out.fileName_;
-    }
-
-    // Color.
-    if (in.contains("color"))
-    {
-        fromJson(out.color_, in["color"]);
-    }
-    else
-    {
-        out.color_.set(1.0, 1.0, 1.0);
-    }
-
-    // Read.
-    out.read();
-
-    // Transformation.
-    if (in.contains("translation"))
-    {
-        fromJson(out.translationFile_, in["translation"]);
-        out.translation_ = out.translationFile_;
-    }
-
-    if (in.contains("scaling"))
-    {
-        fromJson(out.scalingFile_, in["scaling"]);
-    }
-
-    out.updateBoundary();
-}
-
-void toJson(Json &out, const Dataset &in)
-{
-    toJson(out["id"], in.id_);
-    toJson(out["label"], in.label_);
-    toJson(out["color"], in.color_);
-    toJson(out["path"], in.pathUnresolved_);
-    toJson(out["dateCreated"], in.dateCreated_);
-    toJson(out["translation"], in.translationFile_);
-    toJson(out["scaling"], in.scalingFile_);
-}
-
 void Dataset::setPath(const std::string &path, const std::string &projectPath)
 {
     // Data set absolute path.
@@ -228,4 +157,94 @@ void Dataset::Range::extend(const Dataset::Range &range)
     {
         elevationMax = range.elevationMax;
     }
+}
+
+void fromJson(Dataset &out, const Json &in, const std::string &projectPath)
+{
+    LOG_DEBUG(<< "Open from json. Project path <" << projectPath << ">.");
+
+    if (!in.typeObject())
+    {
+        THROW("Data set is not JSON object");
+    }
+
+    // Data set path.
+    fromJson(out.pathUnresolved_, in["path"]);
+    out.setPath(out.pathUnresolved_, projectPath);
+
+    // Date Created.
+    if (in.contains("dateCreated"))
+    {
+        fromJson(out.dateCreated_, in["dateCreated"]);
+    }
+
+    // ID.
+    fromJson(out.id_, in["id"]);
+
+    // Label.
+    if (in.contains("label"))
+    {
+        fromJson(out.label_, in["label"]);
+    }
+    else
+    {
+        out.label_ = out.fileName_;
+    }
+
+    // Color.
+    if (in.contains("color"))
+    {
+        fromJson(out.color_, in["color"]);
+    }
+    else
+    {
+        out.color_.set(1.0, 1.0, 1.0);
+    }
+
+    // Read.
+    out.read();
+
+    // Transformation.
+    if (in.contains("translation"))
+    {
+        fromJson(out.translationFile_, in["translation"]);
+        out.translation_ = out.translationFile_;
+    }
+
+    if (in.contains("scaling"))
+    {
+        fromJson(out.scalingFile_, in["scaling"]);
+    }
+
+    out.updateBoundary();
+}
+
+void toJson(Json &out, const Dataset &in)
+{
+    toJson(out["id"], in.id_);
+    toJson(out["label"], in.label_);
+    toJson(out["color"], in.color_);
+    toJson(out["path"], in.pathUnresolved_);
+    toJson(out["dateCreated"], in.dateCreated_);
+    toJson(out["translation"], in.translationFile_);
+    toJson(out["scaling"], in.scalingFile_);
+}
+
+void fromJson(Dataset::Range &out, const Json &in)
+{
+    fromJson(out.elevationMin, in["elevationMin"]);
+    fromJson(out.elevationMax, in["elevationMax"]);
+}
+
+void toJson(Json &out, const Dataset::Range &in)
+{
+    toJson(out["elevationMin"], in.elevationMin);
+    toJson(out["elevationMax"], in.elevationMax);
+}
+
+std::string toString(const Dataset::Range &in)
+{
+    Json json;
+    toJson(json, in);
+    return json.serialize(0);
 }

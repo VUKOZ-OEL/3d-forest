@@ -82,7 +82,8 @@ void ElevationFilterWidget::slotUpdate(void *sender,
     }
 
     if (target.empty() || target.contains(Editor::TYPE_ELEVATION) ||
-        target.contains(Editor::TYPE_SETTINGS))
+        target.contains(Editor::TYPE_SETTINGS) ||
+        target.contains(Editor::TYPE_DATA_SET))
     {
         LOG_DEBUG_UPDATE(<< "Input elevation filter.");
         setElevation(mainWindow_->editor().elevationFilter());

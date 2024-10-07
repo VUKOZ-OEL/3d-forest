@@ -113,7 +113,8 @@ void ClipFilterBoxWidget::slotUpdate(void *sender,
     }
 
     if (target.empty() || target.contains(Editor::TYPE_CLIP_FILTER) ||
-        target.contains(Editor::TYPE_SETTINGS))
+        target.contains(Editor::TYPE_SETTINGS) ||
+        target.contains(Editor::TYPE_DATA_SET))
     {
         LOG_DEBUG_UPDATE(<< "Input clip box filter.");
         setRegion(mainWindow_->editor().clipFilter());

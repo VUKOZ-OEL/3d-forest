@@ -172,6 +172,7 @@ protected:
 
     void setProjectPath(const std::string &projectPath);
 
+    void updateAfterSet();
     void updateAfterRead();
 };
 

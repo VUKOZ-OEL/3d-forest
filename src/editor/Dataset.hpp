@@ -123,11 +123,10 @@ protected:
 void fromJson(Dataset &out, const Json &in, const std::string &projectPath);
 void toJson(Json &out, const Dataset &in);
 
-inline std::string toString(const Dataset::Range &in)
-{
-    return "[" + std::to_string(in.elevationMin) + "," +
-           std::to_string(in.elevationMax) + "]";
-}
+void fromJson(Dataset::Range &out, const Json &in);
+void toJson(Json &out, const Dataset::Range &in);
+
+std::string toString(const Dataset::Range &in);
 
 #include <WarningsEnable.hpp>
 
