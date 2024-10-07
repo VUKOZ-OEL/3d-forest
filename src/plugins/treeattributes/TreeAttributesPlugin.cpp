@@ -29,7 +29,7 @@
 #define LOG_MODULE_NAME "TreeAttributesPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/tree_attributes/", name))
+#define ICON(name) (ThemeIcon(":/treeattributes/", name))
 
 TreeAttributesPlugin::TreeAttributesPlugin()
     : mainWindow_(nullptr),

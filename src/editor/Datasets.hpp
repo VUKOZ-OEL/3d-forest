@@ -112,6 +112,8 @@ public:
     Box<double> boundary(const QueryFilterSet &datasetFilter) const;
     void updateBoundary();
 
+    Dataset::Range range();
+
     uint64_t nPoints() const;
     uint64_t nPoints(const QueryFilterSet &datasetFilter) const;
 

@@ -46,7 +46,7 @@ public:
         addFileExists(prefix + name + "_16px", QSize(16, 16));
         addFileExists(prefix + name + "_20px", QSize(20, 20));
         addFileExists(prefix + name + "_24px", QSize(24, 24));
-        addFileExists(prefix + name + "_30px", QSize(30, 30));
+        // addFileExists(prefix + name + "_30px", QSize(30, 30));
     }
 
 private:

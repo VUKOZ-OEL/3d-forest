@@ -38,7 +38,7 @@
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/tree_attributes/", name))
+#define ICON(name) (ThemeIcon(":/treeattributes/", name))
 
 TreeAttributesWidget::TreeAttributesWidget(MainWindow *mainWindow)
     : QWidget(),

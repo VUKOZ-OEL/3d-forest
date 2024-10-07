@@ -180,7 +180,7 @@ void SegmentationAction::stepResetPoints()
         // Set point index to voxel to none.
         query_.voxel() = SIZE_MAX;
 
-        // Set point segment to main segment.
+        // Set point segment to 'unsegmented' segment.
         query_.segment() = 0;
 
         query_.setModified();
@@ -239,7 +239,7 @@ void SegmentationAction::stepPointsToVoxels()
         if (query_.voxel() == SIZE_MAX &&
             query_.classification() != LasFile::CLASS_GROUND &&
             (parameters_.zCoordinatesAsElevation ||
-             !(query_.elevation() < parameters_.treeBaseElevationMin)))
+             (query_.elevation() >= parameters_.treeBaseElevationMin)))
         {
             // Create new voxel.
             createVoxel();
@@ -663,9 +663,9 @@ void SegmentationAction::createVoxel()
 
     while (queryPoint_.next())
     {
-        if (query_.classification() == LasFile::CLASS_GROUND)
+        if (queryPoint_.classification() == LasFile::CLASS_GROUND)
         {
-            return;
+            continue;
         }
 
         p.x += queryPoint_.x();

@@ -49,22 +49,25 @@ public:
 
 public slots:
     void slotUpdate(void *sender, const QSet<Editor::Type> &target);
-    void slotColorSourceChanged(int index);
+
     void slotSetPointSize(int v);
-    void slotSetFogEnabled(int v);
-    void slotSetSceneBoundingBoxVisible(int v);
-    void slotSetAttributesVisible(int v);
     void slotSetColor();
+    void slotColorSourceChanged(int index);
+
+    void slotSetDistanceBasedFadingVisible(int v);
+    void slotSetSceneBoundingBoxVisible(int v);
+    void slotSetTreeAttributesVisible(int v);
 
 private:
     MainWindow *mainWindow_;
 
-    ColorSwitchWidget *colorSwitchWidget_;
-    QCheckBox *fogCheckBox_;
-    QCheckBox *sceneBoundingBoxVisibleCheckBox_;
-    QCheckBox *attributesVisibleCheckBox_;
-    QComboBox *colorSourceComboBox_;
     QSlider *pointSizeSlider_;
+    ColorSwitchWidget *colorSwitchWidget_;
+    QComboBox *colorSourceComboBox_;
+
+    QCheckBox *distanceBasedFadingVisibleCheckBox_;
+    QCheckBox *sceneBoundingBoxVisibleCheckBox_;
+    QCheckBox *treeAttributesVisibleCheckBox_;
 
     SettingsView settings_;
 

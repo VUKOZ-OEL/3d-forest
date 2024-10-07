@@ -377,14 +377,22 @@ void MainWindow::loadPlugins()
     const QStringList entries = pluginsDir.entryList(QDir::Files);
 
     qsizetype n = entries.count();
-    LOG_DEBUG(<< "Found number of plugins <" << n << ">.");
+    LOG_DEBUG(<< "Found number of files <" << n << ">.");
 
     qsizetype i = 0;
     for (const QString &fileName : entries)
     {
         // Try to load the file as a plugin.
         QString pluginPath = pluginsDir.absoluteFilePath(fileName);
-        LOG_DEBUG(<< "Load plugin <" << (i + 1) << "/" << n << "> path <"
+
+        if (!(fileName.endsWith(".dll") || fileName.endsWith(".so")))
+        {
+            LOG_DEBUG(<< "Skip file <" << (i + 1) << "/" << n << "> path <"
+                      << pluginPath.toStdString() << ">.");
+            continue;
+        }
+
+        LOG_DEBUG(<< "Load file <" << (i + 1) << "/" << n << "> path <"
                   << pluginPath.toStdString() << ">.");
 
         QPluginLoader pluginLoader(pluginPath);

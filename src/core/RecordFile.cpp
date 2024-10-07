@@ -38,6 +38,66 @@
 #define RECORD_FILE_SIGNATURE_2 0x43
 #define RECORD_FILE_SIGNATURE_3 0x46
 
+template <class T>
+static void recordFileBufferWrite(std::vector<uint8_t> &dst,
+                                  const std::vector<T> &src,
+                                  RecordFile::Type recordType,
+                                  size_t n)
+{
+    if (dst.size() < n)
+    {
+        dst.resize(n);
+    }
+
+    switch (recordType)
+    {
+        case RecordFile::TYPE_U32:
+            htol32(dst.data(), src.data(), n);
+            break;
+        case RecordFile::TYPE_U64:
+            htol64(dst.data(), src.data(), n);
+            break;
+        case RecordFile::TYPE_F64:
+            htold(dst.data(), src.data(), n);
+            break;
+        case RecordFile::TYPE_CUSTOM:
+        default:
+            THROW("Can not write record file type <" +
+                  std::to_string(recordType) + ">.");
+            break;
+    }
+}
+
+template <class T>
+static void recordFileBufferRead(std::vector<T> &dst,
+                                 const std::vector<uint8_t> &src,
+                                 RecordFile::Type recordType,
+                                 size_t n)
+{
+    if (dst.size() < n)
+    {
+        dst.resize(n);
+    }
+
+    switch (recordType)
+    {
+        case RecordFile::TYPE_U32:
+            ltoh32(dst.data(), src.data(), n);
+            break;
+        case RecordFile::TYPE_U64:
+            ltoh64(dst.data(), src.data(), n);
+            break;
+        case RecordFile::TYPE_F64:
+            ltohd(dst.data(), src.data(), n);
+            break;
+        case RecordFile::TYPE_CUSTOM:
+        default:
+            THROW("Can not read record file type <" +
+                  std::to_string(recordType) + ">.");
+            break;
+    }
+}
+
 RecordFile::RecordFile()
 {
     init();
@@ -342,33 +402,53 @@ void RecordFile::writeBuffer(const RecordFile::Buffer &buffer,
 }
 
 template <class T>
-static void recordFileBufferWrite(std::vector<uint8_t> &dst,
-                                  const std::vector<T> &src,
-                                  RecordFile::Type recordType,
-                                  size_t n)
+static void rangeT(T &min,
+                   T &max,
+                   File &file,
+                   RecordFile::Type recordType,
+                   size_t recordSize,
+                   uint64_t n)
 {
-    if (dst.size() < n)
-    {
-        dst.resize(n);
-    }
+    std::vector<T> values;
+    size_t nValues = 1000000;
+    values.resize(nValues);
 
-    switch (recordType)
+    std::vector<uint8_t> buffer;
+    uint64_t nBytes = nValues * recordSize;
+    buffer.resize(nBytes);
+
+    while (n > 0)
     {
-        case RecordFile::TYPE_U32:
-            htol32(dst.data(), src.data(), n);
-            break;
-        case RecordFile::TYPE_U64:
-            htol64(dst.data(), src.data(), n);
-            break;
-        case RecordFile::TYPE_F64:
-            htold(dst.data(), src.data(), n);
-            break;
-        case RecordFile::TYPE_CUSTOM:
-        default:
-            THROW("Can not write record file type <" +
-                  std::to_string(recordType) + ">.");
-            break;
+        if (n < static_cast<uint64_t>(nValues))
+        {
+            nValues = static_cast<size_t>(n);
+            nBytes = nValues * recordSize;
+        }
+
+        file.read(buffer.data(), nBytes);
+        recordFileBufferRead(values, buffer, recordType, nValues);
+
+        for (size_t i = 0; i < nValues; i++)
+        {
+            if (values[i] < min)
+            {
+                min = values[i];
+            }
+
+            if (values[i] > max)
+            {
+                max = values[i];
+            }
+        }
+
+        n -= nValues;
     }
+}
+
+void RecordFile::range(uint32_t &min, uint32_t &max, uint64_t n, uint64_t from)
+{
+    setIndex(from);
+    rangeT(min, max, file_, recordType_, recordSize_, n);
 }
 
 void RecordFile::Buffer::write(const std::vector<size_t> &v)
@@ -379,36 +459,6 @@ void RecordFile::Buffer::write(const std::vector<size_t> &v)
 void RecordFile::Buffer::write(const std::vector<double> &v)
 {
     recordFileBufferWrite(data, v, recordType, size);
-}
-
-template <class T>
-static void recordFileBufferRead(std::vector<T> &dst,
-                                 const std::vector<uint8_t> &src,
-                                 RecordFile::Type recordType,
-                                 size_t n)
-{
-    if (dst.size() < n)
-    {
-        dst.resize(n);
-    }
-
-    switch (recordType)
-    {
-        case RecordFile::TYPE_U32:
-            ltoh32(dst.data(), src.data(), n);
-            break;
-        case RecordFile::TYPE_U64:
-            ltoh64(dst.data(), src.data(), n);
-            break;
-        case RecordFile::TYPE_F64:
-            ltohd(dst.data(), src.data(), n);
-            break;
-        case RecordFile::TYPE_CUSTOM:
-        default:
-            THROW("Can not read record file type <" +
-                  std::to_string(recordType) + ">.");
-            break;
-    }
 }
 
 void RecordFile::Buffer::read(std::vector<size_t> &v) const

@@ -81,6 +81,84 @@ void Dataset::read(size_t id,
     updateBoundary();
 }
 
+void Dataset::setPath(const std::string &path, const std::string &projectPath)
+{
+    // Data set absolute path.
+    path_ = File::resolvePath(path, projectPath);
+
+    // Data set file name.
+    fileName_ = File::fileName(path_);
+}
+
+void Dataset::read()
+{
+    LOG_INFO(<< "Read dataset <" << path_ << ">.");
+
+    las_ = std::make_shared<LasFile>();
+    las_->open(path_);
+    las_->readHeader();
+    las_->range(1, range_.elevationMin, range_.elevationMax);
+
+    if (dateCreated_.empty())
+    {
+        dateCreated_ = las_->header.dateCreated();
+    }
+
+    translationFile_.set(las_->header.x_offset,
+                         las_->header.y_offset,
+                         las_->header.z_offset);
+
+    translation_ = translationFile_;
+
+    LOG_DEBUG(<< "File translation <" << translationFile_ << ">.");
+    LOG_DEBUG(<< "Translation <" << translation_ << ">.");
+
+    scalingFile_.set(las_->header.x_scale_factor,
+                     las_->header.y_scale_factor,
+                     las_->header.z_scale_factor);
+
+    LOG_DEBUG(<< "File scaling <" << scalingFile_ << ">.");
+
+    scaling_.set(1.0, 1.0, 1.0);
+
+    LOG_DEBUG(<< "Scaling <" << scaling_ << ">.");
+
+    // Boundary.
+    const std::string pathIndex = IndexFileBuilder::extension(path_);
+    index_ = std::make_shared<IndexFile>();
+    index_->read(pathIndex);
+
+    boundaryFile_ = index_->boundaryPoints();
+    updateBoundary();
+
+    nPoints_ = las_->header.number_of_point_records;
+
+    LOG_DEBUG(<< "Number of points <" << nPoints_ << ">.");
+}
+
+void Dataset::updateBoundary()
+{
+    boundary_ = boundaryFile_;
+    boundary_.translate(translation_);
+    index_->translate(translation_);
+
+    LOG_DEBUG(<< "File boundary <" << boundaryFile_ << ">.");
+    LOG_DEBUG(<< "Boundary <" << boundary_ << ">.");
+}
+
+void Dataset::Range::extend(const Dataset::Range &range)
+{
+    if (range.elevationMin < elevationMin)
+    {
+        elevationMin = range.elevationMin;
+    }
+
+    if (range.elevationMax > elevationMax)
+    {
+        elevationMax = range.elevationMax;
+    }
+}
+
 void fromJson(Dataset &out, const Json &in, const std::string &projectPath)
 {
     LOG_DEBUG(<< "Open from json. Project path <" << projectPath << ">.");
@@ -152,66 +230,21 @@ void toJson(Json &out, const Dataset &in)
     toJson(out["scaling"], in.scalingFile_);
 }
 
-void Dataset::setPath(const std::string &path, const std::string &projectPath)
+void fromJson(Dataset::Range &out, const Json &in)
 {
-    // Data set absolute path.
-    path_ = File::resolvePath(path, projectPath);
-
-    // Data set file name.
-    fileName_ = File::fileName(path_);
+    fromJson(out.elevationMin, in["elevationMin"]);
+    fromJson(out.elevationMax, in["elevationMax"]);
 }
 
-void Dataset::read()
+void toJson(Json &out, const Dataset::Range &in)
 {
-    LOG_INFO(<< "Read dataset <" << path_ << ">.");
-
-    las_ = std::make_shared<LasFile>();
-    las_->open(path_);
-    las_->readHeader();
-
-    if (dateCreated_.empty())
-    {
-        dateCreated_ = las_->header.dateCreated();
-    }
-
-    translationFile_.set(las_->header.x_offset,
-                         las_->header.y_offset,
-                         las_->header.z_offset);
-
-    translation_ = translationFile_;
-
-    LOG_DEBUG(<< "File translation <" << translationFile_ << ">.");
-    LOG_DEBUG(<< "Translation <" << translation_ << ">.");
-
-    scalingFile_.set(las_->header.x_scale_factor,
-                     las_->header.y_scale_factor,
-                     las_->header.z_scale_factor);
-
-    LOG_DEBUG(<< "File scaling <" << scalingFile_ << ">.");
-
-    scaling_.set(1.0, 1.0, 1.0);
-
-    LOG_DEBUG(<< "Scaling <" << scaling_ << ">.");
-
-    // Boundary.
-    const std::string pathIndex = IndexFileBuilder::extension(path_);
-    index_ = std::make_shared<IndexFile>();
-    index_->read(pathIndex);
-
-    boundaryFile_ = index_->boundaryPoints();
-    updateBoundary();
-
-    nPoints_ = las_->header.number_of_point_records;
-
-    LOG_DEBUG(<< "Number of points <" << nPoints_ << ">.");
+    toJson(out["elevationMin"], in.elevationMin);
+    toJson(out["elevationMax"], in.elevationMax);
 }
 
-void Dataset::updateBoundary()
+std::string toString(const Dataset::Range &in)
 {
-    boundary_ = boundaryFile_;
-    boundary_.translate(translation_);
-    index_->translate(translation_);
-
-    LOG_DEBUG(<< "File boundary <" << boundaryFile_ << ">.");
-    LOG_DEBUG(<< "Boundary <" << boundary_ << ">.");
+    Json json;
+    toJson(json, in);
+    return json.serialize(0);
 }

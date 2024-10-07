@@ -21,8 +21,8 @@
 <qresource prefix="/classification">
 
 <!-- Tool bar -->
-<file>ground_16px_color.png</file>
-<file>ground_24px_color.png</file>
+<file>ground_16px.png</file>
+<file>ground_20px.png</file>
 
 <!-- Images -->
 <file>classification.png</file>

@@ -842,30 +842,19 @@ void Page::runModifiers()
 void Page::runColorModifier()
 {
     const SettingsView &opt = editor_->settings().view();
-    double r = 1.0; // opt.pointColor()[0];
-    double g = 1.0; // opt.pointColor()[1];
-    double b = 1.0; // opt.pointColor()[2];
 
     size_t n = size();
 
-    for (size_t i = 0; i < n; i++)
-    {
-        renderColor[i * 3 + 0] = static_cast<float>(r);
-        renderColor[i * 3 + 1] = static_cast<float>(g);
-        renderColor[i * 3 + 2] = static_cast<float>(b);
-    }
-
-    if (opt.colorSourceEnabled(opt.COLOR_SOURCE_COLOR))
+    if (opt.colorSource() == SettingsView::ColorSource::COLOR)
     {
         for (size_t i = 0; i < n; i++)
         {
-            renderColor[i * 3 + 0] *= static_cast<float>(color[i * 3 + 0]);
-            renderColor[i * 3 + 1] *= static_cast<float>(color[i * 3 + 1]);
-            renderColor[i * 3 + 2] *= static_cast<float>(color[i * 3 + 2]);
+            renderColor[i * 3 + 0] = static_cast<float>(color[i * 3 + 0]);
+            renderColor[i * 3 + 1] = static_cast<float>(color[i * 3 + 1]);
+            renderColor[i * 3 + 2] = static_cast<float>(color[i * 3 + 2]);
         }
     }
-
-    if (opt.colorSourceEnabled(opt.COLOR_SOURCE_INTENSITY))
+    else if (opt.colorSource() == SettingsView::ColorSource::INTENSITY)
     {
         // for (size_t i = 0; i < n; i++)
         // {
@@ -882,8 +871,7 @@ void Page::runColorModifier()
                      ColorPalette::BlueCyanYellowRed256);
         }
     }
-
-    if (opt.colorSourceEnabled(opt.COLOR_SOURCE_RETURN_NUMBER))
+    else if (opt.colorSource() == SettingsView::ColorSource::RETURN_NUMBER)
     {
         for (size_t i = 0; i < n; i++)
         {
@@ -893,8 +881,7 @@ void Page::runColorModifier()
                      ColorPalette::BlueCyanGreenYellowRed16);
         }
     }
-
-    if (opt.colorSourceEnabled(opt.COLOR_SOURCE_NUMBER_OF_RETURNS))
+    else if (opt.colorSource() == SettingsView::ColorSource::NUMBER_OF_RETURNS)
     {
         for (size_t i = 0; i < n; i++)
         {
@@ -904,16 +891,14 @@ void Page::runColorModifier()
                      ColorPalette::BlueCyanGreenYellowRed16);
         }
     }
-
-    if (opt.colorSourceEnabled(opt.COLOR_SOURCE_CLASSIFICATION))
+    else if (opt.colorSource() == SettingsView::ColorSource::CLASSIFICATION)
     {
         for (size_t i = 0; i < n; i++)
         {
             setColor(i, classification[i], 15, ColorPalette::Classification);
         }
     }
-
-    if (opt.colorSourceEnabled(opt.COLOR_SOURCE_SEGMENT))
+    else if (opt.colorSource() == SettingsView::ColorSource::SEGMENT)
     {
         const Segments &segments = editor_->segments();
         const size_t max = segments.size();
@@ -924,9 +909,9 @@ void Page::runColorModifier()
             if (segment[i] < max)
             {
                 const Vector3<double> &c = segments[segment[i]].color;
-                renderColor[i * 3 + 0] *= static_cast<float>(c[0]);
-                renderColor[i * 3 + 1] *= static_cast<float>(c[1]);
-                renderColor[i * 3 + 2] *= static_cast<float>(c[2]);
+                renderColor[i * 3 + 0] = static_cast<float>(c[0]);
+                renderColor[i * 3 + 1] = static_cast<float>(c[1]);
+                renderColor[i * 3 + 2] = static_cast<float>(c[2]);
             }
             else
             {
@@ -936,8 +921,7 @@ void Page::runColorModifier()
             }
         }
     }
-
-    if (opt.colorSourceEnabled(opt.COLOR_SOURCE_ELEVATION))
+    else if (opt.colorSource() == SettingsView::ColorSource::ELEVATION)
     {
         const Dataset &dataset = editor_->datasets().key(datasetId_);
         double zlen = dataset.boundary().length(2);
@@ -954,8 +938,7 @@ void Page::runColorModifier()
             }
         }
     }
-
-    if (opt.colorSourceEnabled(opt.COLOR_SOURCE_DESCRIPTOR))
+    else if (opt.colorSource() == SettingsView::ColorSource::DESCRIPTOR)
     {
         for (size_t i = 0; i < n; i++)
         {
@@ -963,6 +946,19 @@ void Page::runColorModifier()
                      static_cast<size_t>(descriptor[i] * 255.0),
                      255,
                      ColorPalette::BlueCyanYellowRed256);
+        }
+    }
+    else
+    {
+        double r = 1.0; // opt.pointColor()[0];
+        double g = 1.0; // opt.pointColor()[1];
+        double b = 1.0; // opt.pointColor()[2];
+
+        for (size_t i = 0; i < n; i++)
+        {
+            renderColor[i * 3 + 0] = static_cast<float>(r);
+            renderColor[i * 3 + 1] = static_cast<float>(g);
+            renderColor[i * 3 + 2] = static_cast<float>(b);
         }
     }
 }
@@ -977,7 +973,7 @@ void Page::setColor(size_t idx,
         colorValue = colorMax;
     }
 
-    renderColor[idx * 3 + 0] *= static_cast<float>(pal[colorValue][0]);
-    renderColor[idx * 3 + 1] *= static_cast<float>(pal[colorValue][1]);
-    renderColor[idx * 3 + 2] *= static_cast<float>(pal[colorValue][2]);
+    renderColor[idx * 3 + 0] = static_cast<float>(pal[colorValue][0]);
+    renderColor[idx * 3 + 1] = static_cast<float>(pal[colorValue][1]);
+    renderColor[idx * 3 + 2] = static_cast<float>(pal[colorValue][2]);
 }
