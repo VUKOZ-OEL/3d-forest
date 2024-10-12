@@ -547,7 +547,7 @@ void ViewerOpenGLViewport::renderAttributes()
     {
         const Segment &segment = segments[i];
 
-        if (!segment.attributesCalculated)
+        if (segment.treeAttributes.status != TreeAttributes::Status::VALID)
         {
             continue;
         }
@@ -565,13 +565,15 @@ void ViewerOpenGLViewport::renderAttributes()
         }
 
         // Render attributes.
+        const TreeAttributes &treeAttributes = segment.treeAttributes;
+
         glColor3f(1.0F, 1.0F, 0.0F);
 
-        Vector3<float> treeDbhPosition(segment.dbhPosition);
-        float treeDbhRadius = static_cast<float>(segment.dbh) * 0.5F;
+        Vector3<float> treeDbhPosition(treeAttributes.dbhPosition);
+        float treeDbhRadius = static_cast<float>(treeAttributes.dbh) * 0.5F;
         ViewerOpenGL::renderCircle(treeDbhPosition, treeDbhRadius);
 
-        Vector3<float> treePosition(segment.position);
+        Vector3<float> treePosition(treeAttributes.position);
         ViewerOpenGL::renderCross(
             treePosition,
             static_cast<float>(segment.boundary.length(0)),
@@ -580,7 +582,7 @@ void ViewerOpenGLViewport::renderAttributes()
         Vector3<float> treeTip(treePosition[0],
                                treePosition[1],
                                treePosition[2] +
-                                   static_cast<float>(segment.height));
+                                   static_cast<float>(treeAttributes.height));
         ViewerOpenGL::renderLine(treePosition, treeTip);
     }
 }

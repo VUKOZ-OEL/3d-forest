@@ -26,6 +26,7 @@
 #include <Box.hpp>
 #include <Json.hpp>
 #include <Mesh.hpp>
+#include <TreeAttributes.hpp>
 
 // Include local.
 #include <ExportEditor.hpp>
@@ -40,17 +41,11 @@ public:
     Vector3<double> color;
     bool selected{false};
 
-    std::vector<Mesh> meshList;
-
-    bool attributesCalculated{false};
-
-    Vector3<double> position;
     Box<double> boundary;
 
-    double height{0.0};
+    TreeAttributes treeAttributes;
 
-    Vector3<double> dbhPosition;
-    double dbh{0.0};
+    std::vector<Mesh> meshList;
 
     Segment();
 };

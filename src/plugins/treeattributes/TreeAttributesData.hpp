@@ -24,6 +24,7 @@
 
 // Include 3D Forest.
 #include <Json.hpp>
+#include <TreeAttributes.hpp>
 #include <Vector3.hpp>
 
 /** Tree Attributes Data. */
@@ -36,38 +37,26 @@ public:
     /// Collected point coordinates in DBH elevation range.
     std::vector<double> dbhPoints; // x0, y0, z0, x1, y1, z1, ...
 
-    /// The position of calculated DBH circle.
-    Vector3<double> dbhPosition;
-
-    /// Calculated DBH (Diameter at Breast Height) value.
-    double dbh{0.0};
-
     /// Collected point X coordinates in tree base range.
     std::vector<double> xCoordinates;
 
     /// Collected point Y coordinates in tree base range.
     std::vector<double> yCoordinates;
 
-    /// Calculated tree position from X and Y coordinates in tree base range.
-    Vector3<double> position;
-
-    /// Calculated tree height.
-    double height{0.0};
-
     /// The Z coordinate of the lowest point.
     double zCoordinateMin{Numeric::max<double>()};
 
     /// The elevation value of the highest point.
     double elevationMax{Numeric::min<double>()};
+
+    /// Calculated tree attributes.
+    TreeAttributes treeAttributes;
 };
 
 inline void toJson(Json &out, const TreeAttributesData &in)
 {
     toJson(out["treeId"], in.treeId);
-    toJson(out["dbhPosition"], in.dbhPosition);
-    toJson(out["dbh"], in.dbh);
-    toJson(out["position"], in.position);
-    toJson(out["height"], in.height);
+    toJson(out["treeAttributes"], in.treeAttributes);
 }
 
 inline std::string toString(const TreeAttributesData &in)

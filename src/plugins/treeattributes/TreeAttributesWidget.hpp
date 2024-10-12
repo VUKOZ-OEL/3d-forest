@@ -55,6 +55,7 @@ private:
     DoubleSliderWidget *treePositionHeightRangeSlider_;
     DoubleSliderWidget *dbhElevationSlider_;
     DoubleSliderWidget *dbhElevationRangeSlider_;
+    DoubleSliderWidget *maximumValidCalculatedDbhSlider_;
 
     QPushButton *applyButton_;
 };
