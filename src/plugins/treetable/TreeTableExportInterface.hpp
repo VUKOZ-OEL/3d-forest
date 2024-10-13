@@ -17,29 +17,34 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file TreeTableExportCsv.hpp */
+/** @file TreeTableExportInterface.hpp */
 
-#ifndef TREE_TABLE_EXPORT_CSV_HPP
-#define TREE_TABLE_EXPORT_CSV_HPP
+#ifndef TREE_TABLE_EXPORT_INTERFACE_HPP
+#define TREE_TABLE_EXPORT_INTERFACE_HPP
 
 // Include 3D Forest.
-#include <File.hpp>
-#include <TreeTableExportInterface.hpp>
+#include <Segment.hpp>
+#include <TreeTableExportProperties.hpp>
 
-/** Tree Table Export CSV. */
-class TreeTableExportCsv : public TreeTableExportInterface
+/** Tree Table Export Interface. */
+class TreeTableExportInterface
 {
 public:
-    TreeTableExportCsv();
-    virtual ~TreeTableExportCsv();
+    virtual ~TreeTableExportInterface() = default;
 
-    virtual bool open() { return file_.open(); }
-    virtual void create(const std::string &path);
-    virtual void write(const Segment &segment);
-    virtual void close();
+    virtual bool open() = 0;
+    virtual void create(const std::string &path) = 0;
+    virtual void write(const Segment &segment) = 0;
+    virtual void close() = 0;
+
+    void setProperties(const TreeTableExportProperties &prop)
+    {
+        properties_ = prop;
+    }
+    const TreeTableExportProperties &properties() const { return properties_; }
 
 private:
-    File file_;
+    TreeTableExportProperties properties_;
 };
 
-#endif /* TREE_TABLE_EXPORT_CSV_HPP */
+#endif /* TREE_TABLE_EXPORT_INTERFACE_HPP */

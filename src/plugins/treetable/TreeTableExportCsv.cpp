@@ -53,8 +53,16 @@ void TreeTableExportCsv::create(const std::string &path)
     file_.write(text);
 }
 
-void TreeTableExportCsv::write(const Segment &segment, double ppm)
+void TreeTableExportCsv::write(const Segment &segment)
 {
+    if (properties().exportValidValuesOnly() &&
+        segment.treeAttributes.status != TreeAttributes::Status::VALID)
+    {
+        return;
+    }
+
+    double ppm = properties().pointsPerMeter();
+
     // Format data into text line.
     char text[4096];
 

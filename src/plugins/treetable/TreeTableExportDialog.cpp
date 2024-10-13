@@ -22,10 +22,14 @@
 // Include 3D Forest.
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
+#include <TreeTableExportCsv.hpp>
 #include <TreeTableExportDialog.hpp>
 
 // Include Qt.
+#include <QCheckBox>
 #include <QFileDialog>
+#include <QGridLayout>
+#include <QGroupBox>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
@@ -56,6 +60,17 @@ TreeTableExportDialog::TreeTableExportDialog(MainWindow *mainWindow,
     fileNameLayout->addWidget(fileNameLineEdit_);
     fileNameLayout->addWidget(browseButton_);
 
+    // Options.
+    exportValidValuesOnlyCheckBox_ =
+        new QCheckBox(tr("Export valid values only"));
+    exportValidValuesOnlyCheckBox_->setChecked(true);
+
+    QVBoxLayout *optionsVBoxLayout = new QVBoxLayout;
+    optionsVBoxLayout->addWidget(exportValidValuesOnlyCheckBox_);
+
+    QGroupBox *optionsGroupBox = new QGroupBox(tr("Options"));
+    optionsGroupBox->setLayout(optionsVBoxLayout);
+
     // Buttons.
     acceptButton_ = new QPushButton(tr("Export"));
     connect(acceptButton_, SIGNAL(clicked()), this, SLOT(slotAccept()));
@@ -71,6 +86,8 @@ TreeTableExportDialog::TreeTableExportDialog(MainWindow *mainWindow,
     // Dialog layout.
     QVBoxLayout *dialogLayout = new QVBoxLayout;
     dialogLayout->addLayout(fileNameLayout);
+    dialogLayout->addSpacing(10);
+    dialogLayout->addWidget(optionsGroupBox);
     dialogLayout->addSpacing(10);
     dialogLayout->addLayout(dialogButtons);
     dialogLayout->addStretch();
@@ -144,7 +161,42 @@ void TreeTableExportDialog::slotReject()
     setResult(QDialog::Rejected);
 }
 
-std::string TreeTableExportDialog::fileName() const
+std::shared_ptr<TreeTableExportInterface> TreeTableExportDialog::writer() const
 {
-    return fileNameLineEdit_->text().toStdString();
+    std::shared_ptr<TreeTableExportInterface> result;
+
+    std::string path = fileNameLineEdit_->text().toStdString();
+    std::string ext = toLower(File::fileExtension(path));
+
+    if (ext == "csv")
+    {
+        result = std::make_shared<TreeTableExportCsv>();
+    }
+    else
+    {
+        THROW("The selected file format is not supported. "
+              "Please choose a different format.");
+    }
+
+    result->setProperties(properties());
+
+    return result;
+}
+
+TreeTableExportProperties TreeTableExportDialog::properties() const
+{
+    TreeTableExportProperties result;
+
+    // File name.
+    result.setFileName(fileNameLineEdit_->text().toStdString());
+
+    // Options.
+    result.setExportValidValuesOnly(
+        exportValidValuesOnlyCheckBox_->isChecked());
+
+    // Other values.
+    double ppm = mainWindow_->editor().settings().units().pointsPerMeter()[0];
+    result.setPointsPerMeter(ppm);
+
+    return result;
 }

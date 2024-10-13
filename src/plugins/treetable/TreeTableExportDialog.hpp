@@ -22,14 +22,13 @@
 #ifndef TREE_TABLE_EXPORT_DIALOG_HPP
 #define TREE_TABLE_EXPORT_DIALOG_HPP
 
-// Include std.
-#include <string>
-
 // Include 3D Forest.
+#include <TreeTableExportInterface.hpp>
 class MainWindow;
 
 // Include Qt.
 #include <QDialog>
+class QCheckBox;
 class QLineEdit;
 class QPushButton;
 
@@ -41,7 +40,8 @@ class TreeTableExportDialog : public QDialog
 public:
     TreeTableExportDialog(MainWindow *mainWindow, const QString &fileName);
 
-    std::string fileName() const;
+    std::shared_ptr<TreeTableExportInterface> writer() const;
+    TreeTableExportProperties properties() const;
 
 public slots:
     void slotBrowse();
@@ -53,6 +53,7 @@ private:
 
     QLineEdit *fileNameLineEdit_;
     QPushButton *browseButton_;
+    QCheckBox *exportValidValuesOnlyCheckBox_;
 
     QPushButton *acceptButton_;
     QPushButton *rejectButton_;

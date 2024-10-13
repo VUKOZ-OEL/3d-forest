@@ -47,14 +47,28 @@ TreeTableWidget::TreeTableWidget(MainWindow *mainWindow)
     LOG_DEBUG(<< "Create.");
 
     // Widgets.
-    table_ = new QTableWidget();
+    tableWidget_ = new QTableWidget();
 
-    table_->setRowCount(0);
-    table_->setColumnCount(2);
+    tableWidget_->setRowCount(0);
+    tableWidget_->setColumnCount(2);
+
+    tableWidget_->setStyleSheet("QHeaderView::section {"
+                                "background-color: lightblue;"
+                                "color: black;"
+                                "padding: 5px;"
+                                "}");
+
+    // Enable alternating row colors
+    tableWidget_->setAlternatingRowColors(true);
+
+    QPalette palette = tableWidget_->palette();
+    palette.setColor(QPalette::AlternateBase, QColor(240, 240, 240));
+    palette.setColor(QPalette::Base, Qt::white);
+    tableWidget_->setPalette(palette);
 
     // Layout.
     QVBoxLayout *tableLayout = new QVBoxLayout;
-    tableLayout->addWidget(table_);
+    tableLayout->addWidget(tableWidget_);
     tableLayout->addStretch();
 
     // Buttons.
@@ -111,18 +125,18 @@ void TreeTableWidget::setSegments(const Segments &segments)
 
     segments_ = segments;
 
-    table_->clear();
+    tableWidget_->clear();
 
-    table_->setRowCount(static_cast<int>(segments_.size()));
-    table_->setColumnCount(COLUMN_LAST);
-    table_->setHorizontalHeaderLabels({"ID",
-                                       "Label",
-                                       "X [m]",
-                                       "Y [m]",
-                                       "Z [m]",
-                                       "Height [m]",
-                                       "DBH [m]",
-                                       "Status"});
+    tableWidget_->setRowCount(static_cast<int>(segments_.size()));
+    tableWidget_->setColumnCount(COLUMN_LAST);
+    tableWidget_->setHorizontalHeaderLabels({"ID",
+                                             "Label",
+                                             "X [m]",
+                                             "Y [m]",
+                                             "Z [m]",
+                                             "Height [m]",
+                                             "DBH [m]",
+                                             "Status"});
 
     // Content.
     for (size_t i = 0; i < segments_.size(); i++)
@@ -133,12 +147,12 @@ void TreeTableWidget::setSegments(const Segments &segments)
     // Resize Columns to the minimum space.
     // for (int i = 0; i < COLUMN_LAST; i++)
     // {
-    //     table_->resizeColumnToContents(i);
+    //     tableWidget_->resizeColumnToContents(i);
     // }
 
     // Sort Content.
-    table_->setSortingEnabled(true);
-    table_->sortItems(COLUMN_ID, Qt::AscendingOrder);
+    tableWidget_->setSortingEnabled(true);
+    tableWidget_->sortItems(COLUMN_ID, Qt::AscendingOrder);
 
     unblock();
 }
@@ -191,7 +205,7 @@ void TreeTableWidget::setCell(int row, int col, const std::string &value)
         item->setBackground(brush);
     }
 
-    table_->setItem(row, col, item);
+    tableWidget_->setItem(row, col, item);
 }
 
 void TreeTableWidget::block()
@@ -208,34 +222,33 @@ void TreeTableWidget::slotExport()
 {
     LOG_DEBUG(<< "Start exporting tree table.");
 
-    double ppm = mainWindow_->editor().settings().units().pointsPerMeter()[0];
-
     try
     {
         TreeTableExportDialog dialog(mainWindow_, fileName_);
 
         if (dialog.exec() == QDialog::Accepted)
         {
-            std::string fileName = dialog.fileName();
+            std::shared_ptr<TreeTableExportInterface> writer = dialog.writer();
 
-            TreeTableExportCsv exportFile;
-            exportFile.create(fileName);
+            writer->create(writer->properties().fileName());
 
             for (size_t i = 0; i < segments_.size(); i++)
             {
-                exportFile.write(segments_[i], ppm);
+                writer->write(segments_[i]);
             }
 
-            fileName_ = QString::fromStdString(fileName);
+            fileName_ = QString::fromStdString(writer->properties().fileName());
         }
     }
     catch (std::exception &e)
     {
-        mainWindow_->showError(e.what());
+        std::string msg("Export failed: ");
+        msg += e.what();
+        mainWindow_->showError(msg.c_str());
     }
     catch (...)
     {
-        mainWindow_->showError("Unknown error");
+        mainWindow_->showError("Export failed: Unknown error");
     }
 
     LOG_DEBUG(<< "Finished exporting tree table.");
