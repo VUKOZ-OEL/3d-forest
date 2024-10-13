@@ -886,6 +886,7 @@ powershell -C "gci | % {rni $_.Name ($_.Name -replace '24px', '24')}"
         "${workspaceRoot}/src/plugins/settingsview",
         "${workspaceRoot}/src/plugins/treeattributes",
         "${workspaceRoot}/src/plugins/trees",
+        "${workspaceRoot}/src/plugins/treetable",
         "${workspaceRoot}/src/plugins/viewer"
       ]
     }

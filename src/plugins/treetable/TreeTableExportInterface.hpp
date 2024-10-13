@@ -17,44 +17,34 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Segment.hpp */
+/** @file TreeTableExportInterface.hpp */
 
-#ifndef SEGMENT_HPP
-#define SEGMENT_HPP
+#ifndef TREE_TABLE_EXPORT_INTERFACE_HPP
+#define TREE_TABLE_EXPORT_INTERFACE_HPP
 
 // Include 3D Forest.
-#include <Box.hpp>
-#include <Json.hpp>
-#include <Mesh.hpp>
-#include <TreeAttributes.hpp>
+#include <Segment.hpp>
+#include <TreeTableExportProperties.hpp>
 
-// Include local.
-#include <ExportEditor.hpp>
-#include <WarningsDisable.hpp>
-
-/** Segment. */
-class EXPORT_EDITOR Segment
+/** Tree Table Export Interface. */
+class TreeTableExportInterface
 {
 public:
-    size_t id{0};
-    std::string label;
-    Vector3<double> color;
-    bool selected{false};
+    virtual ~TreeTableExportInterface() = default;
 
-    Box<double> boundary;
+    virtual bool open() = 0;
+    virtual void create(const std::string &path) = 0;
+    virtual void write(const Segment &segment) = 0;
+    virtual void close() = 0;
 
-    TreeAttributes treeAttributes;
+    void setProperties(const TreeTableExportProperties &prop)
+    {
+        properties_ = prop;
+    }
+    const TreeTableExportProperties &properties() const { return properties_; }
 
-    std::vector<Mesh> meshList;
-
-    Segment();
+private:
+    TreeTableExportProperties properties_;
 };
 
-void fromJson(Segment &out, const Json &in);
-void toJson(Json &out, const Segment &in);
-
-std::ostream &operator<<(std::ostream &out, const Segment &in);
-
-#include <WarningsEnable.hpp>
-
-#endif /* SEGMENT_HPP */
+#endif /* TREE_TABLE_EXPORT_INTERFACE_HPP */

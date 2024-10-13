@@ -67,11 +67,11 @@ void TreeWidget::setSegment(const Segment &segment)
     double ppm = mainWindow_->editor().settings().units().pointsPerMeter()[0];
 
     setRow(0, "label", segment_.label);
-    setRow(1, "x", segment_.position[0] / ppm, "m");
-    setRow(2, "y", segment_.position[1] / ppm, "m");
-    setRow(3, "z", segment_.position[2] / ppm, "m");
-    setRow(4, "height", segment_.height / ppm, "m");
-    setRow(5, "DBH", segment_.dbh / ppm, "m");
+    setRow(1, "x", segment_.treeAttributes.position[0] / ppm, "m");
+    setRow(2, "y", segment_.treeAttributes.position[1] / ppm, "m");
+    setRow(3, "z", segment_.treeAttributes.position[2] / ppm, "m");
+    setRow(4, "height", segment_.treeAttributes.height / ppm, "m");
+    setRow(5, "DBH", segment_.treeAttributes.dbh / ppm, "m");
 }
 
 void TreeWidget::clear()

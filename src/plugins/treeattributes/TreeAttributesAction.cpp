@@ -72,6 +72,7 @@ void TreeAttributesAction::start(const TreeAttributesParameters &parameters)
     parameters_.treeTipHeightRange *= ppm;
     parameters_.dbhElevation *= ppm;
     parameters_.dbhElevationRange *= ppm;
+    parameters_.maximumValidCalculatedDbh *= ppm;
 
     // Clear work data.
     treesMap_.clear();
@@ -274,8 +275,8 @@ void TreeAttributesAction::calculateDbh(TreeAttributesData &tree)
                                                           tree.dbhPoints,
                                                           parameters_);
 
-    tree.dbhPosition.set(circle.a, circle.b, circle.z);
-    tree.dbh = circle.r * 2.0;
+    tree.treeAttributes.dbhPosition.set(circle.a, circle.b, circle.z);
+    tree.treeAttributes.dbh = circle.r * 2.0;
 }
 
 void TreeAttributesAction::calculateTreePosition(TreeAttributesData &tree)
@@ -320,18 +321,18 @@ void TreeAttributesAction::calculateTreePosition(TreeAttributesData &tree)
         z = 0.0;
     }
 
-    tree.position.set(x, y, z);
+    tree.treeAttributes.position.set(x, y, z);
 }
 
 void TreeAttributesAction::calculateTreeHeight(TreeAttributesData &tree)
 {
     if (tree.elevationMax > Numeric::min<double>())
     {
-        tree.height = tree.elevationMax;
+        tree.treeAttributes.height = tree.elevationMax;
     }
     else
     {
-        tree.height = 0.0;
+        tree.treeAttributes.height = 0.0;
     }
 }
 
@@ -347,17 +348,12 @@ void TreeAttributesAction::stepUpdateTreeAttributes()
     {
         Segment &segment = segments[segments.index(it.treeId)];
 
-        segment.position.set(it.position[0], it.position[1], it.position[2]);
+        segment.treeAttributes = it.treeAttributes;
+        validateAttributes(segment.treeAttributes);
 
-        segment.height = it.height;
-
-        segment.dbhPosition = it.dbhPosition;
-        segment.dbh = it.dbh;
-
-        segment.attributesCalculated = true;
-
-        LOG_DEBUG(<< "Tree position <" << segment.position << "> height <"
-                  << segment.height << "> DBH <" << segment.dbh << ">.");
+        LOG_DEBUG(<< "Tree position <" << segment.treeAttributes.position
+                  << "> height <" << segment.treeAttributes.height << "> DBH <"
+                  << segment.treeAttributes.dbh << ">.");
     }
 
     // Set new segments to editor.
@@ -366,4 +362,16 @@ void TreeAttributesAction::stepUpdateTreeAttributes()
     // Finish.
     progress_.setValueStep(progress_.maximumStep());
     progress_.setValueSteps(progress_.maximumSteps());
+}
+
+void TreeAttributesAction::validateAttributes(TreeAttributes &treeAttributes)
+{
+    if (treeAttributes.dbh > parameters_.maximumValidCalculatedDbh)
+    {
+        treeAttributes.status = TreeAttributes::Status::INVALID;
+    }
+    else
+    {
+        treeAttributes.status = TreeAttributes::Status::VALID;
+    }
 }

@@ -37,15 +37,8 @@ void fromJson(Segment &out, const Json &in)
     fromJson(out.label, in["label"]);
     fromJson(out.color, in["color"]);
 
-    fromJson(out.attributesCalculated, in["attributesCalculated"]);
-
-    fromJson(out.position, in["position"]);
     fromJson(out.boundary, in["boundary"]);
-
-    fromJson(out.height, in["height"]);
-
-    fromJson(out.dbhPosition, in["dbhPosition"]);
-    fromJson(out.dbh, in["dbh"]);
+    fromJson(out.treeAttributes, in["treeAttributes"]);
 }
 
 void toJson(Json &out, const Segment &in)
@@ -54,15 +47,8 @@ void toJson(Json &out, const Segment &in)
     toJson(out["label"], in.label);
     toJson(out["color"], in.color);
 
-    toJson(out["attributesCalculated"], in.attributesCalculated);
-
-    toJson(out["position"], in.position);
     toJson(out["boundary"], in.boundary);
-
-    toJson(out["height"], in.height);
-
-    toJson(out["dbhPosition"], in.dbhPosition);
-    toJson(out["dbh"], in.dbh);
+    toJson(out["treeAttributes"], in.treeAttributes);
 }
 
 std::ostream &operator<<(std::ostream &out, const Segment &in)

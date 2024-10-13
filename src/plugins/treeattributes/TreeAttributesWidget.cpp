@@ -88,11 +88,24 @@ TreeAttributesWidget::TreeAttributesWidget(MainWindow *mainWindow)
                                0.5,
                                parameters_.dbhElevationRange);
 
+    DoubleSliderWidget::create(maximumValidCalculatedDbhSlider_,
+                               this,
+                               nullptr,
+                               nullptr,
+                               tr("Maximum valid calculated DBH"),
+                               tr("Maximum valid calculated DBH"),
+                               tr("m"),
+                               0.01,
+                               0.01,
+                               10.0,
+                               parameters_.maximumValidCalculatedDbh);
+
     // Settings layout.
     QVBoxLayout *settingsLayout = new QVBoxLayout;
     settingsLayout->addWidget(treePositionHeightRangeSlider_);
     settingsLayout->addWidget(dbhElevationSlider_);
     settingsLayout->addWidget(dbhElevationRangeSlider_);
+    settingsLayout->addWidget(maximumValidCalculatedDbhSlider_);
     settingsLayout->addStretch();
 
     // Buttons.
@@ -134,6 +147,8 @@ void TreeAttributesWidget::slotApply()
         treePositionHeightRangeSlider_->value();
     parameters_.dbhElevation = dbhElevationSlider_->value();
     parameters_.dbhElevationRange = dbhElevationRangeSlider_->value();
+    parameters_.maximumValidCalculatedDbh =
+        maximumValidCalculatedDbhSlider_->value();
 
     try
     {

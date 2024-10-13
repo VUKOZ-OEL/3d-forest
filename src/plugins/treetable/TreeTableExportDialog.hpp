@@ -17,47 +17,46 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file TreeAttributesWidget.hpp */
+/** @file TreeTableExportDialog.hpp */
 
-#ifndef TREE_ATTRIBUTES_WIDGET_HPP
-#define TREE_ATTRIBUTES_WIDGET_HPP
+#ifndef TREE_TABLE_EXPORT_DIALOG_HPP
+#define TREE_TABLE_EXPORT_DIALOG_HPP
 
 // Include 3D Forest.
-#include <TreeAttributesAction.hpp>
-#include <TreeAttributesParameters.hpp>
+#include <TreeTableExportInterface.hpp>
 class MainWindow;
-class DoubleSliderWidget;
 
 // Include Qt.
-#include <QWidget>
+#include <QDialog>
+class QCheckBox;
+class QLineEdit;
 class QPushButton;
 
-/** Tree Attributes Widget. */
-class TreeAttributesWidget : public QWidget
+/** Tree Table Export Dialog. */
+class TreeTableExportDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    TreeAttributesWidget(MainWindow *mainWindow);
+    TreeTableExportDialog(MainWindow *mainWindow, const QString &fileName);
 
-protected slots:
-    void slotApply();
+    std::shared_ptr<TreeTableExportInterface> writer() const;
+    TreeTableExportProperties properties() const;
 
-protected:
-    void hideEvent(QHideEvent *event) override;
+public slots:
+    void slotBrowse();
+    void slotAccept();
+    void slotReject();
 
 private:
     MainWindow *mainWindow_;
 
-    TreeAttributesParameters parameters_;
-    TreeAttributesAction treeAttributesAction_;
+    QLineEdit *fileNameLineEdit_;
+    QPushButton *browseButton_;
+    QCheckBox *exportValidValuesOnlyCheckBox_;
 
-    DoubleSliderWidget *treePositionHeightRangeSlider_;
-    DoubleSliderWidget *dbhElevationSlider_;
-    DoubleSliderWidget *dbhElevationRangeSlider_;
-    DoubleSliderWidget *maximumValidCalculatedDbhSlider_;
-
-    QPushButton *applyButton_;
+    QPushButton *acceptButton_;
+    QPushButton *rejectButton_;
 };
 
-#endif /* TREE_ATTRIBUTES_WIDGET_HPP */
+#endif /* TREE_TABLE_EXPORT_DIALOG_HPP */

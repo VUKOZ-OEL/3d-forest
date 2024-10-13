@@ -17,44 +17,29 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Segment.hpp */
+/** @file TreeTableExportCsv.hpp */
 
-#ifndef SEGMENT_HPP
-#define SEGMENT_HPP
+#ifndef TREE_TABLE_EXPORT_CSV_HPP
+#define TREE_TABLE_EXPORT_CSV_HPP
 
 // Include 3D Forest.
-#include <Box.hpp>
-#include <Json.hpp>
-#include <Mesh.hpp>
-#include <TreeAttributes.hpp>
+#include <File.hpp>
+#include <TreeTableExportInterface.hpp>
 
-// Include local.
-#include <ExportEditor.hpp>
-#include <WarningsDisable.hpp>
-
-/** Segment. */
-class EXPORT_EDITOR Segment
+/** Tree Table Export CSV. */
+class TreeTableExportCsv : public TreeTableExportInterface
 {
 public:
-    size_t id{0};
-    std::string label;
-    Vector3<double> color;
-    bool selected{false};
+    TreeTableExportCsv();
+    virtual ~TreeTableExportCsv();
 
-    Box<double> boundary;
+    virtual bool open() { return file_.open(); }
+    virtual void create(const std::string &path);
+    virtual void write(const Segment &segment);
+    virtual void close();
 
-    TreeAttributes treeAttributes;
-
-    std::vector<Mesh> meshList;
-
-    Segment();
+private:
+    File file_;
 };
 
-void fromJson(Segment &out, const Json &in);
-void toJson(Json &out, const Segment &in);
-
-std::ostream &operator<<(std::ostream &out, const Segment &in);
-
-#include <WarningsEnable.hpp>
-
-#endif /* SEGMENT_HPP */
+#endif /* TREE_TABLE_EXPORT_CSV_HPP */

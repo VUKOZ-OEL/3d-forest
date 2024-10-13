@@ -17,44 +17,29 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Segment.hpp */
+/** @file TreeTableWindow.hpp */
 
-#ifndef SEGMENT_HPP
-#define SEGMENT_HPP
+#ifndef TREE_TABLE_WINDOW_HPP
+#define TREE_TABLE_WINDOW_HPP
 
 // Include 3D Forest.
-#include <Box.hpp>
-#include <Json.hpp>
-#include <Mesh.hpp>
-#include <TreeAttributes.hpp>
+class MainWindow;
+class TreeTableWidget;
 
-// Include local.
-#include <ExportEditor.hpp>
-#include <WarningsDisable.hpp>
+// Include Qt.
+#include <QDialog>
 
-/** Segment. */
-class EXPORT_EDITOR Segment
+/** Tree Table Window. */
+class TreeTableWindow : public QDialog
 {
+    Q_OBJECT
+
 public:
-    size_t id{0};
-    std::string label;
-    Vector3<double> color;
-    bool selected{false};
+    TreeTableWindow(MainWindow *mainWindow);
+    ~TreeTableWindow();
 
-    Box<double> boundary;
-
-    TreeAttributes treeAttributes;
-
-    std::vector<Mesh> meshList;
-
-    Segment();
+private:
+    TreeTableWidget *widget_;
 };
 
-void fromJson(Segment &out, const Json &in);
-void toJson(Json &out, const Segment &in);
-
-std::ostream &operator<<(std::ostream &out, const Segment &in);
-
-#include <WarningsEnable.hpp>
-
-#endif /* SEGMENT_HPP */
+#endif /* TREE_TABLE_WINDOW_HPP */

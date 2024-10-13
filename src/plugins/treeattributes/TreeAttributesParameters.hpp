@@ -36,6 +36,7 @@ public:
     // DBH parameters.
     double dbhElevation{1.3};
     double dbhElevationRange{0.05};
+    double maximumValidCalculatedDbh{2.0};
 
     // Least Squared Regression parameters.
     size_t taubinFitIterationsMax{20}; // Usually, 4-6 iterations are enough.
@@ -50,6 +51,7 @@ inline void toJson(Json &out, const TreeAttributesParameters &in)
     toJson(out["treePositionHeightRange"], in.treePositionHeightRange);
     toJson(out["dbhElevation"], in.dbhElevation);
     toJson(out["dbhElevationRange"], in.dbhElevationRange);
+    toJson(out["maximumValidCalculatedDbh"], in.maximumValidCalculatedDbh);
     toJson(out["taubinFitIterationsMax"], in.taubinFitIterationsMax);
     toJson(out["geometricCircleIterationsMax"],
            in.geometricCircleIterationsMax);

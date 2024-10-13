@@ -350,10 +350,10 @@ inline std::string toString(unsigned int in)
     return std::to_string(in);
 }
 
-inline std::string toString(double in)
+inline std::string toString(double in, int precision)
 {
     std::ostringstream oss;
-    oss << std::fixed << std::setprecision(15) << in;
+    oss << std::fixed << std::setprecision(precision) << in;
     std::string str = oss.str();
 
     size_t end = str.find_last_not_of('0');
@@ -369,6 +369,11 @@ inline std::string toString(double in)
     }
 
     return str;
+}
+
+inline std::string toString(double in)
+{
+    return toString(in, 15);
 }
 
 inline std::string toString(long in)
