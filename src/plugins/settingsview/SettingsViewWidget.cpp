@@ -220,6 +220,18 @@ void SettingsViewWidget::setViewSettings(const SettingsView &settings)
     colorSourceComboBox_->setCurrentText(
         toString(settings_.colorSource()).c_str());
 
+    // Distance-based fading.
+    distanceBasedFadingVisibleCheckBox_->setChecked(
+        settings_.distanceBasedFadingVisible());
+
+    // Bounding box.
+    sceneBoundingBoxVisibleCheckBox_->setChecked(
+        settings_.sceneBoundingBoxVisible());
+
+    // Tree attributes.
+    treeAttributesVisibleCheckBox_->setChecked(
+        settings_.treeAttributesVisible());
+
     unblock();
 }
 
