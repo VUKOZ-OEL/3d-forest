@@ -449,9 +449,21 @@ void ViewerOpenGLViewport::renderFirstFrame()
         glDisable(GL_FOG);
     }
 
-    ViewerOpenGL::renderClipFilter(editor_->clipFilter());
+    const Region &clipFilter = editor_->clipFilter();
+    glLineWidth(2.0F);
+    ViewerOpenGL::renderClipFilter(clipFilter);
+    glLineWidth(1.0F);
+
     renderAttributes();
     renderSegments();
+
+    // Bounding box.
+    if (editor_->settings().view().sceneBoundingBoxVisible())
+    {
+        glColor3f(0.25F, 0.25F, 0.25F);
+        ViewerOpenGL::renderAabb(aabb_);
+    }
+
     renderGuides();
 
     if (editor_->settings().view().distanceBasedFadingVisible())
@@ -589,13 +601,6 @@ void ViewerOpenGLViewport::renderAttributes()
 
 void ViewerOpenGLViewport::renderGuides()
 {
-    // Bounding box.
-    if (editor_->settings().view().sceneBoundingBoxVisible())
-    {
-        glColor3f(0.25F, 0.25F, 0.25F);
-        ViewerOpenGL::renderAabb(aabb_);
-    }
-
     // Overlay.
     QMatrix4x4 m;
     float w = static_cast<float>(camera_.width());
