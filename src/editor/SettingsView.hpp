@@ -101,7 +101,8 @@ std::string toString(const SettingsView &in);
 void fromJson(SettingsView::ColorSource &out, const Json &in);
 void toJson(Json &out, const SettingsView::ColorSource &in);
 
-void EXPORT_EDITOR fromString(SettingsView::ColorSource &out, const std::string &in);
+void EXPORT_EDITOR fromString(SettingsView::ColorSource &out,
+                              const std::string &in);
 std::string EXPORT_EDITOR toString(const SettingsView::ColorSource &in);
 
 #include <WarningsEnable.hpp>
