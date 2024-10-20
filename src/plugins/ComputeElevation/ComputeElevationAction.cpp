@@ -330,7 +330,7 @@ void ComputeElevationAction::createGroundPoint()
             p.y += queryPoint_.y();
 
             // Store maximal z coordinate from all neighbors into elevation.
-            if (queryPoint_.z() > p.elevation)
+            if (n == 0 || queryPoint_.z() > p.elevation)
             {
                 p.elevation = queryPoint_.z();
             }
