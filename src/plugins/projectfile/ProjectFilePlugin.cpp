@@ -31,7 +31,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "ProjectFilePlugin"
-// #define LOG_MODULE_DEBUG_ENABLED 1
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define PROJECT_FILE_PLUGIN_FILTER_PRJ "3DForest Project (*.json)"
@@ -105,6 +105,7 @@ void ProjectFilePlugin::slotNewProject()
 
     // Update.
     mainWindow_->updateNewProject();
+    mainWindow_->slotRenderViewports();
 
     LOG_DEBUG(<< "Finished creating new project.");
 }
