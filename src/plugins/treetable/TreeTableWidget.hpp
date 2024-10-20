@@ -40,7 +40,7 @@ class TreeTableWidget : public QWidget
 public:
     TreeTableWidget(MainWindow *mainWindow);
 
-    QSize sizeHint() const override { return QSize(600, 200); }
+    QSize sizeHint() const override { return QSize(700, 200); }
 
 public slots:
     void slotUpdate(void *sender, const QSet<Editor::Type> &target);

@@ -29,6 +29,7 @@
 
 // Include Qt.
 #include <QHBoxLayout>
+#include <QHeaderView>
 #include <QPushButton>
 #include <QTableWidget>
 #include <QVBoxLayout>
@@ -149,6 +150,9 @@ void TreeTableWidget::setSegments(const Segments &segments)
     // {
     //     tableWidget_->resizeColumnToContents(i);
     // }
+
+    tableWidget_->horizontalHeader()->setDefaultSectionSize(100);
+    tableWidget_->setColumnWidth(COLUMN_ID, 20);
 
     // Sort Content.
     tableWidget_->setSortingEnabled(true);
