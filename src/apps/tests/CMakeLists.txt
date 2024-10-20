@@ -25,7 +25,7 @@ set(SUB_PROJECT_NAME "3DForestTest")
 file(GLOB_RECURSE SOURCES "*.cpp")
 file(GLOB_RECURSE SOURCES_CORE "../../core/tests/*.cpp")
 file(GLOB_RECURSE SOURCES_EDITOR "../../editor/tests/*.cpp")
-file(GLOB_RECURSE SOURCES_PLUGIN_DESCRIPTOR "../../plugins/descriptor/tests/*.cpp")
+file(GLOB_RECURSE SOURCES_PLUGIN_DESCRIPTOR "../../plugins/ComputeDescriptor/tests/*.cpp")
 
 add_executable(
     ${SUB_PROJECT_NAME}
@@ -33,15 +33,15 @@ add_executable(
     ${SOURCES_CORE}
     ${SOURCES_EDITOR}
     ${SOURCES_PLUGIN_DESCRIPTOR}
-    ../../plugins/descriptor/DescriptorAction.cpp
-    ../../plugins/descriptor/DescriptorPca.cpp
+    ../../plugins/ComputeDescriptor/ComputeDescriptorAction.cpp
+    ../../plugins/ComputeDescriptor/ComputeDescriptorPca.cpp
 )
 
 target_include_directories(
     ${SUB_PROJECT_NAME}
     PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}
-    ../../plugins/descriptor
+    ../../plugins/ComputeDescriptor
     ../../../3rdparty/eigen
     ../../../3rdparty/unibnoctree
 )

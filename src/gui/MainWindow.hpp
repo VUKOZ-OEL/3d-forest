@@ -32,12 +32,9 @@
 
 // Include 3D Forest plugins.
 class PluginInterface;
-class ExportFilePlugin;
-class ImportFilePlugin;
-class MessageLogPlugin;
-class ProjectFilePlugin;
-class ViewerPlugin;
-class HelpPlugin;
+class ProjectFileInterface;
+class ImportFileInterface;
+class ViewerInterface;
 
 // Include Qt.
 #include <QHash>
@@ -58,6 +55,14 @@ class QToolButton;
 #include <ExportGui.hpp>
 #include <WarningsDisable.hpp>
 
+#define MAIN_WINDOW_MENU_FILE_PRIORITY 10
+#define MAIN_WINDOW_MENU_VIEWPORT_PRIORITY 20
+#define MAIN_WINDOW_MENU_DATA_PRIORITY 30
+#define MAIN_WINDOW_MENU_COMPUTE_PRIORITY 40
+#define MAIN_WINDOW_MENU_FILTER_PRIORITY 50
+#define MAIN_WINDOW_MENU_SETTINGS_PRIORITY 60
+#define MAIN_WINDOW_MENU_HELP_PRIORITY 70
+
 /** Main Window. */
 class EXPORT_GUI MainWindow : public QMainWindow, public ThreadCallbackInterface
 {
@@ -76,6 +81,9 @@ public:
     QSize sizeHint() const override;
 
     void showError(const char *message);
+    void importFile();
+    Editor &editor() { return editor_; }
+
     void setWindowTitle(const QString &path);
 
     void createAction(QAction **result,
@@ -86,6 +94,7 @@ public:
                       const QIcon &icon,
                       const QObject *receiver,
                       const char *member,
+                      int menuPriority = -1,
                       int menuItemPriority = -1);
 
     static void createToolButton(QToolButton **result,
@@ -121,8 +130,6 @@ public:
     /// Reset rendered state of cached point data and start new rendering.
     void updateRender();
 
-    Editor &editor() { return editor_; }
-
 public slots:
     /// Calls paint() on all viewports.
     void slotRender();
@@ -149,19 +156,17 @@ protected:
 
 private:
     void loadPlugins();
-    void loadPlugin(QObject *plugin);
+    bool loadPlugin(QObject *plugin);
 
     // Editor.
     Editor editor_;
     RenderThread threadRender_;
 
-    // Gui.
-    ImportFilePlugin *importFilePlugin_;
-    ExportFilePlugin *exportFilePlugin_;
-    MessageLogPlugin *messageLogPlugin_;
-    ProjectFilePlugin *projectFilePlugin_;
-    ViewerPlugin *viewerPlugin_;
-    HelpPlugin *helpPlugin_;
+    // Plugins.
+    ProjectFileInterface *projectFilePlugin_;
+    ImportFileInterface *importFilePlugin_;
+    ViewerInterface *viewerPlugin_;
+
     std::vector<PluginInterface *> plugins_;
 
     // Menu.
@@ -181,6 +186,7 @@ private:
     public:
         QMenu *menu;
         QString title;
+        int priority;
         std::vector<MenuItem> items;
     };
 
@@ -188,7 +194,7 @@ private:
     QHash<QString, size_t> menuIndex_;
     QHash<QString, QToolBar *> toolBars_;
 
-    QAction *actionExit_;
+    QAction *exitAction_;
 
     void createMenu();
 };

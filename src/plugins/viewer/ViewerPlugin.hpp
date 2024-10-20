@@ -23,27 +23,39 @@
 #define VIEWER_PLUGIN_HPP
 
 // Include 3D Forest.
+#include <PluginInterface.hpp>
+#include <ViewerInterface.hpp>
 #include <ViewerViewports.hpp>
-class MainWindow;
 
-// Include Qt.
-#include <QObject>
-class QAction;
-
-// Include local.
-#include <ExportGui.hpp>
+#if defined(_MSC_VER)
+    #if defined(EXPORT_3DForestViewerPlugin)
+        #define EXPORT_VIEWER_PLUGIN __declspec(dllexport)
+    #else
+        #define EXPORT_VIEWER_PLUGIN __declspec(dllimport)
+    #endif
+#else
+    #define EXPORT_VIEWER_PLUGIN
+#endif
 
 /** Viewer Plugin. */
-class EXPORT_GUI ViewerPlugin : public QObject
+class EXPORT_VIEWER_PLUGIN ViewerPlugin : public QObject,
+                                          public PluginInterface,
+                                          public ViewerInterface
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID PluginInterface_iid)
+    Q_INTERFACES(PluginInterface)
 
 public:
     ViewerPlugin();
 
-    void initialize(MainWindow *mainWindow);
+    virtual void initialize(MainWindow *mainWindow);
 
-    ViewerViewports *viewports() { return viewports_; }
+    virtual std::vector<Camera> camera(size_t viewportId) const;
+    virtual std::vector<Camera> camera() const;
+
+    virtual void updateScene(Editor *editor);
+    virtual void resetScene(Editor *editor, bool resetView);
 
 public slots:
     void slotViewOrthographic();
@@ -58,29 +70,30 @@ public slots:
     void slotViewResetCenter();
 
     void slotViewLayoutSingle();
-    void slotViewLayout2Columns();
+    void slotViewLayoutTwoColumns();
     void slotViewLayoutGrid();
-    void slotViewLayout3RowsRight();
+    void slotViewLayoutThreeRowsRight();
+
     void slotViewLayout(ViewerViewports::ViewLayout layout);
 
-protected:
+private:
     MainWindow *mainWindow_;
 
-    QAction *actionViewOrthographic_;
-    QAction *actionViewPerspective_;
+    QAction *viewOrthographicAction_;
+    QAction *viewPerspectiveAction_;
 
-    QAction *actionViewTop_;
-    QAction *actionViewFront_;
-    QAction *actionViewRight_;
-    QAction *actionView3d_;
+    QAction *viewTopAction_;
+    QAction *viewFrontAction_;
+    QAction *viewRightAction_;
+    QAction *view3dAction_;
 
-    QAction *actionViewResetDistance_;
-    QAction *actionViewResetCenter_;
+    QAction *viewResetDistanceAction_;
+    QAction *viewResetCenterAction_;
 
-    QAction *actionViewLayoutSingle_;
-    QAction *actionViewLayoutTwoColumns_;
-    QAction *actionViewLayoutGrid_;
-    QAction *actionViewLayoutGridRight_;
+    QAction *viewLayoutSingleAction_;
+    QAction *viewLayoutTwoColumnsAction_;
+    QAction *viewLayoutGridAction_;
+    QAction *viewLayoutThreeRowsRightAction_;
 
     ViewerViewports *viewports_;
 

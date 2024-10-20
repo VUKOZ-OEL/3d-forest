@@ -20,14 +20,14 @@ set(SUB_PROJECT_NAME "3DForestDescriptor")
 add_executable(
     ${SUB_PROJECT_NAME}
     descriptor.cpp
-    ../../../plugins/descriptor/DescriptorAction.cpp
-    ../../../plugins/descriptor/DescriptorPca.cpp
+    ../../../plugins/ComputeDescriptor/ComputeDescriptorAction.cpp
+    ../../../plugins/ComputeDescriptor/ComputeDescriptorPca.cpp
 )
 
 target_include_directories(
     ${SUB_PROJECT_NAME}
     PUBLIC
-    ../../../plugins/descriptor
+    ../../../plugins/ComputeDescriptor
     ../../../../3rdparty/eigen
 )
 

@@ -40,7 +40,7 @@
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/settingsview/", name))
+#define ICON(name) (ThemeIcon(":/SettingsViewResources/", name))
 
 SettingsViewWidget::SettingsViewWidget(MainWindow *mainWindow)
     : QWidget(mainWindow),

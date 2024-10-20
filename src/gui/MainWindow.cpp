@@ -22,16 +22,12 @@
 // Include 3D Forest.
 #include <GuiUtil.hpp>
 #include <MainWindow.hpp>
-#include <PluginInterface.hpp>
-#include <ViewerViewports.hpp>
 
 // Include 3D Forest plugins.
-#include <ExportFilePlugin.hpp>
-#include <HelpPlugin.hpp>
-#include <ImportFilePlugin.hpp>
-#include <MessageLogPlugin.hpp>
-#include <ProjectFilePlugin.hpp>
-#include <ViewerPlugin.hpp>
+#include <ImportFileInterface.hpp>
+#include <PluginInterface.hpp>
+#include <ProjectFileInterface.hpp>
+#include <ViewerInterface.hpp>
 
 // Include Qt.
 #include <QCloseEvent>
@@ -59,54 +55,36 @@ const int MainWindow::ICON_SIZE_TEXT = 16;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
-      threadRender_(&editor_)
+      threadRender_(&editor_),
+      projectFilePlugin_(nullptr),
+      importFilePlugin_(nullptr),
+      viewerPlugin_(nullptr)
 {
     LOG_DEBUG(<< "Start creating the main window.");
 
     // Status bar.
     statusBar()->showMessage(tr("Ready"));
 
-    // Menu.
-    projectFilePlugin_ = new ProjectFilePlugin();
-    projectFilePlugin_->initialize(this);
-
-    importFilePlugin_ = new ImportFilePlugin();
-    importFilePlugin_->initialize(this);
-
-    exportFilePlugin_ = new ExportFilePlugin();
-    exportFilePlugin_->initialize(this);
-
-    messageLogPlugin_ = new MessageLogPlugin();
-    messageLogPlugin_->initialize(this);
-
-    viewerPlugin_ = new ViewerPlugin();
-    viewerPlugin_->initialize(this);
-
+    // Plugins.
     loadPlugins();
 
-    helpPlugin_ = new HelpPlugin();
-    helpPlugin_->initialize(this);
-
     // Exit.
-    createAction(&actionExit_,
+    createAction(&exitAction_,
                  "File",
                  "",
                  tr("E&xit"),
                  tr("Exit the application"),
                  QIcon(),
                  this,
-                 SLOT(close()));
-    actionExit_->setShortcuts(QKeySequence::Quit);
+                 SLOT(close()),
+                 MAIN_WINDOW_MENU_FILE_PRIORITY,
+                 100);
+    exitAction_->setShortcuts(QKeySequence::Quit);
 
     // Menu.
     createMenu();
 
     // Rendering.
-    connect(viewerPlugin_->viewports(),
-            SIGNAL(cameraChanged(size_t)),
-            this,
-            SLOT(slotRenderViewport(size_t)));
-
     connect(this,
             SIGNAL(signalRender()),
             this,
@@ -122,7 +100,14 @@ MainWindow::MainWindow(QWidget *parent)
     LOG_DEBUG_UPDATE(<< "Emit update.");
     emit signalUpdate(this, {});
 
-    viewerPlugin_->viewports()->resetScene(&editor_, true);
+    if (viewerPlugin_)
+    {
+        viewerPlugin_->resetScene(&editor_, true);
+    }
+    else
+    {
+        LOG_ERROR(<< "The viewer plugin is not loaded to perform the action.");
+    }
 
     LOG_DEBUG(<< "Finished creating the main window.");
 }
@@ -170,7 +155,15 @@ void MainWindow::hideEvent(QHideEvent *event)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if (projectFilePlugin_->projectClose())
+    if (!projectFilePlugin_)
+    {
+        LOG_ERROR(<< "The project file plugin is not loaded"
+                     " to perform the action.");
+        event->accept();
+        return;
+    }
+
+    if (projectFilePlugin_->closeProject())
     {
         event->accept();
     }
@@ -183,6 +176,18 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::showError(const char *message)
 {
     (void)QMessageBox::critical(this, tr("Error"), message);
+}
+
+void MainWindow::importFile()
+{
+    if (!importFilePlugin_)
+    {
+        LOG_ERROR(<< "The import file plugin is not loaded"
+                     " to perform the action.");
+        return;
+    }
+
+    importFilePlugin_->importFile();
 }
 
 void MainWindow::setWindowTitle(const QString &path)
@@ -205,12 +210,14 @@ void MainWindow::createAction(QAction **result,
                               const QIcon &icon,
                               const QObject *receiver,
                               const char *member,
+                              int menuPriority,
                               int menuItemPriority)
 {
     LOG_DEBUG(<< "Create action menu <" << menuTitle.toStdString()
               << "> toolBar <" << toolBarTitle.toStdString() << "> text <"
-              << text.toStdString() << "> priority <" << menuItemPriority
-              << "> icon sizes <" << icon.availableSizes().count() << ">.");
+              << text.toStdString() << "> priority <" << menuPriority << "/"
+              << menuItemPriority << "> icon sizes <"
+              << icon.availableSizes().count() << ">.");
 
     QAction *action;
 
@@ -246,6 +253,7 @@ void MainWindow::createAction(QAction **result,
         MainWindow::Menu menu;
         menu.menu = nullptr;
         menu.title = menuTitle;
+        menu.priority = menuPriority;
         menu.items.push_back(std::move(menuItem));
 
         if (menuItem.priority < 0)
@@ -278,6 +286,15 @@ void MainWindow::createAction(QAction **result,
 void MainWindow::createMenu()
 {
     // Sort menu.
+    std::sort(menus_.begin(),
+              menus_.end(),
+              [](const MainWindow::Menu &a, const MainWindow::Menu &b)
+              {
+                  return (a.priority < b.priority) ||
+                         (a.priority == b.priority && a.title < b.title);
+              });
+
+    // Sort menu items.
     for (auto &menu : menus_)
     {
         std::sort(
@@ -382,17 +399,19 @@ void MainWindow::loadPlugins()
     qsizetype i = 0;
     for (const QString &fileName : entries)
     {
+        i++;
+
         // Try to load the file as a plugin.
         QString pluginPath = pluginsDir.absoluteFilePath(fileName);
 
         if (!(fileName.endsWith(".dll") || fileName.endsWith(".so")))
         {
-            LOG_DEBUG(<< "Skip file <" << (i + 1) << "/" << n << "> path <"
+            LOG_DEBUG(<< "Skip file <" << i << "/" << n << "> path <"
                       << pluginPath.toStdString() << ">.");
             continue;
         }
 
-        LOG_DEBUG(<< "Load file <" << (i + 1) << "/" << n << "> path <"
+        LOG_DEBUG(<< "Load file <" << i << "/" << n << "> path <"
                   << pluginPath.toStdString() << ">.");
 
         QPluginLoader pluginLoader(pluginPath);
@@ -400,84 +419,132 @@ void MainWindow::loadPlugins()
 
         if (plugin)
         {
-            loadPlugin(plugin);
+            if (!loadPlugin(plugin))
+            {
+                LOG_WARNING(<< "Skip unknown plugin <"
+                            << pluginPath.toStdString() << ">.");
+            }
         }
         else
         {
             LOG_ERROR(<< "Unable to get instance of plugin <"
                       << pluginPath.toStdString() << ">.");
         }
-
-        i++;
     }
 
     LOG_DEBUG(<< "Finished loading all plugins.");
 }
 
-void MainWindow::loadPlugin(QObject *plugin)
+bool MainWindow::loadPlugin(QObject *plugin)
 {
     // Detect and register various plugins.
-
     PluginInterface *pluginInterface;
     pluginInterface = qobject_cast<PluginInterface *>(plugin);
-    if (pluginInterface)
+    if (!pluginInterface)
     {
-        pluginInterface->initialize(this);
-        plugins_.push_back(pluginInterface);
-
-        ModifierInterface *modifier;
-        modifier = dynamic_cast<ModifierInterface *>(pluginInterface);
-        if (modifier)
-        {
-            editor_.addModifier(modifier);
-        }
-
-        return;
+        LOG_DEBUG(<< "Plugin interface not recognized.");
+        return false;
     }
+
+    pluginInterface->initialize(this);
+    plugins_.push_back(pluginInterface);
+
+    // Modifier.
+    ModifierInterface *modifierInterface;
+    modifierInterface = dynamic_cast<ModifierInterface *>(pluginInterface);
+    if (modifierInterface)
+    {
+        LOG_DEBUG(<< "Add modifier plugin.");
+        editor_.addModifier(modifierInterface);
+    }
+
+    // Project file.
+    ProjectFileInterface *projectFileInterface;
+    projectFileInterface =
+        dynamic_cast<ProjectFileInterface *>(pluginInterface);
+    if (projectFileInterface)
+    {
+        LOG_DEBUG(<< "Set project file plugin.");
+        projectFilePlugin_ = projectFileInterface;
+    }
+
+    // Import file.
+    ImportFileInterface *importFileInterface;
+    importFileInterface = dynamic_cast<ImportFileInterface *>(pluginInterface);
+    if (importFileInterface)
+    {
+        LOG_DEBUG(<< "Set import file plugin.");
+        importFilePlugin_ = importFileInterface;
+    }
+
+    // Viewer.
+    ViewerInterface *viewerInterface;
+    viewerInterface = dynamic_cast<ViewerInterface *>(pluginInterface);
+    if (viewerInterface)
+    {
+        LOG_DEBUG(<< "Set viewer plugin.");
+        viewerPlugin_ = viewerInterface;
+    }
+
+    return true;
 }
 
 void MainWindow::suspendThreads()
 {
     LOG_DEBUG_RENDER(<< "Suspend threads.");
+
     threadRender_.cancel();
 }
 
 void MainWindow::resumeThreads()
 {
     LOG_DEBUG_RENDER(<< "Resume threads.");
+
     slotRenderViewports();
 }
 
 void MainWindow::threadProgress(bool finished)
 {
     (void)finished;
+
     LOG_DEBUG_RENDER(<< "Thread progress finished <" << finished << ">.");
+
     emit signalRender();
 }
 
 void MainWindow::slotRender()
 {
-    std::unique_lock<std::mutex> mutexlock(editor_.mutex_);
-    viewerPlugin_->viewports()->updateScene(&editor_);
+    if (viewerPlugin_)
+    {
+        std::unique_lock<std::mutex> mutexlock(editor_.mutex_);
+        viewerPlugin_->updateScene(&editor_);
+    }
 }
 
 void MainWindow::slotRenderViewport(size_t viewportId)
 {
     LOG_DEBUG_RENDER(<< "Render viewport <" << viewportId << ">.");
-    ViewerViewports *viewports = viewerPlugin_->viewports();
-    threadRender_.render(viewports->camera(viewportId));
+
+    if (viewerPlugin_)
+    {
+        threadRender_.render(viewerPlugin_->camera(viewportId));
+    }
 }
 
 void MainWindow::slotRenderViewports()
 {
     LOG_DEBUG_RENDER(<< "Render viewports.");
-    threadRender_.render(viewerPlugin_->viewports()->camera());
-    // viewerPlugin_->viewports()->update();
+
+    if (viewerPlugin_)
+    {
+        threadRender_.render(viewerPlugin_->camera());
+    }
 }
 
 void MainWindow::update(void *sender, const QSet<Editor::Type> &target)
 {
     LOG_DEBUG_UPDATE(<< "Update target <" << target << "> emit.");
+
     emit signalUpdate(sender, target);
 }
 
@@ -488,6 +555,7 @@ void MainWindow::update(const QSet<Editor::Type> &target,
     LOG_DEBUG_UPDATE(<< "Update target <" << target << "> set page state <"
                      << viewPortsCacheState << "> reset camera <"
                      << static_cast<int>(resetCamera) << ">.");
+
     suspendThreads();
 
     editor_.viewports().setState(viewPortsCacheState);
@@ -495,8 +563,10 @@ void MainWindow::update(const QSet<Editor::Type> &target,
 
     if (resetCamera)
     {
-        ViewerViewports *viewports = viewerPlugin_->viewports();
-        viewports->resetScene(&editor_, false);
+        if (viewerPlugin_)
+        {
+            viewerPlugin_->resetScene(&editor_, false);
+        }
     }
 
     update(this, target);
@@ -507,21 +577,17 @@ void MainWindow::update(const QSet<Editor::Type> &target,
 void MainWindow::updateNewProject()
 {
     LOG_DEBUG(<< "Start updating new project.");
-    // suspendThreads();
 
     setWindowTitle(QString::fromStdString(editor_.projectPath()));
 
-    ViewerViewports *viewports = viewerPlugin_->viewports();
+    if (viewerPlugin_)
     {
         std::unique_lock<std::mutex> mutexlock(editor_.mutex_);
-        viewports->resetScene(&editor_, true);
+        viewerPlugin_->resetScene(&editor_, true);
     }
 
     LOG_DEBUG(<< "Emit update.");
     emit signalUpdate(this, {});
-
-    //    size_t viewportId = viewports->selectedViewportId();
-    //    threadRender_.render(viewportId, viewports->camera(viewportId));
 
     LOG_DEBUG(<< "Finished updating new project.");
 }
@@ -529,10 +595,14 @@ void MainWindow::updateNewProject()
 void MainWindow::updateData()
 {
     LOG_DEBUG_UPDATE(<< "Update data.");
+
     suspendThreads();
 
-    ViewerViewports *viewports = viewerPlugin_->viewports();
-    viewports->resetScene(&editor_, false);
+    if (viewerPlugin_)
+    {
+        viewerPlugin_->resetScene(&editor_, false);
+    }
+
     editor_.viewports().clearContent();
     editor_.applyFilters();
 
@@ -542,10 +612,14 @@ void MainWindow::updateData()
 void MainWindow::updateFilter()
 {
     LOG_DEBUG_UPDATE(<< "Update filter.");
+
     suspendThreads();
 
-    ViewerViewports *viewports = viewerPlugin_->viewports();
-    viewports->resetScene(&editor_, false);
+    if (viewerPlugin_)
+    {
+        viewerPlugin_->resetScene(&editor_, false);
+    }
+
     editor_.viewports().setState(Page::STATE_SELECT);
 
     resumeThreads();
@@ -554,6 +628,7 @@ void MainWindow::updateFilter()
 void MainWindow::updateModifiers()
 {
     LOG_DEBUG_UPDATE(<< "Update modifiers.");
+
     suspendThreads();
 
     editor_.viewports().setState(Page::STATE_RUN_MODIFIERS);
@@ -564,6 +639,7 @@ void MainWindow::updateModifiers()
 void MainWindow::updateRender()
 {
     LOG_DEBUG_UPDATE(<< "Update render.");
+
     suspendThreads();
 
     editor_.viewports().setState(Page::STATE_RENDER);

@@ -18,11 +18,11 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 -->
 <RCC version="1.0">
-<qresource prefix="/settingsview">
+<qresource prefix="/SettingsViewResources">
 
 <!-- Plugin -->
-<file>brush_16px.png</file>
-<file>brush_20px.png</file>
+<file>brush-16px.png</file>
+<file>brush-20px.png</file>
 
 </qresource>
 </RCC>

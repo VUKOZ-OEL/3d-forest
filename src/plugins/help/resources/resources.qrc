@@ -18,11 +18,11 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 -->
 <RCC version="1.0">
-<qresource prefix="/help">
+<qresource prefix="/HelpResources">
 
 <!-- Menu -->
-<file>about_24px.png</file>
-<file>help_24px.png</file>
+<file>about-24px.png</file>
+<file>help-24px.png</file>
 
 </qresource>
 </RCC>

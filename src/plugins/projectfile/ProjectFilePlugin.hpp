@@ -23,44 +23,51 @@
 #define PROJECT_FILE_PLUGIN_HPP
 
 // Include 3D Forest.
-class MainWindow;
+#include <PluginInterface.hpp>
+#include <ProjectFileInterface.hpp>
 
-// Include Qt.
-#include <QObject>
-#include <QString>
-class QAction;
-
-// Include local.
-#include <ExportGui.hpp>
+#if defined(_MSC_VER)
+    #if defined(EXPORT_3DForestProjectFilePlugin)
+        #define EXPORT_PROJECT_FILE_PLUGIN __declspec(dllexport)
+    #else
+        #define EXPORT_PROJECT_FILE_PLUGIN __declspec(dllimport)
+    #endif
+#else
+    #define EXPORT_PROJECT_FILE_PLUGIN
+#endif
 
 /** Project File Plugin. */
-class EXPORT_GUI ProjectFilePlugin : public QObject
+class EXPORT_PROJECT_FILE_PLUGIN ProjectFilePlugin : public QObject,
+                                                     public PluginInterface,
+                                                     public ProjectFileInterface
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID PluginInterface_iid)
+    Q_INTERFACES(PluginInterface)
 
 public:
     ProjectFilePlugin();
 
-    void initialize(MainWindow *mainWindow);
+    virtual void initialize(MainWindow *mainWindow);
 
-    bool projectClose();
+    virtual bool closeProject();
 
 public slots:
-    void slotProjectNew();
-    void slotProjectOpen();
-    void slotProjectSave();
-    void slotProjectSaveAs();
+    void slotNewProject();
+    void slotOpenProject();
+    void slotSaveProject();
+    void slotSaveAsProject();
 
-protected:
-    bool projectOpen(const QString &path);
-    bool projectSave(const QString &path = "");
+private:
+    bool openProject(const QString &path);
+    bool saveProject(const QString &path = "");
 
     MainWindow *mainWindow_;
 
-    QAction *actionProjectNew_;
-    QAction *actionProjectOpen_;
-    QAction *actionProjectSave_;
-    QAction *actionProjectSaveAs_;
+    QAction *newProjectAction_;
+    QAction *openProjectAction_;
+    QAction *saveProjectAction_;
+    QAction *saveAsProjectAction_;
 };
 
 #endif /* PROJECT_FILE_PLUGIN_HPP */

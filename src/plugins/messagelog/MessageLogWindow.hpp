@@ -43,8 +43,6 @@ public:
     virtual void println(const LogMessage &message);
     virtual void flush();
 
-    static void EXPORT_GUI install();
-
 public slots:
     void slotPrintln(const LogMessage &message);
 

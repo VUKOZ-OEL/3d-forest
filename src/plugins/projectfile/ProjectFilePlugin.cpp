@@ -35,7 +35,7 @@
 #include <Log.hpp>
 
 #define PROJECT_FILE_PLUGIN_FILTER_PRJ "3DForest Project (*.json)"
-#define ICON(name) (ThemeIcon(":/projectfile/", name))
+#define ICON(name) (ThemeIcon(":/ProjectFileResources/", name))
 
 ProjectFilePlugin::ProjectFilePlugin() : mainWindow_(nullptr)
 {
@@ -45,51 +45,59 @@ void ProjectFilePlugin::initialize(MainWindow *mainWindow)
 {
     mainWindow_ = mainWindow;
 
-    mainWindow_->createAction(&actionProjectNew_,
+    mainWindow_->createAction(&newProjectAction_,
                               "File",
                               "File Project",
                               tr("&New Project"),
                               tr("Create new project"),
                               ICON("create"),
                               this,
-                              SLOT(slotProjectNew()));
+                              SLOT(slotNewProject()),
+                              MAIN_WINDOW_MENU_FILE_PRIORITY,
+                              10);
 
-    mainWindow_->createAction(&actionProjectOpen_,
+    mainWindow_->createAction(&openProjectAction_,
                               "File",
                               "File Project",
                               tr("&Open Project..."),
                               tr("Open new project"),
-                              ICON("opened_folder"),
+                              ICON("opened-folder"),
                               this,
-                              SLOT(slotProjectOpen()));
+                              SLOT(slotOpenProject()),
+                              MAIN_WINDOW_MENU_FILE_PRIORITY,
+                              20);
 
-    mainWindow_->createAction(&actionProjectSave_,
+    mainWindow_->createAction(&saveProjectAction_,
                               "File",
                               "File Project",
                               tr("&Save Project"),
                               tr("Save project"),
                               ICON("save"),
                               this,
-                              SLOT(slotProjectSave()));
+                              SLOT(slotSaveProject()),
+                              MAIN_WINDOW_MENU_FILE_PRIORITY,
+                              30);
 
-    mainWindow_->createAction(&actionProjectSaveAs_,
+    mainWindow_->createAction(&saveAsProjectAction_,
                               "File",
                               "File Project",
                               tr("Save Project &As..."),
                               tr("Save project as"),
-                              ICON("save_as"),
+                              ICON("save-as"),
                               this,
-                              SLOT(slotProjectSaveAs()));
+                              SLOT(slotSaveAsProject()),
+                              MAIN_WINDOW_MENU_FILE_PRIORITY,
+                              40);
 
     mainWindow_->hideToolBar("File Project");
 }
 
-void ProjectFilePlugin::slotProjectNew()
+void ProjectFilePlugin::slotNewProject()
 {
     LOG_DEBUG(<< "Start creating a new project.");
 
     // Close the current project.
-    if (!projectClose())
+    if (!closeProject())
     {
         LOG_DEBUG(<< "Cancelled, the current project can not be closed.");
         return;
@@ -101,7 +109,7 @@ void ProjectFilePlugin::slotProjectNew()
     LOG_DEBUG(<< "Finished creating new project.");
 }
 
-void ProjectFilePlugin::slotProjectOpen()
+void ProjectFilePlugin::slotOpenProject()
 {
     LOG_DEBUG(<< "Start opening a new project.");
 
@@ -118,21 +126,21 @@ void ProjectFilePlugin::slotProjectOpen()
         return;
     }
 
-    (void)projectOpen(fileName);
+    (void)openProject(fileName);
 
     LOG_DEBUG(<< "Finished opening new project <" << fileName << ">.");
 }
 
-void ProjectFilePlugin::slotProjectSave()
+void ProjectFilePlugin::slotSaveProject()
 {
     LOG_DEBUG(<< "Start saving the project.");
 
-    (void)projectSave();
+    (void)saveProject();
 
     LOG_DEBUG(<< "Finished saving the project.");
 }
 
-void ProjectFilePlugin::slotProjectSaveAs()
+void ProjectFilePlugin::slotSaveAsProject()
 {
     LOG_DEBUG(<< "Start saving the project as.");
 
@@ -149,17 +157,17 @@ void ProjectFilePlugin::slotProjectSaveAs()
         return;
     }
 
-    (void)projectSave(fileName);
+    (void)saveProject(fileName);
 
     LOG_DEBUG(<< "Finished saving the project as <" << fileName << ">.");
 }
 
-bool ProjectFilePlugin::projectOpen(const QString &path)
+bool ProjectFilePlugin::openProject(const QString &path)
 {
     LOG_DEBUG(<< "Start opening new project <" << path << ">.");
 
     // Close the current project.
-    if (!projectClose())
+    if (!closeProject())
     {
         LOG_DEBUG(<< "Cancelled, the current project can not be closed.");
         return false;
@@ -186,7 +194,7 @@ bool ProjectFilePlugin::projectOpen(const QString &path)
     return true; // Opened
 }
 
-bool ProjectFilePlugin::projectClose()
+bool ProjectFilePlugin::closeProject()
 {
     LOG_DEBUG(<< "Start closing the project.");
 
@@ -210,7 +218,7 @@ bool ProjectFilePlugin::projectClose()
         {
             case QMessageBox::Save:
                 // Save was clicked.
-                canClose = projectSave();
+                canClose = saveProject();
                 break;
             case QMessageBox::Discard:
                 // Don't Save was clicked.
@@ -248,7 +256,7 @@ bool ProjectFilePlugin::projectClose()
     return true; // Closed.
 }
 
-bool ProjectFilePlugin::projectSave(const QString &path)
+bool ProjectFilePlugin::saveProject(const QString &path)
 {
     LOG_DEBUG(<< "Start saving the project to path <" << path << ">.");
 

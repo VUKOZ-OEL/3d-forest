@@ -38,7 +38,7 @@
 #define LOG_MODULE_NAME "ImportFileDialog"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/importfile/", name))
+#define ICON(name) (ThemeIcon(":/ImportFileResources/", name))
 
 ImportFileDialog::ImportFileDialog(MainWindow *mainWindow)
     : QDialog(mainWindow),
@@ -117,7 +117,7 @@ ImportFileDialog::ImportFileDialog(MainWindow *mainWindow)
 
     // Window.
     setWindowTitle(tr("Import File"));
-    setWindowIcon(ICON("import_file"));
+    setWindowIcon(ICON("import-file"));
     setMaximumWidth(width());
     setMaximumHeight(height());
 }

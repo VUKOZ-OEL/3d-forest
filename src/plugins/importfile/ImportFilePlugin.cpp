@@ -37,7 +37,7 @@
 #include <Log.hpp>
 
 #define IMPORT_PLUGIN_FILTER "LAS (LASer) File (*.las)"
-#define ICON(name) (ThemeIcon(":/importfile/", name))
+#define ICON(name) (ThemeIcon(":/ImportFileResources/", name))
 
 ImportFilePlugin::ImportFilePlugin() : mainWindow_(nullptr)
 {
@@ -52,16 +52,18 @@ void ImportFilePlugin::initialize(MainWindow *mainWindow)
                               "File Import/Export",
                               tr("Import..."),
                               tr("Import new point cloud dataset"),
-                              ICON("import_file"),
+                              ICON("import-file"),
                               this,
-                              SLOT(slotImportFile()));
+                              SLOT(slotImportFile()),
+                              MAIN_WINDOW_MENU_FILE_PRIORITY,
+                              50);
 
     mainWindow_->hideToolBar("File Import/Export");
 }
 
 void ImportFilePlugin::slotImportFile()
 {
-    ImportFilePlugin::import(mainWindow_);
+    importFile();
 }
 
 static void importPluginDialog(MainWindow *mainWindow);
@@ -72,15 +74,15 @@ static bool importPluginCreateIndex(const QString &path,
                                     const SettingsImport &settings,
                                     MainWindow *mainWindow);
 
-void ImportFilePlugin::import(MainWindow *mainWindow)
+void ImportFilePlugin::importFile()
 {
     try
     {
-        importPluginDialog(mainWindow);
+        importPluginDialog(mainWindow_);
     }
     catch (std::exception &e)
     {
-        mainWindow->showError(e.what());
+        mainWindow_->showError(e.what());
         return;
     }
 }

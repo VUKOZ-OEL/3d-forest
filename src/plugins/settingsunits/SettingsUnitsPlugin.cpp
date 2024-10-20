@@ -29,7 +29,7 @@
 #define LOG_MODULE_NAME "SettingsUnitsPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/settingsunits/", name))
+#define ICON(name) (ThemeIcon(":/SettingsUnitsResources/", name))
 
 SettingsUnitsPlugin::SettingsUnitsPlugin()
     : mainWindow_(nullptr),
@@ -48,7 +48,8 @@ void SettingsUnitsPlugin::initialize(MainWindow *mainWindow)
                               tr("Show units settings"),
                               ICON("units"),
                               this,
-                              SLOT(slotPlugin()));
+                              SLOT(slotPlugin()),
+                              MAIN_WINDOW_MENU_SETTINGS_PRIORITY);
 }
 
 void SettingsUnitsPlugin::slotPlugin()

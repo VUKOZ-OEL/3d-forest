@@ -23,31 +23,39 @@
 #define IMPORT_FILE_PLUGIN_HPP
 
 // Include 3D Forest.
-class MainWindow;
+#include <ImportFileInterface.hpp>
+#include <PluginInterface.hpp>
 
-// Include Qt.
-#include <QObject>
-class QAction;
-
-// Include local.
-#include <ExportGui.hpp>
+#if defined(_MSC_VER)
+    #if defined(EXPORT_3DForestImportFilePlugin)
+        #define EXPORT_IMPORT_FILE_PLUGIN __declspec(dllexport)
+    #else
+        #define EXPORT_IMPORT_FILE_PLUGIN __declspec(dllimport)
+    #endif
+#else
+    #define EXPORT_IMPORT_FILE_PLUGIN
+#endif
 
 /** Import File Plugin. */
-class EXPORT_GUI ImportFilePlugin : public QObject
+class EXPORT_IMPORT_FILE_PLUGIN ImportFilePlugin : public QObject,
+                                                   public PluginInterface,
+                                                   public ImportFileInterface
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID PluginInterface_iid)
+    Q_INTERFACES(PluginInterface)
 
 public:
     ImportFilePlugin();
 
-    void initialize(MainWindow *mainWindow);
+    virtual void initialize(MainWindow *mainWindow);
 
-    static void import(MainWindow *mainWindow);
+    virtual void importFile();
 
 public slots:
     void slotImportFile();
 
-protected:
+private:
     MainWindow *mainWindow_;
     QAction *importFileAction_;
 };

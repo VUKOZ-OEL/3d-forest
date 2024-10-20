@@ -21,7 +21,6 @@
 
 // Include 3D Forest.
 #include <MainWindow.hpp>
-#include <MessageLogWindow.hpp>
 
 // Include Qt.
 #include <QApplication>
@@ -33,12 +32,16 @@
 
 #include <WarningsDisable.hpp>
 
+static void messageLogWindowQtMessageHandler(QtMsgType type,
+                                             const QMessageLogContext &context,
+                                             const QString &msg);
+
 int main(int argc, char *argv[])
 {
     int rc = 1;
 
     globalLogThread = std::make_shared<LogThread>();
-    MessageLogWindow::install();
+    qInstallMessageHandler(messageLogWindowQtMessageHandler);
 
     LOG_INFO(<< "3D Forest started.");
 
@@ -52,14 +55,14 @@ int main(int argc, char *argv[])
         app.setOrganizationName("VUKOZ v.v.i.");
         app.setApplicationName(MainWindow::APPLICATION_NAME);
         app.setApplicationVersion(MainWindow::APPLICATION_VERSION);
-        app.setWindowIcon(QIcon(":/3dforest_128px.png"));
+        app.setWindowIcon(QIcon(":/3d-forest-128px.png"));
 
         QSurfaceFormat format;
         format.setDepthBufferSize(24);
         QSurfaceFormat::setDefaultFormat(format);
 
         MainWindow window;
-        window.setWindowIcon(QIcon(":/3dforest_128px.png"));
+        window.setWindowIcon(QIcon(":/3d-forest-128px.png"));
         window.show();
 
         rc = app.exec();
@@ -72,6 +75,34 @@ int main(int argc, char *argv[])
     globalLogThread->stop();
 
     return rc;
+}
+
+static void messageLogWindowQtMessageHandler(QtMsgType type,
+                                             const QMessageLogContext &context,
+                                             const QString &msg)
+{
+    (void)context;
+
+    LogType logType;
+    switch (type)
+    {
+        case QtDebugMsg:
+            logType = LOG_TYPE_DEBUG;
+            break;
+        case QtWarningMsg:
+            logType = LOG_TYPE_WARNING;
+            break;
+        case QtInfoMsg:
+            logType = LOG_TYPE_INFO;
+            break;
+        case QtCriticalMsg:
+        case QtFatalMsg:
+        default:
+            logType = LOG_TYPE_ERROR;
+            break;
+    }
+
+    LOG_MESSAGE(logType, "Qt", << msg.toStdString());
 }
 
 #include <WarningsEnable.hpp>

@@ -29,7 +29,7 @@
 #define LOG_MODULE_NAME "TreeTablePlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/treetable/", name))
+#define ICON(name) (ThemeIcon(":/TreeTableResources/", name))
 
 TreeTablePlugin::TreeTablePlugin()
     : mainWindow_(nullptr),
@@ -42,14 +42,14 @@ void TreeTablePlugin::initialize(MainWindow *mainWindow)
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
-                              "Tools", // "Data",
+                              "Data",
                               "Data",
                               tr("Tree Table"),
                               tr("Show tree table"),
-                              ICON("tree_table"),
+                              ICON("tree-table"),
                               this,
                               SLOT(slotPlugin()),
-                              5);
+                              MAIN_WINDOW_MENU_DATA_PRIORITY);
 }
 
 void TreeTablePlugin::slotPlugin()

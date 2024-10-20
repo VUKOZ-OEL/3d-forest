@@ -21,8 +21,8 @@
 
 // Include 3D Forest.
 #include <ArgumentParser.hpp>
+#include <ComputeElevationAction.hpp>
 #include <Editor.hpp>
-#include <ElevationAction.hpp>
 #include <Error.hpp>
 
 // Include local.
@@ -36,7 +36,7 @@ static void elevationCompute(const std::string &inputPath, double voxelRadius)
     editor.open(inputPath);
 
     // Compute elevation by steps.
-    ElevationAction elevation(&editor);
+    ComputeElevationAction elevation(&editor);
     elevation.start(voxelRadius);
     while (!elevation.end())
     {

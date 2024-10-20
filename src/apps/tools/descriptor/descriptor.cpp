@@ -23,8 +23,8 @@
 
 // Include 3D Forest.
 #include <ArgumentParser.hpp>
-#include <DescriptorAction.hpp>
-#include <DescriptorParameters.hpp>
+#include <ComputeDescriptorAction.hpp>
+#include <ComputeDescriptorParameters.hpp>
 #include <Editor.hpp>
 #include <Error.hpp>
 
@@ -33,14 +33,14 @@
 #include <Log.hpp>
 
 static void descriptorCompute(const std::string &inputPath,
-                              const DescriptorParameters &parameters)
+                              const ComputeDescriptorParameters &parameters)
 {
     // Open input file in editor.
     Editor editor;
     editor.open(inputPath);
 
     // Calculate descriptors by steps.
-    DescriptorAction descriptor(&editor);
+    ComputeDescriptorAction descriptor(&editor);
     descriptor.start(parameters);
     while (!descriptor.end())
     {
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 
     try
     {
-        DescriptorParameters p;
+        ComputeDescriptorParameters p;
 
         ArgumentParser arg("calculates descriptor values for points");
         arg.add("-f",
@@ -82,11 +82,11 @@ int main(int argc, char *argv[])
         {
             if (arg.toString("--method") == "density")
             {
-                p.method = DescriptorParameters::METHOD_DENSITY;
+                p.method = ComputeDescriptorParameters::METHOD_DENSITY;
             }
             else if (arg.toString("--method") == "pca")
             {
-                p.method = DescriptorParameters::METHOD_PCA_INTENSITY;
+                p.method = ComputeDescriptorParameters::METHOD_PCA_INTENSITY;
             }
             else
             {

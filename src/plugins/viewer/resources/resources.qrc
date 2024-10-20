@@ -18,51 +18,51 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 -->
 <RCC version="1.0">
-<qresource prefix="/viewer">
+<qresource prefix="/ViewerResources">
 
 <!-- Tool bar -->
-<file>orthographic_wire_16px.png</file>
-<file>orthographic_wire_20px.png</file>
-<file>orthographic_wire_24px.png</file>
-<file>perspective_wire_16px.png</file>
-<file>perspective_wire_20px.png</file>
-<file>perspective_wire_24px.png</file>
+<file>orthographic-wire-16px.png</file>
+<file>orthographic-wire-20px.png</file>
+<file>orthographic-wire-24px.png</file>
+<file>perspective-wire-16px.png</file>
+<file>perspective-wire-20px.png</file>
+<file>perspective-wire-24px.png</file>
 
-<file>view_top_16px.png</file>
-<file>view_top_20px.png</file>
-<file>view_top_24px.png</file>
+<file>view-top-16px.png</file>
+<file>view-top-20px.png</file>
+<file>view-top-24px.png</file>
 
-<file>view_front_16px.png</file>
-<file>view_front_20px.png</file>
-<file>view_front_24px.png</file>
+<file>view-front-16px.png</file>
+<file>view-front-20px.png</file>
+<file>view-front-24px.png</file>
 
-<file>view_right_16px.png</file>
-<file>view_right_20px.png</file>
-<file>view_right_24px.png</file>
+<file>view-right-16px.png</file>
+<file>view-right-20px.png</file>
+<file>view-right-24px.png</file>
 
-<file>portraits_fill_16px.png</file>
-<file>portraits_fill_20px.png</file>
-<file>portraits_fill_24px.png</file>
+<file>portraits-fill-16px.png</file>
+<file>portraits-fill-20px.png</file>
+<file>portraits-fill-24px.png</file>
 
-<file>fit_to_page_16px.png</file>
-<file>fit_to_page_20px.png</file>
-<file>fit_to_page_24px.png</file>
-<file>collect_16px.png</file>
-<file>collect_20px.png</file>
-<file>collect_24px.png</file>
+<file>fit-to-page-16px.png</file>
+<file>fit-to-page-20px.png</file>
+<file>fit-to-page-24px.png</file>
+<file>collect-16px.png</file>
+<file>collect-20px.png</file>
+<file>collect-24px.png</file>
 
-<file>layout_single_16px.png</file>
-<file>layout_single_20px.png</file>
-<file>layout_single_24px.png</file>
-<file>layout_columns_16px.png</file>
-<file>layout_columns_20px.png</file>
-<file>layout_columns_24px.png</file>
-<file>layout_grid_16px.png</file>
-<file>layout_grid_20px.png</file>
-<file>layout_grid_24px.png</file>
-<file>layout_grid_3_right_16px.png</file>
-<file>layout_grid_3_right_20px.png</file>
-<file>layout_grid_3_right_24px.png</file>
+<file>layout-single-16px.png</file>
+<file>layout-single-20px.png</file>
+<file>layout-single-24px.png</file>
+<file>layout-columns-16px.png</file>
+<file>layout-columns-20px.png</file>
+<file>layout-columns-24px.png</file>
+<file>layout-grid-16px.png</file>
+<file>layout-grid-20px.png</file>
+<file>layout-grid-24px.png</file>
+<file>layout-grid-3-right-16px.png</file>
+<file>layout-grid-3-right-20px.png</file>
+<file>layout-grid-3-right-24px.png</file>
 
 </qresource>
 </RCC>

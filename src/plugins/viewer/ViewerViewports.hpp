@@ -37,7 +37,7 @@ class ViewerOpenGLViewport;
 #include <ExportGui.hpp>
 
 /** Viewer Viewports. */
-class EXPORT_GUI ViewerViewports : public QWidget
+class ViewerViewports : public QWidget
 {
     Q_OBJECT
 

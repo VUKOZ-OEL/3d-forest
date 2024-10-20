@@ -38,7 +38,7 @@
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/treetable/", name))
+#define ICON(name) (ThemeIcon(":/TreeTableResources/", name))
 
 TreeTableWidget::TreeTableWidget(MainWindow *mainWindow)
     : QWidget(),
@@ -73,7 +73,7 @@ TreeTableWidget::TreeTableWidget(MainWindow *mainWindow)
 
     // Buttons.
     exportButton_ = new QPushButton(tr("Export"));
-    exportButton_->setIcon(THEME_ICON("export_file"));
+    exportButton_->setIcon(THEME_ICON("export-file"));
     exportButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(exportButton_, SIGNAL(clicked()), this, SLOT(slotExport()));
 

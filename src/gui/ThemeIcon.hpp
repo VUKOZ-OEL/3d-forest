@@ -43,18 +43,18 @@ class EXPORT_GUI ThemeIcon : public QIcon
 public:
     ThemeIcon(const QString &prefix, const QString &name) : QIcon()
     {
-        addFileExists(prefix + name + "_16px", QSize(16, 16));
-        addFileExists(prefix + name + "_20px", QSize(20, 20));
-        addFileExists(prefix + name + "_24px", QSize(24, 24));
+        addFileExists(prefix + name + "-16px", QSize(16, 16));
+        addFileExists(prefix + name + "-20px", QSize(20, 20));
+        addFileExists(prefix + name + "-24px", QSize(24, 24));
         // addFileExists(prefix + name + "_30px", QSize(30, 30));
     }
 
 private:
     void addFileExists(const QString &filename, const QSize &size)
     {
-        if (QFile(filename + "_color.png").exists())
+        if (QFile(filename + "-color.png").exists())
         {
-            addFile(filename + "_color.png", size);
+            addFile(filename + "-color.png", size);
         }
         else if (QFile(filename + ".png").exists())
         {
