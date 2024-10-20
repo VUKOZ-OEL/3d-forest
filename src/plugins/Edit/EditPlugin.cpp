@@ -51,8 +51,11 @@ void EditPlugin::slotResetElevation()
 {
     LOG_DEBUG(<< "Start resetting elevation values.");
 
+    mainWindow_->suspendThreads();
+
     Editor *editor = &mainWindow_->editor();
 
+    /** @todo Progress dialog with cancel button. */
     Query query(editor);
     query.setWhere(editor->viewports().where());
     query.exec();
