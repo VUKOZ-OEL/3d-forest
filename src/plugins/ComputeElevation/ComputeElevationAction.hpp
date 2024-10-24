@@ -56,6 +56,7 @@ protected:
 
     double elevationMinimum_;
     double elevationMaximum_;
+    double zMinimum_;
 
     Points points_;
 

@@ -86,11 +86,15 @@ void ComputeElevationAction::start(double voxelRadius)
     elevationMinimum_ = 0;
     elevationMaximum_ = 0;
 
+    zMinimum_ = editor_->boundary().min(2);
+    LOG_DEBUG(<< "Z minimum_ <" << zMinimum_ << "> maximum <"
+              << editor_->boundary().max(2) << ">.");
+
     points_.clear();
 
     // Plan the steps.
     progress_.setMaximumStep(numberOfPoints_, 1000);
-    progress_.setMaximumSteps({5.0, 5.0, 25.0, 5.0, 60.0});
+    progress_.setMaximumSteps({14.0, 8.0, 35.0, 1.0, 42.0});
     progress_.setValueSteps(COMPUTE_ELEVATION_STEP_RESET_POINTS);
 }
 
@@ -131,6 +135,8 @@ void ComputeElevationAction::stepResetPoints()
     // Initialize.
     if (progress_.valueStep() == 0)
     {
+        LOG_DEBUG(<< "Start step reset points.");
+
         // Reset elevation range.
         Range<double> range;
         editor_->setElevationFilter(range);
@@ -155,8 +161,11 @@ void ComputeElevationAction::stepResetPoints()
     }
 
     // Next.
+    // query_.flush();
     progress_.setMaximumStep(numberOfPoints_, 1000);
     progress_.setValueSteps(COMPUTE_ELEVATION_STEP_COUNT_POINTS);
+
+    LOG_DEBUG(<< "Finished step reset points.");
 }
 
 void ComputeElevationAction::stepCountPoints()
@@ -166,6 +175,8 @@ void ComputeElevationAction::stepCountPoints()
     // Initialize.
     if (progress_.valueStep() == 0)
     {
+        LOG_DEBUG(<< "Start step count points.");
+
         // Set query to use the active filter.
         query_.setWhere(editor_->viewports().where());
         query_.exec();
@@ -190,15 +201,26 @@ void ComputeElevationAction::stepCountPoints()
         }
     }
 
+    LOG_DEBUG(<< "Number of ground points <" << numberOfGroundPoints_ << ">.");
+    LOG_DEBUG(<< "Number of non-ground points <" << numberOfNonGroundPoints_
+              << ">.");
+
     // Next.
     query_.reset();
     progress_.setMaximumStep(numberOfGroundPoints_, 100);
     progress_.setValueSteps(COMPUTE_ELEVATION_STEP_CREATE_GROUND);
+
+    LOG_DEBUG(<< "Finished step count points.");
 }
 
 void ComputeElevationAction::stepCreateGround()
 {
     progress_.startTimer();
+
+    if (progress_.valueStep() == 0)
+    {
+        LOG_DEBUG(<< "Start step create ground.");
+    }
 
     // Iterate all points:
     while (query_.next())
@@ -220,10 +242,14 @@ void ComputeElevationAction::stepCreateGround()
     // Next.
     progress_.setMaximumStep();
     progress_.setValueSteps(COMPUTE_ELEVATION_STEP_CREATE_INDEX);
+
+    LOG_DEBUG(<< "Finished step create ground.");
 }
 
 void ComputeElevationAction::stepCreateIndex()
 {
+    LOG_DEBUG(<< "Start step create index.");
+
     // Create ground index.
     points_.createIndex();
 
@@ -231,11 +257,18 @@ void ComputeElevationAction::stepCreateIndex()
     query_.reset();
     progress_.setMaximumStep(numberOfNonGroundPoints_, 100);
     progress_.setValueSteps(COMPUTE_ELEVATION_STEP_COMPUTE_ELEVATION);
+
+    LOG_DEBUG(<< "Finished step create index.");
 }
 
 void ComputeElevationAction::stepComputeElevation()
 {
     progress_.startTimer();
+
+    if (progress_.valueStep() == 0)
+    {
+        LOG_DEBUG(<< "Start step compute elevation.");
+    }
 
     // Iterate all points:
     while (query_.next())
@@ -244,7 +277,7 @@ void ComputeElevationAction::stepComputeElevation()
         if (query_.classification() != LasFile::CLASS_GROUND)
         {
             // Find nearest neighbour in ground projection:
-            size_t idx = points_.findNN(query_.x(), query_.y(), 0.0);
+            size_t idx = points_.findNN(query_.x(), query_.y(), zMinimum_);
             if (idx < points_.size())
             {
                 // Compute elevation to this nearest neighbour.
@@ -272,6 +305,7 @@ void ComputeElevationAction::stepComputeElevation()
 
                 // Set computed elevation.
                 query_.elevation() = d;
+                query_.setModified();
             }
 
             progress_.addValueStep(1);
@@ -294,6 +328,8 @@ void ComputeElevationAction::stepComputeElevation()
     // All steps are now complete.
     progress_.setValueStep(progress_.maximumStep());
     progress_.setValueSteps(progress_.maximumSteps());
+
+    LOG_DEBUG(<< "Finished step compute elevation.");
 }
 
 void ComputeElevationAction::createGroundPoint()
@@ -308,8 +344,8 @@ void ComputeElevationAction::createGroundPoint()
     Point p;
     p.x = 0;
     p.y = 0;
-    p.z = 0;
-    p.elevation = 0;
+    p.z = zMinimum_;
+    p.elevation = zMinimum_;
 
     // Compute point coordinates as average from all neighbour points:
     size_t n = 0;
@@ -330,7 +366,7 @@ void ComputeElevationAction::createGroundPoint()
             p.y += queryPoint_.y();
 
             // Store maximal z coordinate from all neighbors into elevation.
-            if (n == 0 || queryPoint_.z() > p.elevation)
+            if (queryPoint_.z() > p.elevation)
             {
                 p.elevation = queryPoint_.z();
             }
