@@ -481,7 +481,7 @@ void ViewerOpenGLViewport::renderLastFrame()
 {
     glLineWidth(2.0F);
     glDisable(GL_DEPTH_TEST);
-    renderAttributes();
+    // renderAttributes();
     glEnable(GL_DEPTH_TEST);
     glLineWidth(1.0F);
 }
