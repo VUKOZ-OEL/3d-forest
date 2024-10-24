@@ -47,7 +47,6 @@ TreeTableWindow::TreeTableWindow(MainWindow *mainWindow)
     // Main layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(widget_);
-    mainLayout->addStretch();
 
     // Dialog.
     setLayout(mainLayout);

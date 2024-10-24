@@ -53,6 +53,8 @@ TreeTableWidget::TreeTableWidget(MainWindow *mainWindow)
     tableWidget_->setRowCount(0);
     tableWidget_->setColumnCount(2);
 
+    tableWidget_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
     tableWidget_->setStyleSheet("QHeaderView::section {"
                                 "background-color: lightblue;"
                                 "color: black;"
@@ -67,11 +69,6 @@ TreeTableWidget::TreeTableWidget(MainWindow *mainWindow)
     palette.setColor(QPalette::Base, Qt::white);
     tableWidget_->setPalette(palette);
 
-    // Layout.
-    QVBoxLayout *tableLayout = new QVBoxLayout;
-    tableLayout->addWidget(tableWidget_);
-    tableLayout->addStretch();
-
     // Buttons.
     exportButton_ = new QPushButton(tr("Export"));
     exportButton_->setIcon(THEME_ICON("export-file"));
@@ -85,10 +82,8 @@ TreeTableWidget::TreeTableWidget(MainWindow *mainWindow)
 
     // Main layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addLayout(tableLayout);
-    mainLayout->addSpacing(10);
-    mainLayout->addLayout(buttonsLayout);
-    mainLayout->addStretch();
+    mainLayout->addWidget(tableWidget_, 1);
+    mainLayout->addLayout(buttonsLayout, 0);
 
     // Widget.
     setLayout(mainLayout);
