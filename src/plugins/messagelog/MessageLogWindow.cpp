@@ -108,36 +108,3 @@ void MessageLogWindow::slotPrintln(const LogMessage &message)
     textEdit_->append(line);
     file_.write(line.toStdString() + "\n");
 }
-
-static void messageLogWindowQtMessageHandler(QtMsgType type,
-                                             const QMessageLogContext &context,
-                                             const QString &msg)
-{
-    (void)context;
-
-    LogType logType;
-    switch (type)
-    {
-        case QtDebugMsg:
-            logType = LOG_TYPE_DEBUG;
-            break;
-        case QtWarningMsg:
-            logType = LOG_TYPE_WARNING;
-            break;
-        case QtInfoMsg:
-            logType = LOG_TYPE_INFO;
-            break;
-        case QtCriticalMsg:
-        case QtFatalMsg:
-        default:
-            logType = LOG_TYPE_ERROR;
-            break;
-    }
-
-    LOG_MESSAGE(logType, "Qt", << msg.toStdString());
-}
-
-void MessageLogWindow::install()
-{
-    qInstallMessageHandler(messageLogWindowQtMessageHandler);
-}

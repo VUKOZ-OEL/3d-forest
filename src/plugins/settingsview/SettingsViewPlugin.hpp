@@ -52,7 +52,7 @@ public:
 public slots:
     void slotPlugin();
 
-protected:
+private:
     MainWindow *mainWindow_;
     SettingsViewWindow *pluginWindow_;
 };

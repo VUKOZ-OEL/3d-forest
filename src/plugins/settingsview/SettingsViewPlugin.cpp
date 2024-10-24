@@ -29,7 +29,7 @@
 #define LOG_MODULE_NAME "SettingsViewPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/settingsview/", name))
+#define ICON(name) (ThemeIcon(":/SettingsViewResources/", name))
 
 SettingsViewPlugin::SettingsViewPlugin()
     : mainWindow_(nullptr),
@@ -48,7 +48,8 @@ void SettingsViewPlugin::initialize(MainWindow *mainWindow)
                               tr("Show view settings"),
                               ICON("brush"),
                               this,
-                              SLOT(slotPlugin()));
+                              SLOT(slotPlugin()),
+                              MAIN_WINDOW_MENU_SETTINGS_PRIORITY);
 }
 
 void SettingsViewPlugin::slotPlugin()

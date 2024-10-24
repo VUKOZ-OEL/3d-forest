@@ -23,8 +23,8 @@
 
 // Include 3D Forest.
 #include <ArgumentParser.hpp>
-#include <ClassificationAction.hpp>
-#include <ClassificationParameters.hpp>
+#include <ComputeClassificationAction.hpp>
+#include <ComputeClassificationParameters.hpp>
 #include <Editor.hpp>
 #include <Error.hpp>
 
@@ -32,15 +32,16 @@
 #define LOG_MODULE_NAME "classification"
 #include <Log.hpp>
 
-static void classificationCompute(const std::string &inputPath,
-                                  const ClassificationParameters &parameters)
+static void classificationCompute(
+    const std::string &inputPath,
+    const ComputeClassificationParameters &parameters)
 {
     // Open input file in editor.
     Editor editor;
     editor.open(inputPath);
 
     // Classify ground by steps.
-    ClassificationAction classification(&editor);
+    ComputeClassificationAction classification(&editor);
     classification.start(parameters);
     while (!classification.end())
     {
@@ -58,7 +59,7 @@ int main(int argc, char *argv[])
 
     try
     {
-        ClassificationParameters p;
+        ComputeClassificationParameters p;
 
         ArgumentParser arg("classifies ground points");
         arg.add("-f",

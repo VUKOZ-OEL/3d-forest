@@ -33,7 +33,7 @@
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/treetable/", name))
+#define ICON(name) (ThemeIcon(":/TreeTableResources/", name))
 
 TreeTableWindow::TreeTableWindow(MainWindow *mainWindow)
     : QDialog(mainWindow),
@@ -47,12 +47,11 @@ TreeTableWindow::TreeTableWindow(MainWindow *mainWindow)
     // Main layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(widget_);
-    mainLayout->addStretch();
 
     // Dialog.
     setLayout(mainLayout);
     setWindowTitle(tr("Tree Table"));
-    setWindowIcon(ICON("tree_table"));
+    setWindowIcon(ICON("tree-table"));
     setModal(false);
 }
 

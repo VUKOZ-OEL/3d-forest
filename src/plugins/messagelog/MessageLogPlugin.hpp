@@ -23,31 +23,38 @@
 #define MESSAGE_LOG_PLUGIN_HPP
 
 // Include 3D Forest.
-class MainWindow;
+#include <PluginInterface.hpp>
 class MessageLogWindow;
 
-// Include Qt.
-#include <QObject>
-
-// Include local.
-#include <ExportGui.hpp>
+#if defined(_MSC_VER)
+    #if defined(EXPORT_3DForestMessageLogPlugin)
+        #define EXPORT_MESSAGE_LOG_PLUGIN __declspec(dllexport)
+    #else
+        #define EXPORT_MESSAGE_LOG_PLUGIN __declspec(dllimport)
+    #endif
+#else
+    #define EXPORT_MESSAGE_LOG_PLUGIN
+#endif
 
 /** Message Log Plugin. */
-class EXPORT_GUI MessageLogPlugin : public QObject
+class EXPORT_MESSAGE_LOG_PLUGIN MessageLogPlugin : public QObject,
+                                                   public PluginInterface
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID PluginInterface_iid)
+    Q_INTERFACES(PluginInterface)
 
 public:
     MessageLogPlugin();
 
-    void initialize(MainWindow *mainWindow);
+    virtual void initialize(MainWindow *mainWindow);
 
 public slots:
     void slotPlugin();
 
-protected:
+private:
     MainWindow *mainWindow_;
-    MessageLogWindow *messageLogWindow_;
+    MessageLogWindow *pluginWindow_;
 };
 
 #endif /* MESSAGE_LOG_PLUGIN_HPP */

@@ -29,7 +29,7 @@
 #define LOG_MODULE_NAME "SettingsUnitsWindow"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/settingsunits/", name))
+#define ICON(name) (ThemeIcon(":/SettingsUnitsResources/", name))
 
 SettingsUnitsWindow::SettingsUnitsWindow(MainWindow *mainWindow)
     : QDockWidget(mainWindow)

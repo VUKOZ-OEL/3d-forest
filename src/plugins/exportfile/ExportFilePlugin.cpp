@@ -49,9 +49,11 @@ void ExportFilePlugin::initialize(MainWindow *mainWindow)
                               "File Import/Export",
                               tr("Export..."),
                               tr("Export point cloud"),
-                              ICON("export_file"),
+                              ICON("export-file"),
                               this,
-                              SLOT(slotExportFile()));
+                              SLOT(slotExportFile()),
+                              MAIN_WINDOW_MENU_FILE_PRIORITY,
+                              60);
 }
 
 void ExportFilePlugin::slotExportFile()

@@ -18,12 +18,12 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 -->
 <RCC version="1.0">
-<qresource prefix="/messagelog">
+<qresource prefix="/MessageLogResources">
 
 <!-- Tool bar -->
-<file>message_log_16px.png</file>
-<file>message_log_20px.png</file>
-<file>message_log_24px.png</file>
+<file>message-log-16px.png</file>
+<file>message-log-20px.png</file>
+<file>message-log-24px.png</file>
 
 </qresource>
 </RCC>

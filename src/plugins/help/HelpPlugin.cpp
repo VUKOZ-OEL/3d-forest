@@ -31,7 +31,7 @@
 #define LOG_MODULE_NAME "HelpPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/help/", name))
+#define ICON(name) (ThemeIcon(":/HelpResources/", name))
 
 HelpPlugin::HelpPlugin() : mainWindow_(nullptr)
 {
@@ -48,7 +48,8 @@ void HelpPlugin::initialize(MainWindow *mainWindow)
                               tr("About this application"),
                               THEME_ICON("question"),
                               this,
-                              SLOT(slotAbout()));
+                              SLOT(slotAbout()),
+                              MAIN_WINDOW_MENU_HELP_PRIORITY);
 }
 
 void HelpPlugin::slotAbout()

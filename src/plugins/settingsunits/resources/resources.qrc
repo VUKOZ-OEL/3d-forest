@@ -18,11 +18,11 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 -->
 <RCC version="1.0">
-<qresource prefix="/settingsunits">
+<qresource prefix="/SettingsUnitsResources">
 
 <!-- Plugin -->
-<file>units_16px.png</file>
-<file>units_20px.png</file>
+<file>units-16px.png</file>
+<file>units-20px.png</file>
 
 </qresource>
 </RCC>

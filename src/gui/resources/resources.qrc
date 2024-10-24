@@ -21,38 +21,38 @@
 <qresource prefix="/gui">
 
 <!-- Standard -->
-<file>question_16px.png</file>
-<file>question_16px_color.png</file>
-<file>question_20px.png</file>
-<file>question_20px_color.png</file>
-<file>add_16px.png</file>
-<file>add_20px.png</file>
-<file>add_24px.png</file>
-<file>export_file_16px.png</file>
-<file>export_file_20px.png</file>
-<file>remove_16px.png</file>
-<file>remove_20px.png</file>
-<file>remove_24px.png</file>
-<file>run_16px.png</file>
-<file>run_20px.png</file>
+<file>question-16px.png</file>
+<file>question-16px-color.png</file>
+<file>question-20px.png</file>
+<file>question-20px-color.png</file>
+<file>add-16px.png</file>
+<file>add-20px.png</file>
+<file>add-24px.png</file>
+<file>export-file-16px.png</file>
+<file>export-file-20px.png</file>
+<file>remove-16px.png</file>
+<file>remove-20px.png</file>
+<file>remove-24px.png</file>
+<file>run-16px.png</file>
+<file>run-20px.png</file>
 
 <!-- Common -->
-<file>eye_16px.png</file>
-<file>eye_20px.png</file>
-<file>eye_24px.png</file>
-<file>hide_16px.png</file>
-<file>hide_20px.png</file>
-<file>hide_24px.png</file>
+<file>eye-16px.png</file>
+<file>eye-20px.png</file>
+<file>eye-24px.png</file>
+<file>hide-16px.png</file>
+<file>hide-20px.png</file>
+<file>hide-24px.png</file>
 
-<file>select_all_16px.png</file>
-<file>select_all_20px.png</file>
-<file>select_all_24px.png</file>
-<file>select_invert_16px.png</file>
-<file>select_invert_20px.png</file>
-<file>select_invert_24px.png</file>
-<file>select_none_16px.png</file>
-<file>select_none_20px.png</file>
-<file>select_none_24px.png</file>
+<file>select-all-16px.png</file>
+<file>select-all-20px.png</file>
+<file>select-all-24px.png</file>
+<file>select-invert-16px.png</file>
+<file>select-invert-20px.png</file>
+<file>select-invert-24px.png</file>
+<file>select-none-16px.png</file>
+<file>select-none-20px.png</file>
+<file>select-none-24px.png</file>
 
 </qresource>
 </RCC>

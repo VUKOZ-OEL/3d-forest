@@ -23,30 +23,35 @@
 #define EXPORT_FILE_PLUGIN_HPP
 
 // Include 3D Forest.
-class MainWindow;
+#include <PluginInterface.hpp>
 
-// Include Qt.
-#include <QObject>
-#include <QString>
-class QAction;
-
-// Include local.
-#include <ExportGui.hpp>
+#if defined(_MSC_VER)
+    #if defined(EXPORT_3DForestExportFilePlugin)
+        #define EXPORT_EXPORT_FILE_PLUGIN __declspec(dllexport)
+    #else
+        #define EXPORT_EXPORT_FILE_PLUGIN __declspec(dllimport)
+    #endif
+#else
+    #define EXPORT_EXPORT_FILE_PLUGIN
+#endif
 
 /** Export File Plugin. */
-class EXPORT_GUI ExportFilePlugin : public QObject
+class EXPORT_EXPORT_FILE_PLUGIN ExportFilePlugin : public QObject,
+                                                   public PluginInterface
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID PluginInterface_iid)
+    Q_INTERFACES(PluginInterface)
 
 public:
     ExportFilePlugin();
 
-    void initialize(MainWindow *mainWindow);
+    virtual void initialize(MainWindow *mainWindow);
 
 public slots:
     void slotExportFile();
 
-protected:
+private:
     MainWindow *mainWindow_;
     QAction *exportFileAction_;
     QString fileName_;

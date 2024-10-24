@@ -18,11 +18,11 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 -->
 <RCC version="1.0">
-<qresource prefix="/treetable">
+<qresource prefix="/TreeTableResources">
 
 <!-- Tool bar -->
-<file>tree_table_16px.png</file>
-<file>tree_table_20px.png</file>
+<file>tree-table-16px.png</file>
+<file>tree-table-20px.png</file>
 
 <!-- Images -->
 

@@ -47,7 +47,13 @@ void TreeTableExportCsv::create(const std::string &path)
     char text[256] = {};
     text[0] = 0;
 
-    (void)ustrcat(text, "id, label, x, y, z, height, dbh, status");
+    (void)ustrcat(text, "id, label, x, y, z, height, dbh");
+
+    if (!properties().exportValidValuesOnly())
+    {
+        (void)ustrcat(text, ", status");
+    }
+
     (void)ustrcat(text, "\n");
 
     file_.write(text);
@@ -65,18 +71,30 @@ void TreeTableExportCsv::write(const Segment &segment)
 
     // Format data into text line.
     char text[4096];
+    char buffer[32];
 
     (void)snprintf(text,
                    sizeof(text),
-                   "%d, \"%s\", %f, %f, %f, %f, %f, \"%s\"\n",
+                   "%d, \"%s\", %f, %f, %f, %f, %f",
                    static_cast<int>(segment.id),
                    segment.label.c_str(),
                    segment.treeAttributes.position[0] / ppm,
                    segment.treeAttributes.position[1] / ppm,
                    segment.treeAttributes.position[2] / ppm,
                    segment.treeAttributes.height / ppm,
-                   segment.treeAttributes.dbh / ppm,
-                   toString(segment.treeAttributes.status).c_str());
+                   segment.treeAttributes.dbh / ppm);
+
+    if (!properties().exportValidValuesOnly())
+    {
+        (void)snprintf(buffer,
+                       sizeof(buffer),
+                       ", \"%s\"",
+                       toString(segment.treeAttributes.status).c_str());
+
+        (void)ustrcat(text, buffer);
+    }
+
+    (void)ustrcat(text, "\n");
 
     // Write new tree into file.
     file_.write(text);

@@ -164,6 +164,9 @@ void PageData::updatePoint(uint8_t *ptr, size_t i, uint8_t fmt)
     // - gps time
     // - etc.
 
+    // Update intensity.
+    htol16(&ptr[12], static_cast<uint16_t>(intensity[i] * 65535.0));
+
     // Update classification.
     if (fmt > 5)
     {

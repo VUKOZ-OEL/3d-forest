@@ -25,11 +25,11 @@
 #include <MessageLogWindow.hpp>
 #include <ThemeIcon.hpp>
 
-#define ICON(name) (ThemeIcon(":/messagelog/", name))
+#define ICON(name) (ThemeIcon(":/MessageLogResources/", name))
 
 MessageLogPlugin::MessageLogPlugin()
     : mainWindow_(nullptr),
-      messageLogWindow_(nullptr)
+      pluginWindow_(nullptr)
 {
 }
 
@@ -37,11 +37,11 @@ void MessageLogPlugin::initialize(MainWindow *mainWindow)
 {
     mainWindow_ = mainWindow;
 
-    messageLogWindow_ = new MessageLogWindow(mainWindow_);
-    messageLogWindow_->hide();
+    pluginWindow_ = new MessageLogWindow(mainWindow_);
+    pluginWindow_->hide();
     if (globalLogThread)
     {
-        globalLogThread->setCallback(messageLogWindow_);
+        globalLogThread->setCallback(pluginWindow_);
     }
 
     mainWindow_->createAction(nullptr,
@@ -49,19 +49,21 @@ void MessageLogPlugin::initialize(MainWindow *mainWindow)
                               "Windows",
                               tr("Message Log"),
                               tr("Show message log"),
-                              ICON("message_log"),
+                              ICON("message-log"),
                               this,
-                              SLOT(slotPlugin()));
+                              SLOT(slotPlugin()),
+                              MAIN_WINDOW_MENU_FILE_PRIORITY,
+                              90);
 
     mainWindow_->hideToolBar("Windows");
 }
 
 void MessageLogPlugin::slotPlugin()
 {
-    if (messageLogWindow_)
+    if (pluginWindow_)
     {
-        messageLogWindow_->show();
-        messageLogWindow_->raise();
-        messageLogWindow_->activateWindow();
+        pluginWindow_->show();
+        pluginWindow_->raise();
+        pluginWindow_->activateWindow();
     }
 }

@@ -30,7 +30,7 @@
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/viewer/", name))
+#define ICON(name) (ThemeIcon(":/ViewerResources/", name))
 
 ViewerPlugin::ViewerPlugin() : mainWindow_(nullptr)
 {
@@ -43,116 +43,153 @@ void ViewerPlugin::initialize(MainWindow *mainWindow)
     viewports_ = new ViewerViewports(mainWindow_);
     mainWindow_->setCentralWidget(viewports_);
 
-    mainWindow_->createAction(&actionViewOrthographic_,
+    connect(viewports_,
+            SIGNAL(cameraChanged(size_t)),
+            mainWindow_,
+            SLOT(slotRenderViewport(size_t)));
+
+    mainWindow_->createAction(&viewOrthographicAction_,
                               "Viewport",
                               "Viewport Projection",
                               tr("Orthographic"),
                               tr("Orthographic projection"),
-                              ICON("orthographic_wire"),
+                              ICON("orthographic-wire"),
                               this,
-                              SLOT(slotViewOrthographic()));
+                              SLOT(slotViewOrthographic()),
+                              MAIN_WINDOW_MENU_VIEWPORT_PRIORITY);
 
-    mainWindow_->createAction(&actionViewPerspective_,
+    mainWindow_->createAction(&viewPerspectiveAction_,
                               "Viewport",
                               "Viewport Projection",
                               tr("Perspective"),
                               tr("Perspective projection"),
-                              ICON("perspective_wire"),
+                              ICON("perspective-wire"),
                               this,
-                              SLOT(slotViewPerspective()));
+                              SLOT(slotViewPerspective()),
+                              MAIN_WINDOW_MENU_VIEWPORT_PRIORITY);
 
-    mainWindow_->createAction(&actionView3d_,
+    mainWindow_->createAction(&view3dAction_,
                               "Viewport",
                               "Viewport",
                               tr("3d view"),
                               tr("3d view"),
-                              ICON("portraits_fill"),
+                              ICON("portraits-fill"),
                               this,
-                              SLOT(slotView3d()));
+                              SLOT(slotView3d()),
+                              MAIN_WINDOW_MENU_VIEWPORT_PRIORITY);
 
-    mainWindow_->createAction(&actionViewTop_,
+    mainWindow_->createAction(&viewTopAction_,
                               "Viewport",
                               "Viewport",
                               tr("Top view"),
                               tr("Top view"),
-                              ICON("view_top"),
+                              ICON("view-top"),
                               this,
-                              SLOT(slotViewTop()));
+                              SLOT(slotViewTop()),
+                              MAIN_WINDOW_MENU_VIEWPORT_PRIORITY);
 
-    mainWindow_->createAction(&actionViewFront_,
+    mainWindow_->createAction(&viewFrontAction_,
                               "Viewport",
                               "Viewport",
                               tr("Front view"),
                               tr("Front view"),
-                              ICON("view_front"),
+                              ICON("view-front"),
                               this,
-                              SLOT(slotViewFront()));
+                              SLOT(slotViewFront()),
+                              MAIN_WINDOW_MENU_VIEWPORT_PRIORITY);
 
-    mainWindow_->createAction(&actionViewRight_,
+    mainWindow_->createAction(&viewRightAction_,
                               "Viewport",
                               "Viewport",
                               tr("Right view"),
                               tr("Right view"),
-                              ICON("view_right"),
+                              ICON("view-right"),
                               this,
-                              SLOT(slotViewRight()));
+                              SLOT(slotViewRight()),
+                              MAIN_WINDOW_MENU_VIEWPORT_PRIORITY);
 
-    mainWindow_->createAction(&actionViewResetDistance_,
+    mainWindow_->createAction(&viewResetDistanceAction_,
                               "Viewport",
                               "Viewport",
                               tr("Reset distance"),
                               tr("Reset distance"),
-                              ICON("fit_to_page"),
+                              ICON("fit-to-page"),
                               this,
-                              SLOT(slotViewResetDistance()));
+                              SLOT(slotViewResetDistance()),
+                              MAIN_WINDOW_MENU_VIEWPORT_PRIORITY);
 
-    mainWindow_->createAction(&actionViewResetCenter_,
+    mainWindow_->createAction(&viewResetCenterAction_,
                               "Viewport",
                               "Viewport",
                               tr("Reset center"),
                               tr("Reset center"),
                               ICON("collect"),
                               this,
-                              SLOT(slotViewResetCenter()));
+                              SLOT(slotViewResetCenter()),
+                              MAIN_WINDOW_MENU_VIEWPORT_PRIORITY);
 
-    mainWindow_->createAction(&actionViewLayoutSingle_,
+    mainWindow_->createAction(&viewLayoutSingleAction_,
                               "Viewport",
                               "Viewport Layout",
                               tr("Single layout"),
                               tr("Single layout"),
-                              ICON("layout_single"),
+                              ICON("layout-single"),
                               this,
-                              SLOT(slotViewLayoutSingle()));
+                              SLOT(slotViewLayoutSingle()),
+                              MAIN_WINDOW_MENU_VIEWPORT_PRIORITY);
 
-    mainWindow_->createAction(&actionViewLayoutTwoColumns_,
+    mainWindow_->createAction(&viewLayoutTwoColumnsAction_,
                               "Viewport",
                               "Viewport Layout",
                               tr("Column layout"),
                               tr("Layout with two columns"),
-                              ICON("layout_columns"),
+                              ICON("layout-columns"),
                               this,
-                              SLOT(slotViewLayout2Columns()));
+                              SLOT(slotViewLayoutTwoColumns()),
+                              MAIN_WINDOW_MENU_VIEWPORT_PRIORITY);
 
-    mainWindow_->createAction(&actionViewLayoutGrid_,
+    mainWindow_->createAction(&viewLayoutGridAction_,
                               "Viewport",
                               "Viewport Layout",
                               tr("Grid layout"),
                               tr("Grid layout"),
-                              ICON("layout_grid"),
+                              ICON("layout-grid"),
                               this,
-                              SLOT(slotViewLayoutGrid()));
+                              SLOT(slotViewLayoutGrid()),
+                              MAIN_WINDOW_MENU_VIEWPORT_PRIORITY);
 
-    mainWindow_->createAction(&actionViewLayoutGridRight_,
+    mainWindow_->createAction(&viewLayoutThreeRowsRightAction_,
                               "Viewport",
                               "Viewport Layout",
                               tr("Grid layout 3"),
                               tr("Grid layout with 3 rows"),
-                              ICON("layout_grid_3_right"),
+                              ICON("layout-grid-3-right"),
                               this,
-                              SLOT(slotViewLayout3RowsRight()));
+                              SLOT(slotViewLayoutThreeRowsRight()),
+                              MAIN_WINDOW_MENU_VIEWPORT_PRIORITY);
 
     // mainWindow_->hideToolBar("Viewport Projection");
     mainWindow_->hideToolBar("Viewport Layout");
+}
+
+std::vector<Camera> ViewerPlugin::camera(size_t viewportId) const
+{
+    return viewports_->camera(viewportId);
+}
+
+std::vector<Camera> ViewerPlugin::camera() const
+{
+    return viewports_->camera();
+}
+
+void ViewerPlugin::updateScene(Editor *editor)
+{
+    return viewports_->updateScene(editor);
+}
+
+void ViewerPlugin::resetScene(Editor *editor, bool resetView)
+{
+    return viewports_->resetScene(editor, resetView);
 }
 
 void ViewerPlugin::slotViewOrthographic()
@@ -208,7 +245,7 @@ void ViewerPlugin::slotViewLayoutSingle()
     slotViewLayout(ViewerViewports::VIEW_LAYOUT_SINGLE);
 }
 
-void ViewerPlugin::slotViewLayout2Columns()
+void ViewerPlugin::slotViewLayoutTwoColumns()
 {
     slotViewLayout(ViewerViewports::VIEW_LAYOUT_TWO_COLUMNS);
 }
@@ -218,7 +255,7 @@ void ViewerPlugin::slotViewLayoutGrid()
     slotViewLayout(ViewerViewports::VIEW_LAYOUT_GRID);
 }
 
-void ViewerPlugin::slotViewLayout3RowsRight()
+void ViewerPlugin::slotViewLayoutThreeRowsRight()
 {
     slotViewLayout(ViewerViewports::VIEW_LAYOUT_THREE_ROWS_RIGHT);
 }

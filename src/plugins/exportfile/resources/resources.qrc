@@ -21,9 +21,9 @@
 <qresource prefix="/exportfile">
 
 <!-- Tool bar -->
-<file>export_file_16px.png</file>
-<file>export_file_20px.png</file>
-<file>export_file_24px.png</file>
+<file>export-file-16px.png</file>
+<file>export-file-20px.png</file>
+<file>export-file-24px.png</file>
 
 </qresource>
 </RCC>

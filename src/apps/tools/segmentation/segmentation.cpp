@@ -26,23 +26,24 @@
 
 // Include 3D Forest.
 #include <ArgumentParser.hpp>
+#include <ComputeSegmentationNNAction.hpp>
 #include <Editor.hpp>
 #include <Error.hpp>
-#include <SegmentationAction.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "segmentation"
 #include <Log.hpp>
 
-static void segmentationCompute(const std::string &inputPath,
-                                const SegmentationParameters &parameters)
+static void segmentationCompute(
+    const std::string &inputPath,
+    const ComputeSegmentationNNParameters &parameters)
 {
     // Open input file in editor.
     Editor editor;
     editor.open(inputPath);
 
     // Repeatedly call tree segmentation until it is complete.
-    SegmentationAction segmentation(&editor);
+    ComputeSegmentationNNAction segmentation(&editor);
     segmentation.start(parameters);
     while (!segmentation.end())
     {
@@ -60,7 +61,7 @@ int main(int argc, char *argv[])
 
     try
     {
-        SegmentationParameters p;
+        ComputeSegmentationNNParameters p;
 
         ArgumentParser arg("computes point segmentation to trees");
         arg.add("-f",
@@ -112,15 +113,16 @@ int main(int argc, char *argv[])
             if (arg.toString("--wood-channel") == "descriptor")
             {
                 p.leafToWoodChannel =
-                    SegmentationParameters::CHANNEL_DESCRIPTOR;
+                    ComputeSegmentationNNParameters::CHANNEL_DESCRIPTOR;
             }
             else if (arg.toString("--wood-channel") == "intensity")
             {
-                p.leafToWoodChannel = SegmentationParameters::CHANNEL_INTENSITY;
+                p.leafToWoodChannel =
+                    ComputeSegmentationNNParameters::CHANNEL_INTENSITY;
             }
             else
             {
-                THROW("Invalid descriptor channel option. "
+                THROW("Invalid --wood-channel option. "
                       "Try '--help' for more information.");
             }
 

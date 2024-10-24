@@ -36,7 +36,7 @@
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/settingsunits/", name))
+#define ICON(name) (ThemeIcon(":/SettingsUnitsResources/", name))
 
 SettingsUnitsWidget::SettingsUnitsWidget(MainWindow *mainWindow)
     : QWidget(mainWindow),

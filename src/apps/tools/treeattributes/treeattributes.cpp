@@ -23,24 +23,24 @@
 
 // Include 3D Forest.
 #include <ArgumentParser.hpp>
+#include <ComputeTreeAttributesAction.hpp>
+#include <ComputeTreeAttributesParameters.hpp>
 #include <Editor.hpp>
 #include <Error.hpp>
-#include <TreeAttributesAction.hpp>
-#include <TreeAttributesParameters.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "treeattributes"
 #include <Log.hpp>
 
 static void compute(const std::string &inputPath,
-                    const TreeAttributesParameters &parameters)
+                    const ComputeTreeAttributesParameters &parameters)
 {
     // Open input file in editor.
     Editor editor;
     editor.open(inputPath);
 
     // Calculate tree attributes by steps.
-    TreeAttributesAction treeAttributes(&editor);
+    ComputeTreeAttributesAction treeAttributes(&editor);
     treeAttributes.start(parameters);
     while (!treeAttributes.end())
     {
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 
     try
     {
-        TreeAttributesParameters p;
+        ComputeTreeAttributesParameters p;
 
         ArgumentParser arg("calculates tree attributes");
 

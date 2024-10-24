@@ -140,7 +140,7 @@ void ViewerOpenGL::renderClipFilter(const Region &clipFilter)
     }
 
     glColor3f(0.0F, 0.75F, 0.0F);
-    glDepthMask(GL_FALSE);
+    // glDepthMask(GL_FALSE);
     glEnable(GL_LINE_STIPPLE);
     glLineStipple(1, 0xff);
 
@@ -169,7 +169,7 @@ void ViewerOpenGL::renderClipFilter(const Region &clipFilter)
     }
 
     glDisable(GL_LINE_STIPPLE);
-    glDepthMask(GL_TRUE);
+    // glDepthMask(GL_TRUE);
 }
 
 void ViewerOpenGL::renderAabb(const ViewerAabb &box)

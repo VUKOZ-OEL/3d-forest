@@ -20,14 +20,14 @@ set(SUB_PROJECT_NAME "3DForestTreeAttributes")
 add_executable(
     ${SUB_PROJECT_NAME}
     treeattributes.cpp
-    ../../../plugins/treeattributes/TreeAttributesAction.cpp
-    ../../../plugins/treeattributes/TreeAttributesLeastSquaredRegression.cpp
+    ../../../plugins/ComputeTreeAttributes/ComputeTreeAttributesAction.cpp
+    ../../../plugins/ComputeTreeAttributes/ComputeTreeAttributesLeastSquaredRegression.cpp
 )
 
 target_include_directories(
     ${SUB_PROJECT_NAME}
     PUBLIC
-    ../../../plugins/treeattributes
+    ../../../plugins/ComputeTreeAttributes
     ../../../../3rdparty/eigen
 )
 

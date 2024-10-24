@@ -29,7 +29,7 @@
 #define LOG_MODULE_NAME "SettingsViewWindow"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/settingsview/", name))
+#define ICON(name) (ThemeIcon(":/SettingsViewResources/", name))
 
 SettingsViewWindow::SettingsViewWindow(MainWindow *mainWindow)
     : QDockWidget(mainWindow)

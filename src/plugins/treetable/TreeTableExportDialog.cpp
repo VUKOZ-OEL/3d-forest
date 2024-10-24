@@ -41,7 +41,7 @@
 #define LOG_MODULE_NAME "TreeTableExportDialog"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/treetable/", name))
+#define ICON(name) (ThemeIcon(":/TreeTableResources/", name))
 
 TreeTableExportDialog::TreeTableExportDialog(MainWindow *mainWindow,
                                              const QString &fileName)
@@ -96,7 +96,7 @@ TreeTableExportDialog::TreeTableExportDialog(MainWindow *mainWindow,
 
     // Window.
     setWindowTitle(tr("Export File"));
-    setWindowIcon(THEME_ICON("export_file"));
+    setWindowIcon(THEME_ICON("export-file"));
     setMaximumWidth(600);
     setMaximumHeight(height());
 }

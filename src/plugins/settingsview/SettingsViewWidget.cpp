@@ -40,7 +40,7 @@
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/settingsview/", name))
+#define ICON(name) (ThemeIcon(":/SettingsViewResources/", name))
 
 SettingsViewWidget::SettingsViewWidget(MainWindow *mainWindow)
     : QWidget(mainWindow),
@@ -219,6 +219,18 @@ void SettingsViewWidget::setViewSettings(const SettingsView &settings)
     // Color source.
     colorSourceComboBox_->setCurrentText(
         toString(settings_.colorSource()).c_str());
+
+    // Distance-based fading.
+    distanceBasedFadingVisibleCheckBox_->setChecked(
+        settings_.distanceBasedFadingVisible());
+
+    // Bounding box.
+    sceneBoundingBoxVisibleCheckBox_->setChecked(
+        settings_.sceneBoundingBoxVisible());
+
+    // Tree attributes.
+    treeAttributesVisibleCheckBox_->setChecked(
+        settings_.treeAttributesVisible());
 
     unblock();
 }

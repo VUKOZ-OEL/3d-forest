@@ -29,6 +29,7 @@
 
 // Include Qt.
 #include <QHBoxLayout>
+#include <QHeaderView>
 #include <QPushButton>
 #include <QTableWidget>
 #include <QVBoxLayout>
@@ -38,7 +39,7 @@
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/treetable/", name))
+#define ICON(name) (ThemeIcon(":/TreeTableResources/", name))
 
 TreeTableWidget::TreeTableWidget(MainWindow *mainWindow)
     : QWidget(),
@@ -51,6 +52,8 @@ TreeTableWidget::TreeTableWidget(MainWindow *mainWindow)
 
     tableWidget_->setRowCount(0);
     tableWidget_->setColumnCount(2);
+
+    tableWidget_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     tableWidget_->setStyleSheet("QHeaderView::section {"
                                 "background-color: lightblue;"
@@ -66,14 +69,9 @@ TreeTableWidget::TreeTableWidget(MainWindow *mainWindow)
     palette.setColor(QPalette::Base, Qt::white);
     tableWidget_->setPalette(palette);
 
-    // Layout.
-    QVBoxLayout *tableLayout = new QVBoxLayout;
-    tableLayout->addWidget(tableWidget_);
-    tableLayout->addStretch();
-
     // Buttons.
     exportButton_ = new QPushButton(tr("Export"));
-    exportButton_->setIcon(THEME_ICON("export_file"));
+    exportButton_->setIcon(THEME_ICON("export-file"));
     exportButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(exportButton_, SIGNAL(clicked()), this, SLOT(slotExport()));
 
@@ -84,10 +82,8 @@ TreeTableWidget::TreeTableWidget(MainWindow *mainWindow)
 
     // Main layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addLayout(tableLayout);
-    mainLayout->addSpacing(10);
-    mainLayout->addLayout(buttonsLayout);
-    mainLayout->addStretch();
+    mainLayout->addWidget(tableWidget_, 1);
+    mainLayout->addLayout(buttonsLayout, 0);
 
     // Widget.
     setLayout(mainLayout);
@@ -149,6 +145,9 @@ void TreeTableWidget::setSegments(const Segments &segments)
     // {
     //     tableWidget_->resizeColumnToContents(i);
     // }
+
+    tableWidget_->horizontalHeader()->setDefaultSectionSize(100);
+    tableWidget_->setColumnWidth(COLUMN_ID, 20);
 
     // Sort Content.
     tableWidget_->setSortingEnabled(true);
