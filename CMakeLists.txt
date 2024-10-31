@@ -25,6 +25,8 @@ endif()
 
 include(cmake/cxxflags.cmake)
 
+find_package(Threads REQUIRED)
+
 if(MSVC)
     # Lazy fix for Windows issue with dual mingw + msvc environment
     # Microsoft Visual Studio insists on using GNU MinGW Qt
