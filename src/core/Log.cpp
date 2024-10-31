@@ -247,7 +247,7 @@ void LoggerStdout::flush()
 LoggerFile::LoggerFile(const std::string &fileName)
 {
     file_.open(fileName, "w+t");
-};
+}
 
 void LoggerFile::println(const LogMessage &message)
 {
@@ -257,7 +257,7 @@ void LoggerFile::println(const LogMessage &message)
         std::to_string(message.threadId);
 
     file_.write(line + "\n");
-};
+}
 
 void LoggerFile::flush()
 {
