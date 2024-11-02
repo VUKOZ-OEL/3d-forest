@@ -34,6 +34,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "ImportFilePlugin"
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define IMPORT_PLUGIN_FILTER "LAS (LASer) File (*.las)"
@@ -68,7 +69,9 @@ void ImportFilePlugin::slotImportFile()
 
 static void importPluginDialog(MainWindow *mainWindow);
 
-static void importPluginFile(const QString &path, MainWindow *mainWindow);
+static void importPluginFile(const QString &path,
+                             const SettingsImport &settings,
+                             MainWindow *mainWindow);
 
 static bool importPluginCreateIndex(const QString &path,
                                     const SettingsImport &settings,
@@ -89,49 +92,71 @@ void ImportFilePlugin::importFile()
 
 static void importPluginDialog(MainWindow *mainWindow)
 {
-    QFileDialog dialog(mainWindow, QObject::tr("Import File"));
-    dialog.setNameFilter(QObject::tr(IMPORT_PLUGIN_FILTER));
+    LOG_DEBUG(<< "Start importing files.");
 
-    if (dialog.exec() == QDialog::Rejected)
+    QFileDialog fileDialog(mainWindow, QObject::tr("Import File"));
+    fileDialog.setNameFilter(QObject::tr(IMPORT_PLUGIN_FILTER));
+    fileDialog.setFileMode(QFileDialog::ExistingFiles);
+
+    if (fileDialog.exec() == QDialog::Rejected)
     {
+        LOG_DEBUG(<< "Canceled importing files from the dialog.");
         return;
     }
 
-    QStringList files = dialog.selectedFiles();
-    if (files.count() < 1)
+    QStringList files = fileDialog.selectedFiles();
+    QStringList selectedFiles;
+    for (auto const &file : files)
     {
+        if (file.length() > 0)
+        {
+            selectedFiles.append(file);
+        }
+    }
+
+    LOG_DEBUG(<< "Selected <" << selectedFiles.count() << "> files.");
+    if (selectedFiles.count() < 1)
+    {
+        LOG_DEBUG(<< "Canceled importing files. No files selected.");
         return;
     }
 
-    QString fileName = files.at(0);
-    if (fileName.isEmpty())
-    {
-        return;
-    }
-
-    importPluginFile(fileName, mainWindow);
-}
-
-static void importPluginFile(const QString &path, MainWindow *mainWindow)
-{
+    // Stop rendering.
     mainWindow->suspendThreads();
 
-    ImportFileDialog dialog(mainWindow);
+    // Import settings.
+    ImportFileDialog settingsDialog(mainWindow);
 
-    if (dialog.exec() == QDialog::Rejected)
+    if (settingsDialog.exec() == QDialog::Rejected)
     {
         return;
     }
 
-    SettingsImport settings = dialog.settings();
+    SettingsImport settings = settingsDialog.settings();
+
+    // Import.
+    for (auto const &file : selectedFiles)
+    {
+        importPluginFile(file, settings, mainWindow);
+    }
+
+    // Update.
+    mainWindow->updateNewProject();
+    mainWindow->slotRenderViewports();
+
+    LOG_DEBUG(<< "Finished importing files.");
+}
+
+static void importPluginFile(const QString &path,
+                             const SettingsImport &settings,
+                             MainWindow *mainWindow)
+{
+    LOG_DEBUG(<< "Import file <" << path.toStdString() << ">.");
 
     if (importPluginCreateIndex(path, settings, mainWindow))
     {
         mainWindow->editor().open(path.toStdString(), settings);
     }
-
-    mainWindow->updateNewProject();
-    mainWindow->slotRenderViewports();
 }
 
 static bool importPluginCreateIndex(const QString &path,

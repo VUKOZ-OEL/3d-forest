@@ -103,37 +103,59 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
 
 @image html 3d-forest-linux.png "3D Forest application on Debian 12 (with LXQt desktop)"
 
-@subsection build-linux-make-qt Install Qt
-    - Download Qt installer from https://www.qt.io/download
-        - Clicked "Downloads for open source users" button in "Go open source"
-        - Clicked "Download the Qt Online Installer" button in bottom section
-          of the page "Looking for Qt binaries"
-        - Recommended download was "Qt Online Installer for Linux (64-bit)"
-        - "Download" button saved file "qt-unified-linux-x64-4.6.0-online.run"
-    - Run the installer
-        - Checked "make file executable" in file properties of downloaded file
-        - Open "qt-unified-linux-x64-4.6.0-online.run", shows "Qt Setup" window
-        - Entered Qt Account Email and Password, "Next"
-        - Checked "I have read" and "I am an individual person", "Next", "Next"
-        - "/home/user/Qt" is directory where Qt will be installed, default
-        - Selected "Custom installation", "Next"
-        - Additionally checked: Qt - Qt 5.15.2 - Desktop gcc 64-bit
-        - Additionally checked: Qt - Qt 5.15.2 - Sources
-        - "Next", "Install", the installation took 13 minutes
-        - Qt installation will use 5.74 GB of disk space
-
-@subsection build-linux-make-opengl Installation of other tools: OpenGL and CMake from a terminal
+@subsection build-linux-make-apt Install Packages
+-#  Updating APT Packages
     @verbatim
-    $ sudo apt-get update
+    $ sudo apt update
+    $ sudo apt upgrade
+    @endverbatim
+
+-#  Installing Virtual Machine Tools [Optional]
+    @verbatim
+    $ sudo apt install open-vm-tools-desktop
+    @endverbatim
+
+-#  Installing Additional Tools: gcc, g++, make, libc6-dev, etc.
+    @verbatim
+    $ sudo apt install build-essential
+    @endverbatim
+
+-#  Installing Additional Tools: OpenGL and CMake from a terminal
+    @verbatim
     $ sudo apt install mesa-common-dev libglu1-mesa-dev
     $ sudo apt install cmake
     $ sudo apt install git
     @endverbatim
 
-@subsection build-linux-make-gcc Installation of other tools: gcc, g++, make, libc6-dev, etc.
+-#  Installing Required Libraries for Qt Installer [May not be necessary]
     @verbatim
-    $ sudo apt install build-essential
+    $ sudo apt install libxcb-cursor0 libxcb-cursor-dev
     @endverbatim
+
+@subsection build-linux-make-qt Install Qt
+    - Download Qt installer from https://www.qt.io/download
+        - Click "Downloads for open source users" button in "Go open source"
+        - Click "Download the Qt Online Installer" button in bottom section
+          of the page "Looking for Qt binaries"
+        - Recommended download was "Qt Online Installer for Linux (64-bit)"
+        - "Download" button saved file "qt-unified-linux-x64-4.6.0-online.run"
+    - Run the installer
+        - Check "make file executable" in file properties of downloaded file
+        - Open "qt-unified-linux-x64-4.6.0-online.run", shows "Qt Setup" window
+        - Enter Qt Account Email and Password, "Next"
+        - Check "I have read" and "I am an individual person", "Next", "Next"
+        - "/home/user/Qt" is directory where Qt will be installed, default
+        - Select "Custom installation", "Next"
+        - The current installer allows to install versions 6.5.3 to 6.8.0
+            - Additionally checked: Qt - Qt 6.5.3 - Desktop gcc 64-bit
+            - Additionally checked: Qt - Qt 6.5.3 - Sources
+        - To install older version like 5.15.0
+            - Check "Archive" checkbox and click "Filter" button
+            - Click "Deselect All" button if you do not need Qt Design Studio etc.
+            - Check Qt - Qt 5.15.0 - Desktop gcc 64-bit
+            - Check Qt - Qt 5.15.0 - Sources
+        - Click "Next", license checkbox and "Next", click "Install"
+        - Qt 5.15 installation used 3.65 GB of disk space and took about 10 minutes
 
 @subsection build-linux-make-3dforest Build 3D Forest
 -#  Get 3D Forest source code
@@ -147,8 +169,8 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
     $ cd /home/user/3d-forest
     $ mkdir build
     $ cd /home/user/3d-forest/build
-    $ PATH=$PATH:/home/user/Qt/5.15.2/gcc_64/bin
-    $ cmake -G "Unix Makefiles" .. -DCMAKE_INSTALL_PREFIX=..
+    $ PATH=$PATH:/home/user/Qt/5.15.0/gcc_64/bin
+    $ cmake -G "Unix Makefiles" .. -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_INSTALL_RPATH="/home/user/3d-forest/bin;/home/user/Qt/5.15.0/gcc_64/lib" -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE
     $ make
     $ make install
     @endverbatim
@@ -156,17 +178,8 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
 -#  Start 3D Forest application
     @verbatim
     $ cd /home/user/3d-forest/bin
-    $ LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/3d-forest/bin:/home/user/Qt/5.15.2/gcc_64/lib ./3DForest
+    $ ./3DForest
     @endverbatim
-
--#  We can open example project "project.json" from directory
-    "/home/user/3d-forest/data"
-
--#  We can see that we did not store modified PATH and LD_LIBRARY_PATH to user
-    or system variables.
-    One could modify "/home/<user>/.bashrc" or "/home/<user>/.profile" to make
-    the change persistent.
-
 
 
 @section build-macos-make Build from Source Code in Mac OS with "Unix Makefiles"
