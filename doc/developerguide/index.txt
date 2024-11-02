@@ -101,7 +101,7 @@ using APIs in 3D Forest and other libraries.
 The code uses C++17, CMake, Qt5/Qt6 and OpenGL which will be installed in the
 following steps. Qt and OpenGL are required only for GUI desktop application.
 
-@image html 3d-forest-linux.png "3D Forest application on Debian 12 (with LXQt desktop)"
+@image html 3d-forest-linux.png "3D Forest application on Lubuntu 20.04 (with LXQt desktop)"
 
 @subsection build-linux-make-apt Install Packages
 -#  Updating APT Packages
