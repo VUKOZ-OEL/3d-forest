@@ -37,4 +37,9 @@ target_compile_definitions(
     EXPORT_${SUB_PROJECT_NAME}=1
 )
 
+target_link_libraries(
+    ${SUB_PROJECT_NAME}
+    Threads::Threads
+)
+
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

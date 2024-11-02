@@ -25,6 +25,8 @@ endif()
 
 include(cmake/cxxflags.cmake)
 
+find_package(Threads REQUIRED)
+
 if(MSVC)
     # Lazy fix for Windows issue with dual mingw + msvc environment
     # Microsoft Visual Studio insists on using GNU MinGW Qt
@@ -34,24 +36,24 @@ endif()
 
 find_package(OpenGL QUIET)
 
-if(FORCE_QT5)
-    # When CMake would otherwise autodetect Qt6
-    find_package(Qt5 COMPONENTS Core Gui Widgets OpenGL)
-    if (Qt5_FOUND AND Qt5OpenGL_FOUND AND OpenGL_FOUND)
-        message(STATUS "Gui with Qt5 and OpenGL found")
-        set(QT_VERSION_MAJOR 5)
-    endif()
-else()
-    # Default autodetect Qt version
+if(FORCE_QT6)
+    # When CMake would otherwise autodetect Qt5
     find_package(Qt6 COMPONENTS Core Gui Widgets OpenGL OpenGLWidgets)
     if(Qt6_FOUND AND Qt6OpenGL_FOUND AND OpenGL_FOUND)
         message(STATUS "Gui with Qt6 and OpenGL found")
         set(QT_VERSION_MAJOR 6)
+    endif()
+else()
+    # Default autodetect Qt version
+    find_package(Qt5 COMPONENTS Core Gui Widgets OpenGL)
+    if (Qt5_FOUND AND Qt5OpenGL_FOUND AND OpenGL_FOUND)
+        message(STATUS "Gui with Qt5 and OpenGL found")
+        set(QT_VERSION_MAJOR 5)
     else()
-        find_package(Qt5 COMPONENTS Core Gui Widgets OpenGL)
-        if (Qt5_FOUND AND Qt5OpenGL_FOUND AND OpenGL_FOUND)
-            message(STATUS "Gui with Qt5 and OpenGL found")
-            set(QT_VERSION_MAJOR 5)
+        find_package(Qt6 COMPONENTS Core Gui Widgets OpenGL OpenGLWidgets)
+        if(Qt6_FOUND AND Qt6OpenGL_FOUND AND OpenGL_FOUND)
+            message(STATUS "Gui with Qt6 and OpenGL found")
+            set(QT_VERSION_MAJOR 6)
         endif()
     endif()
 endif()
