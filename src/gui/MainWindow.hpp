@@ -35,6 +35,7 @@ class PluginInterface;
 class ProjectFileInterface;
 class ImportFileInterface;
 class ViewerInterface;
+class HelpPlugin;
 
 // Include Qt.
 #include <QHash>
@@ -167,6 +168,7 @@ private:
     ProjectFileInterface *projectFilePlugin_;
     ImportFileInterface *importFilePlugin_;
     ViewerInterface *viewerPlugin_;
+    HelpPlugin *helpPlugin_;
 
     std::vector<PluginInterface *> plugins_;
 
