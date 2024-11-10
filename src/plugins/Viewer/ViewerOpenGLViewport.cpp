@@ -636,7 +636,7 @@ void ViewerOpenGLViewport::renderSceneSettingsEnable()
     glClearColor(static_cast<float>(rgb[0]),
                  static_cast<float>(rgb[1]),
                  static_cast<float>(rgb[2]),
-                 0.0F);
+                 1.0F);
 
     // Point size.
     glPointSize(static_cast<float>(opt.pointSize()));
