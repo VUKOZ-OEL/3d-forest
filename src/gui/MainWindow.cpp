@@ -28,6 +28,7 @@
 #include <PluginInterface.hpp>
 #include <ProjectFileInterface.hpp>
 #include <ViewerInterface.hpp>
+
 #include <HelpPlugin.hpp>
 
 // Include Qt.
