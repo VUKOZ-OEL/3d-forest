@@ -28,6 +28,7 @@
 #include <PluginInterface.hpp>
 #include <ProjectFileInterface.hpp>
 #include <ViewerInterface.hpp>
+#include <HelpPlugin.hpp>
 
 // Include Qt.
 #include <QCloseEvent>
@@ -58,7 +59,8 @@ MainWindow::MainWindow(QWidget *parent)
       threadRender_(&editor_),
       projectFilePlugin_(nullptr),
       importFilePlugin_(nullptr),
-      viewerPlugin_(nullptr)
+      viewerPlugin_(nullptr),
+      helpPlugin_(nullptr)
 {
     LOG_DEBUG(<< "Start creating the main window.");
 
@@ -66,6 +68,9 @@ MainWindow::MainWindow(QWidget *parent)
     statusBar()->showMessage(tr("Ready"));
 
     // Plugins.
+    helpPlugin_ = new HelpPlugin();
+    helpPlugin_->initialize(this);
+
     loadPlugins();
 
     // Exit.
