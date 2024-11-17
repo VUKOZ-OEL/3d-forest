@@ -396,6 +396,20 @@ inline std::string toString(unsigned long long in)
     return std::to_string(in);
 }
 
+inline void fromString(double &out, const std::string &in)
+{
+    auto index = in.find(".");
+    if (index == std::string::npos)
+    {
+        out = static_cast<double>(std::stoll(in));
+        return;
+    }
+    double whole = static_cast<double>(std::stoll(in.substr(0, index)));
+    double fraction = static_cast<double>(std::stoll(in.substr(index + 1)));
+    double exponent = static_cast<double>(in.substr(index + 1).size());
+    out = whole + (fraction / std::pow(10.0, exponent));
+}
+
 #include <WarningsEnable.hpp>
 
 #endif /* UTIL_HPP */
