@@ -32,6 +32,7 @@ static const char *EDITOR_KEY_PROJECT_NAME = "projectName";
 static const char *EDITOR_KEY_DATA_SET = "datasets";
 static const char *EDITOR_KEY_SEGMENT = "segments";
 static const char *EDITOR_KEY_SETTINGS = "settings";
+static const char *EDITOR_KEY_APPLICATION_SETTINGS = "applicationSettings";
 // static const char *EDITOR_KEY_CLASSIFICATIONS = "classifications";
 // static const char *EDITOR_KEY_CLIP_FILTER = "clipFilter";
 // static const char *EDITOR_KEY_ELEVATION_RANGE = "elevationRange";
@@ -40,6 +41,7 @@ Editor::Editor()
 {
     LOG_DEBUG(<< "Start creating the editor.");
     close();
+    readApplicationSettings();
     viewportsResize(1);
     LOG_DEBUG(<< "Finished creating the editor.");
 }
@@ -47,6 +49,38 @@ Editor::Editor()
 Editor::~Editor()
 {
     LOG_DEBUG(<< "Destroy.");
+}
+
+void Editor::readApplicationSettings()
+{
+    LOG_DEBUG(<< "Start reading application settings.");
+
+    try
+    {
+        Json in;
+        in.read("settings.json");
+
+        ApplicationSettings newSettings;
+        fromJson(newSettings, in[EDITOR_KEY_APPLICATION_SETTINGS]);
+        applicationSettings_ = newSettings;
+    }
+    catch (std::exception &e)
+    {
+        LOG_WARNING(<< "Cancel reading application settings, error message <"
+                    << e.what() << ">. Using settings <"
+                    << toString(applicationSettings_) << ">.");
+        return;
+    }
+    catch (...)
+    {
+        LOG_WARNING(<< "Cancel reading application settings, unknown exception "
+                       "is raised. Using settings <"
+                    << toString(applicationSettings_) << ">.");
+        return;
+    }
+
+    LOG_DEBUG(<< "Finished reading application settings <"
+              << toString(applicationSettings_) << ">.");
 }
 
 void Editor::close()

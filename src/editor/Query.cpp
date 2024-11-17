@@ -35,7 +35,7 @@
 Query::Query(Editor *editor) : editor_(editor)
 {
     maximumResults_ = 0;
-    cacheSizeMax_ = 20;
+    cacheSizeMax_ = editor->applicationSettings().cacheSizeMaximum();
 }
 
 Query::~Query()
