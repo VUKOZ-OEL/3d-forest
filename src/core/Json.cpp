@@ -376,12 +376,10 @@ void Json::deserialize(Json &obj, const char *in, size_t n, size_t &i)
                     double number{0.0};
                     fromString(number, str);
                     obj.createNumber(number);
-                    LOG_DEBUG(<< "Read JSON number <"
-                              << std::fixed << std::setprecision(12)
-                              << obj.number()
+                    LOG_DEBUG(<< "Read JSON number <" << std::fixed
+                              << std::setprecision(12) << obj.number()
                               << "> converted as <" << number
-                              << "> from string <" << str
-                              << ">.");
+                              << "> from string <" << str << ">.");
                     return;
                 }
                 break;
