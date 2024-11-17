@@ -26,9 +26,11 @@
 // Include 3D Forest.
 #include <File.hpp>
 #include <Json.hpp>
+#include <Util.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "Json"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 void Json::clear()
@@ -371,7 +373,15 @@ void Json::deserialize(Json &obj, const char *in, size_t n, size_t &i)
                     {
                         str[j] = in[str_start + j];
                     }
-                    obj.createNumber(std::stod(str));
+                    double number{0.0};
+                    fromString(number, str);
+                    obj.createNumber(number);
+                    LOG_DEBUG(<< "Read JSON number <"
+                              << std::fixed << std::setprecision(12)
+                              << obj.number()
+                              << "> converted as <" << number
+                              << "> from string <" << str
+                              << ">.");
                     return;
                 }
                 break;
