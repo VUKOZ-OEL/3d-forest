@@ -115,14 +115,19 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
     $ sudo apt install open-vm-tools-desktop
     @endverbatim
 
--#  Installing Additional Tools: gcc, g++, make, libc6-dev, etc.
+-#  Installing Additional Tools: C/C++ development
     @verbatim
     $ sudo apt install build-essential
     @endverbatim
 
--#  Installing Additional Tools: OpenGL and CMake from a terminal
+-#  Installing Additional Tools: GUI development with OpenGL 3D graphics library
     @verbatim
-    $ sudo apt install mesa-common-dev libglu1-mesa-dev
+    $ sudo apt install mesa-common-dev libgl1-mesa-dev
+    $ sudo apt install libxkbcommon-dev libxkbfile-dev
+    @endverbatim
+
+-#  Installing Additional Tools: CMake and GIT
+    @verbatim
     $ sudo apt install cmake
     $ sudo apt install git
     @endverbatim
@@ -130,52 +135,53 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
 -#  Installing Required Libraries for Qt Installer [May not be necessary]
     @verbatim
     $ sudo apt install libxcb-cursor0 libxcb-cursor-dev
+    $ sudo apt-get install libxcb-xinerama0
     @endverbatim
 
 @subsection build-linux-make-qt Install Qt
     - Download Qt installer from https://www.qt.io/download
-        - Click "Downloads for open source users" button in "Go open source"
-        - Click "Download the Qt Online Installer" button in bottom section
-          of the page "Looking for Qt binaries"
-        - Recommended download was "Qt Online Installer for Linux (64-bit)"
-        - "Download" button saved file "qt-unified-linux-x64-4.6.0-online.run"
+        - Click the "Downloads for open source users" button under "Go open source"
+        - Click the "Download the Qt Online Installer" button in the bottom section
+          of the "Looking for Qt binaries" page
+        - The recommended download is usually "Qt Online Installer for Linux (64-bit)"
+        - The "Download" button saved the file as "qt-unified-linux-x64-4.6.0-online.run"
     - Run the installer
-        - Check "make file executable" in file properties of downloaded file
-        - Open "qt-unified-linux-x64-4.6.0-online.run", shows "Qt Setup" window
-        - Enter Qt Account Email and Password, "Next"
-        - Check "I have read" and "I am an individual person", "Next", "Next"
-        - "/home/user/Qt" is directory where Qt will be installed, default
-        - Select "Custom installation", "Next"
-        - The current installer allows to install versions 6.5.3 to 6.8.0
-            - Additionally checked: Qt - Qt 6.5.3 - Desktop gcc 64-bit
-            - Additionally checked: Qt - Qt 6.5.3 - Sources
-        - To install older version like 5.15.0
-            - Check "Archive" checkbox and click "Filter" button
+        - You may need to check the "Make file executable" option in the file properties of the downloaded file
+        - Opening qt-unified-linux-x64-4.6.0-online.run will display the "Qt Setup" window
+        - Enter your Qt Account email and password, then click "Next"
+        - Check the boxes for "I have read" and "I am an individual person," then click 'Next'
+        - Click "Next"
+        - "/home/user/Qt" is the default directory where Qt will be installed
+        - Select "Custom installation", then click "Next"
+        - The current installer allows you to install Qt versions from 6.5.3 to 6.8.0.
+          Older versions like Qt 5.15.0 are available by selecting the "Archive" checkbox.
             - Click "Deselect All" button if you do not need Qt Design Studio etc.
-            - Check Qt - Qt 5.15.0 - Desktop gcc 64-bit
-            - Check Qt - Qt 5.15.0 - Sources
-        - Click "Next", license checkbox and "Next", click "Install"
-        - Qt 5.15 installation used 3.65 GB of disk space and took about 10 minutes
+            - Check: Qt - Qt 6.8.0 - Desktop
+            - Check: Qt - Qt 6.8.0 - Sources
+            - Click "Next"
+        - Check license checkbox and click "Next"
+        - Click "Install" button
+        - Qt 6.8.0 installation used 2.77 GB of disk space and took about 8 minutes
 
 @subsection build-linux-make-3dforest Build 3D Forest
--#  Get 3D Forest source code
+-#  Download the 3D Forest source code
     @verbatim
     $ cd /home/user/
     $ git clone https://github.com/VUKOZ-OEL/3d-forest.git
     @endverbatim
 
--#  Build 3D Forest
+-#  Build the 3D Forest project
     @verbatim
     $ cd /home/user/3d-forest
     $ mkdir build
     $ cd /home/user/3d-forest/build
-    $ PATH=$PATH:/home/user/Qt/5.15.0/gcc_64/bin
-    $ cmake -G "Unix Makefiles" .. -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_INSTALL_RPATH="/home/user/3d-forest/bin;/home/user/Qt/5.15.0/gcc_64/lib" -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE
+    $ PATH=$PATH:/home/user/Qt/6.8.0/gcc_64/bin
+    $ cmake -G "Unix Makefiles" .. -DCMAKE_INSTALL_PREFIX=.. -DOpenGL_GL_PREFERENCE=GLVND -DCMAKE_INSTALL_RPATH="/home/user/3d-forest/bin;/home/user/Qt/6.8.0/gcc_64/lib" -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE
     $ make
     $ make install
     @endverbatim
 
--#  Start 3D Forest application
+-#  Start the 3D Forest application
     @verbatim
     $ cd /home/user/3d-forest/bin
     $ ./3DForest
@@ -817,7 +823,7 @@ cmake -G "MinGW Makefiles" .. -DCMAKE_INSTALL_PREFIX=.. -DCMAKE_BUILD_TYPE=Debug
 mingw32-make format
 mingw32-make
 mingw32-make install
-mingw32-make doxygen
+mingw32-make doc
 qhelpgenerator ..\doc\index.qhcp -o html\index.qhc
 mkdir ..\bin\documentation
 copy html\index.qhc ..\bin\documentation\
