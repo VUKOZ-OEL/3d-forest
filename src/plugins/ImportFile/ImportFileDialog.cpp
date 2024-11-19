@@ -134,16 +134,16 @@ void ImportFileDialog::slotReject()
     setResult(QDialog::Rejected);
 }
 
-SettingsImport ImportFileDialog::settings() const
+ImportSettings ImportFileDialog::settings() const
 {
-    SettingsImport settingsImport;
+    ImportSettings settings;
 
-    settingsImport.convertToVersion1Dot4 = convertCheckBox_->isChecked();
-    settingsImport.translateToOrigin = translateToOriginCheckBox_->isChecked();
-    settingsImport.randomizePoints = randomizeCheckBox_->isChecked();
-    settingsImport.copyExtraBytes = copyExtraBytesCheckBox_->isChecked();
+    settings.convertToVersion1Dot4 = convertCheckBox_->isChecked();
+    settings.translateToOrigin = translateToOriginCheckBox_->isChecked();
+    settings.randomizePoints = randomizeCheckBox_->isChecked();
+    settings.copyExtraBytes = copyExtraBytesCheckBox_->isChecked();
 
-    return settingsImport;
+    return settings;
 }
 
 void ImportFileDialog::slotHelp()

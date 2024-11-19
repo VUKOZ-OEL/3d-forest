@@ -17,16 +17,16 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SettingsImport.cpp */
+/** @file ImportSettings.cpp */
 
 // Include 3D Forest.
-#include <SettingsImport.hpp>
+#include <ImportSettings.hpp>
 
 // Include local.
-#define LOG_MODULE_NAME "SettingsImport"
+#define LOG_MODULE_NAME "ImportSettings"
 #include <Log.hpp>
 
-SettingsImport::SettingsImport()
+ImportSettings::ImportSettings()
     : convertToVersion1Dot4(false),
       translateToOrigin(false),
       randomizePoints(true),

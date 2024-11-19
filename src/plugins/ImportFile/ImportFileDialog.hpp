@@ -23,7 +23,7 @@
 #define IMPORT_FILE_DIALOG_HPP
 
 // Include 3D Forest.
-#include <SettingsImport.hpp>
+#include <ImportSettings.hpp>
 class MainWindow;
 class InfoDialog;
 
@@ -40,7 +40,7 @@ class ImportFileDialog : public QDialog
 public:
     ImportFileDialog(MainWindow *mainWindow);
 
-    SettingsImport settings() const;
+    ImportSettings settings() const;
 
 public slots:
     void slotHelp();

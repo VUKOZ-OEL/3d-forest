@@ -17,10 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SettingsImport.hpp */
+/** @file ImportSettings.hpp */
 
-#ifndef SETTINGS_IMPORT_HPP
-#define SETTINGS_IMPORT_HPP
+#ifndef IMPORT_SETTINGS_HPP
+#define IMPORT_SETTINGS_HPP
 
 // Include std.
 #include <cstddef>
@@ -29,8 +29,8 @@
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 
-/** Settings Import. */
-class EXPORT_EDITOR SettingsImport
+/** Import Settings. */
+class EXPORT_EDITOR ImportSettings
 {
 public:
     bool convertToVersion1Dot4;
@@ -46,9 +46,9 @@ public:
 
     size_t bufferSize;
 
-    SettingsImport();
+    ImportSettings();
 };
 
 #include <WarningsEnable.hpp>
 
-#endif /* SETTINGS_IMPORT_HPP */
+#endif /* IMPORT_SETTINGS_HPP */

@@ -70,11 +70,11 @@ void ImportFilePlugin::slotImportFile()
 static void importPluginDialog(MainWindow *mainWindow);
 
 static void importPluginFile(const QString &path,
-                             const SettingsImport &settings,
+                             const ImportSettings &settings,
                              MainWindow *mainWindow);
 
 static bool importPluginCreateIndex(const QString &path,
-                                    const SettingsImport &settings,
+                                    const ImportSettings &settings,
                                     MainWindow *mainWindow);
 
 void ImportFilePlugin::importFile()
@@ -132,7 +132,7 @@ static void importPluginDialog(MainWindow *mainWindow)
         return;
     }
 
-    SettingsImport settings = settingsDialog.settings();
+    ImportSettings settings = settingsDialog.settings();
 
     // Import.
     for (auto const &file : selectedFiles)
@@ -148,7 +148,7 @@ static void importPluginDialog(MainWindow *mainWindow)
 }
 
 static void importPluginFile(const QString &path,
-                             const SettingsImport &settings,
+                             const ImportSettings &settings,
                              MainWindow *mainWindow)
 {
     LOG_DEBUG(<< "Import file <" << path.toStdString() << ">.");
@@ -160,7 +160,7 @@ static void importPluginFile(const QString &path,
 }
 
 static bool importPluginCreateIndex(const QString &path,
-                                    const SettingsImport &settings,
+                                    const ImportSettings &settings,
                                     MainWindow *mainWindow)
 {
     // If the index already exists, then return success.

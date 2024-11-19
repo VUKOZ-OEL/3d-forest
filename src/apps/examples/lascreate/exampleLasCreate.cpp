@@ -167,7 +167,7 @@ static void createLine(const std::string &path)
 static void createIndex(const std::string &path)
 {
     // Create LAS file index
-    SettingsImport settings;
+    ImportSettings settings;
     IndexFileBuilder::index(path, path, settings);
 }
 #endif

@@ -175,7 +175,7 @@ void Datasets::erase(size_t i)
 
 void Datasets::read(const std::string &path,
                     const std::string &projectPath,
-                    const SettingsImport &settings,
+                    const ImportSettings &settings,
                     const Box<double> &projectBoundary,
                     QueryFilterSet &filter)
 {
