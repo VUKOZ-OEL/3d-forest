@@ -58,6 +58,9 @@ ImportFileDialog::ImportFileDialog(MainWindow *mainWindow)
     QGroupBox *options = new QGroupBox(tr("Options"));
 
     // Widgets with options.
+    importFilesAsSeparateTreesCheckBox_ = new QCheckBox;
+    importFilesAsSeparateTreesCheckBox_->setChecked(false);
+
     convertCheckBox_ = new QCheckBox;
     convertCheckBox_->setChecked(false);
 
@@ -85,6 +88,11 @@ ImportFileDialog::ImportFileDialog(MainWindow *mainWindow)
     // Layout.
     QGridLayout *optionsLayout = new QGridLayout;
     int row = 0;
+    optionsLayout->addWidget(new QLabel(tr("Import files as separate trees")),
+                             row,
+                             0);
+    optionsLayout->addWidget(importFilesAsSeparateTreesCheckBox_, row, 1);
+    row++;
     optionsLayout->addWidget(new QLabel(tr("Convert to v1.4+")), row, 0);
     optionsLayout->addWidget(convertCheckBox_, row, 1);
     row++;
@@ -138,6 +146,8 @@ ImportSettings ImportFileDialog::settings() const
 {
     ImportSettings settings;
 
+    settings.importFilesAsSeparateTrees =
+        importFilesAsSeparateTreesCheckBox_->isChecked();
     settings.convertToVersion1Dot4 = convertCheckBox_->isChecked();
     settings.translateToOrigin = translateToOriginCheckBox_->isChecked();
     settings.randomizePoints = randomizeCheckBox_->isChecked();
@@ -153,6 +163,8 @@ void ImportFileDialog::slotHelp()
         "<h2>Options</h2>"
         "The import file dialog allows to set the following options: "
         "<ul>"
+        "<li><b>Import files as separate trees</b> -"
+        " Import each file as a separate tree.</li>"
         "<li><b>Convert to v1.4+</b> -"
         " Convert LAS file to version 1.4 if it is in lower version."
         " Version 1.4 allows to use more classifications, GPS coordinates,"

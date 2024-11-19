@@ -33,6 +33,7 @@
 class EXPORT_EDITOR ImportSettings
 {
 public:
+    bool importFilesAsSeparateTrees;
     bool convertToVersion1Dot4;
     bool translateToOrigin;
     bool randomizePoints;

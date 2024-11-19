@@ -77,6 +77,8 @@ static bool importPluginCreateIndex(const QString &path,
                                     const ImportSettings &settings,
                                     MainWindow *mainWindow);
 
+static void importPluginAddAsNewTree(MainWindow *mainWindow);
+
 void ImportFilePlugin::importFile()
 {
     try
@@ -153,9 +155,16 @@ static void importPluginFile(const QString &path,
 {
     LOG_DEBUG(<< "Import file <" << path.toStdString() << ">.");
 
-    if (importPluginCreateIndex(path, settings, mainWindow))
+    if (!importPluginCreateIndex(path, settings, mainWindow))
     {
-        mainWindow->editor().open(path.toStdString(), settings);
+        return;
+    }
+
+    mainWindow->editor().open(path.toStdString(), settings);
+
+    if (settings.importFilesAsSeparateTrees)
+    {
+        importPluginAddAsNewTree(mainWindow);
     }
 }
 
@@ -227,4 +236,46 @@ static bool importPluginCreateIndex(const QString &path,
     progressDialog.setValue(progressDialog.maximum());
 
     return true;
+}
+
+static void importPluginAddAsNewTree(MainWindow *mainWindow)
+{
+    Editor &editor = mainWindow->editor();
+
+    Segments segments = editor.segments();
+    QueryFilterSet segmentsFilter = editor.segmentsFilter();
+    const Datasets datasets = editor.datasets();
+
+    if (datasets.size() < 1)
+    {
+        return;
+    }
+
+    const Dataset &dataset = datasets.at(datasets.size() - 1);
+
+    size_t segmentId = segments.unusedId();
+
+    /** @todo Progress dialog with cancel button. */
+    QueryFilterSet filter;
+    filter.setFilter({dataset.id()});
+    filter.setEnabled(true);
+
+    QueryWhere where;
+    where.setDataset(filter);
+
+    Query query(&editor);
+    query.setWhere(where);
+    query.exec();
+    while (query.next())
+    {
+        query.segment() = segmentId;
+        query.setModified();
+    }
+    query.flush();
+
+    segments.addTree(segmentId, dataset.boundary());
+    segmentsFilter.setEnabled(segmentId, true);
+
+    editor.setSegments(segments);
+    editor.setSegmentsFilter(segmentsFilter);
 }

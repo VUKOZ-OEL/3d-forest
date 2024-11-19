@@ -27,7 +27,8 @@
 #include <Log.hpp>
 
 ImportSettings::ImportSettings()
-    : convertToVersion1Dot4(false),
+    : importFilesAsSeparateTrees(false),
+      convertToVersion1Dot4(false),
       translateToOrigin(false),
       randomizePoints(true),
       copyExtraBytes(true),

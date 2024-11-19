@@ -50,6 +50,7 @@ public slots:
 protected:
     InfoDialog *helpDialog_;
 
+    QCheckBox *importFilesAsSeparateTreesCheckBox_;
     QCheckBox *convertCheckBox_;
     QCheckBox *translateToOriginCheckBox_;
     QCheckBox *randomizeCheckBox_;
