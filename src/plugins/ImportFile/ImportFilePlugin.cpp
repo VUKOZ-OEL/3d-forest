@@ -255,7 +255,6 @@ static void importPluginAddAsNewTree(MainWindow *mainWindow)
 
     size_t segmentId = segments.unusedId();
 
-    /** @todo Progress dialog with cancel button. */
     QueryFilterSet filter;
     filter.setFilter({dataset.id()});
     filter.setEnabled(true);
@@ -266,12 +265,55 @@ static void importPluginAddAsNewTree(MainWindow *mainWindow)
     Query query(&editor);
     query.setWhere(where);
     query.exec();
+
+    bool canceled = false;
+    int i = 0;
+    int maximum = static_cast<int>(dataset.nPoints());
+    int j = 0;
+    int n = 10 * 1000;
+
+    QProgressDialog progressDialog(mainWindow);
+    progressDialog.setCancelButtonText(QObject::tr("&Cancel"));
+    progressDialog.setRange(0, maximum);
+    progressDialog.setWindowTitle(QObject::tr("Add new tree"));
+    progressDialog.setWindowModality(Qt::WindowModal);
+    progressDialog.setMinimumDuration(0);
+    progressDialog.show();
+
     while (query.next())
     {
         query.segment() = segmentId;
         query.setModified();
+
+        i++;
+        if (i > maximum)
+        {
+            i = maximum;
+        }
+
+        j++;
+        if (j >= n)
+        {
+            j = 0;
+            progressDialog.setValue(i);
+
+            QCoreApplication::processEvents();
+            if (progressDialog.wasCanceled())
+            {
+                canceled = true;
+                break;
+            }
+        }
     }
+
+    progressDialog.setValue(progressDialog.maximum());
+
     query.flush();
+
+    if (canceled)
+    {
+        return;
+    }
 
     segments.addTree(segmentId, dataset.boundary());
     segmentsFilter.setEnabled(segmentId, true);
