@@ -23,7 +23,7 @@
 #define IMPORT_FILE_DIALOG_HPP
 
 // Include 3D Forest.
-#include <SettingsImport.hpp>
+#include <ImportSettings.hpp>
 class MainWindow;
 class InfoDialog;
 
@@ -40,7 +40,7 @@ class ImportFileDialog : public QDialog
 public:
     ImportFileDialog(MainWindow *mainWindow);
 
-    SettingsImport settings() const;
+    ImportSettings settings() const;
 
 public slots:
     void slotHelp();
@@ -50,9 +50,11 @@ public slots:
 protected:
     InfoDialog *helpDialog_;
 
-    QCheckBox *convertCheckBox_;
+    QCheckBox *importFilesAsSeparateTreesCheckBox_;
     QCheckBox *translateToOriginCheckBox_;
-    QCheckBox *randomizeCheckBox_;
+
+    QCheckBox *convertToVersion1Dot4CheckBox_;
+    QCheckBox *randomizePointsCheckBox_;
     QCheckBox *copyExtraBytesCheckBox_;
 
     QPushButton *helpButton_;

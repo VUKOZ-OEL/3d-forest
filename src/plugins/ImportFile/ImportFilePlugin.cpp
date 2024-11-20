@@ -70,12 +70,14 @@ void ImportFilePlugin::slotImportFile()
 static void importPluginDialog(MainWindow *mainWindow);
 
 static void importPluginFile(const QString &path,
-                             const SettingsImport &settings,
+                             const ImportSettings &settings,
                              MainWindow *mainWindow);
 
 static bool importPluginCreateIndex(const QString &path,
-                                    const SettingsImport &settings,
+                                    const ImportSettings &settings,
                                     MainWindow *mainWindow);
+
+static void importPluginAddAsNewTree(MainWindow *mainWindow);
 
 void ImportFilePlugin::importFile()
 {
@@ -132,7 +134,7 @@ static void importPluginDialog(MainWindow *mainWindow)
         return;
     }
 
-    SettingsImport settings = settingsDialog.settings();
+    ImportSettings settings = settingsDialog.settings();
 
     // Import.
     for (auto const &file : selectedFiles)
@@ -148,19 +150,26 @@ static void importPluginDialog(MainWindow *mainWindow)
 }
 
 static void importPluginFile(const QString &path,
-                             const SettingsImport &settings,
+                             const ImportSettings &settings,
                              MainWindow *mainWindow)
 {
     LOG_DEBUG(<< "Import file <" << path.toStdString() << ">.");
 
-    if (importPluginCreateIndex(path, settings, mainWindow))
+    if (!importPluginCreateIndex(path, settings, mainWindow))
     {
-        mainWindow->editor().open(path.toStdString(), settings);
+        return;
+    }
+
+    mainWindow->editor().open(path.toStdString(), settings);
+
+    if (settings.importFilesAsSeparateTrees)
+    {
+        importPluginAddAsNewTree(mainWindow);
     }
 }
 
 static bool importPluginCreateIndex(const QString &path,
-                                    const SettingsImport &settings,
+                                    const ImportSettings &settings,
                                     MainWindow *mainWindow)
 {
     // If the index already exists, then return success.
@@ -227,4 +236,88 @@ static bool importPluginCreateIndex(const QString &path,
     progressDialog.setValue(progressDialog.maximum());
 
     return true;
+}
+
+static void importPluginAddAsNewTree(MainWindow *mainWindow)
+{
+    Editor &editor = mainWindow->editor();
+
+    Segments segments = editor.segments();
+    QueryFilterSet segmentsFilter = editor.segmentsFilter();
+    const Datasets datasets = editor.datasets();
+
+    if (datasets.size() < 1)
+    {
+        return;
+    }
+
+    const Dataset &dataset = datasets.at(datasets.size() - 1);
+
+    size_t segmentId = segments.unusedId();
+
+    QueryFilterSet filter;
+    filter.setFilter({dataset.id()});
+    filter.setEnabled(true);
+
+    QueryWhere where;
+    where.setDataset(filter);
+
+    Query query(&editor);
+    query.setWhere(where);
+    query.exec();
+
+    bool canceled = false;
+    int i = 0;
+    int maximum = static_cast<int>(dataset.nPoints());
+    int j = 0;
+    int n = 10 * 1000;
+
+    QProgressDialog progressDialog(mainWindow);
+    progressDialog.setCancelButtonText(QObject::tr("&Cancel"));
+    progressDialog.setRange(0, maximum);
+    progressDialog.setWindowTitle(QObject::tr("Add new tree"));
+    progressDialog.setWindowModality(Qt::WindowModal);
+    progressDialog.setMinimumDuration(0);
+    progressDialog.show();
+
+    while (query.next())
+    {
+        query.segment() = segmentId;
+        query.setModified();
+
+        i++;
+        if (i > maximum)
+        {
+            i = maximum;
+        }
+
+        j++;
+        if (j >= n)
+        {
+            j = 0;
+            progressDialog.setValue(i);
+
+            QCoreApplication::processEvents();
+            if (progressDialog.wasCanceled())
+            {
+                canceled = true;
+                break;
+            }
+        }
+    }
+
+    progressDialog.setValue(progressDialog.maximum());
+
+    query.flush();
+
+    if (canceled)
+    {
+        return;
+    }
+
+    segments.addTree(segmentId, dataset.boundary());
+    segmentsFilter.setEnabled(segmentId, true);
+
+    editor.setSegments(segments);
+    editor.setSegmentsFilter(segmentsFilter);
 }

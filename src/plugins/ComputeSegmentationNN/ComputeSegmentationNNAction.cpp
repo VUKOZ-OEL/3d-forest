@@ -20,7 +20,6 @@
 /** @file ComputeSegmentationNNAction.cpp */
 
 // Include 3D Forest.
-#include <ColorPalette.hpp>
 #include <ComputeSegmentationNNAction.hpp>
 #include <Editor.hpp>
 #include <Util.hpp>
@@ -602,11 +601,9 @@ void ComputeSegmentationNNAction::stepCreateSegments()
         size_t segmentId = it.second.segmentId;
 
         // Create new segment.
-        Segment segment;
-        createSegmentFromGroup(segmentId, segment, it.second);
+        segments.addTree(segmentId, it.second.boundary);
 
-        // Append new segment to segments.
-        segments.push_back(segment);
+        // Enable new segment in segment filter.
         segmentsFilter.setEnabled(segmentId, true);
     }
 
@@ -616,23 +613,6 @@ void ComputeSegmentationNNAction::stepCreateSegments()
 
     progress_.setValueStep(progress_.maximumStep());
     progress_.setValueSteps(progress_.maximumSteps());
-}
-
-void ComputeSegmentationNNAction::createSegmentFromGroup(size_t segmentId,
-                                                         Segment &segment,
-                                                         const Group &group)
-{
-    segment.id = segmentId;
-
-    segment.label = "Tree " + std::to_string(segment.id);
-    segment.color =
-        ColorPalette::MPN65[segment.id % ColorPalette::MPN65.size()];
-
-    // double n = static_cast<double>(group.nPoints);
-    // segment.position = group.averagePoint / n;
-
-    segment.boundary = group.boundary;
-    // segment.height = segment.boundary.length(2);
 }
 
 void ComputeSegmentationNNAction::createVoxel()

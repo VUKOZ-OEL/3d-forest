@@ -119,7 +119,7 @@ void Editor::close()
     LOG_DEBUG(<< "Finished closing the editor.");
 }
 
-void Editor::open(const std::string &path, const SettingsImport &settings)
+void Editor::open(const std::string &path, const ImportSettings &settings)
 {
     LOG_DEBUG(<< "Start opening new project/dataset path <" << path << ">.");
 
@@ -242,7 +242,7 @@ void Editor::saveProject(const std::string &path)
 }
 
 void Editor::openDataset(const std::string &path,
-                         const SettingsImport &settings)
+                         const ImportSettings &settings)
 {
     LOG_DEBUG(<< "Start opening new dataset from path <" << path << ">.");
 

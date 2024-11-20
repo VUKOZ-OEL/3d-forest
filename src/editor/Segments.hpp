@@ -71,6 +71,8 @@ public:
 
     size_t unusedId() const;
 
+    void addTree(size_t id, const Box<double> &boundary);
+
 protected:
     std::vector<Segment> segments_;
     std::unordered_map<size_t, size_t> hashTableId_;

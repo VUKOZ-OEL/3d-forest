@@ -17,25 +17,41 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file SettingsImport.cpp */
+/** @file ImportSettings.hpp */
 
-// Include 3D Forest.
-#include <SettingsImport.hpp>
+#ifndef IMPORT_SETTINGS_HPP
+#define IMPORT_SETTINGS_HPP
+
+// Include std.
+#include <cstddef>
 
 // Include local.
-#define LOG_MODULE_NAME "SettingsImport"
-#include <Log.hpp>
+#include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
 
-SettingsImport::SettingsImport()
-    : convertToVersion1Dot4(false),
-      translateToOrigin(false),
-      randomizePoints(true),
-      copyExtraBytes(true),
-      terminalOutput(false),
-      maxIndexLevel1(0),
-      maxIndexLevel1Size(100 * 1000),
-      maxIndexLevel2(5),
-      maxIndexLevel2Size(32),
-      bufferSize(5 * 1024 * 1024)
+/** Import Settings. */
+class EXPORT_EDITOR ImportSettings
 {
-}
+public:
+    bool importFilesAsSeparateTrees;
+    bool translateToOrigin;
+
+    bool convertToVersion1Dot4;
+    bool randomizePoints;
+    bool copyExtraBytes;
+
+    bool terminalOutput;
+
+    size_t maxIndexLevel1;
+    size_t maxIndexLevel1Size;
+    size_t maxIndexLevel2;
+    size_t maxIndexLevel2Size;
+
+    size_t bufferSize;
+
+    ImportSettings();
+};
+
+#include <WarningsEnable.hpp>
+
+#endif /* IMPORT_SETTINGS_HPP */

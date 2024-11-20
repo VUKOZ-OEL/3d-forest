@@ -32,6 +32,10 @@
 
 #include <WarningsDisable.hpp>
 
+#ifndef GIT_COMMIT_HASH
+    #define GIT_COMMIT_HASH "unknown"
+#endif
+
 static void messageLogWindowQtMessageHandler(QtMsgType type,
                                              const QMessageLogContext &context,
                                              const QString &msg);
@@ -43,7 +47,7 @@ int main(int argc, char *argv[])
     globalLogThread = std::make_shared<LogThread>();
     qInstallMessageHandler(messageLogWindowQtMessageHandler);
 
-    LOG_INFO(<< "3D Forest started.");
+    LOG_INFO(<< "3D Forest started. Git Revision <" << GIT_COMMIT_HASH << ">.");
 
     try
     {

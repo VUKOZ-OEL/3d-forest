@@ -126,7 +126,7 @@ static void createDataSet()
     LasFile::create(DATA_PATH, points, {SCALE, SCALE, SCALE}, {0, 0, 0});
 
     // Index
-    SettingsImport settings;
+    ImportSettings settings;
     settings.maxIndexLevel1Size = 1;
 
     IndexFileBuilder::index(DATA_PATH, DATA_PATH, settings);

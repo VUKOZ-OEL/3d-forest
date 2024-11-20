@@ -15,38 +15,15 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-set(SUB_PROJECT_NAME "3DForest")
-
-if(NOT QT_VERSION_MAJOR)
-    message(WARNING "Gui not found - skipping ${SUB_PROJECT_NAME}")
-    return()
-endif()
-
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-
-file(GLOB_RECURSE SOURCES "*.cpp")
-list(APPEND SOURCES resources/resources.rc)
-
-include(../../../cmake/githash.cmake)
-
-add_executable(
-    ${SUB_PROJECT_NAME}
-    WIN32 MACOSX_BUNDLE
-    ${SOURCES}
-    resources/resources.qrc
+# Get the current Git commit hash
+execute_process(
+    COMMAND git rev-parse --short HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_COMMIT_HASH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-target_include_directories(
-    ${SUB_PROJECT_NAME}
-    PUBLIC
-    ${CMAKE_CURRENT_LIST_DIR}
-)
-
-target_link_libraries(
-    ${SUB_PROJECT_NAME}
-    3DForestGui
-#    Qt${QT_VERSION_MAJOR}::Help
-)
-
-install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)
+# Add the Git hash as a define
+# add_compile_definitions(GIT_COMMIT_HASH="${GIT_COMMIT_HASH}")
+add_definitions(-DGIT_COMMIT_HASH="${GIT_COMMIT_HASH}")
+message(STATUS "Git Commit Hash: ${GIT_COMMIT_HASH}")

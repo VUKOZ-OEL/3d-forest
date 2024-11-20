@@ -93,10 +93,6 @@ private:
     void startGroup(const Point &a, bool trunk = false);
     void continueGroup(const Point &a, bool trunk = false);
     void mergeToGroup(Group &dst, const Group &src);
-
-    void createSegmentFromGroup(size_t segmentId,
-                                Segment &segment,
-                                const Group &group);
 };
 
 #endif /* COMPUTE_SEGMENTATION_NN_ACTION_HPP */
