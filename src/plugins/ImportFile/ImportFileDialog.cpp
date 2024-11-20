@@ -44,7 +44,55 @@ ImportFileDialog::ImportFileDialog(MainWindow *mainWindow)
     : QDialog(mainWindow),
       helpDialog_(nullptr)
 {
-    // Widgets.
+    int row = 0;
+
+    // Dataset options.
+    QGroupBox *datasetOptions = new QGroupBox(tr("Options"));
+
+    importFilesAsSeparateTreesCheckBox_ = new QCheckBox;
+    importFilesAsSeparateTreesCheckBox_->setChecked(false);
+
+    translateToOriginCheckBox_ = new QCheckBox;
+    translateToOriginCheckBox_->setChecked(false);
+
+    QGridLayout *ldo = new QGridLayout;
+    row = 0;
+    ldo->addWidget(new QLabel(tr("Import files as separate trees")), row, 0);
+    ldo->addWidget(importFilesAsSeparateTreesCheckBox_, row, 1);
+    row++;
+    ldo->addWidget(new QLabel(tr("Translate to the origin")), row, 0);
+    ldo->addWidget(translateToOriginCheckBox_, row, 1);
+    row++;
+
+    datasetOptions->setLayout(ldo);
+
+    // File format options.
+    QGroupBox *fileFormatOptions = new QGroupBox(tr("File format options"));
+
+    convertToVersion1Dot4CheckBox_ = new QCheckBox;
+    convertToVersion1Dot4CheckBox_->setChecked(false);
+
+    randomizePointsCheckBox_ = new QCheckBox;
+    randomizePointsCheckBox_->setChecked(true);
+
+    copyExtraBytesCheckBox_ = new QCheckBox;
+    copyExtraBytesCheckBox_->setChecked(true);
+
+    QGridLayout *lfo = new QGridLayout;
+    row = 0;
+    lfo->addWidget(new QLabel(tr("Convert to v1.4+")), row, 0);
+    lfo->addWidget(convertToVersion1Dot4CheckBox_, row, 1);
+    row++;
+    lfo->addWidget(new QLabel(tr("Randomize points")), row, 0);
+    lfo->addWidget(randomizePointsCheckBox_, row, 1);
+    row++;
+    lfo->addWidget(new QLabel(tr("Copy extra bytes")), row, 0);
+    lfo->addWidget(copyExtraBytesCheckBox_, row, 1);
+    row++;
+
+    fileFormatOptions->setLayout(lfo);
+
+    // Description.
     QLabel *description = new QLabel(tr("Import action will modify "
                                         "the original input file."));
 
@@ -54,24 +102,6 @@ ImportFileDialog::ImportFileDialog(MainWindow *mainWindow)
                                "(fixed) to match LAS specification.\n"
                                "Nonstandard application specific extra bytes "
                                "can be optionally removed from point data."));
-
-    QGroupBox *options = new QGroupBox(tr("Options"));
-
-    // Widgets with options.
-    importFilesAsSeparateTreesCheckBox_ = new QCheckBox;
-    importFilesAsSeparateTreesCheckBox_->setChecked(false);
-
-    convertCheckBox_ = new QCheckBox;
-    convertCheckBox_->setChecked(false);
-
-    translateToOriginCheckBox_ = new QCheckBox;
-    translateToOriginCheckBox_->setChecked(false);
-
-    randomizeCheckBox_ = new QCheckBox;
-    randomizeCheckBox_->setChecked(true);
-
-    copyExtraBytesCheckBox_ = new QCheckBox;
-    copyExtraBytesCheckBox_->setChecked(true);
 
     // Dialog buttons.
     helpButton_ = new QPushButton(tr("Help"));
@@ -85,36 +115,16 @@ ImportFileDialog::ImportFileDialog(MainWindow *mainWindow)
     rejectButton_ = new QPushButton(tr("Cancel"));
     connect(rejectButton_, SIGNAL(clicked()), this, SLOT(slotReject()));
 
-    // Layout.
-    QGridLayout *optionsLayout = new QGridLayout;
-    int row = 0;
-    optionsLayout->addWidget(new QLabel(tr("Import files as separate trees")),
-                             row,
-                             0);
-    optionsLayout->addWidget(importFilesAsSeparateTreesCheckBox_, row, 1);
-    row++;
-    optionsLayout->addWidget(new QLabel(tr("Convert to v1.4+")), row, 0);
-    optionsLayout->addWidget(convertCheckBox_, row, 1);
-    row++;
-    optionsLayout->addWidget(new QLabel(tr("Translate to the origin")), row, 0);
-    optionsLayout->addWidget(translateToOriginCheckBox_, row, 1);
-    row++;
-    optionsLayout->addWidget(new QLabel(tr("Randomize points")), row, 0);
-    optionsLayout->addWidget(randomizeCheckBox_, row, 1);
-    row++;
-    optionsLayout->addWidget(new QLabel(tr("Copy extra bytes")), row, 0);
-    optionsLayout->addWidget(copyExtraBytesCheckBox_, row, 1);
-    row++;
-    options->setLayout(optionsLayout);
-
     QHBoxLayout *dialogButtons = new QHBoxLayout;
     dialogButtons->addWidget(helpButton_);
     dialogButtons->addStretch();
     dialogButtons->addWidget(acceptButton_);
     dialogButtons->addWidget(rejectButton_);
 
+    // Dialog.
     QVBoxLayout *dialogLayout = new QVBoxLayout;
-    dialogLayout->addWidget(options);
+    dialogLayout->addWidget(datasetOptions);
+    dialogLayout->addWidget(fileFormatOptions);
     dialogLayout->addSpacing(10);
     dialogLayout->addWidget(description);
     dialogLayout->addSpacing(10);
@@ -123,7 +133,6 @@ ImportFileDialog::ImportFileDialog(MainWindow *mainWindow)
 
     setLayout(dialogLayout);
 
-    // Window.
     setWindowTitle(tr("Import File"));
     setWindowIcon(ICON("import-file"));
     setMaximumWidth(width());
@@ -148,9 +157,11 @@ ImportSettings ImportFileDialog::settings() const
 
     settings.importFilesAsSeparateTrees =
         importFilesAsSeparateTreesCheckBox_->isChecked();
-    settings.convertToVersion1Dot4 = convertCheckBox_->isChecked();
     settings.translateToOrigin = translateToOriginCheckBox_->isChecked();
-    settings.randomizePoints = randomizeCheckBox_->isChecked();
+
+    settings.convertToVersion1Dot4 =
+        convertToVersion1Dot4CheckBox_->isChecked();
+    settings.randomizePoints = randomizePointsCheckBox_->isChecked();
     settings.copyExtraBytes = copyExtraBytesCheckBox_->isChecked();
 
     return settings;
@@ -165,13 +176,13 @@ void ImportFileDialog::slotHelp()
         "<ul>"
         "<li><b>Import files as separate trees</b> -"
         " Import each file as a separate tree.</li>"
+        "<li><b>Translate to the origin</b> -"
+        " The coordinates will be translated to the origin of the coordinate"
+        " system.</li>"
         "<li><b>Convert to v1.4+</b> -"
         " Convert LAS file to version 1.4 if it is in lower version."
         " Version 1.4 allows to use more classifications, GPS coordinates,"
         " etc.</li>"
-        "<li><b>Translate to the origin</b> -"
-        " The coordinates will be translated to the origin of the coordinate"
-        " system.</li>"
         "<li><b>Randomize points</b> -"
         " It is suggested to randomize the order of points in LAS files"
         " to prevent eye popping artifacts caused displaying subsets"

@@ -34,10 +34,12 @@ class EXPORT_EDITOR ImportSettings
 {
 public:
     bool importFilesAsSeparateTrees;
-    bool convertToVersion1Dot4;
     bool translateToOrigin;
+
+    bool convertToVersion1Dot4;
     bool randomizePoints;
     bool copyExtraBytes;
+
     bool terminalOutput;
 
     size_t maxIndexLevel1;

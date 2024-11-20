@@ -28,8 +28,8 @@
 
 ImportSettings::ImportSettings()
     : importFilesAsSeparateTrees(false),
-      convertToVersion1Dot4(false),
       translateToOrigin(false),
+      convertToVersion1Dot4(false),
       randomizePoints(true),
       copyExtraBytes(true),
       terminalOutput(false),

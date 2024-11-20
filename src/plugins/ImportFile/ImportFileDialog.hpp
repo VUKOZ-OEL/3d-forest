@@ -51,9 +51,10 @@ protected:
     InfoDialog *helpDialog_;
 
     QCheckBox *importFilesAsSeparateTreesCheckBox_;
-    QCheckBox *convertCheckBox_;
     QCheckBox *translateToOriginCheckBox_;
-    QCheckBox *randomizeCheckBox_;
+
+    QCheckBox *convertToVersion1Dot4CheckBox_;
+    QCheckBox *randomizePointsCheckBox_;
     QCheckBox *copyExtraBytesCheckBox_;
 
     QPushButton *helpButton_;
