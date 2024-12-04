@@ -32,16 +32,41 @@
 #include <QProgressBar>
 #include <QProgressDialog>
 
+// Include 3rd party.
+#include <pcdio.h>
+
 // Include local.
 #define LOG_MODULE_NAME "ImportFilePlugin"
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define IMPORT_PLUGIN_FILTER "LAS (LASer) File (*.las)"
+#define IMPORT_PLUGIN_FILTER "LAS (LASer) File (*.las);;PCL (*.pcd)"
 #define ICON(name) (ThemeIcon(":/ImportFileResources/", name))
+
+static void importPluginPCDLogMessageHandler(pcl::VERBOSITY_LEVEL level,
+                                             const std::string &message)
+{
+    switch (level)
+    {
+        case pcl::L_WARN:
+            LOG_WARNING(<< message);
+            break;
+        case pcl::L_ERROR:
+            LOG_ERROR(<< message);
+            break;
+        case pcl::L_INFO:
+            LOG_INFO(<< message);
+            break;
+        case pcl::L_DEBUG:
+        default:
+            LOG_DEBUG(<< message);
+            break;
+    }
+}
 
 ImportFilePlugin::ImportFilePlugin() : mainWindow_(nullptr)
 {
+    pcl::logMessageHandler = importPluginPCDLogMessageHandler;
 }
 
 void ImportFilePlugin::initialize(MainWindow *mainWindow)
@@ -69,15 +94,20 @@ void ImportFilePlugin::slotImportFile()
 
 static void importPluginDialog(MainWindow *mainWindow);
 
-static void importPluginFile(const QString &path,
+static void importPluginFile(const std::string &pathIn,
+                             const std::string &pathOut,
                              const ImportSettings &settings,
                              MainWindow *mainWindow);
 
-static bool importPluginCreateIndex(const QString &path,
+static bool importPluginCreateIndex(const std::string &pathIn,
+                                    const std::string &pathOut,
                                     const ImportSettings &settings,
                                     MainWindow *mainWindow);
 
 static void importPluginAddAsNewTree(MainWindow *mainWindow);
+
+static bool importPluginPcd2Las(const std::string &pathIn,
+                                const std::string &pathOut);
 
 void ImportFilePlugin::importFile()
 {
@@ -139,7 +169,9 @@ static void importPluginDialog(MainWindow *mainWindow)
     // Import.
     for (auto const &file : selectedFiles)
     {
-        importPluginFile(file, settings, mainWindow);
+        std::string pathIn = file.toStdString();
+        std::string pathOut = File::replaceExtension(pathIn, ".las");
+        importPluginFile(pathIn, pathOut, settings, mainWindow);
     }
 
     // Update.
@@ -149,18 +181,19 @@ static void importPluginDialog(MainWindow *mainWindow)
     LOG_DEBUG(<< "Finished importing files.");
 }
 
-static void importPluginFile(const QString &path,
+static void importPluginFile(const std::string &pathIn,
+                             const std::string &pathOut,
                              const ImportSettings &settings,
                              MainWindow *mainWindow)
 {
-    LOG_DEBUG(<< "Import file <" << path.toStdString() << ">.");
+    LOG_DEBUG(<< "Import file <" << pathIn << ">.");
 
-    if (!importPluginCreateIndex(path, settings, mainWindow))
+    if (!importPluginCreateIndex(pathIn, pathOut, settings, mainWindow))
     {
         return;
     }
 
-    mainWindow->editor().open(path.toStdString(), settings);
+    mainWindow->editor().open(pathOut, settings);
 
     if (settings.importFilesAsSeparateTrees)
     {
@@ -168,17 +201,34 @@ static void importPluginFile(const QString &path,
     }
 }
 
-static bool importPluginCreateIndex(const QString &path,
+static bool importPluginCreateIndex(const std::string &pathIn,
+                                    const std::string &pathOut,
                                     const ImportSettings &settings,
                                     MainWindow *mainWindow)
 {
+    std::string ext = toLower(File::fileExtension(pathIn));
+    if (ext == "pcd")
+    {
+        LOG_DEBUG(<< "Import PCD file <" << pathIn << ">.");
+        if (!importPluginPcd2Las(pathIn, pathOut))
+        {
+            return false;
+        }
+    }
+    else if (ext == "las")
+    {
+        LOG_DEBUG(<< "Import LAS file <" << pathIn << ">.");
+    }
+    else
+    {
+        THROW("Unknown file format <" + ext + "> in <" + pathIn + ">.");
+    }
+
     // If the index already exists, then return success.
-    std::string pathStd;
     std::string pathFile;
     std::string pathIndex;
 
-    pathStd = path.toStdString();
-    pathFile = File::resolvePath(pathStd, mainWindow->editor().projectPath());
+    pathFile = File::resolvePath(pathOut, mainWindow->editor().projectPath());
     pathIndex = IndexFileBuilder::extension(pathFile);
 
     if (File::exists(pathIndex))
@@ -202,7 +252,7 @@ static bool importPluginCreateIndex(const QString &path,
 
     // Initialize index builder.
     IndexFileBuilder builder;
-    builder.start(pathStd, pathStd, settings);
+    builder.start(pathOut, pathOut, settings);
 
     char buffer[80];
 
@@ -234,6 +284,41 @@ static bool importPluginCreateIndex(const QString &path,
     }
 
     progressDialog.setValue(progressDialog.maximum());
+
+    return true;
+}
+
+static bool importPluginPcd2Las(const std::string &pathIn,
+                                const std::string &pathOut)
+{
+    pcl::PCLPointCloud2 cloud2;
+    if (pcl::io::loadPCDFile(pathIn, cloud2) != 0)
+    {
+        THROW("Can't read file '" + pathIn + "'");
+    }
+
+    pcl::PointCloud<pcl::PointXYZI> cloud;
+    if (!pcl::fromPCLPointCloud2(cloud2, cloud))
+    {
+        THROW("Can't convert pcd file '" + pathIn + "'");
+    }
+
+    /** @todo Progress bar. */
+    std::vector<LasFile::Point> points;
+    points.resize(cloud.size());
+    std::memset(points.data(), 0, sizeof(LasFile::Point) * points.size());
+
+    const float s = 1000.0F;
+
+    for (size_t i = 0; i < cloud.size(); i++)
+    {
+        points[i].x = static_cast<int32_t>(cloud[i].x * s);
+        points[i].y = static_cast<int32_t>(cloud[i].y * s);
+        points[i].z = static_cast<int32_t>(cloud[i].z * s);
+        points[i].format = 0;
+    }
+
+    LasFile::create(pathOut, points, {0.001, 0.001, 0.001});
 
     return true;
 }
