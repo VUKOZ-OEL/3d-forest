@@ -67,6 +67,7 @@ void HelpPlugin::slotAbout()
            "Uses delaunator-cpp, modified eigen, modified libigl, stb\n"
            "Uses modified octree, (c) University of Bonn\n"
            "Uses modified ctkRangeSlider, (c) Kitware Inc.\n"
+           "Uses parts of modified Point Cloud Library in pcdio.\n"
            "\n"
            "3D Forest software license:\n"
            "This program is free software and is distributed under the GNU\n"

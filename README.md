@@ -53,6 +53,7 @@ third-party libraries **without downloading and installation** of each library.
 - libigl (2.4.0), A simple geometry processing library.
 - stb_image_write (v1.16), stb single-file public domain libraries for C++.
 - octree (0.1-icra), Index-based Octree implementation.
+- parts of Point Cloud Library (1.12.1) in pcdio (Nov 24, 2024).
 
 ## Known Issues
 This software is currently in development.

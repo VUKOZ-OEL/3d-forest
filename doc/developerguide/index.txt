@@ -874,6 +874,7 @@ powershell -C "gci | % {rni $_.Name ($_.Name -replace '24px', '24')}"
         "${workspaceRoot}/3rdparty/delaunator",
         "${workspaceRoot}/3rdparty/eigen",
         "${workspaceRoot}/3rdparty/libigl/include",
+        "${workspaceRoot}/3rdparty/pcdio",
         "${workspaceRoot}/3rdparty/stb",
         "${workspaceRoot}/3rdparty/unibnoctree",
         "${workspaceRoot}/3rdparty/warnings",
