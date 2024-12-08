@@ -3350,8 +3350,9 @@ class PCDWriter {
     // setLockingPermissions(file_name, file_lock);
 
     // Stretch the file size to the size of the data
-    long result =
-        io::raw_lseek(fd, getpagesize() + cloud.data.size() - 1, SEEK_SET);
+    off_t file_offset = getpagesize() +
+                        static_cast<off_t>(cloud.data.size()) - 1;
+    long result = io::raw_lseek(fd, file_offset, SEEK_SET);
     if (result < 0) {
       io::raw_close(fd);
       // resetLockingPermissions(file_name, file_lock);
@@ -3516,11 +3517,21 @@ class PCDWriter {
 
 #ifndef _WIN32
     // Stretch the file size to the size of the data
-    std::size_t page_size = getpagesize();
-    std::size_t size_pages = ostr.size() / page_size;
-    std::size_t partial_pages = (size_pages * page_size < ostr.size()) ? 1 : 0;
-    long result = io::raw_lseek(
-        fd, (size_pages + partial_pages) * page_size - 1, SEEK_SET);
+    std::int64_t page_size = static_cast<std::int64_t>(getpagesize());
+    std::int64_t ostr_size = static_cast<std::int64_t>(ostr.size());
+    std::int64_t size_pages = ostr_size / page_size;
+    std::int64_t partial_pages = (size_pages * page_size < ostr_size) ? 1 : 0;
+    std::int64_t file_offset = (size_pages + partial_pages) * page_size - 1;
+    if (file_offset < 0 || file_offset > static_cast<std::int64_t>(
+        std::numeric_limits<off_t>::max()))
+    {
+      io::raw_close(fd);
+      PCL_ERROR(
+          "[pcl::PCDWriter::writeBinaryCompressed] File offset error.\n");
+      return -1;
+    }
+        
+    long result = io::raw_lseek(fd, static_cast<off_t>(file_offset), SEEK_SET);
     if (result < 0) {
       io::raw_close(fd);
       // resetLockingPermissions(file_name, file_lock);
