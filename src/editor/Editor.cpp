@@ -55,12 +55,36 @@ void Editor::readApplicationSettings()
 {
     LOG_DEBUG(<< "Start reading application settings.");
 
+    std::string path = "settings.json";
+
+    ApplicationSettings newSettings;
+
+    // Create default settings.
+    try
+    {
+        if (!File::exists(path))
+        {
+            Json out;
+            toJson(out[EDITOR_KEY_APPLICATION_SETTINGS], newSettings);
+            out.write(path);
+        }
+    }
+    catch (std::exception &e)
+    {
+        LOG_WARNING(<< "Failed to create application settings, error message <"
+                    << e.what() << ">.");
+    }
+    catch (...)
+    {
+        LOG_WARNING(<< "Failed to create application settings, "
+                       "unknown exception is raised.");
+    }
+
+    // Read current settings.
     try
     {
         Json in;
-        in.read("settings.json");
-
-        ApplicationSettings newSettings;
+        in.read(path);
         fromJson(newSettings, in[EDITOR_KEY_APPLICATION_SETTINGS]);
         applicationSettings_ = newSettings;
     }
