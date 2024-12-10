@@ -77,6 +77,9 @@ public:
     bool treeAttributesVisible() const;
     void setTreeAttributesVisible(bool b);
 
+    bool treePositionAtBottom() const;
+    void setTreePositionAtBottom(bool b);
+
 protected:
     double pointSize_;
     Vector3<double> pointColor_;
@@ -86,6 +89,7 @@ protected:
     bool distanceBasedFadingVisible_;
     bool sceneBoundingBoxVisible_;
     bool treeAttributesVisible_;
+    bool treePositionAtBottom_;
 
     std::vector<std::string> colorSourceString_;
 

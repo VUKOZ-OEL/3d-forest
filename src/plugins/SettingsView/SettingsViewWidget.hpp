@@ -45,7 +45,7 @@ class SettingsViewWidget : public QWidget
 public:
     SettingsViewWidget(MainWindow *mainWindow);
 
-    QSize sizeHint() const override { return QSize(300, 200); }
+    QSize sizeHint() const override { return QSize(300, 240); }
 
 public slots:
     void slotUpdate(void *sender, const QSet<Editor::Type> &target);
@@ -57,6 +57,7 @@ public slots:
     void slotSetDistanceBasedFadingVisible(int v);
     void slotSetSceneBoundingBoxVisible(int v);
     void slotSetTreeAttributesVisible(int v);
+    void slotSetTreePositionAtBottom(int v);
 
 private:
     MainWindow *mainWindow_;
@@ -68,6 +69,7 @@ private:
     QCheckBox *distanceBasedFadingVisibleCheckBox_;
     QCheckBox *sceneBoundingBoxVisibleCheckBox_;
     QCheckBox *treeAttributesVisibleCheckBox_;
+    QCheckBox *treePositionAtBottomCheckBox_;
 
     SettingsView settings_;
 
