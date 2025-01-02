@@ -116,8 +116,7 @@ SettingsViewWidget::SettingsViewWidget(MainWindow *mainWindow)
             SLOT(slotSetTreeAttributesVisible(int)));
 
     treePositionAtBottomCheckBox_ = new QCheckBox;
-    treePositionAtBottomCheckBox_->setChecked(
-        settings_.treePositionAtBottom());
+    treePositionAtBottomCheckBox_->setChecked(settings_.treePositionAtBottom());
     treePositionAtBottomCheckBox_->setText(tr("Show tree position at bottom"));
     connect(treePositionAtBottomCheckBox_,
             SIGNAL(stateChanged(int)),
