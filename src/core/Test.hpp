@@ -84,7 +84,7 @@ public:
     int failed() const { return testsFailed_; }
 
 private:
-    explicit Test() : testsPassed_(0), testsFailed_(0){};
+    explicit Test() : testsPassed_(0), testsFailed_(0) {};
     int testsPassed_;
     int testsFailed_;
     std::vector<Test::TestCase *> testCases_;

@@ -586,16 +586,21 @@ void ViewerOpenGLViewport::renderAttributes()
         ViewerOpenGL::renderCircle(treeDbhPosition, treeDbhRadius);
 
         Vector3<float> treePosition(treeAttributes.position);
-        ViewerOpenGL::renderCross(
-            treePosition,
-            static_cast<float>(segment.boundary.length(0)),
-            static_cast<float>(segment.boundary.length(1)));
-
         Vector3<float> treeTip(treePosition[0],
                                treePosition[1],
                                treePosition[2] +
                                    static_cast<float>(treeAttributes.height));
         ViewerOpenGL::renderLine(treePosition, treeTip);
+
+        if (!editor_->settings().view().treePositionAtBottom())
+        {
+            treePosition[2] += static_cast<float>(treeAttributes.height);
+        }
+
+        ViewerOpenGL::renderCross(
+            treePosition,
+            static_cast<float>(segment.boundary.length(0)),
+            static_cast<float>(segment.boundary.length(1)));
     }
 }
 

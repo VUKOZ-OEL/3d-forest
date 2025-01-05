@@ -132,6 +132,8 @@ public:
     void setModified() { modified_ = true; }
     bool modified() const { return modified_; }
 
+    static size_t sizeInMemory(uint64_t numberOfPoints);
+
 private:
     /** Dataset identifier. */
     uint32_t datasetId_;

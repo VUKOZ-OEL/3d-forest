@@ -115,10 +115,19 @@ SettingsViewWidget::SettingsViewWidget(MainWindow *mainWindow)
             this,
             SLOT(slotSetTreeAttributesVisible(int)));
 
+    treePositionAtBottomCheckBox_ = new QCheckBox;
+    treePositionAtBottomCheckBox_->setChecked(settings_.treePositionAtBottom());
+    treePositionAtBottomCheckBox_->setText(tr("Show tree position at bottom"));
+    connect(treePositionAtBottomCheckBox_,
+            SIGNAL(stateChanged(int)),
+            this,
+            SLOT(slotSetTreePositionAtBottom(int)));
+
     QVBoxLayout *optionsVBoxLayout = new QVBoxLayout;
     optionsVBoxLayout->addWidget(distanceBasedFadingVisibleCheckBox_);
     optionsVBoxLayout->addWidget(sceneBoundingBoxVisibleCheckBox_);
     optionsVBoxLayout->addWidget(treeAttributesVisibleCheckBox_);
+    optionsVBoxLayout->addWidget(treePositionAtBottomCheckBox_);
 
     QGroupBox *optionsGroupBox = new QGroupBox(tr("Options"));
     optionsGroupBox->setLayout(optionsVBoxLayout);
@@ -232,6 +241,9 @@ void SettingsViewWidget::setViewSettings(const SettingsView &settings)
     treeAttributesVisibleCheckBox_->setChecked(
         settings_.treeAttributesVisible());
 
+    // Tree position.
+    treePositionAtBottomCheckBox_->setChecked(settings_.treePositionAtBottom());
+
     unblock();
 }
 
@@ -289,6 +301,14 @@ void SettingsViewWidget::slotSetTreeAttributesVisible(int v)
     (void)v;
     settings_.setTreeAttributesVisible(
         treeAttributesVisibleCheckBox_->isChecked());
+    dataChanged();
+}
+
+void SettingsViewWidget::slotSetTreePositionAtBottom(int v)
+{
+    (void)v;
+    settings_.setTreePositionAtBottom(
+        treePositionAtBottomCheckBox_->isChecked());
     dataChanged();
 }
 

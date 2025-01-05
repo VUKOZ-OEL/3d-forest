@@ -31,7 +31,7 @@ if(MSVC)
     # Lazy fix for Windows issue with dual mingw + msvc environment
     # Microsoft Visual Studio insists on using GNU MinGW Qt
     # Should be set when running cmake or by ordering env variables
-    set(CMAKE_PREFIX_PATH "C:\\Qt\\6.3.0\\msvc2019_64")
+    set(CMAKE_PREFIX_PATH "C:\\Qt\\6.8.1\\msvc2022_64")
 endif()
 
 find_package(OpenGL QUIET)

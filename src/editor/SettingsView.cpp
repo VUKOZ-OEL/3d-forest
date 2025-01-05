@@ -34,7 +34,8 @@ SettingsView::SettingsView()
       colorSource_(SettingsView::ColorSource::COLOR),
       distanceBasedFadingVisible_(false),
       sceneBoundingBoxVisible_(true),
-      treeAttributesVisible_(true)
+      treeAttributesVisible_(true),
+      treePositionAtBottom_(true)
 {
     colorSourceString_ = {"Color",
                           "Intensity",
@@ -121,6 +122,16 @@ void SettingsView::setTreeAttributesVisible(bool b)
     treeAttributesVisible_ = b;
 }
 
+bool SettingsView::treePositionAtBottom() const
+{
+    return treePositionAtBottom_;
+}
+
+void SettingsView::setTreePositionAtBottom(bool b)
+{
+    treePositionAtBottom_ = b;
+}
+
 void fromJson(SettingsView &out, const Json &in)
 {
     fromJson(out.pointSize_, in["pointSize"]);
@@ -131,6 +142,7 @@ void fromJson(SettingsView &out, const Json &in)
     fromJson(out.distanceBasedFadingVisible_, in["distanceBasedFadingVisible"]);
     fromJson(out.sceneBoundingBoxVisible_, in["sceneBoundingBoxVisible"]);
     fromJson(out.treeAttributesVisible_, in["treeAttributesVisible"]);
+    fromJson(out.treePositionAtBottom_, in["treePositionAtBottom"]);
 }
 
 void toJson(Json &out, const SettingsView &in)
@@ -143,6 +155,7 @@ void toJson(Json &out, const SettingsView &in)
     toJson(out["distanceBasedFadingVisible"], in.distanceBasedFadingVisible_);
     toJson(out["sceneBoundingBoxVisible"], in.sceneBoundingBoxVisible_);
     toJson(out["treeAttributesVisible"], in.treeAttributesVisible_);
+    toJson(out["treePositionAtBottom"], in.treePositionAtBottom_);
 }
 
 std::string toString(const SettingsView &in)
