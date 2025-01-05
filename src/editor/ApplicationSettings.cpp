@@ -28,7 +28,7 @@
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-ApplicationSettings::ApplicationSettings() : cacheSizeMaximum_(200)
+ApplicationSettings::ApplicationSettings() : cacheSizeMaximum_(1024)
 {
 }
 

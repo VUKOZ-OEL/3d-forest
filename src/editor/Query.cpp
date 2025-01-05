@@ -35,7 +35,8 @@
 Query::Query(Editor *editor) : editor_(editor)
 {
     maximumResults_ = 0;
-    cacheSizeMax_ = editor->applicationSettings().cacheSizeMaximum();
+    cacheSizeMaximum_ =
+        editor->applicationSettings().cacheSizeMaximum() * 1048576;
 }
 
 Query::~Query()
@@ -157,6 +158,7 @@ void Query::clear()
 
     cache_.clear();
     lru_.clear();
+    lruSize_ = 0;
 
     page_.reset();
     selectedPages_.clear();
@@ -192,7 +194,7 @@ bool Query::nextPage()
                   << selectedPages_.size() << ">.");
 
         IndexFile::Selection &selectedPage = selectedPages_[pageIndex_];
-        page_ = read(selectedPage.id, selectedPage.idx);
+        page_ = readPage(selectedPage.id, selectedPage.idx);
         page_->nextState();
         pageIndex_++;
 
@@ -259,7 +261,7 @@ void Query::setState(Page::State state)
 
 bool Query::nextState()
 {
-    LOG_DEBUG(<< "Lru size <" << lru_.size() << ">.");
+    //    LOG_DEBUG(<< "Lru size <" << lru_.size() << ">.");
 
     for (size_t i = 0; i < lru_.size(); i++)
     {
@@ -283,6 +285,7 @@ void Query::applyCamera(const Camera &camera)
     viewPrev = lru_;
 
     lru_.clear();
+    lruSize_ = 0;
 
     std::multimap<double, Key> queue;
 
@@ -291,7 +294,7 @@ void Query::applyCamera(const Camera &camera)
         const std::unordered_set<size_t> &idList = where().dataset().filter();
         for (auto const &it : idList)
         {
-            queue.insert({0, {it, 0}});
+            queue.insert({-1.0, {it, 0}});
         }
     }
     else
@@ -299,20 +302,24 @@ void Query::applyCamera(const Camera &camera)
         const std::unordered_set<size_t> &idList = editor_->datasets().idList();
         for (auto const &it : idList)
         {
-            queue.insert({0, {it, 0}});
+            queue.insert({-1.0, {it, 0}});
         }
     }
 
-    while (!queue.empty() && lru_.size() < cacheSizeMax_)
+    while (!queue.empty())
     {
         const auto it = queue.begin();
         Key nk = it->second;
         queue.erase(it);
 
-        const Dataset &editor = editor_->datasets().key(nk.datasetId);
-        const IndexFile::Node *node;
-        const IndexFile &index = editor.index();
-        node = index.at(nk.pageId);
+        if (cacheSizeMaximum_ > 0 && lruSize_ >= cacheSizeMaximum_)
+        {
+            break;
+        }
+
+        const Dataset &dataset = editor_->datasets().key(nk.datasetId);
+        const IndexFile &index = dataset.index();
+        const IndexFile::Node *node = index.at(nk.pageId);
 
         if (editor_->clipFilter().shape != Region::Shape::NONE)
         {
@@ -345,6 +352,17 @@ void Query::applyCamera(const Camera &camera)
             lru_.push_back(page);
         }
 
+        size_t pageSizeInMemory = PageData::sizeInMemory(node->size);
+        lruSize_ += pageSizeInMemory;
+        /*
+                LOG_DEBUG(<< "Added new page. Page count <" << lru_.size()
+                          << "> dataset ID <" << nk.datasetId << "> page ID <"
+                          << nk.pageId << "> point count <" << node->size
+                          << "> page size in memory <" << pageSizeInMemory
+                          << "> LRU size in memory <" << lruSize_ << "> from
+           maximum <"
+                          << cacheSizeMaximum_ << "> bytes.");
+        */
         for (size_t i = 0; i < 8; i++)
         {
             if (node->next[i])
@@ -655,9 +673,9 @@ bool Query::Key::operator<(const Key &rhs) const
     return pageId < rhs.pageId;
 }
 
-std::shared_ptr<Page> Query::read(size_t dataset, size_t index)
+std::shared_ptr<Page> Query::readPage(size_t datasetId, size_t pageId)
 {
-    Key nk = {dataset, index};
+    Key nk = {datasetId, pageId};
 
     auto search = cache_.find(nk);
     if (search != cache_.end())
@@ -690,7 +708,7 @@ std::shared_ptr<Page> Query::read(size_t dataset, size_t index)
         {
             size_t idx;
 
-            if (lru_.size() < cacheSizeMax_)
+            if (lruSize_ < cacheSizeMaximum_)
             {
                 // Make room for new page.
                 lru_.resize(lru_.size() + 1);
@@ -706,6 +724,16 @@ std::shared_ptr<Page> Query::read(size_t dataset, size_t index)
                 }
                 Key nkrm = {lru_[idx]->datasetId(), lru_[idx]->pageId()};
                 cache_.erase(nkrm);
+
+                size_t pageSizeInMemory =
+                    PageData::sizeInMemory(lru_[idx]->size());
+                lruSize_ -= pageSizeInMemory;
+                LOG_DEBUG(<< "Drop page. Dataset ID <" << nkrm.datasetId
+                          << "> page ID <" << nkrm.pageId << "> point count <"
+                          << lru_[idx]->size() << "> page size in memory <"
+                          << pageSizeInMemory << "> LRU size in memory <"
+                          << lruSize_ << "> from maximum <" << cacheSizeMaximum_
+                          << "> bytes.");
             }
 
             // New page is on top.
@@ -725,9 +753,22 @@ std::shared_ptr<Page> Query::read(size_t dataset, size_t index)
         cache_[nk] = result;
         lru_[0] = result;
 
+        const Dataset &dataset = editor_->datasets().key(nk.datasetId);
+        const IndexFile &index = dataset.index();
+        const IndexFile::Node *node = index.at(nk.pageId);
+
+        size_t pageSizeInMemory = PageData::sizeInMemory(node->size);
+        lruSize_ += pageSizeInMemory;
+        LOG_DEBUG(<< "Added new page. Page count <" << lru_.size()
+                  << "> dataset ID <" << nk.datasetId << "> page ID <"
+                  << nk.pageId << "> point count <" << node->size
+                  << "> page size in memory <" << pageSizeInMemory
+                  << "> LRU size in memory <" << lruSize_ << "> from maximum <"
+                  << cacheSizeMaximum_ << "> bytes.");
+
         try
         {
-            LOG_DEBUG(<< "Page pageId <" << nk.pageId << ">.");
+            LOG_DEBUG(<< "Read page ID <" << nk.pageId << ">.");
             result->readPage();
         }
         catch (...)

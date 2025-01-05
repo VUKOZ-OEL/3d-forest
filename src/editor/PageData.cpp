@@ -29,6 +29,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "PageData"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 PageData::PageData(uint32_t datasetId, uint32_t pageId)
@@ -44,6 +45,25 @@ PageData::~PageData()
 {
     LOG_DEBUG(<< "Destroy page <" << pageId_ << "> dataset <" << datasetId_
               << ">.");
+}
+
+size_t PageData::sizeInMemory(uint64_t numberOfPoints)
+{
+    size_t pointSize = sizeof(decltype(position)::value_type) * 3 +
+                       sizeof(decltype(intensity)::value_type) +
+                       sizeof(decltype(returnNumber)::value_type) +
+                       sizeof(decltype(numberOfReturns)::value_type) +
+                       sizeof(decltype(classification)::value_type) +
+                       sizeof(decltype(userData)::value_type) +
+                       sizeof(decltype(gpsTime)::value_type) +
+                       sizeof(decltype(color)::value_type) * 3 +
+                       sizeof(decltype(segment)::value_type) +
+                       sizeof(decltype(elevation)::value_type) +
+                       sizeof(decltype(descriptor)::value_type) +
+                       sizeof(decltype(voxel)::value_type) +
+                       sizeof(decltype(renderPosition)::value_type) * 3;
+
+    return pointSize * static_cast<size_t>(numberOfPoints);
 }
 
 void PageData::resize(size_t n)
@@ -81,6 +101,8 @@ void PageData::readPage(Editor *editor)
     size_t numberOfPointsInPage = static_cast<size_t>(node->size);
     size_t pointSize = las.header.point_data_record_length;
     size_t bufferLasPageSize = pointSize * numberOfPointsInPage;
+    LOG_DEBUG(<< "Page has <" << numberOfPointsInPage << "> points in <"
+              << bufferLasPageSize << "> bytes.");
     // uint8_t fmt = las.header.point_data_record_format;
     pointDataBuffer_.resize(bufferLasPageSize);
     las.readBuffer(pointDataBuffer_.data(), bufferLasPageSize);

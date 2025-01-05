@@ -214,13 +214,14 @@ protected:
 
         bool operator<(const Key &rhs) const;
     };
-    size_t cacheSizeMax_;
+    size_t cacheSizeMaximum_;
     std::map<Key, std::shared_ptr<Page>> cache_;
 
     // Last Recently Used (LRU) for Cache.
     std::vector<std::shared_ptr<Page>> lru_;
+    size_t lruSize_;
 
-    std::shared_ptr<Page> read(size_t dataset, size_t index);
+    std::shared_ptr<Page> readPage(size_t datasetId, size_t pageId);
 };
 
 void toJson(Json &out, Query &in);
