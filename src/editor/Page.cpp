@@ -923,14 +923,16 @@ void Page::runColorModifier()
     }
     else if (opt.colorSource() == SettingsView::ColorSource::ELEVATION)
     {
-        const Dataset &dataset = editor_->datasets().key(datasetId_);
-        double zlen = dataset.boundary().length(2);
+        const Range<double> &e = editor_->elevationFilter();
+        const Dataset &d = editor_->datasets().key(datasetId_);
+        double a = static_cast<double>(d.range().elevationMin);
+        double len = e.maximum() - e.minimum();
 
-        if (zlen > 1e-6)
+        if (len > 1e-6)
         {
             for (size_t i = 0; i < n; i++)
             {
-                const float v = static_cast<float>(1. - (elevation[i] / zlen));
+                float v = static_cast<float>(1. - ((elevation[i] - a) / len));
                 setColor(i,
                          static_cast<size_t>(v * 255.0),
                          255,
