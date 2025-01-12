@@ -64,6 +64,7 @@ void HelpPlugin::slotAbout()
            "Blue Cat team and other authors\n"
            "https://www.3dforest.eu\n"
            "\n"
+           "Uses convhull_3d, (c) Leo McCormack, George Papazafeiropoulos.\n"
            "Uses delaunator-cpp, modified eigen, modified libigl, stb\n"
            "Uses modified octree, (c) University of Bonn\n"
            "Uses modified ctkRangeSlider, (c) Kitware Inc.\n"

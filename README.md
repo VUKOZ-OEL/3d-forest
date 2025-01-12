@@ -47,6 +47,7 @@ See [INSTALL](INSTALL) for more information.
 under 3rdparty directory. This approach allows to use compatible versions of
 third-party libraries **without downloading and installation** of each library.
 
+- convhull_3d (Jan 12, 2025), 3-D quickhull algorithm.
 - ctk widgets: ctkRangeSlider (Jul 27, 2018), A slider that has 2 input values.
 - delaunator-cpp (Oct 6, 2018), Delaunay triangulation of 2D points.
 - eigen (3.4.0), Template library for linear algebra.
