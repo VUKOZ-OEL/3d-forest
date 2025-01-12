@@ -51,6 +51,9 @@ void ViewerOpenGL::render(Mode mode,
         case LINES:
             glmode = GL_LINES;
             break;
+        case TRIANGLES:
+            glmode = GL_TRIANGLES;
+            break;
         case QUADS:
             glmode = GL_QUADS;
             break;
@@ -99,6 +102,9 @@ void ViewerOpenGL::render(Mode mode,
         case LINES:
             glmode = GL_LINES;
             break;
+        case TRIANGLES:
+            glmode = GL_TRIANGLES;
+            break;
         case QUADS:
             glmode = GL_QUADS;
             break;
@@ -130,6 +136,49 @@ void ViewerOpenGL::render(Mode mode,
         glDisableClientState(GL_VERTEX_ARRAY);
         glDisableClientState(GL_COLOR_ARRAY);
     }
+}
+
+void ViewerOpenGL::render(const Mesh &mesh)
+{
+    ViewerOpenGL::Mode mode;
+    if (mesh.mode == Mesh::MODE_POINTS)
+    {
+        mode = ViewerOpenGL::POINTS;
+        // glPointSize(3.0F);
+    }
+    else if (mesh.mode == Mesh::MODE_TRIANGLES)
+    {
+        mode = ViewerOpenGL::TRIANGLES;
+    }
+    else if (mesh.mode == Mesh::MODE_QUADS)
+    {
+        mode = ViewerOpenGL::QUADS;
+    }
+    else
+    {
+        mode = ViewerOpenGL::LINES;
+    }
+
+    if (mesh.indices.size() > 0)
+    {
+        ViewerOpenGL::render(mode,
+                             mesh.xyz.data(),
+                             mesh.xyz.size(),
+                             mesh.rgb.data(),
+                             mesh.rgb.size(),
+                             mesh.indices.data(),
+                             mesh.indices.size());
+    }
+    else
+    {
+        ViewerOpenGL::render(mode,
+                             mesh.xyz.data(),
+                             mesh.xyz.size(),
+                             mesh.rgb.data(),
+                             mesh.rgb.size());
+    }
+
+    // glPointSize(1.0F);
 }
 
 void ViewerOpenGL::renderClipFilter(const Region &clipFilter)

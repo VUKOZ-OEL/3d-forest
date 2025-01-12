@@ -41,4 +41,6 @@ void Mesh::clear()
 {
     xyz.clear();
     rgb.clear();
+
+    indices.clear();
 }

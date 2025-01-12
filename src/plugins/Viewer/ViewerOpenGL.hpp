@@ -26,6 +26,7 @@
 #include <vector>
 
 // Include 3D Forest.
+#include <Mesh.hpp>
 #include <Region.hpp>
 #include <ViewerAabb.hpp>
 
@@ -40,6 +41,7 @@ public:
     {
         POINTS,
         LINES,
+        TRIANGLES,
         QUADS
     };
 
@@ -59,6 +61,8 @@ public:
                        size_t rgbSize,
                        const unsigned int *indices,
                        size_t indicesSize);
+
+    static void render(const Mesh &mesh);
 
     static void renderClipFilter(const Region &clipFilter);
     static void renderAabb(const ViewerAabb &box);

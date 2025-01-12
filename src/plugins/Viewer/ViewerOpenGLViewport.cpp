@@ -521,26 +521,7 @@ void ViewerOpenGLViewport::renderSegments()
         // Render meshes.
         for (size_t m = 0; m < segment.meshList.size(); m++)
         {
-            const Mesh &mesh = segment.meshList[m];
-
-            ViewerOpenGL::Mode mode;
-            if (mesh.mode == Mesh::MODE_POINTS)
-            {
-                mode = ViewerOpenGL::POINTS;
-                glPointSize(3.0F);
-            }
-            else
-            {
-                mode = ViewerOpenGL::LINES;
-            }
-
-            ViewerOpenGL::render(mode,
-                                 mesh.xyz.data(),
-                                 mesh.xyz.size(),
-                                 mesh.rgb.data(),
-                                 mesh.rgb.size());
-
-            glPointSize(1.0F);
+            ViewerOpenGL::render(segment.meshList[m]);
         }
     }
 }

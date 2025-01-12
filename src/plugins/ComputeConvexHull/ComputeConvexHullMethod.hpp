@@ -17,19 +17,20 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ComputeConvexHullBasicMethod.hpp */
+/** @file ComputeConvexHullMethod.hpp */
 
-#ifndef COMPUTE_CONVEX_HULL_BASIC_METHOD_HPP
-#define COMPUTE_CONVEX_HULL_BASIC_METHOD_HPP
+#ifndef COMPUTE_CONVEX_HULL_METHOD_HPP
+#define COMPUTE_CONVEX_HULL_METHOD_HPP
 
 // Include 3D Forest.
 #include <ComputeConvexHullData.hpp>
-#include <ComputeConvexHullParameters.hpp>
+#include <Mesh.hpp>
 
-/** Compute Convex Hull Basic Method. */
-class ComputeConvexHullBasicMethod
+/** Compute Convex Hull Method. */
+class ComputeConvexHullMethod
 {
 public:
+    static void quickhull(const std::vector<double> &points, Mesh &mesh);
 };
 
-#endif /* COMPUTE_CONVEX_HULL_BASIC_METHOD_HPP */
+#endif /* COMPUTE_CONVEX_HULL_METHOD_HPP */

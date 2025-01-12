@@ -25,7 +25,7 @@
 // Include 3D Forest.
 #include <ColorPalette.hpp>
 #include <ComputeConvexHullAction.hpp>
-#include <ComputeConvexHullBasicMethod.hpp>
+#include <ComputeConvexHullMethod.hpp>
 #include <Editor.hpp>
 #include <Util.hpp>
 
@@ -37,6 +37,7 @@
 #define COMPUTE_CONVEX_HULL_STEP_RESET_POINTS 0
 #define COMPUTE_CONVEX_HULL_STEP_COUNT_POINTS 1
 #define COMPUTE_CONVEX_HULL_STEP_POINTS_TO_VOXELS 2
+#define COMPUTE_CONVEX_HULL_STEP_CALCULATE_HULL 3
 
 ComputeConvexHullAction::ComputeConvexHullAction(Editor *editor)
     : editor_(editor),
@@ -80,7 +81,7 @@ void ComputeConvexHullAction::start(
     trees_.clear();
 
     // Plan the steps.
-    progress_.setMaximumStep(ProgressCounter::npos, 1000);
+    progress_.setMaximumStep(nPointsTotal_, 1000);
     progress_.setMaximumSteps(1);
     progress_.setValueSteps(COMPUTE_CONVEX_HULL_STEP_RESET_POINTS);
 }
@@ -101,27 +102,14 @@ void ComputeConvexHullAction::next()
             stepPointsToVoxels();
             break;
 
+        case COMPUTE_CONVEX_HULL_STEP_CALCULATE_HULL:
+            stepCalculateHull();
+            break;
+
         default:
             // Empty.
             break;
     }
-}
-
-size_t ComputeConvexHullAction::treeIndex(size_t treeId)
-{
-    auto it = treesMap_.find(treeId);
-
-    if (it == treesMap_.end())
-    {
-        size_t index = trees_.size();
-        treesMap_[treeId] = index;
-        trees_.push_back(ComputeConvexHullData());
-        trees_[index].treeId = treeId;
-        trees_[index].points.reserve(100);
-        return index;
-    }
-
-    return it->second;
 }
 
 void ComputeConvexHullAction::stepResetPoints()
@@ -131,18 +119,6 @@ void ComputeConvexHullAction::stepResetPoints()
     if (progress_.valueStep() == 0)
     {
         LOG_DEBUG(<< "Reset all <" << nPointsTotal_ << "> points.");
-
-        // Initialize. Remove all segments and create default main segment.
-        Segments segments;
-        segments.setDefault();
-
-        QueryFilterSet segmentsFilter;
-        segmentsFilter.clear();
-        segmentsFilter.setEnabled(0, true);
-        segmentsFilter.setEnabled(true);
-
-        editor_->setSegments(segments);
-        editor_->setSegmentsFilter(segmentsFilter);
 
         // Set query to iterate all points. Active filter is ignored.
         query_.setWhere(QueryWhere());
@@ -154,10 +130,6 @@ void ComputeConvexHullAction::stepResetPoints()
     {
         // Set point index to voxel to none.
         query_.voxel() = SIZE_MAX;
-
-        // Set point segment to 'unsegmented' segment.
-        query_.segment() = 0;
-
         query_.setModified();
 
         progress_.addValueStep(1);
@@ -224,11 +196,74 @@ void ComputeConvexHullAction::stepPointsToVoxels()
         }
     }
 
-    // voxels_.exportToFile("voxels.json");
-    LOG_DEBUG(<< "Found <" << trees_.size() << "> trees from points.");
+    progress_.setMaximumStep(trees_.size(), 1);
+    progress_.setValueSteps(COMPUTE_CONVEX_HULL_STEP_CALCULATE_HULL);
+}
+
+void ComputeConvexHullAction::stepCalculateHull()
+{
+    progress_.startTimer();
+
+    // Initialize.
+    if (progress_.valueStep() == 0)
+    {
+        LOG_DEBUG(<< "Start calculating convex hull for <" << trees_.size()
+                  << "> trees.");
+
+        currentTreeIndex_ = 0;
+    }
+
+    // For each tree:
+    while (currentTreeIndex_ < trees_.size())
+    {
+        LOG_DEBUG(<< "Calculating convex hull for tree index <"
+                  << (currentTreeIndex_ + 1) << "/" << trees_.size()
+                  << "> tree ID <" << trees_[currentTreeIndex_].treeId
+                  << "> point count <"
+                  << trees_[currentTreeIndex_].points.size() / 3 << ">.");
+
+        Mesh m;
+        ComputeConvexHullMethod::quickhull(trees_[currentTreeIndex_].points, m);
+
+        LOG_DEBUG(<< "Calculated convex hull has <" << m.xyz.size() / 3
+                  << "> vertices and <" << m.indices.size() / 3
+                  << "> triangles.");
+
+        Segment segment = editor_->segment(trees_[currentTreeIndex_].treeId);
+        segment.meshList.clear();
+        segment.meshList.push_back(std::move(m));
+        editor_->setSegment(segment);
+
+        // Next tree.
+        currentTreeIndex_++;
+        progress_.addValueStep(1);
+        if (progress_.timedOut())
+        {
+            return;
+        }
+    }
 
     progress_.setValueStep(progress_.maximumStep());
     progress_.setValueSteps(progress_.maximumSteps());
+
+    LOG_DEBUG(<< "Finished calculating convex hull for trees.");
+}
+
+size_t ComputeConvexHullAction::treeIndex(size_t treeId)
+{
+    auto it = treesMap_.find(treeId);
+
+    if (it == treesMap_.end())
+    {
+        size_t index = trees_.size();
+        treesMap_[treeId] = index;
+        trees_.push_back(ComputeConvexHullData());
+        trees_[index].treeId = treeId;
+        trees_[index].points.reserve(100);
+        return index;
+    }
+
+    return it->second;
 }
 
 void ComputeConvexHullAction::createVoxel()

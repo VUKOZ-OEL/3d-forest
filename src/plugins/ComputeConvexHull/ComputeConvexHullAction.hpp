@@ -61,6 +61,7 @@ private:
     void stepResetPoints();
     void stepCountPoints();
     void stepPointsToVoxels();
+    void stepCalculateHull();
 
     size_t treeIndex(size_t treeId);
 

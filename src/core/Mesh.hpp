@@ -38,6 +38,7 @@ public:
     {
         MODE_POINTS,
         MODE_LINES,
+        MODE_TRIANGLES,
         MODE_QUADS
     };
 
@@ -45,6 +46,8 @@ public:
 
     std::vector<float> xyz;
     std::vector<float> rgb;
+
+    std::vector<unsigned int> indices;
 
     Mesh();
     ~Mesh();
