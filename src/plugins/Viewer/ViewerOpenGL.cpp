@@ -42,59 +42,17 @@ void ViewerOpenGL::render(Mode mode,
                           const float *xyz,
                           size_t xyzSize,
                           const float *rgb,
-                          size_t rgbSize)
-{
-    // Specify what kind of primitives to render.
-    GLenum glmode;
-    switch (mode)
-    {
-        case LINES:
-            glmode = GL_LINES;
-            break;
-        case TRIANGLES:
-            glmode = GL_TRIANGLES;
-            break;
-        case QUADS:
-            glmode = GL_QUADS;
-            break;
-        case POINTS:
-        default:
-            glmode = GL_POINTS;
-            break;
-    }
-
-    // Render.
-    if (xyzSize > 0)
-    {
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(3, GL_FLOAT, 0, xyz);
-
-        if (rgbSize > 0)
-        {
-            glEnableClientState(GL_COLOR_ARRAY);
-            glColorPointer(3, GL_FLOAT, 0, rgb);
-        }
-        else
-        {
-            glColor3f(1.0F, 1.0F, 1.0F);
-        }
-
-        GLsizei n = static_cast<GLsizei>(xyzSize / 3);
-        glDrawArrays(glmode, 0, n);
-
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glDisableClientState(GL_COLOR_ARRAY);
-    }
-}
-
-void ViewerOpenGL::render(Mode mode,
-                          const float *xyz,
-                          size_t xyzSize,
-                          const float *rgb,
                           size_t rgbSize,
+                          const float *normal,
+                          size_t normalSize,
                           const unsigned int *indices,
                           size_t indicesSize)
 {
+    if (xyzSize < 1)
+    {
+        return;
+    }
+
     // Specify what kind of primitives to render.
     GLenum glmode;
     switch (mode)
@@ -115,70 +73,66 @@ void ViewerOpenGL::render(Mode mode,
     }
 
     // Render.
-    if (indicesSize > 0 && xyzSize > 0)
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, xyz);
+
+    if (rgbSize > 0)
     {
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(3, GL_FLOAT, 0, xyz);
+        glEnableClientState(GL_COLOR_ARRAY);
+        glColorPointer(3, GL_FLOAT, 0, rgb);
+    }
 
-        if (rgbSize > 0)
-        {
-            glEnableClientState(GL_COLOR_ARRAY);
-            glColorPointer(3, GL_FLOAT, 0, rgb);
-        }
-        else
-        {
-            glColor3f(1.0F, 1.0F, 1.0F);
-        }
+    if (normalSize > 0)
+    {
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glColorPointer(3, GL_FLOAT, 0, normal);
+    }
 
+    if (indicesSize > 0)
+    {
         GLsizei n = static_cast<GLsizei>(indicesSize);
         glDrawElements(glmode, n, GL_UNSIGNED_INT, indices);
-
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glDisableClientState(GL_COLOR_ARRAY);
     }
+    else
+    {
+        GLsizei n = static_cast<GLsizei>(xyzSize / 3);
+        glDrawArrays(glmode, 0, n);
+    }
+
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_COLOR_ARRAY);
+    glDisableClientState(GL_NORMAL_ARRAY);
 }
 
 void ViewerOpenGL::render(const Mesh &mesh)
 {
-    ViewerOpenGL::Mode mode;
-    if (mesh.mode == Mesh::MODE_POINTS)
+    Mode mode;
+    if (mesh.mode == Mesh::MODE_LINES)
     {
-        mode = ViewerOpenGL::POINTS;
-        // glPointSize(3.0F);
+        mode = LINES;
     }
     else if (mesh.mode == Mesh::MODE_TRIANGLES)
     {
-        mode = ViewerOpenGL::TRIANGLES;
+        mode = TRIANGLES;
     }
     else if (mesh.mode == Mesh::MODE_QUADS)
     {
-        mode = ViewerOpenGL::QUADS;
+        mode = QUADS;
     }
     else
     {
-        mode = ViewerOpenGL::LINES;
+        mode = POINTS;
     }
 
-    if (mesh.indices.size() > 0)
-    {
-        ViewerOpenGL::render(mode,
-                             mesh.xyz.data(),
-                             mesh.xyz.size(),
-                             mesh.rgb.data(),
-                             mesh.rgb.size(),
-                             mesh.indices.data(),
-                             mesh.indices.size());
-    }
-    else
-    {
-        ViewerOpenGL::render(mode,
-                             mesh.xyz.data(),
-                             mesh.xyz.size(),
-                             mesh.rgb.data(),
-                             mesh.rgb.size());
-    }
-
-    // glPointSize(1.0F);
+    ViewerOpenGL::render(mode,
+                         mesh.xyz.data(),
+                         mesh.xyz.size(),
+                         mesh.rgb.data(),
+                         mesh.rgb.size(),
+                         mesh.normal.data(),
+                         mesh.normal.size(),
+                         mesh.indices.data(),
+                         mesh.indices.size());
 }
 
 void ViewerOpenGL::renderClipFilter(const Region &clipFilter)

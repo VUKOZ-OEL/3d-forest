@@ -230,8 +230,7 @@ void ComputeConvexHullAction::stepCalculateHull()
                   << "> triangles.");
 
         Segment segment = editor_->segment(trees_[currentTreeIndex_].treeId);
-        segment.meshList.clear();
-        segment.meshList.push_back(std::move(m));
+        segment.meshList["convexHull"] = std::move(m);
         editor_->setSegment(segment);
 
         // Next tree.

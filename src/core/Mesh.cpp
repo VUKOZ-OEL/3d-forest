@@ -24,6 +24,7 @@
 
 // Include 3D Forest.
 #include <Mesh.hpp>
+#include <Vector3.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "Mesh"
@@ -41,6 +42,55 @@ void Mesh::clear()
 {
     xyz.clear();
     rgb.clear();
+    normal.clear();
 
     indices.clear();
+}
+
+void Mesh::calculateNormals()
+{
+    if (indices.empty())
+    {
+        if (mode == Mesh::MODE_TRIANGLES)
+        {
+            calculateNormalsTriangles();
+        }
+    }
+}
+
+void Mesh::calculateNormalsTriangles()
+{
+    Vector3<float> v1;
+    Vector3<float> v2;
+    Vector3<float> vnormal;
+
+    normal.resize(xyz.size());
+
+    size_t nTriangles = xyz.size() / 9;
+
+    for (size_t i = 0; i < nTriangles; i++)
+    {
+        v1[0] = xyz[i * 9 + 3] - xyz[i * 9 + 0];
+        v1[1] = xyz[i * 9 + 4] - xyz[i * 9 + 1];
+        v1[2] = xyz[i * 9 + 5] - xyz[i * 9 + 2];
+
+        v2[0] = xyz[i * 9 + 6] - xyz[i * 9 + 0];
+        v2[1] = xyz[i * 9 + 7] - xyz[i * 9 + 1];
+        v2[2] = xyz[i * 9 + 8] - xyz[i * 9 + 2];
+
+        vnormal = Vector3<float>::crossProduct(v1, v2);
+        vnormal.normalize();
+
+        normal[i * 9 + 0] = vnormal[0];
+        normal[i * 9 + 1] = vnormal[1];
+        normal[i * 9 + 2] = vnormal[2];
+
+        normal[i * 9 + 3] = vnormal[3];
+        normal[i * 9 + 4] = vnormal[4];
+        normal[i * 9 + 5] = vnormal[5];
+
+        normal[i * 9 + 6] = vnormal[6];
+        normal[i * 9 + 7] = vnormal[7];
+        normal[i * 9 + 8] = vnormal[8];
+    }
 }

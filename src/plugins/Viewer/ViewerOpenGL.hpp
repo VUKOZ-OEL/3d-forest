@@ -52,13 +52,9 @@ public:
                        const float *xyz,
                        size_t xyzSize,
                        const float *rgb,
-                       size_t rgbSize);
-
-    static void render(Mode mode,
-                       const float *xyz,
-                       size_t xyzSize,
-                       const float *rgb,
                        size_t rgbSize,
+                       const float *normal,
+                       size_t normalSize,
                        const unsigned int *indices,
                        size_t indicesSize);
 

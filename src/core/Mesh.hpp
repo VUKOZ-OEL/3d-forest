@@ -46,6 +46,7 @@ public:
 
     std::vector<float> xyz;
     std::vector<float> rgb;
+    std::vector<float> normal;
 
     std::vector<unsigned int> indices;
 
@@ -53,6 +54,11 @@ public:
     ~Mesh();
 
     void clear();
+
+    void calculateNormals();
+
+private:
+    void calculateNormalsTriangles();
 };
 
 #include <WarningsEnable.hpp>

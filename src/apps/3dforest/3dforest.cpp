@@ -63,6 +63,8 @@ int main(int argc, char *argv[])
 
         QSurfaceFormat format;
         format.setDepthBufferSize(24);
+        format.setAlphaBufferSize(8);
+        format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
         QSurfaceFormat::setDefaultFormat(format);
 
         MainWindow window;

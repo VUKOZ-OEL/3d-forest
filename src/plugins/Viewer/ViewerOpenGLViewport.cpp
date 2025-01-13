@@ -397,11 +397,18 @@ void ViewerOpenGLViewport::renderScene()
                 renderFirstFrame();
             }
 
+            if (page.renderColor.empty())
+            {
+                glColor3f(1.0F, 1.0F, 1.0F);
+            }
+
             ViewerOpenGL::render(ViewerOpenGL::POINTS,
                                  page.renderPosition,
                                  page.size(),
                                  page.renderColor.data(),
                                  page.renderColor.size(),
+                                 nullptr,
+                                 0,
                                  page.selection.data(),
                                  page.selectionSize);
 
@@ -501,12 +508,14 @@ void ViewerOpenGLViewport::renderSegments()
             continue;
         }
 
+        float r = static_cast<float>(segment.color[0]);
+        float g = static_cast<float>(segment.color[1]);
+        float b = static_cast<float>(segment.color[2]);
+
         // Render boundary.
         if (segment.selected)
         {
-            glColor3f(static_cast<float>(segment.color[0]),
-                      static_cast<float>(segment.color[1]),
-                      static_cast<float>(segment.color[2]));
+            glColor3f(r, g, b);
             ViewerAabb boundary;
             boundary.set(segment.boundary);
             ViewerOpenGL::renderAabb(boundary);
@@ -518,11 +527,19 @@ void ViewerOpenGLViewport::renderSegments()
             continue;
         }
 
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDisable(GL_DEPTH_TEST);
+        glColor4f(r, g, b, 0.25F);
+
         // Render meshes.
-        for (size_t m = 0; m < segment.meshList.size(); m++)
+        for (const auto &m : segment.meshList)
         {
-            ViewerOpenGL::render(segment.meshList[m]);
+            ViewerOpenGL::render(m.second);
         }
+
+        glDisable(GL_BLEND);
+        glEnable(GL_DEPTH_TEST);
     }
 }
 

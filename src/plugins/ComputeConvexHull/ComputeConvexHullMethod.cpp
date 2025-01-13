@@ -81,6 +81,8 @@ void ComputeConvexHullMethod::quickhull(const std::vector<double> &points,
             static_cast<float>(vertices[indices[i * 3 + 2]].z);
     }
 
+    mesh.calculateNormals();
+
     free(vertices);
     free(indices);
 }

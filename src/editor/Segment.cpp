@@ -39,6 +39,8 @@ void fromJson(Segment &out, const Json &in)
 
     fromJson(out.boundary, in["boundary"]);
     fromJson(out.treeAttributes, in["treeAttributes"]);
+
+    // mesh list
 }
 
 void toJson(Json &out, const Segment &in)
@@ -49,6 +51,8 @@ void toJson(Json &out, const Segment &in)
 
     toJson(out["boundary"], in.boundary);
     toJson(out["treeAttributes"], in.treeAttributes);
+
+    // mesh list
 }
 
 std::ostream &operator<<(std::ostream &out, const Segment &in)

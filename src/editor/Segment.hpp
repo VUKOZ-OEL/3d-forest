@@ -45,7 +45,7 @@ public:
 
     TreeAttributes treeAttributes;
 
-    std::vector<Mesh> meshList;
+    std::map<std::string, Mesh> meshList;
 
     Segment();
 };
