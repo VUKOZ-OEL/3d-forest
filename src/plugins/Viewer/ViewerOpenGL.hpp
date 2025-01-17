@@ -49,10 +49,10 @@ public:
     ~ViewerOpenGL();
 
     static void render(Mode mode,
-                       const float *xyz,
-                       size_t xyzSize,
-                       const float *rgb,
-                       size_t rgbSize,
+                       const float *position,
+                       size_t positionSize,
+                       const float *color,
+                       size_t colorSize,
                        const float *normal,
                        size_t normalSize,
                        const unsigned int *indices,

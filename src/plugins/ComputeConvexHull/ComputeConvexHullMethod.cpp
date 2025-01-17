@@ -54,30 +54,30 @@ void ComputeConvexHullMethod::quickhull(const std::vector<double> &points,
     size_t nFaces = static_cast<size_t>(nFacesInt);
 
     mesh.clear();
-    mesh.mode = Mesh::MODE_TRIANGLES;
-    mesh.xyz.resize(nFaces * 3 * 3);
+    mesh.mode = Mesh::Mode::MODE_TRIANGLES;
+    mesh.position.resize(nFaces * 3 * 3);
 
     for (size_t i = 0; i < nFaces; i++)
     {
-        mesh.xyz[i * 9 + 0] =
+        mesh.position[i * 9 + 0] =
             static_cast<float>(vertices[indices[i * 3 + 0]].x);
-        mesh.xyz[i * 9 + 1] =
+        mesh.position[i * 9 + 1] =
             static_cast<float>(vertices[indices[i * 3 + 0]].y);
-        mesh.xyz[i * 9 + 2] =
+        mesh.position[i * 9 + 2] =
             static_cast<float>(vertices[indices[i * 3 + 0]].z);
 
-        mesh.xyz[i * 9 + 3] =
+        mesh.position[i * 9 + 3] =
             static_cast<float>(vertices[indices[i * 3 + 1]].x);
-        mesh.xyz[i * 9 + 4] =
+        mesh.position[i * 9 + 4] =
             static_cast<float>(vertices[indices[i * 3 + 1]].y);
-        mesh.xyz[i * 9 + 5] =
+        mesh.position[i * 9 + 5] =
             static_cast<float>(vertices[indices[i * 3 + 1]].z);
 
-        mesh.xyz[i * 9 + 6] =
+        mesh.position[i * 9 + 6] =
             static_cast<float>(vertices[indices[i * 3 + 2]].x);
-        mesh.xyz[i * 9 + 7] =
+        mesh.position[i * 9 + 7] =
             static_cast<float>(vertices[indices[i * 3 + 2]].y);
-        mesh.xyz[i * 9 + 8] =
+        mesh.position[i * 9 + 8] =
             static_cast<float>(vertices[indices[i * 3 + 2]].z);
     }
 

@@ -225,12 +225,13 @@ void ComputeConvexHullAction::stepCalculateHull()
         Mesh m;
         ComputeConvexHullMethod::quickhull(trees_[currentTreeIndex_].points, m);
 
-        LOG_DEBUG(<< "Calculated convex hull has <" << m.xyz.size() / 3
+        LOG_DEBUG(<< "Calculated convex hull has <" << m.position.size() / 3
                   << "> vertices and <" << m.indices.size() / 3
                   << "> triangles.");
 
         Segment segment = editor_->segment(trees_[currentTreeIndex_].treeId);
-        segment.meshList["convexHull"] = std::move(m);
+        m.name = "convexHull";
+        segment.meshList[m.name] = std::move(m);
         editor_->setSegment(segment);
 
         // Next tree.

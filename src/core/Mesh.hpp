@@ -23,7 +23,11 @@
 #define MESH_HPP
 
 // Include std.
+#include <string>
 #include <vector>
+
+// Include 3D Forest.
+#include <Json.hpp>
 
 // Include local.
 #include <ExportCore.hpp>
@@ -33,21 +37,28 @@
 class EXPORT_CORE Mesh
 {
 public:
-    /** Mesh Mode. */
-    enum EXPORT_CORE Mode
+    /** Mesh Geometric Primitive Type. */
+    enum class EXPORT_CORE Mode
     {
         MODE_POINTS,
         MODE_LINES,
-        MODE_TRIANGLES,
-        MODE_QUADS
+        MODE_TRIANGLES
     };
 
-    Mode mode;
+    /// Mesh name.
+    std::string name;
 
-    std::vector<float> xyz;
-    std::vector<float> rgb;
+    /// Mesh geometric primitive type.
+    Mesh::Mode mode;
+
+    /// Mesh position vertex data [x0, y0, z0, x1, y1, ...].
+    std::vector<float> position;
+    /// Mesh color vertex data [r0, g0, b0, r1, g1, ...].
+    std::vector<float> color;
+    /// Mesh normal vertex data [nx0, ny0, nz0, nx1, ny1, ...].
     std::vector<float> normal;
 
+    /// Mesh vertex indices.
     std::vector<unsigned int> indices;
 
     Mesh();
@@ -60,6 +71,15 @@ public:
 private:
     void calculateNormalsTriangles();
 };
+
+std::string EXPORT_CORE toString(const Mesh::Mode &in);
+void EXPORT_CORE fromString(Mesh::Mode &out, const std::string &in);
+
+void EXPORT_CORE toJson(Json &out, const Mesh::Mode &in);
+void EXPORT_CORE fromJson(Mesh::Mode &out, const Json &in);
+
+void EXPORT_CORE toJson(Json &out, const Mesh &in);
+void EXPORT_CORE fromJson(Mesh &out, const Json &in);
 
 #include <WarningsEnable.hpp>
 

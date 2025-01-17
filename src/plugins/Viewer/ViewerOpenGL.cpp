@@ -39,16 +39,16 @@ ViewerOpenGL::~ViewerOpenGL()
 }
 
 void ViewerOpenGL::render(Mode mode,
-                          const float *xyz,
-                          size_t xyzSize,
-                          const float *rgb,
-                          size_t rgbSize,
+                          const float *position,
+                          size_t positionSize,
+                          const float *color,
+                          size_t colorSize,
                           const float *normal,
                           size_t normalSize,
                           const unsigned int *indices,
                           size_t indicesSize)
 {
-    if (xyzSize < 1)
+    if (positionSize < 1)
     {
         return;
     }
@@ -74,12 +74,12 @@ void ViewerOpenGL::render(Mode mode,
 
     // Render.
     glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(3, GL_FLOAT, 0, xyz);
+    glVertexPointer(3, GL_FLOAT, 0, position);
 
-    if (rgbSize > 0)
+    if (colorSize > 0)
     {
         glEnableClientState(GL_COLOR_ARRAY);
-        glColorPointer(3, GL_FLOAT, 0, rgb);
+        glColorPointer(3, GL_FLOAT, 0, color);
     }
 
     if (normalSize > 0)
@@ -95,7 +95,7 @@ void ViewerOpenGL::render(Mode mode,
     }
     else
     {
-        GLsizei n = static_cast<GLsizei>(xyzSize / 3);
+        GLsizei n = static_cast<GLsizei>(positionSize / 3);
         glDrawArrays(glmode, 0, n);
     }
 
@@ -107,17 +107,13 @@ void ViewerOpenGL::render(Mode mode,
 void ViewerOpenGL::render(const Mesh &mesh)
 {
     Mode mode;
-    if (mesh.mode == Mesh::MODE_LINES)
+    if (mesh.mode == Mesh::Mode::MODE_LINES)
     {
         mode = LINES;
     }
-    else if (mesh.mode == Mesh::MODE_TRIANGLES)
+    else if (mesh.mode == Mesh::Mode::MODE_TRIANGLES)
     {
         mode = TRIANGLES;
-    }
-    else if (mesh.mode == Mesh::MODE_QUADS)
-    {
-        mode = QUADS;
     }
     else
     {
@@ -125,10 +121,10 @@ void ViewerOpenGL::render(const Mesh &mesh)
     }
 
     ViewerOpenGL::render(mode,
-                         mesh.xyz.data(),
-                         mesh.xyz.size(),
-                         mesh.rgb.data(),
-                         mesh.rgb.size(),
+                         mesh.position.data(),
+                         mesh.position.size(),
+                         mesh.color.data(),
+                         mesh.color.size(),
                          mesh.normal.data(),
                          mesh.normal.size(),
                          mesh.indices.data(),
