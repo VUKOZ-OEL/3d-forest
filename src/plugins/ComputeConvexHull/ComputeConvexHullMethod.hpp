@@ -17,44 +17,21 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Segment.hpp */
+/** @file ComputeConvexHullMethod.hpp */
 
-#ifndef SEGMENT_HPP
-#define SEGMENT_HPP
+#ifndef COMPUTE_CONVEX_HULL_METHOD_HPP
+#define COMPUTE_CONVEX_HULL_METHOD_HPP
 
 // Include 3D Forest.
-#include <Box.hpp>
-#include <Json.hpp>
+#include <ComputeConvexHullData.hpp>
 #include <Mesh.hpp>
-#include <TreeAttributes.hpp>
 
-// Include local.
-#include <ExportEditor.hpp>
-#include <WarningsDisable.hpp>
-
-/** Segment. */
-class EXPORT_EDITOR Segment
+/** Compute Convex Hull Method. */
+class ComputeConvexHullMethod
 {
 public:
-    size_t id{0};
-    std::string label;
-    Vector3<double> color;
-    bool selected{false};
-
-    Box<double> boundary;
-
-    TreeAttributes treeAttributes;
-
-    std::map<std::string, Mesh> meshList;
-
-    Segment();
+    static void qhull3d(const std::vector<double> &points, Mesh &mesh);
+    static void qhull2d(const std::vector<double> &points, Mesh &mesh, float z);
 };
 
-void fromJson(Segment &out, const Json &in);
-void toJson(Json &out, const Segment &in);
-
-std::ostream &operator<<(std::ostream &out, const Segment &in);
-
-#include <WarningsEnable.hpp>
-
-#endif /* SEGMENT_HPP */
+#endif /* COMPUTE_CONVEX_HULL_METHOD_HPP */

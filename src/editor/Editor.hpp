@@ -112,6 +112,11 @@ public:
     // Segments.
     const Segments &segments() const { return segments_; }
     void setSegments(const Segments &segments);
+    const Segment &segment(size_t id) const
+    {
+        return segments_[segments_.index(id)];
+    }
+    void setSegment(const Segment &segment);
     const QueryFilterSet &segmentsFilter() const { return segmentsFilter_; }
     void setSegmentsFilter(const QueryFilterSet &filter);
 

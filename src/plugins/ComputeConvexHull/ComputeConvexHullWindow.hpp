@@ -17,44 +17,29 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Segment.hpp */
+/** @file ComputeConvexHullWindow.hpp */
 
-#ifndef SEGMENT_HPP
-#define SEGMENT_HPP
+#ifndef COMPUTE_CONVEX_HULL_WINDOW_HPP
+#define COMPUTE_CONVEX_HULL_WINDOW_HPP
 
 // Include 3D Forest.
-#include <Box.hpp>
-#include <Json.hpp>
-#include <Mesh.hpp>
-#include <TreeAttributes.hpp>
+class MainWindow;
+class ComputeConvexHullWidget;
 
-// Include local.
-#include <ExportEditor.hpp>
-#include <WarningsDisable.hpp>
+// Include Qt.
+#include <QDialog>
 
-/** Segment. */
-class EXPORT_EDITOR Segment
+/** Compute Convex Hull Window. */
+class ComputeConvexHullWindow : public QDialog
 {
+    Q_OBJECT
+
 public:
-    size_t id{0};
-    std::string label;
-    Vector3<double> color;
-    bool selected{false};
+    ComputeConvexHullWindow(MainWindow *mainWindow);
+    ~ComputeConvexHullWindow();
 
-    Box<double> boundary;
-
-    TreeAttributes treeAttributes;
-
-    std::map<std::string, Mesh> meshList;
-
-    Segment();
+private:
+    ComputeConvexHullWidget *widget_;
 };
 
-void fromJson(Segment &out, const Json &in);
-void toJson(Json &out, const Segment &in);
-
-std::ostream &operator<<(std::ostream &out, const Segment &in);
-
-#include <WarningsEnable.hpp>
-
-#endif /* SEGMENT_HPP */
+#endif /* COMPUTE_CONVEX_HULL_WINDOW_HPP */

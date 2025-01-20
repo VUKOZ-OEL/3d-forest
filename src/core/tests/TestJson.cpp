@@ -44,6 +44,78 @@ TEST_CASE(TestJsonNumber)
     TEST(equal(obj["width"].number(), 5.0));
 }
 
+TEST_CASE(TestJsonVectorInt)
+{
+    std::vector<int> in{0, 1, 3, -7};
+
+    Json obj;
+    obj["vec"] = in;
+
+    TEST(obj.contains("vec"));
+    TEST(obj["vec"].typeArray());
+    TEST(equal(static_cast<int>(obj["vec"][0].number()), 0));
+    TEST(equal(static_cast<int>(obj["vec"][1].number()), 1));
+    TEST(equal(static_cast<int>(obj["vec"][2].number()), 3));
+    TEST(equal(static_cast<int>(obj["vec"][3].number()), -7));
+
+    std::vector<int> out;
+    fromJson(out, obj["vec"]);
+
+    TEST(out.size() == 4);
+    TEST(equal(out[0], 0));
+    TEST(equal(out[1], 1));
+    TEST(equal(out[2], 3));
+    TEST(equal(out[3], -7));
+}
+
+TEST_CASE(TestJsonVectorDouble)
+{
+    std::vector<double> in{0, 1.5, 3.14, 7.9};
+
+    Json obj;
+    obj["vec"] = in;
+
+    TEST(obj.contains("vec"));
+    TEST(obj["vec"].typeArray());
+    TEST(equal(obj["vec"][0].number(), 0.0));
+    TEST(equal(obj["vec"][1].number(), 1.5));
+    TEST(equal(obj["vec"][2].number(), 3.14));
+    TEST(equal(obj["vec"][3].number(), 7.9));
+
+    std::vector<double> out;
+    fromJson(out, obj["vec"]);
+
+    TEST(out.size() == 4);
+    TEST(equal(out[0], 0.0));
+    TEST(equal(out[1], 1.5));
+    TEST(equal(out[2], 3.14));
+    TEST(equal(out[3], 7.9));
+}
+
+TEST_CASE(TestJsonVectorFloat)
+{
+    std::vector<float> in{0.0F, 1.5F, 3.14F, 7.9F};
+
+    Json obj;
+    obj["vec"] = in;
+
+    TEST(obj.contains("vec"));
+    TEST(obj["vec"].typeArray());
+    TEST(equal(static_cast<float>(obj["vec"][0].number()), 0.0F));
+    TEST(equal(static_cast<float>(obj["vec"][1].number()), 1.5F));
+    TEST(equal(static_cast<float>(obj["vec"][2].number()), 3.14F));
+    TEST(equal(static_cast<float>(obj["vec"][3].number()), 7.9F));
+
+    std::vector<float> out;
+    fromJson(out, obj["vec"]);
+
+    TEST(out.size() == 4);
+    TEST(equal(out[0], 0.0F));
+    TEST(equal(out[1], 1.5F));
+    TEST(equal(out[2], 3.14F));
+    TEST(equal(out[3], 7.9F));
+}
+
 TEST_CASE(TestJsonSerialize)
 {
     Json a;

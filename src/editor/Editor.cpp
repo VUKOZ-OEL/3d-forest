@@ -433,6 +433,13 @@ void Editor::setSegments(const Segments &segments)
     unsavedChanges_ = true;
 }
 
+void Editor::setSegment(const Segment &segment)
+{
+    LOG_DEBUG(<< "Set segments.");
+    segments_[segments_.index(segment.id)] = segment;
+    unsavedChanges_ = true;
+}
+
 void Editor::setSegmentsFilter(const QueryFilterSet &filter)
 {
     LOG_DEBUG(<< "Set segments filter.");

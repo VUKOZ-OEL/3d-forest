@@ -100,6 +100,7 @@ public:
     Json(bool in);
     Json(int in);
     Json(unsigned int in);
+    Json(float in);
     Json(double in);
     Json(long in);
     Json(unsigned long in);
@@ -107,7 +108,9 @@ public:
     Json(unsigned long long in);
     Json(const char *in);
     Json(const std::string &in);
-    Json(const std::vector<double> &in);
+
+    template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
+    Json(const std::vector<T> &in);
 
     void clear();
 
@@ -161,6 +164,10 @@ public:
     friend void fromJson(unsigned long long &out, const Json &in);
     friend void fromJson(std::string &out, const Json &in);
 
+    template <typename T>
+    friend typename std::enable_if<std::is_arithmetic_v<T>, void>::type
+    fromJson(const std::vector<T> &out, const Json &in);
+
     friend void toJson(Json &out, bool in);
     friend void toJson(Json &out, int in);
     friend void toJson(Json &out, unsigned int in);
@@ -170,6 +177,11 @@ public:
     friend void toJson(Json &out, long long in);
     friend void toJson(Json &out, unsigned long long in);
     friend void toJson(Json &out, const std::string &in);
+
+    template <typename T>
+    friend typename std::enable_if<std::is_arithmetic_v<T>, void>::type toJson(
+        Json &out,
+        const std::vector<T> &in);
 
     void read(const std::string &fileName);
     void write(const std::string &fileName, size_t indent = DEFAULT_INDENT);
@@ -203,10 +215,13 @@ private:
 
     void createObject();
     void createArray();
-    void createArray(const std::vector<double> &in);
     void createString(const std::string &in);
     void createNumber(double in);
     void createType(Type t);
+
+    template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
+    void createArray(const std::vector<T> &in);
+
     void serialize(std::ostringstream &out) const;
     void serialize(std::ostringstream &out,
                    const std::string &indent,
@@ -232,6 +247,11 @@ inline Json::Json(int in)
 inline Json::Json(unsigned int in)
 {
     createNumber(static_cast<double>(in));
+}
+
+inline Json::Json(float in)
+{
+    createNumber(in);
 }
 
 inline Json::Json(double in)
@@ -269,7 +289,7 @@ inline Json::Json(const std::string &in)
     createString(in);
 }
 
-inline Json::Json(const std::vector<double> &in)
+template <typename T, typename> inline Json::Json(const std::vector<T> &in)
 {
     createArray(in);
 }
@@ -286,7 +306,8 @@ inline void Json::createArray()
     data_.array = std::make_shared<std::vector<Json>>();
 }
 
-inline void Json::createArray(const std::vector<double> &in)
+template <typename T, typename>
+inline void Json::createArray(const std::vector<T> &in)
 {
     createArray();
     data_.array->resize(in.size());
@@ -616,6 +637,27 @@ inline void toJson(Json &out, unsigned long long in)
 }
 
 inline void toJson(Json &out, const std::string &in)
+{
+    out = in;
+}
+
+template <typename T>
+inline typename std::enable_if<std::is_arithmetic_v<T>, void>::type fromJson(
+    std::vector<T> &out,
+    const Json &in)
+{
+    const std::vector<Json> &a = in.array();
+    out.resize(a.size());
+    for (size_t i = 0; i < a.size(); i++)
+    {
+        out[i] = static_cast<T>(a[i].number());
+    }
+}
+
+template <typename T>
+inline typename std::enable_if<std::is_arithmetic_v<T>, void>::type toJson(
+    Json &out,
+    const std::vector<T> &in)
 {
     out = in;
 }

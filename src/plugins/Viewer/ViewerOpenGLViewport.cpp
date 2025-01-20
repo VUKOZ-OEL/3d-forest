@@ -397,11 +397,18 @@ void ViewerOpenGLViewport::renderScene()
                 renderFirstFrame();
             }
 
+            if (page.renderColor.empty())
+            {
+                glColor3f(1.0F, 1.0F, 1.0F);
+            }
+
             ViewerOpenGL::render(ViewerOpenGL::POINTS,
                                  page.renderPosition,
                                  page.size(),
                                  page.renderColor.data(),
                                  page.renderColor.size(),
+                                 nullptr,
+                                 0,
                                  page.selection.data(),
                                  page.selectionSize);
 
@@ -501,12 +508,14 @@ void ViewerOpenGLViewport::renderSegments()
             continue;
         }
 
+        float r = static_cast<float>(segment.color[0]);
+        float g = static_cast<float>(segment.color[1]);
+        float b = static_cast<float>(segment.color[2]);
+
         // Render boundary.
         if (segment.selected)
         {
-            glColor3f(static_cast<float>(segment.color[0]),
-                      static_cast<float>(segment.color[1]),
-                      static_cast<float>(segment.color[2]));
+            glColor3f(r, g, b);
             ViewerAabb boundary;
             boundary.set(segment.boundary);
             ViewerOpenGL::renderAabb(boundary);
@@ -518,30 +527,19 @@ void ViewerOpenGLViewport::renderSegments()
             continue;
         }
 
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDisable(GL_DEPTH_TEST);
+        glColor4f(r, g, b, 0.25F);
+
         // Render meshes.
-        for (size_t m = 0; m < segment.meshList.size(); m++)
+        for (const auto &it : segment.meshList)
         {
-            const Mesh &mesh = segment.meshList[m];
-
-            ViewerOpenGL::Mode mode;
-            if (mesh.mode == Mesh::MODE_POINTS)
-            {
-                mode = ViewerOpenGL::POINTS;
-                glPointSize(3.0F);
-            }
-            else
-            {
-                mode = ViewerOpenGL::LINES;
-            }
-
-            ViewerOpenGL::render(mode,
-                                 mesh.xyz.data(),
-                                 mesh.xyz.size(),
-                                 mesh.rgb.data(),
-                                 mesh.rgb.size());
-
-            glPointSize(1.0F);
+            ViewerOpenGL::render(it.second);
         }
+
+        glDisable(GL_BLEND);
+        glEnable(GL_DEPTH_TEST);
     }
 }
 
@@ -559,11 +557,6 @@ void ViewerOpenGLViewport::renderAttributes()
     {
         const Segment &segment = segments[i];
 
-        if (segment.treeAttributes.status != TreeAttributes::Status::VALID)
-        {
-            continue;
-        }
-
         // Ignore hidden segments.
         if (!filter.enabled(segment.id))
         {
@@ -577,24 +570,29 @@ void ViewerOpenGLViewport::renderAttributes()
         }
 
         // Render attributes.
-        const TreeAttributes &treeAttributes = segment.treeAttributes;
+        const TreeAttributes &atr = segment.treeAttributes;
 
         glColor3f(1.0F, 1.0F, 0.0F);
 
-        Vector3<float> treeDbhPosition(treeAttributes.dbhPosition);
-        float treeDbhRadius = static_cast<float>(treeAttributes.dbh) * 0.5F;
+        if (segment.treeAttributes.status != TreeAttributes::Status::VALID)
+        {
+            continue;
+        }
+
+        Vector3<float> treeDbhPosition(atr.dbhPosition);
+        float treeDbhRadius = static_cast<float>(atr.dbh) * 0.5F;
         ViewerOpenGL::renderCircle(treeDbhPosition, treeDbhRadius);
 
-        Vector3<float> treePosition(treeAttributes.position);
+        Vector3<float> treePosition(atr.position);
         Vector3<float> treeTip(treePosition[0],
                                treePosition[1],
                                treePosition[2] +
-                                   static_cast<float>(treeAttributes.height));
+                                   static_cast<float>(atr.height));
         ViewerOpenGL::renderLine(treePosition, treeTip);
 
         if (!editor_->settings().view().treePositionAtBottom())
         {
-            treePosition[2] += static_cast<float>(treeAttributes.height);
+            treePosition[2] += static_cast<float>(atr.height);
         }
 
         ViewerOpenGL::renderCross(

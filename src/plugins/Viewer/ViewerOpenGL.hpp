@@ -26,6 +26,7 @@
 #include <vector>
 
 // Include 3D Forest.
+#include <Mesh.hpp>
 #include <Region.hpp>
 #include <ViewerAabb.hpp>
 
@@ -40,6 +41,7 @@ public:
     {
         POINTS,
         LINES,
+        TRIANGLES,
         QUADS
     };
 
@@ -47,18 +49,16 @@ public:
     ~ViewerOpenGL();
 
     static void render(Mode mode,
-                       const float *xyz,
-                       size_t xyzSize,
-                       const float *rgb,
-                       size_t rgbSize);
-
-    static void render(Mode mode,
-                       const float *xyz,
-                       size_t xyzSize,
-                       const float *rgb,
-                       size_t rgbSize,
+                       const float *position,
+                       size_t positionSize,
+                       const float *color,
+                       size_t colorSize,
+                       const float *normal,
+                       size_t normalSize,
                        const unsigned int *indices,
                        size_t indicesSize);
+
+    static void render(const Mesh &mesh);
 
     static void renderClipFilter(const Region &clipFilter);
     static void renderAabb(const ViewerAabb &box);

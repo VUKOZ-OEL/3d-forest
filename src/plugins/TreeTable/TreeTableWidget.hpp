@@ -59,6 +59,7 @@ private:
         COLUMN_Z,
         COLUMN_HEIGHT,
         COLUMN_DBH,
+        COLUMN_AREA,
         COLUMN_STATUS,
         COLUMN_LAST,
     };

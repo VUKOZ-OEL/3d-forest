@@ -17,44 +17,37 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Segment.hpp */
+/** @file ComputeConvexHullData.hpp */
 
-#ifndef SEGMENT_HPP
-#define SEGMENT_HPP
+#ifndef COMPUTE_CONVEX_HULL_DATA_HPP
+#define COMPUTE_CONVEX_HULL_DATA_HPP
 
 // Include 3D Forest.
-#include <Box.hpp>
 #include <Json.hpp>
-#include <Mesh.hpp>
 #include <TreeAttributes.hpp>
+#include <Vector3.hpp>
 
-// Include local.
-#include <ExportEditor.hpp>
-#include <WarningsDisable.hpp>
-
-/** Segment. */
-class EXPORT_EDITOR Segment
+/** Compute Convex Hull Data. */
+class ComputeConvexHullData
 {
 public:
-    size_t id{0};
-    std::string label;
-    Vector3<double> color;
-    bool selected{false};
+    /// Tree ID.
+    size_t treeId{0};
 
-    Box<double> boundary;
-
-    TreeAttributes treeAttributes;
-
-    std::map<std::string, Mesh> meshList;
-
-    Segment();
+    /// Collected point coordinates
+    std::vector<double> points; // x0, y0, z0, x1, y1, z1, ...
 };
 
-void fromJson(Segment &out, const Json &in);
-void toJson(Json &out, const Segment &in);
+inline void toJson(Json &out, const ComputeConvexHullData &in)
+{
+    toJson(out["treeId"], in.treeId);
+}
 
-std::ostream &operator<<(std::ostream &out, const Segment &in);
+inline std::string toString(const ComputeConvexHullData &in)
+{
+    Json json;
+    toJson(json, in);
+    return json.serialize(0);
+}
 
-#include <WarningsEnable.hpp>
-
-#endif /* SEGMENT_HPP */
+#endif /* COMPUTE_CONVEX_HULL_DATA_HPP */
