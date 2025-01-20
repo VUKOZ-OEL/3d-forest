@@ -68,8 +68,11 @@ public:
 
     void calculateNormals();
 
+    double calculateSurfaceArea2d();
+
 private:
     void calculateNormalsTriangles();
+    double calculateSurfaceArea2dTriangles();
 };
 
 std::string EXPORT_CORE toString(const Mesh::Mode &in);

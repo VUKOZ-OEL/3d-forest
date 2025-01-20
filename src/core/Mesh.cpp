@@ -97,6 +97,37 @@ void Mesh::calculateNormalsTriangles()
     }
 }
 
+double Mesh::calculateSurfaceArea2d()
+{
+    if (indices.empty())
+    {
+        if (mode == Mesh::Mode::MODE_TRIANGLES)
+        {
+            return calculateSurfaceArea2dTriangles();
+        }
+    }
+
+    return 0;
+}
+
+double Mesh::calculateSurfaceArea2dTriangles()
+{
+    double a = 0;
+    double b = 0;
+    double c = 0;
+
+    size_t nTriangles = position.size() / 9;
+
+    for (size_t i = 0; i < nTriangles; i++)
+    {
+        a += position[i * 9 + 0] * (position[i * 9 + 4] - position[i * 9 + 7]);
+        b += position[i * 9 + 3] * (position[i * 9 + 7] - position[i * 9 + 1]);
+        c += position[i * 9 + 6] * (position[i * 9 + 1] - position[i * 9 + 4]);
+    }
+
+    return fabs(a + b + c) * 0.5;
+}
+
 std::string toString(const Mesh::Mode &in)
 {
     switch (in)
