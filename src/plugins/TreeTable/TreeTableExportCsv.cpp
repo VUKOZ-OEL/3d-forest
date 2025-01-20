@@ -47,7 +47,7 @@ void TreeTableExportCsv::create(const std::string &path)
     char text[256] = {};
     text[0] = 0;
 
-    (void)ustrcat(text, "id, label, x, y, z, height, dbh");
+    (void)ustrcat(text, "id, label, x, y, z, height, dbh, area");
 
     if (!properties().exportValidValuesOnly())
     {
@@ -75,14 +75,15 @@ void TreeTableExportCsv::write(const Segment &segment)
 
     (void)snprintf(text,
                    sizeof(text),
-                   "%d, \"%s\", %f, %f, %f, %f, %f",
+                   "%d, \"%s\", %f, %f, %f, %f, %f, %f",
                    static_cast<int>(segment.id),
                    segment.label.c_str(),
                    segment.treeAttributes.position[0] / ppm,
                    segment.treeAttributes.position[1] / ppm,
                    segment.treeAttributes.position[2] / ppm,
                    segment.treeAttributes.height / ppm,
-                   segment.treeAttributes.dbh / ppm);
+                   segment.treeAttributes.dbh / ppm,
+                   segment.treeAttributes.area / (ppm * ppm));
 
     if (!properties().exportValidValuesOnly())
     {

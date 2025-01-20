@@ -63,6 +63,9 @@ private:
     void stepPointsToVoxels();
     void stepCalculateHull();
 
+    void calculateConvexHull(Segment &segment);
+    void calculateConvexHullProjection(Segment &segment, float z);
+
     size_t treeIndex(size_t treeId);
 
     void createVoxel();

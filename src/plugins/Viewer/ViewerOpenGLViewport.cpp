@@ -533,9 +533,9 @@ void ViewerOpenGLViewport::renderSegments()
         glColor4f(r, g, b, 0.25F);
 
         // Render meshes.
-        for (const auto &m : segment.meshList)
+        for (const auto &it : segment.meshList)
         {
-            ViewerOpenGL::render(m.second);
+            ViewerOpenGL::render(it.second);
         }
 
         glDisable(GL_BLEND);
@@ -557,11 +557,6 @@ void ViewerOpenGLViewport::renderAttributes()
     {
         const Segment &segment = segments[i];
 
-        if (segment.treeAttributes.status != TreeAttributes::Status::VALID)
-        {
-            continue;
-        }
-
         // Ignore hidden segments.
         if (!filter.enabled(segment.id))
         {
@@ -575,24 +570,29 @@ void ViewerOpenGLViewport::renderAttributes()
         }
 
         // Render attributes.
-        const TreeAttributes &treeAttributes = segment.treeAttributes;
+        const TreeAttributes &atr = segment.treeAttributes;
 
         glColor3f(1.0F, 1.0F, 0.0F);
 
-        Vector3<float> treeDbhPosition(treeAttributes.dbhPosition);
-        float treeDbhRadius = static_cast<float>(treeAttributes.dbh) * 0.5F;
+        if (segment.treeAttributes.status != TreeAttributes::Status::VALID)
+        {
+            continue;
+        }
+
+        Vector3<float> treeDbhPosition(atr.dbhPosition);
+        float treeDbhRadius = static_cast<float>(atr.dbh) * 0.5F;
         ViewerOpenGL::renderCircle(treeDbhPosition, treeDbhRadius);
 
-        Vector3<float> treePosition(treeAttributes.position);
+        Vector3<float> treePosition(atr.position);
         Vector3<float> treeTip(treePosition[0],
                                treePosition[1],
                                treePosition[2] +
-                                   static_cast<float>(treeAttributes.height));
+                                   static_cast<float>(atr.height));
         ViewerOpenGL::renderLine(treePosition, treeTip);
 
         if (!editor_->settings().view().treePositionAtBottom())
         {
-            treePosition[2] += static_cast<float>(treeAttributes.height);
+            treePosition[2] += static_cast<float>(atr.height);
         }
 
         ViewerOpenGL::renderCross(

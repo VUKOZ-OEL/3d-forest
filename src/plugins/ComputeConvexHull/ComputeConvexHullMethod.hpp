@@ -30,7 +30,8 @@
 class ComputeConvexHullMethod
 {
 public:
-    static void quickhull(const std::vector<double> &points, Mesh &mesh);
+    static void qhull3d(const std::vector<double> &points, Mesh &mesh);
+    static void qhull2d(const std::vector<double> &points, Mesh &mesh, float z);
 };
 
 #endif /* COMPUTE_CONVEX_HULL_METHOD_HPP */

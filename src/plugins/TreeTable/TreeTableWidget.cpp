@@ -132,6 +132,7 @@ void TreeTableWidget::setSegments(const Segments &segments)
                                              "Z [m]",
                                              "Height [m]",
                                              "DBH [m]",
+                                             "Area [m^2]",
                                              "Status"});
 
     // Content.
@@ -172,6 +173,7 @@ void TreeTableWidget::setRow(size_t i)
     setCell(row, COLUMN_HEIGHT, treeAttributes.height / ppm);
     setCell(row, COLUMN_STATUS, toString(treeAttributes.status));
     setCell(row, COLUMN_DBH, treeAttributes.dbh / ppm);
+    setCell(row, COLUMN_AREA, treeAttributes.area / (ppm * ppm));
 }
 
 void TreeTableWidget::setCell(int row, int col, size_t value)

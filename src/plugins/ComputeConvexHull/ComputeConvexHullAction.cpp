@@ -82,7 +82,7 @@ void ComputeConvexHullAction::start(
 
     // Plan the steps.
     progress_.setMaximumStep(nPointsTotal_, 1000);
-    progress_.setMaximumSteps(1);
+    progress_.setMaximumSteps({25.0, 25.0, 25.0, 25.0});
     progress_.setValueSteps(COMPUTE_CONVEX_HULL_STEP_RESET_POINTS);
 }
 
@@ -222,16 +222,13 @@ void ComputeConvexHullAction::stepCalculateHull()
                   << "> point count <"
                   << trees_[currentTreeIndex_].points.size() / 3 << ">.");
 
-        Mesh m;
-        ComputeConvexHullMethod::quickhull(trees_[currentTreeIndex_].points, m);
-
-        LOG_DEBUG(<< "Calculated convex hull has <" << m.position.size() / 3
-                  << "> vertices and <" << m.indices.size() / 3
-                  << "> triangles.");
-
         Segment segment = editor_->segment(trees_[currentTreeIndex_].treeId);
-        m.name = "convexHull";
-        segment.meshList[m.name] = std::move(m);
+
+        float z = static_cast<float>(segment.boundary.min(2));
+
+        calculateConvexHull(segment);
+        calculateConvexHullProjection(segment, z);
+
         editor_->setSegment(segment);
 
         // Next tree.
@@ -247,6 +244,36 @@ void ComputeConvexHullAction::stepCalculateHull()
     progress_.setValueSteps(progress_.maximumSteps());
 
     LOG_DEBUG(<< "Finished calculating convex hull for trees.");
+}
+
+void ComputeConvexHullAction::calculateConvexHull(Segment &segment)
+{
+    Mesh m;
+
+    ComputeConvexHullMethod::qhull3d(trees_[currentTreeIndex_].points, m);
+
+    LOG_DEBUG(<< "Calculated convex hull has <" << m.position.size() / 3
+              << "> vertices and <" << m.position.size() / 9 << "> triangles.");
+
+    m.name = "convexHull";
+    segment.meshList[m.name] = std::move(m);
+}
+
+void ComputeConvexHullAction::calculateConvexHullProjection(Segment &segment,
+                                                            float z)
+{
+    Mesh m;
+
+    ComputeConvexHullMethod::qhull2d(trees_[currentTreeIndex_].points, m, z);
+
+    LOG_DEBUG(<< "Calculated convex hull has <" << m.position.size() / 3
+              << "> vertices and <" << m.position.size() / 9 << "> triangles.");
+
+    // double ppm = editor_->settings().units().pointsPerMeter()[0];
+    segment.treeAttributes.area = m.calculateSurfaceArea2d();
+
+    m.name = "convexHullProjection";
+    segment.meshList[m.name] = std::move(m);
 }
 
 size_t ComputeConvexHullAction::treeIndex(size_t treeId)

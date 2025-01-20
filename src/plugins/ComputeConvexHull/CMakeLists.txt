@@ -31,6 +31,7 @@ add_library(
     ${SUB_PROJECT_NAME}
     SHARED
     ${SOURCES}
+    ../../../3rdparty/cdt/CDT.cpp
     resources/resources.qrc
 )
 
@@ -38,6 +39,7 @@ target_include_directories(
     ${SUB_PROJECT_NAME}
     PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}
+    ../../../3rdparty/cdt
     ../../../3rdparty/convhull_3d
 )
 
