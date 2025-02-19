@@ -15,6 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
+message(
+    STATUS
+    "C++ Compiler: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}"
+)
+
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     message(STATUS "Clang compiler detected, adding compile flags")
     set(CLANG_COMPILE_FLAGS "\
