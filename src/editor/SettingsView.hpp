@@ -80,6 +80,9 @@ public:
     bool treePositionAtBottom() const;
     void setTreePositionAtBottom(bool b);
 
+    bool convexHullVisible() const;
+    void setConvexHullVisible(bool b);
+
 protected:
     double pointSize_;
     Vector3<double> pointColor_;
@@ -90,6 +93,7 @@ protected:
     bool sceneBoundingBoxVisible_;
     bool treeAttributesVisible_;
     bool treePositionAtBottom_;
+    bool convexHullVisible_;
 
     std::vector<std::string> colorSourceString_;
 

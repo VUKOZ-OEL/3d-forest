@@ -58,6 +58,7 @@ public slots:
     void slotSetSceneBoundingBoxVisible(int v);
     void slotSetTreeAttributesVisible(int v);
     void slotSetTreePositionAtBottom(int v);
+    void slotSetConvexHullVisible(int v);
 
 private:
     MainWindow *mainWindow_;
@@ -70,6 +71,7 @@ private:
     QCheckBox *sceneBoundingBoxVisibleCheckBox_;
     QCheckBox *treeAttributesVisibleCheckBox_;
     QCheckBox *treePositionAtBottomCheckBox_;
+    QCheckBox *convexHullVisibleCheckBox_;
 
     SettingsView settings_;
 

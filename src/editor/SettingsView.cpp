@@ -35,7 +35,8 @@ SettingsView::SettingsView()
       distanceBasedFadingVisible_(false),
       sceneBoundingBoxVisible_(true),
       treeAttributesVisible_(true),
-      treePositionAtBottom_(true)
+      treePositionAtBottom_(true),
+      convexHullVisible_(true)
 {
     colorSourceString_ = {"Color",
                           "Intensity",
@@ -132,6 +133,16 @@ void SettingsView::setTreePositionAtBottom(bool b)
     treePositionAtBottom_ = b;
 }
 
+bool SettingsView::convexHullVisible() const
+{
+    return convexHullVisible_;
+}
+
+void SettingsView::setConvexHullVisible(bool b)
+{
+    convexHullVisible_ = b;
+}
+
 void fromJson(SettingsView &out, const Json &in)
 {
     fromJson(out.pointSize_, in["pointSize"]);
@@ -143,6 +154,7 @@ void fromJson(SettingsView &out, const Json &in)
     fromJson(out.sceneBoundingBoxVisible_, in["sceneBoundingBoxVisible"]);
     fromJson(out.treeAttributesVisible_, in["treeAttributesVisible"]);
     fromJson(out.treePositionAtBottom_, in["treePositionAtBottom"]);
+    fromJson(out.convexHullVisible_, in["convexHullVisible"]);
 }
 
 void toJson(Json &out, const SettingsView &in)
@@ -156,6 +168,7 @@ void toJson(Json &out, const SettingsView &in)
     toJson(out["sceneBoundingBoxVisible"], in.sceneBoundingBoxVisible_);
     toJson(out["treeAttributesVisible"], in.treeAttributesVisible_);
     toJson(out["treePositionAtBottom"], in.treePositionAtBottom_);
+    toJson(out["convexHullVisible"], in.convexHullVisible_);
 }
 
 std::string toString(const SettingsView &in)

@@ -527,19 +527,26 @@ void ViewerOpenGLViewport::renderSegments()
             continue;
         }
 
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glDisable(GL_DEPTH_TEST);
-        glColor4f(r, g, b, 0.25F);
-
-        // Render meshes.
-        for (const auto &it : segment.meshList)
+        if (editor_->settings().view().convexHullVisible())
         {
-            ViewerOpenGL::render(it.second);
-        }
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glDisable(GL_DEPTH_TEST);
+            glColor4f(r, g, b, 0.25F);
 
-        glDisable(GL_BLEND);
-        glEnable(GL_DEPTH_TEST);
+            // Render meshes.
+            for (const auto &it : segment.meshList)
+            {
+                if (it.first == "convexHull" ||
+                    it.first == "convexHullProjection")
+                {
+                    ViewerOpenGL::render(it.second);
+                }
+            }
+
+            glDisable(GL_BLEND);
+            glEnable(GL_DEPTH_TEST);
+        }
     }
 }
 

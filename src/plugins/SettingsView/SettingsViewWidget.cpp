@@ -123,11 +123,21 @@ SettingsViewWidget::SettingsViewWidget(MainWindow *mainWindow)
             this,
             SLOT(slotSetTreePositionAtBottom(int)));
 
+    // Convex hull.
+    convexHullVisibleCheckBox_ = new QCheckBox;
+    convexHullVisibleCheckBox_->setChecked(settings_.convexHullVisible());
+    convexHullVisibleCheckBox_->setText(tr("Show convex hull"));
+    connect(convexHullVisibleCheckBox_,
+            SIGNAL(stateChanged(int)),
+            this,
+            SLOT(slotSetConvexHullVisible(int)));
+
     QVBoxLayout *optionsVBoxLayout = new QVBoxLayout;
     optionsVBoxLayout->addWidget(distanceBasedFadingVisibleCheckBox_);
     optionsVBoxLayout->addWidget(sceneBoundingBoxVisibleCheckBox_);
     optionsVBoxLayout->addWidget(treeAttributesVisibleCheckBox_);
     optionsVBoxLayout->addWidget(treePositionAtBottomCheckBox_);
+    optionsVBoxLayout->addWidget(convexHullVisibleCheckBox_);
 
     QGroupBox *optionsGroupBox = new QGroupBox(tr("Options"));
     optionsGroupBox->setLayout(optionsVBoxLayout);
@@ -244,6 +254,9 @@ void SettingsViewWidget::setViewSettings(const SettingsView &settings)
     // Tree position.
     treePositionAtBottomCheckBox_->setChecked(settings_.treePositionAtBottom());
 
+    // Convex hull.
+    convexHullVisibleCheckBox_->setChecked(settings_.convexHullVisible());
+
     unblock();
 }
 
@@ -309,6 +322,13 @@ void SettingsViewWidget::slotSetTreePositionAtBottom(int v)
     (void)v;
     settings_.setTreePositionAtBottom(
         treePositionAtBottomCheckBox_->isChecked());
+    dataChanged();
+}
+
+void SettingsViewWidget::slotSetConvexHullVisible(int v)
+{
+    (void)v;
+    settings_.setConvexHullVisible(convexHullVisibleCheckBox_->isChecked());
     dataChanged();
 }
 
