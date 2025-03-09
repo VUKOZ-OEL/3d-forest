@@ -26,7 +26,6 @@
 #include <mutex>
 
 // Include 3D Forest.
-#include <ApplicationSettings.hpp>
 #include <Classifications.hpp>
 #include <Datasets.hpp>
 #include <ModifierInterface.hpp>
@@ -34,6 +33,7 @@
 #include <Region.hpp>
 #include <Segments.hpp>
 #include <Settings.hpp>
+#include <SettingsApplication.hpp>
 #include <Viewports.hpp>
 
 // Include local.
@@ -63,7 +63,7 @@ public:
 
     // File.
     void open(const std::string &path,
-              const ImportSettings &settings = ImportSettings());
+              const SettingsImport &settings = SettingsImport());
     void saveProject(const std::string &path);
     const std::string &projectPath() const { return projectPath_; }
     const std::string &projectName() const { return projectName_; }
@@ -126,9 +126,9 @@ public:
     void setSettingsUnits(const SettingsUnits &settingsUnits);
 
     // Application Settings.
-    const ApplicationSettings &applicationSettings() const
+    const SettingsApplication &settingsApplication() const
     {
-        return applicationSettings_;
+        return settingsApplication_;
     }
 
     // Modifiers.
@@ -158,7 +158,7 @@ protected:
 
     Segments segments_;
     Settings settings_;
-    ApplicationSettings applicationSettings_;
+    SettingsApplication settingsApplication_;
     Classifications classifications_;
 
     Region clipFilter_;
@@ -178,12 +178,12 @@ protected:
     // Data.
     PageManager pageManager_;
 
-    void readApplicationSettings();
+    void readSettingsApplication();
 
     void openProject(const std::string &path);
 
     void openDataset(const std::string &path,
-                     const ImportSettings &settings = ImportSettings());
+                     const SettingsImport &settings = SettingsImport());
 
     void setProjectPath(const std::string &projectPath);
 

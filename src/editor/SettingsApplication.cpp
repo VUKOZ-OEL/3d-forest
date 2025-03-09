@@ -17,37 +17,37 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ApplicationSettings.cpp */
+/** @file SettingsApplication.cpp */
 
 // Include 3D Forest.
-#include <ApplicationSettings.hpp>
+#include <SettingsApplication.hpp>
 #include <Util.hpp>
 
 // Include local.
-#define LOG_MODULE_NAME "ApplicationSettings"
+#define LOG_MODULE_NAME "SettingsApplication"
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-ApplicationSettings::ApplicationSettings() : cacheSizeMaximum_(1024)
+SettingsApplication::SettingsApplication() : cacheSizeMaximum_(1024)
 {
 }
 
-size_t ApplicationSettings::cacheSizeMaximum() const
+size_t SettingsApplication::cacheSizeMaximum() const
 {
     return cacheSizeMaximum_;
 }
 
-void fromJson(ApplicationSettings &out, const Json &in)
+void fromJson(SettingsApplication &out, const Json &in)
 {
     fromJson(out.cacheSizeMaximum_, in["cacheSizeMaximum"]);
 }
 
-void toJson(Json &out, const ApplicationSettings &in)
+void toJson(Json &out, const SettingsApplication &in)
 {
     toJson(out["cacheSizeMaximum"], in.cacheSizeMaximum_);
 }
 
-std::string toString(const ApplicationSettings &in)
+std::string toString(const SettingsApplication &in)
 {
     Json json;
     toJson(json, in);

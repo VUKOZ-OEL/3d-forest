@@ -90,7 +90,7 @@ static void createDataSet(const std::string &path, double scale)
     LasFile::create(path, points, {scale, scale, scale}, {0, 0, 0});
 
     // Index
-    ImportSettings settings;
+    SettingsImport settings;
     settings.maxIndexLevel1Size = 100;
 
     IndexFileBuilder::index(path, path, settings);

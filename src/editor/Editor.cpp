@@ -32,7 +32,7 @@ static const char *EDITOR_KEY_PROJECT_NAME = "projectName";
 static const char *EDITOR_KEY_DATA_SET = "datasets";
 static const char *EDITOR_KEY_SEGMENT = "segments";
 static const char *EDITOR_KEY_SETTINGS = "settings";
-static const char *EDITOR_KEY_APPLICATION_SETTINGS = "applicationSettings";
+static const char *EDITOR_KEY_SETTINGS_APPLICATION = "settingsApplication";
 // static const char *EDITOR_KEY_CLASSIFICATIONS = "classifications";
 // static const char *EDITOR_KEY_CLIP_FILTER = "clipFilter";
 // static const char *EDITOR_KEY_ELEVATION_RANGE = "elevationRange";
@@ -41,7 +41,7 @@ Editor::Editor()
 {
     LOG_DEBUG(<< "Start creating the editor.");
     close();
-    readApplicationSettings();
+    readSettingsApplication();
     viewportsResize(1);
     LOG_DEBUG(<< "Finished creating the editor.");
 }
@@ -51,13 +51,13 @@ Editor::~Editor()
     LOG_DEBUG(<< "Destroy.");
 }
 
-void Editor::readApplicationSettings()
+void Editor::readSettingsApplication()
 {
     LOG_DEBUG(<< "Start reading application settings.");
 
     std::string path = "settings.json";
 
-    ApplicationSettings newSettings;
+    SettingsApplication newSettings;
 
     // Create default settings.
     try
@@ -65,7 +65,7 @@ void Editor::readApplicationSettings()
         if (!File::exists(path))
         {
             Json out;
-            toJson(out[EDITOR_KEY_APPLICATION_SETTINGS], newSettings);
+            toJson(out[EDITOR_KEY_SETTINGS_APPLICATION], newSettings);
             out.write(path);
         }
     }
@@ -85,26 +85,26 @@ void Editor::readApplicationSettings()
     {
         Json in;
         in.read(path);
-        fromJson(newSettings, in[EDITOR_KEY_APPLICATION_SETTINGS]);
-        applicationSettings_ = newSettings;
+        fromJson(newSettings, in[EDITOR_KEY_SETTINGS_APPLICATION]);
+        settingsApplication_ = newSettings;
     }
     catch (std::exception &e)
     {
         LOG_WARNING(<< "Cancel reading application settings, error message <"
                     << e.what() << ">. Using settings <"
-                    << toString(applicationSettings_) << ">.");
+                    << toString(settingsApplication_) << ">.");
         return;
     }
     catch (...)
     {
         LOG_WARNING(<< "Cancel reading application settings, unknown exception "
                        "is raised. Using settings <"
-                    << toString(applicationSettings_) << ">.");
+                    << toString(settingsApplication_) << ">.");
         return;
     }
 
     LOG_DEBUG(<< "Finished reading application settings <"
-              << toString(applicationSettings_) << ">.");
+              << toString(settingsApplication_) << ">.");
 }
 
 void Editor::close()
@@ -143,7 +143,7 @@ void Editor::close()
     LOG_DEBUG(<< "Finished closing the editor.");
 }
 
-void Editor::open(const std::string &path, const ImportSettings &settings)
+void Editor::open(const std::string &path, const SettingsImport &settings)
 {
     LOG_DEBUG(<< "Start opening new project/dataset path <" << path << ">.");
 
@@ -266,7 +266,7 @@ void Editor::saveProject(const std::string &path)
 }
 
 void Editor::openDataset(const std::string &path,
-                         const ImportSettings &settings)
+                         const SettingsImport &settings)
 {
     LOG_DEBUG(<< "Start opening new dataset from path <" << path << ">.");
 

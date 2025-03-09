@@ -23,7 +23,7 @@
 #define SETTINGS_HPP
 
 // Include 3D Forest.
-#include <ImportSettings.hpp>
+#include <SettingsImport.hpp>
 #include <SettingsUnits.hpp>
 #include <SettingsView.hpp>
 

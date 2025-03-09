@@ -56,7 +56,7 @@ std::string IndexFileBuilder::extension(const std::string &path)
 
 void IndexFileBuilder::index(const std::string &outputPath,
                              const std::string &inputPath,
-                             const ImportSettings &settings)
+                             const SettingsImport &settings)
 {
     char buffer[80];
     IndexFileBuilder builder;
@@ -95,7 +95,7 @@ double IndexFileBuilder::percent() const
 
 void IndexFileBuilder::start(const std::string &outputPath,
                              const std::string &inputPath,
-                             const ImportSettings &settings)
+                             const SettingsImport &settings)
 {
     LOG_INFO(<< "Start creating index for file <" << inputPath << ">.");
 

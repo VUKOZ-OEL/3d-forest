@@ -17,10 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ApplicationSettings.hpp */
+/** @file SettingsApplication.hpp */
 
-#ifndef APPLICATION_SETTINGS_HPP
-#define APPLICATION_SETTINGS_HPP
+#ifndef SETTINGS_APPLICATION_HPP
+#define SETTINGS_APPLICATION_HPP
 
 // Include std.
 
@@ -32,28 +32,28 @@
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 
-/** Application Settings. */
-class EXPORT_EDITOR ApplicationSettings
+/** Settings Application. */
+class EXPORT_EDITOR SettingsApplication
 {
 public:
-    ApplicationSettings();
+    SettingsApplication();
 
     size_t cacheSizeMaximum() const;
 
 private:
     size_t cacheSizeMaximum_;
 
-    friend void fromJson(ApplicationSettings &out, const Json &in);
-    friend void toJson(Json &out, const ApplicationSettings &in);
+    friend void fromJson(SettingsApplication &out, const Json &in);
+    friend void toJson(Json &out, const SettingsApplication &in);
 
-    friend std::string toString(const ApplicationSettings &in);
+    friend std::string toString(const SettingsApplication &in);
 };
 
-void fromJson(ApplicationSettings &out, const Json &in);
-void toJson(Json &out, const ApplicationSettings &in);
+void fromJson(SettingsApplication &out, const Json &in);
+void toJson(Json &out, const SettingsApplication &in);
 
-std::string toString(const ApplicationSettings &in);
+std::string toString(const SettingsApplication &in);
 
 #include <WarningsEnable.hpp>
 
-#endif /* APPLICATION_SETTINGS_HPP */
+#endif /* SETTINGS_APPLICATION_HPP */

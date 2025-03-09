@@ -24,10 +24,10 @@
 
 // Include 3D Forest.
 #include <Box.hpp>
-#include <ImportSettings.hpp>
 #include <IndexFile.hpp>
 #include <Json.hpp>
 #include <LasFile.hpp>
+#include <SettingsImport.hpp>
 
 // Include local.
 #include <ExportEditor.hpp>
@@ -82,7 +82,7 @@ public:
     void read(size_t id,
               const std::string &path,
               const std::string &projectPath,
-              const ImportSettings &settings,
+              const SettingsImport &settings,
               const Box<double> &projectBoundary);
 
 protected:

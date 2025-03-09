@@ -29,9 +29,9 @@
 
 // Include 3D Forest.
 #include <ChunkFile.hpp>
-#include <ImportSettings.hpp>
 #include <IndexFile.hpp>
 #include <LasFile.hpp>
+#include <SettingsImport.hpp>
 
 // Include local.
 #include <ExportEditor.hpp>
@@ -46,7 +46,7 @@ public:
 
     void start(const std::string &outputPath,
                const std::string &inputPath,
-               const ImportSettings &settings);
+               const SettingsImport &settings);
 
     void next();
 
@@ -58,11 +58,11 @@ public:
 
     static void index(const std::string &outputPath,
                       const std::string &inputPath,
-                      const ImportSettings &settings);
+                      const SettingsImport &settings);
 
 protected:
     // Settings.
-    ImportSettings settings_;
+    SettingsImport settings_;
 
     /** Index File Builder State. */
     enum State
