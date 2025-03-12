@@ -159,7 +159,8 @@ void TreeTableWidget::setSegments(const Segments &segments)
 
 void TreeTableWidget::setRow(size_t i)
 {
-    double ppm = mainWindow_->editor().settings().units().pointsPerMeter()[0];
+    double ppm =
+        mainWindow_->editor().settings().unitsSettings().pointsPerMeter()[0];
     int row = static_cast<int>(i);
 
     const Segment &segment = segments_[i];

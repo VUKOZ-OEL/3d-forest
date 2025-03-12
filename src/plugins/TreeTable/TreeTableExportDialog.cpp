@@ -195,7 +195,8 @@ TreeTableExportProperties TreeTableExportDialog::properties() const
         exportValidValuesOnlyCheckBox_->isChecked());
 
     // Other values.
-    double ppm = mainWindow_->editor().settings().units().pointsPerMeter()[0];
+    double ppm =
+        mainWindow_->editor().settings().unitsSettings().pointsPerMeter()[0];
     result.setPointsPerMeter(ppm);
 
     return result;

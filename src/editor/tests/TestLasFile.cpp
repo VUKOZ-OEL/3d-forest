@@ -74,7 +74,7 @@ TEST_CASE(TestLasFileCreateV10)
     LasFile::create(TEST_LAS_FILE_PATH, points, {1, 1, 1}, {0, 0, 0}, 0);
 
     // Create LAS file index.
-    SettingsImport settings;
+    ImportSettings settings;
     IndexFileBuilder::index(TEST_LAS_FILE_PATH, TEST_LAS_FILE_PATH, settings);
 
     // Read the test file.

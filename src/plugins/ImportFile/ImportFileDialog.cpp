@@ -151,9 +151,9 @@ void ImportFileDialog::slotReject()
     setResult(QDialog::Rejected);
 }
 
-SettingsImport ImportFileDialog::settings() const
+ImportSettings ImportFileDialog::settings() const
 {
-    SettingsImport settings;
+    ImportSettings settings;
 
     settings.importFilesAsSeparateTrees =
         importFilesAsSeparateTreesCheckBox_->isChecked();

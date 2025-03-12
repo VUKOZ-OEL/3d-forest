@@ -67,7 +67,7 @@ void ComputeConvexHullAction::start(
     LOG_DEBUG(<< "Start with parameters <" << toString(parameters) << ">.");
 
     // Set input parameters.
-    double ppm = editor_->settings().units().pointsPerMeter()[0];
+    double ppm = editor_->settings().unitsSettings().pointsPerMeter()[0];
 
     parameters_ = parameters;
 
@@ -269,7 +269,7 @@ void ComputeConvexHullAction::calculateConvexHullProjection(Segment &segment,
     LOG_DEBUG(<< "Calculated convex hull has <" << m.position.size() / 3
               << "> vertices and <" << m.position.size() / 9 << "> triangles.");
 
-    // double ppm = editor_->settings().units().pointsPerMeter()[0];
+    // double ppm = editor_->settings().unitsSettings().pointsPerMeter()[0];
     segment.treeAttributes.area = m.calculateSurfaceArea2d();
 
     m.name = "convexHullProjection";

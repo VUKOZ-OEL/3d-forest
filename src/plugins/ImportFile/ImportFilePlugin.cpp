@@ -96,12 +96,12 @@ static void importPluginDialog(MainWindow *mainWindow);
 
 static void importPluginFile(const std::string &pathIn,
                              const std::string &pathOut,
-                             const SettingsImport &settings,
+                             const ImportSettings &settings,
                              MainWindow *mainWindow);
 
 static bool importPluginCreateIndex(const std::string &pathIn,
                                     const std::string &pathOut,
-                                    const SettingsImport &settings,
+                                    const ImportSettings &settings,
                                     MainWindow *mainWindow);
 
 static void importPluginAddAsNewTree(MainWindow *mainWindow);
@@ -164,7 +164,7 @@ static void importPluginDialog(MainWindow *mainWindow)
         return;
     }
 
-    SettingsImport settings = settingsDialog.settings();
+    ImportSettings settings = settingsDialog.settings();
 
     // Import.
     for (auto const &file : selectedFiles)
@@ -183,7 +183,7 @@ static void importPluginDialog(MainWindow *mainWindow)
 
 static void importPluginFile(const std::string &pathIn,
                              const std::string &pathOut,
-                             const SettingsImport &settings,
+                             const ImportSettings &settings,
                              MainWindow *mainWindow)
 {
     LOG_DEBUG(<< "Import file <" << pathIn << ">.");
@@ -203,7 +203,7 @@ static void importPluginFile(const std::string &pathIn,
 
 static bool importPluginCreateIndex(const std::string &pathIn,
                                     const std::string &pathOut,
-                                    const SettingsImport &settings,
+                                    const ImportSettings &settings,
                                     MainWindow *mainWindow)
 {
     std::string ext = toLower(File::fileExtension(pathIn));

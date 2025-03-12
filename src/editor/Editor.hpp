@@ -31,9 +31,9 @@
 #include <ModifierInterface.hpp>
 #include <PageManager.hpp>
 #include <Region.hpp>
+#include <RenderingSettings.hpp>
 #include <Segments.hpp>
 #include <Settings.hpp>
-#include <SettingsApplication.hpp>
 #include <Viewports.hpp>
 
 // Include local.
@@ -63,7 +63,7 @@ public:
 
     // File.
     void open(const std::string &path,
-              const SettingsImport &settings = SettingsImport());
+              const ImportSettings &settings = ImportSettings());
     void saveProject(const std::string &path);
     const std::string &projectPath() const { return projectPath_; }
     const std::string &projectName() const { return projectName_; }
@@ -122,14 +122,10 @@ public:
 
     // Settings.
     const Settings &settings() const { return settings_; }
-    void setSettingsView(const SettingsView &settingsView);
-    void setSettingsUnits(const SettingsUnits &settingsUnits);
-
-    // Application Settings.
-    const SettingsApplication &settingsApplication() const
-    {
-        return settingsApplication_;
-    }
+    void setRenderingSettings(const RenderingSettings &renderingSettings);
+    void setTreeSettings(const TreeSettings &treeSettings);
+    void setUnitsSettings(const UnitsSettings &unitsSettings);
+    void setViewSettings(const ViewSettings &viewSettings);
 
     // Modifiers.
     void addModifier(ModifierInterface *modifier);
@@ -158,7 +154,6 @@ protected:
 
     Segments segments_;
     Settings settings_;
-    SettingsApplication settingsApplication_;
     Classifications classifications_;
 
     Region clipFilter_;
@@ -178,12 +173,13 @@ protected:
     // Data.
     PageManager pageManager_;
 
-    void readSettingsApplication();
+    void readSettings();
+    void writeSettings();
 
     void openProject(const std::string &path);
 
     void openDataset(const std::string &path,
-                     const SettingsImport &settings = SettingsImport());
+                     const ImportSettings &settings = ImportSettings());
 
     void setProjectPath(const std::string &projectPath);
 

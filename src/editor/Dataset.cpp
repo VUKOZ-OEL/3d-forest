@@ -53,7 +53,7 @@ void Dataset::setTranslation(const Vector3<double> &translation)
 void Dataset::read(size_t id,
                    const std::string &path,
                    const std::string &projectPath,
-                   const SettingsImport &settings,
+                   const ImportSettings &settings,
                    const Box<double> &projectBoundary)
 {
     LOG_DEBUG(<< "Read dataset from path <" << path << "> project path <"

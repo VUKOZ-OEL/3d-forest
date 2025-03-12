@@ -28,11 +28,11 @@
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
+static const char *EDITOR_FILE_NAME_SETTINGS = "settings.json";
 static const char *EDITOR_KEY_PROJECT_NAME = "projectName";
 static const char *EDITOR_KEY_DATA_SET = "datasets";
 static const char *EDITOR_KEY_SEGMENT = "segments";
 static const char *EDITOR_KEY_SETTINGS = "settings";
-static const char *EDITOR_KEY_SETTINGS_APPLICATION = "settingsApplication";
 // static const char *EDITOR_KEY_CLASSIFICATIONS = "classifications";
 // static const char *EDITOR_KEY_CLIP_FILTER = "clipFilter";
 // static const char *EDITOR_KEY_ELEVATION_RANGE = "elevationRange";
@@ -41,7 +41,7 @@ Editor::Editor()
 {
     LOG_DEBUG(<< "Start creating the editor.");
     close();
-    readSettingsApplication();
+    readSettings();
     viewportsResize(1);
     LOG_DEBUG(<< "Finished creating the editor.");
 }
@@ -51,32 +51,30 @@ Editor::~Editor()
     LOG_DEBUG(<< "Destroy.");
 }
 
-void Editor::readSettingsApplication()
+void Editor::readSettings()
 {
     LOG_DEBUG(<< "Start reading application settings.");
 
-    std::string path = "settings.json";
-
-    SettingsApplication newSettings;
+    Settings newSettings;
 
     // Create default settings.
     try
     {
-        if (!File::exists(path))
+        if (!File::exists(EDITOR_FILE_NAME_SETTINGS))
         {
             Json out;
-            toJson(out[EDITOR_KEY_SETTINGS_APPLICATION], newSettings);
-            out.write(path);
+            toJson(out[EDITOR_KEY_SETTINGS], newSettings);
+            out.write(EDITOR_FILE_NAME_SETTINGS);
         }
     }
     catch (std::exception &e)
     {
-        LOG_WARNING(<< "Failed to create application settings, error message <"
-                    << e.what() << ">.");
+        LOG_WARNING(<< "Failed to create application settings file, "
+                    << "error message <" << e.what() << ">.");
     }
     catch (...)
     {
-        LOG_WARNING(<< "Failed to create application settings, "
+        LOG_WARNING(<< "Failed to create application settings file, "
                        "unknown exception is raised.");
     }
 
@@ -84,27 +82,52 @@ void Editor::readSettingsApplication()
     try
     {
         Json in;
-        in.read(path);
-        fromJson(newSettings, in[EDITOR_KEY_SETTINGS_APPLICATION]);
-        settingsApplication_ = newSettings;
+        in.read(EDITOR_FILE_NAME_SETTINGS);
+        fromJson(newSettings, in[EDITOR_KEY_SETTINGS]);
+        settings_ = newSettings;
     }
     catch (std::exception &e)
     {
         LOG_WARNING(<< "Cancel reading application settings, error message <"
-                    << e.what() << ">. Using settings <"
-                    << toString(settingsApplication_) << ">.");
+                    << e.what() << ">. Using settings <" << toString(settings_)
+                    << ">.");
         return;
     }
     catch (...)
     {
         LOG_WARNING(<< "Cancel reading application settings, unknown exception "
                        "is raised. Using settings <"
-                    << toString(settingsApplication_) << ">.");
+                    << toString(settings_) << ">.");
         return;
     }
 
     LOG_DEBUG(<< "Finished reading application settings <"
-              << toString(settingsApplication_) << ">.");
+              << toString(settings_) << ">.");
+}
+
+void Editor::writeSettings()
+{
+    LOG_DEBUG(<< "Start writing application settings.");
+
+    // Write the current settings.
+    try
+    {
+        Json out;
+        toJson(out[EDITOR_KEY_SETTINGS], settings_);
+        out.write(EDITOR_FILE_NAME_SETTINGS);
+    }
+    catch (std::exception &e)
+    {
+        LOG_WARNING(<< "Failed to create application settings file, "
+                    << "error message <" << e.what() << ">.");
+    }
+    catch (...)
+    {
+        LOG_WARNING(<< "Failed to create application settings file, "
+                       "unknown exception is raised.");
+    }
+
+    LOG_DEBUG(<< "Finished writing application settings.");
 }
 
 void Editor::close()
@@ -143,7 +166,7 @@ void Editor::close()
     LOG_DEBUG(<< "Finished closing the editor.");
 }
 
-void Editor::open(const std::string &path, const SettingsImport &settings)
+void Editor::open(const std::string &path, const ImportSettings &settings)
 {
     LOG_DEBUG(<< "Start opening new project/dataset path <" << path << ">.");
 
@@ -211,10 +234,10 @@ void Editor::openProject(const std::string &path)
         // }
 
         // Settings.
-        if (in.contains(EDITOR_KEY_SETTINGS))
-        {
-            fromJson(settings_, in[EDITOR_KEY_SETTINGS]);
-        }
+        // if (in.contains(EDITOR_KEY_SETTINGS))
+        // {
+        //     fromJson(settings_, in[EDITOR_KEY_SETTINGS]);
+        // }
 
         // Clip filter.
         // if (in.contains(EDITOR_KEY_CLIP_FILTER))
@@ -254,7 +277,7 @@ void Editor::saveProject(const std::string &path)
     toJson(out[EDITOR_KEY_DATA_SET], datasets_);
     toJson(out[EDITOR_KEY_SEGMENT], segments_);
     // toJson(out[EDITOR_KEY_CLASSIFICATIONS], classifications_);
-    toJson(out[EDITOR_KEY_SETTINGS], settings_);
+    // toJson(out[EDITOR_KEY_SETTINGS], settings_);
     // toJson(out[EDITOR_KEY_CLIP_FILTER], clipFilter_);
     // toJson(out[EDITOR_KEY_ELEVATION_RANGE], elevationFilter_);
 
@@ -266,7 +289,7 @@ void Editor::saveProject(const std::string &path)
 }
 
 void Editor::openDataset(const std::string &path,
-                         const SettingsImport &settings)
+                         const ImportSettings &settings)
 {
     LOG_DEBUG(<< "Start opening new dataset from path <" << path << ">.");
 
@@ -478,10 +501,10 @@ void Editor::updateAfterRead()
 
     if (datasets_.size() > 0)
     {
-        SettingsUnits settingsUnits = settings_.units();
-        settingsUnits.setLasFileScaling(datasets_.at(0).scalingFile());
+        UnitsSettings unitsSettings = settings_.unitsSettings();
+        unitsSettings.setLasFileScaling(datasets_.at(0).scalingFile());
 
-        setSettingsUnits(settingsUnits);
+        setUnitsSettings(unitsSettings);
     }
 
     for (size_t i = 0; i < segments_.size(); i++)
@@ -510,15 +533,28 @@ void Editor::applyFilters()
     }
 }
 
-void Editor::setSettingsView(const SettingsView &settingsView)
+void Editor::setRenderingSettings(const RenderingSettings &renderingSettings)
 {
-    settings_.view(settingsView);
-    unsavedChanges_ = true;
+    settings_.setRenderingSettings(renderingSettings);
+    writeSettings();
 }
 
-void Editor::setSettingsUnits(const SettingsUnits &settingsUnits)
+void Editor::setTreeSettings(const TreeSettings &treeSettings)
 {
-    unsavedChanges_ = settings_.units(settingsUnits);
+    settings_.setTreeSettings(treeSettings);
+    writeSettings();
+}
+
+void Editor::setUnitsSettings(const UnitsSettings &unitsSettings)
+{
+    settings_.setUnitsSettings(unitsSettings);
+    writeSettings();
+}
+
+void Editor::setViewSettings(const ViewSettings &viewSettings)
+{
+    settings_.setViewSettings(viewSettings);
+    writeSettings();
 }
 
 void Editor::addModifier(ModifierInterface *modifier)

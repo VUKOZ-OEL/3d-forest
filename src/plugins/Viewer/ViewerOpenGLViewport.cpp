@@ -451,7 +451,7 @@ void ViewerOpenGLViewport::renderFirstFrame()
 
     clearScreen();
 
-    if (editor_->settings().view().distanceBasedFadingVisible())
+    if (editor_->settings().viewSettings().distanceBasedFadingVisible())
     {
         glDisable(GL_FOG);
     }
@@ -465,7 +465,7 @@ void ViewerOpenGLViewport::renderFirstFrame()
     renderSegments();
 
     // Bounding box.
-    if (editor_->settings().view().sceneBoundingBoxVisible())
+    if (editor_->settings().viewSettings().sceneBoundingBoxVisible())
     {
         glColor3f(0.25F, 0.25F, 0.25F);
         ViewerOpenGL::renderAabb(aabb_);
@@ -473,7 +473,7 @@ void ViewerOpenGLViewport::renderFirstFrame()
 
     renderGuides();
 
-    if (editor_->settings().view().distanceBasedFadingVisible())
+    if (editor_->settings().viewSettings().distanceBasedFadingVisible())
     {
         glEnable(GL_FOG);
     }
@@ -527,7 +527,7 @@ void ViewerOpenGLViewport::renderSegments()
             continue;
         }
 
-        if (editor_->settings().view().convexHullVisible())
+        if (editor_->settings().treeSettings().convexHullVisible())
         {
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -552,7 +552,7 @@ void ViewerOpenGLViewport::renderSegments()
 
 void ViewerOpenGLViewport::renderAttributes()
 {
-    if (!editor_->settings().view().treeAttributesVisible())
+    if (!editor_->settings().treeSettings().treeAttributesVisible())
     {
         return;
     }
@@ -597,7 +597,8 @@ void ViewerOpenGLViewport::renderAttributes()
                                    static_cast<float>(atr.height));
         ViewerOpenGL::renderLine(treePosition, treeTip);
 
-        if (!editor_->settings().view().treePositionAtBottom())
+        if (editor_->settings().treeSettings().treePosition() ==
+            TreeSettings::Position::TOP)
         {
             treePosition[2] += static_cast<float>(atr.height);
         }
@@ -639,7 +640,7 @@ void ViewerOpenGLViewport::renderGuides()
 
 void ViewerOpenGLViewport::renderSceneSettingsEnable()
 {
-    const SettingsView &opt = editor_->settings().view();
+    const ViewSettings &opt = editor_->settings().viewSettings();
 
     // Background.
     const Vector3<double> &rgb = opt.backgroundColor();
@@ -677,7 +678,7 @@ void ViewerOpenGLViewport::renderSceneSettingsDisable()
 {
     glPointSize(1.0F);
 
-    if (editor_->settings().view().distanceBasedFadingVisible())
+    if (editor_->settings().viewSettings().distanceBasedFadingVisible())
     {
         glDisable(GL_FOG);
     }
