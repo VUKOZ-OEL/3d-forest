@@ -66,12 +66,12 @@ protected:
 
 void fromJson(TreeSettings &out, const Json &in);
 void toJson(Json &out, const TreeSettings &in);
-std::string toString(const TreeSettings &in);
+std::string EXPORT_EDITOR toString(const TreeSettings &in);
 
 void fromJson(TreeSettings::Position &out, const Json &in);
 void toJson(Json &out, const TreeSettings::Position &in);
 void fromString(TreeSettings::Position &out, const std::string &in);
-std::string toString(const TreeSettings::Position &in);
+std::string EXPORT_EDITOR toString(const TreeSettings::Position &in);
 
 #include <WarningsEnable.hpp>
 
