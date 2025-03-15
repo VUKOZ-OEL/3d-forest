@@ -527,6 +527,26 @@ void ViewerOpenGLViewport::renderSegments()
             continue;
         }
 
+        if (editor_->settings().treeSettings().convexHullProjectionVisible())
+        {
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glDisable(GL_DEPTH_TEST);
+            glColor4f(r, g, b, 0.25F);
+
+            // Render meshes.
+            for (const auto &it : segment.meshList)
+            {
+                if (it.first == "convexHullProjection")
+                {
+                    ViewerOpenGL::render(it.second);
+                }
+            }
+
+            glDisable(GL_BLEND);
+            glEnable(GL_DEPTH_TEST);
+        }
+
         if (editor_->settings().treeSettings().convexHullVisible())
         {
             glEnable(GL_BLEND);
@@ -537,8 +557,7 @@ void ViewerOpenGLViewport::renderSegments()
             // Render meshes.
             for (const auto &it : segment.meshList)
             {
-                if (it.first == "convexHull" ||
-                    it.first == "convexHullProjection")
+                if (it.first == "convexHull")
                 {
                     ViewerOpenGL::render(it.second);
                 }
@@ -577,36 +596,42 @@ void ViewerOpenGLViewport::renderAttributes()
         }
 
         // Render attributes.
-        const TreeAttributes &atr = segment.treeAttributes;
+        const TreeAttributes &attributes = segment.treeAttributes;
 
         glColor3f(1.0F, 1.0F, 0.0F);
 
-        if (segment.treeAttributes.status != TreeAttributes::Status::VALID)
+        if (attributes.isDbhValid())
         {
-            continue;
+            Vector3<float> treeDbhPosition(attributes.dbhPosition);
+            float treeDbhRadius = static_cast<float>(attributes.dbh) * 0.5F;
+            ViewerOpenGL::renderCircle(treeDbhPosition, treeDbhRadius);
         }
 
-        Vector3<float> treeDbhPosition(atr.dbhPosition);
-        float treeDbhRadius = static_cast<float>(atr.dbh) * 0.5F;
-        ViewerOpenGL::renderCircle(treeDbhPosition, treeDbhRadius);
-
-        Vector3<float> treePosition(atr.position);
-        Vector3<float> treeTip(treePosition[0],
-                               treePosition[1],
-                               treePosition[2] +
-                                   static_cast<float>(atr.height));
-        ViewerOpenGL::renderLine(treePosition, treeTip);
-
-        if (editor_->settings().treeSettings().treePosition() ==
-            TreeSettings::Position::TOP)
+        if (attributes.isPositionValid())
         {
-            treePosition[2] += static_cast<float>(atr.height);
-        }
+            Vector3<float> treePosition(attributes.position);
 
-        ViewerOpenGL::renderCross(
-            treePosition,
-            static_cast<float>(segment.boundary.length(0)),
-            static_cast<float>(segment.boundary.length(1)));
+            if (attributes.isHeightValid())
+            {
+                Vector3<float> treeTip(
+                    treePosition[0],
+                    treePosition[1],
+                    treePosition[2] + static_cast<float>(attributes.height));
+
+                ViewerOpenGL::renderLine(treePosition, treeTip);
+
+                if (editor_->settings().treeSettings().treePosition() ==
+                    TreeSettings::Position::TOP)
+                {
+                    treePosition[2] += static_cast<float>(attributes.height);
+                }
+            }
+
+            ViewerOpenGL::renderCross(
+                treePosition,
+                static_cast<float>(segment.boundary.length(0)),
+                static_cast<float>(segment.boundary.length(1)));
+        }
     }
 }
 

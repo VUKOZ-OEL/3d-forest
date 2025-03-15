@@ -374,10 +374,6 @@ void ComputeTreeAttributesAction::validateAttributes(
 {
     if (treeAttributes.dbh > parameters_.maximumValidCalculatedDbh)
     {
-        treeAttributes.status = TreeAttributes::Status::INVALID;
-    }
-    else
-    {
-        treeAttributes.status = TreeAttributes::Status::VALID;
+        treeAttributes.dbh = 0.0;
     }
 }

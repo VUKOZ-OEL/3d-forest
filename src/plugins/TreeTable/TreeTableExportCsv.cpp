@@ -62,7 +62,7 @@ void TreeTableExportCsv::create(const std::string &path)
 void TreeTableExportCsv::write(const Segment &segment)
 {
     if (properties().exportValidValuesOnly() &&
-        segment.treeAttributes.status != TreeAttributes::Status::VALID)
+        !segment.treeAttributes.isValid())
     {
         return;
     }
@@ -90,7 +90,7 @@ void TreeTableExportCsv::write(const Segment &segment)
         (void)snprintf(buffer,
                        sizeof(buffer),
                        ", \"%s\"",
-                       toString(segment.treeAttributes.status).c_str());
+                       segment.treeAttributes.isValid() ? "Valid" : "Invalid");
 
         (void)ustrcat(text, buffer);
     }

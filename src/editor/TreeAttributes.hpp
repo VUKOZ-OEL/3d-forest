@@ -30,14 +30,6 @@
 class TreeAttributes
 {
 public:
-    /** Tree Attributes Status. */
-    enum class Status
-    {
-        UNKNOWN,
-        VALID,
-        INVALID
-    };
-
     /// Calculated tree position from X and Y coordinates in tree base range.
     Vector3<double> position;
 
@@ -53,48 +45,37 @@ public:
     /// Calculated DBH (Diameter at Breast Height) value.
     double dbh{0.0};
 
-    /// Result of tree attributes calculation.
-    TreeAttributes::Status status{TreeAttributes::Status::UNKNOWN};
+    /// Validate position and height.
+    bool isValid() const;
+
+    /// Validate position.
+    bool isPositionValid() const;
+
+    /// Validate height.
+    bool isHeightValid() const;
+
+    /// Validate DBH.
+    bool isDbhValid() const;
 };
 
-inline std::string toString(const TreeAttributes::Status &in)
+inline bool TreeAttributes::isValid() const
 {
-    switch (in)
-    {
-        case TreeAttributes::Status::VALID:
-            return "Valid";
-        case TreeAttributes::Status::INVALID:
-            return "Invalid";
-        case TreeAttributes::Status::UNKNOWN:
-        default:
-            return "Unknown";
-    }
+    return isHeightValid() && isPositionValid();
 }
 
-inline void fromString(TreeAttributes::Status &out, const std::string &in)
+inline bool TreeAttributes::isPositionValid() const
 {
-    if (in == "Valid")
-    {
-        out = TreeAttributes::Status::VALID;
-    }
-    else if (in == "Invalid")
-    {
-        out = TreeAttributes::Status::INVALID;
-    }
-    else
-    {
-        out = TreeAttributes::Status::UNKNOWN;
-    }
+    return position != Vector3<double>();
 }
 
-inline void toJson(Json &out, const TreeAttributes::Status &in)
+inline bool TreeAttributes::isHeightValid() const
 {
-    out = toString(in);
+    return height > 0.0;
 }
 
-inline void fromJson(TreeAttributes::Status &out, const Json &in)
+inline bool TreeAttributes::isDbhValid() const
 {
-    fromString(out, in.string());
+    return dbh > 0.0 && dbhPosition != Vector3<double>();
 }
 
 inline void toJson(Json &out, const TreeAttributes &in)
@@ -104,7 +85,6 @@ inline void toJson(Json &out, const TreeAttributes &in)
     toJson(out["area"], in.area);
     toJson(out["dbhPosition"], in.dbhPosition);
     toJson(out["dbh"], in.dbh);
-    toJson(out["status"], in.status);
 }
 
 inline void fromJson(TreeAttributes &out, const Json &in)
@@ -114,7 +94,6 @@ inline void fromJson(TreeAttributes &out, const Json &in)
     fromJson(out.area, in["area"]);
     fromJson(out.dbhPosition, in["dbhPosition"]);
     fromJson(out.dbh, in["dbh"]);
-    fromJson(out.status, in["status"]);
 }
 
 inline std::string toString(const TreeAttributes &in)
