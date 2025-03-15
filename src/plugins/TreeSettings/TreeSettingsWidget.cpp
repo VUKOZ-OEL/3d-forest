@@ -49,6 +49,16 @@ TreeSettingsWidget::TreeSettingsWidget(MainWindow *mainWindow)
     LOG_DEBUG(<< "Start creating tree settings widget.");
 
     // Tree attributes.
+    useOnlyForSelectedTreesCheckBox_ = new QCheckBox;
+    useOnlyForSelectedTreesCheckBox_->setChecked(
+        settings_.useOnlyForSelectedTrees());
+    useOnlyForSelectedTreesCheckBox_->setText(
+        tr("Use only for selected trees"));
+    connect(useOnlyForSelectedTreesCheckBox_,
+            SIGNAL(stateChanged(int)),
+            this,
+            SLOT(slotSetUseOnlyForSelectedTrees(int)));
+
     treeAttributesVisibleCheckBox_ = new QCheckBox;
     treeAttributesVisibleCheckBox_->setChecked(
         settings_.treeAttributesVisible());
@@ -86,6 +96,7 @@ TreeSettingsWidget::TreeSettingsWidget(MainWindow *mainWindow)
             SLOT(slotSetConvexHullProjectionVisible(int)));
 
     QVBoxLayout *optionsVBoxLayout = new QVBoxLayout;
+    optionsVBoxLayout->addWidget(useOnlyForSelectedTreesCheckBox_);
     optionsVBoxLayout->addWidget(treeAttributesVisibleCheckBox_);
     optionsVBoxLayout->addWidget(treePositionAtBottomCheckBox_);
     optionsVBoxLayout->addWidget(convexHullVisibleCheckBox_);
@@ -157,6 +168,10 @@ void TreeSettingsWidget::setTreeSettings(const TreeSettings &settings)
 
     settings_ = settings;
 
+    // Use only for selected/all trees.
+    useOnlyForSelectedTreesCheckBox_->setChecked(
+        settings_.useOnlyForSelectedTrees());
+
     // Tree attributes.
     treeAttributesVisibleCheckBox_->setChecked(
         settings_.treeAttributesVisible());
@@ -173,6 +188,14 @@ void TreeSettingsWidget::setTreeSettings(const TreeSettings &settings)
         settings_.convexHullProjectionVisible());
 
     unblock();
+}
+
+void TreeSettingsWidget::slotSetUseOnlyForSelectedTrees(int v)
+{
+    (void)v;
+    settings_.setUseOnlyForSelectedTrees(
+        useOnlyForSelectedTreesCheckBox_->isChecked());
+    dataChanged();
 }
 
 void TreeSettingsWidget::slotSetTreeAttributesVisible(int v)

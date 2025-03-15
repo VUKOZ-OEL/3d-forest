@@ -527,6 +527,12 @@ void ViewerOpenGLViewport::renderSegments()
             continue;
         }
 
+        if (editor_->settings().treeSettings().useOnlyForSelectedTrees() &&
+            !segment.selected)
+        {
+            continue;
+        }
+
         if (editor_->settings().treeSettings().convexHullProjectionVisible())
         {
             glEnable(GL_BLEND);
@@ -591,6 +597,12 @@ void ViewerOpenGLViewport::renderAttributes()
 
         // Ignore "unsegmented".
         if (segment.id == 0)
+        {
+            continue;
+        }
+
+        if (editor_->settings().treeSettings().useOnlyForSelectedTrees() &&
+            !segment.selected)
         {
             continue;
         }

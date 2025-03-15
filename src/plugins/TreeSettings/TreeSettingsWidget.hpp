@@ -48,6 +48,7 @@ public:
 public slots:
     void slotUpdate(void *sender, const QSet<Editor::Type> &target);
 
+    void slotSetUseOnlyForSelectedTrees(int v);
     void slotSetTreeAttributesVisible(int v);
     void slotSetTreePositionAtBottom(int v);
     void slotSetConvexHullVisible(int v);
@@ -56,6 +57,7 @@ public slots:
 private:
     MainWindow *mainWindow_;
 
+    QCheckBox *useOnlyForSelectedTreesCheckBox_;
     QCheckBox *treeAttributesVisibleCheckBox_;
     QCheckBox *treePositionAtBottomCheckBox_;
     QCheckBox *convexHullVisibleCheckBox_;

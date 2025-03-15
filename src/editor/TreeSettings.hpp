@@ -36,6 +36,9 @@ class EXPORT_EDITOR TreeSettings
 public:
     TreeSettings();
 
+    bool useOnlyForSelectedTrees() const;
+    void setUseOnlyForSelectedTrees(bool on);
+
     bool treeAttributesVisible() const;
     void setTreeAttributesVisible(bool visible);
 
@@ -55,6 +58,7 @@ public:
     void setConvexHullProjectionVisible(bool visible);
 
 protected:
+    bool useOnlyForSelectedTrees_;
     bool treeAttributesVisible_;
     TreeSettings::Position treePosition_;
     bool convexHullVisible_;

@@ -28,12 +28,23 @@
 #include <Log.hpp>
 
 TreeSettings::TreeSettings()
-    : treeAttributesVisible_(true),
+    : useOnlyForSelectedTrees_(false),
+      treeAttributesVisible_(true),
       treePosition_(TreeSettings::Position::BOTTOM),
       convexHullVisible_(true),
       convexHullProjectionVisible_(true)
 {
     // empty
+}
+
+bool TreeSettings::useOnlyForSelectedTrees() const
+{
+    return useOnlyForSelectedTrees_;
+}
+
+void TreeSettings::setUseOnlyForSelectedTrees(bool on)
+{
+    useOnlyForSelectedTrees_ = on;
 }
 
 bool TreeSettings::treeAttributesVisible() const
@@ -78,6 +89,7 @@ void TreeSettings::setConvexHullProjectionVisible(bool visible)
 
 void fromJson(TreeSettings &out, const Json &in)
 {
+    fromJson(out.useOnlyForSelectedTrees_, in["useOnlyForSelectedTrees"]);
     fromJson(out.treeAttributesVisible_, in["treeAttributesVisible"]);
     fromJson(out.treePosition_, in["treePosition"]);
     fromJson(out.convexHullVisible_, in["convexHullVisible"]);
@@ -87,6 +99,7 @@ void fromJson(TreeSettings &out, const Json &in)
 
 void toJson(Json &out, const TreeSettings &in)
 {
+    toJson(out["useOnlyForSelectedTrees"], in.useOnlyForSelectedTrees_);
     toJson(out["treeAttributesVisible"], in.treeAttributesVisible_);
     toJson(out["treePosition"], in.treePosition_);
     toJson(out["convexHullVisible"], in.convexHullVisible_);
