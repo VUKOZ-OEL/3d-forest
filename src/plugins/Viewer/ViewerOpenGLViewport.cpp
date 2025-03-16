@@ -402,15 +402,18 @@ void ViewerOpenGLViewport::renderScene()
                 glColor3f(1.0F, 1.0F, 1.0F);
             }
 
-            ViewerOpenGL::render(ViewerOpenGL::POINTS,
-                                 page.renderPosition,
-                                 page.size(),
-                                 page.renderColor.data(),
-                                 page.renderColor.size(),
-                                 nullptr,
-                                 0,
-                                 page.selection.data(),
-                                 page.selectionSize);
+            if (page.selectionSize > 0)
+            {
+                ViewerOpenGL::render(ViewerOpenGL::POINTS,
+                                     page.renderPosition,
+                                     page.size(),
+                                     page.renderColor.data(),
+                                     page.renderColor.size(),
+                                     nullptr,
+                                     0,
+                                     page.selection.data(),
+                                     page.selectionSize);
+            }
 
             glFlush();
 

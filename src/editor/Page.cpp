@@ -32,6 +32,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "Page"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 Page::Page(Editor *editor, Query *query, uint32_t datasetId, uint32_t pageId)
@@ -826,6 +827,8 @@ void Page::queryWhereSegment()
         }
     }
 
+    LOG_DEBUG(<< "Old selection size <" << selectionSize << ">.");
+    LOG_DEBUG(<< "New selection size <" << nSelectedNew << ">.");
     selectionSize = nSelectedNew;
 }
 

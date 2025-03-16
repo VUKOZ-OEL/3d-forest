@@ -28,6 +28,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "ViewerOpenGL"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 ViewerOpenGL::ViewerOpenGL()
@@ -91,11 +92,13 @@ void ViewerOpenGL::render(Mode mode,
     if (indicesSize > 0)
     {
         GLsizei n = static_cast<GLsizei>(indicesSize);
+        LOG_DEBUG(<< "glDrawElements n <" << n << ">.");
         glDrawElements(glmode, n, GL_UNSIGNED_INT, indices);
     }
     else
     {
         GLsizei n = static_cast<GLsizei>(positionSize / 3);
+        LOG_DEBUG(<< "glDrawArrays n <" << n << ">.");
         glDrawArrays(glmode, 0, n);
     }
 
