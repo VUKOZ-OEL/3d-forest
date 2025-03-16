@@ -26,12 +26,12 @@
 #include <mutex>
 
 // Include 3D Forest.
-#include <ApplicationSettings.hpp>
 #include <Classifications.hpp>
 #include <Datasets.hpp>
 #include <ModifierInterface.hpp>
 #include <PageManager.hpp>
 #include <Region.hpp>
+#include <RenderingSettings.hpp>
 #include <Segments.hpp>
 #include <Settings.hpp>
 #include <Viewports.hpp>
@@ -122,14 +122,10 @@ public:
 
     // Settings.
     const Settings &settings() const { return settings_; }
-    void setSettingsView(const SettingsView &settingsView);
-    void setSettingsUnits(const SettingsUnits &settingsUnits);
-
-    // Application Settings.
-    const ApplicationSettings &applicationSettings() const
-    {
-        return applicationSettings_;
-    }
+    void setRenderingSettings(const RenderingSettings &renderingSettings);
+    void setTreeSettings(const TreeSettings &treeSettings);
+    void setUnitsSettings(const UnitsSettings &unitsSettings);
+    void setViewSettings(const ViewSettings &viewSettings);
 
     // Modifiers.
     void addModifier(ModifierInterface *modifier);
@@ -158,7 +154,6 @@ protected:
 
     Segments segments_;
     Settings settings_;
-    ApplicationSettings applicationSettings_;
     Classifications classifications_;
 
     Region clipFilter_;
@@ -178,7 +173,8 @@ protected:
     // Data.
     PageManager pageManager_;
 
-    void readApplicationSettings();
+    void readSettings();
+    void writeSettings();
 
     void openProject(const std::string &path);
 

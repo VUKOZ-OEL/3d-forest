@@ -123,7 +123,8 @@ void TreeTableWidget::setSegments(const Segments &segments)
 
     tableWidget_->clear();
 
-    tableWidget_->setRowCount(static_cast<int>(segments_.size()));
+    size_t nRows = (segments_.size() > 0) ? (segments_.size() - 1) : 0;
+    tableWidget_->setRowCount(static_cast<int>(nRows));
     tableWidget_->setColumnCount(COLUMN_LAST);
     tableWidget_->setHorizontalHeaderLabels({"ID",
                                              "Label",
@@ -136,9 +137,9 @@ void TreeTableWidget::setSegments(const Segments &segments)
                                              "Status"});
 
     // Content.
-    for (size_t i = 0; i < segments_.size(); i++)
+    for (size_t i = 1; i < segments_.size(); i++)
     {
-        setRow(i);
+        setRow(static_cast<int>(i - 1), i);
     }
 
     // Resize Columns to the minimum space.
@@ -157,10 +158,10 @@ void TreeTableWidget::setSegments(const Segments &segments)
     unblock();
 }
 
-void TreeTableWidget::setRow(size_t i)
+void TreeTableWidget::setRow(int row, size_t i)
 {
-    double ppm = mainWindow_->editor().settings().units().pointsPerMeter()[0];
-    int row = static_cast<int>(i);
+    double ppm =
+        mainWindow_->editor().settings().unitsSettings().pointsPerMeter()[0];
 
     const Segment &segment = segments_[i];
     const TreeAttributes &treeAttributes = segment.treeAttributes;
@@ -171,7 +172,7 @@ void TreeTableWidget::setRow(size_t i)
     setCell(row, COLUMN_Y, treeAttributes.position[1] / ppm);
     setCell(row, COLUMN_Z, treeAttributes.position[2] / ppm);
     setCell(row, COLUMN_HEIGHT, treeAttributes.height / ppm);
-    setCell(row, COLUMN_STATUS, toString(treeAttributes.status));
+    setCell(row, COLUMN_STATUS, treeAttributes.isValid() ? "Valid" : "Invalid");
     setCell(row, COLUMN_DBH, treeAttributes.dbh / ppm);
     setCell(row, COLUMN_AREA, treeAttributes.area / (ppm * ppm));
 }
@@ -194,7 +195,7 @@ void TreeTableWidget::setCell(int row, int col, const std::string &value)
     if (col == COLUMN_ID)
     {
         // Color legend.
-        size_t index = static_cast<size_t>(row);
+        size_t index = static_cast<size_t>(row) + 1;
         const Vector3<double> &rgb = segments_[index].color;
 
         QColor color;
@@ -233,7 +234,7 @@ void TreeTableWidget::slotExport()
 
             writer->create(writer->properties().fileName());
 
-            for (size_t i = 0; i < segments_.size(); i++)
+            for (size_t i = 1; i < segments_.size(); i++)
             {
                 writer->write(segments_[i]);
             }

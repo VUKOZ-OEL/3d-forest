@@ -127,7 +127,8 @@ void FilterAreaBoxWidget::setRegion(const Region &region)
 
     region_ = region;
 
-    double ppm = mainWindow_->editor().settings().units().pointsPerMeter()[0];
+    double ppm =
+        mainWindow_->editor().settings().unitsSettings().pointsPerMeter()[0];
 
     for (size_t i = 0; i < 3; i++)
     {
@@ -186,7 +187,8 @@ void FilterAreaBoxWidget::slotRangeIntermediateMinimumValue()
 {
     LOG_DEBUG(<< "Minimum value changed.");
 
-    double ppm = mainWindow_->editor().settings().units().pointsPerMeter()[0];
+    double ppm =
+        mainWindow_->editor().settings().unitsSettings().pointsPerMeter()[0];
 
     QObject *obj = sender();
     for (int i = 0; i < 3; i++)
@@ -206,7 +208,8 @@ void FilterAreaBoxWidget::slotRangeIntermediateMaximumValue()
 {
     LOG_DEBUG(<< "Maximum value changed.");
 
-    double ppm = mainWindow_->editor().settings().units().pointsPerMeter()[0];
+    double ppm =
+        mainWindow_->editor().settings().unitsSettings().pointsPerMeter()[0];
 
     QObject *obj = sender();
     for (int i = 0; i < 3; i++)

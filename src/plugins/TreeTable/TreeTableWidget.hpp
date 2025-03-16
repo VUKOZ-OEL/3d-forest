@@ -75,7 +75,7 @@ private:
 
     void setSegments(const Segments &segments);
 
-    void setRow(size_t index);
+    void setRow(int row, size_t index);
     void setCell(int row, int col, size_t value);
     void setCell(int row, int col, double value);
     void setCell(int row, int col, const std::string &value);

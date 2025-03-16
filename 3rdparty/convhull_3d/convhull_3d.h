@@ -744,7 +744,7 @@ void convhull_3d_build_alloc
             reldist[i] += ch_pow(absdist[i*d+j], (CH_FLOAT)2.0);
     
     /* Sort from maximum to minimum relative distance */
-    int num_pleft, cnt;
+    int num_pleft; //, cnt;
     int* ind, *pleft;
     ind = (int*)ch_stateful_malloc(allocator, (nVert-d-1) * sizeof(int));
     pleft = (int*)ch_stateful_malloc(allocator, (nVert-d-1) * sizeof(int));
@@ -762,7 +762,7 @@ void convhull_3d_build_alloc
 
     /* cnt is equal to the points having been selected without deletion of
      nonvisible points (i.e. points inside the current convex hull) */
-    cnt=0;
+    // cnt=0;
     
     /* The main loop for the quickhull algorithm */
     CH_FLOAT detA;
@@ -794,7 +794,7 @@ void convhull_3d_build_alloc
             pleft = (int*)ch_stateful_realloc(allocator, pleft, num_pleft*sizeof(int));
         
         /* Update point selection counter */
-        cnt++;
+        // cnt++;
         
         /* find visible faces */
         for(j=0; j<d; j++)
@@ -1429,7 +1429,7 @@ void convhull_nd_build_alloc
             reldist[i] += ch_pow(absdist[i*d+j], (CH_FLOAT)2.0);
 
     /* Sort from maximum to minimum relative distance */
-    int num_pleft, cnt;
+    int num_pleft; //, cnt;
     int* ind, *pleft;
     ind = (int*)ch_stateful_malloc(allocator, (nVert-d-1) * sizeof(int));
     pleft = (int*)ch_stateful_malloc(allocator, (nVert-d-1) * sizeof(int));
@@ -1447,7 +1447,7 @@ void convhull_nd_build_alloc
 
     /* cnt is equal to the points having been selected without deletion of
      nonvisible points (i.e. points inside the current convex hull) */
-    cnt=0;
+    // cnt=0;
 
     /* The main loop for the quickhull algorithm */
     CH_FLOAT detA;
@@ -1479,7 +1479,7 @@ void convhull_nd_build_alloc
             pleft = (int*)ch_stateful_realloc(allocator, pleft, num_pleft*sizeof(int));
 
         /* Update point selection counter */
-        cnt++;
+        // cnt++;
 
         /* find visible faces */
         for(j=0; j<d; j++)

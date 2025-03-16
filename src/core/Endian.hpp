@@ -30,6 +30,10 @@
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>
 
+#ifndef __FLOAT_WORD_ORDER__
+    #define __FLOAT_WORD_ORDER__ __BYTE_ORDER__
+#endif
+
 /** Copy 2 bytes. */
 inline void EXPORT_CORE copy16(uint8_t *dst, const uint8_t *src)
 {
@@ -181,6 +185,7 @@ inline double EXPORT_CORE ltohd(const uint8_t *src)
 {
     double ret;
     uint8_t *dst = reinterpret_cast<uint8_t *>(&ret);
+
 #if __FLOAT_WORD_ORDER__ == __ORDER_LITTLE_ENDIAN__
     copy64(dst, src);
 #else

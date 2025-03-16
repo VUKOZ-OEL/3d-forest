@@ -89,6 +89,15 @@ public:
     Vector3<T> perpendicular() const;
     Vector3<T> rotated(const Vector3<T> &axis, double angle) const;
 
+    bool operator==(const Vector3<T> &other) const
+    {
+        return equal(this->operator[](0), other[0]) &&
+               equal(this->operator[](1), other[1]) &&
+               equal(this->operator[](2), other[2]);
+    }
+
+    bool operator!=(const Vector3<T> &other) const { return !(*this == other); }
+
     friend Vector3<T> operator+(const Vector3<T> &a, const Vector3<T> &b)
     {
         return Vector3<T>(a[0] + b[0], a[1] + b[1], a[2] + b[2]);

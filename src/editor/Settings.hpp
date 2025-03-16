@@ -23,9 +23,10 @@
 #define SETTINGS_HPP
 
 // Include 3D Forest.
-#include <ImportSettings.hpp>
-#include <SettingsUnits.hpp>
-#include <SettingsView.hpp>
+#include <RenderingSettings.hpp>
+#include <TreeSettings.hpp>
+#include <UnitsSettings.hpp>
+#include <ViewSettings.hpp>
 
 // Include local.
 #include <ExportEditor.hpp>
@@ -35,15 +36,24 @@
 class EXPORT_EDITOR Settings
 {
 public:
-    const SettingsView &view() const { return view_; };
-    const SettingsUnits &units() const { return units_; };
+    const RenderingSettings &renderingSettings() const
+    {
+        return renderingSettings_;
+    };
+    const TreeSettings &treeSettings() const { return treeSettings_; };
+    const UnitsSettings &unitsSettings() const { return unitsSettings_; };
+    const ViewSettings &viewSettings() const { return viewSettings_; };
 
-    void view(const SettingsView &view);
-    bool units(const SettingsUnits &units);
+    void setRenderingSettings(const RenderingSettings &renderingSettings);
+    void setTreeSettings(const TreeSettings &treeSettings);
+    bool setUnitsSettings(const UnitsSettings &unitsSettings);
+    void setViewSettings(const ViewSettings &viewSettings);
 
 protected:
-    SettingsView view_;
-    SettingsUnits units_;
+    RenderingSettings renderingSettings_;
+    TreeSettings treeSettings_;
+    UnitsSettings unitsSettings_;
+    ViewSettings viewSettings_;
 
     friend void fromJson(Settings &out, const Json &in);
     friend void toJson(Json &out, const Settings &in);

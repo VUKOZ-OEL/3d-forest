@@ -908,10 +908,11 @@ powershell -C "gci | % {rni $_.Name ($_.Name -replace '24px', '24')}"
         "${workspaceRoot}/src/plugins/ImportFile",
         "${workspaceRoot}/src/plugins/MessageLog",
         "${workspaceRoot}/src/plugins/ProjectFile",
-        "${workspaceRoot}/src/plugins/SettingsUnits",
-        "${workspaceRoot}/src/plugins/SettingsView",
+        "${workspaceRoot}/src/plugins/TreeSettings",
         "${workspaceRoot}/src/plugins/TreeTable",
-        "${workspaceRoot}/src/plugins/Viewer"
+        "${workspaceRoot}/src/plugins/UnitsSettings",
+        "${workspaceRoot}/src/plugins/Viewer",
+        "${workspaceRoot}/src/plugins/ViewSettings"
       ]
     }
     @endverbatim

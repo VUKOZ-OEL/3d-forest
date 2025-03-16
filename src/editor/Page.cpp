@@ -841,11 +841,11 @@ void Page::runModifiers()
 
 void Page::runColorModifier()
 {
-    const SettingsView &opt = editor_->settings().view();
+    const ViewSettings &opt = editor_->settings().viewSettings();
 
     size_t n = size();
 
-    if (opt.colorSource() == SettingsView::ColorSource::COLOR)
+    if (opt.colorSource() == ViewSettings::ColorSource::COLOR)
     {
         for (size_t i = 0; i < n; i++)
         {
@@ -854,7 +854,7 @@ void Page::runColorModifier()
             renderColor[i * 3 + 2] = static_cast<float>(color[i * 3 + 2]);
         }
     }
-    else if (opt.colorSource() == SettingsView::ColorSource::INTENSITY)
+    else if (opt.colorSource() == ViewSettings::ColorSource::INTENSITY)
     {
         // for (size_t i = 0; i < n; i++)
         // {
@@ -871,7 +871,7 @@ void Page::runColorModifier()
                      ColorPalette::BlueCyanYellowRed256);
         }
     }
-    else if (opt.colorSource() == SettingsView::ColorSource::RETURN_NUMBER)
+    else if (opt.colorSource() == ViewSettings::ColorSource::RETURN_NUMBER)
     {
         for (size_t i = 0; i < n; i++)
         {
@@ -881,7 +881,7 @@ void Page::runColorModifier()
                      ColorPalette::BlueCyanGreenYellowRed16);
         }
     }
-    else if (opt.colorSource() == SettingsView::ColorSource::NUMBER_OF_RETURNS)
+    else if (opt.colorSource() == ViewSettings::ColorSource::NUMBER_OF_RETURNS)
     {
         for (size_t i = 0; i < n; i++)
         {
@@ -891,14 +891,14 @@ void Page::runColorModifier()
                      ColorPalette::BlueCyanGreenYellowRed16);
         }
     }
-    else if (opt.colorSource() == SettingsView::ColorSource::CLASSIFICATION)
+    else if (opt.colorSource() == ViewSettings::ColorSource::CLASSIFICATION)
     {
         for (size_t i = 0; i < n; i++)
         {
             setColor(i, classification[i], 15, ColorPalette::Classification);
         }
     }
-    else if (opt.colorSource() == SettingsView::ColorSource::SEGMENT)
+    else if (opt.colorSource() == ViewSettings::ColorSource::SEGMENT)
     {
         const Segments &segments = editor_->segments();
         const size_t max = segments.size();
@@ -921,7 +921,7 @@ void Page::runColorModifier()
             }
         }
     }
-    else if (opt.colorSource() == SettingsView::ColorSource::ELEVATION)
+    else if (opt.colorSource() == ViewSettings::ColorSource::ELEVATION)
     {
         const Range<double> &e = editor_->elevationFilter();
         const Dataset &d = editor_->datasets().key(datasetId_);
@@ -940,7 +940,7 @@ void Page::runColorModifier()
             }
         }
     }
-    else if (opt.colorSource() == SettingsView::ColorSource::DESCRIPTOR)
+    else if (opt.colorSource() == ViewSettings::ColorSource::DESCRIPTOR)
     {
         for (size_t i = 0; i < n; i++)
         {

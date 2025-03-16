@@ -26,37 +26,61 @@
 #define LOG_MODULE_NAME "Settings"
 #include <Log.hpp>
 
-void Settings::view(const SettingsView &view)
+void Settings::setRenderingSettings(const RenderingSettings &renderingSettings)
 {
-    view_ = view;
+    renderingSettings_ = renderingSettings;
 }
 
-bool Settings::units(const SettingsUnits &units)
+void Settings::setTreeSettings(const TreeSettings &treeSettings)
 {
-    return units_.apply(units);
+    treeSettings_ = treeSettings;
+}
+
+bool Settings::setUnitsSettings(const UnitsSettings &unitsSettings)
+{
+    return unitsSettings_.apply(unitsSettings);
+}
+
+void Settings::setViewSettings(const ViewSettings &viewSettings)
+{
+    viewSettings_ = viewSettings;
 }
 
 void fromJson(Settings &out, const Json &in)
 {
-    if (in.contains("view"))
+    if (in.contains("renderingSettings"))
     {
-        fromJson(out.view_, in["view"]);
+        fromJson(out.renderingSettings_, in["renderingSettings"]);
     }
 
-    if (in.contains("units"))
+    if (in.contains("treeSettings"))
     {
-        fromJson(out.units_, in["units"]);
+        fromJson(out.treeSettings_, in["treeSettings"]);
+    }
+
+    if (in.contains("unitsSettings"))
+    {
+        fromJson(out.unitsSettings_, in["unitsSettings"]);
+    }
+
+    if (in.contains("viewSettings"))
+    {
+        fromJson(out.viewSettings_, in["viewSettings"]);
     }
 }
 
 void toJson(Json &out, const Settings &in)
 {
-    toJson(out["view"], in.view_);
-    toJson(out["units"], in.units_);
+    toJson(out["renderingSettings"], in.renderingSettings_);
+    toJson(out["treeSettings"], in.treeSettings_);
+    toJson(out["unitsSettings"], in.unitsSettings_);
+    toJson(out["viewSettings"], in.viewSettings_);
 }
 
 std::string toString(const Settings &in)
 {
-    return "{\"view\": " + toString(in.view_) +
-           ",\"units\": " + toString(in.units_) + "}";
+    return "{\"renderingSettings\": " + toString(in.renderingSettings_) +
+           ",\"treeSettings\": " + toString(in.treeSettings_) +
+           ",\"unitsSettings\": " + toString(in.unitsSettings_) +
+           ",\"viewSettings\": " + toString(in.viewSettings_) + "}";
 }

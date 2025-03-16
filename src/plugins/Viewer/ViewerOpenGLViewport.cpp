@@ -451,7 +451,7 @@ void ViewerOpenGLViewport::renderFirstFrame()
 
     clearScreen();
 
-    if (editor_->settings().view().distanceBasedFadingVisible())
+    if (editor_->settings().viewSettings().distanceBasedFadingVisible())
     {
         glDisable(GL_FOG);
     }
@@ -465,7 +465,7 @@ void ViewerOpenGLViewport::renderFirstFrame()
     renderSegments();
 
     // Bounding box.
-    if (editor_->settings().view().sceneBoundingBoxVisible())
+    if (editor_->settings().viewSettings().sceneBoundingBoxVisible())
     {
         glColor3f(0.25F, 0.25F, 0.25F);
         ViewerOpenGL::renderAabb(aabb_);
@@ -473,7 +473,7 @@ void ViewerOpenGLViewport::renderFirstFrame()
 
     renderGuides();
 
-    if (editor_->settings().view().distanceBasedFadingVisible())
+    if (editor_->settings().viewSettings().distanceBasedFadingVisible())
     {
         glEnable(GL_FOG);
     }
@@ -527,25 +527,57 @@ void ViewerOpenGLViewport::renderSegments()
             continue;
         }
 
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glDisable(GL_DEPTH_TEST);
-        glColor4f(r, g, b, 0.25F);
-
-        // Render meshes.
-        for (const auto &it : segment.meshList)
+        if (editor_->settings().treeSettings().useOnlyForSelectedTrees() &&
+            !segment.selected)
         {
-            ViewerOpenGL::render(it.second);
+            continue;
         }
 
-        glDisable(GL_BLEND);
-        glEnable(GL_DEPTH_TEST);
+        if (editor_->settings().treeSettings().convexHullProjectionVisible())
+        {
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glDisable(GL_DEPTH_TEST);
+            glColor4f(r, g, b, 0.25F);
+
+            // Render meshes.
+            for (const auto &it : segment.meshList)
+            {
+                if (it.first == "convexHullProjection")
+                {
+                    ViewerOpenGL::render(it.second);
+                }
+            }
+
+            glDisable(GL_BLEND);
+            glEnable(GL_DEPTH_TEST);
+        }
+
+        if (editor_->settings().treeSettings().convexHullVisible())
+        {
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glDisable(GL_DEPTH_TEST);
+            glColor4f(r, g, b, 0.25F);
+
+            // Render meshes.
+            for (const auto &it : segment.meshList)
+            {
+                if (it.first == "convexHull")
+                {
+                    ViewerOpenGL::render(it.second);
+                }
+            }
+
+            glDisable(GL_BLEND);
+            glEnable(GL_DEPTH_TEST);
+        }
     }
 }
 
 void ViewerOpenGLViewport::renderAttributes()
 {
-    if (!editor_->settings().view().treeAttributesVisible())
+    if (!editor_->settings().treeSettings().treeAttributesVisible())
     {
         return;
     }
@@ -569,36 +601,49 @@ void ViewerOpenGLViewport::renderAttributes()
             continue;
         }
 
-        // Render attributes.
-        const TreeAttributes &atr = segment.treeAttributes;
-
-        glColor3f(1.0F, 1.0F, 0.0F);
-
-        if (segment.treeAttributes.status != TreeAttributes::Status::VALID)
+        if (editor_->settings().treeSettings().useOnlyForSelectedTrees() &&
+            !segment.selected)
         {
             continue;
         }
 
-        Vector3<float> treeDbhPosition(atr.dbhPosition);
-        float treeDbhRadius = static_cast<float>(atr.dbh) * 0.5F;
-        ViewerOpenGL::renderCircle(treeDbhPosition, treeDbhRadius);
+        // Render attributes.
+        const TreeAttributes &attributes = segment.treeAttributes;
 
-        Vector3<float> treePosition(atr.position);
-        Vector3<float> treeTip(treePosition[0],
-                               treePosition[1],
-                               treePosition[2] +
-                                   static_cast<float>(atr.height));
-        ViewerOpenGL::renderLine(treePosition, treeTip);
+        glColor3f(1.0F, 1.0F, 0.0F);
 
-        if (!editor_->settings().view().treePositionAtBottom())
+        if (attributes.isDbhValid())
         {
-            treePosition[2] += static_cast<float>(atr.height);
+            Vector3<float> treeDbhPosition(attributes.dbhPosition);
+            float treeDbhRadius = static_cast<float>(attributes.dbh) * 0.5F;
+            ViewerOpenGL::renderCircle(treeDbhPosition, treeDbhRadius);
         }
 
-        ViewerOpenGL::renderCross(
-            treePosition,
-            static_cast<float>(segment.boundary.length(0)),
-            static_cast<float>(segment.boundary.length(1)));
+        if (attributes.isPositionValid())
+        {
+            Vector3<float> treePosition(attributes.position);
+
+            if (attributes.isHeightValid())
+            {
+                Vector3<float> treeTip(
+                    treePosition[0],
+                    treePosition[1],
+                    treePosition[2] + static_cast<float>(attributes.height));
+
+                ViewerOpenGL::renderLine(treePosition, treeTip);
+
+                if (editor_->settings().treeSettings().treePosition() ==
+                    TreeSettings::Position::TOP)
+                {
+                    treePosition[2] += static_cast<float>(attributes.height);
+                }
+            }
+
+            ViewerOpenGL::renderCross(
+                treePosition,
+                static_cast<float>(segment.boundary.length(0)),
+                static_cast<float>(segment.boundary.length(1)));
+        }
     }
 }
 
@@ -632,7 +677,7 @@ void ViewerOpenGLViewport::renderGuides()
 
 void ViewerOpenGLViewport::renderSceneSettingsEnable()
 {
-    const SettingsView &opt = editor_->settings().view();
+    const ViewSettings &opt = editor_->settings().viewSettings();
 
     // Background.
     const Vector3<double> &rgb = opt.backgroundColor();
@@ -670,7 +715,7 @@ void ViewerOpenGLViewport::renderSceneSettingsDisable()
 {
     glPointSize(1.0F);
 
-    if (editor_->settings().view().distanceBasedFadingVisible())
+    if (editor_->settings().viewSettings().distanceBasedFadingVisible())
     {
         glDisable(GL_FOG);
     }
