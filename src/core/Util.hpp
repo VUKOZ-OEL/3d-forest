@@ -32,6 +32,7 @@
 #include <stdexcept>
 #include <string>
 #include <thread>
+#include <vector>
 
 // Include local.
 #include <ExportCore.hpp>
@@ -166,6 +167,152 @@ inline char *ustrcat(char *dst, const char *src)
         dst++;
     }
     return ustrcpy(dst, src);
+}
+
+// Set all elements to the specified value.
+template <class T> void set(std::vector<T> &v, const T &element)
+{
+    for (size_t i = 0; i < v.size(); i++)
+    {
+        v[i] = element;
+    }
+}
+
+// Insert an element to the vector.
+template <class T> size_t insert(std::vector<T> &v, const T &element)
+{
+    size_t i;
+    size_t n = v.size();
+
+    v.resize(n + 1);
+
+    i = n;
+    while (i > 0 && v[i - 1] > element)
+    {
+        // shift
+        v[i] = v[i - 1];
+        --i;
+    }
+
+    v[i] = element;
+
+    return i;
+}
+
+// Insert an element to the vector.
+template <class T>
+void insertAt(std::vector<T> &v, size_t idx, const T &element)
+{
+    size_t i;
+    size_t n = v.size();
+
+    v.resize(n + 1);
+
+    for (i = n; i > idx; --i)
+    {
+        v[i] = v[i - 1];
+    }
+
+    v[idx] = element;
+}
+
+// Remove all appearances of given element from the vector.
+template <class T> void remove(std::vector<T> &v, const T &element)
+{
+    size_t i;
+    size_t n = v.size();
+    size_t nRem = 0;
+
+    for (i = 0; i < n; ++i)
+    {
+        if (nRem > 0)
+        {
+            // shift
+            v[i - nRem] = v[i];
+        }
+        if (v[i] == element)
+        {
+            ++nRem;
+        }
+    }
+
+    if (nRem > 0)
+    {
+        v.resize(n - nRem);
+    }
+}
+
+// Remove an element specified by the index from the vector.
+template <class T> void removeAt(std::vector<T> &v, size_t idx)
+{
+    size_t n = v.size();
+    if (n > 1 && idx < n)
+    {
+        n--;
+
+        // shift
+        for (size_t i = idx; i < n; ++i)
+        {
+            v[i] = v[i + 1];
+        }
+
+        v.resize(n);
+    }
+}
+
+// Find the first appearances of given element in the vector.
+template <class T> bool contains(const std::vector<T> &v, const T &element)
+{
+    size_t i = 0;
+    size_t n = v.size();
+    size_t idx = SIZE_MAX;
+
+    while (i < n)
+    {
+        if (v[i] == element)
+        {
+            idx = i;
+            break;
+        }
+        ++i;
+    }
+
+    return idx != SIZE_MAX;
+}
+
+// Perform binary search to find an index of given element in the vector.
+// Returns SIZE_MAX when the element is not found.
+template <class T>
+size_t binarySearch(const std::vector<T> &v, const T &element)
+{
+    size_t idx = SIZE_MAX;
+
+    if (v.size() > 0)
+    {
+        size_t first = 0;
+        size_t last = v.size() - 1;
+
+        while (first <= last)
+        {
+            size_t i = (first + last) / 2;
+            if (element > v[i])
+            {
+                first = i + 1;
+            }
+            else if (element < v[i])
+            {
+                last = i - 1;
+            }
+            else
+            {
+                // found at index i
+                idx = i;
+                break;
+            }
+        }
+    }
+
+    return idx;
 }
 
 inline size_t threadId()
