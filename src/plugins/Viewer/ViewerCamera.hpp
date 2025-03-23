@@ -77,6 +77,7 @@ public:
     float distance() const { return distance_; }
     const QVector3D &eye() const { return eye_; }
     const QVector3D &center() const { return center_; }
+    const QVector3D &offset() const { return offset_; }
     const QVector3D &up() const { return up_; }
     const QVector3D &right() const { return right_; }
     const QVector3D &direction() const { return direction_; }
@@ -96,6 +97,7 @@ public:
     void rotate(int dx, int dy);
     void pan(int dx, int dy);
     void zoom(int dy);
+    void setOffset(const QVector3D &offset) { offset_ = offset; }
 
     // Matrix.
     const QMatrix4x4 &modelView() const { return modelView_; }
@@ -116,6 +118,7 @@ protected:
     // Camera.
     QVector3D eye_;
     QVector3D center_;
+    QVector3D offset_;
     QVector3D right_;
     QVector3D up_;
     QVector3D direction_;
@@ -173,6 +176,19 @@ inline std::string toString(const ViewerCamera &in)
     Json json;
     toJson(json, in);
     return json.serialize(0);
+}
+
+inline std::string toString(const QMatrix4x4 &in)
+{
+    return "[[" + std::to_string(in(0, 0)) + ", " + std::to_string(in(0, 1)) +
+           ", " + std::to_string(in(0, 2)) + ", " + std::to_string(in(0, 3)) +
+           "], [" + std::to_string(in(1, 0)) + ", " + std::to_string(in(1, 1)) +
+           ", " + std::to_string(in(1, 2)) + ", " + std::to_string(in(1, 3)) +
+           "], [" + std::to_string(in(2, 0)) + ", " + std::to_string(in(2, 1)) +
+           ", " + std::to_string(in(2, 2)) + ", " + std::to_string(in(2, 3)) +
+           "], [" + std::to_string(in(3, 0)) + ", " + std::to_string(in(3, 1)) +
+           ", " + std::to_string(in(3, 2)) + ", " + std::to_string(in(3, 3)) +
+           "]]";
 }
 
 inline std::ostream &operator<<(std::ostream &out, const ViewerCamera &in)
