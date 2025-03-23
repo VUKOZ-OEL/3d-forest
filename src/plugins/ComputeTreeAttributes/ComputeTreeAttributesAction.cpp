@@ -180,21 +180,6 @@ void ComputeTreeAttributesAction::stepPointsToTrees()
                 tree.dbhPoints.push_back(query_.y());
                 tree.dbhPoints.push_back(query_.z());
             }
-
-            // When point Z distance from the maximal tree boundary Z value
-            // is within tree tip range, then:
-            if ((segment.boundary.max(2) - query_.z()) <=
-                parameters_.treeTipHeightRange)
-            {
-                ComputeTreeAttributesData &tree = trees_[treeIndex(treeId)];
-
-                // When point elevation has new highest value, then
-                // set the value as new elevation maximum.
-                if (query_.elevation() > tree.elevationMax)
-                {
-                    tree.elevationMax = query_.elevation();
-                }
-            }
         }
 
         progress_.addValueStep(1);
@@ -247,9 +232,6 @@ void ComputeTreeAttributesAction::stepCalculateComputeTreeAttributes()
 
         // Calculate tree position.
         calculateTreePosition(trees_[currentTreeIndex_]);
-
-        // Calculate tree height.
-        calculateTreeHeight(trees_[currentTreeIndex_]);
 
         // Next tree.
         currentTreeIndex_++;
@@ -328,19 +310,6 @@ void ComputeTreeAttributesAction::calculateTreePosition(
     tree.treeAttributes.position.set(x, y, z);
 }
 
-void ComputeTreeAttributesAction::calculateTreeHeight(
-    ComputeTreeAttributesData &tree)
-{
-    if (tree.elevationMax > Numeric::min<double>())
-    {
-        tree.treeAttributes.height = tree.elevationMax;
-    }
-    else
-    {
-        tree.treeAttributes.height = 0.0;
-    }
-}
-
 void ComputeTreeAttributesAction::stepUpdateComputeTreeAttributes()
 {
     LOG_DEBUG(<< "Update <" << trees_.size() << "> trees.");
@@ -354,6 +323,7 @@ void ComputeTreeAttributesAction::stepUpdateComputeTreeAttributes()
         Segment &segment = segments[segments.index(it.treeId)];
 
         segment.treeAttributes = it.treeAttributes;
+        segment.treeAttributes.height = segment.boundary.length(2);
         validateAttributes(segment.treeAttributes);
 
         LOG_DEBUG(<< "Tree position <" << segment.treeAttributes.position

@@ -46,9 +46,6 @@ public:
     /// The Z coordinate of the lowest point.
     double zCoordinateMin{Numeric::max<double>()};
 
-    /// The elevation value of the highest point.
-    double elevationMax{Numeric::min<double>()};
-
     /// Calculated tree attributes.
     TreeAttributes treeAttributes;
 };

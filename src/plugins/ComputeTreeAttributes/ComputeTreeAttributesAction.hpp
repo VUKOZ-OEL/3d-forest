@@ -60,7 +60,6 @@ private:
 
     void calculateDbh(ComputeTreeAttributesData &tree);
     void calculateTreePosition(ComputeTreeAttributesData &tree);
-    void calculateTreeHeight(ComputeTreeAttributesData &tree);
 
     void validateAttributes(TreeAttributes &treeAttributes);
 
