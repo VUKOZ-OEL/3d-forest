@@ -24,6 +24,7 @@
 
 // Include 3D Forest.
 #include <Editor.hpp>
+#include <ViewerOpenGLManager.hpp>
 #include <ViewerOpenGLViewport.hpp>
 #include <ViewerViewports.hpp>
 
@@ -81,6 +82,8 @@ void ViewerViewports::hideEvent(QHideEvent *event)
 void ViewerViewports::initializeViewports()
 {
     LOG_DEBUG(<< "Initialize viewports.");
+    manager_ = std::make_shared<ViewerOpenGLManager>();
+    manager_->init();
     setLayout(ViewLayout::VIEW_LAYOUT_SINGLE);
 }
 
@@ -88,6 +91,7 @@ ViewerOpenGLViewport *ViewerViewports::createViewport(size_t viewportId)
 {
     LOG_DEBUG(<< "Create viewport <" << viewportId << ">.");
     ViewerOpenGLViewport *viewport = new ViewerOpenGLViewport(this);
+    viewport->setManager(manager_.get());
     viewport->setViewports(this, viewportId);
     viewport->setSelected(false);
 
