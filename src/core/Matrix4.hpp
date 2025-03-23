@@ -555,6 +555,19 @@ template <class T> Vector3<T> Matrix4<T>::unproject(const Vector3<T> &v)
     return Vector3<T>(x, y, z);
 }
 
+template <class T> inline std::string toString(const Matrix4<T> &in)
+{
+    return "[[" + std::to_string(in(0, 0)) + "," + std::to_string(in(0, 1)) +
+           "," + std::to_string(in(0, 2)) + "," + std::to_string(in(0, 3)) +
+           "], [" + std::to_string(in(1, 0)) + "," + std::to_string(in(1, 1)) +
+           "," + std::to_string(in(1, 2)) + "," + std::to_string(in(1, 3)) +
+           "], [" + std::to_string(in(2, 0)) + "," + std::to_string(in(2, 1)) +
+           "," + std::to_string(in(2, 2)) + "," + std::to_string(in(2, 3)) +
+           "], [" + std::to_string(in(3, 0)) + "," + std::to_string(in(3, 1)) +
+           "," + std::to_string(in(3, 2)) + "," + std::to_string(in(3, 3)) +
+           "]]";
+}
+
 #include <WarningsEnable.hpp>
 
 #endif /* MATRIX4_HPP */
