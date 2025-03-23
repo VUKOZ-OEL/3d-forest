@@ -23,6 +23,7 @@
 #include <Editor.hpp>
 #include <Time.hpp>
 #include <ViewerOpenGL.hpp>
+#include <ViewerOpenGLManager.hpp>
 #include <ViewerOpenGLViewport.hpp>
 #include <ViewerViewports.hpp>
 
@@ -33,11 +34,12 @@
 
 // Include local.
 #define LOG_MODULE_NAME "ViewerOpenGLViewport"
-// #define LOG_MODULE_DEBUG_ENABLED 1
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 ViewerOpenGLViewport::ViewerOpenGLViewport(QWidget *parent)
     : QOpenGLWidget(parent),
+      manager_(nullptr),
       windowViewports_(nullptr),
       viewportId_(0),
       selected_(false),
@@ -143,6 +145,11 @@ void ViewerOpenGLViewport::cameraChanged()
         LOG_DEBUG_RENDER(<< "Emit camera changed.");
         emit windowViewports_->cameraChanged(viewportId_);
     }
+}
+
+void ViewerOpenGLViewport::setManager(ViewerOpenGLManager *manager)
+{
+    manager_ = manager;
 }
 
 void ViewerOpenGLViewport::setViewports(ViewerViewports *viewer,
@@ -308,6 +315,7 @@ void ViewerOpenGLViewport::setViewResetCenter()
         // center[2] = aabb_.min().z();
     }
 
+    camera_.setOffset(QVector3D(0.0F, 0.0F, 0.0F));
     camera_.setLookAt(camera_.direction(),
                       camera_.distance(),
                       center,
@@ -454,9 +462,24 @@ void ViewerOpenGLViewport::renderFirstFrame()
 
     clearScreen();
 
+    // Update manager.
+    if (!manager_->isInitialized())
+    {
+        manager_->init();
+    }
+
+    manager_->updateResources();
+
+    // Backup gl states.
     if (editor_->settings().viewSettings().distanceBasedFadingVisible())
     {
         glDisable(GL_FOG);
+    }
+
+    GLboolean glLightEnabled = SAFE_GL(glIsEnabled(GL_LIGHTING));
+    if (glLightEnabled)
+    {
+        SAFE_GL(glDisable(GL_LIGHTING));
     }
 
     const Region &clipFilter = editor_->clipFilter();
@@ -474,24 +497,26 @@ void ViewerOpenGLViewport::renderFirstFrame()
         ViewerOpenGL::renderAabb(aabb_);
     }
 
+    SAFE_GL(glPushMatrix());
     renderGuides();
+    SAFE_GL(glPopMatrix());
 
+    // recover gl states
+    if (glLightEnabled == GL_TRUE)
+    {
+        SAFE_GL(glEnable(GL_LIGHTING));
+    }
     if (editor_->settings().viewSettings().distanceBasedFadingVisible())
     {
         glEnable(GL_FOG);
     }
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadMatrixf(camera_.projection().data());
-    glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixf(camera_.modelView().data());
 }
 
 void ViewerOpenGLViewport::renderLastFrame()
 {
     glLineWidth(2.0F);
     glDisable(GL_DEPTH_TEST);
-    // renderAttributes();
+    renderLabels();
     glEnable(GL_DEPTH_TEST);
     glLineWidth(1.0F);
 }
@@ -580,32 +605,13 @@ void ViewerOpenGLViewport::renderSegments()
 
 void ViewerOpenGLViewport::renderAttributes()
 {
-    if (!editor_->settings().treeSettings().treeAttributesVisible())
-    {
-        return;
-    }
-
     const Segments &segments = editor_->segments();
-    const QueryFilterSet &filter = editor_->segmentsFilter();
 
     for (size_t i = 0; i < segments.size(); i++)
     {
         const Segment &segment = segments[i];
 
-        // Ignore hidden segments.
-        if (!filter.enabled(segment.id))
-        {
-            continue;
-        }
-
-        // Ignore "unsegmented".
-        if (segment.id == 0)
-        {
-            continue;
-        }
-
-        if (editor_->settings().treeSettings().useOnlyForSelectedTrees() &&
-            !segment.selected)
+        if (skipSegmentRendering(segment))
         {
             continue;
         }
@@ -624,7 +630,7 @@ void ViewerOpenGLViewport::renderAttributes()
 
         if (attributes.isPositionValid())
         {
-            Vector3<float> treePosition(attributes.position);
+            Vector3<float> treePosition = attributes.position;
 
             if (attributes.isHeightValid())
             {
@@ -648,6 +654,67 @@ void ViewerOpenGLViewport::renderAttributes()
                 static_cast<float>(segment.boundary.length(1)));
         }
     }
+}
+
+void ViewerOpenGLViewport::renderLabels()
+{
+    const Segments &segments = editor_->segments();
+
+    for (size_t i = 0; i < segments.size(); i++)
+    {
+        const Segment &segment = segments[i];
+
+        if (skipSegmentRendering(segment))
+        {
+            continue;
+        }
+
+        glColor3f(1.0F, 1.0F, 0.0F);
+
+        ViewerAabb boundary;
+        boundary.set(segment.boundary);
+        Vector3<float> treePosition;
+        treePosition[0] = boundary.center().x();
+        treePosition[1] = boundary.center().y();
+        treePosition[2] = boundary.max().z();
+
+        ViewerOpenGL::renderText(manager_,
+                                 camera_,
+                                 treePosition,
+                                 segment.label,
+                                 0.05F * camera_.distance());
+    }
+}
+
+bool ViewerOpenGLViewport::skipSegmentRendering(const Segment &segment)
+{
+    // Do not render any attributes.
+    if (!editor_->settings().treeSettings().treeAttributesVisible())
+    {
+        return true;
+    }
+
+    // Ignore "unsegmented".
+    if (segment.id == 0)
+    {
+        return true;
+    }
+
+    // Render only selected trees.
+    if (editor_->settings().treeSettings().useOnlyForSelectedTrees() &&
+        !segment.selected)
+    {
+        return true;
+    }
+
+    // Ignore hidden segments.
+    const QueryFilterSet &filter = editor_->segmentsFilter();
+    if (!filter.enabled(segment.id))
+    {
+        return true;
+    }
+
+    return false;
 }
 
 void ViewerOpenGLViewport::renderGuides()
@@ -676,6 +743,12 @@ void ViewerOpenGLViewport::renderGuides()
     ViewerOpenGL::renderAxis();
     glLineWidth(1.0F);
     glEnable(GL_DEPTH_TEST);
+
+    // Restore matrix.
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixf(camera_.projection().data());
+    glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixf(camera_.modelView().data());
 }
 
 void ViewerOpenGLViewport::renderSceneSettingsEnable()

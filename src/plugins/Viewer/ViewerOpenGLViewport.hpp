@@ -24,10 +24,12 @@
 
 // Include 3D Forest.
 #include <Camera.hpp>
+#include <Segment.hpp>
 #include <ViewerAabb.hpp>
 #include <ViewerCamera.hpp>
 class Editor;
 class ViewerViewports;
+class ViewerOpenGLManager;
 
 // Include Qt.
 #include <QOpenGLFunctions>
@@ -43,6 +45,8 @@ class ViewerOpenGLViewport : public QOpenGLWidget, protected QOpenGLFunctions
 public:
     explicit ViewerOpenGLViewport(QWidget *parent = nullptr);
     ~ViewerOpenGLViewport();
+
+    void setManager(ViewerOpenGLManager *manager);
 
     void setViewports(ViewerViewports *viewer, size_t viewportId);
     size_t viewportId() const;
@@ -79,6 +83,8 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
 
+    ViewerOpenGLManager *manager_;
+
     // Window Viewports.
     ViewerViewports *windowViewports_;
     size_t viewportId_;
@@ -97,6 +103,8 @@ protected:
     void renderLastFrame();
     void renderSegments();
     void renderAttributes();
+    void renderLabels();
+    bool skipSegmentRendering(const Segment &segment);
     void renderGuides();
     void renderSceneSettingsEnable();
     void renderSceneSettingsDisable();

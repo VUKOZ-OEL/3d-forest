@@ -39,6 +39,7 @@
 ViewerCamera::ViewerCamera()
     : eye_(0.0F, 0.0F, 1.0F),
       center_(0.0F, 0.0F, 0.0F),
+      offset_(0.0F, 0.0F, 0.0F),
       right_(1.0F, 0.0F, 0.0F),
       up_(0.0F, 1.0F, 0.0F),
       direction_(0.0F, 0.0F, 1.0F),
@@ -340,6 +341,7 @@ void ViewerCamera::pan(int dx, int dy)
 
     QVector3D shift = (x * right_) + (y * up_);
     center_ -= shift;
+    offset_ -= shift;
 
     updateMatrix();
 }

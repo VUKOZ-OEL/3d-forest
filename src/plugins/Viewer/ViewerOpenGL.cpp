@@ -20,16 +20,43 @@
 /** @file ViewerOpenGL.cpp */
 
 // Include 3D Forest.
+#include <Matrix4.hpp>
 #include <Util.hpp>
 #include <ViewerOpenGL.hpp>
+#include <ViewerOpenGLManager.hpp>
 
 // Include Qt.
-#include <QOpenGLFunctions>
+#include <QMatrix4x4>
 
 // Include local.
 #define LOG_MODULE_NAME "ViewerOpenGL"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
+
+const char *viewerOpenGLErrorString(GLenum err)
+{
+    switch (err)
+    {
+        case GL_NO_ERROR:
+            return "No error";
+        case GL_INVALID_ENUM:
+            return "Invalid enum";
+        case GL_INVALID_VALUE:
+            return "Invalid value";
+        case GL_INVALID_OPERATION:
+            return "Invalid operation";
+        case GL_STACK_OVERFLOW:
+            return "Stack overflow";
+        case GL_STACK_UNDERFLOW:
+            return "Stack underflow";
+        case GL_OUT_OF_MEMORY:
+            return "Out of memory";
+        case GL_INVALID_FRAMEBUFFER_OPERATION:
+            return "Invalid framebuffer operation";
+        default:
+            return "Unknown error";
+    }
+}
 
 ViewerOpenGL::ViewerOpenGL()
 {
@@ -355,4 +382,33 @@ void ViewerOpenGL::renderCircle(const Vector3<float> &p,
     glVertexPointer(3, GL_FLOAT, 0, static_cast<GLvoid *>(xyz.data()));
     glDrawElements(GL_LINE_LOOP, indicesCount, GL_UNSIGNED_INT, indices.data());
     glDisableClientState(GL_VERTEX_ARRAY);
+}
+
+void ViewerOpenGL::renderText(ViewerOpenGLManager *manager,
+                              const ViewerCamera &camera,
+                              const Vector3<float> &p,
+                              const std::string &text,
+                              float scale)
+{
+    GLuint displayList = manager->font();
+    if (displayList < 1)
+    {
+        return;
+    }
+
+    std::string cleanText(manager->cleanText(text));
+
+    QMatrix4x4 mvi = camera.modelViewInv();
+    mvi(0, 3) = p[0];
+    mvi(1, 3) = p[1];
+    mvi(2, 3) = p[2];
+
+    SAFE_GL(glPushMatrix());
+    SAFE_GL(glMultMatrixf(mvi.data()));
+    glScalef(scale, scale, scale);
+    glListBase(displayList);
+    glCallLists(static_cast<GLsizei>(cleanText.size()),
+                GL_BYTE,
+                reinterpret_cast<const GLbyte *>(cleanText.c_str()));
+    SAFE_GL(glPopMatrix());
 }

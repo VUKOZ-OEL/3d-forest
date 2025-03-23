@@ -87,13 +87,13 @@ void Mesh::calculateNormalsTriangles()
         normal[i * 9 + 1] = vnormal[1];
         normal[i * 9 + 2] = vnormal[2];
 
-        normal[i * 9 + 3] = vnormal[3];
-        normal[i * 9 + 4] = vnormal[4];
-        normal[i * 9 + 5] = vnormal[5];
+        normal[i * 9 + 3] = vnormal[0];
+        normal[i * 9 + 4] = vnormal[1];
+        normal[i * 9 + 5] = vnormal[2];
 
-        normal[i * 9 + 6] = vnormal[6];
-        normal[i * 9 + 7] = vnormal[7];
-        normal[i * 9 + 8] = vnormal[8];
+        normal[i * 9 + 6] = vnormal[0];
+        normal[i * 9 + 7] = vnormal[1];
+        normal[i * 9 + 8] = vnormal[2];
     }
 }
 

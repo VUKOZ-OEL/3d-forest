@@ -29,6 +29,7 @@
 #include <Camera.hpp>
 class Editor;
 class ViewerOpenGLViewport;
+class ViewerOpenGLManager;
 
 // Include Qt.
 #include <QWidget>
@@ -83,6 +84,7 @@ protected:
     void hideEvent(QHideEvent *event) override;
 
     std::vector<ViewerOpenGLViewport *> viewports_;
+    std::shared_ptr<ViewerOpenGLManager> manager_;
 
     void initializeViewports();
     ViewerOpenGLViewport *createViewport(size_t viewportId);
