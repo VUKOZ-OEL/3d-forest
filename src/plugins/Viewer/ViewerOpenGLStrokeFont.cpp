@@ -28,7 +28,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "ViewerOpenGLStrokeFont"
-#define LOG_MODULE_DEBUG_ENABLED 1
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 ViewerOpenGLStrokeFont::ViewerOpenGLStrokeFont()
