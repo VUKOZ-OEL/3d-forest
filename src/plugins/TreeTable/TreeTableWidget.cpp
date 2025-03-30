@@ -36,7 +36,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "TreeTableWidget"
-#define LOG_MODULE_DEBUG_ENABLED 1
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define ICON(name) (ThemeIcon(":/TreeTableResources/", name))
@@ -89,6 +89,7 @@ TreeTableWidget::TreeTableWidget(MainWindow *mainWindow)
     setLayout(mainLayout);
 
     // Data.
+    updatesEnabled_ = true;
     connect(mainWindow_,
             SIGNAL(signalUpdate(void *, const QSet<Editor::Type> &)),
             this,
@@ -109,24 +110,28 @@ void TreeTableWidget::slotUpdate(void *sender, const QSet<Editor::Type> &target)
     {
         LOG_DEBUG_UPDATE(<< "Input segments.");
 
-        setSegments(mainWindow_->editor().segments());
+        setSegments(mainWindow_->editor().segments(),
+                    mainWindow_->editor().segmentsFilter());
     }
 }
 
-void TreeTableWidget::setSegments(const Segments &segments)
+void TreeTableWidget::setSegments(const Segments &segments,
+                                  const QueryFilterSet &filter)
 {
     LOG_DEBUG(<< "Set segments n <" << segments.size() << ">.");
 
     block();
 
     segments_ = segments;
+    filter_ = filter;
 
     tableWidget_->clear();
 
-    size_t nRows = (segments_.size() > 0) ? (segments_.size() - 1) : 0;
-    tableWidget_->setRowCount(static_cast<int>(nRows));
+    int nRows = static_cast<int>(segments_.size());
+    tableWidget_->setRowCount(nRows);
     tableWidget_->setColumnCount(COLUMN_LAST);
     tableWidget_->setHorizontalHeaderLabels({"ID",
+                                             "Visible",
                                              "Label",
                                              "X [m]",
                                              "Y [m]",
@@ -137,9 +142,9 @@ void TreeTableWidget::setSegments(const Segments &segments)
                                              "Status"});
 
     // Content.
-    for (size_t i = 1; i < segments_.size(); i++)
+    for (size_t i = 0; i < segments_.size(); i++)
     {
-        setRow(static_cast<int>(i - 1), i);
+        setRow(i);
     }
 
     // Resize Columns to the minimum space.
@@ -158,15 +163,43 @@ void TreeTableWidget::setSegments(const Segments &segments)
     unblock();
 }
 
-void TreeTableWidget::setRow(int row, size_t i)
+void TreeTableWidget::dataChanged()
 {
+    LOG_DEBUG_UPDATE(<< "Start updating the changed segment data.");
+
+    mainWindow_->suspendThreads();
+    mainWindow_->editor().setSegments(segments_);
+    mainWindow_->editor().setSegmentsFilter(filter_);
+    mainWindow_->updateData();
+
+    LOG_DEBUG_UPDATE(<< "Finished updating the changed segment data.");
+}
+
+void TreeTableWidget::filterChanged()
+{
+    LOG_DEBUG_UPDATE(<< "Start updating the changed segment filter.");
+
+    mainWindow_->suspendThreads();
+    mainWindow_->editor().setSegmentsFilter(filter_);
+    mainWindow_->updateFilter();
+
+    LOG_DEBUG_UPDATE(<< "Finished updating the changed segment filter.");
+}
+
+void TreeTableWidget::setRow(size_t index)
+{
+    const Segment &segment = segments_[index];
+    const TreeAttributes &treeAttributes = segment.treeAttributes;
+
     double ppm =
         mainWindow_->editor().settings().unitsSettings().pointsPerMeter()[0];
 
-    const Segment &segment = segments_[i];
-    const TreeAttributes &treeAttributes = segment.treeAttributes;
+    size_t id = segments_.id(index);
+
+    int row = static_cast<int>(index);
 
     setCell(row, COLUMN_ID, segment.id);
+    setCell(row, COLUMN_VISIBLE, filter_.enabled(id), true);
     setCell(row, COLUMN_LABEL, segment.label);
     setCell(row, COLUMN_X, treeAttributes.position[0] / ppm);
     setCell(row, COLUMN_Y, treeAttributes.position[1] / ppm);
@@ -175,6 +208,22 @@ void TreeTableWidget::setRow(int row, size_t i)
     setCell(row, COLUMN_STATUS, treeAttributes.isValid() ? "Valid" : "Invalid");
     setCell(row, COLUMN_DBH, treeAttributes.dbh / ppm);
     setCell(row, COLUMN_AREA, treeAttributes.area / (ppm * ppm));
+}
+
+void TreeTableWidget::setCell(int row, int col, bool value, bool userCheckable)
+{
+    if (userCheckable)
+    {
+        QTableWidgetItem *item = new QTableWidgetItem();
+        item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+        item->setCheckState(value ? Qt::Checked : Qt::Unchecked);
+
+        tableWidget_->setItem(row, col, item);
+    }
+    else
+    {
+        setCell(row, col, value ? "Yes" : "No");
+    }
 }
 
 void TreeTableWidget::setCell(int row, int col, size_t value)
@@ -195,7 +244,7 @@ void TreeTableWidget::setCell(int row, int col, const std::string &value)
     if (col == COLUMN_ID)
     {
         // Color legend.
-        size_t index = static_cast<size_t>(row) + 1;
+        size_t index = static_cast<size_t>(row);
         const Vector3<double> &rgb = segments_[index].color;
 
         QColor color;
@@ -212,12 +261,19 @@ void TreeTableWidget::setCell(int row, int col, const std::string &value)
 
 void TreeTableWidget::block()
 {
+    disconnect(tableWidget_, SIGNAL(cellClicked(int, int)), 0, 0);
+
     (void)blockSignals(true);
 }
 
 void TreeTableWidget::unblock()
 {
     (void)blockSignals(false);
+
+    connect(tableWidget_,
+            SIGNAL(cellClicked(int, int)),
+            this,
+            SLOT(onCellClicked(int, int)));
 }
 
 void TreeTableWidget::slotExport()
@@ -254,4 +310,57 @@ void TreeTableWidget::slotExport()
     }
 
     LOG_DEBUG(<< "Finished exporting tree table.");
+}
+
+void TreeTableWidget::onCellClicked(int row, int column)
+{
+    LOG_DEBUG(<< "Start table clicked, row <" << row << "> column <" << column
+              << ">.");
+
+    QTableWidgetItem *itemId = tableWidget_->item(row, COLUMN_ID);
+    if (!itemId)
+    {
+        LOG_ERROR(<< "Failed to get table item ID.");
+    }
+
+    QString textId = itemId->text();
+    LOG_DEBUG(<< "Item text <" << textId.toStdString() << ">.");
+
+    size_t id = textId.toULong();
+    size_t index = segments_.index(id);
+
+    if (column == COLUMN_VISIBLE)
+    {
+        QTableWidgetItem *item = tableWidget_->item(row, column);
+
+        bool checked = (item->checkState() == Qt::Checked);
+
+        LOG_DEBUG(<< "Set filter ID <" << id << "> enabled <"
+                  << toString(checked) << ">.");
+
+        filter_.setEnabled(id, checked);
+
+        if (updatesEnabled_)
+        {
+            filterChanged();
+        }
+    }
+    else
+    {
+        LOG_DEBUG(<< "Set segment ID <" << id << "> selected.");
+
+        for (size_t i = 0; i < segments_.size(); i++)
+        {
+            segments_[i].selected = false;
+        }
+
+        segments_[index].selected = true;
+
+        if (updatesEnabled_)
+        {
+            dataChanged();
+        }
+    }
+
+    LOG_DEBUG(<< "Finished table clicked.");
 }

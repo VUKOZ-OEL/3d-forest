@@ -44,6 +44,7 @@ public:
 
 public slots:
     void slotUpdate(void *sender, const QSet<Editor::Type> &target);
+    void onCellClicked(int row, int column);
 
 protected slots:
     void slotExport();
@@ -53,6 +54,7 @@ private:
     enum Column
     {
         COLUMN_ID,
+        COLUMN_VISIBLE,
         COLUMN_LABEL,
         COLUMN_X,
         COLUMN_Y,
@@ -70,12 +72,17 @@ private:
     QPushButton *exportButton_;
 
     Segments segments_;
+    QueryFilterSet filter_;
+    bool updatesEnabled_;
 
     QString fileName_;
 
-    void setSegments(const Segments &segments);
+    void setSegments(const Segments &segments, const QueryFilterSet &filter);
+    void dataChanged();
+    void filterChanged();
 
-    void setRow(int row, size_t index);
+    void setRow(size_t index);
+    void setCell(int row, int col, bool value, bool userCheckable);
     void setCell(int row, int col, size_t value);
     void setCell(int row, int col, double value);
     void setCell(int row, int col, const std::string &value);
