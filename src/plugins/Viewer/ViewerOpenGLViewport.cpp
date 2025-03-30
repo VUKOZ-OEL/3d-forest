@@ -483,7 +483,7 @@ void ViewerOpenGLViewport::renderFirstFrame()
     }
 
     const Region &clipFilter = editor_->clipFilter();
-    glLineWidth(2.0F);
+    glLineWidth(1.0F);
     ViewerOpenGL::renderClipFilter(clipFilter);
     glLineWidth(1.0F);
 
@@ -494,7 +494,7 @@ void ViewerOpenGLViewport::renderFirstFrame()
     if (editor_->settings().viewSettings().sceneBoundingBoxVisible())
     {
         glColor3f(0.25F, 0.25F, 0.25F);
-        ViewerOpenGL::renderAabb(aabb_);
+        ViewerOpenGL::renderAabbCorners(aabb_);
     }
 
     SAFE_GL(glPushMatrix());
@@ -543,10 +543,11 @@ void ViewerOpenGLViewport::renderSegments()
         // Render boundary.
         if (segment.selected)
         {
-            glColor3f(r, g, b);
+            // glColor3f(r, g, b);
+            glColor3f(1.0F, 1.0F, 0.0F);
             ViewerAabb boundary;
             boundary.set(segment.boundary);
-            ViewerOpenGL::renderAabb(boundary);
+            ViewerOpenGL::renderAabbCorners(boundary, 0);
         }
 
         // Ignore "unsegmented".

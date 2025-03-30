@@ -158,6 +158,7 @@ public:
 
     static void renderClipFilter(const Region &clipFilter);
     static void renderAabb(const ViewerAabb &box);
+    static void renderAabbCorners(const ViewerAabb &box, float scale = 0.025F);
     static void renderCylinder(const Vector3<float> &a,
                                const Vector3<float> &b,
                                float radius,

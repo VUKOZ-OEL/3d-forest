@@ -226,6 +226,74 @@ void ViewerOpenGL::renderAabb(const ViewerAabb &box)
     glDisableClientState(GL_VERTEX_ARRAY);
 }
 
+void ViewerOpenGL::renderAabbCorners(const ViewerAabb &box, float scale)
+{
+    QVector3D v[32];
+    QVector3D u(1.0F, 1.0F, 1.0F);
+    QVector3D min = box.min() - (u * scale * box.radius());
+    QVector3D max = box.max() + (u * scale * box.radius());
+
+    float x = (max[0] - min[0]) * 0.25F;
+    float y = (max[1] - min[1]) * 0.25F;
+    float z = (max[2] - min[2]) * 0.25F;
+
+    v[0] = QVector3D(min[0], min[1], min[2]);
+    v[1] = QVector3D(min[0] + x, min[1], min[2]);
+    v[2] = QVector3D(min[0], min[1] + y, min[2]);
+    v[3] = QVector3D(min[0], min[1], min[2] + z);
+
+    v[4] = QVector3D(min[0], min[1], max[2]);
+    v[5] = QVector3D(min[0] + x, min[1], max[2]);
+    v[6] = QVector3D(min[0], min[1] + y, max[2]);
+    v[7] = QVector3D(min[0], min[1], max[2] - z);
+
+    v[8] = QVector3D(min[0], max[1], max[2]);
+    v[9] = QVector3D(min[0] + x, max[1], max[2]);
+    v[10] = QVector3D(min[0], max[1] - y, max[2]);
+    v[11] = QVector3D(min[0], max[1], max[2] - z);
+
+    v[12] = QVector3D(min[0], max[1], min[2]);
+    v[13] = QVector3D(min[0] + x, max[1], min[2]);
+    v[14] = QVector3D(min[0], max[1] - y, min[2]);
+    v[15] = QVector3D(min[0], max[1], min[2] + z);
+
+    v[16] = QVector3D(max[0], min[1], min[2]);
+    v[17] = QVector3D(max[0] - x, min[1], min[2]);
+    v[18] = QVector3D(max[0], min[1] + y, min[2]);
+    v[19] = QVector3D(max[0], min[1], min[2] + z);
+
+    v[20] = QVector3D(max[0], min[1], max[2]);
+    v[21] = QVector3D(max[0] - x, min[1], max[2]);
+    v[22] = QVector3D(max[0], min[1] + y, max[2]);
+    v[23] = QVector3D(max[0], min[1], max[2] - z);
+
+    v[24] = QVector3D(max[0], max[1], max[2]);
+    v[25] = QVector3D(max[0] - x, max[1], max[2]);
+    v[26] = QVector3D(max[0], max[1] - y, max[2]);
+    v[27] = QVector3D(max[0], max[1], max[2] - z);
+
+    v[28] = QVector3D(max[0], max[1], min[2]);
+    v[29] = QVector3D(max[0] - x, max[1], min[2]);
+    v[30] = QVector3D(max[0], max[1] - y, min[2]);
+    v[31] = QVector3D(max[0], max[1], min[2] + z);
+
+    // clang-format off
+    GLuint indices[48] = { 0,  1,  0,  2,  0,  3,
+                           4,  5,  4,  6,  4,  7,
+                           8,  9,  8, 10,  8, 11,
+                          12, 13, 12, 14, 12, 15,
+                          16, 17, 16, 18, 16, 19,
+                          20, 21, 20, 22, 20, 23,
+                          24, 25, 24, 26, 24, 27,
+                          28, 29, 28, 30, 28, 31 };
+    // clang-format on
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, static_cast<GLvoid *>(&v[0]));
+    glDrawElements(GL_LINES, 48, GL_UNSIGNED_INT, indices);
+    glDisableClientState(GL_VERTEX_ARRAY);
+}
+
 void ViewerOpenGL::renderCylinder(const Vector3<float> &a,
                                   const Vector3<float> &b,
                                   float radius,
