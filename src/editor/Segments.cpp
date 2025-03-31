@@ -114,6 +114,18 @@ void Segments::addTree(size_t id, const Box<double> &boundary)
     push_back(segment);
 }
 
+void Segments::exportMeshList(const std::string &projectFilePath) const
+{
+    for (auto const &it : segments_)
+    {
+        it.exportMeshList(projectFilePath);
+    }
+}
+
+void Segments::importMeshList(const std::string &projectFilePath)
+{
+}
+
 void fromJson(Segments &out, const Json &in)
 {
     out.clear();

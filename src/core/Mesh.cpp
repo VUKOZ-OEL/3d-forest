@@ -128,6 +128,67 @@ double Mesh::calculateSurfaceArea2dTriangles()
     return fabs(a + b + c) * 0.5;
 }
 
+void Mesh::exportPLY(const std::string &path) const
+{
+    LOG_DEBUG(<< "Export path <" << path << "> position size <" << position.size() << ">.");
+
+    if (position.size() < 3)
+    {
+        return;
+    }
+
+    size_t nVertices = position.size() / 3;
+    unsigned int nElements;
+    char text[512];
+
+    File f;
+    f.open(path, "w+t");
+    
+    f.write("ply\n");
+    f.write("format ascii 1.0\n");
+    f.write("element vertex " + toString(nVertices) + "\n");
+    f.write("property float x\n");
+    f.write("property float y\n");
+    f.write("property float z\n");
+
+    if (mode == Mesh::Mode::MODE_TRIANGLES)
+    {
+        nElements = static_cast<unsigned int>(nVertices / 3);
+        f.write("element face " + toString(nElements) + "\n");
+        f.write("property list uchar uint vertex_indices\n");
+    }
+
+    f.write("end_header\n");
+
+    for (size_t i = 0; i < nVertices; i++)
+    {
+        (void)snprintf(text,
+                       sizeof(text),
+                       "%s %s %s\n",
+                       toString(position[i * 3 + 0]).c_str(),
+                       toString(position[i * 3 + 1]).c_str(),
+                       toString(position[i * 3 + 2]).c_str());
+        f.write(text);
+    }
+
+    if (mode == Mesh::Mode::MODE_TRIANGLES)
+    {
+    for (unsigned int i = 0; i < nElements; i++)
+    {
+        (void)snprintf(text,
+                       sizeof(text),
+                       "3 %u %u %u\n",
+                       i * 3, i * 3 + 1, i * 3 + 2);
+        f.write(text);
+    }
+    }
+
+    f.close();
+}
+void Mesh::importPLY(const std::string &path)
+{
+}
+
 std::string toString(const Mesh::Mode &in)
 {
     switch (in)

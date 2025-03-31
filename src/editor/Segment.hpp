@@ -48,6 +48,9 @@ public:
     std::map<std::string, Mesh> meshList;
 
     Segment();
+
+    void exportMeshList(const std::string &projectFilePath) const;
+    void importMeshList(const std::string &projectFilePath);
 };
 
 void fromJson(Segment &out, const Json &in);

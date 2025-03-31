@@ -73,6 +73,9 @@ public:
 
     void addTree(size_t id, const Box<double> &boundary);
 
+    void exportMeshList(const std::string &projectFilePath) const;
+    void importMeshList(const std::string &projectFilePath);
+
 protected:
     std::vector<Segment> segments_;
     std::unordered_map<size_t, size_t> hashTableId_;

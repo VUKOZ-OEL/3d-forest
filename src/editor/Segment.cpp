@@ -31,6 +31,23 @@ Segment::Segment()
 {
 }
 
+void Segment::exportMeshList(const std::string &projectFilePath) const
+{
+    std::string extId = "." + toString(id) + ".ply";
+    std::string pathId = File::replaceExtension(projectFilePath, extId);
+
+    for (const auto &it : meshList)
+    {
+        std::string extMesh = "." + it.first + ".ply";
+        std::string pathMesh = File::replaceExtension(pathId, extMesh);
+        it.second.exportPLY(pathMesh);
+    }
+}
+
+void Segment::importMeshList(const std::string &projectFilePath)
+{
+}
+
 void fromJson(Segment &out, const Json &in)
 {
     fromJson(out.id, in["id"]);
@@ -39,19 +56,6 @@ void fromJson(Segment &out, const Json &in)
 
     fromJson(out.boundary, in["boundary"]);
     fromJson(out.treeAttributes, in["treeAttributes"]);
-
-    // Import mesh list.
-    if (in.contains("meshList"))
-    {
-        const auto &a = in["meshList"].array();
-
-        for (size_t i = 0; i < a.size(); i++)
-        {
-            Mesh m;
-            fromJson(m, a[i]);
-            out.meshList[m.name] = std::move(m);
-        }
-    }
 }
 
 void toJson(Json &out, const Segment &in)
@@ -62,14 +66,6 @@ void toJson(Json &out, const Segment &in)
 
     toJson(out["boundary"], in.boundary);
     toJson(out["treeAttributes"], in.treeAttributes);
-
-    // Export mesh list.
-    size_t iMesh = 0;
-    for (const auto &it : in.meshList)
-    {
-        toJson(out["meshList"][iMesh], it.second);
-        iMesh++;
-    }
 }
 
 std::ostream &operator<<(std::ostream &out, const Segment &in)
