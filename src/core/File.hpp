@@ -24,6 +24,8 @@
 
 // Include std.
 #include <cstdint>
+#include <filesystem>
+#include <regex>
 #include <string>
 
 // Include local.
@@ -71,6 +73,8 @@ public:
                                         const std::string &newExtension);
     static std::string resolvePath(const std::string &path,
                                    const std::string &basePath);
+    static std::vector<std::string> listFiles(const std::string &path,
+                                              const std::regex &pattern);
 
     static void read(uint8_t *buffer,
                      const std::string &path,

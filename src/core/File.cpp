@@ -918,6 +918,26 @@ std::string File::resolvePath(const std::string &path,
     return rval;
 }
 
+std::vector<std::string> File::listFiles(const std::string &path,
+                                         const std::regex &pattern)
+{
+    std::vector<std::string> fileNames;
+
+    for (const auto &entry : std::filesystem::directory_iterator(path))
+    {
+        if (entry.is_regular_file())
+        {
+            std::string filename = entry.path().filename().string();
+            if (std::regex_match(filename, pattern))
+            {
+                fileNames.push_back(filename);
+            }
+        }
+    }
+
+    return fileNames;
+}
+
 std::string File::tmpname(const std::string &path)
 {
     unsigned long long t = Time::realTime64();
