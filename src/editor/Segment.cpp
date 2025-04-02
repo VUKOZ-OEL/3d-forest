@@ -31,23 +31,6 @@ Segment::Segment()
 {
 }
 
-void Segment::exportMeshList(const std::string &projectFilePath) const
-{
-    std::string extId = "." + toString(id) + ".ply";
-    std::string pathId = File::replaceExtension(projectFilePath, extId);
-
-    for (const auto &it : meshList)
-    {
-        std::string extMesh = "." + it.first + ".ply";
-        std::string pathMesh = File::replaceExtension(pathId, extMesh);
-        it.second.exportPLY(pathMesh);
-    }
-}
-
-void Segment::importMeshList(const std::string &projectFilePath)
-{
-}
-
 void fromJson(Segment &out, const Json &in)
 {
     fromJson(out.id, in["id"]);

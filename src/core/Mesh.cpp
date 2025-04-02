@@ -21,6 +21,7 @@
 
 // Include std.
 #include <cmath>
+#include <fstream>
 
 // Include 3D Forest.
 #include <Mesh.hpp>
@@ -28,6 +29,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "Mesh"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 Mesh::Mesh() : mode(Mesh::Mode::MODE_POINTS)
@@ -128,22 +130,24 @@ double Mesh::calculateSurfaceArea2dTriangles()
     return fabs(a + b + c) * 0.5;
 }
 
-void Mesh::exportPLY(const std::string &path) const
+void Mesh::exportPLY(const std::string &path, double scale) const
 {
-    LOG_DEBUG(<< "Export path <" << path << "> position size <" << position.size() << ">.");
+    LOG_DEBUG(<< "Export path <" << path << "> position size <"
+              << position.size() << ">.");
 
     if (position.size() < 3)
     {
         return;
     }
 
+    float s = static_cast<float>(scale);
     size_t nVertices = position.size() / 3;
     unsigned int nElements;
     char text[512];
 
     File f;
     f.open(path, "w+t");
-    
+
     f.write("ply\n");
     f.write("format ascii 1.0\n");
     f.write("element vertex " + toString(nVertices) + "\n");
@@ -165,28 +169,88 @@ void Mesh::exportPLY(const std::string &path) const
         (void)snprintf(text,
                        sizeof(text),
                        "%s %s %s\n",
-                       toString(position[i * 3 + 0]).c_str(),
-                       toString(position[i * 3 + 1]).c_str(),
-                       toString(position[i * 3 + 2]).c_str());
+                       toString(position[i * 3 + 0] * s).c_str(),
+                       toString(position[i * 3 + 1] * s).c_str(),
+                       toString(position[i * 3 + 2] * s).c_str());
         f.write(text);
     }
 
     if (mode == Mesh::Mode::MODE_TRIANGLES)
     {
-    for (unsigned int i = 0; i < nElements; i++)
-    {
-        (void)snprintf(text,
-                       sizeof(text),
-                       "3 %u %u %u\n",
-                       i * 3, i * 3 + 1, i * 3 + 2);
-        f.write(text);
-    }
+        for (unsigned int i = 0; i < nElements; i++)
+        {
+            (void)snprintf(text,
+                           sizeof(text),
+                           "3 %u %u %u\n",
+                           i * 3,
+                           i * 3 + 1,
+                           i * 3 + 2);
+            f.write(text);
+        }
     }
 
     f.close();
 }
-void Mesh::importPLY(const std::string &path)
+void Mesh::importPLY(const std::string &path, double scale)
 {
+    LOG_DEBUG(<< "Import path <" << path << ">.");
+
+    std::ifstream file(path);
+
+    if (!file)
+    {
+        THROW("Could not open file <" + path + ">.");
+    }
+
+    int state = 0;
+    float s = static_cast<float>(scale);
+    size_t nVertices = 0;
+    size_t nVerticesLines = 0;
+    std::vector<float> positionRead;
+
+    std::string line;
+    while (std::getline(file, line))
+    {
+        LOG_DEBUG(<< "Line <" << line << ">.");
+        if (state == 0)
+        {
+            if (line == "end_header")
+            {
+                state = 1;
+            }
+            else if (line.rfind("element vertex", 0) == 0)
+            {
+                std::string numberStr = line.substr(15);
+                nVertices = toSize(numberStr);
+                LOG_DEBUG(<< "Vertex count <" << nVertices << ">.");
+                positionRead.resize(nVertices * 3);
+                set(positionRead, 0.0F);
+            }
+        }
+        else if (state == 1)
+        {
+            LOG_DEBUG(<< "Vertex number <" << nVerticesLines << ">.");
+
+            std::vector<std::string> tokens = split(line, ' ');
+            if (tokens.size() > 2)
+            {
+                LOG_DEBUG(<< "Vertex coordinates x <" << tokens[0] << "> y <"
+                          << tokens[1] << "> z <" << tokens[2] << ">.");
+                positionRead[nVerticesLines * 3 + 0] = toFloat(tokens[0]) * s;
+                positionRead[nVerticesLines * 3 + 1] = toFloat(tokens[1]) * s;
+                positionRead[nVerticesLines * 3 + 2] = toFloat(tokens[2]) * s;
+            }
+
+            nVerticesLines++;
+            if (nVerticesLines >= nVertices)
+            {
+                break;
+            }
+        }
+    }
+
+    position = positionRead;
+    mode = Mesh::Mode::MODE_TRIANGLES;
 }
 
 std::string toString(const Mesh::Mode &in)

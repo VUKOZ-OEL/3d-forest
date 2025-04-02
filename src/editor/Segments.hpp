@@ -73,8 +73,8 @@ public:
 
     void addTree(size_t id, const Box<double> &boundary);
 
-    void exportMeshList(const std::string &projectFilePath) const;
-    void importMeshList(const std::string &projectFilePath);
+    void exportMeshList(const std::string &projectFilePath, double scale) const;
+    void importMeshList(const std::string &projectFilePath, double scale);
 
 protected:
     std::vector<Segment> segments_;

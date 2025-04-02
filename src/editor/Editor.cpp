@@ -266,7 +266,7 @@ void Editor::openProject(const std::string &path)
     // Load mesh list.
     try
     {
-        segments_.importMeshList(path);
+        segments_.importMeshList(path, 1.0);
     }
     catch (...)
     {
@@ -297,7 +297,7 @@ void Editor::saveProject(const std::string &path)
     out.write(path);
 
     // Save mesh list.
-    segments_.exportMeshList(path);
+    segments_.exportMeshList(path, 1.0);
 
     // Mark as saved.
     unsavedChanges_ = false;
