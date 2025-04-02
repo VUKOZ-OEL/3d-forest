@@ -24,6 +24,7 @@
 
 // Include 3D Forest.
 #include <ArgumentParser.hpp>
+#include <Util.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ArgumentParser"
@@ -136,37 +137,37 @@ bool ArgumentParser::read(const std::string &longOption, int &value) const
 
 bool ArgumentParser::toBool(const std::string &longOption) const
 {
-    return toString(longOption) == "true";
+    return ::toBool(toString(longOption));
 }
 
 float ArgumentParser::toFloat(const std::string &longOption) const
 {
-    return std::stof(toString(longOption));
+    return ::toFloat(toString(longOption));
 }
 
 double ArgumentParser::toDouble(const std::string &longOption) const
 {
-    return std::stod(toString(longOption));
+    return ::toDouble(toString(longOption));
 }
 
 int ArgumentParser::toInt(const std::string &longOption) const
 {
-    return static_cast<int>(std::stoll(toString(longOption)));
+    return ::toInt(toString(longOption));
 }
 
 size_t ArgumentParser::toSize(const std::string &longOption) const
 {
-    return static_cast<size_t>(std::stoull(toString(longOption)));
+    return ::toSize(toString(longOption));
 }
 
 uint32_t ArgumentParser::toUint32(const std::string &longOption) const
 {
-    return static_cast<uint32_t>(std::stoull(toString(longOption)));
+    return ::toUint32(toString(longOption));
 }
 
 uint64_t ArgumentParser::toUint64(const std::string &longOption) const
 {
-    return static_cast<uint64_t>(std::stoull(toString(longOption)));
+    return ::toUint64(toString(longOption));
 }
 
 void ArgumentParser::help() const

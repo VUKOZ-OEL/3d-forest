@@ -315,6 +315,25 @@ size_t binarySearch(const std::vector<T> &v, const T &element)
     return idx;
 }
 
+inline std::vector<std::string> split(const std::string &string, char c)
+{
+    std::vector<std::string> tokens;
+    size_t start = 0;
+    size_t end;
+
+    // Manual split on c.
+    while ((end = string.find(c, start)) != std::string::npos)
+    {
+        tokens.push_back(string.substr(start, end - start));
+        start = end + 1;
+    }
+
+    // Add the last token after the last c.
+    tokens.push_back(string.substr(start));
+
+    return tokens;
+}
+
 inline size_t threadId()
 {
     return std::hash<std::thread::id>()(std::this_thread::get_id());
@@ -555,6 +574,41 @@ inline void fromString(double &out, const std::string &in)
     double fraction = static_cast<double>(std::stoll(in.substr(index + 1)));
     double exponent = static_cast<double>(in.substr(index + 1).size());
     out = whole + (fraction / std::pow(10.0, exponent));
+}
+
+inline bool toBool(const std::string &string)
+{
+    return toLower(string) == "true";
+}
+
+inline float toFloat(const std::string &string)
+{
+    return std::stof(string);
+}
+
+inline double toDouble(const std::string &string)
+{
+    return std::stod(string);
+}
+
+inline int toInt(const std::string &string)
+{
+    return static_cast<int>(std::stoll(string));
+}
+
+inline size_t toSize(const std::string &string)
+{
+    return static_cast<size_t>(std::stoull(string));
+}
+
+inline uint32_t toUint32(const std::string &string)
+{
+    return static_cast<uint32_t>(std::stoull(string));
+}
+
+inline uint64_t toUint64(const std::string &string)
+{
+    return static_cast<uint64_t>(std::stoull(string));
 }
 
 #include <WarningsEnable.hpp>
