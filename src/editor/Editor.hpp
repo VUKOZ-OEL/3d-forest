@@ -141,7 +141,7 @@ public:
     void erasePage(size_t dataset, size_t index);
 
     // Lock.
-    std::mutex mutex_;
+    std::mutex editorMutex_;
 
 protected:
     // Project data.

@@ -358,7 +358,7 @@ void ViewerOpenGLViewport::renderScene()
         return;
     }
 
-    std::unique_lock<std::mutex> mutexlock(editor_->mutex_);
+    std::unique_lock<std::mutex> mutexlock(editor_->editorMutex_);
 
     renderSceneSettingsEnable();
 

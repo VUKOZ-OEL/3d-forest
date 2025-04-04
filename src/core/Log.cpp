@@ -48,7 +48,7 @@ LogThread::~LogThread()
 void LogThread::setCallback(LogThreadCallbackInterface *callback)
 {
     {
-        std::unique_lock<std::mutex> mutexlock(mutex_);
+        std::unique_lock<std::mutex> mutexlock(logMutex_);
         callback_ = callback;
     }
     condition_.notify_one();
@@ -57,7 +57,7 @@ void LogThread::setCallback(LogThreadCallbackInterface *callback)
 void LogThread::stop()
 {
     {
-        std::unique_lock<std::mutex> mutexlock(mutex_);
+        std::unique_lock<std::mutex> mutexlock(logMutex_);
         running_ = false;
         received_ = false;
     }
@@ -83,7 +83,7 @@ void LogThread::println(LogType type,
     size_t threadId = std::hash<std::thread::id>()(std::this_thread::get_id());
 
     {
-        std::unique_lock<std::mutex> mutexlock(mutex_);
+        std::unique_lock<std::mutex> mutexlock(logMutex_);
 
         messageQueue_[messageQueueHead_]
             .set(type, threadId, timeString, module, function, text);
@@ -118,7 +118,7 @@ void LogThread::run()
     LogThreadCallbackInterface *callback = nullptr;
     std::vector<LogMessage> messageQueue;
     size_t messageCount;
-    std::unique_lock<std::mutex> mutexlock(mutex_, std::defer_lock);
+    std::unique_lock<std::mutex> mutexlock(logMutex_, std::defer_lock);
 
     while (1)
     {

@@ -77,7 +77,7 @@ bool ThreadLoop::running()
 {
     State state;
     {
-        std::unique_lock<std::mutex> mutexlock(mutex_);
+        std::unique_lock<std::mutex> mutexlock(threadMutex_);
         state = state_;
     }
     LOG_DEBUG(<< "Current state <" << state << ">.");
@@ -94,7 +94,7 @@ void ThreadLoop::stop()
 void ThreadLoop::wait()
 {
     LOG_DEBUG(<< "Wait for thread.");
-    std::unique_lock<std::mutex> mutexlock(mutex_, std::defer_lock);
+    std::unique_lock<std::mutex> mutexlock(threadMutex_, std::defer_lock);
     mutexlock.lock();
     waiting_ = true;
     condition_.notify_one();
@@ -105,7 +105,7 @@ void ThreadLoop::wait()
 void ThreadLoop::setState(State state)
 {
     LOG_DEBUG(<< "Set state <" << state << ">.");
-    std::unique_lock<std::mutex> mutexlock(mutex_);
+    std::unique_lock<std::mutex> mutexlock(threadMutex_);
     state_ = state;
     LOG_DEBUG(<< "State <" << state << "> is set.");
     finished_ = false;
@@ -119,7 +119,7 @@ void ThreadLoop::runLoop()
     State state;
     bool finished = true;
     bool waiting = false;
-    std::unique_lock<std::mutex> mutexlock(mutex_, std::defer_lock);
+    std::unique_lock<std::mutex> mutexlock(threadMutex_, std::defer_lock);
 
     while (1)
     {

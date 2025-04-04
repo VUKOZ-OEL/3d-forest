@@ -137,7 +137,7 @@ private:
     size_t messageQueueTail_;
 
     std::shared_ptr<std::thread> thread_;
-    std::mutex mutex_;
+    std::mutex logMutex_;
     std::condition_variable condition_;
 
     std::mutex mutexCaller_;

@@ -522,7 +522,7 @@ void MainWindow::slotRender()
 {
     if (viewerPlugin_)
     {
-        std::unique_lock<std::mutex> mutexlock(editor_.mutex_);
+        std::unique_lock<std::mutex> mutexlock(editor_.editorMutex_);
         viewerPlugin_->updateScene(&editor_);
     }
 }
@@ -588,7 +588,7 @@ void MainWindow::updateNewProject()
 
     if (viewerPlugin_)
     {
-        std::unique_lock<std::mutex> mutexlock(editor_.mutex_);
+        std::unique_lock<std::mutex> mutexlock(editor_.editorMutex_);
         viewerPlugin_->resetScene(&editor_, true);
     }
 

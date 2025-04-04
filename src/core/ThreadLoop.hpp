@@ -67,7 +67,7 @@ protected:
     };
 
     // Thread state.
-    std::mutex mutex_;
+    std::mutex threadMutex_;
     std::condition_variable condition_;
     State state_;
     bool finished_;
