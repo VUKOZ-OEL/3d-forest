@@ -70,6 +70,9 @@ public:
 
     double calculateSurfaceArea2d();
 
+    void exportPLY(const std::string &path, double scale) const;
+    void importPLY(const std::string &path, double scale);
+
 private:
     void calculateNormalsTriangles();
     double calculateSurfaceArea2dTriangles();

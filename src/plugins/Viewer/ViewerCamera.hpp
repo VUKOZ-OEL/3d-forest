@@ -88,7 +88,7 @@ public:
     // Transform.
     QVector3D project(const QVector3D &world) const;
     QVector3D unproject(const QVector3D &window) const;
-    void ray(int x, int y, QVector3D *base, QVector3D *direction);
+    void ray(int x, int y, QVector3D *near, QVector3D *far);
 
     // Interaction.
     void mousePressEvent(QMouseEvent *event);

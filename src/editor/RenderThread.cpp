@@ -56,7 +56,7 @@ bool RenderThread::next()
     {
         LOG_DEBUG_RENDER(<< "Apply camera to viewports.");
         {
-            std::unique_lock<std::mutex> mutexlock(editor_->mutex_);
+            std::unique_lock<std::mutex> mutexlock(editor_->editorMutex_);
             editor_->viewports().applyCamera(cameraList_);
         }
         initialized_ = true;
@@ -68,7 +68,7 @@ bool RenderThread::next()
     double t1 = Time::realTime();
     bool finished = false;
     {
-        std::unique_lock<std::mutex> mutexlock(editor_->mutex_);
+        std::unique_lock<std::mutex> mutexlock(editor_->editorMutex_);
         finished = !editor_->viewports().nextState();
     }
     double t2 = Time::realTime();

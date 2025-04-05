@@ -25,7 +25,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "ViewerOpenGLResource"
-#define LOG_MODULE_DEBUG_ENABLED 1
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 size_t ViewerOpenGLResource::nextConsumerId_ = 0;

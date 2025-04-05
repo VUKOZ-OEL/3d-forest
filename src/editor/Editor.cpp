@@ -193,6 +193,7 @@ void Editor::openProject(const std::string &path)
 
     close();
 
+    // Load data.
     Json in;
     in.read(path);
 
@@ -257,11 +258,22 @@ void Editor::openProject(const std::string &path)
     }
     catch (...)
     {
-        LOG_DEBUG(<< "Cancel opening new project, exception is raised.");
+        LOG_ERROR(<< "Cancel opening new project, exception is raised.");
         close();
         throw;
     }
 
+    // Load mesh list.
+    try
+    {
+        segments_.importMeshList(path, 1.0);
+    }
+    catch (...)
+    {
+        LOG_ERROR(<< "Unable to read mesh list, exception is raised.");
+    }
+
+    // Update the editor.
     updateAfterRead();
 
     LOG_DEBUG(<< "Finished opening project.");
@@ -271,6 +283,7 @@ void Editor::saveProject(const std::string &path)
 {
     LOG_DEBUG(<< "Start saving the project to path <" << path << ">.");
 
+    // Save data.
     Json out;
 
     toJson(out[EDITOR_KEY_PROJECT_NAME], projectName_);
@@ -283,6 +296,10 @@ void Editor::saveProject(const std::string &path)
 
     out.write(path);
 
+    // Save mesh list.
+    segments_.exportMeshList(path, 1.0);
+
+    // Mark as saved.
     unsavedChanges_ = false;
 
     LOG_DEBUG(<< "Finished saving the project.");

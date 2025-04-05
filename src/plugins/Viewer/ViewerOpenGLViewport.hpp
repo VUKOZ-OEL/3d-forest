@@ -111,6 +111,19 @@ protected:
     void cameraChanged();
     void setFocus();
     void setViewDirection(const QVector3D &dir, const QVector3D &up);
+
+    class Object
+    {
+    public:
+        size_t id{0};
+        ViewerAabb aabb;
+    };
+
+    std::vector<Object> objects_;
+    size_t selectedId{0};
+
+    void updateObjects();
+    void pickObject(const QPoint &p);
 };
 
 #endif /* VIEWER_OPENGL_VIEWPORT_HPP */

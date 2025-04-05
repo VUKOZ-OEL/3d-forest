@@ -103,7 +103,7 @@ void ComputeHeightMapModifier::setPreviewEnabled(bool enabled,
         mutex_.unlock();
 
         {
-            std::unique_lock<std::mutex> mutexlock(editor_->mutex_);
+            std::unique_lock<std::mutex> mutexlock(editor_->editorMutex_);
             if (reload)
             {
                 editor_->viewports().setState(Page::STATE_READ);
@@ -233,7 +233,7 @@ void ComputeHeightMapModifier::apply(QWidget *widget)
 
         // Process step i.
         {
-            std::unique_lock<std::mutex> mutexlock(editor_->mutex_);
+            std::unique_lock<std::mutex> mutexlock(editor_->editorMutex_);
             if (query.nextPage())
             {
                 // editor_->applyFilters(query.page());

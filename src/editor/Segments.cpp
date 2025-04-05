@@ -25,6 +25,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "Segments"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 Segments::Segments()
@@ -112,6 +113,108 @@ void Segments::addTree(size_t id, const Box<double> &boundary)
     segment.boundary = boundary;
 
     push_back(segment);
+}
+
+void Segments::exportMeshList(const std::string &projectFilePath,
+                              double scale) const
+{
+    for (auto const &it : segments_)
+    {
+        std::string extId = "." + toString(it.id) + ".ply";
+        std::string pathId = File::replaceExtension(projectFilePath, extId);
+
+        for (const auto &m : it.meshList)
+        {
+            std::string extMesh = "." + m.first + ".ply";
+            std::string pathMesh = File::replaceExtension(pathId, extMesh);
+            m.second.exportPLY(pathMesh, scale);
+        }
+    }
+}
+
+void Segments::importMeshList(const std::string &projectFilePath, double scale)
+{
+    std::filesystem::path path = projectFilePath;
+    std::filesystem::path dir = path.parent_path();
+    std::string projectFileName = path.filename().string();
+    std::string projectName = File::replaceExtension(projectFileName, "");
+
+    LOG_DEBUG(<< "Project file path <" << projectFilePath << ">.");
+    LOG_DEBUG(<< "Project name <" << projectName << ">.");
+
+    // List file names in project directory.
+    for (const auto &entry : std::filesystem::directory_iterator(dir))
+    {
+        // Skip directories etc.
+        if (!entry.is_regular_file())
+        {
+            continue;
+        }
+
+        // The file name must start with the project name.
+        // For example look for "forest.1.mesh.ply" for "forest.json" project.
+        std::string fileName = entry.path().filename().string();
+        std::string fileNamePath = entry.path().string();
+        LOG_DEBUG(<< "File name <" << fileName << "> path <" << fileNamePath
+                  << ">.");
+        if (fileName.rfind(projectName + ".", 0) != 0)
+        {
+            continue;
+        }
+
+        std::vector<std::string> tokens = split(fileName, '.');
+
+        // Need at least 4 tokens to have "<project>.<number>.<name>.ply".
+        size_t n = tokens.size();
+        if (n < 4)
+        {
+            continue;
+        }
+
+        if (tokens[n - 1] != "ply")
+        {
+            continue;
+        }
+
+        // Read segment ID.
+        size_t id;
+        try
+        {
+            id = toSize(tokens[n - 3]);
+        }
+        catch (...)
+        {
+            LOG_ERROR(<< "Unexpected segment ID <" << tokens[n - 3]
+                      << "> format in mesh file name <" << fileNamePath
+                      << ">.");
+        }
+
+        // Read mesh name.
+        std::string meshName = tokens[n - 2];
+
+        // Import the mesh.
+        LOG_DEBUG(<< "File name <" << fileName << "> id <" << id << "> mesh <"
+                  << meshName << ">.");
+
+        size_t i;
+        try
+        {
+            i = index(id);
+        }
+        catch (...)
+        {
+            LOG_ERROR(<< "Unexpected segment ID <" << id
+                      << "> in mesh file name <" << fileNamePath
+                      << "> not found in segments.");
+        }
+
+        Segment &segment = segments_[i];
+
+        Mesh m;
+        m.name = meshName;
+        m.importPLY(fileNamePath, scale);
+        segment.meshList[m.name] = std::move(m);
+    }
 }
 
 void fromJson(Segments &out, const Json &in)
