@@ -21,6 +21,7 @@
 
 // Include 3D Forest.
 #include <Editor.hpp>
+#include <Geometry.hpp>
 #include <Time.hpp>
 #include <ViewerOpenGL.hpp>
 #include <ViewerOpenGLManager.hpp>
@@ -111,6 +112,7 @@ void ViewerOpenGLViewport::mouseReleaseEvent(QMouseEvent *event)
 void ViewerOpenGLViewport::mousePressEvent(QMouseEvent *event)
 {
     camera_.mousePressEvent(event);
+    pickObject(event->pos());
     setFocus();
 }
 
@@ -360,6 +362,8 @@ void ViewerOpenGLViewport::renderScene()
 
     std::unique_lock<std::mutex> mutexlock(editor_->editorMutex_);
 
+    updateObjects();
+
     renderSceneSettingsEnable();
 
     double t1 = Time::realTime();
@@ -543,11 +547,10 @@ void ViewerOpenGLViewport::renderSegments()
         // Render boundary.
         if (segment.selected)
         {
-            // glColor3f(r, g, b);
-            glColor3f(1.0F, 1.0F, 0.0F);
+            glColor3f(r, g, b);
             ViewerAabb boundary;
             boundary.set(segment.boundary);
-            ViewerOpenGL::renderAabbCorners(boundary, 0);
+            ViewerOpenGL::renderAabb(boundary);
         }
 
         // Ignore "unsegmented".
@@ -796,4 +799,86 @@ void ViewerOpenGLViewport::renderSceneSettingsDisable()
     {
         glDisable(GL_FOG);
     }
+}
+
+void ViewerOpenGLViewport::updateObjects()
+{
+    objects_.clear();
+
+    const Segments &segments = editor_->segments();
+    const QueryFilterSet &filter = editor_->segmentsFilter();
+
+    for (size_t i = 0; i < segments.size(); i++)
+    {
+        const Segment &segment = segments[i];
+
+        if (segment.id == 0)
+        {
+            continue;
+        }
+
+        if (!filter.enabled(segment.id))
+        {
+            continue;
+        }
+
+        Object obj;
+        obj.id = segment.id;
+        obj.aabb.set(segment.boundary);
+
+        objects_.push_back(std::move(obj));
+    }
+}
+
+void ViewerOpenGLViewport::pickObject(const QPoint &p)
+{
+    LOG_DEBUG(<< "Pick x <" << p.x() << "> y <" << p.y() << ">.");
+
+    selectedId = 0;
+
+    size_t nearId = 0;
+    float dist = Numeric::max<float>();
+
+    QVector3D p1;
+    QVector3D p2;
+
+    camera_.ray(p.x(), p.y(), &p1, &p2);
+
+    for (size_t i = 0; i < objects_.size(); i++)
+    {
+        const QVector3D &min = objects_[i].aabb.min();
+        const QVector3D &max = objects_[i].aabb.max();
+        float x;
+        float y;
+        float z;
+        bool b = intersectSegmentAABB(p1.x(),
+                                      p1.y(),
+                                      p1.z(),
+                                      p2.x(),
+                                      p2.y(),
+                                      p2.z(),
+                                      min.x(),
+                                      min.y(),
+                                      min.z(),
+                                      max.x(),
+                                      max.y(),
+                                      max.z(),
+                                      x,
+                                      y,
+                                      z);
+        if (b)
+        {
+            float d = distance(x, y, z, p1.x(), p1.y(), p1.z());
+            if (d < dist)
+            {
+                LOG_DEBUG(<< "d <" << d << "> < dist <" << dist << "> ID <"
+                          << objects_[i].id << ">.");
+                dist = d;
+                nearId = objects_[i].id;
+            }
+        }
+    }
+
+    selectedId = nearId;
+    LOG_DEBUG(<< "Selected ID <" << selectedId << ">.");
 }

@@ -247,7 +247,7 @@ QVector3D ViewerCamera::unproject(const QVector3D &window) const
     return p.unproject(modelView_, projection_, viewport_);
 }
 
-void ViewerCamera::ray(int x, int y, QVector3D *base, QVector3D *direction)
+void ViewerCamera::ray(int x, int y, QVector3D *near, QVector3D *far)
 {
     QVector3D pt;
     int w = viewport_.right();
@@ -258,16 +258,14 @@ void ViewerCamera::ray(int x, int y, QVector3D *base, QVector3D *direction)
         pt[0] = ((2.0F * static_cast<float>(x)) / static_cast<float>(w)) - 1.0F;
         pt[1] = ((2.0F * static_cast<float>(y)) / static_cast<float>(h)) - 1.0F;
     }
+
     pt[2] = -1.0F;
     QVector3D p1 = projectionInv_.map(pt);
+    *near = modelViewInv_.map(p1);
+
     pt[2] = 1.0F;
     QVector3D p2 = projectionInv_.map(pt);
-    *base = modelViewInv_.map(p1);
-
-    QVector3D viewdirection = p2 - p1;
-    viewdirection.normalize();
-    *direction = modelViewInv_.mapVector(viewdirection);
-    direction->normalize();
+    *far = modelViewInv_.map(p2);
 }
 
 void ViewerCamera::mousePressEvent(QMouseEvent *event)
