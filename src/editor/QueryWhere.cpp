@@ -159,3 +159,13 @@ void QueryWhere::setSpecies(const std::unordered_set<size_t> &list)
 {
     speciesFilter_.setFilter(list);
 }
+
+void QueryWhere::setManagementStatus(const QueryFilterSet &list)
+{
+    managementStatusFilter_ = list;
+}
+
+void QueryWhere::setManagementStatus(const std::unordered_set<size_t> &list)
+{
+    managementStatusFilter_.setFilter(list);
+}

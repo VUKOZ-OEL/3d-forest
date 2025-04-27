@@ -266,6 +266,7 @@ void Page::queryWhere()
     queryWhereClassification();
     queryWhereSegment();
     queryWhereSpecies();
+    queryWhereManagementStatus();
 
     state_ = Page::STATE_RUN_MODIFIERS;
 }
@@ -876,6 +877,49 @@ void Page::queryWhereSpecies()
     selectionSize = nSelectedNew;
 }
 
+void Page::queryWhereManagementStatus()
+{
+    if (!query_->where().managementStatus().enabled())
+    {
+        return;
+    }
+
+    const std::unordered_set<size_t> &statusFilter =
+        query_->where().managementStatus().filter();
+    const ManagementStatusList &statusList = editor_->managementStatusList();
+    const Segments &segments = editor_->segments();
+
+    LOG_DEBUG(<< "Page pageId <" << pageId_ << ">.");
+    LOG_DEBUG(<< "Number of query species <" << statusFilter.size() << ">.");
+
+    size_t nSelectedNew = 0;
+
+    for (size_t i = 0; i < selectionSize; i++)
+    {
+        size_t segmentId = segment[selection[i]];
+        size_t segmentIndex = segments.index(segmentId, false);
+
+        if (segmentIndex != SIZE_MAX)
+        {
+            size_t statusId = segments[segmentIndex].managementStatusId;
+
+            if (statusFilter.find(statusId) != statusFilter.end() ||
+                !statusList.contains(statusId))
+            {
+                if (nSelectedNew != i)
+                {
+                    selection[nSelectedNew] = selection[i];
+                }
+                nSelectedNew++;
+            }
+        }
+    }
+
+    LOG_DEBUG(<< "Old selection size <" << selectionSize << ">.");
+    LOG_DEBUG(<< "New selection size <" << nSelectedNew << ">.");
+    selectionSize = nSelectedNew;
+}
+
 void Page::runModifiers()
 {
     // LOG_TRACE_UNKNOWN(<< "Page pageId <" << pageId_ << ">.");
@@ -982,6 +1026,40 @@ void Page::runColorModifier()
                 if (speciesIndex != SIZE_MAX)
                 {
                     const Vector3<double> &c = species[speciesIndex].color;
+                    renderColor[i * 3 + 0] = static_cast<float>(c[0]);
+                    renderColor[i * 3 + 1] = static_cast<float>(c[1]);
+                    renderColor[i * 3 + 2] = static_cast<float>(c[2]);
+                }
+                else
+                {
+                    renderColor[i * 3 + 0] = 0.8F;
+                    renderColor[i * 3 + 1] = 0.8F;
+                    renderColor[i * 3 + 2] = 0.8F;
+                }
+            }
+            else
+            {
+                renderColor[i * 3 + 0] = 0.8F;
+                renderColor[i * 3 + 1] = 0.8F;
+                renderColor[i * 3 + 2] = 0.8F;
+            }
+        }
+    }
+    else if (opt.colorSource() == ViewSettings::ColorSource::MANAGEMENT_STATUS)
+    {
+        const Segments &segments = editor_->segments();
+        const ManagementStatusList &statList = editor_->managementStatusList();
+
+        for (size_t i = 0; i < n; i++)
+        {
+            size_t segmentIndex = segments.index(segment[i], false);
+            if (segmentIndex != SIZE_MAX)
+            {
+                size_t id = segments[segmentIndex].managementStatusId;
+                size_t index = statList.index(id, false);
+                if (index != SIZE_MAX)
+                {
+                    const Vector3<double> &c = statList[index].color;
                     renderColor[i * 3 + 0] = static_cast<float>(c[0]);
                     renderColor[i * 3 + 1] = static_cast<float>(c[1]);
                     renderColor[i * 3 + 2] = static_cast<float>(c[2]);

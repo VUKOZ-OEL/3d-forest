@@ -47,6 +47,7 @@ public:
         CLASSIFICATION,
         SEGMENT,
         SPECIES,
+        MANAGEMENT_STATUS,
         ELEVATION,
         DESCRIPTOR,
         UNKNOWN

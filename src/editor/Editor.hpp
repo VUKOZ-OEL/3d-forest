@@ -28,6 +28,7 @@
 // Include 3D Forest.
 #include <Classifications.hpp>
 #include <Datasets.hpp>
+#include <ManagementStatusList.hpp>
 #include <ModifierInterface.hpp>
 #include <PageManager.hpp>
 #include <Region.hpp>
@@ -56,6 +57,7 @@ public:
         TYPE_INTENSITY,
         TYPE_SEGMENT,
         TYPE_SPECIES,
+        TYPE_MANAGEMENT_STATUS,
         TYPE_PROJECT_NAME,
         TYPE_SETTINGS,
     };
@@ -133,6 +135,24 @@ public:
     const QueryFilterSet &speciesFilter() const { return speciesFilter_; }
     void setSpeciesFilter(const QueryFilterSet &filter);
 
+    // Management status.
+    const ManagementStatusList &managementStatusList() const
+    {
+        return managementStatusList_;
+    }
+    void setManagementStatusList(
+        const ManagementStatusList &managementStatusList);
+    const ManagementStatus &managementStatus(size_t id) const
+    {
+        return managementStatusList_[managementStatusList_.index(id)];
+    }
+    void setManagementStatus(const ManagementStatus &managementStatus);
+    const QueryFilterSet &managementStatusFilter() const
+    {
+        return managementStatusFilter_;
+    }
+    void setManagementStatusFilter(const QueryFilterSet &filter);
+
     // Settings.
     const Settings &settings() const { return settings_; }
     void setRenderingSettings(const RenderingSettings &renderingSettings);
@@ -167,6 +187,7 @@ protected:
 
     Segments segments_;
     SpeciesList speciesList_;
+    ManagementStatusList managementStatusList_;
     Settings settings_;
     Classifications classifications_;
 
@@ -178,6 +199,7 @@ protected:
     QueryFilterSet datasetsFilter_;
     QueryFilterSet segmentsFilter_;
     QueryFilterSet speciesFilter_;
+    QueryFilterSet managementStatusFilter_;
 
     // Modifiers.
     std::vector<ModifierInterface *> modifiers_;

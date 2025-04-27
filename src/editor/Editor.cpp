@@ -33,6 +33,7 @@ static const char *EDITOR_KEY_PROJECT_NAME = "projectName";
 static const char *EDITOR_KEY_DATA_SET = "datasets";
 static const char *EDITOR_KEY_SEGMENT = "segments";
 static const char *EDITOR_KEY_SPECIES = "species";
+static const char *EDITOR_KEY_MANAGEMENT_STATUS = "managementStatus";
 static const char *EDITOR_KEY_SETTINGS = "settings";
 // static const char *EDITOR_KEY_CLASSIFICATIONS = "classifications";
 // static const char *EDITOR_KEY_CLIP_FILTER = "clipFilter";
@@ -152,6 +153,11 @@ void Editor::close()
     speciesFilter_.setEnabled(0, true);
     speciesFilter_.setEnabled(true);
 
+    managementStatusList_.clear();
+    managementStatusFilter_.clear();
+    managementStatusFilter_.setEnabled(0, true);
+    managementStatusFilter_.setEnabled(true);
+
     classifications_.clear();
     classificationsFilter_.clear();
     for (size_t i = 0; i < classifications_.size(); i++)
@@ -240,6 +246,12 @@ void Editor::openProject(const std::string &path)
             fromJson(speciesList_, in[EDITOR_KEY_SPECIES]);
         }
 
+        // Management status.
+        if (in.contains(EDITOR_KEY_MANAGEMENT_STATUS))
+        {
+            fromJson(managementStatusList_, in[EDITOR_KEY_MANAGEMENT_STATUS]);
+        }
+
         // Classifications.
         // if (in.contains(EDITOR_KEY_CLASSIFICATIONS))
         // {
@@ -302,6 +314,7 @@ void Editor::saveProject(const std::string &path)
     toJson(out[EDITOR_KEY_DATA_SET], datasets_);
     toJson(out[EDITOR_KEY_SEGMENT], segments_);
     toJson(out[EDITOR_KEY_SPECIES], speciesList_);
+    toJson(out[EDITOR_KEY_MANAGEMENT_STATUS], managementStatusList_);
     // toJson(out[EDITOR_KEY_CLASSIFICATIONS], classifications_);
     // toJson(out[EDITOR_KEY_SETTINGS], settings_);
     // toJson(out[EDITOR_KEY_CLIP_FILTER], clipFilter_);
@@ -531,6 +544,34 @@ void Editor::setSpeciesFilter(const QueryFilterSet &filter)
     }
 }
 
+void Editor::setManagementStatusList(
+    const ManagementStatusList &managementStatusList)
+{
+    LOG_DEBUG(<< "Set management status list.");
+    managementStatusList_ = managementStatusList;
+    unsavedChanges_ = true;
+}
+
+void Editor::setManagementStatus(const ManagementStatus &managementStatus)
+{
+    LOG_DEBUG(<< "Set management status.");
+    managementStatusList_[managementStatusList_.index(managementStatus.id)] =
+        managementStatus;
+    unsavedChanges_ = true;
+}
+
+void Editor::setManagementStatusFilter(const QueryFilterSet &filter)
+{
+    LOG_DEBUG(<< "Set management status filter.");
+    managementStatusFilter_ = filter;
+
+    if (viewports_.size() > 0)
+    {
+        viewports_.where().setManagementStatus(filter);
+        viewports_.applyWhereToAll();
+    }
+}
+
 void Editor::updateAfterSet()
 {
     datasetsRange_ = datasets_.range();
@@ -573,6 +614,11 @@ void Editor::updateAfterRead()
         speciesFilter_.setEnabled(speciesList_[i].id, true);
     }
 
+    for (size_t i = 0; i < managementStatusList_.size(); i++)
+    {
+        managementStatusFilter_.setEnabled(managementStatusList_[i].id, true);
+    }
+
     applyFilters();
 
     LOG_DEBUG(<< "Finished editor update after read.");
@@ -590,6 +636,7 @@ void Editor::applyFilters()
         viewports_.where().setClassification(classificationsFilter_);
         viewports_.where().setSegment(segmentsFilter_);
         viewports_.where().setSpecies(speciesFilter_);
+        viewports_.where().setManagementStatus(managementStatusFilter_);
 
         viewports_.applyWhereToAll();
     }
