@@ -17,46 +17,37 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Segment.hpp */
-
-#ifndef SEGMENT_HPP
-#define SEGMENT_HPP
+/** @file Species.cpp */
 
 // Include 3D Forest.
-#include <Box.hpp>
-#include <Json.hpp>
-#include <Mesh.hpp>
-#include <TreeAttributes.hpp>
+#include <Error.hpp>
+#include <Species.hpp>
 
 // Include local.
-#include <ExportEditor.hpp>
-#include <WarningsDisable.hpp>
+#define LOG_MODULE_NAME "Species"
+#include <Log.hpp>
 
-/** Segment. */
-class EXPORT_EDITOR Segment
+Species::Species()
 {
-public:
-    size_t id{0};
-    std::string label;
-    Vector3<double> color;
-    bool selected{false};
+}
 
-    size_t speciesId{0};
+void fromJson(Species &out, const Json &in)
+{
+    fromJson(out.id, in["id"]);
+    fromJson(out.label, in["label"]);
+    fromJson(out.color, in["color"]);
+}
 
-    Box<double> boundary;
+void toJson(Json &out, const Species &in)
+{
+    toJson(out["id"], in.id);
+    toJson(out["label"], in.label);
+    toJson(out["color"], in.color);
+}
 
-    TreeAttributes treeAttributes;
-
-    std::map<std::string, Mesh> meshList;
-
-    Segment();
-};
-
-void fromJson(Segment &out, const Json &in);
-void toJson(Json &out, const Segment &in);
-
-std::ostream &operator<<(std::ostream &out, const Segment &in);
-
-#include <WarningsEnable.hpp>
-
-#endif /* SEGMENT_HPP */
+std::ostream &operator<<(std::ostream &out, const Species &in)
+{
+    Json json;
+    toJson(json, in);
+    return out << json.serialize();
+}

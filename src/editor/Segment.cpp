@@ -37,6 +37,15 @@ void fromJson(Segment &out, const Json &in)
     fromJson(out.label, in["label"]);
     fromJson(out.color, in["color"]);
 
+    if (in.contains("speciesId"))
+    {
+        fromJson(out.speciesId, in["speciesId"]);
+    }
+    else
+    {
+        out.speciesId = 0;
+    }
+
     fromJson(out.boundary, in["boundary"]);
     fromJson(out.treeAttributes, in["treeAttributes"]);
 }
@@ -46,6 +55,8 @@ void toJson(Json &out, const Segment &in)
     toJson(out["id"], in.id);
     toJson(out["label"], in.label);
     toJson(out["color"], in.color);
+
+    toJson(out["speciesId"], in.speciesId);
 
     toJson(out["boundary"], in.boundary);
     toJson(out["treeAttributes"], in.treeAttributes);

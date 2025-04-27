@@ -32,6 +32,7 @@ static const char *EDITOR_FILE_NAME_SETTINGS = "settings.json";
 static const char *EDITOR_KEY_PROJECT_NAME = "projectName";
 static const char *EDITOR_KEY_DATA_SET = "datasets";
 static const char *EDITOR_KEY_SEGMENT = "segments";
+static const char *EDITOR_KEY_SPECIES = "species";
 static const char *EDITOR_KEY_SETTINGS = "settings";
 // static const char *EDITOR_KEY_CLASSIFICATIONS = "classifications";
 // static const char *EDITOR_KEY_CLIP_FILTER = "clipFilter";
@@ -146,6 +147,11 @@ void Editor::close()
     segmentsFilter_.setEnabled(0, true);
     segmentsFilter_.setEnabled(true);
 
+    speciesList_.clear();
+    speciesFilter_.clear();
+    speciesFilter_.setEnabled(0, true);
+    speciesFilter_.setEnabled(true);
+
     classifications_.clear();
     classificationsFilter_.clear();
     for (size_t i = 0; i < classifications_.size(); i++)
@@ -228,6 +234,12 @@ void Editor::openProject(const std::string &path)
             fromJson(segments_, in[EDITOR_KEY_SEGMENT]);
         }
 
+        // Species.
+        if (in.contains(EDITOR_KEY_SPECIES))
+        {
+            fromJson(speciesList_, in[EDITOR_KEY_SPECIES]);
+        }
+
         // Classifications.
         // if (in.contains(EDITOR_KEY_CLASSIFICATIONS))
         // {
@@ -289,6 +301,7 @@ void Editor::saveProject(const std::string &path)
     toJson(out[EDITOR_KEY_PROJECT_NAME], projectName_);
     toJson(out[EDITOR_KEY_DATA_SET], datasets_);
     toJson(out[EDITOR_KEY_SEGMENT], segments_);
+    toJson(out[EDITOR_KEY_SPECIES], speciesList_);
     // toJson(out[EDITOR_KEY_CLASSIFICATIONS], classifications_);
     // toJson(out[EDITOR_KEY_SETTINGS], settings_);
     // toJson(out[EDITOR_KEY_CLIP_FILTER], clipFilter_);
@@ -492,6 +505,32 @@ void Editor::setSegmentsFilter(const QueryFilterSet &filter)
     }
 }
 
+void Editor::setSpeciesList(const SpeciesList &speciesList)
+{
+    LOG_DEBUG(<< "Set species list.");
+    speciesList_ = speciesList;
+    unsavedChanges_ = true;
+}
+
+void Editor::setSpecies(const Species &species)
+{
+    LOG_DEBUG(<< "Set species.");
+    speciesList_[speciesList_.index(species.id)] = species;
+    unsavedChanges_ = true;
+}
+
+void Editor::setSpeciesFilter(const QueryFilterSet &filter)
+{
+    LOG_DEBUG(<< "Set species filter.");
+    speciesFilter_ = filter;
+
+    if (viewports_.size() > 0)
+    {
+        viewports_.where().setSpecies(filter);
+        viewports_.applyWhereToAll();
+    }
+}
+
 void Editor::updateAfterSet()
 {
     datasetsRange_ = datasets_.range();
@@ -529,6 +568,11 @@ void Editor::updateAfterRead()
         segmentsFilter_.setEnabled(segments_[i].id, true);
     }
 
+    for (size_t i = 0; i < speciesList_.size(); i++)
+    {
+        speciesFilter_.setEnabled(speciesList_[i].id, true);
+    }
+
     applyFilters();
 
     LOG_DEBUG(<< "Finished editor update after read.");
@@ -545,6 +589,7 @@ void Editor::applyFilters()
         viewports_.where().setIntensity(intensityFilter_);
         viewports_.where().setClassification(classificationsFilter_);
         viewports_.where().setSegment(segmentsFilter_);
+        viewports_.where().setSpecies(speciesFilter_);
 
         viewports_.applyWhereToAll();
     }

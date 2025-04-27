@@ -47,6 +47,7 @@ void QueryWhere::clear()
     classification_.clear();
     classificationArray_.clear();
     segment_.clear();
+    speciesFilter_.clear();
 }
 
 void QueryWhere::setDataset(const QueryFilterSet &list)
@@ -147,4 +148,14 @@ void QueryWhere::setSegment(const QueryFilterSet &list)
 void QueryWhere::setSegment(const std::unordered_set<size_t> &list)
 {
     segment_.setFilter(list);
+}
+
+void QueryWhere::setSpecies(const QueryFilterSet &list)
+{
+    speciesFilter_ = list;
+}
+
+void QueryWhere::setSpecies(const std::unordered_set<size_t> &list)
+{
+    speciesFilter_.setFilter(list);
 }

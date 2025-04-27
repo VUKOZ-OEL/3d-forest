@@ -89,6 +89,10 @@ public:
     void setSegment(const QueryFilterSet &list);
     const QueryFilterSet &segment() const { return segment_; }
 
+    void setSpecies(const std::unordered_set<size_t> &list);
+    void setSpecies(const QueryFilterSet &list);
+    const QueryFilterSet &species() const { return speciesFilter_; }
+
 private:
     Region region_;
     Range<double> elevation_;
@@ -98,6 +102,7 @@ private:
     QueryFilterSet classification_;
     std::vector<int> classificationArray_;
     QueryFilterSet segment_;
+    QueryFilterSet speciesFilter_;
 
     void classificationsToArray();
 };

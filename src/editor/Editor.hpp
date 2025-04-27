@@ -34,6 +34,7 @@
 #include <RenderingSettings.hpp>
 #include <Segments.hpp>
 #include <Settings.hpp>
+#include <SpeciesList.hpp>
 #include <Viewports.hpp>
 
 // Include local.
@@ -54,6 +55,7 @@ public:
         TYPE_ELEVATION,
         TYPE_INTENSITY,
         TYPE_SEGMENT,
+        TYPE_SPECIES,
         TYPE_PROJECT_NAME,
         TYPE_SETTINGS,
     };
@@ -120,6 +122,17 @@ public:
     const QueryFilterSet &segmentsFilter() const { return segmentsFilter_; }
     void setSegmentsFilter(const QueryFilterSet &filter);
 
+    // Species.
+    const SpeciesList &speciesList() const { return speciesList_; }
+    void setSpeciesList(const SpeciesList &speciesList);
+    const Species &species(size_t id) const
+    {
+        return speciesList_[speciesList_.index(id)];
+    }
+    void setSpecies(const Species &species);
+    const QueryFilterSet &speciesFilter() const { return speciesFilter_; }
+    void setSpeciesFilter(const QueryFilterSet &filter);
+
     // Settings.
     const Settings &settings() const { return settings_; }
     void setRenderingSettings(const RenderingSettings &renderingSettings);
@@ -153,6 +166,7 @@ protected:
     Dataset::Range datasetsRange_;
 
     Segments segments_;
+    SpeciesList speciesList_;
     Settings settings_;
     Classifications classifications_;
 
@@ -163,6 +177,7 @@ protected:
     QueryFilterSet classificationsFilter_;
     QueryFilterSet datasetsFilter_;
     QueryFilterSet segmentsFilter_;
+    QueryFilterSet speciesFilter_;
 
     // Modifiers.
     std::vector<ModifierInterface *> modifiers_;

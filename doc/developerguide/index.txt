@@ -903,6 +903,7 @@ powershell -C "gci | % {rni $_.Name ($_.Name -replace '24px', '24')}"
         "${workspaceRoot}/src/plugins/FilterElevation",
         "${workspaceRoot}/src/plugins/FilterFiles",
         "${workspaceRoot}/src/plugins/FilterIntensity",
+        "${workspaceRoot}/src/plugins/FilterSpecies",
         "${workspaceRoot}/src/plugins/FilterTrees",
         "${workspaceRoot}/src/plugins/Help",
         "${workspaceRoot}/src/plugins/ImportFile",

@@ -17,46 +17,33 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Segment.hpp */
+/** @file FilterSpeciesWindow.hpp */
 
-#ifndef SEGMENT_HPP
-#define SEGMENT_HPP
+#ifndef FILTER_SPECIES_WINDOW_HPP
+#define FILTER_SPECIES_WINDOW_HPP
 
 // Include 3D Forest.
-#include <Box.hpp>
-#include <Json.hpp>
-#include <Mesh.hpp>
-#include <TreeAttributes.hpp>
+class MainWindow;
+class FilterSpeciesWidget;
 
-// Include local.
-#include <ExportEditor.hpp>
-#include <WarningsDisable.hpp>
+// Include Qt.
+#include <QDockWidget>
+class QCloseEvent;
 
-/** Segment. */
-class EXPORT_EDITOR Segment
+/** Filter Species Window. */
+class FilterSpeciesWindow : public QDockWidget
 {
+    Q_OBJECT
+
 public:
-    size_t id{0};
-    std::string label;
-    Vector3<double> color;
-    bool selected{false};
+    FilterSpeciesWindow(MainWindow *mainWindow);
 
-    size_t speciesId{0};
+protected:
+    FilterSpeciesWidget *widget_;
 
-    Box<double> boundary;
-
-    TreeAttributes treeAttributes;
-
-    std::map<std::string, Mesh> meshList;
-
-    Segment();
+    void showEvent(QShowEvent *event) override;
+    void hideEvent(QHideEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
 };
 
-void fromJson(Segment &out, const Json &in);
-void toJson(Json &out, const Segment &in);
-
-std::ostream &operator<<(std::ostream &out, const Segment &in);
-
-#include <WarningsEnable.hpp>
-
-#endif /* SEGMENT_HPP */
+#endif /* FILTER_SPECIES_WINDOW_HPP */

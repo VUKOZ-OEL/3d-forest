@@ -182,6 +182,7 @@ private:
     void queryWhereIntensity();
     void queryWhereClassification();
     void queryWhereSegment();
+    void queryWhereSpecies();
 
     void runModifiers();
     void runColorModifier();

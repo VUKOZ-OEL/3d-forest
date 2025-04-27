@@ -75,6 +75,7 @@ ViewSettingsWidget::ViewSettingsWidget(MainWindow *mainWindow)
                                                   "Number of Returns",
                                                   "Classification",
                                                   "Tree",
+                                                  "Species",
                                                   "Elevation",
                                                   "Descriptor"};
     colorSourceComboBox_ = new QComboBox;
