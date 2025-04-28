@@ -41,6 +41,8 @@ ViewSettings::ViewSettings()
                           "Number of Returns",
                           "Classification",
                           "Tree",
+                          "Species",
+                          "Management Status",
                           "Elevation",
                           "Descriptor"};
 }
@@ -177,6 +179,14 @@ void fromString(ViewSettings::ColorSource &out, const std::string &in)
     {
         out = ViewSettings::ColorSource::SEGMENT;
     }
+    else if (in == "Species")
+    {
+        out = ViewSettings::ColorSource::SPECIES;
+    }
+    else if (in == "Management Status")
+    {
+        out = ViewSettings::ColorSource::MANAGEMENT_STATUS;
+    }
     else if (in == "Elevation")
     {
         out = ViewSettings::ColorSource::ELEVATION;
@@ -208,6 +218,10 @@ std::string toString(const ViewSettings::ColorSource &in)
             return "Classification";
         case ViewSettings::ColorSource::SEGMENT:
             return "Tree";
+        case ViewSettings::ColorSource::SPECIES:
+            return "Species";
+        case ViewSettings::ColorSource::MANAGEMENT_STATUS:
+            return "Management Status";
         case ViewSettings::ColorSource::ELEVATION:
             return "Elevation";
         case ViewSettings::ColorSource::DESCRIPTOR:

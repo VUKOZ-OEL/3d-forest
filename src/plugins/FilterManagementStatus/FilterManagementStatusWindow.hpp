@@ -17,42 +17,33 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file EditPlugin.hpp */
+/** @file FilterManagementStatusWindow.hpp */
 
-#ifndef EDIT_PLUGIN_HPP
-#define EDIT_PLUGIN_HPP
+#ifndef FILTER_MANAGEMENT_STATUS_WINDOW_HPP
+#define FILTER_MANAGEMENT_STATUS_WINDOW_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
+class MainWindow;
+class FilterManagementStatusWidget;
 
-#if defined(_MSC_VER)
-    #if defined(EXPORT_3DForestEditPlugin)
-        #define EXPORT_EDIT_PLUGIN __declspec(dllexport)
-    #else
-        #define EXPORT_EDIT_PLUGIN __declspec(dllimport)
-    #endif
-#else
-    #define EXPORT_EDIT_PLUGIN
-#endif
+// Include Qt.
+#include <QDockWidget>
+class QCloseEvent;
 
-/** Edit Plugin. */
-class EXPORT_EDIT_PLUGIN EditPlugin : public QObject, public PluginInterface
+/** Filter Management Status Window. */
+class FilterManagementStatusWindow : public QDockWidget
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
 
 public:
-    EditPlugin();
+    FilterManagementStatusWindow(MainWindow *mainWindow);
 
-    virtual void initialize(MainWindow *mainWindow);
+protected:
+    FilterManagementStatusWidget *widget_;
 
-public slots:
-    void slotResetElevation();
-    void slotSetClassification();
-
-private:
-    MainWindow *mainWindow_;
+    void showEvent(QShowEvent *event) override;
+    void hideEvent(QHideEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
 };
 
-#endif /* EDIT_PLUGIN_HPP */
+#endif /* FILTER_MANAGEMENT_STATUS_WINDOW_HPP */

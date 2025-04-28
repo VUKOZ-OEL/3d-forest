@@ -21,6 +21,7 @@
 
 // Include 3D Forest.
 #include <EditPlugin.hpp>
+#include <EditPluginSetClassification.hpp>
 #include <MainWindow.hpp>
 
 // Include local.
@@ -44,6 +45,16 @@ void EditPlugin::initialize(MainWindow *mainWindow)
                               QIcon(),
                               this,
                               SLOT(slotResetElevation()),
+                              MAIN_WINDOW_MENU_EDIT_PRIORITY);
+
+    mainWindow_->createAction(nullptr,
+                              "Edit",
+                              "Edit",
+                              tr("Set classification"),
+                              tr("Set classification"),
+                              QIcon(),
+                              this,
+                              SLOT(slotSetClassification()),
                               MAIN_WINDOW_MENU_EDIT_PRIORITY);
 }
 
@@ -69,4 +80,9 @@ void EditPlugin::slotResetElevation()
     mainWindow_->update({Editor::TYPE_ELEVATION});
 
     LOG_DEBUG(<< "Finished resetting elevation values.");
+}
+
+void EditPlugin::slotSetClassification()
+{
+    EditPluginSetClassification::run(mainWindow_);
 }

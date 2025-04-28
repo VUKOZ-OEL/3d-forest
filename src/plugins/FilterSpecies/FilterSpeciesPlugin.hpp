@@ -17,42 +17,44 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file EditPlugin.hpp */
+/** @file FilterSpeciesPlugin.hpp */
 
-#ifndef EDIT_PLUGIN_HPP
-#define EDIT_PLUGIN_HPP
+#ifndef FILTER_SPECIES_PLUGIN_HPP
+#define FILTER_SPECIES_PLUGIN_HPP
 
 // Include 3D Forest.
 #include <PluginInterface.hpp>
+class FilterSpeciesWindow;
 
 #if defined(_MSC_VER)
-    #if defined(EXPORT_3DForestEditPlugin)
-        #define EXPORT_EDIT_PLUGIN __declspec(dllexport)
+    #if defined(EXPORT_3DForestFilterSpeciesPlugin)
+        #define EXPORT_FILTER_SPECIES_PLUGIN __declspec(dllexport)
     #else
-        #define EXPORT_EDIT_PLUGIN __declspec(dllimport)
+        #define EXPORT_FILTER_SPECIES_PLUGIN __declspec(dllimport)
     #endif
 #else
-    #define EXPORT_EDIT_PLUGIN
+    #define EXPORT_FILTER_SPECIES_PLUGIN
 #endif
 
-/** Edit Plugin. */
-class EXPORT_EDIT_PLUGIN EditPlugin : public QObject, public PluginInterface
+/** Filter Species Plugin. */
+class EXPORT_FILTER_SPECIES_PLUGIN FilterSpeciesPlugin : public QObject,
+                                                         public PluginInterface
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID PluginInterface_iid)
     Q_INTERFACES(PluginInterface)
 
 public:
-    EditPlugin();
+    FilterSpeciesPlugin();
 
     virtual void initialize(MainWindow *mainWindow);
 
 public slots:
-    void slotResetElevation();
-    void slotSetClassification();
+    void slotPlugin();
 
 private:
     MainWindow *mainWindow_;
+    FilterSpeciesWindow *pluginWindow_;
 };
 
-#endif /* EDIT_PLUGIN_HPP */
+#endif /* FILTER_SPECIES_PLUGIN_HPP */

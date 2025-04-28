@@ -46,6 +46,8 @@ public:
         NUMBER_OF_RETURNS,
         CLASSIFICATION,
         SEGMENT,
+        SPECIES,
+        MANAGEMENT_STATUS,
         ELEVATION,
         DESCRIPTOR,
         UNKNOWN

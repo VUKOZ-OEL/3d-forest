@@ -17,47 +17,44 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Segment.hpp */
+/** @file EditPluginSetClassification.hpp */
 
-#ifndef SEGMENT_HPP
-#define SEGMENT_HPP
+#ifndef INPUT_COMBO_BOX_DIALOG_HPP
+#define INPUT_COMBO_BOX_DIALOG_HPP
 
-// Include 3D Forest.
-#include <Box.hpp>
-#include <Json.hpp>
-#include <Mesh.hpp>
-#include <TreeAttributes.hpp>
+// Include Qt.
+#include <QDialog>
+class QComboBox;
+class QPushButton;
 
 // Include local.
-#include <ExportEditor.hpp>
+#include <ExportGui.hpp>
 #include <WarningsDisable.hpp>
 
-/** Segment. */
-class EXPORT_EDITOR Segment
+/** Input Combo Box Dialog. */
+class EXPORT_GUI InputComboBoxDialog : public QDialog
 {
+    Q_OBJECT
+
 public:
-    size_t id{0};
-    std::string label;
-    Vector3<double> color;
-    bool selected{false};
+    explicit InputComboBoxDialog(QWidget *parent = nullptr);
 
-    size_t speciesId{0};
-    size_t managementStatusId{0};
+    void setOkButtonText(const QString &text);
 
-    Box<double> boundary;
+    void addItem(const QString &text);
 
-    TreeAttributes treeAttributes;
+    /// Returns current combo box item index.
+    int currentIndex() const;
 
-    std::map<std::string, Mesh> meshList;
+    /// Returns current combo box item text.
+    QString currentText() const;
 
-    Segment();
+private:
+    QComboBox *comboBox;
+    QPushButton *okButton;
+    QPushButton *cancelButton;
 };
-
-void fromJson(Segment &out, const Json &in);
-void toJson(Json &out, const Segment &in);
-
-std::ostream &operator<<(std::ostream &out, const Segment &in);
 
 #include <WarningsEnable.hpp>
 
-#endif /* SEGMENT_HPP */
+#endif /* INPUT_COMBO_BOX_DIALOG_HPP */

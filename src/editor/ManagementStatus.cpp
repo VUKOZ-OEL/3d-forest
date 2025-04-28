@@ -17,62 +17,35 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Segment.cpp */
+/** @file ManagementStatus.cpp */
 
 // Include 3D Forest.
 #include <Error.hpp>
-#include <Segment.hpp>
+#include <ManagementStatus.hpp>
 
 // Include local.
-#define LOG_MODULE_NAME "Segment"
+#define LOG_MODULE_NAME "ManagementStatus"
 #include <Log.hpp>
 
-Segment::Segment()
+ManagementStatus::ManagementStatus()
 {
 }
 
-void fromJson(Segment &out, const Json &in)
+void fromJson(ManagementStatus &out, const Json &in)
 {
     fromJson(out.id, in["id"]);
     fromJson(out.label, in["label"]);
     fromJson(out.color, in["color"]);
-
-    if (in.contains("speciesId"))
-    {
-        fromJson(out.speciesId, in["speciesId"]);
-    }
-    else
-    {
-        out.speciesId = 0;
-    }
-
-    if (in.contains("managementStatusId"))
-    {
-        fromJson(out.managementStatusId, in["managementStatusId"]);
-    }
-    else
-    {
-        out.speciesId = 0;
-    }
-
-    fromJson(out.boundary, in["boundary"]);
-    fromJson(out.treeAttributes, in["treeAttributes"]);
 }
 
-void toJson(Json &out, const Segment &in)
+void toJson(Json &out, const ManagementStatus &in)
 {
     toJson(out["id"], in.id);
     toJson(out["label"], in.label);
     toJson(out["color"], in.color);
-
-    toJson(out["speciesId"], in.speciesId);
-    toJson(out["managementStatusId"], in.managementStatusId);
-
-    toJson(out["boundary"], in.boundary);
-    toJson(out["treeAttributes"], in.treeAttributes);
 }
 
-std::ostream &operator<<(std::ostream &out, const Segment &in)
+std::ostream &operator<<(std::ostream &out, const ManagementStatus &in)
 {
     Json json;
     toJson(json, in);

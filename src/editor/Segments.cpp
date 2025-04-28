@@ -87,6 +87,34 @@ void Segments::erase(size_t pos)
     segments_.resize(n);
 }
 
+size_t Segments::index(size_t id, bool throwException) const
+{
+    const auto &it = hashTableId_.find(id);
+    if (it != hashTableId_.end())
+    {
+        return it->second;
+    }
+
+    if (throwException)
+    {
+        THROW("Invalid segment id");
+    }
+    else
+    {
+        return SIZE_MAX;
+    }
+}
+
+bool Segments::contains(size_t id) const
+{
+    const auto &it = hashTableId_.find(id);
+    if (it != hashTableId_.end())
+    {
+        return true;
+    }
+    return false;
+}
+
 size_t Segments::unusedId() const
 {
     LOG_DEBUG(<< "Obtain unused id.");

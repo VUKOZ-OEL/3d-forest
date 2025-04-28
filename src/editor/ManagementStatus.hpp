@@ -17,47 +17,35 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Segment.hpp */
+/** @file ManagementStatus.hpp */
 
-#ifndef SEGMENT_HPP
-#define SEGMENT_HPP
+#ifndef MANAGEMENT_STATUS_HPP
+#define MANAGEMENT_STATUS_HPP
 
 // Include 3D Forest.
-#include <Box.hpp>
 #include <Json.hpp>
-#include <Mesh.hpp>
-#include <TreeAttributes.hpp>
+#include <Vector3.hpp>
 
 // Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
 
-/** Segment. */
-class EXPORT_EDITOR Segment
+/** Management Status. */
+class EXPORT_EDITOR ManagementStatus
 {
 public:
     size_t id{0};
     std::string label;
     Vector3<double> color;
-    bool selected{false};
 
-    size_t speciesId{0};
-    size_t managementStatusId{0};
-
-    Box<double> boundary;
-
-    TreeAttributes treeAttributes;
-
-    std::map<std::string, Mesh> meshList;
-
-    Segment();
+    ManagementStatus();
 };
 
-void fromJson(Segment &out, const Json &in);
-void toJson(Json &out, const Segment &in);
+void fromJson(ManagementStatus &out, const Json &in);
+void toJson(Json &out, const ManagementStatus &in);
 
-std::ostream &operator<<(std::ostream &out, const Segment &in);
+std::ostream &operator<<(std::ostream &out, const ManagementStatus &in);
 
 #include <WarningsEnable.hpp>
 
-#endif /* SEGMENT_HPP */
+#endif /* MANAGEMENT_STATUS_HPP */
