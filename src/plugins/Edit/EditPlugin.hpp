@@ -49,6 +49,7 @@ public:
 
 public slots:
     void slotResetElevation();
+    void slotSetClassification();
 
 private:
     MainWindow *mainWindow_;
