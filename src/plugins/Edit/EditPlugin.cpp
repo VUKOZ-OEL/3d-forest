@@ -21,6 +21,7 @@
 
 // Include 3D Forest.
 #include <EditPlugin.hpp>
+#include <EditPluginResetElevation.hpp>
 #include <EditPluginSetClassification.hpp>
 #include <MainWindow.hpp>
 
@@ -60,26 +61,7 @@ void EditPlugin::initialize(MainWindow *mainWindow)
 
 void EditPlugin::slotResetElevation()
 {
-    LOG_DEBUG(<< "Start resetting elevation values.");
-
-    mainWindow_->suspendThreads();
-
-    Editor *editor = &mainWindow_->editor();
-
-    /** @todo Progress dialog with cancel button. */
-    Query query(editor);
-    query.setWhere(editor->viewports().where());
-    query.exec();
-    while (query.next())
-    {
-        query.elevation() = 0;
-        query.setModified();
-    }
-    query.flush();
-
-    mainWindow_->update({Editor::TYPE_ELEVATION});
-
-    LOG_DEBUG(<< "Finished resetting elevation values.");
+    EditPluginResetElevation::run(mainWindow_);
 }
 
 void EditPlugin::slotSetClassification()
