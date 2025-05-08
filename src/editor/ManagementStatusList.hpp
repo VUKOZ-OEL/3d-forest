@@ -40,6 +40,7 @@ public:
     ManagementStatusList();
 
     void clear();
+    void setDefault();
 
     size_t size() const { return data_.size(); }
     ManagementStatus &operator[](size_t index) { return data_[index]; }

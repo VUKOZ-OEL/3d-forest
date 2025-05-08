@@ -42,8 +42,8 @@ static const char *EDITOR_KEY_SETTINGS = "settings";
 Editor::Editor()
 {
     LOG_DEBUG(<< "Start creating the editor.");
-    close();
     readSettings();
+    close();
     viewportsResize(1);
     LOG_DEBUG(<< "Finished creating the editor.");
 }
@@ -148,14 +148,20 @@ void Editor::close()
     segmentsFilter_.setEnabled(0, true);
     segmentsFilter_.setEnabled(true);
 
-    speciesList_.clear();
+    speciesList_ = settings().defaultSpeciesList();
     speciesFilter_.clear();
-    speciesFilter_.setEnabled(0, true);
+    for (size_t i = 0; i < speciesList_.size(); i++)
+    {
+        speciesFilter_.setEnabled(speciesList_[i].id, true);
+    }
     speciesFilter_.setEnabled(true);
 
-    managementStatusList_.clear();
+    managementStatusList_ = settings().defaultManagementStatusList();
     managementStatusFilter_.clear();
-    managementStatusFilter_.setEnabled(0, true);
+    for (size_t i = 0; i < managementStatusList_.size(); i++)
+    {
+        managementStatusFilter_.setEnabled(managementStatusList_[i].id, true);
+    }
     managementStatusFilter_.setEnabled(true);
 
     classifications_.clear();

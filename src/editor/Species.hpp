@@ -39,6 +39,7 @@ public:
     Vector3<double> color;
 
     Species();
+    Species(size_t id, const std::string &label, const Vector3<double> &color);
 };
 
 void fromJson(Species &out, const Json &in);

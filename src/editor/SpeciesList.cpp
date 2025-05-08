@@ -38,6 +38,17 @@ void SpeciesList::clear()
     index_.clear();
 }
 
+void SpeciesList::setDefault()
+{
+    LOG_DEBUG(<< "Set default.");
+
+    clear();
+
+    push_back(Species(0, "unknown", {0.8, 0.8, 0.8}));
+    push_back(Species(1, "Picea abies", {0.5, 1.0, 0.5}));
+    push_back(Species(2, "Cedrus sp", {0.5, 0.5, 1.0}));
+}
+
 void SpeciesList::push_back(const Species &species)
 {
     LOG_DEBUG(<< "Append species <" << species << ">.");

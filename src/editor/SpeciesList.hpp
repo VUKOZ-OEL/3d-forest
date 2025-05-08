@@ -40,6 +40,7 @@ public:
     SpeciesList();
 
     void clear();
+    void setDefault();
 
     size_t size() const { return data_.size(); }
     Species &operator[](size_t index) { return data_[index]; }

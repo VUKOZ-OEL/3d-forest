@@ -31,6 +31,15 @@ Species::Species()
 {
 }
 
+Species::Species(size_t id,
+                 const std::string &label,
+                 const Vector3<double> &color)
+    : id(id),
+      label(label),
+      color(color)
+{
+}
+
 void fromJson(Species &out, const Json &in)
 {
     fromJson(out.id, in["id"]);
