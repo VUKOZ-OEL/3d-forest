@@ -50,6 +50,8 @@ public:
 public slots:
     void slotResetElevation();
     void slotSetClassification();
+    void slotSetManagementStatus();
+    void slotSetSpecies();
 
 private:
     MainWindow *mainWindow_;
