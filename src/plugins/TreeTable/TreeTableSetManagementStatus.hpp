@@ -17,19 +17,22 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file EditPluginSetSpecies.hpp */
+/** @file TreeTableSetManagementStatus.hpp */
 
-#ifndef EDIT_PLUGIN_SET_SPECIES_HPP
-#define EDIT_PLUGIN_SET_SPECIES_HPP
+#ifndef TREE_TABLE_SET_MANAGEMENT_STATUS_HPP
+#define TREE_TABLE_SET_MANAGEMENT_STATUS_HPP
+
+// Include Std.
+#include <unordered_set>
 
 // Include 3D Forest.
 class MainWindow;
 
-/** Edit Plugin Set Species. */
-class EditPluginSetSpecies
+/** Tree Table Set Management Status. */
+class TreeTableSetManagementStatus
 {
 public:
-    static void run(MainWindow *mainWindow);
+    static void run(MainWindow *mainWindow, std::unordered_set<size_t> idList);
 };
 
-#endif /* EDIT_PLUGIN_SET_SPECIES_HPP */
+#endif /* TREE_TABLE_SET_MANAGEMENT_STATUS_HPP */

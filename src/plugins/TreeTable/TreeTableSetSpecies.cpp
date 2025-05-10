@@ -17,23 +17,24 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file EditPluginSetSpecies.cpp */
+/** @file TreeTableSetSpecies.cpp */
 
 // Include 3D Forest.
-#include <EditPluginSetSpecies.hpp>
 #include <InputComboBoxDialog.hpp>
 #include <MainWindow.hpp>
+#include <TreeTableSetSpecies.hpp>
 
 // Include Qt.
 #include <QCoreApplication>
 #include <QProgressDialog>
 
 // Include local.
-#define LOG_MODULE_NAME "EditPluginSetSpecies"
+#define LOG_MODULE_NAME "TreeTableSetSpecies"
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-void EditPluginSetSpecies::run(MainWindow *mainWindow)
+void TreeTableSetSpecies::run(MainWindow *mainWindow,
+                              std::unordered_set<size_t> idList)
 {
     LOG_DEBUG(<< "Start setting species values.");
 
@@ -76,43 +77,15 @@ void EditPluginSetSpecies::run(MainWindow *mainWindow)
 
     // Edit segments.
     Segments segments = editor->segments();
-
-    // Run.
-    QProgressDialog progress("Processing...", "Cancel", 0, 0);
-    progress.setWindowModality(Qt::WindowModal);
-    progress.show();
-
-    Query query(editor);
-    query.setWhere(editor->viewports().where());
-    query.exec();
-
-    int bulk = 1000;
-    int counter = 0;
-    while (query.next())
+    for (const auto &id : idList)
     {
-        size_t segmentId = query.segment();
-        size_t segmentIndex = segments.index(segmentId, false);
+        size_t index = segments.index(id, false);
 
-        if (segmentIndex != SIZE_MAX)
+        if (index != SIZE_MAX)
         {
-            segments[segmentIndex].speciesId = newSpeciesId;
-        }
-
-        counter++;
-        if (counter == bulk)
-        {
-            counter = 0;
-
-            QCoreApplication::processEvents();
-
-            if (progress.wasCanceled())
-            {
-                break;
-            }
+            segments[index].speciesId = newSpeciesId;
         }
     }
-
-    progress.close();
 
     editor->setSegments(segments);
     mainWindow->update({Editor::TYPE_SEGMENT, Editor::TYPE_SPECIES});

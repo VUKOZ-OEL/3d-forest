@@ -56,6 +56,8 @@ public:
     size_t index(size_t id, bool throwException = true) const;
     bool contains(size_t id) const;
 
+    std::string labelById(size_t id, bool throwException = true) const;
+
     size_t unusedId() const;
 
 protected:

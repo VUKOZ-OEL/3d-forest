@@ -23,8 +23,6 @@
 #include <EditPlugin.hpp>
 #include <EditPluginResetElevation.hpp>
 #include <EditPluginSetClassification.hpp>
-#include <EditPluginSetManagementStatus.hpp>
-#include <EditPluginSetSpecies.hpp>
 #include <MainWindow.hpp>
 
 // Include local.
@@ -59,26 +57,6 @@ void EditPlugin::initialize(MainWindow *mainWindow)
                               this,
                               SLOT(slotSetClassification()),
                               MAIN_WINDOW_MENU_EDIT_PRIORITY);
-
-    mainWindow_->createAction(nullptr,
-                              "Edit",
-                              "Edit",
-                              tr("Set management status"),
-                              tr("Set management status"),
-                              QIcon(),
-                              this,
-                              SLOT(slotSetManagementStatus()),
-                              MAIN_WINDOW_MENU_EDIT_PRIORITY);
-
-    mainWindow_->createAction(nullptr,
-                              "Edit",
-                              "Edit",
-                              tr("Set species"),
-                              tr("Set species"),
-                              QIcon(),
-                              this,
-                              SLOT(slotSetSpecies()),
-                              MAIN_WINDOW_MENU_EDIT_PRIORITY);
 }
 
 void EditPlugin::slotResetElevation()
@@ -89,14 +67,4 @@ void EditPlugin::slotResetElevation()
 void EditPlugin::slotSetClassification()
 {
     EditPluginSetClassification::run(mainWindow_);
-}
-
-void EditPlugin::slotSetManagementStatus()
-{
-    EditPluginSetManagementStatus::run(mainWindow_);
-}
-
-void EditPlugin::slotSetSpecies()
-{
-    EditPluginSetSpecies::run(mainWindow_);
 }

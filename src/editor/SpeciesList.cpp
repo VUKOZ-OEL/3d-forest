@@ -110,6 +110,16 @@ bool SpeciesList::contains(size_t id) const
     return false;
 }
 
+std::string SpeciesList::labelById(size_t id, bool throwException) const
+{
+    size_t idx = index(id, throwException);
+    if (idx != SIZE_MAX)
+    {
+        return data_[idx].label;
+    }
+    return "Unknown";
+}
+
 size_t SpeciesList::unusedId() const
 {
     LOG_DEBUG(<< "Obtain unused id.");

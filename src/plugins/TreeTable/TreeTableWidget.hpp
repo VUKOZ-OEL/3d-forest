@@ -45,12 +45,12 @@ public:
 
 public slots:
     void slotUpdate(void *sender, const QSet<Editor::Type> &target);
-    void onCellClicked(int row, int column);
 
 protected slots:
     void showOnlyVisibleTrees();
     void showAllTrees();
     void slotExport();
+    void slotCustomContextMenuRequested(const QPoint &pos);
 
 private:
     /** Tree Table Column. */
@@ -58,6 +58,8 @@ private:
     {
         COLUMN_ID,
         COLUMN_LABEL,
+        COLUMN_MANAGEMENT_STATUS,
+        COLUMN_SPECIES,
         COLUMN_X,
         COLUMN_Y,
         COLUMN_Z,
