@@ -30,6 +30,7 @@ class DoubleSliderWidget;
 
 // Include Qt.
 #include <QWidget>
+class QComboBox;
 class QPushButton;
 
 /** Compute Tree Attributes Widget. */
@@ -41,6 +42,7 @@ public:
     ComputeTreeAttributesWidget(MainWindow *mainWindow);
 
 protected slots:
+    void dbhMethodChanged(int i);
     void slotApply();
 
 protected:
@@ -53,6 +55,8 @@ private:
     ComputeTreeAttributesAction treeAttributesAction_;
 
     DoubleSliderWidget *treePositionHeightRangeSlider_;
+    QComboBox *dbhMethodComboBox_;
+    DoubleSliderWidget *dbhRhtGridCmSlider_;
     DoubleSliderWidget *dbhElevationSlider_;
     DoubleSliderWidget *dbhElevationRangeSlider_;
     DoubleSliderWidget *maximumValidCalculatedDbhSlider_;

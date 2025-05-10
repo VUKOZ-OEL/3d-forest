@@ -22,6 +22,7 @@ add_executable(
     treeattributes.cpp
     ../../../plugins/ComputeTreeAttributes/ComputeTreeAttributesAction.cpp
     ../../../plugins/ComputeTreeAttributes/ComputeTreeAttributesLeastSquaredRegression.cpp
+    ../../../plugins/ComputeTreeAttributes/ComputeTreeAttributesRandomizedHoughTransform.cpp
 )
 
 target_include_directories(
