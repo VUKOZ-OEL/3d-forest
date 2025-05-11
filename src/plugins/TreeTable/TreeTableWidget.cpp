@@ -434,8 +434,7 @@ void TreeTableWidget::slotCustomContextMenuRequested(const QPoint &pos)
         QTableWidgetItem *itemId = tableWidget_->item(row, COLUMN_ID);
         if (!itemId)
         {
-            LOG_ERROR(<< "Failed to get table item ID at row <" +
-                             std::to_string(row) + ">.");
+            LOG_ERROR(<< "Failed to get table item ID at row <" << row << ">.");
             continue;
         }
 
