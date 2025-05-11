@@ -59,6 +59,9 @@ private:
     void stepUpdateComputeTreeAttributes();
 
     void calculateDbh(ComputeTreeAttributesData &tree);
+    void calculateDbhRht(ComputeTreeAttributesData &tree);
+    void calculateDbhLsr(ComputeTreeAttributesData &tree);
+
     void calculateTreePosition(ComputeTreeAttributesData &tree);
 
     void validateAttributes(TreeAttributes &treeAttributes);

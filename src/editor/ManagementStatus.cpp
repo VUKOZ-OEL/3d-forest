@@ -31,6 +31,15 @@ ManagementStatus::ManagementStatus()
 {
 }
 
+ManagementStatus::ManagementStatus(size_t id,
+                                   const std::string &label,
+                                   const Vector3<double> &color)
+    : id(id),
+      label(label),
+      color(color)
+{
+}
+
 void fromJson(ManagementStatus &out, const Json &in)
 {
     fromJson(out.id, in["id"]);

@@ -39,6 +39,9 @@ public:
     Vector3<double> color;
 
     ManagementStatus();
+    ManagementStatus(size_t id,
+                     const std::string &label,
+                     const Vector3<double> &color);
 };
 
 void fromJson(ManagementStatus &out, const Json &in);

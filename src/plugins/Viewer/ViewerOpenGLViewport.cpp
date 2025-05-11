@@ -718,6 +718,18 @@ bool ViewerOpenGLViewport::skipSegmentRendering(const Segment &segment)
         return true;
     }
 
+    const QueryFilterSet &speciesFilter = editor_->speciesFilter();
+    if (!speciesFilter.enabled(segment.speciesId))
+    {
+        return true;
+    }
+
+    const QueryFilterSet &statusFilter = editor_->managementStatusFilter();
+    if (!statusFilter.enabled(segment.managementStatusId))
+    {
+        return true;
+    }
+
     return false;
 }
 

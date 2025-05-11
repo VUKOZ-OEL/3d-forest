@@ -23,7 +23,9 @@
 #define SETTINGS_HPP
 
 // Include 3D Forest.
+#include <ManagementStatusList.hpp>
 #include <RenderingSettings.hpp>
+#include <SpeciesList.hpp>
 #include <TreeSettings.hpp>
 #include <UnitsSettings.hpp>
 #include <ViewSettings.hpp>
@@ -36,6 +38,8 @@
 class EXPORT_EDITOR Settings
 {
 public:
+    Settings();
+
     const RenderingSettings &renderingSettings() const
     {
         return renderingSettings_;
@@ -49,11 +53,24 @@ public:
     bool setUnitsSettings(const UnitsSettings &unitsSettings);
     void setViewSettings(const ViewSettings &viewSettings);
 
+    const SpeciesList &defaultSpeciesList() const
+    {
+        return defaultSpeciesList_;
+    };
+
+    const ManagementStatusList &defaultManagementStatusList() const
+    {
+        return defaultManagementStatusList_;
+    };
+
 protected:
     RenderingSettings renderingSettings_;
     TreeSettings treeSettings_;
     UnitsSettings unitsSettings_;
     ViewSettings viewSettings_;
+
+    SpeciesList defaultSpeciesList_;
+    ManagementStatusList defaultManagementStatusList_;
 
     friend void fromJson(Settings &out, const Json &in);
     friend void toJson(Json &out, const Settings &in);

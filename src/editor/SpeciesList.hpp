@@ -40,6 +40,7 @@ public:
     SpeciesList();
 
     void clear();
+    void setDefault();
 
     size_t size() const { return data_.size(); }
     Species &operator[](size_t index) { return data_[index]; }
@@ -51,6 +52,8 @@ public:
 
     size_t index(size_t id, bool throwException = true) const;
     bool contains(size_t id) const;
+
+    std::string labelById(size_t id, bool throwException = true) const;
 
     size_t unusedId() const;
 

@@ -29,6 +29,7 @@ class MainWindow;
 
 // Include Qt.
 #include <QWidget>
+class QCheckBox;
 class QPushButton;
 class QTableWidget;
 
@@ -44,18 +45,21 @@ public:
 
 public slots:
     void slotUpdate(void *sender, const QSet<Editor::Type> &target);
-    void onCellClicked(int row, int column);
 
 protected slots:
+    void showOnlyVisibleTrees();
+    void showAllTrees();
     void slotExport();
+    void slotCustomContextMenuRequested(const QPoint &pos);
 
 private:
     /** Tree Table Column. */
     enum Column
     {
         COLUMN_ID,
-        COLUMN_VISIBLE,
         COLUMN_LABEL,
+        COLUMN_MANAGEMENT_STATUS,
+        COLUMN_SPECIES,
         COLUMN_X,
         COLUMN_Y,
         COLUMN_Z,
@@ -71,6 +75,11 @@ private:
     QTableWidget *tableWidget_;
     QPushButton *exportButton_;
 
+    QPushButton *showOnlyVisibleTreesButton_;
+    QPushButton *showAllTreesButton_;
+
+    std::unordered_set<size_t> visibleTreesIdList_;
+
     Segments segments_;
     QueryFilterSet filter_;
     bool updatesEnabled_;
@@ -81,7 +90,8 @@ private:
     void dataChanged();
     void filterChanged();
 
-    void setRow(size_t index);
+    void setTable();
+    void setRow(int row, size_t index);
     void setCell(int row, int col, bool value, bool userCheckable);
     void setCell(int row, int col, size_t value);
     void setCell(int row, int col, double value);

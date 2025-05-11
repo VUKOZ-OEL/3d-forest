@@ -17,36 +17,19 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Species.hpp */
+/** @file EditPluginResetElevation.hpp */
 
-#ifndef SPECIES_HPP
-#define SPECIES_HPP
+#ifndef EDIT_PLUGIN_RESET_ELEVATION_HPP
+#define EDIT_PLUGIN_RESET_ELEVATION_HPP
 
 // Include 3D Forest.
-#include <Json.hpp>
-#include <Vector3.hpp>
+class MainWindow;
 
-// Include local.
-#include <ExportEditor.hpp>
-#include <WarningsDisable.hpp>
-
-/** Species. */
-class EXPORT_EDITOR Species
+/** Edit Plugin Reset Elevation. */
+class EditPluginResetElevation
 {
 public:
-    size_t id{0};
-    std::string label;
-    Vector3<double> color;
-
-    Species();
-    Species(size_t id, const std::string &label, const Vector3<double> &color);
+    static void run(MainWindow *mainWindow);
 };
 
-void fromJson(Species &out, const Json &in);
-void toJson(Json &out, const Species &in);
-
-std::ostream &operator<<(std::ostream &out, const Species &in);
-
-#include <WarningsEnable.hpp>
-
-#endif /* SPECIES_HPP */
+#endif /* EDIT_PLUGIN_RESET_ELEVATION_HPP */

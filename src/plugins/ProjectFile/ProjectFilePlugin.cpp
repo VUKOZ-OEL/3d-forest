@@ -60,7 +60,7 @@ void ProjectFilePlugin::initialize(MainWindow *mainWindow)
                               "File",
                               "File Project",
                               tr("&Open Project..."),
-                              tr("Open new project"),
+                              tr("Open project"),
                               ICON("opened-folder"),
                               this,
                               SLOT(slotOpenProject()),
@@ -112,7 +112,7 @@ void ProjectFilePlugin::slotNewProject()
 
 void ProjectFilePlugin::slotOpenProject()
 {
-    LOG_DEBUG(<< "Start opening a new project.");
+    LOG_DEBUG(<< "Start opening a project.");
 
     QString fileName;
 
@@ -129,7 +129,7 @@ void ProjectFilePlugin::slotOpenProject()
 
     (void)openProject(fileName);
 
-    LOG_DEBUG(<< "Finished opening new project <" << fileName << ">.");
+    LOG_DEBUG(<< "Finished opening project <" << fileName << ">.");
 }
 
 void ProjectFilePlugin::slotSaveProject()

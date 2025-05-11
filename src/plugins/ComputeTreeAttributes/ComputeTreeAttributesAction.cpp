@@ -26,6 +26,7 @@
 #include <ColorPalette.hpp>
 #include <ComputeTreeAttributesAction.hpp>
 #include <ComputeTreeAttributesLeastSquaredRegression.hpp>
+#include <ComputeTreeAttributesRandomizedHoughTransform.hpp>
 #include <Editor.hpp>
 #include <Util.hpp>
 
@@ -249,6 +250,36 @@ void ComputeTreeAttributesAction::stepCalculateComputeTreeAttributes()
 }
 
 void ComputeTreeAttributesAction::calculateDbh(ComputeTreeAttributesData &tree)
+{
+    switch (parameters_.dbhMethod)
+    {
+        case ComputeTreeAttributesParameters::DbhMethod::RHT:
+            calculateDbhRht(tree);
+            break;
+        case ComputeTreeAttributesParameters::DbhMethod::LSR:
+            calculateDbhLsr(tree);
+            break;
+        default:
+            THROW("Unknown DBH method");
+            break;
+    }
+}
+
+void ComputeTreeAttributesAction::calculateDbhRht(
+    ComputeTreeAttributesData &tree)
+{
+    ComputeTreeAttributesRandomizedHoughTransform::FittingCircle circle;
+
+    ComputeTreeAttributesRandomizedHoughTransform::compute(circle,
+                                                           tree.dbhPoints,
+                                                           parameters_);
+
+    tree.treeAttributes.dbhPosition.set(circle.a, circle.b, circle.z);
+    tree.treeAttributes.dbh = circle.r * 2.0;
+}
+
+void ComputeTreeAttributesAction::calculateDbhLsr(
+    ComputeTreeAttributesData &tree)
 {
     ComputeTreeAttributesLeastSquaredRegression::FittingCircle circle;
 

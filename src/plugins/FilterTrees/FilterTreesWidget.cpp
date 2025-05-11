@@ -118,6 +118,7 @@ FilterTreesWidget::FilterTreesWidget(MainWindow *mainWindow)
     toolBar->addWidget(selectNoneButton_);
     toolBar->setIconSize(QSize(MainWindow::ICON_SIZE, MainWindow::ICON_SIZE));
 
+#if defined(FILTER_TREES_SHOW_DETAIL)
     // Segment.
     treeWidget_ = new FilterTreesTreeWidget(mainWindow_);
 
@@ -127,12 +128,17 @@ FilterTreesWidget::FilterTreesWidget(MainWindow *mainWindow)
     splitter_->addWidget(treeWidget_);
     splitter_->setOrientation(Qt::Vertical);
     splitter_->setSizes(QList<int>({1, 1}));
+#endif
 
     // Layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(toolBar);
+#if defined(FILTER_TREES_SHOW_DETAIL)
     mainLayout->addWidget(splitter_);
+#else
+    mainLayout->addWidget(tree_);
+#endif
 
     setLayout(mainLayout);
 
@@ -209,6 +215,7 @@ void FilterTreesWidget::setSegments(const Segments &segments,
     labels << tr("Visible") << tr("Id") << tr("Label");
     tree_->setHeaderLabels(labels);
 
+#if defined(FILTER_TREES_SHOW_DETAIL)
     if (segments_.size() > 0)
     {
         treeWidget_->setSegment(segments_[0]);
@@ -217,6 +224,7 @@ void FilterTreesWidget::setSegments(const Segments &segments,
     {
         treeWidget_->clear();
     }
+#endif
 
     // Content.
     for (size_t i = 0; i < segments_.size(); i++)
@@ -407,7 +415,9 @@ void FilterTreesWidget::slotItemClicked(QTreeWidgetItem *item, int column)
         return;
     }
 
+#if defined(FILTER_TREES_SHOW_DETAIL)
     treeWidget_->setSegment(segments_[index]);
+#endif
 
     for (size_t i = 0; i < segments_.size(); i++)
     {

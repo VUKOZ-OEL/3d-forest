@@ -809,7 +809,7 @@ void Page::queryWhereSegment()
     const Segments &segments = editor_->segments();
 
     LOG_DEBUG(<< "Page pageId <" << pageId_ << ">.");
-    LOG_DEBUG(<< "Number of query segments <" << segmentFilter.size() << ">.");
+    LOG_DEBUG(<< "Filter size <" << segmentFilter.size() << ">.");
 
     size_t nSelectedNew = 0;
 
@@ -847,7 +847,7 @@ void Page::queryWhereSpecies()
     const Segments &segments = editor_->segments();
 
     LOG_DEBUG(<< "Page pageId <" << pageId_ << ">.");
-    LOG_DEBUG(<< "Number of query species <" << speciesFilter.size() << ">.");
+    LOG_DEBUG(<< "Filter size <" << speciesFilter.size() << ">.");
 
     size_t nSelectedNew = 0;
 
@@ -890,7 +890,7 @@ void Page::queryWhereManagementStatus()
     const Segments &segments = editor_->segments();
 
     LOG_DEBUG(<< "Page pageId <" << pageId_ << ">.");
-    LOG_DEBUG(<< "Number of query species <" << statusFilter.size() << ">.");
+    LOG_DEBUG(<< "Filter size <" << statusFilter.size() << ">.");
 
     size_t nSelectedNew = 0;
 

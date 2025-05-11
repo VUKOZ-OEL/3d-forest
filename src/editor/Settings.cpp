@@ -26,6 +26,19 @@
 #define LOG_MODULE_NAME "Settings"
 #include <Log.hpp>
 
+static const char *SETTINGS_KEY_RENDERING = "renderingSettings";
+static const char *SETTINGS_KEY_TREE = "treeSettings";
+static const char *SETTINGS_KEY_UNITS = "unitsSettings";
+static const char *SETTINGS_KEY_VIEW = "viewSettings";
+static const char *SETTINGS_KEY_SPECIES = "defaultSpecies";
+static const char *SETTINGS_KEY_MANAGEMENT_STATUS = "defaultManagementStatus";
+
+Settings::Settings()
+{
+    defaultSpeciesList_.setDefault();
+    defaultManagementStatusList_.setDefault();
+}
+
 void Settings::setRenderingSettings(const RenderingSettings &renderingSettings)
 {
     renderingSettings_ = renderingSettings;
@@ -48,39 +61,52 @@ void Settings::setViewSettings(const ViewSettings &viewSettings)
 
 void fromJson(Settings &out, const Json &in)
 {
-    if (in.contains("renderingSettings"))
+    if (in.contains(SETTINGS_KEY_RENDERING))
     {
-        fromJson(out.renderingSettings_, in["renderingSettings"]);
+        fromJson(out.renderingSettings_, in[SETTINGS_KEY_RENDERING]);
     }
 
-    if (in.contains("treeSettings"))
+    if (in.contains(SETTINGS_KEY_TREE))
     {
-        fromJson(out.treeSettings_, in["treeSettings"]);
+        fromJson(out.treeSettings_, in[SETTINGS_KEY_TREE]);
     }
 
-    if (in.contains("unitsSettings"))
+    if (in.contains(SETTINGS_KEY_UNITS))
     {
-        fromJson(out.unitsSettings_, in["unitsSettings"]);
+        fromJson(out.unitsSettings_, in[SETTINGS_KEY_UNITS]);
     }
 
-    if (in.contains("viewSettings"))
+    if (in.contains(SETTINGS_KEY_VIEW))
     {
-        fromJson(out.viewSettings_, in["viewSettings"]);
+        fromJson(out.viewSettings_, in[SETTINGS_KEY_VIEW]);
+    }
+
+    if (in.contains(SETTINGS_KEY_SPECIES))
+    {
+        fromJson(out.defaultSpeciesList_, in[SETTINGS_KEY_SPECIES]);
+    }
+
+    if (in.contains(SETTINGS_KEY_MANAGEMENT_STATUS))
+    {
+        fromJson(out.defaultManagementStatusList_,
+                 in[SETTINGS_KEY_MANAGEMENT_STATUS]);
     }
 }
 
 void toJson(Json &out, const Settings &in)
 {
-    toJson(out["renderingSettings"], in.renderingSettings_);
-    toJson(out["treeSettings"], in.treeSettings_);
-    toJson(out["unitsSettings"], in.unitsSettings_);
-    toJson(out["viewSettings"], in.viewSettings_);
+    toJson(out[SETTINGS_KEY_RENDERING], in.renderingSettings_);
+    toJson(out[SETTINGS_KEY_TREE], in.treeSettings_);
+    toJson(out[SETTINGS_KEY_UNITS], in.unitsSettings_);
+    toJson(out[SETTINGS_KEY_VIEW], in.viewSettings_);
+    toJson(out[SETTINGS_KEY_SPECIES], in.defaultSpeciesList_);
+    toJson(out[SETTINGS_KEY_MANAGEMENT_STATUS],
+           in.defaultManagementStatusList_);
 }
 
 std::string toString(const Settings &in)
 {
-    return "{\"renderingSettings\": " + toString(in.renderingSettings_) +
-           ",\"treeSettings\": " + toString(in.treeSettings_) +
-           ",\"unitsSettings\": " + toString(in.unitsSettings_) +
-           ",\"viewSettings\": " + toString(in.viewSettings_) + "}";
+    Json json;
+    toJson(json, in);
+    return json.serialize();
 }

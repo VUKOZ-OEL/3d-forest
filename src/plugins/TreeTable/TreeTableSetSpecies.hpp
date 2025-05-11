@@ -17,36 +17,22 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Species.hpp */
+/** @file TreeTableSetSpecies.hpp */
 
-#ifndef SPECIES_HPP
-#define SPECIES_HPP
+#ifndef TREE_TABLE_SET_SPECIES_HPP
+#define TREE_TABLE_SET_SPECIES_HPP
+
+// Include Std.
+#include <unordered_set>
 
 // Include 3D Forest.
-#include <Json.hpp>
-#include <Vector3.hpp>
+class MainWindow;
 
-// Include local.
-#include <ExportEditor.hpp>
-#include <WarningsDisable.hpp>
-
-/** Species. */
-class EXPORT_EDITOR Species
+/** Tree Table Set Species. */
+class TreeTableSetSpecies
 {
 public:
-    size_t id{0};
-    std::string label;
-    Vector3<double> color;
-
-    Species();
-    Species(size_t id, const std::string &label, const Vector3<double> &color);
+    static void run(MainWindow *mainWindow, std::unordered_set<size_t> idList);
 };
 
-void fromJson(Species &out, const Json &in);
-void toJson(Json &out, const Species &in);
-
-std::ostream &operator<<(std::ostream &out, const Species &in);
-
-#include <WarningsEnable.hpp>
-
-#endif /* SPECIES_HPP */
+#endif /* TREE_TABLE_SET_SPECIES_HPP */

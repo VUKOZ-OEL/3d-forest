@@ -38,6 +38,20 @@ void ManagementStatusList::clear()
     index_.clear();
 }
 
+void ManagementStatusList::setDefault()
+{
+    LOG_DEBUG(<< "Set default.");
+
+    clear();
+
+    push_back(ManagementStatus(0, "untouched", {1.0, 0.5, 0.5}));
+    push_back(ManagementStatus(1, "target tree", {0.5, 1.0, 0.5}));
+    push_back(ManagementStatus(2, "remove - concurency", {0.5, 0.5, 1.0}));
+    push_back(ManagementStatus(3, "remove - health", {1.0, 1.0, 0.5}));
+    push_back(ManagementStatus(4, "remove - target DBH", {0.5, 1.0, 1.0}));
+    push_back(ManagementStatus(5, "retain - habitat", {1.0, 0.5, 1.0}));
+}
+
 void ManagementStatusList::push_back(const ManagementStatus &managementStatus)
 {
     LOG_DEBUG(<< "Append management status <" << managementStatus << ">.");
@@ -97,6 +111,17 @@ bool ManagementStatusList::contains(size_t id) const
         return true;
     }
     return false;
+}
+
+std::string ManagementStatusList::labelById(size_t id,
+                                            bool throwException) const
+{
+    size_t idx = index(id, throwException);
+    if (idx != SIZE_MAX)
+    {
+        return data_[idx].label;
+    }
+    return "Unknown";
 }
 
 size_t ManagementStatusList::unusedId() const

@@ -17,36 +17,22 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Species.hpp */
+/** @file FindVisibleObjects.hpp */
 
-#ifndef SPECIES_HPP
-#define SPECIES_HPP
+#ifndef FIND_VISIBLE_OBJECTS_HPP
+#define FIND_VISIBLE_OBJECTS_HPP
+
+// Include Std.
+#include <unordered_set>
 
 // Include 3D Forest.
-#include <Json.hpp>
-#include <Vector3.hpp>
+class MainWindow;
 
-// Include local.
-#include <ExportEditor.hpp>
-#include <WarningsDisable.hpp>
-
-/** Species. */
-class EXPORT_EDITOR Species
+/** Find Visible Objects. */
+class FindVisibleObjects
 {
 public:
-    size_t id{0};
-    std::string label;
-    Vector3<double> color;
-
-    Species();
-    Species(size_t id, const std::string &label, const Vector3<double> &color);
+    static void run(std::unordered_set<size_t> &result, MainWindow *mainWindow);
 };
 
-void fromJson(Species &out, const Json &in);
-void toJson(Json &out, const Species &in);
-
-std::ostream &operator<<(std::ostream &out, const Species &in);
-
-#include <WarningsEnable.hpp>
-
-#endif /* SPECIES_HPP */
+#endif /* FIND_VISIBLE_OBJECTS_HPP */

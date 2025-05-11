@@ -29,7 +29,9 @@
 
 // Include Qt.
 #include <QCheckBox>
+#include <QComboBox>
 #include <QHBoxLayout>
+#include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
 
@@ -62,6 +64,42 @@ ComputeTreeAttributesWidget::ComputeTreeAttributesWidget(MainWindow *mainWindow)
                                1.0,
                                parameters_.treePositionHeightRange);
 
+    // DBH Settings.
+    dbhMethodComboBox_ = new QComboBox;
+    dbhMethodComboBox_->addItem(QString::fromStdString(
+        toString(ComputeTreeAttributesParameters::DbhMethod::RHT)));
+    dbhMethodComboBox_->addItem(QString::fromStdString(
+        toString(ComputeTreeAttributesParameters::DbhMethod::LSR)));
+    dbhMethodComboBox_->setCurrentText(
+        QString::fromStdString(toString(parameters_.dbhMethod)));
+
+    connect(dbhMethodComboBox_,
+            SIGNAL(activated(int)),
+            this,
+            SLOT(dbhMethodChanged(int)));
+
+    QLabel *dbhMethodLabel = new QLabel(tr("DBH method"));
+
+    QHBoxLayout *dbhMethodLayout = new QHBoxLayout;
+    dbhMethodLayout->addWidget(dbhMethodLabel);
+    dbhMethodLayout->addWidget(dbhMethodComboBox_);
+
+    // RHT DBH settings.
+    DoubleSliderWidget::create(dbhRhtGridCmSlider_,
+                               this,
+                               nullptr,
+                               nullptr,
+                               tr("RHT grid resolution"),
+                               tr("RHT grid resolution"),
+                               tr("cm"),
+                               1.0,
+                               1.0,
+                               10.0,
+                               parameters_.dbhRhtGridCm);
+
+    dbhMethodChanged(0);
+
+    // General DBH settings.
     DoubleSliderWidget::create(dbhElevationSlider_,
                                this,
                                nullptr,
@@ -70,8 +108,8 @@ ComputeTreeAttributesWidget::ComputeTreeAttributesWidget(MainWindow *mainWindow)
                                tr("Calculate DBH at given elevation"),
                                tr("m"),
                                0.01,
-                               0.5,
-                               1.5,
+                               0.1,
+                               2.0,
                                parameters_.dbhElevation);
 
     DoubleSliderWidget::create(dbhElevationRangeSlider_,
@@ -97,12 +135,14 @@ ComputeTreeAttributesWidget::ComputeTreeAttributesWidget(MainWindow *mainWindow)
                                tr("m"),
                                0.01,
                                0.01,
-                               10.0,
+                               5.0,
                                parameters_.maximumValidCalculatedDbh);
 
     // Settings layout.
     QVBoxLayout *settingsLayout = new QVBoxLayout;
     settingsLayout->addWidget(treePositionHeightRangeSlider_);
+    settingsLayout->addLayout(dbhMethodLayout);
+    settingsLayout->addWidget(dbhRhtGridCmSlider_);
     settingsLayout->addWidget(dbhElevationSlider_);
     settingsLayout->addWidget(dbhElevationRangeSlider_);
     settingsLayout->addWidget(maximumValidCalculatedDbhSlider_);
@@ -137,14 +177,37 @@ void ComputeTreeAttributesWidget::hideEvent(QHideEvent *event)
     QWidget::hideEvent(event);
 }
 
+void ComputeTreeAttributesWidget::dbhMethodChanged(int i)
+{
+    (void)i;
+
+    fromString(parameters_.dbhMethod,
+               dbhMethodComboBox_->currentText().toStdString());
+
+    if (parameters_.dbhMethod ==
+        ComputeTreeAttributesParameters::DbhMethod::RHT)
+    {
+        dbhRhtGridCmSlider_->setEnabled(true);
+    }
+    else
+    {
+        dbhRhtGridCmSlider_->setEnabled(false);
+    }
+}
+
 void ComputeTreeAttributesWidget::slotApply()
 {
     LOG_DEBUG(<< "Apply.");
 
     mainWindow_->suspendThreads();
 
+    parameters_.ppm =
+        mainWindow_->editor().settings().unitsSettings().pointsPerMeter()[0];
     parameters_.treePositionHeightRange =
         treePositionHeightRangeSlider_->value();
+    fromString(parameters_.dbhMethod,
+               dbhMethodComboBox_->currentText().toStdString());
+    parameters_.dbhRhtGridCm = dbhRhtGridCmSlider_->value();
     parameters_.dbhElevation = dbhElevationSlider_->value();
     parameters_.dbhElevationRange = dbhElevationRangeSlider_->value();
     parameters_.maximumValidCalculatedDbh =

@@ -20,23 +20,28 @@
 /** @file TreeTableWidget.cpp */
 
 // Include 3D Forest.
+#include <FindVisibleObjects.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 #include <TreeTableExportCsv.hpp>
 #include <TreeTableExportDialog.hpp>
+#include <TreeTableSetManagementStatus.hpp>
+#include <TreeTableSetSpecies.hpp>
 #include <TreeTableWidget.hpp>
 #include <Util.hpp>
 
 // Include Qt.
+#include <QCheckBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
+#include <QMenu>
 #include <QPushButton>
 #include <QTableWidget>
 #include <QVBoxLayout>
 
 // Include local.
 #define LOG_MODULE_NAME "TreeTableWidget"
-// #define LOG_MODULE_DEBUG_ENABLED 1
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define ICON(name) (ThemeIcon(":/TreeTableResources/", name))
@@ -47,7 +52,7 @@ TreeTableWidget::TreeTableWidget(MainWindow *mainWindow)
 {
     LOG_DEBUG(<< "Create.");
 
-    // Widgets.
+    // Table widget.
     tableWidget_ = new QTableWidget();
 
     tableWidget_->setRowCount(0);
@@ -59,9 +64,13 @@ TreeTableWidget::TreeTableWidget(MainWindow *mainWindow)
                                 "background-color: lightblue;"
                                 "color: black;"
                                 "padding: 5px;"
+                                "}"
+                                "QTableWidget::item:selected {"
+                                "  background-color: #3399FF;"
+                                "  color: white;"
                                 "}");
 
-    // Enable alternating row colors
+    // Table: enable alternating row colors
     tableWidget_->setAlternatingRowColors(true);
 
     QPalette palette = tableWidget_->palette();
@@ -69,7 +78,32 @@ TreeTableWidget::TreeTableWidget(MainWindow *mainWindow)
     palette.setColor(QPalette::Base, Qt::white);
     tableWidget_->setPalette(palette);
 
+    // Table: Context menu.
+    tableWidget_->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    connect(tableWidget_,
+            SIGNAL(customContextMenuRequested(QPoint)),
+            this,
+            SLOT(slotCustomContextMenuRequested(QPoint)));
+
+    // Table: Selection.
+    tableWidget_->setSelectionBehavior(QAbstractItemView::SelectRows);
+    tableWidget_->setSelectionMode(QAbstractItemView::ExtendedSelection);
+
     // Buttons.
+    showOnlyVisibleTreesButton_ = new QPushButton(tr("Show visible"));
+    showOnlyVisibleTreesButton_->setSizePolicy(QSizePolicy::Minimum,
+                                               QSizePolicy::Minimum);
+    connect(showOnlyVisibleTreesButton_,
+            SIGNAL(clicked()),
+            this,
+            SLOT(showOnlyVisibleTrees()));
+
+    showAllTreesButton_ = new QPushButton(tr("Show all"));
+    showAllTreesButton_->setSizePolicy(QSizePolicy::Minimum,
+                                       QSizePolicy::Minimum);
+    connect(showAllTreesButton_, SIGNAL(clicked()), this, SLOT(showAllTrees()));
+
     exportButton_ = new QPushButton(tr("Export"));
     exportButton_->setIcon(THEME_ICON("export-file"));
     exportButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -77,6 +111,8 @@ TreeTableWidget::TreeTableWidget(MainWindow *mainWindow)
 
     // Buttons layout.
     QHBoxLayout *buttonsLayout = new QHBoxLayout;
+    buttonsLayout->addWidget(showOnlyVisibleTreesButton_);
+    buttonsLayout->addWidget(showAllTreesButton_);
     buttonsLayout->addStretch();
     buttonsLayout->addWidget(exportButton_);
 
@@ -120,47 +156,10 @@ void TreeTableWidget::setSegments(const Segments &segments,
 {
     LOG_DEBUG(<< "Set segments n <" << segments.size() << ">.");
 
-    block();
-
     segments_ = segments;
     filter_ = filter;
 
-    tableWidget_->clear();
-
-    int nRows = static_cast<int>(segments_.size());
-    tableWidget_->setRowCount(nRows);
-    tableWidget_->setColumnCount(COLUMN_LAST);
-    tableWidget_->setHorizontalHeaderLabels({"ID",
-                                             "Visible",
-                                             "Label",
-                                             "X [m]",
-                                             "Y [m]",
-                                             "Z [m]",
-                                             "Height [m]",
-                                             "DBH [m]",
-                                             "Area [m^2]",
-                                             "Status"});
-
-    // Content.
-    for (size_t i = 0; i < segments_.size(); i++)
-    {
-        setRow(i);
-    }
-
-    // Resize Columns to the minimum space.
-    // for (int i = 0; i < COLUMN_LAST; i++)
-    // {
-    //     tableWidget_->resizeColumnToContents(i);
-    // }
-
-    tableWidget_->horizontalHeader()->setDefaultSectionSize(100);
-    tableWidget_->setColumnWidth(COLUMN_ID, 20);
-
-    // Sort Content.
-    tableWidget_->setSortingEnabled(true);
-    tableWidget_->sortItems(COLUMN_ID, Qt::AscendingOrder);
-
-    unblock();
+    setTable();
 }
 
 void TreeTableWidget::dataChanged()
@@ -186,21 +185,99 @@ void TreeTableWidget::filterChanged()
     LOG_DEBUG_UPDATE(<< "Finished updating the changed segment filter.");
 }
 
-void TreeTableWidget::setRow(size_t index)
+void TreeTableWidget::setTable()
 {
+    block();
+
+    tableWidget_->clear();
+    tableWidget_->setSortingEnabled(false);
+
+    tableWidget_->setColumnCount(COLUMN_LAST);
+    tableWidget_->setHorizontalHeaderLabels({"ID",
+                                             "Label",
+                                             "M.Status",
+                                             "Species",
+                                             "X [m]",
+                                             "Y [m]",
+                                             "Z [m]",
+                                             "Height [m]",
+                                             "DBH [m]",
+                                             "Area [m^2]",
+                                             "Status"});
+
+    // Content.
+    if (visibleTreesIdList_.size() > 0)
+    {
+        int nRows = static_cast<int>(visibleTreesIdList_.size());
+        tableWidget_->setRowCount(nRows);
+        LOG_DEBUG(<< "Set row count <" << nRows << ">.");
+
+        int i = 0;
+        for (const auto &id : visibleTreesIdList_)
+        {
+            size_t index = segments_.index(id, false);
+            if (index != SIZE_MAX)
+            {
+                setRow(i, index);
+                i++;
+            }
+        }
+    }
+    else
+    {
+        int nRows = static_cast<int>(segments_.size());
+        tableWidget_->setRowCount(nRows);
+        LOG_DEBUG(<< "Set row count <" << nRows << ">.");
+
+        int i = 0;
+        for (size_t index = 0; index < segments_.size(); index++)
+        {
+            setRow(i, index);
+            i++;
+        }
+    }
+
+    // Resize Columns to the minimum space.
+    // for (int i = 0; i < COLUMN_LAST; i++)
+    // {
+    //     tableWidget_->resizeColumnToContents(i);
+    // }
+
+    tableWidget_->horizontalHeader()->setDefaultSectionSize(100);
+    tableWidget_->setColumnWidth(COLUMN_ID, 20);
+
+    // Sort Content.
+    tableWidget_->setSortingEnabled(true);
+
+    unblock();
+}
+
+void TreeTableWidget::setRow(int row, size_t index)
+{
+    LOG_DEBUG(<< "Set row <" << row << "> index <" << index << ">.");
+
     const Segment &segment = segments_[index];
     const TreeAttributes &treeAttributes = segment.treeAttributes;
+
+    const auto &managementStatusList =
+        mainWindow_->editor().managementStatusList();
+    const auto &speciesList = mainWindow_->editor().speciesList();
 
     double ppm =
         mainWindow_->editor().settings().unitsSettings().pointsPerMeter()[0];
 
-    size_t id = segments_.id(index);
-
-    int row = static_cast<int>(index);
+    // size_t id = segments_.id(index);
+    LOG_DEBUG(<< "Set id <" << segment.id << "> label <" << segment.label
+              << ">.");
 
     setCell(row, COLUMN_ID, segment.id);
-    setCell(row, COLUMN_VISIBLE, filter_.enabled(id), true);
     setCell(row, COLUMN_LABEL, segment.label);
+    setCell(row,
+            COLUMN_MANAGEMENT_STATUS,
+            managementStatusList.labelById(segment.managementStatusId, false));
+    setCell(row,
+            COLUMN_SPECIES,
+            speciesList.labelById(segment.speciesId, false));
     setCell(row, COLUMN_X, treeAttributes.position[0] / ppm);
     setCell(row, COLUMN_Y, treeAttributes.position[1] / ppm);
     setCell(row, COLUMN_Z, treeAttributes.position[2] / ppm);
@@ -240,28 +317,28 @@ void TreeTableWidget::setCell(int row, int col, const std::string &value)
 {
     QString text(QString::fromStdString(value));
     QTableWidgetItem *item = new QTableWidgetItem(text);
+    /*
+        if (col == COLUMN_ID)
+        {
+            // Color legend.
+            size_t index = static_cast<size_t>(row);
+            const Vector3<double> &rgb = segments_[index].color;
 
-    if (col == COLUMN_ID)
-    {
-        // Color legend.
-        size_t index = static_cast<size_t>(row);
-        const Vector3<double> &rgb = segments_[index].color;
+            QColor color;
+            color.setRedF(static_cast<float>(rgb[0]));
+            color.setGreenF(static_cast<float>(rgb[1]));
+            color.setBlueF(static_cast<float>(rgb[2]));
 
-        QColor color;
-        color.setRedF(static_cast<float>(rgb[0]));
-        color.setGreenF(static_cast<float>(rgb[1]));
-        color.setBlueF(static_cast<float>(rgb[2]));
-
-        QBrush brush(color, Qt::SolidPattern);
-        item->setBackground(brush);
-    }
-
+            QBrush brush(color, Qt::SolidPattern);
+            item->setBackground(brush);
+        }
+    */
     tableWidget_->setItem(row, col, item);
 }
 
 void TreeTableWidget::block()
 {
-    disconnect(tableWidget_, SIGNAL(cellClicked(int, int)), 0, 0);
+    disconnect(tableWidget_, SIGNAL(customContextMenuRequested(QPoint)), 0, 0);
 
     (void)blockSignals(true);
 }
@@ -271,9 +348,21 @@ void TreeTableWidget::unblock()
     (void)blockSignals(false);
 
     connect(tableWidget_,
-            SIGNAL(cellClicked(int, int)),
+            SIGNAL(customContextMenuRequested(QPoint)),
             this,
-            SLOT(onCellClicked(int, int)));
+            SLOT(slotCustomContextMenuRequested(QPoint)));
+}
+
+void TreeTableWidget::showOnlyVisibleTrees()
+{
+    FindVisibleObjects::run(visibleTreesIdList_, mainWindow_);
+    setTable();
+}
+
+void TreeTableWidget::showAllTrees()
+{
+    visibleTreesIdList_.clear();
+    setTable();
 }
 
 void TreeTableWidget::slotExport()
@@ -312,55 +401,54 @@ void TreeTableWidget::slotExport()
     LOG_DEBUG(<< "Finished exporting tree table.");
 }
 
-void TreeTableWidget::onCellClicked(int row, int column)
+void TreeTableWidget::slotCustomContextMenuRequested(const QPoint &pos)
 {
-    LOG_DEBUG(<< "Start table clicked, row <" << row << "> column <" << column
+    QModelIndex index = tableWidget_->indexAt(pos);
+    if (!index.isValid())
+    {
+        return;
+    }
+
+    LOG_DEBUG(<< "Row <" << index.row() << "> column <" << index.column()
               << ">.");
 
-    QTableWidgetItem *itemId = tableWidget_->item(row, COLUMN_ID);
-    if (!itemId)
+    // Create and run the context menu.
+    QMenu contextMenu(this);
+    QAction *setStatusAction = contextMenu.addAction("Set Management Status");
+    QAction *setSpeciesAction = contextMenu.addAction("Set Species");
+
+    QAction *selectedAction =
+        contextMenu.exec(tableWidget_->viewport()->mapToGlobal(pos));
+
+    // Selected rows to id list.
+    QModelIndexList indexes = tableWidget_->selectionModel()->selectedIndexes();
+    QSet<int> selectedRows;
+    for (const QModelIndex &index : indexes)
     {
-        LOG_ERROR(<< "Failed to get table item ID.");
+        selectedRows.insert(index.row());
     }
 
-    QString textId = itemId->text();
-    LOG_DEBUG(<< "Item text <" << textId.toStdString() << ">.");
-
-    size_t id = textId.toULong();
-    size_t index = segments_.index(id);
-
-    if (column == COLUMN_VISIBLE)
+    std::unordered_set<size_t> idList;
+    for (int row : selectedRows)
     {
-        QTableWidgetItem *item = tableWidget_->item(row, column);
-
-        bool checked = (item->checkState() == Qt::Checked);
-
-        LOG_DEBUG(<< "Set filter ID <" << id << "> enabled <"
-                  << toString(checked) << ">.");
-
-        filter_.setEnabled(id, checked);
-
-        if (updatesEnabled_)
+        QTableWidgetItem *itemId = tableWidget_->item(row, COLUMN_ID);
+        if (!itemId)
         {
-            filterChanged();
-        }
-    }
-    else
-    {
-        LOG_DEBUG(<< "Set segment ID <" << id << "> selected.");
-
-        for (size_t i = 0; i < segments_.size(); i++)
-        {
-            segments_[i].selected = false;
+            LOG_ERROR(<< "Failed to get table item ID at row <" << row << ">.");
+            continue;
         }
 
-        segments_[index].selected = true;
-
-        if (updatesEnabled_)
-        {
-            dataChanged();
-        }
+        QString textId = itemId->text();
+        idList.insert(static_cast<size_t>(textId.toULong()));
     }
 
-    LOG_DEBUG(<< "Finished table clicked.");
+    // Run selected action.
+    if (selectedAction == setStatusAction)
+    {
+        TreeTableSetManagementStatus::run(mainWindow_, idList);
+    }
+    else if (selectedAction == setSpeciesAction)
+    {
+        TreeTableSetSpecies::run(mainWindow_, idList);
+    }
 }
