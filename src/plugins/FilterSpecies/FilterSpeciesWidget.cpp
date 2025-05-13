@@ -369,7 +369,7 @@ void FilterSpeciesWidget::addTreeItem(size_t index)
     item->setText(COLUMN_ID, QString::number(species.id));
 
     // Label.
-    item->setText(COLUMN_LABEL, QString::fromStdString(species.label));
+    item->setText(COLUMN_LABEL, QString::fromStdString(species.latin));
 
     // Color legend.
     QColor color;

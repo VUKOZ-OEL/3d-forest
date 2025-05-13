@@ -55,7 +55,7 @@ void TreeTableSetSpecies::run(MainWindow *mainWindow,
     {
         const Species &species = speciesList[i];
         QString text = QString::number(species.id) + " : " +
-                       QString::fromStdString(species.label);
+                       QString::fromStdString(species.latin);
         dialog.addItem(text);
     }
 

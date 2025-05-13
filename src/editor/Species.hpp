@@ -35,11 +35,19 @@ class EXPORT_EDITOR Species
 {
 public:
     size_t id{0};
-    std::string label;
+    std::string genus;
+    std::string species;
+    std::string latin;
+    std::string czech;
     Vector3<double> color;
 
     Species();
-    Species(size_t id, const std::string &label, const Vector3<double> &color);
+    Species(size_t id,
+            const std::string &genus,
+            const std::string &species,
+            const std::string &latin,
+            const std::string &czech,
+            const Vector3<double> &color);
 };
 
 void fromJson(Species &out, const Json &in);
