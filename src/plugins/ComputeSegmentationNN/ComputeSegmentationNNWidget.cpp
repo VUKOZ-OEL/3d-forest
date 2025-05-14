@@ -143,6 +143,7 @@ ComputeSegmentationNNWidget::ComputeSegmentationNNWidget(MainWindow *mainWindow)
         this,
         nullptr,
         nullptr,
+        nullptr,
         tr("Look for tree base in elevation range"),
         tr("The values allow to cut off flying trees and prevent connecting "
            "trees by ground wood."),

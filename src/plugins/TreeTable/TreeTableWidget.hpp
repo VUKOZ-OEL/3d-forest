@@ -43,12 +43,13 @@ public:
 
     QSize sizeHint() const override { return QSize(700, 200); }
 
+    void closeWidget();
+
 public slots:
     void slotUpdate(void *sender, const QSet<Editor::Type> &target);
 
 protected slots:
-    void showOnlyVisibleTrees();
-    void showAllTrees();
+    void slotShowOnlyVisibleTreesChanged(int index);
     void slotExport();
     void slotCustomContextMenuRequested(const QPoint &pos);
 
@@ -75,9 +76,7 @@ private:
     QTableWidget *tableWidget_;
     QPushButton *exportButton_;
 
-    QPushButton *showOnlyVisibleTreesButton_;
-    QPushButton *showAllTreesButton_;
-
+    QCheckBox *showOnlyVisibleTreesCheckBox_;
     std::unordered_set<size_t> visibleTreesIdList_;
 
     Segments segments_;
@@ -99,6 +98,8 @@ private:
 
     void block();
     void unblock();
+
+    void showOnlyVisibleTreesUpdate();
 };
 
 #endif /* TREE_TABLE_WIDGET_HPP */

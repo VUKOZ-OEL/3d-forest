@@ -46,6 +46,7 @@ public:
                        const QObject *receiver,
                        const char *memberIntermediateMinimumValue,
                        const char *memberIntermediateMaximumValue,
+                       const char *memberFinalValue,
                        const QString &text,
                        const QString &toolTip,
                        const QString &unitsList,
@@ -69,10 +70,13 @@ public:
 signals:
     void signalIntermediateMinimumValue();
     void signalIntermediateMaximumValue();
+    void signalFinalValue();
 
 protected slots:
     void slotIntermediateMinimumValue(double v);
     void slotIntermediateMaximumValue(double v);
+    void slotFinalValue(double v);
+    void slotFinalValue();
 
 protected:
     ctkDoubleRangeSlider *slider_;

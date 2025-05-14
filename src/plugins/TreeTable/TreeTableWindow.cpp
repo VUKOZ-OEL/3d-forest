@@ -26,6 +26,7 @@
 #include <TreeTableWindow.hpp>
 
 // Include Qt.
+#include <QCloseEvent>
 #include <QVBoxLayout>
 
 // Include local.
@@ -58,4 +59,13 @@ TreeTableWindow::TreeTableWindow(MainWindow *mainWindow)
 TreeTableWindow::~TreeTableWindow()
 {
     LOG_DEBUG(<< "Destroy.");
+}
+
+void TreeTableWindow::closeEvent(QCloseEvent *event)
+{
+    LOG_DEBUG(<< "Close event.");
+
+    widget_->closeWidget();
+
+    event->accept();
 }

@@ -124,7 +124,7 @@ public:
     void updateData();
 
     /// Reset selection of cached point data and start new rendering.
-    void updateFilter();
+    void updateFilter(void *sender = nullptr, bool final = true);
 
     /// Reset modifiers of cached point data and start new rendering.
     void updateModifiers();

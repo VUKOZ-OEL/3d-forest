@@ -45,6 +45,7 @@ FilterElevationWidget::FilterElevationWidget(MainWindow *mainWindow)
                                     this,
                                     SLOT(slotRangeIntermediateMinimumValue()),
                                     SLOT(slotRangeIntermediateMaximumValue()),
+                                    SLOT(slotFinalValue()),
                                     tr("Elevation"),
                                     tr("Min-max elevation range filter"),
                                     tr("m"),
@@ -109,13 +110,13 @@ void FilterElevationWidget::setElevation(const Range<double> &range)
     elevationInput_->blockSignals(false);
 }
 
-void FilterElevationWidget::filterChanged()
+void FilterElevationWidget::filterChanged(bool final)
 {
     LOG_DEBUG(<< "Elevation filer changed.");
 
     mainWindow_->suspendThreads();
     mainWindow_->editor().setElevationFilter(elevationRange_);
-    mainWindow_->updateFilter();
+    mainWindow_->updateFilter(this, final);
 }
 
 void FilterElevationWidget::setFilterEnabled(bool b)
@@ -123,7 +124,7 @@ void FilterElevationWidget::setFilterEnabled(bool b)
     LOG_DEBUG(<< "Set elevation filer enabled <" << toString(b) << ">.");
 
     elevationRange_.setEnabled(b);
-    filterChanged();
+    filterChanged(true);
 }
 
 void FilterElevationWidget::slotRangeIntermediateMinimumValue()
@@ -134,7 +135,7 @@ void FilterElevationWidget::slotRangeIntermediateMinimumValue()
         mainWindow_->editor().settings().unitsSettings().pointsPerMeter()[0];
 
     elevationRange_.setMinimumValue(elevationInput_->minimumValue() * ppm);
-    filterChanged();
+    filterChanged(false);
 }
 
 void FilterElevationWidget::slotRangeIntermediateMaximumValue()
@@ -145,5 +146,10 @@ void FilterElevationWidget::slotRangeIntermediateMaximumValue()
         mainWindow_->editor().settings().unitsSettings().pointsPerMeter()[0];
 
     elevationRange_.setMaximumValue(elevationInput_->maximumValue() * ppm);
-    filterChanged();
+    filterChanged(false);
+}
+
+void FilterElevationWidget::slotFinalValue()
+{
+    filterChanged(true);
 }

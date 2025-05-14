@@ -49,6 +49,7 @@ public:
     /** Editor Data Type. */
     enum Type
     {
+        TYPE_FILTER,
         TYPE_CLASSIFICATION,
         TYPE_CLIP_FILTER,
         TYPE_DATA_SET,

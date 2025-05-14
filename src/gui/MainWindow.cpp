@@ -615,7 +615,7 @@ void MainWindow::updateData()
     resumeThreads();
 }
 
-void MainWindow::updateFilter()
+void MainWindow::updateFilter(void *sender, bool final)
 {
     LOG_DEBUG_UPDATE(<< "Update filter.");
 
@@ -627,6 +627,11 @@ void MainWindow::updateFilter()
     }
 
     editor_.viewports().setState(Page::STATE_SELECT);
+
+    if (final)
+    {
+        update(sender, {Editor::TYPE_FILTER});
+    }
 
     resumeThreads();
 }

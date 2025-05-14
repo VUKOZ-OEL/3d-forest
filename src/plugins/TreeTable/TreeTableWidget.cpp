@@ -90,20 +90,17 @@ TreeTableWidget::TreeTableWidget(MainWindow *mainWindow)
     tableWidget_->setSelectionBehavior(QAbstractItemView::SelectRows);
     tableWidget_->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
-    // Buttons.
-    showOnlyVisibleTreesButton_ = new QPushButton(tr("Show visible"));
-    showOnlyVisibleTreesButton_->setSizePolicy(QSizePolicy::Minimum,
-                                               QSizePolicy::Minimum);
-    connect(showOnlyVisibleTreesButton_,
-            SIGNAL(clicked()),
+    // Options.
+    showOnlyVisibleTreesCheckBox_ = new QCheckBox;
+    showOnlyVisibleTreesCheckBox_->setText(tr("Show only visible trees"));
+    showOnlyVisibleTreesCheckBox_->setChecked(false);
+
+    connect(showOnlyVisibleTreesCheckBox_,
+            SIGNAL(stateChanged(int)),
             this,
-            SLOT(showOnlyVisibleTrees()));
+            SLOT(slotShowOnlyVisibleTreesChanged(int)));
 
-    showAllTreesButton_ = new QPushButton(tr("Show all"));
-    showAllTreesButton_->setSizePolicy(QSizePolicy::Minimum,
-                                       QSizePolicy::Minimum);
-    connect(showAllTreesButton_, SIGNAL(clicked()), this, SLOT(showAllTrees()));
-
+    // Buttons.
     exportButton_ = new QPushButton(tr("Export"));
     exportButton_->setIcon(THEME_ICON("export-file"));
     exportButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -111,8 +108,7 @@ TreeTableWidget::TreeTableWidget(MainWindow *mainWindow)
 
     // Buttons layout.
     QHBoxLayout *buttonsLayout = new QHBoxLayout;
-    buttonsLayout->addWidget(showOnlyVisibleTreesButton_);
-    buttonsLayout->addWidget(showAllTreesButton_);
+    buttonsLayout->addWidget(showOnlyVisibleTreesCheckBox_);
     buttonsLayout->addStretch();
     buttonsLayout->addWidget(exportButton_);
 
@@ -148,6 +144,11 @@ void TreeTableWidget::slotUpdate(void *sender, const QSet<Editor::Type> &target)
 
         setSegments(mainWindow_->editor().segments(),
                     mainWindow_->editor().segmentsFilter());
+    }
+
+    if (target.contains(Editor::TYPE_FILTER))
+    {
+        showOnlyVisibleTreesUpdate();
     }
 }
 
@@ -353,15 +354,33 @@ void TreeTableWidget::unblock()
             SLOT(slotCustomContextMenuRequested(QPoint)));
 }
 
-void TreeTableWidget::showOnlyVisibleTrees()
+void TreeTableWidget::showOnlyVisibleTreesUpdate()
 {
-    FindVisibleObjects::run(visibleTreesIdList_, mainWindow_);
-    setTable();
+    if (showOnlyVisibleTreesCheckBox_->isChecked())
+    {
+        FindVisibleObjects::run(visibleTreesIdList_, mainWindow_);
+        setTable();
+    }
+    else if (!visibleTreesIdList_.empty())
+    {
+        visibleTreesIdList_.clear();
+        setTable();
+    }
 }
 
-void TreeTableWidget::showAllTrees()
+void TreeTableWidget::slotShowOnlyVisibleTreesChanged(int index)
 {
-    visibleTreesIdList_.clear();
+    (void)index;
+
+    if (showOnlyVisibleTreesCheckBox_->isChecked())
+    {
+        FindVisibleObjects::run(visibleTreesIdList_, mainWindow_);
+    }
+    else
+    {
+        visibleTreesIdList_.clear();
+    }
+
     setTable();
 }
 
@@ -450,5 +469,14 @@ void TreeTableWidget::slotCustomContextMenuRequested(const QPoint &pos)
     else if (selectedAction == setSpeciesAction)
     {
         TreeTableSetSpecies::run(mainWindow_, idList);
+    }
+}
+
+void TreeTableWidget::closeWidget()
+{
+    if (showOnlyVisibleTreesCheckBox_->isChecked())
+    {
+        showOnlyVisibleTreesCheckBox_->setChecked(false);
+        showOnlyVisibleTreesUpdate();
     }
 }

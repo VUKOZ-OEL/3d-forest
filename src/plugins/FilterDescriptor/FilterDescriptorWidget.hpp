@@ -49,6 +49,7 @@ public slots:
 
     void slotRangeIntermediateMinimumValue();
     void slotRangeIntermediateMaximumValue();
+    void slotFinalValue();
 
 protected:
     MainWindow *mainWindow_;
@@ -56,7 +57,7 @@ protected:
     Range<double> descriptorRange_;
 
     void setDescriptor(const Range<double> &descriptorRange);
-    void filterChanged();
+    void filterChanged(bool final);
 };
 
 #endif /* FILTER_DESCRIPTOR_WIDGET_HPP */

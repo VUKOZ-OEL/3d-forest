@@ -49,6 +49,7 @@ public slots:
 
     void slotRangeIntermediateMinimumValue();
     void slotRangeIntermediateMaximumValue();
+    void slotFinalValue();
 
 protected:
     MainWindow *mainWindow_;
@@ -56,7 +57,7 @@ protected:
     Range<double> elevationRange_;
 
     void setElevation(const Range<double> &elevationRange);
-    void filterChanged();
+    void filterChanged(bool final);
 };
 
 #endif /* FILTER_ELEVATION_WIDGET_HPP */

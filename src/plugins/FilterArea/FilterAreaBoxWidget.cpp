@@ -46,6 +46,7 @@ FilterAreaBoxWidget::FilterAreaBoxWidget(MainWindow *mainWindow)
         this,
         SLOT(slotRangeIntermediateMinimumValue()),
         SLOT(slotRangeIntermediateMaximumValue()),
+        SLOT(slotFinalValue()),
         tr("X range"),
         tr("Min-max clipping range filter along X axis"),
         tr("m"),
@@ -60,6 +61,7 @@ FilterAreaBoxWidget::FilterAreaBoxWidget(MainWindow *mainWindow)
         this,
         SLOT(slotRangeIntermediateMinimumValue()),
         SLOT(slotRangeIntermediateMaximumValue()),
+        SLOT(slotFinalValue()),
         tr("Y range"),
         tr("Min-max clipping range filter along Y axis"),
         tr("m"),
@@ -74,6 +76,7 @@ FilterAreaBoxWidget::FilterAreaBoxWidget(MainWindow *mainWindow)
         this,
         SLOT(slotRangeIntermediateMinimumValue()),
         SLOT(slotRangeIntermediateMaximumValue()),
+        SLOT(slotFinalValue()),
         tr("Z range"),
         tr("Min-max clipping range filter along Z axis"),
         tr("m"),
@@ -146,7 +149,7 @@ void FilterAreaBoxWidget::setRegion(const Region &region)
     }
 }
 
-void FilterAreaBoxWidget::filterChanged()
+void FilterAreaBoxWidget::filterChanged(bool final)
 {
     LOG_DEBUG(<< "Clip box filer changed.");
 
@@ -162,7 +165,7 @@ void FilterAreaBoxWidget::filterChanged()
 
     mainWindow_->suspendThreads();
     mainWindow_->editor().setClipFilter(region_);
-    mainWindow_->updateFilter();
+    mainWindow_->updateFilter(this, final);
 }
 
 void FilterAreaBoxWidget::setFilterEnabled(bool b)
@@ -180,7 +183,7 @@ void FilterAreaBoxWidget::setFilterEnabled(bool b)
 
     mainWindow_->suspendThreads();
     mainWindow_->editor().setClipFilter(region_);
-    mainWindow_->updateFilter();
+    mainWindow_->updateFilter(this, true);
 }
 
 void FilterAreaBoxWidget::slotRangeIntermediateMinimumValue()
@@ -201,7 +204,7 @@ void FilterAreaBoxWidget::slotRangeIntermediateMinimumValue()
         }
     }
 
-    filterChanged();
+    filterChanged(false);
 }
 
 void FilterAreaBoxWidget::slotRangeIntermediateMaximumValue()
@@ -222,7 +225,12 @@ void FilterAreaBoxWidget::slotRangeIntermediateMaximumValue()
         }
     }
 
-    filterChanged();
+    filterChanged(false);
+}
+
+void FilterAreaBoxWidget::slotFinalValue()
+{
+    filterChanged(true);
 }
 
 void FilterAreaBoxWidget::showEvent(QShowEvent *event)
