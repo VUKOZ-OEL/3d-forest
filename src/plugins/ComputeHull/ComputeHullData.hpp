@@ -17,31 +17,37 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ComputeConvexHullParameters.hpp */
+/** @file ComputeHullData.hpp */
 
-#ifndef COMPUTE_CONVEX_HULL_PARAMETERS_HPP
-#define COMPUTE_CONVEX_HULL_PARAMETERS_HPP
+#ifndef COMPUTE_HULL_DATA_HPP
+#define COMPUTE_HULL_DATA_HPP
 
 // Include 3D Forest.
 #include <Json.hpp>
+#include <TreeAttributes.hpp>
+#include <Vector3.hpp>
 
-/** Compute Convex Hull Parameters. */
-class ComputeConvexHullParameters
+/** Compute Hull Data. */
+class ComputeHullData
 {
 public:
-    double voxelRadius{0.1};
+    /// Tree ID.
+    size_t treeId{0};
+
+    /// Collected point coordinates
+    std::vector<double> points; // x0, y0, z0, x1, y1, z1, ...
 };
 
-inline void toJson(Json &out, const ComputeConvexHullParameters &in)
+inline void toJson(Json &out, const ComputeHullData &in)
 {
-    toJson(out["voxelRadius"], in.voxelRadius);
+    toJson(out["treeId"], in.treeId);
 }
 
-inline std::string toString(const ComputeConvexHullParameters &in)
+inline std::string toString(const ComputeHullData &in)
 {
     Json json;
     toJson(json, in);
     return json.serialize(0);
 }
 
-#endif /* COMPUTE_CONVEX_HULL_PARAMETERS_HPP */
+#endif /* COMPUTE_HULL_DATA_HPP */

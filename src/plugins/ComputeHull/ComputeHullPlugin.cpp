@@ -17,46 +17,46 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ComputeConvexHullPlugin.cpp */
+/** @file ComputeHullPlugin.cpp */
 
 // Include 3D Forest.
-#include <ComputeConvexHullPlugin.hpp>
-#include <ComputeConvexHullWindow.hpp>
+#include <ComputeHullPlugin.hpp>
+#include <ComputeHullWindow.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
-#define LOG_MODULE_NAME "ComputeConvexHullPlugin"
+#define LOG_MODULE_NAME "ComputeHullPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ComputeConvexHullResources/", name))
+#define ICON(name) (ThemeIcon(":/ComputeHullResources/", name))
 
-ComputeConvexHullPlugin::ComputeConvexHullPlugin()
+ComputeHullPlugin::ComputeHullPlugin()
     : mainWindow_(nullptr),
       pluginWindow_(nullptr)
 {
 }
 
-void ComputeConvexHullPlugin::initialize(MainWindow *mainWindow)
+void ComputeHullPlugin::initialize(MainWindow *mainWindow)
 {
     mainWindow_ = mainWindow;
 
     mainWindow_->createAction(nullptr,
                               "Compute",
                               "Compute",
-                              tr("Convex Hull"),
-                              tr("Compute convex hull"),
-                              ICON("convex-hull"),
+                              tr("Hull"),
+                              tr("Compute hull"),
+                              ICON("compute-hull"),
                               this,
                               SLOT(slotPlugin()),
                               MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
 }
 
-void ComputeConvexHullPlugin::slotPlugin()
+void ComputeHullPlugin::slotPlugin()
 {
     if (!pluginWindow_)
     {
-        pluginWindow_ = new ComputeConvexHullWindow(mainWindow_);
+        pluginWindow_ = new ComputeHullWindow(mainWindow_);
     }
 
     pluginWindow_->show();

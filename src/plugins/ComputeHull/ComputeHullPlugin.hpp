@@ -17,36 +17,35 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ComputeConvexHullPlugin.hpp */
+/** @file ComputeHullPlugin.hpp */
 
-#ifndef COMPUTE_CONVEX_HULL_PLUGIN_HPP
-#define COMPUTE_CONVEX_HULL_PLUGIN_HPP
+#ifndef COMPUTE_HULL_PLUGIN_HPP
+#define COMPUTE_HULL_PLUGIN_HPP
 
 // Include 3D Forest.
 #include <PluginInterface.hpp>
-class ComputeConvexHullWindow;
+class ComputeHullWindow;
 
 #if defined(_MSC_VER)
-    #if defined(EXPORT_3DForestComputeConvexHullPlugin)
-        #define EXPORT_COMPUTE_CONVEX_HULL_PLUGIN __declspec(dllexport)
+    #if defined(EXPORT_3DForestComputeHullPlugin)
+        #define EXPORT_COMPUTE_HULL_PLUGIN __declspec(dllexport)
     #else
-        #define EXPORT_COMPUTE_CONVEX_HULL_PLUGIN __declspec(dllimport)
+        #define EXPORT_COMPUTE_HULL_PLUGIN __declspec(dllimport)
     #endif
 #else
-    #define EXPORT_COMPUTE_CONVEX_HULL_PLUGIN
+    #define EXPORT_COMPUTE_HULL_PLUGIN
 #endif
 
-/** Compute Convex Hull Plugin. */
-class EXPORT_COMPUTE_CONVEX_HULL_PLUGIN ComputeConvexHullPlugin
-    : public QObject,
-      public PluginInterface
+/** Compute Hull Plugin. */
+class EXPORT_COMPUTE_HULL_PLUGIN ComputeHullPlugin : public QObject,
+                                                     public PluginInterface
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID PluginInterface_iid)
     Q_INTERFACES(PluginInterface)
 
 public:
-    ComputeConvexHullPlugin();
+    ComputeHullPlugin();
 
     virtual void initialize(MainWindow *mainWindow);
 
@@ -55,7 +54,7 @@ public slots:
 
 private:
     MainWindow *mainWindow_;
-    ComputeConvexHullWindow *pluginWindow_;
+    ComputeHullWindow *pluginWindow_;
 };
 
-#endif /* COMPUTE_CONVEX_HULL_PLUGIN_HPP */
+#endif /* COMPUTE_HULL_PLUGIN_HPP */

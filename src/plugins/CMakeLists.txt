@@ -16,10 +16,10 @@
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
 add_subdirectory(ComputeClassification)
-add_subdirectory(ComputeConvexHull)
 add_subdirectory(ComputeDescriptor)
 add_subdirectory(ComputeElevation)
 add_subdirectory(ComputeHeightMap)
+add_subdirectory(ComputeHull)
 add_subdirectory(ComputeSegmentationNN)
 add_subdirectory(ComputeTreeAttributes)
 add_subdirectory(Edit)

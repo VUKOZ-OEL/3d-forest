@@ -17,29 +17,29 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ComputeConvexHullAction.cpp */
+/** @file ComputeHullAction.cpp */
 
 // Include std.
 #include <algorithm>
 
 // Include 3D Forest.
 #include <ColorPalette.hpp>
-#include <ComputeConvexHullAction.hpp>
-#include <ComputeConvexHullMethod.hpp>
+#include <ComputeHullAction.hpp>
+#include <ComputeHullMethod.hpp>
 #include <Editor.hpp>
 #include <Util.hpp>
 
 // Include local.
-#define LOG_MODULE_NAME "ComputeConvexHullAction"
+#define LOG_MODULE_NAME "ComputeHullAction"
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define COMPUTE_CONVEX_HULL_STEP_RESET_POINTS 0
-#define COMPUTE_CONVEX_HULL_STEP_COUNT_POINTS 1
-#define COMPUTE_CONVEX_HULL_STEP_POINTS_TO_VOXELS 2
-#define COMPUTE_CONVEX_HULL_STEP_CALCULATE_HULL 3
+#define COMPUTE_HULL_STEP_RESET_POINTS 0
+#define COMPUTE_HULL_STEP_COUNT_POINTS 1
+#define COMPUTE_HULL_STEP_POINTS_TO_VOXELS 2
+#define COMPUTE_HULL_STEP_CALCULATE_HULL 3
 
-ComputeConvexHullAction::ComputeConvexHullAction(Editor *editor)
+ComputeHullAction::ComputeHullAction(Editor *editor)
     : editor_(editor),
       query_(editor),
       queryPoint_(editor)
@@ -47,12 +47,12 @@ ComputeConvexHullAction::ComputeConvexHullAction(Editor *editor)
     LOG_DEBUG(<< "Create.");
 }
 
-ComputeConvexHullAction::~ComputeConvexHullAction()
+ComputeHullAction::~ComputeHullAction()
 {
     LOG_DEBUG(<< "Destroy.");
 }
 
-void ComputeConvexHullAction::clear()
+void ComputeHullAction::clear()
 {
     LOG_DEBUG(<< "Clear.");
 
@@ -61,8 +61,7 @@ void ComputeConvexHullAction::clear()
     trees_.clear();
 }
 
-void ComputeConvexHullAction::start(
-    const ComputeConvexHullParameters &parameters)
+void ComputeHullAction::start(const ComputeHullParameters &parameters)
 {
     LOG_DEBUG(<< "Start with parameters <" << toString(parameters) << ">.");
 
@@ -83,26 +82,26 @@ void ComputeConvexHullAction::start(
     // Plan the steps.
     progress_.setMaximumStep(nPointsTotal_, 1000);
     progress_.setMaximumSteps({25.0, 25.0, 25.0, 25.0});
-    progress_.setValueSteps(COMPUTE_CONVEX_HULL_STEP_RESET_POINTS);
+    progress_.setValueSteps(COMPUTE_HULL_STEP_RESET_POINTS);
 }
 
-void ComputeConvexHullAction::next()
+void ComputeHullAction::next()
 {
     switch (progress_.valueSteps())
     {
-        case COMPUTE_CONVEX_HULL_STEP_RESET_POINTS:
+        case COMPUTE_HULL_STEP_RESET_POINTS:
             stepResetPoints();
             break;
 
-        case COMPUTE_CONVEX_HULL_STEP_COUNT_POINTS:
+        case COMPUTE_HULL_STEP_COUNT_POINTS:
             stepCountPoints();
             break;
 
-        case COMPUTE_CONVEX_HULL_STEP_POINTS_TO_VOXELS:
+        case COMPUTE_HULL_STEP_POINTS_TO_VOXELS:
             stepPointsToVoxels();
             break;
 
-        case COMPUTE_CONVEX_HULL_STEP_CALCULATE_HULL:
+        case COMPUTE_HULL_STEP_CALCULATE_HULL:
             stepCalculateHull();
             break;
 
@@ -112,7 +111,7 @@ void ComputeConvexHullAction::next()
     }
 }
 
-void ComputeConvexHullAction::stepResetPoints()
+void ComputeHullAction::stepResetPoints()
 {
     progress_.startTimer();
 
@@ -140,10 +139,10 @@ void ComputeConvexHullAction::stepResetPoints()
     }
 
     progress_.setMaximumStep(nPointsTotal_, 1000);
-    progress_.setValueSteps(COMPUTE_CONVEX_HULL_STEP_COUNT_POINTS);
+    progress_.setValueSteps(COMPUTE_HULL_STEP_COUNT_POINTS);
 }
 
-void ComputeConvexHullAction::stepCountPoints()
+void ComputeHullAction::stepCountPoints()
 {
     progress_.startTimer();
 
@@ -172,10 +171,10 @@ void ComputeConvexHullAction::stepCountPoints()
     query_.reset();
 
     progress_.setMaximumStep(nPointsInFilter_, 1000);
-    progress_.setValueSteps(COMPUTE_CONVEX_HULL_STEP_POINTS_TO_VOXELS);
+    progress_.setValueSteps(COMPUTE_HULL_STEP_POINTS_TO_VOXELS);
 }
 
-void ComputeConvexHullAction::stepPointsToVoxels()
+void ComputeHullAction::stepPointsToVoxels()
 {
     progress_.startTimer();
 
@@ -197,17 +196,17 @@ void ComputeConvexHullAction::stepPointsToVoxels()
     }
 
     progress_.setMaximumStep(trees_.size(), 1);
-    progress_.setValueSteps(COMPUTE_CONVEX_HULL_STEP_CALCULATE_HULL);
+    progress_.setValueSteps(COMPUTE_HULL_STEP_CALCULATE_HULL);
 }
 
-void ComputeConvexHullAction::stepCalculateHull()
+void ComputeHullAction::stepCalculateHull()
 {
     progress_.startTimer();
 
     // Initialize.
     if (progress_.valueStep() == 0)
     {
-        LOG_DEBUG(<< "Start calculating convex hull for <" << trees_.size()
+        LOG_DEBUG(<< "Start calculating hull for <" << trees_.size()
                   << "> trees.");
 
         currentTreeIndex_ = 0;
@@ -216,18 +215,34 @@ void ComputeConvexHullAction::stepCalculateHull()
     // For each tree:
     while (currentTreeIndex_ < trees_.size())
     {
-        LOG_DEBUG(<< "Calculating convex hull for tree index <"
+        LOG_DEBUG(<< "Calculating hull for tree index <"
                   << (currentTreeIndex_ + 1) << "/" << trees_.size()
                   << "> tree ID <" << trees_[currentTreeIndex_].treeId
                   << "> point count <"
                   << trees_[currentTreeIndex_].points.size() / 3 << ">.");
 
-        Segment segment = editor_->segment(trees_[currentTreeIndex_].treeId);
+        const ComputeHullData &treeData = trees_[currentTreeIndex_];
+        Segment segment = editor_->segment(treeData.treeId);
 
-        float z = static_cast<float>(segment.boundary.min(2));
+        if (parameters_.computeConvexHull)
+        {
+            calculateConvexHull(segment, treeData);
+        }
 
-        calculateConvexHull(segment);
-        calculateConvexHullProjection(segment, z);
+        if (parameters_.computeConvexHullProjection)
+        {
+            calculateConvexHullProjection(segment, treeData);
+        }
+
+        if (parameters_.computeConcaveHull)
+        {
+            calculateAlphaShape3(segment, treeData);
+        }
+
+        if (parameters_.computeConcaveHullProjection)
+        {
+            calculateAlphaShape2(segment, treeData);
+        }
 
         editor_->setSegment(segment);
 
@@ -243,40 +258,53 @@ void ComputeConvexHullAction::stepCalculateHull()
     progress_.setValueStep(progress_.maximumStep());
     progress_.setValueSteps(progress_.maximumSteps());
 
-    LOG_DEBUG(<< "Finished calculating convex hull for trees.");
+    LOG_DEBUG(<< "Finished calculating hull for trees.");
 }
 
-void ComputeConvexHullAction::calculateConvexHull(Segment &segment)
+void ComputeHullAction::calculateConvexHull(Segment &segment,
+                                            const ComputeHullData &data)
 {
-    Mesh m;
-
-    ComputeConvexHullMethod::qhull3d(trees_[currentTreeIndex_].points, m);
-
-    LOG_DEBUG(<< "Calculated convex hull has <" << m.position.size() / 3
-              << "> vertices and <" << m.position.size() / 9 << "> triangles.");
-
-    m.name = "convexHull";
-    segment.meshList[m.name] = std::move(m);
+    Mesh mesh;
+    ComputeHullMethod::qhull3d(data.points, mesh);
+    mesh.name = "convexHull";
+    segment.meshList[mesh.name] = std::move(mesh);
 }
 
-void ComputeConvexHullAction::calculateConvexHullProjection(Segment &segment,
-                                                            float z)
+void ComputeHullAction::calculateConvexHullProjection(
+    Segment &segment,
+    const ComputeHullData &data)
 {
-    Mesh m;
+    float z = static_cast<float>(segment.boundary.min(2));
 
-    ComputeConvexHullMethod::qhull2d(trees_[currentTreeIndex_].points, m, z);
-
-    LOG_DEBUG(<< "Calculated convex hull has <" << m.position.size() / 3
-              << "> vertices and <" << m.position.size() / 9 << "> triangles.");
-
-    // double ppm = editor_->settings().unitsSettings().pointsPerMeter()[0];
-    segment.treeAttributes.area = m.calculateSurfaceArea2d();
-
-    m.name = "convexHullProjection";
-    segment.meshList[m.name] = std::move(m);
+    Mesh mesh;
+    ComputeHullMethod::qhull2d(data.points, mesh, z);
+    segment.treeAttributes.area = mesh.calculateSurfaceArea2d();
+    mesh.name = "convexHullProjection";
+    segment.meshList[mesh.name] = std::move(mesh);
 }
 
-size_t ComputeConvexHullAction::treeIndex(size_t treeId)
+void ComputeHullAction::calculateAlphaShape3(Segment &segment,
+                                             const ComputeHullData &data)
+{
+    Mesh mesh;
+    ComputeHullMethod::alphaShape3(data.points, mesh, parameters_.alpha);
+    mesh.name = "concaveHull";
+    segment.meshList[mesh.name] = std::move(mesh);
+}
+
+void ComputeHullAction::calculateAlphaShape2(Segment &segment,
+                                             const ComputeHullData &data)
+{
+    float z = static_cast<float>(segment.boundary.min(2));
+
+    Mesh mesh;
+    ComputeHullMethod::alphaShape2(data.points, mesh, parameters_.alpha, z);
+    segment.treeAttributes.area = ComputeHullMethod::surface2(mesh);
+    mesh.name = "concaveHullProjection";
+    segment.meshList[mesh.name] = std::move(mesh);
+}
+
+size_t ComputeHullAction::treeIndex(size_t treeId)
 {
     auto it = treesMap_.find(treeId);
 
@@ -284,7 +312,7 @@ size_t ComputeConvexHullAction::treeIndex(size_t treeId)
     {
         size_t index = trees_.size();
         treesMap_[treeId] = index;
-        trees_.push_back(ComputeConvexHullData());
+        trees_.push_back(ComputeHullData());
         trees_[index].treeId = treeId;
         trees_[index].points.reserve(100);
         return index;
@@ -293,7 +321,7 @@ size_t ComputeConvexHullAction::treeIndex(size_t treeId)
     return it->second;
 }
 
-void ComputeConvexHullAction::createVoxel()
+void ComputeHullAction::createVoxel()
 {
     // Initialize new voxel point.
     size_t treeId = query_.segment();
@@ -338,7 +366,7 @@ void ComputeConvexHullAction::createVoxel()
     z = z / static_cast<double>(n);
 
     // Append new voxel to voxel array.
-    ComputeConvexHullData &tree = trees_[treeIndex(treeId)];
+    ComputeHullData &tree = trees_[treeIndex(treeId)];
     tree.points.push_back(x);
     tree.points.push_back(y);
     tree.points.push_back(z);

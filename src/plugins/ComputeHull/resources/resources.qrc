@@ -1,4 +1,5 @@
-/*
+<!DOCTYPE RCC>
+<!--
     Copyright 2020 VUKOZ
 
     This file is part of 3D Forest.
@@ -15,39 +16,15 @@
 
     You should have received a copy of the GNU General Public License
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
-*/
+-->
+<RCC version="1.0">
+<qresource prefix="/ComputeHullResources">
 
-/** @file ComputeConvexHullData.hpp */
+<!-- Tool bar -->
+<file>compute-hull-16px.png</file>
+<file>compute-hull-20px.png</file>
 
-#ifndef COMPUTE_CONVEX_HULL_DATA_HPP
-#define COMPUTE_CONVEX_HULL_DATA_HPP
+<!-- Images -->
 
-// Include 3D Forest.
-#include <Json.hpp>
-#include <TreeAttributes.hpp>
-#include <Vector3.hpp>
-
-/** Compute Convex Hull Data. */
-class ComputeConvexHullData
-{
-public:
-    /// Tree ID.
-    size_t treeId{0};
-
-    /// Collected point coordinates
-    std::vector<double> points; // x0, y0, z0, x1, y1, z1, ...
-};
-
-inline void toJson(Json &out, const ComputeConvexHullData &in)
-{
-    toJson(out["treeId"], in.treeId);
-}
-
-inline std::string toString(const ComputeConvexHullData &in)
-{
-    Json json;
-    toJson(json, in);
-    return json.serialize(0);
-}
-
-#endif /* COMPUTE_CONVEX_HULL_DATA_HPP */
+</qresource>
+</RCC>

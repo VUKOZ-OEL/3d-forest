@@ -1,5 +1,4 @@
-<!DOCTYPE RCC>
-<!--
+/*
     Copyright 2020 VUKOZ
 
     This file is part of 3D Forest.
@@ -16,15 +15,31 @@
 
     You should have received a copy of the GNU General Public License
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
--->
-<RCC version="1.0">
-<qresource prefix="/ComputeConvexHullResources">
+*/
 
-<!-- Tool bar -->
-<file>convex-hull-16px.png</file>
-<file>convex-hull-20px.png</file>
+/** @file ComputeHullWindow.hpp */
 
-<!-- Images -->
+#ifndef COMPUTE_HULL_WINDOW_HPP
+#define COMPUTE_HULL_WINDOW_HPP
 
-</qresource>
-</RCC>
+// Include 3D Forest.
+class MainWindow;
+class ComputeHullWidget;
+
+// Include Qt.
+#include <QDialog>
+
+/** Compute Hull Window. */
+class ComputeHullWindow : public QDialog
+{
+    Q_OBJECT
+
+public:
+    ComputeHullWindow(MainWindow *mainWindow);
+    ~ComputeHullWindow();
+
+private:
+    ComputeHullWidget *widget_;
+};
+
+#endif /* COMPUTE_HULL_WINDOW_HPP */

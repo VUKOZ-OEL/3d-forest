@@ -77,6 +77,7 @@ TreeSettingsWidget::TreeSettingsWidget(MainWindow *mainWindow)
             this,
             SLOT(slotSetTreePositionAtBottom(int)));
 
+    // Convex hull.
     convexHullVisibleCheckBox_ = new QCheckBox;
     convexHullVisibleCheckBox_->setChecked(settings_.convexHullVisible());
     convexHullVisibleCheckBox_->setText(tr("Show convex hull"));
@@ -95,12 +96,34 @@ TreeSettingsWidget::TreeSettingsWidget(MainWindow *mainWindow)
             this,
             SLOT(slotSetConvexHullProjectionVisible(int)));
 
+    // Concave hull.
+    concaveHullVisibleCheckBox_ = new QCheckBox;
+    concaveHullVisibleCheckBox_->setChecked(settings_.concaveHullVisible());
+    concaveHullVisibleCheckBox_->setText(tr("Show concave hull"));
+    connect(concaveHullVisibleCheckBox_,
+            SIGNAL(stateChanged(int)),
+            this,
+            SLOT(slotSetConcaveHullVisible(int)));
+
+    concaveHullProjectionVisibleCheckBox_ = new QCheckBox;
+    concaveHullProjectionVisibleCheckBox_->setChecked(
+        settings_.concaveHullVisible());
+    concaveHullProjectionVisibleCheckBox_->setText(
+        tr("Show concave hull projection"));
+    connect(concaveHullProjectionVisibleCheckBox_,
+            SIGNAL(stateChanged(int)),
+            this,
+            SLOT(slotSetConcaveHullProjectionVisible(int)));
+
+    // Options.
     QVBoxLayout *optionsVBoxLayout = new QVBoxLayout;
     optionsVBoxLayout->addWidget(useOnlyForSelectedTreesCheckBox_);
     optionsVBoxLayout->addWidget(treeAttributesVisibleCheckBox_);
     optionsVBoxLayout->addWidget(treePositionAtBottomCheckBox_);
     optionsVBoxLayout->addWidget(convexHullVisibleCheckBox_);
     optionsVBoxLayout->addWidget(convexHullProjectionVisibleCheckBox_);
+    optionsVBoxLayout->addWidget(concaveHullVisibleCheckBox_);
+    optionsVBoxLayout->addWidget(concaveHullProjectionVisibleCheckBox_);
 
     QGroupBox *optionsGroupBox = new QGroupBox(tr("Options"));
     optionsGroupBox->setLayout(optionsVBoxLayout);
@@ -187,6 +210,13 @@ void TreeSettingsWidget::setTreeSettings(const TreeSettings &settings)
     convexHullProjectionVisibleCheckBox_->setChecked(
         settings_.convexHullProjectionVisible());
 
+    // Concave hull.
+    concaveHullVisibleCheckBox_->setChecked(settings_.concaveHullVisible());
+
+    // Concave hull projection.
+    concaveHullProjectionVisibleCheckBox_->setChecked(
+        settings_.concaveHullProjectionVisible());
+
     unblock();
 }
 
@@ -234,6 +264,21 @@ void TreeSettingsWidget::slotSetConvexHullProjectionVisible(int v)
     (void)v;
     settings_.setConvexHullProjectionVisible(
         convexHullProjectionVisibleCheckBox_->isChecked());
+    dataChanged();
+}
+
+void TreeSettingsWidget::slotSetConcaveHullVisible(int v)
+{
+    (void)v;
+    settings_.setConcaveHullVisible(concaveHullVisibleCheckBox_->isChecked());
+    dataChanged();
+}
+
+void TreeSettingsWidget::slotSetConcaveHullProjectionVisible(int v)
+{
+    (void)v;
+    settings_.setConcaveHullProjectionVisible(
+        concaveHullProjectionVisibleCheckBox_->isChecked());
     dataChanged();
 }
 

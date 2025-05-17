@@ -17,11 +17,11 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ComputeConvexHullWindow.cpp */
+/** @file ComputeHullWindow.cpp */
 
 // Include 3D Forest.
-#include <ComputeConvexHullWidget.hpp>
-#include <ComputeConvexHullWindow.hpp>
+#include <ComputeHullWidget.hpp>
+#include <ComputeHullWindow.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
@@ -29,20 +29,20 @@
 #include <QVBoxLayout>
 
 // Include local.
-#define LOG_MODULE_NAME "ComputeConvexHullWindow"
+#define LOG_MODULE_NAME "ComputeHullWindow"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ComputeConvexHullResources/", name))
+#define ICON(name) (ThemeIcon(":/ComputeHullResources/", name))
 
-ComputeConvexHullWindow::ComputeConvexHullWindow(MainWindow *mainWindow)
+ComputeHullWindow::ComputeHullWindow(MainWindow *mainWindow)
     : QDialog(mainWindow),
       widget_(nullptr)
 {
     LOG_DEBUG(<< "Create.");
 
     // Widget.
-    widget_ = new ComputeConvexHullWidget(mainWindow);
+    widget_ = new ComputeHullWidget(mainWindow);
 
     // Main layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -51,13 +51,13 @@ ComputeConvexHullWindow::ComputeConvexHullWindow(MainWindow *mainWindow)
 
     // Dialog.
     setLayout(mainLayout);
-    setWindowTitle(tr("Compute Convex Hull"));
-    setWindowIcon(ICON("convex-hull"));
+    setWindowTitle(tr("Compute Hull"));
+    setWindowIcon(ICON("compute-hull"));
     setMaximumHeight(height());
     setModal(false);
 }
 
-ComputeConvexHullWindow::~ComputeConvexHullWindow()
+ComputeHullWindow::~ComputeHullWindow()
 {
     LOG_DEBUG(<< "Destroy.");
 }

@@ -17,31 +17,33 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ComputeConvexHullWidget.hpp */
+/** @file ComputeHullWidget.hpp */
 
-#ifndef COMPUTE_CONVEX_HULL_WIDGET_HPP
-#define COMPUTE_CONVEX_HULL_WIDGET_HPP
+#ifndef COMPUTE_HULL_WIDGET_HPP
+#define COMPUTE_HULL_WIDGET_HPP
 
 // Include 3D Forest.
-#include <ComputeConvexHullAction.hpp>
-#include <ComputeConvexHullParameters.hpp>
+#include <ComputeHullAction.hpp>
+#include <ComputeHullParameters.hpp>
 class MainWindow;
 class DoubleSliderWidget;
 
 // Include Qt.
 #include <QWidget>
+class QCheckBox;
 class QPushButton;
 
-/** Compute Convex Hull Widget. */
-class ComputeConvexHullWidget : public QWidget
+/** Compute Hull Widget. */
+class ComputeHullWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    ComputeConvexHullWidget(MainWindow *mainWindow);
+    ComputeHullWidget(MainWindow *mainWindow);
 
 protected slots:
     void slotApply();
+    void slotFindOptimalAlphaChanged(int index);
 
 protected:
     void hideEvent(QHideEvent *event) override;
@@ -49,12 +51,20 @@ protected:
 private:
     MainWindow *mainWindow_;
 
-    ComputeConvexHullParameters parameters_;
-    ComputeConvexHullAction action_;
+    ComputeHullParameters parameters_;
+    ComputeHullAction action_;
+
+    QCheckBox *computeConvexHullCheckBox_;
+    QCheckBox *computeConvexHullProjectionCheckBox_;
+    QCheckBox *computeConcaveHullCheckBox_;
+    QCheckBox *computeConcaveHullProjectionCheckBox_;
+
+    QCheckBox *findOptimalAlphaCheckBox_;
+    DoubleSliderWidget *alphaSlider_;
 
     DoubleSliderWidget *voxelRadiusSlider_;
 
     QPushButton *applyButton_;
 };
 
-#endif /* COMPUTE_CONVEX_HULL_WIDGET_HPP */
+#endif /* COMPUTE_HULL_WIDGET_HPP */

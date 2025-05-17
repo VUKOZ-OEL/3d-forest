@@ -17,14 +17,14 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ComputeConvexHullAction.hpp */
+/** @file ComputeHullAction.hpp */
 
-#ifndef COMPUTE_CONVEX_HULL_ACTION_HPP
-#define COMPUTE_CONVEX_HULL_ACTION_HPP
+#ifndef COMPUTE_HULL_ACTION_HPP
+#define COMPUTE_HULL_ACTION_HPP
 
 // Include 3D Forest.
-#include <ComputeConvexHullData.hpp>
-#include <ComputeConvexHullParameters.hpp>
+#include <ComputeHullData.hpp>
+#include <ComputeHullParameters.hpp>
 #include <Point.hpp>
 #include <Points.hpp>
 #include <ProgressActionInterface.hpp>
@@ -32,14 +32,14 @@
 class Editor;
 class Segment;
 
-/** Compute Convex Hull Action. */
-class ComputeConvexHullAction : public ProgressActionInterface
+/** Compute Hull Action. */
+class ComputeHullAction : public ProgressActionInterface
 {
 public:
-    ComputeConvexHullAction(Editor *editor);
-    virtual ~ComputeConvexHullAction();
+    ComputeHullAction(Editor *editor);
+    virtual ~ComputeHullAction();
 
-    void start(const ComputeConvexHullParameters &parameters);
+    void start(const ComputeHullParameters &parameters);
     virtual void next();
     void clear();
 
@@ -48,13 +48,13 @@ private:
     Query query_;
     Query queryPoint_;
 
-    ComputeConvexHullParameters parameters_;
+    ComputeHullParameters parameters_;
 
     uint64_t nPointsTotal_;
     uint64_t nPointsInFilter_;
 
     std::map<size_t, size_t> treesMap_; // [tree ID : tree index]
-    std::vector<ComputeConvexHullData> trees_;
+    std::vector<ComputeHullData> trees_;
 
     size_t currentTreeIndex_;
 
@@ -63,12 +63,15 @@ private:
     void stepPointsToVoxels();
     void stepCalculateHull();
 
-    void calculateConvexHull(Segment &segment);
-    void calculateConvexHullProjection(Segment &segment, float z);
+    void calculateConvexHull(Segment &segment, const ComputeHullData &data);
+    void calculateConvexHullProjection(Segment &segment,
+                                       const ComputeHullData &data);
+    void calculateAlphaShape3(Segment &segment, const ComputeHullData &data);
+    void calculateAlphaShape2(Segment &segment, const ComputeHullData &data);
 
     size_t treeIndex(size_t treeId);
 
     void createVoxel();
 };
 
-#endif /* COMPUTE_CONVEX_HULL_ACTION_HPP */
+#endif /* COMPUTE_HULL_ACTION_HPP */

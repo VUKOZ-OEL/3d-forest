@@ -32,7 +32,9 @@ TreeSettings::TreeSettings()
       treeAttributesVisible_(true),
       treePosition_(TreeSettings::Position::BOTTOM),
       convexHullVisible_(true),
-      convexHullProjectionVisible_(true)
+      convexHullProjectionVisible_(true),
+      concaveHullVisible_(true),
+      concaveHullProjectionVisible_(true)
 {
     // empty
 }
@@ -87,6 +89,26 @@ void TreeSettings::setConvexHullProjectionVisible(bool visible)
     convexHullProjectionVisible_ = visible;
 }
 
+bool TreeSettings::concaveHullVisible() const
+{
+    return concaveHullVisible_;
+}
+
+void TreeSettings::setConcaveHullVisible(bool visible)
+{
+    concaveHullVisible_ = visible;
+}
+
+bool TreeSettings::concaveHullProjectionVisible() const
+{
+    return concaveHullProjectionVisible_;
+}
+
+void TreeSettings::setConcaveHullProjectionVisible(bool visible)
+{
+    concaveHullProjectionVisible_ = visible;
+}
+
 void fromJson(TreeSettings &out, const Json &in)
 {
     fromJson(out.useOnlyForSelectedTrees_, in["useOnlyForSelectedTrees"]);
@@ -95,6 +117,9 @@ void fromJson(TreeSettings &out, const Json &in)
     fromJson(out.convexHullVisible_, in["convexHullVisible"]);
     fromJson(out.convexHullProjectionVisible_,
              in["convexHullProjectionVisible"]);
+    fromJson(out.concaveHullVisible_, in["concaveHullVisible"]);
+    fromJson(out.concaveHullProjectionVisible_,
+             in["concaveHullProjectionVisible"]);
 }
 
 void toJson(Json &out, const TreeSettings &in)
@@ -104,6 +129,9 @@ void toJson(Json &out, const TreeSettings &in)
     toJson(out["treePosition"], in.treePosition_);
     toJson(out["convexHullVisible"], in.convexHullVisible_);
     toJson(out["convexHullProjectionVisible"], in.convexHullProjectionVisible_);
+    toJson(out["concaveHullVisible"], in.concaveHullVisible_);
+    toJson(out["concaveHullProjectionVisible"],
+           in.concaveHullProjectionVisible_);
 }
 
 std::string toString(const TreeSettings &in)

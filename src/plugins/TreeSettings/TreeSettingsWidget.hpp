@@ -53,6 +53,8 @@ public slots:
     void slotSetTreePositionAtBottom(int v);
     void slotSetConvexHullVisible(int v);
     void slotSetConvexHullProjectionVisible(int v);
+    void slotSetConcaveHullVisible(int v);
+    void slotSetConcaveHullProjectionVisible(int v);
 
 private:
     MainWindow *mainWindow_;
@@ -62,6 +64,8 @@ private:
     QCheckBox *treePositionAtBottomCheckBox_;
     QCheckBox *convexHullVisibleCheckBox_;
     QCheckBox *convexHullProjectionVisibleCheckBox_;
+    QCheckBox *concaveHullVisibleCheckBox_;
+    QCheckBox *concaveHullProjectionVisibleCheckBox_;
 
     TreeSettings settings_;
 

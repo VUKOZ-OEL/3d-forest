@@ -57,12 +57,20 @@ public:
     bool convexHullProjectionVisible() const;
     void setConvexHullProjectionVisible(bool visible);
 
+    bool concaveHullVisible() const;
+    void setConcaveHullVisible(bool visible);
+
+    bool concaveHullProjectionVisible() const;
+    void setConcaveHullProjectionVisible(bool visible);
+
 protected:
     bool useOnlyForSelectedTrees_;
     bool treeAttributesVisible_;
     TreeSettings::Position treePosition_;
     bool convexHullVisible_;
     bool convexHullProjectionVisible_;
+    bool concaveHullVisible_;
+    bool concaveHullProjectionVisible_;
 
     friend void fromJson(TreeSettings &out, const Json &in);
     friend void toJson(Json &out, const TreeSettings &in);
