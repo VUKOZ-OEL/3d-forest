@@ -20,6 +20,7 @@ if(NOT BUILD_EXAMPLES)
     return()
 endif()
 
+add_subdirectory(cgal)
 add_subdirectory(colorpalette)
 add_subdirectory(editor)
 add_subdirectory(eigen)
