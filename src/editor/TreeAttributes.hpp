@@ -37,7 +37,13 @@ public:
     double height{0.0};
 
     /// Area of tree projection from top view.
-    double area{0.0};
+    double surfaceAreaProjection{0.0};
+
+    /// Tree surface area.
+    double surfaceArea{0.0};
+
+    /// Tree volume.
+    double volume{0.0};
 
     /// The position of calculated DBH circle.
     Vector3<double> dbhPosition;
@@ -82,7 +88,9 @@ inline void toJson(Json &out, const TreeAttributes &in)
 {
     toJson(out["position"], in.position);
     toJson(out["height"], in.height);
-    toJson(out["area"], in.area);
+    toJson(out["surfaceAreaProjection"], in.surfaceAreaProjection);
+    toJson(out["surfaceArea"], in.surfaceArea);
+    toJson(out["volume"], in.volume);
     toJson(out["dbhPosition"], in.dbhPosition);
     toJson(out["dbh"], in.dbh);
 }
@@ -91,7 +99,9 @@ inline void fromJson(TreeAttributes &out, const Json &in)
 {
     fromJson(out.position, in["position"]);
     fromJson(out.height, in["height"]);
-    fromJson(out.area, in["area"]);
+    fromJson(out.surfaceAreaProjection, in["surfaceAreaProjection"]);
+    fromJson(out.surfaceArea, in["surfaceArea"]);
+    fromJson(out.volume, in["volume"]);
     fromJson(out.dbhPosition, in["dbhPosition"]);
     fromJson(out.dbh, in["dbh"]);
 }

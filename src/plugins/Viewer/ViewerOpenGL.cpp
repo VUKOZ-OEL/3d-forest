@@ -113,7 +113,7 @@ void ViewerOpenGL::render(Mode mode,
     if (normalSize > 0)
     {
         glEnableClientState(GL_NORMAL_ARRAY);
-        glColorPointer(3, GL_FLOAT, 0, normal);
+        glNormalPointer(GL_FLOAT, 0, normal);
     }
 
     if (indicesSize > 0)
@@ -137,17 +137,20 @@ void ViewerOpenGL::render(Mode mode,
 void ViewerOpenGL::render(const Mesh &mesh)
 {
     Mode mode;
-    if (mesh.mode == Mesh::Mode::MODE_LINES)
+    switch (mesh.mode)
     {
-        mode = LINES;
-    }
-    else if (mesh.mode == Mesh::Mode::MODE_TRIANGLES)
-    {
-        mode = TRIANGLES;
-    }
-    else
-    {
-        mode = POINTS;
+        case Mesh::Mode::MODE_POINTS:
+            mode = POINTS;
+            break;
+        case Mesh::Mode::MODE_LINES:
+            mode = LINES;
+            break;
+        case Mesh::Mode::MODE_TRIANGLES:
+            mode = TRIANGLES;
+            break;
+        case Mesh::Mode::MODE_UNKNOWN:
+        default:
+            return;
     }
 
     ViewerOpenGL::render(mode,

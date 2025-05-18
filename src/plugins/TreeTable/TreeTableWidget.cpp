@@ -204,6 +204,7 @@ void TreeTableWidget::setTable()
                                              "Height [m]",
                                              "DBH [m]",
                                              "Area [m^2]",
+                                             "Vol [m^3]",
                                              "Status"});
 
     // Content.
@@ -266,12 +267,20 @@ void TreeTableWidget::setRow(int row, size_t index)
 
     double ppm =
         mainWindow_->editor().settings().unitsSettings().pointsPerMeter()[0];
+    double ppm2 = ppm * ppm;
+    double ppm3 = ppm * ppm * ppm;
 
     // size_t id = segments_.id(index);
     LOG_DEBUG(<< "Set id <" << segment.id << "> label <" << segment.label
               << ">.");
 
-    setCell(row, COLUMN_ID, segment.id);
+    const Vector3<double> &treeColorRGB = segment.color;
+    QColor treeColor;
+    treeColor.setRedF(static_cast<float>(treeColorRGB[0]));
+    treeColor.setGreenF(static_cast<float>(treeColorRGB[1]));
+    treeColor.setBlueF(static_cast<float>(treeColorRGB[2]));
+
+    setCell(row, COLUMN_ID, segment.id, treeColor);
     setCell(row, COLUMN_LABEL, segment.label);
     setCell(row,
             COLUMN_MANAGEMENT_STATUS,
@@ -285,10 +294,15 @@ void TreeTableWidget::setRow(int row, size_t index)
     setCell(row, COLUMN_HEIGHT, treeAttributes.height / ppm);
     setCell(row, COLUMN_STATUS, treeAttributes.isValid() ? "Valid" : "Invalid");
     setCell(row, COLUMN_DBH, treeAttributes.dbh / ppm);
-    setCell(row, COLUMN_AREA, treeAttributes.area / (ppm * ppm));
+    setCell(row, COLUMN_AREA, treeAttributes.surfaceAreaProjection / ppm2);
+    setCell(row, COLUMN_VOLUME, treeAttributes.volume / ppm3);
 }
 
-void TreeTableWidget::setCell(int row, int col, bool value, bool userCheckable)
+void TreeTableWidget::setCell(int row,
+                              int col,
+                              bool value,
+                              bool userCheckable,
+                              const QColor &color)
 {
     if (userCheckable)
     {
@@ -300,40 +314,40 @@ void TreeTableWidget::setCell(int row, int col, bool value, bool userCheckable)
     }
     else
     {
-        setCell(row, col, value ? "Yes" : "No");
+        setCell(row, col, value ? "Yes" : "No", color);
     }
 }
 
-void TreeTableWidget::setCell(int row, int col, size_t value)
+void TreeTableWidget::setCell(int row,
+                              int col,
+                              size_t value,
+                              const QColor &color)
 {
-    setCell(row, col, toString(value));
+    setCell(row, col, toString(value), color);
 }
 
-void TreeTableWidget::setCell(int row, int col, double value)
+void TreeTableWidget::setCell(int row,
+                              int col,
+                              double value,
+                              const QColor &color)
 {
-    setCell(row, col, toString(value, 3));
+    setCell(row, col, toString(value, 3), color);
 }
 
-void TreeTableWidget::setCell(int row, int col, const std::string &value)
+void TreeTableWidget::setCell(int row,
+                              int col,
+                              const std::string &value,
+                              const QColor &color)
 {
     QString text(QString::fromStdString(value));
     QTableWidgetItem *item = new QTableWidgetItem(text);
-    /*
-        if (col == COLUMN_ID)
-        {
-            // Color legend.
-            size_t index = static_cast<size_t>(row);
-            const Vector3<double> &rgb = segments_[index].color;
 
-            QColor color;
-            color.setRedF(static_cast<float>(rgb[0]));
-            color.setGreenF(static_cast<float>(rgb[1]));
-            color.setBlueF(static_cast<float>(rgb[2]));
+    if (color.isValid())
+    {
+        QBrush brush(color, Qt::SolidPattern);
+        item->setBackground(brush);
+    }
 
-            QBrush brush(color, Qt::SolidPattern);
-            item->setBackground(brush);
-        }
-    */
     tableWidget_->setItem(row, col, item);
 }
 

@@ -68,6 +68,8 @@ void TreeTableExportCsv::write(const Segment &segment)
     }
 
     double ppm = properties().pointsPerMeter();
+    double ppm2 = ppm * ppm;
+    double ppm3 = ppm * ppm * ppm;
 
     // Format data into text line.
     char text[4096];
@@ -75,7 +77,7 @@ void TreeTableExportCsv::write(const Segment &segment)
 
     (void)snprintf(text,
                    sizeof(text),
-                   "%d, \"%s\", %f, %f, %f, %f, %f, %f",
+                   "%d, \"%s\", %f, %f, %f, %f, %f, %f, %f",
                    static_cast<int>(segment.id),
                    segment.label.c_str(),
                    segment.treeAttributes.position[0] / ppm,
@@ -83,7 +85,8 @@ void TreeTableExportCsv::write(const Segment &segment)
                    segment.treeAttributes.position[2] / ppm,
                    segment.treeAttributes.height / ppm,
                    segment.treeAttributes.dbh / ppm,
-                   segment.treeAttributes.area / (ppm * ppm));
+                   segment.treeAttributes.surfaceAreaProjection / ppm2,
+                   segment.treeAttributes.volume / ppm3);
 
     if (!properties().exportValidValuesOnly())
     {

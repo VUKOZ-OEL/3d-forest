@@ -278,7 +278,8 @@ void ComputeHullAction::calculateConvexHullProjection(
 
     Mesh mesh;
     ComputeHullMethod::qhull2d(data.points, mesh, z);
-    segment.treeAttributes.area = mesh.calculateSurfaceArea2d();
+    segment.treeAttributes.surfaceAreaProjection =
+        mesh.calculateSurfaceArea2d();
     mesh.name = "convexHullProjection";
     segment.meshList[mesh.name] = std::move(mesh);
 }
@@ -289,6 +290,8 @@ void ComputeHullAction::calculateAlphaShape3(Segment &segment,
     Mesh mesh;
     ComputeHullMethod::alphaShape3(data.points, mesh, parameters_.alpha);
     mesh.name = "concaveHull";
+    segment.treeAttributes.surfaceArea = mesh.surfaceArea;
+    segment.treeAttributes.volume = mesh.volume;
     segment.meshList[mesh.name] = std::move(mesh);
 }
 
@@ -299,7 +302,8 @@ void ComputeHullAction::calculateAlphaShape2(Segment &segment,
 
     Mesh mesh;
     ComputeHullMethod::alphaShape2(data.points, mesh, parameters_.alpha, z);
-    segment.treeAttributes.area = ComputeHullMethod::surface2(mesh);
+    segment.treeAttributes.surfaceAreaProjection =
+        mesh.calculateSurfaceArea2d();
     mesh.name = "concaveHullProjection";
     segment.meshList[mesh.name] = std::move(mesh);
 }

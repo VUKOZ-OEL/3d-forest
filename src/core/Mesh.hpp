@@ -40,6 +40,7 @@ public:
     /** Mesh Geometric Primitive Type. */
     enum class EXPORT_CORE Mode
     {
+        MODE_UNKNOWN,
         MODE_POINTS,
         MODE_LINES,
         MODE_TRIANGLES
@@ -49,7 +50,7 @@ public:
     std::string name;
 
     /// Mesh geometric primitive type.
-    Mesh::Mode mode;
+    Mesh::Mode mode{Mesh::Mode::MODE_UNKNOWN};
 
     /// Mesh position vertex data [x0, y0, z0, x1, y1, ...].
     std::vector<float> position;
@@ -60,6 +61,12 @@ public:
 
     /// Mesh vertex indices.
     std::vector<unsigned int> indices;
+
+    /// Mesh volume.
+    double volume{0.0};
+
+    /// Mesh surface area.
+    double surfaceArea{0.0};
 
     Mesh();
     ~Mesh();

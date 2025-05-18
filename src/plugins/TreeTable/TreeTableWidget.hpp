@@ -67,6 +67,7 @@ private:
         COLUMN_HEIGHT,
         COLUMN_DBH,
         COLUMN_AREA,
+        COLUMN_VOLUME,
         COLUMN_STATUS,
         COLUMN_LAST,
     };
@@ -91,10 +92,23 @@ private:
 
     void setTable();
     void setRow(int row, size_t index);
-    void setCell(int row, int col, bool value, bool userCheckable);
-    void setCell(int row, int col, size_t value);
-    void setCell(int row, int col, double value);
-    void setCell(int row, int col, const std::string &value);
+    void setCell(int row,
+                 int col,
+                 bool value,
+                 bool userCheckable,
+                 const QColor &color = QColor());
+    void setCell(int row,
+                 int col,
+                 size_t value,
+                 const QColor &color = QColor());
+    void setCell(int row,
+                 int col,
+                 double value,
+                 const QColor &color = QColor());
+    void setCell(int row,
+                 int col,
+                 const std::string &value,
+                 const QColor &color = QColor());
 
     void block();
     void unblock();

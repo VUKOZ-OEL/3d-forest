@@ -220,6 +220,7 @@ void ComputeHullMethod::alphaShape3(const std::vector<double> &points,
     typedef CGAL::Delaunay_triangulation_3<K, Tds> Triangulation_3;
     typedef CGAL::Alpha_shape_3<Triangulation_3> Alpha_shape_3;
     typedef K::Point_3 Point;
+    typedef K::Triangle_3 Triangle;
 
     // Define a vector of 3D points used to construct the alpha shape.
     std::vector<Point> pointsAS;
@@ -278,20 +279,40 @@ void ComputeHullMethod::alphaShape3(const std::vector<double> &points,
 
         // Extract the three vertices of the facet by skipping the vertex
         // at index i.
-        std::array<Point, 3> triangle;
+        std::array<Point, 3> t;
         int idx = 0;
         for (int j = 0; j < 4; ++j)
         {
             if (j != i)
             {
-                triangle[idx++] = cell->vertex(j)->point();
+                t[idx++] = cell->vertex(j)->point();
             }
         }
+#if 0
+        // Find the neighbor on the other side of the facet
+        Alpha_shape_3::Cell_handle neighbor = cell->neighbor(i);
 
+        // Classify current and neighbor cells
+        Alpha_shape_3::Classification_type c_class = as.classify(cell);
+        Alpha_shape_3::Classification_type n_class = as.classify(neighbor);
+
+        // Flip if needed: ensure normal points from inside to outside
+        // Assuming "c" is inside and "neighbor" is outside
+        bool c_is_inside = (c_class == Alpha_shape_3::INTERIOR ||
+                            c_class == Alpha_shape_3::SINGULAR ||
+                            c_class == Alpha_shape_3::REGULAR);
+        bool neighbor_is_outside = (n_class == Alpha_shape_3::EXTERIOR);
+
+        if (!(c_is_inside && neighbor_is_outside))
+        {
+            // Flip normal direction
+            std::swap(t[1], t[2]);
+        }
+#endif
         // Store the triangle's vertices sequentially into the triangle list.
-        triangles.push_back(triangle[0]);
-        triangles.push_back(triangle[1]);
-        triangles.push_back(triangle[2]);
+        triangles.push_back(t[0]);
+        triangles.push_back(t[1]);
+        triangles.push_back(t[2]);
     }
 
     // Create Mesh.
@@ -317,6 +338,82 @@ void ComputeHullMethod::alphaShape3(const std::vector<double> &points,
     }
 
     mesh.calculateNormals();
+
+    // Calculate the volume.
+    double totalVolume = 0.0;
+    for (auto it = as.finite_cells_begin(); it != as.finite_cells_end(); ++it)
+    {
+        // Skip cells that are not part of the solid interior.
+        if (as.classify(it) != Alpha_shape_3::INTERIOR)
+        {
+            continue;
+        }
+
+        // Get the 4 points of the tetrahedron.
+        const Point &p0 = it->vertex(0)->point();
+        const Point &p1 = it->vertex(1)->point();
+        const Point &p2 = it->vertex(2)->point();
+        const Point &p3 = it->vertex(3)->point();
+
+        // Compute signed volume of the tetrahedron.
+        double volume = std::abs(CGAL::to_double(CGAL::scalar_product(
+                            CGAL::cross_product(p1 - p0, p2 - p0),
+                            p3 - p0))) /
+                        6.0;
+
+        totalVolume += volume;
+    }
+
+    mesh.volume = totalVolume;
+
+    // Calculate the surface area.
+    double totalArea = 0.0;
+
+    // Loop through all finite facets (triangular faces of tetrahedra).
+    for (auto it = as.finite_facets_begin(); it != as.finite_facets_end(); ++it)
+    {
+        // Only consider facets which are part of the alpha shape boundary.
+        if (as.classify(*it) != Alpha_shape_3::REGULAR)
+        {
+            continue;
+        }
+
+        auto cell = it->first;
+        int i = it->second;
+
+        // Get neighboring cell across the facet.
+        auto neighbor = cell->neighbor(i);
+
+        // Classify the two cells on either side of the facet.
+        auto class1 = as.classify(cell);
+        auto class2 = as.classify(neighbor);
+
+        // Check if this facet separates INTERIOR from NON-INTERIOR
+        // (i.e., lies on the surface).
+        bool isBoundary = (class1 == Alpha_shape_3::INTERIOR &&
+                           class2 != Alpha_shape_3::INTERIOR) ||
+                          (class2 == Alpha_shape_3::INTERIOR &&
+                           class1 != Alpha_shape_3::INTERIOR);
+
+        if (isBoundary)
+        {
+            // The facet is opposite vertex 'i', so the triangle is formed by
+            // the other three vertices.
+            int i1 = (i + 1) % 4;
+            int i2 = (i + 2) % 4;
+            int i3 = (i + 3) % 4;
+
+            const Point &p1 = cell->vertex(i1)->point();
+            const Point &p2 = cell->vertex(i2)->point();
+            const Point &p3 = cell->vertex(i3)->point();
+
+            // Compute the area of the triangle and add to the total.
+            Triangle tri(p1, p2, p3);
+            totalArea += std::sqrt(CGAL::to_double(tri.squared_area()));
+        }
+    }
+
+    mesh.surfaceArea = totalArea;
 }
 
 void ComputeHullMethod::alphaShape2(const std::vector<double> &points,
@@ -333,9 +430,6 @@ void ComputeHullMethod::alphaShape2(const std::vector<double> &points,
     typedef CGAL::Triangulation_data_structure_2<Vb, Fb> Tds;
     typedef CGAL::Delaunay_triangulation_2<K, Tds> Triangulation_2;
     typedef CGAL::Alpha_shape_2<Triangulation_2> Alpha_shape_2;
-
-    typedef Alpha_shape_2::Alpha_shape_edges_iterator
-        Alpha_shape_edges_iterator;
 
     // Define a vector of 2D points used to construct the alpha shape.
     std::vector<Point> pointsAS;
@@ -374,6 +468,46 @@ void ComputeHullMethod::alphaShape2(const std::vector<double> &points,
 
     LOG_DEBUG(<< "Using alpha <" << as.get_alpha() << ">.");
 
+    // Extract triangles.
+    std::vector<Point> triangles;
+    for (auto it = as.finite_faces_begin(); it != as.finite_faces_end(); ++it)
+    {
+        if (as.classify(it) != Alpha_shape_2::INTERIOR)
+        {
+            continue;
+        }
+
+        for (int i = 0; i < 3; ++i)
+        {
+            triangles.push_back(it->vertex(i)->point());
+        }
+    }
+
+    // Create Mesh.
+    size_t nFaces = triangles.size() / 3;
+
+    mesh.clear();
+    mesh.mode = Mesh::Mode::MODE_TRIANGLES;
+    mesh.position.resize(nFaces * 3 * 3);
+
+    for (size_t i = 0; i < nFaces; i++)
+    {
+        mesh.position[i * 9 + 0] = static_cast<float>(triangles[i * 3 + 0].x());
+        mesh.position[i * 9 + 1] = static_cast<float>(triangles[i * 3 + 0].y());
+        mesh.position[i * 9 + 2] = z;
+
+        mesh.position[i * 9 + 3] = static_cast<float>(triangles[i * 3 + 1].x());
+        mesh.position[i * 9 + 4] = static_cast<float>(triangles[i * 3 + 1].y());
+        mesh.position[i * 9 + 5] = z;
+
+        mesh.position[i * 9 + 6] = static_cast<float>(triangles[i * 3 + 2].x());
+        mesh.position[i * 9 + 7] = static_cast<float>(triangles[i * 3 + 2].y());
+        mesh.position[i * 9 + 8] = z;
+    }
+
+    mesh.calculateNormals();
+
+#if 0
     // Extract polygon boundary.
     std::vector<Point> boundary;
     for (Alpha_shape_edges_iterator it = as.alpha_shape_edges_begin();
@@ -398,6 +532,7 @@ void ComputeHullMethod::alphaShape2(const std::vector<double> &points,
         mesh.position[i * 3 + 1] = static_cast<float>(boundary[i].y());
         mesh.position[i * 3 + 2] = z;
     }
+#endif
 }
 
 double ComputeHullMethod::surface2(const Mesh &mesh)
