@@ -70,6 +70,16 @@ void toJson(Json &out, const Segment &in)
 
     toJson(out["boundary"], in.boundary);
     toJson(out["treeAttributes"], in.treeAttributes);
+
+#if 0
+    // Export mesh list.
+    size_t iMesh = 0;
+    for (const auto &it : in.meshList)
+    {
+        toJson(out["meshList"][iMesh], it.second);
+        iMesh++;
+    }
+#endif
 }
 
 std::ostream &operator<<(std::ostream &out, const Segment &in)
