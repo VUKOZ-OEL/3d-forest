@@ -44,7 +44,7 @@ UnitsSettingsWidget::UnitsSettingsWidget(MainWindow *mainWindow)
 {
     // Widgets.
     ppmLasSpinBox_ = new QDoubleSpinBox;
-    ppmLasSpinBox_->setRange(1, 10000);
+    ppmLasSpinBox_->setRange(1, 1000000);
     ppmLasSpinBox_->setValue(1000);
     ppmLasSpinBox_->setSingleStep(1);
     ppmLasSpinBox_->setEnabled(false);
@@ -54,7 +54,7 @@ UnitsSettingsWidget::UnitsSettingsWidget(MainWindow *mainWindow)
             SLOT(slotIntermediateLas(double)));
 
     ppmUserSpinBox_ = new QDoubleSpinBox;
-    ppmUserSpinBox_->setRange(1, 10000);
+    ppmUserSpinBox_->setRange(1, 1000000);
     ppmUserSpinBox_->setValue(1000);
     ppmUserSpinBox_->setSingleStep(1);
     ppmUserSpinBox_->setEnabled(settings_.userDefined);
