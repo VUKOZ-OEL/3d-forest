@@ -91,6 +91,18 @@ void ViewerOpenGLViewport::initializeGL()
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     glClearDepth(1.0F);
+
+    glEnable(GL_NORMALIZE);
+    glShadeModel(GL_SMOOTH);
+
+    glEnable(GL_COLOR_MATERIAL);
+    glColorMaterial(GL_FRONT, GL_DIFFUSE);
+
+    GLfloat diffuse[] = {1.0f, 1.0f, 1.0f, 1.0f};
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+
+    GLfloat lightDir[] = {-1.0f, -1.0f, -1.0f, 0.0f}; // Directional light.
+    glLightfv(GL_LIGHT0, GL_POSITION, lightDir);
 }
 
 void ViewerOpenGLViewport::resizeGL(int w, int h)
