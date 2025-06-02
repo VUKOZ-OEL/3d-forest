@@ -101,6 +101,9 @@ void ViewerOpenGLViewport::initializeGL()
     GLfloat diffuse[] = {1.0f, 1.0f, 1.0f, 1.0f};
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
 
+    GLfloat ambient[] = {0.2f, 0.2f, 0.2f, 1.0f};
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+
     GLfloat lightDir[] = {-1.0f, -1.0f, -1.0f, 0.0f}; // Directional light.
     glLightfv(GL_LIGHT0, GL_POSITION, lightDir);
 }
@@ -599,6 +602,7 @@ void ViewerOpenGLViewport::renderSegments()
             glEnable(GL_DEPTH_TEST);
         }
 
+#if 1
         if (editor_->settings().treeSettings().concaveHullVisible())
         {
             glEnable(GL_BLEND);
@@ -618,6 +622,29 @@ void ViewerOpenGLViewport::renderSegments()
             glDisable(GL_BLEND);
             glEnable(GL_DEPTH_TEST);
         }
+#else
+        if (editor_->settings().treeSettings().concaveHullVisible())
+        {
+            glEnable(GL_LIGHTING);
+            glEnable(GL_LIGHT0);
+
+            GLfloat lightDir[] = {-1.0f, -1.0f, -1.0f, 0.0f};
+            glLightfv(GL_LIGHT0, GL_POSITION, lightDir);
+
+            glColor3f(r, g, b);
+
+            // Render meshes.
+            for (const auto &it : segment.meshList)
+            {
+                if (it.first == "concaveHull")
+                {
+                    ViewerOpenGL::render(it.second);
+                }
+            }
+
+            glDisable(GL_LIGHTING);
+        }
+#endif
 
         if (editor_->settings().treeSettings().convexHullVisible())
         {

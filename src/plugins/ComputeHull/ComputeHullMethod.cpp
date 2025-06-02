@@ -209,6 +209,25 @@ void ComputeHullMethod::qhull2d(const std::vector<double> &points,
     }
 }
 
+// Helper for keying by rounded point position (epsilon ~1e-6)
+struct RoundedPointKey
+{
+    int x, y, z;
+    static constexpr double scale = 1e6;
+
+    RoundedPointKey(double x_, double y_, double z_)
+    {
+        x = static_cast<int>(std::round(x_ * scale));
+        y = static_cast<int>(std::round(y_ * scale));
+        z = static_cast<int>(std::round(z_ * scale));
+    }
+
+    bool operator<(const RoundedPointKey &other) const
+    {
+        return std::tie(x, y, z) < std::tie(other.x, other.y, other.z);
+    }
+};
+
 void ComputeHullMethod::alphaShape3(const std::vector<double> &points,
                                     Mesh &mesh,
                                     double alpha)
@@ -221,6 +240,11 @@ void ComputeHullMethod::alphaShape3(const std::vector<double> &points,
     typedef CGAL::Alpha_shape_3<Triangulation_3> Alpha_shape_3;
     typedef K::Point_3 Point;
     typedef K::Triangle_3 Triangle;
+    typedef K::Vector_3 Vector;
+
+    typedef Alpha_shape_3::Cell_handle Cell_handle;
+    // typedef Alpha_shape_3::Vertex_handle Vertex_handle;
+    // typedef Alpha_shape_3::Facet Facet;
 
     // Define a vector of 3D points used to construct the alpha shape.
     std::vector<Point> pointsAS;
@@ -263,60 +287,78 @@ void ComputeHullMethod::alphaShape3(const std::vector<double> &points,
 
     LOG_DEBUG(<< "Using alpha <" << as.get_alpha() << ">.");
 
-    // Vector to store vertices of all surface triangles
-    // (each triangle consists of 3 Point objects).
-    std::vector<Point> triangles;
+    // Flat list of triangle vertices: a, b, c, d, e, f ...
+    // Each group of 3 represents a triangle
+    std::vector<Point> vertices;
 
-    // Loop over all facets (triangular faces) that are part of the alpha shape.
-    for (auto fit = as.alpha_shape_facets_begin();
-         fit != as.alpha_shape_facets_end();
+    // Matching flat list of normals: one per vertex in vertices
+    std::vector<Vector> normals;
+
+    // Intermediate structures
+    std::map<Point, Vector> accumulatedNormals;
+    std::map<RoundedPointKey, Vector> normal_buckets;
+
+    // First pass: accumulate normals at each unique vertex
+    for (auto fit = as.finite_facets_begin(); fit != as.finite_facets_end();
          ++fit)
     {
-        // Each facet is represented by a pair: a cell (tetrahedron) and the
-        // index of the face (0-3) opposite to vertex i.
-        Alpha_shape_3::Cell_handle cell = fit->first;
+        auto type = as.classify(*fit);
+        if (type != Alpha_shape_3::REGULAR && type != Alpha_shape_3::SINGULAR)
+            continue;
+
+        Cell_handle cell = fit->first;
         int i = fit->second;
 
-        // Extract the three vertices of the facet by skipping the vertex
-        // at index i.
-        std::array<Point, 3> t;
+        Point p[3];
         int idx = 0;
         for (int j = 0; j < 4; ++j)
-        {
             if (j != i)
+                p[idx++] = cell->vertex(j)->point();
+
+        Vector normal = CGAL::cross_product(p[1] - p[0], p[2] - p[0]);
+
+        if (normal != CGAL::NULL_VECTOR)
+            for (int k = 0; k < 3; ++k)
             {
-                t[idx++] = cell->vertex(j)->point();
+                RoundedPointKey key(p[k].x(), p[k].y(), p[k].z());
+                normal_buckets[key] = normal_buckets[key] + normal;
+                accumulatedNormals[p[k]] = accumulatedNormals[p[k]] + normal;
             }
-        }
-#if 0
-        // Find the neighbor on the other side of the facet
-        Alpha_shape_3::Cell_handle neighbor = cell->neighbor(i);
+    }
 
-        // Classify current and neighbor cells
-        Alpha_shape_3::Classification_type c_class = as.classify(cell);
-        Alpha_shape_3::Classification_type n_class = as.classify(neighbor);
+    // Second pass: rebuild flat triangle list and use smoothed normals
+    for (auto fit = as.finite_facets_begin(); fit != as.finite_facets_end();
+         ++fit)
+    {
+        auto type = as.classify(*fit);
+        if (type != Alpha_shape_3::REGULAR && type != Alpha_shape_3::SINGULAR)
+            continue;
 
-        // Flip if needed: ensure normal points from inside to outside
-        // Assuming "c" is inside and "neighbor" is outside
-        bool c_is_inside = (c_class == Alpha_shape_3::INTERIOR ||
-                            c_class == Alpha_shape_3::SINGULAR ||
-                            c_class == Alpha_shape_3::REGULAR);
-        bool neighbor_is_outside = (n_class == Alpha_shape_3::EXTERIOR);
+        Cell_handle cell = fit->first;
+        int i = fit->second;
 
-        if (!(c_is_inside && neighbor_is_outside))
+        Point p[3];
+        int idx = 0;
+        for (int j = 0; j < 4; ++j)
+            if (j != i)
+                p[idx++] = cell->vertex(j)->point();
+
+        for (int k = 0; k < 3; ++k)
         {
-            // Flip normal direction
-            std::swap(t[1], t[2]);
+            vertices.push_back(p[k]);
+
+            // Vector n = accumulatedNormals[p[k]];
+            RoundedPointKey key(p[k].x(), p[k].y(), p[k].z());
+            Vector n = normal_buckets[key];
+            if (n != CGAL::NULL_VECTOR)
+                n = n / std::sqrt(n.squared_length());
+
+            normals.push_back(n);
         }
-#endif
-        // Store the triangle's vertices sequentially into the triangle list.
-        triangles.push_back(t[0]);
-        triangles.push_back(t[1]);
-        triangles.push_back(t[2]);
     }
 
     // Create Mesh.
-    size_t nFaces = triangles.size() / 3;
+    size_t nFaces = vertices.size() / 3;
 
     mesh.clear();
     mesh.mode = Mesh::Mode::MODE_TRIANGLES;
@@ -324,21 +366,38 @@ void ComputeHullMethod::alphaShape3(const std::vector<double> &points,
 
     for (size_t i = 0; i < nFaces; i++)
     {
-        mesh.position[i * 9 + 0] = static_cast<float>(triangles[i * 3 + 0].x());
-        mesh.position[i * 9 + 1] = static_cast<float>(triangles[i * 3 + 0].y());
-        mesh.position[i * 9 + 2] = static_cast<float>(triangles[i * 3 + 0].z());
+        mesh.position[i * 9 + 0] = static_cast<float>(vertices[i * 3 + 0].x());
+        mesh.position[i * 9 + 1] = static_cast<float>(vertices[i * 3 + 0].y());
+        mesh.position[i * 9 + 2] = static_cast<float>(vertices[i * 3 + 0].z());
 
-        mesh.position[i * 9 + 3] = static_cast<float>(triangles[i * 3 + 1].x());
-        mesh.position[i * 9 + 4] = static_cast<float>(triangles[i * 3 + 1].y());
-        mesh.position[i * 9 + 5] = static_cast<float>(triangles[i * 3 + 1].z());
+        mesh.position[i * 9 + 3] = static_cast<float>(vertices[i * 3 + 1].x());
+        mesh.position[i * 9 + 4] = static_cast<float>(vertices[i * 3 + 1].y());
+        mesh.position[i * 9 + 5] = static_cast<float>(vertices[i * 3 + 1].z());
 
-        mesh.position[i * 9 + 6] = static_cast<float>(triangles[i * 3 + 2].x());
-        mesh.position[i * 9 + 7] = static_cast<float>(triangles[i * 3 + 2].y());
-        mesh.position[i * 9 + 8] = static_cast<float>(triangles[i * 3 + 2].z());
+        mesh.position[i * 9 + 6] = static_cast<float>(vertices[i * 3 + 2].x());
+        mesh.position[i * 9 + 7] = static_cast<float>(vertices[i * 3 + 2].y());
+        mesh.position[i * 9 + 8] = static_cast<float>(vertices[i * 3 + 2].z());
+    }
+#if 0
+    mesh.normal.resize(nFaces * 3 * 3);
+
+    for (size_t i = 0; i < nFaces; i++)
+    {
+        mesh.normal[i * 9 + 0] = static_cast<float>(normals[i * 3 + 0].x());
+        mesh.normal[i * 9 + 1] = static_cast<float>(normals[i * 3 + 0].y());
+        mesh.normal[i * 9 + 2] = static_cast<float>(normals[i * 3 + 0].z());
+
+        mesh.normal[i * 9 + 3] = static_cast<float>(normals[i * 3 + 1].x());
+        mesh.normal[i * 9 + 4] = static_cast<float>(normals[i * 3 + 1].y());
+        mesh.normal[i * 9 + 5] = static_cast<float>(normals[i * 3 + 1].z());
+
+        mesh.normal[i * 9 + 6] = static_cast<float>(normals[i * 3 + 2].x());
+        mesh.normal[i * 9 + 7] = static_cast<float>(normals[i * 3 + 2].y());
+        mesh.normal[i * 9 + 8] = static_cast<float>(normals[i * 3 + 2].z());
     }
 
-    mesh.calculateNormals();
-
+    // mesh.calculateNormals();
+#endif
     // Calculate the volume.
     double totalVolume = 0.0;
     for (auto it = as.finite_cells_begin(); it != as.finite_cells_end(); ++it)
