@@ -412,9 +412,20 @@ void TreeTableWidget::slotExport()
 
             writer->create(writer->properties().fileName());
 
-            for (size_t i = 1; i < segments_.size(); i++)
+            int rowCount = tableWidget_->rowCount();
+            for (int row = 0; row < rowCount; ++row)
             {
-                writer->write(segments_[i]);
+                QTableWidgetItem *item = tableWidget_->item(row, COLUMN_ID);
+                if (item)
+                {
+                    QString text = item->text();
+                    size_t id = static_cast<size_t>(text.toULong());
+                    size_t index = segments_.index(id, false);
+                    if (index != SIZE_MAX)
+                    {
+                        writer->write(segments_[index]);
+                    }
+                }
             }
 
             fileName_ = QString::fromStdString(writer->properties().fileName());
