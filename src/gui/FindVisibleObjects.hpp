@@ -28,11 +28,17 @@
 // Include 3D Forest.
 class MainWindow;
 
+// Include local.
+#include <ExportGui.hpp>
+#include <WarningsDisable.hpp>
+
 /** Find Visible Objects. */
-class FindVisibleObjects
+class EXPORT_GUI FindVisibleObjects
 {
 public:
     static void run(std::unordered_set<size_t> &result, MainWindow *mainWindow);
 };
+
+#include <WarningsEnable.hpp>
 
 #endif /* FIND_VISIBLE_OBJECTS_HPP */
