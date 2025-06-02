@@ -48,6 +48,9 @@ public:
     /// The position of calculated DBH circle.
     Vector3<double> dbhPosition;
 
+    /// The normal vector of calculated DBH circle.
+    Vector3<double> dbhNormal;
+
     /// Calculated DBH (Diameter at Breast Height) value.
     double dbh{0.0};
 
@@ -92,6 +95,7 @@ inline void toJson(Json &out, const TreeAttributes &in)
     toJson(out["surfaceArea"], in.surfaceArea);
     toJson(out["volume"], in.volume);
     toJson(out["dbhPosition"], in.dbhPosition);
+    toJson(out["dbhNormal"], in.dbhNormal);
     toJson(out["dbh"], in.dbh);
 }
 
@@ -103,6 +107,14 @@ inline void fromJson(TreeAttributes &out, const Json &in)
     fromJson(out.surfaceArea, in["surfaceArea"]);
     fromJson(out.volume, in["volume"]);
     fromJson(out.dbhPosition, in["dbhPosition"]);
+    if (in.contains("dbhNormal"))
+    {
+        fromJson(out.dbhNormal, in["dbhNormal"]);
+    }
+    else
+    {
+        out.dbhNormal.set(0.0, 0.0, 1.0);
+    }
     fromJson(out.dbh, in["dbh"]);
 }
 

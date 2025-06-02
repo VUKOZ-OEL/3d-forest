@@ -361,6 +361,74 @@ void ViewerOpenGL::renderCylinder(const Vector3<float> &a,
     glDisableClientState(GL_VERTEX_ARRAY);
 }
 
+void ViewerOpenGL::renderHollowCylinder(const Vector3<float> &a,
+                                        const Vector3<float> &b,
+                                        float radius,
+                                        size_t slices)
+{
+    Vector3<float> ab = b - a;
+    float length = ab.length();
+
+    if (length < 1e-6F || slices < 3)
+    {
+        return;
+    }
+
+    Vector3<float> n1 = ab.normalized();
+    Vector3<float> n2 = n1.perpendicular();
+
+    double sliceAngle = 6.283185307 / static_cast<double>(slices);
+
+    GLuint nSlices = static_cast<GLuint>(slices);
+    std::vector<Vector3<float>> xyz;
+    std::vector<Vector3<float>> normal;
+    std::vector<GLuint> indices;
+
+    xyz.resize(slices * 2);
+    normal.resize(slices * 2);
+    indices.resize(slices * 6);
+
+    for (GLuint i = 0; i < nSlices; i++)
+    {
+        // Vertices
+        n2.normalize();
+
+        xyz[i * 2 + 0] = a + (radius * n2);
+        xyz[i * 2 + 1] = b + (radius * n2);
+
+        normal[i * 2 + 0] = n2;
+        normal[i * 2 + 1] = n2;
+
+        n2 = n2.rotated(n1, sliceAngle);
+
+        // Indices
+        GLuint i0 = (i * 2);
+        GLuint i1 = (i0 + 2) % (2 * nSlices); // Wrap around
+        GLuint j0 = i0 + 1;
+        GLuint j1 = i1 + 1;
+
+        // First triangle
+        indices[i * 6 + 0] = i0;
+        indices[i * 6 + 1] = i1;
+        indices[i * 6 + 2] = j1;
+
+        // Second triangle
+        indices[i * 6 + 3] = i0;
+        indices[i * 6 + 4] = j1;
+        indices[i * 6 + 5] = j0;
+    }
+
+    // Render the vertex array.
+    GLsizei indicesCount = static_cast<GLsizei>(indices.size());
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, static_cast<GLvoid *>(xyz.data()));
+    glNormalPointer(GL_FLOAT, 0, normal.data());
+    glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, indices.data());
+    glDisableClientState(GL_NORMAL_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
+}
+
 void ViewerOpenGL::renderAxis()
 {
     float d = 1.0F;

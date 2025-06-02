@@ -163,6 +163,10 @@ public:
                                const Vector3<float> &b,
                                float radius,
                                size_t slices = 16);
+    static void renderHollowCylinder(const Vector3<float> &a,
+                                     const Vector3<float> &b,
+                                     float radius,
+                                     size_t slices = 16);
     static void renderAxis();
     static void renderCross(const Vector3<float> &p,
                             float lengthX,

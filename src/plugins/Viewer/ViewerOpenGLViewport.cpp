@@ -89,7 +89,8 @@ void ViewerOpenGLViewport::initializeGL()
     setUpdateBehavior(QOpenGLWidget::PartialUpdate);
 
     glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
+    // glDepthFunc(GL_LEQUAL);
+    glDepthFunc(GL_LESS);
     glClearDepth(1.0F);
 
     glEnable(GL_NORMALIZE);
@@ -97,14 +98,17 @@ void ViewerOpenGLViewport::initializeGL()
 
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT, GL_DIFFUSE);
+    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 
-    GLfloat diffuse[] = {1.0f, 1.0f, 1.0f, 1.0f};
+    glEnable(GL_LIGHT0);
+
+    GLfloat diffuse[] = {1.0F, 1.0F, 1.0F, 1.0F};
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
 
-    GLfloat ambient[] = {0.2f, 0.2f, 0.2f, 1.0f};
+    GLfloat ambient[] = {0.2F, 0.2F, 0.2F, 1.0F};
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
 
-    GLfloat lightDir[] = {-1.0f, -1.0f, -1.0f, 0.0f}; // Directional light.
+    GLfloat lightDir[] = {-1.0F, -1.0F, -1.0F, 0.0F}; // Directional light.
     glLightfv(GL_LIGHT0, GL_POSITION, lightDir);
 }
 
@@ -360,6 +364,13 @@ void ViewerOpenGLViewport::paintGL()
     glLoadMatrixf(camera_.projection().data());
 
     glMatrixMode(GL_MODELVIEW);
+
+    // Setup directional light.
+    glLoadIdentity();
+    GLfloat lightDir[] = {1.0F, -1.0F, 0.0F, 0.0F};
+    glLightfv(GL_LIGHT0, GL_POSITION, lightDir);
+
+    // Finish camera setup.
     glLoadMatrixf(camera_.modelView().data());
 
     // Render.
@@ -626,11 +637,6 @@ void ViewerOpenGLViewport::renderSegments()
         if (editor_->settings().treeSettings().concaveHullVisible())
         {
             glEnable(GL_LIGHTING);
-            glEnable(GL_LIGHT0);
-
-            GLfloat lightDir[] = {-1.0f, -1.0f, -1.0f, 0.0f};
-            glLightfv(GL_LIGHT0, GL_POSITION, lightDir);
-
             glColor3f(r, g, b);
 
             // Render meshes.
@@ -684,17 +690,35 @@ void ViewerOpenGLViewport::renderAttributes()
         // Render attributes.
         const TreeAttributes &attributes = segment.treeAttributes;
 
-        glColor3f(1.0F, 1.0F, 0.0F);
-
         if (attributes.isDbhValid())
         {
-            Vector3<float> treeDbhPosition(attributes.dbhPosition);
+            glColor3f(1.0F, 0.0F, 0.0F);
+
             float treeDbhRadius = static_cast<float>(attributes.dbh) * 0.5F;
-            ViewerOpenGL::renderCircle(treeDbhPosition, treeDbhRadius);
+
+            Vector3<float> treeDbhPosition(attributes.dbhPosition);
+            Vector3<float> treeDbhNormal(attributes.dbhNormal);
+
+            Vector3<float> a = treeDbhPosition;
+            Vector3<float> b = a + (treeDbhNormal * treeDbhRadius * 0.75F);
+
+            glEnable(GL_LIGHTING);
+            glDisable(GL_COLOR_MATERIAL);
+            GLfloat diffuse[] = {1.0F, 0.0F, 0.0F, 1.0F};
+            glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+            GLfloat ambient[] = {0.5F, 0.0F, 0.0F, 1.0F};
+            glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+
+            ViewerOpenGL::renderHollowCylinder(a, b, treeDbhRadius, 10);
+
+            glEnable(GL_COLOR_MATERIAL);
+            glDisable(GL_LIGHTING);
         }
 
         if (attributes.isPositionValid())
         {
+            glColor3f(1.0F, 1.0F, 0.0F);
+
             Vector3<float> treePosition = attributes.position;
 
             if (attributes.isHeightValid())

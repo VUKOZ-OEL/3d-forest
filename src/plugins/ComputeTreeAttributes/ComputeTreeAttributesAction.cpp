@@ -275,6 +275,7 @@ void ComputeTreeAttributesAction::calculateDbhRht(
                                                            parameters_);
 
     tree.treeAttributes.dbhPosition.set(circle.a, circle.b, circle.z);
+    tree.treeAttributes.dbhNormal.set(0.0, 0.0, 1.0);
     tree.treeAttributes.dbh = circle.r * 2.0;
 }
 
@@ -292,6 +293,7 @@ void ComputeTreeAttributesAction::calculateDbhLsr(
                                                                  parameters_);
 
     tree.treeAttributes.dbhPosition.set(circle.a, circle.b, circle.z);
+    tree.treeAttributes.dbhNormal.set(0.0, 0.0, 1.0);
     tree.treeAttributes.dbh = circle.r * 2.0;
 }
 
