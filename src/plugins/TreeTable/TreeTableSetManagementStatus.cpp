@@ -25,10 +25,10 @@
 #include <TreeTableSetManagementStatus.hpp>
 
 // Include Qt.
-#include <QCoreApplication>
-#include <QProgressDialog>
 #include <QAction>
+#include <QCoreApplication>
 #include <QMenu>
+#include <QProgressDialog>
 
 // Include local.
 #define LOG_MODULE_NAME "TreeTableSetManagementStatus"
