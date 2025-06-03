@@ -23,16 +23,33 @@
 #define TREE_TABLE_SET_MANAGEMENT_STATUS_HPP
 
 // Include Std.
+#include <map>
 #include <unordered_set>
 
 // Include 3D Forest.
 class MainWindow;
 
+// Include Qt.
+class QAction;
+class QMenu;
+
 /** Tree Table Set Management Status. */
 class TreeTableSetManagementStatus
 {
 public:
+    TreeTableSetManagementStatus(MainWindow *mainWindow, QMenu *contextMenu);
+
+    void runAction(QAction *selectedAction, std::unordered_set<size_t> idList);
+
     static void run(MainWindow *mainWindow, std::unordered_set<size_t> idList);
+
+private:
+    MainWindow *mainWindow_;
+    QMenu *contextMenu_;
+    QMenu *menu_;
+    std::map<QAction *, size_t> actions_;
+
+    void create();
 };
 
 #endif /* TREE_TABLE_SET_MANAGEMENT_STATUS_HPP */

@@ -456,10 +456,14 @@ void TreeTableWidget::slotCustomContextMenuRequested(const QPoint &pos)
     LOG_DEBUG(<< "Row <" << index.row() << "> column <" << index.column()
               << ">.");
 
+    mainWindow_->suspendThreads();
+
     // Create and run the context menu.
     QMenu contextMenu(this);
-    QAction *setStatusAction = contextMenu.addAction("Set Management Status");
-    QAction *setSpeciesAction = contextMenu.addAction("Set Species");
+
+    TreeTableSetManagementStatus managementStatusMenu(mainWindow_,
+                                                      &contextMenu);
+    TreeTableSetSpecies speciesMenu(mainWindow_, &contextMenu);
 
     QAction *selectedAction =
         contextMenu.exec(tableWidget_->viewport()->mapToGlobal(pos));
@@ -487,14 +491,8 @@ void TreeTableWidget::slotCustomContextMenuRequested(const QPoint &pos)
     }
 
     // Run selected action.
-    if (selectedAction == setStatusAction)
-    {
-        TreeTableSetManagementStatus::run(mainWindow_, idList);
-    }
-    else if (selectedAction == setSpeciesAction)
-    {
-        TreeTableSetSpecies::run(mainWindow_, idList);
-    }
+    managementStatusMenu.runAction(selectedAction, idList);
+    speciesMenu.runAction(selectedAction, idList);
 }
 
 void TreeTableWidget::closeWidget()

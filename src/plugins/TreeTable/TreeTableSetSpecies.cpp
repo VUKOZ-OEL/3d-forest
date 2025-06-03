@@ -25,13 +25,75 @@
 #include <TreeTableSetSpecies.hpp>
 
 // Include Qt.
+#include <QAction>
 #include <QCoreApplication>
+#include <QMenu>
 #include <QProgressDialog>
 
 // Include local.
 #define LOG_MODULE_NAME "TreeTableSetSpecies"
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
+
+TreeTableSetSpecies::TreeTableSetSpecies(MainWindow *mainWindow,
+                                         QMenu *contextMenu)
+    : mainWindow_(mainWindow),
+      contextMenu_(contextMenu),
+      menu_(nullptr)
+{
+    create();
+}
+
+void TreeTableSetSpecies::create()
+{
+    menu_ = new QMenu("Set Species", contextMenu_);
+
+    // Set dialog items.
+    Editor *editor = &mainWindow_->editor();
+    const SpeciesList &speciesList = editor->speciesList();
+    for (size_t i = 0; i < speciesList.size(); i++)
+    {
+        const Species &species = speciesList[i];
+        QString text = QString::number(species.id) + " : " +
+                       QString::fromStdString(species.latin);
+
+        QAction *action = menu_->addAction(text);
+        actions_[action] = species.id;
+    }
+
+    // Add to the parent menu.
+    contextMenu_->addMenu(menu_);
+}
+
+void TreeTableSetSpecies::runAction(QAction *selectedAction,
+                                    std::unordered_set<size_t> idList)
+{
+    auto it = actions_.find(selectedAction);
+    if (it == actions_.end())
+    {
+        return;
+    }
+
+    LOG_DEBUG(<< "Start setting species values.");
+
+    size_t newSpeciesId = it->second;
+    Editor *editor = &mainWindow_->editor();
+    Segments segments = editor->segments();
+    for (const auto &id : idList)
+    {
+        size_t index = segments.index(id, false);
+
+        if (index != SIZE_MAX)
+        {
+            segments[index].speciesId = newSpeciesId;
+        }
+    }
+
+    editor->setSegments(segments);
+    mainWindow_->update({Editor::TYPE_SEGMENT, Editor::TYPE_SPECIES});
+
+    LOG_DEBUG(<< "Finished setting species values.");
+}
 
 void TreeTableSetSpecies::run(MainWindow *mainWindow,
                               std::unordered_set<size_t> idList)
