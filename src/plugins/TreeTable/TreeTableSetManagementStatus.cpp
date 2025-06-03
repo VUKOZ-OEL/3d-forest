@@ -25,10 +25,10 @@
 #include <TreeTableSetManagementStatus.hpp>
 
 // Include Qt.
-#include <QAction>
 #include <QCoreApplication>
-#include <QMenu>
 #include <QProgressDialog>
+#include <QAction>
+#include <QMenu>
 
 // Include local.
 #define LOG_MODULE_NAME "TreeTableSetManagementStatus"
@@ -78,10 +78,7 @@ void TreeTableSetManagementStatus::runAction(QAction *selectedAction,
     LOG_DEBUG(<< "Start setting management status values.");
 
     size_t newManagementStatusId = it->second;
-
-    // Edit segments.
     Editor *editor = &mainWindow_->editor();
-
     Segments segments = editor->segments();
     for (const auto &id : idList)
     {
