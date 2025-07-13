@@ -59,6 +59,7 @@ private:
     {
         COLUMN_ID,
         COLUMN_LABEL,
+        COLUMN_FILTER,
         COLUMN_MANAGEMENT_STATUS,
         COLUMN_SPECIES,
         COLUMN_X,

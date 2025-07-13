@@ -23,6 +23,7 @@
 #include <FindVisibleObjects.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
+#include <TreeTableAction.hpp>
 #include <TreeTableExportCsv.hpp>
 #include <TreeTableExportDialog.hpp>
 #include <TreeTableSetManagementStatus.hpp>
@@ -196,6 +197,7 @@ void TreeTableWidget::setTable()
     tableWidget_->setColumnCount(COLUMN_LAST);
     tableWidget_->setHorizontalHeaderLabels({"ID",
                                              "Label",
+                                             "Filter",
                                              "M.Status",
                                              "Species",
                                              "X [m]",
@@ -280,8 +282,17 @@ void TreeTableWidget::setRow(int row, size_t index)
     treeColor.setGreenF(static_cast<float>(treeColorRGB[1]));
     treeColor.setBlueF(static_cast<float>(treeColorRGB[2]));
 
+    const QueryFilterSet &filter = mainWindow_->editor().segmentsFilter();
+    const std::unordered_set<size_t> &filterIdList = filter.filter();
+    bool isInFilter = false;
+    if (filterIdList.find(segment.id) != filterIdList.end())
+    {
+        isInFilter = true;
+    }
+
     setCell(row, COLUMN_ID, segment.id, treeColor);
     setCell(row, COLUMN_LABEL, segment.label);
+    setCell(row, COLUMN_FILTER, isInFilter ? "Yes" : "No");
     setCell(row,
             COLUMN_MANAGEMENT_STATUS,
             managementStatusList.labelById(segment.managementStatusId, false));
@@ -464,6 +475,8 @@ void TreeTableWidget::slotCustomContextMenuRequested(const QPoint &pos)
     TreeTableSetManagementStatus managementStatusMenu(mainWindow_,
                                                       &contextMenu);
     TreeTableSetSpecies speciesMenu(mainWindow_, &contextMenu);
+    QAction *showTreesAction = contextMenu.addAction("Show selected trees");
+    QAction *hideTreesAction = contextMenu.addAction("Hide selected trees");
 
     QAction *selectedAction =
         contextMenu.exec(tableWidget_->viewport()->mapToGlobal(pos));
@@ -493,6 +506,19 @@ void TreeTableWidget::slotCustomContextMenuRequested(const QPoint &pos)
     // Run selected action.
     managementStatusMenu.runAction(selectedAction, idList);
     speciesMenu.runAction(selectedAction, idList);
+
+    if (selectedAction == showTreesAction)
+    {
+        TreeTableAction::showTrees(mainWindow_, idList);
+        mainWindow_->update({Editor::TYPE_SEGMENT});
+        setTable();
+    }
+    else if (selectedAction == hideTreesAction)
+    {
+        TreeTableAction::hideTrees(mainWindow_, idList);
+        mainWindow_->update({Editor::TYPE_SEGMENT});
+        setTable();
+    }
 }
 
 void TreeTableWidget::closeWidget()
