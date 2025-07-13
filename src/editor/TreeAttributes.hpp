@@ -36,6 +36,9 @@ public:
     /// Calculated tree height.
     double height{0.0};
 
+    /// Calculated crown start.
+    double crownStartHeight{0.0};
+
     /// Area of tree projection from top view.
     double surfaceAreaProjection{0.0};
 

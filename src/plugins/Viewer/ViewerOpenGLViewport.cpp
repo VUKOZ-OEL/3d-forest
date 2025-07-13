@@ -721,6 +721,11 @@ void ViewerOpenGLViewport::renderAttributes()
 
             Vector3<float> treePosition = attributes.position;
 
+            float crownStartH = attributes.crownStartHeight;
+            Vector3<float> crownStartPosition(treePosition[0],
+                                              treePosition[1],
+                                              treePosition[2] + crownStartH);
+
             if (attributes.isHeightValid())
             {
                 Vector3<float> treeTip(
@@ -741,6 +746,14 @@ void ViewerOpenGLViewport::renderAttributes()
                 treePosition,
                 static_cast<float>(segment.boundary.length(0)),
                 static_cast<float>(segment.boundary.length(1)));
+
+            if (attributes.crownStartHeight > 0.0)
+            {
+                ViewerOpenGL::renderCross(
+                    crownStartPosition,
+                    static_cast<float>(segment.boundary.length(0) * 0.5),
+                    static_cast<float>(segment.boundary.length(1) * 0.5));
+            }
         }
     }
 }

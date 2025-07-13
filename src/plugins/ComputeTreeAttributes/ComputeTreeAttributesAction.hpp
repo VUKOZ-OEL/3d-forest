@@ -61,12 +61,11 @@ private:
     void calculateDbh(ComputeTreeAttributesData &tree);
     void calculateDbhRht(ComputeTreeAttributesData &tree);
     void calculateDbhLsr(ComputeTreeAttributesData &tree);
-
     void calculateTreePosition(ComputeTreeAttributesData &tree);
-
+    void calculateProfile(ComputeTreeAttributesData &tree);
     void validateAttributes(TreeAttributes &treeAttributes);
 
-    size_t treeIndex(size_t treeId);
+    size_t treeIndex(size_t treeId, const Segment &segment);
 };
 
 #endif /* COMPUTE_TREE_ATTRIBUTES_ACTION_HPP */

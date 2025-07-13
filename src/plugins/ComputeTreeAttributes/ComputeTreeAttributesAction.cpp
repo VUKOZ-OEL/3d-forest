@@ -108,7 +108,8 @@ void ComputeTreeAttributesAction::next()
     }
 }
 
-size_t ComputeTreeAttributesAction::treeIndex(size_t treeId)
+size_t ComputeTreeAttributesAction::treeIndex(size_t treeId,
+                                              const Segment &segment)
 {
     auto it = treesMap_.find(treeId);
 
@@ -116,9 +117,15 @@ size_t ComputeTreeAttributesAction::treeIndex(size_t treeId)
     {
         size_t index = trees_.size();
         treesMap_[treeId] = index;
+
         trees_.push_back(ComputeTreeAttributesData());
         trees_[index].treeId = treeId;
         trees_[index].dbhPoints.reserve(100);
+        trees_[index].bins.resize(parameters_.nProfileBins);
+        set(trees_[index].bins, 0.0);
+        trees_[index].zBoundaryMax = segment.boundary.max(2);
+        trees_[index].zBoundaryMin = segment.boundary.min(2);
+
         return index;
     }
 
@@ -148,14 +155,15 @@ void ComputeTreeAttributesAction::stepPointsToTrees()
         if (treeId > 0 && treeId < segments.size())
         {
             const Segment &segment = segments[treeId];
+            ComputeTreeAttributesData &tree =
+                trees_[treeIndex(treeId, segment)];
+
+            double z = query_.z() - segment.boundary.min(2);
 
             // When point Z distance from the minimal tree boundary Z value
             // is within tree position range, then:
-            if ((query_.z() - segment.boundary.min(2)) <=
-                parameters_.treePositionHeightRange)
+            if (z <= parameters_.treePositionHeightRange)
             {
-                ComputeTreeAttributesData &tree = trees_[treeIndex(treeId)];
-
                 // Add point X and Y coordinates to X and Y coordinates lists.
                 tree.xCoordinates.push_back(query_.x());
                 tree.yCoordinates.push_back(query_.y());
@@ -175,11 +183,19 @@ void ComputeTreeAttributesAction::stepPointsToTrees()
                 query_.elevation() <=
                     parameters_.dbhElevation + parameters_.dbhElevationRange)
             {
-                ComputeTreeAttributesData &tree = trees_[treeIndex(treeId)];
-
                 tree.dbhPoints.push_back(query_.x());
                 tree.dbhPoints.push_back(query_.y());
                 tree.dbhPoints.push_back(query_.z());
+            }
+
+            // Profile.
+            double len = segment.boundary.length(2);
+            double nd = static_cast<double>(tree.bins.size());
+            if (nd > 0.0 && z < len)
+            {
+                double step = len / nd;
+                size_t idx = static_cast<size_t>(z / step);
+                tree.bins[idx] += 1.0;
             }
         }
 
@@ -224,15 +240,20 @@ void ComputeTreeAttributesAction::stepCalculateComputeTreeAttributes()
     // For each tree:
     while (currentTreeIndex_ < trees_.size())
     {
+        ComputeTreeAttributesData &tree = trees_[currentTreeIndex_];
+
         LOG_DEBUG(<< "Calculating tree attributes for tree index <"
                   << (currentTreeIndex_ + 1) << "/" << trees_.size()
-                  << "> tree ID <" << trees_[currentTreeIndex_].treeId << ">.");
+                  << "> tree ID <" << tree.treeId << ">.");
 
         // Calculate DBH.
-        calculateDbh(trees_[currentTreeIndex_]);
+        calculateDbh(tree);
 
         // Calculate tree position.
-        calculateTreePosition(trees_[currentTreeIndex_]);
+        calculateTreePosition(tree);
+
+        // Calculate profile.
+        calculateProfile(tree);
 
         // Next tree.
         currentTreeIndex_++;
@@ -341,6 +362,36 @@ void ComputeTreeAttributesAction::calculateTreePosition(
     }
 
     tree.treeAttributes.position.set(x, y, z);
+}
+
+void ComputeTreeAttributesAction::calculateProfile(
+    ComputeTreeAttributesData &tree)
+{
+    double max = 0;
+
+    for (size_t i = 0; i < tree.bins.size(); i++)
+    {
+        if (tree.bins[i] > max)
+        {
+            max = tree.bins[i];
+        }
+    }
+
+    double len = tree.zBoundaryMax - tree.zBoundaryMin;
+    double step = len / static_cast<double>(tree.bins.size());
+
+    double h = 0;
+
+    for (size_t i = 0; i < tree.bins.size(); i++)
+    {
+        if (tree.bins[i] > max * parameters_.crownStartRatio)
+        {
+            h = static_cast<double>(i) * step;
+            break;
+        }
+    }
+
+    tree.treeAttributes.crownStartHeight = h;
 }
 
 void ComputeTreeAttributesAction::stepUpdateComputeTreeAttributes()

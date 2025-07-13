@@ -43,6 +43,11 @@ public:
     /// Collected point Y coordinates in tree base range.
     std::vector<double> yCoordinates;
 
+    /// Height profile.
+    std::vector<double> bins;
+    double zBoundaryMin;
+    double zBoundaryMax;
+
     /// The Z coordinate of the lowest point.
     double zCoordinateMin{Numeric::max<double>()};
 

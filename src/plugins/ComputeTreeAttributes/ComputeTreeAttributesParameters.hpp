@@ -36,6 +36,10 @@ public:
     double treePositionHeightRange{0.6};
     double treeTipHeightRange{0.1};
 
+    // Height profile.
+    size_t nProfileBins{30};
+    double crownStartRatio{0.25};
+
     // DBH parameters.
     enum class DbhMethod
     {
