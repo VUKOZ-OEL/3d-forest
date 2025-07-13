@@ -178,6 +178,7 @@ void FilterTreesWidget::dataChanged()
     mainWindow_->editor().setSegments(segments_);
     mainWindow_->editor().setSegmentsFilter(filter_);
     mainWindow_->updateData();
+    mainWindow_->update({Editor::TYPE_SEGMENT});
 }
 
 void FilterTreesWidget::filterChanged()
@@ -187,6 +188,7 @@ void FilterTreesWidget::filterChanged()
     mainWindow_->suspendThreads();
     mainWindow_->editor().setSegmentsFilter(filter_);
     mainWindow_->updateFilter();
+    mainWindow_->update({Editor::TYPE_SEGMENT});
 }
 
 void FilterTreesWidget::setFilterEnabled(bool b)
