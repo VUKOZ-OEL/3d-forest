@@ -104,6 +104,14 @@ void toJson(Json &out, const Settings &in)
            in.defaultManagementStatusList_);
 }
 
+void toJsonProjectSettings(Json &out, const Settings &in)
+{
+    toJson(out[SETTINGS_KEY_RENDERING], in.renderingSettings_);
+    toJson(out[SETTINGS_KEY_TREE], in.treeSettings_);
+    toJson(out[SETTINGS_KEY_UNITS], in.unitsSettings_);
+    toJson(out[SETTINGS_KEY_VIEW], in.viewSettings_);
+}
+
 std::string toString(const Settings &in)
 {
     Json json;

@@ -77,6 +77,7 @@ void toJson(Json &out, const UnitsSettings &in)
 {
     toJson(out["userDefined"], in.userDefined);
     toJson(out["pointsPerMeterUser"], in.pointsPerMeterUser);
+    toJson(out["pointsPerMeter"], in.pointsPerMeter());
 }
 
 std::string toString(const UnitsSettings &in)

@@ -36,7 +36,7 @@ static const char *EDITOR_KEY_SPECIES = "species";
 static const char *EDITOR_KEY_MANAGEMENT_STATUS = "managementStatus";
 static const char *EDITOR_KEY_SETTINGS = "settings";
 // static const char *EDITOR_KEY_CLASSIFICATIONS = "classifications";
-// static const char *EDITOR_KEY_CLIP_FILTER = "clipFilter";
+static const char *EDITOR_KEY_CLIP_FILTER = "clipFilter";
 // static const char *EDITOR_KEY_ELEVATION_RANGE = "elevationRange";
 
 Editor::Editor()
@@ -265,20 +265,20 @@ void Editor::openProject(const std::string &path)
         // }
 
         // Settings.
-        // if (in.contains(EDITOR_KEY_SETTINGS))
-        // {
-        //     fromJson(settings_, in[EDITOR_KEY_SETTINGS]);
-        // }
+        if (in.contains(EDITOR_KEY_SETTINGS))
+        {
+            fromJson(settings_, in[EDITOR_KEY_SETTINGS]);
+        }
 
         // Clip filter.
-        // if (in.contains(EDITOR_KEY_CLIP_FILTER))
-        // {
-        //     fromJson(clipFilter_, in[EDITOR_KEY_CLIP_FILTER]);
-        // }
-        // else
-        // {
-        //     clipFilter_.clear();
-        // }
+        if (in.contains(EDITOR_KEY_CLIP_FILTER))
+        {
+            fromJson(clipFilter_, in[EDITOR_KEY_CLIP_FILTER]);
+        }
+        else
+        {
+            clipFilter_.clear();
+        }
 
         // Elevation range.
         // if (in.contains(EDITOR_KEY_ELEVATION_RANGE))
@@ -322,8 +322,8 @@ void Editor::saveProject(const std::string &path)
     toJson(out[EDITOR_KEY_SPECIES], speciesList_);
     toJson(out[EDITOR_KEY_MANAGEMENT_STATUS], managementStatusList_);
     // toJson(out[EDITOR_KEY_CLASSIFICATIONS], classifications_);
-    // toJson(out[EDITOR_KEY_SETTINGS], settings_);
-    // toJson(out[EDITOR_KEY_CLIP_FILTER], clipFilter_);
+    toJsonProjectSettings(out[EDITOR_KEY_SETTINGS], settings_);
+    toJson(out[EDITOR_KEY_CLIP_FILTER], clipFilter_);
     // toJson(out[EDITOR_KEY_ELEVATION_RANGE], elevationFilter_);
 
     out.write(path);
