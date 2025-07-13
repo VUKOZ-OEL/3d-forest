@@ -222,6 +222,7 @@ protected:
     size_t lruSize_;
 
     std::shared_ptr<Page> readPage(size_t datasetId, size_t pageId);
+    size_t erasePageIndex(std::vector<std::shared_ptr<Page>> &queue);
 };
 
 void toJson(Json &out, Query &in);

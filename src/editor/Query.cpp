@@ -275,6 +275,21 @@ bool Query::nextState()
     return false;
 }
 
+size_t Query::erasePageIndex(std::vector<std::shared_ptr<Page>> &queue)
+{
+    size_t idx = queue.size();
+    do
+    {
+        idx--;
+        if (queue[idx].get()->pageId() > 0)
+        {
+            break;
+        }
+    } while (idx > 0);
+
+    return (idx > 0) ? idx : queue.size() - 1;
+}
+
 void Query::applyCamera(const Camera &camera)
 {
     double eyeX = camera.eye[0];
@@ -339,10 +354,11 @@ void Query::applyCamera(const Camera &camera)
         {
             if (viewPrev.size() > 0)
             {
-                const Page *lru = viewPrev[viewPrev.size() - 1].get();
+                size_t eraseIndex = erasePageIndex(viewPrev);
+                const Page *lru = viewPrev[eraseIndex].get();
                 Key nkrm = {lru->datasetId(), lru->pageId()};
                 cache_.erase(nkrm);
-                viewPrev.resize(viewPrev.size() - 1);
+                removeAt(viewPrev, eraseIndex);
             }
 
             std::shared_ptr<Page> page;
@@ -717,7 +733,7 @@ std::shared_ptr<Page> Query::readPage(size_t datasetId, size_t pageId)
             else
             {
                 // Drop oldest page.
-                idx = lru_.size() - 1;
+                idx = erasePageIndex(lru_);
                 if (lru_[idx]->modified())
                 {
                     lru_[idx]->writePage();
