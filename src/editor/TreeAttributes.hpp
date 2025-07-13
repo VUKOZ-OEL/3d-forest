@@ -39,6 +39,13 @@ public:
     /// Calculated crown start.
     double crownStartHeight{0.0};
 
+    /// Crown voxel counts.
+    std::vector<size_t> crownVoxelCountPerMeters;
+    size_t crownVoxelCount{0};
+    size_t crownVoxelCountShared{0};
+    double crownVoxelCountSharedPercent{0.0};
+    double crownVoxelSize{0.0};
+
     /// Area of tree projection from top view.
     double surfaceAreaProjection{0.0};
 
@@ -100,6 +107,14 @@ inline void toJson(Json &out, const TreeAttributes &in)
     toJson(out["dbhPosition"], in.dbhPosition);
     toJson(out["dbhNormal"], in.dbhNormal);
     toJson(out["dbh"], in.dbh);
+
+    toJson(out["crownStartHeight"], in.crownStartHeight);
+    toJson(out["crownVoxelCountPerMeters"], in.crownVoxelCountPerMeters);
+    toJson(out["crownVoxelCount"], in.crownVoxelCount);
+    toJson(out["crownVoxelCountShared"], in.crownVoxelCountShared);
+    toJson(out["crownVoxelCountSharedPercent"],
+           in.crownVoxelCountSharedPercent);
+    toJson(out["crownVoxelSize"], in.crownVoxelSize);
 }
 
 inline void fromJson(TreeAttributes &out, const Json &in)
@@ -119,6 +134,37 @@ inline void fromJson(TreeAttributes &out, const Json &in)
         out.dbhNormal.set(0.0, 0.0, 1.0);
     }
     fromJson(out.dbh, in["dbh"]);
+
+    if (in.contains("crownStartHeight"))
+    {
+        fromJson(out.crownStartHeight, in["crownStartHeight"]);
+    }
+
+    if (in.contains("crownVoxelCountPerMeters"))
+    {
+        fromJson(out.crownVoxelCountPerMeters, in["crownVoxelCountPerMeters"]);
+    }
+
+    if (in.contains("crownVoxelCount"))
+    {
+        fromJson(out.crownVoxelCount, in["crownVoxelCount"]);
+    }
+
+    if (in.contains("crownVoxelCountShared"))
+    {
+        fromJson(out.crownVoxelCountShared, in["crownVoxelCountShared"]);
+    }
+
+    if (in.contains("crownVoxelCountSharedPercent"))
+    {
+        fromJson(out.crownVoxelCountSharedPercent,
+                 in["crownVoxelCountSharedPercent"]);
+    }
+
+    if (in.contains("crownVoxelSize"))
+    {
+        fromJson(out.crownVoxelSize, in["crownVoxelSize"]);
+    }
 }
 
 inline std::string toString(const TreeAttributes &in)
