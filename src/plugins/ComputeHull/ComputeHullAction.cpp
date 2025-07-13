@@ -178,14 +178,25 @@ void ComputeHullAction::stepPointsToVoxels()
 {
     progress_.startTimer();
 
+    const Segments &segments = editor_->segments();
+
     // For each point in filtered datasets:
     while (query_.next())
     {
         // If point index to voxel is none:
-        if (query_.voxel() == SIZE_MAX && query_.segment() > 0)
+        if (query_.voxel() == SIZE_MAX)
         {
-            // Create new voxel.
-            createVoxel();
+            size_t treeId = query_.segment();
+            if (treeId > 0 && treeId < segments.size())
+            {
+                const Segment &segment = segments[treeId];
+                double z = query_.z() - segment.boundary.min(2);
+                if (z >= segment.treeAttributes.crownStartHeight)
+                {
+                    // Create new voxel.
+                    createVoxel();
+                }
+            }
         }
 
         progress_.addValueStep(1);
