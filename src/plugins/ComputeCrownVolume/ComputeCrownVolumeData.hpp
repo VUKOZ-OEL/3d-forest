@@ -23,6 +23,7 @@
 #define COMPUTE_CROWN_VOLUME_DATA_HPP
 
 // Include std.
+#include <stddef.h>
 #include <unordered_set>
 
 /** Compute Crown Volume Data. */

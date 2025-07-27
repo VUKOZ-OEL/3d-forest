@@ -23,6 +23,7 @@
 #define FIND_VISIBLE_OBJECTS_HPP
 
 // Include Std.
+#include <stddef.h>
 #include <unordered_set>
 
 // Include 3D Forest.
