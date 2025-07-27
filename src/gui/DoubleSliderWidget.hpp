@@ -67,6 +67,7 @@ public:
     void setValue(double value);
     void setMinimum(double min);
     void setMaximum(double max);
+    void setTargetProduct(double value);
 
     void blockSignals(bool block);
 
@@ -84,6 +85,9 @@ protected:
     QDoubleSpinBox *spinBox_;
     double minimumValue_;
     double maximumValue_;
+    double targetProduct_;
+
+    double snapToReciprocal(double value) const;
 };
 
 #include <WarningsEnable.hpp>
