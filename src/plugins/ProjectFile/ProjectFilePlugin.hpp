@@ -57,6 +57,7 @@ public slots:
     void slotOpenProject();
     void slotSaveProject();
     void slotSaveAsProject();
+    void slotReloadProject();
 
 private:
     bool openProject(const QString &path);
@@ -68,6 +69,7 @@ private:
     QAction *openProjectAction_;
     QAction *saveProjectAction_;
     QAction *saveAsProjectAction_;
+    QAction *reloadProjectAction_;
 };
 
 #endif /* PROJECT_FILE_PLUGIN_HPP */

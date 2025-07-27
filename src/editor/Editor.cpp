@@ -194,7 +194,7 @@ void Editor::open(const std::string &path, const ImportSettings &settings)
     if (ext == "json")
     {
         // Open new project from json format.
-        openProject(path);
+        openProject(path, false);
     }
     else
     {
@@ -205,7 +205,12 @@ void Editor::open(const std::string &path, const ImportSettings &settings)
     LOG_DEBUG(<< "Finished opening the project/dataset.");
 }
 
-void Editor::openProject(const std::string &path)
+void Editor::reload()
+{
+    openProject(projectPath_, true);
+}
+
+void Editor::openProject(std::string path, bool reload)
 {
     LOG_DEBUG(<< "Start opening project from path <" << path << ">.");
 
@@ -312,6 +317,8 @@ void Editor::openProject(const std::string &path)
 void Editor::saveProject(const std::string &path)
 {
     LOG_DEBUG(<< "Start saving the project to path <" << path << ">.");
+
+    setProjectPath(path);
 
     // Save data.
     Json out;

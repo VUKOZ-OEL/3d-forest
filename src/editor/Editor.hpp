@@ -69,6 +69,7 @@ public:
     // File.
     void open(const std::string &path,
               const ImportSettings &settings = ImportSettings());
+    void reload();
     void saveProject(const std::string &path);
     const std::string &projectPath() const { return projectPath_; }
     const std::string &projectName() const { return projectName_; }
@@ -214,7 +215,7 @@ protected:
     void readSettings();
     void writeSettings();
 
-    void openProject(const std::string &path);
+    void openProject(std::string path, bool reload);
 
     void openDataset(const std::string &path,
                      const ImportSettings &settings = ImportSettings());

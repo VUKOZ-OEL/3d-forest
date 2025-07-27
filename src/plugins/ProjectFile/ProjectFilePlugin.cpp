@@ -89,6 +89,17 @@ void ProjectFilePlugin::initialize(MainWindow *mainWindow)
                               MAIN_WINDOW_MENU_FILE_PRIORITY,
                               40);
 
+    mainWindow_->createAction(&reloadProjectAction_,
+                              "File",
+                              "File Project",
+                              tr("&Reload Project"),
+                              tr("Reload Project"),
+                              ICON("reload"),
+                              this,
+                              SLOT(slotReloadProject()),
+                              MAIN_WINDOW_MENU_FILE_PRIORITY,
+                              45);
+
     mainWindow_->hideToolBar("File Project");
 }
 
@@ -161,6 +172,43 @@ void ProjectFilePlugin::slotSaveAsProject()
     (void)saveProject(fileName);
 
     LOG_DEBUG(<< "Finished saving the project as <" << fileName << ">.");
+}
+
+void ProjectFilePlugin::slotReloadProject()
+{
+    LOG_DEBUG(<< "Start reloading the project.");
+
+    mainWindow_->suspendThreads();
+
+    if (mainWindow_->editor().unsavedChanges())
+    {
+        LOG_DEBUG(<< "Project has unsaved changes.");
+
+        QMessageBox msgBox;
+        msgBox.setText("The document has been modified.");
+        msgBox.setInformativeText("Please save the changes first.");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        (void)msgBox.exec();
+        return;
+    }
+
+    try
+    {
+        mainWindow_->editor().reload();
+    }
+    catch (std::exception &e)
+    {
+        LOG_DEBUG(<< "Cancelled, show error <" << e.what() << ">.");
+        mainWindow_->showError(e.what());
+        return;
+    }
+
+    // Update.
+    mainWindow_->updateNewProject();
+    mainWindow_->slotRenderViewports();
+
+    LOG_DEBUG(<< "Finished reloading the project.");
 }
 
 bool ProjectFilePlugin::openProject(const QString &path)
