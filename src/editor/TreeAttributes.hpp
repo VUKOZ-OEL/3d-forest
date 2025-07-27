@@ -163,7 +163,8 @@ inline void fromJson(TreeAttributes &out, const Json &in)
     }
 
     out.crownVoxelCountShared.clear();
-    if (in.contains("crownVoxelCountShared"))
+    if (in.contains("crownVoxelCountShared") &&
+        in["crownVoxelCountShared"].typeArray())
     {
         const auto &list = in["crownVoxelCountShared"].array();
         for (size_t i = 0; i < list.size(); i++)
