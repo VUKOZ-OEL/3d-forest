@@ -61,6 +61,8 @@ ComputeCrownVolumeWidget::ComputeCrownVolumeWidget(MainWindow *mainWindow)
         1.0,
         parameters_.voxelSize);
 
+    voxelSizeSlider_->setTargetProduct(1.0);
+
     // Settings layout.
     QVBoxLayout *settingsLayout = new QVBoxLayout;
     settingsLayout->addWidget(voxelSizeSlider_);

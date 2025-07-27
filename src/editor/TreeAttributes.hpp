@@ -39,11 +39,16 @@ public:
     /// Calculated crown start.
     double crownStartHeight{0.0};
 
-    /// Crown voxel counts.
+    /// Crown voxel counts per each meter.
     std::vector<size_t> crownVoxelCountPerMeters;
+
+    /// Crown voxel count.
     size_t crownVoxelCount{0};
-    size_t crownVoxelCountShared{0};
-    double crownVoxelCountSharedPercent{0.0};
+
+    /// Shared crown voxel count [other tree id : count].
+    std::map<size_t, size_t> crownVoxelCountShared;
+
+    /// Crown voxel size.
     double crownVoxelSize{0.0};
 
     /// Area of tree projection from top view.
@@ -111,9 +116,16 @@ inline void toJson(Json &out, const TreeAttributes &in)
     toJson(out["crownStartHeight"], in.crownStartHeight);
     toJson(out["crownVoxelCountPerMeters"], in.crownVoxelCountPerMeters);
     toJson(out["crownVoxelCount"], in.crownVoxelCount);
-    toJson(out["crownVoxelCountShared"], in.crownVoxelCountShared);
-    toJson(out["crownVoxelCountSharedPercent"],
-           in.crownVoxelCountSharedPercent);
+
+    Json &list = out["crownVoxelCountShared"];
+    size_t idx = 0;
+    for (const auto &it : in.crownVoxelCountShared)
+    {
+        toJson(list[idx]["treeId"], it.first);
+        toJson(list[idx]["count"], it.second);
+        idx++;
+    }
+
     toJson(out["crownVoxelSize"], in.crownVoxelSize);
 }
 
@@ -150,15 +162,19 @@ inline void fromJson(TreeAttributes &out, const Json &in)
         fromJson(out.crownVoxelCount, in["crownVoxelCount"]);
     }
 
+    out.crownVoxelCountShared.clear();
     if (in.contains("crownVoxelCountShared"))
     {
-        fromJson(out.crownVoxelCountShared, in["crownVoxelCountShared"]);
-    }
-
-    if (in.contains("crownVoxelCountSharedPercent"))
-    {
-        fromJson(out.crownVoxelCountSharedPercent,
-                 in["crownVoxelCountSharedPercent"]);
+        const auto &list = in["crownVoxelCountShared"].array();
+        for (size_t i = 0; i < list.size(); i++)
+        {
+            size_t k;
+            size_t v;
+            const auto &item = list[i];
+            fromJson(k, item["treeId"]);
+            fromJson(v, item["count"]);
+            out.crownVoxelCountShared[k] = v;
+        }
     }
 
     if (in.contains("crownVoxelSize"))

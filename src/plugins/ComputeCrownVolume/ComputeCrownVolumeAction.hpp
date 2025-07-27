@@ -55,6 +55,7 @@ private:
 
     std::map<std::tuple<int, int, int>, ComputeCrownVolumeData> grid_;
     std::map<size_t, int> treeIdGridMinZ_;
+    double ppm_;
 
     void stepPointsToVoxels();
     void stepCalculateVolume();

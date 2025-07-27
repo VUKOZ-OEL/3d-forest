@@ -64,11 +64,11 @@ void ComputeCrownVolumeAction::start(
     LOG_DEBUG(<< "Start with parameters <" << toString(parameters) << ">.");
 
     // Set input parameters.
-    double ppm = editor_->settings().unitsSettings().pointsPerMeter()[0];
+    ppm_ = editor_->settings().unitsSettings().pointsPerMeter()[0];
 
     parameters_ = parameters;
 
-    parameters_.voxelSize *= ppm;
+    parameters_.voxelSize *= ppm_;
 
     // Clear work data.
     nPointsTotal_ = editor_->datasets().nPoints();
@@ -156,27 +156,34 @@ void ComputeCrownVolumeAction::stepCalculateVolume()
 
     // Get copy of current segments.
     Segments segments = editor_->segments();
+
+    // Reset tree attribute values.
     for (size_t i = 0; i < segments.size(); i++)
     {
         segments[i].treeAttributes.crownVoxelCountPerMeters.clear();
         segments[i].treeAttributes.crownVoxelCount = 0;
-        segments[i].treeAttributes.crownVoxelCountShared = 0;
-        segments[i].treeAttributes.crownVoxelCountSharedPercent = 0;
+        segments[i].treeAttributes.crownVoxelCountShared.clear();
         segments[i].treeAttributes.crownVoxelSize = 0;
     }
 
     LOG_DEBUG(<< "Grid size <" << grid_.size() << ">.");
 
+    // Iterate the grid.
     for (const auto &[k, v] : grid_)
     {
+        // Get grid voxel.
         const auto &[qx, qy, qz] = k;
+
+        // The number of trees in the voxel.
         size_t nTrees = v.treeIdList.size();
 
         // LOG_DEBUG(<< "Voxel [" << qx << ", " << qy << ", " << qz << "]"
         //           << "size <" << v.treeIdList.size() << ">.");
 
+        // Iterate all tree ids in the voxel.
         for (size_t treeId : v.treeIdList)
         {
+            // Get tree and tree attributes from the cell.
             size_t segmentIndex = segments.index(treeId, false);
             if (segmentIndex == SIZE_MAX)
             {
@@ -186,16 +193,28 @@ void ComputeCrownVolumeAction::stepCalculateVolume()
             Segment &segment = segments[segmentIndex];
             TreeAttributes &atr = segment.treeAttributes;
 
+            // Increment total voxel count.
             atr.crownVoxelCount++;
+
+            // Process shared tree voxels.
             if (nTrees > 1)
             {
-                atr.crownVoxelCountShared++;
+                for (size_t otherTreeId : v.treeIdList)
+                {
+                    if (otherTreeId != treeId)
+                    {
+                        atr.crownVoxelCountShared[otherTreeId]++;
+                    }
+                }
             }
 
+            // Store the number of voxels per each meter.
             auto itMin = treeIdGridMinZ_.find(treeId);
             if (itMin != treeIdGridMinZ_.end())
             {
-                size_t h = qz - itMin->second;
+                size_t qh = qz - itMin->second;
+                double hppm = static_cast<double>(qh) * parameters_.voxelSize;
+                size_t h = static_cast<size_t>(hppm / ppm_); // To meters.
                 size_t n = atr.crownVoxelCountPerMeters.size();
                 if (h >= n)
                 {
@@ -211,41 +230,13 @@ void ComputeCrownVolumeAction::stepCalculateVolume()
         }
     }
 
-    // Set shared percents.
+    // Set attributes.
     for (size_t i = 0; i < segments.size(); i++)
     {
         TreeAttributes &atr = segments[i].treeAttributes;
 
-        // Resize to meters.
-        std::vector<size_t> b;
-        const std::vector<size_t> &a = atr.crownVoxelCountPerMeters;
-
-        for (size_t i = 0; i + 1 < a.size(); i += 2)
-        {
-            b.push_back(a[i] + a[i + 1]);
-        }
-
-        if (a.size() % 2 != 0)
-        {
-            b.push_back(a.back());
-        }
-
-        atr.crownVoxelCountPerMeters = b;
-
-        // Volume.
+        // Store voxel size which was used for the calculation.
         atr.crownVoxelSize = parameters_.voxelSize;
-
-        // Calculate percents shared.
-        size_t c = atr.crownVoxelCount;
-        if (c == 0)
-        {
-            continue;
-        }
-
-        size_t s = atr.crownVoxelCountShared;
-        double p = static_cast<double>(s) / static_cast<double>(c);
-
-        atr.crownVoxelCountSharedPercent = p * 100.0;
     }
 
     // Set new segments to editor.
