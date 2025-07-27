@@ -27,6 +27,9 @@
 #include <cstdint>
 #include <unordered_set>
 
+// Include 3D Forest.
+#include <Json.hpp>
+
 // Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
@@ -67,7 +70,13 @@ private:
     std::unordered_set<size_t> filter_;
     std::unordered_set<size_t> values_;
     bool enabled_;
+
+    friend void fromJson(QueryFilterSet &out, const Json &in);
+    friend void toJson(Json &out, const QueryFilterSet &in);
 };
+
+void fromJson(QueryFilterSet &out, const Json &in);
+void toJson(Json &out, const QueryFilterSet &in);
 
 #include <WarningsEnable.hpp>
 

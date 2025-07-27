@@ -35,9 +35,17 @@ static const char *EDITOR_KEY_SEGMENT = "segments";
 static const char *EDITOR_KEY_SPECIES = "species";
 static const char *EDITOR_KEY_MANAGEMENT_STATUS = "managementStatus";
 static const char *EDITOR_KEY_SETTINGS = "settings";
-// static const char *EDITOR_KEY_CLASSIFICATIONS = "classifications";
+static const char *EDITOR_KEY_CLASSIFICATIONS = "classifications";
 static const char *EDITOR_KEY_CLIP_FILTER = "clipFilter";
-// static const char *EDITOR_KEY_ELEVATION_RANGE = "elevationRange";
+static const char *EDITOR_KEY_ELEVATION_FILTER = "elevationFilter";
+static const char *EDITOR_KEY_DESCRIPTOR_FILTER = "descriptorFilter";
+static const char *EDITOR_KEY_INTENSITY_FILTER = "intensityFilter";
+static const char *EDITOR_KEY_CLASSIFICATIONS_FILTER = "classificationsFilter";
+static const char *EDITOR_KEY_DATASETS_FILTER = "datasetsFilter";
+static const char *EDITOR_KEY_SEGMENTS_FILTER = "segmentsFilter";
+static const char *EDITOR_KEY_SPECIES_FILTER = "speciesFilter";
+static const char *EDITOR_KEY_MANAGEMENT_STATUS_FILTER =
+    "managementStatusFilter";
 
 Editor::Editor()
 {
@@ -140,6 +148,7 @@ void Editor::close()
     projectName_ = "Untitled";
 
     datasets_.clear();
+    datasetsRange_ = Dataset::Range();
     datasetsFilter_.clear();
     datasetsFilter_.setEnabled(true);
 
@@ -243,6 +252,8 @@ void Editor::openProject(std::string path, bool reload)
                      in[EDITOR_KEY_DATA_SET],
                      projectPath_,
                      datasetsFilter_);
+
+            datasetsRange_ = datasets_.range();
         }
 
         // Segments.
@@ -264,10 +275,10 @@ void Editor::openProject(std::string path, bool reload)
         }
 
         // Classifications.
-        // if (in.contains(EDITOR_KEY_CLASSIFICATIONS))
-        // {
-        //     fromJson(classifications_, in[EDITOR_KEY_CLASSIFICATIONS]);
-        // }
+        if (in.contains(EDITOR_KEY_CLASSIFICATIONS))
+        {
+            fromJson(classifications_, in[EDITOR_KEY_CLASSIFICATIONS]);
+        }
 
         // Settings.
         if (in.contains(EDITOR_KEY_SETTINGS))
@@ -282,14 +293,88 @@ void Editor::openProject(std::string path, bool reload)
         }
         else
         {
-            clipFilter_.clear();
+            // clipFilter_.clear();
+            clipFilter_.boundary = datasets_.boundary();
+            clipFilter_.box = clipFilter_.boundary;
         }
 
-        // Elevation range.
-        // if (in.contains(EDITOR_KEY_ELEVATION_RANGE))
-        // {
-        //     fromJson(elevationFilter_, in[EDITOR_KEY_ELEVATION_RANGE]);
-        // }
+        // Elevation filter.
+        if (in.contains(EDITOR_KEY_ELEVATION_FILTER))
+        {
+            fromJson(elevationFilter_, in[EDITOR_KEY_ELEVATION_FILTER]);
+        }
+        else
+        {
+            elevationFilter_.set(
+                static_cast<double>(datasetsRange_.elevationMin),
+                static_cast<double>(datasetsRange_.elevationMax));
+        }
+
+        // Descriptor filter.
+        if (in.contains(EDITOR_KEY_DESCRIPTOR_FILTER))
+        {
+            fromJson(descriptorFilter_, in[EDITOR_KEY_DESCRIPTOR_FILTER]);
+        }
+
+        // Intensity filter.
+        if (in.contains(EDITOR_KEY_INTENSITY_FILTER))
+        {
+            fromJson(intensityFilter_, in[EDITOR_KEY_INTENSITY_FILTER]);
+        }
+
+        // Classifications filter.
+        if (in.contains(EDITOR_KEY_CLASSIFICATIONS_FILTER))
+        {
+            fromJson(classificationsFilter_,
+                     in[EDITOR_KEY_CLASSIFICATIONS_FILTER]);
+        }
+
+        // Datasets filter.
+        if (in.contains(EDITOR_KEY_DATASETS_FILTER))
+        {
+            fromJson(datasetsFilter_, in[EDITOR_KEY_DATASETS_FILTER]);
+        }
+
+        // Segments filter.
+        if (in.contains(EDITOR_KEY_SEGMENTS_FILTER))
+        {
+            fromJson(segmentsFilter_, in[EDITOR_KEY_SEGMENTS_FILTER]);
+        }
+        else
+        {
+            for (size_t i = 0; i < segments_.size(); i++)
+            {
+                segmentsFilter_.setEnabled(segments_[i].id, true);
+            }
+        }
+
+        // Species filter.
+        if (in.contains(EDITOR_KEY_SPECIES_FILTER))
+        {
+            fromJson(speciesFilter_, in[EDITOR_KEY_SPECIES_FILTER]);
+        }
+        else
+        {
+            for (size_t i = 0; i < speciesList_.size(); i++)
+            {
+                speciesFilter_.setEnabled(speciesList_[i].id, true);
+            }
+        }
+
+        // Management status filter.
+        if (in.contains(EDITOR_KEY_MANAGEMENT_STATUS_FILTER))
+        {
+            fromJson(managementStatusFilter_,
+                     in[EDITOR_KEY_MANAGEMENT_STATUS_FILTER]);
+        }
+        else
+        {
+            for (size_t i = 0; i < managementStatusList_.size(); i++)
+            {
+                managementStatusFilter_.setEnabled(managementStatusList_[i].id,
+                                                   true);
+            }
+        }
     }
     catch (...)
     {
@@ -328,10 +413,17 @@ void Editor::saveProject(const std::string &path)
     toJson(out[EDITOR_KEY_SEGMENT], segments_);
     toJson(out[EDITOR_KEY_SPECIES], speciesList_);
     toJson(out[EDITOR_KEY_MANAGEMENT_STATUS], managementStatusList_);
-    // toJson(out[EDITOR_KEY_CLASSIFICATIONS], classifications_);
+    toJson(out[EDITOR_KEY_CLASSIFICATIONS], classifications_);
     toJsonProjectSettings(out[EDITOR_KEY_SETTINGS], settings_);
     toJson(out[EDITOR_KEY_CLIP_FILTER], clipFilter_);
-    // toJson(out[EDITOR_KEY_ELEVATION_RANGE], elevationFilter_);
+    toJson(out[EDITOR_KEY_ELEVATION_FILTER], elevationFilter_);
+    toJson(out[EDITOR_KEY_DESCRIPTOR_FILTER], descriptorFilter_);
+    toJson(out[EDITOR_KEY_INTENSITY_FILTER], intensityFilter_);
+    toJson(out[EDITOR_KEY_CLASSIFICATIONS_FILTER], classificationsFilter_);
+    toJson(out[EDITOR_KEY_DATASETS_FILTER], datasetsFilter_);
+    toJson(out[EDITOR_KEY_SEGMENTS_FILTER], segmentsFilter_);
+    toJson(out[EDITOR_KEY_SPECIES_FILTER], speciesFilter_);
+    toJson(out[EDITOR_KEY_MANAGEMENT_STATUS_FILTER], managementStatusFilter_);
 
     out.write(path);
 
@@ -372,6 +464,7 @@ void Editor::openDataset(const std::string &path,
         throw;
     }
 
+    updateAfterSet();
     updateAfterRead();
 
     unsavedChanges_ = true;
@@ -602,8 +695,6 @@ void Editor::updateAfterRead()
 {
     LOG_DEBUG(<< "Start editor update after read.");
 
-    updateAfterSet();
-
     LOG_DEBUG(<< "Use clip box filter region <" << clipFilter_ << ">.");
     LOG_DEBUG(<< "Use elevation filter range <" << elevationFilter_ << ">.");
     LOG_DEBUG(<< "Use descriptor filter range <" << descriptorFilter_ << ">.");
@@ -615,21 +706,6 @@ void Editor::updateAfterRead()
         unitsSettings.setLasFileScaling(datasets_.at(0).scalingFile());
 
         setUnitsSettings(unitsSettings);
-    }
-
-    for (size_t i = 0; i < segments_.size(); i++)
-    {
-        segmentsFilter_.setEnabled(segments_[i].id, true);
-    }
-
-    for (size_t i = 0; i < speciesList_.size(); i++)
-    {
-        speciesFilter_.setEnabled(speciesList_[i].id, true);
-    }
-
-    for (size_t i = 0; i < managementStatusList_.size(); i++)
-    {
-        managementStatusFilter_.setEnabled(managementStatusList_[i].id, true);
     }
 
     applyFilters();
