@@ -53,8 +53,8 @@ public:
     Segment();
 };
 
-void fromJson(Segment &out, const Json &in);
-void toJson(Json &out, const Segment &in);
+void fromJson(Segment &out, const Json &in, double scale = 1.0);
+void toJson(Json &out, const Segment &in, double scale = 1.0);
 
 std::ostream &operator<<(std::ostream &out, const Segment &in);
 

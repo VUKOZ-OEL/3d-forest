@@ -49,9 +49,6 @@ void Mesh::clear()
     normal.clear();
 
     indices.clear();
-
-    volume = 0.0;
-    surfaceArea = 0.0;
 }
 
 void Mesh::calculateNormals()
@@ -315,6 +312,26 @@ void fromJson(Mesh::Mode &out, const Json &in)
     fromString(out, in.string());
 }
 
+void fromJson(Mesh::Mode &out,
+              const Json &in,
+              const std::string &key,
+              Mesh::Mode defaultValue = Mesh::Mode::MODE_UNKNOWN,
+              bool optional = true)
+{
+    if (in.contains(key) && in[key].typeString())
+    {
+        fromString(out, in[key].string());
+    }
+    else if (!optional)
+    {
+        THROW("JSON required key " + key + " was not found");
+    }
+    else
+    {
+        out = defaultValue;
+    }
+}
+
 void toJson(Json &out, const Mesh &in)
 {
     toJson(out["name"], in.name);
@@ -323,18 +340,17 @@ void toJson(Json &out, const Mesh &in)
     toJson(out["color"], in.color);
     toJson(out["normal"], in.normal);
     toJson(out["indices"], in.indices);
-    toJson(out["volume"], in.volume);
-    toJson(out["surfaceArea"], in.surfaceArea);
 }
 
 void fromJson(Mesh &out, const Json &in)
 {
-    fromJson(out.name, in["name"]);
-    fromJson(out.mode, in["mode"]);
-    fromJson(out.position, in["position"]);
-    fromJson(out.color, in["color"]);
-    fromJson(out.normal, in["normal"]);
-    fromJson(out.indices, in["indices"]);
-    fromJson(out.volume, in["volume"]);
-    fromJson(out.surfaceArea, in["surfaceArea"]);
+    out.clear();
+
+    fromJson(out.name, in, "name", "", false);
+    fromJson(out.mode, in, "mode");
+
+    fromJson(out.position, in, "position");
+    fromJson(out.color, in, "color");
+    fromJson(out.normal, in, "normal");
+    fromJson(out.indices, in, "indices");
 }

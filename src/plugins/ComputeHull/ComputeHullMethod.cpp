@@ -228,10 +228,16 @@ struct RoundedPointKey
     }
 };
 
-void ComputeHullMethod::alphaShape3(const std::vector<double> &points,
-                                    Mesh &mesh,
+void ComputeHullMethod::alphaShape3(Mesh &mesh,
+                                    double &meshVolume,
+                                    double &meshSurfaceArea,
+                                    const std::vector<double> &points,
                                     double alpha)
 {
+    mesh.clear();
+    meshVolume = 0;
+    meshSurfaceArea = 0;
+
     typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
     typedef CGAL::Alpha_shape_vertex_base_3<K> Vb;
     typedef CGAL::Alpha_shape_cell_base_3<K> Cb;
@@ -423,7 +429,7 @@ void ComputeHullMethod::alphaShape3(const std::vector<double> &points,
         totalVolume += volume;
     }
 
-    mesh.volume = totalVolume;
+    meshVolume = totalVolume;
 
     // Calculate the surface area.
     double totalArea = 0.0;
@@ -472,11 +478,11 @@ void ComputeHullMethod::alphaShape3(const std::vector<double> &points,
         }
     }
 
-    mesh.surfaceArea = totalArea;
+    meshSurfaceArea = totalArea;
 }
 
-void ComputeHullMethod::alphaShape2(const std::vector<double> &points,
-                                    Mesh &mesh,
+void ComputeHullMethod::alphaShape2(Mesh &mesh,
+                                    const std::vector<double> &points,
                                     double alpha,
                                     float z)
 {

@@ -111,15 +111,17 @@ void TreeSettings::setConcaveHullProjectionVisible(bool visible)
 
 void fromJson(TreeSettings &out, const Json &in)
 {
-    fromJson(out.useOnlyForSelectedTrees_, in["useOnlyForSelectedTrees"]);
-    fromJson(out.treeAttributesVisible_, in["treeAttributesVisible"]);
-    fromJson(out.treePosition_, in["treePosition"]);
-    fromJson(out.convexHullVisible_, in["convexHullVisible"]);
+    fromJson(out.useOnlyForSelectedTrees_, in, "useOnlyForSelectedTrees");
+    fromJson(out.treeAttributesVisible_, in, "treeAttributesVisible", true);
+    fromJson(out.treePosition_, in, "treePosition");
+    fromJson(out.convexHullVisible_, in, "convexHullVisible");
     fromJson(out.convexHullProjectionVisible_,
-             in["convexHullProjectionVisible"]);
-    fromJson(out.concaveHullVisible_, in["concaveHullVisible"]);
+             in,
+             "convexHullProjectionVisible");
+    fromJson(out.concaveHullVisible_, in, "concaveHullVisible");
     fromJson(out.concaveHullProjectionVisible_,
-             in["concaveHullProjectionVisible"]);
+             in,
+             "concaveHullProjectionVisible");
 }
 
 void toJson(Json &out, const TreeSettings &in)
@@ -146,6 +148,24 @@ void fromJson(TreeSettings::Position &out, const Json &in)
     std::string tmp;
     fromJson(tmp, in);
     fromString(out, tmp);
+}
+
+void fromJson(TreeSettings::Position &out,
+              const Json &in,
+              const std::string &key,
+              TreeSettings::Position defaultValue,
+              bool optional)
+{
+    std::string tmp;
+    fromJson(tmp, in, key, "", optional);
+    if (tmp.empty())
+    {
+        out = defaultValue;
+    }
+    else
+    {
+        fromString(out, tmp);
+    }
 }
 
 void toJson(Json &out, const TreeSettings::Position &in)

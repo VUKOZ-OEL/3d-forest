@@ -43,6 +43,10 @@ void fromJson(RenderingSettings &out, const Json &in)
     {
         fromJson(out.cacheSizeMaximum_, in["cacheSizeMaximum"]);
     }
+    else
+    {
+        out.cacheSizeMaximum_ = 1024;
+    }
 }
 
 void toJson(Json &out, const RenderingSettings &in)

@@ -63,12 +63,12 @@ protected:
     std::vector<Segment> segments_;
     std::unordered_map<size_t, size_t> hashTableId_;
 
-    friend void fromJson(Segments &out, const Json &in);
-    friend void toJson(Json &out, const Segments &in);
+    friend void fromJson(Segments &out, const Json &in, double scale);
+    friend void toJson(Json &out, const Segments &in, double scale);
 };
 
-void fromJson(Segments &out, const Json &in);
-void toJson(Json &out, const Segments &in);
+void fromJson(Segments &out, const Json &in, double scale);
+void toJson(Json &out, const Segments &in, double scale);
 
 #include <WarningsEnable.hpp>
 

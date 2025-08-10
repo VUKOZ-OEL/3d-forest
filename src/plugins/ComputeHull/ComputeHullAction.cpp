@@ -299,10 +299,12 @@ void ComputeHullAction::calculateAlphaShape3(Segment &segment,
                                              const ComputeHullData &data)
 {
     Mesh mesh;
-    ComputeHullMethod::alphaShape3(data.points, mesh, parameters_.alpha);
+    double v;
+    double s;
+    ComputeHullMethod::alphaShape3(mesh, v, s, data.points, parameters_.alpha);
     mesh.name = "concaveHull";
-    segment.treeAttributes.surfaceArea = mesh.surfaceArea;
-    segment.treeAttributes.volume = mesh.volume;
+    segment.treeAttributes.volume = v;
+    segment.treeAttributes.surfaceArea = s;
     segment.meshList[mesh.name] = std::move(mesh);
 }
 
@@ -312,7 +314,7 @@ void ComputeHullAction::calculateAlphaShape2(Segment &segment,
     float z = static_cast<float>(segment.boundary.min(2));
 
     Mesh mesh;
-    ComputeHullMethod::alphaShape2(data.points, mesh, parameters_.alpha, z);
+    ComputeHullMethod::alphaShape2(mesh, data.points, parameters_.alpha, z);
     segment.treeAttributes.surfaceAreaProjection =
         mesh.calculateSurfaceArea2d();
     mesh.name = "concaveHullProjection";

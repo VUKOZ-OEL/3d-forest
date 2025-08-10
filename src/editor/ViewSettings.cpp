@@ -114,13 +114,24 @@ void ViewSettings::setSceneBoundingBoxVisible(bool b)
 
 void fromJson(ViewSettings &out, const Json &in)
 {
-    fromJson(out.pointSize_, in["pointSize"]);
-    fromJson(out.pointColor_, in["pointColor"]);
-    fromJson(out.backgroundColor_, in["backgroundColor"]);
-    fromJson(out.colorSource_, in["colorSource"]);
+    fromJson(out.pointSize_, in, "pointSize", 1.0);
+    fromJson(out.pointColor_, in, "pointColor", {1.0, 1.0, 1.0});
+    fromJson(out.backgroundColor_, in, "backgroundColor", {0.2, 0.2, 0.2});
 
-    fromJson(out.distanceBasedFadingVisible_, in["distanceBasedFadingVisible"]);
-    fromJson(out.sceneBoundingBoxVisible_, in["sceneBoundingBoxVisible"]);
+    if (in.contains("colorSource"))
+    {
+        fromJson(out.colorSource_, in["colorSource"]);
+    }
+    else
+    {
+        out.colorSource_ = ViewSettings::ColorSource::COLOR;
+    }
+
+    fromJson(out.distanceBasedFadingVisible_,
+             in,
+             "distanceBasedFadingVisible",
+             false);
+    fromJson(out.sceneBoundingBoxVisible_, in, "sceneBoundingBoxVisible", true);
 }
 
 void toJson(Json &out, const ViewSettings &in)

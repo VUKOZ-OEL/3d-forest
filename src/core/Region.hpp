@@ -60,6 +60,30 @@ public:
     ~Region();
 
     void clear();
+
+    bool operator==(const Region &other) const
+    {
+        if (shape != other.shape)
+        {
+            return false;
+        }
+
+        if (boundary != other.boundary)
+        {
+            return false;
+        }
+
+        if (shape == Region::Shape::BOX)
+        {
+            return box == other.box;
+        }
+
+        // @todo
+
+        return shape == Region::Shape::NONE;
+    }
+
+    bool operator!=(const Region &other) const { return !(*this == other); }
 };
 
 inline Region::Region()
@@ -95,6 +119,40 @@ inline std::string toString(const Region::Shape &in)
     }
 }
 
+inline void fromJson(Region &out,
+                     const Json &in,
+                     const std::string &key,
+                     const Region &defaultValue = {},
+                     bool optional = true,
+                     double scale = 1.0)
+{
+    out.clear();
+
+    if (in.contains(key))
+    {
+        std::string shape;
+        fromJson(shape, in[key], "shape", "", optional);
+        if (shape == "box")
+        {
+            out.shape = Region::Shape::BOX;
+        }
+        else
+        {
+            out.shape = Region::Shape::NONE;
+        }
+
+        fromJson(out.box, in[key], "box", defaultValue.box, optional, scale);
+    }
+    else if (!optional)
+    {
+        THROW("JSON required key " + key + " was not found");
+    }
+    else
+    {
+        out = defaultValue;
+    }
+}
+
 inline void fromJson(Region &out, const Json &in)
 {
     std::string shape;
@@ -110,14 +168,10 @@ inline void fromJson(Region &out, const Json &in)
     }
 }
 
-inline void toJson(Json &out, const Region &in)
+inline void toJson(Json &out, const Region &in, double scale = 1.0)
 {
-    if (in.shape == Region::Shape::BOX)
-    {
-        toJson(out["box"], in.box);
-    }
-
     toJson(out["shape"], toString(in.shape));
+    toJson(out["box"], in.box, scale);
 }
 
 inline std::string toString(const Region &in)

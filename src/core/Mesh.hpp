@@ -62,12 +62,6 @@ public:
     /// Mesh vertex indices.
     std::vector<unsigned int> indices;
 
-    /// Mesh volume.
-    double volume{0.0};
-
-    /// Mesh surface area.
-    double surfaceArea{0.0};
-
     Mesh();
     ~Mesh();
 

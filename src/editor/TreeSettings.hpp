@@ -81,6 +81,12 @@ void toJson(Json &out, const TreeSettings &in);
 std::string EXPORT_EDITOR toString(const TreeSettings &in);
 
 void fromJson(TreeSettings::Position &out, const Json &in);
+void fromJson(
+    TreeSettings::Position &out,
+    const Json &in,
+    const std::string &key,
+    TreeSettings::Position defaultValue = TreeSettings::Position::BOTTOM,
+    bool optional = true);
 void toJson(Json &out, const TreeSettings::Position &in);
 void fromString(TreeSettings::Position &out, const std::string &in);
 std::string EXPORT_EDITOR toString(const TreeSettings::Position &in);

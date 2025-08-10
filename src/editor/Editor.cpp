@@ -245,6 +245,14 @@ void Editor::openProject(std::string path, bool reload)
             fromJson(projectName_, in[EDITOR_KEY_PROJECT_NAME]);
         }
 
+        // Settings.
+        if (in.contains(EDITOR_KEY_SETTINGS))
+        {
+            fromJson(settings_, in[EDITOR_KEY_SETTINGS]);
+        }
+
+        double ppm = settings().unitsSettings().pointsPerMeter()[0];
+
         // Data sets.
         if (in.contains(EDITOR_KEY_DATA_SET))
         {
@@ -259,7 +267,7 @@ void Editor::openProject(std::string path, bool reload)
         // Segments.
         if (in.contains(EDITOR_KEY_SEGMENT))
         {
-            fromJson(segments_, in[EDITOR_KEY_SEGMENT]);
+            fromJson(segments_, in[EDITOR_KEY_SEGMENT], ppm);
         }
 
         // Species.
@@ -280,35 +288,27 @@ void Editor::openProject(std::string path, bool reload)
             fromJson(classifications_, in[EDITOR_KEY_CLASSIFICATIONS]);
         }
 
-        // Settings.
-        if (in.contains(EDITOR_KEY_SETTINGS))
-        {
-            fromJson(settings_, in[EDITOR_KEY_SETTINGS]);
-        }
-
         // Clip filter.
-        if (in.contains(EDITOR_KEY_CLIP_FILTER))
-        {
-            fromJson(clipFilter_, in[EDITOR_KEY_CLIP_FILTER]);
-        }
-        else
-        {
-            // clipFilter_.clear();
-            clipFilter_.boundary = datasets_.boundary();
-            clipFilter_.box = clipFilter_.boundary;
-        }
+        clipFilter_.boundary = datasets_.boundary();
+        clipFilter_.box = clipFilter_.boundary;
+
+        fromJson(clipFilter_,
+                 in,
+                 EDITOR_KEY_CLIP_FILTER,
+                 clipFilter_,
+                 true,
+                 ppm);
 
         // Elevation filter.
-        if (in.contains(EDITOR_KEY_ELEVATION_FILTER))
-        {
-            fromJson(elevationFilter_, in[EDITOR_KEY_ELEVATION_FILTER]);
-        }
-        else
-        {
-            elevationFilter_.set(
-                static_cast<double>(datasetsRange_.elevationMin),
-                static_cast<double>(datasetsRange_.elevationMax));
-        }
+        elevationFilter_.set(static_cast<double>(datasetsRange_.elevationMin),
+                             static_cast<double>(datasetsRange_.elevationMax));
+
+        fromJson(elevationFilter_,
+                 in,
+                 EDITOR_KEY_ELEVATION_FILTER,
+                 elevationFilter_,
+                 true,
+                 ppm);
 
         // Descriptor filter.
         if (in.contains(EDITOR_KEY_DESCRIPTOR_FILTER))
@@ -405,18 +405,21 @@ void Editor::saveProject(const std::string &path)
 
     setProjectPath(path);
 
+    double ppm = settings().unitsSettings().pointsPerMeter()[0];
+    double mpp = 1.0 / ppm;
+
     // Save data.
     Json out;
 
     toJson(out[EDITOR_KEY_PROJECT_NAME], projectName_);
     toJson(out[EDITOR_KEY_DATA_SET], datasets_);
-    toJson(out[EDITOR_KEY_SEGMENT], segments_);
+    toJson(out[EDITOR_KEY_SEGMENT], segments_, mpp);
     toJson(out[EDITOR_KEY_SPECIES], speciesList_);
     toJson(out[EDITOR_KEY_MANAGEMENT_STATUS], managementStatusList_);
     toJson(out[EDITOR_KEY_CLASSIFICATIONS], classifications_);
     toJsonProjectSettings(out[EDITOR_KEY_SETTINGS], settings_);
-    toJson(out[EDITOR_KEY_CLIP_FILTER], clipFilter_);
-    toJson(out[EDITOR_KEY_ELEVATION_FILTER], elevationFilter_);
+    toJson(out[EDITOR_KEY_CLIP_FILTER], clipFilter_, mpp);
+    toJson(out[EDITOR_KEY_ELEVATION_FILTER], elevationFilter_, mpp);
     toJson(out[EDITOR_KEY_DESCRIPTOR_FILTER], descriptorFilter_);
     toJson(out[EDITOR_KEY_INTENSITY_FILTER], intensityFilter_);
     toJson(out[EDITOR_KEY_CLASSIFICATIONS_FILTER], classificationsFilter_);

@@ -31,7 +31,7 @@ Segment::Segment()
 {
 }
 
-void fromJson(Segment &out, const Json &in)
+void fromJson(Segment &out, const Json &in, double scale)
 {
     fromJson(out.id, in["id"]);
     fromJson(out.label, in["label"]);
@@ -52,14 +52,18 @@ void fromJson(Segment &out, const Json &in)
     }
     else
     {
-        out.speciesId = 0;
+        out.managementStatusId = 0;
     }
 
-    fromJson(out.boundary, in["boundary"]);
-    fromJson(out.treeAttributes, in["treeAttributes"]);
+    fromJson(out.boundary, in, "boundary", Box<double>(), true, scale);
+
+    if (in.contains("treeAttributes"))
+    {
+        fromJson(out.treeAttributes, in["treeAttributes"], scale);
+    }
 }
 
-void toJson(Json &out, const Segment &in)
+void toJson(Json &out, const Segment &in, double scale)
 {
     toJson(out["id"], in.id);
     toJson(out["label"], in.label);
@@ -68,8 +72,8 @@ void toJson(Json &out, const Segment &in)
     toJson(out["speciesId"], in.speciesId);
     toJson(out["managementStatusId"], in.managementStatusId);
 
-    toJson(out["boundary"], in.boundary);
-    toJson(out["treeAttributes"], in.treeAttributes);
+    toJson(out["boundary"], in.boundary, scale);
+    toJson(out["treeAttributes"], in.treeAttributes, scale);
 
 #if 0
     // Export mesh list.

@@ -58,7 +58,7 @@ public:
 inline void toJson(Json &out, const ComputeTreeAttributesData &in)
 {
     toJson(out["treeId"], in.treeId);
-    toJson(out["treeAttributes"], in.treeAttributes);
+    toJson(out["treeAttributes"], in.treeAttributes, 1.0);
 }
 
 inline std::string toString(const ComputeTreeAttributesData &in)

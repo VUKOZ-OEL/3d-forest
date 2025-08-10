@@ -99,14 +99,18 @@ void FilterElevationWidget::setElevation(const Range<double> &range)
 
     double ppm =
         mainWindow_->editor().settings().unitsSettings().pointsPerMeter()[0];
+
     double min = elevationRange_.minimum() / ppm;
     double max = elevationRange_.maximum() / ppm;
+
+    double minValue = elevationRange_.minimumValue() / ppm;
+    double maxValue = elevationRange_.maximumValue() / ppm;
 
     elevationInput_->blockSignals(true);
     elevationInput_->setMinimum(min);
     elevationInput_->setMaximum(max);
-    elevationInput_->setMinimumValue(min);
-    elevationInput_->setMaximumValue(max);
+    elevationInput_->setMinimumValue(minValue);
+    elevationInput_->setMaximumValue(maxValue);
     elevationInput_->blockSignals(false);
 }
 

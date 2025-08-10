@@ -69,8 +69,15 @@ bool UnitsSettings::apply(const UnitsSettings &newSettings)
 
 void fromJson(UnitsSettings &out, const Json &in)
 {
-    fromJson(out.userDefined, in["userDefined"]);
-    fromJson(out.pointsPerMeterUser, in["pointsPerMeterUser"]);
+    fromJson(out.userDefined, in, "userDefined", false);
+    fromJson(out.pointsPerMeterUser,
+             in,
+             "pointsPerMeterUser",
+             {1000.0, 1000.0, 1000.0});
+    fromJson(out.pointsPerMeterLas,
+             in,
+             "pointsPerMeter",
+             {1000.0, 1000.0, 1000.0});
 }
 
 void toJson(Json &out, const UnitsSettings &in)

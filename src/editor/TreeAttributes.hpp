@@ -102,18 +102,21 @@ inline bool TreeAttributes::isDbhValid() const
     return dbh > 0.0 && dbhPosition != Vector3<double>();
 }
 
-inline void toJson(Json &out, const TreeAttributes &in)
+inline void toJson(Json &out, const TreeAttributes &in, double scale)
 {
-    toJson(out["position"], in.position);
-    toJson(out["height"], in.height);
-    toJson(out["surfaceAreaProjection"], in.surfaceAreaProjection);
-    toJson(out["surfaceArea"], in.surfaceArea);
-    toJson(out["volume"], in.volume);
-    toJson(out["dbhPosition"], in.dbhPosition);
-    toJson(out["dbhNormal"], in.dbhNormal);
-    toJson(out["dbh"], in.dbh);
+    double scale2 = scale * scale;
+    double scale3 = scale * scale * scale;
 
-    toJson(out["crownStartHeight"], in.crownStartHeight);
+    toJson(out["position"], in.position * scale);
+    toJson(out["height"], in.height * scale);
+    toJson(out["surfaceAreaProjection"], in.surfaceAreaProjection * scale2);
+    toJson(out["surfaceArea"], in.surfaceArea * scale2);
+    toJson(out["volume"], in.volume * scale3);
+    toJson(out["dbhPosition"], in.dbhPosition * scale);
+    toJson(out["dbhNormal"], in.dbhNormal);
+    toJson(out["dbh"], in.dbh * scale);
+
+    toJson(out["crownStartHeight"], in.crownStartHeight * scale);
     toJson(out["crownVoxelCountPerMeters"], in.crownVoxelCountPerMeters);
     toJson(out["crownVoxelCount"], in.crownVoxelCount);
 
@@ -126,41 +129,40 @@ inline void toJson(Json &out, const TreeAttributes &in)
         idx++;
     }
 
-    toJson(out["crownVoxelSize"], in.crownVoxelSize);
+    toJson(out["crownVoxelSize"], in.crownVoxelSize * scale);
 }
 
-inline void fromJson(TreeAttributes &out, const Json &in)
+inline void fromJson(TreeAttributes &out, const Json &in, double scale)
 {
-    fromJson(out.position, in["position"]);
-    fromJson(out.height, in["height"]);
-    fromJson(out.surfaceAreaProjection, in["surfaceAreaProjection"]);
-    fromJson(out.surfaceArea, in["surfaceArea"]);
-    fromJson(out.volume, in["volume"]);
-    fromJson(out.dbhPosition, in["dbhPosition"]);
-    if (in.contains("dbhNormal"))
-    {
-        fromJson(out.dbhNormal, in["dbhNormal"]);
-    }
-    else
-    {
-        out.dbhNormal.set(0.0, 0.0, 1.0);
-    }
-    fromJson(out.dbh, in["dbh"]);
+    fromJson(out.position, in, "position");
+    out.position = out.position * scale;
 
-    if (in.contains("crownStartHeight"))
-    {
-        fromJson(out.crownStartHeight, in["crownStartHeight"]);
-    }
+    fromJson(out.height, in, "height");
+    out.height *= scale;
 
-    if (in.contains("crownVoxelCountPerMeters"))
-    {
-        fromJson(out.crownVoxelCountPerMeters, in["crownVoxelCountPerMeters"]);
-    }
+    fromJson(out.surfaceAreaProjection, in, "surfaceAreaProjection");
+    out.surfaceAreaProjection = out.surfaceAreaProjection * (scale * scale);
 
-    if (in.contains("crownVoxelCount"))
-    {
-        fromJson(out.crownVoxelCount, in["crownVoxelCount"]);
-    }
+    fromJson(out.surfaceArea, in, "surfaceArea");
+    out.surfaceArea = out.surfaceArea * (scale * scale);
+
+    fromJson(out.volume, in, "volume");
+    out.volume = out.volume * (scale * scale * scale);
+
+    fromJson(out.dbhPosition, in, "dbhPosition");
+    out.dbhPosition = out.dbhPosition * scale;
+
+    fromJson(out.dbhNormal, in, "dbhNormal", Vector3<double>(0.0, 0.0, 1.0));
+
+    fromJson(out.dbh, in, "dbh");
+    out.dbh *= scale;
+
+    fromJson(out.crownStartHeight, in, "crownStartHeight");
+    out.crownStartHeight *= scale;
+
+    fromJson(out.crownVoxelCountPerMeters, in, "crownVoxelCountPerMeters");
+
+    fromJson(out.crownVoxelCount, in, "crownVoxelCount");
 
     out.crownVoxelCountShared.clear();
     if (in.contains("crownVoxelCountShared") &&
@@ -178,16 +180,14 @@ inline void fromJson(TreeAttributes &out, const Json &in)
         }
     }
 
-    if (in.contains("crownVoxelSize"))
-    {
-        fromJson(out.crownVoxelSize, in["crownVoxelSize"]);
-    }
+    fromJson(out.crownVoxelSize, in, "crownVoxelSize");
+    out.crownVoxelSize *= scale;
 }
 
 inline std::string toString(const TreeAttributes &in)
 {
     Json json;
-    toJson(json, in);
+    toJson(json, in, 1.0);
     return json.serialize(0);
 }
 

@@ -38,6 +38,16 @@
 #include <ExportCore.hpp>
 #include <WarningsDisable.hpp>
 
+class Json;
+
+template <typename T>
+inline typename std::enable_if<std::is_arithmetic_v<T>, void>::type fromJson(
+    std::vector<T> &out,
+    const Json &in,
+    const std::string &key,
+    const std::vector<T> &defaultValue = {},
+    bool optional = true);
+
 /** JSON.
 
     example deserialize:
@@ -166,7 +176,61 @@ public:
 
     template <typename T>
     friend typename std::enable_if<std::is_arithmetic_v<T>, void>::type
-    fromJson(const std::vector<T> &out, const Json &in);
+    fromJson(std::vector<T> &out, const Json &in);
+
+    friend void fromJson(bool &out,
+                         const Json &in,
+                         const std::string &key,
+                         bool defaultValue,
+                         bool optional);
+    friend void fromJson(int &out,
+                         const Json &in,
+                         const std::string &key,
+                         int defaultValue,
+                         bool optional);
+    friend void fromJson(unsigned int &out,
+                         const Json &in,
+                         const std::string &key,
+                         unsigned int defaultValue,
+                         bool optional);
+    friend void fromJson(double &out,
+                         const Json &in,
+                         const std::string &key,
+                         double defaultValue,
+                         bool optional);
+    friend void fromJson(long &out,
+                         const Json &in,
+                         const std::string &key,
+                         long defaultValue,
+                         bool optional);
+    friend void fromJson(unsigned long &out,
+                         const Json &in,
+                         const std::string &key,
+                         unsigned long defaultValue,
+                         bool optional);
+    friend void fromJson(long long &out,
+                         const Json &in,
+                         const std::string &key,
+                         long long defaultValue,
+                         bool optional);
+    friend void fromJson(unsigned long long &out,
+                         const Json &in,
+                         const std::string &key,
+                         unsigned long long defaultValue,
+                         bool optional);
+    friend void fromJson(std::string &out,
+                         const Json &in,
+                         const std::string &key,
+                         const std::string &defaultValue,
+                         bool optional);
+
+    template <typename T>
+    friend typename std::enable_if<std::is_arithmetic_v<T>, void>::type
+    fromJson(std::vector<T> &out,
+             const Json &in,
+             const std::string &key,
+             const std::vector<T> &defaultValue,
+             bool optional);
 
     friend void toJson(Json &out, bool in);
     friend void toJson(Json &out, int in);
@@ -594,6 +658,282 @@ inline void fromJson(unsigned long long &out, const Json &in)
 inline void fromJson(std::string &out, const Json &in)
 {
     out = in.string();
+}
+
+inline void fromJson(bool &out,
+                     const Json &in,
+                     const std::string &key,
+                     bool defaultValue = false,
+                     bool optional = true)
+{
+    if (in.typeObject())
+    {
+        auto search = in.data_.object->find(key);
+        if (search != in.data_.object->end())
+        {
+            if (search->second.typeTrue())
+            {
+                out = true;
+                return;
+            }
+
+            if (search->second.typeFalse())
+            {
+                out = false;
+                return;
+            }
+        }
+    }
+
+    out = defaultValue;
+
+    if (!optional)
+    {
+        THROW("JSON required key " + key + " was not found");
+    }
+}
+
+inline void fromJson(int &out,
+                     const Json &in,
+                     const std::string &key,
+                     int defaultValue = 0,
+                     bool optional = true)
+{
+    if (in.typeObject())
+    {
+        auto search = in.data_.object->find(key);
+        if (search != in.data_.object->end() && search->second.typeNumber())
+        {
+            out = static_cast<int>(search->second.data_.number);
+            return;
+        }
+    }
+
+    out = defaultValue;
+
+    if (!optional)
+    {
+        THROW("JSON required key " + key + " was not found");
+    }
+}
+
+inline void fromJson(unsigned int &out,
+                     const Json &in,
+                     const std::string &key,
+                     unsigned int defaultValue = 0,
+                     bool optional = true)
+{
+    if (in.typeObject())
+    {
+        auto search = in.data_.object->find(key);
+        if (search != in.data_.object->end() && search->second.typeNumber() &&
+            !(search->second.data_.number < 0.0))
+        {
+            out = static_cast<unsigned int>(search->second.data_.number);
+            return;
+        }
+    }
+
+    out = defaultValue;
+
+    if (!optional)
+    {
+        THROW("JSON required key " + key + " was not found");
+    }
+}
+
+inline void fromJson(double &out,
+                     const Json &in,
+                     const std::string &key,
+                     double defaultValue = 0.0,
+                     bool optional = true)
+{
+    if (in.typeObject())
+    {
+        auto search = in.data_.object->find(key);
+        if (search != in.data_.object->end() && search->second.typeNumber())
+        {
+            out = search->second.data_.number;
+            return;
+        }
+    }
+
+    out = defaultValue;
+
+    if (!optional)
+    {
+        THROW("JSON required key " + key + " was not found");
+    }
+}
+
+inline void fromJson(long &out,
+                     const Json &in,
+                     const std::string &key,
+                     long defaultValue = 0,
+                     bool optional = true)
+{
+    if (in.typeObject())
+    {
+        auto search = in.data_.object->find(key);
+        if (search != in.data_.object->end() && search->second.typeNumber())
+        {
+            out = static_cast<long>(search->second.data_.number);
+            return;
+        }
+    }
+
+    out = defaultValue;
+
+    if (!optional)
+    {
+        THROW("JSON required key " + key + " was not found");
+    }
+}
+
+inline void fromJson(unsigned long &out,
+                     const Json &in,
+                     const std::string &key,
+                     unsigned long defaultValue = 0,
+                     bool optional = true)
+{
+    if (in.typeObject())
+    {
+        auto search = in.data_.object->find(key);
+        if (search != in.data_.object->end() && search->second.typeNumber() &&
+            !(search->second.data_.number < 0.0))
+        {
+            out = static_cast<unsigned long>(search->second.data_.number);
+            return;
+        }
+    }
+
+    out = defaultValue;
+
+    if (!optional)
+    {
+        THROW("JSON required key " + key + " was not found");
+    }
+}
+
+inline void fromJson(long long &out,
+                     const Json &in,
+                     const std::string &key,
+                     long long defaultValue = 0,
+                     bool optional = true)
+{
+    if (in.typeObject())
+    {
+        auto search = in.data_.object->find(key);
+        if (search != in.data_.object->end() && search->second.typeNumber())
+        {
+            out = static_cast<long long>(search->second.data_.number);
+            return;
+        }
+    }
+
+    out = defaultValue;
+
+    if (!optional)
+    {
+        THROW("JSON required key " + key + " was not found");
+    }
+}
+
+inline void fromJson(unsigned long long &out,
+                     const Json &in,
+                     const std::string &key,
+                     unsigned long long defaultValue = 0,
+                     bool optional = true)
+{
+    if (in.typeObject())
+    {
+        auto search = in.data_.object->find(key);
+        if (search != in.data_.object->end() && search->second.typeNumber() &&
+            !(search->second.data_.number < 0.0))
+        {
+            out = static_cast<unsigned long long>(search->second.data_.number);
+            return;
+        }
+    }
+
+    out = defaultValue;
+
+    if (!optional)
+    {
+        THROW("JSON required key " + key + " was not found");
+    }
+}
+
+inline void fromJson(std::string &out,
+                     const Json &in,
+                     const std::string &key,
+                     const std::string &defaultValue = "",
+                     bool optional = true)
+{
+    if (in.typeObject())
+    {
+        auto search = in.data_.object->find(key);
+        if (search != in.data_.object->end() && search->second.typeString())
+        {
+            out = *search->second.data_.string;
+            return;
+        }
+    }
+
+    out = defaultValue;
+
+    if (!optional)
+    {
+        THROW("JSON required key " + key + " was not found");
+    }
+}
+
+template <typename T>
+inline typename std::enable_if<std::is_arithmetic_v<T>, void>::type fromJson(
+    std::vector<T> &out,
+    const Json &in,
+    const std::string &key,
+    const std::vector<T> &defaultValue,
+    bool optional)
+{
+    if (in.typeObject())
+    {
+        auto search = in.data_.object->find(key);
+        if (search != in.data_.object->end() && search->second.typeArray() &&
+            (defaultValue.empty() ||
+             defaultValue.size() == search->second.data_.array->size()))
+        {
+            const auto &inArray = search->second.data_.array;
+            size_t n = inArray->size();
+
+            std::vector<T> tmp(n);
+            bool error = false;
+
+            for (size_t i = 0; i < n; i++)
+            {
+                const auto &inItem = inArray->operator[](i);
+                if (!inItem.typeNumber())
+                {
+                    error = true;
+                    break;
+                }
+                tmp[i] = static_cast<T>(inItem.data_.number);
+            }
+
+            if (!error)
+            {
+                out = tmp;
+                return;
+            }
+        }
+    }
+
+    out = defaultValue;
+
+    if (!optional)
+    {
+        THROW("JSON required key " + key + " was not found");
+    }
 }
 
 inline void toJson(Json &out, bool in)

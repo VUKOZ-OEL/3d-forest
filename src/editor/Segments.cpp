@@ -245,7 +245,7 @@ void Segments::importMeshList(const std::string &projectFilePath, double scale)
     }
 }
 
-void fromJson(Segments &out, const Json &in)
+void fromJson(Segments &out, const Json &in, double scale)
 {
     out.clear();
 
@@ -256,7 +256,7 @@ void fromJson(Segments &out, const Json &in)
 
     for (auto const &it : in.array())
     {
-        fromJson(out.segments_[i], it);
+        fromJson(out.segments_[i], it, scale);
         size_t id = out.segments_[i].id;
         out.hashTableId_[id] = i;
         i++;
@@ -269,13 +269,13 @@ void fromJson(Segments &out, const Json &in)
     }
 }
 
-void toJson(Json &out, const Segments &in)
+void toJson(Json &out, const Segments &in, double scale)
 {
     size_t i = 0;
 
     for (auto const &it : in.segments_)
     {
-        toJson(out[i], it);
+        toJson(out[i], it, scale);
         i++;
     }
 }
