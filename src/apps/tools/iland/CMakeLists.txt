@@ -15,11 +15,31 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-add_subdirectory(classification)
-add_subdirectory(descriptor)
-add_subdirectory(elevation)
-add_subdirectory(icon)
-add_subdirectory(iland)
-add_subdirectory(sandbox)
-add_subdirectory(segmentation)
-add_subdirectory(treeattributes)
+set(SUB_PROJECT_NAME "3DForestILand")
+
+if(NOT QT_VERSION_MAJOR)
+    message(WARNING "Qt not found - skipping ${SUB_PROJECT_NAME}")
+    return()
+endif()
+
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+add_executable(
+    ${SUB_PROJECT_NAME}
+    iland.cpp
+)
+
+target_include_directories(
+    ${SUB_PROJECT_NAME}
+    PUBLIC
+    ../../../../3rdparty/iland-model/src
+)
+
+target_link_libraries(
+    ${SUB_PROJECT_NAME}
+    PUBLIC
+    ILandModel
+)
+
+install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

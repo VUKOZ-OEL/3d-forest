@@ -877,6 +877,7 @@ powershell -C "gci | % {rni $_.Name ($_.Name -replace '24px', '24')}"
         "${workspaceRoot}/3rdparty/convhull_3d",
         "${workspaceRoot}/3rdparty/delaunator",
         "${workspaceRoot}/3rdparty/eigen",
+        "${workspaceRoot}/3rdparty/iland-model/src/**",
         "${workspaceRoot}/3rdparty/libigl/include",
         "${workspaceRoot}/3rdparty/pcdio",
         "${workspaceRoot}/3rdparty/stb",
