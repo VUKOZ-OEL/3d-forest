@@ -145,6 +145,19 @@ add_library(
     tools/ticktack.cpp
     tools/viewport.cpp
     tools/xmlhelper.cpp
+    plugins/barkbeetle/barkbeetleplugin.cpp
+    plugins/barkbeetle/barkbeetlemodule.cpp
+    plugins/barkbeetle/barkbeetlescript.cpp
+    plugins/barkbeetle/bbgenerations.cpp
+    plugins/barkbeetle/barkbeetleout.cpp
+    plugins/fire/fireplugin.cpp
+    plugins/fire/firemodule.cpp
+    plugins/fire/fireout.cpp
+    plugins/fire/firescript.cpp
+    plugins/wind/windplugin.cpp
+    plugins/wind/windmodule.cpp
+    plugins/wind/windscript.cpp
+    plugins/wind/windout.cpp
 )
 
 if (WIN32)
@@ -164,6 +177,10 @@ target_include_directories(
     bite
     core
     output
+    plugins
+    plugins/barkbeetle
+    plugins/fire
+    plugins/wind
     tools
     ${CMAKE_CURRENT_LIST_DIR}
 )
