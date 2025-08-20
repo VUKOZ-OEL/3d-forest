@@ -147,6 +147,14 @@ add_library(
     tools/xmlhelper.cpp
 )
 
+if (WIN32)
+    set_target_properties(
+        ${SUB_PROJECT_NAME}
+        PROPERTIES
+        WINDOWS_EXPORT_ALL_SYMBOLS ON
+    )
+endif()
+
 target_include_directories(
     ${SUB_PROJECT_NAME}
     PUBLIC
