@@ -908,6 +908,7 @@ powershell -C "gci | % {rni $_.Name ($_.Name -replace '24px', '24')}"
         "${workspaceRoot}/src/plugins/ComputeTreeAttributes",
         "${workspaceRoot}/src/plugins/Edit",
         "${workspaceRoot}/src/plugins/ExportFile",
+        "${workspaceRoot}/src/plugins/External3dMarteloscope",
         "${workspaceRoot}/src/plugins/FilterArea",
         "${workspaceRoot}/src/plugins/FilterClassification",
         "${workspaceRoot}/src/plugins/FilterDescriptor",

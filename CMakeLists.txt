@@ -45,7 +45,7 @@ if(FORCE_QT5)
     endif()
 else()
     # Default autodetect Qt version
-    find_package(Qt6 COMPONENTS Core Gui Widgets Concurrent Qml Sql Xml OpenGL OpenGLWidgets QUIET)
+    find_package(Qt6 COMPONENTS Core Gui Widgets Network Concurrent Qml Sql Xml OpenGL OpenGLWidgets)
     if(Qt6_FOUND AND Qt6OpenGL_FOUND AND OpenGL_FOUND)
         message(STATUS "Gui with Qt6 and OpenGL found")
         set(QT_VERSION_MAJOR 6)
