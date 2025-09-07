@@ -111,8 +111,11 @@ inline bool Region::empty() const
         case Region::Shape::BOX:
             return box.empty();
         case Region::Shape::CONE:
+            return cone.empty();
         case Region::Shape::CYLINDER:
+            return cylinder.empty();
         case Region::Shape::SPHERE:
+            return sphere.empty();
         case Region::Shape::NONE:
         default:
             return false;
