@@ -242,7 +242,7 @@ void Page::queryWhere()
 
     const Region &region = query_->where().region();
 
-    if (region.shape == Region::Shape::NONE)
+    if (region.matchesAll())
     {
         // Reset selection to mark all points as selected.
         LOG_DEBUG(<< "Reset selection.");
@@ -254,12 +254,14 @@ void Page::queryWhere()
             selection[i] = i;
         }
     }
+    else
+    {
+        queryWhereBox();
+        queryWhereCone();
+        queryWhereCylinder();
+        queryWhereSphere();
+    }
 
-    // Apply new selection.
-    queryWhereBox();
-    queryWhereCone();
-    queryWhereCylinder();
-    queryWhereSphere();
     queryWhereElevation();
     queryWhereIntensity();
     queryWhereDescriptor();
@@ -275,7 +277,7 @@ void Page::queryWhereBox()
 {
     const Region &region = query_->where().region();
     const Box<double> &clipBox = region.box;
-    if (region.shape != Region::Shape::BOX || clipBox.empty())
+    if (region.shape != Region::Shape::BOX)
     {
         return;
     }
@@ -421,7 +423,7 @@ void Page::queryWhereCone()
 {
     const Region &region = query_->where().region();
     const Cone<double> &clipCone = region.cone;
-    if (region.shape != Region::Shape::CONE || clipCone.empty())
+    if (region.shape != Region::Shape::CONE)
     {
         return;
     }
@@ -504,7 +506,7 @@ void Page::queryWhereCylinder()
 {
     const Region &region = query_->where().region();
     const Cylinder<double> &clipCylinder = region.cylinder;
-    if (region.shape != Region::Shape::CYLINDER || clipCylinder.empty())
+    if (region.shape != Region::Shape::CYLINDER)
     {
         return;
     }
@@ -587,7 +589,7 @@ void Page::queryWhereSphere()
 {
     const Region &region = query_->where().region();
     const Sphere<double> &clipSphere = region.sphere;
-    if (region.shape != Region::Shape::SPHERE || clipSphere.empty())
+    if (region.shape != Region::Shape::SPHERE)
     {
         return;
     }
@@ -670,7 +672,7 @@ void Page::queryWhereElevation()
 {
     const Range<double> &elevationRange = query_->where().elevation();
 
-    if (elevationRange.enabled() == false || elevationRange.full())
+    if (elevationRange.full())
     {
         return;
     }
@@ -702,7 +704,7 @@ void Page::queryWhereDescriptor()
 {
     const Range<double> &descriptorRange = query_->where().descriptor();
 
-    if (descriptorRange.enabled() == false || descriptorRange.full())
+    if (descriptorRange.full())
     {
         return;
     }
@@ -734,7 +736,7 @@ void Page::queryWhereIntensity()
 {
     const Range<double> &intensityRange = query_->where().intensity();
 
-    if (intensityRange.enabled() == false || intensityRange.full())
+    if (intensityRange.full())
     {
         return;
     }
@@ -764,7 +766,7 @@ void Page::queryWhereIntensity()
 
 void Page::queryWhereClassification()
 {
-    if (!query_->where().classification().enabled())
+    if (query_->where().classification().matchesAll())
     {
         return;
     }
@@ -799,7 +801,7 @@ void Page::queryWhereClassification()
 
 void Page::queryWhereSegment()
 {
-    if (!query_->where().segment().enabled())
+    if (query_->where().segment().matchesAll())
     {
         return;
     }
@@ -836,7 +838,7 @@ void Page::queryWhereSegment()
 
 void Page::queryWhereSpecies()
 {
-    if (!query_->where().species().enabled())
+    if (query_->where().species().matchesAll())
     {
         return;
     }
@@ -879,7 +881,7 @@ void Page::queryWhereSpecies()
 
 void Page::queryWhereManagementStatus()
 {
-    if (!query_->where().managementStatus().enabled())
+    if (query_->where().managementStatus().matchesAll())
     {
         return;
     }

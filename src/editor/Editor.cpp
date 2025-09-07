@@ -290,6 +290,7 @@ void Editor::openProject(std::string path, bool reload)
 
         // Clip filter.
         clipFilter_.boundary = datasets_.boundary();
+        clipFilter_.shape = Region::Shape::BOX;
         clipFilter_.box = clipFilter_.boundary;
 
         fromJson(clipFilter_,
@@ -691,7 +692,7 @@ void Editor::updateAfterSet()
 
     clipFilter_.boundary = datasets_.boundary();
     clipFilter_.box = clipFilter_.boundary;
-    // clipFilter_.enabled = Region::Shape::BOX;
+    clipFilter_.shape = Region::Shape::BOX;
 }
 
 void Editor::updateAfterRead()

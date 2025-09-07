@@ -61,6 +61,9 @@ public:
 
     void clear();
 
+    bool empty() const;
+    bool matchesAll() const;
+
     bool operator==(const Region &other) const
     {
         if (shape != other.shape)
@@ -99,6 +102,36 @@ inline void Region::clear()
 {
     box.clear();
     shape = Region::Shape::NONE;
+}
+
+inline bool Region::empty() const
+{
+    switch (shape)
+    {
+        case Region::Shape::BOX:
+            return box.empty();
+        case Region::Shape::CONE:
+        case Region::Shape::CYLINDER:
+        case Region::Shape::SPHERE:
+        case Region::Shape::NONE:
+        default:
+            return false;
+    }
+}
+
+inline bool Region::matchesAll() const
+{
+    switch (shape)
+    {
+        case Region::Shape::BOX:
+            return boundary == box;
+        case Region::Shape::CONE:
+        case Region::Shape::CYLINDER:
+        case Region::Shape::SPHERE:
+        case Region::Shape::NONE:
+        default:
+            return false;
+    }
 }
 
 inline std::string toString(const Region::Shape &in)

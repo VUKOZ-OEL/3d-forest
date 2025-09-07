@@ -184,20 +184,14 @@ void ViewerOpenGL::renderClipFilter(const Region &clipFilter)
 
         ViewerOpenGL::renderCylinder(a, b, radius, 10);
     }
-    else
+    else if (clipFilter.shape == Region::Shape::BOX)
     {
-        ViewerAabb box;
-
-        if (clipFilter.shape == Region::Shape::BOX)
+        if (!clipFilter.matchesAll())
         {
+            ViewerAabb box;
             box.set(clipFilter.box);
+            ViewerOpenGL::renderAabb(box);
         }
-        else
-        {
-            box.set(clipFilter.boundary);
-        }
-
-        ViewerOpenGL::renderAabb(box);
     }
 
     glDisable(GL_LINE_STIPPLE);

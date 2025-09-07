@@ -44,6 +44,9 @@ public:
 
     void clear();
 
+    bool empty() const { return filter_.empty(); }
+    bool matchesAll() const { return filter_.size() == values_.size(); }
+
     void setEnabled(bool enabled) { enabled_ = enabled; }
     bool enabled() const { return enabled_; }
 

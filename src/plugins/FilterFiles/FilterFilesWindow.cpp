@@ -51,7 +51,7 @@ FilterFilesWindow::FilterFilesWindow(MainWindow *mainWindow)
 void FilterFilesWindow::showEvent(QShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
-    widget_->setFilterEnabled(true);
+    // widget_->setFilterEnabled(true);
     QWidget::showEvent(event);
 }
 
@@ -64,6 +64,6 @@ void FilterFilesWindow::hideEvent(QHideEvent *event)
 void FilterFilesWindow::closeEvent(QCloseEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Close event.");
-    widget_->setFilterEnabled(false);
+    // widget_->setFilterEnabled(false);
     event->accept();
 }
