@@ -174,6 +174,7 @@ public:
     static void renderLine(const Vector3<float> &a, const Vector3<float> &b);
     static void renderCircle(const Vector3<float> &p,
                              float radius,
+                             bool fill = false,
                              size_t pointCount = 16);
 
     static void renderText(ViewerOpenGLManager *manager,

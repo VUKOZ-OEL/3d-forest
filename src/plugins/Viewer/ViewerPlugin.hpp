@@ -60,6 +60,7 @@ public:
 public slots:
     void slotViewOrthographic();
     void slotViewPerspective();
+    void slotView2d();
 
     void slotViewTop();
     void slotViewFront();
@@ -81,6 +82,7 @@ private:
 
     QAction *viewOrthographicAction_;
     QAction *viewPerspectiveAction_;
+    QAction *view2dAction_;
 
     QAction *viewTopAction_;
     QAction *viewFrontAction_;

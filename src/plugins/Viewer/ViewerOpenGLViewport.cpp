@@ -46,7 +46,6 @@ ViewerOpenGLViewport::ViewerOpenGLViewport(QWidget *parent)
       selected_(false),
       resized_(false),
       editor_(nullptr)
-
 {
     setViewDefault();
 }
@@ -231,11 +230,32 @@ Camera ViewerOpenGLViewport::camera() const
 void ViewerOpenGLViewport::setViewOrthographic()
 {
     camera_.setOrthographic();
+
+    bool l2d = camera_.lock2d();
+    camera_.setLock2d(false);
+    if (l2d)
+    {
+        setView3d();
+    }
 }
 
 void ViewerOpenGLViewport::setViewPerspective()
 {
     camera_.setPerspective();
+
+    bool l2d = camera_.lock2d();
+    camera_.setLock2d(false);
+    if (l2d)
+    {
+        setView3d();
+    }
+}
+
+void ViewerOpenGLViewport::setView2d()
+{
+    setViewOrthographic();
+    setViewTop();
+    camera_.setLock2d(true);
 }
 
 void ViewerOpenGLViewport::setViewDirection(const QVector3D &dir,
@@ -251,6 +271,10 @@ void ViewerOpenGLViewport::setViewDirection(const QVector3D &dir,
 void ViewerOpenGLViewport::setViewTop()
 {
     LOG_DEBUG(<< "Set top view in viewport <" << viewportId_ << ">.");
+    if (camera_.lock2d())
+    {
+        return;
+    }
 
     QVector3D dir(0.0F, 0.0F, -1.0F);
     QVector3D up(0.0F, -1.0F, 0.0F);
@@ -260,6 +284,10 @@ void ViewerOpenGLViewport::setViewTop()
 void ViewerOpenGLViewport::setViewFront()
 {
     LOG_DEBUG(<< "Set front view in viewport <" << viewportId_ << ">.");
+    if (camera_.lock2d())
+    {
+        return;
+    }
 
     QVector3D dir(0.0F, -1.0F, 0.0F);
     QVector3D up(0.0F, 0.0F, 1.0F);
@@ -269,6 +297,10 @@ void ViewerOpenGLViewport::setViewFront()
 void ViewerOpenGLViewport::setViewRight()
 {
     LOG_DEBUG(<< "Set right view in viewport <" << viewportId_ << ">.");
+    if (camera_.lock2d())
+    {
+        return;
+    }
 
     QVector3D dir(1.0F, 0.0F, 0.0F);
     QVector3D up(0.0F, 0.0F, 1.0F);
@@ -278,6 +310,10 @@ void ViewerOpenGLViewport::setViewRight()
 void ViewerOpenGLViewport::setView3d()
 {
     LOG_DEBUG(<< "Set 3D view in viewport <" << viewportId_ << ">.");
+    if (camera_.lock2d())
+    {
+        return;
+    }
 
     QVector3D dir(-1.0F, -1.0F, -1.0F);
     QVector3D up(-1.0F, -1.0F, 1.0F);
@@ -440,7 +476,7 @@ void ViewerOpenGLViewport::renderScene()
                 glColor3f(1.0F, 1.0F, 1.0F);
             }
 
-            if (page.selectionSize > 0)
+            if (page.selectionSize > 0 && !camera_.lock2d())
             {
                 ViewerOpenGL::render(ViewerOpenGL::POINTS,
                                      page.renderPosition,
@@ -512,13 +548,7 @@ void ViewerOpenGLViewport::renderFirstFrame()
         SAFE_GL(glDisable(GL_LIGHTING));
     }
 
-    const Region &clipFilter = editor_->clipFilter();
-    glLineWidth(1.0F);
-    ViewerOpenGL::renderClipFilter(clipFilter);
-    glLineWidth(1.0F);
-
-    renderAttributes();
-    renderSegments();
+    renderFirstFrameData();
 
     // Bounding box.
     if (editor_->settings().viewSettings().sceneBoundingBoxVisible())
@@ -549,6 +579,63 @@ void ViewerOpenGLViewport::renderLastFrame()
     renderLabels();
     glEnable(GL_DEPTH_TEST);
     glLineWidth(1.0F);
+}
+
+void ViewerOpenGLViewport::renderFirstFrameData()
+{
+    if (camera_.lock2d())
+    {
+        renderDbh();
+        return;
+    }
+
+    const Region &clipFilter = editor_->clipFilter();
+    glLineWidth(1.0F);
+    ViewerOpenGL::renderClipFilter(clipFilter);
+    glLineWidth(1.0F);
+
+    renderAttributes();
+    renderSegments();
+}
+
+void ViewerOpenGLViewport::renderDbh()
+{
+    const Segments &segments = editor_->segments();
+    const SpeciesList &speciesList = editor_->speciesList();
+
+    for (size_t i = 0; i < segments.size(); i++)
+    {
+        // Segment.
+        const Segment &segment = segments[i];
+
+        if (skipSegmentRendering(segment))
+        {
+            continue;
+        }
+
+        // Attributes.
+        const TreeAttributes &attributes = segment.treeAttributes;
+        if (!attributes.isDbhValid())
+        {
+            continue;
+        }
+
+        // Species.
+        size_t speciesId = segment.speciesId;
+        size_t speciesIndex = speciesList.index(speciesId, false);
+        if (speciesIndex == SIZE_MAX)
+        {
+            continue;
+        }
+        const Species &species = speciesList[speciesIndex];
+
+        Vector3<float> color(species.color);
+        glColor3f(color[0], color[1], color[2]);
+
+        float radius = static_cast<float>(attributes.dbh) * 0.5F;
+        Vector3<float> position(attributes.dbhPosition);
+        ViewerOpenGL::renderCircle(position, radius, true);
+    }
 }
 
 void ViewerOpenGLViewport::renderSegments()

@@ -136,6 +136,12 @@ void ViewerViewports::setViewPerspective()
     selectedViewport()->setViewPerspective();
 }
 
+void ViewerViewports::setView2d()
+{
+    LOG_DEBUG(<< "Set 2d view to the active viewport.");
+    selectedViewport()->setView2d();
+}
+
 void ViewerViewports::setViewTop()
 {
     LOG_DEBUG(<< "Set top view to the active viewport.");

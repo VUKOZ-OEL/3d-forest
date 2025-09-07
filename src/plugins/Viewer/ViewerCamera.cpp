@@ -53,7 +53,8 @@ ViewerCamera::ViewerCamera()
       viewport_(0, 0, 100, 100),
       sensitivityX_(1.0F),
       sensitivityY_(1.0F),
-      sensitivityZoom_(4.0F)
+      sensitivityZoom_(4.0F),
+      lock2d_(false)
 {
     frustrumPlanes_.resize(24);
     std::fill(frustrumPlanes_.begin(), frustrumPlanes_.end(), 0.0F);
@@ -280,7 +281,10 @@ void ViewerCamera::mouseMoveEvent(QMouseEvent *event)
 
     if (event->buttons() & Qt::LeftButton)
     {
-        rotate(dx, dy);
+        if (!lock2d())
+        {
+            rotate(dx, dy);
+        }
     }
     else if (event->buttons() & Qt::RightButton)
     {

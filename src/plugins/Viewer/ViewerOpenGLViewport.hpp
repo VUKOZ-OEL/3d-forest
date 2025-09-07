@@ -61,6 +61,8 @@ public:
 
     void setViewOrthographic();
     void setViewPerspective();
+    void setView2d();
+
     void setViewTop();
     void setViewFront();
     void setViewRight();
@@ -100,7 +102,9 @@ protected:
     void clearScreen();
     void renderScene();
     void renderFirstFrame();
+    void renderFirstFrameData();
     void renderLastFrame();
+    void renderDbh();
     void renderSegments();
     void renderAttributes();
     void renderLabels();

@@ -58,6 +58,8 @@ public:
 
     void setViewOrthographic();
     void setViewPerspective();
+    void setView2d();
+
     void setViewTop();
     void setViewFront();
     void setViewRight();

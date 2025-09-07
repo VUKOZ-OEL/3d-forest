@@ -488,33 +488,64 @@ void ViewerOpenGL::renderLine(const Vector3<float> &a, const Vector3<float> &b)
 
 void ViewerOpenGL::renderCircle(const Vector3<float> &p,
                                 float radius,
+                                bool fill,
                                 size_t pointCount)
 {
     GLuint pointCountGL = static_cast<GLuint>(pointCount);
     std::vector<float> xyz;
-    std::vector<GLuint> indices;
 
-    xyz.resize(pointCount * 3);
-    indices.resize(pointCount);
-
-    for (GLuint i = 0; i < pointCountGL; i++)
+    if (fill)
     {
-        double angle = (static_cast<double>(i) * 2.0 * 3.14) /
-                       static_cast<double>(pointCountGL);
+        // Add center point first
+        xyz.push_back(p[0]);
+        xyz.push_back(p[1]);
+        xyz.push_back(p[2]);
 
-        xyz[i * 3 + 0] = p[0] + (radius * static_cast<float>(cos(angle)));
-        xyz[i * 3 + 1] = p[1] + (radius * static_cast<float>(sin(angle)));
-        xyz[i * 3 + 2] = p[2];
+        // Perimeter points
+        for (GLuint i = 0; i <= pointCountGL; i++) // <= closes the fan
+        {
+            double angle = (static_cast<double>(i) * 2.0 * M_PI) /
+                           static_cast<double>(pointCountGL);
 
-        indices[i] = i;
+            xyz.push_back(p[0] + radius * static_cast<float>(cos(angle)));
+            xyz.push_back(p[1] + radius * static_cast<float>(sin(angle)));
+            xyz.push_back(p[2]);
+        }
+
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glVertexPointer(3, GL_FLOAT, 0, xyz.data());
+        glDrawArrays(GL_TRIANGLE_FAN, 0, static_cast<GLsizei>(xyz.size() / 3));
+        glDisableClientState(GL_VERTEX_ARRAY);
     }
+    else
+    {
+        std::vector<GLuint> indices;
 
-    // Render the vertex array.
-    GLsizei indicesCount = static_cast<GLsizei>(indices.size());
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(3, GL_FLOAT, 0, static_cast<GLvoid *>(xyz.data()));
-    glDrawElements(GL_LINE_LOOP, indicesCount, GL_UNSIGNED_INT, indices.data());
-    glDisableClientState(GL_VERTEX_ARRAY);
+        xyz.resize(pointCount * 3);
+        indices.resize(pointCount);
+
+        for (GLuint i = 0; i < pointCountGL; i++)
+        {
+            double angle = (static_cast<double>(i) * 2.0 * 3.14) /
+                           static_cast<double>(pointCountGL);
+
+            xyz[i * 3 + 0] = p[0] + (radius * static_cast<float>(cos(angle)));
+            xyz[i * 3 + 1] = p[1] + (radius * static_cast<float>(sin(angle)));
+            xyz[i * 3 + 2] = p[2];
+
+            indices[i] = i;
+        }
+
+        // Render the vertex array.
+        GLsizei indicesCount = static_cast<GLsizei>(indices.size());
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glVertexPointer(3, GL_FLOAT, 0, static_cast<GLvoid *>(xyz.data()));
+        glDrawElements(GL_LINE_LOOP,
+                       indicesCount,
+                       GL_UNSIGNED_INT,
+                       indices.data());
+        glDisableClientState(GL_VERTEX_ARRAY);
+    }
 }
 
 void ViewerOpenGL::renderText(ViewerOpenGLManager *manager,
