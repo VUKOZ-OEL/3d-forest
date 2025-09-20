@@ -58,6 +58,8 @@ private:
     void stepCalculateComputeTreeAttributes();
     void stepUpdateComputeTreeAttributes();
 
+    void processPoint();
+
     void calculateDbh(ComputeTreeAttributesData &tree);
     void calculateDbhRht(ComputeTreeAttributesData &tree);
     void calculateDbhLsr(ComputeTreeAttributesData &tree);

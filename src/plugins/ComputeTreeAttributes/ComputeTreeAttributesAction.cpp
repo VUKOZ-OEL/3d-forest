@@ -145,59 +145,10 @@ void ComputeTreeAttributesAction::stepPointsToTrees()
         query_.exec();
     }
 
-    const Segments &segments = editor_->segments();
-
     // For each point in all datasets:
     while (query_.next())
     {
-        size_t treeId = query_.segment();
-
-        if (treeId > 0 && treeId < segments.size())
-        {
-            const Segment &segment = segments[treeId];
-            ComputeTreeAttributesData &tree =
-                trees_[treeIndex(treeId, segment)];
-
-            double z = query_.z() - segment.boundary.min(2);
-
-            // When point Z distance from the minimal tree boundary Z value
-            // is within tree position range, then:
-            if (z <= parameters_.treePositionHeightRange)
-            {
-                // Add point X and Y coordinates to X and Y coordinates lists.
-                tree.xCoordinates.push_back(query_.x());
-                tree.yCoordinates.push_back(query_.y());
-
-                // When point Z coordinate has new lowest value, then
-                // set the value as new Z minimum.
-                if (query_.z() < tree.zCoordinateMin)
-                {
-                    tree.zCoordinateMin = query_.z();
-                }
-            }
-
-            // When point elevation is within DBH elevation range, then
-            // add point XYZ coordinates to DBH point list.
-            if (query_.elevation() >=
-                    parameters_.dbhElevation - parameters_.dbhElevationRange &&
-                query_.elevation() <=
-                    parameters_.dbhElevation + parameters_.dbhElevationRange)
-            {
-                tree.dbhPoints.push_back(query_.x());
-                tree.dbhPoints.push_back(query_.y());
-                tree.dbhPoints.push_back(query_.z());
-            }
-
-            // Profile.
-            double len = segment.boundary.length(2);
-            double nd = static_cast<double>(tree.bins.size());
-            if (nd > 0.0 && z < len)
-            {
-                double step = len / nd;
-                size_t idx = static_cast<size_t>(z / step);
-                tree.bins[idx] += 1.0;
-            }
-        }
+        processPoint();
 
         progress_.addValueStep(1);
         if (progress_.timedOut())
@@ -221,6 +172,68 @@ void ComputeTreeAttributesAction::stepPointsToTrees()
         LOG_DEBUG(<< "No trees were found.");
         progress_.setValueStep(progress_.maximumStep());
         progress_.setValueSteps(progress_.maximumSteps());
+    }
+}
+
+void ComputeTreeAttributesAction::processPoint()
+{
+    const Segments &segments = editor_->segments();
+
+    size_t treeId = query_.segment();
+    size_t index = segments.index(treeId, false);
+
+    if (index == SIZE_MAX)
+    {
+        return;
+    }
+
+    const Segment &segment = segments[index];
+
+    ComputeTreeAttributesData &tree = trees_[treeIndex(treeId, segment)];
+
+    double h = query_.z() - segment.boundary.min(2);
+
+    // When point Z distance from the minimal tree boundary Z value
+    // is within tree position range, then:
+    if (h <= parameters_.treePositionHeightRange)
+    {
+        // Add point X and Y coordinates to X and Y coordinates lists.
+        tree.xCoordinates.push_back(query_.x());
+        tree.yCoordinates.push_back(query_.y());
+
+        // When point Z coordinate has new lowest value, then
+        // set the value as new Z minimum.
+        if (query_.z() < tree.zCoordinateMin)
+        {
+            tree.zCoordinateMin = query_.z();
+        }
+    }
+
+    // When point elevation is within DBH elevation range, then
+    // add point XYZ coordinates to DBH point list.
+    if (query_.elevation() >=
+            parameters_.dbhElevation - parameters_.dbhElevationRange &&
+        query_.elevation() <=
+            parameters_.dbhElevation + parameters_.dbhElevationRange)
+    {
+        tree.dbhPoints.push_back(query_.x());
+        tree.dbhPoints.push_back(query_.y());
+        tree.dbhPoints.push_back(query_.z());
+    }
+
+    // Profile.
+    double treeHeight = segment.boundary.length(2);
+    double nBins = static_cast<double>(tree.bins.size());
+
+    if (treeHeight > 0.0 && nBins > 0.0)
+    {
+        double binHeight = treeHeight / nBins;
+        size_t idx = static_cast<size_t>(std::floor(h / binHeight));
+        if (idx >= tree.bins.size())
+        {
+            idx = tree.bins.size() - 1;
+        }
+        tree.bins[idx] += 1.0;
     }
 }
 
