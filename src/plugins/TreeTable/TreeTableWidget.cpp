@@ -210,7 +210,7 @@ void TreeTableWidget::setTable()
                                              "Status"});
 
     // Content.
-    if (visibleTreesIdList_.size() > 0)
+    if (showOnlyVisibleTreesCheckBox_->isChecked())
     {
         int nRows = static_cast<int>(visibleTreesIdList_.size());
         tableWidget_->setRowCount(nRows);
