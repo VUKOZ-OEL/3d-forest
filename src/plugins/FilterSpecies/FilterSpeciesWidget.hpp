@@ -22,6 +22,9 @@
 #ifndef FILTER_SPECIES_WIDGET_HPP
 #define FILTER_SPECIES_WIDGET_HPP
 
+// Include std.
+#include <set>
+
 // Include 3D Forest.
 #include <Editor.hpp>
 #include <SpeciesList.hpp>
@@ -77,10 +80,14 @@ protected:
     QToolButton *selectNoneButton_;
     bool updatesEnabled_;
 
+    Segments segments_;
     SpeciesList species_;
     QueryFilterSet filter_;
 
-    void setSpeciesList(const SpeciesList &species,
+    std::set<size_t> usedSpeciesIds_;
+
+    void setSpeciesList(const Segments &segments,
+                        const SpeciesList &species,
                         const QueryFilterSet &filter);
     void dataChanged();
     void filterChanged();
@@ -89,6 +96,7 @@ protected:
     void updateTree();
     void block();
     void unblock();
+    void updateUsedSpecies();
     void addTreeItem(size_t index);
 };
 

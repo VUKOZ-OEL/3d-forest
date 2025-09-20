@@ -124,11 +124,13 @@ void FilterSpeciesWidget::slotUpdate(void *sender,
         return;
     }
 
-    if (target.empty() || target.contains(Editor::TYPE_SPECIES))
+    if (target.empty() || target.contains(Editor::TYPE_SPECIES) ||
+        target.contains(Editor::TYPE_SEGMENT))
     {
         LOG_DEBUG_UPDATE(<< "Input species.");
 
-        setSpeciesList(mainWindow_->editor().speciesList(),
+        setSpeciesList(mainWindow_->editor().segments(),
+                       mainWindow_->editor().speciesList(),
                        mainWindow_->editor().speciesFilter());
     }
 }
@@ -160,15 +162,19 @@ void FilterSpeciesWidget::setFilterEnabled(bool b)
     filterChanged();
 }
 
-void FilterSpeciesWidget::setSpeciesList(const SpeciesList &species,
+void FilterSpeciesWidget::setSpeciesList(const Segments &segments,
+                                         const SpeciesList &species,
                                          const QueryFilterSet &filter)
 {
     LOG_DEBUG(<< "Set species n <" << species.size() << ">.");
 
     block();
 
+    segments_ = segments;
     species_ = species;
     filter_ = filter;
+
+    updateUsedSpecies();
 
     tree_->clear();
 
@@ -181,7 +187,10 @@ void FilterSpeciesWidget::setSpeciesList(const SpeciesList &species,
     // Content.
     for (size_t i = 0; i < species_.size(); i++)
     {
-        addTreeItem(i);
+        if (usedSpeciesIds_.count(species_[i].id) > 0)
+        {
+            addTreeItem(i);
+        }
     }
 
     // Resize Columns to the minimum space.
@@ -191,6 +200,16 @@ void FilterSpeciesWidget::setSpeciesList(const SpeciesList &species,
     }
 
     unblock();
+}
+
+void FilterSpeciesWidget::updateUsedSpecies()
+{
+    usedSpeciesIds_.clear();
+
+    for (size_t i = 0; i < segments_.size(); i++)
+    {
+        usedSpeciesIds_.insert(segments_[i].speciesId);
+    }
 }
 
 void FilterSpeciesWidget::slotShow()
