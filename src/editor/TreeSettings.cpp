@@ -34,7 +34,8 @@ TreeSettings::TreeSettings()
       convexHullVisible_(true),
       convexHullProjectionVisible_(true),
       concaveHullVisible_(true),
-      concaveHullProjectionVisible_(true)
+      concaveHullProjectionVisible_(true),
+      dbhScale_(5.0)
 {
     // empty
 }
@@ -109,6 +110,16 @@ void TreeSettings::setConcaveHullProjectionVisible(bool visible)
     concaveHullProjectionVisible_ = visible;
 }
 
+double TreeSettings::dbhScale() const
+{
+    return dbhScale_;
+}
+
+void TreeSettings::setDbhScale(double value)
+{
+    dbhScale_ = value;
+}
+
 void fromJson(TreeSettings &out, const Json &in)
 {
     fromJson(out.useOnlyForSelectedTrees_, in, "useOnlyForSelectedTrees");
@@ -122,6 +133,7 @@ void fromJson(TreeSettings &out, const Json &in)
     fromJson(out.concaveHullProjectionVisible_,
              in,
              "concaveHullProjectionVisible");
+    fromJson(out.dbhScale_, in, "dbhScale", 5.0);
 }
 
 void toJson(Json &out, const TreeSettings &in)
@@ -134,6 +146,7 @@ void toJson(Json &out, const TreeSettings &in)
     toJson(out["concaveHullVisible"], in.concaveHullVisible_);
     toJson(out["concaveHullProjectionVisible"],
            in.concaveHullProjectionVisible_);
+    toJson(out["dbhScale"], in.dbhScale_);
 }
 
 std::string toString(const TreeSettings &in)

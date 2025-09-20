@@ -115,6 +115,19 @@ TreeSettingsWidget::TreeSettingsWidget(MainWindow *mainWindow)
             this,
             SLOT(slotSetConcaveHullProjectionVisible(int)));
 
+    // DBH scale.
+    dbhScaleSlider_ = new QSlider;
+    dbhScaleSlider_->setMinimum(1);
+    dbhScaleSlider_->setMaximum(10);
+    dbhScaleSlider_->setSingleStep(1);
+    dbhScaleSlider_->setTickInterval(1);
+    dbhScaleSlider_->setTickPosition(QSlider::TicksAbove);
+    dbhScaleSlider_->setOrientation(Qt::Horizontal);
+    connect(dbhScaleSlider_,
+            SIGNAL(valueChanged(int)),
+            this,
+            SLOT(slotSetDbhScale(int)));
+
     // Options.
     QVBoxLayout *optionsVBoxLayout = new QVBoxLayout;
     optionsVBoxLayout->addWidget(useOnlyForSelectedTreesCheckBox_);
@@ -130,7 +143,9 @@ TreeSettingsWidget::TreeSettingsWidget(MainWindow *mainWindow)
 
     // Layout.
     QGridLayout *groupBoxLayout = new QGridLayout;
-    groupBoxLayout->addWidget(optionsGroupBox, 0, 1);
+    groupBoxLayout->addWidget(optionsGroupBox, 0, 0, 1, 2);
+    groupBoxLayout->addWidget(new QLabel(tr("DBH scale:")), 1, 0);
+    groupBoxLayout->addWidget(dbhScaleSlider_, 1, 1);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(groupBoxLayout);
@@ -217,6 +232,9 @@ void TreeSettingsWidget::setTreeSettings(const TreeSettings &settings)
     concaveHullProjectionVisibleCheckBox_->setChecked(
         settings_.concaveHullProjectionVisible());
 
+    // DBH scale.
+    dbhScaleSlider_->setValue(static_cast<int>(settings_.dbhScale()));
+
     unblock();
 }
 
@@ -279,6 +297,12 @@ void TreeSettingsWidget::slotSetConcaveHullProjectionVisible(int v)
     (void)v;
     settings_.setConcaveHullProjectionVisible(
         concaveHullProjectionVisibleCheckBox_->isChecked());
+    dataChanged();
+}
+
+void TreeSettingsWidget::slotSetDbhScale(int v)
+{
+    settings_.setDbhScale(static_cast<double>(v));
     dataChanged();
 }
 

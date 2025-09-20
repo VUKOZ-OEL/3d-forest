@@ -602,6 +602,7 @@ void ViewerOpenGLViewport::renderDbh()
 {
     const Segments &segments = editor_->segments();
     const SpeciesList &speciesList = editor_->speciesList();
+    double scale = editor_->settings().treeSettings().dbhScale();
 
     for (size_t i = 0; i < segments.size(); i++)
     {
@@ -632,7 +633,7 @@ void ViewerOpenGLViewport::renderDbh()
         Vector3<float> color(species.color);
         glColor3f(color[0], color[1], color[2]);
 
-        float radius = static_cast<float>(attributes.dbh) * 0.5F;
+        float radius = static_cast<float>(attributes.dbh) * 0.5F * scale;
         Vector3<float> position(attributes.dbhPosition);
         ViewerOpenGL::renderCircle(position, radius, true);
     }

@@ -63,6 +63,9 @@ public:
     bool concaveHullProjectionVisible() const;
     void setConcaveHullProjectionVisible(bool visible);
 
+    double dbhScale() const;
+    void setDbhScale(double value);
+
 protected:
     bool useOnlyForSelectedTrees_;
     bool treeAttributesVisible_;
@@ -71,6 +74,7 @@ protected:
     bool convexHullProjectionVisible_;
     bool concaveHullVisible_;
     bool concaveHullProjectionVisible_;
+    double dbhScale_;
 
     friend void fromJson(TreeSettings &out, const Json &in);
     friend void toJson(Json &out, const TreeSettings &in);
