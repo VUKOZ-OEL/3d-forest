@@ -46,7 +46,7 @@ FilterAreaWindow::FilterAreaWindow(MainWindow *mainWindow)
     setWidget(widget_);
     setFixedHeight(widget()->sizeHint().height());
     setWindowTitle(tr("Filter Area"));
-    setWindowIcon(ICON("clip-filter"));
+    setWindowIcon(ICON("clip-filter").icon());
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
 

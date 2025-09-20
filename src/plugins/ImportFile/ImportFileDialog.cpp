@@ -105,11 +105,11 @@ ImportFileDialog::ImportFileDialog(MainWindow *mainWindow)
 
     // Dialog buttons.
     helpButton_ = new QPushButton(tr("Help"));
-    helpButton_->setIcon(THEME_ICON("question"));
+    helpButton_->setIcon(THEME_ICON("question").icon());
     connect(helpButton_, SIGNAL(clicked()), this, SLOT(slotHelp()));
 
     acceptButton_ = new QPushButton(tr("Import"));
-    acceptButton_->setIcon(THEME_ICON("run"));
+    acceptButton_->setIcon(THEME_ICON("run").icon());
     connect(acceptButton_, SIGNAL(clicked()), this, SLOT(slotAccept()));
 
     rejectButton_ = new QPushButton(tr("Cancel"));
@@ -134,7 +134,7 @@ ImportFileDialog::ImportFileDialog(MainWindow *mainWindow)
     setLayout(dialogLayout);
 
     setWindowTitle(tr("Import File"));
-    setWindowIcon(ICON("import-file"));
+    setWindowIcon(ICON("import-file").icon());
     setMaximumWidth(width());
     setMaximumHeight(height());
 }

@@ -52,7 +52,7 @@ ComputeHullWindow::ComputeHullWindow(MainWindow *mainWindow)
     // Dialog.
     setLayout(mainLayout);
     setWindowTitle(tr("Compute Hull"));
-    setWindowIcon(ICON("compute-hull"));
+    setWindowIcon(ICON("compute-hull").icon());
     setMaximumHeight(height());
     setModal(false);
 }

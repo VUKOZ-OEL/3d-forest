@@ -45,7 +45,7 @@ FilterClassificationWindow::FilterClassificationWindow(MainWindow *mainWindow)
     // Dock.
     setWidget(widget_);
     setWindowTitle(tr("Filter Classification"));
-    setWindowIcon(ICON("classification-filter"));
+    setWindowIcon(ICON("classification-filter").icon());
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
 

@@ -135,7 +135,7 @@ ExportFileDialog::ExportFileDialog(MainWindow *mainWindow,
 
     // Window.
     setWindowTitle(tr("Export File"));
-    setWindowIcon(ICON("export-file"));
+    setWindowIcon(ICON("export-file").icon());
     setMaximumWidth(600);
     setMaximumHeight(height());
 }

@@ -45,7 +45,7 @@ FilterSpeciesWindow::FilterSpeciesWindow(MainWindow *mainWindow)
     // Dock.
     setWidget(widget_);
     setWindowTitle(tr("Filter Species"));
-    setWindowIcon(ICON("species-filter"));
+    setWindowIcon(ICON("species-filter").icon());
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
 

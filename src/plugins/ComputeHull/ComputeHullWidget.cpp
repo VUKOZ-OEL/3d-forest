@@ -135,7 +135,7 @@ ComputeHullWidget::ComputeHullWidget(MainWindow *mainWindow)
 
     // Buttons.
     applyButton_ = new QPushButton(tr("Run"));
-    applyButton_->setIcon(THEME_ICON("run"));
+    applyButton_->setIcon(THEME_ICON("run").icon());
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
 

@@ -52,7 +52,7 @@ TreeTableWindow::TreeTableWindow(MainWindow *mainWindow)
     // Dialog.
     setLayout(mainLayout);
     setWindowTitle(tr("Tree Table"));
-    setWindowIcon(ICON("tree-table"));
+    setWindowIcon(ICON("tree-table").icon());
     setModal(false);
 }
 

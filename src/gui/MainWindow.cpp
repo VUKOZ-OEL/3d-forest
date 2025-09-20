@@ -32,6 +32,7 @@
 #include <HelpPlugin.hpp>
 
 // Include Qt.
+#include <QApplication>
 #include <QCloseEvent>
 #include <QCoreApplication>
 #include <QDir>
@@ -40,6 +41,7 @@
 #include <QMessageBox>
 #include <QPluginLoader>
 #include <QStatusBar>
+#include <QStyleHints>
 #include <QToolBar>
 #include <QToolButton>
 
@@ -80,7 +82,7 @@ MainWindow::MainWindow(QWidget *parent)
                  "",
                  tr("E&xit"),
                  tr("Exit the application"),
-                 QIcon(),
+                 ThemeIcon(),
                  this,
                  SLOT(close()),
                  MAIN_WINDOW_MENU_FILE_PRIORITY,
@@ -89,6 +91,15 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Menu.
     createMenu();
+
+    // initialize icons according to current theme
+    onThemeChanged();
+
+    // update when theme changes
+    connect(qApp->styleHints(),
+            &QStyleHints::colorSchemeChanged,
+            this,
+            &MainWindow::onThemeChanged);
 
     // Rendering.
     connect(this,
@@ -133,6 +144,16 @@ QSize MainWindow::minimumSizeHint() const
 QSize MainWindow::sizeHint() const
 {
     return QSize(1024, 768);
+}
+
+bool MainWindow::event(QEvent *e)
+{
+    if (e->type() == QEvent::ApplicationPaletteChange)
+    {
+        onThemeChanged();
+    }
+
+    return QMainWindow::event(e);
 }
 
 void MainWindow::paintEvent(QPaintEvent *event)
@@ -208,12 +229,49 @@ void MainWindow::setWindowTitle(const QString &path)
     QMainWindow::setWindowTitle(newtitle + " [*]");
 }
 
+bool MainWindow::isDarkMode()
+{
+    auto scheme = qApp->styleHints()->colorScheme();
+
+    if (scheme == Qt::ColorScheme::Dark)
+    {
+        return true;
+    }
+
+    if (scheme == Qt::ColorScheme::Light)
+    {
+        return false;
+    }
+
+    // Fallback.
+    int lightness = qApp->palette().color(QPalette::Window).lightness();
+
+    return lightness < 128;
+}
+
+void MainWindow::onThemeChanged()
+{
+    bool dark = isDarkMode();
+
+    for (auto &it : icons_)
+    {
+        if (it.action)
+        {
+            it.action->setIcon(it.themeIcon.icon(dark));
+        }
+        else if (it.button)
+        {
+            it.button->setIcon(it.themeIcon.icon(dark));
+        }
+    }
+}
+
 void MainWindow::createAction(QAction **result,
                               const QString &menuTitle,
                               const QString &toolBarTitle,
                               const QString &text,
                               const QString &toolTip,
-                              const QIcon &icon,
+                              const ThemeIcon &themeIcon,
                               const QObject *receiver,
                               const char *member,
                               int menuPriority,
@@ -222,8 +280,8 @@ void MainWindow::createAction(QAction **result,
     LOG_DEBUG(<< "Create action menu <" << menuTitle.toStdString()
               << "> toolBar <" << toolBarTitle.toStdString() << "> text <"
               << text.toStdString() << "> priority <" << menuPriority << "/"
-              << menuItemPriority << "> icon sizes <"
-              << icon.availableSizes().count() << ">.");
+              << menuItemPriority << "> icons <" << themeIcon.toQString()
+              << ">.");
 
     QAction *action;
 
@@ -236,9 +294,16 @@ void MainWindow::createAction(QAction **result,
         action->setStatusTip(toolTip);
     }
 
+    QIcon icon = themeIcon.icon(isDarkMode());
     if (!icon.isNull())
     {
         action->setIcon(icon);
+
+        IconEntry ie;
+        ie.action = action;
+        ie.themeIcon = themeIcon;
+
+        icons_.push_back(ie);
     }
 
     // Connect action.
@@ -353,7 +418,7 @@ void MainWindow::createMenu()
 void MainWindow::createToolButton(QToolButton **result,
                                   const QString &text,
                                   const QString &toolTip,
-                                  const QIcon &icon,
+                                  const ThemeIcon &themeIcon,
                                   const QObject *receiver,
                                   const char *member)
 {
@@ -364,9 +429,20 @@ void MainWindow::createToolButton(QToolButton **result,
     button->setText(text);
     button->setToolTip(toolTip);
     button->setStatusTip(toolTip);
-    button->setIcon(icon);
     button->setEnabled(true);
     button->setToolButtonStyle(Qt::ToolButtonIconOnly);
+
+    QIcon icon = themeIcon.icon(isDarkMode());
+    if (!icon.isNull())
+    {
+        button->setIcon(icon);
+
+        IconEntry ie;
+        ie.button = button;
+        ie.themeIcon = themeIcon;
+
+        icons_.push_back(ie);
+    }
 
     // Connect button.
     if (receiver && member)

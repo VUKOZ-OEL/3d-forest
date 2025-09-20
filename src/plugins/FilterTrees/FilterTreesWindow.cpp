@@ -43,7 +43,7 @@ FilterTreesWindow::FilterTreesWindow(MainWindow *mainWindow)
     // Dock.
     setWidget(widget_);
     setWindowTitle(tr("Filter Trees"));
-    setWindowIcon(ICON("tree"));
+    setWindowIcon(ICON("tree").icon());
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
 }

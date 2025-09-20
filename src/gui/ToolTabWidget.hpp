@@ -25,6 +25,10 @@
 // Include std.
 #include <vector>
 
+// Include 3D Forest.
+#include <ThemeIcon.hpp>
+class MainWindow;
+
 // Include Qt.
 #include <QWidget>
 class QToolButton;
@@ -44,10 +48,10 @@ class EXPORT_GUI ToolTabWidget : public QWidget
     Q_OBJECT
 
 public:
-    ToolTabWidget();
+    ToolTabWidget(MainWindow *mainWindow);
 
     void addTab(QWidget *widget,
-                const QIcon &icon,
+                const ThemeIcon &icon,
                 const QString &label,
                 const QString &toolTip = "");
 
@@ -55,6 +59,7 @@ public slots:
     void slotToolButton();
 
 private:
+    MainWindow *mainWindow_;
     FlowLayout *toolBox_;
     QLabel *icon_;
     QLabel *label_;

@@ -52,7 +52,7 @@ ComputeCrownVolumeWindow::ComputeCrownVolumeWindow(MainWindow *mainWindow)
     // Dialog.
     setLayout(mainLayout);
     setWindowTitle(tr("Compute Crown Volume"));
-    setWindowIcon(ICON("compute-crown-volume"));
+    setWindowIcon(ICON("compute-crown-volume").icon());
     setMaximumHeight(height());
     setModal(false);
 }

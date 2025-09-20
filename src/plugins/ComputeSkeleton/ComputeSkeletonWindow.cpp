@@ -52,7 +52,7 @@ ComputeSkeletonWindow::ComputeSkeletonWindow(MainWindow *mainWindow)
     // Dialog.
     setLayout(mainLayout);
     setWindowTitle(tr("Compute Skeleton"));
-    setWindowIcon(ICON("compute-skeleton"));
+    setWindowIcon(ICON("compute-skeleton").icon());
     setMaximumHeight(height());
     setModal(false);
 }

@@ -103,7 +103,7 @@ TreeTableWidget::TreeTableWidget(MainWindow *mainWindow)
 
     // Buttons.
     exportButton_ = new QPushButton(tr("Export"));
-    exportButton_->setIcon(THEME_ICON("export-file"));
+    exportButton_->setIcon(THEME_ICON("export-file").icon());
     exportButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(exportButton_, SIGNAL(clicked()), this, SLOT(slotExport()));
 

@@ -43,7 +43,7 @@ void EditPlugin::initialize(MainWindow *mainWindow)
                               "Edit",
                               tr("Reset elevation"),
                               tr("Reset elevation"),
-                              QIcon(),
+                              ThemeIcon(),
                               this,
                               SLOT(slotResetElevation()),
                               MAIN_WINDOW_MENU_EDIT_PRIORITY);
@@ -53,7 +53,7 @@ void EditPlugin::initialize(MainWindow *mainWindow)
                               "Edit",
                               tr("Set classification"),
                               tr("Set classification"),
-                              QIcon(),
+                              ThemeIcon(),
                               this,
                               SLOT(slotSetClassification()),
                               MAIN_WINDOW_MENU_EDIT_PRIORITY);

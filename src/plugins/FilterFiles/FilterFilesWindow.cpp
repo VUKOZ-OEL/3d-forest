@@ -43,7 +43,7 @@ FilterFilesWindow::FilterFilesWindow(MainWindow *mainWindow)
     // Dock.
     setWidget(widget_);
     setWindowTitle(tr("Filter Files"));
-    setWindowIcon(ICON("files"));
+    setWindowIcon(ICON("files").icon());
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
 }

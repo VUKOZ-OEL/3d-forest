@@ -51,57 +51,57 @@ FilterFilesWidget::FilterFilesWidget(MainWindow *mainWindow)
     tree_->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     // Tool bar buttons.
-    MainWindow::createToolButton(&addButton_,
-                                 tr("Add"),
-                                 tr("Add new data set"),
-                                 THEME_ICON("add"),
-                                 this,
-                                 SLOT(slotAdd()));
+    mainWindow_->createToolButton(&addButton_,
+                                  tr("Add"),
+                                  tr("Add new data set"),
+                                  THEME_ICON("add"),
+                                  this,
+                                  SLOT(slotAdd()));
 
-    MainWindow::createToolButton(&deleteButton_,
-                                 tr("Remove"),
-                                 tr("Remove selected data set"),
-                                 THEME_ICON("remove"),
-                                 this,
-                                 SLOT(slotDelete()));
+    mainWindow_->createToolButton(&deleteButton_,
+                                  tr("Remove"),
+                                  tr("Remove selected data set"),
+                                  THEME_ICON("remove"),
+                                  this,
+                                  SLOT(slotDelete()));
     deleteButton_->setEnabled(false);
 
-    MainWindow::createToolButton(&showButton_,
-                                 tr("Show"),
-                                 tr("Make selected data sets visible"),
-                                 THEME_ICON("eye"),
-                                 this,
-                                 SLOT(slotShow()));
+    mainWindow_->createToolButton(&showButton_,
+                                  tr("Show"),
+                                  tr("Make selected data sets visible"),
+                                  THEME_ICON("eye"),
+                                  this,
+                                  SLOT(slotShow()));
     showButton_->setEnabled(false);
 
-    MainWindow::createToolButton(&hideButton_,
-                                 tr("Hide"),
-                                 tr("Hide selected data sets"),
-                                 THEME_ICON("hide"),
-                                 this,
-                                 SLOT(slotHide()));
+    mainWindow_->createToolButton(&hideButton_,
+                                  tr("Hide"),
+                                  tr("Hide selected data sets"),
+                                  THEME_ICON("hide"),
+                                  this,
+                                  SLOT(slotHide()));
     hideButton_->setEnabled(false);
 
-    MainWindow::createToolButton(&selectAllButton_,
-                                 tr("Select all"),
-                                 tr("Select all"),
-                                 THEME_ICON("select-all"),
-                                 this,
-                                 SLOT(slotSelectAll()));
+    mainWindow_->createToolButton(&selectAllButton_,
+                                  tr("Select all"),
+                                  tr("Select all"),
+                                  THEME_ICON("select-all"),
+                                  this,
+                                  SLOT(slotSelectAll()));
 
-    MainWindow::createToolButton(&selectInvertButton_,
-                                 tr("Invert"),
-                                 tr("Invert selection"),
-                                 THEME_ICON("select-invert"),
-                                 this,
-                                 SLOT(slotSelectInvert()));
+    mainWindow_->createToolButton(&selectInvertButton_,
+                                  tr("Invert"),
+                                  tr("Invert selection"),
+                                  THEME_ICON("select-invert"),
+                                  this,
+                                  SLOT(slotSelectInvert()));
 
-    MainWindow::createToolButton(&selectNoneButton_,
-                                 tr("Select none"),
-                                 tr("Select none"),
-                                 THEME_ICON("select-none"),
-                                 this,
-                                 SLOT(slotSelectNone()));
+    mainWindow_->createToolButton(&selectNoneButton_,
+                                  tr("Select none"),
+                                  tr("Select none"),
+                                  THEME_ICON("select-none"),
+                                  this,
+                                  SLOT(slotSelectNone()));
 
     // Tool bar.
     QToolBar *toolBar = new QToolBar;

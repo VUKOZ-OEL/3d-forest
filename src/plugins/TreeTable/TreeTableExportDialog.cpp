@@ -96,7 +96,7 @@ TreeTableExportDialog::TreeTableExportDialog(MainWindow *mainWindow,
 
     // Window.
     setWindowTitle(tr("Export File"));
-    setWindowIcon(THEME_ICON("export-file"));
+    setWindowIcon(THEME_ICON("export-file").icon());
     setMaximumWidth(600);
     setMaximumHeight(height());
 }

@@ -46,7 +46,7 @@ FilterManagementStatusWindow::FilterManagementStatusWindow(
     // Dock.
     setWidget(widget_);
     setWindowTitle(tr("Filter ManagementStatus"));
-    setWindowIcon(ICON("management-status-filter"));
+    setWindowIcon(ICON("management-status-filter").icon());
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
 

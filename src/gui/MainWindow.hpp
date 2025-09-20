@@ -28,6 +28,7 @@
 // Include 3D Forest.
 #include <Editor.hpp>
 #include <RenderThread.hpp>
+#include <ThemeIcon.hpp>
 #include <ThreadCallbackInterface.hpp>
 
 // Include 3D Forest plugins.
@@ -39,7 +40,6 @@ class HelpPlugin;
 
 // Include Qt.
 #include <QHash>
-#include <QIcon>
 #include <QMainWindow>
 #include <QSet>
 
@@ -94,18 +94,18 @@ public:
                       const QString &toolBarTitle,
                       const QString &text,
                       const QString &toolTip,
-                      const QIcon &icon,
+                      const ThemeIcon &themeIcon,
                       const QObject *receiver,
                       const char *member,
                       int menuPriority = -1,
                       int menuItemPriority = -1);
 
-    static void createToolButton(QToolButton **result,
-                                 const QString &text,
-                                 const QString &toolTip,
-                                 const QIcon &icon,
-                                 const QObject *receiver,
-                                 const char *member);
+    void createToolButton(QToolButton **result,
+                          const QString &text,
+                          const QString &toolTip,
+                          const ThemeIcon &themeIcon,
+                          const QObject *receiver,
+                          const char *member);
 
     void hideToolBar(const QString &menu);
 
@@ -151,6 +151,7 @@ signals:
     void signalUpdate(void *sender, const QSet<Editor::Type> &target);
 
 protected:
+    bool event(QEvent *e);
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
     void showEvent(QShowEvent *event) override;
@@ -172,6 +173,20 @@ private:
     HelpPlugin *helpPlugin_;
 
     std::vector<PluginInterface *> plugins_;
+
+    // Icons.
+    class IconEntry
+    {
+    public:
+        QAction *action{nullptr};
+        QToolButton *button{nullptr};
+        ThemeIcon themeIcon;
+    };
+
+    std::vector<IconEntry> icons_;
+
+    bool isDarkMode();
+    void onThemeChanged();
 
     // Menu.
     /** Main Window Menu Item. */
