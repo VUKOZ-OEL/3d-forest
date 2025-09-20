@@ -187,14 +187,18 @@ void ComputeHullAction::stepPointsToVoxels()
         if (query_.voxel() == SIZE_MAX)
         {
             size_t treeId = query_.segment();
-            if (treeId > 0 && treeId < segments.size())
+            if (treeId > 0)
             {
-                const Segment &segment = segments[treeId];
-                double z = query_.z() - segment.boundary.min(2);
-                if (z >= segment.treeAttributes.crownStartHeight)
+                size_t segmentIndex = segments.index(treeId, false);
+                if (segmentIndex != SIZE_MAX)
                 {
-                    // Create new voxel.
-                    createVoxel();
+                    const Segment &segment = segments[segmentIndex];
+                    double h = query_.z() - segment.boundary.min(2);
+                    if (h >= segment.treeAttributes.crownStartHeight)
+                    {
+                        // Create new voxel.
+                        createVoxel();
+                    }
                 }
             }
         }
