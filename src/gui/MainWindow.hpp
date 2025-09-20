@@ -151,7 +151,7 @@ signals:
     void signalUpdate(void *sender, const QSet<Editor::Type> &target);
 
 protected:
-    bool event(QEvent *e);
+    bool event(QEvent *e) override;
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
     void showEvent(QShowEvent *event) override;
