@@ -601,7 +601,7 @@ void ComputeSegmentationNNAction::stepCreateSegments()
         size_t segmentId = it.second.segmentId;
 
         // Create new segment.
-        segments.addTree(segmentId, it.second.boundary);
+        segments.addTree(segmentId, "", it.second.boundary);
 
         // Enable new segment in segment filter.
         segmentsFilter.setEnabled(segmentId, true);

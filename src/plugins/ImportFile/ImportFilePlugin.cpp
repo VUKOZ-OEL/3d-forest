@@ -104,7 +104,8 @@ static bool importPluginCreateIndex(const std::string &pathIn,
                                     const ImportSettings &settings,
                                     MainWindow *mainWindow);
 
-static void importPluginAddAsNewTree(MainWindow *mainWindow);
+static void importPluginAddAsNewTree(const std::string &path,
+                                     MainWindow *mainWindow);
 
 static bool importPluginPcd2Las(const std::string &pathIn,
                                 const std::string &pathOut);
@@ -197,7 +198,7 @@ static void importPluginFile(const std::string &pathIn,
 
     if (settings.importFilesAsSeparateTrees)
     {
-        importPluginAddAsNewTree(mainWindow);
+        importPluginAddAsNewTree(pathIn, mainWindow);
     }
 }
 
@@ -323,7 +324,8 @@ static bool importPluginPcd2Las(const std::string &pathIn,
     return true;
 }
 
-static void importPluginAddAsNewTree(MainWindow *mainWindow)
+static void importPluginAddAsNewTree(const std::string &path,
+                                     MainWindow *mainWindow)
 {
     Editor &editor = mainWindow->editor();
 
@@ -400,7 +402,7 @@ static void importPluginAddAsNewTree(MainWindow *mainWindow)
         return;
     }
 
-    segments.addTree(segmentId, dataset.boundary());
+    segments.addTree(segmentId, File::baseName(path), dataset.boundary());
     segmentsFilter.setEnabled(segmentId, true);
 
     editor.setSegments(segments);

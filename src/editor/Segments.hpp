@@ -54,7 +54,9 @@ public:
 
     size_t unusedId() const;
 
-    void addTree(size_t id, const Box<double> &boundary);
+    void addTree(size_t id,
+                 const std::string &label,
+                 const Box<double> &boundary);
 
     void exportMeshList(const std::string &projectFilePath, double scale) const;
     void importMeshList(const std::string &projectFilePath, double scale);

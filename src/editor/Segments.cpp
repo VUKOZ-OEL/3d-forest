@@ -130,12 +130,21 @@ size_t Segments::unusedId() const
     THROW("New segment identifier is not available.");
 }
 
-void Segments::addTree(size_t id, const Box<double> &boundary)
+void Segments::addTree(size_t id,
+                       const std::string &label,
+                       const Box<double> &boundary)
 {
     Segment segment;
 
     segment.id = id;
-    segment.label = "Tree " + std::to_string(segment.id);
+    if (label.empty())
+    {
+        segment.label = "Tree " + std::to_string(id);
+    }
+    else
+    {
+        segment.label = label;
+    }
     segment.color =
         ColorPalette::MPN65[segment.id % ColorPalette::MPN65.size()];
     segment.boundary = boundary;
