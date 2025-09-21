@@ -39,6 +39,7 @@ target_include_directories(
 target_link_libraries(
     ${SUB_PROJECT_NAME}
     PUBLIC
+    3DForestCore
     ILandModel
 )
 
