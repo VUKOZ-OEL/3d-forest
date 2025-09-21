@@ -10,8 +10,7 @@ st.set_page_config(
 # Import your data
 
 if "trees" not in st.session_state:
-    #file_path = ("c:/Users/krucek/OneDrive - vukoz.cz/DATA/_GS-LCR/SLP_Pokojna/PokojnaHora_3df/_PokojnaHora_v11.json")
-    file_path = ("c:/data/1.json")
+    file_path = st.session_state["file_path"]
     st.session_state.trees = io.load_project_json(file_path)
 
 df: pd.DataFrame = st.session_state.trees.copy()

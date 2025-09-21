@@ -1,6 +1,14 @@
 import streamlit as st
+import sys
 
 #from streamlit_multipage import MultiPage
+
+if len(sys.argv) > 1:
+    file_path = sys.argv[1]
+else:
+    file_path = "c:/default.json"
+
+st.session_state["file_path"] = file_path
 
 st.set_page_config(page_title="3D-Marteloscope", page_icon=":material/nature_people:",layout="wide")
 

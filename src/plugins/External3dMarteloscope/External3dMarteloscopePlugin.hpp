@@ -54,6 +54,9 @@ public slots:
 
 private:
     MainWindow *mainWindow_;
+
+    void runILandModel(const std::string &projectPath);
+    void runPythonApp(const std::string &projectPath);
 };
 
 #endif /* EXTERNAL_3D_MARTELOSCOPE_PLUGIN_HPP */

@@ -9,8 +9,7 @@ st.set_page_config(layout="wide")
 
 # --- Načtení dat do session_state ---
 if "trees" not in st.session_state:
-    #file_path = "c:/Users/krucek/OneDrive - vukoz.cz/DATA/_GS-LCR/SLP_Pokojna/PokojnaHora_3df/_PokojnaHora_v11.json"
-    file_path = ("c:/data/1.json")
+    file_path = st.session_state["file_path"]
     st.session_state.trees = load_project_json(file_path)
 
 # Přidej management_status, pokud chybí

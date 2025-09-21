@@ -20,6 +20,7 @@
 /** @file External3dMarteloscopePlugin.cpp */
 
 // Include 3D Forest.
+#include <External3dMarteloscopeDialog.hpp>
 #include <External3dMarteloscopePlugin.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
@@ -28,15 +29,27 @@
 #include <QCoreApplication>
 #include <QDesktopServices>
 #include <QProcess>
+#include <QTcpServer>
 #include <QTcpSocket>
 #include <QThread>
 #include <QUrl>
 
+// Include 3rd party.
+#include "global.h"
+#include "model.h"
+#include "modelcontroller.h"
+
 // Include local.
 #define LOG_MODULE_NAME "External3dMarteloscopePlugin"
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define ICON(name) (ThemeIcon(":/External3dMarteloscopeResources/", name))
+
+static std::string toStdString(const QString &str)
+{
+    return str.toUtf8().constData();
+}
 
 External3dMarteloscopePlugin::External3dMarteloscopePlugin()
     : mainWindow_(nullptr)
@@ -60,7 +73,94 @@ void External3dMarteloscopePlugin::initialize(MainWindow *mainWindow)
 
 void External3dMarteloscopePlugin::slotPlugin()
 {
-    int port = 8501;
+    std::string errorMessage;
+
+    try
+    {
+        External3dMarteloscopeDialog dialog(mainWindow_);
+        if (dialog.exec() != QDialog::Accepted)
+        {
+            return;
+        }
+
+        std::string iLandProjectPath = dialog.path();
+        int n = 100;
+        for (int i = 0; i < n; i++)
+        {
+            runILandModel(iLandProjectPath);
+        }
+
+        std::string projectPath = mainWindow_->editor().projectPath();
+        runPythonApp(projectPath);
+    }
+    catch (const IException &e)
+    {
+        errorMessage = toStdString(e.message());
+    }
+    catch (std::exception &e)
+    {
+        errorMessage = e.what();
+    }
+    catch (...)
+    {
+        errorMessage = "unknown";
+    }
+
+    if (!errorMessage.empty())
+    {
+        mainWindow_->showError(errorMessage.c_str());
+        return;
+    }
+}
+
+void External3dMarteloscopePlugin::runILandModel(const std::string &projectPath)
+{
+    LOG_DEBUG(<< "Run iLand Model <" << projectPath << ">.");
+
+    QString xmlName = QString::fromStdString(projectPath);
+    int years = 1;
+
+    ModelController iLandModel;
+    GlobalSettings::instance()->setModelController(&iLandModel);
+
+    iLandModel.setFileName(xmlName);
+    if (iLandModel.hasError())
+    {
+        THROW("set iLand file name: " + toStdString(iLandModel.lastError()));
+    }
+
+    iLandModel.create();
+    if (iLandModel.hasError())
+    {
+        THROW("create iLand: " + toStdString(iLandModel.lastError()));
+    }
+
+    iLandModel.run(years);
+    if (iLandModel.hasError())
+    {
+        THROW("run iLand: " + toStdString(iLandModel.lastError()));
+    }
+
+    LOG_DEBUG(<< "Finished running iLand Model.");
+}
+
+void External3dMarteloscopePlugin::runPythonApp(const std::string &projectPath)
+{
+    LOG_DEBUG(<< "Start python app with project <" << projectPath << ">.");
+
+    int port = -1;
+
+    QTcpServer server;
+    if (server.listen(QHostAddress::LocalHost, 0))
+    {
+        port = server.serverPort();
+        server.close();
+    }
+    if (port < 0)
+    {
+        qWarning() << "Could not find free port";
+        return;
+    }
 
     QTcpSocket socket;
     socket.connectToHost("127.0.0.1", port);
@@ -83,7 +183,8 @@ void External3dMarteloscopePlugin::slotPlugin()
 
     QStringList arguments;
     arguments << "-m" << "streamlit" << "run" << app << "--server.port"
-              << QString::number(port) << "--server.headless" << "true";
+              << QString::number(port) << "--server.headless" << "true"
+              << "--" << QString::fromStdString(projectPath);
 
     qint64 pid;
     bool ok = QProcess::startDetached(program, arguments, QString(), &pid);
@@ -98,4 +199,6 @@ void External3dMarteloscopePlugin::slotPlugin()
     QThread::sleep(1);
 
     QDesktopServices::openUrl(QUrl(QString("http://localhost:%1").arg(port)));
+
+    LOG_DEBUG(<< "Finished starting python app.");
 }

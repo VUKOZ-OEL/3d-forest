@@ -38,6 +38,7 @@ target_include_directories(
     ${SUB_PROJECT_NAME}
     PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}
+    ../../../3rdparty/iland-model/src
 )
 
 target_compile_definitions(
@@ -50,6 +51,7 @@ target_link_libraries(
     ${SUB_PROJECT_NAME}
     PRIVATE
     3DForestGui
+    ILandModel
     Qt${QT_VERSION_MAJOR}::Network
 )
 
