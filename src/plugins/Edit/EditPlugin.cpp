@@ -22,6 +22,7 @@
 // Include 3D Forest.
 #include <EditPlugin.hpp>
 #include <EditPluginResetElevation.hpp>
+#include <EditPluginResetManagementStatus.hpp>
 #include <EditPluginSetClassification.hpp>
 #include <MainWindow.hpp>
 
@@ -51,6 +52,16 @@ void EditPlugin::initialize(MainWindow *mainWindow)
     mainWindow_->createAction(nullptr,
                               "Edit",
                               "Edit",
+                              tr("Reset management status"),
+                              tr("Reset management status"),
+                              ThemeIcon(),
+                              this,
+                              SLOT(slotResetManagementStatus()),
+                              MAIN_WINDOW_MENU_EDIT_PRIORITY);
+
+    mainWindow_->createAction(nullptr,
+                              "Edit",
+                              "Edit",
                               tr("Set classification"),
                               tr("Set classification"),
                               ThemeIcon(),
@@ -62,6 +73,11 @@ void EditPlugin::initialize(MainWindow *mainWindow)
 void EditPlugin::slotResetElevation()
 {
     EditPluginResetElevation::run(mainWindow_);
+}
+
+void EditPlugin::slotResetManagementStatus()
+{
+    EditPluginResetManagementStatus::run(mainWindow_);
 }
 
 void EditPlugin::slotSetClassification()
