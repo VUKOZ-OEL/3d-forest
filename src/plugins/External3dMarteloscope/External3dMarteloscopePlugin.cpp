@@ -35,9 +35,9 @@
 #include <QUrl>
 
 // Include 3rd party.
-#include "global.h"
-#include "model.h"
-#include "modelcontroller.h"
+// #include "global.h"
+// #include "model.h"
+// #include "modelcontroller.h"
 
 // Include local.
 #define LOG_MODULE_NAME "External3dMarteloscopePlugin"
@@ -94,10 +94,12 @@ void External3dMarteloscopePlugin::slotPlugin()
         std::string projectPath = mainWindow_->editor().projectPath();
         runPythonApp(projectPath);
     }
+#if 0
     catch (const IException &e)
     {
         errorMessage = toStdString(e.message());
     }
+#endif
     catch (std::exception &e)
     {
         errorMessage = e.what();
@@ -116,6 +118,7 @@ void External3dMarteloscopePlugin::slotPlugin()
 
 void External3dMarteloscopePlugin::runILandModel(const std::string &projectPath)
 {
+#if 0
     LOG_DEBUG(<< "Run iLand Model <" << projectPath << ">.");
 
     QString xmlName = QString::fromStdString(projectPath);
@@ -143,6 +146,7 @@ void External3dMarteloscopePlugin::runILandModel(const std::string &projectPath)
     }
 
     LOG_DEBUG(<< "Finished running iLand Model.");
+#endif
 }
 
 void External3dMarteloscopePlugin::runPythonApp(const std::string &projectPath)
