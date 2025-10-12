@@ -30,17 +30,24 @@
 class ComputeHullMethod
 {
 public:
-    static void qhull3d(const std::vector<double> &points, Mesh &mesh);
-    static void qhull2d(const std::vector<double> &points, Mesh &mesh, float z);
+    static void qhull3d(Mesh &mesh,
+                        Vector3<double> &center,
+                        const std::vector<double> &points);
+
+    static void qhull2d(Mesh &mesh, const std::vector<double> &points, float z);
+
     static void alphaShape3(Mesh &mesh,
                             double &meshVolume,
                             double &meshSurfaceArea,
+                            Vector3<double> &center,
                             const std::vector<double> &points,
                             double alpha);
+
     static void alphaShape2(Mesh &mesh,
                             const std::vector<double> &points,
                             double alpha,
                             float z);
+
     static double surface2(const Mesh &mesh);
 };
 

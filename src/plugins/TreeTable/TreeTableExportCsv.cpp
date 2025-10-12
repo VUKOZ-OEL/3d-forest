@@ -47,56 +47,42 @@ void TreeTableExportCsv::create(const std::string &path)
     char text[256] = {};
     text[0] = 0;
 
-    (void)ustrcat(text, "id, label, x, y, z, height, dbh, area");
-
-    if (!properties().exportValidValuesOnly())
-    {
-        (void)ustrcat(text, ", status");
-    }
+    (void)ustrcat(text, "id;species;x;y;dbh;height");
 
     (void)ustrcat(text, "\n");
 
     file_.write(text);
 }
 
-void TreeTableExportCsv::write(const Segment &segment)
+void TreeTableExportCsv::write(const Segment &segment,
+                               const SpeciesList &speciesList)
 {
-    if (properties().exportValidValuesOnly() &&
-        !segment.treeAttributes.isValid())
+    if (segment.id == 0)
     {
         return;
     }
 
+    std::string species;
+    size_t speciesIdx = speciesList.index(segment.speciesId, false);
+    if (speciesIdx != SIZE_MAX)
+    {
+        species = speciesList[speciesIdx].species;
+    }
+
     double ppm = properties().pointsPerMeter();
-    double ppm2 = ppm * ppm;
-    double ppm3 = ppm * ppm * ppm;
 
     // Format data into text line.
     char text[4096];
-    char buffer[32];
 
     (void)snprintf(text,
                    sizeof(text),
-                   "%d, \"%s\", %f, %f, %f, %f, %f, %f, %f",
+                   "%d;%s;%f;%f;%f;%f",
                    static_cast<int>(segment.id),
-                   segment.label.c_str(),
-                   segment.treeAttributes.position[0] / ppm,
-                   segment.treeAttributes.position[1] / ppm,
-                   segment.treeAttributes.position[2] / ppm,
-                   segment.treeAttributes.height / ppm,
+                   species.c_str(),
+                   segment.treeAttributes.crownCenter[0] / ppm,
+                   segment.treeAttributes.crownCenter[1] / ppm,
                    segment.treeAttributes.dbh / ppm,
-                   segment.treeAttributes.surfaceAreaProjection / ppm2,
-                   segment.treeAttributes.volume / ppm3);
-
-    if (!properties().exportValidValuesOnly())
-    {
-        (void)snprintf(buffer,
-                       sizeof(buffer),
-                       ", \"%s\"",
-                       segment.treeAttributes.isValid() ? "Valid" : "Invalid");
-
-        (void)ustrcat(text, buffer);
-    }
+                   segment.treeAttributes.height / ppm);
 
     (void)ustrcat(text, "\n");
 

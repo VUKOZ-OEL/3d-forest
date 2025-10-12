@@ -37,7 +37,7 @@ public:
     bool findOptimalAlpha{true};
     double alpha{0.8};
 
-    double voxelRadius{0.1};
+    double voxelRadius{0.5};
 };
 
 inline void toJson(Json &out, const ComputeHullParameters &in)

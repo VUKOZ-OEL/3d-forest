@@ -50,7 +50,9 @@
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-void ComputeHullMethod::qhull3d(const std::vector<double> &points, Mesh &mesh)
+void ComputeHullMethod::qhull3d(Mesh &mesh,
+                                Vector3<double> &center,
+                                const std::vector<double> &points)
 {
     size_t nVertices = points.size() / 3;
     ch_vertex *vertices;
@@ -78,24 +80,33 @@ void ComputeHullMethod::qhull3d(const std::vector<double> &points, Mesh &mesh)
     {
         mesh.position[i * 9 + 0] =
             static_cast<float>(vertices[indices[i * 3 + 0]].x);
+        center[0] += vertices[indices[i * 3 + 0]].x;
         mesh.position[i * 9 + 1] =
             static_cast<float>(vertices[indices[i * 3 + 0]].y);
+        center[1] += vertices[indices[i * 3 + 0]].y;
         mesh.position[i * 9 + 2] =
             static_cast<float>(vertices[indices[i * 3 + 0]].z);
+        center[2] += vertices[indices[i * 3 + 0]].z;
 
         mesh.position[i * 9 + 3] =
             static_cast<float>(vertices[indices[i * 3 + 1]].x);
+        center[0] += vertices[indices[i * 3 + 1]].x;
         mesh.position[i * 9 + 4] =
             static_cast<float>(vertices[indices[i * 3 + 1]].y);
+        center[1] += vertices[indices[i * 3 + 1]].y;
         mesh.position[i * 9 + 5] =
             static_cast<float>(vertices[indices[i * 3 + 1]].z);
+        center[2] += vertices[indices[i * 3 + 1]].z;
 
         mesh.position[i * 9 + 6] =
             static_cast<float>(vertices[indices[i * 3 + 2]].x);
+        center[0] += vertices[indices[i * 3 + 2]].x;
         mesh.position[i * 9 + 7] =
             static_cast<float>(vertices[indices[i * 3 + 2]].y);
+        center[1] += vertices[indices[i * 3 + 2]].y;
         mesh.position[i * 9 + 8] =
             static_cast<float>(vertices[indices[i * 3 + 2]].z);
+        center[2] += vertices[indices[i * 3 + 2]].z;
     }
 
     mesh.calculateNormals();
@@ -104,8 +115,8 @@ void ComputeHullMethod::qhull3d(const std::vector<double> &points, Mesh &mesh)
     free(indices);
 }
 
-void ComputeHullMethod::qhull2d(const std::vector<double> &points,
-                                Mesh &mesh,
+void ComputeHullMethod::qhull2d(Mesh &mesh,
+                                const std::vector<double> &points,
                                 float z)
 {
     // Calculate the 2D convex hull polygon in the XY plane.
@@ -231,12 +242,14 @@ struct RoundedPointKey
 void ComputeHullMethod::alphaShape3(Mesh &mesh,
                                     double &meshVolume,
                                     double &meshSurfaceArea,
+                                    Vector3<double> &center,
                                     const std::vector<double> &points,
                                     double alpha)
 {
     mesh.clear();
     meshVolume = 0;
     meshSurfaceArea = 0;
+    center = Vector3<double>();
 
     typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
     typedef CGAL::Alpha_shape_vertex_base_3<K> Vb;
@@ -365,6 +378,14 @@ void ComputeHullMethod::alphaShape3(Mesh &mesh,
 
     // Create Mesh.
     size_t nFaces = vertices.size() / 3;
+
+    for (size_t i = 0; i < vertices.size(); i++)
+    {
+        center[0] += vertices[i].x();
+        center[1] += vertices[i].y();
+        center[2] += vertices[i].z();
+    }
+    center = center / static_cast<double>(vertices.size());
 
     mesh.clear();
     mesh.mode = Mesh::Mode::MODE_TRIANGLES;

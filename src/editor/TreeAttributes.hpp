@@ -36,6 +36,9 @@ public:
     /// Calculated tree height.
     double height{0.0};
 
+    // Crown center coordinates.
+    Vector3<double> crownCenter;
+
     /// Calculated crown start.
     double crownStartHeight{0.0};
 
@@ -116,6 +119,7 @@ inline void toJson(Json &out, const TreeAttributes &in, double scale)
     toJson(out["dbhNormal"], in.dbhNormal);
     toJson(out["dbh"], in.dbh * scale);
 
+    toJson(out["crownCenter"], in.crownCenter * scale);
     toJson(out["crownStartHeight"], in.crownStartHeight * scale);
     toJson(out["crownVoxelCountPerMeters"], in.crownVoxelCountPerMeters);
     toJson(out["crownVoxelCount"], in.crownVoxelCount);
@@ -156,6 +160,9 @@ inline void fromJson(TreeAttributes &out, const Json &in, double scale)
 
     fromJson(out.dbh, in, "dbh");
     out.dbh *= scale;
+
+    fromJson(out.crownCenter, in, "crownCenter");
+    out.crownCenter = out.crownCenter * scale;
 
     fromJson(out.crownStartHeight, in, "crownStartHeight");
     out.crownStartHeight *= scale;

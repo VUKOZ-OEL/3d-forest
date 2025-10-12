@@ -24,6 +24,7 @@
 
 // Include 3D Forest.
 #include <Segment.hpp>
+#include <SpeciesList.hpp>
 #include <TreeTableExportProperties.hpp>
 
 /** Tree Table Export Interface. */
@@ -34,7 +35,8 @@ public:
 
     virtual bool open() = 0;
     virtual void create(const std::string &path) = 0;
-    virtual void write(const Segment &segment) = 0;
+    virtual void write(const Segment &segment,
+                       const SpeciesList &speciesList) = 0;
     virtual void close() = 0;
 
     void setProperties(const TreeTableExportProperties &prop)

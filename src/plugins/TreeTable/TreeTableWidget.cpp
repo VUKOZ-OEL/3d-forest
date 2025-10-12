@@ -143,6 +143,8 @@ void TreeTableWidget::slotUpdate(void *sender, const QSet<Editor::Type> &target)
     {
         LOG_DEBUG_UPDATE(<< "Input segments.");
 
+        speciesList_ = mainWindow_->editor().speciesList();
+
         setSegments(mainWindow_->editor().segments(),
                     mainWindow_->editor().segmentsFilter());
     }
@@ -205,6 +207,9 @@ void TreeTableWidget::setTable()
                                              "Z [m]",
                                              "Height [m]",
                                              "DBH [m]",
+                                             "Crown X [m]",
+                                             "Crown Y [m]",
+                                             "Crown Z [m]",
                                              "Area [m^2]",
                                              "Vol [m^3]",
                                              "Status"});
@@ -265,7 +270,6 @@ void TreeTableWidget::setRow(int row, size_t index)
 
     const auto &managementStatusList =
         mainWindow_->editor().managementStatusList();
-    const auto &speciesList = mainWindow_->editor().speciesList();
 
     double ppm =
         mainWindow_->editor().settings().unitsSettings().pointsPerMeter()[0];
@@ -298,13 +302,16 @@ void TreeTableWidget::setRow(int row, size_t index)
             managementStatusList.labelById(segment.managementStatusId, false));
     setCell(row,
             COLUMN_SPECIES,
-            speciesList.labelById(segment.speciesId, false));
+            speciesList_.labelById(segment.speciesId, false));
     setCell(row, COLUMN_X, treeAttributes.position[0] / ppm);
     setCell(row, COLUMN_Y, treeAttributes.position[1] / ppm);
     setCell(row, COLUMN_Z, treeAttributes.position[2] / ppm);
     setCell(row, COLUMN_HEIGHT, treeAttributes.height / ppm);
     setCell(row, COLUMN_STATUS, treeAttributes.isValid() ? "Valid" : "Invalid");
     setCell(row, COLUMN_DBH, treeAttributes.dbh / ppm);
+    setCell(row, COLUMN_CROWN_X, treeAttributes.crownCenter[0] / ppm);
+    setCell(row, COLUMN_CROWN_Y, treeAttributes.crownCenter[1] / ppm);
+    setCell(row, COLUMN_CROWN_Z, treeAttributes.crownCenter[2] / ppm);
     setCell(row, COLUMN_AREA, treeAttributes.surfaceAreaProjection / ppm2);
     setCell(row, COLUMN_VOLUME, treeAttributes.volume / ppm3);
 }
@@ -434,7 +441,7 @@ void TreeTableWidget::slotExport()
                     size_t index = segments_.index(id, false);
                     if (index != SIZE_MAX)
                     {
-                        writer->write(segments_[index]);
+                        writer->write(segments_[index], speciesList_);
                     }
                 }
             }

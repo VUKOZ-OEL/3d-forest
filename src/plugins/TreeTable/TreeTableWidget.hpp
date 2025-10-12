@@ -67,6 +67,9 @@ private:
         COLUMN_Z,
         COLUMN_HEIGHT,
         COLUMN_DBH,
+        COLUMN_CROWN_X,
+        COLUMN_CROWN_Y,
+        COLUMN_CROWN_Z,
         COLUMN_AREA,
         COLUMN_VOLUME,
         COLUMN_STATUS,
@@ -82,6 +85,7 @@ private:
     std::unordered_set<size_t> visibleTreesIdList_;
 
     Segments segments_;
+    SpeciesList speciesList_;
     QueryFilterSet filter_;
     bool updatesEnabled_;
 

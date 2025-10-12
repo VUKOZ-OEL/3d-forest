@@ -35,7 +35,7 @@ public:
 
     virtual bool open() { return file_.open(); }
     virtual void create(const std::string &path);
-    virtual void write(const Segment &segment);
+    virtual void write(const Segment &segment, const SpeciesList &speciesList);
     virtual void close();
 
 private:
