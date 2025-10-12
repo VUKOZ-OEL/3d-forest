@@ -77,6 +77,7 @@ void External3dMarteloscopePlugin::slotPlugin()
 
     try
     {
+#if 0
         External3dMarteloscopeDialog dialog(mainWindow_);
         if (dialog.exec() != QDialog::Accepted)
         {
@@ -89,7 +90,7 @@ void External3dMarteloscopePlugin::slotPlugin()
         {
             runILandModel(iLandProjectPath);
         }
-
+#endif
         std::string projectPath = mainWindow_->editor().projectPath();
         runPythonApp(projectPath);
     }
