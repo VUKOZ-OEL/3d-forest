@@ -278,7 +278,7 @@ void TreeTableWidget::setRow(int row, size_t index)
 
     // size_t id = segments_.id(index);
     LOG_DEBUG(<< "Set id <" << segment.id << "> label <" << segment.label
-              << ">.");
+              << "> selected <" << segment.selected << ">.");
 
     const Vector3<double> &treeColorRGB = segment.color;
     QColor treeColor;
@@ -314,6 +314,11 @@ void TreeTableWidget::setRow(int row, size_t index)
     setCell(row, COLUMN_CROWN_Z, treeAttributes.crownCenter[2] / ppm);
     setCell(row, COLUMN_AREA, treeAttributes.surfaceAreaProjection / ppm2);
     setCell(row, COLUMN_VOLUME, treeAttributes.volume / ppm3);
+
+    if (segment.selected)
+    {
+        tableWidget_->selectRow(row);
+    }
 }
 
 void TreeTableWidget::setCell(int row,

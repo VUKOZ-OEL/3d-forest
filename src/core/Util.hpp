@@ -28,6 +28,7 @@
 #include <cmath>
 #include <iomanip>
 #include <limits>
+#include <set>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -579,6 +580,27 @@ inline std::string toString(long long in)
 inline std::string toString(unsigned long long in)
 {
     return std::to_string(in);
+}
+
+template <class T>
+inline std::string toString(const std::set<T> &list,
+                            const std::string &separator = ",")
+{
+    std::string result;
+
+    auto it = list.begin();
+    if (it != list.end())
+    {
+        result = toString(*it);
+        ++it;
+    }
+    while (it != list.end())
+    {
+        result = result + separator + toString(*it);
+        ++it;
+    }
+
+    return result;
 }
 
 inline void fromString(double &out, const std::string &in)

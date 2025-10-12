@@ -22,6 +22,7 @@
 // Include 3D Forest.
 #include <Editor.hpp>
 #include <Geometry.hpp>
+#include <MainWindow.hpp>
 #include <Time.hpp>
 #include <ViewerOpenGL.hpp>
 #include <ViewerOpenGLManager.hpp>
@@ -35,11 +36,20 @@
 
 // Include local.
 #define LOG_MODULE_NAME "ViewerOpenGLViewport"
-// #define LOG_MODULE_DEBUG_ENABLED 1
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-ViewerOpenGLViewport::ViewerOpenGLViewport(QWidget *parent)
+static QVector3D fromVector3(const Vector3<double> &v)
+{
+    return QVector3D(static_cast<float>(v[0]),
+                     static_cast<float>(v[1]),
+                     static_cast<float>(v[2]));
+}
+
+ViewerOpenGLViewport::ViewerOpenGLViewport(QWidget *parent,
+                                           MainWindow *mainWindow)
     : QOpenGLWidget(parent),
+      mainWindow_(mainWindow),
       manager_(nullptr),
       windowViewports_(nullptr),
       viewportId_(0),
@@ -129,8 +139,10 @@ void ViewerOpenGLViewport::mouseReleaseEvent(QMouseEvent *event)
 
 void ViewerOpenGLViewport::mousePressEvent(QMouseEvent *event)
 {
+    bool ctrl = event->modifiers() & Qt::ControlModifier;
+
     camera_.mousePressEvent(event);
-    pickObject(event->pos());
+    pickObject(event->pos(), ctrl);
     setFocus();
 }
 
@@ -424,8 +436,6 @@ void ViewerOpenGLViewport::renderScene()
 
     std::unique_lock<std::mutex> mutexlock(editor_->editorMutex_);
 
-    updateObjects();
-
     renderSceneSettingsEnable();
 
     double t1 = Time::realTime();
@@ -438,6 +448,7 @@ void ViewerOpenGLViewport::renderScene()
     if (pageSize == 0)
     {
         renderFirstFrame();
+        updateObjects();
     }
 
     if (resized_)
@@ -469,6 +480,7 @@ void ViewerOpenGLViewport::renderScene()
             if (pageIndex == 0)
             {
                 renderFirstFrame();
+                updateObjects();
             }
 
             if (page.renderColor.empty())
@@ -636,6 +648,12 @@ void ViewerOpenGLViewport::renderDbh()
         float radius = static_cast<float>(attributes.dbh) * 0.5F * scale;
         Vector3<float> position(attributes.dbhPosition);
         ViewerOpenGL::renderCircle(position, radius, true);
+
+        if (segment.selected)
+        {
+            glColor3f(0.0F, 1.0F, 0.0F);
+            ViewerOpenGL::renderCircle(position, radius * 1.2F, false);
+        }
     }
 }
 
@@ -1023,24 +1041,95 @@ void ViewerOpenGLViewport::updateObjects()
         Object obj;
         obj.id = segment.id;
         obj.aabb.set(segment.boundary);
+        obj.dbhPosition = fromVector3(segment.treeAttributes.dbhPosition);
+        obj.dbh = segment.treeAttributes.dbh;
+        obj.selected = segment.selected;
 
         objects_.push_back(std::move(obj));
     }
+
+    LOG_DEBUG(<< "Created <" << objects_.size() << "> objects.");
 }
 
-void ViewerOpenGLViewport::pickObject(const QPoint &p)
+void ViewerOpenGLViewport::pickObject(const QPoint &p, bool ctrl)
 {
     LOG_DEBUG(<< "Pick x <" << p.x() << "> y <" << p.y() << ">.");
 
-    selectedId = 0;
-
-    size_t nearId = 0;
-    float dist = Numeric::max<float>();
-
+    // Get picking ray in 3D.
     QVector3D p1;
     QVector3D p2;
 
     camera_.ray(p.x(), p.y(), &p1, &p2);
+
+    // Pick geometry.
+    size_t selectedId = 0;
+
+    if (camera_.lock2d())
+    {
+        selectedId = pickObject2D(p1, p2);
+    }
+    else
+    {
+        selectedId = pickObject3D(p1, p2);
+    }
+
+    // Select picked object.
+    std::set<size_t> selectedIds;
+    if (selectedId > 0)
+    {
+        selectedIds.insert(selectedId);
+    }
+    pickObject(selectedIds, ctrl);
+}
+
+size_t ViewerOpenGLViewport::pickObject2D(const QVector3D &p1,
+                                          const QVector3D &p2)
+{
+    size_t nearId = 0;
+
+    double scale = editor_->settings().treeSettings().dbhScale();
+
+    for (size_t i = 0; i < objects_.size(); i++)
+    {
+        const QVector3D &p3 = objects_[i].dbhPosition;
+        float radius = objects_[i].dbh * 0.5F * scale;
+
+        if (radius < 0.01)
+        {
+            continue;
+        }
+
+        float ix;
+        float iy;
+        float iz;
+
+        bool b = intersectSegmentSphere(p1.x(),
+                                        p1.y(),
+                                        p1.z(),
+                                        p2.x(),
+                                        p2.y(),
+                                        p2.z(),
+                                        p3.x(),
+                                        p3.y(),
+                                        p3.z(),
+                                        radius,
+                                        &ix,
+                                        &iy,
+                                        &iz);
+        if (b)
+        {
+            nearId = objects_[i].id;
+        }
+    }
+
+    return nearId;
+}
+
+size_t ViewerOpenGLViewport::pickObject3D(const QVector3D &p1,
+                                          const QVector3D &p2)
+{
+    size_t nearId = 0;
+    float dist = Numeric::max<float>();
 
     for (size_t i = 0; i < objects_.size(); i++)
     {
@@ -1077,6 +1166,34 @@ void ViewerOpenGLViewport::pickObject(const QPoint &p)
         }
     }
 
-    selectedId = nearId;
-    LOG_DEBUG(<< "Selected ID <" << selectedId << ">.");
+    return nearId;
+}
+
+void ViewerOpenGLViewport::pickObject(const std::set<size_t> &selectedIds,
+                                      bool ctrl)
+{
+    LOG_DEBUG(<< "Selected ID <" << toString(selectedIds) << ">.");
+
+    Segments segments = editor_->segments();
+
+    if (!ctrl)
+    {
+        for (size_t i = 0; i < segments.size(); i++)
+        {
+            segments[i].selected = false;
+        }
+    }
+
+    for (size_t i = 0; i < segments.size(); i++)
+    {
+        Segment &segment = segments[i];
+
+        if (selectedIds.count(segment.id) > 0)
+        {
+            segment.selected = true;
+        }
+    }
+
+    editor_->setSegments(segments);
+    mainWindow_->update({Editor::TYPE_SEGMENT});
 }

@@ -28,6 +28,7 @@
 #include <ViewerAabb.hpp>
 #include <ViewerCamera.hpp>
 class Editor;
+class MainWindow;
 class ViewerViewports;
 class ViewerOpenGLManager;
 
@@ -43,7 +44,7 @@ class ViewerOpenGLViewport : public QOpenGLWidget, protected QOpenGLFunctions
     Q_OBJECT
 
 public:
-    explicit ViewerOpenGLViewport(QWidget *parent = nullptr);
+    explicit ViewerOpenGLViewport(QWidget *parent, MainWindow *mainWindow);
     ~ViewerOpenGLViewport();
 
     void setManager(ViewerOpenGLManager *manager);
@@ -85,6 +86,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
 
+    MainWindow *mainWindow_;
     ViewerOpenGLManager *manager_;
 
     // Window Viewports.
@@ -121,13 +123,18 @@ protected:
     public:
         size_t id{0};
         ViewerAabb aabb;
+        QVector3D dbhPosition;
+        float dbh{0.0F};
+        bool selected{false};
     };
 
     std::vector<Object> objects_;
-    size_t selectedId{0};
 
     void updateObjects();
-    void pickObject(const QPoint &p);
+    void pickObject(const QPoint &p, bool ctrl);
+    size_t pickObject2D(const QVector3D &p1, const QVector3D &p2);
+    size_t pickObject3D(const QVector3D &p1, const QVector3D &p2);
+    void pickObject(const std::set<size_t> &selectedIds, bool ctrl);
 };
 
 #endif /* VIEWER_OPENGL_VIEWPORT_HPP */
