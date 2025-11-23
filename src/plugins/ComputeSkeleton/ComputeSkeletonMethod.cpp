@@ -37,6 +37,6 @@
 void ComputeSkeletonMethod::compute(ComputeSkeletonData &data,
                                     const ComputeSkeletonParameters &parameters)
 {
-    pcl::PointCloud<pcl::PointXYZI>::Ptr cloud;
-    f3d::Skeleton s(cloud, 0.5, 1);
+    // pcl::PointCloud<pcl::PointXYZI>::Ptr cloud;
+    // f3d::Skeleton s(cloud, 0.5, 1);
 }

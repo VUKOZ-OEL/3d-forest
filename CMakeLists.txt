@@ -45,7 +45,7 @@ if(FORCE_QT5)
     endif()
 else()
     # Default autodetect Qt version
-    find_package(Qt6 COMPONENTS Core Gui Widgets Network Concurrent Qml Sql Xml OpenGL OpenGLWidgets)
+    find_package(Qt6 COMPONENTS Core Gui Widgets WebEngineWidgets OpenGL OpenGLWidgets Concurrent Qml Sql Xml)
     if(Qt6_FOUND AND Qt6OpenGL_FOUND AND OpenGL_FOUND)
         message(STATUS "Gui with Qt6 and OpenGL found")
         set(QT_VERSION_MAJOR 6)
@@ -58,8 +58,29 @@ else()
     endif()
 endif()
 
+function(install_and_deploy_qt_runtime app_target bin_dest)
+  install(TARGETS ${app_target}
+    RUNTIME DESTINATION ${bin_dest}
+    BUNDLE  DESTINATION ${bin_dest}
+  )
+
+  qt_generate_deploy_app_script(
+    TARGET ${app_target}
+    OUTPUT_SCRIPT ${app_target}_deploy.cmake
+    NO_UNSUPPORTED_PLATFORM_ERROR
+  )
+  install(SCRIPT ${${app_target}_deploy.cmake})
+endfunction()
+
 add_subdirectory(3rdparty)
 add_subdirectory(src)
 
 include(cmake/clangformat.cmake)
 include(cmake/doxygen.cmake)
+
+# qt_generate_deploy_app_script(
+#     TARGET 3DForestILand
+#     OUTPUT_SCRIPT deploy_script
+#     NO_UNSUPPORTED_PLATFORM_ERROR
+# )
+# install(SCRIPT ${deploy_script})

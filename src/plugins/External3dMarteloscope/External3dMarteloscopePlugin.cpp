@@ -22,17 +22,15 @@
 // Include 3D Forest.
 #include <External3dMarteloscopeDialog.hpp>
 #include <External3dMarteloscopePlugin.hpp>
+#include <External3dMarteloscopeRunner.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
 #include <QCoreApplication>
-#include <QDesktopServices>
 #include <QProcess>
-#include <QTcpServer>
-#include <QTcpSocket>
-#include <QThread>
 #include <QUrl>
+#include <QWebEngineView>
 
 // Include 3rd party.
 // #include "global.h"
@@ -52,8 +50,17 @@ static std::string toStdString(const QString &str)
 }
 
 External3dMarteloscopePlugin::External3dMarteloscopePlugin()
-    : mainWindow_(nullptr)
+    : mainWindow_(nullptr),
+      runner_(nullptr)
 {
+}
+
+External3dMarteloscopePlugin::~External3dMarteloscopePlugin()
+{
+    if (runner_ && runner_->isRunning())
+    {
+        runner_->stop();
+    }
 }
 
 void External3dMarteloscopePlugin::initialize(MainWindow *mainWindow)
@@ -75,31 +82,16 @@ void External3dMarteloscopePlugin::slotPlugin()
 {
     std::string errorMessage;
 
+    if (!runner_)
+    {
+        runner_ = new External3dMarteloscopeRunner(mainWindow_);
+    }
+
     try
     {
-#if 0
-        External3dMarteloscopeDialog dialog(mainWindow_);
-        if (dialog.exec() != QDialog::Accepted)
-        {
-            return;
-        }
-
-        std::string iLandProjectPath = dialog.path();
-        int n = 100;
-        for (int i = 0; i < n; i++)
-        {
-            runILandModel(iLandProjectPath);
-        }
-#endif
         std::string projectPath = mainWindow_->editor().projectPath();
         runPythonApp(projectPath);
     }
-#if 0
-    catch (const IException &e)
-    {
-        errorMessage = toStdString(e.message());
-    }
-#endif
     catch (std::exception &e)
     {
         errorMessage = e.what();
@@ -116,94 +108,15 @@ void External3dMarteloscopePlugin::slotPlugin()
     }
 }
 
-void External3dMarteloscopePlugin::runILandModel(const std::string &projectPath)
-{
-#if 0
-    LOG_DEBUG(<< "Run iLand Model <" << projectPath << ">.");
-
-    QString xmlName = QString::fromStdString(projectPath);
-    int years = 1;
-
-    ModelController iLandModel;
-    GlobalSettings::instance()->setModelController(&iLandModel);
-
-    iLandModel.setFileName(xmlName);
-    if (iLandModel.hasError())
-    {
-        THROW("set iLand file name: " + toStdString(iLandModel.lastError()));
-    }
-
-    iLandModel.create();
-    if (iLandModel.hasError())
-    {
-        THROW("create iLand: " + toStdString(iLandModel.lastError()));
-    }
-
-    iLandModel.run(years);
-    if (iLandModel.hasError())
-    {
-        THROW("run iLand: " + toStdString(iLandModel.lastError()));
-    }
-
-    LOG_DEBUG(<< "Finished running iLand Model.");
-#endif
-}
-
 void External3dMarteloscopePlugin::runPythonApp(const std::string &projectPath)
 {
     LOG_DEBUG(<< "Start python app with project <" << projectPath << ">.");
 
-    int port = -1;
-
-    QTcpServer server;
-    if (server.listen(QHostAddress::LocalHost, 0))
-    {
-        port = server.serverPort();
-        server.close();
-    }
-    if (port < 0)
-    {
-        qWarning() << "Could not find free port";
-        return;
-    }
-
-    QTcpSocket socket;
-    socket.connectToHost("127.0.0.1", port);
-    bool connected = socket.waitForConnected(200);
-    socket.abort();
-
-    if (connected)
-    {
-        qDebug() << "Streamlit already running on port" << port
-                 << ", reusing it.";
-        QDesktopServices::openUrl(
-            QUrl(QString("http://localhost:%1").arg(port)));
-        return;
-    }
-
-    QString program = "python";
-
-    QString app = QCoreApplication::applicationDirPath() +
+    QString pythonPath = "python";
+    QString appPath = QCoreApplication::applicationDirPath() +
                   "/plugins/3DForestExternal3dMarteloscopePlugin/python/app.py";
 
-    QStringList arguments;
-    arguments << "-m" << "streamlit" << "run" << app << "--server.port"
-              << QString::number(port) << "--server.headless" << "true"
-              << "--" << QString::fromStdString(projectPath);
-
-    qint64 pid;
-    bool ok = QProcess::startDetached(program, arguments, QString(), &pid);
-    if (!ok)
-    {
-        qWarning() << "Failed to start process";
-        return;
-    }
-
-    qDebug() << "Started process with PID:" << pid;
-
-    QThread::sleep(1);
-
-    QDesktopServices::openUrl(QUrl(QString("http://localhost:%1").arg(port)));
+    runner_->start(pythonPath, appPath, QString::fromStdString(projectPath));
 
     LOG_DEBUG(<< "Finished starting python app.");
 }

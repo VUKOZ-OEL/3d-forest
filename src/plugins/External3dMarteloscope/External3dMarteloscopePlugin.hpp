@@ -25,6 +25,8 @@
 // Include 3D Forest.
 #include <PluginInterface.hpp>
 
+class External3dMarteloscopeRunner;
+
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestExternal3dMarteloscopePlugin)
         #define EXPORT_EXTERNAL_3D_MARTELOSCOPE_PLUGIN __declspec(dllexport)
@@ -46,6 +48,7 @@ class EXPORT_EXTERNAL_3D_MARTELOSCOPE_PLUGIN External3dMarteloscopePlugin
 
 public:
     External3dMarteloscopePlugin();
+    ~External3dMarteloscopePlugin();
 
     virtual void initialize(MainWindow *mainWindow);
 
@@ -54,8 +57,8 @@ public slots:
 
 private:
     MainWindow *mainWindow_;
+    External3dMarteloscopeRunner *runner_;
 
-    void runILandModel(const std::string &projectPath);
     void runPythonApp(const std::string &projectPath);
 };
 

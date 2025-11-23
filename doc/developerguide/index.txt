@@ -540,6 +540,7 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
                 - Qt 5 Compatibility Module
                 - Additional Libraries
                 - Qt Debug Information Files
+           - Check Extensions > Qt WebEngine > Qt 6.3.0 (for 3D Marteloscope)
         - "Next", "Install", the installation takes between 10 to 30 minutes
         - Click "Finish"
     - Run "systempropertiesadvanced" from the search box

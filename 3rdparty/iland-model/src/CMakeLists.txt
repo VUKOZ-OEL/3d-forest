@@ -134,6 +134,7 @@ add_library(
     tools/modules.cpp
     tools/random.cpp
     tools/randomgenerator.cpp
+    tools/runilandmodel.cpp
     tools/scriptglobal.cpp
     tools/scriptgrid.cpp
     tools/scriptresourceunit.cpp
@@ -160,13 +161,13 @@ add_library(
     plugins/wind/windout.cpp
 )
 
-if (WIN32)
-    set_target_properties(
-        ${SUB_PROJECT_NAME}
-        PROPERTIES
-        WINDOWS_EXPORT_ALL_SYMBOLS ON
-    )
-endif()
+# if (WIN32)
+#     set_target_properties(
+#         ${SUB_PROJECT_NAME}
+#         PROPERTIES
+#         WINDOWS_EXPORT_ALL_SYMBOLS ON
+#     )
+# endif()
 
 target_include_directories(
     ${SUB_PROJECT_NAME}
@@ -202,4 +203,5 @@ target_link_libraries(
     Qt${QT_VERSION_MAJOR}::Xml
 )
 
-install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)
+#install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)
+install_and_deploy_qt_runtime(${SUB_PROJECT_NAME} "bin")

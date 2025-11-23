@@ -52,11 +52,12 @@ target_link_libraries(
     PRIVATE
     3DForestGui
 #    ILandModel
-    Qt${QT_VERSION_MAJOR}::Network
+    Qt${QT_VERSION_MAJOR}::WebEngineWidgets
 )
 
 # Install plugin
-install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin/plugins)
+# install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin/plugins)
+install_and_deploy_qt_runtime(${SUB_PROJECT_NAME} "bin/plugins")
 
 # Install python app
 install(

@@ -31,41 +31,19 @@
 #include <QString>
 
 // Include 3rd party.
-#include "global.h"
-#include "model.h"
-#include "modelcontroller.h"
-#include <version.h>
 
 // Include local.
 #define LOG_MODULE_NAME "iland"
 #include <Log.hpp>
 
-static std::string toStdString(const QString &str)
+extern "C" int runilandmodel(const char *path, int years);
+
+static void run(const std::string &xmlName, int years)
 {
-    return str.toUtf8().constData();
-}
-
-static void iLandModelRun(const QString &xmlName, int years)
-{
-    ModelController iLandModel;
-    GlobalSettings::instance()->setModelController(&iLandModel);
-
-    iLandModel.setFileName(xmlName);
-    if (iLandModel.hasError())
+    int ret = runilandmodel(xmlName.c_str(), years);
+    if (ret)
     {
-        THROW("setFileName: " + toStdString(iLandModel.lastError()));
-    }
-
-    iLandModel.create();
-    if (iLandModel.hasError())
-    {
-        THROW("create: " + toStdString(iLandModel.lastError()));
-    }
-
-    iLandModel.run(years);
-    if (iLandModel.hasError())
-    {
-        THROW("run: " + toStdString(iLandModel.lastError()));
+        THROW("iLandModel error");
     }
 }
 
@@ -94,17 +72,10 @@ int main(int argc, char *argv[])
 
         if (arg.parse(argc, argv))
         {
-            QString xmlName = QString::fromStdString(arg.toString("--file"));
-            int years = arg.toInt("--years");
-
-            iLandModelRun(xmlName, years);
+            run(arg.toString("--file"), arg.toInt("--years"));
         }
 
         rc = 0;
-    }
-    catch (const IException &e)
-    {
-        std::cerr << "error: " << toStdString(e.message()) << std::endl;
     }
     catch (std::exception &e)
     {

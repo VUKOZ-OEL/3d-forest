@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-add_subdirectory(3d-forest-classic)
+#add_subdirectory(3d-forest-classic)
 add_subdirectory(iland-model)
-add_subdirectory(lz4)
-add_subdirectory(pcl)
+#add_subdirectory(lz4)
+#add_subdirectory(pcl)

@@ -1,5 +1,7 @@
 import streamlit as st
 import sys
+import ctypes, os
+from pathlib import Path
 
 #from streamlit_multipage import MultiPage
 
@@ -10,6 +12,31 @@ else:
 
 st.session_state["file_path"] = file_path
 
+# ------------------------------------------------------------------------------
+# Get directory of the running script
+base_dir = Path(__file__).resolve().parent
+
+# Build a relative path to the DLL
+lib_path = base_dir / "../../../ILandModel.dll"
+os.add_dll_directory(str(lib_path.parent))
+
+# Normalize (resolve) the path
+lib_path = lib_path.resolve()
+
+# Load the shared library
+iland = ctypes.CDLL(str(lib_path))
+
+# Define argument and return types
+iland.runilandmodel.argtypes = [ctypes.c_char_p, ctypes.c_int]
+iland.runilandmodel.restype = ctypes.c_int
+
+# Call the function
+xml_path = b"C:\\Users\\vbubn\\Documents\\3d-forest\\bin\\iland2\\Pokojna_hora.xml"
+years = 1
+result = iland.runilandmodel(xml_path, years)
+# print("Result:", result)
+
+# ------------------------------------------------------------------------------
 st.set_page_config(page_title="3D-Marteloscope", page_icon=":material/nature_people:",layout="wide")
 
 dash_page = st.Page("src/Dashboard.py", title="Plot Info", icon=":material/dashboard:")

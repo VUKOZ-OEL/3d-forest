@@ -59,7 +59,7 @@ target_link_libraries(
     ${SUB_PROJECT_NAME}
     PRIVATE
     3DForestGui
-    3DForestClassic
+    #3DForestClassic
 )
 
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin/plugins)
