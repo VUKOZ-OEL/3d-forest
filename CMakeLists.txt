@@ -77,10 +77,3 @@ add_subdirectory(src)
 
 include(cmake/clangformat.cmake)
 include(cmake/doxygen.cmake)
-
-# qt_generate_deploy_app_script(
-#     TARGET 3DForestILand
-#     OUTPUT_SCRIPT deploy_script
-#     NO_UNSUPPORTED_PLATFORM_ERROR
-# )
-# install(SCRIPT ${deploy_script})

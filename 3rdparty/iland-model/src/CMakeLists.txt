@@ -203,5 +203,4 @@ target_link_libraries(
     Qt${QT_VERSION_MAJOR}::Xml
 )
 
-#install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)
 install_and_deploy_qt_runtime(${SUB_PROJECT_NAME} "bin")
