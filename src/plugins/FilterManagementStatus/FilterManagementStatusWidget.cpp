@@ -22,6 +22,7 @@
 // Include 3D Forest.
 #include <ColorPalette.hpp>
 #include <FilterManagementStatusWidget.hpp>
+#include <FilterManagementStatusTreeWidget.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
@@ -34,6 +35,7 @@
 #include <QTreeWidgetItem>
 #include <QTreeWidgetItemIterator>
 #include <QVBoxLayout>
+#include <QSplitter>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterManagementStatusWidget"
@@ -99,11 +101,21 @@ FilterManagementStatusWidget::FilterManagementStatusWidget(
     toolBar->addWidget(selectNoneButton_);
     toolBar->setIconSize(QSize(MainWindow::ICON_SIZE, MainWindow::ICON_SIZE));
 
+    // Detail.
+    treeWidget_ = new FilterManagementStatusTreeWidget(mainWindow_);
+
+    // Splitter.
+    splitter_ = new QSplitter;
+    splitter_->addWidget(tree_);
+    splitter_->addWidget(treeWidget_);
+    splitter_->setOrientation(Qt::Vertical);
+    splitter_->setSizes(QList<int>({1, 1}));
+
     // Layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(toolBar);
-    mainLayout->addWidget(tree_);
+    mainLayout->addWidget(splitter_);
 
     setLayout(mainLayout);
 
@@ -120,7 +132,7 @@ FilterManagementStatusWidget::FilterManagementStatusWidget(
 void FilterManagementStatusWidget::slotUpdate(void *sender,
                                               const QSet<Editor::Type> &target)
 {
-    if (sender == this)
+    if (sender == this || sender == treeWidget_)
     {
         return;
     }
@@ -131,6 +143,26 @@ void FilterManagementStatusWidget::slotUpdate(void *sender,
 
         setManagementStatusList(mainWindow_->editor().managementStatusList(),
                                 mainWindow_->editor().managementStatusFilter());
+    }
+
+    if (target.empty() || target.contains(Editor::TYPE_SEGMENT))
+    {
+        LOG_DEBUG_UPDATE(<< "Input segment.");
+        bool found = false;
+        const Segments &segments = mainWindow_->editor().segments();
+        for (size_t i = 0; i < segments.size(); i++)
+        {
+            if (segments[i].selected)
+            {
+                treeWidget_->setSegment(segments[i]);
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+        {
+            treeWidget_->clear();
+        }
     }
 }
 
