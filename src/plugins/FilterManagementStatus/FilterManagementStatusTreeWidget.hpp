@@ -33,6 +33,7 @@ class MainWindow;
 // Include Qt.
 #include <QWidget>
 class QCheckBox;
+class QVBoxLayout;
 
 /** Management Status Tree Widget. */
 class FilterManagementStatusTreeWidget : public QWidget
@@ -46,13 +47,31 @@ public:
     void clear();
 
 public slots:
-    void slotSetCheckbox(int v);
+    void slotSetCheckbox(bool b);
 
 protected:
     MainWindow *mainWindow_;
     std::vector<QCheckBox*> checkboxList_;
-    std::map<size_t,size_t> statusMap_;
+    QVBoxLayout *mainLayout_ = nullptr;
+
     Segment segment_;
+
+    class Status
+    {
+    public:
+        size_t statusId;
+        QString label;
+
+        bool operator==(const Status &other) const
+        {
+            return statusId == other.statusId && label == other.label;
+        }
+    };
+    std::map<size_t,Status> statusMap_;
+
+    std::map<size_t,Status> createMap(); 
+    void createCheckBoxList();
+    void updateCheckBoxList();
 
     void setCheckbox(size_t idx);
 };

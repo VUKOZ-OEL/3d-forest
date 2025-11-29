@@ -30,7 +30,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "FilterManagementStatusTreeWidget"
-#define LOG_MODULE_DEBUG_ENABLED 1
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 FilterManagementStatusTreeWidget::FilterManagementStatusTreeWidget(MainWindow *mainWindow)
@@ -40,75 +40,113 @@ FilterManagementStatusTreeWidget::FilterManagementStatusTreeWidget(MainWindow *m
     LOG_DEBUG(<< "Create.");
 
     // Status map.
+    statusMap_ = createMap();
+
+    // Layout.
+    mainLayout_ = new QVBoxLayout;
+    mainLayout_->setContentsMargins(0, 0, 0, 0);
+
+    // Checkbox list
+    createCheckBoxList();
+
+    setLayout(mainLayout_);
+}
+
+std::map<size_t,FilterManagementStatusTreeWidget::Status>
+FilterManagementStatusTreeWidget::createMap()
+{
+    std::map<size_t,Status> statusMap;
+
     Editor *editor = &mainWindow_->editor();
     const ManagementStatusList &statusList = editor->managementStatusList();
-    std::vector<QString> str;
+
     for (size_t i = 0; i < statusList.size(); i++)
     {
         const ManagementStatus &status = statusList[i];
-        str.push_back(QString::fromStdString(status.label));
-        statusMap_[i] = status.id;
+        FilterManagementStatusTreeWidget::Status statusItem;
+        statusItem.statusId = status.id;
+        statusItem.label = QString::fromStdString(status.label);
+
+        statusMap[i] = statusItem;
     }
 
+    return statusMap;
+}
+
+void FilterManagementStatusTreeWidget::createCheckBoxList()
+{
+    LOG_DEBUG(<< "Create check box list.");
+
+    // Delete.
+    while (QLayoutItem *item = mainLayout_->takeAt(0))
+    {
+        if (QWidget *w = item->widget())
+        {
+            w->deleteLater();
+        }
+
+        delete item;
+    }
+
+    checkboxList_.clear();
+
     // Checkbox list
-    checkboxList_.resize(str.size());
+    checkboxList_.resize(statusMap_.size());
     for (size_t i = 0; i < checkboxList_.size(); i++)
     {
         checkboxList_[i] = new QCheckBox;
         checkboxList_[i]->setChecked(false);
-        checkboxList_[i]->setText(str[i]);
+        checkboxList_[i]->setText(statusMap_[i].label);
         connect(checkboxList_[i],
-                SIGNAL(stateChanged(int)),
+                SIGNAL(clicked(bool)),
                 this,
-                SLOT(slotSetCheckbox(int)));
+                SLOT(slotSetCheckbox(bool)));
     }
 
     // Layout.
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->setContentsMargins(0, 0, 0, 0);
-    mainLayout->addWidget(new QLabel(tr("Selected tree:")));
+    mainLayout_->addWidget(new QLabel(tr("Selected tree:")));
     for (size_t i = 0; i < checkboxList_.size(); i++)
     {
-        mainLayout->addWidget(checkboxList_[i]);
+        mainLayout_->addWidget(checkboxList_[i]);
     }
-    mainLayout->addStretch();
-
-    setLayout(mainLayout);
+    mainLayout_->addStretch();
 }
 
-void FilterManagementStatusTreeWidget::slotSetCheckbox(int v)
+void FilterManagementStatusTreeWidget::updateCheckBoxList()
 {
-    LOG_DEBUG(<< "Checkbox changed.");
-    (void)v;
-    return;
+    std::map<size_t,Status> statusMap = createMap();
 
-    // for (size_t i = 0; i < checkboxList_.size(); i++)
-    // {
-    //     disconnect(checkboxList_[i], SIGNAL(stateChanged(int)), 0, 0);
-    // }
+    if (statusMap != statusMap_)
+    {
+        LOG_DEBUG(<< "Update: The status list is different.");
+        createCheckBoxList();
+    }
+    else
+    {
+        LOG_DEBUG(<< "Update: The status list is the same.");
+    }
+}
+
+void FilterManagementStatusTreeWidget::slotSetCheckbox(bool b)
+{
+    LOG_DEBUG(<< "Checkbox clicked.");
+    (void)b;
 
     QObject *obj = sender();
     for (size_t i = 0; i < checkboxList_.size(); i++)
     {
         if (obj == checkboxList_[i])
         {
-            LOG_DEBUG(<< "Checkbox pos <" << i << ">.");
+            LOG_DEBUG(<< "Checkbox pos <" << i << "> sender.");
             checkboxList_[i]->setChecked(true);
-            // setCheckbox(i);
+            setCheckbox(i);
         }
         else
         {
+            LOG_DEBUG(<< "Checkbox pos <" << i << "> not sender.");
             checkboxList_[i]->setChecked(false);
         }
     }
-
-    // for (size_t i = 0; i < checkboxList_.size(); i++)
-    // {
-    //     connect(checkboxList_[i],
-    //             SIGNAL(stateChanged(int)),
-    //             this,
-    //             SLOT(slotSetCheckbox(int)));
-    // }
 }
 
 void FilterManagementStatusTreeWidget::setCheckbox(size_t idx)
@@ -126,7 +164,7 @@ void FilterManagementStatusTreeWidget::setCheckbox(size_t idx)
     {
         if (segments[i].id == segment_.id)
         {
-            segments[i].managementStatusId = statusMap_[idx];
+            segments[i].managementStatusId = statusMap_[idx].statusId;
             break;
         }
     }
@@ -141,9 +179,11 @@ void FilterManagementStatusTreeWidget::setSegment(const Segment &segment)
 
     segment_ = segment;
 
+    updateCheckBoxList();
+
     for (size_t i = 0; i < checkboxList_.size(); i++)
     {
-        if (statusMap_[i] == segment_.managementStatusId)
+        if (statusMap_[i].statusId == segment_.managementStatusId)
         {
             checkboxList_[i]->setChecked(true);
         }
