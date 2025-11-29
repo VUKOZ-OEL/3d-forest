@@ -44,20 +44,15 @@ void ManagementStatusList::setDefault()
 
     clear();
 
-    push_back(ManagementStatus(0, "Untouched", {0.5, 0.5, 0.5}));
+    push_back(ManagementStatus(0, "Untouched", {0.65098, 0.65098, 0.65098}));
+    push_back(ManagementStatus(1, "Target tree", {0.956863, 0.933333, 0.0}));
+    push_back(ManagementStatus(2, "Competition", {0.0, 0.501961, 0.0}));
+    push_back(ManagementStatus(3, "Maturity", {0.8, 0.4, 0.0}));
+    push_back(ManagementStatus(4, "Promote regeneration", {0.6, 1.0, 0.2}));
     push_back(
-        ManagementStatus(1, "Target tree", {0.305882, 0.47451, 0.654902}));
-    push_back(
-        ManagementStatus(2, "Competition", {0.94902, 0.556863, 0.168627}));
-    push_back(ManagementStatus(3, "Maturity", {0.882353, 0.341176, 0.34902}));
-    push_back(ManagementStatus(4,
-                               "Promote regeneration",
-                               {0.611765, 0.458824, 0.372549}));
-    push_back(ManagementStatus(5,
-                               "Promote rare species",
-                               {0.690196, 0.478431, 0.631373}));
-    push_back(ManagementStatus(6, "Sanitary", {0.590196, 0.578431, 0.631373}));
-    push_back(ManagementStatus(7, "Technical", {0.690196, 0.678431, 0.631373}));
+        ManagementStatus(5, "Promote rare species", {0.0, 0.690196, 0.941176}));
+    push_back(ManagementStatus(6, "Sanitary", {1.0, 0.0, 0.0}));
+    push_back(ManagementStatus(7, "Technical", {0.6, 0.0, 1.0}));
 }
 
 void ManagementStatusList::push_back(const ManagementStatus &managementStatus)
