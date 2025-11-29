@@ -1103,10 +1103,7 @@ void Page::runColorModifier()
         {
             for (size_t i = 0; i < n; i++)
             {
-                setColor(i,
-                         0,
-                         255,
-                         ColorPalette::BlueCyanYellowRed256);
+                setColor(i, 0, 255, ColorPalette::BlueCyanYellowRed256);
             }
         }
     }

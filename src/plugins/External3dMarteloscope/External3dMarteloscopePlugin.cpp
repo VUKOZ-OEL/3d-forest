@@ -113,8 +113,9 @@ void External3dMarteloscopePlugin::runPythonApp(const std::string &projectPath)
     LOG_DEBUG(<< "Start python app with project <" << projectPath << ">.");
 
     QString pythonPath = "python";
-    QString appPath = QCoreApplication::applicationDirPath() +
-                  "/plugins/3DForestExternal3dMarteloscopePlugin/python/app.py";
+    QString appPath =
+        QCoreApplication::applicationDirPath() +
+        "/plugins/3DForestExternal3dMarteloscopePlugin/python/app.py";
 
     runner_->start(pythonPath, appPath, QString::fromStdString(projectPath));
 

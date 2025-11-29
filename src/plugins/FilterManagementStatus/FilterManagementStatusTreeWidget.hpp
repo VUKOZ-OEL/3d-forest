@@ -23,8 +23,8 @@
 #define FILTER_MANAGEMENT_STATUS_TREE_WIDGET_HPP
 
 // Include std.
-#include <vector>
 #include <map>
+#include <vector>
 
 // Include 3D Forest.
 #include <Segment.hpp>
@@ -51,7 +51,7 @@ public slots:
 
 protected:
     MainWindow *mainWindow_;
-    std::vector<QCheckBox*> checkboxList_;
+    std::vector<QCheckBox *> checkboxList_;
     QVBoxLayout *mainLayout_ = nullptr;
 
     Segment segment_;
@@ -67,9 +67,9 @@ protected:
             return statusId == other.statusId && label == other.label;
         }
     };
-    std::map<size_t,Status> statusMap_;
+    std::map<size_t, Status> statusMap_;
 
-    std::map<size_t,Status> createMap(); 
+    std::map<size_t, Status> createMap();
     void createCheckBoxList();
     void updateCheckBoxList();
 

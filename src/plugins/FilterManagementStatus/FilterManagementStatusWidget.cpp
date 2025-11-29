@@ -21,21 +21,21 @@
 
 // Include 3D Forest.
 #include <ColorPalette.hpp>
-#include <FilterManagementStatusWidget.hpp>
 #include <FilterManagementStatusTreeWidget.hpp>
+#include <FilterManagementStatusWidget.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QSplitter>
 #include <QToolBar>
 #include <QToolButton>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QTreeWidgetItemIterator>
 #include <QVBoxLayout>
-#include <QSplitter>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterManagementStatusWidget"

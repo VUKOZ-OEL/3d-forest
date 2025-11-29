@@ -118,7 +118,7 @@ void External3dMarteloscopeRunner::start(const QString &pythonPath,
         }
         qDebug() << "Streamlit started on port" << port_;
 
-        QProcess* p = process_;  // snapshot pointer for the lambda
+        QProcess *p = process_; // snapshot pointer for the lambda
 
         connect(p,
                 &QProcess::finished,
@@ -146,9 +146,7 @@ void External3dMarteloscopeRunner::start(const QString &pythonPath,
     view_->resize(800, 600);
     view_->show();
 
-    connect(view_, &QObject::destroyed, this, [this]() {
-        view_.clear();
-    });
+    connect(view_, &QObject::destroyed, this, [this]() { view_.clear(); });
 }
 
 void External3dMarteloscopeRunner::stop()

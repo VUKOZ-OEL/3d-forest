@@ -25,15 +25,16 @@
 
 // Include Qt.
 #include <QCheckBox>
-#include <QVBoxLayout>
 #include <QLabel>
+#include <QVBoxLayout>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterManagementStatusTreeWidget"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-FilterManagementStatusTreeWidget::FilterManagementStatusTreeWidget(MainWindow *mainWindow)
+FilterManagementStatusTreeWidget::FilterManagementStatusTreeWidget(
+    MainWindow *mainWindow)
     : QWidget(mainWindow),
       mainWindow_(mainWindow)
 {
@@ -52,10 +53,10 @@ FilterManagementStatusTreeWidget::FilterManagementStatusTreeWidget(MainWindow *m
     setLayout(mainLayout_);
 }
 
-std::map<size_t,FilterManagementStatusTreeWidget::Status>
+std::map<size_t, FilterManagementStatusTreeWidget::Status>
 FilterManagementStatusTreeWidget::createMap()
 {
-    std::map<size_t,Status> statusMap;
+    std::map<size_t, Status> statusMap;
 
     Editor *editor = &mainWindow_->editor();
     const ManagementStatusList &statusList = editor->managementStatusList();
@@ -114,7 +115,7 @@ void FilterManagementStatusTreeWidget::createCheckBoxList()
 
 void FilterManagementStatusTreeWidget::updateCheckBoxList()
 {
-    std::map<size_t,Status> statusMap = createMap();
+    std::map<size_t, Status> statusMap = createMap();
 
     if (statusMap != statusMap_)
     {
