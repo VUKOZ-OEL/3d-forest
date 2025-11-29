@@ -66,7 +66,7 @@ void TreeTableExportCsv::write(const Segment &segment,
     size_t speciesIdx = speciesList.index(segment.speciesId, false);
     if (speciesIdx != SIZE_MAX)
     {
-        species = speciesList[speciesIdx].species;
+        species = speciesList[speciesIdx].abbreviation;
     }
 
     double ppm = properties().pointsPerMeter();
