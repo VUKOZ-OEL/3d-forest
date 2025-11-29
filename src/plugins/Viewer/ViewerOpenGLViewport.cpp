@@ -36,7 +36,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "ViewerOpenGLViewport"
-#define LOG_MODULE_DEBUG_ENABLED 1
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 static QVector3D fromVector3(const Vector3<double> &v)
