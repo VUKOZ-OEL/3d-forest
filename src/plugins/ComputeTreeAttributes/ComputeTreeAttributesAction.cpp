@@ -211,10 +211,13 @@ void ComputeTreeAttributesAction::processPoint()
 
     // When point elevation is within DBH elevation range, then
     // add point XYZ coordinates to DBH point list.
-    if (query_.elevation() >=
-            parameters_.dbhElevation - parameters_.dbhElevationRange &&
-        query_.elevation() <=
-            parameters_.dbhElevation + parameters_.dbhElevationRange)
+    double e = query_.elevation();
+    if (e < 1e-6)
+    {
+        e = h;
+    }
+    if (e >= parameters_.dbhElevation - parameters_.dbhElevationRange &&
+        e <= parameters_.dbhElevation + parameters_.dbhElevationRange)
     {
         tree.dbhPoints.push_back(query_.x());
         tree.dbhPoints.push_back(query_.y());
