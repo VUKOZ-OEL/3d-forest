@@ -35,6 +35,7 @@ class EXPORT_EDITOR Species
 {
 public:
     size_t id{0};
+    std::string abbreviation;
     std::string genus;
     std::string species;
     std::string latin;
@@ -43,6 +44,7 @@ public:
 
     Species();
     Species(size_t id,
+            const std::string &abbreviation,
             const std::string &genus,
             const std::string &species,
             const std::string &latin,
