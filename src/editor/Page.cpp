@@ -1099,6 +1099,16 @@ void Page::runColorModifier()
                          ColorPalette::BlueCyanYellowRed256);
             }
         }
+        else
+        {
+            for (size_t i = 0; i < n; i++)
+            {
+                setColor(i,
+                         0,
+                         255,
+                         ColorPalette::BlueCyanYellowRed256);
+            }
+        }
     }
     else if (opt.colorSource() == ViewSettings::ColorSource::DESCRIPTOR)
     {
