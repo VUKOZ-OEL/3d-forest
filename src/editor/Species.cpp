@@ -51,7 +51,7 @@ Species::Species(size_t id,
 void fromJson(Species &out, const Json &in)
 {
     fromJson(out.id, in["id"]);
-    fromJson(out.abbreviation, in["abbreviation"]);
+    fromJson(out.abbreviation, in, "abbreviation");
     fromJson(out.genus, in["genus"]);
     fromJson(out.species, in["species"]);
     fromJson(out.latin, in["latin"]);
