@@ -598,13 +598,18 @@ void ViewerOpenGLViewport::renderFirstFrameData()
     if (camera_.lock2d())
     {
         renderDbh();
-        return;
     }
 
     const Region &clipFilter = editor_->clipFilter();
     glLineWidth(1.0F);
     ViewerOpenGL::renderClipFilter(clipFilter);
     glLineWidth(1.0F);
+
+    if (camera_.lock2d())
+    {
+        renderHullProjections();
+        return;
+    }
 
     renderAttributes();
     renderSegments();
@@ -657,17 +662,130 @@ void ViewerOpenGLViewport::renderDbh()
     }
 }
 
-void ViewerOpenGLViewport::renderSegments()
+void ViewerOpenGLViewport::renderHullProjections()
 {
     const Segments &segments = editor_->segments();
-    const QueryFilterSet &filter = editor_->segmentsFilter();
 
     for (size_t i = 0; i < segments.size(); i++)
     {
         const Segment &segment = segments[i];
 
-        // Ignore hidden segments.
-        if (!filter.enabled(segment.id))
+        if (skipSegmentRendering(segment))
+        {
+            continue;
+        }
+
+        renderMeshes(segment, true);
+    }
+}
+
+void ViewerOpenGLViewport::renderMeshes(const Segment &segment, bool onlyProjections)
+{
+    if (editor_->settings().treeSettings().useOnlyForSelectedTrees() &&
+        !segment.selected)
+    {
+        return;
+    }
+
+    float r = static_cast<float>(segment.color[0]);
+    float g = static_cast<float>(segment.color[1]);
+    float b = static_cast<float>(segment.color[2]);
+
+    if (editor_->settings().treeSettings().convexHullProjectionVisible())
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDisable(GL_DEPTH_TEST);
+        glColor4f(r, g, b, 0.25F);
+
+        // Render meshes.
+        for (const auto &it : segment.meshList)
+        {
+            if (it.first == "convexHullProjection")
+            {
+                ViewerOpenGL::render(it.second);
+            }
+        }
+
+        glDisable(GL_BLEND);
+        glEnable(GL_DEPTH_TEST);
+    }
+
+    if (editor_->settings().treeSettings().concaveHullProjectionVisible())
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDisable(GL_DEPTH_TEST);
+        glColor4f(r, g, b, 0.25F);
+
+        // Render meshes.
+        for (const auto &it : segment.meshList)
+        {
+            if (it.first == "concaveHullProjection")
+            {
+                ViewerOpenGL::render(it.second);
+            }
+        }
+
+        glDisable(GL_BLEND);
+        glEnable(GL_DEPTH_TEST);
+    }
+
+    if (onlyProjections)
+    {
+        return;
+    }
+
+    if (editor_->settings().treeSettings().concaveHullVisible())
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDisable(GL_DEPTH_TEST);
+        glColor4f(r, g, b, 0.25F);
+
+        // Render meshes.
+        for (const auto &it : segment.meshList)
+        {
+            if (it.first == "concaveHull")
+            {
+                ViewerOpenGL::render(it.second);
+            }
+        }
+
+        glDisable(GL_BLEND);
+        glEnable(GL_DEPTH_TEST);
+    }
+
+    if (editor_->settings().treeSettings().convexHullVisible())
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDisable(GL_DEPTH_TEST);
+        glColor4f(r, g, b, 0.25F);
+
+        // Render meshes.
+        for (const auto &it : segment.meshList)
+        {
+            if (it.first == "convexHull")
+            {
+                ViewerOpenGL::render(it.second);
+            }
+        }
+
+        glDisable(GL_BLEND);
+        glEnable(GL_DEPTH_TEST);
+    }
+}
+
+void ViewerOpenGLViewport::renderSegments()
+{
+    const Segments &segments = editor_->segments();
+
+    for (size_t i = 0; i < segments.size(); i++)
+    {
+        const Segment &segment = segments[i];
+
+        if (skipSegmentRendering(segment))
         {
             continue;
         }
@@ -685,98 +803,7 @@ void ViewerOpenGLViewport::renderSegments()
             ViewerOpenGL::renderAabb(boundary);
         }
 
-        // Ignore "unsegmented".
-        if (segment.id == 0)
-        {
-            continue;
-        }
-
-        if (editor_->settings().treeSettings().useOnlyForSelectedTrees() &&
-            !segment.selected)
-        {
-            continue;
-        }
-
-        if (editor_->settings().treeSettings().convexHullProjectionVisible() ||
-            editor_->settings().treeSettings().concaveHullProjectionVisible())
-        {
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            glDisable(GL_DEPTH_TEST);
-            glColor4f(r, g, b, 0.25F);
-
-            // Render meshes.
-            for (const auto &it : segment.meshList)
-            {
-                if (it.first == "convexHullProjection" ||
-                    it.first == "concaveHullProjection")
-                {
-                    ViewerOpenGL::render(it.second);
-                }
-            }
-
-            glDisable(GL_BLEND);
-            glEnable(GL_DEPTH_TEST);
-        }
-
-#if 1
-        if (editor_->settings().treeSettings().concaveHullVisible())
-        {
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            glDisable(GL_DEPTH_TEST);
-            glColor4f(r, g, b, 0.25F);
-
-            // Render meshes.
-            for (const auto &it : segment.meshList)
-            {
-                if (it.first == "concaveHull")
-                {
-                    ViewerOpenGL::render(it.second);
-                }
-            }
-
-            glDisable(GL_BLEND);
-            glEnable(GL_DEPTH_TEST);
-        }
-#else
-        if (editor_->settings().treeSettings().concaveHullVisible())
-        {
-            glEnable(GL_LIGHTING);
-            glColor3f(r, g, b);
-
-            // Render meshes.
-            for (const auto &it : segment.meshList)
-            {
-                if (it.first == "concaveHull")
-                {
-                    ViewerOpenGL::render(it.second);
-                }
-            }
-
-            glDisable(GL_LIGHTING);
-        }
-#endif
-
-        if (editor_->settings().treeSettings().convexHullVisible())
-        {
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            glDisable(GL_DEPTH_TEST);
-            glColor4f(r, g, b, 0.25F);
-
-            // Render meshes.
-            for (const auto &it : segment.meshList)
-            {
-                if (it.first == "convexHull")
-                {
-                    ViewerOpenGL::render(it.second);
-                }
-            }
-
-            glDisable(GL_BLEND);
-            glEnable(GL_DEPTH_TEST);
-        }
+        renderMeshes(segment, false);
     }
 }
 
@@ -932,6 +959,21 @@ bool ViewerOpenGLViewport::skipSegmentRendering(const Segment &segment)
     if (!statusFilter.enabled(segment.managementStatusId))
     {
         return true;
+    }
+
+    // Clip filter.
+    const TreeAttributes &attributes = segment.treeAttributes;
+    if (attributes.isPositionValid())
+    {
+        const Region &clipFilter = editor_->clipFilter();
+        if (clipFilter.shape == Region::Shape::BOX)
+        {
+            const auto &p = attributes.position;
+            if (!clipFilter.box.contains(p[0], p[1], p[2]))
+            {
+                return true;
+            }
+        }
     }
 
     return false;

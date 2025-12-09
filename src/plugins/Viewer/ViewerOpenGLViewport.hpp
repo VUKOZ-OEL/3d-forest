@@ -107,6 +107,8 @@ protected:
     void renderFirstFrameData();
     void renderLastFrame();
     void renderDbh();
+    void renderHullProjections();
+    void renderMeshes(const Segment &segment, bool onlyProjections);
     void renderSegments();
     void renderAttributes();
     void renderLabels();
