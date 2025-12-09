@@ -679,7 +679,8 @@ void ViewerOpenGLViewport::renderHullProjections()
     }
 }
 
-void ViewerOpenGLViewport::renderMeshes(const Segment &segment, bool onlyProjections)
+void ViewerOpenGLViewport::renderMeshes(const Segment &segment,
+                                        bool onlyProjections)
 {
     if (editor_->settings().treeSettings().useOnlyForSelectedTrees() &&
         !segment.selected)
