@@ -1219,6 +1219,15 @@ void ViewerOpenGLViewport::pickObject(const std::set<size_t> &selectedIds,
 
     Segments segments = editor_->segments();
 
+    std::set<size_t> selectedIdsOld;
+    for (size_t i = 0; i < segments.size(); i++)
+    {
+        if (segments[i].selected)
+        {
+            selectedIdsOld.insert(segments[i].id);
+        }
+    }
+
     if (!ctrl)
     {
         for (size_t i = 0; i < segments.size(); i++)
@@ -1227,16 +1236,24 @@ void ViewerOpenGLViewport::pickObject(const std::set<size_t> &selectedIds,
         }
     }
 
+    std::set<size_t> selectedIdsNew;
     for (size_t i = 0; i < segments.size(); i++)
     {
-        Segment &segment = segments[i];
-
-        if (selectedIds.count(segment.id) > 0)
+        if (selectedIds.count(segments[i].id) > 0)
         {
-            segment.selected = true;
+            segments[i].selected = true;
+        }
+        if (segments[i].selected)
+        {
+            selectedIdsNew.insert(segments[i].id);
         }
     }
 
+    if (selectedIdsOld == selectedIdsNew)
+    {
+        return;
+    }
+
     editor_->setSegments(segments);
-    mainWindow_->update({Editor::TYPE_SEGMENT});
+    mainWindow_->update({Editor::TYPE_SEGMENT}, Page::STATE_RENDER);
 }
