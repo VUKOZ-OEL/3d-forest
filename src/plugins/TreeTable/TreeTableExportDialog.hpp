@@ -53,7 +53,6 @@ private:
 
     QLineEdit *fileNameLineEdit_;
     QPushButton *browseButton_;
-    QCheckBox *exportValidValuesOnlyCheckBox_;
 
     QPushButton *acceptButton_;
     QPushButton *rejectButton_;

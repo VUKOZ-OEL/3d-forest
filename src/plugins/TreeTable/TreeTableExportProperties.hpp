@@ -32,15 +32,11 @@ public:
     void setFileName(const std::string &fileName) { fileName_ = fileName; }
     const std::string &fileName() const { return fileName_; }
 
-    void setExportValidValuesOnly(bool b) { exportValidValuesOnly_ = b; }
-    bool exportValidValuesOnly() const { return exportValidValuesOnly_; }
-
     void setPointsPerMeter(double ppm) { pointsPerMeter_ = ppm; }
     double pointsPerMeter() const { return pointsPerMeter_; }
 
 private:
     std::string fileName_;
-    bool exportValidValuesOnly_{true};
     double pointsPerMeter_{1000.0};
 };
 

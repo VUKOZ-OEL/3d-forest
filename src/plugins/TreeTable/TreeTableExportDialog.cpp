@@ -60,17 +60,6 @@ TreeTableExportDialog::TreeTableExportDialog(MainWindow *mainWindow,
     fileNameLayout->addWidget(fileNameLineEdit_);
     fileNameLayout->addWidget(browseButton_);
 
-    // Options.
-    exportValidValuesOnlyCheckBox_ =
-        new QCheckBox(tr("Export valid values only"));
-    exportValidValuesOnlyCheckBox_->setChecked(true);
-
-    QVBoxLayout *optionsVBoxLayout = new QVBoxLayout;
-    optionsVBoxLayout->addWidget(exportValidValuesOnlyCheckBox_);
-
-    QGroupBox *optionsGroupBox = new QGroupBox(tr("Options"));
-    optionsGroupBox->setLayout(optionsVBoxLayout);
-
     // Buttons.
     acceptButton_ = new QPushButton(tr("Export"));
     connect(acceptButton_, SIGNAL(clicked()), this, SLOT(slotAccept()));
@@ -86,8 +75,6 @@ TreeTableExportDialog::TreeTableExportDialog(MainWindow *mainWindow,
     // Dialog layout.
     QVBoxLayout *dialogLayout = new QVBoxLayout;
     dialogLayout->addLayout(fileNameLayout);
-    dialogLayout->addSpacing(10);
-    dialogLayout->addWidget(optionsGroupBox);
     dialogLayout->addSpacing(10);
     dialogLayout->addLayout(dialogButtons);
     dialogLayout->addStretch();
@@ -189,10 +176,6 @@ TreeTableExportProperties TreeTableExportDialog::properties() const
 
     // File name.
     result.setFileName(fileNameLineEdit_->text().toStdString());
-
-    // Options.
-    result.setExportValidValuesOnly(
-        exportValidValuesOnlyCheckBox_->isChecked());
 
     // Other values.
     double ppm =
