@@ -122,7 +122,7 @@ ComputeHullWidget::ComputeHullWidget(MainWindow *mainWindow)
         tr("m"),
         0.01,
         0.01,
-        1.0,
+        0.5,
         parameters_.voxelRadius);
 
     // Settings layout.
