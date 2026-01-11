@@ -591,7 +591,7 @@ void ComputeHullMethod::alphaShape2(Mesh &mesh,
         mesh.position[i * 9 + 8] = z;
     }
 
-    mesh.calculateNormals();
+    // mesh.calculateNormals();
 
 #if 0
     // Extract polygon boundary.
