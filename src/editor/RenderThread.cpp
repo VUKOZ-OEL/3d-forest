@@ -93,5 +93,7 @@ bool RenderThread::next()
         callback_->threadProgress(finished);
     }
 
+    Time::msleep(1);
+
     return !finished;
 }
