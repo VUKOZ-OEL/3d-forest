@@ -522,13 +522,13 @@ void TreeTableWidget::slotCustomContextMenuRequested(const QPoint &pos)
     if (selectedAction == showTreesAction)
     {
         TreeTableAction::showTrees(mainWindow_, idList);
-        mainWindow_->update({Editor::TYPE_SEGMENT});
+        mainWindow_->update({Editor::TYPE_SEGMENT}, Page::STATE_READ);
         setTable();
     }
     else if (selectedAction == hideTreesAction)
     {
         TreeTableAction::hideTrees(mainWindow_, idList);
-        mainWindow_->update({Editor::TYPE_SEGMENT});
+        mainWindow_->update({Editor::TYPE_SEGMENT}, Page::STATE_READ);
         setTable();
     }
 }

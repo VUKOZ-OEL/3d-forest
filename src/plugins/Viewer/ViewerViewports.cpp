@@ -218,7 +218,7 @@ void ViewerViewports::updateScene(Editor *editor)
     for (size_t i = 0; i < viewports_.size(); i++)
     {
         viewports_[i]->updateScene(editor);
-        viewports_[i]->update();
+        viewports_[i]->repaint();
     }
     LOG_DEBUG_RENDER(<< "Finished updating all viewports.");
 }

@@ -22,6 +22,7 @@
 // Include 3D Forest.
 #include <GuiUtil.hpp>
 #include <MainWindow.hpp>
+#include <Time.hpp>
 
 // Include 3D Forest plugins.
 #include <ImportFileInterface.hpp>
@@ -102,12 +103,6 @@ MainWindow::MainWindow(QWidget *parent)
             &MainWindow::onThemeChanged);
 
     // Rendering.
-    connect(this,
-            SIGNAL(signalRender()),
-            this,
-            SLOT(slotRender()),
-            Qt::QueuedConnection);
-
     threadRender_.setCallback(this);
     threadRender_.create();
 
@@ -591,16 +586,39 @@ void MainWindow::threadProgress(bool finished)
 
     LOG_DEBUG_RENDER(<< "Thread progress finished <" << finished << ">.");
 
-    emit signalRender();
+    requestRenderFromAnyThread();
+}
+
+void MainWindow::requestRenderFromAnyThread()
+{
+    if (renderPending_.exchange(true))
+    {
+        return;
+    }
+
+    QMetaObject::invokeMethod(
+        this,
+        [this]
+        {
+            renderPending_.store(false);
+            slotRender();
+        },
+        Qt::QueuedConnection);
 }
 
 void MainWindow::slotRender()
 {
+    LOG_DEBUG_RENDER(<< "Start rendering.");
+    double t1 = Time::realTime();
+
     if (viewerPlugin_)
     {
-        std::unique_lock<std::mutex> mutexlock(editor_.editorMutex_);
         viewerPlugin_->updateScene(&editor_);
     }
+
+    double t2 = Time::realTime();
+    LOG_DEBUG_RENDER(<< "Finished rendering after <" << (t2 - t1)
+                     << "> seconds.");
 }
 
 void MainWindow::slotRenderViewport(size_t viewportId)

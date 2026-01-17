@@ -23,6 +23,7 @@
 #include <cmath>
 
 // Include 3D Forest.
+#include <Time.hpp>
 #include <ViewerCamera.hpp>
 
 // Include Qt.
@@ -54,7 +55,8 @@ ViewerCamera::ViewerCamera()
       sensitivityX_(1.0F),
       sensitivityY_(1.0F),
       sensitivityZoom_(4.0F),
-      lock2d_(false)
+      lock2d_(false),
+      timeUpdated_(0.0)
 {
     frustrumPlanes_.resize(24);
     std::fill(frustrumPlanes_.begin(), frustrumPlanes_.end(), 0.0F);
@@ -83,6 +85,8 @@ void ViewerCamera::setViewport(int x, int y, int width, int height)
     }
 
     viewport_.setRect(x, y, width, height);
+
+    timeUpdated_ = Time::realTime();
 }
 
 void ViewerCamera::updateProjection()
@@ -230,6 +234,7 @@ Camera ViewerCamera::toCamera() const
     ret.up.set(up_.x(), up_.y(), up_.z());
     ret.fov = fov_;
     ret.viewportId = viewportId_;
+    ret.timeUpdated = timeUpdated_;
 
     return ret;
 }
@@ -372,7 +377,9 @@ void ViewerCamera::updateMatrix()
     up_ = QVector3D(m(1, 0), m(1, 1), m(1, 2));
     right_ = QVector3D(m(0, 0), m(0, 1), m(0, 2));
     direction_ = QVector3D(-m(2, 0), -m(2, 1), -m(2, 2));
-    eye_ = center_ + (direction_ * distance_);
+    eye_ = center_ + (direction_ * -distance_);
+
+    timeUpdated_ = Time::realTime();
 
     LOG_DEBUG(<< "Update up <" << up_ << "> right <" << right_
               << "> direction <" << direction_ << "> eye <" << eye_

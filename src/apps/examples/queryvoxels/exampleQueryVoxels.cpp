@@ -91,7 +91,7 @@ static void createDataSet(const std::string &path, double scale)
 
     // Index
     ImportSettings settings;
-    settings.maxIndexLevel1Size = 100;
+    settings.maxIndexLevel1Size = {100};
 
     IndexFileBuilder::index(path, path, settings);
 }

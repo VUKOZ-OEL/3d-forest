@@ -120,7 +120,7 @@ void ComputeElevationWidget::slotApply()
         mainWindow_->showError("Unknown error");
     }
 
-    mainWindow_->update({Editor::TYPE_ELEVATION});
+    mainWindow_->update({Editor::TYPE_ELEVATION}, Page::STATE_READ);
 }
 
 void ComputeElevationWidget::slotHelp()

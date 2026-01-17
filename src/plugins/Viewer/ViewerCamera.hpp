@@ -101,6 +101,7 @@ public:
 
     void setLock2d(bool b) { lock2d_ = b; }
     bool lock2d() const { return lock2d_; }
+    double timeUpdated() const { return timeUpdated_; }
 
     // Matrix.
     const QMatrix4x4 &modelView() const { return modelView_; }
@@ -153,6 +154,7 @@ protected:
     float sensitivityY_;
     float sensitivityZoom_;
     bool lock2d_;
+    double timeUpdated_;
 
     void updateMatrix();
     void setModelView(const QMatrix4x4 &m);

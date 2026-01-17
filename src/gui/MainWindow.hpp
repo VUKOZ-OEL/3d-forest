@@ -23,6 +23,7 @@
 #define MAIN_WINDOW_HPP
 
 // Include std.
+#include <atomic>
 #include <set>
 
 // Include 3D Forest.
@@ -115,7 +116,7 @@ public:
 
     void update(void *sender, const QSet<Editor::Type> &target);
     void update(const QSet<Editor::Type> &target,
-                Page::State viewPortsCacheState = Page::STATE_READ,
+                Page::State viewPortsCacheState = Page::STATE_RENDER,
                 bool resetCamera = false);
 
     /// Call when the whole project was opened or closed.
@@ -133,6 +134,9 @@ public:
     /// Reset rendered state of cached point data and start new rendering.
     void updateRender();
 
+    /// Call rendering from another thread.
+    void requestRenderFromAnyThread();
+
 public slots:
     /// Calls paint() on all viewports.
     void slotRender();
@@ -144,9 +148,6 @@ public slots:
     void slotRenderViewports();
 
 signals:
-    /// Call rendering from another thread.
-    void signalRender();
-
     /// Connect to this signal in your plugin to be notified about data changes.
     void signalUpdate(void *sender, const QSet<Editor::Type> &target);
 
@@ -165,6 +166,7 @@ private:
     // Editor.
     Editor editor_;
     RenderThread threadRender_;
+    std::atomic_bool renderPending_{false};
 
     // Plugins.
     ProjectFileInterface *projectFilePlugin_;

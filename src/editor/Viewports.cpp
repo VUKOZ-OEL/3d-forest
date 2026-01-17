@@ -98,13 +98,18 @@ void Viewports::setState(Page::State state)
     }
 }
 
-bool Viewports::nextState()
+bool Viewports::nextState(bool *lruL0Ready)
 {
+    if (lruL0Ready)
+    {
+        *lruL0Ready = true;
+    }
+
     bool continuing = false;
 
     for (auto &it : viewports_)
     {
-        if (it->nextState())
+        if (it->nextState(lruL0Ready))
         {
             continuing = true;
         }

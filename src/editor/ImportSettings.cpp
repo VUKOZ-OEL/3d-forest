@@ -34,9 +34,9 @@ ImportSettings::ImportSettings()
       copyExtraBytes(true),
       terminalOutput(false),
       maxIndexLevel1(0),
-      maxIndexLevel1Size(10 * 1000),
+      maxIndexLevel1Size({1000, 10 * 1000}),
       maxIndexLevel2(5),
-      maxIndexLevel2Size(32),
+      maxIndexLevel2Size({32}),
       bufferSize(5 * 1024 * 1024)
 {
 }

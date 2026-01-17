@@ -125,7 +125,8 @@ void Page::resize(size_t n)
 
 void Page::readPage()
 {
-    LOG_DEBUG(<< "Page pageId <" << pageId_ << ">.");
+    LOG_DEBUG(<< "Read page datasetId <" << datasetId_ << "> pageId <"
+              << pageId_ << ">.");
 
     pageData_ = editor_->readPage(datasetId_, pageId_);
 
@@ -167,7 +168,8 @@ void Page::setState(Page::State state)
 
 bool Page::nextState()
 {
-    LOG_DEBUG(<< "Compute state <" << Page::stateToString(state_) << ">.");
+    LOG_DEBUG(<< "Next state datasetId <" << datasetId_ << "> pageId <"
+              << pageId_ << "> state <" << Page::stateToString(state_) << ">.");
 
     if (state_ == Page::STATE_READ)
     {
@@ -207,13 +209,13 @@ bool Page::nextState()
         {
             runModifiers();
         }
-        return true;
+        // return true;
     }
 
-    if (state_ == Page::STATE_RENDER)
-    {
-        return true;
-    }
+    // if (state_ == Page::STATE_RENDER)
+    // {
+    //     return true;
+    // }
 
     return false;
 }
@@ -238,7 +240,8 @@ void Page::transform()
 
 void Page::queryWhere()
 {
-    LOG_DEBUG(<< "Page pageId <" << pageId_ << ">.");
+    LOG_DEBUG(<< "Select page datasetId <" << datasetId_ << "> pageId <"
+              << pageId_ << ">.");
 
     const Region &region = query_->where().region();
 

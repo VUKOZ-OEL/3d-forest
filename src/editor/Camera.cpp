@@ -21,6 +21,7 @@
 
 // Include 3D Forest.
 #include <Camera.hpp>
+#include <Time.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "Camera"
@@ -28,6 +29,7 @@
 
 Camera::Camera() : fov(60.0), viewportId(0)
 {
+    timeUpdated = Time::realTime();
 }
 
 Camera::~Camera()

@@ -158,7 +158,7 @@ void FilterFilesWidget::dataChanged()
     mainWindow_->editor().setDatasets(datasets_);
     mainWindow_->editor().setDatasetsFilter(filter_);
     mainWindow_->updateData();
-    mainWindow_->update({Editor::TYPE_DATA_SET});
+    mainWindow_->update({Editor::TYPE_DATA_SET}, Page::STATE_READ);
 }
 
 void FilterFilesWidget::filterChanged()

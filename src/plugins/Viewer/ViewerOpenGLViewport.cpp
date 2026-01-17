@@ -139,6 +139,7 @@ void ViewerOpenGLViewport::mouseReleaseEvent(QMouseEvent *event)
 
 void ViewerOpenGLViewport::mousePressEvent(QMouseEvent *event)
 {
+    LOG_DEBUG_RENDER(<< "Mouse press event");
     bool ctrl = event->modifiers() & Qt::ControlModifier;
 
     camera_.mousePressEvent(event);
@@ -148,6 +149,7 @@ void ViewerOpenGLViewport::mousePressEvent(QMouseEvent *event)
 
 void ViewerOpenGLViewport::mouseMoveEvent(QMouseEvent *event)
 {
+    LOG_DEBUG_RENDER(<< "Mouse move event");
     camera_.mouseMoveEvent(event);
     cameraChanged();
 }
@@ -439,11 +441,14 @@ void ViewerOpenGLViewport::renderScene()
     renderSceneSettingsEnable();
 
     double t1 = Time::realTime();
+    double t2 = t1;
+    double msec = 0;
 
     size_t pageIndex = 0;
     size_t pageSize = editor_->viewports().pageSize(viewportId_);
+    size_t renderedPageCount = 0;
 
-    LOG_DEBUG_RENDER(<< "Render pages n <" << pageSize << ">.");
+    LOG_DEBUG_RENDER(<< "Render cache page count <" << pageSize << ">.");
 
     if (pageSize == 0)
     {
@@ -473,9 +478,9 @@ void ViewerOpenGLViewport::renderScene()
 
         if (page.state() == Page::STATE_RENDER)
         {
-            LOG_DEBUG_RENDER(<< "Render page <" << (pageIndex + 1) << "/"
-                             << pageSize << "> page id <" << page.pageId()
-                             << ">.");
+            // LOG_DEBUG_RENDER(<< "Render page <" << (pageIndex + 1) << "/"
+            //                  << pageSize << "> page id <" << page.pageId()
+            //                  << ">.");
 
             if (pageIndex == 0)
             {
@@ -501,23 +506,23 @@ void ViewerOpenGLViewport::renderScene()
                                      page.selectionSize);
             }
 
-            glFlush();
-
             page.setState(Page::STATE_RENDERED);
+            renderedPageCount++;
 
-            double t2 = Time::realTime();
-            if (t2 - t1 > 0.02)
+            t2 = Time::realTime();
+            msec = (t2 - t1) * 1000.0;
+            if (page.pageId() > 0 && msec > 10.0)
             {
-                LOG_DEBUG_RENDER(<< "Terminate rendering after <" << (t2 - t1)
-                                 << "> seconds.");
+                LOG_DEBUG_RENDER(<< "Rendering timeout <" << msec << "> ms.");
+                pageIndex++;
                 break;
             }
         }
         else
         {
-            LOG_DEBUG_RENDER(<< "Skip rendering of page <" << (pageIndex + 1)
-                             << "/" << pageSize << "> page id <"
-                             << page.pageId() << ">.");
+            // LOG_DEBUG_RENDER(<< "Skip rendering of page <" << (pageIndex + 1)
+            //                  << "/" << pageSize << "> page id <"
+            //                  << page.pageId() << ">.");
         }
 
         pageIndex++;
@@ -530,7 +535,24 @@ void ViewerOpenGLViewport::renderScene()
         renderLastFrame();
     }
 
-    LOG_DEBUG_RENDER(<< "Finished rendering viewport <" << viewportId_ << ">.");
+    if (pageIndex < pageSize)
+    {
+        LOG_DEBUG_RENDER(<< "Request next rendering of viewport <"
+                         << viewportId_ << ">.");
+        mainWindow_->requestRenderFromAnyThread();
+    }
+
+    t2 = Time::realTime();
+    msec = (t2 - t1) * 1000.0;
+
+    if (msec > 40.0)
+    {
+        LOG_DEBUG_RENDER(<< "Extra rendering time.");
+    }
+
+    LOG_DEBUG_RENDER(<< "Finished rendering viewport <" << viewportId_
+                     << "> rendered pages <" << renderedPageCount
+                     << "> in time <" << msec << "> ms.");
 }
 
 void ViewerOpenGLViewport::renderFirstFrame()
@@ -1032,7 +1054,7 @@ void ViewerOpenGLViewport::renderSceneSettingsEnable()
     if (opt.distanceBasedFadingVisible())
     {
         QVector3D eye = camera_.eye();
-        QVector3D direction = -camera_.direction();
+        QVector3D direction = camera_.direction();
         direction.normalize();
 
         float min;
@@ -1255,5 +1277,5 @@ void ViewerOpenGLViewport::pickObject(const std::set<size_t> &selectedIds,
     }
 
     editor_->setSegments(segments);
-    mainWindow_->update({Editor::TYPE_SEGMENT}, Page::STATE_RENDER);
+    mainWindow_->update({Editor::TYPE_SEGMENT});
 }

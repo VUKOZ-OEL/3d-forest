@@ -38,6 +38,7 @@ public:
     Vector3<double> center;
     Vector3<double> up;
     double fov;
+    double timeUpdated;
     size_t viewportId;
 
     Camera();

@@ -37,7 +37,7 @@
 static void createDataSet()
 {
     ImportSettings settings;
-    settings.maxIndexLevel1Size = 2;
+    settings.maxIndexLevel1Size = {2};
 
     std::vector<LasFile::Point> points;
 

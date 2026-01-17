@@ -164,7 +164,8 @@ void ComputeClassificationWidget::slotApply()
         mainWindow_->showError("Unknown error");
     }
 
-    mainWindow_->update({Editor::TYPE_CLASSIFICATION, Editor::TYPE_ELEVATION});
+    mainWindow_->update({Editor::TYPE_CLASSIFICATION, Editor::TYPE_ELEVATION},
+                        Page::STATE_READ);
 }
 
 void ComputeClassificationWidget::slotHelp()

@@ -133,7 +133,7 @@ public:
     uint64_t numberOfVisitedVoxels() const { return voxelVisitedCount_; }
 
     void setState(Page::State state);
-    bool nextState();
+    bool nextState(bool *lruL0Ready);
 
     void setModified();
     void flush();
@@ -211,6 +211,7 @@ protected:
     {
         size_t datasetId;
         size_t pageId;
+        size_t size;
 
         bool operator<(const Key &rhs) const;
     };
@@ -223,6 +224,14 @@ protected:
 
     std::shared_ptr<Page> readPage(size_t datasetId, size_t pageId);
     size_t erasePageIndex(std::vector<std::shared_ptr<Page>> &queue);
+    double distance(const Vector3<double> &eye, const Box<double> &box);
+    void insertToQueue(std::multimap<double, Key> &queue,
+                       const Key &key,
+                       const Vector3<double> &eye);
+    bool insertToLru(std::vector<std::shared_ptr<Page>> &lruNew,
+                     std::vector<std::shared_ptr<Page>> &lruOld,
+                     const Key &key,
+                     bool checkCacheLimit);
 };
 
 void toJson(Json &out, Query &in);

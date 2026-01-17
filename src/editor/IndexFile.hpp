@@ -122,7 +122,7 @@ public:
     // Build tree.
     void insertBegin(const Box<double> &boundary,
                      const Box<double> &boundaryPoints,
-                     size_t maxSize,
+                     const std::vector<size_t> &maxSize,
                      size_t maxLevel = 0,
                      bool insertOnlyToLeaves = false);
     uint64_t insert(double x, double y, double z);
@@ -185,7 +185,7 @@ protected:
     std::shared_ptr<BuildNode> root_;
 
     // Build tree settings.
-    size_t maxSize_;
+    std::vector<size_t> maxSize_;
     size_t maxLevel_;
     bool insertOnlyToLeaves_;
 
