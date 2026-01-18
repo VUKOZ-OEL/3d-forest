@@ -610,7 +610,7 @@ void ViewerOpenGLViewport::renderLastFrame()
 {
     glLineWidth(2.0F);
     glDisable(GL_DEPTH_TEST);
-    renderLabels();
+    renderSegmentsLabels();
     glEnable(GL_DEPTH_TEST);
     glLineWidth(1.0F);
 }
@@ -619,7 +619,7 @@ void ViewerOpenGLViewport::renderFirstFrameData()
 {
     if (camera_.lock2d())
     {
-        renderDbh();
+        renderSegmentsDbh();
     }
 
     const Region &clipFilter = editor_->clipFilter();
@@ -629,15 +629,41 @@ void ViewerOpenGLViewport::renderFirstFrameData()
 
     if (camera_.lock2d())
     {
-        renderHullProjections();
+        renderSegmentsHullProjections();
         return;
     }
 
-    renderAttributes();
-    renderSegments();
+    renderSegmentsAttributes();
+    renderSegmentsMeshes();
+    renderSegmentsSelection();
 }
 
-void ViewerOpenGLViewport::renderDbh()
+void ViewerOpenGLViewport::renderSegmentsSelection()
+{
+    const Segments &segments = editor_->segments();
+
+    for (size_t i = 0; i < segments.size(); i++)
+    {
+        const Segment &segment = segments[i];
+
+        if (!segment.selected || skipSegmentByFilter(segment))
+        {
+            continue;
+        }
+
+        // Render boundary.
+        float r = static_cast<float>(segment.color[0]);
+        float g = static_cast<float>(segment.color[1]);
+        float b = static_cast<float>(segment.color[2]);
+
+        glColor3f(r, g, b);
+        ViewerAabb boundary;
+        boundary.set(segment.boundary);
+        ViewerOpenGL::renderAabb(boundary);
+    }
+}
+
+void ViewerOpenGLViewport::renderSegmentsDbh()
 {
     const Segments &segments = editor_->segments();
     const SpeciesList &speciesList = editor_->speciesList();
@@ -648,7 +674,7 @@ void ViewerOpenGLViewport::renderDbh()
         // Segment.
         const Segment &segment = segments[i];
 
-        if (skipSegmentRendering(segment))
+        if (skipSegmentByFilter(segment))
         {
             continue;
         }
@@ -684,7 +710,7 @@ void ViewerOpenGLViewport::renderDbh()
     }
 }
 
-void ViewerOpenGLViewport::renderHullProjections()
+void ViewerOpenGLViewport::renderSegmentsHullProjections()
 {
     const Segments &segments = editor_->segments();
 
@@ -692,24 +718,18 @@ void ViewerOpenGLViewport::renderHullProjections()
     {
         const Segment &segment = segments[i];
 
-        if (skipSegmentRendering(segment))
+        if (skipSegment(segment))
         {
             continue;
         }
 
-        renderMeshes(segment, true);
+        renderSegmentMeshes(segment, true);
     }
 }
 
-void ViewerOpenGLViewport::renderMeshes(const Segment &segment,
-                                        bool onlyProjections)
+void ViewerOpenGLViewport::renderSegmentMeshes(const Segment &segment,
+                                               bool onlyProjections)
 {
-    if (editor_->settings().treeSettings().useOnlyForSelectedTrees() &&
-        !segment.selected)
-    {
-        return;
-    }
-
     float r = static_cast<float>(segment.color[0]);
     float g = static_cast<float>(segment.color[1]);
     float b = static_cast<float>(segment.color[2]);
@@ -800,7 +820,7 @@ void ViewerOpenGLViewport::renderMeshes(const Segment &segment,
     }
 }
 
-void ViewerOpenGLViewport::renderSegments()
+void ViewerOpenGLViewport::renderSegmentsMeshes()
 {
     const Segments &segments = editor_->segments();
 
@@ -808,29 +828,16 @@ void ViewerOpenGLViewport::renderSegments()
     {
         const Segment &segment = segments[i];
 
-        if (skipSegmentRendering(segment))
+        if (skipSegment(segment))
         {
             continue;
         }
 
-        float r = static_cast<float>(segment.color[0]);
-        float g = static_cast<float>(segment.color[1]);
-        float b = static_cast<float>(segment.color[2]);
-
-        // Render boundary.
-        if (segment.selected)
-        {
-            glColor3f(r, g, b);
-            ViewerAabb boundary;
-            boundary.set(segment.boundary);
-            ViewerOpenGL::renderAabb(boundary);
-        }
-
-        renderMeshes(segment, false);
+        renderSegmentMeshes(segment, false);
     }
 }
 
-void ViewerOpenGLViewport::renderAttributes()
+void ViewerOpenGLViewport::renderSegmentsAttributes()
 {
     const Segments &segments = editor_->segments();
 
@@ -838,7 +845,7 @@ void ViewerOpenGLViewport::renderAttributes()
     {
         const Segment &segment = segments[i];
 
-        if (skipSegmentRendering(segment))
+        if (skipSegment(segment))
         {
             continue;
         }
@@ -914,7 +921,7 @@ void ViewerOpenGLViewport::renderAttributes()
     }
 }
 
-void ViewerOpenGLViewport::renderLabels()
+void ViewerOpenGLViewport::renderSegmentsLabels()
 {
     const Segments &segments = editor_->segments();
 
@@ -922,7 +929,7 @@ void ViewerOpenGLViewport::renderLabels()
     {
         const Segment &segment = segments[i];
 
-        if (skipSegmentRendering(segment))
+        if (skipSegment(segment))
         {
             continue;
         }
@@ -944,23 +951,15 @@ void ViewerOpenGLViewport::renderLabels()
     }
 }
 
-bool ViewerOpenGLViewport::skipSegmentRendering(const Segment &segment)
+bool ViewerOpenGLViewport::skipSegment(const Segment &segment)
 {
-    // Do not render any attributes.
-    if (!editor_->settings().treeSettings().treeAttributesVisible())
-    {
-        return true;
-    }
+    return skipSegmentByFilter(segment) || skipSegmentByAttributes(segment);
+}
 
+bool ViewerOpenGLViewport::skipSegmentByFilter(const Segment &segment)
+{
     // Ignore "unsegmented".
     if (segment.id == 0)
-    {
-        return true;
-    }
-
-    // Render only selected trees.
-    if (editor_->settings().treeSettings().useOnlyForSelectedTrees() &&
-        !segment.selected)
     {
         return true;
     }
@@ -997,6 +996,24 @@ bool ViewerOpenGLViewport::skipSegmentRendering(const Segment &segment)
                 return true;
             }
         }
+    }
+
+    return false;
+}
+
+bool ViewerOpenGLViewport::skipSegmentByAttributes(const Segment &segment)
+{
+    // Do not render any attributes.
+    if (!editor_->settings().treeSettings().treeAttributesVisible())
+    {
+        return true;
+    }
+
+    // Render only selected trees.
+    if (editor_->settings().treeSettings().useOnlyForSelectedTrees() &&
+        !segment.selected)
+    {
+        return true;
     }
 
     return false;
@@ -1196,8 +1213,20 @@ size_t ViewerOpenGLViewport::pickObject3D(const QVector3D &p1,
     size_t nearId = 0;
     float dist = Numeric::max<float>();
 
+    const Segments &segments = editor_->segments();
+
     for (size_t i = 0; i < objects_.size(); i++)
     {
+        size_t segmentIndex = segments.index(objects_[i].id, false);
+        if (segmentIndex == SIZE_MAX)
+        {
+            continue;
+        }
+        if (skipSegmentByFilter(segments[segmentIndex]))
+        {
+            continue;
+        }
+
         const QVector3D &min = objects_[i].aabb.min();
         const QVector3D &max = objects_[i].aabb.max();
         float x;

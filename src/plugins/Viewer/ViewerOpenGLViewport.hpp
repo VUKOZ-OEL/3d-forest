@@ -102,17 +102,24 @@ protected:
 
     void setViewDefault();
     void clearScreen();
+
     void renderScene();
     void renderFirstFrame();
     void renderFirstFrameData();
     void renderLastFrame();
-    void renderDbh();
-    void renderHullProjections();
-    void renderMeshes(const Segment &segment, bool onlyProjections);
-    void renderSegments();
-    void renderAttributes();
-    void renderLabels();
-    bool skipSegmentRendering(const Segment &segment);
+
+    void renderSegmentsSelection();
+    void renderSegmentsDbh();
+    void renderSegmentsHullProjections();
+    void renderSegmentMeshes(const Segment &segment, bool onlyProjections);
+    void renderSegmentsMeshes();
+    void renderSegmentsAttributes();
+    void renderSegmentsLabels();
+
+    bool skipSegment(const Segment &segment);
+    bool skipSegmentByFilter(const Segment &segment);
+    bool skipSegmentByAttributes(const Segment &segment);
+
     void renderGuides();
     void renderSceneSettingsEnable();
     void renderSceneSettingsDisable();
