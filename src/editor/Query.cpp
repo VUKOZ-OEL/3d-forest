@@ -21,6 +21,7 @@
 
 // Include std.
 #include <queue>
+#include <list>
 
 // Include 3D Forest.
 #include <Editor.hpp>
@@ -385,37 +386,41 @@ void Query::applyCamera(const Camera &camera)
     lru_.clear();
     lruSize_ = 0;
 
-    std::multimap<double, Key> queue;
+    // Sorted by level of detail (asc); same level by distance to camera (asc).
+    std::list<Key> queue;
 
-    // Initialize with L0
+    // Sorted by distance to camera (asc).
+    std::multimap<double, Key> queueNext;
+
+    // Initialize with level of detail 0 (L0).
     const std::unordered_set<size_t> &idList = where().dataset().filter();
     for (auto const &it : idList)
     {
-        insertToQueue(queue, {it, 0, 0}, camera.eye);
+        insertToQueue(queueNext, {it, 0, 0}, camera.eye);
     }
 
-    for (const auto &it : queue)
+    for (const auto &it : queueNext)
     {
         if (!insertToLru(lru_, lruOld, it.second, false))
         {
             break;
         }
+
+        queue.push_back(it.second);
     }
 
-    // Expand L1, L2, ...
-    std::multimap<double, Key> queueExpand;
-
+    // Expand L0 -> L1 -> L2, ...
     while (!queue.empty())
     {
         const auto it = queue.begin();
-        Key key = it->second;
+        Key key = *it;
         queue.erase(it);
 
         const Dataset &dataset = editor_->datasets().key(key.datasetId);
         const IndexFile &index = dataset.index();
         const IndexFile::Node *node = index.at(key.pageId);
 
-        queueExpand.clear();
+        queueNext.clear();
 
         for (size_t i = 0; i < 8; i++)
         {
@@ -423,21 +428,20 @@ void Query::applyCamera(const Camera &camera)
             {
                 key.pageId = node->next[i];
                 key.size = 0;
-                insertToQueue(queueExpand, key, camera.eye);
+                insertToQueue(queueNext, key, camera.eye);
             }
         }
 
-        for (const auto &it : queueExpand)
+        for (const auto &it : queueNext)
         {
             if (!insertToLru(lru_, lruOld, it.second, true))
             {
+                // Stop expansion. No free cache space available.
                 queue.clear();
                 break;
             }
-            else
-            {
-                queue.insert(it);
-            }
+
+            queue.push_back(it.second);
         }
     }
 
