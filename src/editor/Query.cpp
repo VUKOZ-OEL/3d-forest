@@ -20,8 +20,8 @@
 /** @file Query.cpp */
 
 // Include std.
-#include <queue>
 #include <list>
+#include <queue>
 
 // Include 3D Forest.
 #include <Editor.hpp>
