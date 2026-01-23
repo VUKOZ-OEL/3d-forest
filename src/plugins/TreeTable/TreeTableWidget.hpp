@@ -113,7 +113,8 @@ private:
     void setCell(int row,
                  int col,
                  const std::string &value,
-                 const QColor &color = QColor());
+                 const QColor &color = QColor(),
+                 bool isNumeric = false);
 
     void block();
     void unblock();

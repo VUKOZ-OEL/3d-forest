@@ -47,6 +47,18 @@
 
 #define ICON(name) (ThemeIcon(":/TreeTableResources/", name))
 
+/** Tree Table Numeric Widget Item for Sorting. */
+class TreeTableNumericWidgetItem : public QTableWidgetItem
+{
+public:
+    using QTableWidgetItem::QTableWidgetItem;
+
+    bool operator<(const QTableWidgetItem &other) const override
+    {
+        return text().toDouble() < other.text().toDouble();
+    }
+};
+
 TreeTableWidget::TreeTableWidget(MainWindow *mainWindow)
     : QWidget(),
       mainWindow_(mainWindow)
@@ -346,7 +358,7 @@ void TreeTableWidget::setCell(int row,
                               size_t value,
                               const QColor &color)
 {
-    setCell(row, col, toString(value), color);
+    setCell(row, col, toString(value), color, true);
 }
 
 void TreeTableWidget::setCell(int row,
@@ -354,16 +366,26 @@ void TreeTableWidget::setCell(int row,
                               double value,
                               const QColor &color)
 {
-    setCell(row, col, toString(value, 3), color);
+    setCell(row, col, toString(value, 3), color, true);
 }
 
 void TreeTableWidget::setCell(int row,
                               int col,
                               const std::string &value,
-                              const QColor &color)
+                              const QColor &color,
+                              bool isNumeric)
 {
     QString text(QString::fromStdString(value));
-    QTableWidgetItem *item = new QTableWidgetItem(text);
+    QTableWidgetItem *item;
+
+    if (isNumeric)
+    {
+        item = new TreeTableNumericWidgetItem(text);
+    }
+    else
+    {
+        item = new QTableWidgetItem(text);
+    }
 
     if (color.isValid())
     {
