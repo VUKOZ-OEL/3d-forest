@@ -152,6 +152,9 @@ void FilterManagementStatusTreeWidget::slotSetCheckbox(bool b)
 
 void FilterManagementStatusTreeWidget::setCheckbox(size_t idx)
 {
+    LOG_DEBUG(<< "Set checkbox index <" << idx << "> to segment id <"
+              << segment_.id << ">.");
+
     if (segment_.id == 0)
     {
         return;

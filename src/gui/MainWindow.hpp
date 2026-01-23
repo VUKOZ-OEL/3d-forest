@@ -116,7 +116,7 @@ public:
 
     void update(void *sender, const QSet<Editor::Type> &target);
     void update(const QSet<Editor::Type> &target,
-                Page::State viewPortsCacheState = Page::STATE_RENDER,
+                Page::State viewPortsCacheState = Page::STATE_SELECT,
                 bool resetCamera = false);
 
     /// Call when the whole project was opened or closed.

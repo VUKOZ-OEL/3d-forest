@@ -1322,5 +1322,5 @@ void ViewerOpenGLViewport::pickObject(const std::set<size_t> &selectedIds,
     }
 
     editor_->setSegments(segments);
-    mainWindow_->update({Editor::TYPE_SEGMENT});
+    mainWindow_->update({Editor::TYPE_SEGMENT}, Page::STATE_RENDER);
 }
