@@ -126,6 +126,8 @@ public:
     const QueryFilterSet &segmentsFilter() const { return segmentsFilter_; }
     void setSegmentsFilter(const QueryFilterSet &filter);
 
+    Vector3<double> segmentColor(const Segment &segment) const;
+
     // Species.
     const SpeciesList &speciesList() const { return speciesList_; }
     void setSpeciesList(const SpeciesList &speciesList);

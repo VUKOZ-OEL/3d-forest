@@ -628,6 +628,44 @@ void Editor::setSegmentsFilter(const QueryFilterSet &filter)
     }
 }
 
+Vector3<double> Editor::segmentColor(const Segment &segment) const
+{
+    const ViewSettings &opt = settings().viewSettings();
+
+    Vector3<double> color = opt.pointColor();
+
+    size_t segmentIndex = segments_.index(segment.id, false);
+    if (segmentIndex == SIZE_MAX)
+    {
+        return color;
+    }
+
+    if (opt.colorSource() == ViewSettings::ColorSource::SEGMENT)
+    {
+        color = segments_[segmentIndex].color;
+    }
+    else if (opt.colorSource() == ViewSettings::ColorSource::SPECIES)
+    {
+        size_t id = segments_[segmentIndex].speciesId;
+        size_t index = speciesList_.index(id, false);
+        if (index != SIZE_MAX)
+        {
+            color = speciesList_[index].color;
+        }
+    }
+    else if (opt.colorSource() == ViewSettings::ColorSource::MANAGEMENT_STATUS)
+    {
+        size_t id = segments_[segmentIndex].managementStatusId;
+        size_t index = managementStatusList_.index(id, false);
+        if (index != SIZE_MAX)
+        {
+            color = managementStatusList_[index].color;
+        }
+    }
+
+    return color;
+}
+
 void Editor::setSpeciesList(const SpeciesList &speciesList)
 {
     LOG_DEBUG(<< "Set species list.");

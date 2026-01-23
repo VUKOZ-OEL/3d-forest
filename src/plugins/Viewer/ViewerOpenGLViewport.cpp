@@ -666,8 +666,8 @@ void ViewerOpenGLViewport::renderSegmentsSelection()
 void ViewerOpenGLViewport::renderSegmentsDbh()
 {
     const Segments &segments = editor_->segments();
-    const SpeciesList &speciesList = editor_->speciesList();
     double scale = editor_->settings().treeSettings().dbhScale();
+    double ppm = editor_->settings().unitsSettings().pointsPerMeter()[0];
 
     for (size_t i = 0; i < segments.size(); i++)
     {
@@ -679,29 +679,45 @@ void ViewerOpenGLViewport::renderSegmentsDbh()
             continue;
         }
 
-        // Attributes.
+        // Render DBH as a circle when DBH is valid;
+        // otherwise, render the tree position as a cross.
         const TreeAttributes &attributes = segment.treeAttributes;
-        if (!attributes.isDbhValid())
+
+        bool renderDbhCircle = false;
+        float diameter = static_cast<float>(0.2 * ppm);
+        Vector3<float> position;
+
+        if (attributes.isDbhValid())
         {
-            continue;
+            renderDbhCircle = true;
+            diameter = static_cast<float>(attributes.dbh);
+            position = Vector3<float>(attributes.dbhPosition);
+        }
+        else if (attributes.isPositionValid())
+        {
+            position = Vector3<float>(attributes.position);
+        }
+        else
+        {
+            position = Vector3<float>(segment.boundary.center());
         }
 
-        // Species.
-        size_t speciesId = segment.speciesId;
-        size_t speciesIndex = speciesList.index(speciesId, false);
-        if (speciesIndex == SIZE_MAX)
-        {
-            continue;
-        }
-        const Species &species = speciesList[speciesIndex];
-
-        Vector3<float> color(species.color);
+        Vector3<float> color(editor_->segmentColor(segment));
         glColor3f(color[0], color[1], color[2]);
 
-        float radius = static_cast<float>(attributes.dbh) * 0.5F * scale;
-        Vector3<float> position(attributes.dbhPosition);
-        ViewerOpenGL::renderCircle(position, radius, true);
+        diameter *= scale;
+        float radius = diameter * 0.5F;
 
+        if (renderDbhCircle)
+        {
+            ViewerOpenGL::renderCircle(position, radius, true);
+        }
+        else
+        {
+            ViewerOpenGL::renderCross(position, diameter, diameter);
+        }
+
+        // Render selection.
         if (segment.selected)
         {
             glColor3f(0.0F, 1.0F, 0.0F);
