@@ -17,29 +17,35 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file TreeTableExportCsv.hpp */
+/** @file FileFormatTable.hpp */
 
-#ifndef TREE_TABLE_EXPORT_CSV_HPP
-#define TREE_TABLE_EXPORT_CSV_HPP
+#ifndef FILE_FORMAT_TABLE_HPP
+#define FILE_FORMAT_TABLE_HPP
 
-// Include 3D Forest.
-#include <File.hpp>
-#include <TreeTableExportInterface.hpp>
+// Include std.
+#include <string>
+#include <vector>
 
-/** Tree Table Export CSV. */
-class TreeTableExportCsv : public TreeTableExportInterface
+/** File Format Table. */
+class FileFormatTable
 {
 public:
-    TreeTableExportCsv();
-    virtual ~TreeTableExportCsv();
+    /** File Format Table Cell. */
+    class Cell
+    {
+    public:
+        std::string text;
+    };
 
-    virtual bool open() { return file_.open(); }
-    virtual void create(const std::string &path);
-    virtual void write(const Segment &segment, const SpeciesList &speciesList);
-    virtual void close();
+    /** File Format Table Column. */
+    class Column
+    {
+    public:
+        std::string header;
+        std::vector<FileFormatTable::Cell> cells;
+    };
 
-private:
-    File file_;
+    std::vector<FileFormatTable::Column> columns;
 };
 
-#endif /* TREE_TABLE_EXPORT_CSV_HPP */
+#endif /* FILE_FORMAT_TABLE_HPP */

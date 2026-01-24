@@ -20,9 +20,9 @@
 /** @file TreeTableExportDialog.cpp */
 
 // Include 3D Forest.
+#include <FileFormatCsv.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
-#include <TreeTableExportCsv.hpp>
 #include <TreeTableExportDialog.hpp>
 
 // Include Qt.
@@ -148,16 +148,16 @@ void TreeTableExportDialog::slotReject()
     setResult(QDialog::Rejected);
 }
 
-std::shared_ptr<TreeTableExportInterface> TreeTableExportDialog::writer() const
+std::shared_ptr<FileFormatInterface> TreeTableExportDialog::writer() const
 {
-    std::shared_ptr<TreeTableExportInterface> result;
-
     std::string path = fileNameLineEdit_->text().toStdString();
     std::string ext = toLower(File::fileExtension(path));
 
     if (ext == "csv")
     {
-        result = std::make_shared<TreeTableExportCsv>();
+        std::shared_ptr<FileFormatCsv> csv = std::make_shared<FileFormatCsv>();
+        csv->setFileName(path);
+        return csv;
     }
     else
     {
@@ -165,22 +165,5 @@ std::shared_ptr<TreeTableExportInterface> TreeTableExportDialog::writer() const
               "Please choose a different format.");
     }
 
-    result->setProperties(properties());
-
-    return result;
-}
-
-TreeTableExportProperties TreeTableExportDialog::properties() const
-{
-    TreeTableExportProperties result;
-
-    // File name.
-    result.setFileName(fileNameLineEdit_->text().toStdString());
-
-    // Other values.
-    double ppm =
-        mainWindow_->editor().settings().unitsSettings().pointsPerMeter()[0];
-    result.setPointsPerMeter(ppm);
-
-    return result;
+    return std::shared_ptr<FileFormatInterface>();
 }

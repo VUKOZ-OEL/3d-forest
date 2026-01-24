@@ -17,27 +17,26 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file TreeTableExportProperties.hpp */
+/** @file FileFormatInterface.hpp */
 
-#ifndef TREE_TABLE_EXPORT_PROPERTIES_HPP
-#define TREE_TABLE_EXPORT_PROPERTIES_HPP
+#ifndef FILE_FORMAT_INTERFACE_HPP
+#define FILE_FORMAT_INTERFACE_HPP
 
-// Include Std.
-#include <string>
+// Include 3D Forest.
+#include <FileFormatTable.hpp>
 
-/** Tree Table Export Properties. */
-class TreeTableExportProperties
+// Include local.
+#include <ExportCore.hpp>
+
+/** File Format Interface. */
+class EXPORT_CORE FileFormatInterface
 {
 public:
-    void setFileName(const std::string &fileName) { fileName_ = fileName; }
-    const std::string &fileName() const { return fileName_; }
+    virtual ~FileFormatInterface() = default;
 
-    void setPointsPerMeter(double ppm) { pointsPerMeter_ = ppm; }
-    double pointsPerMeter() const { return pointsPerMeter_; }
+    virtual void create(const FileFormatTable &table) = 0;
 
-private:
-    std::string fileName_;
-    double pointsPerMeter_{1000.0};
+    virtual const std::string &fileName() const = 0;
 };
 
-#endif /* TREE_TABLE_EXPORT_PROPERTIES_HPP */
+#endif /* FILE_FORMAT_INTERFACE_HPP */

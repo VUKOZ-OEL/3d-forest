@@ -20,11 +20,11 @@
 /** @file TreeTableWidget.cpp */
 
 // Include 3D Forest.
+#include <FileFormatCsv.hpp>
 #include <FindVisibleObjects.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 #include <TreeTableAction.hpp>
-#include <TreeTableExportCsv.hpp>
 #include <TreeTableExportDialog.hpp>
 #include <TreeTableSetManagementStatus.hpp>
 #include <TreeTableSetSpecies.hpp>
@@ -222,6 +222,49 @@ std::unordered_set<size_t> TreeTableWidget::selectedRowsToIds()
     return idList;
 }
 
+FileFormatTable TreeTableWidget::createExportTable() const
+{
+    FileFormatTable table;
+
+    int colCount = tableWidget_->columnCount();
+    int rowCount = tableWidget_->rowCount();
+
+    if (colCount < 1 || rowCount < 1)
+    {
+        return table;
+    }
+
+    table.columns.resize(static_cast<size_t>(colCount));
+
+    for (int col = 0; col < colCount; ++col)
+    {
+        size_t c = static_cast<size_t>(col);
+        QTableWidgetItem *item = tableWidget_->horizontalHeaderItem(col);
+        if (item)
+        {
+            table.columns[c].header = item->text().toStdString();
+        }
+
+        table.columns[c].cells.resize(static_cast<size_t>(rowCount));
+    }
+
+    for (int col = 0; col < colCount; ++col)
+    {
+        size_t c = static_cast<size_t>(col);
+        for (int row = 0; row < rowCount; ++row)
+        {
+            size_t r = static_cast<size_t>(row);
+            QTableWidgetItem *item = tableWidget_->item(row, col);
+            if (item)
+            {
+                table.columns[c].cells[r].text = item->text().toStdString();
+            }
+        }
+    }
+
+    return table;
+}
+
 // -----------------------------------------------------------------------------
 // Slots.
 
@@ -272,27 +315,14 @@ void TreeTableWidget::slotExport()
 
         if (dialog.exec() == QDialog::Accepted)
         {
-            std::shared_ptr<TreeTableExportInterface> writer = dialog.writer();
+            // Create a writer based on filename extension.
+            std::shared_ptr<FileFormatInterface> writer = dialog.writer();
 
-            writer->create(writer->properties().fileName());
+            // Write table data by using the writer.
+            writer->create(createExportTable());
 
-            int rowCount = tableWidget_->rowCount();
-            for (int row = 0; row < rowCount; ++row)
-            {
-                QTableWidgetItem *item = tableWidget_->item(row, COLUMN_ID);
-                if (item)
-                {
-                    QString text = item->text();
-                    size_t id = static_cast<size_t>(text.toULong());
-                    size_t index = segments_.index(id, false);
-                    if (index != SIZE_MAX)
-                    {
-                        writer->write(segments_[index], speciesList_);
-                    }
-                }
-            }
-
-            fileName_ = QString::fromStdString(writer->properties().fileName());
+            // Remember the last file name used for export.
+            fileName_ = QString::fromStdString(writer->fileName());
         }
     }
     catch (std::exception &e)
@@ -440,8 +470,7 @@ void TreeTableWidget::updateTableContent()
                                              "Crown Y [m]",
                                              "Crown Z [m]",
                                              "Area [m^2]",
-                                             "Vol [m^3]",
-                                             "Status"});
+                                             "Vol [m^3]"});
 
     // Content.
     if (showOnlyVisibleTreesCheckBox_->isChecked())
@@ -538,7 +567,6 @@ void TreeTableWidget::setRow(int row, size_t index)
     setCell(row, COLUMN_Y, treeAttributes.position[1] / ppm);
     setCell(row, COLUMN_Z, treeAttributes.position[2] / ppm);
     setCell(row, COLUMN_HEIGHT, treeAttributes.height / ppm);
-    setCell(row, COLUMN_STATUS, treeAttributes.isValid() ? "Valid" : "Invalid");
     setCell(row, COLUMN_DBH, treeAttributes.dbh / ppm);
     setCell(row, COLUMN_CROWN_X, treeAttributes.crownCenter[0] / ppm);
     setCell(row, COLUMN_CROWN_Y, treeAttributes.crownCenter[1] / ppm);

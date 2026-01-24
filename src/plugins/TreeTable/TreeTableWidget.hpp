@@ -24,6 +24,7 @@
 
 // Include 3D Forest.
 #include <Editor.hpp>
+#include <FileFormatTable.hpp>
 class MainWindow;
 
 // Include Qt.
@@ -74,7 +75,6 @@ private:
         COLUMN_CROWN_Z,
         COLUMN_AREA,
         COLUMN_VOLUME,
-        COLUMN_STATUS,
         COLUMN_LAST,
     };
 
@@ -100,6 +100,7 @@ private:
 
     // Helpers.
     std::unordered_set<size_t> selectedRowsToIds();
+    FileFormatTable createExportTable() const;
 
     // Setup and manage signals.
     void block();

@@ -17,44 +17,34 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file TreeTableExportDialog.hpp */
+/** @file FileFormatCsv.hpp */
 
-#ifndef TREE_TABLE_EXPORT_DIALOG_HPP
-#define TREE_TABLE_EXPORT_DIALOG_HPP
+#ifndef FILE_FORMAT_CSV_HPP
+#define FILE_FORMAT_CSV_HPP
 
 // Include 3D Forest.
 #include <FileFormatInterface.hpp>
-class MainWindow;
 
-// Include Qt.
-#include <QDialog>
-class QCheckBox;
-class QLineEdit;
-class QPushButton;
+// Include local.
+#include <ExportCore.hpp>
+#include <WarningsDisable.hpp>
 
-/** Tree Table Export Dialog. */
-class TreeTableExportDialog : public QDialog
+/** File Format CSV. */
+class EXPORT_CORE FileFormatCsv : public FileFormatInterface
 {
-    Q_OBJECT
-
 public:
-    TreeTableExportDialog(MainWindow *mainWindow, const QString &fileName);
+    FileFormatCsv();
+    virtual ~FileFormatCsv();
 
-    std::shared_ptr<FileFormatInterface> writer() const;
+    virtual void create(const FileFormatTable &table);
 
-public slots:
-    void slotBrowse();
-    void slotAccept();
-    void slotReject();
+    void setFileName(const std::string &fileName) { fileName_ = fileName; }
+    virtual const std::string &fileName() const { return fileName_; }
 
 private:
-    MainWindow *mainWindow_;
-
-    QLineEdit *fileNameLineEdit_;
-    QPushButton *browseButton_;
-
-    QPushButton *acceptButton_;
-    QPushButton *rejectButton_;
+    std::string fileName_;
 };
 
-#endif /* TREE_TABLE_EXPORT_DIALOG_HPP */
+#include <WarningsEnable.hpp>
+
+#endif /* FILE_FORMAT_CSV_HPP */
