@@ -24,6 +24,7 @@
 
 // Include std.
 #include <unordered_map>
+#include <unordered_set>
 
 // Include 3D Forest.
 #include <Segment.hpp>
@@ -57,6 +58,9 @@ public:
     void addTree(size_t id,
                  const std::string &label,
                  const Box<double> &boundary);
+
+    bool updateSelection(const std::unordered_set<size_t> &selectedIds,
+                         bool ctrl = false);
 
     void exportMeshList(const std::string &projectFilePath, double scale) const;
     void importMeshList(const std::string &projectFilePath, double scale);

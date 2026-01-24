@@ -109,8 +109,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Update.
     setWindowTitle(QString::fromStdString(editor_.projectPath()));
 
-    LOG_DEBUG_UPDATE(<< "Emit update.");
-    emit signalUpdate(this, {});
+    emitUpdate(this, {});
 
     if (viewerPlugin_)
     {
@@ -641,14 +640,15 @@ void MainWindow::slotRenderViewports()
     }
 }
 
-void MainWindow::update(void *sender, const QSet<Editor::Type> &target)
+void MainWindow::emitUpdate(void *sender, const QSet<Editor::Type> &target)
 {
     LOG_DEBUG_UPDATE(<< "Update target <" << target << "> emit.");
 
     emit signalUpdate(sender, target);
 }
 
-void MainWindow::update(const QSet<Editor::Type> &target,
+void MainWindow::update(void *sender,
+                        const QSet<Editor::Type> &target,
                         Page::State viewPortsCacheState,
                         bool resetCamera)
 {
@@ -669,7 +669,7 @@ void MainWindow::update(const QSet<Editor::Type> &target,
         }
     }
 
-    update(this, target);
+    emitUpdate(sender, target);
 
     resumeThreads();
 }
@@ -686,8 +686,7 @@ void MainWindow::updateNewProject()
         viewerPlugin_->resetScene(&editor_, true);
     }
 
-    LOG_DEBUG(<< "Emit update.");
-    emit signalUpdate(this, {});
+    emitUpdate(this, {});
 
     LOG_DEBUG(<< "Finished updating new project.");
 }
@@ -724,7 +723,7 @@ void MainWindow::updateFilter(void *sender, bool final)
 
     if (final)
     {
-        update(sender, {Editor::TYPE_FILTER});
+        emitUpdate(sender, {Editor::TYPE_FILTER});
     }
 
     resumeThreads();

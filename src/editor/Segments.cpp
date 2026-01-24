@@ -152,6 +152,47 @@ void Segments::addTree(size_t id,
     push_back(segment);
 }
 
+bool Segments::updateSelection(const std::unordered_set<size_t> &selectedIds,
+                               bool ctrl)
+{
+    LOG_DEBUG(<< "Selected ids <" << selectedIds << ">.");
+
+    std::set<size_t> selectedIdsOld;
+    for (size_t i = 0; i < segments_.size(); i++)
+    {
+        if (segments_[i].selected)
+        {
+            selectedIdsOld.insert(segments_[i].id);
+        }
+    }
+
+    std::set<size_t> selectedIdsNew;
+    for (size_t i = 0; i < segments_.size(); i++)
+    {
+        if (!ctrl)
+        {
+            segments_[i].selected = false;
+        }
+
+        if (selectedIds.count(segments_[i].id) > 0)
+        {
+            segments_[i].selected = !segments_[i].selected;
+        }
+
+        if (segments_[i].selected)
+        {
+            selectedIdsNew.insert(segments_[i].id);
+        }
+    }
+
+    if (selectedIdsOld == selectedIdsNew)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 void Segments::exportMeshList(const std::string &projectFilePath,
                               double scale) const
 {

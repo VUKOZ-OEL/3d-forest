@@ -51,7 +51,8 @@ void EditPluginResetManagementStatus::run(MainWindow *mainWindow)
     }
 
     editor->setSegments(segments);
-    mainWindow->update({Editor::TYPE_SEGMENT, Editor::TYPE_MANAGEMENT_STATUS});
+    mainWindow->update(nullptr,
+                       {Editor::TYPE_SEGMENT, Editor::TYPE_MANAGEMENT_STATUS});
 
     LOG_DEBUG(<< "Finished resetting management status values.");
 }

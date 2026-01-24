@@ -133,7 +133,7 @@ void UnitsSettingsWidget::dataChanged()
 
     mainWindow_->suspendThreads();
     mainWindow_->editor().setUnitsSettings(settings_);
-    mainWindow_->update(this, {Editor::TYPE_SETTINGS});
+    mainWindow_->emitUpdate(this, {Editor::TYPE_SETTINGS});
 }
 
 void UnitsSettingsWidget::setUnitsSettings(const UnitsSettings &settings)

@@ -90,7 +90,7 @@ void TreeTableSetSpecies::runAction(QAction *selectedAction,
     }
 
     editor->setSegments(segments);
-    mainWindow_->update({Editor::TYPE_SEGMENT, Editor::TYPE_SPECIES});
+    mainWindow_->update(this, {Editor::TYPE_SEGMENT, Editor::TYPE_SPECIES});
 
     LOG_DEBUG(<< "Finished setting species values.");
 }
@@ -150,7 +150,7 @@ void TreeTableSetSpecies::run(MainWindow *mainWindow,
     }
 
     editor->setSegments(segments);
-    mainWindow->update({Editor::TYPE_SEGMENT, Editor::TYPE_SPECIES});
+    mainWindow->update(nullptr, {Editor::TYPE_SEGMENT, Editor::TYPE_SPECIES});
 
     LOG_DEBUG(<< "Finished setting species values.");
 }

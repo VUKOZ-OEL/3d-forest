@@ -24,7 +24,7 @@
 
 // Include 3D Forest.
 #include <Camera.hpp>
-#include <Segment.hpp>
+#include <Segments.hpp>
 #include <ViewerAabb.hpp>
 #include <ViewerCamera.hpp>
 class Editor;
@@ -139,12 +139,12 @@ protected:
     };
 
     std::vector<Object> objects_;
+    Segments segments_;
 
     void updateObjects();
     void pickObject(const QPoint &p, bool ctrl);
     size_t pickObject2D(const QVector3D &p1, const QVector3D &p2);
     size_t pickObject3D(const QVector3D &p1, const QVector3D &p2);
-    void pickObject(const std::set<size_t> &selectedIds, bool ctrl);
 };
 
 #endif /* VIEWER_OPENGL_VIEWPORT_HPP */

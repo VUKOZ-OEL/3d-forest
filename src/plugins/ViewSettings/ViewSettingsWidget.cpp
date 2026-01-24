@@ -177,7 +177,7 @@ void ViewSettingsWidget::dataChanged(bool modifiers)
 
     mainWindow_->suspendThreads();
     mainWindow_->editor().setViewSettings(settings_);
-    mainWindow_->update(this, {Editor::TYPE_SETTINGS});
+    mainWindow_->emitUpdate(this, {Editor::TYPE_SETTINGS});
 
     if (modifiers)
     {

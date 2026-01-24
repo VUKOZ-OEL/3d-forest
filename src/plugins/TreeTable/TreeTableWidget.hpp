@@ -24,10 +24,10 @@
 
 // Include 3D Forest.
 #include <Editor.hpp>
-#include <Segments.hpp>
 class MainWindow;
 
 // Include Qt.
+#include <QItemSelection>
 #include <QWidget>
 class QCheckBox;
 class QPushButton;
@@ -52,6 +52,8 @@ protected slots:
     void slotShowOnlyVisibleTreesChanged(int index);
     void slotExport();
     void slotCustomContextMenuRequested(const QPoint &pos);
+    void slotTableSelectionChanged(const QItemSelection &selected,
+                                   const QItemSelection &deselected);
 
 private:
     /** Tree Table Column. */
@@ -85,17 +87,28 @@ private:
     std::unordered_set<size_t> visibleTreesIdList_;
 
     Segments segments_;
-    SpeciesList speciesList_;
     QueryFilterSet filter_;
+    SpeciesList speciesList_;
+    ManagementStatusList managementStatusList_;
     bool updatesEnabled_;
 
     QString fileName_;
 
-    void setSegments(const Segments &segments, const QueryFilterSet &filter);
-    void dataChanged();
-    void filterChanged();
+    // New data.
+    void newData();
+    void newFilter();
 
-    void setTable();
+    // Helpers.
+    std::unordered_set<size_t> selectedRowsToIds();
+
+    // Setup and manage signals.
+    void block();
+    void unblock();
+    void disconnectSignals();
+    void connectSignals();
+
+    // Set table data.
+    void updateTableContent();
     void setRow(int row, size_t index);
     void setCell(int row,
                  int col,
@@ -115,11 +128,6 @@ private:
                  const std::string &value,
                  const QColor &color = QColor(),
                  bool isNumeric = false);
-
-    void block();
-    void unblock();
-
-    void showOnlyVisibleTreesUpdate();
 };
 
 #endif /* TREE_TABLE_WIDGET_HPP */

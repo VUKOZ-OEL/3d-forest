@@ -186,7 +186,7 @@ void TreeSettingsWidget::dataChanged(bool modifiers)
 
     mainWindow_->suspendThreads();
     mainWindow_->editor().setTreeSettings(settings_);
-    mainWindow_->update(this, {Editor::TYPE_SETTINGS});
+    mainWindow_->emitUpdate(this, {Editor::TYPE_SETTINGS});
 
     if (modifiers)
     {

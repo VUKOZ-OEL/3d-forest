@@ -651,15 +651,15 @@ void ViewerOpenGLViewport::renderSegmentsSelection()
             continue;
         }
 
-        // Render boundary.
-        float r = static_cast<float>(segment.color[0]);
-        float g = static_cast<float>(segment.color[1]);
-        float b = static_cast<float>(segment.color[2]);
+        glColor3f(1.0F, 1.0F, 0.0F);
+        glEnable(GL_LINE_STIPPLE);
+        glLineStipple(1, 0xff);
 
-        glColor3f(r, g, b);
         ViewerAabb boundary;
         boundary.set(segment.boundary);
         ViewerOpenGL::renderAabb(boundary);
+
+        glDisable(GL_LINE_STIPPLE);
     }
 }
 
@@ -1122,6 +1122,8 @@ void ViewerOpenGLViewport::updateObjects()
     const Segments &segments = editor_->segments();
     const QueryFilterSet &filter = editor_->segmentsFilter();
 
+    segments_ = segments;
+
     for (size_t i = 0; i < segments.size(); i++)
     {
         const Segment &segment = segments[i];
@@ -1172,12 +1174,21 @@ void ViewerOpenGLViewport::pickObject(const QPoint &p, bool ctrl)
     }
 
     // Select picked object.
-    std::set<size_t> selectedIds;
+    std::unordered_set<size_t> selectedIds;
     if (selectedId > 0)
     {
         selectedIds.insert(selectedId);
     }
-    pickObject(selectedIds, ctrl);
+
+    LOG_DEBUG(<< "Selected ids <" << selectedIds << ">.");
+
+    if (segments_.updateSelection(selectedIds, ctrl))
+    {
+        LOG_DEBUG(<< "Apply new selection to editor.");
+        mainWindow_->suspendThreads();
+        mainWindow_->editor().setSegments(segments_);
+        mainWindow_->update(this, {Editor::TYPE_SEGMENT}, Page::STATE_RENDER);
+    }
 }
 
 size_t ViewerOpenGLViewport::pickObject2D(const QVector3D &p1,
@@ -1277,50 +1288,4 @@ size_t ViewerOpenGLViewport::pickObject3D(const QVector3D &p1,
     }
 
     return nearId;
-}
-
-void ViewerOpenGLViewport::pickObject(const std::set<size_t> &selectedIds,
-                                      bool ctrl)
-{
-    LOG_DEBUG(<< "Selected ID <" << toString(selectedIds) << ">.");
-
-    Segments segments = editor_->segments();
-
-    std::set<size_t> selectedIdsOld;
-    for (size_t i = 0; i < segments.size(); i++)
-    {
-        if (segments[i].selected)
-        {
-            selectedIdsOld.insert(segments[i].id);
-        }
-    }
-
-    if (!ctrl)
-    {
-        for (size_t i = 0; i < segments.size(); i++)
-        {
-            segments[i].selected = false;
-        }
-    }
-
-    std::set<size_t> selectedIdsNew;
-    for (size_t i = 0; i < segments.size(); i++)
-    {
-        if (selectedIds.count(segments[i].id) > 0)
-        {
-            segments[i].selected = true;
-        }
-        if (segments[i].selected)
-        {
-            selectedIdsNew.insert(segments[i].id);
-        }
-    }
-
-    if (selectedIdsOld == selectedIdsNew)
-    {
-        return;
-    }
-
-    editor_->setSegments(segments);
-    mainWindow_->update({Editor::TYPE_SEGMENT}, Page::STATE_RENDER);
 }

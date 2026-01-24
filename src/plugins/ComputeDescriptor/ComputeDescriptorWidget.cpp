@@ -183,7 +183,7 @@ void ComputeDescriptorWidget::slotApply()
 
     descriptor_.clear();
 
-    mainWindow_->update({Editor::TYPE_DESCRIPTOR}, Page::STATE_READ);
+    mainWindow_->update(this, {Editor::TYPE_DESCRIPTOR}, Page::STATE_READ);
 }
 
 void ComputeDescriptorWidget::slotHelp()

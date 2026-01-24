@@ -91,7 +91,8 @@ void TreeTableSetManagementStatus::runAction(QAction *selectedAction,
     }
 
     editor->setSegments(segments);
-    mainWindow_->update({Editor::TYPE_SEGMENT, Editor::TYPE_MANAGEMENT_STATUS});
+    mainWindow_->update(this,
+                        {Editor::TYPE_SEGMENT, Editor::TYPE_MANAGEMENT_STATUS});
 
     LOG_DEBUG(<< "Finished setting management status values.");
 }
@@ -151,7 +152,8 @@ void TreeTableSetManagementStatus::run(MainWindow *mainWindow,
     }
 
     editor->setSegments(segments);
-    mainWindow->update({Editor::TYPE_SEGMENT, Editor::TYPE_MANAGEMENT_STATUS});
+    mainWindow->update(nullptr,
+                       {Editor::TYPE_SEGMENT, Editor::TYPE_MANAGEMENT_STATUS});
 
     LOG_DEBUG(<< "Finished setting management status values.");
 }

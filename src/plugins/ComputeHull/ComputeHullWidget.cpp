@@ -209,7 +209,7 @@ void ComputeHullWidget::slotApply()
         mainWindow_->showError("Unknown error");
     }
 
-    mainWindow_->update({Editor::TYPE_SEGMENT});
+    mainWindow_->update(this, {Editor::TYPE_SEGMENT});
 }
 
 void ComputeHullWidget::slotFindOptimalAlphaChanged(int index)

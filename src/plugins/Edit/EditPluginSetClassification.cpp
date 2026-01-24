@@ -105,7 +105,9 @@ void EditPluginSetClassification::run(MainWindow *mainWindow)
 
     progress.close();
 
-    mainWindow->update({Editor::TYPE_CLASSIFICATION}, Page::STATE_READ);
+    mainWindow->update(nullptr,
+                       {Editor::TYPE_CLASSIFICATION},
+                       Page::STATE_READ);
 
     LOG_DEBUG(<< "Finished setting classification values.");
 }

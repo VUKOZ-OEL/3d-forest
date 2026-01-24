@@ -114,8 +114,9 @@ public:
     void resumeThreads();
     virtual void threadProgress(bool finished) override;
 
-    void update(void *sender, const QSet<Editor::Type> &target);
-    void update(const QSet<Editor::Type> &target,
+    void emitUpdate(void *sender, const QSet<Editor::Type> &target);
+    void update(void *sender,
+                const QSet<Editor::Type> &target,
                 Page::State viewPortsCacheState = Page::STATE_SELECT,
                 bool resetCamera = false);
 
