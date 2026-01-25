@@ -34,6 +34,9 @@ public:
     class Cell
     {
     public:
+        Cell() = default;
+        Cell(const std::string &str) : text(str) {};
+
         std::string text;
     };
 
@@ -41,6 +44,9 @@ public:
     class Column
     {
     public:
+        Column() = default;
+        Column(const std::string &str) : header(str) {};
+
         std::string header;
         std::vector<FileFormatTable::Cell> cells;
     };

@@ -11,6 +11,7 @@ else:
     file_path = "c:/default.json"
 
 st.session_state["file_path"] = file_path
+st.session_state["trees_csv_path"] = os.path.join(os.path.dirname(file_path), 'trees.csv')
 
 # ------------------------------------------------------------------------------
 # Get directory of the running script

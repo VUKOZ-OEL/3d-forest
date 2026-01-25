@@ -65,6 +65,7 @@ public:
     static std::string currentPath();
     static bool exists(const std::string &path);
     static bool absolute(const std::string &path);
+    static std::string directory(const std::string &path);
     static std::string fileName(const std::string &path);
     static std::string baseName(const std::string &path);
     static std::string fileExtension(const std::string &path);
