@@ -140,8 +140,13 @@ void ViewerOpenGLViewport::mouseDoubleClickEvent(QMouseEvent *event)
 
     if (event->button() == Qt::LeftButton)
     {
+        const QPointF posLogical = event->position(); // logical (DIP)
+        const qreal dpr = devicePixelRatioF();        // e.g. 1.25 on 125%
+        const QPoint posDevice = (posLogical * dpr).toPoint(); // device pixels
+
         bool ctrl = event->modifiers() & Qt::ControlModifier;
-        pickObject(event->pos(), ctrl);
+
+        pickObject(posDevice, ctrl);
     }
 
     QOpenGLWidget::mouseDoubleClickEvent(event);
