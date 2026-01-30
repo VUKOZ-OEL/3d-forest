@@ -132,19 +132,31 @@ void ViewerOpenGLViewport::resizeGL(int w, int h)
     // cameraChanged();
 }
 
-void ViewerOpenGLViewport::mouseReleaseEvent(QMouseEvent *event)
+void ViewerOpenGLViewport::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    (void)event;
+    LOG_DEBUG_RENDER(<< "Mouse double click event");
+
+    setFocus();
+
+    if (event->button() == Qt::LeftButton)
+    {
+        bool ctrl = event->modifiers() & Qt::ControlModifier;
+        pickObject(event->pos(), ctrl);
+    }
+
+    QOpenGLWidget::mouseDoubleClickEvent(event);
 }
 
 void ViewerOpenGLViewport::mousePressEvent(QMouseEvent *event)
 {
     LOG_DEBUG_RENDER(<< "Mouse press event");
-    bool ctrl = event->modifiers() & Qt::ControlModifier;
-
     camera_.mousePressEvent(event);
-    pickObject(event->pos(), ctrl);
     setFocus();
+}
+
+void ViewerOpenGLViewport::mouseReleaseEvent(QMouseEvent *event)
+{
+    (void)event;
 }
 
 void ViewerOpenGLViewport::mouseMoveEvent(QMouseEvent *event)
