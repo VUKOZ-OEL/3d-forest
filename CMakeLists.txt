@@ -45,7 +45,22 @@ if(FORCE_QT5)
     endif()
 else()
     # Default autodetect Qt version
-    find_package(Qt6 COMPONENTS Core Gui Widgets WebEngineWidgets OpenGL OpenGLWidgets Concurrent Qml Sql Xml)
+    find_package(Qt6 QUIET COMPONENTS Core Gui Widgets)
+
+    if(Qt6_FOUND)
+        find_package(Qt6 QUIET
+            COMPONENTS Core Gui Widgets
+            OPTIONAL_COMPONENTS
+                WebEngineWidgets
+                OpenGL
+                OpenGLWidgets
+                Concurrent
+                Qml
+                Sql
+                Xml
+        )
+    endif()
+
     if(Qt6_FOUND AND Qt6OpenGL_FOUND AND OpenGL_FOUND)
         message(STATUS "Gui with Qt6 and OpenGL found")
         set(QT_VERSION_MAJOR 6)
@@ -54,7 +69,39 @@ else()
         if (Qt5_FOUND AND Qt5OpenGL_FOUND AND OpenGL_FOUND)
             message(STATUS "Gui with Qt5 and OpenGL found")
             set(QT_VERSION_MAJOR 5)
+        else()
+            message(STATUS "Qt library for Gui not found")
         endif()
+    endif()
+endif()
+
+if(QT_VERSION_MAJOR)
+    if(TARGET Qt${QT_VERSION_MAJOR}::WebEngineWidgets)
+        set(HAS_QT_WEB_ENGINE_WIDGETS ON)
+    endif()
+
+    if(TARGET Qt${QT_VERSION_MAJOR}::OpenGL)
+        set(HAS_QT_OPEN_GL ON)
+    endif()
+
+    if(TARGET Qt${QT_VERSION_MAJOR}::OpenGLWidgets)
+        set(HAS_QT_OPEN_GL_WIDGETS ON)
+    endif()
+
+    if(TARGET Qt${QT_VERSION_MAJOR}::Concurrent)
+        set(HAS_QT_CONCURRENT ON)
+    endif()
+
+    if(TARGET Qt${QT_VERSION_MAJOR}::Qml)
+        set(HAS_QT_QML ON)
+    endif()
+
+    if(TARGET Qt${QT_VERSION_MAJOR}::Sql)
+        set(HAS_QT_SQL ON)
+    endif()
+
+    if(TARGET Qt${QT_VERSION_MAJOR}::Xml)
+        set(HAS_QT_XML ON)
     endif()
 endif()
 

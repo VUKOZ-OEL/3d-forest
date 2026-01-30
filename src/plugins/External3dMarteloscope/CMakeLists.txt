@@ -38,7 +38,6 @@ target_include_directories(
     ${SUB_PROJECT_NAME}
     PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}
-#    ../../../3rdparty/iland-model/src
 )
 
 target_compile_definitions(
@@ -47,13 +46,27 @@ target_compile_definitions(
     EXPORT_${SUB_PROJECT_NAME}=1
 )
 
+if(TARGET Qt${QT_VERSION_MAJOR}::WebEngineWidgets)
+    target_compile_definitions(
+        ${SUB_PROJECT_NAME}
+        PRIVATE
+        HAS_QT_WEB_ENGINE_WIDGETS=1
+    )
+endif()
+
 target_link_libraries(
     ${SUB_PROJECT_NAME}
     PRIVATE
     3DForestGui
-#    ILandModel
-    Qt${QT_VERSION_MAJOR}::WebEngineWidgets
 )
+
+if(TARGET Qt${QT_VERSION_MAJOR}::WebEngineWidgets)
+    target_link_libraries(
+        ${SUB_PROJECT_NAME}
+        PRIVATE
+        Qt${QT_VERSION_MAJOR}::WebEngineWidgets
+    )
+endif()
 
 # Install plugin
 # install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin/plugins)

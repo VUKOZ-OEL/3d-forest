@@ -15,8 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-if(NOT QT_VERSION_MAJOR)
-    message(WARNING "Gui not found - skipping iLand-model")
+if(NOT (QT_VERSION_MAJOR AND
+        HAS_QT_CONCURRENT AND
+        HAS_QT_QML AND
+        HAS_QT_SQL AND
+        HAS_QT_XML))
+    message(WARNING
+            "Gui, Concurrent, Qml, Sql, Xml required - skipping iLand-model")
     return()
 endif()
 

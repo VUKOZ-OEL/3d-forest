@@ -31,7 +31,10 @@ class MainWindow;
 #include <QObject>
 #include <QPointer>
 class QProcess;
-class QWebEngineView;
+
+#if defined(HAS_QT_WEB_ENGINE_WIDGETS)
+    class QWebEngineView;
+#endif
 
 /** External 3d-Marteloscope Runner. */
 class External3dMarteloscopeRunner : public QObject
@@ -55,10 +58,14 @@ private:
     int findFreePort(int startPort) const;
 
     MainWindow *mainWindow_ = nullptr;
+
     QPointer<QProcess> process_;
-    QPointer<QWebEngineView> view_;
     int port_ = -1;
     bool stopping_ = false;
+
+#if defined(HAS_QT_WEB_ENGINE_WIDGETS)
+    QPointer<QWebEngineView> view_;
+#endif
 };
 
 #endif /* EXTERNAL_3D_MARTELOSCOPE_RUNNER_HPP */

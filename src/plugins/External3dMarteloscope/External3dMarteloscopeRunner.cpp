@@ -27,7 +27,9 @@
 #include <QProcess>
 #include <QTcpSocket>
 
-#include <QWebEngineView>
+#if defined(HAS_QT_WEB_ENGINE_WIDGETS)
+    #include <QWebEngineView>
+#endif
 
 // Include local.
 #define LOG_MODULE_NAME "External3dMarteloscopeRunner"
@@ -120,6 +122,7 @@ void External3dMarteloscopeRunner::start(const QString &pythonPath,
 
         QProcess *p = process_; // snapshot pointer for the lambda
 
+#if defined(HAS_QT_WEB_ENGINE_WIDGETS)
         connect(p,
                 &QProcess::finished,
                 this,
@@ -131,14 +134,30 @@ void External3dMarteloscopeRunner::start(const QString &pythonPath,
                         view_->close();
                         view_.clear();
                     }
+
                     // process_->deleteLater();
                     if (process_ == p)
                     {
                         process_.clear();
                     }
                 });
+#else
+        connect(p,
+                &QProcess::finished,
+                this,
+                [this, p]()
+                {
+                    qDebug() << "Streamlit process finished.";
+                    // process_->deleteLater();
+                    if (process_ == p)
+                    {
+                        process_.clear();
+                    }
+                });
+#endif
     }
 
+#if defined(HAS_QT_WEB_ENGINE_WIDGETS)
     // Show the web view
     view_ = new QWebEngineView();
     view_->setAttribute(Qt::WA_DeleteOnClose);
@@ -147,6 +166,7 @@ void External3dMarteloscopeRunner::start(const QString &pythonPath,
     view_->show();
 
     connect(view_, &QObject::destroyed, this, [this]() { view_.clear(); });
+#endif
 }
 
 void External3dMarteloscopeRunner::stop()
@@ -176,11 +196,13 @@ void External3dMarteloscopeRunner::stop()
         process_.clear();
     }
 
+#if defined(HAS_QT_WEB_ENGINE_WIDGETS)
     if (view_)
     {
         view_->close();
         view_.clear();
     }
+#endif
 
     port_ = -1;
     stopping_ = false;

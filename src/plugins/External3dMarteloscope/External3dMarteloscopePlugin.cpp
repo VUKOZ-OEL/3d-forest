@@ -20,7 +20,6 @@
 /** @file External3dMarteloscopePlugin.cpp */
 
 // Include 3D Forest.
-#include <External3dMarteloscopeDialog.hpp>
 #include <External3dMarteloscopePlugin.hpp>
 #include <External3dMarteloscopeRunner.hpp>
 #include <File.hpp>
@@ -30,14 +29,6 @@
 
 // Include Qt.
 #include <QCoreApplication>
-#include <QProcess>
-#include <QUrl>
-#include <QWebEngineView>
-
-// Include 3rd party.
-// #include "global.h"
-// #include "model.h"
-// #include "modelcontroller.h"
 
 // Include local.
 #define LOG_MODULE_NAME "External3dMarteloscopePlugin"
