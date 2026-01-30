@@ -86,10 +86,10 @@ protected:
     ManagementStatusList managementStatus_;
     QueryFilterSet filter_;
 
-    void setManagementStatusList(const ManagementStatusList &managementStatus,
-                                 const QueryFilterSet &filter);
-    void dataChanged();
-    void filterChanged();
+    // New data.
+    void receivedSegments();
+    void receivedManagementStatusList();
+    void sendFilter();
 
     size_t identifier(const QTreeWidgetItem *item);
     void updateTree();

@@ -140,43 +140,17 @@ void FilterManagementStatusWidget::slotUpdate(void *sender,
     if (target.empty() || target.contains(Editor::TYPE_MANAGEMENT_STATUS))
     {
         LOG_DEBUG_UPDATE(<< "Input management status.");
-
-        setManagementStatusList(mainWindow_->editor().managementStatusList(),
-                                mainWindow_->editor().managementStatusFilter());
+        receivedManagementStatusList();
     }
 
     if (target.empty() || target.contains(Editor::TYPE_SEGMENT))
     {
-        LOG_DEBUG_UPDATE(<< "Input segment.");
-        bool found = false;
-        const Segments &segments = mainWindow_->editor().segments();
-        for (size_t i = 0; i < segments.size(); i++)
-        {
-            if (segments[i].selected)
-            {
-                treeWidget_->setSegment(segments[i]);
-                found = true;
-                break;
-            }
-        }
-        if (!found)
-        {
-            treeWidget_->clear();
-        }
+        LOG_DEBUG_UPDATE(<< "Input segments.");
+        receivedSegments();
     }
 }
 
-void FilterManagementStatusWidget::dataChanged()
-{
-    LOG_DEBUG_UPDATE(<< "Output management status.");
-
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setManagementStatusList(managementStatus_);
-    mainWindow_->editor().setManagementStatusFilter(filter_);
-    mainWindow_->updateData();
-}
-
-void FilterManagementStatusWidget::filterChanged()
+void FilterManagementStatusWidget::sendFilter()
 {
     LOG_DEBUG_UPDATE(<< "Output management status filter.");
 
@@ -191,20 +165,37 @@ void FilterManagementStatusWidget::setFilterEnabled(bool b)
               << ">.");
 
     filter_.setEnabled(b);
-    filterChanged();
+    sendFilter();
 }
 
-void FilterManagementStatusWidget::setManagementStatusList(
-    const ManagementStatusList &managementStatus,
-    const QueryFilterSet &filter)
+void FilterManagementStatusWidget::receivedSegments()
+{
+    bool found = false;
+    const Segments &segments = mainWindow_->editor().segments();
+    for (size_t i = 0; i < segments.size(); i++)
+    {
+        if (segments[i].selected)
+        {
+            treeWidget_->setSegment(segments[i]);
+            found = true;
+            break;
+        }
+    }
+    if (!found)
+    {
+        treeWidget_->clear();
+    }
+}
+
+void FilterManagementStatusWidget::receivedManagementStatusList()
 {
     LOG_DEBUG(<< "Set management status n <" << managementStatus.size()
               << ">.");
 
     block();
 
-    managementStatus_ = managementStatus;
-    filter_ = filter;
+    managementStatus_ = mainWindow_->editor().managementStatusList();
+    filter_ = mainWindow_->editor().managementStatusFilter();
 
     tree_->clear();
 
@@ -242,7 +233,7 @@ void FilterManagementStatusWidget::slotShow()
         }
         updatesEnabled_ = true;
 
-        filterChanged();
+        sendFilter();
     }
 }
 
@@ -259,7 +250,7 @@ void FilterManagementStatusWidget::slotHide()
         }
         updatesEnabled_ = true;
 
-        filterChanged();
+        sendFilter();
     }
 }
 
@@ -330,7 +321,7 @@ void FilterManagementStatusWidget::slotItemChanged(QTreeWidgetItem *item,
 
         if (updatesEnabled_)
         {
-            filterChanged();
+            sendFilter();
         }
     }
 }

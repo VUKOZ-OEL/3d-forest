@@ -105,7 +105,7 @@ void FilterManagementStatusTreeWidget::createCheckBoxList()
     }
 
     // Layout.
-    mainLayout_->addWidget(new QLabel(tr("Selected tree:")));
+    mainLayout_->addWidget(new QLabel(tr("Selected trees:")));
     for (size_t i = 0; i < checkboxList_.size(); i++)
     {
         mainLayout_->addWidget(checkboxList_[i]);
@@ -152,25 +152,25 @@ void FilterManagementStatusTreeWidget::slotSetCheckbox(bool b)
 
 void FilterManagementStatusTreeWidget::setCheckbox(size_t idx)
 {
-    LOG_DEBUG(<< "Set checkbox index <" << idx << "> to segment id <"
-              << segment_.id << ">.");
-
-    if (segment_.id == 0)
-    {
-        return;
-    }
+    LOG_DEBUG(<< "Set checkbox index <" << idx << "> to selected segments.");
 
     mainWindow_->suspendThreads();
     Editor *editor = &mainWindow_->editor();
     Segments segments = editor->segments();
 
+    size_t nSelected = 0;
     for (size_t i = 0; i < segments.size(); i++)
     {
-        if (segments[i].id == segment_.id)
+        if (segments[i].selected)
         {
             segments[i].managementStatusId = statusMap_[idx].statusId;
-            break;
+            nSelected++;
         }
+    }
+
+    if (nSelected == 0)
+    {
+        return;
     }
 
     editor->setSegments(segments);
