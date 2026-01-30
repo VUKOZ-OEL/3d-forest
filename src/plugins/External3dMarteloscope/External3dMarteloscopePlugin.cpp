@@ -23,10 +23,10 @@
 #include <External3dMarteloscopeDialog.hpp>
 #include <External3dMarteloscopePlugin.hpp>
 #include <External3dMarteloscopeRunner.hpp>
+#include <File.hpp>
+#include <FileFormatCsv.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
-#include <FileFormatCsv.hpp>
-#include <File.hpp>
 
 // Include Qt.
 #include <QCoreApplication>
@@ -155,6 +155,7 @@ void External3dMarteloscopePlugin::fillTreeTable(FileFormatTable *table)
 
     const Segments &segments = editor.segments();
     const SpeciesList &speciesList = editor.speciesList();
+    const ManagementStatusList &management = editor.managementStatusList();
     double ppm = editor.settings().unitsSettings().pointsPerMeter()[0];
 
     // Header "id;species;x;y;dbh;height".
@@ -183,6 +184,16 @@ void External3dMarteloscopePlugin::fillTreeTable(FileFormatTable *table)
         if (speciesIdx != SIZE_MAX)
         {
             species = speciesList[speciesIdx].abbreviation;
+        }
+
+        size_t managementIdx =
+            management.index(segment.managementStatusId, false);
+        if (managementIdx != SIZE_MAX &&
+            management[managementIdx].label != "Untouched" &&
+            management[managementIdx].label != "Target tree")
+        {
+            // Skip trees with all other management status.
+            continue;
         }
 
         columns[0].cells.push_back(toString(segment.id));
