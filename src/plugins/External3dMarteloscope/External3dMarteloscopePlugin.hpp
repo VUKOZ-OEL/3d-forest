@@ -62,8 +62,6 @@ private:
 
     void run();
     void runPythonApp(const std::string &projectPath);
-    void exportTrees(const std::string &projectPath);
-    void fillTreeTable(FileFormatTable *table);
 };
 
 #endif /* EXTERNAL_3D_MARTELOSCOPE_PLUGIN_HPP */
