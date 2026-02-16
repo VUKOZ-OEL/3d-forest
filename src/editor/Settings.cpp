@@ -113,7 +113,6 @@ void toJson(Json &out, const Settings &in)
 
 void toJsonProjectSettings(Json &out, const Settings &in)
 {
-    toJson(out[SETTINGS_KEY_APPLICATION], in.applicationSettings_);
     toJson(out[SETTINGS_KEY_RENDERING], in.renderingSettings_);
     toJson(out[SETTINGS_KEY_TREE], in.treeSettings_);
     toJson(out[SETTINGS_KEY_UNITS], in.unitsSettings_);
