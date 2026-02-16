@@ -21,6 +21,7 @@
 
 // Include 3D Forest.
 #include <FilterManagementStatusTreeWidget.hpp>
+#include <Core.hpp>
 #include <MainWindow.hpp>
 
 // Include Qt.
@@ -97,7 +98,8 @@ void FilterManagementStatusTreeWidget::createCheckBoxList()
     {
         checkboxList_[i] = new QCheckBox;
         checkboxList_[i]->setChecked(false);
-        checkboxList_[i]->setText(statusMap_[i].label);
+        auto label = core().translate(statusMap_[i].label.toStdString());
+        checkboxList_[i]->setText(QString::fromStdString(label));
         connect(checkboxList_[i],
                 SIGNAL(clicked(bool)),
                 this,

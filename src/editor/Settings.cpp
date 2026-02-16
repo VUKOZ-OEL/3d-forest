@@ -26,6 +26,7 @@
 #define LOG_MODULE_NAME "Settings"
 #include <Log.hpp>
 
+static const char *SETTINGS_KEY_APPLICATION = "applicationSettings";
 static const char *SETTINGS_KEY_RENDERING = "renderingSettings";
 static const char *SETTINGS_KEY_TREE = "treeSettings";
 static const char *SETTINGS_KEY_UNITS = "unitsSettings";
@@ -61,6 +62,11 @@ void Settings::setViewSettings(const ViewSettings &viewSettings)
 
 void fromJson(Settings &out, const Json &in)
 {
+    if (in.contains(SETTINGS_KEY_APPLICATION))
+    {
+        fromJson(out.applicationSettings_, in[SETTINGS_KEY_APPLICATION]);
+    }
+
     if (in.contains(SETTINGS_KEY_RENDERING))
     {
         fromJson(out.renderingSettings_, in[SETTINGS_KEY_RENDERING]);
@@ -95,6 +101,7 @@ void fromJson(Settings &out, const Json &in)
 
 void toJson(Json &out, const Settings &in)
 {
+    toJson(out[SETTINGS_KEY_APPLICATION], in.applicationSettings_);
     toJson(out[SETTINGS_KEY_RENDERING], in.renderingSettings_);
     toJson(out[SETTINGS_KEY_TREE], in.treeSettings_);
     toJson(out[SETTINGS_KEY_UNITS], in.unitsSettings_);
@@ -106,6 +113,7 @@ void toJson(Json &out, const Settings &in)
 
 void toJsonProjectSettings(Json &out, const Settings &in)
 {
+    toJson(out[SETTINGS_KEY_APPLICATION], in.applicationSettings_);
     toJson(out[SETTINGS_KEY_RENDERING], in.renderingSettings_);
     toJson(out[SETTINGS_KEY_TREE], in.treeSettings_);
     toJson(out[SETTINGS_KEY_UNITS], in.unitsSettings_);

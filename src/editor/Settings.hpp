@@ -26,6 +26,7 @@
 #include <ManagementStatusList.hpp>
 #include <RenderingSettings.hpp>
 #include <SpeciesList.hpp>
+#include <ApplicationSettings.hpp>
 #include <TreeSettings.hpp>
 #include <UnitsSettings.hpp>
 #include <ViewSettings.hpp>
@@ -64,6 +65,7 @@ public:
     };
 
 protected:
+    ApplicationSettings applicationSettings_;
     RenderingSettings renderingSettings_;
     TreeSettings treeSettings_;
     UnitsSettings unitsSettings_;

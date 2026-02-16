@@ -25,6 +25,7 @@
 #include <FilterManagementStatusWidget.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
+#include <Core.hpp>
 
 // Include Qt.
 #include <QHBoxLayout>
@@ -397,7 +398,8 @@ void FilterManagementStatusWidget::addTreeItem(size_t index)
     item->setText(COLUMN_ID, QString::number(managementStatus.id));
 
     // Label.
-    item->setText(COLUMN_LABEL, QString::fromStdString(managementStatus.label));
+    auto label = core().translate(managementStatus.label);
+    item->setText(COLUMN_LABEL, QString::fromStdString(label));
 
     // Color legend.
     QColor color;
