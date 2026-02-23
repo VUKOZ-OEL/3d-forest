@@ -1,22 +1,22 @@
 import streamlit as st
 import pandas as pd
-from st_aggrid import AgGrid, GridOptionsBuilder, DataReturnMode, GridUpdateMode
-from src.io import load_project_json
 import numpy as np
+import re
+import src.io_utils as iou
 
 # stránka na šířku
 st.set_page_config(layout="wide")
 
 # --- Načtení dat do session_state ---
 if "trees" not in st.session_state:
-    file_path = st.session_state["file_path"]
-    st.session_state.trees = load_project_json(file_path)
-
-# Přidej management_status, pokud chybí
-if "management_status" not in st.session_state.trees.columns:
-    st.session_state.trees["management_status"] = "none"
+    file_path = "c:/Users/krucek/OneDrive - vukoz.cz/DATA/_GS-LCR/SLP_Pokojna/PokojnaHora_3df/_PokojnaHora_v11.json"
+    st.session_state.trees = iou.load_project_json(file_path)
 
 df = st.session_state.trees
+
+# Přidej management_status, pokud chybí
+if "management_status" not in df.columns:
+    df["management_status"] = "none"
 
 # --- Vyber jen "ploché" sloupce (žádné list/dict/tuple/set) ---
 def is_nested(val):
@@ -24,64 +24,77 @@ def is_nested(val):
 
 flat_columns = []
 for col in df.columns:
-    # bezpečně přeskoč NaN/None
     has_nested = df[col].dropna().apply(is_nested).any() if col in df else False
     if not has_nested:
         flat_columns.append(col)
 
-# zajisti přítomnost id a management_status
+# zajisti přítomnost id a management_status (pokud tam jsou, ale vypadly z flat_columns)
 must_have = [c for c in ["id", "management_status"] if c in df.columns and c not in flat_columns]
 display_columns = flat_columns + must_have
 
 # --- Kopie pro zobrazení + zaokrouhlení numerických hodnot na 1 desetinné místo ---
 df_display = df[display_columns].copy()
 
-# zaokrouhlení všech numerických sloupců (vč. int -> float s 1 des. místem)
 num_cols = df_display.select_dtypes(include=[np.number]).columns
 if len(num_cols) > 0:
     df_display[num_cols] = df_display[num_cols].round(1)
 
-# --- Konfigurace AgGrid (needitovatelná, bez výběru/checkboxů) ---
-gb = GridOptionsBuilder.from_dataframe(df_display)
+# --- Příprava zvýraznění řádků podle managementColorHex ---
+# robustní parsování barvy (podporuje "#RRGGBB", "RRGGBB", "#RGB", "rgb(...)", "rgba(...)")
+def parse_color_to_rgb(value: str):
+    if not isinstance(value, str):
+        return None
+    s = value.strip()
+    # rgb/rgba
+    m = re.match(r"rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)", s, flags=re.I)
+    if m:
+        r, g, b = (int(m.group(1)), int(m.group(2)), int(m.group(3)))
+        r = max(0, min(255, r)); g = max(0, min(255, g)); b = max(0, min(255, b))
+        return (r, g, b)
+    # #RRGGBB nebo RRGGBB
+    m = re.match(r"^#?([0-9a-fA-F]{6})$", s)
+    if m:
+        hex6 = m.group(1)
+        r = int(hex6[0:2], 16)
+        g = int(hex6[2:4], 16)
+        b = int(hex6[4:6], 16)
+        return (r, g, b)
+    # #RGB
+    m = re.match(r"^#?([0-9a-fA-F]{3})$", s)
+    if m:
+        h = m.group(1)
+        r = int(h[0]*2, 16)
+        g = int(h[1]*2, 16)
+        b = int(h[2]*2, 16)
+        return (r, g, b)
+    return None
 
-# žádné checkboxy, žádný výběr
-# (když nena-konfigurujeme selection, ag-Grid výběr neumožní a nevkládá checkboxový sloupec)
-gb.configure_grid_options(
-    domLayout="normal",
-    suppressRowClickSelection=True,    # jistota, že nepůjde vybírat klikem
-    suppressHorizontalScroll=False,
-)
+# map index -> rgba styl
+alpha = 0.15  # "lehké" podbarvení
+row_bg_cache = {}
+if "managementColorHex" in df.columns:
+    for idx, val in df["managementColorHex"].items():
+        rgb = parse_color_to_rgb(val)
+        if rgb:
+            r, g, b = rgb
+            row_bg_cache[idx] = f"background-color: rgba({r},{g},{b},{alpha})"
+        else:
+            row_bg_cache[idx] = ""  # bez zvýraznění
+else:
+    # sloupec není – bez zvýraznění
+    row_bg_cache = {idx: "" for idx in df_display.index}
 
-# širší defaultní sloupce + resizable
-# (nastavíme v defaultColDef; minWidth zajistí větší výchozí šířku)
-grid_options = gb.build()
-grid_options.setdefault("defaultColDef", {})
-grid_options["defaultColDef"].update({
-    "resizable": True,
-    "minWidth": 100,     # zvětšená minimální šířka sloupců
-})
+def style_row(row: pd.Series):
+    # vrátí list stylů pro všechny sloupce v aktuálním řádku
+    bg = row_bg_cache.get(row.name, "")
+    return [bg] * len(row)
 
-# zapnout sidebar s filtry
-grid_options["sideBar"] = {
-    "toolPanels": [
-        {"id": "filters", "labelDefault": "Filters", "labelKey": "filters", "iconKey": "filter", "toolPanel": "agFiltersToolPanel"},
-    ],
-    "defaultToolPanel": "filters",
-}
+# vytvoř Styler; index držíme z původního DF, aby šel dohledat row_bg_cache
+styler = df_display.style.apply(style_row, axis=1)
 
-# nechceme auto-fit sloupců (ať zůstanou širší a jde scrollovat)
-# fit_columns_on_grid_load=False -> zachovává šířky a nechává horizontální posuvník
-GRID_HEIGHT = 600  # dostatečně vysoké, aby bylo maximum v rámci „wide“ layoutu; posuvník řeší zbytek
-
-# --- Zobrazení AgGrid ---
-AgGrid(
-    df_display,
-    gridOptions=grid_options,
-    update_mode=GridUpdateMode.NO_UPDATE,              # nic needitujeme, tak není třeba update eventů
-    data_return_mode=DataReturnMode.FILTERED_AND_SORTED,
-    theme="streamlit",
-    enable_enterprise_modules=False,
-    fit_columns_on_grid_load=False,                    # důležité: nezmenšuj sloupce na šířku containeru
-    height=GRID_HEIGHT,                                # velké, ale s vertikálním scrollbarem, takže nepřetéká stránku
-    key="trees_grid",
+# --- Zobrazení nativní tabulky ---
+st.dataframe(
+    styler,
+    use_container_width=True,
+    height=600
 )
