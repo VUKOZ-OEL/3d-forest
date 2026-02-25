@@ -1,17 +1,49 @@
 import streamlit as st
 import pandas as pd
-import src.io as io
+import src.io_utils as iou
 from pygwalker.api.streamlit import StreamlitRenderer
- 
-# Adjust the width of the Streamlit page
-st.set_page_config(
-    page_title="Use Pygwalker In Streamlit",
-)
+
 # Import your data
 
+with st.expander("### Interaktivní tvorba uživatelských grafů"):
+    st.markdown("""
+        #### Orientace v okně (co kam táhnout)
+        Fields (sloupce) – app rozliší Dimension (kategorie, datum) vs Measure (číselné metriky), jde to ale měnit.
+        X / Y – vodorovná a svislá osa.
+        Color / Size / Shape – vizuální kódování další proměnné.
+        Row / Column – facety (mřížka grafů) podle kategorií.
+        Mark (typ grafu) – sloupcový, čárový, bodový, histogram, heatmapa…
+
+        Aggregate – souhrny (Count, Sum, Avg, Min/Max…).
+        Filters – výběr subsetu dat (práh, seznam hodnot, rozsahy).
+        Data Table – náhled tabulky, rychlé profilování a změny typů.
+
+        #### Rychlé recepty (tažení-a-pouštění)
+        Sloupcový graf: počty podle kategorie
+        Přetáhni kategorii na X, Count (nebo jinou metriku) na Y → „Bar“.
+
+        Časová řada
+        Přetáhni datum/čas na X, metriku na Y → „Line“.
+
+        Histogram / Heatmapa
+        Jedna číselná proměnná na X → „Histogram“. Dvě na X a Y → „Heatmap“.
+
+        Bodový graf se třemi proměnnými
+        X = metrika1, Y = metrika2, Color = kategorie (nebo Size = metrika3).
+        Facety (mřížka)
+        Táhni kategorii do Row nebo Column → jeden graf na každou hodnotu.
+        Top N
+        Seřaď Y a ve filtru nech „First N rows“ (nebo vyber konkrétní hodnoty).
+
+        #### Uložení & sdílení
+        Uložení konfigurace grafů (aby ses k nim vrátil později): parametr spec="moje_nastaveni.json" – stav uložíš z UI tlačítkem Save a příště načteš automaticky. 
+        Export do HTML (samostatná stránka pro sdílení): HTML export přes API (např. to_html) – výsledek můžeš poslat kolegům. 
+
+     """)
+
 if "trees" not in st.session_state:
-    file_path = st.session_state["file_path"]
-    st.session_state.trees = io.load_project_json(file_path)
+    file_path = ("c:/Users/krucek/OneDrive - vukoz.cz/DATA/_GS-LCR/SLP_Pokojna/PokojnaHora_3df/PokojnaHora.json")
+    st.session_state.trees = iou.load_project_json(file_path)
 
 df: pd.DataFrame = st.session_state.trees.copy()
 

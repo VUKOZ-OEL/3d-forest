@@ -1,338 +1,266 @@
+from datetime import datetime
 import streamlit as st
 import pandas as pd
-import numpy as np
-import math
-import plotly.express as px
-import src.io as io
-from plotly.subplots import make_subplots
-import plotly.graph_objects as go
 
-# --- Data ---
-if "trees" not in st.session_state:
-    file_path = st.session_state["file_path"]
-    st.session_state.trees = io.load_project_json(file_path)
+import src.io_utils as iou
+from src.i18n import t, t_help
+from src.db_utils import (
+    get_sqlite_path_from_session,
+    ensure_mgmt_tables,
+    list_managements,
+    load_management_map,
+    save_management_from_trees,
+    delete_management,
+)
 
+
+from src.report_utils import generate_all_summary_figs, build_intervention_report_pdf, SummaryVariant
+
+# ---------- DATA ----------
+plot_info = st.session_state.plot_info
 df: pd.DataFrame = st.session_state.trees.copy()
 
-# ========== UI HLAVIČKA ==========
+# ---------- DB PATH ----------
+sqlite_path = get_sqlite_path_from_session(st.session_state)
+ensure_mgmt_tables(sqlite_path)
 
-st.markdown("### Marteloscope site: XXX")
-st.markdown("new line")
-st.markdown("new line 2")
-
-# Přepínač typu distribuce (segmented_control pokud je k dispozici)
-dist_options = ["Species Distribution", "DBH Distribution", "Height Distribution"]
-c_left, c_mid, c_right = st.columns([1, 2, 1])
-
-with c_left:
-    st.markdown("#### Show Management by:")
-
-with c_mid:
-    dist_mode = st.segmented_control("", options=dist_options, default="Species Distribution")
-
-# ========== SPOLEČNÉ POMŮCKY ==========
-CHART_HEIGHT = 200  # výška každého grafu
-
-df = df.copy()
-if "speciesColorHex" in df.columns:
-    df["speciesColorHex"] = df["speciesColorHex"]
-if "species" in df.columns:
-    df["species"] = df["species"].astype(str)
-
-keep_status = {"Target tree", "Untouched"}
-mask_after   = df.get("management_status", pd.Series(False, index=df.index)).isin(keep_status)
-mask_removed = ~mask_after if "management_status" in df.columns else pd.Series(False, index=df.index)
-
-# ========== SPECIES DISTRIBUTION ==========
-def render_species_distribution(df_all: pd.DataFrame):
-    required = {"species", "management_status", "speciesColorHex"}
-    missing = required - set(df_all.columns)
-    if missing:
-        st.warning("Chybí sloupce pro Species distribution: " + ", ".join(sorted(missing)))
-        return
-
-    def counts_by_species(sub: pd.DataFrame) -> pd.DataFrame:
-        return (sub.groupby("species", as_index=False)
-                    .agg(count=("species", "size"),
-                         speciesColorHex=("speciesColorHex", "first")))
-
-    before_df  = counts_by_species(df_all)
-    after_df   = counts_by_species(df_all[mask_after])
-    removed_df = counts_by_species(df_all[mask_removed])
-
-    # Pořadí dle Before
-    species_order = before_df.sort_values("count", ascending=False)["species"].tolist()
-
-    # Doplň chybějící druhy na 0 a barvy z before_df
-    def ensure_all_species(sub_counts: pd.DataFrame) -> pd.DataFrame:
-        base = pd.DataFrame({"species": species_order})
-        sub  = base.merge(sub_counts, on="species", how="left")
-        sub["count"] = sub["count"].fillna(0).astype(int)
-        color_map_full = dict(zip(before_df["species"], before_df["speciesColorHex"]))
-        sub["speciesColorHex"] = sub["species"].map(color_map_full).fillna("#AAAAAA")
-        return sub
-
-    before_df  = ensure_all_species(before_df)
-    after_df   = ensure_all_species(after_df)
-    removed_df = ensure_all_species(removed_df)
-
-    # Barvy per druh do px.bar
-    discrete_map = dict(zip(before_df["species"], before_df["speciesColorHex"]))
-
-    # Fix Y (zaokrouhlení nahoru na 50)
-    y_max_before = int(before_df["count"].max() if len(before_df) else 0)
-    y_upper = int(max(50, math.ceil(y_max_before / 50.0) * 50))
-
-    def bar(fig_df: pd.DataFrame, title: str):
-        fig = px.bar(
-            fig_df,
-            x="species",
-            y="count",
-            color="species",
-            color_discrete_map=discrete_map,
-            category_orders={"species": species_order},
-            title=title
-        )
-        fig.update_layout(
-            showlegend=False,
-            height=CHART_HEIGHT + 100,
-            margin=dict(l=10, r=10, t=40, b=10),
-        )
-        fig.update_xaxes(title=None, tickangle=45)
-        fig.update_yaxes(title="Trees", range=[0, y_upper], tick0=0, dtick=50)
-        return fig
-
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        st.plotly_chart(bar(before_df, "Before"), use_container_width=True)
-    with c2:
-        st.plotly_chart(bar(after_df,  "After"), use_container_width=True)
-    with c3:
-        st.plotly_chart(bar(removed_df, "Removed"), use_container_width=True)
-
-# ========== OBECNÁ BINNERKA PRO DBH / HEIGHT ==========
-# --- helper: barvy druhů z celého df (konzistence napříč grafy) ---
-
-
-def _species_colors(df_all: pd.DataFrame) -> dict:
-    if "species" not in df_all.columns or "speciesColorHex" not in df_all.columns:
-        return {}
-    tmp = (df_all.assign(species=lambda d: d["species"].astype(str),
-                         speciesColorHex=lambda d: d["speciesColorHex"])
-                 .groupby("species")["speciesColorHex"].first())
-    return tmp.to_dict()
-
-# --- helper: společné biny a popisky z CELÉHO df (stejná X-osa pro všechny tři grafy) ---
-def _make_bins_labels(df_all: pd.DataFrame, value_col: str, bin_size: float, unit_label: str):
-    vals = pd.to_numeric(df_all.get(value_col), errors="coerce")
-    vals_ok = vals.dropna()
-    if vals_ok.empty:
-        return None, None
-    vmin = float(np.floor(vals_ok.min() / bin_size) * bin_size)
-    vmax = float(np.ceil (vals_ok.max()  / bin_size) * bin_size)
-    if vmax <= vmin:
-        vmax = vmin + bin_size
-    bins = np.arange(vmin, vmax + bin_size, bin_size, dtype=float)
-    labels = [f"{int(b)}–{int(b + bin_size)} {unit_label}" for b in bins[:-1]]
-    return bins, labels
-
-
-# --- robustní masky (nepočítat NaN jako Removed) ---
-def _make_masks(df: pd.DataFrame):
-    keep_status = {"Target tree", "Untouched"}
-    mask_after   = df.get("management_status", pd.Series(False, index=df.index)).isin(keep_status)
-    mask_removed = ~mask_after if "management_status" in df.columns else pd.Series(False, index=df.index)
-    print(mask_removed)
-    return mask_after, mask_removed
-
-
-# --- helper pro výšku osy Y: max počet stromů v binu (z daného sloupce) ---
-def _y_upper_for(df_all: pd.DataFrame, value_col: str, bins: np.ndarray, labels: list[str]) -> int:
-    vals = pd.to_numeric(df_all.get(value_col), errors="coerce")
-    cats = pd.cut(vals, bins=bins, labels=labels, include_lowest=True, right=False, ordered=True)
-    vc = cats.value_counts()
-    if vc.empty:
-        return 10
-    return int(max(10, math.ceil(vc.max() / 10.0) * 10))
-
-def _compute_binned_counts(df_sub: pd.DataFrame,
-                           value_col: str,
-                           bins: np.ndarray,
-                           color_map_species: dict,
-                           labels: list[str]) -> pd.DataFrame:
+# ---------- helper: user cache ----------
+def _ensure_usr_cache():
     """
-    Vrátí long DF: ['bin','species','count'] se zaručenými nulami pro chybějící kombinace
-    a stabilním pořadím tříd (labels). Ošetří i prázdné/NaN hodnoty.
+    Uloží aktuální user management_status do usr_mgmt_cache, pokud ještě není.
+    Cache je "poslední uživatelský zásah" nezávislý na přepínání scénářů.
     """
-    d = df_sub.copy()
+    if "usr_mgmt_cache" not in st.session_state or st.session_state["usr_mgmt_cache"] is None:
+        tmp = st.session_state.trees[["id", "management_status"]].copy()
+        tmp["id"] = pd.to_numeric(tmp["id"], errors="coerce").astype("Int64")
+        tmp = tmp.dropna(subset=["id"]).copy()
+        tmp["id"] = tmp["id"].astype(int)
+        st.session_state["usr_mgmt_cache"] = dict(zip(tmp["id"].tolist(), tmp["management_status"].tolist()))
 
-    cat = pd.Categorical(pd.cut(d[value_col], bins=bins, labels=labels,
-                                include_lowest=True, right=False, ordered=True),
-                         categories=labels, ordered=True)
-    d = d.assign(bin=cat)
+def _restore_usr_cache():
+    _ensure_usr_cache()
+    tr = st.session_state.trees.copy()
+    tr["id"] = pd.to_numeric(tr["id"], errors="coerce").astype("Int64")
+    tr = tr.dropna(subset=["id"]).copy()
+    tr["id"] = tr["id"].astype(int)
 
-    # pivot = čisté počty řádků (kusy)
-    species_all = sorted(pd.Index(d["species"]).union(pd.Index(color_map_species.keys())))
-    idx = pd.MultiIndex.from_product([labels, species_all], names=["bin", "species"])
+    cache = st.session_state.get("usr_mgmt_cache", {}) or {}
+    # apply only where cache has value (and not None)
+    tr["management_status"] = tr["id"].map(cache).fillna(tr["management_status"])
+    # refresh colors
+    palette = st.session_state.get("color_palette", {})
+    tr = iou.refresh_management_colors(tr, palette)
+    st.session_state.trees = tr
+
+def _apply_saved_mgmt(mgmt_id: int):
+    # before switching away, preserve current user intervention (once)
+    _ensure_usr_cache()
+
+    mp = load_management_map(sqlite_path, mgmt_id=int(mgmt_id))
+    tr = st.session_state.trees.copy()
+
+    tr["id"] = pd.to_numeric(tr["id"], errors="coerce").astype("Int64")
+    tr = tr.dropna(subset=["id"]).copy()
+    tr["id"] = tr["id"].astype(int)
+
+    # apply scenario values only where present
+    s = tr["id"].map(mp)
+    mask = s.notna()
+    tr.loc[mask, "management_status"] = s.loc[mask].astype(object)
+
+    palette = st.session_state.get("color_palette", {})
+    tr = iou.refresh_management_colors(tr, palette)
+    st.session_state.trees = tr
 
 
-    pv = (d.pivot_table(index="bin", columns="species", aggfunc="size", fill_value=0))
-    print(pv)
-    long = pv.stack().rename("count").reset_index()
+# ---------- OVLÁDÁNÍ ----------
+c1, c2 = st.columns([2, 2])
 
-    # barvy
-    discrete_map = {sp: color_map_species.get(sp, "#AAAAAA") for sp in long["species"].unique()}
-    long["count"] = long["count"].astype(int)
-    print(long)
-    return long
+with c1:
+    st.markdown(f"### :orange[**{plot_info['name'].iloc[0]}**]")
+    st.markdown("###")
 
-
-def build_three_panel_shared_legend(df_all: pd.DataFrame,
-                                    value_col: str,
-                                    bin_size: float,
-                                    unit_label: str,
-                                    color_map: dict,
-                                    m_after: pd.Series,
-                                    m_removed: pd.Series,
-                                    y_upper: int):
-    """Vytvoří 3 podgrafy vedle sebe + jednu sdílenou legendu dole."""
-    # společné biny a štítky
-    bins, labels = _make_bins_labels(df_all, value_col, bin_size, unit_label)
-    if bins is None:
-        return None
-
-    # počty v long formátu pro každou fázi
-    long_before  = _compute_binned_counts(df_all,              value_col, bins, color_map,labels)
-    long_after   = _compute_binned_counts(df_all[m_after],     value_col, bins, color_map,labels)
-    long_removed = _compute_binned_counts(df_all[m_removed],   value_col, bins, color_map,labels)
-
-    # sjednocený seznam druhů kvůli barvám + stabilní pořadí
-    species_all = sorted(pd.Index(long_before["species"]).astype(str).str.strip().unique())
-    print(species_all)
-
-    # default barvy pro chybějící druhy
-    def color_for(sp):
-        return color_map.get(sp, "#AAAAAA")
-
-    # vytvoření subplots
-    fig = make_subplots(
-        rows=1, cols=3,
-        subplot_titles=("Before", "After", "Removed"),
-        horizontal_spacing=0.06
+    st.markdown(f"##### {t('overview_header')}")
+    st.markdown("")
+    st.markdown(
+        f"""
+- **{t('forest_type')}** {plot_info['forest_type'].iloc[0]}
+- **{t('number_of_trees_label')}** {plot_info['no_trees'].iloc[0]}
+- **{t('wood_volume_label')}** {plot_info['volume'].iloc[0]} m³
+- **{t('area')}** {plot_info['size_ha'].iloc[0]} ha
+- **{t('altitude')}** {plot_info['altitude'].iloc[0]} m
+- **{t('precipitation')}** {plot_info['precipitation'].iloc[0]} mm/year
+- **{t('average_temperature')}** {plot_info['temperature'].iloc[0]} °C
+- **{t('established')}** {plot_info['established'].iloc[0]}
+- **{t('location')}** {plot_info['state'].iloc[0]}
+- **{t('owner')}** {plot_info['owner'].iloc[0]}
+- **{t('scan_date')}** {plot_info['scan_date'].iloc[0]}
+"""
     )
 
-    # přidej stackované bary po druzích do každého subgrafu
-    # aby se legenda nedublovala: showlegend=True pouze při prvním přidání daného druhu (v 1. podgrafu)
-    def add_traces(long_df: pd.DataFrame, col: int, show_legend_for_species: set[str]):
-        for sp in species_all:
-            y_vals = (long_df[long_df["species"] == sp]
-                      .set_index("bin")
-                      .reindex(labels)["count"]
-                      .fillna(0)
-                      .tolist())
-            fig.add_trace(
-                go.Bar(
-                    x=labels,
-                    y=y_vals,
-                    name=sp,
-                    marker_color=color_for(sp),
-                    showlegend=(sp in show_legend_for_species),
-                    hovertemplate=f"%{{x}}<br>Species: {sp}<br>Trees: %{{y}}<extra></extra>",
-                ),
-                row=1, col=col
+with c2:
+    st.markdown(f"##### {t('choose_existing_selection')}")
+    st.markdown("")
+
+    msg = st.session_state.pop("flash_success", None)
+    if msg:
+        st.success(msg)
+
+    # --- dropdown items ---
+    # special "user" option
+    USER_KEY = "__USER__"
+
+    mgmts_df = list_managements(sqlite_path)
+    # make labels like: "Label (id: 12)"
+    saved_items = []
+    for _, r in mgmts_df.iterrows():
+        mid = int(r["mgmt_id"])
+        lbl = str(r["label"])
+        saved_items.append((f"{lbl}  (id: {mid})", mid))
+
+    # options mapping: display_label -> value (USER_KEY or mgmt_id)
+    options = {t("usr_mgmt_unsaved"): USER_KEY}
+    for disp, mid in saved_items:
+        options[disp] = mid
+
+    labels = list(options.keys())
+
+    # current selection
+    active = st.session_state.get("active_mgmt_selection", USER_KEY)
+    # invert to label
+    inv = {v: k for k, v in options.items()}
+    current_label = inv.get(active, t("usr_mgmt_unsaved"))
+    default_index = labels.index(current_label) if current_label in labels else 0
+
+    selected_label = st.selectbox(
+        f"**{t('management_examples')}**",
+        labels,
+        index=default_index,
+        key="mgmt_selectbox",
+    )
+    selected_value = options[selected_label]  # USER_KEY or mgmt_id
+
+    # ---- Load (switch displayed management) ----
+    if st.button(
+        f"**{t('load_example')}**",
+        icon=":material/model_training:",
+        use_container_width=True,
+        key="btn_load_mgmt",
+    ):
+        if selected_value == USER_KEY:
+            _restore_usr_cache()
+            st.session_state.active_mgmt_selection = USER_KEY
+            st.session_state.flash_success = t("success_load_usr_mgmt")
+        else:
+            _apply_saved_mgmt(int(selected_value))
+            st.session_state.active_mgmt_selection = int(selected_value)
+            st.session_state.flash_success = t("success_load_mgmt")
+        st.session_state.flash_success_ts = pd.Timestamp.utcnow().isoformat()
+        st.rerun()
+
+    st.divider()
+
+    # ---- Save current user intervention to SQLite ----
+    st.markdown(f"##### {t('save_current_mgmt_header')}")
+    label = st.text_input(
+        f"**{t('mgmt_label_input')}**",
+        value="",
+        placeholder=t("mgmt_label_placeholder"),
+        key="mgmt_label_input",
+    )
+
+    if st.button(
+        f"**{t('save_current_mgmt_btn')}**",
+        icon=":material/save:",
+        use_container_width=True,
+        key="btn_save_current_mgmt",
+    ):
+        if not str(label).strip():
+            st.warning(t("mgmt_label_required"))
+        else:
+            # IMPORTANT: we save what's currently in trees[management_status] (user intervention)
+            new_id = save_management_from_trees(
+                sqlite_path=sqlite_path,
+                trees=st.session_state.trees,
+                label=str(label).strip(),
+                id_col="id",
+                value_col="management_status",
+            )
+            st.session_state.active_mgmt_selection = int(new_id)
+            st.session_state.flash_success = t("success_save_mgmt")
+            st.session_state.flash_success_ts = pd.Timestamp.utcnow().isoformat()
+            st.rerun()
+
+    # ---- Delete selected saved management from SQLite ----
+    can_delete = selected_value != USER_KEY
+    if st.button(
+        f"**{t('delete_selected_mgmt_btn')}**",
+        icon=":material/delete:",
+        use_container_width=True,
+        disabled=not can_delete,
+        key="btn_delete_selected_mgmt",
+        type="primary",
+    ):
+        if can_delete:
+            delete_management(sqlite_path, int(selected_value))
+            # after delete: go back to user intervention view
+            st.session_state.active_mgmt_selection = USER_KEY
+            _restore_usr_cache()
+            st.session_state.flash_success = t("success_delete_mgmt")
+            st.session_state.flash_success_ts = pd.Timestamp.utcnow().isoformat()
+            st.rerun()
+
+    st.divider()
+
+    st.markdown(f"##### {t('project_controls')}")
+   # --- Label zásahu (přizpůsob si podle svého mgmt logiky) ---
+    active = st.session_state.get("active_mgmt_selection", "__USER__")
+    if active == "__USER__":
+        intervention_label = t("usr_mgmt_unsaved")  # např. "Uživatelský zásah (neuložený)"
+    else:
+        #intervention_label = f"{t('management_examples')} #{active}"
+        active_label = next((lbl for lbl, mid in saved_items if mid == active), None)
+        intervention_label = active_label if active_label else t("usr_mgmt_unsaved")
+
+# --- 1) Render tlačítko ---
+    if st.button(
+        t("export_results"),
+        icon=":material/file_save:",
+        use_container_width=True,
+    ):
+        with st.spinner(t("export_rendering_pdf")):
+
+            figs = generate_all_summary_figs(
+                plot_info=st.session_state.plot_info,
+                trees=st.session_state.trees,
+                t=t,
             )
 
-    # legenda jen v prvním panelu
-    add_traces(long_before,  col=1, show_legend_for_species=set(species_all))
-    add_traces(long_after,   col=2, show_legend_for_species=set())  # bez legendy
-    add_traces(long_removed, col=3, show_legend_for_species=set())  # bez legendy
+            pdf_bytes = build_intervention_report_pdf(
+                plot_info=st.session_state.plot_info,
+                trees=st.session_state.trees,
+                figs=figs,
+                intervention_label=intervention_label,
+                t=t,
+                language=st.session_state.get("lang", "cs"),
+                created_dt=datetime.now(),
+            )
 
-    # layout
-    fig.update_layout(
-        barmode="stack",
-        height=CHART_HEIGHT + 140,  # trochu místa navíc na legendu
-        margin=dict(l=10, r=10, t=60, b=80),
-        legend=dict(
-            orientation="h",
-            yanchor="top",
-            y=-0.35,     # pod grafy
-            xanchor="center",
-            x=0.5,
-            title="Species"
+            st.session_state["export_pdf_bytes"] = pdf_bytes
+            st.session_state["export_pdf_name"] = f"report_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf"
+            st.session_state["export_pdf_ready_ts"] = datetime.now().isoformat()
+
+    # --- 2) Download se ukáže až po renderu ---
+    if st.session_state.get("export_pdf_bytes"):
+        st.download_button(
+            label=t("export_download_ready"),
+            data=st.session_state["export_pdf_bytes"],
+            file_name=st.session_state.get("export_pdf_name", "report.pdf"),
+            mime="application/pdf",
+            icon=":material/download:",
+            use_container_width=True,
         )
-    )
-    # osy
-    fig.update_xaxes(title_text=None, tickangle=45, categoryorder="array", categoryarray=labels)
-    # titul pouze u 1. panelu
-    fig.update_yaxes(title_text="Trees", row=1, col=1, tick0=0, dtick=25, range=[0, y_upper])
-    fig.update_yaxes(title_text=None, row=1, col=2, tick0=0, dtick=25, range=[0, y_upper])
-    fig.update_yaxes(title_text=None, row=1, col=3, tick0=0, dtick=25, range=[0, y_upper])
-
-    return fig
-
-# === Nahraďte vaši původní funkci render_dbh_distribution tímto ===
-def render_dbh_distribution(df_all: pd.DataFrame):
-    bins, labels = _make_bins_labels(df_all, "dbh", 10, "cm")
-    if bins is None:
-        st.info("Žádné platné DBH hodnoty.")
-        return
-
-    color_map = _species_colors(df_all)
-    m_after, m_removed = _make_masks(df_all)
-    y_upper = _y_upper_for(df_all, "dbh", bins, labels)
-
-    fig = build_three_panel_shared_legend(
-        df_all=df_all,
-        value_col="dbh",
-        bin_size=10,
-        unit_label="cm",
-        color_map=color_map,
-        m_after=m_after,
-        m_removed=m_removed,
-        y_upper=y_upper
-    )
-    if fig is None:
-        st.info("Žádná data pro DBH graf.")
-        return
-
-    st.plotly_chart(fig, use_container_width=True)
-
-# === Nahraďte vaši původní funkci render_height_distribution tímto ===
-def render_height_distribution(df_all: pd.DataFrame):
-    if "height" not in df_all.columns:
-        st.warning("Chybí sloupec 'height' pro Height distribution.")
-        return
-
-    bins, labels = _make_bins_labels(df_all, "height", 5, "m")
-    if bins is None:
-        st.info("Žádné platné Height hodnoty.")
-        return
-
-    color_map = _species_colors(df_all)
-    m_after, m_removed = _make_masks(df_all)
-    y_upper = _y_upper_for(df_all, "height", bins, labels)
-
-    fig = build_three_panel_shared_legend(
-        df_all=df_all,
-        value_col="height",
-        bin_size=5,
-        unit_label="m",
-        color_map=color_map,
-        m_after=m_after,
-        m_removed=m_removed,
-        y_upper=y_upper
-    )
-    if fig is None:
-        st.info("Žádná data pro Height graf.")
-        return
-
-    st.plotly_chart(fig, use_container_width=True)
 
 
-# ========== RENDER PODLE PŘEPÍNAČE ==========
-if dist_mode == "Species Distribution":
-    render_species_distribution(df)
-elif dist_mode == "DBH Distribution":
-    render_dbh_distribution(df)
-else:  # Height distribution
-    render_height_distribution(df)
+with st.expander(label=t("expander_help_label"),icon=":material/help:"):
+    st.markdown(t_help("dashboard_help"))
