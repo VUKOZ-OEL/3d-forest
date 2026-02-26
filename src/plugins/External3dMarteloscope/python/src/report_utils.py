@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import io
+import os
+import streamlit as st
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Callable, List, Optional, Sequence, Tuple
@@ -32,8 +34,11 @@ from src.summary_charts import (
 FONT_REG = "DejaVu"
 FONT_BOLD = "DejaVu-Bold"
 
-pdfmetrics.registerFont(TTFont(FONT_REG, "assets/fonts/DejaVuSans.ttf"))
-pdfmetrics.registerFont(TTFont(FONT_BOLD, "assets/fonts/DejaVuSans-Bold.ttf"))
+font_path = os.path.join(st.session_state.python_script_dir, "assets", "fonts", "DejaVuSans.ttf")
+pdfmetrics.registerFont(TTFont(FONT_REG, font_path))
+
+font_path = os.path.join(st.session_state.python_script_dir, "assets", "fonts", "DejaVuSans-Bold.ttf")
+pdfmetrics.registerFont(TTFont(FONT_BOLD, font_path))
 
 
 # ------------------------------------------------------------------

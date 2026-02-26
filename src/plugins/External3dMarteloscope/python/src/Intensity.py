@@ -19,7 +19,7 @@ from src.i18n import t, t_help, t_mgmt
 # LOAD DATA
 # ------------------------------------------------------------
 if "trees" not in st.session_state:
-    file_path = "c:/Users/krucek/OneDrive - vukoz.cz/DATA/_GS-LCR/SLP_Pokojna/PokojnaHora_3df/PokojnaHora.json"
+    file_path = st.session_state.project_file
     st.session_state.trees = iou.load_project_json(file_path)
 
 df0 = st.session_state.trees.copy()

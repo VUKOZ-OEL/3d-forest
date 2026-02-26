@@ -35,9 +35,13 @@ out_csv = sut.export_iland_trees_csv(
 # =============================================================================
 # CONFIG
 # =============================================================================
-xml_path = Path("C:/Users/krucek/Documents/iLand/test/Pokojna_hora.xml")
-out_db = Path("C:/Users/krucek/Documents/iLand/test/output/output.sqlite")
-temp_db = Path("C:/Users/krucek/Documents/iLand/test/output/temp.sqlite")
+# xml_path = Path("C:/Users/krucek/Documents/iLand/test/Pokojna_hora.xml")
+# out_db = Path("C:/Users/krucek/Documents/iLand/test/output/output.sqlite")
+# temp_db = Path("C:/Users/krucek/Documents/iLand/test/output/temp.sqlite")
+
+xml_path = st.session_state.project_file.replace(".json", ".xml")
+out_db = st.session_state.project_file.replace(".json", ".output.sqlite")
+temp_db = st.session_state.project_file.replace(".json", ".temp.sqlite")
 
 def _fan_label(g: str) -> str:
     if g == "SUM":
