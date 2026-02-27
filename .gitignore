@@ -1,6 +1,8 @@
 # Build
 bin/
 build/
+build-msvc-release/
+stage/
 out/
 
 # Visual Studio Code, Editor

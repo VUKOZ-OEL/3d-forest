@@ -72,8 +72,10 @@ int External3dMarteloscopeRunner::findFreePort(int startPort) const
     return -1; // none free
 }
 
-void External3dMarteloscopeRunner::start(const QString &pythonPath,
-                                         const QString &appPath,
+void External3dMarteloscopeRunner::start(const QString &pythonHome,
+                                         const QString &pythonPath,
+                                         const QString &pythonExe,
+                                         const QString &pyhonScript,
                                          const QString &projectPath,
                                          int startPort)
 {
@@ -101,15 +103,28 @@ void External3dMarteloscopeRunner::start(const QString &pythonPath,
     }
     else
     {
+        qDebug() << "run:";
+        qDebug() << "  pythonHome" << pythonHome;
+        qDebug() << "  pythonPath" << pythonPath;
+        qDebug() << "  pythonExe" << pythonExe;
+        qDebug() << "  pyhonScript" << pyhonScript;
+        qDebug() << "  projectPath" << projectPath;
+
         // Start Streamlit
         process_ = new QProcess(this);
 
+        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+        env.insert("PYTHONHOME", pythonHome);
+        env.insert("PYTHONPATH", pythonPath);
+        env.insert("PYTHONNOUSERSITE", "1");
+        process_->setProcessEnvironment(env);
+
         QStringList args;
-        args << "-m" << "streamlit" << "run" << appPath << "--server.port"
+        args << "-m" << "streamlit" << "run" << pyhonScript << "--server.port"
              << QString::number(port_) << "--server.headless" << "true"
              << "--" << projectPath;
 
-        process_->start(pythonPath, args);
+        process_->start(pythonExe, args);
 
         if (!process_->waitForStarted(3000))
         {

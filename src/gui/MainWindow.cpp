@@ -504,7 +504,8 @@ void MainWindow::loadPlugins()
         else
         {
             LOG_ERROR(<< "Unable to get instance of plugin <"
-                      << pluginPath.toStdString() << ">.");
+                      << pluginPath.toStdString() << "> error <"
+                      << pluginLoader.errorString() << ">.");
         }
     }
 

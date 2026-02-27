@@ -32,6 +32,7 @@ class MainWindow;
 #include <QPointer>
 class QProcess;
 
+#define HAS_QT_WEB_ENGINE_WIDGETS 1
 #if defined(HAS_QT_WEB_ENGINE_WIDGETS)
     class QWebEngineView;
 #endif
@@ -45,8 +46,10 @@ public:
     External3dMarteloscopeRunner(MainWindow *mainWindow);
     ~External3dMarteloscopeRunner();
 
-    void start(const QString &pythonPath,
-               const QString &appPath,
+    void start(const QString &pythonHome,
+               const QString &pythonPath,
+               const QString &pythonExe,
+               const QString &pyhonScript,
                const QString &projectPath,
                int startPort = 8501);
 

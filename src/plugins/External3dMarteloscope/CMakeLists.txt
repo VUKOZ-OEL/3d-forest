@@ -22,6 +22,16 @@ if(NOT QT_VERSION_MAJOR)
     return()
 endif()
 
+if(NOT TARGET Qt${QT_VERSION_MAJOR}::Network)
+    message(WARNING "Skipping ${SUB_PROJECT_NAME} (Qt Network not available)")
+    return()
+endif()
+
+if(NOT TARGET Qt${QT_VERSION_MAJOR}::WebEngineWidgets)
+    message(WARNING "Skipping ${SUB_PROJECT_NAME} (Qt WebEngine not available)")
+    return()
+endif()
+
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
@@ -46,27 +56,29 @@ target_compile_definitions(
     EXPORT_${SUB_PROJECT_NAME}=1
 )
 
-if(TARGET Qt${QT_VERSION_MAJOR}::WebEngineWidgets)
-    target_compile_definitions(
-        ${SUB_PROJECT_NAME}
-        PRIVATE
-        HAS_QT_WEB_ENGINE_WIDGETS=1
-    )
-endif()
+# if(TARGET Qt${QT_VERSION_MAJOR}::WebEngineWidgets)
+#     target_compile_definitions(
+#         ${SUB_PROJECT_NAME}
+#         PRIVATE
+#         HAS_QT_WEB_ENGINE_WIDGETS=1
+#     )
+# endif()
 
 target_link_libraries(
     ${SUB_PROJECT_NAME}
     PRIVATE
     3DForestGui
+    Qt${QT_VERSION_MAJOR}::Network
+    Qt${QT_VERSION_MAJOR}::WebEngineWidgets
 )
 
-if(TARGET Qt${QT_VERSION_MAJOR}::WebEngineWidgets)
-    target_link_libraries(
-        ${SUB_PROJECT_NAME}
-        PRIVATE
-        Qt${QT_VERSION_MAJOR}::WebEngineWidgets
-    )
-endif()
+# if(TARGET Qt${QT_VERSION_MAJOR}::WebEngineWidgets)
+#     target_link_libraries(
+#         ${SUB_PROJECT_NAME}
+#         PRIVATE
+#         Qt${QT_VERSION_MAJOR}::WebEngineWidgets
+#     )
+# endif()
 
 # Install plugin
 # install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin/plugins)

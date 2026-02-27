@@ -29,6 +29,7 @@
 
 // Include Qt.
 #include <QCoreApplication>
+#include <QDir>
 
 // Include local.
 #define LOG_MODULE_NAME "External3dMarteloscopePlugin"
@@ -110,12 +111,19 @@ void External3dMarteloscopePlugin::runPythonApp(const std::string &projectPath)
 {
     LOG_DEBUG(<< "Start python app with project <" << projectPath << ">.");
 
-    QString pythonPath = "python";
-    QString appPath =
-        QCoreApplication::applicationDirPath() +
-        "/plugins/3DForestExternal3dMarteloscopePlugin/python/app.py";
+    QString appDir = QCoreApplication::applicationDirPath();
 
-    runner_->start(pythonPath, appPath, QString::fromStdString(projectPath));
+    QString pythonHome = QDir(appDir).filePath("python");
+    QString pythonPath = QDir(appDir).filePath("python/Lib");
+    QString pythonExe = QDir(appDir).filePath("python/python.exe");
+    QString pyhonScript = QDir(appDir).filePath(
+                "plugins/3DForestExternal3dMarteloscopePlugin/python/app.py");
+
+    runner_->start(pythonHome,
+                   pythonPath,
+                   pythonExe,
+                   pyhonScript,
+                   QString::fromStdString(projectPath));
 
     LOG_DEBUG(<< "Finished starting python app.");
 }
