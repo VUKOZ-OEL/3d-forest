@@ -93,6 +93,110 @@ inline T pointPlaneDistance(T x, T y, T z, T px, T py, T pz, T nx, T ny, T nz)
 }
 
 template <class T>
+bool intersectSegmentSphere(T x1,
+                            T y1,
+                            T z1, // segment start
+                            T x2,
+                            T y2,
+                            T z2, // segment end
+                            T sx,
+                            T sy,
+                            T sz,     // sphere center
+                            T radius, // sphere radius (>=0)
+                            T *cp_x = nullptr,
+                            T *cp_y = nullptr,
+                            T *cp_z = nullptr // optional out collision point
+)
+{
+    static_assert(std::is_floating_point<T>::value, "T must be floating point");
+    if (radius < static_cast<T>(0))
+    {
+        return false;
+    }
+
+    const T EPS = std::numeric_limits<T>::epsilon() * static_cast<T>(100);
+
+    // ab = x2 - x1
+    T abx = x2 - x1;
+    T aby = y2 - y1;
+    T abz = z2 - z1;
+
+    // as = s - x1
+    T asx = sx - x1;
+    T asy = sy - y1;
+    T asz = sz - z1;
+
+    // center of segment c = x1 + ab*0.5
+    T cx = x1 + abx * static_cast<T>(0.5);
+    T cy = y1 + aby * static_cast<T>(0.5);
+    T cz = z1 + abz * static_cast<T>(0.5);
+
+    // sc = c - s
+    T scx = cx - sx;
+    T scy = cy - sy;
+    T scz = cz - sz;
+
+    T ab_sqr = abx * abx + aby * aby + abz * abz;
+    T ab_norm = std::sqrt(ab_sqr);
+    T sc_norm = std::sqrt(scx * scx + scy * scy + scz * scz);
+
+    T half_len = ab_norm * static_cast<T>(0.5);
+
+    // quick reject using segment midpoint
+    if (sc_norm > half_len + radius + EPS)
+    {
+        return false;
+    }
+
+    // projection parameter ti = ab.dot(as) / ab.normSqr()
+    if (ab_sqr <= EPS)
+    { // degenerate segment -> point test
+        T dx = x1 - sx;
+        T dy = y1 - sy;
+        T dz = z1 - sz;
+        T dist2 = dx * dx + dy * dy + dz * dz;
+        if (dist2 <= radius * radius + EPS)
+        {
+            if (cp_x)
+                *cp_x = x1;
+            if (cp_y)
+                *cp_y = y1;
+            if (cp_z)
+                *cp_z = z1;
+            return true;
+        }
+        return false;
+    }
+
+    T bdot = abx * asx + aby * asy + abz * asz;
+    T ti = bdot / ab_sqr;
+
+    // point on infinite line
+    T px = x1 + abx * ti;
+    T py = y1 + aby * ti;
+    T pz = z1 + abz * ti;
+
+    // distance from this point to sphere center
+    T dx = px - sx;
+    T dy = py - sy;
+    T dz = pz - sz;
+    T dist = std::sqrt(dx * dx + dy * dy + dz * dz);
+
+    if (dist <= radius + EPS)
+    {
+        if (cp_x)
+            *cp_x = px;
+        if (cp_y)
+            *cp_y = py;
+        if (cp_z)
+            *cp_z = pz;
+        return true;
+    }
+
+    return false;
+}
+
+template <class T>
 inline bool intersectSegmentAABB(T ax,
                                  T ay,
                                  T az,

@@ -20,12 +20,14 @@
 /** @file Query.cpp */
 
 // Include std.
+#include <list>
 #include <queue>
 
 // Include 3D Forest.
 #include <Editor.hpp>
 #include <Error.hpp>
 #include <Query.hpp>
+#include <Time.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "Query"
@@ -259,15 +261,20 @@ void Query::setState(Page::State state)
     }
 }
 
-bool Query::nextState()
+bool Query::nextState(bool *lruL0Ready)
 {
-    //    LOG_DEBUG(<< "Lru size <" << lru_.size() << ">.");
+    LOG_DEBUG(<< "Lru size <" << lru_.size() << ">.");
 
     for (size_t i = 0; i < lru_.size(); i++)
     {
         bool continuing = lru_[i]->nextState();
         if (continuing)
         {
+            if (lruL0Ready && lru_[i]->pageId() < 1)
+            {
+                *lruL0Ready = false;
+            }
+
             return true;
         }
     }
@@ -275,118 +282,166 @@ bool Query::nextState()
     return false;
 }
 
+size_t Query::erasePageIndex(std::vector<std::shared_ptr<Page>> &queue)
+{
+    size_t idx = queue.size();
+    do
+    {
+        idx--;
+        if (queue[idx].get()->pageId() > 0)
+        {
+            break;
+        }
+    } while (idx > 0);
+
+    return (idx > 0) ? idx : queue.size() - 1;
+}
+
+double Query::distance(const Vector3<double> &eye, const Box<double> &box)
+{
+    Vector3<double> c = box.center();
+
+    double d = std::sqrt(((c[0] - eye[0]) * (c[0] - eye[0])) +
+                         ((c[1] - eye[1]) * (c[1] - eye[1])));
+
+    return d;
+}
+
+void Query::insertToQueue(std::multimap<double, Key> &queue,
+                          const Key &key,
+                          const Vector3<double> &eye)
+{
+    const Dataset &dataset = editor_->datasets().key(key.datasetId);
+    const IndexFile &index = dataset.index();
+    const IndexFile::Node *node = index.at(key.pageId);
+
+    if (editor_->clipFilter().shape != Region::Shape::NONE)
+    {
+        Box<double> box = index.boundary(node, index.boundary());
+        if (!editor_->clipFilter().box.intersects(box))
+        {
+            return;
+        }
+    }
+
+    Box<double> box = index.boundary(node, index.boundary());
+    double w = distance(eye, box);
+
+    Key updatedKey = key;
+    updatedKey.size = PageData::sizeInMemory(node->size);
+
+    queue.insert({w, updatedKey});
+}
+
+bool Query::insertToLru(std::vector<std::shared_ptr<Page>> &lruNew,
+                        std::vector<std::shared_ptr<Page>> &lruOld,
+                        const Key &key,
+                        bool checkCacheLimit)
+{
+    if (checkCacheLimit && cacheSizeMaximum_ > 0 &&
+        lruSize_ >= cacheSizeMaximum_)
+    {
+        return false;
+    }
+
+    auto search = cache_.find({key.datasetId, key.pageId});
+
+    if (search != cache_.end())
+    {
+        lruNew.push_back(search->second);
+    }
+    else
+    {
+        if (lruOld.size() > 0)
+        {
+            size_t eraseIndex = erasePageIndex(lruOld);
+            const Page *lru = lruOld[eraseIndex].get();
+            Key nkrm = {lru->datasetId(), lru->pageId()};
+            cache_.erase(nkrm);
+            removeAt(lruOld, eraseIndex);
+        }
+
+        std::shared_ptr<Page> page;
+        page = std::make_shared<Page>(editor_, this, key.datasetId, key.pageId);
+        cache_[key] = page;
+
+        lruNew.push_back(page);
+    }
+
+    lruSize_ += key.size;
+
+    return true;
+}
+
 void Query::applyCamera(const Camera &camera)
 {
-    double eyeX = camera.eye[0];
-    double eyeY = camera.eye[1];
-    double eyeZ = camera.eye[2];
+    double timeApply = Time::realTime();
+    double timeDelayApply = (timeApply - camera.timeUpdated) * 1000.0;
+    LOG_DEBUG_RENDER(<< "Apply camera <" << camera.eye << "> delay <"
+                     << timeDelayApply << "> ms.");
 
-    std::vector<std::shared_ptr<Page>> viewPrev;
-    viewPrev = lru_;
+    std::vector<std::shared_ptr<Page>> lruOld;
+    lruOld = lru_;
 
     lru_.clear();
     lruSize_ = 0;
 
-    std::multimap<double, Key> queue;
+    // Sorted by level of detail (asc); same level by distance to camera (asc).
+    std::list<Key> queue;
 
-    if (where().dataset().enabled())
+    // Sorted by distance to camera (asc).
+    std::multimap<double, Key> queueNext;
+
+    // Initialize with level of detail 0 (L0).
+    const std::unordered_set<size_t> &idList = where().dataset().filter();
+    for (auto const &it : idList)
     {
-        const std::unordered_set<size_t> &idList = where().dataset().filter();
-        for (auto const &it : idList)
-        {
-            queue.insert({-1.0, {it, 0}});
-        }
-    }
-    else
-    {
-        const std::unordered_set<size_t> &idList = editor_->datasets().idList();
-        for (auto const &it : idList)
-        {
-            queue.insert({-1.0, {it, 0}});
-        }
+        insertToQueue(queueNext, {it, 0, 0}, camera.eye);
     }
 
-    while (!queue.empty())
+    for (const auto &it : queueNext)
     {
-        const auto it = queue.begin();
-        Key nk = it->second;
-        queue.erase(it);
-
-        if (cacheSizeMaximum_ > 0 && lruSize_ >= cacheSizeMaximum_)
+        if (!insertToLru(lru_, lruOld, it.second, false))
         {
             break;
         }
 
-        const Dataset &dataset = editor_->datasets().key(nk.datasetId);
+        queue.push_back(it.second);
+    }
+
+    // Expand L0 -> L1 -> L2, ...
+    while (!queue.empty())
+    {
+        const auto it = queue.begin();
+        Key key = *it;
+        queue.erase(it);
+
+        const Dataset &dataset = editor_->datasets().key(key.datasetId);
         const IndexFile &index = dataset.index();
-        const IndexFile::Node *node = index.at(nk.pageId);
+        const IndexFile::Node *node = index.at(key.pageId);
 
-        if (editor_->clipFilter().shape != Region::Shape::NONE)
-        {
-            Box<double> box = index.boundary(node, index.boundary());
-            if (!editor_->clipFilter().box.intersects(box))
-            {
-                continue;
-            }
-        }
+        queueNext.clear();
 
-        auto search = cache_.find({nk.datasetId, nk.pageId});
-        if (search != cache_.end())
-        {
-            lru_.push_back(search->second);
-        }
-        else
-        {
-            if (viewPrev.size() > 0)
-            {
-                const Page *lru = viewPrev[viewPrev.size() - 1].get();
-                Key nkrm = {lru->datasetId(), lru->pageId()};
-                cache_.erase(nkrm);
-                viewPrev.resize(viewPrev.size() - 1);
-            }
-
-            std::shared_ptr<Page> page;
-            page =
-                std::make_shared<Page>(editor_, this, nk.datasetId, nk.pageId);
-            cache_[nk] = page;
-            lru_.push_back(page);
-        }
-
-        size_t pageSizeInMemory = PageData::sizeInMemory(node->size);
-        lruSize_ += pageSizeInMemory;
-        /*
-                LOG_DEBUG(<< "Added new page. Page count <" << lru_.size()
-                          << "> dataset ID <" << nk.datasetId << "> page ID <"
-                          << nk.pageId << "> point count <" << node->size
-                          << "> page size in memory <" << pageSizeInMemory
-                          << "> LRU size in memory <" << lruSize_ << "> from
-           maximum <"
-                          << cacheSizeMaximum_ << "> bytes.");
-        */
         for (size_t i = 0; i < 8; i++)
         {
             if (node->next[i])
             {
-                const IndexFile::Node *sub = index.at(node->next[i]);
-                Box<double> box = index.boundary(sub, editor_->clipBoundary());
-
-                double radius = box.radius();
-                double distance = box.distance(eyeX, eyeY, eyeZ);
-                double w;
-
-                if (distance < radius)
-                {
-                    w = 0;
-                }
-                else
-                {
-                    distance = distance * 0.002;
-                    distance = distance * distance;
-                    w = distance / radius;
-                }
-
-                queue.insert({w, {nk.datasetId, node->next[i]}});
+                key.pageId = node->next[i];
+                key.size = 0;
+                insertToQueue(queueNext, key, camera.eye);
             }
+        }
+
+        for (const auto &it : queueNext)
+        {
+            if (!insertToLru(lru_, lruOld, it.second, true))
+            {
+                // Stop expansion. No free cache space available.
+                queue.clear();
+                break;
+            }
+
+            queue.push_back(it.second);
         }
     }
 
@@ -717,7 +772,7 @@ std::shared_ptr<Page> Query::readPage(size_t datasetId, size_t pageId)
             else
             {
                 // Drop oldest page.
-                idx = lru_.size() - 1;
+                idx = erasePageIndex(lru_);
                 if (lru_[idx]->modified())
                 {
                     lru_[idx]->writePage();

@@ -65,6 +65,9 @@ public:
     const T &min(size_t idx) const { return min_[idx]; }
     const T &max(size_t idx) const { return max_[idx]; }
 
+    Vector3<T> min() const { return Vector3<T>(min_[0], min_[1], min_[2]); }
+    Vector3<T> max() const { return Vector3<T>(max_[0], max_[1], max_[2]); }
+
     Vector3<T> length() const;
     T length(size_t idx) const { return max_[idx] - min_[idx]; }
     T maximumLength() const;
@@ -77,6 +80,13 @@ public:
     bool intersects(const Box<T> &box) const;
     bool contains(const Box<T> &box) const;
     bool contains(T x, T y, T z) const;
+
+    bool operator==(const Box<T> &other) const
+    {
+        return min() == other.min() && max() == other.max();
+    }
+
+    bool operator!=(const Box<T> &other) const { return !(*this == other); }
 
 private:
     T min_[3];
@@ -428,6 +438,38 @@ template <class T> inline bool Box<T>::contains(T x, T y, T z) const
              (z < min_[2] || z > max_[2]));
 }
 
+template <class T>
+inline void fromJson(Box<T> &out,
+                     const Json &in,
+                     const std::string &key,
+                     const Box<T> &defaultValue = {},
+                     bool optional = true,
+                     double scale = 1.0)
+{
+    Vector3<T> min = defaultValue.min();
+    Vector3<T> max = defaultValue.max();
+
+    if (in.contains(key))
+    {
+        fromJson(min, in[key], "min", defaultValue.min(), optional);
+        fromJson(max, in[key], "max", defaultValue.max(), optional);
+    }
+    else if (!optional)
+    {
+        THROW("JSON required key " + key + " was not found");
+    }
+
+    min[0] = min[0] * scale;
+    min[1] = min[1] * scale;
+    min[2] = min[2] * scale;
+
+    max[0] = max[0] * scale;
+    max[1] = max[1] * scale;
+    max[2] = max[2] * scale;
+
+    out.set(min[0], min[1], min[2], max[0], max[1], max[2]);
+}
+
 template <class T> inline void fromJson(Box<T> &out, const Json &in)
 {
     T min[3];
@@ -443,15 +485,16 @@ template <class T> inline void fromJson(Box<T> &out, const Json &in)
     out.set(min[0], min[1], min[2], max[0], max[1], max[2]);
 }
 
-template <class T> inline void toJson(Json &out, const Box<T> &in)
+template <class T>
+inline void toJson(Json &out, const Box<T> &in, double scale = 1.0)
 {
-    toJson(out["min"][0], in.min(0));
-    toJson(out["min"][1], in.min(1));
-    toJson(out["min"][2], in.min(2));
+    toJson(out["min"][0], in.min(0) * scale);
+    toJson(out["min"][1], in.min(1) * scale);
+    toJson(out["min"][2], in.min(2) * scale);
 
-    toJson(out["max"][0], in.max(0));
-    toJson(out["max"][1], in.max(1));
-    toJson(out["max"][2], in.max(2));
+    toJson(out["max"][0], in.max(0) * scale);
+    toJson(out["max"][1], in.max(1) * scale);
+    toJson(out["max"][2], in.max(2) * scale);
 }
 
 template <class T> inline std::string toString(const Box<T> &in)

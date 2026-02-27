@@ -150,7 +150,7 @@ ComputeTreeAttributesWidget::ComputeTreeAttributesWidget(MainWindow *mainWindow)
 
     // Buttons.
     applyButton_ = new QPushButton(tr("Run"));
-    applyButton_->setIcon(THEME_ICON("run"));
+    applyButton_->setIcon(THEME_ICON("run").icon());
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
 
@@ -230,5 +230,5 @@ void ComputeTreeAttributesWidget::slotApply()
         mainWindow_->showError("Unknown error");
     }
 
-    mainWindow_->update({Editor::TYPE_SEGMENT});
+    mainWindow_->update(this, {Editor::TYPE_SEGMENT});
 }

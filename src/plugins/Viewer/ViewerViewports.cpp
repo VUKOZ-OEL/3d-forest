@@ -24,6 +24,7 @@
 
 // Include 3D Forest.
 #include <Editor.hpp>
+#include <MainWindow.hpp>
 #include <ViewerOpenGLManager.hpp>
 #include <ViewerOpenGLViewport.hpp>
 #include <ViewerViewports.hpp>
@@ -43,7 +44,9 @@
 #define VIEWER_VIEWPORTS_FRONT 2
 #define VIEWER_VIEWPORTS_RIGHT 3
 
-ViewerViewports::ViewerViewports(QWidget *parent) : QWidget(parent)
+ViewerViewports::ViewerViewports(MainWindow *mainWindow)
+    : QWidget(mainWindow),
+      mainWindow_(mainWindow)
 {
     LOG_DEBUG(<< "The viewports are being created.");
     initializeViewports();
@@ -90,7 +93,8 @@ void ViewerViewports::initializeViewports()
 ViewerOpenGLViewport *ViewerViewports::createViewport(size_t viewportId)
 {
     LOG_DEBUG(<< "Create viewport <" << viewportId << ">.");
-    ViewerOpenGLViewport *viewport = new ViewerOpenGLViewport(this);
+    ViewerOpenGLViewport *viewport =
+        new ViewerOpenGLViewport(this, mainWindow_);
     viewport->setManager(manager_.get());
     viewport->setViewports(this, viewportId);
     viewport->setSelected(false);
@@ -134,6 +138,12 @@ void ViewerViewports::setViewPerspective()
 {
     LOG_DEBUG(<< "Set perspective view to the active viewport.");
     selectedViewport()->setViewPerspective();
+}
+
+void ViewerViewports::setView2d()
+{
+    LOG_DEBUG(<< "Set 2d view to the active viewport.");
+    selectedViewport()->setView2d();
 }
 
 void ViewerViewports::setViewTop()
@@ -208,7 +218,7 @@ void ViewerViewports::updateScene(Editor *editor)
     for (size_t i = 0; i < viewports_.size(); i++)
     {
         viewports_[i]->updateScene(editor);
-        viewports_[i]->update();
+        viewports_[i]->repaint();
     }
     LOG_DEBUG_RENDER(<< "Finished updating all viewports.");
 }

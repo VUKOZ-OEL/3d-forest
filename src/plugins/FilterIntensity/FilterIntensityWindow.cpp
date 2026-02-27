@@ -46,7 +46,7 @@ FilterIntensityWindow::FilterIntensityWindow(MainWindow *mainWindow)
     setWidget(widget_);
     setFixedHeight(widget()->sizeHint().height());
     setWindowTitle(tr("Filter Intensity"));
-    setWindowIcon(ICON("intensity-filter"));
+    setWindowIcon(ICON("intensity-filter").icon());
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
 
@@ -56,7 +56,7 @@ FilterIntensityWindow::FilterIntensityWindow(MainWindow *mainWindow)
 void FilterIntensityWindow::showEvent(QShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
-    widget_->setFilterEnabled(true);
+    // widget_->setFilterEnabled(true);
     QWidget::showEvent(event);
 }
 
@@ -69,6 +69,6 @@ void FilterIntensityWindow::hideEvent(QHideEvent *event)
 void FilterIntensityWindow::closeEvent(QCloseEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Close event.");
-    widget_->setFilterEnabled(false);
+    // widget_->setFilterEnabled(false);
     event->accept();
 }

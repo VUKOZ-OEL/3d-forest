@@ -156,10 +156,24 @@ void DoubleRangeSliderWidget::slotIntermediateMaximumValue(double v)
     emit signalIntermediateMaximumValue();
 }
 
+void DoubleRangeSliderWidget::slotFinalValue(double v)
+{
+    LOG_DEBUG(<< "Final value <" << v << ">.");
+    (void)v;
+    emit signalFinalValue();
+}
+
+void DoubleRangeSliderWidget::slotFinalValue()
+{
+    LOG_DEBUG(<< "Final value.");
+    emit signalFinalValue();
+}
+
 void DoubleRangeSliderWidget::create(DoubleRangeSliderWidget *&outputWidget,
                                      const QObject *receiver,
                                      const char *memberIntermediateMinimumValue,
                                      const char *memberIntermediateMaximumValue,
+                                     const char *memberFinalValue,
                                      const QString &text,
                                      const QString &toolTip,
                                      const QString &unitsList,
@@ -233,6 +247,19 @@ void DoubleRangeSliderWidget::create(DoubleRangeSliderWidget *&outputWidget,
                 memberIntermediateMaximumValue);
     }
 
+    connect(slider,
+            SIGNAL(sliderReleased()),
+            outputWidget,
+            SLOT(slotFinalValue()));
+
+    if (memberFinalValue)
+    {
+        connect(outputWidget,
+                SIGNAL(signalFinalValue()),
+                receiver,
+                memberFinalValue);
+    }
+
     // Value SpinBox.
     outputWidget->minSpinBox_ = new QDoubleSpinBox;
     QDoubleSpinBox *minSpinBox = outputWidget->minSpinBox_;
@@ -245,6 +272,11 @@ void DoubleRangeSliderWidget::create(DoubleRangeSliderWidget *&outputWidget,
             outputWidget,
             SLOT(slotIntermediateMinimumValue(double)));
 
+    connect(minSpinBox,
+            SIGNAL(valueChanged(double)),
+            outputWidget,
+            SLOT(slotFinalValue(double)));
+
     outputWidget->maxSpinBox_ = new QDoubleSpinBox;
     QDoubleSpinBox *maxSpinBox = outputWidget->maxSpinBox_;
     maxSpinBox->setRange(min, max);
@@ -255,6 +287,11 @@ void DoubleRangeSliderWidget::create(DoubleRangeSliderWidget *&outputWidget,
             SIGNAL(valueChanged(double)),
             outputWidget,
             SLOT(slotIntermediateMaximumValue(double)));
+
+    connect(maxSpinBox,
+            SIGNAL(valueChanged(double)),
+            outputWidget,
+            SLOT(slotFinalValue(double)));
 
     // Value Layout.
     QHBoxLayout *valueLayout = new QHBoxLayout;

@@ -20,9 +20,9 @@
 /** @file TreeTableExportDialog.cpp */
 
 // Include 3D Forest.
+#include <FileFormatCsv.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
-#include <TreeTableExportCsv.hpp>
 #include <TreeTableExportDialog.hpp>
 
 // Include Qt.
@@ -60,17 +60,6 @@ TreeTableExportDialog::TreeTableExportDialog(MainWindow *mainWindow,
     fileNameLayout->addWidget(fileNameLineEdit_);
     fileNameLayout->addWidget(browseButton_);
 
-    // Options.
-    exportValidValuesOnlyCheckBox_ =
-        new QCheckBox(tr("Export valid values only"));
-    exportValidValuesOnlyCheckBox_->setChecked(true);
-
-    QVBoxLayout *optionsVBoxLayout = new QVBoxLayout;
-    optionsVBoxLayout->addWidget(exportValidValuesOnlyCheckBox_);
-
-    QGroupBox *optionsGroupBox = new QGroupBox(tr("Options"));
-    optionsGroupBox->setLayout(optionsVBoxLayout);
-
     // Buttons.
     acceptButton_ = new QPushButton(tr("Export"));
     connect(acceptButton_, SIGNAL(clicked()), this, SLOT(slotAccept()));
@@ -87,8 +76,6 @@ TreeTableExportDialog::TreeTableExportDialog(MainWindow *mainWindow,
     QVBoxLayout *dialogLayout = new QVBoxLayout;
     dialogLayout->addLayout(fileNameLayout);
     dialogLayout->addSpacing(10);
-    dialogLayout->addWidget(optionsGroupBox);
-    dialogLayout->addSpacing(10);
     dialogLayout->addLayout(dialogButtons);
     dialogLayout->addStretch();
 
@@ -96,7 +83,7 @@ TreeTableExportDialog::TreeTableExportDialog(MainWindow *mainWindow,
 
     // Window.
     setWindowTitle(tr("Export File"));
-    setWindowIcon(THEME_ICON("export-file"));
+    setWindowIcon(THEME_ICON("export-file").icon());
     setMaximumWidth(600);
     setMaximumHeight(height());
 }
@@ -161,16 +148,16 @@ void TreeTableExportDialog::slotReject()
     setResult(QDialog::Rejected);
 }
 
-std::shared_ptr<TreeTableExportInterface> TreeTableExportDialog::writer() const
+std::shared_ptr<FileFormatInterface> TreeTableExportDialog::writer() const
 {
-    std::shared_ptr<TreeTableExportInterface> result;
-
     std::string path = fileNameLineEdit_->text().toStdString();
     std::string ext = toLower(File::fileExtension(path));
 
     if (ext == "csv")
     {
-        result = std::make_shared<TreeTableExportCsv>();
+        std::shared_ptr<FileFormatCsv> csv = std::make_shared<FileFormatCsv>();
+        csv->setFileName(path);
+        return csv;
     }
     else
     {
@@ -178,26 +165,5 @@ std::shared_ptr<TreeTableExportInterface> TreeTableExportDialog::writer() const
               "Please choose a different format.");
     }
 
-    result->setProperties(properties());
-
-    return result;
-}
-
-TreeTableExportProperties TreeTableExportDialog::properties() const
-{
-    TreeTableExportProperties result;
-
-    // File name.
-    result.setFileName(fileNameLineEdit_->text().toStdString());
-
-    // Options.
-    result.setExportValidValuesOnly(
-        exportValidValuesOnlyCheckBox_->isChecked());
-
-    // Other values.
-    double ppm =
-        mainWindow_->editor().settings().unitsSettings().pointsPerMeter()[0];
-    result.setPointsPerMeter(ppm);
-
-    return result;
+    return std::shared_ptr<FileFormatInterface>();
 }

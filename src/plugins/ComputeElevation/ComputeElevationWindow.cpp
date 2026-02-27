@@ -51,7 +51,7 @@ ComputeElevationWindow::ComputeElevationWindow(MainWindow *mainWindow)
     // Dialog.
     setLayout(mainLayout);
     setWindowTitle(tr("Compute Elevation"));
-    setWindowIcon(ICON("elevation"));
+    setWindowIcon(ICON("elevation").icon());
     setMaximumHeight(height());
     setModal(false);
 }

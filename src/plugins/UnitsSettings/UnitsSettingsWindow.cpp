@@ -41,7 +41,7 @@ UnitsSettingsWindow::UnitsSettingsWindow(MainWindow *mainWindow)
     setWidget(widget);
     setFixedHeight(widget->sizeHint().height());
     setWindowTitle(tr("Units Settings"));
-    setWindowIcon(ICON("units"));
+    setWindowIcon(ICON("units").icon());
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
 }

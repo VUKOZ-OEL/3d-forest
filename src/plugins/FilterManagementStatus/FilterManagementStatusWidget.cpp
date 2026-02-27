@@ -21,13 +21,16 @@
 
 // Include 3D Forest.
 #include <ColorPalette.hpp>
+#include <FilterManagementStatusTreeWidget.hpp>
 #include <FilterManagementStatusWidget.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
+#include <Core.hpp>
 
 // Include Qt.
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QSplitter>
 #include <QToolBar>
 #include <QToolButton>
 #include <QTreeWidget>
@@ -52,42 +55,42 @@ FilterManagementStatusWidget::FilterManagementStatusWidget(
     tree_->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     // Tool bar buttons.
-    MainWindow::createToolButton(&showButton_,
-                                 tr("Show"),
-                                 tr("Make selected management status visible"),
-                                 THEME_ICON("eye"),
-                                 this,
-                                 SLOT(slotShow()));
+    mainWindow_->createToolButton(&showButton_,
+                                  tr("Show"),
+                                  tr("Make selected management status visible"),
+                                  THEME_ICON("eye"),
+                                  this,
+                                  SLOT(slotShow()));
     showButton_->setEnabled(false);
 
-    MainWindow::createToolButton(&hideButton_,
-                                 tr("Hide"),
-                                 tr("Hide selected management status"),
-                                 THEME_ICON("hide"),
-                                 this,
-                                 SLOT(slotHide()));
+    mainWindow_->createToolButton(&hideButton_,
+                                  tr("Hide"),
+                                  tr("Hide selected management status"),
+                                  THEME_ICON("hide"),
+                                  this,
+                                  SLOT(slotHide()));
     hideButton_->setEnabled(false);
 
-    MainWindow::createToolButton(&selectAllButton_,
-                                 tr("Select all"),
-                                 tr("Select all"),
-                                 THEME_ICON("select-all"),
-                                 this,
-                                 SLOT(slotSelectAll()));
+    mainWindow_->createToolButton(&selectAllButton_,
+                                  tr("Select all"),
+                                  tr("Select all"),
+                                  THEME_ICON("select-all"),
+                                  this,
+                                  SLOT(slotSelectAll()));
 
-    MainWindow::createToolButton(&selectInvertButton_,
-                                 tr("Invert"),
-                                 tr("Invert selection"),
-                                 THEME_ICON("select-invert"),
-                                 this,
-                                 SLOT(slotSelectInvert()));
+    mainWindow_->createToolButton(&selectInvertButton_,
+                                  tr("Invert"),
+                                  tr("Invert selection"),
+                                  THEME_ICON("select-invert"),
+                                  this,
+                                  SLOT(slotSelectInvert()));
 
-    MainWindow::createToolButton(&selectNoneButton_,
-                                 tr("Select none"),
-                                 tr("Select none"),
-                                 THEME_ICON("select-none"),
-                                 this,
-                                 SLOT(slotSelectNone()));
+    mainWindow_->createToolButton(&selectNoneButton_,
+                                  tr("Select none"),
+                                  tr("Select none"),
+                                  THEME_ICON("select-none"),
+                                  this,
+                                  SLOT(slotSelectNone()));
 
     // Tool bar.
     QToolBar *toolBar = new QToolBar;
@@ -99,11 +102,21 @@ FilterManagementStatusWidget::FilterManagementStatusWidget(
     toolBar->addWidget(selectNoneButton_);
     toolBar->setIconSize(QSize(MainWindow::ICON_SIZE, MainWindow::ICON_SIZE));
 
+    // Detail.
+    treeWidget_ = new FilterManagementStatusTreeWidget(mainWindow_);
+
+    // Splitter.
+    splitter_ = new QSplitter;
+    splitter_->addWidget(tree_);
+    splitter_->addWidget(treeWidget_);
+    splitter_->setOrientation(Qt::Vertical);
+    splitter_->setSizes(QList<int>({1, 1}));
+
     // Layout.
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(toolBar);
-    mainLayout->addWidget(tree_);
+    mainLayout->addWidget(splitter_);
 
     setLayout(mainLayout);
 
@@ -120,7 +133,7 @@ FilterManagementStatusWidget::FilterManagementStatusWidget(
 void FilterManagementStatusWidget::slotUpdate(void *sender,
                                               const QSet<Editor::Type> &target)
 {
-    if (sender == this)
+    if (sender == this || sender == treeWidget_)
     {
         return;
     }
@@ -128,23 +141,17 @@ void FilterManagementStatusWidget::slotUpdate(void *sender,
     if (target.empty() || target.contains(Editor::TYPE_MANAGEMENT_STATUS))
     {
         LOG_DEBUG_UPDATE(<< "Input management status.");
+        receivedManagementStatusList();
+    }
 
-        setManagementStatusList(mainWindow_->editor().managementStatusList(),
-                                mainWindow_->editor().managementStatusFilter());
+    if (target.empty() || target.contains(Editor::TYPE_SEGMENT))
+    {
+        LOG_DEBUG_UPDATE(<< "Input segments.");
+        receivedSegments();
     }
 }
 
-void FilterManagementStatusWidget::dataChanged()
-{
-    LOG_DEBUG_UPDATE(<< "Output management status.");
-
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setManagementStatusList(managementStatus_);
-    mainWindow_->editor().setManagementStatusFilter(filter_);
-    mainWindow_->updateData();
-}
-
-void FilterManagementStatusWidget::filterChanged()
+void FilterManagementStatusWidget::sendFilter()
 {
     LOG_DEBUG_UPDATE(<< "Output management status filter.");
 
@@ -159,20 +166,37 @@ void FilterManagementStatusWidget::setFilterEnabled(bool b)
               << ">.");
 
     filter_.setEnabled(b);
-    filterChanged();
+    sendFilter();
 }
 
-void FilterManagementStatusWidget::setManagementStatusList(
-    const ManagementStatusList &managementStatus,
-    const QueryFilterSet &filter)
+void FilterManagementStatusWidget::receivedSegments()
+{
+    bool found = false;
+    const Segments &segments = mainWindow_->editor().segments();
+    for (size_t i = 0; i < segments.size(); i++)
+    {
+        if (segments[i].selected)
+        {
+            treeWidget_->setSegment(segments[i]);
+            found = true;
+            break;
+        }
+    }
+    if (!found)
+    {
+        treeWidget_->clear();
+    }
+}
+
+void FilterManagementStatusWidget::receivedManagementStatusList()
 {
     LOG_DEBUG(<< "Set management status n <" << managementStatus.size()
               << ">.");
 
     block();
 
-    managementStatus_ = managementStatus;
-    filter_ = filter;
+    managementStatus_ = mainWindow_->editor().managementStatusList();
+    filter_ = mainWindow_->editor().managementStatusFilter();
 
     tree_->clear();
 
@@ -210,7 +234,7 @@ void FilterManagementStatusWidget::slotShow()
         }
         updatesEnabled_ = true;
 
-        filterChanged();
+        sendFilter();
     }
 }
 
@@ -227,7 +251,7 @@ void FilterManagementStatusWidget::slotHide()
         }
         updatesEnabled_ = true;
 
-        filterChanged();
+        sendFilter();
     }
 }
 
@@ -298,7 +322,7 @@ void FilterManagementStatusWidget::slotItemChanged(QTreeWidgetItem *item,
 
         if (updatesEnabled_)
         {
-            filterChanged();
+            sendFilter();
         }
     }
 }
@@ -374,7 +398,8 @@ void FilterManagementStatusWidget::addTreeItem(size_t index)
     item->setText(COLUMN_ID, QString::number(managementStatus.id));
 
     // Label.
-    item->setText(COLUMN_LABEL, QString::fromStdString(managementStatus.label));
+    auto label = core().translate(managementStatus.label);
+    item->setText(COLUMN_LABEL, QString::fromStdString(label));
 
     // Color legend.
     QColor color;

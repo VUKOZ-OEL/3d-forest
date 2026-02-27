@@ -45,6 +45,7 @@ FilterDescriptorWidget::FilterDescriptorWidget(MainWindow *mainWindow)
                                     this,
                                     SLOT(slotRangeIntermediateMinimumValue()),
                                     SLOT(slotRangeIntermediateMaximumValue()),
+                                    SLOT(slotFinalValue()),
                                     tr("Descriptor"),
                                     tr("Min-max descriptor range filter"),
                                     tr("%"),
@@ -105,13 +106,13 @@ void FilterDescriptorWidget::setDescriptor(const Range<double> &range)
     descriptorInput_->blockSignals(false);
 }
 
-void FilterDescriptorWidget::filterChanged()
+void FilterDescriptorWidget::filterChanged(bool final)
 {
     LOG_DEBUG(<< "Descriptor filer changed.");
 
     mainWindow_->suspendThreads();
     mainWindow_->editor().setDescriptorFilter(descriptorRange_);
-    mainWindow_->updateFilter();
+    mainWindow_->updateFilter(this, final);
 }
 
 void FilterDescriptorWidget::setFilterEnabled(bool b)
@@ -119,7 +120,7 @@ void FilterDescriptorWidget::setFilterEnabled(bool b)
     LOG_DEBUG(<< "Set descriptor filer enabled <" << toString(b) << ">.");
 
     descriptorRange_.setEnabled(b);
-    filterChanged();
+    filterChanged(true);
 }
 
 void FilterDescriptorWidget::slotRangeIntermediateMinimumValue()
@@ -127,7 +128,7 @@ void FilterDescriptorWidget::slotRangeIntermediateMinimumValue()
     LOG_DEBUG(<< "Minimum value changed.");
 
     descriptorRange_.setMinimumValue(descriptorInput_->minimumValue() * 0.01);
-    filterChanged();
+    filterChanged(false);
 }
 
 void FilterDescriptorWidget::slotRangeIntermediateMaximumValue()
@@ -135,5 +136,10 @@ void FilterDescriptorWidget::slotRangeIntermediateMaximumValue()
     LOG_DEBUG(<< "Maximum value changed.");
 
     descriptorRange_.setMaximumValue(descriptorInput_->maximumValue() * 0.01);
-    filterChanged();
+    filterChanged(false);
+}
+
+void FilterDescriptorWidget::slotFinalValue()
+{
+    filterChanged(true);
 }

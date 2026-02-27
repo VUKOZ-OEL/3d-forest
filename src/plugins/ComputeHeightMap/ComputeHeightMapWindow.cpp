@@ -54,7 +54,7 @@ ComputeHeightMapWindow::ComputeHeightMapWindow(
     // Dialog.
     setLayout(mainLayout);
     setWindowTitle(tr("Compute Height Map"));
-    setWindowIcon(ICON("height-map"));
+    setWindowIcon(ICON("height-map").icon());
     setMaximumHeight(height());
     setModal(false);
 }

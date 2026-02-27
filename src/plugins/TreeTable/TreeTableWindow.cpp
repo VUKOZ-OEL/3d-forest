@@ -26,6 +26,7 @@
 #include <TreeTableWindow.hpp>
 
 // Include Qt.
+#include <QCloseEvent>
 #include <QVBoxLayout>
 
 // Include local.
@@ -51,11 +52,20 @@ TreeTableWindow::TreeTableWindow(MainWindow *mainWindow)
     // Dialog.
     setLayout(mainLayout);
     setWindowTitle(tr("Tree Table"));
-    setWindowIcon(ICON("tree-table"));
+    setWindowIcon(ICON("tree-table").icon());
     setModal(false);
 }
 
 TreeTableWindow::~TreeTableWindow()
 {
     LOG_DEBUG(<< "Destroy.");
+}
+
+void TreeTableWindow::closeEvent(QCloseEvent *event)
+{
+    LOG_DEBUG(<< "Close event.");
+
+    widget_->closeWidget();
+
+    event->accept();
 }

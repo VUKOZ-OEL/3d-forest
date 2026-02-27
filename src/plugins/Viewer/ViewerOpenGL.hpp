@@ -163,6 +163,10 @@ public:
                                const Vector3<float> &b,
                                float radius,
                                size_t slices = 16);
+    static void renderHollowCylinder(const Vector3<float> &a,
+                                     const Vector3<float> &b,
+                                     float radius,
+                                     size_t slices = 16);
     static void renderAxis();
     static void renderCross(const Vector3<float> &p,
                             float lengthX,
@@ -170,6 +174,7 @@ public:
     static void renderLine(const Vector3<float> &a, const Vector3<float> &b);
     static void renderCircle(const Vector3<float> &p,
                              float radius,
+                             bool fill = false,
                              size_t pointCount = 16);
 
     static void renderText(ViewerOpenGLManager *manager,

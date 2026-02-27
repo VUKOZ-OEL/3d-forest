@@ -27,6 +27,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "RenderThread"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 RenderThread::RenderThread(Editor *editor)
@@ -66,13 +67,24 @@ bool RenderThread::next()
     LOG_DEBUG_RENDER(<< "Compute next state.");
 
     double t1 = Time::realTime();
+    double t2 = 0;
+    double msec = 0;
     bool finished = false;
+    bool lruL0Ready = true;
     {
         std::unique_lock<std::mutex> mutexlock(editor_->editorMutex_);
-        finished = !editor_->viewports().nextState();
+        do
+        {
+            finished = !editor_->viewports().nextState(&lruL0Ready);
+            t2 = Time::realTime();
+            msec = (t2 - t1) * 1000.0;
+        } while (!finished && (!lruL0Ready || msec < 10.0));
     }
-    double t2 = Time::realTime();
-    double msec = (t2 - t1) * 1000.;
+
+    if (msec > 40.0)
+    {
+        LOG_DEBUG_RENDER(<< "Extra worker time.");
+    }
 
     if (callback_)
     {
@@ -81,10 +93,7 @@ bool RenderThread::next()
         callback_->threadProgress(finished);
     }
 
-    if (msec < 20.)
-    {
-        Time::msleep(1);
-    }
+    Time::msleep(1);
 
     return !finished;
 }

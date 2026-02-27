@@ -1,0 +1,15 @@
+Package               Version
+--------------------- -------
+choreographer         1.2.1
+kaleido               0.2.1
+laspy                 2.6.1
+matplotlib            3.10.8
+numba                 0.63.1
+orjson                3.11.5
+pip                   25.3
+plotly                5.24.1
+pytest-timeout        2.4.0
+reportlab             4.4.9
+scipy                 1.17.0
+shapely               2.1.2
+st-gsheets-connection 0.1.0

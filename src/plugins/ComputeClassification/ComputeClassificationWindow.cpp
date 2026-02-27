@@ -51,7 +51,7 @@ ComputeClassificationWindow::ComputeClassificationWindow(MainWindow *mainWindow)
     // Dialog.
     setLayout(mainLayout);
     setWindowTitle(tr("Compute Classification"));
-    setWindowIcon(ICON("ground"));
+    setWindowIcon(ICON("ground").icon());
     setMaximumHeight(height());
     setModal(false);
 }

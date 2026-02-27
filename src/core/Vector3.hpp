@@ -363,6 +363,25 @@ inline Vector3<double> safeDivide(double numerator,
                            safeDivide(numerator, denominator[2]));
 }
 
+template <class T>
+inline void fromJson(Vector3<T> &out,
+                     const Json &in,
+                     const std::string &key,
+                     const Vector3<T> &defaultValue = {},
+                     bool optional = true)
+{
+    std::vector<T> tmp;
+    std::vector<T> tmpDefault{defaultValue[0],
+                              defaultValue[1],
+                              defaultValue[2]};
+
+    fromJson(tmp, in, key, tmpDefault, optional);
+
+    out[0] = tmp[0];
+    out[1] = tmp[1];
+    out[2] = tmp[2];
+}
+
 template <class T> inline void fromJson(Vector3<T> &out, const Json &in)
 {
     fromJson(out[0], in[0]);

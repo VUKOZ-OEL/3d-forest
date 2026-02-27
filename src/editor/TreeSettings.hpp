@@ -57,12 +57,24 @@ public:
     bool convexHullProjectionVisible() const;
     void setConvexHullProjectionVisible(bool visible);
 
+    bool concaveHullVisible() const;
+    void setConcaveHullVisible(bool visible);
+
+    bool concaveHullProjectionVisible() const;
+    void setConcaveHullProjectionVisible(bool visible);
+
+    double dbhScale() const;
+    void setDbhScale(double value);
+
 protected:
     bool useOnlyForSelectedTrees_;
     bool treeAttributesVisible_;
     TreeSettings::Position treePosition_;
     bool convexHullVisible_;
     bool convexHullProjectionVisible_;
+    bool concaveHullVisible_;
+    bool concaveHullProjectionVisible_;
+    double dbhScale_;
 
     friend void fromJson(TreeSettings &out, const Json &in);
     friend void toJson(Json &out, const TreeSettings &in);
@@ -73,6 +85,12 @@ void toJson(Json &out, const TreeSettings &in);
 std::string EXPORT_EDITOR toString(const TreeSettings &in);
 
 void fromJson(TreeSettings::Position &out, const Json &in);
+void fromJson(
+    TreeSettings::Position &out,
+    const Json &in,
+    const std::string &key,
+    TreeSettings::Position defaultValue = TreeSettings::Position::BOTTOM,
+    bool optional = true);
 void toJson(Json &out, const TreeSettings::Position &in);
 void fromString(TreeSettings::Position &out, const std::string &in);
 std::string EXPORT_EDITOR toString(const TreeSettings::Position &in);

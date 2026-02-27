@@ -360,8 +360,10 @@ void IndexFileBuilder::nextState()
             copyPointsRestartIndex_ = 0;
             copyPointsCurrentIndex_ = 0;
 #ifndef INDEX_FILE_BUILDER_DEBUG_SAME_ORDER
-            copyPointsSkipCount_ = maximumIndex_ / settings_.maxIndexLevel1Size;
-            if (maximumIndex_ % settings_.maxIndexLevel1Size > 0)
+            // broken
+            copyPointsSkipCount_ =
+                maximumIndex_ / settings_.maxIndexLevel1Size[0];
+            if (maximumIndex_ % settings_.maxIndexLevel1Size[0] > 0)
             {
                 copyPointsSkipCount_++;
             }

@@ -130,17 +130,67 @@ size_t Segments::unusedId() const
     THROW("New segment identifier is not available.");
 }
 
-void Segments::addTree(size_t id, const Box<double> &boundary)
+void Segments::addTree(size_t id,
+                       const std::string &label,
+                       const Box<double> &boundary)
 {
     Segment segment;
 
     segment.id = id;
-    segment.label = "Tree " + std::to_string(segment.id);
+    if (label.empty())
+    {
+        segment.label = "Tree " + std::to_string(id);
+    }
+    else
+    {
+        segment.label = label;
+    }
     segment.color =
         ColorPalette::MPN65[segment.id % ColorPalette::MPN65.size()];
     segment.boundary = boundary;
 
     push_back(segment);
+}
+
+bool Segments::updateSelection(const std::unordered_set<size_t> &selectedIds,
+                               bool ctrl)
+{
+    LOG_DEBUG(<< "Selected ids <" << selectedIds << ">.");
+
+    std::set<size_t> selectedIdsOld;
+    for (size_t i = 0; i < segments_.size(); i++)
+    {
+        if (segments_[i].selected)
+        {
+            selectedIdsOld.insert(segments_[i].id);
+        }
+    }
+
+    std::set<size_t> selectedIdsNew;
+    for (size_t i = 0; i < segments_.size(); i++)
+    {
+        if (!ctrl)
+        {
+            segments_[i].selected = false;
+        }
+
+        if (selectedIds.count(segments_[i].id) > 0)
+        {
+            segments_[i].selected = !segments_[i].selected;
+        }
+
+        if (segments_[i].selected)
+        {
+            selectedIdsNew.insert(segments_[i].id);
+        }
+    }
+
+    if (selectedIdsOld == selectedIdsNew)
+    {
+        return false;
+    }
+
+    return true;
 }
 
 void Segments::exportMeshList(const std::string &projectFilePath,
@@ -245,7 +295,7 @@ void Segments::importMeshList(const std::string &projectFilePath, double scale)
     }
 }
 
-void fromJson(Segments &out, const Json &in)
+void fromJson(Segments &out, const Json &in, double scale)
 {
     out.clear();
 
@@ -256,7 +306,7 @@ void fromJson(Segments &out, const Json &in)
 
     for (auto const &it : in.array())
     {
-        fromJson(out.segments_[i], it);
+        fromJson(out.segments_[i], it, scale);
         size_t id = out.segments_[i].id;
         out.hashTableId_[id] = i;
         i++;
@@ -269,13 +319,13 @@ void fromJson(Segments &out, const Json &in)
     }
 }
 
-void toJson(Json &out, const Segments &in)
+void toJson(Json &out, const Segments &in, double scale)
 {
     size_t i = 0;
 
     for (auto const &it : in.segments_)
     {
-        toJson(out[i], it);
+        toJson(out[i], it, scale);
         i++;
     }
 }

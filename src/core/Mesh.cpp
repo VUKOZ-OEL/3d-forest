@@ -32,7 +32,7 @@
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-Mesh::Mesh() : mode(Mesh::Mode::MODE_POINTS)
+Mesh::Mesh()
 {
 }
 
@@ -42,7 +42,7 @@ Mesh::~Mesh()
 
 void Mesh::clear()
 {
-    mode = Mesh::Mode::MODE_POINTS;
+    mode = Mesh::Mode::MODE_UNKNOWN;
 
     position.clear();
     color.clear();
@@ -69,6 +69,7 @@ void Mesh::calculateNormalsTriangles()
     Vector3<float> vnormal;
 
     normal.resize(position.size());
+    // color.resize(position.size());
 
     size_t nTriangles = position.size() / 9;
 
@@ -96,6 +97,18 @@ void Mesh::calculateNormalsTriangles()
         normal[i * 9 + 6] = vnormal[0];
         normal[i * 9 + 7] = vnormal[1];
         normal[i * 9 + 8] = vnormal[2];
+
+#if 0
+        color[i * 9 + 0] = vnormal[0] * 0.5F + 0.5F;
+        color[i * 9 + 1] = vnormal[1] * 0.5F + 0.5F;
+        color[i * 9 + 2] = vnormal[2] * 0.5F + 0.5F;
+        color[i * 9 + 3] = vnormal[0] * 0.5F + 0.5F;
+        color[i * 9 + 4] = vnormal[1] * 0.5F + 0.5F;
+        color[i * 9 + 5] = vnormal[2] * 0.5F + 0.5F;
+        color[i * 9 + 6] = vnormal[0] * 0.5F + 0.5F;
+        color[i * 9 + 7] = vnormal[1] * 0.5F + 0.5F;
+        color[i * 9 + 8] = vnormal[2] * 0.5F + 0.5F;
+#endif
     }
 }
 
@@ -257,13 +270,15 @@ std::string toString(const Mesh::Mode &in)
 {
     switch (in)
     {
+        case Mesh::Mode::MODE_POINTS:
+            return "Points";
         case Mesh::Mode::MODE_LINES:
             return "Lines";
         case Mesh::Mode::MODE_TRIANGLES:
             return "Triangles";
-        case Mesh::Mode::MODE_POINTS:
+        case Mesh::Mode::MODE_UNKNOWN:
         default:
-            return "Points";
+            return "Unknown";
     }
 }
 
@@ -277,9 +292,13 @@ void fromString(Mesh::Mode &out, const std::string &in)
     {
         out = Mesh::Mode::MODE_TRIANGLES;
     }
-    else
+    else if (in == "Points")
     {
         out = Mesh::Mode::MODE_POINTS;
+    }
+    else
+    {
+        out = Mesh::Mode::MODE_UNKNOWN;
     }
 }
 
@@ -291,6 +310,26 @@ void toJson(Json &out, const Mesh::Mode &in)
 void fromJson(Mesh::Mode &out, const Json &in)
 {
     fromString(out, in.string());
+}
+
+void fromJson(Mesh::Mode &out,
+              const Json &in,
+              const std::string &key,
+              Mesh::Mode defaultValue = Mesh::Mode::MODE_UNKNOWN,
+              bool optional = true)
+{
+    if (in.contains(key) && in[key].typeString())
+    {
+        fromString(out, in[key].string());
+    }
+    else if (!optional)
+    {
+        THROW("JSON required key " + key + " was not found");
+    }
+    else
+    {
+        out = defaultValue;
+    }
 }
 
 void toJson(Json &out, const Mesh &in)
@@ -305,10 +344,13 @@ void toJson(Json &out, const Mesh &in)
 
 void fromJson(Mesh &out, const Json &in)
 {
-    fromJson(out.name, in["name"]);
-    fromJson(out.mode, in["mode"]);
-    fromJson(out.position, in["position"]);
-    fromJson(out.color, in["color"]);
-    fromJson(out.normal, in["normal"]);
-    fromJson(out.indices, in["indices"]);
+    out.clear();
+
+    fromJson(out.name, in, "name", "", false);
+    fromJson(out.mode, in, "mode");
+
+    fromJson(out.position, in, "position");
+    fromJson(out.color, in, "color");
+    fromJson(out.normal, in, "normal");
+    fromJson(out.indices, in, "indices");
 }

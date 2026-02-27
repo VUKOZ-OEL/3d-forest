@@ -43,6 +43,11 @@ public:
     /// Collected point Y coordinates in tree base range.
     std::vector<double> yCoordinates;
 
+    /// Height profile.
+    std::vector<double> bins;
+    double zBoundaryMin;
+    double zBoundaryMax;
+
     /// The Z coordinate of the lowest point.
     double zCoordinateMin{Numeric::max<double>()};
 
@@ -53,7 +58,7 @@ public:
 inline void toJson(Json &out, const ComputeTreeAttributesData &in)
 {
     toJson(out["treeId"], in.treeId);
-    toJson(out["treeAttributes"], in.treeAttributes);
+    toJson(out["treeAttributes"], in.treeAttributes, 1.0);
 }
 
 inline std::string toString(const ComputeTreeAttributesData &in)

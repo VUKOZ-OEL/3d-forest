@@ -134,3 +134,43 @@ void QueryFilterSet::setEnabled(size_t id, bool enabled)
         values_.insert(id);
     }
 }
+
+void fromJson(QueryFilterSet &out, const Json &in)
+{
+    out.clear();
+
+    fromJson(out.enabled_, in["enabled"]);
+
+    size_t value;
+
+    for (auto const &it : in["filter"].array())
+    {
+        fromJson(value, it);
+        out.filter_.insert(value);
+    }
+
+    for (auto const &it : in["values"].array())
+    {
+        fromJson(value, it);
+        out.values_.insert(value);
+    }
+}
+
+void toJson(Json &out, const QueryFilterSet &in)
+{
+    toJson(out["enabled"], in.enabled_);
+
+    size_t i = 0;
+    for (auto const &it : in.filter_)
+    {
+        out["filter"][i] = it;
+        i++;
+    }
+
+    size_t j = 0;
+    for (auto const &it : in.values_)
+    {
+        out["values"][j] = it;
+        j++;
+    }
+}

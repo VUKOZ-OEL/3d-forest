@@ -52,7 +52,7 @@ ComputeSegmentationNNWindow::ComputeSegmentationNNWindow(MainWindow *mainWindow)
     // Dialog.
     setLayout(mainLayout);
     setWindowTitle(tr("Compute Segmentation NN"));
-    setWindowIcon(ICON("forest"));
+    setWindowIcon(ICON("forest").icon());
     setMaximumHeight(height());
     setModal(false);
 }

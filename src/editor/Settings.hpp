@@ -26,6 +26,7 @@
 #include <ManagementStatusList.hpp>
 #include <RenderingSettings.hpp>
 #include <SpeciesList.hpp>
+#include <ApplicationSettings.hpp>
 #include <TreeSettings.hpp>
 #include <UnitsSettings.hpp>
 #include <ViewSettings.hpp>
@@ -64,6 +65,7 @@ public:
     };
 
 protected:
+    ApplicationSettings applicationSettings_;
     RenderingSettings renderingSettings_;
     TreeSettings treeSettings_;
     UnitsSettings unitsSettings_;
@@ -74,12 +76,14 @@ protected:
 
     friend void fromJson(Settings &out, const Json &in);
     friend void toJson(Json &out, const Settings &in);
+    friend void toJsonProjectSettings(Json &out, const Settings &in);
 
     friend std::string toString(const Settings &in);
 };
 
 void fromJson(Settings &out, const Json &in);
 void toJson(Json &out, const Settings &in);
+void toJsonProjectSettings(Json &out, const Settings &in);
 
 std::string toString(const Settings &in);
 

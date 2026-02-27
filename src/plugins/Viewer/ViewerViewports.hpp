@@ -28,6 +28,7 @@
 // Include 3D Forest.
 #include <Camera.hpp>
 class Editor;
+class MainWindow;
 class ViewerOpenGLViewport;
 class ViewerOpenGLManager;
 
@@ -51,13 +52,15 @@ public:
         VIEW_LAYOUT_THREE_ROWS_RIGHT
     };
 
-    explicit ViewerViewports(QWidget *parent = nullptr);
+    explicit ViewerViewports(MainWindow *mainWindow = nullptr);
     ~ViewerViewports();
 
     void setLayout(ViewLayout viewLayout);
 
     void setViewOrthographic();
     void setViewPerspective();
+    void setView2d();
+
     void setViewTop();
     void setViewFront();
     void setViewRight();
@@ -78,6 +81,8 @@ signals:
     void cameraChanged(size_t viewportId);
 
 protected:
+    MainWindow *mainWindow_;
+
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
     void showEvent(QShowEvent *event) override;

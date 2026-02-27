@@ -28,6 +28,7 @@
 #include <cmath>
 #include <iomanip>
 #include <limits>
+#include <set>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -143,6 +144,25 @@ template <typename T> inline bool equal(T a, T b)
 {
     return std::abs(a - b) <= (std::max(std::abs(a), std::abs(b)) *
                                std::numeric_limits<T>::epsilon());
+}
+
+template <typename T>
+inline bool equal(const std::vector<T> &a, const std::vector<T> &b)
+{
+    if (a.size() != b.size())
+    {
+        return false;
+    }
+
+    for (size_t i = 0; i < a.size(); i++)
+    {
+        if (!equal(a[i], b[i]))
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 template <typename T> inline bool between(T v, T a, T b)
@@ -562,6 +582,27 @@ inline std::string toString(unsigned long long in)
     return std::to_string(in);
 }
 
+template <class T>
+inline std::string toString(const std::set<T> &list,
+                            const std::string &separator = ",")
+{
+    std::string result;
+
+    auto it = list.begin();
+    if (it != list.end())
+    {
+        result = toString(*it);
+        ++it;
+    }
+    while (it != list.end())
+    {
+        result = result + separator + toString(*it);
+        ++it;
+    }
+
+    return result;
+}
+
 inline void fromString(double &out, const std::string &in)
 {
     auto index = in.find(".");
@@ -573,6 +614,10 @@ inline void fromString(double &out, const std::string &in)
     double whole = static_cast<double>(std::stoll(in.substr(0, index)));
     double fraction = static_cast<double>(std::stoll(in.substr(index + 1)));
     double exponent = static_cast<double>(in.substr(index + 1).size());
+
+    if (in[0] == '-')
+        fraction = -fraction;
+
     out = whole + (fraction / std::pow(10.0, exponent));
 }
 

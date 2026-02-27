@@ -466,7 +466,7 @@ Box<double> IndexFile::boundary(const Node *node, const Box<double> &box) const
 
 void IndexFile::insertBegin(const Box<double> &boundary,
                             const Box<double> &boundaryPoints,
-                            size_t maxSize,
+                            const std::vector<size_t> &maxSize,
                             size_t maxLevel,
                             bool insertOnlyToLeaves)
 {
@@ -490,7 +490,7 @@ void IndexFile::insertBegin(const Box<double> &boundary,
 
     if (insertOnlyToLeaves_)
     {
-        maxSize_ = 0; /**< @todo This value should be used. */
+        maxSize_.clear(); /**< @todo This value should be used. */
     }
 }
 
@@ -621,10 +621,16 @@ uint64_t IndexFile::insert(double x, double y, double z)
     double x1, y1, z1, x2, y2, z2;
     Box<double> octant = boundary_;
     BuildNode *node = root_.get();
+    size_t maxSize = 0;
 
     for (size_t level = 0; level < maxLevel_; level++)
     {
-        if (node->size < maxSize_)
+        if (level < maxSize_.size())
+        {
+            maxSize = maxSize_[level];
+        }
+
+        if (node->size < maxSize)
         {
             node->size++;
             return ecode;

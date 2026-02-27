@@ -45,7 +45,7 @@ FilterSpeciesWindow::FilterSpeciesWindow(MainWindow *mainWindow)
     // Dock.
     setWidget(widget_);
     setWindowTitle(tr("Filter Species"));
-    setWindowIcon(ICON("species-filter"));
+    setWindowIcon(ICON("species-filter").icon());
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
 
@@ -55,7 +55,7 @@ FilterSpeciesWindow::FilterSpeciesWindow(MainWindow *mainWindow)
 void FilterSpeciesWindow::showEvent(QShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
-    widget_->setFilterEnabled(true);
+    // widget_->setFilterEnabled(true);
     QWidget::showEvent(event);
 }
 
@@ -68,6 +68,6 @@ void FilterSpeciesWindow::hideEvent(QHideEvent *event)
 void FilterSpeciesWindow::closeEvent(QCloseEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Close event.");
-    widget_->setFilterEnabled(false);
+    // widget_->setFilterEnabled(false);
     event->accept();
 }

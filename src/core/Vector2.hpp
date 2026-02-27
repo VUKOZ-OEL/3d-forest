@@ -172,16 +172,32 @@ template <class T> inline Vector2<T> Vector2<T>::normalized() const
     return v;
 }
 
+template <class T>
+inline void fromJson(Vector2<T> &out,
+                     const Json &in,
+                     const std::string &key,
+                     const Vector2<T> &defaultValue = {},
+                     bool optional = true)
+{
+    std::vector<T> tmp;
+    std::vector<T> tmpDefault{defaultValue[0], defaultValue[1]};
+
+    fromJson(tmp, in, key, tmpDefault, optional);
+
+    out[0] = tmp[0];
+    out[1] = tmp[1];
+}
+
 template <class T> inline void fromJson(Vector2<T> &out, const Json &in)
 {
-    fromJson(out(0), in[0]);
-    fromJson(out(1), in[1]);
+    fromJson(out[0], in[0]);
+    fromJson(out[1], in[1]);
 }
 
 template <class T> inline void toJson(Json &out, const Vector2<T> &in)
 {
-    toJson(out[0], in(0));
-    toJson(out[1], in(1));
+    toJson(out[0], in[0]);
+    toJson(out[1], in[1]);
 }
 
 template <class T> inline std::string toString(const Vector2<T> &in)

@@ -44,12 +44,15 @@ void ManagementStatusList::setDefault()
 
     clear();
 
-    push_back(ManagementStatus(0, "untouched", {1.0, 0.5, 0.5}));
-    push_back(ManagementStatus(1, "target tree", {0.5, 1.0, 0.5}));
-    push_back(ManagementStatus(2, "remove - concurency", {0.5, 0.5, 1.0}));
-    push_back(ManagementStatus(3, "remove - health", {1.0, 1.0, 0.5}));
-    push_back(ManagementStatus(4, "remove - target DBH", {0.5, 1.0, 1.0}));
-    push_back(ManagementStatus(5, "retain - habitat", {1.0, 0.5, 1.0}));
+    push_back(ManagementStatus(0, "Untouched", {0.65098, 0.65098, 0.65098}));
+    push_back(ManagementStatus(1, "Target tree", {0.956863, 0.933333, 0.0}));
+    push_back(ManagementStatus(2, "Competition", {0.0, 0.501961, 0.0}));
+    push_back(ManagementStatus(3, "Maturity", {0.8, 0.4, 0.0}));
+    push_back(ManagementStatus(4, "Promote regeneration", {0.6, 1.0, 0.2}));
+    push_back(
+        ManagementStatus(5, "Promote rare species", {0.0, 0.690196, 0.941176}));
+    push_back(ManagementStatus(6, "Sanitary", {1.0, 0.0, 0.0}));
+    push_back(ManagementStatus(7, "Technical", {0.6, 0.0, 1.0}));
 }
 
 void ManagementStatusList::push_back(const ManagementStatus &managementStatus)

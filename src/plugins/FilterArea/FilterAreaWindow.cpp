@@ -46,7 +46,7 @@ FilterAreaWindow::FilterAreaWindow(MainWindow *mainWindow)
     setWidget(widget_);
     setFixedHeight(widget()->sizeHint().height());
     setWindowTitle(tr("Filter Area"));
-    setWindowIcon(ICON("clip-filter"));
+    setWindowIcon(ICON("clip-filter").icon());
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
 
@@ -56,7 +56,7 @@ FilterAreaWindow::FilterAreaWindow(MainWindow *mainWindow)
 void FilterAreaWindow::showEvent(QShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
-    widget_->setFilterEnabled(true);
+    // widget_->setFilterEnabled(true);
     QWidget::showEvent(event);
 }
 
@@ -69,6 +69,6 @@ void FilterAreaWindow::hideEvent(QHideEvent *event)
 void FilterAreaWindow::closeEvent(QCloseEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Close event.");
-    widget_->setFilterEnabled(false);
+    // widget_->setFilterEnabled(false);
     event->accept();
 }

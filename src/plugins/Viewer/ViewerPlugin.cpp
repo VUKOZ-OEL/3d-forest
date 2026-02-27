@@ -68,6 +68,16 @@ void ViewerPlugin::initialize(MainWindow *mainWindow)
                               SLOT(slotViewPerspective()),
                               MAIN_WINDOW_MENU_VIEWPORT_PRIORITY);
 
+    mainWindow_->createAction(&view2dAction_,
+                              "Viewport",
+                              "Viewport Projection",
+                              tr("2D DBH"),
+                              tr("2D projection with DBH"),
+                              ICON("view-2d"),
+                              this,
+                              SLOT(slotView2d()),
+                              MAIN_WINDOW_MENU_VIEWPORT_PRIORITY);
+
     mainWindow_->createAction(&view3dAction_,
                               "Viewport",
                               "Viewport",
@@ -201,6 +211,12 @@ void ViewerPlugin::slotViewOrthographic()
 void ViewerPlugin::slotViewPerspective()
 {
     viewports_->setViewPerspective();
+    updateViewer();
+}
+
+void ViewerPlugin::slotView2d()
+{
+    viewports_->setView2d();
     updateViewer();
 }
 

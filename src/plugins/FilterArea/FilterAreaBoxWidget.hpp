@@ -49,6 +49,7 @@ public slots:
 
     void slotRangeIntermediateMinimumValue();
     void slotRangeIntermediateMaximumValue();
+    void slotFinalValue();
 
 protected:
     MainWindow *mainWindow_;
@@ -57,7 +58,7 @@ protected:
     Region region_;
 
     void setRegion(const Region &region);
-    void filterChanged();
+    void filterChanged(bool final);
 
     void showEvent(QShowEvent *event) override;
     void hideEvent(QHideEvent *event) override;

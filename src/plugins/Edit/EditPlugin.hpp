@@ -49,6 +49,7 @@ public:
 
 public slots:
     void slotResetElevation();
+    void slotResetManagementStatus();
     void slotSetClassification();
 
 private:

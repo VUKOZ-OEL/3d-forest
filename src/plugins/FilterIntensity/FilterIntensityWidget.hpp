@@ -49,6 +49,7 @@ public slots:
 
     void slotRangeIntermediateMinimumValue();
     void slotRangeIntermediateMaximumValue();
+    void slotFinalValue();
 
 protected:
     MainWindow *mainWindow_;
@@ -56,7 +57,7 @@ protected:
     Range<double> intensityRange_;
 
     void setIntensity(const Range<double> &intensityRange);
-    void filterChanged();
+    void filterChanged(bool final);
 };
 
 #endif /* FILTER_INTENSITY_WIDGET_HPP */

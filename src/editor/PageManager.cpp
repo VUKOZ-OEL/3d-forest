@@ -25,6 +25,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "PageManager"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 PageManager::PageManager()
@@ -58,6 +59,7 @@ std::shared_ptr<PageData> PageManager::readPage(Editor *editor,
     auto search = cache_.find(nk);
     if (search != cache_.end())
     {
+        LOG_DEBUG(<< "Return from cache.");
         return search->second;
     }
 
@@ -67,6 +69,7 @@ std::shared_ptr<PageData> PageManager::readPage(Editor *editor,
 
     try
     {
+        LOG_DEBUG(<< "Read new page data.");
         result->readPage(editor);
     }
     catch (...)

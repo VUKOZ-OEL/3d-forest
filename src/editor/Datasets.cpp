@@ -137,7 +137,7 @@ void Datasets::clear()
 size_t Datasets::unusedId() const
 {
     // Return minimum available id value.
-    for (size_t rval = 0; rval < std::numeric_limits<size_t>::max(); rval++)
+    for (size_t rval = 1; rval < std::numeric_limits<size_t>::max(); rval++)
     {
         if (hashTable_.find(rval) == hashTable_.end())
         {

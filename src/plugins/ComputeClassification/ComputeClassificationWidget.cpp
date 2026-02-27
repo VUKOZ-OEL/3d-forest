@@ -104,11 +104,11 @@ ComputeClassificationWidget::ComputeClassificationWidget(MainWindow *mainWindow)
 
     // Buttons.
     helpButton_ = new QPushButton(tr("Help"));
-    helpButton_->setIcon(THEME_ICON("question"));
+    helpButton_->setIcon(THEME_ICON("question").icon());
     connect(helpButton_, SIGNAL(clicked()), this, SLOT(slotHelp()));
 
     applyButton_ = new QPushButton(tr("Run"));
-    applyButton_->setIcon(THEME_ICON("run"));
+    applyButton_->setIcon(THEME_ICON("run").icon());
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
 
@@ -164,7 +164,9 @@ void ComputeClassificationWidget::slotApply()
         mainWindow_->showError("Unknown error");
     }
 
-    mainWindow_->update({Editor::TYPE_CLASSIFICATION, Editor::TYPE_ELEVATION});
+    mainWindow_->update(this,
+                        {Editor::TYPE_CLASSIFICATION, Editor::TYPE_ELEVATION},
+                        Page::STATE_READ);
 }
 
 void ComputeClassificationWidget::slotHelp()

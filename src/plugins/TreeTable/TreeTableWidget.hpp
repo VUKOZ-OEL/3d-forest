@@ -24,10 +24,11 @@
 
 // Include 3D Forest.
 #include <Editor.hpp>
-#include <Segments.hpp>
+#include <FileFormatTable.hpp>
 class MainWindow;
 
 // Include Qt.
+#include <QItemSelection>
 #include <QWidget>
 class QCheckBox;
 class QPushButton;
@@ -43,14 +44,17 @@ public:
 
     QSize sizeHint() const override { return QSize(700, 200); }
 
+    void closeWidget();
+
 public slots:
     void slotUpdate(void *sender, const QSet<Editor::Type> &target);
 
 protected slots:
-    void showOnlyVisibleTrees();
-    void showAllTrees();
+    void slotShowOnlyVisibleTreesChanged(int index);
     void slotExport();
     void slotCustomContextMenuRequested(const QPoint &pos);
+    void slotTableSelectionChanged(const QItemSelection &selected,
+                                   const QItemSelection &deselected);
 
 private:
     /** Tree Table Column. */
@@ -58,6 +62,7 @@ private:
     {
         COLUMN_ID,
         COLUMN_LABEL,
+        COLUMN_FILTER,
         COLUMN_MANAGEMENT_STATUS,
         COLUMN_SPECIES,
         COLUMN_X,
@@ -65,8 +70,11 @@ private:
         COLUMN_Z,
         COLUMN_HEIGHT,
         COLUMN_DBH,
+        COLUMN_CROWN_X,
+        COLUMN_CROWN_Y,
+        COLUMN_CROWN_Z,
         COLUMN_AREA,
-        COLUMN_STATUS,
+        COLUMN_VOLUME,
         COLUMN_LAST,
     };
 
@@ -75,30 +83,52 @@ private:
     QTableWidget *tableWidget_;
     QPushButton *exportButton_;
 
-    QPushButton *showOnlyVisibleTreesButton_;
-    QPushButton *showAllTreesButton_;
-
+    QCheckBox *showOnlyVisibleTreesCheckBox_;
     std::unordered_set<size_t> visibleTreesIdList_;
 
     Segments segments_;
     QueryFilterSet filter_;
+    SpeciesList speciesList_;
+    ManagementStatusList managementStatusList_;
     bool updatesEnabled_;
 
     QString fileName_;
 
-    void setSegments(const Segments &segments, const QueryFilterSet &filter);
-    void dataChanged();
-    void filterChanged();
+    // New data.
+    void newData();
+    void newFilter();
 
-    void setTable();
-    void setRow(int row, size_t index);
-    void setCell(int row, int col, bool value, bool userCheckable);
-    void setCell(int row, int col, size_t value);
-    void setCell(int row, int col, double value);
-    void setCell(int row, int col, const std::string &value);
+    // Helpers.
+    std::unordered_set<size_t> selectedRowsToIds();
+    FileFormatTable createExportTable() const;
 
+    // Setup and manage signals.
     void block();
     void unblock();
+    void disconnectSignals();
+    void connectSignals();
+
+    // Set table data.
+    void updateTableContent();
+    void setRow(int row, size_t index);
+    void setCell(int row,
+                 int col,
+                 bool value,
+                 bool userCheckable,
+                 const QColor &color = QColor());
+    void setCell(int row,
+                 int col,
+                 size_t value,
+                 const QColor &color = QColor());
+    void setCell(int row,
+                 int col,
+                 double value,
+                 const QColor &color = QColor());
+    void setCell(int row,
+                 int col,
+                 const std::string &value,
+                 const QColor &color = QColor(),
+                 bool isNumeric = false);
 };
 
 #endif /* TREE_TABLE_WIDGET_HPP */

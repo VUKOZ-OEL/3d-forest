@@ -24,6 +24,7 @@
 
 // Include std.
 #include <cstddef>
+#include <vector>
 
 // Include local.
 #include <ExportEditor.hpp>
@@ -43,9 +44,9 @@ public:
     bool terminalOutput;
 
     size_t maxIndexLevel1;
-    size_t maxIndexLevel1Size;
+    std::vector<size_t> maxIndexLevel1Size;
     size_t maxIndexLevel2;
-    size_t maxIndexLevel2Size;
+    std::vector<size_t> maxIndexLevel2Size;
 
     size_t bufferSize;
 

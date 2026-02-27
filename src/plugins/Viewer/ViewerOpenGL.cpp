@@ -113,7 +113,7 @@ void ViewerOpenGL::render(Mode mode,
     if (normalSize > 0)
     {
         glEnableClientState(GL_NORMAL_ARRAY);
-        glColorPointer(3, GL_FLOAT, 0, normal);
+        glNormalPointer(GL_FLOAT, 0, normal);
     }
 
     if (indicesSize > 0)
@@ -137,17 +137,20 @@ void ViewerOpenGL::render(Mode mode,
 void ViewerOpenGL::render(const Mesh &mesh)
 {
     Mode mode;
-    if (mesh.mode == Mesh::Mode::MODE_LINES)
+    switch (mesh.mode)
     {
-        mode = LINES;
-    }
-    else if (mesh.mode == Mesh::Mode::MODE_TRIANGLES)
-    {
-        mode = TRIANGLES;
-    }
-    else
-    {
-        mode = POINTS;
+        case Mesh::Mode::MODE_POINTS:
+            mode = POINTS;
+            break;
+        case Mesh::Mode::MODE_LINES:
+            mode = LINES;
+            break;
+        case Mesh::Mode::MODE_TRIANGLES:
+            mode = TRIANGLES;
+            break;
+        case Mesh::Mode::MODE_UNKNOWN:
+        default:
+            return;
     }
 
     ViewerOpenGL::render(mode,
@@ -181,20 +184,14 @@ void ViewerOpenGL::renderClipFilter(const Region &clipFilter)
 
         ViewerOpenGL::renderCylinder(a, b, radius, 10);
     }
-    else
+    else if (clipFilter.shape == Region::Shape::BOX)
     {
-        ViewerAabb box;
-
-        if (clipFilter.shape == Region::Shape::BOX)
+        if (!clipFilter.matchesAll())
         {
+            ViewerAabb box;
             box.set(clipFilter.box);
+            ViewerOpenGL::renderAabb(box);
         }
-        else
-        {
-            box.set(clipFilter.boundary);
-        }
-
-        ViewerOpenGL::renderAabb(box);
     }
 
     glDisable(GL_LINE_STIPPLE);
@@ -358,6 +355,74 @@ void ViewerOpenGL::renderCylinder(const Vector3<float> &a,
     glDisableClientState(GL_VERTEX_ARRAY);
 }
 
+void ViewerOpenGL::renderHollowCylinder(const Vector3<float> &a,
+                                        const Vector3<float> &b,
+                                        float radius,
+                                        size_t slices)
+{
+    Vector3<float> ab = b - a;
+    float length = ab.length();
+
+    if (length < 1e-6F || slices < 3)
+    {
+        return;
+    }
+
+    Vector3<float> n1 = ab.normalized();
+    Vector3<float> n2 = n1.perpendicular();
+
+    double sliceAngle = 6.283185307 / static_cast<double>(slices);
+
+    GLuint nSlices = static_cast<GLuint>(slices);
+    std::vector<Vector3<float>> xyz;
+    std::vector<Vector3<float>> normal;
+    std::vector<GLuint> indices;
+
+    xyz.resize(slices * 2);
+    normal.resize(slices * 2);
+    indices.resize(slices * 6);
+
+    for (GLuint i = 0; i < nSlices; i++)
+    {
+        // Vertices
+        n2.normalize();
+
+        xyz[i * 2 + 0] = a + (radius * n2);
+        xyz[i * 2 + 1] = b + (radius * n2);
+
+        normal[i * 2 + 0] = n2;
+        normal[i * 2 + 1] = n2;
+
+        n2 = n2.rotated(n1, sliceAngle);
+
+        // Indices
+        GLuint i0 = (i * 2);
+        GLuint i1 = (i0 + 2) % (2 * nSlices); // Wrap around
+        GLuint j0 = i0 + 1;
+        GLuint j1 = i1 + 1;
+
+        // First triangle
+        indices[i * 6 + 0] = i0;
+        indices[i * 6 + 1] = i1;
+        indices[i * 6 + 2] = j1;
+
+        // Second triangle
+        indices[i * 6 + 3] = i0;
+        indices[i * 6 + 4] = j1;
+        indices[i * 6 + 5] = j0;
+    }
+
+    // Render the vertex array.
+    GLsizei indicesCount = static_cast<GLsizei>(indices.size());
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, static_cast<GLvoid *>(xyz.data()));
+    glNormalPointer(GL_FLOAT, 0, normal.data());
+    glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, indices.data());
+    glDisableClientState(GL_NORMAL_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
+}
+
 void ViewerOpenGL::renderAxis()
 {
     float d = 1.0F;
@@ -423,33 +488,64 @@ void ViewerOpenGL::renderLine(const Vector3<float> &a, const Vector3<float> &b)
 
 void ViewerOpenGL::renderCircle(const Vector3<float> &p,
                                 float radius,
+                                bool fill,
                                 size_t pointCount)
 {
     GLuint pointCountGL = static_cast<GLuint>(pointCount);
     std::vector<float> xyz;
-    std::vector<GLuint> indices;
 
-    xyz.resize(pointCount * 3);
-    indices.resize(pointCount);
-
-    for (GLuint i = 0; i < pointCountGL; i++)
+    if (fill)
     {
-        double angle = (static_cast<double>(i) * 2.0 * 3.14) /
-                       static_cast<double>(pointCountGL);
+        // Add center point first
+        xyz.push_back(p[0]);
+        xyz.push_back(p[1]);
+        xyz.push_back(p[2]);
 
-        xyz[i * 3 + 0] = p[0] + (radius * static_cast<float>(cos(angle)));
-        xyz[i * 3 + 1] = p[1] + (radius * static_cast<float>(sin(angle)));
-        xyz[i * 3 + 2] = p[2];
+        // Perimeter points
+        for (GLuint i = 0; i <= pointCountGL; i++) // <= closes the fan
+        {
+            double angle = (static_cast<double>(i) * 2.0 * M_PI) /
+                           static_cast<double>(pointCountGL);
 
-        indices[i] = i;
+            xyz.push_back(p[0] + radius * static_cast<float>(cos(angle)));
+            xyz.push_back(p[1] + radius * static_cast<float>(sin(angle)));
+            xyz.push_back(p[2]);
+        }
+
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glVertexPointer(3, GL_FLOAT, 0, xyz.data());
+        glDrawArrays(GL_TRIANGLE_FAN, 0, static_cast<GLsizei>(xyz.size() / 3));
+        glDisableClientState(GL_VERTEX_ARRAY);
     }
+    else
+    {
+        std::vector<GLuint> indices;
 
-    // Render the vertex array.
-    GLsizei indicesCount = static_cast<GLsizei>(indices.size());
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(3, GL_FLOAT, 0, static_cast<GLvoid *>(xyz.data()));
-    glDrawElements(GL_LINE_LOOP, indicesCount, GL_UNSIGNED_INT, indices.data());
-    glDisableClientState(GL_VERTEX_ARRAY);
+        xyz.resize(pointCount * 3);
+        indices.resize(pointCount);
+
+        for (GLuint i = 0; i < pointCountGL; i++)
+        {
+            double angle = (static_cast<double>(i) * 2.0 * 3.14) /
+                           static_cast<double>(pointCountGL);
+
+            xyz[i * 3 + 0] = p[0] + (radius * static_cast<float>(cos(angle)));
+            xyz[i * 3 + 1] = p[1] + (radius * static_cast<float>(sin(angle)));
+            xyz[i * 3 + 2] = p[2];
+
+            indices[i] = i;
+        }
+
+        // Render the vertex array.
+        GLsizei indicesCount = static_cast<GLsizei>(indices.size());
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glVertexPointer(3, GL_FLOAT, 0, static_cast<GLvoid *>(xyz.data()));
+        glDrawElements(GL_LINE_LOOP,
+                       indicesCount,
+                       GL_UNSIGNED_INT,
+                       indices.data());
+        glDisableClientState(GL_VERTEX_ARRAY);
+    }
 }
 
 void ViewerOpenGL::renderText(ViewerOpenGLManager *manager,

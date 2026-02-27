@@ -45,7 +45,7 @@ FilterClassificationWindow::FilterClassificationWindow(MainWindow *mainWindow)
     // Dock.
     setWidget(widget_);
     setWindowTitle(tr("Filter Classification"));
-    setWindowIcon(ICON("classification-filter"));
+    setWindowIcon(ICON("classification-filter").icon());
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
 
@@ -55,7 +55,7 @@ FilterClassificationWindow::FilterClassificationWindow(MainWindow *mainWindow)
 void FilterClassificationWindow::showEvent(QShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
-    widget_->setFilterEnabled(true);
+    // widget_->setFilterEnabled(true);
     QWidget::showEvent(event);
 }
 
@@ -68,6 +68,6 @@ void FilterClassificationWindow::hideEvent(QHideEvent *event)
 void FilterClassificationWindow::closeEvent(QCloseEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Close event.");
-    widget_->setFilterEnabled(false);
+    // widget_->setFilterEnabled(false);
     event->accept();
 }

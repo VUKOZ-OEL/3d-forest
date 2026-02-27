@@ -28,6 +28,7 @@ class TreeTableWidget;
 
 // Include Qt.
 #include <QDialog>
+class QCloseEvent;
 
 /** Tree Table Window. */
 class TreeTableWindow : public QDialog
@@ -37,6 +38,9 @@ class TreeTableWindow : public QDialog
 public:
     TreeTableWindow(MainWindow *mainWindow);
     ~TreeTableWindow();
+
+protected:
+    void closeEvent(QCloseEvent *event) override;
 
 private:
     TreeTableWidget *widget_;

@@ -540,6 +540,7 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
                 - Qt 5 Compatibility Module
                 - Additional Libraries
                 - Qt Debug Information Files
+           - Check Extensions > Qt WebEngine > Qt 6.3.0 (for 3D Marteloscope)
         - "Next", "Install", the installation takes between 10 to 30 minutes
         - Click "Finish"
     - Run "systempropertiesadvanced" from the search box
@@ -871,12 +872,21 @@ powershell -C "gci | % {rni $_.Name ($_.Name -replace '24px', '24')}"
       "files.eol": "\n",
       "C_Cpp.default.includePath":[
         "C:/Qt/6.3.0/mingw_64/include/**",
+        "${workspaceRoot}/3rdparty/3d-forest-classic",
+        "${workspaceRoot}/3rdparty/boost",
         "${workspaceRoot}/3rdparty/cdt",
+        "${workspaceRoot}/3rdparty/cgal/**",
         "${workspaceRoot}/3rdparty/convhull_3d",
         "${workspaceRoot}/3rdparty/delaunator",
         "${workspaceRoot}/3rdparty/eigen",
+        "${workspaceRoot}/3rdparty/flann/**",
+        "${workspaceRoot}/3rdparty/iland-model/src/**",
         "${workspaceRoot}/3rdparty/libigl/include",
         "${workspaceRoot}/3rdparty/pcdio",
+        "${workspaceRoot}/3rdparty/pcl/common/include/**",
+        "${workspaceRoot}/3rdparty/pcl/kdtree/include/**",
+        "${workspaceRoot}/3rdparty/pcl/octree/include/**",
+        "${workspaceRoot}/3rdparty/pcl/search/include/**",
         "${workspaceRoot}/3rdparty/stb",
         "${workspaceRoot}/3rdparty/unibnoctree",
         "${workspaceRoot}/3rdparty/warnings",
@@ -889,14 +899,17 @@ powershell -C "gci | % {rni $_.Name ($_.Name -replace '24px', '24')}"
         "${workspaceRoot}/src/editor",
         "${workspaceRoot}/src/gui",
         "${workspaceRoot}/src/plugins/ComputeClassification",
-        "${workspaceRoot}/src/plugins/ComputeConvexHull",
+        "${workspaceRoot}/src/plugins/ComputeCrownVolume",
         "${workspaceRoot}/src/plugins/ComputeDescriptor",
         "${workspaceRoot}/src/plugins/ComputeElevation",
         "${workspaceRoot}/src/plugins/ComputeHeightMap",
+        "${workspaceRoot}/src/plugins/ComputeHull",
         "${workspaceRoot}/src/plugins/ComputeSegmentationNN",
+        "${workspaceRoot}/src/plugins/ComputeSkeleton",
         "${workspaceRoot}/src/plugins/ComputeTreeAttributes",
         "${workspaceRoot}/src/plugins/Edit",
         "${workspaceRoot}/src/plugins/ExportFile",
+        "${workspaceRoot}/src/plugins/External3dMarteloscope",
         "${workspaceRoot}/src/plugins/FilterArea",
         "${workspaceRoot}/src/plugins/FilterClassification",
         "${workspaceRoot}/src/plugins/FilterDescriptor",

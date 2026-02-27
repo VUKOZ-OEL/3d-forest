@@ -32,10 +32,18 @@ Species::Species()
 }
 
 Species::Species(size_t id,
-                 const std::string &label,
+                 const std::string &abbreviation,
+                 const std::string &genus,
+                 const std::string &species,
+                 const std::string &latin,
+                 const std::string &czech,
                  const Vector3<double> &color)
     : id(id),
-      label(label),
+      abbreviation(abbreviation),
+      genus(genus),
+      species(species),
+      latin(latin),
+      czech(czech),
       color(color)
 {
 }
@@ -43,14 +51,22 @@ Species::Species(size_t id,
 void fromJson(Species &out, const Json &in)
 {
     fromJson(out.id, in["id"]);
-    fromJson(out.label, in["label"]);
+    fromJson(out.abbreviation, in, "abbreviation");
+    fromJson(out.genus, in["genus"]);
+    fromJson(out.species, in["species"]);
+    fromJson(out.latin, in["latin"]);
+    fromJson(out.czech, in["czech"]);
     fromJson(out.color, in["color"]);
 }
 
 void toJson(Json &out, const Species &in)
 {
     toJson(out["id"], in.id);
-    toJson(out["label"], in.label);
+    toJson(out["abbreviation"], in.abbreviation);
+    toJson(out["genus"], in.genus);
+    toJson(out["species"], in.species);
+    toJson(out["latin"], in.latin);
+    toJson(out["czech"], in.czech);
     toJson(out["color"], in.color);
 }
 

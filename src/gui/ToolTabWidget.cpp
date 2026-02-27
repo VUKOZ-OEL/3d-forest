@@ -39,8 +39,9 @@
 #define LOG_MODULE_NAME "ToolTabWidget"
 #include <Log.hpp>
 
-ToolTabWidget::ToolTabWidget()
+ToolTabWidget::ToolTabWidget(MainWindow *mainWindow)
     : QWidget(),
+      mainWindow_(mainWindow),
       toolBox_(nullptr),
       icon_(nullptr),
       label_(nullptr),
@@ -52,7 +53,7 @@ ToolTabWidget::ToolTabWidget()
 }
 
 void ToolTabWidget::addTab(QWidget *widget,
-                           const QIcon &icon,
+                           const ThemeIcon &icon,
                            const QString &label,
                            const QString &toolTip)
 {
@@ -67,12 +68,12 @@ void ToolTabWidget::addTab(QWidget *widget,
     // Create tool button.
     QToolButton *toolButton;
 
-    MainWindow::createToolButton(&toolButton,
-                                 label,
-                                 toolTipCopy,
-                                 icon,
-                                 this,
-                                 SLOT(slotToolButton()));
+    mainWindow_->createToolButton(&toolButton,
+                                  label,
+                                  toolTipCopy,
+                                  icon,
+                                  this,
+                                  SLOT(slotToolButton()));
 
     toolButton->setAutoRaise(false);
     toolButton->setCheckable(true);
@@ -103,7 +104,8 @@ void ToolTabWidget::addTab(QWidget *widget,
 
         // Title.
         icon_ = new QLabel;
-        icon_->setPixmap(icon.pixmap(icon.actualSize(QSize(16, 16))));
+        // icon_->setPixmap(icon.pixmap(icon.actualSize(QSize(16, 16))));
+        icon_->setPixmap(icon.pixmap(16));
         icon_->setContentsMargins(1, 1, 1, 1);
 
         label_ = new QLabel;

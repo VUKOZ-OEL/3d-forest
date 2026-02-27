@@ -41,7 +41,8 @@ DoubleSliderWidget::DoubleSliderWidget()
       slider_(nullptr),
       spinBox_(nullptr),
       minimumValue_(0),
-      maximumValue_(0)
+      maximumValue_(0),
+      targetProduct_(0)
 {
 }
 
@@ -83,6 +84,11 @@ void DoubleSliderWidget::setMaximum(double max)
     maximumValue_ = max;
 }
 
+void DoubleSliderWidget::setTargetProduct(double value)
+{
+    targetProduct_ = value;
+}
+
 void DoubleSliderWidget::blockSignals(bool block)
 {
     spinBox_->blockSignals(block);
@@ -101,6 +107,8 @@ void DoubleSliderWidget::slotIntermediateValue(int v)
     double value = minimumValue_ + (static_cast<double>(v) * 0.001 *
                                     (maximumValue_ - minimumValue_));
 
+    value = snapToReciprocal(value);
+
     if (obj == slider_)
     {
         spinBox_->blockSignals(true);
@@ -114,6 +122,8 @@ void DoubleSliderWidget::slotIntermediateValue(int v)
 void DoubleSliderWidget::slotIntermediateValue(double v)
 {
     QObject *obj = sender();
+
+    v = snapToReciprocal(v);
 
     int valueInt = static_cast<int>(
         ((v - minimumValue_) / (maximumValue_ - minimumValue_)) * 1000);
@@ -249,4 +259,20 @@ void DoubleSliderWidget::create(DoubleSliderWidget *&outputWidget,
 
         outputWidget->setLayout(groupLayout);
     }
+}
+
+double DoubleSliderWidget::snapToReciprocal(double value) const
+{
+    double result = value;
+
+    if (targetProduct_ > 0.0 && value > 0.0)
+    {
+        double x = std::round(targetProduct_ / value);
+        if (x > 0.0)
+        {
+            result = targetProduct_ / x;
+        }
+    }
+
+    return result;
 }

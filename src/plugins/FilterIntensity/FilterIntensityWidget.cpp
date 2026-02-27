@@ -45,6 +45,7 @@ FilterIntensityWidget::FilterIntensityWidget(MainWindow *mainWindow)
                                     this,
                                     SLOT(slotRangeIntermediateMinimumValue()),
                                     SLOT(slotRangeIntermediateMaximumValue()),
+                                    SLOT(slotFinalValue()),
                                     tr("Intensity"),
                                     tr("Min-max intensity range filter"),
                                     tr("%"),
@@ -105,13 +106,13 @@ void FilterIntensityWidget::setIntensity(const Range<double> &range)
     intensityInput_->blockSignals(false);
 }
 
-void FilterIntensityWidget::filterChanged()
+void FilterIntensityWidget::filterChanged(bool final)
 {
     LOG_DEBUG(<< "Intensity filer changed.");
 
     mainWindow_->suspendThreads();
     mainWindow_->editor().setIntensityFilter(intensityRange_);
-    mainWindow_->updateFilter();
+    mainWindow_->updateFilter(this, final);
 }
 
 void FilterIntensityWidget::setFilterEnabled(bool b)
@@ -119,7 +120,7 @@ void FilterIntensityWidget::setFilterEnabled(bool b)
     LOG_DEBUG(<< "Set intensity filer enabled <" << toString(b) << ">.");
 
     intensityRange_.setEnabled(b);
-    filterChanged();
+    filterChanged(true);
 }
 
 void FilterIntensityWidget::slotRangeIntermediateMinimumValue()
@@ -127,7 +128,7 @@ void FilterIntensityWidget::slotRangeIntermediateMinimumValue()
     LOG_DEBUG(<< "Minimum value changed.");
 
     intensityRange_.setMinimumValue(intensityInput_->minimumValue() * 0.01);
-    filterChanged();
+    filterChanged(false);
 }
 
 void FilterIntensityWidget::slotRangeIntermediateMaximumValue()
@@ -135,5 +136,10 @@ void FilterIntensityWidget::slotRangeIntermediateMaximumValue()
     LOG_DEBUG(<< "Maximum value changed.");
 
     intensityRange_.setMaximumValue(intensityInput_->maximumValue() * 0.01);
-    filterChanged();
+    filterChanged(false);
+}
+
+void FilterIntensityWidget::slotFinalValue()
+{
+    filterChanged(true);
 }

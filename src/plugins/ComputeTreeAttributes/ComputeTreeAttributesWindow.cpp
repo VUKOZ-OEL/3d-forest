@@ -52,7 +52,7 @@ ComputeTreeAttributesWindow::ComputeTreeAttributesWindow(MainWindow *mainWindow)
     // Dialog.
     setLayout(mainLayout);
     setWindowTitle(tr("Compute Tree Attributes"));
-    setWindowIcon(ICON("tree-attributes"));
+    setWindowIcon(ICON("tree-attributes").icon());
     setMaximumHeight(height());
     setModal(false);
 }

@@ -24,6 +24,7 @@
 
 // Include std.
 #include <unordered_map>
+#include <unordered_set>
 
 // Include 3D Forest.
 #include <Segment.hpp>
@@ -54,7 +55,12 @@ public:
 
     size_t unusedId() const;
 
-    void addTree(size_t id, const Box<double> &boundary);
+    void addTree(size_t id,
+                 const std::string &label,
+                 const Box<double> &boundary);
+
+    bool updateSelection(const std::unordered_set<size_t> &selectedIds,
+                         bool ctrl = false);
 
     void exportMeshList(const std::string &projectFilePath, double scale) const;
     void importMeshList(const std::string &projectFilePath, double scale);
@@ -63,12 +69,12 @@ protected:
     std::vector<Segment> segments_;
     std::unordered_map<size_t, size_t> hashTableId_;
 
-    friend void fromJson(Segments &out, const Json &in);
-    friend void toJson(Json &out, const Segments &in);
+    friend void fromJson(Segments &out, const Json &in, double scale);
+    friend void toJson(Json &out, const Segments &in, double scale);
 };
 
-void fromJson(Segments &out, const Json &in);
-void toJson(Json &out, const Segments &in);
+void fromJson(Segments &out, const Json &in, double scale);
+void toJson(Json &out, const Segments &in, double scale);
 
 #include <WarningsEnable.hpp>
 

@@ -34,6 +34,7 @@ class ColorSwitchWidget;
 // Include Qt.
 #include <QWidget>
 class QCheckBox;
+class QSlider;
 
 /** Tree Settings Widget. */
 class TreeSettingsWidget : public QWidget
@@ -43,7 +44,7 @@ class TreeSettingsWidget : public QWidget
 public:
     TreeSettingsWidget(MainWindow *mainWindow);
 
-    QSize sizeHint() const override { return QSize(300, 240); }
+    QSize sizeHint() const override { return QSize(300, 265); }
 
 public slots:
     void slotUpdate(void *sender, const QSet<Editor::Type> &target);
@@ -53,6 +54,9 @@ public slots:
     void slotSetTreePositionAtBottom(int v);
     void slotSetConvexHullVisible(int v);
     void slotSetConvexHullProjectionVisible(int v);
+    void slotSetConcaveHullVisible(int v);
+    void slotSetConcaveHullProjectionVisible(int v);
+    void slotSetDbhScale(int v);
 
 private:
     MainWindow *mainWindow_;
@@ -62,6 +66,9 @@ private:
     QCheckBox *treePositionAtBottomCheckBox_;
     QCheckBox *convexHullVisibleCheckBox_;
     QCheckBox *convexHullProjectionVisibleCheckBox_;
+    QCheckBox *concaveHullVisibleCheckBox_;
+    QCheckBox *concaveHullProjectionVisibleCheckBox_;
+    QSlider *dbhScaleSlider_;
 
     TreeSettings settings_;
 

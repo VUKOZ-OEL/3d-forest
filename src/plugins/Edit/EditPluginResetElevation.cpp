@@ -77,7 +77,7 @@ void EditPluginResetElevation::run(MainWindow *mainWindow)
 
     progress.close();
 
-    mainWindow->update({Editor::TYPE_ELEVATION});
+    mainWindow->update(nullptr, {Editor::TYPE_ELEVATION}, Page::STATE_READ);
 
     LOG_DEBUG(<< "Finished resetting elevation values.");
 }

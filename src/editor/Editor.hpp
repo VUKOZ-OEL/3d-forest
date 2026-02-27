@@ -49,6 +49,7 @@ public:
     /** Editor Data Type. */
     enum Type
     {
+        TYPE_FILTER,
         TYPE_CLASSIFICATION,
         TYPE_CLIP_FILTER,
         TYPE_DATA_SET,
@@ -68,6 +69,7 @@ public:
     // File.
     void open(const std::string &path,
               const ImportSettings &settings = ImportSettings());
+    void reload();
     void saveProject(const std::string &path);
     const std::string &projectPath() const { return projectPath_; }
     const std::string &projectName() const { return projectName_; }
@@ -123,6 +125,8 @@ public:
     void setSegment(const Segment &segment);
     const QueryFilterSet &segmentsFilter() const { return segmentsFilter_; }
     void setSegmentsFilter(const QueryFilterSet &filter);
+
+    Vector3<double> segmentColor(const Segment &segment) const;
 
     // Species.
     const SpeciesList &speciesList() const { return speciesList_; }
@@ -213,7 +217,7 @@ protected:
     void readSettings();
     void writeSettings();
 
-    void openProject(const std::string &path);
+    void openProject(std::string path, bool reload);
 
     void openDataset(const std::string &path,
                      const ImportSettings &settings = ImportSettings());

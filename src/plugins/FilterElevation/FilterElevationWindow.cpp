@@ -46,7 +46,7 @@ FilterElevationWindow::FilterElevationWindow(MainWindow *mainWindow)
     setWidget(widget_);
     setFixedHeight(widget()->sizeHint().height());
     setWindowTitle(tr("Filter Elevation"));
-    setWindowIcon(ICON("elevation-filter"));
+    setWindowIcon(ICON("elevation-filter").icon());
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
 
@@ -56,7 +56,7 @@ FilterElevationWindow::FilterElevationWindow(MainWindow *mainWindow)
 void FilterElevationWindow::showEvent(QShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
-    widget_->setFilterEnabled(true);
+    // widget_->setFilterEnabled(true);
     QWidget::showEvent(event);
 }
 
@@ -69,6 +69,6 @@ void FilterElevationWindow::hideEvent(QHideEvent *event)
 void FilterElevationWindow::closeEvent(QCloseEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Close event.");
-    widget_->setFilterEnabled(false);
+    // widget_->setFilterEnabled(false);
     event->accept();
 }

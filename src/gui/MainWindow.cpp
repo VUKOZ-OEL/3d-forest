@@ -22,6 +22,7 @@
 // Include 3D Forest.
 #include <GuiUtil.hpp>
 #include <MainWindow.hpp>
+#include <Time.hpp>
 
 // Include 3D Forest plugins.
 #include <ImportFileInterface.hpp>
@@ -32,6 +33,7 @@
 #include <HelpPlugin.hpp>
 
 // Include Qt.
+#include <QApplication>
 #include <QCloseEvent>
 #include <QCoreApplication>
 #include <QDir>
@@ -40,6 +42,7 @@
 #include <QMessageBox>
 #include <QPluginLoader>
 #include <QStatusBar>
+#include <QStyleHints>
 #include <QToolBar>
 #include <QToolButton>
 
@@ -80,7 +83,7 @@ MainWindow::MainWindow(QWidget *parent)
                  "",
                  tr("E&xit"),
                  tr("Exit the application"),
-                 QIcon(),
+                 ThemeIcon(),
                  this,
                  SLOT(close()),
                  MAIN_WINDOW_MENU_FILE_PRIORITY,
@@ -90,21 +93,23 @@ MainWindow::MainWindow(QWidget *parent)
     // Menu.
     createMenu();
 
-    // Rendering.
-    connect(this,
-            SIGNAL(signalRender()),
-            this,
-            SLOT(slotRender()),
-            Qt::QueuedConnection);
+    // initialize icons according to current theme
+    onThemeChanged();
 
+    // update when theme changes
+    connect(qApp->styleHints(),
+            &QStyleHints::colorSchemeChanged,
+            this,
+            &MainWindow::onThemeChanged);
+
+    // Rendering.
     threadRender_.setCallback(this);
     threadRender_.create();
 
     // Update.
     setWindowTitle(QString::fromStdString(editor_.projectPath()));
 
-    LOG_DEBUG_UPDATE(<< "Emit update.");
-    emit signalUpdate(this, {});
+    emitUpdate(this, {});
 
     if (viewerPlugin_)
     {
@@ -133,6 +138,16 @@ QSize MainWindow::minimumSizeHint() const
 QSize MainWindow::sizeHint() const
 {
     return QSize(1024, 768);
+}
+
+bool MainWindow::event(QEvent *e)
+{
+    if (e->type() == QEvent::ApplicationPaletteChange)
+    {
+        onThemeChanged();
+    }
+
+    return QMainWindow::event(e);
 }
 
 void MainWindow::paintEvent(QPaintEvent *event)
@@ -208,12 +223,49 @@ void MainWindow::setWindowTitle(const QString &path)
     QMainWindow::setWindowTitle(newtitle + " [*]");
 }
 
+bool MainWindow::isDarkMode()
+{
+    auto scheme = qApp->styleHints()->colorScheme();
+
+    if (scheme == Qt::ColorScheme::Dark)
+    {
+        return true;
+    }
+
+    if (scheme == Qt::ColorScheme::Light)
+    {
+        return false;
+    }
+
+    // Fallback.
+    int lightness = qApp->palette().color(QPalette::Window).lightness();
+
+    return lightness < 128;
+}
+
+void MainWindow::onThemeChanged()
+{
+    bool dark = isDarkMode();
+
+    for (auto &it : icons_)
+    {
+        if (it.action)
+        {
+            it.action->setIcon(it.themeIcon.icon(dark));
+        }
+        else if (it.button)
+        {
+            it.button->setIcon(it.themeIcon.icon(dark));
+        }
+    }
+}
+
 void MainWindow::createAction(QAction **result,
                               const QString &menuTitle,
                               const QString &toolBarTitle,
                               const QString &text,
                               const QString &toolTip,
-                              const QIcon &icon,
+                              const ThemeIcon &themeIcon,
                               const QObject *receiver,
                               const char *member,
                               int menuPriority,
@@ -222,8 +274,8 @@ void MainWindow::createAction(QAction **result,
     LOG_DEBUG(<< "Create action menu <" << menuTitle.toStdString()
               << "> toolBar <" << toolBarTitle.toStdString() << "> text <"
               << text.toStdString() << "> priority <" << menuPriority << "/"
-              << menuItemPriority << "> icon sizes <"
-              << icon.availableSizes().count() << ">.");
+              << menuItemPriority << "> icons <" << themeIcon.toQString()
+              << ">.");
 
     QAction *action;
 
@@ -236,9 +288,16 @@ void MainWindow::createAction(QAction **result,
         action->setStatusTip(toolTip);
     }
 
+    QIcon icon = themeIcon.icon(isDarkMode());
     if (!icon.isNull())
     {
         action->setIcon(icon);
+
+        IconEntry ie;
+        ie.action = action;
+        ie.themeIcon = themeIcon;
+
+        icons_.push_back(ie);
     }
 
     // Connect action.
@@ -353,7 +412,7 @@ void MainWindow::createMenu()
 void MainWindow::createToolButton(QToolButton **result,
                                   const QString &text,
                                   const QString &toolTip,
-                                  const QIcon &icon,
+                                  const ThemeIcon &themeIcon,
                                   const QObject *receiver,
                                   const char *member)
 {
@@ -364,9 +423,20 @@ void MainWindow::createToolButton(QToolButton **result,
     button->setText(text);
     button->setToolTip(toolTip);
     button->setStatusTip(toolTip);
-    button->setIcon(icon);
     button->setEnabled(true);
     button->setToolButtonStyle(Qt::ToolButtonIconOnly);
+
+    QIcon icon = themeIcon.icon(isDarkMode());
+    if (!icon.isNull())
+    {
+        button->setIcon(icon);
+
+        IconEntry ie;
+        ie.button = button;
+        ie.themeIcon = themeIcon;
+
+        icons_.push_back(ie);
+    }
 
     // Connect button.
     if (receiver && member)
@@ -434,7 +504,8 @@ void MainWindow::loadPlugins()
         else
         {
             LOG_ERROR(<< "Unable to get instance of plugin <"
-                      << pluginPath.toStdString() << ">.");
+                      << pluginPath.toStdString() << "> error <"
+                      << pluginLoader.errorString() << ">.");
         }
     }
 
@@ -515,16 +586,39 @@ void MainWindow::threadProgress(bool finished)
 
     LOG_DEBUG_RENDER(<< "Thread progress finished <" << finished << ">.");
 
-    emit signalRender();
+    requestRenderFromAnyThread();
+}
+
+void MainWindow::requestRenderFromAnyThread()
+{
+    if (renderPending_.exchange(true))
+    {
+        return;
+    }
+
+    QMetaObject::invokeMethod(
+        this,
+        [this]
+        {
+            renderPending_.store(false);
+            slotRender();
+        },
+        Qt::QueuedConnection);
 }
 
 void MainWindow::slotRender()
 {
+    LOG_DEBUG_RENDER(<< "Start rendering.");
+    double t1 = Time::realTime();
+
     if (viewerPlugin_)
     {
-        std::unique_lock<std::mutex> mutexlock(editor_.editorMutex_);
         viewerPlugin_->updateScene(&editor_);
     }
+
+    double t2 = Time::realTime();
+    LOG_DEBUG_RENDER(<< "Finished rendering after <" << (t2 - t1)
+                     << "> seconds.");
 }
 
 void MainWindow::slotRenderViewport(size_t viewportId)
@@ -547,14 +641,15 @@ void MainWindow::slotRenderViewports()
     }
 }
 
-void MainWindow::update(void *sender, const QSet<Editor::Type> &target)
+void MainWindow::emitUpdate(void *sender, const QSet<Editor::Type> &target)
 {
     LOG_DEBUG_UPDATE(<< "Update target <" << target << "> emit.");
 
     emit signalUpdate(sender, target);
 }
 
-void MainWindow::update(const QSet<Editor::Type> &target,
+void MainWindow::update(void *sender,
+                        const QSet<Editor::Type> &target,
                         Page::State viewPortsCacheState,
                         bool resetCamera)
 {
@@ -575,7 +670,7 @@ void MainWindow::update(const QSet<Editor::Type> &target,
         }
     }
 
-    update(this, target);
+    emitUpdate(sender, target);
 
     resumeThreads();
 }
@@ -592,8 +687,7 @@ void MainWindow::updateNewProject()
         viewerPlugin_->resetScene(&editor_, true);
     }
 
-    LOG_DEBUG(<< "Emit update.");
-    emit signalUpdate(this, {});
+    emitUpdate(this, {});
 
     LOG_DEBUG(<< "Finished updating new project.");
 }
@@ -615,7 +709,7 @@ void MainWindow::updateData()
     resumeThreads();
 }
 
-void MainWindow::updateFilter()
+void MainWindow::updateFilter(void *sender, bool final)
 {
     LOG_DEBUG_UPDATE(<< "Update filter.");
 
@@ -627,6 +721,11 @@ void MainWindow::updateFilter()
     }
 
     editor_.viewports().setState(Page::STATE_SELECT);
+
+    if (final)
+    {
+        emitUpdate(sender, {Editor::TYPE_FILTER});
+    }
 
     resumeThreads();
 }

@@ -20,9 +20,15 @@
 /** @file TestJson.cpp */
 
 // Include 3D Forest.
+#include <Box.hpp>
 #include <Json.hpp>
+#include <Mesh.hpp>
+#include <Range.hpp>
+#include <Region.hpp>
 #include <Test.hpp>
 #include <Util.hpp>
+#include <Vector2.hpp>
+#include <Vector3.hpp>
 
 TEST_CASE(TestJsonString)
 {
@@ -34,6 +40,24 @@ TEST_CASE(TestJsonString)
     TEST(obj["name"].string() == "John");
 }
 
+TEST_CASE(TestJsonStringOpt)
+{
+    Json obj;
+    obj["name"] = "John";
+
+    std::string a;
+    fromJson(a, obj, "name");
+    TEST(a == "John");
+
+    std::string b;
+    fromJson(b, obj, "surname");
+    TEST(b.empty());
+
+    std::string c;
+    fromJson(c, obj, "surname", "Doe");
+    TEST(c == "Doe");
+}
+
 TEST_CASE(TestJsonNumber)
 {
     Json obj;
@@ -42,6 +66,24 @@ TEST_CASE(TestJsonNumber)
     TEST(obj.contains("width"));
     TEST(obj["width"].typeNumber());
     TEST(equal(obj["width"].number(), 5.0));
+}
+
+TEST_CASE(TestJsonNumberOpt)
+{
+    Json obj;
+    obj["width"] = 5;
+
+    double a;
+    fromJson(a, obj, "width");
+    TEST(equal(a, 5.0));
+
+    double b;
+    fromJson(b, obj, "height");
+    TEST(equal(b, 0.0));
+
+    double c;
+    fromJson(c, obj, "height", 3.14);
+    TEST(equal(c, 3.14));
 }
 
 TEST_CASE(TestJsonVectorInt)
@@ -92,6 +134,27 @@ TEST_CASE(TestJsonVectorDouble)
     TEST(equal(out[3], 7.9));
 }
 
+TEST_CASE(TestJsonVectorDoubleOpt)
+{
+    std::vector<double> in{0, 1.5, 3.14, 7.9};
+
+    Json obj;
+    obj["vec"] = in;
+
+    std::vector<double> a;
+    fromJson(a, obj, "vec");
+    TEST(a.size() == in.size());
+    TEST(equal(a, in));
+
+    std::vector<double> b;
+    fromJson(b, obj, "foo");
+    TEST(equal(b, {}));
+
+    std::vector<double> c;
+    fromJson(c, obj, "foo", {1.2, 0.5});
+    TEST(equal(c, {1.2, 0.5}));
+}
+
 TEST_CASE(TestJsonVectorFloat)
 {
     std::vector<float> in{0.0F, 1.5F, 3.14F, 7.9F};
@@ -131,4 +194,141 @@ TEST_CASE(TestJsonSerialize)
     TEST(b.contains("width"));
     TEST(b["width"].typeNumber());
     TEST(equal(b["width"].number(), 5.0));
+}
+
+TEST_CASE(TestJsonVector2)
+{
+    Vector2<double> in{0, 1.5};
+
+    Json obj;
+    toJson(obj["vec"], in);
+
+    Vector2<double> out;
+    fromJson(out, obj["vec"]);
+    TEST(out == in);
+
+    Vector2<double> a;
+    fromJson(a, obj, "vec");
+    TEST(a == in);
+
+    Vector2<double> b;
+    fromJson(b, obj, "foo");
+    TEST(b == Vector2<double>());
+
+    Vector2<double> c;
+    fromJson(c, obj, "foo", {1.2, 0.5});
+    TEST(c == Vector2<double>(1.2, 0.5));
+}
+
+TEST_CASE(TestJsonVector3)
+{
+    Vector3<double> in{0, 1.5, 3.14};
+
+    Json obj;
+    toJson(obj["vec"], in);
+
+    Vector3<double> out;
+    fromJson(out, obj["vec"]);
+    TEST(out == in);
+
+    Vector3<double> a;
+    fromJson(a, obj, "vec");
+    TEST(a == in);
+
+    Vector3<double> b;
+    fromJson(b, obj, "foo");
+    TEST(b == Vector3<double>());
+
+    Vector3<double> c;
+    fromJson(c, obj, "foo", {1.2, 0.5, 2.0});
+    TEST(c == Vector3<double>(1.2, 0.5, 2.0));
+}
+
+TEST_CASE(TestJsonBox)
+{
+    Box<double> in(0.0, 0.0, 0.0, 1.0, 1.0, 1.0);
+
+    Json obj;
+    toJson(obj["box"], in);
+
+    Box<double> out;
+    fromJson(out, obj["box"]);
+    TEST(out == in);
+
+    Box<double> a;
+    fromJson(a, obj, "box");
+    TEST(a == in);
+
+    Box<double> b;
+    fromJson(b, obj, "foo");
+    TEST(b == Box<double>());
+
+    Box<double> c;
+    fromJson(c, obj, "foo", Box<double>(0.5, 1.5));
+    TEST(c == Box<double>(0.5, 1.5));
+}
+
+TEST_CASE(TestJsonMesh)
+{
+    Mesh in;
+    in.name = "hull";
+    in.mode = Mesh::Mode::MODE_POINTS;
+
+    Json obj;
+    toJson(obj["mesh"], in);
+
+    Mesh out;
+    fromJson(out, obj["mesh"]);
+    TEST(out.name == in.name);
+    TEST(out.mode == in.mode);
+}
+
+TEST_CASE(TestJsonRange)
+{
+    Range<double> in(0.0, 0.1, 0.8, 1.0);
+
+    Json obj;
+    toJson(obj["range"], in);
+
+    Range<double> out;
+    fromJson(out, obj["range"]);
+    TEST(out == in);
+
+    Range<double> a;
+    fromJson(a, obj, "range");
+    TEST(a == in);
+
+    Range<double> b;
+    fromJson(b, obj, "foo");
+    TEST(b == Range<double>());
+
+    Range<double> c;
+    fromJson(c, obj, "foo", Range<double>(0.5, 1.5));
+    TEST(c == Range<double>(0.5, 1.5));
+}
+
+TEST_CASE(TestJsonRegion)
+{
+    Region in;
+    in.shape = Region::Shape::BOX;
+    in.box.set(0.0, 1.0);
+
+    Json obj;
+    toJson(obj["region"], in);
+
+    Region out;
+    fromJson(out, obj["region"]);
+    TEST(out == in);
+
+    Region a;
+    fromJson(a, obj, "region");
+    TEST(a == in);
+
+    Region b;
+    fromJson(b, obj, "foo");
+    TEST(b == Region());
+
+    Region c;
+    fromJson(c, obj, "foo", in);
+    TEST(c == in);
 }

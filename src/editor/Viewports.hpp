@@ -52,7 +52,7 @@ public:
     void applyCamera(const std::vector<Camera> &cameraList);
 
     void setState(Page::State state);
-    bool nextState();
+    bool nextState(bool *lruL0Ready);
 
     size_t pageSize(size_t viewport) const
     {

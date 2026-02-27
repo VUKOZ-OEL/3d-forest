@@ -104,12 +104,21 @@ public:
     // Operations.
     bool contains(T v) const;
 
+    bool operator==(const Range<T> &other) const
+    {
+        return equal(this->operator[](0), other[0]) &&
+               equal(this->operator[](1), other[1]) &&
+               equal(this->operator[](2), other[2]) &&
+               equal(this->operator[](3), other[3]) &&
+               enabled() == other.enabled();
+    }
+
+    bool operator!=(const Range<T> &other) const { return !(*this == other); }
+
 protected:
     bool enabled_;
 
     template <class U> friend void fromJson(Range<U> &out, const Json &in);
-
-    template <class U> friend void toJson(Json &out, const Range<U> &in);
 
     template <class U> friend std::string toString(const Range<U> &in);
 
@@ -158,6 +167,49 @@ template <class T> inline bool Range<T>::contains(T v) const
     return !(v < minimumValue() || v > maximumValue());
 }
 
+template <class U>
+inline void fromJson(Range<U> &out,
+                     const Json &in,
+                     const std::string &key,
+                     const Range<U> &defaultValue = {},
+                     bool optional = true,
+                     double scale = 1.0)
+{
+    out.clear();
+
+    if (in.contains(key))
+    {
+        std::array<U, 4> v;
+
+        fromJson(v[0], in[key], "minimum", defaultValue.minimum(), optional);
+        fromJson(v[1],
+                 in[key],
+                 "minimumValue",
+                 defaultValue.minimumValue(),
+                 optional);
+        fromJson(v[2],
+                 in[key],
+                 "maximumValue",
+                 defaultValue.maximumValue(),
+                 optional);
+        fromJson(v[3], in[key], "maximum", defaultValue.maximum(), optional);
+
+        bool enabled;
+        fromJson(enabled, in[key], "enabled", defaultValue.enabled(), optional);
+
+        out.set(v[0] * scale, v[1] * scale, v[2] * scale, v[3] * scale);
+        out.setEnabled(enabled);
+    }
+    else if (!optional)
+    {
+        THROW("JSON required key " + key + " was not found");
+    }
+    else
+    {
+        out = defaultValue;
+    }
+}
+
 template <class U> inline void fromJson(Range<U> &out, const Json &in)
 {
     fromJson(out[0], in["minimum"]);
@@ -167,13 +219,14 @@ template <class U> inline void fromJson(Range<U> &out, const Json &in)
     fromJson(out.enabled_, in["enabled"]);
 }
 
-template <class U> inline void toJson(Json &out, const Range<U> &in)
+template <class U>
+inline void toJson(Json &out, const Range<U> &in, double scale = 1.0)
 {
-    toJson(out["minimum"], in[0]);
-    toJson(out["minimumValue"], in[1]);
-    toJson(out["maximumValue"], in[2]);
-    toJson(out["maximum"], in[3]);
-    toJson(out["enabled"], in.enabled_);
+    toJson(out["minimum"], in[0] * scale);
+    toJson(out["minimumValue"], in[1] * scale);
+    toJson(out["maximumValue"], in[2] * scale);
+    toJson(out["maximum"], in[3] * scale);
+    toJson(out["enabled"], in.enabled());
 }
 
 template <class U> inline std::string toString(const Range<U> &in)

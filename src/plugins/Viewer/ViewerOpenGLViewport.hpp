@@ -24,10 +24,11 @@
 
 // Include 3D Forest.
 #include <Camera.hpp>
-#include <Segment.hpp>
+#include <Segments.hpp>
 #include <ViewerAabb.hpp>
 #include <ViewerCamera.hpp>
 class Editor;
+class MainWindow;
 class ViewerViewports;
 class ViewerOpenGLManager;
 
@@ -43,7 +44,7 @@ class ViewerOpenGLViewport : public QOpenGLWidget, protected QOpenGLFunctions
     Q_OBJECT
 
 public:
-    explicit ViewerOpenGLViewport(QWidget *parent = nullptr);
+    explicit ViewerOpenGLViewport(QWidget *parent, MainWindow *mainWindow);
     ~ViewerOpenGLViewport();
 
     void setManager(ViewerOpenGLManager *manager);
@@ -61,6 +62,8 @@ public:
 
     void setViewOrthographic();
     void setViewPerspective();
+    void setView2d();
+
     void setViewTop();
     void setViewFront();
     void setViewRight();
@@ -78,11 +81,13 @@ protected:
     void initializeGL() override;
     void paintGL() override;
     void resizeGL(int w, int h) override;
-    void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
 
+    MainWindow *mainWindow_;
     ViewerOpenGLManager *manager_;
 
     // Window Viewports.
@@ -98,16 +103,28 @@ protected:
 
     void setViewDefault();
     void clearScreen();
+
     void renderScene();
     void renderFirstFrame();
+    void renderFirstFrameData();
     void renderLastFrame();
-    void renderSegments();
-    void renderAttributes();
-    void renderLabels();
-    bool skipSegmentRendering(const Segment &segment);
+
+    void renderSegmentsSelection();
+    void renderSegmentsDbh();
+    void renderSegmentsHullProjections();
+    void renderSegmentMeshes(const Segment &segment, bool onlyProjections);
+    void renderSegmentsMeshes();
+    void renderSegmentsAttributes();
+    void renderSegmentsLabels();
+
+    bool skipSegment(const Segment &segment);
+    bool skipSegmentByFilter(const Segment &segment);
+    bool skipSegmentByAttributes(const Segment &segment);
+
     void renderGuides();
     void renderSceneSettingsEnable();
     void renderSceneSettingsDisable();
+
     void cameraChanged();
     void setFocus();
     void setViewDirection(const QVector3D &dir, const QVector3D &up);
@@ -117,13 +134,18 @@ protected:
     public:
         size_t id{0};
         ViewerAabb aabb;
+        QVector3D dbhPosition;
+        float dbh{0.0F};
+        bool selected{false};
     };
 
     std::vector<Object> objects_;
-    size_t selectedId{0};
+    Segments segments_;
 
     void updateObjects();
-    void pickObject(const QPoint &p);
+    void pickObject(const QPoint &p, bool ctrl);
+    size_t pickObject2D(const QVector3D &p1, const QVector3D &p2);
+    size_t pickObject3D(const QVector3D &p1, const QVector3D &p2);
 };
 
 #endif /* VIEWER_OPENGL_VIEWPORT_HPP */

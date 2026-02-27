@@ -99,6 +99,10 @@ public:
     void zoom(int dy);
     void setOffset(const QVector3D &offset) { offset_ = offset; }
 
+    void setLock2d(bool b) { lock2d_ = b; }
+    bool lock2d() const { return lock2d_; }
+    double timeUpdated() const { return timeUpdated_; }
+
     // Matrix.
     const QMatrix4x4 &modelView() const { return modelView_; }
     const QMatrix4x4 &projection() const { return projection_; }
@@ -149,6 +153,8 @@ protected:
     float sensitivityX_;
     float sensitivityY_;
     float sensitivityZoom_;
+    bool lock2d_;
+    double timeUpdated_;
 
     void updateMatrix();
     void setModelView(const QMatrix4x4 &m);

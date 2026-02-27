@@ -23,11 +23,13 @@
 #define MAIN_WINDOW_HPP
 
 // Include std.
+#include <atomic>
 #include <set>
 
 // Include 3D Forest.
 #include <Editor.hpp>
 #include <RenderThread.hpp>
+#include <ThemeIcon.hpp>
 #include <ThreadCallbackInterface.hpp>
 
 // Include 3D Forest plugins.
@@ -39,7 +41,6 @@ class HelpPlugin;
 
 // Include Qt.
 #include <QHash>
-#include <QIcon>
 #include <QMainWindow>
 #include <QSet>
 
@@ -61,6 +62,7 @@ class QToolButton;
 #define MAIN_WINDOW_MENU_DATA_PRIORITY 30
 #define MAIN_WINDOW_MENU_COMPUTE_PRIORITY 40
 #define MAIN_WINDOW_MENU_FILTER_PRIORITY 50
+#define MAIN_WINDOW_MENU_EXTERNAL_PRIORITY 52
 #define MAIN_WINDOW_MENU_VIEWPORT_PRIORITY 55
 #define MAIN_WINDOW_MENU_SETTINGS_PRIORITY 60
 #define MAIN_WINDOW_MENU_HELP_PRIORITY 70
@@ -93,18 +95,18 @@ public:
                       const QString &toolBarTitle,
                       const QString &text,
                       const QString &toolTip,
-                      const QIcon &icon,
+                      const ThemeIcon &themeIcon,
                       const QObject *receiver,
                       const char *member,
                       int menuPriority = -1,
                       int menuItemPriority = -1);
 
-    static void createToolButton(QToolButton **result,
-                                 const QString &text,
-                                 const QString &toolTip,
-                                 const QIcon &icon,
-                                 const QObject *receiver,
-                                 const char *member);
+    void createToolButton(QToolButton **result,
+                          const QString &text,
+                          const QString &toolTip,
+                          const ThemeIcon &themeIcon,
+                          const QObject *receiver,
+                          const char *member);
 
     void hideToolBar(const QString &menu);
 
@@ -112,9 +114,10 @@ public:
     void resumeThreads();
     virtual void threadProgress(bool finished) override;
 
-    void update(void *sender, const QSet<Editor::Type> &target);
-    void update(const QSet<Editor::Type> &target,
-                Page::State viewPortsCacheState = Page::STATE_READ,
+    void emitUpdate(void *sender, const QSet<Editor::Type> &target);
+    void update(void *sender,
+                const QSet<Editor::Type> &target,
+                Page::State viewPortsCacheState = Page::STATE_SELECT,
                 bool resetCamera = false);
 
     /// Call when the whole project was opened or closed.
@@ -124,13 +127,16 @@ public:
     void updateData();
 
     /// Reset selection of cached point data and start new rendering.
-    void updateFilter();
+    void updateFilter(void *sender = nullptr, bool final = true);
 
     /// Reset modifiers of cached point data and start new rendering.
     void updateModifiers();
 
     /// Reset rendered state of cached point data and start new rendering.
     void updateRender();
+
+    /// Call rendering from another thread.
+    void requestRenderFromAnyThread();
 
 public slots:
     /// Calls paint() on all viewports.
@@ -143,13 +149,11 @@ public slots:
     void slotRenderViewports();
 
 signals:
-    /// Call rendering from another thread.
-    void signalRender();
-
     /// Connect to this signal in your plugin to be notified about data changes.
     void signalUpdate(void *sender, const QSet<Editor::Type> &target);
 
 protected:
+    bool event(QEvent *e) override;
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
     void showEvent(QShowEvent *event) override;
@@ -163,6 +167,7 @@ private:
     // Editor.
     Editor editor_;
     RenderThread threadRender_;
+    std::atomic_bool renderPending_{false};
 
     // Plugins.
     ProjectFileInterface *projectFilePlugin_;
@@ -171,6 +176,20 @@ private:
     HelpPlugin *helpPlugin_;
 
     std::vector<PluginInterface *> plugins_;
+
+    // Icons.
+    class IconEntry
+    {
+    public:
+        QAction *action{nullptr};
+        QToolButton *button{nullptr};
+        ThemeIcon themeIcon;
+    };
+
+    std::vector<IconEntry> icons_;
+
+    bool isDarkMode();
+    void onThemeChanged();
 
     // Menu.
     /** Main Window Menu Item. */

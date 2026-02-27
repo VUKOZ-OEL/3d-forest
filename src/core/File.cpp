@@ -794,6 +794,23 @@ bool File::absolute(const std::string &path)
     return false;
 }
 
+std::string File::directory(const std::string &path)
+{
+    std::string dir;
+
+    size_t pos = path.find_last_of("/\\");
+    if (pos == std::string::npos)
+    {
+        dir = "";
+    }
+    else
+    {
+        dir = path.substr(0, pos);
+    }
+
+    return dir;
+}
+
 std::string File::fileName(const std::string &path)
 {
     size_t i = path.size();
@@ -816,6 +833,29 @@ std::string File::fileName(const std::string &path)
     }
 
     return "";
+}
+
+std::string File::baseName(const std::string &path)
+{
+    std::string fname;
+
+    size_t pos = path.find_last_of("/\\");
+    if (pos == std::string::npos)
+    {
+        fname = path;
+    }
+    else
+    {
+        fname = path.substr(pos + 1);
+    }
+
+    size_t dot = fname.find_last_of('.');
+    if (dot != std::string::npos)
+    {
+        return fname.substr(0, dot);
+    }
+
+    return fname;
 }
 
 std::string File::fileExtension(const std::string &path)

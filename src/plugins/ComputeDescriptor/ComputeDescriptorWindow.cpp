@@ -51,7 +51,7 @@ ComputeDescriptorWindow::ComputeDescriptorWindow(MainWindow *mainWindow)
     // Dialog
     setLayout(mainLayout);
     setWindowTitle(tr("Compute Descriptor"));
-    setWindowIcon(ICON("descriptor"));
+    setWindowIcon(ICON("descriptor").icon());
     setMaximumHeight(height());
     setModal(false);
 }

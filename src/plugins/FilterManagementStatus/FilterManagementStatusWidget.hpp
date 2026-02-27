@@ -26,9 +26,11 @@
 #include <Editor.hpp>
 #include <ManagementStatusList.hpp>
 class MainWindow;
+class FilterManagementStatusTreeWidget;
 
 // Include Qt.
 #include <QWidget>
+class QSplitter;
 class QToolButton;
 class QTreeWidget;
 class QTreeWidgetItem;
@@ -77,13 +79,17 @@ protected:
     QToolButton *selectNoneButton_;
     bool updatesEnabled_;
 
+    QSplitter *splitter_;
+
+    FilterManagementStatusTreeWidget *treeWidget_;
+
     ManagementStatusList managementStatus_;
     QueryFilterSet filter_;
 
-    void setManagementStatusList(const ManagementStatusList &managementStatus,
-                                 const QueryFilterSet &filter);
-    void dataChanged();
-    void filterChanged();
+    // New data.
+    void receivedSegments();
+    void receivedManagementStatusList();
+    void sendFilter();
 
     size_t identifier(const QTreeWidgetItem *item);
     void updateTree();

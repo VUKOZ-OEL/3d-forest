@@ -22,6 +22,7 @@
 // Include 3D Forest.
 #include <Editor.hpp>
 #include <Geometry.hpp>
+#include <MainWindow.hpp>
 #include <Time.hpp>
 #include <ViewerOpenGL.hpp>
 #include <ViewerOpenGLManager.hpp>
@@ -38,15 +39,23 @@
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-ViewerOpenGLViewport::ViewerOpenGLViewport(QWidget *parent)
+static QVector3D fromVector3(const Vector3<double> &v)
+{
+    return QVector3D(static_cast<float>(v[0]),
+                     static_cast<float>(v[1]),
+                     static_cast<float>(v[2]));
+}
+
+ViewerOpenGLViewport::ViewerOpenGLViewport(QWidget *parent,
+                                           MainWindow *mainWindow)
     : QOpenGLWidget(parent),
+      mainWindow_(mainWindow),
       manager_(nullptr),
       windowViewports_(nullptr),
       viewportId_(0),
       selected_(false),
       resized_(false),
       editor_(nullptr)
-
 {
     setViewDefault();
 }
@@ -89,8 +98,27 @@ void ViewerOpenGLViewport::initializeGL()
     setUpdateBehavior(QOpenGLWidget::PartialUpdate);
 
     glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
+    // glDepthFunc(GL_LEQUAL);
+    glDepthFunc(GL_LESS);
     glClearDepth(1.0F);
+
+    glEnable(GL_NORMALIZE);
+    glShadeModel(GL_SMOOTH);
+
+    glEnable(GL_COLOR_MATERIAL);
+    glColorMaterial(GL_FRONT, GL_DIFFUSE);
+    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+
+    glEnable(GL_LIGHT0);
+
+    GLfloat diffuse[] = {1.0F, 1.0F, 1.0F, 1.0F};
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+
+    GLfloat ambient[] = {0.2F, 0.2F, 0.2F, 1.0F};
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+
+    GLfloat lightDir[] = {-1.0F, -1.0F, -1.0F, 0.0F}; // Directional light.
+    glLightfv(GL_LIGHT0, GL_POSITION, lightDir);
 }
 
 void ViewerOpenGLViewport::resizeGL(int w, int h)
@@ -104,20 +132,41 @@ void ViewerOpenGLViewport::resizeGL(int w, int h)
     // cameraChanged();
 }
 
+void ViewerOpenGLViewport::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    LOG_DEBUG_RENDER(<< "Mouse double click event");
+
+    setFocus();
+
+    if (event->button() == Qt::LeftButton)
+    {
+        const QPointF posLogical = event->position(); // logical (DIP)
+        const qreal dpr = devicePixelRatioF();        // e.g. 1.25 on 125%
+        const QPoint posDevice = (posLogical * dpr).toPoint(); // device pixels
+
+        bool ctrl = event->modifiers() & Qt::ControlModifier;
+
+        pickObject(posDevice, ctrl);
+    }
+
+    QOpenGLWidget::mouseDoubleClickEvent(event);
+}
+
+void ViewerOpenGLViewport::mousePressEvent(QMouseEvent *event)
+{
+    LOG_DEBUG_RENDER(<< "Mouse press event");
+    camera_.mousePressEvent(event);
+    setFocus();
+}
+
 void ViewerOpenGLViewport::mouseReleaseEvent(QMouseEvent *event)
 {
     (void)event;
 }
 
-void ViewerOpenGLViewport::mousePressEvent(QMouseEvent *event)
-{
-    camera_.mousePressEvent(event);
-    pickObject(event->pos());
-    setFocus();
-}
-
 void ViewerOpenGLViewport::mouseMoveEvent(QMouseEvent *event)
 {
+    LOG_DEBUG_RENDER(<< "Mouse move event");
     camera_.mouseMoveEvent(event);
     cameraChanged();
 }
@@ -212,11 +261,32 @@ Camera ViewerOpenGLViewport::camera() const
 void ViewerOpenGLViewport::setViewOrthographic()
 {
     camera_.setOrthographic();
+
+    bool l2d = camera_.lock2d();
+    camera_.setLock2d(false);
+    if (l2d)
+    {
+        setView3d();
+    }
 }
 
 void ViewerOpenGLViewport::setViewPerspective()
 {
     camera_.setPerspective();
+
+    bool l2d = camera_.lock2d();
+    camera_.setLock2d(false);
+    if (l2d)
+    {
+        setView3d();
+    }
+}
+
+void ViewerOpenGLViewport::setView2d()
+{
+    setViewOrthographic();
+    setViewTop();
+    camera_.setLock2d(true);
 }
 
 void ViewerOpenGLViewport::setViewDirection(const QVector3D &dir,
@@ -232,6 +302,10 @@ void ViewerOpenGLViewport::setViewDirection(const QVector3D &dir,
 void ViewerOpenGLViewport::setViewTop()
 {
     LOG_DEBUG(<< "Set top view in viewport <" << viewportId_ << ">.");
+    if (camera_.lock2d())
+    {
+        return;
+    }
 
     QVector3D dir(0.0F, 0.0F, -1.0F);
     QVector3D up(0.0F, -1.0F, 0.0F);
@@ -241,6 +315,10 @@ void ViewerOpenGLViewport::setViewTop()
 void ViewerOpenGLViewport::setViewFront()
 {
     LOG_DEBUG(<< "Set front view in viewport <" << viewportId_ << ">.");
+    if (camera_.lock2d())
+    {
+        return;
+    }
 
     QVector3D dir(0.0F, -1.0F, 0.0F);
     QVector3D up(0.0F, 0.0F, 1.0F);
@@ -250,6 +328,10 @@ void ViewerOpenGLViewport::setViewFront()
 void ViewerOpenGLViewport::setViewRight()
 {
     LOG_DEBUG(<< "Set right view in viewport <" << viewportId_ << ">.");
+    if (camera_.lock2d())
+    {
+        return;
+    }
 
     QVector3D dir(1.0F, 0.0F, 0.0F);
     QVector3D up(0.0F, 0.0F, 1.0F);
@@ -259,6 +341,10 @@ void ViewerOpenGLViewport::setViewRight()
 void ViewerOpenGLViewport::setView3d()
 {
     LOG_DEBUG(<< "Set 3D view in viewport <" << viewportId_ << ">.");
+    if (camera_.lock2d())
+    {
+        return;
+    }
 
     QVector3D dir(-1.0F, -1.0F, -1.0F);
     QVector3D up(-1.0F, -1.0F, 1.0F);
@@ -345,6 +431,13 @@ void ViewerOpenGLViewport::paintGL()
     glLoadMatrixf(camera_.projection().data());
 
     glMatrixMode(GL_MODELVIEW);
+
+    // Setup directional light.
+    glLoadIdentity();
+    GLfloat lightDir[] = {1.0F, -1.0F, 0.0F, 0.0F};
+    glLightfv(GL_LIGHT0, GL_POSITION, lightDir);
+
+    // Finish camera setup.
     glLoadMatrixf(camera_.modelView().data());
 
     // Render.
@@ -362,20 +455,22 @@ void ViewerOpenGLViewport::renderScene()
 
     std::unique_lock<std::mutex> mutexlock(editor_->editorMutex_);
 
-    updateObjects();
-
     renderSceneSettingsEnable();
 
     double t1 = Time::realTime();
+    double t2 = t1;
+    double msec = 0;
 
     size_t pageIndex = 0;
     size_t pageSize = editor_->viewports().pageSize(viewportId_);
+    size_t renderedPageCount = 0;
 
-    LOG_DEBUG_RENDER(<< "Render pages n <" << pageSize << ">.");
+    LOG_DEBUG_RENDER(<< "Render cache page count <" << pageSize << ">.");
 
     if (pageSize == 0)
     {
         renderFirstFrame();
+        updateObjects();
     }
 
     if (resized_)
@@ -400,13 +495,14 @@ void ViewerOpenGLViewport::renderScene()
 
         if (page.state() == Page::STATE_RENDER)
         {
-            LOG_DEBUG_RENDER(<< "Render page <" << (pageIndex + 1) << "/"
-                             << pageSize << "> page id <" << page.pageId()
-                             << ">.");
+            // LOG_DEBUG_RENDER(<< "Render page <" << (pageIndex + 1) << "/"
+            //                  << pageSize << "> page id <" << page.pageId()
+            //                  << ">.");
 
             if (pageIndex == 0)
             {
                 renderFirstFrame();
+                updateObjects();
             }
 
             if (page.renderColor.empty())
@@ -414,7 +510,7 @@ void ViewerOpenGLViewport::renderScene()
                 glColor3f(1.0F, 1.0F, 1.0F);
             }
 
-            if (page.selectionSize > 0)
+            if (page.selectionSize > 0 && !camera_.lock2d())
             {
                 ViewerOpenGL::render(ViewerOpenGL::POINTS,
                                      page.renderPosition,
@@ -427,23 +523,23 @@ void ViewerOpenGLViewport::renderScene()
                                      page.selectionSize);
             }
 
-            glFlush();
-
             page.setState(Page::STATE_RENDERED);
+            renderedPageCount++;
 
-            double t2 = Time::realTime();
-            if (t2 - t1 > 0.02)
+            t2 = Time::realTime();
+            msec = (t2 - t1) * 1000.0;
+            if (page.pageId() > 0 && msec > 10.0)
             {
-                LOG_DEBUG_RENDER(<< "Terminate rendering after <" << (t2 - t1)
-                                 << "> seconds.");
+                LOG_DEBUG_RENDER(<< "Rendering timeout <" << msec << "> ms.");
+                pageIndex++;
                 break;
             }
         }
         else
         {
-            LOG_DEBUG_RENDER(<< "Skip rendering of page <" << (pageIndex + 1)
-                             << "/" << pageSize << "> page id <"
-                             << page.pageId() << ">.");
+            // LOG_DEBUG_RENDER(<< "Skip rendering of page <" << (pageIndex + 1)
+            //                  << "/" << pageSize << "> page id <"
+            //                  << page.pageId() << ">.");
         }
 
         pageIndex++;
@@ -456,7 +552,24 @@ void ViewerOpenGLViewport::renderScene()
         renderLastFrame();
     }
 
-    LOG_DEBUG_RENDER(<< "Finished rendering viewport <" << viewportId_ << ">.");
+    if (pageIndex < pageSize)
+    {
+        LOG_DEBUG_RENDER(<< "Request next rendering of viewport <"
+                         << viewportId_ << ">.");
+        mainWindow_->requestRenderFromAnyThread();
+    }
+
+    t2 = Time::realTime();
+    msec = (t2 - t1) * 1000.0;
+
+    if (msec > 40.0)
+    {
+        LOG_DEBUG_RENDER(<< "Extra rendering time.");
+    }
+
+    LOG_DEBUG_RENDER(<< "Finished rendering viewport <" << viewportId_
+                     << "> rendered pages <" << renderedPageCount
+                     << "> in time <" << msec << "> ms.");
 }
 
 void ViewerOpenGLViewport::renderFirstFrame()
@@ -486,13 +599,7 @@ void ViewerOpenGLViewport::renderFirstFrame()
         SAFE_GL(glDisable(GL_LIGHTING));
     }
 
-    const Region &clipFilter = editor_->clipFilter();
-    glLineWidth(1.0F);
-    ViewerOpenGL::renderClipFilter(clipFilter);
-    glLineWidth(1.0F);
-
-    renderAttributes();
-    renderSegments();
+    renderFirstFrameData();
 
     // Bounding box.
     if (editor_->settings().viewSettings().sceneBoundingBoxVisible())
@@ -520,94 +627,123 @@ void ViewerOpenGLViewport::renderLastFrame()
 {
     glLineWidth(2.0F);
     glDisable(GL_DEPTH_TEST);
-    renderLabels();
+    renderSegmentsLabels();
     glEnable(GL_DEPTH_TEST);
     glLineWidth(1.0F);
 }
 
-void ViewerOpenGLViewport::renderSegments()
+void ViewerOpenGLViewport::renderFirstFrameData()
+{
+    if (camera_.lock2d())
+    {
+        renderSegmentsDbh();
+    }
+
+    const Region &clipFilter = editor_->clipFilter();
+    glLineWidth(1.0F);
+    ViewerOpenGL::renderClipFilter(clipFilter);
+    glLineWidth(1.0F);
+
+    if (camera_.lock2d())
+    {
+        renderSegmentsHullProjections();
+        return;
+    }
+
+    renderSegmentsAttributes();
+    renderSegmentsMeshes();
+    renderSegmentsSelection();
+}
+
+void ViewerOpenGLViewport::renderSegmentsSelection()
 {
     const Segments &segments = editor_->segments();
-    const QueryFilterSet &filter = editor_->segmentsFilter();
 
     for (size_t i = 0; i < segments.size(); i++)
     {
         const Segment &segment = segments[i];
 
-        // Ignore hidden segments.
-        if (!filter.enabled(segment.id))
+        if (!segment.selected || skipSegmentByFilter(segment))
         {
             continue;
         }
 
-        float r = static_cast<float>(segment.color[0]);
-        float g = static_cast<float>(segment.color[1]);
-        float b = static_cast<float>(segment.color[2]);
+        glColor3f(1.0F, 1.0F, 0.0F);
+        glEnable(GL_LINE_STIPPLE);
+        glLineStipple(1, 0xff);
 
-        // Render boundary.
+        ViewerAabb boundary;
+        boundary.set(segment.boundary);
+        ViewerOpenGL::renderAabb(boundary);
+
+        glDisable(GL_LINE_STIPPLE);
+    }
+}
+
+void ViewerOpenGLViewport::renderSegmentsDbh()
+{
+    const Segments &segments = editor_->segments();
+    double scale = editor_->settings().treeSettings().dbhScale();
+    double ppm = editor_->settings().unitsSettings().pointsPerMeter()[0];
+
+    for (size_t i = 0; i < segments.size(); i++)
+    {
+        // Segment.
+        const Segment &segment = segments[i];
+
+        if (skipSegmentByFilter(segment))
+        {
+            continue;
+        }
+
+        // Render DBH as a circle when DBH is valid;
+        // otherwise, render the tree position as a cross.
+        const TreeAttributes &attributes = segment.treeAttributes;
+
+        bool renderDbhCircle = false;
+        float diameter = static_cast<float>(0.2 * ppm);
+        Vector3<float> position;
+
+        if (attributes.isDbhValid())
+        {
+            renderDbhCircle = true;
+            diameter = static_cast<float>(attributes.dbh);
+            position = Vector3<float>(attributes.dbhPosition);
+        }
+        else if (attributes.isPositionValid())
+        {
+            position = Vector3<float>(attributes.position);
+        }
+        else
+        {
+            position = Vector3<float>(segment.boundary.center());
+        }
+
+        Vector3<float> color(editor_->segmentColor(segment));
+        glColor3f(color[0], color[1], color[2]);
+
+        diameter *= scale;
+        float radius = diameter * 0.5F;
+
+        if (renderDbhCircle)
+        {
+            ViewerOpenGL::renderCircle(position, radius, true);
+        }
+        else
+        {
+            ViewerOpenGL::renderCross(position, diameter, diameter);
+        }
+
+        // Render selection.
         if (segment.selected)
         {
-            glColor3f(r, g, b);
-            ViewerAabb boundary;
-            boundary.set(segment.boundary);
-            ViewerOpenGL::renderAabb(boundary);
-        }
-
-        // Ignore "unsegmented".
-        if (segment.id == 0)
-        {
-            continue;
-        }
-
-        if (editor_->settings().treeSettings().useOnlyForSelectedTrees() &&
-            !segment.selected)
-        {
-            continue;
-        }
-
-        if (editor_->settings().treeSettings().convexHullProjectionVisible())
-        {
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            glDisable(GL_DEPTH_TEST);
-            glColor4f(r, g, b, 0.25F);
-
-            // Render meshes.
-            for (const auto &it : segment.meshList)
-            {
-                if (it.first == "convexHullProjection")
-                {
-                    ViewerOpenGL::render(it.second);
-                }
-            }
-
-            glDisable(GL_BLEND);
-            glEnable(GL_DEPTH_TEST);
-        }
-
-        if (editor_->settings().treeSettings().convexHullVisible())
-        {
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            glDisable(GL_DEPTH_TEST);
-            glColor4f(r, g, b, 0.25F);
-
-            // Render meshes.
-            for (const auto &it : segment.meshList)
-            {
-                if (it.first == "convexHull")
-                {
-                    ViewerOpenGL::render(it.second);
-                }
-            }
-
-            glDisable(GL_BLEND);
-            glEnable(GL_DEPTH_TEST);
+            glColor3f(0.0F, 1.0F, 0.0F);
+            ViewerOpenGL::renderCircle(position, radius * 1.2F, false);
         }
     }
 }
 
-void ViewerOpenGLViewport::renderAttributes()
+void ViewerOpenGLViewport::renderSegmentsHullProjections()
 {
     const Segments &segments = editor_->segments();
 
@@ -615,7 +751,134 @@ void ViewerOpenGLViewport::renderAttributes()
     {
         const Segment &segment = segments[i];
 
-        if (skipSegmentRendering(segment))
+        if (skipSegment(segment))
+        {
+            continue;
+        }
+
+        renderSegmentMeshes(segment, true);
+    }
+}
+
+void ViewerOpenGLViewport::renderSegmentMeshes(const Segment &segment,
+                                               bool onlyProjections)
+{
+    float r = static_cast<float>(segment.color[0]);
+    float g = static_cast<float>(segment.color[1]);
+    float b = static_cast<float>(segment.color[2]);
+
+    if (editor_->settings().treeSettings().convexHullProjectionVisible())
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDisable(GL_DEPTH_TEST);
+        glColor4f(r, g, b, 0.25F);
+
+        // Render meshes.
+        for (const auto &it : segment.meshList)
+        {
+            if (it.first == "convexHullProjection")
+            {
+                ViewerOpenGL::render(it.second);
+            }
+        }
+
+        glDisable(GL_BLEND);
+        glEnable(GL_DEPTH_TEST);
+    }
+
+    if (editor_->settings().treeSettings().concaveHullProjectionVisible())
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDisable(GL_DEPTH_TEST);
+        glColor4f(r, g, b, 0.25F);
+
+        // Render meshes.
+        for (const auto &it : segment.meshList)
+        {
+            if (it.first == "concaveHullProjection")
+            {
+                ViewerOpenGL::render(it.second);
+            }
+        }
+
+        glDisable(GL_BLEND);
+        glEnable(GL_DEPTH_TEST);
+    }
+
+    if (onlyProjections)
+    {
+        return;
+    }
+
+    if (editor_->settings().treeSettings().concaveHullVisible())
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDisable(GL_DEPTH_TEST);
+        glColor4f(r, g, b, 0.25F);
+
+        // Render meshes.
+        for (const auto &it : segment.meshList)
+        {
+            if (it.first == "concaveHull")
+            {
+                ViewerOpenGL::render(it.second);
+            }
+        }
+
+        glDisable(GL_BLEND);
+        glEnable(GL_DEPTH_TEST);
+    }
+
+    if (editor_->settings().treeSettings().convexHullVisible())
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDisable(GL_DEPTH_TEST);
+        glColor4f(r, g, b, 0.25F);
+
+        // Render meshes.
+        for (const auto &it : segment.meshList)
+        {
+            if (it.first == "convexHull")
+            {
+                ViewerOpenGL::render(it.second);
+            }
+        }
+
+        glDisable(GL_BLEND);
+        glEnable(GL_DEPTH_TEST);
+    }
+}
+
+void ViewerOpenGLViewport::renderSegmentsMeshes()
+{
+    const Segments &segments = editor_->segments();
+
+    for (size_t i = 0; i < segments.size(); i++)
+    {
+        const Segment &segment = segments[i];
+
+        if (skipSegment(segment))
+        {
+            continue;
+        }
+
+        renderSegmentMeshes(segment, false);
+    }
+}
+
+void ViewerOpenGLViewport::renderSegmentsAttributes()
+{
+    const Segments &segments = editor_->segments();
+
+    for (size_t i = 0; i < segments.size(); i++)
+    {
+        const Segment &segment = segments[i];
+
+        if (skipSegment(segment))
         {
             continue;
         }
@@ -623,18 +886,41 @@ void ViewerOpenGLViewport::renderAttributes()
         // Render attributes.
         const TreeAttributes &attributes = segment.treeAttributes;
 
-        glColor3f(1.0F, 1.0F, 0.0F);
-
         if (attributes.isDbhValid())
         {
-            Vector3<float> treeDbhPosition(attributes.dbhPosition);
+            glColor3f(1.0F, 0.0F, 0.0F);
+
             float treeDbhRadius = static_cast<float>(attributes.dbh) * 0.5F;
-            ViewerOpenGL::renderCircle(treeDbhPosition, treeDbhRadius);
+
+            Vector3<float> treeDbhPosition(attributes.dbhPosition);
+            Vector3<float> treeDbhNormal(attributes.dbhNormal);
+
+            Vector3<float> a = treeDbhPosition;
+            Vector3<float> b = a + (treeDbhNormal * treeDbhRadius * 0.75F);
+
+            glEnable(GL_LIGHTING);
+            glDisable(GL_COLOR_MATERIAL);
+            GLfloat diffuse[] = {1.0F, 0.0F, 0.0F, 1.0F};
+            glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+            GLfloat ambient[] = {0.5F, 0.0F, 0.0F, 1.0F};
+            glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+
+            ViewerOpenGL::renderHollowCylinder(a, b, treeDbhRadius, 10);
+
+            glEnable(GL_COLOR_MATERIAL);
+            glDisable(GL_LIGHTING);
         }
 
         if (attributes.isPositionValid())
         {
+            glColor3f(1.0F, 1.0F, 0.0F);
+
             Vector3<float> treePosition = attributes.position;
+
+            float crownStartH = attributes.crownStartHeight;
+            Vector3<float> crownStartPosition(treePosition[0],
+                                              treePosition[1],
+                                              treePosition[2] + crownStartH);
 
             if (attributes.isHeightValid())
             {
@@ -656,11 +942,19 @@ void ViewerOpenGLViewport::renderAttributes()
                 treePosition,
                 static_cast<float>(segment.boundary.length(0)),
                 static_cast<float>(segment.boundary.length(1)));
+
+            if (attributes.crownStartHeight > 0.0)
+            {
+                ViewerOpenGL::renderCross(
+                    crownStartPosition,
+                    static_cast<float>(segment.boundary.length(0) * 0.5),
+                    static_cast<float>(segment.boundary.length(1) * 0.5));
+            }
         }
     }
 }
 
-void ViewerOpenGLViewport::renderLabels()
+void ViewerOpenGLViewport::renderSegmentsLabels()
 {
     const Segments &segments = editor_->segments();
 
@@ -668,7 +962,7 @@ void ViewerOpenGLViewport::renderLabels()
     {
         const Segment &segment = segments[i];
 
-        if (skipSegmentRendering(segment))
+        if (skipSegment(segment))
         {
             continue;
         }
@@ -690,23 +984,15 @@ void ViewerOpenGLViewport::renderLabels()
     }
 }
 
-bool ViewerOpenGLViewport::skipSegmentRendering(const Segment &segment)
+bool ViewerOpenGLViewport::skipSegment(const Segment &segment)
 {
-    // Do not render any attributes.
-    if (!editor_->settings().treeSettings().treeAttributesVisible())
-    {
-        return true;
-    }
+    return skipSegmentByFilter(segment) || skipSegmentByAttributes(segment);
+}
 
+bool ViewerOpenGLViewport::skipSegmentByFilter(const Segment &segment)
+{
     // Ignore "unsegmented".
     if (segment.id == 0)
-    {
-        return true;
-    }
-
-    // Render only selected trees.
-    if (editor_->settings().treeSettings().useOnlyForSelectedTrees() &&
-        !segment.selected)
     {
         return true;
     }
@@ -726,6 +1012,39 @@ bool ViewerOpenGLViewport::skipSegmentRendering(const Segment &segment)
 
     const QueryFilterSet &statusFilter = editor_->managementStatusFilter();
     if (!statusFilter.enabled(segment.managementStatusId))
+    {
+        return true;
+    }
+
+    // Clip filter.
+    const TreeAttributes &attributes = segment.treeAttributes;
+    if (attributes.isPositionValid())
+    {
+        const Region &clipFilter = editor_->clipFilter();
+        if (clipFilter.shape == Region::Shape::BOX)
+        {
+            const auto &p = attributes.position;
+            if (!clipFilter.box.contains(p[0], p[1], p[2]))
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool ViewerOpenGLViewport::skipSegmentByAttributes(const Segment &segment)
+{
+    // Do not render any attributes.
+    if (!editor_->settings().treeSettings().treeAttributesVisible())
+    {
+        return true;
+    }
+
+    // Render only selected trees.
+    if (editor_->settings().treeSettings().useOnlyForSelectedTrees() &&
+        !segment.selected)
     {
         return true;
     }
@@ -785,7 +1104,7 @@ void ViewerOpenGLViewport::renderSceneSettingsEnable()
     if (opt.distanceBasedFadingVisible())
     {
         QVector3D eye = camera_.eye();
-        QVector3D direction = -camera_.direction();
+        QVector3D direction = camera_.direction();
         direction.normalize();
 
         float min;
@@ -820,6 +1139,8 @@ void ViewerOpenGLViewport::updateObjects()
     const Segments &segments = editor_->segments();
     const QueryFilterSet &filter = editor_->segmentsFilter();
 
+    segments_ = segments;
+
     for (size_t i = 0; i < segments.size(); i++)
     {
         const Segment &segment = segments[i];
@@ -837,27 +1158,119 @@ void ViewerOpenGLViewport::updateObjects()
         Object obj;
         obj.id = segment.id;
         obj.aabb.set(segment.boundary);
+        obj.dbhPosition = fromVector3(segment.treeAttributes.dbhPosition);
+        obj.dbh = segment.treeAttributes.dbh;
+        obj.selected = segment.selected;
 
         objects_.push_back(std::move(obj));
     }
+
+    LOG_DEBUG(<< "Created <" << objects_.size() << "> objects.");
 }
 
-void ViewerOpenGLViewport::pickObject(const QPoint &p)
+void ViewerOpenGLViewport::pickObject(const QPoint &p, bool ctrl)
 {
     LOG_DEBUG(<< "Pick x <" << p.x() << "> y <" << p.y() << ">.");
 
-    selectedId = 0;
-
-    size_t nearId = 0;
-    float dist = Numeric::max<float>();
-
+    // Get picking ray in 3D.
     QVector3D p1;
     QVector3D p2;
 
     camera_.ray(p.x(), p.y(), &p1, &p2);
 
+    // Pick geometry.
+    size_t selectedId = 0;
+
+    if (camera_.lock2d())
+    {
+        selectedId = pickObject2D(p1, p2);
+    }
+    else
+    {
+        selectedId = pickObject3D(p1, p2);
+    }
+
+    // Select picked object.
+    std::unordered_set<size_t> selectedIds;
+    if (selectedId > 0)
+    {
+        selectedIds.insert(selectedId);
+    }
+
+    LOG_DEBUG(<< "Selected ids <" << selectedIds << ">.");
+
+    if (segments_.updateSelection(selectedIds, ctrl))
+    {
+        LOG_DEBUG(<< "Apply new selection to editor.");
+        mainWindow_->suspendThreads();
+        mainWindow_->editor().setSegments(segments_);
+        mainWindow_->update(this, {Editor::TYPE_SEGMENT}, Page::STATE_RENDER);
+    }
+}
+
+size_t ViewerOpenGLViewport::pickObject2D(const QVector3D &p1,
+                                          const QVector3D &p2)
+{
+    size_t nearId = 0;
+
+    double scale = editor_->settings().treeSettings().dbhScale();
+
     for (size_t i = 0; i < objects_.size(); i++)
     {
+        const QVector3D &p3 = objects_[i].dbhPosition;
+        float radius = objects_[i].dbh * 0.5F * scale;
+
+        if (radius < 0.01)
+        {
+            continue;
+        }
+
+        float ix;
+        float iy;
+        float iz;
+
+        bool b = intersectSegmentSphere(p1.x(),
+                                        p1.y(),
+                                        p1.z(),
+                                        p2.x(),
+                                        p2.y(),
+                                        p2.z(),
+                                        p3.x(),
+                                        p3.y(),
+                                        p3.z(),
+                                        radius,
+                                        &ix,
+                                        &iy,
+                                        &iz);
+        if (b)
+        {
+            nearId = objects_[i].id;
+        }
+    }
+
+    return nearId;
+}
+
+size_t ViewerOpenGLViewport::pickObject3D(const QVector3D &p1,
+                                          const QVector3D &p2)
+{
+    size_t nearId = 0;
+    float dist = Numeric::max<float>();
+
+    const Segments &segments = editor_->segments();
+
+    for (size_t i = 0; i < objects_.size(); i++)
+    {
+        size_t segmentIndex = segments.index(objects_[i].id, false);
+        if (segmentIndex == SIZE_MAX)
+        {
+            continue;
+        }
+        if (skipSegmentByFilter(segments[segmentIndex]))
+        {
+            continue;
+        }
+
         const QVector3D &min = objects_[i].aabb.min();
         const QVector3D &max = objects_[i].aabb.max();
         float x;
@@ -891,6 +1304,5 @@ void ViewerOpenGLViewport::pickObject(const QPoint &p)
         }
     }
 
-    selectedId = nearId;
-    LOG_DEBUG(<< "Selected ID <" << selectedId << ">.");
+    return nearId;
 }
