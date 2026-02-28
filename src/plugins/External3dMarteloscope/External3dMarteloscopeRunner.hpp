@@ -32,7 +32,6 @@ class MainWindow;
 #include <QPointer>
 class QProcess;
 
-#define HAS_QT_WEB_ENGINE_WIDGETS 1
 #if defined(HAS_QT_WEB_ENGINE_WIDGETS)
     class QWebEngineView;
 #endif

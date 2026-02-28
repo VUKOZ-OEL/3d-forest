@@ -547,6 +547,9 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
     - Click "Environment Variables"
     - In "System variables" select Variable "Path" and click "Edit..."
     - Click "New" and add "C:\Qt\6.3.0\msvc2019_64\bin"
+    - Click "New" and add "c:\Qt\6.8.1\msvc2022_64\lib\cmake"
+    - Click "New" and add "c:\Qt\Tools\CMake_64\bin\" to run "cmake"
+    - Click "New" and add "c:\Qt\Tools\Ninja\" to use ninja from cmake
 
 @subsection build-windows-visual-studio-3dforest Build 3D Forest
     - Open directory "3d-forest" in Visual Studio. This will automatically
@@ -554,7 +557,43 @@ following steps. Qt and OpenGL are required only for GUI desktop application.
     - Change "Select Startup Item" to "3dforest.exe (install) (bin\3dforest.exe)" from the tool bar.
     - Click on "3dforest.exe (install) (bin\3dforest.exe)" to build and start 3d Forest.
 
-
+@subsection build-windows-visual-studio-release Create a Release build of 3D Forest for distribution
+    - Open "cmd" terminal windows application
+    - Use "cd" command to navigate to local git repository folder
+      @verbatim
+        cd Documents\3d-forest
+      @endverbatim
+    - Run the following to setup Visual Studio command line variables:
+      @verbatim
+        "%ProgramFiles%\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
+      @endverbatim
+    - Run the following command to configure the project (build in build-msvc-release directory)
+      @verbatim
+        cmake -S . -B build-msvc-release -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DCMAKE_PREFIX_PATH="C:/Qt/6.8.1/msvc2022_64"
+      @endverbatim
+    - Run the following command to build the project
+      @verbatim
+        cmake --build build-msvc-release
+      @endverbatim
+    - Run the following command to install the project into stage directory
+      @verbatim
+        cmake --install build-msvc-release --prefix "%CD%\stage"
+      @endverbatim
+    - Use "cd" command to navigate to generated binary folder
+      @verbatim
+        cd Documents\3d-forest\stage\bin
+      @endverbatim
+    - Run
+      @verbatim
+        windeployqt 3DForest.exe
+      @endverbatim
+    - Copy "c:\Qt\6.8.1\msvc2022_64\bin\Qt6OpenGLWidgets.dll" to 
+      "C:\Users\user\Documents\3d-forest\stage\bin\".
+    - Copy directory "c:\Users\user\AppData\Local\Programs\Python\Python312" to
+      "C:\Users\user\Documents\3d-forest\stage\bin\python".
+      Now there should be "C:\Users\user\Documents\3d-forest\stage\bin\python\python.exe".
+    - "C:\Users\user\Documents\3d-forest\stage" directory can be copied to another PC.
+      You may need to run "vc_redist.x64.exe" which can be found in the distribution bin folder.
 
 @section add-new-functionality Add New Functionality
 
@@ -871,7 +910,7 @@ powershell -C "gci | % {rni $_.Name ($_.Name -replace '24px', '24')}"
     {
       "files.eol": "\n",
       "C_Cpp.default.includePath":[
-        "C:/Qt/6.3.0/mingw_64/include/**",
+        "C:/Qt/6.8.1/msvc2022_64/include/**",
         "${workspaceRoot}/3rdparty/3d-forest-classic",
         "${workspaceRoot}/3rdparty/boost",
         "${workspaceRoot}/3rdparty/cdt",

@@ -18,17 +18,12 @@
 set(SUB_PROJECT_NAME "3DForestExternal3dMarteloscopePlugin")
 
 if(NOT QT_VERSION_MAJOR)
-    message(WARNING "Gui not found - skipping ${SUB_PROJECT_NAME}")
+    message(WARNING "Skipping ${SUB_PROJECT_NAME} (Qt Gui not available)")
     return()
 endif()
 
 if(NOT TARGET Qt${QT_VERSION_MAJOR}::Network)
     message(WARNING "Skipping ${SUB_PROJECT_NAME} (Qt Network not available)")
-    return()
-endif()
-
-if(NOT TARGET Qt${QT_VERSION_MAJOR}::WebEngineWidgets)
-    message(WARNING "Skipping ${SUB_PROJECT_NAME} (Qt WebEngine not available)")
     return()
 endif()
 
@@ -56,32 +51,30 @@ target_compile_definitions(
     EXPORT_${SUB_PROJECT_NAME}=1
 )
 
-# if(TARGET Qt${QT_VERSION_MAJOR}::WebEngineWidgets)
-#     target_compile_definitions(
-#         ${SUB_PROJECT_NAME}
-#         PRIVATE
-#         HAS_QT_WEB_ENGINE_WIDGETS=1
-#     )
-# endif()
+if(TARGET Qt${QT_VERSION_MAJOR}::WebEngineWidgets)
+    target_compile_definitions(
+        ${SUB_PROJECT_NAME}
+        PRIVATE
+        HAS_QT_WEB_ENGINE_WIDGETS=1
+    )
+endif()
 
 target_link_libraries(
     ${SUB_PROJECT_NAME}
     PRIVATE
     3DForestGui
     Qt${QT_VERSION_MAJOR}::Network
-    Qt${QT_VERSION_MAJOR}::WebEngineWidgets
 )
 
-# if(TARGET Qt${QT_VERSION_MAJOR}::WebEngineWidgets)
-#     target_link_libraries(
-#         ${SUB_PROJECT_NAME}
-#         PRIVATE
-#         Qt${QT_VERSION_MAJOR}::WebEngineWidgets
-#     )
-# endif()
+if(TARGET Qt${QT_VERSION_MAJOR}::WebEngineWidgets)
+    target_link_libraries(
+        ${SUB_PROJECT_NAME}
+        PRIVATE
+        Qt${QT_VERSION_MAJOR}::WebEngineWidgets
+    )
+endif()
 
 # Install plugin
-# install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin/plugins)
 install_and_deploy_qt_runtime(${SUB_PROJECT_NAME} "bin/plugins")
 
 # Install python app
