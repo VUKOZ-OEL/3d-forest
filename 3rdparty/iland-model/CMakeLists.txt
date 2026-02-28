@@ -16,10 +16,11 @@
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
 if(NOT (QT_VERSION_MAJOR AND
-        HAS_QT_CONCURRENT AND
-        HAS_QT_QML AND
-        HAS_QT_SQL AND
-        HAS_QT_XML))
+        TARGET Qt${QT_VERSION_MAJOR}::Concurrent AND
+        TARGET Qt${QT_VERSION_MAJOR}::Qml AND
+        TARGET Qt${QT_VERSION_MAJOR}::Sql AND
+        TARGET Qt${QT_VERSION_MAJOR}::Xml)
+  )
     message(WARNING
             "Gui, Concurrent, Qml, Sql, Xml required - skipping iLand-model")
     return()

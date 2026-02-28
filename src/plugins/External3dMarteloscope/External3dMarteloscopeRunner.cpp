@@ -113,11 +113,14 @@ void External3dMarteloscopeRunner::start(const QString &pythonHome,
         // Start Streamlit
         process_ = new QProcess(this);
 
-        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-        env.insert("PYTHONHOME", pythonHome);
-        env.insert("PYTHONPATH", pythonPath);
-        env.insert("PYTHONNOUSERSITE", "1");
-        process_->setProcessEnvironment(env);
+        if (pythonExe != "python")
+        {
+            QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+            env.insert("PYTHONHOME", pythonHome);
+            env.insert("PYTHONPATH", pythonPath);
+            env.insert("PYTHONNOUSERSITE", "1");
+            process_->setProcessEnvironment(env);
+        }
 
         QStringList args;
         args << "-m" << "streamlit" << "run" << pyhonScript << "--server.port"
@@ -173,6 +176,8 @@ void External3dMarteloscopeRunner::start(const QString &pythonHome,
     }
 
 #if defined(HAS_QT_WEB_ENGINE_WIDGETS)
+    qDebug() << "Open QWebEngineView";
+
     // Show the web view
     view_ = new QWebEngineView();
     view_->setAttribute(Qt::WA_DeleteOnClose);

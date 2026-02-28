@@ -17,34 +17,34 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+# Declare the CMake project name and version (packaging, install rules, etc.)
 project(3DForest VERSION 1.0)
 
-# if(NOT CMAKE_BUILD_TYPE)
-#     set(CMAKE_BUILD_TYPE Debug)
-# endif()
-
-include(cmake/cxxflags.cmake)
-
-find_package(Threads REQUIRED)
-
-if(MSVC)
-    # Lazy fix for Windows issue with dual mingw + msvc environment
-    # Microsoft Visual Studio insists on using GNU MinGW Qt
-    # Should be set when running cmake or by ordering env variables
-    set(CMAKE_PREFIX_PATH "C:\\Qt\\6.8.1\\msvc2022_64")
+# Default to Debug builds if the user didn't specify a build type
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Debug)
 endif()
 
+# Project-specific compiler/language flags
+include(cmake/cxxflags.cmake)
+
+# Always require threading support (e.g., pthread on Linux)
+find_package(Threads REQUIRED)
+
+# Try to locate system OpenGL
 find_package(OpenGL QUIET)
 
+# If set, prefer Qt5 even if Qt6 is available on the system
 if(FORCE_QT5)
-    # When CMake would otherwise autodetect Qt6
+    # Explicitly search for Qt5 modules used by the GUI
     find_package(Qt5 COMPONENTS Core Gui Widgets OpenGL)
+
     if (Qt5_FOUND AND Qt5OpenGL_FOUND AND OpenGL_FOUND)
         message(STATUS "Gui with Qt5 and OpenGL found")
         set(QT_VERSION_MAJOR 5)
     endif()
 else()
-    # Default autodetect Qt version
+    # Default behavior: try Qt6 first, then fall back to Qt5
     find_package(Qt6 QUIET COMPONENTS Core Gui Widgets)
 
     if(Qt6_FOUND)
@@ -76,36 +76,9 @@ else()
     endif()
 endif()
 
-if(QT_VERSION_MAJOR)
-    if(TARGET Qt${QT_VERSION_MAJOR}::WebEngineWidgets)
-        set(HAS_QT_WEB_ENGINE_WIDGETS ON)
-    endif()
-
-    if(TARGET Qt${QT_VERSION_MAJOR}::OpenGL)
-        set(HAS_QT_OPEN_GL ON)
-    endif()
-
-    if(TARGET Qt${QT_VERSION_MAJOR}::OpenGLWidgets)
-        set(HAS_QT_OPEN_GL_WIDGETS ON)
-    endif()
-
-    if(TARGET Qt${QT_VERSION_MAJOR}::Concurrent)
-        set(HAS_QT_CONCURRENT ON)
-    endif()
-
-    if(TARGET Qt${QT_VERSION_MAJOR}::Qml)
-        set(HAS_QT_QML ON)
-    endif()
-
-    if(TARGET Qt${QT_VERSION_MAJOR}::Sql)
-        set(HAS_QT_SQL ON)
-    endif()
-
-    if(TARGET Qt${QT_VERSION_MAJOR}::Xml)
-        set(HAS_QT_XML ON)
-    endif()
-endif()
-
+# Helper to:
+#  1) install an app target, and
+#  2) generate/install a Qt deployment script that copies required Qt runtime deps
 function(install_and_deploy_qt_runtime app_target bin_dest)
   install(TARGETS ${app_target}
     RUNTIME DESTINATION ${bin_dest}
@@ -120,8 +93,12 @@ function(install_and_deploy_qt_runtime app_target bin_dest)
   install(SCRIPT ${${app_target}_deploy.cmake})
 endfunction()
 
+# Build third-party dependencies first (libraries, externals)
 add_subdirectory(3rdparty)
+
+# Build the project sources (main targets)
 add_subdirectory(src)
 
+# Developer tooling integrations: formatting, documentation generation
 include(cmake/clangformat.cmake)
 include(cmake/doxygen.cmake)

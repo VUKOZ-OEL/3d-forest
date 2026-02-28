@@ -113,11 +113,24 @@ void External3dMarteloscopePlugin::runPythonApp(const std::string &projectPath)
 
     QString appDir = QCoreApplication::applicationDirPath();
 
-    QString pythonHome = QDir(appDir).filePath("python");
-    QString pythonPath = QDir(appDir).filePath("python/Lib");
+    QString pythonHome;
+    QString pythonPath;
     QString pythonExe = QDir(appDir).filePath("python/python.exe");
     QString pyhonScript = QDir(appDir).filePath(
                 "plugins/3DForestExternal3dMarteloscopePlugin/python/app.py");
+
+    if (!QFile::exists(pythonExe))
+    {
+        // Use system Python if bundled version is not found.
+        // This is intended for use in a development environment.
+        pythonExe = "python";
+    }
+    else
+    {
+        // Use bundled Python
+        pythonHome = QDir(appDir).filePath("python");
+        pythonPath = QDir(appDir).filePath("python/Lib");
+    }
 
     runner_->start(pythonHome,
                    pythonPath,
