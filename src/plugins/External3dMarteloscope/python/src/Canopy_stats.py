@@ -20,14 +20,6 @@ from src.i18n import t, t_help, t_mgmt
 # ------------------------------------------------------------
 st.markdown(f"#### {t('explore_canopy_stats')}")
 
-
-# ------------------------------------------------------------
-# DATA
-# ------------------------------------------------------------
-if "trees" not in st.session_state:
-    file_path = st.session_state.project_file
-    st.session_state.trees = iou.load_project_json(file_path)
-
 df: pd.DataFrame = st.session_state.trees.copy()
 
 # ------------------------------------------------------------
@@ -48,7 +40,7 @@ LAYER_MGMT = "management_label"  # i18n already uses this key as "Treatment sele
 # ------------------------------------------------------------
 # UI CONTROLS
 # ------------------------------------------------------------
-c1, c2, c3 = st.columns([2, 2, 2])
+c1, c2, c3, c4,_, c5 = st.columns([2, 3, 1, 2,1, 2])
 with c2:
     layers_mode = st.segmented_control(
         f"**{t('show_values_by')}**",
@@ -57,7 +49,6 @@ with c2:
         selection_mode="multi",
         width="stretch",
         format_func=lambda k: t(k),
-        help=t("canopy_profiles_layers_help"),  # <- new key (see below)
     )
 
 # ensure list + at least one layer
@@ -69,6 +60,49 @@ elif isinstance(layers_mode, str):
 primary = layers_mode[0]
 overlay = layers_mode[1] if len(layers_mode) > 1 else None
 
+# DBH / Height sliders (same interaction pattern as other pages)
+with c4:
+    dbh_range = None
+    if "dbh" in df.columns:
+        dbh_vals = pd.to_numeric(df["dbh"], errors="coerce").dropna()
+        if not dbh_vals.empty:
+            min_dbh = int(np.floor(dbh_vals.min()))
+            max_dbh = int(np.ceil(dbh_vals.max()))
+            dbh_range = st.slider(
+                f"**{t('dbh_filter')}**",
+                min_value=min_dbh,
+                max_value=max_dbh,
+                value=(min_dbh, max_dbh),
+                step=1,
+            )
+
+with c5:
+    height_range = None
+    if "height" in df.columns:
+        h_vals = pd.to_numeric(df["height"], errors="coerce").dropna()
+        if not h_vals.empty:
+            min_h = int(np.floor(h_vals.min()))
+            max_h = int(np.ceil(h_vals.max()))
+            height_range = st.slider(
+                f"**{t('height_filter')}**",
+                min_value=min_h,
+                max_value=max_h,
+                value=(min_h, max_h),
+                step=1,
+            )
+
+df_filtered = df.copy()
+if dbh_range is not None and "dbh" in df_filtered.columns:
+    dbh_num = pd.to_numeric(df_filtered["dbh"], errors="coerce")
+    df_filtered = df_filtered[(dbh_num >= dbh_range[0]) & (dbh_num <= dbh_range[1])]
+
+if height_range is not None and "height" in df_filtered.columns:
+    h_num = pd.to_numeric(df_filtered["height"], errors="coerce")
+    df_filtered = df_filtered[(h_num >= height_range[0]) & (h_num <= height_range[1])]
+
+if df_filtered.empty:
+    st.warning(t("warn_no_data_for_filters"))
+    st.stop()
 
 # ------------------------------------------------------------
 # AREA (ha) for per-ha conversion
@@ -80,17 +114,6 @@ try:
 except Exception:
     area_ha = 1.0
 
-
-# ------------------------------------------------------------
-# MASKS (after / removed)
-# ------------------------------------------------------------
-keep_status = {"Target tree", "Untouched"}
-if "management_status" in df.columns:
-    mask_after = df["management_status"].isin(keep_status)
-    mask_removed = ~mask_after
-else:
-    mask_after = pd.Series(False, index=df.index)
-    mask_removed = pd.Series(False, index=df.index)
 
 
 # ------------------------------------------------------------
@@ -251,6 +274,14 @@ def render_crown_volume_profiles(df_all: pd.DataFrame, primary: str, overlay: st
 
     species_cmap = _species_colors(df_all)
     mgmt_cmap = _management_colors(df_all)
+
+    keep_status = {"Target tree", "Untouched"}
+    if "management_status" in df_all.columns:
+        mask_after = df_all["management_status"].isin(keep_status)
+        mask_removed = ~mask_after
+    else:
+        mask_after = pd.Series(False, index=df_all.index)
+        mask_removed = pd.Series(False, index=df_all.index)
 
     df_before = df_all
     df_after = df_all[mask_after]
@@ -453,7 +484,7 @@ def render_crown_volume_profiles(df_all: pd.DataFrame, primary: str, overlay: st
     st.plotly_chart(fig, use_container_width=True)
 
 
-render_crown_volume_profiles(df, primary=primary, overlay=overlay)
+render_crown_volume_profiles(df_filtered, primary=primary, overlay=overlay)
 
 with st.expander(label=t("expander_help_label"),icon=":material/help:"):
     st.markdown(t_help("canopy_help"))
