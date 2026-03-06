@@ -22,14 +22,10 @@
 // Include 3D Forest.
 #include <External3dMarteloscopePlugin.hpp>
 #include <External3dMarteloscopeRunner.hpp>
-#include <File.hpp>
-#include <FileFormatCsv.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
-#include <QCoreApplication>
-#include <QDir>
 
 // Include local.
 #define LOG_MODULE_NAME "External3dMarteloscopePlugin"
@@ -83,7 +79,9 @@ void External3dMarteloscopePlugin::slotPlugin()
 
     try
     {
-        run();
+        std::string projectPath = mainWindow_->editor().projectPath();
+
+        runner_->start(projectPath);
     }
     catch (std::exception &e)
     {
@@ -98,45 +96,4 @@ void External3dMarteloscopePlugin::slotPlugin()
     {
         mainWindow_->showError(errorMessage.c_str());
     }
-}
-
-void External3dMarteloscopePlugin::run()
-{
-    std::string projectPath = mainWindow_->editor().projectPath();
-
-    runPythonApp(projectPath);
-}
-
-void External3dMarteloscopePlugin::runPythonApp(const std::string &projectPath)
-{
-    LOG_DEBUG(<< "Start python app with project <" << projectPath << ">.");
-
-    QString appDir = QCoreApplication::applicationDirPath();
-
-    QString pythonHome;
-    QString pythonPath;
-    QString pythonExe = QDir(appDir).filePath("python/python.exe");
-    QString pyhonScript = QDir(appDir).filePath(
-                "plugins/3DForestExternal3dMarteloscopePlugin/python/app.py");
-
-    if (!QFile::exists(pythonExe))
-    {
-        // Use system Python if bundled version is not found.
-        // This is intended for use in a development environment.
-        pythonExe = "python";
-    }
-    else
-    {
-        // Use bundled Python
-        pythonHome = QDir(appDir).filePath("python");
-        pythonPath = QDir(appDir).filePath("python/Lib");
-    }
-
-    runner_->start(pythonHome,
-                   pythonPath,
-                   pythonExe,
-                   pyhonScript,
-                   QString::fromStdString(projectPath));
-
-    LOG_DEBUG(<< "Finished starting python app.");
 }

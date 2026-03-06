@@ -26,7 +26,6 @@
 #include <PluginInterface.hpp>
 
 class External3dMarteloscopeRunner;
-class FileFormatTable;
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestExternal3dMarteloscopePlugin)
@@ -59,9 +58,6 @@ public slots:
 private:
     MainWindow *mainWindow_;
     External3dMarteloscopeRunner *runner_;
-
-    void run();
-    void runPythonApp(const std::string &projectPath);
 };
 
 #endif /* EXTERNAL_3D_MARTELOSCOPE_PLUGIN_HPP */

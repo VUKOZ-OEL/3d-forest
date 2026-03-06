@@ -44,11 +44,16 @@ if len(sys.argv) > 1:
 else:
     file_path = "c:/default.json"
 
+if len(sys.argv) > 2:
+    bin_path = sys.argv[2]
+else:
+    bin_path = ""
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Init data
 if not st.session_state.get("data_initialized"):
-    st.session_state.bin_path = "C:/Users/krucek/Documents/GitHub/VUK/3d-forest/out/install/x64-Debug/bin"
+    st.session_state.bin_path = bin_path
     st.session_state.project_file = file_path
     st.session_state.python_script_dir = BASE_DIR
     st.session_state.sqlite_path = st.session_state.project_file.replace(".json", ".sqlite")
