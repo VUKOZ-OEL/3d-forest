@@ -2,8 +2,8 @@
 # ------------------------------------------------------------
 # Safe iLand runner using multiprocessing (Qt-safe)
 # ------------------------------------------------------------
-
 from __future__ import annotations
+from numba import char
 
 import ctypes
 import multiprocessing as mp
@@ -47,51 +47,33 @@ def _iland_worker(xml_path_bytes: bytes, years: int, dll_path: str, result_queue
 # ------------------------------------------------------------
 # PUBLIC API
 # ------------------------------------------------------------
-def run_iland(xml_path: bytes, years: int, *, timeout: int | None = None) -> dict:
-    """
-    Run iLand safely in a separate process.
-
-    Parameters
-    ----------
-    xml_path : bytes
-        UTF-8 encoded path to iLand XML
-        e.g. str(path).encode("utf-8")
-    years : int
-        Number of simulation years
-    timeout : int | None
-        Optional timeout in seconds
-
-    Returns
-    -------
-    dict
-        {
-            "ok": bool,
-            "return_code": int | None,
-            "error": str | None
-        }
-    """
+def run_iland(
+    xml_path: bytes,
+    years: int,
+    *,
+    bin_path: str | Path,
+    timeout: int | None = None,
+) -> dict:
 
     if not isinstance(xml_path, (bytes, bytearray)):
         raise TypeError("xml_path must be bytes (use str(path).encode('utf-8'))")
 
-    # --- Locate DLL (adjust if needed) ---
-    DLL_NAME = "iland.dll"
+    DLL_NAME = "ILandModel.dll"
 
-    if getattr(sys, "frozen", False):
-        base_dir = Path(sys.executable).parent
-    else:
-        base_dir = Path(__file__).resolve().parent
+    bin_path = Path(bin_path)
 
-    dll_path = str((base_dir / DLL_NAME).resolve()) # CHECK CORRECT PATH
-    #dll_path = "C:/Users/krucek/Documents/GitHub/VUK/3d-forest/out/install/x64-Debug/bin/ILandModel.dll"
+    if not bin_path.exists():
+        raise FileNotFoundError(f"iLand bin folder not found: {bin_path}")
 
-    if not os.path.exists(dll_path):
+    dll_path = bin_path / DLL_NAME
+
+    if not dll_path.exists():
         raise FileNotFoundError(f"iLand DLL not found: {dll_path}")
 
-    # --- IPC queue ---
+    dll_path = str(dll_path.resolve())
+
     result_queue: mp.Queue = mp.Queue()
 
-    # --- Spawn process ---
     proc = mp.Process(
         target=_iland_worker,
         args=(xml_path, years, dll_path, result_queue),

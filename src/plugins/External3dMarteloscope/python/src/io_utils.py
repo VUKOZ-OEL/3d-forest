@@ -487,7 +487,7 @@ def load_project_json(file_path: str, exclude_from_sql_update: List[str] = None)
         try:
             mid = int(item.get("id"))
             mg_id_map[mid] = {
-                "label": item.get("label", "Unknown"),
+                "label": item.get("en", "Unknown"),
                 "color": _to_hex(item.get("color")),
             }
         except:

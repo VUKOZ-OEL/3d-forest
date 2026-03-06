@@ -17,6 +17,7 @@ def read_single_sqlite_living(path: Path | str, rep_id: str) -> pd.DataFrame:
     import sqlite3
 
     con = sqlite3.connect(str(path))
+
     try:
         df = pd.read_sql_query("SELECT * FROM tree", con)
     finally:
@@ -136,10 +137,6 @@ def agg_fan(
 
     return stats
 
-    #_--____------------------------
-    import pandas as pd
-from pathlib import Path
-
 # ============================================================================
 # 5) EXPORT Trees to CSV
 # ============================================================================
@@ -232,15 +229,19 @@ def export_iland_trees_csv(
 # 6) MODIFY iLand XML
 # ============================================================================
 
-def set_iland_mortality_regeneration(
+def set_iland_xml(
     xml_path: str | Path,
     mortality_enabled: bool,
     regeneration_enabled: bool,
+    climate_scenario: str = "RCP 4.5",
+    batch_years: int = 30,
 ):
     """
     Upraví projektové iLand XML:
       - <mortalityEnabled>
       - <regenerationEnabled>
+      - <climate>/<tableName>
+      - <climate>/<batchYears>
 
     Ostatní části XML zůstávají beze změny.
     """
@@ -249,22 +250,37 @@ def set_iland_mortality_regeneration(
     if not xml_path.exists():
         raise FileNotFoundError(f"XML file not found: {xml_path}")
 
+
     tree = ET.parse(xml_path)
     root = tree.getroot()
 
-    # najdi <settings> block
+    # <model><settings>
     settings = root.find(".//model/settings")
     if settings is None:
         raise RuntimeError("Could not find <model><settings> block in XML.")
 
-    def _set_bool(tag: str, value: bool):
-        el = settings.find(tag)
+    def _set_bool(parent: ET.Element, tag: str, value: bool):
+        el = parent.find(tag)
         if el is None:
-            # pokud element chybí, vytvoříme ho
-            el = ET.SubElement(settings, tag)
+            el = ET.SubElement(parent, tag)
         el.text = "true" if value else "false"
 
-    _set_bool("mortalityEnabled", mortality_enabled)
-    _set_bool("regenerationEnabled", regeneration_enabled)
+    def _set_text(parent: ET.Element, tag: str, value: str):
+        el = parent.find(tag)
+        if el is None:
+            el = ET.SubElement(parent, tag)
+        el.text = value
+
+    # mortality / regeneration
+    _set_bool(settings, "mortalityEnabled", mortality_enabled)
+    _set_bool(settings, "regenerationEnabled", regeneration_enabled)
+
+    # <climate>
+    climate = root.find("./model/climate")
+    if climate is None:
+        raise RuntimeError("Could not find <model><climate> block in XML.")
+
+    _set_text(climate, "tableName", climate_scenario)
+    _set_text(climate, "batchYears", str(int(batch_years)))
 
     tree.write(xml_path, encoding="utf-8", xml_declaration=True)
