@@ -47,6 +47,8 @@ static const char *EDITOR_KEY_SPECIES_FILTER = "speciesFilter";
 static const char *EDITOR_KEY_MANAGEMENT_STATUS_FILTER =
     "managementStatusFilter";
 
+static const char *EDITOR_KEY_PLOT_INFO = "plot_info";
+
 Editor::Editor()
 {
     LOG_DEBUG(<< "Start creating the editor.");
@@ -180,6 +182,8 @@ void Editor::close()
         classificationsFilter_.setEnabled(i, true);
     }
     classificationsFilter_.setEnabled(true);
+
+    plotInfo_ = Json();
 
     viewports_.clearContent();
 
@@ -376,6 +380,12 @@ void Editor::openProject(std::string path, bool reload)
                                                    true);
             }
         }
+
+        // User defined
+        if (in.contains(EDITOR_KEY_PLOT_INFO))
+        {
+            plotInfo_ = in[EDITOR_KEY_PLOT_INFO];
+        }
     }
     catch (...)
     {
@@ -428,6 +438,8 @@ void Editor::saveProject(const std::string &path)
     toJson(out[EDITOR_KEY_SEGMENTS_FILTER], segmentsFilter_);
     toJson(out[EDITOR_KEY_SPECIES_FILTER], speciesFilter_);
     toJson(out[EDITOR_KEY_MANAGEMENT_STATUS_FILTER], managementStatusFilter_);
+
+    out[EDITOR_KEY_PLOT_INFO] = plotInfo_;
 
     out.write(path);
 

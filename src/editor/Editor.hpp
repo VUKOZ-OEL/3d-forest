@@ -194,6 +194,7 @@ protected:
     ManagementStatusList managementStatusList_;
     Settings settings_;
     Classifications classifications_;
+    Json plotInfo_;
 
     Region clipFilter_;
     Range<double> elevationFilter_;
