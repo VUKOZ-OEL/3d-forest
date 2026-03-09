@@ -40,6 +40,11 @@ Settings::Settings()
     defaultManagementStatusList_.setDefault();
 }
 
+void Settings::setApplicationSettings(const ApplicationSettings &settings)
+{
+    applicationSettings_ = settings;
+}
+
 void Settings::setRenderingSettings(const RenderingSettings &renderingSettings)
 {
     renderingSettings_ = renderingSettings;

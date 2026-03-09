@@ -785,6 +785,12 @@ void Editor::applyFilters()
     }
 }
 
+void Editor::setApplicationSettings(const ApplicationSettings &settings)
+{
+    settings_.setApplicationSettings(settings);
+    writeSettings();
+}
+
 void Editor::setRenderingSettings(const RenderingSettings &renderingSettings)
 {
     settings_.setRenderingSettings(renderingSettings);

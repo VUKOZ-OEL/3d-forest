@@ -159,6 +159,7 @@ public:
 
     // Settings.
     const Settings &settings() const { return settings_; }
+    void setApplicationSettings(const ApplicationSettings &settings);
     void setRenderingSettings(const RenderingSettings &renderingSettings);
     void setTreeSettings(const TreeSettings &treeSettings);
     void setUnitsSettings(const UnitsSettings &unitsSettings);

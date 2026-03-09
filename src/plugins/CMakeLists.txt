@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
+add_subdirectory(ApplicationSettings)
 add_subdirectory(ComputeClassification)
 add_subdirectory(ComputeCrownVolume)
 add_subdirectory(ComputeDescriptor)
