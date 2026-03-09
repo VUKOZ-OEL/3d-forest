@@ -36,6 +36,7 @@ add_library(
     ${SUB_PROJECT_NAME}
     SHARED
     ${SOURCES}
+    ../ProjectFile/ProjectFileAction.cpp
     resources/resources.qrc
 )
 
@@ -43,6 +44,7 @@ target_include_directories(
     ${SUB_PROJECT_NAME}
     PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}
+    ../ProjectFile/
 )
 
 target_compile_definitions(
