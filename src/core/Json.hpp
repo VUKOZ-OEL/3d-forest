@@ -23,6 +23,7 @@
 #define JSON_HPP
 
 // Include std.
+#include <any>
 #include <iostream>
 #include <limits>
 #include <map>
@@ -118,6 +119,7 @@ public:
     Json(unsigned long long in);
     Json(const char *in);
     Json(const std::string &in);
+    Json(const std::any &in);
 
     template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
     Json(const std::vector<T> &in);
@@ -173,6 +175,7 @@ public:
     friend void fromJson(long long &out, const Json &in);
     friend void fromJson(unsigned long long &out, const Json &in);
     friend void fromJson(std::string &out, const Json &in);
+    friend void fromJson(std::any &out, const Json &in);
 
     template <typename T>
     friend typename std::enable_if<std::is_arithmetic_v<T>, void>::type
@@ -241,6 +244,7 @@ public:
     friend void toJson(Json &out, long long in);
     friend void toJson(Json &out, unsigned long long in);
     friend void toJson(Json &out, const std::string &in);
+    friend void toJson(Json &out, const std::any &in);
 
     template <typename T>
     friend typename std::enable_if<std::is_arithmetic_v<T>, void>::type toJson(
@@ -351,6 +355,26 @@ inline Json::Json(const char *in)
 inline Json::Json(const std::string &in)
 {
     createString(in);
+}
+
+inline Json::Json(const std::any &in)
+{
+    if (auto v = std::any_cast<std::string>(&in))
+    {
+        createString(*v);
+    }
+    else if (auto v = std::any_cast<double>(&in))
+    {
+        createNumber(*v);
+    }
+    else if (auto v = std::any_cast<bool>(&in))
+    {
+        createType((*v) ? TYPE_TRUE : TYPE_FALSE);
+    }
+    else
+    {
+        createType(TYPE_NULL);
+    }
 }
 
 template <typename T, typename> inline Json::Json(const std::vector<T> &in)
@@ -658,6 +682,26 @@ inline void fromJson(unsigned long long &out, const Json &in)
 inline void fromJson(std::string &out, const Json &in)
 {
     out = in.string();
+}
+
+inline void fromJson(std::any &out, const Json &in)
+{
+    if (in.typeString())
+    {
+        out = in.string();
+    }
+    else if (in.typeNumber())
+    {
+        out = in.number();
+    }
+    else if (in.typeTrue() || in.typeFalse())
+    {
+        out = in.typeTrue();
+    }
+    else
+    {
+        out.reset();
+    }
 }
 
 inline void fromJson(bool &out,
@@ -977,6 +1021,11 @@ inline void toJson(Json &out, unsigned long long in)
 }
 
 inline void toJson(Json &out, const std::string &in)
+{
+    out = in;
+}
+
+inline void toJson(Json &out, const std::any &in)
 {
     out = in;
 }

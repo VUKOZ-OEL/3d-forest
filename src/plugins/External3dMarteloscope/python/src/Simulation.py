@@ -10,7 +10,7 @@ import numpy as np
 import plotly.graph_objects as go
 
 import src.io_utils as iou
-import src.simul_utils2 as sut
+import src.simul_utils as sut
 from src.i18n import t, t_help, t_mgmt
 from src.species_dict import species_dict
 from src.run_iland import run_iland
@@ -35,13 +35,16 @@ out_csv = sut.export_iland_trees_csv(
 # =============================================================================
 # CONFIG
 # =============================================================================
-# xml_path = Path("C:/Users/krucek/Documents/iLand/test/Pokojna_hora.xml")
-# out_db = Path("C:/Users/krucek/Documents/iLand/test/output/output.sqlite")
-# temp_db = Path("C:/Users/krucek/Documents/iLand/test/output/temp.sqlite")
-
 xml_path = st.session_state.project_file.replace(".json", ".xml")
-out_db = st.session_state.project_file.replace(".json", ".output.sqlite")
-temp_db = st.session_state.project_file.replace(".json", ".temp.sqlite")
+project_dir = Path(st.session_state.project_file).parent
+
+print(project_dir)
+
+out_db = project_dir / "output" / "output.sqlite"
+temp_db = project_dir / "output" / "temp.sqlite"
+
+print(out_db)
+print(temp_db)
 
 def _fan_label(g: str) -> str:
     if g == "SUM":
@@ -75,7 +78,7 @@ with c1:
 
 with c2:
     st.markdown(f"**{t('simulation_period')}**")
-    years = st.slider("", min_value=0, max_value=100, value=30, step=5)
+    years = st.slider("", min_value=0, max_value=75, value=30, step=5)
 
 with c3:
     st.markdown(f"**{t('replications')}**")
@@ -111,8 +114,12 @@ if run_simul:
             text=t("simulation_progress_replication").format(p=percent),
         )
 
-        run_iland(str(xml_path).encode("utf-8"), years)
+        run_iland(str(xml_path).encode("utf-8"), years, bin_path=st.session_state.bin_path)
         shutil.copyfile(out_db, temp_db)
+
+        print("SQLITES")
+        print(out_db)
+        print(temp_db)
 
         living = sut.read_single_sqlite_living(
             temp_db,

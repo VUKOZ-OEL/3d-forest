@@ -159,6 +159,7 @@ public:
 
     // Settings.
     const Settings &settings() const { return settings_; }
+    void setApplicationSettings(const ApplicationSettings &settings);
     void setRenderingSettings(const RenderingSettings &renderingSettings);
     void setTreeSettings(const TreeSettings &treeSettings);
     void setUnitsSettings(const UnitsSettings &unitsSettings);
@@ -194,6 +195,7 @@ protected:
     ManagementStatusList managementStatusList_;
     Settings settings_;
     Classifications classifications_;
+    Json plotInfo_;
 
     Region clipFilter_;
     Range<double> elevationFilter_;

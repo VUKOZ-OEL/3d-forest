@@ -45,19 +45,21 @@ public:
     External3dMarteloscopeRunner(MainWindow *mainWindow);
     ~External3dMarteloscopeRunner();
 
-    void start(const QString &pythonHome,
-               const QString &pythonPath,
-               const QString &pythonExe,
-               const QString &pyhonScript,
-               const QString &projectPath,
-               int startPort = 8501);
-
+    void start(const std::string &projectPath, int startPort = 8501);
     void stop();
     bool isRunning() const;
 
 private:
     bool isPortFree(int port) const;
     int findFreePort(int startPort) const;
+
+    void start(const QString &binPath,
+               const QString &pythonHome,
+               const QString &pythonPath,
+               const QString &pythonExe,
+               const QString &pyhonScript,
+               const QString &projectPath,
+               int startPort);
 
     MainWindow *mainWindow_ = nullptr;
 

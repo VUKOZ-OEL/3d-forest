@@ -60,9 +60,6 @@ public slots:
     void slotReloadProject();
 
 private:
-    bool openProject(const QString &path);
-    bool saveProject(const QString &path = "");
-
     MainWindow *mainWindow_;
 
     QAction *newProjectAction_;

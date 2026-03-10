@@ -13,7 +13,7 @@ from src.import_utils import (
     load_usr_attributes_wide,
 )
 
-from src.data_prep.simulate_light import compute_light_competition
+from src.simulate_light import compute_light_competition
 
 # =================================================
 # INIT

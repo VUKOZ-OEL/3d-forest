@@ -469,8 +469,14 @@ void TreeTableWidget::updateTableContent()
                                              "Crown X [m]",
                                              "Crown Y [m]",
                                              "Crown Z [m]",
-                                             "Area [m^2]",
-                                             "Vol [m^3]"});
+                                             "Crown Vol [m^3]",
+                                             "Crown Projected Area [m^2]",
+                                             "Stem Vol [m^3]",
+                                             "Basal Area [m^2]",
+                                             "Crown Eccentricity [m^2]",
+                                             "Slenderness",
+                                             "Crown Projection Exposure [%]",
+                                            });
 
     // Content.
     if (showOnlyVisibleTreesCheckBox_->isChecked())
@@ -524,7 +530,7 @@ void TreeTableWidget::setRow(int row, size_t index)
     // LOG_DEBUG(<< "Set row <" << row << "> index <" << index << ">.");
 
     const Segment &segment = segments_[index];
-    const TreeAttributes &treeAttributes = segment.treeAttributes;
+    const TreeAttributes &atr = segment.treeAttributes;
 
     double ppm =
         mainWindow_->editor().settings().unitsSettings().pointsPerMeter()[0];
@@ -563,16 +569,21 @@ void TreeTableWidget::setRow(int row, size_t index)
     setCell(row, COLUMN_FILTER, isInFilter ? "Yes" : "No");
     setCell(row, COLUMN_MANAGEMENT_STATUS, managementStatusLabel);
     setCell(row, COLUMN_SPECIES, speciesLabel);
-    setCell(row, COLUMN_X, treeAttributes.position[0] / ppm);
-    setCell(row, COLUMN_Y, treeAttributes.position[1] / ppm);
-    setCell(row, COLUMN_Z, treeAttributes.position[2] / ppm);
-    setCell(row, COLUMN_HEIGHT, treeAttributes.height / ppm);
-    setCell(row, COLUMN_DBH, treeAttributes.dbh / ppm);
-    setCell(row, COLUMN_CROWN_X, treeAttributes.crownCenter[0] / ppm);
-    setCell(row, COLUMN_CROWN_Y, treeAttributes.crownCenter[1] / ppm);
-    setCell(row, COLUMN_CROWN_Z, treeAttributes.crownCenter[2] / ppm);
-    setCell(row, COLUMN_AREA, treeAttributes.surfaceAreaProjection / ppm2);
-    setCell(row, COLUMN_VOLUME, treeAttributes.volume / ppm3);
+    setCell(row, COLUMN_X, atr.position[0] / ppm);
+    setCell(row, COLUMN_Y, atr.position[1] / ppm);
+    setCell(row, COLUMN_Z, atr.position[2] / ppm);
+    setCell(row, COLUMN_HEIGHT, atr.height / ppm);
+    setCell(row, COLUMN_DBH, atr.dbh / ppm);
+    setCell(row, COLUMN_CROWN_X, atr.crownCenter[0] / ppm);
+    setCell(row, COLUMN_CROWN_Y, atr.crownCenter[1] / ppm);
+    setCell(row, COLUMN_CROWN_Z, atr.crownCenter[2] / ppm);
+    setCell(row, COLUMN_CROWN_VOLUME, atr.volume / ppm3);
+    setCell(row, COLUMN_CROWN_PROJ_AREA, atr.surfaceAreaProjection / ppm2);
+    setCell(row, COLUMN_STEM_VOLUME, atr.number("stem_volume"));
+    setCell(row, COLUMN_BASAL_AREA, atr.number("basal_area_m2"));
+    setCell(row, COLUMN_CROWN_ECCENTRICITY, atr.number("crown_eccentricity"));
+    setCell(row, COLUMN_SLENDERNESS, (atr.height / ppm) * (atr.dbh / ppm));
+    setCell(row, COLUMN_CROWN_PROJ_EXPOSURE, atr.number("projection_exposure"));
 
     if (segment.selected)
     {

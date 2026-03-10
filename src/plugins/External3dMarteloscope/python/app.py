@@ -37,22 +37,23 @@ simul_page = st.Page("src/Simulation.py", title=t("page_prediction"), icon=":mat
 # Settings
 add_atts_page = st.Page("src/Add_attributes_prj.py", title=t("page_add_attributes"), icon=":material/list_alt_add:")
 colors_page = st.Page("src/Colors_settings.py", title=t("colors"), icon=":material/colors:")
-# Temp tests
-#sandbox_page = st.Page("src/sandbox.py", title=t("Sandbox"), icon=":material/thumb_up:")
 
-#file_path = "d:/GS_LCR_DELIVERABLE/Buchlovice/Buchlovice.json"
-#file_path = "d:/GS_LCR_DELIVERABLE/Klepacov/Klepacov.json"
-#file_path = "d:/GS_LCR_DELIVERABLE/Krivoklat/Krivoklat.json"
 
 if len(sys.argv) > 1:
     file_path = sys.argv[1]
 else:
     file_path = "c:/default.json"
 
+if len(sys.argv) > 2:
+    bin_path = sys.argv[2]
+else:
+    bin_path = ""
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Init data
 if not st.session_state.get("data_initialized"):
+    st.session_state.bin_path = bin_path
     st.session_state.project_file = file_path
     st.session_state.python_script_dir = BASE_DIR
     st.session_state.sqlite_path = st.session_state.project_file.replace(".json", ".sqlite")
