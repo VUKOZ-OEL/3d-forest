@@ -15,15 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-set(SUB_PROJECT_NAME "3DForestExternal3dMarteloscopePlugin")
+set(SUB_PROJECT_NAME "3DForestApplicationSettingsPlugin")
 
 if(NOT QT_VERSION_MAJOR)
-    message(WARNING "Skipping ${SUB_PROJECT_NAME} (Qt Gui not available)")
-    return()
-endif()
-
-if(NOT TARGET Qt${QT_VERSION_MAJOR}::Network)
-    message(WARNING "Skipping ${SUB_PROJECT_NAME} (Qt Network not available)")
+    message(WARNING "Gui not found - skipping ${SUB_PROJECT_NAME}")
     return()
 endif()
 
@@ -36,7 +31,6 @@ add_library(
     ${SUB_PROJECT_NAME}
     SHARED
     ${SOURCES}
-    ../ProjectFile/ProjectFileAction.cpp
     resources/resources.qrc
 )
 
@@ -44,7 +38,6 @@ target_include_directories(
     ${SUB_PROJECT_NAME}
     PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}
-    ../ProjectFile/
 )
 
 target_compile_definitions(
@@ -53,34 +46,10 @@ target_compile_definitions(
     EXPORT_${SUB_PROJECT_NAME}=1
 )
 
-if(TARGET Qt${QT_VERSION_MAJOR}::WebEngineWidgets)
-    target_compile_definitions(
-        ${SUB_PROJECT_NAME}
-        PRIVATE
-        HAS_QT_WEB_ENGINE_WIDGETS=1
-    )
-endif()
-
 target_link_libraries(
     ${SUB_PROJECT_NAME}
     PRIVATE
     3DForestGui
-    Qt${QT_VERSION_MAJOR}::Network
 )
 
-if(TARGET Qt${QT_VERSION_MAJOR}::WebEngineWidgets)
-    target_link_libraries(
-        ${SUB_PROJECT_NAME}
-        PRIVATE
-        Qt${QT_VERSION_MAJOR}::WebEngineWidgets
-    )
-endif()
-
-# Install plugin
-install_and_deploy_qt_runtime(${SUB_PROJECT_NAME} "bin/plugins")
-
-# Install python app
-install(
-    DIRECTORY python
-    DESTINATION bin/plugins/${SUB_PROJECT_NAME}
-)
+install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin/plugins)

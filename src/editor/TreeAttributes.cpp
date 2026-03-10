@@ -96,9 +96,14 @@ void toJson(Json &out, const TreeAttributes &in, double scale)
 
     toJson(out["crownVoxelSize"], in.crownVoxelSize * scale);
 
-    for (const auto &it : in.attributes)
+    // for (const auto &it : in.attributes)
+    // {
+    //     toJson(out[it.first], it.second);
+    // }
+
+    for (const auto &it : in.attributesJson)
     {
-        toJson(out[it.first], it.second);
+        out[it.first] = it.second;
     }
 }
 
@@ -121,6 +126,8 @@ void fromJson(TreeAttributes &out, const Json &in, double scale)
     {
         if (knownTags.count(it.first) == 0)
         {
+            out.attributesJson[it.first] = it.second;
+
             std::any value;
             fromJson(value, it.second);
             out.attributes[it.first] = value;

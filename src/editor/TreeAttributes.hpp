@@ -90,6 +90,7 @@ public:
 
     /// Attributes.
     std::map<std::string, std::any> attributes;
+    std::map<std::string, Json> attributesJson;
 
     double number(const std::string &key, double defaultValue = 0.0) const;
 };

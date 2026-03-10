@@ -22,6 +22,7 @@
 // Include 3D Forest.
 #include <External3dMarteloscopePlugin.hpp>
 #include <External3dMarteloscopeRunner.hpp>
+#include <ProjectFileAction.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
 
@@ -79,8 +80,11 @@ void External3dMarteloscopePlugin::slotPlugin()
 
     try
     {
-        std::string projectPath = mainWindow_->editor().projectPath();
+        // Save current project.
+        (void)ProjectFileAction::saveProject(mainWindow_);
 
+        // Start python.
+        std::string projectPath = mainWindow_->editor().projectPath();
         runner_->start(projectPath);
     }
     catch (std::exception &e)

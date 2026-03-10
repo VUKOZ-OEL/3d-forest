@@ -41,14 +41,19 @@ class EXPORT_EDITOR Settings
 public:
     Settings();
 
+    const ApplicationSettings &applicationSettings() const
+    {
+        return applicationSettings_;
+    }
     const RenderingSettings &renderingSettings() const
     {
         return renderingSettings_;
-    };
-    const TreeSettings &treeSettings() const { return treeSettings_; };
-    const UnitsSettings &unitsSettings() const { return unitsSettings_; };
-    const ViewSettings &viewSettings() const { return viewSettings_; };
+    }
+    const TreeSettings &treeSettings() const { return treeSettings_; }
+    const UnitsSettings &unitsSettings() const { return unitsSettings_; }
+    const ViewSettings &viewSettings() const { return viewSettings_; }
 
+    void setApplicationSettings(const ApplicationSettings &settings);
     void setRenderingSettings(const RenderingSettings &renderingSettings);
     void setTreeSettings(const TreeSettings &treeSettings);
     bool setUnitsSettings(const UnitsSettings &unitsSettings);
@@ -57,12 +62,12 @@ public:
     const SpeciesList &defaultSpeciesList() const
     {
         return defaultSpeciesList_;
-    };
+    }
 
     const ManagementStatusList &defaultManagementStatusList() const
     {
         return defaultManagementStatusList_;
-    };
+    }
 
 protected:
     ApplicationSettings applicationSettings_;

@@ -17,56 +17,44 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ProjectFilePlugin.hpp */
+/** @file ApplicationSettingsPlugin.hpp */
 
-#ifndef PROJECT_FILE_PLUGIN_HPP
-#define PROJECT_FILE_PLUGIN_HPP
+#ifndef APPLICATION_SETTINGS_PLUGIN_HPP
+#define APPLICATION_SETTINGS_PLUGIN_HPP
 
 // Include 3D Forest.
 #include <PluginInterface.hpp>
-#include <ProjectFileInterface.hpp>
+class ApplicationSettingsWindow;
 
 #if defined(_MSC_VER)
-    #if defined(EXPORT_3DForestProjectFilePlugin)
-        #define EXPORT_PROJECT_FILE_PLUGIN __declspec(dllexport)
+    #if defined(EXPORT_3DForestApplicationSettingsPlugin)
+        #define EXPORT_APPLICATION_SETTINGS_PLUGIN __declspec(dllexport)
     #else
-        #define EXPORT_PROJECT_FILE_PLUGIN __declspec(dllimport)
+        #define EXPORT_APPLICATION_SETTINGS_PLUGIN __declspec(dllimport)
     #endif
 #else
-    #define EXPORT_PROJECT_FILE_PLUGIN
+    #define EXPORT_APPLICATION_SETTINGS_PLUGIN
 #endif
 
-/** Project File Plugin. */
-class EXPORT_PROJECT_FILE_PLUGIN ProjectFilePlugin : public QObject,
-                                                     public PluginInterface,
-                                                     public ProjectFileInterface
+/** Application Settings Plugin. */
+class EXPORT_APPLICATION_SETTINGS_PLUGIN ApplicationSettingsPlugin : public QObject,
+                                                                     public PluginInterface
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID PluginInterface_iid)
     Q_INTERFACES(PluginInterface)
 
 public:
-    ProjectFilePlugin();
+    ApplicationSettingsPlugin();
 
     virtual void initialize(MainWindow *mainWindow);
 
-    virtual bool closeProject();
-
 public slots:
-    void slotNewProject();
-    void slotOpenProject();
-    void slotSaveProject();
-    void slotSaveAsProject();
-    void slotReloadProject();
+    void slotPlugin();
 
 private:
     MainWindow *mainWindow_;
-
-    QAction *newProjectAction_;
-    QAction *openProjectAction_;
-    QAction *saveProjectAction_;
-    QAction *saveAsProjectAction_;
-    QAction *reloadProjectAction_;
+    ApplicationSettingsWindow *pluginWindow_;
 };
 
-#endif /* PROJECT_FILE_PLUGIN_HPP */
+#endif /* APPLICATION_SETTINGS_PLUGIN_HPP */
