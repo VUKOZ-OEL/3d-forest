@@ -36,7 +36,7 @@ out_csv = sut.export_iland_trees_csv(
 # CONFIG
 # =============================================================================
 xml_path = st.session_state.project_file.replace(".json", ".xml")
-project_dir = Path(xml_path).parent
+project_dir = Path(st.session_state.project_file).parent
 
 print(project_dir)
 
