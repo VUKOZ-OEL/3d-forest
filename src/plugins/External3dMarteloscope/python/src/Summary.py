@@ -20,13 +20,13 @@ df = df.copy()
 
 # bezpečné vytvoření 'volume'
 if "stem_volume" in df.columns:
-    df["stem_volume"] = pd.to_numeric(df["stem_volume"], errors="coerce")
+    df["volume"] = pd.to_numeric(df["stem_volume"], errors="coerce").fillna(0.0)
 else:
-    df["stem_volume"] = np.nan
+    df["volume"] = np.nan
 
 # dopočet bazální plochy [m²] z DBH [cm]  -> BA = π * (dbh_cm / 200)^2
 if "dbh" in df.columns:
-    dbh_cm = pd.to_numeric(df["dbh"], errors="coerce")
+    dbh_cm = pd.to_numeric(df["dbh"], errors="coerce").fillna(0.0)
     df["basal_area_m2"] = np.pi * (dbh_cm / 200.0) ** 2
 else:
     df["basal_area_m2"] = np.nan
@@ -187,7 +187,7 @@ def _metric_meta(metric_id: str):
         return None, t("trees"), t("trees_per_ha"), t("trees"), "trees"
 
     if metric_id == METRIC_VOLUME:
-        return "stem_volume", f"{t('value_volume')} (m³)", t("m3_per_ha"), f"{t('value_volume')} (m³)", "m³"
+        return "volume", f"{t('value_volume')} (m³)", t("m3_per_ha"), f"{t('value_volume')} (m³)", "m³"
 
     if metric_id == METRIC_BASAL_AREA:
         return "basal_area_m2", f"{t('basal_area')} (m²)", t("m2_per_ha"), f"{t('basal_area')} (m²)", "m²"
@@ -196,7 +196,7 @@ def _metric_meta(metric_id: str):
         return "canopy_cover_pct", t("metric_canopy_cover_pct"), t("unit_percent"), t("metric_canopy_cover"), "%"
 
     if metric_id == METRIC_STOCKING:
-        return "volume", t("stocking"), t("unit_percent"), t("stocking"), "%"
+        return "stocking", t("stocking"), t("unit_percent"), t("stocking"), "%"
     
 
     return None, t("trees"), t("trees_per_ha"), t("trees"), "trees"

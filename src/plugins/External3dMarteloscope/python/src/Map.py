@@ -51,42 +51,29 @@ df_all["height"] = pd.to_numeric(df_all["height"], errors="coerce")
 # masks
 masks = make_masks(df_all)
 
+
 # =========================================================
 # SCALE POINT SIZE BY – dropdown
 # =========================================================
-scale_candidates = [
-    "dbh",
-    "height",
-    "Volume_m3",
-    "crown_base_height",
-    "crown_centroid_height",
-    "crown_volume",
-    "crown_surface",
-    "horizontal_crown_proj",
-    "vertical_crown_proj",
-    "heightXdbh",
-    "projection_exposure",
+SCALE_VAR_MAP = {
+    "dbh": "dbh",
+    "tree_height": "height",
+    "volume": "stem_volume",
+    "crown_base_height": "crownStartHeight",
+    "crown_centroid_height": "crown_centroid_height",
+    "crown_surface": "surfaceArea",
+    "horizontal_crown_proj": "surfaceAreaProjection",
+    "vertical_crown_proj": "vertical_crown_projection",
+    "height_dbh_ratio": "heightXdbh",
+    "projection_exposure": "projection_exposure",
+}
+available_scale_vars = [
+    k for k, v in SCALE_VAR_MAP.items() if v in df_all.columns
 ]
-available_scale_vars = [c for c in scale_candidates if c in df_all.columns]
 default_scale_index = available_scale_vars.index("dbh") if "dbh" in available_scale_vars else (0 if available_scale_vars else 0)
 
 def _scale_var_label(v: str) -> str:
-    # map variable -> i18n key (use existing keys wherever possible)
-    mapping = {
-        "dbh": "dbh",
-        "height": "tree_height",
-        "Volume_m3": "volume",
-        "crown_base_height": "crown_base_height",
-        "crown_centroid_height": "crown_centroid_height",
-        "crown_volume": "crown_volume",
-        "crown_surface": "crown_surface",
-        "horizontal_crown_proj": "scale_horizontal_proj",   # label without units exists
-        "vertical_crown_proj": "vertical_crown_proj",
-        "heightXdbh": "height_dbh_ratio",
-        "projection_exposure": "projection_exposure",
-    }
-    key = mapping.get(v)
-    return t(key) if key else v
+    return t(v) if v else v
 
 # =========================================================
 # HEADER (optional)
@@ -191,7 +178,8 @@ with c23:
     colors = df[color_col].apply(_valid_hex)
 
     # ---- POINT SIZES ----
-    sizes = compute_point_sizes(df, scale_var, size_min, size_max, default_var="dbh")
+    real_col = SCALE_VAR_MAP.get(scale_var, scale_var)
+    sizes = compute_point_sizes(df, real_col, size_min, size_max, default_var="dbh")
 
     # ---- HOVER DATA ----
     customdata, hovertemplate = make_hover_data(df)

@@ -87,13 +87,13 @@ def make_hover_data(df: pd.DataFrame):
             dbh_rounded.to_numpy(),                       # 2
             df["management_status"].map(t_mgmt),          # 3  ✅ i18n
             r1("height"),                                 # 4
-            r1("Volume_m3"),                              # 5
-            r1("crown_base_height"),                      # 6
+            r1("stem_volume"),                              # 5
+            r1("crownStartHeight"),                      # 6
             r1("crown_centroid_height"),                  # 7
-            r1("crown_volume"),                           # 8
-            r1("crown_surface"),                          # 9
-            r1("horizontal_crown_proj"),                  # 10
-            r1("vertical_crown_proj"),                    # 11
+            r1("volume"),                           # 8
+            r1("surfaceArea"),                          # 9
+            r1("surfaceAreaProjection"),                  # 10
+            r1("vertical_crown_projection"),                    # 11
             r1("heightXdbh"),                             # 12
             r1("projection_exposure"),                    # 13
         ]

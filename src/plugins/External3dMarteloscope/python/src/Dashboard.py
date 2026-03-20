@@ -1,6 +1,8 @@
 from datetime import datetime
 import streamlit as st
 import pandas as pd
+import tempfile, os
+import webbrowser
 
 import src.io_utils as iou
 from src.i18n import t, t_help
@@ -246,20 +248,27 @@ with c2:
                 created_dt=datetime.now(),
             )
 
+            file_path = os.path.join(
+                tempfile.gettempdir(),
+                f"report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+            )
+
+            with open(file_path, "wb") as f:
+                f.write(pdf_bytes)
+
+            st.session_state["export_pdf_path"] = file_path
             st.session_state["export_pdf_bytes"] = pdf_bytes
             st.session_state["export_pdf_name"] = f"report_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf"
             st.session_state["export_pdf_ready_ts"] = datetime.now().isoformat()
 
+    
     # --- 2) Download se ukáže až po renderu ---
-    if st.session_state.get("export_pdf_bytes"):
-        st.download_button(
-            label=t("export_download_ready"),
-            data=st.session_state["export_pdf_bytes"],
-            file_name=st.session_state.get("export_pdf_name", "report.pdf"),
-            mime="application/pdf",
-            icon=":material/download:",
-            use_container_width=True,
-        )
+    if st.session_state.get("export_pdf_path"):
+        file_path = st.session_state["export_pdf_path"]
+
+        if st.button(t("export_download_ready")):
+            url = "file:///" + file_path.replace("\\", "/")
+            webbrowser.open(url)
 
 
 with st.expander(label=t("expander_help_label"),icon=":material/help:"):
