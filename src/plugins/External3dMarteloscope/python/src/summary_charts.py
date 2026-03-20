@@ -23,6 +23,32 @@ METRIC_VOLUME = "metric_volume_m3"
 METRIC_BASAL_AREA = "metric_basal_area_m2"
 METRIC_CANOPY_COVER = "metric_canopy_cover_pct"
 
+def safe_pie(ax, values, colors, **kwargs):
+    import numpy as np
+
+    values = np.array(values, dtype=float)
+
+    # 1) NaN → 0
+    values = np.nan_to_num(values, nan=0.0)
+
+    # 2) sum = 0 → fallback
+    if values.sum() <= 0:
+        ax.text(0.5, 0.5, "No data", ha="center", va="center")
+        ax.set_axis_off()
+        return
+
+    # 3) odstranit nulové hodnoty (a odpovídající barvy)
+    mask = values > 0
+    values = values[mask]
+    colors = [c for c, m in zip(colors, mask) if m]
+
+    # 4) finální kontrola
+    if len(values) == 0:
+        ax.text(0.5, 0.5, "No data", ha="center", va="center")
+        ax.set_axis_off()
+        return
+
+    ax.pie(values, colors=colors, **kwargs)
 
 # ---------- Masks ----------
 def _make_masks(d: pd.DataFrame) -> Dict[str, pd.Series]:
@@ -153,11 +179,12 @@ def build_three_panel_figure(
     d = df.copy()
 
     # Derived columns
-    if "Volume_m3" in d.columns:
-        d["volume"] = pd.to_numeric(d["Volume_m3"], errors="coerce")
+    if "stem_volume" in d.columns:
+        d["volume"] = pd.to_numeric(d["stem_volume"], errors="coerce").fillna(0.0)
+        d["volume"] = d["volume"].clip(lower=0)
 
     if "dbh" in d.columns:
-        dbh = pd.to_numeric(d["dbh"], errors="coerce")
+        dbh = pd.to_numeric(d["dbh"], errors="coerce").fillna(0.0).fillna(0.0)
         d["basal_area_m2"] = np.pi * (dbh / 200.0) ** 2
 
     # Canopy cover contribution per tree (relative to plot area)
@@ -204,7 +231,8 @@ def build_three_panel_figure(
         else dsel.groupby(hue_col).size()
     ).reindex(categories, fill_value=0)
 
-    ax0.pie(
+    safe_pie(
+        ax0,
         pie.values,
         colors=[cmap.get(k, "#AAAAAA") for k in pie.index],
         startangle=90,

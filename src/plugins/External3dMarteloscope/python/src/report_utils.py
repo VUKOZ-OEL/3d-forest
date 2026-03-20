@@ -44,6 +44,20 @@ pdfmetrics.registerFont(TTFont(FONT_BOLD, font_path))
 # ------------------------------------------------------------------
 # HELPERS
 # ------------------------------------------------------------------
+def _safe_series(df, col, default=0.0):
+    """Vrátí sloupec jako numeric bez NaN, nebo default pokud neexistuje."""
+    if col not in df.columns:
+        return pd.Series(default, index=df.index, dtype=float)
+    return pd.to_numeric(df[col], errors="coerce").fillna(default)
+
+def _safe_sum(series):
+    """Bezpečný součet (nikdy nespadne)."""
+    try:
+        return float(pd.to_numeric(series, errors="coerce").fillna(0.0).sum())
+    except Exception:
+        return 0.0
+
+
 def mpl_fig_to_png_bytes(fig: MplFigure, dpi: int = 170) -> bytes:
     bio = io.BytesIO()
     fig.savefig(bio, format="png", dpi=dpi, bbox_inches="tight")
@@ -111,16 +125,20 @@ def generate_all_summary_figs(
 def _ensure_metrics(df: pd.DataFrame, area_ha: float) -> pd.DataFrame:
     d = df.copy()
 
-    if "Volume_m3" in d.columns:
-        d["volume"] = pd.to_numeric(d["Volume_m3"], errors="coerce").fillna(0.0)
+    # volume (safe)
+    d["volume"] = _safe_series(d, "Volume_m3", 0.0)
 
-    if "dbh" in d.columns:
-        dbh_cm = pd.to_numeric(d["dbh"], errors="coerce")
-        d["basal_area_m2"] = np.pi * (dbh_cm / 200.0) ** 2
+    # basal area (safe i když chybí dbh)
+    dbh_cm = _safe_series(d, "dbh", 0.0)
+    d["basal_area_m2"] = np.pi * (dbh_cm / 200.0) ** 2
 
-    if "surfaceAreaProjection" in d.columns:
-        sap = pd.to_numeric(d["surfaceAreaProjection"], errors="coerce").fillna(0.0)
-        d["canopy_cover_pct"] = (sap / (area_ha * 10_000.0)) * 100.0
+    # canopy cover (safe i když chybí surfaceAreaProjection)
+    sap = _safe_series(d, "surfaceAreaProjection", 0.0)
+
+    if area_ha <= 0 or not np.isfinite(area_ha):
+        area_ha = 1.0
+
+    d["canopy_cover_pct"] = (sap / (area_ha * 10_000.0)) * 100.0
 
     return d
 
@@ -156,10 +174,19 @@ def compute_report_table(trees: pd.DataFrame, plot_info: pd.DataFrame) -> dict:
     out = {"area_ha": area_ha}
     for k, m in masks.items():
         dd = d[m]
+
+        # ochrana proti prázdnému datasetu
+        if dd is None or len(dd) == 0:
+            out[(k, "tree_count")] = 0.0
+            out[(k, "volume")] = 0.0
+            out[(k, "basal_area")] = 0.0
+            out[(k, "canopy_cover")] = 0.0
+            continue
+
         out[(k, "tree_count")] = float(len(dd))
-        out[(k, "volume")] = float(dd["volume"].sum())
-        out[(k, "basal_area")] = float(dd["basal_area_m2"].sum())
-        out[(k, "canopy_cover")] = float(dd["canopy_cover_pct"].sum())
+        out[(k, "volume")] = _safe_sum(dd.get("volume", 0.0))
+        out[(k, "basal_area")] = _safe_sum(dd.get("basal_area_m2", 0.0))
+        out[(k, "canopy_cover")] = _safe_sum(dd.get("canopy_cover_pct", 0.0))
 
     return out
 
@@ -178,6 +205,9 @@ def build_intervention_report_pdf(
     created_dt: Optional[datetime] = None,
     png_dpi: int = 170,
 ) -> bytes:
+
+    if trees is None or len(trees) == 0:
+        raise ValueError("No tree data available for report generation")
 
     created_dt = created_dt or datetime.now()
 

@@ -57,15 +57,15 @@ VALUE_TREE_COUNT = "tree_count"  # exists :contentReference[oaicite:1]{index=1}
 value_mapping = {
     VALUE_TREE_COUNT: None,
     "dbh": "dbh",                          # exists :contentReference[oaicite:2]{index=2}
-    "basal_area_m2": "BasalArea_m2",       # exists :contentReference[oaicite:3]{index=3}
-    "volume": "Volume_m3",                 # exists :contentReference[oaicite:4]{index=4}
+    "basal_area_m2": "basal_area_m2",       # exists :contentReference[oaicite:3]{index=3}
+    "volume": "stem_volume",                 # exists :contentReference[oaicite:4]{index=4}
     "tree_height": "height",               # exists :contentReference[oaicite:5]{index=5}
-    "crown_base_height": "crown_base_height",          # exists :contentReference[oaicite:6]{index=6}
+    "crown_base_height": "crownStartHeight",          # exists :contentReference[oaicite:6]{index=6}
     "crown_centroid_height": "crown_centroid_height",  # exists :contentReference[oaicite:7]{index=7}
-    "crown_volume_m3": "crown_volume",                 # exists :contentReference[oaicite:8]{index=8}
-    "crown_surface": "crown_surface",                  # exists :contentReference[oaicite:9]{index=9}
-    "horizontal_crown_proj": "horizontal_crown_proj",  # exists :contentReference[oaicite:10]{index=10}
-    "vertical_crown_proj": "vertical_crown_proj",      # exists :contentReference[oaicite:11]{index=11}
+    "crown_volume_m3": "volume",                 # exists :contentReference[oaicite:8]{index=8}
+    "crown_surface": "surfaceArea",                  # exists :contentReference[oaicite:9]{index=9}
+    "horizontal_crown_proj": "surfaceAreaProjection",  # exists :contentReference[oaicite:10]{index=10}
+    "vertical_crown_proj": "vertical_crown_projection",      # exists :contentReference[oaicite:11]{index=11}
     "crown_eccentricity": "crown_eccentricity",        # exists :contentReference[oaicite:12]{index=12}
     "height_dbh_ratio": "heightXdbh",                  # exists :contentReference[oaicite:13]{index=13}
 }
