@@ -2,6 +2,7 @@
 bin/
 build/
 build-msvc-release/
+installer/
 stage/
 out/
 
