@@ -29,7 +29,7 @@ df0["species"] = df0["species"].astype(str).str.strip()
 df0["management_status"] = df0["management_status"].astype(str).str.strip()
 
 # numeric fix
-for col in ["dbh", "height", "Volume_m3", "BA_m2", "crown_volume"]:
+for col in ["dbh", "height", "stem_volume", "BA_m2", "volume"]:
     if col in df0:
         df0[col] = pd.to_numeric(df0[col], errors="coerce")
 
@@ -38,8 +38,8 @@ if "BA_m2" not in df0:
     df0["BA_m2"] = np.pi * (df0["dbh"] / 200.0) ** 2
 
 # crown volume placeholder if missing
-if "crown_volume" not in df0:
-    df0["crown_volume"] = np.nan
+if "volume" not in df0:
+    df0["volume"] = np.nan
 
 
 # ------------------------------------------------------------
@@ -112,11 +112,11 @@ df = df[(df["height"] >= height_range[0]) & (df["height"] <= height_range[1])]
 if metric_id == METRIC_TREE_COUNT:
     df["metric_value"] = 1.0
 elif metric_id == METRIC_VOLUME_M3:
-    df["metric_value"] = df.get("Volume_m3", pd.Series(index=df.index, dtype=float)).fillna(0.0)
+    df["metric_value"] = df.get("stem_volume", pd.Series(index=df.index, dtype=float)).fillna(0.0)
 elif metric_id == METRIC_BASAL_AREA_M2:
     df["metric_value"] = df.get("BA_m2", pd.Series(index=df.index, dtype=float)).fillna(0.0)
 else:
-    df["metric_value"] = df.get("crown_volume", pd.Series(index=df.index, dtype=float)).fillna(0.0)
+    df["metric_value"] = df.get("volume", pd.Series(index=df.index, dtype=float)).fillna(0.0)
 
 
 # ------------------------------------------------------------

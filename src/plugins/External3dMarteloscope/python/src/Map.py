@@ -51,86 +51,29 @@ df_all["height"] = pd.to_numeric(df_all["height"], errors="coerce")
 # masks
 masks = make_masks(df_all)
 
-VALUE_MAPPING_STATS = {
+
+# =========================================================
+# SCALE POINT SIZE BY – dropdown
+# =========================================================
+SCALE_VAR_MAP = {
     "dbh": "dbh",
     "tree_height": "height",
     "volume": "stem_volume",
     "crown_base_height": "crownStartHeight",
     "crown_centroid_height": "crown_centroid_height",
-    "crown_volume_m3": "volume",
     "crown_surface": "surfaceArea",
     "horizontal_crown_proj": "surfaceAreaProjection",
     "vertical_crown_proj": "vertical_crown_projection",
     "height_dbh_ratio": "heightXdbh",
     "projection_exposure": "projection_exposure",
 }
-
-# Canonical columns expected by the map page -> source columns in trees
-MAP_EXPECTED_TO_SOURCE = {
-    "dbh": VALUE_MAPPING_STATS["dbh"],
-    "height": VALUE_MAPPING_STATS["tree_height"],
-    "Volume_m3": VALUE_MAPPING_STATS["volume"],
-    "crown_base_height": VALUE_MAPPING_STATS["crown_base_height"],
-    "crown_centroid_height": VALUE_MAPPING_STATS["crown_centroid_height"],
-    "crown_volume": VALUE_MAPPING_STATS["crown_volume_m3"],
-    "crown_surface": VALUE_MAPPING_STATS["crown_surface"],
-    "horizontal_crown_proj": VALUE_MAPPING_STATS["horizontal_crown_proj"],
-    "vertical_crown_proj": VALUE_MAPPING_STATS["vertical_crown_proj"],
-    "heightXdbh": VALUE_MAPPING_STATS["height_dbh_ratio"],
-    "projection_exposure": VALUE_MAPPING_STATS["projection_exposure"],
-}
-
-
-def normalize_map_columns(df: pd.DataFrame) -> pd.DataFrame:
-    """Return dataframe with map-page canonical columns filled from stats mapping.
-
-    Behavior:
-    - If canonical column exists, keep it.
-    - Else if mapped source exists, copy source into canonical.
-    - Otherwise leave column missing.
-    """
-    out = df.copy()
-    for canonical_col, source_col in MAP_EXPECTED_TO_SOURCE.items():
-        if canonical_col not in out.columns and source_col in out.columns:
-            out[canonical_col] = out[source_col]
-    return out
-
-# =========================================================
-# SCALE POINT SIZE BY – dropdown
-# =========================================================
-scale_candidates = [
-    "dbh",
-    "height",
-    "Volume_m3",
-    "crown_base_height",
-    "crown_centroid_height",
-    "crown_volume",
-    "crown_surface",
-    "horizontal_crown_proj",
-    "vertical_crown_proj",
-    "heightXdbh",
-    "projection_exposure",
+available_scale_vars = [
+    k for k, v in SCALE_VAR_MAP.items() if v in df_all.columns
 ]
-available_scale_vars = [c for c in scale_candidates if c in df_all.columns]
 default_scale_index = available_scale_vars.index("dbh") if "dbh" in available_scale_vars else (0 if available_scale_vars else 0)
 
 def _scale_var_label(v: str) -> str:
-    # map variable -> i18n key (use existing keys wherever possible)
-    mapping = {
-        "dbh": "dbh",
-        "tree_height": "height",
-        "volume": "stem_volume",
-        "crown_base_height": "crownStartHeight",
-        "crown_centroid_height": "crown_centroid_height",
-        "crown_volume_m3": "volume",
-        "crown_surface": "surfaceArea",
-        "horizontal_crown_proj": "surfaceAreaProjection",
-        "vertical_crown_proj": "vertical_crown_projection",
-        "height_dbh_ratio": "heightXdbh",
-        "projection_exposure": "projection_exposure",
-    }
-    key = mapping.get(v)
-    return t(key) if key else v
+    return t(v) if v else v
 
 # =========================================================
 # HEADER (optional)
@@ -235,7 +178,8 @@ with c23:
     colors = df[color_col].apply(_valid_hex)
 
     # ---- POINT SIZES ----
-    sizes = compute_point_sizes(df, scale_var, size_min, size_max, default_var="dbh")
+    real_col = SCALE_VAR_MAP.get(scale_var, scale_var)
+    sizes = compute_point_sizes(df, real_col, size_min, size_max, default_var="dbh")
 
     # ---- HOVER DATA ----
     customdata, hovertemplate = make_hover_data(df)
