@@ -283,7 +283,7 @@ def load_color_palette(file_path: str) -> Dict[str, Dict[str, str]]:
     Vrací dict:
       {
         "species": { "<latin>": "#RRGGBB", ... },
-        "management": { "<label>": "#RRGGBB", ... }
+        "management": { "<en>": "#RRGGBB", ... }
       }
     """
     with open(file_path, "r", encoding="utf-8") as f:
@@ -302,11 +302,11 @@ def load_color_palette(file_path: str) -> Dict[str, Dict[str, str]]:
         if latin and hexc:
             sp_map[str(latin)] = hexc
 
-    # --- managementStatus: label -> color ---
+    # --- managementStatus: en -> color ---
     for item in data.get("managementStatus", []) or []:
         if not isinstance(item, dict):
             continue
-        label = item.get("label")
+        label = item.get("en")
         col = item.get("color")
         hexc = _to_hex(col)
         if label and hexc:
