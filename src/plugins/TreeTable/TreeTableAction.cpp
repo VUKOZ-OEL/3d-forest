@@ -22,6 +22,7 @@
 // Include 3D Forest.
 #include <MainWindow.hpp>
 #include <TreeTableAction.hpp>
+#include <OpenFileDialog.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "TreeTableAction"
@@ -62,4 +63,87 @@ void TreeTableAction::hideTrees(MainWindow *mainWindow,
     mainWindow->updateFilter();
 
     LOG_DEBUG(<< "Finished showing trees.");
+}
+
+void TreeTableAction::readMesh(MainWindow *mainWindow,
+                               const std::unordered_set<size_t> &idList,
+                               const std::string &meshName)
+{
+    LOG_DEBUG(<< "Start read mesh");
+
+    if (idList.empty())
+    {
+        LOG_DEBUG(<< "No tree selected");
+        return;
+    }
+
+    Editor *editor = &mainWindow->editor();
+    Segments segments = editor->segments();
+
+    size_t id = *idList.begin();
+    size_t index = segments.index(id, false);
+
+    if (index == SIZE_MAX)
+    {
+        LOG_DEBUG(<< "Tree not found");
+        return;
+    }
+
+    std::string path = OpenFileDialog::dialog(mainWindow, "(*.ply)");
+    if (path.empty())
+    {
+        LOG_DEBUG(<< "No file selected");
+        return;
+    }
+
+    double ppm = editor->settings().unitsSettings().pointsPerMeter()[0];
+
+    LOG_DEBUG(<< "Read mesh from file <" << path << ">");
+
+    Mesh mesh;
+    mesh.read(path, ppm);
+    mesh.name = meshName;
+
+    segments[index].meshList[mesh.name] = std::move(mesh);
+
+    editor->setSegments(segments);
+
+    LOG_DEBUG(<< "Finished read mesh");
+}
+
+void TreeTableAction::deleteMesh(MainWindow *mainWindow,
+                                 const std::unordered_set<size_t> &idList,
+                                 const std::string &meshName)
+{
+    LOG_DEBUG(<< "Delete mesh <" << meshName << ">");
+
+    if (idList.empty())
+    {
+        LOG_DEBUG(<< "No tree selected");
+        return;
+    }
+
+    Editor *editor = &mainWindow->editor();
+    Segments segments = editor->segments();
+
+    size_t id = *idList.begin();
+    size_t index = segments.index(id, false);
+
+    if (index == SIZE_MAX)
+    {
+        LOG_DEBUG(<< "Tree not found");
+        return;
+    }
+
+    for (const auto &id : idList)
+    {
+        size_t index = segments.index(id, false);
+
+        if (index != SIZE_MAX)
+        {
+            segments[index].meshList.erase(meshName);
+        }
+    }
+
+    LOG_DEBUG(<< "Finished delete mesh");
 }

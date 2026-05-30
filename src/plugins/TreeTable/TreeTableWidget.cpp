@@ -360,6 +360,8 @@ void TreeTableWidget::slotCustomContextMenuRequested(const QPoint &pos)
     TreeTableSetSpecies speciesMenu(mainWindow_, &contextMenu);
     QAction *showTreesAction = contextMenu.addAction("Show selected trees");
     QAction *hideTreesAction = contextMenu.addAction("Hide selected trees");
+    QAction *readQsmAction = contextMenu.addAction("Read QSM mesh");
+    QAction *deleteQsmAction = contextMenu.addAction("Delete QSM mesh");
 
     QAction *selectedAction =
         contextMenu.exec(tableWidget_->viewport()->mapToGlobal(pos));
@@ -382,6 +384,23 @@ void TreeTableWidget::slotCustomContextMenuRequested(const QPoint &pos)
         TreeTableAction::hideTrees(mainWindow_, idList);
         mainWindow_->update(this, {Editor::TYPE_SEGMENT}, Page::STATE_READ);
         updateTableContent();
+    }
+    else if (selectedAction == readQsmAction)
+    {
+        try
+        {
+           TreeTableAction::readMesh(mainWindow_, idList, "qsm");
+           mainWindow_->update(this, {Editor::TYPE_SEGMENT}, Page::STATE_READ);
+        }
+        catch (std::exception &e)
+        {
+           mainWindow_->showError(e.what());
+        }
+    }
+    else if (selectedAction == deleteQsmAction)
+    {
+        TreeTableAction::deleteMesh(mainWindow_, idList, "qsm");
+        mainWindow_->update(this, {Editor::TYPE_SEGMENT}, Page::STATE_READ);
     }
 }
 

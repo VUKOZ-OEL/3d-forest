@@ -205,7 +205,7 @@ void Segments::exportMeshList(const std::string &projectFilePath,
         {
             std::string extMesh = "." + m.first + ".ply";
             std::string pathMesh = File::replaceExtension(pathId, extMesh);
-            m.second.exportPLY(pathMesh, scale);
+            m.second.write(pathMesh, scale);
         }
     }
 }
@@ -290,7 +290,7 @@ void Segments::importMeshList(const std::string &projectFilePath, double scale)
 
         Mesh m;
         m.name = meshName;
-        m.importPLY(fileNamePath, scale);
+        m.read(fileNamePath, scale);
         segment.meshList[m.name] = std::move(m);
     }
 }

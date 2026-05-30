@@ -229,6 +229,8 @@ void Editor::openProject(std::string path, bool reload)
 
     close();
 
+    double ppm = 1.0;
+
     // Load data.
     Json in;
     in.read(path);
@@ -255,7 +257,7 @@ void Editor::openProject(std::string path, bool reload)
             fromJson(settings_, in[EDITOR_KEY_SETTINGS]);
         }
 
-        double ppm = settings().unitsSettings().pointsPerMeter()[0];
+        ppm = settings().unitsSettings().pointsPerMeter()[0];
 
         // Data sets.
         if (in.contains(EDITOR_KEY_DATA_SET))
@@ -397,7 +399,7 @@ void Editor::openProject(std::string path, bool reload)
     // Load mesh list.
     try
     {
-        segments_.importMeshList(path, 1.0);
+        segments_.importMeshList(path, ppm);
     }
     catch (...)
     {
@@ -444,7 +446,7 @@ void Editor::saveProject(const std::string &path)
     out.write(path);
 
     // Save mesh list.
-    segments_.exportMeshList(path, 1.0);
+    segments_.exportMeshList(path, mpp);
 
     // Mark as saved.
     unsavedChanges_ = false;

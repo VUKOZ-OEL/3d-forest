@@ -35,8 +35,17 @@ class TreeTableAction
 public:
     static void showTrees(MainWindow *mainWindow,
                           std::unordered_set<size_t> idList);
+
     static void hideTrees(MainWindow *mainWindow,
                           std::unordered_set<size_t> idList);
+
+    static void readMesh(MainWindow *mainWindow,
+                         const std::unordered_set<size_t> &idList,
+                         const std::string &meshName);
+
+    static void deleteMesh(MainWindow *mainWindow,
+                           const std::unordered_set<size_t> &idList,
+                           const std::string &meshName);
 };
 
 #endif /* TREE_TABLE_ACTION_HPP */
