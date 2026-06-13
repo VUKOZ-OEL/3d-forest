@@ -767,6 +767,20 @@ void ViewerOpenGLViewport::renderSegmentMeshes(const Segment &segment,
     float g = static_cast<float>(segment.color[1]);
     float b = static_cast<float>(segment.color[2]);
 
+    if (1)
+    {
+        glColor4f(r, g, b, 1.0F);
+
+        // Render meshes.
+        for (const auto &it : segment.meshList)
+        {
+            if (it.first == "qsm")
+            {
+                ViewerOpenGL::render(it.second);
+            }
+        }
+    }
+
     if (editor_->settings().treeSettings().convexHullProjectionVisible())
     {
         glEnable(GL_BLEND);
