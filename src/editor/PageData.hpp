@@ -116,11 +116,11 @@ public:
     /** Octree. */
     IndexFile octree;
 
-    PageData(uint32_t datasetId, uint32_t pageId);
+    PageData(size_t datasetId, size_t pageId);
     ~PageData();
 
-    uint32_t datasetId() const { return datasetId_; }
-    uint32_t pageId() const { return pageId_; }
+    size_t datasetId() const { return datasetId_; }
+    size_t pageId() const { return pageId_; }
 
     void readPage(Editor *editor);
     void writePage(Editor *editor);
@@ -136,10 +136,10 @@ public:
 
 private:
     /** Dataset identifier. */
-    uint32_t datasetId_;
+    size_t datasetId_;
 
     /** Page identifier in a dataset. */
-    uint32_t pageId_;
+    size_t pageId_;
 
     /** When true, this page should be written back to hard drive. */
     bool modified_;

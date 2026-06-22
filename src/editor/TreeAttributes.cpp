@@ -114,13 +114,20 @@ void fromJson(TreeAttributes &out, const Json &in, double scale)
         return;
     }
 
-    std::unordered_set<std::string> knownTags = {
-        "position", "height",
-        "surfaceAreaProjection", "surfaceArea", "volume",
-        "dbhPosition", "dbhNormal", "dbh",
-        "crownCenter", "crownStartHeight",
-        "crownVoxelCountPerMeters", "crownVoxelCount", "crownVoxelCountShared",
-        "crownVoxelSize" };
+    std::unordered_set<std::string> knownTags = {"position",
+                                                 "height",
+                                                 "surfaceAreaProjection",
+                                                 "surfaceArea",
+                                                 "volume",
+                                                 "dbhPosition",
+                                                 "dbhNormal",
+                                                 "dbh",
+                                                 "crownCenter",
+                                                 "crownStartHeight",
+                                                 "crownVoxelCountPerMeters",
+                                                 "crownVoxelCount",
+                                                 "crownVoxelCountShared",
+                                                 "crownVoxelSize"};
 
     for (const auto &it : in.object())
     {
@@ -134,8 +141,8 @@ void fromJson(TreeAttributes &out, const Json &in, double scale)
 
             if (value.type() == typeid(double))
             {
-                LOG_DEBUG(<< "Read custom tag <" << it.first << "> value <" <<
-                          std::any_cast<double>(value) << ">");
+                LOG_DEBUG(<< "Read custom tag <" << it.first << "> value <"
+                          << std::any_cast<double>(value) << ">");
             }
             else
             {

@@ -20,10 +20,10 @@
 /** @file ApplicationSettingsPlugin.cpp */
 
 // Include 3D Forest.
-#include <MainWindow.hpp>
-#include <ThemeIcon.hpp>
 #include <ApplicationSettingsPlugin.hpp>
 #include <ApplicationSettingsWindow.hpp>
+#include <MainWindow.hpp>
+#include <ThemeIcon.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ApplicationSettingsPlugin"

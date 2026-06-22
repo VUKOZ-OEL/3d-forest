@@ -22,8 +22,8 @@
 // Include 3D Forest.
 #include <External3dMarteloscopePlugin.hpp>
 #include <External3dMarteloscopeRunner.hpp>
-#include <ProjectFileAction.hpp>
 #include <MainWindow.hpp>
+#include <ProjectFileAction.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.

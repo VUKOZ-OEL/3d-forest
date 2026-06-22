@@ -21,8 +21,8 @@
 
 // Include 3D Forest.
 #include <MainWindow.hpp>
-#include <ProjectFilePlugin.hpp>
 #include <ProjectFileAction.hpp>
+#include <ProjectFilePlugin.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.

@@ -20,8 +20,8 @@
 /** @file FilterManagementStatusTreeWidget.cpp */
 
 // Include 3D Forest.
-#include <FilterManagementStatusTreeWidget.hpp>
 #include <Core.hpp>
+#include <FilterManagementStatusTreeWidget.hpp>
 #include <MainWindow.hpp>
 
 // Include Qt.

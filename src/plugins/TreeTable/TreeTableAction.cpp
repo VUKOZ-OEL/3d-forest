@@ -21,8 +21,8 @@
 
 // Include 3D Forest.
 #include <MainWindow.hpp>
-#include <TreeTableAction.hpp>
 #include <OpenFileDialog.hpp>
+#include <TreeTableAction.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "TreeTableAction"

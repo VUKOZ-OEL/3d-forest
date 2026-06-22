@@ -36,7 +36,9 @@ class EXPORT_CORE FileFormatMeshPly
 {
 public:
     static void read(Mesh &mesh, const std::string &path, double scale = 1.0);
-    static void write(const Mesh &mesh, const std::string &path, double scale = 1.0);
+    static void write(const Mesh &mesh,
+                      const std::string &path,
+                      double scale = 1.0);
 };
 
 #include <WarningsEnable.hpp>

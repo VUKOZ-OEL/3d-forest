@@ -20,10 +20,10 @@
 /** @file ProjectFileAction.cpp */
 
 // Include 3D Forest.
-#include <GuiUtil.hpp>
-#include <ProjectFileAction.hpp>
-#include <MainWindow.hpp>
 #include <Editor.hpp>
+#include <GuiUtil.hpp>
+#include <MainWindow.hpp>
+#include <ProjectFileAction.hpp>
 
 // Include Qt.
 #include <QFileDialog>
@@ -61,10 +61,11 @@ bool ProjectFileAction::openProject(MainWindow *mainWindow)
 
     QString fileName;
 
-    fileName = QFileDialog::getOpenFileName(mainWindow,
-                                            QObject::tr("Open Project"),
-                                            "",
-                                            QObject::tr(PROJECT_FILE_PLUGIN_FILTER_PRJ));
+    fileName = QFileDialog::getOpenFileName(
+        mainWindow,
+        QObject::tr("Open Project"),
+        "",
+        QObject::tr(PROJECT_FILE_PLUGIN_FILTER_PRJ));
 
     if (fileName.isEmpty())
     {
@@ -94,10 +95,11 @@ bool ProjectFileAction::saveAsProject(MainWindow *mainWindow)
 
     QString fileName;
 
-    fileName = QFileDialog::getSaveFileName(mainWindow,
-                                            QObject::tr("Save Project As"),
-                                            "",
-                                            QObject::tr(PROJECT_FILE_PLUGIN_FILTER_PRJ));
+    fileName = QFileDialog::getSaveFileName(
+        mainWindow,
+        QObject::tr("Save Project As"),
+        "",
+        QObject::tr(PROJECT_FILE_PLUGIN_FILTER_PRJ));
 
     if (fileName.isEmpty())
     {

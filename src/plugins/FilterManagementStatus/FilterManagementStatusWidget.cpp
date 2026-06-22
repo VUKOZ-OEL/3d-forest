@@ -21,11 +21,11 @@
 
 // Include 3D Forest.
 #include <ColorPalette.hpp>
+#include <Core.hpp>
 #include <FilterManagementStatusTreeWidget.hpp>
 #include <FilterManagementStatusWidget.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
-#include <Core.hpp>
 
 // Include Qt.
 #include <QHBoxLayout>

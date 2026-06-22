@@ -37,8 +37,9 @@ class ApplicationSettingsWindow;
 #endif
 
 /** Application Settings Plugin. */
-class EXPORT_APPLICATION_SETTINGS_PLUGIN ApplicationSettingsPlugin : public QObject,
-                                                                     public PluginInterface
+class EXPORT_APPLICATION_SETTINGS_PLUGIN ApplicationSettingsPlugin
+    : public QObject,
+      public PluginInterface
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID PluginInterface_iid)

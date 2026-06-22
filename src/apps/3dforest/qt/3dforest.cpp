@@ -20,16 +20,12 @@
 /** @file 3dforest.cpp */
 
 // Include 3D Forest.
-#include <MainWindow.hpp>
-
-// Include Qt.
-#include <QApplication>
-#include <QSurfaceFormat>
+#include <Error.hpp>
+#include <QtApplication.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "3dforest"
 #include <Log.hpp>
-
 #include <WarningsDisable.hpp>
 
 #ifndef GIT_COMMIT_HASH
@@ -44,41 +40,41 @@ int main(int argc, char *argv[])
 {
     int rc = 1;
 
-    globalLogThread = std::make_shared<LogThread>();
-    qInstallMessageHandler(messageLogWindowQtMessageHandler);
+    LOGGER_START_FILE("log.txt");
+    // qInstallMessageHandler(messageLogWindowQtMessageHandler);
 
-    LOG_INFO(<< "3D Forest started. Git Revision <" << GIT_COMMIT_HASH << ">.");
+    LOG_INFO(<< "3DForest started. Git Revision <" << GIT_COMMIT_HASH << ">.");
 
     try
     {
         (void)qRegisterMetaType<size_t>("size_t");
         (void)qRegisterMetaType<LogMessage>("LogMessage");
 
-        QApplication app(argc, argv);
+        QtApplication app(argc, argv);
 
         app.setOrganizationName("VUKOZ v.v.i.");
-        app.setApplicationName(MainWindow::APPLICATION_NAME);
-        app.setApplicationVersion(MainWindow::APPLICATION_VERSION);
-        app.setWindowIcon(QIcon(":/3d-forest-128px.png"));
+        app.setApplicationName("3D Forest");
+        app.setApplicationVersion("1.0");
+        // app.setWindowIcon(QIcon(":/3d-forest-128px.png"));
 
-        QSurfaceFormat format;
-        format.setDepthBufferSize(24);
-        format.setAlphaBufferSize(8);
-        format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
-        QSurfaceFormat::setDefaultFormat(format);
+        // MainWindow window;
+        // window.setWindowIcon(QIcon(":/3d-forest-128px.png"));
+        // window.show();
 
-        MainWindow window;
-        window.setWindowIcon(QIcon(":/3d-forest-128px.png"));
-        window.show();
+        app.init();
 
         rc = app.exec();
     }
+    catch (std::exception &e)
+    {
+        LOG_ERROR("error: " << e.what());
+    }
     catch (...)
     {
-        // empty
+        LOG_ERROR("error: unknown");
     }
 
-    globalLogThread->stop();
+    LOGGER_STOP_FILE;
 
     return rc;
 }

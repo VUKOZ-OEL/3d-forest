@@ -120,11 +120,11 @@ public:
     std::vector<uint32_t> selection;
     size_t selectionSize;
 
-    Page(Editor *editor, Query *query, uint32_t datasetId, uint32_t pageId);
+    Page(Editor *editor, Query *query, size_t datasetId, size_t pageId);
     ~Page();
 
-    uint32_t datasetId() const { return datasetId_; }
-    uint32_t pageId() const { return pageId_; }
+    size_t datasetId() const { return datasetId_; }
+    size_t pageId() const { return pageId_; }
 
     void readPage();
     void writePage();
@@ -156,8 +156,8 @@ private:
     Query *query_;
 
     // Identifier.
-    uint32_t datasetId_;
-    uint32_t pageId_;
+    size_t datasetId_;
+    size_t pageId_;
 
     // State.
     Page::State state_;

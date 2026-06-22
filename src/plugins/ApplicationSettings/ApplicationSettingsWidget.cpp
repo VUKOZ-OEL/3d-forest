@@ -20,9 +20,9 @@
 /** @file ApplicationSettingsWidget.cpp */
 
 // Include 3D Forest.
+#include <ApplicationSettingsWidget.hpp>
 #include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
-#include <ApplicationSettingsWidget.hpp>
 
 // Include Qt.
 #include <QComboBox>
@@ -79,7 +79,7 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(MainWindow *mainWindow)
 }
 
 void ApplicationSettingsWidget::slotUpdate(void *sender,
-                                    const QSet<Editor::Type> &target)
+                                           const QSet<Editor::Type> &target)
 {
     if (sender == this)
     {
@@ -90,7 +90,8 @@ void ApplicationSettingsWidget::slotUpdate(void *sender,
     {
         LOG_DEBUG_UPDATE(<< "Input application settings.");
 
-        setApplicationSettings(mainWindow_->editor().settings().applicationSettings());
+        setApplicationSettings(
+            mainWindow_->editor().settings().applicationSettings());
     }
 }
 
@@ -112,7 +113,8 @@ void ApplicationSettingsWidget::dataChanged(bool modifiers)
     }
 }
 
-void ApplicationSettingsWidget::setApplicationSettings(const ApplicationSettings &settings)
+void ApplicationSettingsWidget::setApplicationSettings(
+    const ApplicationSettings &settings)
 {
     LOG_DEBUG(<< "Set application settings.");
 

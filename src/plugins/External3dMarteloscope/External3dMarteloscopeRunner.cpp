@@ -24,10 +24,10 @@
 #include <MainWindow.hpp>
 
 // Include Qt.
-#include <QProcess>
-#include <QTcpSocket>
 #include <QCoreApplication>
 #include <QDir>
+#include <QProcess>
+#include <QTcpSocket>
 
 #if defined(HAS_QT_WEB_ENGINE_WIDGETS)
     #include <QWebEngineView>
@@ -83,7 +83,7 @@ void External3dMarteloscopeRunner::start(const std::string &projectPath,
     QString pythonPath;
     QString pythonExe = QDir(binPath).filePath("python/python.exe");
     QString pyhonScript = QDir(binPath).filePath(
-                "plugins/3DForestExternal3dMarteloscopePlugin/python/app.py");
+        "plugins/3DForestExternal3dMarteloscopePlugin/python/app.py");
 
     if (!QFile::exists(pythonExe))
     {

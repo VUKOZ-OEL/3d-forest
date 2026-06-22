@@ -35,7 +35,7 @@
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-Page::Page(Editor *editor, Query *query, uint32_t datasetId, uint32_t pageId)
+Page::Page(Editor *editor, Query *query, size_t datasetId, size_t pageId)
     : position(nullptr),
       intensity(nullptr),
       returnNumber(nullptr),

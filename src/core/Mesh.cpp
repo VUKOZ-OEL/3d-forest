@@ -24,9 +24,9 @@
 #include <fstream>
 
 // Include 3D Forest.
+#include <FileFormatMeshPly.hpp>
 #include <Mesh.hpp>
 #include <Vector3.hpp>
-#include <FileFormatMeshPly.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "Mesh"

@@ -1,0 +1,58 @@
+<!DOCTYPE RCC>
+<!--
+    Copyright 2020 VUKOZ
+
+    This file is part of 3D Forest.
+
+    3D Forest is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    3D Forest is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
+-->
+<RCC version="1.0">
+<qresource prefix="/gui">
+
+<!-- Standard -->
+<file>question-16px.png</file>
+<file>question-16px-color.png</file>
+<file>question-20px.png</file>
+<file>question-20px-color.png</file>
+<file>add-16px.png</file>
+<file>add-20px.png</file>
+<file>add-24px.png</file>
+<file>export-file-16px.png</file>
+<file>export-file-20px.png</file>
+<file>remove-16px.png</file>
+<file>remove-20px.png</file>
+<file>remove-24px.png</file>
+<file>run-16px.png</file>
+<file>run-20px.png</file>
+
+<!-- Common -->
+<file>eye-16px.png</file>
+<file>eye-20px.png</file>
+<file>eye-24px.png</file>
+<file>hide-16px.png</file>
+<file>hide-20px.png</file>
+<file>hide-24px.png</file>
+
+<file>select-all-16px.png</file>
+<file>select-all-20px.png</file>
+<file>select-all-24px.png</file>
+<file>select-invert-16px.png</file>
+<file>select-invert-20px.png</file>
+<file>select-invert-24px.png</file>
+<file>select-none-16px.png</file>
+<file>select-none-20px.png</file>
+<file>select-none-24px.png</file>
+
+</qresource>
+</RCC>

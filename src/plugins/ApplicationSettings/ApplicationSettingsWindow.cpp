@@ -20,10 +20,10 @@
 /** @file ApplicationSettingsWindow.cpp */
 
 // Include 3D Forest.
-#include <MainWindow.hpp>
-#include <ThemeIcon.hpp>
 #include <ApplicationSettingsWidget.hpp>
 #include <ApplicationSettingsWindow.hpp>
+#include <MainWindow.hpp>
+#include <ThemeIcon.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ApplicationSettingsWindow"
@@ -35,7 +35,8 @@ ApplicationSettingsWindow::ApplicationSettingsWindow(MainWindow *mainWindow)
     : QDockWidget(mainWindow)
 {
     // Widget.
-    ApplicationSettingsWidget *widget = new ApplicationSettingsWidget(mainWindow);
+    ApplicationSettingsWidget *widget =
+        new ApplicationSettingsWidget(mainWindow);
 
     // Dock.
     setWidget(widget);

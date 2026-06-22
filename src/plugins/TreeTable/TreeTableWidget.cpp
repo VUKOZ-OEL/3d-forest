@@ -389,12 +389,12 @@ void TreeTableWidget::slotCustomContextMenuRequested(const QPoint &pos)
     {
         try
         {
-           TreeTableAction::readMesh(mainWindow_, idList, "qsm");
-           mainWindow_->update(this, {Editor::TYPE_SEGMENT}, Page::STATE_READ);
+            TreeTableAction::readMesh(mainWindow_, idList, "qsm");
+            mainWindow_->update(this, {Editor::TYPE_SEGMENT}, Page::STATE_READ);
         }
         catch (std::exception &e)
         {
-           mainWindow_->showError(e.what());
+            mainWindow_->showError(e.what());
         }
     }
     else if (selectedAction == deleteQsmAction)
@@ -475,27 +475,28 @@ void TreeTableWidget::updateTableContent()
     tableWidget_->setSortingEnabled(false);
 
     tableWidget_->setColumnCount(COLUMN_LAST);
-    tableWidget_->setHorizontalHeaderLabels({"ID",
-                                             "Label",
-                                             "Filter",
-                                             "M.Status",
-                                             "Species",
-                                             "X [m]",
-                                             "Y [m]",
-                                             "Z [m]",
-                                             "Height [m]",
-                                             "DBH [m]",
-                                             "Crown X [m]",
-                                             "Crown Y [m]",
-                                             "Crown Z [m]",
-                                             "Crown Vol [m^3]",
-                                             "Crown Projected Area [m^2]",
-                                             "Stem Vol [m^3]",
-                                             "Basal Area [m^2]",
-                                             "Crown Eccentricity [m^2]",
-                                             "Slenderness",
-                                             "Crown Projection Exposure [%]",
-                                            });
+    tableWidget_->setHorizontalHeaderLabels({
+        "ID",
+        "Label",
+        "Filter",
+        "M.Status",
+        "Species",
+        "X [m]",
+        "Y [m]",
+        "Z [m]",
+        "Height [m]",
+        "DBH [m]",
+        "Crown X [m]",
+        "Crown Y [m]",
+        "Crown Z [m]",
+        "Crown Vol [m^3]",
+        "Crown Projected Area [m^2]",
+        "Stem Vol [m^3]",
+        "Basal Area [m^2]",
+        "Crown Eccentricity [m^2]",
+        "Slenderness",
+        "Crown Projection Exposure [%]",
+    });
 
     // Content.
     if (showOnlyVisibleTreesCheckBox_->isChecked())

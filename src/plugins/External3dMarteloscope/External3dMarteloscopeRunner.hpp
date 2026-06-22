@@ -33,7 +33,7 @@ class MainWindow;
 class QProcess;
 
 #if defined(HAS_QT_WEB_ENGINE_WIDGETS)
-    class QWebEngineView;
+class QWebEngineView;
 #endif
 
 /** External 3d-Marteloscope Runner. */

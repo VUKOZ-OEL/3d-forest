@@ -20,8 +20,8 @@
 /** @file OpenFileDialog.cpp */
 
 // Include 3D Forest.
-#include <OpenFileDialog.hpp>
 #include <MainWindow.hpp>
+#include <OpenFileDialog.hpp>
 
 // Include Qt.
 #include <QFileDialog>
@@ -34,12 +34,11 @@
 std::string OpenFileDialog::dialog(MainWindow *mainWindow,
                                    const std::string &filter)
 {
-    QString filePath = QFileDialog::getOpenFileName(
-        mainWindow,
-        QObject::tr("Open File"),
-        QString(),                    // initial directory
-        QString::fromStdString(filter)
-    );
+    QString filePath =
+        QFileDialog::getOpenFileName(mainWindow,
+                                     QObject::tr("Open File"),
+                                     QString(), // initial directory
+                                     QString::fromStdString(filter));
 
     if (!filePath.isEmpty())
     {
