@@ -48,4 +48,4 @@ target_link_libraries(
     3DForestUiQt
 )
 
-install_and_deploy_qt_runtime(${SUB_PROJECT_NAME} "bin")
+install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

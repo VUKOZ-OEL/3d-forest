@@ -23,8 +23,10 @@
 #define PROJECT_FILE_PLUGIN_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
+#include <Plugin.hpp>
 #include <ProjectFileInterface.hpp>
+
+class Action;
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestProjectFilePlugin)
@@ -37,22 +39,17 @@
 #endif
 
 /** Project File Plugin. */
-class EXPORT_PROJECT_FILE_PLUGIN ProjectFilePlugin : public QObject,
-                                                     public PluginInterface,
-                                                     public ProjectFileInterface
+class ProjectFilePlugin : public Plugin, public ProjectFileInterface
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
     ProjectFilePlugin();
 
-    virtual void initialize(MainWindow *mainWindow);
+    const char *name() const override { return "ProjectFilePlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
     virtual bool closeProject();
 
-public slots:
     void slotNewProject();
     void slotOpenProject();
     void slotSaveProject();
@@ -60,13 +57,18 @@ public slots:
     void slotReloadProject();
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_{nullptr};
 
-    QAction *newProjectAction_;
-    QAction *openProjectAction_;
-    QAction *saveProjectAction_;
-    QAction *saveAsProjectAction_;
-    QAction *reloadProjectAction_;
+    Action *newProjectAction_;
+    Action *openProjectAction_;
+    Action *saveProjectAction_;
+    Action *saveAsProjectAction_;
+    Action *reloadProjectAction_;
 };
+
+extern "C" EXPORT_PROJECT_FILE_PLUGIN Plugin *createPlugin()
+{
+    return new ProjectFilePlugin();
+}
 
 #endif /* PROJECT_FILE_PLUGIN_HPP */

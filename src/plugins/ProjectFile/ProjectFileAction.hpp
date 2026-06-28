@@ -22,25 +22,25 @@
 #ifndef PROJECT_FILE_ACTION_HPP
 #define PROJECT_FILE_ACTION_HPP
 
-// Include 3D Forest.
-class MainWindow;
+// Include std.
+#include <string>
 
-// Include Qt.
-#include <QString>
+// Include 3D Forest.
+class Application;
 
 /** Project File Action. */
 class ProjectFileAction
 {
 public:
-    static bool newProject(MainWindow *mainWindow);
-    static bool openProject(MainWindow *mainWindow);
-    static bool saveProject(MainWindow *mainWindow);
-    static bool saveAsProject(MainWindow *mainWindow);
-    static bool reloadProject(MainWindow *mainWindow);
+    static bool newProject(Application *app);
+    static bool openProject(Application *app);
+    static bool saveProject(Application *app);
+    static bool saveAsProject(Application *app);
+    static bool reloadProject(Application *app);
 
-    static bool openProject(MainWindow *mainWindow, const QString &path);
-    static bool saveProject(MainWindow *mainWindow, const QString &path);
-    static bool closeProject(MainWindow *mainWindow);
+    static bool openProject(Application *app, const std::string &path);
+    static bool saveProject(Application *app, const std::string &path);
+    static bool closeProject(Application *app);
 };
 
 #endif /* PROJECT_FILE_ACTION_HPP */

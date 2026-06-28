@@ -17,26 +17,34 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file PluginHandle.hpp */
+/** @file Platform.hpp */
 
-#ifndef PLUGIN_HANDLE_HPP
-#define PLUGIN_HANDLE_HPP
+#ifndef PLATFORM_HPP
+#define PLATFORM_HPP
 
-// Include 3D Forest.
-#include <Plugin.hpp>
+#if defined(_WIN32)
+    #define PLATFORM_WINDOWS 1
+    #define PLATFORM_PLUGIN_WIN32 1
+#endif
 
-// Include local.
-#include <ExportUiCommon.hpp>
-#include <WarningsDisable.hpp>
+#if defined(__linux__)
+    #define PLATFORM_LINUX 1
+#endif
 
-/** Plugin Handle. */
-class EXPORT_UI_COMMON PluginHandle
-{
-public:
-    Plugin *plugin{nullptr};
-    void *handle{nullptr};
-};
+#if defined(__APPLE__)
+    #define PLATFORM_MACOS 1
+#endif
 
-#include <WarningsEnable.hpp>
+#if defined(_MSC_VER)
+    #define COMPILER_MSVC 1
+#endif
 
-#endif /* PLUGIN_HANDLE_HPP */
+#if defined(__clang__)
+    #define COMPILER_CLANG 1
+#endif
+
+#if defined(__GNUC__) && !defined(__clang__)
+    #define COMPILER_GCC 1
+#endif
+
+#endif /* PLATFORM_HPP */

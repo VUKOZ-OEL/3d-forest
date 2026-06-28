@@ -25,7 +25,7 @@
 #include <QtApplication.hpp>
 
 // Include Qt.
-#include <QSurfaceFormat>
+// #include <QSurfaceFormat>
 
 // Include local.
 #define LOG_MODULE_NAME "QtApplication"
@@ -41,11 +41,11 @@ QtApplication::~QtApplication()
 
 void QtApplication::init()
 {
-    QSurfaceFormat format;
-    format.setDepthBufferSize(24);
-    format.setAlphaBufferSize(8);
-    format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
-    QSurfaceFormat::setDefaultFormat(format);
+    // QSurfaceFormat format;
+    // format.setDepthBufferSize(24);
+    // format.setAlphaBufferSize(8);
+    // format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+    // QSurfaceFormat::setDefaultFormat(format);
 
     load();
 }

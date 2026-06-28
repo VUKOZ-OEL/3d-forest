@@ -17,26 +17,31 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file PluginHandle.hpp */
+/** @file Action.hpp */
 
-#ifndef PLUGIN_HANDLE_HPP
-#define PLUGIN_HANDLE_HPP
+#ifndef ACTION_HPP
+#define ACTION_HPP
+
+// Include std.
+#include <functional>
+#include <string>
 
 // Include 3D Forest.
-#include <Plugin.hpp>
 
 // Include local.
 #include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
 
-/** Plugin Handle. */
-class EXPORT_UI_COMMON PluginHandle
+/** Action. */
+class EXPORT_UI_COMMON Action
 {
 public:
-    Plugin *plugin{nullptr};
-    void *handle{nullptr};
+    Action();
+    virtual ~Action();
+
+private:
 };
 
 #include <WarningsEnable.hpp>
 
-#endif /* PLUGIN_HANDLE_HPP */
+#endif /* ACTION_HPP */

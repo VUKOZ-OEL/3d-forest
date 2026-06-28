@@ -20,110 +20,108 @@
 /** @file ProjectFilePlugin.cpp */
 
 // Include 3D Forest.
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ProjectFileAction.hpp>
 #include <ProjectFilePlugin.hpp>
-#include <ThemeIcon.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ProjectFilePlugin"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ProjectFileResources/", name))
-
-ProjectFilePlugin::ProjectFilePlugin() : mainWindow_(nullptr)
+ProjectFilePlugin::ProjectFilePlugin()
 {
 }
 
-void ProjectFilePlugin::initialize(MainWindow *mainWindow)
+void ProjectFilePlugin::initialize(Application *app)
 {
-    mainWindow_ = mainWindow;
+    LOG_DEBUG(<< "Initialize.");
+    app_ = app;
 
-    mainWindow_->createAction(&newProjectAction_,
-                              "File",
-                              "File Project",
-                              tr("&New Project"),
-                              tr("Create new project"),
-                              ICON("create"),
-                              this,
-                              SLOT(slotNewProject()),
-                              MAIN_WINDOW_MENU_FILE_PRIORITY,
-                              10);
+    app_->createAction(&newProjectAction_,
+                       "File",
+                       "File Project",
+                       "New Project",
+                       "Create new project",
+                       "create",
+                       this,
+                       &ProjectFilePlugin::slotNewProject,
+                       MAIN_WINDOW_MENU_FILE_PRIORITY,
+                       10);
 
-    mainWindow_->createAction(&openProjectAction_,
-                              "File",
-                              "File Project",
-                              tr("&Open Project..."),
-                              tr("Open project"),
-                              ICON("opened-folder"),
-                              this,
-                              SLOT(slotOpenProject()),
-                              MAIN_WINDOW_MENU_FILE_PRIORITY,
-                              20);
+    app_->createAction(&openProjectAction_,
+                       "File",
+                       "File Project",
+                       "Open Project...",
+                       "Open project",
+                       "opened-folder",
+                       this,
+                       &ProjectFilePlugin::slotOpenProject,
+                       MAIN_WINDOW_MENU_FILE_PRIORITY,
+                       20);
 
-    mainWindow_->createAction(&saveProjectAction_,
-                              "File",
-                              "File Project",
-                              tr("&Save Project"),
-                              tr("Save project"),
-                              ICON("save"),
-                              this,
-                              SLOT(slotSaveProject()),
-                              MAIN_WINDOW_MENU_FILE_PRIORITY,
-                              30);
+    app_->createAction(&saveProjectAction_,
+                       "File",
+                       "File Project",
+                       "Save Project",
+                       "Save project",
+                       "save",
+                       this,
+                       &ProjectFilePlugin::slotSaveProject,
+                       MAIN_WINDOW_MENU_FILE_PRIORITY,
+                       30);
 
-    mainWindow_->createAction(&saveAsProjectAction_,
-                              "File",
-                              "File Project",
-                              tr("Save Project &As..."),
-                              tr("Save project as"),
-                              ICON("save-as"),
-                              this,
-                              SLOT(slotSaveAsProject()),
-                              MAIN_WINDOW_MENU_FILE_PRIORITY,
-                              40);
+    app_->createAction(&saveAsProjectAction_,
+                       "File",
+                       "File Project",
+                       "Save Project &As...",
+                       "Save project as",
+                       "save-as",
+                       this,
+                       &ProjectFilePlugin::slotSaveAsProject,
+                       MAIN_WINDOW_MENU_FILE_PRIORITY,
+                       40);
 
-    mainWindow_->createAction(&reloadProjectAction_,
-                              "File",
-                              "File Project",
-                              tr("&Reload Project"),
-                              tr("Reload Project"),
-                              ICON("reload"),
-                              this,
-                              SLOT(slotReloadProject()),
-                              MAIN_WINDOW_MENU_FILE_PRIORITY,
-                              45);
+    app_->createAction(&reloadProjectAction_,
+                       "File",
+                       "File Project",
+                       "Reload Project",
+                       "Reload Project",
+                       "reload",
+                       this,
+                       &ProjectFilePlugin::slotReloadProject,
+                       MAIN_WINDOW_MENU_FILE_PRIORITY,
+                       45);
 
-    mainWindow_->hideToolBar("File Project");
+    app_->hideToolBar("File Project");
 }
 
 void ProjectFilePlugin::slotNewProject()
 {
-    (void)ProjectFileAction::newProject(mainWindow_);
+    (void)ProjectFileAction::newProject(app_);
 }
 
 void ProjectFilePlugin::slotOpenProject()
 {
-    (void)ProjectFileAction::openProject(mainWindow_);
+    (void)ProjectFileAction::openProject(app_);
 }
 
 void ProjectFilePlugin::slotSaveProject()
 {
-    (void)ProjectFileAction::saveProject(mainWindow_);
+    (void)ProjectFileAction::saveProject(app_);
 }
 
 void ProjectFilePlugin::slotSaveAsProject()
 {
-    (void)ProjectFileAction::saveAsProject(mainWindow_);
+    (void)ProjectFileAction::saveAsProject(app_);
 }
 
 void ProjectFilePlugin::slotReloadProject()
 {
-    (void)ProjectFileAction::reloadProject(mainWindow_);
+    (void)ProjectFileAction::reloadProject(app_);
 }
 
 bool ProjectFilePlugin::closeProject()
 {
-    return ProjectFileAction::closeProject(mainWindow_);
+    return ProjectFileAction::closeProject(app_);
 }

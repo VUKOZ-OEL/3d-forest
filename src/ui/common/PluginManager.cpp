@@ -19,8 +19,11 @@
 
 /** @file PluginManager.cpp */
 
+#include <Platform.hpp>
+
 // Include std.
-#if defined(_MSC_VER)
+#if defined(PLATFORM_WINDOWS)
+    #define NOMINMAX
     #include <windows.h>
 #else
     #include <dlfcn.h>
@@ -36,13 +39,32 @@
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-PluginManager::PluginManager()
+static void *pluginManagerOpenLibrary(const std::string &fileName)
 {
+#if defined(PLATFORM_WINDOWS)
+    return reinterpret_cast<void *>(LoadLibraryA(fileName.c_str()));
+#else
+    return dlopen(fileName.c_str(), RTLD_NOW);
+#endif
 }
 
-PluginManager::~PluginManager()
+static void pluginManagerCloseLibrary(void *handle)
 {
-    unload();
+#if defined(PLATFORM_WINDOWS)
+    FreeLibrary(reinterpret_cast<HMODULE>(handle));
+#else
+    dlclose(handle);
+#endif
+}
+
+static void *pluginManagerLoadSymbol(void *handle, const char *name)
+{
+#if defined(PLATFORM_WINDOWS)
+    return reinterpret_cast<void *>(
+        GetProcAddress(reinterpret_cast<HMODULE>(handle), name));
+#else
+    return dlsym(handle, name);
+#endif
 }
 
 static void pluginManagerUnLoad(PluginHandle &pluginHandle)
@@ -53,19 +75,11 @@ static void pluginManagerUnLoad(PluginHandle &pluginHandle)
         pluginHandle.plugin = nullptr;
     }
 
-#if defined(_MSC_VER)
     if (pluginHandle.handle)
     {
-        FreeLibrary(pluginHandle.handle);
+        pluginManagerCloseLibrary(pluginHandle.handle);
         pluginHandle.handle = nullptr;
     }
-#else
-    if (pluginHandle.handle)
-    {
-        dlclose(pluginHandle.handle);
-        pluginHandle.handle = nullptr;
-    }
-#endif
 }
 
 static PluginHandle pluginManagerLoad(const std::string &fileName)
@@ -74,8 +88,7 @@ static PluginHandle pluginManagerLoad(const std::string &fileName)
 
     using CreatePluginFn = Plugin *(*)();
 
-#if defined(_MSC_VER)
-    result.handle = LoadLibraryA(fileName.c_str());
+    result.handle = pluginManagerOpenLibrary(fileName);
     if (!result.handle)
     {
         LOG_WARNING(<< "Load library failed.");
@@ -83,19 +96,7 @@ static PluginHandle pluginManagerLoad(const std::string &fileName)
     }
 
     auto create = reinterpret_cast<CreatePluginFn>(
-        GetProcAddress(result.handle, "createPlugin"));
-#else
-    result.handle = dlopen(fileName.c_str(), RTLD_NOW);
-    if (!result.handle)
-    {
-        LOG_WARNING(<< "Load library failed.");
-        return result;
-    }
-
-    auto create =
-        reinterpret_cast<CreatePluginFn>(dlsym(result.handle, "createPlugin"));
-#endif
-
+        pluginManagerLoadSymbol(result.handle, "createPlugin"));
     if (!create)
     {
         LOG_WARNING(<< "Load library failed: missing createPlugin.");
@@ -108,12 +109,23 @@ static PluginHandle pluginManagerLoad(const std::string &fileName)
     return result;
 }
 
+PluginManager::PluginManager()
+{
+}
+
+PluginManager::~PluginManager()
+{
+    unload();
+}
+
 void PluginManager::load(Application *app)
 {
     std::string dirPath = File::currentPath() + "plugins/";
 
-#if defined(_MSC_VER)
+#if defined(PLATFORM_WINDOWS)
     std::string pattern = "*.dll";
+#elif defined(PLATFORM_MACOS)
+    std::string pattern = "*.dylib";
 #else
     std::string pattern = "*.so";
 #endif
@@ -127,15 +139,7 @@ void PluginManager::load(Application *app)
     for (const auto &fileName : fileNames)
     {
         std::string path = dirPath + fileName;
-
-        LOG_DEBUG(<< "Load file path <" << path << ">.");
-
-        PluginHandle handle = pluginManagerLoad(path);
-        if (handle.plugin)
-        {
-            handle.plugin->initialize(app);
-            plugins_.push_back(handle);
-        }
+        load(app, path);
     }
 }
 
@@ -147,4 +151,65 @@ void PluginManager::unload()
     }
 
     plugins_.clear();
+}
+
+void PluginManager::load(Application *app, const std::string &fileName)
+{
+    LOG_DEBUG(<< "Load file path <" << fileName << ">.");
+
+    PluginHandle handle = pluginManagerLoad(fileName);
+    if (!handle.plugin)
+    {
+        return;
+    }
+
+    Plugin *pluginInterface;
+    pluginInterface = dynamic_cast<Plugin *>(handle.plugin);
+    if (!pluginInterface)
+    {
+        LOG_DEBUG(<< "Plugin interface not recognized.");
+        return;
+    }
+
+    handle.plugin->initialize(app);
+    plugins_.push_back(handle);
+
+#if 0
+    // Modifier.
+    ModifierInterface *modifierInterface;
+    modifierInterface = dynamic_cast<ModifierInterface *>(pluginInterface);
+    if (modifierInterface)
+    {
+        LOG_DEBUG(<< "Add modifier plugin.");
+        editor_.addModifier(modifierInterface);
+    }
+#endif
+    // Project file.
+    ProjectFileInterface *projectFileInterface;
+    projectFileInterface =
+        dynamic_cast<ProjectFileInterface *>(pluginInterface);
+    if (projectFileInterface)
+    {
+        LOG_DEBUG(<< "Set project file plugin.");
+        projectFilePlugin_ = projectFileInterface;
+    }
+#if 0
+    // Import file.
+    ImportFileInterface *importFileInterface;
+    importFileInterface = dynamic_cast<ImportFileInterface *>(pluginInterface);
+    if (importFileInterface)
+    {
+        LOG_DEBUG(<< "Set import file plugin.");
+        importFilePlugin_ = importFileInterface;
+    }
+
+    // Viewer.
+    ViewerInterface *viewerInterface;
+    viewerInterface = dynamic_cast<ViewerInterface *>(pluginInterface);
+    if (viewerInterface)
+    {
+        LOG_DEBUG(<< "Set viewer plugin.");
+        viewerPlugin_ = viewerInterface;
+    }
+#endif
 }

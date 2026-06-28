@@ -36,7 +36,7 @@
 #endif
 
 /** Example Plugin. */
-class EXPORT_EXAMPLE_PLUGIN ExamplePlugin : public Plugin
+class ExamplePlugin : public Plugin
 {
 public:
     const char *name() const override { return "ExamplePlugin"; }

@@ -20,14 +20,11 @@
 /** @file ProjectFileAction.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <Editor.hpp>
-#include <GuiUtil.hpp>
-#include <MainWindow.hpp>
+#include <FileDialog.hpp>
+#include <MessageBox.hpp>
 #include <ProjectFileAction.hpp>
-
-// Include Qt.
-#include <QFileDialog>
-#include <QMessageBox>
 
 // Include local.
 #define LOG_MODULE_NAME "ProjectFileAction"
@@ -36,127 +33,124 @@
 
 #define PROJECT_FILE_PLUGIN_FILTER_PRJ "3DForest Project (*.json)"
 
-bool ProjectFileAction::newProject(MainWindow *mainWindow)
+bool ProjectFileAction::newProject(Application *app)
 {
     LOG_DEBUG(<< "Start creating a new project.");
 
     // Close the current project.
-    if (!closeProject(mainWindow))
+    if (!closeProject(app))
     {
         LOG_DEBUG(<< "Cancelled, the current project can not be closed.");
         return false;
     }
 
     // Update.
-    mainWindow->updateNewProject();
-    mainWindow->slotRenderViewports();
+    app->updateNewProject();
+    app->slotRenderViewports();
 
     LOG_DEBUG(<< "Finished creating new project.");
     return true;
 }
 
-bool ProjectFileAction::openProject(MainWindow *mainWindow)
+bool ProjectFileAction::openProject(Application *app)
 {
     LOG_DEBUG(<< "Start opening a project.");
 
-    QString fileName;
+    std::string fileName;
 
-    fileName = QFileDialog::getOpenFileName(
-        mainWindow,
-        QObject::tr("Open Project"),
-        "",
-        QObject::tr(PROJECT_FILE_PLUGIN_FILTER_PRJ));
+    fileName = FileDialog::getOpenFileName(app,
+                                           "Open Project",
+                                           PROJECT_FILE_PLUGIN_FILTER_PRJ);
 
-    if (fileName.isEmpty())
+    if (fileName.empty())
     {
         LOG_DEBUG(<< "Cancelled, the filename is empty.");
         return false;
     }
 
-    bool result = openProject(mainWindow, fileName);
+    bool result = openProject(app, fileName);
 
     LOG_DEBUG(<< "Finished opening project <" << fileName << ">.");
     return result;
 }
 
-bool ProjectFileAction::saveProject(MainWindow *mainWindow)
+bool ProjectFileAction::saveProject(Application *app)
 {
     LOG_DEBUG(<< "Start saving the project.");
 
-    bool result = saveProject(mainWindow, "");
+    bool result = saveProject(app, "");
 
     LOG_DEBUG(<< "Finished saving the project.");
     return result;
 }
 
-bool ProjectFileAction::saveAsProject(MainWindow *mainWindow)
+bool ProjectFileAction::saveAsProject(Application *app)
 {
     LOG_DEBUG(<< "Start saving the project as.");
 
-    QString fileName;
+    std::string fileName;
 
-    fileName = QFileDialog::getSaveFileName(
-        mainWindow,
-        QObject::tr("Save Project As"),
-        "",
-        QObject::tr(PROJECT_FILE_PLUGIN_FILTER_PRJ));
+    fileName = FileDialog::getSaveFileName(app,
+                                           "Save Project As",
+                                           PROJECT_FILE_PLUGIN_FILTER_PRJ);
 
-    if (fileName.isEmpty())
+    if (fileName.empty())
     {
         LOG_DEBUG(<< "Cancelled, the filename is empty.");
         return false;
     }
 
-    bool result = saveProject(mainWindow, fileName);
+    bool result = saveProject(app, fileName);
 
     LOG_DEBUG(<< "Finished saving the project as <" << fileName << ">.");
     return result;
 }
 
-bool ProjectFileAction::reloadProject(MainWindow *mainWindow)
+bool ProjectFileAction::reloadProject(Application *app)
 {
     LOG_DEBUG(<< "Start reloading the project.");
 
-    mainWindow->suspendThreads();
+    app->suspendThreads();
 
-    if (mainWindow->editor().unsavedChanges())
+    if (app->editor().unsavedChanges())
     {
         LOG_DEBUG(<< "Project has unsaved changes.");
 
-        QMessageBox msgBox;
+        MessageBox msgBox;
         msgBox.setText("The document has been modified.");
         msgBox.setInformativeText("Please save the changes first.");
-        msgBox.setStandardButtons(QMessageBox::Ok);
-        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.setStandardButtons(MessageBox::Ok);
+        msgBox.setDefaultButton(MessageBox::Ok);
         (void)msgBox.exec();
+
         return false;
     }
 
     try
     {
-        mainWindow->editor().reload();
+        app->editor().reload();
     }
     catch (std::exception &e)
     {
         LOG_DEBUG(<< "Cancelled, show error <" << e.what() << ">.");
-        mainWindow->showError(e.what());
+        app->showError(e.what());
         return false;
     }
 
     // Update.
-    mainWindow->updateNewProject();
-    mainWindow->slotRenderViewports();
+    app->updateNewProject();
+    app->slotRenderViewports();
 
     LOG_DEBUG(<< "Finished reloading the project.");
     return true;
 }
 
-bool ProjectFileAction::openProject(MainWindow *mainWindow, const QString &path)
+bool ProjectFileAction::openProject(Application *app, const std::string &path)
 {
     LOG_DEBUG(<< "Start opening new project <" << path << ">.");
 
     // Close the current project.
-    if (!closeProject(mainWindow))
+    if (!closeProject(app))
     {
         LOG_DEBUG(<< "Cancelled, the current project can not be closed.");
         return false;
@@ -165,77 +159,76 @@ bool ProjectFileAction::openProject(MainWindow *mainWindow, const QString &path)
     // Open new project.
     try
     {
-        mainWindow->editor().open(path.toStdString());
+        app->editor().open(path);
     }
     catch (std::exception &e)
     {
         LOG_DEBUG(<< "Cancelled, show error <" << e.what() << ">.");
-        mainWindow->showError(e.what());
+        app->showError(e.what());
         return false;
     }
 
     // Update.
-    mainWindow->updateNewProject();
-    mainWindow->slotRenderViewports();
+    app->updateNewProject();
+    app->slotRenderViewports();
 
     LOG_DEBUG(<< "Finished opening new project.");
 
     return true; // Opened
 }
 
-bool ProjectFileAction::saveProject(MainWindow *mainWindow, const QString &path)
+bool ProjectFileAction::saveProject(Application *app, const std::string &path)
 {
     LOG_DEBUG(<< "Start saving the project to path <" << path << ">.");
 
     std::string writePath;
 
-    mainWindow->suspendThreads();
+    app->suspendThreads();
 
-    if (path.isEmpty())
+    if (path.empty())
     {
         // Save.
-        if (mainWindow->editor().projectPath().empty())
+        if (app->editor().projectPath().empty())
         {
             // First time save.
-            QString fileName;
+            std::string fileName;
 
-            fileName = QFileDialog::getSaveFileName(
-                mainWindow,
-                QObject::tr("Save As"),
-                "",
-                QObject::tr(PROJECT_FILE_PLUGIN_FILTER_PRJ));
+            fileName =
+                FileDialog::getSaveFileName(app,
+                                            "Save As",
+                                            PROJECT_FILE_PLUGIN_FILTER_PRJ);
 
-            if (fileName.isEmpty())
+            if (fileName.empty())
             {
                 LOG_DEBUG(<< "Cancelled, the filename is empty.");
                 return false;
             }
 
-            writePath = fileName.toStdString();
+            writePath = fileName;
             LOG_DEBUG(<< "Set project path to <" << writePath << ">.");
         }
         else
         {
-            writePath = mainWindow->editor().projectPath();
+            writePath = app->editor().projectPath();
             LOG_DEBUG(<< "Set project path to <" << writePath << ">.");
         }
     }
     else
     {
         // Save As.
-        writePath = path.toStdString();
+        writePath = path;
         LOG_DEBUG(<< "Set project path to <" << writePath << ">.");
     }
 
     // Write.
     try
     {
-        mainWindow->editor().saveProject(writePath);
+        app->editor().saveProject(writePath);
     }
     catch (std::exception &e)
     {
         LOG_DEBUG(<< "Cancelled, show error <" << e.what() << ">.");
-        mainWindow->showError(e.what());
+        app->showError(e.what());
         return false;
     }
 
@@ -244,42 +237,41 @@ bool ProjectFileAction::saveProject(MainWindow *mainWindow, const QString &path)
     return true; // Saved.
 }
 
-bool ProjectFileAction::closeProject(MainWindow *mainWindow)
+bool ProjectFileAction::closeProject(Application *app)
 {
     LOG_DEBUG(<< "Start closing the project.");
 
-    mainWindow->suspendThreads();
+    app->suspendThreads();
 
     // Save changes.
-    if (mainWindow->editor().unsavedChanges())
+    if (app->editor().unsavedChanges())
     {
         LOG_DEBUG(<< "Project has unsaved changes.");
 
-        QMessageBox msgBox;
+        MessageBox msgBox;
         msgBox.setText("The document has been modified.");
         msgBox.setInformativeText("Do you want to save your changes?");
-        msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard |
-                                  QMessageBox::Cancel);
-        msgBox.setDefaultButton(QMessageBox::Save);
+        msgBox.setStandardButtons(MessageBox::Save | MessageBox::Discard |
+                                  MessageBox::Cancel);
+        msgBox.setDefaultButton(MessageBox::Save);
         int ret = msgBox.exec();
         bool canClose = true;
 
         switch (ret)
         {
-            case QMessageBox::Save:
+            case MessageBox::Save:
                 // Save was clicked.
-                canClose = saveProject(mainWindow, "");
+                canClose = saveProject(app, "");
                 break;
-            case QMessageBox::Discard:
+            case MessageBox::Discard:
                 // Don't Save was clicked.
                 break;
-            case QMessageBox::Cancel:
+            case MessageBox::Cancel:
                 // Cancel was clicked.
                 canClose = false;
                 break;
             default:
                 // Should never be reached.
-                Q_UNREACHABLE();
                 break;
         }
 
@@ -293,12 +285,12 @@ bool ProjectFileAction::closeProject(MainWindow *mainWindow)
     // Close.
     try
     {
-        mainWindow->editor().close();
+        app->editor().close();
     }
     catch (std::exception &e)
     {
         LOG_DEBUG(<< "Cancelled, show error <" << e.what() << ">.");
-        mainWindow->showError(e.what());
+        app->showError(e.what());
     }
 
     LOG_DEBUG(<< "Finished closing the project.");

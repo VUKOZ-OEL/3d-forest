@@ -28,6 +28,7 @@
 
 // Include 3D Forest.
 #include <PluginHandle.hpp>
+#include <ProjectFileInterface.hpp>
 
 class Application;
 
@@ -47,6 +48,13 @@ public:
 
 private:
     std::vector<PluginHandle> plugins_;
+
+    void load(Application *app, const std::string &fileName);
+
+    ProjectFileInterface *projectFilePlugin_;
+    // ImportFileInterface *importFilePlugin_;
+    // ViewerInterface *viewerPlugin_;
+    // HelpPlugin *helpPlugin_;
 };
 
 #include <WarningsEnable.hpp>

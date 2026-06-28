@@ -17,26 +17,28 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file PluginHandle.hpp */
+/** @file FileDialog.cpp */
 
-#ifndef PLUGIN_HANDLE_HPP
-#define PLUGIN_HANDLE_HPP
+// Include std.
 
 // Include 3D Forest.
-#include <Plugin.hpp>
+#include <Application.hpp>
+#include <FileDialog.hpp>
 
 // Include local.
-#include <ExportUiCommon.hpp>
-#include <WarningsDisable.hpp>
+#define LOG_MODULE_NAME "FileDialog"
+#include <Log.hpp>
 
-/** Plugin Handle. */
-class EXPORT_UI_COMMON PluginHandle
+std::string FileDialog::getOpenFileName(Application *app,
+                                        const std::string &dialogTitle,
+                                        const std::string &filter)
 {
-public:
-    Plugin *plugin{nullptr};
-    void *handle{nullptr};
-};
+    return "";
+}
 
-#include <WarningsEnable.hpp>
-
-#endif /* PLUGIN_HANDLE_HPP */
+std::string FileDialog::getSaveFileName(Application *app,
+                                        const std::string &dialogTitle,
+                                        const std::string &filter)
+{
+    return "";
+}

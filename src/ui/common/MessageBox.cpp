@@ -17,26 +17,38 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file PluginHandle.hpp */
+/** @file MessageBox.cpp */
 
-#ifndef PLUGIN_HANDLE_HPP
-#define PLUGIN_HANDLE_HPP
+// Include std.
 
 // Include 3D Forest.
-#include <Plugin.hpp>
+#include <MessageBox.hpp>
 
 // Include local.
-#include <ExportUiCommon.hpp>
-#include <WarningsDisable.hpp>
+#define LOG_MODULE_NAME "MessageBox"
+#include <Log.hpp>
 
-/** Plugin Handle. */
-class EXPORT_UI_COMMON PluginHandle
+MessageBox::MessageBox()
 {
-public:
-    Plugin *plugin{nullptr};
-    void *handle{nullptr};
-};
+}
 
-#include <WarningsEnable.hpp>
+void MessageBox::setText(const std::string &text)
+{
+}
 
-#endif /* PLUGIN_HANDLE_HPP */
+void MessageBox::setInformativeText(const std::string &text)
+{
+}
+
+void MessageBox::setStandardButtons(int buttons)
+{
+}
+
+void MessageBox::setDefaultButton(int button)
+{
+}
+
+int MessageBox::exec()
+{
+    return defaultButton_;
+}

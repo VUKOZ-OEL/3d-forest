@@ -17,26 +17,23 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file PluginHandle.hpp */
+/** @file ProjectFileInterface.hpp */
 
-#ifndef PLUGIN_HANDLE_HPP
-#define PLUGIN_HANDLE_HPP
-
-// Include 3D Forest.
-#include <Plugin.hpp>
+#ifndef PROJECT_FILE_INTERFACE_HPP
+#define PROJECT_FILE_INTERFACE_HPP
 
 // Include local.
 #include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
 
-/** Plugin Handle. */
-class EXPORT_UI_COMMON PluginHandle
+/** Project File Interface. */
+class ProjectFileInterface
 {
 public:
-    Plugin *plugin{nullptr};
-    void *handle{nullptr};
+    virtual ~ProjectFileInterface() = default;
+    virtual bool closeProject() = 0;
 };
 
 #include <WarningsEnable.hpp>
 
-#endif /* PLUGIN_HANDLE_HPP */
+#endif /* PROJECT_FILE_INTERFACE_HPP */
