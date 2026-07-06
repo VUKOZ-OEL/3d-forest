@@ -20,22 +20,20 @@
 /** @file MessageLogWindow.cpp */
 
 // Include 3D Forest.
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <MessageLogWindow.hpp>
-
-// Include Qt.
-#include <QTextEdit>
+#include <TextEdit.hpp>
 
 // #define MESSAGE_LOG_WINDOW_DEBUG_PRINT 1
 #define MESSAGE_LOG_WINDOW_FILE_NAME "log.txt"
 #define MESSAGE_LOG_WINDOW_FILE_SIZE_MAX (100 * 1024 * 1024)
 
-MessageLogWindow::MessageLogWindow(MainWindow *mainWindow)
-    : QDockWidget(mainWindow),
-      mainWindow_(mainWindow)
+MessageLogWindow::MessageLogWindow(Application *app)
+    : DockWidget(app),
+      app_(app)
 {
     // Widget.
-    textEdit_ = new QTextEdit;
+    textEdit_ = new TextEdit;
     textEdit_->setReadOnly(true);
 
     // File.
@@ -44,16 +42,9 @@ MessageLogWindow::MessageLogWindow(MainWindow *mainWindow)
     // Dock.
     setWidget(textEdit_);
     setWindowTitle(tr("Message Log"));
-    setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea |
-                    Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
-    mainWindow_->addDockWidget(Qt::BottomDockWidgetArea, this);
-
-    // Signals.
-    connect(this,
-            SIGNAL(signalPrintln(const LogMessage &)),
-            this,
-            SLOT(slotPrintln(const LogMessage &)),
-            Qt::QueuedConnection);
+    setAllowedAreas(Ui::LeftDockWidgetArea | Ui::RightDockWidgetArea |
+                    Ui::TopDockWidgetArea | Ui::BottomDockWidgetArea);
+    app->addDockWidget(Ui::BottomDockWidgetArea, this);
 }
 
 MessageLogWindow::~MessageLogWindow()
@@ -66,7 +57,9 @@ MessageLogWindow::~MessageLogWindow()
 
 void MessageLogWindow::println(const LogMessage &message)
 {
-    emit signalPrintln(message);
+    app_->post([this, message]() {
+        slotPrintln(message);
+    });
 }
 
 void MessageLogWindow::flush()
@@ -83,13 +76,13 @@ void MessageLogWindow::slotPrintln(const LogMessage &message)
     }
 
 #if defined(MESSAGE_LOG_WINDOW_DEBUG_PRINT)
-    QString line = QString::number(message.threadId) + " " +
-                   QString::fromStdString(message.time) +
-                   QString(LogMessage::typeString(message.type)) +
-                   QString::fromStdString(message.text) + " [" +
-                   QString::fromStdString(message.module) + ":" +
-                   QString::fromStdString(message.function) + "] " +
-                   QString::number(file_.size());
+    std::string line = std::to_string(message.threadId) + " " +
+                   message.time +
+                   LogMessage::typeString(message.type) +
+                   message.text) + " [" +
+                   message.module + ":" +
+                   message.function + "] " +
+                   std::to_string(file_.size());
 
     if (threadId_ != 0 && threadId_ != message.threadId)
     {
@@ -97,14 +90,14 @@ void MessageLogWindow::slotPrintln(const LogMessage &message)
     }
     threadId_ = message.threadId;
 #else
-    QString line = QString::fromStdString(message.time) +
-                   QString(LogMessage::typeString(message.type)) +
-                   QString::fromStdString(message.text) + " [" +
-                   QString::fromStdString(message.module) + ":" +
-                   QString::fromStdString(message.function) + "] " +
-                   QString::number(message.threadId);
+    std::string line = message.time +
+                   LogMessage::typeString(message.type) +
+                   message.text + " [" +
+                   message.module + ":" +
+                   message.function + "] " +
+                   std::to_string(message.threadId);
 #endif
 
     textEdit_->append(line);
-    file_.write(line.toStdString() + "\n");
+    file_.write(line + "\n");
 }

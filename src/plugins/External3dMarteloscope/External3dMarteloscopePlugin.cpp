@@ -22,7 +22,7 @@
 // Include 3D Forest.
 #include <External3dMarteloscopePlugin.hpp>
 #include <External3dMarteloscopeRunner.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ProjectFileAction.hpp>
 #include <ThemeIcon.hpp>
 
@@ -41,7 +41,7 @@ static std::string toStdString(const QString &str)
 }
 
 External3dMarteloscopePlugin::External3dMarteloscopePlugin()
-    : mainWindow_(nullptr),
+    : app_(nullptr),
       runner_(nullptr)
 {
 }
@@ -54,18 +54,18 @@ External3dMarteloscopePlugin::~External3dMarteloscopePlugin()
     }
 }
 
-void External3dMarteloscopePlugin::initialize(MainWindow *mainWindow)
+void External3dMarteloscopePlugin::initialize(Application *app)
 {
-    mainWindow_ = mainWindow;
+    app_ = app;
 
-    mainWindow_->createAction(nullptr,
+    app_->createAction(nullptr,
                               "External",
                               "External",
                               tr("3d-Marteloscope"),
                               tr("Start 3d-Marteloscope"),
                               ICON("external-3d-marteloscope"),
                               this,
-                              SLOT(slotPlugin()),
+                              &External3dMarteloscopePlugin::slotPlugin,
                               MAIN_WINDOW_MENU_EXTERNAL_PRIORITY);
 }
 
@@ -75,16 +75,16 @@ void External3dMarteloscopePlugin::slotPlugin()
 
     if (!runner_)
     {
-        runner_ = new External3dMarteloscopeRunner(mainWindow_);
+        runner_ = new External3dMarteloscopeRunner(app_);
     }
 
     try
     {
         // Save current project.
-        (void)ProjectFileAction::saveProject(mainWindow_);
+        (void)ProjectFileAction::saveProject(app_);
 
         // Start python.
-        std::string projectPath = mainWindow_->editor().projectPath();
+        std::string projectPath = app_->editor().projectPath();
         runner_->start(projectPath);
     }
     catch (std::exception &e)
@@ -98,6 +98,6 @@ void External3dMarteloscopePlugin::slotPlugin()
 
     if (!errorMessage.empty())
     {
-        mainWindow_->showError(errorMessage.c_str());
+        app_->showError(errorMessage.c_str());
     }
 }

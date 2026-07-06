@@ -22,18 +22,18 @@
 // Include 3D Forest.
 #include <ColorPalette.hpp>
 #include <FilterClassificationWidget.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
-#include <QHBoxLayout>
-#include <QLabel>
+#include <HBoxLayout>
+#include <Label>
 #include <QToolBar>
 #include <QToolButton>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QTreeWidgetItemIterator>
-#include <QVBoxLayout>
+#include <VBoxLayout>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterClassificationWidget"
@@ -42,8 +42,8 @@
 
 #define ICON(name) (ThemeIcon(":/FilterClassificationResources/", name))
 
-FilterClassificationWidget::FilterClassificationWidget(MainWindow *mainWindow)
-    : mainWindow_(mainWindow)
+FilterClassificationWidget::FilterClassificationWidget(Application *app)
+    : app_(app)
 {
     // Table.
     tree_ = new QTreeWidget();
@@ -51,7 +51,7 @@ FilterClassificationWidget::FilterClassificationWidget(MainWindow *mainWindow)
     tree_->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     // Tool bar buttons.
-    mainWindow_->createToolButton(&showButton_,
+    app_->createToolButton(&showButton_,
                                   tr("Show"),
                                   tr("Make selected classifications visible"),
                                   THEME_ICON("eye"),
@@ -59,7 +59,7 @@ FilterClassificationWidget::FilterClassificationWidget(MainWindow *mainWindow)
                                   SLOT(slotShow()));
     showButton_->setEnabled(false);
 
-    mainWindow_->createToolButton(&hideButton_,
+    app_->createToolButton(&hideButton_,
                                   tr("Hide"),
                                   tr("Hide selected classifications"),
                                   THEME_ICON("hide"),
@@ -67,21 +67,21 @@ FilterClassificationWidget::FilterClassificationWidget(MainWindow *mainWindow)
                                   SLOT(slotHide()));
     hideButton_->setEnabled(false);
 
-    mainWindow_->createToolButton(&selectAllButton_,
+    app_->createToolButton(&selectAllButton_,
                                   tr("Select all"),
                                   tr("Select all"),
                                   THEME_ICON("select-all"),
                                   this,
                                   SLOT(slotSelectAll()));
 
-    mainWindow_->createToolButton(&selectInvertButton_,
+    app_->createToolButton(&selectInvertButton_,
                                   tr("Invert"),
                                   tr("Invert selection"),
                                   THEME_ICON("select-invert"),
                                   this,
                                   SLOT(slotSelectInvert()));
 
-    mainWindow_->createToolButton(&selectNoneButton_,
+    app_->createToolButton(&selectNoneButton_,
                                   tr("Select none"),
                                   tr("Select none"),
                                   THEME_ICON("select-none"),
@@ -96,10 +96,10 @@ FilterClassificationWidget::FilterClassificationWidget(MainWindow *mainWindow)
     toolBar->addWidget(selectAllButton_);
     toolBar->addWidget(selectInvertButton_);
     toolBar->addWidget(selectNoneButton_);
-    toolBar->setIconSize(QSize(MainWindow::ICON_SIZE, MainWindow::ICON_SIZE));
+    toolBar->setIconSize(Size(Application::ICON_SIZE, Application::ICON_SIZE));
 
     // Layout.
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(toolBar);
     mainLayout->addWidget(tree_);
@@ -108,28 +108,28 @@ FilterClassificationWidget::FilterClassificationWidget(MainWindow *mainWindow)
 
     // Data.
     updatesEnabled_ = true;
-    connect(mainWindow_,
-            SIGNAL(signalUpdate(void *, const QSet<Editor::Type> &)),
-            this,
-            SLOT(slotUpdate(void *, const QSet<Editor::Type> &)));
+    app_->signalUpdate.connect([this](void *sender, const std::set<Editor::Type> &target)
+    {
+        slotUpdate(sender, target);
+    });
 
-    slotUpdate(nullptr, QSet<Editor::Type>());
+    slotUpdate(nullptr, std::set<Editor::Type>());
 }
 
 void FilterClassificationWidget::slotUpdate(void *sender,
-                                            const QSet<Editor::Type> &target)
+                                            const std::set<Editor::Type> &target)
 {
     if (sender == this)
     {
         return;
     }
 
-    if (target.empty() || target.contains(Editor::TYPE_CLASSIFICATION))
+    if (target.empty() || target.count(Editor::TYPE_CLASSIFICATION))
     {
         LOG_DEBUG_UPDATE(<< "Input classifications.");
 
-        setClassifications(mainWindow_->editor().classifications(),
-                           mainWindow_->editor().classificationsFilter());
+        setClassifications(app_->editor().classifications(),
+                           app_->editor().classificationsFilter());
     }
 }
 
@@ -137,19 +137,19 @@ void FilterClassificationWidget::dataChanged()
 {
     LOG_DEBUG_UPDATE(<< "Output classifications.");
 
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setClassifications(classifications_);
-    mainWindow_->editor().setClassificationsFilter(filter_);
-    mainWindow_->updateData();
+    app_->suspendThreads();
+    app_->editor().setClassifications(classifications_);
+    app_->editor().setClassificationsFilter(filter_);
+    app_->updateData();
 }
 
 void FilterClassificationWidget::filterChanged()
 {
     LOG_DEBUG_UPDATE(<< "Output classifications filter.");
 
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setClassificationsFilter(filter_);
-    mainWindow_->updateFilter();
+    app_->suspendThreads();
+    app_->editor().setClassificationsFilter(filter_);
+    app_->updateFilter();
 }
 
 void FilterClassificationWidget::setFilterEnabled(bool b)
@@ -373,14 +373,14 @@ void FilterClassificationWidget::addTreeItem(size_t index)
     {
         const Vector3<double> &rgb = ColorPalette::Classification[index];
 
-        QColor color;
+        Color color;
         color.setRedF(static_cast<float>(rgb[0]));
         color.setGreenF(static_cast<float>(rgb[1]));
         color.setBlueF(static_cast<float>(rgb[2]));
 
         QBrush brush(color, Qt::SolidPattern);
         item->setBackground(COLUMN_ID, brush);
-        // brush.setColor(QColor(0, 0, 0));
+        // brush.setColor(Color(0, 0, 0));
         // item->setForeground(COLUMN_ID, brush);
     }
 }

@@ -25,51 +25,51 @@
 // Include 3D Forest.
 #include <ComputeSegmentationNNAction.hpp>
 #include <ComputeSegmentationNNParameters.hpp>
-class MainWindow;
-class DoubleSliderWidget;
+class Application;
+class DoubleSlider;
 class DoubleRangeSliderWidget;
 class InfoDialog;
 
 // Include Qt.
-#include <QWidget>
-class QPushButton;
+#include <Widget>
+class PushButton;
 class QRadioButton;
-class QCheckBox;
+class CheckBox;
 
 /** Compute Segmentation NN Widget. */
-class ComputeSegmentationNNWidget : public QWidget
+class ComputeSegmentationNNWidget : public Widget
 {
-    Q_OBJECT
+
 
 public:
-    ComputeSegmentationNNWidget(MainWindow *mainWindow);
+    ComputeSegmentationNNWidget(Application *app);
 
 protected slots:
     void slotApply();
     void slotHelp();
 
 protected:
-    void hideEvent(QHideEvent *event) override;
+    void hideEvent(HideEvent *event) override;
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
     InfoDialog *infoDialog_;
 
     ComputeSegmentationNNParameters parameters_;
     ComputeSegmentationNNAction segmentation_;
 
-    DoubleSliderWidget *voxelRadiusSlider_;
-    DoubleSliderWidget *woodThresholdMinMinSlider_;
+    DoubleSlider *voxelRadiusSlider_;
+    DoubleSlider *woodThresholdMinMinSlider_;
     std::vector<QRadioButton *> leafToWoodChannelRadioButton_;
-    DoubleSliderWidget *searchRadiusForTrunkPointsSlider_;
-    DoubleSliderWidget *searchRadiusForLeafPointsSlider_;
+    DoubleSlider *searchRadiusForTrunkPointsSlider_;
+    DoubleSlider *searchRadiusForLeafPointsSlider_;
     DoubleRangeSliderWidget *treeBaseElevationSlider_;
-    DoubleSliderWidget *treeHeightSlider_;
-    QCheckBox *zCoordinatesAsElevationCheckBox_;
-    QCheckBox *segmentOnlyTrunksCheckBox_;
+    DoubleSlider *treeHeightSlider_;
+    CheckBox *zCoordinatesAsElevationCheckBox_;
+    CheckBox *segmentOnlyTrunksCheckBox_;
 
-    QPushButton *helpButton_;
-    QPushButton *applyButton_;
+    PushButton *helpButton_;
+    PushButton *applyButton_;
 };
 
 #endif /* COMPUTE_SEGMENTATION_NN_WIDGET_HPP */

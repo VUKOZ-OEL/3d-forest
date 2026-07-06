@@ -28,7 +28,7 @@
 #include <ViewerAabb.hpp>
 #include <ViewerCamera.hpp>
 class Editor;
-class MainWindow;
+class Application;
 class ViewerViewports;
 class ViewerOpenGLManager;
 
@@ -41,10 +41,10 @@ class QWheelEvent;
 /** Viewer OpenGL Viewport. */
 class ViewerOpenGLViewport : public QOpenGLWidget, protected QOpenGLFunctions
 {
-    Q_OBJECT
+
 
 public:
-    explicit ViewerOpenGLViewport(QWidget *parent, MainWindow *mainWindow);
+    explicit ViewerOpenGLViewport(Widget *parent, Application *app);
     ~ViewerOpenGLViewport();
 
     void setManager(ViewerOpenGLManager *manager);
@@ -76,7 +76,7 @@ protected:
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
     void showEvent(QShowEvent *event) override;
-    void hideEvent(QHideEvent *event) override;
+    void hideEvent(HideEvent *event) override;
 
     void initializeGL() override;
     void paintGL() override;
@@ -87,7 +87,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
 
-    MainWindow *mainWindow_;
+    Application *app_;
     ViewerOpenGLManager *manager_;
 
     // Window Viewports.

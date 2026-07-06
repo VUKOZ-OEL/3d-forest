@@ -22,7 +22,7 @@
 // Include 3D Forest.
 #include <FilterFilesPlugin.hpp>
 #include <FilterFilesWindow.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -32,36 +32,36 @@
 #define ICON(name) (ThemeIcon(":/FilterFilesResources/", name))
 
 FilterFilesPlugin::FilterFilesPlugin()
-    : mainWindow_(nullptr),
+    : app_(nullptr),
       pluginWindow_(nullptr)
 {
 }
 
-void FilterFilesPlugin::initialize(MainWindow *mainWindow)
+void FilterFilesPlugin::initialize(Application *app)
 {
-    mainWindow_ = mainWindow;
+    app_ = app;
 
-    mainWindow_->createAction(nullptr,
+    app_->createAction(nullptr,
                               "Filter",
                               "Filter",
                               tr("Files"),
                               tr("Show file filter"),
                               ICON("files"),
                               this,
-                              SLOT(slotPlugin()),
+                              &FilterFilesPlugin::slotPlugin,
                               MAIN_WINDOW_MENU_FILTER_PRIORITY);
 }
 
 void FilterFilesPlugin::slotPlugin()
 {
-    if (!mainWindow_)
+    if (!app_)
     {
         return;
     }
 
     if (!pluginWindow_)
     {
-        pluginWindow_ = new FilterFilesWindow(mainWindow_);
+        pluginWindow_ = new FilterFilesWindow(app_);
     }
 
     pluginWindow_->show();

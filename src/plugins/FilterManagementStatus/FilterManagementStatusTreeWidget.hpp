@@ -28,31 +28,31 @@
 
 // Include 3D Forest.
 #include <Segment.hpp>
-class MainWindow;
+class Application;
 
 // Include Qt.
-#include <QWidget>
-class QCheckBox;
-class QVBoxLayout;
+#include <Widget>
+class CheckBox;
+class VBoxLayout;
 
 /** Management Status Tree Widget. */
-class FilterManagementStatusTreeWidget : public QWidget
+class FilterManagementStatusTreeWidget : public Widget
 {
-    Q_OBJECT
+
 
 public:
-    FilterManagementStatusTreeWidget(MainWindow *mainWindow);
+    FilterManagementStatusTreeWidget(Application *app);
 
     void setSegment(const Segment &segment);
     void clear();
 
-public slots:
+
     void slotSetCheckbox(bool b);
 
 protected:
-    MainWindow *mainWindow_;
-    std::vector<QCheckBox *> checkboxList_;
-    QVBoxLayout *mainLayout_ = nullptr;
+    Application *app_;
+    std::vector<CheckBox *> checkboxList_;
+    VBoxLayout *mainLayout_ = nullptr;
 
     Segment segment_;
 

@@ -20,7 +20,7 @@
 /** @file ViewSettingsPlugin.cpp */
 
 // Include 3D Forest.
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 #include <ViewSettingsPlugin.hpp>
 #include <ViewSettingsWindow.hpp>
@@ -32,36 +32,36 @@
 #define ICON(name) (ThemeIcon(":/ViewSettingsResources/", name))
 
 ViewSettingsPlugin::ViewSettingsPlugin()
-    : mainWindow_(nullptr),
+    : app_(nullptr),
       pluginWindow_(nullptr)
 {
 }
 
-void ViewSettingsPlugin::initialize(MainWindow *mainWindow)
+void ViewSettingsPlugin::initialize(Application *app)
 {
-    mainWindow_ = mainWindow;
+    app_ = app;
 
-    mainWindow_->createAction(nullptr,
+    app_->createAction(nullptr,
                               "Settings",
                               "Settings",
                               tr("View"),
                               tr("Show view settings"),
                               ICON("brush"),
                               this,
-                              SLOT(slotPlugin()),
+                              &ViewSettingsPlugin::slotPlugin,
                               MAIN_WINDOW_MENU_SETTINGS_PRIORITY);
 }
 
 void ViewSettingsPlugin::slotPlugin()
 {
-    if (!mainWindow_)
+    if (!app_)
     {
         return;
     }
 
     if (!pluginWindow_)
     {
-        pluginWindow_ = new ViewSettingsWindow(mainWindow_);
+        pluginWindow_ = new ViewSettingsWindow(app_);
     }
 
     pluginWindow_->show();

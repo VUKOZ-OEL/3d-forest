@@ -20,7 +20,7 @@
 /** @file TreeTablePlugin.cpp */
 
 // Include 3D Forest.
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 #include <TreeTablePlugin.hpp>
 #include <TreeTableWindow.hpp>
@@ -32,23 +32,23 @@
 #define ICON(name) (ThemeIcon(":/TreeTableResources/", name))
 
 TreeTablePlugin::TreeTablePlugin()
-    : mainWindow_(nullptr),
+    : app_(nullptr),
       pluginWindow_(nullptr)
 {
 }
 
-void TreeTablePlugin::initialize(MainWindow *mainWindow)
+void TreeTablePlugin::initialize(Application *app)
 {
-    mainWindow_ = mainWindow;
+    app_ = app;
 
-    mainWindow_->createAction(nullptr,
+    app_->createAction(nullptr,
                               "Data",
                               "Data",
                               tr("Tree Table"),
                               tr("Show tree table"),
                               ICON("tree-table"),
                               this,
-                              SLOT(slotPlugin()),
+                              &TreeTablePlugin::slotPlugin,
                               MAIN_WINDOW_MENU_DATA_PRIORITY);
 }
 
@@ -56,7 +56,7 @@ void TreeTablePlugin::slotPlugin()
 {
     if (!pluginWindow_)
     {
-        pluginWindow_ = new TreeTableWindow(mainWindow_);
+        pluginWindow_ = new TreeTableWindow(app_);
     }
 
     pluginWindow_->show();

@@ -22,7 +22,7 @@
 // Include 3D Forest.
 #include <FilterTreesWidget.hpp>
 #include <FilterTreesWindow.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
@@ -34,31 +34,31 @@
 
 #define ICON(name) (ThemeIcon(":/FilterTreesResources/", name))
 
-FilterTreesWindow::FilterTreesWindow(MainWindow *mainWindow)
-    : QDockWidget(mainWindow)
+FilterTreesWindow::FilterTreesWindow(Application *app)
+    : DockWidget(app)
 {
     // Widget.
-    widget_ = new FilterTreesWidget(mainWindow);
+    widget_ = new FilterTreesWidget(app);
 
     // Dock.
     setWidget(widget_);
     setWindowTitle(tr("Filter Trees"));
-    setWindowIcon(ICON("tree").icon());
+    setWindowIcon(ICON("tree"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
+    app->addDockWidget(Qt::RightDockWidgetArea, this);
 }
 
 void FilterTreesWindow::showEvent(QShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
     // widget_->setFilterEnabled(true);
-    QWidget::showEvent(event);
+    Widget::showEvent(event);
 }
 
-void FilterTreesWindow::hideEvent(QHideEvent *event)
+void FilterTreesWindow::hideEvent(HideEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Hide event.");
-    QWidget::hideEvent(event);
+    Widget::hideEvent(event);
 }
 
 void FilterTreesWindow::closeEvent(QCloseEvent *event)

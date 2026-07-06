@@ -27,23 +27,23 @@
 #include <unordered_set>
 
 // Include 3D Forest.
-class MainWindow;
+class Application;
 
 /** Tree Table Action. */
 class TreeTableAction
 {
 public:
-    static void showTrees(MainWindow *mainWindow,
+    static void showTrees(Application *app,
                           std::unordered_set<size_t> idList);
 
-    static void hideTrees(MainWindow *mainWindow,
+    static void hideTrees(Application *app,
                           std::unordered_set<size_t> idList);
 
-    static void readMesh(MainWindow *mainWindow,
+    static void readMesh(Application *app,
                          const std::unordered_set<size_t> &idList,
                          const std::string &meshName);
 
-    static void deleteMesh(MainWindow *mainWindow,
+    static void deleteMesh(Application *app,
                            const std::unordered_set<size_t> &idList,
                            const std::string &meshName);
 };

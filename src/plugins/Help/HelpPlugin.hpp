@@ -23,7 +23,7 @@
 #define HELP_PLUGIN_HPP
 
 // Include 3D Forest.
-class MainWindow;
+class Application;
 
 // Include Qt.
 #include <QObject>
@@ -35,18 +35,18 @@ class QAction;
 /** Help Plugin. */
 class EXPORT_GUI HelpPlugin : public QObject
 {
-    Q_OBJECT
+
 
 public:
     HelpPlugin();
 
-    void initialize(MainWindow *mainWindow);
+    void initialize(Application *app);
 
-public slots:
+
     void slotAbout();
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
     QAction *aboutAction_;
 };
 

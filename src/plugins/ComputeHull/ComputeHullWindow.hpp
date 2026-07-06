@@ -23,19 +23,19 @@
 #define COMPUTE_HULL_WINDOW_HPP
 
 // Include 3D Forest.
-class MainWindow;
+class Application;
 class ComputeHullWidget;
 
 // Include Qt.
-#include <QDialog>
+#include <Dialog>
 
 /** Compute Hull Window. */
-class ComputeHullWindow : public QDialog
+class ComputeHullWindow : public Dialog
 {
-    Q_OBJECT
+
 
 public:
-    ComputeHullWindow(MainWindow *mainWindow);
+    ComputeHullWindow(Application *app);
     ~ComputeHullWindow();
 
 private:

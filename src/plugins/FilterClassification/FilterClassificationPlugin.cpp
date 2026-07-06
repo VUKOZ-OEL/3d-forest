@@ -22,7 +22,7 @@
 // Include 3D Forest.
 #include <FilterClassificationPlugin.hpp>
 #include <FilterClassificationWindow.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -32,36 +32,36 @@
 #define ICON(name) (ThemeIcon(":/FilterClassificationResources/", name))
 
 FilterClassificationPlugin::FilterClassificationPlugin()
-    : mainWindow_(nullptr),
+    : app_(nullptr),
       pluginWindow_(nullptr)
 {
 }
 
-void FilterClassificationPlugin::initialize(MainWindow *mainWindow)
+void FilterClassificationPlugin::initialize(Application *app)
 {
-    mainWindow_ = mainWindow;
+    app_ = app;
 
-    mainWindow_->createAction(nullptr,
+    app_->createAction(nullptr,
                               "Filter",
                               "Filter",
                               tr("Classification"),
                               tr("Show classification filter"),
                               ICON("classification-filter"),
                               this,
-                              SLOT(slotPlugin()),
+                              &FilterClassificationPlugin::slotPlugin,
                               MAIN_WINDOW_MENU_FILTER_PRIORITY);
 }
 
 void FilterClassificationPlugin::slotPlugin()
 {
-    if (!mainWindow_)
+    if (!app_)
     {
         return;
     }
 
     if (!pluginWindow_)
     {
-        pluginWindow_ = new FilterClassificationWindow(mainWindow_);
+        pluginWindow_ = new FilterClassificationWindow(app_);
     }
 
     pluginWindow_->show();

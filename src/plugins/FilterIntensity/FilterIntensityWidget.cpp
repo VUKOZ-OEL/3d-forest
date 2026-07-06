@@ -22,21 +22,21 @@
 // Include 3D Forest.
 #include <DoubleRangeSliderWidget.hpp>
 #include <FilterIntensityWidget.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 
 // Include Qt.
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QVBoxLayout>
+#include <HBoxLayout>
+#include <PushButton>
+#include <VBoxLayout>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterIntensityWidget"
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-FilterIntensityWidget::FilterIntensityWidget(MainWindow *mainWindow)
-    : QWidget(mainWindow),
-      mainWindow_(mainWindow)
+FilterIntensityWidget::FilterIntensityWidget(Application *app)
+    : Widget(app),
+      app_(app)
 {
     LOG_DEBUG(<< "Start creating intensity filter widget.");
 
@@ -56,7 +56,7 @@ FilterIntensityWidget::FilterIntensityWidget(MainWindow *mainWindow)
                                     100);
 
     // Layout.
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(intensityInput_);
     mainLayout->addStretch();
@@ -64,29 +64,29 @@ FilterIntensityWidget::FilterIntensityWidget(MainWindow *mainWindow)
     setLayout(mainLayout);
 
     // Data.
-    connect(mainWindow_,
-            SIGNAL(signalUpdate(void *, const QSet<Editor::Type> &)),
-            this,
-            SLOT(slotUpdate(void *, const QSet<Editor::Type> &)));
+    app_->signalUpdate.connect([this](void *sender, const std::set<Editor::Type> &target)
+    {
+        slotUpdate(sender, target);
+    });
 
-    slotUpdate(nullptr, QSet<Editor::Type>());
+    slotUpdate(nullptr, std::set<Editor::Type>());
 
     LOG_DEBUG(<< "Finished creating intensity filter widget.");
 }
 
 void FilterIntensityWidget::slotUpdate(void *sender,
-                                       const QSet<Editor::Type> &target)
+                                       const std::set<Editor::Type> &target)
 {
     if (sender == this)
     {
         return;
     }
 
-    if (target.empty() || target.contains(Editor::TYPE_INTENSITY) ||
-        target.contains(Editor::TYPE_SETTINGS))
+    if (target.empty() || target.count(Editor::TYPE_INTENSITY) ||
+        target.count(Editor::TYPE_SETTINGS))
     {
         LOG_DEBUG_UPDATE(<< "Input intensity filter.");
-        setIntensity(mainWindow_->editor().intensityFilter());
+        setIntensity(app_->editor().intensityFilter());
     }
 }
 
@@ -110,9 +110,9 @@ void FilterIntensityWidget::filterChanged(bool final)
 {
     LOG_DEBUG(<< "Intensity filer changed.");
 
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setIntensityFilter(intensityRange_);
-    mainWindow_->updateFilter(this, final);
+    app_->suspendThreads();
+    app_->editor().setIntensityFilter(intensityRange_);
+    app_->updateFilter(this, final);
 }
 
 void FilterIntensityWidget::setFilterEnabled(bool b)

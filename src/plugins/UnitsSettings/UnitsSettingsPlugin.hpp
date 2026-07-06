@@ -23,7 +23,7 @@
 #define UNITS_SETTINGS_PLUGIN_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
+#include <Plugin.hpp>
 class UnitsSettingsWindow;
 
 #if defined(_MSC_VER)
@@ -37,24 +37,26 @@ class UnitsSettingsWindow;
 #endif
 
 /** Units Settings Plugin. */
-class EXPORT_UNITS_SETTINGS_PLUGIN UnitsSettingsPlugin : public QObject,
-                                                         public PluginInterface
+class UnitsSettingsPlugin : 
+                                                         public Plugin
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
     UnitsSettingsPlugin();
 
-    virtual void initialize(MainWindow *mainWindow);
+    const char *name() const override { return "UnitsSettingsPlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
-public slots:
     void slotPlugin();
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
     UnitsSettingsWindow *pluginWindow_;
 };
+
+extern "C" EXPORT_UNITS_SETTINGS_PLUGIN Plugin *createPlugin()
+{
+    return new UnitsSettingsPlugin();
+}
 
 #endif /* UNITS_SETTINGS_PLUGIN_HPP */

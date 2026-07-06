@@ -22,11 +22,9 @@
 // Include 3D Forest.
 #include <ComputeClassificationWidget.hpp>
 #include <ComputeClassificationWindow.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
-
-// Include Qt.
-#include <QVBoxLayout>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeClassificationWindow"
@@ -34,24 +32,24 @@
 
 #define ICON(name) (ThemeIcon(":/ComputeClassificationResources/", name))
 
-ComputeClassificationWindow::ComputeClassificationWindow(MainWindow *mainWindow)
-    : QDialog(mainWindow),
+ComputeClassificationWindow::ComputeClassificationWindow(Application *app)
+    : Dialog(app),
       widget_(nullptr)
 {
     LOG_DEBUG(<< "Create.");
 
     // Widget.
-    widget_ = new ComputeClassificationWidget(mainWindow);
+    widget_ = new ComputeClassificationWidget(app);
 
     // Main layout.
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->addWidget(widget_);
     mainLayout->addStretch();
 
     // Dialog.
     setLayout(mainLayout);
     setWindowTitle(tr("Compute Classification"));
-    setWindowIcon(ICON("ground").icon());
+    setWindowIcon(ICON("ground"));
     setMaximumHeight(height());
     setModal(false);
 }

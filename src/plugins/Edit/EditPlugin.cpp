@@ -24,63 +24,63 @@
 #include <EditPluginResetElevation.hpp>
 #include <EditPluginResetManagementStatus.hpp>
 #include <EditPluginSetClassification.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "EditPlugin"
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-EditPlugin::EditPlugin() : mainWindow_(nullptr)
+EditPlugin::EditPlugin() : app_(nullptr)
 {
 }
 
-void EditPlugin::initialize(MainWindow *mainWindow)
+void EditPlugin::initialize(Application *app)
 {
-    mainWindow_ = mainWindow;
+    app_ = app;
 
-    mainWindow_->createAction(nullptr,
+    app_->createAction(nullptr,
                               "Edit",
                               "Edit",
                               tr("Reset elevation"),
                               tr("Reset elevation"),
                               ThemeIcon(),
                               this,
-                              SLOT(slotResetElevation()),
+                              &EditPlugin::slotResetElevation,
                               MAIN_WINDOW_MENU_EDIT_PRIORITY);
 
-    mainWindow_->createAction(nullptr,
+    app_->createAction(nullptr,
                               "Edit",
                               "Edit",
                               tr("Reset management status"),
                               tr("Reset management status"),
                               ThemeIcon(),
                               this,
-                              SLOT(slotResetManagementStatus()),
+                              &EditPlugin::slotResetManagementStatus,
                               MAIN_WINDOW_MENU_EDIT_PRIORITY);
 
-    mainWindow_->createAction(nullptr,
+    app_->createAction(nullptr,
                               "Edit",
                               "Edit",
                               tr("Set classification"),
                               tr("Set classification"),
                               ThemeIcon(),
                               this,
-                              SLOT(slotSetClassification()),
+                              &EditPlugin::slotSetClassification,
                               MAIN_WINDOW_MENU_EDIT_PRIORITY);
 }
 
 void EditPlugin::slotResetElevation()
 {
-    EditPluginResetElevation::run(mainWindow_);
+    EditPluginResetElevation::run(app_);
 }
 
 void EditPlugin::slotResetManagementStatus()
 {
-    EditPluginResetManagementStatus::run(mainWindow_);
+    EditPluginResetManagementStatus::run(app_);
 }
 
 void EditPlugin::slotSetClassification()
 {
-    EditPluginSetClassification::run(mainWindow_);
+    EditPluginSetClassification::run(app_);
 }

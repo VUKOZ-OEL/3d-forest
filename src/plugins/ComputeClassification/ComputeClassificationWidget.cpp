@@ -21,18 +21,16 @@
 
 // Include 3D Forest.
 #include <ComputeClassificationWidget.hpp>
-#include <DoubleSliderWidget.hpp>
+#include <DoubleSlider.hpp>
 #include <InfoDialog.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ProgressDialog.hpp>
 #include <ThemeIcon.hpp>
-
-// Include Qt.
-#include <QCheckBox>
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QTextEdit>
-#include <QVBoxLayout>
+#include <CheckBox.hpp>
+#include <HBoxLayout.hpp>
+#include <PushButton.hpp>
+#include <TextEdit.hpp>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeClassificationWidget"
@@ -40,16 +38,16 @@
 
 #define ICON(name) (ThemeIcon(":/ComputeClassificationResources/", name))
 
-ComputeClassificationWidget::ComputeClassificationWidget(MainWindow *mainWindow)
-    : QWidget(),
-      mainWindow_(mainWindow),
+ComputeClassificationWidget::ComputeClassificationWidget(Application *app)
+    : Widget(),
+      app_(app),
       infoDialog_(nullptr),
-      classification_(&mainWindow->editor())
+      classification_(&app->editor())
 {
     LOG_DEBUG(<< "Create.");
 
     // Widgets.
-    DoubleSliderWidget::create(voxelSlider_,
+    DoubleSlider::create(voxelSlider_,
                                this,
                                nullptr,
                                nullptr,
@@ -61,7 +59,7 @@ ComputeClassificationWidget::ComputeClassificationWidget(MainWindow *mainWindow)
                                1.0,
                                parameters_.voxelRadius);
 
-    DoubleSliderWidget::create(radiusSlider_,
+    DoubleSlider::create(radiusSlider_,
                                this,
                                nullptr,
                                nullptr,
@@ -73,7 +71,7 @@ ComputeClassificationWidget::ComputeClassificationWidget(MainWindow *mainWindow)
                                2.0,
                                parameters_.searchRadius);
 
-    DoubleSliderWidget::create(angleSlider_,
+    DoubleSlider::create(angleSlider_,
                                this,
                                nullptr,
                                nullptr,
@@ -85,16 +83,16 @@ ComputeClassificationWidget::ComputeClassificationWidget(MainWindow *mainWindow)
                                89.0,
                                parameters_.angle);
 
-    cleanGroundCheckBox_ = new QCheckBox;
+    cleanGroundCheckBox_ = new CheckBox;
     cleanGroundCheckBox_->setText(tr("Clean ground classifications at start"));
     cleanGroundCheckBox_->setChecked(parameters_.cleanGroundClassifications);
 
-    cleanAllCheckBox_ = new QCheckBox;
+    cleanAllCheckBox_ = new CheckBox;
     cleanAllCheckBox_->setText(tr("Clean all classifications at start"));
     cleanAllCheckBox_->setChecked(parameters_.cleanAllClassifications);
 
     // Settings layout.
-    QVBoxLayout *settingsLayout = new QVBoxLayout;
+    VBoxLayout *settingsLayout = new VBoxLayout;
     settingsLayout->addWidget(voxelSlider_);
     settingsLayout->addWidget(radiusSlider_);
     settingsLayout->addWidget(angleSlider_);
@@ -103,23 +101,23 @@ ComputeClassificationWidget::ComputeClassificationWidget(MainWindow *mainWindow)
     settingsLayout->addStretch();
 
     // Buttons.
-    helpButton_ = new QPushButton(tr("Help"));
-    helpButton_->setIcon(THEME_ICON("question").icon());
+    helpButton_ = new PushButton(tr("Help"));
+    helpButton_->setIcon(THEME_ICON("question"));
     connect(helpButton_, SIGNAL(clicked()), this, SLOT(slotHelp()));
 
-    applyButton_ = new QPushButton(tr("Run"));
-    applyButton_->setIcon(THEME_ICON("run").icon());
+    applyButton_ = new PushButton(tr("Run"));
+    applyButton_->setIcon(THEME_ICON("run"));
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
 
     // Buttons layout.
-    QHBoxLayout *buttonsLayout = new QHBoxLayout;
+    HBoxLayout *buttonsLayout = new HBoxLayout;
     buttonsLayout->addWidget(helpButton_);
     buttonsLayout->addStretch();
     buttonsLayout->addWidget(applyButton_);
 
     // Main layout.
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->addLayout(settingsLayout);
     mainLayout->addSpacing(10);
     mainLayout->addLayout(buttonsLayout);
@@ -129,18 +127,18 @@ ComputeClassificationWidget::ComputeClassificationWidget(MainWindow *mainWindow)
     setLayout(mainLayout);
 }
 
-void ComputeClassificationWidget::hideEvent(QHideEvent *event)
+void ComputeClassificationWidget::hideEvent(HideEvent *event)
 {
     LOG_DEBUG(<< "Hide.");
     classification_.clear();
-    QWidget::hideEvent(event);
+    Widget::hideEvent(event);
 }
 
 void ComputeClassificationWidget::slotApply()
 {
     LOG_DEBUG(<< "Compute classification.");
 
-    mainWindow_->suspendThreads();
+    app_->suspendThreads();
 
     parameters_.voxelRadius = voxelSlider_->value();
     parameters_.searchRadius = static_cast<double>(radiusSlider_->value());
@@ -151,20 +149,20 @@ void ComputeClassificationWidget::slotApply()
     try
     {
         classification_.start(parameters_);
-        ProgressDialog::run(mainWindow_,
+        ProgressDialog::run(app_,
                             "Compute Classification",
                             &classification_);
     }
     catch (std::exception &e)
     {
-        mainWindow_->showError(e.what());
+        app_->showError(e.what());
     }
     catch (...)
     {
-        mainWindow_->showError("Unknown error");
+        app_->showError("Unknown error");
     }
 
-    mainWindow_->update(this,
+    app_->update(this,
                         {Editor::TYPE_CLASSIFICATION, Editor::TYPE_ELEVATION},
                         Page::STATE_READ);
 }
@@ -204,7 +202,7 @@ void ComputeClassificationWidget::slotHelp()
 
     if (!infoDialog_)
     {
-        infoDialog_ = new InfoDialog(mainWindow_, 450, 450);
+        infoDialog_ = new InfoDialog(app_, 450, 450);
         infoDialog_->setWindowTitle(tr("Compute Classification Help"));
         infoDialog_->setText(t);
     }

@@ -21,7 +21,7 @@
 
 // Include 3D Forest.
 #include <External3dMarteloscopeRunner.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 
 // Include Qt.
 #include <QCoreApplication>
@@ -38,9 +38,9 @@
 #include <Log.hpp>
 
 External3dMarteloscopeRunner::External3dMarteloscopeRunner(
-    MainWindow *mainWindow)
-    : QObject(mainWindow),
-      mainWindow_(mainWindow)
+    Application *app)
+    : QObject(app),
+      app_(app)
 {
 }
 

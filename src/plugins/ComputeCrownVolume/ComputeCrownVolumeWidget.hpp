@@ -25,36 +25,36 @@
 // Include 3D Forest.
 #include <ComputeCrownVolumeAction.hpp>
 #include <ComputeCrownVolumeParameters.hpp>
-class MainWindow;
-class DoubleSliderWidget;
+class Application;
+class DoubleSlider;
 
 // Include Qt.
-#include <QWidget>
-class QPushButton;
+#include <Widget>
+class PushButton;
 
 /** Compute Crown Volume Widget. */
-class ComputeCrownVolumeWidget : public QWidget
+class ComputeCrownVolumeWidget : public Widget
 {
-    Q_OBJECT
+
 
 public:
-    ComputeCrownVolumeWidget(MainWindow *mainWindow);
+    ComputeCrownVolumeWidget(Application *app);
 
 protected slots:
     void slotApply();
 
 protected:
-    void hideEvent(QHideEvent *event) override;
+    void hideEvent(HideEvent *event) override;
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
 
     ComputeCrownVolumeParameters parameters_;
     ComputeCrownVolumeAction action_;
 
-    DoubleSliderWidget *voxelSizeSlider_;
+    DoubleSlider *voxelSizeSlider_;
 
-    QPushButton *applyButton_;
+    PushButton *applyButton_;
 };
 
 #endif /* COMPUTE_CROWN_VOLUME_WIDGET_HPP */

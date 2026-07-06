@@ -20,7 +20,7 @@
 /** @file ViewerPlugin.cpp */
 
 // Include 3D Forest.
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 #include <ViewerPlugin.hpp>
 #include <ViewerViewports.hpp>
@@ -32,154 +32,149 @@
 
 #define ICON(name) (ThemeIcon(":/ViewerResources/", name))
 
-ViewerPlugin::ViewerPlugin() : mainWindow_(nullptr)
+ViewerPlugin::ViewerPlugin() : app_(nullptr)
 {
 }
 
-void ViewerPlugin::initialize(MainWindow *mainWindow)
+void ViewerPlugin::initialize(Application *app)
 {
-    mainWindow_ = mainWindow;
+    app_ = app;
 
-    viewports_ = new ViewerViewports(mainWindow_);
-    mainWindow_->setCentralWidget(viewports_);
+    viewports_ = new ViewerViewports(app_);
+    app_->setCentralWidget(viewports_);
 
-    connect(viewports_,
-            SIGNAL(cameraChanged(size_t)),
-            mainWindow_,
-            SLOT(slotRenderViewport(size_t)));
-
-    mainWindow_->createAction(&viewOrthographicAction_,
+    app_->createAction(&viewOrthographicAction_,
                               "Viewport",
                               "Viewport Projection",
                               tr("Orthographic"),
                               tr("Orthographic projection"),
                               ICON("orthographic-wire"),
                               this,
-                              SLOT(slotViewOrthographic()),
+                              &ViewerPlugin::slotViewOrthographic,
                               MAIN_WINDOW_MENU_VIEWPORT_PRIORITY);
 
-    mainWindow_->createAction(&viewPerspectiveAction_,
+    app_->createAction(&viewPerspectiveAction_,
                               "Viewport",
                               "Viewport Projection",
                               tr("Perspective"),
                               tr("Perspective projection"),
                               ICON("perspective-wire"),
                               this,
-                              SLOT(slotViewPerspective()),
+                              &ViewerPlugin::slotViewPerspective,
                               MAIN_WINDOW_MENU_VIEWPORT_PRIORITY);
 
-    mainWindow_->createAction(&view2dAction_,
+    app_->createAction(&view2dAction_,
                               "Viewport",
                               "Viewport Projection",
                               tr("2D DBH"),
                               tr("2D projection with DBH"),
                               ICON("view-2d"),
                               this,
-                              SLOT(slotView2d()),
+                              &ViewerPlugin::slotView2d,
                               MAIN_WINDOW_MENU_VIEWPORT_PRIORITY);
 
-    mainWindow_->createAction(&view3dAction_,
+    app_->createAction(&view3dAction_,
                               "Viewport",
                               "Viewport",
                               tr("3d view"),
                               tr("3d view"),
                               ICON("portraits-fill"),
                               this,
-                              SLOT(slotView3d()),
+                              &ViewerPlugin::slotView3d,
                               MAIN_WINDOW_MENU_VIEWPORT_PRIORITY);
 
-    mainWindow_->createAction(&viewTopAction_,
+    app_->createAction(&viewTopAction_,
                               "Viewport",
                               "Viewport",
                               tr("Top view"),
                               tr("Top view"),
                               ICON("view-top"),
                               this,
-                              SLOT(slotViewTop()),
+                              &ViewerPlugin::slotViewTop,
                               MAIN_WINDOW_MENU_VIEWPORT_PRIORITY);
 
-    mainWindow_->createAction(&viewFrontAction_,
+    app_->createAction(&viewFrontAction_,
                               "Viewport",
                               "Viewport",
                               tr("Front view"),
                               tr("Front view"),
                               ICON("view-front"),
                               this,
-                              SLOT(slotViewFront()),
+                              &ViewerPlugin::slotViewFront,
                               MAIN_WINDOW_MENU_VIEWPORT_PRIORITY);
 
-    mainWindow_->createAction(&viewRightAction_,
+    app_->createAction(&viewRightAction_,
                               "Viewport",
                               "Viewport",
                               tr("Right view"),
                               tr("Right view"),
                               ICON("view-right"),
                               this,
-                              SLOT(slotViewRight()),
+                              &ViewerPlugin::slotViewRight,
                               MAIN_WINDOW_MENU_VIEWPORT_PRIORITY);
 
-    mainWindow_->createAction(&viewResetDistanceAction_,
+    app_->createAction(&viewResetDistanceAction_,
                               "Viewport",
                               "Viewport",
                               tr("Reset distance"),
                               tr("Reset distance"),
                               ICON("fit-to-page"),
                               this,
-                              SLOT(slotViewResetDistance()),
+                              &ViewerPlugin::slotViewResetDistance,
                               MAIN_WINDOW_MENU_VIEWPORT_PRIORITY);
 
-    mainWindow_->createAction(&viewResetCenterAction_,
+    app_->createAction(&viewResetCenterAction_,
                               "Viewport",
                               "Viewport",
                               tr("Reset center"),
                               tr("Reset center"),
                               ICON("collect"),
                               this,
-                              SLOT(slotViewResetCenter()),
+                              &ViewerPlugin::slotViewResetCenter,
                               MAIN_WINDOW_MENU_VIEWPORT_PRIORITY);
 
-    mainWindow_->createAction(&viewLayoutSingleAction_,
+    app_->createAction(&viewLayoutSingleAction_,
                               "Viewport",
                               "Viewport Layout",
                               tr("Single layout"),
                               tr("Single layout"),
                               ICON("layout-single"),
                               this,
-                              SLOT(slotViewLayoutSingle()),
+                              &ViewerPlugin::slotViewLayoutSingle,
                               MAIN_WINDOW_MENU_VIEWPORT_PRIORITY);
 
-    mainWindow_->createAction(&viewLayoutTwoColumnsAction_,
+    app_->createAction(&viewLayoutTwoColumnsAction_,
                               "Viewport",
                               "Viewport Layout",
                               tr("Column layout"),
                               tr("Layout with two columns"),
                               ICON("layout-columns"),
                               this,
-                              SLOT(slotViewLayoutTwoColumns()),
+                              &ViewerPlugin::slotViewLayoutTwoColumns,
                               MAIN_WINDOW_MENU_VIEWPORT_PRIORITY);
 
-    mainWindow_->createAction(&viewLayoutGridAction_,
+    app_->createAction(&viewLayoutGridAction_,
                               "Viewport",
                               "Viewport Layout",
                               tr("Grid layout"),
                               tr("Grid layout"),
                               ICON("layout-grid"),
                               this,
-                              SLOT(slotViewLayoutGrid()),
+                              &ViewerPlugin::slotViewLayoutGrid,
                               MAIN_WINDOW_MENU_VIEWPORT_PRIORITY);
 
-    mainWindow_->createAction(&viewLayoutThreeRowsRightAction_,
+    app_->createAction(&viewLayoutThreeRowsRightAction_,
                               "Viewport",
                               "Viewport Layout",
                               tr("Grid layout 3"),
                               tr("Grid layout with 3 rows"),
                               ICON("layout-grid-3-right"),
                               this,
-                              SLOT(slotViewLayoutThreeRowsRight()),
+                              &ViewerPlugin::slotViewLayoutThreeRowsRight,
                               MAIN_WINDOW_MENU_VIEWPORT_PRIORITY);
 
-    // mainWindow_->hideToolBar("Viewport Projection");
-    mainWindow_->hideToolBar("Viewport Layout");
+    // app_->hideToolBar("Viewport Projection");
+    app_->hideToolBar("Viewport Layout");
 }
 
 std::vector<Camera> ViewerPlugin::camera(size_t viewportId) const
@@ -280,27 +275,27 @@ void ViewerPlugin::slotViewLayout(ViewerViewports::ViewLayout layout)
 {
     LOG_DEBUG(<< "Set layout <" << layout << ">.");
 
-    mainWindow_->suspendThreads();
+    app_->suspendThreads();
 
     if (layout == ViewerViewports::VIEW_LAYOUT_SINGLE)
     {
-        mainWindow_->editor().viewportsResize(1);
+        app_->editor().viewportsResize(1);
         viewports_->setLayout(layout);
     }
     else if (layout == ViewerViewports::VIEW_LAYOUT_TWO_COLUMNS)
     {
-        mainWindow_->editor().viewportsResize(2);
+        app_->editor().viewportsResize(2);
         viewports_->setLayout(layout);
-        viewports_->resetViewport(&mainWindow_->editor(), 1, true);
+        viewports_->resetViewport(&app_->editor(), 1, true);
     }
     else if ((layout == ViewerViewports::VIEW_LAYOUT_GRID) ||
              (layout == ViewerViewports::VIEW_LAYOUT_THREE_ROWS_RIGHT))
     {
-        mainWindow_->editor().viewportsResize(4);
+        app_->editor().viewportsResize(4);
         viewports_->setLayout(layout);
-        viewports_->resetViewport(&mainWindow_->editor(), 1, true);
-        viewports_->resetViewport(&mainWindow_->editor(), 2, true);
-        viewports_->resetViewport(&mainWindow_->editor(), 3, true);
+        viewports_->resetViewport(&app_->editor(), 1, true);
+        viewports_->resetViewport(&app_->editor(), 2, true);
+        viewports_->resetViewport(&app_->editor(), 3, true);
     }
 
     updateViewer();
@@ -308,5 +303,5 @@ void ViewerPlugin::slotViewLayout(ViewerViewports::ViewLayout layout)
 
 void ViewerPlugin::updateViewer()
 {
-    mainWindow_->slotRenderViewports();
+    app_->slotRenderViewports();
 }

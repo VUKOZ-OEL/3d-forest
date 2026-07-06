@@ -23,22 +23,22 @@
 #include <ExportFileDialog.hpp>
 #include <ExportFileFormatCsv.hpp>
 #include <ExportFileFormatLas.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 #include <Util.hpp>
 
 // Include Qt.
-#include <QCheckBox>
-#include <QComboBox>
+#include <CheckBox>
+#include <ComboBox>
 #include <QFileDialog>
-#include <QGridLayout>
-#include <QGroupBox>
-#include <QHBoxLayout>
-#include <QLabel>
+#include <GridLayout>
+#include <GroupBox>
+#include <HBoxLayout>
+#include <Label>
 #include <QLineEdit>
 #include <QMessageBox>
-#include <QPushButton>
-#include <QVBoxLayout>
+#include <PushButton>
+#include <VBoxLayout>
 
 // Include local.
 #define LOG_MODULE_NAME "ExportFileDialog"
@@ -46,53 +46,53 @@
 
 #define ICON(name) (ThemeIcon(":/exportfile/", name))
 
-ExportFileDialog::ExportFileDialog(MainWindow *mainWindow,
+ExportFileDialog::ExportFileDialog(Application *app,
                                    const QString &fileName)
-    : QDialog(mainWindow),
-      mainWindow_(mainWindow)
+    : Dialog(app),
+      app_(app)
 {
     // File name.
     fileNameLineEdit_ = new QLineEdit;
     fileNameLineEdit_->setText(fileName);
 
-    browseButton_ = new QPushButton(tr("Browse"));
+    browseButton_ = new PushButton(tr("Browse"));
     connect(browseButton_, SIGNAL(clicked()), this, SLOT(slotBrowse()));
 
-    QHBoxLayout *fileNameLayout = new QHBoxLayout;
-    fileNameLayout->addWidget(new QLabel(tr("File")));
+    HBoxLayout *fileNameLayout = new HBoxLayout;
+    fileNameLayout->addWidget(new Label(tr("File")));
     fileNameLayout->addWidget(fileNameLineEdit_);
     fileNameLayout->addWidget(browseButton_);
 
     // Attributes.
     attributeCheckBox_.resize(5);
 
-    attributeCheckBox_[0] = new QCheckBox(tr("XYZ coordinates"));
+    attributeCheckBox_[0] = new CheckBox(tr("XYZ coordinates"));
     attributeCheckBox_[0]->setChecked(true);
     attributeCheckBox_[0]->setEnabled(false);
 
-    attributeCheckBox_[1] = new QCheckBox(tr("Intensity"));
+    attributeCheckBox_[1] = new CheckBox(tr("Intensity"));
     attributeCheckBox_[1]->setChecked(true);
 
-    attributeCheckBox_[2] = new QCheckBox(tr("Classification"));
+    attributeCheckBox_[2] = new CheckBox(tr("Classification"));
     attributeCheckBox_[2]->setChecked(true);
 
-    attributeCheckBox_[3] = new QCheckBox(tr("Color"));
+    attributeCheckBox_[3] = new CheckBox(tr("Color"));
     attributeCheckBox_[3]->setChecked(true);
 
-    attributeCheckBox_[4] = new QCheckBox(tr("Segment"));
+    attributeCheckBox_[4] = new CheckBox(tr("Segment"));
     attributeCheckBox_[4]->setChecked(true);
 
-    QVBoxLayout *attributeVBoxLayout = new QVBoxLayout;
+    VBoxLayout *attributeVBoxLayout = new VBoxLayout;
     for (size_t i = 0; i < attributeCheckBox_.size(); i++)
     {
         attributeVBoxLayout->addWidget(attributeCheckBox_[i]);
     }
 
-    QGroupBox *attributeGroupBox = new QGroupBox(tr("Point attributes"));
+    GroupBox *attributeGroupBox = new GroupBox(tr("Point attributes"));
     attributeGroupBox->setLayout(attributeVBoxLayout);
 
     // Other options.
-    scaleComboBox_ = new QComboBox;
+    scaleComboBox_ = new ComboBox;
     scaleComboBox_->addItem("0.0001");
     scaleComboBox_->addItem("0.001");
     scaleComboBox_->addItem("0.01");
@@ -100,29 +100,29 @@ ExportFileDialog::ExportFileDialog(MainWindow *mainWindow,
     scaleComboBox_->addItem("1.0");
     scaleComboBox_->setCurrentText("0.001");
 
-    filterEnabledCheckBox_ = new QCheckBox;
+    filterEnabledCheckBox_ = new CheckBox;
     filterEnabledCheckBox_->setChecked(true);
 
-    QGridLayout *valueGridLayout = new QGridLayout;
-    valueGridLayout->addWidget(new QLabel(tr("Scale")), 0, 0);
+    GridLayout *valueGridLayout = new GridLayout;
+    valueGridLayout->addWidget(new Label(tr("Scale")), 0, 0);
     valueGridLayout->addWidget(scaleComboBox_, 0, 1);
-    valueGridLayout->addWidget(new QLabel(tr("Use current filter")), 1, 0);
+    valueGridLayout->addWidget(new Label(tr("Use current filter")), 1, 0);
     valueGridLayout->addWidget(filterEnabledCheckBox_, 1, 1);
 
     // Buttons.
-    acceptButton_ = new QPushButton(tr("Export"));
+    acceptButton_ = new PushButton(tr("Export"));
     connect(acceptButton_, SIGNAL(clicked()), this, SLOT(slotAccept()));
 
-    rejectButton_ = new QPushButton(tr("Cancel"));
+    rejectButton_ = new PushButton(tr("Cancel"));
     connect(rejectButton_, SIGNAL(clicked()), this, SLOT(slotReject()));
 
-    QHBoxLayout *dialogButtons = new QHBoxLayout;
+    HBoxLayout *dialogButtons = new HBoxLayout;
     dialogButtons->addStretch();
     dialogButtons->addWidget(acceptButton_);
     dialogButtons->addWidget(rejectButton_);
 
     // Dialog layout.
-    QVBoxLayout *dialogLayout = new QVBoxLayout;
+    VBoxLayout *dialogLayout = new VBoxLayout;
     dialogLayout->addLayout(fileNameLayout);
     dialogLayout->addSpacing(10);
     dialogLayout->addWidget(attributeGroupBox);
@@ -135,7 +135,7 @@ ExportFileDialog::ExportFileDialog(MainWindow *mainWindow,
 
     // Window.
     setWindowTitle(tr("Export File"));
-    setWindowIcon(ICON("export-file").icon());
+    setWindowIcon(ICON("export-file"));
     setMaximumWidth(600);
     setMaximumHeight(height());
 }
@@ -148,7 +148,7 @@ void ExportFileDialog::slotBrowse()
     QString selectedFilter;
 
     QString fileName =
-        QFileDialog::getSaveFileName(mainWindow_,
+        QFileDialog::getSaveFileName(app_,
                                      tr("Export File As"),
                                      fileNameLineEdit_->text(),
                                      tr("LAS (LASer) File (*.las);;"
@@ -192,13 +192,13 @@ void ExportFileDialog::slotAccept()
     }
 
     close();
-    setResult(QDialog::Accepted);
+    setResult(Dialog::Accepted);
 }
 
 void ExportFileDialog::slotReject()
 {
     close();
-    setResult(QDialog::Rejected);
+    setResult(Dialog::Rejected);
 }
 
 std::shared_ptr<ExportFileFormatInterface> ExportFileDialog::writer() const

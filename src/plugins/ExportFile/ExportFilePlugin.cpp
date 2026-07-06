@@ -23,7 +23,7 @@
 #include <ExportFileAction.hpp>
 #include <ExportFileDialog.hpp>
 #include <ExportFilePlugin.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ProgressDialog.hpp>
 #include <ThemeIcon.hpp>
 
@@ -36,55 +36,55 @@
 
 #define ICON(name) (ThemeIcon(":/exportfile/", name))
 
-ExportFilePlugin::ExportFilePlugin() : mainWindow_(nullptr)
+ExportFilePlugin::ExportFilePlugin() : app_(nullptr)
 {
 }
 
-void ExportFilePlugin::initialize(MainWindow *mainWindow)
+void ExportFilePlugin::initialize(Application *app)
 {
-    mainWindow_ = mainWindow;
+    app_ = app;
 
-    mainWindow_->createAction(&exportFileAction_,
+    app_->createAction(&exportFileAction_,
                               "File",
                               "File Import/Export",
                               tr("Export..."),
                               tr("Export point cloud"),
                               ICON("export-file"),
                               this,
-                              SLOT(slotExportFile()),
+                              &ExportFilePlugin::slotExportFile,
                               MAIN_WINDOW_MENU_FILE_PRIORITY,
                               60);
 }
 
 void ExportFilePlugin::slotExportFile()
 {
-    mainWindow_->suspendThreads();
+    app_->suspendThreads();
 
     try
     {
-        ExportFileDialog dialog(mainWindow_, fileName_);
+        ExportFileDialog dialog(app_, fileName_);
 
-        if (dialog.exec() == QDialog::Accepted)
+        if (dialog.exec() == Dialog::Accepted)
         {
             std::shared_ptr<ExportFileFormatInterface> writer = dialog.writer();
             ExportFileProperties properties = dialog.properties();
 
-            ExportFileAction exportFile(&mainWindow_->editor());
+            ExportFileAction exportFile(&app_->editor());
             exportFile.initialize(writer, properties);
 
-            ProgressDialog::run(mainWindow_, "Exporting file", &exportFile);
+            ProgressDialog::run(app_, "Exporting file", &exportFile);
 
             fileName_ = QString::fromStdString(properties.fileName());
         }
     }
     catch (std::exception &e)
     {
-        mainWindow_->showError(e.what());
+        app_->showError(e.what());
     }
     catch (...)
     {
-        mainWindow_->showError("Unknown error");
+        app_->showError("Unknown error");
     }
 
-    mainWindow_->resumeThreads();
+    app_->resumeThreads();
 }

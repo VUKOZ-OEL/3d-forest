@@ -20,14 +20,14 @@
 /** @file TreeTableWindow.cpp */
 
 // Include 3D Forest.
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 #include <TreeTableWidget.hpp>
 #include <TreeTableWindow.hpp>
 
 // Include Qt.
 #include <QCloseEvent>
-#include <QVBoxLayout>
+#include <VBoxLayout>
 
 // Include local.
 #define LOG_MODULE_NAME "TreeTableWindow"
@@ -36,23 +36,23 @@
 
 #define ICON(name) (ThemeIcon(":/TreeTableResources/", name))
 
-TreeTableWindow::TreeTableWindow(MainWindow *mainWindow)
-    : QDialog(mainWindow),
+TreeTableWindow::TreeTableWindow(Application *app)
+    : Dialog(app),
       widget_(nullptr)
 {
     LOG_DEBUG(<< "Create.");
 
     // Widget.
-    widget_ = new TreeTableWidget(mainWindow);
+    widget_ = new TreeTableWidget(app);
 
     // Main layout.
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->addWidget(widget_);
 
     // Dialog.
     setLayout(mainLayout);
     setWindowTitle(tr("Tree Table"));
-    setWindowIcon(ICON("tree-table").icon());
+    setWindowIcon(ICON("tree-table"));
     setModal(false);
 }
 

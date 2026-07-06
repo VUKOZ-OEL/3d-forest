@@ -23,26 +23,26 @@
 #define FILTER_ELEVATION_WINDOW_HPP
 
 // Include 3D Forest.
-class MainWindow;
+class Application;
 class FilterElevationWidget;
 
 // Include Qt.
-#include <QDockWidget>
+#include <DockWidget>
 class QCloseEvent;
 
 /** Filter Elevation Window. */
-class FilterElevationWindow : public QDockWidget
+class FilterElevationWindow : public DockWidget
 {
-    Q_OBJECT
+
 
 public:
-    FilterElevationWindow(MainWindow *mainWindow);
+    FilterElevationWindow(Application *app);
 
 protected:
     FilterElevationWidget *widget_;
 
     void showEvent(QShowEvent *event) override;
-    void hideEvent(QHideEvent *event) override;
+    void hideEvent(HideEvent *event) override;
 
     void closeEvent(QCloseEvent *event) override;
 };

@@ -20,7 +20,7 @@
 /** @file UnitsSettingsWindow.cpp */
 
 // Include 3D Forest.
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 #include <UnitsSettingsWidget.hpp>
 #include <UnitsSettingsWindow.hpp>
@@ -31,17 +31,17 @@
 
 #define ICON(name) (ThemeIcon(":/UnitsSettingsResources/", name))
 
-UnitsSettingsWindow::UnitsSettingsWindow(MainWindow *mainWindow)
-    : QDockWidget(mainWindow)
+UnitsSettingsWindow::UnitsSettingsWindow(Application *app)
+    : DockWidget(app)
 {
     // Widget.
-    UnitsSettingsWidget *widget = new UnitsSettingsWidget(mainWindow);
+    UnitsSettingsWidget *widget = new UnitsSettingsWidget(app);
 
     // Dock.
     setWidget(widget);
     setFixedHeight(widget->sizeHint().height());
     setWindowTitle(tr("Units Settings"));
-    setWindowIcon(ICON("units").icon());
+    setWindowIcon(ICON("units"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
+    app->addDockWidget(Qt::RightDockWidgetArea, this);
 }

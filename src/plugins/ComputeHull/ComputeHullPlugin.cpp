@@ -22,7 +22,7 @@
 // Include 3D Forest.
 #include <ComputeHullPlugin.hpp>
 #include <ComputeHullWindow.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -32,23 +32,23 @@
 #define ICON(name) (ThemeIcon(":/ComputeHullResources/", name))
 
 ComputeHullPlugin::ComputeHullPlugin()
-    : mainWindow_(nullptr),
+    : app_(nullptr),
       pluginWindow_(nullptr)
 {
 }
 
-void ComputeHullPlugin::initialize(MainWindow *mainWindow)
+void ComputeHullPlugin::initialize(Application *app)
 {
-    mainWindow_ = mainWindow;
+    app_ = app;
 
-    mainWindow_->createAction(nullptr,
+    app_->createAction(nullptr,
                               "Compute",
                               "Compute",
                               tr("Hull"),
                               tr("Compute hull"),
                               ICON("compute-hull"),
                               this,
-                              SLOT(slotPlugin()),
+                              &ComputeHullPlugin::slotPlugin,
                               MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
 }
 
@@ -56,7 +56,7 @@ void ComputeHullPlugin::slotPlugin()
 {
     if (!pluginWindow_)
     {
-        pluginWindow_ = new ComputeHullWindow(mainWindow_);
+        pluginWindow_ = new ComputeHullWindow(app_);
     }
 
     pluginWindow_->show();

@@ -17,21 +17,13 @@
 
 set(SUB_PROJECT_NAME "3DForestFilterTreesPlugin")
 
-if(NOT QT_VERSION_MAJOR)
-    message(WARNING "Gui not found - skipping ${SUB_PROJECT_NAME}")
-    return()
-endif()
-
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-
 file(GLOB_RECURSE SOURCES "*.cpp")
 
 add_library(
     ${SUB_PROJECT_NAME}
     SHARED
     ${SOURCES}
-    resources/resources.qrc
+#    resources/resources.qrc
 )
 
 target_include_directories(
@@ -49,7 +41,7 @@ target_compile_definitions(
 target_link_libraries(
     ${SUB_PROJECT_NAME}
     PRIVATE
-    3DForestGui
+    3DForestUiCommon
 )
 
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin/plugins)

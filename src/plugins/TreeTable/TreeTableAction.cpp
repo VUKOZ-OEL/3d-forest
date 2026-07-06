@@ -20,7 +20,7 @@
 /** @file TreeTableAction.cpp */
 
 // Include 3D Forest.
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <OpenFileDialog.hpp>
 #include <TreeTableAction.hpp>
 
@@ -29,43 +29,43 @@
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-void TreeTableAction::showTrees(MainWindow *mainWindow,
+void TreeTableAction::showTrees(Application *app,
                                 std::unordered_set<size_t> idList)
 {
     LOG_DEBUG(<< "Start showing trees.");
 
-    QueryFilterSet filter = mainWindow->editor().segmentsFilter();
+    QueryFilterSet filter = app->editor().segmentsFilter();
 
     for (const auto &id : idList)
     {
         filter.setEnabled(id, true);
     }
 
-    mainWindow->editor().setSegmentsFilter(filter);
-    mainWindow->updateFilter();
+    app->editor().setSegmentsFilter(filter);
+    app->updateFilter();
 
     LOG_DEBUG(<< "Finished showing trees.");
 }
 
-void TreeTableAction::hideTrees(MainWindow *mainWindow,
+void TreeTableAction::hideTrees(Application *app,
                                 std::unordered_set<size_t> idList)
 {
     LOG_DEBUG(<< "Start showing trees.");
 
-    QueryFilterSet filter = mainWindow->editor().segmentsFilter();
+    QueryFilterSet filter = app->editor().segmentsFilter();
 
     for (const auto &id : idList)
     {
         filter.setEnabled(id, false);
     }
 
-    mainWindow->editor().setSegmentsFilter(filter);
-    mainWindow->updateFilter();
+    app->editor().setSegmentsFilter(filter);
+    app->updateFilter();
 
     LOG_DEBUG(<< "Finished showing trees.");
 }
 
-void TreeTableAction::readMesh(MainWindow *mainWindow,
+void TreeTableAction::readMesh(Application *app,
                                const std::unordered_set<size_t> &idList,
                                const std::string &meshName)
 {
@@ -77,7 +77,7 @@ void TreeTableAction::readMesh(MainWindow *mainWindow,
         return;
     }
 
-    Editor *editor = &mainWindow->editor();
+    Editor *editor = &app->editor();
     Segments segments = editor->segments();
 
     size_t id = *idList.begin();
@@ -89,7 +89,7 @@ void TreeTableAction::readMesh(MainWindow *mainWindow,
         return;
     }
 
-    std::string path = OpenFileDialog::dialog(mainWindow, "(*.ply)");
+    std::string path = OpenFileDialog::dialog(app, "(*.ply)");
     if (path.empty())
     {
         LOG_DEBUG(<< "No file selected");
@@ -111,7 +111,7 @@ void TreeTableAction::readMesh(MainWindow *mainWindow,
     LOG_DEBUG(<< "Finished read mesh");
 }
 
-void TreeTableAction::deleteMesh(MainWindow *mainWindow,
+void TreeTableAction::deleteMesh(Application *app,
                                  const std::unordered_set<size_t> &idList,
                                  const std::string &meshName)
 {
@@ -123,7 +123,7 @@ void TreeTableAction::deleteMesh(MainWindow *mainWindow,
         return;
     }
 
-    Editor *editor = &mainWindow->editor();
+    Editor *editor = &app->editor();
     Segments segments = editor->segments();
 
     size_t id = *idList.begin();

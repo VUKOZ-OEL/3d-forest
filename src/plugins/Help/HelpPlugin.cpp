@@ -21,7 +21,7 @@
 
 // Include 3D Forest.
 #include <HelpPlugin.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
@@ -33,15 +33,15 @@
 
 #define ICON(name) (ThemeIcon(":/HelpResources/", name))
 
-HelpPlugin::HelpPlugin() : mainWindow_(nullptr)
+HelpPlugin::HelpPlugin() : app_(nullptr)
 {
 }
 
-void HelpPlugin::initialize(MainWindow *mainWindow)
+void HelpPlugin::initialize(Application *app)
 {
-    mainWindow_ = mainWindow;
+    app_ = app;
 
-    mainWindow_->createAction(&aboutAction_,
+    app_->createAction(&aboutAction_,
                               "Help",
                               "",
                               tr("About 3D Forest"),
@@ -55,8 +55,8 @@ void HelpPlugin::initialize(MainWindow *mainWindow)
 void HelpPlugin::slotAbout()
 {
     QMessageBox::about(
-        mainWindow_,
-        tr("About 3D Forest, version ") + MainWindow::APPLICATION_VERSION,
+        app_,
+        tr("About 3D Forest, version ") + Application::APPLICATION_VERSION,
         tr("3D Forest is software for analysis, processing, and visualization"
            " of Lidar point clouds, mainly focused on forest environment.\n"
            "\n"

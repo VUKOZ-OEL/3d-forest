@@ -21,19 +21,19 @@
 
 // Include 3D Forest.
 #include <FilterFilesWidget.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QPushButton>
+#include <HBoxLayout>
+#include <Label>
+#include <PushButton>
 #include <QToolBar>
 #include <QToolButton>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QTreeWidgetItemIterator>
-#include <QVBoxLayout>
+#include <VBoxLayout>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterFilesWidget"
@@ -42,8 +42,8 @@
 
 #define ICON(name) (ThemeIcon(":/FilterFilesResources/", name))
 
-FilterFilesWidget::FilterFilesWidget(MainWindow *mainWindow)
-    : mainWindow_(mainWindow)
+FilterFilesWidget::FilterFilesWidget(Application *app)
+    : app_(app)
 {
     // Table.
     tree_ = new QTreeWidget();
@@ -51,14 +51,14 @@ FilterFilesWidget::FilterFilesWidget(MainWindow *mainWindow)
     tree_->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     // Tool bar buttons.
-    mainWindow_->createToolButton(&addButton_,
+    app_->createToolButton(&addButton_,
                                   tr("Add"),
                                   tr("Add new data set"),
                                   THEME_ICON("add"),
                                   this,
                                   SLOT(slotAdd()));
 
-    mainWindow_->createToolButton(&deleteButton_,
+    app_->createToolButton(&deleteButton_,
                                   tr("Remove"),
                                   tr("Remove selected data set"),
                                   THEME_ICON("remove"),
@@ -66,7 +66,7 @@ FilterFilesWidget::FilterFilesWidget(MainWindow *mainWindow)
                                   SLOT(slotDelete()));
     deleteButton_->setEnabled(false);
 
-    mainWindow_->createToolButton(&showButton_,
+    app_->createToolButton(&showButton_,
                                   tr("Show"),
                                   tr("Make selected data sets visible"),
                                   THEME_ICON("eye"),
@@ -74,7 +74,7 @@ FilterFilesWidget::FilterFilesWidget(MainWindow *mainWindow)
                                   SLOT(slotShow()));
     showButton_->setEnabled(false);
 
-    mainWindow_->createToolButton(&hideButton_,
+    app_->createToolButton(&hideButton_,
                                   tr("Hide"),
                                   tr("Hide selected data sets"),
                                   THEME_ICON("hide"),
@@ -82,21 +82,21 @@ FilterFilesWidget::FilterFilesWidget(MainWindow *mainWindow)
                                   SLOT(slotHide()));
     hideButton_->setEnabled(false);
 
-    mainWindow_->createToolButton(&selectAllButton_,
+    app_->createToolButton(&selectAllButton_,
                                   tr("Select all"),
                                   tr("Select all"),
                                   THEME_ICON("select-all"),
                                   this,
                                   SLOT(slotSelectAll()));
 
-    mainWindow_->createToolButton(&selectInvertButton_,
+    app_->createToolButton(&selectInvertButton_,
                                   tr("Invert"),
                                   tr("Invert selection"),
                                   THEME_ICON("select-invert"),
                                   this,
                                   SLOT(slotSelectInvert()));
 
-    mainWindow_->createToolButton(&selectNoneButton_,
+    app_->createToolButton(&selectNoneButton_,
                                   tr("Select none"),
                                   tr("Select none"),
                                   THEME_ICON("select-none"),
@@ -113,10 +113,10 @@ FilterFilesWidget::FilterFilesWidget(MainWindow *mainWindow)
     toolBar->addWidget(selectAllButton_);
     toolBar->addWidget(selectInvertButton_);
     toolBar->addWidget(selectNoneButton_);
-    toolBar->setIconSize(QSize(MainWindow::ICON_SIZE, MainWindow::ICON_SIZE));
+    toolBar->setIconSize(Size(Application::ICON_SIZE, Application::ICON_SIZE));
 
     // Layout.
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(toolBar);
     mainLayout->addWidget(tree_);
@@ -125,28 +125,28 @@ FilterFilesWidget::FilterFilesWidget(MainWindow *mainWindow)
 
     // Data.
     updatesEnabled_ = true;
-    connect(mainWindow_,
-            SIGNAL(signalUpdate(void *, const QSet<Editor::Type> &)),
-            this,
-            SLOT(slotUpdate(void *, const QSet<Editor::Type> &)));
+    app_->signalUpdate.connect([this](void *sender, const std::set<Editor::Type> &target)
+    {
+        slotUpdate(sender, target);
+    });
 
-    slotUpdate(nullptr, QSet<Editor::Type>());
+    slotUpdate(nullptr, std::set<Editor::Type>());
 }
 
 void FilterFilesWidget::slotUpdate(void *sender,
-                                   const QSet<Editor::Type> &target)
+                                   const std::set<Editor::Type> &target)
 {
     if (sender == this)
     {
         return;
     }
 
-    if (target.empty() || target.contains(Editor::TYPE_DATA_SET))
+    if (target.empty() || target.count(Editor::TYPE_DATA_SET))
     {
         LOG_DEBUG_UPDATE(<< "Input datasets.");
 
-        setDatasets(mainWindow_->editor().datasets(),
-                    mainWindow_->editor().datasetsFilter());
+        setDatasets(app_->editor().datasets(),
+                    app_->editor().datasetsFilter());
     }
 }
 
@@ -154,11 +154,11 @@ void FilterFilesWidget::dataChanged()
 {
     LOG_DEBUG_UPDATE(<< "Output datasets.");
 
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setDatasets(datasets_);
-    mainWindow_->editor().setDatasetsFilter(filter_);
-    mainWindow_->updateData();
-    mainWindow_->update(this, {Editor::TYPE_DATA_SET}, Page::STATE_READ);
+    app_->suspendThreads();
+    app_->editor().setDatasets(datasets_);
+    app_->editor().setDatasetsFilter(filter_);
+    app_->updateData();
+    app_->update(this, {Editor::TYPE_DATA_SET}, Page::STATE_READ);
 }
 
 void FilterFilesWidget::filterChanged()
@@ -166,9 +166,9 @@ void FilterFilesWidget::filterChanged()
     LOG_DEBUG_UPDATE(<< "Output datasets filter <" << filter_.enabled()
                      << ">.");
 
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setDatasetsFilter(filter_);
-    mainWindow_->updateFilter();
+    app_->suspendThreads();
+    app_->editor().setDatasetsFilter(filter_);
+    app_->updateFilter();
 }
 
 void FilterFilesWidget::setFilterEnabled(bool b)
@@ -218,7 +218,7 @@ void FilterFilesWidget::setDatasets(const Datasets &datasets,
 
 void FilterFilesWidget::slotAdd()
 {
-    mainWindow_->importFile();
+    app_->importFile();
 }
 
 void FilterFilesWidget::slotDelete()
@@ -430,7 +430,7 @@ void FilterFilesWidget::addTreeItem(size_t index)
     // Color legend.
     const Vector3<double> &rgb = datasets_.color(index);
 
-    QColor color;
+    Color color;
     color.setRedF(static_cast<float>(rgb[0]));
     color.setGreenF(static_cast<float>(rgb[1]));
     color.setBlueF(static_cast<float>(rgb[2]));

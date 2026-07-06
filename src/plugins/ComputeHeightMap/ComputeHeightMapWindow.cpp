@@ -22,12 +22,12 @@
 // Include 3D Forest.
 #include <ComputeHeightMapWidget.hpp>
 #include <ComputeHeightMapWindow.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
 #include <QCloseEvent>
-#include <QVBoxLayout>
+#include <VBoxLayout>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeHeightMapWindow"
@@ -36,25 +36,25 @@
 #define ICON(name) (ThemeIcon(":/ComputeHeightMapResources/", name))
 
 ComputeHeightMapWindow::ComputeHeightMapWindow(
-    MainWindow *mainWindow,
+    Application *app,
     ComputeHeightMapModifier *modifier)
-    : QDialog(mainWindow),
+    : Dialog(app),
       widget_(nullptr)
 {
     LOG_DEBUG(<< "Create.");
 
     // Widget.
-    widget_ = new ComputeHeightMapWidget(mainWindow, modifier);
+    widget_ = new ComputeHeightMapWidget(app, modifier);
 
     // Main layout.
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->addWidget(widget_);
     mainLayout->addStretch();
 
     // Dialog.
     setLayout(mainLayout);
     setWindowTitle(tr("Compute Height Map"));
-    setWindowIcon(ICON("height-map").icon());
+    setWindowIcon(ICON("height-map"));
     setMaximumHeight(height());
     setModal(false);
 }

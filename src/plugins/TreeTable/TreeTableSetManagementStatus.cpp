@@ -21,7 +21,7 @@
 
 // Include 3D Forest.
 #include <InputComboBoxDialog.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <TreeTableSetManagementStatus.hpp>
 
 // Include Qt.
@@ -36,9 +36,9 @@
 #include <Log.hpp>
 
 TreeTableSetManagementStatus::TreeTableSetManagementStatus(
-    MainWindow *mainWindow,
+    Application *app,
     QMenu *contextMenu)
-    : mainWindow_(mainWindow),
+    : app_(app),
       contextMenu_(contextMenu),
       menu_(nullptr)
 {
@@ -50,7 +50,7 @@ void TreeTableSetManagementStatus::create()
     menu_ = new QMenu("Set Management Status", contextMenu_);
 
     // Set dialog items.
-    Editor *editor = &mainWindow_->editor();
+    Editor *editor = &app_->editor();
     const ManagementStatusList &statusList = editor->managementStatusList();
     for (size_t i = 0; i < statusList.size(); i++)
     {
@@ -78,7 +78,7 @@ void TreeTableSetManagementStatus::runAction(QAction *selectedAction,
     LOG_DEBUG(<< "Start setting management status values.");
 
     size_t newManagementStatusId = it->second;
-    Editor *editor = &mainWindow_->editor();
+    Editor *editor = &app_->editor();
     Segments segments = editor->segments();
     for (const auto &id : idList)
     {
@@ -91,13 +91,13 @@ void TreeTableSetManagementStatus::runAction(QAction *selectedAction,
     }
 
     editor->setSegments(segments);
-    mainWindow_->update(this,
+    app_->update(this,
                         {Editor::TYPE_SEGMENT, Editor::TYPE_MANAGEMENT_STATUS});
 
     LOG_DEBUG(<< "Finished setting management status values.");
 }
 
-void TreeTableSetManagementStatus::run(MainWindow *mainWindow,
+void TreeTableSetManagementStatus::run(Application *app,
                                        std::unordered_set<size_t> idList)
 {
     LOG_DEBUG(<< "Start setting management status values.");
@@ -105,9 +105,9 @@ void TreeTableSetManagementStatus::run(MainWindow *mainWindow,
     size_t newManagementStatusId = 0;
 
     // Editor.
-    mainWindow->suspendThreads();
+    app->suspendThreads();
 
-    Editor *editor = &mainWindow->editor();
+    Editor *editor = &app->editor();
 
     // Input.
     InputComboBoxDialog dialog;
@@ -124,7 +124,7 @@ void TreeTableSetManagementStatus::run(MainWindow *mainWindow,
     }
 
     // Open the dialog.
-    if (dialog.exec() == QDialog::Accepted)
+    if (dialog.exec() == Dialog::Accepted)
     {
         // Run.
         size_t index = static_cast<size_t>(dialog.currentIndex());
@@ -152,7 +152,7 @@ void TreeTableSetManagementStatus::run(MainWindow *mainWindow,
     }
 
     editor->setSegments(segments);
-    mainWindow->update(nullptr,
+    app->update(nullptr,
                        {Editor::TYPE_SEGMENT, Editor::TYPE_MANAGEMENT_STATUS});
 
     LOG_DEBUG(<< "Finished setting management status values.");

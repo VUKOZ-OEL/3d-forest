@@ -17,20 +17,20 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Point.cpp */
+/** @file Point3.cpp */
 
 // Include std.
 #include <cstring>
 
 // Include 3D Forest.
 #include <Endian.hpp>
-#include <Point.hpp>
+#include <Point3.hpp>
 
 // Include local.
-#define LOG_MODULE_NAME "Point"
+#define LOG_MODULE_NAME "Point3"
 #include <Log.hpp>
 
-void Point::IO::read(const uint8_t *buffer, Point &point)
+void Point3::IO::read(const uint8_t *buffer, Point3 &point)
 {
     point.x = ltohd(&buffer[0]);
     point.y = ltohd(&buffer[8]);
@@ -43,7 +43,7 @@ void Point::IO::read(const uint8_t *buffer, Point &point)
     point.status = ltoh32(&buffer[56]);
 }
 
-void Point::IO::write(const Point &point, uint8_t *buffer)
+void Point3::IO::write(const Point3 &point, uint8_t *buffer)
 {
     htold(&buffer[0], point.x);
     htold(&buffer[8], point.y);
@@ -56,6 +56,6 @@ void Point::IO::write(const Point &point, uint8_t *buffer)
     htol32(&buffer[56], point.status);
 }
 
-Point::Point(double x_, double y_, double z_) : x(x_), y(y_), z(z_)
+Point3::Point3(double x_, double y_, double z_) : x(x_), y(y_), z(z_)
 {
 }

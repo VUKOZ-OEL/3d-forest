@@ -23,7 +23,7 @@
 #define TREE_SETTINGS_PLUGIN_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
+#include <Plugin.hpp>
 class TreeSettingsWindow;
 
 #if defined(_MSC_VER)
@@ -37,24 +37,26 @@ class TreeSettingsWindow;
 #endif
 
 /** Tree Settings Plugin. */
-class EXPORT_VIEW_SETTINGS_PLUGIN TreeSettingsPlugin : public QObject,
-                                                       public PluginInterface
+class TreeSettingsPlugin : 
+                                                       public Plugin
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
     TreeSettingsPlugin();
 
-    virtual void initialize(MainWindow *mainWindow);
+    const char *name() const override { return "TreeSettingsPlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
-public slots:
     void slotPlugin();
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
     TreeSettingsWindow *pluginWindow_;
 };
+
+extern "C" EXPORT_VIEW_SETTINGS_PLUGIN Plugin *createPlugin()
+{
+    return new TreeSettingsPlugin();
+}
 
 #endif /* TREE_SETTINGS_PLUGIN_HPP */

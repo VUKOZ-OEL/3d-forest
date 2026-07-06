@@ -25,7 +25,7 @@
 // Include Std.
 
 // Include 3D Forest.
-class MainWindow;
+class Application;
 
 // Include Qt.
 #include <QObject>
@@ -39,10 +39,10 @@ class QWebEngineView;
 /** External 3d-Marteloscope Runner. */
 class External3dMarteloscopeRunner : public QObject
 {
-    Q_OBJECT
+
 
 public:
-    External3dMarteloscopeRunner(MainWindow *mainWindow);
+    External3dMarteloscopeRunner(Application *app);
     ~External3dMarteloscopeRunner();
 
     void start(const std::string &projectPath, int startPort = 8501);
@@ -61,7 +61,7 @@ private:
                const QString &projectPath,
                int startPort);
 
-    MainWindow *mainWindow_ = nullptr;
+    Application *app_ = nullptr;
 
     QPointer<QProcess> process_;
     int port_ = -1;

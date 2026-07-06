@@ -23,18 +23,18 @@
 #define UNITS_SETTINGS_WINDOW_HPP
 
 // Include 3D Forest.
-class MainWindow;
+class Application;
 
 // Include Qt.
-#include <QDockWidget>
+#include <DockWidget>
 
 /** Units Settings Window. */
-class UnitsSettingsWindow : public QDockWidget
+class UnitsSettingsWindow : public DockWidget
 {
-    Q_OBJECT
+
 
 public:
-    UnitsSettingsWindow(MainWindow *mainWindow);
+    UnitsSettingsWindow(Application *app);
 };
 
 #endif /* UNITS_SETTINGS_WINDOW_HPP */

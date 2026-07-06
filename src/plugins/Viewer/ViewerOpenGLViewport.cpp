@@ -22,7 +22,7 @@
 // Include 3D Forest.
 #include <Editor.hpp>
 #include <Geometry.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <Time.hpp>
 #include <ViewerOpenGL.hpp>
 #include <ViewerOpenGLManager.hpp>
@@ -46,10 +46,10 @@ static QVector3D fromVector3(const Vector3<double> &v)
                      static_cast<float>(v[2]));
 }
 
-ViewerOpenGLViewport::ViewerOpenGLViewport(QWidget *parent,
-                                           MainWindow *mainWindow)
+ViewerOpenGLViewport::ViewerOpenGLViewport(Widget *parent,
+                                           Application *app)
     : QOpenGLWidget(parent),
-      mainWindow_(mainWindow),
+      app_(app),
       manager_(nullptr),
       windowViewports_(nullptr),
       viewportId_(0),
@@ -83,7 +83,7 @@ void ViewerOpenGLViewport::showEvent(QShowEvent *event)
     QOpenGLWidget::showEvent(event);
 }
 
-void ViewerOpenGLViewport::hideEvent(QHideEvent *event)
+void ViewerOpenGLViewport::hideEvent(HideEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Hide.");
     QOpenGLWidget::hideEvent(event);
@@ -556,7 +556,7 @@ void ViewerOpenGLViewport::renderScene()
     {
         LOG_DEBUG_RENDER(<< "Request next rendering of viewport <"
                          << viewportId_ << ">.");
-        mainWindow_->requestRenderFromAnyThread();
+        app_->requestRenderFromAnyThread();
     }
 
     t2 = Time::realTime();
@@ -1216,9 +1216,9 @@ void ViewerOpenGLViewport::pickObject(const QPoint &p, bool ctrl)
     if (segments_.updateSelection(selectedIds, ctrl))
     {
         LOG_DEBUG(<< "Apply new selection to editor.");
-        mainWindow_->suspendThreads();
-        mainWindow_->editor().setSegments(segments_);
-        mainWindow_->update(this, {Editor::TYPE_SEGMENT}, Page::STATE_RENDER);
+        app_->suspendThreads();
+        app_->editor().setSegments(segments_);
+        app_->update(this, {Editor::TYPE_SEGMENT}, Page::STATE_RENDER);
     }
 }
 

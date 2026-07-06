@@ -23,11 +23,14 @@
 #include <Application.hpp>
 #include <ProjectFileAction.hpp>
 #include <ProjectFilePlugin.hpp>
+#include <ThemeIcon.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ProjectFilePlugin"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
+
+#define ICON(name) (ThemeIcon(":/ProjectFileResources/", name))
 
 ProjectFilePlugin::ProjectFilePlugin()
 {
@@ -41,9 +44,9 @@ void ProjectFilePlugin::initialize(Application *app)
     app_->createAction(&newProjectAction_,
                        "File",
                        "File Project",
-                       "New Project",
-                       "Create new project",
-                       "create",
+                       tr("New Project"),
+                       tr("Create new project"),
+                       ICON("create"),
                        this,
                        &ProjectFilePlugin::slotNewProject,
                        MAIN_WINDOW_MENU_FILE_PRIORITY,
@@ -52,9 +55,9 @@ void ProjectFilePlugin::initialize(Application *app)
     app_->createAction(&openProjectAction_,
                        "File",
                        "File Project",
-                       "Open Project...",
-                       "Open project",
-                       "opened-folder",
+                       tr("Open Project..."),
+                       tr("Open project"),
+                       ICON("opened-folder"),
                        this,
                        &ProjectFilePlugin::slotOpenProject,
                        MAIN_WINDOW_MENU_FILE_PRIORITY,
@@ -63,9 +66,9 @@ void ProjectFilePlugin::initialize(Application *app)
     app_->createAction(&saveProjectAction_,
                        "File",
                        "File Project",
-                       "Save Project",
-                       "Save project",
-                       "save",
+                       tr("Save Project"),
+                       tr("Save project"),
+                       ICON("save"),
                        this,
                        &ProjectFilePlugin::slotSaveProject,
                        MAIN_WINDOW_MENU_FILE_PRIORITY,
@@ -74,9 +77,9 @@ void ProjectFilePlugin::initialize(Application *app)
     app_->createAction(&saveAsProjectAction_,
                        "File",
                        "File Project",
-                       "Save Project &As...",
-                       "Save project as",
-                       "save-as",
+                       tr("Save Project &As..."),
+                       tr("Save project as"),
+                       ICON("save-as"),
                        this,
                        &ProjectFilePlugin::slotSaveAsProject,
                        MAIN_WINDOW_MENU_FILE_PRIORITY,
@@ -85,9 +88,9 @@ void ProjectFilePlugin::initialize(Application *app)
     app_->createAction(&reloadProjectAction_,
                        "File",
                        "File Project",
-                       "Reload Project",
-                       "Reload Project",
-                       "reload",
+                       tr("Reload Project"),
+                       tr("Reload Project"),
+                       ICON("reload"),
                        this,
                        &ProjectFilePlugin::slotReloadProject,
                        MAIN_WINDOW_MENU_FILE_PRIORITY,

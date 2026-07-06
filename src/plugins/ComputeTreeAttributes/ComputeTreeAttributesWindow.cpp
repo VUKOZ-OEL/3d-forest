@@ -22,11 +22,11 @@
 // Include 3D Forest.
 #include <ComputeTreeAttributesWidget.hpp>
 #include <ComputeTreeAttributesWindow.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
-#include <QVBoxLayout>
+#include <VBoxLayout>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeTreeAttributesWindow"
@@ -35,24 +35,24 @@
 
 #define ICON(name) (ThemeIcon(":/ComputeTreeAttributesResources/", name))
 
-ComputeTreeAttributesWindow::ComputeTreeAttributesWindow(MainWindow *mainWindow)
-    : QDialog(mainWindow),
+ComputeTreeAttributesWindow::ComputeTreeAttributesWindow(Application *app)
+    : Dialog(app),
       widget_(nullptr)
 {
     LOG_DEBUG(<< "Create.");
 
     // Widget.
-    widget_ = new ComputeTreeAttributesWidget(mainWindow);
+    widget_ = new ComputeTreeAttributesWidget(app);
 
     // Main layout.
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->addWidget(widget_);
     mainLayout->addStretch();
 
     // Dialog.
     setLayout(mainLayout);
     setWindowTitle(tr("Compute Tree Attributes"));
-    setWindowIcon(ICON("tree-attributes").icon());
+    setWindowIcon(ICON("tree-attributes"));
     setMaximumHeight(height());
     setModal(false);
 }

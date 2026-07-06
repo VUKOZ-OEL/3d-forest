@@ -21,7 +21,7 @@
 
 // Include 3D Forest.
 #include <InputComboBoxDialog.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <TreeTableSetSpecies.hpp>
 
 // Include Qt.
@@ -35,9 +35,9 @@
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-TreeTableSetSpecies::TreeTableSetSpecies(MainWindow *mainWindow,
+TreeTableSetSpecies::TreeTableSetSpecies(Application *app,
                                          QMenu *contextMenu)
-    : mainWindow_(mainWindow),
+    : app_(app),
       contextMenu_(contextMenu),
       menu_(nullptr)
 {
@@ -49,7 +49,7 @@ void TreeTableSetSpecies::create()
     menu_ = new QMenu("Set Species", contextMenu_);
 
     // Set dialog items.
-    Editor *editor = &mainWindow_->editor();
+    Editor *editor = &app_->editor();
     const SpeciesList &speciesList = editor->speciesList();
     for (size_t i = 0; i < speciesList.size(); i++)
     {
@@ -77,7 +77,7 @@ void TreeTableSetSpecies::runAction(QAction *selectedAction,
     LOG_DEBUG(<< "Start setting species values.");
 
     size_t newSpeciesId = it->second;
-    Editor *editor = &mainWindow_->editor();
+    Editor *editor = &app_->editor();
     Segments segments = editor->segments();
     for (const auto &id : idList)
     {
@@ -90,12 +90,12 @@ void TreeTableSetSpecies::runAction(QAction *selectedAction,
     }
 
     editor->setSegments(segments);
-    mainWindow_->update(this, {Editor::TYPE_SEGMENT, Editor::TYPE_SPECIES});
+    app_->update(this, {Editor::TYPE_SEGMENT, Editor::TYPE_SPECIES});
 
     LOG_DEBUG(<< "Finished setting species values.");
 }
 
-void TreeTableSetSpecies::run(MainWindow *mainWindow,
+void TreeTableSetSpecies::run(Application *app,
                               std::unordered_set<size_t> idList)
 {
     LOG_DEBUG(<< "Start setting species values.");
@@ -103,9 +103,9 @@ void TreeTableSetSpecies::run(MainWindow *mainWindow,
     size_t newSpeciesId = 0;
 
     // Editor.
-    mainWindow->suspendThreads();
+    app->suspendThreads();
 
-    Editor *editor = &mainWindow->editor();
+    Editor *editor = &app->editor();
 
     // Input.
     InputComboBoxDialog dialog;
@@ -122,7 +122,7 @@ void TreeTableSetSpecies::run(MainWindow *mainWindow,
     }
 
     // Open the dialog.
-    if (dialog.exec() == QDialog::Accepted)
+    if (dialog.exec() == Dialog::Accepted)
     {
         // Run.
         size_t index = static_cast<size_t>(dialog.currentIndex());
@@ -150,7 +150,7 @@ void TreeTableSetSpecies::run(MainWindow *mainWindow,
     }
 
     editor->setSegments(segments);
-    mainWindow->update(nullptr, {Editor::TYPE_SEGMENT, Editor::TYPE_SPECIES});
+    app->update(nullptr, {Editor::TYPE_SEGMENT, Editor::TYPE_SPECIES});
 
     LOG_DEBUG(<< "Finished setting species values.");
 }

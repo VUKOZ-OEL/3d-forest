@@ -22,7 +22,7 @@
 // Include 3D Forest.
 #include <ComputeDescriptorPlugin.hpp>
 #include <ComputeDescriptorWindow.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -32,23 +32,23 @@
 #define ICON(name) (ThemeIcon(":/ComputeDescriptorResources/", name))
 
 ComputeDescriptorPlugin::ComputeDescriptorPlugin()
-    : mainWindow_(nullptr),
+    : app_(nullptr),
       pluginWindow_(nullptr)
 {
 }
 
-void ComputeDescriptorPlugin::initialize(MainWindow *mainWindow)
+void ComputeDescriptorPlugin::initialize(Application *app)
 {
-    mainWindow_ = mainWindow;
+    app_ = app;
 
-    mainWindow_->createAction(nullptr,
+    app_->createAction(nullptr,
                               "Compute",
                               "Compute",
                               tr("Descriptor"),
                               tr("Compute descriptor of each point"),
                               ICON("descriptor"),
                               this,
-                              SLOT(slotPlugin()),
+                              &ComputeDescriptorPlugin::slotPlugin,
                               MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
 }
 
@@ -57,7 +57,7 @@ void ComputeDescriptorPlugin::slotPlugin()
     // Create GUI only when this plugin is used for the first time
     if (!pluginWindow_)
     {
-        pluginWindow_ = new ComputeDescriptorWindow(mainWindow_);
+        pluginWindow_ = new ComputeDescriptorWindow(app_);
     }
 
     pluginWindow_->show();

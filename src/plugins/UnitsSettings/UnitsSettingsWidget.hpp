@@ -28,26 +28,26 @@
 // Include 3D Forest.
 #include <Editor.hpp>
 #include <Settings.hpp>
-class MainWindow;
+class Application;
 class ColorSwitchWidget;
 
 // Include Qt.
-#include <QWidget>
-class QCheckBox;
+#include <Widget>
+class CheckBox;
 class QDoubleSpinBox;
 
 /** Units Settings Widget. */
-class UnitsSettingsWidget : public QWidget
+class UnitsSettingsWidget : public Widget
 {
-    Q_OBJECT
+
 
 public:
-    UnitsSettingsWidget(MainWindow *mainWindow);
+    UnitsSettingsWidget(Application *app);
 
-    QSize sizeHint() const override { return QSize(300, 150); }
+    Size sizeHint() const override { return Size(300, 150); }
 
-public slots:
-    void slotUpdate(void *sender, const QSet<Editor::Type> &target);
+
+    void slotUpdate(void *sender, const std::set<Editor::Type> &target);
 
 protected slots:
     void slotIntermediateLas(double v);
@@ -55,11 +55,11 @@ protected slots:
     void slotUserDefined(int v);
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
 
     QDoubleSpinBox *ppmLasSpinBox_;
     QDoubleSpinBox *ppmUserSpinBox_;
-    QCheckBox *userDefinedCheckBox_;
+    CheckBox *userDefinedCheckBox_;
 
     UnitsSettings settings_;
 

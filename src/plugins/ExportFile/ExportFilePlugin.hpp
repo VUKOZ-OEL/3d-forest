@@ -23,7 +23,7 @@
 #define EXPORT_FILE_PLUGIN_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
+#include <Plugin.hpp>
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestExportFilePlugin)
@@ -36,25 +36,27 @@
 #endif
 
 /** Export File Plugin. */
-class EXPORT_EXPORT_FILE_PLUGIN ExportFilePlugin : public QObject,
-                                                   public PluginInterface
+class ExportFilePlugin : 
+                                                   public Plugin
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
     ExportFilePlugin();
 
-    virtual void initialize(MainWindow *mainWindow);
+    const char *name() const override { return "ExportFilePlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
-public slots:
     void slotExportFile();
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
     QAction *exportFileAction_;
     QString fileName_;
 };
+
+extern "C" EXPORT_EXPORT_FILE_PLUGIN Plugin *createPlugin()
+{
+    return new ExportFilePlugin();
+}
 
 #endif /* EXPORT_FILE_PLUGIN_HPP */

@@ -22,23 +22,23 @@
 // Include 3D Forest.
 #include <ComputeHeightMapModifier.hpp>
 #include <ComputeHeightMapWidget.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 
 // Include Qt.
-#include <QCheckBox>
+#include <CheckBox>
 #include <QCloseEvent>
-#include <QComboBox>
+#include <ComboBox>
 #include <QCoreApplication>
 #include <QDebug>
-#include <QGridLayout>
-#include <QGroupBox>
-#include <QHBoxLayout>
-#include <QLabel>
+#include <GridLayout>
+#include <GroupBox>
+#include <HBoxLayout>
+#include <Label>
 #include <QMainWindow>
 #include <QProgressDialog>
-#include <QPushButton>
+#include <PushButton>
 #include <QSpinBox>
-#include <QVBoxLayout>
+#include <VBoxLayout>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeHeightMapWidget"
@@ -59,10 +59,10 @@
     PLUGIN_COMPUTE_HEIGHT_MAP_SOURCE_Z_POSITION
 
 ComputeHeightMapWidget::ComputeHeightMapWidget(
-    MainWindow *mainWindow,
+    Application *app,
     ComputeHeightMapModifier *modifier)
-    : QWidget(),
-      mainWindow_(mainWindow),
+    : Widget(),
+      app_(app),
       modifier_(modifier)
 {
     // Widgets colormap.
@@ -76,7 +76,7 @@ ComputeHeightMapWidget::ComputeHeightMapWidget(
             this,
             SLOT(colorCountChanged(int)));
 
-    colormapComboBox_ = new QComboBox;
+    colormapComboBox_ = new ComboBox;
     colormapComboBox_->addItem(PLUGIN_COMPUTE_HEIGHT_MAP_COLORMAP_MATLAB_JET);
     colormapComboBox_->addItem(PLUGIN_COMPUTE_HEIGHT_MAP_COLORMAP_VTK);
     colormapComboBox_->addItem(PLUGIN_COMPUTE_HEIGHT_MAP_COLORMAP_GRAY);
@@ -89,7 +89,7 @@ ComputeHeightMapWidget::ComputeHeightMapWidget(
             this,
             SLOT(colorCountChanged(int)));
 
-    sourceComboBox_ = new QComboBox;
+    sourceComboBox_ = new ComboBox;
     sourceComboBox_->addItem(PLUGIN_COMPUTE_HEIGHT_MAP_SOURCE_Z_POSITION);
     sourceComboBox_->addItem(PLUGIN_COMPUTE_HEIGHT_MAP_SOURCE_ELEVATION);
     sourceComboBox_->setCurrentText(PLUGIN_COMPUTE_HEIGHT_MAP_SOURCE_DEFAULT);
@@ -100,36 +100,36 @@ ComputeHeightMapWidget::ComputeHeightMapWidget(
             SLOT(sourceChanged(int)));
 
     // Widgets apply.
-    previewCheckBox_ = new QCheckBox;
+    previewCheckBox_ = new CheckBox;
     connect(previewCheckBox_,
             SIGNAL(stateChanged(int)),
             this,
             SLOT(previewChanged(int)));
     // previewCheckBox_->setChecked(true);
 
-    applyButton_ = new QPushButton(tr("Apply and save"));
+    applyButton_ = new PushButton(tr("Apply and save"));
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     applyButton_->setDisabled(true);
     connect(applyButton_, SIGNAL(clicked()), this, SLOT(apply()));
 
     // Layout.
-    QGridLayout *groupBoxLayout = new QGridLayout;
-    groupBoxLayout->addWidget(new QLabel(tr("N colors")), 0, 0);
+    GridLayout *groupBoxLayout = new GridLayout;
+    groupBoxLayout->addWidget(new Label(tr("N colors")), 0, 0);
     groupBoxLayout->addWidget(colorCountSpinBox_, 0, 1);
-    groupBoxLayout->addWidget(new QLabel(tr("Colormap")), 1, 0);
+    groupBoxLayout->addWidget(new Label(tr("Colormap")), 1, 0);
     groupBoxLayout->addWidget(colormapComboBox_, 1, 1);
-    groupBoxLayout->addWidget(new QLabel(tr("Source")), 2, 0);
+    groupBoxLayout->addWidget(new Label(tr("Source")), 2, 0);
     groupBoxLayout->addWidget(sourceComboBox_, 2, 1);
     groupBoxLayout->setColumnStretch(1, 1);
 
-    QHBoxLayout *hbox = new QHBoxLayout;
+    HBoxLayout *hbox = new HBoxLayout;
     hbox->addWidget(previewCheckBox_);
-    hbox->addWidget(new QLabel(tr("Preview")));
+    hbox->addWidget(new Label(tr("Preview")));
     hbox->addStretch();
     hbox->addWidget(applyButton_, 0, Qt::AlignRight);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->addLayout(groupBoxLayout);
     mainLayout->addSpacing(10);
     mainLayout->addLayout(hbox);
@@ -181,7 +181,7 @@ void ComputeHeightMapWidget::apply()
 {
     // Filter is active during processing.
     modifier_->setPreviewEnabled(true, false);
-    modifier_->apply(mainWindow_);
+    modifier_->apply(app_);
     modifier_->setPreviewEnabled(previewCheckBox_->isChecked(), true, true);
 }
 

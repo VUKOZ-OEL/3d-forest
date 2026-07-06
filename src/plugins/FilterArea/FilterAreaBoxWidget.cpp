@@ -22,21 +22,21 @@
 // Include 3D Forest.
 #include <DoubleRangeSliderWidget.hpp>
 #include <FilterAreaBoxWidget.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 
 // Include Qt.
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QVBoxLayout>
+#include <HBoxLayout>
+#include <PushButton>
+#include <VBoxLayout>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterAreaBoxWidget"
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-FilterAreaBoxWidget::FilterAreaBoxWidget(MainWindow *mainWindow)
-    : QWidget(mainWindow),
-      mainWindow_(mainWindow)
+FilterAreaBoxWidget::FilterAreaBoxWidget(Application *app)
+    : Widget(app),
+      app_(app)
 {
     LOG_DEBUG(<< "Start creating clip filter widget.");
 
@@ -87,7 +87,7 @@ FilterAreaBoxWidget::FilterAreaBoxWidget(MainWindow *mainWindow)
         100);
 
     // Layout.
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(rangeInput_[0]);
     mainLayout->addWidget(rangeInput_[1]);
@@ -97,30 +97,30 @@ FilterAreaBoxWidget::FilterAreaBoxWidget(MainWindow *mainWindow)
     setLayout(mainLayout);
 
     // Data.
-    connect(mainWindow_,
-            SIGNAL(signalUpdate(void *, const QSet<Editor::Type> &)),
-            this,
-            SLOT(slotUpdate(void *, const QSet<Editor::Type> &)));
+    app_->signalUpdate.connect([this](void *sender, const std::set<Editor::Type> &target)
+    {
+        slotUpdate(sender, target);
+    });
 
-    slotUpdate(nullptr, QSet<Editor::Type>());
+    slotUpdate(nullptr, std::set<Editor::Type>());
 
     LOG_DEBUG(<< "Finished creating clip filter widget.");
 }
 
 void FilterAreaBoxWidget::slotUpdate(void *sender,
-                                     const QSet<Editor::Type> &target)
+                                     const std::set<Editor::Type> &target)
 {
     if (sender == this)
     {
         return;
     }
 
-    if (target.empty() || target.contains(Editor::TYPE_CLIP_FILTER) ||
-        target.contains(Editor::TYPE_SETTINGS) ||
-        target.contains(Editor::TYPE_DATA_SET))
+    if (target.empty() || target.count(Editor::TYPE_CLIP_FILTER) ||
+        target.count(Editor::TYPE_SETTINGS) ||
+        target.count(Editor::TYPE_DATA_SET))
     {
         LOG_DEBUG_UPDATE(<< "Input clip box filter.");
-        setRegion(mainWindow_->editor().clipFilter());
+        setRegion(app_->editor().clipFilter());
     }
 }
 
@@ -131,7 +131,7 @@ void FilterAreaBoxWidget::setRegion(const Region &region)
     region_ = region;
 
     double ppm =
-        mainWindow_->editor().settings().unitsSettings().pointsPerMeter()[0];
+        app_->editor().settings().unitsSettings().pointsPerMeter()[0];
 
     for (size_t i = 0; i < 3; i++)
     {
@@ -163,9 +163,9 @@ void FilterAreaBoxWidget::filterChanged(bool final)
     region_.box.set(x1, y1, z1, x2, y2, z2);
     region_.shape = Region::Shape::BOX;
 
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setClipFilter(region_);
-    mainWindow_->updateFilter(this, final);
+    app_->suspendThreads();
+    app_->editor().setClipFilter(region_);
+    app_->updateFilter(this, final);
 }
 
 void FilterAreaBoxWidget::setFilterEnabled(bool b)
@@ -181,9 +181,9 @@ void FilterAreaBoxWidget::setFilterEnabled(bool b)
         region_.shape = Region::Shape::NONE;
     }
 
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setClipFilter(region_);
-    mainWindow_->updateFilter(this, true);
+    app_->suspendThreads();
+    app_->editor().setClipFilter(region_);
+    app_->updateFilter(this, true);
 }
 
 void FilterAreaBoxWidget::slotRangeIntermediateMinimumValue()
@@ -191,7 +191,7 @@ void FilterAreaBoxWidget::slotRangeIntermediateMinimumValue()
     LOG_DEBUG(<< "Minimum value changed.");
 
     double ppm =
-        mainWindow_->editor().settings().unitsSettings().pointsPerMeter()[0];
+        app_->editor().settings().unitsSettings().pointsPerMeter()[0];
 
     QObject *obj = sender();
     for (int i = 0; i < 3; i++)
@@ -212,7 +212,7 @@ void FilterAreaBoxWidget::slotRangeIntermediateMaximumValue()
     LOG_DEBUG(<< "Maximum value changed.");
 
     double ppm =
-        mainWindow_->editor().settings().unitsSettings().pointsPerMeter()[0];
+        app_->editor().settings().unitsSettings().pointsPerMeter()[0];
 
     QObject *obj = sender();
     for (int i = 0; i < 3; i++)
@@ -236,11 +236,11 @@ void FilterAreaBoxWidget::slotFinalValue()
 void FilterAreaBoxWidget::showEvent(QShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
-    QWidget::showEvent(event);
+    Widget::showEvent(event);
 }
 
-void FilterAreaBoxWidget::hideEvent(QHideEvent *event)
+void FilterAreaBoxWidget::hideEvent(HideEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Hide event.");
-    QWidget::hideEvent(event);
+    Widget::hideEvent(event);
 }

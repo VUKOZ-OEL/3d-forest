@@ -23,26 +23,26 @@
 #define FILTER_TREES_WINDOW_HPP
 
 // Include 3D Forest.
-class MainWindow;
+class Application;
 class FilterTreesWidget;
 
 // Include Qt.
-#include <QDockWidget>
+#include <DockWidget>
 class QCloseEvent;
 
 /** Filter Trees Window. */
-class FilterTreesWindow : public QDockWidget
+class FilterTreesWindow : public DockWidget
 {
-    Q_OBJECT
+
 
 public:
-    FilterTreesWindow(MainWindow *mainWindow);
+    FilterTreesWindow(Application *app);
 
 protected:
     FilterTreesWidget *widget_;
 
     void showEvent(QShowEvent *event) override;
-    void hideEvent(QHideEvent *event) override;
+    void hideEvent(HideEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
 };
 

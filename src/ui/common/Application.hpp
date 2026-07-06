@@ -33,10 +33,15 @@
 #include <PluginManager.hpp>
 #include <RenderThread.hpp>
 #include <ThreadCallbackInterface.hpp>
+#include <ThemeIcon.hpp>
+#include <EventQueue.hpp>
+#include <DockWidget.hpp>
 
 // Include local.
 #include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
+
+#define tr(x) (x)
 
 #define MAIN_WINDOW_MENU_FILE_PRIORITY 10
 #define MAIN_WINDOW_MENU_EDIT_PRIORITY 20
@@ -72,7 +77,7 @@ public:
                       const std::string &toolBarTitle,
                       const std::string &text,
                       const std::string &toolTip,
-                      const std::string &iconName,
+                      const ThemeIcon &icon,
                       std::function<void()> cb,
                       int menuPriority = -1,
                       int menuItemPriority = -1);
@@ -83,7 +88,7 @@ public:
                       const std::string &toolBarTitle,
                       const std::string &text,
                       const std::string &toolTip,
-                      const std::string &iconName,
+                      const ThemeIcon &icon,
                       T *object,
                       void (T::*method)(),
                       int menuPriority = -1,
@@ -95,7 +100,7 @@ public:
             toolBarTitle,
             text,
             toolTip,
-            iconName,
+            icon,
             [object, method] { (object->*method)(); },
             menuPriority,
             menuItemPriority);
@@ -108,11 +113,16 @@ public:
     //                       const QObject *receiver,
     //                       const char *member);
 
+    void setCentralWidget(Widget *widget);
+    void addDockWidget(int area, DockWidget *widget);
     void hideToolBar(const std::string &toolBarTitle);
 
     void suspendThreads();
     void resumeThreads();
     virtual void threadProgress(bool finished) override;
+
+    void post(std::function<void()> fn);
+    virtual void processEvents();
 
     void emitUpdate(void *sender, const std::set<Editor::Type> &target);
     void update(void *sender,
@@ -148,7 +158,8 @@ public:
     void slotRenderViewports();
 
     /// Connect to this signal in your plugin to be notified about data changes.
-    void signalUpdate(void *sender, const std::set<Editor::Type> &target);
+    // void signalUpdate(void *sender, const std::set<Editor::Type> &target);
+    Signal<void*, std::set<Editor::Type>> signalUpdate;
 
     // bool event(QEvent *e) override;
     // void paintEvent(QPaintEvent *event) override;
@@ -166,6 +177,7 @@ private:
     PluginManager pluginManager_;
 
     MenuBar menuBar_;
+    EventQueue eventQueue_;
 
     void createMenu();
 };

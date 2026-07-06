@@ -23,19 +23,19 @@
 #define COMPUTE_TREE_ATTRIBUTES_WINDOW_HPP
 
 // Include 3D Forest.
-class MainWindow;
+class Application;
 class ComputeTreeAttributesWidget;
 
 // Include Qt.
-#include <QDialog>
+#include <Dialog>
 
 /** Compute Tree Attributes Window. */
-class ComputeTreeAttributesWindow : public QDialog
+class ComputeTreeAttributesWindow : public Dialog
 {
-    Q_OBJECT
+
 
 public:
-    ComputeTreeAttributesWindow(MainWindow *mainWindow);
+    ComputeTreeAttributesWindow(Application *app);
     ~ComputeTreeAttributesWindow();
 
 private:

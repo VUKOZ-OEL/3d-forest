@@ -20,7 +20,7 @@
 /** @file TreeSettingsWindow.cpp */
 
 // Include 3D Forest.
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 #include <TreeSettingsWidget.hpp>
 #include <TreeSettingsWindow.hpp>
@@ -31,17 +31,17 @@
 
 #define ICON(name) (ThemeIcon(":/TreeSettingsResources/", name))
 
-TreeSettingsWindow::TreeSettingsWindow(MainWindow *mainWindow)
-    : QDockWidget(mainWindow)
+TreeSettingsWindow::TreeSettingsWindow(Application *app)
+    : DockWidget(app)
 {
     // Widget.
-    TreeSettingsWidget *widget = new TreeSettingsWidget(mainWindow);
+    TreeSettingsWidget *widget = new TreeSettingsWidget(app);
 
     // Dock.
     setWidget(widget);
     setFixedHeight(widget->sizeHint().height());
     setWindowTitle(tr("Tree Settings"));
-    setWindowIcon(ICON("tree-settings").icon());
+    setWindowIcon(ICON("tree-settings"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
+    app->addDockWidget(Qt::RightDockWidgetArea, this);
 }

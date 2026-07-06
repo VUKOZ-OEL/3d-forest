@@ -21,16 +21,16 @@
 
 // Include 3D Forest.
 #include <ComputeCrownVolumeWidget.hpp>
-#include <DoubleSliderWidget.hpp>
+#include <DoubleSlider.hpp>
 #include <InfoDialog.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ProgressDialog.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QVBoxLayout>
+#include <HBoxLayout>
+#include <PushButton>
+#include <VBoxLayout>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeCrownVolumeWidget"
@@ -39,15 +39,15 @@
 
 #define ICON(name) (ThemeIcon(":/ComputeCrownVolumeResources/", name))
 
-ComputeCrownVolumeWidget::ComputeCrownVolumeWidget(MainWindow *mainWindow)
-    : QWidget(),
-      mainWindow_(mainWindow),
-      action_(&mainWindow->editor())
+ComputeCrownVolumeWidget::ComputeCrownVolumeWidget(Application *app)
+    : Widget(),
+      app_(app),
+      action_(&app->editor())
 {
     LOG_DEBUG(<< "Create.");
 
     // Voxel size.
-    DoubleSliderWidget::create(
+    DoubleSlider::create(
         voxelSizeSlider_,
         this,
         nullptr,
@@ -64,23 +64,23 @@ ComputeCrownVolumeWidget::ComputeCrownVolumeWidget(MainWindow *mainWindow)
     voxelSizeSlider_->setTargetProduct(1.0);
 
     // Settings layout.
-    QVBoxLayout *settingsLayout = new QVBoxLayout;
+    VBoxLayout *settingsLayout = new VBoxLayout;
     settingsLayout->addWidget(voxelSizeSlider_);
     settingsLayout->addStretch();
 
     // Buttons.
-    applyButton_ = new QPushButton(tr("Run"));
-    applyButton_->setIcon(THEME_ICON("run").icon());
+    applyButton_ = new PushButton(tr("Run"));
+    applyButton_->setIcon(THEME_ICON("run"));
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
 
     // Buttons layout.
-    QHBoxLayout *buttonsLayout = new QHBoxLayout;
+    HBoxLayout *buttonsLayout = new HBoxLayout;
     buttonsLayout->addStretch();
     buttonsLayout->addWidget(applyButton_);
 
     // Main layout.
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->addLayout(settingsLayout);
     mainLayout->addSpacing(10);
     mainLayout->addLayout(buttonsLayout);
@@ -90,18 +90,18 @@ ComputeCrownVolumeWidget::ComputeCrownVolumeWidget(MainWindow *mainWindow)
     setLayout(mainLayout);
 }
 
-void ComputeCrownVolumeWidget::hideEvent(QHideEvent *event)
+void ComputeCrownVolumeWidget::hideEvent(HideEvent *event)
 {
     LOG_DEBUG(<< "Hide.");
     action_.clear();
-    QWidget::hideEvent(event);
+    Widget::hideEvent(event);
 }
 
 void ComputeCrownVolumeWidget::slotApply()
 {
     LOG_DEBUG(<< "Apply.");
 
-    mainWindow_->suspendThreads();
+    app_->suspendThreads();
 
     parameters_.voxelSize = voxelSizeSlider_->value();
 
@@ -109,16 +109,16 @@ void ComputeCrownVolumeWidget::slotApply()
     {
         action_.start(parameters_);
 
-        ProgressDialog::run(mainWindow_, "Computing Volume", &action_);
+        ProgressDialog::run(app_, "Computing Volume", &action_);
     }
     catch (std::exception &e)
     {
-        mainWindow_->showError(e.what());
+        app_->showError(e.what());
     }
     catch (...)
     {
-        mainWindow_->showError("Unknown error");
+        app_->showError("Unknown error");
     }
 
-    mainWindow_->update(this, {Editor::TYPE_SEGMENT});
+    app_->update(this, {Editor::TYPE_SEGMENT});
 }

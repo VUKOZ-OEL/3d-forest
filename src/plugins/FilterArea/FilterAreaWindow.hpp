@@ -23,26 +23,26 @@
 #define FILTER_AREA_WINDOW_HPP
 
 // Include 3D Forest.
-class MainWindow;
+class Application;
 class FilterAreaBoxWidget;
 
 // Include Qt.
-#include <QDockWidget>
+#include <DockWidget>
 class QCloseEvent;
 
 /** Filter Area Window. */
-class FilterAreaWindow : public QDockWidget
+class FilterAreaWindow : public DockWidget
 {
-    Q_OBJECT
+
 
 public:
-    FilterAreaWindow(MainWindow *mainWindow);
+    FilterAreaWindow(Application *app);
 
 protected:
     FilterAreaBoxWidget *widget_;
 
     void showEvent(QShowEvent *event) override;
-    void hideEvent(QHideEvent *event) override;
+    void hideEvent(HideEvent *event) override;
 
     void closeEvent(QCloseEvent *event) override;
 };

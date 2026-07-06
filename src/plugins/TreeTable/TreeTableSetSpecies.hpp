@@ -27,7 +27,7 @@
 #include <unordered_set>
 
 // Include 3D Forest.
-class MainWindow;
+class Application;
 
 // Include Qt.
 class QAction;
@@ -37,14 +37,14 @@ class QMenu;
 class TreeTableSetSpecies
 {
 public:
-    TreeTableSetSpecies(MainWindow *mainWindow, QMenu *contextMenu);
+    TreeTableSetSpecies(Application *app, QMenu *contextMenu);
 
     void runAction(QAction *selectedAction, std::unordered_set<size_t> idList);
 
-    static void run(MainWindow *mainWindow, std::unordered_set<size_t> idList);
+    static void run(Application *app, std::unordered_set<size_t> idList);
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
     QMenu *contextMenu_;
     QMenu *menu_;
     std::map<QAction *, size_t> actions_;

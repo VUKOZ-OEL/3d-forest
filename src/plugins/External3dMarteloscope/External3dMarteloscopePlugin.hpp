@@ -23,7 +23,7 @@
 #define EXTERNAL_3D_MARTELOSCOPE_PLUGIN_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
+#include <Plugin.hpp>
 
 class External3dMarteloscopeRunner;
 
@@ -38,26 +38,28 @@ class External3dMarteloscopeRunner;
 #endif
 
 /** External 3d-Marteloscope Plugin. */
-class EXPORT_EXTERNAL_3D_MARTELOSCOPE_PLUGIN External3dMarteloscopePlugin
-    : public QObject,
-      public PluginInterface
+class External3dMarteloscopePlugin
+    : 
+      public Plugin
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
     External3dMarteloscopePlugin();
     ~External3dMarteloscopePlugin();
 
-    virtual void initialize(MainWindow *mainWindow);
+    const char *name() const override { return "External3dMarteloscopePlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
-public slots:
     void slotPlugin();
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
     External3dMarteloscopeRunner *runner_;
 };
+
+extern "C" EXPORT_EXTERNAL_3D_MARTELOSCOPE_PLUGIN Plugin *createPlugin()
+{
+    return new External3dMarteloscopePlugin();
+}
 
 #endif /* EXTERNAL_3D_MARTELOSCOPE_PLUGIN_HPP */

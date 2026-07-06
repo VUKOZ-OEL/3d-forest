@@ -23,9 +23,10 @@
 #define VIEWER_PLUGIN_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
+#include <Plugin.hpp>
 #include <ViewerInterface.hpp>
 #include <ViewerViewports.hpp>
+class Action;
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestViewerPlugin)
@@ -38,18 +39,16 @@
 #endif
 
 /** Viewer Plugin. */
-class EXPORT_VIEWER_PLUGIN ViewerPlugin : public QObject,
-                                          public PluginInterface,
+class ViewerPlugin : 
+                                          public Plugin,
                                           public ViewerInterface
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
     ViewerPlugin();
 
-    virtual void initialize(MainWindow *mainWindow);
+    const char *name() const override { return "ViewerPlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
     virtual std::vector<Camera> camera(size_t viewportId) const;
     virtual std::vector<Camera> camera() const;
@@ -57,7 +56,7 @@ public:
     virtual void updateScene(Editor *editor);
     virtual void resetScene(Editor *editor, bool resetView);
 
-public slots:
+
     void slotViewOrthographic();
     void slotViewPerspective();
     void slotView2d();
@@ -78,28 +77,33 @@ public slots:
     void slotViewLayout(ViewerViewports::ViewLayout layout);
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
 
-    QAction *viewOrthographicAction_;
-    QAction *viewPerspectiveAction_;
-    QAction *view2dAction_;
+    Action *viewOrthographicAction_;
+    Action *viewPerspectiveAction_;
+    Action *view2dAction_;
 
-    QAction *viewTopAction_;
-    QAction *viewFrontAction_;
-    QAction *viewRightAction_;
-    QAction *view3dAction_;
+    Action *viewTopAction_;
+    Action *viewFrontAction_;
+    Action *viewRightAction_;
+    Action *view3dAction_;
 
-    QAction *viewResetDistanceAction_;
-    QAction *viewResetCenterAction_;
+    Action *viewResetDistanceAction_;
+    Action *viewResetCenterAction_;
 
-    QAction *viewLayoutSingleAction_;
-    QAction *viewLayoutTwoColumnsAction_;
-    QAction *viewLayoutGridAction_;
-    QAction *viewLayoutThreeRowsRightAction_;
+    Action *viewLayoutSingleAction_;
+    Action *viewLayoutTwoColumnsAction_;
+    Action *viewLayoutGridAction_;
+    Action *viewLayoutThreeRowsRightAction_;
 
     ViewerViewports *viewports_;
 
     void updateViewer();
 };
+
+extern "C" EXPORT_VIEWER_PLUGIN Plugin *createPlugin()
+{
+    return new ViewerPlugin();
+}
 
 #endif /* VIEWER_PLUGIN_HPP */

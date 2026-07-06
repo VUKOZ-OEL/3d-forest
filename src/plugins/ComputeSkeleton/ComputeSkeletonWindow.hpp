@@ -23,19 +23,19 @@
 #define COMPUTE_SKELETON_WINDOW_HPP
 
 // Include 3D Forest.
-class MainWindow;
+class Application;
 class ComputeSkeletonWidget;
 
 // Include Qt.
-#include <QDialog>
+#include <Dialog>
 
 /** Compute Skeleton Window. */
-class ComputeSkeletonWindow : public QDialog
+class ComputeSkeletonWindow : public Dialog
 {
-    Q_OBJECT
+
 
 public:
-    ComputeSkeletonWindow(MainWindow *mainWindow);
+    ComputeSkeletonWindow(Application *app);
     ~ComputeSkeletonWindow();
 
 private:

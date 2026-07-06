@@ -28,20 +28,20 @@
 // Include 3D Forest.
 #include <Camera.hpp>
 class Editor;
-class MainWindow;
+class Application;
 class ViewerOpenGLViewport;
 class ViewerOpenGLManager;
 
 // Include Qt.
-#include <QWidget>
+#include <Widget>
 
 // Include local.
 #include <ExportGui.hpp>
 
 /** Viewer Viewports. */
-class ViewerViewports : public QWidget
+class ViewerViewports : public Widget
 {
-    Q_OBJECT
+
 
 public:
     enum ViewLayout
@@ -52,7 +52,7 @@ public:
         VIEW_LAYOUT_THREE_ROWS_RIGHT
     };
 
-    explicit ViewerViewports(MainWindow *mainWindow = nullptr);
+    explicit ViewerViewports(Application *app = nullptr);
     ~ViewerViewports();
 
     void setLayout(ViewLayout viewLayout);
@@ -81,12 +81,12 @@ signals:
     void cameraChanged(size_t viewportId);
 
 protected:
-    MainWindow *mainWindow_;
+    Application *app_;
 
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
     void showEvent(QShowEvent *event) override;
-    void hideEvent(QHideEvent *event) override;
+    void hideEvent(HideEvent *event) override;
 
     std::vector<ViewerOpenGLViewport *> viewports_;
     std::shared_ptr<ViewerOpenGLManager> manager_;

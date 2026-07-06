@@ -23,19 +23,15 @@
 #define COMPUTE_CLASSIFICATION_WINDOW_HPP
 
 // Include 3D Forest.
-class MainWindow;
+#include <Dialog.hpp>
+class Application;
 class ComputeClassificationWidget;
 
-// Include Qt.
-#include <QDialog>
-
 /** Compute Classification Window. */
-class ComputeClassificationWindow : public QDialog
+class ComputeClassificationWindow : public Dialog
 {
-    Q_OBJECT
-
 public:
-    ComputeClassificationWindow(MainWindow *mainWindow);
+    ComputeClassificationWindow(Application *app);
 
 private:
     ComputeClassificationWidget *widget_;

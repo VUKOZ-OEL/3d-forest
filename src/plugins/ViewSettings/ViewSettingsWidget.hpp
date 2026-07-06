@@ -28,27 +28,22 @@
 // Include 3D Forest.
 #include <Editor.hpp>
 #include <Settings.hpp>
-class MainWindow;
-class ColorSwitchWidget;
-
-// Include Qt.
-#include <QWidget>
-class QCheckBox;
-class QComboBox;
-class QSlider;
+#include <Widget.hpp>
+class Application;
+class ColorSwitch;
+class CheckBox;
+class ComboBox;
+class Slider;
 
 /** View Settings Widget. */
-class ViewSettingsWidget : public QWidget
+class ViewSettingsWidget : public Widget
 {
-    Q_OBJECT
-
 public:
-    ViewSettingsWidget(MainWindow *mainWindow);
+    ViewSettingsWidget(Application *app);
 
-    QSize sizeHint() const override { return QSize(300, 200); }
+    // Size sizeHint() const override { return Size(300, 200); }
 
-public slots:
-    void slotUpdate(void *sender, const QSet<Editor::Type> &target);
+    void slotUpdate(void *sender, const std::set<Editor::Type> &target);
 
     void slotSetPointSize(int v);
     void slotSetColor();
@@ -58,14 +53,14 @@ public slots:
     void slotSetSceneBoundingBoxVisible(int v);
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
 
-    QSlider *pointSizeSlider_;
-    ColorSwitchWidget *colorSwitchWidget_;
-    QComboBox *colorSourceComboBox_;
+    Slider *pointSizeSlider_;
+    ColorSwitch *colorSwitch_;
+    ComboBox *colorSourceComboBox_;
 
-    QCheckBox *distanceBasedFadingVisibleCheckBox_;
-    QCheckBox *sceneBoundingBoxVisibleCheckBox_;
+    CheckBox *distanceBasedFadingVisibleCheckBox_;
+    CheckBox *sceneBoundingBoxVisibleCheckBox_;
 
     ViewSettings settings_;
 

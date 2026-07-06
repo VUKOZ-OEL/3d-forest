@@ -29,11 +29,11 @@
 #include <Vector3.hpp>
 class Editor;
 class Page;
-class MainWindow;
+class Application;
 
 // Include Qt.
 #include <QMutex>
-class QWidget;
+class Widget;
 
 /** Compute Height Map Modifier.
 
@@ -56,7 +56,7 @@ public:
 
     ComputeHeightMapModifier();
 
-    void initialize(MainWindow *mainWindow);
+    void initialize(Application *app);
     void setSource(Source source);
     void setColormap(const QString &name, int colorCount);
     void setPreviewEnabled(bool enabled,
@@ -64,10 +64,10 @@ public:
                            bool reload = false);
     bool previewEnabled();
     void applyModifier(Page *page);
-    void apply(QWidget *widget);
+    void apply(Widget *widget);
 
 protected:
-    MainWindow *mainWindow_;
+    Application *app_;
     Editor *editor_;
     bool previewEnabled_;
     Source source_;

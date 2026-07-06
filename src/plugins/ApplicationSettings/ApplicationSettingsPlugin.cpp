@@ -22,7 +22,7 @@
 // Include 3D Forest.
 #include <ApplicationSettingsPlugin.hpp>
 #include <ApplicationSettingsWindow.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -32,36 +32,36 @@
 #define ICON(name) (ThemeIcon(":/ApplicationSettingsResources/", name))
 
 ApplicationSettingsPlugin::ApplicationSettingsPlugin()
-    : mainWindow_(nullptr),
+    : app_(nullptr),
       pluginWindow_(nullptr)
 {
 }
 
-void ApplicationSettingsPlugin::initialize(MainWindow *mainWindow)
+void ApplicationSettingsPlugin::initialize(Application *app)
 {
-    mainWindow_ = mainWindow;
+    app_ = app;
 
-    mainWindow_->createAction(nullptr,
+    app_->createAction(nullptr,
                               "Settings",
                               "Settings",
                               tr("Application"),
                               tr("Show application settings"),
                               ICON("settings"),
                               this,
-                              SLOT(slotPlugin()),
+                              &ApplicationSettingsPlugin::slotPlugin,
                               MAIN_WINDOW_MENU_SETTINGS_PRIORITY);
 }
 
 void ApplicationSettingsPlugin::slotPlugin()
 {
-    if (!mainWindow_)
+    if (!app_)
     {
         return;
     }
 
     if (!pluginWindow_)
     {
-        pluginWindow_ = new ApplicationSettingsWindow(mainWindow_);
+        pluginWindow_ = new ApplicationSettingsWindow(app_);
     }
 
     pluginWindow_->show();

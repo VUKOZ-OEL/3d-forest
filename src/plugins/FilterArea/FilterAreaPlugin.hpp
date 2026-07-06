@@ -23,7 +23,7 @@
 #define FILTER_AREA_PLUGIN_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
+#include <Plugin.hpp>
 class FilterAreaWindow;
 
 #if defined(_MSC_VER)
@@ -37,24 +37,26 @@ class FilterAreaWindow;
 #endif
 
 /** Filter Area Plugin. */
-class EXPORT_FILTER_AREA_PLUGIN FilterAreaPlugin : public QObject,
-                                                   public PluginInterface
+class FilterAreaPlugin : 
+                                                   public Plugin
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
     FilterAreaPlugin();
 
-    virtual void initialize(MainWindow *mainWindow);
+    const char *name() const override { return "FilterAreaPlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
-public slots:
     void slotPlugin();
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
     FilterAreaWindow *pluginWindow_;
 };
+
+extern "C" EXPORT_FILTER_AREA_PLUGIN Plugin *createPlugin()
+{
+    return new FilterAreaPlugin();
+}
 
 #endif /* FILTER_AREA_PLUGIN_HPP */

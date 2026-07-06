@@ -25,28 +25,28 @@
 // Include 3D Forest.
 #include <Datasets.hpp>
 #include <Editor.hpp>
-class MainWindow;
+class Application;
 
 // Include Qt.
-#include <QWidget>
+#include <Widget>
 class QToolButton;
 class QTreeWidget;
 class QTreeWidgetItem;
 
 /** Filter Files Widget. */
-class FilterFilesWidget : public QWidget
+class FilterFilesWidget : public Widget
 {
-    Q_OBJECT
+
 
 public:
-    FilterFilesWidget(MainWindow *mainWindow);
+    FilterFilesWidget(Application *app);
 
     void setFilterEnabled(bool b);
 
-    QSize sizeHint() const override { return QSize(300, 200); }
+    Size sizeHint() const override { return Size(300, 200); }
 
-public slots:
-    void slotUpdate(void *sender, const QSet<Editor::Type> &target);
+
+    void slotUpdate(void *sender, const std::set<Editor::Type> &target);
 
     void slotAdd();
     void slotDelete();
@@ -70,7 +70,7 @@ protected:
         COLUMN_LAST,
     };
 
-    MainWindow *mainWindow_;
+    Application *app_;
 
     QTreeWidget *tree_;
     QToolButton *addButton_;

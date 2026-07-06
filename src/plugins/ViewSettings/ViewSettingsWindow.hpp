@@ -23,18 +23,14 @@
 #define VIEW_SETTINGS_WINDOW_HPP
 
 // Include 3D Forest.
-class MainWindow;
-
-// Include Qt.
-#include <QDockWidget>
+#include <DockWidget.hpp>
+class Application;
 
 /** View Settings Window. */
-class ViewSettingsWindow : public QDockWidget
+class ViewSettingsWindow : public DockWidget
 {
-    Q_OBJECT
-
 public:
-    ViewSettingsWindow(MainWindow *mainWindow);
+    ViewSettingsWindow(Application *app);
 };
 
 #endif /* VIEW_SETTINGS_WINDOW_HPP */

@@ -22,7 +22,7 @@
 // Include 3D Forest.
 #include <FilterManagementStatusWidget.hpp>
 #include <FilterManagementStatusWindow.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
@@ -35,20 +35,20 @@
 #define ICON(name) (ThemeIcon(":/FilterManagementStatusResources/", name))
 
 FilterManagementStatusWindow::FilterManagementStatusWindow(
-    MainWindow *mainWindow)
-    : QDockWidget(mainWindow)
+    Application *app)
+    : DockWidget(app)
 {
     LOG_DEBUG(<< "Start creating management status window.");
 
     // Widget.
-    widget_ = new FilterManagementStatusWidget(mainWindow);
+    widget_ = new FilterManagementStatusWidget(app);
 
     // Dock.
     setWidget(widget_);
     setWindowTitle(tr("Filter Management Status"));
-    setWindowIcon(ICON("management-status-filter").icon());
+    setWindowIcon(ICON("management-status-filter"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
+    app->addDockWidget(Qt::RightDockWidgetArea, this);
 
     LOG_DEBUG(<< "Finished creating management status window.");
 }
@@ -57,13 +57,13 @@ void FilterManagementStatusWindow::showEvent(QShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
     // widget_->setFilterEnabled(true);
-    QWidget::showEvent(event);
+    Widget::showEvent(event);
 }
 
-void FilterManagementStatusWindow::hideEvent(QHideEvent *event)
+void FilterManagementStatusWindow::hideEvent(HideEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Hide event.");
-    QWidget::hideEvent(event);
+    Widget::hideEvent(event);
 }
 
 void FilterManagementStatusWindow::closeEvent(QCloseEvent *event)

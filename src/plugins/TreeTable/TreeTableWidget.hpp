@@ -25,29 +25,29 @@
 // Include 3D Forest.
 #include <Editor.hpp>
 #include <FileFormatTable.hpp>
-class MainWindow;
+class Application;
 
 // Include Qt.
 #include <QItemSelection>
-#include <QWidget>
-class QCheckBox;
-class QPushButton;
+#include <Widget>
+class CheckBox;
+class PushButton;
 class QTableWidget;
 
 /** Tree Table Widget. */
-class TreeTableWidget : public QWidget
+class TreeTableWidget : public Widget
 {
-    Q_OBJECT
+
 
 public:
-    TreeTableWidget(MainWindow *mainWindow);
+    TreeTableWidget(Application *app);
 
-    QSize sizeHint() const override { return QSize(700, 200); }
+    Size sizeHint() const override { return Size(700, 200); }
 
     void closeWidget();
 
-public slots:
-    void slotUpdate(void *sender, const QSet<Editor::Type> &target);
+
+    void slotUpdate(void *sender, const std::set<Editor::Type> &target);
 
 protected slots:
     void slotShowOnlyVisibleTreesChanged(int index);
@@ -83,12 +83,12 @@ private:
         COLUMN_LAST,
     };
 
-    MainWindow *mainWindow_;
+    Application *app_;
 
     QTableWidget *tableWidget_;
-    QPushButton *exportButton_;
+    PushButton *exportButton_;
 
-    QCheckBox *showOnlyVisibleTreesCheckBox_;
+    CheckBox *showOnlyVisibleTreesCheckBox_;
     std::unordered_set<size_t> visibleTreesIdList_;
 
     Segments segments_;
@@ -120,19 +120,19 @@ private:
                  int col,
                  bool value,
                  bool userCheckable,
-                 const QColor &color = QColor());
+                 const Color &color = Color());
     void setCell(int row,
                  int col,
                  size_t value,
-                 const QColor &color = QColor());
+                 const Color &color = Color());
     void setCell(int row,
                  int col,
                  double value,
-                 const QColor &color = QColor());
+                 const Color &color = Color());
     void setCell(int row,
                  int col,
                  const std::string &value,
-                 const QColor &color = QColor(),
+                 const Color &color = Color(),
                  bool isNumeric = false);
 };
 

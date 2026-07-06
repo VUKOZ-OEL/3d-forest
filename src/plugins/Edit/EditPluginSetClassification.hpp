@@ -23,13 +23,13 @@
 #define EDIT_PLUGIN_SET_CLASSIFICATION_HPP
 
 // Include 3D Forest.
-class MainWindow;
+class Application;
 
 /** Edit Plugin Set Classification. */
 class EditPluginSetClassification
 {
 public:
-    static void run(MainWindow *mainWindow);
+    static void run(Application *app);
 };
 
 #endif /* EDIT_PLUGIN_SET_CLASSIFICATION_HPP */

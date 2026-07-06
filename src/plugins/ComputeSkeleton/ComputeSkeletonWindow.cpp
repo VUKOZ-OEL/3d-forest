@@ -22,11 +22,11 @@
 // Include 3D Forest.
 #include <ComputeSkeletonWidget.hpp>
 #include <ComputeSkeletonWindow.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
-#include <QVBoxLayout>
+#include <VBoxLayout>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeSkeletonWindow"
@@ -35,24 +35,24 @@
 
 #define ICON(name) (ThemeIcon(":/ComputeSkeletonResources/", name))
 
-ComputeSkeletonWindow::ComputeSkeletonWindow(MainWindow *mainWindow)
-    : QDialog(mainWindow),
+ComputeSkeletonWindow::ComputeSkeletonWindow(Application *app)
+    : Dialog(app),
       widget_(nullptr)
 {
     LOG_DEBUG(<< "Create.");
 
     // Widget.
-    widget_ = new ComputeSkeletonWidget(mainWindow);
+    widget_ = new ComputeSkeletonWidget(app);
 
     // Main layout.
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->addWidget(widget_);
     mainLayout->addStretch();
 
     // Dialog.
     setLayout(mainLayout);
     setWindowTitle(tr("Compute Skeleton"));
-    setWindowIcon(ICON("compute-skeleton").icon());
+    setWindowIcon(ICON("compute-skeleton"));
     setMaximumHeight(height());
     setModal(false);
 }

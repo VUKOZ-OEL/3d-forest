@@ -22,11 +22,11 @@
 // Include 3D Forest.
 #include <ComputeDescriptorWidget.hpp>
 #include <ComputeDescriptorWindow.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
-#include <QVBoxLayout>
+#include <VBoxLayout>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeDescriptorWindow"
@@ -34,24 +34,24 @@
 
 #define ICON(name) (ThemeIcon(":/ComputeDescriptorResources/", name))
 
-ComputeDescriptorWindow::ComputeDescriptorWindow(MainWindow *mainWindow)
-    : QDialog(mainWindow),
+ComputeDescriptorWindow::ComputeDescriptorWindow(Application *app)
+    : Dialog(app),
       widget_(nullptr)
 {
     LOG_DEBUG(<< "Create.");
 
     // Widget
-    widget_ = new ComputeDescriptorWidget(mainWindow);
+    widget_ = new ComputeDescriptorWidget(app);
 
     // Main layout
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->addWidget(widget_);
     mainLayout->addStretch();
 
     // Dialog
     setLayout(mainLayout);
     setWindowTitle(tr("Compute Descriptor"));
-    setWindowIcon(ICON("descriptor").icon());
+    setWindowIcon(ICON("descriptor"));
     setMaximumHeight(height());
     setModal(false);
 }

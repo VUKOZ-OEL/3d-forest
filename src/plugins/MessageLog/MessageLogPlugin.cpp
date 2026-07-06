@@ -20,7 +20,7 @@
 /** @file MessageLogPlugin.cpp */
 
 // Include 3D Forest.
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <MessageLogPlugin.hpp>
 #include <MessageLogWindow.hpp>
 #include <ThemeIcon.hpp>
@@ -28,34 +28,34 @@
 #define ICON(name) (ThemeIcon(":/MessageLogResources/", name))
 
 MessageLogPlugin::MessageLogPlugin()
-    : mainWindow_(nullptr),
+    : app_(nullptr),
       pluginWindow_(nullptr)
 {
 }
 
-void MessageLogPlugin::initialize(MainWindow *mainWindow)
+void MessageLogPlugin::initialize(Application *app)
 {
-    mainWindow_ = mainWindow;
+    app_ = app;
 
-    pluginWindow_ = new MessageLogWindow(mainWindow_);
+    pluginWindow_ = new MessageLogWindow(app_);
     pluginWindow_->hide();
     if (globalLogThread)
     {
         globalLogThread->setCallback(pluginWindow_);
     }
 
-    mainWindow_->createAction(nullptr,
+    app_->createAction(nullptr,
                               "File",
                               "Windows",
                               tr("Message Log"),
                               tr("Show message log"),
                               ICON("message-log"),
                               this,
-                              SLOT(slotPlugin()),
+                              &MessageLogPlugin::slotPlugin,
                               MAIN_WINDOW_MENU_FILE_PRIORITY,
                               90);
 
-    mainWindow_->hideToolBar("Windows");
+    app_->hideToolBar("Windows");
 }
 
 void MessageLogPlugin::slotPlugin()

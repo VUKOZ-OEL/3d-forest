@@ -21,20 +21,20 @@
 
 // Include 3D Forest.
 #include <FilterTreesTreeWidget.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 
 // Include Qt.
 #include <QTableWidget>
-#include <QVBoxLayout>
+#include <VBoxLayout>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterTreesTreeWidget"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-FilterTreesTreeWidget::FilterTreesTreeWidget(MainWindow *mainWindow)
-    : QWidget(mainWindow),
-      mainWindow_(mainWindow)
+FilterTreesTreeWidget::FilterTreesTreeWidget(Application *app)
+    : Widget(app),
+      app_(app)
 {
     LOG_DEBUG(<< "Create.");
 
@@ -45,7 +45,7 @@ FilterTreesTreeWidget::FilterTreesTreeWidget(MainWindow *mainWindow)
     table_->setColumnCount(2);
 
     // Layout.
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(table_);
 
@@ -65,7 +65,7 @@ void FilterTreesTreeWidget::setSegment(const Segment &segment)
     table_->setHorizontalHeaderLabels({"Property", "Value"});
 
     double ppm =
-        mainWindow_->editor().settings().unitsSettings().pointsPerMeter()[0];
+        app_->editor().settings().unitsSettings().pointsPerMeter()[0];
 
     setRow(0, "label", segment_.label);
     setRow(1, "x", segment_.treeAttributes.position[0] / ppm, "m");

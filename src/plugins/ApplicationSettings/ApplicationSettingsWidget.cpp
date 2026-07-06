@@ -21,14 +21,12 @@
 
 // Include 3D Forest.
 #include <ApplicationSettingsWidget.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
-
-// Include Qt.
-#include <QComboBox>
-#include <QGridLayout>
-#include <QLabel>
-#include <QVBoxLayout>
+#include <ComboBox.hpp>
+#include <GridLayout.hpp>
+#include <Label.hpp>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ApplicationSettingsWidget"
@@ -37,61 +35,60 @@
 
 #define ICON(name) (ThemeIcon(":/ApplicationSettingsResources/", name))
 
-ApplicationSettingsWidget::ApplicationSettingsWidget(MainWindow *mainWindow)
-    : QWidget(mainWindow),
-      mainWindow_(mainWindow)
+ApplicationSettingsWidget::ApplicationSettingsWidget(Application *app)
+    : Widget(app),
+      app_(app)
 {
     LOG_DEBUG(<< "Start creating settings application widget.");
 
     // Language.
-    languageComboBox_ = new QComboBox;
+    languageComboBox_ = new ComboBox;
     languageComboBox_->addItem("en");
     languageComboBox_->addItem("cs");
-    QString languageCode = QString::fromStdString(settings_.languageCode);
-    languageComboBox_->setCurrentText(languageCode);
+    languageComboBox_->setCurrentText(settings_.languageCode);
 
-    connect(languageComboBox_,
-            SIGNAL(activated(int)),
-            this,
-            SLOT(slotLanguageChanged(int)));
+    languageComboBox_->activated.connect([this](int value)
+    {
+        slotLanguageChanged(value);
+    });
 
     // Layout.
-    QGridLayout *groupBoxLayout = new QGridLayout;
+    GridLayout *groupBoxLayout = new GridLayout;
 
-    groupBoxLayout->addWidget(new QLabel(tr("Language:")), 1, 0);
+    groupBoxLayout->addWidget(new Label(tr("Language:")), 1, 0);
     groupBoxLayout->addWidget(languageComboBox_, 1, 1);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->addLayout(groupBoxLayout);
     mainLayout->addStretch();
 
     setLayout(mainLayout);
 
     // Data.
-    connect(mainWindow_,
-            SIGNAL(signalUpdate(void *, const QSet<Editor::Type> &)),
-            this,
-            SLOT(slotUpdate(void *, const QSet<Editor::Type> &)));
+    app_->signalUpdate.connect([this](void *sender, const std::set<Editor::Type> &target)
+    {
+        slotUpdate(sender, target);
+    });
 
-    slotUpdate(nullptr, QSet<Editor::Type>());
+    slotUpdate(nullptr, std::set<Editor::Type>());
 
     LOG_DEBUG(<< "Finished creating settings application widget.");
 }
 
 void ApplicationSettingsWidget::slotUpdate(void *sender,
-                                           const QSet<Editor::Type> &target)
+                                           const std::set<Editor::Type> &target)
 {
     if (sender == this)
     {
         return;
     }
 
-    if (target.empty() || target.contains(Editor::TYPE_SETTINGS))
+    if (target.empty() || target.count(Editor::TYPE_SETTINGS))
     {
         LOG_DEBUG_UPDATE(<< "Input application settings.");
 
         setApplicationSettings(
-            mainWindow_->editor().settings().applicationSettings());
+            app_->editor().settings().applicationSettings());
     }
 }
 
@@ -99,17 +96,17 @@ void ApplicationSettingsWidget::dataChanged(bool modifiers)
 {
     LOG_DEBUG_UPDATE(<< "Output application settings.");
 
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setApplicationSettings(settings_);
-    mainWindow_->emitUpdate(this, {Editor::TYPE_SETTINGS});
+    app_->suspendThreads();
+    app_->editor().setApplicationSettings(settings_);
+    app_->emitUpdate(this, {Editor::TYPE_SETTINGS});
 
     if (modifiers)
     {
-        mainWindow_->updateModifiers();
+        app_->updateModifiers();
     }
     else
     {
-        mainWindow_->updateRender();
+        app_->updateRender();
     }
 }
 
@@ -118,15 +115,10 @@ void ApplicationSettingsWidget::setApplicationSettings(
 {
     LOG_DEBUG(<< "Set application settings.");
 
-    block();
-
     settings_ = settings;
 
     // Language.
-    QString languageCode = QString::fromStdString(settings_.languageCode);
-    languageComboBox_->setCurrentText(languageCode);
-
-    unblock();
+    languageComboBox_->setCurrentText(settings_.languageCode, false);
 }
 
 void ApplicationSettingsWidget::slotLanguageChanged(int index)
@@ -138,17 +130,7 @@ void ApplicationSettingsWidget::slotLanguageChanged(int index)
         return;
     }
 
-    settings_.languageCode = languageComboBox_->itemText(index).toStdString();
+    settings_.languageCode = languageComboBox_->itemText(index);
 
     dataChanged(true);
-}
-
-void ApplicationSettingsWidget::block()
-{
-    (void)blockSignals(true);
-}
-
-void ApplicationSettingsWidget::unblock()
-{
-    (void)blockSignals(false);
 }

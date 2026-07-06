@@ -22,7 +22,7 @@
 // Include 3D Forest.
 #include <FilterDescriptorWidget.hpp>
 #include <FilterDescriptorWindow.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
@@ -34,21 +34,21 @@
 
 #define ICON(name) (ThemeIcon(":/FilterDescriptorResources/", name))
 
-FilterDescriptorWindow::FilterDescriptorWindow(MainWindow *mainWindow)
-    : QDockWidget(mainWindow)
+FilterDescriptorWindow::FilterDescriptorWindow(Application *app)
+    : DockWidget(app)
 {
     LOG_DEBUG(<< "Start creating descriptor filter window.");
 
     // Widget.
-    widget_ = new FilterDescriptorWidget(mainWindow);
+    widget_ = new FilterDescriptorWidget(app);
 
     // Dock.
     setWidget(widget_);
     setFixedHeight(widget()->sizeHint().height());
     setWindowTitle(tr("Filter Descriptor"));
-    setWindowIcon(ICON("descriptor-filter").icon());
+    setWindowIcon(ICON("descriptor-filter"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
+    app->addDockWidget(Qt::RightDockWidgetArea, this);
 
     LOG_DEBUG(<< "Finished creating descriptor filter window.");
 }
@@ -57,13 +57,13 @@ void FilterDescriptorWindow::showEvent(QShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
     // widget_->setFilterEnabled(true);
-    QWidget::showEvent(event);
+    Widget::showEvent(event);
 }
 
-void FilterDescriptorWindow::hideEvent(QHideEvent *event)
+void FilterDescriptorWindow::hideEvent(HideEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Hide event.");
-    QWidget::hideEvent(event);
+    Widget::hideEvent(event);
 }
 
 void FilterDescriptorWindow::closeEvent(QCloseEvent *event)

@@ -22,7 +22,7 @@
 // Include 3D Forest.
 #include <FilterAreaBoxWidget.hpp>
 #include <FilterAreaWindow.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
@@ -34,21 +34,21 @@
 
 #define ICON(name) (ThemeIcon(":/FilterAreaResources/", name))
 
-FilterAreaWindow::FilterAreaWindow(MainWindow *mainWindow)
-    : QDockWidget(mainWindow)
+FilterAreaWindow::FilterAreaWindow(Application *app)
+    : DockWidget(app)
 {
     LOG_DEBUG(<< "Start creating clip filter window.");
 
     // Widget.
-    widget_ = new FilterAreaBoxWidget(mainWindow);
+    widget_ = new FilterAreaBoxWidget(app);
 
     // Dock.
     setWidget(widget_);
     setFixedHeight(widget()->sizeHint().height());
     setWindowTitle(tr("Filter Area"));
-    setWindowIcon(ICON("clip-filter").icon());
+    setWindowIcon(ICON("clip-filter"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
+    app->addDockWidget(Qt::RightDockWidgetArea, this);
 
     LOG_DEBUG(<< "Finished creating clip filter window.");
 }
@@ -57,13 +57,13 @@ void FilterAreaWindow::showEvent(QShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
     // widget_->setFilterEnabled(true);
-    QWidget::showEvent(event);
+    Widget::showEvent(event);
 }
 
-void FilterAreaWindow::hideEvent(QHideEvent *event)
+void FilterAreaWindow::hideEvent(HideEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Hide event.");
-    QWidget::hideEvent(event);
+    Widget::hideEvent(event);
 }
 
 void FilterAreaWindow::closeEvent(QCloseEvent *event)

@@ -23,7 +23,7 @@
 #define APPLICATION_SETTINGS_PLUGIN_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
+#include <Plugin.hpp>
 class ApplicationSettingsWindow;
 
 #if defined(_MSC_VER)
@@ -37,25 +37,25 @@ class ApplicationSettingsWindow;
 #endif
 
 /** Application Settings Plugin. */
-class EXPORT_APPLICATION_SETTINGS_PLUGIN ApplicationSettingsPlugin
-    : public QObject,
-      public PluginInterface
+class ApplicationSettingsPlugin : public Plugin
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
     ApplicationSettingsPlugin();
 
-    virtual void initialize(MainWindow *mainWindow);
+    const char *name() const override { return "ApplicationSettingsPlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
-public slots:
     void slotPlugin();
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
     ApplicationSettingsWindow *pluginWindow_;
 };
+
+extern "C" EXPORT_APPLICATION_SETTINGS_PLUGIN Plugin *createPlugin()
+{
+    return new ApplicationSettingsPlugin();
+}
 
 #endif /* APPLICATION_SETTINGS_PLUGIN_HPP */

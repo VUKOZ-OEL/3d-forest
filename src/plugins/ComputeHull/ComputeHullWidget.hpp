@@ -25,46 +25,46 @@
 // Include 3D Forest.
 #include <ComputeHullAction.hpp>
 #include <ComputeHullParameters.hpp>
-class MainWindow;
-class DoubleSliderWidget;
+class Application;
+class DoubleSlider;
 
 // Include Qt.
-#include <QWidget>
-class QCheckBox;
-class QPushButton;
+#include <Widget>
+class CheckBox;
+class PushButton;
 
 /** Compute Hull Widget. */
-class ComputeHullWidget : public QWidget
+class ComputeHullWidget : public Widget
 {
-    Q_OBJECT
+
 
 public:
-    ComputeHullWidget(MainWindow *mainWindow);
+    ComputeHullWidget(Application *app);
 
 protected slots:
     void slotApply();
     void slotFindOptimalAlphaChanged(int index);
 
 protected:
-    void hideEvent(QHideEvent *event) override;
+    void hideEvent(HideEvent *event) override;
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
 
     ComputeHullParameters parameters_;
     ComputeHullAction action_;
 
-    QCheckBox *computeConvexHullCheckBox_;
-    QCheckBox *computeConvexHullProjectionCheckBox_;
-    QCheckBox *computeConcaveHullCheckBox_;
-    QCheckBox *computeConcaveHullProjectionCheckBox_;
+    CheckBox *computeConvexHullCheckBox_;
+    CheckBox *computeConvexHullProjectionCheckBox_;
+    CheckBox *computeConcaveHullCheckBox_;
+    CheckBox *computeConcaveHullProjectionCheckBox_;
 
-    QCheckBox *findOptimalAlphaCheckBox_;
-    DoubleSliderWidget *alphaSlider_;
+    CheckBox *findOptimalAlphaCheckBox_;
+    DoubleSlider *alphaSlider_;
 
-    DoubleSliderWidget *voxelRadiusSlider_;
+    DoubleSlider *voxelRadiusSlider_;
 
-    QPushButton *applyButton_;
+    PushButton *applyButton_;
 };
 
 #endif /* COMPUTE_HULL_WIDGET_HPP */

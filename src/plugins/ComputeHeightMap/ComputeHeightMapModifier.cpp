@@ -23,14 +23,14 @@
 #include <ColorPalette.hpp>
 #include <ComputeHeightMapModifier.hpp>
 #include <Editor.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <Time.hpp>
 
 // Include Qt.
 #include <QCoreApplication>
 #include <QProgressDialog>
 #include <QString>
-#include <QWidget>
+#include <Widget>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeHeightMapModifier"
@@ -46,17 +46,17 @@
 #define PLUGIN_COMPUTE_HEIGHT_MAP_COLORS_DEFAULT 256
 
 ComputeHeightMapModifier::ComputeHeightMapModifier()
-    : mainWindow_(nullptr),
+    : app_(nullptr),
       editor_(nullptr),
       previewEnabled_(false),
       source_(SOURCE_Z_POSITION)
 {
 }
 
-void ComputeHeightMapModifier::initialize(MainWindow *mainWindow)
+void ComputeHeightMapModifier::initialize(Application *app)
 {
-    mainWindow_ = mainWindow;
-    editor_ = &mainWindow->editor();
+    app_ = app;
+    editor_ = &app->editor();
     colormap_ = createColormap(PLUGIN_COMPUTE_HEIGHT_MAP_COLORMAP_DEFAULT,
                                PLUGIN_COMPUTE_HEIGHT_MAP_COLORS_DEFAULT);
 }
@@ -96,7 +96,7 @@ void ComputeHeightMapModifier::setPreviewEnabled(bool enabled,
 {
     if (update)
     {
-        mainWindow_->suspendThreads();
+        app_->suspendThreads();
 
         mutex_.lock();
         previewEnabled_ = enabled;
@@ -114,7 +114,7 @@ void ComputeHeightMapModifier::setPreviewEnabled(bool enabled,
             }
         }
 
-        mainWindow_->resumeThreads();
+        app_->resumeThreads();
     }
     else
     {
@@ -200,9 +200,9 @@ void ComputeHeightMapModifier::applyModifier(Page *page)
     mutex_.unlock();
 }
 
-void ComputeHeightMapModifier::apply(QWidget *widget)
+void ComputeHeightMapModifier::apply(Widget *widget)
 {
-    mainWindow_->suspendThreads();
+    app_->suspendThreads();
 
     Query query(editor_);
     query.where().setBox(editor_->clipBoundary());
@@ -243,7 +243,7 @@ void ComputeHeightMapModifier::apply(QWidget *widget)
     }
     progressDialog.setValue(progressDialog.maximum());
 
-    mainWindow_->resumeThreads();
+    app_->resumeThreads();
 }
 
 std::vector<Vector3<double>> ComputeHeightMapModifier::createColormap(

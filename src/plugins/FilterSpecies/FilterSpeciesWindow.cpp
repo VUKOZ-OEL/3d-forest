@@ -22,7 +22,7 @@
 // Include 3D Forest.
 #include <FilterSpeciesWidget.hpp>
 #include <FilterSpeciesWindow.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
@@ -34,20 +34,20 @@
 
 #define ICON(name) (ThemeIcon(":/FilterSpeciesResources/", name))
 
-FilterSpeciesWindow::FilterSpeciesWindow(MainWindow *mainWindow)
-    : QDockWidget(mainWindow)
+FilterSpeciesWindow::FilterSpeciesWindow(Application *app)
+    : DockWidget(app)
 {
     LOG_DEBUG(<< "Start creating species window.");
 
     // Widget.
-    widget_ = new FilterSpeciesWidget(mainWindow);
+    widget_ = new FilterSpeciesWidget(app);
 
     // Dock.
     setWidget(widget_);
     setWindowTitle(tr("Filter Species"));
-    setWindowIcon(ICON("species-filter").icon());
+    setWindowIcon(ICON("species-filter"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
+    app->addDockWidget(Qt::RightDockWidgetArea, this);
 
     LOG_DEBUG(<< "Finished creating species window.");
 }
@@ -56,13 +56,13 @@ void FilterSpeciesWindow::showEvent(QShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
     // widget_->setFilterEnabled(true);
-    QWidget::showEvent(event);
+    Widget::showEvent(event);
 }
 
-void FilterSpeciesWindow::hideEvent(QHideEvent *event)
+void FilterSpeciesWindow::hideEvent(HideEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Hide event.");
-    QWidget::hideEvent(event);
+    Widget::hideEvent(event);
 }
 
 void FilterSpeciesWindow::closeEvent(QCloseEvent *event)

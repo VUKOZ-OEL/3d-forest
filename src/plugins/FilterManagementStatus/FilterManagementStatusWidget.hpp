@@ -25,30 +25,30 @@
 // Include 3D Forest.
 #include <Editor.hpp>
 #include <ManagementStatusList.hpp>
-class MainWindow;
+class Application;
 class FilterManagementStatusTreeWidget;
 
 // Include Qt.
-#include <QWidget>
+#include <Widget>
 class QSplitter;
 class QToolButton;
 class QTreeWidget;
 class QTreeWidgetItem;
 
 /** Filter Management Status Widget. */
-class FilterManagementStatusWidget : public QWidget
+class FilterManagementStatusWidget : public Widget
 {
-    Q_OBJECT
+
 
 public:
-    FilterManagementStatusWidget(MainWindow *mainWindow);
+    FilterManagementStatusWidget(Application *app);
 
     void setFilterEnabled(bool b);
 
-    QSize sizeHint() const override { return QSize(300, 200); }
+    Size sizeHint() const override { return Size(300, 200); }
 
-public slots:
-    void slotUpdate(void *sender, const QSet<Editor::Type> &target);
+
+    void slotUpdate(void *sender, const std::set<Editor::Type> &target);
 
     void slotShow();
     void slotHide();
@@ -69,7 +69,7 @@ protected:
         COLUMN_LAST,
     };
 
-    MainWindow *mainWindow_;
+    Application *app_;
 
     QTreeWidget *tree_;
     QToolButton *showButton_;

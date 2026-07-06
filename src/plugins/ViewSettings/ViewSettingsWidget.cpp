@@ -20,20 +20,19 @@
 /** @file ViewSettingsWidget.cpp */
 
 // Include 3D Forest.
-#include <ColorSwitchWidget.hpp>
-#include <MainWindow.hpp>
+#include <ColorSwitch.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 #include <ViewSettingsWidget.hpp>
-
-// Include Qt.
-#include <QCheckBox>
-#include <QColor>
-#include <QComboBox>
-#include <QGridLayout>
-#include <QGroupBox>
-#include <QLabel>
-#include <QSlider>
-#include <QVBoxLayout>
+#include <CheckBox.hpp>
+#include <Color.hpp>
+#include <ComboBox.hpp>
+#include <GridLayout.hpp>
+#include <GroupBox.hpp>
+#include <Label.hpp>
+#include <Slider.hpp>
+#include <VBoxLayout.hpp>
+#include <Ui.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ViewSettingsWidget"
@@ -42,31 +41,31 @@
 
 #define ICON(name) (ThemeIcon(":/ViewSettingsResources/", name))
 
-ViewSettingsWidget::ViewSettingsWidget(MainWindow *mainWindow)
-    : QWidget(mainWindow),
-      mainWindow_(mainWindow)
+ViewSettingsWidget::ViewSettingsWidget(Application *app)
+    : Widget(app),
+      app_(app)
 {
     LOG_DEBUG(<< "Start creating settings view widget.");
 
     // Point size.
-    pointSizeSlider_ = new QSlider;
+    pointSizeSlider_ = new Slider;
     pointSizeSlider_->setMinimum(1);
     pointSizeSlider_->setMaximum(5);
     pointSizeSlider_->setSingleStep(1);
     pointSizeSlider_->setTickInterval(1);
-    pointSizeSlider_->setTickPosition(QSlider::TicksAbove);
-    pointSizeSlider_->setOrientation(Qt::Horizontal);
-    connect(pointSizeSlider_,
-            SIGNAL(valueChanged(int)),
-            this,
-            SLOT(slotSetPointSize(int)));
+    pointSizeSlider_->setTickPosition(Slider::TicksAbove);
+    pointSizeSlider_->setOrientation(Ui::Horizontal);
+    pointSizeSlider_->valueChanged.connect([this](int value)
+    {
+        slotSetPointSize(value);
+    });
 
     // Color.
-    colorSwitchWidget_ = new ColorSwitchWidget;
-    connect(colorSwitchWidget_,
-            SIGNAL(colorChanged()),
-            this,
-            SLOT(slotSetColor()));
+    colorSwitch_ = new ColorSwitch;
+    colorSwitch_->colorChanged.connect([this]()
+    {
+        slotSetColor();
+    });
 
     // Color source.
     std::vector<std::string> colorSourceString = {"Color",
@@ -79,95 +78,94 @@ ViewSettingsWidget::ViewSettingsWidget(MainWindow *mainWindow)
                                                   "Management Status",
                                                   "Elevation",
                                                   "Descriptor"};
-    colorSourceComboBox_ = new QComboBox;
+    colorSourceComboBox_ = new ComboBox;
     for (size_t i = 0; i < colorSourceString.size(); i++)
     {
-        colorSourceComboBox_->addItem(colorSourceString[i].c_str());
+        colorSourceComboBox_->addItem(colorSourceString[i]);
     }
-    colorSourceComboBox_->setCurrentText(
-        toString(settings_.colorSource()).c_str());
+    colorSourceComboBox_->setCurrentText(toString(settings_.colorSource()));
 
-    connect(colorSourceComboBox_,
-            SIGNAL(activated(int)),
-            this,
-            SLOT(slotColorSourceChanged(int)));
+    colorSourceComboBox_->activated.connect([this](int value)
+    {
+        slotColorSourceChanged(value);
+    });
 
     // Distance-based fading.
-    distanceBasedFadingVisibleCheckBox_ = new QCheckBox;
+    distanceBasedFadingVisibleCheckBox_ = new CheckBox;
     distanceBasedFadingVisibleCheckBox_->setChecked(
         settings_.distanceBasedFadingVisible());
     distanceBasedFadingVisibleCheckBox_->setToolTip(
         tr("Reduce intensity with increasing distance"));
     distanceBasedFadingVisibleCheckBox_->setText(
         tr("Show distance-based fading"));
-    connect(distanceBasedFadingVisibleCheckBox_,
-            SIGNAL(stateChanged(int)),
-            this,
-            SLOT(slotSetDistanceBasedFadingVisible(int)));
+    distanceBasedFadingVisibleCheckBox_->stateChanged.connect([this](int value)
+    {
+        slotSetDistanceBasedFadingVisible(value);
+    });
 
     // Bounding box.
-    sceneBoundingBoxVisibleCheckBox_ = new QCheckBox;
+    sceneBoundingBoxVisibleCheckBox_ = new CheckBox;
     sceneBoundingBoxVisibleCheckBox_->setChecked(
         settings_.sceneBoundingBoxVisible());
     sceneBoundingBoxVisibleCheckBox_->setText(tr("Show scene bounding box"));
-    connect(sceneBoundingBoxVisibleCheckBox_,
-            SIGNAL(stateChanged(int)),
-            this,
-            SLOT(slotSetSceneBoundingBoxVisible(int)));
+    sceneBoundingBoxVisibleCheckBox_->stateChanged.connect([this](int value)
+    {
+        slotSetSceneBoundingBoxVisible(value);
+    });
 
     // Options.
-    QVBoxLayout *optionsVBoxLayout = new QVBoxLayout;
+    VBoxLayout *optionsVBoxLayout = new VBoxLayout;
     optionsVBoxLayout->addWidget(distanceBasedFadingVisibleCheckBox_);
     optionsVBoxLayout->addWidget(sceneBoundingBoxVisibleCheckBox_);
 
-    QGroupBox *optionsGroupBox = new QGroupBox(tr("Options"));
+    GroupBox *optionsGroupBox = new GroupBox(tr("Options"));
     optionsGroupBox->setLayout(optionsVBoxLayout);
 
     // Layout.
-    QGridLayout *groupBoxLayout = new QGridLayout;
+    GridLayout *groupBoxLayout = new GridLayout;
 
-    groupBoxLayout->addWidget(colorSwitchWidget_,
+    groupBoxLayout->addWidget(colorSwitch_,
                               0,
                               0,
-                              Qt::AlignHCenter | Qt::AlignVCenter);
+                              Ui::AlignHCenter | Ui::AlignVCenter);
     groupBoxLayout->addWidget(optionsGroupBox, 0, 1);
 
-    groupBoxLayout->addWidget(new QLabel(tr("Color mode:")), 1, 0);
+    groupBoxLayout->addWidget(new Label(tr("Color mode:")), 1, 0);
     groupBoxLayout->addWidget(colorSourceComboBox_, 1, 1);
 
-    groupBoxLayout->addWidget(new QLabel(tr("Point size:")), 2, 0);
+    groupBoxLayout->addWidget(new Label(tr("Point size:")), 2, 0);
     groupBoxLayout->addWidget(pointSizeSlider_, 2, 1);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->addLayout(groupBoxLayout);
     mainLayout->addStretch();
 
     setLayout(mainLayout);
 
     // Data.
-    connect(mainWindow_,
-            SIGNAL(signalUpdate(void *, const QSet<Editor::Type> &)),
-            this,
-            SLOT(slotUpdate(void *, const QSet<Editor::Type> &)));
+    app_->signalUpdate.connect([this](void *sender, const std::set<Editor::Type> &target)
+    {
+        slotUpdate(sender, target);
+    });
 
-    slotUpdate(nullptr, QSet<Editor::Type>());
+    slotUpdate(nullptr, std::set<Editor::Type>());
 
     LOG_DEBUG(<< "Finished creating settings view widget.");
 }
 
 void ViewSettingsWidget::slotUpdate(void *sender,
-                                    const QSet<Editor::Type> &target)
+                                    const std::set<Editor::Type> &target)
 {
     if (sender == this)
     {
         return;
     }
 
-    if (target.empty() || target.contains(Editor::TYPE_SETTINGS))
+    if (target.empty() || target.count(Editor::TYPE_SETTINGS))
     {
         LOG_DEBUG_UPDATE(<< "Input view settings.");
 
-        setViewSettings(mainWindow_->editor().settings().viewSettings());
+        setViewSettings(app_->editor().settings().viewSettings());
     }
 }
 
@@ -175,17 +173,17 @@ void ViewSettingsWidget::dataChanged(bool modifiers)
 {
     LOG_DEBUG_UPDATE(<< "Output view settings.");
 
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setViewSettings(settings_);
-    mainWindow_->emitUpdate(this, {Editor::TYPE_SETTINGS});
+    app_->suspendThreads();
+    app_->editor().setViewSettings(settings_);
+    app_->emitUpdate(this, {Editor::TYPE_SETTINGS});
 
     if (modifiers)
     {
-        mainWindow_->updateModifiers();
+        app_->updateModifiers();
     }
     else
     {
-        mainWindow_->updateRender();
+        app_->updateRender();
     }
 }
 
@@ -199,26 +197,26 @@ void ViewSettingsWidget::setViewSettings(const ViewSettings &settings)
 
     // Foreground color.
     auto fgv = settings_.pointColor();
-    QColor fg;
+    Color fg;
     fg.setRgbF(static_cast<float>(fgv[0]),
                static_cast<float>(fgv[1]),
                static_cast<float>(fgv[2]));
-    colorSwitchWidget_->setForegroundColor(fg);
+    colorSwitch_->setForegroundColor(fg);
 
     // Background color.
     auto bgv = settings_.backgroundColor();
-    QColor bg;
+    Color bg;
     bg.setRgbF(static_cast<float>(bgv[0]),
                static_cast<float>(bgv[1]),
                static_cast<float>(bgv[2]));
-    colorSwitchWidget_->setBackgroundColor(bg);
+    colorSwitch_->setBackgroundColor(bg);
 
     // Point size.
     pointSizeSlider_->setValue(static_cast<int>(settings_.pointSize()));
 
     // Color source.
     colorSourceComboBox_->setCurrentText(
-        toString(settings_.colorSource()).c_str());
+        toString(settings_.colorSource()));
 
     // Distance-based fading.
     distanceBasedFadingVisibleCheckBox_->setChecked(
@@ -239,10 +237,10 @@ void ViewSettingsWidget::slotSetPointSize(int v)
 
 void ViewSettingsWidget::slotSetColor()
 {
-    QColor fg = colorSwitchWidget_->foregroundColor();
+    Color fg = colorSwitch_->foregroundColor();
     settings_.setPointColor({fg.redF(), fg.greenF(), fg.blueF()});
 
-    QColor bg = colorSwitchWidget_->backgroundColor();
+    Color bg = colorSwitch_->backgroundColor();
     settings_.setBackgroundColor({bg.redF(), bg.greenF(), bg.blueF()});
 
     dataChanged(true);
@@ -259,7 +257,7 @@ void ViewSettingsWidget::slotColorSourceChanged(int index)
 
     ViewSettings::ColorSource colorSource;
     fromString(colorSource,
-               colorSourceComboBox_->itemText(index).toStdString());
+               colorSourceComboBox_->itemText(index));
     settings_.setColorSource(colorSource);
     dataChanged(true);
 }

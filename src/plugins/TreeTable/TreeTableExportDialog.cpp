@@ -21,21 +21,21 @@
 
 // Include 3D Forest.
 #include <FileFormatCsv.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 #include <TreeTableExportDialog.hpp>
 
 // Include Qt.
-#include <QCheckBox>
+#include <CheckBox>
 #include <QFileDialog>
-#include <QGridLayout>
-#include <QGroupBox>
-#include <QHBoxLayout>
-#include <QLabel>
+#include <GridLayout>
+#include <GroupBox>
+#include <HBoxLayout>
+#include <Label>
 #include <QLineEdit>
 #include <QMessageBox>
-#include <QPushButton>
-#include <QVBoxLayout>
+#include <PushButton>
+#include <VBoxLayout>
 
 // Include local.
 #define LOG_MODULE_NAME "TreeTableExportDialog"
@@ -43,37 +43,37 @@
 
 #define ICON(name) (ThemeIcon(":/TreeTableResources/", name))
 
-TreeTableExportDialog::TreeTableExportDialog(MainWindow *mainWindow,
+TreeTableExportDialog::TreeTableExportDialog(Application *app,
                                              const QString &fileName)
-    : QDialog(mainWindow),
-      mainWindow_(mainWindow)
+    : Dialog(app),
+      app_(app)
 {
     // File name.
     fileNameLineEdit_ = new QLineEdit;
     fileNameLineEdit_->setText(fileName);
 
-    browseButton_ = new QPushButton(tr("Browse"));
+    browseButton_ = new PushButton(tr("Browse"));
     connect(browseButton_, SIGNAL(clicked()), this, SLOT(slotBrowse()));
 
-    QHBoxLayout *fileNameLayout = new QHBoxLayout;
-    fileNameLayout->addWidget(new QLabel(tr("File")));
+    HBoxLayout *fileNameLayout = new HBoxLayout;
+    fileNameLayout->addWidget(new Label(tr("File")));
     fileNameLayout->addWidget(fileNameLineEdit_);
     fileNameLayout->addWidget(browseButton_);
 
     // Buttons.
-    acceptButton_ = new QPushButton(tr("Export"));
+    acceptButton_ = new PushButton(tr("Export"));
     connect(acceptButton_, SIGNAL(clicked()), this, SLOT(slotAccept()));
 
-    rejectButton_ = new QPushButton(tr("Cancel"));
+    rejectButton_ = new PushButton(tr("Cancel"));
     connect(rejectButton_, SIGNAL(clicked()), this, SLOT(slotReject()));
 
-    QHBoxLayout *dialogButtons = new QHBoxLayout;
+    HBoxLayout *dialogButtons = new HBoxLayout;
     dialogButtons->addStretch();
     dialogButtons->addWidget(acceptButton_);
     dialogButtons->addWidget(rejectButton_);
 
     // Dialog layout.
-    QVBoxLayout *dialogLayout = new QVBoxLayout;
+    VBoxLayout *dialogLayout = new VBoxLayout;
     dialogLayout->addLayout(fileNameLayout);
     dialogLayout->addSpacing(10);
     dialogLayout->addLayout(dialogButtons);
@@ -83,7 +83,7 @@ TreeTableExportDialog::TreeTableExportDialog(MainWindow *mainWindow,
 
     // Window.
     setWindowTitle(tr("Export File"));
-    setWindowIcon(THEME_ICON("export-file").icon());
+    setWindowIcon(THEME_ICON("export-file"));
     setMaximumWidth(600);
     setMaximumHeight(height());
 }
@@ -96,7 +96,7 @@ void TreeTableExportDialog::slotBrowse()
     QString selectedFilter;
 
     QString fileName =
-        QFileDialog::getSaveFileName(mainWindow_,
+        QFileDialog::getSaveFileName(app_,
                                      tr("Export File As"),
                                      fileNameLineEdit_->text(),
                                      tr("Comma Separated Values (*.csv)"),
@@ -139,13 +139,13 @@ void TreeTableExportDialog::slotAccept()
     }
 
     close();
-    setResult(QDialog::Accepted);
+    setResult(Dialog::Accepted);
 }
 
 void TreeTableExportDialog::slotReject()
 {
     close();
-    setResult(QDialog::Rejected);
+    setResult(Dialog::Rejected);
 }
 
 std::shared_ptr<FileFormatInterface> TreeTableExportDialog::writer() const

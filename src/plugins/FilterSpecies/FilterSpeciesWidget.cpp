@@ -22,18 +22,18 @@
 // Include 3D Forest.
 #include <ColorPalette.hpp>
 #include <FilterSpeciesWidget.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
-#include <QHBoxLayout>
-#include <QLabel>
+#include <HBoxLayout>
+#include <Label>
 #include <QToolBar>
 #include <QToolButton>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QTreeWidgetItemIterator>
-#include <QVBoxLayout>
+#include <VBoxLayout>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterSpeciesWidget"
@@ -42,8 +42,8 @@
 
 #define ICON(name) (ThemeIcon(":/FilterSpeciesResources/", name))
 
-FilterSpeciesWidget::FilterSpeciesWidget(MainWindow *mainWindow)
-    : mainWindow_(mainWindow)
+FilterSpeciesWidget::FilterSpeciesWidget(Application *app)
+    : app_(app)
 {
     // Table.
     tree_ = new QTreeWidget();
@@ -51,7 +51,7 @@ FilterSpeciesWidget::FilterSpeciesWidget(MainWindow *mainWindow)
     tree_->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     // Tool bar buttons.
-    mainWindow_->createToolButton(&showButton_,
+    app_->createToolButton(&showButton_,
                                   tr("Show"),
                                   tr("Make selected species visible"),
                                   THEME_ICON("eye"),
@@ -59,7 +59,7 @@ FilterSpeciesWidget::FilterSpeciesWidget(MainWindow *mainWindow)
                                   SLOT(slotShow()));
     showButton_->setEnabled(false);
 
-    mainWindow_->createToolButton(&hideButton_,
+    app_->createToolButton(&hideButton_,
                                   tr("Hide"),
                                   tr("Hide selected species"),
                                   THEME_ICON("hide"),
@@ -67,21 +67,21 @@ FilterSpeciesWidget::FilterSpeciesWidget(MainWindow *mainWindow)
                                   SLOT(slotHide()));
     hideButton_->setEnabled(false);
 
-    mainWindow_->createToolButton(&selectAllButton_,
+    app_->createToolButton(&selectAllButton_,
                                   tr("Select all"),
                                   tr("Select all"),
                                   THEME_ICON("select-all"),
                                   this,
                                   SLOT(slotSelectAll()));
 
-    mainWindow_->createToolButton(&selectInvertButton_,
+    app_->createToolButton(&selectInvertButton_,
                                   tr("Invert"),
                                   tr("Invert selection"),
                                   THEME_ICON("select-invert"),
                                   this,
                                   SLOT(slotSelectInvert()));
 
-    mainWindow_->createToolButton(&selectNoneButton_,
+    app_->createToolButton(&selectNoneButton_,
                                   tr("Select none"),
                                   tr("Select none"),
                                   THEME_ICON("select-none"),
@@ -96,10 +96,10 @@ FilterSpeciesWidget::FilterSpeciesWidget(MainWindow *mainWindow)
     toolBar->addWidget(selectAllButton_);
     toolBar->addWidget(selectInvertButton_);
     toolBar->addWidget(selectNoneButton_);
-    toolBar->setIconSize(QSize(MainWindow::ICON_SIZE, MainWindow::ICON_SIZE));
+    toolBar->setIconSize(Size(Application::ICON_SIZE, Application::ICON_SIZE));
 
     // Layout.
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(toolBar);
     mainLayout->addWidget(tree_);
@@ -108,30 +108,30 @@ FilterSpeciesWidget::FilterSpeciesWidget(MainWindow *mainWindow)
 
     // Data.
     updatesEnabled_ = true;
-    connect(mainWindow_,
-            SIGNAL(signalUpdate(void *, const QSet<Editor::Type> &)),
-            this,
-            SLOT(slotUpdate(void *, const QSet<Editor::Type> &)));
+    app_->signalUpdate.connect([this](void *sender, const std::set<Editor::Type> &target)
+    {
+        slotUpdate(sender, target);
+    });
 
-    slotUpdate(nullptr, QSet<Editor::Type>());
+    slotUpdate(nullptr, std::set<Editor::Type>());
 }
 
 void FilterSpeciesWidget::slotUpdate(void *sender,
-                                     const QSet<Editor::Type> &target)
+                                     const std::set<Editor::Type> &target)
 {
     if (sender == this)
     {
         return;
     }
 
-    if (target.empty() || target.contains(Editor::TYPE_SPECIES) ||
-        target.contains(Editor::TYPE_SEGMENT))
+    if (target.empty() || target.count(Editor::TYPE_SPECIES) ||
+        target.count(Editor::TYPE_SEGMENT))
     {
         LOG_DEBUG_UPDATE(<< "Input species.");
 
-        setSpeciesList(mainWindow_->editor().segments(),
-                       mainWindow_->editor().speciesList(),
-                       mainWindow_->editor().speciesFilter());
+        setSpeciesList(app_->editor().segments(),
+                       app_->editor().speciesList(),
+                       app_->editor().speciesFilter());
     }
 }
 
@@ -139,19 +139,19 @@ void FilterSpeciesWidget::dataChanged()
 {
     LOG_DEBUG_UPDATE(<< "Output species.");
 
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setSpeciesList(species_);
-    mainWindow_->editor().setSpeciesFilter(filter_);
-    mainWindow_->updateData();
+    app_->suspendThreads();
+    app_->editor().setSpeciesList(species_);
+    app_->editor().setSpeciesFilter(filter_);
+    app_->updateData();
 }
 
 void FilterSpeciesWidget::filterChanged()
 {
     LOG_DEBUG_UPDATE(<< "Output species filter.");
 
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setSpeciesFilter(filter_);
-    mainWindow_->updateFilter();
+    app_->suspendThreads();
+    app_->editor().setSpeciesFilter(filter_);
+    app_->updateFilter();
 }
 
 void FilterSpeciesWidget::setFilterEnabled(bool b)
@@ -391,7 +391,7 @@ void FilterSpeciesWidget::addTreeItem(size_t index)
     item->setText(COLUMN_LABEL, QString::fromStdString(species.latin));
 
     // Color legend.
-    QColor color;
+    Color color;
     color.setRedF(static_cast<float>(species.color[0]));
     color.setGreenF(static_cast<float>(species.color[1]));
     color.setBlueF(static_cast<float>(species.color[2]));

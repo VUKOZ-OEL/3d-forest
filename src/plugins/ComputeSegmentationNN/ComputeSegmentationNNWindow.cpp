@@ -22,11 +22,11 @@
 // Include 3D Forest.
 #include <ComputeSegmentationNNWidget.hpp>
 #include <ComputeSegmentationNNWindow.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
-#include <QVBoxLayout>
+#include <VBoxLayout>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeSegmentationNNWindow"
@@ -35,24 +35,24 @@
 
 #define ICON(name) (ThemeIcon(":/ComputeSegmentationNNResources/", name))
 
-ComputeSegmentationNNWindow::ComputeSegmentationNNWindow(MainWindow *mainWindow)
-    : QDialog(mainWindow),
+ComputeSegmentationNNWindow::ComputeSegmentationNNWindow(Application *app)
+    : Dialog(app),
       widget_(nullptr)
 {
     LOG_DEBUG(<< "Create.");
 
     // Widget.
-    widget_ = new ComputeSegmentationNNWidget(mainWindow);
+    widget_ = new ComputeSegmentationNNWidget(app);
 
     // Main layout.
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->addWidget(widget_);
     mainLayout->addStretch();
 
     // Dialog.
     setLayout(mainLayout);
     setWindowTitle(tr("Compute Segmentation NN"));
-    setWindowIcon(ICON("forest").icon());
+    setWindowIcon(ICON("forest"));
     setMaximumHeight(height());
     setModal(false);
 }

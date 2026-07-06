@@ -24,15 +24,15 @@
 
 // Include 3D Forest.
 #include <Editor.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ViewerOpenGLManager.hpp>
 #include <ViewerOpenGLViewport.hpp>
 #include <ViewerViewports.hpp>
 
 // Include Qt.
-#include <QHBoxLayout>
+#include <HBoxLayout>
 #include <QSplitter>
-#include <QVBoxLayout>
+#include <VBoxLayout>
 
 // Include local.
 #define LOG_MODULE_NAME "ViewerViewports"
@@ -44,12 +44,17 @@
 #define VIEWER_VIEWPORTS_FRONT 2
 #define VIEWER_VIEWPORTS_RIGHT 3
 
-ViewerViewports::ViewerViewports(MainWindow *mainWindow)
-    : QWidget(mainWindow),
-      mainWindow_(mainWindow)
+ViewerViewports::ViewerViewports(Application *app)
+    : Widget(app),
+      app_(app)
 {
     LOG_DEBUG(<< "The viewports are being created.");
     initializeViewports();
+//    connect(viewports_,
+//            SIGNAL(cameraChanged(size_t)),
+//            app_,
+//            SLOT(slotRenderViewport(size_t)));
+
     LOG_DEBUG(<< "Finished creating the viewports.");
 }
 
@@ -61,25 +66,25 @@ ViewerViewports::~ViewerViewports()
 void ViewerViewports::paintEvent(QPaintEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Paint event.");
-    QWidget::paintEvent(event);
+    Widget::paintEvent(event);
 }
 
 void ViewerViewports::resizeEvent(QResizeEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Resize event.");
-    QWidget::resizeEvent(event);
+    Widget::resizeEvent(event);
 }
 
 void ViewerViewports::showEvent(QShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
-    QWidget::showEvent(event);
+    Widget::showEvent(event);
 }
 
-void ViewerViewports::hideEvent(QHideEvent *event)
+void ViewerViewports::hideEvent(HideEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Hide.");
-    QWidget::hideEvent(event);
+    Widget::hideEvent(event);
 }
 
 void ViewerViewports::initializeViewports()
@@ -94,7 +99,7 @@ ViewerOpenGLViewport *ViewerViewports::createViewport(size_t viewportId)
 {
     LOG_DEBUG(<< "Create viewport <" << viewportId << ">.");
     ViewerOpenGLViewport *viewport =
-        new ViewerOpenGLViewport(this, mainWindow_);
+        new ViewerOpenGLViewport(this, app_);
     viewport->setManager(manager_.get());
     viewport->setViewports(this, viewportId);
     viewport->setSelected(false);
@@ -382,7 +387,7 @@ void ViewerViewports::setLayout(ViewLayout viewLayout)
     }
 
     // Create new layout.
-    QHBoxLayout *newLayout = new QHBoxLayout;
+    HBoxLayout *newLayout = new HBoxLayout;
     newLayout->setContentsMargins(1, 1, 1, 1);
 
     // Set layout.
@@ -469,7 +474,7 @@ void ViewerViewports::setLayout(ViewLayout viewLayout)
     }
 
     // Set new layout.
-    QWidget::setLayout(newLayout);
+    Widget::setLayout(newLayout);
 
     LOG_DEBUG_RENDER(<< "Finished setting layout.");
 }

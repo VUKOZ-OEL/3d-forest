@@ -22,20 +22,20 @@
 // Include 3D Forest.
 #include <FilterTreesTreeWidget.hpp>
 #include <FilterTreesWidget.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QPushButton>
+#include <HBoxLayout>
+#include <Label>
+#include <PushButton>
 #include <QSplitter>
 #include <QToolBar>
 #include <QToolButton>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QTreeWidgetItemIterator>
-#include <QVBoxLayout>
+#include <VBoxLayout>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterTreesWidget"
@@ -44,8 +44,8 @@
 
 #define ICON(name) (ThemeIcon(":/FilterTreesResources/", name))
 
-FilterTreesWidget::FilterTreesWidget(MainWindow *mainWindow)
-    : mainWindow_(mainWindow)
+FilterTreesWidget::FilterTreesWidget(Application *app)
+    : app_(app)
 {
     // Table.
     tree_ = new QTreeWidget();
@@ -53,7 +53,7 @@ FilterTreesWidget::FilterTreesWidget(MainWindow *mainWindow)
     tree_->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     // Tool bar buttons.
-    mainWindow_->createToolButton(&addButton_,
+    app_->createToolButton(&addButton_,
                                   tr("Add"),
                                   tr("Add new segments"),
                                   THEME_ICON("add"),
@@ -61,7 +61,7 @@ FilterTreesWidget::FilterTreesWidget(MainWindow *mainWindow)
                                   SLOT(slotAdd()));
     addButton_->setEnabled(false);
 
-    mainWindow_->createToolButton(&deleteButton_,
+    app_->createToolButton(&deleteButton_,
                                   tr("Remove"),
                                   tr("Remove selected segments"),
                                   THEME_ICON("remove"),
@@ -69,7 +69,7 @@ FilterTreesWidget::FilterTreesWidget(MainWindow *mainWindow)
                                   SLOT(slotDelete()));
     deleteButton_->setEnabled(false);
 
-    mainWindow_->createToolButton(&showButton_,
+    app_->createToolButton(&showButton_,
                                   tr("Show"),
                                   tr("Make selected segments visible"),
                                   THEME_ICON("eye"),
@@ -77,7 +77,7 @@ FilterTreesWidget::FilterTreesWidget(MainWindow *mainWindow)
                                   SLOT(slotShow()));
     showButton_->setEnabled(false);
 
-    mainWindow_->createToolButton(&hideButton_,
+    app_->createToolButton(&hideButton_,
                                   tr("Hide"),
                                   tr("Hide selected segments"),
                                   THEME_ICON("hide"),
@@ -85,21 +85,21 @@ FilterTreesWidget::FilterTreesWidget(MainWindow *mainWindow)
                                   SLOT(slotHide()));
     hideButton_->setEnabled(false);
 
-    mainWindow_->createToolButton(&selectAllButton_,
+    app_->createToolButton(&selectAllButton_,
                                   tr("Select all"),
                                   tr("Select all"),
                                   THEME_ICON("select-all"),
                                   this,
                                   SLOT(slotSelectAll()));
 
-    mainWindow_->createToolButton(&selectInvertButton_,
+    app_->createToolButton(&selectInvertButton_,
                                   tr("Invert"),
                                   tr("Invert selection"),
                                   THEME_ICON("select-invert"),
                                   this,
                                   SLOT(slotSelectInvert()));
 
-    mainWindow_->createToolButton(&selectNoneButton_,
+    app_->createToolButton(&selectNoneButton_,
                                   tr("Select none"),
                                   tr("Select none"),
                                   THEME_ICON("select-none"),
@@ -116,11 +116,11 @@ FilterTreesWidget::FilterTreesWidget(MainWindow *mainWindow)
     toolBar->addWidget(selectAllButton_);
     toolBar->addWidget(selectInvertButton_);
     toolBar->addWidget(selectNoneButton_);
-    toolBar->setIconSize(QSize(MainWindow::ICON_SIZE, MainWindow::ICON_SIZE));
+    toolBar->setIconSize(Size(Application::ICON_SIZE, Application::ICON_SIZE));
 
 #if defined(FILTER_TREES_SHOW_DETAIL)
     // Segment.
-    treeWidget_ = new FilterTreesTreeWidget(mainWindow_);
+    treeWidget_ = new FilterTreesTreeWidget(app_);
 
     // Splitter.
     splitter_ = new QSplitter;
@@ -131,7 +131,7 @@ FilterTreesWidget::FilterTreesWidget(MainWindow *mainWindow)
 #endif
 
     // Layout.
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(toolBar);
 #if defined(FILTER_TREES_SHOW_DETAIL)
@@ -144,29 +144,29 @@ FilterTreesWidget::FilterTreesWidget(MainWindow *mainWindow)
 
     // Data.
     updatesEnabled_ = true;
-    connect(mainWindow_,
-            SIGNAL(signalUpdate(void *, const QSet<Editor::Type> &)),
-            this,
-            SLOT(slotUpdate(void *, const QSet<Editor::Type> &)));
+    app_->signalUpdate.connect([this](void *sender, const std::set<Editor::Type> &target)
+    {
+        slotUpdate(sender, target);
+    });
 
-    slotUpdate(nullptr, QSet<Editor::Type>());
+    slotUpdate(nullptr, std::set<Editor::Type>());
 }
 
 void FilterTreesWidget::slotUpdate(void *sender,
-                                   const QSet<Editor::Type> &target)
+                                   const std::set<Editor::Type> &target)
 {
     if (sender == this)
     {
         return;
     }
 
-    if (target.empty() || target.contains(Editor::TYPE_SEGMENT) ||
-        target.contains(Editor::TYPE_SETTINGS))
+    if (target.empty() || target.count(Editor::TYPE_SEGMENT) ||
+        target.count(Editor::TYPE_SETTINGS))
     {
         LOG_DEBUG_UPDATE(<< "Input segments.");
 
-        setSegments(mainWindow_->editor().segments(),
-                    mainWindow_->editor().segmentsFilter());
+        setSegments(app_->editor().segments(),
+                    app_->editor().segmentsFilter());
     }
 }
 
@@ -174,21 +174,21 @@ void FilterTreesWidget::dataChanged()
 {
     LOG_DEBUG_UPDATE(<< "Output segments.");
 
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setSegments(segments_);
-    mainWindow_->editor().setSegmentsFilter(filter_);
-    mainWindow_->updateData();
-    mainWindow_->update(this, {Editor::TYPE_SEGMENT});
+    app_->suspendThreads();
+    app_->editor().setSegments(segments_);
+    app_->editor().setSegmentsFilter(filter_);
+    app_->updateData();
+    app_->update(this, {Editor::TYPE_SEGMENT});
 }
 
 void FilterTreesWidget::filterChanged()
 {
     LOG_DEBUG_UPDATE(<< "Output segments filter.");
 
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setSegmentsFilter(filter_);
-    mainWindow_->updateFilter();
-    mainWindow_->update(this, {Editor::TYPE_SEGMENT});
+    app_->suspendThreads();
+    app_->editor().setSegmentsFilter(filter_);
+    app_->updateFilter();
+    app_->update(this, {Editor::TYPE_SEGMENT});
 }
 
 void FilterTreesWidget::setFilterEnabled(bool b)
@@ -531,7 +531,7 @@ void FilterTreesWidget::addTreeItem(size_t index)
     // Color legend.
     const Vector3<double> &rgb = segments_[index].color;
 
-    QColor color;
+    Color color;
     color.setRedF(static_cast<float>(rgb[0]));
     color.setGreenF(static_cast<float>(rgb[1]));
     color.setBlueF(static_cast<float>(rgb[2]));

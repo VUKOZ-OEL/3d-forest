@@ -17,24 +17,24 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Point.hpp */
+/** @file Point3.hpp */
 
-#ifndef POINT_HPP
-#define POINT_HPP
+#ifndef POINT_3_HPP
+#define POINT_3_HPP
 
 // Include 3D Forest.
 #include <Box.hpp>
 
-/** Point. */
-class Point
+/** Point3. */
+class Point3
 {
 public:
-    /** Point IO. */
+    /** Point3 IO. */
     class IO
     {
     public:
-        static void read(const uint8_t *buffer, Point &point);
-        static void write(const Point &point, uint8_t *buffer);
+        static void read(const uint8_t *buffer, Point3 &point);
+        static void write(const Point3 &point, uint8_t *buffer);
     };
 
     // Class.
@@ -54,11 +54,11 @@ public:
     uint32_t status;
 
     // Construct/Copy/Destroy.
-    Point() = default;
-    Point(double x_, double y_, double z_);
+    Point3() = default;
+    Point3(double x_, double y_, double z_);
 };
 
-inline void toJson(Json &out, const Point &in)
+inline void toJson(Json &out, const Point3 &in)
 {
     toJson(out["position"][0], in.x);
     toJson(out["position"][1], in.y);
@@ -70,16 +70,16 @@ inline void toJson(Json &out, const Point &in)
     toJson(out["status"], in.status);
 }
 
-inline std::string toString(const Point &in)
+inline std::string toString(const Point3 &in)
 {
     Json json;
     toJson(json, in);
     return json.serialize();
 }
 
-inline std::ostream &operator<<(std::ostream &out, const Point &in)
+inline std::ostream &operator<<(std::ostream &out, const Point3 &in)
 {
     return out << toString(in);
 }
 
-#endif /* POINT_HPP */
+#endif /* POINT_3_HPP */

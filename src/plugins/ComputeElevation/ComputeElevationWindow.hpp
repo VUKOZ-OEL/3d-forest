@@ -23,19 +23,19 @@
 #define COMPUTE_ELEVATION_WINDOW_HPP
 
 // Include 3D Forest.
-class MainWindow;
+class Application;
 class ComputeElevationWidget;
 
 // Include Qt.
-#include <QDialog>
+#include <Dialog>
 
 /** Compute Elevation Window. */
-class ComputeElevationWindow : public QDialog
+class ComputeElevationWindow : public Dialog
 {
-    Q_OBJECT
+
 
 public:
-    ComputeElevationWindow(MainWindow *mainWindow);
+    ComputeElevationWindow(Application *app);
 
 private:
     ComputeElevationWidget *widget_;

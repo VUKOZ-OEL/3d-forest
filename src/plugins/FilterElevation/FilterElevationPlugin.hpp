@@ -23,7 +23,7 @@
 #define FILTER_ELEVATION_PLUGIN_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
+#include <Plugin.hpp>
 class FilterElevationWindow;
 
 #if defined(_MSC_VER)
@@ -37,25 +37,27 @@ class FilterElevationWindow;
 #endif
 
 /** Filter Elevation Plugin. */
-class EXPORT_FILTER_ELEVATION_PLUGIN FilterElevationPlugin
-    : public QObject,
-      public PluginInterface
+class FilterElevationPlugin
+    : 
+      public Plugin
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
     FilterElevationPlugin();
 
-    virtual void initialize(MainWindow *mainWindow);
+    const char *name() const override { return "FilterElevationPlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
-public slots:
     void slotPlugin();
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
     FilterElevationWindow *pluginWindow_;
 };
+
+extern "C" EXPORT_FILTER_ELEVATION_PLUGIN Plugin *createPlugin()
+{
+    return new FilterElevationPlugin();
+}
 
 #endif /* FILTER_ELEVATION_PLUGIN_HPP */

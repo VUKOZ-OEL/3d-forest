@@ -22,7 +22,7 @@
 // Include 3D Forest.
 #include <ComputeHeightMapPlugin.hpp>
 #include <ComputeHeightMapWindow.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -32,26 +32,26 @@
 #define ICON(name) (ThemeIcon(":/ComputeHeightMapResources/", name))
 
 ComputeHeightMapPlugin::ComputeHeightMapPlugin()
-    : mainWindow_(nullptr),
+    : app_(nullptr),
       pluginWindow_(nullptr)
 {
 }
 
-void ComputeHeightMapPlugin::initialize(MainWindow *mainWindow)
+void ComputeHeightMapPlugin::initialize(Application *app)
 {
-    mainWindow_ = mainWindow;
+    app_ = app;
 
-    mainWindow_->createAction(nullptr,
+    app_->createAction(nullptr,
                               "Compute",
                               "Compute",
                               tr("Height Map"),
                               tr("Compute height map"),
                               ICON("height-map"),
                               this,
-                              SLOT(slotPlugin()),
+                              &ComputeHeightMapPlugin::slotPlugin,
                               MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
 
-    modifier_.initialize(mainWindow_);
+    modifier_.initialize(app_);
 }
 
 void ComputeHeightMapPlugin::slotPlugin()
@@ -59,7 +59,7 @@ void ComputeHeightMapPlugin::slotPlugin()
     // Create GUI only when this plugin is used for the first time.
     if (!pluginWindow_)
     {
-        pluginWindow_ = new ComputeHeightMapWindow(mainWindow_, &modifier_);
+        pluginWindow_ = new ComputeHeightMapWindow(app_, &modifier_);
     }
 
     pluginWindow_->show();

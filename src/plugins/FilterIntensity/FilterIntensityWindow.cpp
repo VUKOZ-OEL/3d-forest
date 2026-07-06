@@ -22,7 +22,7 @@
 // Include 3D Forest.
 #include <FilterIntensityWidget.hpp>
 #include <FilterIntensityWindow.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
@@ -34,21 +34,21 @@
 
 #define ICON(name) (ThemeIcon(":/FilterIntensityResources/", name))
 
-FilterIntensityWindow::FilterIntensityWindow(MainWindow *mainWindow)
-    : QDockWidget(mainWindow)
+FilterIntensityWindow::FilterIntensityWindow(Application *app)
+    : DockWidget(app)
 {
     LOG_DEBUG(<< "Start creating intensity filter window.");
 
     // Widget.
-    widget_ = new FilterIntensityWidget(mainWindow);
+    widget_ = new FilterIntensityWidget(app);
 
     // Dock.
     setWidget(widget_);
     setFixedHeight(widget()->sizeHint().height());
     setWindowTitle(tr("Filter Intensity"));
-    setWindowIcon(ICON("intensity-filter").icon());
+    setWindowIcon(ICON("intensity-filter"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
+    app->addDockWidget(Qt::RightDockWidgetArea, this);
 
     LOG_DEBUG(<< "Finished creating intensity filter window.");
 }
@@ -57,13 +57,13 @@ void FilterIntensityWindow::showEvent(QShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
     // widget_->setFilterEnabled(true);
-    QWidget::showEvent(event);
+    Widget::showEvent(event);
 }
 
-void FilterIntensityWindow::hideEvent(QHideEvent *event)
+void FilterIntensityWindow::hideEvent(HideEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Hide event.");
-    QWidget::hideEvent(event);
+    Widget::hideEvent(event);
 }
 
 void FilterIntensityWindow::closeEvent(QCloseEvent *event)

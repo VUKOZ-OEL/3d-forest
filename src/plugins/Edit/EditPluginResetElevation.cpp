@@ -21,7 +21,7 @@
 
 // Include 3D Forest.
 #include <EditPluginResetElevation.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 
 // Include Qt.
 #include <QCoreApplication>
@@ -32,16 +32,16 @@
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-void EditPluginResetElevation::run(MainWindow *mainWindow)
+void EditPluginResetElevation::run(Application *app)
 {
     LOG_DEBUG(<< "Start resetting elevation values.");
 
     double newElevationValue = 0.0;
 
     // Editor.
-    mainWindow->suspendThreads();
+    app->suspendThreads();
 
-    Editor *editor = &mainWindow->editor();
+    Editor *editor = &app->editor();
 
     // Run.
     QProgressDialog progress("Processing...", "Cancel", 0, 0);
@@ -77,7 +77,7 @@ void EditPluginResetElevation::run(MainWindow *mainWindow)
 
     progress.close();
 
-    mainWindow->update(nullptr, {Editor::TYPE_ELEVATION}, Page::STATE_READ);
+    app->update(nullptr, {Editor::TYPE_ELEVATION}, Page::STATE_READ);
 
     LOG_DEBUG(<< "Finished resetting elevation values.");
 }

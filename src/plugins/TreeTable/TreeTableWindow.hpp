@@ -23,20 +23,20 @@
 #define TREE_TABLE_WINDOW_HPP
 
 // Include 3D Forest.
-class MainWindow;
+class Application;
 class TreeTableWidget;
 
 // Include Qt.
-#include <QDialog>
+#include <Dialog>
 class QCloseEvent;
 
 /** Tree Table Window. */
-class TreeTableWindow : public QDialog
+class TreeTableWindow : public Dialog
 {
-    Q_OBJECT
+
 
 public:
-    TreeTableWindow(MainWindow *mainWindow);
+    TreeTableWindow(Application *app);
     ~TreeTableWindow();
 
 protected:

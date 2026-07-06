@@ -20,7 +20,7 @@
 /** @file UnitsSettingsPlugin.cpp */
 
 // Include 3D Forest.
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 #include <UnitsSettingsPlugin.hpp>
 #include <UnitsSettingsWindow.hpp>
@@ -32,36 +32,36 @@
 #define ICON(name) (ThemeIcon(":/UnitsSettingsResources/", name))
 
 UnitsSettingsPlugin::UnitsSettingsPlugin()
-    : mainWindow_(nullptr),
+    : app_(nullptr),
       pluginWindow_(nullptr)
 {
 }
 
-void UnitsSettingsPlugin::initialize(MainWindow *mainWindow)
+void UnitsSettingsPlugin::initialize(Application *app)
 {
-    mainWindow_ = mainWindow;
+    app_ = app;
 
-    mainWindow_->createAction(nullptr,
+    app_->createAction(nullptr,
                               "Settings",
                               "Settings",
                               tr("Units"),
                               tr("Show units settings"),
                               ICON("units"),
                               this,
-                              SLOT(slotPlugin()),
+                              &UnitsSettingsPlugin::slotPlugin,
                               MAIN_WINDOW_MENU_SETTINGS_PRIORITY);
 }
 
 void UnitsSettingsPlugin::slotPlugin()
 {
-    if (!mainWindow_)
+    if (!app_)
     {
         return;
     }
 
     if (!pluginWindow_)
     {
-        pluginWindow_ = new UnitsSettingsWindow(mainWindow_);
+        pluginWindow_ = new UnitsSettingsWindow(app_);
     }
 
     pluginWindow_->show();

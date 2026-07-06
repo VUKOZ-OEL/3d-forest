@@ -22,7 +22,7 @@
 // Include 3D Forest.
 #include <FilterClassificationWidget.hpp>
 #include <FilterClassificationWindow.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
@@ -34,20 +34,20 @@
 
 #define ICON(name) (ThemeIcon(":/FilterClassificationResources/", name))
 
-FilterClassificationWindow::FilterClassificationWindow(MainWindow *mainWindow)
-    : QDockWidget(mainWindow)
+FilterClassificationWindow::FilterClassificationWindow(Application *app)
+    : DockWidget(app)
 {
     LOG_DEBUG(<< "Start creating classifications window.");
 
     // Widget.
-    widget_ = new FilterClassificationWidget(mainWindow);
+    widget_ = new FilterClassificationWidget(app);
 
     // Dock.
     setWidget(widget_);
     setWindowTitle(tr("Filter Classification"));
-    setWindowIcon(ICON("classification-filter").icon());
+    setWindowIcon(ICON("classification-filter"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
+    app->addDockWidget(Qt::RightDockWidgetArea, this);
 
     LOG_DEBUG(<< "Finished creating classifications window.");
 }
@@ -56,13 +56,13 @@ void FilterClassificationWindow::showEvent(QShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
     // widget_->setFilterEnabled(true);
-    QWidget::showEvent(event);
+    Widget::showEvent(event);
 }
 
-void FilterClassificationWindow::hideEvent(QHideEvent *event)
+void FilterClassificationWindow::hideEvent(HideEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Hide event.");
-    QWidget::hideEvent(event);
+    Widget::hideEvent(event);
 }
 
 void FilterClassificationWindow::closeEvent(QCloseEvent *event)

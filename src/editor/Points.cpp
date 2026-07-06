@@ -48,12 +48,12 @@ void Points::clear()
     points_.clear();
 }
 
-void Points::push_back(const Point &point)
+void Points::push_back(const Point3 &point)
 {
     points_.push_back(point);
 }
 
-void Points::push_back(Point &&point)
+void Points::push_back(Point3 &&point)
 {
     points_.push_back(point);
 }
@@ -69,14 +69,14 @@ void Points::findRadius(double x,
                         double r,
                         std::vector<size_t> &resultIndices)
 {
-    octree_.radiusNeighbors<unibn::L2Distance<Point>>({x, y, z},
+    octree_.radiusNeighbors<unibn::L2Distance<Point3>>({x, y, z},
                                                       r,
                                                       resultIndices);
 }
 
 size_t Points::findNN(double x, double y, double z)
 {
-    int32_t r = octree_.findNeighbor<unibn::L2Distance<Point>>({x, y, z});
+    int32_t r = octree_.findNeighbor<unibn::L2Distance<Point3>>({x, y, z});
     if (r >= 0)
     {
         return static_cast<size_t>(r);

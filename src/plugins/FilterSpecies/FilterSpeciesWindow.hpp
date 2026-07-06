@@ -23,26 +23,26 @@
 #define FILTER_SPECIES_WINDOW_HPP
 
 // Include 3D Forest.
-class MainWindow;
+class Application;
 class FilterSpeciesWidget;
 
 // Include Qt.
-#include <QDockWidget>
+#include <DockWidget>
 class QCloseEvent;
 
 /** Filter Species Window. */
-class FilterSpeciesWindow : public QDockWidget
+class FilterSpeciesWindow : public DockWidget
 {
-    Q_OBJECT
+
 
 public:
-    FilterSpeciesWindow(MainWindow *mainWindow);
+    FilterSpeciesWindow(Application *app);
 
 protected:
     FilterSpeciesWidget *widget_;
 
     void showEvent(QShowEvent *event) override;
-    void hideEvent(QHideEvent *event) override;
+    void hideEvent(HideEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
 };
 

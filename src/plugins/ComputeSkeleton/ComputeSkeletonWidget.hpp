@@ -25,36 +25,36 @@
 // Include 3D Forest.
 #include <ComputeSkeletonAction.hpp>
 #include <ComputeSkeletonParameters.hpp>
-class MainWindow;
-class DoubleSliderWidget;
+class Application;
+class DoubleSlider;
 
 // Include Qt.
-#include <QWidget>
-class QPushButton;
+#include <Widget>
+class PushButton;
 
 /** Compute Skeleton Widget. */
-class ComputeSkeletonWidget : public QWidget
+class ComputeSkeletonWidget : public Widget
 {
-    Q_OBJECT
+
 
 public:
-    ComputeSkeletonWidget(MainWindow *mainWindow);
+    ComputeSkeletonWidget(Application *app);
 
 protected slots:
     void slotApply();
 
 protected:
-    void hideEvent(QHideEvent *event) override;
+    void hideEvent(HideEvent *event) override;
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
 
     ComputeSkeletonParameters parameters_;
     ComputeSkeletonAction action_;
 
-    DoubleSliderWidget *voxelSizeSlider_;
+    DoubleSlider *voxelSizeSlider_;
 
-    QPushButton *applyButton_;
+    PushButton *applyButton_;
 };
 
 #endif /* COMPUTE_SKELETON_WIDGET_HPP */

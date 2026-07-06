@@ -22,11 +22,11 @@
 // Include 3D Forest.
 #include <ComputeElevationWidget.hpp>
 #include <ComputeElevationWindow.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
-#include <QVBoxLayout>
+#include <VBoxLayout>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeElevationWindow"
@@ -34,24 +34,24 @@
 
 #define ICON(name) (ThemeIcon(":/ComputeElevationResources/", name))
 
-ComputeElevationWindow::ComputeElevationWindow(MainWindow *mainWindow)
-    : QDialog(mainWindow),
+ComputeElevationWindow::ComputeElevationWindow(Application *app)
+    : Dialog(app),
       widget_(nullptr)
 {
     LOG_DEBUG(<< "Create.");
 
     // Widget.
-    widget_ = new ComputeElevationWidget(mainWindow);
+    widget_ = new ComputeElevationWidget(app);
 
     // Main layout.
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->addWidget(widget_);
     mainLayout->addStretch();
 
     // Dialog.
     setLayout(mainLayout);
     setWindowTitle(tr("Compute Elevation"));
-    setWindowIcon(ICON("elevation").icon());
+    setWindowIcon(ICON("elevation"));
     setMaximumHeight(height());
     setModal(false);
 }

@@ -22,7 +22,7 @@
 // Include 3D Forest.
 #include <ComputeSkeletonPlugin.hpp>
 #include <ComputeSkeletonWindow.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -32,23 +32,23 @@
 #define ICON(name) (ThemeIcon(":/ComputeSkeletonResources/", name))
 
 ComputeSkeletonPlugin::ComputeSkeletonPlugin()
-    : mainWindow_(nullptr),
+    : app_(nullptr),
       pluginWindow_(nullptr)
 {
 }
 
-void ComputeSkeletonPlugin::initialize(MainWindow *mainWindow)
+void ComputeSkeletonPlugin::initialize(Application *app)
 {
-    mainWindow_ = mainWindow;
+    app_ = app;
 
-    mainWindow_->createAction(nullptr,
+    app_->createAction(nullptr,
                               "Compute",
                               "Compute",
                               tr("Skeleton"),
                               tr("Compute skeleton"),
                               ICON("compute-skeleton"),
                               this,
-                              SLOT(slotPlugin()),
+                              &ComputeSkeletonPlugin::slotPlugin,
                               MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
 }
 
@@ -56,7 +56,7 @@ void ComputeSkeletonPlugin::slotPlugin()
 {
     if (!pluginWindow_)
     {
-        pluginWindow_ = new ComputeSkeletonWindow(mainWindow_);
+        pluginWindow_ = new ComputeSkeletonWindow(app_);
     }
 
     pluginWindow_->show();

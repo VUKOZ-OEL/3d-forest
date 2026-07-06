@@ -21,18 +21,18 @@
 
 // Include 3D Forest.
 #include <ComputeHullWidget.hpp>
-#include <DoubleSliderWidget.hpp>
+#include <DoubleSlider.hpp>
 #include <InfoDialog.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ProgressDialog.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
-#include <QCheckBox>
-#include <QGroupBox>
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QVBoxLayout>
+#include <CheckBox>
+#include <GroupBox>
+#include <HBoxLayout>
+#include <PushButton>
+#include <VBoxLayout>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeHullWidget"
@@ -41,46 +41,46 @@
 
 #define ICON(name) (ThemeIcon(":/ComputeHullResources/", name))
 
-ComputeHullWidget::ComputeHullWidget(MainWindow *mainWindow)
-    : QWidget(),
-      mainWindow_(mainWindow),
-      action_(&mainWindow->editor())
+ComputeHullWidget::ComputeHullWidget(Application *app)
+    : Widget(),
+      app_(app),
+      action_(&app->editor())
 {
     LOG_DEBUG(<< "Create.");
 
     // Hull options.
-    computeConvexHullCheckBox_ = new QCheckBox;
+    computeConvexHullCheckBox_ = new CheckBox;
     computeConvexHullCheckBox_->setChecked(false);
     computeConvexHullCheckBox_->setText(tr("Convex hull"));
 
-    computeConvexHullProjectionCheckBox_ = new QCheckBox;
+    computeConvexHullProjectionCheckBox_ = new CheckBox;
     computeConvexHullProjectionCheckBox_->setChecked(false);
     computeConvexHullProjectionCheckBox_->setText(tr("Convex hull projection"));
 
-    computeConcaveHullCheckBox_ = new QCheckBox;
+    computeConcaveHullCheckBox_ = new CheckBox;
     computeConcaveHullCheckBox_->setChecked(true);
     computeConcaveHullCheckBox_->setText(tr("Concave hull (alpha shape)"));
 
-    computeConcaveHullProjectionCheckBox_ = new QCheckBox;
+    computeConcaveHullProjectionCheckBox_ = new CheckBox;
     computeConcaveHullProjectionCheckBox_->setChecked(true);
     computeConcaveHullProjectionCheckBox_->setText(
         tr("Concave hull projection"));
 
     // Hull type options group.
-    QVBoxLayout *typeOptionsVBoxLayout = new QVBoxLayout;
+    VBoxLayout *typeOptionsVBoxLayout = new VBoxLayout;
     typeOptionsVBoxLayout->addWidget(computeConvexHullCheckBox_);
     typeOptionsVBoxLayout->addWidget(computeConvexHullProjectionCheckBox_);
     typeOptionsVBoxLayout->addWidget(computeConcaveHullCheckBox_);
     typeOptionsVBoxLayout->addWidget(computeConcaveHullProjectionCheckBox_);
 
-    QGroupBox *typeOptionsGroupBox = new QGroupBox(tr("Compute hull"));
+    GroupBox *typeOptionsGroupBox = new GroupBox(tr("Compute hull"));
     typeOptionsGroupBox->setLayout(typeOptionsVBoxLayout);
 
-    QGridLayout *typeOptionsGroupBoxLayout = new QGridLayout;
+    GridLayout *typeOptionsGroupBoxLayout = new GridLayout;
     typeOptionsGroupBoxLayout->addWidget(typeOptionsGroupBox, 0, 1);
 
     // Concave hull alpha.
-    findOptimalAlphaCheckBox_ = new QCheckBox;
+    findOptimalAlphaCheckBox_ = new CheckBox;
     findOptimalAlphaCheckBox_->setText(tr("Find optimal alpha"));
     findOptimalAlphaCheckBox_->setChecked(parameters_.findOptimalAlpha);
     connect(findOptimalAlphaCheckBox_,
@@ -92,7 +92,7 @@ ComputeHullWidget::ComputeHullWidget(MainWindow *mainWindow)
     // very local features. If points are spaced ~100 units apart, you might
     // need α = 50+ to see a connected shape.
 
-    DoubleSliderWidget::create(
+    DoubleSlider::create(
         alphaSlider_,
         this,
         nullptr,
@@ -111,7 +111,7 @@ ComputeHullWidget::ComputeHullWidget(MainWindow *mainWindow)
     alphaSlider_->setEnabled(!findOptimalAlphaCheckBox_->isChecked());
 
     // Voxel radius.
-    DoubleSliderWidget::create(
+    DoubleSlider::create(
         voxelRadiusSlider_,
         this,
         nullptr,
@@ -126,7 +126,7 @@ ComputeHullWidget::ComputeHullWidget(MainWindow *mainWindow)
         parameters_.voxelRadius);
 
     // Settings layout.
-    QVBoxLayout *settingsLayout = new QVBoxLayout;
+    VBoxLayout *settingsLayout = new VBoxLayout;
     settingsLayout->addLayout(typeOptionsGroupBoxLayout);
     settingsLayout->addWidget(findOptimalAlphaCheckBox_);
     settingsLayout->addWidget(alphaSlider_);
@@ -134,18 +134,18 @@ ComputeHullWidget::ComputeHullWidget(MainWindow *mainWindow)
     settingsLayout->addStretch();
 
     // Buttons.
-    applyButton_ = new QPushButton(tr("Run"));
-    applyButton_->setIcon(THEME_ICON("run").icon());
+    applyButton_ = new PushButton(tr("Run"));
+    applyButton_->setIcon(THEME_ICON("run"));
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
 
     // Buttons layout.
-    QHBoxLayout *buttonsLayout = new QHBoxLayout;
+    HBoxLayout *buttonsLayout = new HBoxLayout;
     buttonsLayout->addStretch();
     buttonsLayout->addWidget(applyButton_);
 
     // Main layout.
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->addLayout(settingsLayout);
     mainLayout->addSpacing(10);
     mainLayout->addLayout(buttonsLayout);
@@ -155,18 +155,18 @@ ComputeHullWidget::ComputeHullWidget(MainWindow *mainWindow)
     setLayout(mainLayout);
 }
 
-void ComputeHullWidget::hideEvent(QHideEvent *event)
+void ComputeHullWidget::hideEvent(HideEvent *event)
 {
     LOG_DEBUG(<< "Hide.");
     action_.clear();
-    QWidget::hideEvent(event);
+    Widget::hideEvent(event);
 }
 
 void ComputeHullWidget::slotApply()
 {
     LOG_DEBUG(<< "Apply.");
 
-    mainWindow_->suspendThreads();
+    app_->suspendThreads();
 
     parameters_.computeConvexHull = computeConvexHullCheckBox_->isChecked();
     parameters_.computeConvexHullProjection =
@@ -184,7 +184,7 @@ void ComputeHullWidget::slotApply()
     else
     {
         double alpha = alphaSlider_->value();
-        double ppm = mainWindow_->editor()
+        double ppm = app_->editor()
                          .settings()
                          .unitsSettings()
                          .pointsPerMeter()[0];
@@ -198,18 +198,18 @@ void ComputeHullWidget::slotApply()
     {
         action_.start(parameters_);
 
-        ProgressDialog::run(mainWindow_, "Computing Hull", &action_);
+        ProgressDialog::run(app_, "Computing Hull", &action_);
     }
     catch (std::exception &e)
     {
-        mainWindow_->showError(e.what());
+        app_->showError(e.what());
     }
     catch (...)
     {
-        mainWindow_->showError("Unknown error");
+        app_->showError("Unknown error");
     }
 
-    mainWindow_->update(this, {Editor::TYPE_SEGMENT});
+    app_->update(this, {Editor::TYPE_SEGMENT});
 }
 
 void ComputeHullWidget::slotFindOptimalAlphaChanged(int index)

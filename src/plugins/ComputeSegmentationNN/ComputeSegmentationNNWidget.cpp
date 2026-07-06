@@ -22,19 +22,19 @@
 // Include 3D Forest.
 #include <ComputeSegmentationNNWidget.hpp>
 #include <DoubleRangeSliderWidget.hpp>
-#include <DoubleSliderWidget.hpp>
+#include <DoubleSlider.hpp>
 #include <InfoDialog.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ProgressDialog.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
-#include <QCheckBox>
-#include <QGroupBox>
-#include <QHBoxLayout>
-#include <QPushButton>
+#include <CheckBox>
+#include <GroupBox>
+#include <HBoxLayout>
+#include <PushButton>
 #include <QRadioButton>
-#include <QVBoxLayout>
+#include <VBoxLayout>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeSegmentationNNWidget"
@@ -43,16 +43,16 @@
 
 #define ICON(name) (ThemeIcon(":/ComputeSegmentationNNResources/", name))
 
-ComputeSegmentationNNWidget::ComputeSegmentationNNWidget(MainWindow *mainWindow)
-    : QWidget(),
-      mainWindow_(mainWindow),
+ComputeSegmentationNNWidget::ComputeSegmentationNNWidget(Application *app)
+    : Widget(),
+      app_(app),
       infoDialog_(nullptr),
-      segmentation_(&mainWindow->editor())
+      segmentation_(&app->editor())
 {
     LOG_DEBUG(<< "Create.");
 
     // Voxel radius.
-    DoubleSliderWidget::create(
+    DoubleSlider::create(
         voxelRadiusSlider_,
         this,
         nullptr,
@@ -85,18 +85,18 @@ ComputeSegmentationNNWidget::ComputeSegmentationNNWidget(MainWindow *mainWindow)
         THROW("Parameter leafToWoodChannel not implemented.");
     }
 
-    QVBoxLayout *trunkDescriptorChannelVBoxLayout = new QVBoxLayout;
+    VBoxLayout *trunkDescriptorChannelVBoxLayout = new VBoxLayout;
     for (size_t i = 0; i < leafToWoodChannelRadioButton_.size(); i++)
     {
         trunkDescriptorChannelVBoxLayout->addWidget(
             leafToWoodChannelRadioButton_[i]);
     }
 
-    QGroupBox *trunkDescriptorChannelGroupBox =
-        new QGroupBox(tr("Leaf-to-wood gradient channel"));
+    GroupBox *trunkDescriptorChannelGroupBox =
+        new GroupBox(tr("Leaf-to-wood gradient channel"));
     trunkDescriptorChannelGroupBox->setLayout(trunkDescriptorChannelVBoxLayout);
 
-    DoubleSliderWidget::create(woodThresholdMinMinSlider_,
+    DoubleSlider::create(woodThresholdMinMinSlider_,
                                this,
                                nullptr,
                                nullptr,
@@ -111,7 +111,7 @@ ComputeSegmentationNNWidget::ComputeSegmentationNNWidget(MainWindow *mainWindow)
                                parameters_.woodThresholdMin);
 
     // Search radius.
-    DoubleSliderWidget::create(searchRadiusForTrunkPointsSlider_,
+    DoubleSlider::create(searchRadiusForTrunkPointsSlider_,
                                this,
                                nullptr,
                                nullptr,
@@ -124,7 +124,7 @@ ComputeSegmentationNNWidget::ComputeSegmentationNNWidget(MainWindow *mainWindow)
                                1.0,
                                parameters_.searchRadiusTrunkPoints);
 
-    DoubleSliderWidget::create(searchRadiusForLeafPointsSlider_,
+    DoubleSlider::create(searchRadiusForLeafPointsSlider_,
                                this,
                                nullptr,
                                nullptr,
@@ -154,7 +154,7 @@ ComputeSegmentationNNWidget::ComputeSegmentationNNWidget(MainWindow *mainWindow)
         parameters_.treeBaseElevationMin,
         parameters_.treeBaseElevationMax);
 
-    DoubleSliderWidget::create(treeHeightSlider_,
+    DoubleSlider::create(treeHeightSlider_,
                                this,
                                nullptr,
                                nullptr,
@@ -168,19 +168,19 @@ ComputeSegmentationNNWidget::ComputeSegmentationNNWidget(MainWindow *mainWindow)
                                parameters_.treeHeightMin);
 
     // Options.
-    zCoordinatesAsElevationCheckBox_ = new QCheckBox;
+    zCoordinatesAsElevationCheckBox_ = new CheckBox;
     zCoordinatesAsElevationCheckBox_->setText(tr("Use z-coordinates instead of"
                                                  " ground elevation"));
     zCoordinatesAsElevationCheckBox_->setChecked(
         parameters_.zCoordinatesAsElevation);
 
-    segmentOnlyTrunksCheckBox_ = new QCheckBox;
+    segmentOnlyTrunksCheckBox_ = new CheckBox;
     segmentOnlyTrunksCheckBox_->setText(tr("Segment only trunks"
                                            " (fast preview)"));
     segmentOnlyTrunksCheckBox_->setChecked(parameters_.segmentOnlyTrunks);
 
     // Settings layout.
-    QVBoxLayout *settingsLayout = new QVBoxLayout;
+    VBoxLayout *settingsLayout = new VBoxLayout;
     settingsLayout->addWidget(voxelRadiusSlider_);
     settingsLayout->addWidget(trunkDescriptorChannelGroupBox);
     settingsLayout->addWidget(woodThresholdMinMinSlider_);
@@ -193,23 +193,23 @@ ComputeSegmentationNNWidget::ComputeSegmentationNNWidget(MainWindow *mainWindow)
     settingsLayout->addStretch();
 
     // Buttons.
-    helpButton_ = new QPushButton(tr("Help"));
-    helpButton_->setIcon(THEME_ICON("question").icon());
+    helpButton_ = new PushButton(tr("Help"));
+    helpButton_->setIcon(THEME_ICON("question"));
     connect(helpButton_, SIGNAL(clicked()), this, SLOT(slotHelp()));
 
-    applyButton_ = new QPushButton(tr("Run"));
-    applyButton_->setIcon(THEME_ICON("run").icon());
+    applyButton_ = new PushButton(tr("Run"));
+    applyButton_->setIcon(THEME_ICON("run"));
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
 
     // Buttons layout.
-    QHBoxLayout *buttonsLayout = new QHBoxLayout;
+    HBoxLayout *buttonsLayout = new HBoxLayout;
     buttonsLayout->addWidget(helpButton_);
     buttonsLayout->addStretch();
     buttonsLayout->addWidget(applyButton_);
 
     // Main layout.
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->addLayout(settingsLayout);
     mainLayout->addSpacing(10);
     mainLayout->addLayout(buttonsLayout);
@@ -219,18 +219,18 @@ ComputeSegmentationNNWidget::ComputeSegmentationNNWidget(MainWindow *mainWindow)
     setLayout(mainLayout);
 }
 
-void ComputeSegmentationNNWidget::hideEvent(QHideEvent *event)
+void ComputeSegmentationNNWidget::hideEvent(HideEvent *event)
 {
     LOG_DEBUG(<< "Hide.");
     segmentation_.clear();
-    QWidget::hideEvent(event);
+    Widget::hideEvent(event);
 }
 
 void ComputeSegmentationNNWidget::slotApply()
 {
     LOG_DEBUG(<< "Apply.");
 
-    mainWindow_->suspendThreads();
+    app_->suspendThreads();
 
     parameters_.leafToWoodChannel =
         ComputeSegmentationNNParameters::CHANNEL_DESCRIPTOR;
@@ -260,20 +260,20 @@ void ComputeSegmentationNNWidget::slotApply()
     {
         segmentation_.start(parameters_);
 
-        ProgressDialog::run(mainWindow_,
+        ProgressDialog::run(app_,
                             "Compute Segmentation NN",
                             &segmentation_);
     }
     catch (std::exception &e)
     {
-        mainWindow_->showError(e.what());
+        app_->showError(e.what());
     }
     catch (...)
     {
-        mainWindow_->showError("Unknown error");
+        app_->showError("Unknown error");
     }
 
-    mainWindow_->update(this, {Editor::TYPE_SEGMENT}, Page::STATE_READ);
+    app_->update(this, {Editor::TYPE_SEGMENT}, Page::STATE_READ);
 }
 
 void ComputeSegmentationNNWidget::slotHelp()
@@ -348,7 +348,7 @@ void ComputeSegmentationNNWidget::slotHelp()
 
     if (!infoDialog_)
     {
-        infoDialog_ = new InfoDialog(mainWindow_, 550, 450);
+        infoDialog_ = new InfoDialog(app_, 550, 450);
         infoDialog_->setWindowTitle(tr("Compute Segmentation NN Help"));
         infoDialog_->setText(t);
     }

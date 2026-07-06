@@ -79,8 +79,8 @@ public:
         text = text_;
     }
 
-    const char *typeString() const;
-    static const char *typeString(int type_);
+    std::string typeString() const;
+    static std::string typeString(int type_);
 };
 
 /** Log Thread Callback Interface. */

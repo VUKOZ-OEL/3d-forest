@@ -23,26 +23,26 @@
 #define FILTER_FILES_WINDOW_HPP
 
 // Include 3D Forest.
-class MainWindow;
+class Application;
 class FilterFilesWidget;
 
 // Include Qt.
-#include <QDockWidget>
+#include <DockWidget>
 class QCloseEvent;
 
 /** Filter Files Window. */
-class FilterFilesWindow : public QDockWidget
+class FilterFilesWindow : public DockWidget
 {
-    Q_OBJECT
+
 
 public:
-    FilterFilesWindow(MainWindow *mainWindow);
+    FilterFilesWindow(Application *app);
 
 protected:
     FilterFilesWidget *widget_;
 
     void showEvent(QShowEvent *event) override;
-    void hideEvent(QHideEvent *event) override;
+    void hideEvent(HideEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
 };
 

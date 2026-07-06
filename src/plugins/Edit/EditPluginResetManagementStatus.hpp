@@ -23,13 +23,13 @@
 #define EDIT_PLUGIN_RESET_MANAGEMENT_STATUS_HPP
 
 // Include 3D Forest.
-class MainWindow;
+class Application;
 
 /** Edit Plugin Reset Management Status. */
 class EditPluginResetManagementStatus
 {
 public:
-    static void run(MainWindow *mainWindow);
+    static void run(Application *app);
 };
 
 #endif /* EDIT_PLUGIN_RESET_MANAGEMENT_STATUS_HPP */

@@ -20,7 +20,7 @@
 /** @file TreeSettingsPlugin.cpp */
 
 // Include 3D Forest.
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 #include <TreeSettingsPlugin.hpp>
 #include <TreeSettingsWindow.hpp>
@@ -32,36 +32,36 @@
 #define ICON(name) (ThemeIcon(":/TreeSettingsResources/", name))
 
 TreeSettingsPlugin::TreeSettingsPlugin()
-    : mainWindow_(nullptr),
+    : app_(nullptr),
       pluginWindow_(nullptr)
 {
 }
 
-void TreeSettingsPlugin::initialize(MainWindow *mainWindow)
+void TreeSettingsPlugin::initialize(Application *app)
 {
-    mainWindow_ = mainWindow;
+    app_ = app;
 
-    mainWindow_->createAction(nullptr,
+    app_->createAction(nullptr,
                               "Settings",
                               "Settings",
                               tr("Tree"),
                               tr("Show tree settings"),
                               ICON("tree-settings"),
                               this,
-                              SLOT(slotPlugin()),
+                              &TreeSettingsPlugin::slotPlugin,
                               MAIN_WINDOW_MENU_SETTINGS_PRIORITY);
 }
 
 void TreeSettingsPlugin::slotPlugin()
 {
-    if (!mainWindow_)
+    if (!app_)
     {
         return;
     }
 
     if (!pluginWindow_)
     {
-        pluginWindow_ = new TreeSettingsWindow(mainWindow_);
+        pluginWindow_ = new TreeSettingsWindow(app_);
     }
 
     pluginWindow_->show();

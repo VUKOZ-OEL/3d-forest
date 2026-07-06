@@ -22,7 +22,7 @@
 // Include 3D Forest.
 #include <FilterElevationWidget.hpp>
 #include <FilterElevationWindow.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
@@ -34,21 +34,21 @@
 
 #define ICON(name) (ThemeIcon(":/FilterElevationResources/", name))
 
-FilterElevationWindow::FilterElevationWindow(MainWindow *mainWindow)
-    : QDockWidget(mainWindow)
+FilterElevationWindow::FilterElevationWindow(Application *app)
+    : DockWidget(app)
 {
     LOG_DEBUG(<< "Start creating elevation filter window.");
 
     // Widget.
-    widget_ = new FilterElevationWidget(mainWindow);
+    widget_ = new FilterElevationWidget(app);
 
     // Dock.
     setWidget(widget_);
     setFixedHeight(widget()->sizeHint().height());
     setWindowTitle(tr("Filter Elevation"));
-    setWindowIcon(ICON("elevation-filter").icon());
+    setWindowIcon(ICON("elevation-filter"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
+    app->addDockWidget(Qt::RightDockWidgetArea, this);
 
     LOG_DEBUG(<< "Finished creating elevation filter window.");
 }
@@ -57,13 +57,13 @@ void FilterElevationWindow::showEvent(QShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
     // widget_->setFilterEnabled(true);
-    QWidget::showEvent(event);
+    Widget::showEvent(event);
 }
 
-void FilterElevationWindow::hideEvent(QHideEvent *event)
+void FilterElevationWindow::hideEvent(HideEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Hide event.");
-    QWidget::hideEvent(event);
+    Widget::hideEvent(event);
 }
 
 void FilterElevationWindow::closeEvent(QCloseEvent *event)

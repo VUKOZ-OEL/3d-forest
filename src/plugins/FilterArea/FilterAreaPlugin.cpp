@@ -22,7 +22,7 @@
 // Include 3D Forest.
 #include <FilterAreaPlugin.hpp>
 #include <FilterAreaWindow.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -32,36 +32,36 @@
 #define ICON(name) (ThemeIcon(":/FilterAreaResources/", name))
 
 FilterAreaPlugin::FilterAreaPlugin()
-    : mainWindow_(nullptr),
+    : app_(nullptr),
       pluginWindow_(nullptr)
 {
 }
 
-void FilterAreaPlugin::initialize(MainWindow *mainWindow)
+void FilterAreaPlugin::initialize(Application *app)
 {
-    mainWindow_ = mainWindow;
+    app_ = app;
 
-    mainWindow_->createAction(nullptr,
+    app_->createAction(nullptr,
                               "Filter",
                               "Filter",
                               tr("Area"),
                               tr("Show area filter"),
                               ICON("clip-filter"),
                               this,
-                              SLOT(slotPlugin()),
+                              &FilterAreaPlugin::slotPlugin,
                               MAIN_WINDOW_MENU_FILTER_PRIORITY);
 }
 
 void FilterAreaPlugin::slotPlugin()
 {
-    if (!mainWindow_)
+    if (!app_)
     {
         return;
     }
 
     if (!pluginWindow_)
     {
-        pluginWindow_ = new FilterAreaWindow(mainWindow_);
+        pluginWindow_ = new FilterAreaWindow(app_);
     }
 
     pluginWindow_->show();

@@ -22,7 +22,7 @@
 // Include 3D Forest.
 #include <EditPluginSetClassification.hpp>
 #include <InputComboBoxDialog.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 
 // Include Qt.
 #include <QCoreApplication>
@@ -33,16 +33,16 @@
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-void EditPluginSetClassification::run(MainWindow *mainWindow)
+void EditPluginSetClassification::run(Application *app)
 {
     LOG_DEBUG(<< "Start setting classification values.");
 
     uint8_t newClassificationValue = 0;
 
     // Editor.
-    mainWindow->suspendThreads();
+    app->suspendThreads();
 
-    Editor *editor = &mainWindow->editor();
+    Editor *editor = &app->editor();
 
     // Input.
     InputComboBoxDialog dialog;
@@ -58,7 +58,7 @@ void EditPluginSetClassification::run(MainWindow *mainWindow)
     }
 
     // Open the dialog.
-    if (dialog.exec() == QDialog::Accepted)
+    if (dialog.exec() == Dialog::Accepted)
     {
         // Run.
         newClassificationValue = static_cast<uint8_t>(dialog.currentIndex());
@@ -105,7 +105,7 @@ void EditPluginSetClassification::run(MainWindow *mainWindow)
 
     progress.close();
 
-    mainWindow->update(nullptr,
+    app->update(nullptr,
                        {Editor::TYPE_CLASSIFICATION},
                        Page::STATE_READ);
 

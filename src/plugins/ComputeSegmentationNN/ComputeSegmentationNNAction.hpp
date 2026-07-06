@@ -24,7 +24,7 @@
 
 // Include 3D Forest.
 #include <ComputeSegmentationNNParameters.hpp>
-#include <Point.hpp>
+#include <Point3.hpp>
 #include <Points.hpp>
 #include <ProgressActionInterface.hpp>
 #include <Query.hpp>
@@ -62,8 +62,8 @@ private:
     void stepVoxelsToPoints();
 
     void createVoxel();
-    void findNearestNeighbor(Point &a);
-    bool trunkVoxel(const Point &a);
+    void findNearestNeighbor(Point3 &a);
+    bool trunkVoxel(const Point3 &a);
 
     Points voxels_;
     std::vector<size_t> path_;
@@ -90,8 +90,8 @@ private:
     Group groupUnsegmented_;
     std::map<size_t, Group> groups_;
 
-    void startGroup(const Point &a, bool trunk = false);
-    void continueGroup(const Point &a, bool trunk = false);
+    void startGroup(const Point3 &a, bool trunk = false);
+    void continueGroup(const Point3 &a, bool trunk = false);
     void mergeToGroup(Group &dst, const Group &src);
 };
 

@@ -25,7 +25,7 @@
 // Include 3D Forest.
 #include <ComputeHeightMapModifier.hpp>
 #include <ModifierInterface.hpp>
-#include <PluginInterface.hpp>
+#include <Plugin.hpp>
 class ComputeHeightMapWindow;
 
 #if defined(_MSC_VER)
@@ -53,28 +53,26 @@ class ComputeHeightMapWindow;
     Compute Height Map plugin uses delayed lazy initialization of GUI widgets to
     save plugin loading time and memory.
 */
-class EXPORT_COMPUTE_HEIGHT_MAP_PLUGIN ComputeHeightMapPlugin
-    : public QObject,
-      public PluginInterface,
+class ComputeHeightMapPlugin
+    : 
+      public Plugin,
       public ModifierInterface
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
     ComputeHeightMapPlugin();
 
-    virtual void initialize(MainWindow *mainWindow);
+    const char *name() const override { return "ComputeHeightMapPlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
     virtual bool modifierEnabled();
     virtual void applyModifier(Page *page);
 
-public slots:
+
     void slotPlugin();
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
 
     /** First time use creates GUI. */
     ComputeHeightMapWindow *pluginWindow_;
@@ -82,5 +80,10 @@ private:
     /** Must be created from the constructor.*/
     ComputeHeightMapModifier modifier_;
 };
+
+extern "C" EXPORT_COMPUTE_HEIGHT_MAP_PLUGIN Plugin *createPlugin()
+{
+    return new ComputeHeightMapPlugin();
+}
 
 #endif /* COMPUTE_HEIGHT_MAP_PLUGIN_HPP */

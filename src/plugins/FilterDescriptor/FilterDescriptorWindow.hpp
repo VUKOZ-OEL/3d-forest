@@ -23,26 +23,26 @@
 #define FILTER_DESCRIPTOR_WINDOW_HPP
 
 // Include 3D Forest.
-class MainWindow;
+class Application;
 class FilterDescriptorWidget;
 
 // Include Qt.
-#include <QDockWidget>
+#include <DockWidget>
 class QCloseEvent;
 
 /** Filter Descriptor Window. */
-class FilterDescriptorWindow : public QDockWidget
+class FilterDescriptorWindow : public DockWidget
 {
-    Q_OBJECT
+
 
 public:
-    FilterDescriptorWindow(MainWindow *mainWindow);
+    FilterDescriptorWindow(Application *app);
 
 protected:
     FilterDescriptorWidget *widget_;
 
     void showEvent(QShowEvent *event) override;
-    void hideEvent(QHideEvent *event) override;
+    void hideEvent(HideEvent *event) override;
 
     void closeEvent(QCloseEvent *event) override;
 };

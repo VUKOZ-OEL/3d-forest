@@ -23,7 +23,7 @@
 #define COMPUTE_SKELETON_PLUGIN_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
+#include <Plugin.hpp>
 class ComputeSkeletonWindow;
 
 #if defined(_MSC_VER)
@@ -37,25 +37,27 @@ class ComputeSkeletonWindow;
 #endif
 
 /** Compute Skeleton Plugin. */
-class EXPORT_COMPUTE_SKELETON_PLUGIN ComputeSkeletonPlugin
-    : public QObject,
-      public PluginInterface
+class ComputeSkeletonPlugin
+    : 
+      public Plugin
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
     ComputeSkeletonPlugin();
 
-    virtual void initialize(MainWindow *mainWindow);
+    const char *name() const override { return "ComputeSkeletonPlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
-public slots:
     void slotPlugin();
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
     ComputeSkeletonWindow *pluginWindow_;
 };
+
+extern "C" EXPORT_COMPUTE_SKELETON_PLUGIN Plugin *createPlugin()
+{
+    return new ComputeSkeletonPlugin();
+}
 
 #endif /* COMPUTE_SKELETON_PLUGIN_HPP */

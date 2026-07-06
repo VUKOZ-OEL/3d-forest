@@ -23,7 +23,7 @@
 #define MESSAGE_LOG_PLUGIN_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
+#include <Plugin.hpp>
 class MessageLogWindow;
 
 #if defined(_MSC_VER)
@@ -37,24 +37,26 @@ class MessageLogWindow;
 #endif
 
 /** Message Log Plugin. */
-class EXPORT_MESSAGE_LOG_PLUGIN MessageLogPlugin : public QObject,
-                                                   public PluginInterface
+class MessageLogPlugin : 
+                                                   public Plugin
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
     MessageLogPlugin();
 
-    virtual void initialize(MainWindow *mainWindow);
+    const char *name() const override { return "MessageLogPlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
-public slots:
     void slotPlugin();
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
     MessageLogWindow *pluginWindow_;
 };
+
+extern "C" EXPORT_MESSAGE_LOG_PLUGIN Plugin *createPlugin()
+{
+    return new MessageLogPlugin();
+}
 
 #endif /* MESSAGE_LOG_PLUGIN_HPP */

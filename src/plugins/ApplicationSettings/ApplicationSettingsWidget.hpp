@@ -22,43 +22,34 @@
 #ifndef APPLICATION_SETTINGS_WIDGET_HPP
 #define APPLICATION_SETTINGS_WIDGET_HPP
 
-// Include std.
-
 // Include 3D Forest.
 #include <Editor.hpp>
 #include <Settings.hpp>
-class MainWindow;
-
-// Include Qt.
-#include <QWidget>
-class QComboBox;
+#include <Widget.hpp>
+class Application;
+class ComboBox;
 
 /** Application Settings Widget. */
-class ApplicationSettingsWidget : public QWidget
+class ApplicationSettingsWidget : public Widget
 {
-    Q_OBJECT
-
 public:
-    ApplicationSettingsWidget(MainWindow *mainWindow);
+    ApplicationSettingsWidget(Application *app);
 
-    QSize sizeHint() const override { return QSize(300, 80); }
+    Size sizeHint() const override { return Size(300, 80); }
 
-public slots:
-    void slotUpdate(void *sender, const QSet<Editor::Type> &target);
+    void slotUpdate(void *sender, const std::set<Editor::Type> &target);
 
     void slotLanguageChanged(int index);
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
 
-    QComboBox *languageComboBox_;
+    ComboBox *languageComboBox_;
 
     ApplicationSettings settings_;
 
     void dataChanged(bool modifiers = false);
     void setApplicationSettings(const ApplicationSettings &settings);
-    void block();
-    void unblock();
 };
 
 #endif /* APPLICATION_SETTINGS_WIDGET_HPP */

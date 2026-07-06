@@ -23,7 +23,7 @@
 #define COMPUTE_SEGMENTATION_NN_PLUGIN_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
+#include <Plugin.hpp>
 class ComputeSegmentationNNWindow;
 
 #if defined(_MSC_VER)
@@ -37,25 +37,31 @@ class ComputeSegmentationNNWindow;
 #endif
 
 /** Compute Segmentation NN Plugin. */
-class EXPORT_COMPUTE_SEGMENTATION_NN_PLUGIN ComputeSegmentationNNPlugin
-    : public QObject,
-      public PluginInterface
+class ComputeSegmentationNNPlugin
+    : 
+      public Plugin
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
+
+
+
 
 public:
     ComputeSegmentationNNPlugin();
 
-    virtual void initialize(MainWindow *mainWindow);
+    const char *name() const override { return "ComputeSegmentationNNPlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
-public slots:
     void slotPlugin();
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
     ComputeSegmentationNNWindow *pluginWindow_;
 };
+
+extern "C" EXPORT_COMPUTE_SEGMENTATION_NN_PLUGIN Plugin *createPlugin()
+{
+    return new ComputeSegmentationNNPlugin();
+}
 
 #endif /* COMPUTE_SEGMENTATION_NN_PLUGIN_HPP */

@@ -328,7 +328,7 @@ void ComputeSegmentationNNAction::stepCreateTrunks()
             // Try to expand the current group with neighbor voxels:
             for (size_t i = idx; i < groupPath_.size(); i++)
             {
-                Point &a = voxels_[groupPath_[i]];
+                Point3 &a = voxels_[groupPath_[i]];
                 voxels_.findRadius(a.x,
                                    a.y,
                                    a.z,
@@ -336,7 +336,7 @@ void ComputeSegmentationNNAction::stepCreateTrunks()
                                    search_);
                 for (size_t j = 0; j < search_.size(); j++)
                 {
-                    Point &b = voxels_[search_[j]];
+                    Point3 &b = voxels_[search_[j]];
                     // If a voxel in search radius is not processed and meets
                     // criteria (for wood), add it to group expansion.
                     if (trunkVoxel(b))
@@ -444,7 +444,7 @@ void ComputeSegmentationNNAction::stepCreateBranches()
             for (size_t i = 0; i < path_.size(); i++)
             {
                 const Points &points = voxels_;
-                const Point &a = points[path_[i]];
+                const Point3 &a = points[path_[i]];
                 if (a.next != SIZE_MAX && a.dist < dist)
                 {
                     dist = a.dist;
@@ -468,7 +468,7 @@ void ComputeSegmentationNNAction::stepCreateBranches()
             // Else nearest neighbor U is found, expand the path:
             else
             {
-                Point &a = voxels_[nextIdx];
+                Point3 &a = voxels_[nextIdx];
                 // If nearest neighbor U belongs to a group, connect the whole
                 // path to this group:
                 if (a.group != SIZE_MAX)
@@ -476,7 +476,7 @@ void ComputeSegmentationNNAction::stepCreateBranches()
                     // Set all voxels in the path to the same group as U.
                     for (size_t i = 0; i < path_.size(); i++)
                     {
-                        Point &b = voxels_[path_[i]];
+                        Point3 &b = voxels_[path_[i]];
                         b.group = a.group;
                     }
 
@@ -507,7 +507,7 @@ void ComputeSegmentationNNAction::stepCreateBranches()
                     // voxels which have V.next equal to U.
                     for (size_t i = 0; i < path_.size(); i++)
                     {
-                        Point &b = voxels_[path_[i]];
+                        Point3 &b = voxels_[path_[i]];
                         if (b.next != SIZE_MAX && b.next == nextIdx)
                         {
                             findNearestNeighbor(b);
@@ -621,7 +621,7 @@ void ComputeSegmentationNNAction::createVoxel()
     size_t idx = voxels_.size();
 
     // Initialize new voxel point.
-    Point p;
+    Point3 p;
     p.x = 0;
     p.y = 0;
     p.z = 0;
@@ -696,7 +696,7 @@ void ComputeSegmentationNNAction::createVoxel()
     voxels_.push_back(std::move(p));
 }
 
-void ComputeSegmentationNNAction::findNearestNeighbor(Point &a)
+void ComputeSegmentationNNAction::findNearestNeighbor(Point3 &a)
 {
     a.dist = std::numeric_limits<double>::max();
     a.next = SIZE_MAX;
@@ -709,7 +709,7 @@ void ComputeSegmentationNNAction::findNearestNeighbor(Point &a)
 
     for (size_t j = 0; j < search_.size(); j++)
     {
-        Point &b = voxels_[search_[j]];
+        Point3 &b = voxels_[search_[j]];
 
         if (b.group != a.group)
         {
@@ -727,13 +727,13 @@ void ComputeSegmentationNNAction::findNearestNeighbor(Point &a)
     }
 }
 
-bool ComputeSegmentationNNAction::trunkVoxel(const Point &a)
+bool ComputeSegmentationNNAction::trunkVoxel(const Point3 &a)
 {
     return a.group == SIZE_MAX &&
            !(a.descriptor < parameters_.woodThresholdMin);
 }
 
-void ComputeSegmentationNNAction::startGroup(const Point &a, bool trunk)
+void ComputeSegmentationNNAction::startGroup(const Point3 &a, bool trunk)
 {
     if (trunk)
     {
@@ -756,7 +756,7 @@ void ComputeSegmentationNNAction::startGroup(const Point &a, bool trunk)
     group_.averagePoint[2] += a.z;
 }
 
-void ComputeSegmentationNNAction::continueGroup(const Point &a, bool trunk)
+void ComputeSegmentationNNAction::continueGroup(const Point3 &a, bool trunk)
 {
     if (trunk)
     {

@@ -341,7 +341,7 @@ void ComputeElevationAction::createGroundPoint()
     }
 
     // Initialize new ground point.
-    Point p;
+    Point3 p;
     p.x = 0;
     p.y = 0;
     p.z = zMinimum_;

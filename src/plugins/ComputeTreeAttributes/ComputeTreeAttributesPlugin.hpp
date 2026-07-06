@@ -23,7 +23,7 @@
 #define COMPUTE_TREE_ATTRIBUTES_PLUGIN_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
+#include <Plugin.hpp>
 class ComputeTreeAttributesWindow;
 
 #if defined(_MSC_VER)
@@ -37,25 +37,27 @@ class ComputeTreeAttributesWindow;
 #endif
 
 /** Compute Tree Attributes Plugin. */
-class EXPORT_COMPUTE_TREE_ATTRIBUTES_PLUGIN ComputeTreeAttributesPlugin
-    : public QObject,
-      public PluginInterface
+class ComputeTreeAttributesPlugin
+    : 
+      public Plugin
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
     ComputeTreeAttributesPlugin();
 
-    virtual void initialize(MainWindow *mainWindow);
+    const char *name() const override { return "ComputeTreeAttributesPlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
-public slots:
     void slotPlugin();
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
     ComputeTreeAttributesWindow *pluginWindow_;
 };
+
+extern "C" EXPORT_COMPUTE_TREE_ATTRIBUTES_PLUGIN Plugin *createPlugin()
+{
+    return new ComputeTreeAttributesPlugin();
+}
 
 #endif /* COMPUTE_TREE_ATTRIBUTES_PLUGIN_HPP */

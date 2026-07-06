@@ -26,7 +26,7 @@
 #include <UnibnOctree.hpp>
 
 // Include 3D Forest.
-#include <Point.hpp>
+#include <Point3.hpp>
 #include <VectorFile.hpp>
 
 // Include local.
@@ -46,14 +46,14 @@ public:
     size_t size() const { return points_.size(); }
 
     // Element access.
-    Point &operator[](size_t pos) { return points_.at(pos); }
-    const Point &operator[](size_t pos) const { return points_.at(pos); }
-    Point &at(size_t pos) { return points_.at(pos); }
-    const Point &at(size_t pos) const { return points_.at(pos); }
+    Point3 &operator[](size_t pos) { return points_.at(pos); }
+    const Point3 &operator[](size_t pos) const { return points_.at(pos); }
+    Point3 &at(size_t pos) { return points_.at(pos); }
+    const Point3 &at(size_t pos) const { return points_.at(pos); }
 
     // Modifiers.
-    void push_back(const Point &point);
-    void push_back(Point &&point);
+    void push_back(const Point3 &point);
+    void push_back(Point3 &&point);
     void clear();
 
     // Search.
@@ -69,8 +69,8 @@ public:
     void exportToFile(const std::string &path) const;
 
 private:
-    VectorFile<Point, Point::IO> points_;
-    unibn::Octree<Point, VectorFile<Point, Point::IO>> octree_;
+    VectorFile<Point3, Point3::IO> points_;
+    unibn::Octree<Point3, VectorFile<Point3, Point3::IO>> octree_;
 
     // I/O
     friend void toJson(Json &out, const Points &in);

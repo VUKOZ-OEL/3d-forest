@@ -24,7 +24,7 @@
 
 // Include 3D Forest.
 #include <ImportFileInterface.hpp>
-#include <PluginInterface.hpp>
+#include <Plugin.hpp>
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestImportFilePlugin)
@@ -37,27 +37,29 @@
 #endif
 
 /** Import File Plugin. */
-class EXPORT_IMPORT_FILE_PLUGIN ImportFilePlugin : public QObject,
-                                                   public PluginInterface,
+class ImportFilePlugin : 
+                                                   public Plugin,
                                                    public ImportFileInterface
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
     ImportFilePlugin();
 
-    virtual void initialize(MainWindow *mainWindow);
+    const char *name() const override { return "ImportFilePlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
     virtual void importFile();
 
-public slots:
     void slotImportFile();
 
 private:
-    MainWindow *mainWindow_;
-    QAction *importFileAction_;
+    Application *app_;
+    Action *importFileAction_;
 };
+
+extern "C" EXPORT_IMPORT_FILE_PLUGIN Plugin *createPlugin()
+{
+    return new ImportFilePlugin();
+}
 
 #endif /* IMPORT_FILE_PLUGIN_HPP */

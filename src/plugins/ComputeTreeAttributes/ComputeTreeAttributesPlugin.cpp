@@ -22,7 +22,7 @@
 // Include 3D Forest.
 #include <ComputeTreeAttributesPlugin.hpp>
 #include <ComputeTreeAttributesWindow.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -32,23 +32,23 @@
 #define ICON(name) (ThemeIcon(":/ComputeTreeAttributesResources/", name))
 
 ComputeTreeAttributesPlugin::ComputeTreeAttributesPlugin()
-    : mainWindow_(nullptr),
+    : app_(nullptr),
       pluginWindow_(nullptr)
 {
 }
 
-void ComputeTreeAttributesPlugin::initialize(MainWindow *mainWindow)
+void ComputeTreeAttributesPlugin::initialize(Application *app)
 {
-    mainWindow_ = mainWindow;
+    app_ = app;
 
-    mainWindow_->createAction(nullptr,
+    app_->createAction(nullptr,
                               "Compute",
                               "Compute",
                               tr("Tree Attributes"),
                               tr("Compute tree attributes"),
                               ICON("tree-attributes"),
                               this,
-                              SLOT(slotPlugin()),
+                              &ComputeTreeAttributesPlugin::slotPlugin,
                               MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
 }
 
@@ -56,7 +56,7 @@ void ComputeTreeAttributesPlugin::slotPlugin()
 {
     if (!pluginWindow_)
     {
-        pluginWindow_ = new ComputeTreeAttributesWindow(mainWindow_);
+        pluginWindow_ = new ComputeTreeAttributesWindow(app_);
     }
 
     pluginWindow_->show();

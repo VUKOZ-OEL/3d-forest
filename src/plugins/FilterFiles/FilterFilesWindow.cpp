@@ -22,7 +22,7 @@
 // Include 3D Forest.
 #include <FilterFilesWidget.hpp>
 #include <FilterFilesWindow.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
@@ -34,31 +34,31 @@
 
 #define ICON(name) (ThemeIcon(":/FilterFilesResources/", name))
 
-FilterFilesWindow::FilterFilesWindow(MainWindow *mainWindow)
-    : QDockWidget(mainWindow)
+FilterFilesWindow::FilterFilesWindow(Application *app)
+    : DockWidget(app)
 {
     // Widget.
-    widget_ = new FilterFilesWidget(mainWindow);
+    widget_ = new FilterFilesWidget(app);
 
     // Dock.
     setWidget(widget_);
     setWindowTitle(tr("Filter Files"));
-    setWindowIcon(ICON("files").icon());
+    setWindowIcon(ICON("files"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
+    app->addDockWidget(Qt::RightDockWidgetArea, this);
 }
 
 void FilterFilesWindow::showEvent(QShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
     // widget_->setFilterEnabled(true);
-    QWidget::showEvent(event);
+    Widget::showEvent(event);
 }
 
-void FilterFilesWindow::hideEvent(QHideEvent *event)
+void FilterFilesWindow::hideEvent(HideEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Hide event.");
-    QWidget::hideEvent(event);
+    Widget::hideEvent(event);
 }
 
 void FilterFilesWindow::closeEvent(QCloseEvent *event)

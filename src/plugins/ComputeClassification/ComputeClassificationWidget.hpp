@@ -25,45 +25,39 @@
 // Include 3D Forest.
 #include <ComputeClassificationAction.hpp>
 #include <ComputeClassificationParameters.hpp>
-class MainWindow;
-class DoubleSliderWidget;
+#include <Widget.hpp>
+class Application;
+class DoubleSlider;
 class InfoDialog;
-
-// Include Qt.
-#include <QWidget>
-class QPushButton;
-class QCheckBox;
+class PushButton;
+class CheckBox;
 
 /** Compute Classification Widget. */
-class ComputeClassificationWidget : public QWidget
+class ComputeClassificationWidget : public Widget
 {
-    Q_OBJECT
-
 public:
-    ComputeClassificationWidget(MainWindow *mainWindow);
+    ComputeClassificationWidget(Application *app);
 
-protected slots:
     void slotApply();
     void slotHelp();
 
-protected:
-    void hideEvent(QHideEvent *event) override;
+    void hideEvent(HideEvent *event) override;
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
     InfoDialog *infoDialog_;
 
     ComputeClassificationParameters parameters_;
     ComputeClassificationAction classification_;
 
-    DoubleSliderWidget *voxelSlider_;
-    DoubleSliderWidget *radiusSlider_;
-    DoubleSliderWidget *angleSlider_;
-    QCheckBox *cleanGroundCheckBox_;
-    QCheckBox *cleanAllCheckBox_;
+    DoubleSlider *voxelSlider_;
+    DoubleSlider *radiusSlider_;
+    DoubleSlider *angleSlider_;
+    CheckBox *cleanGroundCheckBox_;
+    CheckBox *cleanAllCheckBox_;
 
-    QPushButton *helpButton_;
-    QPushButton *applyButton_;
+    PushButton *helpButton_;
+    PushButton *applyButton_;
 };
 
 #endif /* COMPUTE_CLASSIFICATION_WIDGET_HPP */

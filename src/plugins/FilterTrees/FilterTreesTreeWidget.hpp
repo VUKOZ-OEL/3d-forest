@@ -24,25 +24,25 @@
 
 // Include 3D Forest.
 #include <Segment.hpp>
-class MainWindow;
+class Application;
 
 // Include Qt.
-#include <QWidget>
+#include <Widget>
 class QTableWidget;
 
 /** Tree Widget. */
-class FilterTreesTreeWidget : public QWidget
+class FilterTreesTreeWidget : public Widget
 {
-    Q_OBJECT
+
 
 public:
-    FilterTreesTreeWidget(MainWindow *mainWindow);
+    FilterTreesTreeWidget(Application *app);
 
     void setSegment(const Segment &segment);
     void clear();
 
 protected:
-    MainWindow *mainWindow_;
+    Application *app_;
     QTableWidget *table_;
     Segment segment_;
 

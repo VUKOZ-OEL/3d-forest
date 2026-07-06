@@ -22,7 +22,7 @@
 // Include 3D Forest.
 #include <ApplicationSettingsWidget.hpp>
 #include <ApplicationSettingsWindow.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -31,18 +31,18 @@
 
 #define ICON(name) (ThemeIcon(":/ApplicationSettingsResources/", name))
 
-ApplicationSettingsWindow::ApplicationSettingsWindow(MainWindow *mainWindow)
-    : QDockWidget(mainWindow)
+ApplicationSettingsWindow::ApplicationSettingsWindow(Application *app)
+    : DockWidget(app)
 {
     // Widget.
     ApplicationSettingsWidget *widget =
-        new ApplicationSettingsWidget(mainWindow);
+        new ApplicationSettingsWidget(app);
 
     // Dock.
     setWidget(widget);
     setFixedHeight(widget->sizeHint().height());
     setWindowTitle(tr("Application Settings"));
-    setWindowIcon(ICON("settings").icon());
+    setWindowIcon(ICON("settings"));
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
+    app->addDockWidget(Qt::RightDockWidgetArea, this);
 }

@@ -20,7 +20,7 @@
 /** @file ViewSettingsWindow.cpp */
 
 // Include 3D Forest.
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 #include <ViewSettingsWidget.hpp>
 #include <ViewSettingsWindow.hpp>
@@ -31,17 +31,17 @@
 
 #define ICON(name) (ThemeIcon(":/ViewSettingsResources/", name))
 
-ViewSettingsWindow::ViewSettingsWindow(MainWindow *mainWindow)
-    : QDockWidget(mainWindow)
+ViewSettingsWindow::ViewSettingsWindow(Application *app)
+    : DockWidget(app)
 {
     // Widget.
-    ViewSettingsWidget *widget = new ViewSettingsWidget(mainWindow);
+    ViewSettingsWidget *widget = new ViewSettingsWidget(app);
 
     // Dock.
     setWidget(widget);
-    setFixedHeight(widget->sizeHint().height());
+    // setFixedHeight(widget->sizeHint().height());
     setWindowTitle(tr("View Settings"));
-    setWindowIcon(ICON("brush").icon());
-    setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    mainWindow->addDockWidget(Qt::RightDockWidgetArea, this);
+    setWindowIcon(ICON("brush"));
+    setAllowedAreas(Ui::LeftDockWidgetArea | Ui::RightDockWidgetArea);
+    app->addDockWidget(Ui::RightDockWidgetArea, this);
 }

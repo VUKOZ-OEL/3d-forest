@@ -23,19 +23,19 @@
 #define COMPUTE_SEGMENTATION_NN_WINDOW_HPP
 
 // Include 3D Forest.
-class MainWindow;
+class Application;
 class ComputeSegmentationNNWidget;
 
 // Include Qt.
-#include <QDialog>
+#include <Dialog>
 
 /** Compute Segmentation NN Window. */
-class ComputeSegmentationNNWindow : public QDialog
+class ComputeSegmentationNNWindow : public Dialog
 {
-    Q_OBJECT
+
 
 public:
-    ComputeSegmentationNNWindow(MainWindow *mainWindow);
+    ComputeSegmentationNNWindow(Application *app);
     ~ComputeSegmentationNNWindow();
 
 private:

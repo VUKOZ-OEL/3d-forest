@@ -25,30 +25,30 @@
 // Include 3D Forest.
 #include <Editor.hpp>
 #include <Segments.hpp>
-class MainWindow;
+class Application;
 class FilterTreesTreeWidget;
 
 // Include Qt.
-#include <QWidget>
+#include <Widget>
 class QSplitter;
 class QToolButton;
 class QTreeWidget;
 class QTreeWidgetItem;
 
 /** Filter Trees Widget. */
-class FilterTreesWidget : public QWidget
+class FilterTreesWidget : public Widget
 {
-    Q_OBJECT
+
 
 public:
-    FilterTreesWidget(MainWindow *mainWindow);
+    FilterTreesWidget(Application *app);
 
     void setFilterEnabled(bool b);
 
-    QSize sizeHint() const override { return QSize(300, 200); }
+    Size sizeHint() const override { return Size(300, 200); }
 
-public slots:
-    void slotUpdate(void *sender, const QSet<Editor::Type> &target);
+
+    void slotUpdate(void *sender, const std::set<Editor::Type> &target);
 
     void slotAdd();
     void slotDelete();
@@ -72,7 +72,7 @@ protected:
         COLUMN_LAST,
     };
 
-    MainWindow *mainWindow_;
+    Application *app_;
 
     QTreeWidget *tree_;
     QToolButton *addButton_;

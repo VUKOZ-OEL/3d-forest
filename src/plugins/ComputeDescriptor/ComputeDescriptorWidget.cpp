@@ -21,19 +21,19 @@
 
 // Include 3D Forest.
 #include <ComputeDescriptorWidget.hpp>
-#include <DoubleSliderWidget.hpp>
+#include <DoubleSlider.hpp>
 #include <InfoDialog.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ProgressDialog.hpp>
 #include <ThemeIcon.hpp>
 
 // Include Qt.
-#include <QCheckBox>
-#include <QGroupBox>
-#include <QHBoxLayout>
-#include <QPushButton>
+#include <CheckBox>
+#include <GroupBox>
+#include <HBoxLayout>
+#include <PushButton>
 #include <QRadioButton>
-#include <QVBoxLayout>
+#include <VBoxLayout>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeDescriptorWidget"
@@ -42,11 +42,11 @@
 
 #define ICON(name) (ThemeIcon(":/ComputeDescriptorResources/", name))
 
-ComputeDescriptorWidget::ComputeDescriptorWidget(MainWindow *mainWindow)
-    : QWidget(),
-      mainWindow_(mainWindow),
+ComputeDescriptorWidget::ComputeDescriptorWidget(Application *app)
+    : Widget(),
+      app_(app),
       infoDialog_(nullptr),
-      descriptor_(&mainWindow->editor())
+      descriptor_(&app->editor())
 {
     LOG_DEBUG(<< "Create.");
 
@@ -68,17 +68,17 @@ ComputeDescriptorWidget::ComputeDescriptorWidget(MainWindow *mainWindow)
         THROW("ComputeDescriptorParameters method not implemented.");
     }
 
-    QVBoxLayout *methodVBoxLayout = new QVBoxLayout;
+    VBoxLayout *methodVBoxLayout = new VBoxLayout;
     for (size_t i = 0; i < methodRadioButton_.size(); i++)
     {
         methodVBoxLayout->addWidget(methodRadioButton_[i]);
     }
 
-    QGroupBox *methodGroupBox = new QGroupBox(tr("Method"));
+    GroupBox *methodGroupBox = new GroupBox(tr("Method"));
     methodGroupBox->setLayout(methodVBoxLayout);
 
     // Widgets.
-    DoubleSliderWidget::create(voxelRadiusSlider_,
+    DoubleSlider::create(voxelRadiusSlider_,
                                this,
                                nullptr,
                                nullptr,
@@ -90,7 +90,7 @@ ComputeDescriptorWidget::ComputeDescriptorWidget(MainWindow *mainWindow)
                                1.0,
                                parameters_.voxelRadius);
 
-    DoubleSliderWidget::create(searchRadiusSlider_,
+    DoubleSlider::create(searchRadiusSlider_,
                                this,
                                nullptr,
                                nullptr,
@@ -103,12 +103,12 @@ ComputeDescriptorWidget::ComputeDescriptorWidget(MainWindow *mainWindow)
                                parameters_.searchRadius);
 
     // Options.
-    includeGroundPointsCheckBox_ = new QCheckBox;
+    includeGroundPointsCheckBox_ = new CheckBox;
     includeGroundPointsCheckBox_->setText(tr("Include ground points"));
     includeGroundPointsCheckBox_->setChecked(parameters_.includeGroundPoints);
 
     // Settings layout.
-    QVBoxLayout *settingsLayout = new QVBoxLayout;
+    VBoxLayout *settingsLayout = new VBoxLayout;
     settingsLayout->addWidget(methodGroupBox);
     settingsLayout->addWidget(voxelRadiusSlider_);
     settingsLayout->addWidget(searchRadiusSlider_);
@@ -116,23 +116,23 @@ ComputeDescriptorWidget::ComputeDescriptorWidget(MainWindow *mainWindow)
     settingsLayout->addStretch();
 
     // Buttons.
-    helpButton_ = new QPushButton(tr("Help"));
-    helpButton_->setIcon(THEME_ICON("question").icon());
+    helpButton_ = new PushButton(tr("Help"));
+    helpButton_->setIcon(THEME_ICON("question"));
     connect(helpButton_, SIGNAL(clicked()), this, SLOT(slotHelp()));
 
-    applyButton_ = new QPushButton(tr("Run"));
-    applyButton_->setIcon(THEME_ICON("run").icon());
+    applyButton_ = new PushButton(tr("Run"));
+    applyButton_->setIcon(THEME_ICON("run"));
     applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
 
     // Buttons layout.
-    QHBoxLayout *buttonsLayout = new QHBoxLayout;
+    HBoxLayout *buttonsLayout = new HBoxLayout;
     buttonsLayout->addWidget(helpButton_);
     buttonsLayout->addStretch();
     buttonsLayout->addWidget(applyButton_);
 
     // Main layout.
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->addLayout(settingsLayout);
     mainLayout->addSpacing(10);
     mainLayout->addLayout(buttonsLayout);
@@ -142,18 +142,18 @@ ComputeDescriptorWidget::ComputeDescriptorWidget(MainWindow *mainWindow)
     setLayout(mainLayout);
 }
 
-void ComputeDescriptorWidget::hideEvent(QHideEvent *event)
+void ComputeDescriptorWidget::hideEvent(HideEvent *event)
 {
     LOG_DEBUG(<< "Hide.");
     descriptor_.clear();
-    QWidget::hideEvent(event);
+    Widget::hideEvent(event);
 }
 
 void ComputeDescriptorWidget::slotApply()
 {
     LOG_DEBUG(<< "Apply.");
 
-    mainWindow_->suspendThreads();
+    app_->suspendThreads();
 
     parameters_.method = ComputeDescriptorParameters::METHOD_DENSITY;
     if (methodRadioButton_[ComputeDescriptorParameters::METHOD_PCA_INTENSITY]
@@ -170,20 +170,20 @@ void ComputeDescriptorWidget::slotApply()
     try
     {
         descriptor_.start(parameters_);
-        ProgressDialog::run(mainWindow_, "Compute Descriptor", &descriptor_);
+        ProgressDialog::run(app_, "Compute Descriptor", &descriptor_);
     }
     catch (std::exception &e)
     {
-        mainWindow_->showError(e.what());
+        app_->showError(e.what());
     }
     catch (...)
     {
-        mainWindow_->showError("Unknown error");
+        app_->showError("Unknown error");
     }
 
     descriptor_.clear();
 
-    mainWindow_->update(this, {Editor::TYPE_DESCRIPTOR}, Page::STATE_READ);
+    app_->update(this, {Editor::TYPE_DESCRIPTOR}, Page::STATE_READ);
 }
 
 void ComputeDescriptorWidget::slotHelp()
@@ -213,7 +213,7 @@ void ComputeDescriptorWidget::slotHelp()
 
     if (!infoDialog_)
     {
-        infoDialog_ = new InfoDialog(mainWindow_, 450, 450);
+        infoDialog_ = new InfoDialog(app_, 450, 450);
         infoDialog_->setWindowTitle(tr("Compute Descriptor Help"));
         infoDialog_->setText(t);
     }

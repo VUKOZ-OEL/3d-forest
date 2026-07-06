@@ -22,6 +22,7 @@
 // Include 3D Forest.
 #include <Application.hpp>
 #include <Time.hpp>
+#include <Widget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "Application"
@@ -230,6 +231,17 @@ void Application::slotRenderViewports()
     // }
 }
 
+void Application::post(std::function<void()> fn)
+{
+    eventQueue_.post(fn);
+}
+
+void Application::processEvents()
+{
+    // eventQueue_.runOne();
+    // QCoreApplication::processEvents();
+}
+
 void Application::emitUpdate(void *sender, const std::set<Editor::Type> &target)
 {
     LOG_DEBUG_UPDATE(<< "Update target <" << target << "> emit.");
@@ -346,7 +358,7 @@ void Application::createAction(Action **result,
                                const std::string &toolBarTitle,
                                const std::string &text,
                                const std::string &toolTip,
-                               const std::string &iconName,
+                               const ThemeIcon &icon,
                                std::function<void()> cb,
                                int menuPriority,
                                int menuItemPriority)
@@ -532,6 +544,14 @@ void Application::createMenu()
         }
     }
 #endif
+}
+
+void Application::setCentralWidget(Widget *widget)
+{
+}
+
+void Application::addDockWidget(int area, DockWidget *widget)
+{
 }
 
 void Application::hideToolBar(const std::string &toolBarTitle)

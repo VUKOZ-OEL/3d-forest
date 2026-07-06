@@ -36,6 +36,10 @@ class Application;
 class EXPORT_UI_COMMON FileDialog
 {
 public:
+    static std::vector<std::string> selectFiles(Application *app,
+                                                const std::string &dialogTitle,
+                                                const std::string &filter);
+
     static std::string getOpenFileName(Application *app,
                                        const std::string &dialogTitle,
                                        const std::string &filter);

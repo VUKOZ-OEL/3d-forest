@@ -23,7 +23,7 @@
 #define COMPUTE_CROWN_VOLUME_PLUGIN_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
+#include <Plugin.hpp>
 class ComputeCrownVolumeWindow;
 
 #if defined(_MSC_VER)
@@ -37,25 +37,27 @@ class ComputeCrownVolumeWindow;
 #endif
 
 /** Compute Crown Volume Plugin. */
-class EXPORT_COMPUTE_CROWN_VOLUME_PLUGIN ComputeCrownVolumePlugin
-    : public QObject,
-      public PluginInterface
+class ComputeCrownVolumePlugin
+    : 
+      public Plugin
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
     ComputeCrownVolumePlugin();
 
-    virtual void initialize(MainWindow *mainWindow);
+    const char *name() const override { return "ProjectFilePlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
-public slots:
     void slotPlugin();
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
     ComputeCrownVolumeWindow *pluginWindow_;
 };
+
+extern "C" EXPORT_COMPUTE_CROWN_VOLUME_PLUGIN Plugin *createPlugin()
+{
+    return new ComputeCrownVolumePlugin();
+}
 
 #endif /* COMPUTE_CROWN_VOLUME_PLUGIN_HPP */

@@ -23,7 +23,7 @@
 #define COMPUTE_ELEVATION_PLUGIN_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
+#include <Plugin.hpp>
 class ComputeElevationWindow;
 
 #if defined(_MSC_VER)
@@ -37,25 +37,27 @@ class ComputeElevationWindow;
 #endif
 
 /** Compute Elevation Plugin. */
-class EXPORT_COMPUTE_ELEVATION_PLUGIN ComputeElevationPlugin
-    : public QObject,
-      public PluginInterface
+class ComputeElevationPlugin
+    : 
+      public Plugin
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
     ComputeElevationPlugin();
 
-    virtual void initialize(MainWindow *mainWindow);
+    const char *name() const override { return "ComputeElevationPlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
-public slots:
     void slotPlugin();
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
     ComputeElevationWindow *pluginWindow_;
 };
+
+extern "C" EXPORT_COMPUTE_ELEVATION_PLUGIN Plugin *createPlugin()
+{
+    return new ComputeElevationPlugin();
+}
 
 #endif /* COMPUTE_ELEVATION_PLUGIN_HPP */

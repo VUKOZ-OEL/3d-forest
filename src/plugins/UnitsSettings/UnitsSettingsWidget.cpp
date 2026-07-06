@@ -20,16 +20,16 @@
 /** @file UnitsSettingsWidget.cpp */
 
 // Include 3D Forest.
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 #include <UnitsSettingsWidget.hpp>
 
 // Include Qt.
-#include <QCheckBox>
+#include <CheckBox>
 #include <QDoubleSpinBox>
-#include <QGridLayout>
-#include <QLabel>
-#include <QVBoxLayout>
+#include <GridLayout>
+#include <Label>
+#include <VBoxLayout>
 
 // Include local.
 #define LOG_MODULE_NAME "UnitsSettingsWidget"
@@ -38,9 +38,9 @@
 
 #define ICON(name) (ThemeIcon(":/UnitsSettingsResources/", name))
 
-UnitsSettingsWidget::UnitsSettingsWidget(MainWindow *mainWindow)
-    : QWidget(mainWindow),
-      mainWindow_(mainWindow)
+UnitsSettingsWidget::UnitsSettingsWidget(Application *app)
+    : Widget(app),
+      app_(app)
 {
     // Widgets.
     ppmLasSpinBox_ = new QDoubleSpinBox;
@@ -63,7 +63,7 @@ UnitsSettingsWidget::UnitsSettingsWidget(MainWindow *mainWindow)
             this,
             SLOT(slotIntermediateUser(double)));
 
-    userDefinedCheckBox_ = new QCheckBox;
+    userDefinedCheckBox_ = new CheckBox;
     userDefinedCheckBox_->setChecked(settings_.userDefined);
     // userDefinedCheckBox_->setText(tr("Enabled"));
     connect(userDefinedCheckBox_,
@@ -71,7 +71,7 @@ UnitsSettingsWidget::UnitsSettingsWidget(MainWindow *mainWindow)
             this,
             SLOT(slotUserDefined(int)));
 
-    QLabel *help = new QLabel;
+    Label *help = new Label;
     help->setToolTip(tr("The values are in points per meter.\n"
                         "Example: las scaling 0.01 is 100 points per meter, "
                         "two points have integer x coordinates 5 and 7 "
@@ -79,50 +79,50 @@ UnitsSettingsWidget::UnitsSettingsWidget(MainWindow *mainWindow)
                         "The user is able to override input file las scaling "
                         "to user defined value."));
     ThemeIcon helpIcon(":/gui/", "question");
-    help->setPixmap(helpIcon.pixmap(MainWindow::ICON_SIZE_TEXT));
+    help->setPixmap(helpIcon.pixmap(Application::ICON_SIZE_TEXT));
 
     // Layout.
-    QGridLayout *groupBoxLayout = new QGridLayout;
+    GridLayout *groupBoxLayout = new GridLayout;
 
-    groupBoxLayout->addWidget(new QLabel(tr("Las scaling:")), 0, 0);
+    groupBoxLayout->addWidget(new Label(tr("Las scaling:")), 0, 0);
     groupBoxLayout->addWidget(ppmLasSpinBox_, 0, 1);
 
-    groupBoxLayout->addWidget(new QLabel(tr("User scaling:")), 1, 0);
+    groupBoxLayout->addWidget(new Label(tr("User scaling:")), 1, 0);
     groupBoxLayout->addWidget(ppmUserSpinBox_, 1, 1);
 
-    groupBoxLayout->addWidget(new QLabel(tr("User scaling enabled:")), 2, 0);
+    groupBoxLayout->addWidget(new Label(tr("User scaling enabled:")), 2, 0);
     groupBoxLayout->addWidget(userDefinedCheckBox_, 2, 1);
 
     groupBoxLayout->addWidget(help, 3, 0);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->addLayout(groupBoxLayout);
     mainLayout->addStretch();
 
     setLayout(mainLayout);
 
     // Data.
-    connect(mainWindow_,
-            SIGNAL(signalUpdate(void *, const QSet<Editor::Type> &)),
-            this,
-            SLOT(slotUpdate(void *, const QSet<Editor::Type> &)));
+    app_->signalUpdate.connect([this](void *sender, const std::set<Editor::Type> &target)
+    {
+        slotUpdate(sender, target);
+    });
 
-    slotUpdate(nullptr, QSet<Editor::Type>());
+    slotUpdate(nullptr, std::set<Editor::Type>());
 }
 
 void UnitsSettingsWidget::slotUpdate(void *sender,
-                                     const QSet<Editor::Type> &target)
+                                     const std::set<Editor::Type> &target)
 {
     if (sender == this)
     {
         return;
     }
 
-    if (target.empty() || target.contains(Editor::TYPE_SETTINGS))
+    if (target.empty() || target.count(Editor::TYPE_SETTINGS))
     {
         LOG_DEBUG_UPDATE(<< "Input units settings.");
 
-        setUnitsSettings(mainWindow_->editor().settings().unitsSettings());
+        setUnitsSettings(app_->editor().settings().unitsSettings());
     }
 }
 
@@ -131,9 +131,9 @@ void UnitsSettingsWidget::dataChanged()
     LOG_DEBUG_UPDATE(<< "Output units settings <" << toString(settings_)
                      << ">.");
 
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setUnitsSettings(settings_);
-    mainWindow_->emitUpdate(this, {Editor::TYPE_SETTINGS});
+    app_->suspendThreads();
+    app_->editor().setUnitsSettings(settings_);
+    app_->emitUpdate(this, {Editor::TYPE_SETTINGS});
 }
 
 void UnitsSettingsWidget::setUnitsSettings(const UnitsSettings &settings)

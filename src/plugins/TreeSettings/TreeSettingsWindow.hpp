@@ -23,18 +23,18 @@
 #define TREE_SETTINGS_WINDOW_HPP
 
 // Include 3D Forest.
-class MainWindow;
+class Application;
 
 // Include Qt.
-#include <QDockWidget>
+#include <DockWidget>
 
 /** Tree Settings Window. */
-class TreeSettingsWindow : public QDockWidget
+class TreeSettingsWindow : public DockWidget
 {
-    Q_OBJECT
+
 
 public:
-    TreeSettingsWindow(MainWindow *mainWindow);
+    TreeSettingsWindow(Application *app);
 };
 
 #endif /* TREE_SETTINGS_WINDOW_HPP */

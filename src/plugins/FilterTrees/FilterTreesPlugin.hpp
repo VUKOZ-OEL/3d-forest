@@ -23,7 +23,7 @@
 #define FILTER_TREES_PLUGIN_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
+#include <Plugin.hpp>
 class FilterTreesWindow;
 
 #if defined(_MSC_VER)
@@ -37,24 +37,26 @@ class FilterTreesWindow;
 #endif
 
 /** Filter Trees Plugin. */
-class EXPORT_FILTER_TREES_PLUGIN FilterTreesPlugin : public QObject,
-                                                     public PluginInterface
+class FilterTreesPlugin : 
+                                                     public Plugin
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
     FilterTreesPlugin();
 
-    virtual void initialize(MainWindow *mainWindow);
+    const char *name() const override { return "FilterTreesPlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
-public slots:
     void slotPlugin();
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
     FilterTreesWindow *pluginWindow_;
 };
+
+extern "C" EXPORT_FILTER_TREES_PLUGIN Plugin *createPlugin()
+{
+    return new FilterTreesPlugin();
+}
 
 #endif /* FILTER_TREES_PLUGIN_HPP */

@@ -23,14 +23,10 @@
 #include <ImportFileDialog.hpp>
 #include <ImportFilePlugin.hpp>
 #include <IndexFileBuilder.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
-
-// Include Qt.
-#include <QCoreApplication>
-#include <QFileDialog>
-#include <QProgressBar>
-#include <QProgressDialog>
+#include <FileDialog.hpp>
+#include <ProgressDialog.hpp>
 
 // Include 3rd party.
 #include <pcdio.h>
@@ -64,27 +60,27 @@ static void importPluginPCDLogMessageHandler(pcl::VERBOSITY_LEVEL level,
     }
 }
 
-ImportFilePlugin::ImportFilePlugin() : mainWindow_(nullptr)
+ImportFilePlugin::ImportFilePlugin() : app_(nullptr)
 {
     pcl::logMessageHandler = importPluginPCDLogMessageHandler;
 }
 
-void ImportFilePlugin::initialize(MainWindow *mainWindow)
+void ImportFilePlugin::initialize(Application *app)
 {
-    mainWindow_ = mainWindow;
+    app_ = app;
 
-    mainWindow_->createAction(&importFileAction_,
+    app_->createAction(&importFileAction_,
                               "File",
                               "File Import/Export",
                               tr("Import..."),
                               tr("Import new point cloud dataset"),
                               ICON("import-file"),
                               this,
-                              SLOT(slotImportFile()),
+                              &ImportFilePlugin::slotImportFile,
                               MAIN_WINDOW_MENU_FILE_PRIORITY,
                               50);
 
-    mainWindow_->hideToolBar("File Import/Export");
+    app_->hideToolBar("File Import/Export");
 }
 
 void ImportFilePlugin::slotImportFile()
@@ -92,20 +88,20 @@ void ImportFilePlugin::slotImportFile()
     importFile();
 }
 
-static void importPluginDialog(MainWindow *mainWindow);
+static void importPluginDialog(Application *app);
 
 static void importPluginFile(const std::string &pathIn,
                              const std::string &pathOut,
                              const ImportSettings &settings,
-                             MainWindow *mainWindow);
+                             Application *app);
 
 static bool importPluginCreateIndex(const std::string &pathIn,
                                     const std::string &pathOut,
                                     const ImportSettings &settings,
-                                    MainWindow *mainWindow);
+                                    Application *app);
 
 static void importPluginAddAsNewTree(const std::string &path,
-                                     MainWindow *mainWindow);
+                                     Application *app);
 
 static bool importPluginPcd2Las(const std::string &pathIn,
                                 const std::string &pathOut);
@@ -114,53 +110,38 @@ void ImportFilePlugin::importFile()
 {
     try
     {
-        importPluginDialog(mainWindow_);
+        importPluginDialog(app_);
     }
     catch (std::exception &e)
     {
-        mainWindow_->showError(e.what());
+        app_->showError(e.what());
         return;
     }
 }
 
-static void importPluginDialog(MainWindow *mainWindow)
+static void importPluginDialog(Application *app)
 {
     LOG_DEBUG(<< "Start importing files.");
 
-    QFileDialog fileDialog(mainWindow, QObject::tr("Import File"));
-    fileDialog.setNameFilter(QObject::tr(IMPORT_PLUGIN_FILTER));
-    fileDialog.setFileMode(QFileDialog::ExistingFiles);
+    std::vector<std::string> fileNames;
+    fileNames = FileDialog::selectFiles(app,
+                                        tr("Import File"),
+                                        IMPORT_PLUGIN_FILTER);
 
-    if (fileDialog.exec() == QDialog::Rejected)
-    {
-        LOG_DEBUG(<< "Canceled importing files from the dialog.");
-        return;
-    }
-
-    QStringList files = fileDialog.selectedFiles();
-    QStringList selectedFiles;
-    for (auto const &file : files)
-    {
-        if (file.length() > 0)
-        {
-            selectedFiles.append(file);
-        }
-    }
-
-    LOG_DEBUG(<< "Selected <" << selectedFiles.count() << "> files.");
-    if (selectedFiles.count() < 1)
+    LOG_DEBUG(<< "Selected <" << fileNames.size() << "> files.");
+    if (fileNames.empty())
     {
         LOG_DEBUG(<< "Canceled importing files. No files selected.");
         return;
     }
 
     // Stop rendering.
-    mainWindow->suspendThreads();
+    app->suspendThreads();
 
     // Import settings.
-    ImportFileDialog settingsDialog(mainWindow);
+    ImportFileDialog settingsDialog(app);
 
-    if (settingsDialog.exec() == QDialog::Rejected)
+    if (settingsDialog.exec() == Dialog::Rejected)
     {
         return;
     }
@@ -168,16 +149,15 @@ static void importPluginDialog(MainWindow *mainWindow)
     ImportSettings settings = settingsDialog.settings();
 
     // Import.
-    for (auto const &file : selectedFiles)
+    for (auto const &fileName : fileNames)
     {
-        std::string pathIn = file.toStdString();
-        std::string pathOut = File::replaceExtension(pathIn, ".las");
-        importPluginFile(pathIn, pathOut, settings, mainWindow);
+        std::string pathOut = File::replaceExtension(fileName, ".las");
+        importPluginFile(fileName, pathOut, settings, app);
     }
 
     // Update.
-    mainWindow->updateNewProject();
-    mainWindow->slotRenderViewports();
+    app->updateNewProject();
+    app->slotRenderViewports();
 
     LOG_DEBUG(<< "Finished importing files.");
 }
@@ -185,27 +165,27 @@ static void importPluginDialog(MainWindow *mainWindow)
 static void importPluginFile(const std::string &pathIn,
                              const std::string &pathOut,
                              const ImportSettings &settings,
-                             MainWindow *mainWindow)
+                             Application *app)
 {
     LOG_DEBUG(<< "Import file <" << pathIn << ">.");
 
-    if (!importPluginCreateIndex(pathIn, pathOut, settings, mainWindow))
+    if (!importPluginCreateIndex(pathIn, pathOut, settings, app))
     {
         return;
     }
 
-    mainWindow->editor().open(pathOut, settings);
+    app->editor().open(pathOut, settings);
 
     if (settings.importFilesAsSeparateTrees)
     {
-        importPluginAddAsNewTree(pathIn, mainWindow);
+        importPluginAddAsNewTree(pathIn, app);
     }
 }
 
 static bool importPluginCreateIndex(const std::string &pathIn,
                                     const std::string &pathOut,
                                     const ImportSettings &settings,
-                                    MainWindow *mainWindow)
+                                    Application *app)
 {
     std::string ext = toLower(File::fileExtension(pathIn));
     if (ext == "pcd")
@@ -229,7 +209,7 @@ static bool importPluginCreateIndex(const std::string &pathIn,
     std::string pathFile;
     std::string pathIndex;
 
-    pathFile = File::resolvePath(pathOut, mainWindow->editor().projectPath());
+    pathFile = File::resolvePath(pathOut, app->editor().projectPath());
     pathIndex = IndexFileBuilder::extension(pathFile);
 
     if (File::exists(pathIndex))
@@ -237,19 +217,10 @@ static bool importPluginCreateIndex(const std::string &pathIn,
         return true;
     }
 
-    // Create modal progress dialog with custom progress bar.
-    // Custom progress bar allows to display percentage with fractional part.
-    QProgressDialog progressDialog(mainWindow);
-    progressDialog.setWindowTitle(QObject::tr("Create Index"));
-    progressDialog.setWindowModality(Qt::WindowModal);
-    progressDialog.setCancelButtonText(QObject::tr("&Cancel"));
-    progressDialog.setMinimumDuration(0);
-
-    QProgressBar *progressBar = new QProgressBar(&progressDialog);
-    progressBar->setTextVisible(false);
-    progressBar->setRange(0, 100);
-    progressBar->setValue(progressBar->minimum());
-    progressDialog.setBar(progressBar);
+    // Create progress dialog.
+    ProgressDialog progressDialog(app);
+    progressDialog.setWindowTitle(tr("Create Index"));
+    progressDialog.setRange(0, 100);
 
     // Initialize index builder.
     IndexFileBuilder builder;
@@ -273,7 +244,7 @@ static bool importPluginCreateIndex(const std::string &pathIn,
         progressDialog.setValue(static_cast<int>(value));
         progressDialog.setLabelText(buffer);
 
-        QCoreApplication::processEvents();
+        app->processEvents();
 
         if (progressDialog.wasCanceled())
         {
@@ -325,9 +296,9 @@ static bool importPluginPcd2Las(const std::string &pathIn,
 }
 
 static void importPluginAddAsNewTree(const std::string &path,
-                                     MainWindow *mainWindow)
+                                     Application *app)
 {
-    Editor &editor = mainWindow->editor();
+    Editor &editor = app->editor();
 
     Segments segments = editor.segments();
     QueryFilterSet segmentsFilter = editor.segmentsFilter();
@@ -359,12 +330,9 @@ static void importPluginAddAsNewTree(const std::string &path,
     int j = 0;
     int n = 10 * 1000;
 
-    QProgressDialog progressDialog(mainWindow);
-    progressDialog.setCancelButtonText(QObject::tr("&Cancel"));
+    ProgressDialog progressDialog(app);
+    progressDialog.setWindowTitle(tr("Add new tree"));
     progressDialog.setRange(0, maximum);
-    progressDialog.setWindowTitle(QObject::tr("Add new tree"));
-    progressDialog.setWindowModality(Qt::WindowModal);
-    progressDialog.setMinimumDuration(0);
     progressDialog.show();
 
     while (query.next())
@@ -384,7 +352,8 @@ static void importPluginAddAsNewTree(const std::string &path,
             j = 0;
             progressDialog.setValue(i);
 
-            QCoreApplication::processEvents();
+            app->processEvents();
+
             if (progressDialog.wasCanceled())
             {
                 canceled = true;

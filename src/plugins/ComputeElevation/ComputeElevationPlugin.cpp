@@ -22,7 +22,7 @@
 // Include 3D Forest.
 #include <ComputeElevationPlugin.hpp>
 #include <ComputeElevationWindow.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -32,16 +32,16 @@
 #define ICON(name) (ThemeIcon(":/ComputeElevationResources/", name))
 
 ComputeElevationPlugin::ComputeElevationPlugin()
-    : mainWindow_(nullptr),
+    : app_(nullptr),
       pluginWindow_(nullptr)
 {
 }
 
-void ComputeElevationPlugin::initialize(MainWindow *mainWindow)
+void ComputeElevationPlugin::initialize(Application *app)
 {
-    mainWindow_ = mainWindow;
+    app_ = app;
 
-    mainWindow_->createAction(nullptr,
+    app_->createAction(nullptr,
                               "Compute",
                               "Compute",
                               tr("Elevation"),
@@ -49,7 +49,7 @@ void ComputeElevationPlugin::initialize(MainWindow *mainWindow)
                                  " for each point"),
                               ICON("elevation"),
                               this,
-                              SLOT(slotPlugin()),
+                              &ComputeElevationPlugin::slotPlugin,
                               MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
 }
 
@@ -58,7 +58,7 @@ void ComputeElevationPlugin::slotPlugin()
     // Create GUI only when this plugin is used for the first time.
     if (!pluginWindow_)
     {
-        pluginWindow_ = new ComputeElevationWindow(mainWindow_);
+        pluginWindow_ = new ComputeElevationWindow(app_);
     }
 
     pluginWindow_->show();
