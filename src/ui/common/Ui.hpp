@@ -33,6 +33,21 @@ class Application;
 class EXPORT_UI_COMMON Ui
 {
 public:
+    enum WindowModality {
+        NonModal,
+        WindowModal,
+        ApplicationModal
+    };
+
+    enum FocusPolicy
+    {
+        NoFocus    = 0,
+        TabFocus   = 0x1,
+        ClickFocus = 0x2,
+        StrongFocus = TabFocus | ClickFocus,
+        WheelFocus  = StrongFocus | 0x4
+    };
+
     enum Orientation
     {
         Horizontal = 0x1,

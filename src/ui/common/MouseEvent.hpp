@@ -24,13 +24,14 @@
 
 // Include 3D Forest.
 #include <Point.hpp>
+#include <Event.hpp>
 
 // Include local.
 #include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
 
 /** MouseEvent. */
-class EXPORT_UI_COMMON MouseEvent
+class EXPORT_UI_COMMON MouseEvent : public Event
 {
 public:
     Point pos() const { return pos_; }

@@ -52,3 +52,7 @@ void Layout::addLayout(Layout *layout)
 void Layout::addStretch()
 {
 }
+
+void Layout::addSpacing(int spacing)
+{
+}

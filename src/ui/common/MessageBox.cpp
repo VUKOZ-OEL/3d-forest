@@ -52,3 +52,35 @@ int MessageBox::exec()
 {
     return defaultButton_;
 }
+
+int MessageBox::information(Application *app,
+                const std::string &title,
+                const std::string &text,
+                int buttons,
+                int defaultButton)
+{
+}
+
+int MessageBox::question(Application *app,
+                const std::string &title,
+                const std::string &text,
+                int buttons,
+                int defaultButton)
+{
+}
+
+int MessageBox::warning(Application *app,
+                const std::string &title,
+                const std::string &text,
+                int buttons,
+                int defaultButton)
+{
+}
+
+int MessageBox::critical(Application *app,
+                const std::string &title,
+                const std::string &text,
+                int buttons,
+                int defaultButtonn)
+{
+}

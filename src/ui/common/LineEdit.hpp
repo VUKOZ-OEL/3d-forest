@@ -17,44 +17,33 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file EditPluginSetClassification.hpp */
+/** @file LineEdit.hpp */
 
-#ifndef INPUT_COMBO_BOX_DIALOG_HPP
-#define INPUT_COMBO_BOX_DIALOG_HPP
+#ifndef LINE_EDIT_HPP
+#define LINE_EDIT_HPP
 
-// Include Qt.
-#include <QDialog>
-class QComboBox;
-class QPushButton;
+// Include 3D Forest.
+#include <Widget.hpp>
+class Application;
 
 // Include local.
-#include <ExportGui.hpp>
+#include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
 
-/** Input Combo Box Dialog. */
-class EXPORT_GUI InputComboBoxDialog : public QDialog
+/** LineEdit. */
+class EXPORT_UI_COMMON LineEdit : public Widget
 {
-    Q_OBJECT
-
 public:
-    explicit InputComboBoxDialog(QWidget *parent = nullptr);
+    LineEdit();
+    virtual ~LineEdit();
 
-    void setOkButtonText(const QString &text);
-
-    void addItem(const QString &text);
-
-    /// Returns current combo box item index.
-    int currentIndex() const;
-
-    /// Returns current combo box item text.
-    QString currentText() const;
+    void setReadOnly(bool b);
+    void append(const std::string &str);
+    void clear();
 
 private:
-    QComboBox *comboBox;
-    QPushButton *okButton;
-    QPushButton *cancelButton;
 };
 
 #include <WarningsEnable.hpp>
 
-#endif /* INPUT_COMBO_BOX_DIALOG_HPP */
+#endif /* LINE_EDIT_HPP */

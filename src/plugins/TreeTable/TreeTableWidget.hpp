@@ -29,7 +29,7 @@ class Application;
 
 // Include Qt.
 #include <QItemSelection>
-#include <Widget>
+#include <Widget.hpp>
 class CheckBox;
 class PushButton;
 class QTableWidget;
@@ -49,7 +49,7 @@ public:
 
     void slotUpdate(void *sender, const std::set<Editor::Type> &target);
 
-protected slots:
+
     void slotShowOnlyVisibleTreesChanged(int index);
     void slotExport();
     void slotCustomContextMenuRequested(const QPoint &pos);
@@ -97,7 +97,7 @@ private:
     ManagementStatusList managementStatusList_;
     bool updatesEnabled_;
 
-    QString fileName_;
+    std::string fileName_;
 
     // New data.
     void newData();

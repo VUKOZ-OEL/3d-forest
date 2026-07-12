@@ -25,9 +25,6 @@
 #include <Application.hpp>
 #include <ThemeIcon.hpp>
 
-// Include Qt.
-#include <QCloseEvent>
-
 // Include local.
 #define LOG_MODULE_NAME "FilterAreaWindow"
 #include <Log.hpp>
@@ -47,26 +44,26 @@ FilterAreaWindow::FilterAreaWindow(Application *app)
     setFixedHeight(widget()->sizeHint().height());
     setWindowTitle(tr("Filter Area"));
     setWindowIcon(ICON("clip-filter"));
-    setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    app->addDockWidget(Qt::RightDockWidgetArea, this);
+    setAllowedAreas(Ui::LeftDockWidgetArea | Ui::RightDockWidgetArea);
+    app->addDockWidget(Ui::RightDockWidgetArea, this);
 
     LOG_DEBUG(<< "Finished creating clip filter window.");
 }
 
-void FilterAreaWindow::showEvent(QShowEvent *event)
+void FilterAreaWindow::showEvent(ShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
     // widget_->setFilterEnabled(true);
-    Widget::showEvent(event);
+    DockWidget::showEvent(event);
 }
 
 void FilterAreaWindow::hideEvent(HideEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Hide event.");
-    Widget::hideEvent(event);
+    DockWidget::hideEvent(event);
 }
 
-void FilterAreaWindow::closeEvent(QCloseEvent *event)
+void FilterAreaWindow::closeEvent(CloseEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Close event.");
     // widget_->setFilterEnabled(false);

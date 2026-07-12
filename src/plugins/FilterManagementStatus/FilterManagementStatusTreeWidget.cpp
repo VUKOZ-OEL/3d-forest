@@ -25,9 +25,9 @@
 #include <Application.hpp>
 
 // Include Qt.
-#include <CheckBox>
-#include <Label>
-#include <VBoxLayout>
+#include <CheckBox.hpp>
+#include <Label.hpp>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterManagementStatusTreeWidget"
@@ -67,7 +67,7 @@ FilterManagementStatusTreeWidget::createMap()
         const ManagementStatus &status = statusList[i];
         FilterManagementStatusTreeWidget::Status statusItem;
         statusItem.statusId = status.id;
-        statusItem.label = QString::fromStdString(status.label);
+        statusItem.label = std::string::fromStdString(status.label);
 
         statusMap[i] = statusItem;
     }
@@ -99,7 +99,7 @@ void FilterManagementStatusTreeWidget::createCheckBoxList()
         checkboxList_[i] = new CheckBox;
         checkboxList_[i]->setChecked(false);
         auto label = core().translate(statusMap_[i].label.toStdString());
-        checkboxList_[i]->setText(QString::fromStdString(label));
+        checkboxList_[i]->setText(std::string::fromStdString(label));
         connect(checkboxList_[i],
                 SIGNAL(clicked(bool)),
                 this,

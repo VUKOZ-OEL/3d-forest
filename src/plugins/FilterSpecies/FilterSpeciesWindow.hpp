@@ -27,7 +27,7 @@ class Application;
 class FilterSpeciesWidget;
 
 // Include Qt.
-#include <DockWidget>
+#include <DockWidget.hpp>
 class QCloseEvent;
 
 /** Filter Species Window. */
@@ -41,7 +41,7 @@ public:
 protected:
     FilterSpeciesWidget *widget_;
 
-    void showEvent(QShowEvent *event) override;
+    void showEvent(ShowEvent *event) override;
     void hideEvent(HideEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
 };

@@ -44,21 +44,21 @@ FilterTreesWindow::FilterTreesWindow(Application *app)
     setWidget(widget_);
     setWindowTitle(tr("Filter Trees"));
     setWindowIcon(ICON("tree"));
-    setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    app->addDockWidget(Qt::RightDockWidgetArea, this);
+    setAllowedAreas(Ui::LeftDockWidgetArea | Ui::RightDockWidgetArea);
+    app->addDockWidget(Ui::RightDockWidgetArea, this);
 }
 
-void FilterTreesWindow::showEvent(QShowEvent *event)
+void FilterTreesWindow::showEvent(ShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
     // widget_->setFilterEnabled(true);
-    Widget::showEvent(event);
+    DockWidget::showEvent(event);
 }
 
 void FilterTreesWindow::hideEvent(HideEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Hide event.");
-    Widget::hideEvent(event);
+    DockWidget::hideEvent(event);
 }
 
 void FilterTreesWindow::closeEvent(QCloseEvent *event)

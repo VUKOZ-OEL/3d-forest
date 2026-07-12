@@ -23,17 +23,13 @@
 #define COMPUTE_DESCRIPTOR_WINDOW_HPP
 
 // Include 3D Forest.
+#include <Dialog.hpp>
 class Application;
 class ComputeDescriptorWidget;
-
-// Include Qt.
-#include <Dialog>
 
 /** Compute Descriptor Window. */
 class ComputeDescriptorWindow : public Dialog
 {
-
-
 public:
     ComputeDescriptorWindow(Application *app);
 

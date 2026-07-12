@@ -26,14 +26,14 @@
 #include <ThemeIcon.hpp>
 
 // Include Qt.
-#include <HBoxLayout>
-#include <Label>
+#include <HBoxLayout.hpp>
+#include <Label.hpp>
 #include <QToolBar>
 #include <QToolButton>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QTreeWidgetItemIterator>
-#include <VBoxLayout>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterClassificationWidget"
@@ -203,7 +203,7 @@ void FilterClassificationWidget::slotShow()
         updatesEnabled_ = false;
         for (auto &item : items)
         {
-            item->setCheckState(COLUMN_CHECKED, Qt::Checked);
+            item->setCheckState(COLUMN_CHECKED, Ui::Checked);
         }
         updatesEnabled_ = true;
 
@@ -220,7 +220,7 @@ void FilterClassificationWidget::slotHide()
         updatesEnabled_ = false;
         for (auto &item : items)
         {
-            item->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
+            item->setCheckState(COLUMN_CHECKED, Ui::Unchecked);
         }
         updatesEnabled_ = true;
 
@@ -289,7 +289,7 @@ void FilterClassificationWidget::slotItemChanged(QTreeWidgetItem *item,
     if (column == COLUMN_CHECKED)
     {
         size_t id = identifier(item);
-        bool checked = (item->checkState(COLUMN_CHECKED) == Qt::Checked);
+        bool checked = (item->checkState(COLUMN_CHECKED) == Ui::Checked);
 
         filter_.setEnabled(id, checked);
 
@@ -316,11 +316,11 @@ void FilterClassificationWidget::updateTree()
     {
         if (filter_.enabled(i))
         {
-            (*it)->setCheckState(COLUMN_CHECKED, Qt::Checked);
+            (*it)->setCheckState(COLUMN_CHECKED, Ui::Checked);
         }
         else
         {
-            (*it)->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
+            (*it)->setCheckState(COLUMN_CHECKED, Ui::Unchecked);
         }
 
         ++i;
@@ -356,17 +356,17 @@ void FilterClassificationWidget::addTreeItem(size_t index)
 
     if (filter_.enabled(index))
     {
-        item->setCheckState(COLUMN_CHECKED, Qt::Checked);
+        item->setCheckState(COLUMN_CHECKED, Ui::Checked);
     }
     else
     {
-        item->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
+        item->setCheckState(COLUMN_CHECKED, Ui::Unchecked);
     }
 
-    item->setText(COLUMN_ID, QString::number(index));
+    item->setText(COLUMN_ID, std::string::number(index));
 
     item->setText(COLUMN_LABEL,
-                  QString::fromStdString(classifications_.label(index)));
+                  std::string::fromStdString(classifications_.label(index)));
 
     // Color legend.
     if (index < ColorPalette::Classification.size())
@@ -378,7 +378,7 @@ void FilterClassificationWidget::addTreeItem(size_t index)
         color.setGreenF(static_cast<float>(rgb[1]));
         color.setBlueF(static_cast<float>(rgb[2]));
 
-        QBrush brush(color, Qt::SolidPattern);
+        QBrush brush(color, Ui::SolidPattern);
         item->setBackground(COLUMN_ID, brush);
         // brush.setColor(Color(0, 0, 0));
         // item->setForeground(COLUMN_ID, brush);

@@ -21,19 +21,17 @@
 
 // Include 3D Forest.
 #include <ComputeDescriptorWidget.hpp>
-#include <DoubleSlider.hpp>
+#include <DoubleSliderWidget.hpp>
 #include <InfoDialog.hpp>
 #include <Application.hpp>
-#include <ProgressDialog.hpp>
+#include <ProgressActionDialog.hpp>
 #include <ThemeIcon.hpp>
-
-// Include Qt.
-#include <CheckBox>
-#include <GroupBox>
-#include <HBoxLayout>
-#include <PushButton>
-#include <QRadioButton>
-#include <VBoxLayout>
+#include <CheckBox.hpp>
+#include <GroupBox.hpp>
+#include <HBoxLayout.hpp>
+#include <PushButton.hpp>
+#include <RadioButton.hpp>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeDescriptorWidget"
@@ -51,8 +49,8 @@ ComputeDescriptorWidget::ComputeDescriptorWidget(Application *app)
     LOG_DEBUG(<< "Create.");
 
     // Method.
-    methodRadioButton_.push_back(new QRadioButton(tr("Density")));
-    methodRadioButton_.push_back(new QRadioButton(tr("PCA intensity")));
+    methodRadioButton_.push_back(new RadioButton(tr("Density")));
+    methodRadioButton_.push_back(new RadioButton(tr("PCA intensity")));
 
     if (parameters_.method == ComputeDescriptorParameters::METHOD_DENSITY)
     {
@@ -78,8 +76,7 @@ ComputeDescriptorWidget::ComputeDescriptorWidget(Application *app)
     methodGroupBox->setLayout(methodVBoxLayout);
 
     // Widgets.
-    DoubleSlider::create(voxelRadiusSlider_,
-                               this,
+    DoubleSliderWidget::create(voxelRadiusSlider_,
                                nullptr,
                                nullptr,
                                tr("Voxel radius"),
@@ -90,8 +87,7 @@ ComputeDescriptorWidget::ComputeDescriptorWidget(Application *app)
                                1.0,
                                parameters_.voxelRadius);
 
-    DoubleSlider::create(searchRadiusSlider_,
-                               this,
+    DoubleSliderWidget::create(searchRadiusSlider_,
                                nullptr,
                                nullptr,
                                tr("Neighborhood search radius"),
@@ -118,12 +114,17 @@ ComputeDescriptorWidget::ComputeDescriptorWidget(Application *app)
     // Buttons.
     helpButton_ = new PushButton(tr("Help"));
     helpButton_->setIcon(THEME_ICON("question"));
-    connect(helpButton_, SIGNAL(clicked()), this, SLOT(slotHelp()));
+    helpButton_->clicked.connect([this]()
+    {
+        slotHelp();
+    });
 
     applyButton_ = new PushButton(tr("Run"));
     applyButton_->setIcon(THEME_ICON("run"));
-    applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
+    applyButton_->clicked.connect([this]()
+    {
+        slotApply();
+    });
 
     // Buttons layout.
     HBoxLayout *buttonsLayout = new HBoxLayout;
@@ -170,7 +171,7 @@ void ComputeDescriptorWidget::slotApply()
     try
     {
         descriptor_.start(parameters_);
-        ProgressDialog::run(app_, "Compute Descriptor", &descriptor_);
+        ProgressActionDialog::run(app_, "Compute Descriptor", &descriptor_);
     }
     catch (std::exception &e)
     {
@@ -188,7 +189,7 @@ void ComputeDescriptorWidget::slotApply()
 
 void ComputeDescriptorWidget::slotHelp()
 {
-    QString t;
+    std::string t;
     t = "<h3>Compute Descriptor Tool</h3>"
         "This tool calculates point descriptor values. "
         "Descriptors are calculated from <i>Neighborhood Radius</i> "

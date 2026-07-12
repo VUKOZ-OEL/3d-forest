@@ -26,19 +26,17 @@
 #include <Application.hpp>
 #include <ThemeIcon.hpp>
 #include <Util.hpp>
-
-// Include Qt.
-#include <CheckBox>
-#include <ComboBox>
-#include <QFileDialog>
-#include <GridLayout>
-#include <GroupBox>
-#include <HBoxLayout>
-#include <Label>
-#include <QLineEdit>
-#include <QMessageBox>
-#include <PushButton>
-#include <VBoxLayout>
+#include <CheckBox.hpp>
+#include <ComboBox.hpp>
+#include <FileDialog.hpp>
+#include <GridLayout.hpp>
+#include <GroupBox.hpp>
+#include <HBoxLayout.hpp>
+#include <Label.hpp>
+#include <LineEdit.hpp>
+#include <MessageBox.hpp>
+#include <PushButton.hpp>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ExportFileDialog"
@@ -47,16 +45,19 @@
 #define ICON(name) (ThemeIcon(":/exportfile/", name))
 
 ExportFileDialog::ExportFileDialog(Application *app,
-                                   const QString &fileName)
+                                   const std::string &fileName)
     : Dialog(app),
       app_(app)
 {
     // File name.
-    fileNameLineEdit_ = new QLineEdit;
+    fileNameLineEdit_ = new LineEdit;
     fileNameLineEdit_->setText(fileName);
 
     browseButton_ = new PushButton(tr("Browse"));
-    connect(browseButton_, SIGNAL(clicked()), this, SLOT(slotBrowse()));
+    browseButton_->clicked.connect([this]()
+    {
+        slotBrowse();
+    });
 
     HBoxLayout *fileNameLayout = new HBoxLayout;
     fileNameLayout->addWidget(new Label(tr("File")));
@@ -111,10 +112,16 @@ ExportFileDialog::ExportFileDialog(Application *app,
 
     // Buttons.
     acceptButton_ = new PushButton(tr("Export"));
-    connect(acceptButton_, SIGNAL(clicked()), this, SLOT(slotAccept()));
+    acceptButton_->clicked.connect([this]()
+    {
+        slotAccept();
+    });
 
     rejectButton_ = new PushButton(tr("Cancel"));
-    connect(rejectButton_, SIGNAL(clicked()), this, SLOT(slotReject()));
+    rejectButton_->clicked.connect([this]()
+    {
+        slotReject();
+    });
 
     HBoxLayout *dialogButtons = new HBoxLayout;
     dialogButtons->addStretch();
@@ -142,21 +149,18 @@ ExportFileDialog::ExportFileDialog(Application *app,
 
 void ExportFileDialog::slotBrowse()
 {
-    QFileDialog::Options options;
-    options = QFlag(QFileDialog::DontConfirmOverwrite);
+    std::string selectedFilter;
 
-    QString selectedFilter;
-
-    QString fileName =
-        QFileDialog::getSaveFileName(app_,
+    std::string fileName =
+        FileDialog::getSaveFileName(app_,
                                      tr("Export File As"),
                                      fileNameLineEdit_->text(),
                                      tr("LAS (LASer) File (*.las);;"
                                         "Comma Separated Values (*.csv)"),
                                      &selectedFilter,
-                                     options);
+                                     FileDialog::DontConfirmOverwrite);
 
-    if (fileName.isEmpty())
+    if (fileName.empty())
     {
         return;
     }
@@ -166,26 +170,26 @@ void ExportFileDialog::slotBrowse()
 
 void ExportFileDialog::slotAccept()
 {
-    QString path = fileNameLineEdit_->text();
+    std::string path = fileNameLineEdit_->text();
 
-    if (path.isEmpty())
+    if (path.empty())
     {
-        (void)QMessageBox::information(this,
+        (void)MessageBox::information(app_,
                                        tr("Export File"),
                                        tr("Please choose a file name."));
         return;
     }
 
-    if (File::exists(path.toStdString()))
+    if (File::exists(path))
     {
-        QMessageBox::StandardButton reply;
+        int reply;
 
-        reply = QMessageBox::question(this,
+        reply = MessageBox::question(app_,
                                       tr("Export File"),
                                       tr("Overwrite existing file?"),
-                                      QMessageBox::Yes | QMessageBox::No);
+                                      MessageBox::Yes | MessageBox::No);
 
-        if (reply != QMessageBox::Yes)
+        if (reply != MessageBox::Yes)
         {
             return;
         }
@@ -205,7 +209,7 @@ std::shared_ptr<ExportFileFormatInterface> ExportFileDialog::writer() const
 {
     std::shared_ptr<ExportFileFormatInterface> result;
 
-    std::string path = fileNameLineEdit_->text().toStdString();
+    std::string path = fileNameLineEdit_->text();
     std::string ext = toLower(File::fileExtension(path));
 
     if (ext == "csv")
@@ -225,7 +229,7 @@ ExportFileProperties ExportFileDialog::properties() const
     ExportFileProperties result;
 
     // File name.
-    result.setFileName(fileNameLineEdit_->text().toStdString());
+    result.setFileName(fileNameLineEdit_->text());
 
     // Point format.
     uint32_t fmt = 0;
@@ -241,7 +245,7 @@ ExportFileProperties ExportFileDialog::properties() const
     result.setFormat(fmt);
 
     // Scale.
-    result.setScale(scaleComboBox_->currentText().toDouble());
+    result.setScale(toDouble(scaleComboBox_->currentText()));
 
     // Filter.
     result.setFilterEnabled(filterEnabledCheckBox_->isChecked());

@@ -17,20 +17,58 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ExportGui.hpp */
+/** @file SpinBox.cpp */
 
-#ifndef EXPORT_GUI_HPP
-#define EXPORT_GUI_HPP
+// Include std.
 
-#if defined(_MSC_VER)
-    #if defined(EXPORT_3DForestGui)
-        #define EXPORT_GUI __declspec(dllexport)
-    #else
-        #define EXPORT_GUI __declspec(dllimport)
-        #define EXPORT_GUI_IMPORT
-    #endif
-#else
-    #define EXPORT_GUI
-#endif
+// Include 3D Forest.
+#include <SpinBox.hpp>
+#include <Application.hpp>
 
-#endif /* EXPORT_GUI_HPP */
+// Include local.
+#define LOG_MODULE_NAME "SpinBox"
+#include <Log.hpp>
+
+SpinBox::SpinBox()
+{
+}
+
+SpinBox::~SpinBox()
+{
+}
+
+void SpinBox::setSingleStep(int val)
+{
+    singleStep_ = val;
+}
+
+void SpinBox::setMinimum(int min)
+{
+    minimum_ = min;
+}
+
+void SpinBox::setMaximum(int max)
+{
+    maximum_ = max;
+}
+
+void SpinBox::setRange(int min, int max)
+{
+    setMinimum(min);
+    setMaximum(max);
+}
+
+void SpinBox::setValue(int value, bool notify)
+{
+    if (value == value_)
+    {
+        return;
+    }
+
+    value_ = value;
+
+    if (notify && !signalsBlocked())
+    {
+        valueChanged(value_);
+    }
+}

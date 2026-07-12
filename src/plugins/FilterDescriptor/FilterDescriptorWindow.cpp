@@ -47,23 +47,23 @@ FilterDescriptorWindow::FilterDescriptorWindow(Application *app)
     setFixedHeight(widget()->sizeHint().height());
     setWindowTitle(tr("Filter Descriptor"));
     setWindowIcon(ICON("descriptor-filter"));
-    setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    app->addDockWidget(Qt::RightDockWidgetArea, this);
+    setAllowedAreas(Ui::LeftDockWidgetArea | Ui::RightDockWidgetArea);
+    app->addDockWidget(Ui::RightDockWidgetArea, this);
 
     LOG_DEBUG(<< "Finished creating descriptor filter window.");
 }
 
-void FilterDescriptorWindow::showEvent(QShowEvent *event)
+void FilterDescriptorWindow::showEvent(ShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
     // widget_->setFilterEnabled(true);
-    Widget::showEvent(event);
+    DockWidget::showEvent(event);
 }
 
 void FilterDescriptorWindow::hideEvent(HideEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Hide event.");
-    Widget::hideEvent(event);
+    DockWidget::hideEvent(event);
 }
 
 void FilterDescriptorWindow::closeEvent(QCloseEvent *event)

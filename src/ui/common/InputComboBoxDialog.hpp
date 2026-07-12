@@ -17,43 +17,42 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file InfoDialog.hpp */
+/** @file EditPluginSetClassification.hpp */
 
-#ifndef INFO_DIALOG_HPP
-#define INFO_DIALOG_HPP
+#ifndef INPUT_COMBO_BOX_DIALOG_HPP
+#define INPUT_COMBO_BOX_DIALOG_HPP
 
-// Include Qt.
-#include <QDialog>
-class QTextEdit;
-class QPushButton;
+// Include 3D Forest.
+#include <Dialog.hpp>
+class ComboBox;
+class PushButton;
 
 // Include local.
-#include <ExportGui.hpp>
+#include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
 
-/** Info Dialog. */
-class EXPORT_GUI InfoDialog : public QDialog
+/** Input Combo Box Dialog. */
+class EXPORT_UI_COMMON InputComboBoxDialog : public Dialog
 {
-    Q_OBJECT
-
 public:
-    InfoDialog(QWidget *parent = nullptr, int w = 0, int h = 0);
+    explicit InputComboBoxDialog(Application *app);
 
-    QSize sizeHint() const override;
-    QSize minimumSizeHint() const override;
+    void setOkButtonText(const std::string &text);
 
-    void setText(const QString &text);
+    void addItem(const std::string &text);
 
-public slots:
-    void slotClose();
+    /// Returns current combo box item index.
+    int currentIndex() const;
+
+    /// Returns current combo box item text.
+    std::string currentText() const;
 
 private:
-    int defaultWidth_;
-    int defaultHeight_;
-    QTextEdit *textEdit_;
-    QPushButton *closeButton_;
+    ComboBox *comboBox_;
+    PushButton *okButton_;
+    PushButton *cancelButton_;
 };
 
 #include <WarningsEnable.hpp>
 
-#endif /* INFO_DIALOG_HPP */
+#endif /* INPUT_COMBO_BOX_DIALOG_HPP */

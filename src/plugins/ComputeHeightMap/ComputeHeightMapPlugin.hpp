@@ -68,7 +68,6 @@ public:
     virtual bool modifierEnabled();
     virtual void applyModifier(Page *page);
 
-
     void slotPlugin();
 
 private:

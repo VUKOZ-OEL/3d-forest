@@ -37,3 +37,7 @@ PushButton::PushButton(const std::string &str)
 PushButton::~PushButton()
 {
 }
+
+void PushButton::setIcon(const ThemeIcon &icon)
+{
+}

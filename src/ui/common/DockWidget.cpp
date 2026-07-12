@@ -65,3 +65,23 @@ void DockWidget::setWidget(Widget *widget)
 void DockWidget::setFixedHeight(int h)
 {
 }
+
+void DockWidget::paintEvent(PaintEvent *event)
+{
+}
+
+void DockWidget::mousePressEvent(MouseEvent *event)
+{
+}
+
+void DockWidget::hideEvent(HideEvent *event)
+{
+}
+
+void DockWidget::showEvent(ShowEvent *event)
+{
+}
+
+void DockWidget::closeEvent(CloseEvent *event)
+{
+}

@@ -47,23 +47,23 @@ FilterElevationWindow::FilterElevationWindow(Application *app)
     setFixedHeight(widget()->sizeHint().height());
     setWindowTitle(tr("Filter Elevation"));
     setWindowIcon(ICON("elevation-filter"));
-    setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    app->addDockWidget(Qt::RightDockWidgetArea, this);
+    setAllowedAreas(Ui::LeftDockWidgetArea | Ui::RightDockWidgetArea);
+    app->addDockWidget(Ui::RightDockWidgetArea, this);
 
     LOG_DEBUG(<< "Finished creating elevation filter window.");
 }
 
-void FilterElevationWindow::showEvent(QShowEvent *event)
+void FilterElevationWindow::showEvent(ShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
     // widget_->setFilterEnabled(true);
-    Widget::showEvent(event);
+    DockWidget::showEvent(event);
 }
 
 void FilterElevationWindow::hideEvent(HideEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Hide event.");
-    Widget::hideEvent(event);
+    DockWidget::hideEvent(event);
 }
 
 void FilterElevationWindow::closeEvent(QCloseEvent *event)

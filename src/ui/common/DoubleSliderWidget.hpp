@@ -22,21 +22,18 @@
 #ifndef DOUBLE_SLIDER_WIDGET_HPP
 #define DOUBLE_SLIDER_WIDGET_HPP
 
-// Include Qt.
-#include <QWidget>
-class QDoubleSpinBox;
-class QSlider;
-class QVBoxLayout;
+// Include 3D Forest.
+#include <Widget.hpp>
+class Slider;
+class DoubleSpinBox;
 
 // Include local.
-#include <ExportGui.hpp>
+#include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
 
-/** Slider Widget with values in double. */
-class EXPORT_GUI DoubleSliderWidget : public QWidget
+/** DoubleSliderWidget. */
+class EXPORT_UI_COMMON DoubleSliderWidget : public Widget
 {
-    Q_OBJECT
-
 public:
     /** Slider layout. */
     enum Layout
@@ -46,45 +43,42 @@ public:
     };
 
     DoubleSliderWidget();
+    virtual ~DoubleSliderWidget();
 
     static void create(DoubleSliderWidget *&outputWidget,
-                       const QObject *receiver,
-                       const char *memberIntermediateValue,
-                       const char *memberFinalValue,
-                       const QString &text,
-                       const QString &toolTip,
-                       const QString &unitsList,
+                       std::function<void(double)> valueChangedCallback = {},
+                       std::function<void()> finalValueCallback = {},
+                       const std::string &text,
+                       const std::string &toolTip,
+                       const std::string &unitsList,
                        double step,
                        double min,
                        double max,
                        double value,
                        Layout layout = LAYOUT_SLIDER_UNDER_LABEL);
 
-    double value() const;
     double minimum() const;
-    double maximum() const;
+    void setMinimum(double v);
 
-    void setValue(double value);
-    void setMinimum(double min);
-    void setMaximum(double max);
+    double maximum() const;
+    void setMaximum(double v);
+
     void setTargetProduct(double value);
 
-    void blockSignals(bool block);
+    double value() const;
+    void setValue(double value, bool notify = false);
 
-signals:
-    void signalIntermediateValue(double v);
-    void signalFinalValue();
+    Signal<double> valueChanged;
+    Signal<> finalValue;
 
-protected slots:
-    void slotIntermediateValue(int v);
-    void slotIntermediateValue(double v);
-    void slotFinalValue();
+    void slotValueChangedSlider(int v);
+    void slotValueChangedSpinBox(double v);
+    void slotFinalValueSlider();
+    void slotFinalValueSpinBox();
 
-protected:
-    QSlider *slider_;
-    QDoubleSpinBox *spinBox_;
-    double minimumValue_;
-    double maximumValue_;
+private:
+    Slider *slider_;
+    DoubleSpinBox *spinBox_;
     double targetProduct_;
 
     double snapToReciprocal(double value) const;

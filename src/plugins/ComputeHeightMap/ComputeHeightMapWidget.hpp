@@ -27,8 +27,8 @@ class Application;
 class ComputeHeightMapModifier;
 
 // Include Qt.
-#include <Widget>
-class QSpinBox;
+#include <Widget.hpp>
+class SpinBox;
 class ComboBox;
 class CheckBox;
 class PushButton;
@@ -40,15 +40,12 @@ class PushButton;
 */
 class ComputeHeightMapWidget : public Widget
 {
-
-
 public:
     ComputeHeightMapWidget(Application *app,
                            ComputeHeightMapModifier *modifier);
 
     void closeModifier();
 
-protected slots:
     void colorCountChanged(int i);
     void colormapChanged(int index);
     void sourceChanged(int index);
@@ -59,7 +56,7 @@ protected:
     Application *app_;
     ComputeHeightMapModifier *modifier_;
 
-    QSpinBox *colorCountSpinBox_;
+    SpinBox *colorCountSpinBox_;
     ComboBox *colormapComboBox_;
     ComboBox *sourceComboBox_;
     CheckBox *previewCheckBox_;

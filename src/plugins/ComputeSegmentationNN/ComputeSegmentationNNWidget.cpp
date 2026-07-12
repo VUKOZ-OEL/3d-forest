@@ -22,19 +22,17 @@
 // Include 3D Forest.
 #include <ComputeSegmentationNNWidget.hpp>
 #include <DoubleRangeSliderWidget.hpp>
-#include <DoubleSlider.hpp>
+#include <DoubleSliderWidget.hpp>
 #include <InfoDialog.hpp>
 #include <Application.hpp>
-#include <ProgressDialog.hpp>
+#include <ProgressActionDialog.hpp>
 #include <ThemeIcon.hpp>
-
-// Include Qt.
-#include <CheckBox>
-#include <GroupBox>
-#include <HBoxLayout>
-#include <PushButton>
-#include <QRadioButton>
-#include <VBoxLayout>
+#include <CheckBox.hpp>
+#include <GroupBox.hpp>
+#include <HBoxLayout.hpp>
+#include <PushButton.hpp>
+#include <RadioButton.hpp>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeSegmentationNNWidget"
@@ -52,9 +50,8 @@ ComputeSegmentationNNWidget::ComputeSegmentationNNWidget(Application *app)
     LOG_DEBUG(<< "Create.");
 
     // Voxel radius.
-    DoubleSlider::create(
+    DoubleSliderWidget::create(
         voxelRadiusSlider_,
-        this,
         nullptr,
         nullptr,
         tr("Voxel radius"),
@@ -67,8 +64,8 @@ ComputeSegmentationNNWidget::ComputeSegmentationNNWidget(Application *app)
         parameters_.voxelRadius);
 
     // Descriptor.
-    leafToWoodChannelRadioButton_.push_back(new QRadioButton(tr("descriptor")));
-    leafToWoodChannelRadioButton_.push_back(new QRadioButton(tr("intensity")));
+    leafToWoodChannelRadioButton_.push_back(new RadioButton(tr("descriptor")));
+    leafToWoodChannelRadioButton_.push_back(new RadioButton(tr("intensity")));
 
     if (parameters_.leafToWoodChannel ==
         ComputeSegmentationNNParameters::CHANNEL_DESCRIPTOR)
@@ -96,8 +93,7 @@ ComputeSegmentationNNWidget::ComputeSegmentationNNWidget(Application *app)
         new GroupBox(tr("Leaf-to-wood gradient channel"));
     trunkDescriptorChannelGroupBox->setLayout(trunkDescriptorChannelVBoxLayout);
 
-    DoubleSlider::create(woodThresholdMinMinSlider_,
-                               this,
+    DoubleSliderWidget::create(woodThresholdMinMinSlider_,
                                nullptr,
                                nullptr,
                                tr("Minimal leaf-to-wood gradient threshold"
@@ -111,8 +107,7 @@ ComputeSegmentationNNWidget::ComputeSegmentationNNWidget(Application *app)
                                parameters_.woodThresholdMin);
 
     // Search radius.
-    DoubleSlider::create(searchRadiusForTrunkPointsSlider_,
-                               this,
+    DoubleSliderWidget::create(searchRadiusForTrunkPointsSlider_,
                                nullptr,
                                nullptr,
                                tr("Maximal distance to connect trunk points"),
@@ -124,8 +119,7 @@ ComputeSegmentationNNWidget::ComputeSegmentationNNWidget(Application *app)
                                1.0,
                                parameters_.searchRadiusTrunkPoints);
 
-    DoubleSlider::create(searchRadiusForLeafPointsSlider_,
-                               this,
+    DoubleSliderWidget::create(searchRadiusForLeafPointsSlider_,
                                nullptr,
                                nullptr,
                                tr("Maximal distance to connect leaf points"),
@@ -140,7 +134,6 @@ ComputeSegmentationNNWidget::ComputeSegmentationNNWidget(Application *app)
     // Tree.
     DoubleRangeSliderWidget::create(
         treeBaseElevationSlider_,
-        this,
         nullptr,
         nullptr,
         nullptr,
@@ -154,8 +147,7 @@ ComputeSegmentationNNWidget::ComputeSegmentationNNWidget(Application *app)
         parameters_.treeBaseElevationMin,
         parameters_.treeBaseElevationMax);
 
-    DoubleSlider::create(treeHeightSlider_,
-                               this,
+    DoubleSliderWidget::create(treeHeightSlider_,
                                nullptr,
                                nullptr,
                                tr("Minimal height of tree"),
@@ -195,12 +187,17 @@ ComputeSegmentationNNWidget::ComputeSegmentationNNWidget(Application *app)
     // Buttons.
     helpButton_ = new PushButton(tr("Help"));
     helpButton_->setIcon(THEME_ICON("question"));
-    connect(helpButton_, SIGNAL(clicked()), this, SLOT(slotHelp()));
+    helpButton_->clicked.connect([this]()
+    {
+        slotHelp();
+    });
 
     applyButton_ = new PushButton(tr("Run"));
     applyButton_->setIcon(THEME_ICON("run"));
-    applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
+    applyButton_->clicked.connect([this]()
+    {
+        slotApply();
+    });
 
     // Buttons layout.
     HBoxLayout *buttonsLayout = new HBoxLayout;
@@ -260,7 +257,7 @@ void ComputeSegmentationNNWidget::slotApply()
     {
         segmentation_.start(parameters_);
 
-        ProgressDialog::run(app_,
+        ProgressActionDialog::run(app_,
                             "Compute Segmentation NN",
                             &segmentation_);
     }
@@ -278,7 +275,7 @@ void ComputeSegmentationNNWidget::slotApply()
 
 void ComputeSegmentationNNWidget::slotHelp()
 {
-    QString t;
+    std::string t;
     t = "<h3>Automatic Segmentation NN Tool</h3>"
         "This tool identifies trees in point cloud. "
         "The basic idea of used segmentation algorithm is the same as in "

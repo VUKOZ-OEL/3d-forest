@@ -23,22 +23,16 @@
 #include <ComputeHeightMapModifier.hpp>
 #include <ComputeHeightMapWidget.hpp>
 #include <Application.hpp>
-
-// Include Qt.
-#include <CheckBox>
-#include <QCloseEvent>
-#include <ComboBox>
-#include <QCoreApplication>
-#include <QDebug>
-#include <GridLayout>
-#include <GroupBox>
-#include <HBoxLayout>
-#include <Label>
-#include <QMainWindow>
-#include <QProgressDialog>
-#include <PushButton>
-#include <QSpinBox>
-#include <VBoxLayout>
+#include <CheckBox.hpp>
+#include <ComboBox.hpp>
+#include <GridLayout.hpp>
+#include <GroupBox.hpp>
+#include <HBoxLayout.hpp>
+#include <Label.hpp>
+#include <ProgressDialog.hpp>
+#include <PushButton.hpp>
+#include <SpinBox.hpp>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeHeightMapWidget"
@@ -66,15 +60,14 @@ ComputeHeightMapWidget::ComputeHeightMapWidget(
       modifier_(modifier)
 {
     // Widgets colormap.
-    colorCountSpinBox_ = new QSpinBox;
+    colorCountSpinBox_ = new SpinBox;
     colorCountSpinBox_->setRange(1, PLUGIN_COMPUTE_HEIGHT_MAP_COLORS_MAX);
     colorCountSpinBox_->setValue(PLUGIN_COMPUTE_HEIGHT_MAP_COLORS_DEFAULT);
     colorCountSpinBox_->setSingleStep(1);
-
-    connect(colorCountSpinBox_,
-            SIGNAL(valueChanged(int)),
-            this,
-            SLOT(colorCountChanged(int)));
+    colorCountSpinBox_->valueChanged.connect([this](int value)
+    {
+        colorCountChanged(value);
+    });
 
     colormapComboBox_ = new ComboBox;
     colormapComboBox_->addItem(PLUGIN_COMPUTE_HEIGHT_MAP_COLORMAP_MATLAB_JET);
@@ -83,35 +76,35 @@ ComputeHeightMapWidget::ComputeHeightMapWidget(
     colormapComboBox_->addItem(PLUGIN_COMPUTE_HEIGHT_MAP_COLORMAP_WIN_XP);
     colormapComboBox_->setCurrentText(
         PLUGIN_COMPUTE_HEIGHT_MAP_COLORMAP_DEFAULT);
-
-    connect(colormapComboBox_,
-            SIGNAL(activated(int)),
-            this,
-            SLOT(colorCountChanged(int)));
+    colormapComboBox_->activated.connect([this](int value)
+    {
+        colorCountChanged(value);
+    });
 
     sourceComboBox_ = new ComboBox;
     sourceComboBox_->addItem(PLUGIN_COMPUTE_HEIGHT_MAP_SOURCE_Z_POSITION);
     sourceComboBox_->addItem(PLUGIN_COMPUTE_HEIGHT_MAP_SOURCE_ELEVATION);
     sourceComboBox_->setCurrentText(PLUGIN_COMPUTE_HEIGHT_MAP_SOURCE_DEFAULT);
-
-    connect(sourceComboBox_,
-            SIGNAL(activated(int)),
-            this,
-            SLOT(sourceChanged(int)));
+    sourceComboBox_->activated.connect([this](int value)
+    {
+        sourceChanged(value);
+    });
 
     // Widgets apply.
     previewCheckBox_ = new CheckBox;
-    connect(previewCheckBox_,
-            SIGNAL(stateChanged(int)),
-            this,
-            SLOT(previewChanged(int)));
+    previewCheckBox_->stateChanged.connect([this](int value)
+    {
+        previewChanged(value);
+    });
+
     // previewCheckBox_->setChecked(true);
 
     applyButton_ = new PushButton(tr("Apply and save"));
-    applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     applyButton_->setDisabled(true);
-    connect(applyButton_, SIGNAL(clicked()), this, SLOT(apply()));
+    applyButton_->clicked.connect([this]()
+    {
+        apply();
+    });
 
     // Layout.
     GridLayout *groupBoxLayout = new GridLayout;
@@ -127,7 +120,7 @@ ComputeHeightMapWidget::ComputeHeightMapWidget(
     hbox->addWidget(previewCheckBox_);
     hbox->addWidget(new Label(tr("Preview")));
     hbox->addStretch();
-    hbox->addWidget(applyButton_, 0, Qt::AlignRight);
+    hbox->addWidget(applyButton_, 0, Ui::AlignRight);
 
     VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->addLayout(groupBoxLayout);

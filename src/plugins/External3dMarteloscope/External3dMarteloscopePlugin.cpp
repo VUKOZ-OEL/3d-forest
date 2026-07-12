@@ -26,19 +26,12 @@
 #include <ProjectFileAction.hpp>
 #include <ThemeIcon.hpp>
 
-// Include Qt.
-
 // Include local.
 #define LOG_MODULE_NAME "External3dMarteloscopePlugin"
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define ICON(name) (ThemeIcon(":/External3dMarteloscopeResources/", name))
-
-static std::string toStdString(const QString &str)
-{
-    return str.toUtf8().constData();
-}
 
 External3dMarteloscopePlugin::External3dMarteloscopePlugin()
     : app_(nullptr),

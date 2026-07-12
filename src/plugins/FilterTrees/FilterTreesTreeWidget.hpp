@@ -27,7 +27,7 @@
 class Application;
 
 // Include Qt.
-#include <Widget>
+#include <Widget.hpp>
 class QTableWidget;
 
 /** Tree Widget. */

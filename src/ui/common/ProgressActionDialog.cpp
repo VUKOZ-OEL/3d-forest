@@ -17,79 +17,78 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ProgressDialog.cpp */
+/** @file ProgressActionDialog.cpp */
 
 // Include std.
 #include <cinttypes>
 
 // Include 3D Forest.
-#include <MainWindow.hpp>
+#include <ProgressActionDialog.hpp>
 #include <ProgressActionInterface.hpp>
-#include <ProgressDialog.hpp>
+#include <Application.hpp>
+#include <GridLayout.hpp>
+#include <HBoxLayout.hpp>
+#include <Label.hpp>
+#include <ProgressBar.hpp>
+#include <PushButton.hpp>
+#include <VBoxLayout.hpp>
 #include <Time.hpp>
 
-// Include Qt.
-#include <QCloseEvent>
-#include <QCoreApplication>
-#include <QGridLayout>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QProgressBar>
-#include <QPushButton>
-#include <QVBoxLayout>
-
 // Include local.
-#define LOG_MODULE_NAME "ProgressDialog"
-// #define LOG_MODULE_DEBUG_ENABLED 1
+#define LOG_MODULE_NAME "ProgressActionDialog"
 #include <Log.hpp>
 
 #define PROGRESS_DIALOG_ETA_MIN 5.0
 
-bool ProgressDialog::run(MainWindow *mainWindow,
-                         const char *title,
+bool ProgressActionDialog::run(Application *app,
+                         const std::string &title,
                          ProgressActionInterface *progressAction)
 {
-    LOG_DEBUG(<< "Run progress dialog <" << std::string(title) << ">.");
-    ProgressDialog *progressDialog = new ProgressDialog(mainWindow, title);
+    LOG_DEBUG(<< "Run progress dialog <" << title << ">.");
+    ProgressActionDialog *progressDialog = new ProgressActionDialog(app);
+    progressDialog->setWindowTitle(title);
     return progressDialog->run(progressAction);
 }
 
-ProgressDialog::ProgressDialog(MainWindow *mainWindow, const char *title)
-    : QDialog(mainWindow),
+ProgressActionDialog::ProgressActionDialog(Application *app)
+    : Dialog(app),
       canceledFlag_(false)
 {
     LOG_DEBUG(<< "Create progress dialog <" << std::string(title) << ">.");
 
     // Create modal progress dialog with custom progress bar.
     // Custom progress bar allows to display percentage with fractional part.
-    setWindowTitle(QObject::tr(title));
-    setWindowModality(Qt::WindowModal);
+    setWindowTitle(windowTitle_);
+    setWindowModality(Ui::WindowModal);
 
     // Progress info labels.
-    progressStepsLabel_ = new QLabel(tr(" "));
-    progressStepLabel_ = new QLabel(tr(" "));
-    etaLabel_ = new QLabel(tr(" "));
+    progressStepsLabel_ = new Label(tr(" "));
+    progressStepLabel_ = new Label(tr(" "));
+    etaLabel_ = new Label(tr(" "));
 
-    QGridLayout *progressLabelsLayout = new QGridLayout;
+    GridLayout *progressLabelsLayout = new GridLayout;
     progressLabelsLayout->addWidget(progressStepsLabel_, 0, 0);
     progressLabelsLayout->addWidget(etaLabel_, 0, 1);
     progressLabelsLayout->addWidget(progressStepLabel_, 0, 2);
 
     // Progress bar.
-    progressBar_ = new QProgressBar;
+    progressBar_ = new ProgressBar;
     progressBar_->setRange(0, 100);
     progressBar_->setValue(progressBar_->minimum());
 
     // Buttons.
-    cancelButton_ = new QPushButton(tr("Cancel"));
-    connect(cancelButton_, SIGNAL(clicked()), this, SLOT(slotCancel()));
+    cancelButton_ = new PushButton(tr("Cancel"));
+    cancelButton_->clicked.connect([this]()
+    {
+        slotCancel();
+    });
 
-    QHBoxLayout *buttonsLayout = new QHBoxLayout;
+    HBoxLayout *buttonsLayout = new HBoxLayout;
     buttonsLayout->addStretch();
     buttonsLayout->addWidget(cancelButton_);
 
     // Main layout.
-    QVBoxLayout *dialogLayout = new QVBoxLayout;
+    VBoxLayout *dialogLayout = new VBoxLayout;
     dialogLayout->addLayout(progressLabelsLayout);
     dialogLayout->addWidget(progressBar_);
     dialogLayout->addSpacing(10);
@@ -99,20 +98,20 @@ ProgressDialog::ProgressDialog(MainWindow *mainWindow, const char *title)
     setLayout(dialogLayout);
 }
 
-void ProgressDialog::slotCancel()
+void ProgressActionDialog::slotCancel()
 {
     LOG_DEBUG(<< "Cancel progress dialog.");
     canceledFlag_ = true;
 }
 
-void ProgressDialog::closeEvent(QCloseEvent *event)
+void ProgressActionDialog::closeEvent(CloseEvent *event)
 {
     LOG_DEBUG(<< "Close progress dialog.");
     slotCancel();
-    QDialog::closeEvent(event);
+    Dialog::closeEvent(event);
 }
 
-bool ProgressDialog::run(ProgressActionInterface *progressAction)
+bool ProgressActionDialog::run(ProgressActionInterface *progressAction)
 {
     LOG_DEBUG(<< "Run progress dialog.");
 
@@ -128,7 +127,7 @@ bool ProgressDialog::run(ProgressActionInterface *progressAction)
         updateLabels(progressAction);
 
         // Keep processing qt events.
-        QCoreApplication::processEvents();
+        app_->processEvents();
 
         // Canceled?
         if (canceledFlag_)
@@ -147,7 +146,7 @@ bool ProgressDialog::run(ProgressActionInterface *progressAction)
     return true;
 }
 
-void ProgressDialog::initializeLabels(ProgressActionInterface *progressAction)
+void ProgressActionDialog::initializeLabels(ProgressActionInterface *progressAction)
 {
     if (progressAction->progressMaximumSteps() > 1)
     {
@@ -162,7 +161,7 @@ void ProgressDialog::initializeLabels(ProgressActionInterface *progressAction)
     etaStartPercent_ = 0.0;
 }
 
-void ProgressDialog::updateLabels(ProgressActionInterface *progressAction)
+void ProgressActionDialog::updateLabels(ProgressActionInterface *progressAction)
 {
     char buffer[64];
 

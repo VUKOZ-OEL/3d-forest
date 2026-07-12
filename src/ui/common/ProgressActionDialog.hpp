@@ -17,58 +17,57 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ProgressDialog.hpp */
+/** @file ProgressActionDialog.hpp */
 
-#ifndef PROGRESS_DIALOG_HPP
-#define PROGRESS_DIALOG_HPP
+#ifndef PROGRESS_ACTION_DIALOG_HPP
+#define PROGRESS_ACTION_DIALOG_HPP
+
+// Include std.
+#include <string>
 
 // Include 3D Forest.
-class MainWindow;
+#include <Dialog.hpp>
+class Application;
 class ProgressActionInterface;
-
-// Include Qt.
-#include <QDialog>
-class QCloseEvent;
-class QLabel;
-class QProgressBar;
-class QPushButton;
+class Label;
+class ProgressBar;
+class PushButton;
 
 // Include local.
-#include <ExportGui.hpp>
+#include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
 
-/** Progress Dialog. */
-class EXPORT_GUI ProgressDialog : public QDialog
+/** Progress Action Dialog. */
+class EXPORT_UI_COMMON ProgressActionDialog : public Dialog
 {
-    Q_OBJECT
-
 public:
-    ProgressDialog(MainWindow *mainWindow, const char *title);
+    ProgressActionDialog(Application *app);
+    virtual ~ProgressActionDialog();
 
     bool run(ProgressActionInterface *progressAction);
 
-    static bool run(MainWindow *mainWindow,
-                    const char *title,
+    static bool run(Application *app,
+                    const std::string &title,
                     ProgressActionInterface *progressAction);
 
-public slots:
     void slotCancel();
+
+    void closeEvent(CloseEvent *event) override;
 
 private:
     bool canceledFlag_;
     double etaStartTime_;
     double etaStartPercent_;
-    QLabel *progressStepsLabel_;
-    QLabel *progressStepLabel_;
-    QLabel *etaLabel_;
-    QProgressBar *progressBar_;
-    QPushButton *cancelButton_;
+    Label *progressStepsLabel_;
+    Label *progressStepLabel_;
+    Label *etaLabel_;
+    ProgressBar *progressBar_;
+    PushButton *cancelButton_;
 
-    void closeEvent(QCloseEvent *event) override;
     void initializeLabels(ProgressActionInterface *progressAction);
     void updateLabels(ProgressActionInterface *progressAction);
 };
 
 #include <WarningsEnable.hpp>
 
-#endif /* PROGRESS_DIALOG_HPP */
+#endif /* PROGRESS_ACTION_DIALOG_HPP */

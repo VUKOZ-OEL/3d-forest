@@ -22,10 +22,8 @@
 #ifndef MESSAGE_BOX_HPP
 #define MESSAGE_BOX_HPP
 
-// Include std.
-#include <string>
-
 // Include 3D Forest.
+#include <Dialog.hpp>
 
 // Include local.
 #include <ExportUiCommon.hpp>
@@ -66,6 +64,30 @@ public:
     void setDefaultButton(int button);
 
     int exec();
+
+    static int information(Application *app,
+                    const std::string &title,
+                    const std::string &text,
+                    int buttons = Ok,
+                    int defaultButton = NoButton);
+
+    static int question(Application *app,
+                    const std::string &title,
+                    const std::string &text,
+                    int buttons = Yes | No,
+                    int defaultButton = NoButton);
+
+    static int warning(Application *app,
+                    const std::string &title,
+                    const std::string &text,
+                    int buttons = Ok,
+                    int defaultButton = NoButton);
+
+    static int critical(Application *app,
+                    const std::string &title,
+                    const std::string &text,
+                    int buttons = Ok,
+                    int defaultButton = NoButton);
 
 private:
     int defaultButton_{0};

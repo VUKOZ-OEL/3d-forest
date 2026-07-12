@@ -30,9 +30,9 @@
 #include <ViewerViewports.hpp>
 
 // Include Qt.
-#include <HBoxLayout>
+#include <HBoxLayout.hpp>
 #include <QSplitter>
-#include <VBoxLayout>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ViewerViewports"
@@ -75,10 +75,10 @@ void ViewerViewports::resizeEvent(QResizeEvent *event)
     Widget::resizeEvent(event);
 }
 
-void ViewerViewports::showEvent(QShowEvent *event)
+void ViewerViewports::showEvent(ShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
-    Widget::showEvent(event);
+    Widget::ShowEvent(event);
 }
 
 void ViewerViewports::hideEvent(HideEvent *event)
@@ -426,13 +426,13 @@ void ViewerViewports::setLayout(ViewLayout viewLayout)
         QSplitter *splitterLeft = new QSplitter;
         splitterLeft->addWidget(viewports_[VIEWER_VIEWPORTS_TOP]);
         splitterLeft->addWidget(viewports_[VIEWER_VIEWPORTS_FRONT]);
-        splitterLeft->setOrientation(Qt::Vertical);
+        splitterLeft->setOrientation(Ui::Vertical);
         splitterLeft->setSizes(QList<int>({h, h}));
 
         QSplitter *splitterRight = new QSplitter;
         splitterRight->addWidget(viewports_[VIEWER_VIEWPORTS_3D]);
         splitterRight->addWidget(viewports_[VIEWER_VIEWPORTS_RIGHT]);
-        splitterRight->setOrientation(Qt::Vertical);
+        splitterRight->setOrientation(Ui::Vertical);
         splitterRight->setSizes(QList<int>({h, h}));
 
         QSplitter *splitter = new QSplitter;
@@ -458,7 +458,7 @@ void ViewerViewports::setLayout(ViewLayout viewLayout)
         splitterRight->addWidget(viewports_[1]);
         splitterRight->addWidget(viewports_[2]);
         splitterRight->addWidget(viewports_[3]);
-        splitterRight->setOrientation(Qt::Vertical);
+        splitterRight->setOrientation(Ui::Vertical);
         splitterRight->setSizes(QList<int>({h, h, h}));
 
         QSplitter *splitter = new QSplitter;

@@ -30,7 +30,7 @@ class DoubleRangeSliderWidget;
 class Application;
 
 // Include Qt.
-#include <Widget>
+#include <Widget.hpp>
 
 /** Filter Intensity Widget. */
 class FilterIntensityWidget : public Widget

@@ -28,15 +28,15 @@
 #include <ThemeIcon.hpp>
 
 // Include Qt.
-#include <HBoxLayout>
-#include <Label>
+#include <HBoxLayout.hpp>
+#include <Label.hpp>
 #include <QSplitter>
 #include <QToolBar>
 #include <QToolButton>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QTreeWidgetItemIterator>
-#include <VBoxLayout>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterManagementStatusWidget"
@@ -109,7 +109,7 @@ FilterManagementStatusWidget::FilterManagementStatusWidget(
     splitter_ = new QSplitter;
     splitter_->addWidget(tree_);
     splitter_->addWidget(treeWidget_);
-    splitter_->setOrientation(Qt::Vertical);
+    splitter_->setOrientation(Ui::Vertical);
     splitter_->setSizes(QList<int>({1, 1}));
 
     // Layout.
@@ -230,7 +230,7 @@ void FilterManagementStatusWidget::slotShow()
         updatesEnabled_ = false;
         for (auto &item : items)
         {
-            item->setCheckState(COLUMN_CHECKED, Qt::Checked);
+            item->setCheckState(COLUMN_CHECKED, Ui::Checked);
         }
         updatesEnabled_ = true;
 
@@ -247,7 +247,7 @@ void FilterManagementStatusWidget::slotHide()
         updatesEnabled_ = false;
         for (auto &item : items)
         {
-            item->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
+            item->setCheckState(COLUMN_CHECKED, Ui::Unchecked);
         }
         updatesEnabled_ = true;
 
@@ -316,7 +316,7 @@ void FilterManagementStatusWidget::slotItemChanged(QTreeWidgetItem *item,
     if (column == COLUMN_CHECKED)
     {
         size_t id = identifier(item);
-        bool checked = (item->checkState(COLUMN_CHECKED) == Qt::Checked);
+        bool checked = (item->checkState(COLUMN_CHECKED) == Ui::Checked);
 
         filter_.setEnabled(id, checked);
 
@@ -343,11 +343,11 @@ void FilterManagementStatusWidget::updateTree()
     {
         if (filter_.enabled(i))
         {
-            (*it)->setCheckState(COLUMN_CHECKED, Qt::Checked);
+            (*it)->setCheckState(COLUMN_CHECKED, Ui::Checked);
         }
         else
         {
-            (*it)->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
+            (*it)->setCheckState(COLUMN_CHECKED, Ui::Unchecked);
         }
 
         ++i;
@@ -384,22 +384,22 @@ void FilterManagementStatusWidget::addTreeItem(size_t index)
     // Checked.
     if (filter_.enabled(index))
     {
-        item->setCheckState(COLUMN_CHECKED, Qt::Checked);
+        item->setCheckState(COLUMN_CHECKED, Ui::Checked);
     }
     else
     {
-        item->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
+        item->setCheckState(COLUMN_CHECKED, Ui::Unchecked);
     }
 
     // Data.
     const ManagementStatus &managementStatus = managementStatus_[index];
 
     // Id.
-    item->setText(COLUMN_ID, QString::number(managementStatus.id));
+    item->setText(COLUMN_ID, std::string::number(managementStatus.id));
 
     // Label.
     auto label = core().translate(managementStatus.label);
-    item->setText(COLUMN_LABEL, QString::fromStdString(label));
+    item->setText(COLUMN_LABEL, std::string::fromStdString(label));
 
     // Color legend.
     Color color;
@@ -407,6 +407,6 @@ void FilterManagementStatusWidget::addTreeItem(size_t index)
     color.setGreenF(static_cast<float>(managementStatus.color[1]));
     color.setBlueF(static_cast<float>(managementStatus.color[2]));
 
-    QBrush brush(color, Qt::SolidPattern);
+    QBrush brush(color, Ui::SolidPattern);
     item->setBackground(COLUMN_ID, brush);
 }

@@ -23,11 +23,9 @@
 #include <DoubleRangeSliderWidget.hpp>
 #include <FilterAreaBoxWidget.hpp>
 #include <Application.hpp>
-
-// Include Qt.
-#include <HBoxLayout>
-#include <PushButton>
-#include <VBoxLayout>
+#include <HBoxLayout.hpp>
+#include <PushButton.hpp>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterAreaBoxWidget"
@@ -233,7 +231,7 @@ void FilterAreaBoxWidget::slotFinalValue()
     filterChanged(true);
 }
 
-void FilterAreaBoxWidget::showEvent(QShowEvent *event)
+void FilterAreaBoxWidget::showEvent(ShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
     Widget::showEvent(event);

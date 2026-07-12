@@ -32,7 +32,7 @@ class Application;
 class ColorSwitchWidget;
 
 // Include Qt.
-#include <Widget>
+#include <Widget.hpp>
 class CheckBox;
 class QSlider;
 

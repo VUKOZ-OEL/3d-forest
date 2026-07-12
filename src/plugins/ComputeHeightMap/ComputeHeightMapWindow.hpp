@@ -23,24 +23,18 @@
 #define COMPUTE_HEIGHT_MAP_WINDOW_HPP
 
 // Include 3D Forest.
+#include <Dialog.hpp>
 class Application;
 class ComputeHeightMapWidget;
-
-// Include Qt.
-#include <Dialog>
-class QCloseEvent;
 
 /** Compute Height Map Window. */
 class ComputeHeightMapWindow : public Dialog
 {
-
-
 public:
     ComputeHeightMapWindow(Application *app,
                            ComputeHeightMapModifier *modifier);
 
-protected:
-    void closeEvent(QCloseEvent *event) override;
+    void closeEvent(CloseEvent *event) override;
 
 private:
     ComputeHeightMapWidget *widget_;

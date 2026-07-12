@@ -24,6 +24,7 @@
 
 // Include 3D Forest.
 #include <Widget.hpp>
+#include <Pixmap.hpp>
 class Application;
 
 // Include local.
@@ -36,6 +37,8 @@ class EXPORT_UI_COMMON Label : public Widget
 public:
     Label(const std::string &str = "");
     virtual ~Label();
+
+    void setPixmap(const Pixmap &pixmap);
 
 private:
 };

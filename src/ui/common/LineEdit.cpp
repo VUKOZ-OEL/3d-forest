@@ -17,61 +17,32 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file DoubleSlider.cpp */
-
-// Include std.
+/** @file LineEdit.cpp */
 
 // Include 3D Forest.
-#include <DoubleSlider.hpp>
+#include <LineEdit.hpp>
 #include <Application.hpp>
 
 // Include local.
-#define LOG_MODULE_NAME "DoubleSlider"
+#define LOG_MODULE_NAME "LineEdit"
 #include <Log.hpp>
 
-DoubleSlider::DoubleSlider()
+LineEdit::LineEdit()
 {
 }
 
-DoubleSlider::~DoubleSlider()
+LineEdit::~LineEdit()
 {
 }
 
-void DoubleSlider::setMinimum(int v)
+void LineEdit::setReadOnly(bool b)
 {
 }
 
-void DoubleSlider::setMaximum(int v)
+void LineEdit::append(const std::string &str)
 {
 }
 
-void DoubleSlider::setSingleStep(int v)
+void LineEdit::clear()
 {
-}
-
-void DoubleSlider::setTickInterval(int v)
-{
-}
-
-void DoubleSlider::setTickPosition(int v)
-{
-}
-
-void DoubleSlider::setOrientation(int v)
-{
-}
-
-void DoubleSlider::setValue(int value, bool notify)
-{
-    if (value_ == value)
-    {
-        return;
-    }
-
-    value_ = value;
-
-    if (notify && !signalsBlocked())
-    {
-        valueChanged(value_);
-    }
 }

@@ -23,17 +23,13 @@
 #define COMPUTE_SEGMENTATION_NN_WINDOW_HPP
 
 // Include 3D Forest.
+#include <Dialog.hpp>
 class Application;
 class ComputeSegmentationNNWidget;
-
-// Include Qt.
-#include <Dialog>
 
 /** Compute Segmentation NN Window. */
 class ComputeSegmentationNNWindow : public Dialog
 {
-
-
 public:
     ComputeSegmentationNNWindow(Application *app);
     ~ComputeSegmentationNNWindow();

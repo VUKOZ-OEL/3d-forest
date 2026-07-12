@@ -31,7 +31,10 @@
 #include <PaintEvent.hpp>
 #include <MouseEvent.hpp>
 #include <HideEvent.hpp>
+#include <ShowEvent.hpp>
+#include <CloseEvent.hpp>
 #include <Ui.hpp>
+#include <ThemeIcon.hpp>
 class Application;
 class Layout;
 
@@ -48,7 +51,13 @@ public:
     virtual ~Widget();
 
     void setText(const std::string &str);
+    std::string text() const { return text_; }
+
     void setToolTip(const std::string &str);
+    void setFocusPolicy(int focusPolicy);
+    void setVisible(bool b);
+    void setEnabled(bool b);
+    void setDisabled(bool b);
 
     void setLayout(Layout *layout);
 
@@ -63,6 +72,8 @@ public:
     virtual void paintEvent(PaintEvent *event);
     virtual void mousePressEvent(MouseEvent *event);
     virtual void hideEvent(HideEvent *event);
+    virtual void showEvent(ShowEvent *event);
+    virtual void closeEvent(CloseEvent *event);
 
 private:
     std::string text_;

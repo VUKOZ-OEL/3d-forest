@@ -36,6 +36,17 @@ class Application;
 class EXPORT_UI_COMMON FileDialog
 {
 public:
+    enum Option
+    {
+        ShowDirsOnly                = 0x00000001,
+        DontResolveSymlinks         = 0x00000002,
+        DontConfirmOverwrite        = 0x00000004,
+        DontUseNativeDialog         = 0x00000008,
+        ReadOnly                    = 0x00000010,
+        HideNameFilterDetails       = 0x00000020,
+        DontUseCustomDirectoryIcons = 0x00000040
+    };
+
     static std::vector<std::string> selectFiles(Application *app,
                                                 const std::string &dialogTitle,
                                                 const std::string &filter);
@@ -47,6 +58,13 @@ public:
     static std::string getSaveFileName(Application *app,
                                        const std::string &dialogTitle,
                                        const std::string &filter);
+
+    static std::string getSaveFileName(Application *app,
+                                       const std::string &caption,
+                                       const std::string &dir,
+                                       const std::string &filter,
+                                       std::string *selectedFilter = nullptr,
+                                       int options = 0);
 
 private:
 };

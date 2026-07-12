@@ -23,27 +23,22 @@
 #define FILTER_AREA_BOX_WIDGET_HPP
 
 // Include 3D Forest.
+#include <Widget.hpp>
 #include <Editor.hpp>
 #include <Range.hpp>
 #include <Region.hpp>
 class DoubleRangeSliderWidget;
 class Application;
 
-// Include Qt.
-#include <Widget>
-
 /** Filter Area Box Widget. */
 class FilterAreaBoxWidget : public Widget
 {
-
-
 public:
     FilterAreaBoxWidget(Application *app);
 
     void setFilterEnabled(bool b);
 
     Size sizeHint() const override { return Size(300, 300); }
-
 
     void slotUpdate(void *sender, const std::set<Editor::Type> &target);
 
@@ -60,7 +55,7 @@ protected:
     void setRegion(const Region &region);
     void filterChanged(bool final);
 
-    void showEvent(QShowEvent *event) override;
+    void showEvent(ShowEvent *event) override;
     void hideEvent(HideEvent *event) override;
 };
 

@@ -25,7 +25,7 @@
 
 // Include Qt.
 #include <QTableWidget>
-#include <VBoxLayout>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterTreesTreeWidget"
@@ -85,10 +85,10 @@ void FilterTreesTreeWidget::setRow(int row,
                                    const std::string &key,
                                    const std::string &value)
 {
-    table_->setItem(row, 0, new QTableWidgetItem(QString::fromStdString(key)));
+    table_->setItem(row, 0, new QTableWidgetItem(std::string::fromStdString(key)));
     table_->setItem(row,
                     1,
-                    new QTableWidgetItem(QString::fromStdString(value)));
+                    new QTableWidgetItem(std::string::fromStdString(value)));
 }
 
 void FilterTreesTreeWidget::setRow(int row,
@@ -96,17 +96,17 @@ void FilterTreesTreeWidget::setRow(int row,
                                    double value,
                                    const std::string &comment)
 {
-    QString valueText;
+    std::string valueText;
     if (comment.empty())
     {
-        valueText = QString::fromStdString(std::to_string(value));
+        valueText = std::string::fromStdString(std::to_string(value));
     }
     else
     {
         valueText =
-            QString::fromStdString(std::to_string(value) + " " + comment);
+            std::string::fromStdString(std::to_string(value) + " " + comment);
     }
 
-    table_->setItem(row, 0, new QTableWidgetItem(QString::fromStdString(key)));
+    table_->setItem(row, 0, new QTableWidgetItem(std::string::fromStdString(key)));
     table_->setItem(row, 1, new QTableWidgetItem(valueText));
 }

@@ -45,18 +45,31 @@ public:
     Slider();
     virtual ~Slider();
 
-    void setMinimum(int v);
-    void setMaximum(int v);
-    void setSingleStep(int v);
+    int singleStep() const { return singleStep_; }
+    void setSingleStep(int val);
+
     void setTickInterval(int v);
     void setTickPosition(int v);
     void setOrientation(int v);
 
+    int minimum() const { return minimum_; }
+    void setMinimum(int min);
+
+    int maximum() const { return maximum_; }
+    void setMaximum(int max);
+
+    void setRange(int min, int max);
+
+    int value() const { return value_; }
     void setValue(int value, bool notify = false);
 
     Signal<int> valueChanged;
+    Signal<> sliderReleased;
 
 private:
+    int singleStep_{0};
+    int minimum_{0};
+    int maximum_{0};
     int value_{0};
 };
 

@@ -22,12 +22,15 @@
 #ifndef PAINT_EVENT_HPP
 #define PAINT_EVENT_HPP
 
+// Include 3D Forest.
+#include <Event.hpp>
+
 // Include local.
 #include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
 
 /** PaintEvent. */
-class EXPORT_UI_COMMON PaintEvent
+class EXPORT_UI_COMMON PaintEvent : public Event
 {
 public:
 

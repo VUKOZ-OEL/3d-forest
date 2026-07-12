@@ -37,8 +37,11 @@ public:
     virtual ~ComboBox();
 
     void addItem(const std::string &str);
-    void setCurrentText(const std::string &str, bool notify = false);
     std::string itemText(int index) const;
+
+    void setCurrentText(const std::string &str, bool notify = false);
+    std::string currentText() const;
+    int currentIndex() const;
 
     void setValue(int value, bool notify = false);
 

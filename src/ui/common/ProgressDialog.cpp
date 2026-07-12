@@ -70,7 +70,15 @@ void ProgressDialog::setLabelText(const std::string &str)
 {
 }
 
+void ProgressDialog::setWindowModality(int modality)
+{
+}
+
 void ProgressDialog::show()
+{
+}
+
+void ProgressDialog::close()
 {
 }
 

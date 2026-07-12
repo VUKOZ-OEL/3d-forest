@@ -47,23 +47,23 @@ FilterManagementStatusWindow::FilterManagementStatusWindow(
     setWidget(widget_);
     setWindowTitle(tr("Filter Management Status"));
     setWindowIcon(ICON("management-status-filter"));
-    setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    app->addDockWidget(Qt::RightDockWidgetArea, this);
+    setAllowedAreas(Ui::LeftDockWidgetArea | Ui::RightDockWidgetArea);
+    app->addDockWidget(Ui::RightDockWidgetArea, this);
 
     LOG_DEBUG(<< "Finished creating management status window.");
 }
 
-void FilterManagementStatusWindow::showEvent(QShowEvent *event)
+void FilterManagementStatusWindow::showEvent(ShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
     // widget_->setFilterEnabled(true);
-    Widget::showEvent(event);
+    DockWidget::showEvent(event);
 }
 
 void FilterManagementStatusWindow::hideEvent(HideEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Hide event.");
-    Widget::hideEvent(event);
+    DockWidget::hideEvent(event);
 }
 
 void FilterManagementStatusWindow::closeEvent(QCloseEvent *event)

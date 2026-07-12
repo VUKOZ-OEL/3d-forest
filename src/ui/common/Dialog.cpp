@@ -36,6 +36,7 @@ Dialog::Dialog()
 
 Dialog::Dialog(Application *app)
 {
+    app_ = app;
 }
 
 Dialog::~Dialog()
@@ -44,6 +45,7 @@ Dialog::~Dialog()
 
 void Dialog::setWindowTitle(const std::string &str)
 {
+    windowTitle_ = str;
 }
 
 void Dialog::setWindowIcon(const ThemeIcon &icon)
@@ -58,6 +60,10 @@ void Dialog::setFixedHeight(int h)
 {
 }
 
+void Dialog::setMaximumWidth(int w)
+{
+}
+
 void Dialog::setMaximumHeight(int h)
 {
 }
@@ -68,5 +74,22 @@ int Dialog::height() const
 }
 
 void Dialog::setModal(bool b)
+{
+}
+
+void Dialog::setWindowModality(int modality)
+{
+}
+
+int Dialog::exec()
+{
+    return Dialog::Accepted;
+}
+
+void Dialog::close()
+{
+}
+
+void Dialog::setResult(int result)
 {
 }

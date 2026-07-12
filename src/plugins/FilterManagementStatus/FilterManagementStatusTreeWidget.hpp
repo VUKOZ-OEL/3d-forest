@@ -31,7 +31,7 @@
 class Application;
 
 // Include Qt.
-#include <Widget>
+#include <Widget.hpp>
 class CheckBox;
 class VBoxLayout;
 
@@ -60,7 +60,7 @@ protected:
     {
     public:
         size_t statusId;
-        QString label;
+        std::string label;
 
         bool operator==(const Status &other) const
         {

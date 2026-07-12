@@ -27,7 +27,10 @@
 #include <vector>
 
 // Include 3D Forest.
+#include <Ui.hpp>
+#include <Size.hpp>
 #include <ThemeIcon.hpp>
+#include <CloseEvent.hpp>
 class Application;
 class Layout;
 
@@ -51,16 +54,33 @@ public:
     void setLayout(Layout *layout);
 
     void setFixedHeight(int h);
+    void setMaximumWidth(int w);
     void setMaximumHeight(int h);
     int height() const;
 
     void setModal(bool b);
+    void setWindowModality(int modality);
 
+    int exec();
     void show() {};
+    void hide() {};
     void raise() {};
     void activateWindow() {};
 
-private:
+    void close();
+    void setResult(int result);
+
+    virtual Size sizeHint() const { return Size(); }
+    virtual Size minimumSizeHint() const { return Size(); }
+
+    virtual void accept() {}
+    virtual void reject() {}
+
+    virtual void closeEvent(CloseEvent *event);
+
+protected:
+    Application *app_;
+    std::string windowTitle_;
 };
 
 #include <WarningsEnable.hpp>

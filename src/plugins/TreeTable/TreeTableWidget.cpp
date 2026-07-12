@@ -32,13 +32,13 @@
 #include <Util.hpp>
 
 // Include Qt.
-#include <CheckBox>
-#include <HBoxLayout>
+#include <CheckBox.hpp>
+#include <HBoxLayout.hpp>
 #include <QHeaderView>
 #include <QMenu>
-#include <PushButton>
+#include <PushButton.hpp>
 #include <QTableWidget>
-#include <VBoxLayout>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "TreeTableWidget"
@@ -88,11 +88,11 @@ TreeTableWidget::TreeTableWidget(Application *app)
 
     QPalette palette = tableWidget_->palette();
     palette.setColor(QPalette::AlternateBase, Color(240, 240, 240));
-    palette.setColor(QPalette::Base, Qt::white);
+    palette.setColor(QPalette::Base, Ui::white);
     tableWidget_->setPalette(palette);
 
     // Table: Context menu.
-    tableWidget_->setContextMenuPolicy(Qt::CustomContextMenu);
+    tableWidget_->setContextMenuPolicy(Ui::CustomContextMenu);
 
     // Table: Selection.
     tableWidget_->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -215,7 +215,7 @@ std::unordered_set<size_t> TreeTableWidget::selectedRowsToIds()
             continue;
         }
 
-        QString textId = itemId->text();
+        std::string textId = itemId->text();
         idList.insert(static_cast<size_t>(textId.toULong()));
     }
 
@@ -322,7 +322,7 @@ void TreeTableWidget::slotExport()
             writer->create(createExportTable());
 
             // Remember the last file name used for export.
-            fileName_ = QString::fromStdString(writer->fileName());
+            fileName_ = std::string::fromStdString(writer->fileName());
         }
     }
     catch (std::exception &e)
@@ -623,8 +623,8 @@ void TreeTableWidget::setCell(int row,
     if (userCheckable)
     {
         QTableWidgetItem *item = new QTableWidgetItem();
-        item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-        item->setCheckState(value ? Qt::Checked : Qt::Unchecked);
+        item->setFlags(item->flags() | Ui::ItemIsUserCheckable);
+        item->setCheckState(value ? Ui::Checked : Ui::Unchecked);
 
         tableWidget_->setItem(row, col, item);
     }
@@ -656,7 +656,7 @@ void TreeTableWidget::setCell(int row,
                               const Color &color,
                               bool isNumeric)
 {
-    QString text(QString::fromStdString(value));
+    std::string text(std::string::fromStdString(value));
     QTableWidgetItem *item;
 
     if (isNumeric)
@@ -670,7 +670,7 @@ void TreeTableWidget::setCell(int row,
 
     if (color.isValid())
     {
-        QBrush brush(color, Qt::SolidPattern);
+        QBrush brush(color, Ui::SolidPattern);
         item->setBackground(brush);
     }
 

@@ -27,7 +27,7 @@
 #include <ComputeClassificationParameters.hpp>
 #include <Widget.hpp>
 class Application;
-class DoubleSlider;
+class DoubleSliderWidget;
 class InfoDialog;
 class PushButton;
 class CheckBox;
@@ -50,9 +50,9 @@ private:
     ComputeClassificationParameters parameters_;
     ComputeClassificationAction classification_;
 
-    DoubleSlider *voxelSlider_;
-    DoubleSlider *radiusSlider_;
-    DoubleSlider *angleSlider_;
+    DoubleSliderWidget *voxelSlider_;
+    DoubleSliderWidget *radiusSlider_;
+    DoubleSliderWidget *angleSlider_;
     CheckBox *cleanGroundCheckBox_;
     CheckBox *cleanAllCheckBox_;
 

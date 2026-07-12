@@ -26,16 +26,16 @@
 #include <TreeTableExportDialog.hpp>
 
 // Include Qt.
-#include <CheckBox>
-#include <QFileDialog>
-#include <GridLayout>
-#include <GroupBox>
-#include <HBoxLayout>
-#include <Label>
-#include <QLineEdit>
-#include <QMessageBox>
-#include <PushButton>
-#include <VBoxLayout>
+#include <CheckBox.hpp>
+#include <FileDialog.hpp>
+#include <GridLayout.hpp>
+#include <GroupBox.hpp>
+#include <HBoxLayout.hpp>
+#include <Label.hpp>
+#include <LineEdit.hpp>
+#include <MessageBox.hpp>
+#include <PushButton.hpp>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "TreeTableExportDialog"
@@ -44,12 +44,12 @@
 #define ICON(name) (ThemeIcon(":/TreeTableResources/", name))
 
 TreeTableExportDialog::TreeTableExportDialog(Application *app,
-                                             const QString &fileName)
+                                             const std::string &fileName)
     : Dialog(app),
       app_(app)
 {
     // File name.
-    fileNameLineEdit_ = new QLineEdit;
+    fileNameLineEdit_ = new LineEdit;
     fileNameLineEdit_->setText(fileName);
 
     browseButton_ = new PushButton(tr("Browse"));
@@ -90,13 +90,13 @@ TreeTableExportDialog::TreeTableExportDialog(Application *app,
 
 void TreeTableExportDialog::slotBrowse()
 {
-    QFileDialog::Options options;
-    options = QFlag(QFileDialog::DontConfirmOverwrite);
+    FileDialog::Options options;
+    options = QFlag(FileDialog::DontConfirmOverwrite);
 
-    QString selectedFilter;
+    std::string selectedFilter;
 
-    QString fileName =
-        QFileDialog::getSaveFileName(app_,
+    std::string fileName =
+        FileDialog::getSaveFileName(app_,
                                      tr("Export File As"),
                                      fileNameLineEdit_->text(),
                                      tr("Comma Separated Values (*.csv)"),
@@ -113,11 +113,11 @@ void TreeTableExportDialog::slotBrowse()
 
 void TreeTableExportDialog::slotAccept()
 {
-    QString path = fileNameLineEdit_->text();
+    std::string path = fileNameLineEdit_->text();
 
     if (path.isEmpty())
     {
-        (void)QMessageBox::information(this,
+        (void)MessageBox::information(this,
                                        tr("Export File"),
                                        tr("Please choose a file name."));
         return;
@@ -125,14 +125,14 @@ void TreeTableExportDialog::slotAccept()
 
     if (File::exists(path.toStdString()))
     {
-        QMessageBox::StandardButton reply;
+        MessageBox::StandardButton reply;
 
-        reply = QMessageBox::question(this,
+        reply = MessageBox::question(this,
                                       tr("Export File"),
                                       tr("Overwrite existing file?"),
-                                      QMessageBox::Yes | QMessageBox::No);
+                                      MessageBox::Yes | MessageBox::No);
 
-        if (reply != QMessageBox::Yes)
+        if (reply != MessageBox::Yes)
         {
             return;
         }

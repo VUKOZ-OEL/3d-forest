@@ -26,7 +26,7 @@
 class Application;
 
 // Include Qt.
-#include <DockWidget>
+#include <DockWidget.hpp>
 
 /** Units Settings Window. */
 class UnitsSettingsWindow : public DockWidget

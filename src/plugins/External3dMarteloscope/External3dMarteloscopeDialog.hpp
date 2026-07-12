@@ -22,27 +22,19 @@
 #ifndef EXTERNAL_3D_MARTELOSCOPE_DIALOG_HPP
 #define EXTERNAL_3D_MARTELOSCOPE_DIALOG_HPP
 
-// Include Std.
-#include <string>
-
 // Include 3D Forest.
+#include <Dialog.hpp>
 class Application;
-
-// Include Qt.
-#include <Dialog>
-class QLineEdit;
+class LineEdit;
 class PushButton;
 
 /** External 3d-Marteloscope Dialog. */
 class External3dMarteloscopeDialog : public Dialog
 {
-
-
 public:
     External3dMarteloscopeDialog(Application *app);
 
     const std::string &path() const { return path_; }
-
 
     void slotBrowse();
     void slotAccept();
@@ -53,7 +45,7 @@ protected:
 
     std::string path_;
 
-    QLineEdit *fileNameLineEdit_;
+    LineEdit *fileNameLineEdit_;
     PushButton *browseButton_;
 
     PushButton *acceptButton_;

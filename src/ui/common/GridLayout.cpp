@@ -36,3 +36,7 @@ GridLayout::GridLayout()
 GridLayout::~GridLayout()
 {
 }
+
+void GridLayout::setColumnStretch(int row, int column)
+{
+}

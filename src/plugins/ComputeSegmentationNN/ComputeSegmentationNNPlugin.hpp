@@ -41,10 +41,6 @@ class ComputeSegmentationNNPlugin
     : 
       public Plugin
 {
-
-
-
-
 public:
     ComputeSegmentationNNPlugin();
 

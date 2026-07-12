@@ -22,10 +22,7 @@
 // Include 3D Forest.
 #include <EditPluginResetManagementStatus.hpp>
 #include <Application.hpp>
-
-// Include Qt.
-#include <QCoreApplication>
-#include <QProgressDialog>
+#include <ProgressDialog.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "EditPluginResetManagementStatus"

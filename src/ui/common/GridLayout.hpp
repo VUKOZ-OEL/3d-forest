@@ -37,6 +37,8 @@ public:
     GridLayout();
     virtual ~GridLayout();
 
+    void setColumnStretch(int row, int column);
+
 private:
 };
 

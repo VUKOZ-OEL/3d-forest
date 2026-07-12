@@ -75,7 +75,7 @@ protected:
     // Qt.
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
-    void showEvent(QShowEvent *event) override;
+    void showEvent(ShowEvent *event) override;
     void hideEvent(HideEvent *event) override;
 
     void initializeGL() override;

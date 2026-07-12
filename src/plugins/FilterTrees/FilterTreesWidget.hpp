@@ -29,7 +29,7 @@ class Application;
 class FilterTreesTreeWidget;
 
 // Include Qt.
-#include <Widget>
+#include <Widget.hpp>
 class QSplitter;
 class QToolButton;
 class QTreeWidget;

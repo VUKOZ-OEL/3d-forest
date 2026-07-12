@@ -21,19 +21,17 @@
 
 // Include 3D Forest.
 #include <ComputeTreeAttributesWidget.hpp>
-#include <DoubleSlider.hpp>
+#include <DoubleSliderWidget.hpp>
 #include <InfoDialog.hpp>
 #include <Application.hpp>
-#include <ProgressDialog.hpp>
+#include <ProgressActionDialog.hpp>
 #include <ThemeIcon.hpp>
-
-// Include Qt.
-#include <CheckBox>
-#include <ComboBox>
-#include <HBoxLayout>
-#include <Label>
-#include <PushButton>
-#include <VBoxLayout>
+#include <CheckBox.hpp>
+#include <ComboBox.hpp>
+#include <HBoxLayout.hpp>
+#include <Label.hpp>
+#include <PushButton.hpp>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeTreeAttributesWidget"
@@ -50,8 +48,7 @@ ComputeTreeAttributesWidget::ComputeTreeAttributesWidget(Application *app)
     LOG_DEBUG(<< "Create.");
 
     // Widgets.
-    DoubleSlider::create(treePositionHeightRangeSlider_,
-                               this,
+    DoubleSliderWidget::create(treePositionHeightRangeSlider_,
                                nullptr,
                                nullptr,
                                tr("Tree position height range"),
@@ -66,17 +63,15 @@ ComputeTreeAttributesWidget::ComputeTreeAttributesWidget(Application *app)
 
     // DBH Settings.
     dbhMethodComboBox_ = new ComboBox;
-    dbhMethodComboBox_->addItem(QString::fromStdString(
-        toString(ComputeTreeAttributesParameters::DbhMethod::RHT)));
-    dbhMethodComboBox_->addItem(QString::fromStdString(
-        toString(ComputeTreeAttributesParameters::DbhMethod::LSR)));
-    dbhMethodComboBox_->setCurrentText(
-        QString::fromStdString(toString(parameters_.dbhMethod)));
-
-    connect(dbhMethodComboBox_,
-            SIGNAL(activated(int)),
-            this,
-            SLOT(dbhMethodChanged(int)));
+    dbhMethodComboBox_->addItem(
+        toString(ComputeTreeAttributesParameters::DbhMethod::RHT));
+    dbhMethodComboBox_->addItem(
+        toString(ComputeTreeAttributesParameters::DbhMethod::LSR));
+    dbhMethodComboBox_->setCurrentText(toString(parameters_.dbhMethod));
+    dbhMethodComboBox_->activated.connect([this](int value)
+    {
+        dbhMethodChanged(value);
+    });
 
     Label *dbhMethodLabel = new Label(tr("DBH method"));
 
@@ -85,8 +80,7 @@ ComputeTreeAttributesWidget::ComputeTreeAttributesWidget(Application *app)
     dbhMethodLayout->addWidget(dbhMethodComboBox_);
 
     // RHT DBH settings.
-    DoubleSlider::create(dbhRhtGridCmSlider_,
-                               this,
+    DoubleSliderWidget::create(dbhRhtGridCmSlider_,
                                nullptr,
                                nullptr,
                                tr("RHT grid resolution"),
@@ -100,8 +94,7 @@ ComputeTreeAttributesWidget::ComputeTreeAttributesWidget(Application *app)
     dbhMethodChanged(0);
 
     // General DBH settings.
-    DoubleSlider::create(dbhElevationSlider_,
-                               this,
+    DoubleSliderWidget::create(dbhElevationSlider_,
                                nullptr,
                                nullptr,
                                tr("Calculate DBH at given elevation"),
@@ -112,8 +105,7 @@ ComputeTreeAttributesWidget::ComputeTreeAttributesWidget(Application *app)
                                2.0,
                                parameters_.dbhElevation);
 
-    DoubleSlider::create(dbhElevationRangeSlider_,
-                               this,
+    DoubleSliderWidget::create(dbhElevationRangeSlider_,
                                nullptr,
                                nullptr,
                                tr("DBH elevation range"),
@@ -126,8 +118,7 @@ ComputeTreeAttributesWidget::ComputeTreeAttributesWidget(Application *app)
                                0.5,
                                parameters_.dbhElevationRange);
 
-    DoubleSlider::create(maximumValidCalculatedDbhSlider_,
-                               this,
+    DoubleSliderWidget::create(maximumValidCalculatedDbhSlider_,
                                nullptr,
                                nullptr,
                                tr("Maximum valid calculated DBH"),
@@ -151,8 +142,10 @@ ComputeTreeAttributesWidget::ComputeTreeAttributesWidget(Application *app)
     // Buttons.
     applyButton_ = new PushButton(tr("Run"));
     applyButton_->setIcon(THEME_ICON("run"));
-    applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
+    applyButton_->clicked.connect([this]()
+    {
+        slotApply();
+    });
 
     // Buttons layout.
     HBoxLayout *buttonsLayout = new HBoxLayout;
@@ -182,7 +175,7 @@ void ComputeTreeAttributesWidget::dbhMethodChanged(int i)
     (void)i;
 
     fromString(parameters_.dbhMethod,
-               dbhMethodComboBox_->currentText().toStdString());
+               dbhMethodComboBox_->currentText());
 
     if (parameters_.dbhMethod ==
         ComputeTreeAttributesParameters::DbhMethod::RHT)
@@ -206,7 +199,7 @@ void ComputeTreeAttributesWidget::slotApply()
     parameters_.treePositionHeightRange =
         treePositionHeightRangeSlider_->value();
     fromString(parameters_.dbhMethod,
-               dbhMethodComboBox_->currentText().toStdString());
+               dbhMethodComboBox_->currentText());
     parameters_.dbhRhtGridCm = dbhRhtGridCmSlider_->value();
     parameters_.dbhElevation = dbhElevationSlider_->value();
     parameters_.dbhElevationRange = dbhElevationRangeSlider_->value();
@@ -217,7 +210,7 @@ void ComputeTreeAttributesWidget::slotApply()
     {
         treeAttributesAction_.start(parameters_);
 
-        ProgressDialog::run(app_,
+        ProgressActionDialog::run(app_,
                             "Computing Compute Tree Attributes",
                             &treeAttributesAction_);
     }

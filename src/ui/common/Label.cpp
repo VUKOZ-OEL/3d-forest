@@ -37,3 +37,7 @@ Label::Label(const std::string &str)
 Label::~Label()
 {
 }
+
+void Label::setPixmap(const Pixmap &pixmap)
+{
+}

@@ -24,11 +24,9 @@
 #include <ExportFileDialog.hpp>
 #include <ExportFilePlugin.hpp>
 #include <Application.hpp>
-#include <ProgressDialog.hpp>
+#include <ProgressActionDialog.hpp>
 #include <ThemeIcon.hpp>
-
-// Include Qt.
-#include <QMessageBox>
+#include <MessageBox.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ExportFilePlugin"
@@ -72,9 +70,9 @@ void ExportFilePlugin::slotExportFile()
             ExportFileAction exportFile(&app_->editor());
             exportFile.initialize(writer, properties);
 
-            ProgressDialog::run(app_, "Exporting file", &exportFile);
+            ProgressActionDialog::run(app_, "Exporting file", &exportFile);
 
-            fileName_ = QString::fromStdString(properties.fileName());
+            fileName_ = properties.fileName();
         }
     }
     catch (std::exception &e)

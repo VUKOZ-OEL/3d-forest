@@ -26,6 +26,7 @@
 #include <string>
 
 // Include 3D Forest.
+#include <Dialog.hpp>
 class Application;
 
 // Include local.
@@ -46,7 +47,10 @@ public:
     void setValue(int value);
     void setLabelText(const std::string &str);
 
+    void setWindowModality(int modality);
+
     void show();
+    void close();
     bool wasCanceled();
 
 private:

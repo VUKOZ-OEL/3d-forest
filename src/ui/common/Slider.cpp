@@ -24,6 +24,7 @@
 // Include 3D Forest.
 #include <Slider.hpp>
 #include <Application.hpp>
+#include <Util.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "Slider"
@@ -37,16 +38,9 @@ Slider::~Slider()
 {
 }
 
-void Slider::setMinimum(int v)
+void Slider::setSingleStep(int val)
 {
-}
-
-void Slider::setMaximum(int v)
-{
-}
-
-void Slider::setSingleStep(int v)
-{
+    singleStep_ = val;
 }
 
 void Slider::setTickInterval(int v)
@@ -59,6 +53,24 @@ void Slider::setTickPosition(int v)
 
 void Slider::setOrientation(int v)
 {
+}
+
+void Slider::setMinimum(int min)
+{
+    minimum_ = min;
+    clamp(value_, minimum_, maximum_);
+}
+
+void Slider::setMaximum(int max)
+{
+    maximum_ = max;
+    clamp(value_, minimum_, maximum_);
+}
+
+void Slider::setRange(int min, int max)
+{
+    setMinimum(min);
+    setMaximum(max);
 }
 
 void Slider::setValue(int value, bool notify)

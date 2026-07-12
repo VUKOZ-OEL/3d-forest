@@ -51,7 +51,7 @@ public:
 private:
     Application *app_;
     QAction *exportFileAction_;
-    QString fileName_;
+    std::string fileName_;
 };
 
 extern "C" EXPORT_EXPORT_FILE_PLUGIN Plugin *createPlugin()

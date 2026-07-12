@@ -77,7 +77,7 @@ void ViewerOpenGLViewport::resizeEvent(QResizeEvent *event)
     QOpenGLWidget::resizeEvent(event);
 }
 
-void ViewerOpenGLViewport::showEvent(QShowEvent *event)
+void ViewerOpenGLViewport::showEvent(ShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
     QOpenGLWidget::showEvent(event);
@@ -138,13 +138,13 @@ void ViewerOpenGLViewport::mouseDoubleClickEvent(QMouseEvent *event)
 
     setFocus();
 
-    if (event->button() == Qt::LeftButton)
+    if (event->button() == Ui::LeftButton)
     {
         const QPointF posLogical = event->position(); // logical (DIP)
         const qreal dpr = devicePixelRatioF();        // e.g. 1.25 on 125%
         const QPoint posDevice = (posLogical * dpr).toPoint(); // device pixels
 
-        bool ctrl = event->modifiers() & Qt::ControlModifier;
+        bool ctrl = event->modifiers() & Ui::ControlModifier;
 
         pickObject(posDevice, ctrl);
     }

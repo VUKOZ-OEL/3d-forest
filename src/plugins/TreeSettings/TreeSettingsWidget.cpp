@@ -26,14 +26,14 @@
 #include <TreeSettingsWidget.hpp>
 
 // Include Qt.
-#include <CheckBox>
+#include <CheckBox.hpp>
 #include <Color>
-#include <ComboBox>
-#include <GridLayout>
-#include <GroupBox>
-#include <Label>
+#include <ComboBox.hpp>
+#include <GridLayout.hpp>
+#include <GroupBox.hpp>
+#include <Label.hpp>
 #include <QSlider>
-#include <VBoxLayout>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "TreeSettingsWidget"
@@ -122,7 +122,7 @@ TreeSettingsWidget::TreeSettingsWidget(Application *app)
     dbhScaleSlider_->setSingleStep(1);
     dbhScaleSlider_->setTickInterval(1);
     dbhScaleSlider_->setTickPosition(QSlider::TicksAbove);
-    dbhScaleSlider_->setOrientation(Qt::Horizontal);
+    dbhScaleSlider_->setOrientation(Ui::Horizontal);
     connect(dbhScaleSlider_,
             SIGNAL(valueChanged(int)),
             this,

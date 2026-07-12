@@ -25,27 +25,21 @@
 // Include 3D Forest.
 #include <ComputeHullAction.hpp>
 #include <ComputeHullParameters.hpp>
+#include <Widget.hpp>
 class Application;
-class DoubleSlider;
-
-// Include Qt.
-#include <Widget>
+class DoubleSliderWidget;
 class CheckBox;
 class PushButton;
 
 /** Compute Hull Widget. */
 class ComputeHullWidget : public Widget
 {
-
-
 public:
     ComputeHullWidget(Application *app);
 
-protected slots:
     void slotApply();
     void slotFindOptimalAlphaChanged(int index);
 
-protected:
     void hideEvent(HideEvent *event) override;
 
 private:
@@ -58,12 +52,9 @@ private:
     CheckBox *computeConvexHullProjectionCheckBox_;
     CheckBox *computeConcaveHullCheckBox_;
     CheckBox *computeConcaveHullProjectionCheckBox_;
-
     CheckBox *findOptimalAlphaCheckBox_;
-    DoubleSlider *alphaSlider_;
-
-    DoubleSlider *voxelRadiusSlider_;
-
+    DoubleSliderWidget *alphaSlider_;
+    DoubleSliderWidget *voxelRadiusSlider_;
     PushButton *applyButton_;
 };
 

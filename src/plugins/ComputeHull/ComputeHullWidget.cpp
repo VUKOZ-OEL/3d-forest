@@ -21,18 +21,17 @@
 
 // Include 3D Forest.
 #include <ComputeHullWidget.hpp>
-#include <DoubleSlider.hpp>
+#include <DoubleSliderWidget.hpp>
 #include <InfoDialog.hpp>
 #include <Application.hpp>
-#include <ProgressDialog.hpp>
+#include <ProgressActionDialog.hpp>
 #include <ThemeIcon.hpp>
-
-// Include Qt.
-#include <CheckBox>
-#include <GroupBox>
-#include <HBoxLayout>
-#include <PushButton>
-#include <VBoxLayout>
+#include <CheckBox.hpp>
+#include <GroupBox.hpp>
+#include <HBoxLayout.hpp>
+#include <GridLayout.hpp>
+#include <PushButton.hpp>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeHullWidget"
@@ -83,18 +82,17 @@ ComputeHullWidget::ComputeHullWidget(Application *app)
     findOptimalAlphaCheckBox_ = new CheckBox;
     findOptimalAlphaCheckBox_->setText(tr("Find optimal alpha"));
     findOptimalAlphaCheckBox_->setChecked(parameters_.findOptimalAlpha);
-    connect(findOptimalAlphaCheckBox_,
-            SIGNAL(stateChanged(int)),
-            this,
-            SLOT(slotFindOptimalAlphaChanged(int)));
+    findOptimalAlphaCheckBox_->stateChanged.connect([this](int value)
+    {
+        slotFindOptimalAlphaChanged(value);
+    });
 
     // If your data points are spaced ~1 unit apart, α = 0.1 will include only
     // very local features. If points are spaced ~100 units apart, you might
     // need α = 50+ to see a connected shape.
 
-    DoubleSlider::create(
+    DoubleSliderWidget::create(
         alphaSlider_,
-        this,
         nullptr,
         nullptr,
         tr("Alpha (sphere radius)"),
@@ -111,9 +109,8 @@ ComputeHullWidget::ComputeHullWidget(Application *app)
     alphaSlider_->setEnabled(!findOptimalAlphaCheckBox_->isChecked());
 
     // Voxel radius.
-    DoubleSlider::create(
+    DoubleSliderWidget::create(
         voxelRadiusSlider_,
-        this,
         nullptr,
         nullptr,
         tr("Voxel radius"),
@@ -136,8 +133,10 @@ ComputeHullWidget::ComputeHullWidget(Application *app)
     // Buttons.
     applyButton_ = new PushButton(tr("Run"));
     applyButton_->setIcon(THEME_ICON("run"));
-    applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
+    applyButton_->clicked.connect([this]()
+    {
+        slotApply();
+    });
 
     // Buttons layout.
     HBoxLayout *buttonsLayout = new HBoxLayout;
@@ -198,7 +197,7 @@ void ComputeHullWidget::slotApply()
     {
         action_.start(parameters_);
 
-        ProgressDialog::run(app_, "Computing Hull", &action_);
+        ProgressActionDialog::run(app_, "Computing Hull", &action_);
     }
     catch (std::exception &e)
     {

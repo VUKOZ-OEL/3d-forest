@@ -26,7 +26,7 @@
 class Application;
 
 // Include Qt.
-#include <DockWidget>
+#include <DockWidget.hpp>
 
 /** Tree Settings Window. */
 class TreeSettingsWindow : public DockWidget

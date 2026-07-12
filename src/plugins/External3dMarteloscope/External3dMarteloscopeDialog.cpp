@@ -23,14 +23,12 @@
 #include <External3dMarteloscopeDialog.hpp>
 #include <Application.hpp>
 #include <ThemeIcon.hpp>
-
-// Include Qt.
-#include <QFileDialog>
-#include <HBoxLayout>
-#include <Label>
-#include <QLineEdit>
-#include <PushButton>
-#include <VBoxLayout>
+#include <FileDialog.hpp>
+#include <HBoxLayout.hpp>
+#include <Label.hpp>
+#include <LineEdit.hpp>
+#include <PushButton.hpp>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "External3dMarteloscopeDialog"
@@ -44,11 +42,14 @@ External3dMarteloscopeDialog::External3dMarteloscopeDialog(
       app_(app)
 {
     // File name.
-    fileNameLineEdit_ = new QLineEdit;
-    fileNameLineEdit_->setText(QString::fromStdString(path_));
+    fileNameLineEdit_ = new LineEdit;
+    fileNameLineEdit_->setText(path_);
 
     browseButton_ = new PushButton(tr("Browse"));
-    connect(browseButton_, SIGNAL(clicked()), this, SLOT(slotBrowse()));
+    browseButton_->clicked.connect([this]()
+    {
+        slotBrowse();
+    });
 
     HBoxLayout *fileNameLayout = new HBoxLayout;
     fileNameLayout->addWidget(new Label(tr("File")));
@@ -58,10 +59,16 @@ External3dMarteloscopeDialog::External3dMarteloscopeDialog(
     // Dialog buttons.
     acceptButton_ = new PushButton(tr("Run"));
     acceptButton_->setIcon(THEME_ICON("run"));
-    connect(acceptButton_, SIGNAL(clicked()), this, SLOT(slotAccept()));
+    acceptButton_->clicked.connect([this]()
+    {
+        slotAccept();
+    });
 
     rejectButton_ = new PushButton(tr("Cancel"));
-    connect(rejectButton_, SIGNAL(clicked()), this, SLOT(slotReject()));
+    rejectButton_->clicked.connect([this]()
+    {
+        slotReject();
+    });
 
     HBoxLayout *dialogButtons = new HBoxLayout;
     dialogButtons->addStretch();
@@ -85,20 +92,17 @@ External3dMarteloscopeDialog::External3dMarteloscopeDialog(
 
 void External3dMarteloscopeDialog::slotBrowse()
 {
-    QFileDialog::Options options;
-    options = QFlag(QFileDialog::DontConfirmOverwrite);
+    std::string selectedFilter;
 
-    QString selectedFilter;
-
-    QString fileName =
-        QFileDialog::getSaveFileName(app_,
+    std::string fileName =
+        FileDialog::getSaveFileName(app_,
                                      tr("Select File"),
                                      fileNameLineEdit_->text(),
                                      tr("iLand project XML (*.xml)"),
                                      &selectedFilter,
-                                     options);
+                                     FileDialog::DontConfirmOverwrite);
 
-    if (fileName.isEmpty())
+    if (fileName.empty())
     {
         return;
     }
@@ -108,7 +112,7 @@ void External3dMarteloscopeDialog::slotBrowse()
 
 void External3dMarteloscopeDialog::slotAccept()
 {
-    path_ = fileNameLineEdit_->text().toStdString();
+    path_ = fileNameLineEdit_->text();
 
     close();
     setResult(Dialog::Accepted);

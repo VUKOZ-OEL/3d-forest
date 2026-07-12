@@ -41,6 +41,7 @@ public:
     void addWidget(Widget *widget, int row, int column, int alignment = 0);
     void addLayout(Layout *layout);
     void addStretch();
+    void addSpacing(int spacing);
 
 private:
 };

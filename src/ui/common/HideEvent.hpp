@@ -22,12 +22,15 @@
 #ifndef HIDE_EVENT_HPP
 #define HIDE_EVENT_HPP
 
+// Include 3D Forest.
+#include <Event.hpp>
+
 // Include local.
 #include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
 
 /** HideEvent. */
-class EXPORT_UI_COMMON HideEvent
+class EXPORT_UI_COMMON HideEvent : public Event
 {
 public:
 

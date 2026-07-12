@@ -17,46 +17,53 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file GuiUtil.hpp */
+/** @file DoubleSpinBox.cpp */
 
-#ifndef GUI_UTIL_HPP
-#define GUI_UTIL_HPP
+// Include std.
 
 // Include 3D Forest.
-#include <Editor.hpp>
-
-// Include Qt.
-#include <QSet>
-#include <QString>
+#include <DoubleSpinBox.hpp>
+#include <Application.hpp>
 
 // Include local.
-#include <ExportGui.hpp>
-#include <WarningsDisable.hpp>
+#define LOG_MODULE_NAME "DoubleSpinBox"
+#include <Log.hpp>
 
-inline std::ostream &operator<<(std::ostream &out, const QString &in)
+DoubleSpinBox::DoubleSpinBox()
 {
-    out << in.toStdString();
-    return out;
 }
 
-inline std::ostream &operator<<(std::ostream &out, const QSet<Editor::Type> &in)
+DoubleSpinBox::~DoubleSpinBox()
 {
-    out << "{";
-    int c = 0;
-    for (auto &it : in)
+}
+
+void DoubleSpinBox::setSingleStep(double val)
+{
+    singleStep_ = val;
+}
+
+void DoubleSpinBox::setMinimum(double min)
+{
+    minimum_ = min;
+}
+
+void DoubleSpinBox::setMaximum(double max)
+{
+    maximum_ = max;
+}
+
+void DoubleSpinBox::setRange(double min, double max)
+{
+    setMinimum(min);
+    setMaximum(max);
+}
+
+void DoubleSpinBox::setValue(double value, bool notify)
+{
+    value_ = value;
+
+    if (notify && !signalsBlocked())
     {
-        if (c > 0)
-        {
-            out << ", ";
-        }
-        c++;
-
-        out << it;
+        valueChanged(value_);
     }
-    out << "}";
-    return out;
 }
-
-#include <WarningsEnable.hpp>
-
-#endif /* GUI_UTIL_HPP */

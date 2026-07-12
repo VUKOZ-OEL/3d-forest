@@ -44,21 +44,21 @@ FilterFilesWindow::FilterFilesWindow(Application *app)
     setWidget(widget_);
     setWindowTitle(tr("Filter Files"));
     setWindowIcon(ICON("files"));
-    setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    app->addDockWidget(Qt::RightDockWidgetArea, this);
+    setAllowedAreas(Ui::LeftDockWidgetArea | Ui::RightDockWidgetArea);
+    app->addDockWidget(Ui::RightDockWidgetArea, this);
 }
 
-void FilterFilesWindow::showEvent(QShowEvent *event)
+void FilterFilesWindow::showEvent(ShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
     // widget_->setFilterEnabled(true);
-    Widget::showEvent(event);
+    DockWidget::showEvent(event);
 }
 
 void FilterFilesWindow::hideEvent(HideEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Hide event.");
-    Widget::hideEvent(event);
+    DockWidget::hideEvent(event);
 }
 
 void FilterFilesWindow::closeEvent(QCloseEvent *event)

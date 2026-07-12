@@ -27,7 +27,7 @@ class Application;
 class TreeTableWidget;
 
 // Include Qt.
-#include <Dialog>
+#include <Dialog.hpp>
 class QCloseEvent;
 
 /** Tree Table Window. */

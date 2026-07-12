@@ -28,6 +28,12 @@
 
 // Include 3D Forest.
 #include <ThemeIcon.hpp>
+#include <PaintEvent.hpp>
+#include <MouseEvent.hpp>
+#include <HideEvent.hpp>
+#include <ShowEvent.hpp>
+#include <CloseEvent.hpp>
+#include <Ui.hpp>
 class Application;
 class Widget;
 
@@ -50,6 +56,7 @@ public:
     void setArea(int area);
 
     void setWidget(Widget *widget);
+    Widget *widget() { return widget_; }
 
     void setFixedHeight(int h);
 
@@ -57,7 +64,14 @@ public:
     void raise() {};
     void activateWindow() {};
 
+    virtual void paintEvent(PaintEvent *event);
+    virtual void mousePressEvent(MouseEvent *event);
+    virtual void hideEvent(HideEvent *event);
+    virtual void showEvent(ShowEvent *event);
+    virtual void closeEvent(CloseEvent *event);
+
 private:
+    Widget *widget_;
 };
 
 #include <WarningsEnable.hpp>

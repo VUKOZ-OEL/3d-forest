@@ -24,10 +24,7 @@
 #include <ComputeHeightMapWindow.hpp>
 #include <Application.hpp>
 #include <ThemeIcon.hpp>
-
-// Include Qt.
-#include <QCloseEvent>
-#include <VBoxLayout>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeHeightMapWindow"
@@ -59,7 +56,7 @@ ComputeHeightMapWindow::ComputeHeightMapWindow(
     setModal(false);
 }
 
-void ComputeHeightMapWindow::closeEvent(QCloseEvent *event)
+void ComputeHeightMapWindow::closeEvent(CloseEvent *event)
 {
     LOG_DEBUG(<< "Close event.");
 

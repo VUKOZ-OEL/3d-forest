@@ -17,10 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file DoubleSlider.hpp */
+/** @file DoubleSpinBox.hpp */
 
-#ifndef DOUBLE_SLIDER_HPP
-#define DOUBLE_SLIDER_HPP
+#ifndef DOUBLE_SPIN_BOX_HPP
+#define DOUBLE_SPIN_BOX_HPP
 
 // Include 3D Forest.
 #include <Widget.hpp>
@@ -29,35 +29,37 @@
 #include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
 
-/** DoubleSlider. */
-class EXPORT_UI_COMMON DoubleSlider : public Widget
+/** DoubleSpinBox. */
+class EXPORT_UI_COMMON DoubleSpinBox : public Widget
 {
 public:
-    /** Slider layout. */
-    enum Layout
-    {
-        LAYOUT_SLIDER_BESIDE_LABEL,
-        LAYOUT_SLIDER_UNDER_LABEL
-    };
+    DoubleSpinBox();
+    virtual ~DoubleSpinBox();
 
-    DoubleSlider();
-    virtual ~DoubleSlider();
+    double singleStep() const { return singleStep_; }
+    void setSingleStep(double val);
 
-    void setMinimum(int v);
-    void setMaximum(int v);
-    void setSingleStep(int v);
-    void setTickInterval(int v);
-    void setTickPosition(int v);
-    void setOrientation(int v);
+    double minimum() const { return minimum_; }
+    void setMinimum(double min);
 
-    void setValue(int value, bool notify = false);
+    double maximum() const { return maximum_; }
+    void setMaximum(double max);
 
-    Signal<int> valueChanged;
+    void setRange(double min, double max);
+
+    double value() const { return value_; }
+    void setValue(double value, bool notify = false);
+
+    Signal<double> valueChanged;
+    Signal<> editingFinished;
 
 private:
-    int value_{0};
+    double singleStep_{0.0};
+    double minimum_{0.0};
+    double maximum_{0.0};
+    double value_{0.0};
 };
 
 #include <WarningsEnable.hpp>
 
-#endif /* DOUBLE_SLIDER_HPP */
+#endif /* DOUBLE_SPIN_BOX_HPP */

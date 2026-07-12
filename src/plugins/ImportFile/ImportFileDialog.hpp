@@ -28,7 +28,7 @@ class Application;
 class InfoDialog;
 
 // Include Qt.
-#include <Dialog>
+#include <Dialog.hpp>
 class CheckBox;
 class PushButton;
 

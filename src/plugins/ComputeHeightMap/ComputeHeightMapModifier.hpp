@@ -24,16 +24,13 @@
 
 // Include std.
 #include <vector>
+#include <mutex>
 
 // Include 3D Forest.
 #include <Vector3.hpp>
 class Editor;
 class Page;
 class Application;
-
-// Include Qt.
-#include <QMutex>
-class Widget;
 
 /** Compute Height Map Modifier.
 
@@ -58,13 +55,13 @@ public:
 
     void initialize(Application *app);
     void setSource(Source source);
-    void setColormap(const QString &name, int colorCount);
+    void setColormap(const std::string &name, int colorCount);
     void setPreviewEnabled(bool enabled,
                            bool update = true,
                            bool reload = false);
     bool previewEnabled();
     void applyModifier(Page *page);
-    void apply(Widget *widget);
+    void apply(Application *app);
 
 protected:
     Application *app_;
@@ -72,9 +69,9 @@ protected:
     bool previewEnabled_;
     Source source_;
     std::vector<Vector3<double>> colormap_;
-    QMutex mutex_;
+    std::mutex mutex_;
 
-    std::vector<Vector3<double>> createColormap(const QString &name,
+    std::vector<Vector3<double>> createColormap(const std::string &name,
                                                 int colorCount);
 };
 

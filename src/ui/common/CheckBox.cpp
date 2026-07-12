@@ -29,8 +29,9 @@
 #define LOG_MODULE_NAME "CheckBox"
 #include <Log.hpp>
 
-CheckBox::CheckBox()
+CheckBox::CheckBox(const std::string &str)
 {
+    setText(str);
 }
 
 CheckBox::~CheckBox()

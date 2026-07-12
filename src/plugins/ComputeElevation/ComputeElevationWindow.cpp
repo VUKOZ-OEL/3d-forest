@@ -24,9 +24,7 @@
 #include <ComputeElevationWindow.hpp>
 #include <Application.hpp>
 #include <ThemeIcon.hpp>
-
-// Include Qt.
-#include <VBoxLayout>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeElevationWindow"

@@ -17,29 +17,37 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file OpenFileDialog.hpp */
+/** @file ProgressBar.hpp */
 
-#ifndef OPEN_FILE_DIALOG_HPP
-#define OPEN_FILE_DIALOG_HPP
-
-// Include std.
-#include <string>
+#ifndef PROGRESS_BAR_HPP
+#define PROGRESS_BAR_HPP
 
 // Include 3D Forest.
-class MainWindow;
+#include <Widget.hpp>
 
 // Include local.
-#include <ExportGui.hpp>
+#include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
 
-/** Open File Dialog. */
-class EXPORT_GUI OpenFileDialog
+/** Progress Bar. */
+class EXPORT_UI_COMMON ProgressBar : public Widget
 {
 public:
-    static std::string dialog(MainWindow *mainWindow,
-                              const std::string &filter = "(*.*)");
+    ProgressBar();
+    virtual ~ProgressBar();
+
+    void setRange(int min, int max);
+    int minimum() const { return min_; }
+    int maximum() const { return max_; }
+
+    void setValue(int value);
+    void setLabelText(const std::string &str);
+
+private:
+    int min_;
+    int max_;
 };
 
 #include <WarningsEnable.hpp>
 
-#endif /* OPEN_FILE_DIALOG_HPP */
+#endif /* PROGRESS_BAR_HPP */

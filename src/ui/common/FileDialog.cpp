@@ -73,3 +73,16 @@ std::string FileDialog::getSaveFileName(Application *app,
 {
     return "";
 }
+
+std::string FileDialog::getSaveFileName(Application *app,
+                                        const std::string &caption,
+                                        const std::string &dir,
+                                        const std::string &filter,
+                                        std::string *selectedFilter,
+                                        int options)
+{
+#if 0
+    QFileDialog::Options options;
+    options = QFlag(QFileDialog::DontConfirmOverwrite);
+#endif
+}

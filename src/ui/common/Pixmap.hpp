@@ -17,33 +17,23 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ShowDetailsWidget.hpp */
+/** @file Pixmap.hpp */
 
-#ifndef SHOW_DETAILS_WIDGET_HPP
-#define SHOW_DETAILS_WIDGET_HPP
-
-// Include Qt.
-#include <QWidget>
-class QTextEdit;
+#ifndef PIXMAP_HPP
+#define PIXMAP_HPP
 
 // Include local.
-#include <ExportGui.hpp>
+#include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
 
-/** Show Details Widget. */
-class EXPORT_GUI ShowDetailsWidget : public QWidget
+/** Pixmap. */
+class EXPORT_UI_COMMON Pixmap
 {
-    Q_OBJECT
-
 public:
-    ShowDetailsWidget(const QString &text);
 
-    static void create(ShowDetailsWidget *&outputWidget, const QString &text);
-
-protected:
-    QTextEdit *textEdit_;
+private:
 };
 
 #include <WarningsEnable.hpp>
 
-#endif /* SHOW_DETAILS_WIDGET_HPP */
+#endif /* PIXMAP_HPP */

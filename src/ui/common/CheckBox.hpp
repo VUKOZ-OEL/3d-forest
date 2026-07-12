@@ -34,7 +34,7 @@ class Application;
 class EXPORT_UI_COMMON CheckBox : public Widget
 {
 public:
-    CheckBox();
+    CheckBox(const std::string &str = "");
     virtual ~CheckBox();
 
     void setChecked(bool b, bool notify = false);

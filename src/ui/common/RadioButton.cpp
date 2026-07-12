@@ -17,23 +17,39 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ProjectFileInterface.hpp */
+/** @file RadioButton.cpp */
 
-#ifndef PROJECT_FILE_INTERFACE_HPP
-#define PROJECT_FILE_INTERFACE_HPP
+// Include std.
+
+// Include 3D Forest.
+#include <RadioButton.hpp>
+#include <Application.hpp>
 
 // Include local.
-#include <ExportGui.hpp>
-#include <WarningsDisable.hpp>
+#define LOG_MODULE_NAME "RadioButton"
+#include <Log.hpp>
 
-/** Project File Interface. */
-class EXPORT_GUI ProjectFileInterface
+RadioButton::RadioButton(const std::string &str)
 {
-public:
-    virtual ~ProjectFileInterface() = default;
-    virtual bool closeProject() = 0;
-};
+    setText(str);
+}
 
-#include <WarningsEnable.hpp>
+RadioButton::~RadioButton()
+{
+}
 
-#endif /* PROJECT_FILE_INTERFACE_HPP */
+void RadioButton::setChecked(bool b, bool notify)
+{
+    checked_ = b;
+
+    if (notify && !signalsBlocked())
+    {
+        stateChanged(checked_ ? 1 : 0);
+    }
+}
+
+bool RadioButton::isChecked() const
+{
+    return checked_;
+}
+

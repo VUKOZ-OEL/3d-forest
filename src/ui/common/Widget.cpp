@@ -51,6 +51,22 @@ void Widget::setToolTip(const std::string &str)
     toolTip_ = str;
 }
 
+void Widget::setFocusPolicy(int focusPolicy)
+{
+}
+
+void Widget::setVisible(bool b)
+{
+}
+
+void Widget::setEnabled(bool b)
+{
+}
+
+void Widget::setDisabled(bool b)
+{
+}
+
 void Widget::setLayout(Layout *layout)
 {
 }
@@ -90,5 +106,13 @@ void Widget::mousePressEvent(MouseEvent *event)
 }
 
 void Widget::hideEvent(HideEvent *event)
+{
+}
+
+void Widget::showEvent(ShowEvent *event)
+{
+}
+
+void Widget::closeEvent(CloseEvent *event)
 {
 }

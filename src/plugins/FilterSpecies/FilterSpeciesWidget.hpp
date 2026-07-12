@@ -31,7 +31,7 @@
 class Application;
 
 // Include Qt.
-#include <Widget>
+#include <Widget.hpp>
 class QToolButton;
 class QTreeWidget;
 class QTreeWidgetItem;

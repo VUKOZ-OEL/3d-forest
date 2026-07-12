@@ -46,23 +46,23 @@ FilterClassificationWindow::FilterClassificationWindow(Application *app)
     setWidget(widget_);
     setWindowTitle(tr("Filter Classification"));
     setWindowIcon(ICON("classification-filter"));
-    setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    app->addDockWidget(Qt::RightDockWidgetArea, this);
+    setAllowedAreas(Ui::LeftDockWidgetArea | Ui::RightDockWidgetArea);
+    app->addDockWidget(Ui::RightDockWidgetArea, this);
 
     LOG_DEBUG(<< "Finished creating classifications window.");
 }
 
-void FilterClassificationWindow::showEvent(QShowEvent *event)
+void FilterClassificationWindow::showEvent(ShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
     // widget_->setFilterEnabled(true);
-    Widget::showEvent(event);
+    DockWidget::showEvent(event);
 }
 
 void FilterClassificationWindow::hideEvent(HideEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Hide event.");
-    Widget::hideEvent(event);
+    DockWidget::hideEvent(event);
 }
 
 void FilterClassificationWindow::closeEvent(QCloseEvent *event)

@@ -28,7 +28,7 @@
 #include <QAction>
 #include <QCoreApplication>
 #include <QMenu>
-#include <QProgressDialog>
+#include <ProgressDialog.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "TreeTableSetManagementStatus"
@@ -55,8 +55,8 @@ void TreeTableSetManagementStatus::create()
     for (size_t i = 0; i < statusList.size(); i++)
     {
         const ManagementStatus &status = statusList[i];
-        QString text = QString::number(status.id) + " : " +
-                       QString::fromStdString(status.label);
+        std::string text = std::string::number(status.id) + " : " +
+                       std::string::fromStdString(status.label);
 
         QAction *action = menu_->addAction(text);
         actions_[action] = status.id;
@@ -118,8 +118,8 @@ void TreeTableSetManagementStatus::run(Application *app,
     for (size_t i = 0; i < statusList.size(); i++)
     {
         const ManagementStatus &status = statusList[i];
-        QString text = QString::number(status.id) + " : " +
-                       QString::fromStdString(status.label);
+        std::string text = std::string::number(status.id) + " : " +
+                       std::string::fromStdString(status.label);
         dialog.addItem(text);
     }
 

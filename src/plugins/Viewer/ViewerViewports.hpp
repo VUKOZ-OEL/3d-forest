@@ -33,7 +33,7 @@ class ViewerOpenGLViewport;
 class ViewerOpenGLManager;
 
 // Include Qt.
-#include <Widget>
+#include <Widget.hpp>
 
 // Include local.
 #include <ExportGui.hpp>
@@ -85,7 +85,7 @@ protected:
 
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
-    void showEvent(QShowEvent *event) override;
+    void showEvent(ShowEvent *event) override;
     void hideEvent(HideEvent *event) override;
 
     std::vector<ViewerOpenGLViewport *> viewports_;

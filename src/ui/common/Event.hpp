@@ -17,38 +17,27 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file PluginInterface.hpp */
+/** @file Event.hpp */
 
-#ifndef PLUGIN_INTERFACE_HPP
-#define PLUGIN_INTERFACE_HPP
-
-// Include Qt.
-#include <QtPlugin>
-
-#if QT_VERSION_MAJOR == 5
-    // Fix for qt5 which has two QAction classes.
-    #include <QtWidgets/QAction>
-#else
-    #include <QAction>
-#endif
+#ifndef EVENT_HPP
+#define EVENT_HPP
 
 // Include local.
-#include <ExportGui.hpp>
+#include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
 
-class MainWindow;
-
-/** Plugin Interface. */
-class EXPORT_GUI PluginInterface
+/** Event. */
+class EXPORT_UI_COMMON Event
 {
 public:
-    virtual ~PluginInterface() = default;
-    virtual void initialize(MainWindow *mainWindow) = 0;
-};
+    Event() {};
+    virtual ~Event() {};
 
-#define PluginInterface_iid "vukoz.3dforest.qt.PluginInterface/1.0"
-Q_DECLARE_INTERFACE(PluginInterface, PluginInterface_iid)
+    void accept() {};
+
+private:
+};
 
 #include <WarningsEnable.hpp>
 
-#endif /* PLUGIN_INTERFACE_HPP */
+#endif /* EVENT_HPP */

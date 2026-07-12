@@ -37,6 +37,10 @@ public:
     PushButton(const std::string &str = "");
     virtual ~PushButton();
 
+    void setIcon(const ThemeIcon &icon);
+
+    Signal<> clicked;
+
 private:
 };
 

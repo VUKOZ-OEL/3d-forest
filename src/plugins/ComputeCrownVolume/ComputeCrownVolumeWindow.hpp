@@ -23,17 +23,13 @@
 #define COMPUTE_CROWN_VOLUME_WINDOW_HPP
 
 // Include 3D Forest.
+#include <Dialog.hpp>
 class Application;
 class ComputeCrownVolumeWidget;
-
-// Include Qt.
-#include <Dialog>
 
 /** Compute Crown Volume Window. */
 class ComputeCrownVolumeWindow : public Dialog
 {
-
-
 public:
     ComputeCrownVolumeWindow(Application *app);
     ~ComputeCrownVolumeWindow();

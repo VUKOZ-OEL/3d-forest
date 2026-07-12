@@ -17,29 +17,40 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file FindVisibleObjects.hpp */
+/** @file InfoDialog.hpp */
 
-#ifndef FIND_VISIBLE_OBJECTS_HPP
-#define FIND_VISIBLE_OBJECTS_HPP
-
-// Include Std.
-#include <stddef.h>
-#include <unordered_set>
+#ifndef INFO_DIALOG_HPP
+#define INFO_DIALOG_HPP
 
 // Include 3D Forest.
-class MainWindow;
+#include <Dialog.hpp>
+class TextEdit;
+class PushButton;
 
 // Include local.
-#include <ExportGui.hpp>
+#include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
 
-/** Find Visible Objects. */
-class EXPORT_GUI FindVisibleObjects
+/** Info Dialog. */
+class EXPORT_UI_COMMON InfoDialog : public Dialog
 {
 public:
-    static void run(std::unordered_set<size_t> &result, MainWindow *mainWindow);
+    InfoDialog(Application *app, int w = 0, int h = 0);
+
+    Size sizeHint() const override;
+    Size minimumSizeHint() const override;
+
+    void setText(const std::string &text);
+
+    void slotClose();
+
+private:
+    int defaultWidth_;
+    int defaultHeight_;
+    TextEdit *textEdit_;
+    PushButton *closeButton_;
 };
 
 #include <WarningsEnable.hpp>
 
-#endif /* FIND_VISIBLE_OBJECTS_HPP */
+#endif /* INFO_DIALOG_HPP */

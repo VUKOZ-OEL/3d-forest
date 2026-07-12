@@ -41,13 +41,23 @@ void ComboBox::addItem(const std::string &str)
 {
 }
 
+std::string ComboBox::itemText(int index) const
+{
+    return "";
+}
+
 void ComboBox::setCurrentText(const std::string &str, bool notify)
 {
 }
 
-std::string ComboBox::itemText(int index) const
+std::string ComboBox::currentText() const
 {
     return "";
+}
+
+int ComboBox::currentIndex() const
+{
+    return value_;
 }
 
 void ComboBox::setValue(int value, bool notify)

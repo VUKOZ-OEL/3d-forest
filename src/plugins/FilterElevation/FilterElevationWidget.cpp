@@ -25,9 +25,9 @@
 #include <Application.hpp>
 
 // Include Qt.
-#include <HBoxLayout>
-#include <PushButton>
-#include <VBoxLayout>
+#include <HBoxLayout.hpp>
+#include <PushButton.hpp>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterElevationWidget"

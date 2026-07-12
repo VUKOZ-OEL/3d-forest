@@ -27,7 +27,7 @@
 
 // Include Qt.
 #include <QCloseEvent>
-#include <VBoxLayout>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "TreeTableWindow"

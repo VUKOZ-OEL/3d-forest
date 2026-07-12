@@ -284,18 +284,18 @@ void ViewerCamera::mouseMoveEvent(QMouseEvent *event)
     int dx = event->pos().x() - mouseLastPosition_.x();
     int dy = event->pos().y() - mouseLastPosition_.y();
 
-    if (event->buttons() & Qt::LeftButton)
+    if (event->buttons() & Ui::LeftButton)
     {
         if (!lock2d())
         {
             rotate(dx, dy);
         }
     }
-    else if (event->buttons() & Qt::RightButton)
+    else if (event->buttons() & Ui::RightButton)
     {
         pan(dx, dy);
     }
-    else if (event->buttons() & Qt::MiddleButton)
+    else if (event->buttons() & Ui::MiddleButton)
     {
         zoom(dy);
     }

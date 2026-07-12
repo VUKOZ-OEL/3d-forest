@@ -77,12 +77,12 @@ int External3dMarteloscopeRunner::findFreePort(int startPort) const
 void External3dMarteloscopeRunner::start(const std::string &projectPath,
                                          int startPort)
 {
-    QString binPath = QCoreApplication::applicationDirPath();
+    std::string binPath = QCoreApplication::applicationDirPath();
 
-    QString pythonHome;
-    QString pythonPath;
-    QString pythonExe = QDir(binPath).filePath("python/python.exe");
-    QString pyhonScript = QDir(binPath).filePath(
+    std::string pythonHome;
+    std::string pythonPath;
+    std::string pythonExe = QDir(binPath).filePath("python/python.exe");
+    std::string pyhonScript = QDir(binPath).filePath(
         "plugins/3DForestExternal3dMarteloscopePlugin/python/app.py");
 
     if (!QFile::exists(pythonExe))
@@ -103,16 +103,16 @@ void External3dMarteloscopeRunner::start(const std::string &projectPath,
           pythonPath,
           pythonExe,
           pyhonScript,
-          QString::fromStdString(projectPath),
+          std::string::fromStdString(projectPath),
           startPort);
 }
 
-void External3dMarteloscopeRunner::start(const QString &binPath,
-                                         const QString &pythonHome,
-                                         const QString &pythonPath,
-                                         const QString &pythonExe,
-                                         const QString &pyhonScript,
-                                         const QString &projectPath,
+void External3dMarteloscopeRunner::start(const std::string &binPath,
+                                         const std::string &pythonHome,
+                                         const std::string &pythonPath,
+                                         const std::string &pythonExe,
+                                         const std::string &pyhonScript,
+                                         const std::string &projectPath,
                                          int startPort)
 {
     if (process_)
@@ -161,7 +161,7 @@ void External3dMarteloscopeRunner::start(const QString &binPath,
 
         QStringList args;
         args << "-m" << "streamlit" << "run" << pyhonScript << "--server.port"
-             << QString::number(port_) << "--server.headless" << "true"
+             << std::string::number(port_) << "--server.headless" << "true"
              << "--" << projectPath << binPath;
 
         process_->start(pythonExe, args);
@@ -217,8 +217,8 @@ void External3dMarteloscopeRunner::start(const QString &binPath,
 
     // Show the web view
     view_ = new QWebEngineView();
-    view_->setAttribute(Qt::WA_DeleteOnClose);
-    view_->setUrl(QUrl(QString("http://localhost:%1").arg(port_)));
+    view_->setAttribute(Ui::WA_DeleteOnClose);
+    view_->setUrl(QUrl(std::string("http://localhost:%1").arg(port_)));
     view_->resize(1024, 768);
     view_->show();
 

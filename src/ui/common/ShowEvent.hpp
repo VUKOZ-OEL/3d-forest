@@ -17,35 +17,26 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ViewerInterface.hpp */
+/** @file ShowEvent.hpp */
 
-#ifndef VIEWER_INTERFACE_HPP
-#define VIEWER_INTERFACE_HPP
-
-// Include std.
-#include <vector>
+#ifndef SHOW_EVENT_HPP
+#define SHOW_EVENT_HPP
 
 // Include 3D Forest.
-#include <Camera.hpp>
-class Editor;
+#include <Event.hpp>
 
 // Include local.
-#include <ExportGui.hpp>
+#include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
 
-/** Viewer Interface. */
-class EXPORT_GUI ViewerInterface
+/** ShowEvent. */
+class EXPORT_UI_COMMON ShowEvent : public Event
 {
 public:
-    virtual ~ViewerInterface() = default;
 
-    virtual std::vector<Camera> camera(size_t viewportId) const = 0;
-    virtual std::vector<Camera> camera() const = 0;
-
-    virtual void updateScene(Editor *editor) = 0;
-    virtual void resetScene(Editor *editor, bool resetView) = 0;
+private:
 };
 
 #include <WarningsEnable.hpp>
 
-#endif /* VIEWER_INTERFACE_HPP */
+#endif /* SHOW_EVENT_HPP */

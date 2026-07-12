@@ -25,29 +25,23 @@
 // Include 3D Forest.
 #include <ComputeDescriptorAction.hpp>
 #include <ComputeDescriptorParameters.hpp>
+#include <Widget.hpp>
 class Application;
-class DoubleSlider;
+class DoubleSliderWidget;
 class InfoDialog;
-
-// Include Qt.
-#include <Widget>
 class PushButton;
-class QRadioButton;
+class RadioButton;
 class CheckBox;
 
 /** Compute Descriptor Widget. */
 class ComputeDescriptorWidget : public Widget
 {
-
-
 public:
     ComputeDescriptorWidget(Application *app);
 
-protected slots:
     void slotApply();
     void slotHelp();
 
-protected:
     void hideEvent(HideEvent *event) override;
 
 private:
@@ -57,9 +51,9 @@ private:
     ComputeDescriptorParameters parameters_;
     ComputeDescriptorAction descriptor_;
 
-    std::vector<QRadioButton *> methodRadioButton_;
-    DoubleSlider *voxelRadiusSlider_;
-    DoubleSlider *searchRadiusSlider_;
+    std::vector<RadioButton *> methodRadioButton_;
+    DoubleSliderWidget *voxelRadiusSlider_;
+    DoubleSliderWidget *searchRadiusSlider_;
     CheckBox *includeGroundPointsCheckBox_;
 
     PushButton *helpButton_;

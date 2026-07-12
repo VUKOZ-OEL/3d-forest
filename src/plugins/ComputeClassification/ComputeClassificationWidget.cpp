@@ -21,10 +21,10 @@
 
 // Include 3D Forest.
 #include <ComputeClassificationWidget.hpp>
-#include <DoubleSlider.hpp>
+#include <DoubleSliderWidget.hpp>
 #include <InfoDialog.hpp>
 #include <Application.hpp>
-#include <ProgressDialog.hpp>
+#include <ProgressActionDialog.hpp>
 #include <ThemeIcon.hpp>
 #include <CheckBox.hpp>
 #include <HBoxLayout.hpp>
@@ -47,8 +47,7 @@ ComputeClassificationWidget::ComputeClassificationWidget(Application *app)
     LOG_DEBUG(<< "Create.");
 
     // Widgets.
-    DoubleSlider::create(voxelSlider_,
-                               this,
+    DoubleSliderWidget::create(voxelSlider_,
                                nullptr,
                                nullptr,
                                tr("Voxel radius"),
@@ -59,8 +58,7 @@ ComputeClassificationWidget::ComputeClassificationWidget(Application *app)
                                1.0,
                                parameters_.voxelRadius);
 
-    DoubleSlider::create(radiusSlider_,
-                               this,
+    DoubleSliderWidget::create(radiusSlider_,
                                nullptr,
                                nullptr,
                                tr("Neighborhood search radius"),
@@ -71,8 +69,7 @@ ComputeClassificationWidget::ComputeClassificationWidget(Application *app)
                                2.0,
                                parameters_.searchRadius);
 
-    DoubleSlider::create(angleSlider_,
-                               this,
+    DoubleSliderWidget::create(angleSlider_,
                                nullptr,
                                nullptr,
                                tr("Maximum ground angle"),
@@ -103,12 +100,17 @@ ComputeClassificationWidget::ComputeClassificationWidget(Application *app)
     // Buttons.
     helpButton_ = new PushButton(tr("Help"));
     helpButton_->setIcon(THEME_ICON("question"));
-    connect(helpButton_, SIGNAL(clicked()), this, SLOT(slotHelp()));
+    helpButton_->clicked.connect([this]()
+    {
+        slotHelp();
+    });
 
     applyButton_ = new PushButton(tr("Run"));
     applyButton_->setIcon(THEME_ICON("run"));
-    applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
+    applyButton_->clicked.connect([this]()
+    {
+        slotApply();
+    });
 
     // Buttons layout.
     HBoxLayout *buttonsLayout = new HBoxLayout;
@@ -149,9 +151,9 @@ void ComputeClassificationWidget::slotApply()
     try
     {
         classification_.start(parameters_);
-        ProgressDialog::run(app_,
-                            "Compute Classification",
-                            &classification_);
+        ProgressActionDialog::run(app_,
+                                  "Compute Classification",
+                                  &classification_);
     }
     catch (std::exception &e)
     {
@@ -169,36 +171,37 @@ void ComputeClassificationWidget::slotApply()
 
 void ComputeClassificationWidget::slotHelp()
 {
-    QString t = "<h3>Compute Classification</h3>"
-                "This tool calculates classification of ground points. "
-                "It uses new algorithm which is specialized to classify "
-                "LiDAR point clouds of complex natural forest environments. "
-                "The algorithm is based on global minimum to deal with "
-                "missing data in non scanned or obstructed parts. "
-                "<br><br>"
-                "<img "
-                "src=':/ComputeClassificationResources/classification.png' "
-                "width='362' height='388'/>"
-                "<div>Example dataset with classified ground.</div>"
-                ""
-                "<h3>Algorithm</h3>"
-                "<ol>"
-                "<li>Voxelize the dataset.</li>"
-                "<li>Find voxel with minimal z coordinate and append"
-                " this voxel to working set W.</li>"
-                "<li>While W is not processed, append other"
-                " voxels in search radius from each new voxel in W, if"
-                " selection cone given by maximal ground angle and"
-                " their position does not contain any voxels, eg."
-                " there is nothing below. Voxel is marked as processed"
-                " when it searched for its neighbors.</li>"
-                "<li>All voxels in W are classified as ground points.</li>"
-                "<li>Voxel values are applied back to the dataset.</li>"
-                "</ol>"
-                "<br>"
-                "<img "
-                "src=':/ComputeClassificationResources/classification-alg.png' "
-                "/>";
+    std::string t;
+    t = "<h3>Compute Classification</h3>"
+        "This tool calculates classification of ground points. "
+        "It uses new algorithm which is specialized to classify "
+        "LiDAR point clouds of complex natural forest environments. "
+        "The algorithm is based on global minimum to deal with "
+        "missing data in non scanned or obstructed parts. "
+        "<br><br>"
+        "<img "
+        "src=':/ComputeClassificationResources/classification.png' "
+        "width='362' height='388'/>"
+        "<div>Example dataset with classified ground.</div>"
+        ""
+        "<h3>Algorithm</h3>"
+        "<ol>"
+        "<li>Voxelize the dataset.</li>"
+        "<li>Find voxel with minimal z coordinate and append"
+        " this voxel to working set W.</li>"
+        "<li>While W is not processed, append other"
+        " voxels in search radius from each new voxel in W, if"
+        " selection cone given by maximal ground angle and"
+        " their position does not contain any voxels, eg."
+        " there is nothing below. Voxel is marked as processed"
+        " when it searched for its neighbors.</li>"
+        "<li>All voxels in W are classified as ground points.</li>"
+        "<li>Voxel values are applied back to the dataset.</li>"
+        "</ol>"
+        "<br>"
+        "<img "
+        "src=':/ComputeClassificationResources/classification-alg.png' "
+        "/>";
 
     if (!infoDialog_)
     {

@@ -24,23 +24,18 @@
 
 // Include 3D Forest.
 #include <ComputeElevationAction.hpp>
+#include <Widget.hpp>
 class Application;
-class DoubleSlider;
 class InfoDialog;
-
-// Include Qt.
-#include <Widget>
+class DoubleSliderWidget;
 class PushButton;
 
 /** Compute Elevation Widget. */
 class ComputeElevationWidget : public Widget
 {
-
-
 public:
     ComputeElevationWidget(Application *app);
 
-protected slots:
     void slotApply();
     void slotHelp();
 
@@ -53,7 +48,7 @@ private:
 
     ComputeElevationAction elevation_;
 
-    DoubleSlider *voxelRadiusSlider_;
+    DoubleSliderWidget *voxelRadiusSlider_;
 
     PushButton *helpButton_;
     PushButton *applyButton_;

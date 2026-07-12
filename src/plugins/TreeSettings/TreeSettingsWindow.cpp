@@ -42,6 +42,6 @@ TreeSettingsWindow::TreeSettingsWindow(Application *app)
     setFixedHeight(widget->sizeHint().height());
     setWindowTitle(tr("Tree Settings"));
     setWindowIcon(ICON("tree-settings"));
-    setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    app->addDockWidget(Qt::RightDockWidgetArea, this);
+    setAllowedAreas(Ui::LeftDockWidgetArea | Ui::RightDockWidgetArea);
+    app->addDockWidget(Ui::RightDockWidgetArea, this);
 }

@@ -23,17 +23,13 @@
 #define COMPUTE_TREE_ATTRIBUTES_WINDOW_HPP
 
 // Include 3D Forest.
+#include <Dialog.hpp>
 class Application;
 class ComputeTreeAttributesWidget;
-
-// Include Qt.
-#include <Dialog>
 
 /** Compute Tree Attributes Window. */
 class ComputeTreeAttributesWindow : public Dialog
 {
-
-
 public:
     ComputeTreeAttributesWindow(Application *app);
     ~ComputeTreeAttributesWindow();

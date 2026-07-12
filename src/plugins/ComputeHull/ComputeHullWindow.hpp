@@ -23,17 +23,13 @@
 #define COMPUTE_HULL_WINDOW_HPP
 
 // Include 3D Forest.
+#include <Dialog.hpp>
 class Application;
 class ComputeHullWidget;
-
-// Include Qt.
-#include <Dialog>
 
 /** Compute Hull Window. */
 class ComputeHullWindow : public Dialog
 {
-
-
 public:
     ComputeHullWindow(Application *app);
     ~ComputeHullWindow();

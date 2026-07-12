@@ -32,7 +32,7 @@ class Application;
 class ColorSwitchWidget;
 
 // Include Qt.
-#include <Widget>
+#include <Widget.hpp>
 class CheckBox;
 class QDoubleSpinBox;
 
@@ -49,7 +49,7 @@ public:
 
     void slotUpdate(void *sender, const std::set<Editor::Type> &target);
 
-protected slots:
+
     void slotIntermediateLas(double v);
     void slotIntermediateUser(double v);
     void slotUserDefined(int v);

@@ -53,12 +53,12 @@ private:
     bool isPortFree(int port) const;
     int findFreePort(int startPort) const;
 
-    void start(const QString &binPath,
-               const QString &pythonHome,
-               const QString &pythonPath,
-               const QString &pythonExe,
-               const QString &pyhonScript,
-               const QString &projectPath,
+    void start(const std::string &binPath,
+               const std::string &pythonHome,
+               const std::string &pythonPath,
+               const std::string &pythonExe,
+               const std::string &pyhonScript,
+               const std::string &projectPath,
                int startPort);
 
     Application *app_ = nullptr;

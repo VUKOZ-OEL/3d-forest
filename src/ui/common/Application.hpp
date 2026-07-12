@@ -57,6 +57,9 @@
 class EXPORT_UI_COMMON Application : public ThreadCallbackInterface
 {
 public:
+    static const int ICON_SIZE{16};
+    static const int ICON_SIZE_TEXT{16};
+
     Application();
     virtual ~Application();
 

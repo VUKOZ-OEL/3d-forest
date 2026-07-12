@@ -43,6 +43,6 @@ ApplicationSettingsWindow::ApplicationSettingsWindow(Application *app)
     setFixedHeight(widget->sizeHint().height());
     setWindowTitle(tr("Application Settings"));
     setWindowIcon(ICON("settings"));
-    setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    app->addDockWidget(Qt::RightDockWidgetArea, this);
+    setAllowedAreas(Ui::LeftDockWidgetArea | Ui::RightDockWidgetArea);
+    app->addDockWidget(Ui::RightDockWidgetArea, this);
 }

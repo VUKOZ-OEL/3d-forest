@@ -20,20 +20,20 @@
 /** @file InfoDialog.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <InfoDialog.hpp>
-
-// Include Qt.
-#include <QPushButton>
-#include <QTextEdit>
-#include <QVBoxLayout>
+#include <PushButton.hpp>
+#include <TextEdit.hpp>
+#include <VBoxLayout.hpp>
+#include <HBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "InfoDialog"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-InfoDialog::InfoDialog(QWidget *parent, int w, int h)
-    : QDialog(parent),
+InfoDialog::InfoDialog(Application *app, int w, int h)
+    : Dialog(app),
       defaultWidth_(w),
       defaultHeight_(h),
       textEdit_(nullptr)
@@ -41,20 +41,23 @@ InfoDialog::InfoDialog(QWidget *parent, int w, int h)
     LOG_DEBUG(<< "Create.");
 
     // Text.
-    textEdit_ = new QTextEdit;
-    textEdit_->setFocusPolicy(Qt::NoFocus);
+    textEdit_ = new TextEdit;
+    textEdit_->setFocusPolicy(Ui::NoFocus);
     textEdit_->setReadOnly(true);
 
     // Buttons.
-    closeButton_ = new QPushButton(tr("Close"));
-    connect(closeButton_, SIGNAL(clicked()), this, SLOT(slotClose()));
+    closeButton_ = new PushButton(tr("Close"));
+    closeButton_->clicked.connect([this]()
+    {
+        slotClose();
+    });
 
-    QHBoxLayout *buttonsLayout = new QHBoxLayout;
+    HBoxLayout *buttonsLayout = new HBoxLayout;
     buttonsLayout->addStretch();
     buttonsLayout->addWidget(closeButton_);
 
     // Dialog layout.
-    QVBoxLayout *dialogLayout = new QVBoxLayout;
+    VBoxLayout *dialogLayout = new VBoxLayout;
     dialogLayout->addWidget(textEdit_);
     dialogLayout->addSpacing(10);
     dialogLayout->addLayout(buttonsLayout);
@@ -62,17 +65,17 @@ InfoDialog::InfoDialog(QWidget *parent, int w, int h)
     setLayout(dialogLayout);
 }
 
-QSize InfoDialog::sizeHint() const
+Size InfoDialog::sizeHint() const
 {
-    return QSize(defaultWidth_, defaultHeight_);
+    return Size(defaultWidth_, defaultHeight_);
 }
 
-QSize InfoDialog::minimumSizeHint() const
+Size InfoDialog::minimumSizeHint() const
 {
-    return QSize(defaultWidth_, defaultHeight_);
+    return Size(defaultWidth_, defaultHeight_);
 }
 
-void InfoDialog::setText(const QString &text)
+void InfoDialog::setText(const std::string &text)
 {
     textEdit_->setText(text);
 }

@@ -27,7 +27,7 @@ class Application;
 class FilterIntensityWidget;
 
 // Include Qt.
-#include <DockWidget>
+#include <DockWidget.hpp>
 class QCloseEvent;
 
 /** Filter Intensity Window. */
@@ -41,7 +41,7 @@ public:
 protected:
     FilterIntensityWidget *widget_;
 
-    void showEvent(QShowEvent *event) override;
+    void showEvent(ShowEvent *event) override;
     void hideEvent(HideEvent *event) override;
 
     void closeEvent(QCloseEvent *event) override;

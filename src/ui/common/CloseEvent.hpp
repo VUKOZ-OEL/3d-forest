@@ -17,23 +17,26 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ImportFileInterface.hpp */
+/** @file CloseEvent.hpp */
 
-#ifndef IMPORT_FILE_INTERFACE_HPP
-#define IMPORT_FILE_INTERFACE_HPP
+#ifndef CLOSE_EVENT_HPP
+#define CLOSE_EVENT_HPP
+
+// Include 3D Forest.
+#include <Event.hpp>
 
 // Include local.
-#include <ExportGui.hpp>
+#include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
 
-/** Import File Interface. */
-class EXPORT_GUI ImportFileInterface
+/** CloseEvent. */
+class EXPORT_UI_COMMON CloseEvent : public Event
 {
 public:
-    virtual ~ImportFileInterface() = default;
-    virtual void importFile() = 0;
+
+private:
 };
 
 #include <WarningsEnable.hpp>
 
-#endif /* IMPORT_FILE_INTERFACE_HPP */
+#endif /* CLOSE_EVENT_HPP */

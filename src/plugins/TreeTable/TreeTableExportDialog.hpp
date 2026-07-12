@@ -27,9 +27,9 @@
 class Application;
 
 // Include Qt.
-#include <Dialog>
+#include <Dialog.hpp>
 class CheckBox;
-class QLineEdit;
+class LineEdit;
 class PushButton;
 
 /** Tree Table Export Dialog. */
@@ -38,7 +38,7 @@ class TreeTableExportDialog : public Dialog
 
 
 public:
-    TreeTableExportDialog(Application *app, const QString &fileName);
+    TreeTableExportDialog(Application *app, const std::string &fileName);
 
     std::shared_ptr<FileFormatInterface> writer() const;
 
@@ -50,7 +50,7 @@ public:
 private:
     Application *app_;
 
-    QLineEdit *fileNameLineEdit_;
+    LineEdit *fileNameLineEdit_;
     PushButton *browseButton_;
 
     PushButton *acceptButton_;

@@ -40,10 +40,6 @@ class ComputeHullWindow;
 class ComputeHullPlugin : 
                                                      public Plugin
 {
-
-
-
-
 public:
     ComputeHullPlugin();
 

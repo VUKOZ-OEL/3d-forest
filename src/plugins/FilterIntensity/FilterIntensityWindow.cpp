@@ -47,23 +47,23 @@ FilterIntensityWindow::FilterIntensityWindow(Application *app)
     setFixedHeight(widget()->sizeHint().height());
     setWindowTitle(tr("Filter Intensity"));
     setWindowIcon(ICON("intensity-filter"));
-    setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    app->addDockWidget(Qt::RightDockWidgetArea, this);
+    setAllowedAreas(Ui::LeftDockWidgetArea | Ui::RightDockWidgetArea);
+    app->addDockWidget(Ui::RightDockWidgetArea, this);
 
     LOG_DEBUG(<< "Finished creating intensity filter window.");
 }
 
-void FilterIntensityWindow::showEvent(QShowEvent *event)
+void FilterIntensityWindow::showEvent(ShowEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Show event.");
     // widget_->setFilterEnabled(true);
-    Widget::showEvent(event);
+    DockWidget::showEvent(event);
 }
 
 void FilterIntensityWindow::hideEvent(HideEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Hide event.");
-    Widget::hideEvent(event);
+    DockWidget::hideEvent(event);
 }
 
 void FilterIntensityWindow::closeEvent(QCloseEvent *event)

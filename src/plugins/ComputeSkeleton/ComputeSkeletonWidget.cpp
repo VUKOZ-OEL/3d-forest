@@ -21,16 +21,14 @@
 
 // Include 3D Forest.
 #include <ComputeSkeletonWidget.hpp>
-#include <DoubleSlider.hpp>
+#include <DoubleSliderWidget.hpp>
 #include <InfoDialog.hpp>
 #include <Application.hpp>
-#include <ProgressDialog.hpp>
+#include <ProgressActionDialog.hpp>
 #include <ThemeIcon.hpp>
-
-// Include Qt.
-#include <HBoxLayout>
-#include <PushButton>
-#include <VBoxLayout>
+#include <HBoxLayout.hpp>
+#include <PushButton.hpp>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeSkeletonWidget"
@@ -47,9 +45,8 @@ ComputeSkeletonWidget::ComputeSkeletonWidget(Application *app)
     LOG_DEBUG(<< "Create.");
 
     // Voxel size.
-    DoubleSlider::create(
+    DoubleSliderWidget::create(
         voxelSizeSlider_,
-        this,
         nullptr,
         nullptr,
         tr("Voxel size"),
@@ -71,8 +68,10 @@ ComputeSkeletonWidget::ComputeSkeletonWidget(Application *app)
     // Buttons.
     applyButton_ = new PushButton(tr("Run"));
     applyButton_->setIcon(THEME_ICON("run"));
-    applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
+    applyButton_->clicked.connect([this]()
+    {
+        slotApply();
+    });
 
     // Buttons layout.
     HBoxLayout *buttonsLayout = new HBoxLayout;
@@ -109,7 +108,7 @@ void ComputeSkeletonWidget::slotApply()
     {
         action_.start(parameters_);
 
-        ProgressDialog::run(app_,
+        ProgressActionDialog::run(app_,
                             "Computing Compute Skeleton",
                             &action_);
     }

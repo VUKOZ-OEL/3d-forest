@@ -21,63 +21,61 @@
 
 // Include 3D Forest.
 #include <InputComboBoxDialog.hpp>
-
-// Include Qt.
-#include <QComboBox>
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QVBoxLayout>
+#include <ComboBox.hpp>
+#include <HBoxLayout.hpp>
+#include <PushButton.hpp>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "InputComboBoxDialog"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-InputComboBoxDialog::InputComboBoxDialog(QWidget *parent) : QDialog(parent)
+InputComboBoxDialog::InputComboBoxDialog(Application *app) : Dialog(app)
 {
     setWindowTitle("Select a value");
 
-    comboBox = new QComboBox(this);
+    comboBox_ = new ComboBox;
 
-    okButton = new QPushButton("Ok", this);
-    cancelButton = new QPushButton("Cancel", this);
+    okButton_ = new PushButton("Ok");
+    okButton_->clicked.connect([this]()
+    {
+        accept();
+    });
 
-    connect(okButton,
-            &QPushButton::clicked,
-            this,
-            &InputComboBoxDialog::accept);
-    connect(cancelButton,
-            &QPushButton::clicked,
-            this,
-            &InputComboBoxDialog::reject);
+    cancelButton_ = new PushButton("Cancel");
+    cancelButton_->clicked.connect([this]()
+    {
+        reject();
+    });
 
-    QHBoxLayout *buttonLayout = new QHBoxLayout;
-    buttonLayout->addWidget(okButton);
-    buttonLayout->addWidget(cancelButton);
+    HBoxLayout *buttonLayout = new HBoxLayout;
+    buttonLayout->addWidget(okButton_);
+    buttonLayout->addWidget(cancelButton_);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->addWidget(comboBox);
+    VBoxLayout *mainLayout = new VBoxLayout;
+    mainLayout->addWidget(comboBox_);
     mainLayout->addLayout(buttonLayout);
 
     setLayout(mainLayout);
 }
 
-void InputComboBoxDialog::setOkButtonText(const QString &text)
+void InputComboBoxDialog::setOkButtonText(const std::string &text)
 {
-    okButton->setText(text);
+    okButton_->setText(text);
 }
 
-void InputComboBoxDialog::addItem(const QString &text)
+void InputComboBoxDialog::addItem(const std::string &text)
 {
-    comboBox->addItem(text);
+    comboBox_->addItem(text);
 }
 
 int InputComboBoxDialog::currentIndex() const
 {
-    return comboBox->currentIndex();
+    return comboBox_->currentIndex();
 }
 
-QString InputComboBoxDialog::currentText() const
+std::string InputComboBoxDialog::currentText() const
 {
-    return comboBox->currentText();
+    return comboBox_->currentText();
 }

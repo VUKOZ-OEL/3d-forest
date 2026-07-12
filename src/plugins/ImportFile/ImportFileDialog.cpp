@@ -26,13 +26,13 @@
 #include <ThemeIcon.hpp>
 
 // Include Qt.
-#include <CheckBox>
-#include <GridLayout>
-#include <GroupBox>
-#include <HBoxLayout>
-#include <Label>
-#include <PushButton>
-#include <VBoxLayout>
+#include <CheckBox.hpp>
+#include <GridLayout.hpp>
+#include <GroupBox.hpp>
+#include <HBoxLayout.hpp>
+#include <Label.hpp>
+#include <PushButton.hpp>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ImportFileDialog"
@@ -169,7 +169,7 @@ ImportSettings ImportFileDialog::settings() const
 
 void ImportFileDialog::slotHelp()
 {
-    QString t;
+    std::string t;
     t = "<h3>Import File</h3>"
         "<h2>Options</h2>"
         "The import file dialog allows to set the following options: "

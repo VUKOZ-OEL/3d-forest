@@ -23,17 +23,13 @@
 #define COMPUTE_ELEVATION_WINDOW_HPP
 
 // Include 3D Forest.
+#include <Dialog.hpp>
 class Application;
 class ComputeElevationWidget;
-
-// Include Qt.
-#include <Dialog>
 
 /** Compute Elevation Window. */
 class ComputeElevationWindow : public Dialog
 {
-
-
 public:
     ComputeElevationWindow(Application *app);
 

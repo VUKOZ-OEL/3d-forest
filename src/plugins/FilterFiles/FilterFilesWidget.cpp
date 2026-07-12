@@ -25,15 +25,15 @@
 #include <ThemeIcon.hpp>
 
 // Include Qt.
-#include <HBoxLayout>
-#include <Label>
-#include <PushButton>
+#include <HBoxLayout.hpp>
+#include <Label.hpp>
+#include <PushButton.hpp>
 #include <QToolBar>
 #include <QToolButton>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QTreeWidgetItemIterator>
-#include <VBoxLayout>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterFilesWidget"
@@ -211,7 +211,7 @@ void FilterFilesWidget::setDatasets(const Datasets &datasets,
 
     // Sort Content.
     tree_->setSortingEnabled(true);
-    tree_->sortItems(COLUMN_ID, Qt::AscendingOrder);
+    tree_->sortItems(COLUMN_ID, Ui::AscendingOrder);
 
     unblock();
 }
@@ -251,7 +251,7 @@ void FilterFilesWidget::slotShow()
         updatesEnabled_ = false;
         for (auto &item : items)
         {
-            item->setCheckState(COLUMN_CHECKED, Qt::Checked);
+            item->setCheckState(COLUMN_CHECKED, Ui::Checked);
             filter_.setEnabled(index(item), true);
         }
         updatesEnabled_ = true;
@@ -269,7 +269,7 @@ void FilterFilesWidget::slotHide()
         updatesEnabled_ = false;
         for (auto &item : items)
         {
-            item->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
+            item->setCheckState(COLUMN_CHECKED, Ui::Unchecked);
             filter_.setEnabled(index(item), false);
         }
         updatesEnabled_ = true;
@@ -340,7 +340,7 @@ void FilterFilesWidget::slotItemChanged(QTreeWidgetItem *item, int column)
     if (column == COLUMN_CHECKED)
     {
         size_t id = identifier(item);
-        bool checked = (item->checkState(COLUMN_CHECKED) == Qt::Checked);
+        bool checked = (item->checkState(COLUMN_CHECKED) == Ui::Checked);
 
         filter_.setEnabled(id, checked);
 
@@ -373,11 +373,11 @@ void FilterFilesWidget::updateTree()
 
         if (filter_.enabled(id))
         {
-            (*it)->setCheckState(COLUMN_CHECKED, Qt::Checked);
+            (*it)->setCheckState(COLUMN_CHECKED, Ui::Checked);
         }
         else
         {
-            (*it)->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
+            (*it)->setCheckState(COLUMN_CHECKED, Ui::Unchecked);
         }
 
         ++it;
@@ -414,18 +414,18 @@ void FilterFilesWidget::addTreeItem(size_t index)
 
     if (filter_.enabled(id))
     {
-        item->setCheckState(COLUMN_CHECKED, Qt::Checked);
+        item->setCheckState(COLUMN_CHECKED, Ui::Checked);
     }
     else
     {
-        item->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
+        item->setCheckState(COLUMN_CHECKED, Ui::Unchecked);
     }
 
-    item->setText(COLUMN_ID, QString::number(id));
+    item->setText(COLUMN_ID, std::string::number(id));
 
-    item->setText(COLUMN_LABEL, QString::fromStdString(datasets_.label(index)));
+    item->setText(COLUMN_LABEL, std::string::fromStdString(datasets_.label(index)));
     item->setText(COLUMN_DATE_CREATED,
-                  QString::fromStdString(datasets_.dateCreated(index)));
+                  std::string::fromStdString(datasets_.dateCreated(index)));
 
     // Color legend.
     const Vector3<double> &rgb = datasets_.color(index);
@@ -435,6 +435,6 @@ void FilterFilesWidget::addTreeItem(size_t index)
     color.setGreenF(static_cast<float>(rgb[1]));
     color.setBlueF(static_cast<float>(rgb[2]));
 
-    QBrush brush(color, Qt::SolidPattern);
+    QBrush brush(color, Ui::SolidPattern);
     item->setBackground(COLUMN_ID, brush);
 }

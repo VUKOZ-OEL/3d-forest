@@ -25,11 +25,11 @@
 #include <UnitsSettingsWidget.hpp>
 
 // Include Qt.
-#include <CheckBox>
+#include <CheckBox.hpp>
 #include <QDoubleSpinBox>
-#include <GridLayout>
-#include <Label>
-#include <VBoxLayout>
+#include <GridLayout.hpp>
+#include <Label.hpp>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "UnitsSettingsWidget"

@@ -23,10 +23,7 @@
 #include <EditPluginSetClassification.hpp>
 #include <InputComboBoxDialog.hpp>
 #include <Application.hpp>
-
-// Include Qt.
-#include <QCoreApplication>
-#include <QProgressDialog>
+#include <ProgressDialog.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "EditPluginSetClassification"
@@ -45,15 +42,14 @@ void EditPluginSetClassification::run(Application *app)
     Editor *editor = &app->editor();
 
     // Input.
-    InputComboBoxDialog dialog;
-    dialog.setWindowTitle("Select a classification");
+    InputComboBoxDialog dialog(app);
+    dialog.setWindowTitle(tr("Select a classification"));
 
     // Set dialog items.
     const Classifications &classifications = editor->classifications();
     for (size_t i = 0; i < classifications.size(); i++)
     {
-        QString text = QString::number(i) + " : " +
-                       QString::fromStdString(classifications.label(i));
+        std::string text = toString(i) + " : " + classifications.label(i);
         dialog.addItem(text);
     }
 
@@ -72,8 +68,9 @@ void EditPluginSetClassification::run(Application *app)
     }
 
     // Run.
-    QProgressDialog progress("Processing...", "Cancel", 0, 0);
-    progress.setWindowModality(Qt::WindowModal);
+    ProgressDialog progress(app);
+    progress.setWindowTitle(tr("Processing..."));
+    progress.setWindowModality(Ui::WindowModal);
     progress.show();
 
     Query query(editor);
@@ -92,7 +89,7 @@ void EditPluginSetClassification::run(Application *app)
         {
             counter = 0;
 
-            QCoreApplication::processEvents();
+            app->processEvents();
 
             if (progress.wasCanceled())
             {

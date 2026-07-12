@@ -25,7 +25,7 @@
 #include <ThemeIcon.hpp>
 
 // Include Qt.
-#include <QMessageBox>
+#include <MessageBox.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "HelpPlugin"
@@ -54,7 +54,7 @@ void HelpPlugin::initialize(Application *app)
 
 void HelpPlugin::slotAbout()
 {
-    QMessageBox::about(
+    MessageBox::about(
         app_,
         tr("About 3D Forest, version ") + Application::APPLICATION_VERSION,
         tr("3D Forest is software for analysis, processing, and visualization"

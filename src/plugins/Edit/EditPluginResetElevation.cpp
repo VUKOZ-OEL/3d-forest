@@ -22,10 +22,7 @@
 // Include 3D Forest.
 #include <EditPluginResetElevation.hpp>
 #include <Application.hpp>
-
-// Include Qt.
-#include <QCoreApplication>
-#include <QProgressDialog>
+#include <ProgressDialog.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "EditPluginResetElevation"
@@ -44,8 +41,9 @@ void EditPluginResetElevation::run(Application *app)
     Editor *editor = &app->editor();
 
     // Run.
-    QProgressDialog progress("Processing...", "Cancel", 0, 0);
-    progress.setWindowModality(Qt::WindowModal);
+    ProgressDialog progress(app);
+    progress.setWindowTitle(tr("Processing..."));
+    progress.setWindowModality(Ui::WindowModal);
     progress.show();
 
     Query query(editor);
@@ -64,7 +62,7 @@ void EditPluginResetElevation::run(Application *app)
         {
             counter = 0;
 
-            QCoreApplication::processEvents();
+            app->processEvents();
 
             if (progress.wasCanceled())
             {
