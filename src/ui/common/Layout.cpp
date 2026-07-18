@@ -23,6 +23,7 @@
 
 // Include 3D Forest.
 #include <Layout.hpp>
+#include <Splitter.hpp>
 #include <Application.hpp>
 
 // Include local.
@@ -37,15 +38,30 @@ Layout::~Layout()
 {
 }
 
-void Layout::addWidget(Widget *widget)
+void Layout::clear()
+{
+#if 0
+    while (QLayoutItem *item = mainLayout_->takeAt(0))
+    {
+        if (Widget *w = item->widget())
+        {
+            w->deleteLater();
+        }
+
+        delete item;
+    }
+#endif
+}
+
+void Layout::addWidget(Widget *widget, int stretch)
 {
 }
 
-void Layout::addWidget(Widget *widget, int row, int column, int alignment)
+void Layout::addWidget(Splitter *widget, int stretch)
 {
 }
 
-void Layout::addLayout(Layout *layout)
+void Layout::addLayout(Layout *layout, int stretch)
 {
 }
 
@@ -54,5 +70,17 @@ void Layout::addStretch()
 }
 
 void Layout::addSpacing(int spacing)
+{
+}
+
+void Layout::setContentsMargins(int left, int top, int right, int bottom)
+{
+}
+
+void Layout::addWidget(Widget *widget, int row, int column, int alignment)
+{
+}
+
+void Layout::addWidget(Widget *widget, int row, int column, int rowSpan, int columnSpan, int alignment)
 {
 }

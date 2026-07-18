@@ -23,8 +23,6 @@
 #include <DoubleRangeSliderWidget.hpp>
 #include <FilterIntensityWidget.hpp>
 #include <Application.hpp>
-
-// Include Qt.
 #include <HBoxLayout.hpp>
 #include <PushButton.hpp>
 #include <VBoxLayout.hpp>
@@ -42,10 +40,9 @@ FilterIntensityWidget::FilterIntensityWidget(Application *app)
 
     // Input widgets.
     DoubleRangeSliderWidget::create(intensityInput_,
-                                    this,
-                                    SLOT(slotRangeIntermediateMinimumValue()),
-                                    SLOT(slotRangeIntermediateMaximumValue()),
-                                    SLOT(slotFinalValue()),
+        [this](double val){ slotMinimumValueChanged(val); },
+        [this](double val){ slotMaximumValueChanged(val); },
+        [this](){ slotFinalValue(); },
                                     tr("Intensity"),
                                     tr("Min-max intensity range filter"),
                                     tr("%"),
@@ -123,7 +120,7 @@ void FilterIntensityWidget::setFilterEnabled(bool b)
     filterChanged(true);
 }
 
-void FilterIntensityWidget::slotRangeIntermediateMinimumValue()
+void FilterIntensityWidget::slotMinimumValueChanged(double val)
 {
     LOG_DEBUG(<< "Minimum value changed.");
 
@@ -131,7 +128,7 @@ void FilterIntensityWidget::slotRangeIntermediateMinimumValue()
     filterChanged(false);
 }
 
-void FilterIntensityWidget::slotRangeIntermediateMaximumValue()
+void FilterIntensityWidget::slotMaximumValueChanged(double val)
 {
     LOG_DEBUG(<< "Maximum value changed.");
 

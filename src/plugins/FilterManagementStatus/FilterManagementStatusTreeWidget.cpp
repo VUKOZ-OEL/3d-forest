@@ -23,8 +23,6 @@
 #include <Core.hpp>
 #include <FilterManagementStatusTreeWidget.hpp>
 #include <Application.hpp>
-
-// Include Qt.
 #include <CheckBox.hpp>
 #include <Label.hpp>
 #include <VBoxLayout.hpp>
@@ -67,7 +65,7 @@ FilterManagementStatusTreeWidget::createMap()
         const ManagementStatus &status = statusList[i];
         FilterManagementStatusTreeWidget::Status statusItem;
         statusItem.statusId = status.id;
-        statusItem.label = std::string::fromStdString(status.label);
+        statusItem.label = status.label;
 
         statusMap[i] = statusItem;
     }
@@ -80,30 +78,23 @@ void FilterManagementStatusTreeWidget::createCheckBoxList()
     LOG_DEBUG(<< "Create check box list.");
 
     // Delete.
-    while (QLayoutItem *item = mainLayout_->takeAt(0))
-    {
-        if (Widget *w = item->widget())
-        {
-            w->deleteLater();
-        }
-
-        delete item;
-    }
-
+    mainLayout_->clear();
     checkboxList_.clear();
 
     // Checkbox list
     checkboxList_.resize(statusMap_.size());
     for (size_t i = 0; i < checkboxList_.size(); i++)
     {
-        checkboxList_[i] = new CheckBox;
-        checkboxList_[i]->setChecked(false);
-        auto label = core().translate(statusMap_[i].label.toStdString());
-        checkboxList_[i]->setText(std::string::fromStdString(label));
-        connect(checkboxList_[i],
-                SIGNAL(clicked(bool)),
-                this,
-                SLOT(slotSetCheckbox(bool)));
+        CheckBox *checkbox = new CheckBox;
+        checkbox->setChecked(false);
+        // auto label = core().translate(statusMap_[i].label);
+        checkbox->setText(statusMap_[i].label);
+        checkbox->clicked.connect([this, checkbox](bool val)
+        {
+            slotSetCheckbox(val, checkbox);
+        });
+
+        checkboxList_[i] = checkbox;
     }
 
     // Layout.
@@ -130,15 +121,14 @@ void FilterManagementStatusTreeWidget::updateCheckBoxList()
     }
 }
 
-void FilterManagementStatusTreeWidget::slotSetCheckbox(bool b)
+void FilterManagementStatusTreeWidget::slotSetCheckbox(bool b, CheckBox *sender)
 {
     LOG_DEBUG(<< "Checkbox clicked.");
     (void)b;
 
-    QObject *obj = sender();
     for (size_t i = 0; i < checkboxList_.size(); i++)
     {
-        if (obj == checkboxList_[i])
+        if (sender == checkboxList_[i])
         {
             LOG_DEBUG(<< "Checkbox pos <" << i << "> sender.");
             checkboxList_[i]->setChecked(true);

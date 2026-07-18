@@ -23,10 +23,8 @@
 #include <Application.hpp>
 #include <ThemeIcon.hpp>
 #include <UnitsSettingsWidget.hpp>
-
-// Include Qt.
 #include <CheckBox.hpp>
-#include <QDoubleSpinBox>
+#include <DoubleSpinBox.hpp>
 #include <GridLayout.hpp>
 #include <Label.hpp>
 #include <VBoxLayout.hpp>
@@ -43,33 +41,33 @@ UnitsSettingsWidget::UnitsSettingsWidget(Application *app)
       app_(app)
 {
     // Widgets.
-    ppmLasSpinBox_ = new QDoubleSpinBox;
+    ppmLasSpinBox_ = new DoubleSpinBox;
     ppmLasSpinBox_->setRange(1, 1000000);
     ppmLasSpinBox_->setValue(1000);
     ppmLasSpinBox_->setSingleStep(1);
     ppmLasSpinBox_->setEnabled(false);
-    connect(ppmLasSpinBox_,
-            SIGNAL(valueChanged(double)),
-            this,
-            SLOT(slotIntermediateLas(double)));
+    ppmLasSpinBox_->valueChanged.connect([this](double val)
+    {
+        slotIntermediateLas(val);
+    });
 
-    ppmUserSpinBox_ = new QDoubleSpinBox;
+    ppmUserSpinBox_ = new DoubleSpinBox;
     ppmUserSpinBox_->setRange(1, 1000000);
     ppmUserSpinBox_->setValue(1000);
     ppmUserSpinBox_->setSingleStep(1);
     ppmUserSpinBox_->setEnabled(settings_.userDefined);
-    connect(ppmUserSpinBox_,
-            SIGNAL(valueChanged(double)),
-            this,
-            SLOT(slotIntermediateUser(double)));
+    ppmUserSpinBox_->valueChanged.connect([this](double val)
+    {
+        slotIntermediateUser(val);
+    });
 
     userDefinedCheckBox_ = new CheckBox;
     userDefinedCheckBox_->setChecked(settings_.userDefined);
     // userDefinedCheckBox_->setText(tr("Enabled"));
-    connect(userDefinedCheckBox_,
-            SIGNAL(stateChanged(int)),
-            this,
-            SLOT(slotUserDefined(int)));
+    userDefinedCheckBox_->stateChanged.connect([this](int val)
+    {
+        slotUserDefined(val);
+    });
 
     Label *help = new Label;
     help->setToolTip(tr("The values are in points per meter.\n"

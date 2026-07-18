@@ -28,26 +28,24 @@
 
 // Include 3D Forest.
 class Application;
-
-// Include Qt.
-class QAction;
-class QMenu;
+class Action;
+class Menu;
 
 /** Tree Table Set Species. */
 class TreeTableSetSpecies
 {
 public:
-    TreeTableSetSpecies(Application *app, QMenu *contextMenu);
+    TreeTableSetSpecies(Application *app, Menu *contextMenu);
 
-    void runAction(QAction *selectedAction, std::unordered_set<size_t> idList);
+    void runAction(Action *selectedAction, std::unordered_set<size_t> idList);
 
     static void run(Application *app, std::unordered_set<size_t> idList);
 
 private:
     Application *app_;
-    QMenu *contextMenu_;
-    QMenu *menu_;
-    std::map<QAction *, size_t> actions_;
+    Menu *contextMenu_;
+    Menu *menu_;
+    std::map<Action *, size_t> actions_;
 
     void create();
 };

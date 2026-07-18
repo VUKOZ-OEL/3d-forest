@@ -23,20 +23,16 @@
 #define FILTER_INTENSITY_WIDGET_HPP
 
 // Include 3D Forest.
+#include <Widget.hpp>
 #include <Editor.hpp>
 #include <Range.hpp>
 #include <Region.hpp>
 class DoubleRangeSliderWidget;
 class Application;
 
-// Include Qt.
-#include <Widget.hpp>
-
 /** Filter Intensity Widget. */
 class FilterIntensityWidget : public Widget
 {
-
-
 public:
     FilterIntensityWidget(Application *app);
 
@@ -44,11 +40,10 @@ public:
 
     Size sizeHint() const override { return Size(300, 120); }
 
-
     void slotUpdate(void *sender, const std::set<Editor::Type> &target);
 
-    void slotRangeIntermediateMinimumValue();
-    void slotRangeIntermediateMaximumValue();
+    void slotMinimumValueChanged(double val);
+    void slotMaximumValueChanged(double val);
     void slotFinalValue();
 
 protected:

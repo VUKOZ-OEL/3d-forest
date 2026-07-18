@@ -24,8 +24,6 @@
 #include <Application.hpp>
 #include <ThemeIcon.hpp>
 #include <TreeTableExportDialog.hpp>
-
-// Include Qt.
 #include <CheckBox.hpp>
 #include <FileDialog.hpp>
 #include <GridLayout.hpp>
@@ -53,7 +51,10 @@ TreeTableExportDialog::TreeTableExportDialog(Application *app,
     fileNameLineEdit_->setText(fileName);
 
     browseButton_ = new PushButton(tr("Browse"));
-    connect(browseButton_, SIGNAL(clicked()), this, SLOT(slotBrowse()));
+    browseButton_->clicked.connect([this]()
+    {
+        slotBrowse();
+    });
 
     HBoxLayout *fileNameLayout = new HBoxLayout;
     fileNameLayout->addWidget(new Label(tr("File")));
@@ -62,10 +63,16 @@ TreeTableExportDialog::TreeTableExportDialog(Application *app,
 
     // Buttons.
     acceptButton_ = new PushButton(tr("Export"));
-    connect(acceptButton_, SIGNAL(clicked()), this, SLOT(slotAccept()));
+    acceptButton_->clicked.connect([this]()
+    {
+        slotAccept();
+    });
 
     rejectButton_ = new PushButton(tr("Cancel"));
-    connect(rejectButton_, SIGNAL(clicked()), this, SLOT(slotReject()));
+    rejectButton_->clicked.connect([this]()
+    {
+        slotReject();
+    });
 
     HBoxLayout *dialogButtons = new HBoxLayout;
     dialogButtons->addStretch();
@@ -90,9 +97,6 @@ TreeTableExportDialog::TreeTableExportDialog(Application *app,
 
 void TreeTableExportDialog::slotBrowse()
 {
-    FileDialog::Options options;
-    options = QFlag(FileDialog::DontConfirmOverwrite);
-
     std::string selectedFilter;
 
     std::string fileName =
@@ -101,9 +105,9 @@ void TreeTableExportDialog::slotBrowse()
                                      fileNameLineEdit_->text(),
                                      tr("Comma Separated Values (*.csv)"),
                                      &selectedFilter,
-                                     options);
+                                     FileDialog::DontConfirmOverwrite);
 
-    if (fileName.isEmpty())
+    if (fileName.empty())
     {
         return;
     }
@@ -115,19 +119,17 @@ void TreeTableExportDialog::slotAccept()
 {
     std::string path = fileNameLineEdit_->text();
 
-    if (path.isEmpty())
+    if (path.empty())
     {
-        (void)MessageBox::information(this,
+        (void)MessageBox::information(app_,
                                        tr("Export File"),
                                        tr("Please choose a file name."));
         return;
     }
 
-    if (File::exists(path.toStdString()))
+    if (File::exists(path))
     {
-        MessageBox::StandardButton reply;
-
-        reply = MessageBox::question(this,
+        int reply = MessageBox::question(app_,
                                       tr("Export File"),
                                       tr("Overwrite existing file?"),
                                       MessageBox::Yes | MessageBox::No);
@@ -150,7 +152,7 @@ void TreeTableExportDialog::slotReject()
 
 std::shared_ptr<FileFormatInterface> TreeTableExportDialog::writer() const
 {
-    std::string path = fileNameLineEdit_->text().toStdString();
+    std::string path = fileNameLineEdit_->text();
     std::string ext = toLower(File::fileExtension(path));
 
     if (ext == "csv")

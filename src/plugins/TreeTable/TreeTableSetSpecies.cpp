@@ -23,11 +23,8 @@
 #include <InputComboBoxDialog.hpp>
 #include <Application.hpp>
 #include <TreeTableSetSpecies.hpp>
-
-// Include Qt.
-#include <QAction>
-#include <QCoreApplication>
-#include <QMenu>
+#include <Action.hpp>
+#include <Menu.hpp>
 #include <ProgressDialog.hpp>
 
 // Include local.
@@ -36,7 +33,7 @@
 #include <Log.hpp>
 
 TreeTableSetSpecies::TreeTableSetSpecies(Application *app,
-                                         QMenu *contextMenu)
+                                         Menu *contextMenu)
     : app_(app),
       contextMenu_(contextMenu),
       menu_(nullptr)
@@ -46,7 +43,7 @@ TreeTableSetSpecies::TreeTableSetSpecies(Application *app,
 
 void TreeTableSetSpecies::create()
 {
-    menu_ = new QMenu("Set Species", contextMenu_);
+    menu_ = new Menu("Set Species", contextMenu_);
 
     // Set dialog items.
     Editor *editor = &app_->editor();
@@ -54,10 +51,9 @@ void TreeTableSetSpecies::create()
     for (size_t i = 0; i < speciesList.size(); i++)
     {
         const Species &species = speciesList[i];
-        std::string text = std::string::number(species.id) + " : " +
-                       std::string::fromStdString(species.latin);
+        std::string text = toString(species.id) + " : " + species.latin;
 
-        QAction *action = menu_->addAction(text);
+        Action *action = menu_->addAction(text);
         actions_[action] = species.id;
     }
 
@@ -65,7 +61,7 @@ void TreeTableSetSpecies::create()
     contextMenu_->addMenu(menu_);
 }
 
-void TreeTableSetSpecies::runAction(QAction *selectedAction,
+void TreeTableSetSpecies::runAction(Action *selectedAction,
                                     std::unordered_set<size_t> idList)
 {
     auto it = actions_.find(selectedAction);
@@ -108,7 +104,7 @@ void TreeTableSetSpecies::run(Application *app,
     Editor *editor = &app->editor();
 
     // Input.
-    InputComboBoxDialog dialog;
+    InputComboBoxDialog dialog(app);
     dialog.setWindowTitle("Select a species");
 
     // Set dialog items.
@@ -116,8 +112,7 @@ void TreeTableSetSpecies::run(Application *app,
     for (size_t i = 0; i < speciesList.size(); i++)
     {
         const Species &species = speciesList[i];
-        std::string text = std::string::number(species.id) + " : " +
-                       std::string::fromStdString(species.latin);
+        std::string text = toString(species.id) + " : " + species.latin;
         dialog.addItem(text);
     }
 

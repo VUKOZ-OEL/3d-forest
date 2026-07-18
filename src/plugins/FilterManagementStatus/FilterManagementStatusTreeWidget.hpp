@@ -27,27 +27,22 @@
 #include <vector>
 
 // Include 3D Forest.
+#include <Widget.hpp>
 #include <Segment.hpp>
 class Application;
-
-// Include Qt.
-#include <Widget.hpp>
 class CheckBox;
 class VBoxLayout;
 
 /** Management Status Tree Widget. */
 class FilterManagementStatusTreeWidget : public Widget
 {
-
-
 public:
     FilterManagementStatusTreeWidget(Application *app);
 
     void setSegment(const Segment &segment);
     void clear();
 
-
-    void slotSetCheckbox(bool b);
+    void slotSetCheckbox(bool b, CheckBox *sender);
 
 protected:
     Application *app_;

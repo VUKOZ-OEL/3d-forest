@@ -27,6 +27,8 @@
 
 // Include 3D Forest.
 #include <Signal.hpp>
+#include <SizePolicy.hpp>
+#include <Palette.hpp>
 #include <Size.hpp>
 #include <PaintEvent.hpp>
 #include <MouseEvent.hpp>
@@ -61,6 +63,12 @@ public:
 
     void setLayout(Layout *layout);
 
+    void setSizePolicy(SizePolicy::Policy hor, SizePolicy::Policy ver);
+    void setStyleSheet(const std::string &str);
+
+    Palette palette() const { return palette_; }
+    void setPalette(const Palette &palette);
+
     bool blockSignals(bool b);
     bool signalsBlocked() const;
 
@@ -79,6 +87,7 @@ private:
     std::string text_;
     std::string toolTip_;
     bool signalsBlocked_{false};
+    Palette palette_;
 };
 
 #include <WarningsEnable.hpp>

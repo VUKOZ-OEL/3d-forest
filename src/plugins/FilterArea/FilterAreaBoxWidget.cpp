@@ -41,10 +41,9 @@ FilterAreaBoxWidget::FilterAreaBoxWidget(Application *app)
     // Widgets.
     DoubleRangeSliderWidget::create(
         rangeInput_[0],
-        this,
-        SLOT(slotRangeIntermediateMinimumValue()),
-        SLOT(slotRangeIntermediateMaximumValue()),
-        SLOT(slotFinalValue()),
+        [this](double val){ slotMinimumValueChanged(val, 0); },
+        [this](double val){ slotMaximumValueChanged(val, 0); },
+        [this](){ slotFinalValue(); },
         tr("X range"),
         tr("Min-max clipping range filter along X axis"),
         tr("m"),
@@ -56,10 +55,9 @@ FilterAreaBoxWidget::FilterAreaBoxWidget(Application *app)
 
     DoubleRangeSliderWidget::create(
         rangeInput_[1],
-        this,
-        SLOT(slotRangeIntermediateMinimumValue()),
-        SLOT(slotRangeIntermediateMaximumValue()),
-        SLOT(slotFinalValue()),
+        [this](double val){ slotMinimumValueChanged(val, 1); },
+        [this](double val){ slotMaximumValueChanged(val, 1); },
+        [this](){ slotFinalValue(); },
         tr("Y range"),
         tr("Min-max clipping range filter along Y axis"),
         tr("m"),
@@ -71,10 +69,9 @@ FilterAreaBoxWidget::FilterAreaBoxWidget(Application *app)
 
     DoubleRangeSliderWidget::create(
         rangeInput_[2],
-        this,
-        SLOT(slotRangeIntermediateMinimumValue()),
-        SLOT(slotRangeIntermediateMaximumValue()),
-        SLOT(slotFinalValue()),
+        [this](double val){ slotMinimumValueChanged(val, 2); },
+        [this](double val){ slotMaximumValueChanged(val, 2); },
+        [this](){ slotFinalValue(); },
         tr("Z range"),
         tr("Min-max clipping range filter along Z axis"),
         tr("m"),
@@ -184,43 +181,31 @@ void FilterAreaBoxWidget::setFilterEnabled(bool b)
     app_->updateFilter(this, true);
 }
 
-void FilterAreaBoxWidget::slotRangeIntermediateMinimumValue()
+void FilterAreaBoxWidget::slotMinimumValueChanged(double val, int i)
 {
-    LOG_DEBUG(<< "Minimum value changed.");
+    LOG_DEBUG(<< "Minimum value changed to <" << val << "> at <" << i << ">.");
 
     double ppm =
         app_->editor().settings().unitsSettings().pointsPerMeter()[0];
 
-    QObject *obj = sender();
-    for (int i = 0; i < 3; i++)
+    if (i >= 0 && i < 3)
     {
-        if (obj == rangeInput_[i])
-        {
-            double v = rangeInput_[i]->minimumValue();
-            LOG_DEBUG(<< "Input minimumValue <" << v << ">.");
-            clipRange_[i].setMinimumValue(v * ppm);
-        }
+        clipRange_[i].setMinimumValue(val * ppm);
     }
 
     filterChanged(false);
 }
 
-void FilterAreaBoxWidget::slotRangeIntermediateMaximumValue()
+void FilterAreaBoxWidget::slotMaximumValueChanged(double val, int i)
 {
-    LOG_DEBUG(<< "Maximum value changed.");
+    LOG_DEBUG(<< "Maximum value changed to <" << val << "> at <" << i << ">.");
 
     double ppm =
         app_->editor().settings().unitsSettings().pointsPerMeter()[0];
 
-    QObject *obj = sender();
-    for (int i = 0; i < 3; i++)
+    if (i >= 0 && i < 3)
     {
-        if (obj == rangeInput_[i])
-        {
-            double v = rangeInput_[i]->maximumValue();
-            LOG_DEBUG(<< "Input maximumValue <" << v << ">.");
-            clipRange_[i].setMaximumValue(v * ppm);
-        }
+        clipRange_[i].setMaximumValue(val * ppm);
     }
 
     filterChanged(false);

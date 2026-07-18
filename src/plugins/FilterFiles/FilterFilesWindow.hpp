@@ -23,18 +23,13 @@
 #define FILTER_FILES_WINDOW_HPP
 
 // Include 3D Forest.
+#include <DockWidget.hpp>
 class Application;
 class FilterFilesWidget;
-
-// Include Qt.
-#include <DockWidget.hpp>
-class QCloseEvent;
 
 /** Filter Files Window. */
 class FilterFilesWindow : public DockWidget
 {
-
-
 public:
     FilterFilesWindow(Application *app);
 
@@ -43,7 +38,7 @@ protected:
 
     void showEvent(ShowEvent *event) override;
     void hideEvent(HideEvent *event) override;
-    void closeEvent(QCloseEvent *event) override;
+    void closeEvent(CloseEvent *event) override;
 };
 
 #endif /* FILTER_FILES_WINDOW_HPP */

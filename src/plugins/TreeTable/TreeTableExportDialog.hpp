@@ -23,11 +23,9 @@
 #define TREE_TABLE_EXPORT_DIALOG_HPP
 
 // Include 3D Forest.
+#include <Dialog.hpp>
 #include <FileFormatInterface.hpp>
 class Application;
-
-// Include Qt.
-#include <Dialog.hpp>
 class CheckBox;
 class LineEdit;
 class PushButton;
@@ -35,13 +33,10 @@ class PushButton;
 /** Tree Table Export Dialog. */
 class TreeTableExportDialog : public Dialog
 {
-
-
 public:
     TreeTableExportDialog(Application *app, const std::string &fileName);
 
     std::shared_ptr<FileFormatInterface> writer() const;
-
 
     void slotBrowse();
     void slotAccept();

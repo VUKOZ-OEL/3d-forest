@@ -23,28 +23,23 @@
 #define FILTER_FILES_WIDGET_HPP
 
 // Include 3D Forest.
+#include <Widget.hpp>
 #include <Datasets.hpp>
 #include <Editor.hpp>
 class Application;
-
-// Include Qt.
-#include <Widget.hpp>
-class QToolButton;
-class QTreeWidget;
-class QTreeWidgetItem;
+class ToolButton;
+class TreeWidget;
+class TreeWidgetItem;
 
 /** Filter Files Widget. */
 class FilterFilesWidget : public Widget
 {
-
-
 public:
     FilterFilesWidget(Application *app);
 
     void setFilterEnabled(bool b);
 
     Size sizeHint() const override { return Size(300, 200); }
-
 
     void slotUpdate(void *sender, const std::set<Editor::Type> &target);
 
@@ -57,7 +52,7 @@ public:
     void slotSelectNone();
 
     void slotItemSelectionChanged();
-    void slotItemChanged(QTreeWidgetItem *item, int column);
+    void slotItemChanged(TreeWidgetItem *item, int column);
 
 protected:
     /** Filter Files Column. */
@@ -72,14 +67,15 @@ protected:
 
     Application *app_;
 
-    QTreeWidget *tree_;
-    QToolButton *addButton_;
-    QToolButton *deleteButton_;
-    QToolButton *showButton_;
-    QToolButton *hideButton_;
-    QToolButton *selectAllButton_;
-    QToolButton *selectInvertButton_;
-    QToolButton *selectNoneButton_;
+    TreeWidget *tree_;
+    ToolButton *addButton_;
+    ToolButton *deleteButton_;
+    ToolButton *showButton_;
+    ToolButton *hideButton_;
+    ToolButton *selectAllButton_;
+    ToolButton *selectInvertButton_;
+    ToolButton *selectNoneButton_;
+
     Datasets datasets_;
     QueryFilterSet filter_;
     bool updatesEnabled_;
@@ -88,8 +84,8 @@ protected:
     void dataChanged();
     void filterChanged();
 
-    size_t identifier(const QTreeWidgetItem *item);
-    size_t index(const QTreeWidgetItem *item);
+    size_t identifier(const TreeWidgetItem *item);
+    size_t index(const TreeWidgetItem *item);
     void updateTree();
     void block();
     void unblock();

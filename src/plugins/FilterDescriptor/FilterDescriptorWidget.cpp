@@ -23,8 +23,6 @@
 #include <DoubleRangeSliderWidget.hpp>
 #include <FilterDescriptorWidget.hpp>
 #include <Application.hpp>
-
-// Include Qt.
 #include <HBoxLayout.hpp>
 #include <PushButton.hpp>
 #include <VBoxLayout.hpp>
@@ -42,10 +40,9 @@ FilterDescriptorWidget::FilterDescriptorWidget(Application *app)
 
     // Input widgets.
     DoubleRangeSliderWidget::create(descriptorInput_,
-                                    this,
-                                    SLOT(slotRangeIntermediateMinimumValue()),
-                                    SLOT(slotRangeIntermediateMaximumValue()),
-                                    SLOT(slotFinalValue()),
+        [this](double val){ slotMinimumValueChanged(val); },
+        [this](double val){ slotMaximumValueChanged(val); },
+        [this](){ slotFinalValue(); },
                                     tr("Descriptor"),
                                     tr("Min-max descriptor range filter"),
                                     tr("%"),
@@ -123,7 +120,7 @@ void FilterDescriptorWidget::setFilterEnabled(bool b)
     filterChanged(true);
 }
 
-void FilterDescriptorWidget::slotRangeIntermediateMinimumValue()
+void FilterDescriptorWidget::slotMinimumValueChanged(double val)
 {
     LOG_DEBUG(<< "Minimum value changed.");
 
@@ -131,7 +128,7 @@ void FilterDescriptorWidget::slotRangeIntermediateMinimumValue()
     filterChanged(false);
 }
 
-void FilterDescriptorWidget::slotRangeIntermediateMaximumValue()
+void FilterDescriptorWidget::slotMaximumValueChanged(double val)
 {
     LOG_DEBUG(<< "Maximum value changed.");
 

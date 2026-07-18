@@ -41,6 +41,7 @@ public:
     bool isChecked() const;
 
     Signal<int> stateChanged;
+    Signal<bool> clicked;
 
 private:
     bool checked_{false};

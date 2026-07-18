@@ -442,14 +442,13 @@ void Application::createAction(Action **result,
 #endif
 }
 
-#if 0
-void Application::createToolButton(QToolButton **result,
-                                  const std::string &text,
-                                  const std::string &toolTip,
-                                  const ThemeIcon &themeIcon,
-                                  const QObject *receiver,
-                                  const char *member)
+void Application::createToolButton(ToolButton **result,
+                                   const std::string &text,
+                                   const std::string &toolTip,
+                                   const ThemeIcon &themeIcon,
+                                   std::function<void()> callback)
 {
+#if 0
     QToolButton *button;
 
     // Create button.
@@ -480,8 +479,8 @@ void Application::createToolButton(QToolButton **result,
 
     // Return value.
     *result = button;
-}
 #endif
+}
 
 void Application::createMenu()
 {

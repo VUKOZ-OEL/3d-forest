@@ -68,6 +68,11 @@ void Dialog::setMaximumHeight(int h)
 {
 }
 
+int Dialog::width() const
+{
+    return 0;
+}
+
 int Dialog::height() const
 {
     return 0;

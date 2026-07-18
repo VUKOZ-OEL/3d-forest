@@ -28,24 +28,18 @@
 // Include 3D Forest.
 #include <Editor.hpp>
 #include <Settings.hpp>
-class Application;
-class ColorSwitchWidget;
-
-// Include Qt.
 #include <Widget.hpp>
+class Application;
 class CheckBox;
-class QSlider;
+class Slider;
 
 /** Tree Settings Widget. */
 class TreeSettingsWidget : public Widget
 {
-
-
 public:
     TreeSettingsWidget(Application *app);
 
     Size sizeHint() const override { return Size(300, 265); }
-
 
     void slotUpdate(void *sender, const std::set<Editor::Type> &target);
 
@@ -68,7 +62,7 @@ private:
     CheckBox *convexHullProjectionVisibleCheckBox_;
     CheckBox *concaveHullVisibleCheckBox_;
     CheckBox *concaveHullProjectionVisibleCheckBox_;
-    QSlider *dbhScaleSlider_;
+    Slider *dbhScaleSlider_;
 
     TreeSettings settings_;
 

@@ -23,30 +23,25 @@
 #define FILTER_MANAGEMENT_STATUS_WIDGET_HPP
 
 // Include 3D Forest.
+#include <Widget.hpp>
 #include <Editor.hpp>
 #include <ManagementStatusList.hpp>
 class Application;
 class FilterManagementStatusTreeWidget;
-
-// Include Qt.
-#include <Widget.hpp>
-class QSplitter;
-class QToolButton;
-class QTreeWidget;
-class QTreeWidgetItem;
+class Splitter;
+class ToolButton;
+class TreeWidget;
+class TreeWidgetItem;
 
 /** Filter Management Status Widget. */
 class FilterManagementStatusWidget : public Widget
 {
-
-
 public:
     FilterManagementStatusWidget(Application *app);
 
     void setFilterEnabled(bool b);
 
     Size sizeHint() const override { return Size(300, 200); }
-
 
     void slotUpdate(void *sender, const std::set<Editor::Type> &target);
 
@@ -57,7 +52,7 @@ public:
     void slotSelectNone();
 
     void slotItemSelectionChanged();
-    void slotItemChanged(QTreeWidgetItem *item, int column);
+    void slotItemChanged(TreeWidgetItem *item, int column);
 
 protected:
     /** Filter ManagementStatus Column. */
@@ -71,15 +66,15 @@ protected:
 
     Application *app_;
 
-    QTreeWidget *tree_;
-    QToolButton *showButton_;
-    QToolButton *hideButton_;
-    QToolButton *selectAllButton_;
-    QToolButton *selectInvertButton_;
-    QToolButton *selectNoneButton_;
+    TreeWidget *tree_;
+    ToolButton *showButton_;
+    ToolButton *hideButton_;
+    ToolButton *selectAllButton_;
+    ToolButton *selectInvertButton_;
+    ToolButton *selectNoneButton_;
     bool updatesEnabled_;
 
-    QSplitter *splitter_;
+    Splitter *splitter_;
 
     FilterManagementStatusTreeWidget *treeWidget_;
 
@@ -91,7 +86,7 @@ protected:
     void receivedManagementStatusList();
     void sendFilter();
 
-    size_t identifier(const QTreeWidgetItem *item);
+    size_t identifier(const TreeWidgetItem *item);
     void updateTree();
     void block();
     void unblock();

@@ -24,9 +24,6 @@
 #include <ThemeIcon.hpp>
 #include <TreeTableWidget.hpp>
 #include <TreeTableWindow.hpp>
-
-// Include Qt.
-#include <QCloseEvent>
 #include <VBoxLayout.hpp>
 
 // Include local.
@@ -61,7 +58,7 @@ TreeTableWindow::~TreeTableWindow()
     LOG_DEBUG(<< "Destroy.");
 }
 
-void TreeTableWindow::closeEvent(QCloseEvent *event)
+void TreeTableWindow::closeEvent(CloseEvent *event)
 {
     LOG_DEBUG(<< "Close event.");
 

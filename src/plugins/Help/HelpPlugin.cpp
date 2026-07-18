@@ -23,8 +23,6 @@
 #include <HelpPlugin.hpp>
 #include <Application.hpp>
 #include <ThemeIcon.hpp>
-
-// Include Qt.
 #include <MessageBox.hpp>
 
 // Include local.
@@ -48,7 +46,7 @@ void HelpPlugin::initialize(Application *app)
                               tr("About this application"),
                               THEME_ICON("question"),
                               this,
-                              SLOT(slotAbout()),
+                              &HelpPlugin::slotAbout,
                               MAIN_WINDOW_MENU_HELP_PRIORITY);
 }
 

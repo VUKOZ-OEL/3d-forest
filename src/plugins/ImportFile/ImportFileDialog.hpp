@@ -23,31 +23,27 @@
 #define IMPORT_FILE_DIALOG_HPP
 
 // Include 3D Forest.
+#include <Dialog.hpp>
 #include <ImportSettings.hpp>
 class Application;
 class InfoDialog;
-
-// Include Qt.
-#include <Dialog.hpp>
 class CheckBox;
 class PushButton;
 
 /** Import File Dialog. */
 class ImportFileDialog : public Dialog
 {
-
-
 public:
     ImportFileDialog(Application *app);
 
     ImportSettings settings() const;
-
 
     void slotHelp();
     void slotAccept();
     void slotReject();
 
 protected:
+    Application *app_;
     InfoDialog *helpDialog_;
 
     CheckBox *importFilesAsSeparateTreesCheckBox_;

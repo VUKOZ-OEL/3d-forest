@@ -23,16 +23,13 @@
 #include <FilterFilesWidget.hpp>
 #include <Application.hpp>
 #include <ThemeIcon.hpp>
-
-// Include Qt.
 #include <HBoxLayout.hpp>
 #include <Label.hpp>
 #include <PushButton.hpp>
-#include <QToolBar>
-#include <QToolButton>
-#include <QTreeWidget>
-#include <QTreeWidgetItem>
-#include <QTreeWidgetItemIterator>
+#include <ToolBar.hpp>
+#include <ToolButton.hpp>
+#include <TreeWidget.hpp>
+#include <TreeWidgetItem.hpp>
 #include <VBoxLayout.hpp>
 
 // Include local.
@@ -46,65 +43,68 @@ FilterFilesWidget::FilterFilesWidget(Application *app)
     : app_(app)
 {
     // Table.
-    tree_ = new QTreeWidget();
-    tree_->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    tree_->setSelectionBehavior(QAbstractItemView::SelectRows);
+    tree_ = new TreeWidget();
+    tree_->setSelectionMode(AbstractItemView::ExtendedSelection);
+    tree_->setSelectionBehavior(AbstractItemView::SelectRows);
+
+    tree_->itemChanged.connect([this](TreeWidgetItem *item, int column)
+    {
+        slotItemChanged(item, column);
+    });
+
+    tree_->itemSelectionChanged.connect([this]()
+    {
+        slotItemSelectionChanged();
+    });
 
     // Tool bar buttons.
     app_->createToolButton(&addButton_,
                                   tr("Add"),
                                   tr("Add new data set"),
                                   THEME_ICON("add"),
-                                  this,
-                                  SLOT(slotAdd()));
+                                  [this](){ slotAdd(); });
 
     app_->createToolButton(&deleteButton_,
                                   tr("Remove"),
                                   tr("Remove selected data set"),
                                   THEME_ICON("remove"),
-                                  this,
-                                  SLOT(slotDelete()));
+                                  [this](){ slotDelete(); });
     deleteButton_->setEnabled(false);
 
     app_->createToolButton(&showButton_,
                                   tr("Show"),
                                   tr("Make selected data sets visible"),
                                   THEME_ICON("eye"),
-                                  this,
-                                  SLOT(slotShow()));
+                                  [this](){ slotShow(); });
     showButton_->setEnabled(false);
 
     app_->createToolButton(&hideButton_,
                                   tr("Hide"),
                                   tr("Hide selected data sets"),
                                   THEME_ICON("hide"),
-                                  this,
-                                  SLOT(slotHide()));
+                                  [this](){ slotHide(); });
     hideButton_->setEnabled(false);
 
     app_->createToolButton(&selectAllButton_,
                                   tr("Select all"),
                                   tr("Select all"),
                                   THEME_ICON("select-all"),
-                                  this,
-                                  SLOT(slotSelectAll()));
+                                  [this](){ slotSelectAll(); });
 
     app_->createToolButton(&selectInvertButton_,
                                   tr("Invert"),
                                   tr("Invert selection"),
                                   THEME_ICON("select-invert"),
-                                  this,
-                                  SLOT(slotSelectInvert()));
+                                  [this](){ slotSelectInvert(); });
 
     app_->createToolButton(&selectNoneButton_,
                                   tr("Select none"),
                                   tr("Select none"),
                                   THEME_ICON("select-none"),
-                                  this,
-                                  SLOT(slotSelectNone()));
+                                  [this](){ slotSelectNone(); });
 
     // Tool bar.
-    QToolBar *toolBar = new QToolBar;
+    ToolBar *toolBar = new ToolBar;
     toolBar->addWidget(addButton_);
     toolBar->addWidget(deleteButton_);
     toolBar->addWidget(showButton_);
@@ -193,8 +193,11 @@ void FilterFilesWidget::setDatasets(const Datasets &datasets,
 
     // Header.
     tree_->setColumnCount(COLUMN_LAST);
-    QStringList labels;
-    labels << tr("Visible") << tr("Id") << tr("Label") << tr("Date");
+    std::vector<std::string> labels;
+    labels.push_back(tr("Visible"));
+    labels.push_back(tr("Id"));
+    labels.push_back(tr("Label"));
+    labels.push_back(tr("Date"));
     tree_->setHeaderLabels(labels);
 
     // Content.
@@ -223,9 +226,9 @@ void FilterFilesWidget::slotAdd()
 
 void FilterFilesWidget::slotDelete()
 {
-    QList<QTreeWidgetItem *> items = tree_->selectedItems();
+    std::vector<TreeWidgetItem *> items = tree_->selectedItems();
 
-    if (items.count() > 0)
+    if (items.size() > 0)
     {
         slotSelectNone();
 
@@ -244,9 +247,9 @@ void FilterFilesWidget::slotDelete()
 void FilterFilesWidget::slotShow()
 {
     LOG_DEBUG(<< "Show.");
-    QList<QTreeWidgetItem *> items = tree_->selectedItems();
+    std::vector<TreeWidgetItem *> items = tree_->selectedItems();
 
-    if (items.count() > 0)
+    if (items.size() > 0)
     {
         updatesEnabled_ = false;
         for (auto &item : items)
@@ -262,9 +265,9 @@ void FilterFilesWidget::slotShow()
 
 void FilterFilesWidget::slotHide()
 {
-    QList<QTreeWidgetItem *> items = tree_->selectedItems();
+    std::vector<TreeWidgetItem *> items = tree_->selectedItems();
 
-    if (items.count() > 0)
+    if (items.size() > 0)
     {
         updatesEnabled_ = false;
         for (auto &item : items)
@@ -280,12 +283,9 @@ void FilterFilesWidget::slotHide()
 
 void FilterFilesWidget::slotSelectAll()
 {
-    QTreeWidgetItemIterator it(tree_);
-
-    while (*it)
+    for (auto &item : tree_->items())
     {
-        (*it)->setSelected(true);
-        ++it;
+        item.setSelected(true);
     }
 
     slotItemSelectionChanged();
@@ -293,12 +293,9 @@ void FilterFilesWidget::slotSelectAll()
 
 void FilterFilesWidget::slotSelectInvert()
 {
-    QTreeWidgetItemIterator it(tree_);
-
-    while (*it)
+    for (auto &item : tree_->items())
     {
-        (*it)->setSelected(!(*it)->isSelected());
-        ++it;
+        item.setSelected(!item.isSelected());
     }
 
     slotItemSelectionChanged();
@@ -306,12 +303,9 @@ void FilterFilesWidget::slotSelectInvert()
 
 void FilterFilesWidget::slotSelectNone()
 {
-    QTreeWidgetItemIterator it(tree_);
-
-    while (*it)
+    for (auto &item : tree_->items())
     {
-        (*it)->setSelected(false);
-        ++it;
+        item.setSelected(false);
     }
 
     slotItemSelectionChanged();
@@ -319,9 +313,9 @@ void FilterFilesWidget::slotSelectNone()
 
 void FilterFilesWidget::slotItemSelectionChanged()
 {
-    QList<QTreeWidgetItem *> items = tree_->selectedItems();
+    std::vector<TreeWidgetItem *> items = tree_->selectedItems();
 
-    if (items.count() > 0)
+    if (items.size() > 0)
     {
         deleteButton_->setEnabled(true);
         showButton_->setEnabled(true);
@@ -335,7 +329,7 @@ void FilterFilesWidget::slotItemSelectionChanged()
     }
 }
 
-void FilterFilesWidget::slotItemChanged(QTreeWidgetItem *item, int column)
+void FilterFilesWidget::slotItemChanged(TreeWidgetItem *item, int column)
 {
     if (column == COLUMN_CHECKED)
     {
@@ -351,36 +345,32 @@ void FilterFilesWidget::slotItemChanged(QTreeWidgetItem *item, int column)
     }
 }
 
-size_t FilterFilesWidget::identifier(const QTreeWidgetItem *item)
+size_t FilterFilesWidget::identifier(const TreeWidgetItem *item)
 {
-    return static_cast<size_t>(item->text(COLUMN_ID).toULong());
+    return toSize(item->text(COLUMN_ID));
 }
 
-size_t FilterFilesWidget::index(const QTreeWidgetItem *item)
+size_t FilterFilesWidget::index(const TreeWidgetItem *item)
 {
-    return datasets_.index(item->text(COLUMN_ID).toULong());
+    return datasets_.index(identifier(item));
 }
 
 void FilterFilesWidget::updateTree()
 {
     block();
 
-    QTreeWidgetItemIterator it(tree_);
-
-    while (*it)
+    for (auto &item : tree_->items())
     {
-        size_t id = identifier(*it);
+        size_t id = identifier(&item);
 
         if (filter_.enabled(id))
         {
-            (*it)->setCheckState(COLUMN_CHECKED, Ui::Checked);
+            item.setCheckState(COLUMN_CHECKED, Ui::Checked);
         }
         else
         {
-            (*it)->setCheckState(COLUMN_CHECKED, Ui::Unchecked);
+            item.setCheckState(COLUMN_CHECKED, Ui::Unchecked);
         }
-
-        ++it;
     }
 
     unblock();
@@ -388,44 +378,35 @@ void FilterFilesWidget::updateTree()
 
 void FilterFilesWidget::block()
 {
-    disconnect(tree_, SIGNAL(itemChanged(QTreeWidgetItem *, int)), 0, 0);
-    disconnect(tree_, SIGNAL(itemSelectionChanged()), 0, 0);
+    (void)tree_->blockSignals(true);
     (void)blockSignals(true);
 }
 
 void FilterFilesWidget::unblock()
 {
     (void)blockSignals(false);
-    connect(tree_,
-            SIGNAL(itemChanged(QTreeWidgetItem *, int)),
-            this,
-            SLOT(slotItemChanged(QTreeWidgetItem *, int)));
-    connect(tree_,
-            SIGNAL(itemSelectionChanged()),
-            this,
-            SLOT(slotItemSelectionChanged()));
+    (void)tree_->blockSignals(false);
 }
 
 void FilterFilesWidget::addTreeItem(size_t index)
 {
-    QTreeWidgetItem *item = new QTreeWidgetItem(tree_);
+    TreeWidgetItem item;
 
     size_t id = datasets_.id(index);
 
     if (filter_.enabled(id))
     {
-        item->setCheckState(COLUMN_CHECKED, Ui::Checked);
+        item.setCheckState(COLUMN_CHECKED, Ui::Checked);
     }
     else
     {
-        item->setCheckState(COLUMN_CHECKED, Ui::Unchecked);
+        item.setCheckState(COLUMN_CHECKED, Ui::Unchecked);
     }
 
-    item->setText(COLUMN_ID, std::string::number(id));
-
-    item->setText(COLUMN_LABEL, std::string::fromStdString(datasets_.label(index)));
-    item->setText(COLUMN_DATE_CREATED,
-                  std::string::fromStdString(datasets_.dateCreated(index)));
+    item.setText(COLUMN_ID, toString(id));
+    item.setText(COLUMN_LABEL, datasets_.label(index));
+    item.setText(COLUMN_DATE_CREATED,
+                  datasets_.dateCreated(index));
 
     // Color legend.
     const Vector3<double> &rgb = datasets_.color(index);
@@ -435,6 +416,8 @@ void FilterFilesWidget::addTreeItem(size_t index)
     color.setGreenF(static_cast<float>(rgb[1]));
     color.setBlueF(static_cast<float>(rgb[2]));
 
-    QBrush brush(color, Ui::SolidPattern);
-    item->setBackground(COLUMN_ID, brush);
+    Brush brush(color, Ui::SolidPattern);
+    item.setBackground(COLUMN_ID, brush);
+
+    tree_->push_back(item);
 }

@@ -71,6 +71,19 @@ void Widget::setLayout(Layout *layout)
 {
 }
 
+void Widget::setSizePolicy(SizePolicy::Policy hor, SizePolicy::Policy ver)
+{
+}
+
+void Widget::setStyleSheet(const std::string &str)
+{
+}
+
+void Widget::setPalette(const Palette &palette)
+{
+    palette_ = palette;
+}
+
 bool Widget::blockSignals(bool b)
 {
     bool wasBlocked = signalsBlocked();

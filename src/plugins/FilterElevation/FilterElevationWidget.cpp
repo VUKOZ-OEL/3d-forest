@@ -23,8 +23,6 @@
 #include <DoubleRangeSliderWidget.hpp>
 #include <FilterElevationWidget.hpp>
 #include <Application.hpp>
-
-// Include Qt.
 #include <HBoxLayout.hpp>
 #include <PushButton.hpp>
 #include <VBoxLayout.hpp>
@@ -42,10 +40,9 @@ FilterElevationWidget::FilterElevationWidget(Application *app)
 
     // Input widgets.
     DoubleRangeSliderWidget::create(elevationInput_,
-                                    this,
-                                    SLOT(slotRangeIntermediateMinimumValue()),
-                                    SLOT(slotRangeIntermediateMaximumValue()),
-                                    SLOT(slotFinalValue()),
+        [this](double val){ slotMinimumValueChanged(val); },
+        [this](double val){ slotMaximumValueChanged(val); },
+        [this](){ slotFinalValue(); },
                                     tr("Elevation"),
                                     tr("Min-max elevation range filter"),
                                     tr("m"),
@@ -131,7 +128,7 @@ void FilterElevationWidget::setFilterEnabled(bool b)
     filterChanged(true);
 }
 
-void FilterElevationWidget::slotRangeIntermediateMinimumValue()
+void FilterElevationWidget::slotMinimumValueChanged(double val)
 {
     LOG_DEBUG(<< "Minimum value changed.");
 
@@ -142,7 +139,7 @@ void FilterElevationWidget::slotRangeIntermediateMinimumValue()
     filterChanged(false);
 }
 
-void FilterElevationWidget::slotRangeIntermediateMaximumValue()
+void FilterElevationWidget::slotMaximumValueChanged(double val)
 {
     LOG_DEBUG(<< "Maximum value changed.");
 

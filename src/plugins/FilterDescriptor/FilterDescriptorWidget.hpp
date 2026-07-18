@@ -23,20 +23,16 @@
 #define FILTER_DESCRIPTOR_WIDGET_HPP
 
 // Include 3D Forest.
+#include <Widget.hpp>
 #include <Editor.hpp>
 #include <Range.hpp>
 #include <Region.hpp>
 class DoubleRangeSliderWidget;
 class Application;
 
-// Include Qt.
-#include <Widget.hpp>
-
 /** Filter Descriptor Widget. */
 class FilterDescriptorWidget : public Widget
 {
-
-
 public:
     FilterDescriptorWidget(Application *app);
 
@@ -44,11 +40,10 @@ public:
 
     Size sizeHint() const override { return Size(300, 120); }
 
-
     void slotUpdate(void *sender, const std::set<Editor::Type> &target);
 
-    void slotRangeIntermediateMinimumValue();
-    void slotRangeIntermediateMaximumValue();
+    void slotMinimumValueChanged(double val);
+    void slotMaximumValueChanged(double val);
     void slotFinalValue();
 
 protected:

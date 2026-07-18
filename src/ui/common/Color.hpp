@@ -22,6 +22,9 @@
 #ifndef COLOR_HPP
 #define COLOR_HPP
 
+// Include 3D Forest.
+#include <Ui.hpp>
+
 // Include local.
 #include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
@@ -30,13 +33,30 @@
 class EXPORT_UI_COMMON Color
 {
 public:
+    enum Spec { Invalid, Rgb, Hsv, Cmyk, Hsl, ExtendedRgb };
+    enum NameFormat { HexRgb, HexArgb };
+
     Color();
     Color(int r, int g, int b, int a = 255);
+    Color(Ui::GlobalColor gc);
+
+    Spec spec() const { return spec_; }
+    bool isValid() const { return spec_ != Invalid; }
+
+    void setRed(int r);
+    void setGreen(int g);
+    void setBlue(int b);
+    void setAlpha(int a);
 
     int red() const { return r_; }
     int green() const { return g_; }
     int blue() const { return b_; }
     int alpha() const { return a_; }
+
+    void setRedF(float r);
+    void setGreenF(float g);
+    void setBlueF(float b);
+    void setAlphaF(float a);
 
     float redF() const { return static_cast<float>(r_) / 255.0; }
     float greenF() const { return static_cast<float>(g_) / 255.0; }
@@ -47,6 +67,7 @@ public:
     void setRgbF(float r, float g, float b, float a = 1.0F);
 
 private:
+    Spec spec_{Invalid};
     int r_{255};
     int g_{255};
     int b_{255};

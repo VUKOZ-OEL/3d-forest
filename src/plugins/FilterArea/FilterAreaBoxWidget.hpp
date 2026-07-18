@@ -42,8 +42,8 @@ public:
 
     void slotUpdate(void *sender, const std::set<Editor::Type> &target);
 
-    void slotRangeIntermediateMinimumValue();
-    void slotRangeIntermediateMaximumValue();
+    void slotMinimumValueChanged(double val, int i);
+    void slotMaximumValueChanged(double val, int i);
     void slotFinalValue();
 
 protected:

@@ -25,9 +25,6 @@
 #include <Application.hpp>
 #include <ThemeIcon.hpp>
 
-// Include Qt.
-#include <QCloseEvent>
-
 // Include local.
 #define LOG_MODULE_NAME "FilterIntensityWindow"
 #include <Log.hpp>
@@ -66,7 +63,7 @@ void FilterIntensityWindow::hideEvent(HideEvent *event)
     DockWidget::hideEvent(event);
 }
 
-void FilterIntensityWindow::closeEvent(QCloseEvent *event)
+void FilterIntensityWindow::closeEvent(CloseEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Close event.");
     // widget_->setFilterEnabled(false);

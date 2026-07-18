@@ -26,29 +26,23 @@
 #include <vector>
 
 // Include 3D Forest.
+#include <Widget.hpp>
 #include <Editor.hpp>
 #include <Settings.hpp>
 class Application;
 class ColorSwitchWidget;
-
-// Include Qt.
-#include <Widget.hpp>
 class CheckBox;
-class QDoubleSpinBox;
+class DoubleSpinBox;
 
 /** Units Settings Widget. */
 class UnitsSettingsWidget : public Widget
 {
-
-
 public:
     UnitsSettingsWidget(Application *app);
 
     Size sizeHint() const override { return Size(300, 150); }
 
-
     void slotUpdate(void *sender, const std::set<Editor::Type> &target);
-
 
     void slotIntermediateLas(double v);
     void slotIntermediateUser(double v);
@@ -57,8 +51,8 @@ public:
 private:
     Application *app_;
 
-    QDoubleSpinBox *ppmLasSpinBox_;
-    QDoubleSpinBox *ppmUserSpinBox_;
+    DoubleSpinBox *ppmLasSpinBox_;
+    DoubleSpinBox *ppmUserSpinBox_;
     CheckBox *userDefinedCheckBox_;
 
     UnitsSettings settings_;

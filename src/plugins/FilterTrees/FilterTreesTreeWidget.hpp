@@ -28,7 +28,7 @@ class Application;
 
 // Include Qt.
 #include <Widget.hpp>
-class QTableWidget;
+class TableWidget;
 
 /** Tree Widget. */
 class FilterTreesTreeWidget : public Widget
@@ -43,7 +43,7 @@ public:
 
 protected:
     Application *app_;
-    QTableWidget *table_;
+    TableWidget *table_;
     Segment segment_;
 
     void setRow(int row, const std::string &key, const std::string &value);

@@ -24,7 +24,7 @@
 #include <Application.hpp>
 
 // Include Qt.
-#include <QTableWidget>
+#include <TableWidget.hpp>
 #include <VBoxLayout.hpp>
 
 // Include local.
@@ -39,7 +39,7 @@ FilterTreesTreeWidget::FilterTreesTreeWidget(Application *app)
     LOG_DEBUG(<< "Create.");
 
     // Table.
-    table_ = new QTableWidget();
+    table_ = new TableWidget();
 
     table_->setRowCount(0);
     table_->setColumnCount(2);
@@ -85,10 +85,10 @@ void FilterTreesTreeWidget::setRow(int row,
                                    const std::string &key,
                                    const std::string &value)
 {
-    table_->setItem(row, 0, new QTableWidgetItem(std::string::fromStdString(key)));
+    table_->setItem(row, 0, new TableWidgetItem(std::string::fromStdString(key)));
     table_->setItem(row,
                     1,
-                    new QTableWidgetItem(std::string::fromStdString(value)));
+                    new TableWidgetItem(std::string::fromStdString(value)));
 }
 
 void FilterTreesTreeWidget::setRow(int row,
@@ -107,6 +107,6 @@ void FilterTreesTreeWidget::setRow(int row,
             std::string::fromStdString(std::to_string(value) + " " + comment);
     }
 
-    table_->setItem(row, 0, new QTableWidgetItem(std::string::fromStdString(key)));
-    table_->setItem(row, 1, new QTableWidgetItem(valueText));
+    table_->setItem(row, 0, new TableWidgetItem(std::string::fromStdString(key)));
+    table_->setItem(row, 1, new TableWidgetItem(valueText));
 }

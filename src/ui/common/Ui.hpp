@@ -22,6 +22,10 @@
 #ifndef UI_HPP
 #define UI_HPP
 
+// Include std.
+#include <string>
+#include <vector>
+
 // Include 3D Forest.
 class Application;
 
@@ -33,10 +37,57 @@ class Application;
 class EXPORT_UI_COMMON Ui
 {
 public:
-    enum WindowModality {
+    enum GlobalColor
+    {
+        color0,
+        color1,
+        black,
+        white,
+        darkGray,
+        gray,
+        lightGray,
+        red,
+        green,
+        blue,
+        cyan,
+        magenta,
+        yellow,
+        darkRed,
+        darkGreen,
+        darkBlue,
+        darkCyan,
+        darkMagenta,
+        darkYellow,
+        transparent
+    };
+
+    enum class ColorScheme
+    {
+        Unknown,
+        Light,
+        Dark,
+    };
+
+    enum SortOrder
+    {
+        AscendingOrder,
+        DescendingOrder
+    };
+
+    enum WindowModality
+    {
         NonModal,
         WindowModal,
         ApplicationModal
+    };
+
+    enum ContextMenuPolicy
+    {
+        NoContextMenu,
+        DefaultContextMenu,
+        ActionsContextMenu,
+        CustomContextMenu,
+        PreventContextMenu
     };
 
     enum FocusPolicy
@@ -52,6 +103,27 @@ public:
     {
         Horizontal = 0x1,
         Vertical = 0x2
+    };
+
+    enum CheckState
+    {
+        Unchecked,
+        PartiallyChecked,
+        Checked
+    };
+
+    enum ItemFlag
+    {
+        NoItemFlags = 0,
+        ItemIsSelectable = 1,
+        ItemIsEditable = 2,
+        ItemIsDragEnabled = 4,
+        ItemIsDropEnabled = 8,
+        ItemIsUserCheckable = 16,
+        ItemIsEnabled = 32,
+        ItemIsAutoTristate = 64,
+        ItemNeverHasChildren = 128,
+        ItemIsUserTristate = 256
     };
 
     enum AlignmentFlag
@@ -81,6 +153,12 @@ public:
         RightDockWidgetArea = (1 << 1),
         TopDockWidgetArea = (1 << 1),
         BottomDockWidgetArea = (1 << 1),
+    };
+
+    enum BrushStyle
+    {
+        NoBrush,
+        SolidPattern
     };
 };
 

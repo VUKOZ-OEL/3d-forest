@@ -31,7 +31,7 @@
 
 // Include Qt.
 #include <HBoxLayout.hpp>
-#include <QSplitter>
+#include <Splitter.hpp>
 #include <VBoxLayout.hpp>
 
 // Include local.
@@ -337,7 +337,7 @@ void ViewerViewports::setLayout(ViewLayout viewLayout)
     {
         LOG_DEBUG_RENDER(<< "Remove old layout.");
 
-        Q_ASSERT(oldLayout->count() == 1);
+        Q_ASSERT(oldLayout->size() == 1);
         QLayoutItem *item = oldLayout->itemAt(0);
         ViewerOpenGLViewport *viewport =
             dynamic_cast<ViewerOpenGLViewport *>(item->widget());
@@ -349,7 +349,7 @@ void ViewerViewports::setLayout(ViewLayout viewLayout)
         }
         else
         {
-            QSplitter *splitter = dynamic_cast<QSplitter *>(item->widget());
+            Splitter *splitter = dynamic_cast<Splitter *>(item->widget());
 
             if (splitter)
             {
@@ -403,11 +403,11 @@ void ViewerViewports::setLayout(ViewLayout viewLayout)
         viewports_[1] = createViewport(VIEWER_VIEWPORTS_TOP);
 
         // Create new layout.
-        QSplitter *splitter = new QSplitter;
+        Splitter *splitter = new Splitter;
         splitter->addWidget(viewports_[0]);
         splitter->addWidget(viewports_[1]);
         int w = width() / 2;
-        splitter->setSizes(QList<int>({w, w}));
+        splitter->setSizes(std::vector<int>({w, w}));
 
         newLayout->addWidget(splitter);
     }
@@ -423,22 +423,22 @@ void ViewerViewports::setLayout(ViewLayout viewLayout)
         int w = width() / 2;
         int h = height() / 2;
 
-        QSplitter *splitterLeft = new QSplitter;
+        Splitter *splitterLeft = new Splitter;
         splitterLeft->addWidget(viewports_[VIEWER_VIEWPORTS_TOP]);
         splitterLeft->addWidget(viewports_[VIEWER_VIEWPORTS_FRONT]);
         splitterLeft->setOrientation(Ui::Vertical);
-        splitterLeft->setSizes(QList<int>({h, h}));
+        splitterLeft->setSizes(std::vector<int>({h, h}));
 
-        QSplitter *splitterRight = new QSplitter;
+        Splitter *splitterRight = new Splitter;
         splitterRight->addWidget(viewports_[VIEWER_VIEWPORTS_3D]);
         splitterRight->addWidget(viewports_[VIEWER_VIEWPORTS_RIGHT]);
         splitterRight->setOrientation(Ui::Vertical);
-        splitterRight->setSizes(QList<int>({h, h}));
+        splitterRight->setSizes(std::vector<int>({h, h}));
 
-        QSplitter *splitter = new QSplitter;
+        Splitter *splitter = new Splitter;
         splitter->addWidget(splitterLeft);
         splitter->addWidget(splitterRight);
-        splitter->setSizes(QList<int>({w, w}));
+        splitter->setSizes(std::vector<int>({w, w}));
 
         newLayout->addWidget(splitter);
     }
@@ -454,17 +454,17 @@ void ViewerViewports::setLayout(ViewLayout viewLayout)
         int w = width() / 3;
         int h = height() / 3;
 
-        QSplitter *splitterRight = new QSplitter;
+        Splitter *splitterRight = new Splitter;
         splitterRight->addWidget(viewports_[1]);
         splitterRight->addWidget(viewports_[2]);
         splitterRight->addWidget(viewports_[3]);
         splitterRight->setOrientation(Ui::Vertical);
-        splitterRight->setSizes(QList<int>({h, h, h}));
+        splitterRight->setSizes(std::vector<int>({h, h, h}));
 
-        QSplitter *splitter = new QSplitter;
+        Splitter *splitter = new Splitter;
         splitter->addWidget(viewports_[0]);
         splitter->addWidget(splitterRight);
-        splitter->setSizes(QList<int>({w + w, w}));
+        splitter->setSizes(std::vector<int>({w + w, w}));
 
         newLayout->addWidget(splitter);
     }

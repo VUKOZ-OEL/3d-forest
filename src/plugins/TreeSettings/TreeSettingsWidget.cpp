@@ -20,19 +20,16 @@
 /** @file TreeSettingsWidget.cpp */
 
 // Include 3D Forest.
-#include <ColorSwitchWidget.hpp>
 #include <Application.hpp>
 #include <ThemeIcon.hpp>
 #include <TreeSettingsWidget.hpp>
-
-// Include Qt.
 #include <CheckBox.hpp>
-#include <Color>
+#include <Color.hpp>
 #include <ComboBox.hpp>
 #include <GridLayout.hpp>
 #include <GroupBox.hpp>
 #include <Label.hpp>
-#include <QSlider>
+#include <Slider.hpp>
 #include <VBoxLayout.hpp>
 
 // Include local.
@@ -54,79 +51,79 @@ TreeSettingsWidget::TreeSettingsWidget(Application *app)
         settings_.useOnlyForSelectedTrees());
     useOnlyForSelectedTreesCheckBox_->setText(
         tr("Use only for selected trees"));
-    connect(useOnlyForSelectedTreesCheckBox_,
-            SIGNAL(stateChanged(int)),
-            this,
-            SLOT(slotSetUseOnlyForSelectedTrees(int)));
+    useOnlyForSelectedTreesCheckBox_->stateChanged.connect([this](int val)
+    {
+        slotSetUseOnlyForSelectedTrees(val);
+    });
 
     treeAttributesVisibleCheckBox_ = new CheckBox;
     treeAttributesVisibleCheckBox_->setChecked(
         settings_.treeAttributesVisible());
     treeAttributesVisibleCheckBox_->setText(tr("Show tree attributes"));
-    connect(treeAttributesVisibleCheckBox_,
-            SIGNAL(stateChanged(int)),
-            this,
-            SLOT(slotSetTreeAttributesVisible(int)));
+    treeAttributesVisibleCheckBox_->stateChanged.connect([this](int val)
+    {
+        slotSetTreeAttributesVisible(val);
+    });
 
     treePositionAtBottomCheckBox_ = new CheckBox;
     treePositionAtBottomCheckBox_->setChecked(settings_.treePosition() ==
                                               TreeSettings::Position::BOTTOM);
     treePositionAtBottomCheckBox_->setText(tr("Show tree position at bottom"));
-    connect(treePositionAtBottomCheckBox_,
-            SIGNAL(stateChanged(int)),
-            this,
-            SLOT(slotSetTreePositionAtBottom(int)));
+    treePositionAtBottomCheckBox_->stateChanged.connect([this](int val)
+    {
+        slotSetTreePositionAtBottom(val);
+    });
 
     // Convex hull.
     convexHullVisibleCheckBox_ = new CheckBox;
     convexHullVisibleCheckBox_->setChecked(settings_.convexHullVisible());
     convexHullVisibleCheckBox_->setText(tr("Show convex hull"));
-    connect(convexHullVisibleCheckBox_,
-            SIGNAL(stateChanged(int)),
-            this,
-            SLOT(slotSetConvexHullVisible(int)));
+    convexHullVisibleCheckBox_->stateChanged.connect([this](int val)
+    {
+        slotSetConvexHullVisible(val);
+    });
 
     convexHullProjectionVisibleCheckBox_ = new CheckBox;
     convexHullProjectionVisibleCheckBox_->setChecked(
         settings_.convexHullVisible());
     convexHullProjectionVisibleCheckBox_->setText(
         tr("Show convex hull projection"));
-    connect(convexHullProjectionVisibleCheckBox_,
-            SIGNAL(stateChanged(int)),
-            this,
-            SLOT(slotSetConvexHullProjectionVisible(int)));
+    convexHullProjectionVisibleCheckBox_->stateChanged.connect([this](int val)
+    {
+        slotSetConvexHullProjectionVisible(val);
+    });
 
     // Concave hull.
     concaveHullVisibleCheckBox_ = new CheckBox;
     concaveHullVisibleCheckBox_->setChecked(settings_.concaveHullVisible());
     concaveHullVisibleCheckBox_->setText(tr("Show concave hull"));
-    connect(concaveHullVisibleCheckBox_,
-            SIGNAL(stateChanged(int)),
-            this,
-            SLOT(slotSetConcaveHullVisible(int)));
+    concaveHullVisibleCheckBox_->stateChanged.connect([this](int val)
+    {
+        slotSetConcaveHullVisible(val);
+    });
 
     concaveHullProjectionVisibleCheckBox_ = new CheckBox;
     concaveHullProjectionVisibleCheckBox_->setChecked(
         settings_.concaveHullVisible());
     concaveHullProjectionVisibleCheckBox_->setText(
         tr("Show concave hull projection"));
-    connect(concaveHullProjectionVisibleCheckBox_,
-            SIGNAL(stateChanged(int)),
-            this,
-            SLOT(slotSetConcaveHullProjectionVisible(int)));
+    concaveHullProjectionVisibleCheckBox_->stateChanged.connect([this](int val)
+    {
+        slotSetConcaveHullProjectionVisible(val);
+    });
 
     // DBH scale.
-    dbhScaleSlider_ = new QSlider;
+    dbhScaleSlider_ = new Slider;
     dbhScaleSlider_->setMinimum(1);
     dbhScaleSlider_->setMaximum(10);
     dbhScaleSlider_->setSingleStep(1);
     dbhScaleSlider_->setTickInterval(1);
-    dbhScaleSlider_->setTickPosition(QSlider::TicksAbove);
+    dbhScaleSlider_->setTickPosition(Slider::TicksAbove);
     dbhScaleSlider_->setOrientation(Ui::Horizontal);
-    connect(dbhScaleSlider_,
-            SIGNAL(valueChanged(int)),
-            this,
-            SLOT(slotSetDbhScale(int)));
+    dbhScaleSlider_->valueChanged.connect([this](int val)
+    {
+        slotSetDbhScale(val);
+    });
 
     // Options.
     VBoxLayout *optionsVBoxLayout = new VBoxLayout;

@@ -26,16 +26,13 @@
 #include <FilterManagementStatusWidget.hpp>
 #include <Application.hpp>
 #include <ThemeIcon.hpp>
-
-// Include Qt.
 #include <HBoxLayout.hpp>
 #include <Label.hpp>
-#include <QSplitter>
-#include <QToolBar>
-#include <QToolButton>
-#include <QTreeWidget>
-#include <QTreeWidgetItem>
-#include <QTreeWidgetItemIterator>
+#include <Splitter.hpp>
+#include <ToolBar.hpp>
+#include <ToolButton.hpp>
+#include <TreeWidget.hpp>
+#include <TreeWidgetItem.hpp>
 #include <VBoxLayout.hpp>
 
 // Include local.
@@ -50,50 +47,55 @@ FilterManagementStatusWidget::FilterManagementStatusWidget(
     : app_(app)
 {
     // Table.
-    tree_ = new QTreeWidget();
-    tree_->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    tree_->setSelectionBehavior(QAbstractItemView::SelectRows);
+    tree_ = new TreeWidget();
+    tree_->setSelectionMode(AbstractItemView::ExtendedSelection);
+    tree_->setSelectionBehavior(AbstractItemView::SelectRows);
+
+    tree_->itemChanged.connect([this](TreeWidgetItem *item, int column)
+    {
+        slotItemChanged(item, column);
+    });
+
+    tree_->itemSelectionChanged.connect([this]()
+    {
+        slotItemSelectionChanged();
+    });
 
     // Tool bar buttons.
     app_->createToolButton(&showButton_,
                                   tr("Show"),
                                   tr("Make selected management status visible"),
                                   THEME_ICON("eye"),
-                                  this,
-                                  SLOT(slotShow()));
+                                  [this](){ slotShow(); });
     showButton_->setEnabled(false);
 
     app_->createToolButton(&hideButton_,
                                   tr("Hide"),
                                   tr("Hide selected management status"),
                                   THEME_ICON("hide"),
-                                  this,
-                                  SLOT(slotHide()));
+                                  [this](){ slotHide(); });
     hideButton_->setEnabled(false);
 
     app_->createToolButton(&selectAllButton_,
                                   tr("Select all"),
                                   tr("Select all"),
                                   THEME_ICON("select-all"),
-                                  this,
-                                  SLOT(slotSelectAll()));
+                                  [this](){ slotSelectAll(); });
 
     app_->createToolButton(&selectInvertButton_,
                                   tr("Invert"),
                                   tr("Invert selection"),
                                   THEME_ICON("select-invert"),
-                                  this,
-                                  SLOT(slotSelectInvert()));
+                                  [this](){ slotSelectInvert(); });
 
     app_->createToolButton(&selectNoneButton_,
                                   tr("Select none"),
                                   tr("Select none"),
                                   THEME_ICON("select-none"),
-                                  this,
-                                  SLOT(slotSelectNone()));
+                                  [this](){ slotSelectNone(); });
 
     // Tool bar.
-    QToolBar *toolBar = new QToolBar;
+    ToolBar *toolBar = new ToolBar;
     toolBar->addWidget(showButton_);
     toolBar->addWidget(hideButton_);
     toolBar->addSeparator();
@@ -106,11 +108,11 @@ FilterManagementStatusWidget::FilterManagementStatusWidget(
     treeWidget_ = new FilterManagementStatusTreeWidget(app_);
 
     // Splitter.
-    splitter_ = new QSplitter;
+    splitter_ = new Splitter;
     splitter_->addWidget(tree_);
     splitter_->addWidget(treeWidget_);
     splitter_->setOrientation(Ui::Vertical);
-    splitter_->setSizes(QList<int>({1, 1}));
+    splitter_->setSizes(std::vector<int>({1, 1}));
 
     // Layout.
     VBoxLayout *mainLayout = new VBoxLayout;
@@ -202,8 +204,10 @@ void FilterManagementStatusWidget::receivedManagementStatusList()
 
     // Header.
     tree_->setColumnCount(COLUMN_LAST);
-    QStringList labels;
-    labels << tr("Visible") << tr("Id") << tr("Name");
+    std::vector<std::string> labels;
+    labels.push_back(tr("Visible"));
+    labels.push_back(tr("Id"));
+    labels.push_back(tr("Name"));
     tree_->setHeaderLabels(labels);
 
     // Content.
@@ -223,9 +227,9 @@ void FilterManagementStatusWidget::receivedManagementStatusList()
 
 void FilterManagementStatusWidget::slotShow()
 {
-    QList<QTreeWidgetItem *> items = tree_->selectedItems();
+    std::vector<TreeWidgetItem *> items = tree_->selectedItems();
 
-    if (items.count() > 0)
+    if (items.size() > 0)
     {
         updatesEnabled_ = false;
         for (auto &item : items)
@@ -240,9 +244,9 @@ void FilterManagementStatusWidget::slotShow()
 
 void FilterManagementStatusWidget::slotHide()
 {
-    QList<QTreeWidgetItem *> items = tree_->selectedItems();
+    std::vector<TreeWidgetItem *> items = tree_->selectedItems();
 
-    if (items.count() > 0)
+    if (items.size() > 0)
     {
         updatesEnabled_ = false;
         for (auto &item : items)
@@ -257,12 +261,9 @@ void FilterManagementStatusWidget::slotHide()
 
 void FilterManagementStatusWidget::slotSelectAll()
 {
-    QTreeWidgetItemIterator it(tree_);
-
-    while (*it)
+    for (auto &item : tree_->items())
     {
-        (*it)->setSelected(true);
-        ++it;
+        item.setSelected(true);
     }
 
     slotItemSelectionChanged();
@@ -270,12 +271,9 @@ void FilterManagementStatusWidget::slotSelectAll()
 
 void FilterManagementStatusWidget::slotSelectInvert()
 {
-    QTreeWidgetItemIterator it(tree_);
-
-    while (*it)
+    for (auto &item : tree_->items())
     {
-        (*it)->setSelected(!(*it)->isSelected());
-        ++it;
+        item.setSelected(!item.isSelected());
     }
 
     slotItemSelectionChanged();
@@ -283,12 +281,9 @@ void FilterManagementStatusWidget::slotSelectInvert()
 
 void FilterManagementStatusWidget::slotSelectNone()
 {
-    QTreeWidgetItemIterator it(tree_);
-
-    while (*it)
+    for (auto &item : tree_->items())
     {
-        (*it)->setSelected(false);
-        ++it;
+        item.setSelected(false);
     }
 
     slotItemSelectionChanged();
@@ -296,9 +291,9 @@ void FilterManagementStatusWidget::slotSelectNone()
 
 void FilterManagementStatusWidget::slotItemSelectionChanged()
 {
-    QList<QTreeWidgetItem *> items = tree_->selectedItems();
+    std::vector<TreeWidgetItem *> items = tree_->selectedItems();
 
-    if (items.count() > 0)
+    if (items.size() > 0)
     {
         showButton_->setEnabled(true);
         hideButton_->setEnabled(true);
@@ -310,7 +305,7 @@ void FilterManagementStatusWidget::slotItemSelectionChanged()
     }
 }
 
-void FilterManagementStatusWidget::slotItemChanged(QTreeWidgetItem *item,
+void FilterManagementStatusWidget::slotItemChanged(TreeWidgetItem *item,
                                                    int column)
 {
     if (column == COLUMN_CHECKED)
@@ -327,31 +322,29 @@ void FilterManagementStatusWidget::slotItemChanged(QTreeWidgetItem *item,
     }
 }
 
-size_t FilterManagementStatusWidget::identifier(const QTreeWidgetItem *item)
+size_t FilterManagementStatusWidget::identifier(const TreeWidgetItem *item)
 {
-    return static_cast<size_t>(item->text(COLUMN_ID).toULong());
+    return toSize(item->text(COLUMN_ID));
 }
 
 void FilterManagementStatusWidget::updateTree()
 {
     block();
 
-    QTreeWidgetItemIterator it(tree_);
     size_t i = 0;
 
-    while (*it)
+    for (auto &item : tree_->items())
     {
         if (filter_.enabled(i))
         {
-            (*it)->setCheckState(COLUMN_CHECKED, Ui::Checked);
+            item.setCheckState(COLUMN_CHECKED, Ui::Checked);
         }
         else
         {
-            (*it)->setCheckState(COLUMN_CHECKED, Ui::Unchecked);
+            item.setCheckState(COLUMN_CHECKED, Ui::Unchecked);
         }
 
         ++i;
-        ++it;
     }
 
     unblock();
@@ -359,47 +352,39 @@ void FilterManagementStatusWidget::updateTree()
 
 void FilterManagementStatusWidget::block()
 {
-    disconnect(tree_, SIGNAL(itemChanged(QTreeWidgetItem *, int)), 0, 0);
-    disconnect(tree_, SIGNAL(itemSelectionChanged()), 0, 0);
+    (void)tree_->blockSignals(true);
     (void)blockSignals(true);
 }
 
 void FilterManagementStatusWidget::unblock()
 {
     (void)blockSignals(false);
-    connect(tree_,
-            SIGNAL(itemChanged(QTreeWidgetItem *, int)),
-            this,
-            SLOT(slotItemChanged(QTreeWidgetItem *, int)));
-    connect(tree_,
-            SIGNAL(itemSelectionChanged()),
-            this,
-            SLOT(slotItemSelectionChanged()));
+    (void)tree_->blockSignals(false);
 }
 
 void FilterManagementStatusWidget::addTreeItem(size_t index)
 {
-    QTreeWidgetItem *item = new QTreeWidgetItem(tree_);
+    TreeWidgetItem item;
 
     // Checked.
     if (filter_.enabled(index))
     {
-        item->setCheckState(COLUMN_CHECKED, Ui::Checked);
+        item.setCheckState(COLUMN_CHECKED, Ui::Checked);
     }
     else
     {
-        item->setCheckState(COLUMN_CHECKED, Ui::Unchecked);
+        item.setCheckState(COLUMN_CHECKED, Ui::Unchecked);
     }
 
     // Data.
     const ManagementStatus &managementStatus = managementStatus_[index];
 
     // Id.
-    item->setText(COLUMN_ID, std::string::number(managementStatus.id));
+    item.setText(COLUMN_ID, toString(managementStatus.id));
 
     // Label.
-    auto label = core().translate(managementStatus.label);
-    item->setText(COLUMN_LABEL, std::string::fromStdString(label));
+    // auto label = core().translate(managementStatus.label);
+    item.setText(COLUMN_LABEL, managementStatus.label);
 
     // Color legend.
     Color color;
@@ -407,6 +392,8 @@ void FilterManagementStatusWidget::addTreeItem(size_t index)
     color.setGreenF(static_cast<float>(managementStatus.color[1]));
     color.setBlueF(static_cast<float>(managementStatus.color[2]));
 
-    QBrush brush(color, Ui::SolidPattern);
-    item->setBackground(COLUMN_ID, brush);
+    Brush brush(color, Ui::SolidPattern);
+    item.setBackground(COLUMN_ID, brush);
+
+    tree_->push_back(item);
 }

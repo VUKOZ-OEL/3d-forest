@@ -25,9 +25,6 @@
 #include <Application.hpp>
 #include <ThemeIcon.hpp>
 
-// Include Qt.
-#include <QCloseEvent>
-
 // Include local.
 #define LOG_MODULE_NAME "FilterSpeciesWindow"
 #include <Log.hpp>
@@ -65,7 +62,7 @@ void FilterSpeciesWindow::hideEvent(HideEvent *event)
     DockWidget::hideEvent(event);
 }
 
-void FilterSpeciesWindow::closeEvent(QCloseEvent *event)
+void FilterSpeciesWindow::closeEvent(CloseEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Close event.");
     // widget_->setFilterEnabled(false);

@@ -61,6 +61,7 @@ public:
     void setFixedHeight(int h);
 
     void show() {};
+    void hide() {};
     void raise() {};
     void activateWindow() {};
 

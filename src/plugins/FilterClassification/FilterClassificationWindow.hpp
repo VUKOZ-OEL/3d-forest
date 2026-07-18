@@ -23,18 +23,13 @@
 #define FILTER_CLASSIFICATION_WINDOW_HPP
 
 // Include 3D Forest.
+#include <DockWidget.hpp>
 class Application;
 class FilterClassificationWidget;
-
-// Include Qt.
-#include <DockWidget.hpp>
-class QCloseEvent;
 
 /** Filter Classification Window. */
 class FilterClassificationWindow : public DockWidget
 {
-
-
 public:
     FilterClassificationWindow(Application *app);
 
@@ -43,7 +38,7 @@ protected:
 
     void showEvent(ShowEvent *event) override;
     void hideEvent(HideEvent *event) override;
-    void closeEvent(QCloseEvent *event) override;
+    void closeEvent(CloseEvent *event) override;
 };
 
 #endif /* FILTER_CLASSIFICATION_WINDOW_HPP */

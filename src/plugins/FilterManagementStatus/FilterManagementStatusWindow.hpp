@@ -23,18 +23,13 @@
 #define FILTER_MANAGEMENT_STATUS_WINDOW_HPP
 
 // Include 3D Forest.
+#include <DockWidget.hpp>
 class Application;
 class FilterManagementStatusWidget;
-
-// Include Qt.
-#include <DockWidget.hpp>
-class QCloseEvent;
 
 /** Filter Management Status Window. */
 class FilterManagementStatusWindow : public DockWidget
 {
-
-
 public:
     FilterManagementStatusWindow(Application *app);
 
@@ -43,7 +38,7 @@ protected:
 
     void showEvent(ShowEvent *event) override;
     void hideEvent(HideEvent *event) override;
-    void closeEvent(QCloseEvent *event) override;
+    void closeEvent(CloseEvent *event) override;
 };
 
 #endif /* FILTER_MANAGEMENT_STATUS_WINDOW_HPP */

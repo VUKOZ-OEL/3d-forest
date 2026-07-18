@@ -37,6 +37,7 @@ class EXPORT_UI_COMMON Action
 {
 public:
     Action();
+    Action(const std::string &text);
     virtual ~Action();
 
 private:

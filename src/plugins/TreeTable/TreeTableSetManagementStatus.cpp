@@ -23,11 +23,8 @@
 #include <InputComboBoxDialog.hpp>
 #include <Application.hpp>
 #include <TreeTableSetManagementStatus.hpp>
-
-// Include Qt.
-#include <QAction>
-#include <QCoreApplication>
-#include <QMenu>
+#include <Action.hpp>
+#include <Menu.hpp>
 #include <ProgressDialog.hpp>
 
 // Include local.
@@ -37,7 +34,7 @@
 
 TreeTableSetManagementStatus::TreeTableSetManagementStatus(
     Application *app,
-    QMenu *contextMenu)
+    Menu *contextMenu)
     : app_(app),
       contextMenu_(contextMenu),
       menu_(nullptr)
@@ -47,7 +44,7 @@ TreeTableSetManagementStatus::TreeTableSetManagementStatus(
 
 void TreeTableSetManagementStatus::create()
 {
-    menu_ = new QMenu("Set Management Status", contextMenu_);
+    menu_ = new Menu(tr("Set Management Status"), contextMenu_);
 
     // Set dialog items.
     Editor *editor = &app_->editor();
@@ -55,10 +52,9 @@ void TreeTableSetManagementStatus::create()
     for (size_t i = 0; i < statusList.size(); i++)
     {
         const ManagementStatus &status = statusList[i];
-        std::string text = std::string::number(status.id) + " : " +
-                       std::string::fromStdString(status.label);
+        std::string text = toString(status.id) + " : " + status.label;
 
-        QAction *action = menu_->addAction(text);
+        Action *action = menu_->addAction(text);
         actions_[action] = status.id;
     }
 
@@ -66,7 +62,7 @@ void TreeTableSetManagementStatus::create()
     contextMenu_->addMenu(menu_);
 }
 
-void TreeTableSetManagementStatus::runAction(QAction *selectedAction,
+void TreeTableSetManagementStatus::runAction(Action *selectedAction,
                                              std::unordered_set<size_t> idList)
 {
     auto it = actions_.find(selectedAction);
@@ -110,7 +106,7 @@ void TreeTableSetManagementStatus::run(Application *app,
     Editor *editor = &app->editor();
 
     // Input.
-    InputComboBoxDialog dialog;
+    InputComboBoxDialog dialog(app);
     dialog.setWindowTitle("Select a management status");
 
     // Set dialog items.
@@ -118,8 +114,7 @@ void TreeTableSetManagementStatus::run(Application *app,
     for (size_t i = 0; i < statusList.size(); i++)
     {
         const ManagementStatus &status = statusList[i];
-        std::string text = std::string::number(status.id) + " : " +
-                       std::string::fromStdString(status.label);
+        std::string text = toString(status.id) + " : " + status.label;
         dialog.addItem(text);
     }
 

@@ -30,14 +30,12 @@
 #include <TreeTableSetSpecies.hpp>
 #include <TreeTableWidget.hpp>
 #include <Util.hpp>
-
-// Include Qt.
 #include <CheckBox.hpp>
 #include <HBoxLayout.hpp>
-#include <QHeaderView>
-#include <QMenu>
+#include <HeaderView.hpp>
+#include <Menu.hpp>
 #include <PushButton.hpp>
-#include <QTableWidget>
+#include <TableWidget.hpp>
 #include <VBoxLayout.hpp>
 
 // Include local.
@@ -47,18 +45,6 @@
 
 #define ICON(name) (ThemeIcon(":/TreeTableResources/", name))
 
-/** Tree Table Numeric Widget Item for Sorting. */
-class TreeTableNumericWidgetItem : public QTableWidgetItem
-{
-public:
-    using QTableWidgetItem::QTableWidgetItem;
-
-    bool operator<(const QTableWidgetItem &other) const override
-    {
-        return text().toDouble() < other.text().toDouble();
-    }
-};
-
 TreeTableWidget::TreeTableWidget(Application *app)
     : Widget(),
       app_(app)
@@ -66,19 +52,19 @@ TreeTableWidget::TreeTableWidget(Application *app)
     LOG_DEBUG(<< "Create.");
 
     // Table widget.
-    tableWidget_ = new QTableWidget();
+    tableWidget_ = new TableWidget();
 
     tableWidget_->setRowCount(0);
     tableWidget_->setColumnCount(2);
 
-    tableWidget_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    tableWidget_->setSizePolicy(SizePolicy::Expanding, SizePolicy::Expanding);
 
     tableWidget_->setStyleSheet("QHeaderView::section {"
                                 "background-color: lightblue;"
                                 "color: black;"
                                 "padding: 5px;"
                                 "}"
-                                "QTableWidget::item:selected {"
+                                "TableWidget::item:selected {"
                                 "  background-color: #3399FF;"
                                 "  color: white;"
                                 "}");
@@ -86,36 +72,46 @@ TreeTableWidget::TreeTableWidget(Application *app)
     // Table: enable alternating row colors
     tableWidget_->setAlternatingRowColors(true);
 
-    QPalette palette = tableWidget_->palette();
-    palette.setColor(QPalette::AlternateBase, Color(240, 240, 240));
-    palette.setColor(QPalette::Base, Ui::white);
+    Palette palette = tableWidget_->palette();
+    palette.setColor(Palette::AlternateBase, Color(240, 240, 240));
+    palette.setColor(Palette::Base, Ui::white);
     tableWidget_->setPalette(palette);
 
     // Table: Context menu.
     tableWidget_->setContextMenuPolicy(Ui::CustomContextMenu);
 
     // Table: Selection.
-    tableWidget_->setSelectionBehavior(QAbstractItemView::SelectRows);
-    tableWidget_->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    tableWidget_->setSelectionBehavior(AbstractItemView::SelectRows);
+    tableWidget_->setSelectionMode(AbstractItemView::ExtendedSelection);
 
     // Table: Signals.
-    connectSignals();
+    tableWidget_->customContextMenuRequested.connect([this](Point pos)
+    {
+        slotCustomContextMenuRequested(pos);
+    });
+
+    tableWidget_->selectionChanged.connect([this](ItemSelection selected, ItemSelection deselected)
+    {
+        slotTableSelectionChanged(selected, deselected);
+    });
 
     // Options.
     showOnlyVisibleTreesCheckBox_ = new CheckBox;
     showOnlyVisibleTreesCheckBox_->setText(tr("Show only visible trees"));
     showOnlyVisibleTreesCheckBox_->setChecked(false);
-
-    connect(showOnlyVisibleTreesCheckBox_,
-            SIGNAL(stateChanged(int)),
-            this,
-            SLOT(slotShowOnlyVisibleTreesChanged(int)));
+    showOnlyVisibleTreesCheckBox_->stateChanged.connect([this](int val)
+    {
+        slotShowOnlyVisibleTreesChanged(val);
+    });
 
     // Buttons.
     exportButton_ = new PushButton(tr("Export"));
     exportButton_->setIcon(THEME_ICON("export-file"));
-    exportButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    connect(exportButton_, SIGNAL(clicked()), this, SLOT(slotExport()));
+    exportButton_->setSizePolicy(SizePolicy::Minimum, SizePolicy::Minimum);
+    exportButton_->clicked.connect([this]()
+    {
+        slotExport();
+    });
 
     // Buttons layout.
     HBoxLayout *buttonsLayout = new HBoxLayout;
@@ -200,7 +196,7 @@ std::unordered_set<size_t> TreeTableWidget::selectedRowsToIds()
 {
     QModelIndexList indexes = tableWidget_->selectionModel()->selectedIndexes();
     std::set<int> selectedRows;
-    for (const QModelIndex &index : indexes)
+    for (const ModelIndex &index : indexes)
     {
         selectedRows.insert(index.row());
     }
@@ -208,15 +204,14 @@ std::unordered_set<size_t> TreeTableWidget::selectedRowsToIds()
     std::unordered_set<size_t> idList;
     for (int row : selectedRows)
     {
-        QTableWidgetItem *itemId = tableWidget_->item(row, COLUMN_ID);
+        TableWidgetItem *itemId = tableWidget_->item(row, COLUMN_ID);
         if (!itemId)
         {
             LOG_ERROR(<< "Failed to get table item ID at row <" << row << ">.");
             continue;
         }
 
-        std::string textId = itemId->text();
-        idList.insert(static_cast<size_t>(textId.toULong()));
+        idList.insert(toSize(itemId->text()));
     }
 
     return idList;
@@ -239,10 +234,10 @@ FileFormatTable TreeTableWidget::createExportTable() const
     for (int col = 0; col < colCount; ++col)
     {
         size_t c = static_cast<size_t>(col);
-        QTableWidgetItem *item = tableWidget_->horizontalHeaderItem(col);
+        TableWidgetItem *item = tableWidget_->horizontalHeaderItem(col);
         if (item)
         {
-            table.columns[c].header = item->text().toStdString();
+            table.columns[c].header = item->text();
         }
 
         table.columns[c].cells.resize(static_cast<size_t>(rowCount));
@@ -254,10 +249,10 @@ FileFormatTable TreeTableWidget::createExportTable() const
         for (int row = 0; row < rowCount; ++row)
         {
             size_t r = static_cast<size_t>(row);
-            QTableWidgetItem *item = tableWidget_->item(row, col);
+            TableWidgetItem *item = tableWidget_->item(row, col);
             if (item)
             {
-                table.columns[c].cells[r].text = item->text().toStdString();
+                table.columns[c].cells[r].text = item->text();
             }
         }
     }
@@ -285,8 +280,8 @@ void TreeTableWidget::slotShowOnlyVisibleTreesChanged(int index)
 }
 
 void TreeTableWidget::slotTableSelectionChanged(
-    const QItemSelection &selected,
-    const QItemSelection &deselected)
+    const ItemSelection &selected,
+    const ItemSelection &deselected)
 {
     LOG_DEBUG(<< "Selection changed.");
     (void)selected;
@@ -322,7 +317,7 @@ void TreeTableWidget::slotExport()
             writer->create(createExportTable());
 
             // Remember the last file name used for export.
-            fileName_ = std::string::fromStdString(writer->fileName());
+            fileName_ = writer->fileName();
         }
     }
     catch (std::exception &e)
@@ -339,9 +334,9 @@ void TreeTableWidget::slotExport()
     LOG_DEBUG(<< "Finished exporting tree table.");
 }
 
-void TreeTableWidget::slotCustomContextMenuRequested(const QPoint &pos)
+void TreeTableWidget::slotCustomContextMenuRequested(const Point &pos)
 {
-    QModelIndex index = tableWidget_->indexAt(pos);
+    ModelIndex index = tableWidget_->indexAt(pos);
     if (!index.isValid())
     {
         return;
@@ -353,17 +348,17 @@ void TreeTableWidget::slotCustomContextMenuRequested(const QPoint &pos)
     app_->suspendThreads();
 
     // Create and run the context menu.
-    QMenu contextMenu(this);
+    Menu contextMenu(app_);
 
     TreeTableSetManagementStatus managementStatusMenu(app_,
                                                       &contextMenu);
     TreeTableSetSpecies speciesMenu(app_, &contextMenu);
-    QAction *showTreesAction = contextMenu.addAction("Show selected trees");
-    QAction *hideTreesAction = contextMenu.addAction("Hide selected trees");
-    QAction *readQsmAction = contextMenu.addAction("Read QSM mesh");
-    QAction *deleteQsmAction = contextMenu.addAction("Delete QSM mesh");
+    Action *showTreesAction = contextMenu.addAction("Show selected trees");
+    Action *hideTreesAction = contextMenu.addAction("Hide selected trees");
+    Action *readQsmAction = contextMenu.addAction("Read QSM mesh");
+    Action *deleteQsmAction = contextMenu.addAction("Delete QSM mesh");
 
-    QAction *selectedAction =
+    Action *selectedAction =
         contextMenu.exec(tableWidget_->viewport()->mapToGlobal(pos));
 
     // Selected rows to id list.
@@ -420,48 +415,14 @@ void TreeTableWidget::closeWidget()
 
 void TreeTableWidget::block()
 {
-    disconnectSignals();
+    (void)tableWidget_->blockSignals(true);
     (void)blockSignals(true);
 }
 
 void TreeTableWidget::unblock()
 {
     (void)blockSignals(false);
-    connectSignals();
-}
-
-void TreeTableWidget::disconnectSignals()
-{
-    // disconnect(tableWidget_, SIGNAL(customContextMenuRequested(QPoint)), 0,
-    // 0);
-
-    disconnect(tableWidget_,
-               &QTableWidget::customContextMenuRequested,
-               this,
-               &TreeTableWidget::slotCustomContextMenuRequested);
-
-    disconnect(tableWidget_->selectionModel(),
-               &QItemSelectionModel::selectionChanged,
-               this,
-               &TreeTableWidget::slotTableSelectionChanged);
-}
-
-void TreeTableWidget::connectSignals()
-{
-    // connect(tableWidget_,
-    //         SIGNAL(customContextMenuRequested(QPoint)),
-    //         this,
-    //         SLOT(slotCustomContextMenuRequested(QPoint)));
-
-    connect(tableWidget_,
-            &QTableWidget::customContextMenuRequested,
-            this,
-            &TreeTableWidget::slotCustomContextMenuRequested);
-
-    connect(tableWidget_->selectionModel(),
-            &QItemSelectionModel::selectionChanged,
-            this,
-            &TreeTableWidget::slotTableSelectionChanged);
+    (void)tableWidget_->blockSignals(false);
 }
 
 // -----------------------------------------------------------------------------
@@ -622,9 +583,9 @@ void TreeTableWidget::setCell(int row,
 {
     if (userCheckable)
     {
-        QTableWidgetItem *item = new QTableWidgetItem();
-        item->setFlags(item->flags() | Ui::ItemIsUserCheckable);
-        item->setCheckState(value ? Ui::Checked : Ui::Unchecked);
+        TableWidgetItem item;
+        item.setFlags(item.flags() | Ui::ItemIsUserCheckable);
+        item.setCheckState(value ? Ui::Checked : Ui::Unchecked);
 
         tableWidget_->setItem(row, col, item);
     }
@@ -656,22 +617,15 @@ void TreeTableWidget::setCell(int row,
                               const Color &color,
                               bool isNumeric)
 {
-    std::string text(std::string::fromStdString(value));
-    QTableWidgetItem *item;
+    TableWidgetItem item;
 
-    if (isNumeric)
-    {
-        item = new TreeTableNumericWidgetItem(text);
-    }
-    else
-    {
-        item = new QTableWidgetItem(text);
-    }
+    item.setText(value);
+    item.setNumeric(isNumeric);
 
     if (color.isValid())
     {
-        QBrush brush(color, Ui::SolidPattern);
-        item->setBackground(brush);
+        Brush brush(color, Ui::SolidPattern);
+        item.setBackground(brush);
     }
 
     tableWidget_->setItem(row, col, item);

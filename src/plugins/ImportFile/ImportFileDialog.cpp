@@ -24,8 +24,6 @@
 #include <InfoDialog.hpp>
 #include <Application.hpp>
 #include <ThemeIcon.hpp>
-
-// Include Qt.
 #include <CheckBox.hpp>
 #include <GridLayout.hpp>
 #include <GroupBox.hpp>
@@ -42,6 +40,7 @@
 
 ImportFileDialog::ImportFileDialog(Application *app)
     : Dialog(app),
+      app_(app),
       helpDialog_(nullptr)
 {
     int row = 0;
@@ -106,14 +105,23 @@ ImportFileDialog::ImportFileDialog(Application *app)
     // Dialog buttons.
     helpButton_ = new PushButton(tr("Help"));
     helpButton_->setIcon(THEME_ICON("question"));
-    connect(helpButton_, SIGNAL(clicked()), this, SLOT(slotHelp()));
+    helpButton_->clicked.connect([this]()
+    {
+        slotHelp();
+    });
 
     acceptButton_ = new PushButton(tr("Import"));
     acceptButton_->setIcon(THEME_ICON("run"));
-    connect(acceptButton_, SIGNAL(clicked()), this, SLOT(slotAccept()));
+    acceptButton_->clicked.connect([this]()
+    {
+        slotAccept();
+    });
 
     rejectButton_ = new PushButton(tr("Cancel"));
-    connect(rejectButton_, SIGNAL(clicked()), this, SLOT(slotReject()));
+    rejectButton_->clicked.connect([this]()
+    {
+        slotReject();
+    });
 
     HBoxLayout *dialogButtons = new HBoxLayout;
     dialogButtons->addWidget(helpButton_);
@@ -205,7 +213,7 @@ void ImportFileDialog::slotHelp()
 
     if (!helpDialog_)
     {
-        helpDialog_ = new InfoDialog(this, 550, 450);
+        helpDialog_ = new InfoDialog(app_, 550, 450);
         helpDialog_->setWindowTitle(tr("Import File Help"));
         helpDialog_->setText(t);
     }

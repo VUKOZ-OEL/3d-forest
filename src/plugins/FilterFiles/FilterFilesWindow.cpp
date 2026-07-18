@@ -25,9 +25,6 @@
 #include <Application.hpp>
 #include <ThemeIcon.hpp>
 
-// Include Qt.
-#include <QCloseEvent>
-
 // Include local.
 #define LOG_MODULE_NAME "FilterFilesWindow"
 #include <Log.hpp>
@@ -61,7 +58,7 @@ void FilterFilesWindow::hideEvent(HideEvent *event)
     DockWidget::hideEvent(event);
 }
 
-void FilterFilesWindow::closeEvent(QCloseEvent *event)
+void FilterFilesWindow::closeEvent(CloseEvent *event)
 {
     LOG_DEBUG_QT_EVENT(<< "Close event.");
     // widget_->setFilterEnabled(false);

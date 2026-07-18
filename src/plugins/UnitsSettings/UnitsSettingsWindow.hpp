@@ -23,16 +23,12 @@
 #define UNITS_SETTINGS_WINDOW_HPP
 
 // Include 3D Forest.
-class Application;
-
-// Include Qt.
 #include <DockWidget.hpp>
+class Application;
 
 /** Units Settings Window. */
 class UnitsSettingsWindow : public DockWidget
 {
-
-
 public:
     UnitsSettingsWindow(Application *app);
 };

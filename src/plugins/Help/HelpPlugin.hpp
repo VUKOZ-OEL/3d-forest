@@ -23,31 +23,37 @@
 #define HELP_PLUGIN_HPP
 
 // Include 3D Forest.
-class Application;
+#include <Plugin.hpp>
+class Action;
 
-// Include Qt.
-#include <QObject>
-class QAction;
-
-// Include local.
-#include <ExportGui.hpp>
+#if defined(_MSC_VER)
+    #if defined(EXPORT_3DForestHelpPlugin)
+        #define EXPORT_HELP_PLUGIN __declspec(dllexport)
+    #else
+        #define EXPORT_HELP_PLUGIN __declspec(dllimport)
+    #endif
+#else
+    #define EXPORT_HELP_PLUGIN
+#endif
 
 /** Help Plugin. */
-class EXPORT_GUI HelpPlugin : public QObject
+class HelpPlugin : public Plugin
 {
-
-
 public:
-    HelpPlugin();
-
-    void initialize(Application *app);
-
+    const char *name() const override { return "HelpPlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
     void slotAbout();
 
 private:
     Application *app_;
-    QAction *aboutAction_;
+    Action *aboutAction_;
 };
+
+extern "C" EXPORT_HELP_PLUGIN Plugin *createPlugin()
+{
+    return new HelpPlugin();
+}
 
 #endif /* HELP_PLUGIN_HPP */

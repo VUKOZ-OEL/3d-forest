@@ -56,6 +56,7 @@ public:
     void setFixedHeight(int h);
     void setMaximumWidth(int w);
     void setMaximumHeight(int h);
+    int width() const;
     int height() const;
 
     void setModal(bool b);

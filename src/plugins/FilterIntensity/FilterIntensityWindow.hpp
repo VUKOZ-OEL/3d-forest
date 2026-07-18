@@ -23,18 +23,13 @@
 #define FILTER_INTENSITY_WINDOW_HPP
 
 // Include 3D Forest.
+#include <DockWidget.hpp>
 class Application;
 class FilterIntensityWidget;
-
-// Include Qt.
-#include <DockWidget.hpp>
-class QCloseEvent;
 
 /** Filter Intensity Window. */
 class FilterIntensityWindow : public DockWidget
 {
-
-
 public:
     FilterIntensityWindow(Application *app);
 
@@ -43,8 +38,7 @@ protected:
 
     void showEvent(ShowEvent *event) override;
     void hideEvent(HideEvent *event) override;
-
-    void closeEvent(QCloseEvent *event) override;
+    void closeEvent(CloseEvent *event) override;
 };
 
 #endif /* FILTER_INTENSITY_WINDOW_HPP */

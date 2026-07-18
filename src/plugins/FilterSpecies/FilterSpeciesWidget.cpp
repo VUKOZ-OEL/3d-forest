@@ -24,15 +24,12 @@
 #include <FilterSpeciesWidget.hpp>
 #include <Application.hpp>
 #include <ThemeIcon.hpp>
-
-// Include Qt.
 #include <HBoxLayout.hpp>
 #include <Label.hpp>
-#include <QToolBar>
-#include <QToolButton>
-#include <QTreeWidget>
-#include <QTreeWidgetItem>
-#include <QTreeWidgetItemIterator>
+#include <ToolBar.hpp>
+#include <ToolButton.hpp>
+#include <TreeWidget.hpp>
+#include <TreeWidgetItem.hpp>
 #include <VBoxLayout.hpp>
 
 // Include local.
@@ -46,50 +43,55 @@ FilterSpeciesWidget::FilterSpeciesWidget(Application *app)
     : app_(app)
 {
     // Table.
-    tree_ = new QTreeWidget();
-    tree_->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    tree_->setSelectionBehavior(QAbstractItemView::SelectRows);
+    tree_ = new TreeWidget();
+    tree_->setSelectionMode(AbstractItemView::ExtendedSelection);
+    tree_->setSelectionBehavior(AbstractItemView::SelectRows);
+
+    tree_->itemChanged.connect([this](TreeWidgetItem *item, int column)
+    {
+        slotItemChanged(item, column);
+    });
+
+    tree_->itemSelectionChanged.connect([this]()
+    {
+        slotItemSelectionChanged();
+    });
 
     // Tool bar buttons.
     app_->createToolButton(&showButton_,
                                   tr("Show"),
                                   tr("Make selected species visible"),
                                   THEME_ICON("eye"),
-                                  this,
-                                  SLOT(slotShow()));
+                                  [this](){ slotShow(); });
     showButton_->setEnabled(false);
 
     app_->createToolButton(&hideButton_,
                                   tr("Hide"),
                                   tr("Hide selected species"),
                                   THEME_ICON("hide"),
-                                  this,
-                                  SLOT(slotHide()));
+                                  [this](){ slotHide(); });
     hideButton_->setEnabled(false);
 
     app_->createToolButton(&selectAllButton_,
                                   tr("Select all"),
                                   tr("Select all"),
                                   THEME_ICON("select-all"),
-                                  this,
-                                  SLOT(slotSelectAll()));
+                                  [this](){ slotSelectAll(); });
 
     app_->createToolButton(&selectInvertButton_,
                                   tr("Invert"),
                                   tr("Invert selection"),
                                   THEME_ICON("select-invert"),
-                                  this,
-                                  SLOT(slotSelectInvert()));
+                                  [this](){ slotSelectInvert(); });
 
     app_->createToolButton(&selectNoneButton_,
                                   tr("Select none"),
                                   tr("Select none"),
                                   THEME_ICON("select-none"),
-                                  this,
-                                  SLOT(slotSelectNone()));
+                                  [this](){ slotSelectNone(); });
 
     // Tool bar.
-    QToolBar *toolBar = new QToolBar;
+    ToolBar *toolBar = new ToolBar;
     toolBar->addWidget(showButton_);
     toolBar->addWidget(hideButton_);
     toolBar->addSeparator();
@@ -180,8 +182,10 @@ void FilterSpeciesWidget::setSpeciesList(const Segments &segments,
 
     // Header.
     tree_->setColumnCount(COLUMN_LAST);
-    QStringList labels;
-    labels << tr("Visible") << tr("Id") << tr("Name");
+    std::vector<std::string> labels;
+    labels.push_back(tr("Visible"));
+    labels.push_back(tr("Id"));
+    labels.push_back(tr("Name"));
     tree_->setHeaderLabels(labels);
 
     // Content.
@@ -214,9 +218,9 @@ void FilterSpeciesWidget::updateUsedSpecies()
 
 void FilterSpeciesWidget::slotShow()
 {
-    QList<QTreeWidgetItem *> items = tree_->selectedItems();
+    std::vector<TreeWidgetItem *> items = tree_->selectedItems();
 
-    if (items.count() > 0)
+    if (items.size() > 0)
     {
         updatesEnabled_ = false;
         for (auto &item : items)
@@ -231,9 +235,9 @@ void FilterSpeciesWidget::slotShow()
 
 void FilterSpeciesWidget::slotHide()
 {
-    QList<QTreeWidgetItem *> items = tree_->selectedItems();
+    std::vector<TreeWidgetItem *> items = tree_->selectedItems();
 
-    if (items.count() > 0)
+    if (items.size() > 0)
     {
         updatesEnabled_ = false;
         for (auto &item : items)
@@ -248,12 +252,9 @@ void FilterSpeciesWidget::slotHide()
 
 void FilterSpeciesWidget::slotSelectAll()
 {
-    QTreeWidgetItemIterator it(tree_);
-
-    while (*it)
+    for (auto &item : tree_->items())
     {
-        (*it)->setSelected(true);
-        ++it;
+        item.setSelected(true);
     }
 
     slotItemSelectionChanged();
@@ -261,12 +262,9 @@ void FilterSpeciesWidget::slotSelectAll()
 
 void FilterSpeciesWidget::slotSelectInvert()
 {
-    QTreeWidgetItemIterator it(tree_);
-
-    while (*it)
+    for (auto &item : tree_->items())
     {
-        (*it)->setSelected(!(*it)->isSelected());
-        ++it;
+        item.setSelected(!item.isSelected());
     }
 
     slotItemSelectionChanged();
@@ -274,12 +272,9 @@ void FilterSpeciesWidget::slotSelectInvert()
 
 void FilterSpeciesWidget::slotSelectNone()
 {
-    QTreeWidgetItemIterator it(tree_);
-
-    while (*it)
+    for (auto &item : tree_->items())
     {
-        (*it)->setSelected(false);
-        ++it;
+        item.setSelected(false);
     }
 
     slotItemSelectionChanged();
@@ -287,9 +282,9 @@ void FilterSpeciesWidget::slotSelectNone()
 
 void FilterSpeciesWidget::slotItemSelectionChanged()
 {
-    QList<QTreeWidgetItem *> items = tree_->selectedItems();
+    std::vector<TreeWidgetItem *> items = tree_->selectedItems();
 
-    if (items.count() > 0)
+    if (items.size() > 0)
     {
         showButton_->setEnabled(true);
         hideButton_->setEnabled(true);
@@ -301,7 +296,7 @@ void FilterSpeciesWidget::slotItemSelectionChanged()
     }
 }
 
-void FilterSpeciesWidget::slotItemChanged(QTreeWidgetItem *item, int column)
+void FilterSpeciesWidget::slotItemChanged(TreeWidgetItem *item, int column)
 {
     if (column == COLUMN_CHECKED)
     {
@@ -317,31 +312,29 @@ void FilterSpeciesWidget::slotItemChanged(QTreeWidgetItem *item, int column)
     }
 }
 
-size_t FilterSpeciesWidget::identifier(const QTreeWidgetItem *item)
+size_t FilterSpeciesWidget::identifier(const TreeWidgetItem *item)
 {
-    return static_cast<size_t>(item->text(COLUMN_ID).toULong());
+    return toSize(item->text(COLUMN_ID));
 }
 
 void FilterSpeciesWidget::updateTree()
 {
     block();
 
-    QTreeWidgetItemIterator it(tree_);
     size_t i = 0;
 
-    while (*it)
+    for (auto &item : tree_->items())
     {
         if (filter_.enabled(i))
         {
-            (*it)->setCheckState(COLUMN_CHECKED, Ui::Checked);
+            item.setCheckState(COLUMN_CHECKED, Ui::Checked);
         }
         else
         {
-            (*it)->setCheckState(COLUMN_CHECKED, Ui::Unchecked);
+            item.setCheckState(COLUMN_CHECKED, Ui::Unchecked);
         }
 
         ++i;
-        ++it;
     }
 
     unblock();
@@ -349,46 +342,38 @@ void FilterSpeciesWidget::updateTree()
 
 void FilterSpeciesWidget::block()
 {
-    disconnect(tree_, SIGNAL(itemChanged(QTreeWidgetItem *, int)), 0, 0);
-    disconnect(tree_, SIGNAL(itemSelectionChanged()), 0, 0);
+    (void)tree_->blockSignals(true);
     (void)blockSignals(true);
 }
 
 void FilterSpeciesWidget::unblock()
 {
     (void)blockSignals(false);
-    connect(tree_,
-            SIGNAL(itemChanged(QTreeWidgetItem *, int)),
-            this,
-            SLOT(slotItemChanged(QTreeWidgetItem *, int)));
-    connect(tree_,
-            SIGNAL(itemSelectionChanged()),
-            this,
-            SLOT(slotItemSelectionChanged()));
+    (void)tree_->blockSignals(false);
 }
 
 void FilterSpeciesWidget::addTreeItem(size_t index)
 {
-    QTreeWidgetItem *item = new QTreeWidgetItem(tree_);
+    TreeWidgetItem item;
 
     // Checked.
     if (filter_.enabled(index))
     {
-        item->setCheckState(COLUMN_CHECKED, Ui::Checked);
+        item.setCheckState(COLUMN_CHECKED, Ui::Checked);
     }
     else
     {
-        item->setCheckState(COLUMN_CHECKED, Ui::Unchecked);
+        item.setCheckState(COLUMN_CHECKED, Ui::Unchecked);
     }
 
     // Data.
     const Species &species = species_[index];
 
     // Id.
-    item->setText(COLUMN_ID, std::string::number(species.id));
+    item.setText(COLUMN_ID, toString(species.id));
 
     // Label.
-    item->setText(COLUMN_LABEL, std::string::fromStdString(species.latin));
+    item.setText(COLUMN_LABEL, species.latin);
 
     // Color legend.
     Color color;
@@ -396,6 +381,8 @@ void FilterSpeciesWidget::addTreeItem(size_t index)
     color.setGreenF(static_cast<float>(species.color[1]));
     color.setBlueF(static_cast<float>(species.color[2]));
 
-    QBrush brush(color, Ui::SolidPattern);
-    item->setBackground(COLUMN_ID, brush);
+    Brush brush(color, Ui::SolidPattern);
+    item.setBackground(COLUMN_ID, brush);
+
+    tree_->push_back(item);
 }

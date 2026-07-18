@@ -25,26 +25,21 @@
 // Include 3D Forest.
 #include <Classifications.hpp>
 #include <Editor.hpp>
-class Application;
-
-// Include Qt.
 #include <Widget.hpp>
-class QToolButton;
-class QTreeWidget;
-class QTreeWidgetItem;
+class Application;
+class ToolButton;
+class TreeWidget;
+class TreeWidgetItem;
 
 /** Filter Classification Widget. */
 class FilterClassificationWidget : public Widget
 {
-
-
 public:
     FilterClassificationWidget(Application *app);
 
     void setFilterEnabled(bool b);
 
     Size sizeHint() const override { return Size(300, 200); }
-
 
     void slotUpdate(void *sender, const std::set<Editor::Type> &target);
 
@@ -55,7 +50,7 @@ public:
     void slotSelectNone();
 
     void slotItemSelectionChanged();
-    void slotItemChanged(QTreeWidgetItem *item, int column);
+    void slotItemChanged(TreeWidgetItem *item, int column);
 
 protected:
     /** Filter Classification Column. */
@@ -69,12 +64,12 @@ protected:
 
     Application *app_;
 
-    QTreeWidget *tree_;
-    QToolButton *showButton_;
-    QToolButton *hideButton_;
-    QToolButton *selectAllButton_;
-    QToolButton *selectInvertButton_;
-    QToolButton *selectNoneButton_;
+    TreeWidget *tree_;
+    ToolButton *showButton_;
+    ToolButton *hideButton_;
+    ToolButton *selectAllButton_;
+    ToolButton *selectInvertButton_;
+    ToolButton *selectNoneButton_;
     bool updatesEnabled_;
 
     Classifications classifications_;
@@ -85,7 +80,7 @@ protected:
     void dataChanged();
     void filterChanged();
 
-    size_t identifier(const QTreeWidgetItem *item);
+    size_t identifier(const TreeWidgetItem *item);
     void updateTree();
     void block();
     void unblock();

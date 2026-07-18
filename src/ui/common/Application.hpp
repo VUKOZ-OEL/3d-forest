@@ -36,6 +36,7 @@
 #include <ThemeIcon.hpp>
 #include <EventQueue.hpp>
 #include <DockWidget.hpp>
+#include <ToolButton.hpp>
 
 // Include local.
 #include <ExportUiCommon.hpp>
@@ -57,6 +58,8 @@
 class EXPORT_UI_COMMON Application : public ThreadCallbackInterface
 {
 public:
+    static inline const std::string APPLICATION_NAME{"1.0"};
+    static inline const std::string APPLICATION_VERSION{"3D Forest"};
     static const int ICON_SIZE{16};
     static const int ICON_SIZE_TEXT{16};
 
@@ -109,12 +112,11 @@ public:
             menuItemPriority);
     }
 
-    // void createToolButton(QToolButton **result,
-    //                       const QString &text,
-    //                       const QString &toolTip,
-    //                       const ThemeIcon &themeIcon,
-    //                       const QObject *receiver,
-    //                       const char *member);
+    void createToolButton(ToolButton **result,
+                          const std::string &text,
+                          const std::string &toolTip,
+                          const ThemeIcon &themeIcon,
+                          std::function<void()> callback = {});
 
     void setCentralWidget(Widget *widget);
     void addDockWidget(int area, DockWidget *widget);

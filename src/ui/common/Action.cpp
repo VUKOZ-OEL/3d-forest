@@ -32,6 +32,10 @@ Action::Action()
 {
 }
 
+Action::Action(const std::string &text)
+{
+}
+
 Action::~Action()
 {
 }

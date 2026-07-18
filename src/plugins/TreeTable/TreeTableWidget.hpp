@@ -23,22 +23,19 @@
 #define TREE_TABLE_WIDGET_HPP
 
 // Include 3D Forest.
+#include <ItemSelection.hpp>
+#include <Color.hpp>
+#include <Widget.hpp>
 #include <Editor.hpp>
 #include <FileFormatTable.hpp>
 class Application;
-
-// Include Qt.
-#include <QItemSelection>
-#include <Widget.hpp>
 class CheckBox;
 class PushButton;
-class QTableWidget;
+class TableWidget;
 
 /** Tree Table Widget. */
 class TreeTableWidget : public Widget
 {
-
-
 public:
     TreeTableWidget(Application *app);
 
@@ -46,15 +43,13 @@ public:
 
     void closeWidget();
 
-
     void slotUpdate(void *sender, const std::set<Editor::Type> &target);
-
 
     void slotShowOnlyVisibleTreesChanged(int index);
     void slotExport();
-    void slotCustomContextMenuRequested(const QPoint &pos);
-    void slotTableSelectionChanged(const QItemSelection &selected,
-                                   const QItemSelection &deselected);
+    void slotCustomContextMenuRequested(const Point &pos);
+    void slotTableSelectionChanged(const ItemSelection &selected,
+                                   const ItemSelection &deselected);
 
 private:
     /** Tree Table Column. */
@@ -85,7 +80,7 @@ private:
 
     Application *app_;
 
-    QTableWidget *tableWidget_;
+    TableWidget *tableWidget_;
     PushButton *exportButton_;
 
     CheckBox *showOnlyVisibleTreesCheckBox_;
@@ -110,8 +105,6 @@ private:
     // Setup and manage signals.
     void block();
     void unblock();
-    void disconnectSignals();
-    void connectSignals();
 
     // Set table data.
     void updateTableContent();

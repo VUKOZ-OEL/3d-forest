@@ -21,6 +21,7 @@
 
 // Include 3D Forest.
 #include <Color.hpp>
+#include <Util.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "Color"
@@ -35,22 +36,73 @@ Color::Color(int r, int g, int b, int a)
     setRgb(r, g, b, a);
 }
 
+Color::Color(Ui::GlobalColor gc)
+{
+}
+
 Color::~Color()
 {
 }
 
-void Color::setRgb(int r, int g, int b, int a)
+void Color::setRed(int r)
 {
     r_ = r;
+    clamp(r_, 0, 255);
+    spec_ = Color::Rgb;
+}
+
+void Color::setGreen(int g)
+{
     g_ = g;
+    clamp(g_, 0, 255);
+    spec_ = Color::Rgb;
+}
+
+void Color::setBlue(int b)
+{
     b_ = b;
+    clamp(b_, 0, 255);
+    spec_ = Color::Rgb;
+}
+
+void Color::setAlpha(int a)
+{
     a_ = a;
+    clamp(a_, 0, 255);
+}
+
+void Color::setRedF(float r)
+{
+    setRed(static_cast<int>(r * 255.0F));
+}
+
+void Color::setGreenF(float g)
+{
+    setGreen(static_cast<int>(g * 255.0F));
+}
+
+void Color::setBlueF(float b)
+{
+    setBlue(static_cast<int>(b * 255.0F));
+}
+
+void Color::setAlphaF(float a)
+{
+    setAlpha(static_cast<int>(a * 255.0F));
+}
+
+void Color::setRgb(int r, int g, int b, int a)
+{
+    setRed(r);
+    setGreen(g);
+    setBlue(b);
+    setAlpha(a);
 }
 
 void Color::setRgbF(float r, float g, float b, float a)
 {
-    setRgb(static_cast<int>(r * 255.0F),
-           static_cast<int>(g * 255.0F),
-           static_cast<int>(b * 255.0F),
-           static_cast<int>(a * 255.0F));
+    setRedF(r);
+    setGreenF(g);
+    setBlueF(b);
+    setAlphaF(a);
 }

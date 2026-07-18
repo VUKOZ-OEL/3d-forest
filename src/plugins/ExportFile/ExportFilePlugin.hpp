@@ -50,7 +50,7 @@ public:
 
 private:
     Application *app_;
-    QAction *exportFileAction_;
+    Action *exportFileAction_;
     std::string fileName_;
 };
 

@@ -71,6 +71,12 @@ public:
                     int buttons = Ok,
                     int defaultButton = NoButton);
 
+    static int about(Application *app,
+                    const std::string &title,
+                    const std::string &text,
+                    int buttons = Ok,
+                    int defaultButton = NoButton);
+
     static int question(Application *app,
                     const std::string &title,
                     const std::string &text,
