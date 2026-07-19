@@ -37,8 +37,7 @@ class FilterFilesWindow;
 #endif
 
 /** Filter Files Plugin. */
-class FilterFilesPlugin : 
-                                                     public Plugin
+class FilterFilesPlugin : public Plugin
 {
 public:
     FilterFilesPlugin();

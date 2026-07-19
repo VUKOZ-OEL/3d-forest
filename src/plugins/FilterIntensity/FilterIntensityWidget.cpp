@@ -20,9 +20,9 @@
 /** @file FilterIntensityWidget.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <DoubleRangeSliderWidget.hpp>
 #include <FilterIntensityWidget.hpp>
-#include <Application.hpp>
 #include <HBoxLayout.hpp>
 #include <PushButton.hpp>
 #include <VBoxLayout.hpp>
@@ -39,18 +39,19 @@ FilterIntensityWidget::FilterIntensityWidget(Application *app)
     LOG_DEBUG(<< "Start creating intensity filter widget.");
 
     // Input widgets.
-    DoubleRangeSliderWidget::create(intensityInput_,
-        [this](double val){ slotMinimumValueChanged(val); },
-        [this](double val){ slotMaximumValueChanged(val); },
-        [this](){ slotFinalValue(); },
-                                    tr("Intensity"),
-                                    tr("Min-max intensity range filter"),
-                                    tr("%"),
-                                    1,
-                                    0,
-                                    100,
-                                    0,
-                                    100);
+    DoubleRangeSliderWidget::create(
+        intensityInput_,
+        [this](double val) { slotMinimumValueChanged(val); },
+        [this](double val) { slotMaximumValueChanged(val); },
+        [this]() { slotFinalValue(); },
+        tr("Intensity"),
+        tr("Min-max intensity range filter"),
+        tr("%"),
+        1,
+        0,
+        100,
+        0,
+        100);
 
     // Layout.
     VBoxLayout *mainLayout = new VBoxLayout;
@@ -61,10 +62,9 @@ FilterIntensityWidget::FilterIntensityWidget(Application *app)
     setLayout(mainLayout);
 
     // Data.
-    app_->signalUpdate.connect([this](void *sender, const std::set<Editor::Type> &target)
-    {
-        slotUpdate(sender, target);
-    });
+    app_->signalUpdate.connect(
+        [this](void *sender, const std::set<Editor::Type> &target)
+        { slotUpdate(sender, target); });
 
     slotUpdate(nullptr, std::set<Editor::Type>());
 

@@ -20,21 +20,20 @@
 /** @file TreeTableSetManagementStatus.cpp */
 
 // Include 3D Forest.
-#include <InputComboBoxDialog.hpp>
-#include <Application.hpp>
-#include <TreeTableSetManagementStatus.hpp>
 #include <Action.hpp>
+#include <Application.hpp>
+#include <InputComboBoxDialog.hpp>
 #include <Menu.hpp>
 #include <ProgressDialog.hpp>
+#include <TreeTableSetManagementStatus.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "TreeTableSetManagementStatus"
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-TreeTableSetManagementStatus::TreeTableSetManagementStatus(
-    Application *app,
-    Menu *contextMenu)
+TreeTableSetManagementStatus::TreeTableSetManagementStatus(Application *app,
+                                                           Menu *contextMenu)
     : app_(app),
       contextMenu_(contextMenu),
       menu_(nullptr)
@@ -87,8 +86,7 @@ void TreeTableSetManagementStatus::runAction(Action *selectedAction,
     }
 
     editor->setSegments(segments);
-    app_->update(this,
-                        {Editor::TYPE_SEGMENT, Editor::TYPE_MANAGEMENT_STATUS});
+    app_->update(this, {Editor::TYPE_SEGMENT, Editor::TYPE_MANAGEMENT_STATUS});
 
     LOG_DEBUG(<< "Finished setting management status values.");
 }
@@ -148,7 +146,7 @@ void TreeTableSetManagementStatus::run(Application *app,
 
     editor->setSegments(segments);
     app->update(nullptr,
-                       {Editor::TYPE_SEGMENT, Editor::TYPE_MANAGEMENT_STATUS});
+                {Editor::TYPE_SEGMENT, Editor::TYPE_MANAGEMENT_STATUS});
 
     LOG_DEBUG(<< "Finished setting management status values.");
 }

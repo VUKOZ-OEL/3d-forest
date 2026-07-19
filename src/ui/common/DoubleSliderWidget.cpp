@@ -22,13 +22,13 @@
 // Include std.
 
 // Include 3D Forest.
-#include <DoubleSliderWidget.hpp>
 #include <Application.hpp>
-#include <Slider.hpp>
-#include <DoubleSpinBox.hpp>
 #include <ComboBox.hpp>
+#include <DoubleSliderWidget.hpp>
+#include <DoubleSpinBox.hpp>
 #include <HBoxLayout.hpp>
 #include <Label.hpp>
+#include <Slider.hpp>
 #include <VBoxLayout.hpp>
 
 // Include local.
@@ -163,17 +163,18 @@ double DoubleSliderWidget::snapToReciprocal(double value) const
     return result;
 }
 
-void DoubleSliderWidget::create(DoubleSliderWidget *&outputWidget,
-                       std::function<void(double)> valueChangedCallback,
-                       std::function<void()> finalValueCallback,
-                       const std::string &text,
-                       const std::string &toolTip,
-                       const std::string &unitsList,
-                       double step,
-                       double min,
-                       double max,
-                       double value,
-                       Layout layout)
+void DoubleSliderWidget::create(
+    DoubleSliderWidget *&outputWidget,
+    std::function<void(double)> valueChangedCallback,
+    std::function<void()> finalValueCallback,
+    const std::string &text,
+    const std::string &toolTip,
+    const std::string &unitsList,
+    double step,
+    double min,
+    double max,
+    double value,
+    Layout layout)
 {
     outputWidget = new DoubleSliderWidget();
 
@@ -203,15 +204,12 @@ void DoubleSliderWidget::create(DoubleSliderWidget *&outputWidget,
     slider->setSingleStep(stepInt);
     slider->setOrientation(Ui::Horizontal);
 
-    slider->valueChanged.connect([outputWidget](int value)
-    {
-        outputWidget->slotValueChangedSlider(value);
-    });
+    slider->valueChanged.connect(
+        [outputWidget](int value)
+        { outputWidget->slotValueChangedSlider(value); });
 
     slider->sliderReleased.connect([outputWidget]()
-    {
-        outputWidget->slotFinalValueSlider();
-    });
+                                   { outputWidget->slotFinalValueSlider(); });
 
     // Value SpinBox.
     outputWidget->spinBox_ = new DoubleSpinBox;
@@ -220,15 +218,12 @@ void DoubleSliderWidget::create(DoubleSliderWidget *&outputWidget,
     spinBox->setValue(value);
     spinBox->setSingleStep(step);
 
-    spinBox->valueChanged.connect([outputWidget](double value)
-    {
-        outputWidget->slotValueChangedSpinBox(value);
-    });
+    spinBox->valueChanged.connect(
+        [outputWidget](double value)
+        { outputWidget->slotValueChangedSpinBox(value); });
 
-    spinBox->editingFinished.connect([outputWidget]()
-    {
-        outputWidget->slotFinalValueSpinBox();
-    });
+    spinBox->editingFinished.connect(
+        [outputWidget]() { outputWidget->slotFinalValueSpinBox(); });
 
     // Create widget layout.
     if (layout == LAYOUT_SLIDER_BESIDE_LABEL)
@@ -268,13 +263,11 @@ void DoubleSliderWidget::create(DoubleSliderWidget *&outputWidget,
     // Connect.
     if (valueChangedCallback)
     {
-        outputWidget->valueChanged.connect(
-            std::move(valueChangedCallback));
+        outputWidget->valueChanged.connect(std::move(valueChangedCallback));
     }
 
     if (finalValueCallback)
     {
-        outputWidget->finalValue.connect(
-            std::move(finalValueCallback));
+        outputWidget->finalValue.connect(std::move(finalValueCallback));
     }
 }

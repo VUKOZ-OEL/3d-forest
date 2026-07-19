@@ -20,14 +20,14 @@
 /** @file ComputeSkeletonWidget.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ComputeSkeletonWidget.hpp>
 #include <DoubleSliderWidget.hpp>
-#include <InfoDialog.hpp>
-#include <Application.hpp>
-#include <ProgressActionDialog.hpp>
-#include <ThemeIcon.hpp>
 #include <HBoxLayout.hpp>
+#include <InfoDialog.hpp>
+#include <ProgressActionDialog.hpp>
 #include <PushButton.hpp>
+#include <ThemeIcon.hpp>
 #include <VBoxLayout.hpp>
 
 // Include local.
@@ -68,10 +68,7 @@ ComputeSkeletonWidget::ComputeSkeletonWidget(Application *app)
     // Buttons.
     applyButton_ = new PushButton(tr("Run"));
     applyButton_->setIcon(THEME_ICON("run"));
-    applyButton_->clicked.connect([this]()
-    {
-        slotApply();
-    });
+    applyButton_->clicked.connect([this]() { slotApply(); });
 
     // Buttons layout.
     HBoxLayout *buttonsLayout = new HBoxLayout;
@@ -108,9 +105,7 @@ void ComputeSkeletonWidget::slotApply()
     {
         action_.start(parameters_);
 
-        ProgressActionDialog::run(app_,
-                            "Computing Compute Skeleton",
-                            &action_);
+        ProgressActionDialog::run(app_, "Computing Compute Skeleton", &action_);
     }
     catch (std::exception &e)
     {

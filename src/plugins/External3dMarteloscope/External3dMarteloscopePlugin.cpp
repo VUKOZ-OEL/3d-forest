@@ -20,9 +20,9 @@
 /** @file External3dMarteloscopePlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <External3dMarteloscopePlugin.hpp>
 #include <External3dMarteloscopeRunner.hpp>
-#include <Application.hpp>
 #include <ProjectFileAction.hpp>
 #include <ThemeIcon.hpp>
 
@@ -51,15 +51,15 @@ void External3dMarteloscopePlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(nullptr,
-                              "External",
-                              "External",
-                              tr("3d-Marteloscope"),
-                              tr("Start 3d-Marteloscope"),
-                              ICON("external-3d-marteloscope"),
-                              this,
-                              &External3dMarteloscopePlugin::slotPlugin,
-                              MAIN_WINDOW_MENU_EXTERNAL_PRIORITY);
+    app_->createAction(
+        nullptr,
+        "External",
+        "External",
+        tr("3d-Marteloscope"),
+        tr("Start 3d-Marteloscope"),
+        ICON("external-3d-marteloscope"),
+        [this]() { slotPlugin(); },
+        MAIN_WINDOW_MENU_EXTERNAL_PRIORITY);
 }
 
 void External3dMarteloscopePlugin::slotPlugin()

@@ -23,24 +23,20 @@
 #define SIGNAL_HPP
 
 // Include std.
-#include <vector>
 #include <functional>
+#include <vector>
 
 // Include local.
 #include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
 
 /** Signal. */
-template<typename... Args>
-class Signal
+template <typename... Args> class Signal
 {
 public:
     using Slot = std::function<void(Args...)>;
 
-    void connect(Slot slot)
-    {
-        slots_.push_back(std::move(slot));
-    }
+    void connect(Slot slot) { slots_.push_back(std::move(slot)); }
 
     void operator()(Args... args)
     {

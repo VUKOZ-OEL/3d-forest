@@ -30,8 +30,7 @@ Size::Size()
 {
 }
 
-Size::Size(int w, int h)
-   : w_(w), h_(h)
+Size::Size(int w, int h) : w_(w), h_(h)
 {
 }
 

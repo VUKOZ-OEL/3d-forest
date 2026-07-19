@@ -31,8 +31,7 @@
 
 #define ICON(name) (ThemeIcon(":/TreeSettingsResources/", name))
 
-TreeSettingsWindow::TreeSettingsWindow(Application *app)
-    : DockWidget(app)
+TreeSettingsWindow::TreeSettingsWindow(Application *app) : DockWidget(app)
 {
     // Widget.
     TreeSettingsWidget *widget = new TreeSettingsWidget(app);

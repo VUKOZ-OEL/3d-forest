@@ -22,8 +22,8 @@
 // Include std.
 
 // Include 3D Forest.
-#include <ProgressBar.hpp>
 #include <Application.hpp>
+#include <ProgressBar.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ProgressBar"

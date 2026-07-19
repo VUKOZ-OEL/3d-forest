@@ -20,9 +20,9 @@
 /** @file ComputeSegmentationNNWindow.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ComputeSegmentationNNWidget.hpp>
 #include <ComputeSegmentationNNWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 #include <VBoxLayout.hpp>
 

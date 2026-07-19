@@ -31,8 +31,7 @@
 
 #define ICON(name) (ThemeIcon(":/ViewSettingsResources/", name))
 
-ViewSettingsWindow::ViewSettingsWindow(Application *app)
-    : DockWidget(app)
+ViewSettingsWindow::ViewSettingsWindow(Application *app) : DockWidget(app)
 {
     // Widget.
     ViewSettingsWidget *widget = new ViewSettingsWidget(app);

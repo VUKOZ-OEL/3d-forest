@@ -37,9 +37,7 @@ class FilterClassificationWindow;
 #endif
 
 /** Filter Classification Plugin. */
-class FilterClassificationPlugin
-    : 
-      public Plugin
+class FilterClassificationPlugin : public Plugin
 {
 public:
     FilterClassificationPlugin();

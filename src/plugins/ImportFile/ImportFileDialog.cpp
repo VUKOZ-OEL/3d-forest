@@ -20,16 +20,16 @@
 /** @file ImportFileDialog.cpp */
 
 // Include 3D Forest.
-#include <ImportFileDialog.hpp>
-#include <InfoDialog.hpp>
 #include <Application.hpp>
-#include <ThemeIcon.hpp>
 #include <CheckBox.hpp>
 #include <GridLayout.hpp>
 #include <GroupBox.hpp>
 #include <HBoxLayout.hpp>
+#include <ImportFileDialog.hpp>
+#include <InfoDialog.hpp>
 #include <Label.hpp>
 #include <PushButton.hpp>
+#include <ThemeIcon.hpp>
 #include <VBoxLayout.hpp>
 
 // Include local.
@@ -93,7 +93,7 @@ ImportFileDialog::ImportFileDialog(Application *app)
 
     // Description.
     Label *description = new Label(tr("Import action will modify "
-                                        "the original input file."));
+                                      "the original input file."));
 
     description->setToolTip(tr("The points will be sorted by 3D spatial index "
                                "for fast access.\n"
@@ -105,23 +105,14 @@ ImportFileDialog::ImportFileDialog(Application *app)
     // Dialog buttons.
     helpButton_ = new PushButton(tr("Help"));
     helpButton_->setIcon(THEME_ICON("question"));
-    helpButton_->clicked.connect([this]()
-    {
-        slotHelp();
-    });
+    helpButton_->clicked.connect([this]() { slotHelp(); });
 
     acceptButton_ = new PushButton(tr("Import"));
     acceptButton_->setIcon(THEME_ICON("run"));
-    acceptButton_->clicked.connect([this]()
-    {
-        slotAccept();
-    });
+    acceptButton_->clicked.connect([this]() { slotAccept(); });
 
     rejectButton_ = new PushButton(tr("Cancel"));
-    rejectButton_->clicked.connect([this]()
-    {
-        slotReject();
-    });
+    rejectButton_->clicked.connect([this]() { slotReject(); });
 
     HBoxLayout *dialogButtons = new HBoxLayout;
     dialogButtons->addWidget(helpButton_);

@@ -20,17 +20,17 @@
 /** @file ComputeDescriptorWidget.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
+#include <CheckBox.hpp>
 #include <ComputeDescriptorWidget.hpp>
 #include <DoubleSliderWidget.hpp>
-#include <InfoDialog.hpp>
-#include <Application.hpp>
-#include <ProgressActionDialog.hpp>
-#include <ThemeIcon.hpp>
-#include <CheckBox.hpp>
 #include <GroupBox.hpp>
 #include <HBoxLayout.hpp>
+#include <InfoDialog.hpp>
+#include <ProgressActionDialog.hpp>
 #include <PushButton.hpp>
 #include <RadioButton.hpp>
+#include <ThemeIcon.hpp>
 #include <VBoxLayout.hpp>
 
 // Include local.
@@ -114,17 +114,11 @@ ComputeDescriptorWidget::ComputeDescriptorWidget(Application *app)
     // Buttons.
     helpButton_ = new PushButton(tr("Help"));
     helpButton_->setIcon(THEME_ICON("question"));
-    helpButton_->clicked.connect([this]()
-    {
-        slotHelp();
-    });
+    helpButton_->clicked.connect([this]() { slotHelp(); });
 
     applyButton_ = new PushButton(tr("Run"));
     applyButton_->setIcon(THEME_ICON("run"));
-    applyButton_->clicked.connect([this]()
-    {
-        slotApply();
-    });
+    applyButton_->clicked.connect([this]() { slotApply(); });
 
     // Buttons layout.
     HBoxLayout *buttonsLayout = new HBoxLayout;

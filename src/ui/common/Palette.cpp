@@ -33,5 +33,4 @@ Palette::Palette()
 
 void Palette::setColor(ColorRole cr, const Color &color)
 {
-
 }

@@ -30,7 +30,6 @@ Brush::Brush()
 {
 }
 
-Brush::Brush(const Color &color, Ui::BrushStyle brushStyle)
-   : color_(color)
+Brush::Brush(const Color &color, Ui::BrushStyle brushStyle) : color_(color)
 {
 }

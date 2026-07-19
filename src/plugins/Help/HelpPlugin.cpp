@@ -20,10 +20,10 @@
 /** @file HelpPlugin.cpp */
 
 // Include 3D Forest.
-#include <HelpPlugin.hpp>
 #include <Application.hpp>
-#include <ThemeIcon.hpp>
+#include <HelpPlugin.hpp>
 #include <MessageBox.hpp>
+#include <ThemeIcon.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "HelpPlugin"
@@ -39,15 +39,15 @@ void HelpPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(&aboutAction_,
-                              "Help",
-                              "",
-                              tr("About 3D Forest"),
-                              tr("About this application"),
-                              THEME_ICON("question"),
-                              this,
-                              &HelpPlugin::slotAbout,
-                              MAIN_WINDOW_MENU_HELP_PRIORITY);
+    app_->createAction(
+        &aboutAction_,
+        "Help",
+        "",
+        tr("About 3D Forest"),
+        tr("About this application"),
+        THEME_ICON("question"),
+        [this]() { slotAbout(); },
+        MAIN_WINDOW_MENU_HELP_PRIORITY);
 }
 
 void HelpPlugin::slotAbout()

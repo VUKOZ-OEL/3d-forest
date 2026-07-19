@@ -36,8 +36,7 @@
 #endif
 
 /** Export File Plugin. */
-class ExportFilePlugin : 
-                                                   public Plugin
+class ExportFilePlugin : public Plugin
 {
 public:
     ExportFilePlugin();

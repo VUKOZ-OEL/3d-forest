@@ -40,6 +40,8 @@ class Action;
 class HelpPlugin : public Plugin
 {
 public:
+    HelpPlugin();
+
     const char *name() const override { return "HelpPlugin"; }
     void initialize(Application *app) override;
     void release() override { delete this; }

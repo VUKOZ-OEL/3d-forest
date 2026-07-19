@@ -39,8 +39,6 @@ class QWebEngineView;
 /** External 3d-Marteloscope Runner. */
 class External3dMarteloscopeRunner : public QObject
 {
-
-
 public:
     External3dMarteloscopeRunner(Application *app);
     ~External3dMarteloscopeRunner();

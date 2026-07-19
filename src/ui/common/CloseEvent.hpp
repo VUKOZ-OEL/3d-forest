@@ -33,7 +33,6 @@
 class EXPORT_UI_COMMON CloseEvent : public Event
 {
 public:
-
 private:
 };
 

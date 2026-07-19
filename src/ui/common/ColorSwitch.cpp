@@ -22,9 +22,9 @@
 // Include std.
 
 // Include 3D Forest.
-#include <ColorSwitch.hpp>
 #include <Application.hpp>
 #include <ColorDialog.hpp>
+#include <ColorSwitch.hpp>
 #include <Painter.hpp>
 
 // Include local.

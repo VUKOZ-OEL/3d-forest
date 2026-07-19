@@ -26,9 +26,9 @@
 #include <set>
 
 // Include 3D Forest.
-#include <Widget.hpp>
 #include <Editor.hpp>
 #include <SpeciesList.hpp>
+#include <Widget.hpp>
 class Application;
 class ToolButton;
 class TreeWidget;

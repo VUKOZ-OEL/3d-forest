@@ -23,11 +23,11 @@
 #define TREE_TABLE_WIDGET_HPP
 
 // Include 3D Forest.
-#include <ItemSelection.hpp>
 #include <Color.hpp>
-#include <Widget.hpp>
 #include <Editor.hpp>
 #include <FileFormatTable.hpp>
+#include <ItemSelection.hpp>
+#include <Widget.hpp>
 class Application;
 class CheckBox;
 class PushButton;
@@ -114,14 +114,8 @@ private:
                  bool value,
                  bool userCheckable,
                  const Color &color = Color());
-    void setCell(int row,
-                 int col,
-                 size_t value,
-                 const Color &color = Color());
-    void setCell(int row,
-                 int col,
-                 double value,
-                 const Color &color = Color());
+    void setCell(int row, int col, size_t value, const Color &color = Color());
+    void setCell(int row, int col, double value, const Color &color = Color());
     void setCell(int row,
                  int col,
                  const std::string &value,

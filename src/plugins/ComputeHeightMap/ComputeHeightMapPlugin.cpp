@@ -20,9 +20,9 @@
 /** @file ComputeHeightMapPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ComputeHeightMapPlugin.hpp>
 #include <ComputeHeightMapWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -41,15 +41,15 @@ void ComputeHeightMapPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(nullptr,
-                              "Compute",
-                              "Compute",
-                              tr("Height Map"),
-                              tr("Compute height map"),
-                              ICON("height-map"),
-                              this,
-                              &ComputeHeightMapPlugin::slotPlugin,
-                              MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
+    app_->createAction(
+        nullptr,
+        "Compute",
+        "Compute",
+        tr("Height Map"),
+        tr("Compute height map"),
+        ICON("height-map"),
+        [this]() { slotPlugin(); },
+        MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
 
     modifier_.initialize(app_);
 }

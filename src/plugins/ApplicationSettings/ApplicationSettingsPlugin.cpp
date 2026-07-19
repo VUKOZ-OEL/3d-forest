@@ -20,9 +20,9 @@
 /** @file ApplicationSettingsPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ApplicationSettingsPlugin.hpp>
 #include <ApplicationSettingsWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -41,15 +41,15 @@ void ApplicationSettingsPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(nullptr,
-                              "Settings",
-                              "Settings",
-                              tr("Application"),
-                              tr("Show application settings"),
-                              ICON("settings"),
-                              this,
-                              &ApplicationSettingsPlugin::slotPlugin,
-                              MAIN_WINDOW_MENU_SETTINGS_PRIORITY);
+    app_->createAction(
+        nullptr,
+        "Settings",
+        "Settings",
+        tr("Application"),
+        tr("Show application settings"),
+        ICON("settings"),
+        [this]() { slotPlugin(); },
+        MAIN_WINDOW_MENU_SETTINGS_PRIORITY);
 }
 
 void ApplicationSettingsPlugin::slotPlugin()

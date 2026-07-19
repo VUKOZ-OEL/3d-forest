@@ -20,9 +20,9 @@
 /** @file ComputeSegmentationNNPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ComputeSegmentationNNPlugin.hpp>
 #include <ComputeSegmentationNNWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -41,15 +41,15 @@ void ComputeSegmentationNNPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(nullptr,
-                              "Compute",
-                              "Compute",
-                              tr("Segmentation NN"),
-                              tr("Compute segmentation NN"),
-                              ICON("forest"),
-                              this,
-                              &ComputeSegmentationNNPlugin::slotPlugin,
-                              MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
+    app_->createAction(
+        nullptr,
+        "Compute",
+        "Compute",
+        tr("Segmentation NN"),
+        tr("Compute segmentation NN"),
+        ICON("forest"),
+        [this]() { slotPlugin(); },
+        MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
 }
 
 void ComputeSegmentationNNPlugin::slotPlugin()

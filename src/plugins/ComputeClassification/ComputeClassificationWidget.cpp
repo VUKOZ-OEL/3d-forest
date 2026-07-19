@@ -20,16 +20,16 @@
 /** @file ComputeClassificationWidget.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
+#include <CheckBox.hpp>
 #include <ComputeClassificationWidget.hpp>
 #include <DoubleSliderWidget.hpp>
-#include <InfoDialog.hpp>
-#include <Application.hpp>
-#include <ProgressActionDialog.hpp>
-#include <ThemeIcon.hpp>
-#include <CheckBox.hpp>
 #include <HBoxLayout.hpp>
+#include <InfoDialog.hpp>
+#include <ProgressActionDialog.hpp>
 #include <PushButton.hpp>
 #include <TextEdit.hpp>
+#include <ThemeIcon.hpp>
 #include <VBoxLayout.hpp>
 
 // Include local.
@@ -100,17 +100,11 @@ ComputeClassificationWidget::ComputeClassificationWidget(Application *app)
     // Buttons.
     helpButton_ = new PushButton(tr("Help"));
     helpButton_->setIcon(THEME_ICON("question"));
-    helpButton_->clicked.connect([this]()
-    {
-        slotHelp();
-    });
+    helpButton_->clicked.connect([this]() { slotHelp(); });
 
     applyButton_ = new PushButton(tr("Run"));
     applyButton_->setIcon(THEME_ICON("run"));
-    applyButton_->clicked.connect([this]()
-    {
-        slotApply();
-    });
+    applyButton_->clicked.connect([this]() { slotApply(); });
 
     // Buttons layout.
     HBoxLayout *buttonsLayout = new HBoxLayout;
@@ -165,8 +159,8 @@ void ComputeClassificationWidget::slotApply()
     }
 
     app_->update(this,
-                        {Editor::TYPE_CLASSIFICATION, Editor::TYPE_ELEVATION},
-                        Page::STATE_READ);
+                 {Editor::TYPE_CLASSIFICATION, Editor::TYPE_ELEVATION},
+                 Page::STATE_READ);
 }
 
 void ComputeClassificationWidget::slotHelp()

@@ -54,10 +54,10 @@ public:
     Signal<> editingFinished;
 
 private:
-    int singleStep_{0.0};
-    int minimum_{0.0};
-    int maximum_{0.0};
-    int value_{0.0};
+    int singleStep_{0};
+    int minimum_{0};
+    int maximum_{0};
+    int value_{0};
 };
 
 #include <WarningsEnable.hpp>

@@ -37,8 +37,7 @@ class FilterSpeciesWindow;
 #endif
 
 /** Filter Species Plugin. */
-class FilterSpeciesPlugin : 
-                                                         public Plugin
+class FilterSpeciesPlugin : public Plugin
 {
 public:
     FilterSpeciesPlugin();

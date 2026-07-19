@@ -23,20 +23,21 @@
 #define WIDGET_HPP
 
 // Include std.
+#include <set>
 #include <string>
 
 // Include 3D Forest.
-#include <Signal.hpp>
-#include <SizePolicy.hpp>
-#include <Palette.hpp>
-#include <Size.hpp>
-#include <PaintEvent.hpp>
-#include <MouseEvent.hpp>
-#include <HideEvent.hpp>
-#include <ShowEvent.hpp>
 #include <CloseEvent.hpp>
-#include <Ui.hpp>
+#include <HideEvent.hpp>
+#include <MouseEvent.hpp>
+#include <PaintEvent.hpp>
+#include <Palette.hpp>
+#include <ShowEvent.hpp>
+#include <Signal.hpp>
+#include <Size.hpp>
+#include <SizePolicy.hpp>
 #include <ThemeIcon.hpp>
+#include <Ui.hpp>
 class Application;
 class Layout;
 
@@ -68,6 +69,8 @@ public:
 
     Palette palette() const { return palette_; }
     void setPalette(const Palette &palette);
+
+    Point mapToGlobal(const Point &point) const;
 
     bool blockSignals(bool b);
     bool signalsBlocked() const;

@@ -20,9 +20,9 @@
 /** @file FilterIntensityWindow.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <FilterIntensityWidget.hpp>
 #include <FilterIntensityWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -31,8 +31,7 @@
 
 #define ICON(name) (ThemeIcon(":/FilterIntensityResources/", name))
 
-FilterIntensityWindow::FilterIntensityWindow(Application *app)
-    : DockWidget(app)
+FilterIntensityWindow::FilterIntensityWindow(Application *app) : DockWidget(app)
 {
     LOG_DEBUG(<< "Start creating intensity filter window.");
 

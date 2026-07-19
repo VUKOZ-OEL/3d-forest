@@ -20,9 +20,9 @@
 /** @file ComputeDescriptorWindow.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ComputeDescriptorWidget.hpp>
 #include <ComputeDescriptorWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 #include <VBoxLayout.hpp>
 

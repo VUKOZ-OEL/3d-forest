@@ -20,19 +20,19 @@
 /** @file ViewSettingsWidget.cpp */
 
 // Include 3D Forest.
-#include <ColorSwitch.hpp>
 #include <Application.hpp>
-#include <ThemeIcon.hpp>
-#include <ViewSettingsWidget.hpp>
 #include <CheckBox.hpp>
 #include <Color.hpp>
+#include <ColorSwitch.hpp>
 #include <ComboBox.hpp>
 #include <GridLayout.hpp>
 #include <GroupBox.hpp>
 #include <Label.hpp>
 #include <Slider.hpp>
-#include <VBoxLayout.hpp>
+#include <ThemeIcon.hpp>
 #include <Ui.hpp>
+#include <VBoxLayout.hpp>
+#include <ViewSettingsWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ViewSettingsWidget"
@@ -56,16 +56,11 @@ ViewSettingsWidget::ViewSettingsWidget(Application *app)
     pointSizeSlider_->setTickPosition(Slider::TicksAbove);
     pointSizeSlider_->setOrientation(Ui::Horizontal);
     pointSizeSlider_->valueChanged.connect([this](int value)
-    {
-        slotSetPointSize(value);
-    });
+                                           { slotSetPointSize(value); });
 
     // Color.
     colorSwitch_ = new ColorSwitch;
-    colorSwitch_->colorChanged.connect([this]()
-    {
-        slotSetColor();
-    });
+    colorSwitch_->colorChanged.connect([this]() { slotSetColor(); });
 
     // Color source.
     std::vector<std::string> colorSourceString = {"Color",
@@ -86,9 +81,7 @@ ViewSettingsWidget::ViewSettingsWidget(Application *app)
     colorSourceComboBox_->setCurrentText(toString(settings_.colorSource()));
 
     colorSourceComboBox_->activated.connect([this](int value)
-    {
-        slotColorSourceChanged(value);
-    });
+                                            { slotColorSourceChanged(value); });
 
     // Distance-based fading.
     distanceBasedFadingVisibleCheckBox_ = new CheckBox;
@@ -98,20 +91,16 @@ ViewSettingsWidget::ViewSettingsWidget(Application *app)
         tr("Reduce intensity with increasing distance"));
     distanceBasedFadingVisibleCheckBox_->setText(
         tr("Show distance-based fading"));
-    distanceBasedFadingVisibleCheckBox_->stateChanged.connect([this](int value)
-    {
-        slotSetDistanceBasedFadingVisible(value);
-    });
+    distanceBasedFadingVisibleCheckBox_->stateChanged.connect(
+        [this](int value) { slotSetDistanceBasedFadingVisible(value); });
 
     // Bounding box.
     sceneBoundingBoxVisibleCheckBox_ = new CheckBox;
     sceneBoundingBoxVisibleCheckBox_->setChecked(
         settings_.sceneBoundingBoxVisible());
     sceneBoundingBoxVisibleCheckBox_->setText(tr("Show scene bounding box"));
-    sceneBoundingBoxVisibleCheckBox_->stateChanged.connect([this](int value)
-    {
-        slotSetSceneBoundingBoxVisible(value);
-    });
+    sceneBoundingBoxVisibleCheckBox_->stateChanged.connect(
+        [this](int value) { slotSetSceneBoundingBoxVisible(value); });
 
     // Options.
     VBoxLayout *optionsVBoxLayout = new VBoxLayout;
@@ -143,10 +132,9 @@ ViewSettingsWidget::ViewSettingsWidget(Application *app)
     setLayout(mainLayout);
 
     // Data.
-    app_->signalUpdate.connect([this](void *sender, const std::set<Editor::Type> &target)
-    {
-        slotUpdate(sender, target);
-    });
+    app_->signalUpdate.connect(
+        [this](void *sender, const std::set<Editor::Type> &target)
+        { slotUpdate(sender, target); });
 
     slotUpdate(nullptr, std::set<Editor::Type>());
 
@@ -215,8 +203,7 @@ void ViewSettingsWidget::setViewSettings(const ViewSettings &settings)
     pointSizeSlider_->setValue(static_cast<int>(settings_.pointSize()));
 
     // Color source.
-    colorSourceComboBox_->setCurrentText(
-        toString(settings_.colorSource()));
+    colorSourceComboBox_->setCurrentText(toString(settings_.colorSource()));
 
     // Distance-based fading.
     distanceBasedFadingVisibleCheckBox_->setChecked(
@@ -256,8 +243,7 @@ void ViewSettingsWidget::slotColorSourceChanged(int index)
     }
 
     ViewSettings::ColorSource colorSource;
-    fromString(colorSource,
-               colorSourceComboBox_->itemText(index));
+    fromString(colorSource, colorSourceComboBox_->itemText(index));
     settings_.setColorSource(colorSource);
     dataChanged(true);
 }

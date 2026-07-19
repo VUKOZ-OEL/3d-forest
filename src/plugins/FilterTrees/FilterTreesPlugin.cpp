@@ -20,9 +20,9 @@
 /** @file FilterTreesPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <FilterTreesPlugin.hpp>
 #include <FilterTreesWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -31,9 +31,7 @@
 
 #define ICON(name) (ThemeIcon(":/FilterTreesResources/", name))
 
-FilterTreesPlugin::FilterTreesPlugin()
-    : app_(nullptr),
-      pluginWindow_(nullptr)
+FilterTreesPlugin::FilterTreesPlugin() : app_(nullptr), pluginWindow_(nullptr)
 {
 }
 
@@ -41,15 +39,15 @@ void FilterTreesPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(nullptr,
-                              "Filter",
-                              "Filter",
-                              tr("Trees"),
-                              tr("Show tree filter"),
-                              ICON("tree"),
-                              this,
-                              &FilterTreesPlugin::slotPlugin,
-                              MAIN_WINDOW_MENU_FILTER_PRIORITY);
+    app_->createAction(
+        nullptr,
+        "Filter",
+        "Filter",
+        tr("Trees"),
+        tr("Show tree filter"),
+        ICON("tree"),
+        [this]() { slotPlugin(); },
+        MAIN_WINDOW_MENU_FILTER_PRIORITY);
 }
 
 void FilterTreesPlugin::slotPlugin()

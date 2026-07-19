@@ -37,9 +37,7 @@
 #endif
 
 /** Import File Plugin. */
-class ImportFilePlugin : 
-                                                   public Plugin,
-                                                   public ImportFileInterface
+class ImportFilePlugin : public Plugin, public ImportFileInterface
 {
 public:
     ImportFilePlugin();

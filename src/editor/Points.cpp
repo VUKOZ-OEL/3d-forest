@@ -70,8 +70,8 @@ void Points::findRadius(double x,
                         std::vector<size_t> &resultIndices)
 {
     octree_.radiusNeighbors<unibn::L2Distance<Point3>>({x, y, z},
-                                                      r,
-                                                      resultIndices);
+                                                       r,
+                                                       resultIndices);
 }
 
 size_t Points::findNN(double x, double y, double z)

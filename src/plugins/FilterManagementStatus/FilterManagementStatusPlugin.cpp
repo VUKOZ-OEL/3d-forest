@@ -20,9 +20,9 @@
 /** @file FilterManagementStatusPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <FilterManagementStatusPlugin.hpp>
 #include <FilterManagementStatusWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -41,15 +41,15 @@ void FilterManagementStatusPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(nullptr,
-                              "Filter",
-                              "Filter",
-                              tr("Management Status"),
-                              tr("Show management status filter"),
-                              ICON("management-status-filter"),
-                              this,
-                              &FilterManagementStatusPlugin::slotPlugin,
-                              MAIN_WINDOW_MENU_FILTER_PRIORITY);
+    app_->createAction(
+        nullptr,
+        "Filter",
+        "Filter",
+        tr("Management Status"),
+        tr("Show management status filter"),
+        ICON("management-status-filter"),
+        [this]() { slotPlugin(); },
+        MAIN_WINDOW_MENU_FILTER_PRIORITY);
 }
 
 void FilterManagementStatusPlugin::slotPlugin()

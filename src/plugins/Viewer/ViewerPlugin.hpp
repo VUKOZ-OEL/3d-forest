@@ -25,8 +25,7 @@
 // Include 3D Forest.
 #include <Plugin.hpp>
 #include <ViewerInterface.hpp>
-#include <ViewerViewports.hpp>
-class Action;
+class ViewerWidget;
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestViewerPlugin)
@@ -39,9 +38,7 @@ class Action;
 #endif
 
 /** Viewer Plugin. */
-class ViewerPlugin : 
-                                          public Plugin,
-                                          public ViewerInterface
+class ViewerPlugin : public Plugin, public ViewerInterface
 {
 public:
     ViewerPlugin();
@@ -50,55 +47,9 @@ public:
     void initialize(Application *app) override;
     void release() override { delete this; }
 
-    virtual std::vector<Camera> camera(size_t viewportId) const;
-    virtual std::vector<Camera> camera() const;
-
-    virtual void updateScene(Editor *editor);
-    virtual void resetScene(Editor *editor, bool resetView);
-
-
-    void slotViewOrthographic();
-    void slotViewPerspective();
-    void slotView2d();
-
-    void slotViewTop();
-    void slotViewFront();
-    void slotViewRight();
-    void slotView3d();
-
-    void slotViewResetDistance();
-    void slotViewResetCenter();
-
-    void slotViewLayoutSingle();
-    void slotViewLayoutTwoColumns();
-    void slotViewLayoutGrid();
-    void slotViewLayoutThreeRowsRight();
-
-    void slotViewLayout(ViewerViewports::ViewLayout layout);
-
 private:
     Application *app_;
-
-    Action *viewOrthographicAction_;
-    Action *viewPerspectiveAction_;
-    Action *view2dAction_;
-
-    Action *viewTopAction_;
-    Action *viewFrontAction_;
-    Action *viewRightAction_;
-    Action *view3dAction_;
-
-    Action *viewResetDistanceAction_;
-    Action *viewResetCenterAction_;
-
-    Action *viewLayoutSingleAction_;
-    Action *viewLayoutTwoColumnsAction_;
-    Action *viewLayoutGridAction_;
-    Action *viewLayoutThreeRowsRightAction_;
-
-    ViewerViewports *viewports_;
-
-    void updateViewer();
+    ViewerWidget *viewerWidget_;
 };
 
 extern "C" EXPORT_VIEWER_PLUGIN Plugin *createPlugin()

@@ -20,12 +20,12 @@
 /** @file ComputeHeightMapModifier.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ColorPalette.hpp>
 #include <ComputeHeightMapModifier.hpp>
 #include <Editor.hpp>
-#include <Application.hpp>
-#include <Time.hpp>
 #include <ProgressDialog.hpp>
+#include <Time.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeHeightMapModifier"
@@ -72,7 +72,8 @@ void ComputeHeightMapModifier::setSource(Source source)
     }
 }
 
-void ComputeHeightMapModifier::setColormap(const std::string &name, int colorCount)
+void ComputeHeightMapModifier::setColormap(const std::string &name,
+                                           int colorCount)
 {
     bool previewEnabled;
 

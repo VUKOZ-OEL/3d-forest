@@ -37,9 +37,7 @@ class ComputeElevationWindow;
 #endif
 
 /** Compute Elevation Plugin. */
-class ComputeElevationPlugin
-    : 
-      public Plugin
+class ComputeElevationPlugin : public Plugin
 {
 public:
     ComputeElevationPlugin();

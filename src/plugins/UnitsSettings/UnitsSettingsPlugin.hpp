@@ -37,8 +37,7 @@ class UnitsSettingsWindow;
 #endif
 
 /** Units Settings Plugin. */
-class UnitsSettingsPlugin : 
-                                                         public Plugin
+class UnitsSettingsPlugin : public Plugin
 {
 public:
     UnitsSettingsPlugin();

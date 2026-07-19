@@ -23,9 +23,10 @@
 #define CELL_HPP
 
 // Include 3D Forest.
-#include <Ui.hpp>
-#include <Color.hpp>
 #include <Brush.hpp>
+#include <Color.hpp>
+#include <Ui.hpp>
+#include <Util.hpp>
 
 // Include local.
 #include <ExportUiCommon.hpp>

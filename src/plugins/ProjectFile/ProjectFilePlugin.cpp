@@ -41,60 +41,60 @@ void ProjectFilePlugin::initialize(Application *app)
     LOG_DEBUG(<< "Initialize.");
     app_ = app;
 
-    app_->createAction(&newProjectAction_,
-                       "File",
-                       "File Project",
-                       tr("New Project"),
-                       tr("Create new project"),
-                       ICON("create"),
-                       this,
-                       &ProjectFilePlugin::slotNewProject,
-                       MAIN_WINDOW_MENU_FILE_PRIORITY,
-                       10);
+    app_->createAction(
+        &newProjectAction_,
+        "File",
+        "File Project",
+        tr("New Project"),
+        tr("Create new project"),
+        ICON("create"),
+        [this]() { slotNewProject(); },
+        MAIN_WINDOW_MENU_FILE_PRIORITY,
+        10);
 
-    app_->createAction(&openProjectAction_,
-                       "File",
-                       "File Project",
-                       tr("Open Project..."),
-                       tr("Open project"),
-                       ICON("opened-folder"),
-                       this,
-                       &ProjectFilePlugin::slotOpenProject,
-                       MAIN_WINDOW_MENU_FILE_PRIORITY,
-                       20);
+    app_->createAction(
+        &openProjectAction_,
+        "File",
+        "File Project",
+        tr("Open Project..."),
+        tr("Open project"),
+        ICON("opened-folder"),
+        [this]() { slotOpenProject(); },
+        MAIN_WINDOW_MENU_FILE_PRIORITY,
+        20);
 
-    app_->createAction(&saveProjectAction_,
-                       "File",
-                       "File Project",
-                       tr("Save Project"),
-                       tr("Save project"),
-                       ICON("save"),
-                       this,
-                       &ProjectFilePlugin::slotSaveProject,
-                       MAIN_WINDOW_MENU_FILE_PRIORITY,
-                       30);
+    app_->createAction(
+        &saveProjectAction_,
+        "File",
+        "File Project",
+        tr("Save Project"),
+        tr("Save project"),
+        ICON("save"),
+        [this]() { slotSaveProject(); },
+        MAIN_WINDOW_MENU_FILE_PRIORITY,
+        30);
 
-    app_->createAction(&saveAsProjectAction_,
-                       "File",
-                       "File Project",
-                       tr("Save Project &As..."),
-                       tr("Save project as"),
-                       ICON("save-as"),
-                       this,
-                       &ProjectFilePlugin::slotSaveAsProject,
-                       MAIN_WINDOW_MENU_FILE_PRIORITY,
-                       40);
+    app_->createAction(
+        &saveAsProjectAction_,
+        "File",
+        "File Project",
+        tr("Save Project &As..."),
+        tr("Save project as"),
+        ICON("save-as"),
+        [this]() { slotSaveAsProject(); },
+        MAIN_WINDOW_MENU_FILE_PRIORITY,
+        40);
 
-    app_->createAction(&reloadProjectAction_,
-                       "File",
-                       "File Project",
-                       tr("Reload Project"),
-                       tr("Reload Project"),
-                       ICON("reload"),
-                       this,
-                       &ProjectFilePlugin::slotReloadProject,
-                       MAIN_WINDOW_MENU_FILE_PRIORITY,
-                       45);
+    app_->createAction(
+        &reloadProjectAction_,
+        "File",
+        "File Project",
+        tr("Reload Project"),
+        tr("Reload Project"),
+        ICON("reload"),
+        [this]() { slotReloadProject(); },
+        MAIN_WINDOW_MENU_FILE_PRIORITY,
+        45);
 
     app_->hideToolBar("File Project");
 }

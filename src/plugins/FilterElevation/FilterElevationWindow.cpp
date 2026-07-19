@@ -20,9 +20,9 @@
 /** @file FilterElevationWindow.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <FilterElevationWidget.hpp>
 #include <FilterElevationWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -31,8 +31,7 @@
 
 #define ICON(name) (ThemeIcon(":/FilterElevationResources/", name))
 
-FilterElevationWindow::FilterElevationWindow(Application *app)
-    : DockWidget(app)
+FilterElevationWindow::FilterElevationWindow(Application *app) : DockWidget(app)
 {
     LOG_DEBUG(<< "Start creating elevation filter window.");
 

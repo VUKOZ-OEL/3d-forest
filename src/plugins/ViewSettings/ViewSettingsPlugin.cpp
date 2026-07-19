@@ -31,9 +31,7 @@
 
 #define ICON(name) (ThemeIcon(":/ViewSettingsResources/", name))
 
-ViewSettingsPlugin::ViewSettingsPlugin()
-    : app_(nullptr),
-      pluginWindow_(nullptr)
+ViewSettingsPlugin::ViewSettingsPlugin() : app_(nullptr), pluginWindow_(nullptr)
 {
 }
 
@@ -41,15 +39,15 @@ void ViewSettingsPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(nullptr,
-                              "Settings",
-                              "Settings",
-                              tr("View"),
-                              tr("Show view settings"),
-                              ICON("brush"),
-                              this,
-                              &ViewSettingsPlugin::slotPlugin,
-                              MAIN_WINDOW_MENU_SETTINGS_PRIORITY);
+    app_->createAction(
+        nullptr,
+        "Settings",
+        "Settings",
+        tr("View"),
+        tr("Show view settings"),
+        ICON("brush"),
+        [this]() { slotPlugin(); },
+        MAIN_WINDOW_MENU_SETTINGS_PRIORITY);
 }
 
 void ViewSettingsPlugin::slotPlugin()

@@ -37,8 +37,7 @@ class TreeSettingsWindow;
 #endif
 
 /** Tree Settings Plugin. */
-class TreeSettingsPlugin : 
-                                                       public Plugin
+class TreeSettingsPlugin : public Plugin
 {
 public:
     TreeSettingsPlugin();

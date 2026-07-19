@@ -20,17 +20,17 @@
 /** @file ComputeTreeAttributesWidget.cpp */
 
 // Include 3D Forest.
-#include <ComputeTreeAttributesWidget.hpp>
-#include <DoubleSliderWidget.hpp>
-#include <InfoDialog.hpp>
 #include <Application.hpp>
-#include <ProgressActionDialog.hpp>
-#include <ThemeIcon.hpp>
 #include <CheckBox.hpp>
 #include <ComboBox.hpp>
+#include <ComputeTreeAttributesWidget.hpp>
+#include <DoubleSliderWidget.hpp>
 #include <HBoxLayout.hpp>
+#include <InfoDialog.hpp>
 #include <Label.hpp>
+#include <ProgressActionDialog.hpp>
 #include <PushButton.hpp>
+#include <ThemeIcon.hpp>
 #include <VBoxLayout.hpp>
 
 // Include local.
@@ -69,9 +69,7 @@ ComputeTreeAttributesWidget::ComputeTreeAttributesWidget(Application *app)
         toString(ComputeTreeAttributesParameters::DbhMethod::LSR));
     dbhMethodComboBox_->setCurrentText(toString(parameters_.dbhMethod));
     dbhMethodComboBox_->activated.connect([this](int value)
-    {
-        dbhMethodChanged(value);
-    });
+                                          { dbhMethodChanged(value); });
 
     Label *dbhMethodLabel = new Label(tr("DBH method"));
 
@@ -142,10 +140,7 @@ ComputeTreeAttributesWidget::ComputeTreeAttributesWidget(Application *app)
     // Buttons.
     applyButton_ = new PushButton(tr("Run"));
     applyButton_->setIcon(THEME_ICON("run"));
-    applyButton_->clicked.connect([this]()
-    {
-        slotApply();
-    });
+    applyButton_->clicked.connect([this]() { slotApply(); });
 
     // Buttons layout.
     HBoxLayout *buttonsLayout = new HBoxLayout;
@@ -174,8 +169,7 @@ void ComputeTreeAttributesWidget::dbhMethodChanged(int i)
 {
     (void)i;
 
-    fromString(parameters_.dbhMethod,
-               dbhMethodComboBox_->currentText());
+    fromString(parameters_.dbhMethod, dbhMethodComboBox_->currentText());
 
     if (parameters_.dbhMethod ==
         ComputeTreeAttributesParameters::DbhMethod::RHT)
@@ -198,8 +192,7 @@ void ComputeTreeAttributesWidget::slotApply()
         app_->editor().settings().unitsSettings().pointsPerMeter()[0];
     parameters_.treePositionHeightRange =
         treePositionHeightRangeSlider_->value();
-    fromString(parameters_.dbhMethod,
-               dbhMethodComboBox_->currentText());
+    fromString(parameters_.dbhMethod, dbhMethodComboBox_->currentText());
     parameters_.dbhRhtGridCm = dbhRhtGridCmSlider_->value();
     parameters_.dbhElevation = dbhElevationSlider_->value();
     parameters_.dbhElevationRange = dbhElevationRangeSlider_->value();
@@ -211,8 +204,8 @@ void ComputeTreeAttributesWidget::slotApply()
         treeAttributesAction_.start(parameters_);
 
         ProgressActionDialog::run(app_,
-                            "Computing Compute Tree Attributes",
-                            &treeAttributesAction_);
+                                  "Computing Compute Tree Attributes",
+                                  &treeAttributesAction_);
     }
     catch (std::exception &e)
     {

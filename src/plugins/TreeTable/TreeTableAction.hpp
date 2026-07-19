@@ -33,11 +33,9 @@ class Application;
 class TreeTableAction
 {
 public:
-    static void showTrees(Application *app,
-                          std::unordered_set<size_t> idList);
+    static void showTrees(Application *app, std::unordered_set<size_t> idList);
 
-    static void hideTrees(Application *app,
-                          std::unordered_set<size_t> idList);
+    static void hideTrees(Application *app, std::unordered_set<size_t> idList);
 
     static void readMesh(Application *app,
                          const std::unordered_set<size_t> &idList,

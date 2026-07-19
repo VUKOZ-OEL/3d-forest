@@ -46,8 +46,8 @@ public:
     virtual ~DoubleSliderWidget();
 
     static void create(DoubleSliderWidget *&outputWidget,
-                       std::function<void(double)> valueChangedCallback = {},
-                       std::function<void()> finalValueCallback = {},
+                       std::function<void(double)> valueChangedCallback,
+                       std::function<void()> finalValueCallback,
                        const std::string &text,
                        const std::string &toolTip,
                        const std::string &unitsList,

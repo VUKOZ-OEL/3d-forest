@@ -20,8 +20,8 @@
 /** @file EditPluginResetElevation.cpp */
 
 // Include 3D Forest.
-#include <EditPluginResetElevation.hpp>
 #include <Application.hpp>
+#include <EditPluginResetElevation.hpp>
 #include <ProgressDialog.hpp>
 
 // Include local.

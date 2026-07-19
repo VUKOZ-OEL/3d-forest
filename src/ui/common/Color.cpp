@@ -40,10 +40,6 @@ Color::Color(Ui::GlobalColor gc)
 {
 }
 
-Color::~Color()
-{
-}
-
 void Color::setRed(int r)
 {
     r_ = r;

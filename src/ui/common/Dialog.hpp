@@ -27,10 +27,10 @@
 #include <vector>
 
 // Include 3D Forest.
-#include <Ui.hpp>
+#include <CloseEvent.hpp>
 #include <Size.hpp>
 #include <ThemeIcon.hpp>
-#include <CloseEvent.hpp>
+#include <Ui.hpp>
 class Application;
 class Layout;
 
@@ -42,7 +42,11 @@ class Layout;
 class EXPORT_UI_COMMON Dialog
 {
 public:
-    enum DialogCode { Rejected, Accepted };
+    enum DialogCode
+    {
+        Rejected,
+        Accepted
+    };
 
     Dialog();
     Dialog(Application *app);

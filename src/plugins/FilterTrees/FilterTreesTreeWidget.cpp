@@ -20,8 +20,8 @@
 /** @file FilterTreesTreeWidget.cpp */
 
 // Include 3D Forest.
-#include <FilterTreesTreeWidget.hpp>
 #include <Application.hpp>
+#include <FilterTreesTreeWidget.hpp>
 
 // Include Qt.
 #include <TableWidget.hpp>
@@ -64,8 +64,7 @@ void FilterTreesTreeWidget::setSegment(const Segment &segment)
     table_->setColumnCount(2);
     table_->setHorizontalHeaderLabels({"Property", "Value"});
 
-    double ppm =
-        app_->editor().settings().unitsSettings().pointsPerMeter()[0];
+    double ppm = app_->editor().settings().unitsSettings().pointsPerMeter()[0];
 
     setRow(0, "label", segment_.label);
     setRow(1, "x", segment_.treeAttributes.position[0] / ppm, "m");
@@ -85,10 +84,8 @@ void FilterTreesTreeWidget::setRow(int row,
                                    const std::string &key,
                                    const std::string &value)
 {
-    table_->setItem(row, 0, new TableWidgetItem(std::string::fromStdString(key)));
-    table_->setItem(row,
-                    1,
-                    new TableWidgetItem(std::string::fromStdString(value)));
+    table_->setItem(row, 0, TableWidgetItem(key));
+    table_->setItem(row, 1, TableWidgetItem(value));
 }
 
 void FilterTreesTreeWidget::setRow(int row,
@@ -99,14 +96,13 @@ void FilterTreesTreeWidget::setRow(int row,
     std::string valueText;
     if (comment.empty())
     {
-        valueText = std::string::fromStdString(std::to_string(value));
+        valueText = toString(value);
     }
     else
     {
-        valueText =
-            std::string::fromStdString(std::to_string(value) + " " + comment);
+        valueText = toString(value) + " " + comment;
     }
 
-    table_->setItem(row, 0, new TableWidgetItem(std::string::fromStdString(key)));
-    table_->setItem(row, 1, new TableWidgetItem(valueText));
+    table_->setItem(row, 0, TableWidgetItem(key));
+    table_->setItem(row, 1, TableWidgetItem(valueText));
 }

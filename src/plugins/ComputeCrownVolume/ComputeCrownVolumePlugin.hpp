@@ -37,9 +37,7 @@ class ComputeCrownVolumeWindow;
 #endif
 
 /** Compute Crown Volume Plugin. */
-class ComputeCrownVolumePlugin
-    : 
-      public Plugin
+class ComputeCrownVolumePlugin : public Plugin
 {
 public:
     ComputeCrownVolumePlugin();

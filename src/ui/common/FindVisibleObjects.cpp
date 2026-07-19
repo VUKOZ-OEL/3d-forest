@@ -20,8 +20,8 @@
 /** @file FindVisibleObjects.cpp */
 
 // Include 3D Forest.
-#include <FindVisibleObjects.hpp>
 #include <Application.hpp>
+#include <FindVisibleObjects.hpp>
 #include <ProgressDialog.hpp>
 
 // Include local.

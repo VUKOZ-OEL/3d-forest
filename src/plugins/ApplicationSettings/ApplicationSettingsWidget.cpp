@@ -20,12 +20,12 @@
 /** @file ApplicationSettingsWidget.cpp */
 
 // Include 3D Forest.
-#include <ApplicationSettingsWidget.hpp>
 #include <Application.hpp>
-#include <ThemeIcon.hpp>
+#include <ApplicationSettingsWidget.hpp>
 #include <ComboBox.hpp>
 #include <GridLayout.hpp>
 #include <Label.hpp>
+#include <ThemeIcon.hpp>
 #include <VBoxLayout.hpp>
 
 // Include local.
@@ -48,9 +48,7 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(Application *app)
     languageComboBox_->setCurrentText(settings_.languageCode);
 
     languageComboBox_->activated.connect([this](int value)
-    {
-        slotLanguageChanged(value);
-    });
+                                         { slotLanguageChanged(value); });
 
     // Layout.
     GridLayout *groupBoxLayout = new GridLayout;
@@ -65,10 +63,9 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(Application *app)
     setLayout(mainLayout);
 
     // Data.
-    app_->signalUpdate.connect([this](void *sender, const std::set<Editor::Type> &target)
-    {
-        slotUpdate(sender, target);
-    });
+    app_->signalUpdate.connect(
+        [this](void *sender, const std::set<Editor::Type> &target)
+        { slotUpdate(sender, target); });
 
     slotUpdate(nullptr, std::set<Editor::Type>());
 
@@ -87,8 +84,7 @@ void ApplicationSettingsWidget::slotUpdate(void *sender,
     {
         LOG_DEBUG_UPDATE(<< "Input application settings.");
 
-        setApplicationSettings(
-            app_->editor().settings().applicationSettings());
+        setApplicationSettings(app_->editor().settings().applicationSettings());
     }
 }
 

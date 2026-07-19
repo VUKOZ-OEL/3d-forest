@@ -66,34 +66,34 @@ public:
     int exec();
 
     static int information(Application *app,
-                    const std::string &title,
-                    const std::string &text,
-                    int buttons = Ok,
-                    int defaultButton = NoButton);
+                           const std::string &title,
+                           const std::string &text,
+                           int buttons = Ok,
+                           int defaultButton = NoButton);
 
     static int about(Application *app,
-                    const std::string &title,
-                    const std::string &text,
-                    int buttons = Ok,
-                    int defaultButton = NoButton);
+                     const std::string &title,
+                     const std::string &text,
+                     int buttons = Ok,
+                     int defaultButton = NoButton);
 
     static int question(Application *app,
-                    const std::string &title,
-                    const std::string &text,
-                    int buttons = Yes | No,
-                    int defaultButton = NoButton);
+                        const std::string &title,
+                        const std::string &text,
+                        int buttons = Yes | No,
+                        int defaultButton = NoButton);
 
     static int warning(Application *app,
-                    const std::string &title,
-                    const std::string &text,
-                    int buttons = Ok,
-                    int defaultButton = NoButton);
+                       const std::string &title,
+                       const std::string &text,
+                       int buttons = Ok,
+                       int defaultButton = NoButton);
 
     static int critical(Application *app,
-                    const std::string &title,
-                    const std::string &text,
-                    int buttons = Ok,
-                    int defaultButton = NoButton);
+                        const std::string &title,
+                        const std::string &text,
+                        int buttons = Ok,
+                        int defaultButton = NoButton);
 
 private:
     int defaultButton_{0};

@@ -33,7 +33,6 @@
 class EXPORT_UI_COMMON PaintEvent : public Event
 {
 public:
-
 private:
 };
 

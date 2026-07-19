@@ -20,8 +20,8 @@
 /** @file ColorDialog.cpp */
 
 // Include 3D Forest.
-#include <ColorDialog.hpp>
 #include <Application.hpp>
+#include <ColorDialog.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ColorDialog"

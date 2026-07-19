@@ -20,20 +20,19 @@
 /** @file TreeTableSetSpecies.cpp */
 
 // Include 3D Forest.
-#include <InputComboBoxDialog.hpp>
-#include <Application.hpp>
-#include <TreeTableSetSpecies.hpp>
 #include <Action.hpp>
+#include <Application.hpp>
+#include <InputComboBoxDialog.hpp>
 #include <Menu.hpp>
 #include <ProgressDialog.hpp>
+#include <TreeTableSetSpecies.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "TreeTableSetSpecies"
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-TreeTableSetSpecies::TreeTableSetSpecies(Application *app,
-                                         Menu *contextMenu)
+TreeTableSetSpecies::TreeTableSetSpecies(Application *app, Menu *contextMenu)
     : app_(app),
       contextMenu_(contextMenu),
       menu_(nullptr)

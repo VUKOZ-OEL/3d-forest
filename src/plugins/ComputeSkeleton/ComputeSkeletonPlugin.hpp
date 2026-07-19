@@ -37,9 +37,7 @@ class ComputeSkeletonWindow;
 #endif
 
 /** Compute Skeleton Plugin. */
-class ComputeSkeletonPlugin
-    : 
-      public Plugin
+class ComputeSkeletonPlugin : public Plugin
 {
 public:
     ComputeSkeletonPlugin();

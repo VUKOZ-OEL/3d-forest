@@ -17,42 +17,25 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file FilterIntensityWidget.hpp */
+/** @file ViewerWidget.hpp */
 
-#ifndef FILTER_INTENSITY_WIDGET_HPP
-#define FILTER_INTENSITY_WIDGET_HPP
+#ifndef VIEWER_WIDGET_HPP
+#define VIEWER_WIDGET_HPP
 
 // Include 3D Forest.
 #include <Editor.hpp>
-#include <Range.hpp>
-#include <Region.hpp>
 #include <Widget.hpp>
-class DoubleRangeSliderWidget;
-class Application;
 
-/** Filter Intensity Widget. */
-class FilterIntensityWidget : public Widget
+/** Viewer Widget. */
+class ViewerWidget : public Widget
 {
 public:
-    FilterIntensityWidget(Application *app);
-
-    void setFilterEnabled(bool b);
-
-    Size sizeHint() const override { return Size(300, 120); }
+    ViewerWidget(Application *app);
 
     void slotUpdate(void *sender, const std::set<Editor::Type> &target);
 
-    void slotMinimumValueChanged(double val);
-    void slotMaximumValueChanged(double val);
-    void slotFinalValue();
-
-protected:
+private:
     Application *app_;
-    DoubleRangeSliderWidget *intensityInput_;
-    Range<double> intensityRange_;
-
-    void setIntensity(const Range<double> &intensityRange);
-    void filterChanged(bool final);
 };
 
-#endif /* FILTER_INTENSITY_WIDGET_HPP */
+#endif /* VIEWER_WIDGET_HPP */

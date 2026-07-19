@@ -20,9 +20,9 @@
 /** @file ComputeHullWindow.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ComputeHullWidget.hpp>
 #include <ComputeHullWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 #include <VBoxLayout.hpp>
 

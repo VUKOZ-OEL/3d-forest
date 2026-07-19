@@ -23,9 +23,9 @@
 #define COMPUTE_TREE_ATTRIBUTES_WIDGET_HPP
 
 // Include 3D Forest.
-#include <Widget.hpp>
 #include <ComputeTreeAttributesAction.hpp>
 #include <ComputeTreeAttributesParameters.hpp>
+#include <Widget.hpp>
 class Application;
 class DoubleSliderWidget;
 class ComboBox;

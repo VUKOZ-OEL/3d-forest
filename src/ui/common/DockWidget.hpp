@@ -27,12 +27,12 @@
 #include <vector>
 
 // Include 3D Forest.
-#include <ThemeIcon.hpp>
-#include <PaintEvent.hpp>
-#include <MouseEvent.hpp>
-#include <HideEvent.hpp>
-#include <ShowEvent.hpp>
 #include <CloseEvent.hpp>
+#include <HideEvent.hpp>
+#include <MouseEvent.hpp>
+#include <PaintEvent.hpp>
+#include <ShowEvent.hpp>
+#include <ThemeIcon.hpp>
 #include <Ui.hpp>
 class Application;
 class Widget;

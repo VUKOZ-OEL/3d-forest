@@ -23,8 +23,8 @@
 #define COMPUTE_HEIGHT_MAP_MODIFIER_HPP
 
 // Include std.
-#include <vector>
 #include <mutex>
+#include <vector>
 
 // Include 3D Forest.
 #include <Vector3.hpp>

@@ -23,7 +23,7 @@
 #define IMPORT_FILE_INTERFACE_HPP
 
 // Include local.
-#include <ExportGui.hpp>
+#include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
 
 /** Import File Interface. */

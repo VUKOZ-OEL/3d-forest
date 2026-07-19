@@ -22,8 +22,8 @@
 // Include std.
 
 // Include 3D Forest.
-#include <Dialog.hpp>
 #include <Application.hpp>
+#include <Dialog.hpp>
 #include <Layout.hpp>
 
 // Include local.
@@ -96,5 +96,9 @@ void Dialog::close()
 }
 
 void Dialog::setResult(int result)
+{
+}
+
+void Dialog::closeEvent(CloseEvent *event)
 {
 }

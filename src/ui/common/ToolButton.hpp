@@ -23,8 +23,8 @@
 #define TOOL_BUTTON_HPP
 
 // Include 3D Forest.
-#include <Widget.hpp>
 #include <Pixmap.hpp>
+#include <Widget.hpp>
 class Application;
 
 // Include local.

@@ -17,44 +17,35 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Menu.cpp */
+/** @file ViewerWidget.cpp */
 
 // Include 3D Forest.
-#include <Action.hpp>
 #include <Application.hpp>
-#include <Menu.hpp>
+#include <ThemeIcon.hpp>
+#include <ViewerWidget.hpp>
 
 // Include local.
-#define LOG_MODULE_NAME "Menu"
+#define LOG_MODULE_NAME "ViewerWidget"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-Menu::Menu()
+#define ICON(name) (ThemeIcon(":/UnitsSettingsResources/", name))
+
+ViewerWidget::ViewerWidget(Application *app) : Widget(app), app_(app)
 {
+    // Data.
+    app_->signalUpdate.connect(
+        [this](void *sender, const std::set<Editor::Type> &target)
+        { slotUpdate(sender, target); });
+
+    slotUpdate(nullptr, std::set<Editor::Type>());
 }
 
-Menu::Menu(Application *app)
+void ViewerWidget::slotUpdate(void *sender,
+                              const std::set<Editor::Type> &target)
 {
-}
-
-Menu::Menu(const std::string &title, Menu *parent)
-{
-}
-
-Menu::~Menu()
-{
-}
-
-Action *Menu::addAction(const std::string &title)
-{
-    Action *action = new Action(title);
-    return action;
-}
-
-void Menu::addMenu(Menu *menu)
-{
-}
-
-Action *Menu::exec(const Point &pos)
-{
-    return nullptr;
+    if (sender == this)
+    {
+        return;
+    }
 }

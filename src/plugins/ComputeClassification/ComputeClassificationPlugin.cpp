@@ -20,9 +20,9 @@
 /** @file ComputeClassificationPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ComputeClassificationPlugin.hpp>
 #include <ComputeClassificationWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -41,15 +41,15 @@ void ComputeClassificationPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(nullptr,
-                              "Compute",
-                              "Compute",
-                              tr("Classification"),
-                              tr("Classify points to ground and unassigned"),
-                              ICON("ground"),
-                              this,
-                              &ComputeClassificationPlugin::slotPlugin,
-                              MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
+    app_->createAction(
+        nullptr,
+        "Compute",
+        "Compute",
+        tr("Classification"),
+        tr("Classify points to ground and unassigned"),
+        ICON("ground"),
+        [this]() { slotPlugin(); },
+        MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
 }
 
 void ComputeClassificationPlugin::slotPlugin()

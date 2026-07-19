@@ -20,9 +20,9 @@
 /** @file FilterTreesWindow.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <FilterTreesWidget.hpp>
 #include <FilterTreesWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -31,8 +31,7 @@
 
 #define ICON(name) (ThemeIcon(":/FilterTreesResources/", name))
 
-FilterTreesWindow::FilterTreesWindow(Application *app)
-    : DockWidget(app)
+FilterTreesWindow::FilterTreesWindow(Application *app) : DockWidget(app)
 {
     // Widget.
     widget_ = new FilterTreesWidget(app);

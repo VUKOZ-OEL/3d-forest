@@ -23,8 +23,8 @@
 #define MOUSE_EVENT_HPP
 
 // Include 3D Forest.
-#include <Point.hpp>
 #include <Event.hpp>
+#include <Point.hpp>
 
 // Include local.
 #include <ExportUiCommon.hpp>

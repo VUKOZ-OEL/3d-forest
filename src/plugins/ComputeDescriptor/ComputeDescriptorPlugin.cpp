@@ -20,9 +20,9 @@
 /** @file ComputeDescriptorPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ComputeDescriptorPlugin.hpp>
 #include <ComputeDescriptorWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -41,15 +41,15 @@ void ComputeDescriptorPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(nullptr,
-                              "Compute",
-                              "Compute",
-                              tr("Descriptor"),
-                              tr("Compute descriptor of each point"),
-                              ICON("descriptor"),
-                              this,
-                              &ComputeDescriptorPlugin::slotPlugin,
-                              MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
+    app_->createAction(
+        nullptr,
+        "Compute",
+        "Compute",
+        tr("Descriptor"),
+        tr("Compute descriptor of each point"),
+        ICON("descriptor"),
+        [this]() { slotPlugin(); },
+        MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
 }
 
 void ComputeDescriptorPlugin::slotPlugin()

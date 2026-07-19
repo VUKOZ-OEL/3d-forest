@@ -23,9 +23,9 @@
 #define EXPORT_FILE_DIALOG_HPP
 
 // Include 3D Forest.
+#include <Dialog.hpp>
 #include <ExportFileFormatInterface.hpp>
 #include <ExportFileProperties.hpp>
-#include <Dialog.hpp>
 class Application;
 class CheckBox;
 class LineEdit;

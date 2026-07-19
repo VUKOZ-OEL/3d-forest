@@ -22,8 +22,8 @@
 // Include std.
 
 // Include 3D Forest.
-#include <RadioButton.hpp>
 #include <Application.hpp>
+#include <RadioButton.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "RadioButton"
@@ -52,4 +52,3 @@ bool RadioButton::isChecked() const
 {
     return checked_;
 }
-

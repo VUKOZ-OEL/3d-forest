@@ -20,9 +20,9 @@
 /** @file FilterElevationPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <FilterElevationPlugin.hpp>
 #include <FilterElevationWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -41,15 +41,15 @@ void FilterElevationPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(nullptr,
-                              "Filter",
-                              "Filter",
-                              tr("Elevation"),
-                              tr("Show elevation filter"),
-                              ICON("elevation-filter"),
-                              this,
-                              &FilterElevationPlugin::slotPlugin,
-                              MAIN_WINDOW_MENU_FILTER_PRIORITY);
+    app_->createAction(
+        nullptr,
+        "Filter",
+        "Filter",
+        tr("Elevation"),
+        tr("Show elevation filter"),
+        ICON("elevation-filter"),
+        [this]() { slotPlugin(); },
+        MAIN_WINDOW_MENU_FILTER_PRIORITY);
 }
 
 void FilterElevationPlugin::slotPlugin()

@@ -20,14 +20,14 @@
 /** @file External3dMarteloscopeDialog.cpp */
 
 // Include 3D Forest.
-#include <External3dMarteloscopeDialog.hpp>
 #include <Application.hpp>
-#include <ThemeIcon.hpp>
+#include <External3dMarteloscopeDialog.hpp>
 #include <FileDialog.hpp>
 #include <HBoxLayout.hpp>
 #include <Label.hpp>
 #include <LineEdit.hpp>
 #include <PushButton.hpp>
+#include <ThemeIcon.hpp>
 #include <VBoxLayout.hpp>
 
 // Include local.
@@ -36,8 +36,7 @@
 
 #define ICON(name) (ThemeIcon(":/External3dMarteloscopeResources/", name))
 
-External3dMarteloscopeDialog::External3dMarteloscopeDialog(
-    Application *app)
+External3dMarteloscopeDialog::External3dMarteloscopeDialog(Application *app)
     : Dialog(app),
       app_(app)
 {
@@ -46,10 +45,7 @@ External3dMarteloscopeDialog::External3dMarteloscopeDialog(
     fileNameLineEdit_->setText(path_);
 
     browseButton_ = new PushButton(tr("Browse"));
-    browseButton_->clicked.connect([this]()
-    {
-        slotBrowse();
-    });
+    browseButton_->clicked.connect([this]() { slotBrowse(); });
 
     HBoxLayout *fileNameLayout = new HBoxLayout;
     fileNameLayout->addWidget(new Label(tr("File")));
@@ -59,16 +55,10 @@ External3dMarteloscopeDialog::External3dMarteloscopeDialog(
     // Dialog buttons.
     acceptButton_ = new PushButton(tr("Run"));
     acceptButton_->setIcon(THEME_ICON("run"));
-    acceptButton_->clicked.connect([this]()
-    {
-        slotAccept();
-    });
+    acceptButton_->clicked.connect([this]() { slotAccept(); });
 
     rejectButton_ = new PushButton(tr("Cancel"));
-    rejectButton_->clicked.connect([this]()
-    {
-        slotReject();
-    });
+    rejectButton_->clicked.connect([this]() { slotReject(); });
 
     HBoxLayout *dialogButtons = new HBoxLayout;
     dialogButtons->addStretch();
@@ -96,11 +86,11 @@ void External3dMarteloscopeDialog::slotBrowse()
 
     std::string fileName =
         FileDialog::getSaveFileName(app_,
-                                     tr("Select File"),
-                                     fileNameLineEdit_->text(),
-                                     tr("iLand project XML (*.xml)"),
-                                     &selectedFilter,
-                                     FileDialog::DontConfirmOverwrite);
+                                    tr("Select File"),
+                                    fileNameLineEdit_->text(),
+                                    tr("iLand project XML (*.xml)"),
+                                    &selectedFilter,
+                                    FileDialog::DontConfirmOverwrite);
 
     if (fileName.empty())
     {

@@ -20,8 +20,8 @@
 /** @file LineEdit.cpp */
 
 // Include 3D Forest.
-#include <LineEdit.hpp>
 #include <Application.hpp>
+#include <LineEdit.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "LineEdit"

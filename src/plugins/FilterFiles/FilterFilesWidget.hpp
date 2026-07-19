@@ -23,9 +23,9 @@
 #define FILTER_FILES_WIDGET_HPP
 
 // Include 3D Forest.
-#include <Widget.hpp>
 #include <Datasets.hpp>
 #include <Editor.hpp>
+#include <Widget.hpp>
 class Application;
 class ToolButton;
 class TreeWidget;

@@ -20,9 +20,9 @@
 /** @file FilterSpeciesWindow.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <FilterSpeciesWidget.hpp>
 #include <FilterSpeciesWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -31,8 +31,7 @@
 
 #define ICON(name) (ThemeIcon(":/FilterSpeciesResources/", name))
 
-FilterSpeciesWindow::FilterSpeciesWindow(Application *app)
-    : DockWidget(app)
+FilterSpeciesWindow::FilterSpeciesWindow(Application *app) : DockWidget(app)
 {
     LOG_DEBUG(<< "Start creating species window.");
 

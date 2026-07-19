@@ -20,8 +20,8 @@
 /** @file DoubleRangeSlider.cpp */
 
 // Include 3D Forest.
-#include <DoubleRangeSlider.hpp>
 #include <Application.hpp>
+#include <DoubleRangeSlider.hpp>
 #include <Util.hpp>
 
 // Include local.

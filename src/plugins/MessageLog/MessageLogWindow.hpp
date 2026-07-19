@@ -23,9 +23,9 @@
 #define MESSAGE_LOG_WINDOW_HPP
 
 // Include 3D Forest.
+#include <DockWidget.hpp>
 #include <File.hpp>
 #include <Log.hpp>
-#include <DockWidget.hpp>
 class Application;
 class TextEdit;
 

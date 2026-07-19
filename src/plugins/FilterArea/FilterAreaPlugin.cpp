@@ -20,9 +20,9 @@
 /** @file FilterAreaPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <FilterAreaPlugin.hpp>
 #include <FilterAreaWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -31,9 +31,7 @@
 
 #define ICON(name) (ThemeIcon(":/FilterAreaResources/", name))
 
-FilterAreaPlugin::FilterAreaPlugin()
-    : app_(nullptr),
-      pluginWindow_(nullptr)
+FilterAreaPlugin::FilterAreaPlugin() : app_(nullptr), pluginWindow_(nullptr)
 {
 }
 
@@ -41,15 +39,15 @@ void FilterAreaPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(nullptr,
-                              "Filter",
-                              "Filter",
-                              tr("Area"),
-                              tr("Show area filter"),
-                              ICON("clip-filter"),
-                              this,
-                              &FilterAreaPlugin::slotPlugin,
-                              MAIN_WINDOW_MENU_FILTER_PRIORITY);
+    app_->createAction(
+        nullptr,
+        "Filter",
+        "Filter",
+        tr("Area"),
+        tr("Show area filter"),
+        ICON("clip-filter"),
+        [this]() { slotPlugin(); },
+        MAIN_WINDOW_MENU_FILTER_PRIORITY);
 }
 
 void FilterAreaPlugin::slotPlugin()

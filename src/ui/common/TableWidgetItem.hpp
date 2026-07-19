@@ -33,7 +33,7 @@
 class EXPORT_UI_COMMON TableWidgetItem : public Cell
 {
 public:
-    TableWidgetItem();
+    TableWidgetItem(const std::string &str = "");
 
 private:
 };

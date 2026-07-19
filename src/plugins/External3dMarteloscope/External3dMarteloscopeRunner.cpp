@@ -20,8 +20,8 @@
 /** @file External3dMarteloscopeRunner.cpp */
 
 // Include 3D Forest.
-#include <External3dMarteloscopeRunner.hpp>
 #include <Application.hpp>
+#include <External3dMarteloscopeRunner.hpp>
 
 // Include Qt.
 #include <QCoreApplication>
@@ -37,8 +37,7 @@
 #define LOG_MODULE_NAME "External3dMarteloscopeRunner"
 #include <Log.hpp>
 
-External3dMarteloscopeRunner::External3dMarteloscopeRunner(
-    Application *app)
+External3dMarteloscopeRunner::External3dMarteloscopeRunner(Application *app)
     : QObject(app),
       app_(app)
 {

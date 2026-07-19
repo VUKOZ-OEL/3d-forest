@@ -20,9 +20,9 @@
 /** @file FilterDescriptorPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <FilterDescriptorPlugin.hpp>
 #include <FilterDescriptorWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -41,15 +41,15 @@ void FilterDescriptorPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(nullptr,
-                              "Filter",
-                              "Filter",
-                              tr("Descriptor"),
-                              tr("Show descriptor filter"),
-                              ICON("descriptor-filter"),
-                              this,
-                              &FilterDescriptorPlugin::slotPlugin,
-                              MAIN_WINDOW_MENU_FILTER_PRIORITY);
+    app_->createAction(
+        nullptr,
+        "Filter",
+        "Filter",
+        tr("Descriptor"),
+        tr("Show descriptor filter"),
+        ICON("descriptor-filter"),
+        [this]() { slotPlugin(); },
+        MAIN_WINDOW_MENU_FILTER_PRIORITY);
 }
 
 void FilterDescriptorPlugin::slotPlugin()

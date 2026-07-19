@@ -20,9 +20,9 @@
 /** @file ComputeSkeletonWindow.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ComputeSkeletonWidget.hpp>
 #include <ComputeSkeletonWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 #include <VBoxLayout.hpp>
 

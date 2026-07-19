@@ -20,14 +20,12 @@
 /** @file ExportFileDialog.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
+#include <CheckBox.hpp>
+#include <ComboBox.hpp>
 #include <ExportFileDialog.hpp>
 #include <ExportFileFormatCsv.hpp>
 #include <ExportFileFormatLas.hpp>
-#include <Application.hpp>
-#include <ThemeIcon.hpp>
-#include <Util.hpp>
-#include <CheckBox.hpp>
-#include <ComboBox.hpp>
 #include <FileDialog.hpp>
 #include <GridLayout.hpp>
 #include <GroupBox.hpp>
@@ -36,6 +34,8 @@
 #include <LineEdit.hpp>
 #include <MessageBox.hpp>
 #include <PushButton.hpp>
+#include <ThemeIcon.hpp>
+#include <Util.hpp>
 #include <VBoxLayout.hpp>
 
 // Include local.
@@ -54,10 +54,7 @@ ExportFileDialog::ExportFileDialog(Application *app,
     fileNameLineEdit_->setText(fileName);
 
     browseButton_ = new PushButton(tr("Browse"));
-    browseButton_->clicked.connect([this]()
-    {
-        slotBrowse();
-    });
+    browseButton_->clicked.connect([this]() { slotBrowse(); });
 
     HBoxLayout *fileNameLayout = new HBoxLayout;
     fileNameLayout->addWidget(new Label(tr("File")));
@@ -112,16 +109,10 @@ ExportFileDialog::ExportFileDialog(Application *app,
 
     // Buttons.
     acceptButton_ = new PushButton(tr("Export"));
-    acceptButton_->clicked.connect([this]()
-    {
-        slotAccept();
-    });
+    acceptButton_->clicked.connect([this]() { slotAccept(); });
 
     rejectButton_ = new PushButton(tr("Cancel"));
-    rejectButton_->clicked.connect([this]()
-    {
-        slotReject();
-    });
+    rejectButton_->clicked.connect([this]() { slotReject(); });
 
     HBoxLayout *dialogButtons = new HBoxLayout;
     dialogButtons->addStretch();
@@ -153,12 +144,12 @@ void ExportFileDialog::slotBrowse()
 
     std::string fileName =
         FileDialog::getSaveFileName(app_,
-                                     tr("Export File As"),
-                                     fileNameLineEdit_->text(),
-                                     tr("LAS (LASer) File (*.las);;"
-                                        "Comma Separated Values (*.csv)"),
-                                     &selectedFilter,
-                                     FileDialog::DontConfirmOverwrite);
+                                    tr("Export File As"),
+                                    fileNameLineEdit_->text(),
+                                    tr("LAS (LASer) File (*.las);;"
+                                       "Comma Separated Values (*.csv)"),
+                                    &selectedFilter,
+                                    FileDialog::DontConfirmOverwrite);
 
     if (fileName.empty())
     {
@@ -175,8 +166,8 @@ void ExportFileDialog::slotAccept()
     if (path.empty())
     {
         (void)MessageBox::information(app_,
-                                       tr("Export File"),
-                                       tr("Please choose a file name."));
+                                      tr("Export File"),
+                                      tr("Please choose a file name."));
         return;
     }
 
@@ -185,9 +176,9 @@ void ExportFileDialog::slotAccept()
         int reply;
 
         reply = MessageBox::question(app_,
-                                      tr("Export File"),
-                                      tr("Overwrite existing file?"),
-                                      MessageBox::Yes | MessageBox::No);
+                                     tr("Export File"),
+                                     tr("Overwrite existing file?"),
+                                     MessageBox::Yes | MessageBox::No);
 
         if (reply != MessageBox::Yes)
         {

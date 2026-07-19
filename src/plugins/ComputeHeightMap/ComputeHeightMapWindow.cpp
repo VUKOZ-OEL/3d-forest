@@ -20,9 +20,9 @@
 /** @file ComputeHeightMapWindow.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ComputeHeightMapWidget.hpp>
 #include <ComputeHeightMapWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 #include <VBoxLayout.hpp>
 

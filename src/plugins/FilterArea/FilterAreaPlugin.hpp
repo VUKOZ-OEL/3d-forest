@@ -37,8 +37,7 @@ class FilterAreaWindow;
 #endif
 
 /** Filter Area Plugin. */
-class FilterAreaPlugin : 
-                                                   public Plugin
+class FilterAreaPlugin : public Plugin
 {
 public:
     FilterAreaPlugin();

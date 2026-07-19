@@ -20,9 +20,9 @@
 /** @file ComputeElevationWindow.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ComputeElevationWidget.hpp>
 #include <ComputeElevationWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 #include <VBoxLayout.hpp>
 

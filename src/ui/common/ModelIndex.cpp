@@ -32,5 +32,6 @@ ModelIndex::ModelIndex()
 
 bool ModelIndex::isValid() const
 {
-    return row_ >= 0 && row_ < rowCount_ && column_ >= 0 && column_ < columnCount_;
+    return row_ >= 0 && row_ < rowCount_ && column_ >= 0 &&
+           column_ < columnCount_;
 }

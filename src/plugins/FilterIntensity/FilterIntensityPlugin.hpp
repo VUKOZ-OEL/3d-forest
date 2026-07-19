@@ -37,9 +37,7 @@ class FilterIntensityWindow;
 #endif
 
 /** Filter Intensity Plugin. */
-class FilterIntensityPlugin
-    : 
-      public Plugin
+class FilterIntensityPlugin : public Plugin
 {
 public:
     FilterIntensityPlugin();

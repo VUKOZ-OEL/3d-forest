@@ -20,8 +20,8 @@
 /** @file EditPluginResetManagementStatus.cpp */
 
 // Include 3D Forest.
-#include <EditPluginResetManagementStatus.hpp>
 #include <Application.hpp>
+#include <EditPluginResetManagementStatus.hpp>
 #include <ProgressDialog.hpp>
 
 // Include local.
@@ -49,7 +49,7 @@ void EditPluginResetManagementStatus::run(Application *app)
 
     editor->setSegments(segments);
     app->update(nullptr,
-                       {Editor::TYPE_SEGMENT, Editor::TYPE_MANAGEMENT_STATUS});
+                {Editor::TYPE_SEGMENT, Editor::TYPE_MANAGEMENT_STATUS});
 
     LOG_DEBUG(<< "Finished resetting management status values.");
 }

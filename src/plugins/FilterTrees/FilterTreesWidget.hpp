@@ -23,9 +23,9 @@
 #define FILTER_TREES_WIDGET_HPP
 
 // Include 3D Forest.
-#include <Widget.hpp>
 #include <Editor.hpp>
 #include <Segments.hpp>
+#include <Widget.hpp>
 class Application;
 class FilterTreesTreeWidget;
 class Splitter;

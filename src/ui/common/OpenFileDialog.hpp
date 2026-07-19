@@ -17,44 +17,29 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Menu.cpp */
+/** @file OpenFileDialog.hpp */
+
+#ifndef OPEN_FILE_DIALOG_HPP
+#define OPEN_FILE_DIALOG_HPP
+
+// Include std.
+#include <string>
 
 // Include 3D Forest.
-#include <Action.hpp>
-#include <Application.hpp>
-#include <Menu.hpp>
+class Application;
 
 // Include local.
-#define LOG_MODULE_NAME "Menu"
-#include <Log.hpp>
+#include <ExportUiCommon.hpp>
+#include <WarningsDisable.hpp>
 
-Menu::Menu()
+/** Open File Dialog. */
+class EXPORT_UI_COMMON OpenFileDialog
 {
-}
+public:
+    static std::string dialog(Application *app,
+                              const std::string &filter = "(*.*)");
+};
 
-Menu::Menu(Application *app)
-{
-}
+#include <WarningsEnable.hpp>
 
-Menu::Menu(const std::string &title, Menu *parent)
-{
-}
-
-Menu::~Menu()
-{
-}
-
-Action *Menu::addAction(const std::string &title)
-{
-    Action *action = new Action(title);
-    return action;
-}
-
-void Menu::addMenu(Menu *menu)
-{
-}
-
-Action *Menu::exec(const Point &pos)
-{
-    return nullptr;
-}
+#endif /* OPEN_FILE_DIALOG_HPP */

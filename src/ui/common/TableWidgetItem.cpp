@@ -26,6 +26,7 @@
 #define LOG_MODULE_NAME "TableWidgetItem"
 #include <Log.hpp>
 
-TableWidgetItem::TableWidgetItem()
+TableWidgetItem::TableWidgetItem(const std::string &str)
 {
+    setText(str);
 }

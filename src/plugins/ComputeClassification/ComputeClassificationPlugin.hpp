@@ -37,9 +37,7 @@ class ComputeClassificationWindow;
 #endif
 
 /** Compute Classification Plugin. */
-class ComputeClassificationPlugin
-    : 
-      public Plugin
+class ComputeClassificationPlugin : public Plugin
 {
 public:
     ComputeClassificationPlugin();

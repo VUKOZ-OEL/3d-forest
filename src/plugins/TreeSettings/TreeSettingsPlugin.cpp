@@ -31,9 +31,7 @@
 
 #define ICON(name) (ThemeIcon(":/TreeSettingsResources/", name))
 
-TreeSettingsPlugin::TreeSettingsPlugin()
-    : app_(nullptr),
-      pluginWindow_(nullptr)
+TreeSettingsPlugin::TreeSettingsPlugin() : app_(nullptr), pluginWindow_(nullptr)
 {
 }
 
@@ -41,15 +39,15 @@ void TreeSettingsPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(nullptr,
-                              "Settings",
-                              "Settings",
-                              tr("Tree"),
-                              tr("Show tree settings"),
-                              ICON("tree-settings"),
-                              this,
-                              &TreeSettingsPlugin::slotPlugin,
-                              MAIN_WINDOW_MENU_SETTINGS_PRIORITY);
+    app_->createAction(
+        nullptr,
+        "Settings",
+        "Settings",
+        tr("Tree"),
+        tr("Show tree settings"),
+        ICON("tree-settings"),
+        [this]() { slotPlugin(); },
+        MAIN_WINDOW_MENU_SETTINGS_PRIORITY);
 }
 
 void TreeSettingsPlugin::slotPlugin()

@@ -20,9 +20,9 @@
 /** @file FilterSpeciesPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <FilterSpeciesPlugin.hpp>
 #include <FilterSpeciesWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -41,15 +41,15 @@ void FilterSpeciesPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(nullptr,
-                              "Filter",
-                              "Filter",
-                              tr("Species"),
-                              tr("Show species filter"),
-                              ICON("species-filter"),
-                              this,
-                              &FilterSpeciesPlugin::slotPlugin,
-                              MAIN_WINDOW_MENU_FILTER_PRIORITY);
+    app_->createAction(
+        nullptr,
+        "Filter",
+        "Filter",
+        tr("Species"),
+        tr("Show species filter"),
+        ICON("species-filter"),
+        [this]() { slotPlugin(); },
+        MAIN_WINDOW_MENU_FILTER_PRIORITY);
 }
 
 void FilterSpeciesPlugin::slotPlugin()

@@ -20,10 +20,10 @@
 /** @file FilterManagementStatusTreeWidget.cpp */
 
 // Include 3D Forest.
-#include <Core.hpp>
-#include <FilterManagementStatusTreeWidget.hpp>
 #include <Application.hpp>
 #include <CheckBox.hpp>
+#include <Core.hpp>
+#include <FilterManagementStatusTreeWidget.hpp>
 #include <Label.hpp>
 #include <VBoxLayout.hpp>
 
@@ -90,9 +90,7 @@ void FilterManagementStatusTreeWidget::createCheckBoxList()
         // auto label = core().translate(statusMap_[i].label);
         checkbox->setText(statusMap_[i].label);
         checkbox->clicked.connect([this, checkbox](bool val)
-        {
-            slotSetCheckbox(val, checkbox);
-        });
+                                  { slotSetCheckbox(val, checkbox); });
 
         checkboxList_[i] = checkbox;
     }
@@ -166,8 +164,7 @@ void FilterManagementStatusTreeWidget::setCheckbox(size_t idx)
     }
 
     editor->setSegments(segments);
-    app_->update(this,
-                        {Editor::TYPE_SEGMENT, Editor::TYPE_MANAGEMENT_STATUS});
+    app_->update(this, {Editor::TYPE_SEGMENT, Editor::TYPE_MANAGEMENT_STATUS});
 }
 
 void FilterManagementStatusTreeWidget::setSegment(const Segment &segment)

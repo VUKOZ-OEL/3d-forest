@@ -20,8 +20,8 @@
 /** @file ToolBar.cpp */
 
 // Include 3D Forest.
-#include <ToolBar.hpp>
 #include <Application.hpp>
+#include <ToolBar.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ToolBar"

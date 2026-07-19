@@ -30,8 +30,8 @@
 #include <Log.hpp>
 
 std::vector<std::string> FileDialog::selectFiles(Application *app,
-                                                const std::string &dialogTitle,
-                                                const std::string &filter)
+                                                 const std::string &dialogTitle,
+                                                 const std::string &filter)
 {
     std::vector<std::string> list;
 
@@ -85,4 +85,5 @@ std::string FileDialog::getSaveFileName(Application *app,
     QFileDialog::Options options;
     options = QFlag(QFileDialog::DontConfirmOverwrite);
 #endif
+    return "";
 }

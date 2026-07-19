@@ -27,8 +27,8 @@
 #include <vector>
 
 // Include 3D Forest.
-#include <Widget.hpp>
 #include <Segment.hpp>
+#include <Widget.hpp>
 class Application;
 class CheckBox;
 class VBoxLayout;

@@ -22,8 +22,8 @@
 // Include std.
 
 // Include 3D Forest.
-#include <TextEdit.hpp>
 #include <Application.hpp>
+#include <TextEdit.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "TextEdit"

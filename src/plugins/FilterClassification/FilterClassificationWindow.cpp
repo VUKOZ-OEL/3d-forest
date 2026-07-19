@@ -20,9 +20,9 @@
 /** @file FilterClassificationWindow.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <FilterClassificationWidget.hpp>
 #include <FilterClassificationWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.

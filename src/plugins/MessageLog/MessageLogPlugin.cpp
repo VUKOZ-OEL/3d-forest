@@ -27,9 +27,7 @@
 
 #define ICON(name) (ThemeIcon(":/MessageLogResources/", name))
 
-MessageLogPlugin::MessageLogPlugin()
-    : app_(nullptr),
-      pluginWindow_(nullptr)
+MessageLogPlugin::MessageLogPlugin() : app_(nullptr), pluginWindow_(nullptr)
 {
 }
 
@@ -44,16 +42,16 @@ void MessageLogPlugin::initialize(Application *app)
         globalLogThread->setCallback(pluginWindow_);
     }
 
-    app_->createAction(nullptr,
-                              "File",
-                              "Windows",
-                              tr("Message Log"),
-                              tr("Show message log"),
-                              ICON("message-log"),
-                              this,
-                              &MessageLogPlugin::slotPlugin,
-                              MAIN_WINDOW_MENU_FILE_PRIORITY,
-                              90);
+    app_->createAction(
+        nullptr,
+        "File",
+        "Windows",
+        tr("Message Log"),
+        tr("Show message log"),
+        ICON("message-log"),
+        [this]() { slotPlugin(); },
+        MAIN_WINDOW_MENU_FILE_PRIORITY,
+        90);
 
     app_->hideToolBar("Windows");
 }

@@ -28,14 +28,14 @@
 
 // Include 3D Forest.
 #include <Action.hpp>
+#include <DockWidget.hpp>
 #include <Editor.hpp>
+#include <EventQueue.hpp>
 #include <MenuBar.hpp>
 #include <PluginManager.hpp>
 #include <RenderThread.hpp>
-#include <ThreadCallbackInterface.hpp>
 #include <ThemeIcon.hpp>
-#include <EventQueue.hpp>
-#include <DockWidget.hpp>
+#include <ThreadCallbackInterface.hpp>
 #include <ToolButton.hpp>
 
 // Include local.
@@ -87,30 +87,6 @@ public:
                       std::function<void()> cb,
                       int menuPriority = -1,
                       int menuItemPriority = -1);
-
-    template <typename T>
-    void createAction(Action **result,
-                      const std::string &menuTitle,
-                      const std::string &toolBarTitle,
-                      const std::string &text,
-                      const std::string &toolTip,
-                      const ThemeIcon &icon,
-                      T *object,
-                      void (T::*method)(),
-                      int menuPriority = -1,
-                      int menuItemPriority = -1)
-    {
-        return createAction(
-            result,
-            menuTitle,
-            toolBarTitle,
-            text,
-            toolTip,
-            icon,
-            [object, method] { (object->*method)(); },
-            menuPriority,
-            menuItemPriority);
-    }
 
     void createToolButton(ToolButton **result,
                           const std::string &text,
@@ -164,7 +140,7 @@ public:
 
     /// Connect to this signal in your plugin to be notified about data changes.
     // void signalUpdate(void *sender, const std::set<Editor::Type> &target);
-    Signal<void*, std::set<Editor::Type>> signalUpdate;
+    Signal<void *, std::set<Editor::Type>> signalUpdate;
 
     // bool event(QEvent *e) override;
     // void paintEvent(QPaintEvent *event) override;

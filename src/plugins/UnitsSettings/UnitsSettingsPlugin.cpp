@@ -41,15 +41,15 @@ void UnitsSettingsPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(nullptr,
-                              "Settings",
-                              "Settings",
-                              tr("Units"),
-                              tr("Show units settings"),
-                              ICON("units"),
-                              this,
-                              &UnitsSettingsPlugin::slotPlugin,
-                              MAIN_WINDOW_MENU_SETTINGS_PRIORITY);
+    app_->createAction(
+        nullptr,
+        "Settings",
+        "Settings",
+        tr("Units"),
+        tr("Show units settings"),
+        ICON("units"),
+        [this]() { slotPlugin(); },
+        MAIN_WINDOW_MENU_SETTINGS_PRIORITY);
 }
 
 void UnitsSettingsPlugin::slotPlugin()

@@ -20,13 +20,13 @@
 /** @file ExportFilePlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ExportFileAction.hpp>
 #include <ExportFileDialog.hpp>
 #include <ExportFilePlugin.hpp>
-#include <Application.hpp>
+#include <MessageBox.hpp>
 #include <ProgressActionDialog.hpp>
 #include <ThemeIcon.hpp>
-#include <MessageBox.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ExportFilePlugin"
@@ -42,16 +42,16 @@ void ExportFilePlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(&exportFileAction_,
-                              "File",
-                              "File Import/Export",
-                              tr("Export..."),
-                              tr("Export point cloud"),
-                              ICON("export-file"),
-                              this,
-                              &ExportFilePlugin::slotExportFile,
-                              MAIN_WINDOW_MENU_FILE_PRIORITY,
-                              60);
+    app_->createAction(
+        &exportFileAction_,
+        "File",
+        "File Import/Export",
+        tr("Export..."),
+        tr("Export point cloud"),
+        ICON("export-file"),
+        [this]() { slotExportFile(); },
+        MAIN_WINDOW_MENU_FILE_PRIORITY,
+        60);
 }
 
 void ExportFilePlugin::slotExportFile()

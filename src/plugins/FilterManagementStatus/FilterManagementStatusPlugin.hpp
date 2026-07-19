@@ -37,9 +37,7 @@ class FilterManagementStatusWindow;
 #endif
 
 /** Filter Management Status Plugin. */
-class FilterManagementStatusPlugin
-    : 
-      public Plugin
+class FilterManagementStatusPlugin : public Plugin
 {
 public:
     FilterManagementStatusPlugin();

@@ -20,11 +20,11 @@
 /** @file ComputeHeightMapWidget.cpp */
 
 // Include 3D Forest.
-#include <ComputeHeightMapModifier.hpp>
-#include <ComputeHeightMapWidget.hpp>
 #include <Application.hpp>
 #include <CheckBox.hpp>
 #include <ComboBox.hpp>
+#include <ComputeHeightMapModifier.hpp>
+#include <ComputeHeightMapWidget.hpp>
 #include <GridLayout.hpp>
 #include <GroupBox.hpp>
 #include <HBoxLayout.hpp>
@@ -65,9 +65,7 @@ ComputeHeightMapWidget::ComputeHeightMapWidget(
     colorCountSpinBox_->setValue(PLUGIN_COMPUTE_HEIGHT_MAP_COLORS_DEFAULT);
     colorCountSpinBox_->setSingleStep(1);
     colorCountSpinBox_->valueChanged.connect([this](int value)
-    {
-        colorCountChanged(value);
-    });
+                                             { colorCountChanged(value); });
 
     colormapComboBox_ = new ComboBox;
     colormapComboBox_->addItem(PLUGIN_COMPUTE_HEIGHT_MAP_COLORMAP_MATLAB_JET);
@@ -77,34 +75,25 @@ ComputeHeightMapWidget::ComputeHeightMapWidget(
     colormapComboBox_->setCurrentText(
         PLUGIN_COMPUTE_HEIGHT_MAP_COLORMAP_DEFAULT);
     colormapComboBox_->activated.connect([this](int value)
-    {
-        colorCountChanged(value);
-    });
+                                         { colorCountChanged(value); });
 
     sourceComboBox_ = new ComboBox;
     sourceComboBox_->addItem(PLUGIN_COMPUTE_HEIGHT_MAP_SOURCE_Z_POSITION);
     sourceComboBox_->addItem(PLUGIN_COMPUTE_HEIGHT_MAP_SOURCE_ELEVATION);
     sourceComboBox_->setCurrentText(PLUGIN_COMPUTE_HEIGHT_MAP_SOURCE_DEFAULT);
     sourceComboBox_->activated.connect([this](int value)
-    {
-        sourceChanged(value);
-    });
+                                       { sourceChanged(value); });
 
     // Widgets apply.
     previewCheckBox_ = new CheckBox;
     previewCheckBox_->stateChanged.connect([this](int value)
-    {
-        previewChanged(value);
-    });
+                                           { previewChanged(value); });
 
     // previewCheckBox_->setChecked(true);
 
     applyButton_ = new PushButton(tr("Apply and save"));
     applyButton_->setDisabled(true);
-    applyButton_->clicked.connect([this]()
-    {
-        apply();
-    });
+    applyButton_->clicked.connect([this]() { apply(); });
 
     // Layout.
     GridLayout *groupBoxLayout = new GridLayout;

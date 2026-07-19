@@ -20,9 +20,9 @@
 /** @file FilterElevationWidget.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <DoubleRangeSliderWidget.hpp>
 #include <FilterElevationWidget.hpp>
-#include <Application.hpp>
 #include <HBoxLayout.hpp>
 #include <PushButton.hpp>
 #include <VBoxLayout.hpp>
@@ -39,18 +39,19 @@ FilterElevationWidget::FilterElevationWidget(Application *app)
     LOG_DEBUG(<< "Start creating elevation filter widget.");
 
     // Input widgets.
-    DoubleRangeSliderWidget::create(elevationInput_,
-        [this](double val){ slotMinimumValueChanged(val); },
-        [this](double val){ slotMaximumValueChanged(val); },
-        [this](){ slotFinalValue(); },
-                                    tr("Elevation"),
-                                    tr("Min-max elevation range filter"),
-                                    tr("m"),
-                                    0.01,
-                                    0,
-                                    100,
-                                    0,
-                                    100);
+    DoubleRangeSliderWidget::create(
+        elevationInput_,
+        [this](double val) { slotMinimumValueChanged(val); },
+        [this](double val) { slotMaximumValueChanged(val); },
+        [this]() { slotFinalValue(); },
+        tr("Elevation"),
+        tr("Min-max elevation range filter"),
+        tr("m"),
+        0.01,
+        0,
+        100,
+        0,
+        100);
 
     // Layout.
     VBoxLayout *mainLayout = new VBoxLayout;
@@ -61,10 +62,9 @@ FilterElevationWidget::FilterElevationWidget(Application *app)
     setLayout(mainLayout);
 
     // Data.
-    app_->signalUpdate.connect([this](void *sender, const std::set<Editor::Type> &target)
-    {
-        slotUpdate(sender, target);
-    });
+    app_->signalUpdate.connect(
+        [this](void *sender, const std::set<Editor::Type> &target)
+        { slotUpdate(sender, target); });
 
     slotUpdate(nullptr, std::set<Editor::Type>());
 
@@ -94,8 +94,7 @@ void FilterElevationWidget::setElevation(const Range<double> &range)
 
     elevationRange_ = range;
 
-    double ppm =
-        app_->editor().settings().unitsSettings().pointsPerMeter()[0];
+    double ppm = app_->editor().settings().unitsSettings().pointsPerMeter()[0];
 
     double min = elevationRange_.minimum() / ppm;
     double max = elevationRange_.maximum() / ppm;
@@ -132,8 +131,7 @@ void FilterElevationWidget::slotMinimumValueChanged(double val)
 {
     LOG_DEBUG(<< "Minimum value changed.");
 
-    double ppm =
-        app_->editor().settings().unitsSettings().pointsPerMeter()[0];
+    double ppm = app_->editor().settings().unitsSettings().pointsPerMeter()[0];
 
     elevationRange_.setMinimumValue(elevationInput_->minimumValue() * ppm);
     filterChanged(false);
@@ -143,8 +141,7 @@ void FilterElevationWidget::slotMaximumValueChanged(double val)
 {
     LOG_DEBUG(<< "Maximum value changed.");
 
-    double ppm =
-        app_->editor().settings().unitsSettings().pointsPerMeter()[0];
+    double ppm = app_->editor().settings().unitsSettings().pointsPerMeter()[0];
 
     elevationRange_.setMaximumValue(elevationInput_->maximumValue() * ppm);
     filterChanged(false);

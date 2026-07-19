@@ -20,9 +20,9 @@
 /** @file ComputeElevationPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ComputeElevationPlugin.hpp>
 #include <ComputeElevationWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -41,16 +41,16 @@ void ComputeElevationPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(nullptr,
-                              "Compute",
-                              "Compute",
-                              tr("Elevation"),
-                              tr("Compute elevation above ground"
-                                 " for each point"),
-                              ICON("elevation"),
-                              this,
-                              &ComputeElevationPlugin::slotPlugin,
-                              MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
+    app_->createAction(
+        nullptr,
+        "Compute",
+        "Compute",
+        tr("Elevation"),
+        tr("Compute elevation above ground"
+           " for each point"),
+        ICON("elevation"),
+        [this]() { slotPlugin(); },
+        MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
 }
 
 void ComputeElevationPlugin::slotPlugin()

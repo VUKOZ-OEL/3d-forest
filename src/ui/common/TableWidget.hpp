@@ -24,11 +24,11 @@
 
 // Include 3D Forest.
 #include <AbstractItemView.hpp>
-#include <TableWidgetItem.hpp>
 #include <HeaderView.hpp>
-#include <ModelIndex.hpp>
-#include <Widget.hpp>
 #include <ItemSelection.hpp>
+#include <ModelIndex.hpp>
+#include <TableWidgetItem.hpp>
+#include <Widget.hpp>
 class Application;
 
 // Include local.
@@ -65,7 +65,10 @@ public:
     void setSelectionBehavior(int behavior);
     void selectRow(int row);
 
+    std::set<int> selectedRows() const;
+
     ModelIndex indexAt(const Point &pos) const;
+    const Widget *viewport() const;
 
     void setSortingEnabled(bool b);
     void sortItems(int column, Ui::SortOrder order);

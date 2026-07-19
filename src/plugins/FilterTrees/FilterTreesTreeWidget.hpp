@@ -33,8 +33,6 @@ class TableWidget;
 /** Tree Widget. */
 class FilterTreesTreeWidget : public Widget
 {
-
-
 public:
     FilterTreesTreeWidget(Application *app);
 

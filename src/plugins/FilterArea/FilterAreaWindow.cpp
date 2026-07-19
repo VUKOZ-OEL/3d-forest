@@ -20,9 +20,9 @@
 /** @file FilterAreaWindow.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <FilterAreaBoxWidget.hpp>
 #include <FilterAreaWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -31,8 +31,7 @@
 
 #define ICON(name) (ThemeIcon(":/FilterAreaResources/", name))
 
-FilterAreaWindow::FilterAreaWindow(Application *app)
-    : DockWidget(app)
+FilterAreaWindow::FilterAreaWindow(Application *app) : DockWidget(app)
 {
     LOG_DEBUG(<< "Start creating clip filter window.");
 

@@ -17,39 +17,28 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ViewerUtil.hpp */
-
-#ifndef VIEWER_UTIL_HPP
-#define VIEWER_UTIL_HPP
+/** @file OpenFileDialog.cpp */
 
 // Include 3D Forest.
-#include <Json.hpp>
-
-// Include Qt.
-#include <QVector3D>
+#include <Application.hpp>
+#include <FileDialog.hpp>
+#include <OpenFileDialog.hpp>
 
 // Include local.
-#include <WarningsDisable.hpp>
+#define LOG_MODULE_NAME "OpenFileDialog"
+// #define LOG_MODULE_DEBUG_ENABLED 1
+#include <Log.hpp>
 
-inline void toJson(Json &out, const QVector3D &in)
+std::string OpenFileDialog::dialog(Application *app, const std::string &filter)
 {
-    toJson(out[0], in[0]);
-    toJson(out[1], in[1]);
-    toJson(out[2], in[2]);
+    std::string filePath =
+        FileDialog::getOpenFileName(app, tr("Open File"), filter);
+
+    if (!filePath.empty())
+    {
+        LOG_DEBUG(<< "Selected file <" << filePath << ">");
+        return filePath;
+    }
+
+    return std::string();
 }
-
-inline std::string toString(const QVector3D &in)
-{
-    return "[" + toString(in[0]) + "," + toString(in[1]) + "," +
-           toString(in[2]) + "]";
-}
-
-inline std::ostream &operator<<(std::ostream &out, const QVector3D &in)
-{
-    return out << std::fixed << std::setprecision(15) << "[" << in[0] << ","
-               << in[1] << "," << in[2] << "]" << std::defaultfloat;
-}
-
-#include <WarningsEnable.hpp>
-
-#endif /* VIEWER_UTIL_HPP */

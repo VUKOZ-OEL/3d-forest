@@ -20,14 +20,14 @@
 /** @file ComputeCrownVolumeWidget.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ComputeCrownVolumeWidget.hpp>
 #include <DoubleSliderWidget.hpp>
-#include <InfoDialog.hpp>
-#include <Application.hpp>
-#include <ProgressActionDialog.hpp>
-#include <ThemeIcon.hpp>
 #include <HBoxLayout.hpp>
+#include <InfoDialog.hpp>
+#include <ProgressActionDialog.hpp>
 #include <PushButton.hpp>
+#include <ThemeIcon.hpp>
 #include <VBoxLayout.hpp>
 
 // Include local.
@@ -68,10 +68,7 @@ ComputeCrownVolumeWidget::ComputeCrownVolumeWidget(Application *app)
     // Buttons.
     applyButton_ = new PushButton(tr("Run"));
     applyButton_->setIcon(THEME_ICON("run"));
-    applyButton_->clicked.connect([this]()
-    {
-        slotApply();
-    });
+    applyButton_->clicked.connect([this]() { slotApply(); });
 
     // Buttons layout.
     HBoxLayout *buttonsLayout = new HBoxLayout;

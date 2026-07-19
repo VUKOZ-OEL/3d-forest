@@ -21,11 +21,11 @@
 
 // Include 3D Forest.
 #include <Application.hpp>
+#include <HBoxLayout.hpp>
 #include <InfoDialog.hpp>
 #include <PushButton.hpp>
 #include <TextEdit.hpp>
 #include <VBoxLayout.hpp>
-#include <HBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "InfoDialog"
@@ -47,10 +47,7 @@ InfoDialog::InfoDialog(Application *app, int w, int h)
 
     // Buttons.
     closeButton_ = new PushButton(tr("Close"));
-    closeButton_->clicked.connect([this]()
-    {
-        slotClose();
-    });
+    closeButton_->clicked.connect([this]() { slotClose(); });
 
     HBoxLayout *buttonsLayout = new HBoxLayout;
     buttonsLayout->addStretch();

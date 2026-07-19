@@ -20,9 +20,9 @@
 /** @file ComputeTreeAttributesWindow.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ComputeTreeAttributesWidget.hpp>
 #include <ComputeTreeAttributesWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 #include <VBoxLayout.hpp>
 

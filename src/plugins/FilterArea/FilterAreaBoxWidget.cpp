@@ -20,9 +20,9 @@
 /** @file FilterAreaBoxWidget.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <DoubleRangeSliderWidget.hpp>
 #include <FilterAreaBoxWidget.hpp>
-#include <Application.hpp>
 #include <HBoxLayout.hpp>
 #include <PushButton.hpp>
 #include <VBoxLayout.hpp>
@@ -41,9 +41,9 @@ FilterAreaBoxWidget::FilterAreaBoxWidget(Application *app)
     // Widgets.
     DoubleRangeSliderWidget::create(
         rangeInput_[0],
-        [this](double val){ slotMinimumValueChanged(val, 0); },
-        [this](double val){ slotMaximumValueChanged(val, 0); },
-        [this](){ slotFinalValue(); },
+        [this](double val) { slotMinimumValueChanged(val, 0); },
+        [this](double val) { slotMaximumValueChanged(val, 0); },
+        [this]() { slotFinalValue(); },
         tr("X range"),
         tr("Min-max clipping range filter along X axis"),
         tr("m"),
@@ -55,9 +55,9 @@ FilterAreaBoxWidget::FilterAreaBoxWidget(Application *app)
 
     DoubleRangeSliderWidget::create(
         rangeInput_[1],
-        [this](double val){ slotMinimumValueChanged(val, 1); },
-        [this](double val){ slotMaximumValueChanged(val, 1); },
-        [this](){ slotFinalValue(); },
+        [this](double val) { slotMinimumValueChanged(val, 1); },
+        [this](double val) { slotMaximumValueChanged(val, 1); },
+        [this]() { slotFinalValue(); },
         tr("Y range"),
         tr("Min-max clipping range filter along Y axis"),
         tr("m"),
@@ -69,9 +69,9 @@ FilterAreaBoxWidget::FilterAreaBoxWidget(Application *app)
 
     DoubleRangeSliderWidget::create(
         rangeInput_[2],
-        [this](double val){ slotMinimumValueChanged(val, 2); },
-        [this](double val){ slotMaximumValueChanged(val, 2); },
-        [this](){ slotFinalValue(); },
+        [this](double val) { slotMinimumValueChanged(val, 2); },
+        [this](double val) { slotMaximumValueChanged(val, 2); },
+        [this]() { slotFinalValue(); },
         tr("Z range"),
         tr("Min-max clipping range filter along Z axis"),
         tr("m"),
@@ -92,10 +92,9 @@ FilterAreaBoxWidget::FilterAreaBoxWidget(Application *app)
     setLayout(mainLayout);
 
     // Data.
-    app_->signalUpdate.connect([this](void *sender, const std::set<Editor::Type> &target)
-    {
-        slotUpdate(sender, target);
-    });
+    app_->signalUpdate.connect(
+        [this](void *sender, const std::set<Editor::Type> &target)
+        { slotUpdate(sender, target); });
 
     slotUpdate(nullptr, std::set<Editor::Type>());
 
@@ -125,8 +124,7 @@ void FilterAreaBoxWidget::setRegion(const Region &region)
 
     region_ = region;
 
-    double ppm =
-        app_->editor().settings().unitsSettings().pointsPerMeter()[0];
+    double ppm = app_->editor().settings().unitsSettings().pointsPerMeter()[0];
 
     for (size_t i = 0; i < 3; i++)
     {
@@ -185,8 +183,7 @@ void FilterAreaBoxWidget::slotMinimumValueChanged(double val, int i)
 {
     LOG_DEBUG(<< "Minimum value changed to <" << val << "> at <" << i << ">.");
 
-    double ppm =
-        app_->editor().settings().unitsSettings().pointsPerMeter()[0];
+    double ppm = app_->editor().settings().unitsSettings().pointsPerMeter()[0];
 
     if (i >= 0 && i < 3)
     {
@@ -200,8 +197,7 @@ void FilterAreaBoxWidget::slotMaximumValueChanged(double val, int i)
 {
     LOG_DEBUG(<< "Maximum value changed to <" << val << "> at <" << i << ">.");
 
-    double ppm =
-        app_->editor().settings().unitsSettings().pointsPerMeter()[0];
+    double ppm = app_->editor().settings().unitsSettings().pointsPerMeter()[0];
 
     if (i >= 0 && i < 3)
     {

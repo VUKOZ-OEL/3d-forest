@@ -22,9 +22,9 @@
 // Include std.
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <Layout.hpp>
 #include <Splitter.hpp>
-#include <Application.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "Layout"
@@ -81,6 +81,11 @@ void Layout::addWidget(Widget *widget, int row, int column, int alignment)
 {
 }
 
-void Layout::addWidget(Widget *widget, int row, int column, int rowSpan, int columnSpan, int alignment)
+void Layout::addWidget(Widget *widget,
+                       int row,
+                       int column,
+                       int rowSpan,
+                       int columnSpan,
+                       int alignment)
 {
 }

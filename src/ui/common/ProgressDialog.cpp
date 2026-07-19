@@ -22,8 +22,8 @@
 // Include std.
 
 // Include 3D Forest.
-#include <ProgressDialog.hpp>
 #include <Application.hpp>
+#include <ProgressDialog.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ProgressDialog"
@@ -86,4 +86,3 @@ bool ProgressDialog::wasCanceled()
 {
     return true;
 }
-

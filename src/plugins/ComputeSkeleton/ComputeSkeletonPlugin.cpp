@@ -20,9 +20,9 @@
 /** @file ComputeSkeletonPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ComputeSkeletonPlugin.hpp>
 #include <ComputeSkeletonWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -41,15 +41,15 @@ void ComputeSkeletonPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(nullptr,
-                              "Compute",
-                              "Compute",
-                              tr("Skeleton"),
-                              tr("Compute skeleton"),
-                              ICON("compute-skeleton"),
-                              this,
-                              &ComputeSkeletonPlugin::slotPlugin,
-                              MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
+    app_->createAction(
+        nullptr,
+        "Compute",
+        "Compute",
+        tr("Skeleton"),
+        tr("Compute skeleton"),
+        ICON("compute-skeleton"),
+        [this]() { slotPlugin(); },
+        MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
 }
 
 void ComputeSkeletonPlugin::slotPlugin()

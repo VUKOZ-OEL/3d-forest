@@ -22,8 +22,8 @@
 // Include std.
 
 // Include 3D Forest.
-#include <SpinBox.hpp>
 #include <Application.hpp>
+#include <SpinBox.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "SpinBox"

@@ -37,8 +37,7 @@ class ComputeHullWindow;
 #endif
 
 /** Compute Hull Plugin. */
-class ComputeHullPlugin : 
-                                                     public Plugin
+class ComputeHullPlugin : public Plugin
 {
 public:
     ComputeHullPlugin();

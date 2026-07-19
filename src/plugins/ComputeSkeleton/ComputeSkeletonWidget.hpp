@@ -23,9 +23,9 @@
 #define COMPUTE_SKELETON_WIDGET_HPP
 
 // Include 3D Forest.
-#include <Widget.hpp>
 #include <ComputeSkeletonAction.hpp>
 #include <ComputeSkeletonParameters.hpp>
+#include <Widget.hpp>
 class Application;
 class DoubleSliderWidget;
 class PushButton;

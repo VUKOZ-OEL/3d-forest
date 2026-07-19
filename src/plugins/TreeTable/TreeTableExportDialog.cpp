@@ -20,12 +20,10 @@
 /** @file TreeTableExportDialog.cpp */
 
 // Include 3D Forest.
-#include <FileFormatCsv.hpp>
 #include <Application.hpp>
-#include <ThemeIcon.hpp>
-#include <TreeTableExportDialog.hpp>
 #include <CheckBox.hpp>
 #include <FileDialog.hpp>
+#include <FileFormatCsv.hpp>
 #include <GridLayout.hpp>
 #include <GroupBox.hpp>
 #include <HBoxLayout.hpp>
@@ -33,6 +31,8 @@
 #include <LineEdit.hpp>
 #include <MessageBox.hpp>
 #include <PushButton.hpp>
+#include <ThemeIcon.hpp>
+#include <TreeTableExportDialog.hpp>
 #include <VBoxLayout.hpp>
 
 // Include local.
@@ -51,10 +51,7 @@ TreeTableExportDialog::TreeTableExportDialog(Application *app,
     fileNameLineEdit_->setText(fileName);
 
     browseButton_ = new PushButton(tr("Browse"));
-    browseButton_->clicked.connect([this]()
-    {
-        slotBrowse();
-    });
+    browseButton_->clicked.connect([this]() { slotBrowse(); });
 
     HBoxLayout *fileNameLayout = new HBoxLayout;
     fileNameLayout->addWidget(new Label(tr("File")));
@@ -63,16 +60,10 @@ TreeTableExportDialog::TreeTableExportDialog(Application *app,
 
     // Buttons.
     acceptButton_ = new PushButton(tr("Export"));
-    acceptButton_->clicked.connect([this]()
-    {
-        slotAccept();
-    });
+    acceptButton_->clicked.connect([this]() { slotAccept(); });
 
     rejectButton_ = new PushButton(tr("Cancel"));
-    rejectButton_->clicked.connect([this]()
-    {
-        slotReject();
-    });
+    rejectButton_->clicked.connect([this]() { slotReject(); });
 
     HBoxLayout *dialogButtons = new HBoxLayout;
     dialogButtons->addStretch();
@@ -101,11 +92,11 @@ void TreeTableExportDialog::slotBrowse()
 
     std::string fileName =
         FileDialog::getSaveFileName(app_,
-                                     tr("Export File As"),
-                                     fileNameLineEdit_->text(),
-                                     tr("Comma Separated Values (*.csv)"),
-                                     &selectedFilter,
-                                     FileDialog::DontConfirmOverwrite);
+                                    tr("Export File As"),
+                                    fileNameLineEdit_->text(),
+                                    tr("Comma Separated Values (*.csv)"),
+                                    &selectedFilter,
+                                    FileDialog::DontConfirmOverwrite);
 
     if (fileName.empty())
     {
@@ -122,17 +113,17 @@ void TreeTableExportDialog::slotAccept()
     if (path.empty())
     {
         (void)MessageBox::information(app_,
-                                       tr("Export File"),
-                                       tr("Please choose a file name."));
+                                      tr("Export File"),
+                                      tr("Please choose a file name."));
         return;
     }
 
     if (File::exists(path))
     {
         int reply = MessageBox::question(app_,
-                                      tr("Export File"),
-                                      tr("Overwrite existing file?"),
-                                      MessageBox::Yes | MessageBox::No);
+                                         tr("Export File"),
+                                         tr("Overwrite existing file?"),
+                                         MessageBox::Yes | MessageBox::No);
 
         if (reply != MessageBox::Yes)
         {

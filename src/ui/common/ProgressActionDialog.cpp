@@ -23,16 +23,16 @@
 #include <cinttypes>
 
 // Include 3D Forest.
-#include <ProgressActionDialog.hpp>
-#include <ProgressActionInterface.hpp>
 #include <Application.hpp>
 #include <GridLayout.hpp>
 #include <HBoxLayout.hpp>
 #include <Label.hpp>
+#include <ProgressActionDialog.hpp>
+#include <ProgressActionInterface.hpp>
 #include <ProgressBar.hpp>
 #include <PushButton.hpp>
-#include <VBoxLayout.hpp>
 #include <Time.hpp>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ProgressActionDialog"
@@ -41,8 +41,8 @@
 #define PROGRESS_DIALOG_ETA_MIN 5.0
 
 bool ProgressActionDialog::run(Application *app,
-                         const std::string &title,
-                         ProgressActionInterface *progressAction)
+                               const std::string &title,
+                               ProgressActionInterface *progressAction)
 {
     LOG_DEBUG(<< "Run progress dialog <" << title << ">.");
     ProgressActionDialog *progressDialog = new ProgressActionDialog(app);
@@ -78,10 +78,7 @@ ProgressActionDialog::ProgressActionDialog(Application *app)
 
     // Buttons.
     cancelButton_ = new PushButton(tr("Cancel"));
-    cancelButton_->clicked.connect([this]()
-    {
-        slotCancel();
-    });
+    cancelButton_->clicked.connect([this]() { slotCancel(); });
 
     HBoxLayout *buttonsLayout = new HBoxLayout;
     buttonsLayout->addStretch();
@@ -146,7 +143,8 @@ bool ProgressActionDialog::run(ProgressActionInterface *progressAction)
     return true;
 }
 
-void ProgressActionDialog::initializeLabels(ProgressActionInterface *progressAction)
+void ProgressActionDialog::initializeLabels(
+    ProgressActionInterface *progressAction)
 {
     if (progressAction->progressMaximumSteps() > 1)
     {

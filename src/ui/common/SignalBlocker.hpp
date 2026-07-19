@@ -34,15 +34,12 @@ class EXPORT_UI_COMMON SignalBlocker
 {
 public:
     explicit SignalBlocker(Widget *object)
-        : object_(object)
-        , previousState_(object->blockSignals(true))
+        : object_(object),
+          previousState_(object->blockSignals(true))
     {
     }
 
-    ~SignalBlocker()
-    {
-        object_->blockSignals(previousState_);
-    }
+    ~SignalBlocker() { object_->blockSignals(previousState_); }
 
     SignalBlocker(const SignalBlocker &) = delete;
     SignalBlocker &operator=(const SignalBlocker &) = delete;

@@ -20,9 +20,9 @@
 /** @file FilterFilesPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <FilterFilesPlugin.hpp>
 #include <FilterFilesWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -31,9 +31,7 @@
 
 #define ICON(name) (ThemeIcon(":/FilterFilesResources/", name))
 
-FilterFilesPlugin::FilterFilesPlugin()
-    : app_(nullptr),
-      pluginWindow_(nullptr)
+FilterFilesPlugin::FilterFilesPlugin() : app_(nullptr), pluginWindow_(nullptr)
 {
 }
 
@@ -41,15 +39,15 @@ void FilterFilesPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(nullptr,
-                              "Filter",
-                              "Filter",
-                              tr("Files"),
-                              tr("Show file filter"),
-                              ICON("files"),
-                              this,
-                              &FilterFilesPlugin::slotPlugin,
-                              MAIN_WINDOW_MENU_FILTER_PRIORITY);
+    app_->createAction(
+        nullptr,
+        "Filter",
+        "Filter",
+        tr("Files"),
+        tr("Show file filter"),
+        ICON("files"),
+        [this]() { slotPlugin(); },
+        MAIN_WINDOW_MENU_FILTER_PRIORITY);
 }
 
 void FilterFilesPlugin::slotPlugin()

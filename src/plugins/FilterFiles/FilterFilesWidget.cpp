@@ -20,12 +20,12 @@
 /** @file FilterFilesWidget.cpp */
 
 // Include 3D Forest.
-#include <FilterFilesWidget.hpp>
 #include <Application.hpp>
-#include <ThemeIcon.hpp>
+#include <FilterFilesWidget.hpp>
 #include <HBoxLayout.hpp>
 #include <Label.hpp>
 #include <PushButton.hpp>
+#include <ThemeIcon.hpp>
 #include <ToolBar.hpp>
 #include <ToolButton.hpp>
 #include <TreeWidget.hpp>
@@ -39,8 +39,7 @@
 
 #define ICON(name) (ThemeIcon(":/FilterFilesResources/", name))
 
-FilterFilesWidget::FilterFilesWidget(Application *app)
-    : app_(app)
+FilterFilesWidget::FilterFilesWidget(Application *app) : app_(app)
 {
     // Table.
     tree_ = new TreeWidget();
@@ -48,60 +47,56 @@ FilterFilesWidget::FilterFilesWidget(Application *app)
     tree_->setSelectionBehavior(AbstractItemView::SelectRows);
 
     tree_->itemChanged.connect([this](TreeWidgetItem *item, int column)
-    {
-        slotItemChanged(item, column);
-    });
+                               { slotItemChanged(item, column); });
 
     tree_->itemSelectionChanged.connect([this]()
-    {
-        slotItemSelectionChanged();
-    });
+                                        { slotItemSelectionChanged(); });
 
     // Tool bar buttons.
     app_->createToolButton(&addButton_,
-                                  tr("Add"),
-                                  tr("Add new data set"),
-                                  THEME_ICON("add"),
-                                  [this](){ slotAdd(); });
+                           tr("Add"),
+                           tr("Add new data set"),
+                           THEME_ICON("add"),
+                           [this]() { slotAdd(); });
 
     app_->createToolButton(&deleteButton_,
-                                  tr("Remove"),
-                                  tr("Remove selected data set"),
-                                  THEME_ICON("remove"),
-                                  [this](){ slotDelete(); });
+                           tr("Remove"),
+                           tr("Remove selected data set"),
+                           THEME_ICON("remove"),
+                           [this]() { slotDelete(); });
     deleteButton_->setEnabled(false);
 
     app_->createToolButton(&showButton_,
-                                  tr("Show"),
-                                  tr("Make selected data sets visible"),
-                                  THEME_ICON("eye"),
-                                  [this](){ slotShow(); });
+                           tr("Show"),
+                           tr("Make selected data sets visible"),
+                           THEME_ICON("eye"),
+                           [this]() { slotShow(); });
     showButton_->setEnabled(false);
 
     app_->createToolButton(&hideButton_,
-                                  tr("Hide"),
-                                  tr("Hide selected data sets"),
-                                  THEME_ICON("hide"),
-                                  [this](){ slotHide(); });
+                           tr("Hide"),
+                           tr("Hide selected data sets"),
+                           THEME_ICON("hide"),
+                           [this]() { slotHide(); });
     hideButton_->setEnabled(false);
 
     app_->createToolButton(&selectAllButton_,
-                                  tr("Select all"),
-                                  tr("Select all"),
-                                  THEME_ICON("select-all"),
-                                  [this](){ slotSelectAll(); });
+                           tr("Select all"),
+                           tr("Select all"),
+                           THEME_ICON("select-all"),
+                           [this]() { slotSelectAll(); });
 
     app_->createToolButton(&selectInvertButton_,
-                                  tr("Invert"),
-                                  tr("Invert selection"),
-                                  THEME_ICON("select-invert"),
-                                  [this](){ slotSelectInvert(); });
+                           tr("Invert"),
+                           tr("Invert selection"),
+                           THEME_ICON("select-invert"),
+                           [this]() { slotSelectInvert(); });
 
     app_->createToolButton(&selectNoneButton_,
-                                  tr("Select none"),
-                                  tr("Select none"),
-                                  THEME_ICON("select-none"),
-                                  [this](){ slotSelectNone(); });
+                           tr("Select none"),
+                           tr("Select none"),
+                           THEME_ICON("select-none"),
+                           [this]() { slotSelectNone(); });
 
     // Tool bar.
     ToolBar *toolBar = new ToolBar;
@@ -125,10 +120,9 @@ FilterFilesWidget::FilterFilesWidget(Application *app)
 
     // Data.
     updatesEnabled_ = true;
-    app_->signalUpdate.connect([this](void *sender, const std::set<Editor::Type> &target)
-    {
-        slotUpdate(sender, target);
-    });
+    app_->signalUpdate.connect(
+        [this](void *sender, const std::set<Editor::Type> &target)
+        { slotUpdate(sender, target); });
 
     slotUpdate(nullptr, std::set<Editor::Type>());
 }
@@ -145,8 +139,7 @@ void FilterFilesWidget::slotUpdate(void *sender,
     {
         LOG_DEBUG_UPDATE(<< "Input datasets.");
 
-        setDatasets(app_->editor().datasets(),
-                    app_->editor().datasetsFilter());
+        setDatasets(app_->editor().datasets(), app_->editor().datasetsFilter());
     }
 }
 
@@ -405,8 +398,7 @@ void FilterFilesWidget::addTreeItem(size_t index)
 
     item.setText(COLUMN_ID, toString(id));
     item.setText(COLUMN_LABEL, datasets_.label(index));
-    item.setText(COLUMN_DATE_CREATED,
-                  datasets_.dateCreated(index));
+    item.setText(COLUMN_DATE_CREATED, datasets_.dateCreated(index));
 
     // Color legend.
     const Vector3<double> &rgb = datasets_.color(index);

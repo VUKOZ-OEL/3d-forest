@@ -37,9 +37,7 @@ class FilterDescriptorWindow;
 #endif
 
 /** Filter Descriptor Plugin. */
-class FilterDescriptorPlugin
-    : 
-      public Plugin
+class FilterDescriptorPlugin : public Plugin
 {
 public:
     FilterDescriptorPlugin();

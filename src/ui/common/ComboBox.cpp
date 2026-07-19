@@ -22,8 +22,8 @@
 // Include std.
 
 // Include 3D Forest.
-#include <ComboBox.hpp>
 #include <Application.hpp>
+#include <ComboBox.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ComboBox"

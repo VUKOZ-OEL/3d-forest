@@ -37,9 +37,7 @@ class FilterElevationWindow;
 #endif
 
 /** Filter Elevation Plugin. */
-class FilterElevationPlugin
-    : 
-      public Plugin
+class FilterElevationPlugin : public Plugin
 {
 public:
     FilterElevationPlugin();

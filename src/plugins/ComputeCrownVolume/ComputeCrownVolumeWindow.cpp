@@ -20,9 +20,9 @@
 /** @file ComputeCrownVolumeWindow.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ComputeCrownVolumeWidget.hpp>
 #include <ComputeCrownVolumeWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 #include <VBoxLayout.hpp>
 

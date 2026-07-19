@@ -37,9 +37,7 @@ class ComputeDescriptorWindow;
 #endif
 
 /** Compute Descriptor Plugin. */
-class ComputeDescriptorPlugin
-    : 
-      public Plugin
+class ComputeDescriptorPlugin : public Plugin
 {
 public:
     ComputeDescriptorPlugin();

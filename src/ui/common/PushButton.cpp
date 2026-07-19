@@ -22,8 +22,8 @@
 // Include std.
 
 // Include 3D Forest.
-#include <PushButton.hpp>
 #include <Application.hpp>
+#include <PushButton.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "PushButton"

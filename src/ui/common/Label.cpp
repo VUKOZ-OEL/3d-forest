@@ -22,8 +22,8 @@
 // Include std.
 
 // Include 3D Forest.
-#include <Label.hpp>
 #include <Application.hpp>
+#include <Label.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "Label"

@@ -23,9 +23,9 @@
 #define FILTER_MANAGEMENT_STATUS_WIDGET_HPP
 
 // Include 3D Forest.
-#include <Widget.hpp>
 #include <Editor.hpp>
 #include <ManagementStatusList.hpp>
+#include <Widget.hpp>
 class Application;
 class FilterManagementStatusTreeWidget;
 class Splitter;

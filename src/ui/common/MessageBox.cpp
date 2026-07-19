@@ -54,41 +54,46 @@ int MessageBox::exec()
 }
 
 int MessageBox::information(Application *app,
-                const std::string &title,
-                const std::string &text,
-                int buttons,
-                int defaultButton)
+                            const std::string &title,
+                            const std::string &text,
+                            int buttons,
+                            int defaultButton)
 {
+    return defaultButton;
 }
 
 int MessageBox::about(Application *app,
-                const std::string &title,
-                const std::string &text,
-                int buttons,
-                int defaultButton)
+                      const std::string &title,
+                      const std::string &text,
+                      int buttons,
+                      int defaultButton)
 {
+    return defaultButton;
 }
 
 int MessageBox::question(Application *app,
-                const std::string &title,
-                const std::string &text,
-                int buttons,
-                int defaultButton)
+                         const std::string &title,
+                         const std::string &text,
+                         int buttons,
+                         int defaultButton)
 {
+    return defaultButton;
 }
 
 int MessageBox::warning(Application *app,
-                const std::string &title,
-                const std::string &text,
-                int buttons,
-                int defaultButton)
+                        const std::string &title,
+                        const std::string &text,
+                        int buttons,
+                        int defaultButton)
 {
+    return defaultButton;
 }
 
 int MessageBox::critical(Application *app,
-                const std::string &title,
-                const std::string &text,
-                int buttons,
-                int defaultButtonn)
+                         const std::string &title,
+                         const std::string &text,
+                         int buttons,
+                         int defaultButton)
 {
+    return defaultButton;
 }

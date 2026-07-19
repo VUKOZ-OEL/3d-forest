@@ -53,10 +53,7 @@ class ComputeHeightMapWindow;
     Compute Height Map plugin uses delayed lazy initialization of GUI widgets to
     save plugin loading time and memory.
 */
-class ComputeHeightMapPlugin
-    : 
-      public Plugin,
-      public ModifierInterface
+class ComputeHeightMapPlugin : public Plugin, public ModifierInterface
 {
 public:
     ComputeHeightMapPlugin();

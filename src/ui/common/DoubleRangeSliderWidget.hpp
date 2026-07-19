@@ -39,9 +39,9 @@ public:
     virtual ~DoubleRangeSliderWidget();
 
     static void create(DoubleRangeSliderWidget *&outputWidget,
-                       std::function<void(double)> minValueChangedCallback = {},
-                       std::function<void(double)> maxValueChangedCallback = {},
-                       std::function<void()> finalValueCallback = {},
+                       std::function<void(double)> minValueChangedCallback,
+                       std::function<void(double)> maxValueChangedCallback,
+                       std::function<void()> finalValueCallback,
                        const std::string &text,
                        const std::string &toolTip,
                        const std::string &unitsList,

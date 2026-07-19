@@ -20,9 +20,9 @@
 /** @file ComputeTreeAttributesPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ComputeTreeAttributesPlugin.hpp>
 #include <ComputeTreeAttributesWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -41,15 +41,15 @@ void ComputeTreeAttributesPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(nullptr,
-                              "Compute",
-                              "Compute",
-                              tr("Tree Attributes"),
-                              tr("Compute tree attributes"),
-                              ICON("tree-attributes"),
-                              this,
-                              &ComputeTreeAttributesPlugin::slotPlugin,
-                              MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
+    app_->createAction(
+        nullptr,
+        "Compute",
+        "Compute",
+        tr("Tree Attributes"),
+        tr("Compute tree attributes"),
+        ICON("tree-attributes"),
+        [this]() { slotPlugin(); },
+        MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
 }
 
 void ComputeTreeAttributesPlugin::slotPlugin()

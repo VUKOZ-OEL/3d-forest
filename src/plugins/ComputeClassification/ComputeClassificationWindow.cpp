@@ -20,9 +20,9 @@
 /** @file ComputeClassificationWindow.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ComputeClassificationWidget.hpp>
 #include <ComputeClassificationWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 #include <VBoxLayout.hpp>
 

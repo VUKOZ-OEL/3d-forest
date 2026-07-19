@@ -20,15 +20,15 @@
 /** @file FilterManagementStatusWidget.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ColorPalette.hpp>
 #include <Core.hpp>
 #include <FilterManagementStatusTreeWidget.hpp>
 #include <FilterManagementStatusWidget.hpp>
-#include <Application.hpp>
-#include <ThemeIcon.hpp>
 #include <HBoxLayout.hpp>
 #include <Label.hpp>
 #include <Splitter.hpp>
+#include <ThemeIcon.hpp>
 #include <ToolBar.hpp>
 #include <ToolButton.hpp>
 #include <TreeWidget.hpp>
@@ -42,8 +42,7 @@
 
 #define ICON(name) (ThemeIcon(":/FilterManagementStatusResources/", name))
 
-FilterManagementStatusWidget::FilterManagementStatusWidget(
-    Application *app)
+FilterManagementStatusWidget::FilterManagementStatusWidget(Application *app)
     : app_(app)
 {
     // Table.
@@ -52,47 +51,43 @@ FilterManagementStatusWidget::FilterManagementStatusWidget(
     tree_->setSelectionBehavior(AbstractItemView::SelectRows);
 
     tree_->itemChanged.connect([this](TreeWidgetItem *item, int column)
-    {
-        slotItemChanged(item, column);
-    });
+                               { slotItemChanged(item, column); });
 
     tree_->itemSelectionChanged.connect([this]()
-    {
-        slotItemSelectionChanged();
-    });
+                                        { slotItemSelectionChanged(); });
 
     // Tool bar buttons.
     app_->createToolButton(&showButton_,
-                                  tr("Show"),
-                                  tr("Make selected management status visible"),
-                                  THEME_ICON("eye"),
-                                  [this](){ slotShow(); });
+                           tr("Show"),
+                           tr("Make selected management status visible"),
+                           THEME_ICON("eye"),
+                           [this]() { slotShow(); });
     showButton_->setEnabled(false);
 
     app_->createToolButton(&hideButton_,
-                                  tr("Hide"),
-                                  tr("Hide selected management status"),
-                                  THEME_ICON("hide"),
-                                  [this](){ slotHide(); });
+                           tr("Hide"),
+                           tr("Hide selected management status"),
+                           THEME_ICON("hide"),
+                           [this]() { slotHide(); });
     hideButton_->setEnabled(false);
 
     app_->createToolButton(&selectAllButton_,
-                                  tr("Select all"),
-                                  tr("Select all"),
-                                  THEME_ICON("select-all"),
-                                  [this](){ slotSelectAll(); });
+                           tr("Select all"),
+                           tr("Select all"),
+                           THEME_ICON("select-all"),
+                           [this]() { slotSelectAll(); });
 
     app_->createToolButton(&selectInvertButton_,
-                                  tr("Invert"),
-                                  tr("Invert selection"),
-                                  THEME_ICON("select-invert"),
-                                  [this](){ slotSelectInvert(); });
+                           tr("Invert"),
+                           tr("Invert selection"),
+                           THEME_ICON("select-invert"),
+                           [this]() { slotSelectInvert(); });
 
     app_->createToolButton(&selectNoneButton_,
-                                  tr("Select none"),
-                                  tr("Select none"),
-                                  THEME_ICON("select-none"),
-                                  [this](){ slotSelectNone(); });
+                           tr("Select none"),
+                           tr("Select none"),
+                           THEME_ICON("select-none"),
+                           [this]() { slotSelectNone(); });
 
     // Tool bar.
     ToolBar *toolBar = new ToolBar;
@@ -124,16 +119,16 @@ FilterManagementStatusWidget::FilterManagementStatusWidget(
 
     // Data.
     updatesEnabled_ = true;
-    app_->signalUpdate.connect([this](void *sender, const std::set<Editor::Type> &target)
-    {
-        slotUpdate(sender, target);
-    });
+    app_->signalUpdate.connect(
+        [this](void *sender, const std::set<Editor::Type> &target)
+        { slotUpdate(sender, target); });
 
     slotUpdate(nullptr, std::set<Editor::Type>());
 }
 
-void FilterManagementStatusWidget::slotUpdate(void *sender,
-                                              const std::set<Editor::Type> &target)
+void FilterManagementStatusWidget::slotUpdate(
+    void *sender,
+    const std::set<Editor::Type> &target)
 {
     if (sender == this || sender == treeWidget_)
     {

@@ -30,7 +30,6 @@
 class EXPORT_UI_COMMON Pixmap
 {
 public:
-
 private:
 };
 

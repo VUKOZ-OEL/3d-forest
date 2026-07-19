@@ -20,8 +20,8 @@
 /** @file TableWidget.cpp */
 
 // Include 3D Forest.
-#include <TableWidget.hpp>
 #include <Application.hpp>
+#include <TableWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "TableWidget"
@@ -64,7 +64,8 @@ void TableWidget::setColumnWidth(int col, int width)
 {
 }
 
-void TableWidget::setHorizontalHeaderLabels(const std::vector<std::string> &labels)
+void TableWidget::setHorizontalHeaderLabels(
+    const std::vector<std::string> &labels)
 {
 }
 
@@ -85,10 +86,30 @@ void TableWidget::selectRow(int row)
 {
 }
 
+std::set<int> TableWidget::selectedRows() const
+{
+#if 0
+    QModelIndexList indexes = tableWidget_->selectionModel()->selectedIndexes();
+    std::set<int> selectedRows;
+    for (const ModelIndex &index : indexes)
+    {
+        selectedRows.insert(index.row());
+    }
+#endif
+
+    std::set<int> list;
+    return list;
+}
+
 ModelIndex TableWidget::indexAt(const Point &pos) const
 {
     ModelIndex index;
     return index;
+}
+
+const Widget *TableWidget::viewport() const
+{
+    return this;
 }
 
 void TableWidget::setSortingEnabled(bool b)

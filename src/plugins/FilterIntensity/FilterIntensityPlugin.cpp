@@ -20,9 +20,9 @@
 /** @file FilterIntensityPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <FilterIntensityPlugin.hpp>
 #include <FilterIntensityWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -41,15 +41,15 @@ void FilterIntensityPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(nullptr,
-                              "Filter",
-                              "Filter",
-                              tr("Intensity"),
-                              tr("Show intensity filter"),
-                              ICON("intensity-filter"),
-                              this,
-                              &FilterIntensityPlugin::slotPlugin,
-                              MAIN_WINDOW_MENU_FILTER_PRIORITY);
+    app_->createAction(
+        nullptr,
+        "Filter",
+        "Filter",
+        tr("Intensity"),
+        tr("Show intensity filter"),
+        ICON("intensity-filter"),
+        [this]() { slotPlugin(); },
+        MAIN_WINDOW_MENU_FILTER_PRIORITY);
 }
 
 void FilterIntensityPlugin::slotPlugin()

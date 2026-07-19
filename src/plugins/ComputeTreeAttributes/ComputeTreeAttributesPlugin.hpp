@@ -37,9 +37,7 @@ class ComputeTreeAttributesWindow;
 #endif
 
 /** Compute Tree Attributes Plugin. */
-class ComputeTreeAttributesPlugin
-    : 
-      public Plugin
+class ComputeTreeAttributesPlugin : public Plugin
 {
 public:
     ComputeTreeAttributesPlugin();

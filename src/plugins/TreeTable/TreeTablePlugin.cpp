@@ -31,9 +31,7 @@
 
 #define ICON(name) (ThemeIcon(":/TreeTableResources/", name))
 
-TreeTablePlugin::TreeTablePlugin()
-    : app_(nullptr),
-      pluginWindow_(nullptr)
+TreeTablePlugin::TreeTablePlugin() : app_(nullptr), pluginWindow_(nullptr)
 {
 }
 
@@ -41,15 +39,15 @@ void TreeTablePlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(nullptr,
-                              "Data",
-                              "Data",
-                              tr("Tree Table"),
-                              tr("Show tree table"),
-                              ICON("tree-table"),
-                              this,
-                              &TreeTablePlugin::slotPlugin,
-                              MAIN_WINDOW_MENU_DATA_PRIORITY);
+    app_->createAction(
+        nullptr,
+        "Data",
+        "Data",
+        tr("Tree Table"),
+        tr("Show tree table"),
+        ICON("tree-table"),
+        [this]() { slotPlugin(); },
+        MAIN_WINDOW_MENU_DATA_PRIORITY);
 }
 
 void TreeTablePlugin::slotPlugin()

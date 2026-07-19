@@ -37,8 +37,7 @@ class FilterTreesWindow;
 #endif
 
 /** Filter Trees Plugin. */
-class FilterTreesPlugin : 
-                                                     public Plugin
+class FilterTreesPlugin : public Plugin
 {
 public:
     FilterTreesPlugin();

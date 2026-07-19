@@ -33,7 +33,8 @@
 class EXPORT_UI_COMMON Slider : public Widget
 {
 public:
-    enum TickPosition {
+    enum TickPosition
+    {
         NoTicks = 0,
         TicksAbove = 1,
         TicksLeft = TicksAbove,

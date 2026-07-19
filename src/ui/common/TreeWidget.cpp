@@ -20,8 +20,8 @@
 /** @file TreeWidget.cpp */
 
 // Include 3D Forest.
-#include <TreeWidget.hpp>
 #include <Application.hpp>
+#include <TreeWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "TreeWidget"

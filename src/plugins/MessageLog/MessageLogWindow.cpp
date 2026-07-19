@@ -57,9 +57,7 @@ MessageLogWindow::~MessageLogWindow()
 
 void MessageLogWindow::println(const LogMessage &message)
 {
-    app_->post([this, message]() {
-        slotPrintln(message);
-    });
+    app_->post([this, message]() { slotPrintln(message); });
 }
 
 void MessageLogWindow::flush()
@@ -76,13 +74,13 @@ void MessageLogWindow::slotPrintln(const LogMessage &message)
     }
 
 #if defined(MESSAGE_LOG_WINDOW_DEBUG_PRINT)
-    std::string line = std::to_string(message.threadId) + " " +
+    std::string line = toString(message.threadId) + " " +
                    message.time +
                    LogMessage::typeString(message.type) +
                    message.text) + " [" +
                    message.module + ":" +
                    message.function + "] " +
-                   std::to_string(file_.size());
+                   toString(file_.size());
 
     if (threadId_ != 0 && threadId_ != message.threadId)
     {
@@ -90,12 +88,9 @@ void MessageLogWindow::slotPrintln(const LogMessage &message)
     }
     threadId_ = message.threadId;
 #else
-    std::string line = message.time +
-                   LogMessage::typeString(message.type) +
-                   message.text + " [" +
-                   message.module + ":" +
-                   message.function + "] " +
-                   std::to_string(message.threadId);
+    std::string line = message.time + LogMessage::typeString(message.type) +
+                       message.text + " [" + message.module + ":" +
+                       message.function + "] " + toString(message.threadId);
 #endif
 
     textEdit_->append(line);

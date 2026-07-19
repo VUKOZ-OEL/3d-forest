@@ -20,9 +20,9 @@
 /** @file InputComboBoxDialog.cpp */
 
 // Include 3D Forest.
-#include <InputComboBoxDialog.hpp>
 #include <ComboBox.hpp>
 #include <HBoxLayout.hpp>
+#include <InputComboBoxDialog.hpp>
 #include <PushButton.hpp>
 #include <VBoxLayout.hpp>
 
@@ -38,16 +38,10 @@ InputComboBoxDialog::InputComboBoxDialog(Application *app) : Dialog(app)
     comboBox_ = new ComboBox;
 
     okButton_ = new PushButton("Ok");
-    okButton_->clicked.connect([this]()
-    {
-        accept();
-    });
+    okButton_->clicked.connect([this]() { accept(); });
 
     cancelButton_ = new PushButton("Cancel");
-    cancelButton_->clicked.connect([this]()
-    {
-        reject();
-    });
+    cancelButton_->clicked.connect([this]() { reject(); });
 
     HBoxLayout *buttonLayout = new HBoxLayout;
     buttonLayout->addWidget(okButton_);

@@ -20,14 +20,14 @@
 /** @file DoubleRangeSliderWidget.cpp */
 
 // Include 3D Forest.
-#include <DoubleRangeSliderWidget.hpp>
-#include <DoubleRangeSlider.hpp>
 #include <Application.hpp>
-#include <Slider.hpp>
-#include <DoubleSpinBox.hpp>
 #include <ComboBox.hpp>
+#include <DoubleRangeSlider.hpp>
+#include <DoubleRangeSliderWidget.hpp>
+#include <DoubleSpinBox.hpp>
 #include <HBoxLayout.hpp>
 #include <Label.hpp>
+#include <Slider.hpp>
 #include <VBoxLayout.hpp>
 
 // Include local.
@@ -168,18 +168,19 @@ void DoubleRangeSliderWidget::slotFinalValueSpinBox()
     finalValue();
 }
 
-void DoubleRangeSliderWidget::create(DoubleRangeSliderWidget *&outputWidget,
-                       std::function<void(double)> minValueChangedCallback,
-                       std::function<void(double)> maxValueChangedCallback,
-                       std::function<void()> finalValueCallback,
-                       const std::string &text,
-                       const std::string &toolTip,
-                       const std::string &unitsList,
-                       double step,
-                       double min,
-                       double max,
-                       double minValue,
-                       double maxValue)
+void DoubleRangeSliderWidget::create(
+    DoubleRangeSliderWidget *&outputWidget,
+    std::function<void(double)> minValueChangedCallback,
+    std::function<void(double)> maxValueChangedCallback,
+    std::function<void()> finalValueCallback,
+    const std::string &text,
+    const std::string &toolTip,
+    const std::string &unitsList,
+    double step,
+    double min,
+    double max,
+    double minValue,
+    double maxValue)
 {
     LOG_DEBUG(<< "Create with parameter min <" << min << ">"
               << " max <" << max << ">"
@@ -216,20 +217,16 @@ void DoubleRangeSliderWidget::create(DoubleRangeSliderWidget *&outputWidget,
     slider->setSingleStep(step);
     slider->setOrientation(Ui::Horizontal);
 
-    slider->minimumValueChanged.connect([outputWidget](int value)
-    {
-        outputWidget->slotMinimumValueChangedSlider(value);
-    });
+    slider->minimumValueChanged.connect(
+        [outputWidget](double value)
+        { outputWidget->slotMinimumValueChangedSlider(value); });
 
-    slider->maximumValueChanged.connect([outputWidget](int value)
-    {
-        outputWidget->slotMaximumValueChangedSlider(value);
-    });
+    slider->maximumValueChanged.connect(
+        [outputWidget](double value)
+        { outputWidget->slotMaximumValueChangedSlider(value); });
 
     slider->sliderReleased.connect([outputWidget]()
-    {
-        outputWidget->slotFinalValueSlider();
-    });
+                                   { outputWidget->slotFinalValueSlider(); });
 
     // Value SpinBox.
     outputWidget->minSpinBox_ = new DoubleSpinBox;
@@ -238,15 +235,12 @@ void DoubleRangeSliderWidget::create(DoubleRangeSliderWidget *&outputWidget,
     minSpinBox->setValue(minValue);
     minSpinBox->setSingleStep(step);
 
-    minSpinBox->valueChanged.connect([outputWidget](double value)
-    {
-        outputWidget->slotMinimumValueChangedSpinBox(value);
-    });
+    minSpinBox->valueChanged.connect(
+        [outputWidget](double value)
+        { outputWidget->slotMinimumValueChangedSpinBox(value); });
 
-    minSpinBox->editingFinished.connect([outputWidget]()
-    {
-        outputWidget->slotFinalValueSpinBox();
-    });
+    minSpinBox->editingFinished.connect(
+        [outputWidget]() { outputWidget->slotFinalValueSpinBox(); });
 
     outputWidget->maxSpinBox_ = new DoubleSpinBox;
     DoubleSpinBox *maxSpinBox = outputWidget->maxSpinBox_;
@@ -254,15 +248,12 @@ void DoubleRangeSliderWidget::create(DoubleRangeSliderWidget *&outputWidget,
     maxSpinBox->setValue(maxValue);
     maxSpinBox->setSingleStep(step);
 
-    maxSpinBox->valueChanged.connect([outputWidget](double value)
-    {
-        outputWidget->slotMaximumValueChangedSpinBox(value);
-    });
+    maxSpinBox->valueChanged.connect(
+        [outputWidget](double value)
+        { outputWidget->slotMaximumValueChangedSpinBox(value); });
 
-    maxSpinBox->editingFinished.connect([outputWidget]()
-    {
-        outputWidget->slotFinalValueSpinBox();
-    });
+    maxSpinBox->editingFinished.connect(
+        [outputWidget]() { outputWidget->slotFinalValueSpinBox(); });
 
     // Value Layout.
     HBoxLayout *valueLayout = new HBoxLayout;
@@ -294,7 +285,6 @@ void DoubleRangeSliderWidget::create(DoubleRangeSliderWidget *&outputWidget,
 
     if (finalValueCallback)
     {
-        outputWidget->finalValue.connect(
-            std::move(finalValueCallback));
+        outputWidget->finalValue.connect(std::move(finalValueCallback));
     }
 }

@@ -22,8 +22,8 @@
 // Include std.
 
 // Include 3D Forest.
-#include <Widget.hpp>
 #include <Application.hpp>
+#include <Widget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "Widget"
@@ -82,6 +82,11 @@ void Widget::setStyleSheet(const std::string &str)
 void Widget::setPalette(const Palette &palette)
 {
     palette_ = palette;
+}
+
+Point Widget::mapToGlobal(const Point &point) const
+{
+    return point;
 }
 
 bool Widget::blockSignals(bool b)

@@ -22,8 +22,8 @@
 // Include std.
 
 // Include 3D Forest.
-#include <CheckBox.hpp>
 #include <Application.hpp>
+#include <CheckBox.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "CheckBox"
@@ -52,4 +52,3 @@ bool CheckBox::isChecked() const
 {
     return checked_;
 }
-

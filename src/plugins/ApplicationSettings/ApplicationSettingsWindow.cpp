@@ -20,9 +20,9 @@
 /** @file ApplicationSettingsWindow.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ApplicationSettingsWidget.hpp>
 #include <ApplicationSettingsWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -35,8 +35,7 @@ ApplicationSettingsWindow::ApplicationSettingsWindow(Application *app)
     : DockWidget(app)
 {
     // Widget.
-    ApplicationSettingsWidget *widget =
-        new ApplicationSettingsWidget(app);
+    ApplicationSettingsWidget *widget = new ApplicationSettingsWidget(app);
 
     // Dock.
     setWidget(widget);

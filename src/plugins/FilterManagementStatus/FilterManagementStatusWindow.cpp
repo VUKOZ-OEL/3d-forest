@@ -20,9 +20,9 @@
 /** @file FilterManagementStatusWindow.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <FilterManagementStatusWidget.hpp>
 #include <FilterManagementStatusWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -31,8 +31,7 @@
 
 #define ICON(name) (ThemeIcon(":/FilterManagementStatusResources/", name))
 
-FilterManagementStatusWindow::FilterManagementStatusWindow(
-    Application *app)
+FilterManagementStatusWindow::FilterManagementStatusWindow(Application *app)
     : DockWidget(app)
 {
     LOG_DEBUG(<< "Start creating management status window.");

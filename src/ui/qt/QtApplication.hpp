@@ -28,6 +28,30 @@
 // Include 3D Forest.
 #include <Application.hpp>
 
+#ifdef interface
+    #error interface is defined
+#endif
+
+#ifdef signals
+    #error signals is defined
+#endif
+
+#ifdef slots
+    #error slots is defined
+#endif
+
+#ifdef emit
+    #error emit is defined
+#endif
+
+#ifdef const
+    #error const is defined
+#endif
+
+#ifdef tr
+    #undef tr
+#endif
+
 // Include Qt.
 #include <QApplication>
 

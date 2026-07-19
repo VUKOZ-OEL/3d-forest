@@ -42,7 +42,6 @@ class EXPORT_UI_COMMON ProgressActionDialog : public Dialog
 {
 public:
     ProgressActionDialog(Application *app);
-    virtual ~ProgressActionDialog();
 
     bool run(ProgressActionInterface *progressAction);
 

@@ -20,9 +20,9 @@
 /** @file FilterClassificationPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <FilterClassificationPlugin.hpp>
 #include <FilterClassificationWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -41,15 +41,15 @@ void FilterClassificationPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(nullptr,
-                              "Filter",
-                              "Filter",
-                              tr("Classification"),
-                              tr("Show classification filter"),
-                              ICON("classification-filter"),
-                              this,
-                              &FilterClassificationPlugin::slotPlugin,
-                              MAIN_WINDOW_MENU_FILTER_PRIORITY);
+    app_->createAction(
+        nullptr,
+        "Filter",
+        "Filter",
+        tr("Classification"),
+        tr("Show classification filter"),
+        ICON("classification-filter"),
+        [this]() { slotPlugin(); },
+        MAIN_WINDOW_MENU_FILTER_PRIORITY);
 }
 
 void FilterClassificationPlugin::slotPlugin()

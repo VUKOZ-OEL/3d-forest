@@ -22,8 +22,8 @@
 // Include std.
 
 // Include 3D Forest.
-#include <Slider.hpp>
 #include <Application.hpp>
+#include <Slider.hpp>
 #include <Util.hpp>
 
 // Include local.

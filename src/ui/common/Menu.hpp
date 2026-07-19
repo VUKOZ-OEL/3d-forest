@@ -27,6 +27,7 @@
 #include <vector>
 
 // Include 3D Forest.
+#include <Point.hpp>
 class Application;
 class Action;
 
@@ -45,6 +46,8 @@ public:
 
     Action *addAction(const std::string &title);
     void addMenu(Menu *menu);
+
+    Action *exec(const Point &pos);
 
 private:
 };

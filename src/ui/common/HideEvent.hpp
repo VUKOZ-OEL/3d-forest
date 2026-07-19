@@ -33,7 +33,6 @@
 class EXPORT_UI_COMMON HideEvent : public Event
 {
 public:
-
 private:
 };
 

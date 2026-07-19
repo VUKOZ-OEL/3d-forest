@@ -33,7 +33,6 @@
 class EXPORT_UI_COMMON ShowEvent : public Event
 {
 public:
-
 private:
 };
 

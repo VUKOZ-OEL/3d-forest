@@ -23,10 +23,10 @@
 #define FILTER_ELEVATION_WIDGET_HPP
 
 // Include 3D Forest.
-#include <Widget.hpp>
 #include <Editor.hpp>
 #include <Range.hpp>
 #include <Region.hpp>
+#include <Widget.hpp>
 class DoubleRangeSliderWidget;
 class Application;
 

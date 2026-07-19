@@ -23,8 +23,8 @@
 #define COLOR_SWITCH_HPP
 
 // Include 3D Forest.
-#include <Widget.hpp>
 #include <Color.hpp>
+#include <Widget.hpp>
 
 // Include local.
 #include <ExportUiCommon.hpp>

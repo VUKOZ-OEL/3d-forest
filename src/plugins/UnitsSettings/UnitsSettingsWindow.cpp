@@ -31,8 +31,7 @@
 
 #define ICON(name) (ThemeIcon(":/UnitsSettingsResources/", name))
 
-UnitsSettingsWindow::UnitsSettingsWindow(Application *app)
-    : DockWidget(app)
+UnitsSettingsWindow::UnitsSettingsWindow(Application *app) : DockWidget(app)
 {
     // Widget.
     UnitsSettingsWidget *widget = new UnitsSettingsWidget(app);

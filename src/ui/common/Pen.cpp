@@ -30,7 +30,6 @@ Pen::Pen()
 {
 }
 
-Pen::Pen(const Color &color)
-   : color_(color)
+Pen::Pen(const Color &color) : color_(color)
 {
 }

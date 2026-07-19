@@ -49,7 +49,12 @@ public:
     void setContentsMargins(int left, int top, int right, int bottom);
 
     void addWidget(Widget *widget, int row, int column, int alignment = 0);
-    void addWidget(Widget *widget, int row, int column, int rowSpan, int columnSpan, int alignment = 0);
+    void addWidget(Widget *widget,
+                   int row,
+                   int column,
+                   int rowSpan,
+                   int columnSpan,
+                   int alignment = 0);
 
 private:
 };

@@ -37,8 +37,7 @@ class ViewSettingsWindow;
 #endif
 
 /** View Settings Plugin. */
-class ViewSettingsPlugin : 
-                                                       public Plugin
+class ViewSettingsPlugin : public Plugin
 {
 public:
     ViewSettingsPlugin();

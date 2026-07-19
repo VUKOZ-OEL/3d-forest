@@ -37,9 +37,7 @@ class ComputeSegmentationNNWindow;
 #endif
 
 /** Compute Segmentation NN Plugin. */
-class ComputeSegmentationNNPlugin
-    : 
-      public Plugin
+class ComputeSegmentationNNPlugin : public Plugin
 {
 public:
     ComputeSegmentationNNPlugin();

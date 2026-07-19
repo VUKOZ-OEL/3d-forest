@@ -20,9 +20,15 @@
 /** @file TreeTableWidget.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
+#include <CheckBox.hpp>
 #include <FileFormatCsv.hpp>
 #include <FindVisibleObjects.hpp>
-#include <Application.hpp>
+#include <HBoxLayout.hpp>
+#include <HeaderView.hpp>
+#include <Menu.hpp>
+#include <PushButton.hpp>
+#include <TableWidget.hpp>
 #include <ThemeIcon.hpp>
 #include <TreeTableAction.hpp>
 #include <TreeTableExportDialog.hpp>
@@ -30,12 +36,6 @@
 #include <TreeTableSetSpecies.hpp>
 #include <TreeTableWidget.hpp>
 #include <Util.hpp>
-#include <CheckBox.hpp>
-#include <HBoxLayout.hpp>
-#include <HeaderView.hpp>
-#include <Menu.hpp>
-#include <PushButton.hpp>
-#include <TableWidget.hpp>
 #include <VBoxLayout.hpp>
 
 // Include local.
@@ -45,9 +45,7 @@
 
 #define ICON(name) (ThemeIcon(":/TreeTableResources/", name))
 
-TreeTableWidget::TreeTableWidget(Application *app)
-    : Widget(),
-      app_(app)
+TreeTableWidget::TreeTableWidget(Application *app) : Widget(), app_(app)
 {
     LOG_DEBUG(<< "Create.");
 
@@ -85,33 +83,25 @@ TreeTableWidget::TreeTableWidget(Application *app)
     tableWidget_->setSelectionMode(AbstractItemView::ExtendedSelection);
 
     // Table: Signals.
-    tableWidget_->customContextMenuRequested.connect([this](Point pos)
-    {
-        slotCustomContextMenuRequested(pos);
-    });
+    tableWidget_->customContextMenuRequested.connect(
+        [this](Point pos) { slotCustomContextMenuRequested(pos); });
 
-    tableWidget_->selectionChanged.connect([this](ItemSelection selected, ItemSelection deselected)
-    {
-        slotTableSelectionChanged(selected, deselected);
-    });
+    tableWidget_->selectionChanged.connect(
+        [this](ItemSelection selected, ItemSelection deselected)
+        { slotTableSelectionChanged(selected, deselected); });
 
     // Options.
     showOnlyVisibleTreesCheckBox_ = new CheckBox;
     showOnlyVisibleTreesCheckBox_->setText(tr("Show only visible trees"));
     showOnlyVisibleTreesCheckBox_->setChecked(false);
-    showOnlyVisibleTreesCheckBox_->stateChanged.connect([this](int val)
-    {
-        slotShowOnlyVisibleTreesChanged(val);
-    });
+    showOnlyVisibleTreesCheckBox_->stateChanged.connect(
+        [this](int val) { slotShowOnlyVisibleTreesChanged(val); });
 
     // Buttons.
     exportButton_ = new PushButton(tr("Export"));
     exportButton_->setIcon(THEME_ICON("export-file"));
     exportButton_->setSizePolicy(SizePolicy::Minimum, SizePolicy::Minimum);
-    exportButton_->clicked.connect([this]()
-    {
-        slotExport();
-    });
+    exportButton_->clicked.connect([this]() { slotExport(); });
 
     // Buttons layout.
     HBoxLayout *buttonsLayout = new HBoxLayout;
@@ -129,10 +119,9 @@ TreeTableWidget::TreeTableWidget(Application *app)
 
     // New data.
     updatesEnabled_ = true;
-    app_->signalUpdate.connect([this](void *sender, const std::set<Editor::Type> &target)
-    {
-        slotUpdate(sender, target);
-    });
+    app_->signalUpdate.connect(
+        [this](void *sender, const std::set<Editor::Type> &target)
+        { slotUpdate(sender, target); });
 
     slotUpdate(nullptr, std::set<Editor::Type>());
 }
@@ -140,7 +129,8 @@ TreeTableWidget::TreeTableWidget(Application *app)
 // -----------------------------------------------------------------------------
 // New data.
 
-void TreeTableWidget::slotUpdate(void *sender, const std::set<Editor::Type> &target)
+void TreeTableWidget::slotUpdate(void *sender,
+                                 const std::set<Editor::Type> &target)
 {
     if (sender == this)
     {
@@ -194,12 +184,7 @@ void TreeTableWidget::newFilter()
 // Helpers.
 std::unordered_set<size_t> TreeTableWidget::selectedRowsToIds()
 {
-    QModelIndexList indexes = tableWidget_->selectionModel()->selectedIndexes();
-    std::set<int> selectedRows;
-    for (const ModelIndex &index : indexes)
-    {
-        selectedRows.insert(index.row());
-    }
+    std::set<int> selectedRows = tableWidget_->selectedRows();
 
     std::unordered_set<size_t> idList;
     for (int row : selectedRows)
@@ -279,9 +264,8 @@ void TreeTableWidget::slotShowOnlyVisibleTreesChanged(int index)
     updateTableContent();
 }
 
-void TreeTableWidget::slotTableSelectionChanged(
-    const ItemSelection &selected,
-    const ItemSelection &deselected)
+void TreeTableWidget::slotTableSelectionChanged(const ItemSelection &selected,
+                                                const ItemSelection &deselected)
 {
     LOG_DEBUG(<< "Selection changed.");
     (void)selected;
@@ -350,8 +334,7 @@ void TreeTableWidget::slotCustomContextMenuRequested(const Point &pos)
     // Create and run the context menu.
     Menu contextMenu(app_);
 
-    TreeTableSetManagementStatus managementStatusMenu(app_,
-                                                      &contextMenu);
+    TreeTableSetManagementStatus managementStatusMenu(app_, &contextMenu);
     TreeTableSetSpecies speciesMenu(app_, &contextMenu);
     Action *showTreesAction = contextMenu.addAction("Show selected trees");
     Action *hideTreesAction = contextMenu.addAction("Hide selected trees");
@@ -513,8 +496,7 @@ void TreeTableWidget::setRow(int row, size_t index)
     const Segment &segment = segments_[index];
     const TreeAttributes &atr = segment.treeAttributes;
 
-    double ppm =
-        app_->editor().settings().unitsSettings().pointsPerMeter()[0];
+    double ppm = app_->editor().settings().unitsSettings().pointsPerMeter()[0];
     double ppm2 = ppm * ppm;
     double ppm3 = ppm * ppm * ppm;
 

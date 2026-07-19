@@ -33,8 +33,20 @@
 class EXPORT_UI_COMMON Color
 {
 public:
-    enum Spec { Invalid, Rgb, Hsv, Cmyk, Hsl, ExtendedRgb };
-    enum NameFormat { HexRgb, HexArgb };
+    enum Spec
+    {
+        Invalid,
+        Rgb,
+        Hsv,
+        Cmyk,
+        Hsl,
+        ExtendedRgb
+    };
+    enum NameFormat
+    {
+        HexRgb,
+        HexArgb
+    };
 
     Color();
     Color(int r, int g, int b, int a = 255);
@@ -58,10 +70,10 @@ public:
     void setBlueF(float b);
     void setAlphaF(float a);
 
-    float redF() const { return static_cast<float>(r_) / 255.0; }
-    float greenF() const { return static_cast<float>(g_) / 255.0; }
-    float blueF() const { return static_cast<float>(b_) / 255.0; }
-    float alphaF() const { return static_cast<float>(a_) / 255.0; }
+    float redF() const { return static_cast<float>(r_) / 255.0F; }
+    float greenF() const { return static_cast<float>(g_) / 255.0F; }
+    float blueF() const { return static_cast<float>(b_) / 255.0F; }
+    float alphaF() const { return static_cast<float>(a_) / 255.0F; }
 
     void setRgb(int r, int g, int b, int a = 255);
     void setRgbF(float r, float g, float b, float a = 1.0F);

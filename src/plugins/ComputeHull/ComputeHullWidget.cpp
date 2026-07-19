@@ -20,17 +20,17 @@
 /** @file ComputeHullWidget.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
+#include <CheckBox.hpp>
 #include <ComputeHullWidget.hpp>
 #include <DoubleSliderWidget.hpp>
-#include <InfoDialog.hpp>
-#include <Application.hpp>
-#include <ProgressActionDialog.hpp>
-#include <ThemeIcon.hpp>
-#include <CheckBox.hpp>
+#include <GridLayout.hpp>
 #include <GroupBox.hpp>
 #include <HBoxLayout.hpp>
-#include <GridLayout.hpp>
+#include <InfoDialog.hpp>
+#include <ProgressActionDialog.hpp>
 #include <PushButton.hpp>
+#include <ThemeIcon.hpp>
 #include <VBoxLayout.hpp>
 
 // Include local.
@@ -82,10 +82,8 @@ ComputeHullWidget::ComputeHullWidget(Application *app)
     findOptimalAlphaCheckBox_ = new CheckBox;
     findOptimalAlphaCheckBox_->setText(tr("Find optimal alpha"));
     findOptimalAlphaCheckBox_->setChecked(parameters_.findOptimalAlpha);
-    findOptimalAlphaCheckBox_->stateChanged.connect([this](int value)
-    {
-        slotFindOptimalAlphaChanged(value);
-    });
+    findOptimalAlphaCheckBox_->stateChanged.connect(
+        [this](int value) { slotFindOptimalAlphaChanged(value); });
 
     // If your data points are spaced ~1 unit apart, α = 0.1 will include only
     // very local features. If points are spaced ~100 units apart, you might
@@ -133,10 +131,7 @@ ComputeHullWidget::ComputeHullWidget(Application *app)
     // Buttons.
     applyButton_ = new PushButton(tr("Run"));
     applyButton_->setIcon(THEME_ICON("run"));
-    applyButton_->clicked.connect([this]()
-    {
-        slotApply();
-    });
+    applyButton_->clicked.connect([this]() { slotApply(); });
 
     // Buttons layout.
     HBoxLayout *buttonsLayout = new HBoxLayout;
@@ -183,10 +178,8 @@ void ComputeHullWidget::slotApply()
     else
     {
         double alpha = alphaSlider_->value();
-        double ppm = app_->editor()
-                         .settings()
-                         .unitsSettings()
-                         .pointsPerMeter()[0];
+        double ppm =
+            app_->editor().settings().unitsSettings().pointsPerMeter()[0];
 
         parameters_.alpha = (alpha * alpha) * ppm;
     }

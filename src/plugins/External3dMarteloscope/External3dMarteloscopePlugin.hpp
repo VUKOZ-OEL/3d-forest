@@ -38,9 +38,7 @@ class External3dMarteloscopeRunner;
 #endif
 
 /** External 3d-Marteloscope Plugin. */
-class External3dMarteloscopePlugin
-    : 
-      public Plugin
+class External3dMarteloscopePlugin : public Plugin
 {
 public:
     External3dMarteloscopePlugin();

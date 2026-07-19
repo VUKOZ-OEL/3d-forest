@@ -20,9 +20,9 @@
 /** @file EditPluginSetClassification.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <EditPluginSetClassification.hpp>
 #include <InputComboBoxDialog.hpp>
-#include <Application.hpp>
 #include <ProgressDialog.hpp>
 
 // Include local.
@@ -102,9 +102,7 @@ void EditPluginSetClassification::run(Application *app)
 
     progress.close();
 
-    app->update(nullptr,
-                       {Editor::TYPE_CLASSIFICATION},
-                       Page::STATE_READ);
+    app->update(nullptr, {Editor::TYPE_CLASSIFICATION}, Page::STATE_READ);
 
     LOG_DEBUG(<< "Finished setting classification values.");
 }

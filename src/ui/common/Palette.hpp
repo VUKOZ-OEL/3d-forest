@@ -35,13 +35,26 @@ class EXPORT_UI_COMMON Palette
 public:
     enum ColorRole
     {
-        WindowText, Button, Light, Midlight, Dark, Mid,
-        Text, BrightText, ButtonText, Base, Window, Shadow,
-        Highlight, HighlightedText,
-        Link, LinkVisited,
+        WindowText,
+        Button,
+        Light,
+        Midlight,
+        Dark,
+        Mid,
+        Text,
+        BrightText,
+        ButtonText,
+        Base,
+        Window,
+        Shadow,
+        Highlight,
+        HighlightedText,
+        Link,
+        LinkVisited,
         AlternateBase,
         NoRole,
-        ToolTipBase, ToolTipText,
+        ToolTipBase,
+        ToolTipText,
         PlaceholderText,
         Accent
     };

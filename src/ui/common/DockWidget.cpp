@@ -22,8 +22,8 @@
 // Include std.
 
 // Include 3D Forest.
-#include <DockWidget.hpp>
 #include <Application.hpp>
+#include <DockWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "DockWidget"

@@ -36,7 +36,7 @@
 #endif
 
 /** Edit Plugin. */
-class EditPlugin :  public Plugin
+class EditPlugin : public Plugin
 {
 public:
     EditPlugin();

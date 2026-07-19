@@ -37,8 +37,7 @@ class MessageLogWindow;
 #endif
 
 /** Message Log Plugin. */
-class MessageLogPlugin : 
-                                                   public Plugin
+class MessageLogPlugin : public Plugin
 {
 public:
     MessageLogPlugin();

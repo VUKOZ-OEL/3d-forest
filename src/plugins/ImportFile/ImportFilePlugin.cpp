@@ -20,13 +20,13 @@
 /** @file ImportFilePlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
+#include <FileDialog.hpp>
 #include <ImportFileDialog.hpp>
 #include <ImportFilePlugin.hpp>
 #include <IndexFileBuilder.hpp>
-#include <Application.hpp>
-#include <ThemeIcon.hpp>
-#include <FileDialog.hpp>
 #include <ProgressDialog.hpp>
+#include <ThemeIcon.hpp>
 
 // Include 3rd party.
 #include <pcdio.h>
@@ -69,16 +69,16 @@ void ImportFilePlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(&importFileAction_,
-                              "File",
-                              "File Import/Export",
-                              tr("Import..."),
-                              tr("Import new point cloud dataset"),
-                              ICON("import-file"),
-                              this,
-                              &ImportFilePlugin::slotImportFile,
-                              MAIN_WINDOW_MENU_FILE_PRIORITY,
-                              50);
+    app_->createAction(
+        &importFileAction_,
+        "File",
+        "File Import/Export",
+        tr("Import..."),
+        tr("Import new point cloud dataset"),
+        ICON("import-file"),
+        [this]() { slotImportFile(); },
+        MAIN_WINDOW_MENU_FILE_PRIORITY,
+        50);
 
     app_->hideToolBar("File Import/Export");
 }
@@ -100,8 +100,7 @@ static bool importPluginCreateIndex(const std::string &pathIn,
                                     const ImportSettings &settings,
                                     Application *app);
 
-static void importPluginAddAsNewTree(const std::string &path,
-                                     Application *app);
+static void importPluginAddAsNewTree(const std::string &path, Application *app);
 
 static bool importPluginPcd2Las(const std::string &pathIn,
                                 const std::string &pathOut);
@@ -124,9 +123,8 @@ static void importPluginDialog(Application *app)
     LOG_DEBUG(<< "Start importing files.");
 
     std::vector<std::string> fileNames;
-    fileNames = FileDialog::selectFiles(app,
-                                        tr("Import File"),
-                                        IMPORT_PLUGIN_FILTER);
+    fileNames =
+        FileDialog::selectFiles(app, tr("Import File"), IMPORT_PLUGIN_FILTER);
 
     LOG_DEBUG(<< "Selected <" << fileNames.size() << "> files.");
     if (fileNames.empty())
@@ -295,8 +293,7 @@ static bool importPluginPcd2Las(const std::string &pathIn,
     return true;
 }
 
-static void importPluginAddAsNewTree(const std::string &path,
-                                     Application *app)
+static void importPluginAddAsNewTree(const std::string &path, Application *app)
 {
     Editor &editor = app->editor();
 

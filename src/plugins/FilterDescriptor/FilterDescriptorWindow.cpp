@@ -20,9 +20,9 @@
 /** @file FilterDescriptorWindow.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <FilterDescriptorWidget.hpp>
 #include <FilterDescriptorWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.

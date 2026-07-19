@@ -37,8 +37,7 @@ class TreeTableWindow;
 #endif
 
 /** Tree Table Plugin. */
-class TreeTablePlugin : 
-                                                 public Plugin
+class TreeTablePlugin : public Plugin
 {
 public:
     TreeTablePlugin();

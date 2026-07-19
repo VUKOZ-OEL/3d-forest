@@ -22,8 +22,8 @@
 // Include std.
 
 // Include 3D Forest.
-#include <VBoxLayout.hpp>
 #include <Application.hpp>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "VBoxLayout"

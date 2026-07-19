@@ -26,9 +26,9 @@
 #include <vector>
 
 // Include 3D Forest.
-#include <Widget.hpp>
 #include <Editor.hpp>
 #include <Settings.hpp>
+#include <Widget.hpp>
 class Application;
 class ColorSwitchWidget;
 class CheckBox;

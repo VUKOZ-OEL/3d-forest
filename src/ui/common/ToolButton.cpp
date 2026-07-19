@@ -22,8 +22,8 @@
 // Include std.
 
 // Include 3D Forest.
-#include <ToolButton.hpp>
 #include <Application.hpp>
+#include <ToolButton.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ToolButton"

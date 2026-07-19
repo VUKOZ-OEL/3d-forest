@@ -21,12 +21,12 @@
 
 // Include 3D Forest.
 #include <Application.hpp>
-#include <ThemeIcon.hpp>
-#include <UnitsSettingsWidget.hpp>
 #include <CheckBox.hpp>
 #include <DoubleSpinBox.hpp>
 #include <GridLayout.hpp>
 #include <Label.hpp>
+#include <ThemeIcon.hpp>
+#include <UnitsSettingsWidget.hpp>
 #include <VBoxLayout.hpp>
 
 // Include local.
@@ -47,9 +47,7 @@ UnitsSettingsWidget::UnitsSettingsWidget(Application *app)
     ppmLasSpinBox_->setSingleStep(1);
     ppmLasSpinBox_->setEnabled(false);
     ppmLasSpinBox_->valueChanged.connect([this](double val)
-    {
-        slotIntermediateLas(val);
-    });
+                                         { slotIntermediateLas(val); });
 
     ppmUserSpinBox_ = new DoubleSpinBox;
     ppmUserSpinBox_->setRange(1, 1000000);
@@ -57,17 +55,13 @@ UnitsSettingsWidget::UnitsSettingsWidget(Application *app)
     ppmUserSpinBox_->setSingleStep(1);
     ppmUserSpinBox_->setEnabled(settings_.userDefined);
     ppmUserSpinBox_->valueChanged.connect([this](double val)
-    {
-        slotIntermediateUser(val);
-    });
+                                          { slotIntermediateUser(val); });
 
     userDefinedCheckBox_ = new CheckBox;
     userDefinedCheckBox_->setChecked(settings_.userDefined);
     // userDefinedCheckBox_->setText(tr("Enabled"));
     userDefinedCheckBox_->stateChanged.connect([this](int val)
-    {
-        slotUserDefined(val);
-    });
+                                               { slotUserDefined(val); });
 
     Label *help = new Label;
     help->setToolTip(tr("The values are in points per meter.\n"
@@ -100,10 +94,9 @@ UnitsSettingsWidget::UnitsSettingsWidget(Application *app)
     setLayout(mainLayout);
 
     // Data.
-    app_->signalUpdate.connect([this](void *sender, const std::set<Editor::Type> &target)
-    {
-        slotUpdate(sender, target);
-    });
+    app_->signalUpdate.connect(
+        [this](void *sender, const std::set<Editor::Type> &target)
+        { slotUpdate(sender, target); });
 
     slotUpdate(nullptr, std::set<Editor::Type>());
 }

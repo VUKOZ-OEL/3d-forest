@@ -20,9 +20,9 @@
 /** @file ComputeCrownVolumePlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ComputeCrownVolumePlugin.hpp>
 #include <ComputeCrownVolumeWindow.hpp>
-#include <Application.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
@@ -41,15 +41,15 @@ void ComputeCrownVolumePlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(nullptr,
-                              "Compute",
-                              "Compute",
-                              tr("Crown volume"),
-                              tr("Compute crown volume"),
-                              ICON("compute-crown-volume"),
-                              this,
-                              ComputeCrownVolumePlugin::slotPlugin,
-                              MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
+    app_->createAction(
+        nullptr,
+        "Compute",
+        "Compute",
+        tr("Crown volume"),
+        tr("Compute crown volume"),
+        ICON("compute-crown-volume"),
+        [this]() { slotPlugin(); },
+        MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
 }
 
 void ComputeCrownVolumePlugin::slotPlugin()
