@@ -142,23 +142,20 @@ FilterTreesWidget::FilterTreesWidget(Application *app) : app_(app)
 
     // Data.
     updatesEnabled_ = true;
-    app_->signalUpdate.connect(
-        [this](void *sender, const std::set<Editor::Type> &target)
-        { slotUpdate(sender, target); });
+    app_->signalUpdate.connect([this](const Message &msg) { slotUpdate(msg); });
 
-    slotUpdate(nullptr, std::set<Editor::Type>());
+    slotUpdate({});
 }
 
-void FilterTreesWidget::slotUpdate(void *sender,
-                                   const std::set<Editor::Type> &target)
+void FilterTreesWidget::slotUpdate(const Message &msg)
 {
-    if (sender == this)
+    if (msg.sender() == this)
     {
         return;
     }
 
-    if (target.empty() || target.count(Editor::TYPE_SEGMENT) ||
-        target.count(Editor::TYPE_SETTINGS))
+    if (msg.empty() || msg.contains(Message::TYPE_SEGMENT) ||
+        msg.contains(Message::TYPE_SETTINGS))
     {
         LOG_DEBUG_UPDATE(<< "Input segments.");
 
@@ -174,7 +171,7 @@ void FilterTreesWidget::dataChanged()
     app_->editor().setSegments(segments_);
     app_->editor().setSegmentsFilter(filter_);
     app_->updateData();
-    app_->update(this, {Editor::TYPE_SEGMENT});
+    app_->update(this, Message::TYPE_SEGMENT);
 }
 
 void FilterTreesWidget::filterChanged()
@@ -184,7 +181,7 @@ void FilterTreesWidget::filterChanged()
     app_->suspendThreads();
     app_->editor().setSegmentsFilter(filter_);
     app_->updateFilter();
-    app_->update(this, {Editor::TYPE_SEGMENT});
+    app_->update(this, Message::TYPE_SEGMENT);
 }
 
 void FilterTreesWidget::setFilterEnabled(bool b)

@@ -105,9 +105,9 @@ public:
     void post(std::function<void()> fn);
     virtual void processEvents();
 
-    void emitUpdate(void *sender, const std::set<Editor::Type> &target);
+    void emitUpdate(void *sender, int type);
     void update(void *sender,
-                const std::set<Editor::Type> &target,
+                int type,
                 Page::State viewPortsCacheState = Page::STATE_SELECT,
                 bool resetCamera = false);
 
@@ -140,7 +140,7 @@ public:
 
     /// Connect to this signal in your plugin to be notified about data changes.
     // void signalUpdate(void *sender, const std::set<Editor::Type> &target);
-    Signal<void *, std::set<Editor::Type>> signalUpdate;
+    Signal<Message> signalUpdate;
 
     // bool event(QEvent *e) override;
     // void paintEvent(QPaintEvent *event) override;

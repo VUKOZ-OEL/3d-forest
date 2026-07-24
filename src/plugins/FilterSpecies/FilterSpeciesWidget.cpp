@@ -105,23 +105,20 @@ FilterSpeciesWidget::FilterSpeciesWidget(Application *app) : app_(app)
 
     // Data.
     updatesEnabled_ = true;
-    app_->signalUpdate.connect(
-        [this](void *sender, const std::set<Editor::Type> &target)
-        { slotUpdate(sender, target); });
+    app_->signalUpdate.connect([this](const Message &msg) { slotUpdate(msg); });
 
-    slotUpdate(nullptr, std::set<Editor::Type>());
+    slotUpdate({});
 }
 
-void FilterSpeciesWidget::slotUpdate(void *sender,
-                                     const std::set<Editor::Type> &target)
+void FilterSpeciesWidget::slotUpdate(const Message &msg)
 {
-    if (sender == this)
+    if (msg.sender() == this)
     {
         return;
     }
 
-    if (target.empty() || target.count(Editor::TYPE_SPECIES) ||
-        target.count(Editor::TYPE_SEGMENT))
+    if (msg.empty() || msg.contains(Message::TYPE_SPECIES) ||
+        msg.contains(Message::TYPE_SEGMENT))
     {
         LOG_DEBUG_UPDATE(<< "Input species.");
 

@@ -41,7 +41,7 @@ public:
 
     Size sizeHint() const override { return Size(300, 265); }
 
-    void slotUpdate(void *sender, const std::set<Editor::Type> &target);
+    void slotUpdate(const Message &msg);
 
     void slotSetUseOnlyForSelectedTrees(int v);
     void slotSetTreeAttributesVisible(int v);

@@ -37,7 +37,7 @@ public:
 
     Size sizeHint() const override { return Size(300, 80); }
 
-    void slotUpdate(void *sender, const std::set<Editor::Type> &target);
+    void slotUpdate(const Message &msg);
 
     void slotLanguageChanged(int index);
 

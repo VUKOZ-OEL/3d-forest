@@ -94,22 +94,19 @@ UnitsSettingsWidget::UnitsSettingsWidget(Application *app)
     setLayout(mainLayout);
 
     // Data.
-    app_->signalUpdate.connect(
-        [this](void *sender, const std::set<Editor::Type> &target)
-        { slotUpdate(sender, target); });
+    app_->signalUpdate.connect([this](const Message &msg) { slotUpdate(msg); });
 
-    slotUpdate(nullptr, std::set<Editor::Type>());
+    slotUpdate({});
 }
 
-void UnitsSettingsWidget::slotUpdate(void *sender,
-                                     const std::set<Editor::Type> &target)
+void UnitsSettingsWidget::slotUpdate(const Message &msg)
 {
-    if (sender == this)
+    if (msg.sender() == this)
     {
         return;
     }
 
-    if (target.empty() || target.count(Editor::TYPE_SETTINGS))
+    if (msg.empty() || msg.contains(Message::TYPE_SETTINGS))
     {
         LOG_DEBUG_UPDATE(<< "Input units settings.");
 
@@ -124,7 +121,7 @@ void UnitsSettingsWidget::dataChanged()
 
     app_->suspendThreads();
     app_->editor().setUnitsSettings(settings_);
-    app_->emitUpdate(this, {Editor::TYPE_SETTINGS});
+    app_->emitUpdate(this, {Message::TYPE_SETTINGS});
 }
 
 void UnitsSettingsWidget::setUnitsSettings(const UnitsSettings &settings)

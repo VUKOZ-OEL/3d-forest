@@ -85,7 +85,7 @@ void TreeTableSetSpecies::runAction(Action *selectedAction,
     }
 
     editor->setSegments(segments);
-    app_->update(this, {Editor::TYPE_SEGMENT, Editor::TYPE_SPECIES});
+    app_->update(this, Message::TYPE_SEGMENT | Message::TYPE_SPECIES);
 
     LOG_DEBUG(<< "Finished setting species values.");
 }
@@ -144,7 +144,7 @@ void TreeTableSetSpecies::run(Application *app,
     }
 
     editor->setSegments(segments);
-    app->update(nullptr, {Editor::TYPE_SEGMENT, Editor::TYPE_SPECIES});
+    app->update(nullptr, Message::TYPE_SEGMENT | Message::TYPE_SPECIES);
 
     LOG_DEBUG(<< "Finished setting species values.");
 }

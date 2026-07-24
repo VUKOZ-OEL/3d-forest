@@ -242,19 +242,19 @@ void Application::processEvents()
     // QCoreApplication::processEvents();
 }
 
-void Application::emitUpdate(void *sender, const std::set<Editor::Type> &target)
+void Application::emitUpdate(void *sender, int type)
 {
-    LOG_DEBUG_UPDATE(<< "Update target <" << target << "> emit.");
+    LOG_DEBUG_UPDATE(<< "Update target <" << type << "> emit.");
 
     // emit signalUpdate(sender, target);
 }
 
 void Application::update(void *sender,
-                         const std::set<Editor::Type> &target,
+                         int type,
                          Page::State viewPortsCacheState,
                          bool resetCamera)
 {
-    LOG_DEBUG_UPDATE(<< "Update target <" << target << "> set page state <"
+    LOG_DEBUG_UPDATE(<< "Update target <" << type << "> set page state <"
                      << viewPortsCacheState << "> reset camera <"
                      << static_cast<int>(resetCamera) << ">.");
 
@@ -271,7 +271,7 @@ void Application::update(void *sender,
         // }
     }
 
-    emitUpdate(sender, target);
+    emitUpdate(sender, type);
 
     resumeThreads();
 }
@@ -325,7 +325,7 @@ void Application::updateFilter(void *sender, bool final)
 
     if (final)
     {
-        emitUpdate(sender, {Editor::TYPE_FILTER});
+        emitUpdate(sender, {Message::TYPE_FILTER});
     }
 
     resumeThreads();

@@ -62,26 +62,23 @@ FilterElevationWidget::FilterElevationWidget(Application *app)
     setLayout(mainLayout);
 
     // Data.
-    app_->signalUpdate.connect(
-        [this](void *sender, const std::set<Editor::Type> &target)
-        { slotUpdate(sender, target); });
+    app_->signalUpdate.connect([this](const Message &msg) { slotUpdate(msg); });
 
-    slotUpdate(nullptr, std::set<Editor::Type>());
+    slotUpdate({});
 
     LOG_DEBUG(<< "Finished creating elevation filter widget.");
 }
 
-void FilterElevationWidget::slotUpdate(void *sender,
-                                       const std::set<Editor::Type> &target)
+void FilterElevationWidget::slotUpdate(const Message &msg)
 {
-    if (sender == this)
+    if (msg.sender() == this)
     {
         return;
     }
 
-    if (target.empty() || target.count(Editor::TYPE_ELEVATION) ||
-        target.count(Editor::TYPE_SETTINGS) ||
-        target.count(Editor::TYPE_DATA_SET))
+    if (msg.empty() || msg.contains(Message::TYPE_ELEVATION) ||
+        msg.contains(Message::TYPE_SETTINGS) ||
+        msg.contains(Message::TYPE_DATA_SET))
     {
         LOG_DEBUG_UPDATE(<< "Input elevation filter.");
         setElevation(app_->editor().elevationFilter());

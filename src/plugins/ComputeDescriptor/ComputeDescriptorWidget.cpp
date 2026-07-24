@@ -178,7 +178,7 @@ void ComputeDescriptorWidget::slotApply()
 
     descriptor_.clear();
 
-    app_->update(this, {Editor::TYPE_DESCRIPTOR}, Page::STATE_READ);
+    app_->update(this, Message::TYPE_DESCRIPTOR, Page::STATE_READ);
 }
 
 void ComputeDescriptorWidget::slotHelp()

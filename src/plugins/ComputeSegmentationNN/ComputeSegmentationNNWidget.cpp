@@ -264,7 +264,7 @@ void ComputeSegmentationNNWidget::slotApply()
         app_->showError("Unknown error");
     }
 
-    app_->update(this, {Editor::TYPE_SEGMENT}, Page::STATE_READ);
+    app_->update(this, Message::TYPE_SEGMENT, Page::STATE_READ);
 }
 
 void ComputeSegmentationNNWidget::slotHelp()

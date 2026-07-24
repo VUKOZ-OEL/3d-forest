@@ -120,22 +120,19 @@ FilterFilesWidget::FilterFilesWidget(Application *app) : app_(app)
 
     // Data.
     updatesEnabled_ = true;
-    app_->signalUpdate.connect(
-        [this](void *sender, const std::set<Editor::Type> &target)
-        { slotUpdate(sender, target); });
+    app_->signalUpdate.connect([this](const Message &msg) { slotUpdate(msg); });
 
-    slotUpdate(nullptr, std::set<Editor::Type>());
+    slotUpdate({});
 }
 
-void FilterFilesWidget::slotUpdate(void *sender,
-                                   const std::set<Editor::Type> &target)
+void FilterFilesWidget::slotUpdate(const Message &msg)
 {
-    if (sender == this)
+    if (msg.sender() == this)
     {
         return;
     }
 
-    if (target.empty() || target.count(Editor::TYPE_DATA_SET))
+    if (msg.empty() || msg.contains(Message::TYPE_DATA_SET))
     {
         LOG_DEBUG_UPDATE(<< "Input datasets.");
 
@@ -151,7 +148,7 @@ void FilterFilesWidget::dataChanged()
     app_->editor().setDatasets(datasets_);
     app_->editor().setDatasetsFilter(filter_);
     app_->updateData();
-    app_->update(this, {Editor::TYPE_DATA_SET}, Page::STATE_READ);
+    app_->update(this, Message::TYPE_DATA_SET, Page::STATE_READ);
 }
 
 void FilterFilesWidget::filterChanged()

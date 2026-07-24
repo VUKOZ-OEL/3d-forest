@@ -164,7 +164,7 @@ void FilterManagementStatusTreeWidget::setCheckbox(size_t idx)
     }
 
     editor->setSegments(segments);
-    app_->update(this, {Editor::TYPE_SEGMENT, Editor::TYPE_MANAGEMENT_STATUS});
+    app_->update(this, Message::TYPE_SEGMENT | Message::TYPE_MANAGEMENT_STATUS);
 }
 
 void FilterManagementStatusTreeWidget::setSegment(const Segment &segment)

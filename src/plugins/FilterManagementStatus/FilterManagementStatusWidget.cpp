@@ -119,29 +119,25 @@ FilterManagementStatusWidget::FilterManagementStatusWidget(Application *app)
 
     // Data.
     updatesEnabled_ = true;
-    app_->signalUpdate.connect(
-        [this](void *sender, const std::set<Editor::Type> &target)
-        { slotUpdate(sender, target); });
+    app_->signalUpdate.connect([this](const Message &msg) { slotUpdate(msg); });
 
-    slotUpdate(nullptr, std::set<Editor::Type>());
+    slotUpdate({});
 }
 
-void FilterManagementStatusWidget::slotUpdate(
-    void *sender,
-    const std::set<Editor::Type> &target)
+void FilterManagementStatusWidget::slotUpdate(const Message &msg)
 {
-    if (sender == this || sender == treeWidget_)
+    if (msg.sender() == this || msg.sender() == treeWidget_)
     {
         return;
     }
 
-    if (target.empty() || target.count(Editor::TYPE_MANAGEMENT_STATUS))
+    if (msg.empty() || msg.contains(Message::TYPE_MANAGEMENT_STATUS))
     {
         LOG_DEBUG_UPDATE(<< "Input management status.");
         receivedManagementStatusList();
     }
 
-    if (target.empty() || target.count(Editor::TYPE_SEGMENT))
+    if (msg.empty() || msg.contains(Message::TYPE_SEGMENT))
     {
         LOG_DEBUG_UPDATE(<< "Input segments.");
         receivedSegments();

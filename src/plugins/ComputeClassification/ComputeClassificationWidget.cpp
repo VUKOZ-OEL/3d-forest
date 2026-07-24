@@ -159,7 +159,7 @@ void ComputeClassificationWidget::slotApply()
     }
 
     app_->update(this,
-                 {Editor::TYPE_CLASSIFICATION, Editor::TYPE_ELEVATION},
+                 Message::TYPE_CLASSIFICATION | Message::TYPE_ELEVATION,
                  Page::STATE_READ);
 }
 

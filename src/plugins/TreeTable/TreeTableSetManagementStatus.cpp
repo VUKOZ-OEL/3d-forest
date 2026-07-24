@@ -86,7 +86,7 @@ void TreeTableSetManagementStatus::runAction(Action *selectedAction,
     }
 
     editor->setSegments(segments);
-    app_->update(this, {Editor::TYPE_SEGMENT, Editor::TYPE_MANAGEMENT_STATUS});
+    app_->update(this, Message::TYPE_SEGMENT | Message::TYPE_MANAGEMENT_STATUS);
 
     LOG_DEBUG(<< "Finished setting management status values.");
 }
@@ -146,7 +146,7 @@ void TreeTableSetManagementStatus::run(Application *app,
 
     editor->setSegments(segments);
     app->update(nullptr,
-                {Editor::TYPE_SEGMENT, Editor::TYPE_MANAGEMENT_STATUS});
+                Message::TYPE_SEGMENT | Message::TYPE_MANAGEMENT_STATUS);
 
     LOG_DEBUG(<< "Finished setting management status values.");
 }

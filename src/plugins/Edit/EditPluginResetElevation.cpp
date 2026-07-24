@@ -75,7 +75,7 @@ void EditPluginResetElevation::run(Application *app)
 
     progress.close();
 
-    app->update(nullptr, {Editor::TYPE_ELEVATION}, Page::STATE_READ);
+    app->update(nullptr, Message::TYPE_ELEVATION, Page::STATE_READ);
 
     LOG_DEBUG(<< "Finished resetting elevation values.");
 }

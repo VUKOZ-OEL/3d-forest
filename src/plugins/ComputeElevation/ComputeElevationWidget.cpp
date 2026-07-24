@@ -116,7 +116,7 @@ void ComputeElevationWidget::slotApply()
         app_->showError("Unknown error");
     }
 
-    app_->update(this, {Editor::TYPE_ELEVATION}, Page::STATE_READ);
+    app_->update(this, Message::TYPE_ELEVATION, Page::STATE_READ);
 }
 
 void ComputeElevationWidget::slotHelp()

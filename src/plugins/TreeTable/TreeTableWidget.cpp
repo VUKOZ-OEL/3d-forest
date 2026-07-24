@@ -119,32 +119,29 @@ TreeTableWidget::TreeTableWidget(Application *app) : Widget(), app_(app)
 
     // New data.
     updatesEnabled_ = true;
-    app_->signalUpdate.connect(
-        [this](void *sender, const std::set<Editor::Type> &target)
-        { slotUpdate(sender, target); });
+    app_->signalUpdate.connect([this](const Message &msg) { slotUpdate(msg); });
 
-    slotUpdate(nullptr, std::set<Editor::Type>());
+    slotUpdate({});
 }
 
 // -----------------------------------------------------------------------------
 // New data.
 
-void TreeTableWidget::slotUpdate(void *sender,
-                                 const std::set<Editor::Type> &target)
+void TreeTableWidget::slotUpdate(const Message &msg)
 {
-    if (sender == this)
+    if (msg.sender() == this)
     {
         return;
     }
 
-    if (target.empty() || target.count(Editor::TYPE_SEGMENT) ||
-        target.count(Editor::TYPE_SETTINGS))
+    if (msg.empty() || msg.contains(Message::TYPE_SEGMENT) ||
+        msg.contains(Message::TYPE_SETTINGS))
     {
         LOG_DEBUG_UPDATE(<< "Input data.");
         newData();
     }
 
-    if (target.count(Editor::TYPE_FILTER))
+    if (msg.contains(Message::TYPE_FILTER))
     {
         LOG_DEBUG_UPDATE(<< "Input filter.");
         newFilter();
@@ -280,7 +277,7 @@ void TreeTableWidget::slotTableSelectionChanged(const ItemSelection &selected,
         LOG_DEBUG(<< "Apply new selection to editor.");
         app_->suspendThreads();
         app_->editor().setSegments(segments_);
-        app_->update(this, {Editor::TYPE_SEGMENT}, Page::STATE_RENDER);
+        app_->update(this, Message::TYPE_SEGMENT, Page::STATE_RENDER);
     }
 }
 
@@ -354,13 +351,13 @@ void TreeTableWidget::slotCustomContextMenuRequested(const Point &pos)
     if (selectedAction == showTreesAction)
     {
         TreeTableAction::showTrees(app_, idList);
-        app_->update(this, {Editor::TYPE_SEGMENT}, Page::STATE_READ);
+        app_->update(this, Message::TYPE_SEGMENT, Page::STATE_READ);
         updateTableContent();
     }
     else if (selectedAction == hideTreesAction)
     {
         TreeTableAction::hideTrees(app_, idList);
-        app_->update(this, {Editor::TYPE_SEGMENT}, Page::STATE_READ);
+        app_->update(this, Message::TYPE_SEGMENT, Page::STATE_READ);
         updateTableContent();
     }
     else if (selectedAction == readQsmAction)
@@ -368,7 +365,7 @@ void TreeTableWidget::slotCustomContextMenuRequested(const Point &pos)
         try
         {
             TreeTableAction::readMesh(app_, idList, "qsm");
-            app_->update(this, {Editor::TYPE_SEGMENT}, Page::STATE_READ);
+            app_->update(this, Message::TYPE_SEGMENT, Page::STATE_READ);
         }
         catch (std::exception &e)
         {
@@ -378,7 +375,7 @@ void TreeTableWidget::slotCustomContextMenuRequested(const Point &pos)
     else if (selectedAction == deleteQsmAction)
     {
         TreeTableAction::deleteMesh(app_, idList, "qsm");
-        app_->update(this, {Editor::TYPE_SEGMENT}, Page::STATE_READ);
+        app_->update(this, Message::TYPE_SEGMENT, Page::STATE_READ);
     }
 }
 

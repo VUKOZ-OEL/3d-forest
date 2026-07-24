@@ -216,5 +216,5 @@ void ComputeTreeAttributesWidget::slotApply()
         app_->showError("Unknown error");
     }
 
-    app_->update(this, {Editor::TYPE_SEGMENT});
+    app_->update(this, Message::TYPE_SEGMENT);
 }

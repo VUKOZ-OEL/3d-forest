@@ -43,7 +43,7 @@ public:
 
     void closeWidget();
 
-    void slotUpdate(void *sender, const std::set<Editor::Type> &target);
+    void slotUpdate(const Message &msg);
 
     void slotShowOnlyVisibleTreesChanged(int index);
     void slotExport();

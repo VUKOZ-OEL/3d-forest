@@ -63,24 +63,21 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(Application *app)
     setLayout(mainLayout);
 
     // Data.
-    app_->signalUpdate.connect(
-        [this](void *sender, const std::set<Editor::Type> &target)
-        { slotUpdate(sender, target); });
+    app_->signalUpdate.connect([this](const Message &msg) { slotUpdate(msg); });
 
-    slotUpdate(nullptr, std::set<Editor::Type>());
+    slotUpdate({});
 
     LOG_DEBUG(<< "Finished creating settings application widget.");
 }
 
-void ApplicationSettingsWidget::slotUpdate(void *sender,
-                                           const std::set<Editor::Type> &target)
+void ApplicationSettingsWidget::slotUpdate(const Message &msg)
 {
-    if (sender == this)
+    if (msg.sender() == this)
     {
         return;
     }
 
-    if (target.empty() || target.count(Editor::TYPE_SETTINGS))
+    if (msg.empty() || msg.contains(Message::TYPE_SETTINGS))
     {
         LOG_DEBUG_UPDATE(<< "Input application settings.");
 
@@ -94,7 +91,7 @@ void ApplicationSettingsWidget::dataChanged(bool modifiers)
 
     app_->suspendThreads();
     app_->editor().setApplicationSettings(settings_);
-    app_->emitUpdate(this, {Editor::TYPE_SETTINGS});
+    app_->emitUpdate(this, {Message::TYPE_SETTINGS});
 
     if (modifiers)
     {

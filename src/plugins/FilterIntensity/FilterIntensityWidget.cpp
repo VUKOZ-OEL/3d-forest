@@ -62,25 +62,22 @@ FilterIntensityWidget::FilterIntensityWidget(Application *app)
     setLayout(mainLayout);
 
     // Data.
-    app_->signalUpdate.connect(
-        [this](void *sender, const std::set<Editor::Type> &target)
-        { slotUpdate(sender, target); });
+    app_->signalUpdate.connect([this](const Message &msg) { slotUpdate(msg); });
 
-    slotUpdate(nullptr, std::set<Editor::Type>());
+    slotUpdate({});
 
     LOG_DEBUG(<< "Finished creating intensity filter widget.");
 }
 
-void FilterIntensityWidget::slotUpdate(void *sender,
-                                       const std::set<Editor::Type> &target)
+void FilterIntensityWidget::slotUpdate(const Message &msg)
 {
-    if (sender == this)
+    if (msg.sender() == this)
     {
         return;
     }
 
-    if (target.empty() || target.count(Editor::TYPE_INTENSITY) ||
-        target.count(Editor::TYPE_SETTINGS))
+    if (msg.empty() || msg.contains(Message::TYPE_INTENSITY) ||
+        msg.contains(Message::TYPE_SETTINGS))
     {
         LOG_DEBUG_UPDATE(<< "Input intensity filter.");
         setIntensity(app_->editor().intensityFilter());

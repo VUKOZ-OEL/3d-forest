@@ -102,7 +102,7 @@ void EditPluginSetClassification::run(Application *app)
 
     progress.close();
 
-    app->update(nullptr, {Editor::TYPE_CLASSIFICATION}, Page::STATE_READ);
+    app->update(nullptr, Message::TYPE_CLASSIFICATION, Page::STATE_READ);
 
     LOG_DEBUG(<< "Finished setting classification values.");
 }

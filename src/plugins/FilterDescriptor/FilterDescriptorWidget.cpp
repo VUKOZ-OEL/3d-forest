@@ -62,25 +62,22 @@ FilterDescriptorWidget::FilterDescriptorWidget(Application *app)
     setLayout(mainLayout);
 
     // Data.
-    app_->signalUpdate.connect(
-        [this](void *sender, const std::set<Editor::Type> &target)
-        { slotUpdate(sender, target); });
+    app_->signalUpdate.connect([this](const Message &msg) { slotUpdate(msg); });
 
-    slotUpdate(nullptr, std::set<Editor::Type>());
+    slotUpdate({});
 
     LOG_DEBUG(<< "Finished creating descriptor filter widget.");
 }
 
-void FilterDescriptorWidget::slotUpdate(void *sender,
-                                        const std::set<Editor::Type> &target)
+void FilterDescriptorWidget::slotUpdate(const Message &msg)
 {
-    if (sender == this)
+    if (msg.sender() == this)
     {
         return;
     }
 
-    if (target.empty() || target.count(Editor::TYPE_DESCRIPTOR) ||
-        target.count(Editor::TYPE_SETTINGS))
+    if (msg.empty() || msg.contains(Message::TYPE_DESCRIPTOR) ||
+        msg.contains(Message::TYPE_SETTINGS))
     {
         LOG_DEBUG_UPDATE(<< "Input descriptor filter.");
         setDescriptor(app_->editor().descriptorFilter());

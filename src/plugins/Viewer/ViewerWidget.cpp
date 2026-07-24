@@ -34,17 +34,14 @@
 ViewerWidget::ViewerWidget(Application *app) : Widget(app), app_(app)
 {
     // Data.
-    app_->signalUpdate.connect(
-        [this](void *sender, const std::set<Editor::Type> &target)
-        { slotUpdate(sender, target); });
+    app_->signalUpdate.connect([this](const Message &msg) { slotUpdate(msg); });
 
-    slotUpdate(nullptr, std::set<Editor::Type>());
+    slotUpdate({});
 }
 
-void ViewerWidget::slotUpdate(void *sender,
-                              const std::set<Editor::Type> &target)
+void ViewerWidget::slotUpdate(const Message &msg)
 {
-    if (sender == this)
+    if (msg.sender() == this)
     {
         return;
     }

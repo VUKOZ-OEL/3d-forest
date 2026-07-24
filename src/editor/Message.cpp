@@ -17,25 +17,19 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ViewerWidget.hpp */
-
-#ifndef VIEWER_WIDGET_HPP
-#define VIEWER_WIDGET_HPP
+/** @file Message.cpp */
 
 // Include 3D Forest.
-#include <Editor.hpp>
-#include <Widget.hpp>
+#include <Message.hpp>
 
-/** Viewer Widget. */
-class ViewerWidget : public Widget
+// Include local.
+#define LOG_MODULE_NAME "Message"
+#include <Log.hpp>
+
+Message::Message()
 {
-public:
-    ViewerWidget(Application *app);
+}
 
-    void slotUpdate(const Message &msg);
-
-private:
-    Application *app_;
-};
-
-#endif /* VIEWER_WIDGET_HPP */
+Message::Message(void *sender, int type) : sender_(sender), type_(type)
+{
+}

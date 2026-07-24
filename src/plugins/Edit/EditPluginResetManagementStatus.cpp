@@ -49,7 +49,7 @@ void EditPluginResetManagementStatus::run(Application *app)
 
     editor->setSegments(segments);
     app->update(nullptr,
-                {Editor::TYPE_SEGMENT, Editor::TYPE_MANAGEMENT_STATUS});
+                Message::TYPE_SEGMENT | Message::TYPE_MANAGEMENT_STATUS);
 
     LOG_DEBUG(<< "Finished resetting management status values.");
 }
