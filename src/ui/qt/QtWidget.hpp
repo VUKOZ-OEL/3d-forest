@@ -17,50 +17,37 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file PluginManager.hpp */
+/** @file QtWidget.hpp */
 
-#ifndef PLUGIN_MANAGER_HPP
-#define PLUGIN_MANAGER_HPP
-
-// Include std.
-#include <string>
-#include <vector>
+#ifndef QT_WIDGET_HPP
+#define QT_WIDGET_HPP
 
 // Include 3D Forest.
-#include <PluginHandle.hpp>
-#include <ProjectFileInterface.hpp>
-#include <ViewerInterface.hpp>
+#include <Widget.hpp>
+class QtApplication;
 
-class Application;
+// Include Qt.
+#include <QWidget>
 
 // Include local.
-#include <ExportUiCommon.hpp>
+#include <ExportUiQt.hpp>
 #include <WarningsDisable.hpp>
 
-/** Plugin Manager. */
-class EXPORT_UI_COMMON PluginManager
+/** QtWidget. */
+class EXPORT_UI_QT QtWidget : public QWidget
 {
 public:
-    PluginManager();
-    virtual ~PluginManager();
+    explicit QtWidget(Widget *widget,
+                      QtApplication *app,
+                      QWidget *parent = nullptr);
+    virtual ~QtWidget();
 
-    void clear();
-    void load(Application *app);
-    void unload();
-
-    ViewerInterface *viewer() { return viewerPlugin_; }
+    Widget *commonWidget() const { return widget_; }
 
 private:
-    std::vector<PluginHandle> plugins_;
-
-    void load(Application *app, const std::string &fileName);
-
-    ProjectFileInterface *projectFilePlugin_;
-    // ImportFileInterface *importFilePlugin_;
-    ViewerInterface *viewerPlugin_;
-    // HelpPlugin *helpPlugin_;
+    Widget *widget_;
 };
 
 #include <WarningsEnable.hpp>
 
-#endif /* PLUGIN_MANAGER_HPP */
+#endif /* QT_WIDGET_HPP */

@@ -32,11 +32,58 @@
 
 #define ICON(name) (ThemeIcon(":/ViewerResources/", name))
 
-ViewerPlugin::ViewerPlugin() : app_(nullptr)
+ViewerPlugin::ViewerPlugin()
+   : app_(nullptr),
+     viewerWidget_(nullptr)
 {
 }
 
 void ViewerPlugin::initialize(Application *app)
 {
     app_ = app;
+    viewerWidget_ = new ViewerWidget(app_);
+}
+
+std::vector<Camera> ViewerPlugin::camera(size_t viewportId) const
+{
+    if (viewerWidget_)
+    {
+        return viewerWidget_->camera(viewportId);
+    }
+
+    return std::vector<Camera>();
+}
+
+std::vector<Camera> ViewerPlugin::camera() const
+{
+    if (viewerWidget_)
+    {
+        return viewerWidget_->camera();
+    }
+
+    return std::vector<Camera>();
+}
+
+void ViewerPlugin::updateScene()
+{
+    if (viewerWidget_)
+    {
+        return viewerWidget_->updateScene();
+    }
+}
+
+void ViewerPlugin::resetScene()
+{
+    if (viewerWidget_)
+    {
+        return viewerWidget_->resetScene();
+    }
+}
+
+void ViewerPlugin::resetSceneView()
+{
+    if (viewerWidget_)
+    {
+        return viewerWidget_->resetSceneView();
+    }
 }

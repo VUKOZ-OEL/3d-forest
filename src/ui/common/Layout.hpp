@@ -22,7 +22,11 @@
 #ifndef LAYOUT_HPP
 #define LAYOUT_HPP
 
+// Include std.
+#include <vector>
+
 // Include 3D Forest.
+#include <Signal.hpp>
 class Application;
 class Widget;
 class Splitter;
@@ -56,7 +60,15 @@ public:
                    int columnSpan,
                    int alignment = 0);
 
+    const std::vector<Widget *> &widgets() const
+    {
+        return widgets_;
+    }
+
+    Signal<Widget *> widgetAdded;
+
 private:
+    std::vector<Widget *> widgets_;
 };
 
 #include <WarningsEnable.hpp>

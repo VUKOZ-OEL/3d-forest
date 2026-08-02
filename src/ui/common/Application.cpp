@@ -84,16 +84,18 @@ void Application::load()
 
     emitUpdate(this, {});
 
-#if 0
-    if (viewerPlugin_)
+    if (pluginManager_.viewer())
     {
-        viewerPlugin_->resetScene(&editor_, true);
+        if (interactive_)
+        {
+            pluginManager_.viewer()->resetSceneView();
+        }
     }
     else
     {
         LOG_ERROR(<< "The viewer plugin is not loaded to perform the action.");
     }
-#endif
+
     LOG_DEBUG(<< "Finished creating the application.");
 }
 
@@ -201,10 +203,10 @@ void Application::slotRender()
     LOG_DEBUG_RENDER(<< "Start rendering.");
     double t1 = Time::realTime();
 
-    // if (viewerPlugin_)
-    // {
-    //     viewerPlugin_->updateScene(&editor_);
-    // }
+    if (interactive_ && pluginManager_.viewer())
+    {
+        pluginManager_.viewer()->updateScene();
+    }
 
     double t2 = Time::realTime();
     LOG_DEBUG_RENDER(<< "Finished rendering after <" << (t2 - t1)
@@ -215,20 +217,20 @@ void Application::slotRenderViewport(size_t viewportId)
 {
     LOG_DEBUG_RENDER(<< "Render viewport <" << viewportId << ">.");
 
-    // if (viewerPlugin_)
-    // {
-    //     threadRender_.render(viewerPlugin_->camera(viewportId));
-    // }
+    if (interactive_ && pluginManager_.viewer())
+    {
+        threadRender_.render(pluginManager_.viewer()->camera(viewportId));
+    }
 }
 
 void Application::slotRenderViewports()
 {
     LOG_DEBUG_RENDER(<< "Render viewports.");
 
-    // if (viewerPlugin_)
-    // {
-    //     threadRender_.render(viewerPlugin_->camera());
-    // }
+    if (interactive_ && pluginManager_.viewer())
+    {
+        threadRender_.render(pluginManager_.viewer()->camera());
+    }
 }
 
 void Application::post(std::function<void()> fn)
@@ -265,10 +267,10 @@ void Application::update(void *sender,
 
     if (resetCamera)
     {
-        // if (viewerPlugin_)
-        // {
-        //     viewerPlugin_->resetScene(&editor_, false);
-        // }
+        if (interactive_ && pluginManager_.viewer())
+        {
+            pluginManager_.viewer()->resetScene();
+        }
     }
 
     emitUpdate(sender, type);
@@ -282,11 +284,11 @@ void Application::updateNewProject()
 
     setWindowTitle(editor_.projectPath());
 
-    // if (viewerPlugin_)
-    // {
-    //     std::unique_lock<std::mutex> mutexlock(editor_.editorMutex_);
-    //     viewerPlugin_->resetScene(&editor_, true);
-    // }
+    if (interactive_ && pluginManager_.viewer())
+    {
+        std::unique_lock<std::mutex> mutexlock(editor_.editorMutex_);
+        pluginManager_.viewer()->resetSceneView();
+    }
 
     emitUpdate(this, {});
 
@@ -299,10 +301,10 @@ void Application::updateData()
 
     suspendThreads();
 
-    // if (viewerPlugin_)
-    // {
-    //     viewerPlugin_->resetScene(&editor_, false);
-    // }
+    if (interactive_ && pluginManager_.viewer())
+    {
+        pluginManager_.viewer()->resetScene();
+    }
 
     editor_.viewports().clearContent();
     editor_.applyFilters();
@@ -316,10 +318,10 @@ void Application::updateFilter(void *sender, bool final)
 
     suspendThreads();
 
-    // if (viewerPlugin_)
-    // {
-    //     viewerPlugin_->resetScene(&editor_, false);
-    // }
+    if (interactive_ && pluginManager_.viewer())
+    {
+        pluginManager_.viewer()->resetScene();
+    }
 
     editor_.viewports().setState(Page::STATE_SELECT);
 
@@ -550,6 +552,10 @@ void Application::setCentralWidget(Widget *widget)
 }
 
 void Application::addDockWidget(int area, DockWidget *widget)
+{
+}
+
+void Application::showWidget(Widget *widget)
 {
 }
 

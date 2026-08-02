@@ -46,3 +46,27 @@ void ViewerWidget::slotUpdate(const Message &msg)
         return;
     }
 }
+
+std::vector<Camera> ViewerWidget::camera(size_t viewportId) const
+{
+    std::vector<Camera> list;
+    return list;
+}
+
+std::vector<Camera> ViewerWidget::camera() const
+{
+    std::vector<Camera> list;
+    return list;
+}
+
+void ViewerWidget::updateScene()
+{
+}
+
+void ViewerWidget::resetScene()
+{
+}
+
+void ViewerWidget::resetSceneView()
+{
+}

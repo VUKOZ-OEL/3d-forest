@@ -17,35 +17,33 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ViewerInterface.hpp */
-
-#ifndef VIEWER_INTERFACE_HPP
-#define VIEWER_INTERFACE_HPP
-
-// Include std.
-#include <vector>
+/** @file QtWidget.cpp */
 
 // Include 3D Forest.
-#include <Camera.hpp>
+#include <QtApplication.hpp>
+#include <QtWidget.hpp>
+
+// Include Qt.
 
 // Include local.
-#include <ExportUiCommon.hpp>
-#include <WarningsDisable.hpp>
+#define LOG_MODULE_NAME "QtWidget"
+#include <Log.hpp>
 
-/** Viewer Interface. */
-class ViewerInterface
+QtWidget::QtWidget(Widget *widget,
+                      QtApplication *app,
+                      QWidget *parent)
+   : QWidget(parent),
+     widget_(widget)
 {
-public:
-    virtual ~ViewerInterface() = default;
+    if (widget_->layout())
+    {
+        QLayout *qtLayout =
+            app->createLayout(widget_->layout(), this);
 
-    virtual std::vector<Camera> camera(size_t viewportId) const = 0;
-    virtual std::vector<Camera> camera() const = 0;
+        QWidget::setLayout(qtLayout);
+    }
+}
 
-    virtual void updateScene() = 0;
-    virtual void resetScene() = 0;
-    virtual void resetSceneView() = 0;
-};
-
-#include <WarningsEnable.hpp>
-
-#endif /* VIEWER_INTERFACE_HPP */
+QtWidget::~QtWidget()
+{
+}

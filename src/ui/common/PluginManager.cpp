@@ -111,11 +111,18 @@ static PluginHandle pluginManagerLoad(const std::string &fileName)
 
 PluginManager::PluginManager()
 {
+    clear();
 }
 
 PluginManager::~PluginManager()
 {
     unload();
+}
+
+void PluginManager::clear()
+{
+    projectFilePlugin_ = nullptr;
+    viewerPlugin_ = nullptr;
 }
 
 void PluginManager::load(Application *app)
@@ -151,6 +158,8 @@ void PluginManager::unload()
     }
 
     plugins_.clear();
+
+    clear();
 }
 
 void PluginManager::load(Application *app, const std::string &fileName)
@@ -202,7 +211,7 @@ void PluginManager::load(Application *app, const std::string &fileName)
         LOG_DEBUG(<< "Set import file plugin.");
         importFilePlugin_ = importFileInterface;
     }
-
+#endif
     // Viewer.
     ViewerInterface *viewerInterface;
     viewerInterface = dynamic_cast<ViewerInterface *>(pluginInterface);
@@ -211,5 +220,4 @@ void PluginManager::load(Application *app, const std::string &fileName)
         LOG_DEBUG(<< "Set viewer plugin.");
         viewerPlugin_ = viewerInterface;
     }
-#endif
 }

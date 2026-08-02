@@ -28,32 +28,10 @@
 // Include 3D Forest.
 #include <Application.hpp>
 
-#ifdef interface
-    #error interface is defined
-#endif
-
-#ifdef signals
-    #error signals is defined
-#endif
-
-#ifdef slots
-    #error slots is defined
-#endif
-
-#ifdef emit
-    #error emit is defined
-#endif
-
-#ifdef const
-    #error const is defined
-#endif
-
-#ifdef tr
-    #undef tr
-#endif
-
 // Include Qt.
 #include <QApplication>
+#include <QMainWindow>
+#include <QWidget>
 
 // Include local.
 #include <ExportUiQt.hpp>
@@ -74,8 +52,16 @@ public:
 
     int exec();
 
+    void setCentralWidget(Widget *widget) override;
+    void addDockWidget(int area, DockWidget *widget) override;
+    void showWidget(Widget *widget) override;
+    void hideToolBar(const std::string &toolBarTitle) override;
+    QWidget *createWidget(Widget *widget, QWidget *parent = nullptr);
+    QLayout *createLayout(Layout *layout, QWidget *parent = nullptr);
+
 private:
     QApplication qapplication_;
+    QMainWindow mainWindow_;
 };
 
 #include <WarningsEnable.hpp>

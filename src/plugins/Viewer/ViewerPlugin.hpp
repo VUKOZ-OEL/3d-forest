@@ -47,6 +47,13 @@ public:
     void initialize(Application *app) override;
     void release() override { delete this; }
 
+    std::vector<Camera> camera(size_t viewportId) const override;
+    std::vector<Camera> camera() const override;
+
+    void updateScene() override;
+    void resetScene() override;
+    void resetSceneView() override;
+
 private:
     Application *app_;
     ViewerWidget *viewerWidget_;

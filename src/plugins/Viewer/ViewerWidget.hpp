@@ -25,6 +25,7 @@
 // Include 3D Forest.
 #include <Editor.hpp>
 #include <Widget.hpp>
+class Viewer;
 
 /** Viewer Widget. */
 class ViewerWidget : public Widget
@@ -32,10 +33,21 @@ class ViewerWidget : public Widget
 public:
     ViewerWidget(Application *app);
 
+    // Interface.
+    std::vector<Camera> camera(size_t viewportId) const;
+    std::vector<Camera> camera() const;
+
+    void updateScene();
+    void resetScene();
+    void resetSceneView();
+
+    // Viewer.
     void slotUpdate(const Message &msg);
 
 private:
     Application *app_;
+
+    Viewer *viewer_;
 };
 
 #endif /* VIEWER_WIDGET_HPP */

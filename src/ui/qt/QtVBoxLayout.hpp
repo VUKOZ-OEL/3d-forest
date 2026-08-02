@@ -17,50 +17,36 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file PluginManager.hpp */
+/** @file QtVBoxLayout.hpp */
 
-#ifndef PLUGIN_MANAGER_HPP
-#define PLUGIN_MANAGER_HPP
-
-// Include std.
-#include <string>
-#include <vector>
+#ifndef QT_V_BOX_LAYOUT_HPP
+#define QT_V_BOX_LAYOUT_HPP
 
 // Include 3D Forest.
-#include <PluginHandle.hpp>
-#include <ProjectFileInterface.hpp>
-#include <ViewerInterface.hpp>
+#include <VBoxLayout.hpp>
+class QtApplication;
 
-class Application;
+// Include Qt.
+#include <QVBoxLayout>
+class QWidget;
 
 // Include local.
-#include <ExportUiCommon.hpp>
+#include <ExportUiQt.hpp>
 #include <WarningsDisable.hpp>
 
-/** Plugin Manager. */
-class EXPORT_UI_COMMON PluginManager
+/** QtVBoxLayout. */
+class EXPORT_UI_QT QtVBoxLayout : public QVBoxLayout
 {
 public:
-    PluginManager();
-    virtual ~PluginManager();
-
-    void clear();
-    void load(Application *app);
-    void unload();
-
-    ViewerInterface *viewer() { return viewerPlugin_; }
+    explicit QtVBoxLayout(VBoxLayout *layout,
+                          QtApplication *app,
+                          QWidget *parent = nullptr);
+    virtual ~QtVBoxLayout();
 
 private:
-    std::vector<PluginHandle> plugins_;
-
-    void load(Application *app, const std::string &fileName);
-
-    ProjectFileInterface *projectFilePlugin_;
-    // ImportFileInterface *importFilePlugin_;
-    ViewerInterface *viewerPlugin_;
-    // HelpPlugin *helpPlugin_;
+    VBoxLayout *layout_;
 };
 
 #include <WarningsEnable.hpp>
 
-#endif /* PLUGIN_MANAGER_HPP */
+#endif /* QT_V_BOX_LAYOUT_HPP */

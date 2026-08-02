@@ -34,6 +34,7 @@ Widget::Widget()
 }
 
 Widget::Widget(Application *app)
+   : app_(app)
 {
 }
 

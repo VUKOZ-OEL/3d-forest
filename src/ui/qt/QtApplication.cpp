@@ -23,6 +23,9 @@
 
 // Include 3D Forest.
 #include <QtApplication.hpp>
+#include <QtSlider.hpp>
+#include <QtWidget.hpp>
+#include <QtVBoxLayout.hpp>
 
 // Include Qt.
 // #include <QSurfaceFormat>
@@ -64,5 +67,61 @@ void QtApplication::setApplicationVersion(const std::string &str)
 
 int QtApplication::exec()
 {
-    return 0;
+    mainWindow_.show();
+    return qapplication_.exec();
+}
+
+void QtApplication::setCentralWidget(Widget *widget)
+{
+    QWidget *qtWidget = createWidget(widget, &mainWindow_);
+    mainWindow_.setCentralWidget(qtWidget);
+}
+
+void QtApplication::addDockWidget(int area, DockWidget *widget)
+{
+#if 0
+    QWidget *qtWidget = createWidget(widget, &mainWindow_);
+
+    auto *qtDockWidget =
+        dynamic_cast<QDockWidget *>(qtWidget);
+
+    if (!qtDockWidget)
+    {
+        return;
+    }
+
+    mainWindow_.addDockWidget(
+        static_cast<Qt::DockWidgetArea>(area),
+        qtDockWidget);
+#endif
+}
+
+void QtApplication::showWidget(Widget *widget)
+{
+    QWidget *qtWidget = createWidget(widget);
+    qtWidget->show();
+}
+
+void QtApplication::hideToolBar(const std::string &toolBarTitle)
+{
+}
+
+QWidget *QtApplication::createWidget(Widget *widget, QWidget *parent)
+{
+    if (auto *slider = dynamic_cast<Slider *>(widget))
+    {
+        return new QtSlider(slider, parent);
+    }
+
+    return new QtWidget(widget, this, parent);
+}
+
+QLayout *QtApplication::createLayout(Layout *layout, QWidget *parent)
+{
+    if (auto *vbox = dynamic_cast<VBoxLayout *>(layout))
+    {
+        return new QtVBoxLayout(vbox, this, parent);
+    }
+
+    return nullptr;
 }

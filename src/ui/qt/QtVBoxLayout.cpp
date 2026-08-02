@@ -17,35 +17,38 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ViewerInterface.hpp */
-
-#ifndef VIEWER_INTERFACE_HPP
-#define VIEWER_INTERFACE_HPP
-
-// Include std.
-#include <vector>
+/** @file QtVBoxLayout.cpp */
 
 // Include 3D Forest.
-#include <Camera.hpp>
+#include <QtApplication.hpp>
+#include <QtVBoxLayout.hpp>
+
+// Include Qt.
+#include <QSignalBlocker>
 
 // Include local.
-#include <ExportUiCommon.hpp>
-#include <WarningsDisable.hpp>
+#define LOG_MODULE_NAME "QtVBoxLayout"
+#include <Log.hpp>
 
-/** Viewer Interface. */
-class ViewerInterface
+QtVBoxLayout::QtVBoxLayout(VBoxLayout *layout,
+                           QtApplication *app,
+                           QWidget *parent)
+   : QVBoxLayout(parent),
+     layout_(layout)
 {
-public:
-    virtual ~ViewerInterface() = default;
+    for (Widget *widget : layout_->widgets())
+    {
+        QWidget *qtWidget = app->createWidget(widget);
+        addWidget(qtWidget);
+    }
 
-    virtual std::vector<Camera> camera(size_t viewportId) const = 0;
-    virtual std::vector<Camera> camera() const = 0;
+    /*layout_->widgetAdded.connect(
+    [this, application](Widget *widget)
+    {
+        addWidget(application->createWidget(widget));
+    });*/
+}
 
-    virtual void updateScene() = 0;
-    virtual void resetScene() = 0;
-    virtual void resetSceneView() = 0;
-};
-
-#include <WarningsEnable.hpp>
-
-#endif /* VIEWER_INTERFACE_HPP */
+QtVBoxLayout::~QtVBoxLayout()
+{
+}

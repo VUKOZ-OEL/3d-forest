@@ -17,35 +17,16 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ViewerInterface.hpp */
-
-#ifndef VIEWER_INTERFACE_HPP
-#define VIEWER_INTERFACE_HPP
-
-// Include std.
-#include <vector>
+/** @file Translation.cpp */
 
 // Include 3D Forest.
-#include <Camera.hpp>
+#include <Translation.hpp>
 
 // Include local.
-#include <ExportUiCommon.hpp>
-#include <WarningsDisable.hpp>
+#define LOG_MODULE_NAME "Translation"
+#include <Log.hpp>
 
-/** Viewer Interface. */
-class ViewerInterface
+std::string tr(const char *text)
 {
-public:
-    virtual ~ViewerInterface() = default;
-
-    virtual std::vector<Camera> camera(size_t viewportId) const = 0;
-    virtual std::vector<Camera> camera() const = 0;
-
-    virtual void updateScene() = 0;
-    virtual void resetScene() = 0;
-    virtual void resetSceneView() = 0;
-};
-
-#include <WarningsEnable.hpp>
-
-#endif /* VIEWER_INTERFACE_HPP */
+    return text;
+}

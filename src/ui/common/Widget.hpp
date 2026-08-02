@@ -63,6 +63,7 @@ public:
     void setDisabled(bool b);
 
     void setLayout(Layout *layout);
+    Layout *layout() const { return layout_; }
 
     void setSizePolicy(SizePolicy::Policy hor, SizePolicy::Policy ver);
     void setStyleSheet(const std::string &str);
@@ -87,6 +88,8 @@ public:
     virtual void closeEvent(CloseEvent *event);
 
 private:
+    Application *app_{nullptr};
+    Layout *layout_{nullptr};
     std::string text_;
     std::string toolTip_;
     bool signalsBlocked_{false};

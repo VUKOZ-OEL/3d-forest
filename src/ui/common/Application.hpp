@@ -37,12 +37,11 @@
 #include <ThemeIcon.hpp>
 #include <ThreadCallbackInterface.hpp>
 #include <ToolButton.hpp>
+#include <Translation.hpp>
 
 // Include local.
 #include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
-
-#define tr(x) (x)
 
 #define MAIN_WINDOW_MENU_FILE_PRIORITY 10
 #define MAIN_WINDOW_MENU_EDIT_PRIORITY 20
@@ -94,9 +93,10 @@ public:
                           const ThemeIcon &themeIcon,
                           std::function<void()> callback = {});
 
-    void setCentralWidget(Widget *widget);
-    void addDockWidget(int area, DockWidget *widget);
-    void hideToolBar(const std::string &toolBarTitle);
+    virtual void setCentralWidget(Widget *widget);
+    virtual void addDockWidget(int area, DockWidget *widget);
+    virtual void showWidget(Widget *widget);
+    virtual void hideToolBar(const std::string &toolBarTitle);
 
     void suspendThreads();
     void resumeThreads();
@@ -154,6 +154,7 @@ private:
 
     RenderThread threadRender_;
     std::atomic_bool renderPending_{false};
+    bool interactive_{false};
 
     PluginManager pluginManager_;
 
