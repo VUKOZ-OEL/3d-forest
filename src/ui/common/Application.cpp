@@ -547,18 +547,18 @@ void Application::createMenu()
 #endif
 }
 
-void Application::setCentralWidget(Widget *widget)
+void Application::addPanel(const std::string &title, Widget *widget)
 {
 }
 
-void Application::addDockWidget(int area, DockWidget *widget)
+void Application::removePanel(Widget *widget)
 {
 }
 
-void Application::showWidget(Widget *widget)
+void Application::setViewer(Widget *widget)
 {
 }
 
-void Application::hideToolBar(const std::string &toolBarTitle)
+void Application::removeViewer(Widget *widget)
 {
 }

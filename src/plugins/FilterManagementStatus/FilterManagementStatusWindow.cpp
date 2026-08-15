@@ -44,7 +44,7 @@ FilterManagementStatusWindow::FilterManagementStatusWindow(Application *app)
     setWindowTitle(tr("Filter Management Status"));
     setWindowIcon(ICON("management-status-filter"));
     setAllowedAreas(Ui::LeftDockWidgetArea | Ui::RightDockWidgetArea);
-    app->addDockWidget(Ui::RightDockWidgetArea, this);
+    // app->addDockWidget(Ui::RightDockWidgetArea, this);
 
     LOG_DEBUG(<< "Finished creating management status window.");
 }

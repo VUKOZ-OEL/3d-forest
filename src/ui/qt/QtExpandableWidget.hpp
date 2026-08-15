@@ -17,38 +17,41 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file QtVBoxLayout.cpp */
+/** @file QtExpandableWidget.hpp */
+
+#ifndef QT_EXPANDABLE_WIDGET_HPP
+#define QT_EXPANDABLE_WIDGET_HPP
+
+// Include std.
+#include <string>
 
 // Include 3D Forest.
-#include <QtApplication.hpp>
-#include <QtVBoxLayout.hpp>
 
 // Include Qt.
-#include <QSignalBlocker>
+#include <QWidget>
+
+class QToolButton;
+class QVBoxLayout;
 
 // Include local.
-#define LOG_MODULE_NAME "QtVBoxLayout"
-#include <Log.hpp>
+#include <ExportUiQt.hpp>
+#include <WarningsDisable.hpp>
 
-QtVBoxLayout::QtVBoxLayout(VBoxLayout *layout,
-                           QtApplication *app,
-                           QWidget *parent)
-    : QVBoxLayout(parent),
-      layout_(layout)
+/** QtExpandableWidget. */
+class EXPORT_UI_QT QtExpandableWidget : public QWidget
 {
-    for (Widget *widget : layout_->widgets())
-    {
-        QWidget *qtWidget = app->createWidget(widget);
-        addWidget(qtWidget);
-    }
+public:
+    QtExpandableWidget(const std::string &title,
+                       QWidget *content,
+                       QWidget *parent = nullptr);
 
-    /*layout_->widgetAdded.connect(
-    [this, application](Widget *widget)
-    {
-        addWidget(application->createWidget(widget));
-    });*/
-}
+    QWidget *content() const { return content_; }
 
-QtVBoxLayout::~QtVBoxLayout()
-{
-}
+private:
+    QToolButton *header_;
+    QWidget *content_;
+};
+
+#include <WarningsEnable.hpp>
+
+#endif /* QT_EXPANDABLE_WIDGET_HPP */

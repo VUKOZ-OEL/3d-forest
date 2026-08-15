@@ -157,6 +157,15 @@ public:
         BottomDockWidgetArea = (1 << 1),
     };
 
+    enum class PanelArea
+    {
+        Left,
+        Right,
+        Top,
+        Bottom,
+        Main
+    };
+
     enum BrushStyle
     {
         NoBrush,

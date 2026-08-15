@@ -22,6 +22,8 @@
 // Include 3D Forest.
 #include <Application.hpp>
 #include <ExamplePlugin.hpp>
+#include <ExampleWidget.hpp>
+#include <Ui.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ExamplePlugin"
@@ -30,6 +32,20 @@
 
 void ExamplePlugin::initialize(Application *app)
 {
-    LOG_DEBUG(<< "Initialize.");
+    LOG_DEBUG(<< "Start initializing example plugin.");
     app_ = app;
+    widget_ = new ExampleWidget(app_);
+    app_->addPanel("Example", widget_);
+    LOG_DEBUG(<< "Finished initializing example plugin.");
+}
+
+void ExamplePlugin::release()
+{
+    if (widget_)
+    {
+        app_->removePanel(widget_);
+        delete widget_;
+    }
+
+    delete this;
 }

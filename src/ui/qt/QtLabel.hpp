@@ -17,38 +17,32 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file QtVBoxLayout.cpp */
+/** @file QtLabel.hpp */
+
+#ifndef QT_LABEL_HPP
+#define QT_LABEL_HPP
 
 // Include 3D Forest.
-#include <QtApplication.hpp>
-#include <QtVBoxLayout.hpp>
+#include <Label.hpp>
 
 // Include Qt.
-#include <QSignalBlocker>
+#include <QLabel>
 
 // Include local.
-#define LOG_MODULE_NAME "QtVBoxLayout"
-#include <Log.hpp>
+#include <ExportUiQt.hpp>
+#include <WarningsDisable.hpp>
 
-QtVBoxLayout::QtVBoxLayout(VBoxLayout *layout,
-                           QtApplication *app,
-                           QWidget *parent)
-    : QVBoxLayout(parent),
-      layout_(layout)
+/** QtLabel. */
+class EXPORT_UI_QT QtLabel : public QLabel
 {
-    for (Widget *widget : layout_->widgets())
-    {
-        QWidget *qtWidget = app->createWidget(widget);
-        addWidget(qtWidget);
-    }
+public:
+    explicit QtLabel(Label *label, QWidget *parent = nullptr);
+    virtual ~QtLabel();
 
-    /*layout_->widgetAdded.connect(
-    [this, application](Widget *widget)
-    {
-        addWidget(application->createWidget(widget));
-    });*/
-}
+private:
+    Label *label_;
+};
 
-QtVBoxLayout::~QtVBoxLayout()
-{
-}
+#include <WarningsEnable.hpp>
+
+#endif /* QT_LABEL_HPP */

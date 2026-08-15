@@ -37,6 +37,10 @@ public:
     Viewer();
     virtual ~Viewer();
 
+    void requestUpdate();
+
+    Signal<> updateRequested;
+
 private:
 };
 

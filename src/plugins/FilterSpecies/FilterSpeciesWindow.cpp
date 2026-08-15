@@ -43,7 +43,7 @@ FilterSpeciesWindow::FilterSpeciesWindow(Application *app) : DockWidget(app)
     setWindowTitle(tr("Filter Species"));
     setWindowIcon(ICON("species-filter"));
     setAllowedAreas(Ui::LeftDockWidgetArea | Ui::RightDockWidgetArea);
-    app->addDockWidget(Ui::RightDockWidgetArea, this);
+    // app->addDockWidget(Ui::RightDockWidgetArea, this);
 
     LOG_DEBUG(<< "Finished creating species window.");
 }

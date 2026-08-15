@@ -34,3 +34,8 @@ Viewer::Viewer()
 Viewer::~Viewer()
 {
 }
+
+void Viewer::requestUpdate()
+{
+    updateRequested();
+}

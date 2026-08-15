@@ -45,7 +45,7 @@ FilterDescriptorWindow::FilterDescriptorWindow(Application *app)
     setWindowTitle(tr("Filter Descriptor"));
     setWindowIcon(ICON("descriptor-filter"));
     setAllowedAreas(Ui::LeftDockWidgetArea | Ui::RightDockWidgetArea);
-    app->addDockWidget(Ui::RightDockWidgetArea, this);
+    // app->addDockWidget(Ui::RightDockWidgetArea, this);
 
     LOG_DEBUG(<< "Finished creating descriptor filter window.");
 }

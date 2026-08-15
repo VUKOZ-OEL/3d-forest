@@ -32,23 +32,30 @@
 
 #define ICON(name) (ThemeIcon(":/ViewerResources/", name))
 
-ViewerPlugin::ViewerPlugin()
-   : app_(nullptr),
-     viewerWidget_(nullptr)
-{
-}
-
 void ViewerPlugin::initialize(Application *app)
 {
+    LOG_DEBUG(<< "Start initializing viewer plugin.");
     app_ = app;
-    viewerWidget_ = new ViewerWidget(app_);
+    widget_ = new ViewerWidget(app_);
+    app_->setViewer(widget_);
+    LOG_DEBUG(<< "Finished initializing viewer plugin.");
+}
+
+void ViewerPlugin::release()
+{
+    if (widget_)
+    {
+        app_->removeViewer(widget_);
+    }
+
+    delete this;
 }
 
 std::vector<Camera> ViewerPlugin::camera(size_t viewportId) const
 {
-    if (viewerWidget_)
+    if (widget_)
     {
-        return viewerWidget_->camera(viewportId);
+        return widget_->camera(viewportId);
     }
 
     return std::vector<Camera>();
@@ -56,9 +63,9 @@ std::vector<Camera> ViewerPlugin::camera(size_t viewportId) const
 
 std::vector<Camera> ViewerPlugin::camera() const
 {
-    if (viewerWidget_)
+    if (widget_)
     {
-        return viewerWidget_->camera();
+        return widget_->camera();
     }
 
     return std::vector<Camera>();
@@ -66,24 +73,24 @@ std::vector<Camera> ViewerPlugin::camera() const
 
 void ViewerPlugin::updateScene()
 {
-    if (viewerWidget_)
+    if (widget_)
     {
-        return viewerWidget_->updateScene();
+        return widget_->updateScene();
     }
 }
 
 void ViewerPlugin::resetScene()
 {
-    if (viewerWidget_)
+    if (widget_)
     {
-        return viewerWidget_->resetScene();
+        return widget_->resetScene();
     }
 }
 
 void ViewerPlugin::resetSceneView()
 {
-    if (viewerWidget_)
+    if (widget_)
     {
-        return viewerWidget_->resetSceneView();
+        return widget_->resetSceneView();
     }
 }

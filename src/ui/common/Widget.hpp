@@ -23,6 +23,7 @@
 #define WIDGET_HPP
 
 // Include std.
+#include <memory>
 #include <set>
 #include <string>
 
@@ -50,8 +51,10 @@ class EXPORT_UI_COMMON Widget
 {
 public:
     Widget();
-    Widget(Application *app);
     virtual ~Widget();
+
+    Widget(const Widget &) = delete;
+    Widget &operator=(const Widget &) = delete;
 
     void setText(const std::string &str);
     std::string text() const { return text_; }
@@ -87,8 +90,9 @@ public:
     virtual void showEvent(ShowEvent *event);
     virtual void closeEvent(CloseEvent *event);
 
+    Signal<const std::string &> textChanged;
+
 private:
-    Application *app_{nullptr};
     Layout *layout_{nullptr};
     std::string text_;
     std::string toolTip_;

@@ -36,25 +36,27 @@ Layout::Layout()
 
 Layout::~Layout()
 {
+    clear();
 }
 
 void Layout::clear()
 {
-#if 0
-    while (QLayoutItem *item = mainLayout_->takeAt(0))
+    for (Widget *widget : widgets_)
     {
-        if (Widget *w = item->widget())
-        {
-            w->deleteLater();
-        }
-
-        delete item;
+        delete widget;
     }
-#endif
+
+    widgets_.clear();
 }
 
 void Layout::addWidget(Widget *widget, int stretch)
 {
+    if (!widget)
+    {
+        return;
+    }
+
+    widgets_.push_back(widget);
 }
 
 void Layout::addWidget(Splitter *widget, int stretch)

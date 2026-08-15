@@ -44,7 +44,7 @@ FilterIntensityWindow::FilterIntensityWindow(Application *app) : DockWidget(app)
     setWindowTitle(tr("Filter Intensity"));
     setWindowIcon(ICON("intensity-filter"));
     setAllowedAreas(Ui::LeftDockWidgetArea | Ui::RightDockWidgetArea);
-    app->addDockWidget(Ui::RightDockWidgetArea, this);
+    // app->addDockWidget(Ui::RightDockWidgetArea, this);
 
     LOG_DEBUG(<< "Finished creating intensity filter window.");
 }

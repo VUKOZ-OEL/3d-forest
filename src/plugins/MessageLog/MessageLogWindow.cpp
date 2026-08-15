@@ -44,7 +44,7 @@ MessageLogWindow::MessageLogWindow(Application *app)
     setWindowTitle(tr("Message Log"));
     setAllowedAreas(Ui::LeftDockWidgetArea | Ui::RightDockWidgetArea |
                     Ui::TopDockWidgetArea | Ui::BottomDockWidgetArea);
-    app->addDockWidget(Ui::BottomDockWidgetArea, this);
+    // app->addDockWidget(Ui::BottomDockWidgetArea, this);
 }
 
 MessageLogWindow::~MessageLogWindow()

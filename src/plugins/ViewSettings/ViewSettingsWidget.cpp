@@ -41,9 +41,7 @@
 
 #define ICON(name) (ThemeIcon(":/ViewSettingsResources/", name))
 
-ViewSettingsWidget::ViewSettingsWidget(Application *app)
-    : Widget(app),
-      app_(app)
+ViewSettingsWidget::ViewSettingsWidget(Application *app) : app_(app)
 {
     LOG_DEBUG(<< "Start creating settings view widget.");
 

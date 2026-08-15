@@ -17,38 +17,27 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file QtVBoxLayout.cpp */
+/** @file QtLabel.cpp */
 
 // Include 3D Forest.
-#include <QtApplication.hpp>
-#include <QtVBoxLayout.hpp>
+#include <QtLabel.hpp>
 
 // Include Qt.
 #include <QSignalBlocker>
 
 // Include local.
-#define LOG_MODULE_NAME "QtVBoxLayout"
+#define LOG_MODULE_NAME "QtLabel"
 #include <Log.hpp>
 
-QtVBoxLayout::QtVBoxLayout(VBoxLayout *layout,
-                           QtApplication *app,
-                           QWidget *parent)
-    : QVBoxLayout(parent),
-      layout_(layout)
+QtLabel::QtLabel(Label *label, QWidget *parent)
+    : QLabel(QString::fromStdString(label->text()), parent),
+      label_(label)
 {
-    for (Widget *widget : layout_->widgets())
-    {
-        QWidget *qtWidget = app->createWidget(widget);
-        addWidget(qtWidget);
-    }
-
-    /*layout_->widgetAdded.connect(
-    [this, application](Widget *widget)
-    {
-        addWidget(application->createWidget(widget));
-    });*/
+    label_->textChanged.connect(
+        [this](const std::string &text)
+        { QLabel::setText(QString::fromStdString(text)); });
 }
 
-QtVBoxLayout::~QtVBoxLayout()
+QtLabel::~QtLabel()
 {
 }

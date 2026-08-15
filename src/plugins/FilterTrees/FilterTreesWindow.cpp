@@ -41,7 +41,7 @@ FilterTreesWindow::FilterTreesWindow(Application *app) : DockWidget(app)
     setWindowTitle(tr("Filter Trees"));
     setWindowIcon(ICON("tree"));
     setAllowedAreas(Ui::LeftDockWidgetArea | Ui::RightDockWidgetArea);
-    app->addDockWidget(Ui::RightDockWidgetArea, this);
+    // app->addDockWidget(Ui::RightDockWidgetArea, this);
 }
 
 void FilterTreesWindow::showEvent(ShowEvent *event)

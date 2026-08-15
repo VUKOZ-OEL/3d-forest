@@ -17,38 +17,30 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file QtVBoxLayout.cpp */
+/** @file ExampleWidget.hpp */
+
+#ifndef EXAMPLE_WIDGET_HPP
+#define EXAMPLE_WIDGET_HPP
+
+// Include std.
 
 // Include 3D Forest.
-#include <QtApplication.hpp>
-#include <QtVBoxLayout.hpp>
+#include <Widget.hpp>
+class Application;
+class Slider;
 
-// Include Qt.
-#include <QSignalBlocker>
-
-// Include local.
-#define LOG_MODULE_NAME "QtVBoxLayout"
-#include <Log.hpp>
-
-QtVBoxLayout::QtVBoxLayout(VBoxLayout *layout,
-                           QtApplication *app,
-                           QWidget *parent)
-    : QVBoxLayout(parent),
-      layout_(layout)
+/** Example Widget. */
+class ExampleWidget : public Widget
 {
-    for (Widget *widget : layout_->widgets())
-    {
-        QWidget *qtWidget = app->createWidget(widget);
-        addWidget(qtWidget);
-    }
+public:
+    ExampleWidget(Application *app);
 
-    /*layout_->widgetAdded.connect(
-    [this, application](Widget *widget)
-    {
-        addWidget(application->createWidget(widget));
-    });*/
-}
+    void slotSetPointSize(int v);
 
-QtVBoxLayout::~QtVBoxLayout()
-{
-}
+private:
+    Application *app_;
+
+    Slider *pointSizeSlider_;
+};
+
+#endif /* EXAMPLE_WIDGET_HPP */

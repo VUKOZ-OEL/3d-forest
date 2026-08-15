@@ -24,6 +24,7 @@
 
 // Include 3D Forest.
 #include <Plugin.hpp>
+class ExampleWidget;
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestExamplePlugin)
@@ -41,10 +42,11 @@ class ExamplePlugin : public Plugin
 public:
     const char *name() const override { return "ExamplePlugin"; }
     void initialize(Application *app) override;
-    void release() override { delete this; }
+    void release() override;
 
 private:
-    Application *app_;
+    Application *app_{nullptr};
+    ExampleWidget *widget_{nullptr};
 };
 
 extern "C" EXPORT_EXAMPLE_PLUGIN Plugin *createPlugin()

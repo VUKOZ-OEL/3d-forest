@@ -44,7 +44,7 @@ FilterAreaWindow::FilterAreaWindow(Application *app) : DockWidget(app)
     setWindowTitle(tr("Filter Area"));
     setWindowIcon(ICON("clip-filter"));
     setAllowedAreas(Ui::LeftDockWidgetArea | Ui::RightDockWidgetArea);
-    app->addDockWidget(Ui::RightDockWidgetArea, this);
+    // app->addDockWidget(Ui::RightDockWidgetArea, this);
 
     LOG_DEBUG(<< "Finished creating clip filter window.");
 }

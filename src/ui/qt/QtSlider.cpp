@@ -30,18 +30,15 @@
 #include <Log.hpp>
 
 QtSlider::QtSlider(Slider *slider, QWidget *parent)
-   : QSlider(Qt::Horizontal, parent),
-     slider_(slider)
+    : QSlider(Qt::Horizontal, parent),
+      slider_(slider)
 {
     setValue(slider_->value());
 
     connect(this,
             &QSlider::valueChanged,
             this,
-            [this](int value)
-            {
-                slider_->setValue(value);
-            });
+            [this](int value) { slider_->setValue(value); });
 
     slider_->valueChanged.connect(
         [this](int value)

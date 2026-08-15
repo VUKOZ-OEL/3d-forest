@@ -80,7 +80,7 @@ void ImportFilePlugin::initialize(Application *app)
         MAIN_WINDOW_MENU_FILE_PRIORITY,
         50);
 
-    app_->hideToolBar("File Import/Export");
+    // app_->hideToolBar("File Import/Export");
 }
 
 void ImportFilePlugin::slotImportFile()

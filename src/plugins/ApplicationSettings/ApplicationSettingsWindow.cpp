@@ -43,5 +43,5 @@ ApplicationSettingsWindow::ApplicationSettingsWindow(Application *app)
     setWindowTitle(tr("Application Settings"));
     setWindowIcon(ICON("settings"));
     setAllowedAreas(Ui::LeftDockWidgetArea | Ui::RightDockWidgetArea);
-    app->addDockWidget(Ui::RightDockWidgetArea, this);
+    // app->addDockWidget(Ui::RightDockWidgetArea, this);
 }

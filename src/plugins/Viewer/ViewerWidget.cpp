@@ -22,6 +22,8 @@
 // Include 3D Forest.
 #include <Application.hpp>
 #include <ThemeIcon.hpp>
+#include <VBoxLayout.hpp>
+#include <Viewer.hpp>
 #include <ViewerWidget.hpp>
 
 // Include local.
@@ -29,10 +31,18 @@
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/UnitsSettingsResources/", name))
+#define ICON(name) (ThemeIcon(":/ViewerResources/", name))
 
-ViewerWidget::ViewerWidget(Application *app) : Widget(app), app_(app)
+ViewerWidget::ViewerWidget(Application *app) : app_(app)
 {
+    viewer_ = new Viewer;
+
+    // Layout.
+    VBoxLayout *mainLayout = new VBoxLayout;
+    mainLayout->addWidget(viewer_);
+
+    setLayout(mainLayout);
+
     // Data.
     app_->signalUpdate.connect([this](const Message &msg) { slotUpdate(msg); });
 

@@ -46,7 +46,6 @@ public:
 
 private:
     Application *app_;
-
     Viewer *viewer_;
 };
 

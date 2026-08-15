@@ -17,38 +17,37 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file QtVBoxLayout.cpp */
+/** @file QtViewer.hpp */
+
+#ifndef QT_VIEWER_HPP
+#define QT_VIEWER_HPP
 
 // Include 3D Forest.
-#include <QtApplication.hpp>
-#include <QtVBoxLayout.hpp>
+#include <Viewer.hpp>
 
 // Include Qt.
-#include <QSignalBlocker>
+#include <QOpenGLWidget>
 
 // Include local.
-#define LOG_MODULE_NAME "QtVBoxLayout"
-#include <Log.hpp>
+#include <ExportUiQt.hpp>
+#include <WarningsDisable.hpp>
 
-QtVBoxLayout::QtVBoxLayout(VBoxLayout *layout,
-                           QtApplication *app,
-                           QWidget *parent)
-    : QVBoxLayout(parent),
-      layout_(layout)
+/** QtViewer. */
+class EXPORT_UI_QT QtViewer : public QOpenGLWidget
 {
-    for (Widget *widget : layout_->widgets())
-    {
-        QWidget *qtWidget = app->createWidget(widget);
-        addWidget(qtWidget);
-    }
+public:
+    explicit QtViewer(Viewer *viewer, QWidget *parent = nullptr);
+    virtual ~QtViewer();
 
-    /*layout_->widgetAdded.connect(
-    [this, application](Widget *widget)
-    {
-        addWidget(application->createWidget(widget));
-    });*/
-}
+protected:
+    void initializeGL() override;
+    void resizeGL(int width, int height) override;
+    void paintGL() override;
 
-QtVBoxLayout::~QtVBoxLayout()
-{
-}
+private:
+    Viewer *viewer_;
+};
+
+#include <WarningsEnable.hpp>
+
+#endif /* QT_VIEWER_HPP */

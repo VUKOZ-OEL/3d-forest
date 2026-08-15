@@ -53,7 +53,7 @@ void MessageLogPlugin::initialize(Application *app)
         MAIN_WINDOW_MENU_FILE_PRIORITY,
         90);
 
-    app_->hideToolBar("Windows");
+    // app_->hideToolBar("Windows");
 }
 
 void MessageLogPlugin::slotPlugin()

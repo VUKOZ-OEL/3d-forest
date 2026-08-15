@@ -93,10 +93,10 @@ public:
                           const ThemeIcon &themeIcon,
                           std::function<void()> callback = {});
 
-    virtual void setCentralWidget(Widget *widget);
-    virtual void addDockWidget(int area, DockWidget *widget);
-    virtual void showWidget(Widget *widget);
-    virtual void hideToolBar(const std::string &toolBarTitle);
+    virtual void addPanel(const std::string &title, Widget *widget);
+    virtual void removePanel(Widget *widget);
+    virtual void setViewer(Widget *widget);
+    virtual void removeViewer(Widget *widget);
 
     void suspendThreads();
     void resumeThreads();

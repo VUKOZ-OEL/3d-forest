@@ -42,5 +42,5 @@ UnitsSettingsWindow::UnitsSettingsWindow(Application *app) : DockWidget(app)
     setWindowTitle(tr("Units Settings"));
     setWindowIcon(ICON("units"));
     setAllowedAreas(Ui::LeftDockWidgetArea | Ui::RightDockWidgetArea);
-    app->addDockWidget(Ui::RightDockWidgetArea, this);
+    // app->addDockWidget(Ui::RightDockWidgetArea, this);
 }

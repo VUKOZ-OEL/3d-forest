@@ -42,6 +42,9 @@ public:
     Layout();
     virtual ~Layout();
 
+    Layout(const Layout &) = delete;
+    Layout &operator=(const Layout &) = delete;
+
     void clear();
 
     void addWidget(Widget *widget, int stretch = 0);
@@ -60,10 +63,7 @@ public:
                    int columnSpan,
                    int alignment = 0);
 
-    const std::vector<Widget *> &widgets() const
-    {
-        return widgets_;
-    }
+    const std::vector<Widget *> &widgets() const { return widgets_; }
 
     Signal<Widget *> widgetAdded;
 

@@ -29,17 +29,13 @@
 #define LOG_MODULE_NAME "QtWidget"
 #include <Log.hpp>
 
-QtWidget::QtWidget(Widget *widget,
-                      QtApplication *app,
-                      QWidget *parent)
-   : QWidget(parent),
-     widget_(widget)
+QtWidget::QtWidget(Widget *widget, QtApplication *app, QWidget *parent)
+    : QWidget(parent),
+      widget_(widget)
 {
     if (widget_->layout())
     {
-        QLayout *qtLayout =
-            app->createLayout(widget_->layout(), this);
-
+        QLayout *qtLayout = app->createLayout(widget_->layout(), this);
         QWidget::setLayout(qtLayout);
     }
 }

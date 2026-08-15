@@ -17,38 +17,39 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file QtVBoxLayout.cpp */
+/** @file QtViewer.cpp */
 
 // Include 3D Forest.
-#include <QtApplication.hpp>
-#include <QtVBoxLayout.hpp>
+#include <QtViewer.hpp>
 
 // Include Qt.
-#include <QSignalBlocker>
 
 // Include local.
-#define LOG_MODULE_NAME "QtVBoxLayout"
+#define LOG_MODULE_NAME "QtViewer"
 #include <Log.hpp>
 
-QtVBoxLayout::QtVBoxLayout(VBoxLayout *layout,
-                           QtApplication *app,
-                           QWidget *parent)
-    : QVBoxLayout(parent),
-      layout_(layout)
+QtViewer::QtViewer(Viewer *viewer, QWidget *parent)
+    : QOpenGLWidget(parent),
+      viewer_(viewer)
 {
-    for (Widget *widget : layout_->widgets())
-    {
-        QWidget *qtWidget = app->createWidget(widget);
-        addWidget(qtWidget);
-    }
-
-    /*layout_->widgetAdded.connect(
-    [this, application](Widget *widget)
-    {
-        addWidget(application->createWidget(widget));
-    });*/
+    viewer_->updateRequested.connect([this]() { update(); });
 }
 
-QtVBoxLayout::~QtVBoxLayout()
+QtViewer::~QtViewer()
 {
+}
+
+void QtViewer::initializeGL()
+{
+    // Initialize OpenGL resources.
+}
+
+void QtViewer::resizeGL(int width, int height)
+{
+    // Update viewport/projection.
+}
+
+void QtViewer::paintGL()
+{
+    // Read scene/camera information from viewer_ and render it.
 }

@@ -41,7 +41,7 @@ FilterFilesWindow::FilterFilesWindow(Application *app) : DockWidget(app)
     setWindowTitle(tr("Filter Files"));
     setWindowIcon(ICON("files"));
     setAllowedAreas(Ui::LeftDockWidgetArea | Ui::RightDockWidgetArea);
-    app->addDockWidget(Ui::RightDockWidgetArea, this);
+    // app->addDockWidget(Ui::RightDockWidgetArea, this);
 }
 
 void FilterFilesWindow::showEvent(ShowEvent *event)

@@ -23,6 +23,7 @@
 
 // Include 3D Forest.
 #include <Application.hpp>
+#include <Layout.hpp>
 #include <Widget.hpp>
 
 // Include local.
@@ -33,18 +34,20 @@ Widget::Widget()
 {
 }
 
-Widget::Widget(Application *app)
-   : app_(app)
-{
-}
-
 Widget::~Widget()
 {
+    delete layout_;
 }
 
 void Widget::setText(const std::string &str)
 {
+    if (text_ == str)
+    {
+        return;
+    }
+
     text_ = str;
+    textChanged(text_);
 }
 
 void Widget::setToolTip(const std::string &str)
@@ -70,6 +73,13 @@ void Widget::setDisabled(bool b)
 
 void Widget::setLayout(Layout *layout)
 {
+    if (layout_ == layout)
+    {
+        return;
+    }
+
+    delete layout_;
+    layout_ = layout;
 }
 
 void Widget::setSizePolicy(SizePolicy::Policy hor, SizePolicy::Policy ver)

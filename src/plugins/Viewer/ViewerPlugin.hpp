@@ -41,11 +41,9 @@ class ViewerWidget;
 class ViewerPlugin : public Plugin, public ViewerInterface
 {
 public:
-    ViewerPlugin();
-
     const char *name() const override { return "ViewerPlugin"; }
     void initialize(Application *app) override;
-    void release() override { delete this; }
+    void release() override;
 
     std::vector<Camera> camera(size_t viewportId) const override;
     std::vector<Camera> camera() const override;
@@ -55,8 +53,8 @@ public:
     void resetSceneView() override;
 
 private:
-    Application *app_;
-    ViewerWidget *viewerWidget_;
+    Application *app_{nullptr};
+    ViewerWidget *widget_{nullptr};
 };
 
 extern "C" EXPORT_VIEWER_PLUGIN Plugin *createPlugin()

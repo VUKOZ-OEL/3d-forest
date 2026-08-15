@@ -44,7 +44,7 @@ FilterClassificationWindow::FilterClassificationWindow(Application *app)
     setWindowTitle(tr("Filter Classification"));
     setWindowIcon(ICON("classification-filter"));
     setAllowedAreas(Ui::LeftDockWidgetArea | Ui::RightDockWidgetArea);
-    app->addDockWidget(Ui::RightDockWidgetArea, this);
+    // app->addDockWidget(Ui::RightDockWidgetArea, this);
 
     LOG_DEBUG(<< "Finished creating classifications window.");
 }

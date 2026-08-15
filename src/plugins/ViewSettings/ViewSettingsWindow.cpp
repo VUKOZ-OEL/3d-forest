@@ -42,5 +42,5 @@ ViewSettingsWindow::ViewSettingsWindow(Application *app) : DockWidget(app)
     setWindowTitle(tr("View Settings"));
     setWindowIcon(ICON("brush"));
     setAllowedAreas(Ui::LeftDockWidgetArea | Ui::RightDockWidgetArea);
-    app->addDockWidget(Ui::RightDockWidgetArea, this);
+    // app->addDockWidget(Ui::RightDockWidgetArea, this);
 }

@@ -42,5 +42,5 @@ TreeSettingsWindow::TreeSettingsWindow(Application *app) : DockWidget(app)
     setWindowTitle(tr("Tree Settings"));
     setWindowIcon(ICON("tree-settings"));
     setAllowedAreas(Ui::LeftDockWidgetArea | Ui::RightDockWidgetArea);
-    app->addDockWidget(Ui::RightDockWidgetArea, this);
+    // app->addDockWidget(Ui::RightDockWidgetArea, this);
 }

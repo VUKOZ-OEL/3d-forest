@@ -96,7 +96,7 @@ void ProjectFilePlugin::initialize(Application *app)
         MAIN_WINDOW_MENU_FILE_PRIORITY,
         45);
 
-    app_->hideToolBar("File Project");
+    // app_->hideToolBar("File Project");
 }
 
 void ProjectFilePlugin::slotNewProject()
