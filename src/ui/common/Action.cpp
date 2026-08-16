@@ -32,10 +32,11 @@ Action::Action()
 {
 }
 
-Action::Action(const std::string &text)
+Action::Action(const std::string &text) : text_(text)
 {
 }
 
-Action::~Action()
+void Action::trigger()
 {
+    triggered();
 }

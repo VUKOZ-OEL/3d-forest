@@ -35,8 +35,14 @@ QtWidget::QtWidget(Widget *widget, QtApplication *app, QWidget *parent)
 {
     if (widget_->layout())
     {
-        QLayout *qtLayout = app->createLayout(widget_->layout(), this);
-        QWidget::setLayout(qtLayout);
+        QLayout *layout = app->createLayout(widget_->layout(), this);
+
+        if (layout)
+        {
+            layout->setContentsMargins(0, 0, 0, 0);
+
+            QWidget::setLayout(layout);
+        }
     }
 }
 

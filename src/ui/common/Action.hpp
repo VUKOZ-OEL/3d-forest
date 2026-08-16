@@ -23,10 +23,10 @@
 #define ACTION_HPP
 
 // Include std.
-#include <functional>
 #include <string>
 
 // Include 3D Forest.
+#include <Signal.hpp>
 
 // Include local.
 #include <ExportUiCommon.hpp>
@@ -38,9 +38,15 @@ class EXPORT_UI_COMMON Action
 public:
     Action();
     Action(const std::string &text);
-    virtual ~Action();
+
+    const std::string &text() const { return text_; }
+
+    void trigger();
+
+    Signal<> triggered;
 
 private:
+    std::string text_;
 };
 
 #include <WarningsEnable.hpp>

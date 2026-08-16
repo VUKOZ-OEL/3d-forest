@@ -81,19 +81,8 @@ void QtApplication::initLayout()
 {
     splitter_ = new QSplitter(Qt::Horizontal, &mainWindow_);
 
-    // Left plugin panel area
-    panelScrollArea_ = new QScrollArea(splitter_);
-    panelScrollArea_->setWidgetResizable(true);
-    panelScrollArea_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-    panelContainer_ = new QWidget(panelScrollArea_);
-
-    panelLayout_ = new QVBoxLayout(panelContainer_);
-    panelLayout_->setContentsMargins(4, 4, 4, 4);
-    panelLayout_->setSpacing(4);
-    panelLayout_->addStretch();
-
-    panelScrollArea_->setWidget(panelContainer_);
+    // Left side bar area
+    sidebar_ = new QtSidebar(this, splitter_);
 
     // Right viewer area, initially empty
     viewerContainer_ = new QWidget(splitter_);
@@ -102,16 +91,8 @@ void QtApplication::initLayout()
     viewerLayout_->setContentsMargins(0, 0, 0, 0);
     viewerLayout_->setSpacing(0);
 
-    /*QLabel *placeholder = new QLabel(
-        "No viewer loaded",
-        viewerContainer_);
-
-    placeholder->setAlignment(Qt::AlignCenter);
-
-    viewerLayout_->addWidget(placeholder);
-    viewerWidget_ = placeholder;*/
-
-    splitter_->addWidget(panelScrollArea_);
+    // Splitter.
+    splitter_->addWidget(sidebar_);
     splitter_->addWidget(viewerContainer_);
 
     // Left side does not stretch as much as the viewer.
@@ -121,55 +102,29 @@ void QtApplication::initLayout()
     // Initial widths.
     splitter_->setSizes({300, 900});
 
-    panelScrollArea_->setMinimumWidth(200);
-    panelScrollArea_->setMaximumWidth(600);
-
     mainWindow_.setCentralWidget(splitter_);
 }
 
-void QtApplication::addPanel(const std::string &title, Widget *widget)
+void QtApplication::addMenuItem(const std::vector<std::string> &path,
+                                Action *action)
 {
-    LOG_DEBUG(<< "Start adding panel <" << title << ">.");
+    sidebar_->addMenuItem(path, action);
+}
 
-    QWidget *qtContent = createWidget(widget);
+void QtApplication::removeMenuItem(Action *action)
+{
+    sidebar_->removeMenuItem(action);
+}
 
-    if (!qtContent)
-    {
-        LOG_WARNING(<< "Could not create Qt widget.");
-        return;
-    }
-
-    LOG_DEBUG(<< "Adding widget.");
-
-    QtExpandableWidget *expandable =
-        new QtExpandableWidget(title, qtContent, panelContainer_);
-
-    // Insert before the stretch at the end.
-    panelLayout_->insertWidget(panelLayout_->count() - 1, expandable);
-
-    panelBindings_.push_back({widget, expandable});
-
-    LOG_DEBUG(<< "Finished adding panel.");
+void QtApplication::addPanel(const std::vector<std::string> &path,
+                             Widget *widget)
+{
+    sidebar_->addPanel(path, widget);
 }
 
 void QtApplication::removePanel(Widget *widget)
 {
-    auto it = std::find_if(panelBindings_.begin(),
-                           panelBindings_.end(),
-                           [widget](const PanelBinding &binding)
-                           { return binding.commonWidget == widget; });
-
-    if (it == panelBindings_.end())
-    {
-        return;
-    }
-
-    panelLayout_->removeWidget(it->expandableWidget);
-
-    // Also deletes the contained QtWidget and QtSlider objects.
-    delete it->expandableWidget;
-
-    panelBindings_.erase(it);
+    sidebar_->removePanel(widget);
 }
 
 void QtApplication::setViewer(Widget *widget)

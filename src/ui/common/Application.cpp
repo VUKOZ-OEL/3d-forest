@@ -547,7 +547,16 @@ void Application::createMenu()
 #endif
 }
 
-void Application::addPanel(const std::string &title, Widget *widget)
+void Application::addMenuItem(const std::vector<std::string> &path,
+                              Action *action)
+{
+}
+
+void Application::removeMenuItem(Action *action)
+{
+}
+
+void Application::addPanel(const std::vector<std::string> &path, Widget *widget)
 {
 }
 

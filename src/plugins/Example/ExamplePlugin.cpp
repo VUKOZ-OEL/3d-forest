@@ -35,7 +35,12 @@ void ExamplePlugin::initialize(Application *app)
     LOG_DEBUG(<< "Start initializing example plugin.");
     app_ = app;
     widget_ = new ExampleWidget(app_);
-    app_->addPanel("Example", widget_);
+    app_->addPanel({"Compute", "Example"}, widget_);
+
+    openAction_ = new Action("A");
+    app_->addMenuItem({"File", "Open"}, openAction_);
+    closeAction_ = new Action("B");
+    app_->addMenuItem({"File", "Close"}, closeAction_);
     LOG_DEBUG(<< "Finished initializing example plugin.");
 }
 
@@ -45,6 +50,12 @@ void ExamplePlugin::release()
     {
         app_->removePanel(widget_);
         delete widget_;
+
+        app_->removeMenuItem(openAction_);
+        delete openAction_;
+
+        app_->removeMenuItem(closeAction_);
+        delete closeAction_;
     }
 
     delete this;

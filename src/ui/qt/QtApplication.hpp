@@ -27,12 +27,11 @@
 
 // Include 3D Forest.
 #include <Application.hpp>
-#include <QtExpandableWidget.hpp>
+#include <QtSidebar.hpp>
 
 // Include Qt.
 #include <QApplication>
 #include <QMainWindow>
-#include <QScrollArea>
 #include <QSplitter>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -56,7 +55,11 @@ public:
 
     int exec();
 
-    void addPanel(const std::string &title, Widget *widget) override;
+    void addMenuItem(const std::vector<std::string> &path,
+                     Action *action) override;
+    void removeMenuItem(Action *action) override;
+    void addPanel(const std::vector<std::string> &path,
+                  Widget *widget) override;
     void removePanel(Widget *widget) override;
     void setViewer(Widget *widget) override;
     void removeViewer(Widget *widget) override;
@@ -69,23 +72,11 @@ private:
     QMainWindow mainWindow_;
 
     QSplitter *splitter_{nullptr};
-
-    QScrollArea *panelScrollArea_{nullptr};
-    QWidget *panelContainer_{nullptr};
-    QVBoxLayout *panelLayout_{nullptr};
-
+    QtSidebar *sidebar_{nullptr};
     QWidget *viewerContainer_{nullptr};
     QVBoxLayout *viewerLayout_{nullptr};
     Widget *commonViewer_{nullptr};
     QWidget *qtViewer_{nullptr};
-
-    struct PanelBinding
-    {
-        Widget *commonWidget{nullptr};
-        QtExpandableWidget *expandableWidget{nullptr};
-    };
-
-    std::vector<PanelBinding> panelBindings_;
 
     void initLayout();
 };

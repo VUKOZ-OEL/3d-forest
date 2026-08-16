@@ -93,7 +93,10 @@ public:
                           const ThemeIcon &themeIcon,
                           std::function<void()> callback = {});
 
-    virtual void addPanel(const std::string &title, Widget *widget);
+    virtual void addMenuItem(const std::vector<std::string> &path,
+                             Action *action);
+    virtual void removeMenuItem(Action *action);
+    virtual void addPanel(const std::vector<std::string> &path, Widget *widget);
     virtual void removePanel(Widget *widget);
     virtual void setViewer(Widget *widget);
     virtual void removeViewer(Widget *widget);

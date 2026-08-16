@@ -25,6 +25,7 @@
 // Include 3D Forest.
 #include <Plugin.hpp>
 class ExampleWidget;
+class Action;
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestExamplePlugin)
@@ -47,6 +48,8 @@ public:
 private:
     Application *app_{nullptr};
     ExampleWidget *widget_{nullptr};
+    Action *openAction_{nullptr};
+    Action *closeAction_{nullptr};
 };
 
 extern "C" EXPORT_EXAMPLE_PLUGIN Plugin *createPlugin()
