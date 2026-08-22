@@ -50,6 +50,7 @@ private:
     ExampleWidget *widget_{nullptr};
     Action *openAction_{nullptr};
     Action *closeAction_{nullptr};
+    Action *widgetAction_{nullptr};
 };
 
 extern "C" EXPORT_EXAMPLE_PLUGIN Plugin *createPlugin()

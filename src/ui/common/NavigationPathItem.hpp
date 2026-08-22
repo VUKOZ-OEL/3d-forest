@@ -17,51 +17,28 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file PluginManager.hpp */
+/** @file NavigationPathItem.hpp */
 
-#ifndef PLUGIN_MANAGER_HPP
-#define PLUGIN_MANAGER_HPP
+#ifndef NAVIGATION_PATH_ITEM_HPP
+#define NAVIGATION_PATH_ITEM_HPP
 
 // Include std.
 #include <string>
-#include <vector>
 
 // Include 3D Forest.
-#include <PluginHandle.hpp>
-#include <ProjectFileInterface.hpp>
-#include <ViewerInterface.hpp>
-
-class Application;
 
 // Include local.
 #include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
 
-/** Plugin Manager. */
-class EXPORT_UI_COMMON PluginManager
+/** NavigationPathItem. */
+class EXPORT_UI_COMMON NavigationPathItem
 {
 public:
-    PluginManager();
-    virtual ~PluginManager();
-
-    void clear();
-    void load(Application *app);
-    void unload();
-
-    ViewerInterface *viewer() { return viewerPlugin_; }
-
-private:
-    Application *app_{nullptr};
-    std::vector<PluginHandle> plugins_;
-
-    void load(const std::string &fileName);
-
-    ProjectFileInterface *projectFilePlugin_;
-    // ImportFileInterface *importFilePlugin_;
-    ViewerInterface *viewerPlugin_;
-    // HelpPlugin *helpPlugin_;
+    std::string title;
+    int order{0};
 };
 
 #include <WarningsEnable.hpp>
 
-#endif /* PLUGIN_MANAGER_HPP */
+#endif /* NAVIGATION_PATH_ITEM_HPP */

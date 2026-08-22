@@ -29,6 +29,8 @@
 // Include 3D Forest.
 class Action;
 class Widget;
+class NavigationTree;
+class NavigationItem;
 class QtApplication;
 
 // Include Qt.
@@ -44,58 +46,48 @@ class QTreeWidgetItem;
 class EXPORT_UI_QT QtSidebar : public QWidget
 {
 public:
-    explicit QtSidebar(QtApplication *application, QWidget *parent = nullptr);
+    explicit QtSidebar(NavigationTree *navigation,
+                       QtApplication *application,
+                       QWidget *parent = nullptr);
 
-    void addMenuItem(const std::vector<std::string> &path, Action *action);
-    void removeMenuItem(Action *action);
-    void addPanel(const std::vector<std::string> &path, Widget *widget);
-    void removePanel(Widget *widget);
+    void setDarkMode(bool dark);
 
 private:
-    enum class ItemKind
-    {
-        Group,
-        Action,
-        Panel,
-        PanelContent
-    };
-
     struct Binding
     {
-        ItemKind kind{ItemKind::Group};
+        NavigationItem *commonItem{nullptr};
 
-        Action *action{nullptr};
-        Widget *widget{nullptr};
-
-        QTreeWidgetItem *item{nullptr};
+        QTreeWidgetItem *qtItem{nullptr};
         QTreeWidgetItem *contentItem{nullptr};
 
         QWidget *qtWidget{nullptr};
     };
 
-    static constexpr int ITEM_KIND_ROLE = Qt::UserRole;
+    void addItem(NavigationItem *item);
+    void addItemRecursive(NavigationItem *item);
+    void removeItem(NavigationItem *item);
 
-    static void setItemKind(QTreeWidgetItem *item, ItemKind kind);
+    void handleItemClick(QTreeWidgetItem *qtItem);
 
-    static ItemKind itemKind(const QTreeWidgetItem *item);
+    Binding *findBinding(NavigationItem *item);
 
-    QTreeWidgetItem *findChild(QTreeWidgetItem *parent,
-                               const QString &text) const;
+    Binding *findBinding(QTreeWidgetItem *item);
 
-    QTreeWidgetItem *findOrCreateGroup(QTreeWidgetItem *parent,
-                                       const QString &text);
+    QTreeWidgetItem *findQtParent(NavigationItem *item);
 
-    QTreeWidgetItem *createPathGroups(const std::vector<std::string> &path);
-
-    void removeEmptyGroups(QTreeWidgetItem *item);
-
-    void handleItemClick(QTreeWidgetItem *item);
-
+    NavigationTree *navigation_;
     QtApplication *application_;
 
     QTreeWidget *tree_{nullptr};
 
     std::vector<Binding> bindings_;
+
+    // Ordering.
+    int itemIndex(const NavigationItem *item) const;
+
+    // Theme.
+    bool darkMode_{false};
+    void applyPanelTheme(QWidget *widget);
 };
 
 #include <WarningsEnable.hpp>

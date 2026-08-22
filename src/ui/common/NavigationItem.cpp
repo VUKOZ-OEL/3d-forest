@@ -17,39 +17,28 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file Action.cpp */
-
-// Include std.
+/** @file NavigationItem.cpp */
 
 // Include 3D Forest.
 #include <Action.hpp>
-#include <Widget.hpp>
+#include <NavigationItem.hpp>
+#include <Plugin.hpp>
 
 // Include local.
-#define LOG_MODULE_NAME "Action"
+#define LOG_MODULE_NAME "NavigationItem"
 #include <Log.hpp>
 
-Action::Action(const std::string &text) : text_(text)
+NavigationItem::NavigationItem(Type type, const std::string &title, int order)
+    : type_(type),
+      title_(title),
+      order_(order)
 {
 }
 
-Action::~Action()
+NavigationItem::~NavigationItem()
 {
-    delete panel_;
-}
-
-void Action::setPanel(Widget *panel)
-{
-    if (panel_ == panel)
+    for (NavigationItem *child : children_)
     {
-        return;
+        delete child;
     }
-
-    delete panel_;
-    panel_ = panel;
-}
-
-void Action::trigger()
-{
-    triggered();
 }

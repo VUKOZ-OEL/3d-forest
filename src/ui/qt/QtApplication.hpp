@@ -55,12 +55,6 @@ public:
 
     int exec();
 
-    void addMenuItem(const std::vector<std::string> &path,
-                     Action *action) override;
-    void removeMenuItem(Action *action) override;
-    void addPanel(const std::vector<std::string> &path,
-                  Widget *widget) override;
-    void removePanel(Widget *widget) override;
     void setViewer(Widget *widget) override;
     void removeViewer(Widget *widget) override;
 
@@ -79,6 +73,9 @@ private:
     QWidget *qtViewer_{nullptr};
 
     void initLayout();
+
+    bool isDarkMode() const;
+    void updateTheme();
 };
 
 #include <WarningsEnable.hpp>

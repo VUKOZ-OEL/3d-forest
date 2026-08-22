@@ -27,6 +27,7 @@
 
 // Include 3D Forest.
 #include <Signal.hpp>
+class Widget;
 
 // Include local.
 #include <ExportUiCommon.hpp>
@@ -36,10 +37,17 @@
 class EXPORT_UI_COMMON Action
 {
 public:
-    Action();
-    Action(const std::string &text);
+    explicit Action(const std::string &text);
+    ~Action();
+
+    Action(const Action &) = delete;
+    Action &operator=(const Action &) = delete;
 
     const std::string &text() const { return text_; }
+
+    void setPanel(Widget *panel);
+    Widget *panel() const { return panel_; }
+    bool hasPanel() const { return panel_ != nullptr; }
 
     void trigger();
 
@@ -47,6 +55,7 @@ public:
 
 private:
     std::string text_;
+    Widget *panel_{nullptr};
 };
 
 #include <WarningsEnable.hpp>

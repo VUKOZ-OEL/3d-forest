@@ -547,21 +547,22 @@ void Application::createMenu()
 #endif
 }
 
-void Application::addMenuItem(const std::vector<std::string> &path,
-                              Action *action)
+void Application::addNavigationItem(Plugin *owner,
+                                    const std::vector<NavigationPathItem> &path,
+                                    Action *action,
+                                    int order)
 {
+    navigation_.addItem(owner, path, action, order);
 }
 
-void Application::removeMenuItem(Action *action)
+void Application::removeNavigationItem(Action *action)
 {
+    navigation_.removeItem(action);
 }
 
-void Application::addPanel(const std::vector<std::string> &path, Widget *widget)
+void Application::removeNavigationItems(Plugin *owner)
 {
-}
-
-void Application::removePanel(Widget *widget)
-{
+    navigation_.removeItems(owner);
 }
 
 void Application::setViewer(Widget *widget)

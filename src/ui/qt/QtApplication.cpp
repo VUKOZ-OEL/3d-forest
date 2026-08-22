@@ -32,6 +32,8 @@
 // Include Qt.
 // #include <QSurfaceFormat>
 #include <QHBoxLayout>
+#include <QPalette>
+#include <QStyleHints>
 
 // Include local.
 #define LOG_MODULE_NAME "QtApplication"
@@ -80,9 +82,13 @@ int QtApplication::exec()
 void QtApplication::initLayout()
 {
     splitter_ = new QSplitter(Qt::Horizontal, &mainWindow_);
+    splitter_->setHandleWidth(1);
+    splitter_->setStyleSheet("QSplitter::handle {"
+                             "    background: #303030;"
+                             "}");
 
     // Left side bar area
-    sidebar_ = new QtSidebar(this, splitter_);
+    sidebar_ = new QtSidebar(&navigation(), this, splitter_);
 
     // Right viewer area, initially empty
     viewerContainer_ = new QWidget(splitter_);
@@ -102,29 +108,18 @@ void QtApplication::initLayout()
     // Initial widths.
     splitter_->setSizes({300, 900});
 
+    sidebar_->setMinimumWidth(220);
+    sidebar_->setMaximumWidth(500);
+
     mainWindow_.setCentralWidget(splitter_);
-}
 
-void QtApplication::addMenuItem(const std::vector<std::string> &path,
-                                Action *action)
-{
-    sidebar_->addMenuItem(path, action);
-}
+    // Theme.
+    updateTheme();
 
-void QtApplication::removeMenuItem(Action *action)
-{
-    sidebar_->removeMenuItem(action);
-}
-
-void QtApplication::addPanel(const std::vector<std::string> &path,
-                             Widget *widget)
-{
-    sidebar_->addPanel(path, widget);
-}
-
-void QtApplication::removePanel(Widget *widget)
-{
-    sidebar_->removePanel(widget);
+    QObject::connect(qapplication_.styleHints(),
+                     &QStyleHints::colorSchemeChanged,
+                     &mainWindow_,
+                     [this](Qt::ColorScheme) { updateTheme(); });
 }
 
 void QtApplication::setViewer(Widget *widget)
@@ -216,4 +211,29 @@ QLayout *QtApplication::createLayout(Layout *layout, QWidget *parent)
 
     LOG_DEBUG(<< "Create null layout.");
     return nullptr;
+}
+
+bool QtApplication::isDarkMode() const
+{
+    const Qt::ColorScheme scheme = qapplication_.styleHints()->colorScheme();
+
+    if (scheme == Qt::ColorScheme::Dark)
+    {
+        return true;
+    }
+
+    if (scheme == Qt::ColorScheme::Light)
+    {
+        return false;
+    }
+
+    const int lightness =
+        qapplication_.palette().color(QPalette::Window).lightness();
+
+    return lightness < 128;
+}
+
+void QtApplication::updateTheme()
+{
+    sidebar_->setDarkMode(isDarkMode());
 }

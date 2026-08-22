@@ -67,10 +67,15 @@ static void *pluginManagerLoadSymbol(void *handle, const char *name)
 #endif
 }
 
-static void pluginManagerUnLoad(PluginHandle &pluginHandle)
+static void pluginManagerUnLoad(PluginHandle &pluginHandle,
+                                Application *app = nullptr)
 {
     if (pluginHandle.plugin)
     {
+        if (app)
+        {
+            app->removeNavigationItems(pluginHandle.plugin);
+        }
         pluginHandle.plugin->release();
         pluginHandle.plugin = nullptr;
     }
@@ -127,6 +132,8 @@ void PluginManager::clear()
 
 void PluginManager::load(Application *app)
 {
+    app_ = app;
+
     std::string dirPath = File::currentPath() + "plugins/";
 
 #if defined(PLATFORM_WINDOWS)
@@ -146,7 +153,7 @@ void PluginManager::load(Application *app)
     for (const auto &fileName : fileNames)
     {
         std::string path = dirPath + fileName;
-        load(app, path);
+        load(path);
     }
 }
 
@@ -154,7 +161,7 @@ void PluginManager::unload()
 {
     for (auto &it : plugins_)
     {
-        pluginManagerUnLoad(it);
+        pluginManagerUnLoad(it, app_);
     }
 
     plugins_.clear();
@@ -162,7 +169,7 @@ void PluginManager::unload()
     clear();
 }
 
-void PluginManager::load(Application *app, const std::string &fileName)
+void PluginManager::load(const std::string &fileName)
 {
     LOG_DEBUG(<< "Load file path <" << fileName << ">.");
 
@@ -180,7 +187,7 @@ void PluginManager::load(Application *app, const std::string &fileName)
         return;
     }
 
-    handle.plugin->initialize(app);
+    handle.plugin->initialize(app_);
     plugins_.push_back(handle);
 
 #if 0

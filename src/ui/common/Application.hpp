@@ -32,6 +32,7 @@
 #include <Editor.hpp>
 #include <EventQueue.hpp>
 #include <MenuBar.hpp>
+#include <NavigationTree.hpp>
 #include <PluginManager.hpp>
 #include <RenderThread.hpp>
 #include <ThemeIcon.hpp>
@@ -93,11 +94,15 @@ public:
                           const ThemeIcon &themeIcon,
                           std::function<void()> callback = {});
 
-    virtual void addMenuItem(const std::vector<std::string> &path,
-                             Action *action);
-    virtual void removeMenuItem(Action *action);
-    virtual void addPanel(const std::vector<std::string> &path, Widget *widget);
-    virtual void removePanel(Widget *widget);
+    virtual void addNavigationItem(Plugin *owner,
+                                   const std::vector<NavigationPathItem> &path,
+                                   Action *action,
+                                   int order = 0);
+    virtual void removeNavigationItem(Action *action);
+    void removeNavigationItems(Plugin *owner);
+    NavigationTree &navigation() { return navigation_; }
+    const NavigationTree &navigation() const { return navigation_; }
+
     virtual void setViewer(Widget *widget);
     virtual void removeViewer(Widget *widget);
 
@@ -161,6 +166,7 @@ private:
 
     PluginManager pluginManager_;
 
+    NavigationTree navigation_;
     MenuBar menuBar_;
     EventQueue eventQueue_;
 

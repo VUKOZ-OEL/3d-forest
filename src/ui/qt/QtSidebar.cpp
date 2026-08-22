@@ -24,11 +24,15 @@
 
 // Include 3D Forest.
 #include <Action.hpp>
+#include <NavigationItem.hpp>
+#include <NavigationTree.hpp>
 #include <QtApplication.hpp>
 #include <QtSidebar.hpp>
 #include <Widget.hpp>
 
 // Include Qt.
+#include <QAbstractItemView>
+#include <QFrame>
 #include <QTreeWidget>
 #include <QVBoxLayout>
 
@@ -36,23 +40,27 @@
 #define LOG_MODULE_NAME "QtSidebar"
 #include <Log.hpp>
 
-QtSidebar::QtSidebar(QtApplication *application, QWidget *parent)
+QtSidebar::QtSidebar(NavigationTree *navigation,
+                     QtApplication *application,
+                     QWidget *parent)
     : QWidget(parent),
+      navigation_(navigation),
       application_(application),
       tree_(new QTreeWidget(this))
 {
     tree_->setHeaderHidden(true);
     tree_->setRootIsDecorated(true);
-    tree_->setIndentation(14);
+    tree_->setIndentation(16);
     tree_->setUniformRowHeights(false);
-
     tree_->setItemsExpandable(false);
     tree_->setExpandsOnDoubleClick(false);
+    tree_->setSelectionMode(QAbstractItemView::NoSelection);
+    tree_->setFocusPolicy(Qt::NoFocus);
+    tree_->setFrameShape(QFrame::NoFrame);
+    tree_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    // tree_->setFocusPolicy(Qt::NoFocus);
-    // tree_->setFrameShape(QFrame::NoFrame);
-    // tree_->setHorizontalScrollBarPolicy(
-    //     Qt::ScrollBarAlwaysOff);
+    tree_->setIndentation(0);
+    tree_->setSortingEnabled(false);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -65,274 +73,200 @@ QtSidebar::QtSidebar(QtApplication *application, QWidget *parent)
                      this,
                      [this](QTreeWidgetItem *item, int)
                      { handleItemClick(item); });
-}
 
-void QtSidebar::setItemKind(QTreeWidgetItem *item, ItemKind kind)
-{
-    item->setData(0, ITEM_KIND_ROLE, static_cast<int>(kind));
-}
+    navigation_->itemAdded.connect([this](NavigationItem *item)
+                                   { addItem(item); });
 
-QtSidebar::ItemKind QtSidebar::itemKind(const QTreeWidgetItem *item)
-{
-    return static_cast<ItemKind>(item->data(0, ITEM_KIND_ROLE).toInt());
-}
+    navigation_->itemAboutToBeRemoved.connect([this](NavigationItem *item)
+                                              { removeItem(item); });
 
-QTreeWidgetItem *QtSidebar::findChild(QTreeWidgetItem *parent,
-                                      const QString &text) const
-{
-    const int count =
-        parent ? parent->childCount() : tree_->topLevelItemCount();
-
-    for (int i = 0; i < count; ++i)
+    // Render anything added before QtSidebar was created.
+    for (NavigationItem *item : navigation_->items())
     {
-        QTreeWidgetItem *item =
-            parent ? parent->child(i) : tree_->topLevelItem(i);
+        addItemRecursive(item);
+    }
+}
 
-        if (item->text(0) == text && itemKind(item) == ItemKind::Group)
-        {
-            return item;
-        }
+QtSidebar::Binding *QtSidebar::findBinding(NavigationItem *item)
+{
+    const auto it = std::find_if(bindings_.begin(),
+                                 bindings_.end(),
+                                 [item](const Binding &binding)
+                                 { return binding.commonItem == item; });
+
+    return it == bindings_.end() ? nullptr : &(*it);
+}
+
+QtSidebar::Binding *QtSidebar::findBinding(QTreeWidgetItem *item)
+{
+    const auto it = std::find_if(bindings_.begin(),
+                                 bindings_.end(),
+                                 [item](const Binding &binding)
+                                 { return binding.qtItem == item; });
+
+    return it == bindings_.end() ? nullptr : &(*it);
+}
+
+QTreeWidgetItem *QtSidebar::findQtParent(NavigationItem *item)
+{
+    if (!item || !item->parent())
+    {
+        return nullptr;
     }
 
-    return nullptr;
+    Binding *binding = findBinding(item->parent());
+
+    return binding ? binding->qtItem : nullptr;
 }
 
-QTreeWidgetItem *QtSidebar::findOrCreateGroup(QTreeWidgetItem *parent,
-                                              const QString &text)
+void QtSidebar::addItem(NavigationItem *item)
 {
-    if (QTreeWidgetItem *existing = findChild(parent, text))
+    if (!item || findBinding(item))
     {
-        return existing;
+        return;
     }
 
-    QTreeWidgetItem *item = nullptr;
+    QTreeWidgetItem *qtParent = findQtParent(item);
 
-    if (parent)
+    // Create new item.
+    const int index = itemIndex(item);
+
+    if (index < 0)
     {
-        item = new QTreeWidgetItem(parent);
+        return;
+    }
+
+    QTreeWidgetItem *qtItem = new QTreeWidgetItem;
+
+    if (qtParent)
+    {
+        qtParent->insertChild(index, qtItem);
     }
     else
     {
-        item = new QTreeWidgetItem(tree_);
+        tree_->insertTopLevelItem(index, qtItem);
     }
 
-    item->setText(0, text);
-    setItemKind(item, ItemKind::Group);
+    qtItem->setText(0, QString::fromStdString(item->title()));
 
-    return item;
-}
-
-QTreeWidgetItem *QtSidebar::createPathGroups(
-    const std::vector<std::string> &path)
-{
-    QTreeWidgetItem *parent = nullptr;
-
-    for (std::size_t i = 0; i + 1 < path.size(); ++i)
-    {
-        parent = findOrCreateGroup(parent, QString::fromStdString(path[i]));
-    }
-
-    return parent;
-}
-
-void QtSidebar::removeEmptyGroups(QTreeWidgetItem *item)
-{
-    while (item && itemKind(item) == ItemKind::Group && item->childCount() == 0)
-    {
-        QTreeWidgetItem *parent = item->parent();
-
-        delete item;
-        item = parent;
-    }
-}
-
-void QtSidebar::handleItemClick(QTreeWidgetItem *item)
-{
-    if (!item)
-    {
-        return;
-    }
-
-    const ItemKind kind = itemKind(item);
-
-    switch (kind)
-    {
-        case ItemKind::Group:
-        case ItemKind::Panel:
-        {
-            item->setExpanded(!item->isExpanded());
-
-            // updateExpandableTitle(item);
-
-            // An expandable section is not an active selection.
-            tree_->clearSelection();
-            tree_->setCurrentItem(nullptr);
-
-            break;
-        }
-
-        case ItemKind::Action:
-        {
-            const auto it =
-                std::find_if(bindings_.begin(),
-                             bindings_.end(),
-                             [item](const Binding &binding) {
-                                 return binding.kind == ItemKind::Action &&
-                                        binding.item == item;
-                             });
-
-            if (it != bindings_.end() && it->action)
-            {
-                it->action->trigger();
-            }
-
-            // Remove this if actions represent persistent pages.
-            tree_->clearSelection();
-            tree_->setCurrentItem(nullptr);
-
-            break;
-        }
-
-        case ItemKind::PanelContent:
-            break;
-    }
-}
-
-void QtSidebar::addMenuItem(const std::vector<std::string> &path,
-                            Action *action)
-{
-    if (path.empty() || !action)
-    {
-        return;
-    }
-
-    const auto existing = std::find_if(
-        bindings_.begin(),
-        bindings_.end(),
-        [action](const Binding &binding) {
-            return binding.kind == ItemKind::Action && binding.action == action;
-        });
-
-    if (existing != bindings_.end())
-    {
-        return;
-    }
-
-    QTreeWidgetItem *parent = createPathGroups(path);
-
-    QTreeWidgetItem *item =
-        parent ? new QTreeWidgetItem(parent) : new QTreeWidgetItem(tree_);
-
-    item->setText(0, QString::fromStdString(path.back()));
-
-    setItemKind(item, ItemKind::Action);
-
+    // Binding.
     Binding binding;
-    binding.kind = ItemKind::Action;
-    binding.action = action;
-    binding.item = item;
+    binding.commonItem = item;
+    binding.qtItem = qtItem;
+
+    if (item->type() == NavigationItem::Type::Group)
+    {
+        QFont font = qtItem->font(0);
+        font.setBold(true);
+        qtItem->setFont(0, font);
+
+        qtItem->setExpanded(false);
+
+        bindings_.push_back(binding);
+        return;
+    }
+
+    Action *action = item->action();
+
+    if (!action)
+    {
+        delete qtItem;
+        return;
+    }
+
+    if (action->hasPanel())
+    {
+        QTreeWidgetItem *contentItem = new QTreeWidgetItem(qtItem);
+
+        QWidget *qtWidget = application_->createWidget(action->panel(), tree_);
+
+        if (!qtWidget)
+        {
+            delete qtItem;
+            return;
+        }
+
+        applyPanelTheme(qtWidget);
+
+        contentItem->setFlags(contentItem->flags() & ~Qt::ItemIsSelectable);
+
+        qtWidget->setContentsMargins(10, 4, 4, 10);
+
+        tree_->setItemWidget(contentItem, 0, qtWidget);
+
+        contentItem->setSizeHint(0, qtWidget->sizeHint());
+
+        qtItem->setExpanded(false);
+
+        binding.contentItem = contentItem;
+        binding.qtWidget = qtWidget;
+    }
 
     bindings_.push_back(binding);
 }
 
-void QtSidebar::removeMenuItem(Action *action)
+void QtSidebar::addItemRecursive(NavigationItem *item)
+{
+    addItem(item);
+
+    for (NavigationItem *child : item->children())
+    {
+        addItemRecursive(child);
+    }
+}
+
+void QtSidebar::handleItemClick(QTreeWidgetItem *qtItem)
+{
+    if (!qtItem)
+    {
+        return;
+    }
+
+    Binding *binding = findBinding(qtItem);
+
+    if (!binding || !binding->commonItem)
+    {
+        // A panel content row was clicked.
+        return;
+    }
+
+    NavigationItem *item = binding->commonItem;
+
+    if (item->type() == NavigationItem::Type::Group)
+    {
+        qtItem->setExpanded(!qtItem->isExpanded());
+
+        return;
+    }
+
+    Action *action = item->action();
+
+    if (!action)
+    {
+        return;
+    }
+
+    if (action->hasPanel())
+    {
+        qtItem->setExpanded(!qtItem->isExpanded());
+    }
+    else
+    {
+        action->trigger();
+    }
+}
+
+void QtSidebar::removeItem(NavigationItem *item)
 {
     const auto it = std::find_if(bindings_.begin(),
                                  bindings_.end(),
-                                 [action](const Binding &binding) {
-                                     return binding.kind == ItemKind::Action &&
-                                            binding.action == action;
-                                 });
+                                 [item](const Binding &binding)
+                                 { return binding.commonItem == item; });
 
     if (it == bindings_.end())
     {
         return;
     }
-
-    QTreeWidgetItem *parent = it->item->parent();
-
-    // Deleting the item automatically removes it from
-    // its parent or from tree_ when it is top-level.
-    delete it->item;
-
-    bindings_.erase(it);
-
-    // Remove parent menu groups that no longer contain anything.
-    removeEmptyGroups(parent);
-}
-
-void QtSidebar::addPanel(const std::vector<std::string> &path, Widget *widget)
-{
-    if (path.empty() || !widget)
-    {
-        return;
-    }
-
-    const auto existing = std::find_if(
-        bindings_.begin(),
-        bindings_.end(),
-        [widget](const Binding &binding) {
-            return binding.kind == ItemKind::Panel && binding.widget == widget;
-        });
-
-    if (existing != bindings_.end())
-    {
-        return;
-    }
-
-    QTreeWidgetItem *parent = createPathGroups(path);
-
-    QTreeWidgetItem *panelItem =
-        parent ? new QTreeWidgetItem(parent) : new QTreeWidgetItem(tree_);
-
-    panelItem->setText(0, QString::fromStdString(path.back()));
-
-    setItemKind(panelItem, ItemKind::Panel);
-
-    QTreeWidgetItem *contentItem = new QTreeWidgetItem(panelItem);
-
-    setItemKind(contentItem, ItemKind::PanelContent);
-
-    QWidget *qtWidget = application_->createWidget(widget, tree_);
-
-    if (!qtWidget)
-    {
-        delete panelItem;
-        removeEmptyGroups(parent);
-        return;
-    }
-
-    tree_->setItemWidget(contentItem, 0, qtWidget);
-
-    contentItem->setSizeHint(0, qtWidget->sizeHint());
-
-    panelItem->setExpanded(false);
-
-    Binding binding;
-    binding.kind = ItemKind::Panel;
-    binding.widget = widget;
-    binding.item = panelItem;
-    binding.contentItem = contentItem;
-    binding.qtWidget = qtWidget;
-
-    bindings_.push_back(binding);
-}
-
-void QtSidebar::removePanel(Widget *widget)
-{
-    const auto it = std::find_if(bindings_.begin(),
-                                 bindings_.end(),
-                                 [widget](const Binding &binding) {
-                                     return binding.kind == ItemKind::Panel &&
-                                            binding.widget == widget;
-                                 });
-
-    if (it == bindings_.end())
-    {
-        return;
-    }
-
-    QTreeWidgetItem *parent = it->item->parent();
 
     if (it->qtWidget)
     {
@@ -341,9 +275,191 @@ void QtSidebar::removePanel(Widget *widget)
         delete it->qtWidget;
     }
 
-    delete it->item;
+    // Also deletes contentItem.
+    delete it->qtItem;
 
     bindings_.erase(it);
+}
 
-    removeEmptyGroups(parent);
+int QtSidebar::itemIndex(const NavigationItem *item) const
+{
+    if (!item)
+    {
+        return -1;
+    }
+
+    const std::vector<NavigationItem *> &siblings =
+        item->parent() ? item->parent()->children() : navigation_->items();
+
+    const auto it = std::find(siblings.begin(), siblings.end(), item);
+
+    if (it == siblings.end())
+    {
+        return -1;
+    }
+
+    return static_cast<int>(std::distance(siblings.begin(), it));
+}
+
+void QtSidebar::setDarkMode(bool dark)
+{
+    darkMode_ = dark;
+
+    if (dark)
+    {
+        setStyleSheet("QtSidebar {"
+                      "    background: #171717;"
+                      "}"
+                      ""
+                      "QTreeWidget {"
+                      "    background: #171717;"
+                      "    color: #ececec;"
+                      "    border: none;"
+                      "    outline: none;"
+                      "    font-size: 14px;"
+                      "}"
+                      ""
+                      "QTreeWidget::item {"
+                      "    color: #ececec;"
+                      "    min-height: 30px;"
+                      "    padding: 3px 8px;"
+                      "    border: none;"
+                      "    border-radius: 7px;"
+                      "}"
+                      ""
+                      "QTreeWidget::item:hover {"
+                      "    background: #2b2b2b;"
+                      "}"
+                      ""
+                      "QTreeWidget::branch {"
+                      "    background: #171717;"
+                      "}"
+                      ""
+                      "QLabel,"
+                      "QCheckBox,"
+                      "QRadioButton {"
+                      "    color: #ececec;"
+                      "    background: transparent;"
+                      "}"
+                      ""
+                      "QSlider::groove:horizontal {"
+                      "    height: 4px;"
+                      "    background: #484848;"
+                      "    border-radius: 2px;"
+                      "}"
+                      ""
+                      "QSlider::sub-page:horizontal {"
+                      "    background: #d0d0d0;"
+                      "    border-radius: 2px;"
+                      "}"
+                      ""
+                      "QSlider::handle:horizontal {"
+                      "    width: 14px;"
+                      "    margin: -5px 0;"
+                      "    background: #f0f0f0;"
+                      "    border: 1px solid #909090;"
+                      "    border-radius: 7px;"
+                      "}");
+    }
+    else
+    {
+        setStyleSheet("QtSidebar {"
+                      "    background: #f7f7f7;"
+                      "}"
+                      ""
+                      "QTreeWidget {"
+                      "    background: #f7f7f7;"
+                      "    color: #202020;"
+                      "    border: none;"
+                      "    outline: none;"
+                      "    font-size: 14px;"
+                      "}"
+                      ""
+                      "QTreeWidget::item {"
+                      "    color: #202020;"
+                      "    min-height: 30px;"
+                      "    padding: 3px 8px;"
+                      "    border: none;"
+                      "    border-radius: 7px;"
+                      "}"
+                      ""
+                      "QTreeWidget::item:hover {"
+                      "    background: #e8e8e8;"
+                      "}"
+                      ""
+                      "QTreeWidget::branch {"
+                      "    background: #f7f7f7;"
+                      "}"
+                      ""
+                      "QLabel,"
+                      "QCheckBox,"
+                      "QRadioButton {"
+                      "    color: #202020;"
+                      "    background: transparent;"
+                      "}"
+                      ""
+                      "QSlider::groove:horizontal {"
+                      "    height: 4px;"
+                      "    background: #c6c6c6;"
+                      "    border-radius: 2px;"
+                      "}"
+                      ""
+                      "QSlider::sub-page:horizontal {"
+                      "    background: #505050;"
+                      "    border-radius: 2px;"
+                      "}"
+                      ""
+                      "QSlider::handle:horizontal {"
+                      "    width: 14px;"
+                      "    margin: -5px 0;"
+                      "    background: #ffffff;"
+                      "    border: 1px solid #707070;"
+                      "    border-radius: 7px;"
+                      "}");
+    }
+
+    for (const Binding &binding : bindings_)
+    {
+        if (binding.qtWidget)
+        {
+            applyPanelTheme(binding.qtWidget);
+        }
+    }
+}
+
+void QtSidebar::applyPanelTheme(QWidget *widget)
+{
+    if (!widget)
+    {
+        return;
+    }
+
+    if (darkMode_)
+    {
+        widget->setStyleSheet("QWidget {"
+                              "    color: #ececec;"
+                              "    background: transparent;"
+                              "}"
+                              ""
+                              "QLabel,"
+                              "QCheckBox,"
+                              "QRadioButton {"
+                              "    color: #ececec;"
+                              "    background: transparent;"
+                              "}");
+    }
+    else
+    {
+        widget->setStyleSheet("QWidget {"
+                              "    color: #202020;"
+                              "    background: transparent;"
+                              "}"
+                              ""
+                              "QLabel,"
+                              "QCheckBox,"
+                              "QRadioButton {"
+                              "    color: #202020;"
+                              "    background: transparent;"
+                              "}");
+    }
 }
