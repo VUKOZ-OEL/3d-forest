@@ -29,11 +29,21 @@
 #define LOG_MODULE_NAME "GroupBox"
 #include <Log.hpp>
 
-GroupBox::GroupBox(const std::string &str)
+GroupBox::GroupBox(const std::string &str) : title_(str)
 {
-    setText(str);
 }
 
 GroupBox::~GroupBox()
 {
+}
+
+void GroupBox::setTitle(const std::string &title)
+{
+    if (title_ == title)
+    {
+        return;
+    }
+
+    title_ = title;
+    titleChanged(title_);
 }

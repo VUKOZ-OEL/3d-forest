@@ -37,6 +37,34 @@ GridLayout::~GridLayout()
 {
 }
 
+void GridLayout::clear()
+{
+    Layout::clear();
+    positions_.clear();
+}
+
+void GridLayout::addWidget(Widget *widget, int row, int column, int alignment)
+{
+    addWidget(widget, row, column, 1, 1, alignment);
+}
+
+void GridLayout::addWidget(Widget *widget,
+                           int row,
+                           int column,
+                           int rowSpan,
+                           int columnSpan,
+                           int alignment)
+{
+    if (!widget)
+    {
+        return;
+    }
+
+    Layout::addWidget(widget);
+
+    positions_.push_back({row, column, rowSpan, columnSpan});
+}
+
 void GridLayout::setColumnStretch(int row, int column)
 {
 }

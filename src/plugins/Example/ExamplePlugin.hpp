@@ -43,7 +43,7 @@ class ExamplePlugin : public Plugin
 public:
     const char *name() const override { return "ExamplePlugin"; }
     void initialize(Application *app) override;
-    void release() override;
+    void release() override { delete this; }
 
 private:
     Application *app_{nullptr};

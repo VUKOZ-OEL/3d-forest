@@ -20,6 +20,7 @@
 /** @file ComboBox.cpp */
 
 // Include std.
+#include <algorithm>
 
 // Include 3D Forest.
 #include <Application.hpp>
@@ -39,20 +40,42 @@ ComboBox::~ComboBox()
 
 void ComboBox::addItem(const std::string &str)
 {
+    items_.push_back(str);
+    itemAdded(items_.back());
+
+    // Like QComboBox, adding the first item selects it.
+    if (value_ == -1)
+    {
+        value_ = 0;
+        currentIndexChanged(value_);
+    }
 }
 
 std::string ComboBox::itemText(int index) const
 {
-    return "";
+    if (index < 0 || index >= count())
+    {
+        return {};
+    }
+
+    return items_[static_cast<std::size_t>(index)];
 }
 
 void ComboBox::setCurrentText(const std::string &str, bool notify)
 {
+    for (int i = 0; i < count(); ++i)
+    {
+        if (items_[static_cast<std::size_t>(i)] == str)
+        {
+            setValue(i, notify);
+            return;
+        }
+    }
 }
 
 std::string ComboBox::currentText() const
 {
-    return "";
+    return itemText(value_);
 }
 
 int ComboBox::currentIndex() const
@@ -62,13 +85,21 @@ int ComboBox::currentIndex() const
 
 void ComboBox::setValue(int value, bool notify)
 {
-    if (value_ == value)
+    if (value < -1 || value >= count())
     {
         return;
     }
 
-    value_ = value;
+    const bool changed = value_ != value;
 
+    if (changed)
+    {
+        value_ = value;
+        currentIndexChanged(value_);
+    }
+
+    // QComboBox::activated may occur even when the same item
+    // is selected again.
     if (notify && !signalsBlocked())
     {
         activated(value_);

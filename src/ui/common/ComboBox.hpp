@@ -37,6 +37,8 @@ public:
     virtual ~ComboBox();
 
     void addItem(const std::string &str);
+
+    int count() const { return static_cast<int>(items_.size()); }
     std::string itemText(int index) const;
 
     void setCurrentText(const std::string &str, bool notify = false);
@@ -45,10 +47,14 @@ public:
 
     void setValue(int value, bool notify = false);
 
+    Signal<int> currentIndexChanged;
+    Signal<const std::string &> itemAdded;
+
     Signal<int> activated;
 
 private:
-    int value_{0};
+    std::vector<std::string> items_;
+    int value_{-1};
 };
 
 #include <WarningsEnable.hpp>

@@ -20,16 +20,18 @@
 /** @file LayoutItem.cpp */
 
 // Include 3D Forest.
+#include <Layout.hpp>
 #include <LayoutItem.hpp>
+#include <Widget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "LayoutItem"
 #include <Log.hpp>
 
-LayoutItem::LayoutItem()
+LayoutItem::LayoutItem(Widget *widget) : widget_(widget)
 {
 }
 
-LayoutItem::~LayoutItem()
+LayoutItem::LayoutItem(Layout *layout) : layout_(layout)
 {
 }

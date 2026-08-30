@@ -28,7 +28,6 @@
 
 // Include 3D Forest.
 #include <Action.hpp>
-#include <DockWidget.hpp>
 #include <Editor.hpp>
 #include <EventQueue.hpp>
 #include <MenuBar.hpp>
@@ -44,15 +43,15 @@
 #include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
 
-#define MAIN_WINDOW_MENU_FILE_PRIORITY 10
-#define MAIN_WINDOW_MENU_EDIT_PRIORITY 20
-#define MAIN_WINDOW_MENU_DATA_PRIORITY 30
-#define MAIN_WINDOW_MENU_COMPUTE_PRIORITY 40
-#define MAIN_WINDOW_MENU_FILTER_PRIORITY 50
-#define MAIN_WINDOW_MENU_EXTERNAL_PRIORITY 52
-#define MAIN_WINDOW_MENU_VIEWPORT_PRIORITY 55
-#define MAIN_WINDOW_MENU_SETTINGS_PRIORITY 60
-#define MAIN_WINDOW_MENU_HELP_PRIORITY 70
+#define MAIN_WINDOW_MENU_FILE_PRIORITY 100
+#define MAIN_WINDOW_MENU_EDIT_PRIORITY 200
+#define MAIN_WINDOW_MENU_DATA_PRIORITY 300
+#define MAIN_WINDOW_MENU_COMPUTE_PRIORITY 400
+#define MAIN_WINDOW_MENU_FILTER_PRIORITY 500
+#define MAIN_WINDOW_MENU_EXTERNAL_PRIORITY 550
+#define MAIN_WINDOW_MENU_VIEWPORT_PRIORITY 700
+#define MAIN_WINDOW_MENU_SETTINGS_PRIORITY 800
+#define MAIN_WINDOW_MENU_HELP_PRIORITY 900
 
 /** Application. */
 class EXPORT_UI_COMMON Application : public ThreadCallbackInterface
@@ -93,6 +92,16 @@ public:
                           const std::string &toolTip,
                           const ThemeIcon &themeIcon,
                           std::function<void()> callback = {});
+
+    void createAction(Plugin *owner,
+                      const std::vector<NavigationPathItem> &path,
+                      const std::string &toolBarTitle,
+                      const std::string &text,
+                      const std::string &toolTip,
+                      const ThemeIcon &icon,
+                      std::function<void()> cb,
+                      Widget *widget,
+                      int order = 0);
 
     virtual void addNavigationItem(Plugin *owner,
                                    const std::vector<NavigationPathItem> &path,

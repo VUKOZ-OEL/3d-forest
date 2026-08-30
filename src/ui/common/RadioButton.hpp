@@ -43,6 +43,7 @@ public:
     Signal<int> stateChanged;
 
 private:
+    std::string text_;
     bool checked_{false};
 };
 

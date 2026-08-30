@@ -34,6 +34,7 @@ void ExamplePlugin::initialize(Application *app)
 {
     LOG_DEBUG(<< "Start initializing example plugin.");
     app_ = app;
+
     widget_ = new ExampleWidget(app_);
     widgetAction_ = new Action("View settings");
     widgetAction_->setPanel(widget_);
@@ -44,9 +45,4 @@ void ExamplePlugin::initialize(Application *app)
     closeAction_ = new Action("Close");
     app_->addNavigationItem(this, {{"File", 100}}, closeAction_, 200);
     LOG_DEBUG(<< "Finished initializing example plugin.");
-}
-
-void ExamplePlugin::release()
-{
-    delete this;
 }

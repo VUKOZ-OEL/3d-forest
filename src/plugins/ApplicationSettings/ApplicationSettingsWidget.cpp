@@ -36,8 +36,7 @@
 #define ICON(name) (ThemeIcon(":/ApplicationSettingsResources/", name))
 
 ApplicationSettingsWidget::ApplicationSettingsWidget(Application *app)
-    : Widget(app),
-      app_(app)
+    : app_(app)
 {
     LOG_DEBUG(<< "Start creating settings application widget.");
 

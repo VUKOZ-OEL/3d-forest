@@ -17,30 +17,32 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ViewSettingsWindow.cpp */
+/** @file QtComboBox.hpp */
+
+#ifndef QT_COMBO_BOX_HPP
+#define QT_COMBO_BOX_HPP
 
 // Include 3D Forest.
-#include <Application.hpp>
-#include <ThemeIcon.hpp>
-#include <ViewSettingsWidget.hpp>
-#include <ViewSettingsWindow.hpp>
+#include <ComboBox.hpp>
+
+// Include Qt.
+#include <QComboBox>
+class QWidget;
 
 // Include local.
-#define LOG_MODULE_NAME "ViewSettingsWindow"
-#include <Log.hpp>
+#include <ExportUiQt.hpp>
+#include <WarningsDisable.hpp>
 
-#define ICON(name) (ThemeIcon(":/ViewSettingsResources/", name))
-
-ViewSettingsWindow::ViewSettingsWindow(Application *app) : DockWidget(app)
+/** QtComboBox. */
+class EXPORT_UI_QT QtComboBox : public QComboBox
 {
-    // Widget.
-    ViewSettingsWidget *widget = new ViewSettingsWidget(app);
+public:
+    explicit QtComboBox(ComboBox *comboBox, QWidget *parent = nullptr);
 
-    // Dock.
-    setWidget(widget);
-    // setFixedHeight(widget->sizeHint().height());
-    setWindowTitle(tr("View Settings"));
-    setWindowIcon(ICON("brush"));
-    setAllowedAreas(Ui::LeftDockWidgetArea | Ui::RightDockWidgetArea);
-    // app->addDockWidget(Ui::RightDockWidgetArea, this);
-}
+private:
+    ComboBox *comboBox_;
+};
+
+#include <WarningsEnable.hpp>
+
+#endif /* QT_COMBO_BOX_HPP */

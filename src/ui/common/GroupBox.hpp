@@ -37,7 +37,13 @@ public:
     GroupBox(const std::string &str = "");
     virtual ~GroupBox();
 
+    const std::string &title() const { return title_; }
+    void setTitle(const std::string &title);
+
+    Signal<const std::string &> titleChanged;
+
 private:
+    std::string title_;
 };
 
 #include <WarningsEnable.hpp>

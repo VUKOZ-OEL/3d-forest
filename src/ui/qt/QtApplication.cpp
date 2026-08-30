@@ -23,6 +23,10 @@
 
 // Include 3D Forest.
 #include <QtApplication.hpp>
+#include <QtCheckBox.hpp>
+#include <QtComboBox.hpp>
+#include <QtGridLayout.hpp>
+#include <QtGroupBox.hpp>
 #include <QtLabel.hpp>
 #include <QtSlider.hpp>
 #include <QtVBoxLayout.hpp>
@@ -179,6 +183,24 @@ QWidget *QtApplication::createWidget(Widget *widget, QWidget *parent)
         return nullptr;
     }
 
+    if (auto *w = dynamic_cast<CheckBox *>(widget))
+    {
+        LOG_DEBUG(<< "Create checkbox widget.");
+        return new QtCheckBox(w, parent);
+    }
+
+    if (auto *w = dynamic_cast<ComboBox *>(widget))
+    {
+        LOG_DEBUG(<< "Create combobox widget.");
+        return new QtComboBox(w, parent);
+    }
+
+    if (auto *w = dynamic_cast<GroupBox *>(widget))
+    {
+        LOG_DEBUG(<< "Create groupbox widget.");
+        return new QtGroupBox(w, this, parent);
+    }
+
     if (auto *w = dynamic_cast<Label *>(widget))
     {
         LOG_DEBUG(<< "Create label widget.");
@@ -197,16 +219,22 @@ QWidget *QtApplication::createWidget(Widget *widget, QWidget *parent)
         return new QtViewer(w, parent);
     }
 
-    LOG_DEBUG(<< "Create widget.");
+    LOG_DEBUG(<< "Create default widget.");
     return new QtWidget(widget, this, parent);
 }
 
 QLayout *QtApplication::createLayout(Layout *layout, QWidget *parent)
 {
-    if (auto *vbox = dynamic_cast<VBoxLayout *>(layout))
+    if (auto *gridLayout = dynamic_cast<GridLayout *>(layout))
+    {
+        LOG_DEBUG(<< "Create GridLayout.");
+        return new QtGridLayout(gridLayout, this, parent);
+    }
+
+    if (auto *vBoxLayout = dynamic_cast<VBoxLayout *>(layout))
     {
         LOG_DEBUG(<< "Create VBoxLayout.");
-        return new QtVBoxLayout(vbox, this, parent);
+        return new QtVBoxLayout(vBoxLayout, this, parent);
     }
 
     LOG_DEBUG(<< "Create null layout.");

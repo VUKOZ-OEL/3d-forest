@@ -29,23 +29,34 @@
 #define LOG_MODULE_NAME "CheckBox"
 #include <Log.hpp>
 
-CheckBox::CheckBox(const std::string &str)
+CheckBox::CheckBox(const std::string &str) : text_(str)
 {
-    setText(str);
 }
 
 CheckBox::~CheckBox()
 {
 }
 
+void CheckBox::setText(const std::string &str)
+{
+    if (text_ == str)
+    {
+        return;
+    }
+
+    text_ = str;
+    textChanged(text_);
+}
+
 void CheckBox::setChecked(bool b, bool notify)
 {
-    checked_ = b;
-
-    if (notify && !signalsBlocked())
+    if (checked_ == b)
     {
-        stateChanged(checked_ ? 1 : 0);
+        return;
     }
+
+    checked_ = b;
+    stateChanged(checked_ ? 1 : 0);
 }
 
 bool CheckBox::isChecked() const

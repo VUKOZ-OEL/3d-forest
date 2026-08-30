@@ -29,9 +29,8 @@
 #define LOG_MODULE_NAME "ToolButton"
 #include <Log.hpp>
 
-ToolButton::ToolButton(const std::string &str)
+ToolButton::ToolButton(const std::string &str) : text_(str)
 {
-    setText(str);
 }
 
 ToolButton::~ToolButton()

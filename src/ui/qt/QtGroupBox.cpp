@@ -17,34 +17,40 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file LayoutItem.hpp */
-
-#ifndef LAYOUT_ITEM_HPP
-#define LAYOUT_ITEM_HPP
+/** @file QtGroupBox.cpp */
 
 // Include 3D Forest.
-class Widget;
-class Layout;
+#include <QtApplication.hpp>
+#include <QtGroupBox.hpp>
+
+// Include Qt.
+#include <QSignalBlocker>
 
 // Include local.
-#include <ExportUiCommon.hpp>
-#include <WarningsDisable.hpp>
+#define LOG_MODULE_NAME "QtGroupBox"
+#include <Log.hpp>
 
-/** LayoutItem. */
-class EXPORT_UI_COMMON LayoutItem
+QtGroupBox::QtGroupBox(GroupBox *groupBox, QtApplication *app, QWidget *parent)
+    : QGroupBox(parent),
+      groupBox_(groupBox)
 {
-public:
-    explicit LayoutItem(Widget *widget);
-    explicit LayoutItem(Layout *layout);
+    setTitle(QString::fromStdString(groupBox_->title()));
 
-    Widget *widget() const { return widget_; }
-    Layout *layout() const { return layout_; }
+    groupBox_->titleChanged.connect(
+        [this](const std::string &title)
+        { setTitle(QString::fromStdString(title)); });
 
-private:
-    Widget *widget_{nullptr};
-    Layout *layout_{nullptr};
-};
+    if (groupBox_->layout())
+    {
+        QLayout *layout = app->createLayout(groupBox_->layout(), this);
 
-#include <WarningsEnable.hpp>
+        if (layout)
+        {
+            QGroupBox::setLayout(layout);
+        }
+    }
+}
 
-#endif /* LAYOUT_ITEM_HPP */
+QtGroupBox::~QtGroupBox()
+{
+}

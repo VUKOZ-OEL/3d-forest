@@ -41,12 +41,19 @@ Layout::~Layout()
 
 void Layout::clear()
 {
-    for (Widget *widget : widgets_)
+    for (const LayoutItem &item : items_)
     {
-        delete widget;
+        if (item.widget())
+        {
+            delete item.widget();
+        }
+        else if (item.layout())
+        {
+            delete item.layout();
+        }
     }
 
-    widgets_.clear();
+    items_.clear();
 }
 
 void Layout::addWidget(Widget *widget, int stretch)
@@ -56,15 +63,17 @@ void Layout::addWidget(Widget *widget, int stretch)
         return;
     }
 
-    widgets_.push_back(widget);
-}
-
-void Layout::addWidget(Splitter *widget, int stretch)
-{
+    items_.push_back(LayoutItem(widget));
 }
 
 void Layout::addLayout(Layout *layout, int stretch)
 {
+    if (!layout)
+    {
+        return;
+    }
+
+    items_.push_back(LayoutItem(layout));
 }
 
 void Layout::addStretch()
@@ -76,18 +85,5 @@ void Layout::addSpacing(int spacing)
 }
 
 void Layout::setContentsMargins(int left, int top, int right, int bottom)
-{
-}
-
-void Layout::addWidget(Widget *widget, int row, int column, int alignment)
-{
-}
-
-void Layout::addWidget(Widget *widget,
-                       int row,
-                       int column,
-                       int rowSpan,
-                       int columnSpan,
-                       int alignment)
 {
 }

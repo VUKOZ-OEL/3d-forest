@@ -17,20 +17,35 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ApplicationSettingsWindow.hpp */
+/** @file QtGridLayout.hpp */
 
-#ifndef APPLICATION_SETTINGS_WINDOW_HPP
-#define APPLICATION_SETTINGS_WINDOW_HPP
+#ifndef QT_GRID_LAYOUT_HPP
+#define QT_GRID_LAYOUT_HPP
 
 // Include 3D Forest.
-#include <DockWidget.hpp>
-class Application;
+#include <GridLayout.hpp>
+class QtApplication;
 
-/** Application Settings Window. */
-class ApplicationSettingsWindow : public DockWidget
+// Include Qt.
+#include <QGridLayout>
+class QWidget;
+
+// Include local.
+#include <ExportUiQt.hpp>
+#include <WarningsDisable.hpp>
+
+/** QtGridLayout. */
+class EXPORT_UI_QT QtGridLayout : public QGridLayout
 {
 public:
-    ApplicationSettingsWindow(Application *app);
+    explicit QtGridLayout(GridLayout *layout,
+                          QtApplication *app,
+                          QWidget *parent = nullptr);
+
+private:
+    GridLayout *layout_;
 };
 
-#endif /* APPLICATION_SETTINGS_WINDOW_HPP */
+#include <WarningsEnable.hpp>
+
+#endif /* QT_GRID_LAYOUT_HPP */

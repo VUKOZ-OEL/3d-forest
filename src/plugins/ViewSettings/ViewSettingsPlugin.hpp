@@ -24,7 +24,6 @@
 
 // Include 3D Forest.
 #include <Plugin.hpp>
-class ViewSettingsWindow;
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestViewSettingsPlugin)
@@ -40,17 +39,12 @@ class ViewSettingsWindow;
 class ViewSettingsPlugin : public Plugin
 {
 public:
-    ViewSettingsPlugin();
-
     const char *name() const override { return "ViewSettingsPlugin"; }
     void initialize(Application *app) override;
     void release() override { delete this; }
 
-    void slotPlugin();
-
 private:
     Application *app_;
-    ViewSettingsWindow *pluginWindow_;
 };
 
 extern "C" EXPORT_VIEW_SETTINGS_PLUGIN Plugin *createPlugin()

@@ -24,14 +24,14 @@
 
 // Include 3D Forest.
 #include <Ui.hpp>
-class Widget;
+#include <Widget.hpp>
 
 // Include local.
 #include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
 
 /** Splitter. */
-class EXPORT_UI_COMMON Splitter
+class EXPORT_UI_COMMON Splitter : public Widget
 {
 public:
     Splitter();

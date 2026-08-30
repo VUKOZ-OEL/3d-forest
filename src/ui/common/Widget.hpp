@@ -56,8 +56,8 @@ public:
     Widget(const Widget &) = delete;
     Widget &operator=(const Widget &) = delete;
 
-    void setText(const std::string &str);
-    std::string text() const { return text_; }
+    void setName(const std::string &str) { name_ = str; }
+    const std::string &name() const { return name_; }
 
     void setToolTip(const std::string &str);
     void setFocusPolicy(int focusPolicy);
@@ -90,11 +90,9 @@ public:
     virtual void showEvent(ShowEvent *event);
     virtual void closeEvent(CloseEvent *event);
 
-    Signal<const std::string &> textChanged;
-
 private:
     Layout *layout_{nullptr};
-    std::string text_;
+    std::string name_;
     std::string toolTip_;
     bool signalsBlocked_{false};
     Palette palette_;

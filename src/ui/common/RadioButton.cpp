@@ -29,9 +29,8 @@
 #define LOG_MODULE_NAME "RadioButton"
 #include <Log.hpp>
 
-RadioButton::RadioButton(const std::string &str)
+RadioButton::RadioButton(const std::string &str) : text_(str)
 {
-    setText(str);
 }
 
 RadioButton::~RadioButton()

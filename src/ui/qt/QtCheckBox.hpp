@@ -17,20 +17,32 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ViewSettingsWindow.hpp */
+/** @file QtCheckBox.hpp */
 
-#ifndef VIEW_SETTINGS_WINDOW_HPP
-#define VIEW_SETTINGS_WINDOW_HPP
+#ifndef QT_CHECK_BOX_HPP
+#define QT_CHECK_BOX_HPP
 
 // Include 3D Forest.
-#include <DockWidget.hpp>
-class Application;
+#include <CheckBox.hpp>
 
-/** View Settings Window. */
-class ViewSettingsWindow : public DockWidget
+// Include Qt.
+#include <QCheckBox>
+
+// Include local.
+#include <ExportUiQt.hpp>
+#include <WarningsDisable.hpp>
+
+/** QtCheckBox. */
+class EXPORT_UI_QT QtCheckBox : public QCheckBox
 {
 public:
-    ViewSettingsWindow(Application *app);
+    explicit QtCheckBox(CheckBox *checkBox, QWidget *parent = nullptr);
+    virtual ~QtCheckBox();
+
+private:
+    CheckBox *checkBox_;
 };
 
-#endif /* VIEW_SETTINGS_WINDOW_HPP */
+#include <WarningsEnable.hpp>
+
+#endif /* QT_CHECK_BOX_HPP */

@@ -168,6 +168,8 @@ void ViewSettingsWidget::dataChanged(bool modifiers)
     {
         app_->updateRender();
     }
+
+    LOG_DEBUG_UPDATE(<< "Finished Output view settings.");
 }
 
 void ViewSettingsWidget::setViewSettings(const ViewSettings &settings)

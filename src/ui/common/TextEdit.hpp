@@ -37,11 +37,17 @@ public:
     TextEdit();
     virtual ~TextEdit();
 
+    void setText(const std::string &str);
+    std::string text() const { return text_; }
+
     void setReadOnly(bool b);
     void append(const std::string &str);
     void clear();
 
+    Signal<const std::string &> textChanged;
+
 private:
+    std::string text_;
 };
 
 #include <WarningsEnable.hpp>

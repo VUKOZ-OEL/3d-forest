@@ -26,6 +26,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "Application"
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 Application::Application() : threadRender_(&editor_)
@@ -482,6 +483,26 @@ void Application::createToolButton(ToolButton **result,
     // Return value.
     *result = button;
 #endif
+}
+
+void Application::createAction(Plugin *owner,
+                               const std::vector<NavigationPathItem> &path,
+                               const std::string &toolBarTitle,
+                               const std::string &text,
+                               const std::string &toolTip,
+                               const ThemeIcon &icon,
+                               std::function<void()> cb,
+                               Widget *widget,
+                               int order)
+{
+    Action *action = new Action(text);
+
+    if (widget)
+    {
+        action->setPanel(widget);
+    }
+
+    addNavigationItem(owner, path, action);
 }
 
 void Application::createMenu()

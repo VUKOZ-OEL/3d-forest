@@ -46,8 +46,8 @@ public:
     const std::string &text() const { return text_; }
 
     void setPanel(Widget *panel);
-    Widget *panel() const { return panel_; }
     bool hasPanel() const { return panel_ != nullptr; }
+    Widget *panel() const { return panel_; }
 
     void trigger();
 

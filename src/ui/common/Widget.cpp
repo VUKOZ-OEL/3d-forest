@@ -39,17 +39,6 @@ Widget::~Widget()
     delete layout_;
 }
 
-void Widget::setText(const std::string &str)
-{
-    if (text_ == str)
-    {
-        return;
-    }
-
-    text_ = str;
-    textChanged(text_);
-}
-
 void Widget::setToolTip(const std::string &str)
 {
     toolTip_ = str;

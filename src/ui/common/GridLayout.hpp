@@ -34,12 +34,36 @@ class Application;
 class EXPORT_UI_COMMON GridLayout : public Layout
 {
 public:
+    struct Position
+    {
+        int row;
+        int column;
+        int rowSpan;
+        int columnSpan;
+    };
+
     GridLayout();
     virtual ~GridLayout();
+
+    void clear() override;
+
+    void addWidget(Widget *widget, int row, int column, int alignment = 0);
+    void addWidget(Widget *widget,
+                   int row,
+                   int column,
+                   int rowSpan,
+                   int columnSpan,
+                   int alignment = 0);
+
+    const Position &positionAt(std::size_t index) const
+    {
+        return positions_.at(index);
+    }
 
     void setColumnStretch(int row, int column);
 
 private:
+    std::vector<Position> positions_;
 };
 
 #include <WarningsEnable.hpp>

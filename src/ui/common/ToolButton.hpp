@@ -41,6 +41,7 @@ public:
     void setPixmap(const Pixmap &pixmap);
 
 private:
+    std::string text_;
 };
 
 #include <WarningsEnable.hpp>

@@ -37,11 +37,16 @@ public:
     PushButton(const std::string &str = "");
     virtual ~PushButton();
 
+    void setText(const std::string &str);
+    std::string text() const { return text_; }
+
     void setIcon(const ThemeIcon &icon);
 
+    Signal<const std::string &> textChanged;
     Signal<> clicked;
 
 private:
+    std::string text_;
 };
 
 #include <WarningsEnable.hpp>

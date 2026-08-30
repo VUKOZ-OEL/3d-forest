@@ -17,34 +17,35 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file LayoutItem.hpp */
+/** @file QtGroupBox.hpp */
 
-#ifndef LAYOUT_ITEM_HPP
-#define LAYOUT_ITEM_HPP
+#ifndef QT_GROUP_BOX_HPP
+#define QT_GROUP_BOX_HPP
 
 // Include 3D Forest.
-class Widget;
-class Layout;
+#include <GroupBox.hpp>
+class QtApplication;
+
+// Include Qt.
+#include <QGroupBox>
 
 // Include local.
-#include <ExportUiCommon.hpp>
+#include <ExportUiQt.hpp>
 #include <WarningsDisable.hpp>
 
-/** LayoutItem. */
-class EXPORT_UI_COMMON LayoutItem
+/** QtGroupBox. */
+class EXPORT_UI_QT QtGroupBox : public QGroupBox
 {
 public:
-    explicit LayoutItem(Widget *widget);
-    explicit LayoutItem(Layout *layout);
-
-    Widget *widget() const { return widget_; }
-    Layout *layout() const { return layout_; }
+    explicit QtGroupBox(GroupBox *groupBox,
+                        QtApplication *app,
+                        QWidget *parent = nullptr);
+    virtual ~QtGroupBox();
 
 private:
-    Widget *widget_{nullptr};
-    Layout *layout_{nullptr};
+    GroupBox *groupBox_;
 };
 
 #include <WarningsEnable.hpp>
 
-#endif /* LAYOUT_ITEM_HPP */
+#endif /* QT_GROUP_BOX_HPP */

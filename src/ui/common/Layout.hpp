@@ -26,6 +26,7 @@
 #include <vector>
 
 // Include 3D Forest.
+#include <LayoutItem.hpp>
 #include <Signal.hpp>
 class Application;
 class Widget;
@@ -45,30 +46,29 @@ public:
     Layout(const Layout &) = delete;
     Layout &operator=(const Layout &) = delete;
 
-    void clear();
+    virtual void clear();
 
     void addWidget(Widget *widget, int stretch = 0);
-    void addWidget(Splitter *widget, int stretch = 0);
     void addLayout(Layout *layout, int stretch = 0);
     void addStretch();
     void addSpacing(int spacing);
 
     void setContentsMargins(int left, int top, int right, int bottom);
 
-    void addWidget(Widget *widget, int row, int column, int alignment = 0);
-    void addWidget(Widget *widget,
-                   int row,
-                   int column,
-                   int rowSpan,
-                   int columnSpan,
-                   int alignment = 0);
+    // const std::vector<Widget *> &widgets() const { return widgets_; }
+    std::size_t count() const { return items_.size(); }
 
-    const std::vector<Widget *> &widgets() const { return widgets_; }
+    const LayoutItem &itemAt(std::size_t index) const
+    {
+        return items_.at(index);
+    }
+
+    const std::vector<LayoutItem> &items() const { return items_; }
 
     Signal<Widget *> widgetAdded;
 
 private:
-    std::vector<Widget *> widgets_;
+    std::vector<LayoutItem> items_;
 };
 
 #include <WarningsEnable.hpp>

@@ -29,13 +29,23 @@
 #define LOG_MODULE_NAME "PushButton"
 #include <Log.hpp>
 
-PushButton::PushButton(const std::string &str)
+PushButton::PushButton(const std::string &str) : text_(str)
 {
-    setText(str);
 }
 
 PushButton::~PushButton()
 {
+}
+
+void PushButton::setText(const std::string &str)
+{
+    if (text_ == str)
+    {
+        return;
+    }
+
+    text_ = str;
+    textChanged(text_);
 }
 
 void PushButton::setIcon(const ThemeIcon &icon)

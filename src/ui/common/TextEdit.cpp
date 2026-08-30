@@ -37,6 +37,17 @@ TextEdit::~TextEdit()
 {
 }
 
+void TextEdit::setText(const std::string &str)
+{
+    if (text_ == str)
+    {
+        return;
+    }
+
+    text_ = str;
+    textChanged(text_);
+}
+
 void TextEdit::setReadOnly(bool b)
 {
 }

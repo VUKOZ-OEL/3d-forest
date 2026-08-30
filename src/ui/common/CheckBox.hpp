@@ -37,13 +37,18 @@ public:
     CheckBox(const std::string &str = "");
     virtual ~CheckBox();
 
+    void setText(const std::string &str);
+    std::string text() const { return text_; }
+
     void setChecked(bool b, bool notify = false);
     bool isChecked() const;
 
+    Signal<const std::string &> textChanged;
     Signal<int> stateChanged;
     Signal<bool> clicked;
 
 private:
+    std::string text_;
     bool checked_{false};
 };
 

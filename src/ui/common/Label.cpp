@@ -29,13 +29,23 @@
 #define LOG_MODULE_NAME "Label"
 #include <Log.hpp>
 
-Label::Label(const std::string &str)
+Label::Label(const std::string &str) : text_(str)
 {
-    setText(str);
 }
 
 Label::~Label()
 {
+}
+
+void Label::setText(const std::string &str)
+{
+    if (text_ == str)
+    {
+        return;
+    }
+
+    text_ = str;
+    textChanged(text_);
 }
 
 void Label::setPixmap(const Pixmap &pixmap)

@@ -17,48 +17,49 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file QtVBoxLayout.cpp */
+/** @file QtGridLayout.cpp */
 
 // Include 3D Forest.
 #include <QtApplication.hpp>
-#include <QtVBoxLayout.hpp>
+#include <QtGridLayout.hpp>
 
 // Include Qt.
 #include <QSignalBlocker>
 
 // Include local.
-#define LOG_MODULE_NAME "QtVBoxLayout"
+#define LOG_MODULE_NAME "QtGridLayout"
 #include <Log.hpp>
 
-QtVBoxLayout::QtVBoxLayout(VBoxLayout *layout,
+QtGridLayout::QtGridLayout(GridLayout *layout,
                            QtApplication *app,
                            QWidget *parent)
-    : QVBoxLayout(parent),
+    : QGridLayout(),
       layout_(layout)
 {
-    for (const LayoutItem &item : layout_->items())
+    for (std::size_t i = 0; i < layout_->count(); ++i)
     {
+        const LayoutItem &item = layout_->itemAt(i);
+        const GridLayout::Position &position = layout_->positionAt(i);
+
         if (item.widget())
         {
             QWidget *qtWidget = app->createWidget(item.widget(), parent);
 
-            if (qtWidget)
-            {
-                QVBoxLayout::addWidget(qtWidget);
-            }
+            QGridLayout::addWidget(qtWidget,
+                                   position.row,
+                                   position.column,
+                                   position.rowSpan,
+                                   position.columnSpan);
         }
         else if (item.layout())
         {
             QLayout *qtLayout = app->createLayout(item.layout(), parent);
 
-            if (qtLayout)
-            {
-                QVBoxLayout::addLayout(qtLayout);
-            }
+            QGridLayout::addLayout(qtLayout,
+                                   position.row,
+                                   position.column,
+                                   position.rowSpan,
+                                   position.columnSpan);
         }
     }
-}
-
-QtVBoxLayout::~QtVBoxLayout()
-{
 }

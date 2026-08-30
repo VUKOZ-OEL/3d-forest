@@ -38,9 +38,15 @@ public:
     Label(const std::string &str = "");
     virtual ~Label();
 
+    void setText(const std::string &str);
+    std::string text() const { return text_; }
+
     void setPixmap(const Pixmap &pixmap);
 
+    Signal<const std::string &> textChanged;
+
 private:
+    std::string text_;
 };
 
 #include <WarningsEnable.hpp>
