@@ -58,12 +58,6 @@ public:
 
 private:
     Application *app_{nullptr};
-
-    Action *newProjectAction_;
-    Action *openProjectAction_;
-    Action *saveProjectAction_;
-    Action *saveAsProjectAction_;
-    Action *reloadProjectAction_;
 };
 
 extern "C" EXPORT_PROJECT_FILE_PLUGIN Plugin *createPlugin()

@@ -60,23 +60,28 @@ void ViewerWidget::slotUpdate(const Message &msg)
 std::vector<Camera> ViewerWidget::camera(size_t viewportId) const
 {
     std::vector<Camera> list;
+    list.push_back(viewer_->camera());
     return list;
 }
 
 std::vector<Camera> ViewerWidget::camera() const
 {
     std::vector<Camera> list;
+    list.push_back(viewer_->camera());
     return list;
 }
 
 void ViewerWidget::updateScene()
 {
+    viewer_->requestUpdate();
 }
 
 void ViewerWidget::resetScene()
 {
+    viewer_->requestReset();
 }
 
 void ViewerWidget::resetSceneView()
 {
+    viewer_->requestResetView();
 }

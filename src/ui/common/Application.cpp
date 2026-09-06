@@ -85,6 +85,7 @@ void Application::load()
 
     emitUpdate(this, {});
 
+    LOG_DEBUG_RENDER(<< "Reset viewer.");
     if (pluginManager_.viewer())
     {
         if (interactive_)
@@ -179,39 +180,37 @@ void Application::threadProgress(bool finished)
 
     LOG_DEBUG_RENDER(<< "Thread progress finished <" << finished << ">.");
 
-    requestRenderFromAnyThread();
+    requestRender();
 }
 
-void Application::requestRenderFromAnyThread()
+void Application::requestRender()
 {
-    if (renderPending_.exchange(true))
+    if (!renderPending_.exchange(true))
     {
-        return;
+        wakeUp();
     }
-
-    // QMetaObject::invokeMethod(
-    //     this,
-    //     [this]
-    //     {
-    //         renderPending_.store(false);
-    //         slotRender();
-    //     },
-    //     Qt::QueuedConnection);
 }
 
-void Application::slotRender()
+void Application::processRenderRequest()
 {
     LOG_DEBUG_RENDER(<< "Start rendering.");
     double t1 = Time::realTime();
 
     if (interactive_ && pluginManager_.viewer())
     {
-        pluginManager_.viewer()->updateScene();
+        if (renderPending_.exchange(false))
+        {
+            pluginManager_.viewer()->updateScene();
+        }
     }
 
     double t2 = Time::realTime();
     LOG_DEBUG_RENDER(<< "Finished rendering after <" << (t2 - t1)
                      << "> seconds.");
+}
+
+void Application::wakeUp()
+{
 }
 
 void Application::slotRenderViewport(size_t viewportId)
@@ -268,6 +267,7 @@ void Application::update(void *sender,
 
     if (resetCamera)
     {
+        LOG_DEBUG_RENDER(<< "Reset camera.");
         if (interactive_ && pluginManager_.viewer())
         {
             pluginManager_.viewer()->resetScene();
@@ -501,8 +501,12 @@ void Application::createAction(Plugin *owner,
     {
         action->setPanel(widget);
     }
+    else
+    {
+        action->triggered.connect(cb);
+    }
 
-    addNavigationItem(owner, path, action);
+    addNavigationItem(owner, path, action, order);
 }
 
 void Application::createMenu()
@@ -592,4 +596,10 @@ void Application::setViewer(Widget *widget)
 
 void Application::removeViewer(Widget *widget)
 {
+}
+
+std::string Application::getOpenFileName(const std::string &dialogTitle,
+                                         const std::string &filter)
+{
+    return "";
 }

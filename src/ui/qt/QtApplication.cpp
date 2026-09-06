@@ -35,6 +35,7 @@
 
 // Include Qt.
 // #include <QSurfaceFormat>
+#include <QFileDialog>
 #include <QHBoxLayout>
 #include <QPalette>
 #include <QStyleHints>
@@ -62,6 +63,18 @@ void QtApplication::init()
 
     initLayout();
     load();
+
+    connect(
+        this,
+        &QtApplication::wakeUpRequested,
+        this,
+        [this] { processRenderRequest(); },
+        Qt::QueuedConnection);
+}
+
+void QtApplication::wakeUp()
+{
+    emit wakeUpRequested();
 }
 
 void QtApplication::setOrganizationName(const std::string &str)
@@ -167,7 +180,7 @@ void QtApplication::removeViewer(Widget *widget)
     {
         viewerLayout_->removeWidget(qtViewer_);
 
-        // Deletes QtViewer before the generic Viewer.
+        // Deletes Viewer before the generic Viewer.
         delete qtViewer_;
     }
 
@@ -216,7 +229,7 @@ QWidget *QtApplication::createWidget(Widget *widget, QWidget *parent)
     if (auto *w = dynamic_cast<Viewer *>(widget))
     {
         LOG_DEBUG(<< "Create viewer widget.");
-        return new QtViewer(w, parent);
+        return new QtViewer(w, this, parent);
     }
 
     LOG_DEBUG(<< "Create default widget.");
@@ -264,4 +277,16 @@ bool QtApplication::isDarkMode() const
 void QtApplication::updateTheme()
 {
     sidebar_->setDarkMode(isDarkMode());
+}
+
+std::string QtApplication::getOpenFileName(const std::string &dialogTitle,
+                                           const std::string &filter)
+{
+    const QString filePath =
+        QFileDialog::getOpenFileName(&mainWindow_,
+                                     QString::fromStdString(dialogTitle),
+                                     QString(),
+                                     QString::fromStdString(filter));
+
+    return filePath.toStdString();
 }

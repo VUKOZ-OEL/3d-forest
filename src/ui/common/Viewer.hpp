@@ -23,6 +23,7 @@
 #define VIEWER_HPP
 
 // Include 3D Forest.
+#include <Camera.hpp>
 #include <Widget.hpp>
 class Application;
 
@@ -37,11 +38,19 @@ public:
     Viewer();
     virtual ~Viewer();
 
+    const Camera &camera() const { return camera_; }
+    void setCamera(const Camera &camera);
+
     void requestUpdate();
+    void requestReset();
+    void requestResetView();
 
     Signal<> updateRequested;
+    Signal<> resetRequested;
+    Signal<> resetViewRequested;
 
 private:
+    Camera camera_;
 };
 
 #include <WarningsEnable.hpp>

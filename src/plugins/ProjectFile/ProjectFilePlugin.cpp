@@ -42,59 +42,59 @@ void ProjectFilePlugin::initialize(Application *app)
     app_ = app;
 
     app_->createAction(
-        &newProjectAction_,
-        "File",
+        this,
+        {{"File", MAIN_WINDOW_MENU_FILE_PRIORITY}},
         "File Project",
         tr("New Project"),
         tr("Create new project"),
         ICON("create"),
         [this]() { slotNewProject(); },
-        MAIN_WINDOW_MENU_FILE_PRIORITY,
-        10);
+        nullptr,
+        100);
 
     app_->createAction(
-        &openProjectAction_,
-        "File",
+        this,
+        {{"File", MAIN_WINDOW_MENU_FILE_PRIORITY}},
         "File Project",
         tr("Open Project..."),
         tr("Open project"),
         ICON("opened-folder"),
         [this]() { slotOpenProject(); },
-        MAIN_WINDOW_MENU_FILE_PRIORITY,
-        20);
+        nullptr,
+        200);
 
     app_->createAction(
-        &saveProjectAction_,
-        "File",
+        this,
+        {{"File", MAIN_WINDOW_MENU_FILE_PRIORITY}},
         "File Project",
         tr("Save Project"),
         tr("Save project"),
         ICON("save"),
         [this]() { slotSaveProject(); },
-        MAIN_WINDOW_MENU_FILE_PRIORITY,
-        30);
+        nullptr,
+        300);
 
     app_->createAction(
-        &saveAsProjectAction_,
-        "File",
+        this,
+        {{"File", MAIN_WINDOW_MENU_FILE_PRIORITY}},
         "File Project",
-        tr("Save Project &As..."),
+        tr("Save Project As..."),
         tr("Save project as"),
         ICON("save-as"),
         [this]() { slotSaveAsProject(); },
-        MAIN_WINDOW_MENU_FILE_PRIORITY,
-        40);
+        nullptr,
+        400);
 
     app_->createAction(
-        &reloadProjectAction_,
-        "File",
+        this,
+        {{"File", MAIN_WINDOW_MENU_FILE_PRIORITY}},
         "File Project",
         tr("Reload Project"),
         tr("Reload Project"),
         ICON("reload"),
         [this]() { slotReloadProject(); },
-        MAIN_WINDOW_MENU_FILE_PRIORITY,
-        45);
+        nullptr,
+        500);
 
     // app_->hideToolBar("File Project");
 }

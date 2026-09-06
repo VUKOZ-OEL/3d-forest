@@ -35,7 +35,22 @@ Viewer::~Viewer()
 {
 }
 
+void Viewer::setCamera(const Camera &camera)
+{
+    camera_ = camera;
+}
+
 void Viewer::requestUpdate()
 {
     updateRequested();
+}
+
+void Viewer::requestReset()
+{
+    resetRequested();
+}
+
+void Viewer::requestResetView()
+{
+    resetViewRequested();
 }

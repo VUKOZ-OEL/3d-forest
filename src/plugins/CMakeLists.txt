@@ -41,7 +41,7 @@
 #add_subdirectory(Help)
 #add_subdirectory(ImportFile)
 #add_subdirectory(MessageLog)
-#add_subdirectory(ProjectFile)
+add_subdirectory(ProjectFile)
 #add_subdirectory(TreeSettings)
 #add_subdirectory(TreeTable)
 #add_subdirectory(UnitsSettings)

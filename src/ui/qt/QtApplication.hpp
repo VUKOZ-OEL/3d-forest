@@ -41,13 +41,17 @@
 #include <WarningsDisable.hpp>
 
 /** QtApplication. */
-class EXPORT_UI_QT QtApplication : public Application
+class EXPORT_UI_QT QtApplication : public QObject, public Application
 {
+    Q_OBJECT
+
 public:
     QtApplication(int &argc, char **argv);
     virtual ~QtApplication();
 
     void init();
+
+    void wakeUp() override;
 
     void setOrganizationName(const std::string &str);
     void setApplicationName(const std::string &str);
@@ -60,6 +64,12 @@ public:
 
     QWidget *createWidget(Widget *widget, QWidget *parent = nullptr);
     QLayout *createLayout(Layout *layout, QWidget *parent = nullptr);
+
+    virtual std::string getOpenFileName(const std::string &dialogTitle,
+                                        const std::string &filter) override;
+
+signals:
+    void wakeUpRequested();
 
 private:
     QApplication qapplication_;

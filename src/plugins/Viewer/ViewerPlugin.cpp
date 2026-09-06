@@ -73,6 +73,7 @@ std::vector<Camera> ViewerPlugin::camera() const
 
 void ViewerPlugin::updateScene()
 {
+    LOG_DEBUG(<< "updateScene.");
     if (widget_)
     {
         return widget_->updateScene();
@@ -81,6 +82,7 @@ void ViewerPlugin::updateScene()
 
 void ViewerPlugin::resetScene()
 {
+    LOG_DEBUG(<< "resetScene.");
     if (widget_)
     {
         return widget_->resetScene();
@@ -89,6 +91,7 @@ void ViewerPlugin::resetScene()
 
 void ViewerPlugin::resetSceneView()
 {
+    LOG_DEBUG(<< "resetSceneView.");
     if (widget_)
     {
         return widget_->resetSceneView();

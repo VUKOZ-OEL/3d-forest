@@ -115,6 +115,9 @@ public:
     virtual void setViewer(Widget *widget);
     virtual void removeViewer(Widget *widget);
 
+    virtual std::string getOpenFileName(const std::string &dialogTitle,
+                                        const std::string &filter);
+
     void suspendThreads();
     void resumeThreads();
     virtual void threadProgress(bool finished) override;
@@ -144,16 +147,18 @@ public:
     void updateRender();
 
     /// Call rendering from another thread.
-    void requestRenderFromAnyThread();
+    void requestRender();
 
     /// Calls paint() on all viewports.
-    void slotRender();
+    void processRenderRequest();
 
     /// Updates new data in specified viewport.
     void slotRenderViewport(size_t viewportId);
 
     /// Updates new data in all viewports.
     void slotRenderViewports();
+
+    virtual void wakeUp();
 
     /// Connect to this signal in your plugin to be notified about data changes.
     // void signalUpdate(void *sender, const std::set<Editor::Type> &target);
@@ -171,7 +176,7 @@ private:
 
     RenderThread threadRender_;
     std::atomic_bool renderPending_{false};
-    bool interactive_{false};
+    bool interactive_{true};
 
     PluginManager pluginManager_;
 

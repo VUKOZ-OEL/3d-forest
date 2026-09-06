@@ -58,9 +58,8 @@ bool ProjectFileAction::openProject(Application *app)
 
     std::string fileName;
 
-    fileName = FileDialog::getOpenFileName(app,
-                                           "Open Project",
-                                           PROJECT_FILE_PLUGIN_FILTER_PRJ);
+    fileName =
+        app->getOpenFileName("Open Project", PROJECT_FILE_PLUGIN_FILTER_PRJ);
 
     if (fileName.empty())
     {
