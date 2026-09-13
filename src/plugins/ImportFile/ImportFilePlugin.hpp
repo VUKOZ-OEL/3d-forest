@@ -52,7 +52,6 @@ public:
 
 private:
     Application *app_;
-    Action *importFileAction_;
 };
 
 extern "C" EXPORT_IMPORT_FILE_PLUGIN Plugin *createPlugin()

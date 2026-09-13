@@ -21,7 +21,6 @@
 
 // Include 3D Forest.
 #include <Application.hpp>
-#include <FileDialog.hpp>
 #include <ImportFileDialog.hpp>
 #include <ImportFilePlugin.hpp>
 #include <IndexFileBuilder.hpp>
@@ -70,15 +69,15 @@ void ImportFilePlugin::initialize(Application *app)
     app_ = app;
 
     app_->createAction(
-        &importFileAction_,
-        "File",
+        this,
+        {{"File", MAIN_WINDOW_MENU_FILE_PRIORITY}},
         "File Import/Export",
         tr("Import..."),
         tr("Import new point cloud dataset"),
         ICON("import-file"),
         [this]() { slotImportFile(); },
-        MAIN_WINDOW_MENU_FILE_PRIORITY,
-        50);
+        nullptr,
+        600);
 
     // app_->hideToolBar("File Import/Export");
 }
@@ -123,8 +122,7 @@ static void importPluginDialog(Application *app)
     LOG_DEBUG(<< "Start importing files.");
 
     std::vector<std::string> fileNames;
-    fileNames =
-        FileDialog::selectFiles(app, tr("Import File"), IMPORT_PLUGIN_FILTER);
+    fileNames = app->getOpenFileNames(tr("Import File"), IMPORT_PLUGIN_FILTER);
 
     LOG_DEBUG(<< "Selected <" << fileNames.size() << "> files.");
     if (fileNames.empty())

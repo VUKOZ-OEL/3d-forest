@@ -44,6 +44,7 @@ public:
     bool isChecked() const;
 
     Signal<const std::string &> textChanged;
+    Signal<int> stateUpdated;
     Signal<int> stateChanged;
     Signal<bool> clicked;
 

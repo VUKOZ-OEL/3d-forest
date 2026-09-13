@@ -64,6 +64,7 @@ public:
     int value() const { return value_; }
     void setValue(int value, bool notify = false);
 
+    Signal<int> valueUpdated;
     Signal<int> valueChanged;
     Signal<> sliderReleased;
 

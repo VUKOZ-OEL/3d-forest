@@ -98,9 +98,7 @@ void ComboBox::setValue(int value, bool notify)
         currentIndexChanged(value_);
     }
 
-    // QComboBox::activated may occur even when the same item
-    // is selected again.
-    if (notify && !signalsBlocked())
+    if (notify)
     {
         activated(value_);
     }

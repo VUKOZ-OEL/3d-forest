@@ -38,6 +38,7 @@
 #include <ThreadCallbackInterface.hpp>
 #include <ToolButton.hpp>
 #include <Translation.hpp>
+class MessageBox;
 
 // Include local.
 #include <ExportUiCommon.hpp>
@@ -117,6 +118,18 @@ public:
 
     virtual std::string getOpenFileName(const std::string &dialogTitle,
                                         const std::string &filter);
+
+    virtual std::vector<std::string> getOpenFileNames(
+        const std::string &dialogTitle,
+        const std::string &filter);
+
+    virtual std::string getSaveFileName(const std::string &caption = "",
+                                        const std::string &dir = "",
+                                        const std::string &filter = "",
+                                        std::string *selectedFilter = nullptr,
+                                        int options = 0); // FileDialogOption
+
+    virtual int showMessageBox(const MessageBox &messageBox);
 
     void suspendThreads();
     void resumeThreads();

@@ -21,6 +21,7 @@
 
 // Include 3D Forest.
 #include <Application.hpp>
+#include <MessageBox.hpp>
 #include <Time.hpp>
 #include <Widget.hpp>
 
@@ -602,4 +603,27 @@ std::string Application::getOpenFileName(const std::string &dialogTitle,
                                          const std::string &filter)
 {
     return "";
+}
+
+std::vector<std::string> Application::getOpenFileNames(
+    const std::string &dialogTitle,
+    const std::string &filter)
+{
+    std::vector<std::string> list;
+
+    return list;
+}
+
+std::string Application::getSaveFileName(const std::string &caption,
+                                         const std::string &dir,
+                                         const std::string &filter,
+                                         std::string *selectedFilter,
+                                         int options)
+{
+    return "";
+}
+
+int Application::showMessageBox(const MessageBox &messageBox)
+{
+    return 0;
 }

@@ -66,8 +66,6 @@ private:
 
     void dataChanged(bool modifiers = false);
     void setViewSettings(const ViewSettings &settings);
-    void block();
-    void unblock();
 };
 
 #endif /* VIEW_SETTINGS_WIDGET_HPP */

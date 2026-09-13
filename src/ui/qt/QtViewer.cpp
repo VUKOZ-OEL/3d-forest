@@ -57,7 +57,9 @@ QtViewer::QtViewer(Viewer *viewer, QtApplication *app, QWidget *parent)
 
     editor_ = &app_->editor();
 
-    viewer_->updateRequested.connect([this]() { update(); });
+    viewer_->updateRequested.connect([this]() { updateScene(); });
+    viewer_->resetRequested.connect([this]() { resetScene(); });
+    viewer_->resetViewRequested.connect([this]() { resetSceneView(); });
 }
 
 QtViewer::~QtViewer()
@@ -216,7 +218,8 @@ void QtViewer::updateScene()
 
     // editor_ = editor;
 
-    repaint();
+    update();
+    // repaint(); must finish before the current function returns
 }
 
 void QtViewer::resetScene()

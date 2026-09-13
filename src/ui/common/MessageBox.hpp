@@ -56,12 +56,19 @@ public:
         RestoreDefaults = 0x08000000
     };
 
-    MessageBox();
+    explicit MessageBox(Application *app);
 
+    void setTitle(const std::string &title);
     void setText(const std::string &text);
     void setInformativeText(const std::string &text);
     void setStandardButtons(int buttons);
-    void setDefaultButton(int button);
+    void setDefaultButton(StandardButton button);
+
+    const std::string &title() const { return title_; }
+    const std::string &text() const { return text_; }
+    const std::string &informativeText() const { return informativeText_; }
+    int standardButtons() const { return buttons_; }
+    StandardButton defaultButton() const { return defaultButton_; }
 
     int exec();
 
@@ -96,7 +103,12 @@ public:
                         int defaultButton = NoButton);
 
 private:
-    int defaultButton_{0};
+    Application *app_;
+    std::string title_;
+    std::string text_;
+    std::string informativeText_;
+    int buttons_{Ok};
+    StandardButton defaultButton_{Ok};
 };
 
 #include <WarningsEnable.hpp>

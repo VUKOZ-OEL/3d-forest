@@ -22,6 +22,7 @@
 // Include std.
 
 // Include 3D Forest.
+#include <MessageBox.hpp>
 #include <QtApplication.hpp>
 #include <QtCheckBox.hpp>
 #include <QtComboBox.hpp>
@@ -34,9 +35,9 @@
 #include <QtWidget.hpp>
 
 // Include Qt.
-// #include <QSurfaceFormat>
 #include <QFileDialog>
 #include <QHBoxLayout>
+#include <QMessageBox>
 #include <QPalette>
 #include <QStyleHints>
 
@@ -45,7 +46,8 @@
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-QtApplication::QtApplication(int &argc, char **argv) : qapplication_(argc, argv)
+QtApplication::QtApplication(QApplication &qapplication)
+    : qapplication_(qapplication)
 {
 }
 
@@ -55,13 +57,8 @@ QtApplication::~QtApplication()
 
 void QtApplication::init()
 {
-    // QSurfaceFormat format;
-    // format.setDepthBufferSize(24);
-    // format.setAlphaBufferSize(8);
-    // format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
-    // QSurfaceFormat::setDefaultFormat(format);
-
     initLayout();
+
     load();
 
     connect(
@@ -87,6 +84,12 @@ void QtApplication::setApplicationName(const std::string &str)
 
 void QtApplication::setApplicationVersion(const std::string &str)
 {
+}
+
+void QtApplication::setWindowIcon(const QIcon &icon)
+{
+    qapplication_.setWindowIcon(icon);
+    mainWindow_.setWindowIcon(icon);
 }
 
 int QtApplication::exec()
@@ -289,4 +292,114 @@ std::string QtApplication::getOpenFileName(const std::string &dialogTitle,
                                      QString::fromStdString(filter));
 
     return filePath.toStdString();
+}
+
+std::vector<std::string> QtApplication::getOpenFileNames(
+    const std::string &dialogTitle,
+    const std::string &filter)
+{
+    std::vector<std::string> list;
+
+    QFileDialog fileDialog(&mainWindow_, QString::fromStdString(dialogTitle));
+    fileDialog.setNameFilter(QString::fromStdString(filter));
+    fileDialog.setFileMode(QFileDialog::ExistingFiles);
+
+    if (fileDialog.exec() == QDialog::Rejected)
+    {
+        LOG_DEBUG(<< "Canceled opening files from the dialog.");
+        return list;
+    }
+
+    QStringList files = fileDialog.selectedFiles();
+    for (auto const &file : files)
+    {
+        if (file.length() > 0)
+        {
+            list.push_back(file.toStdString());
+        }
+    }
+
+    return list;
+}
+
+std::string QtApplication::getSaveFileName(const std::string &caption,
+                                           const std::string &dir,
+                                           const std::string &filter,
+                                           std::string *selectedFilter,
+                                           int options)
+{
+    QFileDialog::Options qoptions;
+    if (options & Ui::FileDialogOption::DontConfirmOverwrite)
+    {
+        qoptions = QFlag(QFileDialog::DontConfirmOverwrite);
+    }
+
+    QString qselectedFilter;
+
+    QString fileName =
+        QFileDialog::getSaveFileName(&mainWindow_,
+                                     QString::fromStdString(caption),
+                                     QString::fromStdString(dir),
+                                     QString::fromStdString(filter),
+                                     &qselectedFilter,
+                                     qoptions);
+
+    return fileName.toStdString();
+}
+
+int QtApplication::showMessageBox(const MessageBox &box)
+{
+    QMessageBox dialog(&mainWindow_);
+
+    dialog.setWindowTitle(QString::fromStdString(box.title()));
+    dialog.setText(QString::fromStdString(box.text()));
+    dialog.setInformativeText(QString::fromStdString(box.informativeText()));
+
+    const auto toQt = [](MessageBox::StandardButton button)
+    {
+        switch (button)
+        {
+            case MessageBox::Ok:
+                return QMessageBox::Ok;
+            case MessageBox::Save:
+                return QMessageBox::Save;
+            case MessageBox::Discard:
+                return QMessageBox::Discard;
+            case MessageBox::Cancel:
+                return QMessageBox::Cancel;
+            default:
+                return QMessageBox::NoButton;
+        }
+    };
+
+    QMessageBox::StandardButtons buttons = QMessageBox::NoButton;
+
+    for (auto button : {MessageBox::Ok,
+                        MessageBox::Save,
+                        MessageBox::Discard,
+                        MessageBox::Cancel})
+    {
+        if (box.standardButtons() & button)
+        {
+            buttons |= toQt(button);
+        }
+    }
+
+    dialog.setStandardButtons(buttons);
+    dialog.setDefaultButton(toQt(box.defaultButton()));
+
+    const int result = dialog.exec();
+
+    for (auto button : {MessageBox::Ok,
+                        MessageBox::Save,
+                        MessageBox::Discard,
+                        MessageBox::Cancel})
+    {
+        if (result == toQt(button))
+        {
+            return button;
+        }
+    }
+
+    return MessageBox::NoButton;
 }

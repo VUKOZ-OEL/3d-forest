@@ -176,8 +176,6 @@ void ViewSettingsWidget::setViewSettings(const ViewSettings &settings)
 {
     LOG_DEBUG(<< "Set view settings.");
 
-    block();
-
     settings_ = settings;
 
     // Foreground color.
@@ -209,8 +207,6 @@ void ViewSettingsWidget::setViewSettings(const ViewSettings &settings)
     // Bounding box.
     sceneBoundingBoxVisibleCheckBox_->setChecked(
         settings_.sceneBoundingBoxVisible());
-
-    unblock();
 }
 
 void ViewSettingsWidget::slotSetPointSize(int v)
@@ -259,14 +255,4 @@ void ViewSettingsWidget::slotSetSceneBoundingBoxVisible(int v)
     settings_.setSceneBoundingBoxVisible(
         sceneBoundingBoxVisibleCheckBox_->isChecked());
     dataChanged();
-}
-
-void ViewSettingsWidget::block()
-{
-    (void)blockSignals(true);
-}
-
-void ViewSettingsWidget::unblock()
-{
-    (void)blockSignals(false);
 }

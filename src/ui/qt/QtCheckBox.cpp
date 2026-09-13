@@ -37,9 +37,10 @@ QtCheckBox::QtCheckBox(CheckBox *checkBox, QWidget *parent)
 
     QObject::connect(this,
                      &QCheckBox::toggled,
-                     [this](bool checked) { checkBox_->setChecked(checked); });
+                     [this](bool checked)
+                     { checkBox_->setChecked(checked, true); });
 
-    checkBox_->stateChanged.connect(
+    checkBox_->stateUpdated.connect(
         [this](int checked)
         {
             const QSignalBlocker blocker(this);

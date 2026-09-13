@@ -22,7 +22,6 @@
 // Include 3D Forest.
 #include <Application.hpp>
 #include <External3dMarteloscopeDialog.hpp>
-#include <FileDialog.hpp>
 #include <HBoxLayout.hpp>
 #include <Label.hpp>
 #include <LineEdit.hpp>
@@ -85,12 +84,12 @@ void External3dMarteloscopeDialog::slotBrowse()
     std::string selectedFilter;
 
     std::string fileName =
-        FileDialog::getSaveFileName(app_,
-                                    tr("Select File"),
-                                    fileNameLineEdit_->text(),
-                                    tr("iLand project XML (*.xml)"),
-                                    &selectedFilter,
-                                    FileDialog::DontConfirmOverwrite);
+        app_->getSaveFileName(app_,
+                              tr("Select File"),
+                              fileNameLineEdit_->text(),
+                              tr("iLand project XML (*.xml)"),
+                              &selectedFilter,
+                              Ui::FileDialogOption::DontConfirmOverwrite);
 
     if (fileName.empty())
     {

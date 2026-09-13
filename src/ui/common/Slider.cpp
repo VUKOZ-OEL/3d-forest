@@ -82,7 +82,9 @@ void Slider::setValue(int value, bool notify)
 
     value_ = value;
 
-    if (notify && !signalsBlocked())
+    valueUpdated(value_);
+
+    if (notify)
     {
         valueChanged(value_);
     }

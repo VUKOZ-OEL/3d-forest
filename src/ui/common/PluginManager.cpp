@@ -25,6 +25,10 @@
 #if defined(PLATFORM_WINDOWS)
     #define NOMINMAX
     #include <windows.h>
+
+    #ifdef MessageBox
+        #undef MessageBox
+    #endif
 #else
     #include <dlfcn.h>
 #endif

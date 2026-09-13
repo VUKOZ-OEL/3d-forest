@@ -44,7 +44,6 @@ public:
     PluginManager();
     virtual ~PluginManager();
 
-    void clear();
     void load(Application *app);
     void unload();
 
@@ -54,12 +53,13 @@ private:
     Application *app_{nullptr};
     std::vector<PluginHandle> plugins_;
 
-    void load(const std::string &fileName);
-
     ProjectFileInterface *projectFilePlugin_;
     // ImportFileInterface *importFilePlugin_;
     ViewerInterface *viewerPlugin_;
     // HelpPlugin *helpPlugin_;
+
+    void clear();
+    void load(const std::string &fileName);
 };
 
 #include <WarningsEnable.hpp>

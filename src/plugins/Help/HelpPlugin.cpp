@@ -40,14 +40,15 @@ void HelpPlugin::initialize(Application *app)
     app_ = app;
 
     app_->createAction(
-        &aboutAction_,
-        "Help",
+        this,
+        {{"Help", MAIN_WINDOW_MENU_HELP_PRIORITY}},
         "",
-        tr("About 3D Forest"),
+        tr("About"),
         tr("About this application"),
         THEME_ICON("question"),
         [this]() { slotAbout(); },
-        MAIN_WINDOW_MENU_HELP_PRIORITY);
+        nullptr,
+        100);
 }
 
 void HelpPlugin::slotAbout()

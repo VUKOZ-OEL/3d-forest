@@ -46,7 +46,7 @@ class EXPORT_UI_QT QtApplication : public QObject, public Application
     Q_OBJECT
 
 public:
-    QtApplication(int &argc, char **argv);
+    QtApplication(QApplication &qapplication);
     virtual ~QtApplication();
 
     void init();
@@ -56,6 +56,7 @@ public:
     void setOrganizationName(const std::string &str);
     void setApplicationName(const std::string &str);
     void setApplicationVersion(const std::string &str);
+    void setWindowIcon(const QIcon &icon);
 
     int exec();
 
@@ -65,14 +66,26 @@ public:
     QWidget *createWidget(Widget *widget, QWidget *parent = nullptr);
     QLayout *createLayout(Layout *layout, QWidget *parent = nullptr);
 
-    virtual std::string getOpenFileName(const std::string &dialogTitle,
-                                        const std::string &filter) override;
+    std::string getOpenFileName(const std::string &dialogTitle,
+                                const std::string &filter) override;
+
+    std::vector<std::string> getOpenFileNames(
+        const std::string &dialogTitle,
+        const std::string &filter) override;
+
+    std::string getSaveFileName(const std::string &caption = "",
+                                const std::string &dir = "",
+                                const std::string &filter = "",
+                                std::string *selectedFilter = nullptr,
+                                int options = 0) override;
+
+    int showMessageBox(const MessageBox &messageBox) override;
 
 signals:
     void wakeUpRequested();
 
 private:
-    QApplication qapplication_;
+    QApplication &qapplication_;
     QMainWindow mainWindow_;
 
     QSplitter *splitter_{nullptr};

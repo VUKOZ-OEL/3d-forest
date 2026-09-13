@@ -22,7 +22,6 @@
 // Include 3D Forest.
 #include <Application.hpp>
 #include <CheckBox.hpp>
-#include <FileDialog.hpp>
 #include <FileFormatCsv.hpp>
 #include <GridLayout.hpp>
 #include <GroupBox.hpp>
@@ -91,12 +90,11 @@ void TreeTableExportDialog::slotBrowse()
     std::string selectedFilter;
 
     std::string fileName =
-        FileDialog::getSaveFileName(app_,
-                                    tr("Export File As"),
-                                    fileNameLineEdit_->text(),
-                                    tr("Comma Separated Values (*.csv)"),
-                                    &selectedFilter,
-                                    FileDialog::DontConfirmOverwrite);
+        app_->getSaveFileName(tr("Export File As"),
+                              fileNameLineEdit_->text(),
+                              tr("Comma Separated Values (*.csv)"),
+                              &selectedFilter,
+                              Ui::FileDialogOption::DontConfirmOverwrite);
 
     if (fileName.empty())
     {

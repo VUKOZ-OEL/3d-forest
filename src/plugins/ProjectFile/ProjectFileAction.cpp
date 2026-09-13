@@ -22,7 +22,6 @@
 // Include 3D Forest.
 #include <Application.hpp>
 #include <Editor.hpp>
-#include <FileDialog.hpp>
 #include <MessageBox.hpp>
 #include <ProjectFileAction.hpp>
 
@@ -89,9 +88,9 @@ bool ProjectFileAction::saveAsProject(Application *app)
 
     std::string fileName;
 
-    fileName = FileDialog::getSaveFileName(app,
-                                           "Save Project As",
-                                           PROJECT_FILE_PLUGIN_FILTER_PRJ);
+    fileName = app->getSaveFileName("Save Project As",
+                                    "",
+                                    PROJECT_FILE_PLUGIN_FILTER_PRJ);
 
     if (fileName.empty())
     {
@@ -115,7 +114,7 @@ bool ProjectFileAction::reloadProject(Application *app)
     {
         LOG_DEBUG(<< "Project has unsaved changes.");
 
-        MessageBox msgBox;
+        MessageBox msgBox(app);
         msgBox.setText("The document has been modified.");
         msgBox.setInformativeText("Please save the changes first.");
         msgBox.setStandardButtons(MessageBox::Ok);
@@ -192,9 +191,8 @@ bool ProjectFileAction::saveProject(Application *app, const std::string &path)
             // First time save.
             std::string fileName;
 
-            fileName =
-                FileDialog::getSaveFileName(app,
-                                            "Save As",
+            fileName = app->getSaveFileName("Save As",
+                                            "",
                                             PROJECT_FILE_PLUGIN_FILTER_PRJ);
 
             if (fileName.empty())
@@ -247,7 +245,7 @@ bool ProjectFileAction::closeProject(Application *app)
     {
         LOG_DEBUG(<< "Project has unsaved changes.");
 
-        MessageBox msgBox;
+        MessageBox msgBox(app);
         msgBox.setText("The document has been modified.");
         msgBox.setInformativeText("Do you want to save your changes?");
         msgBox.setStandardButtons(MessageBox::Save | MessageBox::Discard |

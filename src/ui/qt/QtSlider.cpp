@@ -38,9 +38,9 @@ QtSlider::QtSlider(Slider *slider, QWidget *parent)
     connect(this,
             &QSlider::valueChanged,
             this,
-            [this](int value) { slider_->setValue(value); });
+            [this](int value) { slider_->setValue(value, true); });
 
-    slider_->valueChanged.connect(
+    slider_->valueUpdated.connect(
         [this](int value)
         {
             // Prevent the QSlider signal from going back into Slider.

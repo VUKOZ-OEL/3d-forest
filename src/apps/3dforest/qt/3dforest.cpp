@@ -23,6 +23,9 @@
 #include <Error.hpp>
 #include <QtApplication.hpp>
 
+// Include Qt.
+#include <QSurfaceFormat>
+
 // Include local.
 #define LOG_MODULE_NAME "3dforest"
 #include <Log.hpp>
@@ -41,7 +44,7 @@ int main(int argc, char *argv[])
     int rc = 1;
 
     LOGGER_START_FILE("log.txt");
-    // qInstallMessageHandler(messageLogWindowQtMessageHandler);
+    qInstallMessageHandler(messageLogWindowQtMessageHandler);
 
     LOG_INFO(<< "3DForest started. Git Revision <" << GIT_COMMIT_HASH << ">.");
 
@@ -50,16 +53,19 @@ int main(int argc, char *argv[])
         (void)qRegisterMetaType<size_t>("size_t");
         (void)qRegisterMetaType<LogMessage>("LogMessage");
 
-        QtApplication app(argc, argv);
+        QSurfaceFormat format;
+        format.setDepthBufferSize(24);
+        format.setAlphaBufferSize(8);
+        format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+        QSurfaceFormat::setDefaultFormat(format);
+
+        QApplication qapplication(argc, argv);
+        QtApplication app(qapplication);
 
         app.setOrganizationName("VUKOZ v.v.i.");
         app.setApplicationName("3D Forest");
         app.setApplicationVersion("1.0");
-        // app.setWindowIcon(QIcon(":/3d-forest-128px.png"));
-
-        // MainWindow window;
-        // window.setWindowIcon(QIcon(":/3d-forest-128px.png"));
-        // window.show();
+        app.setWindowIcon(QIcon(":/3d-forest-128px.png"));
 
         app.init();
 
@@ -73,6 +79,8 @@ int main(int argc, char *argv[])
     {
         LOG_ERROR("error: unknown");
     }
+
+    LOG_INFO(<< "3DForest closed with exit code <" << rc << ">.");
 
     LOGGER_STOP_FILE;
 

@@ -56,7 +56,13 @@ void CheckBox::setChecked(bool b, bool notify)
     }
 
     checked_ = b;
-    stateChanged(checked_ ? 1 : 0);
+
+    stateUpdated(checked_ ? 1 : 0);
+
+    if (notify)
+    {
+        stateChanged(checked_ ? 1 : 0);
+    }
 }
 
 bool CheckBox::isChecked() const

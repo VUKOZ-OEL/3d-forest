@@ -21,7 +21,6 @@
 
 // Include 3D Forest.
 #include <Application.hpp>
-#include <OpenFileDialog.hpp>
 #include <TreeTableAction.hpp>
 
 // Include local.
@@ -89,7 +88,7 @@ void TreeTableAction::readMesh(Application *app,
         return;
     }
 
-    std::string path = OpenFileDialog::dialog(app, "(*.ply)");
+    std::string path = app->getOpenFileName(tr("Open File"), "(*.ply)");
     if (path.empty())
     {
         LOG_DEBUG(<< "No file selected");

@@ -26,7 +26,6 @@
 #include <ExportFileDialog.hpp>
 #include <ExportFileFormatCsv.hpp>
 #include <ExportFileFormatLas.hpp>
-#include <FileDialog.hpp>
 #include <GridLayout.hpp>
 #include <GroupBox.hpp>
 #include <HBoxLayout.hpp>
@@ -143,13 +142,12 @@ void ExportFileDialog::slotBrowse()
     std::string selectedFilter;
 
     std::string fileName =
-        FileDialog::getSaveFileName(app_,
-                                    tr("Export File As"),
-                                    fileNameLineEdit_->text(),
-                                    tr("LAS (LASer) File (*.las);;"
-                                       "Comma Separated Values (*.csv)"),
-                                    &selectedFilter,
-                                    FileDialog::DontConfirmOverwrite);
+        app_->getSaveFileName(tr("Export File As"),
+                              fileNameLineEdit_->text(),
+                              tr("LAS (LASer) File (*.las);;"
+                                 "Comma Separated Values (*.csv)"),
+                              &selectedFilter,
+                              Ui::FileDialogOption::DontConfirmOverwrite);
 
     if (fileName.empty())
     {

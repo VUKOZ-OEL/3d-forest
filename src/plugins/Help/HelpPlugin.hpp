@@ -24,7 +24,6 @@
 
 // Include 3D Forest.
 #include <Plugin.hpp>
-class Action;
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestHelpPlugin)
@@ -50,7 +49,6 @@ public:
 
 private:
     Application *app_;
-    Action *aboutAction_;
 };
 
 extern "C" EXPORT_HELP_PLUGIN Plugin *createPlugin()

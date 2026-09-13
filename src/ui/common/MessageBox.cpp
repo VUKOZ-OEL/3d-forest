@@ -22,35 +22,45 @@
 // Include std.
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <MessageBox.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "MessageBox"
 #include <Log.hpp>
 
-MessageBox::MessageBox()
+MessageBox::MessageBox(Application *app) : app_(app)
 {
+}
+
+void MessageBox::setTitle(const std::string &title)
+{
+    title_ = title;
 }
 
 void MessageBox::setText(const std::string &text)
 {
+    text_ = text;
 }
 
 void MessageBox::setInformativeText(const std::string &text)
 {
+    informativeText_ = text;
 }
 
 void MessageBox::setStandardButtons(int buttons)
 {
+    buttons_ = buttons;
 }
 
-void MessageBox::setDefaultButton(int button)
+void MessageBox::setDefaultButton(StandardButton button)
 {
+    defaultButton_ = button;
 }
 
 int MessageBox::exec()
 {
-    return defaultButton_;
+    return app_->showMessageBox(*this);
 }
 
 int MessageBox::information(Application *app,
@@ -68,7 +78,11 @@ int MessageBox::about(Application *app,
                       int buttons,
                       int defaultButton)
 {
-    return defaultButton;
+    MessageBox box(app);
+    box.setTitle(title);
+    box.setText(text);
+    box.setStandardButtons(buttons);
+    return box.exec();
 }
 
 int MessageBox::question(Application *app,
@@ -77,7 +91,11 @@ int MessageBox::question(Application *app,
                          int buttons,
                          int defaultButton)
 {
-    return defaultButton;
+    MessageBox box(app);
+    box.setTitle(title);
+    box.setText(text);
+    box.setStandardButtons(buttons);
+    return box.exec();
 }
 
 int MessageBox::warning(Application *app,
@@ -86,7 +104,11 @@ int MessageBox::warning(Application *app,
                         int buttons,
                         int defaultButton)
 {
-    return defaultButton;
+    MessageBox box(app);
+    box.setTitle(title);
+    box.setText(text);
+    box.setStandardButtons(buttons);
+    return box.exec();
 }
 
 int MessageBox::critical(Application *app,
@@ -95,5 +117,9 @@ int MessageBox::critical(Application *app,
                          int buttons,
                          int defaultButton)
 {
-    return defaultButton;
+    MessageBox box(app);
+    box.setTitle(title);
+    box.setText(text);
+    box.setStandardButtons(buttons);
+    return box.exec();
 }
