@@ -20,9 +20,9 @@
 /** @file ProgressBar.cpp */
 
 // Include std.
+#include <stdexcept>
 
 // Include 3D Forest.
-#include <Application.hpp>
 #include <ProgressBar.hpp>
 
 // Include local.
@@ -31,37 +31,71 @@
 
 ProgressBar::ProgressBar()
 {
-#if 0
-    // Create modal progress dialog with custom progress bar.
-    // Custom progress bar allows to display percentage with fractional part.
-    QProgressDialog progressDialog(app);
-    progressDialog.setWindowTitle(QObject::tr("Create Index"));
-    progressDialog.setWindowModality(Qt::WindowModal);
-    progressDialog.setCancelButtonText(QObject::tr("&Cancel"));
-    progressDialog.setMinimumDuration(0);
-
-    QProgressBar *progressBar = new QProgressBar(&progressDialog);
-    progressBar->setTextVisible(false);
-    progressBar->setRange(0, 100);
-    progressBar->setValue(progressBar->minimum());
-    progressDialog.setBar(progressBar);
-#endif
 }
 
 ProgressBar::~ProgressBar()
 {
 }
 
-void ProgressBar::setRange(int min, int max)
+void ProgressBar::setRange(int minimum, int maximum)
 {
-    min_ = min;
-    max_ = max;
+    if (minimum < 0 || maximum < minimum)
+    {
+        throw std::invalid_argument("Invalid progress range");
+    }
+
+    if (minimum_ == minimum && maximum_ == maximum)
+    {
+        return;
+    }
+
+    minimum_ = minimum;
+    maximum_ = maximum;
+
+    const bool resetValue = value_ < minimum_ || value_ > maximum_;
+
+    if (resetValue)
+    {
+        value_ = minimum_ - 1;
+    }
+
+    rangeChanged(minimum_, maximum_);
+
+    if (resetValue)
+    {
+        resetRequested();
+    }
 }
 
 void ProgressBar::setValue(int value)
 {
+    if (value < minimum_ || value > maximum_)
+    {
+        return;
+    }
+
+    if (value_ == value)
+    {
+        return;
+    }
+
+    value_ = value;
+    valueChanged(value_);
 }
 
-void ProgressBar::setLabelText(const std::string &str)
+void ProgressBar::reset()
 {
+    value_ = minimum_ - 1;
+    resetRequested();
+}
+
+void ProgressBar::setTextVisible(bool visible)
+{
+    if (textVisible_ == visible)
+    {
+        return;
+    }
+
+    textVisible_ = visible;
+    textVisibleChanged(textVisible_);
 }

@@ -17,43 +17,36 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file PushButton.hpp */
+/** @file QtHBoxLayout.hpp */
 
-#ifndef PUSH_BUTTON_HPP
-#define PUSH_BUTTON_HPP
+#ifndef QT_H_BOX_LAYOUT_HPP
+#define QT_H_BOX_LAYOUT_HPP
 
 // Include 3D Forest.
-#include <Widget.hpp>
-class Application;
+#include <HBoxLayout.hpp>
+class QtApplication;
+
+// Include Qt.
+#include <QHBoxLayout>
+class QWidget;
 
 // Include local.
-#include <ExportUiCommon.hpp>
+#include <ExportUiQt.hpp>
 #include <WarningsDisable.hpp>
 
-/** PushButton. */
-class EXPORT_UI_COMMON PushButton : public Widget
+/** QtHBoxLayout. */
+class EXPORT_UI_QT QtHBoxLayout : public QHBoxLayout
 {
 public:
-    explicit PushButton(const std::string &str = "");
-    virtual ~PushButton();
-
-    void setText(const std::string &str);
-    std::string text() const { return text_; }
-
-    void setIcon(const ThemeIcon &icon);
-    const ThemeIcon &icon() const { return icon_; }
-
-    void click();
-
-    Signal<const std::string &> textChanged;
-    Signal<const ThemeIcon &> iconChanged;
-    Signal<> clicked;
+    explicit QtHBoxLayout(HBoxLayout *layout,
+                          QtApplication *app,
+                          QWidget *parent = nullptr);
+    virtual ~QtHBoxLayout();
 
 private:
-    std::string text_;
-    ThemeIcon icon_;
+    HBoxLayout *layout_;
 };
 
 #include <WarningsEnable.hpp>
 
-#endif /* PUSH_BUTTON_HPP */
+#endif /* QT_H_BOX_LAYOUT_HPP */

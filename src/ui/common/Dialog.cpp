@@ -20,6 +20,7 @@
 /** @file Dialog.cpp */
 
 // Include std.
+#include <stdexcept>
 
 // Include 3D Forest.
 #include <Application.hpp>
@@ -34,71 +35,198 @@ Dialog::Dialog()
 {
 }
 
-Dialog::Dialog(Application *app)
+Dialog::Dialog(Application *app) : app_(app)
 {
-    app_ = app;
 }
 
 Dialog::~Dialog()
 {
+    destroyed();
+    delete layout_;
 }
 
-void Dialog::setWindowTitle(const std::string &str)
+void Dialog::setApplication(Application *app)
 {
-    windowTitle_ = str;
+    app_ = app;
+}
+
+Application &Dialog::requireApplication() const
+{
+    if (!app_)
+    {
+        throw std::logic_error("Dialog requires an Application");
+    }
+
+    return *app_;
+}
+
+void Dialog::setWindowTitle(const std::string &title)
+{
+    if (windowTitle_ == title)
+    {
+        return;
+    }
+
+    windowTitle_ = title;
+
+    windowTitle_ = title;
+    propertiesChanged();
 }
 
 void Dialog::setWindowIcon(const ThemeIcon &icon)
 {
+    windowIcon_ = icon;
+    propertiesChanged();
+}
+
+void Dialog::setStandardButtons(int buttons)
+{
+    if (buttons_ == buttons)
+    {
+        return;
+    }
+
+    buttons_ = buttons;
+    propertiesChanged();
+}
+
+void Dialog::setDefaultButton(StandardButton button)
+{
+    if (defaultButton_ == button)
+    {
+        return;
+    }
+
+    defaultButton_ = button;
+    propertiesChanged();
 }
 
 void Dialog::setLayout(Layout *layout)
 {
+    if (layout_ == layout)
+    {
+        return;
+    }
+
+    delete layout_;
+    layout_ = layout;
 }
 
-void Dialog::setFixedHeight(int h)
+void Dialog::setFixedHeight(int height)
 {
+    if (height < -1)
+    {
+        throw std::invalid_argument("Invalid fixed height");
+    }
+
+    fixedHeight_ = height;
+    propertiesChanged();
 }
 
-void Dialog::setMaximumWidth(int w)
+void Dialog::setMaximumWidth(int width)
 {
+    if (width < -1)
+    {
+        throw std::invalid_argument("Invalid maximum width");
+    }
+
+    maximumWidth_ = width;
+    propertiesChanged();
 }
 
-void Dialog::setMaximumHeight(int h)
+void Dialog::setMaximumHeight(int height)
 {
+    if (height < -1)
+    {
+        throw std::invalid_argument("Invalid maximum height");
+    }
+
+    maximumHeight_ = height;
+    propertiesChanged();
 }
 
-int Dialog::width() const
+void Dialog::updateSize(int width, int height)
 {
-    return 0;
+    width_ = width;
+    height_ = height;
 }
 
-int Dialog::height() const
+void Dialog::setModal(bool modal)
 {
-    return 0;
-}
-
-void Dialog::setModal(bool b)
-{
+    setWindowModality(modal ? ApplicationModal : NonModal);
 }
 
 void Dialog::setWindowModality(int modality)
 {
+    if (modality < NonModal || modality > ApplicationModal)
+    {
+        throw std::invalid_argument("Invalid window modality");
+    }
+
+    modality_ = static_cast<WindowModality>(modality);
+    propertiesChanged();
 }
 
 int Dialog::exec()
 {
-    return Dialog::Accepted;
+    Application &app = requireApplication();
+
+    result_ = Rejected;
+    result_ = app.showDialog(*this);
+
+    return result_;
+}
+
+void Dialog::show()
+{
+    requireApplication().openDialog(*this);
+}
+
+void Dialog::hide()
+{
+    hideRequested();
+}
+
+void Dialog::raise()
+{
+    raiseRequested();
+}
+
+void Dialog::activateWindow()
+{
+    activateWindowRequested();
 }
 
 void Dialog::close()
 {
-}
+    CloseEvent event;
+    event.accept();
 
-void Dialog::setResult(int result)
-{
+    closeEvent(&event);
+
+    if (event.isAccepted())
+    {
+        reject();
+    }
 }
 
 void Dialog::closeEvent(CloseEvent *event)
 {
+    event->accept();
+}
+
+void Dialog::accept()
+{
+    done(Accepted);
+}
+
+void Dialog::reject()
+{
+    done(Rejected);
+}
+
+void Dialog::done(int result)
+{
+    setResult(result);
+    finished(result);
 }

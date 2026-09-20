@@ -24,6 +24,7 @@
 
 // Include std.
 #include <string>
+#include <unordered_map>
 
 // Include 3D Forest.
 #include <Application.hpp>
@@ -31,7 +32,9 @@
 
 // Include Qt.
 #include <QApplication>
+#include <QDialog>
 #include <QMainWindow>
+#include <QPointer>
 #include <QSplitter>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -59,12 +62,14 @@ public:
     void setWindowIcon(const QIcon &icon);
 
     int exec();
+    void processEvents() override;
 
     void setViewer(Widget *widget) override;
     void removeViewer(Widget *widget) override;
 
     QWidget *createWidget(Widget *widget, QWidget *parent = nullptr);
     QLayout *createLayout(Layout *layout, QWidget *parent = nullptr);
+    QDialog *createDialog(Dialog &dialog, QWidget *parent = nullptr);
 
     std::string getOpenFileName(const std::string &dialogTitle,
                                 const std::string &filter) override;
@@ -79,7 +84,8 @@ public:
                                 std::string *selectedFilter = nullptr,
                                 int options = 0) override;
 
-    int showMessageBox(const MessageBox &messageBox) override;
+    int showDialog(Dialog &dialog) override;
+    void openDialog(Dialog &dialog) override;
 
 signals:
     void wakeUpRequested();
@@ -94,6 +100,8 @@ private:
     QVBoxLayout *viewerLayout_{nullptr};
     Widget *commonViewer_{nullptr};
     QWidget *qtViewer_{nullptr};
+
+    std::unordered_map<Dialog *, QPointer<QDialog>> dialogs_;
 
     void initLayout();
 

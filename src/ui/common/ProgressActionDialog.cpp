@@ -36,6 +36,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "ProgressActionDialog"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 #define PROGRESS_DIALOG_ETA_MIN 5.0
@@ -45,19 +46,21 @@ bool ProgressActionDialog::run(Application *app,
                                ProgressActionInterface *progressAction)
 {
     LOG_DEBUG(<< "Run progress dialog <" << title << ">.");
-    ProgressActionDialog *progressDialog = new ProgressActionDialog(app);
-    progressDialog->setWindowTitle(title);
+    ProgressActionDialog *progressDialog = new ProgressActionDialog(app, title);
+    // progressDialog->setWindowTitle(title);
     return progressDialog->run(progressAction);
 }
 
-ProgressActionDialog::ProgressActionDialog(Application *app)
+ProgressActionDialog::ProgressActionDialog(Application *app,
+                                           const std::string &title)
     : Dialog(app),
       canceledFlag_(false)
 {
-    LOG_DEBUG(<< "Create progress dialog <" << std::string(title) << ">.");
+    LOG_DEBUG(<< "Create progress dialog <" << title << ">.");
 
     // Create modal progress dialog with custom progress bar.
     // Custom progress bar allows to display percentage with fractional part.
+    windowTitle_ = title;
     setWindowTitle(windowTitle_);
     setWindowModality(Ui::WindowModal);
 
@@ -110,7 +113,7 @@ void ProgressActionDialog::closeEvent(CloseEvent *event)
 
 bool ProgressActionDialog::run(ProgressActionInterface *progressAction)
 {
-    LOG_DEBUG(<< "Run progress dialog.");
+    LOG_DEBUG(<< "Start running progress dialog.");
 
     initializeLabels(progressAction);
 
@@ -139,6 +142,8 @@ bool ProgressActionDialog::run(ProgressActionInterface *progressAction)
     }
 
     hide();
+
+    LOG_DEBUG(<< "Finished running progress dialog.");
 
     return true;
 }

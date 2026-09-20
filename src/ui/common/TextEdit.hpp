@@ -37,17 +37,22 @@ public:
     TextEdit();
     virtual ~TextEdit();
 
-    void setText(const std::string &str);
+    void setText(const std::string &str, bool notify = false);
     std::string text() const { return text_; }
 
     void setReadOnly(bool b);
+    bool isReadOnly() const { return readOnly_; }
+
     void append(const std::string &str);
     void clear();
 
+    Signal<const std::string &> textUpdated;
     Signal<const std::string &> textChanged;
+    Signal<bool> readOnlyChanged;
 
 private:
     std::string text_;
+    bool readOnly_{false};
 };
 
 #include <WarningsEnable.hpp>

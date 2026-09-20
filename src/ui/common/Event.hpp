@@ -30,12 +30,16 @@
 class EXPORT_UI_COMMON Event
 {
 public:
-    Event() {};
-    virtual ~Event() {};
+    Event() = default;
+    virtual ~Event() = default;
 
-    void accept() {};
+    void accept() { accepted_ = true; }
+    void ignore() { accepted_ = false; }
+
+    bool isAccepted() const { return accepted_; }
 
 private:
+    bool accepted_{true};
 };
 
 #include <WarningsEnable.hpp>

@@ -24,7 +24,6 @@
 
 // Include 3D Forest.
 #include <Layout.hpp>
-class Application;
 
 // Include local.
 #include <ExportUiCommon.hpp>

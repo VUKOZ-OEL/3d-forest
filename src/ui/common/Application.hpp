@@ -38,7 +38,7 @@
 #include <ThreadCallbackInterface.hpp>
 #include <ToolButton.hpp>
 #include <Translation.hpp>
-class MessageBox;
+class Dialog;
 
 // Include local.
 #include <ExportUiCommon.hpp>
@@ -129,7 +129,8 @@ public:
                                         std::string *selectedFilter = nullptr,
                                         int options = 0); // FileDialogOption
 
-    virtual int showMessageBox(const MessageBox &messageBox);
+    virtual int showDialog(Dialog &dialog);
+    virtual void openDialog(Dialog &dialog);
 
     void suspendThreads();
     void resumeThreads();

@@ -26,10 +26,18 @@
 #include <QtApplication.hpp>
 #include <QtCheckBox.hpp>
 #include <QtComboBox.hpp>
+#include <QtDialog.hpp>
 #include <QtGridLayout.hpp>
 #include <QtGroupBox.hpp>
+#include <QtHBoxLayout.hpp>
 #include <QtLabel.hpp>
+#include <QtLineEdit.hpp>
+#include <QtMessageBox.hpp>
+#include <QtProgressBar.hpp>
+#include <QtProgressDialog.hpp>
+#include <QtPushButton.hpp>
 #include <QtSlider.hpp>
+#include <QtTextEdit.hpp>
 #include <QtVBoxLayout.hpp>
 #include <QtViewer.hpp>
 #include <QtWidget.hpp>
@@ -97,6 +105,11 @@ int QtApplication::exec()
     mainWindow_.resize(800, 600);
     mainWindow_.show();
     return qapplication_.exec();
+}
+
+void QtApplication::processEvents()
+{
+    QCoreApplication::processEvents();
 }
 
 void QtApplication::initLayout()
@@ -223,10 +236,34 @@ QWidget *QtApplication::createWidget(Widget *widget, QWidget *parent)
         return new QtLabel(w, parent);
     }
 
+    if (auto *w = dynamic_cast<LineEdit *>(widget))
+    {
+        LOG_DEBUG(<< "Create line edit widget.");
+        return new QtLineEdit(w, parent);
+    }
+
+    if (auto *w = dynamic_cast<ProgressBar *>(widget))
+    {
+        LOG_DEBUG(<< "Create progress bar widget.");
+        return new QtProgressBar(w, parent);
+    }
+
+    if (auto *w = dynamic_cast<PushButton *>(widget))
+    {
+        LOG_DEBUG(<< "Create push button widget.");
+        return new QtPushButton(w, parent);
+    }
+
     if (auto *w = dynamic_cast<Slider *>(widget))
     {
         LOG_DEBUG(<< "Create slider widget.");
         return new QtSlider(w, parent);
+    }
+
+    if (auto *w = dynamic_cast<TextEdit *>(widget))
+    {
+        LOG_DEBUG(<< "Create text edit widget.");
+        return new QtTextEdit(w, parent);
     }
 
     if (auto *w = dynamic_cast<Viewer *>(widget))
@@ -247,6 +284,12 @@ QLayout *QtApplication::createLayout(Layout *layout, QWidget *parent)
         return new QtGridLayout(gridLayout, this, parent);
     }
 
+    if (auto *hBoxLayout = dynamic_cast<HBoxLayout *>(layout))
+    {
+        LOG_DEBUG(<< "Create HBoxLayout.");
+        return new QtHBoxLayout(hBoxLayout, this, parent);
+    }
+
     if (auto *vBoxLayout = dynamic_cast<VBoxLayout *>(layout))
     {
         LOG_DEBUG(<< "Create VBoxLayout.");
@@ -255,6 +298,21 @@ QLayout *QtApplication::createLayout(Layout *layout, QWidget *parent)
 
     LOG_DEBUG(<< "Create null layout.");
     return nullptr;
+}
+
+QDialog *QtApplication::createDialog(Dialog &dialog, QWidget *parent)
+{
+    if (auto *progressDialog = dynamic_cast<ProgressDialog *>(&dialog))
+    {
+        return new QtProgressDialog(progressDialog, parent);
+    }
+
+    if (auto *messageBox = dynamic_cast<MessageBox *>(&dialog))
+    {
+        return new QtMessageBox(messageBox, parent);
+    }
+
+    return new QtDialog(&dialog, this, parent);
 }
 
 bool QtApplication::isDarkMode() const
@@ -347,59 +405,90 @@ std::string QtApplication::getSaveFileName(const std::string &caption,
     return fileName.toStdString();
 }
 
-int QtApplication::showMessageBox(const MessageBox &box)
+int QtApplication::showDialog(Dialog &dialog)
 {
-    QMessageBox dialog(&mainWindow_);
+    QWidget *parent = QApplication::activeModalWidget();
 
-    dialog.setWindowTitle(QString::fromStdString(box.title()));
-    dialog.setText(QString::fromStdString(box.text()));
-    dialog.setInformativeText(QString::fromStdString(box.informativeText()));
-
-    const auto toQt = [](MessageBox::StandardButton button)
+    if (!parent)
     {
-        switch (button)
+        parent = &mainWindow_;
+    }
+
+    std::unique_ptr<QDialog> qtDialog(createDialog(dialog, parent));
+
+    const int result = qtDialog->exec();
+    dialog.setResult(result);
+
+    return result;
+}
+
+void QtApplication::openDialog(Dialog &dialog)
+{
+    // Remove entries whose Qt representation was destroyed.
+    for (auto it = dialogs_.begin(); it != dialogs_.end();)
+    {
+        if (it->second.isNull())
         {
-            case MessageBox::Ok:
-                return QMessageBox::Ok;
-            case MessageBox::Save:
-                return QMessageBox::Save;
-            case MessageBox::Discard:
-                return QMessageBox::Discard;
-            case MessageBox::Cancel:
-                return QMessageBox::Cancel;
-            default:
-                return QMessageBox::NoButton;
+            it = dialogs_.erase(it);
         }
-    };
-
-    QMessageBox::StandardButtons buttons = QMessageBox::NoButton;
-
-    for (auto button : {MessageBox::Ok,
-                        MessageBox::Save,
-                        MessageBox::Discard,
-                        MessageBox::Cancel})
-    {
-        if (box.standardButtons() & button)
+        else
         {
-            buttons |= toQt(button);
+            ++it;
         }
     }
 
-    dialog.setStandardButtons(buttons);
-    dialog.setDefaultButton(toQt(box.defaultButton()));
+    auto &qtDialog = dialogs_[&dialog];
 
-    const int result = dialog.exec();
-
-    for (auto button : {MessageBox::Ok,
-                        MessageBox::Save,
-                        MessageBox::Discard,
-                        MessageBox::Cancel})
+    if (!qtDialog)
     {
-        if (result == toQt(button))
+        QWidget *parent = QApplication::activeModalWidget();
+
+        if (!parent)
         {
-            return button;
+            parent = &mainWindow_;
         }
+
+        qtDialog = createDialog(dialog, parent);
+
+        const QPointer<QDialog> guard = qtDialog;
+
+        dialog.hideRequested.connect(
+            [guard]
+            {
+                if (guard)
+                {
+                    guard->hide();
+                }
+            });
+
+        dialog.raiseRequested.connect(
+            [guard]
+            {
+                if (guard)
+                {
+                    guard->raise();
+                }
+            });
+
+        dialog.activateWindowRequested.connect(
+            [guard]
+            {
+                if (guard)
+                {
+                    guard->activateWindow();
+                }
+            });
+
+        // Destroy the Qt representation before its common data disappears.
+        dialog.destroyed.connect(
+            [guard]
+            {
+                if (guard)
+                {
+                    delete guard.data();
+                }
+            });
     }
 
-    return MessageBox::NoButton;
+    qtDialog->show();
 }

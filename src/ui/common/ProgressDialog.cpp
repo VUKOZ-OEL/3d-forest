@@ -29,60 +29,93 @@
 #define LOG_MODULE_NAME "ProgressDialog"
 #include <Log.hpp>
 
-ProgressDialog::ProgressDialog(Application *app)
+ProgressDialog::ProgressDialog(Application *app) : Dialog(app)
 {
-#if 0
-    // Create modal progress dialog with custom progress bar.
-    // Custom progress bar allows to display percentage with fractional part.
-    QProgressDialog progressDialog(app);
-    progressDialog.setWindowTitle(QObject::tr("Create Index"));
-    progressDialog.setWindowModality(Qt::WindowModal);
-    progressDialog.setCancelButtonText(QObject::tr("&Cancel"));
-    progressDialog.setMinimumDuration(0);
-
-    QProgressBar *progressBar = new QProgressBar(&progressDialog);
-    progressBar->setTextVisible(false);
-    progressBar->setRange(0, 100);
-    progressBar->setValue(progressBar->minimum());
-    progressDialog.setBar(progressBar);
-#endif
+    setStandardButtons(NoButton);
 }
 
 ProgressDialog::~ProgressDialog()
 {
 }
 
-void ProgressDialog::setWindowTitle(const std::string &str)
+void ProgressDialog::setRange(int minimum, int maximum)
 {
-}
+    if (minimum < 0 || maximum < minimum)
+    {
+        throw std::invalid_argument("Invalid progress range");
+    }
 
-void ProgressDialog::setRange(int min, int max)
-{
-    min_ = min;
-    max_ = max;
+    if (minimum_ == minimum && maximum_ == maximum)
+    {
+        return;
+    }
+
+    minimum_ = minimum;
+    maximum_ = maximum;
+
+    if (value_ < minimum_ || value_ > maximum_)
+    {
+        value_ = minimum_ - 1;
+    }
+
+    rangeChanged(minimum_, maximum_);
+    valueChanged(value_);
 }
 
 void ProgressDialog::setValue(int value)
 {
+    if (value < minimum_ || value > maximum_)
+    {
+        return;
+    }
+
+    if (value_ == value)
+    {
+        return;
+    }
+
+    value_ = value;
+    valueChanged(value_);
 }
 
-void ProgressDialog::setLabelText(const std::string &str)
+void ProgressDialog::setLabelText(const std::string &text)
 {
+    if (labelText_ == text)
+    {
+        return;
+    }
+
+    labelText_ = text;
+    labelTextChanged(labelText_);
 }
 
-void ProgressDialog::setWindowModality(int modality)
+void ProgressDialog::setCancelButtonText(const std::string &text)
 {
+    if (cancelButtonText_ == text)
+    {
+        return;
+    }
+
+    cancelButtonText_ = text;
+    cancelButtonTextChanged(cancelButtonText_);
 }
 
-void ProgressDialog::show()
+void ProgressDialog::cancel()
 {
+    if (canceled_)
+    {
+        return;
+    }
+
+    canceled_ = true;
+    hide();
+    canceled();
 }
 
-void ProgressDialog::close()
+void ProgressDialog::reset()
 {
-}
+    canceled_ = false;
+    value_ = minimum_ - 1;
 
-bool ProgressDialog::wasCanceled()
-{
-    return true;
+    resetRequested();
 }

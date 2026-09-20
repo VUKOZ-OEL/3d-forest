@@ -29,38 +29,22 @@
 #define LOG_MODULE_NAME "MessageBox"
 #include <Log.hpp>
 
-MessageBox::MessageBox(Application *app) : app_(app)
+MessageBox::MessageBox(Application *app) : Dialog(app)
 {
-}
-
-void MessageBox::setTitle(const std::string &title)
-{
-    title_ = title;
+    setStandardButtons(Ok);
+    setDefaultButton(Ok);
 }
 
 void MessageBox::setText(const std::string &text)
 {
     text_ = text;
+    propertiesChanged();
 }
 
 void MessageBox::setInformativeText(const std::string &text)
 {
     informativeText_ = text;
-}
-
-void MessageBox::setStandardButtons(int buttons)
-{
-    buttons_ = buttons;
-}
-
-void MessageBox::setDefaultButton(StandardButton button)
-{
-    defaultButton_ = button;
-}
-
-int MessageBox::exec()
-{
-    return app_->showMessageBox(*this);
+    propertiesChanged();
 }
 
 int MessageBox::information(Application *app,
@@ -69,7 +53,11 @@ int MessageBox::information(Application *app,
                             int buttons,
                             int defaultButton)
 {
-    return defaultButton;
+    MessageBox box(app);
+    box.setWindowTitle(title);
+    box.setText(text);
+    box.setStandardButtons(buttons);
+    return box.exec();
 }
 
 int MessageBox::about(Application *app,
@@ -79,7 +67,7 @@ int MessageBox::about(Application *app,
                       int defaultButton)
 {
     MessageBox box(app);
-    box.setTitle(title);
+    box.setWindowTitle(title);
     box.setText(text);
     box.setStandardButtons(buttons);
     return box.exec();
@@ -92,7 +80,7 @@ int MessageBox::question(Application *app,
                          int defaultButton)
 {
     MessageBox box(app);
-    box.setTitle(title);
+    box.setWindowTitle(title);
     box.setText(text);
     box.setStandardButtons(buttons);
     return box.exec();
@@ -105,7 +93,7 @@ int MessageBox::warning(Application *app,
                         int defaultButton)
 {
     MessageBox box(app);
-    box.setTitle(title);
+    box.setWindowTitle(title);
     box.setText(text);
     box.setStandardButtons(buttons);
     return box.exec();
@@ -118,7 +106,7 @@ int MessageBox::critical(Application *app,
                          int defaultButton)
 {
     MessageBox box(app);
-    box.setTitle(title);
+    box.setWindowTitle(title);
     box.setText(text);
     box.setStandardButtons(buttons);
     return box.exec();

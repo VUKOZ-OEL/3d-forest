@@ -35,6 +35,7 @@ class ImportFileDialog : public Dialog
 {
 public:
     ImportFileDialog(Application *app);
+    ~ImportFileDialog() override;
 
     ImportSettings settings() const;
 

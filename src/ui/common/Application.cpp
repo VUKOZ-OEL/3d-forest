@@ -21,7 +21,7 @@
 
 // Include 3D Forest.
 #include <Application.hpp>
-#include <MessageBox.hpp>
+#include <Dialog.hpp>
 #include <Time.hpp>
 #include <Widget.hpp>
 
@@ -242,7 +242,6 @@ void Application::post(std::function<void()> fn)
 void Application::processEvents()
 {
     // eventQueue_.runOne();
-    // QCoreApplication::processEvents();
 }
 
 void Application::emitUpdate(void *sender, int type)
@@ -623,7 +622,11 @@ std::string Application::getSaveFileName(const std::string &caption,
     return "";
 }
 
-int Application::showMessageBox(const MessageBox &messageBox)
+int Application::showDialog(Dialog &dialog)
 {
     return 0;
+}
+
+void Application::openDialog(Dialog &dialog)
+{
 }

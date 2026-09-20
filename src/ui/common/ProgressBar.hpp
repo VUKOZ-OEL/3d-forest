@@ -34,18 +34,30 @@ class EXPORT_UI_COMMON ProgressBar : public Widget
 {
 public:
     ProgressBar();
-    virtual ~ProgressBar();
+    ~ProgressBar() override;
 
-    void setRange(int min, int max);
-    int minimum() const { return min_; }
-    int maximum() const { return max_; }
+    void setRange(int minimum, int maximum);
+    int minimum() const { return minimum_; }
+    int maximum() const { return maximum_; }
 
     void setValue(int value);
-    void setLabelText(const std::string &str);
+    int value() const { return value_; }
+
+    void reset();
+
+    void setTextVisible(bool visible);
+    bool isTextVisible() const { return textVisible_; }
+
+    Signal<int, int> rangeChanged;
+    Signal<int> valueChanged;
+    Signal<> resetRequested;
+    Signal<bool> textVisibleChanged;
 
 private:
-    int min_;
-    int max_;
+    int minimum_{0};
+    int maximum_{100};
+    int value_{-1};
+    bool textVisible_{true};
 };
 
 #include <WarningsEnable.hpp>

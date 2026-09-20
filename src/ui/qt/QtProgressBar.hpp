@@ -17,43 +17,32 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file PushButton.hpp */
+/** @file QtProgressBar.hpp */
 
-#ifndef PUSH_BUTTON_HPP
-#define PUSH_BUTTON_HPP
+#ifndef QT_PROGRESS_BAR_HPP
+#define QT_PROGRESS_BAR_HPP
 
 // Include 3D Forest.
-#include <Widget.hpp>
-class Application;
+#include <ProgressBar.hpp>
+
+// Include Qt.
+#include <QProgressBar>
 
 // Include local.
-#include <ExportUiCommon.hpp>
+#include <ExportUiQt.hpp>
 #include <WarningsDisable.hpp>
 
-/** PushButton. */
-class EXPORT_UI_COMMON PushButton : public Widget
+/** QtProgressBar. */
+class EXPORT_UI_QT QtProgressBar : public QProgressBar
 {
 public:
-    explicit PushButton(const std::string &str = "");
-    virtual ~PushButton();
-
-    void setText(const std::string &str);
-    std::string text() const { return text_; }
-
-    void setIcon(const ThemeIcon &icon);
-    const ThemeIcon &icon() const { return icon_; }
-
-    void click();
-
-    Signal<const std::string &> textChanged;
-    Signal<const ThemeIcon &> iconChanged;
-    Signal<> clicked;
+    explicit QtProgressBar(ProgressBar *progressBar, QWidget *parent = nullptr);
+    ~QtProgressBar() override;
 
 private:
-    std::string text_;
-    ThemeIcon icon_;
+    ProgressBar *progressBar_;
 };
 
 #include <WarningsEnable.hpp>
 
-#endif /* PUSH_BUTTON_HPP */
+#endif /* QT_PROGRESS_BAR_HPP */

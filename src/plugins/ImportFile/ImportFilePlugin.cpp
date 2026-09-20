@@ -139,6 +139,7 @@ static void importPluginDialog(Application *app)
 
     if (settingsDialog.exec() == Dialog::Rejected)
     {
+        LOG_DEBUG(<< "Import rejected.");
         return;
     }
 

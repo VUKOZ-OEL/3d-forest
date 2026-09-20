@@ -43,15 +43,15 @@ void ExportFilePlugin::initialize(Application *app)
     app_ = app;
 
     app_->createAction(
-        &exportFileAction_,
-        "File",
+        this,
+        {{"File", MAIN_WINDOW_MENU_FILE_PRIORITY}},
         "File Import/Export",
         tr("Export..."),
         tr("Export point cloud"),
         ICON("export-file"),
         [this]() { slotExportFile(); },
-        MAIN_WINDOW_MENU_FILE_PRIORITY,
-        60);
+        nullptr,
+        610);
 }
 
 void ExportFilePlugin::slotExportFile()

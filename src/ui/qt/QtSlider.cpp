@@ -23,6 +23,7 @@
 #include <QtSlider.hpp>
 
 // Include Qt.
+#include <QPointer>
 #include <QSignalBlocker>
 
 // Include local.
@@ -33,7 +34,9 @@ QtSlider::QtSlider(Slider *slider, QWidget *parent)
     : QSlider(Qt::Horizontal, parent),
       slider_(slider)
 {
-    setValue(slider_->value());
+    updateSettings();
+
+    const QPointer<QtSlider> guard(this);
 
     connect(this,
             &QSlider::valueChanged,
@@ -41,14 +44,38 @@ QtSlider::QtSlider(Slider *slider, QWidget *parent)
             [this](int value) { slider_->setValue(value, true); });
 
     slider_->valueUpdated.connect(
-        [this](int value)
+        [guard](int value)
         {
-            // Prevent the QSlider signal from going back into Slider.
-            const QSignalBlocker blocker(this);
-            setValue(value);
+            if (guard)
+            {
+                const QSignalBlocker blocker(guard.data());
+                guard->setValue(value);
+            }
+        });
+
+    slider_->settingsChanged.connect(
+        [guard]
+        {
+            if (guard)
+            {
+                guard->updateSettings();
+            }
         });
 }
 
 QtSlider::~QtSlider()
 {
+}
+
+void QtSlider::updateSettings()
+{
+    const QSignalBlocker blocker(this);
+
+    setRange(slider_->minimum(), slider_->maximum());
+    setSingleStep(slider_->singleStep());
+    setTickInterval(slider_->tickInterval());
+    setTickPosition(
+        static_cast<QSlider::TickPosition>(slider_->tickPosition()));
+
+    setValue(slider_->value());
 }

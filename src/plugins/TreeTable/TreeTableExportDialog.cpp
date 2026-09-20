@@ -129,14 +129,12 @@ void TreeTableExportDialog::slotAccept()
         }
     }
 
-    close();
-    setResult(Dialog::Accepted);
+    accept();
 }
 
 void TreeTableExportDialog::slotReject()
 {
-    close();
-    setResult(Dialog::Rejected);
+    reject();
 }
 
 std::shared_ptr<FileFormatInterface> TreeTableExportDialog::writer() const

@@ -49,7 +49,6 @@ public:
 
 private:
     Application *app_;
-    Action *exportFileAction_;
     std::string fileName_;
 };
 

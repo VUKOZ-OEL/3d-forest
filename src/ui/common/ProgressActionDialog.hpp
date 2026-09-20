@@ -41,7 +41,7 @@ class PushButton;
 class EXPORT_UI_COMMON ProgressActionDialog : public Dialog
 {
 public:
-    ProgressActionDialog(Application *app);
+    ProgressActionDialog(Application *app, const std::string &title);
 
     bool run(ProgressActionInterface *progressAction);
 

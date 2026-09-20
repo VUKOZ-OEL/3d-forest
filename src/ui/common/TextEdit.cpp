@@ -37,7 +37,7 @@ TextEdit::~TextEdit()
 {
 }
 
-void TextEdit::setText(const std::string &str)
+void TextEdit::setText(const std::string &str, bool notify)
 {
     if (text_ == str)
     {
@@ -45,17 +45,39 @@ void TextEdit::setText(const std::string &str)
     }
 
     text_ = str;
-    textChanged(text_);
+    textUpdated(text_);
+
+    if (notify && !signalsBlocked())
+    {
+        textChanged(text_);
+    }
 }
 
-void TextEdit::setReadOnly(bool b)
+void TextEdit::setReadOnly(bool readOnly)
 {
+    if (readOnly_ == readOnly)
+    {
+        return;
+    }
+
+    readOnly_ = readOnly;
+    readOnlyChanged(readOnly_);
 }
 
 void TextEdit::append(const std::string &str)
 {
+    std::string text = text_;
+
+    if (!text.empty())
+    {
+        text += '\n';
+    }
+
+    text += str;
+    setText(text);
 }
 
 void TextEdit::clear()
 {
+    setText("");
 }

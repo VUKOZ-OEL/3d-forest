@@ -184,14 +184,12 @@ void ExportFileDialog::slotAccept()
         }
     }
 
-    close();
-    setResult(Dialog::Accepted);
+    accept();
 }
 
 void ExportFileDialog::slotReject()
 {
-    close();
-    setResult(Dialog::Rejected);
+    reject();
 }
 
 std::shared_ptr<ExportFileFormatInterface> ExportFileDialog::writer() const

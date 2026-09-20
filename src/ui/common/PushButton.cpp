@@ -50,4 +50,11 @@ void PushButton::setText(const std::string &str)
 
 void PushButton::setIcon(const ThemeIcon &icon)
 {
+    icon_ = icon;
+    iconChanged(icon_);
+}
+
+void PushButton::click()
+{
+    clicked();
 }

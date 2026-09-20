@@ -27,7 +27,10 @@
 #define LOG_MODULE_NAME "LineEdit"
 #include <Log.hpp>
 
-LineEdit::LineEdit()
+// LineEdit.cpp
+#include <LineEdit.hpp>
+
+LineEdit::LineEdit(const std::string &text) : text_(text)
 {
 }
 
@@ -35,14 +38,45 @@ LineEdit::~LineEdit()
 {
 }
 
-void LineEdit::setReadOnly(bool b)
+void LineEdit::setText(const std::string &text, bool notify)
 {
-}
+    if (text_ == text)
+    {
+        return;
+    }
 
-void LineEdit::append(const std::string &str)
-{
+    text_ = text;
+    textUpdated(text_);
+
+    if (notify && !signalsBlocked())
+    {
+        textChanged(text_);
+    }
 }
 
 void LineEdit::clear()
 {
+    setText("");
+}
+
+void LineEdit::setPlaceholderText(const std::string &text)
+{
+    if (placeholderText_ == text)
+    {
+        return;
+    }
+
+    placeholderText_ = text;
+    placeholderTextChanged(placeholderText_);
+}
+
+void LineEdit::setReadOnly(bool readOnly)
+{
+    if (readOnly_ == readOnly)
+    {
+        return;
+    }
+
+    readOnly_ = readOnly;
+    readOnlyChanged(readOnly_);
 }

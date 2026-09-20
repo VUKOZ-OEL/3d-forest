@@ -138,16 +138,19 @@ ImportFileDialog::ImportFileDialog(Application *app)
     setMaximumHeight(height());
 }
 
+ImportFileDialog::~ImportFileDialog()
+{
+    delete helpDialog_;
+}
+
 void ImportFileDialog::slotAccept()
 {
-    close();
-    setResult(Dialog::Accepted);
+    accept();
 }
 
 void ImportFileDialog::slotReject()
 {
-    close();
-    setResult(Dialog::Rejected);
+    reject();
 }
 
 ImportSettings ImportFileDialog::settings() const

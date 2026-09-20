@@ -38,17 +38,46 @@ Slider::~Slider()
 {
 }
 
-void Slider::setSingleStep(int val)
+void Slider::setSingleStep(int value)
 {
-    singleStep_ = val;
+    value = std::max(1, value);
+
+    if (singleStep_ == value)
+    {
+        return;
+    }
+
+    singleStep_ = value;
+    settingsChanged();
 }
 
-void Slider::setTickInterval(int v)
+void Slider::setTickInterval(int value)
 {
+    value = std::max(0, value);
+
+    if (tickInterval_ == value)
+    {
+        return;
+    }
+
+    tickInterval_ = value;
+    settingsChanged();
 }
 
-void Slider::setTickPosition(int v)
+void Slider::setTickPosition(int value)
 {
+    if (value < NoTicks || value > TicksBothSides)
+    {
+        throw std::invalid_argument("Invalid tick position");
+    }
+
+    if (tickPosition_ == value)
+    {
+        return;
+    }
+
+    tickPosition_ = static_cast<TickPosition>(value);
+    settingsChanged();
 }
 
 void Slider::setOrientation(int v)

@@ -24,7 +24,6 @@
 
 // Include 3D Forest.
 #include <Widget.hpp>
-class Application;
 
 // Include local.
 #include <ExportUiCommon.hpp>
@@ -34,14 +33,32 @@ class Application;
 class EXPORT_UI_COMMON LineEdit : public Widget
 {
 public:
-    LineEdit();
-    virtual ~LineEdit();
+    explicit LineEdit(const std::string &text = "");
+    ~LineEdit() override;
 
-    void setReadOnly(bool b);
-    void append(const std::string &str);
+    void setText(const std::string &text, bool notify = false);
+    std::string text() const { return text_; }
+
     void clear();
 
+    void setPlaceholderText(const std::string &text);
+    const std::string &placeholderText() const { return placeholderText_; }
+
+    void setReadOnly(bool readOnly);
+    bool isReadOnly() const { return readOnly_; }
+
+    Signal<const std::string &> textUpdated;
+    Signal<const std::string &> textChanged;
+    Signal<const std::string &> placeholderTextChanged;
+    Signal<bool> readOnlyChanged;
+
+    Signal<> returnPressed;
+    Signal<> editingFinished;
+
 private:
+    std::string text_;
+    std::string placeholderText_;
+    bool readOnly_{false};
 };
 
 #include <WarningsEnable.hpp>

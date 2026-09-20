@@ -41,6 +41,8 @@ public:
 
 private:
     Slider *slider_;
+
+    void updateSettings();
 };
 
 #include <WarningsEnable.hpp>

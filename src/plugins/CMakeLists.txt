@@ -27,7 +27,7 @@
 #add_subdirectory(ComputeTreeAttributes)
 #add_subdirectory(Edit)
 #add_subdirectory(Example)
-#add_subdirectory(ExportFile)
+add_subdirectory(ExportFile)
 ## add_subdirectory(External3dMarteloscope)
 #add_subdirectory(FilterArea)
 #add_subdirectory(FilterClassification)

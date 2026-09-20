@@ -17,43 +17,49 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file PushButton.hpp */
+/** @file QtDialog.hpp */
 
-#ifndef PUSH_BUTTON_HPP
-#define PUSH_BUTTON_HPP
+#ifndef QT_DIALOG_HPP
+#define QT_DIALOG_HPP
 
 // Include 3D Forest.
-#include <Widget.hpp>
-class Application;
+class Dialog;
+class QtApplication;
+
+// Include Qt.
+#include <QDialog>
+class QCloseEvent;
+class QDialogButtonBox;
+class QResizeEvent;
 
 // Include local.
-#include <ExportUiCommon.hpp>
+#include <ExportUiQt.hpp>
 #include <WarningsDisable.hpp>
 
-/** PushButton. */
-class EXPORT_UI_COMMON PushButton : public Widget
+/** QtDialog. */
+class EXPORT_UI_QT QtDialog : public QDialog
 {
 public:
-    explicit PushButton(const std::string &str = "");
-    virtual ~PushButton();
+    QtDialog(Dialog *dialog, QtApplication *app, QWidget *parent = nullptr);
 
-    void setText(const std::string &str);
-    std::string text() const { return text_; }
+    void accept() override;
+    void reject() override;
+    void done(int result) override;
 
-    void setIcon(const ThemeIcon &icon);
-    const ThemeIcon &icon() const { return icon_; }
+    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override;
 
-    void click();
-
-    Signal<const std::string &> textChanged;
-    Signal<const ThemeIcon &> iconChanged;
-    Signal<> clicked;
+protected:
+    void closeEvent(QCloseEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
 
 private:
-    std::string text_;
-    ThemeIcon icon_;
+    void updateProperties();
+
+    Dialog *dialog_;
+    QDialogButtonBox *buttonBox_;
 };
 
 #include <WarningsEnable.hpp>
 
-#endif /* PUSH_BUTTON_HPP */
+#endif /* QT_DIALOG_HPP */

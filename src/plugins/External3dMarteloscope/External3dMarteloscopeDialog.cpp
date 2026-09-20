@@ -103,12 +103,10 @@ void External3dMarteloscopeDialog::slotAccept()
 {
     path_ = fileNameLineEdit_->text();
 
-    close();
-    setResult(Dialog::Accepted);
+    accept();
 }
 
 void External3dMarteloscopeDialog::slotReject()
 {
-    close();
-    setResult(Dialog::Rejected);
+    reject();
 }

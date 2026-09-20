@@ -17,43 +17,32 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file PushButton.hpp */
+/** @file QtPushButton.hpp */
 
-#ifndef PUSH_BUTTON_HPP
-#define PUSH_BUTTON_HPP
+#ifndef QT_PUSH_BUTTON_HPP
+#define QT_PUSH_BUTTON_HPP
 
 // Include 3D Forest.
-#include <Widget.hpp>
-class Application;
+#include <PushButton.hpp>
+
+// Include Qt.
+#include <QPushButton>
 
 // Include local.
-#include <ExportUiCommon.hpp>
+#include <ExportUiQt.hpp>
 #include <WarningsDisable.hpp>
 
-/** PushButton. */
-class EXPORT_UI_COMMON PushButton : public Widget
+/** QtPushButton. */
+class EXPORT_UI_QT QtPushButton : public QPushButton
 {
 public:
-    explicit PushButton(const std::string &str = "");
-    virtual ~PushButton();
-
-    void setText(const std::string &str);
-    std::string text() const { return text_; }
-
-    void setIcon(const ThemeIcon &icon);
-    const ThemeIcon &icon() const { return icon_; }
-
-    void click();
-
-    Signal<const std::string &> textChanged;
-    Signal<const ThemeIcon &> iconChanged;
-    Signal<> clicked;
+    explicit QtPushButton(PushButton *pushButton, QWidget *parent = nullptr);
+    virtual ~QtPushButton();
 
 private:
-    std::string text_;
-    ThemeIcon icon_;
+    PushButton *pushButton_;
 };
 
 #include <WarningsEnable.hpp>
 
-#endif /* PUSH_BUTTON_HPP */
+#endif /* QT_PUSH_BUTTON_HPP */

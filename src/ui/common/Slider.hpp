@@ -53,6 +53,9 @@ public:
     void setTickPosition(int v);
     void setOrientation(int v);
 
+    int tickInterval() const { return tickInterval_; }
+    TickPosition tickPosition() const { return tickPosition_; }
+
     int minimum() const { return minimum_; }
     void setMinimum(int min);
 
@@ -67,12 +70,15 @@ public:
     Signal<int> valueUpdated;
     Signal<int> valueChanged;
     Signal<> sliderReleased;
+    Signal<> settingsChanged;
 
 private:
     int singleStep_{0};
     int minimum_{0};
     int maximum_{0};
     int value_{0};
+    int tickInterval_{0};
+    TickPosition tickPosition_{NoTicks};
 };
 
 #include <WarningsEnable.hpp>
