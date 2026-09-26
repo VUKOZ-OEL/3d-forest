@@ -34,29 +34,31 @@ class EXPORT_UI_COMMON SpinBox : public Widget
 {
 public:
     SpinBox();
-    virtual ~SpinBox();
+    ~SpinBox() override;
 
     int singleStep() const { return singleStep_; }
-    void setSingleStep(int val);
+    void setSingleStep(int value);
 
     int minimum() const { return minimum_; }
-    void setMinimum(int min);
+    void setMinimum(int minimum);
 
     int maximum() const { return maximum_; }
-    void setMaximum(int max);
+    void setMaximum(int maximum);
 
-    void setRange(int min, int max);
+    void setRange(int minimum, int maximum);
 
     int value() const { return value_; }
     void setValue(int value, bool notify = false);
 
+    Signal<> settingsChanged;
+    Signal<int> valueUpdated;
     Signal<int> valueChanged;
     Signal<> editingFinished;
 
 private:
-    int singleStep_{0};
+    int singleStep_{1};
     int minimum_{0};
-    int maximum_{0};
+    int maximum_{100};
     int value_{0};
 };
 

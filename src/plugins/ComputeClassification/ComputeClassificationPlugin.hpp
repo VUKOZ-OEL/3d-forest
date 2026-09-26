@@ -24,7 +24,6 @@
 
 // Include 3D Forest.
 #include <Plugin.hpp>
-class ComputeClassificationWindow;
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestComputeClassificationPlugin)
@@ -40,17 +39,12 @@ class ComputeClassificationWindow;
 class ComputeClassificationPlugin : public Plugin
 {
 public:
-    ComputeClassificationPlugin();
-
     const char *name() const override { return "ComputeClassificationPlugin"; }
     void initialize(Application *app) override;
     void release() override { delete this; }
 
-    void slotPlugin();
-
 private:
-    Application *app_;
-    ComputeClassificationWindow *pluginWindow_;
+    Application *app_{nullptr};
 };
 
 extern "C" EXPORT_COMPUTE_CLASSIFICATION_PLUGIN Plugin *createPlugin()

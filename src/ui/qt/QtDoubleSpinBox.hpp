@@ -17,25 +17,35 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ComputeHullWindow.hpp */
+/** @file QtDoubleSpinBox.hpp */
 
-#ifndef COMPUTE_HULL_WINDOW_HPP
-#define COMPUTE_HULL_WINDOW_HPP
+#ifndef QT_DOUBLE_SPIN_BOX_HPP
+#define QT_DOUBLE_SPIN_BOX_HPP
 
 // Include 3D Forest.
-#include <Dialog.hpp>
-class Application;
-class ComputeHullWidget;
+#include <DoubleSpinBox.hpp>
 
-/** Compute Hull Window. */
-class ComputeHullWindow : public Dialog
+// Include Qt.
+#include <QDoubleSpinBox>
+
+// Include local.
+#include <ExportUiQt.hpp>
+#include <WarningsDisable.hpp>
+
+/** QtDoubleSpinBox. */
+class EXPORT_UI_QT QtDoubleSpinBox : public QDoubleSpinBox
 {
 public:
-    ComputeHullWindow(Application *app);
-    ~ComputeHullWindow();
+    explicit QtDoubleSpinBox(DoubleSpinBox *doubleSpinBox,
+                             QWidget *parent = nullptr);
+    virtual ~QtDoubleSpinBox();
 
 private:
-    ComputeHullWidget *widget_;
+    DoubleSpinBox *doubleSpinBox_;
+
+    void updateSettings();
 };
 
-#endif /* COMPUTE_HULL_WINDOW_HPP */
+#include <WarningsEnable.hpp>
+
+#endif /* QT_DOUBLE_SPIN_BOX_HPP */

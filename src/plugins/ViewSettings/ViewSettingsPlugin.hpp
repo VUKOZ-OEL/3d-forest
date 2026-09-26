@@ -44,7 +44,7 @@ public:
     void release() override { delete this; }
 
 private:
-    Application *app_;
+    Application *app_{nullptr};
 };
 
 extern "C" EXPORT_VIEW_SETTINGS_PLUGIN Plugin *createPlugin()

@@ -28,6 +28,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "Slider"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 Slider::Slider()
@@ -104,6 +105,8 @@ void Slider::setRange(int min, int max)
 
 void Slider::setValue(int value, bool notify)
 {
+    LOG_DEBUG(<< "setValue <" << value << ">.");
+
     if (value_ == value)
     {
         return;
@@ -113,7 +116,7 @@ void Slider::setValue(int value, bool notify)
 
     valueUpdated(value_);
 
-    if (notify)
+    if (notify && !signalsBlocked())
     {
         valueChanged(value_);
     }

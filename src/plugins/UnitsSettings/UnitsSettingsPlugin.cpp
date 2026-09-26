@@ -21,9 +21,8 @@
 
 // Include 3D Forest.
 #include <Application.hpp>
-#include <ThemeIcon.hpp>
 #include <UnitsSettingsPlugin.hpp>
-#include <UnitsSettingsWindow.hpp>
+#include <UnitsSettingsWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "UnitsSettingsPlugin"
@@ -31,40 +30,16 @@
 
 #define ICON(name) (ThemeIcon(":/UnitsSettingsResources/", name))
 
-UnitsSettingsPlugin::UnitsSettingsPlugin()
-    : app_(nullptr),
-      pluginWindow_(nullptr)
-{
-}
-
 void UnitsSettingsPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(
-        nullptr,
-        "Settings",
-        "Settings",
-        tr("Units"),
-        tr("Show units settings"),
-        ICON("units"),
-        [this]() { slotPlugin(); },
-        MAIN_WINDOW_MENU_SETTINGS_PRIORITY);
-}
-
-void UnitsSettingsPlugin::slotPlugin()
-{
-    if (!app_)
-    {
-        return;
-    }
-
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new UnitsSettingsWindow(app_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Settings", MAIN_WINDOW_MENU_SETTINGS_PRIORITY}},
+                       "Settings",
+                       tr("Units"),
+                       tr("Show units settings"),
+                       ICON("units"),
+                       {},
+                       new UnitsSettingsWidget(app_));
 }

@@ -22,8 +22,7 @@
 // Include 3D Forest.
 #include <Application.hpp>
 #include <ComputeHullPlugin.hpp>
-#include <ComputeHullWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <ComputeHullWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeHullPlugin"
@@ -31,33 +30,16 @@
 
 #define ICON(name) (ThemeIcon(":/ComputeHullResources/", name))
 
-ComputeHullPlugin::ComputeHullPlugin() : app_(nullptr), pluginWindow_(nullptr)
-{
-}
-
 void ComputeHullPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(
-        nullptr,
-        "Compute",
-        "Compute",
-        tr("Hull"),
-        tr("Compute hull"),
-        ICON("compute-hull"),
-        [this]() { slotPlugin(); },
-        MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
-}
-
-void ComputeHullPlugin::slotPlugin()
-{
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new ComputeHullWindow(app_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Compute", MAIN_WINDOW_MENU_COMPUTE_PRIORITY}},
+                       "Compute",
+                       tr("Hull"),
+                       tr("Compute hull"),
+                       ICON("compute-hull"),
+                       {},
+                       new ComputeHullWidget(app_));
 }

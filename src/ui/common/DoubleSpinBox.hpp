@@ -37,26 +37,28 @@ public:
     virtual ~DoubleSpinBox();
 
     double singleStep() const { return singleStep_; }
-    void setSingleStep(double val);
+    void setSingleStep(double value);
 
     double minimum() const { return minimum_; }
-    void setMinimum(double min);
+    void setMinimum(double minimum);
 
     double maximum() const { return maximum_; }
-    void setMaximum(double max);
+    void setMaximum(double maximum);
 
-    void setRange(double min, double max);
+    void setRange(double minimum, double maximum);
 
     double value() const { return value_; }
     void setValue(double value, bool notify = false);
 
+    Signal<> settingsChanged;
+    Signal<double> valueUpdated;
     Signal<double> valueChanged;
     Signal<> editingFinished;
 
 private:
-    double singleStep_{0.0};
+    double singleStep_{1.0};
     double minimum_{0.0};
-    double maximum_{0.0};
+    double maximum_{100.0};
     double value_{0.0};
 };
 

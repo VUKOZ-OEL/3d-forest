@@ -26,7 +26,6 @@
 #include <ComputeHeightMapModifier.hpp>
 #include <ModifierInterface.hpp>
 #include <Plugin.hpp>
-class ComputeHeightMapWindow;
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestComputeHeightMapPlugin)
@@ -56,8 +55,6 @@ class ComputeHeightMapWindow;
 class ComputeHeightMapPlugin : public Plugin, public ModifierInterface
 {
 public:
-    ComputeHeightMapPlugin();
-
     const char *name() const override { return "ComputeHeightMapPlugin"; }
     void initialize(Application *app) override;
     void release() override { delete this; }
@@ -65,15 +62,8 @@ public:
     virtual bool modifierEnabled();
     virtual void applyModifier(Page *page);
 
-    void slotPlugin();
-
 private:
-    Application *app_;
-
-    /** First time use creates GUI. */
-    ComputeHeightMapWindow *pluginWindow_;
-
-    /** Must be created from the constructor.*/
+    Application *app_{nullptr};
     ComputeHeightMapModifier modifier_;
 };
 

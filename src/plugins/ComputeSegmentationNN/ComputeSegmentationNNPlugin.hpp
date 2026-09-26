@@ -24,7 +24,6 @@
 
 // Include 3D Forest.
 #include <Plugin.hpp>
-class ComputeSegmentationNNWindow;
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestComputeSegmentationNNPlugin)
@@ -40,17 +39,12 @@ class ComputeSegmentationNNWindow;
 class ComputeSegmentationNNPlugin : public Plugin
 {
 public:
-    ComputeSegmentationNNPlugin();
-
     const char *name() const override { return "ComputeSegmentationNNPlugin"; }
     void initialize(Application *app) override;
     void release() override { delete this; }
 
-    void slotPlugin();
-
 private:
-    Application *app_;
-    ComputeSegmentationNNWindow *pluginWindow_;
+    Application *app_{nullptr};
 };
 
 extern "C" EXPORT_COMPUTE_SEGMENTATION_NN_PLUGIN Plugin *createPlugin()

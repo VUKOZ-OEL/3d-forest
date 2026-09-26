@@ -37,30 +37,62 @@ DoubleSpinBox::~DoubleSpinBox()
 {
 }
 
-void DoubleSpinBox::setSingleStep(double val)
+void DoubleSpinBox::setSingleStep(double value)
 {
-    singleStep_ = val;
+    if (value < 0 || singleStep_ == value)
+    {
+        return;
+    }
+
+    singleStep_ = value;
+    settingsChanged();
 }
 
-void DoubleSpinBox::setMinimum(double min)
+void DoubleSpinBox::setMinimum(double minimum)
 {
-    minimum_ = min;
+    setRange(minimum, std::max(minimum, maximum_));
 }
 
-void DoubleSpinBox::setMaximum(double max)
+void DoubleSpinBox::setMaximum(double maximum)
 {
-    maximum_ = max;
+    setRange(std::min(minimum_, maximum), maximum);
 }
 
-void DoubleSpinBox::setRange(double min, double max)
+void DoubleSpinBox::setRange(double minimum, double maximum)
 {
-    setMinimum(min);
-    setMaximum(max);
+    // Ensure a valid range.
+    maximum = std::max(minimum, maximum);
+
+    if (minimum_ == minimum && maximum_ == maximum)
+    {
+        return;
+    }
+
+    minimum_ = minimum;
+    maximum_ = maximum;
+
+    const double previousValue = value_;
+    clamp(value_, minimum_, maximum_);
+
+    settingsChanged();
+
+    if (value_ != previousValue)
+    {
+        valueUpdated(value_);
+    }
 }
 
 void DoubleSpinBox::setValue(double value, bool notify)
 {
+    clamp(value, minimum_, maximum_);
+
+    if (value_ == value)
+    {
+        return;
+    }
+
     value_ = value;
+    valueUpdated(value_);
 
     if (notify && !signalsBlocked())
     {

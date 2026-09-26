@@ -44,7 +44,10 @@ QtVBoxLayout::QtVBoxLayout(VBoxLayout *layout,
 
             if (qtWidget)
             {
-                QVBoxLayout::addWidget(qtWidget);
+                QVBoxLayout::addWidget(
+                    qtWidget,
+                    item.stretch(),
+                    static_cast<Qt::Alignment>(item.alignment()));
             }
         }
         else if (item.layout())
@@ -53,7 +56,7 @@ QtVBoxLayout::QtVBoxLayout(VBoxLayout *layout,
 
             if (qtLayout)
             {
-                QVBoxLayout::addLayout(qtLayout);
+                QVBoxLayout::addLayout(qtLayout, item.stretch());
             }
         }
     }

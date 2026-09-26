@@ -17,25 +17,34 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ComputeCrownVolumeWindow.hpp */
+/** @file QtSpinBox.hpp */
 
-#ifndef COMPUTE_CROWN_VOLUME_WINDOW_HPP
-#define COMPUTE_CROWN_VOLUME_WINDOW_HPP
+#ifndef QT_SPIN_BOX_HPP
+#define QT_SPIN_BOX_HPP
 
 // Include 3D Forest.
-#include <Dialog.hpp>
-class Application;
-class ComputeCrownVolumeWidget;
+#include <SpinBox.hpp>
 
-/** Compute Crown Volume Window. */
-class ComputeCrownVolumeWindow : public Dialog
+// Include Qt.
+#include <QSpinBox>
+
+// Include local.
+#include <ExportUiQt.hpp>
+#include <WarningsDisable.hpp>
+
+/** QtSpinBox. */
+class EXPORT_UI_QT QtSpinBox : public QSpinBox
 {
 public:
-    ComputeCrownVolumeWindow(Application *app);
-    ~ComputeCrownVolumeWindow();
+    explicit QtSpinBox(SpinBox *spinBox, QWidget *parent = nullptr);
+    virtual ~QtSpinBox();
 
 private:
-    ComputeCrownVolumeWidget *widget_;
+    SpinBox *spinBox_;
+
+    void updateSettings();
 };
 
-#endif /* COMPUTE_CROWN_VOLUME_WINDOW_HPP */
+#include <WarningsEnable.hpp>
+
+#endif /* QT_SPIN_BOX_HPP */

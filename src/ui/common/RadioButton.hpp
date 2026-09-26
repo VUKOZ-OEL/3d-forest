@@ -25,6 +25,7 @@
 // Include 3D Forest.
 #include <Widget.hpp>
 class Application;
+class RadioButtonGroup;
 
 // Include local.
 #include <ExportUiCommon.hpp>
@@ -34,17 +35,27 @@ class Application;
 class EXPORT_UI_COMMON RadioButton : public Widget
 {
 public:
-    RadioButton(const std::string &str = "");
-    virtual ~RadioButton();
+    explicit RadioButton(const std::string &text = "");
+    ~RadioButton() override;
 
-    void setChecked(bool b, bool notify = false);
-    bool isChecked() const;
+    void setText(const std::string &text);
+    const std::string &text() const { return text_; }
 
+    void setChecked(bool checked, bool notify = false);
+    bool isChecked() const { return checked_; }
+
+    void setGroup(RadioButtonGroup *group);
+
+    Signal<const std::string &> textChanged;
+    Signal<bool> checkedUpdated;
     Signal<int> stateChanged;
 
 private:
+    friend class RadioButtonGroup;
+
     std::string text_;
     bool checked_{false};
+    RadioButtonGroup *group_{nullptr};
 };
 
 #include <WarningsEnable.hpp>

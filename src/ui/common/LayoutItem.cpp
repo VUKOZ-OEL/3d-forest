@@ -28,10 +28,15 @@
 #define LOG_MODULE_NAME "LayoutItem"
 #include <Log.hpp>
 
-LayoutItem::LayoutItem(Widget *widget) : widget_(widget)
+LayoutItem::LayoutItem(Widget *widget, int stretch, int alignment)
+    : widget_(widget),
+      stretch_(stretch),
+      alignment_(alignment)
 {
 }
 
-LayoutItem::LayoutItem(Layout *layout) : layout_(layout)
+LayoutItem::LayoutItem(Layout *layout, int stretch)
+    : layout_(layout),
+      stretch_(stretch)
 {
 }

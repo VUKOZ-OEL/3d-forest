@@ -22,8 +22,7 @@
 // Include 3D Forest.
 #include <Application.hpp>
 #include <ComputeClassificationPlugin.hpp>
-#include <ComputeClassificationWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <ComputeClassificationWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeClassificationPlugin"
@@ -31,36 +30,16 @@
 
 #define ICON(name) (ThemeIcon(":/ComputeClassificationResources/", name))
 
-ComputeClassificationPlugin::ComputeClassificationPlugin()
-    : app_(nullptr),
-      pluginWindow_(nullptr)
-{
-}
-
 void ComputeClassificationPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(
-        nullptr,
-        "Compute",
-        "Compute",
-        tr("Classification"),
-        tr("Classify points to ground and unassigned"),
-        ICON("ground"),
-        [this]() { slotPlugin(); },
-        MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
-}
-
-void ComputeClassificationPlugin::slotPlugin()
-{
-    // Create GUI only when this plugin is used for the first time.
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new ComputeClassificationWindow(app_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Compute", MAIN_WINDOW_MENU_COMPUTE_PRIORITY}},
+                       "Compute",
+                       tr("Classification"),
+                       tr("Classify points to ground and unassigned"),
+                       ICON("ground"),
+                       {},
+                       new ComputeClassificationWidget(app_));
 }

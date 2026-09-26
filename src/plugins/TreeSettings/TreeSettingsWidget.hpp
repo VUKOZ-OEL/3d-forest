@@ -39,7 +39,7 @@ class TreeSettingsWidget : public Widget
 public:
     TreeSettingsWidget(Application *app);
 
-    Size sizeHint() const override { return Size(300, 265); }
+    // Size sizeHint() const override { return Size(300, 265); }
 
     void slotUpdate(const Message &msg);
 
@@ -68,8 +68,6 @@ private:
 
     void dataChanged(bool modifiers = false);
     void setTreeSettings(const TreeSettings &settings);
-    void block();
-    void unblock();
 };
 
 #endif /* TREE_SETTINGS_WIDGET_HPP */

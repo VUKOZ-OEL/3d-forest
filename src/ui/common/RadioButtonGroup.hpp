@@ -17,40 +17,43 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file LayoutItem.hpp */
+/** @file RadioButton.hpp */
 
-#ifndef LAYOUT_ITEM_HPP
-#define LAYOUT_ITEM_HPP
+#ifndef RADIO_BUTTON_GROUP_HPP
+#define RADIO_BUTTON_GROUP_HPP
+
+// Include std.
+#include <vector>
 
 // Include 3D Forest.
-class Widget;
-class Layout;
+class RadioButton;
 
 // Include local.
 #include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
 
-/** LayoutItem. */
-class EXPORT_UI_COMMON LayoutItem
+/** RadioButton. */
+class EXPORT_UI_COMMON RadioButtonGroup
 {
 public:
-    explicit LayoutItem(Widget *widget, int stretch = 0, int alignment = 0);
+    RadioButtonGroup() = default;
+    ~RadioButtonGroup();
 
-    explicit LayoutItem(Layout *layout, int stretch = 0);
+    RadioButtonGroup(const RadioButtonGroup &) = delete;
+    RadioButtonGroup &operator=(const RadioButtonGroup &) = delete;
 
-    Widget *widget() const { return widget_; }
-    Layout *layout() const { return layout_; }
+    void addButton(RadioButton *button);
+    void removeButton(RadioButton *button);
 
-    int stretch() const { return stretch_; }
-    int alignment() const { return alignment_; }
+    RadioButton *checkedButton() const { return checkedButton_; }
 
 private:
-    Widget *widget_{nullptr};
-    Layout *layout_{nullptr};
-    int stretch_{0};
-    int alignment_{0};
+    friend class RadioButton;
+
+    std::vector<RadioButton *> buttons_;
+    RadioButton *checkedButton_{nullptr};
 };
 
 #include <WarningsEnable.hpp>
 
-#endif /* LAYOUT_ITEM_HPP */
+#endif /* RADIO_BUTTON_GROUP_HPP */

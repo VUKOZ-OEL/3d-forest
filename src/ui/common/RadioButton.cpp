@@ -19,11 +19,10 @@
 
 /** @file RadioButton.cpp */
 
-// Include std.
-
 // Include 3D Forest.
 #include <Application.hpp>
 #include <RadioButton.hpp>
+#include <RadioButtonGroup.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "RadioButton"
@@ -35,11 +34,51 @@ RadioButton::RadioButton(const std::string &str) : text_(str)
 
 RadioButton::~RadioButton()
 {
+    if (group_)
+    {
+        group_->removeButton(this);
+    }
 }
 
-void RadioButton::setChecked(bool b, bool notify)
+void RadioButton::setText(const std::string &text)
 {
-    checked_ = b;
+    if (text_ == text)
+    {
+        return;
+    }
+
+    text_ = text;
+    textChanged(text_);
+}
+
+void RadioButton::setChecked(bool checked, bool notify)
+{
+    if (checked_ == checked)
+    {
+        return;
+    }
+
+    checked_ = checked;
+
+    if (group_)
+    {
+        if (checked)
+        {
+            RadioButton *previous = group_->checkedButton_;
+            group_->checkedButton_ = this;
+
+            if (previous && previous != this)
+            {
+                previous->setChecked(false, notify);
+            }
+        }
+        else if (group_->checkedButton_ == this)
+        {
+            group_->checkedButton_ = nullptr;
+        }
+    }
+
+    checkedUpdated(checked_);
 
     if (notify && !signalsBlocked())
     {
@@ -47,7 +86,20 @@ void RadioButton::setChecked(bool b, bool notify)
     }
 }
 
-bool RadioButton::isChecked() const
+void RadioButton::setGroup(RadioButtonGroup *group)
 {
-    return checked_;
+    if (group_ == group)
+    {
+        return;
+    }
+
+    if (group_)
+    {
+        group_->removeButton(this);
+    }
+
+    if (group)
+    {
+        group->addButton(this);
+    }
 }

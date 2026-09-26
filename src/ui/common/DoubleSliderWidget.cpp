@@ -33,6 +33,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "DoubleSliderWidget"
+// #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 DoubleSliderWidget::DoubleSliderWidget()
@@ -63,7 +64,7 @@ void DoubleSliderWidget::setValue(double value, bool notify)
     int valueInt = 0;
     if (max - min > 0.0)
     {
-        valueInt = static_cast<int>(((value - min) / (max - min)) * 1000);
+        valueInt = static_cast<int>(((value - min) / (max - min)) * 1000.0);
     }
     slider_->setValue(valueInt);
 }
@@ -127,7 +128,7 @@ void DoubleSliderWidget::slotValueChangedSpinBox(double v)
     int valueInt = 0;
     if (max - min > 0.0)
     {
-        valueInt = static_cast<int>((v - min) / (max - min)) * 1000;
+        valueInt = static_cast<int>(((v - min) / (max - min)) * 1000.0);
     }
 
     slider_->blockSignals(true);

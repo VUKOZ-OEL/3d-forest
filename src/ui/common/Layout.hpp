@@ -48,7 +48,7 @@ public:
 
     virtual void clear();
 
-    void addWidget(Widget *widget, int stretch = 0);
+    void addWidget(Widget *widget, int stretch = 0, int alignment = 0);
     void addLayout(Layout *layout, int stretch = 0);
     void addStretch();
     void addSpacing(int spacing);
@@ -65,10 +65,15 @@ public:
 
     const std::vector<LayoutItem> &items() const { return items_; }
 
+    void setOwnerWidget(Widget *widget);
+
     Signal<Widget *> widgetAdded;
 
 private:
     std::vector<LayoutItem> items_;
+    Widget *ownerWidget_{nullptr};
+
+    void attachWidget(Widget *widget);
 };
 
 #include <WarningsEnable.hpp>

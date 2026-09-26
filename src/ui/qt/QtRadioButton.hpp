@@ -17,25 +17,35 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ComputeSegmentationNNWindow.hpp */
+/** @file QtRadioButton.hpp */
 
-#ifndef COMPUTE_SEGMENTATION_NN_WINDOW_HPP
-#define COMPUTE_SEGMENTATION_NN_WINDOW_HPP
+#ifndef QT_RADIO_BUTTON_HPP
+#define QT_RADIO_BUTTON_HPP
 
 // Include 3D Forest.
-#include <Dialog.hpp>
-class Application;
-class ComputeSegmentationNNWidget;
+#include <RadioButton.hpp>
 
-/** Compute Segmentation NN Window. */
-class ComputeSegmentationNNWindow : public Dialog
+// Include Qt.
+#include <QRadioButton>
+
+// Include local.
+#include <ExportUiQt.hpp>
+#include <WarningsDisable.hpp>
+
+/** QtRadioButton. */
+class EXPORT_UI_QT QtRadioButton : public QRadioButton
 {
 public:
-    ComputeSegmentationNNWindow(Application *app);
-    ~ComputeSegmentationNNWindow();
+    explicit QtRadioButton(RadioButton *radioButton, QWidget *parent = nullptr);
+    virtual ~QtRadioButton();
+
+protected:
+    void nextCheckState() override;
 
 private:
-    ComputeSegmentationNNWidget *widget_;
+    RadioButton *radioButton_;
 };
 
-#endif /* COMPUTE_SEGMENTATION_NN_WINDOW_HPP */
+#include <WarningsEnable.hpp>
+
+#endif /* QT_RADIO_BUTTON_HPP */

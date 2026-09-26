@@ -24,7 +24,6 @@
 
 // Include 3D Forest.
 #include <Plugin.hpp>
-class TreeSettingsWindow;
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestTreeSettingsPlugin)
@@ -40,17 +39,12 @@ class TreeSettingsWindow;
 class TreeSettingsPlugin : public Plugin
 {
 public:
-    TreeSettingsPlugin();
-
     const char *name() const override { return "TreeSettingsPlugin"; }
     void initialize(Application *app) override;
     void release() override { delete this; }
 
-    void slotPlugin();
-
 private:
-    Application *app_;
-    TreeSettingsWindow *pluginWindow_;
+    Application *app_{nullptr};
 };
 
 extern "C" EXPORT_VIEW_SETTINGS_PLUGIN Plugin *createPlugin()

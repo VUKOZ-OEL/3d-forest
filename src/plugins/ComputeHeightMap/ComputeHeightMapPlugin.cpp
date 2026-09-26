@@ -22,8 +22,7 @@
 // Include 3D Forest.
 #include <Application.hpp>
 #include <ComputeHeightMapPlugin.hpp>
-#include <ComputeHeightMapWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <ComputeHeightMapWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeHeightMapPlugin"
@@ -31,40 +30,20 @@
 
 #define ICON(name) (ThemeIcon(":/ComputeHeightMapResources/", name))
 
-ComputeHeightMapPlugin::ComputeHeightMapPlugin()
-    : app_(nullptr),
-      pluginWindow_(nullptr)
-{
-}
-
 void ComputeHeightMapPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(
-        nullptr,
-        "Compute",
-        "Compute",
-        tr("Height Map"),
-        tr("Compute height map"),
-        ICON("height-map"),
-        [this]() { slotPlugin(); },
-        MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
+    app_->createAction(this,
+                       {{"Compute", MAIN_WINDOW_MENU_COMPUTE_PRIORITY}},
+                       "Compute",
+                       tr("Height Map"),
+                       tr("Compute height map"),
+                       ICON("height-map"),
+                       {},
+                       new ComputeHeightMapWidget(app_, &modifier_));
 
     modifier_.initialize(app_);
-}
-
-void ComputeHeightMapPlugin::slotPlugin()
-{
-    // Create GUI only when this plugin is used for the first time.
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new ComputeHeightMapWindow(app_, &modifier_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
 }
 
 bool ComputeHeightMapPlugin::modifierEnabled()

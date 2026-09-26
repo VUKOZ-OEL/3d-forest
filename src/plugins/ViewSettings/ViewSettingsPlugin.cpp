@@ -21,7 +21,6 @@
 
 // Include 3D Forest.
 #include <Application.hpp>
-#include <ThemeIcon.hpp>
 #include <ViewSettingsPlugin.hpp>
 #include <ViewSettingsWidget.hpp>
 
@@ -36,12 +35,11 @@ void ViewSettingsPlugin::initialize(Application *app)
     app_ = app;
 
     app_->createAction(this,
-                       {{"Settings", 100}},
+                       {{"Settings", MAIN_WINDOW_MENU_SETTINGS_PRIORITY}},
                        "Settings",
                        tr("View"),
                        tr("Show view settings"),
                        ICON("brush"),
                        {},
-                       new ViewSettingsWidget(app_),
-                       MAIN_WINDOW_MENU_SETTINGS_PRIORITY);
+                       new ViewSettingsWidget(app_));
 }

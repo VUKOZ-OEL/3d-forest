@@ -100,6 +100,8 @@ void ApplicationSettingsWidget::dataChanged(bool modifiers)
     {
         app_->updateRender();
     }
+
+    LOG_DEBUG_UPDATE(<< "Finished Output application settings.");
 }
 
 void ApplicationSettingsWidget::setApplicationSettings(
@@ -110,12 +112,12 @@ void ApplicationSettingsWidget::setApplicationSettings(
     settings_ = settings;
 
     // Language.
-    languageComboBox_->setCurrentText(settings_.languageCode, false);
+    languageComboBox_->setCurrentText(settings_.languageCode);
 }
 
 void ApplicationSettingsWidget::slotLanguageChanged(int index)
 {
-    LOG_DEBUG(<< "Set color source to index <" << index << ">.");
+    LOG_DEBUG(<< "Set language to index <" << index << ">.");
 
     if (index < 0)
     {

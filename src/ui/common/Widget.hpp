@@ -41,6 +41,7 @@
 #include <Ui.hpp>
 class Application;
 class Layout;
+class RadioButtonGroup;
 
 // Include local.
 #include <ExportUiCommon.hpp>
@@ -90,12 +91,16 @@ public:
     virtual void showEvent(ShowEvent *event);
     virtual void closeEvent(CloseEvent *event);
 
+    RadioButtonGroup &radioButtonGroup();
+
 private:
     Layout *layout_{nullptr};
     std::string name_;
     std::string toolTip_;
     bool signalsBlocked_{false};
     Palette palette_;
+
+    std::unique_ptr<RadioButtonGroup> radioButtonGroup_;
 };
 
 #include <WarningsEnable.hpp>

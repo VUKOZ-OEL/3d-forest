@@ -23,7 +23,6 @@
 #include <Application.hpp>
 #include <ApplicationSettingsPlugin.hpp>
 #include <ApplicationSettingsWidget.hpp>
-#include <ThemeIcon.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ApplicationSettingsPlugin"
@@ -35,14 +34,12 @@ void ApplicationSettingsPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(
-        nullptr,
-        this,
-        "Settings",
-        "Settings",
-        tr("Application"),
-        tr("Show application settings"),
-        ICON("settings"),
-        [this]() { slotPlugin(); },
-        MAIN_WINDOW_MENU_SETTINGS_PRIORITY);
+    app_->createAction(this,
+                       {{"Settings", MAIN_WINDOW_MENU_SETTINGS_PRIORITY}},
+                       "Settings",
+                       tr("Application"),
+                       tr("Show application settings"),
+                       ICON("settings"),
+                       {},
+                       new ApplicationSettingsWidget(app_));
 }

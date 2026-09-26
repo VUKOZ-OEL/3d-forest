@@ -24,7 +24,6 @@
 
 // Include 3D Forest.
 #include <Plugin.hpp>
-class ComputeElevationWindow;
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestComputeElevationPlugin)
@@ -40,17 +39,12 @@ class ComputeElevationWindow;
 class ComputeElevationPlugin : public Plugin
 {
 public:
-    ComputeElevationPlugin();
-
     const char *name() const override { return "ComputeElevationPlugin"; }
     void initialize(Application *app) override;
     void release() override { delete this; }
 
-    void slotPlugin();
-
 private:
-    Application *app_;
-    ComputeElevationWindow *pluginWindow_;
+    Application *app_{nullptr};
 };
 
 extern "C" EXPORT_COMPUTE_ELEVATION_PLUGIN Plugin *createPlugin()

@@ -22,8 +22,7 @@
 // Include 3D Forest.
 #include <Application.hpp>
 #include <ComputeCrownVolumePlugin.hpp>
-#include <ComputeCrownVolumeWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <ComputeCrownVolumeWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeCrownVolumePlugin"
@@ -31,35 +30,16 @@
 
 #define ICON(name) (ThemeIcon(":/ComputeCrownVolumeResources/", name))
 
-ComputeCrownVolumePlugin::ComputeCrownVolumePlugin()
-    : app_(nullptr),
-      pluginWindow_(nullptr)
-{
-}
-
 void ComputeCrownVolumePlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(
-        nullptr,
-        "Compute",
-        "Compute",
-        tr("Crown volume"),
-        tr("Compute crown volume"),
-        ICON("compute-crown-volume"),
-        [this]() { slotPlugin(); },
-        MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
-}
-
-void ComputeCrownVolumePlugin::slotPlugin()
-{
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new ComputeCrownVolumeWindow(app_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Compute", MAIN_WINDOW_MENU_COMPUTE_PRIORITY}},
+                       "Compute",
+                       tr("Crown volume"),
+                       tr("Compute crown volume"),
+                       ICON("compute-crown-volume"),
+                       {},
+                       new ComputeCrownVolumeWidget(app_));
 }

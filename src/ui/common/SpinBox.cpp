@@ -20,6 +20,7 @@
 /** @file SpinBox.cpp */
 
 // Include std.
+#include <algorithm>
 
 // Include 3D Forest.
 #include <Application.hpp>
@@ -37,35 +38,62 @@ SpinBox::~SpinBox()
 {
 }
 
-void SpinBox::setSingleStep(int val)
+void SpinBox::setSingleStep(int value)
 {
-    singleStep_ = val;
+    if (value < 0 || singleStep_ == value)
+    {
+        return;
+    }
+
+    singleStep_ = value;
+    settingsChanged();
 }
 
-void SpinBox::setMinimum(int min)
+void SpinBox::setMinimum(int minimum)
 {
-    minimum_ = min;
+    setRange(minimum, std::max(minimum, maximum_));
 }
 
-void SpinBox::setMaximum(int max)
+void SpinBox::setMaximum(int maximum)
 {
-    maximum_ = max;
+    setRange(std::min(minimum_, maximum), maximum);
 }
 
-void SpinBox::setRange(int min, int max)
+void SpinBox::setRange(int minimum, int maximum)
 {
-    setMinimum(min);
-    setMaximum(max);
+    // Ensure a valid range.
+    maximum = std::max(minimum, maximum);
+
+    if (minimum_ == minimum && maximum_ == maximum)
+    {
+        return;
+    }
+
+    minimum_ = minimum;
+    maximum_ = maximum;
+
+    const int previousValue = value_;
+    value_ = std::clamp(value_, minimum_, maximum_);
+
+    settingsChanged();
+
+    if (value_ != previousValue)
+    {
+        valueUpdated(value_);
+    }
 }
 
 void SpinBox::setValue(int value, bool notify)
 {
-    if (value == value_)
+    value = std::clamp(value, minimum_, maximum_);
+
+    if (value_ == value)
     {
         return;
     }
 
     value_ = value;
+    valueUpdated(value_);
 
     if (notify && !signalsBlocked())
     {

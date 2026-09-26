@@ -24,7 +24,6 @@
 
 // Include 3D Forest.
 #include <Plugin.hpp>
-class ComputeTreeAttributesWindow;
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestComputeTreeAttributesPlugin)
@@ -40,17 +39,12 @@ class ComputeTreeAttributesWindow;
 class ComputeTreeAttributesPlugin : public Plugin
 {
 public:
-    ComputeTreeAttributesPlugin();
-
     const char *name() const override { return "ComputeTreeAttributesPlugin"; }
     void initialize(Application *app) override;
     void release() override { delete this; }
 
-    void slotPlugin();
-
 private:
-    Application *app_;
-    ComputeTreeAttributesWindow *pluginWindow_;
+    Application *app_{nullptr};
 };
 
 extern "C" EXPORT_COMPUTE_TREE_ATTRIBUTES_PLUGIN Plugin *createPlugin()

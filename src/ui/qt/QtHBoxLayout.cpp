@@ -44,7 +44,10 @@ QtHBoxLayout::QtHBoxLayout(HBoxLayout *layout,
 
             if (qtWidget)
             {
-                QHBoxLayout::addWidget(qtWidget);
+                QHBoxLayout::addWidget(
+                    qtWidget,
+                    item.stretch(),
+                    static_cast<Qt::Alignment>(item.alignment()));
             }
         }
         else if (item.layout())
@@ -53,7 +56,7 @@ QtHBoxLayout::QtHBoxLayout(HBoxLayout *layout,
 
             if (qtLayout)
             {
-                QHBoxLayout::addLayout(qtLayout);
+                QHBoxLayout::addLayout(qtLayout, item.stretch());
             }
         }
     }

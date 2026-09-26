@@ -22,9 +22,6 @@
 #ifndef UNITS_SETTINGS_WIDGET_HPP
 #define UNITS_SETTINGS_WIDGET_HPP
 
-// Include std.
-#include <vector>
-
 // Include 3D Forest.
 #include <Editor.hpp>
 #include <Settings.hpp>
@@ -40,7 +37,7 @@ class UnitsSettingsWidget : public Widget
 public:
     UnitsSettingsWidget(Application *app);
 
-    Size sizeHint() const override { return Size(300, 150); }
+    // Size sizeHint() const override { return Size(300, 150); }
 
     void slotUpdate(const Message &msg);
 
@@ -59,8 +56,6 @@ private:
 
     void dataChanged();
     void setUnitsSettings(const UnitsSettings &settings);
-    void block();
-    void unblock();
 };
 
 #endif /* UNITS_SETTINGS_WIDGET_HPP */

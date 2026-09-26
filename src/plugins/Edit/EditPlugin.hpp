@@ -39,8 +39,6 @@
 class EditPlugin : public Plugin
 {
 public:
-    EditPlugin();
-
     const char *name() const override { return "EditPlugin"; }
     void initialize(Application *app) override;
     void release() override { delete this; }
@@ -50,7 +48,7 @@ public:
     void slotSetClassification();
 
 private:
-    Application *app_;
+    Application *app_{nullptr};
 };
 
 extern "C" EXPORT_EDIT_PLUGIN Plugin *createPlugin()

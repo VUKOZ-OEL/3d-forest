@@ -21,9 +21,8 @@
 
 // Include 3D Forest.
 #include <Application.hpp>
-#include <ThemeIcon.hpp>
 #include <TreeSettingsPlugin.hpp>
-#include <TreeSettingsWindow.hpp>
+#include <TreeSettingsWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "TreeSettingsPlugin"
@@ -31,38 +30,16 @@
 
 #define ICON(name) (ThemeIcon(":/TreeSettingsResources/", name))
 
-TreeSettingsPlugin::TreeSettingsPlugin() : app_(nullptr), pluginWindow_(nullptr)
-{
-}
-
 void TreeSettingsPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(
-        nullptr,
-        "Settings",
-        "Settings",
-        tr("Tree"),
-        tr("Show tree settings"),
-        ICON("tree-settings"),
-        [this]() { slotPlugin(); },
-        MAIN_WINDOW_MENU_SETTINGS_PRIORITY);
-}
-
-void TreeSettingsPlugin::slotPlugin()
-{
-    if (!app_)
-    {
-        return;
-    }
-
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new TreeSettingsWindow(app_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Settings", MAIN_WINDOW_MENU_SETTINGS_PRIORITY}},
+                       "Settings",
+                       tr("Tree"),
+                       tr("Show tree settings"),
+                       ICON("tree-settings"),
+                       {},
+                       new TreeSettingsWidget(app_));
 }

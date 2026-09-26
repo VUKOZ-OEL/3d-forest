@@ -36,9 +36,7 @@
 
 #define ICON(name) (ThemeIcon(":/UnitsSettingsResources/", name))
 
-UnitsSettingsWidget::UnitsSettingsWidget(Application *app)
-    : Widget(app),
-      app_(app)
+UnitsSettingsWidget::UnitsSettingsWidget(Application *app) : app_(app)
 {
     // Widgets.
     ppmLasSpinBox_ = new DoubleSpinBox;
@@ -128,16 +126,12 @@ void UnitsSettingsWidget::setUnitsSettings(const UnitsSettings &settings)
 {
     LOG_DEBUG(<< "Set units settings <" << toString(settings) << ">.");
 
-    block();
-
     settings_ = settings;
 
     ppmLasSpinBox_->setValue(settings_.pointsPerMeterLas[0]);
     ppmUserSpinBox_->setValue(settings_.pointsPerMeterUser[0]);
     ppmUserSpinBox_->setEnabled(settings_.userDefined);
     userDefinedCheckBox_->setChecked(settings_.userDefined);
-
-    unblock();
 }
 
 void UnitsSettingsWidget::slotIntermediateLas(double v)
@@ -166,14 +160,4 @@ void UnitsSettingsWidget::slotUserDefined(int v)
     settings_.userDefined = userDefinedCheckBox_->isChecked();
     ppmUserSpinBox_->setEnabled(settings_.userDefined);
     dataChanged();
-}
-
-void UnitsSettingsWidget::block()
-{
-    (void)blockSignals(true);
-}
-
-void UnitsSettingsWidget::unblock()
-{
-    (void)blockSignals(false);
 }

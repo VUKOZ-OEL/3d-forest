@@ -39,9 +39,7 @@
 
 #define ICON(name) (ThemeIcon(":/TreeSettingsResources/", name))
 
-TreeSettingsWidget::TreeSettingsWidget(Application *app)
-    : Widget(app),
-      app_(app)
+TreeSettingsWidget::TreeSettingsWidget(Application *app) : app_(app)
 {
     LOG_DEBUG(<< "Start creating tree settings widget.");
 
@@ -179,8 +177,6 @@ void TreeSettingsWidget::setTreeSettings(const TreeSettings &settings)
 {
     LOG_DEBUG(<< "Set tree settings <" << toString(settings) << ">.");
 
-    block();
-
     settings_ = settings;
 
     // Use only for selected/all trees.
@@ -211,8 +207,6 @@ void TreeSettingsWidget::setTreeSettings(const TreeSettings &settings)
 
     // DBH scale.
     dbhScaleSlider_->setValue(static_cast<int>(settings_.dbhScale()));
-
-    unblock();
 }
 
 void TreeSettingsWidget::slotSetUseOnlyForSelectedTrees(int v)
@@ -281,14 +275,4 @@ void TreeSettingsWidget::slotSetDbhScale(int v)
 {
     settings_.setDbhScale(static_cast<double>(v));
     dataChanged();
-}
-
-void TreeSettingsWidget::block()
-{
-    (void)blockSignals(true);
-}
-
-void TreeSettingsWidget::unblock()
-{
-    (void)blockSignals(false);
 }

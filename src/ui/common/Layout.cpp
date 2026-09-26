@@ -24,6 +24,7 @@
 // Include 3D Forest.
 #include <Application.hpp>
 #include <Layout.hpp>
+#include <RadioButton.hpp>
 #include <Splitter.hpp>
 
 // Include local.
@@ -56,14 +57,15 @@ void Layout::clear()
     items_.clear();
 }
 
-void Layout::addWidget(Widget *widget, int stretch)
+void Layout::addWidget(Widget *widget, int stretch, int alignment)
 {
     if (!widget)
     {
         return;
     }
 
-    items_.push_back(LayoutItem(widget));
+    items_.push_back(LayoutItem(widget, stretch, alignment));
+    attachWidget(widget);
 }
 
 void Layout::addLayout(Layout *layout, int stretch)
@@ -73,7 +75,8 @@ void Layout::addLayout(Layout *layout, int stretch)
         return;
     }
 
-    items_.push_back(LayoutItem(layout));
+    items_.push_back(LayoutItem(layout, stretch));
+    layout->setOwnerWidget(ownerWidget_);
 }
 
 void Layout::addStretch()
@@ -86,4 +89,30 @@ void Layout::addSpacing(int spacing)
 
 void Layout::setContentsMargins(int left, int top, int right, int bottom)
 {
+}
+
+void Layout::attachWidget(Widget *widget)
+{
+    if (auto *radioButton = dynamic_cast<RadioButton *>(widget))
+    {
+        radioButton->setGroup(ownerWidget_ ? &ownerWidget_->radioButtonGroup()
+                                           : nullptr);
+    }
+}
+
+void Layout::setOwnerWidget(Widget *widget)
+{
+    ownerWidget_ = widget;
+
+    for (const auto &item : items_)
+    {
+        if (item.widget())
+        {
+            attachWidget(item.widget());
+        }
+        else if (item.layout())
+        {
+            item.layout()->setOwnerWidget(widget);
+        }
+    }
 }

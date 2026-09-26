@@ -35,7 +35,7 @@ class ApplicationSettingsWidget : public Widget
 public:
     ApplicationSettingsWidget(Application *app);
 
-    Size sizeHint() const override { return Size(300, 80); }
+    // Size sizeHint() const override { return Size(300, 80); }
 
     void slotUpdate(const Message &msg);
 

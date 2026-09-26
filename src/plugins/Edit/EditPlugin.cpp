@@ -31,43 +31,39 @@
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-EditPlugin::EditPlugin() : app_(nullptr)
-{
-}
-
 void EditPlugin::initialize(Application *app)
 {
     app_ = app;
 
     app_->createAction(
-        nullptr,
-        "Edit",
-        "Edit",
+        this,
+        {{"Edit", MAIN_WINDOW_MENU_EDIT_PRIORITY}},
+        "Edit Points",
         tr("Reset elevation"),
         tr("Reset elevation"),
         ThemeIcon(),
         [this]() { slotResetElevation(); },
-        MAIN_WINDOW_MENU_EDIT_PRIORITY);
+        nullptr);
 
     app_->createAction(
-        nullptr,
-        "Edit",
-        "Edit",
+        this,
+        {{"Edit", MAIN_WINDOW_MENU_EDIT_PRIORITY}},
+        "Edit Points",
         tr("Reset management status"),
         tr("Reset management status"),
         ThemeIcon(),
         [this]() { slotResetManagementStatus(); },
-        MAIN_WINDOW_MENU_EDIT_PRIORITY);
+        nullptr);
 
     app_->createAction(
-        nullptr,
-        "Edit",
-        "Edit",
+        this,
+        {{"Edit", MAIN_WINDOW_MENU_EDIT_PRIORITY}},
+        "Edit Points",
         tr("Set classification"),
         tr("Set classification"),
         ThemeIcon(),
         [this]() { slotSetClassification(); },
-        MAIN_WINDOW_MENU_EDIT_PRIORITY);
+        nullptr);
 }
 
 void EditPlugin::slotResetElevation()

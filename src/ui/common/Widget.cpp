@@ -24,6 +24,7 @@
 // Include 3D Forest.
 #include <Application.hpp>
 #include <Layout.hpp>
+#include <RadioButtonGroup.hpp>
 #include <Widget.hpp>
 
 // Include local.
@@ -69,6 +70,11 @@ void Widget::setLayout(Layout *layout)
 
     delete layout_;
     layout_ = layout;
+
+    if (layout_)
+    {
+        layout_->setOwnerWidget(this);
+    }
 }
 
 void Widget::setSizePolicy(SizePolicy::Policy hor, SizePolicy::Policy ver)
@@ -133,4 +139,14 @@ void Widget::showEvent(ShowEvent *event)
 
 void Widget::closeEvent(CloseEvent *event)
 {
+}
+
+RadioButtonGroup &Widget::radioButtonGroup()
+{
+    if (!radioButtonGroup_)
+    {
+        radioButtonGroup_ = std::make_unique<RadioButtonGroup>();
+    }
+
+    return *radioButtonGroup_;
 }

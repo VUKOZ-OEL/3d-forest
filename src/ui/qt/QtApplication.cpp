@@ -27,6 +27,7 @@
 #include <QtCheckBox.hpp>
 #include <QtComboBox.hpp>
 #include <QtDialog.hpp>
+#include <QtDoubleSpinBox.hpp>
 #include <QtGridLayout.hpp>
 #include <QtGroupBox.hpp>
 #include <QtHBoxLayout.hpp>
@@ -36,7 +37,9 @@
 #include <QtProgressBar.hpp>
 #include <QtProgressDialog.hpp>
 #include <QtPushButton.hpp>
+#include <QtRadioButton.hpp>
 #include <QtSlider.hpp>
+#include <QtSpinBox.hpp>
 #include <QtTextEdit.hpp>
 #include <QtVBoxLayout.hpp>
 #include <QtViewer.hpp>
@@ -254,10 +257,28 @@ QWidget *QtApplication::createWidget(Widget *widget, QWidget *parent)
         return new QtPushButton(w, parent);
     }
 
+    if (auto *w = dynamic_cast<RadioButton *>(widget))
+    {
+        LOG_DEBUG(<< "Create radio button widget.");
+        return new QtRadioButton(w, parent);
+    }
+
     if (auto *w = dynamic_cast<Slider *>(widget))
     {
         LOG_DEBUG(<< "Create slider widget.");
         return new QtSlider(w, parent);
+    }
+
+    if (auto *w = dynamic_cast<SpinBox *>(widget))
+    {
+        LOG_DEBUG(<< "Create spin box widget.");
+        return new QtSpinBox(w, parent);
+    }
+
+    if (auto *w = dynamic_cast<DoubleSpinBox *>(widget))
+    {
+        LOG_DEBUG(<< "Create double spin box widget.");
+        return new QtDoubleSpinBox(w, parent);
     }
 
     if (auto *w = dynamic_cast<TextEdit *>(widget))

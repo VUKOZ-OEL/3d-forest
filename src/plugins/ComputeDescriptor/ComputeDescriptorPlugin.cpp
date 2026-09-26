@@ -22,8 +22,7 @@
 // Include 3D Forest.
 #include <Application.hpp>
 #include <ComputeDescriptorPlugin.hpp>
-#include <ComputeDescriptorWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <ComputeDescriptorWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeDescriptorPlugin"
@@ -31,36 +30,16 @@
 
 #define ICON(name) (ThemeIcon(":/ComputeDescriptorResources/", name))
 
-ComputeDescriptorPlugin::ComputeDescriptorPlugin()
-    : app_(nullptr),
-      pluginWindow_(nullptr)
-{
-}
-
 void ComputeDescriptorPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(
-        nullptr,
-        "Compute",
-        "Compute",
-        tr("Descriptor"),
-        tr("Compute descriptor of each point"),
-        ICON("descriptor"),
-        [this]() { slotPlugin(); },
-        MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
-}
-
-void ComputeDescriptorPlugin::slotPlugin()
-{
-    // Create GUI only when this plugin is used for the first time
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new ComputeDescriptorWindow(app_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Compute", MAIN_WINDOW_MENU_COMPUTE_PRIORITY}},
+                       "Compute",
+                       tr("Descriptor"),
+                       tr("Compute descriptor of each point"),
+                       ICON("descriptor"),
+                       {},
+                       new ComputeDescriptorWidget(app_));
 }
