@@ -24,7 +24,6 @@
 
 // Include 3D Forest.
 #include <Plugin.hpp>
-class FilterDescriptorWindow;
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestFilterDescriptorPlugin)
@@ -40,17 +39,12 @@ class FilterDescriptorWindow;
 class FilterDescriptorPlugin : public Plugin
 {
 public:
-    FilterDescriptorPlugin();
-
     const char *name() const override { return "FilterDescriptorPlugin"; }
     void initialize(Application *app) override;
     void release() override { delete this; }
 
-    void slotPlugin();
-
 private:
     Application *app_;
-    FilterDescriptorWindow *pluginWindow_;
 };
 
 extern "C" EXPORT_FILTER_DESCRIPTOR_PLUGIN Plugin *createPlugin()

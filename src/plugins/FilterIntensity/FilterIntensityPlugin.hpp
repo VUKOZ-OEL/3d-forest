@@ -24,7 +24,6 @@
 
 // Include 3D Forest.
 #include <Plugin.hpp>
-class FilterIntensityWindow;
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestFilterIntensityPlugin)
@@ -40,17 +39,12 @@ class FilterIntensityWindow;
 class FilterIntensityPlugin : public Plugin
 {
 public:
-    FilterIntensityPlugin();
-
     const char *name() const override { return "FilterIntensityPlugin"; }
     void initialize(Application *app) override;
     void release() override { delete this; }
 
-    void slotPlugin();
-
 private:
-    Application *app_;
-    FilterIntensityWindow *pluginWindow_;
+    Application *app_{nullptr};
 };
 
 extern "C" EXPORT_FILTER_INTENSITY_PLUGIN Plugin *createPlugin()

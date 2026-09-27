@@ -34,8 +34,7 @@
 
 FilterManagementStatusTreeWidget::FilterManagementStatusTreeWidget(
     Application *app)
-    : Widget(app),
-      app_(app)
+    : app_(app)
 {
     LOG_DEBUG(<< "Create.");
 

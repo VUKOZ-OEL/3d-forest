@@ -22,8 +22,7 @@
 // Include 3D Forest.
 #include <Application.hpp>
 #include <FilterIntensityPlugin.hpp>
-#include <FilterIntensityWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <FilterIntensityWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterIntensityPlugin"
@@ -31,40 +30,16 @@
 
 #define ICON(name) (ThemeIcon(":/FilterIntensityResources/", name))
 
-FilterIntensityPlugin::FilterIntensityPlugin()
-    : app_(nullptr),
-      pluginWindow_(nullptr)
-{
-}
-
 void FilterIntensityPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(
-        nullptr,
-        "Filter",
-        "Filter",
-        tr("Intensity"),
-        tr("Show intensity filter"),
-        ICON("intensity-filter"),
-        [this]() { slotPlugin(); },
-        MAIN_WINDOW_MENU_FILTER_PRIORITY);
-}
-
-void FilterIntensityPlugin::slotPlugin()
-{
-    if (!app_)
-    {
-        return;
-    }
-
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new FilterIntensityWindow(app_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Filter", MAIN_WINDOW_MENU_FILTER_PRIORITY}},
+                       "Filter",
+                       tr("Intensity"),
+                       tr("Show intensity filter"),
+                       ICON("intensity-filter"),
+                       {},
+                       new FilterIntensityWidget(app_));
 }

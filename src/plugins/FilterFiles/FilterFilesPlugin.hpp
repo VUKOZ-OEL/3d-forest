@@ -24,7 +24,6 @@
 
 // Include 3D Forest.
 #include <Plugin.hpp>
-class FilterFilesWindow;
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestFilterFilesPlugin)
@@ -40,17 +39,12 @@ class FilterFilesWindow;
 class FilterFilesPlugin : public Plugin
 {
 public:
-    FilterFilesPlugin();
-
     const char *name() const override { return "FilterFilesPlugin"; }
     void initialize(Application *app) override;
     void release() override { delete this; }
 
-    void slotPlugin();
-
 private:
-    Application *app_;
-    FilterFilesWindow *pluginWindow_;
+    Application *app_{nullptr};
 };
 
 extern "C" EXPORT_FILTER_FILES_PLUGIN Plugin *createPlugin()

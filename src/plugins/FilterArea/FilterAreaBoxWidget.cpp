@@ -32,9 +32,7 @@
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-FilterAreaBoxWidget::FilterAreaBoxWidget(Application *app)
-    : Widget(app),
-      app_(app)
+FilterAreaBoxWidget::FilterAreaBoxWidget(Application *app) : app_(app)
 {
     LOG_DEBUG(<< "Start creating clip filter widget.");
 

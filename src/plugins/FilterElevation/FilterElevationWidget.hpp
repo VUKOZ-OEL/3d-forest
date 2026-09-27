@@ -38,7 +38,7 @@ public:
 
     void setFilterEnabled(bool b);
 
-    Size sizeHint() const override { return Size(300, 120); }
+    // Size sizeHint() const override { return Size(300, 120); }
 
     void slotUpdate(const Message &msg);
 

@@ -34,6 +34,8 @@ QtSlider::QtSlider(Slider *slider, QWidget *parent)
     : QSlider(Qt::Horizontal, parent),
       slider_(slider)
 {
+    setProperty("singleValueSlider", true);
+
     updateSettings();
 
     const QPointer<QtSlider> guard(this);

@@ -22,8 +22,7 @@
 // Include 3D Forest.
 #include <Application.hpp>
 #include <FilterDescriptorPlugin.hpp>
-#include <FilterDescriptorWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <FilterDescriptorWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterDescriptorPlugin"
@@ -31,40 +30,16 @@
 
 #define ICON(name) (ThemeIcon(":/FilterDescriptorResources/", name))
 
-FilterDescriptorPlugin::FilterDescriptorPlugin()
-    : app_(nullptr),
-      pluginWindow_(nullptr)
-{
-}
-
 void FilterDescriptorPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(
-        nullptr,
-        "Filter",
-        "Filter",
-        tr("Descriptor"),
-        tr("Show descriptor filter"),
-        ICON("descriptor-filter"),
-        [this]() { slotPlugin(); },
-        MAIN_WINDOW_MENU_FILTER_PRIORITY);
-}
-
-void FilterDescriptorPlugin::slotPlugin()
-{
-    if (!app_)
-    {
-        return;
-    }
-
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new FilterDescriptorWindow(app_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Filter", MAIN_WINDOW_MENU_FILTER_PRIORITY}},
+                       "Filter",
+                       tr("Descriptor"),
+                       tr("Show descriptor filter"),
+                       ICON("descriptor-filter"),
+                       {},
+                       new FilterDescriptorWidget(app_));
 }

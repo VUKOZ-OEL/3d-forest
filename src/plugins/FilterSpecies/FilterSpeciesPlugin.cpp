@@ -22,8 +22,7 @@
 // Include 3D Forest.
 #include <Application.hpp>
 #include <FilterSpeciesPlugin.hpp>
-#include <FilterSpeciesWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <FilterSpeciesWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterSpeciesPlugin"
@@ -31,40 +30,16 @@
 
 #define ICON(name) (ThemeIcon(":/FilterSpeciesResources/", name))
 
-FilterSpeciesPlugin::FilterSpeciesPlugin()
-    : app_(nullptr),
-      pluginWindow_(nullptr)
-{
-}
-
 void FilterSpeciesPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(
-        nullptr,
-        "Filter",
-        "Filter",
-        tr("Species"),
-        tr("Show species filter"),
-        ICON("species-filter"),
-        [this]() { slotPlugin(); },
-        MAIN_WINDOW_MENU_FILTER_PRIORITY);
-}
-
-void FilterSpeciesPlugin::slotPlugin()
-{
-    if (!app_)
-    {
-        return;
-    }
-
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new FilterSpeciesWindow(app_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Filter", MAIN_WINDOW_MENU_FILTER_PRIORITY}},
+                       "Filter",
+                       tr("Species"),
+                       tr("Show species filter"),
+                       ICON("species-filter"),
+                       {},
+                       new FilterSpeciesWidget(app_));
 }

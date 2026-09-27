@@ -32,9 +32,7 @@
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-FilterIntensityWidget::FilterIntensityWidget(Application *app)
-    : Widget(app),
-      app_(app)
+FilterIntensityWidget::FilterIntensityWidget(Application *app) : app_(app)
 {
     LOG_DEBUG(<< "Start creating intensity filter widget.");
 

@@ -33,8 +33,8 @@ add_library(
     SHARED
     ${SOURCES}
 #    ${SOURCES_HELP}
-#    ../../../3rdparty/widgets/ctk/ctkRangeSlider.cpp
-#    ../../../3rdparty/widgets/ctk/ctkDoubleRangeSlider.cpp
+    ../../../3rdparty/widgets/ctk/ctkRangeSlider.cpp
+    ../../../3rdparty/widgets/ctk/ctkDoubleRangeSlider.cpp
 #    ../../../3rdparty/widgets/flowlayout/flowlayout.cpp
     resources/resources.qrc
 #    ../../plugins/Help/resources/resources.qrc
@@ -44,7 +44,7 @@ target_include_directories(
     ${SUB_PROJECT_NAME}
     PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}
-#    ../../../3rdparty/widgets/ctk
+    ../../../3rdparty/widgets/ctk
 #    ../../../3rdparty/widgets/flowlayout
 #    ../../plugins/Help
 )

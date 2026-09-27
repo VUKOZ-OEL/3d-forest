@@ -22,8 +22,7 @@
 // Include 3D Forest.
 #include <Application.hpp>
 #include <FilterManagementStatusPlugin.hpp>
-#include <FilterManagementStatusWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <FilterManagementStatusWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterManagementStatusPlugin"
@@ -31,40 +30,16 @@
 
 #define ICON(name) (ThemeIcon(":/FilterManagementStatusResources/", name))
 
-FilterManagementStatusPlugin::FilterManagementStatusPlugin()
-    : app_(nullptr),
-      pluginWindow_(nullptr)
-{
-}
-
 void FilterManagementStatusPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(
-        nullptr,
-        "Filter",
-        "Filter",
-        tr("Management Status"),
-        tr("Show management status filter"),
-        ICON("management-status-filter"),
-        [this]() { slotPlugin(); },
-        MAIN_WINDOW_MENU_FILTER_PRIORITY);
-}
-
-void FilterManagementStatusPlugin::slotPlugin()
-{
-    if (!app_)
-    {
-        return;
-    }
-
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new FilterManagementStatusWindow(app_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Filter", MAIN_WINDOW_MENU_FILTER_PRIORITY}},
+                       "Filter",
+                       tr("Management Status"),
+                       tr("Show management status filter"),
+                       ICON("management-status-filter"),
+                       {},
+                       new FilterManagementStatusWidget(app_));
 }

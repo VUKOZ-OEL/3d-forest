@@ -22,8 +22,7 @@
 // Include 3D Forest.
 #include <Application.hpp>
 #include <FilterElevationPlugin.hpp>
-#include <FilterElevationWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <FilterElevationWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterElevationPlugin"
@@ -31,40 +30,16 @@
 
 #define ICON(name) (ThemeIcon(":/FilterElevationResources/", name))
 
-FilterElevationPlugin::FilterElevationPlugin()
-    : app_(nullptr),
-      pluginWindow_(nullptr)
-{
-}
-
 void FilterElevationPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(
-        nullptr,
-        "Filter",
-        "Filter",
-        tr("Elevation"),
-        tr("Show elevation filter"),
-        ICON("elevation-filter"),
-        [this]() { slotPlugin(); },
-        MAIN_WINDOW_MENU_FILTER_PRIORITY);
-}
-
-void FilterElevationPlugin::slotPlugin()
-{
-    if (!app_)
-    {
-        return;
-    }
-
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new FilterElevationWindow(app_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Filter", MAIN_WINDOW_MENU_FILTER_PRIORITY}},
+                       "Filter",
+                       tr("Elevation"),
+                       tr("Show elevation filter"),
+                       ICON("elevation-filter"),
+                       {},
+                       new FilterElevationWidget(app_));
 }

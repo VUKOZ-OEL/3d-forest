@@ -22,8 +22,7 @@
 // Include 3D Forest.
 #include <Application.hpp>
 #include <FilterClassificationPlugin.hpp>
-#include <FilterClassificationWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <FilterClassificationWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterClassificationPlugin"
@@ -31,40 +30,16 @@
 
 #define ICON(name) (ThemeIcon(":/FilterClassificationResources/", name))
 
-FilterClassificationPlugin::FilterClassificationPlugin()
-    : app_(nullptr),
-      pluginWindow_(nullptr)
-{
-}
-
 void FilterClassificationPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(
-        nullptr,
-        "Filter",
-        "Filter",
-        tr("Classification"),
-        tr("Show classification filter"),
-        ICON("classification-filter"),
-        [this]() { slotPlugin(); },
-        MAIN_WINDOW_MENU_FILTER_PRIORITY);
-}
-
-void FilterClassificationPlugin::slotPlugin()
-{
-    if (!app_)
-    {
-        return;
-    }
-
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new FilterClassificationWindow(app_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Filter", MAIN_WINDOW_MENU_FILTER_PRIORITY}},
+                       "Filter",
+                       tr("Classification"),
+                       tr("Show classification filter"),
+                       ICON("classification-filter"),
+                       {},
+                       new FilterClassificationWidget(app_));
 }

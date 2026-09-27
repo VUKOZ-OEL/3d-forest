@@ -22,8 +22,7 @@
 // Include 3D Forest.
 #include <Application.hpp>
 #include <FilterTreesPlugin.hpp>
-#include <FilterTreesWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <FilterTreesWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterTreesPlugin"
@@ -31,38 +30,16 @@
 
 #define ICON(name) (ThemeIcon(":/FilterTreesResources/", name))
 
-FilterTreesPlugin::FilterTreesPlugin() : app_(nullptr), pluginWindow_(nullptr)
-{
-}
-
 void FilterTreesPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(
-        nullptr,
-        "Filter",
-        "Filter",
-        tr("Trees"),
-        tr("Show tree filter"),
-        ICON("tree"),
-        [this]() { slotPlugin(); },
-        MAIN_WINDOW_MENU_FILTER_PRIORITY);
-}
-
-void FilterTreesPlugin::slotPlugin()
-{
-    if (!app_)
-    {
-        return;
-    }
-
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new FilterTreesWindow(app_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Filter", MAIN_WINDOW_MENU_FILTER_PRIORITY}},
+                       "Filter",
+                       tr("Trees"),
+                       tr("Show tree filter"),
+                       ICON("tree"),
+                       {},
+                       new FilterTreesWidget(app_));
 }

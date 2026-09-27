@@ -27,6 +27,7 @@
 #include <QtCheckBox.hpp>
 #include <QtComboBox.hpp>
 #include <QtDialog.hpp>
+#include <QtDoubleRangeSlider.hpp>
 #include <QtDoubleSpinBox.hpp>
 #include <QtGridLayout.hpp>
 #include <QtGroupBox.hpp>
@@ -47,9 +48,7 @@
 
 // Include Qt.
 #include <QFileDialog>
-#include <QHBoxLayout>
 #include <QMessageBox>
-#include <QPalette>
 #include <QStyleHints>
 
 // Include local.
@@ -156,6 +155,12 @@ void QtApplication::initLayout()
                      &QStyleHints::colorSchemeChanged,
                      &mainWindow_,
                      [this](Qt::ColorScheme) { updateTheme(); });
+}
+
+void QtApplication::updateTheme()
+{
+    themeColors_.setDarkMode(QtThemeColors::isDesktopDarkMode(&qapplication_));
+    sidebar_->setTheme(themeColors_);
 }
 
 void QtApplication::setViewer(Widget *widget)
@@ -269,6 +274,12 @@ QWidget *QtApplication::createWidget(Widget *widget, QWidget *parent)
         return new QtSlider(w, parent);
     }
 
+    if (auto *w = dynamic_cast<DoubleRangeSlider *>(widget))
+    {
+        LOG_DEBUG(<< "Create double range slider widget.");
+        return new QtDoubleRangeSlider(w, parent);
+    }
+
     if (auto *w = dynamic_cast<SpinBox *>(widget))
     {
         LOG_DEBUG(<< "Create spin box widget.");
@@ -334,31 +345,6 @@ QDialog *QtApplication::createDialog(Dialog &dialog, QWidget *parent)
     }
 
     return new QtDialog(&dialog, this, parent);
-}
-
-bool QtApplication::isDarkMode() const
-{
-    const Qt::ColorScheme scheme = qapplication_.styleHints()->colorScheme();
-
-    if (scheme == Qt::ColorScheme::Dark)
-    {
-        return true;
-    }
-
-    if (scheme == Qt::ColorScheme::Light)
-    {
-        return false;
-    }
-
-    const int lightness =
-        qapplication_.palette().color(QPalette::Window).lightness();
-
-    return lightness < 128;
-}
-
-void QtApplication::updateTheme()
-{
-    sidebar_->setDarkMode(isDarkMode());
 }
 
 std::string QtApplication::getOpenFileName(const std::string &dialogTitle,

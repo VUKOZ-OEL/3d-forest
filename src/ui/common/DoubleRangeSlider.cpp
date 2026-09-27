@@ -19,6 +19,11 @@
 
 /** @file DoubleRangeSlider.cpp */
 
+// Include std.
+#include <algorithm>
+#include <cmath>
+#include <utility>
+
 // Include 3D Forest.
 #include <Application.hpp>
 #include <DoubleRangeSlider.hpp>
@@ -36,125 +41,153 @@ DoubleRangeSlider::~DoubleRangeSlider()
 {
 }
 
-void DoubleRangeSlider::setSingleStep(double val)
+void DoubleRangeSlider::setSingleStep(double value)
 {
-    singleStep_ = val;
+    if (!std::isfinite(value) || value <= 0.0)
+    {
+        return;
+    }
+
+    if (singleStep_ == value)
+    {
+        return;
+    }
+
+    singleStep_ = value;
+    settingsChanged();
 }
 
-void DoubleRangeSlider::setOrientation(int v)
+void DoubleRangeSlider::setOrientation(int orientation)
 {
+    if (orientation != Horizontal && orientation != Vertical)
+    {
+        return;
+    }
+
+    if (orientation_ == orientation)
+    {
+        return;
+    }
+
+    orientation_ = orientation;
+    settingsChanged();
 }
 
-void DoubleRangeSlider::setMinimum(double min)
+void DoubleRangeSlider::setMinimum(double minimum)
 {
-    minimum_ = min;
-    minimumValue_ = min;
+    if (!std::isfinite(minimum))
+    {
+        return;
+    }
+
+    setRange(minimum, std::max(minimum, maximum_));
 }
 
-void DoubleRangeSlider::setMaximum(double max)
+void DoubleRangeSlider::setMaximum(double maximum)
 {
-    maximum_ = max;
-    maximumValue_ = max;
+    if (!std::isfinite(maximum))
+    {
+        return;
+    }
+
+    setRange(std::min(minimum_, maximum), maximum);
 }
 
-void DoubleRangeSlider::setRange(double min, double max)
+void DoubleRangeSlider::setRange(double minimum, double maximum)
 {
-    setMinimum(min);
-    setMaximum(max);
+    if (!std::isfinite(minimum) || !std::isfinite(maximum))
+    {
+        return;
+    }
+
+    maximum = std::max(minimum, maximum);
+
+    if (minimum_ == minimum && maximum_ == maximum)
+    {
+        return;
+    }
+
+    minimum_ = minimum;
+    maximum_ = maximum;
+
+    const double previousMinimumValue = minimumValue_;
+    const double previousMaximumValue = maximumValue_;
+
+    minimumValue_ = std::clamp(minimumValue_, minimum_, maximum_);
+    maximumValue_ = std::clamp(maximumValue_, minimum_, maximum_);
+
+    settingsChanged();
+
+    if (minimumValue_ != previousMinimumValue ||
+        maximumValue_ != previousMaximumValue)
+    {
+        valuesUpdated(minimumValue_, maximumValue_);
+    }
 }
 
 void DoubleRangeSlider::setMinimumValue(double value, bool notify)
 {
-    double newMinimum = value;
-    clamp(newMinimum, minimum_, maximum_);
-    bool minChanged = !equal(newMinimum, minimumValue_);
-
-    minimumValue_ = newMinimum;
-
-    if (minChanged && notify && !signalsBlocked())
+    if (!std::isfinite(value))
     {
-        minimumValueChanged(minimumValue_);
+        return;
     }
+
+    // Move the upper value too if necessary to preserve ordering.
+    setValues(value, std::max(value, maximumValue_), notify);
 }
 
 void DoubleRangeSlider::setMaximumValue(double value, bool notify)
 {
-    double newMaximum = value;
-    clamp(newMaximum, minimum_, maximum_);
-    bool maxChanged = !equal(newMaximum, minimumValue_);
-
-    maximumValue_ = newMaximum;
-
-    if (maxChanged && notify && !signalsBlocked())
+    if (!std::isfinite(value))
     {
-        maximumValueChanged(maximumValue_);
+        return;
     }
+
+    // Move the lower value too if necessary to preserve ordering.
+    setValues(std::min(minimumValue_, value), value, notify);
 }
 
-void DoubleRangeSlider::setValues(double minVal, double maxVal, bool notify)
+void DoubleRangeSlider::setValues(double minimumValue,
+                                  double maximumValue,
+                                  bool notify)
 {
-    double newMinimum = minVal;
-    clamp(newMinimum, minimum_, maximum_);
-    bool minChanged = !equal(newMinimum, minimumValue_);
-    minimumValue_ = newMinimum;
+    if (!std::isfinite(minimumValue) || !std::isfinite(maximumValue))
+    {
+        return;
+    }
 
-    double newMaximum = maxVal;
-    clamp(newMaximum, minimum_, maximum_);
-    bool maxChanged = !equal(newMaximum, minimumValue_);
-    maximumValue_ = newMaximum;
+    if (minimumValue > maximumValue)
+    {
+        std::swap(minimumValue, maximumValue);
+    }
+
+    minimumValue = std::clamp(minimumValue, minimum_, maximum_);
+    maximumValue = std::clamp(maximumValue, minimum_, maximum_);
+
+    const bool minimumChanged = minimumValue_ != minimumValue;
+    const bool maximumChanged = maximumValue_ != maximumValue;
+
+    if (!minimumChanged && !maximumChanged)
+    {
+        return;
+    }
+
+    // Store both values before notifying subscribers.
+    minimumValue_ = minimumValue;
+    maximumValue_ = maximumValue;
+
+    valuesUpdated(minimumValue_, maximumValue_);
 
     if (notify && !signalsBlocked())
     {
-        if (minChanged)
+        if (minimumChanged)
         {
             minimumValueChanged(minimumValue_);
         }
 
-        if (maxChanged)
+        if (maximumChanged)
         {
             maximumValueChanged(maximumValue_);
         }
     }
 }
-
-#if 0
-    // Include 3rd party.
-    #include <ctkDoubleRangeSlider.h>
-
-    ctkDoubleRangeSlider *slider_;
-
-    slider_->setMinimum(min);
-    slider_->setMaximum(max);
-    slider_->setMinimumValue(value);
-    slider_->setMaximumValue(value);
-
-    slider_->disconnectSlider();
-    slider_->connectSlider();
-
-    slider_->blockSignals(true);
-    slider_->setMinimumValue(v);
-    slider_->blockSignals(false);
-
-    // Value Slider.
-    ctkDoubleRangeSlider *slider = new ctkDoubleRangeSlider;
-    slider->setRange(min, max);
-    slider->setValues(minValue, maxValue);
-    slider->setSingleStep(step);
-    slider->setOrientation(Qt::Horizontal);
-
-    connect(slider,
-            SIGNAL(minimumPositionChanged(double)),
-            outputWidget,
-            SLOT(slotIntermediateMinimumValue(double)));
-
-    connect(slider,
-            SIGNAL(maximumPositionChanged(double)),
-            outputWidget,
-            SLOT(slotIntermediateMaximumValue(double)));
-
-    connect(slider,
-            SIGNAL(sliderReleased()),
-            outputWidget,
-            SLOT(slotFinalValue()));
-
-#endif

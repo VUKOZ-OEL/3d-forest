@@ -22,8 +22,7 @@
 // Include 3D Forest.
 #include <Application.hpp>
 #include <FilterFilesPlugin.hpp>
-#include <FilterFilesWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <FilterFilesWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterFilesPlugin"
@@ -31,38 +30,16 @@
 
 #define ICON(name) (ThemeIcon(":/FilterFilesResources/", name))
 
-FilterFilesPlugin::FilterFilesPlugin() : app_(nullptr), pluginWindow_(nullptr)
-{
-}
-
 void FilterFilesPlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(
-        nullptr,
-        "Filter",
-        "Filter",
-        tr("Files"),
-        tr("Show file filter"),
-        ICON("files"),
-        [this]() { slotPlugin(); },
-        MAIN_WINDOW_MENU_FILTER_PRIORITY);
-}
-
-void FilterFilesPlugin::slotPlugin()
-{
-    if (!app_)
-    {
-        return;
-    }
-
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new FilterFilesWindow(app_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Filter", MAIN_WINDOW_MENU_FILTER_PRIORITY}},
+                       "Filter",
+                       tr("Files"),
+                       tr("Show file filter"),
+                       ICON("files"),
+                       {},
+                       new FilterFilesWidget(app_));
 }

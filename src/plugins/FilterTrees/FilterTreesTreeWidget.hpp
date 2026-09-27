@@ -24,10 +24,8 @@
 
 // Include 3D Forest.
 #include <Segment.hpp>
-class Application;
-
-// Include Qt.
 #include <Widget.hpp>
+class Application;
 class TableWidget;
 
 /** Tree Widget. */

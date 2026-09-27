@@ -45,7 +45,7 @@ QtSidebar::QtSidebar(NavigationTree *navigation,
                      QWidget *parent)
     : QWidget(parent),
       navigation_(navigation),
-      application_(application),
+      app_(application),
       tree_(new QTreeWidget(this))
 {
     tree_->setHeaderHidden(true);
@@ -178,7 +178,7 @@ void QtSidebar::addItem(NavigationItem *item)
     {
         QTreeWidgetItem *contentItem = new QTreeWidgetItem(qtItem);
 
-        QWidget *qtWidget = application_->createWidget(action->panel(), tree_);
+        QWidget *qtWidget = app_->createWidget(action->panel(), tree_);
 
         if (!qtWidget)
         {
@@ -186,7 +186,7 @@ void QtSidebar::addItem(NavigationItem *item)
             return;
         }
 
-        applyPanelTheme(qtWidget);
+        applyPanelTheme(qtWidget, styleSheet_);
 
         contentItem->setFlags(contentItem->flags() & ~Qt::ItemIsSelectable);
 
@@ -301,165 +301,27 @@ int QtSidebar::itemIndex(const NavigationItem *item) const
     return static_cast<int>(std::distance(siblings.begin(), it));
 }
 
-void QtSidebar::setDarkMode(bool dark)
+void QtSidebar::setTheme(const QtThemeColors &themeColors)
 {
-    darkMode_ = dark;
+    styleSheet_ = themeColors.getStyleSheet();
 
-    if (dark)
-    {
-        setStyleSheet("QtSidebar {"
-                      "    background: #171717;"
-                      "}"
-                      ""
-                      "QTreeWidget {"
-                      "    background: #171717;"
-                      "    color: #ececec;"
-                      "    border: none;"
-                      "    outline: none;"
-                      "    font-size: 14px;"
-                      "}"
-                      ""
-                      "QTreeWidget::item {"
-                      "    color: #ececec;"
-                      "    min-height: 30px;"
-                      "    padding: 3px 8px;"
-                      "    border: none;"
-                      "    border-radius: 7px;"
-                      "}"
-                      ""
-                      "QTreeWidget::item:hover {"
-                      "    background: #2b2b2b;"
-                      "}"
-                      ""
-                      "QTreeWidget::branch {"
-                      "    background: #171717;"
-                      "}"
-                      ""
-                      "QLabel,"
-                      "QCheckBox,"
-                      "QRadioButton {"
-                      "    color: #ececec;"
-                      "    background: transparent;"
-                      "}"
-                      ""
-                      "QSlider::groove:horizontal {"
-                      "    height: 4px;"
-                      "    background: #484848;"
-                      "    border-radius: 2px;"
-                      "}"
-                      ""
-                      "QSlider::sub-page:horizontal {"
-                      "    background: #d0d0d0;"
-                      "    border-radius: 2px;"
-                      "}"
-                      ""
-                      "QSlider::handle:horizontal {"
-                      "    width: 14px;"
-                      "    margin: -5px 0;"
-                      "    background: #f0f0f0;"
-                      "    border: 1px solid #909090;"
-                      "    border-radius: 7px;"
-                      "}");
-    }
-    else
-    {
-        setStyleSheet("QtSidebar {"
-                      "    background: #f7f7f7;"
-                      "}"
-                      ""
-                      "QTreeWidget {"
-                      "    background: #f7f7f7;"
-                      "    color: #202020;"
-                      "    border: none;"
-                      "    outline: none;"
-                      "    font-size: 14px;"
-                      "}"
-                      ""
-                      "QTreeWidget::item {"
-                      "    color: #202020;"
-                      "    min-height: 30px;"
-                      "    padding: 3px 8px;"
-                      "    border: none;"
-                      "    border-radius: 7px;"
-                      "}"
-                      ""
-                      "QTreeWidget::item:hover {"
-                      "    background: #e8e8e8;"
-                      "}"
-                      ""
-                      "QTreeWidget::branch {"
-                      "    background: #f7f7f7;"
-                      "}"
-                      ""
-                      "QLabel,"
-                      "QCheckBox,"
-                      "QRadioButton {"
-                      "    color: #202020;"
-                      "    background: transparent;"
-                      "}"
-                      ""
-                      "QSlider::groove:horizontal {"
-                      "    height: 4px;"
-                      "    background: #c6c6c6;"
-                      "    border-radius: 2px;"
-                      "}"
-                      ""
-                      "QSlider::sub-page:horizontal {"
-                      "    background: #505050;"
-                      "    border-radius: 2px;"
-                      "}"
-                      ""
-                      "QSlider::handle:horizontal {"
-                      "    width: 14px;"
-                      "    margin: -5px 0;"
-                      "    background: #ffffff;"
-                      "    border: 1px solid #707070;"
-                      "    border-radius: 7px;"
-                      "}");
-    }
+    setStyleSheet(styleSheet_);
 
     for (const Binding &binding : bindings_)
     {
         if (binding.qtWidget)
         {
-            applyPanelTheme(binding.qtWidget);
+            applyPanelTheme(binding.qtWidget, styleSheet_);
         }
     }
 }
 
-void QtSidebar::applyPanelTheme(QWidget *widget)
+void QtSidebar::applyPanelTheme(QWidget *widget, const QString &styleSheet)
 {
     if (!widget)
     {
         return;
     }
 
-    if (darkMode_)
-    {
-        widget->setStyleSheet("QWidget {"
-                              "    color: #ececec;"
-                              "    background: transparent;"
-                              "}"
-                              ""
-                              "QLabel,"
-                              "QCheckBox,"
-                              "QRadioButton {"
-                              "    color: #ececec;"
-                              "    background: transparent;"
-                              "}");
-    }
-    else
-    {
-        widget->setStyleSheet("QWidget {"
-                              "    color: #202020;"
-                              "    background: transparent;"
-                              "}"
-                              ""
-                              "QLabel,"
-                              "QCheckBox,"
-                              "QRadioButton {"
-                              "    color: #202020;"
-                              "    background: transparent;"
-                              "}");
-    }
+    widget->setStyleSheet(styleSheet);
 }

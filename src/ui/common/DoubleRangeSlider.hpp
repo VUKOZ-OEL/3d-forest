@@ -33,21 +33,28 @@
 class EXPORT_UI_COMMON DoubleRangeSlider : public Widget
 {
 public:
+    enum Orientation
+    {
+        Horizontal = 1,
+        Vertical = 2
+    };
+
     DoubleRangeSlider();
     virtual ~DoubleRangeSlider();
 
     double singleStep() const { return singleStep_; }
-    void setSingleStep(double val);
+    void setSingleStep(double value);
 
-    void setOrientation(int v);
+    int orientation() const { return orientation_; }
+    void setOrientation(int orientation);
 
     double minimum() const { return minimum_; }
-    void setMinimum(double min);
+    void setMinimum(double minimum);
 
     double maximum() const { return maximum_; }
-    void setMaximum(double max);
+    void setMaximum(double maximum);
 
-    void setRange(double min, double max);
+    void setRange(double minimum, double maximum);
 
     double minimumValue() const { return minimumValue_; }
     void setMinimumValue(double value, bool notify = false);
@@ -55,18 +62,26 @@ public:
     double maximumValue() const { return maximumValue_; }
     void setMaximumValue(double value, bool notify = false);
 
-    void setValues(double minVal, double maxVal, bool notify = false);
+    void setValues(double minimumValue,
+                   double maximumValue,
+                   bool notify = false);
+
+    Signal<> settingsChanged;
+    Signal<double, double> valuesUpdated;
 
     Signal<double> minimumValueChanged;
     Signal<double> maximumValueChanged;
     Signal<> sliderReleased;
 
 private:
-    double singleStep_{0};
-    double minimum_{0};
-    double maximum_{0};
-    double minimumValue_{0};
-    double maximumValue_{0};
+    double singleStep_{1.0};
+    int orientation_{Horizontal};
+
+    double minimum_{0.0};
+    double maximum_{100.0};
+
+    double minimumValue_{0.0};
+    double maximumValue_{100.0};
 };
 
 #include <WarningsEnable.hpp>

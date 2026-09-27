@@ -32,9 +32,7 @@
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-FilterDescriptorWidget::FilterDescriptorWidget(Application *app)
-    : Widget(app),
-      app_(app)
+FilterDescriptorWidget::FilterDescriptorWidget(Application *app) : app_(app)
 {
     LOG_DEBUG(<< "Start creating descriptor filter widget.");
 

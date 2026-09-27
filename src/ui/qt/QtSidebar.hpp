@@ -27,6 +27,7 @@
 #include <vector>
 
 // Include 3D Forest.
+#include <QtThemeColors.hpp>
 class Action;
 class Widget;
 class NavigationTree;
@@ -50,7 +51,7 @@ public:
                        QtApplication *application,
                        QWidget *parent = nullptr);
 
-    void setDarkMode(bool dark);
+    void setTheme(const QtThemeColors &themeColors);
 
 private:
     struct Binding
@@ -76,7 +77,7 @@ private:
     QTreeWidgetItem *findQtParent(NavigationItem *item);
 
     NavigationTree *navigation_;
-    QtApplication *application_;
+    QtApplication *app_;
 
     QTreeWidget *tree_{nullptr};
 
@@ -86,8 +87,8 @@ private:
     int itemIndex(const NavigationItem *item) const;
 
     // Theme.
-    bool darkMode_{false};
-    void applyPanelTheme(QWidget *widget);
+    QString styleSheet_;
+    void applyPanelTheme(QWidget *widget, const QString &styleSheet);
 };
 
 #include <WarningsEnable.hpp>

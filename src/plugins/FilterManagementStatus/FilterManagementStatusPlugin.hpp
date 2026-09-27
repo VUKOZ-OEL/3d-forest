@@ -24,7 +24,6 @@
 
 // Include 3D Forest.
 #include <Plugin.hpp>
-class FilterManagementStatusWindow;
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestFilterManagementStatusPlugin)
@@ -40,17 +39,12 @@ class FilterManagementStatusWindow;
 class FilterManagementStatusPlugin : public Plugin
 {
 public:
-    FilterManagementStatusPlugin();
-
     const char *name() const override { return "FilterManagementStatusPlugin"; }
     void initialize(Application *app) override;
     void release() override { delete this; }
 
-    void slotPlugin();
-
 private:
-    Application *app_;
-    FilterManagementStatusWindow *pluginWindow_;
+    Application *app_{nullptr};
 };
 
 extern "C" EXPORT_FILTER_MANAGEMENT_STATUS_PLUGIN Plugin *createPlugin()

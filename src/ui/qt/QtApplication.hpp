@@ -29,6 +29,7 @@
 // Include 3D Forest.
 #include <Application.hpp>
 #include <QtSidebar.hpp>
+#include <QtThemeColors.hpp>
 
 // Include Qt.
 #include <QApplication>
@@ -87,12 +88,16 @@ public:
     int showDialog(Dialog &dialog) override;
     void openDialog(Dialog &dialog) override;
 
+    const QtThemeColors &getThemeColors() const { return themeColors_; }
+
 signals:
     void wakeUpRequested();
 
 private:
     QApplication &qapplication_;
     QMainWindow mainWindow_;
+
+    QtThemeColors themeColors_;
 
     QSplitter *splitter_{nullptr};
     QtSidebar *sidebar_{nullptr};
@@ -104,8 +109,6 @@ private:
     std::unordered_map<Dialog *, QPointer<QDialog>> dialogs_;
 
     void initLayout();
-
-    bool isDarkMode() const;
     void updateTheme();
 };
 

@@ -32,9 +32,7 @@
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-FilterTreesTreeWidget::FilterTreesTreeWidget(Application *app)
-    : Widget(app),
-      app_(app)
+FilterTreesTreeWidget::FilterTreesTreeWidget(Application *app) : app_(app)
 {
     LOG_DEBUG(<< "Create.");
 
