@@ -20,6 +20,7 @@
 /** @file Layout.cpp */
 
 // Include std.
+#include <algorithm>
 
 // Include 3D Forest.
 #include <Application.hpp>
@@ -42,6 +43,8 @@ Layout::~Layout()
 
 void Layout::clear()
 {
+    clearing();
+
     for (const LayoutItem &item : items_)
     {
         if (item.widget())
@@ -66,6 +69,8 @@ void Layout::addWidget(Widget *widget, int stretch, int alignment)
 
     items_.push_back(LayoutItem(widget, stretch, alignment));
     attachWidget(widget);
+
+    itemAdded(items_.back());
 }
 
 void Layout::addLayout(Layout *layout, int stretch)
@@ -77,18 +82,28 @@ void Layout::addLayout(Layout *layout, int stretch)
 
     items_.push_back(LayoutItem(layout, stretch));
     layout->setOwnerWidget(ownerWidget_);
+
+    itemAdded(items_.back());
 }
 
-void Layout::addStretch()
+void Layout::addStretch(int stretch)
 {
+    items_.push_back(LayoutItem::makeStretch(std::max(0, stretch)));
+    itemAdded(items_.back());
 }
 
 void Layout::addSpacing(int spacing)
 {
+    items_.push_back(LayoutItem::makeSpacing(std::max(0, spacing)));
+    itemAdded(items_.back());
 }
 
 void Layout::setContentsMargins(int left, int top, int right, int bottom)
 {
+    leftMargin_ = left;
+    topMargin_ = top;
+    rightMargin_ = right;
+    bottomMargin_ = bottom;
 }
 
 void Layout::attachWidget(Widget *widget)

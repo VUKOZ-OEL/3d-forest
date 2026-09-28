@@ -67,6 +67,9 @@ void QtThemeColors::setDarkMode(bool dark)
 
     handle = dark ? QColor("#f0f0f0") : QColor("#ffffff");
     groove = dark ? QColor("#484848") : QColor("#c6c6c6");
+
+    panelBackground = dark ? QColor("#303030") : QColor("#eeeeee");
+    panelBorder = dark ? QColor("#484848") : QColor("#d4d4d4");
 }
 
 QString QtThemeColors::getStyleSheet() const
@@ -78,6 +81,16 @@ QString QtThemeColors::getStyleSheet() const
                  surface.name() +
                  ";"
                  "    background: transparent;"
+                 "}"
+                 ""
+                 "QWidget[sidebarPanel=\"true\"] {"
+                 "    background-color: " +
+                 panelBackground.name() +
+                 ";"
+                 "    border: 1px solid " +
+                 panelBorder.name() +
+                 ";"
+                 "    border-radius: 6px;"
                  "}"
                  ""
                  "QtSidebar {"

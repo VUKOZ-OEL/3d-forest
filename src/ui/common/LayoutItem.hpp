@@ -34,21 +34,39 @@ class Layout;
 class EXPORT_UI_COMMON LayoutItem
 {
 public:
-    explicit LayoutItem(Widget *widget, int stretch = 0, int alignment = 0);
+    enum Type
+    {
+        WidgetItem,
+        LayoutItemType,
+        StretchItem,
+        SpacingItem
+    };
 
+    explicit LayoutItem(Widget *widget, int stretch = 0, int alignment = 0);
     explicit LayoutItem(Layout *layout, int stretch = 0);
+
+    static LayoutItem makeStretch(int stretch);
+    static LayoutItem makeSpacing(int spacing);
+
+    Type type() const { return type_; }
 
     Widget *widget() const { return widget_; }
     Layout *layout() const { return layout_; }
 
     int stretch() const { return stretch_; }
     int alignment() const { return alignment_; }
+    int spacing() const { return spacing_; }
 
 private:
+    explicit LayoutItem(Type type) : type_(type) {}
+
+    Type type_;
     Widget *widget_{nullptr};
     Layout *layout_{nullptr};
+
     int stretch_{0};
     int alignment_{0};
+    int spacing_{0};
 };
 
 #include <WarningsEnable.hpp>

@@ -21,9 +21,11 @@
 
 // Include 3D Forest.
 #include <QtApplication.hpp>
+#include <QtLayoutUtils.hpp>
 #include <QtVBoxLayout.hpp>
 
 // Include Qt.
+#include <QPointer>
 #include <QSignalBlocker>
 
 // Include local.
@@ -36,30 +38,35 @@ QtVBoxLayout::QtVBoxLayout(VBoxLayout *layout,
     : QVBoxLayout(parent),
       layout_(layout)
 {
+    setContentsMargins(layout->leftMargin(),
+                       layout->topMargin(),
+                       layout->rightMargin(),
+                       layout->bottomMargin());
+
     for (const LayoutItem &item : layout_->items())
     {
-        if (item.widget())
-        {
-            QWidget *qtWidget = app->createWidget(item.widget(), parent);
-
-            if (qtWidget)
-            {
-                QVBoxLayout::addWidget(
-                    qtWidget,
-                    item.stretch(),
-                    static_cast<Qt::Alignment>(item.alignment()));
-            }
-        }
-        else if (item.layout())
-        {
-            QLayout *qtLayout = app->createLayout(item.layout(), parent);
-
-            if (qtLayout)
-            {
-                QVBoxLayout::addLayout(qtLayout, item.stretch());
-            }
-        }
+        addQtLayoutItem(this, parent, app, item);
     }
+
+    const QPointer<QtVBoxLayout> guard(this);
+
+    layout->clearing.connect(
+        [guard]
+        {
+            if (guard)
+            {
+                clearQtLayout(guard.data());
+            }
+        });
+
+    layout->itemAdded.connect(
+        [guard, parent, app](const LayoutItem &item)
+        {
+            if (guard)
+            {
+                addQtLayoutItem(guard.data(), parent, app, item);
+            }
+        });
 }
 
 QtVBoxLayout::~QtVBoxLayout()

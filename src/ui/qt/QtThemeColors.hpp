@@ -47,6 +47,9 @@ public:
     QColor handle; // Slider handle fill.
     QColor groove; // Slider groove background.
 
+    QColor panelBackground;
+    QColor panelBorder;
+
     static bool isDesktopDarkMode(const QApplication *qapplication);
 
     void setDarkMode(bool dark);

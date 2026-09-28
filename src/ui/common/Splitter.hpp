@@ -22,8 +22,10 @@
 #ifndef SPLITTER_HPP
 #define SPLITTER_HPP
 
+// Include std.
+#include <vector>
+
 // Include 3D Forest.
-#include <Ui.hpp>
 #include <Widget.hpp>
 
 // Include local.
@@ -35,12 +37,43 @@ class EXPORT_UI_COMMON Splitter : public Widget
 {
 public:
     Splitter();
+    ~Splitter() override;
 
+    Splitter(const Splitter &) = delete;
+    Splitter &operator=(const Splitter &) = delete;
+
+    // Takes ownership of the common widget.
     void addWidget(Widget *widget);
-    void setOrientation(Ui::Orientation v);
+
+    int count() const;
+    Widget *widget(int index) const;
+
+    const std::vector<Widget *> &widgets() const { return widgets_; }
+
+    void setOrientation(int orientation);
+    int orientation() const { return orientation_; }
+
     void setSizes(const std::vector<int> &sizes);
 
+    // Configured sizes, used when creating the backend representation.
+    const std::vector<int> &requestedSizes() const { return sizes_; }
+
+    void setChildrenCollapsible(bool collapsible);
+    bool childrenCollapsible() const { return childrenCollapsible_; }
+
+    Signal<Widget *> widgetAdded;
+    Signal<> settingsChanged;
+    Signal<const std::vector<int> &> sizesUpdated;
+
+    // User moved a handle: position and handle index.
+    Signal<int, int> splitterMoved;
+
 private:
+    std::vector<Widget *> widgets_;
+    std::vector<int> sizes_;
+
+    int orientation_{Ui::Horizontal};
+    bool childrenCollapsible_{true};
 };
 
 #include <WarningsEnable.hpp>

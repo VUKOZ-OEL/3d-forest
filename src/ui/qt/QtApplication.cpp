@@ -41,6 +41,7 @@
 #include <QtRadioButton.hpp>
 #include <QtSlider.hpp>
 #include <QtSpinBox.hpp>
+#include <QtSplitter.hpp>
 #include <QtTextEdit.hpp>
 #include <QtTreeWidget.hpp>
 #include <QtVBoxLayout.hpp>
@@ -291,6 +292,12 @@ QWidget *QtApplication::createWidget(Widget *widget, QWidget *parent)
     {
         LOG_DEBUG(<< "Create double spin box widget.");
         return new QtDoubleSpinBox(w, parent);
+    }
+
+    if (auto *w = dynamic_cast<Splitter *>(widget))
+    {
+        LOG_DEBUG(<< "Create splitter widget.");
+        return new QtSplitter(w, this, parent);
     }
 
     if (auto *w = dynamic_cast<TextEdit *>(widget))

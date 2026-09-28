@@ -17,42 +17,41 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file LayoutItem.cpp */
+/** @file QtSplitter.hpp */
+
+#ifndef QT_SPLITTER_HPP
+#define QT_SPLITTER_HPP
 
 // Include 3D Forest.
-#include <Layout.hpp>
-#include <LayoutItem.hpp>
-#include <Widget.hpp>
+#include <Splitter.hpp>
+class QtApplication;
+
+// Include Qt.
+#include <QSplitter>
 
 // Include local.
-#define LOG_MODULE_NAME "LayoutItem"
-#include <Log.hpp>
+#include <ExportUiQt.hpp>
+#include <WarningsDisable.hpp>
 
-LayoutItem::LayoutItem(Widget *widget, int stretch, int alignment)
-    : type_(WidgetItem),
-      widget_(widget),
-      stretch_(stretch),
-      alignment_(alignment)
+/** QtSplitter. */
+class EXPORT_UI_QT QtSplitter : public QSplitter
 {
-}
+public:
+    QtSplitter(Splitter *splitter,
+               QtApplication *app,
+               QWidget *parent = nullptr);
 
-LayoutItem::LayoutItem(Layout *layout, int stretch)
-    : type_(LayoutItemType),
-      layout_(layout),
-      stretch_(stretch)
-{
-}
+    ~QtSplitter() override;
 
-LayoutItem LayoutItem::makeStretch(int stretch)
-{
-    LayoutItem item(StretchItem);
-    item.stretch_ = stretch;
-    return item;
-}
+private:
+    void addCommonWidget(Widget *widget);
+    void updateSettings();
+    void applySizes(const std::vector<int> &sizes);
 
-LayoutItem LayoutItem::makeSpacing(int spacing)
-{
-    LayoutItem item(SpacingItem);
-    item.spacing_ = spacing;
-    return item;
-}
+    Splitter *splitter_;
+    QtApplication *app_;
+};
+
+#include <WarningsEnable.hpp>
+
+#endif /* QT_SPLITTER_HPP */

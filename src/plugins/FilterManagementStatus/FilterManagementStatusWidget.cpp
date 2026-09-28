@@ -107,7 +107,7 @@ FilterManagementStatusWidget::FilterManagementStatusWidget(Application *app)
     splitter_->addWidget(tree_);
     splitter_->addWidget(treeWidget_);
     splitter_->setOrientation(Ui::Vertical);
-    splitter_->setSizes(std::vector<int>({1, 1}));
+    splitter_->setSizes(std::vector<int>({500, 500}));
 
     // Layout.
     VBoxLayout *mainLayout = new VBoxLayout;

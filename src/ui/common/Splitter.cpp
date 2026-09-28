@@ -19,6 +19,10 @@
 
 /** @file Splitter.cpp */
 
+// Include std.
+#include <algorithm>
+#include <stdexcept>
+
 // Include 3D Forest.
 #include <Splitter.hpp>
 
@@ -30,14 +34,94 @@ Splitter::Splitter()
 {
 }
 
-void Splitter::addWidget(Widget *widget)
+Splitter::~Splitter()
 {
+    for (Widget *widget : widgets_)
+    {
+        delete widget;
+    }
 }
 
-void Splitter::setOrientation(Ui::Orientation v)
+void Splitter::addWidget(Widget *widget)
 {
+    if (!widget || widget == this)
+    {
+        return;
+    }
+
+    if (std::find(widgets_.begin(), widgets_.end(), widget) != widgets_.end())
+    {
+        return;
+    }
+
+    widgets_.push_back(widget);
+
+    // Preserve the existing request when adding another pane.
+    if (!sizes_.empty())
+    {
+        sizes_.push_back(1);
+    }
+
+    widgetAdded(widget);
+}
+
+int Splitter::count() const
+{
+    return static_cast<int>(widgets_.size());
+}
+
+Widget *Splitter::widget(int index) const
+{
+    if (index < 0 || index >= count())
+    {
+        return nullptr;
+    }
+
+    return widgets_[index];
+}
+
+void Splitter::setOrientation(int orientation)
+{
+    if (orientation != Ui::Horizontal && orientation != Ui::Vertical)
+    {
+        return;
+    }
+
+    if (orientation_ == orientation)
+    {
+        return;
+    }
+
+    orientation_ = orientation;
+    settingsChanged();
 }
 
 void Splitter::setSizes(const std::vector<int> &sizes)
 {
+    if (sizes.size() != widgets_.size())
+    {
+        throw std::invalid_argument("Splitter requires one size per widget");
+    }
+
+    sizes_ = sizes;
+
+    for (int &size : sizes_)
+    {
+        size = std::max(0, size);
+    }
+
+    // Emit even if the request is unchanged: the user may have
+    // moved the handles since the previous call.
+    sizesUpdated(sizes_);
+}
+
+void Splitter::setChildrenCollapsible(bool collapsible)
+{
+    if (childrenCollapsible_ == collapsible)
+    {
+        return;
+    }
+
+    childrenCollapsible_ = collapsible;
+    settingsChanged();
 }

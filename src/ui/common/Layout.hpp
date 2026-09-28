@@ -50,12 +50,16 @@ public:
 
     void addWidget(Widget *widget, int stretch = 0, int alignment = 0);
     void addLayout(Layout *layout, int stretch = 0);
-    void addStretch();
+    void addStretch(int stretch = 0);
     void addSpacing(int spacing);
 
     void setContentsMargins(int left, int top, int right, int bottom);
 
-    // const std::vector<Widget *> &widgets() const { return widgets_; }
+    int leftMargin() const { return leftMargin_; }
+    int topMargin() const { return topMargin_; }
+    int rightMargin() const { return rightMargin_; }
+    int bottomMargin() const { return bottomMargin_; }
+
     std::size_t count() const { return items_.size(); }
 
     const LayoutItem &itemAt(std::size_t index) const
@@ -67,11 +71,17 @@ public:
 
     void setOwnerWidget(Widget *widget);
 
-    Signal<Widget *> widgetAdded;
+    Signal<const LayoutItem &> itemAdded;
+    Signal<> clearing;
 
 private:
     std::vector<LayoutItem> items_;
     Widget *ownerWidget_{nullptr};
+
+    int leftMargin_{-1};
+    int topMargin_{-1};
+    int rightMargin_{-1};
+    int bottomMargin_{-1};
 
     void attachWidget(Widget *widget);
 };

@@ -188,6 +188,9 @@ void QtSidebar::addItem(NavigationItem *item)
             return;
         }
 
+        qtWidget->setProperty("sidebarPanel", true);
+        qtWidget->setAttribute(Qt::WA_StyledBackground, true);
+
         applyPanelTheme(qtWidget, styleSheet_);
 
         contentItem->setFlags(contentItem->flags() & ~Qt::ItemIsSelectable);
