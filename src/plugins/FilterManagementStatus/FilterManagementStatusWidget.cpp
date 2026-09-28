@@ -254,7 +254,7 @@ void FilterManagementStatusWidget::slotSelectAll()
 {
     for (auto &item : tree_->items())
     {
-        item.setSelected(true);
+        item->setSelected(true);
     }
 
     slotItemSelectionChanged();
@@ -264,7 +264,7 @@ void FilterManagementStatusWidget::slotSelectInvert()
 {
     for (auto &item : tree_->items())
     {
-        item.setSelected(!item.isSelected());
+        item->setSelected(!item->isSelected());
     }
 
     slotItemSelectionChanged();
@@ -274,7 +274,7 @@ void FilterManagementStatusWidget::slotSelectNone()
 {
     for (auto &item : tree_->items())
     {
-        item.setSelected(false);
+        item->setSelected(false);
     }
 
     slotItemSelectionChanged();
@@ -328,11 +328,11 @@ void FilterManagementStatusWidget::updateTree()
     {
         if (filter_.enabled(i))
         {
-            item.setCheckState(COLUMN_CHECKED, Ui::Checked);
+            item->setCheckState(COLUMN_CHECKED, Ui::Checked);
         }
         else
         {
-            item.setCheckState(COLUMN_CHECKED, Ui::Unchecked);
+            item->setCheckState(COLUMN_CHECKED, Ui::Unchecked);
         }
 
         ++i;

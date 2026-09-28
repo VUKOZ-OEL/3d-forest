@@ -48,6 +48,8 @@ QtSidebar::QtSidebar(NavigationTree *navigation,
       app_(application),
       tree_(new QTreeWidget(this))
 {
+    tree_->setObjectName("sidebarNavigationTree");
+
     tree_->setHeaderHidden(true);
     tree_->setRootIsDecorated(true);
     tree_->setIndentation(16);

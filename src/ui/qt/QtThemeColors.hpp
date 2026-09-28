@@ -22,8 +22,6 @@
 #ifndef QT_THEME_COLORS_HPP
 #define QT_THEME_COLORS_HPP
 
-// Include 3D Forest.
-
 // Include Qt.
 #include <QColor>
 class QApplication;
@@ -32,7 +30,7 @@ class QApplication;
 #include <ExportUiQt.hpp>
 #include <WarningsDisable.hpp>
 
-/** QtLabel. */
+/** QtThemeColors. */
 class EXPORT_UI_QT QtThemeColors
 {
 public:

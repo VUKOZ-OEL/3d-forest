@@ -17,40 +17,35 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file AbstractItemView.hpp */
+/** @file QtTreeWidgetItem.hpp */
 
-#ifndef ABSTRACT_ITEM_VIEW_HPP
-#define ABSTRACT_ITEM_VIEW_HPP
+#ifndef QT_TREE_WIDGET_ITEM_HPP
+#define QT_TREE_WIDGET_ITEM_HPP
+
+// Include 3D Forest.
+#include <TreeWidgetItem.hpp>
+
+// Include Qt.
+#include <QTreeWidgetItem>
 
 // Include local.
-#include <ExportUiCommon.hpp>
+#include <ExportUiQt.hpp>
 #include <WarningsDisable.hpp>
 
-/** AbstractItemView. */
-class EXPORT_UI_COMMON AbstractItemView
+/** QtTreeWidgetItem. */
+class EXPORT_UI_QT QtTreeWidgetItem : public QTreeWidgetItem
 {
 public:
-    enum SelectionMode
-    {
-        NoSelection = 0,
-        SingleSelection = 1,
-        MultiSelection = 2,
-        ExtendedSelection = 3,
-        ContiguousSelection = 4
-    };
+    explicit QtTreeWidgetItem(TreeWidgetItem *item);
 
-    enum SelectionBehavior
-    {
-        SelectItems = 0,
-        SelectRows = 1,
-        SelectColumns = 2
-    };
+    TreeWidgetItem *commonItem() const { return item_; }
 
-    AbstractItemView();
+    bool operator<(const QTreeWidgetItem &other) const override;
 
 private:
+    TreeWidgetItem *item_;
 };
 
 #include <WarningsEnable.hpp>
 
-#endif /* ABSTRACT_ITEM_VIEW_HPP */
+#endif /* QT_TREE_WIDGET_ITEM_HPP */

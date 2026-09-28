@@ -22,20 +22,81 @@
 #ifndef TREE_WIDGET_ITEM_HPP
 #define TREE_WIDGET_ITEM_HPP
 
+// Include std.
+#include <memory>
+#include <string>
+#include <vector>
+
 // Include 3D Forest.
-#include <Cells.hpp>
+#include <Brush.hpp>
+class TreeWidget;
 
 // Include local.
 #include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
 
 /** TreeWidgetItem. */
-class EXPORT_UI_COMMON TreeWidgetItem : public Cells
+class EXPORT_UI_COMMON TreeWidgetItem
 {
 public:
-    TreeWidgetItem();
+    explicit TreeWidgetItem(const std::vector<std::string> &texts = {});
+
+    TreeWidgetItem(const TreeWidgetItem &other);
+    ~TreeWidgetItem();
+
+    TreeWidgetItem &operator=(const TreeWidgetItem &) = delete;
+
+    int columnCount() const;
+
+    // text
+    std::string text(int column) const;
+    void setText(int column, const std::string &text, bool notify = false);
+
+    // editable
+    void setEditable(bool editable);
+    bool isEditable() const { return editable_; }
+
+    // check
+    void setCheckState(int column, int state, bool notify = false);
+
+    Ui::CheckState checkState(int column) const;
+    bool isCheckable(int column) const;
+
+    // selected
+    void setSelected(bool selected, bool notify = false);
+    bool isSelected() const;
+
+    // background
+    void setBackground(int column, const Brush &brush, bool notify = false);
+
+    Brush background(int column) const;
+
+    // children
+    TreeWidgetItem *addChild(const TreeWidgetItem &item);
+
+    int childCount() const;
+    TreeWidgetItem *child(int index) const;
+    TreeWidgetItem *parent() const { return parent_; }
+
+    const std::vector<std::unique_ptr<TreeWidgetItem>> &children() const
+    {
+        return children_;
+    }
 
 private:
+    friend class TreeWidget;
+
+    void attach(TreeWidget *tree, TreeWidgetItem *parent);
+
+    std::vector<std::string> texts_;
+    std::vector<int> checkStates_; // -1 means no checkbox in that column.
+    std::vector<Brush> backgrounds_;
+
+    std::vector<std::unique_ptr<TreeWidgetItem>> children_;
+
+    TreeWidget *tree_{nullptr};
+    TreeWidgetItem *parent_{nullptr};
+    bool editable_{false};
 };
 
 #include <WarningsEnable.hpp>

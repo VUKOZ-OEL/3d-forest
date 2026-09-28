@@ -42,6 +42,7 @@
 #include <QtSlider.hpp>
 #include <QtSpinBox.hpp>
 #include <QtTextEdit.hpp>
+#include <QtTreeWidget.hpp>
 #include <QtVBoxLayout.hpp>
 #include <QtViewer.hpp>
 #include <QtWidget.hpp>
@@ -296,6 +297,12 @@ QWidget *QtApplication::createWidget(Widget *widget, QWidget *parent)
     {
         LOG_DEBUG(<< "Create text edit widget.");
         return new QtTextEdit(w, parent);
+    }
+
+    if (auto *w = dynamic_cast<TreeWidget *>(widget))
+    {
+        LOG_DEBUG(<< "Create tree widget.");
+        return new QtTreeWidget(w, parent);
     }
 
     if (auto *w = dynamic_cast<Viewer *>(widget))

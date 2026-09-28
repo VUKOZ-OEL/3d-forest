@@ -17,40 +17,47 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file AbstractItemView.hpp */
+/** @file QtTreeWidget.hpp */
 
-#ifndef ABSTRACT_ITEM_VIEW_HPP
-#define ABSTRACT_ITEM_VIEW_HPP
+#ifndef QT_TREE_WIDGET_HPP
+#define QT_TREE_WIDGET_HPP
+
+// Include std.
+#include <unordered_map>
+
+// Include 3D Forest.
+#include <TreeWidget.hpp>
+class TreeWidgetItem;
+class QtTreeWidgetItem;
+
+// Include Qt.
+#include <QTreeWidget>
 
 // Include local.
-#include <ExportUiCommon.hpp>
+#include <ExportUiQt.hpp>
 #include <WarningsDisable.hpp>
 
-/** AbstractItemView. */
-class EXPORT_UI_COMMON AbstractItemView
+/** QtTreeWidget. */
+class EXPORT_UI_QT QtTreeWidget : public QTreeWidget
 {
 public:
-    enum SelectionMode
-    {
-        NoSelection = 0,
-        SingleSelection = 1,
-        MultiSelection = 2,
-        ExtendedSelection = 3,
-        ContiguousSelection = 4
-    };
+    explicit QtTreeWidget(TreeWidget *tree, QWidget *parent = nullptr);
 
-    enum SelectionBehavior
-    {
-        SelectItems = 0,
-        SelectRows = 1,
-        SelectColumns = 2
-    };
-
-    AbstractItemView();
+    ~QtTreeWidget() override;
 
 private:
+    void updateSettings();
+    void updateOrder();
+    void updateSelection();
+    void updateItem(TreeWidgetItem *item);
+    void insertItem(TreeWidgetItem *item);
+    void resizeColumns();
+
+    TreeWidget *tree_;
+
+    std::unordered_map<TreeWidgetItem *, QtTreeWidgetItem *> items_;
 };
 
 #include <WarningsEnable.hpp>
 
-#endif /* ABSTRACT_ITEM_VIEW_HPP */
+#endif /* QT_TREE_WIDGET_HPP */

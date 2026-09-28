@@ -22,6 +22,11 @@
 #ifndef TREE_WIDGET_HPP
 #define TREE_WIDGET_HPP
 
+// Include std.
+#include <memory>
+#include <string>
+#include <vector>
+
 // Include 3D Forest.
 #include <AbstractItemView.hpp>
 #include <TreeWidgetItem.hpp>
@@ -37,32 +42,92 @@ class EXPORT_UI_COMMON TreeWidget : public Widget
 {
 public:
     TreeWidget();
-    virtual ~TreeWidget();
+    ~TreeWidget() override;
 
     void clear();
-    void push_back(const TreeWidgetItem &item);
+    TreeWidgetItem *push_back(const TreeWidgetItem &item);
 
-    void setColumnCount(int n);
+    int topLevelItemCount() const;
+    TreeWidgetItem *topLevelItem(int index) const;
+
+    const std::vector<std::unique_ptr<TreeWidgetItem>> &items() const
+    {
+        return items_;
+    }
+
+    void setColumnCount(int count);
+    int columnCount() const { return columnCount_; }
 
     void setHeaderLabels(const std::vector<std::string> &labels);
-    void resizeColumnToContents(int col);
+    const std::vector<std::string> &headerLabels() const
+    {
+        return headerLabels_;
+    }
+
+    void resizeColumnToContents(int column);
+    const std::vector<int> &autoResizeColumns() const
+    {
+        return autoResizeColumns_;
+    }
 
     void setSelectionMode(int mode);
+    int selectionMode() const { return selectionMode_; }
+
     void setSelectionBehavior(int behavior);
-    void selectRow(int row);
+    int selectionBehavior() const { return selectionBehavior_; }
 
-    void setSortingEnabled(bool b);
+    // Index in the common tree's current top-level order.
+    void selectRow(int row, bool notify = false);
+
+    std::vector<TreeWidgetItem *> selectedItems() const
+    {
+        return selectedItems_;
+    }
+
+    void setSelectedItems(const std::vector<TreeWidgetItem *> &items,
+                          bool notify = false);
+
+    void setSortingEnabled(bool enabled);
+    bool isSortingEnabled() const { return sortingEnabled_; }
+
     void sortItems(int column, Ui::SortOrder order);
+    int sortColumn() const { return sortColumn_; }
+    Ui::SortOrder sortOrder() const { return sortOrder_; }
 
-    std::vector<TreeWidgetItem *> selectedItems();
-    std::vector<TreeWidgetItem> &items() { return items_; }
-
+    // Plugin notifications.
     Signal<TreeWidgetItem *, int> itemClicked;
     Signal<TreeWidgetItem *, int> itemChanged;
     Signal<> itemSelectionChanged;
 
+    // Backend notifications.
+    Signal<> settingsChanged;
+    Signal<> clearing;
+    Signal<TreeWidgetItem *> itemInserted;
+    Signal<TreeWidgetItem *, int> itemUpdated;
+    Signal<> selectionUpdated;
+    Signal<> orderUpdated;
+    Signal<int> resizeColumnRequested;
+
 private:
-    std::vector<TreeWidgetItem> items_;
+    friend class TreeWidgetItem;
+
+    void itemDataChanged(TreeWidgetItem *item, int column, bool notify);
+    void inserted(TreeWidgetItem *item);
+    void sortStorage();
+
+    std::vector<std::unique_ptr<TreeWidgetItem>> items_;
+    std::vector<TreeWidgetItem *> selectedItems_;
+
+    std::vector<std::string> headerLabels_;
+    std::vector<int> autoResizeColumns_;
+
+    int columnCount_{1};
+    int selectionMode_{AbstractItemView::SingleSelection};
+    int selectionBehavior_{AbstractItemView::SelectRows};
+
+    bool sortingEnabled_{false};
+    int sortColumn_{0};
+    Ui::SortOrder sortOrder_{Ui::AscendingOrder};
 };
 
 #include <WarningsEnable.hpp>

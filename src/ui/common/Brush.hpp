@@ -35,9 +35,23 @@ class EXPORT_UI_COMMON Brush
 public:
     Brush();
     Brush(const Color &color, Ui::BrushStyle brushStyle);
+    Brush(int red, int green, int blue, int alpha = 255);
+
+    bool hasColor() const { return hasColor_; }
+
+    int red() const { return color_.red(); }
+    int green() const { return color_.green(); }
+    int blue() const { return color_.blue(); }
+    int alpha() const { return color_.alpha(); }
+
+    bool operator==(const Brush &other) const
+    {
+        return hasColor_ == other.hasColor_ && color_ == other.color_;
+    }
 
 private:
     Color color_;
+    bool hasColor_{false};
 };
 
 #include <WarningsEnable.hpp>

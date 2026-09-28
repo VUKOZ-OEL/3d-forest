@@ -42,6 +42,7 @@ public:
         Hsl,
         ExtendedRgb
     };
+
     enum NameFormat
     {
         HexRgb,
@@ -77,6 +78,12 @@ public:
 
     void setRgb(int r, int g, int b, int a = 255);
     void setRgbF(float r, float g, float b, float a = 1.0F);
+
+    bool operator==(const Color &other) const
+    {
+        return spec_ == other.spec_ && r_ == other.r_ && g_ == other.g_ &&
+               b_ == other.b_ && a_ == other.a_;
+    }
 
 private:
     Spec spec_{Invalid};

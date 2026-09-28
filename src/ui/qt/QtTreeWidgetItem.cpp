@@ -17,40 +17,32 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file AbstractItemView.hpp */
+/** @file QtTreeWidgetItem.cpp */
 
-#ifndef ABSTRACT_ITEM_VIEW_HPP
-#define ABSTRACT_ITEM_VIEW_HPP
+// Include 3D Forest.
+#include <QtTreeWidgetItem.hpp>
+
+// Include Qt.
+#include <QTreeWidget>
 
 // Include local.
-#include <ExportUiCommon.hpp>
-#include <WarningsDisable.hpp>
+#define LOG_MODULE_NAME "QtTreeWidgetItem"
+#include <Log.hpp>
 
-/** AbstractItemView. */
-class EXPORT_UI_COMMON AbstractItemView
+QtTreeWidgetItem::QtTreeWidgetItem(TreeWidgetItem *item) : item_(item)
 {
-public:
-    enum SelectionMode
+}
+
+bool QtTreeWidgetItem::operator<(const QTreeWidgetItem &other) const
+{
+    const auto *otherItem = dynamic_cast<const QtTreeWidgetItem *>(&other);
+
+    if (!otherItem)
     {
-        NoSelection = 0,
-        SingleSelection = 1,
-        MultiSelection = 2,
-        ExtendedSelection = 3,
-        ContiguousSelection = 4
-    };
+        return QTreeWidgetItem::operator<(other);
+    }
 
-    enum SelectionBehavior
-    {
-        SelectItems = 0,
-        SelectRows = 1,
-        SelectColumns = 2
-    };
+    const int column = treeWidget() ? treeWidget()->sortColumn() : 0;
 
-    AbstractItemView();
-
-private:
-};
-
-#include <WarningsEnable.hpp>
-
-#endif /* ABSTRACT_ITEM_VIEW_HPP */
+    return item_->text(column) < otherItem->item_->text(column);
+}

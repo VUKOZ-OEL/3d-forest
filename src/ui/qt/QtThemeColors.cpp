@@ -86,7 +86,7 @@ QString QtThemeColors::getStyleSheet() const
                  ";"
                  "}"
                  ""
-                 "QTreeWidget {"
+                 "QTreeWidget#sidebarNavigationTree {"
                  "    background: " +
                  background.name() +
                  ";"
@@ -98,7 +98,7 @@ QString QtThemeColors::getStyleSheet() const
                  "    font-size: 14px;"
                  "}"
                  ""
-                 "QTreeWidget::item {"
+                 "QTreeWidget#sidebarNavigationTree::item {"
                  "    color: " +
                  surface.name() +
                  ";"
@@ -108,13 +108,13 @@ QString QtThemeColors::getStyleSheet() const
                  "    border-radius: 7px;"
                  "}"
                  ""
-                 "QTreeWidget::item:hover {"
+                 "QTreeWidget#sidebarNavigationTree::item:hover {"
                  "    background: " +
                  hover.name() +
                  ";"
                  "}"
                  ""
-                 "QTreeWidget::branch {"
+                 "QTreeWidget#sidebarNavigationTree::branch {"
                  "    background: " +
                  background.name() +
                  ";"

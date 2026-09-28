@@ -30,6 +30,14 @@ Brush::Brush()
 {
 }
 
-Brush::Brush(const Color &color, Ui::BrushStyle brushStyle) : color_(color)
+Brush::Brush(const Color &color, Ui::BrushStyle brushStyle)
+    : color_(color),
+      hasColor_(true)
+{
+}
+
+Brush::Brush(int red, int green, int blue, int alpha)
+    : color_(red, green, blue, alpha),
+      hasColor_(true)
 {
 }
