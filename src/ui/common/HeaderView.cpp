@@ -26,10 +26,35 @@
 #define LOG_MODULE_NAME "HeaderView"
 #include <Log.hpp>
 
-HeaderView::HeaderView()
-{
-}
-
 void HeaderView::setDefaultSectionSize(int size)
 {
+    if (size < 0 || defaultSectionSize_ == size)
+    {
+        return;
+    }
+
+    defaultSectionSize_ = size;
+    settingsChanged();
+}
+
+void HeaderView::setVisible(bool visible)
+{
+    if (visible_ == visible)
+    {
+        return;
+    }
+
+    visible_ = visible;
+    settingsChanged();
+}
+
+void HeaderView::setStretchLastSection(bool stretch)
+{
+    if (stretchLastSection_ == stretch)
+    {
+        return;
+    }
+
+    stretchLastSection_ = stretch;
+    settingsChanged();
 }

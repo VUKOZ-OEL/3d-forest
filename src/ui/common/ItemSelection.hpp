@@ -22,7 +22,11 @@
 #ifndef ITEM_SELECTION_HPP
 #define ITEM_SELECTION_HPP
 
+// Include std.
+#include <vector>
+
 // Include 3D Forest.
+#include <ModelIndex.hpp>
 
 // Include local.
 #include <ExportUiCommon.hpp>
@@ -33,8 +37,14 @@ class EXPORT_UI_COMMON ItemSelection
 {
 public:
     ItemSelection();
+    explicit ItemSelection(std::vector<ModelIndex> indexes);
+
+    const std::vector<ModelIndex> &indexes() const { return indexes_; }
+
+    bool empty() const { return indexes_.empty(); }
 
 private:
+    std::vector<ModelIndex> indexes_;
 };
 
 #include <WarningsEnable.hpp>

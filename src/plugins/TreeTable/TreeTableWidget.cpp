@@ -45,7 +45,7 @@
 
 #define ICON(name) (ThemeIcon(":/TreeTableResources/", name))
 
-TreeTableWidget::TreeTableWidget(Application *app) : Widget(), app_(app)
+TreeTableWidget::TreeTableWidget(Application *app) : app_(app)
 {
     LOG_DEBUG(<< "Create.");
 
@@ -62,7 +62,7 @@ TreeTableWidget::TreeTableWidget(Application *app) : Widget(), app_(app)
                                 "color: black;"
                                 "padding: 5px;"
                                 "}"
-                                "TableWidget::item:selected {"
+                                "QTableWidget::item:selected {"
                                 "  background-color: #3399FF;"
                                 "  color: white;"
                                 "}");

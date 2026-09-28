@@ -30,8 +30,13 @@ ModelIndex::ModelIndex()
 {
 }
 
+ModelIndex::ModelIndex(int row, int column) : row_(row), column_(column)
+{
+}
+
 bool ModelIndex::isValid() const
 {
-    return row_ >= 0 && row_ < rowCount_ && column_ >= 0 &&
-           column_ < columnCount_;
+    return row_ >= 0 && column_ >= 0;
+    // return row_ >= 0 && row_ < rowCount_ && column_ >= 0 &&
+    //        column_ < columnCount_;
 }

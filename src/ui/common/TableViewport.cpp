@@ -17,27 +17,12 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file TreeTableWindow.hpp */
-
-#ifndef TREE_TABLE_WINDOW_HPP
-#define TREE_TABLE_WINDOW_HPP
+/** @file TableViewport.cpp */
 
 // Include 3D Forest.
-#include <Dialog.hpp>
-class Application;
-class TreeTableWidget;
+#include <Application.hpp>
+#include <TableViewport.hpp>
 
-/** Tree Table Window. */
-class TreeTableWindow : public Dialog
-{
-public:
-    TreeTableWindow(Application *app);
-    ~TreeTableWindow();
-
-    void closeEvent(CloseEvent *event) override;
-
-private:
-    TreeTableWidget *widget_;
-};
-
-#endif /* TREE_TABLE_WINDOW_HPP */
+// Include local.
+#define LOG_MODULE_NAME "TableViewport"
+#include <Log.hpp>

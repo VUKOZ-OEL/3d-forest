@@ -25,6 +25,7 @@
 // Include std.
 
 // Include 3D Forest.
+#include <Signal.hpp>
 
 // Include local.
 #include <ExportUiCommon.hpp>
@@ -34,11 +35,25 @@
 class EXPORT_UI_COMMON HeaderView
 {
 public:
-    HeaderView();
+    int defaultSectionSize() const { return defaultSectionSize_; }
 
     void setDefaultSectionSize(int size);
 
+    bool isVisible() const { return visible_; }
+    void setVisible(bool visible);
+
+    void show() { setVisible(true); }
+    void hide() { setVisible(false); }
+
+    bool stretchLastSection() const { return stretchLastSection_; }
+    void setStretchLastSection(bool stretch);
+
+    Signal<> settingsChanged;
+
 private:
+    int defaultSectionSize_{-1};
+    bool visible_{true};
+    bool stretchLastSection_{false};
 };
 
 #include <WarningsEnable.hpp>

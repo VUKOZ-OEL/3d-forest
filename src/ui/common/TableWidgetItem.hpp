@@ -23,19 +23,61 @@
 #define TABLE_WIDGET_ITEM_HPP
 
 // Include 3D Forest.
-#include <Cell.hpp>
+#include <Brush.hpp>
+#include <Color.hpp>
+#include <Ui.hpp>
+#include <Util.hpp>
+class TableWidget;
 
 // Include local.
 #include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
 
 /** TableWidgetItem. */
-class EXPORT_UI_COMMON TableWidgetItem : public Cell
+class EXPORT_UI_COMMON TableWidgetItem
 {
 public:
-    TableWidgetItem(const std::string &str = "");
+    explicit TableWidgetItem(const std::string &text = "");
+
+    TableWidgetItem(const TableWidgetItem &other);
+
+    TableWidgetItem &operator=(const TableWidgetItem &) = delete;
+
+    const std::string &text() const { return text_; }
+    void setText(const std::string &text, bool notify = false);
+
+    bool isNumeric() const { return numeric_; }
+    void setNumeric(bool numeric);
+
+    int flags() const { return flags_; }
+    void setFlags(int flags);
+
+    bool hasCheckState() const { return checkState_ >= 0; }
+    Ui::CheckState checkState() const;
+    void setCheckState(Ui::CheckState state, bool notify = false);
+
+    const Brush &background() const { return background_; }
+    void setBackground(const Brush &background);
+
+    int row() const { return row_; }
+    int column() const { return column_; }
 
 private:
+    friend class TableWidget;
+
+    void changed(bool notify);
+
+    std::string text_;
+    bool numeric_{false};
+
+    int flags_{Ui::ItemIsSelectable | Ui::ItemIsEditable | Ui::ItemIsEnabled};
+
+    int checkState_{-1};
+    Brush background_;
+
+    TableWidget *table_{nullptr};
+    int row_{-1};
+    int column_{-1};
 };
 
 #include <WarningsEnable.hpp>

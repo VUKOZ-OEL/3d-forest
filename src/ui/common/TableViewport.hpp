@@ -17,39 +17,35 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ModelIndex.hpp */
+/** @file TableWidget.hpp */
 
-#ifndef MODEL_INDEX_HPP
-#define MODEL_INDEX_HPP
+#ifndef TABLE_VIEWPORT_HPP
+#define TABLE_VIEWPORT_HPP
+
+// Include std.
+#include <functional>
 
 // Include 3D Forest.
+#include <Point.hpp>
+#include <Widget.hpp>
 
 // Include local.
 #include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
 
-/** ModelIndex Bar. */
-class EXPORT_UI_COMMON ModelIndex
+/** TableWidget. */
+class EXPORT_UI_COMMON TableViewport : public Widget
 {
 public:
-    ModelIndex();
-    ModelIndex(int row, int column);
-
-    int row() const { return row_; }
-    int column() const { return column_; }
-
-    int columnCount() const { return columnCount_; }
-    int rowCount() const { return rowCount_; }
-
-    bool isValid() const;
+public:
+    Point mapToGlobal(const Point &point) const;
 
 private:
-    int row_{-1};
-    int column_{-1};
-    int rowCount_{0};
-    int columnCount_{0};
+    friend class TableWidget;
+
+    std::function<Point(const Point &)> mapToGlobal_;
 };
 
 #include <WarningsEnable.hpp>
 
-#endif /* MODEL_INDEX_HPP */
+#endif /* TABLE_VIEWPORT_HPP */

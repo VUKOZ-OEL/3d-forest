@@ -42,6 +42,7 @@
 #include <QtSlider.hpp>
 #include <QtSpinBox.hpp>
 #include <QtSplitter.hpp>
+#include <QtTableWidget.hpp>
 #include <QtTextEdit.hpp>
 #include <QtTreeWidget.hpp>
 #include <QtVBoxLayout.hpp>
@@ -298,6 +299,12 @@ QWidget *QtApplication::createWidget(Widget *widget, QWidget *parent)
     {
         LOG_DEBUG(<< "Create splitter widget.");
         return new QtSplitter(w, this, parent);
+    }
+
+    if (auto *w = dynamic_cast<TableWidget *>(widget))
+    {
+        LOG_DEBUG(<< "Create table widget.");
+        return new QtTableWidget(w, parent);
     }
 
     if (auto *w = dynamic_cast<TextEdit *>(widget))

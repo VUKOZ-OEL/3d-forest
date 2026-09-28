@@ -22,14 +22,23 @@
 #ifndef TABLE_WIDGET_HPP
 #define TABLE_WIDGET_HPP
 
+// Include std.
+#include <functional>
+#include <map>
+#include <memory>
+#include <set>
+#include <utility>
+#include <vector>
+
 // Include 3D Forest.
 #include <AbstractItemView.hpp>
 #include <HeaderView.hpp>
 #include <ItemSelection.hpp>
 #include <ModelIndex.hpp>
+#include <Point.hpp>
+#include <TableViewport.hpp>
 #include <TableWidgetItem.hpp>
 #include <Widget.hpp>
-class Application;
 
 // Include local.
 #include <ExportUiCommon.hpp>
@@ -39,61 +48,138 @@ class Application;
 class EXPORT_UI_COMMON TableWidget : public Widget
 {
 public:
+    using Cell = std::pair<int, int>;
+    using Selection = std::set<Cell>;
+
     TableWidget();
-    virtual ~TableWidget();
+    ~TableWidget() override;
+
+    TableWidget(const TableWidget &) = delete;
+    TableWidget &operator=(const TableWidget &) = delete;
 
     void clear();
-    void setItem(int row, int col, const TableWidgetItem &item);
 
-    void setColumnCount(int n);
+    void setItem(int row,
+                 int column,
+                 const TableWidgetItem &item,
+                 bool notify = false);
+
+    TableWidgetItem *item(int row, int column) const;
+    std::vector<TableWidgetItem *> items() const;
+
+    void setColumnCount(int count);
     int columnCount() const { return columnCount_; }
 
-    void setRowCount(int n);
+    void setRowCount(int count);
     int rowCount() const { return rowCount_; }
 
     void setHeaderLabels(const std::vector<std::string> &labels);
-    void resizeColumnToContents(int col);
-    void setColumnWidth(int col, int width);
+    void setHorizontalHeaderLabels(const std::vector<std::string> &labels);
+    TableWidgetItem *horizontalHeaderItem(int column) const;
 
     HeaderView *horizontalHeader() { return &horizontalHeader_; }
     HeaderView *verticalHeader() { return &verticalHeader_; }
 
-    void setHorizontalHeaderLabels(const std::vector<std::string> &labels);
-    TableWidgetItem *horizontalHeaderItem(int col);
+    void resizeColumnToContents(int column);
+    void setColumnWidth(int column, int width);
+
+    // Width -1 means resize to contents.
+    const std::map<int, int> &columnWidths() const { return columnWidths_; }
 
     void setSelectionMode(int mode);
+    int selectionMode() const { return selectionMode_; }
+
     void setSelectionBehavior(int behavior);
-    void selectRow(int row);
+    int selectionBehavior() const { return selectionBehavior_; }
+
+    void selectRow(int row, bool notify = false);
+    void clearSelection(bool notify = false);
+
+    void setSelectedCells(const Selection &cells, bool notify = false);
+    const Selection &selectedCells() const { return selection_; }
 
     std::set<int> selectedRows() const;
+    std::vector<TableWidgetItem *> selectedItems() const;
 
-    ModelIndex indexAt(const Point &pos) const;
-    const Widget *viewport() const;
+    void setSortingEnabled(bool enabled);
+    bool isSortingEnabled() const { return sortingEnabled_; }
 
-    void setSortingEnabled(bool b);
     void sortItems(int column, Ui::SortOrder order);
 
-    void setAlternatingRowColors(bool b);
+    int sortColumn() const { return sortColumn_; }
+    Ui::SortOrder sortOrder() const { return sortOrder_; }
 
-    void setContextMenuPolicy(Ui::ContextMenuPolicy contextMenuPolicy);
+    void setAlternatingRowColors(bool enabled);
+    bool alternatingRowColors() const { return alternatingRowColors_; }
 
-    std::vector<TableWidgetItem *> selectedItems();
-    std::vector<TableWidgetItem> &items() { return items_; }
-    TableWidgetItem *item(int row, int col);
+    void setContextMenuPolicy(Ui::ContextMenuPolicy policy);
+    Ui::ContextMenuPolicy contextMenuPolicy() const
+    {
+        return contextMenuPolicy_;
+    }
 
+    ModelIndex indexAt(const Point &position) const;
+    const TableViewport *viewport() const { return &viewport_; }
+
+    // Installed by the backend.
+    void setViewQueries(
+        std::function<ModelIndex(const Point &)> indexAt,
+        std::function<Point(const Point &)> mapViewportToGlobal);
+
+    // Plugin notifications.
     Signal<Point> customContextMenuRequested;
     Signal<ItemSelection, ItemSelection> selectionChanged;
 
+    // The second argument is the item's column.
     Signal<TableWidgetItem *, int> itemClicked;
     Signal<TableWidgetItem *, int> itemChanged;
     Signal<> itemSelectionChanged;
 
+    // Backend notifications: emitted even when plugin signals are blocked.
+    Signal<> tableReset;
+    Signal<int, int> cellUpdated;
+    Signal<> headersUpdated;
+    Signal<> settingsChanged;
+    Signal<> selectionUpdated;
+    Signal<int> columnSizeRequested;
+    Signal<> destroying;
+
 private:
-    std::vector<TableWidgetItem> items_;
+    friend class TableWidgetItem;
+
+    using ItemPtr = std::unique_ptr<TableWidgetItem>;
+    using Row = std::vector<ItemPtr>;
+
+    bool validCell(int row, int column) const;
+    void resizeTable(int rows, int columns);
+    void attachItems();
+    void itemDataChanged(TableWidgetItem *item, bool notify);
+    void sortStorage();
+
+    std::vector<Row> rows_;
+    std::vector<ItemPtr> headers_;
+
     int columnCount_{0};
     int rowCount_{0};
+
     HeaderView horizontalHeader_;
     HeaderView verticalHeader_;
+
+    std::map<int, int> columnWidths_;
+
+    int selectionMode_{AbstractItemView::SingleSelection};
+    int selectionBehavior_{AbstractItemView::SelectItems};
+    Selection selection_;
+
+    bool sortingEnabled_{false};
+    int sortColumn_{0};
+    Ui::SortOrder sortOrder_{Ui::AscendingOrder};
+
+    bool alternatingRowColors_{false};
+    Ui::ContextMenuPolicy contextMenuPolicy_{Ui::DefaultContextMenu};
+
+    TableViewport viewport_;
+    std::function<ModelIndex(const Point &)> indexAt_;
 };
 
 #include <WarningsEnable.hpp>

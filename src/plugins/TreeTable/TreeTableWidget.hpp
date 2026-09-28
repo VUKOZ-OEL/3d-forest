@@ -39,7 +39,7 @@ class TreeTableWidget : public Widget
 public:
     TreeTableWidget(Application *app);
 
-    Size sizeHint() const override { return Size(700, 200); }
+    // Size sizeHint() const override { return Size(700, 200); }
 
     void closeWidget();
 

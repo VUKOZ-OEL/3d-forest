@@ -20,13 +20,88 @@
 /** @file TableWidgetItem.cpp */
 
 // Include 3D Forest.
+#include <TableWidget.hpp>
 #include <TableWidgetItem.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "TableWidgetItem"
 #include <Log.hpp>
 
-TableWidgetItem::TableWidgetItem(const std::string &str)
+TableWidgetItem::TableWidgetItem(const std::string &text) : text_(text)
 {
-    setText(str);
+}
+
+TableWidgetItem::TableWidgetItem(const TableWidgetItem &other)
+    : text_(other.text_),
+      numeric_(other.numeric_),
+      flags_(other.flags_),
+      checkState_(other.checkState_),
+      background_(other.background_)
+{
+}
+
+void TableWidgetItem::changed(bool notify)
+{
+    if (table_)
+    {
+        table_->itemDataChanged(this, notify);
+    }
+}
+
+void TableWidgetItem::setText(const std::string &text, bool notify)
+{
+    if (text_ == text)
+    {
+        return;
+    }
+
+    text_ = text;
+    changed(notify);
+}
+
+void TableWidgetItem::setNumeric(bool numeric)
+{
+    if (numeric_ == numeric)
+    {
+        return;
+    }
+
+    numeric_ = numeric;
+    changed(false);
+}
+
+void TableWidgetItem::setFlags(int flags)
+{
+    if (flags_ == flags)
+    {
+        return;
+    }
+
+    flags_ = flags;
+    changed(false);
+}
+
+Ui::CheckState TableWidgetItem::checkState() const
+{
+    return checkState_ < 0 ? Ui::Unchecked
+                           : static_cast<Ui::CheckState>(checkState_);
+}
+
+void TableWidgetItem::setCheckState(Ui::CheckState state, bool notify)
+{
+    const int value = static_cast<int>(state);
+
+    if (value < 0 || value > 2 || checkState_ == value)
+    {
+        return;
+    }
+
+    checkState_ = value;
+    changed(notify);
+}
+
+void TableWidgetItem::setBackground(const Brush &background)
+{
+    background_ = background;
+    changed(false);
 }

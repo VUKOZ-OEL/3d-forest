@@ -19,6 +19,9 @@
 
 /** @file ItemSelection.cpp */
 
+// Include std.
+#include <utility>
+
 // Include 3D Forest.
 #include <ItemSelection.hpp>
 
@@ -27,5 +30,10 @@
 #include <Log.hpp>
 
 ItemSelection::ItemSelection()
+{
+}
+
+ItemSelection::ItemSelection(std::vector<ModelIndex> indexes)
+    : indexes_(std::move(indexes))
 {
 }

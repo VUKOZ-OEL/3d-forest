@@ -21,9 +21,8 @@
 
 // Include 3D Forest.
 #include <Application.hpp>
-#include <ThemeIcon.hpp>
 #include <TreeTablePlugin.hpp>
-#include <TreeTableWindow.hpp>
+#include <TreeTableWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "TreeTablePlugin"
@@ -31,33 +30,16 @@
 
 #define ICON(name) (ThemeIcon(":/TreeTableResources/", name))
 
-TreeTablePlugin::TreeTablePlugin() : app_(nullptr), pluginWindow_(nullptr)
-{
-}
-
 void TreeTablePlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(
-        nullptr,
-        "Data",
-        "Data",
-        tr("Tree Table"),
-        tr("Show tree table"),
-        ICON("tree-table"),
-        [this]() { slotPlugin(); },
-        MAIN_WINDOW_MENU_DATA_PRIORITY);
-}
-
-void TreeTablePlugin::slotPlugin()
-{
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new TreeTableWindow(app_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Data", MAIN_WINDOW_MENU_DATA_PRIORITY}},
+                       "Data",
+                       tr("Tree Table"),
+                       tr("Show tree table"),
+                       ICON("tree-table"),
+                       {},
+                       new TreeTableWidget(app_));
 }

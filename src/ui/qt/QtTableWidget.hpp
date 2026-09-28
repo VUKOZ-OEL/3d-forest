@@ -17,39 +17,46 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file ModelIndex.hpp */
+/** @file QtTableWidget.hpp */
 
-#ifndef MODEL_INDEX_HPP
-#define MODEL_INDEX_HPP
+#ifndef QT_TABLE_WIDGET_HPP
+#define QT_TABLE_WIDGET_HPP
 
 // Include 3D Forest.
+#include <TableWidget.hpp>
+
+// Include Qt.
+#include <QTableWidget>
 
 // Include local.
-#include <ExportUiCommon.hpp>
+#include <ExportUiQt.hpp>
 #include <WarningsDisable.hpp>
 
-/** ModelIndex Bar. */
-class EXPORT_UI_COMMON ModelIndex
+/** QtTableWidget. */
+class EXPORT_UI_QT QtTableWidget : public QTableWidget
 {
 public:
-    ModelIndex();
-    ModelIndex(int row, int column);
-
-    int row() const { return row_; }
-    int column() const { return column_; }
-
-    int columnCount() const { return columnCount_; }
-    int rowCount() const { return rowCount_; }
-
-    bool isValid() const;
+    explicit QtTableWidget(TableWidget *table, QWidget *parent = nullptr);
+    ~QtTableWidget() override;
 
 private:
-    int row_{-1};
-    int column_{-1};
-    int rowCount_{0};
-    int columnCount_{0};
+    TableWidget *table_;
+
+    void rebuild();
+    void updateCell(int row, int column);
+    void updateHeaders();
+    void updateSettings();
+    void updateHeaderSettings();
+    void updateSelection();
+    void updateColumnSize(int column);
+
+    void readSelection();
+    void readCell(int row, int column);
+
+    static void copyItem(QTableWidgetItem *target,
+                         const TableWidgetItem &source);
 };
 
 #include <WarningsEnable.hpp>
 
-#endif /* MODEL_INDEX_HPP */
+#endif /* QT_TABLE_WIDGET_HPP */
