@@ -23,7 +23,12 @@ add_library(
     ${SUB_PROJECT_NAME}
     SHARED
     ${SOURCES}
-#    resources/resources.qrc
+)
+
+add_plugin_resources(
+    ${SUB_PROJECT_NAME}
+    ExportFileResources
+    "${CMAKE_CURRENT_SOURCE_DIR}/resources/resources.qrc"
 )
 
 target_include_directories(

@@ -28,7 +28,7 @@
 #define LOG_MODULE_NAME "FilterDescriptorPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/FilterDescriptorResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/FilterDescriptorResources/", name))
 
 void FilterDescriptorPlugin::initialize(Application *app)
 {

@@ -32,7 +32,8 @@
 #define LOG_MODULE_NAME "ExportFilePlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/exportfile/", name))
+#include <ExportFileResources.hpp> // Generated
+#define ICON(name) (ThemeIcon(app_, ":/ExportFileResources/", name))
 
 ExportFilePlugin::ExportFilePlugin() : app_(nullptr)
 {
@@ -41,6 +42,7 @@ ExportFilePlugin::ExportFilePlugin() : app_(nullptr)
 void ExportFilePlugin::initialize(Application *app)
 {
     app_ = app;
+    resources_ = registerExportFileResources();
 
     app_->createAction(
         this,

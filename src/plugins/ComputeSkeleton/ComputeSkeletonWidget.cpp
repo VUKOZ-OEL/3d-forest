@@ -35,7 +35,7 @@
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ComputeSkeletonResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ComputeSkeletonResources/", name))
 
 ComputeSkeletonWidget::ComputeSkeletonWidget(Application *app)
     : Widget(),

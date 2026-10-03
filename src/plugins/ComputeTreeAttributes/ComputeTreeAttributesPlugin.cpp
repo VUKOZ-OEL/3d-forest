@@ -28,7 +28,7 @@
 #define LOG_MODULE_NAME "ComputeTreeAttributesPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ComputeTreeAttributesResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ComputeTreeAttributesResources/", name))
 
 void ComputeTreeAttributesPlugin::initialize(Application *app)
 {

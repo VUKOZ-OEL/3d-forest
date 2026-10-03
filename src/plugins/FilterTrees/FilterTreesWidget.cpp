@@ -39,7 +39,7 @@
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/FilterTreesResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/FilterTreesResources/", name))
 
 FilterTreesWidget::FilterTreesWidget(Application *app) : app_(app)
 {

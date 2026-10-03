@@ -37,7 +37,7 @@
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/FilterFilesResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/FilterFilesResources/", name))
 
 FilterFilesWidget::FilterFilesWidget(Application *app) : app_(app)
 {

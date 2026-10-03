@@ -28,7 +28,7 @@
 #define LOG_MODULE_NAME "ComputeClassificationPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ComputeClassificationResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ComputeClassificationResources/", name))
 
 void ComputeClassificationPlugin::initialize(Application *app)
 {

@@ -25,7 +25,7 @@
 #include <MessageLogWindow.hpp>
 #include <ThemeIcon.hpp>
 
-#define ICON(name) (ThemeIcon(":/MessageLogResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/MessageLogResources/", name))
 
 MessageLogPlugin::MessageLogPlugin() : app_(nullptr), pluginWindow_(nullptr)
 {

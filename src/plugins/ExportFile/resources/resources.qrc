@@ -18,7 +18,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 -->
 <RCC version="1.0">
-<qresource prefix="/exportfile">
+<qresource prefix="/ExportFileResources">
 
 <!-- Tool bar -->
 <file>export-file-16px.png</file>

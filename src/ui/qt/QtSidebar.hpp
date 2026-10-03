@@ -87,6 +87,7 @@ private:
     int itemIndex(const NavigationItem *item) const;
 
     // Theme.
+    QtThemeColors themeColors_;
     QString styleSheet_;
     void applyPanelTheme(QWidget *widget, const QString &styleSheet);
 };

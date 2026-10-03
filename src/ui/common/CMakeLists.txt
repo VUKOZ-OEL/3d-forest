@@ -25,6 +25,12 @@ add_library(
     ${SOURCES}
 )
 
+add_plugin_resources(
+    ${SUB_PROJECT_NAME}
+    ApplicationResources
+    "${CMAKE_CURRENT_SOURCE_DIR}/resources/resources.qrc"
+)
+
 target_include_directories(
     ${SUB_PROJECT_NAME}
     PUBLIC

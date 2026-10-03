@@ -36,7 +36,7 @@
 #define LOG_MODULE_NAME "ComputeClassificationWidget"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ComputeClassificationResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ComputeClassificationResources/", name))
 
 ComputeClassificationWidget::ComputeClassificationWidget(Application *app)
     : Widget(),

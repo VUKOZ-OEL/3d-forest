@@ -23,6 +23,7 @@
 #define PLUGIN_HPP
 
 // Include 3D Forest.
+#include <ResourceBundle.hpp>
 class Application;
 
 // Include local.
@@ -39,6 +40,8 @@ public:
 
 protected:
     virtual ~Plugin() = default;
+
+    ResourceBundle resources_;
 };
 
 #include <WarningsEnable.hpp>

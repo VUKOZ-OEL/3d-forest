@@ -24,7 +24,6 @@
 
 // Include 3D Forest.
 #include <Widget.hpp>
-class Application;
 
 // Include local.
 #include <ExportUiCommon.hpp>
@@ -34,15 +33,46 @@ class Application;
 class EXPORT_UI_COMMON ToolBar : public Widget
 {
 public:
-    ToolBar();
-    virtual ~ToolBar();
+    struct Item
+    {
+        // nullptr represents a separator.
+        Widget *widget{nullptr};
 
+        bool isSeparator() const { return widget == nullptr; }
+    };
+
+    ToolBar();
+    ~ToolBar() override;
+
+    ToolBar(const ToolBar &) = delete;
+    ToolBar &operator=(const ToolBar &) = delete;
+
+    // Takes ownership of the common widget.
     void addWidget(Widget *widget);
     void addSeparator();
 
+    // Deletes owned widgets and removes separators.
+    void clear();
+
+    const std::vector<Item> &items() const { return items_; }
+
     void setIconSize(const Size &size);
+    const Size &iconSize() const { return iconSize_; }
+
+    void setOrientation(int orientation);
+    int orientation() const { return orientation_; }
+
+    // Backend notifications.
+    Signal<Item> itemAdded;
+    Signal<> clearing;
+    Signal<> settingsChanged;
+    Signal<> destroying;
 
 private:
+    std::vector<Item> items_;
+
+    Size iconSize_{24, 24};
+    int orientation_{Ui::Horizontal};
 };
 
 #include <WarningsEnable.hpp>

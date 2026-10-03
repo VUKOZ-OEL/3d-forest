@@ -28,7 +28,7 @@
 #define LOG_MODULE_NAME "FilterClassificationPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/FilterClassificationResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/FilterClassificationResources/", name))
 
 void FilterClassificationPlugin::initialize(Application *app)
 {

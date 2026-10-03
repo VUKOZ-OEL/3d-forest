@@ -28,7 +28,7 @@
 #define LOG_MODULE_NAME "FilterSpeciesPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/FilterSpeciesResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/FilterSpeciesResources/", name))
 
 void FilterSpeciesPlugin::initialize(Application *app)
 {

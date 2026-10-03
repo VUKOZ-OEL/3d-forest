@@ -28,7 +28,7 @@
 #define LOG_MODULE_NAME "FilterAreaPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/FilterAreaResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/FilterAreaResources/", name))
 
 void FilterAreaPlugin::initialize(Application *app)
 {

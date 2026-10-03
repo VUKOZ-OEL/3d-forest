@@ -33,7 +33,7 @@
 #define LOG_MODULE_NAME "External3dMarteloscopeDialog"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/External3dMarteloscopeResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/External3dMarteloscopeResources/", name))
 
 External3dMarteloscopeDialog::External3dMarteloscopeDialog(Application *app)
     : Dialog(app),

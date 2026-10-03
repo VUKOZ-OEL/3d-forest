@@ -18,7 +18,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 -->
 <RCC version="1.0">
-<qresource prefix="/gui">
+<qresource prefix="/ApplicationResources">
 
 <!-- Standard -->
 <file>question-16px.png</file>

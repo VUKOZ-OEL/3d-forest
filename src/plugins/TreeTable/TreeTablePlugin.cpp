@@ -28,7 +28,7 @@
 #define LOG_MODULE_NAME "TreeTablePlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/TreeTableResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/TreeTableResources/", name))
 
 void TreeTablePlugin::initialize(Application *app)
 {

@@ -102,16 +102,6 @@ ItemSelection difference(const TableWidget::Selection &left,
 
 } // namespace
 
-Point TableViewport::mapToGlobal(const Point &point) const
-{
-    if (!mapToGlobal_)
-    {
-        throw std::logic_error("Table viewport has no backend.");
-    }
-
-    return mapToGlobal_(point);
-}
-
 TableWidget::TableWidget() = default;
 
 TableWidget::~TableWidget()

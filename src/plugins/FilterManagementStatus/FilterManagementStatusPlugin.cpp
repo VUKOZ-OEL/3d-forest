@@ -28,7 +28,7 @@
 #define LOG_MODULE_NAME "FilterManagementStatusPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/FilterManagementStatusResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/FilterManagementStatusResources/", name))
 
 void FilterManagementStatusPlugin::initialize(Application *app)
 {

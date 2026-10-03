@@ -38,7 +38,7 @@
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ComputeTreeAttributesResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ComputeTreeAttributesResources/", name))
 
 ComputeTreeAttributesWidget::ComputeTreeAttributesWidget(Application *app)
     : Widget(),

@@ -27,6 +27,7 @@
 #include <NavigationItem.hpp>
 #include <NavigationTree.hpp>
 #include <QtApplication.hpp>
+#include <QtIcon.hpp>
 #include <QtSidebar.hpp>
 #include <Widget.hpp>
 
@@ -176,6 +177,9 @@ void QtSidebar::addItem(NavigationItem *item)
         return;
     }
 
+    qtItem->setIcon(0, toQIcon(action->icon(), themeColors_.isDarkMode()));
+    qtItem->setToolTip(0, QString::fromStdString(action->toolTip()));
+
     if (action->hasPanel())
     {
         QTreeWidgetItem *contentItem = new QTreeWidgetItem(qtItem);
@@ -308,6 +312,8 @@ int QtSidebar::itemIndex(const NavigationItem *item) const
 
 void QtSidebar::setTheme(const QtThemeColors &themeColors)
 {
+    themeColors_ = themeColors;
+
     styleSheet_ = themeColors.getStyleSheet();
 
     setStyleSheet(styleSheet_);

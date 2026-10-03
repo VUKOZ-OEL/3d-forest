@@ -88,6 +88,8 @@ public:
     int showDialog(Dialog &dialog) override;
     void openDialog(Dialog &dialog) override;
 
+    Pixmap loadPixmap(const std::string &fileName) const override;
+
     const QtThemeColors &getThemeColors() const { return themeColors_; }
 
 signals:

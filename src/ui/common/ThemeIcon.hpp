@@ -26,120 +26,41 @@
 #include <string>
 
 // Include 3D Forest.
-#include <Pixmap.hpp>
+#include <Icon.hpp>
+class Application;
 
 // Include local.
 #include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
 
-#define THEME_ICON(name) (ThemeIcon(":/gui/", name))
+#define THEME_ICON(name) (ThemeIcon(app_, ":/ApplicationResources/", name))
 
 /** Theme Icon. */
 class EXPORT_UI_COMMON ThemeIcon
 {
 public:
     ThemeIcon() = default;
-    ThemeIcon(const std::string &prefix, const std::string &name)
-    {
-        prefix_ = prefix;
-        name_ = name;
-    }
+    ThemeIcon(Application *app,
+              const std::string &prefix,
+              const std::string &name);
 
-    Pixmap pixmap(int size) { return Pixmap(); }
+    Icon icon(bool dark = false) const;
+
+    // Returns the closest available image without scaling it.
+    Pixmap pixmap(int size, bool dark = false) const;
+
+    bool isNull() const { return light_.empty(); }
+
+    std::string toString() const;
 
 private:
-    std::string prefix_;
-    std::string name_;
+    void addFile(Application *app, const std::string &baseName);
+    void loadPixmap(Pixmap &pixmap, Application *app, const std::string &path);
+
+    std::vector<Pixmap> light_;
+    std::vector<Pixmap> dark_;
 };
 
 #include <WarningsEnable.hpp>
-
-#if 0
-class EXPORT_GUI ThemeIcon
-{
-public:
-    ThemeIcon() = default;
-    ThemeIcon(const QString &prefix, const QString &name)
-    {
-        addFileExists(prefix + name + "-16px", QSize(16, 16));
-        addFileExists(prefix + name + "-20px", QSize(20, 20));
-        addFileExists(prefix + name + "-24px", QSize(24, 24));
-    }
-
-    QIcon icon(bool dark = false) const
-    {
-        QIcon ic;
-        const QList<QPixmap> &src = dark ? dark_ : light_;
-        for (const auto &pm : src)
-        {
-            ic.addPixmap(pm);
-        }
-        return ic;
-    }
-
-    QPixmap pixmap(int size) const
-    {
-        const QList<QPixmap> &src = light_;
-        if (src.isEmpty())
-        {
-            return {};
-        }
-
-        // Choose closest match.
-        const QPixmap *best = &src.first();
-        int bestDiff = std::abs(best->width() - size);
-        for (const auto &pm : src)
-        {
-            int diff = std::abs(pm.width() - size);
-            if (diff < bestDiff)
-            {
-                best = &pm;
-                bestDiff = diff;
-            }
-        }
-
-        return *best;
-    }
-
-    QString toQString() const
-    {
-        return "light count <" + QString::number(light_.size()) +
-               "dark count <" + QString::number(dark_.size());
-    }
-
-private:
-    void addFileExists(const QString &filename, const QSize &size)
-    {
-        if (QFile(filename + "-color.png").exists())
-        {
-            addFile(filename + "-color.png", size);
-        }
-        else if (QFile(filename + ".png").exists())
-        {
-            addFile(filename + ".png", size);
-        }
-    }
-
-    void addFile(const QString &filename, const QSize &size)
-    {
-        (void)size;
-
-        QImage image(filename);
-        if (image.isNull())
-        {
-            return;
-        }
-
-        QImage inverted(image);
-        inverted.invertPixels(QImage::InvertRgb);
-
-        light_ << QPixmap::fromImage(image);
-        dark_ << QPixmap::fromImage(inverted);
-    }
-
-    QList<QPixmap> light_;
-    QList<QPixmap> dark_;
-};
-#endif
 
 #endif /* THEME_ICON_HPP */

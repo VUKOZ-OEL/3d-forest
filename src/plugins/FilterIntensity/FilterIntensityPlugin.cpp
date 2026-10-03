@@ -28,7 +28,7 @@
 #define LOG_MODULE_NAME "FilterIntensityPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/FilterIntensityResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/FilterIntensityResources/", name))
 
 void FilterIntensityPlugin::initialize(Application *app)
 {

@@ -38,7 +38,7 @@
 #define LOG_MODULE_NAME "TreeTableExportDialog"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/TreeTableResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/TreeTableResources/", name))
 
 TreeTableExportDialog::TreeTableExportDialog(Application *app,
                                              const std::string &fileName)

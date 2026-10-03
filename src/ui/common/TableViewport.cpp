@@ -20,9 +20,18 @@
 /** @file TableViewport.cpp */
 
 // Include 3D Forest.
-#include <Application.hpp>
 #include <TableViewport.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "TableViewport"
 #include <Log.hpp>
+
+Point TableViewport::mapToGlobal(const Point &point) const
+{
+    if (!mapToGlobal_)
+    {
+        throw std::logic_error("Table viewport has no backend.");
+    }
+
+    return mapToGlobal_(point);
+}

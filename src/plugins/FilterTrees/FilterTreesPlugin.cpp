@@ -28,7 +28,7 @@
 #define LOG_MODULE_NAME "FilterTreesPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/FilterTreesResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/FilterTreesResources/", name))
 
 void FilterTreesPlugin::initialize(Application *app)
 {

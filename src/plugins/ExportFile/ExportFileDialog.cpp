@@ -41,7 +41,8 @@
 #define LOG_MODULE_NAME "ExportFileDialog"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/exportfile/", name))
+#include <ExportFileResources.hpp> // Generated
+#define ICON(name) (ThemeIcon(app_, ":/ExportFileResources/", name))
 
 ExportFileDialog::ExportFileDialog(Application *app,
                                    const std::string &fileName)

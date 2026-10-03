@@ -28,7 +28,7 @@
 #define LOG_MODULE_NAME "ComputeSegmentationNNPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ComputeSegmentationNNResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ComputeSegmentationNNResources/", name))
 
 void ComputeSegmentationNNPlugin::initialize(Application *app)
 {

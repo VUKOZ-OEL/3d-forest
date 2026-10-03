@@ -39,7 +39,7 @@
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ViewSettingsResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ViewSettingsResources/", name))
 
 ViewSettingsWidget::ViewSettingsWidget(Application *app) : app_(app)
 {

@@ -38,7 +38,7 @@
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ComputeDescriptorResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ComputeDescriptorResources/", name))
 
 ComputeDescriptorWidget::ComputeDescriptorWidget(Application *app)
     : Widget(),

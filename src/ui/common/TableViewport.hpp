@@ -17,7 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file TableWidget.hpp */
+/** @file TableViewport.hpp */
 
 #ifndef TABLE_VIEWPORT_HPP
 #define TABLE_VIEWPORT_HPP
@@ -33,10 +33,9 @@
 #include <ExportUiCommon.hpp>
 #include <WarningsDisable.hpp>
 
-/** TableWidget. */
+/** TableViewport. */
 class EXPORT_UI_COMMON TableViewport : public Widget
 {
-public:
 public:
     Point mapToGlobal(const Point &point) const;
 

@@ -53,6 +53,7 @@ public:
     static bool isDesktopDarkMode(const QApplication *qapplication);
 
     void setDarkMode(bool dark);
+    bool isDarkMode() const { return darkMode_; }
 
     QString getStyleSheet() const;
 

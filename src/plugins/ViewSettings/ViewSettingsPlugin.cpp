@@ -28,7 +28,7 @@
 #define LOG_MODULE_NAME "ViewSettingsPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ViewSettingsResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ViewSettingsResources/", name))
 
 void ViewSettingsPlugin::initialize(Application *app)
 {

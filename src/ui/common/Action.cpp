@@ -38,6 +38,34 @@ Action::~Action()
     delete panel_;
 }
 
+void Action::setText(const std::string &text)
+{
+    if (text_ == text)
+    {
+        return;
+    }
+
+    text_ = text;
+    appearanceChanged();
+}
+
+void Action::setToolTip(const std::string &toolTip)
+{
+    if (toolTip_ == toolTip)
+    {
+        return;
+    }
+
+    toolTip_ = toolTip;
+    appearanceChanged();
+}
+
+void Action::setIcon(const ThemeIcon &icon)
+{
+    icon_ = icon;
+    appearanceChanged();
+}
+
 void Action::setPanel(Widget *panel)
 {
     if (panel_ == panel)

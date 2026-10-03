@@ -185,8 +185,8 @@ void DoubleSliderWidget::create(
     // Description Tool Tip.
     Label *help = new Label;
     help->setToolTip(toolTip);
-    ThemeIcon helpIcon(":/gui/", "question");
-    help->setPixmap(helpIcon.pixmap(Application::ICON_SIZE_TEXT));
+    // ThemeIcon helpIcon(":/gui/", "question");
+    // help->setPixmap(helpIcon.pixmap(Application::ICON_SIZE_TEXT));
 
     // Description Units.
     ComboBox *units = new ComboBox;

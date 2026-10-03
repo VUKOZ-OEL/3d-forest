@@ -44,6 +44,8 @@
 #include <QtSplitter.hpp>
 #include <QtTableWidget.hpp>
 #include <QtTextEdit.hpp>
+#include <QtToolBar.hpp>
+#include <QtToolButton.hpp>
 #include <QtTreeWidget.hpp>
 #include <QtVBoxLayout.hpp>
 #include <QtViewer.hpp>
@@ -271,6 +273,12 @@ QWidget *QtApplication::createWidget(Widget *widget, QWidget *parent)
         return new QtRadioButton(w, parent);
     }
 
+    if (auto *w = dynamic_cast<ToolButton *>(widget))
+    {
+        LOG_DEBUG(<< "Create tool button widget.");
+        return new QtToolButton(w, parent);
+    }
+
     if (auto *w = dynamic_cast<Slider *>(widget))
     {
         LOG_DEBUG(<< "Create slider widget.");
@@ -311,6 +319,12 @@ QWidget *QtApplication::createWidget(Widget *widget, QWidget *parent)
     {
         LOG_DEBUG(<< "Create text edit widget.");
         return new QtTextEdit(w, parent);
+    }
+
+    if (auto *w = dynamic_cast<ToolBar *>(widget))
+    {
+        LOG_DEBUG(<< "Create tool bar widget.");
+        return new QtToolBar(w, this, parent);
     }
 
     if (auto *w = dynamic_cast<TreeWidget *>(widget))
@@ -519,4 +533,53 @@ void QtApplication::openDialog(Dialog &dialog)
     }
 
     qtDialog->show();
+}
+
+Pixmap QtApplication::loadPixmap(const std::string &fileName) const
+{
+    LOG_DEBUG(<< "loadPixmap <" << fileName << ">.");
+
+    QImage image;
+    if (fileName.compare(0, 2, ":/") == 0)
+    {
+        const ResourceData bytes = ResourceRegistry::get(fileName);
+        if (!bytes || bytes->empty() ||
+            bytes->size() >
+                static_cast<std::size_t>((std::numeric_limits<int>::max)()))
+        {
+            LOG_DEBUG(<< "Resource not registered <" << fileName << ">.");
+            return {};
+        }
+        // Decode our registry's bytes. There is no Qt resource lookup here.
+        image =
+            QImage::fromData(bytes->data(), static_cast<int>(bytes->size()));
+    }
+    else
+    {
+        image.load(QString::fromStdString(fileName));
+    }
+
+    if (image.isNull())
+    {
+        LOG_DEBUG(<< "Image decoding failed <" << fileName << ">.");
+        return {};
+    }
+
+    image = image.convertToFormat(QImage::Format_RGBA8888);
+    if (image.isNull())
+    {
+        return {};
+    }
+
+    const std::size_t stride = static_cast<std::size_t>(image.width()) * 4;
+    std::vector<Pixmap::Byte> rgba(stride *
+                                   static_cast<std::size_t>(image.height()));
+    for (int y = 0; y < image.height(); ++y)
+    {
+        std::memcpy(rgba.data() + static_cast<std::size_t>(y) * stride,
+                    image.constScanLine(y),
+                    stride);
+    }
+
+    return Pixmap(image.width(), image.height(), rgba);
 }

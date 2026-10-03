@@ -28,7 +28,7 @@
 #define LOG_MODULE_NAME "ApplicationSettingsPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ApplicationSettingsResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ApplicationSettingsResources/", name))
 
 void ApplicationSettingsPlugin::initialize(Application *app)
 {

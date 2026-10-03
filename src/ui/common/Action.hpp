@@ -27,6 +27,7 @@
 
 // Include 3D Forest.
 #include <Signal.hpp>
+#include <ThemeIcon.hpp>
 class Widget;
 
 // Include local.
@@ -43,7 +44,14 @@ public:
     Action(const Action &) = delete;
     Action &operator=(const Action &) = delete;
 
+    void setText(const std::string &text);
     const std::string &text() const { return text_; }
+
+    void setToolTip(const std::string &toolTip);
+    const std::string &toolTip() const { return toolTip_; }
+
+    void setIcon(const ThemeIcon &icon);
+    const ThemeIcon &icon() const { return icon_; }
 
     void setPanel(Widget *panel);
     bool hasPanel() const { return panel_ != nullptr; }
@@ -52,9 +60,12 @@ public:
     void trigger();
 
     Signal<> triggered;
+    Signal<> appearanceChanged;
 
 private:
     std::string text_;
+    std::string toolTip_;
+    ThemeIcon icon_;
     Widget *panel_{nullptr};
 };
 

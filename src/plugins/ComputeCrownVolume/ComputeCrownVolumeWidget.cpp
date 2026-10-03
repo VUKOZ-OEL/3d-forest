@@ -35,7 +35,7 @@
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ComputeCrownVolumeResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ComputeCrownVolumeResources/", name))
 
 ComputeCrownVolumeWidget::ComputeCrownVolumeWidget(Application *app)
     : Widget(),

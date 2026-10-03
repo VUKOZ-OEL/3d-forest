@@ -36,7 +36,9 @@
 #include <Log.hpp>
 
 #define IMPORT_PLUGIN_FILTER "LAS (LASer) File (*.las);;PCL (*.pcd)"
-#define ICON(name) (ThemeIcon(":/ImportFileResources/", name))
+
+#include <ImportFileResources.hpp> // Generated
+#define ICON(name) (ThemeIcon(app_, ":/ImportFileResources/", name))
 
 static void importPluginPCDLogMessageHandler(pcl::VERBOSITY_LEVEL level,
                                              const std::string &message)
@@ -67,6 +69,7 @@ ImportFilePlugin::ImportFilePlugin() : app_(nullptr)
 void ImportFilePlugin::initialize(Application *app)
 {
     app_ = app;
+    resources_ = registerImportFileResources();
 
     app_->createAction(
         this,

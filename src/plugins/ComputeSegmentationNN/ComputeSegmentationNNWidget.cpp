@@ -39,7 +39,7 @@
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ComputeSegmentationNNResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ComputeSegmentationNNResources/", name))
 
 ComputeSegmentationNNWidget::ComputeSegmentationNNWidget(Application *app)
     : Widget(),

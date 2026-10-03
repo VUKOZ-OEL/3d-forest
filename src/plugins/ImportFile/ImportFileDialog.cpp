@@ -36,7 +36,8 @@
 #define LOG_MODULE_NAME "ImportFileDialog"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ImportFileResources/", name))
+#include <ImportFileResources.hpp> // Generated
+#define ICON(name) (ThemeIcon(app_, ":/ImportFileResources/", name))
 
 ImportFileDialog::ImportFileDialog(Application *app)
     : Dialog(app),

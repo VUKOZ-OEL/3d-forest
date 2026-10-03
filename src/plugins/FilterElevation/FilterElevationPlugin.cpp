@@ -28,7 +28,7 @@
 #define LOG_MODULE_NAME "FilterElevationPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/FilterElevationResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/FilterElevationResources/", name))
 
 void FilterElevationPlugin::initialize(Application *app)
 {

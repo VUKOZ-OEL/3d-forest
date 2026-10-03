@@ -28,7 +28,7 @@
 #define LOG_MODULE_NAME "ComputeHeightMapPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ComputeHeightMapResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ComputeHeightMapResources/", name))
 
 void ComputeHeightMapPlugin::initialize(Application *app)
 {

@@ -19,6 +19,9 @@
 
 /** @file ToolBar.cpp */
 
+// Include std.
+#include <stdexcept>
+
 // Include 3D Forest.
 #include <Application.hpp>
 #include <ToolBar.hpp>
@@ -33,16 +36,97 @@ ToolBar::ToolBar()
 
 ToolBar::~ToolBar()
 {
+    // Destroy the Qt representation before deleting common children.
+    destroying();
+
+    for (const Item &item : items_)
+    {
+        delete item.widget;
+    }
 }
 
 void ToolBar::addWidget(Widget *widget)
 {
+    if (!widget)
+    {
+        return;
+    }
+
+    if (widget == this)
+    {
+        throw std::invalid_argument("ToolBar cannot contain itself.");
+    }
+
+    // Prevent duplicate ownership within this toolbar.
+    for (const Item &item : items_)
+    {
+        if (item.widget == widget)
+        {
+            return;
+        }
+    }
+
+    const Item item{widget};
+
+    items_.push_back(item);
+    itemAdded(item);
 }
 
 void ToolBar::addSeparator()
 {
+    const Item item{nullptr};
+
+    items_.push_back(item);
+    itemAdded(item);
+}
+
+void ToolBar::clear()
+{
+    if (items_.empty())
+    {
+        return;
+    }
+
+    // Remove native widgets before their common data disappears.
+    clearing();
+
+    for (const Item &item : items_)
+    {
+        delete item.widget;
+    }
+
+    items_.clear();
 }
 
 void ToolBar::setIconSize(const Size &size)
 {
+    if (size.width() <= 0 || size.height() <= 0)
+    {
+        return;
+    }
+
+    if (iconSize_.width() == size.width() &&
+        iconSize_.height() == size.height())
+    {
+        return;
+    }
+
+    iconSize_ = size;
+    settingsChanged();
+}
+
+void ToolBar::setOrientation(int orientation)
+{
+    if (orientation != Ui::Horizontal && orientation != Ui::Vertical)
+    {
+        return;
+    }
+
+    if (orientation_ == orientation)
+    {
+        return;
+    }
+
+    orientation_ = orientation;
+    settingsChanged();
 }

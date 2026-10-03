@@ -28,7 +28,7 @@
 #define LOG_MODULE_NAME "TreeSettingsPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/TreeSettingsResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/TreeSettingsResources/", name))
 
 void TreeSettingsPlugin::initialize(Application *app)
 {

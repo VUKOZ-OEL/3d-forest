@@ -34,7 +34,7 @@
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/UnitsSettingsResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/UnitsSettingsResources/", name))
 
 UnitsSettingsWidget::UnitsSettingsWidget(Application *app) : app_(app)
 {
@@ -68,7 +68,7 @@ UnitsSettingsWidget::UnitsSettingsWidget(Application *app) : app_(app)
                         "which is x length 2 cm.\n"
                         "The user is able to override input file las scaling "
                         "to user defined value."));
-    ThemeIcon helpIcon(":/gui/", "question");
+    ThemeIcon helpIcon(app_, ":/ApplicationResources/", "question");
     help->setPixmap(helpIcon.pixmap(Application::ICON_SIZE_TEXT));
 
     // Layout.

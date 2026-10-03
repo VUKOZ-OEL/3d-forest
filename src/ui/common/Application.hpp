@@ -34,6 +34,7 @@
 #include <NavigationTree.hpp>
 #include <PluginManager.hpp>
 #include <RenderThread.hpp>
+#include <ResourceBundle.hpp>
 #include <ThemeIcon.hpp>
 #include <ThreadCallbackInterface.hpp>
 #include <ToolButton.hpp>
@@ -78,22 +79,6 @@ public:
 
     void importFile();
 
-    void createAction(Action **result,
-                      const std::string &menuTitle,
-                      const std::string &toolBarTitle,
-                      const std::string &text,
-                      const std::string &toolTip,
-                      const ThemeIcon &icon,
-                      std::function<void()> cb,
-                      int menuPriority = -1,
-                      int menuItemPriority = -1);
-
-    void createToolButton(ToolButton **result,
-                          const std::string &text,
-                          const std::string &toolTip,
-                          const ThemeIcon &themeIcon,
-                          std::function<void()> callback = {});
-
     void createAction(Plugin *owner,
                       const std::vector<NavigationPathItem> &path,
                       const std::string &toolBarTitle,
@@ -103,6 +88,12 @@ public:
                       std::function<void()> cb,
                       Widget *widget,
                       int order = 0);
+
+    void createToolButton(ToolButton **result,
+                          const std::string &text,
+                          const std::string &toolTip,
+                          const ThemeIcon &icon,
+                          std::function<void()> callback = {});
 
     virtual void addNavigationItem(Plugin *owner,
                                    const std::vector<NavigationPathItem> &path,
@@ -131,6 +122,8 @@ public:
 
     virtual int showDialog(Dialog &dialog);
     virtual void openDialog(Dialog &dialog);
+
+    virtual Pixmap loadPixmap(const std::string &fileName) const;
 
     void suspendThreads();
     void resumeThreads();
@@ -197,6 +190,8 @@ private:
     NavigationTree navigation_;
     MenuBar menuBar_;
     EventQueue eventQueue_;
+
+    ResourceBundle resources_;
 
     void createMenu();
 };

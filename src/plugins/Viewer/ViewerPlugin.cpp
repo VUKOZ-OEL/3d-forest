@@ -30,7 +30,7 @@
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ViewerResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ViewerResources/", name))
 
 void ViewerPlugin::initialize(Application *app)
 {

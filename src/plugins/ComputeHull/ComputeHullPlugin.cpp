@@ -28,7 +28,7 @@
 #define LOG_MODULE_NAME "ComputeHullPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ComputeHullResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ComputeHullResources/", name))
 
 void ComputeHullPlugin::initialize(Application *app)
 {

@@ -34,7 +34,7 @@
 #define LOG_MODULE_NAME "ComputeElevationWidget"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ComputeElevationResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ComputeElevationResources/", name))
 
 ComputeElevationWidget::ComputeElevationWidget(Application *app)
     : Widget(),

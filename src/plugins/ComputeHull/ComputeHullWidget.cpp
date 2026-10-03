@@ -38,7 +38,7 @@
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ComputeHullResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ComputeHullResources/", name))
 
 ComputeHullWidget::ComputeHullWidget(Application *app)
     : Widget(),

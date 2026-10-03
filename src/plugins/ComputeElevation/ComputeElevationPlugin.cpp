@@ -28,7 +28,7 @@
 #define LOG_MODULE_NAME "ComputeElevationPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ComputeElevationResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ComputeElevationResources/", name))
 
 void ComputeElevationPlugin::initialize(Application *app)
 {

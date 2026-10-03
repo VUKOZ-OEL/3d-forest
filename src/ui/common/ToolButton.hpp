@@ -25,7 +25,6 @@
 // Include 3D Forest.
 #include <Pixmap.hpp>
 #include <Widget.hpp>
-class Application;
 
 // Include local.
 #include <ExportUiCommon.hpp>
@@ -35,13 +34,52 @@ class Application;
 class EXPORT_UI_COMMON ToolButton : public Widget
 {
 public:
-    ToolButton(const std::string &str = "");
+    enum ToolButtonStyle
+    {
+        IconOnly,
+        TextOnly,
+        TextBesideIcon,
+        TextUnderIcon
+    };
+
+    ToolButton(const std::string &text = "");
     virtual ~ToolButton();
 
-    void setPixmap(const Pixmap &pixmap);
+    ToolButton(const ToolButton &) = delete;
+    ToolButton &operator=(const ToolButton &) = delete;
+
+    const std::string &text() const { return text_; }
+    void setText(const std::string &text);
+
+    const std::string &toolTip() const { return toolTip_; }
+    void setToolTip(const std::string &toolTip);
+
+    const ThemeIcon &icon() const { return icon_; }
+    void setIcon(const ThemeIcon &icon);
+
+    // void setPixmap(const Pixmap &pixmap);
+    // const Pixmap *pixmap() const { return &pixmap_; }
+
+    ToolButtonStyle toolButtonStyle() const { return style_; }
+    void setToolButtonStyle(ToolButtonStyle style);
+
+    bool autoRaise() const { return autoRaise_; }
+    void setAutoRaise(bool enabled);
+
+    Signal<> clicked;
+
+    // Backend notifications.
+    Signal<> settingsChanged;
+    Signal<> destroying;
 
 private:
     std::string text_;
+    std::string toolTip_;
+    ThemeIcon icon_;
+    // Pixmap pixmap_;
+
+    ToolButtonStyle style_{IconOnly};
+    bool autoRaise_{true};
 };
 
 #include <WarningsEnable.hpp>

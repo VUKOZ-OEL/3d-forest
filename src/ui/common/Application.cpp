@@ -25,6 +25,8 @@
 #include <Time.hpp>
 #include <Widget.hpp>
 
+#include <ApplicationResources.hpp> // Generated
+
 // Include local.
 #define LOG_MODULE_NAME "Application"
 #define LOG_MODULE_DEBUG_ENABLED 1
@@ -48,6 +50,8 @@ void Application::load()
 
     // Status bar.
     // statusBar()->showMessage(tr("Ready"));
+
+    resources_ = registerApplicationResources();
 
     // Plugins.
     pluginManager_.load(this);
@@ -356,101 +360,34 @@ void Application::updateRender()
     resumeThreads();
 }
 
-void Application::createAction(Action **result,
-                               const std::string &menuTitle,
-                               const std::string &toolBarTitle,
-                               const std::string &text,
-                               const std::string &toolTip,
-                               const ThemeIcon &icon,
-                               std::function<void()> cb,
-                               int menuPriority,
-                               int menuItemPriority)
-{
-#if 0
-    LOG_DEBUG(<< "Create action menu <" << menuTitle.toStdString()
-              << "> toolBar <" << toolBarTitle.toStdString() << "> text <"
-              << text.toStdString() << "> priority <" << menuPriority << "/"
-              << menuItemPriority << "> icons <" << themeIcon.toQString()
-              << ">.");
-
-    QAction *action;
-
-    // Create action.
-    action = new QAction(text, this);
-
-    if (!toolTip.isEmpty())
-    {
-        action->setToolTip(toolTip);
-        action->setStatusTip(toolTip);
-    }
-
-    QIcon icon = themeIcon.icon(isDarkMode());
-    if (!icon.isNull())
-    {
-        action->setIcon(icon);
-
-        IconEntry ie;
-        ie.action = action;
-        ie.themeIcon = themeIcon;
-
-        icons_.push_back(ie);
-    }
-
-    // Connect action.
-    if (receiver && member)
-    {
-        connect(action, SIGNAL(triggered()), receiver, member);
-    }
-
-    // Add action to menu.
-    Application::MenuItem menuItem;
-    menuItem.action = action;
-    menuItem.title = text;
-    menuItem.toolBarTitle = toolBarTitle;
-    menuItem.priority = menuItemPriority;
-
-    if (!menuIndex_.contains(menuTitle))
-    {
-        Application::Menu menu;
-        menu.menu = nullptr;
-        menu.title = menuTitle;
-        menu.priority = menuPriority;
-        menu.items.push_back(std::move(menuItem));
-
-        if (menuItem.priority < 0)
-        {
-            menuItem.priority = 0;
-        }
-
-        menuIndex_[menuTitle] = menus_.size();
-        menus_.push_back(std::move(menu));
-    }
-    else
-    {
-        Application::Menu &menu = menus_[menuIndex_[menuTitle]];
-
-        if (menuItem.priority < 0)
-        {
-            menuItem.priority = static_cast<int>(menu.items.size()) * 10;
-        }
-
-        menu.items.push_back(std::move(menuItem));
-    }
-
-    // Optional return value for further customization of new action.
-    if (result)
-    {
-        *result = action;
-    }
-#endif
-}
-
 void Application::createToolButton(ToolButton **result,
                                    const std::string &text,
                                    const std::string &toolTip,
-                                   const ThemeIcon &themeIcon,
+                                   const ThemeIcon &icon,
                                    std::function<void()> callback)
 {
+    if (!result)
+    {
+        throw std::invalid_argument(
+            "Application::createToolButton: result is null.");
+    }
+
+    auto button = std::make_unique<ToolButton>(text);
+    button->setText(text);
+    button->setToolTip(toolTip);
+    // button->setStatusTip(toolTip);
+    button->setEnabled(true);
+    button->setToolButtonStyle(ToolButton::IconOnly);
+
+    button->setIcon(icon);
+
+    if (callback)
+    {
+        button->clicked.connect(std::move(callback));
+    }
+
+    *result = button.release();
+
 #if 0
     QToolButton *button;
 
@@ -496,6 +433,9 @@ void Application::createAction(Plugin *owner,
                                int order)
 {
     Action *action = new Action(text);
+
+    action->setIcon(icon);
+    action->setToolTip(toolTip);
 
     if (widget)
     {
@@ -629,4 +569,10 @@ int Application::showDialog(Dialog &dialog)
 
 void Application::openDialog(Dialog &dialog)
 {
+}
+
+Pixmap Application::loadPixmap(const std::string &fileName) const
+{
+    (void)fileName;
+    return Pixmap();
 }

@@ -28,7 +28,7 @@
 #define LOG_MODULE_NAME "UnitsSettingsPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/UnitsSettingsResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/UnitsSettingsResources/", name))
 
 void UnitsSettingsPlugin::initialize(Application *app)
 {

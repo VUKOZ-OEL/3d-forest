@@ -30,7 +30,8 @@
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ProjectFileResources/", name))
+#include <ProjectFileResources.hpp> // Generated
+#define ICON(name) (ThemeIcon(app_, ":/ProjectFileResources/", name))
 
 ProjectFilePlugin::ProjectFilePlugin()
 {
@@ -40,6 +41,7 @@ void ProjectFilePlugin::initialize(Application *app)
 {
     LOG_DEBUG(<< "Initialize.");
     app_ = app;
+    resources_ = registerProjectFileResources();
 
     app_->createAction(
         this,

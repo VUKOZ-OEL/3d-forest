@@ -28,7 +28,7 @@
 #define LOG_MODULE_NAME "ComputeSkeletonPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ComputeSkeletonResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ComputeSkeletonResources/", name))
 
 void ComputeSkeletonPlugin::initialize(Application *app)
 {

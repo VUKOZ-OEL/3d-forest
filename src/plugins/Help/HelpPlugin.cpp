@@ -29,7 +29,7 @@
 #define LOG_MODULE_NAME "HelpPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/HelpResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/HelpResources/", name))
 
 HelpPlugin::HelpPlugin() : app_(nullptr)
 {

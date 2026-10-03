@@ -28,7 +28,7 @@
 #define LOG_MODULE_NAME "ComputeDescriptorPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ComputeDescriptorResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ComputeDescriptorResources/", name))
 
 void ComputeDescriptorPlugin::initialize(Application *app)
 {

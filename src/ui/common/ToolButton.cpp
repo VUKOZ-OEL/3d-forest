@@ -29,14 +29,67 @@
 #define LOG_MODULE_NAME "ToolButton"
 #include <Log.hpp>
 
-ToolButton::ToolButton(const std::string &str) : text_(str)
+ToolButton::ToolButton(const std::string &text) : text_(text)
 {
 }
 
 ToolButton::~ToolButton()
 {
+    destroying();
 }
 
-void ToolButton::setPixmap(const Pixmap &pixmap)
+void ToolButton::setText(const std::string &text)
 {
+    if (text_ == text)
+    {
+        return;
+    }
+
+    text_ = text;
+    settingsChanged();
+}
+
+void ToolButton::setToolTip(const std::string &toolTip)
+{
+    if (toolTip_ == toolTip)
+    {
+        return;
+    }
+
+    toolTip_ = toolTip;
+    settingsChanged();
+}
+
+void ToolButton::setIcon(const ThemeIcon &icon)
+{
+    icon_ = icon;
+    settingsChanged();
+}
+
+// void ToolButton::setPixmap(const Pixmap &pixmap)
+// {
+//     pixmap_ = pixmap;
+//     settingsChanged();
+// }
+
+void ToolButton::setToolButtonStyle(ToolButtonStyle style)
+{
+    if (style_ == style)
+    {
+        return;
+    }
+
+    style_ = style;
+    settingsChanged();
+}
+
+void ToolButton::setAutoRaise(bool enabled)
+{
+    if (autoRaise_ == enabled)
+    {
+        return;
+    }
+
+    autoRaise_ = enabled;
+    settingsChanged();
 }

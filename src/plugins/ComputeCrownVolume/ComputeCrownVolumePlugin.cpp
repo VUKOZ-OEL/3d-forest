@@ -28,7 +28,7 @@
 #define LOG_MODULE_NAME "ComputeCrownVolumePlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ComputeCrownVolumeResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ComputeCrownVolumeResources/", name))
 
 void ComputeCrownVolumePlugin::initialize(Application *app)
 {
