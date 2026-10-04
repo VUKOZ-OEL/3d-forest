@@ -34,12 +34,29 @@ void TreeTablePlugin::initialize(Application *app)
 {
     app_ = app;
 
-    app_->createAction(this,
-                       {{"Data", MAIN_WINDOW_MENU_DATA_PRIORITY}},
-                       "Data",
-                       tr("Tree Table"),
-                       tr("Show tree table"),
-                       ICON("tree-table"),
-                       {},
-                       new TreeTableWidget(app_));
+    treeTableWidget_ = new TreeTableWidget(app_);
+
+    app_->createAction(
+        this,
+        {{"Data", MAIN_WINDOW_MENU_DATA_PRIORITY}},
+        "Data",
+        tr("Tree Table"),
+        tr("Show tree table"),
+        ICON("tree-table"),
+        [this]() { app_->toggleBottomWidget(treeTableWidget_); },
+        nullptr);
+
+    app_->showBottomWidget(treeTableWidget_);
+}
+
+void TreeTablePlugin::release()
+{
+    if (treeTableWidget_)
+    {
+        app_->removeBottomWidget(treeTableWidget_);
+        delete treeTableWidget_;
+        treeTableWidget_ = nullptr;
+    }
+
+    delete this;
 }

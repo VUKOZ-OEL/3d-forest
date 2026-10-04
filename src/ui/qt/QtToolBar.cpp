@@ -151,12 +151,29 @@ void QtToolBar::updateSettings()
                                  ? Qt::Vertical
                                  : Qt::Horizontal);
 
+    if (orientation() == Qt::Vertical)
+    {
+        setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+    }
+    else
+    {
+        setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    }
+
     const Size &size = toolBar_->iconSize();
 
     QToolBar::setIconSize(QSize(size.width(), size.height()));
 
     // Also applies when the toolbar size itself did not change.
     updateButtonIconSizes();
+
+    // After applying orientation and icon size:
+    if (QLayout *toolbarLayout = QToolBar::layout())
+    {
+        toolbarLayout->setContentsMargins(0, 0, 0, 0);
+    }
+
+    updateGeometry();
 }
 
 void QtToolBar::updateButtonIconSizes()

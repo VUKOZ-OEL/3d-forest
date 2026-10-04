@@ -26,6 +26,7 @@
 #include <Editor.hpp>
 #include <Widget.hpp>
 class Viewer;
+class ToolButton;
 
 /** Viewer Widget. */
 class ViewerWidget : public Widget
@@ -44,9 +45,37 @@ public:
     // Viewer.
     void slotUpdate(const Message &msg);
 
+    // Buttons.
+    void slotViewOrthographic();
+    void slotViewPerspective();
+    void slotView2d();
+
+    void slotViewTop();
+    void slotViewFront();
+    void slotViewRight();
+    void slotView3d();
+
+    void slotViewResetDistance();
+    void slotViewResetCenter();
+
 private:
     Application *app_;
+
     Viewer *viewer_;
+
+    ToolButton *viewOrthographicAction_;
+    ToolButton *viewPerspectiveAction_;
+    ToolButton *view2dAction_;
+
+    ToolButton *viewTopAction_;
+    ToolButton *viewFrontAction_;
+    ToolButton *viewRightAction_;
+    ToolButton *view3dAction_;
+
+    ToolButton *viewResetDistanceAction_;
+    ToolButton *viewResetCenterAction_;
+
+    void updateViewer();
 };
 
 #endif /* VIEWER_WIDGET_HPP */

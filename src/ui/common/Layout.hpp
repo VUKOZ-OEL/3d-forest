@@ -60,6 +60,9 @@ public:
     int rightMargin() const { return rightMargin_; }
     int bottomMargin() const { return bottomMargin_; }
 
+    void setSpacing(int spacing);
+    int spacing() const { return spacing_; }
+
     std::size_t count() const { return items_.size(); }
 
     const LayoutItem &itemAt(std::size_t index) const
@@ -72,6 +75,7 @@ public:
     void setOwnerWidget(Widget *widget);
 
     Signal<const LayoutItem &> itemAdded;
+    Signal<int> spacingChanged;
     Signal<> clearing;
 
 private:
@@ -82,6 +86,8 @@ private:
     int topMargin_{-1};
     int rightMargin_{-1};
     int bottomMargin_{-1};
+
+    int spacing_{-1};
 
     void attachWidget(Widget *widget);
 };

@@ -70,118 +70,170 @@ void QtThemeColors::setDarkMode(bool dark)
 
     panelBackground = dark ? QColor("#303030") : QColor("#eeeeee");
     panelBorder = dark ? QColor("#484848") : QColor("#d4d4d4");
+
+    viewBackground = dark ? QColor("#000000") : QColor("#ffffff");
+    viewAlternate = panelBackground;
+    viewGrid = dark ? border : QColor("#e3e3e3");
+
+    splitterColor = dark ? QColor("#454545") : QColor("#d0d0d0");
+    splitterHoverColor = dark ? QColor("#686868") : QColor("#a0a0a0");
+
+    buttonBackground = dark ? QColor("#414141") : QColor("#ffffff");
+    buttonHover = dark ? QColor("#505050") : QColor("#f5f5f5");
+    buttonPressed = dark ? QColor("#353535") : QColor("#e5e5e5");
+    buttonBorder = dark ? QColor("#606060") : QColor("#c0c0c0");
+    buttonDisabled = dark ? QString("#858585") : QString("#999999");
 }
 
 QString QtThemeColors::getStyleSheet() const
 {
     QString styleSheet;
 
-    styleSheet = "QWidget {"
-                 "    color: " +
-                 surface.name() +
-                 ";"
-                 "    background: transparent;"
-                 "}"
-                 ""
-                 "QWidget[sidebarPanel=\"true\"] {"
-                 "    background-color: " +
-                 panelBackground.name() +
-                 ";"
-                 "    border: 1px solid " +
-                 panelBorder.name() +
-                 ";"
-                 "    border-radius: 6px;"
-                 "}"
-                 ""
-                 "QtSidebar {"
-                 "    background: " +
-                 background.name() +
-                 ";"
-                 "}"
-                 ""
-                 "QTreeWidget#sidebarNavigationTree {"
-                 "    background: " +
-                 background.name() +
-                 ";"
-                 "    color: " +
-                 surface.name() +
-                 ";"
-                 "    border: none;"
-                 "    outline: none;"
-                 "    font-size: 14px;"
-                 "}"
-                 ""
-                 "QTreeWidget#sidebarNavigationTree::item {"
-                 "    color: " +
-                 surface.name() +
-                 ";"
-                 "    min-height: 30px;"
-                 "    padding: 3px 8px;"
-                 "    border: none;"
-                 "    border-radius: 7px;"
-                 "}"
-                 ""
-                 "QTreeWidget#sidebarNavigationTree::item:hover {"
-                 "    background: " +
-                 hover.name() +
-                 ";"
-                 "}"
-                 ""
-                 "QTreeWidget#sidebarNavigationTree::branch {"
-                 "    background: " +
-                 background.name() +
-                 ";"
-                 "}"
-                 ""
-                 "QLabel,"
-                 "QCheckBox,"
-                 "QRadioButton {"
-                 "    color: " +
-                 surface.name() +
-                 ";"
-                 "    background: transparent;"
-                 "}"
-                 ""
-                 "QSlider[singleValueSlider=\"true\"]::groove:horizontal {"
-                 "    height: 4px;"
-                 "    background: " +
-                 groove.name() +
-                 ";"
-                 "    border-radius: 2px;"
-                 "}"
-                 ""
-                 "QSlider[singleValueSlider=\"true\"]::sub-page:horizontal {"
-                 "    background: " +
-                 highlight.name() +
-                 ";"
-                 "    border-radius: 2px;"
-                 "}"
-                 ""
-                 "QSlider[singleValueSlider=\"true\"]::handle:horizontal {"
-                 "    width: 14px;"
-                 "    margin: -5px 0;"
-                 "    background: " +
-                 handle.name() +
-                 ";"
-                 "    border: 1px solid " +
-                 border.name() +
-                 ";"
-                 "    border-radius: 7px;"
-                 "}"
-                 "QtDoubleRangeSlider {"
-                 "    qproperty-grooveColor: " +
-                 groove.name() +
-                 ";"
-                 "    qproperty-highlightColor: " +
-                 highlight.name() +
-                 ";"
-                 "    qproperty-borderColor: " +
-                 border.name() +
-                 ";"
-                 "    qproperty-handleColor: " +
-                 handle.name() +
-                 ";"
-                 "}";
+    // clang-format off
+    styleSheet = 
+        "QWidget[sidebarPanel=\"true\"] {"
+        "    background-color: " + panelBackground.name() + ";"
+        "    border: 1px solid " + panelBorder.name() + ";"
+        "    border-radius: 6px;"
+        "}"
+        ""
+        "QWidget#bottomPanel {"
+        "    background-color: " + panelBackground.name() + ";"
+        "}"
+        ""
+        "QSplitter::handle {"
+        "    background-color: " + splitterColor.name() + ";"
+        "}"
+        ""
+        "QSplitter::handle:hover {"
+        "    background-color: " + splitterHoverColor.name() + ";"
+        "}"
+        ""
+        "QGroupBox {"
+        "    color: " + surface.name() + ";"
+        "}"
+        ""
+        "QToolBar:vertical {"
+        "    border: none;"
+        "    padding: 0px;"
+        "    margin: 0px;"
+        "    spacing: 1px;"
+        "}"
+        ""
+        "QToolBar:vertical QToolButton {"
+        "    padding-left: 2px;"
+        "    padding-right: 2px;"
+        "}"
+        ""
+        "QtSidebar {"
+        "    background: " + background.name() + ";"
+        "}"
+        ""
+        "QTreeWidget#sidebarNavigationTree {"
+        "    background: " + background.name() + ";"
+        "    color: " + surface.name() + ";"
+        "    border: none;"
+        "    outline: none;"
+        "    font-size: 14px;"
+        "}"
+        ""
+        "QTreeWidget#sidebarNavigationTree::item {"
+        "    color: " + surface.name() + ";"
+        "    min-height: 30px;"
+        "    padding: 3px 8px;"
+        "    border: none;"
+        "    border-radius: 7px;"
+        "}"
+        ""
+        "QTreeWidget#sidebarNavigationTree::item:hover {"
+        "    background: " + hover.name() + ";"
+        "}"
+        ""
+        "QTreeWidget#sidebarNavigationTree::branch {"
+        "    background: " + background.name() + ";"
+        "}"
+        ""
+        "QTreeWidget, QTableWidget {"
+        "    background-color: " + viewBackground.name() + ";"
+        // "    alternate-background-color: " + viewAlternate.name() + ";"
+        "    color: " + surface.name() + ";"
+        "}"
+        ""
+        "QTableWidget {"
+        "    gridline-color: " + viewGrid.name() + ";"
+        "}"
+        ""
+        "QHeaderView {"
+        "    background-color: " + viewBackground.name() + ";"
+        "}"
+        "QHeaderView::section {"
+        "    background-color: " + viewBackground.name() + ";"
+        "    color: " + surface.name() + ";"
+        "    border: none;"
+        "    border-right: 1px solid " + viewGrid.name() + ";"
+        "    border-bottom: 1px solid " + viewGrid.name() + ";"
+        "}"
+        ""
+        "QTableCornerButton::section {"
+        "    background-color: " + viewBackground.name() + ";"
+        "    border: none;"
+        "}"
+        ""
+        "QLabel,"
+        "QCheckBox,"
+        "QRadioButton,"
+        // "QPushButton,"
+        "QToolButton,"
+        "QLineEdit,"
+        "QSpinBox,"
+        "QDoubleSpinBox,"
+        "QComboBox {"
+        "    color: " + surface.name() + ";"
+        "    background: transparent;"
+        "}"
+    "QPushButton {"
+    "    color: " + surface.name() + ";"
+    "    background-color: " + buttonBackground.name() + ";"
+    "    border: 1px solid " + buttonBorder.name() + ";"
+    "    border-radius: 4px;"
+    "    padding: 3px 10px;"
+    "}"
+    "QPushButton:hover:enabled {"
+    "    background-color: " + buttonHover.name() + ";"
+    "}"
+    "QPushButton:pressed:enabled {"
+    "    background-color: " + buttonPressed.name() + ";"
+    "}"
+    "QPushButton:disabled {"
+    "    color: " + buttonDisabled.name() + ";"
+    "}"
+        ""
+        "QSlider[singleValueSlider=\"true\"]::groove:horizontal {"
+        "    height: 4px;"
+        "    background: " + groove.name() + ";"
+        "    border-radius: 2px;"
+        "}"
+        ""
+        "QSlider[singleValueSlider=\"true\"]::sub-page:horizontal {"
+        "    background: " + highlight.name() + ";"
+        "    border-radius: 2px;"
+        "}"
+        ""
+        "QSlider[singleValueSlider=\"true\"]::handle:horizontal {"
+        "    width: 14px;"
+        "    margin: -5px 0;"
+        "    background: " + handle.name() + ";"
+        "    border: 1px solid " + border.name() + ";"
+        "    border-radius: 7px;"
+        "}"
+        ""
+        "QtDoubleRangeSlider {"
+        "    qproperty-grooveColor: " + groove.name() + ";"
+        "    qproperty-highlightColor: " + highlight.name() + ";"
+        "    qproperty-borderColor: " + border.name() + ";"
+        "    qproperty-handleColor: " + handle.name() + ";"
+        "}";
+    // clang-format on
 
     return styleSheet;
 }

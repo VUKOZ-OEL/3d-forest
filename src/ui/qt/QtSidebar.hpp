@@ -90,6 +90,7 @@ private:
     QtThemeColors themeColors_;
     QString styleSheet_;
     void applyPanelTheme(QWidget *widget, const QString &styleSheet);
+    void updateActionIcons(bool dark);
 };
 
 #include <WarningsEnable.hpp>

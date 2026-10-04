@@ -20,6 +20,8 @@
 /** @file QtPushButton.cpp */
 
 // Include 3D Forest.
+#include <QtApplication.hpp>
+#include <QtIcon.hpp>
 #include <QtPushButton.hpp>
 
 // Include Qt.
@@ -30,9 +32,12 @@
 #define LOG_MODULE_NAME "QtPushButton"
 #include <Log.hpp>
 
-QtPushButton::QtPushButton(PushButton *pushButton, QWidget *parent)
+QtPushButton::QtPushButton(PushButton *pushButton,
+                           QtApplication *app,
+                           QWidget *parent)
     : QPushButton(QString::fromStdString(pushButton->text()), parent),
-      pushButton_(pushButton)
+      pushButton_(pushButton),
+      app_(app)
 {
     setText(QString::fromStdString(pushButton_->text()));
     // setIcon(iconConverter(pushButton_->icon()));
@@ -61,8 +66,16 @@ QtPushButton::QtPushButton(PushButton *pushButton, QWidget *parent)
                      &QPushButton::clicked,
                      this,
                      [this](bool) { pushButton_->click(); });
+
+    // Theme colors.
+    app_->bindTheme(this, [this](bool) { updateIcon(); });
 }
 
 QtPushButton::~QtPushButton()
 {
+}
+
+void QtPushButton::updateIcon()
+{
+    QPushButton::setIcon(toQIcon(pushButton_->icon(), app_->isDarkMode()));
 }

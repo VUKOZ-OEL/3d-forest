@@ -43,6 +43,8 @@ QtHBoxLayout::QtHBoxLayout(HBoxLayout *layout,
                        layout->rightMargin(),
                        layout->bottomMargin());
 
+    setSpacing(layout->spacing());
+
     for (const LayoutItem &item : layout_->items())
     {
         addQtLayoutItem(this, parent, app, item);
@@ -65,6 +67,15 @@ QtHBoxLayout::QtHBoxLayout(HBoxLayout *layout,
             if (guard)
             {
                 addQtLayoutItem(guard.data(), parent, app, item);
+            }
+        });
+
+    layout->spacingChanged.connect(
+        [guard](int spacing)
+        {
+            if (guard)
+            {
+                guard->setSpacing(spacing);
             }
         });
 }

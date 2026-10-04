@@ -23,7 +23,6 @@
 #define TOOL_BUTTON_HPP
 
 // Include 3D Forest.
-#include <Pixmap.hpp>
 #include <Widget.hpp>
 
 // Include local.
@@ -57,9 +56,6 @@ public:
     const ThemeIcon &icon() const { return icon_; }
     void setIcon(const ThemeIcon &icon);
 
-    // void setPixmap(const Pixmap &pixmap);
-    // const Pixmap *pixmap() const { return &pixmap_; }
-
     ToolButtonStyle toolButtonStyle() const { return style_; }
     void setToolButtonStyle(ToolButtonStyle style);
 
@@ -76,7 +72,6 @@ private:
     std::string text_;
     std::string toolTip_;
     ThemeIcon icon_;
-    // Pixmap pixmap_;
 
     ToolButtonStyle style_{IconOnly};
     bool autoRaise_{true};

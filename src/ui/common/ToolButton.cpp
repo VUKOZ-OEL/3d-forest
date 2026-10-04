@@ -19,8 +19,6 @@
 
 /** @file ToolButton.cpp */
 
-// Include std.
-
 // Include 3D Forest.
 #include <Application.hpp>
 #include <ToolButton.hpp>
@@ -65,12 +63,6 @@ void ToolButton::setIcon(const ThemeIcon &icon)
     icon_ = icon;
     settingsChanged();
 }
-
-// void ToolButton::setPixmap(const Pixmap &pixmap)
-// {
-//     pixmap_ = pixmap;
-//     settingsChanged();
-// }
 
 void ToolButton::setToolButtonStyle(ToolButtonStyle style)
 {

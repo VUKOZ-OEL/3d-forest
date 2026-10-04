@@ -30,14 +30,20 @@
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
+#include <ViewerResources.hpp> // Generated
 #define ICON(name) (ThemeIcon(app_, ":/ViewerResources/", name))
 
 void ViewerPlugin::initialize(Application *app)
 {
     LOG_DEBUG(<< "Start initializing viewer plugin.");
+
     app_ = app;
+
+    resources_ = registerViewerResources();
+
     widget_ = new ViewerWidget(app_);
     app_->setViewer(widget_);
+
     LOG_DEBUG(<< "Finished initializing viewer plugin.");
 }
 

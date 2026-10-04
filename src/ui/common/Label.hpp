@@ -23,9 +23,7 @@
 #define LABEL_HPP
 
 // Include 3D Forest.
-#include <Pixmap.hpp>
 #include <Widget.hpp>
-class Application;
 
 // Include local.
 #include <ExportUiCommon.hpp>
@@ -41,12 +39,15 @@ public:
     void setText(const std::string &str);
     std::string text() const { return text_; }
 
-    void setPixmap(const Pixmap &pixmap);
+    const ThemeIcon &icon() const { return icon_; }
+    void setIcon(const ThemeIcon &icon);
 
-    Signal<const std::string &> textChanged;
+    // Backend notifications.
+    Signal<> settingsChanged;
 
 private:
     std::string text_;
+    ThemeIcon icon_;
 };
 
 #include <WarningsEnable.hpp>

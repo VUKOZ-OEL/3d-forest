@@ -24,6 +24,7 @@
 
 // Include 3D Forest.
 #include <Plugin.hpp>
+class TreeTableWidget;
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestTreeTablePlugin)
@@ -41,10 +42,11 @@ class TreeTablePlugin : public Plugin
 public:
     const char *name() const override { return "TreeTablePlugin"; }
     void initialize(Application *app) override;
-    void release() override { delete this; }
+    void release() override;
 
 private:
     Application *app_{nullptr};
+    TreeTableWidget *treeTableWidget_{nullptr};
 };
 
 extern "C" EXPORT_TREE_TABLE_PLUGIN Plugin *createPlugin()

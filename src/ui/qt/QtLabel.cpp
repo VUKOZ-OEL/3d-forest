@@ -20,6 +20,8 @@
 /** @file QtLabel.cpp */
 
 // Include 3D Forest.
+#include <QtApplication.hpp>
+#include <QtIcon.hpp>
 #include <QtLabel.hpp>
 
 // Include Qt.
@@ -29,15 +31,56 @@
 #define LOG_MODULE_NAME "QtLabel"
 #include <Log.hpp>
 
-QtLabel::QtLabel(Label *label, QWidget *parent)
+QtLabel::QtLabel(Label *label, QtApplication *app, QWidget *parent)
     : QLabel(QString::fromStdString(label->text()), parent),
-      label_(label)
+      label_(label),
+      app_(app)
 {
-    label_->textChanged.connect(
-        [this](const std::string &text)
-        { QLabel::setText(QString::fromStdString(text)); });
+    updateSettings();
+
+    const QPointer<QtLabel> guard(this);
+
+    label_->settingsChanged.connect(
+        [guard]
+        {
+            if (guard)
+            {
+                guard->updateSettings();
+            }
+        });
+
+    // Theme colors.
+    app_->bindTheme(this, [this](bool) { updateIcon(); });
 }
 
 QtLabel::~QtLabel()
 {
+}
+
+void QtLabel::updateSettings()
+{
+    const QSignalBlocker blocker(this);
+    updateIcon();
+}
+
+void QtLabel::updateIcon()
+{
+    if (!label_->icon().isNull())
+    {
+        const QIcon icon = toQIcon(label_->icon(), app_->isDarkMode());
+
+        const int size = Application::ICON_SIZE_TEXT;
+
+        const QPixmap pixmap =
+            icon.pixmap(QSize(size, size), devicePixelRatioF());
+
+        if (!pixmap.isNull())
+        {
+            QLabel::setPixmap(pixmap);
+            return;
+        }
+    }
+
+    QLabel::setText(QString::fromStdString(label_->text()));
+    QLabel::setToolTip(QString::fromStdString(label_->toolTip()));
 }

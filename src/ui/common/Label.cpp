@@ -19,10 +19,7 @@
 
 /** @file Label.cpp */
 
-// Include std.
-
 // Include 3D Forest.
-#include <Application.hpp>
 #include <Label.hpp>
 
 // Include local.
@@ -45,9 +42,11 @@ void Label::setText(const std::string &str)
     }
 
     text_ = str;
-    textChanged(text_);
+    settingsChanged();
 }
 
-void Label::setPixmap(const Pixmap &pixmap)
+void Label::setIcon(const ThemeIcon &icon)
 {
+    icon_ = icon;
+    settingsChanged();
 }

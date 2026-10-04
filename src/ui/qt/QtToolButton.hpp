@@ -24,6 +24,7 @@
 
 // Include 3D Forest.
 #include <ToolButton.hpp>
+class QtApplication;
 
 // Include Qt.
 #include <QToolButton>
@@ -36,13 +37,17 @@
 class EXPORT_UI_QT QtToolButton : public QToolButton
 {
 public:
-    explicit QtToolButton(ToolButton *button, QWidget *parent = nullptr);
+    explicit QtToolButton(ToolButton *button,
+                          QtApplication *app,
+                          QWidget *parent = nullptr);
     virtual ~QtToolButton();
 
 private:
     void updateSettings();
+    void updateIcon();
 
     ToolButton *button_;
+    QtApplication *app_;
 };
 
 #include <WarningsEnable.hpp>

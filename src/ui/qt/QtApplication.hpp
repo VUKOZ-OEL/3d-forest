@@ -37,6 +37,7 @@
 #include <QMainWindow>
 #include <QPointer>
 #include <QSplitter>
+#include <QStackedWidget>
 #include <QVBoxLayout>
 #include <QWidget>
 
@@ -68,6 +69,11 @@ public:
     void setViewer(Widget *widget) override;
     void removeViewer(Widget *widget) override;
 
+    void showBottomWidget(Widget *widget) override;
+    void hideBottomWidget() override;
+    void toggleBottomWidget(Widget *widget) override;
+    void removeBottomWidget(Widget *widget) override;
+
     QWidget *createWidget(Widget *widget, QWidget *parent = nullptr);
     QLayout *createLayout(Layout *layout, QWidget *parent = nullptr);
     QDialog *createDialog(Dialog &dialog, QWidget *parent = nullptr);
@@ -90,10 +96,14 @@ public:
 
     Pixmap loadPixmap(const std::string &fileName) const override;
 
+    // Theme colors.
     const QtThemeColors &getThemeColors() const { return themeColors_; }
+    bool isDarkMode() const { return themeColors_.isDarkMode(); }
+    void bindTheme(QObject *receiver, std::function<void(bool)> applyTheme);
 
 signals:
     void wakeUpRequested();
+    void themeChanged(bool dark);
 
 private:
     QApplication &qapplication_;
@@ -107,6 +117,10 @@ private:
     QVBoxLayout *viewerLayout_{nullptr};
     Widget *commonViewer_{nullptr};
     QWidget *qtViewer_{nullptr};
+
+    QPointer<QSplitter> rightSplitter_;
+    QPointer<QStackedWidget> bottomStack_;
+    std::unordered_map<Widget *, QPointer<QWidget>> bottomWidgets_;
 
     std::unordered_map<Dialog *, QPointer<QDialog>> dialogs_;
 

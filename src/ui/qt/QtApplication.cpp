@@ -20,6 +20,7 @@
 /** @file QtApplication.cpp */
 
 // Include std.
+#include <stdexcept>
 
 // Include 3D Forest.
 #include <MessageBox.hpp>
@@ -123,49 +124,82 @@ void QtApplication::initLayout()
 {
     splitter_ = new QSplitter(Qt::Horizontal, &mainWindow_);
     splitter_->setHandleWidth(1);
-    splitter_->setStyleSheet("QSplitter::handle {"
-                             "    background: #303030;"
-                             "}");
+    // splitter_->setStyleSheet("QSplitter::handle { background: #303030; }");
 
     // Left side bar area
     sidebar_ = new QtSidebar(&navigation(), this, splitter_);
 
-    // Right viewer area, initially empty
-    viewerContainer_ = new QWidget(splitter_);
+    // Right: viewer above an optional plugin panel.
+    rightSplitter_ = new QSplitter(Qt::Vertical, splitter_);
+    rightSplitter_->setHandleWidth(1);
+    rightSplitter_->setChildrenCollapsible(false);
+
+    // Viewer.
+    viewerContainer_ = new QWidget(rightSplitter_);
 
     viewerLayout_ = new QVBoxLayout(viewerContainer_);
     viewerLayout_->setContentsMargins(0, 0, 0, 0);
     viewerLayout_->setSpacing(0);
 
+    // Plugin panels.
+    bottomStack_ = new QStackedWidget(rightSplitter_);
+    bottomStack_->setContentsMargins(0, 0, 0, 0);
+
+    rightSplitter_->addWidget(viewerContainer_);
+    rightSplitter_->addWidget(bottomStack_);
+
+    rightSplitter_->setStretchFactor(0, 1);
+    rightSplitter_->setStretchFactor(1, 1);
+
+    bottomStack_->hide();
+    bottomStack_->setObjectName("bottomPanel");
+
     // Splitter.
     splitter_->addWidget(sidebar_);
-    splitter_->addWidget(viewerContainer_);
+    splitter_->addWidget(rightSplitter_);
 
     // Left side does not stretch as much as the viewer.
     splitter_->setStretchFactor(0, 0);
     splitter_->setStretchFactor(1, 1);
 
     // Initial widths.
-    splitter_->setSizes({300, 900});
+    splitter_->setSizes({280, 920});
 
     sidebar_->setMinimumWidth(220);
     sidebar_->setMaximumWidth(500);
 
     mainWindow_.setCentralWidget(splitter_);
 
-    // Theme.
+    // Theme colors.
     updateTheme();
 
-    QObject::connect(qapplication_.styleHints(),
-                     &QStyleHints::colorSchemeChanged,
-                     &mainWindow_,
-                     [this](Qt::ColorScheme) { updateTheme(); });
+    QObject::connect(
+        qapplication_.styleHints(),
+        &QStyleHints::colorSchemeChanged,
+        &mainWindow_,
+        [this](Qt::ColorScheme) { updateTheme(); },
+        Qt::QueuedConnection);
 }
 
 void QtApplication::updateTheme()
 {
-    themeColors_.setDarkMode(QtThemeColors::isDesktopDarkMode(&qapplication_));
+    const bool darkMode = QtThemeColors::isDesktopDarkMode(&qapplication_);
+
+    themeColors_.setDarkMode(darkMode);
     sidebar_->setTheme(themeColors_);
+
+    QString styleSheet = themeColors_.getStyleSheet();
+    mainWindow_.setStyleSheet(styleSheet);
+
+    Q_EMIT themeChanged(darkMode);
+}
+
+void QtApplication::bindTheme(QObject *receiver,
+                              std::function<void(bool)> applyTheme)
+{
+    QObject::connect(this, &QtApplication::themeChanged, receiver, applyTheme);
+
+    applyTheme(isDarkMode());
 }
 
 void QtApplication::setViewer(Widget *widget)
@@ -217,6 +251,115 @@ void QtApplication::removeViewer(Widget *widget)
     commonViewer_ = nullptr;
 }
 
+void QtApplication::showBottomWidget(Widget *widget)
+{
+    if (!widget)
+    {
+        return;
+    }
+
+    if (!bottomStack_ || !rightSplitter_)
+    {
+        throw std::logic_error("showBottomWidget requires initLayout() first.");
+    }
+
+    auto &qtWidget = bottomWidgets_[widget];
+
+    if (!qtWidget)
+    {
+        qtWidget = createWidget(widget, bottomStack_.data());
+
+        if (!qtWidget)
+        {
+            bottomWidgets_.erase(widget);
+
+            throw std::runtime_error("Failed to create bottom widget.");
+        }
+
+        bottomStack_->addWidget(qtWidget.data());
+    }
+
+    const bool wasHidden = bottomStack_->isHidden();
+
+    bottomStack_->setCurrentWidget(qtWidget.data());
+    bottomStack_->show();
+
+    if (wasHidden)
+    {
+#if 0        
+        // Request equal heights when opening the bottom area.
+        // Qt respects the widgets' minimum sizes.
+        const int height = rightSplitter_->height();
+        const int half = height > 2 ? height / 2 : 500;
+
+        rightSplitter_->setSizes({half, half});
+#else
+        // Viewer: 75%, bottom panel: 25%.
+        rightSplitter_->setSizes({900, 300});
+#endif
+    }
+}
+
+void QtApplication::hideBottomWidget()
+{
+    if (bottomStack_)
+    {
+        bottomStack_->hide();
+    }
+}
+
+void QtApplication::toggleBottomWidget(Widget *widget)
+{
+    if (!widget)
+    {
+        return;
+    }
+
+    const auto it = bottomWidgets_.find(widget);
+
+    if (bottomStack_ && !bottomStack_->isHidden() &&
+        it != bottomWidgets_.end() && it->second &&
+        bottomStack_->currentWidget() == it->second.data())
+    {
+        hideBottomWidget();
+        return;
+    }
+
+    showBottomWidget(widget);
+}
+
+void QtApplication::removeBottomWidget(Widget *widget)
+{
+    const auto it = bottomWidgets_.find(widget);
+
+    if (it == bottomWidgets_.end())
+    {
+        return;
+    }
+
+    const QPointer<QWidget> qtWidget = it->second;
+    bottomWidgets_.erase(it);
+
+    if (!bottomStack_)
+    {
+        return;
+    }
+
+    const bool wasCurrent =
+        qtWidget && bottomStack_->currentWidget() == qtWidget.data();
+
+    if (qtWidget)
+    {
+        bottomStack_->removeWidget(qtWidget.data());
+        delete qtWidget.data();
+    }
+
+    if (wasCurrent || bottomStack_->count() == 0)
+    {
+        bottomStack_->hide();
+    }
+}
+
 QWidget *QtApplication::createWidget(Widget *widget, QWidget *parent)
 {
     if (!widget)
@@ -246,7 +389,7 @@ QWidget *QtApplication::createWidget(Widget *widget, QWidget *parent)
     if (auto *w = dynamic_cast<Label *>(widget))
     {
         LOG_DEBUG(<< "Create label widget.");
-        return new QtLabel(w, parent);
+        return new QtLabel(w, this, parent);
     }
 
     if (auto *w = dynamic_cast<LineEdit *>(widget))
@@ -264,7 +407,7 @@ QWidget *QtApplication::createWidget(Widget *widget, QWidget *parent)
     if (auto *w = dynamic_cast<PushButton *>(widget))
     {
         LOG_DEBUG(<< "Create push button widget.");
-        return new QtPushButton(w, parent);
+        return new QtPushButton(w, this, parent);
     }
 
     if (auto *w = dynamic_cast<RadioButton *>(widget))
@@ -276,7 +419,7 @@ QWidget *QtApplication::createWidget(Widget *widget, QWidget *parent)
     if (auto *w = dynamic_cast<ToolButton *>(widget))
     {
         LOG_DEBUG(<< "Create tool button widget.");
-        return new QtToolButton(w, parent);
+        return new QtToolButton(w, this, parent);
     }
 
     if (auto *w = dynamic_cast<Slider *>(widget))

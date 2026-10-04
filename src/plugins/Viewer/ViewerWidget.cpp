@@ -21,7 +21,10 @@
 
 // Include 3D Forest.
 #include <Application.hpp>
+#include <HBoxLayout.hpp>
 #include <ThemeIcon.hpp>
+#include <ToolBar.hpp>
+#include <ToolButton.hpp>
 #include <VBoxLayout.hpp>
 #include <Viewer.hpp>
 #include <ViewerWidget.hpp>
@@ -31,15 +34,102 @@
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
+#include <ViewerResources.hpp> // Generated
 #define ICON(name) (ThemeIcon(app_, ":/ViewerResources/", name))
 
 ViewerWidget::ViewerWidget(Application *app) : app_(app)
 {
+    // Viewer.
     viewer_ = new Viewer;
 
+    // Tool bar.
+    app_->createToolButton(&viewOrthographicAction_,
+                           tr("Orthographic"),
+                           tr("Orthographic projection"),
+                           ICON("orthographic-wire"),
+                           [this]() { slotViewOrthographic(); });
+
+    app_->createToolButton(&viewPerspectiveAction_,
+                           tr("Perspective"),
+                           tr("Perspective projection"),
+                           ICON("perspective-wire"),
+                           [this]() { slotViewPerspective(); });
+
+    app_->createToolButton(&view2dAction_,
+                           tr("2D DBH"),
+                           tr("2D projection with DBH"),
+                           ICON("view-2d"),
+                           [this]() { slotView2d(); });
+
+    app_->createToolButton(&view3dAction_,
+                           tr("3d view"),
+                           tr("3d view"),
+                           ICON("portraits-fill"),
+                           [this]() { slotView3d(); });
+
+    app_->createToolButton(&viewTopAction_,
+                           tr("Top view"),
+                           tr("Top view"),
+                           ICON("view-top"),
+                           [this]() { slotViewTop(); });
+
+    app_->createToolButton(&viewFrontAction_,
+                           tr("Front view"),
+                           tr("Front view"),
+                           ICON("view-front"),
+                           [this]() { slotViewFront(); });
+
+    app_->createToolButton(&viewRightAction_,
+                           tr("Right view"),
+                           tr("Right view"),
+                           ICON("view-right"),
+                           [this]() { slotViewRight(); });
+
+    app_->createToolButton(&viewResetDistanceAction_,
+                           tr("Reset distance"),
+                           tr("Reset distance"),
+                           ICON("fit-to-page"),
+                           [this]() { slotViewResetDistance(); });
+
+    app_->createToolButton(&viewResetCenterAction_,
+                           tr("Reset center"),
+                           tr("Reset center"),
+                           ICON("collect"),
+                           [this]() { slotViewResetCenter(); });
+
+    ToolBar *toolBar = new ToolBar;
+    // toolBar->setOrientation(Ui::Vertical);
+    toolBar->addWidget(viewOrthographicAction_);
+    toolBar->addWidget(viewPerspectiveAction_);
+    toolBar->addWidget(view2dAction_);
+    toolBar->addSeparator();
+    toolBar->addWidget(viewTopAction_);
+    toolBar->addWidget(viewFrontAction_);
+    toolBar->addWidget(viewRightAction_);
+    toolBar->addWidget(view3dAction_);
+    toolBar->addSeparator();
+    toolBar->addWidget(viewResetDistanceAction_);
+    toolBar->addWidget(viewResetCenterAction_);
+
+    int size = Application::ICON_SIZE;
+    toolBar->setIconSize(Size(size, size));
+
     // Layout.
+#if 0
     VBoxLayout *mainLayout = new VBoxLayout;
-    mainLayout->addWidget(viewer_);
+    toolBar->setOrientation(Ui::Horizontal);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setSpacing(0);
+    mainLayout->addWidget(toolBar, 0);
+    mainLayout->addWidget(viewer_, 1);
+#else
+    HBoxLayout *mainLayout = new HBoxLayout;
+    toolBar->setOrientation(Ui::Vertical);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setSpacing(0);
+    mainLayout->addWidget(toolBar, 0);
+    mainLayout->addWidget(viewer_, 1);
+#endif
 
     setLayout(mainLayout);
 
@@ -84,4 +174,63 @@ void ViewerWidget::resetScene()
 void ViewerWidget::resetSceneView()
 {
     viewer_->requestResetView();
+}
+
+void ViewerWidget::slotViewOrthographic()
+{
+    viewer_->setViewOrthographic();
+    updateViewer();
+}
+
+void ViewerWidget::slotViewPerspective()
+{
+    viewer_->setViewPerspective();
+    updateViewer();
+}
+
+void ViewerWidget::slotView2d()
+{
+    viewer_->setView2d();
+    updateViewer();
+}
+
+void ViewerWidget::slotViewTop()
+{
+    viewer_->setViewTop();
+    updateViewer();
+}
+
+void ViewerWidget::slotViewFront()
+{
+    viewer_->setViewFront();
+    updateViewer();
+}
+
+void ViewerWidget::slotViewRight()
+{
+    viewer_->setViewRight();
+    updateViewer();
+}
+
+void ViewerWidget::slotView3d()
+{
+    viewer_->setView3d();
+    updateViewer();
+}
+
+void ViewerWidget::slotViewResetDistance()
+{
+    viewer_->setViewResetDistance();
+    updateViewer();
+}
+
+void ViewerWidget::slotViewResetCenter()
+{
+    viewer_->setViewResetCenter();
+    updateViewer();
+}
+
+void ViewerWidget::updateViewer()
+{
+    updateScene();
 }

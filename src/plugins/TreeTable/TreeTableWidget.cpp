@@ -56,17 +56,17 @@ TreeTableWidget::TreeTableWidget(Application *app) : app_(app)
     tableWidget_->setColumnCount(2);
 
     tableWidget_->setSizePolicy(SizePolicy::Expanding, SizePolicy::Expanding);
-
-    tableWidget_->setStyleSheet("QHeaderView::section {"
-                                "background-color: lightblue;"
-                                "color: black;"
-                                "padding: 5px;"
-                                "}"
-                                "QTableWidget::item:selected {"
-                                "  background-color: #3399FF;"
-                                "  color: white;"
-                                "}");
-
+    /*
+        tableWidget_->setStyleSheet("QHeaderView::section {"
+                                    "background-color: lightblue;"
+                                    "color: black;"
+                                    "padding: 5px;"
+                                    "}"
+                                    "QTableWidget::item:selected {"
+                                    "  background-color: #3399FF;"
+                                    "  color: white;"
+                                    "}");
+    */
     // Table: enable alternating row colors
     tableWidget_->setAlternatingRowColors(true);
 

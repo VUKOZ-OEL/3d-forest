@@ -364,7 +364,8 @@ void QtTableWidget::updateSettings()
         static_cast<QAbstractItemView::SelectionBehavior>(
             table_->selectionBehavior()));
 
-    QTableWidget::setAlternatingRowColors(table_->alternatingRowColors());
+    // QTableWidget::setAlternatingRowColors(table_->alternatingRowColors());
+    QTableWidget::setAlternatingRowColors(false);
 
     QTableWidget::setContextMenuPolicy(
         static_cast<Qt::ContextMenuPolicy>(table_->contextMenuPolicy()));

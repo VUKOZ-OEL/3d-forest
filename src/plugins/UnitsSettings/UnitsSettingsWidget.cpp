@@ -68,8 +68,7 @@ UnitsSettingsWidget::UnitsSettingsWidget(Application *app) : app_(app)
                         "which is x length 2 cm.\n"
                         "The user is able to override input file las scaling "
                         "to user defined value."));
-    ThemeIcon helpIcon(app_, ":/ApplicationResources/", "question");
-    help->setPixmap(helpIcon.pixmap(Application::ICON_SIZE_TEXT));
+    help->setIcon(THEME_ICON("question"));
 
     // Layout.
     GridLayout *groupBoxLayout = new GridLayout;

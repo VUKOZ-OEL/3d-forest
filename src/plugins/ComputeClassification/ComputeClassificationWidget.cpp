@@ -99,7 +99,7 @@ ComputeClassificationWidget::ComputeClassificationWidget(Application *app)
 
     // Buttons.
     helpButton_ = new PushButton(tr("Help"));
-    helpButton_->setIcon(THEME_ICON("question"));
+    // helpButton_->setIcon(THEME_ICON("question"));
     helpButton_->clicked.connect([this]() { slotHelp(); });
 
     applyButton_ = new PushButton(tr("Run"));

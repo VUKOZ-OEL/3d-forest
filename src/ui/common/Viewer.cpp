@@ -54,3 +54,39 @@ void Viewer::requestResetView()
 {
     resetViewRequested();
 }
+
+void Viewer::setViewOrthographic()
+{
+}
+
+void Viewer::setViewPerspective()
+{
+}
+
+void Viewer::setView2d()
+{
+}
+
+void Viewer::setViewTop()
+{
+}
+
+void Viewer::setViewFront()
+{
+}
+
+void Viewer::setViewRight()
+{
+}
+
+void Viewer::setView3d()
+{
+}
+
+void Viewer::setViewResetDistance()
+{
+}
+
+void Viewer::setViewResetCenter()
+{
+}

@@ -61,6 +61,8 @@ public:
     const std::string &name() const { return name_; }
 
     void setToolTip(const std::string &str);
+    std::string toolTip() const { return toolTip_; }
+
     void setFocusPolicy(int focusPolicy);
     void setVisible(bool b);
     void setEnabled(bool b);

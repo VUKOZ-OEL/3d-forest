@@ -23,6 +23,7 @@
 #include <stdexcept>
 
 // Include 3D Forest.
+#include <QtApplication.hpp>
 #include <QtIcon.hpp>
 #include <QtToolButton.hpp>
 
@@ -59,9 +60,12 @@ Qt::ToolButtonStyle toQtStyle(ToolButton::ToolButtonStyle style)
 }
 } // namespace
 
-QtToolButton::QtToolButton(ToolButton *button, QWidget *parent)
+QtToolButton::QtToolButton(ToolButton *button,
+                           QtApplication *app,
+                           QWidget *parent)
     : QToolButton(parent),
-      button_(button)
+      button_(button),
+      app_(app)
 {
     if (!button_)
     {
@@ -101,6 +105,9 @@ QtToolButton::QtToolButton(ToolButton *button, QWidget *parent)
                 delete guard.data();
             }
         });
+
+    // Theme colors.
+    app_->bindTheme(this, [this](bool) { updateIcon(); });
 }
 
 QtToolButton::~QtToolButton()
@@ -113,9 +120,14 @@ void QtToolButton::updateSettings()
 
     QToolButton::setText(QString::fromStdString(button_->text()));
     QToolButton::setToolTip(QString::fromStdString(button_->toolTip()));
-    QToolButton::setIcon(toQIcon(button_->icon(), false));
+    QToolButton::setIcon(toQIcon(button_->icon(), app_->isDarkMode()));
     QToolButton::setToolButtonStyle(toQtStyle(button_->toolButtonStyle()));
     QToolButton::setAutoRaise(button_->autoRaise());
 
     setAccessibleName(QString::fromStdString(button_->text()));
+}
+
+void QtToolButton::updateIcon()
+{
+    QToolButton::setIcon(toQIcon(button_->icon(), app_->isDarkMode()));
 }

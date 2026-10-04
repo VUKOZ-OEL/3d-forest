@@ -105,7 +105,7 @@ ImportFileDialog::ImportFileDialog(Application *app)
 
     // Dialog buttons.
     helpButton_ = new PushButton(tr("Help"));
-    helpButton_->setIcon(THEME_ICON("question"));
+    // helpButton_->setIcon(THEME_ICON("question"));
     helpButton_->clicked.connect([this]() { slotHelp(); });
 
     acceptButton_ = new PushButton(tr("Import"));

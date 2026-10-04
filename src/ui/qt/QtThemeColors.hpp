@@ -50,6 +50,19 @@ public:
     QColor panelBackground;
     QColor panelBorder;
 
+    QColor viewBackground;
+    QColor viewAlternate;
+    QColor viewGrid;
+
+    QColor splitterColor;
+    QColor splitterHoverColor;
+
+    QColor buttonBackground;
+    QColor buttonHover;
+    QColor buttonPressed;
+    QColor buttonBorder;
+    QColor buttonDisabled;
+
     static bool isDesktopDarkMode(const QApplication *qapplication);
 
     void setDarkMode(bool dark);

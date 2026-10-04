@@ -24,6 +24,7 @@
 
 // Include 3D Forest.
 #include <PushButton.hpp>
+class QtApplication;
 
 // Include Qt.
 #include <QPushButton>
@@ -36,11 +37,16 @@
 class EXPORT_UI_QT QtPushButton : public QPushButton
 {
 public:
-    explicit QtPushButton(PushButton *pushButton, QWidget *parent = nullptr);
+    explicit QtPushButton(PushButton *pushButton,
+                          QtApplication *app,
+                          QWidget *parent = nullptr);
     virtual ~QtPushButton();
 
 private:
+    void updateIcon();
+
     PushButton *pushButton_;
+    QtApplication *app_;
 };
 
 #include <WarningsEnable.hpp>

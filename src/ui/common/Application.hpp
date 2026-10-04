@@ -107,6 +107,11 @@ public:
     virtual void setViewer(Widget *widget);
     virtual void removeViewer(Widget *widget);
 
+    virtual void showBottomWidget(Widget *widget);
+    virtual void hideBottomWidget();
+    virtual void toggleBottomWidget(Widget *widget);
+    virtual void removeBottomWidget(Widget *widget);
+
     virtual std::string getOpenFileName(const std::string &dialogTitle,
                                         const std::string &filter);
 

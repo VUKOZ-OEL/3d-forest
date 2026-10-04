@@ -45,6 +45,18 @@ public:
     void requestReset();
     void requestResetView();
 
+    void setViewOrthographic();
+    void setViewPerspective();
+    void setView2d();
+
+    void setViewTop();
+    void setViewFront();
+    void setViewRight();
+    void setView3d();
+
+    void setViewResetDistance();
+    void setViewResetCenter();
+
     Signal<> updateRequested;
     Signal<> resetRequested;
     Signal<> resetViewRequested;

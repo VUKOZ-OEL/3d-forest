@@ -24,6 +24,7 @@
 
 // Include 3D Forest.
 #include <Label.hpp>
+class QtApplication;
 
 // Include Qt.
 #include <QLabel>
@@ -36,11 +37,17 @@
 class EXPORT_UI_QT QtLabel : public QLabel
 {
 public:
-    explicit QtLabel(Label *label, QWidget *parent = nullptr);
+    explicit QtLabel(Label *label,
+                     QtApplication *app,
+                     QWidget *parent = nullptr);
     virtual ~QtLabel();
 
 private:
+    void updateSettings();
+    void updateIcon();
+
     Label *label_;
+    QtApplication *app_;
 };
 
 #include <WarningsEnable.hpp>

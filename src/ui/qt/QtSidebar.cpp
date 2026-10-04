@@ -34,6 +34,7 @@
 // Include Qt.
 #include <QAbstractItemView>
 #include <QFrame>
+#include <QStyledItemDelegate>
 #include <QTreeWidget>
 #include <QVBoxLayout>
 
@@ -41,19 +42,106 @@
 #define LOG_MODULE_NAME "QtSidebar"
 #include <Log.hpp>
 
+namespace
+{
+// Choose an unused role in your sidebar.
+constexpr int SidebarIndentRole = Qt::UserRole + 100;
+constexpr int SidebarPanelRole = Qt::UserRole + 101;
+
+class SidebarTreeWidget : public QTreeWidget
+{
+public:
+    explicit SidebarTreeWidget(QWidget *parent = nullptr) : QTreeWidget(parent)
+    {
+    }
+
+protected:
+    void drawRow(QPainter *painter,
+                 const QStyleOptionViewItem &option,
+                 const QModelIndex &index) const override
+    {
+        if (index.data(SidebarPanelRole).toBool())
+        {
+            // The embedded panel paints itself.
+            return;
+        }
+
+        QTreeWidget::drawRow(painter, option, index);
+    }
+};
+
+class SidebarItemDelegate : public QStyledItemDelegate
+{
+public:
+    explicit SidebarItemDelegate(QObject *parent = nullptr)
+        : QStyledItemDelegate(parent)
+    {
+    }
+
+    void paint(QPainter *painter,
+               const QStyleOptionViewItem &option,
+               const QModelIndex &index) const override
+    {
+        QStyleOptionViewItem adjusted(option);
+
+        if (index.data(SidebarPanelRole).toBool())
+        {
+            adjusted.state &= ~QStyle::State_MouseOver;
+        }
+        else
+        {
+            adjusted.rect.adjust(index.data(SidebarIndentRole).toInt(),
+                                 0,
+                                 0,
+                                 0);
+        }
+
+        QStyledItemDelegate::paint(painter, adjusted, index);
+    }
+
+    QSize sizeHint(const QStyleOptionViewItem &option,
+                   const QModelIndex &index) const override
+    {
+        QSize size = QStyledItemDelegate::sizeHint(option, index);
+        size.rwidth() += index.data(SidebarIndentRole).toInt();
+        return size;
+    }
+
+protected:
+    void initStyleOption(QStyleOptionViewItem *option,
+                         const QModelIndex &index) const override
+    {
+        QStyledItemDelegate::initStyleOption(option, index);
+
+#if 0
+        if (!option->icon.isNull() &&
+            option->decorationPosition == QStyleOptionViewItem::Left)
+        {
+            option->decorationSize.rwidth() += 4;
+            option->decorationAlignment =
+                Qt::AlignLeft | Qt::AlignVCenter;
+        }
+#else
+        option->icon = QIcon();
+        option->features &= ~QStyleOptionViewItem::HasDecoration;
+        option->decorationSize = QSize(0, 0);
+#endif
+    }
+};
+} // namespace
+
 QtSidebar::QtSidebar(NavigationTree *navigation,
                      QtApplication *application,
                      QWidget *parent)
     : QWidget(parent),
       navigation_(navigation),
-      app_(application),
-      tree_(new QTreeWidget(this))
+      app_(application)
 {
+    tree_ = new SidebarTreeWidget(this);
     tree_->setObjectName("sidebarNavigationTree");
 
     tree_->setHeaderHidden(true);
     tree_->setRootIsDecorated(true);
-    tree_->setIndentation(16);
     tree_->setUniformRowHeights(false);
     tree_->setItemsExpandable(false);
     tree_->setExpandsOnDoubleClick(false);
@@ -63,6 +151,7 @@ QtSidebar::QtSidebar(NavigationTree *navigation,
     tree_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     tree_->setIndentation(0);
+    tree_->setItemDelegate(new SidebarItemDelegate(tree_));
     tree_->setSortingEnabled(false);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -152,6 +241,16 @@ void QtSidebar::addItem(NavigationItem *item)
 
     qtItem->setText(0, QString::fromStdString(item->title()));
 
+    // Indent navigation titles, without indenting embedded panels.
+    int depth = 0;
+
+    for (QTreeWidgetItem *parent = qtParent; parent; parent = parent->parent())
+    {
+        ++depth;
+    }
+
+    qtItem->setData(0, SidebarIndentRole, depth * 8);
+
     // Binding.
     Binding binding;
     binding.commonItem = item;
@@ -184,6 +283,10 @@ void QtSidebar::addItem(NavigationItem *item)
     {
         QTreeWidgetItem *contentItem = new QTreeWidgetItem(qtItem);
 
+        contentItem->setData(0, SidebarIndentRole, 0);
+        contentItem->setData(0, SidebarPanelRole, true);
+        contentItem->setFlags(contentItem->flags() & ~Qt::ItemIsSelectable);
+
         QWidget *qtWidget = app_->createWidget(action->panel(), tree_);
 
         if (!qtWidget)
@@ -202,7 +305,6 @@ void QtSidebar::addItem(NavigationItem *item)
         qtWidget->setContentsMargins(10, 4, 4, 10);
 
         tree_->setItemWidget(contentItem, 0, qtWidget);
-
         contentItem->setSizeHint(0, qtWidget->sizeHint());
 
         qtItem->setExpanded(false);
@@ -325,6 +427,8 @@ void QtSidebar::setTheme(const QtThemeColors &themeColors)
             applyPanelTheme(binding.qtWidget, styleSheet_);
         }
     }
+
+    updateActionIcons(themeColors_.isDarkMode());
 }
 
 void QtSidebar::applyPanelTheme(QWidget *widget, const QString &styleSheet)
@@ -335,4 +439,24 @@ void QtSidebar::applyPanelTheme(QWidget *widget, const QString &styleSheet)
     }
 
     widget->setStyleSheet(styleSheet);
+}
+
+void QtSidebar::updateActionIcons(bool dark)
+{
+    for (const Binding &binding : bindings_)
+    {
+        if (!binding.commonItem || !binding.qtItem)
+        {
+            continue;
+        }
+
+        Action *action = binding.commonItem->action();
+
+        if (!action || action->icon().isNull())
+        {
+            continue;
+        }
+
+        binding.qtItem->setIcon(0, toQIcon(action->icon(), dark));
+    }
 }

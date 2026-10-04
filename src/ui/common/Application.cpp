@@ -253,6 +253,7 @@ void Application::emitUpdate(void *sender, int type)
     LOG_DEBUG_UPDATE(<< "Update target <" << type << "> emit.");
 
     // emit signalUpdate(sender, target);
+    signalUpdate(Message(sender, type));
 }
 
 void Application::update(void *sender,
@@ -536,6 +537,25 @@ void Application::setViewer(Widget *widget)
 
 void Application::removeViewer(Widget *widget)
 {
+}
+
+void Application::showBottomWidget(Widget *widget)
+{
+    (void)widget;
+}
+
+void Application::hideBottomWidget()
+{
+}
+
+void Application::toggleBottomWidget(Widget *widget)
+{
+    showBottomWidget(widget);
+}
+
+void Application::removeBottomWidget(Widget *widget)
+{
+    (void)widget;
 }
 
 std::string Application::getOpenFileName(const std::string &dialogTitle,

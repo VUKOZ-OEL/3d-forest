@@ -106,6 +106,17 @@ void Layout::setContentsMargins(int left, int top, int right, int bottom)
     bottomMargin_ = bottom;
 }
 
+void Layout::setSpacing(int spacing)
+{
+    if (spacing_ == spacing)
+    {
+        return;
+    }
+
+    spacing_ = spacing;
+    spacingChanged(spacing_);
+}
+
 void Layout::attachWidget(Widget *widget)
 {
     if (auto *radioButton = dynamic_cast<RadioButton *>(widget))
