@@ -32,6 +32,8 @@ class Application;
 class CheckBox;
 class PushButton;
 class TableWidget;
+class ToolButton;
+class ToolBar;
 
 /** Tree Table Widget. */
 class TreeTableWidget : public Widget
@@ -50,6 +52,12 @@ public:
     void slotCustomContextMenuRequested(const Point &pos);
     void slotTableSelectionChanged(const ItemSelection &selected,
                                    const ItemSelection &deselected);
+
+    void slotShow();
+    void slotHide();
+    void slotSelectAll();
+    void slotSelectInvert();
+    void slotSelectNone();
 
 private:
     /** Tree Table Column. */
@@ -81,10 +89,17 @@ private:
     Application *app_;
 
     TableWidget *tableWidget_;
-    PushButton *exportButton_;
+
+    ToolButton *showButton_;
+    ToolButton *hideButton_;
+    ToolButton *selectAllButton_;
+    ToolButton *selectInvertButton_;
+    ToolButton *selectNoneButton_;
 
     CheckBox *showOnlyVisibleTreesCheckBox_;
     std::unordered_set<size_t> visibleTreesIdList_;
+
+    PushButton *exportButton_;
 
     Segments segments_;
     QueryFilterSet filter_;
@@ -93,6 +108,9 @@ private:
     bool updatesEnabled_;
 
     std::string fileName_;
+
+    // Ui.
+    ToolBar *createToolBar();
 
     // New data.
     void newData();

@@ -438,6 +438,43 @@ void TableWidget::selectRow(int row, bool notify)
     setSelectedCells(next, notify);
 }
 
+void TableWidget::selectAll()
+{
+    std::set<std::pair<int, int>> cells;
+
+    for (int row = 0; row < rowCount(); ++row)
+    {
+        for (int col = 0; col < columnCount(); ++col)
+        {
+            cells.emplace(row, col);
+        }
+    }
+
+    setSelectedCells(cells);
+}
+
+void TableWidget::invertSelection()
+{
+    const std::set<int> selected = selectedRows();
+
+    std::set<std::pair<int, int>> cells;
+
+    for (int row = 0; row < rowCount(); ++row)
+    {
+        if (selected.count(row) != 0)
+        {
+            continue;
+        }
+
+        for (int col = 0; col < columnCount(); ++col)
+        {
+            cells.emplace(row, col);
+        }
+    }
+
+    setSelectedCells(cells);
+}
+
 std::set<int> TableWidget::selectedRows() const
 {
     std::map<int, int> counts;

@@ -60,10 +60,48 @@ QtViewer::QtViewer(Viewer *viewer, QtApplication *app, QWidget *parent)
     viewer_->updateRequested.connect([this]() { updateScene(); });
     viewer_->resetRequested.connect([this]() { resetScene(); });
     viewer_->resetViewRequested.connect([this]() { resetSceneView(); });
+
+    viewer_->command.connect([this](int value) { command(value); });
 }
 
 QtViewer::~QtViewer()
 {
+}
+
+void QtViewer::command(int cmd)
+{
+    switch (cmd)
+    {
+        case Viewer::ViewOrthographic:
+            setViewOrthographic();
+            break;
+        case Viewer::ViewPerspective:
+            setViewPerspective();
+            break;
+        case Viewer::View2d:
+            setView2d();
+            break;
+        case Viewer::ViewTop:
+            setViewTop();
+            break;
+        case Viewer::ViewFront:
+            setViewFront();
+            break;
+        case Viewer::ViewRight:
+            setViewRight();
+            break;
+        case Viewer::View3d:
+            setView3d();
+            break;
+        case Viewer::ViewResetDistance:
+            setViewResetDistance();
+            break;
+        case Viewer::ViewResetCenter:
+            setViewResetCenter();
+            break;
+        default:
+            break;
+    }
 }
 
 void QtViewer::paintEvent(QPaintEvent *event)

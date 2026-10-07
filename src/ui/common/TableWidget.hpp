@@ -93,6 +93,9 @@ public:
     int selectionBehavior() const { return selectionBehavior_; }
 
     void selectRow(int row, bool notify = false);
+    void selectAll();
+    void invertSelection();
+
     void clearSelection(bool notify = false);
 
     void setSelectedCells(const Selection &cells, bool notify = false);

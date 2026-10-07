@@ -446,6 +446,8 @@ void QtTableWidget::updateSelection()
     }
 
     selectionModel()->select(selection, QItemSelectionModel::ClearAndSelect);
+
+    viewport()->update();
 }
 
 void QtTableWidget::readSelection()

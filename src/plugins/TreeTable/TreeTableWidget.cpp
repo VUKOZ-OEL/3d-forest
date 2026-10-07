@@ -37,6 +37,8 @@
 #include <TreeTableWidget.hpp>
 #include <Util.hpp>
 #include <VBoxLayout.hpp>
+#include <ToolBar.hpp>
+#include <ToolButton.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "TreeTableWidget"
@@ -90,9 +92,33 @@ TreeTableWidget::TreeTableWidget(Application *app) : app_(app)
         [this](ItemSelection selected, ItemSelection deselected)
         { slotTableSelectionChanged(selected, deselected); });
 
+    // Tool bar.
+    ToolBar *toolBar = createToolBar();
+
+    // Main layout.
+    VBoxLayout *mainLayout = new VBoxLayout;
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setSpacing(0);
+    mainLayout->addWidget(tableWidget_, 1);
+    mainLayout->addWidget(toolBar, 0);
+
+    // Widget.
+    setLayout(mainLayout);
+
+    // New data.
+    updatesEnabled_ = true;
+    app_->signalUpdate.connect([this](const Message &msg) { slotUpdate(msg); });
+
+    slotUpdate({});
+}
+
+// -----------------------------------------------------------------------------
+// Ui.
+ToolBar *TreeTableWidget::createToolBar()
+{
     // Options.
     showOnlyVisibleTreesCheckBox_ = new CheckBox;
-    showOnlyVisibleTreesCheckBox_->setText(tr("Show only visible trees"));
+    showOnlyVisibleTreesCheckBox_->setText(tr("Filter Visible"));
     showOnlyVisibleTreesCheckBox_->setChecked(false);
     showOnlyVisibleTreesCheckBox_->stateChanged.connect(
         [this](int val) { slotShowOnlyVisibleTreesChanged(val); });
@@ -103,25 +129,59 @@ TreeTableWidget::TreeTableWidget(Application *app) : app_(app)
     exportButton_->setSizePolicy(SizePolicy::Minimum, SizePolicy::Minimum);
     exportButton_->clicked.connect([this]() { slotExport(); });
 
-    // Buttons layout.
-    HBoxLayout *buttonsLayout = new HBoxLayout;
-    buttonsLayout->addWidget(showOnlyVisibleTreesCheckBox_);
-    buttonsLayout->addStretch();
-    buttonsLayout->addWidget(exportButton_);
+    // Tool bar buttons.
+    app_->createToolButton(&showButton_,
+                           tr("Show"),
+                           tr("Make selected rows visible"),
+                           THEME_ICON("eye"),
+                           [this]() { slotShow(); });
+    showButton_->setEnabled(false);
 
-    // Main layout.
-    VBoxLayout *mainLayout = new VBoxLayout;
-    mainLayout->addWidget(tableWidget_, 1);
-    mainLayout->addLayout(buttonsLayout, 0);
+    app_->createToolButton(&hideButton_,
+                           tr("Hide"),
+                           tr("Hide selected rows"),
+                           THEME_ICON("hide"),
+                           [this]() { slotHide(); });
+    hideButton_->setEnabled(false);
 
-    // Widget.
-    setLayout(mainLayout);
+    app_->createToolButton(&selectAllButton_,
+                           tr("Select all"),
+                           tr("Select all"),
+                           THEME_ICON("select-all"),
+                           [this]() { slotSelectAll(); });
 
-    // New data.
-    updatesEnabled_ = true;
-    app_->signalUpdate.connect([this](const Message &msg) { slotUpdate(msg); });
+    app_->createToolButton(&selectInvertButton_,
+                           tr("Invert"),
+                           tr("Invert selection"),
+                           THEME_ICON("select-invert"),
+                           [this]() { slotSelectInvert(); });
 
-    slotUpdate({});
+    app_->createToolButton(&selectNoneButton_,
+                           tr("Select none"),
+                           tr("Select none"),
+                           THEME_ICON("select-none"),
+                           [this]() { slotSelectNone(); });
+
+    // Tool bar.
+    ToolBar *toolBar = new ToolBar;
+
+    toolBar->setOrientation(Ui::Horizontal);
+
+    toolBar->addWidget(showButton_);
+    toolBar->addWidget(hideButton_);
+    toolBar->addSeparator();
+    toolBar->addWidget(selectAllButton_);
+    toolBar->addWidget(selectInvertButton_);
+    toolBar->addWidget(selectNoneButton_);
+    toolBar->addSeparator();
+    toolBar->addWidget(exportButton_);
+    toolBar->addSeparator();
+    toolBar->addWidget(showOnlyVisibleTreesCheckBox_);
+
+    int size = Application::ICON_SIZE;
+    toolBar->setIconSize(Size(size, size));
+
+    return toolBar;
 }
 
 // -----------------------------------------------------------------------------
@@ -244,6 +304,37 @@ FileFormatTable TreeTableWidget::createExportTable() const
 
 // -----------------------------------------------------------------------------
 // Slots.
+
+void TreeTableWidget::slotShow()
+{
+    std::unordered_set<size_t> idList = selectedRowsToIds();
+    TreeTableAction::showTrees(app_, idList);
+    app_->update(this, Message::TYPE_SEGMENT, Page::STATE_READ);
+    updateTableContent();
+}
+
+void TreeTableWidget::slotHide()
+{
+    std::unordered_set<size_t> idList = selectedRowsToIds();
+    TreeTableAction::hideTrees(app_, idList);
+    app_->update(this, Message::TYPE_SEGMENT, Page::STATE_READ);
+    updateTableContent();
+}
+
+void TreeTableWidget::slotSelectAll()
+{
+    tableWidget_->selectAll();
+}
+
+void TreeTableWidget::slotSelectInvert()
+{
+    tableWidget_->invertSelection();
+}
+
+void TreeTableWidget::slotSelectNone()
+{
+    tableWidget_->clearSelection();
+}
 
 void TreeTableWidget::slotShowOnlyVisibleTreesChanged(int index)
 {

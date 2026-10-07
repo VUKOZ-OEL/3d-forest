@@ -170,7 +170,8 @@ void QtToolBar::updateSettings()
     // After applying orientation and icon size:
     if (QLayout *toolbarLayout = QToolBar::layout())
     {
-        toolbarLayout->setContentsMargins(0, 0, 0, 0);
+    const int margin = orientation() == Qt::Horizontal ? 2 : 0;
+    toolbarLayout->setContentsMargins(margin, margin, margin, margin);
     }
 
     updateGeometry();

@@ -66,13 +66,14 @@ public:
     void setViewOrthographic();
     void setViewPerspective();
     void setView2d();
-
     void setViewTop();
     void setViewFront();
     void setViewRight();
     void setView3d();
     void setViewResetDistance();
     void setViewResetCenter();
+
+    void command(int cmd);
 
 protected:
     void paintEvent(QPaintEvent *event) override;

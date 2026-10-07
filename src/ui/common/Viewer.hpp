@@ -35,6 +35,19 @@ class Application;
 class EXPORT_UI_COMMON Viewer : public Widget
 {
 public:
+    enum Command
+    {
+        ViewOrthographic,
+        ViewPerspective,
+        View2d,
+        ViewTop,
+        ViewFront,
+        ViewRight,
+        View3d,
+        ViewResetDistance,
+        ViewResetCenter
+    };
+
     Viewer();
     virtual ~Viewer();
 
@@ -45,17 +58,7 @@ public:
     void requestReset();
     void requestResetView();
 
-    void setViewOrthographic();
-    void setViewPerspective();
-    void setView2d();
-
-    void setViewTop();
-    void setViewFront();
-    void setViewRight();
-    void setView3d();
-
-    void setViewResetDistance();
-    void setViewResetCenter();
+    Signal<int> command;
 
     Signal<> updateRequested;
     Signal<> resetRequested;

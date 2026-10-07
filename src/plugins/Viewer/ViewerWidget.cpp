@@ -178,59 +178,60 @@ void ViewerWidget::resetSceneView()
 
 void ViewerWidget::slotViewOrthographic()
 {
-    viewer_->setViewOrthographic();
+    viewer_->command(Viewer::ViewOrthographic);
     updateViewer();
 }
 
 void ViewerWidget::slotViewPerspective()
 {
-    viewer_->setViewPerspective();
+    viewer_->command(Viewer::ViewPerspective);
     updateViewer();
 }
 
 void ViewerWidget::slotView2d()
 {
-    viewer_->setView2d();
+    viewer_->command(Viewer::View2d);
     updateViewer();
 }
 
 void ViewerWidget::slotViewTop()
 {
-    viewer_->setViewTop();
+    viewer_->command(Viewer::ViewTop);
     updateViewer();
 }
 
 void ViewerWidget::slotViewFront()
 {
-    viewer_->setViewFront();
+    viewer_->command(Viewer::ViewFront);
     updateViewer();
 }
 
 void ViewerWidget::slotViewRight()
 {
-    viewer_->setViewRight();
+    viewer_->command(Viewer::ViewRight);
     updateViewer();
 }
 
 void ViewerWidget::slotView3d()
 {
-    viewer_->setView3d();
+    viewer_->command(Viewer::View3d);
     updateViewer();
 }
 
 void ViewerWidget::slotViewResetDistance()
 {
-    viewer_->setViewResetDistance();
+    viewer_->command(Viewer::ViewResetDistance);
     updateViewer();
 }
 
 void ViewerWidget::slotViewResetCenter()
 {
-    viewer_->setViewResetCenter();
+    viewer_->command(Viewer::ViewResetCenter);
     updateViewer();
 }
 
 void ViewerWidget::updateViewer()
 {
-    updateScene();
+    //updateScene();
+    app_->slotRenderViewports();
 }
