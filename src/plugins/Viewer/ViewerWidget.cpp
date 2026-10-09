@@ -232,6 +232,6 @@ void ViewerWidget::slotViewResetCenter()
 
 void ViewerWidget::updateViewer()
 {
-    //updateScene();
+    // updateScene();
     app_->slotRenderViewports();
 }

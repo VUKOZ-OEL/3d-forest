@@ -36,6 +36,8 @@ public:
     ComboBox();
     virtual ~ComboBox();
 
+    void clear(bool notify = false);
+
     void addItem(const std::string &str);
 
     int count() const { return static_cast<int>(items_.size()); }
@@ -49,6 +51,7 @@ public:
 
     Signal<int> currentIndexChanged;
     Signal<const std::string &> itemAdded;
+    Signal<> itemsCleared;
 
     Signal<int> activated;
 

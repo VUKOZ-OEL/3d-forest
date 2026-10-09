@@ -30,6 +30,7 @@
 #include <Widget.hpp>
 class Application;
 class CheckBox;
+class ComboBox;
 class PushButton;
 class TableWidget;
 class ToolButton;
@@ -47,17 +48,19 @@ public:
 
     void slotUpdate(const Message &msg);
 
-    void slotShowOnlyVisibleTreesChanged(int index);
-    void slotExport();
-    void slotCustomContextMenuRequested(const Point &pos);
-    void slotTableSelectionChanged(const ItemSelection &selected,
-                                   const ItemSelection &deselected);
-
     void slotShow();
     void slotHide();
     void slotSelectAll();
     void slotSelectInvert();
     void slotSelectNone();
+    void slotReadQsm();
+    void slotDeleteQsm();
+    void slotSpeciesChanged(int index);
+    void slotManagementStatusChanged(int index);
+    void slotExport();
+    void slotShowOnlyVisibleTreesChanged(int index);
+    void slotTableSelectionChanged(const ItemSelection &selected,
+                                   const ItemSelection &deselected);
 
 private:
     /** Tree Table Column. */
@@ -95,6 +98,11 @@ private:
     ToolButton *selectAllButton_;
     ToolButton *selectInvertButton_;
     ToolButton *selectNoneButton_;
+    ToolButton *readQsmButton_;
+    ToolButton *deleteQsmButton_;
+
+    ComboBox *speciesComboBox_;
+    ComboBox *managementStatusComboBox_;
 
     CheckBox *showOnlyVisibleTreesCheckBox_;
     std::unordered_set<size_t> visibleTreesIdList_;
@@ -109,9 +117,6 @@ private:
 
     std::string fileName_;
 
-    // Ui.
-    ToolBar *createToolBar();
-
     // New data.
     void newData();
     void newFilter();
@@ -124,7 +129,12 @@ private:
     void block();
     void unblock();
 
-    // Set table data.
+    // Tool bar.
+    ToolBar *createToolBar();
+    void updateToolBar();
+
+    // Table.
+    TableWidget *createTable();
     void updateTableContent();
     void setRow(int row, size_t index);
     void setCell(int row,

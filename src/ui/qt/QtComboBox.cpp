@@ -23,6 +23,7 @@
 #include <QtComboBox.hpp>
 
 // Include Qt.
+#include <QPointer>
 #include <QSignalBlocker>
 
 // Include local.
@@ -44,6 +45,8 @@ QtComboBox::QtComboBox(ComboBox *comboBox, QWidget *parent)
                      qOverload<int>(&QComboBox::activated),
                      [this](int index) { comboBox_->setValue(index, true); });
 
+    const QPointer<QtComboBox> guard(this);
+
     comboBox_->currentIndexChanged.connect(
         [this](int index)
         {
@@ -59,5 +62,17 @@ QtComboBox::QtComboBox(ComboBox *comboBox, QWidget *parent)
             QComboBox::addItem(QString::fromStdString(text));
 
             QComboBox::setCurrentIndex(comboBox_->currentIndex());
+        });
+
+    comboBox->itemsCleared.connect(
+        [guard]()
+        {
+            if (!guard)
+            {
+                return;
+            }
+
+            const QSignalBlocker blocker(guard.data());
+            guard->QComboBox::clear();
         });
 }

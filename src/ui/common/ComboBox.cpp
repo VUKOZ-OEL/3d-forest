@@ -38,6 +38,27 @@ ComboBox::~ComboBox()
 {
 }
 
+void ComboBox::clear(bool notify)
+{
+    if (items_.empty() && value_ == -1)
+    {
+        return;
+    }
+
+    const bool indexChanged = value_ != -1;
+
+    items_.clear();
+    value_ = -1;
+
+    // Always synchronize the UI.
+    itemsCleared();
+
+    if (notify && indexChanged && !signalsBlocked())
+    {
+        currentIndexChanged(-1);
+    }
+}
+
 void ComboBox::addItem(const std::string &str)
 {
     items_.push_back(str);

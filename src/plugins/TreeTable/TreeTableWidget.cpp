@@ -22,6 +22,7 @@
 // Include 3D Forest.
 #include <Application.hpp>
 #include <CheckBox.hpp>
+#include <ComboBox.hpp>
 #include <FileFormatCsv.hpp>
 #include <FindVisibleObjects.hpp>
 #include <HBoxLayout.hpp>
@@ -30,15 +31,13 @@
 #include <PushButton.hpp>
 #include <TableWidget.hpp>
 #include <ThemeIcon.hpp>
+#include <ToolBar.hpp>
+#include <ToolButton.hpp>
 #include <TreeTableAction.hpp>
 #include <TreeTableExportDialog.hpp>
-#include <TreeTableSetManagementStatus.hpp>
-#include <TreeTableSetSpecies.hpp>
 #include <TreeTableWidget.hpp>
 #include <Util.hpp>
 #include <VBoxLayout.hpp>
-#include <ToolBar.hpp>
-#include <ToolButton.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "TreeTableWidget"
@@ -52,45 +51,7 @@ TreeTableWidget::TreeTableWidget(Application *app) : app_(app)
     LOG_DEBUG(<< "Create.");
 
     // Table widget.
-    tableWidget_ = new TableWidget();
-
-    tableWidget_->setRowCount(0);
-    tableWidget_->setColumnCount(2);
-
-    tableWidget_->setSizePolicy(SizePolicy::Expanding, SizePolicy::Expanding);
-    /*
-        tableWidget_->setStyleSheet("QHeaderView::section {"
-                                    "background-color: lightblue;"
-                                    "color: black;"
-                                    "padding: 5px;"
-                                    "}"
-                                    "QTableWidget::item:selected {"
-                                    "  background-color: #3399FF;"
-                                    "  color: white;"
-                                    "}");
-    */
-    // Table: enable alternating row colors
-    tableWidget_->setAlternatingRowColors(true);
-
-    Palette palette = tableWidget_->palette();
-    palette.setColor(Palette::AlternateBase, Color(240, 240, 240));
-    palette.setColor(Palette::Base, Ui::white);
-    tableWidget_->setPalette(palette);
-
-    // Table: Context menu.
-    tableWidget_->setContextMenuPolicy(Ui::CustomContextMenu);
-
-    // Table: Selection.
-    tableWidget_->setSelectionBehavior(AbstractItemView::SelectRows);
-    tableWidget_->setSelectionMode(AbstractItemView::ExtendedSelection);
-
-    // Table: Signals.
-    tableWidget_->customContextMenuRequested.connect(
-        [this](Point pos) { slotCustomContextMenuRequested(pos); });
-
-    tableWidget_->selectionChanged.connect(
-        [this](ItemSelection selected, ItemSelection deselected)
-        { slotTableSelectionChanged(selected, deselected); });
+    tableWidget_ = createTable();
 
     // Tool bar.
     ToolBar *toolBar = createToolBar();
@@ -113,7 +74,230 @@ TreeTableWidget::TreeTableWidget(Application *app) : app_(app)
 }
 
 // -----------------------------------------------------------------------------
-// Ui.
+// New data.
+
+void TreeTableWidget::slotUpdate(const Message &msg)
+{
+    if (msg.sender() == this)
+    {
+        return;
+    }
+
+    if (msg.empty() || msg.contains(Message::TYPE_SEGMENT) ||
+        msg.contains(Message::TYPE_SETTINGS))
+    {
+        LOG_DEBUG_UPDATE(<< "Input data.");
+        newData();
+    }
+
+    if (msg.contains(Message::TYPE_FILTER))
+    {
+        LOG_DEBUG_UPDATE(<< "Input filter.");
+        newFilter();
+    }
+}
+
+void TreeTableWidget::newData()
+{
+    LOG_DEBUG(<< "New data.");
+
+    segments_ = app_->editor().segments();
+    filter_ = app_->editor().segmentsFilter();
+
+    speciesList_ = app_->editor().speciesList();
+    managementStatusList_ = app_->editor().managementStatusList();
+
+    updateToolBar();
+    updateTableContent();
+}
+
+void TreeTableWidget::newFilter()
+{
+    LOG_DEBUG(<< "New filter.");
+
+    if (showOnlyVisibleTreesCheckBox_->isChecked())
+    {
+        FindVisibleObjects::run(visibleTreesIdList_, app_);
+        updateTableContent();
+    }
+    else if (!visibleTreesIdList_.empty())
+    {
+        visibleTreesIdList_.clear();
+        updateTableContent();
+    }
+}
+
+// -----------------------------------------------------------------------------
+// Slots.
+
+void TreeTableWidget::slotShow()
+{
+    std::unordered_set<size_t> idList = selectedRowsToIds();
+    TreeTableAction::showTrees(app_, idList);
+    app_->update(this, Message::TYPE_SEGMENT, Page::STATE_READ);
+    updateTableContent();
+}
+
+void TreeTableWidget::slotHide()
+{
+    std::unordered_set<size_t> idList = selectedRowsToIds();
+    TreeTableAction::hideTrees(app_, idList);
+    app_->update(this, Message::TYPE_SEGMENT, Page::STATE_READ);
+    updateTableContent();
+}
+
+void TreeTableWidget::slotSelectAll()
+{
+    tableWidget_->selectAll();
+}
+
+void TreeTableWidget::slotSelectInvert()
+{
+    tableWidget_->invertSelection();
+}
+
+void TreeTableWidget::slotSelectNone()
+{
+    tableWidget_->clearSelection();
+}
+
+void TreeTableWidget::slotReadQsm()
+{
+    LOG_DEBUG(<< "ReadQsm.");
+
+    try
+    {
+        std::unordered_set<size_t> idList = selectedRowsToIds();
+        TreeTableAction::readMesh(app_, idList, "qsm");
+        app_->update(this, Message::TYPE_SEGMENT, Page::STATE_READ);
+    }
+    catch (std::exception &e)
+    {
+        app_->showError(e.what());
+    }
+}
+
+void TreeTableWidget::slotDeleteQsm()
+{
+    LOG_DEBUG(<< "DeleteQsm.");
+    std::unordered_set<size_t> idList = selectedRowsToIds();
+    TreeTableAction::deleteMesh(app_, idList, "qsm");
+    app_->update(this, Message::TYPE_SEGMENT, Page::STATE_READ);
+}
+
+void TreeTableWidget::slotSpeciesChanged(int index)
+{
+    LOG_DEBUG(<< "SpeciesChanged <" << index << ">.");
+    std::unordered_set<size_t> idList = selectedRowsToIds();
+    TreeTableAction::setSpecies(app_, idList, index);
+}
+
+void TreeTableWidget::slotManagementStatusChanged(int index)
+{
+    LOG_DEBUG(<< "ManagementStatusChanged <" << index << ">.");
+    std::unordered_set<size_t> idList = selectedRowsToIds();
+    TreeTableAction::setManagementStatus(app_, idList, index);
+}
+
+void TreeTableWidget::slotExport()
+{
+    LOG_DEBUG(<< "Start exporting tree table.");
+
+    try
+    {
+        TreeTableExportDialog dialog(app_, fileName_);
+
+        if (dialog.exec() == Dialog::Accepted)
+        {
+            // Create a writer based on filename extension.
+            std::shared_ptr<FileFormatInterface> writer = dialog.writer();
+
+            // Write table data by using the writer.
+            writer->create(createExportTable());
+
+            // Remember the last file name used for export.
+            fileName_ = writer->fileName();
+        }
+    }
+    catch (std::exception &e)
+    {
+        std::string msg("Export failed: ");
+        msg += e.what();
+        app_->showError(msg.c_str());
+    }
+    catch (...)
+    {
+        app_->showError("Export failed: Unknown error");
+    }
+
+    LOG_DEBUG(<< "Finished exporting tree table.");
+}
+
+void TreeTableWidget::slotShowOnlyVisibleTreesChanged(int index)
+{
+    (void)index;
+
+    if (showOnlyVisibleTreesCheckBox_->isChecked())
+    {
+        FindVisibleObjects::run(visibleTreesIdList_, app_);
+    }
+    else
+    {
+        visibleTreesIdList_.clear();
+    }
+
+    updateTableContent();
+}
+
+void TreeTableWidget::slotTableSelectionChanged(const ItemSelection &selected,
+                                                const ItemSelection &deselected)
+{
+    LOG_DEBUG(<< "Selection changed.");
+    (void)selected;
+    (void)deselected;
+
+    std::unordered_set<size_t> selectedIds = selectedRowsToIds();
+
+    LOG_DEBUG(<< "Selected ids <" << selectedIds << ">.");
+
+    if (segments_.updateSelection(selectedIds))
+    {
+        LOG_DEBUG(<< "Apply new selection to editor.");
+        app_->suspendThreads();
+        app_->editor().setSegments(segments_);
+        app_->update(this, Message::TYPE_SEGMENT, Page::STATE_RENDER);
+    }
+}
+
+void TreeTableWidget::closeWidget()
+{
+    LOG_DEBUG(<< "Close widget.");
+
+    if (showOnlyVisibleTreesCheckBox_->isChecked())
+    {
+        showOnlyVisibleTreesCheckBox_->setChecked(false);
+        visibleTreesIdList_.clear();
+    }
+}
+
+// -----------------------------------------------------------------------------
+// Setup and manage signals.
+
+void TreeTableWidget::block()
+{
+    (void)tableWidget_->blockSignals(true);
+    (void)blockSignals(true);
+}
+
+void TreeTableWidget::unblock()
+{
+    (void)blockSignals(false);
+    (void)tableWidget_->blockSignals(false);
+}
+
+// -----------------------------------------------------------------------------
+// Tool bar.
+
 ToolBar *TreeTableWidget::createToolBar()
 {
     // Options.
@@ -162,6 +346,29 @@ ToolBar *TreeTableWidget::createToolBar()
                            THEME_ICON("select-none"),
                            [this]() { slotSelectNone(); });
 
+    app_->createToolButton(&readQsmButton_,
+                           tr("QSM"),
+                           tr("Read QSM"),
+                           THEME_ICON("add"),
+                           [this]() { slotReadQsm(); });
+    readQsmButton_->setToolButtonStyle(ToolButton::TextBesideIcon);
+
+    app_->createToolButton(&deleteQsmButton_,
+                           tr("QSM"),
+                           tr("Delete QSM"),
+                           THEME_ICON("remove"),
+                           [this]() { slotDeleteQsm(); });
+    deleteQsmButton_->setToolButtonStyle(ToolButton::TextBesideIcon);
+
+    // Combo.
+    speciesComboBox_ = new ComboBox;
+    speciesComboBox_->activated.connect([this](int value)
+                                        { slotSpeciesChanged(value); });
+
+    managementStatusComboBox_ = new ComboBox;
+    managementStatusComboBox_->activated.connect(
+        [this](int value) { slotManagementStatusChanged(value); });
+
     // Tool bar.
     ToolBar *toolBar = new ToolBar;
 
@@ -174,6 +381,10 @@ ToolBar *TreeTableWidget::createToolBar()
     toolBar->addWidget(selectInvertButton_);
     toolBar->addWidget(selectNoneButton_);
     toolBar->addSeparator();
+    toolBar->addWidget(readQsmButton_);
+    toolBar->addWidget(deleteQsmButton_);
+    toolBar->addWidget(speciesComboBox_);
+    toolBar->addWidget(managementStatusComboBox_);
     toolBar->addWidget(exportButton_);
     toolBar->addSeparator();
     toolBar->addWidget(showOnlyVisibleTreesCheckBox_);
@@ -184,320 +395,48 @@ ToolBar *TreeTableWidget::createToolBar()
     return toolBar;
 }
 
-// -----------------------------------------------------------------------------
-// New data.
-
-void TreeTableWidget::slotUpdate(const Message &msg)
+void TreeTableWidget::updateToolBar()
 {
-    if (msg.sender() == this)
+    // Species
+    speciesComboBox_->clear();
+    for (size_t i = 0; i < speciesList_.size(); i++)
     {
-        return;
+        const Species &species = speciesList_[i];
+        std::string text = toString(species.id) + " : " + species.latin;
+        speciesComboBox_->addItem(text);
     }
 
-    if (msg.empty() || msg.contains(Message::TYPE_SEGMENT) ||
-        msg.contains(Message::TYPE_SETTINGS))
+    // ManagementStatus
+    managementStatusComboBox_->clear();
+    for (size_t i = 0; i < managementStatusList_.size(); i++)
     {
-        LOG_DEBUG_UPDATE(<< "Input data.");
-        newData();
-    }
-
-    if (msg.contains(Message::TYPE_FILTER))
-    {
-        LOG_DEBUG_UPDATE(<< "Input filter.");
-        newFilter();
-    }
-}
-
-void TreeTableWidget::newData()
-{
-    LOG_DEBUG(<< "New data.");
-
-    segments_ = app_->editor().segments();
-    filter_ = app_->editor().segmentsFilter();
-
-    speciesList_ = app_->editor().speciesList();
-    managementStatusList_ = app_->editor().managementStatusList();
-
-    updateTableContent();
-}
-
-void TreeTableWidget::newFilter()
-{
-    LOG_DEBUG(<< "New filter.");
-
-    if (showOnlyVisibleTreesCheckBox_->isChecked())
-    {
-        FindVisibleObjects::run(visibleTreesIdList_, app_);
-        updateTableContent();
-    }
-    else if (!visibleTreesIdList_.empty())
-    {
-        visibleTreesIdList_.clear();
-        updateTableContent();
+        const ManagementStatus &status = managementStatusList_[i];
+        std::string text = toString(status.id) + " : " + status.label;
+        managementStatusComboBox_->addItem(text);
     }
 }
 
 // -----------------------------------------------------------------------------
-// Helpers.
-std::unordered_set<size_t> TreeTableWidget::selectedRowsToIds()
+// Table.
+
+TableWidget *TreeTableWidget::createTable()
 {
-    std::set<int> selectedRows = tableWidget_->selectedRows();
+    TableWidget *tableWidget = new TableWidget();
 
-    std::unordered_set<size_t> idList;
-    for (int row : selectedRows)
-    {
-        TableWidgetItem *itemId = tableWidget_->item(row, COLUMN_ID);
-        if (!itemId)
-        {
-            LOG_ERROR(<< "Failed to get table item ID at row <" << row << ">.");
-            continue;
-        }
+    tableWidget->setRowCount(0);
+    tableWidget->setColumnCount(2);
 
-        idList.insert(toSize(itemId->text()));
-    }
+    tableWidget->setSizePolicy(SizePolicy::Expanding, SizePolicy::Expanding);
 
-    return idList;
+    tableWidget->setSelectionBehavior(AbstractItemView::SelectRows);
+    tableWidget->setSelectionMode(AbstractItemView::ExtendedSelection);
+
+    tableWidget->selectionChanged.connect(
+        [this](ItemSelection selected, ItemSelection deselected)
+        { slotTableSelectionChanged(selected, deselected); });
+
+    return tableWidget;
 }
-
-FileFormatTable TreeTableWidget::createExportTable() const
-{
-    FileFormatTable table;
-
-    int colCount = tableWidget_->columnCount();
-    int rowCount = tableWidget_->rowCount();
-
-    if (colCount < 1 || rowCount < 1)
-    {
-        return table;
-    }
-
-    table.columns.resize(static_cast<size_t>(colCount));
-
-    for (int col = 0; col < colCount; ++col)
-    {
-        size_t c = static_cast<size_t>(col);
-        TableWidgetItem *item = tableWidget_->horizontalHeaderItem(col);
-        if (item)
-        {
-            table.columns[c].header = item->text();
-        }
-
-        table.columns[c].cells.resize(static_cast<size_t>(rowCount));
-    }
-
-    for (int col = 0; col < colCount; ++col)
-    {
-        size_t c = static_cast<size_t>(col);
-        for (int row = 0; row < rowCount; ++row)
-        {
-            size_t r = static_cast<size_t>(row);
-            TableWidgetItem *item = tableWidget_->item(row, col);
-            if (item)
-            {
-                table.columns[c].cells[r].text = item->text();
-            }
-        }
-    }
-
-    return table;
-}
-
-// -----------------------------------------------------------------------------
-// Slots.
-
-void TreeTableWidget::slotShow()
-{
-    std::unordered_set<size_t> idList = selectedRowsToIds();
-    TreeTableAction::showTrees(app_, idList);
-    app_->update(this, Message::TYPE_SEGMENT, Page::STATE_READ);
-    updateTableContent();
-}
-
-void TreeTableWidget::slotHide()
-{
-    std::unordered_set<size_t> idList = selectedRowsToIds();
-    TreeTableAction::hideTrees(app_, idList);
-    app_->update(this, Message::TYPE_SEGMENT, Page::STATE_READ);
-    updateTableContent();
-}
-
-void TreeTableWidget::slotSelectAll()
-{
-    tableWidget_->selectAll();
-}
-
-void TreeTableWidget::slotSelectInvert()
-{
-    tableWidget_->invertSelection();
-}
-
-void TreeTableWidget::slotSelectNone()
-{
-    tableWidget_->clearSelection();
-}
-
-void TreeTableWidget::slotShowOnlyVisibleTreesChanged(int index)
-{
-    (void)index;
-
-    if (showOnlyVisibleTreesCheckBox_->isChecked())
-    {
-        FindVisibleObjects::run(visibleTreesIdList_, app_);
-    }
-    else
-    {
-        visibleTreesIdList_.clear();
-    }
-
-    updateTableContent();
-}
-
-void TreeTableWidget::slotTableSelectionChanged(const ItemSelection &selected,
-                                                const ItemSelection &deselected)
-{
-    LOG_DEBUG(<< "Selection changed.");
-    (void)selected;
-    (void)deselected;
-
-    std::unordered_set<size_t> selectedIds = selectedRowsToIds();
-
-    LOG_DEBUG(<< "Selected ids <" << selectedIds << ">.");
-
-    if (segments_.updateSelection(selectedIds))
-    {
-        LOG_DEBUG(<< "Apply new selection to editor.");
-        app_->suspendThreads();
-        app_->editor().setSegments(segments_);
-        app_->update(this, Message::TYPE_SEGMENT, Page::STATE_RENDER);
-    }
-}
-
-void TreeTableWidget::slotExport()
-{
-    LOG_DEBUG(<< "Start exporting tree table.");
-
-    try
-    {
-        TreeTableExportDialog dialog(app_, fileName_);
-
-        if (dialog.exec() == Dialog::Accepted)
-        {
-            // Create a writer based on filename extension.
-            std::shared_ptr<FileFormatInterface> writer = dialog.writer();
-
-            // Write table data by using the writer.
-            writer->create(createExportTable());
-
-            // Remember the last file name used for export.
-            fileName_ = writer->fileName();
-        }
-    }
-    catch (std::exception &e)
-    {
-        std::string msg("Export failed: ");
-        msg += e.what();
-        app_->showError(msg.c_str());
-    }
-    catch (...)
-    {
-        app_->showError("Export failed: Unknown error");
-    }
-
-    LOG_DEBUG(<< "Finished exporting tree table.");
-}
-
-void TreeTableWidget::slotCustomContextMenuRequested(const Point &pos)
-{
-    ModelIndex index = tableWidget_->indexAt(pos);
-    if (!index.isValid())
-    {
-        return;
-    }
-
-    LOG_DEBUG(<< "Row <" << index.row() << "> column <" << index.column()
-              << ">.");
-
-    app_->suspendThreads();
-
-    // Create and run the context menu.
-    Menu contextMenu(app_);
-
-    TreeTableSetManagementStatus managementStatusMenu(app_, &contextMenu);
-    TreeTableSetSpecies speciesMenu(app_, &contextMenu);
-    Action *showTreesAction = contextMenu.addAction("Show selected trees");
-    Action *hideTreesAction = contextMenu.addAction("Hide selected trees");
-    Action *readQsmAction = contextMenu.addAction("Read QSM mesh");
-    Action *deleteQsmAction = contextMenu.addAction("Delete QSM mesh");
-
-    Action *selectedAction =
-        contextMenu.exec(tableWidget_->viewport()->mapToGlobal(pos));
-
-    // Selected rows to id list.
-    std::unordered_set<size_t> idList = selectedRowsToIds();
-
-    // Run selected action.
-    managementStatusMenu.runAction(selectedAction, idList);
-    speciesMenu.runAction(selectedAction, idList);
-
-    if (selectedAction == showTreesAction)
-    {
-        TreeTableAction::showTrees(app_, idList);
-        app_->update(this, Message::TYPE_SEGMENT, Page::STATE_READ);
-        updateTableContent();
-    }
-    else if (selectedAction == hideTreesAction)
-    {
-        TreeTableAction::hideTrees(app_, idList);
-        app_->update(this, Message::TYPE_SEGMENT, Page::STATE_READ);
-        updateTableContent();
-    }
-    else if (selectedAction == readQsmAction)
-    {
-        try
-        {
-            TreeTableAction::readMesh(app_, idList, "qsm");
-            app_->update(this, Message::TYPE_SEGMENT, Page::STATE_READ);
-        }
-        catch (std::exception &e)
-        {
-            app_->showError(e.what());
-        }
-    }
-    else if (selectedAction == deleteQsmAction)
-    {
-        TreeTableAction::deleteMesh(app_, idList, "qsm");
-        app_->update(this, Message::TYPE_SEGMENT, Page::STATE_READ);
-    }
-}
-
-void TreeTableWidget::closeWidget()
-{
-    LOG_DEBUG(<< "Close widget.");
-
-    if (showOnlyVisibleTreesCheckBox_->isChecked())
-    {
-        showOnlyVisibleTreesCheckBox_->setChecked(false);
-        visibleTreesIdList_.clear();
-    }
-}
-
-// -----------------------------------------------------------------------------
-// Setup and manage signals.
-
-void TreeTableWidget::block()
-{
-    (void)tableWidget_->blockSignals(true);
-    (void)blockSignals(true);
-}
-
-void TreeTableWidget::unblock()
-{
-    (void)blockSignals(false);
-    (void)tableWidget_->blockSignals(false);
-}
-
-// -----------------------------------------------------------------------------
-// Set table data.
 
 void TreeTableWidget::updateTableContent()
 {
@@ -699,4 +638,70 @@ void TreeTableWidget::setCell(int row,
     }
 
     tableWidget_->setItem(row, col, item);
+}
+
+// -----------------------------------------------------------------------------
+// Helpers.
+
+std::unordered_set<size_t> TreeTableWidget::selectedRowsToIds()
+{
+    std::set<int> selectedRows = tableWidget_->selectedRows();
+
+    std::unordered_set<size_t> idList;
+    for (int row : selectedRows)
+    {
+        TableWidgetItem *itemId = tableWidget_->item(row, COLUMN_ID);
+        if (!itemId)
+        {
+            LOG_ERROR(<< "Failed to get table item ID at row <" << row << ">.");
+            continue;
+        }
+
+        idList.insert(toSize(itemId->text()));
+    }
+
+    return idList;
+}
+
+FileFormatTable TreeTableWidget::createExportTable() const
+{
+    FileFormatTable table;
+
+    int colCount = tableWidget_->columnCount();
+    int rowCount = tableWidget_->rowCount();
+
+    if (colCount < 1 || rowCount < 1)
+    {
+        return table;
+    }
+
+    table.columns.resize(static_cast<size_t>(colCount));
+
+    for (int col = 0; col < colCount; ++col)
+    {
+        size_t c = static_cast<size_t>(col);
+        TableWidgetItem *item = tableWidget_->horizontalHeaderItem(col);
+        if (item)
+        {
+            table.columns[c].header = item->text();
+        }
+
+        table.columns[c].cells.resize(static_cast<size_t>(rowCount));
+    }
+
+    for (int col = 0; col < colCount; ++col)
+    {
+        size_t c = static_cast<size_t>(col);
+        for (int row = 0; row < rowCount; ++row)
+        {
+            size_t r = static_cast<size_t>(row);
+            TableWidgetItem *item = tableWidget_->item(row, col);
+            if (item)
+            {
+                table.columns[c].cells[r].text = item->text();
+            }
+        }
+    }
+
+    return table;
 }

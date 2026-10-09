@@ -17,7 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file TreeTableSetManagementStatus.hpp */
+/** @file TreeTableAction.hpp */
 
 #ifndef TREE_TABLE_ACTIONTUS_HPP
 #define TREE_TABLE_ACTIONTUS_HPP
@@ -44,6 +44,14 @@ public:
     static void deleteMesh(Application *app,
                            const std::unordered_set<size_t> &idList,
                            const std::string &meshName);
+
+    static void setSpecies(Application *app,
+                           const std::unordered_set<size_t> &idList,
+                           int value);
+
+    static void setManagementStatus(Application *app,
+                                    const std::unordered_set<size_t> &idList,
+                                    int value);
 };
 
 #endif /* TREE_TABLE_ACTION_HPP */

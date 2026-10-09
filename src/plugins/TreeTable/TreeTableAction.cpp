@@ -146,3 +146,55 @@ void TreeTableAction::deleteMesh(Application *app,
 
     LOG_DEBUG(<< "Finished delete mesh");
 }
+
+void TreeTableAction::setSpecies(Application *app,
+                                 const std::unordered_set<size_t> &idList,
+                                 int value)
+{
+    LOG_DEBUG(<< "Start setting species values.");
+
+    size_t newSpeciesId = static_cast<size_t>(value);
+    Editor *editor = &app->editor();
+    Segments segments = editor->segments();
+    for (const auto &id : idList)
+    {
+        size_t index = segments.index(id, false);
+
+        if (index != SIZE_MAX)
+        {
+            segments[index].speciesId = newSpeciesId;
+        }
+    }
+
+    editor->setSegments(segments);
+    app->update(nullptr, Message::TYPE_SEGMENT | Message::TYPE_SPECIES);
+
+    LOG_DEBUG(<< "Finished setting species values.");
+}
+
+void TreeTableAction::setManagementStatus(
+    Application *app,
+    const std::unordered_set<size_t> &idList,
+    int value)
+{
+    LOG_DEBUG(<< "Start setting management status values.");
+
+    size_t newManagementStatusId = static_cast<size_t>(value);
+    Editor *editor = &app->editor();
+    Segments segments = editor->segments();
+    for (const auto &id : idList)
+    {
+        size_t index = segments.index(id, false);
+
+        if (index != SIZE_MAX)
+        {
+            segments[index].managementStatusId = newManagementStatusId;
+        }
+    }
+
+    editor->setSegments(segments);
+    app->update(nullptr,
+                Message::TYPE_SEGMENT | Message::TYPE_MANAGEMENT_STATUS);
+
+    LOG_DEBUG(<< "Finished setting management status values.");
+}

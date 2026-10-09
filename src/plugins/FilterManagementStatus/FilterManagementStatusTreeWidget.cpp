@@ -29,7 +29,7 @@
 
 // Include local.
 #define LOG_MODULE_NAME "FilterManagementStatusTreeWidget"
-// #define LOG_MODULE_DEBUG_ENABLED 1
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 FilterManagementStatusTreeWidget::FilterManagementStatusTreeWidget(
@@ -88,8 +88,8 @@ void FilterManagementStatusTreeWidget::createCheckBoxList()
         checkbox->setChecked(false);
         // auto label = core().translate(statusMap_[i].label);
         checkbox->setText(statusMap_[i].label);
-        checkbox->clicked.connect([this, checkbox](bool val)
-                                  { slotSetCheckbox(val, checkbox); });
+        checkbox->stateChanged.connect([this, checkbox](bool value)
+                                       { slotSetCheckbox(value, checkbox); });
 
         checkboxList_[i] = checkbox;
     }
