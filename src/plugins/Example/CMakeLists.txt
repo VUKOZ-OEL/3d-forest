@@ -23,7 +23,6 @@ add_library(
     ${SUB_PROJECT_NAME}
     SHARED
     ${SOURCES}
-#    resources/resources.qrc
 )
 
 target_include_directories(

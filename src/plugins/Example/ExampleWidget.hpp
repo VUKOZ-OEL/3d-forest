@@ -22,11 +22,8 @@
 #ifndef EXAMPLE_WIDGET_HPP
 #define EXAMPLE_WIDGET_HPP
 
-// Include std.
-
 // Include 3D Forest.
 #include <Widget.hpp>
-class Application;
 class Slider;
 
 /** Example Widget. */

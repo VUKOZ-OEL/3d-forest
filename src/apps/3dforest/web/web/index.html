@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>3D Forest</title>
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/client.js"></script>
+</head>
+<body>
+  <aside>
+    <h2 id="title">3D Forest</h2>
+    <p id="status" role="status">Connecting…</p>
+    <button id="new-session" hidden>Start new session</button>
+    <fieldset id="controls" disabled></fieldset>
+  </aside>
+  <main id="main">
+    <section id="viewer" aria-label="3D viewport"></section>
+    <section id="bottom" aria-label="Results"></section>
+  </main>
+</body>
+</html>

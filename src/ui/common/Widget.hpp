@@ -54,6 +54,11 @@ public:
     Widget();
     virtual ~Widget();
 
+    // Non-owning backend adapters can check whether this widget still exists.
+    std::weak_ptr<void> lifetime() const { return lifetime_; }
+    bool isVisible() const { return visible_; }
+    bool isEnabled() const { return enabled_; }
+
     Widget(const Widget &) = delete;
     Widget &operator=(const Widget &) = delete;
 
@@ -96,6 +101,9 @@ public:
     RadioButtonGroup &radioButtonGroup();
 
 private:
+    std::shared_ptr<void> lifetime_{std::make_shared<int>(0)};
+    bool visible_{true};
+    bool enabled_{true};
     Layout *layout_{nullptr};
     std::string name_;
     std::string toolTip_;

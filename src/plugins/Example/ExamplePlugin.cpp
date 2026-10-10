@@ -23,7 +23,6 @@
 #include <Application.hpp>
 #include <ExamplePlugin.hpp>
 #include <ExampleWidget.hpp>
-#include <Ui.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ExamplePlugin"
@@ -33,16 +32,17 @@
 void ExamplePlugin::initialize(Application *app)
 {
     LOG_DEBUG(<< "Start initializing example plugin.");
+
     app_ = app;
 
-    widget_ = new ExampleWidget(app_);
-    widgetAction_ = new Action("View settings");
-    widgetAction_->setPanel(widget_);
-    app_->addNavigationItem(this, {{"Compute", 200}}, widgetAction_);
+    app_->createAction(this,
+                       {{"Settings", MAIN_WINDOW_MENU_SETTINGS_PRIORITY}},
+                       "Settings",
+                       tr("Example"),
+                       tr("Example"),
+                       ThemeIcon(),
+                       {},
+                       new ExampleWidget(app_));
 
-    openAction_ = new Action("Open");
-    app_->addNavigationItem(this, {{"File", 100}}, openAction_, 100);
-    closeAction_ = new Action("Close");
-    app_->addNavigationItem(this, {{"File", 100}}, closeAction_, 200);
     LOG_DEBUG(<< "Finished initializing example plugin.");
 }

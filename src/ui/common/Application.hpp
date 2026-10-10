@@ -30,7 +30,6 @@
 #include <Action.hpp>
 #include <Editor.hpp>
 #include <EventQueue.hpp>
-#include <MenuBar.hpp>
 #include <NavigationTree.hpp>
 #include <PluginManager.hpp>
 #include <RenderThread.hpp>
@@ -176,13 +175,6 @@ public:
     // void signalUpdate(void *sender, const std::set<Editor::Type> &target);
     Signal<Message> signalUpdate;
 
-    // bool event(QEvent *e) override;
-    // void paintEvent(QPaintEvent *event) override;
-    // void resizeEvent(QResizeEvent *event) override;
-    // void showEvent(QShowEvent *event) override;
-    // void hideEvent(QHideEvent *event) override;
-    // void closeEvent(QCloseEvent *event) override;
-
 private:
     Editor editor_;
 
@@ -191,14 +183,9 @@ private:
     bool interactive_{true};
 
     PluginManager pluginManager_;
-
     NavigationTree navigation_;
-    MenuBar menuBar_;
     EventQueue eventQueue_;
-
     ResourceBundle resources_;
-
-    void createMenu();
 };
 
 #include <WarningsEnable.hpp>

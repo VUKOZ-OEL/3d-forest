@@ -37,6 +37,7 @@ Widget::Widget()
 
 Widget::~Widget()
 {
+    lifetime_.reset();
     delete layout_;
 }
 
@@ -51,14 +52,17 @@ void Widget::setFocusPolicy(int focusPolicy)
 
 void Widget::setVisible(bool b)
 {
+    visible_ = b;
 }
 
 void Widget::setEnabled(bool b)
 {
+    enabled_ = b;
 }
 
 void Widget::setDisabled(bool b)
 {
+    setEnabled(!b);
 }
 
 void Widget::setLayout(Layout *layout)

@@ -20,6 +20,8 @@
 /** @file Slider.cpp */
 
 // Include std.
+#include <algorithm>
+#include <stdexcept>
 
 // Include 3D Forest.
 #include <Application.hpp>
@@ -81,31 +83,50 @@ void Slider::setTickPosition(int value)
     settingsChanged();
 }
 
-void Slider::setOrientation(int v)
+void Slider::setOrientation(int orientation)
 {
+    if (orientation != Ui::Horizontal && orientation != Ui::Vertical)
+    {
+        throw std::invalid_argument("Invalid slider orientation");
+    }
+    if (orientation_ == orientation)
+    {
+        return;
+    }
+    orientation_ = orientation;
+    settingsChanged();
 }
 
-void Slider::setMinimum(int min)
+void Slider::setMinimum(int value)
 {
-    minimum_ = min;
-    clamp(value_, minimum_, maximum_);
+    setRange(value, (std::max)(value, maximum_));
 }
 
-void Slider::setMaximum(int max)
+void Slider::setMaximum(int value)
 {
-    maximum_ = max;
-    clamp(value_, minimum_, maximum_);
+    setRange((std::min)(minimum_, value), value);
 }
 
-void Slider::setRange(int min, int max)
+void Slider::setRange(int minimum, int maximum)
 {
-    setMinimum(min);
-    setMaximum(max);
+    maximum = (std::max)(minimum, maximum);
+    if (minimum_ == minimum && maximum_ == maximum)
+        return;
+    minimum_ = minimum;
+    maximum_ = maximum;
+    const int oldValue = value_;
+    value_ = (std::max)(minimum_, (std::min)(value_, maximum_));
+    const auto guard = lifetime();
+    settingsChanged();
+    if (!guard.expired() && value_ != oldValue)
+        valueUpdated(value_);
 }
 
 void Slider::setValue(int value, bool notify)
 {
     LOG_DEBUG(<< "setValue <" << value << ">.");
+
+    value = (std::max)(minimum_, (std::min)(value, maximum_));
 
     if (value_ == value)
     {
@@ -113,10 +134,10 @@ void Slider::setValue(int value, bool notify)
     }
 
     value_ = value;
-
+    const auto guard = lifetime();
     valueUpdated(value_);
 
-    if (notify && !signalsBlocked())
+    if (!guard.expired() && notify && !signalsBlocked())
     {
         valueChanged(value_);
     }

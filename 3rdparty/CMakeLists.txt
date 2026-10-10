@@ -19,3 +19,8 @@
 #add_subdirectory(iland-model)
 #add_subdirectory(lz4)
 #add_subdirectory(pcl)
+
+# web
+add_subdirectory(zlib)
+add_subdirectory(jsoncpp)
+add_subdirectory(drogon)

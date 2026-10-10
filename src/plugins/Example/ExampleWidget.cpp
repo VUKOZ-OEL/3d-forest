@@ -24,15 +24,12 @@
 #include <ExampleWidget.hpp>
 #include <Label.hpp>
 #include <Slider.hpp>
-#include <Ui.hpp>
 #include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ExampleWidget"
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
-
-#define ICON(name) (ThemeIcon(app_, ":/ExampleResources/", name))
 
 ExampleWidget::ExampleWidget(Application *app) : app_(app)
 {

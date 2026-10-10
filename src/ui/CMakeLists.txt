@@ -16,4 +16,5 @@
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
 add_subdirectory(common)
-add_subdirectory(qt)
+#add_subdirectory(qt)
+add_subdirectory(web)

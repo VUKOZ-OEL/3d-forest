@@ -93,6 +93,7 @@ function(install_and_deploy_qt_runtime app_target bin_dest)
   install(SCRIPT ${${app_target}_deploy.cmake})
 endfunction()
 
+# Function to bundle resources
 include(cmake/AddPluginResources.cmake)
 
 # Build third-party dependencies first (libraries, externals)

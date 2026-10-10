@@ -45,6 +45,15 @@ QtSlider::QtSlider(Slider *slider, QWidget *parent)
             this,
             [this](int value) { slider_->setValue(value, true); });
 
+    connect(this,
+            &QSlider::sliderReleased,
+            this,
+            [this]
+            {
+                if (!slider_->signalsBlocked())
+                    slider_->sliderReleased();
+            });
+
     slider_->valueUpdated.connect(
         [guard](int value)
         {
@@ -73,6 +82,7 @@ void QtSlider::updateSettings()
 {
     const QSignalBlocker blocker(this);
 
+    setOrientation(static_cast<Qt::Orientation>(slider_->orientation()));
     setRange(slider_->minimum(), slider_->maximum());
     setSingleStep(slider_->singleStep());
     setTickInterval(slider_->tickInterval());

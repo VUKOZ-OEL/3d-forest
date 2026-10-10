@@ -69,9 +69,6 @@ void Application::load()
     //              100);
     // exitAction_->setShortcuts(QKeySequence::Quit);
 
-    // Menu.
-    createMenu();
-
     // initialize icons according to current theme
     onThemeChanged();
 
@@ -388,39 +385,6 @@ void Application::createToolButton(ToolButton **result,
     }
 
     *result = button.release();
-
-#if 0
-    QToolButton *button;
-
-    // Create button.
-    button = new QToolButton;
-    button->setText(text);
-    button->setToolTip(toolTip);
-    button->setStatusTip(toolTip);
-    button->setEnabled(true);
-    button->setToolButtonStyle(Qt::ToolButtonIconOnly);
-
-    QIcon icon = themeIcon.icon(isDarkMode());
-    if (!icon.isNull())
-    {
-        button->setIcon(icon);
-
-        IconEntry ie;
-        ie.button = button;
-        ie.themeIcon = themeIcon;
-
-        icons_.push_back(ie);
-    }
-
-    // Connect button.
-    if (receiver && member)
-    {
-        connect(button, SIGNAL(clicked()), receiver, member);
-    }
-
-    // Return value.
-    *result = button;
-#endif
 }
 
 void Application::createAction(Plugin *owner,
@@ -448,69 +412,6 @@ void Application::createAction(Plugin *owner,
     }
 
     addNavigationItem(owner, path, action, order);
-}
-
-void Application::createMenu()
-{
-#if 0
-    // Sort menu.
-    std::sort(menus_.begin(),
-              menus_.end(),
-              [](const Application::Menu &a, const Application::Menu &b)
-              {
-                  return (a.priority < b.priority) ||
-                         (a.priority == b.priority && a.title < b.title);
-              });
-
-    // Sort menu items.
-    for (auto &menu : menus_)
-    {
-        std::sort(
-            menu.items.begin(),
-            menu.items.end(),
-            [](const Application::MenuItem &a, const Application::MenuItem &b)
-            {
-                return (a.priority < b.priority) ||
-                       ((a.priority == b.priority) &&
-                        ((a.toolBarTitle < b.toolBarTitle) ||
-                         (a.toolBarTitle == b.toolBarTitle &&
-                          a.title < b.title)));
-            });
-    }
-
-    // Create menu.
-    for (auto &menu : menus_)
-    {
-        menu.menu = menuBar()->addMenu(menu.title);
-
-        std::string previousToolBarTitle;
-        size_t i = 0;
-        for (const auto &item : menu.items)
-        {
-            if (i > 0 && item.toolBarTitle != previousToolBarTitle)
-            {
-                menu.menu->addSeparator();
-            }
-
-            menu.menu->addAction(item.action);
-
-            if (!item.toolBarTitle.isEmpty() && !item.action->icon().isNull())
-            {
-                if (!toolBars_.contains(item.toolBarTitle))
-                {
-                    toolBars_[item.toolBarTitle] =
-                        addToolBar(item.toolBarTitle);
-                    toolBars_[item.toolBarTitle]->setIconSize(
-                        QSize(ICON_SIZE, ICON_SIZE));
-                }
-                toolBars_[item.toolBarTitle]->addAction(item.action);
-            }
-
-            previousToolBarTitle = menu.items[i].toolBarTitle;
-            i++;
-        }
-    }
-#endif
 }
 
 void Application::addNavigationItem(Plugin *owner,

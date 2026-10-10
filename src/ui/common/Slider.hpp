@@ -52,6 +52,7 @@ public:
     void setTickInterval(int v);
     void setTickPosition(int v);
     void setOrientation(int v);
+    int orientation() const { return orientation_; }
 
     int tickInterval() const { return tickInterval_; }
     TickPosition tickPosition() const { return tickPosition_; }
@@ -73,7 +74,8 @@ public:
     Signal<> settingsChanged;
 
 private:
-    int singleStep_{0};
+    int singleStep_{1};
+    int orientation_{Ui::Horizontal};
     int minimum_{0};
     int maximum_{0};
     int value_{0};

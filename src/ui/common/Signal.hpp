@@ -24,6 +24,7 @@
 
 // Include std.
 #include <functional>
+#include <memory>
 #include <vector>
 
 // Include local.
@@ -36,18 +37,24 @@ template <typename... Args> class Signal
 public:
     using Slot = std::function<void(Args...)>;
 
-    void connect(Slot slot) { slots_.push_back(std::move(slot)); }
+    void connect(Slot slot)
+    {
+        slots_.push_back(std::make_shared<Slot>(std::move(slot)));
+    }
 
     void operator()(Args... args)
     {
-        for (auto &slot : slots_)
+        // A callback may connect another slot or destroy the signal owner.
+        // Iterate a stable copy instead of references into the owner's vector.
+        const auto slots = slots_;
+        for (const auto &slot : slots)
         {
-            slot(args...);
+            (*slot)(args...);
         }
     }
 
 private:
-    std::vector<Slot> slots_;
+    std::vector<std::shared_ptr<Slot>> slots_;
 };
 
 #include <WarningsEnable.hpp>
