@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 
     std::cout << "Open http://127.0.0.1:8080 (Ctrl+C to stop)\n";
 
-    LOGGER_START_FILE("log-web.txt");
+    LOGGER_START_FILE("log.txt");
     LOG_INFO(<< "3DForest started. Git Revision <" << GIT_COMMIT_HASH << ">.");
 
     try
@@ -78,7 +78,6 @@ int main(int argc, char *argv[])
     }
 
     LOG_INFO(<< "3DForest closed with exit code <" << rc << ">.");
-
     LOGGER_STOP_FILE;
 
     return rc;

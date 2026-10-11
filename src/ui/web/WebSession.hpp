@@ -96,6 +96,7 @@ private:
     Clock::time_point sentAt_{};
 
     void run() noexcept;
+    void pumpOne(WebApplication &app, bool wait);
     void send(const JsonCpp::Value &message);
     void sendError(const std::string &message);
     bool canPublish() const;

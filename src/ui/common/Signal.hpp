@@ -25,6 +25,7 @@
 // Include std.
 #include <functional>
 #include <memory>
+#include <utility>
 #include <vector>
 
 // Include local.
@@ -46,8 +47,8 @@ public:
     {
         // A callback may connect another slot or destroy the signal owner.
         // Iterate a stable copy instead of references into the owner's vector.
-        const auto slots = slots_;
-        for (const auto &slot : slots)
+        const auto snapshot = slots_;
+        for (const auto &slot : snapshot)
         {
             (*slot)(args...);
         }

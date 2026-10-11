@@ -26,6 +26,9 @@
 #include <Query.hpp>
 class Editor;
 
+// Include std.
+#include <cstdint>
+
 // Include local.
 #include <ExportEditor.hpp>
 #include <WarningsDisable.hpp>
@@ -36,6 +39,13 @@ class EXPORT_EDITOR Viewports
 public:
     Viewports();
     ~Viewports();
+
+    // Access only while holding Editor::editorMutex_ (or with its worker
+    // stopped). Changes invalidate web streaming cursors without retaining Page
+    // pointers.
+    std::uint64_t renderRevision() const { return renderRevision_; }
+    // Unlike renderRevision, this excludes camera-only changes.
+    std::uint64_t contentRevision() const { return contentRevision_; }
 
     size_t size() const { return viewports_.size(); }
     void resize(Editor *editor, size_t n);
@@ -67,6 +77,8 @@ public:
 protected:
     std::vector<std::shared_ptr<Query>> viewports_;
     size_t activeViewport_;
+    std::uint64_t renderRevision_{1};
+    std::uint64_t contentRevision_{1};
 };
 
 #include <WarningsEnable.hpp>

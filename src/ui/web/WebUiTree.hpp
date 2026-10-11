@@ -26,6 +26,7 @@ class WebApplication;
 class WebWidget;
 class Widget;
 class Layout;
+class Dialog;
 class Action;
 class NavigationItem;
 
@@ -49,12 +50,15 @@ class NavigationItem;
     thread.
     Structural reconciliation is deferred until mutations have completed.
 */
-class EXPORT_UI_WEB WebUiTree
+class WebUiTree
 {
 public:
     explicit WebUiTree(WebApplication &application);
     ~WebUiTree();
     void sync();
+    void open(Dialog &dialog);
+    int exec(Dialog &dialog);
+    bool allowed(const std::string &id) const;
     const JsonCpp::Value &description() const { return description_; }
     bool dispatch(const JsonCpp::Value &event);
     void setViewer(Widget *widget);
@@ -65,6 +69,20 @@ public:
     void removeBottomWidget(Widget *widget);
 
 private:
+    struct DialogState
+    {
+        Dialog *dialog{};
+        std::string id;
+        bool visible{false};
+        bool blocking{false};
+        int result{0};
+        int raise{0};
+    };
+    std::vector<std::shared_ptr<DialogState>> dialogs_;
+    unsigned long long nextDialogId_{0};
+    std::string currentDialog_;
+    std::map<std::string, std::string> widgetDialogs_;
+    std::shared_ptr<DialogState> show(Dialog &dialog, bool blocking);
     struct Root
     {
         Widget *widget{nullptr};

@@ -170,7 +170,7 @@ public:
             type == drogon::WebSocketMessageType::Pong ||
             type == drogon::WebSocketMessageType::Close)
             return;
-        if (type != drogon::WebSocketMessageType::Text || text.size() > 16384)
+        if (type != drogon::WebSocketMessageType::Text || text.size() > 1048576)
         {
             connection->forceClose();
             return;
@@ -295,7 +295,7 @@ int WebServer::exec()
     http.setThreadNum(options.ioThreads);
     http.setDocumentRoot(options.documentRoot);
     http.setHomePage("index.html");
-    http.setClientMaxWebSocketMessageSize(16384);
+    http.setClientMaxWebSocketMessageSize(1048576);
     http.setMaxConnectionNum(256);
     http.addListener(options.address, options.port);
     http.registerController(std::make_shared<Controller>(state_));

@@ -49,6 +49,7 @@ ThemeIcon::ThemeIcon(Application *app,
     }
 
     base += name;
+    sourceBase_ = base;
 
     for (int size : {16, 20, 24})
     {

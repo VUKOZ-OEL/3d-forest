@@ -22,25 +22,18 @@
 // Include 3D Forest.
 #include <Pixmap.hpp>
 #include <WebApplication.hpp>
+#include <WebFileDialog.hpp>
 #include <WebSession.hpp>
 #include <WebUiTree.hpp>
 
 // Include std.
+#include <algorithm>
 #include <stdexcept>
 #include <utility>
 
 // Include local.
 #define LOG_MODULE_NAME "WebApplication"
 #include <Log.hpp>
-
-namespace
-{
-[[noreturn]] void unsupported(const char *operation)
-{
-    throw std::logic_error(std::string(operation) +
-                           " is not implemented by the minimal web backend");
-}
-} // namespace
 
 WebApplication::WebApplication(WebSession &session)
     : session_(session),
@@ -93,6 +86,7 @@ void WebApplication::wakeUp()
 }
 void WebApplication::handleWakeUp()
 {
+    skipNextUiSync_ = false;
     Application::processEvents();
     processRenderRequest();
     if (wakeUpHandler_)
@@ -101,7 +95,7 @@ void WebApplication::handleWakeUp()
 void WebApplication::processEvents()
 {
     assertThread();
-    flush();
+    pump(false);
 }
 
 void WebApplication::setMetadata(const char *name, const std::string &value)
@@ -231,6 +225,7 @@ JsonCpp::Value WebApplication::snapshot() const
 {
     JsonCpp::Value result{JsonCpp::objectValue};
     result["type"] = "snapshot";
+    result["eventSequence"] = eventSequence_;
     result["application"] = metadata_;
     result["ui"] = uiTree_->description();
     result["widgets"] = JsonCpp::Value{JsonCpp::arrayValue};
@@ -248,11 +243,17 @@ JsonCpp::Value WebApplication::snapshot() const
 
 void WebApplication::forceSnapshot()
 {
+    skipNextUiSync_ = false;
     structureDirty_ = true;
 }
 void WebApplication::flush()
 {
     assertThread();
+    if (skipNextUiSync_)
+    {
+        skipNextUiSync_ = false;
+        return;
+    }
     uiTree_->sync();
     if (!session_.canPublish())
         return;
@@ -260,13 +261,21 @@ void WebApplication::flush()
     {
         session_.publish(snapshot());
         structureDirty_ = false;
+        uiDirty_ = false;
+        publishedEventSequence_ = eventSequence_;
         pending_ = JsonCpp::Value{JsonCpp::objectValue};
     }
-    else if (!pending_.empty())
+    else if (!pending_.empty() || uiDirty_ ||
+             publishedEventSequence_ != eventSequence_)
     {
         JsonCpp::Value update{JsonCpp::objectValue};
         update["type"] = "patch";
+        update["eventSequence"] = eventSequence_;
+        publishedEventSequence_ = eventSequence_;
         update["widgets"] = pending_;
+        if (uiDirty_)
+            update["ui"] = uiTree_->description();
+        uiDirty_ = false;
         session_.publish(std::move(update));
         pending_ = JsonCpp::Value{JsonCpp::objectValue};
     }
@@ -277,6 +286,31 @@ void WebApplication::dispatch(const JsonCpp::Value &event)
     assertThread();
     if (!event["id"].isString() || !event["event"].isString())
         throw std::invalid_argument("Invalid widget event");
+    // A read-only binary pull does not mutate common controls. Avoid walking
+    // and serializing every table/layout for each point chunk. Render wakeups
+    // and all ordinary UI events still use the normal reconciliation path.
+    if (event["event"] == "viewerPull")
+    {
+        const auto it = widgets_.find(event["id"].asString());
+        if (it == widgets_.end() || it->second.type != "Viewer" ||
+            !it->second.properties.get("enabled", true).asBool() ||
+            !it->second.properties.get("visible", true).asBool())
+            throw std::invalid_argument("Viewer is unavailable");
+        auto handler = it->second.handler;
+        if (!handler)
+            throw std::invalid_argument("Viewer is unavailable");
+        handler(event);
+        skipNextUiSync_ = true;
+        return;
+    }
+    skipNextUiSync_ = false;
+    if (event.isMember("sequence"))
+    {
+        if (!event["sequence"].isUInt64())
+            throw std::invalid_argument("Invalid event sequence");
+        eventSequence_ =
+            (std::max)(eventSequence_, event["sequence"].asUInt64());
+    }
     uiTree_->sync();
     if (uiTree_->dispatch(event))
         return;
@@ -294,33 +328,88 @@ void WebApplication::dispatch(const JsonCpp::Value &event)
     handler(event); // Adapter validates event names, types, and bounds.
 }
 
-std::string WebApplication::getOpenFileName(const std::string &,
-                                            const std::string &)
+std::string WebApplication::getOpenFileName(const std::string &title,
+                                            const std::string &filter)
 {
-    unsupported("getOpenFileName");
+    auto files = WebFileDialog::choose(*this,
+                                       title,
+                                       filter,
+                                       false,
+                                       false,
+                                       {},
+                                       nullptr,
+                                       0);
+    return files.empty() ? std::string{} : files.front();
 }
-std::vector<std::string> WebApplication::getOpenFileNames(const std::string &,
-                                                          const std::string &)
+std::vector<std::string> WebApplication::getOpenFileNames(
+    const std::string &title,
+    const std::string &filter)
 {
-    unsupported("getOpenFileNames");
+    return WebFileDialog::choose(*this,
+                                 title,
+                                 filter,
+                                 true,
+                                 false,
+                                 {},
+                                 nullptr,
+                                 0);
 }
-std::string WebApplication::getSaveFileName(const std::string &,
-                                            const std::string &,
-                                            const std::string &,
-                                            std::string *,
-                                            int)
+std::string WebApplication::getSaveFileName(const std::string &caption,
+                                            const std::string &dir,
+                                            const std::string &filter,
+                                            std::string *selectedFilter,
+                                            int options)
 {
-    unsupported("getSaveFileName");
+    auto files = WebFileDialog::choose(*this,
+                                       caption,
+                                       filter,
+                                       false,
+                                       true,
+                                       dir,
+                                       selectedFilter,
+                                       options);
+    return files.empty() ? std::string{} : files.front();
 }
-int WebApplication::showDialog(Dialog &)
+int WebApplication::showDialog(Dialog &dialog)
 {
-    unsupported("showDialog");
+    assertThread();
+    return uiTree_->exec(dialog);
 }
-void WebApplication::openDialog(Dialog &)
+void WebApplication::openDialog(Dialog &dialog)
 {
-    unsupported("openDialog");
+    assertThread();
+    uiTree_->open(dialog);
+    flush();
+}
+void WebApplication::pump(bool wait)
+{
+    assertThread();
+    flush();
+    session_.pumpOne(*this, wait);
+    flush();
 }
 Pixmap WebApplication::loadPixmap(const std::string &) const
 {
+    // WebAssets sends encoded resource images directly to the browser.
     return Pixmap{};
+}
+
+bool WebApplication::sendViewerPacket(const std::string &packet)
+{
+    assertThread();
+    if (packet.size() > 64 + 16384 * 16)
+        throw std::invalid_argument("Viewer packet exceeds chunk limit");
+    if (!session_.connection_ || !session_.connection_->connected())
+        return false;
+    session_.connection_->send(packet, drogon::WebSocketMessageType::Binary);
+    return true;
+}
+
+void WebApplication::setViewerMemoryBudget(std::size_t bytes)
+{
+    assertThread();
+    if (initialized_ || bytes < 1024 * 1024 || bytes > 128 * 1024 * 1024)
+        throw std::invalid_argument(
+            "Set viewer budget to 1..128 MiB before init()");
+    viewerMemoryBudget_ = bytes;
 }

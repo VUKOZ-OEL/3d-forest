@@ -22,18 +22,25 @@
 
 // Include 3D Forest.
 #include <Action.hpp>
+#include <Dialog.hpp>
 #include <GridLayout.hpp>
 #include <GroupBox.hpp>
 #include <HBoxLayout.hpp>
 #include <Label.hpp>
 #include <Layout.hpp>
+#include <MessageBox.hpp>
 #include <NavigationItem.hpp>
-#include <Slider.hpp>
+#include <ProgressDialog.hpp>
+#include <Splitter.hpp>
+#include <ToolBar.hpp>
+#include <Viewer.hpp>
 #include <WebApplication.hpp>
-#include <WebSlider.hpp>
+#include <WebControls.hpp>
 #include <WebUiTree.hpp>
+#include <WebViewer.hpp>
 
 // Include std.
+#include <algorithm>
 #include <stdexcept>
 
 // Include local.
@@ -83,15 +90,16 @@ JsonCpp::Value WebUiTree::widget(Widget *common, bool enabled, bool visible)
     if (found == adapters_.end())
     {
         std::shared_ptr<WebWidget> adapter;
-        if (auto *slider = dynamic_cast<Slider *>(common))
-            adapter = std::make_shared<WebSlider>(application_, slider);
+        if (auto *viewer = dynamic_cast<Viewer *>(common))
+        {
+            adapter = std::make_shared<WebViewer>(application_, viewer);
+        }
         else
         {
-            const char *type = dynamic_cast<Label *>(common)      ? "Label"
-                               : dynamic_cast<GroupBox *>(common) ? "GroupBox"
-                               : common->layout()                 ? "Widget"
-                                                  : "Unsupported";
-            adapter = std::make_shared<WebWidget>(application_, common, type);
+            adapter =
+                std::make_shared<WebControls>(application_,
+                                              common,
+                                              WebControls::typeOf(common));
         }
         found = adapters_.emplace(common, std::move(adapter)).first;
         found->second->bind();
@@ -102,6 +110,21 @@ JsonCpp::Value WebUiTree::widget(Widget *common, bool enabled, bool visible)
     JsonCpp::Value node{JsonCpp::objectValue};
     node["kind"] = "widget";
     node["id"] = found->second->id();
+    widgetDialogs_[found->second->id()] = currentDialog_;
+    if (auto *bar = dynamic_cast<ToolBar *>(common))
+    {
+        node["children"] = JsonCpp::Value(JsonCpp::arrayValue);
+        for (auto &item : bar->items())
+            node["children"].append(item.widget
+                                        ? widget(item.widget, enabled, visible)
+                                        : JsonCpp::Value());
+    }
+    if (auto *splitter = dynamic_cast<Splitter *>(common))
+    {
+        node["children"] = JsonCpp::Value(JsonCpp::arrayValue);
+        for (auto *child : splitter->widgets())
+            node["children"].append(widget(child, enabled, visible));
+    }
     if (common->layout())
         node["layout"] = layout(common->layout(), enabled, visible);
     return node;
@@ -189,6 +212,8 @@ void WebUiTree::sync()
     seenLayouts_.clear();
     seenNavigation_.clear();
     actions_.clear();
+    widgetDialogs_.clear();
+    currentDialog_.clear();
     JsonCpp::Value next{JsonCpp::objectValue};
     next["navigation"] = navigation(application_.navigation().items());
     if (viewer_.widget && !viewer_.lifetime.expired())
@@ -200,6 +225,48 @@ void WebUiTree::sync()
     else
         bottom_ = {};
     next["bottomVisible"] = bottomVisible_ && bottom_.widget;
+    next["dialogs"] = JsonCpp::Value(JsonCpp::arrayValue);
+    for (auto &d : dialogs_)
+    {
+        if (!d->dialog || !d->visible)
+            continue;
+        auto *dialog = d->dialog;
+        currentDialog_ = d->id;
+        JsonCpp::Value node(JsonCpp::objectValue);
+        node["id"] = d->id;
+        node["title"] = dialog->windowTitle();
+        node["modal"] = d->blocking || dialog->isModal();
+        node["buttons"] = dialog->standardButtons();
+        node["defaultButton"] = int(dialog->defaultButton());
+        node["width"] = dialog->sizeHint().width();
+        node["height"] = dialog->sizeHint().height();
+        node["fixedHeight"] = dialog->fixedHeight();
+        node["maxWidth"] = dialog->maximumWidth();
+        node["maxHeight"] = dialog->maximumHeight();
+        node["raise"] = d->raise;
+        if (dialog->layout())
+            node["layout"] = layout(dialog->layout(), true, true);
+        if (auto *box = dynamic_cast<MessageBox *>(dialog))
+        {
+            node["message"] = box->text();
+            node["information"] = box->informativeText();
+        }
+        if (auto *progress = dynamic_cast<ProgressDialog *>(dialog))
+        {
+            node["progress"] = true;
+            node["label"] = progress->labelText();
+            node["minimum"] = progress->minimum();
+            node["maximum"] = progress->maximum();
+            node["value"] = progress->value();
+            node["cancelText"] = progress->cancelButtonText();
+        }
+        next["dialogs"].append(node);
+    }
+    currentDialog_.clear();
+    dialogs_.erase(std::remove_if(dialogs_.begin(),
+                                  dialogs_.end(),
+                                  [](const auto &d) { return !d->dialog; }),
+                   dialogs_.end());
     for (auto it = adapters_.begin(); it != adapters_.end();)
         if (!seenWidgets_.count(it->first))
             it = adapters_.erase(it);
@@ -213,13 +280,83 @@ void WebUiTree::sync()
     if (next != description_)
     {
         description_ = std::move(next);
-        application_.forceSnapshot();
+        application_.forceUi();
     }
 }
 
 bool WebUiTree::dispatch(const JsonCpp::Value &event)
 {
     const auto id = event["id"].asString();
+    if (!allowed(id))
+        throw std::invalid_argument("A modal dialog is active");
+    if (!id.empty() && id.front() == 'd')
+    {
+        auto it =
+            std::find_if(dialogs_.begin(),
+                         dialogs_.end(),
+                         [&](const auto &d)
+                         { return d->id == id && d->dialog && d->visible; });
+        if (it == dialogs_.end())
+            throw std::invalid_argument("Dialog has closed");
+        auto state = *it;
+        auto *d = state->dialog;
+        auto name = event["event"].asString();
+        if (name == "close")
+        {
+            d->close();
+            return true;
+        }
+        if (name == "cancel")
+        {
+            if (auto *p = dynamic_cast<ProgressDialog *>(d))
+            {
+                p->cancel();
+                return true;
+            }
+        }
+        if (name == "resize")
+        {
+            if (event["width"].isInt() && event["height"].isInt())
+                d->updateSize(std::clamp(event["width"].asInt(), 0, 10000),
+                              std::clamp(event["height"].asInt(), 0, 10000));
+            return true;
+        }
+        if (name != "button" || !event["button"].isInt())
+            throw std::invalid_argument("Invalid dialog event");
+        int b = event["button"].asInt();
+        if (b <= 0 || (b & (b - 1)) || (d->standardButtons() & b) != b)
+            throw std::invalid_argument("Invalid dialog button");
+        d->buttonClicked(Dialog::StandardButton(b));
+        if (!state->dialog || !state->visible)
+            return true;
+        if (dynamic_cast<MessageBox *>(d))
+        {
+            d->done(b);
+            return true;
+        }
+        switch (b)
+        {
+            case Dialog::Ok:
+            case Dialog::Save:
+            case Dialog::SaveAll:
+            case Dialog::Open:
+            case Dialog::Yes:
+            case Dialog::YesToAll:
+                d->accept();
+                break;
+            case Dialog::Cancel:
+            case Dialog::Close:
+            case Dialog::No:
+            case Dialog::NoToAll:
+            case Dialog::Abort:
+            case Dialog::Discard:
+                d->reject();
+                break;
+            default:
+                break;
+        }
+        return true;
+    }
     if (id.empty() || id.front() != 'n')
         return false;
     const auto it = actions_.find(id);
@@ -270,4 +407,114 @@ void WebUiTree::removeBottomWidget(Widget *w)
         bottom_ = {};
         bottomVisible_ = false;
     }
+}
+
+std::shared_ptr<WebUiTree::DialogState> WebUiTree::show(Dialog &dialog,
+                                                        bool blocking)
+{
+    auto it = std::find_if(dialogs_.begin(),
+                           dialogs_.end(),
+                           [&](const auto &d) { return d->dialog == &dialog; });
+    std::shared_ptr<DialogState> state;
+    if (it != dialogs_.end())
+    {
+        state = *it;
+        dialogs_.erase(it);
+    }
+    else
+    {
+        state = std::make_shared<DialogState>();
+        state->dialog = &dialog;
+        state->id = "d" + std::to_string(++nextDialogId_);
+        std::weak_ptr<DialogState> weak = state;
+        dialog.destroyed.connect(
+            [weak]
+            {
+                if (auto s = weak.lock())
+                {
+                    s->dialog = nullptr;
+                    s->visible = false;
+                }
+            });
+        dialog.finished.connect(
+            [weak](int result)
+            {
+                if (auto s = weak.lock())
+                {
+                    s->result = result;
+                    s->visible = false;
+                }
+            });
+        dialog.hideRequested.connect(
+            [weak]
+            {
+                if (auto s = weak.lock())
+                    s->visible = false;
+            });
+        if (auto *progress = dynamic_cast<ProgressDialog *>(&dialog))
+        {
+            progress->resetRequested.connect(
+                [weak]
+                {
+                    if (auto s = weak.lock())
+                        s->visible = false;
+                });
+            progress->valueChanged.connect(
+                [weak](int value)
+                {
+                    if (auto s = weak.lock())
+                        if (auto *p = dynamic_cast<ProgressDialog *>(s->dialog))
+                            if (p->maximum() > p->minimum() &&
+                                value == p->maximum())
+                                s->visible = false;
+                });
+        }
+        dialog.raiseRequested.connect(
+            [weak]
+            {
+                if (auto s = weak.lock())
+                    ++s->raise;
+            });
+        dialog.activateWindowRequested.connect(
+            [weak]
+            {
+                if (auto s = weak.lock())
+                    ++s->raise;
+            });
+    }
+    state->visible = true;
+    state->blocking = blocking;
+    state->result = Dialog::Rejected;
+    dialogs_.push_back(state);
+    return state;
+}
+void WebUiTree::open(Dialog &dialog)
+{
+    show(dialog, false);
+}
+int WebUiTree::exec(Dialog &dialog)
+{
+    auto state = show(dialog, true);
+    // Keep the original plugin callback on the stack while processing browser
+    // events on this same session thread, including nested modal dialogs.
+    while (state->dialog && state->visible)
+        application_.pump(true);
+    return state->result;
+}
+bool WebUiTree::allowed(const std::string &id) const
+{
+    int modal = -1, owner = -1;
+    auto w = widgetDialogs_.find(id);
+    const auto dialogId = w == widgetDialogs_.end() ? id : w->second;
+    for (std::size_t i = 0; i < dialogs_.size(); ++i)
+    {
+        const auto &s = dialogs_[i];
+        if (!s->visible || !s->dialog)
+            continue;
+        if (s->blocking || s->dialog->isModal())
+            modal = int(i);
+        if (s->id == dialogId)
+            owner = int(i);
+    }
+    return modal < 0 || owner >= modal;
 }

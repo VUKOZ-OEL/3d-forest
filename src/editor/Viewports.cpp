@@ -37,6 +37,8 @@ Viewports::~Viewports()
 
 void Viewports::resize(Editor *editor, size_t n)
 {
+    ++renderRevision_;
+    ++contentRevision_;
     size_t i = viewports_.size();
 
     while (i < n)
@@ -55,6 +57,8 @@ void Viewports::resize(Editor *editor, size_t n)
 
 void Viewports::clearContent()
 {
+    ++renderRevision_;
+    ++contentRevision_;
     LOG_DEBUG(<< "Clear content.");
 
     for (auto &it : viewports_)
@@ -65,6 +69,8 @@ void Viewports::clearContent()
 
 void Viewports::applyWhereToAll()
 {
+    ++renderRevision_;
+    ++contentRevision_;
     for (size_t i = 0; i < viewports_.size(); i++)
     {
         if (i != activeViewport_)
@@ -76,6 +82,7 @@ void Viewports::applyWhereToAll()
 
 void Viewports::applyCamera(const std::vector<Camera> &cameraList)
 {
+    ++renderRevision_;
     for (size_t i = 0; i < cameraList.size(); i++)
     {
         if (cameraList[i].viewportId < viewports_.size())
@@ -92,6 +99,8 @@ void Viewports::applyCamera(const std::vector<Camera> &cameraList)
 
 void Viewports::setState(Page::State state)
 {
+    ++renderRevision_;
+    ++contentRevision_;
     for (auto &it : viewports_)
     {
         it->setState(state);

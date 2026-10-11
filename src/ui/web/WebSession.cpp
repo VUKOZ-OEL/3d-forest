@@ -297,3 +297,44 @@ void WebSession::run() noexcept
     application_.reset();
     currentSession = nullptr;
 }
+
+void WebSession::pumpOne(WebApplication &app, bool wait)
+{
+    Task task;
+    bool wake = false;
+    {
+        std::unique_lock<std::mutex> lock(mutex_);
+        if (wait)
+            condition_.wait_for(lock,
+                                std::chrono::milliseconds(20),
+                                [this] {
+                                    return stopping_ || wakePending_ ||
+                                           !tasks_.empty();
+                                });
+        if (stopping_)
+            throw std::runtime_error("Session stopped");
+        wake = wakePending_;
+        wakePending_ = false;
+        if (!tasks_.empty())
+        {
+            task = std::move(tasks_.front());
+            tasks_.pop_front();
+        }
+    }
+    try
+    {
+        if (task)
+            task(app);
+        if (wake)
+            app.handleWakeUp();
+    }
+    catch (const std::invalid_argument &e)
+    {
+        sendError(e.what());
+        app.forceSnapshot();
+    }
+    if (connection_ &&
+        (!connection_->connected() ||
+         (awaitingAck_ && Clock::now() - sentAt_ > std::chrono::seconds(30))))
+        disconnect();
+}

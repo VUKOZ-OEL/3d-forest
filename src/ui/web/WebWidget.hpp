@@ -40,7 +40,7 @@ class WebApplication;
 
     A backend adapter; it does not own the common widget.
 */
-class EXPORT_UI_WEB WebWidget : public std::enable_shared_from_this<WebWidget>
+class WebWidget : public std::enable_shared_from_this<WebWidget>
 {
 public:
     WebWidget(WebApplication &application,

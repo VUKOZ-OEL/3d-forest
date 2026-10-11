@@ -31,6 +31,7 @@ class WebUiTree;
 #include <json/json.h>
 
 // Include std.
+#include <cstddef>
 #include <functional>
 #include <map>
 #include <memory>
@@ -57,7 +58,8 @@ public:
     void setInitializeHandler(Handler handler);
     void setWakeUpHandler(Handler handler);
     void wakeUp() override; // The only method callable from another thread.
-    void processEvents() override; // Flush only; no nested event loop.
+    void processEvents()
+        override; // Flush state and pump one queued session task.
 
     void setOrganizationName(const std::string &value);
     void setApplicationName(const std::string &value);
@@ -70,6 +72,13 @@ public:
     void hideBottomWidget() override;
     void toggleBottomWidget(Widget *widget) override;
     void removeBottomWidget(Widget *widget) override;
+
+    // Bounded viewer packet; called only from a viewer pull event on this
+    // thread.
+    bool sendViewerPacket(const std::string &packet);
+    // Per-viewer GPU vertex payload budget. Set before init(); default 128 MiB.
+    void setViewerMemoryBudget(std::size_t bytes);
+    std::size_t viewerMemoryBudget() const { return viewerMemoryBudget_; }
 
     // Backend registration used by web adapters.
     // Common widgets stay owned by your common UI/plugin tree.
@@ -108,6 +117,7 @@ private:
         EventHandler handler;
         std::string region{"sidebar"};
     };
+    std::size_t viewerMemoryBudget_{128 * 1024 * 1024};
     WebSession &session_;
     std::unique_ptr<WebUiTree> uiTree_;
     std::shared_ptr<void> lifetime_{std::make_shared<int>(0)};
@@ -115,6 +125,11 @@ private:
     std::unordered_map<Widget *, std::string> ids_;
     JsonCpp::Value metadata_{JsonCpp::objectValue};
     JsonCpp::Value pending_{JsonCpp::objectValue};
+    JsonCpp::UInt64 eventSequence_{0};
+    JsonCpp::UInt64 publishedEventSequence_{0};
+    bool uiDirty_{true};
+    void forceUi() { uiDirty_ = true; }
+    bool skipNextUiSync_{false};
     bool structureDirty_{true};
     bool initialized_{false};
     unsigned long long nextId_{0};
@@ -122,6 +137,7 @@ private:
     Handler wakeUpHandler_;
 
     void assertThread() const;
+    void pump(bool wait);
     void setMetadata(const char *name, const std::string &value);
     JsonCpp::Value snapshot() const;
     void flush();

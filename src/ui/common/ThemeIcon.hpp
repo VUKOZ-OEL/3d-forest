@@ -49,6 +49,8 @@ public:
     // Returns the closest available image without scaling it.
     Pixmap pixmap(int size, bool dark = false) const;
 
+    const std::string &sourceBase() const { return sourceBase_; }
+
     bool isNull() const { return light_.empty(); }
 
     std::string toString() const;
@@ -57,6 +59,7 @@ private:
     void addFile(Application *app, const std::string &baseName);
     void loadPixmap(Pixmap &pixmap, Application *app, const std::string &path);
 
+    std::string sourceBase_;
     std::vector<Pixmap> light_;
     std::vector<Pixmap> dark_;
 };

@@ -22,6 +22,9 @@
 // Include 3D Forest.
 #include <TableViewport.hpp>
 
+// Include std.
+#include <stdexcept>
+
 // Include local.
 #define LOG_MODULE_NAME "TableViewport"
 #include <Log.hpp>
