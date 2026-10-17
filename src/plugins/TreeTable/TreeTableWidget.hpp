@@ -23,38 +23,44 @@
 #define TREE_TABLE_WIDGET_HPP
 
 // Include 3D Forest.
+#include <Color.hpp>
 #include <Editor.hpp>
 #include <FileFormatTable.hpp>
-class MainWindow;
-
-// Include Qt.
-#include <QItemSelection>
-#include <QWidget>
-class QCheckBox;
-class QPushButton;
-class QTableWidget;
+#include <ItemSelection.hpp>
+#include <Widget.hpp>
+class Application;
+class CheckBox;
+class ComboBox;
+class PushButton;
+class TableWidget;
+class ToolButton;
+class ToolBar;
 
 /** Tree Table Widget. */
-class TreeTableWidget : public QWidget
+class TreeTableWidget : public Widget
 {
-    Q_OBJECT
-
 public:
-    TreeTableWidget(MainWindow *mainWindow);
+    TreeTableWidget(Application *app);
 
-    QSize sizeHint() const override { return QSize(700, 200); }
+    // Size sizeHint() const override { return Size(700, 200); }
 
     void closeWidget();
 
-public slots:
-    void slotUpdate(void *sender, const QSet<Editor::Type> &target);
+    void slotUpdate(const Message &msg);
 
-protected slots:
-    void slotShowOnlyVisibleTreesChanged(int index);
+    void slotShow();
+    void slotHide();
+    void slotSelectAll();
+    void slotSelectInvert();
+    void slotSelectNone();
+    void slotReadQsm();
+    void slotDeleteQsm();
+    void slotSpeciesChanged(int index);
+    void slotManagementStatusChanged(int index);
     void slotExport();
-    void slotCustomContextMenuRequested(const QPoint &pos);
-    void slotTableSelectionChanged(const QItemSelection &selected,
-                                   const QItemSelection &deselected);
+    void slotShowOnlyVisibleTreesChanged(int index);
+    void slotTableSelectionChanged(const ItemSelection &selected,
+                                   const ItemSelection &deselected);
 
 private:
     /** Tree Table Column. */
@@ -83,13 +89,25 @@ private:
         COLUMN_LAST,
     };
 
-    MainWindow *mainWindow_;
+    Application *app_;
 
-    QTableWidget *tableWidget_;
-    QPushButton *exportButton_;
+    TableWidget *tableWidget_;
 
-    QCheckBox *showOnlyVisibleTreesCheckBox_;
+    ToolButton *showButton_;
+    ToolButton *hideButton_;
+    ToolButton *selectAllButton_;
+    ToolButton *selectInvertButton_;
+    ToolButton *selectNoneButton_;
+    ToolButton *readQsmButton_;
+    ToolButton *deleteQsmButton_;
+
+    ComboBox *speciesComboBox_;
+    ComboBox *managementStatusComboBox_;
+
+    CheckBox *showOnlyVisibleTreesCheckBox_;
     std::unordered_set<size_t> visibleTreesIdList_;
+
+    PushButton *exportButton_;
 
     Segments segments_;
     QueryFilterSet filter_;
@@ -97,7 +115,7 @@ private:
     ManagementStatusList managementStatusList_;
     bool updatesEnabled_;
 
-    QString fileName_;
+    std::string fileName_;
 
     // New data.
     void newData();
@@ -110,29 +128,26 @@ private:
     // Setup and manage signals.
     void block();
     void unblock();
-    void disconnectSignals();
-    void connectSignals();
 
-    // Set table data.
+    // Tool bar.
+    ToolBar *createToolBar();
+    void updateToolBar();
+
+    // Table.
+    TableWidget *createTable();
     void updateTableContent();
     void setRow(int row, size_t index);
     void setCell(int row,
                  int col,
                  bool value,
                  bool userCheckable,
-                 const QColor &color = QColor());
-    void setCell(int row,
-                 int col,
-                 size_t value,
-                 const QColor &color = QColor());
-    void setCell(int row,
-                 int col,
-                 double value,
-                 const QColor &color = QColor());
+                 const Color &color = Color());
+    void setCell(int row, int col, size_t value, const Color &color = Color());
+    void setCell(int row, int col, double value, const Color &color = Color());
     void setCell(int row,
                  int col,
                  const std::string &value,
-                 const QColor &color = QColor(),
+                 const Color &color = Color(),
                  bool isNumeric = false);
 };
 

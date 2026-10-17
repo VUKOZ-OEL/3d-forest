@@ -20,81 +20,81 @@
 /** @file ImportFileDialog.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
+#include <CheckBox.hpp>
+#include <GridLayout.hpp>
+#include <GroupBox.hpp>
+#include <HBoxLayout.hpp>
 #include <ImportFileDialog.hpp>
 #include <InfoDialog.hpp>
-#include <MainWindow.hpp>
+#include <Label.hpp>
+#include <PushButton.hpp>
 #include <ThemeIcon.hpp>
-
-// Include Qt.
-#include <QCheckBox>
-#include <QGridLayout>
-#include <QGroupBox>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QPushButton>
-#include <QVBoxLayout>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ImportFileDialog"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ImportFileResources/", name))
+#include <ImportFileResources.hpp> // Generated
+#define ICON(name) (ThemeIcon(app_, ":/ImportFileResources/", name))
 
-ImportFileDialog::ImportFileDialog(MainWindow *mainWindow)
-    : QDialog(mainWindow),
+ImportFileDialog::ImportFileDialog(Application *app)
+    : Dialog(app),
+      app_(app),
       helpDialog_(nullptr)
 {
     int row = 0;
 
     // Dataset options.
-    QGroupBox *datasetOptions = new QGroupBox(tr("Options"));
+    GroupBox *datasetOptions = new GroupBox(tr("Options"));
 
-    importFilesAsSeparateTreesCheckBox_ = new QCheckBox;
+    importFilesAsSeparateTreesCheckBox_ = new CheckBox;
     importFilesAsSeparateTreesCheckBox_->setChecked(false);
 
-    translateToOriginCheckBox_ = new QCheckBox;
+    translateToOriginCheckBox_ = new CheckBox;
     translateToOriginCheckBox_->setChecked(false);
 
-    QGridLayout *ldo = new QGridLayout;
+    GridLayout *ldo = new GridLayout;
     row = 0;
-    ldo->addWidget(new QLabel(tr("Import files as separate trees")), row, 0);
+    ldo->addWidget(new Label(tr("Import files as separate trees")), row, 0);
     ldo->addWidget(importFilesAsSeparateTreesCheckBox_, row, 1);
     row++;
-    ldo->addWidget(new QLabel(tr("Translate to the origin")), row, 0);
+    ldo->addWidget(new Label(tr("Translate to the origin")), row, 0);
     ldo->addWidget(translateToOriginCheckBox_, row, 1);
     row++;
 
     datasetOptions->setLayout(ldo);
 
     // File format options.
-    QGroupBox *fileFormatOptions = new QGroupBox(tr("File format options"));
+    GroupBox *fileFormatOptions = new GroupBox(tr("File format options"));
 
-    convertToVersion1Dot4CheckBox_ = new QCheckBox;
+    convertToVersion1Dot4CheckBox_ = new CheckBox;
     convertToVersion1Dot4CheckBox_->setChecked(false);
 
-    randomizePointsCheckBox_ = new QCheckBox;
+    randomizePointsCheckBox_ = new CheckBox;
     randomizePointsCheckBox_->setChecked(true);
 
-    copyExtraBytesCheckBox_ = new QCheckBox;
+    copyExtraBytesCheckBox_ = new CheckBox;
     copyExtraBytesCheckBox_->setChecked(true);
 
-    QGridLayout *lfo = new QGridLayout;
+    GridLayout *lfo = new GridLayout;
     row = 0;
-    lfo->addWidget(new QLabel(tr("Convert to v1.4+")), row, 0);
+    lfo->addWidget(new Label(tr("Convert to v1.4+")), row, 0);
     lfo->addWidget(convertToVersion1Dot4CheckBox_, row, 1);
     row++;
-    lfo->addWidget(new QLabel(tr("Randomize points")), row, 0);
+    lfo->addWidget(new Label(tr("Randomize points")), row, 0);
     lfo->addWidget(randomizePointsCheckBox_, row, 1);
     row++;
-    lfo->addWidget(new QLabel(tr("Copy extra bytes")), row, 0);
+    lfo->addWidget(new Label(tr("Copy extra bytes")), row, 0);
     lfo->addWidget(copyExtraBytesCheckBox_, row, 1);
     row++;
 
     fileFormatOptions->setLayout(lfo);
 
     // Description.
-    QLabel *description = new QLabel(tr("Import action will modify "
-                                        "the original input file."));
+    Label *description = new Label(tr("Import action will modify "
+                                      "the original input file."));
 
     description->setToolTip(tr("The points will be sorted by 3D spatial index "
                                "for fast access.\n"
@@ -104,25 +104,25 @@ ImportFileDialog::ImportFileDialog(MainWindow *mainWindow)
                                "can be optionally removed from point data."));
 
     // Dialog buttons.
-    helpButton_ = new QPushButton(tr("Help"));
-    helpButton_->setIcon(THEME_ICON("question").icon());
-    connect(helpButton_, SIGNAL(clicked()), this, SLOT(slotHelp()));
+    helpButton_ = new PushButton(tr("Help"));
+    // helpButton_->setIcon(THEME_ICON("question"));
+    helpButton_->clicked.connect([this]() { slotHelp(); });
 
-    acceptButton_ = new QPushButton(tr("Import"));
-    acceptButton_->setIcon(THEME_ICON("run").icon());
-    connect(acceptButton_, SIGNAL(clicked()), this, SLOT(slotAccept()));
+    acceptButton_ = new PushButton(tr("Import"));
+    acceptButton_->setIcon(THEME_ICON("run"));
+    acceptButton_->clicked.connect([this]() { slotAccept(); });
 
-    rejectButton_ = new QPushButton(tr("Cancel"));
-    connect(rejectButton_, SIGNAL(clicked()), this, SLOT(slotReject()));
+    rejectButton_ = new PushButton(tr("Cancel"));
+    rejectButton_->clicked.connect([this]() { slotReject(); });
 
-    QHBoxLayout *dialogButtons = new QHBoxLayout;
+    HBoxLayout *dialogButtons = new HBoxLayout;
     dialogButtons->addWidget(helpButton_);
     dialogButtons->addStretch();
     dialogButtons->addWidget(acceptButton_);
     dialogButtons->addWidget(rejectButton_);
 
     // Dialog.
-    QVBoxLayout *dialogLayout = new QVBoxLayout;
+    VBoxLayout *dialogLayout = new VBoxLayout;
     dialogLayout->addWidget(datasetOptions);
     dialogLayout->addWidget(fileFormatOptions);
     dialogLayout->addSpacing(10);
@@ -134,21 +134,24 @@ ImportFileDialog::ImportFileDialog(MainWindow *mainWindow)
     setLayout(dialogLayout);
 
     setWindowTitle(tr("Import File"));
-    setWindowIcon(ICON("import-file").icon());
+    setWindowIcon(ICON("import-file"));
     setMaximumWidth(width());
     setMaximumHeight(height());
 }
 
+ImportFileDialog::~ImportFileDialog()
+{
+    delete helpDialog_;
+}
+
 void ImportFileDialog::slotAccept()
 {
-    close();
-    setResult(QDialog::Accepted);
+    accept();
 }
 
 void ImportFileDialog::slotReject()
 {
-    close();
-    setResult(QDialog::Rejected);
+    reject();
 }
 
 ImportSettings ImportFileDialog::settings() const
@@ -169,7 +172,7 @@ ImportSettings ImportFileDialog::settings() const
 
 void ImportFileDialog::slotHelp()
 {
-    QString t;
+    std::string t;
     t = "<h3>Import File</h3>"
         "<h2>Options</h2>"
         "The import file dialog allows to set the following options: "
@@ -205,7 +208,7 @@ void ImportFileDialog::slotHelp()
 
     if (!helpDialog_)
     {
-        helpDialog_ = new InfoDialog(this, 550, 450);
+        helpDialog_ = new InfoDialog(app_, 550, 450);
         helpDialog_->setWindowTitle(tr("Import File Help"));
         helpDialog_->setText(t);
     }

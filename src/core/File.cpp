@@ -25,8 +25,10 @@
 #include <cstdio>
 #include <cstdlib>
 #include <fcntl.h>
+#include <filesystem>
 #include <iostream>
 #include <limits>
+#include <regex>
 #include <sys/types.h>
 
 #if defined(_MSC_VER)
@@ -958,17 +960,58 @@ std::string File::resolvePath(const std::string &path,
     return rval;
 }
 
+static std::regex fileWildcardToRegex(const std::string &pattern)
+{
+    std::string rx;
+    rx.reserve(pattern.size() * 2);
+    rx += '^';
+
+    for (char c : pattern)
+    {
+        switch (c)
+        {
+            case '*':
+                rx += ".*";
+                break;
+            case '?':
+                rx += '.';
+                break;
+            case '.':
+            case '^':
+            case '$':
+            case '|':
+            case '(':
+            case ')':
+            case '[':
+            case ']':
+            case '{':
+            case '}':
+            case '+':
+            case '\\':
+                rx += '\\';
+                rx += c;
+                break;
+            default:
+                rx += c;
+        }
+    }
+
+    rx += '$';
+    return std::regex(rx);
+}
+
 std::vector<std::string> File::listFiles(const std::string &path,
-                                         const std::regex &pattern)
+                                         const std::string &pattern)
 {
     std::vector<std::string> fileNames;
+    auto re = fileWildcardToRegex(pattern);
 
     for (const auto &entry : std::filesystem::directory_iterator(path))
     {
         if (entry.is_regular_file())
         {
             std::string filename = entry.path().filename().string();
-            if (std::regex_match(filename, pattern))
+            if (std::regex_match(filename, re))
             {
                 fileNames.push_back(filename);
             }

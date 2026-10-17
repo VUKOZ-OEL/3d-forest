@@ -20,71 +20,71 @@
 /** @file ExportFilePlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ExportFileAction.hpp>
 #include <ExportFileDialog.hpp>
 #include <ExportFilePlugin.hpp>
-#include <MainWindow.hpp>
-#include <ProgressDialog.hpp>
+#include <MessageBox.hpp>
+#include <ProgressActionDialog.hpp>
 #include <ThemeIcon.hpp>
-
-// Include Qt.
-#include <QMessageBox>
 
 // Include local.
 #define LOG_MODULE_NAME "ExportFilePlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/exportfile/", name))
+#include <ExportFileResources.hpp> // Generated
+#define ICON(name) (ThemeIcon(app_, ":/ExportFileResources/", name))
 
-ExportFilePlugin::ExportFilePlugin() : mainWindow_(nullptr)
+ExportFilePlugin::ExportFilePlugin() : app_(nullptr)
 {
 }
 
-void ExportFilePlugin::initialize(MainWindow *mainWindow)
+void ExportFilePlugin::initialize(Application *app)
 {
-    mainWindow_ = mainWindow;
+    app_ = app;
+    resources_ = registerExportFileResources();
 
-    mainWindow_->createAction(&exportFileAction_,
-                              "File",
-                              "File Import/Export",
-                              tr("Export..."),
-                              tr("Export point cloud"),
-                              ICON("export-file"),
-                              this,
-                              SLOT(slotExportFile()),
-                              MAIN_WINDOW_MENU_FILE_PRIORITY,
-                              60);
+    app_->createAction(
+        this,
+        {{"File", MAIN_WINDOW_MENU_FILE_PRIORITY}},
+        "File Import/Export",
+        tr("Export..."),
+        tr("Export point cloud"),
+        ICON("export-file"),
+        [this]() { slotExportFile(); },
+        nullptr,
+        610);
 }
 
 void ExportFilePlugin::slotExportFile()
 {
-    mainWindow_->suspendThreads();
+    app_->suspendThreads();
 
     try
     {
-        ExportFileDialog dialog(mainWindow_, fileName_);
+        ExportFileDialog dialog(app_, fileName_);
 
-        if (dialog.exec() == QDialog::Accepted)
+        if (dialog.exec() == Dialog::Accepted)
         {
             std::shared_ptr<ExportFileFormatInterface> writer = dialog.writer();
             ExportFileProperties properties = dialog.properties();
 
-            ExportFileAction exportFile(&mainWindow_->editor());
+            ExportFileAction exportFile(&app_->editor());
             exportFile.initialize(writer, properties);
 
-            ProgressDialog::run(mainWindow_, "Exporting file", &exportFile);
+            ProgressActionDialog::run(app_, "Exporting file", &exportFile);
 
-            fileName_ = QString::fromStdString(properties.fileName());
+            fileName_ = properties.fileName();
         }
     }
     catch (std::exception &e)
     {
-        mainWindow_->showError(e.what());
+        app_->showError(e.what());
     }
     catch (...)
     {
-        mainWindow_->showError("Unknown error");
+        app_->showError("Unknown error");
     }
 
-    mainWindow_->resumeThreads();
+    app_->resumeThreads();
 }

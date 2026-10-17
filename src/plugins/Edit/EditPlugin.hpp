@@ -23,7 +23,7 @@
 #define EDIT_PLUGIN_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
+#include <Plugin.hpp>
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestEditPlugin)
@@ -36,24 +36,24 @@
 #endif
 
 /** Edit Plugin. */
-class EXPORT_EDIT_PLUGIN EditPlugin : public QObject, public PluginInterface
+class EditPlugin : public Plugin
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
-    EditPlugin();
+    const char *name() const override { return "EditPlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
-    virtual void initialize(MainWindow *mainWindow);
-
-public slots:
     void slotResetElevation();
     void slotResetManagementStatus();
     void slotSetClassification();
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_{nullptr};
 };
+
+extern "C" EXPORT_EDIT_PLUGIN Plugin *createPlugin()
+{
+    return new EditPlugin();
+}
 
 #endif /* EDIT_PLUGIN_HPP */

@@ -79,8 +79,8 @@ public:
         text = text_;
     }
 
-    const char *typeString() const;
-    static const char *typeString(int type_);
+    std::string typeString() const;
+    static std::string typeString(int type_);
 };
 
 /** Log Thread Callback Interface. */
@@ -183,7 +183,7 @@ extern std::shared_ptr<LoggerFile> EXPORT_CORE globalLoggerFile;
     #define LOG_DEBUG_UPDATE(msg)
 #endif
 
-#if 0
+#if 1
     #define LOG_DEBUG_RENDER(msg)                                              \
         LOG_MESSAGE(LOG_TYPE_DEBUG, LOG_MODULE_NAME, msg);
 #else

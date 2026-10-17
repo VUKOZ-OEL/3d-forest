@@ -20,47 +20,26 @@
 /** @file ComputeDescriptorPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ComputeDescriptorPlugin.hpp>
-#include <ComputeDescriptorWindow.hpp>
-#include <MainWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <ComputeDescriptorWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeDescriptorPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ComputeDescriptorResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ComputeDescriptorResources/", name))
 
-ComputeDescriptorPlugin::ComputeDescriptorPlugin()
-    : mainWindow_(nullptr),
-      pluginWindow_(nullptr)
+void ComputeDescriptorPlugin::initialize(Application *app)
 {
-}
+    app_ = app;
 
-void ComputeDescriptorPlugin::initialize(MainWindow *mainWindow)
-{
-    mainWindow_ = mainWindow;
-
-    mainWindow_->createAction(nullptr,
-                              "Compute",
-                              "Compute",
-                              tr("Descriptor"),
-                              tr("Compute descriptor of each point"),
-                              ICON("descriptor"),
-                              this,
-                              SLOT(slotPlugin()),
-                              MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
-}
-
-void ComputeDescriptorPlugin::slotPlugin()
-{
-    // Create GUI only when this plugin is used for the first time
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new ComputeDescriptorWindow(mainWindow_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Compute", MAIN_WINDOW_MENU_COMPUTE_PRIORITY}},
+                       "Compute",
+                       tr("Descriptor"),
+                       tr("Compute descriptor of each point"),
+                       ICON("descriptor"),
+                       {},
+                       new ComputeDescriptorWidget(app_));
 }

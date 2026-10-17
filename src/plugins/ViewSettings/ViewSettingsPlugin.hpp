@@ -23,8 +23,7 @@
 #define VIEW_SETTINGS_PLUGIN_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
-class ViewSettingsWindow;
+#include <Plugin.hpp>
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestViewSettingsPlugin)
@@ -37,24 +36,20 @@ class ViewSettingsWindow;
 #endif
 
 /** View Settings Plugin. */
-class EXPORT_VIEW_SETTINGS_PLUGIN ViewSettingsPlugin : public QObject,
-                                                       public PluginInterface
+class ViewSettingsPlugin : public Plugin
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
-    ViewSettingsPlugin();
-
-    virtual void initialize(MainWindow *mainWindow);
-
-public slots:
-    void slotPlugin();
+    const char *name() const override { return "ViewSettingsPlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
 private:
-    MainWindow *mainWindow_;
-    ViewSettingsWindow *pluginWindow_;
+    Application *app_{nullptr};
 };
+
+extern "C" EXPORT_VIEW_SETTINGS_PLUGIN Plugin *createPlugin()
+{
+    return new ViewSettingsPlugin();
+}
 
 #endif /* VIEW_SETTINGS_PLUGIN_HPP */

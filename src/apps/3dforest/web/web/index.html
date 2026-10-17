@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>3D Forest</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script type="module" src="/client.js"></script>
+  </head>
+  <body>
+    <div id="application">
+      <aside id="sidebar">
+        <nav id="controls" aria-label="Navigation"></nav>
+      </aside>
+      <div id="sidebar-handle" class="app-splitter"></div>
+      <main id="main">
+        <section id="viewer" aria-label="3D viewport"></section>
+        <div id="bottom-handle" class="app-splitter horizontal"></div>
+        <section id="bottom" aria-label="Results"></section>
+      </main>
+    </div>
+    <div id="connection">
+      <span id="status" role="status">Connecting…</span
+      ><button id="new-session" hidden>New session</button>
+    </div>
+    <div id="modal-shade" hidden></div>
+    <div id="dialogs"></div>
+  </body>
+</html>

@@ -20,28 +20,25 @@
 /** @file EditPluginResetManagementStatus.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <EditPluginResetManagementStatus.hpp>
-#include <MainWindow.hpp>
-
-// Include Qt.
-#include <QCoreApplication>
-#include <QProgressDialog>
+#include <ProgressDialog.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "EditPluginResetManagementStatus"
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-void EditPluginResetManagementStatus::run(MainWindow *mainWindow)
+void EditPluginResetManagementStatus::run(Application *app)
 {
     LOG_DEBUG(<< "Start resetting management status values.");
 
     size_t newManagementStatusId = 0;
 
     // Editor.
-    mainWindow->suspendThreads();
+    app->suspendThreads();
 
-    Editor *editor = &mainWindow->editor();
+    Editor *editor = &app->editor();
 
     // Edit segments.
     Segments segments = editor->segments();
@@ -51,8 +48,8 @@ void EditPluginResetManagementStatus::run(MainWindow *mainWindow)
     }
 
     editor->setSegments(segments);
-    mainWindow->update(nullptr,
-                       {Editor::TYPE_SEGMENT, Editor::TYPE_MANAGEMENT_STATUS});
+    app->update(nullptr,
+                Message::TYPE_SEGMENT | Message::TYPE_MANAGEMENT_STATUS);
 
     LOG_DEBUG(<< "Finished resetting management status values.");
 }

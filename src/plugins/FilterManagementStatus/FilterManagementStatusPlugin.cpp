@@ -20,51 +20,26 @@
 /** @file FilterManagementStatusPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <FilterManagementStatusPlugin.hpp>
-#include <FilterManagementStatusWindow.hpp>
-#include <MainWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <FilterManagementStatusWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterManagementStatusPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/FilterManagementStatusResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/FilterManagementStatusResources/", name))
 
-FilterManagementStatusPlugin::FilterManagementStatusPlugin()
-    : mainWindow_(nullptr),
-      pluginWindow_(nullptr)
+void FilterManagementStatusPlugin::initialize(Application *app)
 {
-}
+    app_ = app;
 
-void FilterManagementStatusPlugin::initialize(MainWindow *mainWindow)
-{
-    mainWindow_ = mainWindow;
-
-    mainWindow_->createAction(nullptr,
-                              "Filter",
-                              "Filter",
-                              tr("Management Status"),
-                              tr("Show management status filter"),
-                              ICON("management-status-filter"),
-                              this,
-                              SLOT(slotPlugin()),
-                              MAIN_WINDOW_MENU_FILTER_PRIORITY);
-}
-
-void FilterManagementStatusPlugin::slotPlugin()
-{
-    if (!mainWindow_)
-    {
-        return;
-    }
-
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new FilterManagementStatusWindow(mainWindow_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Filter", MAIN_WINDOW_MENU_FILTER_PRIORITY}},
+                       "Filter",
+                       tr("Management Status"),
+                       tr("Show management status filter"),
+                       ICON("management-status-filter"),
+                       {},
+                       new FilterManagementStatusWidget(app_));
 }

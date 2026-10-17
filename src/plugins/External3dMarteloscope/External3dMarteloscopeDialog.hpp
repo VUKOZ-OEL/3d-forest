@@ -22,42 +22,34 @@
 #ifndef EXTERNAL_3D_MARTELOSCOPE_DIALOG_HPP
 #define EXTERNAL_3D_MARTELOSCOPE_DIALOG_HPP
 
-// Include Std.
-#include <string>
-
 // Include 3D Forest.
-class MainWindow;
-
-// Include Qt.
-#include <QDialog>
-class QLineEdit;
-class QPushButton;
+#include <Dialog.hpp>
+class Application;
+class LineEdit;
+class PushButton;
 
 /** External 3d-Marteloscope Dialog. */
-class External3dMarteloscopeDialog : public QDialog
+class External3dMarteloscopeDialog : public Dialog
 {
-    Q_OBJECT
-
 public:
-    External3dMarteloscopeDialog(MainWindow *mainWindow);
+    External3dMarteloscopeDialog(Application *app);
 
     const std::string &path() const { return path_; }
 
-public slots:
     void slotBrowse();
     void slotAccept();
     void slotReject();
 
 protected:
-    MainWindow *mainWindow_;
+    Application *app_;
 
     std::string path_;
 
-    QLineEdit *fileNameLineEdit_;
-    QPushButton *browseButton_;
+    LineEdit *fileNameLineEdit_;
+    PushButton *browseButton_;
 
-    QPushButton *acceptButton_;
-    QPushButton *rejectButton_;
+    PushButton *acceptButton_;
+    PushButton *rejectButton_;
 };
 
 #endif /* EXTERNAL_3D_MARTELOSCOPE_DIALOG_HPP */

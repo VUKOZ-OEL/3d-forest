@@ -23,8 +23,8 @@
 #define TREE_TABLE_PLUGIN_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
-class TreeTableWindow;
+#include <Plugin.hpp>
+class TreeTableWidget;
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestTreeTablePlugin)
@@ -37,24 +37,21 @@ class TreeTableWindow;
 #endif
 
 /** Tree Table Plugin. */
-class EXPORT_TREE_TABLE_PLUGIN TreeTablePlugin : public QObject,
-                                                 public PluginInterface
+class TreeTablePlugin : public Plugin
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
-    TreeTablePlugin();
-
-    virtual void initialize(MainWindow *mainWindow);
-
-public slots:
-    void slotPlugin();
+    const char *name() const override { return "TreeTablePlugin"; }
+    void initialize(Application *app) override;
+    void release() override;
 
 private:
-    MainWindow *mainWindow_;
-    TreeTableWindow *pluginWindow_;
+    Application *app_{nullptr};
+    TreeTableWidget *treeTableWidget_{nullptr};
 };
+
+extern "C" EXPORT_TREE_TABLE_PLUGIN Plugin *createPlugin()
+{
+    return new TreeTablePlugin();
+}
 
 #endif /* TREE_TABLE_PLUGIN_HPP */

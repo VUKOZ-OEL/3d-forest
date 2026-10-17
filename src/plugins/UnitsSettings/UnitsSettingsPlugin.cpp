@@ -20,51 +20,26 @@
 /** @file UnitsSettingsPlugin.cpp */
 
 // Include 3D Forest.
-#include <MainWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <Application.hpp>
 #include <UnitsSettingsPlugin.hpp>
-#include <UnitsSettingsWindow.hpp>
+#include <UnitsSettingsWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "UnitsSettingsPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/UnitsSettingsResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/UnitsSettingsResources/", name))
 
-UnitsSettingsPlugin::UnitsSettingsPlugin()
-    : mainWindow_(nullptr),
-      pluginWindow_(nullptr)
+void UnitsSettingsPlugin::initialize(Application *app)
 {
-}
+    app_ = app;
 
-void UnitsSettingsPlugin::initialize(MainWindow *mainWindow)
-{
-    mainWindow_ = mainWindow;
-
-    mainWindow_->createAction(nullptr,
-                              "Settings",
-                              "Settings",
-                              tr("Units"),
-                              tr("Show units settings"),
-                              ICON("units"),
-                              this,
-                              SLOT(slotPlugin()),
-                              MAIN_WINDOW_MENU_SETTINGS_PRIORITY);
-}
-
-void UnitsSettingsPlugin::slotPlugin()
-{
-    if (!mainWindow_)
-    {
-        return;
-    }
-
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new UnitsSettingsWindow(mainWindow_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Settings", MAIN_WINDOW_MENU_SETTINGS_PRIORITY}},
+                       "Settings",
+                       tr("Units"),
+                       tr("Show units settings"),
+                       ICON("units"),
+                       {},
+                       new UnitsSettingsWidget(app_));
 }

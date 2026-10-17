@@ -20,17 +20,12 @@
 /** @file ComputeHeightMapModifier.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ColorPalette.hpp>
 #include <ComputeHeightMapModifier.hpp>
 #include <Editor.hpp>
-#include <MainWindow.hpp>
+#include <ProgressDialog.hpp>
 #include <Time.hpp>
-
-// Include Qt.
-#include <QCoreApplication>
-#include <QProgressDialog>
-#include <QString>
-#include <QWidget>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeHeightMapModifier"
@@ -46,17 +41,17 @@
 #define PLUGIN_COMPUTE_HEIGHT_MAP_COLORS_DEFAULT 256
 
 ComputeHeightMapModifier::ComputeHeightMapModifier()
-    : mainWindow_(nullptr),
+    : app_(nullptr),
       editor_(nullptr),
       previewEnabled_(false),
       source_(SOURCE_Z_POSITION)
 {
 }
 
-void ComputeHeightMapModifier::initialize(MainWindow *mainWindow)
+void ComputeHeightMapModifier::initialize(Application *app)
 {
-    mainWindow_ = mainWindow;
-    editor_ = &mainWindow->editor();
+    app_ = app;
+    editor_ = &app->editor();
     colormap_ = createColormap(PLUGIN_COMPUTE_HEIGHT_MAP_COLORMAP_DEFAULT,
                                PLUGIN_COMPUTE_HEIGHT_MAP_COLORS_DEFAULT);
 }
@@ -65,10 +60,11 @@ void ComputeHeightMapModifier::setSource(Source source)
 {
     bool previewEnabled;
 
-    mutex_.lock();
-    source_ = source;
-    previewEnabled = previewEnabled_;
-    mutex_.unlock();
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        source_ = source;
+        previewEnabled = previewEnabled_;
+    }
 
     if (previewEnabled)
     {
@@ -76,13 +72,16 @@ void ComputeHeightMapModifier::setSource(Source source)
     }
 }
 
-void ComputeHeightMapModifier::setColormap(const QString &name, int colorCount)
+void ComputeHeightMapModifier::setColormap(const std::string &name,
+                                           int colorCount)
 {
     bool previewEnabled;
-    mutex_.lock();
-    previewEnabled = previewEnabled_;
-    colormap_ = createColormap(name, colorCount);
-    mutex_.unlock();
+
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        previewEnabled = previewEnabled_;
+        colormap_ = createColormap(name, colorCount);
+    }
 
     if (previewEnabled)
     {
@@ -96,11 +95,12 @@ void ComputeHeightMapModifier::setPreviewEnabled(bool enabled,
 {
     if (update)
     {
-        mainWindow_->suspendThreads();
+        app_->suspendThreads();
 
-        mutex_.lock();
-        previewEnabled_ = enabled;
-        mutex_.unlock();
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            previewEnabled_ = enabled;
+        }
 
         {
             std::unique_lock<std::mutex> mutexlock(editor_->editorMutex_);
@@ -114,28 +114,32 @@ void ComputeHeightMapModifier::setPreviewEnabled(bool enabled,
             }
         }
 
-        mainWindow_->resumeThreads();
+        app_->resumeThreads();
     }
     else
     {
-        mutex_.lock();
-        previewEnabled_ = enabled;
-        mutex_.unlock();
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            previewEnabled_ = enabled;
+        }
     }
 }
 
 bool ComputeHeightMapModifier::previewEnabled()
 {
     bool ret;
-    mutex_.lock();
-    ret = previewEnabled_;
-    mutex_.unlock();
+
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        ret = previewEnabled_;
+    }
+
     return ret;
 }
 
 void ComputeHeightMapModifier::applyModifier(Page *page)
 {
-    mutex_.lock();
+    std::lock_guard<std::mutex> lock(mutex_);
 
     // Colormap range step in normalized colormap range.
     double colormapStep = 1.0 / static_cast<double>(colormap_.size() - 1);
@@ -196,13 +200,11 @@ void ComputeHeightMapModifier::applyModifier(Page *page)
         page->renderColor[row * 3 + 2] *=
             static_cast<float>(colormap_[colorIndex][2]);
     }
-
-    mutex_.unlock();
 }
 
-void ComputeHeightMapModifier::apply(QWidget *widget)
+void ComputeHeightMapModifier::apply(Application *app)
 {
-    mainWindow_->suspendThreads();
+    app_->suspendThreads();
 
     Query query(editor_);
     query.where().setBox(editor_->clipBoundary());
@@ -210,22 +212,21 @@ void ComputeHeightMapModifier::apply(QWidget *widget)
 
     int maximum = static_cast<int>(query.pageSizeEstimate());
 
-    QProgressDialog progressDialog(widget);
-    progressDialog.setCancelButtonText(QObject::tr("&Cancel"));
+    ProgressDialog progressDialog(app_);
+    // progressDialog.setCancelButtonText(tr("&Cancel"));
     progressDialog.setRange(0, maximum);
-    progressDialog.setWindowTitle(QObject::tr(PLUGIN_COMPUTE_HEIGHT_MAP_NAME));
-    progressDialog.setWindowModality(Qt::WindowModal);
-    progressDialog.setMinimumDuration(0);
+    progressDialog.setWindowTitle(tr(PLUGIN_COMPUTE_HEIGHT_MAP_NAME));
+    // progressDialog.setWindowModality(Ui::WindowModal);
+    // progressDialog.setMinimumDuration(0);
     progressDialog.show();
 
     for (int i = 0; i < maximum; i++)
     {
         // Update progress i
         progressDialog.setValue(i + 1);
-        progressDialog.setLabelText(
-            QObject::tr("Processing %1 of %n...", nullptr, maximum).arg(i + 1));
+        progressDialog.setLabelText(tr("Processing")); // i + 1 of maximum
 
-        QCoreApplication::processEvents();
+        app_->processEvents();
         if (progressDialog.wasCanceled())
         {
             break;
@@ -243,11 +244,11 @@ void ComputeHeightMapModifier::apply(QWidget *widget)
     }
     progressDialog.setValue(progressDialog.maximum());
 
-    mainWindow_->resumeThreads();
+    app_->resumeThreads();
 }
 
 std::vector<Vector3<double>> ComputeHeightMapModifier::createColormap(
-    const QString &name,
+    const std::string &name,
     int colorCount)
 {
     size_t n = static_cast<size_t>(colorCount);

@@ -20,38 +20,35 @@
 /** @file ComputeTreeAttributesWidget.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
+#include <CheckBox.hpp>
+#include <ComboBox.hpp>
 #include <ComputeTreeAttributesWidget.hpp>
 #include <DoubleSliderWidget.hpp>
+#include <HBoxLayout.hpp>
 #include <InfoDialog.hpp>
-#include <MainWindow.hpp>
-#include <ProgressDialog.hpp>
+#include <Label.hpp>
+#include <ProgressActionDialog.hpp>
+#include <PushButton.hpp>
 #include <ThemeIcon.hpp>
-
-// Include Qt.
-#include <QCheckBox>
-#include <QComboBox>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QPushButton>
-#include <QVBoxLayout>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeTreeAttributesWidget"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ComputeTreeAttributesResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ComputeTreeAttributesResources/", name))
 
-ComputeTreeAttributesWidget::ComputeTreeAttributesWidget(MainWindow *mainWindow)
-    : QWidget(),
-      mainWindow_(mainWindow),
-      treeAttributesAction_(&mainWindow->editor())
+ComputeTreeAttributesWidget::ComputeTreeAttributesWidget(Application *app)
+    : Widget(),
+      app_(app),
+      treeAttributesAction_(&app->editor())
 {
     LOG_DEBUG(<< "Create.");
 
     // Widgets.
     DoubleSliderWidget::create(treePositionHeightRangeSlider_,
-                               this,
                                nullptr,
                                nullptr,
                                tr("Tree position height range"),
@@ -65,28 +62,23 @@ ComputeTreeAttributesWidget::ComputeTreeAttributesWidget(MainWindow *mainWindow)
                                parameters_.treePositionHeightRange);
 
     // DBH Settings.
-    dbhMethodComboBox_ = new QComboBox;
-    dbhMethodComboBox_->addItem(QString::fromStdString(
-        toString(ComputeTreeAttributesParameters::DbhMethod::RHT)));
-    dbhMethodComboBox_->addItem(QString::fromStdString(
-        toString(ComputeTreeAttributesParameters::DbhMethod::LSR)));
-    dbhMethodComboBox_->setCurrentText(
-        QString::fromStdString(toString(parameters_.dbhMethod)));
+    dbhMethodComboBox_ = new ComboBox;
+    dbhMethodComboBox_->addItem(
+        toString(ComputeTreeAttributesParameters::DbhMethod::RHT));
+    dbhMethodComboBox_->addItem(
+        toString(ComputeTreeAttributesParameters::DbhMethod::LSR));
+    dbhMethodComboBox_->setCurrentText(toString(parameters_.dbhMethod));
+    dbhMethodComboBox_->activated.connect([this](int value)
+                                          { dbhMethodChanged(value); });
 
-    connect(dbhMethodComboBox_,
-            SIGNAL(activated(int)),
-            this,
-            SLOT(dbhMethodChanged(int)));
+    Label *dbhMethodLabel = new Label(tr("DBH method"));
 
-    QLabel *dbhMethodLabel = new QLabel(tr("DBH method"));
-
-    QHBoxLayout *dbhMethodLayout = new QHBoxLayout;
+    HBoxLayout *dbhMethodLayout = new HBoxLayout;
     dbhMethodLayout->addWidget(dbhMethodLabel);
     dbhMethodLayout->addWidget(dbhMethodComboBox_);
 
     // RHT DBH settings.
     DoubleSliderWidget::create(dbhRhtGridCmSlider_,
-                               this,
                                nullptr,
                                nullptr,
                                tr("RHT grid resolution"),
@@ -101,7 +93,6 @@ ComputeTreeAttributesWidget::ComputeTreeAttributesWidget(MainWindow *mainWindow)
 
     // General DBH settings.
     DoubleSliderWidget::create(dbhElevationSlider_,
-                               this,
                                nullptr,
                                nullptr,
                                tr("Calculate DBH at given elevation"),
@@ -113,7 +104,6 @@ ComputeTreeAttributesWidget::ComputeTreeAttributesWidget(MainWindow *mainWindow)
                                parameters_.dbhElevation);
 
     DoubleSliderWidget::create(dbhElevationRangeSlider_,
-                               this,
                                nullptr,
                                nullptr,
                                tr("DBH elevation range"),
@@ -127,7 +117,6 @@ ComputeTreeAttributesWidget::ComputeTreeAttributesWidget(MainWindow *mainWindow)
                                parameters_.dbhElevationRange);
 
     DoubleSliderWidget::create(maximumValidCalculatedDbhSlider_,
-                               this,
                                nullptr,
                                nullptr,
                                tr("Maximum valid calculated DBH"),
@@ -139,7 +128,7 @@ ComputeTreeAttributesWidget::ComputeTreeAttributesWidget(MainWindow *mainWindow)
                                parameters_.maximumValidCalculatedDbh);
 
     // Settings layout.
-    QVBoxLayout *settingsLayout = new QVBoxLayout;
+    VBoxLayout *settingsLayout = new VBoxLayout;
     settingsLayout->addWidget(treePositionHeightRangeSlider_);
     settingsLayout->addLayout(dbhMethodLayout);
     settingsLayout->addWidget(dbhRhtGridCmSlider_);
@@ -149,18 +138,17 @@ ComputeTreeAttributesWidget::ComputeTreeAttributesWidget(MainWindow *mainWindow)
     settingsLayout->addStretch();
 
     // Buttons.
-    applyButton_ = new QPushButton(tr("Run"));
-    applyButton_->setIcon(THEME_ICON("run").icon());
-    applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
+    applyButton_ = new PushButton(tr("Run"));
+    applyButton_->setIcon(THEME_ICON("run"));
+    applyButton_->clicked.connect([this]() { slotApply(); });
 
     // Buttons layout.
-    QHBoxLayout *buttonsLayout = new QHBoxLayout;
+    HBoxLayout *buttonsLayout = new HBoxLayout;
     buttonsLayout->addStretch();
     buttonsLayout->addWidget(applyButton_);
 
     // Main layout.
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->addLayout(settingsLayout);
     mainLayout->addSpacing(10);
     mainLayout->addLayout(buttonsLayout);
@@ -170,19 +158,18 @@ ComputeTreeAttributesWidget::ComputeTreeAttributesWidget(MainWindow *mainWindow)
     setLayout(mainLayout);
 }
 
-void ComputeTreeAttributesWidget::hideEvent(QHideEvent *event)
+void ComputeTreeAttributesWidget::hideEvent(HideEvent *event)
 {
     LOG_DEBUG(<< "Hide.");
     treeAttributesAction_.clear();
-    QWidget::hideEvent(event);
+    Widget::hideEvent(event);
 }
 
 void ComputeTreeAttributesWidget::dbhMethodChanged(int i)
 {
     (void)i;
 
-    fromString(parameters_.dbhMethod,
-               dbhMethodComboBox_->currentText().toStdString());
+    fromString(parameters_.dbhMethod, dbhMethodComboBox_->currentText());
 
     if (parameters_.dbhMethod ==
         ComputeTreeAttributesParameters::DbhMethod::RHT)
@@ -199,14 +186,13 @@ void ComputeTreeAttributesWidget::slotApply()
 {
     LOG_DEBUG(<< "Apply.");
 
-    mainWindow_->suspendThreads();
+    app_->suspendThreads();
 
     parameters_.ppm =
-        mainWindow_->editor().settings().unitsSettings().pointsPerMeter()[0];
+        app_->editor().settings().unitsSettings().pointsPerMeter()[0];
     parameters_.treePositionHeightRange =
         treePositionHeightRangeSlider_->value();
-    fromString(parameters_.dbhMethod,
-               dbhMethodComboBox_->currentText().toStdString());
+    fromString(parameters_.dbhMethod, dbhMethodComboBox_->currentText());
     parameters_.dbhRhtGridCm = dbhRhtGridCmSlider_->value();
     parameters_.dbhElevation = dbhElevationSlider_->value();
     parameters_.dbhElevationRange = dbhElevationRangeSlider_->value();
@@ -217,18 +203,18 @@ void ComputeTreeAttributesWidget::slotApply()
     {
         treeAttributesAction_.start(parameters_);
 
-        ProgressDialog::run(mainWindow_,
-                            "Computing Compute Tree Attributes",
-                            &treeAttributesAction_);
+        ProgressActionDialog::run(app_,
+                                  "Computing Compute Tree Attributes",
+                                  &treeAttributesAction_);
     }
     catch (std::exception &e)
     {
-        mainWindow_->showError(e.what());
+        app_->showError(e.what());
     }
     catch (...)
     {
-        mainWindow_->showError("Unknown error");
+        app_->showError("Unknown error");
     }
 
-    mainWindow_->update(this, {Editor::TYPE_SEGMENT});
+    app_->update(this, Message::TYPE_SEGMENT);
 }

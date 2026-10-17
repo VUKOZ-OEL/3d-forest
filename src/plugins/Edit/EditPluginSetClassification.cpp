@@ -20,45 +20,41 @@
 /** @file EditPluginSetClassification.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <EditPluginSetClassification.hpp>
 #include <InputComboBoxDialog.hpp>
-#include <MainWindow.hpp>
-
-// Include Qt.
-#include <QCoreApplication>
-#include <QProgressDialog>
+#include <ProgressDialog.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "EditPluginSetClassification"
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-void EditPluginSetClassification::run(MainWindow *mainWindow)
+void EditPluginSetClassification::run(Application *app)
 {
     LOG_DEBUG(<< "Start setting classification values.");
 
     uint8_t newClassificationValue = 0;
 
     // Editor.
-    mainWindow->suspendThreads();
+    app->suspendThreads();
 
-    Editor *editor = &mainWindow->editor();
+    Editor *editor = &app->editor();
 
     // Input.
-    InputComboBoxDialog dialog;
-    dialog.setWindowTitle("Select a classification");
+    InputComboBoxDialog dialog(app);
+    dialog.setWindowTitle(tr("Select a classification"));
 
     // Set dialog items.
     const Classifications &classifications = editor->classifications();
     for (size_t i = 0; i < classifications.size(); i++)
     {
-        QString text = QString::number(i) + " : " +
-                       QString::fromStdString(classifications.label(i));
+        std::string text = toString(i) + " : " + classifications.label(i);
         dialog.addItem(text);
     }
 
     // Open the dialog.
-    if (dialog.exec() == QDialog::Accepted)
+    if (dialog.exec() == Dialog::Accepted)
     {
         // Run.
         newClassificationValue = static_cast<uint8_t>(dialog.currentIndex());
@@ -72,8 +68,9 @@ void EditPluginSetClassification::run(MainWindow *mainWindow)
     }
 
     // Run.
-    QProgressDialog progress("Processing...", "Cancel", 0, 0);
-    progress.setWindowModality(Qt::WindowModal);
+    ProgressDialog progress(app);
+    progress.setWindowTitle(tr("Processing..."));
+    progress.setWindowModality(Ui::WindowModal);
     progress.show();
 
     Query query(editor);
@@ -92,7 +89,7 @@ void EditPluginSetClassification::run(MainWindow *mainWindow)
         {
             counter = 0;
 
-            QCoreApplication::processEvents();
+            app->processEvents();
 
             if (progress.wasCanceled())
             {
@@ -105,9 +102,7 @@ void EditPluginSetClassification::run(MainWindow *mainWindow)
 
     progress.close();
 
-    mainWindow->update(nullptr,
-                       {Editor::TYPE_CLASSIFICATION},
-                       Page::STATE_READ);
+    app->update(nullptr, Message::TYPE_CLASSIFICATION, Page::STATE_READ);
 
     LOG_DEBUG(<< "Finished setting classification values.");
 }

@@ -20,51 +20,26 @@
 /** @file FilterElevationPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <FilterElevationPlugin.hpp>
-#include <FilterElevationWindow.hpp>
-#include <MainWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <FilterElevationWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterElevationPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/FilterElevationResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/FilterElevationResources/", name))
 
-FilterElevationPlugin::FilterElevationPlugin()
-    : mainWindow_(nullptr),
-      pluginWindow_(nullptr)
+void FilterElevationPlugin::initialize(Application *app)
 {
-}
+    app_ = app;
 
-void FilterElevationPlugin::initialize(MainWindow *mainWindow)
-{
-    mainWindow_ = mainWindow;
-
-    mainWindow_->createAction(nullptr,
-                              "Filter",
-                              "Filter",
-                              tr("Elevation"),
-                              tr("Show elevation filter"),
-                              ICON("elevation-filter"),
-                              this,
-                              SLOT(slotPlugin()),
-                              MAIN_WINDOW_MENU_FILTER_PRIORITY);
-}
-
-void FilterElevationPlugin::slotPlugin()
-{
-    if (!mainWindow_)
-    {
-        return;
-    }
-
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new FilterElevationWindow(mainWindow_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Filter", MAIN_WINDOW_MENU_FILTER_PRIORITY}},
+                       "Filter",
+                       tr("Elevation"),
+                       tr("Show elevation filter"),
+                       ICON("elevation-filter"),
+                       {},
+                       new FilterElevationWidget(app_));
 }

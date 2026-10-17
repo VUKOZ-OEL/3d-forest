@@ -23,8 +23,7 @@
 #define COMPUTE_HULL_PLUGIN_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
-class ComputeHullWindow;
+#include <Plugin.hpp>
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestComputeHullPlugin)
@@ -37,24 +36,20 @@ class ComputeHullWindow;
 #endif
 
 /** Compute Hull Plugin. */
-class EXPORT_COMPUTE_HULL_PLUGIN ComputeHullPlugin : public QObject,
-                                                     public PluginInterface
+class ComputeHullPlugin : public Plugin
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
-    ComputeHullPlugin();
-
-    virtual void initialize(MainWindow *mainWindow);
-
-public slots:
-    void slotPlugin();
+    const char *name() const override { return "ComputeHullPlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
 private:
-    MainWindow *mainWindow_;
-    ComputeHullWindow *pluginWindow_;
+    Application *app_{nullptr};
 };
+
+extern "C" EXPORT_COMPUTE_HULL_PLUGIN Plugin *createPlugin()
+{
+    return new ComputeHullPlugin();
+}
 
 #endif /* COMPUTE_HULL_PLUGIN_HPP */

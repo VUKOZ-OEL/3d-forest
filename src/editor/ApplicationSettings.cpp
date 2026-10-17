@@ -27,8 +27,7 @@
 #define LOG_MODULE_NAME "ApplicationSettings"
 #include <Log.hpp>
 
-ApplicationSettings::ApplicationSettings()
-    : languageCode("en")
+ApplicationSettings::ApplicationSettings() : languageCode("en")
 {
 }
 

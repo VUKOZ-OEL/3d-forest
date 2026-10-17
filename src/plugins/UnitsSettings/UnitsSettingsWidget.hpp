@@ -22,51 +22,40 @@
 #ifndef UNITS_SETTINGS_WIDGET_HPP
 #define UNITS_SETTINGS_WIDGET_HPP
 
-// Include std.
-#include <vector>
-
 // Include 3D Forest.
 #include <Editor.hpp>
 #include <Settings.hpp>
-class MainWindow;
+#include <Widget.hpp>
+class Application;
 class ColorSwitchWidget;
-
-// Include Qt.
-#include <QWidget>
-class QCheckBox;
-class QDoubleSpinBox;
+class CheckBox;
+class DoubleSpinBox;
 
 /** Units Settings Widget. */
-class UnitsSettingsWidget : public QWidget
+class UnitsSettingsWidget : public Widget
 {
-    Q_OBJECT
-
 public:
-    UnitsSettingsWidget(MainWindow *mainWindow);
+    UnitsSettingsWidget(Application *app);
 
-    QSize sizeHint() const override { return QSize(300, 150); }
+    // Size sizeHint() const override { return Size(300, 150); }
 
-public slots:
-    void slotUpdate(void *sender, const QSet<Editor::Type> &target);
+    void slotUpdate(const Message &msg);
 
-protected slots:
     void slotIntermediateLas(double v);
     void slotIntermediateUser(double v);
     void slotUserDefined(int v);
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
 
-    QDoubleSpinBox *ppmLasSpinBox_;
-    QDoubleSpinBox *ppmUserSpinBox_;
-    QCheckBox *userDefinedCheckBox_;
+    DoubleSpinBox *ppmLasSpinBox_;
+    DoubleSpinBox *ppmUserSpinBox_;
+    CheckBox *userDefinedCheckBox_;
 
     UnitsSettings settings_;
 
     void dataChanged();
     void setUnitsSettings(const UnitsSettings &settings);
-    void block();
-    void unblock();
 };
 
 #endif /* UNITS_SETTINGS_WIDGET_HPP */

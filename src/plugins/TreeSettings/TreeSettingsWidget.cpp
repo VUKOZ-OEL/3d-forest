@@ -20,116 +20,95 @@
 /** @file TreeSettingsWidget.cpp */
 
 // Include 3D Forest.
-#include <ColorSwitchWidget.hpp>
-#include <MainWindow.hpp>
+#include <Application.hpp>
+#include <CheckBox.hpp>
+#include <Color.hpp>
+#include <ComboBox.hpp>
+#include <GridLayout.hpp>
+#include <GroupBox.hpp>
+#include <Label.hpp>
+#include <Slider.hpp>
 #include <ThemeIcon.hpp>
 #include <TreeSettingsWidget.hpp>
-
-// Include Qt.
-#include <QCheckBox>
-#include <QColor>
-#include <QComboBox>
-#include <QGridLayout>
-#include <QGroupBox>
-#include <QLabel>
-#include <QSlider>
-#include <QVBoxLayout>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "TreeSettingsWidget"
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/TreeSettingsResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/TreeSettingsResources/", name))
 
-TreeSettingsWidget::TreeSettingsWidget(MainWindow *mainWindow)
-    : QWidget(mainWindow),
-      mainWindow_(mainWindow)
+TreeSettingsWidget::TreeSettingsWidget(Application *app) : app_(app)
 {
     LOG_DEBUG(<< "Start creating tree settings widget.");
 
     // Tree attributes.
-    useOnlyForSelectedTreesCheckBox_ = new QCheckBox;
+    useOnlyForSelectedTreesCheckBox_ = new CheckBox;
     useOnlyForSelectedTreesCheckBox_->setChecked(
         settings_.useOnlyForSelectedTrees());
     useOnlyForSelectedTreesCheckBox_->setText(
         tr("Use only for selected trees"));
-    connect(useOnlyForSelectedTreesCheckBox_,
-            SIGNAL(stateChanged(int)),
-            this,
-            SLOT(slotSetUseOnlyForSelectedTrees(int)));
+    useOnlyForSelectedTreesCheckBox_->stateChanged.connect(
+        [this](int val) { slotSetUseOnlyForSelectedTrees(val); });
 
-    treeAttributesVisibleCheckBox_ = new QCheckBox;
+    treeAttributesVisibleCheckBox_ = new CheckBox;
     treeAttributesVisibleCheckBox_->setChecked(
         settings_.treeAttributesVisible());
     treeAttributesVisibleCheckBox_->setText(tr("Show tree attributes"));
-    connect(treeAttributesVisibleCheckBox_,
-            SIGNAL(stateChanged(int)),
-            this,
-            SLOT(slotSetTreeAttributesVisible(int)));
+    treeAttributesVisibleCheckBox_->stateChanged.connect(
+        [this](int val) { slotSetTreeAttributesVisible(val); });
 
-    treePositionAtBottomCheckBox_ = new QCheckBox;
+    treePositionAtBottomCheckBox_ = new CheckBox;
     treePositionAtBottomCheckBox_->setChecked(settings_.treePosition() ==
                                               TreeSettings::Position::BOTTOM);
     treePositionAtBottomCheckBox_->setText(tr("Show tree position at bottom"));
-    connect(treePositionAtBottomCheckBox_,
-            SIGNAL(stateChanged(int)),
-            this,
-            SLOT(slotSetTreePositionAtBottom(int)));
+    treePositionAtBottomCheckBox_->stateChanged.connect(
+        [this](int val) { slotSetTreePositionAtBottom(val); });
 
     // Convex hull.
-    convexHullVisibleCheckBox_ = new QCheckBox;
+    convexHullVisibleCheckBox_ = new CheckBox;
     convexHullVisibleCheckBox_->setChecked(settings_.convexHullVisible());
     convexHullVisibleCheckBox_->setText(tr("Show convex hull"));
-    connect(convexHullVisibleCheckBox_,
-            SIGNAL(stateChanged(int)),
-            this,
-            SLOT(slotSetConvexHullVisible(int)));
+    convexHullVisibleCheckBox_->stateChanged.connect(
+        [this](int val) { slotSetConvexHullVisible(val); });
 
-    convexHullProjectionVisibleCheckBox_ = new QCheckBox;
+    convexHullProjectionVisibleCheckBox_ = new CheckBox;
     convexHullProjectionVisibleCheckBox_->setChecked(
         settings_.convexHullVisible());
     convexHullProjectionVisibleCheckBox_->setText(
         tr("Show convex hull projection"));
-    connect(convexHullProjectionVisibleCheckBox_,
-            SIGNAL(stateChanged(int)),
-            this,
-            SLOT(slotSetConvexHullProjectionVisible(int)));
+    convexHullProjectionVisibleCheckBox_->stateChanged.connect(
+        [this](int val) { slotSetConvexHullProjectionVisible(val); });
 
     // Concave hull.
-    concaveHullVisibleCheckBox_ = new QCheckBox;
+    concaveHullVisibleCheckBox_ = new CheckBox;
     concaveHullVisibleCheckBox_->setChecked(settings_.concaveHullVisible());
     concaveHullVisibleCheckBox_->setText(tr("Show concave hull"));
-    connect(concaveHullVisibleCheckBox_,
-            SIGNAL(stateChanged(int)),
-            this,
-            SLOT(slotSetConcaveHullVisible(int)));
+    concaveHullVisibleCheckBox_->stateChanged.connect(
+        [this](int val) { slotSetConcaveHullVisible(val); });
 
-    concaveHullProjectionVisibleCheckBox_ = new QCheckBox;
+    concaveHullProjectionVisibleCheckBox_ = new CheckBox;
     concaveHullProjectionVisibleCheckBox_->setChecked(
         settings_.concaveHullVisible());
     concaveHullProjectionVisibleCheckBox_->setText(
         tr("Show concave hull projection"));
-    connect(concaveHullProjectionVisibleCheckBox_,
-            SIGNAL(stateChanged(int)),
-            this,
-            SLOT(slotSetConcaveHullProjectionVisible(int)));
+    concaveHullProjectionVisibleCheckBox_->stateChanged.connect(
+        [this](int val) { slotSetConcaveHullProjectionVisible(val); });
 
     // DBH scale.
-    dbhScaleSlider_ = new QSlider;
+    dbhScaleSlider_ = new Slider;
     dbhScaleSlider_->setMinimum(1);
     dbhScaleSlider_->setMaximum(10);
     dbhScaleSlider_->setSingleStep(1);
     dbhScaleSlider_->setTickInterval(1);
-    dbhScaleSlider_->setTickPosition(QSlider::TicksAbove);
-    dbhScaleSlider_->setOrientation(Qt::Horizontal);
-    connect(dbhScaleSlider_,
-            SIGNAL(valueChanged(int)),
-            this,
-            SLOT(slotSetDbhScale(int)));
+    dbhScaleSlider_->setTickPosition(Slider::TicksAbove);
+    dbhScaleSlider_->setOrientation(Ui::Horizontal);
+    dbhScaleSlider_->valueChanged.connect([this](int val)
+                                          { slotSetDbhScale(val); });
 
     // Options.
-    QVBoxLayout *optionsVBoxLayout = new QVBoxLayout;
+    VBoxLayout *optionsVBoxLayout = new VBoxLayout;
     optionsVBoxLayout->addWidget(useOnlyForSelectedTreesCheckBox_);
     optionsVBoxLayout->addWidget(treeAttributesVisibleCheckBox_);
     optionsVBoxLayout->addWidget(treePositionAtBottomCheckBox_);
@@ -138,45 +117,41 @@ TreeSettingsWidget::TreeSettingsWidget(MainWindow *mainWindow)
     optionsVBoxLayout->addWidget(concaveHullVisibleCheckBox_);
     optionsVBoxLayout->addWidget(concaveHullProjectionVisibleCheckBox_);
 
-    QGroupBox *optionsGroupBox = new QGroupBox(tr("Options"));
+    GroupBox *optionsGroupBox = new GroupBox(tr("Options"));
     optionsGroupBox->setLayout(optionsVBoxLayout);
 
     // Layout.
-    QGridLayout *groupBoxLayout = new QGridLayout;
+    GridLayout *groupBoxLayout = new GridLayout;
     groupBoxLayout->addWidget(optionsGroupBox, 0, 0, 1, 2);
-    groupBoxLayout->addWidget(new QLabel(tr("DBH scale:")), 1, 0);
+    groupBoxLayout->addWidget(new Label(tr("DBH scale:")), 1, 0);
     groupBoxLayout->addWidget(dbhScaleSlider_, 1, 1);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->addLayout(groupBoxLayout);
     mainLayout->addStretch();
 
     setLayout(mainLayout);
 
     // Data.
-    connect(mainWindow_,
-            SIGNAL(signalUpdate(void *, const QSet<Editor::Type> &)),
-            this,
-            SLOT(slotUpdate(void *, const QSet<Editor::Type> &)));
+    app_->signalUpdate.connect([this](const Message &msg) { slotUpdate(msg); });
 
-    slotUpdate(nullptr, QSet<Editor::Type>());
+    slotUpdate({});
 
     LOG_DEBUG(<< "Finished creating tree settings widget.");
 }
 
-void TreeSettingsWidget::slotUpdate(void *sender,
-                                    const QSet<Editor::Type> &target)
+void TreeSettingsWidget::slotUpdate(const Message &msg)
 {
-    if (sender == this)
+    if (msg.sender() == this)
     {
         return;
     }
 
-    if (target.empty() || target.contains(Editor::TYPE_SETTINGS))
+    if (msg.empty() || msg.contains(Message::TYPE_SETTINGS))
     {
         LOG_DEBUG_UPDATE(<< "Input tree settings.");
 
-        setTreeSettings(mainWindow_->editor().settings().treeSettings());
+        setTreeSettings(app_->editor().settings().treeSettings());
     }
 }
 
@@ -184,25 +159,23 @@ void TreeSettingsWidget::dataChanged(bool modifiers)
 {
     LOG_DEBUG_UPDATE(<< "Output tree settings.");
 
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setTreeSettings(settings_);
-    mainWindow_->emitUpdate(this, {Editor::TYPE_SETTINGS});
+    app_->suspendThreads();
+    app_->editor().setTreeSettings(settings_);
+    app_->emitUpdate(this, {Message::TYPE_SETTINGS});
 
     if (modifiers)
     {
-        mainWindow_->updateModifiers();
+        app_->updateModifiers();
     }
     else
     {
-        mainWindow_->updateRender();
+        app_->updateRender();
     }
 }
 
 void TreeSettingsWidget::setTreeSettings(const TreeSettings &settings)
 {
     LOG_DEBUG(<< "Set tree settings <" << toString(settings) << ">.");
-
-    block();
 
     settings_ = settings;
 
@@ -234,8 +207,6 @@ void TreeSettingsWidget::setTreeSettings(const TreeSettings &settings)
 
     // DBH scale.
     dbhScaleSlider_->setValue(static_cast<int>(settings_.dbhScale()));
-
-    unblock();
 }
 
 void TreeSettingsWidget::slotSetUseOnlyForSelectedTrees(int v)
@@ -304,14 +275,4 @@ void TreeSettingsWidget::slotSetDbhScale(int v)
 {
     settings_.setDbhScale(static_cast<double>(v));
     dataChanged();
-}
-
-void TreeSettingsWidget::block()
-{
-    (void)blockSignals(true);
-}
-
-void TreeSettingsWidget::unblock()
-{
-    (void)blockSignals(false);
 }

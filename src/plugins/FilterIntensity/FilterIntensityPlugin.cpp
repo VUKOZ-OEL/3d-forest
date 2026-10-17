@@ -20,51 +20,26 @@
 /** @file FilterIntensityPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <FilterIntensityPlugin.hpp>
-#include <FilterIntensityWindow.hpp>
-#include <MainWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <FilterIntensityWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterIntensityPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/FilterIntensityResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/FilterIntensityResources/", name))
 
-FilterIntensityPlugin::FilterIntensityPlugin()
-    : mainWindow_(nullptr),
-      pluginWindow_(nullptr)
+void FilterIntensityPlugin::initialize(Application *app)
 {
-}
+    app_ = app;
 
-void FilterIntensityPlugin::initialize(MainWindow *mainWindow)
-{
-    mainWindow_ = mainWindow;
-
-    mainWindow_->createAction(nullptr,
-                              "Filter",
-                              "Filter",
-                              tr("Intensity"),
-                              tr("Show intensity filter"),
-                              ICON("intensity-filter"),
-                              this,
-                              SLOT(slotPlugin()),
-                              MAIN_WINDOW_MENU_FILTER_PRIORITY);
-}
-
-void FilterIntensityPlugin::slotPlugin()
-{
-    if (!mainWindow_)
-    {
-        return;
-    }
-
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new FilterIntensityWindow(mainWindow_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Filter", MAIN_WINDOW_MENU_FILTER_PRIORITY}},
+                       "Filter",
+                       tr("Intensity"),
+                       tr("Show intensity filter"),
+                       ICON("intensity-filter"),
+                       {},
+                       new FilterIntensityWidget(app_));
 }

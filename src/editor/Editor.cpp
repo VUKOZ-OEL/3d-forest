@@ -113,8 +113,8 @@ void Editor::readSettings()
         return;
     }
 
-    LOG_DEBUG(<< "Finished reading application settings <"
-              << toString(settings_) << ">.");
+    // LOG_DEBUG(<< "Finished reading application settings <"
+    //           << toString(settings_) << ">.");
 }
 
 void Editor::writeSettings()

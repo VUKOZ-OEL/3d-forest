@@ -23,44 +23,39 @@
 #define EXPORT_FILE_DIALOG_HPP
 
 // Include 3D Forest.
+#include <Dialog.hpp>
 #include <ExportFileFormatInterface.hpp>
 #include <ExportFileProperties.hpp>
-class MainWindow;
-
-// Include Qt.
-#include <QDialog>
-class QCheckBox;
-class QLineEdit;
-class QPushButton;
-class QComboBox;
+class Application;
+class CheckBox;
+class LineEdit;
+class PushButton;
+class ComboBox;
 
 /** Export File Dialog. */
-class ExportFileDialog : public QDialog
+class ExportFileDialog : public Dialog
 {
-    Q_OBJECT
-
 public:
-    ExportFileDialog(MainWindow *mainWindow, const QString &fileName);
+    ExportFileDialog(Application *app, const std::string &fileName);
 
     std::shared_ptr<ExportFileFormatInterface> writer() const;
     ExportFileProperties properties() const;
 
-public slots:
     void slotBrowse();
     void slotAccept();
     void slotReject();
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
 
-    QLineEdit *fileNameLineEdit_;
-    QPushButton *browseButton_;
-    std::vector<QCheckBox *> attributeCheckBox_;
-    QComboBox *scaleComboBox_;
-    QCheckBox *filterEnabledCheckBox_;
+    LineEdit *fileNameLineEdit_;
+    PushButton *browseButton_;
+    std::vector<CheckBox *> attributeCheckBox_;
+    ComboBox *scaleComboBox_;
+    CheckBox *filterEnabledCheckBox_;
 
-    QPushButton *acceptButton_;
-    QPushButton *rejectButton_;
+    PushButton *acceptButton_;
+    PushButton *rejectButton_;
 };
 
 #endif /* EXPORT_FILE_DIALOG_HPP */

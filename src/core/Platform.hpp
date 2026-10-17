@@ -1,0 +1,50 @@
+/*
+    Copyright 2020 VUKOZ
+
+    This file is part of 3D Forest.
+
+    3D Forest is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    3D Forest is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+/** @file Platform.hpp */
+
+#ifndef PLATFORM_HPP
+#define PLATFORM_HPP
+
+#if defined(_WIN32)
+    #define PLATFORM_WINDOWS 1
+    #define PLATFORM_PLUGIN_WIN32 1
+#endif
+
+#if defined(__linux__)
+    #define PLATFORM_LINUX 1
+#endif
+
+#if defined(__APPLE__)
+    #define PLATFORM_MACOS 1
+#endif
+
+#if defined(_MSC_VER)
+    #define COMPILER_MSVC 1
+#endif
+
+#if defined(__clang__)
+    #define COMPILER_CLANG 1
+#endif
+
+#if defined(__GNUC__) && !defined(__clang__)
+    #define COMPILER_GCC 1
+#endif
+
+#endif /* PLATFORM_HPP */

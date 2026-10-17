@@ -19,6 +19,9 @@
 
 /** @file Segments.cpp */
 
+// Include std.
+#include <filesystem>
+
 // Include 3D Forest.
 #include <ColorPalette.hpp>
 #include <Segments.hpp>

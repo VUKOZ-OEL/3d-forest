@@ -23,8 +23,7 @@
 #define FILTER_CLASSIFICATION_PLUGIN_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
-class FilterClassificationWindow;
+#include <Plugin.hpp>
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestFilterClassificationPlugin)
@@ -37,25 +36,20 @@ class FilterClassificationWindow;
 #endif
 
 /** Filter Classification Plugin. */
-class EXPORT_FILTER_CLASSIFICATION_PLUGIN FilterClassificationPlugin
-    : public QObject,
-      public PluginInterface
+class FilterClassificationPlugin : public Plugin
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
-    FilterClassificationPlugin();
-
-    virtual void initialize(MainWindow *mainWindow);
-
-public slots:
-    void slotPlugin();
+    const char *name() const override { return "FilterClassificationPlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
 private:
-    MainWindow *mainWindow_;
-    FilterClassificationWindow *pluginWindow_;
+    Application *app_{nullptr};
 };
+
+extern "C" EXPORT_FILTER_CLASSIFICATION_PLUGIN Plugin *createPlugin()
+{
+    return new FilterClassificationPlugin();
+}
 
 #endif /* FILTER_CLASSIFICATION_PLUGIN_HPP */

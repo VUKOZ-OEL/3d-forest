@@ -23,32 +23,29 @@
 #define COMPUTE_HEIGHT_MAP_WIDGET_HPP
 
 // Include 3D Forest.
-class MainWindow;
+class Application;
 class ComputeHeightMapModifier;
 
 // Include Qt.
-#include <QWidget>
-class QSpinBox;
-class QComboBox;
-class QCheckBox;
-class QPushButton;
+#include <Widget.hpp>
+class SpinBox;
+class ComboBox;
+class CheckBox;
+class PushButton;
 
 /** Compute Height Map Widget.
 
     This class represents Compute Height Map GUI as view-controller for
     ComputeHeightMapModifier.
 */
-class ComputeHeightMapWidget : public QWidget
+class ComputeHeightMapWidget : public Widget
 {
-    Q_OBJECT
-
 public:
-    ComputeHeightMapWidget(MainWindow *mainWindow,
+    ComputeHeightMapWidget(Application *app,
                            ComputeHeightMapModifier *modifier);
 
     void closeModifier();
 
-protected slots:
     void colorCountChanged(int i);
     void colormapChanged(int index);
     void sourceChanged(int index);
@@ -56,15 +53,15 @@ protected slots:
     void apply();
 
 protected:
-    MainWindow *mainWindow_;
+    Application *app_;
     ComputeHeightMapModifier *modifier_;
 
-    QSpinBox *colorCountSpinBox_;
-    QComboBox *colormapComboBox_;
-    QComboBox *sourceComboBox_;
-    QCheckBox *previewCheckBox_;
+    SpinBox *colorCountSpinBox_;
+    ComboBox *colormapComboBox_;
+    ComboBox *sourceComboBox_;
+    CheckBox *previewCheckBox_;
 
-    QPushButton *applyButton_;
+    PushButton *applyButton_;
 };
 
 #endif /* COMPUTE_HEIGHT_MAP_WIDGET_HPP */

@@ -20,24 +20,21 @@
 /** @file FilterManagementStatusTreeWidget.cpp */
 
 // Include 3D Forest.
-#include <FilterManagementStatusTreeWidget.hpp>
+#include <Application.hpp>
+#include <CheckBox.hpp>
 #include <Core.hpp>
-#include <MainWindow.hpp>
-
-// Include Qt.
-#include <QCheckBox>
-#include <QLabel>
-#include <QVBoxLayout>
+#include <FilterManagementStatusTreeWidget.hpp>
+#include <Label.hpp>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterManagementStatusTreeWidget"
-// #define LOG_MODULE_DEBUG_ENABLED 1
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
 FilterManagementStatusTreeWidget::FilterManagementStatusTreeWidget(
-    MainWindow *mainWindow)
-    : QWidget(mainWindow),
-      mainWindow_(mainWindow)
+    Application *app)
+    : app_(app)
 {
     LOG_DEBUG(<< "Create.");
 
@@ -45,7 +42,7 @@ FilterManagementStatusTreeWidget::FilterManagementStatusTreeWidget(
     statusMap_ = createMap();
 
     // Layout.
-    mainLayout_ = new QVBoxLayout;
+    mainLayout_ = new VBoxLayout;
     mainLayout_->setContentsMargins(0, 0, 0, 0);
 
     // Checkbox list
@@ -59,7 +56,7 @@ FilterManagementStatusTreeWidget::createMap()
 {
     std::map<size_t, Status> statusMap;
 
-    Editor *editor = &mainWindow_->editor();
+    Editor *editor = &app_->editor();
     const ManagementStatusList &statusList = editor->managementStatusList();
 
     for (size_t i = 0; i < statusList.size(); i++)
@@ -67,7 +64,7 @@ FilterManagementStatusTreeWidget::createMap()
         const ManagementStatus &status = statusList[i];
         FilterManagementStatusTreeWidget::Status statusItem;
         statusItem.statusId = status.id;
-        statusItem.label = QString::fromStdString(status.label);
+        statusItem.label = status.label;
 
         statusMap[i] = statusItem;
     }
@@ -80,34 +77,25 @@ void FilterManagementStatusTreeWidget::createCheckBoxList()
     LOG_DEBUG(<< "Create check box list.");
 
     // Delete.
-    while (QLayoutItem *item = mainLayout_->takeAt(0))
-    {
-        if (QWidget *w = item->widget())
-        {
-            w->deleteLater();
-        }
-
-        delete item;
-    }
-
+    mainLayout_->clear();
     checkboxList_.clear();
 
     // Checkbox list
     checkboxList_.resize(statusMap_.size());
     for (size_t i = 0; i < checkboxList_.size(); i++)
     {
-        checkboxList_[i] = new QCheckBox;
-        checkboxList_[i]->setChecked(false);
-        auto label = core().translate(statusMap_[i].label.toStdString());
-        checkboxList_[i]->setText(QString::fromStdString(label));
-        connect(checkboxList_[i],
-                SIGNAL(clicked(bool)),
-                this,
-                SLOT(slotSetCheckbox(bool)));
+        CheckBox *checkbox = new CheckBox;
+        checkbox->setChecked(false);
+        // auto label = core().translate(statusMap_[i].label);
+        checkbox->setText(statusMap_[i].label);
+        checkbox->stateChanged.connect([this, checkbox](bool value)
+                                       { slotSetCheckbox(value, checkbox); });
+
+        checkboxList_[i] = checkbox;
     }
 
     // Layout.
-    mainLayout_->addWidget(new QLabel(tr("Selected trees:")));
+    mainLayout_->addWidget(new Label(tr("Selected trees:")));
     for (size_t i = 0; i < checkboxList_.size(); i++)
     {
         mainLayout_->addWidget(checkboxList_[i]);
@@ -130,15 +118,14 @@ void FilterManagementStatusTreeWidget::updateCheckBoxList()
     }
 }
 
-void FilterManagementStatusTreeWidget::slotSetCheckbox(bool b)
+void FilterManagementStatusTreeWidget::slotSetCheckbox(bool b, CheckBox *sender)
 {
     LOG_DEBUG(<< "Checkbox clicked.");
     (void)b;
 
-    QObject *obj = sender();
     for (size_t i = 0; i < checkboxList_.size(); i++)
     {
-        if (obj == checkboxList_[i])
+        if (sender == checkboxList_[i])
         {
             LOG_DEBUG(<< "Checkbox pos <" << i << "> sender.");
             checkboxList_[i]->setChecked(true);
@@ -156,8 +143,8 @@ void FilterManagementStatusTreeWidget::setCheckbox(size_t idx)
 {
     LOG_DEBUG(<< "Set checkbox index <" << idx << "> to selected segments.");
 
-    mainWindow_->suspendThreads();
-    Editor *editor = &mainWindow_->editor();
+    app_->suspendThreads();
+    Editor *editor = &app_->editor();
     Segments segments = editor->segments();
 
     size_t nSelected = 0;
@@ -176,8 +163,7 @@ void FilterManagementStatusTreeWidget::setCheckbox(size_t idx)
     }
 
     editor->setSegments(segments);
-    mainWindow_->update(this,
-                        {Editor::TYPE_SEGMENT, Editor::TYPE_MANAGEMENT_STATUS});
+    app_->update(this, Message::TYPE_SEGMENT | Message::TYPE_MANAGEMENT_STATUS);
 }
 
 void FilterManagementStatusTreeWidget::setSegment(const Segment &segment)

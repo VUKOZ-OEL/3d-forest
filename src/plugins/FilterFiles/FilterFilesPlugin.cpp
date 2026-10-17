@@ -20,51 +20,26 @@
 /** @file FilterFilesPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <FilterFilesPlugin.hpp>
-#include <FilterFilesWindow.hpp>
-#include <MainWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <FilterFilesWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterFilesPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/FilterFilesResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/FilterFilesResources/", name))
 
-FilterFilesPlugin::FilterFilesPlugin()
-    : mainWindow_(nullptr),
-      pluginWindow_(nullptr)
+void FilterFilesPlugin::initialize(Application *app)
 {
-}
+    app_ = app;
 
-void FilterFilesPlugin::initialize(MainWindow *mainWindow)
-{
-    mainWindow_ = mainWindow;
-
-    mainWindow_->createAction(nullptr,
-                              "Filter",
-                              "Filter",
-                              tr("Files"),
-                              tr("Show file filter"),
-                              ICON("files"),
-                              this,
-                              SLOT(slotPlugin()),
-                              MAIN_WINDOW_MENU_FILTER_PRIORITY);
-}
-
-void FilterFilesPlugin::slotPlugin()
-{
-    if (!mainWindow_)
-    {
-        return;
-    }
-
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new FilterFilesWindow(mainWindow_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Filter", MAIN_WINDOW_MENU_FILTER_PRIORITY}},
+                       "Filter",
+                       tr("Files"),
+                       tr("Show file filter"),
+                       ICON("files"),
+                       {},
+                       new FilterFilesWidget(app_));
 }

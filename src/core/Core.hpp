@@ -54,11 +54,11 @@ private:
     class Translation
     {
     public:
-        std::map<std::string,std::string> language;
+        std::map<std::string, std::string> language;
     };
 
     std::string languageCode_;
-    std::map<std::string,Translation> translations_; // source:translation
+    std::map<std::string, Translation> translations_; // source:translation
 };
 
 EXPORT_CORE Core &core();

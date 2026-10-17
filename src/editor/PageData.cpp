@@ -32,7 +32,7 @@
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-PageData::PageData(uint32_t datasetId, uint32_t pageId)
+PageData::PageData(size_t datasetId, size_t pageId)
     : datasetId_(datasetId),
       pageId_(pageId),
       modified_(false)

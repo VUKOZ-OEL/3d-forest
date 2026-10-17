@@ -20,109 +20,94 @@
 /** @file UnitsSettingsWidget.cpp */
 
 // Include 3D Forest.
-#include <MainWindow.hpp>
+#include <Application.hpp>
+#include <CheckBox.hpp>
+#include <DoubleSpinBox.hpp>
+#include <GridLayout.hpp>
+#include <Label.hpp>
 #include <ThemeIcon.hpp>
 #include <UnitsSettingsWidget.hpp>
-
-// Include Qt.
-#include <QCheckBox>
-#include <QDoubleSpinBox>
-#include <QGridLayout>
-#include <QLabel>
-#include <QVBoxLayout>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "UnitsSettingsWidget"
 // #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/UnitsSettingsResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/UnitsSettingsResources/", name))
 
-UnitsSettingsWidget::UnitsSettingsWidget(MainWindow *mainWindow)
-    : QWidget(mainWindow),
-      mainWindow_(mainWindow)
+UnitsSettingsWidget::UnitsSettingsWidget(Application *app) : app_(app)
 {
     // Widgets.
-    ppmLasSpinBox_ = new QDoubleSpinBox;
+    ppmLasSpinBox_ = new DoubleSpinBox;
     ppmLasSpinBox_->setRange(1, 1000000);
     ppmLasSpinBox_->setValue(1000);
     ppmLasSpinBox_->setSingleStep(1);
     ppmLasSpinBox_->setEnabled(false);
-    connect(ppmLasSpinBox_,
-            SIGNAL(valueChanged(double)),
-            this,
-            SLOT(slotIntermediateLas(double)));
+    ppmLasSpinBox_->valueChanged.connect([this](double val)
+                                         { slotIntermediateLas(val); });
 
-    ppmUserSpinBox_ = new QDoubleSpinBox;
+    ppmUserSpinBox_ = new DoubleSpinBox;
     ppmUserSpinBox_->setRange(1, 1000000);
     ppmUserSpinBox_->setValue(1000);
     ppmUserSpinBox_->setSingleStep(1);
     ppmUserSpinBox_->setEnabled(settings_.userDefined);
-    connect(ppmUserSpinBox_,
-            SIGNAL(valueChanged(double)),
-            this,
-            SLOT(slotIntermediateUser(double)));
+    ppmUserSpinBox_->valueChanged.connect([this](double val)
+                                          { slotIntermediateUser(val); });
 
-    userDefinedCheckBox_ = new QCheckBox;
+    userDefinedCheckBox_ = new CheckBox;
     userDefinedCheckBox_->setChecked(settings_.userDefined);
     // userDefinedCheckBox_->setText(tr("Enabled"));
-    connect(userDefinedCheckBox_,
-            SIGNAL(stateChanged(int)),
-            this,
-            SLOT(slotUserDefined(int)));
+    userDefinedCheckBox_->stateChanged.connect([this](int val)
+                                               { slotUserDefined(val); });
 
-    QLabel *help = new QLabel;
+    Label *help = new Label;
     help->setToolTip(tr("The values are in points per meter.\n"
                         "Example: las scaling 0.01 is 100 points per meter, "
                         "two points have integer x coordinates 5 and 7 "
                         "which is x length 2 cm.\n"
                         "The user is able to override input file las scaling "
                         "to user defined value."));
-    ThemeIcon helpIcon(":/gui/", "question");
-    help->setPixmap(helpIcon.pixmap(MainWindow::ICON_SIZE_TEXT));
+    help->setIcon(THEME_ICON("question"));
 
     // Layout.
-    QGridLayout *groupBoxLayout = new QGridLayout;
+    GridLayout *groupBoxLayout = new GridLayout;
 
-    groupBoxLayout->addWidget(new QLabel(tr("Las scaling:")), 0, 0);
+    groupBoxLayout->addWidget(new Label(tr("Las scaling:")), 0, 0);
     groupBoxLayout->addWidget(ppmLasSpinBox_, 0, 1);
 
-    groupBoxLayout->addWidget(new QLabel(tr("User scaling:")), 1, 0);
+    groupBoxLayout->addWidget(new Label(tr("User scaling:")), 1, 0);
     groupBoxLayout->addWidget(ppmUserSpinBox_, 1, 1);
 
-    groupBoxLayout->addWidget(new QLabel(tr("User scaling enabled:")), 2, 0);
+    groupBoxLayout->addWidget(new Label(tr("User scaling enabled:")), 2, 0);
     groupBoxLayout->addWidget(userDefinedCheckBox_, 2, 1);
 
     groupBoxLayout->addWidget(help, 3, 0);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->addLayout(groupBoxLayout);
     mainLayout->addStretch();
 
     setLayout(mainLayout);
 
     // Data.
-    connect(mainWindow_,
-            SIGNAL(signalUpdate(void *, const QSet<Editor::Type> &)),
-            this,
-            SLOT(slotUpdate(void *, const QSet<Editor::Type> &)));
+    app_->signalUpdate.connect([this](const Message &msg) { slotUpdate(msg); });
 
-    slotUpdate(nullptr, QSet<Editor::Type>());
+    slotUpdate({});
 }
 
-void UnitsSettingsWidget::slotUpdate(void *sender,
-                                     const QSet<Editor::Type> &target)
+void UnitsSettingsWidget::slotUpdate(const Message &msg)
 {
-    if (sender == this)
+    if (msg.sender() == this)
     {
         return;
     }
 
-    if (target.empty() || target.contains(Editor::TYPE_SETTINGS))
+    if (msg.empty() || msg.contains(Message::TYPE_SETTINGS))
     {
         LOG_DEBUG_UPDATE(<< "Input units settings.");
 
-        setUnitsSettings(mainWindow_->editor().settings().unitsSettings());
+        setUnitsSettings(app_->editor().settings().unitsSettings());
     }
 }
 
@@ -131,16 +116,14 @@ void UnitsSettingsWidget::dataChanged()
     LOG_DEBUG_UPDATE(<< "Output units settings <" << toString(settings_)
                      << ">.");
 
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setUnitsSettings(settings_);
-    mainWindow_->emitUpdate(this, {Editor::TYPE_SETTINGS});
+    app_->suspendThreads();
+    app_->editor().setUnitsSettings(settings_);
+    app_->emitUpdate(this, {Message::TYPE_SETTINGS});
 }
 
 void UnitsSettingsWidget::setUnitsSettings(const UnitsSettings &settings)
 {
     LOG_DEBUG(<< "Set units settings <" << toString(settings) << ">.");
-
-    block();
 
     settings_ = settings;
 
@@ -148,8 +131,6 @@ void UnitsSettingsWidget::setUnitsSettings(const UnitsSettings &settings)
     ppmUserSpinBox_->setValue(settings_.pointsPerMeterUser[0]);
     ppmUserSpinBox_->setEnabled(settings_.userDefined);
     userDefinedCheckBox_->setChecked(settings_.userDefined);
-
-    unblock();
 }
 
 void UnitsSettingsWidget::slotIntermediateLas(double v)
@@ -178,14 +159,4 @@ void UnitsSettingsWidget::slotUserDefined(int v)
     settings_.userDefined = userDefinedCheckBox_->isChecked();
     ppmUserSpinBox_->setEnabled(settings_.userDefined);
     dataChanged();
-}
-
-void UnitsSettingsWidget::block()
-{
-    (void)blockSignals(true);
-}
-
-void UnitsSettingsWidget::unblock()
-{
-    (void)blockSignals(false);
 }

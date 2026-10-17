@@ -23,8 +23,7 @@
 #define COMPUTE_CLASSIFICATION_PLUGIN_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
-class ComputeClassificationWindow;
+#include <Plugin.hpp>
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestComputeClassificationPlugin)
@@ -37,25 +36,20 @@ class ComputeClassificationWindow;
 #endif
 
 /** Compute Classification Plugin. */
-class EXPORT_COMPUTE_CLASSIFICATION_PLUGIN ComputeClassificationPlugin
-    : public QObject,
-      public PluginInterface
+class ComputeClassificationPlugin : public Plugin
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
-    ComputeClassificationPlugin();
-
-    virtual void initialize(MainWindow *mainWindow);
-
-public slots:
-    void slotPlugin();
+    const char *name() const override { return "ComputeClassificationPlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
 private:
-    MainWindow *mainWindow_;
-    ComputeClassificationWindow *pluginWindow_;
+    Application *app_{nullptr};
 };
+
+extern "C" EXPORT_COMPUTE_CLASSIFICATION_PLUGIN Plugin *createPlugin()
+{
+    return new ComputeClassificationPlugin();
+}
 
 #endif /* COMPUTE_CLASSIFICATION_PLUGIN_HPP */

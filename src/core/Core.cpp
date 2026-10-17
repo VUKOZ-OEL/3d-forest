@@ -49,7 +49,9 @@ void Core::setLanguageByCode(const std::string &code)
     languageCode_ = code;
 }
 
-void Core::insertTranslation(const std::string &source, const std::string &translation, const std::string &languageCode)
+void Core::insertTranslation(const std::string &source,
+                             const std::string &translation,
+                             const std::string &languageCode)
 {
     translations_[source].language[languageCode] = translation;
 }
@@ -59,7 +61,8 @@ const std::string &Core::translate(const std::string &text) const
     return translate(text, languageCode_);
 }
 
-const std::string &Core::translate(const std::string &text, const std::string &languageCode) const
+const std::string &Core::translate(const std::string &text,
+                                   const std::string &languageCode) const
 {
     auto itSource = translations_.find(text);
     if (itSource != translations_.end())

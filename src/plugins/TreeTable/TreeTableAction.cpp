@@ -20,52 +20,51 @@
 /** @file TreeTableAction.cpp */
 
 // Include 3D Forest.
-#include <MainWindow.hpp>
+#include <Application.hpp>
 #include <TreeTableAction.hpp>
-#include <OpenFileDialog.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "TreeTableAction"
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-void TreeTableAction::showTrees(MainWindow *mainWindow,
+void TreeTableAction::showTrees(Application *app,
                                 std::unordered_set<size_t> idList)
 {
     LOG_DEBUG(<< "Start showing trees.");
 
-    QueryFilterSet filter = mainWindow->editor().segmentsFilter();
+    QueryFilterSet filter = app->editor().segmentsFilter();
 
     for (const auto &id : idList)
     {
         filter.setEnabled(id, true);
     }
 
-    mainWindow->editor().setSegmentsFilter(filter);
-    mainWindow->updateFilter();
+    app->editor().setSegmentsFilter(filter);
+    app->updateFilter();
 
     LOG_DEBUG(<< "Finished showing trees.");
 }
 
-void TreeTableAction::hideTrees(MainWindow *mainWindow,
+void TreeTableAction::hideTrees(Application *app,
                                 std::unordered_set<size_t> idList)
 {
     LOG_DEBUG(<< "Start showing trees.");
 
-    QueryFilterSet filter = mainWindow->editor().segmentsFilter();
+    QueryFilterSet filter = app->editor().segmentsFilter();
 
     for (const auto &id : idList)
     {
         filter.setEnabled(id, false);
     }
 
-    mainWindow->editor().setSegmentsFilter(filter);
-    mainWindow->updateFilter();
+    app->editor().setSegmentsFilter(filter);
+    app->updateFilter();
 
     LOG_DEBUG(<< "Finished showing trees.");
 }
 
-void TreeTableAction::readMesh(MainWindow *mainWindow,
+void TreeTableAction::readMesh(Application *app,
                                const std::unordered_set<size_t> &idList,
                                const std::string &meshName)
 {
@@ -77,7 +76,7 @@ void TreeTableAction::readMesh(MainWindow *mainWindow,
         return;
     }
 
-    Editor *editor = &mainWindow->editor();
+    Editor *editor = &app->editor();
     Segments segments = editor->segments();
 
     size_t id = *idList.begin();
@@ -89,7 +88,7 @@ void TreeTableAction::readMesh(MainWindow *mainWindow,
         return;
     }
 
-    std::string path = OpenFileDialog::dialog(mainWindow, "(*.ply)");
+    std::string path = app->getOpenFileName(tr("Open File"), "(*.ply)");
     if (path.empty())
     {
         LOG_DEBUG(<< "No file selected");
@@ -111,7 +110,7 @@ void TreeTableAction::readMesh(MainWindow *mainWindow,
     LOG_DEBUG(<< "Finished read mesh");
 }
 
-void TreeTableAction::deleteMesh(MainWindow *mainWindow,
+void TreeTableAction::deleteMesh(Application *app,
                                  const std::unordered_set<size_t> &idList,
                                  const std::string &meshName)
 {
@@ -123,7 +122,7 @@ void TreeTableAction::deleteMesh(MainWindow *mainWindow,
         return;
     }
 
-    Editor *editor = &mainWindow->editor();
+    Editor *editor = &app->editor();
     Segments segments = editor->segments();
 
     size_t id = *idList.begin();
@@ -146,4 +145,56 @@ void TreeTableAction::deleteMesh(MainWindow *mainWindow,
     }
 
     LOG_DEBUG(<< "Finished delete mesh");
+}
+
+void TreeTableAction::setSpecies(Application *app,
+                                 const std::unordered_set<size_t> &idList,
+                                 int value)
+{
+    LOG_DEBUG(<< "Start setting species values.");
+
+    size_t newSpeciesId = static_cast<size_t>(value);
+    Editor *editor = &app->editor();
+    Segments segments = editor->segments();
+    for (const auto &id : idList)
+    {
+        size_t index = segments.index(id, false);
+
+        if (index != SIZE_MAX)
+        {
+            segments[index].speciesId = newSpeciesId;
+        }
+    }
+
+    editor->setSegments(segments);
+    app->update(nullptr, Message::TYPE_SEGMENT | Message::TYPE_SPECIES);
+
+    LOG_DEBUG(<< "Finished setting species values.");
+}
+
+void TreeTableAction::setManagementStatus(
+    Application *app,
+    const std::unordered_set<size_t> &idList,
+    int value)
+{
+    LOG_DEBUG(<< "Start setting management status values.");
+
+    size_t newManagementStatusId = static_cast<size_t>(value);
+    Editor *editor = &app->editor();
+    Segments segments = editor->segments();
+    for (const auto &id : idList)
+    {
+        size_t index = segments.index(id, false);
+
+        if (index != SIZE_MAX)
+        {
+            segments[index].managementStatusId = newManagementStatusId;
+        }
+    }
+
+    editor->setSegments(segments);
+    app->update(nullptr,
+                Message::TYPE_SEGMENT | Message::TYPE_MANAGEMENT_STATUS);
+
+    LOG_DEBUG(<< "Finished setting management status values.");
 }

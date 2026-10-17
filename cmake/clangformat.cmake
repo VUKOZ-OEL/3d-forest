@@ -15,18 +15,40 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-file(
-    GLOB_RECURSE
-    ALL_SOURCE_FILES
-    src/*.cpp src/*.hpp src/*.c src/*.h
+find_program(CLANG_FORMAT_EXE NAMES clang-format clang-format.exe)
+
+if(NOT CLANG_FORMAT_EXE)
+    message(WARNING "clang-format not found - skipping format target")
+    return()
+endif()
+
+message(STATUS "clang-format: ${CLANG_FORMAT_EXE}")
+
+file(GLOB_RECURSE ALL_SOURCE_FILES
+    "${CMAKE_SOURCE_DIR}/src/*.cpp"
+    "${CMAKE_SOURCE_DIR}/src/*.hpp"
+    "${CMAKE_SOURCE_DIR}/src/*.c"
+    "${CMAKE_SOURCE_DIR}/src/*.h"
 )
 
-add_custom_target(
-    format
-    COMMAND clang-format
-    -style=file
-    -i
-    -fallback-style=none
-#    --verbose
-    ${ALL_SOURCE_FILES}
+set(FORMAT_SCRIPT "${CMAKE_BINARY_DIR}/format.cmake")
+
+file(WRITE "${FORMAT_SCRIPT}" "")
+
+foreach(src IN LISTS ALL_SOURCE_FILES)
+    file(APPEND "${FORMAT_SCRIPT}" "
+execute_process(
+    COMMAND \"${CLANG_FORMAT_EXE}\"
+            -style=file
+            -i
+            -fallback-style=none
+            \"${src}\"
+    COMMAND_ERROR_IS_FATAL ANY
+)
+")
+endforeach()
+
+add_custom_target(format
+    COMMAND "${CMAKE_COMMAND}" -P "${FORMAT_SCRIPT}"
+    COMMENT "Running clang-format"
 )

@@ -20,28 +20,21 @@
 /** @file External3dMarteloscopePlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <External3dMarteloscopePlugin.hpp>
 #include <External3dMarteloscopeRunner.hpp>
 #include <ProjectFileAction.hpp>
-#include <MainWindow.hpp>
 #include <ThemeIcon.hpp>
-
-// Include Qt.
 
 // Include local.
 #define LOG_MODULE_NAME "External3dMarteloscopePlugin"
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/External3dMarteloscopeResources/", name))
-
-static std::string toStdString(const QString &str)
-{
-    return str.toUtf8().constData();
-}
+#define ICON(name) (ThemeIcon(app_, ":/External3dMarteloscopeResources/", name))
 
 External3dMarteloscopePlugin::External3dMarteloscopePlugin()
-    : mainWindow_(nullptr),
+    : app_(nullptr),
       runner_(nullptr)
 {
 }
@@ -54,19 +47,19 @@ External3dMarteloscopePlugin::~External3dMarteloscopePlugin()
     }
 }
 
-void External3dMarteloscopePlugin::initialize(MainWindow *mainWindow)
+void External3dMarteloscopePlugin::initialize(Application *app)
 {
-    mainWindow_ = mainWindow;
+    app_ = app;
 
-    mainWindow_->createAction(nullptr,
-                              "External",
-                              "External",
-                              tr("3d-Marteloscope"),
-                              tr("Start 3d-Marteloscope"),
-                              ICON("external-3d-marteloscope"),
-                              this,
-                              SLOT(slotPlugin()),
-                              MAIN_WINDOW_MENU_EXTERNAL_PRIORITY);
+    app_->createAction(
+        nullptr,
+        "External",
+        "External",
+        tr("3d-Marteloscope"),
+        tr("Start 3d-Marteloscope"),
+        ICON("external-3d-marteloscope"),
+        [this]() { slotPlugin(); },
+        MAIN_WINDOW_MENU_EXTERNAL_PRIORITY);
 }
 
 void External3dMarteloscopePlugin::slotPlugin()
@@ -75,16 +68,16 @@ void External3dMarteloscopePlugin::slotPlugin()
 
     if (!runner_)
     {
-        runner_ = new External3dMarteloscopeRunner(mainWindow_);
+        runner_ = new External3dMarteloscopeRunner(app_);
     }
 
     try
     {
         // Save current project.
-        (void)ProjectFileAction::saveProject(mainWindow_);
+        (void)ProjectFileAction::saveProject(app_);
 
         // Start python.
-        std::string projectPath = mainWindow_->editor().projectPath();
+        std::string projectPath = app_->editor().projectPath();
         runner_->start(projectPath);
     }
     catch (std::exception &e)
@@ -98,6 +91,6 @@ void External3dMarteloscopePlugin::slotPlugin()
 
     if (!errorMessage.empty())
     {
-        mainWindow_->showError(errorMessage.c_str());
+        app_->showError(errorMessage.c_str());
     }
 }

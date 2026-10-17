@@ -1,0 +1,71 @@
+/*
+    Copyright 2020 VUKOZ
+
+    This file is part of 3D Forest.
+
+    3D Forest is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    3D Forest is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+/** @file CheckBox.cpp */
+
+// Include std.
+
+// Include 3D Forest.
+#include <Application.hpp>
+#include <CheckBox.hpp>
+
+// Include local.
+#define LOG_MODULE_NAME "CheckBox"
+#include <Log.hpp>
+
+CheckBox::CheckBox(const std::string &str) : text_(str)
+{
+}
+
+CheckBox::~CheckBox()
+{
+}
+
+void CheckBox::setText(const std::string &str)
+{
+    if (text_ == str)
+    {
+        return;
+    }
+
+    text_ = str;
+    textChanged(text_);
+}
+
+void CheckBox::setChecked(bool b, bool notify)
+{
+    if (checked_ == b)
+    {
+        return;
+    }
+
+    checked_ = b;
+
+    stateUpdated(checked_ ? 1 : 0);
+
+    if (notify)
+    {
+        stateChanged(checked_ ? 1 : 0);
+    }
+}
+
+bool CheckBox::isChecked() const
+{
+    return checked_;
+}

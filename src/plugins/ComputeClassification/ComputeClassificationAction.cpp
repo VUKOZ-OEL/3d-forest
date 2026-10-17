@@ -295,7 +295,7 @@ void ComputeClassificationAction::stepClassifyGround()
         // Try to expand the current group with neighbor voxels.
         for (size_t i = idx; i < group_.size(); i++)
         {
-            Point &a = voxels_[group_[i]];
+            Point3 &a = voxels_[group_[i]];
             progress_.addValueStep(1);
 
             voxels_.findRadius(a.x,
@@ -306,7 +306,7 @@ void ComputeClassificationAction::stepClassifyGround()
             for (size_t j = 0; j < searchNext_.size(); j++)
             {
                 // If a neighbor voxel is not yet processed:
-                Point &b = voxels_[searchNext_[j]];
+                Point3 &b = voxels_[searchNext_[j]];
                 if (b.group == COMPUTE_CLASSIFICATION_PROCESS)
                 {
                     bool ground = true;
@@ -324,7 +324,7 @@ void ComputeClassificationAction::stepClassifyGround()
                     voxels_.findRadius(p[0], p[1], p[2], r, searchGround_);
                     for (size_t k = 0; k < searchGround_.size(); k++)
                     {
-                        Point &c = voxels_[searchGround_[k]];
+                        Point3 &c = voxels_[searchGround_[k]];
                         if (cone.contains(c.x, c.y, c.z))
                         {
                             ground = false;
@@ -399,7 +399,7 @@ void ComputeClassificationAction::createVoxel()
     size_t idx = voxels_.size();
 
     // Initialize new voxel point.
-    Point p;
+    Point3 p;
     p.x = 0;
     p.y = 0;
     p.z = 0;

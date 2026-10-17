@@ -1,0 +1,133 @@
+/*
+    Copyright 2020 VUKOZ
+
+    This file is part of 3D Forest.
+
+    3D Forest is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    3D Forest is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+/** @file QtApplication.hpp */
+
+#ifndef QT_APPLICATION_HPP
+#define QT_APPLICATION_HPP
+
+// Include std.
+#include <string>
+#include <unordered_map>
+
+// Include 3D Forest.
+#include <Application.hpp>
+#include <QtSidebar.hpp>
+#include <QtThemeColors.hpp>
+
+// Include Qt.
+#include <QApplication>
+#include <QDialog>
+#include <QMainWindow>
+#include <QPointer>
+#include <QSplitter>
+#include <QStackedWidget>
+#include <QVBoxLayout>
+#include <QWidget>
+
+// Include local.
+#include <ExportUiQt.hpp>
+#include <WarningsDisable.hpp>
+
+/** QtApplication. */
+class EXPORT_UI_QT QtApplication : public QObject, public Application
+{
+    Q_OBJECT
+
+public:
+    QtApplication(QApplication &qapplication);
+    virtual ~QtApplication();
+
+    void init();
+
+    void wakeUp() override;
+
+    void setOrganizationName(const std::string &str);
+    void setApplicationName(const std::string &str);
+    void setApplicationVersion(const std::string &str);
+    void setWindowIcon(const QIcon &icon);
+
+    int exec();
+    void processEvents() override;
+
+    void setViewer(Widget *widget) override;
+    void removeViewer(Widget *widget) override;
+
+    void showBottomWidget(Widget *widget) override;
+    void hideBottomWidget() override;
+    void toggleBottomWidget(Widget *widget) override;
+    void removeBottomWidget(Widget *widget) override;
+
+    QWidget *createWidget(Widget *widget, QWidget *parent = nullptr);
+    QLayout *createLayout(Layout *layout, QWidget *parent = nullptr);
+    QDialog *createDialog(Dialog &dialog, QWidget *parent = nullptr);
+
+    std::string getOpenFileName(const std::string &dialogTitle,
+                                const std::string &filter) override;
+
+    std::vector<std::string> getOpenFileNames(
+        const std::string &dialogTitle,
+        const std::string &filter) override;
+
+    std::string getSaveFileName(const std::string &caption = "",
+                                const std::string &dir = "",
+                                const std::string &filter = "",
+                                std::string *selectedFilter = nullptr,
+                                int options = 0) override;
+
+    int showDialog(Dialog &dialog) override;
+    void openDialog(Dialog &dialog) override;
+
+    Pixmap loadPixmap(const std::string &fileName) const override;
+
+    // Theme colors.
+    const QtThemeColors &getThemeColors() const { return themeColors_; }
+    bool isDarkMode() const { return themeColors_.isDarkMode(); }
+    void bindTheme(QObject *receiver, std::function<void(bool)> applyTheme);
+
+signals:
+    void wakeUpRequested();
+    void themeChanged(bool dark);
+
+private:
+    QApplication &qapplication_;
+    QMainWindow mainWindow_;
+
+    QtThemeColors themeColors_;
+
+    QSplitter *splitter_{nullptr};
+    QtSidebar *sidebar_{nullptr};
+    QWidget *viewerContainer_{nullptr};
+    QVBoxLayout *viewerLayout_{nullptr};
+    Widget *commonViewer_{nullptr};
+    QWidget *qtViewer_{nullptr};
+
+    QPointer<QSplitter> rightSplitter_;
+    QPointer<QStackedWidget> bottomStack_;
+    std::unordered_map<Widget *, QPointer<QWidget>> bottomWidgets_;
+
+    std::unordered_map<Dialog *, QPointer<QDialog>> dialogs_;
+
+    void initLayout();
+    void updateTheme();
+};
+
+#include <WarningsEnable.hpp>
+
+#endif /* QT_APPLICATION_HPP */

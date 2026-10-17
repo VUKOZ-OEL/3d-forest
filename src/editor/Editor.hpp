@@ -29,6 +29,7 @@
 #include <Classifications.hpp>
 #include <Datasets.hpp>
 #include <ManagementStatusList.hpp>
+#include <Message.hpp>
 #include <ModifierInterface.hpp>
 #include <PageManager.hpp>
 #include <Region.hpp>
@@ -46,23 +47,6 @@
 class EXPORT_EDITOR Editor
 {
 public:
-    /** Editor Data Type. */
-    enum Type
-    {
-        TYPE_FILTER,
-        TYPE_CLASSIFICATION,
-        TYPE_CLIP_FILTER,
-        TYPE_DATA_SET,
-        TYPE_DESCRIPTOR,
-        TYPE_ELEVATION,
-        TYPE_INTENSITY,
-        TYPE_SEGMENT,
-        TYPE_SPECIES,
-        TYPE_MANAGEMENT_STATUS,
-        TYPE_PROJECT_NAME,
-        TYPE_SETTINGS,
-    };
-
     Editor();
     ~Editor();
 
@@ -229,45 +213,6 @@ protected:
     void updateAfterSet();
     void updateAfterRead();
 };
-
-inline std::ostream &operator<<(std::ostream &out, const Editor::Type &in)
-{
-    switch (in)
-    {
-        case Editor::TYPE_CLASSIFICATION:
-            out << "CLASSIFICATION";
-            break;
-        case Editor::TYPE_CLIP_FILTER:
-            out << "CLIP_FILTER";
-            break;
-        case Editor::TYPE_DATA_SET:
-            out << "DATA_SET";
-            break;
-        case Editor::TYPE_DESCRIPTOR:
-            out << "DESCRIPTOR";
-            break;
-        case Editor::TYPE_ELEVATION:
-            out << "ELEVATION";
-            break;
-        case Editor::TYPE_INTENSITY:
-            out << "INTENSITY";
-            break;
-        case Editor::TYPE_SEGMENT:
-            out << "SEGMENT";
-            break;
-        case Editor::TYPE_PROJECT_NAME:
-            out << "PROJECT_NAME";
-            break;
-        case Editor::TYPE_SETTINGS:
-            out << "SETTINGS";
-            break;
-        default:
-            out << "UNKNOWN";
-            break;
-    }
-
-    return out;
-}
 
 #include <WarningsEnable.hpp>
 

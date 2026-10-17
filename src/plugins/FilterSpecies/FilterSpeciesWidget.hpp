@@ -28,28 +28,23 @@
 // Include 3D Forest.
 #include <Editor.hpp>
 #include <SpeciesList.hpp>
-class MainWindow;
-
-// Include Qt.
-#include <QWidget>
-class QToolButton;
-class QTreeWidget;
-class QTreeWidgetItem;
+#include <Widget.hpp>
+class Application;
+class ToolButton;
+class TreeWidget;
+class TreeWidgetItem;
 
 /** Filter Species Widget. */
-class FilterSpeciesWidget : public QWidget
+class FilterSpeciesWidget : public Widget
 {
-    Q_OBJECT
-
 public:
-    FilterSpeciesWidget(MainWindow *mainWindow);
+    FilterSpeciesWidget(Application *app);
 
     void setFilterEnabled(bool b);
 
-    QSize sizeHint() const override { return QSize(300, 200); }
+    // Size sizeHint() const override { return Size(300, 200); }
 
-public slots:
-    void slotUpdate(void *sender, const QSet<Editor::Type> &target);
+    void slotUpdate(const Message &msg);
 
     void slotShow();
     void slotHide();
@@ -58,7 +53,7 @@ public slots:
     void slotSelectNone();
 
     void slotItemSelectionChanged();
-    void slotItemChanged(QTreeWidgetItem *item, int column);
+    void slotItemChanged(TreeWidgetItem *item, int column);
 
 protected:
     /** Filter Species Column. */
@@ -70,14 +65,14 @@ protected:
         COLUMN_LAST,
     };
 
-    MainWindow *mainWindow_;
+    Application *app_;
 
-    QTreeWidget *tree_;
-    QToolButton *showButton_;
-    QToolButton *hideButton_;
-    QToolButton *selectAllButton_;
-    QToolButton *selectInvertButton_;
-    QToolButton *selectNoneButton_;
+    TreeWidget *tree_;
+    ToolButton *showButton_;
+    ToolButton *hideButton_;
+    ToolButton *selectAllButton_;
+    ToolButton *selectInvertButton_;
+    ToolButton *selectNoneButton_;
     bool updatesEnabled_;
 
     Segments segments_;
@@ -92,7 +87,7 @@ protected:
     void dataChanged();
     void filterChanged();
 
-    size_t identifier(const QTreeWidgetItem *item);
+    size_t identifier(const TreeWidgetItem *item);
     void updateTree();
     void block();
     void unblock();

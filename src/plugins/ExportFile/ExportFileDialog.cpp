@@ -20,79 +20,77 @@
 /** @file ExportFileDialog.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
+#include <CheckBox.hpp>
+#include <ComboBox.hpp>
 #include <ExportFileDialog.hpp>
 #include <ExportFileFormatCsv.hpp>
 #include <ExportFileFormatLas.hpp>
-#include <MainWindow.hpp>
+#include <GridLayout.hpp>
+#include <GroupBox.hpp>
+#include <HBoxLayout.hpp>
+#include <Label.hpp>
+#include <LineEdit.hpp>
+#include <MessageBox.hpp>
+#include <PushButton.hpp>
 #include <ThemeIcon.hpp>
 #include <Util.hpp>
-
-// Include Qt.
-#include <QCheckBox>
-#include <QComboBox>
-#include <QFileDialog>
-#include <QGridLayout>
-#include <QGroupBox>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QLineEdit>
-#include <QMessageBox>
-#include <QPushButton>
-#include <QVBoxLayout>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ExportFileDialog"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/exportfile/", name))
+#include <ExportFileResources.hpp> // Generated
+#define ICON(name) (ThemeIcon(app_, ":/ExportFileResources/", name))
 
-ExportFileDialog::ExportFileDialog(MainWindow *mainWindow,
-                                   const QString &fileName)
-    : QDialog(mainWindow),
-      mainWindow_(mainWindow)
+ExportFileDialog::ExportFileDialog(Application *app,
+                                   const std::string &fileName)
+    : Dialog(app),
+      app_(app)
 {
     // File name.
-    fileNameLineEdit_ = new QLineEdit;
+    fileNameLineEdit_ = new LineEdit;
     fileNameLineEdit_->setText(fileName);
 
-    browseButton_ = new QPushButton(tr("Browse"));
-    connect(browseButton_, SIGNAL(clicked()), this, SLOT(slotBrowse()));
+    browseButton_ = new PushButton(tr("Browse"));
+    browseButton_->clicked.connect([this]() { slotBrowse(); });
 
-    QHBoxLayout *fileNameLayout = new QHBoxLayout;
-    fileNameLayout->addWidget(new QLabel(tr("File")));
+    HBoxLayout *fileNameLayout = new HBoxLayout;
+    fileNameLayout->addWidget(new Label(tr("File")));
     fileNameLayout->addWidget(fileNameLineEdit_);
     fileNameLayout->addWidget(browseButton_);
 
     // Attributes.
     attributeCheckBox_.resize(5);
 
-    attributeCheckBox_[0] = new QCheckBox(tr("XYZ coordinates"));
+    attributeCheckBox_[0] = new CheckBox(tr("XYZ coordinates"));
     attributeCheckBox_[0]->setChecked(true);
     attributeCheckBox_[0]->setEnabled(false);
 
-    attributeCheckBox_[1] = new QCheckBox(tr("Intensity"));
+    attributeCheckBox_[1] = new CheckBox(tr("Intensity"));
     attributeCheckBox_[1]->setChecked(true);
 
-    attributeCheckBox_[2] = new QCheckBox(tr("Classification"));
+    attributeCheckBox_[2] = new CheckBox(tr("Classification"));
     attributeCheckBox_[2]->setChecked(true);
 
-    attributeCheckBox_[3] = new QCheckBox(tr("Color"));
+    attributeCheckBox_[3] = new CheckBox(tr("Color"));
     attributeCheckBox_[3]->setChecked(true);
 
-    attributeCheckBox_[4] = new QCheckBox(tr("Segment"));
+    attributeCheckBox_[4] = new CheckBox(tr("Segment"));
     attributeCheckBox_[4]->setChecked(true);
 
-    QVBoxLayout *attributeVBoxLayout = new QVBoxLayout;
+    VBoxLayout *attributeVBoxLayout = new VBoxLayout;
     for (size_t i = 0; i < attributeCheckBox_.size(); i++)
     {
         attributeVBoxLayout->addWidget(attributeCheckBox_[i]);
     }
 
-    QGroupBox *attributeGroupBox = new QGroupBox(tr("Point attributes"));
+    GroupBox *attributeGroupBox = new GroupBox(tr("Point attributes"));
     attributeGroupBox->setLayout(attributeVBoxLayout);
 
     // Other options.
-    scaleComboBox_ = new QComboBox;
+    scaleComboBox_ = new ComboBox;
     scaleComboBox_->addItem("0.0001");
     scaleComboBox_->addItem("0.001");
     scaleComboBox_->addItem("0.01");
@@ -100,29 +98,29 @@ ExportFileDialog::ExportFileDialog(MainWindow *mainWindow,
     scaleComboBox_->addItem("1.0");
     scaleComboBox_->setCurrentText("0.001");
 
-    filterEnabledCheckBox_ = new QCheckBox;
+    filterEnabledCheckBox_ = new CheckBox;
     filterEnabledCheckBox_->setChecked(true);
 
-    QGridLayout *valueGridLayout = new QGridLayout;
-    valueGridLayout->addWidget(new QLabel(tr("Scale")), 0, 0);
+    GridLayout *valueGridLayout = new GridLayout;
+    valueGridLayout->addWidget(new Label(tr("Scale")), 0, 0);
     valueGridLayout->addWidget(scaleComboBox_, 0, 1);
-    valueGridLayout->addWidget(new QLabel(tr("Use current filter")), 1, 0);
+    valueGridLayout->addWidget(new Label(tr("Use current filter")), 1, 0);
     valueGridLayout->addWidget(filterEnabledCheckBox_, 1, 1);
 
     // Buttons.
-    acceptButton_ = new QPushButton(tr("Export"));
-    connect(acceptButton_, SIGNAL(clicked()), this, SLOT(slotAccept()));
+    acceptButton_ = new PushButton(tr("Export"));
+    acceptButton_->clicked.connect([this]() { slotAccept(); });
 
-    rejectButton_ = new QPushButton(tr("Cancel"));
-    connect(rejectButton_, SIGNAL(clicked()), this, SLOT(slotReject()));
+    rejectButton_ = new PushButton(tr("Cancel"));
+    rejectButton_->clicked.connect([this]() { slotReject(); });
 
-    QHBoxLayout *dialogButtons = new QHBoxLayout;
+    HBoxLayout *dialogButtons = new HBoxLayout;
     dialogButtons->addStretch();
     dialogButtons->addWidget(acceptButton_);
     dialogButtons->addWidget(rejectButton_);
 
     // Dialog layout.
-    QVBoxLayout *dialogLayout = new QVBoxLayout;
+    VBoxLayout *dialogLayout = new VBoxLayout;
     dialogLayout->addLayout(fileNameLayout);
     dialogLayout->addSpacing(10);
     dialogLayout->addWidget(attributeGroupBox);
@@ -135,28 +133,24 @@ ExportFileDialog::ExportFileDialog(MainWindow *mainWindow,
 
     // Window.
     setWindowTitle(tr("Export File"));
-    setWindowIcon(ICON("export-file").icon());
+    setWindowIcon(ICON("export-file"));
     setMaximumWidth(600);
     setMaximumHeight(height());
 }
 
 void ExportFileDialog::slotBrowse()
 {
-    QFileDialog::Options options;
-    options = QFlag(QFileDialog::DontConfirmOverwrite);
+    std::string selectedFilter;
 
-    QString selectedFilter;
+    std::string fileName =
+        app_->getSaveFileName(tr("Export File As"),
+                              fileNameLineEdit_->text(),
+                              tr("LAS (LASer) File (*.las);;"
+                                 "Comma Separated Values (*.csv)"),
+                              &selectedFilter,
+                              Ui::FileDialogOption::DontConfirmOverwrite);
 
-    QString fileName =
-        QFileDialog::getSaveFileName(mainWindow_,
-                                     tr("Export File As"),
-                                     fileNameLineEdit_->text(),
-                                     tr("LAS (LASer) File (*.las);;"
-                                        "Comma Separated Values (*.csv)"),
-                                     &selectedFilter,
-                                     options);
-
-    if (fileName.isEmpty())
+    if (fileName.empty())
     {
         return;
     }
@@ -166,46 +160,44 @@ void ExportFileDialog::slotBrowse()
 
 void ExportFileDialog::slotAccept()
 {
-    QString path = fileNameLineEdit_->text();
+    std::string path = fileNameLineEdit_->text();
 
-    if (path.isEmpty())
+    if (path.empty())
     {
-        (void)QMessageBox::information(this,
-                                       tr("Export File"),
-                                       tr("Please choose a file name."));
+        (void)MessageBox::information(app_,
+                                      tr("Export File"),
+                                      tr("Please choose a file name."));
         return;
     }
 
-    if (File::exists(path.toStdString()))
+    if (File::exists(path))
     {
-        QMessageBox::StandardButton reply;
+        int reply;
 
-        reply = QMessageBox::question(this,
-                                      tr("Export File"),
-                                      tr("Overwrite existing file?"),
-                                      QMessageBox::Yes | QMessageBox::No);
+        reply = MessageBox::question(app_,
+                                     tr("Export File"),
+                                     tr("Overwrite existing file?"),
+                                     MessageBox::Yes | MessageBox::No);
 
-        if (reply != QMessageBox::Yes)
+        if (reply != MessageBox::Yes)
         {
             return;
         }
     }
 
-    close();
-    setResult(QDialog::Accepted);
+    accept();
 }
 
 void ExportFileDialog::slotReject()
 {
-    close();
-    setResult(QDialog::Rejected);
+    reject();
 }
 
 std::shared_ptr<ExportFileFormatInterface> ExportFileDialog::writer() const
 {
     std::shared_ptr<ExportFileFormatInterface> result;
 
-    std::string path = fileNameLineEdit_->text().toStdString();
+    std::string path = fileNameLineEdit_->text();
     std::string ext = toLower(File::fileExtension(path));
 
     if (ext == "csv")
@@ -225,7 +217,7 @@ ExportFileProperties ExportFileDialog::properties() const
     ExportFileProperties result;
 
     // File name.
-    result.setFileName(fileNameLineEdit_->text().toStdString());
+    result.setFileName(fileNameLineEdit_->text());
 
     // Point format.
     uint32_t fmt = 0;
@@ -241,7 +233,7 @@ ExportFileProperties ExportFileDialog::properties() const
     result.setFormat(fmt);
 
     // Scale.
-    result.setScale(scaleComboBox_->currentText().toDouble());
+    result.setScale(toDouble(scaleComboBox_->currentText()));
 
     // Filter.
     result.setFilterEnabled(filterEnabledCheckBox_->isChecked());

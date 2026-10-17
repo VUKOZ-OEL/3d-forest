@@ -25,7 +25,7 @@
 // Include Std.
 
 // Include 3D Forest.
-class MainWindow;
+class Application;
 
 // Include Qt.
 #include <QObject>
@@ -33,16 +33,14 @@ class MainWindow;
 class QProcess;
 
 #if defined(HAS_QT_WEB_ENGINE_WIDGETS)
-    class QWebEngineView;
+class QWebEngineView;
 #endif
 
 /** External 3d-Marteloscope Runner. */
 class External3dMarteloscopeRunner : public QObject
 {
-    Q_OBJECT
-
 public:
-    External3dMarteloscopeRunner(MainWindow *mainWindow);
+    External3dMarteloscopeRunner(Application *app);
     ~External3dMarteloscopeRunner();
 
     void start(const std::string &projectPath, int startPort = 8501);
@@ -53,15 +51,15 @@ private:
     bool isPortFree(int port) const;
     int findFreePort(int startPort) const;
 
-    void start(const QString &binPath,
-               const QString &pythonHome,
-               const QString &pythonPath,
-               const QString &pythonExe,
-               const QString &pyhonScript,
-               const QString &projectPath,
+    void start(const std::string &binPath,
+               const std::string &pythonHome,
+               const std::string &pythonPath,
+               const std::string &pythonExe,
+               const std::string &pyhonScript,
+               const std::string &projectPath,
                int startPort);
 
-    MainWindow *mainWindow_ = nullptr;
+    Application *app_ = nullptr;
 
     QPointer<QProcess> process_;
     int port_ = -1;

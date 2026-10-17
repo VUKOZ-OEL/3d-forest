@@ -1,0 +1,82 @@
+/*
+    Copyright 2020 VUKOZ
+
+    This file is part of 3D Forest.
+
+    3D Forest is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    3D Forest is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+/** @file LineEdit.cpp */
+
+// Include 3D Forest.
+#include <Application.hpp>
+#include <LineEdit.hpp>
+
+// Include local.
+#define LOG_MODULE_NAME "LineEdit"
+#include <Log.hpp>
+
+// LineEdit.cpp
+#include <LineEdit.hpp>
+
+LineEdit::LineEdit(const std::string &text) : text_(text)
+{
+}
+
+LineEdit::~LineEdit()
+{
+}
+
+void LineEdit::setText(const std::string &text, bool notify)
+{
+    if (text_ == text)
+    {
+        return;
+    }
+
+    text_ = text;
+    textUpdated(text_);
+
+    if (notify && !signalsBlocked())
+    {
+        textChanged(text_);
+    }
+}
+
+void LineEdit::clear()
+{
+    setText("");
+}
+
+void LineEdit::setPlaceholderText(const std::string &text)
+{
+    if (placeholderText_ == text)
+    {
+        return;
+    }
+
+    placeholderText_ = text;
+    placeholderTextChanged(placeholderText_);
+}
+
+void LineEdit::setReadOnly(bool readOnly)
+{
+    if (readOnly_ == readOnly)
+    {
+        return;
+    }
+
+    readOnly_ = readOnly;
+    readOnlyChanged(readOnly_);
+}

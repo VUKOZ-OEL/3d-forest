@@ -20,9 +20,9 @@
 /** @file ManagementStatus.cpp */
 
 // Include 3D Forest.
+#include <Core.hpp>
 #include <Error.hpp>
 #include <ManagementStatus.hpp>
-#include <Core.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ManagementStatus"
@@ -73,7 +73,7 @@ void toJson(Json &out, const ManagementStatus &in)
     std::string cs = core().translate(in.label, "cs");
     if (cs != in.label)
     {
-         toJson(out["cs"], cs);
+        toJson(out["cs"], cs);
     }
 }
 

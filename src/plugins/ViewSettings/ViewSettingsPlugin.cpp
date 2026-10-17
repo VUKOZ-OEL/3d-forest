@@ -20,51 +20,26 @@
 /** @file ViewSettingsPlugin.cpp */
 
 // Include 3D Forest.
-#include <MainWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <Application.hpp>
 #include <ViewSettingsPlugin.hpp>
-#include <ViewSettingsWindow.hpp>
+#include <ViewSettingsWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ViewSettingsPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ViewSettingsResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ViewSettingsResources/", name))
 
-ViewSettingsPlugin::ViewSettingsPlugin()
-    : mainWindow_(nullptr),
-      pluginWindow_(nullptr)
+void ViewSettingsPlugin::initialize(Application *app)
 {
-}
+    app_ = app;
 
-void ViewSettingsPlugin::initialize(MainWindow *mainWindow)
-{
-    mainWindow_ = mainWindow;
-
-    mainWindow_->createAction(nullptr,
-                              "Settings",
-                              "Settings",
-                              tr("View"),
-                              tr("Show view settings"),
-                              ICON("brush"),
-                              this,
-                              SLOT(slotPlugin()),
-                              MAIN_WINDOW_MENU_SETTINGS_PRIORITY);
-}
-
-void ViewSettingsPlugin::slotPlugin()
-{
-    if (!mainWindow_)
-    {
-        return;
-    }
-
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new ViewSettingsWindow(mainWindow_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Settings", MAIN_WINDOW_MENU_SETTINGS_PRIORITY}},
+                       "Settings",
+                       tr("View"),
+                       tr("Show view settings"),
+                       ICON("brush"),
+                       {},
+                       new ViewSettingsWidget(app_));
 }

@@ -25,7 +25,7 @@
 // Include 3D Forest.
 #include <ComputeCrownVolumeData.hpp>
 #include <ComputeCrownVolumeParameters.hpp>
-#include <Point.hpp>
+#include <Point3.hpp>
 #include <Points.hpp>
 #include <ProgressActionInterface.hpp>
 #include <Query.hpp>

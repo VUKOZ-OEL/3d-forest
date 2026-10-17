@@ -20,60 +20,57 @@
 /** @file TreeTableExportDialog.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
+#include <CheckBox.hpp>
 #include <FileFormatCsv.hpp>
-#include <MainWindow.hpp>
+#include <GridLayout.hpp>
+#include <GroupBox.hpp>
+#include <HBoxLayout.hpp>
+#include <Label.hpp>
+#include <LineEdit.hpp>
+#include <MessageBox.hpp>
+#include <PushButton.hpp>
 #include <ThemeIcon.hpp>
 #include <TreeTableExportDialog.hpp>
-
-// Include Qt.
-#include <QCheckBox>
-#include <QFileDialog>
-#include <QGridLayout>
-#include <QGroupBox>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QLineEdit>
-#include <QMessageBox>
-#include <QPushButton>
-#include <QVBoxLayout>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "TreeTableExportDialog"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/TreeTableResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/TreeTableResources/", name))
 
-TreeTableExportDialog::TreeTableExportDialog(MainWindow *mainWindow,
-                                             const QString &fileName)
-    : QDialog(mainWindow),
-      mainWindow_(mainWindow)
+TreeTableExportDialog::TreeTableExportDialog(Application *app,
+                                             const std::string &fileName)
+    : Dialog(app),
+      app_(app)
 {
     // File name.
-    fileNameLineEdit_ = new QLineEdit;
+    fileNameLineEdit_ = new LineEdit;
     fileNameLineEdit_->setText(fileName);
 
-    browseButton_ = new QPushButton(tr("Browse"));
-    connect(browseButton_, SIGNAL(clicked()), this, SLOT(slotBrowse()));
+    browseButton_ = new PushButton(tr("Browse"));
+    browseButton_->clicked.connect([this]() { slotBrowse(); });
 
-    QHBoxLayout *fileNameLayout = new QHBoxLayout;
-    fileNameLayout->addWidget(new QLabel(tr("File")));
+    HBoxLayout *fileNameLayout = new HBoxLayout;
+    fileNameLayout->addWidget(new Label(tr("File")));
     fileNameLayout->addWidget(fileNameLineEdit_);
     fileNameLayout->addWidget(browseButton_);
 
     // Buttons.
-    acceptButton_ = new QPushButton(tr("Export"));
-    connect(acceptButton_, SIGNAL(clicked()), this, SLOT(slotAccept()));
+    acceptButton_ = new PushButton(tr("Export"));
+    acceptButton_->clicked.connect([this]() { slotAccept(); });
 
-    rejectButton_ = new QPushButton(tr("Cancel"));
-    connect(rejectButton_, SIGNAL(clicked()), this, SLOT(slotReject()));
+    rejectButton_ = new PushButton(tr("Cancel"));
+    rejectButton_->clicked.connect([this]() { slotReject(); });
 
-    QHBoxLayout *dialogButtons = new QHBoxLayout;
+    HBoxLayout *dialogButtons = new HBoxLayout;
     dialogButtons->addStretch();
     dialogButtons->addWidget(acceptButton_);
     dialogButtons->addWidget(rejectButton_);
 
     // Dialog layout.
-    QVBoxLayout *dialogLayout = new QVBoxLayout;
+    VBoxLayout *dialogLayout = new VBoxLayout;
     dialogLayout->addLayout(fileNameLayout);
     dialogLayout->addSpacing(10);
     dialogLayout->addLayout(dialogButtons);
@@ -83,27 +80,23 @@ TreeTableExportDialog::TreeTableExportDialog(MainWindow *mainWindow,
 
     // Window.
     setWindowTitle(tr("Export File"));
-    setWindowIcon(THEME_ICON("export-file").icon());
+    setWindowIcon(THEME_ICON("export-file"));
     setMaximumWidth(600);
     setMaximumHeight(height());
 }
 
 void TreeTableExportDialog::slotBrowse()
 {
-    QFileDialog::Options options;
-    options = QFlag(QFileDialog::DontConfirmOverwrite);
+    std::string selectedFilter;
 
-    QString selectedFilter;
+    std::string fileName =
+        app_->getSaveFileName(tr("Export File As"),
+                              fileNameLineEdit_->text(),
+                              tr("Comma Separated Values (*.csv)"),
+                              &selectedFilter,
+                              Ui::FileDialogOption::DontConfirmOverwrite);
 
-    QString fileName =
-        QFileDialog::getSaveFileName(mainWindow_,
-                                     tr("Export File As"),
-                                     fileNameLineEdit_->text(),
-                                     tr("Comma Separated Values (*.csv)"),
-                                     &selectedFilter,
-                                     options);
-
-    if (fileName.isEmpty())
+    if (fileName.empty())
     {
         return;
     }
@@ -113,44 +106,40 @@ void TreeTableExportDialog::slotBrowse()
 
 void TreeTableExportDialog::slotAccept()
 {
-    QString path = fileNameLineEdit_->text();
+    std::string path = fileNameLineEdit_->text();
 
-    if (path.isEmpty())
+    if (path.empty())
     {
-        (void)QMessageBox::information(this,
-                                       tr("Export File"),
-                                       tr("Please choose a file name."));
+        (void)MessageBox::information(app_,
+                                      tr("Export File"),
+                                      tr("Please choose a file name."));
         return;
     }
 
-    if (File::exists(path.toStdString()))
+    if (File::exists(path))
     {
-        QMessageBox::StandardButton reply;
+        int reply = MessageBox::question(app_,
+                                         tr("Export File"),
+                                         tr("Overwrite existing file?"),
+                                         MessageBox::Yes | MessageBox::No);
 
-        reply = QMessageBox::question(this,
-                                      tr("Export File"),
-                                      tr("Overwrite existing file?"),
-                                      QMessageBox::Yes | QMessageBox::No);
-
-        if (reply != QMessageBox::Yes)
+        if (reply != MessageBox::Yes)
         {
             return;
         }
     }
 
-    close();
-    setResult(QDialog::Accepted);
+    accept();
 }
 
 void TreeTableExportDialog::slotReject()
 {
-    close();
-    setResult(QDialog::Rejected);
+    reject();
 }
 
 std::shared_ptr<FileFormatInterface> TreeTableExportDialog::writer() const
 {
-    std::string path = fileNameLineEdit_->text().toStdString();
+    std::string path = fileNameLineEdit_->text();
     std::string ext = toLower(File::fileExtension(path));
 
     if (ext == "csv")

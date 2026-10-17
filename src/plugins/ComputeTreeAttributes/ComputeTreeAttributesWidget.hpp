@@ -25,43 +25,37 @@
 // Include 3D Forest.
 #include <ComputeTreeAttributesAction.hpp>
 #include <ComputeTreeAttributesParameters.hpp>
-class MainWindow;
+#include <Widget.hpp>
+class Application;
 class DoubleSliderWidget;
-
-// Include Qt.
-#include <QWidget>
-class QComboBox;
-class QPushButton;
+class ComboBox;
+class PushButton;
 
 /** Compute Tree Attributes Widget. */
-class ComputeTreeAttributesWidget : public QWidget
+class ComputeTreeAttributesWidget : public Widget
 {
-    Q_OBJECT
-
 public:
-    ComputeTreeAttributesWidget(MainWindow *mainWindow);
+    ComputeTreeAttributesWidget(Application *app);
 
-protected slots:
     void dbhMethodChanged(int i);
     void slotApply();
 
-protected:
-    void hideEvent(QHideEvent *event) override;
+    void hideEvent(HideEvent *event) override;
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
 
     ComputeTreeAttributesParameters parameters_;
     ComputeTreeAttributesAction treeAttributesAction_;
 
     DoubleSliderWidget *treePositionHeightRangeSlider_;
-    QComboBox *dbhMethodComboBox_;
+    ComboBox *dbhMethodComboBox_;
     DoubleSliderWidget *dbhRhtGridCmSlider_;
     DoubleSliderWidget *dbhElevationSlider_;
     DoubleSliderWidget *dbhElevationRangeSlider_;
     DoubleSliderWidget *maximumValidCalculatedDbhSlider_;
 
-    QPushButton *applyButton_;
+    PushButton *applyButton_;
 };
 
 #endif /* COMPUTE_TREE_ATTRIBUTES_WIDGET_HPP */

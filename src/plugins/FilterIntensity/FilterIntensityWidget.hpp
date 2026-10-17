@@ -26,33 +26,28 @@
 #include <Editor.hpp>
 #include <Range.hpp>
 #include <Region.hpp>
+#include <Widget.hpp>
 class DoubleRangeSliderWidget;
-class MainWindow;
-
-// Include Qt.
-#include <QWidget>
+class Application;
 
 /** Filter Intensity Widget. */
-class FilterIntensityWidget : public QWidget
+class FilterIntensityWidget : public Widget
 {
-    Q_OBJECT
-
 public:
-    FilterIntensityWidget(MainWindow *mainWindow);
+    FilterIntensityWidget(Application *app);
 
     void setFilterEnabled(bool b);
 
-    QSize sizeHint() const override { return QSize(300, 120); }
+    // Size sizeHint() const override { return Size(300, 120); }
 
-public slots:
-    void slotUpdate(void *sender, const QSet<Editor::Type> &target);
+    void slotUpdate(const Message &msg);
 
-    void slotRangeIntermediateMinimumValue();
-    void slotRangeIntermediateMaximumValue();
+    void slotMinimumValueChanged(double val);
+    void slotMaximumValueChanged(double val);
     void slotFinalValue();
 
 protected:
-    MainWindow *mainWindow_;
+    Application *app_;
     DoubleRangeSliderWidget *intensityInput_;
     Range<double> intensityRange_;
 

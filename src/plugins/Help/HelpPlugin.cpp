@@ -20,43 +20,42 @@
 /** @file HelpPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <HelpPlugin.hpp>
-#include <MainWindow.hpp>
+#include <MessageBox.hpp>
 #include <ThemeIcon.hpp>
-
-// Include Qt.
-#include <QMessageBox>
 
 // Include local.
 #define LOG_MODULE_NAME "HelpPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/HelpResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/HelpResources/", name))
 
-HelpPlugin::HelpPlugin() : mainWindow_(nullptr)
+HelpPlugin::HelpPlugin() : app_(nullptr)
 {
 }
 
-void HelpPlugin::initialize(MainWindow *mainWindow)
+void HelpPlugin::initialize(Application *app)
 {
-    mainWindow_ = mainWindow;
+    app_ = app;
 
-    mainWindow_->createAction(&aboutAction_,
-                              "Help",
-                              "",
-                              tr("About 3D Forest"),
-                              tr("About this application"),
-                              THEME_ICON("question"),
-                              this,
-                              SLOT(slotAbout()),
-                              MAIN_WINDOW_MENU_HELP_PRIORITY);
+    app_->createAction(
+        this,
+        {{"Help", MAIN_WINDOW_MENU_HELP_PRIORITY}},
+        "",
+        tr("About"),
+        tr("About this application"),
+        THEME_ICON("question"),
+        [this]() { slotAbout(); },
+        nullptr,
+        100);
 }
 
 void HelpPlugin::slotAbout()
 {
-    QMessageBox::about(
-        mainWindow_,
-        tr("About 3D Forest, version ") + MainWindow::APPLICATION_VERSION,
+    MessageBox::about(
+        app_,
+        tr("About 3D Forest, version ") + Application::APPLICATION_VERSION,
         tr("3D Forest is software for analysis, processing, and visualization"
            " of Lidar point clouds, mainly focused on forest environment.\n"
            "\n"
@@ -64,12 +63,17 @@ void HelpPlugin::slotAbout()
            "Blue Cat team and other authors\n"
            "https://www.3dforest.eu\n"
            "\n"
-           "Uses CDT, (c) Leica Geosystems Technology AB and Contributors.\n"
-           "Uses convhull_3d, (c) Leo McCormack, George Papazafeiropoulos.\n"
+           "Uses CDT, (c) Leica Geosystems Technology AB and Contributors\n"
+           "Uses boost and CGAL, (c) contributors\n"
+           "Uses convhull_3d, (c) Leo McCormack, George Papazafeiropoulos\n"
            "Uses delaunator-cpp, modified eigen, modified libigl, stb\n"
            "Uses modified octree, (c) University of Bonn\n"
            "Uses modified ctkRangeSlider, (c) Kitware Inc.\n"
-           "Uses parts of modified Point Cloud Library in pcdio.\n"
+           "Uses parts of modified Point Cloud Library in pcdio\n"
+           "\n"
+           "Uses drogon web application server, (c) An Tao\n"
+           "Uses JsonCpp, (c) Baptiste Lepilleur\n"
+           "Uses zlib, (c) Jean-loup Gailly and Mark Adler\n"
            "\n"
            "3D Forest software license:\n"
            "This program is free software and is distributed under the GNU\n"

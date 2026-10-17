@@ -23,8 +23,7 @@
 #define FILTER_SPECIES_PLUGIN_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
-class FilterSpeciesWindow;
+#include <Plugin.hpp>
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestFilterSpeciesPlugin)
@@ -37,24 +36,20 @@ class FilterSpeciesWindow;
 #endif
 
 /** Filter Species Plugin. */
-class EXPORT_FILTER_SPECIES_PLUGIN FilterSpeciesPlugin : public QObject,
-                                                         public PluginInterface
+class FilterSpeciesPlugin : public Plugin
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
-    FilterSpeciesPlugin();
-
-    virtual void initialize(MainWindow *mainWindow);
-
-public slots:
-    void slotPlugin();
+    const char *name() const override { return "FilterSpeciesPlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
 private:
-    MainWindow *mainWindow_;
-    FilterSpeciesWindow *pluginWindow_;
+    Application *app_{nullptr};
 };
+
+extern "C" EXPORT_FILTER_SPECIES_PLUGIN Plugin *createPlugin()
+{
+    return new FilterSpeciesPlugin();
+}
 
 #endif /* FILTER_SPECIES_PLUGIN_HPP */

@@ -25,28 +25,23 @@
 // Include 3D Forest.
 #include <Datasets.hpp>
 #include <Editor.hpp>
-class MainWindow;
-
-// Include Qt.
-#include <QWidget>
-class QToolButton;
-class QTreeWidget;
-class QTreeWidgetItem;
+#include <Widget.hpp>
+class Application;
+class ToolButton;
+class TreeWidget;
+class TreeWidgetItem;
 
 /** Filter Files Widget. */
-class FilterFilesWidget : public QWidget
+class FilterFilesWidget : public Widget
 {
-    Q_OBJECT
-
 public:
-    FilterFilesWidget(MainWindow *mainWindow);
+    FilterFilesWidget(Application *app);
 
     void setFilterEnabled(bool b);
 
-    QSize sizeHint() const override { return QSize(300, 200); }
+    // Size sizeHint() const override { return Size(300, 200); }
 
-public slots:
-    void slotUpdate(void *sender, const QSet<Editor::Type> &target);
+    void slotUpdate(const Message &msg);
 
     void slotAdd();
     void slotDelete();
@@ -57,7 +52,7 @@ public slots:
     void slotSelectNone();
 
     void slotItemSelectionChanged();
-    void slotItemChanged(QTreeWidgetItem *item, int column);
+    void slotItemChanged(TreeWidgetItem *item, int column);
 
 protected:
     /** Filter Files Column. */
@@ -70,16 +65,17 @@ protected:
         COLUMN_LAST,
     };
 
-    MainWindow *mainWindow_;
+    Application *app_;
 
-    QTreeWidget *tree_;
-    QToolButton *addButton_;
-    QToolButton *deleteButton_;
-    QToolButton *showButton_;
-    QToolButton *hideButton_;
-    QToolButton *selectAllButton_;
-    QToolButton *selectInvertButton_;
-    QToolButton *selectNoneButton_;
+    TreeWidget *tree_;
+    ToolButton *addButton_;
+    ToolButton *deleteButton_;
+    ToolButton *showButton_;
+    ToolButton *hideButton_;
+    ToolButton *selectAllButton_;
+    ToolButton *selectInvertButton_;
+    ToolButton *selectNoneButton_;
+
     Datasets datasets_;
     QueryFilterSet filter_;
     bool updatesEnabled_;
@@ -88,8 +84,8 @@ protected:
     void dataChanged();
     void filterChanged();
 
-    size_t identifier(const QTreeWidgetItem *item);
-    size_t index(const QTreeWidgetItem *item);
+    size_t identifier(const TreeWidgetItem *item);
+    size_t index(const TreeWidgetItem *item);
     void updateTree();
     void block();
     void unblock();

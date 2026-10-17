@@ -25,30 +25,25 @@
 // Include 3D Forest.
 #include <Editor.hpp>
 #include <ManagementStatusList.hpp>
-class MainWindow;
+#include <Widget.hpp>
+class Application;
 class FilterManagementStatusTreeWidget;
-
-// Include Qt.
-#include <QWidget>
-class QSplitter;
-class QToolButton;
-class QTreeWidget;
-class QTreeWidgetItem;
+class Splitter;
+class ToolButton;
+class TreeWidget;
+class TreeWidgetItem;
 
 /** Filter Management Status Widget. */
-class FilterManagementStatusWidget : public QWidget
+class FilterManagementStatusWidget : public Widget
 {
-    Q_OBJECT
-
 public:
-    FilterManagementStatusWidget(MainWindow *mainWindow);
+    FilterManagementStatusWidget(Application *app);
 
     void setFilterEnabled(bool b);
 
-    QSize sizeHint() const override { return QSize(300, 200); }
+    // Size sizeHint() const override { return Size(300, 200); }
 
-public slots:
-    void slotUpdate(void *sender, const QSet<Editor::Type> &target);
+    void slotUpdate(const Message &msg);
 
     void slotShow();
     void slotHide();
@@ -57,7 +52,7 @@ public slots:
     void slotSelectNone();
 
     void slotItemSelectionChanged();
-    void slotItemChanged(QTreeWidgetItem *item, int column);
+    void slotItemChanged(TreeWidgetItem *item, int column);
 
 protected:
     /** Filter ManagementStatus Column. */
@@ -69,17 +64,17 @@ protected:
         COLUMN_LAST,
     };
 
-    MainWindow *mainWindow_;
+    Application *app_;
 
-    QTreeWidget *tree_;
-    QToolButton *showButton_;
-    QToolButton *hideButton_;
-    QToolButton *selectAllButton_;
-    QToolButton *selectInvertButton_;
-    QToolButton *selectNoneButton_;
+    TreeWidget *tree_;
+    ToolButton *showButton_;
+    ToolButton *hideButton_;
+    ToolButton *selectAllButton_;
+    ToolButton *selectInvertButton_;
+    ToolButton *selectNoneButton_;
     bool updatesEnabled_;
 
-    QSplitter *splitter_;
+    Splitter *splitter_;
 
     FilterManagementStatusTreeWidget *treeWidget_;
 
@@ -91,7 +86,7 @@ protected:
     void receivedManagementStatusList();
     void sendFilter();
 
-    size_t identifier(const QTreeWidgetItem *item);
+    size_t identifier(const TreeWidgetItem *item);
     void updateTree();
     void block();
     void unblock();

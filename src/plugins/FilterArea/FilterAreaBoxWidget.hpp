@@ -26,33 +26,28 @@
 #include <Editor.hpp>
 #include <Range.hpp>
 #include <Region.hpp>
+#include <Widget.hpp>
 class DoubleRangeSliderWidget;
-class MainWindow;
-
-// Include Qt.
-#include <QWidget>
+class Application;
 
 /** Filter Area Box Widget. */
-class FilterAreaBoxWidget : public QWidget
+class FilterAreaBoxWidget : public Widget
 {
-    Q_OBJECT
-
 public:
-    FilterAreaBoxWidget(MainWindow *mainWindow);
+    FilterAreaBoxWidget(Application *app);
 
     void setFilterEnabled(bool b);
 
-    QSize sizeHint() const override { return QSize(300, 300); }
+    // Size sizeHint() const override { return Size(300, 300); }
 
-public slots:
-    void slotUpdate(void *sender, const QSet<Editor::Type> &target);
+    void slotUpdate(const Message &msg);
 
-    void slotRangeIntermediateMinimumValue();
-    void slotRangeIntermediateMaximumValue();
+    void slotMinimumValueChanged(double val, int i);
+    void slotMaximumValueChanged(double val, int i);
     void slotFinalValue();
 
 protected:
-    MainWindow *mainWindow_;
+    Application *app_;
     DoubleRangeSliderWidget *rangeInput_[3];
     Range<double> clipRange_[3];
     Region region_;
@@ -60,8 +55,8 @@ protected:
     void setRegion(const Region &region);
     void filterChanged(bool final);
 
-    void showEvent(QShowEvent *event) override;
-    void hideEvent(QHideEvent *event) override;
+    void showEvent(ShowEvent *event) override;
+    void hideEvent(HideEvent *event) override;
 };
 
 #endif /* FILTER_AREA_BOX_WIDGET_HPP */

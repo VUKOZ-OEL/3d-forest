@@ -20,43 +20,39 @@
 /** @file FilterDescriptorWidget.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <DoubleRangeSliderWidget.hpp>
 #include <FilterDescriptorWidget.hpp>
-#include <MainWindow.hpp>
-
-// Include Qt.
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QVBoxLayout>
+#include <HBoxLayout.hpp>
+#include <PushButton.hpp>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterDescriptorWidget"
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-FilterDescriptorWidget::FilterDescriptorWidget(MainWindow *mainWindow)
-    : QWidget(mainWindow),
-      mainWindow_(mainWindow)
+FilterDescriptorWidget::FilterDescriptorWidget(Application *app) : app_(app)
 {
     LOG_DEBUG(<< "Start creating descriptor filter widget.");
 
     // Input widgets.
-    DoubleRangeSliderWidget::create(descriptorInput_,
-                                    this,
-                                    SLOT(slotRangeIntermediateMinimumValue()),
-                                    SLOT(slotRangeIntermediateMaximumValue()),
-                                    SLOT(slotFinalValue()),
-                                    tr("Descriptor"),
-                                    tr("Min-max descriptor range filter"),
-                                    tr("%"),
-                                    1,
-                                    0,
-                                    100,
-                                    0,
-                                    100);
+    DoubleRangeSliderWidget::create(
+        descriptorInput_,
+        [this](double val) { slotMinimumValueChanged(val); },
+        [this](double val) { slotMaximumValueChanged(val); },
+        [this]() { slotFinalValue(); },
+        tr("Descriptor"),
+        tr("Min-max descriptor range filter"),
+        tr("%"),
+        1,
+        0,
+        100,
+        0,
+        100);
 
     // Layout.
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(descriptorInput_);
     mainLayout->addStretch();
@@ -64,29 +60,25 @@ FilterDescriptorWidget::FilterDescriptorWidget(MainWindow *mainWindow)
     setLayout(mainLayout);
 
     // Data.
-    connect(mainWindow_,
-            SIGNAL(signalUpdate(void *, const QSet<Editor::Type> &)),
-            this,
-            SLOT(slotUpdate(void *, const QSet<Editor::Type> &)));
+    app_->signalUpdate.connect([this](const Message &msg) { slotUpdate(msg); });
 
-    slotUpdate(nullptr, QSet<Editor::Type>());
+    slotUpdate({});
 
     LOG_DEBUG(<< "Finished creating descriptor filter widget.");
 }
 
-void FilterDescriptorWidget::slotUpdate(void *sender,
-                                        const QSet<Editor::Type> &target)
+void FilterDescriptorWidget::slotUpdate(const Message &msg)
 {
-    if (sender == this)
+    if (msg.sender() == this)
     {
         return;
     }
 
-    if (target.empty() || target.contains(Editor::TYPE_DESCRIPTOR) ||
-        target.contains(Editor::TYPE_SETTINGS))
+    if (msg.empty() || msg.contains(Message::TYPE_DESCRIPTOR) ||
+        msg.contains(Message::TYPE_SETTINGS))
     {
         LOG_DEBUG_UPDATE(<< "Input descriptor filter.");
-        setDescriptor(mainWindow_->editor().descriptorFilter());
+        setDescriptor(app_->editor().descriptorFilter());
     }
 }
 
@@ -110,9 +102,9 @@ void FilterDescriptorWidget::filterChanged(bool final)
 {
     LOG_DEBUG(<< "Descriptor filer changed.");
 
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setDescriptorFilter(descriptorRange_);
-    mainWindow_->updateFilter(this, final);
+    app_->suspendThreads();
+    app_->editor().setDescriptorFilter(descriptorRange_);
+    app_->updateFilter(this, final);
 }
 
 void FilterDescriptorWidget::setFilterEnabled(bool b)
@@ -123,7 +115,7 @@ void FilterDescriptorWidget::setFilterEnabled(bool b)
     filterChanged(true);
 }
 
-void FilterDescriptorWidget::slotRangeIntermediateMinimumValue()
+void FilterDescriptorWidget::slotMinimumValueChanged(double val)
 {
     LOG_DEBUG(<< "Minimum value changed.");
 
@@ -131,7 +123,7 @@ void FilterDescriptorWidget::slotRangeIntermediateMinimumValue()
     filterChanged(false);
 }
 
-void FilterDescriptorWidget::slotRangeIntermediateMaximumValue()
+void FilterDescriptorWidget::slotMaximumValueChanged(double val)
 {
     LOG_DEBUG(<< "Maximum value changed.");
 

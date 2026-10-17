@@ -20,51 +20,26 @@
 /** @file ApplicationSettingsPlugin.cpp */
 
 // Include 3D Forest.
-#include <MainWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <Application.hpp>
 #include <ApplicationSettingsPlugin.hpp>
-#include <ApplicationSettingsWindow.hpp>
+#include <ApplicationSettingsWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ApplicationSettingsPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ApplicationSettingsResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ApplicationSettingsResources/", name))
 
-ApplicationSettingsPlugin::ApplicationSettingsPlugin()
-    : mainWindow_(nullptr),
-      pluginWindow_(nullptr)
+void ApplicationSettingsPlugin::initialize(Application *app)
 {
-}
+    app_ = app;
 
-void ApplicationSettingsPlugin::initialize(MainWindow *mainWindow)
-{
-    mainWindow_ = mainWindow;
-
-    mainWindow_->createAction(nullptr,
-                              "Settings",
-                              "Settings",
-                              tr("Application"),
-                              tr("Show application settings"),
-                              ICON("settings"),
-                              this,
-                              SLOT(slotPlugin()),
-                              MAIN_WINDOW_MENU_SETTINGS_PRIORITY);
-}
-
-void ApplicationSettingsPlugin::slotPlugin()
-{
-    if (!mainWindow_)
-    {
-        return;
-    }
-
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new ApplicationSettingsWindow(mainWindow_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Settings", MAIN_WINDOW_MENU_SETTINGS_PRIORITY}},
+                       "Settings",
+                       tr("Application"),
+                       tr("Show application settings"),
+                       ICON("settings"),
+                       {},
+                       new ApplicationSettingsWidget(app_));
 }

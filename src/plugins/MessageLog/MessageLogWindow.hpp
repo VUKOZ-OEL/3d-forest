@@ -23,35 +23,28 @@
 #define MESSAGE_LOG_WINDOW_HPP
 
 // Include 3D Forest.
+#include <DockWidget.hpp>
 #include <File.hpp>
 #include <Log.hpp>
-class MainWindow;
-
-// Include Qt.
-#include <QDockWidget>
-class QTextEdit;
+class Application;
+class TextEdit;
 
 /** Message Log Window. */
-class MessageLogWindow : public QDockWidget, public LogThreadCallbackInterface
+class MessageLogWindow : public DockWidget, public LogThreadCallbackInterface
 {
-    Q_OBJECT
-
 public:
-    MessageLogWindow(MainWindow *mainWindow);
+    MessageLogWindow(Application *app);
     virtual ~MessageLogWindow();
 
     virtual void println(const LogMessage &message);
     virtual void flush();
 
-public slots:
     void slotPrintln(const LogMessage &message);
-
-signals:
     void signalPrintln(const LogMessage &message);
 
 protected:
-    MainWindow *mainWindow_;
-    QTextEdit *textEdit_;
+    Application *app_;
+    TextEdit *textEdit_;
     File file_;
     size_t threadId_{0};
 };

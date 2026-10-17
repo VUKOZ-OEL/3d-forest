@@ -20,51 +20,30 @@
 /** @file ComputeHeightMapPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ComputeHeightMapPlugin.hpp>
-#include <ComputeHeightMapWindow.hpp>
-#include <MainWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <ComputeHeightMapWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeHeightMapPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ComputeHeightMapResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ComputeHeightMapResources/", name))
 
-ComputeHeightMapPlugin::ComputeHeightMapPlugin()
-    : mainWindow_(nullptr),
-      pluginWindow_(nullptr)
+void ComputeHeightMapPlugin::initialize(Application *app)
 {
-}
+    app_ = app;
 
-void ComputeHeightMapPlugin::initialize(MainWindow *mainWindow)
-{
-    mainWindow_ = mainWindow;
+    app_->createAction(this,
+                       {{"Compute", MAIN_WINDOW_MENU_COMPUTE_PRIORITY}},
+                       "Compute",
+                       tr("Height Map"),
+                       tr("Compute height map"),
+                       ICON("height-map"),
+                       {},
+                       new ComputeHeightMapWidget(app_, &modifier_));
 
-    mainWindow_->createAction(nullptr,
-                              "Compute",
-                              "Compute",
-                              tr("Height Map"),
-                              tr("Compute height map"),
-                              ICON("height-map"),
-                              this,
-                              SLOT(slotPlugin()),
-                              MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
-
-    modifier_.initialize(mainWindow_);
-}
-
-void ComputeHeightMapPlugin::slotPlugin()
-{
-    // Create GUI only when this plugin is used for the first time.
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new ComputeHeightMapWindow(mainWindow_, &modifier_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    modifier_.initialize(app_);
 }
 
 bool ComputeHeightMapPlugin::modifierEnabled()

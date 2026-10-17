@@ -23,8 +23,7 @@
 #define FILTER_DESCRIPTOR_PLUGIN_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
-class FilterDescriptorWindow;
+#include <Plugin.hpp>
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestFilterDescriptorPlugin)
@@ -37,25 +36,20 @@ class FilterDescriptorWindow;
 #endif
 
 /** Filter Descriptor Plugin. */
-class EXPORT_FILTER_DESCRIPTOR_PLUGIN FilterDescriptorPlugin
-    : public QObject,
-      public PluginInterface
+class FilterDescriptorPlugin : public Plugin
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
-    FilterDescriptorPlugin();
-
-    virtual void initialize(MainWindow *mainWindow);
-
-public slots:
-    void slotPlugin();
+    const char *name() const override { return "FilterDescriptorPlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
 private:
-    MainWindow *mainWindow_;
-    FilterDescriptorWindow *pluginWindow_;
+    Application *app_;
 };
+
+extern "C" EXPORT_FILTER_DESCRIPTOR_PLUGIN Plugin *createPlugin()
+{
+    return new FilterDescriptorPlugin();
+}
 
 #endif /* FILTER_DESCRIPTOR_PLUGIN_HPP */

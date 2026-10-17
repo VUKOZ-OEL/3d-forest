@@ -20,51 +20,26 @@
 /** @file FilterSpeciesPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <FilterSpeciesPlugin.hpp>
-#include <FilterSpeciesWindow.hpp>
-#include <MainWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <FilterSpeciesWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterSpeciesPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/FilterSpeciesResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/FilterSpeciesResources/", name))
 
-FilterSpeciesPlugin::FilterSpeciesPlugin()
-    : mainWindow_(nullptr),
-      pluginWindow_(nullptr)
+void FilterSpeciesPlugin::initialize(Application *app)
 {
-}
+    app_ = app;
 
-void FilterSpeciesPlugin::initialize(MainWindow *mainWindow)
-{
-    mainWindow_ = mainWindow;
-
-    mainWindow_->createAction(nullptr,
-                              "Filter",
-                              "Filter",
-                              tr("Species"),
-                              tr("Show species filter"),
-                              ICON("species-filter"),
-                              this,
-                              SLOT(slotPlugin()),
-                              MAIN_WINDOW_MENU_FILTER_PRIORITY);
-}
-
-void FilterSpeciesPlugin::slotPlugin()
-{
-    if (!mainWindow_)
-    {
-        return;
-    }
-
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new FilterSpeciesWindow(mainWindow_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Filter", MAIN_WINDOW_MENU_FILTER_PRIORITY}},
+                       "Filter",
+                       tr("Species"),
+                       tr("Show species filter"),
+                       ICON("species-filter"),
+                       {},
+                       new FilterSpeciesWidget(app_));
 }

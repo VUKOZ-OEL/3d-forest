@@ -23,8 +23,7 @@
 #define COMPUTE_DESCRIPTOR_PLUGIN_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
-class ComputeDescriptorWindow;
+#include <Plugin.hpp>
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestComputeDescriptorPlugin)
@@ -37,25 +36,20 @@ class ComputeDescriptorWindow;
 #endif
 
 /** Compute Descriptor Plugin. */
-class EXPORT_COMPUTE_DESCRIPTOR_PLUGIN ComputeDescriptorPlugin
-    : public QObject,
-      public PluginInterface
+class ComputeDescriptorPlugin : public Plugin
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
-    ComputeDescriptorPlugin();
-
-    virtual void initialize(MainWindow *mainWindow);
-
-public slots:
-    void slotPlugin();
+    const char *name() const override { return "ComputeDescriptorPlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
 private:
-    MainWindow *mainWindow_;
-    ComputeDescriptorWindow *pluginWindow_;
+    Application *app_{nullptr};
 };
+
+extern "C" EXPORT_COMPUTE_DESCRIPTOR_PLUGIN Plugin *createPlugin()
+{
+    return new ComputeDescriptorPlugin();
+}
 
 #endif /* COMPUTE_DESCRIPTOR_PLUGIN_HPP */

@@ -23,10 +23,10 @@
 #define SETTINGS_HPP
 
 // Include 3D Forest.
+#include <ApplicationSettings.hpp>
 #include <ManagementStatusList.hpp>
 #include <RenderingSettings.hpp>
 #include <SpeciesList.hpp>
-#include <ApplicationSettings.hpp>
 #include <TreeSettings.hpp>
 #include <UnitsSettings.hpp>
 #include <ViewSettings.hpp>

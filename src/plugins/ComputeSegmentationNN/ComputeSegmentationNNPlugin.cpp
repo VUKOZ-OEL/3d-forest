@@ -20,46 +20,26 @@
 /** @file ComputeSegmentationNNPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ComputeSegmentationNNPlugin.hpp>
-#include <ComputeSegmentationNNWindow.hpp>
-#include <MainWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <ComputeSegmentationNNWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeSegmentationNNPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ComputeSegmentationNNResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ComputeSegmentationNNResources/", name))
 
-ComputeSegmentationNNPlugin::ComputeSegmentationNNPlugin()
-    : mainWindow_(nullptr),
-      pluginWindow_(nullptr)
+void ComputeSegmentationNNPlugin::initialize(Application *app)
 {
-}
+    app_ = app;
 
-void ComputeSegmentationNNPlugin::initialize(MainWindow *mainWindow)
-{
-    mainWindow_ = mainWindow;
-
-    mainWindow_->createAction(nullptr,
-                              "Compute",
-                              "Compute",
-                              tr("Segmentation NN"),
-                              tr("Compute segmentation NN"),
-                              ICON("forest"),
-                              this,
-                              SLOT(slotPlugin()),
-                              MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
-}
-
-void ComputeSegmentationNNPlugin::slotPlugin()
-{
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new ComputeSegmentationNNWindow(mainWindow_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Compute", MAIN_WINDOW_MENU_COMPUTE_PRIORITY}},
+                       "Compute",
+                       tr("Segmentation NN"),
+                       tr("Compute segmentation NN"),
+                       ICON("forest"),
+                       {},
+                       new ComputeSegmentationNNWidget(app_));
 }

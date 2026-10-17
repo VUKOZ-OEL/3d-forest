@@ -201,12 +201,12 @@ void LogThread::run()
     }
 }
 
-const char *LogMessage::typeString() const
+std::string LogMessage::typeString() const
 {
     return typeString(type);
 }
 
-const char *LogMessage::typeString(int type_)
+std::string LogMessage::typeString(int type_)
 {
     switch (type_)
     {

@@ -20,12 +20,12 @@
 /** @file FileFormatMeshPly.cpp */
 
 // Include std.
+#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <cstdint>
 
 // Include 3D Forest.
 #include <File.hpp>
@@ -37,7 +37,7 @@
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-static bool startsWith(const std::string& s, const std::string& p)
+static bool startsWith(const std::string &s, const std::string &p)
 {
     return s.rfind(p, 0) == 0;
 }
@@ -116,7 +116,8 @@ void FileFormatMeshPly::read(Mesh &mesh, const std::string &path, double scale)
         // vertices
         for (size_t i = 0; i < vertexCount; ++i)
         {
-            f.read(reinterpret_cast<char*>(&mesh.position[i * 3]), 3 * sizeof(float));
+            f.read(reinterpret_cast<char *>(&mesh.position[i * 3]),
+                   3 * sizeof(float));
         }
 
         // faces
@@ -124,7 +125,7 @@ void FileFormatMeshPly::read(Mesh &mesh, const std::string &path, double scale)
         for (size_t i = 0; i < faceCount; ++i)
         {
             uint8_t c = 0;
-            f.read(reinterpret_cast<char*>(&c), 1);
+            f.read(reinterpret_cast<char *>(&c), 1);
             if (c < 1)
             {
                 continue;
@@ -133,8 +134,7 @@ void FileFormatMeshPly::read(Mesh &mesh, const std::string &path, double scale)
             size_t count = static_cast<size_t>(c);
             idx.resize(count);
 
-            f.read(reinterpret_cast<char*>(idx.data()),
-                   count * sizeof(int));
+            f.read(reinterpret_cast<char *>(idx.data()), count * sizeof(int));
 
             if (count > 2)
             {
@@ -149,9 +149,8 @@ void FileFormatMeshPly::read(Mesh &mesh, const std::string &path, double scale)
         // vertices
         for (size_t i = 0; i < vertexCount; ++i)
         {
-            f >> mesh.position[i * 3 + 0]
-              >> mesh.position[i * 3 + 1]
-              >> mesh.position[i * 3 + 2];
+            f >> mesh.position[i * 3 + 0] >> mesh.position[i * 3 + 1] >>
+                mesh.position[i * 3 + 2];
         }
 
         // faces
@@ -189,7 +188,9 @@ void FileFormatMeshPly::read(Mesh &mesh, const std::string &path, double scale)
     LOG_DEBUG(<< "Finished reading PLY mesh.");
 }
 
-void FileFormatMeshPly::write(const Mesh &mesh, const std::string &path, double scale)
+void FileFormatMeshPly::write(const Mesh &mesh,
+                              const std::string &path,
+                              double scale)
 {
     LOG_DEBUG(<< "Export path <" << path << "> position size <"
               << mesh.position.size() << ">.");

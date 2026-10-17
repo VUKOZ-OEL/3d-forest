@@ -1,0 +1,499 @@
+/*
+    Copyright 2020 VUKOZ
+
+    This file is part of 3D Forest.
+
+    3D Forest is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    3D Forest is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+/** @file Application.cpp */
+
+// Include 3D Forest.
+#include <Application.hpp>
+#include <Dialog.hpp>
+#include <Time.hpp>
+#include <Widget.hpp>
+
+#include <ApplicationResources.hpp> // Generated
+
+// Include local.
+#define LOG_MODULE_NAME "Application"
+#define LOG_MODULE_DEBUG_ENABLED 1
+#include <Log.hpp>
+
+Application::Application() : threadRender_(&editor_)
+{
+}
+
+Application::~Application()
+{
+    LOG_DEBUG(<< "Start destroying the application.");
+    threadRender_.stop();
+    pluginManager_.unload();
+    LOG_DEBUG(<< "Finished destroying the application.");
+}
+
+void Application::load()
+{
+    LOG_DEBUG(<< "Start creating the application.");
+
+    // Status bar.
+    // statusBar()->showMessage(tr("Ready"));
+
+    resources_ = registerApplicationResources();
+
+    // Plugins.
+    pluginManager_.load(this);
+
+    // Exit.
+    // createAction(&exitAction_,
+    //              "File",
+    //              "",
+    //              tr("E&xit"),
+    //              tr("Exit the application"),
+    //              ThemeIcon(),
+    //              this,
+    //              SLOT(close()),
+    //              MAIN_WINDOW_MENU_FILE_PRIORITY,
+    //              100);
+    // exitAction_->setShortcuts(QKeySequence::Quit);
+
+    // initialize icons according to current theme
+    onThemeChanged();
+
+    // update when theme changes
+    // connect(qApp->styleHints(),
+    //        &QStyleHints::colorSchemeChanged,
+    //        this,
+    //        &Application::onThemeChanged);
+
+    // Rendering.
+    threadRender_.setCallback(this);
+    threadRender_.create();
+
+    // Update.
+    setWindowTitle(editor_.projectPath());
+
+    emitUpdate(this, {});
+
+    LOG_DEBUG_RENDER(<< "Reset viewer.");
+    if (pluginManager_.viewer())
+    {
+        if (interactive_)
+        {
+            pluginManager_.viewer()->resetSceneView();
+        }
+    }
+    else
+    {
+        LOG_ERROR(<< "The viewer plugin is not loaded to perform the action.");
+    }
+
+    LOG_DEBUG(<< "Finished creating the application.");
+}
+
+void Application::setWindowTitle(const std::string &path)
+{
+#if 0
+    std::string newtitle = APPLICATION_NAME;
+
+    if (path != "")
+    {
+        newtitle = newtitle + " - " + path;
+    }
+
+    QMainWindow::setWindowTitle(newtitle + " [*]");
+#endif
+}
+
+void Application::showError(const char *message)
+{
+    //(void)QMessageBox::critical(this, tr("Error"), message);
+}
+
+void Application::onThemeChanged()
+{
+}
+
+bool Application::onClose()
+{
+#if 0
+    if (!projectFilePlugin_)
+    {
+        LOG_ERROR(<< "The project file plugin is not loaded"
+                     " to perform the action.");
+        event->accept();
+        return;
+    }
+
+    if (projectFilePlugin_->closeProject())
+    {
+        return true;
+    }
+
+    return false;
+#else
+    return true;
+#endif
+}
+
+void Application::importFile()
+{
+#if 0
+    if (!importFilePlugin_)
+    {
+        LOG_ERROR(<< "The import file plugin is not loaded"
+                     " to perform the action.");
+        return;
+    }
+
+    importFilePlugin_->importFile();
+#endif
+}
+
+void Application::suspendThreads()
+{
+    LOG_DEBUG_RENDER(<< "Suspend threads.");
+
+    threadRender_.cancel();
+}
+
+void Application::resumeThreads()
+{
+    LOG_DEBUG_RENDER(<< "Resume threads.");
+
+    slotRenderViewports();
+}
+
+void Application::threadProgress(bool finished)
+{
+    (void)finished;
+
+    LOG_DEBUG_RENDER(<< "Thread progress finished <" << finished << ">.");
+
+    requestRender();
+}
+
+void Application::requestRender()
+{
+    if (!renderPending_.exchange(true))
+    {
+        wakeUp();
+    }
+}
+
+void Application::processRenderRequest()
+{
+    LOG_DEBUG_RENDER(<< "Start rendering.");
+    double t1 = Time::realTime();
+
+    if (interactive_ && pluginManager_.viewer())
+    {
+        if (renderPending_.exchange(false))
+        {
+            pluginManager_.viewer()->updateScene();
+        }
+    }
+
+    double t2 = Time::realTime();
+    LOG_DEBUG_RENDER(<< "Finished rendering after <" << (t2 - t1)
+                     << "> seconds.");
+}
+
+void Application::wakeUp()
+{
+}
+
+void Application::slotRenderViewport(size_t viewportId)
+{
+    LOG_DEBUG_RENDER(<< "Render viewport <" << viewportId << ">.");
+
+    if (interactive_ && pluginManager_.viewer())
+    {
+        threadRender_.render(pluginManager_.viewer()->camera(viewportId));
+    }
+}
+
+void Application::slotRenderViewports()
+{
+    LOG_DEBUG_RENDER(<< "Render viewports.");
+
+    if (interactive_ && pluginManager_.viewer())
+    {
+        threadRender_.render(pluginManager_.viewer()->camera());
+    }
+}
+
+void Application::post(std::function<void()> fn)
+{
+    eventQueue_.post(fn);
+}
+
+void Application::processEvents()
+{
+    // eventQueue_.runOne();
+}
+
+void Application::emitUpdate(void *sender, int type)
+{
+    LOG_DEBUG_UPDATE(<< "Update target <" << type << "> emit.");
+
+    // emit signalUpdate(sender, target);
+    signalUpdate(Message(sender, type));
+}
+
+void Application::update(void *sender,
+                         int type,
+                         Page::State viewPortsCacheState,
+                         bool resetCamera)
+{
+    LOG_DEBUG_UPDATE(<< "Update target <" << type << "> set page state <"
+                     << viewPortsCacheState << "> reset camera <"
+                     << static_cast<int>(resetCamera) << ">.");
+
+    suspendThreads();
+
+    editor_.viewports().setState(viewPortsCacheState);
+    // editor_.viewports().clearContent();
+
+    if (resetCamera)
+    {
+        LOG_DEBUG_RENDER(<< "Reset camera.");
+        if (interactive_ && pluginManager_.viewer())
+        {
+            pluginManager_.viewer()->resetScene();
+        }
+    }
+
+    emitUpdate(sender, type);
+
+    resumeThreads();
+}
+
+void Application::updateNewProject()
+{
+    LOG_DEBUG(<< "Start updating new project.");
+
+    setWindowTitle(editor_.projectPath());
+
+    if (interactive_ && pluginManager_.viewer())
+    {
+        std::unique_lock<std::mutex> mutexlock(editor_.editorMutex_);
+        pluginManager_.viewer()->resetSceneView();
+    }
+
+    emitUpdate(this, {});
+
+    LOG_DEBUG(<< "Finished updating new project.");
+}
+
+void Application::updateData()
+{
+    LOG_DEBUG_UPDATE(<< "Update data.");
+
+    suspendThreads();
+
+    if (interactive_ && pluginManager_.viewer())
+    {
+        pluginManager_.viewer()->resetScene();
+    }
+
+    editor_.viewports().clearContent();
+    editor_.applyFilters();
+
+    resumeThreads();
+}
+
+void Application::updateFilter(void *sender, bool final)
+{
+    LOG_DEBUG_UPDATE(<< "Update filter.");
+
+    suspendThreads();
+
+    if (interactive_ && pluginManager_.viewer())
+    {
+        pluginManager_.viewer()->resetScene();
+    }
+
+    editor_.viewports().setState(Page::STATE_SELECT);
+
+    if (final)
+    {
+        emitUpdate(sender, {Message::TYPE_FILTER});
+    }
+
+    resumeThreads();
+}
+
+void Application::updateModifiers()
+{
+    LOG_DEBUG_UPDATE(<< "Update modifiers.");
+
+    suspendThreads();
+
+    editor_.viewports().setState(Page::STATE_RUN_MODIFIERS);
+
+    resumeThreads();
+}
+
+void Application::updateRender()
+{
+    LOG_DEBUG_UPDATE(<< "Update render.");
+
+    suspendThreads();
+
+    editor_.viewports().setState(Page::STATE_RENDER);
+
+    resumeThreads();
+}
+
+void Application::createToolButton(ToolButton **result,
+                                   const std::string &text,
+                                   const std::string &toolTip,
+                                   const ThemeIcon &icon,
+                                   std::function<void()> callback)
+{
+    if (!result)
+    {
+        throw std::invalid_argument(
+            "Application::createToolButton: result is null.");
+    }
+
+    auto button = std::make_unique<ToolButton>(text);
+    button->setText(text);
+    button->setToolTip(toolTip);
+    // button->setStatusTip(toolTip);
+    button->setEnabled(true);
+    button->setToolButtonStyle(ToolButton::IconOnly);
+
+    button->setIcon(icon);
+
+    if (callback)
+    {
+        button->clicked.connect(std::move(callback));
+    }
+
+    *result = button.release();
+}
+
+void Application::createAction(Plugin *owner,
+                               const std::vector<NavigationPathItem> &path,
+                               const std::string &toolBarTitle,
+                               const std::string &text,
+                               const std::string &toolTip,
+                               const ThemeIcon &icon,
+                               std::function<void()> cb,
+                               Widget *widget,
+                               int order)
+{
+    Action *action = new Action(text);
+
+    action->setIcon(icon);
+    action->setToolTip(toolTip);
+
+    if (widget)
+    {
+        action->setPanel(widget);
+    }
+    else
+    {
+        action->triggered.connect(cb);
+    }
+
+    addNavigationItem(owner, path, action, order);
+}
+
+void Application::addNavigationItem(Plugin *owner,
+                                    const std::vector<NavigationPathItem> &path,
+                                    Action *action,
+                                    int order)
+{
+    navigation_.addItem(owner, path, action, order);
+}
+
+void Application::removeNavigationItem(Action *action)
+{
+    navigation_.removeItem(action);
+}
+
+void Application::removeNavigationItems(Plugin *owner)
+{
+    navigation_.removeItems(owner);
+}
+
+void Application::setViewer(Widget *widget)
+{
+}
+
+void Application::removeViewer(Widget *widget)
+{
+}
+
+void Application::showBottomWidget(Widget *widget)
+{
+    (void)widget;
+}
+
+void Application::hideBottomWidget()
+{
+}
+
+void Application::toggleBottomWidget(Widget *widget)
+{
+    showBottomWidget(widget);
+}
+
+void Application::removeBottomWidget(Widget *widget)
+{
+    (void)widget;
+}
+
+std::string Application::getOpenFileName(const std::string &dialogTitle,
+                                         const std::string &filter)
+{
+    return "";
+}
+
+std::vector<std::string> Application::getOpenFileNames(
+    const std::string &dialogTitle,
+    const std::string &filter)
+{
+    std::vector<std::string> list;
+
+    return list;
+}
+
+std::string Application::getSaveFileName(const std::string &caption,
+                                         const std::string &dir,
+                                         const std::string &filter,
+                                         std::string *selectedFilter,
+                                         int options)
+{
+    return "";
+}
+
+int Application::showDialog(Dialog &dialog)
+{
+    return 0;
+}
+
+void Application::openDialog(Dialog &dialog)
+{
+}
+
+Pixmap Application::loadPixmap(const std::string &fileName) const
+{
+    (void)fileName;
+    return Pixmap();
+}

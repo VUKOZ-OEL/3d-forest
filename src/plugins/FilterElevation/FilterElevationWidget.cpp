@@ -20,43 +20,39 @@
 /** @file FilterElevationWidget.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <DoubleRangeSliderWidget.hpp>
 #include <FilterElevationWidget.hpp>
-#include <MainWindow.hpp>
-
-// Include Qt.
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QVBoxLayout>
+#include <HBoxLayout.hpp>
+#include <PushButton.hpp>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterElevationWidget"
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-FilterElevationWidget::FilterElevationWidget(MainWindow *mainWindow)
-    : QWidget(mainWindow),
-      mainWindow_(mainWindow)
+FilterElevationWidget::FilterElevationWidget(Application *app) : app_(app)
 {
     LOG_DEBUG(<< "Start creating elevation filter widget.");
 
     // Input widgets.
-    DoubleRangeSliderWidget::create(elevationInput_,
-                                    this,
-                                    SLOT(slotRangeIntermediateMinimumValue()),
-                                    SLOT(slotRangeIntermediateMaximumValue()),
-                                    SLOT(slotFinalValue()),
-                                    tr("Elevation"),
-                                    tr("Min-max elevation range filter"),
-                                    tr("m"),
-                                    0.01,
-                                    0,
-                                    100,
-                                    0,
-                                    100);
+    DoubleRangeSliderWidget::create(
+        elevationInput_,
+        [this](double val) { slotMinimumValueChanged(val); },
+        [this](double val) { slotMaximumValueChanged(val); },
+        [this]() { slotFinalValue(); },
+        tr("Elevation"),
+        tr("Min-max elevation range filter"),
+        tr("m"),
+        0.01,
+        0,
+        100,
+        0,
+        100);
 
     // Layout.
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(elevationInput_);
     mainLayout->addStretch();
@@ -64,30 +60,26 @@ FilterElevationWidget::FilterElevationWidget(MainWindow *mainWindow)
     setLayout(mainLayout);
 
     // Data.
-    connect(mainWindow_,
-            SIGNAL(signalUpdate(void *, const QSet<Editor::Type> &)),
-            this,
-            SLOT(slotUpdate(void *, const QSet<Editor::Type> &)));
+    app_->signalUpdate.connect([this](const Message &msg) { slotUpdate(msg); });
 
-    slotUpdate(nullptr, QSet<Editor::Type>());
+    slotUpdate({});
 
     LOG_DEBUG(<< "Finished creating elevation filter widget.");
 }
 
-void FilterElevationWidget::slotUpdate(void *sender,
-                                       const QSet<Editor::Type> &target)
+void FilterElevationWidget::slotUpdate(const Message &msg)
 {
-    if (sender == this)
+    if (msg.sender() == this)
     {
         return;
     }
 
-    if (target.empty() || target.contains(Editor::TYPE_ELEVATION) ||
-        target.contains(Editor::TYPE_SETTINGS) ||
-        target.contains(Editor::TYPE_DATA_SET))
+    if (msg.empty() || msg.contains(Message::TYPE_ELEVATION) ||
+        msg.contains(Message::TYPE_SETTINGS) ||
+        msg.contains(Message::TYPE_DATA_SET))
     {
         LOG_DEBUG_UPDATE(<< "Input elevation filter.");
-        setElevation(mainWindow_->editor().elevationFilter());
+        setElevation(app_->editor().elevationFilter());
     }
 }
 
@@ -97,8 +89,7 @@ void FilterElevationWidget::setElevation(const Range<double> &range)
 
     elevationRange_ = range;
 
-    double ppm =
-        mainWindow_->editor().settings().unitsSettings().pointsPerMeter()[0];
+    double ppm = app_->editor().settings().unitsSettings().pointsPerMeter()[0];
 
     double min = elevationRange_.minimum() / ppm;
     double max = elevationRange_.maximum() / ppm;
@@ -118,9 +109,9 @@ void FilterElevationWidget::filterChanged(bool final)
 {
     LOG_DEBUG(<< "Elevation filer changed.");
 
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setElevationFilter(elevationRange_);
-    mainWindow_->updateFilter(this, final);
+    app_->suspendThreads();
+    app_->editor().setElevationFilter(elevationRange_);
+    app_->updateFilter(this, final);
 }
 
 void FilterElevationWidget::setFilterEnabled(bool b)
@@ -131,23 +122,21 @@ void FilterElevationWidget::setFilterEnabled(bool b)
     filterChanged(true);
 }
 
-void FilterElevationWidget::slotRangeIntermediateMinimumValue()
+void FilterElevationWidget::slotMinimumValueChanged(double val)
 {
     LOG_DEBUG(<< "Minimum value changed.");
 
-    double ppm =
-        mainWindow_->editor().settings().unitsSettings().pointsPerMeter()[0];
+    double ppm = app_->editor().settings().unitsSettings().pointsPerMeter()[0];
 
     elevationRange_.setMinimumValue(elevationInput_->minimumValue() * ppm);
     filterChanged(false);
 }
 
-void FilterElevationWidget::slotRangeIntermediateMaximumValue()
+void FilterElevationWidget::slotMaximumValueChanged(double val)
 {
     LOG_DEBUG(<< "Maximum value changed.");
 
-    double ppm =
-        mainWindow_->editor().settings().unitsSettings().pointsPerMeter()[0];
+    double ppm = app_->editor().settings().unitsSettings().pointsPerMeter()[0];
 
     elevationRange_.setMaximumValue(elevationInput_->maximumValue() * ppm);
     filterChanged(false);

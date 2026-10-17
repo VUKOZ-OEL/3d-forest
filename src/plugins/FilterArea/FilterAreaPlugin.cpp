@@ -20,51 +20,26 @@
 /** @file FilterAreaPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
+#include <FilterAreaBoxWidget.hpp>
 #include <FilterAreaPlugin.hpp>
-#include <FilterAreaWindow.hpp>
-#include <MainWindow.hpp>
-#include <ThemeIcon.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterAreaPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/FilterAreaResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/FilterAreaResources/", name))
 
-FilterAreaPlugin::FilterAreaPlugin()
-    : mainWindow_(nullptr),
-      pluginWindow_(nullptr)
+void FilterAreaPlugin::initialize(Application *app)
 {
-}
+    app_ = app;
 
-void FilterAreaPlugin::initialize(MainWindow *mainWindow)
-{
-    mainWindow_ = mainWindow;
-
-    mainWindow_->createAction(nullptr,
-                              "Filter",
-                              "Filter",
-                              tr("Area"),
-                              tr("Show area filter"),
-                              ICON("clip-filter"),
-                              this,
-                              SLOT(slotPlugin()),
-                              MAIN_WINDOW_MENU_FILTER_PRIORITY);
-}
-
-void FilterAreaPlugin::slotPlugin()
-{
-    if (!mainWindow_)
-    {
-        return;
-    }
-
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new FilterAreaWindow(mainWindow_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Filter", MAIN_WINDOW_MENU_FILTER_PRIORITY}},
+                       "Filter",
+                       tr("Area"),
+                       tr("Show area filter"),
+                       ICON("clip-filter"),
+                       {},
+                       new FilterAreaBoxWidget(app_));
 }

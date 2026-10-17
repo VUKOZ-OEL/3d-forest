@@ -20,35 +20,32 @@
 /** @file ComputeElevationWidget.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ComputeElevationWidget.hpp>
 #include <DoubleSliderWidget.hpp>
+#include <HBoxLayout.hpp>
 #include <InfoDialog.hpp>
-#include <MainWindow.hpp>
-#include <ProgressDialog.hpp>
+#include <ProgressActionDialog.hpp>
+#include <PushButton.hpp>
 #include <ThemeIcon.hpp>
-
-// Include Qt.
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QVBoxLayout>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeElevationWidget"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ComputeElevationResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ComputeElevationResources/", name))
 
-ComputeElevationWidget::ComputeElevationWidget(MainWindow *mainWindow)
-    : QWidget(),
-      mainWindow_(mainWindow),
+ComputeElevationWidget::ComputeElevationWidget(Application *app)
+    : Widget(),
+      app_(app),
       infoDialog_(nullptr),
-      elevation_(&mainWindow->editor())
+      elevation_(&app->editor())
 {
     LOG_DEBUG(<< "Create.");
 
     // Widgets.
     DoubleSliderWidget::create(voxelRadiusSlider_,
-                               this,
                                nullptr,
                                nullptr,
                                tr("Voxel radius"),
@@ -60,28 +57,27 @@ ComputeElevationWidget::ComputeElevationWidget(MainWindow *mainWindow)
                                0.1);
 
     // Settings layout.
-    QVBoxLayout *settingsLayout = new QVBoxLayout;
+    VBoxLayout *settingsLayout = new VBoxLayout;
     settingsLayout->addWidget(voxelRadiusSlider_);
     settingsLayout->addStretch();
 
     // Buttons.
-    helpButton_ = new QPushButton(tr("Help"));
-    helpButton_->setIcon(THEME_ICON("question").icon());
-    connect(helpButton_, SIGNAL(clicked()), this, SLOT(slotHelp()));
+    helpButton_ = new PushButton(tr("Help"));
+    // helpButton_->setIcon(THEME_ICON("question"));
+    helpButton_->clicked.connect([this]() { slotHelp(); });
 
-    applyButton_ = new QPushButton(tr("Run"));
-    applyButton_->setIcon(THEME_ICON("run").icon());
-    applyButton_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    connect(applyButton_, SIGNAL(clicked()), this, SLOT(slotApply()));
+    applyButton_ = new PushButton(tr("Run"));
+    applyButton_->setIcon(THEME_ICON("run"));
+    applyButton_->clicked.connect([this]() { slotApply(); });
 
     // Buttons layout.
-    QHBoxLayout *buttonsLayout = new QHBoxLayout;
+    HBoxLayout *buttonsLayout = new HBoxLayout;
     buttonsLayout->addWidget(helpButton_);
     buttonsLayout->addStretch();
     buttonsLayout->addWidget(applyButton_);
 
     // Main layout.
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->addLayout(settingsLayout);
     mainLayout->addSpacing(10);
     mainLayout->addLayout(buttonsLayout);
@@ -91,41 +87,41 @@ ComputeElevationWidget::ComputeElevationWidget(MainWindow *mainWindow)
     setLayout(mainLayout);
 }
 
-void ComputeElevationWidget::hideEvent(QHideEvent *event)
+void ComputeElevationWidget::hideEvent(HideEvent *event)
 {
     LOG_DEBUG(<< "Hide.");
     elevation_.clear();
-    QWidget::hideEvent(event);
+    Widget::hideEvent(event);
 }
 
 void ComputeElevationWidget::slotApply()
 {
     LOG_DEBUG(<< "Compute elevation.");
 
-    mainWindow_->suspendThreads();
+    app_->suspendThreads();
 
     double voxelRadius = voxelRadiusSlider_->value();
 
     try
     {
         elevation_.start(voxelRadius);
-        ProgressDialog::run(mainWindow_, "Compute Elevation", &elevation_);
+        ProgressActionDialog::run(app_, "Compute Elevation", &elevation_);
     }
     catch (std::exception &e)
     {
-        mainWindow_->showError(e.what());
+        app_->showError(e.what());
     }
     catch (...)
     {
-        mainWindow_->showError("Unknown error");
+        app_->showError("Unknown error");
     }
 
-    mainWindow_->update(this, {Editor::TYPE_ELEVATION}, Page::STATE_READ);
+    app_->update(this, Message::TYPE_ELEVATION, Page::STATE_READ);
 }
 
 void ComputeElevationWidget::slotHelp()
 {
-    QString t;
+    std::string t;
     t = "<h3>Compute Elevation Tool</h3>"
         "This tool calculates elevation of points above ground. "
         "It uses new algorithm which is specialized to classify "
@@ -153,7 +149,7 @@ void ComputeElevationWidget::slotHelp()
 
     if (!infoDialog_)
     {
-        infoDialog_ = new InfoDialog(mainWindow_, 450, 450);
+        infoDialog_ = new InfoDialog(app_, 450, 450);
         infoDialog_->setWindowTitle(tr("Compute Elevation Help"));
         infoDialog_->setText(t);
     }

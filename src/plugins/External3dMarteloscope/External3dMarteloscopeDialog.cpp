@@ -20,56 +20,52 @@
 /** @file External3dMarteloscopeDialog.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <External3dMarteloscopeDialog.hpp>
-#include <MainWindow.hpp>
+#include <HBoxLayout.hpp>
+#include <Label.hpp>
+#include <LineEdit.hpp>
+#include <PushButton.hpp>
 #include <ThemeIcon.hpp>
-
-// Include Qt.
-#include <QFileDialog>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QVBoxLayout>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "External3dMarteloscopeDialog"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/External3dMarteloscopeResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/External3dMarteloscopeResources/", name))
 
-External3dMarteloscopeDialog::External3dMarteloscopeDialog(
-    MainWindow *mainWindow)
-    : QDialog(mainWindow),
-      mainWindow_(mainWindow)
+External3dMarteloscopeDialog::External3dMarteloscopeDialog(Application *app)
+    : Dialog(app),
+      app_(app)
 {
     // File name.
-    fileNameLineEdit_ = new QLineEdit;
-    fileNameLineEdit_->setText(QString::fromStdString(path_));
+    fileNameLineEdit_ = new LineEdit;
+    fileNameLineEdit_->setText(path_);
 
-    browseButton_ = new QPushButton(tr("Browse"));
-    connect(browseButton_, SIGNAL(clicked()), this, SLOT(slotBrowse()));
+    browseButton_ = new PushButton(tr("Browse"));
+    browseButton_->clicked.connect([this]() { slotBrowse(); });
 
-    QHBoxLayout *fileNameLayout = new QHBoxLayout;
-    fileNameLayout->addWidget(new QLabel(tr("File")));
+    HBoxLayout *fileNameLayout = new HBoxLayout;
+    fileNameLayout->addWidget(new Label(tr("File")));
     fileNameLayout->addWidget(fileNameLineEdit_);
     fileNameLayout->addWidget(browseButton_);
 
     // Dialog buttons.
-    acceptButton_ = new QPushButton(tr("Run"));
-    acceptButton_->setIcon(THEME_ICON("run").icon());
-    connect(acceptButton_, SIGNAL(clicked()), this, SLOT(slotAccept()));
+    acceptButton_ = new PushButton(tr("Run"));
+    acceptButton_->setIcon(THEME_ICON("run"));
+    acceptButton_->clicked.connect([this]() { slotAccept(); });
 
-    rejectButton_ = new QPushButton(tr("Cancel"));
-    connect(rejectButton_, SIGNAL(clicked()), this, SLOT(slotReject()));
+    rejectButton_ = new PushButton(tr("Cancel"));
+    rejectButton_->clicked.connect([this]() { slotReject(); });
 
-    QHBoxLayout *dialogButtons = new QHBoxLayout;
+    HBoxLayout *dialogButtons = new HBoxLayout;
     dialogButtons->addStretch();
     dialogButtons->addWidget(acceptButton_);
     dialogButtons->addWidget(rejectButton_);
 
     // Dialog.
-    QVBoxLayout *dialogLayout = new QVBoxLayout;
+    VBoxLayout *dialogLayout = new VBoxLayout;
     dialogLayout->addLayout(fileNameLayout);
     dialogLayout->addSpacing(10);
     dialogLayout->addLayout(dialogButtons);
@@ -78,27 +74,24 @@ External3dMarteloscopeDialog::External3dMarteloscopeDialog(
     setLayout(dialogLayout);
 
     setWindowTitle(tr("Run iLand"));
-    setWindowIcon(THEME_ICON("run").icon());
+    setWindowIcon(THEME_ICON("run"));
     setMaximumWidth(600);
     setMaximumHeight(height());
 }
 
 void External3dMarteloscopeDialog::slotBrowse()
 {
-    QFileDialog::Options options;
-    options = QFlag(QFileDialog::DontConfirmOverwrite);
+    std::string selectedFilter;
 
-    QString selectedFilter;
+    std::string fileName =
+        app_->getSaveFileName(app_,
+                              tr("Select File"),
+                              fileNameLineEdit_->text(),
+                              tr("iLand project XML (*.xml)"),
+                              &selectedFilter,
+                              Ui::FileDialogOption::DontConfirmOverwrite);
 
-    QString fileName =
-        QFileDialog::getSaveFileName(mainWindow_,
-                                     tr("Select File"),
-                                     fileNameLineEdit_->text(),
-                                     tr("iLand project XML (*.xml)"),
-                                     &selectedFilter,
-                                     options);
-
-    if (fileName.isEmpty())
+    if (fileName.empty())
     {
         return;
     }
@@ -108,14 +101,12 @@ void External3dMarteloscopeDialog::slotBrowse()
 
 void External3dMarteloscopeDialog::slotAccept()
 {
-    path_ = fileNameLineEdit_->text().toStdString();
+    path_ = fileNameLineEdit_->text();
 
-    close();
-    setResult(QDialog::Accepted);
+    accept();
 }
 
 void External3dMarteloscopeDialog::slotReject()
 {
-    close();
-    setResult(QDialog::Rejected);
+    reject();
 }

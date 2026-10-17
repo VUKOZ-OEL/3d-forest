@@ -20,67 +20,63 @@
 /** @file EditPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <EditPlugin.hpp>
 #include <EditPluginResetElevation.hpp>
 #include <EditPluginResetManagementStatus.hpp>
 #include <EditPluginSetClassification.hpp>
-#include <MainWindow.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "EditPlugin"
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-EditPlugin::EditPlugin() : mainWindow_(nullptr)
+void EditPlugin::initialize(Application *app)
 {
-}
+    app_ = app;
 
-void EditPlugin::initialize(MainWindow *mainWindow)
-{
-    mainWindow_ = mainWindow;
+    app_->createAction(
+        this,
+        {{"Edit", MAIN_WINDOW_MENU_EDIT_PRIORITY}},
+        "Edit Points",
+        tr("Reset elevation"),
+        tr("Reset elevation"),
+        ThemeIcon(),
+        [this]() { slotResetElevation(); },
+        nullptr);
 
-    mainWindow_->createAction(nullptr,
-                              "Edit",
-                              "Edit",
-                              tr("Reset elevation"),
-                              tr("Reset elevation"),
-                              ThemeIcon(),
-                              this,
-                              SLOT(slotResetElevation()),
-                              MAIN_WINDOW_MENU_EDIT_PRIORITY);
+    app_->createAction(
+        this,
+        {{"Edit", MAIN_WINDOW_MENU_EDIT_PRIORITY}},
+        "Edit Points",
+        tr("Reset management status"),
+        tr("Reset management status"),
+        ThemeIcon(),
+        [this]() { slotResetManagementStatus(); },
+        nullptr);
 
-    mainWindow_->createAction(nullptr,
-                              "Edit",
-                              "Edit",
-                              tr("Reset management status"),
-                              tr("Reset management status"),
-                              ThemeIcon(),
-                              this,
-                              SLOT(slotResetManagementStatus()),
-                              MAIN_WINDOW_MENU_EDIT_PRIORITY);
-
-    mainWindow_->createAction(nullptr,
-                              "Edit",
-                              "Edit",
-                              tr("Set classification"),
-                              tr("Set classification"),
-                              ThemeIcon(),
-                              this,
-                              SLOT(slotSetClassification()),
-                              MAIN_WINDOW_MENU_EDIT_PRIORITY);
+    app_->createAction(
+        this,
+        {{"Edit", MAIN_WINDOW_MENU_EDIT_PRIORITY}},
+        "Edit Points",
+        tr("Set classification"),
+        tr("Set classification"),
+        ThemeIcon(),
+        [this]() { slotSetClassification(); },
+        nullptr);
 }
 
 void EditPlugin::slotResetElevation()
 {
-    EditPluginResetElevation::run(mainWindow_);
+    EditPluginResetElevation::run(app_);
 }
 
 void EditPlugin::slotResetManagementStatus()
 {
-    EditPluginResetManagementStatus::run(mainWindow_);
+    EditPluginResetManagementStatus::run(app_);
 }
 
 void EditPlugin::slotSetClassification()
 {
-    EditPluginSetClassification::run(mainWindow_);
+    EditPluginSetClassification::run(app_);
 }

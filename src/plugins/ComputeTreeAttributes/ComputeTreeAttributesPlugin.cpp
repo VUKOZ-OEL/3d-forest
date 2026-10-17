@@ -20,46 +20,26 @@
 /** @file ComputeTreeAttributesPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ComputeTreeAttributesPlugin.hpp>
-#include <ComputeTreeAttributesWindow.hpp>
-#include <MainWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <ComputeTreeAttributesWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeTreeAttributesPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ComputeTreeAttributesResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ComputeTreeAttributesResources/", name))
 
-ComputeTreeAttributesPlugin::ComputeTreeAttributesPlugin()
-    : mainWindow_(nullptr),
-      pluginWindow_(nullptr)
+void ComputeTreeAttributesPlugin::initialize(Application *app)
 {
-}
+    app_ = app;
 
-void ComputeTreeAttributesPlugin::initialize(MainWindow *mainWindow)
-{
-    mainWindow_ = mainWindow;
-
-    mainWindow_->createAction(nullptr,
-                              "Compute",
-                              "Compute",
-                              tr("Tree Attributes"),
-                              tr("Compute tree attributes"),
-                              ICON("tree-attributes"),
-                              this,
-                              SLOT(slotPlugin()),
-                              MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
-}
-
-void ComputeTreeAttributesPlugin::slotPlugin()
-{
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new ComputeTreeAttributesWindow(mainWindow_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Compute", MAIN_WINDOW_MENU_COMPUTE_PRIORITY}},
+                       "Compute",
+                       tr("Tree Attributes"),
+                       tr("Compute tree attributes"),
+                       ICON("tree-attributes"),
+                       {},
+                       new ComputeTreeAttributesWidget(app_));
 }

@@ -20,46 +20,26 @@
 /** @file ComputeSkeletonPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <ComputeSkeletonPlugin.hpp>
-#include <ComputeSkeletonWindow.hpp>
-#include <MainWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <ComputeSkeletonWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "ComputeSkeletonPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/ComputeSkeletonResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/ComputeSkeletonResources/", name))
 
-ComputeSkeletonPlugin::ComputeSkeletonPlugin()
-    : mainWindow_(nullptr),
-      pluginWindow_(nullptr)
+void ComputeSkeletonPlugin::initialize(Application *app)
 {
-}
+    app_ = app;
 
-void ComputeSkeletonPlugin::initialize(MainWindow *mainWindow)
-{
-    mainWindow_ = mainWindow;
-
-    mainWindow_->createAction(nullptr,
-                              "Compute",
-                              "Compute",
-                              tr("Skeleton"),
-                              tr("Compute skeleton"),
-                              ICON("compute-skeleton"),
-                              this,
-                              SLOT(slotPlugin()),
-                              MAIN_WINDOW_MENU_COMPUTE_PRIORITY);
-}
-
-void ComputeSkeletonPlugin::slotPlugin()
-{
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new ComputeSkeletonWindow(mainWindow_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Compute", MAIN_WINDOW_MENU_COMPUTE_PRIORITY}},
+                       "Compute",
+                       tr("Skeleton"),
+                       tr("Compute skeleton"),
+                       ICON("compute-skeleton"),
+                       {},
+                       new ComputeSkeletonWidget(app_));
 }

@@ -17,7 +17,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file TreeTableSetManagementStatus.hpp */
+/** @file TreeTableAction.hpp */
 
 #ifndef TREE_TABLE_ACTIONTUS_HPP
 #define TREE_TABLE_ACTIONTUS_HPP
@@ -27,25 +27,31 @@
 #include <unordered_set>
 
 // Include 3D Forest.
-class MainWindow;
+class Application;
 
 /** Tree Table Action. */
 class TreeTableAction
 {
 public:
-    static void showTrees(MainWindow *mainWindow,
-                          std::unordered_set<size_t> idList);
+    static void showTrees(Application *app, std::unordered_set<size_t> idList);
 
-    static void hideTrees(MainWindow *mainWindow,
-                          std::unordered_set<size_t> idList);
+    static void hideTrees(Application *app, std::unordered_set<size_t> idList);
 
-    static void readMesh(MainWindow *mainWindow,
+    static void readMesh(Application *app,
                          const std::unordered_set<size_t> &idList,
                          const std::string &meshName);
 
-    static void deleteMesh(MainWindow *mainWindow,
+    static void deleteMesh(Application *app,
                            const std::unordered_set<size_t> &idList,
                            const std::string &meshName);
+
+    static void setSpecies(Application *app,
+                           const std::unordered_set<size_t> &idList,
+                           int value);
+
+    static void setManagementStatus(Application *app,
+                                    const std::unordered_set<size_t> &idList,
+                                    int value);
 };
 
 #endif /* TREE_TABLE_ACTION_HPP */

@@ -23,8 +23,7 @@
 #define FILTER_MANAGEMENT_STATUS_PLUGIN_HPP
 
 // Include 3D Forest.
-#include <PluginInterface.hpp>
-class FilterManagementStatusWindow;
+#include <Plugin.hpp>
 
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestFilterManagementStatusPlugin)
@@ -37,25 +36,20 @@ class FilterManagementStatusWindow;
 #endif
 
 /** Filter Management Status Plugin. */
-class EXPORT_FILTER_MANAGEMENT_STATUS_PLUGIN FilterManagementStatusPlugin
-    : public QObject,
-      public PluginInterface
+class FilterManagementStatusPlugin : public Plugin
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID PluginInterface_iid)
-    Q_INTERFACES(PluginInterface)
-
 public:
-    FilterManagementStatusPlugin();
-
-    virtual void initialize(MainWindow *mainWindow);
-
-public slots:
-    void slotPlugin();
+    const char *name() const override { return "FilterManagementStatusPlugin"; }
+    void initialize(Application *app) override;
+    void release() override { delete this; }
 
 private:
-    MainWindow *mainWindow_;
-    FilterManagementStatusWindow *pluginWindow_;
+    Application *app_{nullptr};
 };
+
+extern "C" EXPORT_FILTER_MANAGEMENT_STATUS_PLUGIN Plugin *createPlugin()
+{
+    return new FilterManagementStatusPlugin();
+}
 
 #endif /* FILTER_MANAGEMENT_STATUS_PLUGIN_HPP */

@@ -68,8 +68,8 @@ public:
 
     void translate(T x, T y, T z);
 
-    void perspective(T fovy, T aspect, T near, T far);
-    void ortho(T left, T right, T bottom, T top, T near, T far);
+    void perspective(T fovy, T aspect, T znear, T zfar);
+    void ortho(T left, T right, T bottom, T top, T znear, T zfar);
     void lookAt(const Vector3<T> &eye,
                 const Vector3<T> &center,
                 const Vector3<T> &up);
@@ -399,32 +399,32 @@ template <class T> inline void Matrix4<T>::translate(T x, T y, T z)
 }
 
 template <class T>
-inline void Matrix4<T>::perspective(T fovy, T aspect, T near, T far)
+inline void Matrix4<T>::perspective(T fovy, T aspect, T znear, T zfar)
 {
     double fov = static_cast<double>(fovy) * 3.1415927 / 180.0;
     T f = static_cast<T>(1.0 / std::tan(fov * 0.5));
 
     data_[0][0] = f / aspect;
     data_[1][1] = f;
-    (void)near;
-    (void)far;
-    // data_[2][2] = (far + near) / (near - far);
-    // data_[3][2] = (2 * far * near) / (near - far);
+    (void)znear;
+    (void)zfar;
+    // data_[2][2] = (zfar + znear) / (znear - zfar);
+    // data_[3][2] = (2 * zfar * znear) / (znear - zfar);
     data_[2][3] = -1;
     data_[3][3] = 0;
 }
 
 template <class T>
-inline void Matrix4<T>::ortho(T left, T right, T bottom, T top, T near, T far)
+inline void Matrix4<T>::ortho(T left, T right, T bottom, T top, T znear, T zfar)
 {
     data_[0][0] = 2 / (right - left);
     data_[1][1] = 2 / (top - bottom);
-    (void)near;
-    (void)far;
-    // data_[2][2] = -2 / (far - near);
+    (void)znear;
+    (void)zfar;
+    // data_[2][2] = -2 / (zfar - znear);
     data_[3][0] = -((right + left) / (right - left));
     data_[3][1] = -((top + bottom) / (top - bottom));
-    // data_[3][2] = -((far + near) / (far - near));
+    // data_[3][2] = -((zfar + znear) / (zfar - znear));
 }
 
 template <class T>

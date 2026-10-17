@@ -20,46 +20,43 @@
 /** @file TreeTablePlugin.cpp */
 
 // Include 3D Forest.
-#include <MainWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <Application.hpp>
 #include <TreeTablePlugin.hpp>
-#include <TreeTableWindow.hpp>
+#include <TreeTableWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "TreeTablePlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/TreeTableResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/TreeTableResources/", name))
 
-TreeTablePlugin::TreeTablePlugin()
-    : mainWindow_(nullptr),
-      pluginWindow_(nullptr)
+void TreeTablePlugin::initialize(Application *app)
 {
+    app_ = app;
+
+    treeTableWidget_ = new TreeTableWidget(app_);
+
+    app_->createAction(
+        this,
+        {{"Data", MAIN_WINDOW_MENU_DATA_PRIORITY}},
+        "Data",
+        tr("Tree Table"),
+        tr("Show tree table"),
+        ICON("tree-table"),
+        [this]() { app_->toggleBottomWidget(treeTableWidget_); },
+        nullptr);
+
+    app_->showBottomWidget(treeTableWidget_);
 }
 
-void TreeTablePlugin::initialize(MainWindow *mainWindow)
+void TreeTablePlugin::release()
 {
-    mainWindow_ = mainWindow;
-
-    mainWindow_->createAction(nullptr,
-                              "Data",
-                              "Data",
-                              tr("Tree Table"),
-                              tr("Show tree table"),
-                              ICON("tree-table"),
-                              this,
-                              SLOT(slotPlugin()),
-                              MAIN_WINDOW_MENU_DATA_PRIORITY);
-}
-
-void TreeTablePlugin::slotPlugin()
-{
-    if (!pluginWindow_)
+    if (treeTableWidget_)
     {
-        pluginWindow_ = new TreeTableWindow(mainWindow_);
+        app_->removeBottomWidget(treeTableWidget_);
+        delete treeTableWidget_;
+        treeTableWidget_ = nullptr;
     }
 
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    delete this;
 }

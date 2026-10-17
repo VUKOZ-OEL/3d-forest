@@ -25,34 +25,28 @@
 // Include 3D Forest.
 #include <ComputeSegmentationNNAction.hpp>
 #include <ComputeSegmentationNNParameters.hpp>
-class MainWindow;
+#include <Widget.hpp>
+class Application;
 class DoubleSliderWidget;
 class DoubleRangeSliderWidget;
 class InfoDialog;
-
-// Include Qt.
-#include <QWidget>
-class QPushButton;
-class QRadioButton;
-class QCheckBox;
+class PushButton;
+class RadioButton;
+class CheckBox;
 
 /** Compute Segmentation NN Widget. */
-class ComputeSegmentationNNWidget : public QWidget
+class ComputeSegmentationNNWidget : public Widget
 {
-    Q_OBJECT
-
 public:
-    ComputeSegmentationNNWidget(MainWindow *mainWindow);
+    ComputeSegmentationNNWidget(Application *app);
 
-protected slots:
     void slotApply();
     void slotHelp();
 
-protected:
-    void hideEvent(QHideEvent *event) override;
+    void hideEvent(HideEvent *event) override;
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
     InfoDialog *infoDialog_;
 
     ComputeSegmentationNNParameters parameters_;
@@ -60,16 +54,16 @@ private:
 
     DoubleSliderWidget *voxelRadiusSlider_;
     DoubleSliderWidget *woodThresholdMinMinSlider_;
-    std::vector<QRadioButton *> leafToWoodChannelRadioButton_;
+    std::vector<RadioButton *> leafToWoodChannelRadioButton_;
     DoubleSliderWidget *searchRadiusForTrunkPointsSlider_;
     DoubleSliderWidget *searchRadiusForLeafPointsSlider_;
     DoubleRangeSliderWidget *treeBaseElevationSlider_;
     DoubleSliderWidget *treeHeightSlider_;
-    QCheckBox *zCoordinatesAsElevationCheckBox_;
-    QCheckBox *segmentOnlyTrunksCheckBox_;
+    CheckBox *zCoordinatesAsElevationCheckBox_;
+    CheckBox *segmentOnlyTrunksCheckBox_;
 
-    QPushButton *helpButton_;
-    QPushButton *applyButton_;
+    PushButton *helpButton_;
+    PushButton *applyButton_;
 };
 
 #endif /* COMPUTE_SEGMENTATION_NN_WIDGET_HPP */

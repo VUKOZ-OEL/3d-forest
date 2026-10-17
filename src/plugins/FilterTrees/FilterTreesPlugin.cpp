@@ -20,51 +20,26 @@
 /** @file FilterTreesPlugin.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <FilterTreesPlugin.hpp>
-#include <FilterTreesWindow.hpp>
-#include <MainWindow.hpp>
-#include <ThemeIcon.hpp>
+#include <FilterTreesWidget.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterTreesPlugin"
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/FilterTreesResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/FilterTreesResources/", name))
 
-FilterTreesPlugin::FilterTreesPlugin()
-    : mainWindow_(nullptr),
-      pluginWindow_(nullptr)
+void FilterTreesPlugin::initialize(Application *app)
 {
-}
+    app_ = app;
 
-void FilterTreesPlugin::initialize(MainWindow *mainWindow)
-{
-    mainWindow_ = mainWindow;
-
-    mainWindow_->createAction(nullptr,
-                              "Filter",
-                              "Filter",
-                              tr("Trees"),
-                              tr("Show tree filter"),
-                              ICON("tree"),
-                              this,
-                              SLOT(slotPlugin()),
-                              MAIN_WINDOW_MENU_FILTER_PRIORITY);
-}
-
-void FilterTreesPlugin::slotPlugin()
-{
-    if (!mainWindow_)
-    {
-        return;
-    }
-
-    if (!pluginWindow_)
-    {
-        pluginWindow_ = new FilterTreesWindow(mainWindow_);
-    }
-
-    pluginWindow_->show();
-    pluginWindow_->raise();
-    pluginWindow_->activateWindow();
+    app_->createAction(this,
+                       {{"Filter", MAIN_WINDOW_MENU_FILTER_PRIORITY}},
+                       "Filter",
+                       tr("Trees"),
+                       tr("Show tree filter"),
+                       ICON("tree"),
+                       {},
+                       new FilterTreesWidget(app_));
 }

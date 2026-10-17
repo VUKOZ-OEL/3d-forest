@@ -20,94 +20,92 @@
 /** @file FilterTreesWidget.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <FilterTreesTreeWidget.hpp>
 #include <FilterTreesWidget.hpp>
-#include <MainWindow.hpp>
+#include <HBoxLayout.hpp>
+#include <Label.hpp>
+#include <PushButton.hpp>
+#include <Splitter.hpp>
 #include <ThemeIcon.hpp>
-
-// Include Qt.
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QPushButton>
-#include <QSplitter>
-#include <QToolBar>
-#include <QToolButton>
-#include <QTreeWidget>
-#include <QTreeWidgetItem>
-#include <QTreeWidgetItemIterator>
-#include <QVBoxLayout>
+#include <ToolBar.hpp>
+#include <ToolButton.hpp>
+#include <TreeWidget.hpp>
+#include <TreeWidgetItem.hpp>
+#include <VBoxLayout.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "FilterTreesWidget"
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(":/FilterTreesResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/FilterTreesResources/", name))
 
-FilterTreesWidget::FilterTreesWidget(MainWindow *mainWindow)
-    : mainWindow_(mainWindow)
+FilterTreesWidget::FilterTreesWidget(Application *app) : app_(app)
 {
     // Table.
-    tree_ = new QTreeWidget();
-    tree_->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    tree_->setSelectionBehavior(QAbstractItemView::SelectRows);
+    tree_ = new TreeWidget();
+    tree_->setSelectionMode(AbstractItemView::ExtendedSelection);
+    tree_->setSelectionBehavior(AbstractItemView::SelectRows);
+
+    tree_->itemClicked.connect([this](TreeWidgetItem *item, int column)
+                               { slotItemClicked(item, column); });
+
+    tree_->itemChanged.connect([this](TreeWidgetItem *item, int column)
+                               { slotItemChanged(item, column); });
+
+    tree_->itemSelectionChanged.connect([this]()
+                                        { slotItemSelectionChanged(); });
 
     // Tool bar buttons.
-    mainWindow_->createToolButton(&addButton_,
-                                  tr("Add"),
-                                  tr("Add new segments"),
-                                  THEME_ICON("add"),
-                                  this,
-                                  SLOT(slotAdd()));
+    app_->createToolButton(&addButton_,
+                           tr("Add"),
+                           tr("Add new segments"),
+                           THEME_ICON("add"),
+                           [this]() { slotAdd(); });
     addButton_->setEnabled(false);
 
-    mainWindow_->createToolButton(&deleteButton_,
-                                  tr("Remove"),
-                                  tr("Remove selected segments"),
-                                  THEME_ICON("remove"),
-                                  this,
-                                  SLOT(slotDelete()));
+    app_->createToolButton(&deleteButton_,
+                           tr("Remove"),
+                           tr("Remove selected segments"),
+                           THEME_ICON("remove"),
+                           [this]() { slotDelete(); });
     deleteButton_->setEnabled(false);
 
-    mainWindow_->createToolButton(&showButton_,
-                                  tr("Show"),
-                                  tr("Make selected segments visible"),
-                                  THEME_ICON("eye"),
-                                  this,
-                                  SLOT(slotShow()));
+    app_->createToolButton(&showButton_,
+                           tr("Show"),
+                           tr("Make selected segments visible"),
+                           THEME_ICON("eye"),
+                           [this]() { slotShow(); });
     showButton_->setEnabled(false);
 
-    mainWindow_->createToolButton(&hideButton_,
-                                  tr("Hide"),
-                                  tr("Hide selected segments"),
-                                  THEME_ICON("hide"),
-                                  this,
-                                  SLOT(slotHide()));
+    app_->createToolButton(&hideButton_,
+                           tr("Hide"),
+                           tr("Hide selected segments"),
+                           THEME_ICON("hide"),
+                           [this]() { slotHide(); });
     hideButton_->setEnabled(false);
 
-    mainWindow_->createToolButton(&selectAllButton_,
-                                  tr("Select all"),
-                                  tr("Select all"),
-                                  THEME_ICON("select-all"),
-                                  this,
-                                  SLOT(slotSelectAll()));
+    app_->createToolButton(&selectAllButton_,
+                           tr("Select all"),
+                           tr("Select all"),
+                           THEME_ICON("select-all"),
+                           [this]() { slotSelectAll(); });
 
-    mainWindow_->createToolButton(&selectInvertButton_,
-                                  tr("Invert"),
-                                  tr("Invert selection"),
-                                  THEME_ICON("select-invert"),
-                                  this,
-                                  SLOT(slotSelectInvert()));
+    app_->createToolButton(&selectInvertButton_,
+                           tr("Invert"),
+                           tr("Invert selection"),
+                           THEME_ICON("select-invert"),
+                           [this]() { slotSelectInvert(); });
 
-    mainWindow_->createToolButton(&selectNoneButton_,
-                                  tr("Select none"),
-                                  tr("Select none"),
-                                  THEME_ICON("select-none"),
-                                  this,
-                                  SLOT(slotSelectNone()));
+    app_->createToolButton(&selectNoneButton_,
+                           tr("Select none"),
+                           tr("Select none"),
+                           THEME_ICON("select-none"),
+                           [this]() { slotSelectNone(); });
 
     // Tool bar.
-    QToolBar *toolBar = new QToolBar;
+    ToolBar *toolBar = new ToolBar;
     toolBar->addWidget(addButton_);
     toolBar->addWidget(deleteButton_);
     toolBar->addWidget(showButton_);
@@ -116,22 +114,22 @@ FilterTreesWidget::FilterTreesWidget(MainWindow *mainWindow)
     toolBar->addWidget(selectAllButton_);
     toolBar->addWidget(selectInvertButton_);
     toolBar->addWidget(selectNoneButton_);
-    toolBar->setIconSize(QSize(MainWindow::ICON_SIZE, MainWindow::ICON_SIZE));
+    toolBar->setIconSize(Size(Application::ICON_SIZE, Application::ICON_SIZE));
 
 #if defined(FILTER_TREES_SHOW_DETAIL)
     // Segment.
-    treeWidget_ = new FilterTreesTreeWidget(mainWindow_);
+    treeWidget_ = new FilterTreesTreeWidget(app_);
 
     // Splitter.
-    splitter_ = new QSplitter;
+    splitter_ = new Splitter;
     splitter_->addWidget(tree_);
     splitter_->addWidget(treeWidget_);
-    splitter_->setOrientation(Qt::Vertical);
-    splitter_->setSizes(QList<int>({1, 1}));
+    splitter_->setOrientation(Ui::Vertical);
+    splitter_->setSizes(std::vector<int>({1, 1}));
 #endif
 
     // Layout.
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(toolBar);
 #if defined(FILTER_TREES_SHOW_DETAIL)
@@ -144,29 +142,24 @@ FilterTreesWidget::FilterTreesWidget(MainWindow *mainWindow)
 
     // Data.
     updatesEnabled_ = true;
-    connect(mainWindow_,
-            SIGNAL(signalUpdate(void *, const QSet<Editor::Type> &)),
-            this,
-            SLOT(slotUpdate(void *, const QSet<Editor::Type> &)));
+    app_->signalUpdate.connect([this](const Message &msg) { slotUpdate(msg); });
 
-    slotUpdate(nullptr, QSet<Editor::Type>());
+    slotUpdate({});
 }
 
-void FilterTreesWidget::slotUpdate(void *sender,
-                                   const QSet<Editor::Type> &target)
+void FilterTreesWidget::slotUpdate(const Message &msg)
 {
-    if (sender == this)
+    if (msg.sender() == this)
     {
         return;
     }
 
-    if (target.empty() || target.contains(Editor::TYPE_SEGMENT) ||
-        target.contains(Editor::TYPE_SETTINGS))
+    if (msg.empty() || msg.contains(Message::TYPE_SEGMENT) ||
+        msg.contains(Message::TYPE_SETTINGS))
     {
         LOG_DEBUG_UPDATE(<< "Input segments.");
 
-        setSegments(mainWindow_->editor().segments(),
-                    mainWindow_->editor().segmentsFilter());
+        setSegments(app_->editor().segments(), app_->editor().segmentsFilter());
     }
 }
 
@@ -174,21 +167,21 @@ void FilterTreesWidget::dataChanged()
 {
     LOG_DEBUG_UPDATE(<< "Output segments.");
 
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setSegments(segments_);
-    mainWindow_->editor().setSegmentsFilter(filter_);
-    mainWindow_->updateData();
-    mainWindow_->update(this, {Editor::TYPE_SEGMENT});
+    app_->suspendThreads();
+    app_->editor().setSegments(segments_);
+    app_->editor().setSegmentsFilter(filter_);
+    app_->updateData();
+    app_->update(this, Message::TYPE_SEGMENT);
 }
 
 void FilterTreesWidget::filterChanged()
 {
     LOG_DEBUG_UPDATE(<< "Output segments filter.");
 
-    mainWindow_->suspendThreads();
-    mainWindow_->editor().setSegmentsFilter(filter_);
-    mainWindow_->updateFilter();
-    mainWindow_->update(this, {Editor::TYPE_SEGMENT});
+    app_->suspendThreads();
+    app_->editor().setSegmentsFilter(filter_);
+    app_->updateFilter();
+    app_->update(this, Message::TYPE_SEGMENT);
 }
 
 void FilterTreesWidget::setFilterEnabled(bool b)
@@ -213,8 +206,10 @@ void FilterTreesWidget::setSegments(const Segments &segments,
 
     // Header.
     tree_->setColumnCount(COLUMN_LAST);
-    QStringList labels;
-    labels << tr("Visible") << tr("Id") << tr("Label");
+    std::vector<std::string> labels;
+    labels.push_back(tr("Visible"));
+    labels.push_back(tr("Id"));
+    labels.push_back(tr("Label"));
     tree_->setHeaderLabels(labels);
 
 #if defined(FILTER_TREES_SHOW_DETAIL)
@@ -242,7 +237,7 @@ void FilterTreesWidget::setSegments(const Segments &segments,
 
     // Sort Content.
     tree_->setSortingEnabled(true);
-    tree_->sortItems(COLUMN_ID, Qt::AscendingOrder);
+    tree_->sortItems(COLUMN_ID, Ui::AscendingOrder);
 
     unblock();
 }
@@ -253,9 +248,9 @@ void FilterTreesWidget::slotAdd()
 
 void FilterTreesWidget::slotDelete()
 {
-    QList<QTreeWidgetItem *> items = tree_->selectedItems();
+    std::vector<TreeWidgetItem *> items = tree_->selectedItems();
 
-    if (items.count() > 0)
+    if (items.size() > 0)
     {
         slotSelectNone();
 
@@ -275,14 +270,14 @@ void FilterTreesWidget::slotShow()
 {
     LOG_DEBUG(<< "Show.");
 
-    QList<QTreeWidgetItem *> items = tree_->selectedItems();
+    std::vector<TreeWidgetItem *> items = tree_->selectedItems();
 
-    if (items.count() > 0)
+    if (items.size() > 0)
     {
         updatesEnabled_ = false;
         for (auto &item : items)
         {
-            item->setCheckState(COLUMN_CHECKED, Qt::Checked);
+            item->setCheckState(COLUMN_CHECKED, Ui::Checked);
             filter_.setEnabled(index(item), true);
         }
         updatesEnabled_ = true;
@@ -295,14 +290,14 @@ void FilterTreesWidget::slotHide()
 {
     LOG_DEBUG(<< "Hide.");
 
-    QList<QTreeWidgetItem *> items = tree_->selectedItems();
+    std::vector<TreeWidgetItem *> items = tree_->selectedItems();
 
-    if (items.count() > 0)
+    if (items.size() > 0)
     {
         updatesEnabled_ = false;
         for (auto &item : items)
         {
-            item->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
+            item->setCheckState(COLUMN_CHECKED, Ui::Unchecked);
             filter_.setEnabled(index(item), false);
         }
         updatesEnabled_ = true;
@@ -315,12 +310,9 @@ void FilterTreesWidget::slotSelectAll()
 {
     LOG_DEBUG(<< "Select all.");
 
-    QTreeWidgetItemIterator it(tree_);
-
-    while (*it)
+    for (auto &item : tree_->items())
     {
-        (*it)->setSelected(true);
-        ++it;
+        item->setSelected(true);
     }
 
     slotItemSelectionChanged();
@@ -330,12 +322,9 @@ void FilterTreesWidget::slotSelectInvert()
 {
     LOG_DEBUG(<< "Invert selection.");
 
-    QTreeWidgetItemIterator it(tree_);
-
-    while (*it)
+    for (auto &item : tree_->items())
     {
-        (*it)->setSelected(!(*it)->isSelected());
-        ++it;
+        item->setSelected(!item->isSelected());
     }
 
     slotItemSelectionChanged();
@@ -345,12 +334,9 @@ void FilterTreesWidget::slotSelectNone()
 {
     LOG_DEBUG(<< "Select none.");
 
-    QTreeWidgetItemIterator it(tree_);
-
-    while (*it)
+    for (auto &item : tree_->items())
     {
-        (*it)->setSelected(false);
-        ++it;
+        item->setSelected(false);
     }
 
     slotItemSelectionChanged();
@@ -360,9 +346,9 @@ void FilterTreesWidget::slotItemSelectionChanged()
 {
     LOG_DEBUG(<< "Selection changed.");
 
-    QList<QTreeWidgetItem *> items = tree_->selectedItems();
+    std::vector<TreeWidgetItem *> items = tree_->selectedItems();
 
-    if (items.count() > 0)
+    if (items.size() > 0)
     {
         deleteButton_->setEnabled(true);
         showButton_->setEnabled(true);
@@ -387,7 +373,7 @@ void FilterTreesWidget::slotItemSelectionChanged()
     }
 }
 
-void FilterTreesWidget::slotItemClicked(QTreeWidgetItem *item, int column)
+void FilterTreesWidget::slotItemClicked(TreeWidgetItem *item, int column)
 {
     LOG_DEBUG(<< "Start item clicked in column <" << column << ">.");
 
@@ -403,7 +389,7 @@ void FilterTreesWidget::slotItemClicked(QTreeWidgetItem *item, int column)
 
     if (column == COLUMN_CHECKED)
     {
-        bool checked = (item->checkState(COLUMN_CHECKED) == Qt::Checked);
+        bool checked = (item->checkState(COLUMN_CHECKED) == Ui::Checked);
 
         LOG_DEBUG(<< "Set filter ID <" << id << "> enabled <"
                   << toString(checked) << ">.");
@@ -435,7 +421,7 @@ void FilterTreesWidget::slotItemClicked(QTreeWidgetItem *item, int column)
     LOG_DEBUG(<< "Finished item clicked.");
 }
 
-void FilterTreesWidget::slotItemChanged(QTreeWidgetItem *item, int column)
+void FilterTreesWidget::slotItemChanged(TreeWidgetItem *item, int column)
 {
     if (!item)
     {
@@ -445,14 +431,14 @@ void FilterTreesWidget::slotItemChanged(QTreeWidgetItem *item, int column)
     (void)column;
 }
 
-size_t FilterTreesWidget::identifier(const QTreeWidgetItem *item)
+size_t FilterTreesWidget::identifier(const TreeWidgetItem *item)
 {
-    return static_cast<size_t>(item->text(COLUMN_ID).toULong());
+    return toSize(item->text(COLUMN_ID));
 }
 
-size_t FilterTreesWidget::index(const QTreeWidgetItem *item)
+size_t FilterTreesWidget::index(const TreeWidgetItem *item)
 {
-    return segments_.index(item->text(COLUMN_ID).toULong());
+    return segments_.index(identifier(item));
 }
 
 void FilterTreesWidget::updateTree()
@@ -461,22 +447,18 @@ void FilterTreesWidget::updateTree()
 
     block();
 
-    QTreeWidgetItemIterator it(tree_);
-
-    while (*it)
+    for (auto &item : tree_->items())
     {
-        size_t id = identifier(*it);
+        size_t id = identifier(item.get());
 
         if (filter_.enabled(id))
         {
-            (*it)->setCheckState(COLUMN_CHECKED, Qt::Checked);
+            item->setCheckState(COLUMN_CHECKED, Ui::Checked);
         }
         else
         {
-            (*it)->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
+            item->setCheckState(COLUMN_CHECKED, Ui::Unchecked);
         }
-
-        ++it;
     }
 
     unblock();
@@ -484,58 +466,47 @@ void FilterTreesWidget::updateTree()
 
 void FilterTreesWidget::block()
 {
-    disconnect(tree_, SIGNAL(itemSelectionChanged()), 0, 0);
-    disconnect(tree_, SIGNAL(itemClicked(QTreeWidgetItem *, int)), 0, 0);
-    disconnect(tree_, SIGNAL(itemChanged(QTreeWidgetItem *, int)), 0, 0);
+    (void)tree_->blockSignals(true);
     (void)blockSignals(true);
 }
 
 void FilterTreesWidget::unblock()
 {
     (void)blockSignals(false);
-    connect(tree_,
-            SIGNAL(itemSelectionChanged()),
-            this,
-            SLOT(slotItemSelectionChanged()));
-    connect(tree_,
-            SIGNAL(itemClicked(QTreeWidgetItem *, int)),
-            this,
-            SLOT(slotItemClicked(QTreeWidgetItem *, int)));
-    connect(tree_,
-            SIGNAL(itemChanged(QTreeWidgetItem *, int)),
-            this,
-            SLOT(slotItemChanged(QTreeWidgetItem *, int)));
+    (void)tree_->blockSignals(false);
 }
 
 void FilterTreesWidget::addTreeItem(size_t index)
 {
     LOG_DEBUG(<< "Add tree item to index <" << index << ">.");
 
-    QTreeWidgetItem *item = new QTreeWidgetItem(tree_);
+    TreeWidgetItem item;
 
     size_t id = segments_.id(index);
 
     if (filter_.enabled(id))
     {
-        item->setCheckState(COLUMN_CHECKED, Qt::Checked);
+        item.setCheckState(COLUMN_CHECKED, Ui::Checked);
     }
     else
     {
-        item->setCheckState(COLUMN_CHECKED, Qt::Unchecked);
+        item.setCheckState(COLUMN_CHECKED, Ui::Unchecked);
     }
 
-    item->setText(COLUMN_ID, QString::number(id));
+    item.setText(COLUMN_ID, toString(id));
 
-    item->setText(COLUMN_LABEL, QString::fromStdString(segments_[index].label));
+    item.setText(COLUMN_LABEL, segments_[index].label);
 
     // Color legend.
     const Vector3<double> &rgb = segments_[index].color;
 
-    QColor color;
+    Color color;
     color.setRedF(static_cast<float>(rgb[0]));
     color.setGreenF(static_cast<float>(rgb[1]));
     color.setBlueF(static_cast<float>(rgb[2]));
 
-    QBrush brush(color, Qt::SolidPattern);
-    item->setBackground(COLUMN_ID, brush);
+    Brush brush(color, Ui::SolidPattern);
+    item.setBackground(COLUMN_ID, brush);
+
+    tree_->push_back(item);
 }

@@ -28,26 +28,20 @@
 // Include 3D Forest.
 #include <Editor.hpp>
 #include <Settings.hpp>
-class MainWindow;
-class ColorSwitchWidget;
-
-// Include Qt.
-#include <QWidget>
-class QCheckBox;
-class QSlider;
+#include <Widget.hpp>
+class Application;
+class CheckBox;
+class Slider;
 
 /** Tree Settings Widget. */
-class TreeSettingsWidget : public QWidget
+class TreeSettingsWidget : public Widget
 {
-    Q_OBJECT
-
 public:
-    TreeSettingsWidget(MainWindow *mainWindow);
+    TreeSettingsWidget(Application *app);
 
-    QSize sizeHint() const override { return QSize(300, 265); }
+    // Size sizeHint() const override { return Size(300, 265); }
 
-public slots:
-    void slotUpdate(void *sender, const QSet<Editor::Type> &target);
+    void slotUpdate(const Message &msg);
 
     void slotSetUseOnlyForSelectedTrees(int v);
     void slotSetTreeAttributesVisible(int v);
@@ -59,23 +53,21 @@ public slots:
     void slotSetDbhScale(int v);
 
 private:
-    MainWindow *mainWindow_;
+    Application *app_;
 
-    QCheckBox *useOnlyForSelectedTreesCheckBox_;
-    QCheckBox *treeAttributesVisibleCheckBox_;
-    QCheckBox *treePositionAtBottomCheckBox_;
-    QCheckBox *convexHullVisibleCheckBox_;
-    QCheckBox *convexHullProjectionVisibleCheckBox_;
-    QCheckBox *concaveHullVisibleCheckBox_;
-    QCheckBox *concaveHullProjectionVisibleCheckBox_;
-    QSlider *dbhScaleSlider_;
+    CheckBox *useOnlyForSelectedTreesCheckBox_;
+    CheckBox *treeAttributesVisibleCheckBox_;
+    CheckBox *treePositionAtBottomCheckBox_;
+    CheckBox *convexHullVisibleCheckBox_;
+    CheckBox *convexHullProjectionVisibleCheckBox_;
+    CheckBox *concaveHullVisibleCheckBox_;
+    CheckBox *concaveHullProjectionVisibleCheckBox_;
+    Slider *dbhScaleSlider_;
 
     TreeSettings settings_;
 
     void dataChanged(bool modifiers = false);
     void setTreeSettings(const TreeSettings &settings);
-    void block();
-    void unblock();
 };
 
 #endif /* TREE_SETTINGS_WIDGET_HPP */
