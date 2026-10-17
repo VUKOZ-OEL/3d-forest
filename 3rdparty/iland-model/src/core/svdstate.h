@@ -24,10 +24,18 @@ struct SVDState
     /// calculate neighborhood population, return total weight added to the vector of species
     float neighborhoodAnalysis(QVector<float> &v);
     /// link to the SVD container class
-    static SVDStates *svd;
+    using RunType_svd = SVDStates *;
+    static RunType_svd &runState_svd();
 };
 
 // functions for the hashing of states
+inline bool operator<(const SVDState&a,const SVDState&b)
+{
+    auto first=std::tie(a.composition,a.structure,a.function,a.dominant_species_index);
+    auto second=std::tie(b.composition,b.structure,b.function,b.dominant_species_index);
+    if(first!=second)return first<second;
+    return std::lexicographical_compare(std::begin(a.admixed_species_index),std::end(a.admixed_species_index),std::begin(b.admixed_species_index),std::end(b.admixed_species_index));
+}
 inline bool operator==(const SVDState &s1, const SVDState &s2)
 {
     // this does not include comparing the 'Id'!
@@ -79,7 +87,7 @@ private:
     EStructureClassification mStructureClassification;
     EFunctioningClassification mFunctioningClassification;
 
-    inline void executeNeighborhood(QVector<float> &vec, QPoint center_point, QVector<QPoint> &list, const Grid<ResourceUnit*> &grid);
+    inline void executeNeighborhood(QVector<float> &vec, QPoint center_point, const QVector<QPoint> &list, const Grid<ResourceUnit*> &grid);
     QString createCompositionString(const SVDState &s);
     QVector<SVDState> mStates;
     QVector<QString> mCompositionString;

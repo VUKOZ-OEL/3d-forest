@@ -277,7 +277,7 @@ bool Scheduler::forceHarvest(const FMStand *stand, const int max_years)
     for (QList<SchedulerItem*>::const_iterator nit = mItems.constBegin(); nit!=mItems.constEnd(); ++nit) {
         const SchedulerItem *item = *nit;
         if (item->stand == stand)
-            if (abs(item->optimalYear -  GlobalSettings::instance()->currentYear()) < max_years ) {
+            if (abs(item->optimalYear -  SimulationSettings::current().currentYear()) < max_years ) {
                 item->flags->setExecuteImmediate(true);
                 return true;
             }
@@ -528,10 +528,14 @@ void Scheduler::SchedulerItem::calculate()
 
 
 // **************************************************************************************
-QStringList SchedulerOptions::mAllowedProperties = QStringList()
+SchedulerOptions::RunType_mAllowedProperties &SchedulerOptions::runState_mAllowedProperties()
+{
+    struct State { RunType_mAllowedProperties value = QStringList()
         << "minScheduleHarvest" << "maxScheduleHarvest" << "maxHarvestLevel"
         << "useSustainableHarvest" << "scheduleRebounceDuration" << "deviationDecayRate"
-        << "enabled" << "harvestIntensity" << "maxAbsoluteHarvest";
+        << "enabled" << "harvestIntensity" << "maxAbsoluteHarvest"; };
+    return SimulationContext::state<State>().value;
+}
 
 
 void SchedulerOptions::setup(QJSValue jsvalue)
@@ -544,7 +548,7 @@ void SchedulerOptions::setup(QJSValue jsvalue)
         qCDebug(abeSetup) << "Scheduler options are not an object:" << jsvalue.toString();
         return;
     }
-    FMSTP::checkObjectProperties(jsvalue, mAllowedProperties, "setup of scheduler options");
+    FMSTP::checkObjectProperties(jsvalue, runState_mAllowedProperties(), "setup of scheduler options");
 
     minScheduleHarvest = FMSTP::valueFromJs(jsvalue, "minScheduleHarvest","0").toNumber();
     maxScheduleHarvest = FMSTP::valueFromJs(jsvalue, "maxScheduleHarvest","10000").toNumber();

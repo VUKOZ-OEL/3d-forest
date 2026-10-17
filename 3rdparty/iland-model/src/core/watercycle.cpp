@@ -39,14 +39,34 @@
   */
 
 // static
-QHash<int, double> WaterCycle::mEstPsi;
+WaterCycle::RunType_mEstPsi &WaterCycle::runState_mEstPsi()
+{
+    struct State { RunType_mEstPsi value = {}; };
+    return SimulationContext::state<State>().value;
+}
 
 // parameters
 namespace Water {
-double Canopy::mNeedleFactor = 0.;
-double Canopy::mDecidousFactor = 0.;
-double SnowPack::mSnowTemperature = 0.;
-double SnowPack::mSnowDensity = 300.;
+Canopy::RunType_mNeedleFactor &Canopy::runState_mNeedleFactor()
+{
+    struct State { RunType_mNeedleFactor value = 0.; };
+    return SimulationContext::state<State>().value;
+}
+Canopy::RunType_mDecidousFactor &Canopy::runState_mDecidousFactor()
+{
+    struct State { RunType_mDecidousFactor value = 0.; };
+    return SimulationContext::state<State>().value;
+}
+SnowPack::RunType_mSnowTemperature &SnowPack::runState_mSnowTemperature()
+{
+    struct State { RunType_mSnowTemperature value = 0.; };
+    return SimulationContext::state<State>().value;
+}
+SnowPack::RunType_mSnowDensity &SnowPack::runState_mSnowDensity()
+{
+    struct State { RunType_mSnowDensity value = 300.; };
+    return SimulationContext::state<State>().value;
+}
 
 }
 
@@ -56,7 +76,7 @@ WaterCycle::WaterCycle()
     mLastYear = -1;
     for (int i=0;i<366;++i)
         mPsi[i] = 0.;
-    mEstPsi.clear();
+    runState_mEstPsi().clear();
     mPermafrost = nullptr;
 }
 
@@ -71,7 +91,7 @@ void WaterCycle::setup(const ResourceUnit *ru)
     mRU = ru;
     // get values...
     mFieldCapacity = 0.; // on top
-    const XmlHelper &xml=GlobalSettings::instance()->settings();
+    const XmlHelper &xml=SimulationSettings::current().settings();
     mSoilDepth = xml.valueDouble("model.site.soilDepth", 0.) * 10; // convert from cm to mm
     double pct_sand = xml.valueDouble("model.site.pctSand");
     double pct_silt = xml.valueDouble("model.site.pctSilt");
@@ -116,14 +136,14 @@ void WaterCycle::setup(const ResourceUnit *ru)
     mLastYear = -1;
 
     // canopy settings
-    mCanopy.mNeedleFactor = xml.valueDouble("model.settings.interceptionStorageNeedle", 4.);
-    mCanopy.mDecidousFactor = xml.valueDouble("model.settings.interceptionStorageBroadleaf", 2.);
+    mCanopy.runState_mNeedleFactor() = xml.valueDouble("model.settings.interceptionStorageNeedle", 4.);
+    mCanopy.runState_mDecidousFactor() = xml.valueDouble("model.settings.interceptionStorageBroadleaf", 2.);
 
     // snow settings
-    mSnowPack.mSnowTemperature = xml.valueDouble("model.settings.snowMeltTemperature", 0.);
-    mSnowPack.mSnowDensity = xml.valueDouble("model.settings.snowDensity", 300.);
+    mSnowPack.runState_mSnowTemperature() = xml.valueDouble("model.settings.snowMeltTemperature", 0.);
+    mSnowPack.runState_mSnowDensity() = xml.valueDouble("model.settings.snowDensity", 300.);
     // convert m snowdepth to mm water
-    mSnowPack.mSnowPack = xml.valueDouble("model.settings.snowInitialDepth", 0.) * mSnowPack.mSnowDensity;
+    mSnowPack.mSnowPack = xml.valueDouble("model.settings.snowInitialDepth", 0.) * mSnowPack.runState_mSnowDensity();
 
     // ground vegetation: variable LAI and Psi_min
     mGroundVegetationLAI = xml.valueDouble("model.settings.groundVegetationLAI", 1.);
@@ -289,7 +309,7 @@ inline double WaterCycle::calculateSoilAtmosphereResponse(RUSpeciesShares &speci
 void WaterCycle::run()
 {
     // necessary?
-    if (GlobalSettings::instance()->currentYear() == mLastYear)
+    if (SimulationSettings::current().currentYear() == mLastYear)
         return;
     DebugTimer tw("water:run");
     WaterCycleData add_data;
@@ -382,8 +402,8 @@ void WaterCycle::run()
         mMeanSoilWaterContent += mContent;
 
         //DBGMODE(
-            if (GlobalSettings::instance()->isDebugEnabled(GlobalSettings::dWaterCycle) && mRU->shouldCreateDebugOutput()) {
-                DebugList &out = GlobalSettings::instance()->debugList(day->id(), GlobalSettings::dWaterCycle);
+            if (SimulationSettings::current().isDebugEnabled(SimulationSettings::dWaterCycle) && mRU->shouldCreateDebugOutput()) {
+                DebugList &out = SimulationSettings::current().debugList(day->id(), SimulationSettings::dWaterCycle);
                 // climatic variables
                 out << day->id() << mRU->index() << mRU->id() << day->temperature << day->vpd << day->preciptitation << day->radiation;
                 out << combined_response; // combined response of all species on RU (min(water, vpd))
@@ -412,8 +432,8 @@ void WaterCycle::run()
     mMeanGrowingSeasonSWC /= static_cast<double>(growing_season_days);
 
     // call external modules
-    GlobalSettings::instance()->model()->modules()->calculateWater(mRU, &add_data);
-    mLastYear = GlobalSettings::instance()->currentYear();
+    SimulationSettings::current().model()->modules()->calculateWater(mRU, &add_data);
+    mLastYear = SimulationSettings::current().currentYear();
 
     // reset deciduous litter counter
     if (mRU->snag())
@@ -423,17 +443,17 @@ void WaterCycle::run()
 
 void WaterCycle::resetPsiMin()
 {
-    if (mEstPsi.isEmpty()) {
+    if (runState_mEstPsi().isEmpty()) {
         // insert all possible values (RU-indices x phenology groups)
-        foreach (const ResourceUnit *ru, GlobalSettings::instance()->model()->ruList()) {
+        foreach (const ResourceUnit *ru, SimulationSettings::current().model()->ruList()) {
             for (int pg=0;pg<ru->climate()->phenologyGroupCount();++pg) {
                 int key = ru->index()*100 + pg;
-                mEstPsi[key] = 0;
+                runState_mEstPsi()[key] = 0;
             }
         }
     } else {
         // clear values if already populated
-        for (QHash<int, double>::iterator i=mEstPsi.begin(); i!=mEstPsi.end();++i)
+        for (QHash<int, double>::iterator i=runState_mEstPsi().begin(); i!=runState_mEstPsi().end();++i)
             i.value() = 0.;
     }
 }
@@ -444,12 +464,12 @@ double WaterCycle::estPsiMin(int phenologyGroup) const
     // not yet calculated
     int key = mRU->index()*100 + phenologyGroup;
 
-    if (mEstPsi[key]< 0.) {
-        return mEstPsi[key];
+    if (runState_mEstPsi()[key]< 0.) {
+        return runState_mEstPsi()[key];
     } else {
         // note: currently no Mutex required for parallel execution (for RUs)
         calculatePsiMin(); // calculate once per RU
-        return mEstPsi[key];
+        return runState_mEstPsi()[key];
     }
 }
 
@@ -495,7 +515,7 @@ void WaterCycle::calculatePsiMin() const
             psi_min = min_average / 1000.; // MPa
         }
         int key = mRU->index()*100 + pg;
-        mEstPsi[key] = psi_min;
+        runState_mEstPsi()[key] = psi_min;
 
     }
 
@@ -509,13 +529,13 @@ namespace Water {
   Returns the amount of water that exits the snowpack (precipitation, snow melt) */
 double SnowPack::flow(const double &preciptitation_mm, const double &temperature)
 {
-    if (temperature>mSnowTemperature) {
+    if (temperature>runState_mSnowTemperature()) {
         if (mSnowPack==0.)
             return preciptitation_mm; // no change
         else {
             // snow melts
             const double melting_coefficient = 0.7; // mm/C
-            double melt = qMin( (temperature-mSnowTemperature) * melting_coefficient, mSnowPack);
+            double melt = qMin( (temperature-runState_mSnowTemperature()) * melting_coefficient, mSnowPack);
             mSnowPack -=melt;
             return preciptitation_mm + melt;
         }
@@ -531,7 +551,7 @@ double SnowPack::flow(const double &preciptitation_mm, const double &temperature
 inline double SnowPack::add(const double &preciptitation_mm, const double &temperature)
 {
     // do nothing for temps > 0 C
-    if (temperature>mSnowTemperature)
+    if (temperature>runState_mSnowTemperature())
         return preciptitation_mm;
 
     // temps < 0 C: add to snow
@@ -563,7 +583,7 @@ double Canopy::flow(const double &preciptitation_mm)
         max_interception_mm += preciptitation_mm *  (1. - max_flow_needle * mLAINeedle/mLAI);
         // (2) calculate maximum storage potential based on the current LAI
         //     by weighing the needle/deciduous storage capacity
-        max_storage_potentital += mNeedleFactor * mLAINeedle/mLAI;
+        max_storage_potentital += runState_mNeedleFactor() * mLAINeedle/mLAI;
     }
 
     if (mLAIBroadleaved>0.) {
@@ -571,7 +591,7 @@ double Canopy::flow(const double &preciptitation_mm)
         double max_flow_broad = 0.9 * pow(1.22 - exp(-0.055*preciptitation_mm), 0.35);
         max_interception_mm += preciptitation_mm *  (1. - max_flow_broad) * mLAIBroadleaved/mLAI;
         // (2) calculate maximum storage potential based on the current LAI
-        max_storage_potentital += mDecidousFactor * mLAIBroadleaved/mLAI;
+        max_storage_potentital += runState_mDecidousFactor() * mLAIBroadleaved/mLAI;
     }
 
     // the extent to which the maximum stoarge capacity is exploited, depends on LAI:

@@ -44,7 +44,8 @@ struct SchedulerOptions {
     double maxAbsoluteHarvest; ///< maximum harvest (only used if scheduler is disabled). Scheduler execution stops when level is surpassed
 
     void setup(QJSValue jsvalue);
-    static QStringList mAllowedProperties;
+    using RunType_mAllowedProperties = QStringList;
+    static RunType_mAllowedProperties &runState_mAllowedProperties();
 };
 
 /**

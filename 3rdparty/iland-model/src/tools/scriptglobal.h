@@ -120,10 +120,11 @@ public:
     static void loadScript(const QString &fileName);
     static QString executeScript(QString cmd);
     static QString executeJSFunction(QString function);
-    static QObject *scriptOutput; ///< public "pipe" for script output (is redirected to GUI if available)
+    using RunType_scriptOutput = QObject *;
+    static RunType_scriptOutput &runState_scriptOutput(); ///< public "pipe" for script output (is redirected to GUI if available)
     static QString formattedErrorMessage(const QJSValue &error_value, const QString sourcecode=QString());
     static void throwError(const QString &errormessage);
-    static QString lastErrorMessage() { return mLastErrorMessage; }
+    static QString lastErrorMessage() { return runState_mLastErrorMessage(); }
 
     // view options
     /* View options:
@@ -214,7 +215,8 @@ public slots:
 
     void test_tree_mortality(double thresh, int years, double p_death);
 private:
-    static QString mLastErrorMessage;
+    using RunType_mLastErrorMessage = QString;
+    static RunType_mLastErrorMessage &runState_mLastErrorMessage();
     QString mCurrentDir;
     Model *mModel;
     QJSValue mRUValue;

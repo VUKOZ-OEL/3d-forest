@@ -16,7 +16,7 @@ int FMSaplingList::loadFromRect(ResourceUnit *ru, const QRectF &rect)
 
     mSaplings.clear();
     // loop over all LIF grid cells of the resource unit, and load all occupied saplings
-    GridRunner<float> lif_runner(GlobalSettings::instance()->model()->grid(), rect);
+    GridRunner<float> lif_runner(SimulationSettings::current().model()->grid(), rect);
     while (lif_runner.next()) {
         SaplingCell *cell = ru->saplingCell(lif_runner.currentIndex());
         for (int j=0;j<NSAPCELLS;++j) {
@@ -61,7 +61,7 @@ int FMSaplingList::loadFromStand(int standId, QString filter, bool do_append)
     SaplingWrapper sw;
     Expression filter_expr(filter.isEmpty() ? "true" : filter, &sw);
 
-    SaplingCellRunner scr(standId, GlobalSettings::instance()->model()->standGrid());
+    SaplingCellRunner scr(standId, SimulationSettings::current().model()->standGrid());
     while (SaplingCell *sc = scr.next()) {
         if (sc){
             for (int i=0;i<NSAPCELLS;++i) {

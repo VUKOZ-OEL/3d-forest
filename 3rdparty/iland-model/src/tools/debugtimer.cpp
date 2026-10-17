@@ -24,9 +24,21 @@
 #include <QHash>
 
 // static members
-QHash<QString, double> DebugTimer::mTimingList;
- bool DebugTimer::m_responsive_mode = false;
- qint64 DebugTimer::ms_since_epoch = 0;
+DebugTimer::RunType_mTimingList &DebugTimer::runState_mTimingList()
+{
+    struct State { RunType_mTimingList value = {}; };
+    return SimulationContext::state<State>().value;
+}
+DebugTimer::RunType_m_responsive_mode &DebugTimer::runState_m_responsive_mode()
+{
+    struct State { RunType_m_responsive_mode value = false; };
+    return SimulationContext::state<State>().value;
+}
+DebugTimer::RunType_ms_since_epoch &DebugTimer::runState_ms_since_epoch()
+{
+    struct State { RunType_ms_since_epoch value = 0; };
+    return SimulationContext::state<State>().value;
+}
 /*
 double DebugTimer::m_tick_p_s=0.;
 
@@ -48,45 +60,50 @@ void DebugTimer::sampleClock(int ms)
     qDebug() << ms << "ms -> ticks/msec" << m_tick_p_s << "ticks elapsed" << tickselapsed;
 
 }*/
+static QMutex &runFile_timer_mutex();
 DebugTimer::~DebugTimer()
 {
+    QMutexLocker lock(&runFile_timer_mutex());
     --m_count;
 #ifndef FONSTUDIO
     if (responsiveMode()) {
-        qint64 diff = QDateTime::currentMSecsSinceEpoch() - ms_since_epoch;
+        qint64 diff = QDateTime::currentMSecsSinceEpoch() - runState_ms_since_epoch();
         if (diff > 100) {
-            ms_since_epoch = QDateTime::currentMSecsSinceEpoch();
+            runState_ms_since_epoch() = QDateTime::currentMSecsSinceEpoch();
             // qDebug() << "DebugTimer:: process events after 100ms - now" << ms_since_epoch;
             // process events only if we are currently in the main thread (GUI)
-            if (QThread::currentThread() == QCoreApplication::instance()->thread())
-                QCoreApplication::processEvents();
+            QCoreApplication::processEvents();
         }
     }
 #endif
 
     double t = elapsed();
-    mTimingList[m_caption]+=t;
+    runState_mTimingList()[m_caption]+=t;
     // show message if timer is not set to silent, and if time > 100ms (if timer is set to hideShort (which is the default))
     if (!m_silent && (!m_hideShort || t>100.))
         showElapsed();
 }
 
-QMutex timer_mutex;
+static QMutex &runFile_timer_mutex()
+{
+    struct State { QMutex value = {}; };
+    return SimulationContext::state<State>().value;
+}
 DebugTimer::DebugTimer(const QString &caption, bool silent)
 {
+    QMutexLocker lock(&runFile_timer_mutex());
     ++m_count;
     if (responsiveMode() && m_count==1) {
         // store time of the first call (start of the year)
-        ms_since_epoch = QDateTime::currentMSecsSinceEpoch();
+        runState_ms_since_epoch() = QDateTime::currentMSecsSinceEpoch();
     }
 
     m_caption = caption;
     m_silent=silent;
     m_hideShort=true;
-    if (!mTimingList.contains(caption)) {
-        QMutexLocker locker(&timer_mutex);
-        if (!mTimingList.contains(caption))
-            mTimingList[caption]=0.;
+    if (!runState_mTimingList().contains(caption)) {
+        if (!runState_mTimingList().contains(caption))
+            runState_mTimingList()[caption]=0.;
     }
     start();
 
@@ -94,18 +111,20 @@ DebugTimer::DebugTimer(const QString &caption, bool silent)
 
 void DebugTimer::clearAllTimers()
 {
-    QHash<QString, double>::iterator i = mTimingList.begin();
-     while (i != mTimingList.end()) {
+    QMutexLocker lock(&runFile_timer_mutex());
+    QHash<QString, double>::iterator i = runState_mTimingList().begin();
+     while (i != runState_mTimingList().end()) {
          i.value() = 0.;
          ++i;
      }
 }
 void DebugTimer::printAllTimers()
 {
-    QHash<QString, double>::iterator i = mTimingList.begin();
+    QMutexLocker lock(&runFile_timer_mutex());
+    QHash<QString, double>::iterator i = runState_mTimingList().begin();
     qWarning() << "Total timers\n================";
     double total=0.;
-    while (i != mTimingList.end()) {
+    while (i != runState_mTimingList().end()) {
          if (i.value()>0)
              qWarning() << i.key() << ":" << timeStr(i.value());
          total+=i.value();

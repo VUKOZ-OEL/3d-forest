@@ -38,7 +38,7 @@ public:
     Q_INVOKABLE ScriptGrid(QObject *parent = nullptr);
     Q_INVOKABLE ScriptGrid(QString fileName): ScriptGrid() {  load(fileName); }
 
-    explicit ScriptGrid(Grid<double> *grid) { mVariableName="x"; mGrid = grid; mCreated++; mOwner=true; }
+    explicit ScriptGrid(Grid<double> *grid) { mVariableName="x"; mGrid = grid; runState_mCreated()++; mOwner=true; }
 
     void setGrid(Grid<double> *grid) { mGrid = grid; mOwner=true; }
     void setOwnership(bool should_delete) { mOwner = should_delete; }
@@ -143,8 +143,10 @@ private:
     Grid<double> *mGrid;
     QString mVariableName;
     bool mOwner; // true if we have ownership and should free the grid in d'tor
-    static int mCreated;
-    static int mDeleted;
+    using RunType_mCreated = int;
+    static RunType_mCreated &runState_mCreated();
+    using RunType_mDeleted = int;
+    static RunType_mDeleted &runState_mDeleted();
 };
 
 #endif // SCRIPTGRID_H

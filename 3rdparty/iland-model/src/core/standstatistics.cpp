@@ -250,8 +250,8 @@ void StandStatistics::add(const SaplingStat *sapling)
 
 void SystemStatistics::writeOutput()
 {
-    if (GlobalSettings::instance()->isDebugEnabled(GlobalSettings::dPerformance)) {
-        DebugList &out = GlobalSettings::instance()->debugList(0, GlobalSettings::dPerformance);
+    if (SimulationSettings::current().isDebugEnabled(SimulationSettings::dPerformance)) {
+        DebugList &out = SimulationSettings::current().debugList(0, SimulationSettings::dPerformance);
         out << treeCount << saplingCount << newSaplings << tManagement
             << tApplyPattern << tReadPattern << tTreeGrowth
             << tSeedDistribution  << tEstablishment << tSapling

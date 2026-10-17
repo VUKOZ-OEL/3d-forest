@@ -61,15 +61,15 @@ WaterOut::WaterOut()
 
 void WaterOut::exec()
 {
-    Model *m = GlobalSettings::instance()->model();
+    Model *m = SimulationSettings::current().model();
 
     // global condition
-    if (!mCondition.isEmpty() && mCondition.calculate(GlobalSettings::instance()->currentYear())==0.)
+    if (!mCondition.isEmpty() && mCondition.calculate(SimulationSettings::current().currentYear())==0.)
         return;
 
     bool ru_level = true;
     // switch off details if this is indicated in the conditionRU option
-    if (!mConditionDetails.isEmpty() && mConditionDetails.calculate(GlobalSettings::instance()->currentYear())==0.)
+    if (!mConditionDetails.isEmpty() && mConditionDetails.calculate(SimulationSettings::current().currentYear())==0.)
         ru_level = false;
 
 

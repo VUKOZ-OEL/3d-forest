@@ -112,16 +112,16 @@ void DynamicStandOut::exec()
     if (mFieldList.count()==0)
         return;
     if (!mCondition.isEmpty())
-        if (!mCondition.calculate(GlobalSettings::instance()->currentYear()))
+        if (!mCondition.calculate(SimulationSettings::current().currentYear()))
             return;
 
     DebugTimer t("dynamic stand output");
 
-    bool per_species = GlobalSettings::instance()->settings().valueBool("output.dynamicstand.by_species", true);
-    bool per_ru = GlobalSettings::instance()->settings().valueBool("output.dynamicstand.by_ru", true);
+    bool per_species = SimulationSettings::current().settings().valueBool("output.dynamicstand.by_species", true);
+    bool per_ru = SimulationSettings::current().settings().valueBool("output.dynamicstand.by_ru", true);
     bool per_ru_cond=false;
 
-    if (!mConditionRU.isEmpty() && mConditionRU.calculate(GlobalSettings::instance()->currentYear()))
+    if (!mConditionRU.isEmpty() && mConditionRU.calculate(SimulationSettings::current().currentYear()))
         per_ru_cond = true;
 
 
@@ -135,7 +135,7 @@ void DynamicStandOut::exec()
         extractByResourceUnit(per_species);
     }
 
-    Model *m = GlobalSettings::instance()->model();
+    Model *m = SimulationSettings::current().model();
     QVector<double> data; //statistics data
     TreeWrapper tw;
     Expression custom_expr;
@@ -221,7 +221,7 @@ void DynamicStandOut::extractByResourceUnit(const bool by_species)
     if (mFieldList.count()==0)
         return;
 
-    Model *m = GlobalSettings::instance()->model();
+    Model *m = SimulationSettings::current().model();
     QVector<double> data; //statistics data
     StatData stat; // statistcs helper class
     TreeWrapper tw;

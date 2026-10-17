@@ -50,7 +50,7 @@ void ResourceUnitSpecies::setup(Species *species, ResourceUnit *ru)
     mRU = ru;
     mResponse.setup(this);
     m3PG.setResponse(&mResponse);
-    if (GlobalSettings::instance()->model()->settings().regenerationEnabled)
+    if (SimulationSettings::current().model()->settings().regenerationEnabled)
         mEstablishment.setup(ru->climate(), this);
     mStatistics.setResourceUnitSpecies(this);
     mStatisticsDead.setResourceUnitSpecies(this);
@@ -75,7 +75,7 @@ void ResourceUnitSpecies::calculate(const bool fromEstablishment)
         statistics().clear();
 
     // if already processed in this year, do not repeat
-    if (mLastYear == GlobalSettings::instance()->currentYear())
+    if (mLastYear == SimulationSettings::current().currentYear())
         return;
 
     if (has_leaf_area || fromEstablishment==true) {
@@ -85,7 +85,7 @@ void ResourceUnitSpecies::calculate(const bool fromEstablishment)
         DebugTimer rst("response+3pg");
         mResponse.calculate();// calculate environmental responses per species (vpd, temperature, ...)
         m3PG.calculate();// production of NPP
-        mLastYear = GlobalSettings::instance()->currentYear(); // mark this year as processed
+        mLastYear = SimulationSettings::current().currentYear(); // mark this year as processed
     } else {
         // if no LAI is present, then just clear the respones.
         mResponse.clear();

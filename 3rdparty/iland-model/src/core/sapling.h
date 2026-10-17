@@ -31,7 +31,7 @@ public:
     SaplingTreeOld() { pixel=0; age.age=0; age.stress_years=0; height=0.05f; }
     bool isValid() const {return pixel!=0; }
     float *pixel; // pointer to the lifpixel the sapling lives on, set to 0 if sapling died/removed
-    QPoint coords() const { return GlobalSettings::instance()->model()->grid()->indexOf(pixel); }
+    QPoint coords() const { return SimulationSettings::current().model()->grid()->indexOf(pixel); }
     struct  { // packed two 16bit to a 32 bit integer
         short unsigned int age;  // number of consectuive years the sapling suffers from dire conditions
         short unsigned int stress_years; // (upper 16bits) + age of sapling (lower 16 bits)
@@ -54,7 +54,7 @@ public:
     void clearStatistics();
     void newYear() { clearStatistics(); }
     void clear() { mSaplingTrees.clear(); mSapBitset.reset(); }
-    static void setRecruitmentVariation(const double variation) { mRecruitmentVariation = variation; }
+    static void setRecruitmentVariation(const double variation) { runState_mRecruitmentVariation() = variation; }
     static void updateBrowsingPressure();
 
     // access
@@ -104,8 +104,10 @@ private:
     double mAvgAge; ///< average age of saplings (years)
     double mAvgDeltaHPot; ///< average height increment potential (m)
     double mAvgHRealized; ///< average realized height increment
-    static double mRecruitmentVariation; ///< defines range of random variation for recruited trees
-    static double mBrowsingPressure; ///< scalar for the browsing pressure
+    using RunType_mRecruitmentVariation = double;
+    static RunType_mRecruitmentVariation &runState_mRecruitmentVariation(); ///< defines range of random variation for recruited trees
+    using RunType_mBrowsingPressure = double;
+    static RunType_mBrowsingPressure &runState_mBrowsingPressure(); ///< scalar for the browsing pressure
     CNPair mCarbonLiving;
     CNPair mCarbonGain; ///< net growth (kg / ru) of saplings
 

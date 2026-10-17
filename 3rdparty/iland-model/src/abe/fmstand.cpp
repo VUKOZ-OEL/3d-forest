@@ -602,24 +602,28 @@ void FMStand::setLastExecution(int index)
 }
 
 // storage for properties (static)
-QHash<const FMStand*, QHash<QString, QJSValue> > FMStand::mStandPropertyStorage;
+FMStand::RunType_mStandPropertyStorage &FMStand::runState_mStandPropertyStorage()
+{
+    struct State { RunType_mStandPropertyStorage value = {}; };
+    return SimulationContext::state<State>().value;
+}
 
 
 void FMStand::setProperty(const QString &name, QJSValue value)
 {
     // save a property value for the current stand
-    mStandPropertyStorage[this][name] = value;
+    runState_mStandPropertyStorage()[this][name] = value;
 }
 
 QJSValue FMStand::property(const QString &name) const
 {
     // check if values are already stored for the current stand
-    if (!mStandPropertyStorage.contains(this))
+    if (!runState_mStandPropertyStorage().contains(this))
         return QJSValue();
     // check if something is stored for the property name (return a undefined value if not)
-    if (!mStandPropertyStorage[this].contains(name))
+    if (!runState_mStandPropertyStorage()[this].contains(name))
         return QJSValue();
-    return mStandPropertyStorage[this][name];
+    return runState_mStandPropertyStorage()[this][name];
 }
 
 QStringList FMStand::info()
@@ -668,8 +672,8 @@ QStringList FMStand::info()
 
 
     // stand properties
-    if (mStandPropertyStorage.contains(this)) {
-        QHash<QString, QJSValue> &props = mStandPropertyStorage[this];
+    if (runState_mStandPropertyStorage().contains(this)) {
+        QHash<QString, QJSValue> &props = runState_mStandPropertyStorage()[this];
         lines << QString("properties: %1").arg(props.size()) << "-";
         QHash<QString, QJSValue>::const_iterator i = props.constBegin();
         while (i != props.constEnd()) {

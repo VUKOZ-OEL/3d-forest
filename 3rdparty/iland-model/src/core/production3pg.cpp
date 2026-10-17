@@ -128,7 +128,7 @@ double Production3PG::calculate()
     mRootFraction = 1. - abovegroundFraction();
 
     // global value set?
-    double dbg = GlobalSettings::instance()->settings().paramValue("gpp_per_year",0);
+    double dbg = SimulationSettings::current().settings().paramValue("gpp_per_year",0);
     if (dbg>0.) {
         year_raw_gpp = dbg;
         mRootFraction = 0.4;

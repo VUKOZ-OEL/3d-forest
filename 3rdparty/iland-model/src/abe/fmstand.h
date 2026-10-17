@@ -193,7 +193,7 @@ public:
 
     void setLastExecution(int index);
     // custom property storage
-    static void clearAllProperties() { mStandPropertyStorage.clear(); }
+    static void clearAllProperties() { runState_mStandPropertyStorage().clear(); }
     /// set a property value for the current stand with the name 'name'
     void setProperty(const QString &name, QJSValue value);
     /// retrieve the value of the property 'name'. Returns an empty QJSValue if the property is not defined.
@@ -258,7 +258,8 @@ private:
     QString mContextStr;
     // access to patches
     Patches *mPatches;
-    static QHash<const FMStand*, QHash<QString, QJSValue> > mStandPropertyStorage;
+    using RunType_mStandPropertyStorage = QHash<const FMStand*, QHash<QString, QJSValue> >;
+    static RunType_mStandPropertyStorage &runState_mStandPropertyStorage();
     QJSValue mJSObj;
     QJSValue mJSSignalParameter;
 

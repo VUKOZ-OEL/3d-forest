@@ -42,7 +42,8 @@ public:
 private:
     double calculateGDD(const Climate *clim, double threshold_temp) const;
     double calculateMeanWaterContent(const ResourceUnit *ru, bool only_growing_season) const;
-    static QStringList mClimateVars;
+    using RunType_mClimateVars = QStringList;
+    static RunType_mClimateVars &runState_mClimateVars();
 
 };
 

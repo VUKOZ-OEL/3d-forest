@@ -44,7 +44,11 @@
 #include "statdata.h"
 #include "microclimate.h"
 
-double ResourceUnitVariables::nitrogenAvailableDelta = 0;
+ResourceUnitVariables::RunType_nitrogenAvailableDelta &ResourceUnitVariables::runState_nitrogenAvailableDelta()
+{
+    struct State { RunType_nitrogenAvailableDelta value = 0; };
+    return SimulationContext::state<State>().value;
+}
 
 ResourceUnit::~ResourceUnit()
 {
@@ -105,7 +109,7 @@ void ResourceUnit::setup()
         mSoil = new Soil(this);
         mSnag = new Snag;
         mSnag->setup(this);
-        const XmlHelper &xml=GlobalSettings::instance()->settings();
+        const XmlHelper &xml=SimulationSettings::current().settings();
 
         // setup contents of the soil of the RU; use values for C and N (kg/ha)
         mSoil->setInitialState(CNPool(xml.valueDouble("model.site.youngLabileC", -1),
@@ -134,7 +138,7 @@ void ResourceUnit::setup()
     }
 
     // setup variables
-    mUnitVariables.nitrogenAvailable = GlobalSettings::instance()->settings().valueDouble("model.site.availableNitrogen", 40);
+    mUnitVariables.nitrogenAvailable = SimulationSettings::current().settings().valueDouble("model.site.availableNitrogen", 40);
 
     // if dynamic coupling of soil nitrogen is enabled, a starting value for available N is calculated
     if (mSoil && Model::settings().useDynamicAvailableNitrogen && Model::settings().carbonCycleEnabled) {
@@ -149,7 +153,7 @@ void ResourceUnit::setup()
 void ResourceUnit::setBoundingBox(const QRectF &bb)
 {
     mBoundingBox = bb;
-    mCornerOffset = GlobalSettings::instance()->model()->grid()->indexAt(bb.topLeft());
+    mCornerOffset = SimulationSettings::current().model()->grid()->indexAt(bb.topLeft());
 }
 
 /// return the sapling cell at given LIF-coordinates
@@ -225,7 +229,7 @@ const ResourceUnitSpecies *ResourceUnit::constResourceUnitSpecies(const Species 
 
 double ResourceUnit::topHeight(bool &rIrregular) const
 {
-    GridRunner<HeightGridValue> runner(GlobalSettings::instance()->model()->heightGrid(), boundingBox());
+    GridRunner<HeightGridValue> runner(SimulationSettings::current().model()->heightGrid(), boundingBox());
     int valid=0, total=0;
     QVector<double> px_heights;
     px_heights.reserve(cHeightPerRU*cHeightPerRU);
@@ -255,7 +259,7 @@ void ResourceUnit::notifyDisturbance(ERUDisturbanceType source, double info) con
     // events are stored with newest events first. Oldest event is removed
     // when maximum number of events reached
     mSVDState.disturbanceEvents->prepend(RUSVDState::SVDDisturbanceEvent(
-                                            Globals->currentYear(),
+                                            SimulationSettings::current().currentYear(),
                                             source,
                                             info));
     if (mSVDState.disturbanceEvents->size() > 3 )
@@ -328,10 +332,10 @@ void ResourceUnit::newYear()
     mEffectiveArea = 0.;
     mPixelCount = mStockedPixelCount = 0;
 
-    if (GlobalSettings::instance()->model()->ruList().first()==this && GlobalSettings::instance()->settings().hasNode("model.site.deltaAvailableNitrogen")) {
-        mUnitVariables.nitrogenAvailableDelta = GlobalSettings::instance()->settings().valueDouble("model.site.deltaAvailableNitrogen",0.);
-        if (mUnitVariables.nitrogenAvailableDelta != 0.)
-            qDebug() << "applying a global delta to available Nitrogen:" << mUnitVariables.nitrogenAvailableDelta << "kg N/ha/yr";
+    if (SimulationSettings::current().model()->ruList().first()==this && SimulationSettings::current().settings().hasNode("model.site.deltaAvailableNitrogen")) {
+        mUnitVariables.runState_nitrogenAvailableDelta() = SimulationSettings::current().settings().valueDouble("model.site.deltaAvailableNitrogen",0.);
+        if (mUnitVariables.runState_nitrogenAvailableDelta() != 0.)
+            qDebug() << "applying a global delta to available Nitrogen:" << mUnitVariables.runState_nitrogenAvailableDelta() << "kg N/ha/yr";
     }
 
     snagNewYear();
@@ -425,8 +429,8 @@ void ResourceUnit::production()
         (*i)->calculate(); // CALCULATE 3PG
 
         // debug output related to production
-        if (GlobalSettings::instance()->isDebugEnabled(GlobalSettings::dStandGPP) && shouldCreateDebugOutput() && (*i)->leafAreaIndex()>0.) {
-            DebugList &out = GlobalSettings::instance()->debugList(index(), GlobalSettings::dStandGPP);
+        if (SimulationSettings::current().isDebugEnabled(SimulationSettings::dStandGPP) && shouldCreateDebugOutput() && (*i)->leafAreaIndex()>0.) {
+            DebugList &out = SimulationSettings::current().debugList(index(), SimulationSettings::dStandGPP);
             out << (*i)->species()->id() << index() << id();
             out << (*i)->leafAreaIndex() << (*i)->prod3PG().GPPperArea() << productiveArea()*(*i)->leafAreaIndex()/(leafAreaIndex()==0.?1.:leafAreaIndex()) *(*i)->prod3PG().GPPperArea() << averageAging() << (*i)->prod3PG().fEnvYear() ;
 
@@ -475,7 +479,7 @@ void ResourceUnit::yearEnd()
     mStatistics.calculate(); // aggreagte on stand level
 
     // update carbon flows
-    if (soil() && GlobalSettings::instance()->model()->settings().carbonCycleEnabled) {
+    if (soil() && SimulationSettings::current().model()->settings().carbonCycleEnabled) {
         double area_factor = stockableArea() / cRUArea; //conversion factor
         mUnitVariables.carbonUptake = statistics().npp() * biomassCFraction;
         mUnitVariables.carbonUptake += statistics().nppSaplings() * biomassCFraction;
@@ -505,16 +509,16 @@ void ResourceUnit::yearEnd()
 
 void ResourceUnit::updateSVDState()
 {
-    if (GlobalSettings::instance()->model()->svdStates()){
+    if (SimulationSettings::current().model()->svdStates()){
         if (!mSVDState.localComposition) {
             // create vectors on the heap only when really needed
-            int nspecies = GlobalSettings::instance()->model()->speciesSet()->activeSpecies().size();
+            int nspecies = SimulationSettings::current().model()->speciesSet()->activeSpecies().size();
             mSVDState.localComposition = new QVector<float>(nspecies, 0.f);
             mSVDState.midDistanceComposition = new QVector<float>(nspecies, 0.f);
             // create history vector
             mSVDState.disturbanceEvents = new QVector<RUSVDState::SVDDisturbanceEvent>();
         }
-        int stateId=GlobalSettings::instance()->model()->svdStates()->evaluateState(this);
+        int stateId=SimulationSettings::current().model()->svdStates()->evaluateState(this);
         if (mSVDState.stateId==stateId)
             mSVDState.time++;
         else {
@@ -557,7 +561,7 @@ void ResourceUnit::createStandStatistics()
             resourceUnitSpecies(t.species()).statistics().add(&t, 0);
     }
     // summarise sapling stats
-    GlobalSettings::instance()->model()->saplings()->calculateInitialStatistics(this);
+    SimulationSettings::current().model()->saplings()->calculateInitialStatistics(this);
 
     // summarize statistics for the whole resource unit
     for (int i=0;i<mRUSpecies.count();i++) {
@@ -631,8 +635,8 @@ void ResourceUnit::calculateCarbonCycle()
         mUnitVariables.nitrogenAvailable = soil()->availableNitrogen();
 
     // debug output
-    if (GlobalSettings::instance()->isDebugEnabled(GlobalSettings::dCarbonCycle) && shouldCreateDebugOutput() && !snag()->isEmpty()) {
-        DebugList &out = GlobalSettings::instance()->debugList(index(), GlobalSettings::dCarbonCycle);
+    if (SimulationSettings::current().isDebugEnabled(SimulationSettings::dCarbonCycle) && shouldCreateDebugOutput() && !snag()->isEmpty()) {
+        DebugList &out = SimulationSettings::current().debugList(index(), SimulationSettings::dCarbonCycle);
         out << index() << id(); // resource unit index and id
         out << snag()->debugList(); // snag debug outs
         out << soil()->debugList(); // ICBM/2N debug outs

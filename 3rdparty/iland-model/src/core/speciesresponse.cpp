@@ -90,10 +90,10 @@ void SpeciesResponse::calculate()
     int veg_end = pheno.vegetationPeriodEnd();
 
     // yearly response
-    const double nitrogen = mRu->resouceUnitVariables().nitrogenAvailable + mRu->resouceUnitVariables().nitrogenAvailableDelta;
+    const double nitrogen = mRu->resouceUnitVariables().nitrogenAvailable + mRu->resouceUnitVariables().runState_nitrogenAvailableDelta();
     // Nitrogen response: a yearly value based on available nitrogen
     mNitrogenResponse = mSpecies->nitrogenResponse( nitrogen );
-    const double ambient_co2 = mRu->climate()->begin()->co2; // CO2 level of first day of year (co2 is static)
+    const double ambient_co2 = mRu->climate()->begin()->runState_co2(); // CO2 level of first day of year (co2 is static)
 
     double water_resp, vpd_resp, temp_resp, min_resp;
     double  utilizeable_radiation;
@@ -125,8 +125,8 @@ void SpeciesResponse::calculate()
         mUtilizableRadiation[month]+= utilizeable_radiation;
         doy++;
         //DBGMODE(
-            if (GlobalSettings::instance()->isDebugEnabled(GlobalSettings::dDailyResponses) && mRu->shouldCreateDebugOutput()) {
-                DebugList &out = GlobalSettings::instance()->debugList(day->id(), GlobalSettings::dDailyResponses);
+            if (SimulationSettings::current().isDebugEnabled(SimulationSettings::dDailyResponses) && mRu->shouldCreateDebugOutput()) {
+                DebugList &out = SimulationSettings::current().debugList(day->id(), SimulationSettings::dDailyResponses);
                 // climatic variables
                 out << mSpecies->id() << day->id() << mRu->index() << mRu->id(); // date << day->temperature << day->vpd << day->preciptitation << day->radiation;
                 out << water_resp << temp_resp << vpd_resp << day->radiation << utilizeable_radiation;

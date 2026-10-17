@@ -48,10 +48,10 @@ public:
     /// open a File Dialog and let the user choose a file.
     /// @return the filename selected by the user, an empty string if user cancels.
     static QString fileDialog(const QString &title, const QString &start_directory="", const QString &filter="", const QString &type = "file", QWidget *parent=0);
-    static bool quiet() { return m_NoDebug || m_quiet; }
-    static bool debugEnabled() { return !m_NoDebug; }
-    static void setQuiet(bool quiet) { m_quiet = quiet; }
-    static void setDebugEnabled(bool enable) { m_NoDebug = !enable; }
+    static bool quiet() { return runState_m_NoDebug() || runState_m_quiet(); }
+    static bool debugEnabled() { return !runState_m_NoDebug(); }
+    static void setQuiet(bool quiet) { runState_m_quiet() = quiet; }
+    static void setDebugEnabled(bool enable) { runState_m_NoDebug() = !enable; }
     static void openHelp(const QString& topic);
     static QString stripHtml(const QString &source);
 
@@ -59,8 +59,10 @@ public:
 
 
 private:
-    static bool m_quiet;
-    static bool m_NoDebug;
+    using RunType_m_quiet = bool;
+    static RunType_m_quiet &runState_m_quiet();
+    using RunType_m_NoDebug = bool;
+    static RunType_m_NoDebug &runState_m_NoDebug();
 };
 
 

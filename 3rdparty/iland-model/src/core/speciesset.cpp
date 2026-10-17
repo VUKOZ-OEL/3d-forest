@@ -21,7 +21,7 @@
 #include <QtSql>
 #include <QVector>
 #include "global.h"
-#include "globalsettings.h"
+#include "simulationsettings.h"
 #include "xmlhelper.h"
 #include "speciesset.h"
 #include "species.h"
@@ -75,17 +75,17 @@ bool SpeciesSet::hasVar(const QString &varName)
   */
 int SpeciesSet::setup()
 {
-    const XmlHelper &xml = GlobalSettings::instance()->settings();
+    const XmlHelper &xml = SimulationSettings::current().settings();
     QString tableName = xml.value("model.species.source", "species");
     mName = tableName;
     QString readerFile = xml.value("model.species.reader", "reader.bin");
-    readerFile = GlobalSettings::instance()->path(readerFile, "lip");
+    readerFile = SimulationSettings::current().path(readerFile, "lip");
     mReaderStamp.load(readerFile);
-    if (GlobalSettings::instance()->settings().paramValueBool("debugDumpStamps", false) )
+    if (SimulationSettings::current().settings().paramValueBool("debugDumpStamps", false) )
         qDebug() << mReaderStamp.dump();
 
 
-    QSqlQuery query(GlobalSettings::instance()->dbin());
+    QSqlQuery query(SimulationSettings::current().dbin());
     mSetupQuery = &query;
     QString sql = QString("select * from %1").arg(tableName);
     query.exec(sql);
@@ -178,7 +178,7 @@ static void nc_seed_distribution(Species *species)
 
 void SpeciesSet::regeneration()
 {
-    if (!GlobalSettings::instance()->model()->settings().regenerationEnabled)
+    if (!SimulationSettings::current().model()->settings().regenerationEnabled)
         return;
     DebugTimer t("seed dispersal (all species)");
 
@@ -202,7 +202,7 @@ void SpeciesSet::clearSaplingSeedMap()
   */
 void SpeciesSet::newYear()
 {
-    if (!GlobalSettings::instance()->model()->settings().regenerationEnabled)
+    if (!SimulationSettings::current().model()->settings().regenerationEnabled)
         return;
     foreach(Species *s, mActiveSpecies) {
         s->newYear();
@@ -226,7 +226,7 @@ QVariant SpeciesSet::var(const QString& varName)
     //throw IException(QString("load species parameter: field %1 not found!").arg(varName));
     // lookup in defaults
     //qDebug() << "variable" << varName << "not found - using default.";
-    //return GlobalSettings::instance()->settingDefaultValue(varName);
+    //return SimulationSettings::current().settingDefaultValue(varName);
 }
 
 void SpeciesSet::randomSpeciesOrder(QVector<int>::const_iterator &rBegin, QVector<int>::const_iterator &rEnd)

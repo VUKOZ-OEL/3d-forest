@@ -1,0 +1,8 @@
+# Copy only inputs. Reference outputs must never become calculated outputs.
+set(source "@CMAKE_CURRENT_SOURCE_DIR@/model")
+set(destination "@CMAKE_CURRENT_BINARY_DIR@/run")
+file(MAKE_DIRECTORY "${destination}/output" "${destination}/temp")
+file(WRITE "${destination}/.iland-benchmark-copy" "Disposable benchmark inputs\n")
+file(COPY "${source}/permafrost_bore.hole_project_file.xml"
+    "${source}/databases" "${source}/gis" "${source}/init" "${source}/lip"
+    DESTINATION "${destination}")

@@ -232,15 +232,17 @@ public:
     /// generate vegetative offspring from the tree 't' (sprouts)
     int addSprout(const Tree *t, bool tree_is_removed);
 
-    static void setRecruitmentVariation(const double variation) { mRecruitmentVariation = variation; }
+    static void setRecruitmentVariation(const double variation) { runState_mRecruitmentVariation() = variation; }
     static void updateBrowsingPressure();
 
 private:
     bool growSapling(const ResourceUnit *ru, SaplingCell &scell, SaplingTree &tree, int isc, HeightGridValue &hgv, float lif_value, int cohorts_on_px);
     void vegetativeSprouting(const Species *species, SaplingCell &scell, QPoint tree_pos);
     //Grid<SaplingCell> mGrid;
-    static double mRecruitmentVariation;
-    static double mBrowsingPressure;
+    using RunType_mRecruitmentVariation = double;
+    static RunType_mRecruitmentVariation &runState_mRecruitmentVariation();
+    using RunType_mBrowsingPressure = double;
+    static RunType_mBrowsingPressure &runState_mBrowsingPressure();
 };
 
 

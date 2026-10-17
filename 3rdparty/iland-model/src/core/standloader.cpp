@@ -45,8 +45,8 @@
     See https://iland-model.org/initialize+trees
   */
 // provide a mapping between "Picus"-style and "iLand"-style species Ids
-static QVector<int> picusSpeciesIds = QVector<int>() << 0 << 1 << 17;
-static QStringList iLandSpeciesIds = QStringList() << "piab" << "piab" << "fasy";
+static const QVector<int> picusSpeciesIds = QVector<int>() << 0 << 1 << 17;
+static const QStringList iLandSpeciesIds = QStringList() << "piab" << "piab" << "fasy";
 
 StandLoader::~StandLoader()
 {
@@ -85,8 +85,8 @@ void StandLoader::copyTrees()
 */
 void StandLoader::processInit()
 {
-    GlobalSettings *g = GlobalSettings::instance();
-    XmlHelper xml(g->settings().node("model.initialization"));
+    SimulationSettings &runSettings = SimulationSettings::current();
+    XmlHelper xml(runSettings.settings().node("model.initialization"));
 
     QString copy_mode = xml.value("mode", "copy");
     QString type = xml.value("type", "");
@@ -98,7 +98,7 @@ void StandLoader::processInit()
     //QScopedPointer<const MapGrid> height_grid; // use a QScopedPointer to guarantee that the resource is freed at the end of the processInit() function
     const MapGrid *height_grid;
     if (height_grid_enabled) {
-        QString init_height_grid_file = GlobalSettings::instance()->path(xml.value("heightGrid.fileName"), "init");
+        QString init_height_grid_file = SimulationSettings::current().path(xml.value("heightGrid.fileName"), "init");
         qDebug() << "initialization: using predefined tree heights map" << init_height_grid_file;
 
         height_grid = new MapGrid(init_height_grid_file, false);
@@ -118,7 +118,7 @@ void StandLoader::processInit()
     // one global init-file for the whole area:
     if (copy_mode=="single") {
         // useful for 1ha simulations only...
-        //if (GlobalSettings::instance()->model()->ruList().size()>1)
+        //if (SimulationSettings::current().model()->ruList().size()>1)
         //    throw IException("Error initialization: 'mode' is 'single' but more than one resource unit is simulated (consider using another 'mode').");
         // -> is now ok for multiple resource units in a single file
 
@@ -130,10 +130,10 @@ void StandLoader::processInit()
 
     // call a single tree init for each resource unit
     if (copy_mode=="unit") {
-        foreach( const ResourceUnit *const_ru, g->model()->ruList()) {
+        foreach( const ResourceUnit *const_ru, runSettings.model()->ruList()) {
             ResourceUnit *ru = const_cast<ResourceUnit*>(const_ru);
             // set environment
-            g->model()->environment()->setPosition(ru->boundingBox().center());
+            runSettings.model()->environment()->setPosition(ru->boundingBox().center());
             type = xml.value("type", "");
             fileName = xml.value("file", "");
             if (fileName.isEmpty())
@@ -147,9 +147,9 @@ void StandLoader::processInit()
 
     // map-modus: load a init file for each "polygon" in the standgrid
     if (copy_mode=="map") {
-        if (!g->model()->standGrid() || !g->model()->standGrid()->isValid())
+        if (!runSettings.model()->standGrid() || !runSettings.model()->standGrid()->isValid())
             throw IException(QString("Stand-Initialization: model.initialization.mode is 'map' but there is no valid stand grid defined (model.world.standGrid)"));
-        QString map_file_name = GlobalSettings::instance()->path(xml.value("mapFileName"), "init");
+        QString map_file_name = SimulationSettings::current().path(xml.value("mapFileName"), "init");
 
         CSVFile map_file(map_file_name);
         if (map_file.rowCount()==0)
@@ -179,7 +179,7 @@ void StandLoader::processInit()
             qDebug() << "Stand initialization: no file specifed, starting with bare ground.";
             return;
         }
-        fileName = GlobalSettings::instance()->path(fileName, "init");
+        fileName = SimulationSettings::current().path(fileName, "init");
 
         if (!QFile::exists(fileName))
             throw IException(QString("load-ini-file: file '%1' does not exist.").arg(fileName));
@@ -216,10 +216,10 @@ void StandLoader::processInit()
     }
     if (copy_mode=="snapshot") {
         // load a snapshot from a file
-        GlobalSettings::instance()->model()->setCurrentTask("loading snapshot database");
+        SimulationSettings::current().model()->setCurrentTask("loading snapshot database");
         Snapshot shot;
 
-        QString input_db = GlobalSettings::instance()->path(fileName);
+        QString input_db = SimulationSettings::current().path(fileName);
         shot.loadSnapshot(input_db);
         return;
     }
@@ -228,7 +228,7 @@ void StandLoader::processInit()
 
 void StandLoader::processAfterInit()
 {
-    XmlHelper xml(GlobalSettings::instance()->settings().node("model.initialization"));
+    XmlHelper xml(SimulationSettings::current().settings().node("model.initialization"));
 
     QString mode = xml.value("mode", "copy");
     if (mode=="standgrid") {
@@ -236,7 +236,7 @@ void StandLoader::processAfterInit()
         QString  filename = xml.value("saplingFile", "");
         if (filename.isEmpty())
             return;
-        filename = GlobalSettings::instance()->path(filename, "init");
+        filename = SimulationSettings::current().path(filename, "init");
         if (!QFile::exists(filename))
             throw IException(QString("load-sapling-ini-file: file '%1' does not exist.").arg(filename));
         CSVFile init_file(filename);
@@ -270,17 +270,17 @@ void StandLoader::processAfterInit()
 void StandLoader::evaluateDebugTrees()
 {
     // evaluate debugging
-    QString dbg_str = GlobalSettings::instance()->settings().paramValueString("debug_tree");
+    QString dbg_str = SimulationSettings::current().settings().paramValueString("debug_tree");
     int counter=0;
     if (!dbg_str.isEmpty()) {
         if (dbg_str == "debugstamp") {
             qDebug() << "debug_tree = debugstamp: try touching all trees...";
             // try to force an error if a stamp is invalid
-            AllTreeIterator at(GlobalSettings::instance()->model());
+            AllTreeIterator at(SimulationSettings::current().model());
             double total_offset=0.;
             while (Tree *t=at.next()) {
                 total_offset += t->stamp()->offset();
-                if (!GlobalSettings::instance()->model()->grid()->isIndexValid(t->positionIndex()))
+                if (!SimulationSettings::current().model()->grid()->isIndexValid(t->positionIndex()))
                     qDebug() << "evaluateDebugTrees: debugstamp: invalid position found!";
             }
             qDebug() << "debug_tree = debugstamp: try touching all trees finished..." << total_offset;
@@ -288,7 +288,7 @@ void StandLoader::evaluateDebugTrees()
         }
         TreeWrapper tw;
         Expression dexp(dbg_str, &tw); // load expression dbg_str and enable external model variables
-        AllTreeIterator at(GlobalSettings::instance()->model());
+        AllTreeIterator at(SimulationSettings::current().model());
         double result;
         while (Tree *t = at.next()) {
             tw.setTree(t);
@@ -308,7 +308,7 @@ void StandLoader::evaluateDebugTrees()
 /// @param type init mode. allowed: "picus"/"single" or "iland"/"distribution"
 int StandLoader::loadInitFile(const QString &fileName, const QString &type, int stand_id, ResourceUnit *ru)
 {
-    QString pathFileName = GlobalSettings::instance()->path(fileName, "init");
+    QString pathFileName = SimulationSettings::current().path(fileName, "init");
     if (!QFile::exists(pathFileName))
         throw IException(QString("StandLoader::loadInitFile: File '%1' does not exist!").arg(pathFileName));
 
@@ -346,8 +346,8 @@ int StandLoader::loadSingleTreeList(QStringList content, ResourceUnit *ru_offset
     ResourceUnit *ru;
 
 //    QPointF offset = ru->boundingBox().topLeft();
-    SpeciesSet *speciesSet = GlobalSettings::instance()->model()->speciesSet();
-    const Grid<ResourceUnit*> &rugrid = GlobalSettings::instance()->model()->RUgrid();
+    SpeciesSet *speciesSet = SimulationSettings::current().model()->speciesSet();
+    const Grid<ResourceUnit*> &rugrid = SimulationSettings::current().model()->RUgrid();
 
     int lineno=0;
     for (const auto &line : content) {
@@ -461,7 +461,7 @@ int StandLoader::loadDistributionList(const QStringList &content, ResourceUnit *
 
 
     // setup the random distribution
-    QString density_func = GlobalSettings::instance()->settings().value("model.initialization.randomFunction", "1-x^2");
+    QString density_func = SimulationSettings::current().settings().value("model.initialization.randomFunction", "1-x^2");
     if (logLevelInfo())  qDebug() << "density function:" << density_func;
     if (!mRandom || (mRandom->densityFunction()!= density_func)) {
         if (mRandom)
@@ -474,7 +474,7 @@ int StandLoader::loadDistributionList(const QStringList &content, ResourceUnit *
         executeiLandInitStand(stand_id);
     } else {
         // exeucte the initialization based on single resource units (in this case we care for the ru parameter)
-        ResourceUnit *ru_load = ru ? ru : GlobalSettings::instance()->model()->ru();
+        ResourceUnit *ru_load = ru ? ru : SimulationSettings::current().model()->ru();
         executeiLandInit(ru_load);
         ru_load->cleanTreeList();
     }
@@ -603,7 +603,7 @@ void StandLoader::executeiLandInit(ResourceUnit *ru)
 {
 
     QPointF offset = ru->boundingBox().topLeft();
-    QPoint offsetIdx = GlobalSettings::instance()->model()->grid()->indexAt(offset);
+    QPoint offsetIdx = SimulationSettings::current().model()->grid()->indexAt(offset);
 
     // a multimap holds a list for all trees.
     // key is the index of a 10x10m pixel within the resource unit
@@ -716,7 +716,7 @@ void StandLoader::executeiLandInit(ResourceUnit *ru)
 void StandLoader::executeiLandInitStand(int stand_id)
 {
 
-    const MapGrid *grid = GlobalSettings::instance()->model()->standGrid();
+    const MapGrid *grid = SimulationSettings::current().model()->standGrid();
     if (mCurrentMap)
         grid = mCurrentMap;
 
@@ -735,13 +735,13 @@ void StandLoader::executeiLandInitStand(int stand_id)
     foreach (int i, indices) {
         SInitPixel p;
         p.pixelOffset = grid->grid().indexOf(i); // index in the 10m grid
-        p.resource_unit = GlobalSettings::instance()->model()->ru( grid->grid().cellCenterPoint(p.pixelOffset));
+        p.resource_unit = SimulationSettings::current().model()->ru( grid->grid().cellCenterPoint(p.pixelOffset));
         if (mInitHeightGrid)
             p.h_max = mInitHeightGrid->grid().constValueAtIndex(p.pixelOffset);
         if (p.resource_unit)
             pixel_list.append(p);
         else
-            qDebug() << "Init: no valid resource unit at" << grid->grid().cellCenterPoint(p.pixelOffset) << "for stand" << stand_id << GlobalSettings::instance()->model()->ru( grid->grid().cellCenterPoint(p.pixelOffset));
+            qDebug() << "Init: no valid resource unit at" << grid->grid().cellCenterPoint(p.pixelOffset) << "for stand" << stand_id << SimulationSettings::current().model()->ru( grid->grid().cellCenterPoint(p.pixelOffset));
     }
     if (pixel_list.isEmpty()) {
         qDebug() << "Init: skipping stand" << stand_id << ", no valid pixels.";
@@ -881,7 +881,7 @@ void StandLoader::executeiLandInitStand(int stand_id)
 
             p.resource_unit->trees()[tree_idx].setPosition(tree_pos);
             // test if tree position is valid..
-            if (!GlobalSettings::instance()->model()->grid()->isIndexValid(tree_pos))
+            if (!SimulationSettings::current().model()->grid()->isIndexValid(tree_pos))
                 qDebug() << "Standloader: invalid position!";
         }
     }
@@ -898,7 +898,7 @@ int StandLoader::loadSaplings(const QString &content, int stand_id, const QStrin
     if (mCurrentMap)
         stand_grid = mCurrentMap; // if set
     else
-        stand_grid = GlobalSettings::instance()->model()->standGrid(); // default
+        stand_grid = SimulationSettings::current().model()->standGrid(); // default
 
     QList<int> indices = stand_grid->gridIndices(stand_id); // list of 10x10m pixels
     if (indices.isEmpty()) {
@@ -918,7 +918,7 @@ int StandLoader::loadSaplings(const QString &content, int stand_id, const QStrin
     if (ispecies==-1 || icount==-1)
         throw IException("Error while loading saplings: columns 'species' or 'count' are missing!!");
 
-    const SpeciesSet *set = GlobalSettings::instance()->model()->ru()->speciesSet();
+    const SpeciesSet *set = SimulationSettings::current().model()->ru()->speciesSet();
     double height, age;
     int total = 0;
     for (int row=0;row<init.rowCount();++row) {
@@ -938,7 +938,7 @@ int StandLoader::loadSaplings(const QString &content, int stand_id, const QStrin
            offset = offset * cPxPerHeight; // index of 10m patch -> to lif pixel coordinates
            int in_p = irandom(0, cPxPerHeight*cPxPerHeight); // index of lif-pixel
            offset += QPoint(in_p / cPxPerHeight, in_p % cPxPerHeight);
-           SaplingCell *sc = GlobalSettings::instance()->model()->saplings()->cell(offset);
+           SaplingCell *sc = SimulationSettings::current().model()->saplings()->cell(offset);
            if (sc){
                if (sc->max_height()>height || sc->saplingOfSpecies(species->index())) {
                //if (!ru || ru->saplingHeightForInit(offset) > height) {
@@ -971,12 +971,12 @@ int StandLoader::loadSaplingsLIF(int stand_id, const CSVFile &init, int low_inde
     if (mCurrentMap)
         stand_grid = mCurrentMap; // if set
     else
-        stand_grid = GlobalSettings::instance()->model()->standGrid(); // default
+        stand_grid = SimulationSettings::current().model()->standGrid(); // default
 
     if (!stand_grid->isValid(stand_id))
         return 0;
 
-    if (!GlobalSettings::instance()->model()->saplings()) {
+    if (!SimulationSettings::current().model()->saplings()) {
         return 0;
     }
 
@@ -993,7 +993,7 @@ int StandLoader::loadSaplingsLIF(int stand_id, const CSVFile &init, int low_inde
         offset = offset * cPxPerHeight; // index of 10m patch -> to lif pixel coordinates
         for (int y=0;y<cPxPerHeight;++y)
             for(int x=0;x<cPxPerHeight;++x)
-                lif_ptrs.push_back( GlobalSettings::instance()->model()->grid()->ptr(offset.x()+x, offset.y()+y) );
+                lif_ptrs.push_back( SimulationSettings::current().model()->grid()->ptr(offset.x()+x, offset.y()+y) );
     }
     // sort based on LIF-Value
     std::sort(lif_ptrs.begin(), lif_ptrs.end(), LIFValueHigher); // higher: highest values first
@@ -1016,7 +1016,7 @@ int StandLoader::loadSaplingsLIF(int stand_id, const CSVFile &init, int low_inde
     if (ispecies==-1 || icount==-1)
         throw IException("Error while loading saplings: columns 'species' or 'count' are missing!!");
 
-    const SpeciesSet *set = GlobalSettings::instance()->model()->ru()->speciesSet();
+    const SpeciesSet *set = SimulationSettings::current().model()->ru()->speciesSet();
     double height, age;
     int total = 0;
     for (int row=low_index;row<=high_index;++row) {
@@ -1060,9 +1060,9 @@ int StandLoader::loadSaplingsLIF(int stand_id, const CSVFile &init, int low_inde
                 if (age<=1.)
                     age = qMax(qRound(height/cSapHeight * age4m),1); // assume a linear relationship between height and age
             }
-            QPoint offset = GlobalSettings::instance()->model()->grid()->indexOf(lif_ptrs[rnd_index]);
+            QPoint offset = SimulationSettings::current().model()->grid()->indexOf(lif_ptrs[rnd_index]);
             ResourceUnit *ru;
-            SaplingCell *sc = GlobalSettings::instance()->model()->saplings()->cell(offset, true, &ru);
+            SaplingCell *sc = SimulationSettings::current().model()->saplings()->cell(offset, true, &ru);
             // Look for an unoccupied slot. If the species is already there, do not add a second cohort.
             if (sc && !sc->saplingOfSpecies(species->index())) {
                 if (SaplingTree *st=sc->addSapling(static_cast<float>(height), static_cast<int>(age), species->index())) {
@@ -1090,7 +1090,7 @@ int StandLoader::loadSaplingsLIF(int stand_id, const CSVFile &init, int low_inde
         int grass_cover_value = init.value(low_index, "grass_cover").toInt();
         if (grass_cover_value<0 || grass_cover_value>100)
             throw IException(QString("The grass cover percentage (column 'grass_cover') for stand '%1' is '%2', which is invalid (expected: 0-100)").arg(stand_id).arg(grass_cover_value));
-        GlobalSettings::instance()->model()->grassCover()->setInitialValues(lif_ptrs, grass_cover_value);
+        SimulationSettings::current().model()->grassCover()->setInitialValues(lif_ptrs, grass_cover_value);
     }
 
 

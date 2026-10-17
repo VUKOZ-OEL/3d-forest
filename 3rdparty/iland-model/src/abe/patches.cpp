@@ -85,7 +85,7 @@ double Patches::lif(Patch *patch)
     int n=0;
     for (auto idx : patch->indices()) {
         QRectF cell_rect = mLocalStandGrid.cellRect(mLocalStandGrid.indexOf(idx)).translated(mStandRect.topLeft());
-        GridRunner<float> runner(GlobalSettings::instance()->model()->grid(), cell_rect);
+        GridRunner<float> runner(SimulationSettings::current().model()->grid(), cell_rect);
         while (runner.next()) {
             lif_value += *runner.current();
             ++n;
@@ -96,7 +96,7 @@ double Patches::lif(Patch *patch)
 
 int Patches::getPatch(QPoint position_lif)
 {
-    if (!GlobalSettings::instance()->model()->ABEngine()) return -1;
+    if (!SimulationSettings::current().model()->ABEngine()) return -1;
     int stand_id = ForestManagementEngine::standGrid()->standIDFromLIFCoord(position_lif);
     FMStand* stand = ForestManagementEngine::instance()->stand(stand_id);
     if (!stand) return -1;

@@ -1,5 +1,5 @@
 #include "soilinputout.h"
-#include "globalsettings.h"
+#include "simulationsettings.h"
 #include "model.h"
 #include "resourceunit.h"
 #include "soil.h"
@@ -22,7 +22,7 @@ SoilInputOut::SoilInputOut()
 
 void SoilInputOut::exec()
 {
-    Model *m = GlobalSettings::instance()->model();
+    Model *m = SimulationSettings::current().model();
 
 
     foreach(ResourceUnit *ru, m->ruList()) {

@@ -18,7 +18,7 @@
 ********************************************************************************************/
 
 #include "snag.h"
-#include "globalsettings.h"
+#include "simulationsettings.h"
 // for calculation of climate decomposition
 #include "resourceunit.h"
 #include "watercycle.h"
@@ -38,13 +38,37 @@
 
   */
 // static variables
-double Snag::mDBHLower = -1.;
-double Snag::mDBHHigher = 0.;
-double Snag::mDBHSingle = 1000.;
-double Snag::mCarbonThreshold[] = {0., 0., 0.};
-double Snag::mDecayClassThresholds[] = { 0.2, 0.4, 0.7, 0.9 };
+Snag::RunType_mDBHLower &Snag::runState_mDBHLower()
+{
+    struct State { RunType_mDBHLower value = -1.; };
+    return SimulationContext::state<State>().value;
+}
+Snag::RunType_mDBHHigher &Snag::runState_mDBHHigher()
+{
+    struct State { RunType_mDBHHigher value = 0.; };
+    return SimulationContext::state<State>().value;
+}
+Snag::RunType_mDBHSingle &Snag::runState_mDBHSingle()
+{
+    struct State { RunType_mDBHSingle value = 1000.; };
+    return SimulationContext::state<State>().value;
+}
+Snag::RunType_mCarbonThreshold &Snag::runState_mCarbonThreshold()
+{
+    struct State { RunType_mCarbonThreshold value = {0., 0., 0.}; };
+    return SimulationContext::state<State>().value;
+}
+Snag::RunType_mDecayClassThresholds &Snag::runState_mDecayClassThresholds()
+{
+    struct State { RunType_mDecayClassThresholds value = { 0.2, 0.4, 0.7, 0.9 }; };
+    return SimulationContext::state<State>().value;
+}
 
-double CNPair::biomassCFraction = biomassCFraction; // get global from globalsettings.h
+CNPair::RunType_biomassCFraction &CNPair::runState_biomassCFraction()
+{
+    struct State { RunType_biomassCFraction value = ::biomassCFraction; };
+    return SimulationContext::state<State>().value;
+} // get global from simulationsettings.h
 
 /// add biomass and weigh the parameter_value with the current C-content of the pool
 void CNPool::addBiomass(const double biomass, const double CNratio, const double parameter_value)
@@ -79,19 +103,19 @@ double CNPool::parameter(const CNPool &s) const
 
 void Snag::setupThresholds(const double lower, const double upper, const double single_tree, QString decay_classes)
 {
-    if (mDBHLower == lower)
+    if (runState_mDBHLower() == lower)
         return;
-    mDBHLower = lower;
-    mDBHHigher = upper;
-    mDBHSingle = single_tree;
-    mCarbonThreshold[0] = lower / 2.;
-    mCarbonThreshold[1] = lower + (upper - lower)/2.;
-    mCarbonThreshold[2] = upper + (upper - lower)/2.;
+    runState_mDBHLower() = lower;
+    runState_mDBHHigher() = upper;
+    runState_mDBHSingle() = single_tree;
+    runState_mCarbonThreshold()[0] = lower / 2.;
+    runState_mCarbonThreshold()[1] = lower + (upper - lower)/2.;
+    runState_mCarbonThreshold()[2] = upper + (upper - lower)/2.;
     //# threshold levels for emptying out the dbh-snag-classes
     //# derived from Psme woody allometry, converted to C, with a threshold level set to 1%
     //# values in kg!
     for (int i=0;i<3;i++)
-        mCarbonThreshold[i] = 0.10568*pow(mCarbonThreshold[i],2.4247)*0.5*0.01;
+        runState_mCarbonThreshold()[i] = 0.10568*pow(runState_mCarbonThreshold()[i],2.4247)*0.5*0.01;
 
     // decay-class thresholds:
     QStringList dclasses = decay_classes.split(",");
@@ -100,8 +124,8 @@ void Snag::setupThresholds(const double lower, const double upper, const double 
     for (int i=0;i<4;++i) {
         double val = dclasses[i].toDouble(&ok);
         if (!ok) throw IException(QString("model.settings.soil.decayClassThresholds: error converting '%1' to a valid number!").arg(dclasses[i]));
-        mDecayClassThresholds[i] = val;
-        if (i>0 && val < mDecayClassThresholds[i-1]) throw IException("model.settings.soil.decayClassThresholds: values not monotonously increasing! ");
+        runState_mDecayClassThresholds()[i] = val;
+        if (i>0 && val < runState_mDecayClassThresholds()[i-1]) throw IException("model.settings.soil.decayClassThresholds: values not monotonously increasing! ");
     }
 
 
@@ -133,11 +157,11 @@ void Snag::setup( const ResourceUnit *ru)
     mTotalSnagCarbon = 0.;
     mDeciduousFoliageLitter = 0.;
 
-    if (mDBHLower<=0)
+    if (runState_mDBHLower()<=0)
         throw IException("Snag::setupThresholds() not called or called with invalid parameters.");
 
     // Inital values from XML file
-    XmlHelper xml=GlobalSettings::instance()->settings();
+    XmlHelper xml=SimulationSettings::current().settings();
     double kyr = xml.valueDouble("model.site.youngRefractoryDecompRate", -1);
     // put carbon of snags to the middle size class
     xml.setCurrentNode("model.initialization.snags");
@@ -360,7 +384,7 @@ void Snag::calculateYear()
             // if stems<0.5, empty the whole cohort into DWD, i.e. release the last bit of C and N and clear the stats
             // also, if the Carbon of an average snag is less than 10% of the original average tree
             // (derived from allometries for the three diameter classes), the whole cohort is emptied out to DWD
-            if (mNumberOfSnags[i] < 0.5 || mSWD[i].C / mNumberOfSnags[i] < mCarbonThreshold[i]) {
+            if (mNumberOfSnags[i] < 0.5 || mSWD[i].C / mNumberOfSnags[i] < runState_mCarbonThreshold()[i]) {
                 // clear the pool: add the rest to the soil, clear statistics of the pool
                 mRefractoryFlux += mSWD[i];
                 mRefrFluxAbovegroundCarbon += mSWD[i].C;
@@ -490,7 +514,7 @@ void Snag::addBiomassPools(const Tree *tree,
 
     double effective_stem_to_snag = stem_to_snag;
     if (stem_to_snag>0.) {
-        if (tree->dbh() > mDBHSingle) {
+        if (tree->dbh() > runState_mDBHSingle()) {
             // the stem is tracked individually
             mDeadTrees.push_back(DeadTree(tree));
             effective_stem_to_snag = 0.; // snag biomass already processed, do not double-count

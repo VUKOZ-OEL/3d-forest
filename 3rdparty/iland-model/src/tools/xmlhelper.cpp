@@ -278,8 +278,11 @@ QDomElement XmlHelper::node(const QString &path) const
 // writers
 bool XmlHelper::setNodeValue(QDomElement &node, const QString &value)
 {
-    if (!node.isNull() && node.hasChildNodes()) {
-        node.firstChild().toText().setData(value);
+    if (!node.isNull()) {
+        if (node.hasChildNodes())
+            node.firstChild().toText().setData(value);
+        else
+            node.appendChild(mDoc.createTextNode(value));
         return true;
     }
     return false;
@@ -294,11 +297,15 @@ bool XmlHelper::setNodeValue(const QString &path, const QString &value)
     return setNodeValue(e,value);
 }
 
-QMutex xml_mutex;
+static QMutex &runFile_xml_mutex()
+{
+    struct State { QMutex value; };
+    return SimulationContext::state<State>().value;
+}
 void XmlHelper::missedKey(const QString &keyname) const
 {
     // make the hash non const (for updating it), therefore add a lock
-    QMutexLocker lock(&xml_mutex);
+    QMutexLocker lock(&runFile_xml_mutex());
     QHash<QString, int> &keys = const_cast<QHash<QString, int>& >(mMissingKeys);
 
     QString key = fullName(keyname);

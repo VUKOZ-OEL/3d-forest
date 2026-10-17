@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Lightroom definition file. -->
+<lightroom>
+    <size x="100" y="100" z="65" cellsize="2" />
+    <hemigrid size="5" latitude="48" diffus="0.5" />
+    <cutvalue>0.1</cutvalue>
+	<readerStamp>E:\Daten\iLand\Light\fons\test_reader.bin</readerStamp>
+	<outputStamp>E:\Daten\iLand\Light\fons\test_out.bin</outputStamp>
+    <desc>Just a test for the cleaning of fonstudio.</desc>
+    <trees>
+      <tree name="Piab_4.5_3.15" bhd="4.5" h="3.15" crown="1.2"
+      formula="0.954*(min(0.95, hrel)/0.95)^0.28483" />
+      <tree name="Piab_4.5_3.6" bhd="4.5" h="3.6" crown="1.38"
+      formula="0.954*(min(0.95, hrel)/0.95)^0.28483" />
+    </trees>
+</lightroom>
+

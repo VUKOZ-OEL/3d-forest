@@ -18,7 +18,7 @@
 ********************************************************************************************/
 #include "spatialanalysis.h"
 
-#include "globalsettings.h"
+#include "simulationsettings.h"
 #include "model.h"
 #include "tree.h"
 #include "stamp.h"
@@ -30,8 +30,8 @@
 #include <QJSValue>
 void SpatialAnalysis::addToScriptEngine()
 {
-    QJSValue jsMetaObject = GlobalSettings::instance()->scriptEngine()->newQMetaObject(&SpatialAnalysis::staticMetaObject);
-    GlobalSettings::instance()->scriptEngine()->globalObject().setProperty("SpatialAnalysis", jsMetaObject);
+    QJSValue jsMetaObject = SimulationSettings::current().scriptEngine()->newQMetaObject(&SpatialAnalysis::staticMetaObject);
+    SimulationSettings::current().scriptEngine()->globalObject().setProperty("SpatialAnalysis", jsMetaObject);
 }
 
 SpatialAnalysis::~SpatialAnalysis()
@@ -126,8 +126,8 @@ QList<int> SpatialAnalysis::extractPatches(Grid<double> &src, int min_size, QStr
 
     qDebug() << "extractPatches: found" << patch_index << "patches, total valid pixels:" << total_size << "skipped" << patches_skipped;
     if (!fileName.isEmpty()) {
-        qDebug() << "extractPatches: save to file:" << GlobalSettings::instance()->path(fileName);
-        Helper::saveToTextFile(GlobalSettings::instance()->path(fileName), gridToESRIRaster(mClumpGrid) );
+        qDebug() << "extractPatches: save to file:" << SimulationSettings::current().path(fileName);
+        Helper::saveToTextFile(SimulationSettings::current().path(fileName), gridToESRIRaster(mClumpGrid) );
     }
     return counts;
 
@@ -138,15 +138,15 @@ void SpatialAnalysis::saveRumpleGrid(QString fileName)
     if (!mRumple)
         mRumple = new RumpleIndex;
 
-    gridToFile<float>(mRumple->rumpleGrid(), GlobalSettings::instance()->path(fileName));
-    // Helper::saveToTextFile(GlobalSettings::instance()->path(fileName), gridToESRIRaster(mRumple->rumpleGrid()) );
+    gridToFile<float>(mRumple->rumpleGrid(), SimulationSettings::current().path(fileName));
+    // Helper::saveToTextFile(SimulationSettings::current().path(fileName), gridToESRIRaster(mRumple->rumpleGrid()) );
 
 }
 
 void SpatialAnalysis::saveCrownCoverGrid(QString fileName)
 {
     calculateCrownCoverRU();
-    Helper::saveToTextFile(GlobalSettings::instance()->path(fileName), gridToESRIRaster(mCrownCoverGrid) );
+    Helper::saveToTextFile(SimulationSettings::current().path(fileName), gridToESRIRaster(mCrownCoverGrid) );
 
 }
 
@@ -165,8 +165,8 @@ void SpatialAnalysis::saveCrownCoverGrid(QString fileName, QJSValue grid)
     runCrownProjection2m();
 
 
-    FloatGrid *lifgrid = GlobalSettings::instance()->model()->grid();
-    Model *model = GlobalSettings::instance()->model();
+    FloatGrid *lifgrid = SimulationSettings::current().model()->grid();
+    Model *model = SimulationSettings::current().model();
     double cell_area = gr.cellsize() * gr.cellsize();
 
     for (double *rg = gr.begin(); rg!=gr.end();++rg) {
@@ -181,7 +181,7 @@ void SpatialAnalysis::saveCrownCoverGrid(QString fileName, QJSValue grid)
         double value = cc_sum * cPxSize*cPxSize / cell_area;
         *rg = limit(value, 0., 1.);
     }
-     Helper::saveToTextFile(GlobalSettings::instance()->path(fileName), gridToESRIRaster(gr) );
+     Helper::saveToTextFile(SimulationSettings::current().path(fileName), gridToESRIRaster(gr) );
 
 }
 
@@ -194,9 +194,9 @@ QJSValue SpatialAnalysis::patches(QJSValue grid, int min_size)
         // create a (double) copy of the internal clump grid, and return this grid
         // as a JS value
         QJSValue v = ScriptGrid::createGrid(mClumpGrid.toDouble(),"patch");
-        QJSValue res = GlobalSettings::instance()->scriptEngine()->newObject();
+        QJSValue res = SimulationSettings::current().scriptEngine()->newObject();
         QJSValue areas; // = QJSValue(mLastPatches);
-        areas = GlobalSettings::instance()->scriptEngine()->newArray(mLastPatches.length());
+        areas = SimulationSettings::current().scriptEngine()->newArray(mLastPatches.length());
         for (int i=0;i<mLastPatches.size();++i)
             areas.setProperty(i, QJSValue(mLastPatches[i]));
         res.setProperty("grid", v);
@@ -208,15 +208,15 @@ QJSValue SpatialAnalysis::patches(QJSValue grid, int min_size)
 
 void SpatialAnalysis::calculateCrownCoverRU()
 {
-    mCrownCoverGrid.setup(GlobalSettings::instance()->model()->RUgrid().metricRect(),
-                          GlobalSettings::instance()->model()->RUgrid().cellsize());
+    mCrownCoverGrid.setup(SimulationSettings::current().model()->RUgrid().metricRect(),
+                          SimulationSettings::current().model()->RUgrid().cellsize());
 
     // calculate crown cover by looping over all trees and mis-use the LIF grid
     runCrownProjection2m();
 
-    FloatGrid *grid = GlobalSettings::instance()->model()->grid();
+    FloatGrid *grid = SimulationSettings::current().model()->grid();
     // now aggregate values for each resource unit
-    Model *model = GlobalSettings::instance()->model();
+    Model *model = SimulationSettings::current().model();
     for (float *rg = mCrownCoverGrid.begin(); rg!=mCrownCoverGrid.end();++rg) {
         ResourceUnit *ru =  model->RUgrid().constValueAtIndex(mCrownCoverGrid.indexOf(rg));
         if (!ru) {
@@ -244,12 +244,12 @@ void SpatialAnalysis::runCrownProjection2m(FloatGrid *agrid)
 
     FloatGrid *grid = agrid;
     if (agrid == nullptr)
-        grid = GlobalSettings::instance()->model()->grid();
+        grid = SimulationSettings::current().model()->grid();
 
     grid->initialize(0.f);
     // we simply iterate over all trees of all resource units (not bothering about multithreading here)
     int x,y;
-    AllTreeIterator ati(GlobalSettings::instance()->model());
+    AllTreeIterator ati(SimulationSettings::current().model());
     while (Tree *t = ati.nextLiving()) {
         // apply the reader-stamp
         const Stamp *reader = t->stamp()->reader();
@@ -283,11 +283,11 @@ void SpatialAnalysis::runCrownProjection2m(FloatGrid *agrid)
 void RumpleIndex::setup()
 {
     mRumpleGrid.clear();
-    if (!GlobalSettings::instance()->model()) return;
+    if (!SimulationSettings::current().model()) return;
 
     // the rumple grid hast the same dimensions as the resource unit grid (i.e. 100 meters)
-    mRumpleGrid.setup(GlobalSettings::instance()->model()->RUgrid().metricRect(),
-                    GlobalSettings::instance()->model()->RUgrid().cellsize());
+    mRumpleGrid.setup(SimulationSettings::current().model()->RUgrid().metricRect(),
+                    SimulationSettings::current().model()->RUgrid().cellsize());
 
 }
 
@@ -297,7 +297,7 @@ void RumpleIndex::calculate()
         setup();
 
     mRumpleGrid.initialize(0.f);
-    HeightGrid *hg = GlobalSettings::instance()->model()->heightGrid();
+    HeightGrid *hg = SimulationSettings::current().model()->heightGrid();
 
     // iterate over the resource units and calculate the rumple index / surface area for each resource unit
     HeightGridValue* hgv_8[8]; // array holding pointers to height grid values (neighborhood)
@@ -340,12 +340,12 @@ void RumpleIndex::calculate()
         float rumple_index = total_surface_area / ( (float) total_valid_pixels * hg->cellsize()*hg->cellsize());
         mRumpleIndex = rumple_index;
     }
-    mLastYear = GlobalSettings::instance()->currentYear();
+    mLastYear = SimulationSettings::current().currentYear();
 }
 
 double RumpleIndex::value(const bool force_recalculate)
 {
-    if (force_recalculate ||  mLastYear != GlobalSettings::instance()->currentYear())
+    if (force_recalculate ||  mLastYear != SimulationSettings::current().currentYear())
         calculate();
     return mRumpleIndex;
 }

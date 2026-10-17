@@ -15,7 +15,7 @@ BiteOutputItem::BiteOutputItem(QJSValue obj): BiteItem(obj)
 BiteOutputItem::~BiteOutputItem()
 {
     if (!mTableName.isEmpty())
-        GlobalSettings::instance()->outputManager()->removeOutput(mTableName);
+        SimulationSettings::current().outputManager()->removeOutput(mTableName);
 }
 
 void BiteOutputItem::setup(BiteAgent *parent_agent)
@@ -37,13 +37,13 @@ void BiteOutputItem::setup(BiteAgent *parent_agent)
             mColumns.push_back(it.value().toString());
         }
 
-        //GlobalSettings::instance()->outputManager()->removeOutput(mTableName);
-        if (GlobalSettings::instance()->outputManager()->find(mTableName)) {
+        //SimulationSettings::current().outputManager()->removeOutput(mTableName);
+        if (SimulationSettings::current().outputManager()->find(mTableName)) {
             throw IException(QString("The table name of the bite output '%1' must be unique but is already used.").arg(mTableName));
         }
         mOutput = new BiteCellOutput();
         mOutput->setupBite(mColumns, mTableName);
-        GlobalSettings::instance()->outputManager()->addOutput(mOutput);
+        SimulationSettings::current().outputManager()->addOutput(mOutput);
 
         QJSValue filter = BiteEngine::valueFromJs(mObj, "outputFilter");
         if (!filter.isUndefined())

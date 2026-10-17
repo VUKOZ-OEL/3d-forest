@@ -32,7 +32,7 @@ DevStageOut::DevStageOut()
 void DevStageOut::exec()
 {
     if (!mFilter.isEmpty())
-        if (!mFilter.calculateBool(GlobalSettings::instance()->currentYear()))
+        if (!mFilter.calculateBool(SimulationSettings::current().currentYear()))
             return;
 
     DebugTimer t("DevelopmentStageOutput");
@@ -98,25 +98,25 @@ void DevStageOut::setup()
         throw IException("DevStageOut: invalid 'cellsize'! Allowed values are 10, 20, 50, 100.");
 
     mGrid.clear();
-    mGrid.setup(GlobalSettings::instance()->model()->RUgrid().metricRect(),
+    mGrid.setup(SimulationSettings::current().model()->RUgrid().metricRect(),
                 mCellSize);
     mGrid.initialize(0); // value 0: non forest
 
     mStockableArea.clear();
-    mStockableArea.setup(GlobalSettings::instance()->model()->RUgrid().metricRect(), mCellSize);
+    mStockableArea.setup(SimulationSettings::current().model()->RUgrid().metricRect(), mCellSize);
     mStockableArea.initialize(0);
     setupStockableArea();
 
     // set up the cell object and link to this output
     DevStageCell *dsc = mCell.take(); // test: avoid crash?
     if (dsc)
-        GlobalSettings::instance()->controller()->removePaintLayers(dsc);
+        SimulationSettings::current().controller()->removePaintLayers(dsc);
     mCell.reset(new DevStageCell());
     mCell->setObj(this);
 
     // set up handling code
     QString handling_obj_name = settings().value(".handler");
-    QJSValue handler = GlobalSettings::instance()->scriptEngine()->globalObject().property(handling_obj_name);
+    QJSValue handler = SimulationSettings::current().scriptEngine()->globalObject().property(handling_obj_name);
     if (handler.isUndefined())
         throw IException("DevStageOut: invalid Javascript object specified as 'handler': " + handling_obj_name);
 
@@ -162,14 +162,14 @@ void DevStageOut::setup()
           qDebug()<< "setup of DevStageOutput: No custom code availabe, fallign back to default development stage classification (Zenner et al)";
 
       mPostEvalFunc = ScriptGlobal::valueFromJs(handler, "onFinished");
-      QJSValue js_scriptcell = GlobalSettings::instance()->scriptEngine()->newQObject(&(*mCell));
+      QJSValue js_scriptcell = SimulationSettings::current().scriptEngine()->newQObject(&(*mCell));
       mEvalParam = QJSValueList() << js_scriptcell;
 
 
       // set up link to iLand (user interface) (only relevant for the GUI version of iLand)
       QStringList varlist = {"DevStage - Stage"};
       QVector<GridViewType> paint_types = {GridViewCustom};
-      GlobalSettings::instance()->controller()->addPaintLayers(mCell.get(), varlist, paint_types);
+      SimulationSettings::current().controller()->addPaintLayers(mCell.get(), varlist, paint_types);
 
 
 }
@@ -181,7 +181,7 @@ void DevStageOut::setupStockableArea()
 
     // aggregate stocking area for each cell
     int total=0;
-    HeightGrid *hg = GlobalSettings::instance()->model()->heightGrid();
+    HeightGrid *hg = SimulationSettings::current().model()->heightGrid();
     for (HeightGridValue *hgv=hg->begin(); hgv!=hg->end(); ++hgv) {
         if (hgv->isValid()) {
             total+= cell_area;
@@ -251,7 +251,7 @@ int DevStageCell::loadTrees(int8_t *grid_ptr)
     QPoint location = mOut->mGrid.indexOf(grid_ptr);
     mLocation = location;
     QPointF locF = mOut->mGrid.cellCenterPoint(location);
-    const ResourceUnit *ru = GlobalSettings::instance()->model()->RUgrid().constValueAt(locF);
+    const ResourceUnit *ru = SimulationSettings::current().model()->RUgrid().constValueAt(locF);
     mRU = ru;
 
     mTrees.clear();
@@ -337,7 +337,7 @@ double DevStageCell::CPA()
         // do a crown projection for all trees on the landscape
         // use a 2m grid for this purpose
         if (mCPA_grid.isEmpty())
-            mCPA_grid.setup(*GlobalSettings::instance()->model()->grid());
+            mCPA_grid.setup(*SimulationSettings::current().model()->grid());
 
         SpatialAnalysis::runCrownProjection2m(&mCPA_grid);
         qDebug() << "crown projection grid: sum: " << mCPA_grid.sum();
@@ -345,7 +345,7 @@ double DevStageCell::CPA()
     }
 
     // retrieve from the CPA grid the CPA covered by the cell
-    Model *model = GlobalSettings::instance()->model();
+    Model *model = SimulationSettings::current().model();
 
     GridRunner<float> runner(mCPA_grid, mOut->mGrid.cellRect(mLocation));
     int cc_sum = 0;
@@ -368,18 +368,18 @@ double DevStageCell::Pct_PMugo()
     // count the number of cells in the regeneration layer where P. mugo is present.
 
     // check if the species is available
-    Species *p_mugo_species_index = GlobalSettings::instance()->model()->speciesSet()->species("pimu");
+    Species *p_mugo_species_index = SimulationSettings::current().model()->speciesSet()->species("pimu");
     if (!p_mugo_species_index)
         throw IException("Development stages: Pinus mugo ('pimu') expected but not available!");
 
     // the rectangle of the current cell:
     QRectF cell_rect = mOut->mGrid.cellRect(mLocation);
 
-    GridRunner<float> runner(GlobalSettings::instance()->model()->grid(), cell_rect);
+    GridRunner<float> runner(SimulationSettings::current().model()->grid(), cell_rect);
     int n_not_stockable=0;
     int n_mugo=0, n_nomugo=0;
     while (runner.next()) {
-        SaplingCell *sc=GlobalSettings::instance()->model()->saplings()->cell(runner.currentIndex(), true);
+        SaplingCell *sc=SimulationSettings::current().model()->saplings()->cell(runner.currentIndex(), true);
         if (sc) {
             SaplingTree *t = sc->saplingOfSpecies(p_mugo_species_index->index());
             // count all pixels with P. mugo .... count a pixel if P. mugo >1.3m is present ( && t->height > 1.3f )

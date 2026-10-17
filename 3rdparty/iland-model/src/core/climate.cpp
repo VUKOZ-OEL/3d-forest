@@ -29,12 +29,32 @@
 #include "timeevents.h"
 #include "csvfile.h"
 
-QVector<int> Climate::sampled_years; // list of sampled years to use
+Climate::RunType_sampled_years &Climate::runState_sampled_years()
+{
+    struct State { RunType_sampled_years value = {}; };
+    return SimulationContext::state<State>().value;
+} // list of sampled years to use
 
-double ClimateDay::co2 = 350.; // base value of ambient CO2-concentration (ppm)
-int Climate::co2Startyear = 1980;
-QString Climate::co2Pathway;
-QMap<QString, QVector<double> > Climate::fixedCO2concentrations;
+ClimateDay::RunType_co2 &ClimateDay::runState_co2()
+{
+    struct State { RunType_co2 value = 350.; };
+    return SimulationContext::state<State>().value;
+} // base value of ambient CO2-concentration (ppm)
+Climate::RunType_co2Startyear &Climate::runState_co2Startyear()
+{
+    struct State { RunType_co2Startyear value = 1980; };
+    return SimulationContext::state<State>().value;
+}
+Climate::RunType_co2Pathway &Climate::runState_co2Pathway()
+{
+    struct State { RunType_co2Pathway value = {}; };
+    return SimulationContext::state<State>().value;
+}
+Climate::RunType_fixedCO2concentrations &Climate::runState_fixedCO2concentrations()
+{
+    struct State { RunType_fixedCO2concentrations value = {}; };
+    return SimulationContext::state<State>().value;
+}
 
 
 void Sun::setup(double latitude_rad)
@@ -122,8 +142,8 @@ void Climate::toDate(const int yearday, int *rDay, int *rMonth, int *rYear) cons
 
 void Climate::setup(bool do_log)
 {
-    GlobalSettings *g=GlobalSettings::instance();
-    XmlHelper xml(g->settings().node("model.climate"));
+    SimulationSettings &runSettings = SimulationSettings::current();
+    XmlHelper xml(runSettings.settings().node("model.climate"));
     QString tableName =xml.value("tableName");
 
     mName = tableName;
@@ -169,7 +189,7 @@ void Climate::setup(bool do_log)
 
     QString query=QString("select year,month,day,min_temp,max_temp,prec,rad,vpd from '%1' %2 order by year, month, day").arg(tableName).arg(filter);
     // here add more options...
-    mClimateQuery = QSqlQuery(g->dbclimate());
+    mClimateQuery = QSqlQuery(runSettings.dbclimate());
     mClimateQuery.exec(query);
     mTMaxAvailable = true;
     if (mClimateQuery.lastError().isValid()){
@@ -189,12 +209,12 @@ void Climate::setup(bool do_log)
     // setup sun
     mSun.setup(Model::settings().latitude);
     mCurrentYear--; // go to "-1" -> the first call to next year will go to year 0.
-    sampled_years.clear();
+    runState_sampled_years().clear();
 
-    co2Pathway = xml.value("co2pathway", "No");
-    co2Startyear = xml.valueInt("co2startYear", 1980);
-    if (co2Pathway == "No")
-        co2Pathway = QString();
+    runState_co2Pathway() = xml.value("co2pathway", "No");
+    runState_co2Startyear() = xml.valueInt("co2startYear", 1980);
+    if (runState_co2Pathway() == "No")
+        runState_co2Pathway() = QString();
     mIsSetup = true;
 }
 
@@ -215,9 +235,9 @@ void Climate::load()
     int yeardays;
     for (int i=0;i<mLoadYears;i++) {
         yeardays = 0;
-        if (GlobalSettings::instance()->model()->timeEvents()) {
-            QVariant val_temp = GlobalSettings::instance()->model()->timeEvents()->value(GlobalSettings::instance()->currentYear() + i, "model.climate.temperatureShift");
-            QVariant val_prec = GlobalSettings::instance()->model()->timeEvents()->value(GlobalSettings::instance()->currentYear() + i, "model.climate.precipitationShift");
+        if (SimulationSettings::current().model()->timeEvents()) {
+            QVariant val_temp = SimulationSettings::current().model()->timeEvents()->value(SimulationSettings::current().currentYear() + i, "model.climate.temperatureShift");
+            QVariant val_prec = SimulationSettings::current().model()->timeEvents()->value(SimulationSettings::current().currentYear() + i, "model.climate.precipitationShift");
             if (val_temp.isValid())
                 mTemperatureShift = val_temp.toDouble();
             if (val_prec.isValid())
@@ -329,12 +349,12 @@ void Climate::nextYear()
         if (mRandomYearList.isEmpty()) {
             // random without list
             // make sure that the sequence of years is the same for the full landscape
-            if (sampled_years.size()-1<GlobalSettings::instance()->currentYear()) {
-                while (sampled_years.size()-1 < GlobalSettings::instance()->currentYear())
-                    sampled_years.append(irandom(0,mLoadYears));
+            if (runState_sampled_years().size()-1<SimulationSettings::current().currentYear()) {
+                while (runState_sampled_years().size()-1 < SimulationSettings::current().currentYear())
+                    runState_sampled_years().append(irandom(0,mLoadYears));
             }
 
-            mCurrentYear = sampled_years[GlobalSettings::instance()->currentYear()];
+            mCurrentYear = runState_sampled_years()[SimulationSettings::current().currentYear()];
 
         } else {
             // random with fixed list
@@ -398,48 +418,52 @@ void Climate::climateCalculations(const ClimateDay &lastDay)
 
 }
 
-QMutex _loadco2;
+static QMutex &runFile__loadco2()
+{
+    struct State { QMutex value; };
+    return SimulationContext::state<State>().value;
+}
 void Climate::updateCO2concentration()
 {
 
-    if (!co2Pathway.isEmpty()) {
+    if (!runState_co2Pathway().isEmpty()) {
 
-        QMutexLocker lock(&_loadco2);
-        if (fixedCO2concentrations.isEmpty()) {
+        QMutexLocker lock(&runFile__loadco2());
+        if (runState_fixedCO2concentrations().isEmpty()) {
 
             // load from data file
             CSVFile input_file(":/rcp_co2_1980_2100.txt");
 
             for (int i=0;i<input_file.rowCount(); ++i) {
-                fixedCO2concentrations["RCP2.6"].append(input_file.value(i, "RCP_26").toDouble());
-                fixedCO2concentrations["RCP4.5"].append(input_file.value(i, "RCP_45").toDouble());
-                fixedCO2concentrations["RCP6.0"].append(input_file.value(i, "RCP_60").toDouble());
-                fixedCO2concentrations["RCP8.5"].append(input_file.value(i, "RCP_85").toDouble());
+                runState_fixedCO2concentrations()["RCP2.6"].append(input_file.value(i, "RCP_26").toDouble());
+                runState_fixedCO2concentrations()["RCP4.5"].append(input_file.value(i, "RCP_45").toDouble());
+                runState_fixedCO2concentrations()["RCP6.0"].append(input_file.value(i, "RCP_60").toDouble());
+                runState_fixedCO2concentrations()["RCP8.5"].append(input_file.value(i, "RCP_85").toDouble());
             }
-            if (fixedCO2concentrations["RCP2.6"].isEmpty())
+            if (runState_fixedCO2concentrations()["RCP2.6"].isEmpty())
                 throw IException("Error in loading file with CO2 concentrations!");
         }
 
 
 
-        int year = Globals->currentYear();
+        int year = SimulationSettings::current().currentYear();
         // derive actual year: first year of sim should get the value from co2Startyear (first year in the file is 1980)
 
-        int yearindex =  std::max( (year + co2Startyear - 1) -  1980, 0);
-        yearindex = std::min(yearindex, static_cast<int>(fixedCO2concentrations[co2Pathway].size()-1));
+        int yearindex =  std::max( (year + runState_co2Startyear() - 1) -  1980, 0);
+        yearindex = std::min(yearindex, static_cast<int>(runState_fixedCO2concentrations()[runState_co2Pathway()].size()-1));
         if (yearindex < 0)
             throw IException("climate: set co2 concentration: invalid value for co2. Valid values for 'co2pathway' are: 'No', 'RCP2.6', 'RCP4.5', 'RCP6.0', 'RCP8.5'");
 
-        double new_co2_value = fixedCO2concentrations[co2Pathway][yearindex];
-        ClimateDay::co2 = new_co2_value;
+        double new_co2_value = runState_fixedCO2concentrations()[runState_co2Pathway()][yearindex];
+        ClimateDay::runState_co2() = new_co2_value;
 
     } else {
-        ClimateDay::co2 = GlobalSettings::instance()->settings().valueDouble("model.climate.co2concentration", 380.);
+        ClimateDay::runState_co2() = SimulationSettings::current().settings().valueDouble("model.climate.co2concentration", 380.);
 
     }
 
     if (logLevelDebug())
-        qDebug() << "CO2 concentration" << ClimateDay::co2 << "ppm.";
+        qDebug() << "CO2 concentration" << ClimateDay::runState_co2() << "ppm.";
 
 
 }
@@ -449,7 +473,7 @@ void Climate::setupPhenology()
 {
     mPhenology.clear();
     mPhenology.push_back(Phenology(this)); // id=0
-    XmlHelper xml(GlobalSettings::instance()->settings().node("model.species.phenology"));
+    XmlHelper xml(SimulationSettings::current().settings().node("model.species.phenology"));
     int i=0;
     do {
         QDomElement n = xml.node(QString("type[%1]").arg(i));

@@ -46,8 +46,12 @@ namespace ABE {
   */
 
 // statics
-QStringList Activity::mAllowedProperties = QStringList() << "schedule" << "constraint" << "type"
-                                                         << "onCreate" << "onSetup" << "onEnter" << "onExit" << "onExecute" << "onExecuted" << "onCancel";
+Activity::RunType_mAllowedProperties &Activity::runState_mAllowedProperties()
+{
+    struct State { RunType_mAllowedProperties value = QStringList() << "schedule" << "constraint" << "type"
+                                                         << "onCreate" << "onSetup" << "onEnter" << "onExit" << "onExecute" << "onExecuted" << "onCancel"; };
+    return SimulationContext::state<State>().value;
+}
 
 /***************************************************************************/
 /***************************   Schedule  ***********************************/

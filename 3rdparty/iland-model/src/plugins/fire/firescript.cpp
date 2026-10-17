@@ -57,14 +57,18 @@ double FireScript::igniteBurnIn(double x, double y, double length, double max_fi
     return mFire->burnInIgnition(x,y,length, max_fire_size, simulate);
 }
 
-QString FireScript::fireRUValueType=QLatin1String("");
+FireScript::RunType_fireRUValueType &FireScript::runState_fireRUValueType()
+{
+    struct State { RunType_fireRUValueType value = QLatin1String(""); };
+    return SimulationContext::state<State>().value;
+}
 
 QString fireRUValue(const FireRUData &data) {
-    if (FireScript::fireRUValueType=="kbdi") return QString::number(data.kbdi());
-    if (FireScript::fireRUValueType=="dbh") return QString::number(data.fireRUStats.avg_dbh);
-    if (FireScript::fireRUValueType=="crownkill") return QString::number(data.fireRUStats.crown_kill);
-    if (FireScript::fireRUValueType=="basalarea") return QString::number(data.fireRUStats.basal_area>0?data.fireRUStats.died_basal_area / data.fireRUStats.basal_area:0.);
-    if (FireScript::fireRUValueType=="baseIgnition") return QString::number(data.baseIgnitionProbability());
+    if (FireScript::runState_fireRUValueType()=="kbdi") return QString::number(data.kbdi());
+    if (FireScript::runState_fireRUValueType()=="dbh") return QString::number(data.fireRUStats.avg_dbh);
+    if (FireScript::runState_fireRUValueType()=="crownkill") return QString::number(data.fireRUStats.crown_kill);
+    if (FireScript::runState_fireRUValueType()=="basalarea") return QString::number(data.fireRUStats.basal_area>0?data.fireRUStats.died_basal_area / data.fireRUStats.basal_area:0.);
+    if (FireScript::runState_fireRUValueType()=="baseIgnition") return QString::number(data.baseIgnitionProbability());
     return "Error";
 }
 QString fireCharToStr(const char &c) {
@@ -73,9 +77,9 @@ QString fireCharToStr(const char &c) {
 
 bool FireScript::gridToFile(QString grid_type, QString file_name)
 {
-    if (!GlobalSettings::instance()->model())
+    if (!SimulationSettings::current().model())
         return false;
-    file_name = GlobalSettings::instance()->path(file_name);
+    file_name = SimulationSettings::current().path(file_name);
 
     if (grid_type == "spread") {
         ::gridToFile(mFire->mGrid, file_name);
@@ -87,13 +91,13 @@ bool FireScript::gridToFile(QString grid_type, QString file_name)
         ::gridToFile(mFire->mBorderGrid, file_name);
         return true;
     } else {
-        fireRUValueType = grid_type;
+        runState_fireRUValueType() = grid_type;
         ::gridToFile<FireRUData, double>(mFire->mRUGrid, file_name, [](const FireRUData &data) -> double {
-            if (FireScript::fireRUValueType=="kbdi") return data.kbdi();
-            if (FireScript::fireRUValueType=="dbh") return data.fireRUStats.avg_dbh;
-            if (FireScript::fireRUValueType=="crownkill") return data.fireRUStats.crown_kill;
-            if (FireScript::fireRUValueType=="basalarea") return data.fireRUStats.basal_area>0?data.fireRUStats.died_basal_area / data.fireRUStats.basal_area:0.;
-            if (FireScript::fireRUValueType=="baseIgnition") return data.baseIgnitionProbability();
+            if (FireScript::runState_fireRUValueType()=="kbdi") return data.kbdi();
+            if (FireScript::runState_fireRUValueType()=="dbh") return data.fireRUStats.avg_dbh;
+            if (FireScript::runState_fireRUValueType()=="crownkill") return data.fireRUStats.crown_kill;
+            if (FireScript::runState_fireRUValueType()=="basalarea") return data.fireRUStats.basal_area>0?data.fireRUStats.died_basal_area / data.fireRUStats.basal_area:0.;
+            if (FireScript::runState_fireRUValueType()=="baseIgnition") return data.baseIgnitionProbability();
             return 0.;
         }); // use a specific value function (see above) &fireRUValue
         return true;

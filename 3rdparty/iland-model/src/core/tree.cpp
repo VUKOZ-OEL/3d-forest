@@ -35,20 +35,63 @@
 #include "landscapeout.h"
 
 // static varaibles
-FloatGrid *Tree::mGrid = nullptr;
-HeightGrid *Tree::mHeightGrid = nullptr;
-TreeRemovedOut *Tree::mRemovalOutput = nullptr;
-LandscapeRemovedOut *Tree::mLSRemovalOutput = nullptr;
-Saplings *Tree::saps = nullptr;
-int Tree::m_statPrint=0;
-int Tree::m_statAboveZ=0;
-int Tree::m_statCreated=0;
-int Tree::m_nextId=0;
+Tree::RunType_mGrid &Tree::runState_mGrid()
+{
+    struct State { RunType_mGrid value = nullptr; };
+    return SimulationContext::state<State>().value;
+}
+Tree::RunType_mHeightGrid &Tree::runState_mHeightGrid()
+{
+    struct State { RunType_mHeightGrid value = nullptr; };
+    return SimulationContext::state<State>().value;
+}
+Tree::RunType_mRemovalOutput &Tree::runState_mRemovalOutput()
+{
+    struct State { RunType_mRemovalOutput value = nullptr; };
+    return SimulationContext::state<State>().value;
+}
+Tree::RunType_mLSRemovalOutput &Tree::runState_mLSRemovalOutput()
+{
+    struct State { RunType_mLSRemovalOutput value = nullptr; };
+    return SimulationContext::state<State>().value;
+}
+Tree::RunType_m_statPrint &Tree::runState_m_statPrint()
+{
+    struct State { RunType_m_statPrint value = 0; };
+    return SimulationContext::state<State>().value;
+}
+Tree::RunType_m_statAboveZ &Tree::runState_m_statAboveZ()
+{
+    struct State { RunType_m_statAboveZ value = 0; };
+    return SimulationContext::state<State>().value;
+}
+Tree::RunType_m_statCreated &Tree::runState_m_statCreated()
+{
+    struct State { RunType_m_statCreated value = 0; };
+    return SimulationContext::state<State>().value;
+}
+Tree::RunType_m_nextId &Tree::runState_m_nextId()
+{
+    struct State { RunType_m_nextId value = 0; };
+    return SimulationContext::state<State>().value;
+}
 
 #ifdef ALT_TREE_MORTALITY
-static double _stress_threshold = 0.05;
-static int _stress_years = 5;
-static double _stress_death_prob = 0.33;
+static double &runFile__stress_threshold()
+{
+    struct State { double value = 0.05; };
+    return SimulationContext::state<State>().value;
+}
+static int &runFile__stress_years()
+{
+    struct State { int value = 5; };
+    return SimulationContext::state<State>().value;
+}
+static double &runFile__stress_death_prob()
+{
+    struct State { double value = 0.33; };
+    return SimulationContext::state<State>().value;
+}
 #endif
 
 /** @class Tree
@@ -75,7 +118,11 @@ double dist_and_direction(const QPointF &PStart, const QPointF &PEnd, double &rA
 
 
 // lifecycle
-static QMutex _protectTreeId;
+static QMutex &runFile__protectTreeId()
+{
+    struct State { QMutex value = {}; };
+    return SimulationContext::state<State>().value;
+}
 Tree::Tree()
 {
     mDbh = mHeight = 0;
@@ -86,11 +133,10 @@ Tree::Tree()
     mLightResponse = 0.;
     mStamp = nullptr;
 
-    m_statCreated++;
-    saps = GlobalSettings::instance()->model()->saplings(); // save link to saplings to static variable
 
-    QMutexLocker lock(&_protectTreeId); // make sure tree Ids are unique
-    mId = m_nextId++;
+    QMutexLocker lock(&runFile__protectTreeId()); // make sure tree Ids are unique
+    ++runState_m_statCreated();
+    mId = runState_m_nextId()++;
 
 }
 
@@ -105,7 +151,7 @@ float Tree::crownRadius() const
 
 void Tree::setGrid(FloatGrid* gridToStamp, Grid<HeightGridValue> *dominanceGrid)
 {
-    mGrid = gridToStamp; mHeightGrid = dominanceGrid;
+    runState_mGrid() = gridToStamp; runState_mHeightGrid() = dominanceGrid;
 }
 
 // calculate the thickness of the bark of the tree
@@ -177,7 +223,7 @@ void Tree::applyLIP()
 {
     if (!mStamp)
         return;
-    Q_ASSERT(mGrid!=0 && mStamp!=0 && mRU!=0);
+    Q_ASSERT(runState_mGrid()!=0 && mStamp!=0 && mRU!=0);
     QPoint pos = mPositionIndex;
     int offset = mStamp->offset();
     pos-=QPoint(offset, offset);
@@ -187,20 +233,20 @@ void Tree::applyLIP()
     float value, z, z_zstar;
     int gr_stamp = mStamp->size();
 
-    if (!mGrid->isIndexValid(pos) || !mGrid->isIndexValid(pos+QPoint(gr_stamp, gr_stamp))) {
+    if (!runState_mGrid()->isIndexValid(pos) || !runState_mGrid()->isIndexValid(pos+QPoint(gr_stamp, gr_stamp))) {
         // this should not happen because of the buffer
         return;
     }
     int grid_y = pos.y();
     for (y=0;y<gr_stamp; ++y) {
 
-        float *grid_value_ptr = mGrid->ptr(pos.x(), grid_y);
+        float *grid_value_ptr = runState_mGrid()->ptr(pos.x(), grid_y);
         int grid_x = pos.x();
         for (x=0;x<gr_stamp;++x, ++grid_x, ++grid_value_ptr) {
             // suppose there is no stamping outside
             value = (*mStamp)(x,y); // stampvalue
             //if (value>0.f) {
-                local_dom = (*mHeightGrid)(grid_x/cPxPerHeight, grid_y/cPxPerHeight).height;
+                local_dom = (*runState_mHeightGrid())(grid_x/cPxPerHeight, grid_y/cPxPerHeight).height;
                 z = std::max(mHeight - (*mStamp).distanceToCenter(x,y), 0.f); // distance to center = height (45 degree line)
                 z_zstar = (z>=local_dom)?1.f:z/local_dom;
                 value = 1.f - value*mOpacity * z_zstar; // calculated value
@@ -213,7 +259,7 @@ void Tree::applyLIP()
         grid_y++;
     }
 
-    m_statPrint++; // count # of stamp applications...
+    runState_m_statPrint()++; // count # of stamp applications...
 }
 
 /// helper function for gluing the edges together
@@ -232,8 +278,8 @@ void Tree::applyLIP_torus()
 {
     if (!mStamp)
         return;
-    Q_ASSERT(mGrid!=0 && mStamp!=0 && mRU!=0);
-    int bufferOffset = mGrid->indexAt(QPointF(0.,0.)).x(); // offset of buffer
+    Q_ASSERT(runState_mGrid()!=0 && mStamp!=0 && mRU!=0);
+    int bufferOffset = runState_mGrid()->indexAt(QPointF(0.,0.)).x(); // offset of buffer
     QPoint pos = QPoint((mPositionIndex.x()-bufferOffset)%cPxPerRU  + bufferOffset,
                         (mPositionIndex.y()-bufferOffset)%cPxPerRU + bufferOffset); // offset within the ha
     QPoint ru_offset = QPoint(mPositionIndex.x() - pos.x(), mPositionIndex.y() - pos.y()); // offset of the corner of the resource index
@@ -247,7 +293,7 @@ void Tree::applyLIP_torus()
     int gr_stamp = mStamp->size();
     int grid_x, grid_y;
     float *grid_value;
-    if (!mGrid->isIndexValid(pos) || !mGrid->isIndexValid(pos+QPoint(gr_stamp, gr_stamp))) {
+    if (!runState_mGrid()->isIndexValid(pos) || !runState_mGrid()->isIndexValid(pos+QPoint(gr_stamp, gr_stamp))) {
         // todo: in this case we should use another algorithm!!! necessary????
         return;
     }
@@ -261,7 +307,7 @@ void Tree::applyLIP_torus()
             grid_x = pos.x() + x;
             xt = torusIndex(grid_x,cPxPerRU,bufferOffset, ru_offset.x());
 
-            local_dom = mHeightGrid->valueAtIndex(xt/cPxPerHeight,yt/cPxPerHeight).height;
+            local_dom = runState_mHeightGrid()->valueAtIndex(xt/cPxPerHeight,yt/cPxPerHeight).height;
 
             z = std::max(mHeight - (*mStamp).distanceToCenter(x,y), 0.f); // distance to center = height (45 degree line)
             z_zstar = (z>=local_dom)?1.f:z/local_dom;
@@ -270,12 +316,12 @@ void Tree::applyLIP_torus()
             // old: value = 1. - value*mOpacity / local_dom; // calculated value
             value = qMax(value, 0.02f); // limit value
 
-            grid_value = mGrid->ptr(xt, yt); // use wraparound coordinates
+            grid_value = runState_mGrid()->ptr(xt, yt); // use wraparound coordinates
             *grid_value *= value;
         }
     }
 
-    m_statPrint++; // count # of stamp applications...
+    runState_m_statPrint()++; // count # of stamp applications...
 }
 
 /** heightGrid()
@@ -287,7 +333,7 @@ void Tree::heightGrid()
     QPoint p = QPoint(mPositionIndex.x()/cPxPerHeight, mPositionIndex.y()/cPxPerHeight); // pos of tree on height grid
 
     // count trees that are on height-grid cells (used for stockable area)
-    HeightGridValue &hgv = mHeightGrid->valueAtIndex(p);
+    HeightGridValue &hgv = runState_mHeightGrid()->valueAtIndex(p);
     hgv.increaseCount();
     if (mHeight > hgv.height) {
         hgv.height=mHeight;
@@ -303,16 +349,16 @@ void Tree::heightGrid()
     int index_eastwest = mPositionIndex.x() % cPxPerHeight; // 4: very west, 0 east edge
     int index_northsouth = mPositionIndex.y() % cPxPerHeight; // 4: northern edge, 0: southern edge
     if (index_eastwest - r < 0) { // east
-        mHeightGrid->valueAtIndex(p.x()-1, p.y()).height=qMax(mHeightGrid->valueAtIndex(p.x()-1, p.y()).height,mHeight);
+        runState_mHeightGrid()->valueAtIndex(p.x()-1, p.y()).height=qMax(runState_mHeightGrid()->valueAtIndex(p.x()-1, p.y()).height,mHeight);
     }
     if (index_eastwest + r >= cPxPerHeight) {  // west
-        mHeightGrid->valueAtIndex(p.x()+1, p.y()).height=qMax(mHeightGrid->valueAtIndex(p.x()+1, p.y()).height,mHeight);
+        runState_mHeightGrid()->valueAtIndex(p.x()+1, p.y()).height=qMax(runState_mHeightGrid()->valueAtIndex(p.x()+1, p.y()).height,mHeight);
     }
     if (index_northsouth - r < 0) {  // south
-        mHeightGrid->valueAtIndex(p.x(), p.y()-1).height=qMax(mHeightGrid->valueAtIndex(p.x(), p.y()-1).height,mHeight);
+        runState_mHeightGrid()->valueAtIndex(p.x(), p.y()-1).height=qMax(runState_mHeightGrid()->valueAtIndex(p.x(), p.y()-1).height,mHeight);
     }
     if (index_northsouth + r >= cPxPerHeight) {  // north
-        mHeightGrid->valueAtIndex(p.x(), p.y()+1).height=qMax(mHeightGrid->valueAtIndex(p.x(), p.y()+1).height,mHeight);
+        runState_mHeightGrid()->valueAtIndex(p.x(), p.y()+1).height=qMax(runState_mHeightGrid()->valueAtIndex(p.x(), p.y()+1).height,mHeight);
     }
 
 
@@ -367,7 +413,7 @@ void Tree::heightGrid_torus()
     // height of Z*
 
     QPoint p = QPoint(mPositionIndex.x()/cPxPerHeight, mPositionIndex.y()/cPxPerHeight); // pos of tree on height grid
-    int bufferOffset = mHeightGrid->indexAt(QPointF(0.,0.)).x(); // offset of buffer (i.e.: size of buffer in height-pixels)
+    int bufferOffset = runState_mHeightGrid()->indexAt(QPointF(0.,0.)).x(); // offset of buffer (i.e.: size of buffer in height-pixels)
     p.setX((p.x()-bufferOffset)%10 + bufferOffset); // 10: 10 x 10m pixeln in 100m
     p.setY((p.y()-bufferOffset)%10 + bufferOffset);
 
@@ -376,7 +422,7 @@ void Tree::heightGrid_torus()
     QPoint ru_offset =QPoint(mPositionIndex.x()/cPxPerHeight - p.x(), mPositionIndex.y()/cPxPerHeight - p.y());
 
     // count trees that are on height-grid cells (used for stockable area)
-    HeightGridValue &v = mHeightGrid->valueAtIndex(torusIndex(p.x(),10,bufferOffset,ru_offset.x()),
+    HeightGridValue &v = runState_mHeightGrid()->valueAtIndex(torusIndex(p.x(),10,bufferOffset,ru_offset.x()),
                                                    torusIndex(p.y(),10,bufferOffset,ru_offset.y()));
     v.increaseCount();
     v.height = qMax(v.height, mHeight);
@@ -389,22 +435,22 @@ void Tree::heightGrid_torus()
     int index_eastwest = mPositionIndex.x() % cPxPerHeight; // 4: very west, 0 east edge
     int index_northsouth = mPositionIndex.y() % cPxPerHeight; // 4: northern edge, 0: southern edge
     if (index_eastwest - r < 0) { // east
-        HeightGridValue &v = mHeightGrid->valueAtIndex(torusIndex(p.x()-1,10,bufferOffset,ru_offset.x()),
+        HeightGridValue &v = runState_mHeightGrid()->valueAtIndex(torusIndex(p.x()-1,10,bufferOffset,ru_offset.x()),
                                                        torusIndex(p.y(),10,bufferOffset,ru_offset.y()));
         v.height = qMax(v.height, mHeight);
     }
     if (index_eastwest + r >= cPxPerHeight) {  // west
-        HeightGridValue &v = mHeightGrid->valueAtIndex(torusIndex(p.x()+1,10,bufferOffset,ru_offset.x()),
+        HeightGridValue &v = runState_mHeightGrid()->valueAtIndex(torusIndex(p.x()+1,10,bufferOffset,ru_offset.x()),
                                                        torusIndex(p.y(),10,bufferOffset,ru_offset.y()));
         v.height = qMax(v.height, mHeight);
     }
     if (index_northsouth - r < 0) {  // south
-        HeightGridValue &v = mHeightGrid->valueAtIndex(torusIndex(p.x(),10,bufferOffset,ru_offset.x()),
+        HeightGridValue &v = runState_mHeightGrid()->valueAtIndex(torusIndex(p.x(),10,bufferOffset,ru_offset.x()),
                                                        torusIndex(p.y()-1,10,bufferOffset,ru_offset.y()));
         v.height = qMax(v.height, mHeight);
     }
     if (index_northsouth + r >= cPxPerHeight) {  // north
-        HeightGridValue &v = mHeightGrid->valueAtIndex(torusIndex(p.x(),10,bufferOffset,ru_offset.x()),
+        HeightGridValue &v = runState_mHeightGrid()->valueAtIndex(torusIndex(p.x(),10,bufferOffset,ru_offset.x()),
                                                        torusIndex(p.y()+1,10,bufferOffset,ru_offset.y()));
         v.height = qMax(v.height, mHeight);
     }
@@ -488,10 +534,10 @@ void Tree::readLIF()
     int rx = pos_reader.x();
     int ry = pos_reader.y();
     for (y=0;y<reader_size; ++y, ++ry) {
-        grid_value = mGrid->ptr(rx, ry);
+        grid_value = runState_mGrid()->ptr(rx, ry);
         for (x=0;x<reader_size;++x) {
 
-            const HeightGridValue &hgv = mHeightGrid->constValueAtIndex((rx+x)/cPxPerHeight, ry/cPxPerHeight); // the height grid value, ry: gets ++ed in outer loop, rx not
+            const HeightGridValue &hgv = runState_mHeightGrid()->constValueAtIndex((rx+x)/cPxPerHeight, ry/cPxPerHeight); // the height grid value, ry: gets ++ed in outer loop, rx not
             local_dom = hgv.height;
             z = std::max(mHeight - reader->distanceToCenter(x,y), 0.f); // distance to center = height (45 degree line)
             z_zstar = (z>=local_dom)?1.f:z/local_dom;
@@ -511,7 +557,7 @@ void Tree::readLIF()
     }
     mLRI = static_cast<float>( sum );
     // LRI correction...
-    double hrel = mHeight / mHeightGrid->valueAtIndex(mPositionIndex.x()/cPxPerHeight, mPositionIndex.y()/cPxPerHeight).height;
+    double hrel = mHeight / runState_mHeightGrid()->valueAtIndex(mPositionIndex.x()/cPxPerHeight, mPositionIndex.y()/cPxPerHeight).height;
     if (hrel<1.)
         mLRI = static_cast<float>( species()->speciesSet()->LRIcorrection(mLRI, hrel) );
 
@@ -533,7 +579,7 @@ void Tree::readLIF_torus()
     const Stamp *reader = mStamp->reader();
     if (!reader)
         return;
-    int bufferOffset = mGrid->indexAt(QPointF(0.,0.)).x(); // offset of buffer
+    int bufferOffset = runState_mGrid()->indexAt(QPointF(0.,0.)).x(); // offset of buffer
 
     QPoint pos_reader = QPoint((mPositionIndex.x()-bufferOffset)%cPxPerRU + bufferOffset,
                                (mPositionIndex.y()-bufferOffset)%cPxPerRU + bufferOffset); // offset within the ha
@@ -561,9 +607,9 @@ void Tree::readLIF_torus()
         yt = torusIndex(ry+y,cPxPerRU, bufferOffset, ru_offset.y());
         for (x=0;x<reader_size;++x) {
             xt = torusIndex(rx+x,cPxPerRU, bufferOffset, ru_offset.x());
-            grid_value = mGrid->ptr(xt,yt);
+            grid_value = runState_mGrid()->ptr(xt,yt);
 
-            local_dom = mHeightGrid->valueAtIndex(xt/cPxPerHeight, yt/cPxPerHeight).height; // ry: gets ++ed in outer loop, rx not
+            local_dom = runState_mHeightGrid()->valueAtIndex(xt/cPxPerHeight, yt/cPxPerHeight).height; // ry: gets ++ed in outer loop, rx not
             z = std::max(mHeight - reader->distanceToCenter(x,y), 0.f); // distance to center = height (45 degree line)
             z_zstar = (z>=local_dom)?1.f:z/local_dom;
 
@@ -582,7 +628,7 @@ void Tree::readLIF_torus()
     mLRI = static_cast<float>( sum );
 
     // LRI correction...
-    double hrel = mHeight / mHeightGrid->valueAtIndex(mPositionIndex.x()/cPxPerHeight, mPositionIndex.y()/cPxPerHeight).height;
+    double hrel = mHeight / runState_mHeightGrid()->valueAtIndex(mPositionIndex.x()/cPxPerHeight, mPositionIndex.y()/cPxPerHeight).height;
     if (hrel<1.)
         mLRI = static_cast<float>( species()->speciesSet()->LRIcorrection(mLRI, hrel) );
 
@@ -602,19 +648,19 @@ void Tree::readLIF_torus()
 
 void Tree::resetStatistics()
 {
-    m_statPrint=0;
-    m_statCreated=0;
-    m_statAboveZ=0;
-    m_nextId=1;
+    runState_m_statPrint()=0;
+    runState_m_statCreated()=0;
+    runState_m_statAboveZ()=0;
+    runState_m_nextId()=1;
 }
 
 #ifdef ALT_TREE_MORTALITY
 void Tree::mortalityParams(double dbh_inc_threshold, int stress_years, double stress_mort_prob)
 {
-    _stress_threshold = dbh_inc_threshold;
-    _stress_years = stress_years;
-    _stress_death_prob = stress_mort_prob;
-    qDebug() << "Alternative Mortality enabled: threshold" << dbh_inc_threshold << ", years:" << _stress_years << ", level:" << _stress_death_prob;
+    runFile__stress_threshold() = dbh_inc_threshold;
+    runFile__stress_years() = stress_years;
+    runFile__stress_death_prob() = stress_mort_prob;
+    qDebug() << "Alternative Mortality enabled: threshold" << dbh_inc_threshold << ", years:" << runFile__stress_years() << ", level:" << runFile__stress_death_prob();
 }
 #endif
 
@@ -668,13 +714,13 @@ void Tree::grow()
     d.NPP = gpp * cAutotrophicRespiration; // respiration loss (0.47), cf. Waring et al 1998.
 
     //DBGMODE(
-        if (GlobalSettings::instance()->isDebugEnabled(GlobalSettings::dTreeNPP) && isDebugging()) {
-            DebugList &out = GlobalSettings::instance()->debugList(mId, GlobalSettings::dTreeNPP);
+        if (SimulationSettings::current().isDebugEnabled(SimulationSettings::dTreeNPP) && isDebugging()) {
+            DebugList &out = SimulationSettings::current().debugList(mId, SimulationSettings::dTreeNPP);
             dumpList(out); // add tree headers
             out << mLRI * mRU->LRImodifier() << mLightResponse << effective_area << raw_gpp << gpp << d.NPP << aging_factor;
         }
     //); // DBGMODE()
-    if (Globals->model()->settings().growthEnabled) {
+    if (SimulationSettings::current().model()->settings().growthEnabled) {
             partitioning(d); // split npp to compartments and grow (diameter, height), but also calculate stress index of the tree.
     }
 
@@ -694,8 +740,8 @@ void Tree::grow()
         mRU->resourceUnitSpecies(species()).statistics().add(this, &d);
         // regeneration
         mSpecies->seedProduction(this);
-        if (saps)
-            saps->addSprout(this, false); // check for random sprouts
+        if (SimulationSettings::current().model()->saplings())
+            SimulationSettings::current().model()->saplings()->addSprout(this, false); // check for random sprouts
     } else {
         // we include the NPP of trees that died in the current year (closed carbon balance)
         mRU->resourceUnitSpecies(species()).statistics().addNPP(&d);
@@ -856,9 +902,9 @@ inline void Tree::partitioning(TreeGrowthData &d)
 
 
     //DBGMODE(
-     if (GlobalSettings::instance()->isDebugEnabled(GlobalSettings::dTreePartition)
+     if (SimulationSettings::current().isDebugEnabled(SimulationSettings::dTreePartition)
          /*&& isDebugging()*/ ) {
-            DebugList &out = GlobalSettings::instance()->debugList(mId, GlobalSettings::dTreePartition);
+            DebugList &out = SimulationSettings::current().debugList(mId, SimulationSettings::dTreePartition);
             dumpList(out); // add tree headers
             out << mFineRootMass << biomassBranch() << d.NPP << apct_foliage << apct_wood << apct_root
                     << delta_foliage << net_woody << net_root_inc << mass_lost << mNPPReserve << net_stem << d.stress_index;
@@ -869,7 +915,7 @@ inline void Tree::partitioning(TreeGrowthData &d)
       if (mStemMass<0. || mStemMass>50000 || mFoliageMass<0. || mFoliageMass>2000. || mCoarseRootMass<0. || mCoarseRootMass>30000
          || mNPPReserve>4000.) {
          qDebug() << "Tree:partitioning: invalid or unlikely pools.";
-         qDebug() << GlobalSettings::instance()->debugListCaptions(GlobalSettings::DebugOutputs(0));
+         qDebug() << SimulationSettings::current().debugListCaptions(SimulationSettings::DebugOutputs(0));
          DebugList dbg; dumpList(dbg);
          qDebug() << dbg;
      } );
@@ -952,8 +998,8 @@ inline void Tree::grow_diameter(TreeGrowthData &d)
         DBG_IF_X( (res_final==0.?fabs(mass_factor * (d_m + d_increment)*(d_m + d_increment)*(mHeight + d_increment*hd_growth)-((stem_mass + net_stem_npp))):res_final) > 1, "Tree::grow_diameter", "final residual stem estimate > 1kg", dump());
         DBG_IF_X(d_increment > 10. || d_increment*hd_growth >10., "Tree::grow_diameter", "growth out of bound:",QString("d-increment %1 h-increment %2 ").arg(d_increment).arg(d_increment*hd_growth/100.) + dump());
 
-        if (GlobalSettings::instance()->isDebugEnabled(GlobalSettings::dTreeGrowth) /*&& isDebugging()*/ ) {
-            DebugList &out = GlobalSettings::instance()->debugList(mId, GlobalSettings::dTreeGrowth);
+        if (SimulationSettings::current().isDebugEnabled(SimulationSettings::dTreeGrowth) /*&& isDebugging()*/ ) {
+            DebugList &out = SimulationSettings::current().debugList(mId, SimulationSettings::dTreeGrowth);
             dumpList(out); // add tree headers
             out << net_stem_npp << stem_mass << hd_growth << factor_diameter << delta_d_estimate*100 << d_increment*100;
         }
@@ -1019,8 +1065,8 @@ void Tree::remove(double removeFoliage, double removeBranch, double removeStem )
     else
         notifyTreeRemoved(TreeHarvest);
 
-    if (saps)
-        saps->addSprout(this, true);
+    if (SimulationSettings::current().model()->saplings())
+        SimulationSettings::current().model()->saplings()->addSprout(this, true);
 
     if (ru()->snag())
         ru()->snag()->addHarvest(this, removeStem, removeBranch, removeFoliage);
@@ -1040,8 +1086,8 @@ void Tree::removeDisturbance(const double stem_to_soil_fraction,
     rus.statisticsDead().add(this, nullptr);
     notifyTreeRemoved(TreeDisturbance);
 
-    if (saps)
-        saps->addSprout(this, true);
+    if (SimulationSettings::current().model()->saplings())
+        SimulationSettings::current().model()->saplings()->addSprout(this, true);
 
     if (ru()->snag()) {
         if (isHarvested()) { // if the tree is harvested, do the same as in normal tree harvest (but with default values)
@@ -1084,7 +1130,7 @@ void Tree::removeRootBiomass(const double removeFineRootFraction, const double r
 void Tree::setHeight(const float height)
 {
     if (height<=0.f || height>150.f)
-        qWarning() << "trying to set tree height to invalid value:" << height << " for tree on RU:" << (mRU?mRU->boundingBox():QRect());
+        qWarning() << "trying to set tree height to invalid value:" << height << " for tree on RU:" << (mRU?mRU->boundingBox():QRectF());
     mHeight=height;
 }
 
@@ -1117,10 +1163,10 @@ void Tree::altMortality(TreeGrowthData &d)
     double  p_intrinsic, p_stress=0.;
     p_intrinsic = species()->deathProb_intrinsic();
 
-    if (mDbhDelta < _stress_threshold) {
+    if (mDbhDelta < runFile__stress_threshold()) {
         mStressIndex++;
-        if (mStressIndex> _stress_years)
-            p_stress = _stress_death_prob;
+        if (mStressIndex> runFile__stress_years())
+            p_stress = runFile__stress_death_prob();
     } else
         mStressIndex = 0;
 
@@ -1135,16 +1181,16 @@ void Tree::altMortality(TreeGrowthData &d)
 void Tree::notifyTreeRemoved(TreeRemovalType reason)
 {
     // this information is used to track the removed volume for stands based on grids (and for salvaging operations)
-    ABE::ForestManagementEngine *abe = GlobalSettings::instance()->model()->ABEngine();
+    ABE::ForestManagementEngine *abe = SimulationSettings::current().model()->ABEngine();
     if (abe)
         abe->notifyTreeRemoval(this, static_cast<int>(reason));
 
-    BITE::BiteEngine *bite = GlobalSettings::instance()->model()->biteEngine();
+    BITE::BiteEngine *bite = SimulationSettings::current().model()->biteEngine();
     if (bite)
         bite->notifyTreeRemoval(this, static_cast<int>(reason));
 
     // tell disturbance modules that a tree died
-    GlobalSettings::instance()->model()->modules()->treeDeath(this, static_cast<int>(reason) );
+    SimulationSettings::current().model()->modules()->treeDeath(this, static_cast<int>(reason) );
 
     // update reason, if ABE handled the tree
     if (reason==TreeDisturbance && isHarvested())
@@ -1152,10 +1198,10 @@ void Tree::notifyTreeRemoved(TreeRemovalType reason)
     if (isCutdown())
         reason = TreeCutDown;
     // create output for tree removals
-    if (mRemovalOutput && mRemovalOutput->isEnabled())
-        mRemovalOutput->execRemovedTree(this, static_cast<int>(reason));
-    if (mLSRemovalOutput && mLSRemovalOutput->isEnabled())
-        mLSRemovalOutput->execRemovedTree(this, static_cast<int>(reason));
+    if (runState_mRemovalOutput() && runState_mRemovalOutput()->isEnabled())
+        runState_mRemovalOutput()->execRemovedTree(this, static_cast<int>(reason));
+    if (runState_mLSRemovalOutput() && runState_mLSRemovalOutput()->isEnabled())
+        runState_mLSRemovalOutput()->execRemovedTree(this, static_cast<int>(reason));
 }
 
 //////////////////////////////////////////////////

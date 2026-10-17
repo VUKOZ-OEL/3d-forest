@@ -28,7 +28,7 @@
 
 
 #include <QtCore>
-#include "globalsettings.h"
+#include "simulationsettings.h"
 
 #include "species.h"
 #include "speciesset.h"
@@ -52,7 +52,7 @@ Species::~Species()
 void Species::setup()
 {
     Q_ASSERT(mSet != nullptr);
-    const XmlHelper &xml=GlobalSettings::instance()->settings();
+    const XmlHelper &xml=SimulationSettings::current().settings();
 
     // setup general information
     mId = stringVar("shortName");
@@ -65,10 +65,10 @@ void Species::setup()
 #endif
     QString stampFile = stringVar("LIPFile");
     // load stamps
-    mLIPs.load( GlobalSettings::instance()->path(stampFile, "lip") );
+    mLIPs.load( SimulationSettings::current().path(stampFile, "lip") );
     // attach writer stamps to reader stamps
     mLIPs.attachReaderStamps(mSet->readerStamps());
-    if (GlobalSettings::instance()->settings().paramValueBool("debugDumpStamps", false) )
+    if (SimulationSettings::current().settings().paramValueBool("debugDumpStamps", false) )
         qDebug() << mLIPs.dump();
 
     // general properties
@@ -217,7 +217,7 @@ void Species::setup()
     mSaplingGrowthParams.setupReinekeLookup();
 
     mSaplingGrowthParams.adultSproutProbability = 0.;
-    QString adult_sprout = GlobalSettings::instance()->settings().value("model.species.sprouting.adultSproutProbability");
+    QString adult_sprout = SimulationSettings::current().settings().value("model.species.sprouting.adultSproutProbability");
     if (!adult_sprout.isEmpty()) {
         QStringList sprout_prob_list = adult_sprout.split(QRegularExpression("([^\\.\\w]+)"));
 

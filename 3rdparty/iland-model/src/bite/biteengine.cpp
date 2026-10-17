@@ -26,7 +26,7 @@
 #include "biteoutput.h"
 
 // iLand specific
-#include "globalsettings.h"
+#include "simulationsettings.h"
 #include "helper.h"
 #include "modelcontroller.h"
 #include "debugtimer.h"
@@ -39,7 +39,11 @@ Q_LOGGING_CATEGORY(biteSetup, "bite.setup")
 
 namespace BITE {
 
-BiteEngine *BiteEngine::mInstance=nullptr;
+BiteEngine::RunType_mInstance &BiteEngine::runState_mInstance()
+{
+    struct State { RunType_mInstance value = nullptr; };
+    return SimulationContext::state<State>().value;
+}
 
 
 BiteEngine::BiteEngine()
@@ -52,10 +56,11 @@ BiteEngine::~BiteEngine()
 {
     // delete all agents
     for (auto *a : mAgents) {
-        GlobalSettings::instance()->controller()->removePaintLayers(a);
+        SimulationSettings::current().controller()->removePaintLayers(a);
         delete a;
     }
-    mInstance=nullptr;
+    BiteAgent::clearThreadLists();
+    runState_mInstance()=nullptr;
 }
 
 void BiteEngine::setup()
@@ -67,8 +72,8 @@ void BiteEngine::setup()
 
     resetErrors();
 
-    if (!GlobalSettings::instance()->outputManager()->find("bite")) {
-        GlobalSettings::instance()->outputManager()->addOutput(new BiteOutput);
+    if (!SimulationSettings::current().outputManager()->find("bite")) {
+        SimulationSettings::current().outputManager()->addOutput(new BiteOutput);
     }
 
 
@@ -77,7 +82,7 @@ void BiteEngine::setup()
 
 
     // now load the javascript and execute
-    QString file_name = GlobalSettings::instance()->path(GlobalSettings::instance()->settings().value("modules.bite.file"));
+    QString file_name = SimulationSettings::current().path(SimulationSettings::current().settings().value("modules.bite.file"));
     mRunning = true;
 
     QString code = Helper::loadTextFile(file_name);
@@ -85,7 +90,7 @@ void BiteEngine::setup()
         throw IException("Loading of BITE script file '"  + file_name + "'failed; file missing or empty.");
 
     qCDebug(biteSetup) << "Loading script file" << file_name;
-    QJSValue result = GlobalSettings::instance()->scriptEngine()->evaluate(code, file_name);
+    QJSValue result = SimulationSettings::current().scriptEngine()->evaluate(code, file_name);
     mRunning = false;
     if (result.isError()) {
         int lineno = result.property("lineNumber").toInt();
@@ -113,7 +118,7 @@ void BiteEngine::addAgent(BiteAgent *new_agent)
         qCInfo(bite) << "adding an agent with a name already in use. Deleting the *old* agent.";
         mAgents.removeOne(a);
         // remove agent from UI
-        GlobalSettings::instance()->controller()->removePaintLayers(a);
+        SimulationSettings::current().controller()->removePaintLayers(a);
         delete a;
     }
     mAgents.push_back(new_agent);
@@ -121,7 +126,7 @@ void BiteEngine::addAgent(BiteAgent *new_agent)
     QStringList varlist = new_agent->wrapper()->getVariablesList();
     for (int i=0;i<varlist.size();++i)
         varlist[i] = QString("Bite:%1 - %2").arg(new_agent->name()).arg(varlist[i]);
-    GlobalSettings::instance()->controller()->addPaintLayers(new_agent, varlist);
+    SimulationSettings::current().controller()->addPaintLayers(new_agent, varlist);
 
 }
 
@@ -144,7 +149,7 @@ QStringList BiteEngine::agentNames()
 QJSEngine *BiteEngine::scriptEngine()
 {
     // use global engine from iLand
-    return GlobalSettings::instance()->scriptEngine();
+    return SimulationSettings::current().scriptEngine();
 
 }
 
@@ -219,7 +224,7 @@ void BiteEngine::run()
         }
     }
     // execute bite related outputs
-    GlobalSettings::instance()->outputManager()->execute("bite");
+    SimulationSettings::current().outputManager()->execute("bite");
 }
 
 void BiteEngine::error(QString error_msg)
@@ -227,7 +232,7 @@ void BiteEngine::error(QString error_msg)
     mErrorStack.push_back(error_msg);
     mHasScriptError = true;
     if (!mRunning) {
-        GlobalSettings::instance()->scriptEngine()->throwError(error_msg);
+        SimulationSettings::current().scriptEngine()->throwError(error_msg);
         //throw IException("Bite Error: " + error_msg);
     }
 }

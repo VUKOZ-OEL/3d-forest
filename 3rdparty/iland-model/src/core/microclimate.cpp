@@ -8,7 +8,11 @@
 #include "dem.h"
 #include "climate.h"
 
-Microclimate::MicroClimateSettings Microclimate::mSettings = {true, true, true};
+Microclimate::RunType_mSettings &Microclimate::runState_mSettings()
+{
+    struct State { RunType_mSettings value = {true, true, true}; };
+    return SimulationContext::state<State>().value;
+}
 
 
 Microclimate::Microclimate(const ResourceUnit *ru)
@@ -17,9 +21,9 @@ Microclimate::Microclimate(const ResourceUnit *ru)
     mCells = new MicroclimateCell[cHeightPerRU*cHeightPerRU];
     mIsSetup = false;
     // setup of effect switches (static variable)
-    mSettings.barkbeetle_effect = GlobalSettings::instance()->settings().valueBool("model.climate.microclimate.barkbeetle");
-    mSettings.decomposition_effect = GlobalSettings::instance()->settings().valueBool("model.climate.microclimate.decomposition");
-    mSettings.establishment_effect = GlobalSettings::instance()->settings().valueBool("model.climate.microclimate.establishment");
+    runState_mSettings().barkbeetle_effect = SimulationSettings::current().settings().valueBool("model.climate.microclimate.barkbeetle");
+    runState_mSettings().decomposition_effect = SimulationSettings::current().settings().valueBool("model.climate.microclimate.decomposition");
+    runState_mSettings().establishment_effect = SimulationSettings::current().settings().valueBool("model.climate.microclimate.establishment");
 }
 
 Microclimate::~Microclimate()
@@ -167,14 +171,14 @@ QPointF Microclimate::cellCoord(int index)
 
 void Microclimate::calculateFixedFactors()
 {
-    if (!GlobalSettings::instance()->model()->dem())
+    if (!SimulationSettings::current().model()->dem())
         throw IException("The iLand Microclimate module requires a digital elevation model (DEM).");
 
 
     // extract fixed factors from DEM
-    const DEM *dem =  GlobalSettings::instance()->model()->dem();
+    const DEM *dem =  SimulationSettings::current().model()->dem();
 
-    HeightGrid *hg = GlobalSettings::instance()->model()->heightGrid();
+    HeightGrid *hg = SimulationSettings::current().model()->heightGrid();
 
     for (int i=0;i<cHeightPerRU*cHeightPerRU; ++i) {
         QPointF p = cellCoord(i);
@@ -206,7 +210,11 @@ void Microclimate::calculateFixedFactors()
     mIsSetup = true;
 }
 
-MicroclimateVisualizer *MicroclimateVisualizer::mVisualizer = nullptr;
+MicroclimateVisualizer::RunType_mVisualizer &MicroclimateVisualizer::runState_mVisualizer()
+{
+    struct State { RunType_mVisualizer value = nullptr; };
+    return SimulationContext::state<State>().value;
+}
 
 MicroclimateVisualizer::MicroclimateVisualizer(QObject *parent)
     :QObject(parent)
@@ -216,17 +224,17 @@ MicroclimateVisualizer::MicroclimateVisualizer(QObject *parent)
 
 MicroclimateVisualizer::~MicroclimateVisualizer()
 {
-    GlobalSettings::instance()->controller()->removePaintLayers(mVisualizer);
-    mVisualizer = nullptr;
+    SimulationSettings::current().controller()->removePaintLayers(runState_mVisualizer());
+    runState_mVisualizer() = nullptr;
 }
 
 void MicroclimateVisualizer::setupVisualization()
 {
     // add agent to UI
-    if (mVisualizer)
-        delete mVisualizer;
+    if (runState_mVisualizer())
+        delete runState_mVisualizer();
 
-    mVisualizer = new MicroclimateVisualizer();
+    runState_mVisualizer() = new MicroclimateVisualizer();
 
     QStringList varlist = {"Microclimate - LAI", "Microclimate - ShadeTol", // 0,1
                            "Microclimate - TPI", "Microclimate - Northness",  // 2,3
@@ -237,7 +245,7 @@ void MicroclimateVisualizer::setupVisualization()
                                          GridViewTurbo, GridViewTurbo,
                                          GridViewTurbo, GridViewTurbo,
                                          GridViewTurbo, GridViewTurbo};
-    GlobalSettings::instance()->controller()->addPaintLayers(mVisualizer, varlist, paint_types);
+    SimulationSettings::current().controller()->addPaintLayers(runState_mVisualizer(), varlist, paint_types);
 
 }
 
@@ -248,8 +256,8 @@ Grid<double> *MicroclimateVisualizer::paintGrid(QString what, QStringList &names
 
     if (mGrid.isEmpty()) {
         // setup grid with the dimensions of the iLand height grid
-        mGrid.setup(GlobalSettings::instance()->model()->heightGrid()->metricRect(),
-                    GlobalSettings::instance()->model()->heightGrid()->cellsize());
+        mGrid.setup(SimulationSettings::current().model()->heightGrid()->metricRect(),
+                    SimulationSettings::current().model()->heightGrid()->cellsize());
         mGrid.wipe(0.);
     }
     int index = 0;
@@ -264,7 +272,7 @@ Grid<double> *MicroclimateVisualizer::paintGrid(QString what, QStringList &names
 
     // fill the grid with the expected variable
 
-    foreach (ResourceUnit *ru, GlobalSettings::instance()->model()->ruList()) {
+    foreach (ResourceUnit *ru, SimulationSettings::current().model()->ruList()) {
         const Microclimate *clim = ru->microClimate();
         GridRunner<double> runner(mGrid, ru->boundingBox());
         int cell_index = 0;
@@ -294,8 +302,8 @@ Grid<double> *MicroclimateVisualizer::paintGrid(QString what, QStringList &names
 
 Grid<double> *MicroclimateVisualizer::grid(QString what, int month)
 {
-    Grid<double> *grid = new Grid<double>(GlobalSettings::instance()->model()->heightGrid()->metricRect(),
-                                         GlobalSettings::instance()->model()->heightGrid()->cellsize());
+    Grid<double> *grid = new Grid<double>(SimulationSettings::current().model()->heightGrid()->metricRect(),
+                                         SimulationSettings::current().model()->heightGrid()->cellsize());
     grid->wipe(0.);
     int index = -1;
     if (what == "LAI") index = 0;
@@ -311,7 +319,7 @@ Grid<double> *MicroclimateVisualizer::grid(QString what, int month)
 
     // fill the grid with the expected variable
 
-    foreach (ResourceUnit *ru, GlobalSettings::instance()->model()->ruList()) {
+    foreach (ResourceUnit *ru, SimulationSettings::current().model()->ruList()) {
         const Microclimate *clim = ru->microClimate();
         GridRunner<double> runner(grid, ru->boundingBox());
         int cell_index = 0;

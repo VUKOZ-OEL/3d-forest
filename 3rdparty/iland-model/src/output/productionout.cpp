@@ -88,9 +88,9 @@ void ProductionOut::execute(const ResourceUnitSpecies *rus)
 void ProductionOut::exec()
 {
     DebugTimer t("ProductionOut");
-    Model *m = GlobalSettings::instance()->model();
+    Model *m = SimulationSettings::current().model();
 
-    if (!mCondition.isEmpty() && !mCondition.calculate(GlobalSettings::instance()->currentYear()))
+    if (!mCondition.isEmpty() && !mCondition.calculate(SimulationSettings::current().currentYear()))
         return;
 
     foreach(ResourceUnit *ru, m->ruList()) {

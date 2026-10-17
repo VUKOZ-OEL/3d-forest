@@ -18,7 +18,7 @@
 ********************************************************************************************/
 
 #include "abe_global.h"
-#include "globalsettings.h"
+#include "simulationsettings.h"
 
 
 #include "forestmanagementengine.h"
@@ -78,12 +78,20 @@ namespace ABE {
  * @ingroup abe
 */
 
-ForestManagementEngine *ForestManagementEngine::singleton_fome_engine = nullptr;
-int ForestManagementEngine::mMaxStandId = -1;
+ForestManagementEngine::RunType_singleton_fome_engine &ForestManagementEngine::runState_singleton_fome_engine()
+{
+    struct State { RunType_singleton_fome_engine value = nullptr; };
+    return SimulationContext::state<State>().value;
+}
+ForestManagementEngine::RunType_mMaxStandId &ForestManagementEngine::runState_mMaxStandId()
+{
+    struct State { RunType_mMaxStandId value = -1; };
+    return SimulationContext::state<State>().value;
+}
 ForestManagementEngine::ForestManagementEngine()
 {
     mScriptBridge = nullptr;
-    singleton_fome_engine = this;
+    runState_singleton_fome_engine() = this;
     mCancel = false;
     mEnabled = true;
     setupOutputs(); // add ABE output definitions
@@ -96,19 +104,19 @@ ForestManagementEngine::~ForestManagementEngine()
     // script bridge: script ownership?
     //if (mScriptBridge)
     //    delete mScriptBridge;
-    singleton_fome_engine = nullptr;
+    runState_singleton_fome_engine() = nullptr;
 }
 
 const MapGrid *ForestManagementEngine::standGrid()
 {
-    return GlobalSettings::instance()->model()->standGrid();
+    return SimulationSettings::current().model()->standGrid();
 }
 
 
 void ForestManagementEngine::setupScripting()
 {
     // setup the ABE system
-    const XmlHelper &xml = GlobalSettings::instance()->settings();
+    const XmlHelper &xml = SimulationSettings::current().settings();
 
     ScriptGlobal::setupGlobalScripting(); // general iLand scripting helper functions and such
 
@@ -118,12 +126,12 @@ void ForestManagementEngine::setupScripting()
     mScriptBridge = new FomeScript;
     mScriptBridge->setupScriptEnvironment();
 
-    QString file_name = GlobalSettings::instance()->path(xml.value("model.management.abe.file"));
+    QString file_name = SimulationSettings::current().path(xml.value("model.management.abe.file"));
     QString code = Helper::loadTextFile(file_name);
     if (code.isEmpty())
         throw IException("Loading of ABE script file '"  + file_name + "'failed; file missing or empty.");
     qCDebug(abeSetup) << "Loading script file" << file_name;
-    QJSValue result = GlobalSettings::instance()->scriptEngine()->evaluate(code,file_name);
+    QJSValue result = SimulationSettings::current().scriptEngine()->evaluate(code,file_name);
     if (result.isError()) {
         int lineno = result.property("lineNumber").toInt();
         QStringList code_lines = code.replace('\r', "").split('\n'); // remove CR, split by LF
@@ -180,12 +188,12 @@ void ForestManagementEngine::finalizeRun()
 
 void ForestManagementEngine::setupOutputs()
 {
-    if (GlobalSettings::instance()->outputManager()->find("abeUnit"))
+    if (SimulationSettings::current().outputManager()->find("abeUnit"))
         return; // already set up
-    GlobalSettings::instance()->outputManager()->addOutput(new UnitOut);
-    GlobalSettings::instance()->outputManager()->addOutput(new ABEStandOut);
-    GlobalSettings::instance()->outputManager()->addOutput(new ABEStandDetailsOut);
-    GlobalSettings::instance()->outputManager()->addOutput(new ABEStandRemovalOut);
+    SimulationSettings::current().outputManager()->addOutput(new UnitOut);
+    SimulationSettings::current().outputManager()->addOutput(new ABEStandOut);
+    SimulationSettings::current().outputManager()->addOutput(new ABEStandDetailsOut);
+    SimulationSettings::current().outputManager()->addOutput(new ABEStandRemovalOut);
 }
 
 void ForestManagementEngine::runJavascript(bool after_processing)
@@ -384,7 +392,7 @@ FMUnit *nc_execute_unit(FMUnit *unit)
         unit->scheduler()->run();
     } catch (const IException &e) {
         // thread-safe error message
-        GlobalSettings::instance()->model()->threadExec().throwError(e.message());
+        SimulationSettings::current().model()->threadExec().throwError(e.message());
     }
 
 
@@ -428,18 +436,18 @@ void ForestManagementEngine::setup()
         throw IException(QString("ABE-Error (setup): %1").arg(mLastErrorMessage));
     }
 
-    if (!GlobalSettings::instance()->model())
+    if (!SimulationSettings::current().model())
         throw IException("No model created.... invalid operation.");
 
     // (2) spatial data (stands, units, ...)
-    const MapGrid *stand_grid = GlobalSettings::instance()->model()->standGrid();
+    const MapGrid *stand_grid = SimulationSettings::current().model()->standGrid();
 
     if (stand_grid==nullptr || stand_grid->isValid()==false)
         throw IException("The ABE management model requires a valid stand grid.");
 
-    const XmlHelper &xml = GlobalSettings::instance()->settings();
+    const XmlHelper &xml = SimulationSettings::current().settings();
 
-    QString data_file_name = GlobalSettings::instance()->path(xml.value("model.management.abe.agentDataFile"));
+    QString data_file_name = SimulationSettings::current().path(xml.value("model.management.abe.agentDataFile"));
     qCDebug(abeSetup) << "loading ABE agentDataFile" << data_file_name << "...";
     CSVFile data_file(data_file_name);
     if (data_file.isEmpty())
@@ -565,7 +573,7 @@ void ForestManagementEngine::setup()
         if (iage>-1)
             stand->setAbsoluteAge(data_file.value(i, iage).toDouble());
 
-        mMaxStandId = qMax(mMaxStandId, stand_id);
+        runState_mMaxStandId() = qMax(runState_mMaxStandId(), stand_id);
 
         mUnitStandMap.insert(unit,stand);
         mStands.append(stand);
@@ -642,7 +650,7 @@ void ForestManagementEngine::initialize()
     }
 
     // run the initial planning unit setup
-    GlobalSettings::instance()->model()->threadExec().run(nc_plan_update_unit, mUnits);
+    SimulationSettings::current().model()->threadExec().run(nc_plan_update_unit, mUnits);
 
 
     qCDebug(abeSetup) << "ABE setup complete." << mUnitStandMap.size() << "stands on" << mUnits.count() << "units, managed by" << mAgents.size() << "agents.";
@@ -677,8 +685,8 @@ void ForestManagementEngine::abortExecution(const QString &message)
 void ForestManagementEngine::runOnInit(bool before_init)
 {
     QString handler = before_init ? QStringLiteral("onInit") : QStringLiteral("onAfterInit");
-    if (GlobalSettings::instance()->scriptEngine()->globalObject().hasProperty(handler)) {
-        QJSValue result = GlobalSettings::instance()->scriptEngine()->evaluate(QString("%1()").arg(handler));
+    if (SimulationSettings::current().scriptEngine()->globalObject().hasProperty(handler)) {
+        QJSValue result = SimulationSettings::current().scriptEngine()->evaluate(QString("%1()").arg(handler));
         if (result.isError())
             qCDebug(abeSetup) << "Javascript Error in global"<< handler << "-Handler:" << result.toString();
 
@@ -697,7 +705,7 @@ void ForestManagementEngine::run(int debug_year)
     if (debug_year>-1) {
         mCurrentYear++;
     } else {
-        mCurrentYear = GlobalSettings::instance()->currentYear();
+        mCurrentYear = SimulationSettings::current().currentYear();
     }
     mCancel=false; // reset
     // now re-evaluate stands
@@ -714,11 +722,11 @@ void ForestManagementEngine::run(int debug_year)
         {
             // launch the planning unit level update (annual and thorough analysis every ten years)
             DebugTimer plu("ABE:planUpdate");
-            GlobalSettings::instance()->model()->threadExec().run(nc_plan_update_unit, mUnits, true);
+            SimulationSettings::current().model()->threadExec().run(nc_plan_update_unit, mUnits, true);
         }
 
         // run the actual forest management (incl. scheduler)
-        GlobalSettings::instance()->model()->threadExec().run(nc_execute_unit, mUnits, true); // force single thread operation for now
+        SimulationSettings::current().model()->threadExec().run(nc_execute_unit, mUnits, true); // force single thread operation for now
         if (isCancel()) {
             throw IException(QString("ABE-Error: %1").arg(mLastErrorMessage));
         }
@@ -766,12 +774,12 @@ void ForestManagementEngine::yearEnd()
 
     DebugTimer plu("ABE:outputs");
     if (enabled()) {
-        GlobalSettings::instance()->outputManager()->execute("abeUnit");
-        GlobalSettings::instance()->outputManager()->execute("abeStandDetail");
+        SimulationSettings::current().outputManager()->execute("abeUnit");
+        SimulationSettings::current().outputManager()->execute("abeStandDetail");
     }
     // run ABEStand and StandRemoval in any case.
-    GlobalSettings::instance()->outputManager()->execute("abeStand");
-    GlobalSettings::instance()->outputManager()->execute("abeStandRemoval");
+    SimulationSettings::current().outputManager()->execute("abeStand");
+    SimulationSettings::current().outputManager()->execute("abeStandRemoval");
 
 
     finalizeRun();
@@ -789,7 +797,7 @@ void ForestManagementEngine::test()
     try {
         //Activity::setVerbose(true);
         // setup the activities and the javascript environment...
-        GlobalSettings::instance()->resetScriptEngine(); // clear the script
+        SimulationSettings::current().resetScriptEngine(); // clear the script
         ScriptGlobal::setupGlobalScripting(); // general iLand scripting helper functions and such
         if (mScriptBridge)
             delete mScriptBridge;
@@ -803,7 +811,7 @@ void ForestManagementEngine::test()
     }
     QString file_name = "E:/Daten/iLand/modeling/abm/knowledge_base/test/test_stp.js";
     QString code = Helper::loadTextFile(file_name);
-    QJSValue result = GlobalSettings::instance()->scriptEngine()->evaluate(code,file_name);
+    QJSValue result = SimulationSettings::current().scriptEngine()->evaluate(code,file_name);
     if (result.isError()) {
         int lineno = result.property("lineNumber").toInt();
         QStringList code_lines = code.replace('\r', "").split('\n'); // remove CR, split by LF
@@ -818,7 +826,7 @@ void ForestManagementEngine::test()
 //        qDebug() << "*** test 1 ***";
 //        FMSTP stp;
 //        stp.setVerbose(true);
-//        stp.setup(GlobalSettings::instance()->scriptEngine()->globalObject().property("stp"), "stp");
+//        stp.setup(SimulationSettings::current().scriptEngine()->globalObject().property("stp"), "stp");
 //        stp.dumpInfo();
 
 //    } catch (const IException &e) {
@@ -828,7 +836,7 @@ void ForestManagementEngine::test()
 //        qDebug() << "*** test 2 ***";
 //        FMSTP stp2;
 //        stp2.setVerbose(true);
-//        stp2.setup(GlobalSettings::instance()->scriptEngine()->globalObject().property("degenerated"), "degenerated");
+//        stp2.setup(SimulationSettings::current().scriptEngine()->globalObject().property("degenerated"), "degenerated");
 //        stp2.dumpInfo();
 //    } catch (const IException &e) {
 //        qDebug() << "An error occured:" << e.message();
@@ -856,7 +864,7 @@ QStringList ForestManagementEngine::evaluateClick(const QPointF coord, const QSt
 QJSEngine *ForestManagementEngine::scriptEngine()
 {
     // use global engine from iLand
-    return GlobalSettings::instance()->scriptEngine();
+    return SimulationSettings::current().scriptEngine();
 }
 
 FMSTP *ForestManagementEngine::stp(QString stp_name) const
@@ -955,13 +963,17 @@ bool ForestManagementEngine::notifyBarkbeetleAttack(const ResourceUnit *ru, cons
     return forest_changed;
 }
 
-static QMutex protect_split;
+static QMutex &runFile_protect_split()
+{
+    struct State { QMutex value = {}; };
+    return SimulationContext::state<State>().value;
+}
 FMStand *ForestManagementEngine::splitExistingStand(FMStand *stand)
 {
     // get a new stand-id
     // make sure that the Id is only used once.
-    QMutexLocker protector(&protect_split);
-    int new_stand_id = ++mMaxStandId;
+    QMutexLocker protector(&runFile_protect_split());
+    int new_stand_id = ++runState_mMaxStandId();
 
     FMUnit *unit = const_cast<FMUnit*> (stand->unit());
     FMStand *new_stand = new FMStand(unit,new_stand_id);

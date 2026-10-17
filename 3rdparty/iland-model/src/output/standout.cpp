@@ -66,10 +66,10 @@ void StandOut::setup()
 
 void StandOut::exec()
 {
-    Model *m = GlobalSettings::instance()->model();
+    Model *m = SimulationSettings::current().model();
     if (!mCondition.isEmpty()) {
 
-        if (!mCondition.calculate(GlobalSettings::instance()->currentYear()))
+        if (!mCondition.calculate(SimulationSettings::current().currentYear()))
             return;
     }
 

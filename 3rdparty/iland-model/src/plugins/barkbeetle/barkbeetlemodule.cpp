@@ -19,7 +19,7 @@
 
 #include "barkbeetlemodule.h"
 
-#include "globalsettings.h"
+#include "simulationsettings.h"
 #include "model.h"
 #include "modelcontroller.h"
 #include "resourceunit.h"
@@ -41,8 +41,16 @@
  */
 
 
-int BarkBeetleCell::total_infested = 0;
-int BarkBeetleCell::max_iteration = 0;
+BarkBeetleCell::RunType_total_infested &BarkBeetleCell::runState_total_infested()
+{
+    struct State { RunType_total_infested value = 0; };
+    return SimulationContext::state<State>().value;
+}
+BarkBeetleCell::RunType_max_iteration &BarkBeetleCell::runState_max_iteration()
+{
+    struct State { RunType_max_iteration value = 0; };
+    return SimulationContext::state<State>().value;
+}
 
 /** @class BarkBeetleModule
     @ingroup beetlemodule
@@ -64,23 +72,23 @@ BarkBeetleModule::BarkBeetleModule()
 
 BarkBeetleModule::~BarkBeetleModule()
 {
-    GlobalSettings::instance()->controller()->removeLayers(&mLayers);
-    GlobalSettings::instance()->controller()->removeLayers(&mRULayers);
+    SimulationSettings::current().controller()->removeLayers(&mLayers);
+    SimulationSettings::current().controller()->removeLayers(&mRULayers);
 }
 
 void BarkBeetleModule::setup()
 {
     // setup the bark beetle grid (10m default size)
-    mGrid.setup(GlobalSettings::instance()->model()->heightGrid()->metricRect(), cellsize());
+    mGrid.setup(SimulationSettings::current().model()->heightGrid()->metricRect(), cellsize());
     BarkBeetleCell cell;
     mGrid.initialize(cell);
 
-    mRUGrid.setup(GlobalSettings::instance()->model()->RUgrid().metricRect(), GlobalSettings::instance()->model()->RUgrid().cellsize());
+    mRUGrid.setup(SimulationSettings::current().model()->RUgrid().metricRect(), SimulationSettings::current().model()->RUgrid().cellsize());
     BarkBeetleRUCell ru_cell;
     mRUGrid.initialize(ru_cell);
 
-    GlobalSettings::instance()->controller()->addLayers(&mLayers, "bark beetle");
-    GlobalSettings::instance()->controller()->addLayers(&mRULayers, "bark beetle");
+    SimulationSettings::current().controller()->addLayers(&mLayers, "bark beetle");
+    SimulationSettings::current().controller()->addLayers(&mRULayers, "bark beetle");
 
     // load settings from the XML file
     loadParameters();
@@ -93,7 +101,7 @@ void BarkBeetleModule::setup(const ResourceUnit *ru)
         return;
     //qDebug() << "BB setup for RU" << ru->id();
 
-    double ru_value = GlobalSettings::instance()->settings().valueDouble("modules.barkbeetle.backgroundInfestationProbability");
+    double ru_value = SimulationSettings::current().settings().valueDouble("modules.barkbeetle.backgroundInfestationProbability");
     // probabilistic OR-calculation: p_1ha = 1 - (1 - p_pixel)^n   -> p_pixel = 1 - (1-p_ha)^(1/n)
     // we need the probability of damage starting on a single 10m - pixel.
     double pixel_value = 1. - pow(1. - ru_value, 1./( cellsize()*cellsize()));
@@ -109,7 +117,7 @@ void BarkBeetleModule::setup(const ResourceUnit *ru)
 
 void BarkBeetleModule::loadParameters(bool do_reset)
 {
-    const XmlHelper xml = GlobalSettings::instance()->settings().node("modules.barkbeetle");
+    const XmlHelper xml = SimulationSettings::current().settings().node("modules.barkbeetle");
     params.cohortsPerGeneration = xml.valueInt(".cohortsPerGeneration", params.cohortsPerGeneration);
     params.cohortsPerSisterbrood = xml.valueInt(".cohortsPerSisterbrood", params.cohortsPerSisterbrood);
     params.spreadKernelMaxDistance = xml.valueDouble(".spreadKernelMaxDistance", params.spreadKernelMaxDistance);
@@ -166,7 +174,7 @@ void BarkBeetleModule::loadParameters(bool do_reset)
         throw IException("Barkbeetle Setup: Error: invalid values for seasonalPrecipSum or seasonalTemperatureAverage (4 ','-separated values expected).");
 
     mRefClimate = nullptr;
-    foreach(const Climate *clim, GlobalSettings::instance()->model()->climates())
+    foreach(const Climate *clim, SimulationSettings::current().model()->climates())
         if (clim->name()==ref_table_name) {
             mRefClimate = clim; break;
         }
@@ -179,11 +187,11 @@ void BarkBeetleModule::loadParameters(bool do_reset)
     mAfterExecEvent = xml.value(".onAfterBarkbeetle");
 
     // reset also the backgroundInfestation probability on each resource unit
-    for (ResourceUnit **ru=GlobalSettings::instance()->model()->RUgrid().begin(); ru!=GlobalSettings::instance()->model()->RUgrid().end(); ++ru)
+    for (ResourceUnit **ru=SimulationSettings::current().model()->RUgrid().begin(); ru!=SimulationSettings::current().model()->RUgrid().end(); ++ru)
         setup(*ru);
 
     if (do_reset) {
-        HeightGridValue *hgv = GlobalSettings::instance()->model()->heightGrid()->begin();
+        HeightGridValue *hgv = SimulationSettings::current().model()->heightGrid()->begin();
         for (BarkBeetleCell *b=mGrid.begin();b!=mGrid.end();++b, ++hgv) {
             b->reset();
             //scanResourceUnitTrees(mGrid.indexOf(b)); // scan all - not efficient
@@ -217,7 +225,7 @@ void BarkBeetleModule::clearGrids()
 void BarkBeetleModule::loadAllVegetation()
 {
     // refetch vegetation information (if necessary)
-    foreach (const ResourceUnit *ru, GlobalSettings::instance()->model()->ruList()) {
+    foreach (const ResourceUnit *ru, SimulationSettings::current().model()->ruList()) {
         scanResourceUnitTrees(ru->boundingBox().center());
     }
 
@@ -262,13 +270,13 @@ void BarkBeetleModule::run(int iteration)
 
     // create some outputs....
     qDebug() << "iter/background-inf/winter-mort/storm-inf/N spread/N landed/N infested: " << mIteration << stats.infestedBackground << stats.NWinterMortality << stats.infestedStorm << stats.NCohortsSpread << stats.NCohortsLanded << stats.NInfested;
-    GlobalSettings::instance()->outputManager()->execute("barkbeetle");
-    //GlobalSettings::instance()->outputManager()->save();
+    SimulationSettings::current().outputManager()->execute("barkbeetle");
+    //SimulationSettings::current().outputManager()->save();
 
     // execute the after bark-beetle infestation event
     if (!mAfterExecEvent.isEmpty()) {
         // evaluate the javascript function...
-        GlobalSettings::instance()->executeJavascript(mAfterExecEvent);
+        SimulationSettings::current().executeJavascript(mAfterExecEvent);
     }
 
 }
@@ -312,7 +320,7 @@ void BarkBeetleModule::scanResourceUnitTrees(const QPointF &position)
     if (mRUGrid.valueAt(position).scanned)
         return;
 
-    ResourceUnit *ru = GlobalSettings::instance()->model()->ru(position);
+    ResourceUnit *ru = SimulationSettings::current().model()->ru(position);
     if (!ru)
         return;
 
@@ -355,7 +363,7 @@ bool BarkBeetleModule::sanitationTreatment(QPointF coord) const
         return drandom() < params.sanitationTreatmentProb;
     }
     // check for ABE
-    ABE::ForestManagementEngine *abe = GlobalSettings::instance()->model()->ABEngine();
+    ABE::ForestManagementEngine *abe = SimulationSettings::current().model()->ABEngine();
     if (abe) {
         // coord: metric coordinates of the bb cell
         ABE::FMStand *stand = abe->standAt(coord);
@@ -382,14 +390,14 @@ void BarkBeetleModule::yearBegin()
     for (BarkBeetleCell *c=mGrid.begin(); c!=mGrid.end(); ++c)
         c->deadtrees = BarkBeetleCell::NoDeadTrees;
 
-    mYear = GlobalSettings::instance()->instance()->currentYear();
+    mYear = SimulationSettings::current().currentYear();
 }
 
 void BarkBeetleModule::calculateGenerations()
 {
     // calculate generations
     DebugTimer d("BB:generations");
-    ResourceUnit **ruptr = GlobalSettings::instance()->model()->RUgrid().begin();
+    ResourceUnit **ruptr = SimulationSettings::current().model()->RUgrid().begin();
     BarkBeetleRUCell *bbptr = mRUGrid.begin();
     while (bbptr<mRUGrid.end()) {
         if (*ruptr) {
@@ -411,7 +419,7 @@ void BarkBeetleModule::calculateOutbreakFactor()
     if (!mOutbreakClimateMultiplier.isEmpty()) {
         double vpd = 0;
 
-        ResourceUnit **ru = GlobalSettings::instance()->model()->RUgrid().begin();
+        ResourceUnit **ru = SimulationSettings::current().model()->RUgrid().begin();
         for (BarkBeetleRUCell *bbru= mRUGrid.begin(); bbru!=mRUGrid.end(); ++bbru, ++ru) {
             if (*ru) {
                 // calc mean VPD for june / july
@@ -519,14 +527,14 @@ void BarkBeetleModule::startSpread()
 
     // tell the forest management (at least if someone is interested)
     // if bark beetle attacks are likely
-    ABE::ForestManagementEngine *abe = GlobalSettings::instance()->model()->ABEngine();
+    ABE::ForestManagementEngine *abe = SimulationSettings::current().model()->ABEngine();
     if (abe) {
         // reset the scanned flag of resource units (force reload of stand structure)
         bool forest_changed = false;
         for (BarkBeetleRUCell *bbru=mRUGrid.begin();bbru!=mRUGrid.end();++bbru) {
             if (bbru->generations>=1. && bbru->infested>0) {
                 // notify about potential bb-attack
-                ResourceUnit *ru = GlobalSettings::instance()->model()->RUgrid()[mRUGrid.indexOf(bbru)];
+                ResourceUnit *ru = SimulationSettings::current().model()->RUgrid()[mRUGrid.indexOf(bbru)];
                 forest_changed |= abe->notifyBarkbeetleAttack(ru, bbru->generations, bbru->infested);
 
             }
@@ -742,7 +750,7 @@ void BarkBeetleModule::barkbeetleKill()
     for (BarkBeetleRUCell *rucell=mRUGrid.begin(); rucell!=mRUGrid.end(); ++rucell) {
         if (rucell->killed_trees) {
             // there are killed pixels within the resource unit....
-            ResourceUnit *ru = GlobalSettings::instance()->model()->RUgrid().constValueAtIndex(mRUGrid.indexOf(rucell));
+            ResourceUnit *ru = SimulationSettings::current().model()->RUgrid().constValueAtIndex(mRUGrid.indexOf(rucell));
             QVector<Tree> &tv = ru->trees();
             for (QVector<Tree>::const_iterator t=tv.constBegin(); t!=tv.constEnd(); ++t) {
                 if (!t->isDead() && t->dbh()>params.minDbh && t->species()->id()==QStringLiteral("piab")) {
@@ -797,7 +805,7 @@ double BarkBeetleLayers::value(const BarkBeetleCell &data, const int param_index
     case 3: return data.killed?1.:0.; // pixel has been killed in the (last) year
     case 4: if (data.isHost()) { // dead
             if (data.infested)
-                return data.max_iteration+1; // infested right now (will be dead soon next year)
+                return BarkBeetleCell::runState_max_iteration()+1; // infested right now (will be dead soon next year)
             else
                 return data.killedYear; // iteration when killed
         }
@@ -805,7 +813,7 @@ double BarkBeetleLayers::value(const BarkBeetleCell &data, const int param_index
     case 5: return static_cast<double>(data.p_colonize); // probability of kill
     case 6: return static_cast<double>(data.n_total); // # landed
     case 7: return double(data.deadtrees); // availabilitiy of deadwood (spruce)
-    case 8: return GlobalSettings::instance()->currentYear() - data.outbreakYear;
+    case 8: return SimulationSettings::current().currentYear() - data.outbreakYear;
     case 9: return data.n_events; // number of events on a specific pixel
     case 10: return static_cast<double>(data.sum_volume_killed); // total sum of trees killed for a pixel
     default: throw IException(QString("invalid variable index for a BarkBeetleCell: %1").arg(param_index));

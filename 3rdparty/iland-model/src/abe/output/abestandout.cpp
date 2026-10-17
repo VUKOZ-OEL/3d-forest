@@ -17,7 +17,7 @@
 **    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************************************/
 #include "abestandout.h"
-#include "globalsettings.h"
+#include "simulationsettings.h"
 
 #include "forestmanagementengine.h"
 #include "fmstand.h"
@@ -51,7 +51,7 @@ ABEStandOut::ABEStandOut()
 void ABEStandOut::exec()
 {
     if (!mCondition.isEmpty())
-        if (!mCondition.calculate(GlobalSettings::instance()->currentYear()))
+        if (!mCondition.calculate(SimulationSettings::current().currentYear()))
             return;
 
     foreach(FMStand *stand, ForestManagementEngine::instance()->stands()) {
@@ -99,7 +99,7 @@ ABEStandDetailsOut::ABEStandDetailsOut()
 void ABEStandDetailsOut::exec()
 {
     if (!mCondition.isEmpty())
-        if (!mCondition.calculate(GlobalSettings::instance()->currentYear()))
+        if (!mCondition.calculate(SimulationSettings::current().currentYear()))
             return;
 
     foreach(FMStand *stand, ForestManagementEngine::instance()->stands()) {

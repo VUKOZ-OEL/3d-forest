@@ -24,7 +24,7 @@
 #endif
 
 #include "expression.h"
-#include "globalsettings.h"
+#include "simulationsettings.h"
 #include "speciesset.h"
 
 class StampContainer; // forwards

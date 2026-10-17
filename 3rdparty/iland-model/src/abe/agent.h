@@ -50,7 +50,8 @@ public:
 
     void setup();
 private:
-    static int mAgentsCreated;
+    using RunType_mAgentsCreated = int;
+    static RunType_mAgentsCreated &runState_mAgentsCreated();
     // link to the base agent type
     AgentType *mType;
     // the javascript object representing the agent:

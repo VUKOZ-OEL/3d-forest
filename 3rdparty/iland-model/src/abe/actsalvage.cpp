@@ -189,7 +189,8 @@ void ActSalvage::checkStandAfterDisturbance(FMStand *stand)
 
     const int min_split_size = 50; // min size (100=1ha)
     FloatGrid &grid = trees->localStandGrid();
-    static int no_split = 0;
+    struct RunState_no_split { int value = 0; };
+    auto &no_split = SimulationContext::state<RunState_no_split>().value;
     if (mDebugSplit)
         trees->exportStandGrid(QString("temp/height_%1.txt").arg(++no_split));
 
@@ -265,7 +266,7 @@ void ActSalvage::checkStandAfterDisturbance(FMStand *stand)
         }
     }
     if (mDebugSplit)
-        Helper::saveToTextFile(GlobalSettings::instance()->path(QString("temp/split_before_%1.txt").arg(no_split)), gridToESRIRaster(my_map) );
+        Helper::saveToTextFile(SimulationSettings::current().path(QString("temp/split_before_%1.txt").arg(no_split)), gridToESRIRaster(my_map) );
 
 
     // now flood-fill 0ed areas....
@@ -286,7 +287,7 @@ void ActSalvage::checkStandAfterDisturbance(FMStand *stand)
         }
     }
     if (mDebugSplit)
-        Helper::saveToTextFile(GlobalSettings::instance()->path(QString("temp/split_stands_%1.txt").arg(no_split)), gridToESRIRaster(my_map) );
+        Helper::saveToTextFile(SimulationSettings::current().path(QString("temp/split_stands_%1.txt").arg(no_split)), gridToESRIRaster(my_map) );
 
 
     // special case: remainnig forest are only small patches
@@ -403,7 +404,7 @@ void ActSalvage::checkStandAfterDisturbance(FMStand *stand)
     if (iter==0)
         qCDebug(abe) << "ActSalvage:Loop2: no solution.";
     if (mDebugSplit)
-        Helper::saveToTextFile(GlobalSettings::instance()->path(QString("temp/split_final_%1.txt").arg(no_split)), gridToESRIRaster(my_map) );
+        Helper::saveToTextFile(SimulationSettings::current().path(QString("temp/split_final_%1.txt").arg(no_split)), gridToESRIRaster(my_map) );
 
 
     // determine final new stands....

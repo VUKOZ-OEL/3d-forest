@@ -45,7 +45,7 @@ public:
         void linearize2d(const double low_x, const double high_x, const double low_y, const double high_y, const int stepsx=50, const int stepsy=50);
 
         /// global switch for linerization. If set to false, subsequent calls to linearize are ignored.
-        static void setLinearizationEnabled(const bool enable) {mLinearizationAllowed = enable; }
+        static void setLinearizationEnabled(const bool enable) {runState_mLinearizationAllowed() = enable; }
         // calculations
         double execute(double *varlist=nullptr, ExpressionWrapper *object=nullptr) const; ///< calculate formula and return result. variable values need to be set using "setVar()"
         bool executeBool(double *varlist=nullptr, ExpressionWrapper *object=nullptr) const { return execute(varlist, object) != 0.; }
@@ -154,8 +154,10 @@ private:
         double mLinearLowY, mLinearHighY;
         double mLinearStepY;
         int mLinearStepCountY;
-        static bool mLinearizationAllowed;
-        static bool mThrowExceptionsInJS;
+        using RunType_mLinearizationAllowed = bool;
+    static RunType_mLinearizationAllowed &runState_mLinearizationAllowed();
+        using RunType_mThrowExceptionsInJS = bool;
+    static RunType_mThrowExceptionsInJS &runState_mThrowExceptionsInJS();
         friend class ExprExceptionAsScriptError;
 };
 
@@ -163,8 +165,8 @@ private:
 /// JS environment (this avoids crashes as no exceptions can happen during JS execution)
 class ExprExceptionAsScriptError {
     public:
-        ExprExceptionAsScriptError() { Expression::mThrowExceptionsInJS = true; }
-        ~ExprExceptionAsScriptError() { Expression::mThrowExceptionsInJS = false; }
+        ExprExceptionAsScriptError() { Expression::runState_mThrowExceptionsInJS() = true; }
+        ~ExprExceptionAsScriptError() { Expression::runState_mThrowExceptionsInJS() = false; }
 };
 
 #endif // LOGICEXPRESSION_H

@@ -47,7 +47,7 @@ ExpressionWrapper::ExpressionWrapper()
 {
 }
 // must be overloaded!
-static QStringList baseVarList={"year"};
+static const QStringList baseVarList={"year"};
 const int baseVarListCount = baseVarList.count();
 
 const QStringList ExpressionWrapper::getVariablesList()
@@ -59,7 +59,7 @@ double ExpressionWrapper::value(const int variableIndex)
 {
     switch (variableIndex) {
         case 0: // year
-            return static_cast<double> ( GlobalSettings::instance()->currentYear() );
+            return static_cast<double> ( SimulationSettings::current().currentYear() );
     }
     throw IException(QString("expression wrapper reached base with invalid index index %1").arg(variableIndex));
 }
@@ -78,7 +78,7 @@ double ExpressionWrapper::valueByName(const QString &variableName)
 
 
 
-static QStringList treeVarList=QStringList() << baseVarList << "id" << "dbh" << "height" << "ruindex" // 0..3
+static const QStringList treeVarList=QStringList() << baseVarList << "id" << "dbh" << "height" << "ruindex" // 0..3
                         << "x" << "y" << "volume" << "lri" <<  "leafarea" << "lightresponse" // 4-9
                         << "stemmass" << "rootmass" << "foliagemass" << "age" << "opacity" // 10-14
                         << "dead" << "stress" << "deltad" //15-17
@@ -140,7 +140,7 @@ double TreeWrapper::value(const int variableIndex)
 //// ResourceUnit Wrapper
 ////////////////////////////////////////////////
 
-static QStringList ruVarList=QStringList() << baseVarList << "id" << "totalEffectiveArea"
+static const QStringList ruVarList=QStringList() << baseVarList << "id" << "totalEffectiveArea"
                       << "nitrogenAvailable" << "soilDepth" << "stockedArea" << "stockableArea"
                       << "count" << "volume" << "avgDbh" << "avgHeight" << "basalArea" << "totalCarbon"
                       << "leafAreaIndex" << "aging" << "cohortCount" << "saplingCount" << "saplingAge"

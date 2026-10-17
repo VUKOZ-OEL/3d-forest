@@ -102,7 +102,8 @@ private:
     // general
     bool populateSpeciesSelectivity(QJSValue value, double default_value=1.);
     // syntax checking
-    static QStringList mSyntaxCustom;
+    using RunType_mSyntaxCustom = QStringList;
+    static RunType_mSyntaxCustom &runState_mSyntaxCustom();
     static QStringList mSyntaxSelective;
 
 };

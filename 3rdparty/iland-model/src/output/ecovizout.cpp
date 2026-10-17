@@ -26,9 +26,9 @@ EcoVizOut::EcoVizOut()
 
 void EcoVizOut::exec()
 {
-    Model *m = GlobalSettings::instance()->model();
+    Model *m = SimulationSettings::current().model();
     if (!mCondition.isEmpty())
-        if (!mCondition.calculateBool(GlobalSettings::instance()->currentYear()))
+        if (!mCondition.calculateBool(SimulationSettings::current().currentYear()))
             return;
     int total_tree_count = 0;
     int total_cohort_count = 0;
@@ -48,7 +48,7 @@ void EcoVizOut::exec()
     writeRow();
 
     // write the actual file
-    file = GlobalSettings::instance()->path(file);
+    file = SimulationSettings::current().path(file);
 
     if (mBinaryMode) {
         writePDBBinaryFile(file, total_tree_count, total_cohort_count, currentYear());
@@ -85,14 +85,14 @@ bool EcoVizOut::writePDBFile(QString fileName, int n_trees, int n_cohorts, int y
         //       << "  " << iter_result[2] << " Rotation: " << iter_result[3] <<'\n';
         stream << "3.0" << Qt::endl; // PDB_file_version
         // version 3.0: include local origin in metric coordinates
-        stream << GlobalSettings::instance()->settings().value("model.world.location.x") << " "
-               << GlobalSettings::instance()->settings().value("model.world.location.y") << Qt::endl;
+        stream << SimulationSettings::current().settings().value("model.world.location.x") << " "
+               << SimulationSettings::current().settings().value("model.world.location.y") << Qt::endl;
         stream << year << Qt::endl; // Time_step_number
         qint64 ntree_pos = stream.pos();
         stream << "          " << Qt::endl; // space for total number of trees
 
         // now loop over all trees and write a line for each tree
-        AllTreeIterator at(GlobalSettings::instance()->model());
+        AllTreeIterator at(SimulationSettings::current().model());
         n_trees = 0;
         while (Tree *tree = at.next()) {
             // Tree_ID<int> species_ID<cahr> pos_x<float> pos_y<float> height<float> canopy_radius<float> diameter_at_breast_height<float> status<int>
@@ -108,8 +108,8 @@ bool EcoVizOut::writePDBFile(QString fileName, int n_trees, int n_cohorts, int y
         qint64 nsap_pos = stream.pos();
         stream << "          " << Qt::endl;
         n_cohorts = 0;
-        Saplings *saplings = GlobalSettings::instance()->model()->saplings();
-        foreach(ResourceUnit *ru, GlobalSettings::instance()->model()->ruList()) {
+        Saplings *saplings = SimulationSettings::current().model()->saplings();
+        foreach(ResourceUnit *ru, SimulationSettings::current().model()->ruList()) {
             if (ru->id()==-1)
                 continue; // do not include if out of project area
 
@@ -177,13 +177,13 @@ bool EcoVizOut::writePDBBinaryFile(QString fileName, int n_trees, int n_cohorts,
 
     const std::string version_string = "3.0";
 
-    int64_t world_location_x = GlobalSettings::instance()->settings().valueDouble("model.world.location.x");
-    int64_t world_location_y = GlobalSettings::instance()->settings().valueDouble("model.world.location.y");
+    int64_t world_location_x = SimulationSettings::current().settings().valueDouble("model.world.location.x");
+    int64_t world_location_y = SimulationSettings::current().settings().valueDouble("model.world.location.y");
 
 
     // char vector of species names
     std::vector<std::array<char, 4> > species_names;
-    for (auto *s : GlobalSettings::instance()->model()->speciesSet()->activeSpecies()) {
+    for (auto *s : SimulationSettings::current().model()->speciesSet()->activeSpecies()) {
         if (s->index() != static_cast<int>(species_names.size()))
             throw IException("aarrrghhh");
 
@@ -192,7 +192,7 @@ bool EcoVizOut::writePDBBinaryFile(QString fileName, int n_trees, int n_cohorts,
         std::array<char, 4> temp_array; // Create a temporary array and set to 0
         std::memset(temp_array.data(), 0, 4);
 
-        size_t copySize = std::min(species_id.size(), static_cast<qsizetype>(4));
+        size_t copySize = std::min(species_id.size(), size_t(4));
         std::memcpy(temp_array.data(), species_id.constData(), copySize);
 
         species_names.push_back(temp_array); // Copy the *contents* of temp_array    }
@@ -213,7 +213,7 @@ bool EcoVizOut::writePDBBinaryFile(QString fileName, int n_trees, int n_cohorts,
     std::vector<cohortA> cohortAdata;
 
     // see how many trees we'll have
-    AllTreeIterator at(GlobalSettings::instance()->model());
+    AllTreeIterator at(SimulationSettings::current().model());
     n_trees = 0;
     while (Tree *tree = at.next()) {
         ++n_trees;
@@ -224,7 +224,7 @@ bool EcoVizOut::writePDBBinaryFile(QString fileName, int n_trees, int n_cohorts,
     cohortAdata.resize(n_trees);
     long nBytes = sizeof(cohortA) * n_trees;
 
-    AllTreeIterator at2(GlobalSettings::instance()->model());
+    AllTreeIterator at2(SimulationSettings::current().model());
     int i = 0;
     while (Tree *tree = at2.next()) {
         cohortA &ca = cohortAdata[i];
@@ -275,7 +275,7 @@ bool EcoVizOut::writePDBBinaryFile(QString fileName, int n_trees, int n_cohorts,
     std::vector<cohortB> cohortBdata;
     n_cohorts = 0;
     // count saplings (this means to loop once over all the data....)
-    foreach(ResourceUnit *ru, GlobalSettings::instance()->model()->ruList()) {
+    foreach(ResourceUnit *ru, SimulationSettings::current().model()->ruList()) {
         if (ru->id()==-1)
             continue; // do not include if out of project area
         SaplingCell *s = ru->saplingCellArray();
@@ -298,10 +298,10 @@ bool EcoVizOut::writePDBBinaryFile(QString fileName, int n_trees, int n_cohorts,
 
     cohortBdata.resize(n_cohorts);
     // now fill the structure
-    Saplings *saplings = GlobalSettings::instance()->model()->saplings();
+    Saplings *saplings = SimulationSettings::current().model()->saplings();
     cohortB *cb = &cohortBdata[0];
     int n_filled = 0;
-    foreach(ResourceUnit *ru, GlobalSettings::instance()->model()->ruList()) {
+    foreach(ResourceUnit *ru, SimulationSettings::current().model()->ruList()) {
         if (ru->id()==-1)
             continue; // do not include if out of project area
 

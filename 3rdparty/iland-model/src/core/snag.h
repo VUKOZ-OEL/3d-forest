@@ -34,7 +34,7 @@ class CNPair
 {
 public:
     CNPair(): C(0.), N(0.) {}
-    static void setCFraction(const double fraction) { biomassCFraction = fraction; } ///< set the global fraction of carbon of biomass
+    static void setCFraction(const double fraction) { runState_biomassCFraction() = fraction; } ///< set the global fraction of carbon of biomass
     CNPair(const double c, const double n) {C=c; N=n; }
     bool isEmpty() const { return C==0.; } ///< returns true if pool is empty
     bool isValid() const { return C>=0. && N>=0.; } ///< return true if pool is valid (content of C or N >=0)
@@ -43,10 +43,10 @@ public:
     double CN() { return N>0?C/N:0.; } ///< current CN ratio
     void clear() {C=0.; N=0.; }
     /// retrieve the amount of biomass (kg/ha). Uses the global C-fraciton. Soil pools are in t/ha!!!
-    double biomass() const {return C / biomassCFraction; }
+    double biomass() const {return C / runState_biomassCFraction(); }
     /// add biomass to the pool (kg dry mass/ha); CNratio is used to calculate the N-Content, the global C-Fraction of biomass is used to
     /// calculate the amount of carbon of 'biomass'.
-    void addBiomass(const double biomass, const double CNratio) { C+=biomass*biomassCFraction; N+=biomass*biomassCFraction/CNratio; }
+    void addBiomass(const double biomass, const double CNratio) { C+=biomass*runState_biomassCFraction(); N+=biomass*runState_biomassCFraction()/CNratio; }
     // some simple operators
     void operator+=(const CNPair &s) { C+=s.C; N+=s.N; } ///< add contents of a pool
     void operator*=(const double factor) { C*=factor; N*=factor; } ///< Multiply pool with 'factor'
@@ -54,7 +54,8 @@ public:
     const CNPair operator-(const CNPair &p2) const { return CNPair(C-p2.C, N-p2.N); } ///< return the difference of two pools
     const CNPair operator*(const double factor) const { return CNPair(C*factor, N*factor); } ///< return the pool multiplied with 'factor'
 protected:
-    static double biomassCFraction;
+    using RunType_biomassCFraction = double;
+    static RunType_biomassCFraction &runState_biomassCFraction();
 };
 
 /** CNPool provides (in addition to CNPair) also a weighted parameter value (e.g. a decay rate) */
@@ -106,7 +107,7 @@ public:
 
     /// (calculated) number of snags in diameter class
     const double *numberOfSnags() const { return mNumberOfSnags; }
-    static void snagThresholds(double &rMinDbh, double &rMaxDbh) { rMinDbh = mDBHLower; rMaxDbh = mDBHHigher; }
+    static void snagThresholds(double &rMinDbh, double &rMaxDbh) { rMinDbh = runState_mDBHLower(); rMaxDbh = runState_mDBHHigher(); }
 
     /// deciduous foliage litter (kg/ha) from the previous year
     double freshDeciduousFoliage() const { return mDeciduousFoliageLitter; }
@@ -156,7 +157,7 @@ public:
     void packDeadTreeList();
 
 
-    static double* decayClassThresholds() {return mDecayClassThresholds; }
+    static double* decayClassThresholds() {return runState_mDecayClassThresholds(); }
 private:
     /// storage for snags that are stored individually
     QVector<DeadTree> mDeadTrees;
@@ -167,7 +168,7 @@ private:
     double mClimateFactor; ///< current mean climate factor (influenced by temperature and soil water content)
     const ResourceUnit *mRU; ///< link to resource unit
     /// access SWDPool as function of diameter (cm)
-    int poolIndex(const float dbh) { if (dbh<mDBHLower) return 0; if (dbh>mDBHHigher) return 2; return 1;}
+    int poolIndex(const float dbh) { if (dbh<runState_mDBHLower()) return 0; if (dbh>runState_mDBHHigher()) return 2; return 1;}
     CNPool mSWD[3]; ///< standing woody debris pool (0: smallest dimater class, e.g. <10cm, 1: medium, 2: largest class (e.g. >30cm)) kg/ha
     CNPair mTotalSWD; ///< sum of mSWD[x]
     double mNumberOfSnags[3]; ///< number of snags in diameter class
@@ -194,10 +195,16 @@ private:
     CNPair mTotalToAtm; ///< flux to atmosphere (kg/ha)
     CNPair mTotalToExtern; ///< total flux of masses removed from the site (i.e. harvesting) kg/ha
     CNPair mTotalToDisturbance; ///< fluxes due to disturbance
-    static double mDBHLower, mDBHHigher; ///< thresholds used to classify to SWD-Pools
-    static double mDBHSingle; ///< threshold above which individul trees are tracked
-    static double mCarbonThreshold[3]; ///< carbon content thresholds that are used to decide if the SWD-pool should be emptied
-    static double mDecayClassThresholds[]; ///< thresholds for assigning decay classes to snags / DWD pieces
+    using RunType_mDBHLower = double;
+    static RunType_mDBHLower &runState_mDBHLower();
+    using RunType_mDBHHigher = double;
+    static RunType_mDBHHigher &runState_mDBHHigher(); ///< thresholds used to classify to SWD-Pools
+    using RunType_mDBHSingle = double;
+    static RunType_mDBHSingle &runState_mDBHSingle(); ///< threshold above which individul trees are tracked
+    using RunType_mCarbonThreshold = double[3];
+    static RunType_mCarbonThreshold &runState_mCarbonThreshold(); ///< carbon content thresholds that are used to decide if the SWD-pool should be emptied
+    using RunType_mDecayClassThresholds = double[4];
+    static RunType_mDecayClassThresholds &runState_mDecayClassThresholds(); ///< thresholds for assigning decay classes to snags / DWD pieces
 
     friend class Snapshot;
 };

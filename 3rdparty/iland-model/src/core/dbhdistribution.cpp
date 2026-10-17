@@ -18,7 +18,7 @@
 ********************************************************************************************/
 #include "dbhdistribution.h"
 
-#include "globalsettings.h"
+#include "simulationsettings.h"
 #include "model.h"
 #include "species.h"
 #include "resourceunit.h"
@@ -26,7 +26,11 @@
 #include "mapgrid.h"
 
 // classes: 0..5, 5..10, 10..15, 15..20, ...., 95..100, >100 = 21 classes, + 2 classes for total basal area / volume
-int DBHDistribution::mNClasses = 21 + 2;
+DBHDistribution::RunType_mNClasses &DBHDistribution::runState_mNClasses()
+{
+    struct State { RunType_mNClasses value = 21 + 2; };
+    return SimulationContext::state<State>().value;
+}
 
 
 DBHDistribution::~DBHDistribution()
@@ -45,7 +49,7 @@ void DBHDistribution::calculateFromLandscape()
 {
     // reset
     clear( mData );
-    AllTreeIterator at(GlobalSettings::instance()->model());
+    AllTreeIterator at(SimulationSettings::current().model());
     while (Tree *t=at.nextLiving())
         addTree( t );
 
@@ -70,7 +74,7 @@ void DBHDistribution::calculate()
 void DBHDistribution::addStand(const int standId)
 {
     // get all trees of the stand
-    const MapGrid *mg = GlobalSettings::instance()->model()->standGrid();
+    const MapGrid *mg = SimulationSettings::current().model()->standGrid();
     if (!mg) return;
     QVector<QPair<Tree *, double> > trees;
     // load all trees for the stand
@@ -94,7 +98,7 @@ void DBHDistribution::addStand(const int standId, const double area, QVector<Tre
 {
     QVector<double*> &vec = mStands[standId];
     if (vec.size() == 0) {
-        int n_species = GlobalSettings::instance()->model()->speciesSet()->count();
+        int n_species = SimulationSettings::current().model()->speciesSet()->count();
         for (int i=0;i<n_species;++i) {
             double *ptr = new double[ nClasses() ];
             for (int j=0;j<nClasses();++j)
@@ -122,7 +126,7 @@ void DBHDistribution::addStand(const int standId, const double area, QVector<Tre
 // quick'n'dirty dump to a text file
 void DBHDistribution::saveToTextFile(QString filename)
 {
-    QString path = GlobalSettings::instance()->path(filename);
+    QString path = SimulationSettings::current().path(filename);
     // header
     QString line="species";
     QStringList content;
@@ -141,7 +145,7 @@ void DBHDistribution::saveToTextFile(QString filename)
 
 void DBHDistribution::saveStandInfo(QString filename)
 {
-    QString path = GlobalSettings::instance()->path(filename);
+    QString path = SimulationSettings::current().path(filename);
     QStringList content;
     content << "standId;area;basalArea;volume;stems";
     QHash<int, SStandInfo >::const_iterator i = mStandInfo.constBegin();
@@ -159,7 +163,7 @@ void DBHDistribution::saveStandInfo(QString filename)
 
 DBHDistribution::DBHDistribution(QObject *)
 {
-    mTotalArea = GlobalSettings::instance()->model()->totalStockableArea(); // is in ha
+    mTotalArea = SimulationSettings::current().model()->totalStockableArea(); // is in ha
 }
 
 inline int DBHDistribution::classIndex(const float dbh) const
@@ -182,7 +186,7 @@ QString DBHDistribution::classLabel(const int class_index)
 
 void DBHDistribution::internalSetup()
 {
-    int n_species = GlobalSettings::instance()->model()->speciesSet()->count();
+    int n_species = SimulationSettings::current().model()->speciesSet()->count();
     qDeleteAll(mData);
     mData.clear();
     mSpeciesIds.clear();
@@ -193,7 +197,7 @@ void DBHDistribution::internalSetup()
             ptr[j] = 0.;
 
         mData.push_back(ptr);
-        mSpeciesIds.push_back(GlobalSettings::instance()->model()->speciesSet()->species(i)->id());
+        mSpeciesIds.push_back(SimulationSettings::current().model()->speciesSet()->species(i)->id());
     }
 }
 

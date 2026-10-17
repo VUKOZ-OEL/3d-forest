@@ -19,7 +19,7 @@
 #include "global.h"
 #include "saplings.h"
 
-#include "globalsettings.h"
+#include "simulationsettings.h"
 #include "model.h"
 #include "resourceunit.h"
 #include "resourceunitspecies.h"
@@ -29,8 +29,16 @@
 #include "mapgrid.h"
 #include "grasscover.h"
 
-double Saplings::mRecruitmentVariation = 0.1; // +/- 10%
-double Saplings::mBrowsingPressure = 0.;
+Saplings::RunType_mRecruitmentVariation &Saplings::runState_mRecruitmentVariation()
+{
+    struct State { RunType_mRecruitmentVariation value = 0.1; };
+    return SimulationContext::state<State>().value;
+} // +/- 10%
+Saplings::RunType_mBrowsingPressure &Saplings::runState_mBrowsingPressure()
+{
+    struct State { RunType_mBrowsingPressure value = 0.; };
+    return SimulationContext::state<State>().value;
+}
 
 
 Saplings::Saplings()
@@ -40,10 +48,10 @@ Saplings::Saplings()
 
 void Saplings::setup()
 {
-    //mGrid.setup(GlobalSettings::instance()->model()->grid()->metricRect(), GlobalSettings::instance()->model()->grid()->cellsize());
-    FloatGrid *lif_grid = GlobalSettings::instance()->model()->grid();
+    //mGrid.setup(SimulationSettings::current().model()->grid()->metricRect(), SimulationSettings::current().model()->grid()->cellsize());
+    FloatGrid *lif_grid = SimulationSettings::current().model()->grid();
     // mask out out-of-project areas
-    HeightGrid *hg = GlobalSettings::instance()->model()->heightGrid();
+    HeightGrid *hg = SimulationSettings::current().model()->heightGrid();
     for (int i=0; i<lif_grid->count(); ++i) {
         SaplingCell *s = cell(lif_grid->indexOf(i), false); // false: retrieve also invalid cells
         if (s) {
@@ -94,7 +102,7 @@ void Saplings::calculateInitialStatistics(const ResourceUnit *ru)
 /// see https://iland-model.org/seed+kernel+and+seed+distribution and https://iland-model.org/establishment
 void Saplings::establishment(const ResourceUnit *ru)
 {
-    FloatGrid *lif_grid = GlobalSettings::instance()->model()->grid();
+    FloatGrid *lif_grid = SimulationSettings::current().model()->grid();
 
     QPoint imap = ru->cornerPointOffset(); // offset on LIF/saplings grid
     QPoint iseedmap = QPoint(imap.x()/10, imap.y()/10); // seed-map has 20m resolution, LIF 2m -> factor 10
@@ -199,8 +207,8 @@ void Saplings::establishment(const ResourceUnit *ru)
 
 void Saplings::saplingGrowth(const ResourceUnit *ru)
 {
-    HeightGrid *height_grid = GlobalSettings::instance()->model()->heightGrid();
-    FloatGrid *lif_grid = GlobalSettings::instance()->model()->grid();
+    HeightGrid *height_grid = SimulationSettings::current().model()->heightGrid();
+    FloatGrid *lif_grid = SimulationSettings::current().model()->grid();
 
     QPoint imap = ru->cornerPointOffset();
     bool need_check=false;
@@ -238,13 +246,13 @@ void Saplings::saplingGrowth(const ResourceUnit *ru)
     }
 
     // debug output related to saplings
-    if (GlobalSettings::instance()->isDebugEnabled(GlobalSettings::dSaplingGrowth) && ru->shouldCreateDebugOutput()) {
+    if (SimulationSettings::current().isDebugEnabled(SimulationSettings::dSaplingGrowth) && ru->shouldCreateDebugOutput()) {
 
         // establishment details
         for (QList<ResourceUnitSpecies*>::const_iterator it=ru->ruSpecies().constBegin();it!=ru->ruSpecies().constEnd();++it) {
             if ((*it)->saplingStat().livingCohorts() == 0)
                 continue;
-            DebugList &out = GlobalSettings::instance()->debugList(ru->index(), GlobalSettings::dSaplingGrowth);
+            DebugList &out = SimulationSettings::current().debugList(ru->index(), SimulationSettings::dSaplingGrowth);
             out << (*it)->species()->id() << ru->index() <<ru->id();
             out << (*it)->saplingStat().livingCohorts() << (*it)->saplingStat().averageHeight() << (*it)->saplingStat().averageAge()
                 << (*it)->saplingStat().averageDeltaHPot() << (*it)->saplingStat().averageDeltaHRealized();
@@ -262,8 +270,8 @@ void Saplings::simplifiedGrassCover(const ResourceUnit *ru)
     if (!ru)
         return;
 
-    float threshold = GlobalSettings::instance()->model()->grassCover()->lifThreshold();
-    FloatGrid *lif_grid = GlobalSettings::instance()->model()->grid();
+    float threshold = SimulationSettings::current().model()->grassCover()->lifThreshold();
+    FloatGrid *lif_grid = SimulationSettings::current().model()->grid();
 
     QPoint imap = ru->cornerPointOffset();
     SaplingCell *sap_cells = ru->saplingCellArray();
@@ -297,11 +305,11 @@ double Saplings::topHeight(const ResourceUnit *ru) const
 
 SaplingCell *Saplings::cell(QPoint lif_coords, bool only_valid, ResourceUnit **rRUPtr)
 {
-    FloatGrid *lif_grid = GlobalSettings::instance()->model()->grid();
+    FloatGrid *lif_grid = SimulationSettings::current().model()->grid();
 
     // in this case, getting the actual cell is quite cumbersome: first, retrieve the resource unit, then the
     // cell based on the offset of the given coordiantes relative to the corner of the resource unit.
-    ResourceUnit *ru = GlobalSettings::instance()->model()->ru(lif_grid->cellCenterPoint(lif_coords));
+    ResourceUnit *ru = SimulationSettings::current().model()->ru(lif_grid->cellCenterPoint(lif_coords));
     if (rRUPtr)
         *rRUPtr = ru;
 
@@ -323,7 +331,7 @@ QPointF Saplings::coordOfCell(const ResourceUnit *ru, int cell_index)
     QPoint imap = ru->cornerPointOffset();
     int x = imap.x() + cell_index % cPxPerRU;
     int y = imap.y() + cell_index/cPxPerRU;
-    return GlobalSettings::instance()->model()->grid()->cellCenterPoint(QPoint(x,y));
+    return SimulationSettings::current().model()->grid()->cellCenterPoint(QPoint(x,y));
 }
 
 QPoint Saplings::coordOfCellLIF(const ResourceUnit *ru, int cell_index)
@@ -331,15 +339,15 @@ QPoint Saplings::coordOfCellLIF(const ResourceUnit *ru, int cell_index)
     QPoint imap = ru->cornerPointOffset();
     int x = imap.x() + cell_index % cPxPerRU;
     int y = imap.y() + cell_index/cPxPerRU;
-    QPointF coord = GlobalSettings::instance()->model()->grid()->cellCenterPoint(QPoint(x,y));
-    return GlobalSettings::instance()->model()->grid()->indexAt(coord);
+    QPointF coord = SimulationSettings::current().model()->grid()->cellCenterPoint(QPoint(x,y));
+    return SimulationSettings::current().model()->grid()->indexAt(coord);
 }
 
 
 
 void Saplings::clearSaplings(const QRectF &rectangle, const bool remove_biomass, bool resprout)
 {
-    GridRunner<float> runner(GlobalSettings::instance()->model()->grid(), rectangle);
+    GridRunner<float> runner(SimulationSettings::current().model()->grid(), rectangle);
     ResourceUnit *ru;
     while (runner.next()) {
         SaplingCell *s = cell(runner.currentIndex(), true, &ru);
@@ -387,7 +395,7 @@ void Saplings::clearSaplings(SaplingCell *s, ResourceUnit *ru, const bool remove
 
 void Saplings::clearAllSaplings()
 {
-    GridRunner<float> runner(GlobalSettings::instance()->model()->grid(), GlobalSettings::instance()->model()->grid()->metricRect());
+    GridRunner<float> runner(SimulationSettings::current().model()->grid(), SimulationSettings::current().model()->grid()->metricRect());
     ResourceUnit *ru;
     while (runner.next()) {
         SaplingCell *s = cell(runner.currentIndex(), true, &ru);
@@ -399,8 +407,8 @@ void Saplings::clearAllSaplings()
 
 int Saplings::addSaplings(const QRectF &rectangle, QString species, double height, int age)
 {
-    GridRunner<float> runner(GlobalSettings::instance()->model()->grid(), rectangle);
-    Species *s = GlobalSettings::instance()->model()->speciesSet()->species(species);
+    GridRunner<float> runner(SimulationSettings::current().model()->grid(), rectangle);
+    Species *s = SimulationSettings::current().model()->speciesSet()->species(species);
     if (!s) {
         throw IException("addSaplings: invalid species: " + species);
     }
@@ -470,10 +478,10 @@ int Saplings::addSprout(const Tree *t, bool tree_is_removed)
 
 void Saplings::updateBrowsingPressure()
 {
-    if (GlobalSettings::instance()->settings().valueBool("model.settings.browsing.enabled"))
-        Saplings::mBrowsingPressure = GlobalSettings::instance()->settings().valueDouble("model.settings.browsing.browsingPressure");
+    if (SimulationSettings::current().settings().valueBool("model.settings.browsing.enabled"))
+        Saplings::runState_mBrowsingPressure() = SimulationSettings::current().settings().valueDouble("model.settings.browsing.browsingPressure");
     else
-        Saplings::mBrowsingPressure = 0.;
+        Saplings::runState_mBrowsingPressure() = 0.;
 }
 
 bool Saplings::growSapling(const ResourceUnit *ru, SaplingCell &scell, SaplingTree &tree, int isc, HeightGridValue &hgv, float lif_value, int cohorts_on_px)
@@ -515,11 +523,11 @@ bool Saplings::growSapling(const ResourceUnit *ru, SaplingCell &scell, SaplingTr
         delta_h_factor = delta_h_factor *species->saplingGrowthParameters().sproutGrowth;
 
     // check browsing
-    if (mBrowsingPressure>0. && tree.height<=2.f) {
+    if (runState_mBrowsingPressure()>0. && tree.height<=2.f) {
         double p = rus->species()->saplingGrowthParameters().browsingProbability;
         // calculate modifed annual browsing probability via odds-ratios
         // odds = p/(1-p) -> odds_mod = odds * browsingPressure -> p_mod = odds_mod /( 1 + odds_mod) === p*pressure/(1-p+p*pressure)
-        double p_browse = p*mBrowsingPressure / (1. - p + p*mBrowsingPressure);
+        double p_browse = p*runState_mBrowsingPressure() / (1. - p + p*runState_mBrowsingPressure());
         if (drandom() < p_browse) {
             delta_h_factor = 0.;
         }
@@ -578,10 +586,10 @@ bool Saplings::growSapling(const ResourceUnit *ru, SaplingCell &scell, SaplingTr
         for (int i=0;i<to_establish;i++) {
             Tree &bigtree = const_cast<ResourceUnit*>(ru)->newTree();
 
-            bigtree.setPosition(GlobalSettings::instance()->model()->grid()->indexOf(isc));
+            bigtree.setPosition(SimulationSettings::current().model()->grid()->indexOf(isc));
             // add variation: add +/-N% to dbh and *independently* to height.
-            bigtree.setDbh(static_cast<float>(dbh * nrandom(1. - mRecruitmentVariation, 1. + mRecruitmentVariation)));
-            bigtree.setHeight(static_cast<float>(tree.height * nrandom(1. - mRecruitmentVariation, 1. + mRecruitmentVariation)));
+            bigtree.setDbh(static_cast<float>(dbh * nrandom(1. - runState_mRecruitmentVariation(), 1. + runState_mRecruitmentVariation())));
+            bigtree.setHeight(static_cast<float>(tree.height * nrandom(1. - runState_mRecruitmentVariation(), 1. + runState_mRecruitmentVariation())));
             bigtree.setSpecies( const_cast<Species*>(species) );
             bigtree.setAge(tree.age,tree.height);
             bigtree.setRU(const_cast<ResourceUnit*>(ru));
@@ -632,12 +640,12 @@ bool Saplings::growSapling(const ResourceUnit *ru, SaplingCell &scell, SaplingTr
         float dbh = tree.height / species->saplingGrowthParameters().hdSapling * 100.f;
         double foliage = species->biomassFoliage(dbh);
         leaf_area = static_cast<float>( foliage * n_repr );
-        species->seedDispersal()->setSaplingTree(GlobalSettings::instance()->model()->grid()->indexOf(isc), leaf_area);
+        species->seedDispersal()->setSaplingTree(SimulationSettings::current().model()->grid()->indexOf(isc), leaf_area);
     }
 
     // sprouting from regeneration: this requires a minimum height (and lateral sprouting being enabled)
     if (species->saplingGrowthParameters().adultSproutProbability > 0. && tree.age > species->maturityAge()) {
-        vegetativeSprouting(species, scell, GlobalSettings::instance()->model()->grid()->indexOf(isc));
+        vegetativeSprouting(species, scell, SimulationSettings::current().model()->grid()->indexOf(isc));
     }
 
 
@@ -645,7 +653,7 @@ bool Saplings::growSapling(const ResourceUnit *ru, SaplingCell &scell, SaplingTr
     //float sh_before = hgv.stemHeight();
     if (tree.height > hgv.stemHeight()) {
         hgv.setStemHeight(tree.height);
-        //qDebug()<< "sapheihgt:updated at:"<<GlobalSettings::instance()->model()->heightGrid()->cellCenterPoint(GlobalSettings::instance()->model()->heightGrid()->indexOf(&hgv));
+        //qDebug()<< "sapheihgt:updated at:"<<SimulationSettings::current().model()->heightGrid()->cellCenterPoint(SimulationSettings::current().model()->heightGrid()->indexOf(&hgv));
     }
     //qDebug() << "sapheight:" << tree.height << "hgv:before:" << sh_before << "after:"  << hgv.stemHeight() << "hgv:" << &hgv;
     return false;
@@ -667,7 +675,7 @@ void Saplings::vegetativeSprouting(const Species *species, SaplingCell &scell, Q
         for (int i=0;i<8;++i) {
             SaplingCell *sc_new = cell(tree_pos +QPoint(offsets_x[s], offsets_y[s]), true, &ru_new);
             if (sc_new && !sc_new->saplingOfSpecies(species->index())) {
-                if (GlobalSettings::instance()->model()->settings().torusMode) {
+                if (SimulationSettings::current().model()->settings().torusMode) {
                     // in torus mode we make sure not to grow saplings in an adjacent resource unit
                     if (scell.ru != ru_new) {
                         s = (s+1)%8; // move on...
@@ -773,7 +781,7 @@ void SaplingStat::calculate(const Species *species, ResourceUnit *ru)
         mLeafArea = 0.; // leaf area is not cleared at the beginning of the regen loop (for the water cycle)
     }
 
-    if (GlobalSettings::instance()->currentYear()==0)
+    if (SimulationSettings::current().currentYear()==0)
         return; // no need for carbon flows in initial run
 
 
@@ -810,8 +818,8 @@ void SaplingStat::calculate(const Species *species, ResourceUnit *ru)
         mCarbonGain.clear();
 
 
-    GlobalSettings::instance()->systemStatistics()->saplingCount+=mLiving;
-    GlobalSettings::instance()->systemStatistics()->newSaplings+=mAdded;
+    SimulationSettings::current().systemStatistics()->saplingCount+=mLiving;
+    SimulationSettings::current().systemStatistics()->newSaplings+=mAdded;
 
 }
 
@@ -864,9 +872,9 @@ SaplingCellRunner::SaplingCellRunner(const int stand_id, const MapGrid *stand_gr
     mRunner = nullptr;
     mRU = nullptr;
     mStandId = stand_id;
-    mStandGrid = stand_grid ? stand_grid : GlobalSettings::instance()->model()->standGrid();
+    mStandGrid = stand_grid ? stand_grid : SimulationSettings::current().model()->standGrid();
     QRectF box = mStandGrid->boundingBox(stand_id);
-    mRunner = new GridRunner<float>(GlobalSettings::instance()->model()->grid(), box);
+    mRunner = new GridRunner<float>(SimulationSettings::current().model()->grid(), box);
 
 }
 
@@ -886,7 +894,7 @@ SaplingCell *SaplingCellRunner::next()
             return nullptr; // end of the bounding box
         if (mStandGrid->standIDFromLIFCoord(mRunner->currentIndex()) != mStandId)
             continue; // pixel does not belong to the target stand
-        mRU = GlobalSettings::instance()->model()->ru(mRunner->currentCoord());
+        mRU = SimulationSettings::current().model()->ru(mRunner->currentCoord());
         SaplingCell *sc=nullptr;
         if (mRU)
             sc=mRU->saplingCell(mRunner->currentIndex());

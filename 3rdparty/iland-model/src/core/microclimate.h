@@ -101,7 +101,7 @@ public:
         bool decomposition_effect;
         bool establishment_effect;
     };
-    const MicroClimateSettings &settings() const { return mSettings; }
+    const MicroClimateSettings &settings() const { return runState_mSettings(); }
 private:
     void calculateFixedFactors();
     void calculateRUMeanValues();
@@ -110,7 +110,8 @@ private:
     QPair<float, float> mRUvalues[12]; // save min/max buffering per month
     bool mIsSetup;
 
-    static MicroClimateSettings mSettings;
+    using RunType_mSettings = MicroClimateSettings;
+    static RunType_mSettings &runState_mSettings();
 };
 
 
@@ -128,7 +129,8 @@ public slots:
     static Grid<double> *grid(QString what, int month);
 private:
     Grid<double> mGrid;
-    static MicroclimateVisualizer *mVisualizer;
+    using RunType_mVisualizer = MicroclimateVisualizer *;
+    static RunType_mVisualizer &runState_mVisualizer();
 
 
 };

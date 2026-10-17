@@ -34,14 +34,18 @@ namespace ABE {
 
   */
 
-int Agent::mAgentsCreated = 0;
+Agent::RunType_mAgentsCreated &Agent::runState_mAgentsCreated()
+{
+    struct State { RunType_mAgentsCreated value = 0; };
+    return SimulationContext::state<State>().value;
+}
 
 Agent::Agent(AgentType *type, QJSValue js)
 {
     mType = type;
     mJSAgent = js;
-    mAgentsCreated++;
-    mName = QString("agent_%1").arg(mAgentsCreated);
+    runState_mAgentsCreated()++;
+    mName = QString("agent_%1").arg(runState_mAgentsCreated());
 }
 
 void Agent::setName(const QString &name)

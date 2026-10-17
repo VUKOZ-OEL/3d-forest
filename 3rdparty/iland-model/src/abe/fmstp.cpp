@@ -32,7 +32,11 @@ namespace ABE {
   */
 
 // static values
-bool FMSTP::mVerbose = false;
+FMSTP::RunType_mVerbose &FMSTP::runState_mVerbose()
+{
+    struct State { RunType_mVerbose value = false; };
+    return SimulationContext::state<State>().value;
+}
 
 FMSTP::FMSTP()
 {

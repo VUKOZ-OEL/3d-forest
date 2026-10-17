@@ -15,15 +15,4 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-if(NOT (QT_VERSION_MAJOR AND
-        TARGET Qt${QT_VERSION_MAJOR}::Concurrent AND
-        TARGET Qt${QT_VERSION_MAJOR}::Qml AND
-        TARGET Qt${QT_VERSION_MAJOR}::Sql AND
-        TARGET Qt${QT_VERSION_MAJOR}::Xml)
-  )
-    message(WARNING
-            "Gui, Concurrent, Qml, Sql, Xml required - skipping iLand-model")
-    return()
-endif()
-
 add_subdirectory(src)

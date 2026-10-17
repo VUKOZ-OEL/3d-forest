@@ -26,7 +26,7 @@
 #include "scriptglobal.h"
 #include "model.h"
 #include "resourceunit.h"
-#include "globalsettings.h"
+#include "simulationsettings.h"
 #include "helper.h"
 #include "debugtimer.h"
 #include "standloader.h"
@@ -84,25 +84,34 @@ class ResourceUnit;
   More text.
 */
 
-QObject *ScriptGlobal::scriptOutput = nullptr;
-QString ScriptGlobal::mLastErrorMessage = "";
+ScriptGlobal::RunType_scriptOutput &ScriptGlobal::runState_scriptOutput()
+{
+    struct State { RunType_scriptOutput value = nullptr; };
+    return SimulationContext::state<State>().value;
+}
+ScriptGlobal::RunType_mLastErrorMessage &ScriptGlobal::runState_mLastErrorMessage()
+{
+    struct State { RunType_mLastErrorMessage value = ""; };
+    return SimulationContext::state<State>().value;
+}
 
 ScriptGlobal::ScriptGlobal(QObject *)
 {
-    mModel = GlobalSettings::instance()->model();
+    mModel = SimulationSettings::current().model();
     // current directory
     if (mModel)
-        mCurrentDir = GlobalSettings::instance()->path(QString(), "script") + QDir::separator();
+        mCurrentDir = SimulationSettings::current().path(QString(), "script") + QDir::separator();
 
     mSRU = new ScriptResourceUnit();
-    mRUValue = GlobalSettings::instance()->scriptEngine()->newQObject(mSRU);
+    mSRU->setParent(this);
+    mRUValue = SimulationSettings::current().scriptEngine()->newQObject(mSRU);
 
 }
 
 
 QVariant ScriptGlobal::setting(QString key)
 {
-    const XmlHelper &xml = GlobalSettings::instance()->settings();
+    const XmlHelper &xml = SimulationSettings::current().settings();
     if (!xml.hasNode(key)) {
         throwError("setting(): setting key '" + key + "' not valid.");
         return QVariant(); // undefined???
@@ -111,7 +120,7 @@ QVariant ScriptGlobal::setting(QString key)
 }
 void ScriptGlobal::set(QString key, QString value)
 {
-    XmlHelper &xml = const_cast<XmlHelper&>(GlobalSettings::instance()->settings());
+    XmlHelper &xml = const_cast<XmlHelper&>(SimulationSettings::current().settings());
     if (!xml.hasNode(key)) {
         throwError("setting(): setting key '" + key + "' is not valid.");
         return;
@@ -125,8 +134,8 @@ void ScriptGlobal::print(QString message)
 {
     qDebug() << message;
 #ifdef ILAND_GUI
-    if (ScriptGlobal::scriptOutput) {
-        QTextEdit *e = qobject_cast<QTextEdit*>(ScriptGlobal::scriptOutput);
+    if (ScriptGlobal::runState_scriptOutput()) {
+        QTextEdit *e = qobject_cast<QTextEdit*>(ScriptGlobal::runState_scriptOutput());
         if (e)
             e->append(message);
     }
@@ -144,14 +153,14 @@ void ScriptGlobal::alert(QString message)
 
 void ScriptGlobal::include(QString filename)
 {
-    QString path = GlobalSettings::instance()->path(filename);
+    QString path = SimulationSettings::current().path(filename);
     if (!QFile::exists(path)) {
         throwError(QString("include(): The javascript source file '%1' could not be found.").arg(path)); return;
     }
 
     QString includeFile=Helper::loadTextFile(path);
 
-    QJSValue ret = GlobalSettings::instance()->scriptEngine()->evaluate(includeFile, path);
+    QJSValue ret = SimulationSettings::current().scriptEngine()->evaluate(includeFile, path);
     if (ret.isError()) {
         QString error_message = formattedErrorMessage(ret, includeFile);
         qDebug() << error_message;
@@ -162,16 +171,16 @@ void ScriptGlobal::include(QString filename)
 
 void ScriptGlobal::loadModule(QString moduleName, QString filename)
 {
-    QString path = GlobalSettings::instance()->path(filename);
+    QString path = SimulationSettings::current().path(filename);
     if (!QFile::exists(path)) {
         throwError(QString("include(): The javascript module file '%1' could not be found.").arg(path)); return;
     }
-    QJSValue module = GlobalSettings::instance()->scriptEngine()->importModule(path);
+    QJSValue module = SimulationSettings::current().scriptEngine()->importModule(path);
     if (module.isError()) {
         throwError("Error in javascript-include():" + module.toString());
         return;
     }
-    GlobalSettings::instance()->scriptEngine()->globalObject().setProperty(moduleName, module);
+    SimulationSettings::current().scriptEngine()->globalObject().setProperty(moduleName, module);
 
 }
 
@@ -182,18 +191,18 @@ double ScriptGlobal::random(double from, double to)
 
 QString ScriptGlobal::defaultDirectory(QString dir)
 {
-    QString result = GlobalSettings::instance()->path(QString(), dir) + QDir::separator();
+    QString result = SimulationSettings::current().path(QString(), dir) + QDir::separator();
     return result;
 }
 
 QString ScriptGlobal::path(QString filename)
 {
-    return GlobalSettings::instance()->path(filename);
+    return SimulationSettings::current().path(filename);
 }
 
 int ScriptGlobal::year() const
 {
-    return GlobalSettings::instance()->currentYear();
+    return SimulationSettings::current().currentYear();
 }
 int ScriptGlobal::resourceUnitCount() const
 {
@@ -204,17 +213,17 @@ int ScriptGlobal::resourceUnitCount() const
 
 double ScriptGlobal::worldX()
 {
-    return GlobalSettings::instance()->model()->extent().width();
+    return SimulationSettings::current().model()->extent().width();
 }
 
 double ScriptGlobal::worldY()
 {
-    return GlobalSettings::instance()->model()->extent().height();
+    return SimulationSettings::current().model()->extent().height();
 }
 // wrapped helper functions
 QString ScriptGlobal::loadTextFile(QString fileName)
 {
-    QString file = GlobalSettings::instance()->path(fileName);
+    QString file = SimulationSettings::current().path(fileName);
     QString content = Helper::loadTextFile(file);
     if (content.isEmpty())
         throwError(QString("loadTextFile: the file '%1' does not exist or is empty.").arg(file));
@@ -222,11 +231,11 @@ QString ScriptGlobal::loadTextFile(QString fileName)
 }
 void ScriptGlobal::saveTextFile(QString fileName, QString content)
 {
-    Helper::saveToTextFile(GlobalSettings::instance()->path(fileName), content);
+    Helper::saveToTextFile(SimulationSettings::current().path(fileName), content);
 }
 bool ScriptGlobal::fileExists(QString fileName)
 {
-    return QFile::exists(GlobalSettings::instance()->path(fileName));
+    return QFile::exists(SimulationSettings::current().path(fileName));
 }
 
 QString ScriptGlobal::systemCmd(QString command)
@@ -309,9 +318,9 @@ void MapGridWrapper::addToScriptEngine(QJSEngine &engine)
 MapGridWrapper::MapGridWrapper(QObject *)
 {
     mCreated = false;
-    if (!GlobalSettings::instance()->model())
+    if (!SimulationSettings::current().model())
         return;
-    mMap = const_cast<MapGrid*>(GlobalSettings::instance()->model()->standGrid());
+    mMap = const_cast<MapGrid*>(SimulationSettings::current().model()->standGrid());
 
 }
 
@@ -320,7 +329,7 @@ MapGridWrapper::~MapGridWrapper()
     if (mCreated)
         delete mMap;
     // remove potential links in UI to this grid
-    GlobalSettings::instance()->controller()->removeMapGrid(nullptr, mMap);
+    SimulationSettings::current().controller()->removeMapGrid(nullptr, mMap);
 
 }
 
@@ -347,8 +356,8 @@ void MapGridWrapper::paint(double min_value, double max_value)
 {
     //gridToImage(mMap->grid(), false, min_value, max_value).save(file_name);
     if (mMap) {
-        if (GlobalSettings::instance()->controller())
-            GlobalSettings::instance()->controller()->paintMap(mMap, min_value, max_value);
+        if (SimulationSettings::current().controller())
+            SimulationSettings::current().controller()->paintMap(mMap, min_value, max_value);
 
     }
 
@@ -357,14 +366,14 @@ void MapGridWrapper::paint(double min_value, double max_value)
 void MapGridWrapper::registerUI(QString name)
 {
     if (mMap) {
-        if (GlobalSettings::instance()->controller()) {
+        if (SimulationSettings::current().controller()) {
             QString mapname = name;
             if (name.isEmpty()) {
-                QString home_folder = GlobalSettings::instance()->path("");
+                QString home_folder = SimulationSettings::current().path("");
                 mapname = mMap->name();
                 mapname.replace(home_folder, ""); // ... remove project folder from name
             }
-            GlobalSettings::instance()->controller()->addScriptLayer(nullptr, mMap, mapname);
+            SimulationSettings::current().controller()->addScriptLayer(nullptr, mMap, mapname);
         }
     }
 
@@ -398,7 +407,7 @@ void MapGridWrapper::clearProjectArea()
         mMap->createEmptyGrid();
         mCreated = true;
     }
-    const MapGrid *stand_grid = GlobalSettings::instance()->model()->standGrid();
+    const MapGrid *stand_grid = SimulationSettings::current().model()->standGrid();
     if (!stand_grid) {
         qDebug() << "MapGridWrapper::clearProjectArea: no valid stand grid to copy from!";
         return;
@@ -432,8 +441,8 @@ void MapGridWrapper::createStand(int stand_id, QString paint_function, bool wrap
     } else {
         // WRAP AROUND MODE
         // now loop over all cells ...
-        double delta_x = GlobalSettings::instance()->model()->extent().width();
-        double delta_y = GlobalSettings::instance()->model()->extent().height();
+        double delta_x = SimulationSettings::current().model()->extent().width();
+        double delta_y = SimulationSettings::current().model()->extent().height();
 
         for (int *p = mMap->grid().begin(); p!=mMap->grid().end(); ++p) {
             QPoint pt = mMap->grid().indexOf(p);
@@ -558,18 +567,18 @@ double MapGridWrapper::area(int id) {
 bool ScriptGlobal::startOutput(QString table_name)
 {
     if (table_name == "debug_dynamic") {
-        GlobalSettings::instance()->controller()->setDynamicOutputEnabled(true);
+        SimulationSettings::current().controller()->setDynamicOutputEnabled(true);
         qDebug() << "started dynamic debug output";
         return true;
     }
     if (table_name.startsWith("debug_")) {
-        GlobalSettings::DebugOutputs dbg = GlobalSettings::instance()->debugOutputId(table_name.mid(6));
+        SimulationSettings::DebugOutputs dbg = SimulationSettings::current().debugOutputId(table_name.mid(6));
         if (dbg==0)
             qDebug() << "cannot start debug output" << table_name << "because this is not a valid name.";
-        GlobalSettings::instance()->setDebugOutput(dbg, true);
+        SimulationSettings::current().setDebugOutput(dbg, true);
         return true;
     }
-    OutputManager *om = GlobalSettings::instance()->outputManager();
+    OutputManager *om = SimulationSettings::current().outputManager();
     if (!om) return false;
     Output *out = om->find(table_name);
     if (!out) {
@@ -591,18 +600,18 @@ bool ScriptGlobal::startOutput(QString table_name)
 bool ScriptGlobal::stopOutput(QString table_name)
 {
     if (table_name == "debug_dynamic") {
-        GlobalSettings::instance()->controller()->setDynamicOutputEnabled(false);
+        SimulationSettings::current().controller()->setDynamicOutputEnabled(false);
         qDebug() << "stopped dynamic debug output.";
         return true;
     }
     if (table_name.startsWith("debug_")) {
-        GlobalSettings::DebugOutputs dbg = GlobalSettings::instance()->debugOutputId(table_name.mid(6));
+        SimulationSettings::DebugOutputs dbg = SimulationSettings::current().debugOutputId(table_name.mid(6));
         if (dbg==0)
             qDebug() << "cannot stop debug output" << table_name << "because this is not a valid name.";
-        GlobalSettings::instance()->setDebugOutput(dbg, false);
+        SimulationSettings::current().setDebugOutput(dbg, false);
         return true;
     }
-    OutputManager *om = GlobalSettings::instance()->outputManager();
+    OutputManager *om = SimulationSettings::current().outputManager();
     if (!om) return false;
     Output *out = om->find(table_name);
     if (!out) {
@@ -620,7 +629,7 @@ bool ScriptGlobal::stopOutput(QString table_name)
 
 void ScriptGlobal::useSpecialMapForOutputs(MapGridWrapper *m)
 {
-    CustomAggOut *out = dynamic_cast<CustomAggOut*>(GlobalSettings::instance()->outputManager()->find("customagg"));
+    CustomAggOut *out = dynamic_cast<CustomAggOut*>(SimulationSettings::current().outputManager()->find("customagg"));
     if (!out) {
         throwError("useSpecialMapForOutputs() requires 'customagg' output to be available!"); return;
     }
@@ -634,10 +643,10 @@ void ScriptGlobal::useSpecialMapForOutputs(MapGridWrapper *m)
 void ScriptGlobal::debugOutputFilter(QList<int> ru_indices)
 {
     // ru_indices.contains()
-    if (!GlobalSettings::instance()->model())
+    if (!SimulationSettings::current().model())
         return;
 
-    const Grid<ResourceUnit*> &g = GlobalSettings::instance()->model()->RUgrid();
+    const Grid<ResourceUnit*> &g = SimulationSettings::current().model()->RUgrid();
     int n_enabled = 0;
     for (ResourceUnit **ru = g.begin(); ru!=g.end(); ++ru)
         if (*ru) {
@@ -650,61 +659,61 @@ void ScriptGlobal::debugOutputFilter(QList<int> ru_indices)
 
 bool ScriptGlobal::saveDebugOutputs(bool do_clear)
 {
-    GlobalSettings::instance()->controller()->saveDebugOutputJs(do_clear);
+    SimulationSettings::current().controller()->saveDebugOutputJs(do_clear);
     qDebug() << "saved debug outputs.... clear:" << do_clear;
     return true;
 }
 
 bool ScriptGlobal::screenshot(QString file_name)
 {
-    if (GlobalSettings::instance()->controller())
-        GlobalSettings::instance()->controller()->saveScreenshot(file_name);
+    if (SimulationSettings::current().controller())
+        SimulationSettings::current().controller()->saveScreenshot(file_name);
     return true;
 }
 
 void ScriptGlobal::repaint()
 {
-    if (GlobalSettings::instance()->controller())
-        GlobalSettings::instance()->controller()->repaint();
+    if (SimulationSettings::current().controller())
+        SimulationSettings::current().controller()->repaint();
 }
 
 void ScriptGlobal::setViewport(double x, double y, double scale_px_per_m)
 {
-    if (GlobalSettings::instance()->controller())
-        GlobalSettings::instance()->controller()->setViewport(QPointF(x,y), scale_px_per_m);
+    if (SimulationSettings::current().controller())
+        SimulationSettings::current().controller()->setViewport(QPointF(x,y), scale_px_per_m);
 }
 
 /// write grid to a file...
 bool ScriptGlobal::gridToFile(QString grid_type, QString file_name, double hlevel)
 {
-    if (!GlobalSettings::instance()->model())
+    if (!SimulationSettings::current().model())
         return false;
     //QString result;
 
     try{
-    file_name = GlobalSettings::instance()->path(file_name);
+    file_name = SimulationSettings::current().path(file_name);
 
     if (grid_type == "height") {
-        //result = gridToESRIRaster(*GlobalSettings::instance()->model()->heightGrid(), *heightGrid_height);
-        ::gridToFile<HeightGridValue, float>(*GlobalSettings::instance()->model()->heightGrid(), file_name,
+        //result = gridToESRIRaster(*SimulationSettings::current().model()->heightGrid(), *heightGrid_height);
+        ::gridToFile<HeightGridValue, float>(*SimulationSettings::current().model()->heightGrid(), file_name,
                                              [](const HeightGridValue &hgv){ return hgv.height; });
         return true;
     }
 
 
     if (grid_type == "lif") {
-        //result = gridToESRIRaster(*GlobalSettings::instance()->model()->grid());
-        ::gridToFile(*GlobalSettings::instance()->model()->grid(), file_name);
+        //result = gridToESRIRaster(*SimulationSettings::current().model()->grid());
+        ::gridToFile(*SimulationSettings::current().model()->grid(), file_name);
         return true;
     }
     if (grid_type == "lifc") {
-        FloatGrid lif10m_grid = GlobalSettings::instance()->model()->grid()->averaged(5); // average LIF value with 10m resolution
-        HeightGrid *height_grid = GlobalSettings::instance()->model()->heightGrid();
+        FloatGrid lif10m_grid = SimulationSettings::current().model()->grid()->averaged(5); // average LIF value with 10m resolution
+        HeightGrid *height_grid = SimulationSettings::current().model()->heightGrid();
         if (lif10m_grid.count() != height_grid->count()) {
             throwError("gridToFile: Error: grids do not align!");
             return false;
         }
-        SpeciesSet *sset = GlobalSettings::instance()->model()->speciesSet();
+        SpeciesSet *sset = SimulationSettings::current().model()->speciesSet();
         HeightGridValue *ph = height_grid->begin();
         for (float *pl = lif10m_grid.begin(); pl != lif10m_grid.end(); ++pl, ++ph) {
             double rel_height = hlevel / ph->height;
@@ -749,7 +758,7 @@ QJSValue ScriptGlobal::grid(QString type)
 
     if (index == 4) {
         // stand grid
-        const MapGrid *sg = GlobalSettings::instance()->model()->standGrid();
+        const MapGrid *sg = SimulationSettings::current().model()->standGrid();
         if (!sg || !sg->isValid())
             throw IException("Error in Globals.grid(): a valid stand grid is not available!");
         Grid<double> *dgrid = new Grid<double>(sg->grid().metricRect(), sg->grid().cellsize());
@@ -760,7 +769,7 @@ QJSValue ScriptGlobal::grid(QString type)
         return g;
     }
     if (index < 10) {
-        HeightGrid *h = GlobalSettings::instance()->model()->heightGrid();
+        HeightGrid *h = SimulationSettings::current().model()->heightGrid();
         //Grid<double> *dgrid = new Grid<double>(h->cellsize(), h->sizeX(), h->sizeY());
         Grid<double> *dgrid = new Grid<double>(h->metricRect(), h->cellsize());
         // fetch data from height grid
@@ -778,7 +787,7 @@ QJSValue ScriptGlobal::grid(QString type)
         return g;
     } else {
         // resource unit level
-        const Grid<ResourceUnit*> &rg = GlobalSettings::instance()->model()->RUgrid();
+        const Grid<ResourceUnit*> &rg = SimulationSettings::current().model()->RUgrid();
         Grid<double> *dgrid=new Grid<double>(rg.cellsize(), rg.sizeX(), rg.sizeY());
         double *p = dgrid->begin();
         for (ResourceUnit **ru = rg.begin(); ru!=rg.end(); ++ru, ++p) {
@@ -798,12 +807,12 @@ QJSValue ScriptGlobal::grid(QString type)
 
 QJSValue ScriptGlobal::speciesShareGrid(QString species)
 {
-    Species *s = GlobalSettings::instance()->model()->speciesSet()->species(species);
+    Species *s = SimulationSettings::current().model()->speciesSet()->species(species);
     if (!s) {
         throwError("speciesShareGrid: invalid species: '" + species + "'.");
         return QJSValue();
     }
-    const Grid<ResourceUnit*> &rug = GlobalSettings::instance()->model()->RUgrid();
+    const Grid<ResourceUnit*> &rug = SimulationSettings::current().model()->RUgrid();
     Grid<double> *grid = new Grid<double>(rug.cellsize(), rug.sizeX(), rug.sizeY());
     double *p=grid->begin();
     for (ResourceUnit **ru=rug.begin(); ru!=rug.end(); ++ru, ++p) {
@@ -819,7 +828,7 @@ QJSValue ScriptGlobal::speciesShareGrid(QString species)
 QJSValue ScriptGlobal::resourceUnitGrid(QString expression)
 {
     try {
-    const Grid<ResourceUnit*> &rug = GlobalSettings::instance()->model()->RUgrid();
+    const Grid<ResourceUnit*> &rug = SimulationSettings::current().model()->RUgrid();
     Grid<double> *grid = new Grid<double>(rug.cellsize(), rug.sizeX(), rug.sizeY());
     double *p=grid->begin();
     RUWrapper ru_wrap;
@@ -863,10 +872,10 @@ QJSValue ScriptGlobal::resourceUnit(int index)
     if (!mSRU)
         return QJSValue();
     mSRU->clear();
-    if (!GlobalSettings::instance()->model())
+    if (!SimulationSettings::current().model())
         return mRUValue;
 
-    mSRU->setRU(GlobalSettings::instance()->model()->ru(index));
+    mSRU->setRU(SimulationSettings::current().model()->ru(index));
     return mRUValue;
 
 }
@@ -878,10 +887,10 @@ bool ScriptGlobal::seedMapToFile(QString species, QString file_name)
     // Problem: after a full year cycle the seed maps are already cleared and prepared for the next round
     // --> this is now more an "occurence" map
 
-    if (!GlobalSettings::instance()->model())
+    if (!SimulationSettings::current().model())
         return false;
     // find species
-    Species *s = GlobalSettings::instance()->model()->speciesSet()->species(species);
+    Species *s = SimulationSettings::current().model()->speciesSet()->species(species);
     if (!s) {
         throwError("seedMapToFile: invalid species '" + species + "'. No map saved.");
         return false;
@@ -890,10 +899,10 @@ bool ScriptGlobal::seedMapToFile(QString species, QString file_name)
     qDebug() << "creating raster in the next year cycle for species" << s->id();
     return true;
 
-    //gridToImage( s->seedDispersal()->seedMap(), true, 0., 1.).save(GlobalSettings::instance()->path(file_name));
+    //gridToImage( s->seedDispersal()->seedMap(), true, 0., 1.).save(SimulationSettings::current().path(file_name));
 //    QString result = gridToESRIRaster(s->seedDispersal()->seedMap());
 //    if (!result.isEmpty()) {
-//        file_name = GlobalSettings::instance()->path(file_name);
+//        file_name = SimulationSettings::current().path(file_name);
 //        Helper::saveToTextFile(file_name, result);
 //        qDebug() << "saved grid to " << file_name;
 //        return true;
@@ -929,17 +938,17 @@ int ScriptGlobal::addSaplings(int standId, double x, double y, double width, dou
 {
     QRectF remove_rect(x, y, width, height);
     if (standId>0) {
-        if (!GlobalSettings::instance()->model()->standGrid()) {
+        if (!SimulationSettings::current().model()->standGrid()) {
             throwError("addSaplings - no stand grid available!");
             return -1;
         }
 
-        QRectF box = GlobalSettings::instance()->model()->standGrid()->boundingBox(standId);
+        QRectF box = SimulationSettings::current().model()->standGrid()->boundingBox(standId);
         remove_rect.adjust(box.left(), box.top(), box.left(), box.top());
 
     }
-    if (GlobalSettings::instance()->model()->saplings()) {
-        return GlobalSettings::instance()->model()->saplings()->addSaplings(remove_rect, species, treeheight, age);
+    if (SimulationSettings::current().model()->saplings()) {
+        return SimulationSettings::current().model()->saplings()->addSaplings(remove_rect, species, treeheight, age);
     }
     return -1;
 
@@ -949,16 +958,16 @@ void ScriptGlobal::removeSaplings(int standId, double x, double y, double width,
 {
     QRectF remove_rect(x, y, width, height);
     if (standId>0) {
-        if (!GlobalSettings::instance()->model()->standGrid()) {
+        if (!SimulationSettings::current().model()->standGrid()) {
             throwError("addSaplings - no stand grid available!"); return;
         }
 
-        QRectF box = GlobalSettings::instance()->model()->standGrid()->boundingBox(standId);
+        QRectF box = SimulationSettings::current().model()->standGrid()->boundingBox(standId);
         //remove_rect.moveTo(box.topLeft());
         remove_rect.adjust(box.left(), box.top(), box.left(), box.top());
     }
-    if (GlobalSettings::instance()->model()->saplings()) {
-        GlobalSettings::instance()->model()->saplings()->clearSaplings(remove_rect, false, true);
+    if (SimulationSettings::current().model()->saplings()) {
+        SimulationSettings::current().model()->saplings()->clearSaplings(remove_rect, false, true);
     }
 }
 
@@ -968,7 +977,7 @@ bool ScriptGlobal::saveModelSnapshot(QString file_name)
 {
     try {
         Snapshot shot;
-        QString output_db = GlobalSettings::instance()->path(file_name);
+        QString output_db = SimulationSettings::current().path(file_name);
         return shot.createSnapshot(output_db);
     } catch (const IException &e) {
         throwError(e.message());
@@ -982,7 +991,7 @@ bool ScriptGlobal::loadModelSnapshot(QString file_name)
 {
     try {
         Snapshot shot;
-        QString input_db = GlobalSettings::instance()->path(file_name);
+        QString input_db = SimulationSettings::current().path(file_name);
         return shot.loadSnapshot(input_db);
     } catch (const IException &e) {
         throwError(e.message());
@@ -994,10 +1003,10 @@ bool ScriptGlobal::saveStandSnapshot(int stand_id, QString file_name)
 {
     try {
     Snapshot shot;
-    const MapGrid *map_grid = GlobalSettings::instance()->model()->standGrid();
+    const MapGrid *map_grid = SimulationSettings::current().model()->standGrid();
     if (!map_grid)
         return false;
-    return shot.saveStandSnapshot(stand_id, map_grid, GlobalSettings::instance()->path(file_name));
+    return shot.saveStandSnapshot(stand_id, map_grid, SimulationSettings::current().path(file_name));
     } catch (const IException &e) {
         throwError(e.message());
     }
@@ -1008,10 +1017,10 @@ bool ScriptGlobal::loadStandSnapshot(int stand_id, QString file_name)
 {
     try {
     Snapshot shot;
-    const MapGrid *map_grid = GlobalSettings::instance()->model()->standGrid();
+    const MapGrid *map_grid = SimulationSettings::current().model()->standGrid();
     if (!map_grid)
         return false;
-    return shot.loadStandSnapshot(stand_id, map_grid, GlobalSettings::instance()->path(file_name));
+    return shot.loadStandSnapshot(stand_id, map_grid, SimulationSettings::current().path(file_name));
     } catch (const IException &e) {
         throwError(e.message());
     }
@@ -1045,7 +1054,7 @@ void ScriptGlobal::reloadABE()
 {
     qDebug() << "attempting to reload ABE";
     try {
-        GlobalSettings::instance()->model()->reloadABE();
+        SimulationSettings::current().model()->reloadABE();
     } catch (const IException &e) {
         throwError(e.message());
     }
@@ -1057,7 +1066,7 @@ void ScriptGlobal::setUIshortcuts(QJSValue shortcuts)
         qDebug() << "setUIShortcuts: expected a JS-object (name: javascript-call, value: description). Got: " << shortcuts.toString();
     }
     QVariantMap vm = shortcuts.toVariant().toMap();
-    GlobalSettings::instance()->controller()->setUIShortcuts(vm);
+    SimulationSettings::current().controller()->setUIShortcuts(vm);
 }
 
 void ScriptGlobal::test_tree_mortality(double thresh, int years, double p_death)
@@ -1074,14 +1083,14 @@ void ScriptGlobal::test_tree_mortality(double thresh, int years, double p_death)
 
 void ScriptGlobal::throwError(const QString &errormessage)
 {
-    GlobalSettings::instance()->scriptEngine()->throwError(errormessage);
+    SimulationSettings::current().scriptEngine()->throwError(errormessage);
     // mLastErrorMessage += errormessage + "\n"; // not sure if it works to remove this?
     qWarning() << "Scripterror:" << errormessage;
 }
 
 void ScriptGlobal::loadScript(const QString &fileName)
 {
-    QJSEngine *engine = GlobalSettings::instance()->scriptEngine();
+    QJSEngine *engine = SimulationSettings::current().scriptEngine();
     ExprExceptionAsScriptError no_expression;
 
 
@@ -1108,24 +1117,24 @@ void ScriptGlobal::loadScript(const QString &fileName)
 QString ScriptGlobal::executeScript(QString cmd)
 {
     DebugTimer t("execute javascript");
-    QJSEngine *engine = GlobalSettings::instance()->scriptEngine();
+    QJSEngine *engine = SimulationSettings::current().scriptEngine();
     QJSValue result;
     ExprExceptionAsScriptError no_expression;
 
-    mLastErrorMessage = "";
+    runState_mLastErrorMessage() = "";
     if (engine)
         result = engine->evaluate(cmd);
     if (result.isError()) {
         //int line = mEngine->uncaughtExceptionLineNumber();
         QString msg = QString( "Script Error occured: %1\n").arg( result.toString() );
         qDebug() << msg;
-        mLastErrorMessage += msg + "\n";
+        runState_mLastErrorMessage() += msg + "\n";
 
-        mLastErrorMessage += result.property("stack").toString();
+        runState_mLastErrorMessage() += result.property("stack").toString();
 
 
         // throw only a exception during a simulation
-        if (GlobalSettings::instance()->controller()->isRunning())
+        if (SimulationSettings::current().controller()->isRunning())
             throw IException("A Javascript error occured: " + msg);
 
         return msg;
@@ -1138,11 +1147,11 @@ QString ScriptGlobal::executeScript(QString cmd)
 QString ScriptGlobal::executeJSFunction(QString function)
 {
     DebugTimer t("execute javascript");
-    QJSEngine *engine = GlobalSettings::instance()->scriptEngine();
+    QJSEngine *engine = SimulationSettings::current().scriptEngine();
     QJSValue result;
     ExprExceptionAsScriptError no_expression;
 
-    mLastErrorMessage = "";
+    runState_mLastErrorMessage() = "";
 
     if (!engine)
         return QStringLiteral("No valid javascript engine!");
@@ -1151,10 +1160,10 @@ QString ScriptGlobal::executeJSFunction(QString function)
         result = engine->globalObject().property(function).call();
         if (result.isError()) {
             QString msg = QString( "Script Error occured: %1\n").arg( result.toString() );
-            mLastErrorMessage += msg + "\n";
+            runState_mLastErrorMessage() += msg + "\n";
             qDebug() << msg;
             // throw only a exception during a simulation
-            if (GlobalSettings::instance()->controller()->isRunning())
+            if (SimulationSettings::current().controller()->isRunning())
                 throw IException("A Javascript error occured: " + msg);
 
             return msg;
@@ -1189,7 +1198,7 @@ QJSValue ScriptGlobal::viewOptions()
 {
     QJSValue res;
 #ifdef ILAND_GUI
-    MainWindow *mw = GlobalSettings::instance()->controller()->mainWindow();
+    MainWindow *mw = SimulationSettings::current().controller()->mainWindow();
     Ui::MainWindowClass *ui = mw->uiclass();
     // TODO: fix??
 
@@ -1200,7 +1209,7 @@ QJSValue ScriptGlobal::viewOptions()
 void ScriptGlobal::setViewOptions(QJSValue opts)
 {
 #ifdef ILAND_GUI
-    MainWindow *mw = GlobalSettings::instance()->controller()->mainWindow();
+    MainWindow *mw = SimulationSettings::current().controller()->mainWindow();
     Ui::MainWindowClass *ui = mw->uiclass();
     // ruler options
     if (opts.hasProperty("maxValue") || opts.hasProperty("minValue")) {
@@ -1313,7 +1322,7 @@ QJSValue ScriptGlobal::valueFromJs(const QJSValue &js_value, const QString &key,
 QString ScriptGlobal::JStoString(QJSValue value)
 {
     if (value.isArray() || value.isObject()) {
-        QJSValue fun = GlobalSettings::instance()->scriptEngine()->evaluate("(function(a) { return JSON.stringify(a); })");
+        QJSValue fun = SimulationSettings::current().scriptEngine()->evaluate("(function(a) { return JSON.stringify(a); })");
         QJSValue result = fun.call(QJSValueList() << value);
         return result.toString();
     } else
@@ -1323,7 +1332,7 @@ QString ScriptGlobal::JStoString(QJSValue value)
 
 void ScriptGlobal::setupGlobalScripting()
 {
-    QJSEngine *engine = GlobalSettings::instance()->scriptEngine();
+    QJSEngine *engine = SimulationSettings::current().scriptEngine();
 
     // check if update necessary
     if (engine->globalObject().property("include").isCallable())
@@ -1351,7 +1360,8 @@ void ScriptGlobal::setupGlobalScripting()
 
 
     ScriptObjectFactory *factory = new ScriptObjectFactory;
-    QJSValue obj = GlobalSettings::instance()->scriptEngine()->newQObject(factory);
+    factory->setParent(engine);
+    QJSValue obj = SimulationSettings::current().scriptEngine()->newQObject(factory);
     engine->globalObject().setProperty("Factory", obj);
 
 
@@ -1388,12 +1398,13 @@ QJSValue ScriptObjectFactory::newCSVFile(QString filename)
 {
     qInfo() << "object creation in Javascript is deprecated. See https://iland-model.org/apidoc/classes/Factory.html";
     CSVFile *csv_file = new CSVFile;
+    QJSEngine::setObjectOwnership(csv_file,1);
     if (!filename.isEmpty()) {
         qDebug() << "CSVFile: loading file" << filename;
         csv_file->loadFile(filename);
     }
 
-    QJSValue obj = GlobalSettings::instance()->scriptEngine()->newQObject(csv_file);
+    QJSValue obj = SimulationSettings::current().scriptEngine()->newQObject(csv_file);
     mObjCreated++;
     return obj;
 }
@@ -1402,7 +1413,8 @@ QJSValue ScriptObjectFactory::newClimateConverter()
 {
     qInfo() << "object creation in Javascript is deprecated. See https://iland-model.org/apidoc/classes/Factory.html";
     ClimateConverter *cc = new ClimateConverter(nullptr);
-    QJSValue obj = GlobalSettings::instance()->scriptEngine()->newQObject(cc);
+    QJSEngine::setObjectOwnership(cc,1);
+    QJSValue obj = SimulationSettings::current().scriptEngine()->newQObject(cc);
     mObjCreated++;
     return obj;
 
@@ -1413,7 +1425,8 @@ QJSValue ScriptObjectFactory::newMap()
 {
     qInfo() << "object creation in Javascript is deprecated. See https://iland-model.org/apidoc/classes/Factory.html";
     MapGridWrapper *map = new MapGridWrapper(nullptr);
-    QJSValue obj = GlobalSettings::instance()->scriptEngine()->newQObject(map);
+    QJSEngine::setObjectOwnership(map,1);
+    QJSValue obj = SimulationSettings::current().scriptEngine()->newQObject(map);
     mObjCreated++;
     return obj;
 
@@ -1423,7 +1436,8 @@ QJSValue ScriptObjectFactory::newDBHDistribution()
 {
     qInfo() << "object creation in Javascript is deprecated. See https://iland-model.org/apidoc/classes/Factory.html";
     DBHDistribution *dbh = new DBHDistribution();
-    QJSValue obj = GlobalSettings::instance()->scriptEngine()->newQObject(dbh);
+    QJSEngine::setObjectOwnership(dbh,1);
+    QJSValue obj = SimulationSettings::current().scriptEngine()->newQObject(dbh);
     mObjCreated++;
     return obj;
 }
@@ -1439,7 +1453,8 @@ QJSValue ScriptObjectFactory::newSpatialAnalysis()
 {
     qInfo() << "object creation in Javascript is deprecated. See https://iland-model.org/apidoc/classes/Factory.html";
     SpatialAnalysis *spati = new SpatialAnalysis;
-    QJSValue v = GlobalSettings::instance()->scriptEngine()->newQObject(spati);
+    QJSEngine::setObjectOwnership(spati,1);
+    QJSValue v = SimulationSettings::current().scriptEngine()->newQObject(spati);
     mObjCreated++;
     return v;
 

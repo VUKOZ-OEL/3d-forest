@@ -20,6 +20,7 @@
 #ifndef RANDOMGENERATOR_H
 #define RANDOMGENERATOR_H
 #include <cstdlib>
+#include "compat/simulationcontext.h"
 #include <math.h>
 #include <time.h>
 
@@ -32,13 +33,12 @@ public:
     enum ERandomGenerators { ergMersenneTwister, ergWellRNG512, ergXORShift96, ergFastRandom };
     RandomGenerator() { seed(0); setGeneratorType(ergMersenneTwister); }
     /// set the type of the random generator that should be used.
-    static void setGeneratorType(const ERandomGenerators gen) { mGeneratorType = gen; mRotationCount=RANDOMGENERATORROTATIONS+1;mIndex=0;mRefillCounter=0; }
-    static void debugState(int &rIndex, int &rGeneration, int &rRefillCount) { rIndex = mIndex; rGeneration = mRotationCount; rRefillCount = mRefillCounter; }
-    static int debugNRandomNumbers() { return mIndex + RANDOMGENERATORSIZE*mRotationCount + (RANDOMGENERATORROTATIONS+1)*RANDOMGENERATORSIZE*mRefillCounter; }
+    static void setGeneratorType(const ERandomGenerators gen) { std::lock_guard<std::recursive_mutex> lock(mutex()); runState_mGeneratorType() = gen; runState_mRotationCount()=RANDOMGENERATORROTATIONS+1;runState_mIndex()=0;runState_mRefillCounter()=0; }
+    static void debugState(int &rIndex, int &rGeneration, int &rRefillCount) { std::lock_guard<std::recursive_mutex> lock(mutex()); rIndex = runState_mIndex(); rGeneration = runState_mRotationCount(); rRefillCount = runState_mRefillCounter(); }
+    static int debugNRandomNumbers() { std::lock_guard<std::recursive_mutex> lock(mutex()); return runState_mIndex() + RANDOMGENERATORSIZE*runState_mRotationCount() + (RANDOMGENERATORROTATIONS+1)*RANDOMGENERATORSIZE*runState_mRefillCounter(); }
     /// call this function to check if we need to create new random numbers.
-    /// this function is not reentrant! (e.g. call every year in the model)
-    static void checkGenerator() { if (mRotationCount>RANDOMGENERATORROTATIONS) { refill();  } }
-    static void setup(const ERandomGenerators gen, const unsigned oneSeed) { setGeneratorType(gen); seed(oneSeed); checkGenerator(); }
+    static void checkGenerator() { std::lock_guard<std::recursive_mutex> lock(mutex()); if (runState_mRotationCount()>RANDOMGENERATORROTATIONS) { refill();  } }
+    static void setup(const ERandomGenerators gen, const unsigned oneSeed) { std::lock_guard<std::recursive_mutex> lock(mutex()); setGeneratorType(gen); seed(oneSeed); checkGenerator(); }
     /// set a random generator seed. If oneSeed is 0, then a random number (provided by system time) is used as initial seed.
     static void seed(const unsigned oneSeed);
     /// get a random value from [0., 1.]
@@ -51,12 +51,21 @@ public:
     static inline double randNorm( const double mean, const double stddev );
 
 private:
-    static inline unsigned long next() { ++mIndex; if (mIndex>RANDOMGENERATORSIZE) { mRotationCount++; mIndex=0; checkGenerator(); }  return mBuffer[mIndex]; }
-    static unsigned int mBuffer[RANDOMGENERATORSIZE+5];
-    static int mIndex;
-    static int mRotationCount;
-    static int mRefillCounter;
-    static ERandomGenerators mGeneratorType;
+    static std::recursive_mutex &mutex() {
+        struct State { std::recursive_mutex mutex; };
+        return SimulationContext::state<State>().mutex;
+    }
+    static inline unsigned long next() { std::lock_guard<std::recursive_mutex> lock(mutex()); ++runState_mIndex(); if (runState_mIndex()>RANDOMGENERATORSIZE) { runState_mRotationCount()++; runState_mIndex()=0; checkGenerator(); }  return runState_mBuffer()[runState_mIndex()]; }
+    using RunType_mBuffer = unsigned int[RANDOMGENERATORSIZE+5];
+    static RunType_mBuffer &runState_mBuffer();
+    using RunType_mIndex = int;
+    static RunType_mIndex &runState_mIndex();
+    using RunType_mRotationCount = int;
+    static RunType_mRotationCount &runState_mRotationCount();
+    using RunType_mRefillCounter = int;
+    static RunType_mRefillCounter &runState_mRefillCounter();
+    using RunType_mGeneratorType = ERandomGenerators;
+    static RunType_mGeneratorType &runState_mGeneratorType();
     static void refill();
 };
 

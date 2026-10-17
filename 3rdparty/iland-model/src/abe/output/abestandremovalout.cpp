@@ -17,7 +17,7 @@
 **    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************************************/
 #include "abestandremovalout.h"
-#include "globalsettings.h"
+#include "simulationsettings.h"
 
 #include "forestmanagementengine.h"
 #include "fmstand.h"

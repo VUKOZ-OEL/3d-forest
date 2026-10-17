@@ -37,7 +37,8 @@ struct ClimateDay
     double preciptitation; // sum of day [mm]
     double radiation; // sum of day (MJ/m2)
     double vpd; // average of day [kPa] = [0.1 mbar] (1 bar = 100kPa)
-    static double co2; // ambient CO2 content in ppm
+    using RunType_co2 = double;
+    static RunType_co2 &runState_co2(); // ambient CO2 content in ppm
     QString toString() const { return QString("%1.%2.%3").arg(dayOfMonth).arg(month).arg(year); }
     bool isValid() const  { return (year>=0); }
     int id() const { return year*10000 + month*100 + dayOfMonth; }
@@ -128,11 +129,15 @@ private:
     double mPrecipitationMonth[12]; ///< this years preciptitation sum (mm) per month
     double mTemperatureMonth[12]; ///< this years average temperature per month
     double mMeanAnnualTemperature; ///< mean temperature of the current year
-    static QVector<int> sampled_years; ///< list of sampled years to use
+    using RunType_sampled_years = QVector<int>;
+    static RunType_sampled_years &runState_sampled_years(); ///< list of sampled years to use
     // co2 concentrations
-    static QString co2Pathway;
-    static int co2Startyear;
-    static QMap<QString, QVector<double> > fixedCO2concentrations;
+    using RunType_co2Pathway = QString;
+    static RunType_co2Pathway &runState_co2Pathway();
+    using RunType_co2Startyear = int;
+    static RunType_co2Startyear &runState_co2Startyear();
+    using RunType_fixedCO2concentrations = QMap<QString, QVector<double> >;
+    static RunType_fixedCO2concentrations &runState_fixedCO2concentrations();
 };
 
 #endif // CLIMATE_H

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- More details on iland.boku.ac.at/ProjectFile -->
+<project>
+<database>
+<in>testdb</in>
+<out></out>
+</database>
+<path>
+<home>e:\daten\iland\projects\test</home>
+<database>database</database>
+<lip>lip</lip>
+<temp>temp</temp>
+</path>
+
+<species>
+<source>species</source>
+<reader>readerstamp.bin</reader>
+
+<enabledSpecies>
+piab foobar prozac dunno
+</enabledSpecies>
+</species>
+
+<world>
+<cellSize>2</cellSize>
+<width>100</width>
+<height>200</height>
+<buffer>50</buffer>
+</world>
+
+<treeinit>E:\Daten\iLand\Light\stands\crowded_medium.csv</treeinit>
+</project>

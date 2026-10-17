@@ -61,7 +61,7 @@ public:
     /// get trees/ha of species `speciesID` in class `classIndex`(0..nClasses()-1)
     double dbhClass(const QString &speciesId, const int class_index) const;
     /// return the number of DBH classes
-    int nClasses() const { return mNClasses; }
+    int nClasses() const { return runState_mNClasses(); }
     /// return the index of the class where `dbh` falls into (0..nClasses()-1)
     inline int classIndex(const float dbh) const;
     /// return the label of the class `class_index`. The label caption
@@ -95,7 +95,8 @@ private:
     void clear(QVector< double* > &distribution); ///< clear all data from `distribution`
     /// add dbh distribution `source` to `target`
     void addDistribution(const QVector<double *> &source, QVector<double*> &target);
-    static int mNClasses;
+    using RunType_mNClasses = int;
+    static RunType_mNClasses &runState_mNClasses();
 };
 
 #endif // DBHDISTRIBUTION_H

@@ -48,12 +48,14 @@ public:
     /// current snowpack (mm water)
     double snowPack() const { return mSnowPack; }
     /// depth of snow (m)
-    double snowDepth() const {  return mSnowPack / mSnowDensity; /* mm = kg/m2, density=kg/m3, mm / density = m */ }
+    double snowDepth() const {  return mSnowPack / runState_mSnowDensity(); /* mm = kg/m2, density=kg/m3, mm / density = m */ }
 private:
     double mSnowPack; ///< height of snowpack (mm water column)
     // parameters of snow class
-    static double mSnowTemperature; ///< Threshold temperature for snowing / snow melt
-    static double mSnowDensity; ///< density (kg/m3) of the snow
+    using RunType_mSnowTemperature = double;
+    static RunType_mSnowTemperature &runState_mSnowTemperature(); ///< Threshold temperature for snowing / snow melt
+    using RunType_mSnowDensity = double;
+    static RunType_mSnowDensity &runState_mSnowDensity(); ///< density (kg/m3) of the snow
 
 };
 
@@ -92,8 +94,10 @@ private:
     double mAirDensity; // density of air [kg / m3]
     double mET0[12]; ///< reference evapotranspiration per month (sum of the month, mm)
     // parameters for interception
-    static double mNeedleFactor; ///< factor for calculating water storage capacity for intercepted water for conifers
-    static double mDecidousFactor; ///< the same for broadleaved
+    using RunType_mNeedleFactor = double;
+    static RunType_mNeedleFactor &runState_mNeedleFactor(); ///< factor for calculating water storage capacity for intercepted water for conifers
+    using RunType_mDecidousFactor = double;
+    static RunType_mDecidousFactor &runState_mDecidousFactor(); ///< the same for broadleaved
     friend class ::WaterCycle;
     // GCC problems with friend class and namespaces: http://www.ogre3d.org/forums/viewtopic.php?f=10&t=47540
 };
@@ -180,7 +184,8 @@ private:
 
     /// container for storing min-psi values per resource unit + phenology class
     /// key: RU + phenoGroup, value: psiMin (2week minimum) MPa
-    static QHash<int, double> mEstPsi;
+    using RunType_mEstPsi = QHash<int, double>;
+    static RunType_mEstPsi &runState_mEstPsi();
 
     friend class ::WaterOut;
     friend class Water::Permafrost;

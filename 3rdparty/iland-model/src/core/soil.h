@@ -66,7 +66,8 @@ public:
 private:
     ResourceUnit *mRU; ///< link to containing resource unit
     void fetchParameters(); ///< set iland parameters for soil
-    static SoilParams *mParams; // static container for parameters
+    using RunType_mParams = SoilParams *;
+    static RunType_mParams &runState_mParams(); // static container for parameters
     // variables
     double mRE; ///< climate factor 're' (see Snag::calculateClimateFactors())
     double mAvailableNitrogen; ///< plant available nitrogen (kg/ha)
@@ -90,7 +91,8 @@ private:
     CNPair mTotalToDisturbance; ///< book-keeping pool for heterotrophic respiration (kg/*ha)
     CNPair mTotalToAtmosphere; ///< book-keeping disturbance envents (fire) (kg/ha)
 
-    static double mNitrogenDeposition; ///< annual nitrogen deposition (kg N/ha*yr)
+    using RunType_mNitrogenDeposition = double;
+    static RunType_mNitrogenDeposition &runState_mNitrogenDeposition(); ///< annual nitrogen deposition (kg N/ha*yr)
     friend class Snapshot;
     friend class SoilInputOut;
 };

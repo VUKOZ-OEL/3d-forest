@@ -33,8 +33,16 @@
 
   */
 
-double Sapling::mRecruitmentVariation = 0.1; // +/- 10%
-double Sapling::mBrowsingPressure = 0.;
+Sapling::RunType_mRecruitmentVariation &Sapling::runState_mRecruitmentVariation()
+{
+    struct State { RunType_mRecruitmentVariation value = 0.1; };
+    return SimulationContext::state<State>().value;
+} // +/- 10%
+Sapling::RunType_mBrowsingPressure &Sapling::runState_mBrowsingPressure()
+{
+    struct State { RunType_mBrowsingPressure value = 0.; };
+    return SimulationContext::state<State>().value;
+}
 
 Sapling::Sapling()
 {
@@ -56,10 +64,10 @@ void Sapling::clearStatistics()
 
 void Sapling::updateBrowsingPressure()
 {
-    if (GlobalSettings::instance()->settings().valueBool("model.settings.browsing.enabled"))
-        Sapling::mBrowsingPressure = GlobalSettings::instance()->settings().valueDouble("model.settings.browsing.browsingPressure");
+    if (SimulationSettings::current().settings().valueBool("model.settings.browsing.enabled"))
+        Sapling::runState_mBrowsingPressure() = SimulationSettings::current().settings().valueDouble("model.settings.browsing.browsingPressure");
     else
-        Sapling::mBrowsingPressure = 0.;
+        Sapling::runState_mBrowsingPressure() = 0.;
 }
 
 /// get the *represented* (Reineke's Law) number of trees (N/ha)
@@ -142,7 +150,7 @@ bool Sapling::hasSapling(const QPoint &position) const
         qDebug() << "Sapling error";
     return mSapBitset[index];
     /*
-    float *target = GlobalSettings::instance()->model()->grid()->ptr(position.x(), position.y());
+    float *target = SimulationSettings::current().model()->grid()->ptr(position.x(), position.y());
     QVector<SaplingTree>::const_iterator it;
     for (it = mSaplingTrees.constBegin(); it!=mSaplingTrees.constEnd(); ++it) {
         if (it->pixel==target)
@@ -160,7 +168,7 @@ double Sapling::heightAt(const QPoint &position) const
         return 0.;
     // ok, we'll have to search through all saplings
     QVector<SaplingTreeOld>::const_iterator it;
-    float *lif_ptr = GlobalSettings::instance()->model()->grid()->ptr(position.x(), position.y());
+    float *lif_ptr = SimulationSettings::current().model()->grid()->ptr(position.x(), position.y());
     for (it = mSaplingTrees.constBegin(); it!=mSaplingTrees.constEnd(); ++it) {
         if (it->isValid() && it->pixel == lif_ptr)
             return it->height;
@@ -184,7 +192,7 @@ int Sapling::addSapling(const QPoint &pos_lif, const float height, const int age
     SaplingTreeOld &t = mSaplingTrees.back();
     t.height = height; // default is 5cm height
     t.age.age = age;
-    Grid<float> &lif_map = *GlobalSettings::instance()->model()->grid();
+    Grid<float> &lif_map = *SimulationSettings::current().model()->grid();
     t.pixel = lif_map.ptr(pos_lif.x(), pos_lif.y());
     setBit(pos_lif, true);
     mAdded++;
@@ -194,7 +202,7 @@ int Sapling::addSapling(const QPoint &pos_lif, const float height, const int age
 /// clear  saplings on a given position (after recruitment)
 void Sapling::clearSaplings(const QPoint &position)
 {
-    float *target = GlobalSettings::instance()->model()->grid()->ptr(position.x(), position.y());
+    float *target = SimulationSettings::current().model()->grid()->ptr(position.x(), position.y());
     QVector<SaplingTreeOld>::const_iterator it;
     for (it = mSaplingTrees.constBegin(); it!=mSaplingTrees.constEnd(); ++it) {
         if (it->pixel==target) {
@@ -214,7 +222,7 @@ void Sapling::clearSaplings(const QPoint &position)
 void Sapling::clearSaplings(const QRectF &rectangle, const bool remove_biomass)
 {
     QVector<SaplingTreeOld>::const_iterator it;
-    FloatGrid *grid = GlobalSettings::instance()->model()->grid();
+    FloatGrid *grid = SimulationSettings::current().model()->grid();
     for (it = mSaplingTrees.constBegin(); it!=mSaplingTrees.constEnd(); ++it) {
         if (rectangle.contains(grid->cellCenterPoint(it->coords()))) {
             clearSapling(const_cast<SaplingTreeOld&>(*it), remove_biomass);
@@ -248,8 +256,8 @@ void Sapling::clearSapling(int index, const bool remove)
 /// see also http://iland.boku.ac.at/recruitment
 bool Sapling::growSapling(SaplingTreeOld &tree, const double f_env_yr, Species* species)
 {
-    QPoint p=GlobalSettings::instance()->model()->grid()->indexOf(tree.pixel);
-    //GlobalSettings::instance()->model()->heightGrid()[Grid::index5(tree.pixel-GlobalSettings::instance()->model()->grid()->begin())];
+    QPoint p=SimulationSettings::current().model()->grid()->indexOf(tree.pixel);
+    //SimulationSettings::current().model()->heightGrid()[Grid::index5(tree.pixel-SimulationSettings::current().model()->grid()->begin())];
 
     // (1) calculate height growth potential for the tree (uses linerization of expressions...)
     double h_pot = species->saplingGrowthParameters().heightGrowthPotential.calculate(tree.height); // TODO check if this can be source of crashes (race condition)
@@ -257,7 +265,7 @@ bool Sapling::growSapling(SaplingTreeOld &tree, const double f_env_yr, Species* 
 
     // (2) reduce height growth potential with species growth response f_env_yr and with light state (i.e. LIF-value) of home-pixel.
     double lif_value = *tree.pixel;
-    double h_height_grid = GlobalSettings::instance()->model()->heightGrid()->valueAtIndex(p.x()/cPxPerHeight, p.y()/cPxPerHeight).height;
+    double h_height_grid = SimulationSettings::current().model()->heightGrid()->valueAtIndex(p.x()/cPxPerHeight, p.y()/cPxPerHeight).height;
     if (h_height_grid==0.)
         throw IException(QString("growSapling: height grid at %1/%2 has value 0").arg(p.x()).arg(p.y()));
 
@@ -273,11 +281,11 @@ bool Sapling::growSapling(SaplingTreeOld &tree, const double f_env_yr, Species* 
         qDebug() << "invalid values in Sapling::growSapling";
 
     // check browsing
-    if (mBrowsingPressure>0. && tree.height<=2.f) {
+    if (runState_mBrowsingPressure()>0. && tree.height<=2.f) {
         double p = mRUS->species()->saplingGrowthParameters().browsingProbability;
         // calculate modifed annual browsing probability via odds-ratios
         // odds = p/(1-p) -> odds_mod = odds * browsingPressure -> p_mod = odds_mod /( 1 + odds_mod) === p*pressure/(1-p+p*pressure)
-        double p_browse = p*mBrowsingPressure / (1. - p + p*mBrowsingPressure);
+        double p_browse = p*runState_mBrowsingPressure() / (1. - p + p*runState_mBrowsingPressure());
         if (drandom() < p_browse) {
             delta_h_factor = 0.;
         }
@@ -320,8 +328,8 @@ bool Sapling::growSapling(SaplingTreeOld &tree, const double f_env_yr, Species* 
             Tree &bigtree = ru->newTree();
             bigtree.setPosition(p);
             // add variation: add +/-10% to dbh and *independently* to height.
-            bigtree.setDbh(dbh * nrandom(1. - mRecruitmentVariation, 1. + mRecruitmentVariation));
-            bigtree.setHeight(tree.height * nrandom(1. - mRecruitmentVariation, 1. + mRecruitmentVariation));
+            bigtree.setDbh(dbh * nrandom(1. - runState_mRecruitmentVariation(), 1. + runState_mRecruitmentVariation()));
+            bigtree.setHeight(tree.height * nrandom(1. - runState_mRecruitmentVariation(), 1. + runState_mRecruitmentVariation()));
             bigtree.setSpecies( species );
             bigtree.setAge(tree.age.age,tree.height);
             bigtree.setRU(ru);
@@ -445,8 +453,8 @@ void Sapling::calculateGrowth()
         cleanupStorage();
 
 //    mRUS->statistics().add(this);
-    GlobalSettings::instance()->systemStatistics()->saplingCount+=mLiving;
-    GlobalSettings::instance()->systemStatistics()->newSaplings+=mAdded;
+    SimulationSettings::current().systemStatistics()->saplingCount+=mLiving;
+    SimulationSettings::current().systemStatistics()->newSaplings+=mAdded;
     mAdded = 0; // reset
 
     //qDebug() << ru->index() << species->id()<< ": (living/avg.height):" <<  mLiving << mAvgHeight;

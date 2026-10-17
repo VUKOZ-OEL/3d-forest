@@ -1,0 +1,42 @@
+      31 text files.
+classified 31 files      31 unique files.                              
+       2 files ignored.
+
+github.com/AlDanial/cloc v 1.90  T=0.04 s (736.4 files/s, 117638.8 lines/s)
+------------------------------------------------------------------------------------
+File                                  blank        comment           code
+------------------------------------------------------------------------------------
+.\biteagent.cpp                          92             46            393
+.\bitecellscript.cpp                     87             64            367
+.\biteimpact.cpp                         86             35            346
+.\bitedispersal.cpp                      63             36            192
+.\biteengine.cpp                         49             32            189
+.\bitebiomass.cpp                        59             35            185
+.\biteagent.h                            39             42            133
+.\bitecell.cpp                           27             25            127
+.\bitelifecycle.cpp                      53             24            126
+.\bitecolonization.cpp                   36             23            121
+.\bitecellscript.h                       25             27            114
+.\bitewrapper.cpp                        25             23            103
+.\biteoutput.cpp                         22             25            101
+.\bitescript.cpp                         30             23             84
+.\biteitem.cpp                           22             21             78
+.\biteoutputitem.cpp                     22              1             64
+.\biteclimate.cpp                        12             18             60
+.\bitecell.h                             16             21             57
+.\bitedispersal.h                        17             23             51
+.\biteitem.h                             17             20             51
+.\biteimpact.h                           13             19             48
+.\biteengine.h                           16             27             43
+.\bitewrapper.h                          13             19             43
+.\bitebiomass.h                          11             18             37
+.\bitelifecycle.h                        15             23             37
+.\bitecolonization.h                      9             19             28
+.\biteoutput.h                            7             19             27
+.\biteoutputitem.h                       10              0             27
+.\bitescript.h                           12             19             26
+.\biteclimate.h                           7             19             19
+.\bite_global.h                           6              0             11
+------------------------------------------------------------------------------------
+SUM:                                    918            746           3288
+------------------------------------------------------------------------------------

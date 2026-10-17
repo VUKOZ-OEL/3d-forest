@@ -65,7 +65,8 @@ private:
     QVector<SPlantingItem> mItems;
     bool mRequireLoading;
 
-    static QStringList mAllowedProperties;
+    using RunType_mAllowedProperties = QStringList;
+    static RunType_mAllowedProperties &runState_mAllowedProperties();
 
 
 };

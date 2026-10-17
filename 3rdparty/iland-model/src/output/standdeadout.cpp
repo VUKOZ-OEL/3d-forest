@@ -47,7 +47,7 @@ void StandDeadOut::setup()
 
 void StandDeadOut::exec()
 {
-    Model *m = GlobalSettings::instance()->model();
+    Model *m = SimulationSettings::current().model();
 
     foreach(ResourceUnit *ru, m->ruList()) {
         if (ru->id()==-1)

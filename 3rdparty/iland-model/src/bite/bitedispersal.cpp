@@ -166,7 +166,7 @@ void BiteDispersal::setupKernel(QString expr, double max_dist, QString dbg_file)
     qCDebug(biteSetup) << "Kernel setup. Size (x/y): " << mKernel.sizeX() << "/" << mKernel.sizeY() << ". Sum over all cells:" << ksum << ", max." << kmax << "Scaled: sum=" << mKernel.sum() << "max:" << mKernel.max();
 
     if (!dbg_file.isEmpty()) {
-        QString fileName = GlobalSettings::instance()->path(dbg_file);
+        QString fileName = SimulationSettings::current().path(dbg_file);
         QString result = gridToESRIRaster(mKernel);
         Helper::saveToTextFile(fileName, result);
         qDebug() << "debug: saved dispersal kernel to " << fileName;
@@ -275,7 +275,7 @@ void BiteDistribution::setup(BiteAgent *parent_agent)
 
         QJSValue map_file = BiteEngine::valueFromJs(mObj, "map");
         if (map_file.isString()) {
-            QString map_filename = GlobalSettings::instance()->path(map_file.toString());
+            QString map_filename = SimulationSettings::current().path(map_file.toString());
             mGrid.loadGridFromFile(map_filename);
             qCDebug(biteSetup) << "Loaded input file" << map_filename << "for the BiteDistribution" << name();
         }

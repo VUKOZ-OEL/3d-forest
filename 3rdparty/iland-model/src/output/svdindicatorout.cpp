@@ -135,7 +135,7 @@ double SVDIndicatorOut::calcShannonIndex(const ResourceUnit *ru)
 
 double SVDIndicatorOut::calcCrownCover(const ResourceUnit *ru)
 {
-    Model *model = GlobalSettings::instance()->model();
+    Model *model = SimulationSettings::current().model();
     GridRunner<float> runner(mCrownCoverGrid, ru->boundingBox());
     int cc_sum = 0;
     while (float *gv = runner.next()) {
@@ -167,7 +167,7 @@ void SVDIndicatorOut::addSpeciesProportions(const ResourceUnit *ru)
     // do only once:
     if (mSpecies[0].second == -1) {
         for (int i=0;i<mSpecies.size();++i) {
-            Species *s = Globals->model()->speciesSet()->species(mSpecies[i].first);
+            Species *s = SimulationSettings::current().model()->speciesSet()->species(mSpecies[i].first);
             if (!s)
                 throw IException(QString("Setup SVDIndicatorOut: Species '%1' is not available!").arg(mSpecies[i].first));
             mSpecies[i].second = s->index(); // save index for later use
@@ -189,7 +189,7 @@ void SVDIndicatorOut::addDisturbanceHistory(const ResourceUnit *ru)
     for (int i=0;i<mNDisturbanceHistory;++i) {
         if (i < ru->mSVDState.disturbanceEvents->size()) {
             const ResourceUnit::RUSVDState::SVDDisturbanceEvent &e =  (*ru->mSVDState.disturbanceEvents)[i];
-            *this << Globals->currentYear() - e.year; // time since disturbance
+            *this << SimulationSettings::current().currentYear() - e.year; // time since disturbance
             *this << e.source; // type of disturbance
             *this << e.info; // some additional information
         } else {
@@ -316,10 +316,10 @@ double SVDIndicatorOut::calcIBP(const ResourceUnit *ru)
     // factor H: continuity and forest management
     // we assume a disturbance due to managment when management happened in the last 20 yrs
     int f_continuity = 5;
-    if (GlobalSettings::instance()->model()->ABEngine()) {
-        ABE::FMStand *stand = GlobalSettings::instance()->model()->ABEngine()->standAt(ru->boundingBox().center());
+    if (SimulationSettings::current().model()->ABEngine()) {
+        ABE::FMStand *stand = SimulationSettings::current().model()->ABEngine()->standAt(ru->boundingBox().center());
         if (stand) {
-            if (stand->lastExecution() > -1 && GlobalSettings::instance()->currentYear() - stand->lastExecution() < 20) {
+            if (stand->lastExecution() > -1 && SimulationSettings::current().currentYear() - stand->lastExecution() < 20) {
                 if (stand->age() < 20 && stand->volume() < 100)
                     f_continuity = 0; // we assume full clearcut after a rotation when standing volume is low
                 else
@@ -347,7 +347,7 @@ double SVDIndicatorOut::calcIBP(const ResourceUnit *ru)
 
 void SVDIndicatorOut::exec()
 {
-    if (!GlobalSettings::instance()->model()->svdStates()) {
+    if (!SimulationSettings::current().model()->svdStates()) {
         qWarning() << "Output SVDIndicatorOut cannot be used, because it requires the 'svdstate' output (and the SVD subsystem ('model.settings.svdStates.enabled')). Output disabled.";
 
         throw IException("Setup of SVDIndcatorOut: SVD states are required for this output ('model.settings.svdStates.enabled').");
@@ -357,7 +357,7 @@ void SVDIndicatorOut::exec()
     // we need to run crown projections for all trees...
     if (mIndicators.test(EcrownCover)) {
         if (mCrownCoverGrid.isEmpty())
-            mCrownCoverGrid.setup(*GlobalSettings::instance()->model()->grid());
+            mCrownCoverGrid.setup(*SimulationSettings::current().model()->grid());
 
         SpatialAnalysis::runCrownProjection2m(&mCrownCoverGrid);
 
@@ -365,7 +365,7 @@ void SVDIndicatorOut::exec()
 
 
     QList<ResourceUnit*>::const_iterator it;
-    Model *m = GlobalSettings::instance()->model();
+    Model *m = SimulationSettings::current().model();
     for (it=m->ruList().constBegin(); it!=m->ruList().constEnd(); ++it) {
         if ((*it)->id()==-1)
             continue; // do not include if out of project area

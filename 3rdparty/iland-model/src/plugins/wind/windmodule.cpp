@@ -17,7 +17,7 @@
 **    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************************************/
 #include "windmodule.h"
-#include "globalsettings.h"
+#include "simulationsettings.h"
 #include "debugtimer.h"
 #include "model.h"
 #include "modelcontroller.h"
@@ -128,7 +128,7 @@ WindModule::WindModule()
 
 WindModule::~WindModule()
 {
-    GlobalSettings::instance()->controller()->removeLayers(&mWindLayers);
+    SimulationSettings::current().controller()->removeLayers(&mWindLayers);
 }
 
 /// setup of general settings from the project file.
@@ -136,15 +136,15 @@ WindModule::~WindModule()
 void WindModule::setup()
 {
     // setup the grid (using the size/resolution)
-    mRUGrid.setup(GlobalSettings::instance()->model()->RUgrid().metricRect(),
-                  GlobalSettings::instance()->model()->RUgrid().cellsize());
+    mRUGrid.setup(SimulationSettings::current().model()->RUgrid().metricRect(),
+                  SimulationSettings::current().model()->RUgrid().cellsize());
     // setup the wind grid
     mGrid.clear(); // force a recreate (incl. c'tor)
-    mGrid.setup(GlobalSettings::instance()->model()->heightGrid()->metricRect(), cellsize());
+    mGrid.setup(SimulationSettings::current().model()->heightGrid()->metricRect(), cellsize());
     //mFireId = 0;
 
     // set some global settings
-    XmlHelper xml(GlobalSettings::instance()->settings().node("modules.wind"));
+    XmlHelper xml(SimulationSettings::current().settings().node("modules.wind"));
     mWindDirectionVariation = xml.valueDouble(".directionVariation", 0.) * M_PI/180.;
     mWindDirection = xml.valueDouble(".direction", 0.)*M_PI/180.;
     mWindSpeed = 0.; // set the wind speed explicitely to 0
@@ -183,7 +183,7 @@ void WindModule::setup()
 
     mWindLayers.setGrid(mGrid);
     mWindLayers.setRUGrid(&mRUGrid);
-    GlobalSettings::instance()->controller()->addLayers(&mWindLayers, "wind");
+    SimulationSettings::current().controller()->addLayers(&mWindLayers, "wind");
 
     // Javascript handlers
     mAfterExecEvent = xml.value(".onAfterWind");
@@ -199,7 +199,7 @@ void WindModule::setup()
 void WindModule::setupResourceUnit(const ResourceUnit *ru)
 {
     if (!mTopexFromGrid) {
-        float topo_value =  static_cast<float>( GlobalSettings::instance()->settings().valueDouble("modules.wind.topoModifier", 1.) );
+        float topo_value =  static_cast<float>( SimulationSettings::current().settings().valueDouble("modules.wind.topoModifier", 1.) );
         GridRunner<WindCell> runner(mGrid, ru->boundingBox());
         while (WindCell *p=runner.next()) {
             p->topex = topo_value;
@@ -211,7 +211,7 @@ void WindModule::setupResourceUnit(const ResourceUnit *ru)
 /// wind related species parameter are located in a separate sqlite-table.
 void WindModule::loadSpeciesParameter(const QString &table_name)
 {
-    QSqlQuery query(GlobalSettings::instance()->dbin());
+    QSqlQuery query(SimulationSettings::current().dbin());
     QString sql = QString("select * from %1").arg(table_name);
     query.exec(sql);
     if (query.lastError().isValid()){
@@ -230,7 +230,7 @@ void WindModule::loadSpeciesParameter(const QString &table_name)
     QString species_id;
     while (query.next()) {
         species_id = query.value(iID).toString();
-        Species *s = GlobalSettings::instance()->model()->speciesSet()->species(species_id);
+        Species *s = SimulationSettings::current().model()->speciesSet()->species(species_id);
         if (s) {
             WindSpeciesParameters &p = mSpeciesParameters[s];
             p.Creg = query.value(iCreg).toDouble();
@@ -304,7 +304,7 @@ void WindModule::run(const int iteration, const bool execute_from_script)
     // execute the after wind event
     if (!mBeforeExecEvent.isEmpty()) {
         // evaluate the javascript function...
-        GlobalSettings::instance()->executeJavascript(mBeforeExecEvent);
+        SimulationSettings::current().executeJavascript(mBeforeExecEvent);
     }
 
     // initialize things in the first iteration
@@ -313,7 +313,7 @@ void WindModule::run(const int iteration, const bool execute_from_script)
         if (!execute_from_script) {
             setSimulationMode(false);
             initWindGrid();
-            if (GlobalSettings::instance()->currentYear() == 1) {
+            if (SimulationSettings::current().currentYear() == 1) {
                 initializeEdgeAge(mEdgeAgeBaseValue - 1);
             } else {
                 detectEdges(); //  needed for the increment
@@ -363,13 +363,13 @@ void WindModule::run(const int iteration, const bool execute_from_script)
 
     afterWind(); // some aggregations
 
-    GlobalSettings::instance()->outputManager()->execute("wind");
-    GlobalSettings::instance()->outputManager()->save();
+    SimulationSettings::current().outputManager()->execute("wind");
+    SimulationSettings::current().outputManager()->save();
 
     // execute the after wind event
     if (!mAfterExecEvent.isEmpty()) {
         // evaluate the javascript function...
-        GlobalSettings::instance()->executeJavascript(mAfterExecEvent);
+        SimulationSettings::current().executeJavascript(mAfterExecEvent);
     }
 
 }
@@ -377,7 +377,7 @@ void WindModule::run(const int iteration, const bool execute_from_script)
 void WindModule::initWindGrid()
 {
     DebugTimer t("wind:init");
-    mWindDayOfYear = GlobalSettings::instance()->settings().valueInt("modules.wind.dayOfYear");
+    mWindDayOfYear = SimulationSettings::current().settings().valueInt("modules.wind.dayOfYear");
     // reset some statistics
     mTotalKilledBasalArea = 0.;
     mTotalKilledVolume = 0.;
@@ -386,7 +386,7 @@ void WindModule::initWindGrid()
     // as long as we have 10m -> easy!
     if (cellsize()==cHeightPerRU) {
         WindCell *p = mGrid.begin();
-        for (const HeightGridValue *hgv=GlobalSettings::instance()->model()->heightGrid()->begin(); hgv!=GlobalSettings::instance()->model()->heightGrid()->end(); ++hgv, ++p) {
+        for (const HeightGridValue *hgv=SimulationSettings::current().model()->heightGrid()->begin(); hgv!=SimulationSettings::current().model()->heightGrid()->end(); ++hgv, ++p) {
             p->clear();
             if (hgv->isValid()) {
                 // p->height = hgv->height;
@@ -471,9 +471,21 @@ void WindModule::detectEdges(bool at_startup)
     }
 }
 
-static QMutex wind_mt_counter;
-static WindModule *wind_module=0;
-static int impact_c;
+static QMutex &runFile_wind_mt_counter()
+{
+    struct State { QMutex value = {}; };
+    return SimulationContext::state<State>().value;
+}
+static WindModule * &runFile_wind_module()
+{
+    struct State { WindModule * value = 0; };
+    return SimulationContext::state<State>().value;
+}
+static int &runFile_impact_c()
+{
+    struct State { int value = {}; };
+    return SimulationContext::state<State>().value;
+}
 
 // multithreading enabled main function for fetch calculations
 void nc_calculateFetch(WindCell *begin, WindCell *end)
@@ -483,10 +495,10 @@ void nc_calculateFetch(WindCell *begin, WindCell *end)
         double current_direction;
         for (WindCell *p=begin; p!=end; ++p) {
             if (p->edge >= 1.f) {
-                QPoint pt=wind_module->mGrid.indexOf(p);
-                current_direction = wind_module->mWindDirection + (wind_module->mWindDirectionVariation>0.?nrandom(-wind_module->mWindDirectionVariation, wind_module->mWindDirectionVariation):0);
+                QPoint pt=runFile_wind_module()->mGrid.indexOf(p);
+                current_direction = runFile_wind_module()->mWindDirection + (runFile_wind_module()->mWindDirectionVariation>0.?nrandom(-runFile_wind_module()->mWindDirectionVariation, runFile_wind_module()->mWindDirectionVariation):0);
                 float old_edge = p->edge;
-                wind_module->checkFetch(pt.x(), pt.y(), current_direction, p->height * 10., p->height - wind_module->mEdgeDetectionThreshold);
+                runFile_wind_module()->checkFetch(pt.x(), pt.y(), current_direction, p->height * 10., p->height - runFile_wind_module()->mEdgeDetectionThreshold);
                 ++calculated;
                 // only simulate edges with gapsize > 20m
                 // this skips small gaps (e.g. areas marked as "stones")
@@ -501,53 +513,57 @@ void nc_calculateFetch(WindCell *begin, WindCell *end)
         }
     } catch (const IException &e) {
         // thread-safe error message
-        GlobalSettings::instance()->model()->threadExec().throwError(e.message());
+        SimulationSettings::current().model()->threadExec().throwError(e.message());
     }
 
-    QMutexLocker lock(&wind_mt_counter);
-    impact_c += calculated;
+    QMutexLocker lock(&runFile_wind_mt_counter());
+    runFile_impact_c() += calculated;
 
 }
 
 void WindModule::calculateFetch()
 {
     DebugTimer t("wind:fetch");
-    wind_module = this;
-    impact_c=0;
-    GlobalSettings::instance()->model()->threadExec().runGrid(nc_calculateFetch, mGrid.begin(), mGrid.end());
-    qDebug() << "calculated fetch for" << impact_c << "pixels";
+    runFile_wind_module() = this;
+    runFile_impact_c()=0;
+    SimulationSettings::current().model()->threadExec().runGrid(nc_calculateFetch, mGrid.begin(), mGrid.end());
+    qDebug() << "calculated fetch for" << runFile_impact_c() << "pixels";
     return;
 
 }
 
-static int effective_c;
+static int &runFile_effective_c()
+{
+    struct State { int value = {}; };
+    return SimulationContext::state<State>().value;
+}
 void nc_calculateWindImpact(ResourceUnit *unit)
 {
-    GridRunner<WindCell> runner(wind_module->mGrid, unit->boundingBox());
+    GridRunner<WindCell> runner(runFile_wind_module()->mGrid, unit->boundingBox());
     int calculated=0;
     int effective=0;
     const double pixel_fraction = WindModule::cellsize()*WindModule::cellsize() / cRUArea; // fraction of one pixel, default: 0.01 (10x10 / 100x100)
     try {
     while (WindCell *p = runner.next()) {
         if (p->edge >= 1.f) {
-            QPoint pt=wind_module->mGrid.indexOf(p);
-            if (wind_module->windImpactOnPixel(pt, p))
+            QPoint pt=runFile_wind_module()->mGrid.indexOf(p);
+            if (runFile_wind_module()->windImpactOnPixel(pt, p))
                 ++effective;
             ++calculated;
         }
     }
     // accumulate disturbance for RU over all iterations
-    wind_module->mRUGrid[unit->boundingBox().center()].area_killed += effective * pixel_fraction;
+    runFile_wind_module()->mRUGrid[unit->boundingBox().center()].area_killed += effective * pixel_fraction;
 
     } catch (const IException &e) {
     // thread-safe error message
-    GlobalSettings::instance()->model()->threadExec().throwError(e.message());
+    SimulationSettings::current().model()->threadExec().throwError(e.message());
     }
 
-    QMutexLocker lock(&wind_mt_counter);
+    QMutexLocker lock(&runFile_wind_mt_counter());
 
-    impact_c += calculated;
-    effective_c+=effective;
+    runFile_impact_c() += calculated;
+    runFile_effective_c()+=effective;
 }
 
 /** calculate for each pixel the impact of wind (current round)
@@ -556,11 +572,11 @@ void nc_calculateWindImpact(ResourceUnit *unit)
 int WindModule::calculateWindImpact()
 {
     DebugTimer t("wind:impact");
-    wind_module = this;
-    impact_c=0; effective_c=0;
-    GlobalSettings::instance()->model()->executePerResourceUnit(nc_calculateWindImpact);
-    qDebug() << "calculated impact for" << impact_c << "pixels, affected" << effective_c;
-    return effective_c;
+    runFile_wind_module() = this;
+    runFile_impact_c()=0; runFile_effective_c()=0;
+    SimulationSettings::current().model()->executePerResourceUnit(nc_calculateWindImpact);
+    qDebug() << "calculated impact for" << runFile_impact_c() << "pixels, affected" << runFile_effective_c();
+    return runFile_effective_c();
 
 }
 
@@ -568,7 +584,7 @@ void WindModule::setTopexGrid(QString filename)
 {
     // load the topex-grid from file and assign the values
     GisGrid topex_grid;
-    filename = GlobalSettings::instance()->path(filename);
+    filename = SimulationSettings::current().path(filename);
     if (topex_grid.loadFromFile(filename)) {
         for (int i=0;i<mGrid.count();i++) {
             mGrid.valueAtIndex(i).topex = static_cast<float>( topex_grid.value(mGrid.cellCenterPoint(mGrid.indexOf(i))) );
@@ -584,7 +600,7 @@ void WindModule::afterWind()
     for (int i=0;i<mRUGrid.count();++i) {
         if (mRUGrid[i].area_killed > 0.) {
             // notify iLand that a wind disturbance took place here. info = proportion of area affected on the RU [0..1]
-            ResourceUnit *ru = GlobalSettings::instance()->model()->RUgrid()[i];
+            ResourceUnit *ru = SimulationSettings::current().model()->RUgrid()[i];
             if (ru)
                 ru->notifyDisturbance(ResourceUnit::dtWind, mRUGrid[i].area_killed );
         }
@@ -636,7 +652,7 @@ bool WindModule::eventTriggered()
     // when using time events, a wind event is triggered by the time event mechanism
     // by setting the wind speed of the event > 0
 
-    XmlHelper xml(GlobalSettings::instance()->settings().node("modules.wind"));
+    XmlHelper xml(SimulationSettings::current().settings().node("modules.wind"));
     mWindSpeed = xml.valueDouble(".speed");
     if (mWindSpeed == 0.)
         return false;
@@ -727,7 +743,11 @@ function line(x0, y0, x1, y1)
 }
 
 
-static QMutex tree_kill_lock;
+static QMutex &runFile_tree_kill_lock()
+{
+    struct State { QMutex value = {}; };
+    return SimulationContext::state<State>().value;
+}
 
 /** Main function of the wind module
   @param position the integer index (x/y) of the grid cell for which the wind effect should be calculated
@@ -737,7 +757,7 @@ static QMutex tree_kill_lock;
 bool WindModule::windImpactOnPixel(const QPoint position, WindCell *cell)
 {
     QRectF pixel_rect = mGrid.cellRect(position);
-    ResourceUnit *ru = GlobalSettings::instance()->model()->ru(pixel_rect.center());
+    ResourceUnit *ru = SimulationSettings::current().model()->ru(pixel_rect.center());
     if (!ru)
         return false;
 
@@ -793,15 +813,15 @@ bool WindModule::windImpactOnPixel(const QPoint position, WindCell *cell)
         do_break = cws_break < cws_uproot; // either break or uproot depending on the critical wind speeds
     }
 
-    QMutexLocker locker(&tree_kill_lock); // make sure that the following code is not run in parallel
+    QMutexLocker locker(&runFile_tree_kill_lock()); // make sure that the following code is not run in parallel
 
     // *****************************************************************************
     // Kill the trees that are thrown/uprooted by the wind
     // *****************************************************************************
     if (!do_break) {
         // regeneration is killed in case of uprooting
-        if (GlobalSettings::instance()->model()->saplings())
-            GlobalSettings::instance()->model()->saplings()->clearSaplings(pixel_rect, false, true);
+        if (SimulationSettings::current().model()->saplings())
+            SimulationSettings::current().model()->saplings()->clearSaplings(pixel_rect, false, true);
     }
     QVector<Tree>::const_iterator tend = ru->trees().constEnd();
     for (QVector<Tree>::const_iterator  t=ru->trees().constBegin(); t!=tend; ++t) {
@@ -976,7 +996,7 @@ void WindModule::scanResourceUnitTrees(const QPoint &position)
     if (mRUGrid.valueAt(p_m).flag)
         return;
 
-    ResourceUnit *ru = GlobalSettings::instance()->model()->ru(p_m);
+    ResourceUnit *ru = SimulationSettings::current().model()->ru(p_m);
 
     if (ru) {
         QVector<Tree>::const_iterator tend = ru->trees().constEnd();

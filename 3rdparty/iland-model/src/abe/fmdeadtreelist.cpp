@@ -29,7 +29,7 @@ int ABE::FMDeadTreeList::loadFromRU(ResourceUnit *ru, DeadTreeType loadWhat, boo
 
 int ABE::FMDeadTreeList::loadFromRU(int ru_index, DeadTreeType loadWhat, bool append)
 {
-    ResourceUnit *ru = Globals->model()->ru(ru_index);
+    ResourceUnit *ru = SimulationSettings::current().model()->ru(ru_index);
     if (!ru)
         throw IException("Invalid resource unit index: " + QString::number(ru_index));
     return loadFromRU(ru, loadWhat, append);
@@ -37,7 +37,7 @@ int ABE::FMDeadTreeList::loadFromRU(int ru_index, DeadTreeType loadWhat, bool ap
 
 int ABE::FMDeadTreeList::loadFromStand(int stand_id, DeadTreeType loadWhat, QString filter)
 {
-    auto *stand_grid = Globals->model()->standGrid();
+    auto *stand_grid = SimulationSettings::current().model()->standGrid();
     stand_grid->loadDeadTrees(stand_id, mDeadTrees,  filter );
     // now filter either snags or DWD:
     switch (loadWhat) {
@@ -69,7 +69,7 @@ int ABE::FMDeadTreeList::remove()
     for (auto &dt : mDeadTrees) {
         // find resource unit:
         QPointF coord(QPointF(dt->x(), dt->y()));
-        ResourceUnit *ru = GlobalSettings::instance()->model()->ru(coord);
+        ResourceUnit *ru = SimulationSettings::current().model()->ru(coord);
         if (ru && ru->snag()) {
             for (auto &d : ru->snag()->deadTrees())
                 if ( &d == dt) {

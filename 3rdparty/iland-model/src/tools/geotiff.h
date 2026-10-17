@@ -62,7 +62,8 @@ private:
     static  int noDataInt() { return std::numeric_limits<int>::lowest(); }
     static  float noDataFloat() { return std::numeric_limits<float>::lowest(); }
     static  double noDataDouble() { return std::numeric_limits<double>::lowest(); }
-    static FIBITMAP *mProjectionBitmap;
+    using RunType_mProjectionBitmap = FIBITMAP *;
+    static RunType_mProjectionBitmap &runState_mProjectionBitmap();
     FIBITMAP *dib;
     TIFDatatype mDType;
 

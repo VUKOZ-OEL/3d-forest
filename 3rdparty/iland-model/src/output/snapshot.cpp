@@ -18,7 +18,7 @@
 ********************************************************************************************/
 #include "snapshot.h"
 #include "global.h"
-#include "globalsettings.h"
+#include "simulationsettings.h"
 #include "model.h"
 #include "resourceunit.h"
 #include "species.h"
@@ -149,7 +149,7 @@ Snapshot::Snapshot()
 
 bool Snapshot::openDatabase(const QString &file_name, const bool read)
 {
-    if (!GlobalSettings::instance()->setupDatabaseConnection("snapshot", file_name, read)) {
+    if (!SimulationSettings::current().setupDatabaseConnection("snapshot", file_name, read)) {
         throw IException("Snapshot:createDatabase: database could not be created / opened");
     }
     QSqlDatabase db=QSqlDatabase::database("snapshot");
@@ -199,7 +199,7 @@ void Snapshot::checkContent(QString dbname)
 
 bool Snapshot::openStandDatabase(const QString &file_name, bool read)
 {
-    if (!GlobalSettings::instance()->setupDatabaseConnection("snapshotstand", file_name, read)) {
+    if (!SimulationSettings::current().setupDatabaseConnection("snapshotstand", file_name, read)) {
         throw IException("Snapshot:createDatabase: database could not be created / opened");
     }
     checkContent("snapshotstand");
@@ -209,7 +209,7 @@ bool Snapshot::openStandDatabase(const QString &file_name, bool read)
 
 bool Snapshot::createSnapshot(const QString &file_name)
 {
-    uint bufferSize = GlobalSettings::instance()->settings().value("model.world.buffer").toUInt();
+    uint bufferSize = SimulationSettings::current().settings().value("model.world.buffer").toUInt();
     if (fmod(bufferSize, 100) != 0) {
         throw IException(QString("The buffer size needs to be an integer multiple of 100 so that a snapshot can be created. " \
                                  "Adjust the buffer size and re-run simulation (Model->World). Abort saving snapshot!"));
@@ -232,11 +232,11 @@ bool Snapshot::createSnapshot(const QString &file_name)
     QFileInfo fi(file_name);
     QString grid_file = fi.absolutePath() + "/" + fi.completeBaseName() + ".asc";
     Grid<double> index_grid;
-    index_grid.setup( GlobalSettings::instance()->model()->RUgrid().metricRect(), GlobalSettings::instance()->model()->RUgrid().cellsize());
+    index_grid.setup( SimulationSettings::current().model()->RUgrid().metricRect(), SimulationSettings::current().model()->RUgrid().cellsize());
     RUWrapper ru_wrap;
     Expression ru_value("index", &ru_wrap);
     double *grid_ptr = index_grid.begin();
-    for (ResourceUnit **ru = GlobalSettings::instance()->model()->RUgrid().begin(); ru!=GlobalSettings::instance()->model()->RUgrid().end(); ++ru, ++grid_ptr) {
+    for (ResourceUnit **ru = SimulationSettings::current().model()->RUgrid().begin(); ru!=SimulationSettings::current().model()->RUgrid().end(); ++ru, ++grid_ptr) {
         if (*ru) {
             ru_wrap.setResourceUnit(*ru);
             *grid_ptr = ru_value.execute();
@@ -263,7 +263,7 @@ bool Snapshot::loadSnapshot(const QString &file_name)
     if (!grid.loadFromFile(grid_file)) {
         qDebug() << "loading of snapshot: not a valid grid file (containing resource unit inidices) expected at:" << grid_file;
         qDebug() << "assuming the same size of the project area as for the saved snapshot.";
-        for (ResourceUnit **ru = GlobalSettings::instance()->model()->RUgrid().begin(); ru!=GlobalSettings::instance()->model()->RUgrid().end();++ru) {
+        for (ResourceUnit **ru = SimulationSettings::current().model()->RUgrid().begin(); ru!=SimulationSettings::current().model()->RUgrid().end();++ru) {
             if (*ru)
                 mRUHash[ (*ru)->index() ] = *ru;
         }
@@ -282,7 +282,7 @@ bool Snapshot::loadSnapshot(const QString &file_name)
         }
 
 
-        const Grid<ResourceUnit*> &rugrid = GlobalSettings::instance()->model()->RUgrid();
+        const Grid<ResourceUnit*> &rugrid = SimulationSettings::current().model()->RUgrid();
         for (int i=0;i<rugrid.count();++i) {
             const ResourceUnit *ru = rugrid.constValueAtIndex(i);
             if (ru && ru->index()>-1) {
@@ -300,18 +300,18 @@ bool Snapshot::loadSnapshot(const QString &file_name)
     loadSnags();
     loadDeadTrees();
     // load saplings only when regeneration is enabled (this can save a lot of time)
-    if (GlobalSettings::instance()->model()->settings().regenerationEnabled) {
+    if (SimulationSettings::current().model()->settings().regenerationEnabled) {
         loadSaplings();
         //loadSaplingsOld();
     }
     QSqlDatabase::database("snapshot").close();
 
     // after changing the trees, do a complete apply/read pattern cycle over the landscape...
-    GlobalSettings::instance()->model()->onlyApplyLightPattern();
+    SimulationSettings::current().model()->onlyApplyLightPattern();
     qDebug() << "applied light pattern...";
 
     // refresh the stand statistics
-    foreach (ResourceUnit *ru, GlobalSettings::instance()->model()->ruList()) {
+    foreach (ResourceUnit *ru, SimulationSettings::current().model()->ruList()) {
          ru->recreateStandStatistics(true); // true: recalculate statistics
      }
 
@@ -327,7 +327,7 @@ bool Snapshot::saveStandSnapshot(const int stand_id, const MapGrid *stand_grid, 
     // Check database
     QSqlDatabase db=QSqlDatabase::database("snapshotstand");
     if (!db.isOpen()) {
-        openStandDatabase(GlobalSettings::instance()->path(file_name), false);
+        openStandDatabase(SimulationSettings::current().path(file_name), false);
         db=QSqlDatabase::database("snapshotstand");
         // check if tree/sapling tables are already present
         if (!db.tables().contains("trees_stand") || !db.tables().contains("saplings_stand")) {
@@ -401,7 +401,7 @@ bool Snapshot::saveStandSnapshot(const int stand_id, const MapGrid *stand_grid, 
 
     // save saplings
     // loop over all pixels, only when regeneration is enabled
-    if (GlobalSettings::instance()->model()->settings().regenerationEnabled) {
+    if (SimulationSettings::current().model()->settings().regenerationEnabled) {
         q.exec(QString("delete from saplings_stand where standID=%1").arg(stand_id));
 
         if (!q.prepare(QString("insert into saplings_stand (standID, saplings) " \
@@ -430,7 +430,7 @@ bool Snapshot::saveStandSnapshot(const int stand_id, const MapGrid *stand_grid, 
     }
 
     // save dead trees
-    if (GlobalSettings::instance()->model()->settings().carbonCycleEnabled) {
+    if (SimulationSettings::current().model()->settings().carbonCycleEnabled) {
         q.exec(QString("delete from deadtrees_stand where standID=%1").arg(stand_id));
         if (!q.prepare("insert into deadtrees_stand (standID, deadtrees) values (:standId, :blob)"))
             throw IException(QString("Snapshot::saveStandDeadtrees: prepare:") + q.lastError().text());
@@ -465,7 +465,7 @@ bool Snapshot::loadStandSnapshot(const int stand_id, const MapGrid *stand_grid, 
 {
     QSqlDatabase db=QSqlDatabase::database("snapshotstand");
     if (!db.isOpen()) {
-        openStandDatabase(GlobalSettings::instance()->path(file_name), true);
+        openStandDatabase(SimulationSettings::current().path(file_name), true);
         db=QSqlDatabase::database("snapshotstand");
     }
     // load trees
@@ -482,7 +482,7 @@ bool Snapshot::loadStandSnapshot(const int stand_id, const MapGrid *stand_grid, 
     q.setForwardOnly(true);
     q.exec(QString("select trees "
                    "from trees_stand where standID=%1").arg(stand_id));
-    QRectF extent = GlobalSettings::instance()->model()->extent();
+    QRectF extent = SimulationSettings::current().model()->extent();
     int n=0, sap_n=0, n_sap_removed=0;
     if (q.next()) {
         QByteArray data = q.value(0).toByteArray();
@@ -499,14 +499,14 @@ bool Snapshot::loadStandSnapshot(const int stand_id, const MapGrid *stand_grid, 
            QPointF coord(GisGrid::worldToModel(QPointF(item.x, item.y)));
            if (!extent.contains(coord))
                continue;
-           ResourceUnit *ru = GlobalSettings::instance()->model()->ru(coord);
+           ResourceUnit *ru = SimulationSettings::current().model()->ru(coord);
            if (!ru)
                continue;
            Tree &t = ru->newTree();
            t.setRU(ru);
            t.mId = item.id;
            t.setPosition(coord);
-           Species *s = GlobalSettings::instance()->model()->speciesSet()->species(item.species);
+           Species *s = SimulationSettings::current().model()->speciesSet()->species(item.species);
            if (!s)
                throw IException("Snapshot::loadTrees: Invalid species");
            t.setSpecies(s);
@@ -528,12 +528,12 @@ bool Snapshot::loadStandSnapshot(const int stand_id, const MapGrid *stand_grid, 
     }
 
     // now the saplings
-    if (GlobalSettings::instance()->model()->settings().regenerationEnabled) {
+    if (SimulationSettings::current().model()->settings().regenerationEnabled) {
         // (1) remove all saplings:
         SaplingCellRunner scr(stand_id, stand_grid);
         while (SaplingCell *sc = scr.next()) {
             n_sap_removed += sc->n_occupied();
-            GlobalSettings::instance()->model()->saplings()->clearSaplings(sc, scr.ru(),true, false);
+            SimulationSettings::current().model()->saplings()->clearSaplings(sc, scr.ru(),true, false);
         }
 
         // (2) load saplings from database
@@ -553,7 +553,7 @@ bool Snapshot::loadStandSnapshot(const int stand_id, const MapGrid *stand_grid, 
                 QPointF coord(GisGrid::worldToModel(QPointF(item.x, item.y)));
                 if (!extent.contains(coord))
                     continue;
-                SaplingCell *sc = GlobalSettings::instance()->model()->saplings()->cell(GlobalSettings::instance()->model()->grid()->indexAt(coord));
+                SaplingCell *sc = SimulationSettings::current().model()->saplings()->cell(SimulationSettings::current().model()->grid()->indexAt(coord));
                 if (!sc)
                     continue;
                 if (SaplingTree *st = sc->addSapling(item.height,
@@ -569,7 +569,7 @@ bool Snapshot::loadStandSnapshot(const int stand_id, const MapGrid *stand_grid, 
 
     // now dead trees
     int dt_n = 0, n_dt_removed = 0;
-    if (GlobalSettings::instance()->model()->settings().carbonCycleEnabled) {
+    if (SimulationSettings::current().model()->settings().carbonCycleEnabled) {
         // remove all dead trees on the stand:
         ABE::FMDeadTreeList dt_list;
         dt_list.loadFromStand(stand_id, ABE::FMDeadTreeList::DeadTreeType::Both);
@@ -593,7 +593,7 @@ bool Snapshot::loadStandSnapshot(const int stand_id, const MapGrid *stand_grid, 
                 QPointF coord(item.x, item.y);
                 if (!extent.contains(coord))
                     continue;
-                ResourceUnit *ru = GlobalSettings::instance()->model()->ru(coord);
+                ResourceUnit *ru = SimulationSettings::current().model()->ru(coord);
                 if (!ru)
                     continue;
                 auto &dt_list = ru->snag()->deadTrees();
@@ -603,7 +603,7 @@ bool Snapshot::loadStandSnapshot(const int stand_id, const MapGrid *stand_grid, 
                 dt.mX = coord.x();
                 dt.mY = coord.y();
 
-                dt.mSpecies = GlobalSettings::instance()->model()->speciesSet()->species(item.species);
+                dt.mSpecies = SimulationSettings::current().model()->speciesSet()->species(item.species);
                 if (!dt.mSpecies) throw IException("Snapshot: loadDeadTrees: invalid species");
 
                 dt.mIsStanding = item.dt_IsStanding;
@@ -621,7 +621,7 @@ bool Snapshot::loadStandSnapshot(const int stand_id, const MapGrid *stand_grid, 
     }
 
     // clean up
-    GlobalSettings::instance()->model()->cleanTreeLists(true);
+    SimulationSettings::current().model()->cleanTreeLists(true);
 
     qDebug() << "load stand snapshot for stand "<< stand_id << ": trees (removed/loaded): " <<n_removed<<"/" << n
              << ", saplings (removed/loaded):" << n_sap_removed << "/" << sap_n
@@ -651,7 +651,7 @@ bool Snapshot::loadStandCarbon()
     qDebug() << "loading snags/carbon pools from the stand snapshot...";
 
     mRUHash.clear();
-    for (ResourceUnit **ru = GlobalSettings::instance()->model()->RUgrid().begin(); ru!=GlobalSettings::instance()->model()->RUgrid().end();++ru) {
+    for (ResourceUnit **ru = SimulationSettings::current().model()->RUgrid().begin(); ru!=SimulationSettings::current().model()->RUgrid().end();++ru) {
         if (*ru)
             mRUHash[ (*ru)->index() ] = *ru;
     }
@@ -667,7 +667,7 @@ bool Snapshot::loadStandCarbon()
 void Snapshot::saveTrees()
 {
     QSqlDatabase db=QSqlDatabase::database("snapshot");
-    AllTreeIterator at(GlobalSettings::instance()->model());
+    AllTreeIterator at(SimulationSettings::current().model());
     QSqlQuery q(db);
     if (!q.prepare(QString("insert into trees (ID, RUindex, posX, posY, species,  age, height, dbh, leafArea, opacity, foliageMass, woodyMass, fineRootMass, coarseRootMass, NPPReserve, stressIndex) " \
                       "values (:id, :index, :x, :y, :spec, :age, :h, :d, :la, :opa, :mfol, :mwood, :mfr, :mcr, :npp, :si)")))
@@ -717,12 +717,12 @@ void Snapshot::loadTrees()
     int new_ru;
     int offsetx=0, offsety=0;
     ResourceUnit *ru = 0;
-    HeightGrid *hg = GlobalSettings::instance()->model()->heightGrid();
-    FloatGrid *lif_grid = GlobalSettings::instance()->model()->grid();
+    HeightGrid *hg = SimulationSettings::current().model()->heightGrid();
+    FloatGrid *lif_grid = SimulationSettings::current().model()->grid();
     int n=0, ntotal=0;
     try {
         // clear all trees on the landscape
-        foreach (ResourceUnit *ru, GlobalSettings::instance()->model()->ruList())
+        foreach (ResourceUnit *ru, SimulationSettings::current().model()->ruList())
             ru->trees().clear();
         // load the trees from the database
         while (q.next()) {
@@ -752,7 +752,7 @@ void Snapshot::loadTrees()
             t.mPositionIndex = tree_idx;
             //t.mPositionIndex.setX(offsetx + q.value(2).toInt() % cPxPerRU);
             //t.mPositionIndex.setY(offsety + q.value(3).toInt() % cPxPerRU);
-            Species *s = GlobalSettings::instance()->model()->speciesSet()->species(q.value(4).toString());
+            Species *s = SimulationSettings::current().model()->speciesSet()->species(q.value(4).toString());
             if (!s)
                 throw IException("Snapshot::loadTrees: Invalid species");
             t.setSpecies(s);
@@ -799,7 +799,7 @@ void Snapshot::saveSoil()
 
     int n = 0;
     db.transaction();
-    foreach (ResourceUnit *ru, GlobalSettings::instance()->model()->ruList()) {
+    foreach (ResourceUnit *ru, SimulationSettings::current().model()->ruList()) {
         Soil *s = ru->soil();
         if (s) {
 
@@ -827,7 +827,7 @@ void Snapshot::saveSoilRU(QList<int> stand_ids, bool ridmode)
     int n = 0;
     for (int i=0;i<stand_ids.size();++i) {
         // ridmode = true: numbers are Ids, false: numbers are ruindex
-        ResourceUnit *ru = ridmode ? GlobalSettings::instance()->model()->ruById(stand_ids[i]) : GlobalSettings::instance()->model()->ru(stand_ids[i]);
+        ResourceUnit *ru = ridmode ? SimulationSettings::current().model()->ruById(stand_ids[i]) : SimulationSettings::current().model()->ru(stand_ids[i]);
         if (ru)
             if (ru->soil()) {
                 // save .....
@@ -955,7 +955,7 @@ void Snapshot::saveSnags()
 
     int n = 0;
     db.transaction();
-    foreach (ResourceUnit *ru, GlobalSettings::instance()->model()->ruList()) {
+    foreach (ResourceUnit *ru, SimulationSettings::current().model()->ruList()) {
         Snag *s = ru->snag();
         if (!s)
             continue;
@@ -989,7 +989,7 @@ void Snapshot::saveSnagRU(QList<int> stand_ids, bool ridmode)
     int n = 0;
     for (int i=0;i<stand_ids.size(); ++i) {
         // ridmode = true: numbers are Ids, false: numbers are ruindex
-        ResourceUnit *ru = ridmode ? GlobalSettings::instance()->model()->ruById(stand_ids[i]) : GlobalSettings::instance()->model()->ru(stand_ids[i]);
+        ResourceUnit *ru = ridmode ? SimulationSettings::current().model()->ruById(stand_ids[i]) : SimulationSettings::current().model()->ru(stand_ids[i]);
         if (ru) {
             Snag *s = ru->snag();
             if (s) {
@@ -1145,9 +1145,9 @@ void Snapshot::saveSaplings()
         throw IException(QString("Snapshot::saveSaplings: prepare:") + q.lastError().text());
 
 
-    Saplings *saplings = GlobalSettings::instance()->model()->saplings();
+    Saplings *saplings = SimulationSettings::current().model()->saplings();
 
-    FloatGrid &lif_grid= *GlobalSettings::instance()->model()->grid();
+    FloatGrid &lif_grid= *SimulationSettings::current().model()->grid();
     ResourceUnit *RU;
     for (int y=0; y<lif_grid.sizeY();++y) {
         for (int x=0;x<lif_grid.sizeX(); ++x) {
@@ -1186,7 +1186,7 @@ void Snapshot::saveSaplings()
 
 void Snapshot::saveDeadTrees()
 {
-    if (!GlobalSettings::instance()->model()->settings().carbonCycleEnabled)
+    if (!SimulationSettings::current().model()->settings().carbonCycleEnabled)
         return;
 
     QSqlDatabase db=QSqlDatabase::database("snapshot");
@@ -1200,7 +1200,7 @@ void Snapshot::saveDeadTrees()
     int n = 0;
     db.transaction();
 
-    for (const auto &ru : GlobalSettings::instance()->model()->ruList()) {
+    for (const auto &ru : SimulationSettings::current().model()->ruList()) {
         for (const auto &dt : ru->snag()->deadTrees()) {
             q.addBindValue(ru->index());
             q.addBindValue(dt.x());
@@ -1250,7 +1250,7 @@ void Snapshot::loadSaplings()
     int ci;
     int posx, posy;
     int offsetx=0, offsety=0;
-    Saplings *saplings = GlobalSettings::instance()->model()->saplings();
+    Saplings *saplings = SimulationSettings::current().model()->saplings();
 
     // clear all saplings in the model
     saplings->clearAllSaplings();
@@ -1331,7 +1331,7 @@ void Snapshot::loadDeadTrees()
         dt.mX = q.value(ci++).toFloat();
         dt.mY = q.value(ci++).toFloat();
 
-        dt.mSpecies = GlobalSettings::instance()->model()->speciesSet()->species(q.value(ci++).toString());
+        dt.mSpecies = SimulationSettings::current().model()->speciesSet()->species(q.value(ci++).toString());
         if (!dt.mSpecies) throw IException("Snapshot: loadDeadTrees: invalid species");
 
         dt.mIsStanding = q.value(ci++).toInt() == 1;
@@ -1372,7 +1372,7 @@ void Snapshot::loadSaplingsOld()
 //    int ru_index = -1;
 
 //    // clear all saplings in the whole project area: added for testing/debugging
-////    foreach( ResourceUnit *ru, GlobalSettings::instance()->model()->ruList()) {
+////    foreach( ResourceUnit *ru, SimulationSettings::current().model()->ruList()) {
 ////        foreach (ResourceUnitSpecies *rus, ru->ruSpecies()) {
 ////            rus->changeSapling().clear();
 ////            rus->changeSapling().clearStatistics();
@@ -1410,8 +1410,8 @@ void Snapshot::loadSaplingsOld()
 //        //posy = q.value(ci++).toInt();
 //        posx = offsetx + q.value(ci++).toInt() % cPxPerRU;
 //        posy = offsety + q.value(ci++).toInt() % cPxPerRU;
-//        if (GlobalSettings::instance()->model()->grid()->isIndexValid(posx, posy)) {
-//            t.pixel = GlobalSettings::instance()->model()->grid()->ptr(posx,posy );
+//        if (SimulationSettings::current().model()->grid()->isIndexValid(posx, posy)) {
+//            t.pixel = SimulationSettings::current().model()->grid()->ptr(posx,posy );
 //        } else {
 //            continue;
 //        }

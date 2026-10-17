@@ -1,0 +1,22 @@
+<RCC>
+    <qresource prefix="/">
+        <file>phone-icon.jpg</file>
+        <file>phone-icon.png</file>
+        <file>camera.png</file>
+        <file>audio-input-microphone.png</file>
+        <file>source_xml.png</file>
+        <file>icon4.png</file>
+        <file>www.png</file>
+        <file>go-next.png</file>
+        <file>process-stop.png</file>
+        <file>user-trash.png</file>
+        <file>Play.png</file>
+        <file>Pause.png</file>
+        <file>Play All.png</file>
+        <file>Backup Green Button.png</file>
+        <file>document-save.png</file>
+        <file>document-open.png</file>
+        <file>iland_splash.png</file>
+        <file>project_file_metadata.txt</file>
+    </qresource>
+</RCC>

@@ -51,7 +51,7 @@ public:
     int id() const { return mId; } ///< numerical unique ID of the tree
     int age() const { return mAge; } ///< the tree age (years)
     /// metric coordinates of the tree
-    const QPointF position() const { Q_ASSERT(mGrid!=0); return mGrid->cellCenterPoint(mPositionIndex); }
+    const QPointF position() const { Q_ASSERT(runState_mGrid()!=0); return runState_mGrid()->cellCenterPoint(mPositionIndex); }
 
     /// @property positionIndex The tree does not store the floating point coordinates but only the index of pixel on the LIF grid
     const QPoint positionIndex() const { return mPositionIndex; } ///< the x/y indicies (2m grid) of the tree
@@ -105,9 +105,9 @@ public:
     void removeRootBiomass(const double removeFineRootFraction, const double removeCoarseRootFraction);
 
     // setters for initialization
-    void setNewId() { mId = m_nextId++; } ///< force a new id for this object (after copying trees)
+    void setNewId() { mId = runState_m_nextId()++; } ///< force a new id for this object (after copying trees)
     void setId(const int id) { mId = id; } ///< set a spcific ID (if provided in stand init file).
-    void setPosition(const QPointF pos) { Q_ASSERT(mGrid!=nullptr); mPositionIndex = mGrid->indexAt(pos); }
+    void setPosition(const QPointF pos) { Q_ASSERT(runState_mGrid()!=nullptr); mPositionIndex = runState_mGrid()->indexAt(pos); }
     void setPosition(const QPoint posIndex) { mPositionIndex = posIndex; }
     void setDbh(const float dbh) { mDbh=dbh; }
     void setHeight(const float height);
@@ -159,8 +159,8 @@ public:
     static void setGrid(FloatGrid* gridToStamp, Grid<HeightGridValue> *dominanceGrid);
     // statistics
     static void resetStatistics();
-    static int statPrints() { return m_statPrint; }
-    static int statCreated() { return m_statCreated; }
+    static int statPrints() { return runState_m_statPrint(); }
+    static int statCreated() { return runState_m_statCreated(); }
 #ifdef ALT_TREE_MORTALITY
     static void mortalityParams(double dbh_inc_threshold, int stress_years, double stress_mort_prob);
 #endif
@@ -233,19 +233,26 @@ private:
     bool isDebugging() { return flag(Tree::TreeDebugging); }
 
     // static data
-    static FloatGrid *mGrid;
-    static Grid<HeightGridValue> *mHeightGrid;
-    static TreeRemovedOut *mRemovalOutput;
-    static void setTreeRemovalOutput(TreeRemovedOut *rout) { mRemovalOutput=rout; }
-    static LandscapeRemovedOut *mLSRemovalOutput;
-    static void setLandscapeRemovalOutput(LandscapeRemovedOut *rout) { mLSRemovalOutput=rout; }
-    static Saplings *saps;
+    using RunType_mGrid = FloatGrid *;
+    static RunType_mGrid &runState_mGrid();
+    using RunType_mHeightGrid = Grid<HeightGridValue> *;
+    static RunType_mHeightGrid &runState_mHeightGrid();
+    using RunType_mRemovalOutput = TreeRemovedOut *;
+    static RunType_mRemovalOutput &runState_mRemovalOutput();
+    static void setTreeRemovalOutput(TreeRemovedOut *rout) { runState_mRemovalOutput()=rout; }
+    using RunType_mLSRemovalOutput = LandscapeRemovedOut *;
+    static RunType_mLSRemovalOutput &runState_mLSRemovalOutput();
+    static void setLandscapeRemovalOutput(LandscapeRemovedOut *rout) { runState_mLSRemovalOutput()=rout; }
 
     // statistics
-    static int m_statPrint;
-    static int m_statAboveZ;
-    static int m_statCreated;
-    static int m_nextId;
+    using RunType_m_statPrint = int;
+    static RunType_m_statPrint &runState_m_statPrint();
+    using RunType_m_statAboveZ = int;
+    static RunType_m_statAboveZ &runState_m_statAboveZ();
+    using RunType_m_statCreated = int;
+    static RunType_m_statCreated &runState_m_statCreated();
+    using RunType_m_nextId = int;
+    static RunType_m_nextId &runState_m_nextId();
 
     // friends
     friend class TreeWrapper;

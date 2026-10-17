@@ -54,7 +54,7 @@ BarkBeetlePlugin::BarkBeetlePlugin()
     qDebug() << "Bark beetle plugin created";
     DBGMODE( qDebug("(bark beetle plugin in debug mode)"););
 
-//    foreach (const ResourceUnit *ru, GlobalSettings::instance()->model()->ruList())
+//    foreach (const ResourceUnit *ru, SimulationSettings::current().model()->ruList())
     //        qDebug() << ru->boundingBox() << ru->constTrees().count();
 }
 
@@ -63,8 +63,8 @@ void BarkBeetlePlugin::setup()
     // setup of the fire related outputs: note: here the fire module is passed directly to the output
     BarkBeetleOut *bb_output = new BarkBeetleOut();
     bb_output->setBarkBeetleModule(&mBeetle);
-    GlobalSettings::instance()->outputManager()->removeOutput(bb_output->tableName());
-    GlobalSettings::instance()->outputManager()->addOutput(bb_output);
+    SimulationSettings::current().outputManager()->removeOutput(bb_output->tableName());
+    SimulationSettings::current().outputManager()->addOutput(bb_output);
     // setup of the fire module: load parameters from project file, etc.
     mBeetle.setup();
 }
@@ -75,6 +75,7 @@ void BarkBeetlePlugin::setup()
 void BarkBeetlePlugin::setupScripting(QJSEngine *engine)
 {
     BarkBeetleScript *script = new BarkBeetleScript();
+    script->setParent(engine);
     script->setBBModule(&mBeetle);
     QJSValue obj = engine->newQObject(script);
     engine->globalObject().setProperty("BarkBeetle", obj);

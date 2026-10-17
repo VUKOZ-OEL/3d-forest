@@ -37,7 +37,7 @@
 
 ABELayers::~ABELayers()
 {
-    GlobalSettings::instance()->controller()->removeLayers(this);
+    SimulationSettings::current().controller()->removeLayers(this);
 }
 
 double ABELayers::value(const FMStandPtr &data, const int index) const
@@ -122,7 +122,7 @@ const QString ABELayers::labelvalue(const int value, const int index) const
 
 void ABELayers::registerLayers()
 {
-    GlobalSettings::instance()->controller()->addLayers(this, "ABE");
+    SimulationSettings::current().controller()->addLayers(this, "ABE");
 }
 
 void ABELayers::clearClasses()

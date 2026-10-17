@@ -21,18 +21,21 @@
 #define MODELCONTROLLER_H
 #include <QObject>
 #include <QHash>
+#include "compat/simulationcontext.h"
 #include "grid.h"
 #include "layeredgrid.h"
 class Model;
 class MainWindow;
 class MapGrid;
 class Species;
+class SimulationSettings;
 
 class ModelController: public QObject
 {
     Q_OBJECT
 public:
-    ModelController();
+    // The context must outlive this controller.
+    explicit ModelController(SimulationContext &context);
     ~ModelController();
     void setMainWindow(MainWindow *mw) { mViewerWindow = mw; }
     MainWindow *mainWindow() { return mViewerWindow; }
@@ -103,6 +106,9 @@ public slots:
 private slots:
     void runloop();
 private:
+    // Declared first so the run stays active through member destruction.
+    SimulationContext::Scope mActiveRun;
+    SimulationSettings &mSettings;
     bool internalRun(); ///< runs the main loop
     void internalStop(); ///< save outputs, stop the model execution
     void fetchDynamicOutput(); ///< execute the dynamic output and fetch data

@@ -162,7 +162,7 @@ int FMTreeList::load(const QString &filter)
     } else {
         qCDebug(abe) << "FMTreeList::load: loading *all* trees, because stand id is -1";
         TreeWrapper tw;
-        Model *m = GlobalSettings::instance()->model();
+        Model *m = SimulationSettings::current().model();
         mTrees.clear();
         AllTreeIterator at(m);
         if (filter.isEmpty()) {
@@ -336,6 +336,7 @@ QJSValue FMTreeList::treeObject(int index)
         tree = mTrees[index].first;
 
     ScriptTree *tobj = new ScriptTree();
+    QJSEngine::setObjectOwnership(tobj,1);
     tobj->setTree(tree);
     QJSValue val = ForestManagementEngine::instance()->scriptEngine()->newQObject(tobj);
     return val;
@@ -539,7 +540,7 @@ double FMTreeList::aggregate_function_sapling(QString expression, QString filter
     Expression filter_expr(filter.isEmpty() ? "true" : filter, &sw);
     Expression expr(expression,&sw);
 
-    SaplingCellRunner scr(mStandId, GlobalSettings::instance()->model()->ABEngine()->standGrid());
+    SaplingCellRunner scr(mStandId, SimulationSettings::current().model()->ABEngine()->standGrid());
     double sum = 0.;
     int n=0;
     try{
@@ -755,7 +756,7 @@ void FMTreeList::prepareLocalGrid(QString type, QString custom_expression)
 
 void FMTreeList::exportStandGrid(QString file_name)
 {
-    file_name = GlobalSettings::instance()->path(file_name);
+    file_name = SimulationSettings::current().path(file_name);
     Helper::saveToTextFile(file_name, gridToESRIRaster(mStandGrid) );
     qCDebug(abe) << "saved grid to file" << file_name;
 }
@@ -790,7 +791,7 @@ int FMTreeList::killSaplings(QString expression)
     SaplingWrapper sw;
     Expression expr(expression.isEmpty() ? "true" : expression, &sw);
 
-    SaplingCellRunner scr(mStandId, GlobalSettings::instance()->model()->ABEngine()->standGrid());
+    SaplingCellRunner scr(mStandId, SimulationSettings::current().model()->ABEngine()->standGrid());
     while (SaplingCell *sc = scr.next()) {
         if (sc){
             for (int i=0;i<NSAPCELLS;++i) {

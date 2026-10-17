@@ -26,10 +26,6 @@
 #include <ArgumentParser.hpp>
 #include <Error.hpp>
 
-// Include Qt.
-#include <QCoreApplication>
-#include <QString>
-
 // Include 3rd party.
 
 // Include local.
@@ -55,12 +51,10 @@ int main(int argc, char *argv[])
 
     try
     {
-        QCoreApplication app(argc, argv);
-
         ArgumentParser arg("executes iland-model");
 
-        arg.add("-f",
-                "--file",
+        arg.add("-i",
+                "--input",
                 "",
                 "Path to the input file to be processed.",
                 true);
@@ -72,7 +66,7 @@ int main(int argc, char *argv[])
 
         if (arg.parse(argc, argv))
         {
-            run(arg.toString("--file"), arg.toInt("--years"));
+            run(arg.toString("--input"), arg.toInt("--years"));
         }
 
         rc = 0;
