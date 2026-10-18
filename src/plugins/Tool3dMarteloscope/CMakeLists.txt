@@ -17,19 +17,6 @@
 
 set(SUB_PROJECT_NAME "3DForestTool3dMarteloscopePlugin")
 
-if(NOT QT_VERSION_MAJOR)
-    message(WARNING "Skipping ${SUB_PROJECT_NAME} (Qt Gui not available)")
-    return()
-endif()
-
-if(NOT TARGET Qt${QT_VERSION_MAJOR}::Network)
-    message(WARNING "Skipping ${SUB_PROJECT_NAME} (Qt Network not available)")
-    return()
-endif()
-
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-
 file(GLOB_RECURSE SOURCES "*.cpp")
 
 add_library(
@@ -37,7 +24,7 @@ add_library(
     SHARED
     ${SOURCES}
     ../ProjectFile/ProjectFileAction.cpp
-    resources/resources.qrc
+#    resources/resources.qrc
 )
 
 target_include_directories(
@@ -53,31 +40,14 @@ target_compile_definitions(
     EXPORT_${SUB_PROJECT_NAME}=1
 )
 
-if(TARGET Qt${QT_VERSION_MAJOR}::WebEngineWidgets)
-    target_compile_definitions(
-        ${SUB_PROJECT_NAME}
-        PRIVATE
-        HAS_QT_WEB_ENGINE_WIDGETS=1
-    )
-endif()
-
 target_link_libraries(
     ${SUB_PROJECT_NAME}
     PRIVATE
-    3DForestGui
-    Qt${QT_VERSION_MAJOR}::Network
+    3DForestUiCommon
 )
 
-if(TARGET Qt${QT_VERSION_MAJOR}::WebEngineWidgets)
-    target_link_libraries(
-        ${SUB_PROJECT_NAME}
-        PRIVATE
-        Qt${QT_VERSION_MAJOR}::WebEngineWidgets
-    )
-endif()
-
 # Install plugin
-install_and_deploy_qt_runtime(${SUB_PROJECT_NAME} "bin/plugins")
+install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin/plugins)
 
 # Install python app
 install(

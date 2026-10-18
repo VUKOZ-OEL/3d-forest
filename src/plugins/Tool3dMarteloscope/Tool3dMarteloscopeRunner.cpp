@@ -20,14 +20,8 @@
 /** @file Tool3dMarteloscopeRunner.cpp */
 
 // Include 3D Forest.
-#include <Application.hpp>
+#include <File.hpp>
 #include <Tool3dMarteloscopeRunner.hpp>
-
-// Include Qt.
-#include <QCoreApplication>
-#include <QDir>
-#include <QProcess>
-#include <QTcpSocket>
 
 #if defined(HAS_QT_WEB_ENGINE_WIDGETS)
     #include <QWebEngineView>
@@ -35,11 +29,10 @@
 
 // Include local.
 #define LOG_MODULE_NAME "Tool3dMarteloscopeRunner"
+#define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-Tool3dMarteloscopeRunner::Tool3dMarteloscopeRunner(Application *app)
-    : QObject(app),
-      app_(app)
+Tool3dMarteloscopeRunner::Tool3dMarteloscopeRunner(Application *app) : app_(app)
 {
 }
 
@@ -50,11 +43,12 @@ Tool3dMarteloscopeRunner::~Tool3dMarteloscopeRunner()
 
 bool Tool3dMarteloscopeRunner::isPortFree(int port) const
 {
-    QTcpSocket socket;
-    socket.connectToHost("127.0.0.1", port);
-    bool connected = socket.waitForConnected(200);
-    socket.abort();
-    return !connected; // true if connection failed → port free
+    return true;
+    // QTcpSocket socket;
+    // socket.connectToHost("127.0.0.1", port);
+    // bool connected = socket.waitForConnected(200);
+    // socket.abort();
+    // return !connected; // true if connection failed → port free
 }
 
 int Tool3dMarteloscopeRunner::findFreePort(int startPort) const
@@ -74,17 +68,18 @@ int Tool3dMarteloscopeRunner::findFreePort(int startPort) const
 }
 
 void Tool3dMarteloscopeRunner::start(const std::string &projectPath,
-                                         int startPort)
+                                     int startPort)
 {
-    std::string binPath = QCoreApplication::applicationDirPath();
+    std::string binPath = File::currentPath();
 
     std::string pythonHome;
     std::string pythonPath;
-    std::string pythonExe = QDir(binPath).filePath("python/python.exe");
-    std::string pyhonScript = QDir(binPath).filePath(
-        "plugins/3DForestTool3dMarteloscopePlugin/python/app.py");
+    std::string pythonExe = File::join(binPath, "python/python.exe");
+    std::string pyhonScript =
+        File::join(binPath,
+                   "plugins/3DForestTool3dMarteloscopePlugin/python/app.py");
 
-    if (!QFile::exists(pythonExe))
+    if (!File::exists(pythonExe))
     {
         // Use system Python if bundled version is not found.
         // This is intended for use in a development environment.
@@ -93,8 +88,8 @@ void Tool3dMarteloscopeRunner::start(const std::string &projectPath,
     else
     {
         // Use bundled Python
-        pythonHome = QDir(binPath).filePath("python");
-        pythonPath = QDir(binPath).filePath("python/Lib");
+        pythonHome = File::join(binPath, "python");
+        pythonPath = File::join(pythonHome, "Lib");
     }
 
     start(binPath,
@@ -102,21 +97,24 @@ void Tool3dMarteloscopeRunner::start(const std::string &projectPath,
           pythonPath,
           pythonExe,
           pyhonScript,
-          std::string::fromStdString(projectPath),
+          projectPath,
           startPort);
 }
 
 void Tool3dMarteloscopeRunner::start(const std::string &binPath,
-                                         const std::string &pythonHome,
-                                         const std::string &pythonPath,
-                                         const std::string &pythonExe,
-                                         const std::string &pyhonScript,
-                                         const std::string &projectPath,
-                                         int startPort)
+                                     const std::string &pythonHome,
+                                     const std::string &pythonPath,
+                                     const std::string &pythonExe,
+                                     const std::string &pyhonScript,
+                                     const std::string &projectPath,
+                                     int startPort)
 {
     if (process_)
     {
-        qDebug() << "Restarting Streamlit...";
+        if (process_->isRunning())
+        {
+            LOG_DEBUG(<< "Restarting Streamlit...");
+        }
         stop();
     }
 
@@ -124,7 +122,7 @@ void Tool3dMarteloscopeRunner::start(const std::string &binPath,
     int port = findFreePort(startPort);
     if (port == -1)
     {
-        qWarning() << "No free ports found!";
+        LOG_WARNING("No free ports found!");
         return;
     }
     port_ = port;
@@ -133,86 +131,63 @@ void Tool3dMarteloscopeRunner::start(const std::string &binPath,
     // connect
     if (!isPortFree(startPort) && port == startPort)
     {
-        qDebug() << "Streamlit already running on port" << startPort
-                 << ", reusing it.";
+        LOG_DEBUG(<< "Streamlit already running on port " << startPort
+                  << ", reusing it.");
     }
     else
     {
-        qDebug() << "run:";
-        qDebug() << "  binPath" << binPath;
-        qDebug() << "  pythonHome" << pythonHome;
-        qDebug() << "  pythonPath" << pythonPath;
-        qDebug() << "  pythonExe" << pythonExe;
-        qDebug() << "  pyhonScript" << pyhonScript;
-        qDebug() << "  projectPath" << projectPath;
+        LOG_DEBUG(<< "run:");
+        LOG_DEBUG(<< "  binPath " << binPath);
+        LOG_DEBUG(<< "  pythonHome " << pythonHome);
+        LOG_DEBUG(<< "  pythonPath " << pythonPath);
+        LOG_DEBUG(<< "  pythonExe " << pythonExe);
+        LOG_DEBUG(<< "  pyhonScript " << pyhonScript);
+        LOG_DEBUG(<< "  projectPath " << projectPath);
 
         // Start Streamlit
-        process_ = new QProcess(this);
+        process_ = std::make_unique<Process>();
 
+        process_->setFinishedCallback(
+            [](int exitCode) {
+                LOG_DEBUG("Streamlit process finished with exit code "
+                          << exitCode);
+            });
+
+        ProcessEnvironment env = ProcessEnvironment::systemEnvironment();
         if (pythonExe != "python")
         {
-            QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
             env.insert("PYTHONHOME", pythonHome);
             env.insert("PYTHONPATH", pythonPath);
             env.insert("PYTHONNOUSERSITE", "1");
-            process_->setProcessEnvironment(env);
         }
 
-        QStringList args;
-        args << "-m" << "streamlit" << "run" << pyhonScript << "--server.port"
-             << toString(port_) << "--server.headless" << "true"
-             << "--" << projectPath << binPath;
+        std::vector<std::string> args = {"-m",
+                                         "streamlit",
+                                         "run",
+                                         pyhonScript,
+                                         "--server.port",
+                                         std::to_string(port_),
+                                         "--server.headless",
+                                         "true",
+                                         "--",
+                                         projectPath,
+                                         binPath};
 
-        process_->start(pythonExe, args);
+        process_->start(pythonExe, args, env);
 
         if (!process_->waitForStarted(3000))
         {
-            qWarning() << "Failed to start Streamlit!";
-            process_->deleteLater();
-            process_.clear();
+            LOG_WARNING(<< "Failed to start Streamlit using '" << pythonExe
+                        << "' with script '" << pyhonScript
+                        << "': " << process_->startError());
+            process_.reset();
             return;
         }
-        qDebug() << "Streamlit started on port" << port_;
-
-        QProcess *p = process_; // snapshot pointer for the lambda
-
-#if defined(HAS_QT_WEB_ENGINE_WIDGETS)
-        connect(p,
-                &QProcess::finished,
-                this,
-                [this, p]()
-                {
-                    qDebug() << "Streamlit process finished.";
-                    if (view_)
-                    {
-                        view_->close();
-                        view_.clear();
-                    }
-
-                    // process_->deleteLater();
-                    if (process_ == p)
-                    {
-                        process_.clear();
-                    }
-                });
-#else
-        connect(p,
-                &QProcess::finished,
-                this,
-                [this, p]()
-                {
-                    qDebug() << "Streamlit process finished.";
-                    // process_->deleteLater();
-                    if (process_ == p)
-                    {
-                        process_.clear();
-                    }
-                });
-#endif
+        LOG_DEBUG("Streamlit started on port " << port_);
     }
 
 #if defined(HAS_QT_WEB_ENGINE_WIDGETS)
-    qDebug() << "Open QWebEngineView";
+    LOG_DEBUG("Open QWebEngineView");
 
     // Show the web view
     view_ = new QWebEngineView();
@@ -220,8 +195,14 @@ void Tool3dMarteloscopeRunner::start(const std::string &binPath,
     view_->setUrl(QUrl(std::string("http://localhost:%1").arg(port_)));
     view_->resize(1024, 768);
     view_->show();
-
-    connect(view_, &QObject::destroyed, this, [this]() { view_.clear(); });
+#else
+    #if !defined(TOOL_3D_MARTELOSCOPE_RUNNER_TEST)
+    if (!Process::openUrl("http://localhost", port_))
+    {
+        LOG_WARNING(
+            "Could not open the system browser for the Marteloscope app");
+    }
+    #endif
 #endif
 }
 
@@ -236,20 +217,18 @@ void Tool3dMarteloscopeRunner::stop()
 
     if (process_)
     {
-        qDebug() << "Stopping Streamlit...";
-        process_->disconnect(this);
-
-        if (process_->state() != QProcess::NotRunning)
+        LOG_DEBUG("Stopping Streamlit...");
+        process_->setFinishedCallback(Process::FinishedCallback());
+        if (process_->isRunning())
         {
             process_->terminate();
             if (!process_->waitForFinished(2000))
             {
                 process_->kill();
-                process_->waitForFinished(1000);
+                (void)process_->waitForFinished(1000);
             }
         }
-        process_->deleteLater();
-        process_.clear();
+        process_.reset();
     }
 
 #if defined(HAS_QT_WEB_ENGINE_WIDGETS)
@@ -266,5 +245,5 @@ void Tool3dMarteloscopeRunner::stop()
 
 bool Tool3dMarteloscopeRunner::isRunning() const
 {
-    return process_ && process_->state() != QProcess::NotRunning;
+    return process_ && process_->isRunning();
 }

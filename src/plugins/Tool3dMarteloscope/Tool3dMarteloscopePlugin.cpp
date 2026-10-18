@@ -21,10 +21,10 @@
 
 // Include 3D Forest.
 #include <Application.hpp>
-#include <Tool3dMarteloscopePlugin.hpp>
-#include <Tool3dMarteloscopeRunner.hpp>
 #include <ProjectFileAction.hpp>
 #include <ThemeIcon.hpp>
+#include <Tool3dMarteloscopePlugin.hpp>
+#include <Tool3dMarteloscopeRunner.hpp>
 
 // Include local.
 #define LOG_MODULE_NAME "Tool3dMarteloscopePlugin"

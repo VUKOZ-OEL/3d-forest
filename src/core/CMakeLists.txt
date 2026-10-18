@@ -42,4 +42,9 @@ target_link_libraries(
     Threads::Threads
 )
 
+if(WIN32)
+    # Process::openUrl uses ShellExecuteW to open links in the default browser.
+    target_link_libraries(${SUB_PROJECT_NAME} Shell32)
+endif()
+
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

@@ -23,21 +23,20 @@
 #define TOOL_3D_MARTELOSCOPE_RUNNER_HPP
 
 // Include Std.
+#include <memory>
 
 // Include 3D Forest.
+#include <Process.hpp>
+
 class Application;
 
-// Include Qt.
-#include <QObject>
-#include <QPointer>
-class QProcess;
-
 #if defined(HAS_QT_WEB_ENGINE_WIDGETS)
+    #include <QPointer>
 class QWebEngineView;
 #endif
 
 /** Tool 3d-Marteloscope Runner. */
-class Tool3dMarteloscopeRunner : public QObject
+class Tool3dMarteloscopeRunner
 {
 public:
     Tool3dMarteloscopeRunner(Application *app);
@@ -61,7 +60,7 @@ private:
 
     Application *app_ = nullptr;
 
-    QPointer<QProcess> process_;
+    std::unique_ptr<Process> process_;
     int port_ = -1;
     bool stopping_ = false;
 
