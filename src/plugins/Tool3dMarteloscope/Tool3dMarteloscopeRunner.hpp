@@ -17,10 +17,10 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file External3dMarteloscopeRunner.hpp */
+/** @file Tool3dMarteloscopeRunner.hpp */
 
-#ifndef EXTERNAL_3D_MARTELOSCOPE_RUNNER_HPP
-#define EXTERNAL_3D_MARTELOSCOPE_RUNNER_HPP
+#ifndef TOOL_3D_MARTELOSCOPE_RUNNER_HPP
+#define TOOL_3D_MARTELOSCOPE_RUNNER_HPP
 
 // Include Std.
 
@@ -36,12 +36,12 @@ class QProcess;
 class QWebEngineView;
 #endif
 
-/** External 3d-Marteloscope Runner. */
-class External3dMarteloscopeRunner : public QObject
+/** Tool 3d-Marteloscope Runner. */
+class Tool3dMarteloscopeRunner : public QObject
 {
 public:
-    External3dMarteloscopeRunner(Application *app);
-    ~External3dMarteloscopeRunner();
+    Tool3dMarteloscopeRunner(Application *app);
+    ~Tool3dMarteloscopeRunner();
 
     void start(const std::string &projectPath, int startPort = 8501);
     void stop();
@@ -70,4 +70,4 @@ private:
 #endif
 };
 
-#endif /* EXTERNAL_3D_MARTELOSCOPE_RUNNER_HPP */
+#endif /* TOOL_3D_MARTELOSCOPE_RUNNER_HPP */

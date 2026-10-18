@@ -18,7 +18,7 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 -->
 <RCC version="1.0">
-<qresource prefix="/External3dMarteloscopeResources">
+<qresource prefix="/Tool3dMarteloscopeResources">
 
 <!-- Tool bar -->
 <file>external-3d-marteloscope-16px.png</file>

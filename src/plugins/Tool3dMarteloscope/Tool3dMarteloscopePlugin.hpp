@@ -17,47 +17,47 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file External3dMarteloscopePlugin.hpp */
+/** @file Tool3dMarteloscopePlugin.hpp */
 
-#ifndef EXTERNAL_3D_MARTELOSCOPE_PLUGIN_HPP
-#define EXTERNAL_3D_MARTELOSCOPE_PLUGIN_HPP
+#ifndef TOOL_3D_MARTELOSCOPE_PLUGIN_HPP
+#define TOOL_3D_MARTELOSCOPE_PLUGIN_HPP
 
 // Include 3D Forest.
 #include <Plugin.hpp>
 
-class External3dMarteloscopeRunner;
+class Tool3dMarteloscopeRunner;
 
 #if defined(_MSC_VER)
-    #if defined(EXPORT_3DForestExternal3dMarteloscopePlugin)
-        #define EXPORT_EXTERNAL_3D_MARTELOSCOPE_PLUGIN __declspec(dllexport)
+    #if defined(EXPORT_3DForestTool3dMarteloscopePlugin)
+        #define EXPORT_TOOL_3D_MARTELOSCOPE_PLUGIN __declspec(dllexport)
     #else
-        #define EXPORT_EXTERNAL_3D_MARTELOSCOPE_PLUGIN __declspec(dllimport)
+        #define EXPORT_TOOL_3D_MARTELOSCOPE_PLUGIN __declspec(dllimport)
     #endif
 #else
-    #define EXPORT_EXTERNAL_3D_MARTELOSCOPE_PLUGIN
+    #define EXPORT_TOOL_3D_MARTELOSCOPE_PLUGIN
 #endif
 
-/** External 3d-Marteloscope Plugin. */
-class External3dMarteloscopePlugin : public Plugin
+/** Tool 3d-Marteloscope Plugin. */
+class Tool3dMarteloscopePlugin : public Plugin
 {
 public:
-    External3dMarteloscopePlugin();
-    ~External3dMarteloscopePlugin();
+    Tool3dMarteloscopePlugin();
+    ~Tool3dMarteloscopePlugin();
 
-    const char *name() const override { return "External3dMarteloscopePlugin"; }
+    const char *name() const override { return "Tool3dMarteloscopePlugin"; }
     void initialize(Application *app) override;
     void release() override { delete this; }
 
     void slotPlugin();
 
 private:
-    Application *app_;
-    External3dMarteloscopeRunner *runner_;
+    Application *app_{nullptr};
+    Tool3dMarteloscopeRunner *runner_{nullptr};
 };
 
-extern "C" EXPORT_EXTERNAL_3D_MARTELOSCOPE_PLUGIN Plugin *createPlugin()
+extern "C" EXPORT_TOOL_3D_MARTELOSCOPE_PLUGIN Plugin *createPlugin()
 {
-    return new External3dMarteloscopePlugin();
+    return new Tool3dMarteloscopePlugin();
 }
 
-#endif /* EXTERNAL_3D_MARTELOSCOPE_PLUGIN_HPP */
+#endif /* TOOL_3D_MARTELOSCOPE_PLUGIN_HPP */

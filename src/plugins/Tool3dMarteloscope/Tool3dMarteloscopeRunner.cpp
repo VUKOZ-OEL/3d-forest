@@ -17,11 +17,11 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file External3dMarteloscopeRunner.cpp */
+/** @file Tool3dMarteloscopeRunner.cpp */
 
 // Include 3D Forest.
 #include <Application.hpp>
-#include <External3dMarteloscopeRunner.hpp>
+#include <Tool3dMarteloscopeRunner.hpp>
 
 // Include Qt.
 #include <QCoreApplication>
@@ -34,21 +34,21 @@
 #endif
 
 // Include local.
-#define LOG_MODULE_NAME "External3dMarteloscopeRunner"
+#define LOG_MODULE_NAME "Tool3dMarteloscopeRunner"
 #include <Log.hpp>
 
-External3dMarteloscopeRunner::External3dMarteloscopeRunner(Application *app)
+Tool3dMarteloscopeRunner::Tool3dMarteloscopeRunner(Application *app)
     : QObject(app),
       app_(app)
 {
 }
 
-External3dMarteloscopeRunner::~External3dMarteloscopeRunner()
+Tool3dMarteloscopeRunner::~Tool3dMarteloscopeRunner()
 {
     stop();
 }
 
-bool External3dMarteloscopeRunner::isPortFree(int port) const
+bool Tool3dMarteloscopeRunner::isPortFree(int port) const
 {
     QTcpSocket socket;
     socket.connectToHost("127.0.0.1", port);
@@ -57,7 +57,7 @@ bool External3dMarteloscopeRunner::isPortFree(int port) const
     return !connected; // true if connection failed → port free
 }
 
-int External3dMarteloscopeRunner::findFreePort(int startPort) const
+int Tool3dMarteloscopeRunner::findFreePort(int startPort) const
 {
     int port = startPort;
     while (port < startPort + 100)
@@ -73,7 +73,7 @@ int External3dMarteloscopeRunner::findFreePort(int startPort) const
     return -1; // none free
 }
 
-void External3dMarteloscopeRunner::start(const std::string &projectPath,
+void Tool3dMarteloscopeRunner::start(const std::string &projectPath,
                                          int startPort)
 {
     std::string binPath = QCoreApplication::applicationDirPath();
@@ -82,7 +82,7 @@ void External3dMarteloscopeRunner::start(const std::string &projectPath,
     std::string pythonPath;
     std::string pythonExe = QDir(binPath).filePath("python/python.exe");
     std::string pyhonScript = QDir(binPath).filePath(
-        "plugins/3DForestExternal3dMarteloscopePlugin/python/app.py");
+        "plugins/3DForestTool3dMarteloscopePlugin/python/app.py");
 
     if (!QFile::exists(pythonExe))
     {
@@ -106,7 +106,7 @@ void External3dMarteloscopeRunner::start(const std::string &projectPath,
           startPort);
 }
 
-void External3dMarteloscopeRunner::start(const std::string &binPath,
+void Tool3dMarteloscopeRunner::start(const std::string &binPath,
                                          const std::string &pythonHome,
                                          const std::string &pythonPath,
                                          const std::string &pythonExe,
@@ -225,7 +225,7 @@ void External3dMarteloscopeRunner::start(const std::string &binPath,
 #endif
 }
 
-void External3dMarteloscopeRunner::stop()
+void Tool3dMarteloscopeRunner::stop()
 {
     if (stopping_)
     {
@@ -264,7 +264,7 @@ void External3dMarteloscopeRunner::stop()
     stopping_ = false;
 }
 
-bool External3dMarteloscopeRunner::isRunning() const
+bool Tool3dMarteloscopeRunner::isRunning() const
 {
     return process_ && process_->state() != QProcess::NotRunning;
 }

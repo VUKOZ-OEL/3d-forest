@@ -17,29 +17,29 @@
     along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/** @file External3dMarteloscopePlugin.cpp */
+/** @file Tool3dMarteloscopePlugin.cpp */
 
 // Include 3D Forest.
 #include <Application.hpp>
-#include <External3dMarteloscopePlugin.hpp>
-#include <External3dMarteloscopeRunner.hpp>
+#include <Tool3dMarteloscopePlugin.hpp>
+#include <Tool3dMarteloscopeRunner.hpp>
 #include <ProjectFileAction.hpp>
 #include <ThemeIcon.hpp>
 
 // Include local.
-#define LOG_MODULE_NAME "External3dMarteloscopePlugin"
+#define LOG_MODULE_NAME "Tool3dMarteloscopePlugin"
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
 
-#define ICON(name) (ThemeIcon(app_, ":/External3dMarteloscopeResources/", name))
+#define ICON(name) (ThemeIcon(app_, ":/Tool3dMarteloscopeResources/", name))
 
-External3dMarteloscopePlugin::External3dMarteloscopePlugin()
+Tool3dMarteloscopePlugin::Tool3dMarteloscopePlugin()
     : app_(nullptr),
       runner_(nullptr)
 {
 }
 
-External3dMarteloscopePlugin::~External3dMarteloscopePlugin()
+Tool3dMarteloscopePlugin::~Tool3dMarteloscopePlugin()
 {
     if (runner_ && runner_->isRunning())
     {
@@ -47,28 +47,28 @@ External3dMarteloscopePlugin::~External3dMarteloscopePlugin()
     }
 }
 
-void External3dMarteloscopePlugin::initialize(Application *app)
+void Tool3dMarteloscopePlugin::initialize(Application *app)
 {
     app_ = app;
 
     app_->createAction(
-        nullptr,
-        "External",
-        "External",
+        this,
+        {{"Tool", MAIN_WINDOW_MENU_TOOL_PRIORITY}},
+        "Tool",
         tr("3d-Marteloscope"),
         tr("Start 3d-Marteloscope"),
         ICON("external-3d-marteloscope"),
         [this]() { slotPlugin(); },
-        MAIN_WINDOW_MENU_EXTERNAL_PRIORITY);
+        nullptr);
 }
 
-void External3dMarteloscopePlugin::slotPlugin()
+void Tool3dMarteloscopePlugin::slotPlugin()
 {
     std::string errorMessage;
 
     if (!runner_)
     {
-        runner_ = new External3dMarteloscopeRunner(app_);
+        runner_ = new Tool3dMarteloscopeRunner(app_);
     }
 
     try
