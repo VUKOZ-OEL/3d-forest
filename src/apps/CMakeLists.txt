@@ -17,6 +17,6 @@
 
 add_subdirectory(3dforest)
 # add_subdirectory(examples)
-add_subdirectory(sandbox)
+# add_subdirectory(sandbox)
 # add_subdirectory(tests)
-# add_subdirectory(tools)
+add_subdirectory(tools)

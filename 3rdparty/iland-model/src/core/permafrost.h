@@ -69,7 +69,7 @@ public:
 
     // access to values
     /// thickness of the moss layer in meters
-    double mossLayerThickness() const { return mMossBiomass / mosspar.bulk_density; } // kg/m2  / rho [kg/m3] = m
+    double mossLayerThickness() const { return mMossBiomass / runState_mosspar().bulk_density; } // kg/m2  / rho [kg/m3] = m
     /// thickness of the soil organic layer (in meters)
     double SOLLayerThickness() const {return mSOLDepth; }
     /// moss biomass (kg/m2)
@@ -187,8 +187,10 @@ private:
         double r_deciduous_inhibition; ///< factor for inhibiting effect of fresh broadleaved litter
     };
 
-    static SParam par; ///< (static) parameters of the permafrost module
-    static SMossParam mosspar; ///< (static) parameters of the moss module
+    using RunType_par = SParam;
+    static RunType_par &runState_par(); ///< (static) parameters of the permafrost module
+    using RunType_mosspar = SMossParam;
+    static RunType_mosspar &runState_mosspar(); ///< (static) parameters of the moss module
 
     friend class PermafrostLayers;
     friend class ::WaterOut;

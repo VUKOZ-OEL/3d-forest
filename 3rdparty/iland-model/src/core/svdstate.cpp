@@ -4,7 +4,11 @@
 #include "species.h"
 #include "model.h"
 
-SVDStates *SVDState::svd = nullptr;
+SVDState::RunType_svd &SVDState::runState_svd()
+{
+    struct State { RunType_svd value = nullptr; };
+    return SimulationContext::state<State>().value;
+}
 
 SVDStates::SVDStates()
 {
@@ -13,8 +17,8 @@ SVDStates::SVDStates()
     mStates.push_back(s);
     mCompositionString.push_back( createCompositionString(s) );
     mStateLookup[mStates[0]]=0;
-    s.svd = this;
-    const XmlHelper &xml = GlobalSettings::instance()->settings();
+    SVDState::runState_svd() = this;
+    const XmlHelper &xml = SimulationSettings::current().settings();
 
     QString cls = xml.value("model.settings.svdStates.structure", "4m");
     if (cls=="4m")
@@ -63,7 +67,7 @@ int SVDStates::evaluateState(ResourceUnit *ru)
             int hcls = limit( int(h/2), 0, 30); // 31 classes (0..30)
             if (h==4.) {
                 // 0-4m: differentiate: if saplings >2m exist, then class 1, otherwise class 0.
-                if (GlobalSettings::instance()->model()->saplings()->topHeight(ru)>2.)
+                if (SimulationSettings::current().model()->saplings()->topHeight(ru)>2.)
                     hcls=1;
                 else
                     hcls=0;
@@ -127,7 +131,7 @@ int SVDStates::evaluateState(ResourceUnit *ru)
 }
 
 // 37 values, roughly a circle with 7px diameter
-static QVector<QPoint> mid_points =  QVector<QPoint>()
+static const QVector<QPoint> mid_points =  QVector<QPoint>()
         <<  QPoint(-1,-3) << 	QPoint(0,-3)  << QPoint(1,-3)
         <<  QPoint(-2,-2) << 	QPoint(-1,-2) << QPoint(0,-2) << QPoint(1,-2) << QPoint(2,-2)
         <<  QPoint(-3,-1) << 	QPoint(-2,-1) << QPoint(-1,-1)<< QPoint(0,-1) << QPoint(1,-1) << QPoint(2,-1) << QPoint(3,-1)
@@ -136,7 +140,7 @@ static QVector<QPoint> mid_points =  QVector<QPoint>()
         <<  QPoint(-2,2)  << 	QPoint(-1,2)  << QPoint(0,2)  << QPoint(1,2)  << QPoint(2,2)
         <<  QPoint(-1,3)  << 	QPoint(0,3)   << QPoint(1,3);
 
-static QVector<QPoint> close_points =  QVector<QPoint>() << QPoint(-1,-1) << QPoint(0,-1) << QPoint(1,-1)
+static const QVector<QPoint> close_points =  QVector<QPoint>() << QPoint(-1,-1) << QPoint(0,-1) << QPoint(1,-1)
                                                          << QPoint(-1,0) << QPoint(1,0)
                                                          << QPoint(-1,1) << QPoint(0,1) << QPoint(1,1);
 
@@ -144,7 +148,7 @@ void SVDStates::evaluateNeighborhood(ResourceUnit *ru)
 {
     if (!ru->mSVDState.localComposition) {
         // create vectors on the heap only when really needed
-        int nspecies = GlobalSettings::instance()->model()->speciesSet()->activeSpecies().size();
+        int nspecies = SimulationSettings::current().model()->speciesSet()->activeSpecies().size();
         ru->mSVDState.localComposition = new QVector<float>(nspecies, 0.f);
         ru->mSVDState.midDistanceComposition = new QVector<float>(nspecies, 0.f);
     }
@@ -157,7 +161,7 @@ void SVDStates::evaluateNeighborhood(ResourceUnit *ru)
     midrange.fill(0.f);
 
     // get the center point
-    const Grid<ResourceUnit*> &grid = GlobalSettings::instance()->model()->RUgrid();
+    const Grid<ResourceUnit*> &grid = SimulationSettings::current().model()->RUgrid();
     QPoint cp= grid.indexAt(ru->boundingBox().center());
 
     // do the work:
@@ -172,10 +176,10 @@ QString SVDStates::stateLabel(int index)
     const SVDState &s=state(index);
     QString label;
     if (s.dominant_species_index>=0)
-        label=GlobalSettings::instance()->model()->speciesSet()->species(s.dominant_species_index)->id().toUpper() + " ";
+        label=SimulationSettings::current().model()->speciesSet()->species(s.dominant_species_index)->id().toUpper() + " ";
     for (int i=0;i<5;++i)
         if (s.admixed_species_index[i]>=0)
-            label += GlobalSettings::instance()->model()->speciesSet()->species(s.admixed_species_index[i])->id().toLower() + " ";
+            label += SimulationSettings::current().model()->speciesSet()->species(s.admixed_species_index[i])->id().toLower() + " ";
 
     QString hlabel;
     switch (mStructureClassification) {
@@ -212,7 +216,7 @@ QString SVDStates::stateLabel(int index)
 
 /// run the neighborhood evaluation; list: points to check, vec: a vector with a slot for each species, grid: the resource unit grid,
 /// center_point: the coordinates of the focal resource unit
-void SVDStates::executeNeighborhood(QVector<float> &vec, QPoint center_point, QVector<QPoint> &list, const Grid<ResourceUnit *> &grid)
+void SVDStates::executeNeighborhood(QVector<float> &vec, QPoint center_point, const QVector<QPoint> &list, const Grid<ResourceUnit *> &grid)
 {
     // evaluate the mid range neighborhood
     float n=0.;
@@ -238,10 +242,10 @@ QString SVDStates::createCompositionString(const SVDState &s)
 {
     QString label;
     if (s.dominant_species_index>=0)
-        label=GlobalSettings::instance()->model()->speciesSet()->species(s.dominant_species_index)->id().toUpper() + " ";
+        label=SimulationSettings::current().model()->speciesSet()->species(s.dominant_species_index)->id().toUpper() + " ";
     for (int i=0;i<5;++i)
         if (s.admixed_species_index[i]>=0)
-            label += GlobalSettings::instance()->model()->speciesSet()->species(s.admixed_species_index[i])->id().toLower() + " ";
+            label += SimulationSettings::current().model()->speciesSet()->species(s.admixed_species_index[i])->id().toLower() + " ";
     if (label.isEmpty()) {
         if (s.structure>0)
             return QStringLiteral("mix");
@@ -254,16 +258,16 @@ QString SVDStates::createCompositionString(const SVDState &s)
 
 QString SVDState::compositionString() const
 {
-    if (svd)
-        return svd->compositionString(Id);
+    if (runState_svd())
+        return runState_svd()->compositionString(Id);
     else
         return QStringLiteral("invalid");
 }
 
 QString SVDState::stateLabel() const
 {
-    if (svd)
-        return svd->stateLabel(Id);
+    if (runState_svd())
+        return runState_svd()->stateLabel(Id);
     else
         return QStringLiteral("invalid");
 }

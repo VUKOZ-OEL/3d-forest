@@ -1,0 +1,11 @@
+{
+    "name": "The iLand Javascript API",
+    "description": "The API for iLand and the Agent-Based-management-Engine (ABE)",
+    "version": "1.0",
+    "url": "https://iland-model.org",
+    "options": {
+        "outdir": "../../build/apidocs/docs",
+		"themedir": "node_modules/yuidoc-bootstrap-theme",
+		"helpers": [ "node_modules/yuidoc-bootstrap-theme/helpers/helpers.js" ]
+    }
+}

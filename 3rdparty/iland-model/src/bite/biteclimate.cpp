@@ -25,7 +25,9 @@
 
 namespace BITE {
 
-QStringList BiteClimate::mClimateVars = QStringList() << "MAT" << "MAP" << "GDD" // 0,1,2
+BiteClimate::RunType_mClimateVars &BiteClimate::runState_mClimateVars()
+{
+    struct State { RunType_mClimateVars value = QStringList() << "MAT" << "MAP" << "GDD" // 0,1,2
                                                       << "TMonth1" << "TMonth2" << "TMonth3" // 3-14: monthly temp
                                                       << "TMonth4" << "TMonth5" << "TMonth6"
                                                       << "TMonth7" << "TMonth8" << "TMonth9"
@@ -35,7 +37,9 @@ QStringList BiteClimate::mClimateVars = QStringList() << "MAT" << "MAP" << "GDD"
                                                       << "PMonth7" << "PMonth8" << "PMonth9"
                                                       << "PMonth10" << "PMonth11" << "PMonth12"
                                                       << "GDD10" // 27
-                                                      << "relWaterContentGS" << "relWaterContent"; // 28, 29
+                                                      << "relWaterContentGS" << "relWaterContent"; };
+    return SimulationContext::state<State>().value;
+} // 28, 29
 
 BiteClimate::BiteClimate()
 {
@@ -51,7 +55,7 @@ void BiteClimate::setup(QJSValue clim_vars, BiteWrapperCore &wrapper)
 
         if (it.name() != "length") {
             QString var_name = it.value().toString();
-            int var_index = mClimateVars.indexOf(var_name);
+            int var_index = runState_mClimateVars().indexOf(var_name);
             if (var_index==-1)
                 throw IException(QString("The climate variable '%1' is not valid!").arg(var_name));
             qCDebug(biteSetup) << "registering:" << var_name << "with index:" << var_index;

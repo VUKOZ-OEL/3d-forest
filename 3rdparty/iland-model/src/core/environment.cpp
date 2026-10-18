@@ -53,7 +53,7 @@ Environment::~Environment()
 
 bool Environment::loadFromFile(const QString &fileName)
 {
-    QStringList source = Helper::loadTextFileLines(GlobalSettings::instance()->path(fileName));
+    QStringList source = Helper::loadTextFileLines(SimulationSettings::current().path(fileName));
     if (source.isEmpty())
         throw IException(QString("Environment: input file does not exist or is empty (%1)").arg(fileName));
     return loadFromString(source);
@@ -73,7 +73,7 @@ bool Environment::loadFromString(const QStringList &source)
         mInfile->loadFromStringList(source);
         mKeys = mInfile->captions();
 
-        XmlHelper xml(GlobalSettings::instance()->settings());
+        XmlHelper xml(SimulationSettings::current().settings());
         mSpeciesSets.clear(); // note: the objects are not destroyed - potential memory leak.
         mClimate.clear();
         mRowCoordinates.clear();
@@ -198,7 +198,7 @@ void Environment::setPosition(const QPointF position)
     }
 
     if (mRowCoordinates.contains(key)) {
-        XmlHelper xml(GlobalSettings::instance()->settings());
+        XmlHelper xml(SimulationSettings::current().settings());
         int row = mRowCoordinates[key];
         QString value;
         if (logLevelInfo()) qDebug() << "settting up point" << position << "with row" << row;

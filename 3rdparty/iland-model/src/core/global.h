@@ -105,6 +105,6 @@ inline bool isBitSet(const unsigned int value, const int bit)
 // #define isnan(x) ((x) != (x))
 // #endif
 
-#include "globalsettings.h"
+#include "simulationsettings.h"
 
 #endif // GLOBAL_H

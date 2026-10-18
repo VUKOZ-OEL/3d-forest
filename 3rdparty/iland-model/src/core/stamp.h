@@ -38,7 +38,7 @@ public:
     ~Stamp();
     Stamp(const int size):m_data(NULL) { setup(size); }
     void setOffset(const int offset) { m_offset = offset; }
-    static void setDistanceGrid(const Grid<float> *grid) { mDistanceGrid = grid; }
+    static void setDistanceGrid(const Grid<float> *grid) { runDistanceGrid() = grid; }
     int offset() const { return m_offset; } ///< delta between edge of the stamp and the logical center point (of the tree). e.g. a 5x5 stamp in an 8x8-grid has an offset from 2.
     int count() const { return m_size*m_size; } ///< count of pixels (rectangle)
     int size() const { return m_offset*2+1; } ///< logical size of the stamp
@@ -62,7 +62,7 @@ public:
     float crownRadius() const { return m_crownRadius; }
     float crownArea() const { return m_crownArea; }
     void setCrownRadius(const float r) { m_crownRadius = r; m_crownArea=r*r*M_PI; }
-    float distanceToCenter(const int ix, const int iy) const { return mDistanceGrid->constValueAtIndex(abs(ix-m_offset), abs(iy-m_offset)); }
+    float distanceToCenter(const int ix, const int iy) const { return runDistanceGrid()->constValueAtIndex(abs(ix-m_offset), abs(iy-m_offset)); }
     // loading/saving
     void loadFromFile(const QString &fileName);
     void load(QDataStream &in); ///< load from stream (predefined binary structure)
@@ -76,7 +76,7 @@ private:
     int m_size;
     int m_offset;
     Stamp *m_reader; ///< pointer to the appropriate reader stamp (if available)
-    static const Grid<float> *mDistanceGrid;
+    static const Grid<float> *&runDistanceGrid();
 };
 
 // global functions

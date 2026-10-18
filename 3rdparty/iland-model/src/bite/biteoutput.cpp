@@ -77,10 +77,14 @@ void BiteCellOutput::setup()
 setEnabled(true); // first call creates the table
 }
 
-static QMutex _runCellOut;
+static QMutex &runFile__runCellOut()
+{
+    struct State { QMutex value = {}; };
+    return SimulationContext::state<State>().value;
+}
 void BiteCellOutput::execCell(BiteCell *cell, BiteAgent *agent)
 {
-    QMutexLocker l(&_runCellOut);
+    QMutexLocker l(&runFile__runCellOut());
 
 
     BiteWrapper bw(agent->wrapper(), cell);

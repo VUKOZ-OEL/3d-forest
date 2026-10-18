@@ -3,7 +3,6 @@
 
 #include "grid.h"
 
-// #include "../3rdparty/FreeImage/FreeImage.h"
 
 enum FREE_IMAGE_FORMAT
 {
@@ -199,7 +198,11 @@ static FIBITMAP *FreeImage_AllocateT(FREE_IMAGE_TYPE type, int width, int height
     return nullptr;
 }
 
-FIBITMAP *GeoTIFF::mProjectionBitmap = nullptr;
+GeoTIFF::RunType_mProjectionBitmap &GeoTIFF::runState_mProjectionBitmap()
+{
+    struct State { RunType_mProjectionBitmap value = nullptr; };
+    return SimulationContext::state<State>().value;
+}
 
 GeoTIFF::GeoTIFF()
 {
@@ -219,9 +222,9 @@ GeoTIFF::~GeoTIFF()
 
 void GeoTIFF::clearProjection()
 {
-    if (mProjectionBitmap) {
-        FreeImage_Unload(mProjectionBitmap);
-        mProjectionBitmap = nullptr;
+    if (runState_mProjectionBitmap()) {
+        FreeImage_Unload(runState_mProjectionBitmap());
+        runState_mProjectionBitmap() = nullptr;
     }
 }
 
@@ -229,10 +232,10 @@ int GeoTIFF::loadImage(const QString &fileName)
 {
     qDebug() << "Loading TIF file" << fileName;
     dib = FreeImage_Load(FIF_TIFF, fileName.toStdString().c_str());
-    if (!mProjectionBitmap) {
+    if (!runState_mProjectionBitmap()) {
 
-        mProjectionBitmap = FreeImage_Allocate(10,10,24);
-        FreeImage_CloneMetadata(mProjectionBitmap, dib);
+        runState_mProjectionBitmap() = FreeImage_Allocate(10,10,24);
+        FreeImage_CloneMetadata(runState_mProjectionBitmap(), dib);
         qDebug() << "GeoTIFF: meta data (incl. projection) for writing TIFs is copied from" << fileName;
     }
 
@@ -482,7 +485,7 @@ bool GeoTIFF::saveToFile(const QString &fileName)
 
 void GeoTIFF::initialize(uint width, uint height, TIFDatatype dtype)
 {
-    if (!mProjectionBitmap)
+    if (!runState_mProjectionBitmap())
         throw IException("GeoTif: init write: no projection information is available. You need to load at least one TIF including projection info before writing a TIF.");
 
     mDType = dtype;
@@ -498,7 +501,7 @@ void GeoTIFF::initialize(uint width, uint height, TIFDatatype dtype)
 
     FREE_IMAGE_TYPE fit = FREE_IMAGE_TYPE(dtype);
     dib = FreeImage_AllocateT(fit , width, height );
-    FreeImage_CloneMetadata(dib, mProjectionBitmap);
+    FreeImage_CloneMetadata(dib, runState_mProjectionBitmap());
 
     //if (!FreeImage_SetMetadataKeyValue(FIMD_GEOTIFF, dib, "GDAL_NODATA", "-32768"))
     //   throw std::logic_error("GeoTif: set metadata (NODATA) to xyz not successful!");

@@ -26,13 +26,17 @@
 TimeEvents::TimeEvents()
 {
 }
-static QString lastLoadedFile;
+static QString &runFile_lastLoadedFile()
+{
+    struct State { QString value = {}; };
+    return SimulationContext::state<State>().value;
+}
 bool TimeEvents::loadFromFile(const QString &fileName)
 {
-    QStringList source = Helper::loadTextFileLines(GlobalSettings::instance()->path(fileName));
+    QStringList source = Helper::loadTextFileLines(SimulationSettings::current().path(fileName));
     if (source.isEmpty())
         throw IException(QString("TimeEvents: input file does not exist or is empty (%1)").arg(fileName));
-    lastLoadedFile=fileName;
+    runFile_lastLoadedFile()=fileName;
     return loadFromString(source);
 }
 
@@ -43,7 +47,7 @@ bool TimeEvents::loadFromString(const QStringList &source)
     QStringList captions = infile.captions();
     int yearcol = infile.columnIndex("year");
     if (yearcol==-1)
-        throw IException(QString("TimeEvents: input file '%1' has no 'year' column.").arg(lastLoadedFile));
+        throw IException(QString("TimeEvents: input file '%1' has no 'year' column.").arg(runFile_lastLoadedFile()));
 
     int year;
     QVariantList line;
@@ -61,13 +65,13 @@ bool TimeEvents::loadFromString(const QStringList &source)
              }
         }
     } // for each row
-    qDebug() << QString("loaded TimeEvents (file: %1). %2 items stored.").arg(lastLoadedFile).arg(mData.count());
+    qDebug() << QString("loaded TimeEvents (file: %1). %2 items stored.").arg(runFile_lastLoadedFile()).arg(mData.count());
     return true;
 }
 
 void TimeEvents::run()
 {
-    int current_year = GlobalSettings::instance()->currentYear();
+    int current_year = SimulationSettings::current().currentYear();
     QList<QPair<QString, QVariant> > entries = mData.values(current_year);
     if (entries.count()==0)
         return;
@@ -81,12 +85,12 @@ void TimeEvents::run()
             // execute as javascript expression within the management script context...
             if (!entries[i].second.toString().isEmpty()) {
                 qDebug() << "executing Javascript time event:" << entries[i].second.toString();
-                GlobalSettings::instance()->executeJavascript(entries[i].second.toString());
+                SimulationSettings::current().executeJavascript(entries[i].second.toString());
             }
 
         } else {
             // no special value: a xml node...
-            if (! const_cast<XmlHelper&>(GlobalSettings::instance()->settings()).setNodeValue(key, entries[i].second.toString())) {
+            if (! const_cast<XmlHelper&>(SimulationSettings::current().settings()).setNodeValue(key, entries[i].second.toString())) {
                 qDebug() << "TimeEvents: Error: Key " << key << "not found! (tried to set to" << entries[i].second.toString() << ")";
                 throw IException("TimeEvents: key '" + key + "' not found in the XML file. \n (Note: corresponding value must not be empty in the project file!). ");
             } else

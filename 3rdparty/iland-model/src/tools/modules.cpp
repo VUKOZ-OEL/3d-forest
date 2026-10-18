@@ -21,10 +21,12 @@
 #include "modules.h"
 #include "plugin_interface.h"
 
-#include "globalsettings.h"
+#include "simulationsettings.h"
 #include "debugtimer.h"
 #include "exception.h"
-#include <QtPlugin>
+#include "fireplugin.h"
+#include "windplugin.h"
+#include "barkbeetleplugin.h"
 
 #if 0
 // include the static modules here in the code:
@@ -53,12 +55,13 @@ Modules::~Modules()
 // load the static plugins
 void Modules::init()
 {
-    foreach (QObject *plugin, QPluginLoader::staticInstances()) {
+    QList<QObject*> builtins{new FirePlugin, new WindPlugin, new BarkBeetlePlugin};
+    foreach (QObject *plugin, builtins) {
         DisturbanceInterface *di = qobject_cast<DisturbanceInterface *>(plugin);
         if (di) {
             qDebug() << di->name();
             // check xml file
-            if (GlobalSettings::instance()->settings().valueBool(QString("modules.%1.enabled").arg(di->name()))) {
+            if (SimulationSettings::current().settings().valueBool(QString("modules.%1.enabled").arg(di->name()))) {
                 // plugin is enabled: store in list of active modules
                 mInterfaces.append(di);
                 // check for other interfaces
@@ -71,6 +74,8 @@ void Modules::init()
                 TreeDeathInterface *td = qobject_cast<TreeDeathInterface*>(plugin);
                 if (td)
                     mTreeDeath.append(td);
+            } else {
+                delete plugin;
             }
         }
     }
@@ -108,7 +113,7 @@ void Modules::setup()
         di->setup();
 
     // set up the scripting (i.e., Javascript)
-    QJSEngine *engine = GlobalSettings::instance()->scriptEngine();
+    QJSEngine *engine = SimulationSettings::current().scriptEngine();
     foreach(DisturbanceInterface *di, mInterfaces)
         di->setupScripting(engine);
 }

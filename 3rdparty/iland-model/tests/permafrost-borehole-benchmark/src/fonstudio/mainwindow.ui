@@ -1,0 +1,614 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindowClass</class>
+ <widget class="QMainWindow" name="MainWindowClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>869</width>
+    <height>551</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>FON Studio</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="res/fonstudio.qrc">
+    <normaloff>:/phone-icon.png</normaloff>:/phone-icon.png</iconset>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QGridLayout" name="gridLayout" rowstretch="0,5,2">
+    <property name="leftMargin">
+     <number>3</number>
+    </property>
+    <property name="topMargin">
+     <number>3</number>
+    </property>
+    <property name="rightMargin">
+     <number>3</number>
+    </property>
+    <property name="bottomMargin">
+     <number>3</number>
+    </property>
+    <property name="spacing">
+     <number>3</number>
+    </property>
+    <item row="0" column="0" colspan="2">
+     <widget class="QWidget" name="mainCaption" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>40</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>40</height>
+       </size>
+      </property>
+      <widget class="QLabel" name="headerCaption">
+       <property name="geometry">
+        <rect>
+         <x>9</x>
+         <y>9</y>
+         <width>701</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string>font: 75 14pt &quot;Verdana&quot;;
+color: rgb(85, 0, 0);</string>
+       </property>
+       <property name="text">
+        <string>Lightroom application</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
+       </property>
+      </widget>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QStackedWidget" name="editStack">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>400</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="currentIndex">
+       <number>1</number>
+      </property>
+      <widget class="QWidget" name="pageXML">
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QLineEdit" name="initFileName">
+            <property name="text">
+             <string>fon.xml</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="reloadFile">
+            <property name="toolTip">
+             <string>Reload file from drive</string>
+            </property>
+            <property name="text">
+             <string>Reload</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="openFile">
+            <property name="toolTip">
+             <string>open file using file dialog</string>
+            </property>
+            <property name="text">
+             <string>Open</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="saveFile">
+            <property name="toolTip">
+             <string>save current XML to file</string>
+            </property>
+            <property name="text">
+             <string>Save</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="applyXML">
+            <property name="toolTip">
+             <string>load xml file into the system (necessary!)</string>
+            </property>
+            <property name="text">
+             <string>Apply!</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QTextEdit" name="iniEdit">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>1</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>1000</width>
+            <height>16777215</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="pageLightroom">
+       <widget class="QPushButton" name="pbCreateLightroom">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>30</y>
+          <width>171</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Create Lightroom</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="testLRO">
+        <property name="geometry">
+         <rect>
+          <x>260</x>
+          <y>210</y>
+          <width>75</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>lro - test</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lr_x">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>150</y>
+          <width>41</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>10</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lr_z">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>190</y>
+          <width>41</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>5</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lr_y">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>170</y>
+          <width>41</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>10</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="lroTestHemi">
+        <property name="geometry">
+         <rect>
+          <x>260</x>
+          <y>150</y>
+          <width>75</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Test Grid</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="lrCalcFullGrid">
+        <property name="geometry">
+         <rect>
+          <x>260</x>
+          <y>240</y>
+          <width>81</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>calc full grid</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="lrLightGrid">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>230</y>
+          <width>75</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>draw lightgrid</string>
+        </property>
+       </widget>
+       <widget class="QSlider" name="lrSliderX">
+        <property name="geometry">
+         <rect>
+          <x>80</x>
+          <y>150</y>
+          <width>160</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="minimum">
+         <number>-50</number>
+        </property>
+        <property name="maximum">
+         <number>50</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+       <widget class="QSlider" name="lrSliderY">
+        <property name="geometry">
+         <rect>
+          <x>80</x>
+          <y>170</y>
+          <width>160</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="minimum">
+         <number>-50</number>
+        </property>
+        <property name="maximum">
+         <number>50</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+       <widget class="QSlider" name="lrSliderZ">
+        <property name="geometry">
+         <rect>
+          <x>80</x>
+          <y>190</y>
+          <width>160</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="maximum">
+         <number>50</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lrAzim">
+        <property name="geometry">
+         <rect>
+          <x>150</x>
+          <y>230</y>
+          <width>41</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lrElevation">
+        <property name="geometry">
+         <rect>
+          <x>200</x>
+          <y>230</y>
+          <width>41</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>45</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_4">
+        <property name="geometry">
+         <rect>
+          <x>150</x>
+          <y>210</y>
+          <width>46</width>
+          <height>14</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Azimuth</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_5">
+        <property name="geometry">
+         <rect>
+          <x>200</x>
+          <y>210</y>
+          <width>46</width>
+          <height>14</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Elevation</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="lrProcess">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>90</y>
+          <width>141</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Create &quot;writer&quot; stamps</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="lrHemiValue">
+        <property name="geometry">
+         <rect>
+          <x>296</x>
+          <y>180</y>
+          <width>20</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="lrLoadStamps">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>120</y>
+          <width>141</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Test load Stamps</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="lrReadStamps">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>60</y>
+          <width>141</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Create &quot;reader&quot; stamps</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="pageFON">
+       <layout class="QVBoxLayout" name="verticalLayout_2"/>
+      </widget>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="PaintArea" name="PaintWidget" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>2</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="cursor">
+       <cursorShape>CrossCursor</cursorShape>
+      </property>
+      <property name="autoFillBackground">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0" colspan="2">
+     <widget class="QPlainTextEdit" name="logOutput">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>2</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>200</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>869</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuOutput_menu">
+    <property name="title">
+     <string>Output-menu</string>
+    </property>
+    <addaction name="actionTreelist"/>
+    <addaction name="actionFON_grid"/>
+   </widget>
+   <addaction name="menuOutput_menu"/>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <property name="iconSize">
+    <size>
+     <width>32</width>
+     <height>32</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>LeftToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionEdit_XML_settings"/>
+   <addaction name="actionLightroom"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionLightroom">
+   <property name="icon">
+    <iconset resource="res/fonstudio.qrc">
+     <normaloff>:/camera.png</normaloff>:/camera.png</iconset>
+   </property>
+   <property name="text">
+    <string>Lightroom</string>
+   </property>
+   <property name="toolTip">
+    <string>switch to lightroom</string>
+   </property>
+  </action>
+  <action name="actionEdit_XML_settings">
+   <property name="icon">
+    <iconset resource="res/fonstudio.qrc">
+     <normaloff>:/source_xml.png</normaloff>:/source_xml.png</iconset>
+   </property>
+   <property name="text">
+    <string>XML settings</string>
+   </property>
+  </action>
+  <action name="actionTreelist">
+   <property name="text">
+    <string>treelist</string>
+   </property>
+  </action>
+  <action name="actionFON_grid">
+   <property name="text">
+    <string>FON grid</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>PaintArea</class>
+   <extends>QWidget</extends>
+   <header location="global">paintarea.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>lr_x</tabstop>
+  <tabstop>lr_y</tabstop>
+  <tabstop>lr_z</tabstop>
+  <tabstop>iniEdit</tabstop>
+  <tabstop>pbCreateLightroom</tabstop>
+  <tabstop>logOutput</tabstop>
+  <tabstop>testLRO</tabstop>
+  <tabstop>initFileName</tabstop>
+  <tabstop>applyXML</tabstop>
+  <tabstop>saveFile</tabstop>
+  <tabstop>lroTestHemi</tabstop>
+  <tabstop>lrCalcFullGrid</tabstop>
+  <tabstop>lrLightGrid</tabstop>
+ </tabstops>
+ <resources>
+  <include location="res/fonstudio.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>lrSliderX</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>lroTestHemi</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>218</x>
+     <y>176</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>173</x>
+     <y>242</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lrSliderY</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>lroTestHemi</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>280</x>
+     <y>198</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>167</x>
+     <y>240</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lrSliderZ</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>lroTestHemi</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>251</x>
+     <y>216</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>182</x>
+     <y>243</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

@@ -17,7 +17,7 @@
 **    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************************************/
 #include "scriptgrid.h"
-#include "globalsettings.h"
+#include "simulationsettings.h"
 #include "helper.h"
 #include "expression.h"
 #include "modelcontroller.h"
@@ -31,35 +31,44 @@
 #include <QJSEngine>
 #include <QJSValueIterator>
 
-int ScriptGrid::mDeleted = 0;
-int ScriptGrid::mCreated = 0;
+ScriptGrid::RunType_mDeleted &ScriptGrid::runState_mDeleted()
+{
+    struct State { RunType_mDeleted value = 0; };
+    return SimulationContext::state<State>().value;
+}
+ScriptGrid::RunType_mCreated &ScriptGrid::runState_mCreated()
+{
+    struct State { RunType_mCreated value = 0; };
+    return SimulationContext::state<State>().value;
+}
 
 ScriptGrid::ScriptGrid(QObject *parent) : QObject(parent)
 {
     mGrid = nullptr;
     mVariableName = "x"; // default name
-    mCreated++;
+    runState_mCreated()++;
     mOwner = true;
 }
 
 ScriptGrid::~ScriptGrid()
 {
-    GlobalSettings::instance()->controller()->removeMapGrid(mGrid, nullptr);
+    SimulationSettings::current().controller()->removeMapGrid(mGrid, nullptr);
     if (mGrid && mOwner) {
         delete mGrid;
     }
-    mDeleted++;
+    runState_mDeleted()++;
     // remove potential links in UI to this grid
-    qDebug() << "ScriptGrid::balance: created:" << mCreated << "deleted:" << mDeleted;
+    qDebug() << "ScriptGrid::balance: created:" << runState_mCreated() << "deleted:" << runState_mDeleted();
 }
 
 // create a ScriptGrid-Wrapper around "grid". Note: destructing the 'grid' is done via the JS-garbage-collector.
 QJSValue ScriptGrid::createGrid(Grid<double> *grid, QString name)
 {
     ScriptGrid *g = new ScriptGrid(grid);
+    QJSEngine::setObjectOwnership(g,1);
     if (!name.isEmpty())
         g->setName(name);
-    QJSValue jsgrid = GlobalSettings::instance()->scriptEngine()->newQObject(g);
+    QJSValue jsgrid = SimulationSettings::current().scriptEngine()->newQObject(g);
     return jsgrid;
 }
 
@@ -100,7 +109,7 @@ QJSValue ScriptGrid::copy()
     Grid<double> *copy_grid = new Grid<double>(*mGrid);
     newgrid->setGrid(copy_grid);
 
-    QJSValue jsgrid = GlobalSettings::instance()->scriptEngine()->newQObject(newgrid);
+    QJSValue jsgrid = SimulationSettings::current().scriptEngine()->newQObject(newgrid);
     return jsgrid;
 }
 
@@ -112,14 +121,14 @@ void ScriptGrid::clear()
 
 void ScriptGrid::paint(double min_val, double max_val)
 {
-    if (GlobalSettings::instance()->controller())
-        GlobalSettings::instance()->controller()->paintGrid(mGrid, mVariableName, GridViewRainbow, min_val, max_val);
+    if (SimulationSettings::current().controller())
+        SimulationSettings::current().controller()->paintGrid(mGrid, mVariableName, GridViewRainbow, min_val, max_val);
 }
 
 void ScriptGrid::registerUI(QString name)
 {
-    if (GlobalSettings::instance()->controller())
-        GlobalSettings::instance()->controller()->addScriptLayer(mGrid, nullptr, name.isEmpty() ? mVariableName : name);
+    if (SimulationSettings::current().controller())
+        SimulationSettings::current().controller()->addScriptLayer(mGrid, nullptr, name.isEmpty() ? mVariableName : name);
 
 }
 
@@ -135,19 +144,19 @@ void ScriptGrid::save(QString fileName)
     if (!mGrid || mGrid->isEmpty())
         return;
     try{
-    fileName = GlobalSettings::instance()->path(fileName);
+    fileName = SimulationSettings::current().path(fileName);
     gridToFile<double>(*mGrid, fileName);
     //QString result = gridToESRIRaster(*mGrid);
     //Helper::saveToTextFile(fileName, result);
     qDebug() << "saved grid " << name() << " to " << fileName;
     } catch( const IException &e) {
-    GlobalSettings::instance()->scriptEngine()->throwError(e.message());
+    SimulationSettings::current().scriptEngine()->throwError(e.message());
     }
 }
 
 bool ScriptGrid::load(QString fileName)
 {
-    fileName = GlobalSettings::instance()->path(fileName);
+    fileName = SimulationSettings::current().path(fileName);
     // load the grid from file
 //    MapGrid mg(fileName, false);
 //    if (!mg.isValid()) {
@@ -165,8 +174,8 @@ bool ScriptGrid::load(QString fileName)
     if (!mGrid->loadGridFromFile(fileName))
         return false;
     QRectF rect = mGrid->metricRect();
-    double wx = GlobalSettings::instance()->settings().valueDouble("model.world.location.x");
-    double wy = GlobalSettings::instance()->settings().valueDouble("model.world.location.y");
+    double wx = SimulationSettings::current().settings().valueDouble("model.world.location.x");
+    double wy = SimulationSettings::current().settings().valueDouble("model.world.location.y");
     // move the grid to match the origin (0/0) of the model
     rect.moveTo( rect.left() - wx, rect.top() - wy );
     mGrid->setMetricRect(rect);
@@ -276,7 +285,7 @@ QJSValue ScriptGrid::resample(QJSValue grid_object)
         return QJSValue();
     }
 
-    QJSValue jsgrid = GlobalSettings::instance()->scriptEngine()->newQObject(this);
+    QJSValue jsgrid = SimulationSettings::current().scriptEngine()->newQObject(this);
     return jsgrid;
 
 
@@ -302,7 +311,7 @@ QJSValue ScriptGrid::values()
     if (!mGrid || mGrid->count()<=0) {
         throw IException("ERROR in ScriptGrid::values(): not a valid grid!");
     }
-    QJSValue array = GlobalSettings::instance()->scriptEngine()->newArray(mGrid->count());
+    QJSValue array = SimulationSettings::current().scriptEngine()->newArray(mGrid->count());
     for (int i=0;i<mGrid->count(); ++i)
         array.setProperty(i, mGrid->valueAtIndex(i));
 
@@ -352,7 +361,7 @@ void ScriptGrid::sumTrees(QString expression, QString filter)
         filterexpr.setExpression(filter);
         filterexpr.setModelObject(&tw);
 
-        AllTreeIterator ati(GlobalSettings::instance()->model());
+        AllTreeIterator ati(SimulationSettings::current().model());
         while (Tree *t = ati.next()) {
 
             // only trees on the grid area:

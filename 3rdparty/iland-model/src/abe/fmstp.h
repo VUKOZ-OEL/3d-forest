@@ -70,8 +70,8 @@ public:
     // helper functions
     QString info();
     /// if verbose is true, detailed debug information is provided.
-    static void setVerbose(bool verbose) {mVerbose = verbose; }
-    static bool verbose()  {return mVerbose; } ///< returns true in debug mode
+    static void setVerbose(bool verbose) {runState_mVerbose() = verbose; }
+    static bool verbose()  {return runState_mVerbose(); } ///< returns true in debug mode
     /// get a property of 'js_value' with the name 'key'. If 'errorMessage' is given, an error is thrown when the key does not exist.
     /// If key is not present and a 'default_value' is given, it is returned. Otherwise, an "undefined" JS value is returned.
     static QJSValue valueFromJs(const QJSValue &js_value, const QString &key, const QString default_value=QString(), const QString &errorMessage=QString());
@@ -87,7 +87,8 @@ private:
     void setupActivity(const QJSValue &js_value, const QString &name);
     void clear(); ///< remove all activites
     Events mEvents;
-    static bool mVerbose; ///< debug mode
+    using RunType_mVerbose = bool;
+    static RunType_mVerbose &runState_mVerbose(); ///< debug mode
     bool mHasRepeatingActivities; ///< true, if the STP contains repeating activities
     QVector<Activity*> mActivities; ///< container for the activities of the STP
     QVector<ActivityFlags> mActivityStand; ///< base data for stand-specific STP info.

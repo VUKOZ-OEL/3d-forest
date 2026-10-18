@@ -46,14 +46,14 @@ int WindScript::windEvent(double windspeed, double winddirection, int max_iterat
 
 bool WindScript::gridToFile(QString grid_type, QString file_name)
 {
-    if (!GlobalSettings::instance()->model())
+    if (!SimulationSettings::current().model())
         return false;
     QString result;
 
     result = gridToESRIRaster(mModule->mWindLayers, grid_type); // use a specific value function (see above)
 
     if (!result.isEmpty()) {
-        file_name = GlobalSettings::instance()->path(file_name);
+        file_name = SimulationSettings::current().path(file_name);
         Helper::saveToTextFile(file_name, result);
         qDebug() << "saved grid to " << file_name;
         return true;

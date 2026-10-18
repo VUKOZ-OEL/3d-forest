@@ -32,9 +32,21 @@
 
 namespace BITE {
 
-QHash<QThread*, ABE::FMTreeList* > BiteAgent::mTreeLists;
-QHash<QThread*, ABE::FMSaplingList* > BiteAgent::mSaplingLists;
-QHash<QThread*, ABE::FMDeadTreeList* > BiteAgent::mDeadTreeLists;
+BiteAgent::RunType_mTreeLists &BiteAgent::runState_mTreeLists()
+{
+    struct State { RunType_mTreeLists value = {}; };
+    return SimulationContext::state<State>().value;
+}
+BiteAgent::RunType_mSaplingLists &BiteAgent::runState_mSaplingLists()
+{
+    struct State { RunType_mSaplingLists value = {}; };
+    return SimulationContext::state<State>().value;
+}
+BiteAgent::RunType_mDeadTreeLists &BiteAgent::runState_mDeadTreeLists()
+{
+    struct State { RunType_mDeadTreeLists value = {}; };
+    return SimulationContext::state<State>().value;
+}
 
 
 BiteAgent::BiteAgent(QObject *parent): QObject(parent)
@@ -247,7 +259,7 @@ void BiteAgent::run()
 
     // step 2: run cell-by-cell functions parallel
     try {
-        GlobalSettings::instance()->model()->threadExec().run<BiteCell>( &BiteAgent::runCell, mCells, true);
+        SimulationSettings::current().model()->threadExec().run<BiteCell>( &BiteAgent::runCell, mCells, true);
     } catch (const IException &e) {
         qCWarning(bite) << "An error occured while running the agent" << name() << ":" << e.what();
         throw IException(QString("Bite: Error while running agent: %1: %2").arg(name()).arg(e.what()));
@@ -445,36 +457,51 @@ void BiteAgent::setupScripting()
 
 }
 
-static QMutex _thread_treelist;
+static QMutex &runFile__thread_treelist()
+{
+    struct State { QMutex value = {}; };
+    return SimulationContext::state<State>().value;
+}
 ABE::FMTreeList *BiteAgent::threadTreeList()
 {
-    if (BiteAgent::mTreeLists.contains(QThread::currentThread()))
-        return mTreeLists[QThread::currentThread()];
-    QMutexLocker lock(&_thread_treelist);
-    mTreeLists[QThread::currentThread()] = new ABE::FMTreeList;
-    BiteAgent::setCPPOwnership(mTreeLists[QThread::currentThread()]); // avoid crashes due to gc freeing inadvertantly stuff?
-    return mTreeLists[QThread::currentThread()];
+    QMutexLocker lock(&runFile__thread_treelist());
+    if (BiteAgent::runState_mTreeLists().contains(QThread::currentThread()))
+        return runState_mTreeLists()[QThread::currentThread()];
+    runState_mTreeLists()[QThread::currentThread()] = new ABE::FMTreeList;
+    BiteAgent::setCPPOwnership(runState_mTreeLists()[QThread::currentThread()]); // avoid crashes due to gc freeing inadvertantly stuff?
+    return runState_mTreeLists()[QThread::currentThread()];
 
 }
 
 ABE::FMSaplingList *BiteAgent::threadSaplingList()
 {
-    if (BiteAgent::mSaplingLists.contains(QThread::currentThread()))
-        return mSaplingLists[QThread::currentThread()];
-    QMutexLocker lock(&_thread_treelist);
-    mSaplingLists[QThread::currentThread()] = new ABE::FMSaplingList;
-    return mSaplingLists[QThread::currentThread()];
+    QMutexLocker lock(&runFile__thread_treelist());
+    if (BiteAgent::runState_mSaplingLists().contains(QThread::currentThread()))
+        return runState_mSaplingLists()[QThread::currentThread()];
+    runState_mSaplingLists()[QThread::currentThread()] = new ABE::FMSaplingList;
+    return runState_mSaplingLists()[QThread::currentThread()];
 
 }
 
 ABE::FMDeadTreeList *BiteAgent::threadDeadTreeList()
 {
-    if (BiteAgent::mDeadTreeLists.contains(QThread::currentThread()))
-        return mDeadTreeLists[QThread::currentThread()];
-    QMutexLocker lock(&_thread_treelist);
-    mDeadTreeLists[QThread::currentThread()] = new ABE::FMDeadTreeList;
-    return mDeadTreeLists[QThread::currentThread()];
+    QMutexLocker lock(&runFile__thread_treelist());
+    if (BiteAgent::runState_mDeadTreeLists().contains(QThread::currentThread()))
+        return runState_mDeadTreeLists()[QThread::currentThread()];
+    runState_mDeadTreeLists()[QThread::currentThread()] = new ABE::FMDeadTreeList;
+    return runState_mDeadTreeLists()[QThread::currentThread()];
 
+}
+
+void BiteAgent::clearThreadLists()
+{
+    QMutexLocker lock(&runFile__thread_treelist());
+    qDeleteAll(runState_mTreeLists());
+    qDeleteAll(runState_mSaplingLists());
+    qDeleteAll(runState_mDeadTreeLists());
+    runState_mTreeLists().clear();
+    runState_mSaplingLists().clear();
+    runState_mDeadTreeLists().clear();
 }
 
 void BiteAgent::createStatsGrid()
@@ -506,9 +533,9 @@ BiteCellScript *BiteAgent::cell(int x, int y)
 void BiteAgent::createBaseGrid()
 {
     // setup the internal grid
-    HeightGrid *hg = GlobalSettings::instance()->model()->heightGrid();
+    HeightGrid *hg = SimulationSettings::current().model()->heightGrid();
     mGrid.clear();
-    mGrid.setup(GlobalSettings::instance()->model()->RUgrid().metricRect(),
+    mGrid.setup(SimulationSettings::current().model()->RUgrid().metricRect(),
                 cellSize());
     mGrid.initialize(nullptr);
     mCells.clear();

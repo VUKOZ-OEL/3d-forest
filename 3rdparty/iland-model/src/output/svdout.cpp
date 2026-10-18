@@ -37,7 +37,7 @@ SVDGPPOut::SVDGPPOut()
 
 void SVDGPPOut::exec()
 {
-    Model *m = GlobalSettings::instance()->model();
+    Model *m = SimulationSettings::current().model();
     if (mSpeciesIndex[0]==-1)
         for (int i=0;i<mSpeciesList.count();++i) {
             const Species *s=m->speciesSet()->species(mSpeciesList[i]);
@@ -87,14 +87,18 @@ SVDStateOut::SVDStateOut()
 
 
 // neighborhood analysis per resource unit
-static int svd_evals=0;
+static int &runFile_svd_evals()
+{
+    struct State { int value = 0; };
+    return SimulationContext::state<State>().value;
+}
 void nc_calculateSVDNeighbors(ResourceUnit *unit)
 {
     // evaluate immediately after state change (which sets the time to 1),
     // and at least every 10 yrs.
-    if (GlobalSettings::instance()->currentYear()==0 ||  unit->svdStateTime() % 10 == 1)  {
-        GlobalSettings::instance()->model()->svdStates()->evaluateNeighborhood(unit);
-        svd_evals++;
+    if (SimulationSettings::current().currentYear()==0 ||  unit->svdStateTime() % 10 == 1)  {
+        SimulationSettings::current().model()->svdStates()->evaluateNeighborhood(unit);
+        runFile_svd_evals()++;
     }
 }
 
@@ -102,23 +106,23 @@ void nc_calculateSVDNeighbors(ResourceUnit *unit)
 
 void SVDStateOut::exec()
 {
-    if (!GlobalSettings::instance()->model()->svdStates()) {
+    if (!SimulationSettings::current().model()->svdStates()) {
         qWarning() << "'svdstate' output enabled, but not the SVD state subsystem ('model.settings.svdStates.enabled'). No output written.";
         return;
     }
 
-    SVDStates *svd = GlobalSettings::instance()->model()->svdStates();
+    SVDStates *svd = SimulationSettings::current().model()->svdStates();
     // run the analysis of species composition in the neighborhood in parallel
     { DebugTimer dt("SVDStateNeighbors");
-    int old_val=svd_evals;
-    GlobalSettings::instance()->model()->executePerResourceUnit(nc_calculateSVDNeighbors);
-    qDebug() << "SVDStateOut: evaluate neighbors. total count:" << svd_evals-old_val;
+    int old_val=runFile_svd_evals();
+    SimulationSettings::current().model()->executePerResourceUnit(nc_calculateSVDNeighbors);
+    qDebug() << "SVDStateOut: evaluate neighbors. total count:" << runFile_svd_evals()-old_val;
     }
 
-    bool start_year = GlobalSettings::instance()->currentYear() == 0;
+    bool start_year = SimulationSettings::current().currentYear() == 0;
 
     QList<ResourceUnit*>::const_iterator it;
-    Model *m = GlobalSettings::instance()->model();
+    Model *m = SimulationSettings::current().model();
     for (it=m->ruList().constBegin(); it!=m->ruList().constEnd(); ++it) {
         if ((*it)->id()==-1)
             continue; // do not include if out of project area
@@ -157,8 +161,8 @@ void SVDStateOut::setup()
 
     // add columns for all active species:
     int n=0;
-    for (QList<Species*>::const_iterator i = GlobalSettings::instance()->model()->speciesSet()->activeSpecies().constBegin();
-         i!= GlobalSettings::instance()->model()->speciesSet()->activeSpecies().constEnd(); ++i) {
+    for (QList<Species*>::const_iterator i = SimulationSettings::current().model()->speciesSet()->activeSpecies().constBegin();
+         i!= SimulationSettings::current().model()->speciesSet()->activeSpecies().constEnd(); ++i) {
         columns() << OutputColumn(QString("l_%1").arg((*i)->id()), QString(), OutDouble);
         columns() << OutputColumn(QString("m_%1").arg((*i)->id()), QString(), OutDouble);
         n++;
@@ -187,19 +191,19 @@ SVDUniqueStateOut::SVDUniqueStateOut()
 void SVDUniqueStateOut::exec()
 {
 
-    if (!GlobalSettings::instance()->model()->svdStates()) {
+    if (!SimulationSettings::current().model()->svdStates()) {
         qWarning() << "'svduniquestate' output enabled, but not the SVD state subsystem ('model.settings.svdStates.enabled'). No output written.";
         return;
     }
 
     if (!mCondition.isEmpty())
-        if (!mCondition.calculate(GlobalSettings::instance()->currentYear()))
+        if (!mCondition.calculate(SimulationSettings::current().currentYear()))
             return;
 
     // clear the table before writing
     truncateTable();
 
-    SVDStates *svd = GlobalSettings::instance()->model()->svdStates();
+    SVDStates *svd = SimulationSettings::current().model()->svdStates();
     for (int i=0;i<svd->count();++i) {
 
         const SVDState &s = svd->state(i);

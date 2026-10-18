@@ -40,7 +40,8 @@ public:
     int id() const; ///< the id of the last ignited fire during the simulation
     double x() const; ///< the x-coordinate of the last ignition
     double y() const; ///< the x-coordinate of the last ignition
-    static QString fireRUValueType; // for the exporter
+    using RunType_fireRUValueType = QString;
+    static RunType_fireRUValueType &runState_fireRUValueType(); // for the exporter
 
     // event handlers
     QJSValue onIgnitionRU() const

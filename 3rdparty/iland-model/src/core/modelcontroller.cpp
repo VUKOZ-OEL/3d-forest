@@ -46,7 +46,8 @@
 #include "mainwindow.h" // for the debug message buffering
 #endif
 
-ModelController::ModelController()
+ModelController::ModelController(SimulationContext &context)
+    : mActiveRun(context), mSettings(context.settings())
 {
     mModel = NULL;
     mPaused = false;
@@ -57,11 +58,14 @@ ModelController::ModelController()
     mYearsToRun = 0;
     mViewerWindow = 0;
     mDynamicOutputEnabled = false;
+    mSettings.setModelController(this);
 }
 
 ModelController::~ModelController()
 {
     destroy();
+    if (mSettings.controller() == this)
+        mSettings.setModelController(nullptr);
 }
 
 void ModelController::connectSignals()
@@ -126,7 +130,7 @@ bool ModelController::isPaused()
 
 int ModelController::currentYear() const
 {
-    return GlobalSettings::instance()->currentYear();
+    return SimulationSettings::current().currentYear();
 }
 
 QString ModelController::timeString() const
@@ -146,7 +150,7 @@ bool ModelController::setFileName(QString initFileName)
 {
     mInitFile = initFileName;
     try {
-        GlobalSettings::instance()->loadProjectFile(mInitFile);
+        SimulationSettings::current().loadProjectFile(mInitFile);
         return true;
     } catch(const IException &e) {
         QString error_msg = e.message();
@@ -163,7 +167,7 @@ void ModelController::create()
     if (!canCreate())
         return;
     emit bufferLogs(true);
-    const_cast<XmlHelper&>(GlobalSettings::instance()->settings()).resetWarnings();
+    const_cast<XmlHelper&>(SimulationSettings::current().settings()).resetWarnings();
     mIsStartingUp = true;
     mIsBusy = true;
     qDebug() << "**************************************************";
@@ -188,10 +192,10 @@ void ModelController::create()
         }
 
         // reset clock...
-        GlobalSettings::instance()->setCurrentYear(1); // reset clock
+        SimulationSettings::current().setCurrentYear(1); // reset clock
         // initialization of trees, output on startup
         mModel->beforeRun();
-        GlobalSettings::instance()->executeJSFunction("onAfterCreate");
+        SimulationSettings::current().executeJSFunction("onAfterCreate");
     } catch(const IException &e) {
         QString error_msg = e.message();
         Helper::msg(error_msg);
@@ -202,7 +206,7 @@ void ModelController::create()
     }
     emit bufferLogs(false);
 
-    const_cast<XmlHelper&>(GlobalSettings::instance()->settings()).printSuppressedWarnings();
+    const_cast<XmlHelper&>(SimulationSettings::current().settings()).printSuppressedWarnings();
     qDebug() << "Model created.";
     mIsStartingUp = false;
     mIsBusy = false;
@@ -211,18 +215,19 @@ void ModelController::create()
 void ModelController::destroy()
 {
     if (canDestroy()) {
-        GlobalSettings::instance()->executeJSFunction("onBeforeDestroy");
+        SimulationSettings::current().executeJSFunction("onBeforeDestroy");
         Model *m = mModel;
         mModel = 0;
         delete m;
-        GlobalSettings::instance()->setCurrentYear(0);
+        SimulationSettings::current().setCurrentYear(0);
         qDebug() << "ModelController: Model destroyed.";
     }
 }
 
 void ModelController::runloop()
 {
-    static QTime sStartTime = QTime::currentTime();
+    struct RunState_sStartTime { QTime value = QTime::currentTime(); };
+    auto &sStartTime = SimulationContext::state<RunState_sStartTime>().value;
 #ifdef ILAND_GUI
  //   QApplication::processEvents();
 #else
@@ -232,11 +237,11 @@ void ModelController::runloop()
         return;
     bool doStop = false;
     mHasError = false;
-    if (GlobalSettings::instance()->currentYear()<=1) {
+    if (SimulationSettings::current().currentYear()<=1) {
         mStartTime = QTime::currentTime(); // reset clock at the beginning of the simulation
     }
 
-    if (!mCanceled && GlobalSettings::instance()->currentYear() < mYearsToRun) {
+    if (!mCanceled && SimulationSettings::current().currentYear() < mYearsToRun) {
         emit bufferLogs(true);
 
         mIsBusy = true;
@@ -244,7 +249,7 @@ void ModelController::runloop()
         mIsBusy = false;
 
         mRunning = true;
-        emit year(GlobalSettings::instance()->currentYear());
+        emit year(SimulationSettings::current().currentYear());
         if (!mHasError) {
             int elapsed = sStartTime.msecsTo(QTime::currentTime());
             int time=0;
@@ -302,11 +307,11 @@ bool ModelController::internalRun()
 void ModelController::internalStop()
 {
     if (mRunning) {
-        GlobalSettings::instance()->outputManager()->save();
+        SimulationSettings::current().outputManager()->save();
         DebugTimer::printAllTimers();
         saveDebugOutputs(true);
-        //if (GlobalSettings::instance()->dbout().isOpen())
-        //    GlobalSettings::instance()->dbout().close();
+        //if (SimulationSettings::current().dbout().isOpen())
+        //    SimulationSettings::current().dbout().close();
 
         mFinished = true;
     }
@@ -329,7 +334,7 @@ void ModelController::run(int years)
     mFinished = false;
     mCanceled = false;
     mYearsToRun = years;
-    //GlobalSettings::instance()->setCurrentYear(1); // reset clock
+    //SimulationSettings::current().setCurrentYear(1); // reset clock
 
     DebugTimer::clearAllTimers();
 
@@ -351,7 +356,7 @@ bool ModelController::runYear()
     try {
         emit bufferLogs(true);
         mIsBusy = true;
-        GlobalSettings::instance()->executeJSFunction("onYearBegin");
+        SimulationSettings::current().executeJSFunction("onYearBegin");
         mModel->runYear();
         mIsBusy = false;
 
@@ -384,7 +389,7 @@ bool ModelController::pause()
 
     } else {
         // currently running -> set to pause mode
-        GlobalSettings::instance()->outputManager()->save();
+        SimulationSettings::current().outputManager()->save();
         mPaused = true;
         emit bufferLogs(false);
     }
@@ -408,10 +413,14 @@ void ModelController::cancel()
 
 
 // this function is called when exceptions occur in multithreaded code.
-QMutex error_mutex;
+static QMutex &runFile_error_mutex()
+{
+    struct State { QMutex value; };
+    return SimulationContext::state<State>().value;
+}
 void ModelController::throwError(const QString msg)
 {
-    QMutexLocker lock(&error_mutex); // serialize access
+    QMutexLocker lock(&runFile_error_mutex()); // serialize access
     qDebug() << "ModelController: throwError reached:";
     qDebug() << msg;
     mLastError = msg;
@@ -526,21 +535,21 @@ void ModelController::fetchDynamicOutput()
         line+=QString::number(value);
     }
     line.prepend( QString::number(data.size()) );
-    line.prepend( QString::number(GlobalSettings::instance()->currentYear()) );
+    line.prepend( QString::number(SimulationSettings::current().currentYear()) );
     mDynData.append(line.join(";"));
 }
 
 void ModelController::saveDebugOutputs(bool is_final)
 {
     // save to files if switch is true
-    if (!GlobalSettings::instance()->settings().valueBool("system.settings.debugOutputAutoSave"))
+    if (!SimulationSettings::current().settings().valueBool("system.settings.debugOutputAutoSave"))
         return;
 
-    bool clear_data = GlobalSettings::instance()->settings().paramValueBool("debug_clear");
+    bool clear_data = SimulationSettings::current().settings().paramValueBool("debug_clear");
     bool do_append=false;
     if (clear_data && currentYear()>2) // >2: is called after incrementing the year counter
         do_append = true;
-    QString p = GlobalSettings::instance()->path("debug_", "temp");
+    QString p = SimulationSettings::current().path("debug_", "temp");
 
     if (is_final) {
         Helper::saveToTextFile(p+"dynamic.csv", dynamicOutput());
@@ -555,35 +564,35 @@ void ModelController::saveDebugOutputs(bool is_final)
         qDebug() << "saved debug outputs to" << p;
 
     if (clear_data)
-        GlobalSettings::instance()->clearDebugLists();  // clear debug data
+        SimulationSettings::current().clearDebugLists();  // clear debug data
 
 
 }
 
 void ModelController::saveDebugOutputsCore(QString p, bool do_append)
 {
-    GlobalSettings::instance()->debugDataTable(GlobalSettings::dTreePartition, ";", p + "tree_partition.csv", do_append);
-    GlobalSettings::instance()->debugDataTable(GlobalSettings::dTreeGrowth, ";", p + "tree_growth.csv", do_append);
-    GlobalSettings::instance()->debugDataTable(GlobalSettings::dTreeNPP, ";", p + "tree_npp.csv", do_append);
-    GlobalSettings::instance()->debugDataTable(GlobalSettings::dStandGPP, ";", p + "stand_gpp.csv", do_append);
-    GlobalSettings::instance()->debugDataTable(GlobalSettings::dWaterCycle, ";", p + "water_cycle.csv", do_append);
-    GlobalSettings::instance()->debugDataTable(GlobalSettings::dDailyResponses, ";", p + "daily_responses.csv", do_append);
-    GlobalSettings::instance()->debugDataTable(GlobalSettings::dEstablishment, ";", p + "establishment.csv", do_append);
-    GlobalSettings::instance()->debugDataTable(GlobalSettings::dSaplingGrowth, ";", p + "saplinggrowth.csv", do_append);
-    GlobalSettings::instance()->debugDataTable(GlobalSettings::dCarbonCycle, ";", p + "carboncycle.csv", do_append);
-    GlobalSettings::instance()->debugDataTable(GlobalSettings::dPerformance, ";", p + "performance.csv", do_append);
+    SimulationSettings::current().debugDataTable(SimulationSettings::dTreePartition, ";", p + "tree_partition.csv", do_append);
+    SimulationSettings::current().debugDataTable(SimulationSettings::dTreeGrowth, ";", p + "tree_growth.csv", do_append);
+    SimulationSettings::current().debugDataTable(SimulationSettings::dTreeNPP, ";", p + "tree_npp.csv", do_append);
+    SimulationSettings::current().debugDataTable(SimulationSettings::dStandGPP, ";", p + "stand_gpp.csv", do_append);
+    SimulationSettings::current().debugDataTable(SimulationSettings::dWaterCycle, ";", p + "water_cycle.csv", do_append);
+    SimulationSettings::current().debugDataTable(SimulationSettings::dDailyResponses, ";", p + "daily_responses.csv", do_append);
+    SimulationSettings::current().debugDataTable(SimulationSettings::dEstablishment, ";", p + "establishment.csv", do_append);
+    SimulationSettings::current().debugDataTable(SimulationSettings::dSaplingGrowth, ";", p + "saplinggrowth.csv", do_append);
+    SimulationSettings::current().debugDataTable(SimulationSettings::dCarbonCycle, ";", p + "carboncycle.csv", do_append);
+    SimulationSettings::current().debugDataTable(SimulationSettings::dPerformance, ";", p + "performance.csv", do_append);
 
 }
 
 void ModelController::saveDebugOutputJs(bool do_clear)
 {
-    QString p = GlobalSettings::instance()->path("debug_", "temp");
+    QString p = SimulationSettings::current().path("debug_", "temp");
 
     // save the debug outputs, start new file(s):
     saveDebugOutputsCore(p, false);
 
     if (do_clear)
-        GlobalSettings::instance()->clearDebugLists();  // clear debug data
+        SimulationSettings::current().clearDebugLists();  // clear debug data
 
 
 }
@@ -594,7 +603,7 @@ void ModelController::saveScreenshot(QString file_name)
     if (!mViewerWindow)
         return;
     QImage img = mViewerWindow->screenshot();
-    img.save(GlobalSettings::instance()->path(file_name));
+    img.save(SimulationSettings::current().path(file_name));
 #else
     Q_UNUSED(file_name);
 #endif
@@ -712,17 +721,8 @@ Grid<double> *ModelController::preparePaintGrid(QObject *handler, QString name, 
     // the handler slot should return a pointer to a (double) grid
     Grid<double> *grid_ptr = nullptr;
     bool success = false;
-    handler->dumpObjectTree();
-
-
-    //if (handler->metaObject()->indexOfMethod("paintGrid")>-1) {
-        success = QMetaObject::invokeMethod(handler, "paintGrid", Qt::DirectConnection,
-                                                 Q_RETURN_ARG(Grid<double> *, grid_ptr),
-                                                 Q_ARG(QString, name),
-                                                 Q_ARG(QStringList&, rNamesColors->first),
-                                                 Q_ARG(QStringList&, rNamesColors->second)
-                                                 );
-    //}
+    // Graphical paint callbacks are omitted from the headless library.
+    Q_UNUSED(rNamesColors);
 
     if (success) {
         return grid_ptr;

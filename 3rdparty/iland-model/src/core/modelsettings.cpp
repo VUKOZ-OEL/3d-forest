@@ -27,7 +27,7 @@ ModelSettings::ModelSettings()
 
 void ModelSettings::loadModelSettings()
 {
-    XmlHelper xml(GlobalSettings::instance()->settings().node("model.settings"));
+    XmlHelper xml(SimulationSettings::current().settings().node("model.settings"));
     growthEnabled = xml.valueBool("growthEnabled", true);
     mortalityEnabled = xml.valueBool("mortalityEnabled", true);
     lightExtinctionCoefficient = xml.valueDouble("lightExtinctionCoefficient", 0.5);
@@ -37,13 +37,13 @@ void ModelSettings::loadModelSettings()
     airDensity = xml.valueDouble("airDensity", 1.2);
     laiThresholdForClosedStands = xml.valueDouble("laiThresholdForClosedStands", 3.);
     boundaryLayerConductance = xml.valueDouble("boundaryLayerConductance", 0.2);
-    XmlHelper world(GlobalSettings::instance()->settings().node("model.world"));
+    XmlHelper world(SimulationSettings::current().settings().node("model.world"));
     latitude = RAD(world.valueDouble("latitude",48.));
     usePARFractionBelowGroundAllocation = xml.valueBool("usePARFractionBelowGroundAllocation", true);
     //useDynamicAvailableNitrogen = xml.valueBool("model.settings.soil.useDynamicAvailableNitrogen", false); // TODO: there is a bug in using a xml helper that whose top-node is set
-    useDynamicAvailableNitrogen = GlobalSettings::instance()->settings().valueBool("model.settings.soil.useDynamicAvailableNitrogen", false);
-    torusMode = GlobalSettings::instance()->settings().paramValueBool("torus", false);
-    microclimateEnabled = GlobalSettings::instance()->settings().valueBool("model.climate.microclimate.enabled", false);
+    useDynamicAvailableNitrogen = SimulationSettings::current().settings().valueBool("model.settings.soil.useDynamicAvailableNitrogen", false);
+    torusMode = SimulationSettings::current().settings().paramValueBool("torus", false);
+    microclimateEnabled = SimulationSettings::current().settings().valueBool("model.climate.microclimate.enabled", false);
 }
 
 void ModelSettings::print()

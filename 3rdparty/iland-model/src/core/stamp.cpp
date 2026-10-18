@@ -23,7 +23,11 @@
 #include "stampcontainer.h"
 #include "helper.h"
 
-const Grid<float> *Stamp::mDistanceGrid = 0;
+const Grid<float> *&Stamp::runDistanceGrid()
+{
+    struct State { const Grid<float> *value = nullptr; };
+    return SimulationContext::state<State>().value;
+}
 
 Stamp::Stamp()
 {
@@ -50,7 +54,7 @@ void Stamp::setup(const int size)
     for (int i=0;i<c;i++)
         m_data[i]=0.;
     // set static variable values
-    mDistanceGrid = &StampContainer::distanceGrid();
+    runDistanceGrid() = &StampContainer::distanceGrid();
 }
 
 //inline float Stamp::distanceToCenter(const int ix, const int iy) const

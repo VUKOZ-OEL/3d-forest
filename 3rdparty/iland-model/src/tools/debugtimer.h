@@ -61,12 +61,15 @@ public:
     static void clearAllTimers();
     static void printAllTimers();
     static QString timeStr(double value_ms, bool exact=true);
-    static void setResponsiveMode(bool mode) { m_responsive_mode = mode; }
-    static bool responsiveMode()  { return m_responsive_mode; }
+    static void setResponsiveMode(bool mode) { runState_m_responsive_mode() = mode; }
+    static bool responsiveMode()  { return runState_m_responsive_mode(); }
 private:
-    static QHash<QString, double> mTimingList;
-    static bool m_responsive_mode;
-    static qint64 ms_since_epoch; // milliseconds since epoch for the first call
+    using RunType_mTimingList = QHash<QString, double>;
+    static RunType_mTimingList &runState_mTimingList();
+    using RunType_m_responsive_mode = bool;
+    static RunType_m_responsive_mode &runState_m_responsive_mode();
+    using RunType_ms_since_epoch = qint64;
+    static RunType_ms_since_epoch &runState_ms_since_epoch(); // milliseconds since epoch for the first call
     TickTack t;
     bool m_hideShort; // if true, hide messages for short operations (except an explicit call to showElapsed())
     bool m_shown;

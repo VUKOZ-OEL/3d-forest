@@ -103,9 +103,14 @@ private:
     // external seeds
     Grid<float> mExternalSeedMap; ///< for more complex external seed input, this map holds that information
     void setupExternalSeedsForSpecies(Species *species); ///< setup of special external seed input
-    static Grid<float> *mExternalSeedBaseMap; ///< static intermediate data while setting up external seeds
-    static QHash<QString, QVector<double> > mExtSeedData; ///< holds definition of species and percentages for external seed input
-    static int mExtSeedSizeX, mExtSeedSizeY; ///< size of the sectors used to specify external seed input
+    using RunType_mExternalSeedBaseMap = Grid<float> *;
+    static RunType_mExternalSeedBaseMap &runState_mExternalSeedBaseMap(); ///< static intermediate data while setting up external seeds
+    using RunType_mExtSeedData = QHash<QString, QVector<double> >;
+    static RunType_mExtSeedData &runState_mExtSeedData(); ///< holds definition of species and percentages for external seed input
+    using RunType_mExtSeedSizeX = int;
+    static RunType_mExtSeedSizeX &runState_mExtSeedSizeX();
+    using RunType_mExtSeedSizeY = int;
+    static RunType_mExtSeedSizeY &runState_mExtSeedSizeY(); ///< size of the sectors used to specify external seed input
 };
 
 #endif // SEEDDISPERSAL_H

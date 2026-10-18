@@ -1,33 +1,22 @@
 #include "global.h"
 #include "model.h"
 #include "modelcontroller.h"
-
-#if defined(_WIN32)
-    #if defined(EXPORT_ILandModel)   // CMake already sets EXPORT_ILandModel=1
-      #define ILANDMODEL_API __declspec(dllexport)
-    #else
-      #define ILANDMODEL_API __declspec(dllimport)
-    #endif
-#else
-    #define ILANDMODEL_API __attribute__((visibility("default")))
-#endif
+#include "runilandmodel.h"
 
 extern "C"
 {
 ILANDMODEL_API int runilandmodel(const char *path, int years)
 {
+    if (!path || !*path || years < 0)
+    {
+        qWarning() << "ERROR: invalid run iland-model parameters";
+        return -1;
+    }
+
     try
     {
-        static std::unique_ptr<QCoreApplication> app;
-
-        if (!QCoreApplication::instance())
-        {
-            int argc = 0;
-            app = std::make_unique<QCoreApplication>(argc, nullptr);
-        }
-
-        ModelController iLandModel;
-        GlobalSettings::instance()->setModelController(&iLandModel);
+        SimulationContext context;
+        ModelController iLandModel(context);
 
         QString xmlName(path);
 
@@ -48,6 +37,16 @@ ILANDMODEL_API int runilandmodel(const char *path, int years)
         {
             return -1;
         }
+    }
+    catch (const IException &error)
+    {
+        qWarning() << error.message();
+        return -1;
+    }
+    catch (const std::exception &error)
+    {
+        qWarning() << error.what();
+        return -1;
     }
     catch (...)
     {

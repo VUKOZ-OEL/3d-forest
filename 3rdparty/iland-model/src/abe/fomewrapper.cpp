@@ -30,37 +30,41 @@ namespace ABE {
 // (1) variables of activites
 
 // (2) stand variables
-QStringList standVarList=QStringList() << "basalArea" << "age"  << "absoluteAge" << "nspecies"
+static const QStringList standVarList=QStringList() << "basalArea" << "age"  << "absoluteAge" << "nspecies"
                                        << "volume" << "dbh" << "height"
                                        << "annualIncrement" << "elapsed" << "topHeight" << "area" << "year";
 
 // (3) site variables
-QStringList siteVarList=QStringList() << "annualIncrement" << "harvestMode" << "U";
-int siteVarListOffset = standVarList.count(); // stand vars start here...
+static const QStringList siteVarList=QStringList() << "annualIncrement" << "harvestMode" << "U";
+static const int siteVarListOffset = standVarList.count(); // stand vars start here...
 
 
 // finally: combine all varibles:
-QStringList allVarList;
+static QStringList &runVariableList()
+{
+    struct State { QStringList value; };
+    return SimulationContext::state<State>().value;
+}
 
 // setup the variable names
 // we use "__" internally (instead of .)
 void FOMEWrapper::buildVarList()
 {
-    allVarList.clear();
+    runVariableList().clear();
 
     foreach(QString var, standVarList)
-        allVarList.append(QString("stand__%1").arg(var));
+        runVariableList().append(QString("stand__%1").arg(var));
 
     foreach(QString var, siteVarList)
-        allVarList.append(QString("site__%1").arg(var));
+        runVariableList().append(QString("site__%1").arg(var));
 }
 
 
 const QStringList FOMEWrapper::getVariablesList()
 {
-    if (allVarList.isEmpty())
+    if (runVariableList().isEmpty())
         buildVarList();
-    return allVarList;
+    return runVariableList();
 }
 
 double FOMEWrapper::value(const int variableIndex)
@@ -90,7 +94,7 @@ double FOMEWrapper::valueStand(const int variableIndex)
     case 8: return ForestManagementEngine::instance()->currentYear() - mStand->lastExecution(); // years since last execution of an activity for the stand (yrs)
     case 9: return mStand->topHeight(); // top height (m)
     case 10: return mStand->area(); // stand area (ha)
-    case 11: return GlobalSettings::instance()->currentYear(); // the current year
+    case 11: return SimulationSettings::current().currentYear(); // the current year
     default: return 0;
     }
 }

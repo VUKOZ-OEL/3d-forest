@@ -16,9 +16,14 @@
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
 #add_subdirectory(3d-forest-classic)
-#add_subdirectory(iland-model)
 #add_subdirectory(lz4)
 #add_subdirectory(pcl)
+
+# iland
+add_subdirectory(pugixml)
+add_subdirectory(quickjs)
+add_subdirectory(sqlite)
+add_subdirectory(iland-model)
 
 # web
 add_subdirectory(zlib)

@@ -18,7 +18,7 @@
 ********************************************************************************************/
 
 #include "mapgrid.h"
-#include "globalsettings.h"
+#include "simulationsettings.h"
 #include "model.h"
 #include "resourceunit.h"
 #include "tree.h"
@@ -112,10 +112,10 @@ MapGrid::MapGrid()
 
 bool MapGrid::loadFromGrid(const GisGrid &source_grid, const bool create_index)
 {
-    if (!GlobalSettings::instance()->model())
+    if (!SimulationSettings::current().model())
         throw IException("GisGrid::create10mGrid: no valid model to retrieve height grid.");
 
-    HeightGrid *h_grid = GlobalSettings::instance()->model()->heightGrid();
+    HeightGrid *h_grid = SimulationSettings::current().model()->heightGrid();
     if (!h_grid || h_grid->isEmpty())
         throw IException("GisGrid::create10mGrid: no valid height grid to copy grid size.");
     // create a grid with the same size as the height grid
@@ -123,7 +123,7 @@ bool MapGrid::loadFromGrid(const GisGrid &source_grid, const bool create_index)
     mGrid.clear();
     mGrid.setup(h_grid->metricRect(),h_grid->cellsize());
 
-    const QRectF &world = GlobalSettings::instance()->model()->extent();
+    const QRectF &world = SimulationSettings::current().model()->extent();
     QPointF p;
     for (int i=0;i<mGrid.count();i++) {
         p = mGrid.cellCenterPoint(mGrid.indexOf(i));
@@ -147,7 +147,7 @@ bool MapGrid::loadFromGrid(const GisGrid &source_grid, const bool create_index)
 
 void MapGrid::createEmptyGrid()
 {
-    HeightGrid *h_grid = GlobalSettings::instance()->model()->heightGrid();
+    HeightGrid *h_grid = SimulationSettings::current().model()->heightGrid();
     if (!h_grid || h_grid->isEmpty())
         throw IException("GisGrid::createEmptyGrid: 10mGrid: no valid height grid to copy grid size.");
     // create a grid with the same size as the height grid
@@ -185,7 +185,7 @@ void MapGrid::createIndex()
 //        if (*p==-1)
 //            continue;
 
-//        ResourceUnit *ru = GlobalSettings::instance()->model()->ru(mGrid.cellCenterPoint(mGrid.indexOf(p)));
+//        ResourceUnit *ru = SimulationSettings::current().model()->ru(mGrid.cellCenterPoint(mGrid.indexOf(p)));
 //        if (!ru)
 //            continue;
 //        // find all entries for the current grid id
@@ -208,7 +208,7 @@ void MapGrid::createIndex()
     DebugTimer t3("MapGrid::createIndex: RU areas (alternative)");
     // alternative approach
     QHash<int, double> px_per_ru;
-    foreach (ResourceUnit *ru, GlobalSettings::instance()->model()->ruList()) {
+    foreach (ResourceUnit *ru, SimulationSettings::current().model()->ruList()) {
         px_per_ru.clear();
         // loop over each resource unit and count the stand Ids
         GridRunner<int> runner(mGrid, ru->boundingBox());

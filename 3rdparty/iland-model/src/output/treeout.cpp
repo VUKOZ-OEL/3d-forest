@@ -67,7 +67,7 @@ void TreeOut::setup()
 
 void TreeOut::exec()
 {
-    AllTreeIterator at(GlobalSettings::instance()->model());
+    AllTreeIterator at(SimulationSettings::current().model());
     DebugTimer t("TreeOut::exec()");
     TreeWrapper tw;
     mFilter.setModelObject(&tw);
@@ -129,7 +129,11 @@ TreeRemovedOut::TreeRemovedOut()
 
 }
 
-static QMutex protect_output;
+static QMutex &runFile_protect_output()
+{
+    struct State { QMutex value = {}; };
+    return SimulationContext::state<State>().value;
+}
 void TreeRemovedOut::execRemovedTree(const Tree *t, int reason)
 {
     if (!mFilter.isEmpty()) { // skip trees if filter is present
@@ -139,7 +143,7 @@ void TreeRemovedOut::execRemovedTree(const Tree *t, int reason)
         if (!mFilter.executeBool())
             return;
     }
-    QMutexLocker protector(&protect_output); // output creation can come from many threads
+    QMutexLocker protector(&runFile_protect_output()); // output creation can come from many threads
 
     *this << currentYear() << t->ru()->index() << t->ru()->id() << t->species()->id();
     *this << t->id()  << reason;

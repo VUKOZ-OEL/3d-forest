@@ -54,7 +54,7 @@ void CustomAggOut::setup()
 
     qDeleteAll(mLevels);
     mLevels.clear();
-    XmlHelper &xml = const_cast<XmlHelper&>(GlobalSettings::instance()->settings());
+    XmlHelper &xml = const_cast<XmlHelper&>(SimulationSettings::current().settings());
 
     for (int i=0;i<10;++i) {
         QString outname = QString("output.customagg.output%1").arg(i);
@@ -121,7 +121,7 @@ void CustomAggOutLevel::setup()
     mCondition.setExpression(condition);
     mLevelFilter.setExpression(level_filter);
 
-    mStandGrid = GlobalSettings::instance()->model()->standGrid();
+    mStandGrid = SimulationSettings::current().model()->standGrid();
 
     // clear columns
     columns().clear();
@@ -203,7 +203,7 @@ void CustomAggOutLevel::exec()
         return;
     // filter for years
     if (!mCondition.isEmpty())
-        if (!mCondition.calculate(GlobalSettings::instance()->currentYear()))
+        if (!mCondition.calculate(SimulationSettings::current().currentYear()))
             return;
 
     DebugTimer t("customagg output");
@@ -233,7 +233,7 @@ void CustomAggOutLevel::runTrees()
     switch (mLevel) {
     case CustomAggOut::sLandscape: {
         // loop over all trees in the landsacpe
-        AllTreeIterator ati(GlobalSettings::instance()->model());
+        AllTreeIterator ati(SimulationSettings::current().model());
         while (Tree *t = ati.next()) {
             if (do_filter) {
                 tw.setTree(t);
@@ -246,7 +246,7 @@ void CustomAggOutLevel::runTrees()
 
     }
     case CustomAggOut::sRU: {
-        const QList<ResourceUnit*> &ru_list = GlobalSettings::instance()->model()->ruList();
+        const QList<ResourceUnit*> &ru_list = SimulationSettings::current().model()->ruList();
         for (int i=0;i<ru_list.size();++i) {
             data.clear();
             if (!mLevelFilter.isEmpty()) {
@@ -314,7 +314,7 @@ void CustomAggOutLevel::runTrees()
 // process tree based aggregations
 void CustomAggOutLevel::runSnags()
 {
-    if (!Globals->model()->settings().carbonCycleEnabled)
+    if (!SimulationSettings::current().model()->settings().carbonCycleEnabled)
         throw IException("CustomAgg: should process Snags, but carbon cycle is not enabled in the model!");
 
     // data to (temporarily) store values: per species vector (dim=fields) of vectors (dim=trees)
@@ -325,7 +325,7 @@ void CustomAggOutLevel::runSnags()
     switch (mLevel) {
     case CustomAggOut::sLandscape: {
         // loop over all trees in the landsacpe
-        for (const auto &ru : Globals->model()->ruList()) {
+        for (const auto &ru : SimulationSettings::current().model()->ruList()) {
             for (const auto &dt : ru->snag()->deadTrees()) {
                 if (do_filter) {
                     tw.setDeadTree(&dt);
@@ -341,7 +341,7 @@ void CustomAggOutLevel::runSnags()
     }
     case CustomAggOut::sRU: {
 
-        for (const auto &ru : Globals->model()->ruList()) {
+        for (const auto &ru : SimulationSettings::current().model()->ruList()) {
 
             data.clear();
             if (!mLevelFilter.isEmpty()) {
@@ -414,7 +414,7 @@ void CustomAggOutLevel::runSaplings()
     switch (mLevel) {
     case CustomAggOut::sLandscape: {
         // loop over all trees in the landsacpe
-        foreach (ResourceUnit *ru, GlobalSettings::instance()->model()->ruList()) {
+        foreach (ResourceUnit *ru, SimulationSettings::current().model()->ruList()) {
             SaplingCell *s = ru->saplingCellArray();
             for (int px=0;px<cPxPerHectare;++px, ++s) {
                 int n_on_px = s->n_occupied();
@@ -430,7 +430,7 @@ void CustomAggOutLevel::runSaplings()
 
     case CustomAggOut::sRU: {
         // loop over all trees in the landsacpe
-        foreach (ResourceUnit *ru, GlobalSettings::instance()->model()->ruList()) {
+        foreach (ResourceUnit *ru, SimulationSettings::current().model()->ruList()) {
             if (!mLevelFilter.isEmpty()) {
                 if (!mLevelFilter.calculateBool(ru->id()))
                     continue;

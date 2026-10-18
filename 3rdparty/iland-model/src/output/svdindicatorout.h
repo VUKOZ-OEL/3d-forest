@@ -9,7 +9,6 @@
 // created an updated version of "bitset" including a lil fix
 //#ifdef Q_OS_WIN // <- not working for GCC on Windows
 #ifdef Q_CC_MSVC
-//#include "../3rdparty/bitset.h"
 #else
 #include <bitset>
 #endif

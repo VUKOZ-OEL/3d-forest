@@ -117,17 +117,21 @@ QVector<QPair<QString, int> > planting_patterns =QVector<QPair<QString, int> >()
                        "00001111111111110000"\
                        "00000011111111000000"\
                        "00000000111100000000", 20); // circle20
-QStringList planting_pattern_names = QStringList() << "rect2" << "rect5" << "rect10" << "rect20" << "circle5" << "circle10" << "circle20";
+static const QStringList planting_pattern_names = QStringList() << "rect2" << "rect5" << "rect10" << "rect20" << "circle5" << "circle10" << "circle20";
 
-QStringList ActPlanting::mAllowedProperties;
+ActPlanting::RunType_mAllowedProperties &ActPlanting::runState_mAllowedProperties()
+{
+    struct State { RunType_mAllowedProperties value = {}; };
+    return SimulationContext::state<State>().value;
+}
 
 
 ActPlanting::ActPlanting(FMSTP *parent): Activity(parent)
 {
     //mBaseActivity.setIsScheduled(true); // use the scheduler
     //mBaseActivity.setDoSimulate(true); // simulate per default
-    if (mAllowedProperties.isEmpty())
-        mAllowedProperties = QStringList() << Activity::mAllowedProperties
+    if (runState_mAllowedProperties().isEmpty())
+        runState_mAllowedProperties() = QStringList() << Activity::runState_mAllowedProperties()
                                            << "species" << "fraction" << "height" << "age" << "clear"
                                            << "pattern" << "spacing" << "offset" << "random" << "n";
 
@@ -136,7 +140,7 @@ ActPlanting::ActPlanting(FMSTP *parent): Activity(parent)
 void ActPlanting::setup(QJSValue value)
 {
     // check if regeneration is enabled
-    if (GlobalSettings::instance()->model()->settings().regenerationEnabled == false)
+    if (SimulationSettings::current().model()->settings().regenerationEnabled == false)
         throw IException("Cannot set up planting acitivities when iLand regeneration module is disabled.");
     Activity::setup(value); // setup base events
     events().setup(value, FomeScript::bridge()->activityJS(), QStringList() << "onEvaluate");
@@ -154,14 +158,14 @@ void ActPlanting::setup(QJSValue value)
             mItems.append(SPlantingItem());
             SPlantingItem &item = mItems.last();
             qDebug() << it.name() << ": " << FomeScript::JStoString(it.value());
-            FMSTP::checkObjectProperties(it.value(), mAllowedProperties, "setup of planting activity:" + name() + "; " + it.name());
+            FMSTP::checkObjectProperties(it.value(), runState_mAllowedProperties(), "setup of planting activity:" + name() + "; " + it.name());
 
             item.setup(it.value());
         }
     } else {
         mItems.append(SPlantingItem());
         SPlantingItem &item = mItems.last();
-        FMSTP::checkObjectProperties(items, mAllowedProperties, "setup of planting activity:" + name());
+        FMSTP::checkObjectProperties(items, runState_mAllowedProperties(), "setup of planting activity:" + name());
 
         item.setup(items);
     }
@@ -245,7 +249,7 @@ bool ActPlanting::SPlantingItem::setup(QJSValue value)
 {
 
     QString species_id = FMSTP::valueFromJs(value, "species",QString(), "setup of planting item for planting activity.").toString();
-    species = GlobalSettings::instance()->model()->speciesSet()->species(species_id);
+    species = SimulationSettings::current().model()->speciesSet()->species(species_id);
     if (!species)
         throw IException(QString("'%1' is not a valid species id for setting up a planting item.").arg(species_id));
     fraction = FMSTP::valueFromJs(value, "fraction", "0"); // save the JSValue
@@ -279,7 +283,7 @@ void ActPlanting::SPlantingItem::run(FMStand *stand)
 {
     QRectF box = ForestManagementEngine::instance()->standGrid()->boundingBox(stand->id());
     const MapGrid *sgrid = ForestManagementEngine::instance()->standGrid();
-    Model *model = GlobalSettings::instance()->model();
+    Model *model = SimulationSettings::current().model();
     GridRunner<float> runner(model->grid(), box);
     if (!grouped) {
         // distribute saplings randomly.

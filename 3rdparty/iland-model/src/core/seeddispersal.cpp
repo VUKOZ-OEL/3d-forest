@@ -19,7 +19,7 @@
 
 #include "seeddispersal.h"
 
-#include "globalsettings.h"
+#include "simulationsettings.h"
 #include "model.h"
 #include "debugtimer.h"
 #include "helper.h"
@@ -39,10 +39,26 @@
 
   */
 
-Grid<float> *SeedDispersal::mExternalSeedBaseMap = 0;
-QHash<QString, QVector<double> > SeedDispersal::mExtSeedData;
-int SeedDispersal::mExtSeedSizeX = 0;
-int SeedDispersal::mExtSeedSizeY = 0;
+SeedDispersal::RunType_mExternalSeedBaseMap &SeedDispersal::runState_mExternalSeedBaseMap()
+{
+    struct State { RunType_mExternalSeedBaseMap value = 0; };
+    return SimulationContext::state<State>().value;
+}
+SeedDispersal::RunType_mExtSeedData &SeedDispersal::runState_mExtSeedData()
+{
+    struct State { RunType_mExtSeedData value = {}; };
+    return SimulationContext::state<State>().value;
+}
+SeedDispersal::RunType_mExtSeedSizeX &SeedDispersal::runState_mExtSeedSizeX()
+{
+    struct State { RunType_mExtSeedSizeX value = 0; };
+    return SimulationContext::state<State>().value;
+}
+SeedDispersal::RunType_mExtSeedSizeY &SeedDispersal::runState_mExtSeedSizeY()
+{
+    struct State { RunType_mExtSeedSizeY value = 0; };
+    return SimulationContext::state<State>().value;
+}
 
 SeedDispersal::~SeedDispersal()
 {
@@ -58,15 +74,15 @@ SeedDispersal::~SeedDispersal()
   */
 void SeedDispersal::setup()
 {
-    if (!GlobalSettings::instance()->model()
-        || !GlobalSettings::instance()->model()->heightGrid()
+    if (!SimulationSettings::current().model()
+        || !SimulationSettings::current().model()->heightGrid()
         || !mSpecies)
         return;
 
     const float seedmap_size = 20.f;
     // setup of seed map
     mSeedMap.clear();
-    mSeedMap.setup(GlobalSettings::instance()->model()->heightGrid()->metricRect(), seedmap_size );
+    mSeedMap.setup(SimulationSettings::current().model()->heightGrid()->metricRect(), seedmap_size );
     mSeedMap.initialize(0.);
 
     mSourceMap.setup(mSeedMap);
@@ -79,7 +95,7 @@ void SeedDispersal::setup()
     if (mSpecies==0)
         throw IException("Setup of SeedDispersal: Species not defined.");
 
-    if (fmod(GlobalSettings::instance()->settings().valueDouble("model.world.buffer",0),seedmap_size) != 0.)
+    if (fmod(SimulationSettings::current().settings().valueDouble("model.world.buffer",0),seedmap_size) != 0.)
         throw IException("SeedDispersal:setup(): The buffer (model.world.buffer) must be a integer multiple of the seed pixel size (currently 20m, e.g. 20,40,60,...)).");
 
     // settings
@@ -88,7 +104,7 @@ void SeedDispersal::setup()
     mSpecies->treeMigKernel(mTM_as1, mTM_as2, mTM_ks);
     mTM_fecundity_cell = mSpecies->fecundity_m2() * seedmap_size*seedmap_size * mTM_occupancy; // scale to production for the whole cell
     mNonSeedYearFraction = mSpecies->nonSeedYearFraction();
-    XmlHelper xml(GlobalSettings::instance()->settings().node("model.settings.seedDispersal"));
+    XmlHelper xml(SimulationSettings::current().settings().node("model.settings.seedDispersal"));
     mKernelThresholdArea = xml.valueDouble(".longDistanceDispersal.thresholdArea", 0.0001);
     mKernelThresholdLDD = xml.valueDouble(".longDistanceDispersal.thresholdLDD", 0.0001);
     mLDDSeedlings = static_cast<float>(xml.valueDouble(".longDistanceDispersal.LDDSeedlings", 0.0001));
@@ -109,7 +125,7 @@ void SeedDispersal::setup()
     if (mSpecies->fecunditySerotiny()>0.) {
         // an extra seed map is used for storing information related to post-fire seed rain
         mSeedMapSerotiny.clear();
-        mSeedMapSerotiny.setup(GlobalSettings::instance()->model()->heightGrid()->metricRect(), seedmap_size );
+        mSeedMapSerotiny.setup(SimulationSettings::current().model()->heightGrid()->metricRect(), seedmap_size );
         mSeedMapSerotiny.initialize(0.);
 
         // set up the special seed kernel for post fire seed rain
@@ -119,9 +135,9 @@ void SeedDispersal::setup()
     mHasPendingSerotiny = false;
 
     // debug info
-    mDumpSeedMaps = GlobalSettings::instance()->settings().valueBool("model.settings.seedDispersal.dumpSeedMapsEnabled",false);
+    mDumpSeedMaps = SimulationSettings::current().settings().valueBool("model.settings.seedDispersal.dumpSeedMapsEnabled",false);
     if (mDumpSeedMaps) {
-        QString path = GlobalSettings::instance()->path( GlobalSettings::instance()->settings().value("model.settings.seedDispersal.dumpSeedMapsPath") );
+        QString path = SimulationSettings::current().path( SimulationSettings::current().settings().value("model.settings.seedDispersal.dumpSeedMapsPath") );
         Helper::saveToTextFile(QString("%1/seedkernelYes_%2.csv").arg(path).arg(mSpecies->id()),gridToString(mKernelSeedYear));
         Helper::saveToTextFile(QString("%1/seedkernelNo_%2.csv").arg(path).arg(mSpecies->id()),gridToString(mKernelNonSeedYear));
         if (!mKernelSerotiny.isEmpty())
@@ -134,21 +150,21 @@ void SeedDispersal::setup()
     mExternalSeedBuffer = 0;
     mExternalSeedDirection = 0;
     mExternalSeedBackgroundInput = 0.;
-    if (GlobalSettings::instance()->settings().valueBool("model.settings.seedDispersal.externalSeedEnabled",false)) {
-        if (GlobalSettings::instance()->settings().valueBool("model.settings.seedDispersal.seedBelt.enabled",false)) {
+    if (SimulationSettings::current().settings().valueBool("model.settings.seedDispersal.externalSeedEnabled",false)) {
+        if (SimulationSettings::current().settings().valueBool("model.settings.seedDispersal.seedBelt.enabled",false)) {
             // external seed input specified by sectors and around the project area (seedbelt)
             setupExternalSeedsForSpecies(mSpecies);
         } else {
             // external seeds specified fixedly per cardinal direction
             // current species in list??
-            mHasExternalSeedInput = GlobalSettings::instance()->settings().value("model.settings.seedDispersal.externalSeedSpecies").contains(mSpecies->id());
-            QString dir = GlobalSettings::instance()->settings().value("model.settings.seedDispersal.externalSeedSource").toLower();
+            mHasExternalSeedInput = SimulationSettings::current().settings().value("model.settings.seedDispersal.externalSeedSpecies").contains(mSpecies->id());
+            QString dir = SimulationSettings::current().settings().value("model.settings.seedDispersal.externalSeedSource").toLower();
             // encode cardinal positions as bits: e.g: "e,w" -> 10 (bit 0 not used)
             setBit(mExternalSeedDirection, 1, dir.contains("n"));
             setBit(mExternalSeedDirection, 2, dir.contains("e"));
             setBit(mExternalSeedDirection, 3, dir.contains("s"));
             setBit(mExternalSeedDirection, 4, dir.contains("w"));
-            QStringList buffer_list = GlobalSettings::instance()->settings().value("model.settings.seedDispersal.externalSeedBuffer").split(QRegularExpression("([^\\.\\w]+)"));
+            QStringList buffer_list = SimulationSettings::current().settings().value("model.settings.seedDispersal.externalSeedBuffer").split(QRegularExpression("([^\\.\\w]+)"));
             int index = buffer_list.indexOf(mSpecies->id());
             if (index>=0) {
                 mExternalSeedBuffer = buffer_list[index+1].toInt();
@@ -156,7 +172,7 @@ void SeedDispersal::setup()
             }
 
             // background seed rain (i.e. for the full landscape), use regexp
-            QStringList background_input_list = GlobalSettings::instance()->settings().value("model.settings.seedDispersal.externalSeedBackgroundInput").split(QRegularExpression("([^\\.\\w]+)"));
+            QStringList background_input_list = SimulationSettings::current().settings().value("model.settings.seedDispersal.externalSeedBackgroundInput").split(QRegularExpression("([^\\.\\w]+)"));
             index = background_input_list.indexOf(mSpecies->id());
             if (index>=0) {
                 mExternalSeedBackgroundInput = background_input_list[index+1].toDouble();
@@ -172,65 +188,65 @@ void SeedDispersal::setup()
 
 void SeedDispersal::setupExternalSeeds()
 {
-    mExternalSeedBaseMap = 0;
-    if (!GlobalSettings::instance()->settings().valueBool("model.settings.seedDispersal.seedBelt.enabled",false))
+    runState_mExternalSeedBaseMap() = 0;
+    if (!SimulationSettings::current().settings().valueBool("model.settings.seedDispersal.seedBelt.enabled",false))
         return;
 
     DebugTimer t("setup of external seed maps.");
-    XmlHelper xml(GlobalSettings::instance()->settings().node("model.settings.seedDispersal.seedBelt"));
+    XmlHelper xml(SimulationSettings::current().settings().node("model.settings.seedDispersal.seedBelt"));
     int seedbelt_width =xml.valueInt(".width",10);
     // setup of sectors
     // setup of base map
     const float seedmap_size = 20.f;
-    mExternalSeedBaseMap = new Grid<float>;
-    mExternalSeedBaseMap->setup(GlobalSettings::instance()->model()->heightGrid()->metricRect(), seedmap_size );
-    mExternalSeedBaseMap->initialize(0.);
-    if (mExternalSeedBaseMap->count()*4 != GlobalSettings::instance()->model()->heightGrid()->count())
+    runState_mExternalSeedBaseMap() = new Grid<float>;
+    runState_mExternalSeedBaseMap()->setup(SimulationSettings::current().model()->heightGrid()->metricRect(), seedmap_size );
+    runState_mExternalSeedBaseMap()->initialize(0.);
+    if (runState_mExternalSeedBaseMap()->count()*4 != SimulationSettings::current().model()->heightGrid()->count())
         throw IException("error in setting up external seeds: the width and height of the project area need to be a multiple of 20m when external seeds are enabled.");
     // make a copy of the 10m height grid in lower resolution and mark pixels that are forested and outside of
     // the project area.
-    for (int y=0;y<mExternalSeedBaseMap->sizeY();y++)
-        for (int x=0;x<mExternalSeedBaseMap->sizeX();x++) {
-            bool val = GlobalSettings::instance()->model()->heightGrid()->valueAtIndex(x*2,y*2).isForestOutside();
-            mExternalSeedBaseMap->valueAtIndex(x,y) = val?1.f:0.f;
-            if(GlobalSettings::instance()->model()->heightGrid()->valueAtIndex(x*2,y*2).isValid())
-                mExternalSeedBaseMap->valueAtIndex(x,y) = -1.f;
+    for (int y=0;y<runState_mExternalSeedBaseMap()->sizeY();y++)
+        for (int x=0;x<runState_mExternalSeedBaseMap()->sizeX();x++) {
+            bool val = SimulationSettings::current().model()->heightGrid()->valueAtIndex(x*2,y*2).isForestOutside();
+            runState_mExternalSeedBaseMap()->valueAtIndex(x,y) = val?1.f:0.f;
+            if(SimulationSettings::current().model()->heightGrid()->valueAtIndex(x*2,y*2).isValid())
+                runState_mExternalSeedBaseMap()->valueAtIndex(x,y) = -1.f;
         }
-    QString path = GlobalSettings::instance()->path(GlobalSettings::instance()->settings().value("model.settings.seedDispersal.dumpSeedMapsPath"));
+    QString path = SimulationSettings::current().path(SimulationSettings::current().settings().value("model.settings.seedDispersal.dumpSeedMapsPath"));
 
-    if (GlobalSettings::instance()->settings().valueBool("model.settings.seedDispersal.dumpSeedMapsEnabled",false)) {
+    if (SimulationSettings::current().settings().valueBool("model.settings.seedDispersal.dumpSeedMapsEnabled",false)) {
 #ifdef ILAND_GUI
-        QImage img = gridToImage(*mExternalSeedBaseMap, true, -1., 2.);
+        QImage img = gridToImage(*runState_mExternalSeedBaseMap(), true, -1., 2.);
         img.save(path + "/seedbeltmap_before.png");
 #endif
     }
     //    img.save("seedmap.png");
     // now scan the pixels of the belt: paint all pixels that are close to the project area
     // we do this 4 times (for all cardinal direcitons)
-    for (int y=0;y<mExternalSeedBaseMap->sizeY();y++) {
-        for (int x=0;x<mExternalSeedBaseMap->sizeX();x++) {
-            if (mExternalSeedBaseMap->valueAtIndex(x, y)!=1.)
+    for (int y=0;y<runState_mExternalSeedBaseMap()->sizeY();y++) {
+        for (int x=0;x<runState_mExternalSeedBaseMap()->sizeX();x++) {
+            if (runState_mExternalSeedBaseMap()->valueAtIndex(x, y)!=1.)
                 continue;
-            int look_forward = std::min(x + seedbelt_width, mExternalSeedBaseMap->sizeX()-1);
-            if (mExternalSeedBaseMap->valueAtIndex(look_forward, y)==-1.f) {
+            int look_forward = std::min(x + seedbelt_width, runState_mExternalSeedBaseMap()->sizeX()-1);
+            if (runState_mExternalSeedBaseMap()->valueAtIndex(look_forward, y)==-1.f) {
                 // fill pixels
                 for(; x<look_forward;++x) {
-                    float &v = mExternalSeedBaseMap->valueAtIndex(x, y);
+                    float &v = runState_mExternalSeedBaseMap()->valueAtIndex(x, y);
                     if (v==1.f) v=2.f;
                 }
             }
         }
     }
     // right to left
-    for (int y=0;y<mExternalSeedBaseMap->sizeY();y++) {
-        for (int x=mExternalSeedBaseMap->sizeX();x>=0;--x) {
-            if (mExternalSeedBaseMap->valueAtIndex(x, y)!=1.f)
+    for (int y=0;y<runState_mExternalSeedBaseMap()->sizeY();y++) {
+        for (int x=runState_mExternalSeedBaseMap()->sizeX();x>=0;--x) {
+            if (runState_mExternalSeedBaseMap()->valueAtIndex(x, y)!=1.f)
                 continue;
             int look_forward = std::max(x - seedbelt_width, 0);
-            if (mExternalSeedBaseMap->valueAtIndex(look_forward, y)==-1.f) {
+            if (runState_mExternalSeedBaseMap()->valueAtIndex(look_forward, y)==-1.f) {
                 // fill pixels
                 for(; x>look_forward;--x) {
-                    float &v = mExternalSeedBaseMap->valueAtIndex(x, y);
+                    float &v = runState_mExternalSeedBaseMap()->valueAtIndex(x, y);
                     if (v==1.f) v=2.f;
                 }
             }
@@ -238,44 +254,44 @@ void SeedDispersal::setupExternalSeeds()
     }
     // up and down ***
     // from top to bottom
-    for (int x=0;x<mExternalSeedBaseMap->sizeX();x++) {
-        for (int y=0;y<mExternalSeedBaseMap->sizeY();y++) {
+    for (int x=0;x<runState_mExternalSeedBaseMap()->sizeX();x++) {
+        for (int y=0;y<runState_mExternalSeedBaseMap()->sizeY();y++) {
 
-            if (mExternalSeedBaseMap->valueAtIndex(x, y)!=1.)
+            if (runState_mExternalSeedBaseMap()->valueAtIndex(x, y)!=1.)
                 continue;
-            int look_forward = std::min(y + seedbelt_width, mExternalSeedBaseMap->sizeY()-1);
-            if (mExternalSeedBaseMap->valueAtIndex(x, look_forward)==-1.f) {
+            int look_forward = std::min(y + seedbelt_width, runState_mExternalSeedBaseMap()->sizeY()-1);
+            if (runState_mExternalSeedBaseMap()->valueAtIndex(x, look_forward)==-1.f) {
                 // fill pixels
                 for(; y<look_forward;++y) {
-                    float &v = mExternalSeedBaseMap->valueAtIndex(x, y);
+                    float &v = runState_mExternalSeedBaseMap()->valueAtIndex(x, y);
                     if (v==1.f) v=2.f;
                 }
             }
         }
     }
     // bottom to top ***
-    for (int y=0;y<mExternalSeedBaseMap->sizeY();y++) {
-        for (int x=mExternalSeedBaseMap->sizeX();x>=0;--x) {
-            if (mExternalSeedBaseMap->valueAtIndex(x, y)!=1.)
+    for (int y=0;y<runState_mExternalSeedBaseMap()->sizeY();y++) {
+        for (int x=runState_mExternalSeedBaseMap()->sizeX();x>=0;--x) {
+            if (runState_mExternalSeedBaseMap()->valueAtIndex(x, y)!=1.)
                 continue;
             int look_forward = std::max(y - seedbelt_width, 0);
-            if (mExternalSeedBaseMap->valueAtIndex(x, look_forward)==-1.f) {
+            if (runState_mExternalSeedBaseMap()->valueAtIndex(x, look_forward)==-1.f) {
                 // fill pixels
                 for(; y>look_forward;--y) {
-                    float &v = mExternalSeedBaseMap->valueAtIndex(x, y);
+                    float &v = runState_mExternalSeedBaseMap()->valueAtIndex(x, y);
                     if (v==1.f) v=2.f;
                 }
             }
         }
     }
 
-    if (GlobalSettings::instance()->settings().valueBool("model.settings.seedDispersal.dumpSeedMapsEnabled",false)) {
+    if (SimulationSettings::current().settings().valueBool("model.settings.seedDispersal.dumpSeedMapsEnabled",false)) {
 #ifdef ILAND_GUI
-        QImage img = gridToImage(*mExternalSeedBaseMap, true, -1., 2.);
+        QImage img = gridToImage(*runState_mExternalSeedBaseMap(), true, -1., 2.);
         img.save(path + "/seedbeltmap_after.png");
 #endif
     }
-    mExtSeedData.clear();
+    runState_mExtSeedData().clear();
     int sectors_x = xml.valueInt("sizeX",0);
     int sectors_y = xml.valueInt("sizeY",0);
     if(sectors_x<1 || sectors_y<1)
@@ -297,9 +313,9 @@ void SeedDispersal::setupExternalSeeds()
             // we assume pairs of name and fraction
             QStringList species_list = text.split(" ");
             for (int i=0;i<species_list.count();++i) {
-                if (!GlobalSettings::instance()->model()->speciesSet()->species(species_list[i]))
+                if (!SimulationSettings::current().model()->speciesSet()->species(species_list[i]))
                     throw IException(QString("Setup of external seeds: species '%1' is not a valid species!").arg(species_list[i]));
-                QVector<double> &space = mExtSeedData[species_list[i]];
+                QVector<double> &space = runState_mExtSeedData()[species_list[i]];
                 if (space.isEmpty())
                     space.resize(sectors_x*sectors_y); // are initialized to 0s
                 bool ok;
@@ -310,24 +326,28 @@ void SeedDispersal::setupExternalSeeds()
             }
         }
     }
-    mExtSeedSizeX = sectors_x;
-    mExtSeedSizeY = sectors_y;
+    runState_mExtSeedSizeX() = sectors_x;
+    runState_mExtSeedSizeY() = sectors_y;
     qDebug() << "setting up of external seed maps finished";
 }
 
 void SeedDispersal::finalizeExternalSeeds()
 {
-    if (mExternalSeedBaseMap)
-        delete mExternalSeedBaseMap;
-    mExternalSeedBaseMap = 0;
+    if (runState_mExternalSeedBaseMap())
+        delete runState_mExternalSeedBaseMap();
+    runState_mExternalSeedBaseMap() = 0;
 }
 
-static QMutex _lock_create_seed_map;
+static QMutex &runFile__lock_create_seed_map()
+{
+    struct State { QMutex value = {}; };
+    return SimulationContext::state<State>().value;
+}
 void SeedDispersal::setSaplingTree(const QPoint &lip_index, float leaf_area)
 {
     if (!mSaplingMapCreated) {
         // setup the data on first use
-        QMutexLocker lock(&_lock_create_seed_map);
+        QMutexLocker lock(&runFile__lock_create_seed_map());
         if (!mSaplingMapCreated) {
             // if another thread already created the map, skip
             mSaplingSourceMap.setup(mSeedMap);
@@ -505,28 +525,28 @@ double SeedDispersal::treemig_distanceTo(const double value)
 
 void SeedDispersal::setupExternalSeedsForSpecies(Species *species)
 {
-    if (!mExtSeedData.contains(species->id()))
+    if (!runState_mExtSeedData().contains(species->id()))
         return; // nothing to do
     qDebug() << "setting up external seed map for" << species->id();
-    QVector<double> &pcts = mExtSeedData[species->id()];
+    QVector<double> &pcts = runState_mExtSeedData()[species->id()];
     mExternalSeedMap.setup(mSeedMap);
     mExternalSeedMap.initialize(0.f);
-    for (int sector_x=0; sector_x<mExtSeedSizeX; ++sector_x)
-        for (int sector_y=0; sector_y<mExtSeedSizeY; ++sector_y) {
+    for (int sector_x=0; sector_x<runState_mExtSeedSizeX(); ++sector_x)
+        for (int sector_y=0; sector_y<runState_mExtSeedSizeY(); ++sector_y) {
             int xmin,xmax,ymin,ymax;
-            int fx = mExternalSeedMap.sizeX() / mExtSeedSizeX; // number of cells per sector
+            int fx = mExternalSeedMap.sizeX() / runState_mExtSeedSizeX(); // number of cells per sector
             xmin = sector_x*fx;
             xmax = (sector_x+1)*fx;
-            fx = mExternalSeedMap.sizeY() / mExtSeedSizeY; // number of cells per sector
+            fx = mExternalSeedMap.sizeY() / runState_mExtSeedSizeY(); // number of cells per sector
             ymin = sector_y*fx;
             ymax = (sector_y+1)*fx;
             // now loop over the whole sector
-            int index = sector_y*mExtSeedSizeX  + sector_x;
+            int index = sector_y*runState_mExtSeedSizeX()  + sector_x;
             double p = pcts[index];
             for (int y=ymin;y<ymax;++y)
                 for (int x=xmin;x<xmax;++x) {
                     // check
-                    if (mExternalSeedBaseMap->valueAtIndex(x,y)==2.f)
+                    if (runState_mExternalSeedBaseMap()->valueAtIndex(x,y)==2.f)
                         if (drandom()<p)
                             mExternalSeedMap.valueAtIndex(x,y) = 1.f; // flag
                 }
@@ -578,7 +598,7 @@ void SeedDispersal::newYear()
     if (mHasExternalSeedInput) {
         // if external seed input is enabled, the buffer area of the seed maps is
         // "turned on", i.e. set to 1.
-        int buf_size = GlobalSettings::instance()->settings().valueInt("model.world.buffer",0.) / static_cast<int>(seed_map->cellsize());
+        int buf_size = SimulationSettings::current().settings().valueInt("model.world.buffer",0.) / static_cast<int>(seed_map->cellsize());
         // if a special buffer is defined, reduce the size of the input
         if (mExternalSeedBuffer>0)
             buf_size -= mExternalSeedBuffer;
@@ -625,14 +645,18 @@ void SeedDispersal::clearSaplingMap()
         mSaplingSourceMap.initialize(0.f);
 }
 
-static int _debug_ldd=0;
+static int &runFile__debug_ldd()
+{
+    struct State { int value = 0; };
+    return SimulationContext::state<State>().value;
+}
 void SeedDispersal::execute()
 {
 #ifdef ILAND_GUI
-    int year = GlobalSettings::instance()->currentYear();
+    int year = SimulationSettings::current().currentYear();
     QString path;
     if (mDumpSeedMaps) {
-        path = GlobalSettings::instance()->path( GlobalSettings::instance()->settings().value("model.settings.seedDispersal.dumpSeedMapsPath") );
+        path = SimulationSettings::current().path( SimulationSettings::current().settings().value("model.settings.seedDispersal.dumpSeedMapsPath") );
         gridToImage(seedMap(), true, 0., 1.).save(QString("%1/seed_before_%2_%3.png").arg(path).arg(mSpecies->id()).arg(year));
         qDebug() << "saved seed map image to" << path;
     }
@@ -691,13 +715,13 @@ void SeedDispersal::execute()
     }
 
     if (!mDumpNextYearFileName.isEmpty()) {
-        gridToFile<float>(seedMap(), GlobalSettings::instance()->path(mDumpNextYearFileName));
-        Helper::saveToTextFile(GlobalSettings::instance()->path(mDumpNextYearFileName), gridToESRIRaster(seedMap()));
-        qDebug() << "saved seed map for " << species()->id() << "to" << GlobalSettings::instance()->path(mDumpNextYearFileName);
+        gridToFile<float>(seedMap(), SimulationSettings::current().path(mDumpNextYearFileName));
+        Helper::saveToTextFile(SimulationSettings::current().path(mDumpNextYearFileName), gridToESRIRaster(seedMap()));
+        qDebug() << "saved seed map for " << species()->id() << "to" << SimulationSettings::current().path(mDumpNextYearFileName);
         mDumpNextYearFileName = QString();
     }
     if (logLevelDebug())
-        qDebug() << "LDD-count:" << _debug_ldd;
+        qDebug() << "LDD-count:" << runFile__debug_ldd();
 
 #endif
 }
@@ -743,7 +767,7 @@ void SeedDispersal::distributeSeeds(Grid<float> *seed_map)
     // source mode
 
     // *** seed distribution (Kernel + long distance dispersal) ***
-    if (GlobalSettings::instance()->model()->settings().torusMode==false) {
+    if (SimulationSettings::current().model()->settings().torusMode==false) {
         // ** standard case (no torus) **
         for (float *src=sourcemap.begin(); src!=sourcemap.end(); ++src) {
             if (*src>0.f) {
@@ -774,7 +798,7 @@ void SeedDispersal::distributeSeeds(Grid<float> *seed_map)
                                        pt.y() + static_cast<int>(radius*sin(phi)));
                             if (mSeedMap.isIndexValid(ldd)) {
                                 float &val = mSeedMap.valueAtIndex(ldd);
-                                _debug_ldd++;
+                                runFile__debug_ldd()++;
                                 val += ldd_val;
                             }
                         }
@@ -826,7 +850,7 @@ void SeedDispersal::distributeSeeds(Grid<float> *seed_map)
 
                             if (mSeedMap.isIndexValid(torus_pos)) {
                                 float &val = mSeedMap.valueAtIndex(torus_pos);
-                                _debug_ldd++;
+                                runFile__debug_ldd()++;
                                 val += ldd_val;
                             }
                         }
@@ -866,7 +890,7 @@ void SeedDispersal::addExternalBackgroundSeeds(Grid<float> &map, double backgrou
     float effective_prob = background_value * 1. / (frac_RU * frac_cells);
     int ncells = 0;
 
-    for (auto ru : GlobalSettings::instance()->model()->RUgrid()) {
+    for (auto ru : SimulationSettings::current().model()->RUgrid()) {
         if (ru!=nullptr && drandom() < frac_RU) {
             GridRunner<float> runner(map, ru->boundingBox());
             while (runner.next()) {

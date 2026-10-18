@@ -197,8 +197,16 @@ QString Helper::stripHtml(const QString &source)
 
 
 // debugging
-bool Helper::m_quiet = true;
-bool Helper::m_NoDebug = false;
+Helper::RunType_m_quiet &Helper::runState_m_quiet()
+{
+    struct State { RunType_m_quiet value = true; };
+    return SimulationContext::state<State>().value;
+}
+Helper::RunType_m_NoDebug &Helper::runState_m_NoDebug()
+{
+    struct State { RunType_m_NoDebug value = false; };
+    return SimulationContext::state<State>().value;
+}
 
 
 

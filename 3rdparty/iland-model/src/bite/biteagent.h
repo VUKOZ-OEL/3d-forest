@@ -128,6 +128,7 @@ public:
     static ABE::FMTreeList* threadTreeList();
     static ABE::FMSaplingList* threadSaplingList();
     static ABE::FMDeadTreeList* threadDeadTreeList();
+    static void clearThreadLists();
     BAgentStats &stats()  { return mStats; }
     BiteLifeCycle *lifeCycle() const { return mLC; }
     /// create stats grid (on demand)
@@ -164,9 +165,12 @@ public slots:
     void saveGrid(QString expression, QString file_name);
 private:
     static void runCell(BiteCell &cell);
-    static QHash<QThread*, ABE::FMTreeList* > mTreeLists;
-    static QHash<QThread*, ABE::FMSaplingList* > mSaplingLists;
-    static QHash<QThread*, ABE::FMDeadTreeList* > mDeadTreeLists;
+    using RunType_mTreeLists = QHash<QThread*, ABE::FMTreeList* >;
+    static RunType_mTreeLists &runState_mTreeLists();
+    using RunType_mSaplingLists = QHash<QThread*, ABE::FMSaplingList* >;
+    static RunType_mSaplingLists &runState_mSaplingLists();
+    using RunType_mDeadTreeLists = QHash<QThread*, ABE::FMDeadTreeList* >;
+    static RunType_mDeadTreeLists &runState_mDeadTreeLists();
 
     void setupScripting();
 

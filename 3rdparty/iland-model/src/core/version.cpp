@@ -69,7 +69,7 @@ const char *currentVersion(){ return version;}
 
 QString compiler()
 {
-    return QString("%1 %2 Qt %3").arg(MYCC).arg(BITS).arg(qVersion());
+    return QString("%1 %2 (Qt-free)").arg(MYCC).arg(BITS);
 }
 
 // QString verboseVersion()

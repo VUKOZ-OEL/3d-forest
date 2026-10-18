@@ -18,7 +18,7 @@
 ********************************************************************************************/
 
 #include "stampcontainer.h"
-#include "globalsettings.h"
+#include "simulationsettings.h"
 #include "exception.h"
 
 //constants
@@ -30,7 +30,11 @@ const int StampContainer::cHDclassLow = 35; ///< hd classes offset is 35: class 
 const int StampContainer::cHDclassCount = 16; ///< class count. highest class:  185-195
 
 // static values
-Grid<float> StampContainer::m_distance;
+StampContainer::RunType_m_distance &StampContainer::runState_m_distance()
+{
+    struct State { RunType_m_distance value = {}; };
+    return SimulationContext::state<State>().value;
+}
 
 StampContainer::StampContainer()
 {
@@ -118,7 +122,7 @@ void StampContainer::finalizeSetup()
                 m_lookup.valueAtIndex(fill, h) = m_lookup.valueAtIndex(b,h);
     }
     // distance grid
-    if (m_distance.sizeX()<max_size) {
+    if (runState_m_distance().sizeX()<max_size) {
         setupDistanceGrid(max_size);
     }
 }
@@ -126,11 +130,11 @@ void StampContainer::finalizeSetup()
 void StampContainer::setupDistanceGrid(const int size)
 {
     const float px_size = cPxSize;
-    m_distance.setup(px_size, size, size);
-    float *p=m_distance.begin();
+    runState_m_distance().setup(px_size, size, size);
+    float *p=runState_m_distance().begin();
     QPoint idx;
-    for (;p!=m_distance.end();++p) {
-        idx = m_distance.indexOf(p);
+    for (;p!=runState_m_distance().end();++p) {
+        idx = runState_m_distance().indexOf(p);
         *p = sqrt(double(idx.x()*idx.x()) + double(idx.y()*idx.y()))*px_size;
     }
 }

@@ -33,8 +33,8 @@ public:
     void setup(const QList<ResourceUnit*> &resourceUnitList);
     void setup(const QList<Species*> &speciesList) { mSpeciesMap = speciesList; }
     // access
-    bool multithreading() const { return mMultithreaded; }
-    void setMultithreading(const bool do_multithreading) { mMultithreaded = do_multithreading; }
+    bool multithreading() const { return runState_mMultithreaded(); }
+    void setMultithreading(const bool do_multithreading) { runState_mMultithreaded() = do_multithreading; }
     void print(); ///< print useful debug messages
     // actions
     void run( void (*funcptr)(ResourceUnit*), const bool forceSingleThreaded=false ) const; ///< execute 'funcptr' for all resource units in parallel
@@ -48,60 +48,67 @@ public:
     /// throw an exception that is safe when running
     /// mulitple threads
     void throwError(const QString &message) const;
-    bool hasErrors() const { return  !mErrors.isEmpty(); }
-    void clearErrors() { mErrors.clear(); }
-    const QStringList errors() const { return mErrors; }
+    bool hasErrors() const { return  !runState_mErrors().isEmpty(); }
+    void clearErrors() { runState_mErrors().clear(); }
+    const QStringList errors() const { return runState_mErrors(); }
     void checkErrors();
 private:
-    static QStringList mErrors;
+    using RunType_mErrors = QStringList;
+    static RunType_mErrors &runState_mErrors();
     QList<ResourceUnit*> mMap1, mMap2;
     QList<Species*> mSpeciesMap;
-    static RunState mState;
-    static bool mMultithreaded;
+    using RunType_mState = RunState;
+    static RunType_mState &runState_mState();
+    using RunType_mMultithreaded = bool;
+    static RunType_mMultithreaded &runState_mMultithreaded();
 };
 
 template<class T>
 void ThreadRunner::runGrid(void (*funcptr)(T *, T*), T *begin, T *end, const bool forceSingleThreaded, int minsize, int maxchunks) const
 {
     int length = end - begin; // # of elements
-    if (mMultithreaded && length>minsize*3 && forceSingleThreaded==false) {
+    if (runState_mMultithreaded() && length>minsize*3 && forceSingleThreaded==false) {
         // create multiple calls
-        mState = MultiThreaded;
+        runState_mState() = MultiThreaded;
         int chunksize = minsize;
         if (length > chunksize*maxchunks) {
             chunksize = length / maxchunks;
         }
         // execute operations
+        QList<std::pair<T*,T*>> ranges;
         T* p = begin;
         while (p<end) {
             T* pend = std::min(p+chunksize, end);
-            QFuture result = QtConcurrent::run(funcptr, p, pend);
+            ranges.append(std::make_pair(p,pend));
             p = pend;
         }
+        QtConcurrent::blockingMap(ranges,[funcptr](const auto& range){
+            funcptr(range.first,range.second);
+        });
     } else {
         // run all in one big function call
-        mState = SingleThreaded;
+        runState_mState() = SingleThreaded;
         (*funcptr)(begin, end);
     }
-    mState = Inactive;
+    runState_mState() = Inactive;
 }
 
 // multirunning function
 template<class T>
 void ThreadRunner::run(T *(*funcptr)(T *), const QVector<T *> &container, const bool forceSingleThreaded) const
 {
-    if (mMultithreaded && container.count() > 3 && forceSingleThreaded==false) {
+    if (runState_mMultithreaded() && container.count() > 3 && forceSingleThreaded==false) {
         // execute using QtConcurrent for larger amounts of elements
-        mState = MultiThreaded;
+        runState_mState() = MultiThreaded;
         QtConcurrent::blockingMap(container,funcptr);
     } else {
         // execute serialized in main thread
-        mState = SingleThreaded;
+        runState_mState() = SingleThreaded;
         T *element;
         foreach(element, container)
             (*funcptr)(element);
     }
-    mState = Inactive;
+    runState_mState() = Inactive;
 
 }
 
@@ -109,18 +116,18 @@ void ThreadRunner::run(T *(*funcptr)(T *), const QVector<T *> &container, const 
 template<class T>
 void ThreadRunner::run(void (*funcptr)(T &), QVector<T> &container, const bool forceSingleThreaded) const
 {
-    if (mMultithreaded && container.count() > 3 && forceSingleThreaded==false) {
+    if (runState_mMultithreaded() && container.count() > 3 && forceSingleThreaded==false) {
         // execute using QtConcurrent for larger amounts of elements
-        mState = MultiThreaded;
+        runState_mState() = MultiThreaded;
         QtConcurrent::blockingMap(container,funcptr);
     } else {
         // execute serialized in main thread
-        mState = SingleThreaded;
+        runState_mState() = SingleThreaded;
         for (int i=0;i<container.size();++i)
             (*funcptr)(container[i]);
 
     }
-    mState = Inactive;
+    runState_mState() = Inactive;
 }
 
 #endif // THREADRUNNER_H

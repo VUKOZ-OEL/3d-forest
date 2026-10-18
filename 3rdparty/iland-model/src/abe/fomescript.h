@@ -67,7 +67,7 @@ public:
     /// static accessor function for the responsible script bridge
     static FomeScript *bridge();
     /// returns a string for debug/trace messages
-    const QString &context() const { return mStand?mStand->context():mInvalidContext; }
+    const QString &context() const { return mStand?mStand->context():runState_mInvalidContext(); }
 
     /// convert a javascript object to a string (for debug output)
     static QString JStoString(QJSValue value);
@@ -151,7 +151,8 @@ public:
     void setStandVisualization(QString vis) { mStandVisualization = vis; }
 
 private:
-    static QString mInvalidContext;
+    using RunType_mInvalidContext = QString;
+    static RunType_mInvalidContext &runState_mInvalidContext();
     const FMStand *mStand;
     StandObj *mStandObj;
     UnitObj *mUnitObj;
@@ -443,7 +444,8 @@ public:
 public slots:
 private:
     ActivityFlags &flags() const; // get (depending on the linked objects) the right flags
-    static ActivityFlags mEmptyFlags;
+    using RunType_mEmptyFlags = ActivityFlags;
+    static RunType_mEmptyFlags &runState_mEmptyFlags();
     int mActivityIndex; // link to base activity
     Activity *mActivity; // pointer
     FMStand *mStand; // and to the forest stand....

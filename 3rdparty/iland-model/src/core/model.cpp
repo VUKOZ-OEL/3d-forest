@@ -126,17 +126,21 @@ static void nc_microclimate(ResourceUnit *unit)
 
     } catch (const IException &e) {
         // thread-safe error message
-        GlobalSettings::instance()->model()->threadExec().throwError(e.message());
+        SimulationSettings::current().model()->threadExec().throwError(e.message());
     }
 }
 
 
-ModelSettings Model::mSettings;
+Model::RunType_mSettings &Model::runState_mSettings()
+{
+    struct State { RunType_mSettings value = {}; };
+    return SimulationContext::state<State>().value;
+}
 Model::Model()
 {
     initialize();
-    GlobalSettings::instance()->setModel(this);
-    GlobalSettings::instance()->resetScriptEngine(); // clear the script
+    SimulationSettings::current().setModel(this);
+    SimulationSettings::current().resetScriptEngine(); // clear the script
     QString dbg="extended debug checks disabled.";
     DBGMODE( dbg="extended debug checks enabled."; );
     qDebug() << dbg;
@@ -145,7 +149,7 @@ Model::Model()
 Model::~Model()
 {
     clear();
-    GlobalSettings::instance()->setModel(nullptr);
+    SimulationSettings::current().setModel(nullptr);
 }
 
 /** Initial setup of the Model.
@@ -153,7 +157,7 @@ Model::~Model()
 void Model::initialize()
 {
    mSetup = false;
-   GlobalSettings::instance()->setCurrentYear(0);
+   SimulationSettings::current().setCurrentYear(0);
    mGrid = nullptr;
    mHeightGrid = nullptr;
    mManagement = nullptr;
@@ -176,7 +180,7 @@ void Model::setupSpace()
     setCurrentTask("setup landscape");
     GeoTIFF::clearProjection(); // first chance to load a tif
 
-    XmlHelper xml(GlobalSettings::instance()->settings().node("model.world"));
+    XmlHelper xml(SimulationSettings::current().settings().node("model.world"));
     double cellSize = xml.value("cellSize", "2").toDouble();
     double width = xml.value("width", "100").toDouble();
     double height = xml.value("height", "100").toDouble();
@@ -223,9 +227,9 @@ void Model::setupSpace()
     mEnvironment = new Environment();
 
     if (xml.valueBool("environmentEnabled", false)) {
-        QString env_file = GlobalSettings::instance()->path(xml.value("environmentFile"));
+        QString env_file = SimulationSettings::current().path(xml.value("environmentFile"));
         bool grid_mode = (xml.value("environmentMode")=="grid");
-        QString grid_file = GlobalSettings::instance()->path(xml.value("environmentGrid"));
+        QString grid_file = SimulationSettings::current().path(xml.value("environmentGrid"));
         if (grid_mode) {
             if (QFile::exists(grid_file) && !xml.value("environmentGrid").isEmpty())
                 mEnvironment->setGridMode(grid_file);
@@ -250,7 +254,7 @@ void Model::setupSpace()
     // time series data
     if (xml.valueBool(".timeEventsEnabled", false)) {
         mTimeEvents = new TimeEvents();
-        mTimeEvents->loadFromFile(GlobalSettings::instance()->path(xml.value("timeEventsFile"), "script"));
+        mTimeEvents->loadFromFile(SimulationSettings::current().path(xml.value("timeEventsFile"), "script"));
     }
 
 
@@ -263,7 +267,7 @@ void Model::setupSpace()
 
         bool mask_is_setup = false;
         if (xml.valueBool("standGrid.enabled")) {
-            QString fileName = GlobalSettings::instance()->path(xml.value("standGrid.fileName"));
+            QString fileName = SimulationSettings::current().path(xml.value("standGrid.fileName"));
             mStandGrid = new MapGrid(fileName,false); // create stand grid index later
             if (!mStandGrid->isValid()) {
                 throw IException("Error loading stand grid '" + fileName + "'.");
@@ -362,7 +366,7 @@ void Model::setupSpace()
 
         if (mStandGrid && mStandGrid->isValid()) {
             mStandGrid->createIndex();
-            GlobalSettings::instance()->controller()->addScriptLayer(nullptr, mStandGrid, "iLand standGrid");
+            SimulationSettings::current().controller()->addScriptLayer(nullptr, mStandGrid, "iLand standGrid");
             qDebug() << "Loaded stand grid from " << mStandGrid->name() << ", #stands: " << mStandGrid->count();
         }
         // now store the pointers in the grid.
@@ -382,7 +386,7 @@ void Model::setupSpace()
             // to be extended!!! e.g. to load ESRI-style text files....
             // setup a grid with the same size as the height grid...
             FloatGrid tempgrid(static_cast<int>(mHeightGrid->cellsize()), mHeightGrid->sizeX(), mHeightGrid->sizeY());
-            QString fileName = GlobalSettings::instance()->path(xml.value("areaMask.imageFile"));
+            QString fileName = SimulationSettings::current().path(xml.value("areaMask.imageFile"));
             qDebug() << "loading project area mask from" << fileName << "...";
             loadGridFromImage(fileName, tempgrid); // fetch from image
             for (int i=0;i<tempgrid.count(); i++)
@@ -399,12 +403,12 @@ void Model::setupSpace()
         // setup of the digital elevation map (if present)
         QString dem_file = xml.value("DEM");
         if (!dem_file.isEmpty()) {
-            mDEM = new DEM(GlobalSettings::instance()->path(dem_file));
+            mDEM = new DEM(SimulationSettings::current().path(dem_file));
             // add them to the visuals...
-            GlobalSettings::instance()->controller()->addGrid(mDEM, "DEM - height", GridViewRainbow, 0, 1000);
-            GlobalSettings::instance()->controller()->addGrid(mDEM->slopeGrid(), "DEM - slope", GridViewRainbow, 0, 3);
-            GlobalSettings::instance()->controller()->addGrid(mDEM->aspectGrid(), "DEM - aspect", GridViewRainbow, 0, 360);
-            GlobalSettings::instance()->controller()->addGrid(mDEM->viewGrid(), "DEM - view", GridViewGray, 0, 1);
+            SimulationSettings::current().controller()->addGrid(mDEM, "DEM - height", GridViewRainbow, 0, 1000);
+            SimulationSettings::current().controller()->addGrid(mDEM->slopeGrid(), "DEM - slope", GridViewRainbow, 0, 3);
+            SimulationSettings::current().controller()->addGrid(mDEM->aspectGrid(), "DEM - aspect", GridViewRainbow, 0, 360);
+            SimulationSettings::current().controller()->addGrid(mDEM->viewGrid(), "DEM - view", GridViewGray, 0, 1);
 
         }
 
@@ -439,8 +443,8 @@ void Model::setupSpace()
         ScriptGlobal::setupGlobalScripting();
 
         // setup the helper that does the multithreading
-        bool do_multithreading =GlobalSettings::instance()->settings().valueBool("system.settings.multithreading");
-        int n_threads = GlobalSettings::instance()->settings().valueInt("system.settings.threadCount",-1);
+        bool do_multithreading =SimulationSettings::current().settings().valueBool("system.settings.multithreading");
+        int n_threads = SimulationSettings::current().settings().valueInt("system.settings.threadCount",-1);
         if (do_multithreading) {
             if (n_threads>0) {
                 QThreadPool::globalInstance()->setMaxThreadCount(n_threads);
@@ -492,7 +496,7 @@ void Model::clear()
     if (mTimeEvents)
         delete mTimeEvents;
     if (mStandGrid) {
-        GlobalSettings::instance()->controller()->removeMapGrid(nullptr, mStandGrid);
+        SimulationSettings::current().controller()->removeMapGrid(nullptr, mStandGrid);
         delete mStandGrid;
     }
     if (mModules)
@@ -521,7 +525,7 @@ void Model::clear()
     mBiteEngine = nullptr;
     mSVDStates = nullptr;
 
-    GlobalSettings::instance()->outputManager()->close();
+    SimulationSettings::current().outputManager()->close();
 
     qDebug() << "Model resources freed.";
 }
@@ -533,33 +537,36 @@ void Model::loadProject()
 {
     DebugTimer dt("load project");
     setCurrentTask("Loading project area....");
-    GlobalSettings *g = GlobalSettings::instance();
-    g->printDirectories();
-    const XmlHelper &xml = g->settings();
+    SimulationSettings &runSettings = SimulationSettings::current();
+    runSettings.printDirectories();
+    const XmlHelper &xml = runSettings.settings();
+
+    // Apply the project's debug-output mask before initialization scripts run.
+    runSettings.setDebugOutput(xml.valueInt("system.settings.debugOutput", 0, false));
 
     // load javascript code into the engine
     QString script_file = xml.value("system.javascript.fileName");
     if (!script_file.isEmpty()) {
-        script_file = g->path(script_file, "script");
+        script_file = runSettings.path(script_file, "script");
         ScriptGlobal::loadScript(script_file);
-        g->controller()->setLoadedJavascriptFile(script_file);
+        runSettings.controller()->setLoadedJavascriptFile(script_file);
         // call the global event very early in the process of creating the model
-        GlobalSettings::instance()->executeJSFunction("onBeforeCreate");
+        SimulationSettings::current().executeJSFunction("onBeforeCreate");
     }
 
 
-    g->clearDatabaseConnections();
+    runSettings.clearDatabaseConnections();
     // database connections: reset
-    GlobalSettings::instance()->clearDatabaseConnections();
+    SimulationSettings::current().clearDatabaseConnections();
     // input and climate connection
     // see initOutputDatabase() for output database
-    QString dbPath = g->path( xml.value("system.database.in"), "database");
-    GlobalSettings::instance()->setupDatabaseConnection("in", dbPath, true);
-    dbPath = g->path( xml.value("system.database.climate"), "database");
-    GlobalSettings::instance()->setupDatabaseConnection("climate", dbPath, true);
+    QString dbPath = runSettings.path( xml.value("system.database.in"), "database");
+    SimulationSettings::current().setupDatabaseConnection("in", dbPath, true);
+    dbPath = runSettings.path( xml.value("system.database.climate"), "database");
+    SimulationSettings::current().setupDatabaseConnection("climate", dbPath, true);
 
-    mSettings.loadModelSettings();
-    mSettings.print();
+    runState_mSettings().loadModelSettings();
+    runState_mSettings().print();
 
     DebugTimer::setResponsiveMode(xml.valueBool("system.settings.responsive"));
 
@@ -620,7 +627,7 @@ void Model::loadProject()
     QString mgmtFile = xml.value("model.management.file");
     if (xml.valueBool("model.management.enabled")) {
         mManagement = new Management();
-        QString path = GlobalSettings::instance()->path(mgmtFile, "script");
+        QString path = SimulationSettings::current().path(mgmtFile, "script");
         mManagement->loadScript(path);
         qDebug() << "setup management using script" << path;
     }
@@ -681,32 +688,32 @@ ResourceUnit *Model::ruById(int id) const
 
 void Model::initOutputDatabase()
 {
-    GlobalSettings *g = GlobalSettings::instance();
-    QString dbPath = g->path(g->settings().value("system.database.out"), "output");
+    SimulationSettings &runSettings = SimulationSettings::current();
+    QString dbPath = runSettings.path(runSettings.settings().value("system.database.out"), "output");
     // replace path information
     QString timestamp = QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss");
     dbPath.replace("$date$", timestamp);
     // setup final path
-   g->setupDatabaseConnection("out", dbPath, false);
+   runSettings.setupDatabaseConnection("out", dbPath, false);
 
    // create table for run meta data
-   QSqlQuery creator(g->dbout());
+   QSqlQuery creator(runSettings.dbout());
    QString drop=QString("drop table if exists runinfo");
    creator.exec(drop); // drop table (if exists)
    creator.exec("create table runinfo (timestamp, version)");
-   SqlHelper::executeSql(QString("insert into runinfo (timestamp, version) values ('%1', '%2')").arg(timestamp).arg(verboseVersion()), g->dbout());
+   SqlHelper::executeSql(QString("insert into runinfo (timestamp, version) values ('%1', '%2')").arg(timestamp).arg(verboseVersion()), runSettings.dbout());
 
 }
 
 /// multithreaded run function for resource unit level establishment
 static void nc_establishment(ResourceUnit *unit)
 {
-    Saplings *s = GlobalSettings::instance()->model()->saplings();
+    Saplings *s = SimulationSettings::current().model()->saplings();
     try {
         s->establishment(unit);
 
     } catch (const IException& e) {
-        GlobalSettings::instance()->model()->threadExec().throwError(e.message());
+        SimulationSettings::current().model()->threadExec().throwError(e.message());
     }
 
 }
@@ -714,12 +721,12 @@ static void nc_establishment(ResourceUnit *unit)
 /// multithreaded run function for resource unit level establishment
 static void nc_sapling_growth(ResourceUnit *unit)
 {
-    Saplings *s = GlobalSettings::instance()->model()->saplings();
+    Saplings *s = SimulationSettings::current().model()->saplings();
     try {
         s->saplingGrowth(unit);
 
     } catch (const IException& e) {
-        GlobalSettings::instance()->model()->threadExec().throwError(e.message());
+        SimulationSettings::current().model()->threadExec().throwError(e.message());
     }
 }
 
@@ -733,7 +740,7 @@ static void nc_carbonCycle(ResourceUnit *unit)
         unit->calculateCarbonCycle();
         // (2) do the soil carbon and nitrogen dynamics calculations (ICBM/2N)
     } catch (const IException& e) {
-        GlobalSettings::instance()->model()->threadExec().throwError(e.message());
+        SimulationSettings::current().model()->threadExec().throwError(e.message());
     }
 
 }
@@ -746,11 +753,11 @@ void Model::beforeRun()
 {
     // setup outputs
     // setup output database
-    if (GlobalSettings::instance()->dbout().isOpen())
-        GlobalSettings::instance()->dbout().close();
+    if (SimulationSettings::current().dbout().isOpen())
+        SimulationSettings::current().dbout().close();
     initOutputDatabase();
-    GlobalSettings::instance()->outputManager()->setup();
-    GlobalSettings::instance()->clearDebugLists();
+    SimulationSettings::current().outputManager()->setup();
+    SimulationSettings::current().clearDebugLists();
 
     // initialize stands
     setCurrentTask("loading initialization");
@@ -809,23 +816,23 @@ void Model::beforeRun()
 
     setCurrentTask("outputs during startup");
     // outputs to create with inital state (without any growth) are called here:
-    GlobalSettings::instance()->setCurrentYear(0); // set clock to "0" (for outputs with initial state)
+    SimulationSettings::current().setCurrentYear(0); // set clock to "0" (for outputs with initial state)
 
-    GlobalSettings::instance()->outputManager()->execute("stand"); // year=0
-    GlobalSettings::instance()->outputManager()->execute("landscape"); // year=0
-    GlobalSettings::instance()->outputManager()->execute("sapling"); // year=0
-    GlobalSettings::instance()->outputManager()->execute("saplingdetail"); // year=0
-    GlobalSettings::instance()->outputManager()->execute("tree"); // year=0
-    GlobalSettings::instance()->outputManager()->execute("dynamicstand"); // year=0
-    GlobalSettings::instance()->outputManager()->execute("carbon"); // year=0
-    GlobalSettings::instance()->outputManager()->execute("svdstate"); // year=0
-    GlobalSettings::instance()->outputManager()->execute("devstage"); // year=0
-    GlobalSettings::instance()->outputManager()->execute("ecoviz"); // tree output for visualization, year 0
-    GlobalSettings::instance()->outputManager()->execute("customagg"); // custom aggregation, much like dynamic stand, year 0
-    GlobalSettings::instance()->outputManager()->save(); // commit database changes
+    SimulationSettings::current().outputManager()->execute("stand"); // year=0
+    SimulationSettings::current().outputManager()->execute("landscape"); // year=0
+    SimulationSettings::current().outputManager()->execute("sapling"); // year=0
+    SimulationSettings::current().outputManager()->execute("saplingdetail"); // year=0
+    SimulationSettings::current().outputManager()->execute("tree"); // year=0
+    SimulationSettings::current().outputManager()->execute("dynamicstand"); // year=0
+    SimulationSettings::current().outputManager()->execute("carbon"); // year=0
+    SimulationSettings::current().outputManager()->execute("svdstate"); // year=0
+    SimulationSettings::current().outputManager()->execute("devstage"); // year=0
+    SimulationSettings::current().outputManager()->execute("ecoviz"); // tree output for visualization, year 0
+    SimulationSettings::current().outputManager()->execute("customagg"); // custom aggregation, much like dynamic stand, year 0
+    SimulationSettings::current().outputManager()->save(); // commit database changes
 
 
-    GlobalSettings::instance()->setCurrentYear(1); // set to first year
+    SimulationSettings::current().setCurrentYear(1); // set to first year
 
 }
 
@@ -845,7 +852,7 @@ void Model::beforeRun()
 void Model::runYear()
 {
     DebugTimer t_all("Model::runYear()");
-    GlobalSettings::instance()->systemStatistics()->reset();
+    SimulationSettings::current().systemStatistics()->reset();
     threadRunner.clearErrors();
     RandomGenerator::checkGenerator(); // see if we need to generate new numbers...
     // initalization at start of year for external modules
@@ -856,7 +863,7 @@ void Model::runYear()
         mTimeEvents->run();
 
     // load the next year of the climate database (except for the first year - the first climate year is loaded immediately
-    if (GlobalSettings::instance()->currentYear()>1) {
+    if (SimulationSettings::current().currentYear()>1) {
         foreach(Climate *c, mClimates)
             c->nextYear();
     }
@@ -880,14 +887,14 @@ void Model::runYear()
         setCurrentTask("Management");
         DebugTimer t("management");
         mManagement->run();
-        GlobalSettings::instance()->systemStatistics()->tManagement+=t.elapsed();
+        SimulationSettings::current().systemStatistics()->tManagement+=t.elapsed();
     }
     // ... or ABE (the agent based variant)
     if (mABEManagement) {
         DebugTimer t("ABE:run");
         setCurrentTask("ABE");
         mABEManagement->run();
-        GlobalSettings::instance()->systemStatistics()->tManagement+=t.elapsed();
+        SimulationSettings::current().systemStatistics()->tManagement+=t.elapsed();
     }
 
     // if trees are dead/removed because of management, the tree lists
@@ -913,7 +920,7 @@ void Model::runYear()
         foreach(SpeciesSet *set, mSpeciesSets)
             set->regeneration(); // parallel execution for each species set
 
-        GlobalSettings::instance()->systemStatistics()->tSeedDistribution+=tseed.elapsed();
+        SimulationSettings::current().systemStatistics()->tSeedDistribution+=tseed.elapsed();
 
         // establishment
         Saplings::updateBrowsingPressure();
@@ -922,7 +929,7 @@ void Model::runYear()
         { DebugTimer t("establishment");
         setCurrentTask("Establishment");
         executePerResourceUnit( nc_establishment, false /* true: force single threaded operation */);
-        GlobalSettings::instance()->systemStatistics()->tEstablishment+=t.elapsed();
+        SimulationSettings::current().systemStatistics()->tEstablishment+=t.elapsed();
         }
         { DebugTimer t("sapling growth");
         setCurrentTask("sapling growth");
@@ -934,7 +941,7 @@ void Model::runYear()
         }
 
         executePerResourceUnit( nc_sapling_growth, false /* true: force single threaded operation */);
-        GlobalSettings::instance()->systemStatistics()->tSapling+=t.elapsed();
+        SimulationSettings::current().systemStatistics()->tSapling+=t.elapsed();
         }
 
         mGrassCover->executeAfterRegeneration(); // evaluate ground vegetation
@@ -947,7 +954,7 @@ void Model::runYear()
     // external modules/disturbances
     setCurrentTask("BITE");
     if (mBiteEngine) {
-        mBiteEngine->setYear(GlobalSettings::instance()->currentYear());
+        mBiteEngine->setYear(SimulationSettings::current().currentYear());
         mBiteEngine->run();
     }
 
@@ -962,7 +969,7 @@ void Model::runYear()
         DebugTimer ccycle("carbon cylce");
         setCurrentTask("carbon cycle");
         executePerResourceUnit( nc_carbonCycle, false /* true: force single threaded operation */);
-        GlobalSettings::instance()->systemStatistics()->tCarbonCycle+=ccycle.elapsed();
+        SimulationSettings::current().systemStatistics()->tCarbonCycle+=ccycle.elapsed();
 
     }
 
@@ -976,14 +983,14 @@ void Model::runYear()
         DebugTimer t("ABE:yearEnd");
         setCurrentTask("ABE yearEnd");
         mABEManagement->yearEnd();
-        GlobalSettings::instance()->systemStatistics()->tManagement+=t.elapsed();
+        SimulationSettings::current().systemStatistics()->tManagement+=t.elapsed();
     }
 
     threadRunner.checkErrors();
 
     // create outputs
     setCurrentTask("Write outputs");
-    OutputManager *om = GlobalSettings::instance()->outputManager();
+    OutputManager *om = SimulationSettings::current().outputManager();
     om->execute("tree"); // single tree output
     om->execute("treeremoved"); // single removed tree output
     om->execute("stand"); //resource unit level x species
@@ -1007,17 +1014,17 @@ void Model::runYear()
     om->execute("ecoviz"); // tree output for visualization
     om->execute("customagg"); // custom aggregation, much like dynamic stand
 
-    GlobalSettings::instance()->systemStatistics()->tWriteOutput+=toutput.elapsed();
-    GlobalSettings::instance()->systemStatistics()->tTotalYear+=t_all.elapsed();
-    GlobalSettings::instance()->systemStatistics()->writeOutput();
+    SimulationSettings::current().systemStatistics()->tWriteOutput+=toutput.elapsed();
+    SimulationSettings::current().systemStatistics()->tTotalYear+=t_all.elapsed();
+    SimulationSettings::current().systemStatistics()->writeOutput();
 
     // global javascript event
-    GlobalSettings::instance()->executeJSFunction("onYearEnd");
+    SimulationSettings::current().executeJSFunction("onYearEnd");
 
-    GlobalSettings::instance()->setCurrentYear(GlobalSettings::instance()->currentYear()+1);
+    SimulationSettings::current().setCurrentYear(SimulationSettings::current().currentYear()+1);
 
     // try to clean up a bit of memory (useful if many large JS objects (e.g., grids) are used)
-    GlobalSettings::instance()->scriptEngine()->collectGarbage();
+    SimulationSettings::current().scriptEngine()->collectGarbage();
 }
 
 
@@ -1037,7 +1044,7 @@ static void nc_applyPattern(ResourceUnit *unit)
     try {
 
         // light concurrence influence
-        if (!GlobalSettings::instance()->model()->settings().torusMode) {
+        if (!SimulationSettings::current().model()->settings().torusMode) {
             // height dominance grid
             for (tit=unit->trees().begin(); tit!=tend; ++tit) {
                 (*tit).heightGrid(); // just do it ;)
@@ -1056,7 +1063,7 @@ static void nc_applyPattern(ResourceUnit *unit)
         }
 
     } catch (const IException &e) {
-        GlobalSettings::instance()->model()->threadExec().throwError(e.message());
+        SimulationSettings::current().model()->threadExec().throwError(e.message());
     }
 }
 
@@ -1066,7 +1073,7 @@ static void nc_readPattern(ResourceUnit *unit)
     QVector<Tree>::iterator tit;
     QVector<Tree>::iterator  tend = unit->trees().end();
     try {
-        if (!GlobalSettings::instance()->model()->settings().torusMode) {
+        if (!SimulationSettings::current().model()->settings().torusMode) {
             for (tit=unit->trees().begin(); tit!=tend; ++tit)
                 (*tit).readLIF(); // multipliactive approach
         } else {
@@ -1074,7 +1081,7 @@ static void nc_readPattern(ResourceUnit *unit)
                 (*tit).readLIF_torus(); // do it the wraparound way
         }
     } catch (const IException &e) {
-        GlobalSettings::instance()->model()->threadExec().throwError(e.message());
+        SimulationSettings::current().model()->threadExec().throwError(e.message());
     }
 }
 
@@ -1097,10 +1104,10 @@ static void nc_grow(ResourceUnit *unit)
             (*tit).grow(); // actual growth of individual trees
         }
     } catch (const IException &e) {
-        GlobalSettings::instance()->model()->threadExec().throwError(e.message());
+        SimulationSettings::current().model()->threadExec().throwError(e.message());
     }
 
-    GlobalSettings::instance()->systemStatistics()->treeCount+=unit->trees().count();
+    SimulationSettings::current().systemStatistics()->treeCount+=unit->trees().count();
 }
 
 /// multithreaded running function for resource level production
@@ -1109,7 +1116,7 @@ static void nc_production(ResourceUnit *unit)
     try {
         unit->production();
     } catch (const IException &e) {
-        GlobalSettings::instance()->model()->threadExec().throwError(e.message());
+        SimulationSettings::current().model()->threadExec().throwError(e.message());
     }
 }
 
@@ -1158,14 +1165,14 @@ void Model::applyPattern()
     }
 
     threadRunner.run(nc_applyPattern);
-    GlobalSettings::instance()->systemStatistics()->tApplyPattern+=t.elapsed();
+    SimulationSettings::current().systemStatistics()->tApplyPattern+=t.elapsed();
 }
 
 void Model::readPattern()
 {
     DebugTimer t("readPattern()");
     threadRunner.run(nc_readPattern);
-    GlobalSettings::instance()->systemStatistics()->tReadPattern+=t.elapsed();
+    SimulationSettings::current().systemStatistics()->tReadPattern+=t.elapsed();
 
 }
 
@@ -1195,7 +1202,7 @@ void Model::grow()
        ru->afterGrow();
        //qDebug() << (b-n) << "trees died (of" << b << ").";
    }
-   GlobalSettings::instance()->systemStatistics()->tTreeGrowth+=t.elapsed();
+   SimulationSettings::current().systemStatistics()->tTreeGrowth+=t.elapsed();
 }
 
 /** calculate for each resource unit the fraction of area which is stocked.
@@ -1337,7 +1344,7 @@ void Model::createStandStatistics()
 
 void Model::cleanTreeLists(bool recalculate_stats)
 {
-    foreach(ResourceUnit *ru, GlobalSettings::instance()->model()->ruList()) {
+    foreach(ResourceUnit *ru, SimulationSettings::current().model()->ruList()) {
         if (ru->hasDiedTrees()) {
             ru->cleanTreeList();
             ru->recreateStandStatistics(recalculate_stats);

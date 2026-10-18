@@ -43,9 +43,9 @@ public:
     bool isHost() const { return dbh>0.f; }
     bool isPotentialHost() const {return dbh>0.f && killedYear==0 && infested==false; }
     /// sets the 'infested' state (true: the cell is newly infested, false: the cell stops being infested, e.g. by winter mortality)
-    void setInfested(bool is_infested) { infested=is_infested; if (infested) { total_infested++; killedYear=0; n=0;} }
+    void setInfested(bool is_infested) { infested=is_infested; if (infested) { runState_total_infested()++; killedYear=0; n=0;} }
     /// called after beetles spread out from the cell. The cell is marked as 'killed', and trees will be killed later (barkbeetleKill()).
-    void finishedSpread(int iteration) { infested=false; killedYear=iteration; killed=true; max_iteration=qMax(max_iteration, iteration); ++n_events; }
+    void finishedSpread(int iteration) { infested=false; killedYear=iteration; killed=true; runState_max_iteration()=qMax(runState_max_iteration(), iteration); ++n_events; }
 
     bool infested; // true for cells that are currently occupied by beetles
     bool killed; // true for cells that are killed in the current year
@@ -64,9 +64,11 @@ public:
     /// return true if either storm damaged trees or trap trees are on the pixel or in the Moore neighborhood of the cell
     bool isNeutralized() const { return deadtrees!=NoDeadTrees; }
 
-    static void resetCounters() { total_infested=0; max_iteration=0; }
-    static int total_infested;
-    static int max_iteration;
+    static void resetCounters() { runState_total_infested()=0; runState_max_iteration()=0; }
+    using RunType_total_infested = int;
+    static RunType_total_infested &runState_total_infested();
+    using RunType_max_iteration = int;
+    static RunType_max_iteration &runState_max_iteration();
 
 };
 

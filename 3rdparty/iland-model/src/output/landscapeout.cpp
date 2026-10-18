@@ -57,9 +57,9 @@ void LandscapeOut::setup()
 
 void LandscapeOut::exec()
 {
-    Model *m = GlobalSettings::instance()->model();
+    Model *m = SimulationSettings::current().model();
     if (!mCondition.isEmpty())
-        if (!mCondition.calculate(GlobalSettings::instance()->currentYear()))
+        if (!mCondition.calculate(SimulationSettings::current().currentYear()))
             return;
 
     // clear landscape stats
@@ -125,7 +125,11 @@ LandscapeRemovedOut::LandscapeRemovedOut()
 
 }
 
-static QMutex protect_output;
+static QMutex &runFile_protect_output()
+{
+    struct State { QMutex value = {}; };
+    return SimulationContext::state<State>().value;
+}
 
 void LandscapeRemovedOut::execRemovedTree(const Tree *t, int reason)
 {
@@ -135,7 +139,7 @@ void LandscapeRemovedOut::execRemovedTree(const Tree *t, int reason)
     if ((rem_type==Tree::TreeHarvest || rem_type==Tree::TreeSalavaged || rem_type==Tree::TreeCutDown) && !mIncludeHarvestTrees)
         return;
 
-    QMutexLocker protector(&protect_output); // output creation can come from many threads
+    QMutexLocker protector(&runFile_protect_output()); // output creation can come from many threads
 
     int key = dbhClass(t->dbh())*100000 +  reason*10000 + t->species()->index();
     LROdata &d = mLandscapeRemoval[key];
@@ -160,7 +164,7 @@ void LandscapeRemovedOut::exec()
             Tree::TreeRemovalType rem_type = static_cast<Tree::TreeRemovalType>((i.key() % 100000) / 10000 );
             int species_index = i.key() % 10000;
             int dbh_class = i.key() / 100000;
-            *this << currentYear() << GlobalSettings::instance()->model()->speciesSet()->species(species_index)->id() << dbh_class;
+            *this << currentYear() << SimulationSettings::current().model()->speciesSet()->species(species_index)->id() << dbh_class;
             if (rem_type==Tree::TreeDeath) *this << QStringLiteral("N");
             if (rem_type==Tree::TreeHarvest) *this << QStringLiteral("H");
             if (rem_type==Tree::TreeDisturbance) *this << QStringLiteral("D");

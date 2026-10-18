@@ -28,19 +28,31 @@
 #include "threadrunner.h"
 #include <QtCore>
 #include <QtConcurrent/QtConcurrent>
-bool ThreadRunner::mMultithreaded = true; // static
-QStringList ThreadRunner::mErrors = {};
-ThreadRunner::RunState ThreadRunner::mState = Inactive;
+ThreadRunner::RunType_mMultithreaded &ThreadRunner::runState_mMultithreaded()
+{
+    struct State { RunType_mMultithreaded value = true; };
+    return SimulationContext::state<State>().value;
+} // static
+ThreadRunner::RunType_mErrors &ThreadRunner::runState_mErrors()
+{
+    struct State { RunType_mErrors value = {}; };
+    return SimulationContext::state<State>().value;
+}
+ThreadRunner::RunType_mState &ThreadRunner::runState_mState()
+{
+    struct State { RunType_mState value = Inactive; };
+    return SimulationContext::state<State>().value;
+}
 
 ThreadRunner::ThreadRunner()
 {
-    mMultithreaded = true;
-    mState = Inactive;
+    runState_mMultithreaded() = true;
+    runState_mState() = Inactive;
 }
 
 void ThreadRunner::print()
 {
-    qDebug() << "Multithreading enabled: "<< mMultithreaded << "thread count:" << QThread::idealThreadCount();
+    qDebug() << "Multithreading enabled: "<< runState_mMultithreaded() << "thread count:" << QThread::idealThreadCount();
 }
 
 
@@ -62,14 +74,14 @@ void ThreadRunner::setup(const QList<ResourceUnit*> &resourceUnitList)
 /// run a given function for each ressource unit either multithreaded or not.
 void ThreadRunner::run(void (*funcptr)(ResourceUnit *), const bool forceSingleThreaded ) const
 {
-    if (mMultithreaded && mMap1.count() > 3 && forceSingleThreaded==false) {
+    if (runState_mMultithreaded() && mMap1.count() > 3 && forceSingleThreaded==false) {
         // execute using QtConcurrent for larger amounts of ressource units...
-        mState = MultiThreaded;
+        runState_mState() = MultiThreaded;
         QtConcurrent::blockingMap(mMap1,funcptr);
         QtConcurrent::blockingMap(mMap2,funcptr);
     } else {
         // execute serialized in main thread
-        mState = SingleThreaded;
+        runState_mState() = SingleThreaded;
         ResourceUnit *unit;
         foreach(unit, mMap1)
             (*funcptr)(unit);
@@ -77,38 +89,42 @@ void ThreadRunner::run(void (*funcptr)(ResourceUnit *), const bool forceSingleTh
         foreach(unit, mMap2)
             (*funcptr)(unit);
     }
-    mState = Inactive;
+    runState_mState() = Inactive;
 
 }
 
 /// run a given function for each species
 void ThreadRunner::run(void (*funcptr)(Species *), const bool forceSingleThreaded ) const
 {
-    if (mMultithreaded && mSpeciesMap.count() > 3 && forceSingleThreaded==false) {
-        mState = MultiThreaded;
+    if (runState_mMultithreaded() && mSpeciesMap.count() > 3 && forceSingleThreaded==false) {
+        runState_mState() = MultiThreaded;
         QtConcurrent::blockingMap(mSpeciesMap, funcptr);
     } else {
         // single threaded operation
-        mState = SingleThreaded;
+        runState_mState() = SingleThreaded;
         Species *species;
         foreach(species, mSpeciesMap)
             (*funcptr)(species);
     }
-    mState = Inactive;
+    runState_mState() = Inactive;
 }
 
-QMutex _errorMutex;
+static QMutex &runFile__errorMutex()
+{
+    struct State { QMutex value = {}; };
+    return SimulationContext::state<State>().value;
+}
 void ThreadRunner::throwError(const QString &message) const
 {
-    if (mState == Inactive || mState == SingleThreaded) {
+    if (runState_mState() == Inactive || runState_mState() == SingleThreaded) {
         // we are safe to just throw the error
         throw IException(message);
     } else {
         // the exception was raised while running multiple threads
         // we cannot directly throw the error, but write in an list of errors
         // for later processing
-        QMutexLocker locker(&_errorMutex);
-        mErrors.append(message);
+        QMutexLocker locker(&runFile__errorMutex());
+        runState_mErrors().append(message);
     }
 }
 
@@ -116,7 +132,7 @@ void ThreadRunner::checkErrors()
 {
     if (!hasErrors())
         return;
-    QString full_message = mErrors.join('\n');
+    QString full_message = runState_mErrors().join('\n');
     if (full_message.length() > 1000)
         full_message = full_message.mid(0, 1000) + "...";
     throw IException(QString("Error in multi-threaded code: %1").arg(full_message));

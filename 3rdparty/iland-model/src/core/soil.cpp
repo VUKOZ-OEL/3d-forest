@@ -18,7 +18,7 @@
 ********************************************************************************************/
 
 #include "soil.h"
-#include "globalsettings.h"
+#include "simulationsettings.h"
 #include "xmlhelper.h" // for load settings
 #include "exception.h"
 #include "resourceunit.h"
@@ -29,7 +29,11 @@
 
   */
 
-double Soil::mNitrogenDeposition = 0.;
+Soil::RunType_mNitrogenDeposition &Soil::runState_mNitrogenDeposition()
+{
+    struct State { RunType_mNitrogenDeposition value = 0.; };
+    return SimulationContext::state<State>().value;
+}
 
 // site-specific parameters
 // i.e. parameters that need to be specified in the environment file
@@ -37,7 +41,7 @@ double Soil::mNitrogenDeposition = 0.;
 // (proportional to its mineralization in the mineral soil horizon) is leached
 // see separate wiki-page (https://iland-model.org/soil+parametrization+and+initialization)
 // and R-script on parameter estimation and initialization
-static struct SoilParams {
+struct SoilParams {
     // ICBM/2N parameters
     SoilParams(): qb(5.), qh(25.), leaching(0.15), el(0.0577), er(0.073), is_setup(false) {}
     double qb; ///< C/N ratio of soil microbes
@@ -46,27 +50,35 @@ static struct SoilParams {
     double el; ///< microbal efficiency in the labile pool, auxiliary parameter (see parameterization example)
     double er; ///< microbal efficiency in the refractory pool, auxiliary parameter (see parameterization example)
     bool is_setup;
-} global_soilpar;
-SoilParams *Soil::mParams = &global_soilpar; // save a ptr to the single value container as a static class variable
+};
+static SoilParams &runSoilParameters()
+{
+    return SimulationContext::state<SoilParams>();
+}
+Soil::RunType_mParams &Soil::runState_mParams()
+{
+    struct State { RunType_mParams value = &runSoilParameters(); };
+    return SimulationContext::state<State>().value;
+} // save a ptr to the single value container as a static class variable
 
 void Soil::fetchParameters()
 {
-    XmlHelper xml_site(GlobalSettings::instance()->settings().node("model.site"));
+    XmlHelper xml_site(SimulationSettings::current().settings().node("model.site"));
     mKo = xml_site.valueDouble("somDecompRate", 0.02);
     mH =  xml_site.valueDouble("soilHumificationRate", 0.3);
 
-    if (mParams->is_setup || !GlobalSettings::instance()->model())
+    if (runState_mParams()->is_setup || !SimulationSettings::current().model())
         return;
-    XmlHelper xml(GlobalSettings::instance()->settings().node("model.settings.soil"));
-    mParams->qb =  xml.valueDouble("qb", 5.);
-    mParams->qh =  xml.valueDouble("qh", 25.);
-    mParams->leaching =  xml.valueDouble("leaching", 0.15);
-    mParams->el =  xml.valueDouble("el", 0.0577);
-    mParams->er = xml.valueDouble("er", 0.073);
+    XmlHelper xml(SimulationSettings::current().settings().node("model.settings.soil"));
+    runState_mParams()->qb =  xml.valueDouble("qb", 5.);
+    runState_mParams()->qh =  xml.valueDouble("qh", 25.);
+    runState_mParams()->leaching =  xml.valueDouble("leaching", 0.15);
+    runState_mParams()->el =  xml.valueDouble("el", 0.0577);
+    runState_mParams()->er = xml.valueDouble("er", 0.073);
 
-    mParams->is_setup = true;
+    runState_mParams()->is_setup = true;
 
-    mNitrogenDeposition = xml.valueDouble("nitrogenDeposition",0.);
+    runState_mNitrogenDeposition() = xml.valueDouble("nitrogenDeposition",0.);
 }
 
 
@@ -176,7 +188,7 @@ void Soil::setSoilInput(const CNPool &labile_input_kg_ha, const CNPool &refracto
 /// See Appendix of Kaetterer et al 2001 for integrated equations
 void Soil::calculateYear()
 {
-    SoilParams &sp = *mParams;
+    SoilParams &sp = *runState_mParams();
     // checks
     if (mRE==0.) {
         throw IException("Soil::calculateYear(): Invalid value for 're' (=0) for RU(index): " + QString::number(mRU->index()));
@@ -273,7 +285,7 @@ void Soil::calculateYear()
         qDebug() << "Available Nitrogen is NAN.";
 
     // add nitrogen deposition
-    mAvailableNitrogen += mNitrogenDeposition;
+    mAvailableNitrogen += runState_mNitrogenDeposition();
 
     // stedy state for n-available
     //    double navss = mKyl*mRE*(1.-mH)/(1.-sp.el)*(ynlss-sp.el*ylss/sp.qb); // available nitrogen (steady state)

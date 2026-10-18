@@ -216,10 +216,14 @@ void FMUnit::managementPlanUpdate()
         scheduler()->setHarvestTarget(mAnnualHarvestTarget, mAnnualThinningTarget);
 }
 
-static QMutex _protect_agent_exec;
+static QMutex &runFile__protect_agent_exec()
+{
+    struct State { QMutex value = {}; };
+    return SimulationContext::state<State>().value;
+}
 void FMUnit::runAgent()
 {
-    QMutexLocker m(&_protect_agent_exec); // avoid parallel execution of agent-code....
+    QMutexLocker m(&runFile__protect_agent_exec()); // avoid parallel execution of agent-code....
 
     // we need to set an execution context
     FMStand *stand = *ForestManagementEngine::instance()->stands().find(this);

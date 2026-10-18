@@ -6,6 +6,9 @@ installer/
 stage/
 out/
 
+# AI work folder
+slop/
+
 # Visual Studio Code, Editor
 .vscode
 

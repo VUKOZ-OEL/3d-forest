@@ -54,8 +54,8 @@ void SaplingOut::setup()
 
 void SaplingOut::exec()
 {
-    Model *m = GlobalSettings::instance()->model();
-    if (!GlobalSettings::instance()->model()->saplings())
+    Model *m = SimulationSettings::current().model();
+    if (!SimulationSettings::current().model()->saplings())
         return;
 
 
@@ -66,7 +66,7 @@ void SaplingOut::exec()
 
         if (!mCondition.isEmpty()) {
             *mVarRu = ru->id();
-            *mVarYear = GlobalSettings::instance()->currentYear();
+            *mVarYear = SimulationSettings::current().currentYear();
             if (!mCondition.execute() )
                 continue;
         }
@@ -111,8 +111,8 @@ SaplingDetailsOut::SaplingDetailsOut()
 
 void SaplingDetailsOut::exec()
 {
-    Model *m = GlobalSettings::instance()->model();
-    if (!GlobalSettings::instance()->model()->saplings())
+    Model *m = SimulationSettings::current().model();
+    if (!SimulationSettings::current().model()->saplings())
         return;
 
     foreach(ResourceUnit *ru, m->ruList()) {
@@ -122,7 +122,7 @@ void SaplingDetailsOut::exec()
         // exclude if a condition is specified and condition is not met
         if (!mCondition.isEmpty()) {
             *mVarRu = ru->id();
-            *mVarYear = GlobalSettings::instance()->currentYear();
+            *mVarYear = SimulationSettings::current().currentYear();
             if (!mCondition.execute() )
                 continue;
         }

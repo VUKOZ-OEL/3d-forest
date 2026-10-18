@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- some comment here -->
+<document>
+<params>
+<param1>17</param1>
+<stampFile>e:\dev\iland\fonstudio\inits\circle100fun.jpg</stampFile>
+<cellSize>1</cellSize>
+<cells>100</cells>
+</params>
+<trees>
+<tree x="80" y="80" dbh="10" height="10"/>
+<tree x="30" y="20" dbh="23" height="15"/>
+<tree x="20" y="10" dbh="40.45" height="30"/>
+<tree x="5.454" y="45.4" dbh="20" height="20"/>
+<tree x="50" y="78.6" dbh="10" height="10"/>
+<tree x="70" y="20" dbh="23" height="15"/>
+<tree x="60" y="70" dbh="40.45" height="30"/>
+<tree x="85.454" y="45.4" dbh="20" height="20"/>
+</trees>
+
+</document>

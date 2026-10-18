@@ -1,0 +1,1514 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindowClass</class>
+ <widget class="QMainWindow" name="MainWindowClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1030</width>
+    <height>796</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>iLand Viewer</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="res/iland.qrc">
+    <normaloff>:/icon4.png</normaloff>:/icon4.png</iconset>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="PaintArea" name="PaintWidget" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>2</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="cursor">
+       <cursorShape>CrossCursor</cursorShape>
+      </property>
+      <property name="autoFillBackground">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1030</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuOutput_menu">
+    <property name="title">
+     <string>Misc</string>
+    </property>
+    <widget class="QMenu" name="menuLog_Level">
+     <property name="title">
+      <string>Log Level</string>
+     </property>
+     <addaction name="actionDebug"/>
+     <addaction name="actionInfo"/>
+     <addaction name="actionWarning"/>
+     <addaction name="actionError"/>
+    </widget>
+    <addaction name="actionTreelist"/>
+    <addaction name="actionFON_grid"/>
+    <addaction name="actionOutput_table_description"/>
+    <addaction name="actionTimers"/>
+    <addaction name="menuLog_Level"/>
+    <addaction name="separator"/>
+    <addaction name="actionImageToClipboard"/>
+    <addaction name="actionSave_regeneration_grid"/>
+    <addaction name="actionTest"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionRepaint"/>
+    <addaction name="actionShow_full_extent"/>
+    <addaction name="separator"/>
+    <addaction name="actionShow_Debug_Messages"/>
+   </widget>
+   <widget class="QMenu" name="menuDebug_Data">
+    <property name="title">
+     <string>Debug Data</string>
+    </property>
+    <addaction name="actionSelect_Data_Types"/>
+    <addaction name="actionClearDebugOutput"/>
+    <addaction name="actionTree_NPP"/>
+    <addaction name="actionTree_Partition"/>
+    <addaction name="actionTree_Growth"/>
+    <addaction name="actionWater_Output"/>
+    <addaction name="actionDaily_responses_Output"/>
+    <addaction name="action_debugEstablishment"/>
+    <addaction name="action_debugSapling"/>
+    <addaction name="actionSnag_Dynamics"/>
+    <addaction name="actionPerformance"/>
+    <addaction name="actionDynamic_Output"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionOnline_ressources"/>
+    <addaction name="actionAbout"/>
+   </widget>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <widget class="QMenu" name="menuRecent_Files">
+     <property name="title">
+      <string>Recent Files</string>
+     </property>
+     <addaction name="action"/>
+     <addaction name="action_2"/>
+     <addaction name="action_3"/>
+     <addaction name="action_4"/>
+     <addaction name="action_5"/>
+     <addaction name="action_6"/>
+    </widget>
+    <addaction name="actionOpen"/>
+    <addaction name="separator"/>
+    <addaction name="menuRecent_Files"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuView"/>
+   <addaction name="menuOutput_menu"/>
+   <addaction name="menuDebug_Data"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <property name="iconSize">
+    <size>
+     <width>32</width>
+     <height>32</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionEdit_XML_settings"/>
+   <addaction name="separator"/>
+   <addaction name="actionModelCreate"/>
+   <addaction name="actionModelDestroy"/>
+   <addaction name="separator"/>
+   <addaction name="actionReload"/>
+   <addaction name="actionRun_one_year"/>
+   <addaction name="actionModelRun"/>
+   <addaction name="actionPause"/>
+   <addaction name="actionStop"/>
+   <addaction name="separator"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QDockWidget" name="dockEditor">
+   <property name="windowTitle">
+    <string>Main</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_3">
+    <layout class="QVBoxLayout" name="verticalLayout_5">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <property name="leftMargin">
+      <number>3</number>
+     </property>
+     <property name="topMargin">
+      <number>3</number>
+     </property>
+     <property name="rightMargin">
+      <number>3</number>
+     </property>
+     <property name="bottomMargin">
+      <number>3</number>
+     </property>
+     <item>
+      <widget class="QTabWidget" name="editStack">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">@
+QTabWidget::tab:disabled { width: 0; height: 0; margin: 0; padding: 0; border: none; }
+@</string>
+       </property>
+       <property name="currentIndex">
+        <number>1</number>
+       </property>
+       <widget class="QWidget" name="editStackMain">
+        <attribute name="title">
+         <string>Main</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,2,10">
+         <item>
+          <widget class="QLabel" name="label_10">
+           <property name="text">
+            <string>iLand project file</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QLineEdit" name="initFileName">
+             <property name="text">
+              <string>fon.xml</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="openFile">
+             <property name="toolTip">
+              <string>Select a project file </string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="res/iland.qrc">
+               <normaloff>:/document-open.png</normaloff>:/document-open.png</iconset>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>16</width>
+               <height>16</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="checkXMLFile">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check the XML project file (results in log)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="res/iland.qrc">
+               <normaloff>:/camera.png</normaloff>:/camera.png</iconset>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>16</width>
+               <height>16</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QTextEdit" name="iniEdit">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>1</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>1000</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="lineWrapMode">
+            <enum>QTextEdit::NoWrap</enum>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="qmlRulerLayout">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QPushButton" name="pbReloadQml">
+             <property name="text">
+              <string>reload</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="scriptPage">
+        <attribute name="title">
+         <string>Scripting</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_8">
+         <item>
+          <widget class="QLabel" name="scriptActiveScriptFile">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>loaded: -</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="QToolButton" name="selectJavaScript">
+             <property name="toolTip">
+              <string>Select a javascript file and load it.</string>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="res/iland.qrc">
+               <normaloff>:/document-open.png</normaloff>:/document-open.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="reloadJavaScript">
+             <property name="text">
+              <string>reload script</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButton">
+             <property name="text">
+              <string>Clear Output</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_5">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Below is a minimalistic Javascript Editor.&lt;/p&gt;&lt;p&gt;Use Ctrl+Enter to execute the current line of code, or a selection.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string>Enter Javascript (Ctrl+Enter to execute):</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="JSTextArea" name="scriptCode"/>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="scriptCommand">
+           <property name="placeholderText">
+            <string>... enter javascript and press Enter</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>or select from the command history:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="scriptCommandHistory"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="lJSShortcuts">
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;(no shortcuts defined)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::RichText</enum>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="JSExplorerPage">
+        <attribute name="title">
+         <string>JSExplore</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_7">
+         <item>
+          <widget class="QGroupBox" name="groupBox_2">
+           <property name="title">
+            <string>type top node</string>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_5">
+            <property name="leftMargin">
+             <number>3</number>
+            </property>
+            <property name="topMargin">
+             <number>3</number>
+            </property>
+            <property name="rightMargin">
+             <number>3</number>
+            </property>
+            <property name="bottomMargin">
+             <number>3</number>
+            </property>
+            <item>
+             <widget class="QLineEdit" name="lJSTree">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;type a valid javascript object and click 'show'. If empty, all elements of the global Javascript context are shown.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pbLoadTree">
+              <property name="maximumSize">
+               <size>
+                <width>40</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Show</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QTreeWidget" name="JSTree">
+           <property name="columnCount">
+            <number>2</number>
+           </property>
+           <column>
+            <property name="text">
+             <string>Name</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Value</string>
+            </property>
+           </column>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="editStackExpressions">
+        <attribute name="title">
+         <string>Expressions</string>
+        </attribute>
+        <layout class="QFormLayout" name="formLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Filter expression</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLineEdit" name="expressionFilter"/>
+         </item>
+         <item row="1" column="1">
+          <widget class="QCheckBox" name="cbDrawFiltered">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;when checked, only &amp;quot;filtered&amp;quot; trees are drawn in the main visualization&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string>draw filtered</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Aggregate Expression</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLineEdit" name="expressionText"/>
+         </item>
+         <item row="3" column="1">
+          <widget class="QPushButton" name="pbCalculateExpression">
+           <property name="text">
+            <string>calculate</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Expression history</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0" colspan="2">
+          <widget class="QListWidget" name="expressionHistory"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="editOtherFunctions">
+        <attribute name="title">
+         <string>Other</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QTabWidget" name="tabRest">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>2</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="currentIndex">
+            <number>0</number>
+           </property>
+           <widget class="QWidget" name="tab_2">
+            <attribute name="title">
+             <string>Stamping</string>
+            </attribute>
+            <widget class="QPushButton" name="stampTrees">
+             <property name="geometry">
+              <rect>
+               <x>90</x>
+               <y>10</y>
+               <width>91</width>
+               <height>23</height>
+              </rect>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>stamp trees</string>
+             </property>
+            </widget>
+            <widget class="QPushButton" name="fonRun">
+             <property name="geometry">
+              <rect>
+               <x>10</x>
+               <y>10</y>
+               <width>75</width>
+               <height>23</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>Setup FON</string>
+             </property>
+            </widget>
+            <widget class="QGroupBox" name="gEditTree_2">
+             <property name="geometry">
+              <rect>
+               <x>10</x>
+               <y>40</y>
+               <width>268</width>
+               <height>121</height>
+              </rect>
+             </property>
+             <property name="title">
+              <string>Edit tree</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_2">
+              <item row="0" column="0" rowspan="2">
+               <widget class="QDoubleSpinBox" name="treeDbh">
+                <property name="toolTip">
+                 <string>diameter (cm)</string>
+                </property>
+                <property name="maximum">
+                 <double>299.990000000000009</double>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1" rowspan="2">
+               <widget class="QDoubleSpinBox" name="treeHeight">
+                <property name="toolTip">
+                 <string>Height [m]</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QPushButton" name="treeChange">
+                <property name="text">
+                 <string>Change</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="2" rowspan="2">
+               <widget class="QPushButton" name="pbSetAsDebug">
+                <property name="text">
+                 <string>debug tree</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QDoubleSpinBox" name="treePosX"/>
+              </item>
+              <item row="2" column="1">
+               <widget class="QDoubleSpinBox" name="treePosY"/>
+              </item>
+              <item row="3" column="0" colspan="2">
+               <widget class="QLabel" name="treeImpact">
+                <property name="text">
+                 <string>(value)</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QPushButton" name="pbResults">
+             <property name="geometry">
+              <rect>
+               <x>180</x>
+               <y>10</y>
+               <width>71</width>
+               <height>23</height>
+              </rect>
+             </property>
+             <property name="toolTip">
+              <string>copies tree results in clipboard.</string>
+             </property>
+             <property name="text">
+              <string>Results</string>
+             </property>
+            </widget>
+            <widget class="QLabel" name="lRedraws">
+             <property name="geometry">
+              <rect>
+               <x>70</x>
+               <y>170</y>
+               <width>91</width>
+               <height>20</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>-</string>
+             </property>
+            </widget>
+            <widget class="QLabel" name="label_6">
+             <property name="geometry">
+              <rect>
+               <x>10</x>
+               <y>170</y>
+               <width>51</width>
+               <height>16</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>#redraws:</string>
+             </property>
+            </widget>
+           </widget>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+     <item>
+      <widget class="QProgressBar" name="modelRunProgress">
+       <property name="minimumSize">
+        <size>
+         <width>80</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>200</width>
+         <height>14</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QProgressBar {    border: 1px solid grey;
+    border-radius: 2px;
+    max-height: 12px; 
+   text-align: right;
+}
+QProgressBar::chunk {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,  stop: 0 #a6a7aa, stop: 0.3 #666666 stop: 1 #203030);
+    width: 1px;
+ }</string>
+       </property>
+       <property name="value">
+        <number>24</number>
+       </property>
+       <property name="textVisible">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockLogviewer">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="windowTitle">
+    <string>Log output</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>8</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <property name="leftMargin">
+      <number>3</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>3</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Filter:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="logFilterExpression"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pbFilterExecute">
+         <property name="text">
+          <string>Filter</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pbLogFilterClear">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Clear Filter</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pbLogClearText">
+         <property name="text">
+          <string>clear Text</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pbLogToClipboard">
+         <property name="text">
+          <string>Copy to clipboard</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QPlainTextEdit" name="logOutput">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockWidget">
+   <property name="windowTitle">
+    <string>Console</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_2">
+    <layout class="QVBoxLayout" name="verticalLayout_4">
+     <item>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="title">
+        <string>Visualization Options</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="19" column="0" colspan="3">
+         <widget class="QLabel" name="fonValue">
+          <property name="text">
+           <string>(value)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="18" column="2">
+         <widget class="QPushButton" name="pbExecExpression">
+          <property name="maximumSize">
+           <size>
+            <width>25</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Execute expression for each tree or resource unit (depending on the current view) and draw trees accordingly.&lt;/p&gt;&lt;p&gt;Note: &amp;quot;Autoscale colors&amp;quot; does not work for trees, however, appropriate scaling can be added to the expression itself (e.g. use 'dbh/50' to show the tree diameter from 0cm (blue) to &amp;gt;=50cm (red).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="icon">
+           <iconset resource="res/iland.qrc">
+            <normaloff>:/Play.png</normaloff>:/Play.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>16</width>
+            <height>16</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QCheckBox" name="visSpeciesColor">
+          <property name="text">
+           <string>color by species</string>
+          </property>
+         </widget>
+        </item>
+        <item row="17" column="0">
+         <widget class="QLabel" name="label_4">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>12</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Expression</string>
+          </property>
+         </widget>
+        </item>
+        <item row="18" column="0" colspan="2">
+         <widget class="QLineEdit" name="lTreeExpr"/>
+        </item>
+        <item row="13" column="0" colspan="3">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>other grids</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="3">
+         <widget class="QRadioButton" name="visFon">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the value of the light influence grid at 2m resolution. Drawn is actually 1-LFI, with blue indicating high and red low light availability.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="text">
+           <string>Light influence field</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="0">
+         <widget class="QCheckBox" name="visAutoScale">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;if checked, then some visualizations based on resource units (and 'other grids') are scaled automatically to the value range in the data. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="text">
+           <string>Autoscale colors</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="1">
+         <widget class="QCheckBox" name="visRUSpeciesColor">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked, species domiance on resource unit level is shown. If a species is selected in the dropdown box below, then basal aera of the selected species is drawn.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="text">
+           <string>species shares</string>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="1">
+         <widget class="QCheckBox" name="visShading">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked and if a DEM is loaded, then some of the visualizations add a &amp;quot;shading&amp;quot; effect based on the DEM.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="text">
+           <string>Shading</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0">
+         <widget class="QRadioButton" name="visResourceUnits">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;show resource units (100m). Click on a unit to view details in the &amp;quot;Data&amp;quot; pane. You can visualize variables on resource unit level using expressions below.&lt;/p&gt;&lt;p&gt;If &amp;quot;species share&amp;quot; is checked, then either the dominant species (based on basal area) is drawn, or - when a species is selected - the basal area of the respective species is displayed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="text">
+           <string>resource units</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QRadioButton" name="visImpact">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;show the crown projection of individual trees, colored (by default) with the LRI value of the tree. You can use &amp;quot;Expressions&amp;quot; for visualizing different tree variables, or color the trees with a species-specifc color. Checking 'draw transparent' makes multi-story forests easier to read.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="text">
+           <string>individual Trees</string>
+          </property>
+         </widget>
+        </item>
+        <item row="20" column="0" colspan="3">
+         <widget class="QComboBox" name="speciesFilterBox"/>
+        </item>
+        <item row="9" column="0">
+         <widget class="QCheckBox" name="visClipStandGrid">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;if checked, (some) visualizations are clipped to the stands of the project area.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="text">
+           <string>clip to stands</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="0" colspan="3">
+         <widget class="QRadioButton" name="visOtherGrid">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Display additional data layers.&lt;/p&gt;&lt;p&gt;Which layers are available depends on model settings (e.g. availability of a DEM, enabled disturbance modules).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="text">
+           <string>other grid</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QRadioButton" name="visRegeneration">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;show state of the regen layer (2x2m pixels). Value is the maximum height of saplings on the pixel of either all species, or for specific species&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="text">
+           <string>Regeneration</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QRadioButton" name="visDomGrid">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;show the maximum tree height on 10m resolution. In addition, greyed pixels indicates pixels that are not within the project area.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="text">
+           <string>dominance grid</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QCheckBox" name="drawTransparent">
+          <property name="toolTip">
+           <string>draw single trees transparent</string>
+          </property>
+          <property name="text">
+           <string>draw transparent</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QCheckBox" name="visRegenNew">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;highlight pixels that have newly established saplings (use species list below to filter only saplings of specific species)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="text">
+           <string>established</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QRadioButton" name="visSeeds">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Seed availability per species on 20m resolution. Please select a species in the dropdown box below. The color indicate the amount of seeds on a cell (blue few, red many seeds).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="text">
+           <string>seed availability</string>
+          </property>
+         </widget>
+        </item>
+        <item row="16" column="0" colspan="3">
+         <widget class="QTreeWidget" name="otherGridTree">
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <attribute name="headerVisible">
+           <bool>false</bool>
+          </attribute>
+          <column>
+           <property name="text">
+            <string>Grid</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QCheckBox" name="visDomHeightStem">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;show the top height based on tree stems (checked), or based on tree crowns (as used for light calculations) (if unchecked)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="text">
+           <string>based on stems</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockModelDrill">
+   <property name="floating">
+    <bool>false</bool>
+   </property>
+   <property name="windowTitle">
+    <string>Data</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_4">
+    <layout class="QVBoxLayout" name="verticalLayout_6">
+     <property name="leftMargin">
+      <number>3</number>
+     </property>
+     <property name="topMargin">
+      <number>3</number>
+     </property>
+     <property name="rightMargin">
+      <number>3</number>
+     </property>
+     <property name="bottomMargin">
+      <number>3</number>
+     </property>
+     <item>
+      <widget class="QTreeWidget" name="dataTree">
+       <attribute name="headerDefaultSectionSize">
+        <number>64</number>
+       </attribute>
+       <column>
+        <property name="text">
+         <string>Name</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Value</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <action name="actionEdit_XML_settings">
+   <property name="icon">
+    <iconset resource="res/iland.qrc">
+     <normaloff>:/source_xml.png</normaloff>:/source_xml.png</iconset>
+   </property>
+   <property name="text">
+    <string>XML settings</string>
+   </property>
+  </action>
+  <action name="actionTreelist">
+   <property name="text">
+    <string>treelist</string>
+   </property>
+  </action>
+  <action name="actionFON_grid">
+   <property name="text">
+    <string>FON grid</string>
+   </property>
+  </action>
+  <action name="actionModelCreate">
+   <property name="icon">
+    <iconset resource="res/iland.qrc">
+     <normaloff>:/www.png</normaloff>:/www.png</iconset>
+   </property>
+   <property name="text">
+    <string>Create Model</string>
+   </property>
+  </action>
+  <action name="actionModelDestroy">
+   <property name="icon">
+    <iconset resource="res/iland.qrc">
+     <normaloff>:/user-trash.png</normaloff>:/user-trash.png</iconset>
+   </property>
+   <property name="text">
+    <string>Destroy</string>
+   </property>
+  </action>
+  <action name="actionModelRun">
+   <property name="icon">
+    <iconset resource="res/iland.qrc">
+     <normaloff>:/Play All.png</normaloff>:/Play All.png</iconset>
+   </property>
+   <property name="text">
+    <string>Run Model</string>
+   </property>
+  </action>
+  <action name="actionTree_Partition">
+   <property name="text">
+    <string>Tree Partition</string>
+   </property>
+  </action>
+  <action name="actionTree_Growth">
+   <property name="text">
+    <string>Tree Growth</string>
+   </property>
+  </action>
+  <action name="actionSelect_Data_Types">
+   <property name="text">
+    <string>Select Data Types</string>
+   </property>
+  </action>
+  <action name="actionTree_NPP">
+   <property name="text">
+    <string>Tree NPP</string>
+   </property>
+  </action>
+  <action name="actionRun_one_year">
+   <property name="icon">
+    <iconset resource="res/iland.qrc">
+     <normaloff>:/Play.png</normaloff>:/Play.png</iconset>
+   </property>
+   <property name="text">
+    <string>Run one year</string>
+   </property>
+  </action>
+  <action name="actionReload">
+   <property name="icon">
+    <iconset resource="res/iland.qrc">
+     <normaloff>:/Backup Green Button.png</normaloff>:/Backup Green Button.png</iconset>
+   </property>
+   <property name="text">
+    <string>Reload</string>
+   </property>
+  </action>
+  <action name="actionDynamic_Output">
+   <property name="text">
+    <string>Dynamic Output</string>
+   </property>
+  </action>
+  <action name="actionShow_Debug_Messages">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Debug Messages</string>
+   </property>
+  </action>
+  <action name="actionPause">
+   <property name="icon">
+    <iconset resource="res/iland.qrc">
+     <normaloff>:/Pause.png</normaloff>:/Pause.png</iconset>
+   </property>
+   <property name="text">
+    <string>Pause</string>
+   </property>
+  </action>
+  <action name="actionStop">
+   <property name="icon">
+    <iconset resource="res/iland.qrc">
+     <normaloff>:/process-stop.png</normaloff>:/process-stop.png</iconset>
+   </property>
+   <property name="text">
+    <string>Stop</string>
+   </property>
+  </action>
+  <action name="actionWater_Output">
+   <property name="text">
+    <string>Water Output</string>
+   </property>
+  </action>
+  <action name="actionOutput_table_description">
+   <property name="text">
+    <string>Output table description</string>
+   </property>
+  </action>
+  <action name="actionTimers">
+   <property name="text">
+    <string>Timers</string>
+   </property>
+  </action>
+  <action name="actionOnline_ressources">
+   <property name="text">
+    <string>Online ressources</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About iLand...</string>
+   </property>
+  </action>
+  <action name="actionDaily_responses_Output">
+   <property name="text">
+    <string>Daily responses Output</string>
+   </property>
+  </action>
+  <action name="actionClearDebugOutput">
+   <property name="text">
+    <string>Clear Debug Output</string>
+   </property>
+  </action>
+  <action name="action_debugEstablishment">
+   <property name="text">
+    <string>Establishment</string>
+   </property>
+  </action>
+  <action name="actionSnag_Dynamics">
+   <property name="text">
+    <string>Carbon Cycle</string>
+   </property>
+  </action>
+  <action name="actionDebug">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Debug</string>
+   </property>
+  </action>
+  <action name="actionWarning">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Warning</string>
+   </property>
+  </action>
+  <action name="actionInfo">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Info</string>
+   </property>
+  </action>
+  <action name="actionError">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Error</string>
+   </property>
+  </action>
+  <action name="actionImageToClipboard">
+   <property name="text">
+    <string>Copy Image to Clipboard</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
+  </action>
+  <action name="actionPerformance">
+   <property name="text">
+    <string>Performance</string>
+   </property>
+  </action>
+  <action name="actionTest">
+   <property name="text">
+    <string>Execute test</string>
+   </property>
+   <property name="toolTip">
+    <string>select and execute a test routine</string>
+   </property>
+  </action>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open...</string>
+   </property>
+   <property name="toolTip">
+    <string>Open a XML Project File</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+   <property name="toolTip">
+    <string>Quit iLand</string>
+   </property>
+  </action>
+  <action name="action">
+   <property name="text">
+    <string/>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="action_2">
+   <property name="text">
+    <string/>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="action_3">
+   <property name="text">
+    <string/>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="action_4">
+   <property name="text">
+    <string/>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="action_5">
+   <property name="text">
+    <string/>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="action_6">
+   <property name="text">
+    <string>action_6</string>
+   </property>
+  </action>
+  <action name="action_debugSapling">
+   <property name="text">
+    <string>Sapling growth</string>
+   </property>
+  </action>
+  <action name="actionShow_full_extent">
+   <property name="text">
+    <string>Show full extent</string>
+   </property>
+   <property name="shortcut">
+    <string>F6</string>
+   </property>
+  </action>
+  <action name="actionRepaint">
+   <property name="text">
+    <string>Repaint</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
+   </property>
+  </action>
+  <action name="actionaction_1">
+   <property name="text">
+    <string>action_1</string>
+   </property>
+  </action>
+  <action name="actionSave_regeneration_grid">
+   <property name="text">
+    <string>Save regeneration grid</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>PaintArea</class>
+   <extends>QWidget</extends>
+   <header location="global">paintarea.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>JSTextArea</class>
+   <extends>QTextEdit</extends>
+   <header location="global">jstextarea.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="res/iland.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>logFilterExpression</sender>
+   <signal>returnPressed()</signal>
+   <receiver>pbFilterExecute</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>358</x>
+     <y>659</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>439</x>
+     <y>661</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>visSpeciesColor</sender>
+   <signal>clicked()</signal>
+   <receiver>visImpact</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>979</x>
+     <y>265</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>864</x>
+     <y>242</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>drawTransparent</sender>
+   <signal>clicked()</signal>
+   <receiver>visImpact</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>864</x>
+     <y>265</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>864</x>
+     <y>242</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lJSTree</sender>
+   <signal>returnPressed()</signal>
+   <receiver>pbLoadTree</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>111</x>
+     <y>164</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>177</x>
+     <y>166</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

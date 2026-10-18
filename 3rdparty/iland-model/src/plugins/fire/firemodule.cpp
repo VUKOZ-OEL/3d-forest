@@ -23,7 +23,7 @@
 #include "grid.h"
 #include "model.h"
 #include "modelcontroller.h"
-#include "globalsettings.h"
+#include "simulationsettings.h"
 #include "resourceunit.h"
 #include "watercycle.h"
 #include "permafrost.h"
@@ -33,7 +33,7 @@
 #include "seeddispersal.h"
 #include "outputmanager.h"
 #include "species.h"
-#include "3rdparty/SimpleRNG.h"
+#include <SimpleRNG.h>
 #include "debugtimer.h"
 
 /** @defgroup firemodule iLand firemodule
@@ -51,7 +51,7 @@ void FireRUData::setup(const ResourceUnit *ru)
 {
     mRU = ru;
     // data items loaded here are provided per resource unit
-    XmlHelper xml(GlobalSettings::instance()->settings().node("modules.fire"));
+    XmlHelper xml(SimulationSettings::current().settings().node("modules.fire"));
     mKBDIref = xml.valueDouble(".KBDIref", 0.3);
     mRefMgmt = xml.valueDouble(".rFireSuppression", 1.);
     mRefLand = xml.valueDouble(".rLand", 1.);
@@ -131,7 +131,7 @@ FireModule::FireModule()
 
 FireModule::~FireModule()
 {
-    GlobalSettings::instance()->controller()->removeLayers(&mFireLayers);
+    SimulationSettings::current().controller()->removeLayers(&mFireLayers);
 }
 
 // access data element
@@ -144,15 +144,15 @@ void FireModule::setup()
 {
     // setup the grid (using the size/resolution)
     mRUGrid.clear(); // force recreation (and clearing of statistics)
-    mRUGrid.setup(GlobalSettings::instance()->model()->RUgrid().metricRect(),
-                  GlobalSettings::instance()->model()->RUgrid().cellsize());
+    mRUGrid.setup(SimulationSettings::current().model()->RUgrid().metricRect(),
+                  SimulationSettings::current().model()->RUgrid().cellsize());
     // setup the fire spread grid
     mGrid.setup(mRUGrid.metricRect(), cellsize());
     mGrid.initialize(0.f);
     mFireId = 0;
 
     // set some global settings
-    XmlHelper xml(GlobalSettings::instance()->settings().node("modules.fire"));
+    XmlHelper xml(SimulationSettings::current().settings().node("modules.fire"));
     mWindSpeedMin = xml.valueDouble(".wind.speedMin", 5.);
     mWindSpeedMax = xml.valueDouble(".wind.speedMax", 10.);
     mWindDirection = xml.valueDouble(".wind.direction", 270.); // defaults to "west"
@@ -192,11 +192,11 @@ void FireModule::setup()
     }
 
     // setup of the visualization of the grid
-    GlobalSettings::instance()->controller()->addLayers(&mFireLayers, "fire");
-    GlobalSettings::instance()->controller()->addGrid(&mGrid, "fire spread", GridViewRainbow,0., 50.);
+    SimulationSettings::current().controller()->addLayers(&mFireLayers, "fire");
+    SimulationSettings::current().controller()->addGrid(&mGrid, "fire spread", GridViewRainbow,0., 50.);
 
     // check if we have a DEM in the system
-    if (!GlobalSettings::instance()->model()->dem())
+    if (!SimulationSettings::current().model()->dem())
         throw IException("FireModule:setup: a digital elevation model is required for the fire module!");
 }
 
@@ -223,7 +223,7 @@ void FireModule::yearBegin()
 */
 void FireModule::run()
 {
-    if (GlobalSettings::instance()->settings().valueBool("modules.fire.enabled") == false)
+    if (SimulationSettings::current().settings().valueBool("modules.fire.enabled") == false)
         return;
     // run handler to call external / forced ignitions
     if (mFireScript->onIgnition().isCallable()) {
@@ -346,7 +346,7 @@ double FireModule::ignition(bool only_ignite)
                 afterFire();
 
                 // provide outputs: This calls the FireOut::exec() function
-                GlobalSettings::instance()->outputManager()->execute("fire");
+                SimulationSettings::current().outputManager()->execute("fire");
 
                 total_area += fireStats.fire_size_realized_m2;
             }
@@ -418,7 +418,7 @@ double FireModule::calculateFireSize(const FireRUData *data)
 double FireModule::calcSlopeFactor(const double slope) const
 {
     double slopespread;       /* Slope spread rate in pixels / timestep   */
-    static double firebgc_cellsize = 30.; /* cellsize for which this functions were originally designed */
+    static const double firebgc_cellsize = 30.; /* cellsize for which this functions were originally designed */
 
     if (slope < 0.) {
         // downslope effect
@@ -426,10 +426,10 @@ double FireModule::calcSlopeFactor(const double slope) const
 
     } else {
         // upslope effect
-        static double alpha = 4.0; /* Maximum number of pixels to spread      */
-        static double beta  = 3.5; /* Scaling coeff for inflection point      */
-        static double gamma = 10.0;/* Scaling coeff for graph steepness       */
-        static double zeta  = 0.0; /* Scaling coeff for y intercept           */
+        static const double alpha = 4.0; /* Maximum number of pixels to spread      */
+        static const double beta  = 3.5; /* Scaling coeff for inflection point      */
+        static const double gamma = 10.0;/* Scaling coeff for graph steepness       */
+        static const double zeta  = 0.0; /* Scaling coeff for y intercept           */
 
         slopespread = zeta + ( alpha / ( 1.0 + ( beta * exp( -gamma * slope ) ) ) );
     }
@@ -493,7 +493,7 @@ void FireModule::calculateSpreadProbability(const FireRUData &fire_data, const d
     double spread_metric; // distance that fire supposedly spreads
 
     // calculate the slope from the curent point (pixel_from) to the spreading cell (pixel_to)
-    double h_to = GlobalSettings::instance()->model()->dem()->elevation(mGrid.cellCenterPoint(mGrid.indexOf(pixel_to)));
+    double h_to = SimulationSettings::current().model()->dem()->elevation(mGrid.cellCenterPoint(mGrid.indexOf(pixel_to)));
     if (h_to==-1) {
         // qDebug() << "invalid elevation for pixel during fire spread: " << mGrid.cellCenterPoint(mGrid.indexOf(pixel_to));
         // the pixel is "outside" the project area. No spread is possible.
@@ -584,10 +584,10 @@ void FireModule::probabilisticSpread(const QPoint &start_point, QRect burn_in, i
                 const QPointF pt = mGrid.cellCenterPoint(mGrid.indexOf(p));
                 FireRUData &fire_data = mRUGrid.valueAt(pt);
                 fire_data.fireRUStats.enter(mFireId); // setup/clear statistics if this is the first pixel in the resource unit
-                double h = GlobalSettings::instance()->model()->dem()->elevation(pt);
+                double h = SimulationSettings::current().model()->dem()->elevation(pt);
                 if (h==-1) {
                     qDebug() << "Fire-Spread: invalid elevation at " << pt.x() << "/" << pt.y();
-                    qDebug() << "value is: " << GlobalSettings::instance()->model()->dem()->elevation(pt);
+                    qDebug() << "value is: " << SimulationSettings::current().model()->dem()->elevation(pt);
                     return;
                 }
 
@@ -730,10 +730,10 @@ void FireModule::testSpread()
             spread( pt );
             // stats
             for (FireRUData *fds = mRUGrid.begin(); fds!=mRUGrid.end(); ++fds)
-                fds->fireRUStats.calculate(mFireId, GlobalSettings::instance()->currentYear());
+                fds->fireRUStats.calculate(mFireId, SimulationSettings::current().currentYear());
 
-            GlobalSettings::instance()->controller()->repaint();
-            GlobalSettings::instance()->controller()->saveScreenshot(GlobalSettings::instance()->path(QString("%1_%2.png").arg(r).arg(i), "temp"));
+            SimulationSettings::current().controller()->repaint();
+            SimulationSettings::current().controller()->saveScreenshot(SimulationSettings::current().path(QString("%1_%2.png").arg(r).arg(i), "temp"));
         }
     }
 }
@@ -761,8 +761,8 @@ double FireModule::prescribedIgnition(const double x_m, const double y_m, const 
     mPrescribedFiresize = -1; // reset
 
     // provide outputs: This calls the FireOut::exec() function
-    GlobalSettings::instance()->outputManager()->execute("fire");
-    GlobalSettings::instance()->outputManager()->save();
+    SimulationSettings::current().outputManager()->execute("fire");
+    SimulationSettings::current().outputManager()->save();
 
     return fireStats.fire_size_realized_m2;
 }
@@ -857,7 +857,7 @@ bool FireModule::burnPixel(const QPoint &pos, FireRUData &ru_data)
 {
     // extract a list of trees that are within the pixel boundaries
     QRectF pixel_rect = mGrid.cellRect(pos);
-    ResourceUnit *ru = GlobalSettings::instance()->model()->ru(pixel_rect.center());
+    ResourceUnit *ru = SimulationSettings::current().model()->ru(pixel_rect.center());
     if (!ru)
         return false;
 
@@ -913,8 +913,8 @@ bool FireModule::burnPixel(const QPoint &pos, FireRUData &ru_data)
         //  effect of forest fire on saplings: all saplings are killed.
         //  As regeneration happens before the fire routine, any newly regenarated saplings are killed as well.
         //  Note: re-sprouting after fire from adult trees happens after killing the regeneration
-        if (GlobalSettings::instance()->model()->saplings())
-            GlobalSettings::instance()->model()->saplings()->clearSaplings(pixel_rect, true, true);
+        if (SimulationSettings::current().model()->saplings())
+            SimulationSettings::current().model()->saplings()->clearSaplings(pixel_rect, true, true);
         //ru->clearSaplings(pixel_rect, true); [old version]
     }
 
@@ -987,14 +987,14 @@ void FireModule::afterFire()
     DebugTimer t("Fire:afterFire");
     const double pixel_fraction = cellsize()*cellsize() / cRUArea; // fraction of one pixel, default: 0.04 (20x20 / 100x100)
 
-    int year = GlobalSettings::instance()->currentYear();
+    int year = SimulationSettings::current().currentYear();
     for (FireRUData *fds = mRUGrid.begin(); fds!=mRUGrid.end(); ++fds) {
         fds->fireRUStats.calculate(mFireId, year);
         if (fds->fireRUStats.fire_id == mFireId && fds->fireRUStats.n_cells>0) {
             // a fire happened on this resource unit,
             // so we need to update snags/soil pools
             if (!mOnlyFireSimulation) {
-                //ResourceUnit *ru = GlobalSettings::instance()->model()->ru(ru_idx);
+                //ResourceUnit *ru = SimulationSettings::current().model()->ru(ru_idx);
                 const ResourceUnit *ru = fds->ru();
                 double ru_fraction = fds->fireRUStats.n_cells * pixel_fraction; // fraction of RU burned (0..1)
 
@@ -1023,7 +1023,7 @@ void FireModule::afterFire()
     // execute the after fire event
     if (!mAfterFireEvent.isEmpty()) {
         // evaluate the javascript function...
-        GlobalSettings::instance()->executeJavascript(mAfterFireEvent);
+        SimulationSettings::current().executeJavascript(mAfterFireEvent);
     }
 }
 
@@ -1068,7 +1068,7 @@ double FireModule::calcCombustibleFuel(const FireRUData &ru_data, double &rMoss_
 
 void FireModule::setupBorderGrid()
 {
-    HeightGrid *hg = GlobalSettings::instance()->model()->heightGrid();
+    HeightGrid *hg = SimulationSettings::current().model()->heightGrid();
     GridRunner<HeightGridValue> runner(*hg, hg->metricRect());
     HeightGridValue* neighbors[8];
     while (runner.next()) {

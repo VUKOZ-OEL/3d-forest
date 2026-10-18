@@ -17,14 +17,6 @@
 
 set(SUB_PROJECT_NAME "3DForestILand")
 
-if(NOT QT_VERSION_MAJOR)
-    message(WARNING "Qt not found - skipping ${SUB_PROJECT_NAME}")
-    return()
-endif()
-
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-
 add_executable(
     ${SUB_PROJECT_NAME}
     iland.cpp

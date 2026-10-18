@@ -31,7 +31,7 @@ enum OutputMode { OutDatabase, OutFile, OutText };
 
 class XmlHelper;
 class Output;
-class GlobalSettings;
+class SimulationSettings;
 class OutputColumn
 {
 public:
@@ -87,8 +87,8 @@ protected:
     void setDescription(const QString &description) { mDescription=description; }
 
     QList<OutputColumn> &columns()  { return mColumns; }
-    int currentYear() const { return gl->currentYear(); }
-    const XmlHelper &settings() const { return gl->settings(); } ///< access XML settings (see class description)
+    int currentYear() const { return SimulationSettings::current().currentYear(); }
+    const XmlHelper &settings() const { return SimulationSettings::current().settings(); } ///< access XML settings (see class description)
     // add data
     void writeRow(); ///< saves the current row/line of data to database/file. Must be called for each row.
     void singleThreadedWriteRow(); ///< writeRow() protected by a mutex (if there is a chance that two outputs write at the same time)
@@ -106,7 +106,6 @@ protected:
     void truncateTable();
 
 private:
-    static const GlobalSettings *gl; ///< pointer to globalsettings object
     void newRow(); ///< starts a new row (resets the internal counter)
     void openDatabase(); ///< database open, create output table and prepare insert statement
     void openFile(); ///< open output file

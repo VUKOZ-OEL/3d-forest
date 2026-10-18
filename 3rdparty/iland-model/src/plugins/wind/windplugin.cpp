@@ -73,8 +73,8 @@ void WindPlugin::setup()
 
     mWindOut = new WindOut();
     mWindOut->setWindModule(mWind);
-    GlobalSettings::instance()->outputManager()->removeOutput(mWindOut->tableName());
-    GlobalSettings::instance()->outputManager()->addOutput(mWindOut);
+    SimulationSettings::current().outputManager()->removeOutput(mWindOut->tableName());
+    SimulationSettings::current().outputManager()->addOutput(mWindOut);
 
 }
 
@@ -86,6 +86,7 @@ void WindPlugin::setupResourceUnit(const ResourceUnit *ru)
 void WindPlugin::setupScripting(QJSEngine *engine)
 {
     WindScript *wind_script = new WindScript();
+    wind_script->setParent(engine);
     wind_script->setModule(mWind);
     QJSValue obj = engine->newQObject(wind_script);
     engine->globalObject().setProperty("Wind", obj);

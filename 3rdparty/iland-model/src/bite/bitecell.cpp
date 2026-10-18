@@ -17,7 +17,7 @@
 **    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************************************/
 #include "bitecell.h"
-#include "globalsettings.h"
+#include "simulationsettings.h"
 #include "model.h"
 #include "grid.h"
 #include "resourceunit.h"
@@ -41,7 +41,7 @@ void BiteCell::setup(int cellidx, QPointF pos, BiteAgent *agent)
         largeCellSetup(pos);
     } else {
         // simpler case: smaller cells are always linked to a single resource unit
-        mRU = GlobalSettings::instance()->model()->RUgrid().constValueAt(pos);
+        mRU = SimulationSettings::current().model()->RUgrid().constValueAt(pos);
         mArea = agent->cellSize() * agent->cellSize() / static_cast<float>(cRUArea);
     }
 
@@ -179,8 +179,8 @@ int BiteCell::loadDeadTrees(ABE::FMDeadTreeList *deadtreelist)
 void BiteCell::largeCellSetup(QPointF pos)
 {
     QRectF rect = agent()->grid().cellRect( agent()->grid().indexOf(index()) );
-    rect &= GlobalSettings::instance()->model()->RUgrid().metricRect(); // intersect the grid (force valid range)
-    GridRunner<ResourceUnit*> ru_runner(GlobalSettings::instance()->model()->RUgrid(), rect);
+    rect &= SimulationSettings::current().model()->RUgrid().metricRect(); // intersect the grid (force valid range)
+    GridRunner<ResourceUnit*> ru_runner(SimulationSettings::current().model()->RUgrid(), rect);
     double min_dist = std::numeric_limits<double>::max();
     QVector<ResourceUnit*> rus;
     mArea = 0.f;

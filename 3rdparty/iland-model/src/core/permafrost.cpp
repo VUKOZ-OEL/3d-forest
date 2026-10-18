@@ -31,12 +31,24 @@
 namespace Water {
 
 // static variables
-Permafrost::SParam Permafrost::par;
-Permafrost::SMossParam Permafrost::mosspar;
+Permafrost::RunType_par &Permafrost::runState_par()
+{
+    struct State { RunType_par value = {}; };
+    return SimulationContext::state<State>().value;
+}
+Permafrost::RunType_mosspar &Permafrost::runState_mosspar()
+{
+    struct State { RunType_mosspar value = {}; };
+    return SimulationContext::state<State>().value;
+}
 
 // this global static declaration requires an exit-time destructor (clang warning)
 // this is not optimal; consider moving the object somewhere else
-static PermafrostLayers permafrostLayers;
+static PermafrostLayers &runFile_permafrostLayers()
+{
+    struct State { PermafrostLayers value = {}; };
+    return SimulationContext::state<State>().value;
+}
 
 Permafrost::Permafrost()
 {
@@ -45,43 +57,43 @@ Permafrost::Permafrost()
 
 Permafrost::~Permafrost()
 {
-    permafrostLayers.clearGrid(); // reset
+    runFile_permafrostLayers().clearGrid(); // reset
 }
 
 void Permafrost::setup(WaterCycle *wc)
 {
     mWC = wc;
-    const XmlHelper &xml=GlobalSettings::instance()->settings();
+    const XmlHelper &xml=SimulationSettings::current().settings();
 
-    par.init();
-    par.groundBaseDepth = xml.valueDouble("model.settings.permafrost.groundBaseDepth", 5.);
-    par.lambdaSnow = xml.valueDouble("model.settings.permafrost.lambdaSnow", 0.3);
-    par.lambdaOrganicLayer = xml.valueDouble("model.settings.permafrost.lambdaOrganicLayer", 0.);
-    par.organicLayerDensity = xml.valueDouble("model.settings.permafrost.organicLayerDensity", 50.);
+    runState_par().init();
+    runState_par().groundBaseDepth = xml.valueDouble("model.settings.permafrost.groundBaseDepth", 5.);
+    runState_par().lambdaSnow = xml.valueDouble("model.settings.permafrost.lambdaSnow", 0.3);
+    runState_par().lambdaOrganicLayer = xml.valueDouble("model.settings.permafrost.lambdaOrganicLayer", 0.);
+    runState_par().organicLayerDensity = xml.valueDouble("model.settings.permafrost.organicLayerDensity", 50.);
 
-    par.maxFreezeThawPerDay = xml.valueDouble("model.settings.permafrost.maxFreezeThawPerDay", 10.);
-    if (par.lambdaSnow * par.lambdaOrganicLayer == 0.)
+    runState_par().maxFreezeThawPerDay = xml.valueDouble("model.settings.permafrost.maxFreezeThawPerDay", 10.);
+    if (runState_par().lambdaSnow * runState_par().lambdaOrganicLayer == 0.)
         throw IException("Setp Permafrost: lambdaSnow or lambdaOrganicLayer is invalid (0).");
 
-    par.onlySimulate = xml.valueBool("model.settings.permafrost.onlySimulate", false);
+    runState_par().onlySimulate = xml.valueBool("model.settings.permafrost.onlySimulate", false);
 
     mGroundBaseTemperature= xml.valueDouble("model.settings.permafrost.initialGroundTemperature", 0.);
 
     double ifd = xml.valueDouble("model.settings.permafrost.initialDepthFrozen", 1.);
-    if (ifd < par.maxPermafrostDepth) {
+    if (ifd < runState_par().maxPermafrostDepth) {
         // seasonal permafrost
         mBottom = ifd;
     } else {
-        mBottom = par.maxPermafrostDepth; // permanent permafrost
+        mBottom = runState_par().maxPermafrostDepth; // permanent permafrost
     }
     mTop = 0.; // we assume that the top of the soil is frozen at the beginning of the sim (1st of January)
     mTopFrozen = true;
     mFreezeBack = 0.; // we are not in "freezeback mode" (autumn)
 
     mSOLDepth = 0.;
-    par.SOLDefaultDepth = xml.valueDouble("model.settings.permafrost.organicLayerDefaultDepth", 0.1);
+    runState_par().SOLDefaultDepth = xml.valueDouble("model.settings.permafrost.organicLayerDefaultDepth", 0.1);
     if (!mWC->mRU->soil()) {
-        mSOLDepth = par.SOLDefaultDepth;
+        mSOLDepth = runState_par().SOLDefaultDepth;
         qWarning() << "Permafrost is enabled, but soil carbon cycle is not. Running Permafrost with constant soil organic layer (permafrost.organicLayerDefaultDepth)= " << mSOLDepth;
     }
 
@@ -93,7 +105,7 @@ void Permafrost::setup(WaterCycle *wc)
     double fraction_frozen = mCurrentSoilFrozen / mSoilDepth;
     mCurrentWaterFrozen = mWC->currentContent() * fraction_frozen;
 
-    if (!par.onlySimulate) {
+    if (!runState_par().onlySimulate) {
         mWC->mContent -= mCurrentWaterFrozen;
         mWC->mSoilDepth -= mCurrentSoilFrozen * 1000.;
         mWC->mFieldCapacity = mFC * (1. - fraction_frozen);
@@ -105,9 +117,9 @@ void Permafrost::setup(WaterCycle *wc)
     setupMossLayer();
 
     // setup visual data layers
-    if (!permafrostLayers.isValid()) {
-        permafrostLayers.setGrid( GlobalSettings::instance()->model()->RUgrid() );
-        GlobalSettings::instance()->controller()->addLayers(&permafrostLayers, "permafrost");
+    if (!runFile_permafrostLayers().isValid()) {
+        runFile_permafrostLayers().setGrid( SimulationSettings::current().model()->RUgrid() );
+        SimulationSettings::current().controller()->addLayers(&runFile_permafrostLayers(), "permafrost");
     }
 
     stats.reset();
@@ -136,7 +148,7 @@ void Permafrost::newYear()
         // the fuel layer is the sum of yL (leaves, needles, and twigs) and yR (coarse downed woody debris) pools (t / ha)
         double totalbiomass = s->youngLabile().biomass() * s->youngLabileAbovegroundFraction() + s->youngRefractory().biomass() * s->youngRefractoryAbovegroundFraction();
         // biomass t/ha = 10*kg/m2 / rho [kg/m3] = m
-        mSOLDepth = totalbiomass * 0.1 / par.organicLayerDensity;
+        mSOLDepth = totalbiomass * 0.1 / runState_par().organicLayerDensity;
         // add moss layer
         mSOLDepth += mossLayerThickness();
     }
@@ -218,7 +230,7 @@ void Permafrost::run(const ClimateDay *clim_day)
     mResult.delta_soil = delta.delta_soil + delta_ground.delta_soil;
 
     // effect of freezing/thawing on the water storage of the iLand water bucket
-    if (mResult.delta_mm != 0. && mResult.delta_soil != 0. && !par.onlySimulate) {
+    if (mResult.delta_mm != 0. && mResult.delta_soil != 0. && !runState_par().onlySimulate) {
 
         mWC->mContent = std::max(mWC->mContent + mResult.delta_mm, 0.);
         mCurrentWaterFrozen = std::min( std::max( mCurrentWaterFrozen - mResult.delta_mm, 0.), mFC);
@@ -239,7 +251,7 @@ void Permafrost::run(const ClimateDay *clim_day)
 
 
     // stats (annual)
-    stats.maxThawDepth = std::max(stats.maxThawDepth, mBottom==0. ? par.maxPermafrostDepth : mTop);
+    stats.maxThawDepth = std::max(stats.maxThawDepth, mBottom==0. ? runState_par().maxPermafrostDepth : mTop);
     stats.maxFreezeDepth = std::max(stats.maxFreezeDepth, mBottom);
     stats.maxSnowDepth = std::max(stats.maxSnowDepth, mWC->mSnowPack.snowDepth());
 
@@ -259,20 +271,20 @@ void Permafrost::debugData(DebugList &out)
 
 void Permafrost::setupMossLayer()
 {
-    const XmlHelper &xml=GlobalSettings::instance()->settings();
+    const XmlHelper &xml=SimulationSettings::current().settings();
 
     // state variables per RU
     mMossBiomass = xml.valueDouble("model.settings.permafrost.moss.biomass", 0.05); // kg/m2
     // paramters
-    mosspar.light_k = xml.valueDouble("model.settings.permafrost.moss.light_k", 0.7);
-    mosspar.light_comp = xml.valueDouble("model.settings.permafrost.moss.light_comp", 0.01);
-    mosspar.light_sat = xml.valueDouble("model.settings.permafrost.moss.light_sat", 0.05);
-    mosspar.respiration_q = xml.valueDouble("model.settings.permafrost.moss.respiration_q", 0.12);
-    mosspar.respiration_b = xml.valueDouble("model.settings.permafrost.moss.respiration_b", 0.136);
-    mosspar.CNRatio = xml.valueDouble("model.settings.permafrost.moss.CNRatio", 30.);
-    mosspar.bulk_density = xml.valueDouble("model.settings.permafrost.moss.bulk_density", 50);
-    mosspar.r_decomp = xml.valueDouble("model.settings.permafrost.moss.r_decomp", 0.14);
-    mosspar.r_deciduous_inhibition = xml.valueDouble("model.settings.permafrost.moss.r_deciduous_inhibition", 0.45);
+    runState_mosspar().light_k = xml.valueDouble("model.settings.permafrost.moss.light_k", 0.7);
+    runState_mosspar().light_comp = xml.valueDouble("model.settings.permafrost.moss.light_comp", 0.01);
+    runState_mosspar().light_sat = xml.valueDouble("model.settings.permafrost.moss.light_sat", 0.05);
+    runState_mosspar().respiration_q = xml.valueDouble("model.settings.permafrost.moss.respiration_q", 0.12);
+    runState_mosspar().respiration_b = xml.valueDouble("model.settings.permafrost.moss.respiration_b", 0.136);
+    runState_mosspar().CNRatio = xml.valueDouble("model.settings.permafrost.moss.CNRatio", 30.);
+    runState_mosspar().bulk_density = xml.valueDouble("model.settings.permafrost.moss.bulk_density", 50);
+    runState_mosspar().r_decomp = xml.valueDouble("model.settings.permafrost.moss.r_decomp", 0.14);
+    runState_mosspar().r_deciduous_inhibition = xml.valueDouble("model.settings.permafrost.moss.r_deciduous_inhibition", 0.45);
 
 }
 
@@ -286,12 +298,12 @@ void Permafrost::calculateMoss()
 
     // get leaf area index for canopy and moss layer
     double LAI_canopy = mWC->mRU->leafAreaIndex();
-    double LAI_moss = mMossBiomass * mosspar.SLA;
+    double LAI_moss = mMossBiomass * runState_mosspar().SLA;
 
-    double light_below = exp(-mosspar.light_k * (LAI_canopy + LAI_moss));
+    double light_below = exp(-runState_mosspar().light_k * (LAI_canopy + LAI_moss));
 
     // f_light is a linear function with 0 at the light compensation point, and 1 at the light saturation level
-    double f_light = (light_below - mosspar.light_comp) / (mosspar.light_sat - mosspar.light_comp);
+    double f_light = (light_below - runState_mosspar().light_comp) / (runState_mosspar().light_sat - runState_mosspar().light_comp);
     f_light = limit(f_light, 0., 1.); // clamp to interval [0,1]
 
     // 2) dessication (=dryout) of moss if the canopy is too open (lack of stomatal control of moss plants)
@@ -309,19 +321,19 @@ void Permafrost::calculateMoss()
     if (mWC->mRU->snag())
         fresh_dec_litter = mWC->mRU->snag()->freshDeciduousFoliage() / 1000.; // from kg/ha -> t/ha
 
-    double f_deciduous = exp(-mosspar.r_deciduous_inhibition * fresh_dec_litter);
+    double f_deciduous = exp(-runState_mosspar().r_deciduous_inhibition * fresh_dec_litter);
 
 
     // (3) Total productivity
     // Assimilation (kg/m2): modifiers reduce the potential productivity of 0.3 kg/m2/yr
-    double moss_assimilation = mosspar.AMax * f_light * f_deciduous; // (note: dessication was here: * f_dryout )
+    double moss_assimilation = runState_mosspar().AMax * f_light * f_deciduous; // (note: dessication was here: * f_dryout )
 
     // producitvity [kg / kg biomass/yr]
-    double effective_assimilation = mosspar.SLA * moss_assimilation;
+    double effective_assimilation = runState_mosspar().SLA * moss_assimilation;
     // annual respiration loss (kg/m2/yr) (flux to atmosphere)
-    double moss_rt = mMossBiomass * mosspar.respiration_q;
+    double moss_rt = mMossBiomass * runState_mosspar().respiration_q;
     // annual turnover (biomass to replace) (kg/m2/yr) (flux to litter)
-    double moss_turnover = mMossBiomass * mosspar.respiration_b;
+    double moss_turnover = mMossBiomass * runState_mosspar().respiration_b;
 
     // net productivty (kg/m2/yr): assimilation - respiration - turnover
     double moss_prod = effective_assimilation * mMossBiomass - moss_rt - moss_turnover;
@@ -336,8 +348,8 @@ void Permafrost::calculateMoss()
         // scale up from m2 to stockable area
         double stockable_area = mWC->mRU->stockableArea();
         CNPool litter_input(stockable_area * moss_turnover * biomassCFraction,
-                            stockable_area * moss_turnover * biomassCFraction / mosspar.CNRatio,
-                            mosspar.r_decomp);
+                            stockable_area * moss_turnover * biomassCFraction / runState_mosspar().CNRatio,
+                            runState_mosspar().r_decomp);
         mWC->mRU->snag()->addBiomassToSoil(CNPool(), litter_input);
     }
 
@@ -351,7 +363,7 @@ void Permafrost::setupThermalConductivity()
 {
     // Calcluation of thermal conductivity based on the approach
     // of Farouki 1981 (as described in Bonan 2019)
-    const XmlHelper &xml=GlobalSettings::instance()->settings();
+    const XmlHelper &xml=SimulationSettings::current().settings();
 
     double pct_sand = xml.valueDouble("model.site.pctSand");
     double pct_clay = xml.valueDouble("model.site.pctClay");
@@ -420,7 +432,7 @@ Permafrost::FTResult Permafrost::calcFreezeThaw(double at, double temp, bool low
     // check for all frozen / thawed
     if (mTop == 0. && mBottom == 0. && temp>=0. )
         return result; // everything is already thawed
-    if (mTop == 0. && mBottom >= par.maxPermafrostDepth && temp<=0.)
+    if (mTop == 0. && mBottom >= runState_par().maxPermafrostDepth && temp<=0.)
         return result; // everything is frozen
 
     const double cTempIce = 0.; // temperature of frozen soil
@@ -434,11 +446,11 @@ Permafrost::FTResult Permafrost::calcFreezeThaw(double at, double temp, bool low
         double lambda_soil = thermalConductivity(false);
 
         // thermal resistance of the whole sandwich of layers [m2*K / W]
-        Rtotal = d_snow / par.lambdaSnow + mSOLDepth / par.lambdaOrganicLayer + std::max(at, 0.05) / lambda_soil;
+        Rtotal = d_snow / runState_par().lambdaSnow + mSOLDepth / runState_par().lambdaOrganicLayer + std::max(at, 0.05) / lambda_soil;
 
     } else {
         // energy flux from below
-        double dist_to_layer = std::max(par.groundBaseDepth - at, 0.5);
+        double dist_to_layer = std::max(runState_par().groundBaseDepth - at, 0.5);
         double lambda_soil = thermalConductivity(true); // unfrozen
         // todo: Question: is soil below fully saturated?
         if (temp < cTempIce)
@@ -454,9 +466,9 @@ Permafrost::FTResult Permafrost::calcFreezeThaw(double at, double temp, bool low
 
     // this energy now can freeze (or thaw) an amount of water at the edge of the active layer
     // Efusion: MJ/litre = MJ/mm / m2; Einput/Efusion: mm/day; a positive value indicates thawing
-    double delta_mm = Einput / par.EFusion;
+    double delta_mm = Einput / runState_par().EFusion;
     // the amount of freezing/thawing is capped per day (to ensure numerical stability close to the surface)
-    delta_mm = std::max( std::min(delta_mm, par.maxFreezeThawPerDay), -par.maxFreezeThawPerDay);
+    delta_mm = std::max( std::min(delta_mm, runState_par().maxFreezeThawPerDay), -runState_par().maxFreezeThawPerDay);
 
     //double max_water_content = mWC->fieldCapacity() / mWC->soilDepth(); // [-]
 
@@ -506,9 +518,9 @@ Permafrost::FTResult Permafrost::calcFreezeThaw(double at, double temp, bool low
         delta_soil *= factor;
     }
 
-    if (new_depth > par.maxPermafrostDepth) {
+    if (new_depth > runState_par().maxPermafrostDepth) {
         // limit to max depth of permafrost - no effect on fluxes
-        new_depth = par.maxPermafrostDepth;
+        new_depth = runState_par().maxPermafrostDepth;
     }
 
 

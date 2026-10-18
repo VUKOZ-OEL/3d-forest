@@ -42,7 +42,11 @@ namespace ABE {
   */
 
 // statics
-QStringList ActThinning::mSyntaxCustom;
+ActThinning::RunType_mSyntaxCustom &ActThinning::runState_mSyntaxCustom()
+{
+    struct State { RunType_mSyntaxCustom value = {}; };
+    return SimulationContext::state<State>().value;
+}
 
 
 ActThinning::ActThinning(FMSTP *parent): Activity(parent)
@@ -50,8 +54,8 @@ ActThinning::ActThinning(FMSTP *parent): Activity(parent)
     mBaseActivity.setIsScheduled(true); // use the scheduler
     mBaseActivity.setDoSimulate(true); // simulate per default
     mThinningType = Invalid;
-    if (mSyntaxCustom.isEmpty())
-        mSyntaxCustom = QStringList()  << Activity::mAllowedProperties
+    if (runState_mSyntaxCustom().isEmpty())
+        runState_mSyntaxCustom() = QStringList()  << Activity::runState_mAllowedProperties()
                                        << "percentile" << "removal" << "thinning"
                                        << "relative" << "remainingStems" << "minDbh"
                                        << "filter" << "targetVariable" << "targetRelative"
@@ -180,7 +184,7 @@ void ActThinning::setupTending(QJSValue value)
 // setup of the "custom" thinning operation
 void ActThinning::setupSingleCustom(QJSValue value, SCustomThinning &custom)
 {
-    FMSTP::checkObjectProperties(value, mSyntaxCustom, "setup of 'custom' thinning:" + name());
+    FMSTP::checkObjectProperties(value, runState_mSyntaxCustom(), "setup of 'custom' thinning:" + name());
 
     custom.usePercentiles = FMSTP::boolValueFromJs(value, "percentile", true);
     custom.removal = FMSTP::boolValueFromJs(value, "removal", true);
@@ -254,7 +258,7 @@ bool ActThinning::evaluateCustom(FMStand *stand, SCustomThinning &custom)
         // expecting a list of probabilities....
         // create list if not present
         if (mSpeciesSelectivity.isEmpty()) {
-            foreach(const Species *s, GlobalSettings::instance()->model()->speciesSet()->activeSpecies())
+            foreach(const Species *s, SimulationSettings::current().model()->speciesSet()->activeSpecies())
                 mSpeciesSelectivity[s] = 1.;
         }
         // fetch from javascript
@@ -832,11 +836,11 @@ bool ActThinning::runTending(FMStand* stand)
     // larger saplings (with slightly less selectivity) are therefore favored more strongly
     float *p = grid.begin();
     int saps_to_tend = 0;
-    SaplingCellRunner scr(stand->id(), GlobalSettings::instance()->model()->standGrid());
+    SaplingCellRunner scr(stand->id(), SimulationSettings::current().model()->standGrid());
     while (SaplingCell *sc = scr.next()) {
         while (p!=grid.end() && *p == -1.f) ++p; // skip pixels outside of the stand
         if (p == grid.end()) {
-            //QString fileName = GlobalSettings::instance()->path("debuggrid.csv");
+            //QString fileName = SimulationSettings::current().path("debuggrid.csv");
             //gridToFile<float>(grid, fileName);
             throw IException("activity tending: grid reached end");
         }
@@ -939,7 +943,7 @@ bool ActThinning::runTending(FMStand* stand)
     // now the saplings:
     p = grid.begin();
     int sap_removed = 0;
-    SaplingCellRunner scr_impact(stand->id(), GlobalSettings::instance()->model()->standGrid());
+    SaplingCellRunner scr_impact(stand->id(), SimulationSettings::current().model()->standGrid());
     while (SaplingCell *sc = scr_impact.next()) {
         while (p!=grid.end() && *p == -1.f) ++p; // skip pixels outside of the stand
         if (p == grid.end())
@@ -992,7 +996,7 @@ bool ActThinning::populateSpeciesSelectivity(QJSValue value, double default_valu
 {
     // fill with all active species in the simulation (this list does not change)
     if (mSpeciesSelectivity.isEmpty()) {
-        foreach(const Species *s, GlobalSettings::instance()->model()->speciesSet()->activeSpecies())
+        foreach(const Species *s, SimulationSettings::current().model()->speciesSet()->activeSpecies())
             mSpeciesSelectivity[s] = default_value;
     }
     if (value.isUndefined() || value.isNull())

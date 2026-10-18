@@ -30,7 +30,7 @@ class BiteEngine
 {
 public:
     /// get singleton of the BiteEngine
-    static BiteEngine *instance() {if (mInstance) return mInstance;  mInstance=new BiteEngine(); return mInstance; }
+    static BiteEngine *instance() {if (runState_mInstance()) return runState_mInstance();  runState_mInstance()=new BiteEngine(); return runState_mInstance(); }
     ~BiteEngine();
 
     void setup();
@@ -69,7 +69,8 @@ public:
 private:
     void resetErrors();
     BiteEngine(); // private ctor
-    static BiteEngine *mInstance;
+    using RunType_mInstance = BiteEngine *;
+    static RunType_mInstance &runState_mInstance();
     QList<BiteAgent*> mAgents;
     BiteScript mScript;
     QStringList mErrorStack;

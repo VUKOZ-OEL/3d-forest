@@ -18,7 +18,7 @@
 ********************************************************************************************/
 #include "grasscover.h"
 
-#include "globalsettings.h"
+#include "simulationsettings.h"
 #include "debugtimer.h"
 #include "xmlhelper.h"
 #include "model.h"
@@ -42,11 +42,11 @@ GrassCover::~GrassCover()
 
 void GrassCover::setup()
 {
-    XmlHelper xml=GlobalSettings::instance()->settings();
+    XmlHelper xml=SimulationSettings::current().settings();
     if (!xml.valueBool("model.settings.grass.enabled")) {
         // clear grid
         mGrid.clear();
-        GlobalSettings::instance()->controller()->removeLayers(mLayers);
+        SimulationSettings::current().controller()->removeLayers(mLayers);
         mEnabled=false;
         qDebug() << "grass module not enabled";
         return;
@@ -73,15 +73,15 @@ void GrassCover::setup()
         mGrassLIFThreshold = static_cast<float>( xml.valueDouble("model.settings.grass.LIFThreshold", 0.2) );
         mEnabled = true;
         // this does not work with the simplified mode, as there is no explicit grass cover grid!!
-        // GlobalSettings::instance()->controller()->addLayers(mLayers, QStringLiteral("grass cover"));
+        // SimulationSettings::current().controller()->addLayers(mLayers, QStringLiteral("grass cover"));
         return;
     }
 
     // create the grid
-    mGrid.setup(GlobalSettings::instance()->model()->grid()->metricRect(), GlobalSettings::instance()->model()->grid()->cellsize());
+    mGrid.setup(SimulationSettings::current().model()->grid()->metricRect(), SimulationSettings::current().model()->grid()->cellsize());
     mGrid.wipe();
     // mask out out-of-project areas
-    HeightGrid *hg = GlobalSettings::instance()->model()->heightGrid();
+    HeightGrid *hg = SimulationSettings::current().model()->heightGrid();
     for (int i=0;i<mGrid.count();++i)
         if (!hg->valueAtIndex(mGrid.index5(i)).isValid())
             mGrid[i] = -1;
@@ -129,7 +129,7 @@ void GrassCover::setup()
         mMaxState = static_cast<qint16>( limit(mGrassPotential.calculate(1.f), 0., 1.)*(GRASSCOVERSTEPS-1)  ); // the max value of the potential function
     }
 
-    GlobalSettings::instance()->controller()->addLayers(mLayers, QStringLiteral("grass cover"));
+    SimulationSettings::current().controller()->addLayers(mLayers, QStringLiteral("grass cover"));
     mEnabled = true;
     qDebug() << "setup of grass cover complete.";
 
@@ -144,12 +144,12 @@ void GrassCover::setInitialValues(const QVector<float *> &LIFpixels, const int p
         if (cval > mMaxState)
             cval = mMaxState;
 
-        Grid<float> *lif_grid = GlobalSettings::instance()->model()->grid();
+        Grid<float> *lif_grid = SimulationSettings::current().model()->grid();
         for (QVector<float *>::const_iterator it = LIFpixels.constBegin(); it!=LIFpixels.constEnd(); ++it)
             mGrid.valueAtIndex(lif_grid->indexOf(*it)) = cval;
     } else {
         // mType == Pixel
-        Grid<float> *lif_grid = GlobalSettings::instance()->model()->grid();
+        Grid<float> *lif_grid = SimulationSettings::current().model()->grid();
         for (QVector<float *>::const_iterator it = LIFpixels.constBegin(); it!=LIFpixels.constEnd(); ++it) {
             if (percent > irandom(0,100))
                 mGrid.valueAtIndex(lif_grid->indexOf(*it)) = static_cast<qint16>( mPDF.get() );
@@ -164,10 +164,10 @@ void GrassCover::setInitialValues(const QVector<float *> &LIFpixels, const int p
 void nc_grass_simplified(ResourceUnit *unit)
 {
     try{
-        GlobalSettings::instance()->model()->saplings()->simplifiedGrassCover(unit);
+        SimulationSettings::current().model()->saplings()->simplifiedGrassCover(unit);
     } catch (const IException &e) {
         // thread-safe error message
-        GlobalSettings::instance()->model()->threadExec().throwError(e.message());
+        SimulationSettings::current().model()->threadExec().throwError(e.message());
     }
 
 }
@@ -183,8 +183,8 @@ void GrassCover::execute()
     DebugTimer t("GrassCover");
 
     // Main function of the grass submodule
-    float *lif = GlobalSettings::instance()->model()->grid()->begin();
-    float *end_lif = GlobalSettings::instance()->model()->grid()->end();
+    float *lif = SimulationSettings::current().model()->grid()->begin();
+    float *end_lif = SimulationSettings::current().model()->grid()->end();
     grass_grid_type *gr = mGrid.begin();
 
     if (mType == Continuous) {
@@ -235,7 +235,7 @@ void GrassCover::executeAfterRegeneration()
     DebugTimer t("GrassCover");
     if (mType == Simplified) {
         // loop over all RUs and call function in the Saplings class (multithreaded)
-        GlobalSettings::instance()->model()->threadExec().run(nc_grass_simplified, false);
+        SimulationSettings::current().model()->threadExec().run(nc_grass_simplified, false);
         return;
     }
 

@@ -20,7 +20,7 @@
 #include "global.h"
 #include "dem.h"
 
-#include "globalsettings.h"
+#include "simulationsettings.h"
 #include "model.h"
 
 #include "gisgrid.h"
@@ -51,10 +51,10 @@ T bilinear(
 /// internally, the DEM has always a resolution of 10m
 bool DEM::loadFromFile(const QString &fileName)
 {
-    if (!GlobalSettings::instance()->model())
+    if (!SimulationSettings::current().model())
         throw IException("DEM::create10mGrid: no valid model to retrieve height grid.");
 
-    HeightGrid *h_grid = GlobalSettings::instance()->model()->heightGrid();
+    HeightGrid *h_grid = SimulationSettings::current().model()->heightGrid();
     if (!h_grid || h_grid->isEmpty())
         throw IException("GisGrid::create10mGrid: no valid height grid to copy grid size.");
 
@@ -70,7 +70,7 @@ bool DEM::loadFromFile(const QString &fileName)
 
     setup(h_grid->metricRect(),h_grid->cellsize());
 
-    //const QRectF &world = GlobalSettings::instance()->model()->extent(); // without buffer
+    //const QRectF &world = SimulationSettings::current().model()->extent(); // without buffer
     const QRectF &world = h_grid->metricRect(); // including buffer
 
     if (gis_grid.cellSize() <= cellsize()) {

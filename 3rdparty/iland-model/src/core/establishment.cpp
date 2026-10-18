@@ -274,8 +274,8 @@ void Establishment::calculateAbioticEnvironment()
 
 void Establishment::writeDebugOutputs()
 {
-    if (GlobalSettings::instance()->isDebugEnabled(GlobalSettings::dEstablishment) && mRUS->ru()->shouldCreateDebugOutput()) {
-        DebugList &out = GlobalSettings::instance()->debugList(mRUS->ru()->index(), GlobalSettings::dEstablishment);
+    if (SimulationSettings::current().isDebugEnabled(SimulationSettings::dEstablishment) && mRUS->ru()->shouldCreateDebugOutput()) {
+        DebugList &out = SimulationSettings::current().debugList(mRUS->ru()->index(), SimulationSettings::dEstablishment);
         // establishment details
         out << mRUS->species()->id() << mRUS->ru()->index() << mRUS->ru()->id();
         out << TACAminTemp() << TACAchill() << TACAfrostFree() << TACgdd();

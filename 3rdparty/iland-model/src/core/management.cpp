@@ -60,7 +60,7 @@ QString Management::executeScript(QString cmd)
 Management::Management()
 {
     // setup the scripting engine
-    mEngine = GlobalSettings::instance()->scriptEngine();
+    mEngine = SimulationSettings::current().scriptEngine();
     QJSValue objectValue = mEngine->newQObject(this);
     mEngine->globalObject().setProperty("management", objectValue);
 
@@ -84,7 +84,7 @@ int Management::remain(int number)
 {
     if (logLevelDebug())
         qDebug() << "remain called (number): " << number;
-    Model *m = GlobalSettings::instance()->model();
+    Model *m = SimulationSettings::current().model();
     AllTreeIterator at(m);
     QList<Tree*> trees;
     while (Tree *t=at.next())
@@ -326,7 +326,7 @@ void Management::run()
     mRemoved=0;
     qDebug() << "Management::run() called";
     QJSValue mgmt = mEngine->globalObject().property("manage");
-    int year = GlobalSettings::instance()->currentYear();
+    int year = SimulationSettings::current().currentYear();
     //mgmt.call(QJSValue(), QScriptValueList()<<year);
     QJSValue result = mgmt.call(QJSValueList() << year);
     if (result.isError())
@@ -356,6 +356,7 @@ QJSValue Management::treeObject(int index)
         tree = mTrees[index].first;
 
     ScriptTree *tobj = new ScriptTree();
+    QJSEngine::setObjectOwnership(tobj,1);
     tobj->setTree(tree);
     QJSValue val = mEngine->newQObject(tobj);
     return val;
@@ -418,7 +419,7 @@ int Management::filter(QString filter)
 
 int Management::loadResourceUnit(int ruindex)
 {
-    Model *m = GlobalSettings::instance()->model();
+    Model *m = SimulationSettings::current().model();
     ResourceUnit *ru = m->ru(ruindex);
     if (!ru)
         return -1;
@@ -432,7 +433,7 @@ int Management::loadResourceUnit(int ruindex)
 int Management::load(QString filter)
 {
     TreeWrapper tw;
-    Model *m = GlobalSettings::instance()->model();
+    Model *m = SimulationSettings::current().model();
     mTrees.clear();
     AllTreeIterator at(m);
     if (filter.isEmpty()) {
@@ -478,7 +479,7 @@ void Management::killSaplings(MapGridWrapper *wrap, int key, QString filter)
 {
 
     QRectF box = wrap->map()->boundingBox(key);
-    GridRunner<float> runner(GlobalSettings::instance()->model()->grid(), box);
+    GridRunner<float> runner(SimulationSettings::current().model()->grid(), box);
     ResourceUnit *ru;
 
     SaplingWrapper sw;
@@ -487,11 +488,11 @@ void Management::killSaplings(MapGridWrapper *wrap, int key, QString filter)
     int nsap_removed=0;
     while (runner.next()) {
         if (wrap->map()->standIDFromLIFCoord(runner.currentIndex()) == key) {
-            SaplingCell *sc=GlobalSettings::instance()->model()->saplings()->cell(runner.currentIndex(),true, &ru);
+            SaplingCell *sc=SimulationSettings::current().model()->saplings()->cell(runner.currentIndex(),true, &ru);
             if (sc) {
                 if (filter.isEmpty()) {
                     // clear all saplings on the cell
-                    GlobalSettings::instance()->model()->saplings()->clearSaplings(sc,ru,false, true);
+                    SimulationSettings::current().model()->saplings()->clearSaplings(sc,ru,false, true);
 
                 } else {
                     for (int i=0;i<NSAPCELLS;++i) {
@@ -512,13 +513,13 @@ void Management::killSaplings(MapGridWrapper *wrap, int key, QString filter)
 
 void Management::killSaplingsResourceUnit(int ruindex)
 {
-    ResourceUnit *ru = GlobalSettings::instance()->model()->ru(ruindex);
+    ResourceUnit *ru = SimulationSettings::current().model()->ru(ruindex);
     if (ru) {
-        GridRunner<float> runner(GlobalSettings::instance()->model()->grid(), ru->boundingBox());
+        GridRunner<float> runner(SimulationSettings::current().model()->grid(), ru->boundingBox());
         while (runner.next()) {
-            SaplingCell *sc=GlobalSettings::instance()->model()->saplings()->cell(runner.currentIndex(),true);
+            SaplingCell *sc=SimulationSettings::current().model()->saplings()->cell(runner.currentIndex(),true);
             if (sc)
-                GlobalSettings::instance()->model()->saplings()->clearSaplings(sc,ru,false, true);
+                SimulationSettings::current().model()->saplings()->clearSaplings(sc,ru,false, true);
         }
     }
 }

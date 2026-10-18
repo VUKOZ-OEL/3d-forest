@@ -21,7 +21,7 @@
 #include <stdexcept>
 #include "helper.h"
 
-#include "globalsettings.h"
+#include "simulationsettings.h"
 #include "model.h"
 
 /** @class GisGrid
@@ -33,31 +33,35 @@
   */
 
 // global transformation record:
-static SCoordTrans GISCoordTrans;
+static SCoordTrans &runFile_GISCoordTrans()
+{
+    struct State { SCoordTrans value = {}; };
+    return SimulationContext::state<State>().value;
+}
 
 // setup of global GIS transformation
 // not a good place to put that code here.... please relocate!
 void setupGISTransformation(double offsetx, double offsety, double offsetz, double angle_degree)
 {
-    GISCoordTrans.setupTransformation(offsetx, offsety, offsetz, angle_degree);
+    runFile_GISCoordTrans().setupTransformation(offsetx, offsety, offsetz, angle_degree);
 }
 
 void worldToModel(const Vector3D &From, Vector3D &To)
 {
-    double x=From.x() - GISCoordTrans.offsetX;
-    double y=From.y() - GISCoordTrans.offsetY;
-    To.setZ( From.z() - GISCoordTrans.offsetZ );
-    To.setX( x * GISCoordTrans.cosRotate - y*GISCoordTrans.sinRotate);
-    To.setY( x * GISCoordTrans.sinRotate + y*GISCoordTrans.cosRotate);
+    double x=From.x() - runFile_GISCoordTrans().offsetX;
+    double y=From.y() - runFile_GISCoordTrans().offsetY;
+    To.setZ( From.z() - runFile_GISCoordTrans().offsetZ );
+    To.setX( x * runFile_GISCoordTrans().cosRotate - y*runFile_GISCoordTrans().sinRotate);
+    To.setY( x * runFile_GISCoordTrans().sinRotate + y*runFile_GISCoordTrans().cosRotate);
     //To.setY(-To.y()); // spiegeln
 }
 void modelToWorld(const Vector3D &From, Vector3D &To)
 {
     double x=From.x();
     double y=From.y(); // spiegeln
-    To.setX( x * GISCoordTrans.cosRotateReverse - y*GISCoordTrans.sinRotateReverse + GISCoordTrans.offsetX);
-    To.setY( x * GISCoordTrans.sinRotateReverse + y*GISCoordTrans.cosRotateReverse  + GISCoordTrans.offsetY);
-    To.setZ( From.z() + GISCoordTrans.offsetZ );
+    To.setX( x * runFile_GISCoordTrans().cosRotateReverse - y*runFile_GISCoordTrans().sinRotateReverse + runFile_GISCoordTrans().offsetX);
+    To.setY( x * runFile_GISCoordTrans().sinRotateReverse + y*runFile_GISCoordTrans().cosRotateReverse  + runFile_GISCoordTrans().offsetY);
+    To.setZ( From.z() + runFile_GISCoordTrans().offsetZ );
 }
 
 

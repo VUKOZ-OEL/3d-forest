@@ -114,7 +114,7 @@ void BarkBeetleScript::runBB(int iteration)
 {
     qDebug() << "running bark beetle module....";
     mBeetle->run(iteration);
-    GlobalSettings::instance()->outputManager()->save(); // just make sure database outputs are properly written
+    SimulationSettings::current().outputManager()->save(); // just make sure database outputs are properly written
 }
 
 void BarkBeetleScript::clear()
@@ -127,7 +127,7 @@ void BarkBeetleScript::clear()
 
 bool BarkBeetleScript::gridToFile(QString type, QString filename)
 {
-    if (!GlobalSettings::instance()->model())
+    if (!SimulationSettings::current().model())
         return false;
     QString result;
     result = gridToESRIRaster(mBeetle->mLayers, type); // use a specific value function (see above)
@@ -137,7 +137,7 @@ bool BarkBeetleScript::gridToFile(QString type, QString filename)
     }
 
     if (!result.isEmpty()) {
-        filename = GlobalSettings::instance()->path(filename);
+        filename = SimulationSettings::current().path(filename);
         Helper::saveToTextFile(filename, result);
         qDebug() << "saved grid to " << filename;
         return true;

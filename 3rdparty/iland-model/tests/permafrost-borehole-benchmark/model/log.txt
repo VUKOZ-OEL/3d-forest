@@ -1,0 +1,392 @@
+**************************************************
+project-file: "F:/work/permafrost/permafrost_param/borehole_test/model/permafrost_bore.hole_project_file.xml"
+started at:  "2022/09/30 15:06:19"
+iLand  1.1.2  ( 1463 )
+**************************************************
+"extended debug checks disabled."
+current File Paths:
+"log" :  "F:/work/permafrost/permafrost_param/borehole_test/model"
+"output" :  "F:/work/permafrost/permafrost_param/borehole_test/model/output"
+"init" :  "F:/work/permafrost/permafrost_param/borehole_test/model/init"
+"temp" :  "F:/work/permafrost/permafrost_param/borehole_test/model/temp"
+"lip" :  "F:/work/permafrost/permafrost_param/borehole_test/model/lip"
+"script" :  "F:/work/permafrost/permafrost_param/borehole_test/model"
+"exe" :  "C:/Program Files/executable_qt512.6"
+"home" :  "F:/work/permafrost/permafrost_param/borehole_test/model"
+"database" :  "F:/work/permafrost/permafrost_param/borehole_test/model/databases"
+Warning: xml: node "system.javascript.fileName" is not present.
+setup database connection "in" to "F:/work/permafrost/permafrost_param/borehole_test/model/databases/species_param.sqlite"
+setup database connection "climate" to "F:/work/permafrost/permafrost_param/borehole_test/model/databases/Permafrost.borehole_climate.sqlite"
+"Settings:\ngrowthEnabled=1\nmortalityEnabled=1\nlightExtinctionCoefficient=0.5\nlightExtinctionCoefficientOpacity=0.5\ntemperatureTau=6\nepsilon=2.7\nairDensity=1.204\nuseDynamicAvailableNitrogen=0\nlatitude=65"
+Warning: xml: node "system.settings.responsive" is not present.
+The linearization of expressions is enabled (performance optimization).
+Loglevel set to Warning.
+Fire plugin created
+Wind plugin created
+Bark beetle plugin created
+"fire"
+"wind"
+"barkbeetle"
+"setup of the world: 400x500m with cell-size=2m and 200m buffer"
+setup grid rectangle: QRectF(-200,-200 800x900)
+setup of spatial location: x/y/z 0 0 0 rotation: 0
+loading stamp file "F:/work/permafrost/permafrost_param/borehole_test/model/lip/readerstamp.bin"
+attempting to load a species set from "species"
+loading stamp file "F:/work/permafrost/permafrost_param/borehole_test/model/lip/pima.bin"
+loading stamp file "F:/work/permafrost/permafrost_param/borehole_test/model/lip/pigl.bin"
+loading stamp file "F:/work/permafrost/permafrost_param/borehole_test/model/lip/bene.bin"
+loading stamp file "F:/work/permafrost/permafrost_param/borehole_test/model/lip/potr.bin"
+loaded 4 active species:
+index, id, name
+0 "Pima" "Picea mariana"
+1 "Pigl" "Picea glauca"
+2 "Bene" "Betula neoalaskana"
+3 "Potr" "Populus tremuloides"
+Environment: climate: # of climates in environment file: 20
+adding climate table where-clause: "where  year>2000 "
+Warning: xml: node "model.settings.groundVegetationLAI" is not present.
+Warning: xml: node "model.settings.groundVegetationPsiMin" is not present.
+Permafrost is enabled, but soil carbon cycle is not. Running Permafrost with constant soil organic layer (permafrost.organicLayerDefaultDepth)=  0.056
+Setup Permafrost: RID  1 ": VWCsat: 0.44808, Kdry: 0.206297, Ksat: 2.41147, Kice: 4.49681. (rho_soil: 1490.18)"
+adding climate table where-clause: "where  year>2000 "
+Warning: xml: node "model.settings.groundVegetationLAI" is not present.
+Warning: xml: node "model.settings.groundVegetationPsiMin" is not present.
+Permafrost is enabled, but soil carbon cycle is not. Running Permafrost with constant soil organic layer (permafrost.organicLayerDefaultDepth)=  0
+Setup Permafrost: RID  2 ": VWCsat: 0.44913, Kdry: 0.205572, Ksat: 2.38301, Kice: 4.45022. (rho_soil: 1487.35)"
+adding climate table where-clause: "where  year>2000 "
+Warning: xml: node "model.settings.groundVegetationLAI" is not present (3rd occurrence, suppressed in the future).
+Warning: xml: node "model.settings.groundVegetationPsiMin" is not present (3rd occurrence, suppressed in the future).
+Permafrost is enabled, but soil carbon cycle is not. Running Permafrost with constant soil organic layer (permafrost.organicLayerDefaultDepth)=  0.056
+Setup Permafrost: RID  3 ": VWCsat: 0.45506, Kdry: 0.201532, Ksat: 2.20048, Kice: 4.14338. (rho_soil: 1471.34)"
+adding climate table where-clause: "where  year>2000 "
+Permafrost is enabled, but soil carbon cycle is not. Running Permafrost with constant soil organic layer (permafrost.organicLayerDefaultDepth)=  0.056
+Setup Permafrost: RID  4 ": VWCsat: 0.44555, Kdry: 0.208057, Ksat: 2.3802, Kice: 4.42291. (rho_soil: 1497.01)"
+adding climate table where-clause: "where  year>2000 "
+Permafrost is enabled, but soil carbon cycle is not. Running Permafrost with constant soil organic layer (permafrost.organicLayerDefaultDepth)=  0.056
+Setup Permafrost: RID  5 ": VWCsat: 0.45228, Kdry: 0.203414, Ksat: 2.29794, Kice: 4.31021. (rho_soil: 1478.84)"
+adding climate table where-clause: "where  year>2000 "
+Permafrost is enabled, but soil carbon cycle is not. Running Permafrost with constant soil organic layer (permafrost.organicLayerDefaultDepth)=  0.056
+Setup Permafrost: RID  6 ": VWCsat: 0.44055, Kdry: 0.211588, Ksat: 2.39374, Kice: 4.41724. (rho_soil: 1510.52)"
+adding climate table where-clause: "where  year>2000 "
+Permafrost is enabled, but soil carbon cycle is not. Running Permafrost with constant soil organic layer (permafrost.organicLayerDefaultDepth)=  0.128
+Setup Permafrost: RID  7 ": VWCsat: 0.43993, Kdry: 0.21203, Ksat: 2.50139, Kice: 4.61192. (rho_soil: 1512.19)"
+adding climate table where-clause: "where  year>2000 "
+Permafrost is enabled, but soil carbon cycle is not. Running Permafrost with constant soil organic layer (permafrost.organicLayerDefaultDepth)=  0.056
+Setup Permafrost: RID  8 ": VWCsat: 0.44308, Kdry: 0.209792, Ksat: 2.4203, Kice: 4.482. (rho_soil: 1503.68)"
+adding climate table where-clause: "where  year>2000 "
+Permafrost is enabled, but soil carbon cycle is not. Running Permafrost with constant soil organic layer (permafrost.organicLayerDefaultDepth)=  0
+Setup Permafrost: RID  9 ": VWCsat: 0.44376, Kdry: 0.209313, Ksat: 2.37997, Kice: 4.41148. (rho_soil: 1501.85)"
+adding climate table where-clause: "where  year>2000 "
+Permafrost is enabled, but soil carbon cycle is not. Running Permafrost with constant soil organic layer (permafrost.organicLayerDefaultDepth)=  0.128
+Setup Permafrost: RID  10 ": VWCsat: 0.45123, Kdry: 0.204131, Ksat: 2.32625, Kice: 4.35693. (rho_soil: 1481.68)"
+adding climate table where-clause: "where  year>2000 "
+Permafrost is enabled, but soil carbon cycle is not. Running Permafrost with constant soil organic layer (permafrost.organicLayerDefaultDepth)=  0
+Setup Permafrost: RID  11 ": VWCsat: 0.43493, Kdry: 0.215642, Ksat: 2.50982, Kice: 4.5954. (rho_soil: 1525.69)"
+adding climate table where-clause: "where  year>2000 "
+Permafrost is enabled, but soil carbon cycle is not. Running Permafrost with constant soil organic layer (permafrost.organicLayerDefaultDepth)=  0.08
+Setup Permafrost: RID  12 ": VWCsat: 0.44697, Kdry: 0.207067, Ksat: 2.36689, Kice: 4.40686. (rho_soil: 1493.18)"
+adding climate table where-clause: "where  year>2000 "
+Permafrost is enabled, but soil carbon cycle is not. Running Permafrost with constant soil organic layer (permafrost.organicLayerDefaultDepth)=  0.28
+Setup Permafrost: RID  13 ": VWCsat: 0.4437, Kdry: 0.209355, Ksat: 2.31674, Kice: 4.29393. (rho_soil: 1502.01)"
+adding climate table where-clause: "where  year>2000 "
+Permafrost is enabled, but soil carbon cycle is not. Running Permafrost with constant soil organic layer (permafrost.organicLayerDefaultDepth)=  0.128
+Setup Permafrost: RID  14 ": VWCsat: 0.4416, Kdry: 0.21084, Ksat: 2.368, Kice: 4.37614. (rho_soil: 1507.68)"
+adding climate table where-clause: "where  year>2000 "
+Permafrost is enabled, but soil carbon cycle is not. Running Permafrost with constant soil organic layer (permafrost.organicLayerDefaultDepth)=  0.128
+Setup Permafrost: RID  15 ": VWCsat: 0.44487, Kdry: 0.208533, Ksat: 2.4218, Kice: 4.49597. (rho_soil: 1498.85)"
+adding climate table where-clause: "where  year>2000 "
+Permafrost is enabled, but soil carbon cycle is not. Running Permafrost with constant soil organic layer (permafrost.organicLayerDefaultDepth)=  0.056
+Setup Permafrost: RID  16 ": VWCsat: 0.44518, Kdry: 0.208316, Ksat: 2.36659, Kice: 4.39536. (rho_soil: 1498.01)"
+adding climate table where-clause: "where  year>2000 "
+Permafrost is enabled, but soil carbon cycle is not. Running Permafrost with constant soil organic layer (permafrost.organicLayerDefaultDepth)=  0.128
+Setup Permafrost: RID  17 ": VWCsat: 0.44697, Kdry: 0.207067, Ksat: 2.36689, Kice: 4.40686. (rho_soil: 1493.18)"
+adding climate table where-clause: "where  year>2000 "
+Permafrost is enabled, but soil carbon cycle is not. Running Permafrost with constant soil organic layer (permafrost.organicLayerDefaultDepth)=  0.128
+Setup Permafrost: RID  18 ": VWCsat: 0.4437, Kdry: 0.209355, Ksat: 2.31674, Kice: 4.29393. (rho_soil: 1502.01)"
+adding climate table where-clause: "where  year>2000 "
+Permafrost is enabled, but soil carbon cycle is not. Running Permafrost with constant soil organic layer (permafrost.organicLayerDefaultDepth)=  0.128
+Setup Permafrost: RID  19 ": VWCsat: 0.4437, Kdry: 0.209355, Ksat: 2.31674, Kice: 4.29393. (rho_soil: 1502.01)"
+adding climate table where-clause: "where  year>2000 "
+Permafrost is enabled, but soil carbon cycle is not. Running Permafrost with constant soil organic layer (permafrost.organicLayerDefaultDepth)=  0.2
+Setup Permafrost: RID  20 ": VWCsat: 0.45228, Kdry: 0.203414, Ksat: 2.29794, Kice: 4.31021. (rho_soil: 1478.84)"
+Setup of climates: #loaded: 20 tables: "APP_2009_012, APP_2009_013, APP_2009_014, APP_2009_026, APP_2009_028, APP_2009_031, ..."
+setup of 20 climates performed.
+Loaded stand grid from  "F:/work/permafrost/permafrost_param/borehole_test/model/gis/permafrost_bore_hole_grid.txt" , #stands:  20
+created a grid of ResourceUnits: count= 20 number of RU-map-cells: 20
+Total stockable area of the landscape is 20 ha.
+Warning: xml: node "model.settings.grass.enabled" is not present.
+grass module not enabled
+Warning: xml: node "system.settings.threadCount" is not present.
+Multithreading enabled:  true thread count: 8
+created extra seed map and serotiny seed kernel for species "Picea mariana" with fecundity factor 30
+Setup of seed dispersal maps finished.
+Warning: xml: node "model.management.abeEnabled" is not present.
+Warning: xml: node "model.settings.svdStates.enabled" is not present.
+Warning: xml: node "modules.bite.enabled" is not present.
+Timer "load project" : "108.662ms"
+setup database connection "out" to "F:/work/permafrost/permafrost_param/borehole_test/model/output/output.sqlite"
+setup of output "Tree Output" ( "tree" )
+treeout::setup() called
+setup of output "Tree Removed Output" ( "treeremoved" )
+Warning: xml: node "filter" is not present.
+Warning: xml: node "enabled" is not present.
+setup of output "Stand by species/RU" ( "stand" )
+Warning: xml: node "output.stand.condition" is not present.
+Warning: xml: node "output.stand.rufilter" is not present.
+setup of output "Landscape aggregates per species" ( "landscape" )
+setup of output "Aggregates of removed trees due to death, harvest, and disturbances per species" ( "landscape_removed" )
+Warning: xml: node "includeHarvest" is not present.
+Warning: xml: node "includeNatural" is not present.
+Warning: xml: node "dbhClasses" is not present.
+Warning: xml: node "enabled" is not present.
+setup of output "dynamic stand output by species/RU" ( "dynamicstand" )
+Warning: xml: node "output.dynamicstand.condition" is not present.
+Warning: xml: node "output.dynamicstand.conditionRU" is not present.
+setup of output "Production per month, species and resource unit" ( "production_month" )
+setup of output "Dead trees by species/RU" ( "standdead" )
+setup of output "Removed trees by species/RU" ( "management" )
+setup of output "Sapling Output" ( "sapling" )
+Warning: xml: node "output.sapling.condition" is not present.
+setup of output "Sapling Details Output" ( "saplingdetail" )
+Warning: xml: node "output.saplingdetail.condition" is not present.
+setup of output "Carbon and nitrogen pools above and belowground per RU/yr" ( "carbon" )
+Warning: xml: node "output.carbon.condition" is not present.
+Warning: xml: node "output.carbon.conditionRU" is not present.
+setup of output "Carbon fluxes per RU or landscape/yr" ( "carbonflow" )
+Warning: xml: node "output.carbonflow.condition" is not present.
+Warning: xml: node "output.carbonflow.conditionRU" is not present.
+setup of output "Carbon input to the soil per RU/yr" ( "soilinput" )
+Warning: xml: node "enabled" is not present (3rd occurrence, suppressed in the future).
+setup of output "Water output" ( "water" )
+Warning: xml: node "output.water.condition" is not present.
+Warning: xml: node "output.water.conditionRU" is not present.
+setup of output "Compact GPP potential per RU" ( "svdgpp" )
+setup of output "Forest state transitions" ( "svdstate" )
+SVDStateOutput: added extra columns for 4 species to the output dynamically.
+setup of output "SVD forest indicator data" ( "svdindicator" )
+Output SVDIndicatorOut cannot be used, because it requires the 'svdstate' output (and the SVD subsystem ('model.settings.svdStates.enabled')). Output disabled.
+setup of output "Unique forest states" ( "svduniquestate" )
+Warning: xml: node "condition" is not present.
+setup of output "Stand Development Stage" ( "devstage" )
+setup of output "tree output for visualization software" ( "ecoviz" )
+Warning: xml: node "condition" is not present.
+Warning: xml: node "fileName" is not present.
+Stand initialization: no file specifed, starting with bare ground.
+tried to add 9300 saplings of species  "Potr" to stand 1 but failed in finding enough free positions. Added 17 cohorts (Nrepr= 2361.43 ) and stopped.
+tried to add 9300 saplings of species  "Potr" to stand 1 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 9300 saplings of species  "Potr" to stand 1 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 9300 saplings of species  "Potr" to stand 1 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 3700 saplings of species  "Pigl" to stand 3 but failed in finding enough free positions. Added 600 cohorts (Nrepr= 1932.63 ) and stopped.
+tried to add 3700 saplings of species  "Pigl" to stand 3 but failed in finding enough free positions. Added 106 cohorts (Nrepr= 1810.36 ) and stopped.
+tried to add 3700 saplings of species  "Pigl" to stand 3 but failed in finding enough free positions. Added 17 cohorts (Nrepr= 307.846 ) and stopped.
+tried to add 3700 saplings of species  "Pigl" to stand 3 but failed in finding enough free positions. Added 6 cohorts (Nrepr= 265.228 ) and stopped.
+tried to add 3700 saplings of species  "Pigl" to stand 3 but failed in finding enough free positions. Added 1 cohorts (Nrepr= 12.7282 ) and stopped.
+tried to add 3700 saplings of species  "Pigl" to stand 3 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 3700 saplings of species  "Pigl" to stand 3 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 3700 saplings of species  "Pigl" to stand 3 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 3700 saplings of species  "Pigl" to stand 3 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 3700 saplings of species  "Pigl" to stand 3 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 3700 saplings of species  "Pigl" to stand 3 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 3700 saplings of species  "Pigl" to stand 3 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 3700 saplings of species  "Pigl" to stand 3 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 3000 saplings of species  "Pigl" to stand 10 but failed in finding enough free positions. Added 210 cohorts (Nrepr= 1877.57 ) and stopped.
+tried to add 3000 saplings of species  "Pigl" to stand 10 but failed in finding enough free positions. Added 70 cohorts (Nrepr= 631.271 ) and stopped.
+tried to add 3000 saplings of species  "Pigl" to stand 10 but failed in finding enough free positions. Added 16 cohorts (Nrepr= 709.015 ) and stopped.
+tried to add 3000 saplings of species  "Pigl" to stand 10 but failed in finding enough free positions. Added 4 cohorts (Nrepr= 59.7675 ) and stopped.
+tried to add 3000 saplings of species  "Pigl" to stand 10 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 3000 saplings of species  "Pigl" to stand 10 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 3000 saplings of species  "Pigl" to stand 10 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 3000 saplings of species  "Pigl" to stand 10 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 3000 saplings of species  "Pigl" to stand 10 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 12000 saplings of species  "Pima" to stand 14 but failed in finding enough free positions. Added 105 cohorts (Nrepr= 5473.62 ) and stopped.
+tried to add 12000 saplings of species  "Pima" to stand 14 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 12000 saplings of species  "Pima" to stand 14 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 12000 saplings of species  "Pima" to stand 14 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 12000 saplings of species  "Pima" to stand 14 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 12000 saplings of species  "Pima" to stand 14 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 8450 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 372 cohorts (Nrepr= 5641.38 ) and stopped.
+tried to add 8450 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 14 cohorts (Nrepr= 273.076 ) and stopped.
+tried to add 8450 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 8450 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 1 cohorts (Nrepr= 33.1279 ) and stopped.
+tried to add 8450 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 8450 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 8450 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 8450 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 8450 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 8450 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 8450 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 8450 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 8450 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 850 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 850 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 850 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 850 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 850 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 850 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 850 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 850 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 850 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 850 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 850 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 850 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 850 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 850 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 850 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 850 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 850 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 850 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 850 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 850 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 17 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 12200 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 744 cohorts (Nrepr= 7416.88 ) and stopped.
+tried to add 12200 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 6 cohorts (Nrepr= 267.767 ) and stopped.
+tried to add 12200 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 12200 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 12200 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 12200 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 12200 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 12200 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 12200 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 12200 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 12200 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 12200 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 12200 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 12200 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 12200 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 12200 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 12200 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 12200 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 1450 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 1450 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 1450 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 1450 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 1450 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 1450 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 1450 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 1450 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 1450 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 1450 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 1450 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 1450 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 1450 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 1450 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 1450 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 1450 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 1450 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 1450 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 1450 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 1450 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+tried to add 50 saplings of species  "Pigl" to stand 19 but failed in finding enough free positions. Added 0 cohorts (Nrepr= 0 ) and stopped.
+initialization of sapling: total created: 1587700
+opening transaction
+Settings not found in project file (more often than 3 times):
+=============================================================
+"model.settings.groundVegetationLAI" : 20 times
+"model.settings.groundVegetationPsiMin" : 20 times
+"enabled" : 10 times
+Model created.
+ModelControler: runloop started.
+"15:06:24:" ModelController: run year 1
+Timer "ModelController:runYear" : "157.042ms"
+"15:06:25:" ModelController: run year 2
+Timer "ModelController:runYear" : "129.597ms"
+"15:06:25:" ModelController: run year 3
+Timer "ModelController:runYear" : "131.055ms"
+"15:06:25:" ModelController: run year 4
+Timer "ModelController:runYear" : "133.446ms"
+"15:06:25:" ModelController: run year 5
+SeedDispersal: created seed map for sapling trees for species "Picea mariana"
+Timer "ModelController:runYear" : "126.271ms"
+"15:06:25:" ModelController: run year 6
+Timer "ModelController:runYear" : "126.636ms"
+"15:06:25:" ModelController: run year 7
+Timer "ModelController:runYear" : "134.132ms"
+"15:06:25:" ModelController: run year 8
+Timer "ModelController:runYear" : "129.673ms"
+"15:06:26:" ModelController: run year 9
+Timer "ModelController:runYear" : "132.076ms"
+"15:06:26:" ModelController: run year 10
+Timer "ModelController:runYear" : "134.785ms"
+"15:06:26:" ModelController: run year 11
+Timer "ModelController:runYear" : "135.088ms"
+"15:06:26:" ModelController: run year 12
+Timer "ModelController:runYear" : "135.156ms"
+"15:06:26:" ModelController: run year 13
+Timer "ModelController:runYear" : "143.388ms"
+"15:06:26:" ModelController: run year 14
+Timer "ModelController:runYear" : "138.563ms"
+"15:06:26:" ModelController: run year 15
+Timer "ModelController:runYear" : "140.907ms"
+"15:06:27:" ModelController: run year 16
+Timer "ModelController:runYear" : "145.707ms"
+"15:06:27:" ModelController: run year 17
+Timer "ModelController:runYear" : "145.422ms"
+"15:06:27:" ModelController: run year 18
+Timer "ModelController:runYear" : "159.279ms"
+database transaction commited
+Total timers
+================
+"seed dispersal" : "13.6479ms"
+"ModelController:runYear" : "2478.2ms"
+"sapling growth" : "206.094ms"
+"water:run" : "2589.14ms"
+"Seed dispersal, establishment, sapling growth" : "275.722ms"
+"painting" : "57.4776ms"
+"growRU()" : "260.004ms"
+"Model::runYear()" : "886.234ms"
+"execute javascript" : "0.2186ms"
+"SpeciesResponse::calculate" : "4.2432ms"
+"establishment" : "54.0894ms"
+"applyPattern()" : "79.2774ms"
+"readPattern()" : "35.0916ms"
+"growTrees()" : "51.0875ms"
+"outputs" : "122.495ms"
+"modules" : "0.0057ms"
+"OutputManager::execute()" : "119.441ms"
+"response+3pg" : "5.5728ms"
+"seed dispersal (all species)" : "15.0994ms"
+Sum:  7253.14 ms
+Finished!
+Timer "Timer for 19 runs" : "2818.74ms"
+Model clear: attempting to clear 20 RU,  1 SpeciesSets.
+outputs closed
+Model ressources freed.
+ModelController: Model destroyed.

@@ -49,8 +49,16 @@ namespace ABE {
   */
 
 
-QString FomeScript::mInvalidContext = "S---";
-ActivityFlags ActivityObj::mEmptyFlags;
+FomeScript::RunType_mInvalidContext &FomeScript::runState_mInvalidContext()
+{
+    struct State { RunType_mInvalidContext value = "S---"; };
+    return SimulationContext::state<State>().value;
+}
+ActivityObj::RunType_mEmptyFlags &ActivityObj::runState_mEmptyFlags()
+{
+    struct State { RunType_mEmptyFlags value = {}; };
+    return SimulationContext::state<State>().value;
+}
 
 FomeScript::FomeScript(QObject *parent) :
     QObject(parent)
@@ -767,7 +775,7 @@ ActivityFlags &ActivityObj::flags() const
 
 
     qCDebug(abe) << "ActivityObj:flags: invalid access of flags! stand: " << mStand << "activity-index:" << mActivityIndex;
-    return mEmptyFlags;
+    return runState_mEmptyFlags();
 }
 
 bool UnitObj::agentUpdate(QString what, QString how, QString when)

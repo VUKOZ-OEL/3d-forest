@@ -133,8 +133,8 @@ public:
     void clear(); ///< free ressources
     void loadProject(); ///< setup and load a project
     bool isSetup() const { return mSetup; } ///< return true if the model world is correctly setup.
-    static const ModelSettings &settings() {return mSettings;} ///< access to global model settings.
-    static ModelSettings &changeSettings() {return mSettings;} ///< write access to global model settings.
+    static const ModelSettings &settings() {return runState_mSettings();} ///< access to global model settings.
+    static ModelSettings &changeSettings() {return runState_mSettings();} ///< write access to global model settings.
     void onlyApplyLightPattern() { applyPattern(); readPattern(); }
     void reloadABE(); ///< force a recreate of the agent based forest management engine
     QString currentTask() const { return mCurrentTask; }
@@ -165,7 +165,8 @@ private:
     void debugCheckAllTrees();
     bool multithreading() const { return threadRunner.multithreading(); }
     ThreadRunner threadRunner;
-    static ModelSettings mSettings;
+    using RunType_mSettings = ModelSettings;
+    static RunType_mSettings &runState_mSettings();
     QString mCurrentTask;
     bool mSetup;
     /// container holding all ressource units

@@ -59,7 +59,7 @@
     // (3) the execution
     void TreeOut::exec()
     {
-        AllTreeIterator at(GlobalSettings::instance()->model());
+        AllTreeIterator at(SimulationSettings::current().model());
         while (Tree *t=at.next()) {
             if (mFilter && !mFilter->execute()) // skip if filter present
                 continue;
@@ -77,7 +77,6 @@
     @endcode
 
 */
-const GlobalSettings *Output::gl = GlobalSettings::instance();
 
 
 void Output::exec()
@@ -111,7 +110,7 @@ Output::Output()
   */
 void Output::openDatabase()
 {
-    QSqlDatabase db = GlobalSettings::instance()->dbout();
+    QSqlDatabase db = SimulationSettings::current().dbout();
     // create the "create table" statement
     QString sql = "create table " +mTableName + "(";
     QString insert="insert into " + mTableName + " (";
@@ -159,7 +158,7 @@ void Output::openDatabase()
 
 void Output::openFile()
 {
-    QString path = GlobalSettings::instance()->path(mTableName + ".csv", "output");
+    QString path = SimulationSettings::current().path(mTableName + ".csv", "output");
     mOutputFile.setFileName(path);
     if (!mOutputFile.open(QIODevice::WriteOnly | QIODevice::Text))
           throw IException(QString("The file '%1' for output '%2' cannot be opened!").arg(path, name()) );
@@ -201,10 +200,14 @@ void Output::writeRow()
 
 }
 
-static QMutex __protectWriteRow;
+static QMutex &runFile___protectWriteRow()
+{
+    struct State { QMutex value = {}; };
+    return SimulationContext::state<State>().value;
+}
 void Output::singleThreadedWriteRow()
 {
-    QMutexLocker l(&__protectWriteRow);
+    QMutexLocker l(&runFile___protectWriteRow());
     writeRow();
 }
 
@@ -227,7 +230,7 @@ bool Output::clearColumnsAfter(QString find_name)
 
 void Output::truncateTable()
 {
-    QSqlDatabase db = GlobalSettings::instance()->dbout();
+    QSqlDatabase db = SimulationSettings::current().dbout();
     QSqlQuery query(db);
     QString stmt=QString("delete from %1").arg(tableName());
     query.exec(stmt); //

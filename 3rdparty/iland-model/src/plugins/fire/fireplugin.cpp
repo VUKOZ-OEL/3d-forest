@@ -54,17 +54,17 @@ FirePlugin::FirePlugin()
     qDebug() << "Fire plugin created";
     DBGMODE( qDebug("(Fire plugin in debug mode)"););
 
-//    foreach (const ResourceUnit *ru, GlobalSettings::instance()->model()->ruList())
+//    foreach (const ResourceUnit *ru, SimulationSettings::current().model()->ruList())
     //        qDebug() << ru->boundingBox() << ru->constTrees().count();
 }
 
 void FirePlugin::setup()
 {
     // setup of the fire related outputs: note: here the fire module is passed directly to the output
-    GlobalSettings::instance()->outputManager()->removeOutput("fire");
+    SimulationSettings::current().outputManager()->removeOutput("fire");
     FireOut *fire_output = new FireOut();
     fire_output->setFireModule(&mFire);
-    GlobalSettings::instance()->outputManager()->addOutput(fire_output);
+    SimulationSettings::current().outputManager()->addOutput(fire_output);
     // setup of the fire module: load parameters from project file, etc.
     mFire.setup();
 }
@@ -75,6 +75,7 @@ void FirePlugin::setup()
 void FirePlugin::setupScripting(QJSEngine *engine)
 {
     FireScript *fire_script = new FireScript();
+    fire_script->setParent(engine);
     fire_script->setFireModule(&mFire);
     QJSValue obj = engine->newQObject(fire_script);
     engine->globalObject().setProperty("Fire", obj);

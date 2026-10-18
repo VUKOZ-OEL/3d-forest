@@ -46,7 +46,7 @@
   @code
   TreeWrapper wrapper;
   Expression basalArea("dbh*dbh*3.1415/4", &wrapper); // expression for basal area, add wrapper (see also setModelObject())
-  AllTreeIterator at(GlobalSettings::instance()->model()); // iterator to iterate over all tree in the model
+  AllTreeIterator at(SimulationSettings::current().model()); // iterator to iterate over all tree in the model
   double sum;
   while (Tree *tree = at.next()) {
       wrapper.setTree(tree); // set actual tree
@@ -80,21 +80,33 @@
 #define opAnd 7
 #define opOr  8
 
-static QString mathFuncList=" sin cos tan exp ln sqrt min max if incsum polygon mod sigmoid rnd rndg in round "; // a space at the end is important!
+static const QString mathFuncList=" sin cos tan exp ln sqrt min max if incsum polygon mod sigmoid rnd rndg in round "; // a space at the end is important!
 const int  MaxArgCount[17]={1,1,1,1,  1, 1,   -1, -1, 3, 1,     -1,     2,  4,      2,  2,   -1, 1};
 #define    AGGFUNCCOUNT 6
-static QString AggFuncList[AGGFUNCCOUNT]={"sum", "avg", "max", "min", "stddev", "variance"};
+static const QString AggFuncList[AGGFUNCCOUNT]={"sum", "avg", "max", "min", "stddev", "variance"};
 
 // space for constants
-static QHash<QString, double> mConstants;
+static QHash<QString, double> &runFile_mConstants()
+{
+    struct State { QHash<QString, double> value = {}; };
+    return SimulationContext::state<State>().value;
+}
 
 void Expression::addConstant(const QString const_name, const double const_value)
 {
-    mConstants[const_name] = const_value;
+    runFile_mConstants()[const_name] = const_value;
 }
 
-bool Expression::mLinearizationAllowed = false;
-bool Expression::mThrowExceptionsInJS = true;
+Expression::RunType_mLinearizationAllowed &Expression::runState_mLinearizationAllowed()
+{
+    struct State { RunType_mLinearizationAllowed value = false; };
+    return SimulationContext::state<State>().value;
+}
+Expression::RunType_mThrowExceptionsInJS &Expression::runState_mThrowExceptionsInJS()
+{
+    struct State { RunType_mThrowExceptionsInJS value = true; };
+    return SimulationContext::state<State>().value;
+}
 
 Expression::Expression()
 {
@@ -239,11 +251,15 @@ void Expression::setExpression(const QString& aExpression)
 
 
 // mutex used to serialize expression parsing.
-QMutex mutex;
+static QMutex &runFile_mutex()
+{
+    struct State { QMutex value; };
+    return SimulationContext::state<State>().value;
+}
 
 void  Expression::parse(ExpressionWrapper *wrapper)
 {
-    QMutexLocker locker(&mutex);
+    QMutexLocker locker(&runFile_mutex());
     if (m_parsed)
         return;
     try {
@@ -277,7 +293,7 @@ void  Expression::parse(ExpressionWrapper *wrapper)
 
     } catch (const IException& e) {
         m_errorMsg =QString("Expression::parse: Error in: %1 : %2").arg(m_expression, e.message());
-        if (mThrowExceptionsInJS){
+        if (runState_mThrowExceptionsInJS()){
 #ifndef FONSTUDIO
              ScriptGlobal::throwError(m_errorMsg);
 #endif
@@ -381,9 +397,9 @@ void  Expression::atom()
             checkBuffer(m_execIndex);
         }
         if (m_state==etVariable) {
-            if (mConstants.contains(m_token)) {
+            if (runFile_mConstants().contains(m_token)) {
                 // constant
-                double result=mConstants[m_token];
+                double result=runFile_mConstants()[m_token];
                 m_execList[m_execIndex].Type=etNumber;
                 m_execList[m_execIndex].Value=result;
                 m_execList[m_execIndex++].Index=-1;
@@ -875,7 +891,7 @@ double Expression::udfRandom(int type, double p1, double p2) const
   */
 void Expression::linearize(const double low_value, const double high_value, const int steps)
 {
-    if (!mLinearizationAllowed)
+    if (!runState_mLinearizationAllowed())
         return;
 
     mLinearized.clear();
@@ -896,7 +912,7 @@ void Expression::linearize2d(const double low_x, const double high_x,
                              const double low_y, const double high_y,
                              const int stepsx, const int stepsy)
 {
-    if (!mLinearizationAllowed)
+    if (!runState_mLinearizationAllowed())
         return;
     mLinearized.clear();
     mLinearLow = low_x;

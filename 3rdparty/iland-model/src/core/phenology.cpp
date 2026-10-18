@@ -138,7 +138,7 @@ void Phenology::calculateChillDays(const int end_of_season)
                 days_after++;
         }
     }
-    if (GlobalSettings::instance()->currentYear()==1) {
+    if (SimulationSettings::current().currentYear()==1) {
         // for the first simulation year, use the value of this autumn for the last years autumn
         mChillDaysAfterLastYear = days_after;
     } else {

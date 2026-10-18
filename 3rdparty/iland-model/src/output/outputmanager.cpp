@@ -103,7 +103,7 @@ void OutputManager::setup()
     //close();
     qDebug() << "Setting up outputs...";
     QStringList output_names;
-    XmlHelper &xml = const_cast<XmlHelper&>(GlobalSettings::instance()->settings());
+    XmlHelper &xml = const_cast<XmlHelper&>(SimulationSettings::current().settings());
     QString nodepath;
     foreach(Output *o, mOutputs) {
         nodepath = QString("output.%1").arg(o->tableName());
@@ -150,8 +150,8 @@ void OutputManager::close()
 void OutputManager::startTransaction()
 {
     //return; // test without transactions
-    if (!mTransactionOpen && GlobalSettings::instance()->dbout().isValid()) {
-        if (GlobalSettings::instance()->dbout().transaction()) {
+    if (!mTransactionOpen && SimulationSettings::current().dbout().isValid()) {
+        if (SimulationSettings::current().dbout().transaction()) {
             qDebug() << "opening transaction";
             mTransactionOpen = true;
         }
@@ -160,8 +160,8 @@ void OutputManager::startTransaction()
 void OutputManager::endTransaction()
 {
     //return; // test without transactions
-    if (mTransactionOpen && GlobalSettings::instance()->dbout().isValid()) {
-        if (GlobalSettings::instance()->dbout().commit()) {
+    if (mTransactionOpen && SimulationSettings::current().dbout().isValid()) {
+        if (SimulationSettings::current().dbout().commit()) {
             mTransactionOpen = false;
             qDebug() << "database transaction commited";
         }
