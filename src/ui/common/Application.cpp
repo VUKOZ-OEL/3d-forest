@@ -22,6 +22,7 @@
 // Include 3D Forest.
 #include <Application.hpp>
 #include <Dialog.hpp>
+#include <Process.hpp>
 #include <Time.hpp>
 #include <Widget.hpp>
 
@@ -243,6 +244,20 @@ void Application::post(std::function<void()> fn)
 void Application::processEvents()
 {
     // eventQueue_.runOne();
+}
+
+bool Application::openLocalWebApp(int port)
+{
+    return Process::openUrl("http://127.0.0.1", port);
+}
+
+void Application::closeLocalWebApp()
+{
+}
+
+std::string Application::localWebAppBasePath() const
+{
+    return std::string();
 }
 
 void Application::emitUpdate(void *sender, int type)

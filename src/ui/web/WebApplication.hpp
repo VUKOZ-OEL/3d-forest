@@ -60,6 +60,9 @@ public:
     void wakeUp() override; // The only method callable from another thread.
     void processEvents()
         override; // Flush state and pump one queued session task.
+    bool openLocalWebApp(int port) override;
+    void closeLocalWebApp() override;
+    std::string localWebAppBasePath() const override;
 
     void setOrganizationName(const std::string &value);
     void setApplicationName(const std::string &value);
@@ -128,6 +131,8 @@ private:
     JsonCpp::UInt64 eventSequence_{0};
     JsonCpp::UInt64 publishedEventSequence_{0};
     bool uiDirty_{true};
+    JsonCpp::Value externalLink_{JsonCpp::objectValue};
+    bool externalLinkDirty_{false};
     void forceUi() { uiDirty_ = true; }
     bool skipNextUiSync_{false};
     bool structureDirty_{true};

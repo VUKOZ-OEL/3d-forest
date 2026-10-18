@@ -20,6 +20,7 @@
 /** @file Tool3dMarteloscopeRunner.cpp */
 
 // Include 3D Forest.
+#include <Application.hpp>
 #include <File.hpp>
 #include <Tool3dMarteloscopeRunner.hpp>
 
@@ -27,10 +28,28 @@
     #include <QWebEngineView>
 #endif
 
+// Include std.
+#include <chrono>
+#include <mutex>
+#include <thread>
+
+#if defined(_WIN32)
+    #include <winsock2.h>
+#else
+    #include <arpa/inet.h>
+    #include <sys/socket.h>
+    #include <unistd.h>
+#endif
+
 // Include local.
 #define LOG_MODULE_NAME "Tool3dMarteloscopeRunner"
 #define LOG_MODULE_DEBUG_ENABLED 1
 #include <Log.hpp>
+
+namespace
+{
+std::mutex webSessionPortMutex;
+}
 
 Tool3dMarteloscopeRunner::Tool3dMarteloscopeRunner(Application *app) : app_(app)
 {
@@ -43,11 +62,42 @@ Tool3dMarteloscopeRunner::~Tool3dMarteloscopeRunner()
 
 bool Tool3dMarteloscopeRunner::isPortFree(int port) const
 {
-    return true;
-    // QTcpSocket socket;
-    // socket.connectToHost("127.0.0.1", port);
-    // bool connected = socket.waitForConnected(200);
-    // socket.abort();
+    if (port < 1 || port > 65535)
+        return false;
+
+#if defined(_WIN32)
+    static std::once_flag winsockInitialized;
+    static int winsockResult = WSASYSNOTREADY;
+    std::call_once(winsockInitialized,
+                   []
+                   {
+                       WSADATA data{};
+                       winsockResult = WSAStartup(MAKEWORD(2, 2), &data);
+                   });
+    if (winsockResult != 0)
+        return false;
+    SOCKET socketHandle = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (socketHandle == INVALID_SOCKET)
+        return false;
+#else
+    int socketHandle = ::socket(AF_INET, SOCK_STREAM, 0);
+    if (socketHandle < 0)
+        return false;
+#endif
+
+    sockaddr_in address{};
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+    address.sin_port = htons(static_cast<uint16_t>(port));
+    const int result = ::connect(socketHandle,
+                                 reinterpret_cast<sockaddr *>(&address),
+                                 sizeof(address));
+#if defined(_WIN32)
+    closesocket(socketHandle);
+#else
+    ::close(socketHandle);
+#endif
+    return result != 0;
     // return !connected; // true if connection failed → port free
 }
 
@@ -109,6 +159,15 @@ void Tool3dMarteloscopeRunner::start(const std::string &binPath,
                                      const std::string &projectPath,
                                      int startPort)
 {
+    const std::string baseUrlPath =
+        app_ ? app_->localWebAppBasePath() : std::string();
+    std::unique_lock<std::mutex> portLock(webSessionPortMutex, std::defer_lock);
+    if (!baseUrlPath.empty())
+    {
+        // Keep simultaneous web sessions from selecting the same unused port.
+        portLock.lock();
+    }
+
     if (process_)
     {
         if (process_->isRunning())
@@ -127,64 +186,87 @@ void Tool3dMarteloscopeRunner::start(const std::string &binPath,
     }
     port_ = port;
 
-    // If port was in use, we assume an existing server is running → just
-    // connect
-    if (!isPortFree(startPort) && port == startPort)
+    LOG_DEBUG(<< "run:");
+    LOG_DEBUG(<< "  binPath " << binPath);
+    LOG_DEBUG(<< "  pythonHome " << pythonHome);
+    LOG_DEBUG(<< "  pythonPath " << pythonPath);
+    LOG_DEBUG(<< "  pythonExe " << pythonExe);
+    LOG_DEBUG(<< "  pyhonScript " << pyhonScript);
+    LOG_DEBUG(<< "  projectPath " << projectPath);
+
+    // Start Streamlit
+    process_ = std::make_unique<Process>();
+
+    process_->setFinishedCallback(
+        [](int exitCode) {
+            LOG_DEBUG("Streamlit process finished with exit code " << exitCode);
+        });
+
+    ProcessEnvironment env = ProcessEnvironment::systemEnvironment();
+    if (pythonExe != "python")
     {
-        LOG_DEBUG(<< "Streamlit already running on port " << startPort
-                  << ", reusing it.");
+        env.insert("PYTHONHOME", pythonHome);
+        env.insert("PYTHONPATH", pythonPath);
+        env.insert("PYTHONNOUSERSITE", "1");
     }
-    else
+
+    std::vector<std::string> args = {"-m",
+                                     "streamlit",
+                                     "run",
+                                     pyhonScript,
+                                     "--server.address",
+                                     "127.0.0.1",
+                                     "--server.port",
+                                     std::to_string(port_),
+                                     "--server.headless",
+                                     "true",
+                                     "--",
+                                     projectPath,
+                                     binPath};
+    if (!baseUrlPath.empty())
     {
-        LOG_DEBUG(<< "run:");
-        LOG_DEBUG(<< "  binPath " << binPath);
-        LOG_DEBUG(<< "  pythonHome " << pythonHome);
-        LOG_DEBUG(<< "  pythonPath " << pythonPath);
-        LOG_DEBUG(<< "  pythonExe " << pythonExe);
-        LOG_DEBUG(<< "  pyhonScript " << pyhonScript);
-        LOG_DEBUG(<< "  projectPath " << projectPath);
+        args.insert(args.begin() + 4, {"--server.baseUrlPath", baseUrlPath});
+    }
 
-        // Start Streamlit
-        process_ = std::make_unique<Process>();
+    process_->start(pythonExe, args, env);
 
-        process_->setFinishedCallback(
-            [](int exitCode) {
-                LOG_DEBUG("Streamlit process finished with exit code "
-                          << exitCode);
-            });
+    if (!process_->waitForStarted(3000))
+    {
+        LOG_WARNING(<< "Failed to start Streamlit using '" << pythonExe
+                    << "' with script '" << pyhonScript
+                    << "': " << process_->startError());
+        process_.reset();
+        return;
+    }
 
-        ProcessEnvironment env = ProcessEnvironment::systemEnvironment();
-        if (pythonExe != "python")
+#if !defined(TOOL_3D_MARTELOSCOPE_RUNNER_TEST)
+    if (!baseUrlPath.empty())
+    {
+        bool serverReady = false;
+        for (int attempt = 0; attempt < 150; ++attempt)
         {
-            env.insert("PYTHONHOME", pythonHome);
-            env.insert("PYTHONPATH", pythonPath);
-            env.insert("PYTHONNOUSERSITE", "1");
+            if (!process_->isRunning())
+                break;
+            if (!isPortFree(port_))
+            {
+                serverReady = true;
+                break;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
-
-        std::vector<std::string> args = {"-m",
-                                         "streamlit",
-                                         "run",
-                                         pyhonScript,
-                                         "--server.port",
-                                         std::to_string(port_),
-                                         "--server.headless",
-                                         "true",
-                                         "--",
-                                         projectPath,
-                                         binPath};
-
-        process_->start(pythonExe, args, env);
-
-        if (!process_->waitForStarted(3000))
+        if (!serverReady)
         {
-            LOG_WARNING(<< "Failed to start Streamlit using '" << pythonExe
-                        << "' with script '" << pyhonScript
-                        << "': " << process_->startError());
+            LOG_WARNING(<< "Streamlit did not listen on loopback port " << port_
+                        << " in time");
+            process_->kill();
+            (void)process_->waitForFinished(1000);
             process_.reset();
+            port_ = -1;
             return;
         }
-        LOG_DEBUG("Streamlit started on port " << port_);
     }
+#endif
+    LOG_DEBUG("Streamlit started on port " << port_);
 
 #if defined(HAS_QT_WEB_ENGINE_WIDGETS)
     LOG_DEBUG("Open QWebEngineView");
@@ -197,10 +279,9 @@ void Tool3dMarteloscopeRunner::start(const std::string &binPath,
     view_->show();
 #else
     #if !defined(TOOL_3D_MARTELOSCOPE_RUNNER_TEST)
-    if (!Process::openUrl("http://localhost", port_))
+    if (!app_ || !app_->openLocalWebApp(port_))
     {
-        LOG_WARNING(
-            "Could not open the system browser for the Marteloscope app");
+        LOG_WARNING("Could not expose the Marteloscope app in this UI");
     }
     #endif
 #endif
@@ -214,6 +295,11 @@ void Tool3dMarteloscopeRunner::stop()
     }
 
     stopping_ = true;
+
+    if (app_)
+    {
+        app_->closeLocalWebApp();
+    }
 
     if (process_)
     {

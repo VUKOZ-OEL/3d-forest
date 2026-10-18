@@ -65,6 +65,9 @@ public:
     bool isCurrentThread() const;
     bool expired(Clock::time_point now, std::chrono::seconds timeout) const;
     bool failed() const { return failed_.load(); }
+    const std::string &token() const { return token_; }
+    void setLocalServicePort(int port) { localServicePort_ = port; }
+    int localServicePort() const { return localServicePort_.load(); }
 
     // Server transport entry points. These enqueue work on the session thread.
     bool attach(const drogon::WebSocketConnectionPtr &connection);
@@ -86,6 +89,7 @@ private:
     drogon::WebSocketConnectionPtr ingressConnection_;
     Clock::time_point disconnectedAt_{Clock::now()};
     std::atomic_bool failed_{false};
+    std::atomic<int> localServicePort_{0};
     static constexpr std::size_t maxTasks_{1024};
 
     // Below: accessed only by worker_, including application destruction.

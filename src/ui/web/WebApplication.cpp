@@ -98,6 +98,33 @@ void WebApplication::processEvents()
     pump(false);
 }
 
+bool WebApplication::openLocalWebApp(int port)
+{
+    assertThread();
+    if (port < 1 || port > 65535)
+        return false;
+
+    session_.setLocalServicePort(port);
+    externalLink_ = JsonCpp::Value{JsonCpp::objectValue};
+    externalLink_["url"] = "/marteloscope/" + session_.token() + "/";
+    externalLink_["text"] = "Open 3d-Marteloscope";
+    externalLinkDirty_ = true;
+    return true;
+}
+
+void WebApplication::closeLocalWebApp()
+{
+    assertThread();
+    session_.setLocalServicePort(0);
+    externalLink_ = JsonCpp::Value{JsonCpp::objectValue};
+    externalLinkDirty_ = true;
+}
+
+std::string WebApplication::localWebAppBasePath() const
+{
+    return "marteloscope/" + session_.token();
+}
+
 void WebApplication::setMetadata(const char *name, const std::string &value)
 {
     assertThread();
@@ -227,6 +254,7 @@ JsonCpp::Value WebApplication::snapshot() const
     result["type"] = "snapshot";
     result["eventSequence"] = eventSequence_;
     result["application"] = metadata_;
+    result["externalLink"] = externalLink_;
     result["ui"] = uiTree_->description();
     result["widgets"] = JsonCpp::Value{JsonCpp::arrayValue};
     for (const auto &[id, entry] : widgets_)
@@ -262,10 +290,11 @@ void WebApplication::flush()
         session_.publish(snapshot());
         structureDirty_ = false;
         uiDirty_ = false;
+        externalLinkDirty_ = false;
         publishedEventSequence_ = eventSequence_;
         pending_ = JsonCpp::Value{JsonCpp::objectValue};
     }
-    else if (!pending_.empty() || uiDirty_ ||
+    else if (!pending_.empty() || uiDirty_ || externalLinkDirty_ ||
              publishedEventSequence_ != eventSequence_)
     {
         JsonCpp::Value update{JsonCpp::objectValue};
@@ -273,6 +302,11 @@ void WebApplication::flush()
         update["eventSequence"] = eventSequence_;
         publishedEventSequence_ = eventSequence_;
         update["widgets"] = pending_;
+        if (externalLinkDirty_)
+        {
+            update["externalLink"] = externalLink_;
+            externalLinkDirty_ = false;
+        }
         if (uiDirty_)
             update["ui"] = uiTree_->description();
         uiDirty_ = false;

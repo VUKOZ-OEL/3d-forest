@@ -45,6 +45,7 @@ target_compile_definitions(
 
 target_link_libraries(
     ${SUB_PROJECT_NAME}
+    3DForestCore
     3DForestEditor
 )
 

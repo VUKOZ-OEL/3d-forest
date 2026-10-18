@@ -34,6 +34,8 @@
 #include <WarningsDisable.hpp>
 
 /** WebServer. */
+class StreamlitWebSocketProxy;
+
 class EXPORT_UI_WEB WebServer
 {
 public:
@@ -60,6 +62,7 @@ public:
     void quit(); // Thread-safe once exec() has started.
 
 private:
+    friend class StreamlitWebSocketProxy;
     struct State;
     class Controller;
     std::shared_ptr<State> state_;

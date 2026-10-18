@@ -4,7 +4,8 @@ const controls = document.querySelector("#controls"),
   bottom = document.querySelector("#bottom"),
   main = document.querySelector("#main"),
   status = document.querySelector("#status"),
-  restart = document.querySelector("#new-session");
+  restart = document.querySelector("#new-session"),
+  serviceLink = document.querySelector("#service-link");
 const widgets = new Map(),
   dialogs = new Map(),
   expanded = new Map();
@@ -411,8 +412,25 @@ function snapshot(m) {
       widgets.delete(id);
     }
   document.title = m.application.name || "3D Forest";
+  renderServiceLink(m.externalLink);
   applyUi(m.ui);
   ready = true;
+}
+function renderServiceLink(link) {
+  if (!link?.url || !link?.text) {
+    serviceLink.hidden = true;
+    serviceLink.removeAttribute("href");
+    return;
+  }
+  const url = new URL(link.url, location.origin);
+  if (url.origin !== location.origin) {
+    serviceLink.hidden = true;
+    serviceLink.removeAttribute("href");
+    return;
+  }
+  serviceLink.href = url.href;
+  serviceLink.textContent = link.text;
+  serviceLink.hidden = false;
 }
 function applyUi(ui) {
   const shape = JSON.stringify([ui.navigation, ui.viewer, ui.bottom]);
@@ -468,6 +486,8 @@ function connect() {
             if (!w) throw Error("Unknown widget");
             w.update(props, m.eventSequence || 0);
           }
+        if (m.type === "patch" && m.externalLink)
+          renderServiceLink(m.externalLink);
         if (m.type === "patch" && m.ui) preserveFocus(() => applyUi(m.ui));
         for (const w of widgets.values()) w.update({}, m.eventSequence || 0);
         nextSequence = Math.max(nextSequence, m.eventSequence || 0);

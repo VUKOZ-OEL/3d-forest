@@ -654,6 +654,9 @@ input[type="range"].vertical {
   font-size: 11px;
   opacity: 0.85;
 }
+#service-link {
+  padding: 3px 6px;
+}
 body:not(.disconnected) #status:not(.error) {
   display: none;
 }

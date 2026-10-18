@@ -46,6 +46,10 @@ target_link_libraries(
     3DForestUiCommon
 )
 
+if(WIN32)
+    target_link_libraries(${SUB_PROJECT_NAME} PRIVATE ws2_32)
+endif()
+
 # Install plugin
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin/plugins)
 

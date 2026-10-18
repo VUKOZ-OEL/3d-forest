@@ -25,6 +25,7 @@
 // Include std.
 #include <atomic>
 #include <set>
+#include <string>
 
 // Include 3D Forest.
 #include <Action.hpp>
@@ -135,6 +136,13 @@ public:
 
     void post(std::function<void()> fn);
     virtual void processEvents();
+
+    /** Open a web application hosted by this process on the supplied port.
+     *  UI hosts may override this to expose it through their own transport.
+     */
+    virtual bool openLocalWebApp(int port);
+    virtual void closeLocalWebApp();
+    virtual std::string localWebAppBasePath() const;
 
     void emitUpdate(void *sender, int type);
     void update(void *sender,

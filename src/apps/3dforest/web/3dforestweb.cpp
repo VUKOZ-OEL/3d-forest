@@ -25,6 +25,10 @@
 #include <WebServer.hpp>
 #include <WebSession.hpp>
 
+// Include std.
+#include <stdexcept>
+#include <string>
+
 // Include local.
 #define LOG_MODULE_NAME "3dforestweb"
 #include <Log.hpp>
@@ -38,16 +42,36 @@ int main(int argc, char *argv[])
 {
     int rc = 1;
 
-    std::cout << "Open http://127.0.0.1:8080 (Ctrl+C to stop)\n";
-
     LOGGER_START_FILE("log.txt");
     LOG_INFO(<< "3DForest started. Git Revision <" << GIT_COMMIT_HASH << ">.");
 
     try
     {
+        if (argc > 5)
+        {
+            throw std::invalid_argument(
+                "Usage: 3DForestWeb [web-root] [listen-address] [port] "
+                "[allowed-origin]");
+        }
+
         WebServer::Options options;
         options.documentRoot =
             std::filesystem::absolute(argc > 1 ? argv[1] : "web").string();
+        if (argc > 2)
+            options.address = argv[2];
+        if (argc > 3)
+        {
+            const unsigned long port = std::stoul(argv[3]);
+            if (port == 0 || port > 65535)
+                throw std::invalid_argument("Invalid web server port");
+            options.port = static_cast<std::uint16_t>(port);
+        }
+        if (argc > 4)
+            options.allowedOrigin = argv[4];
+
+        std::cout << "Listening on " << options.address << ':' << options.port
+                  << "; allowed browser origin: " << options.allowedOrigin
+                  << " (Ctrl+C to stop)\n";
 
         WebServer server(options);
 
