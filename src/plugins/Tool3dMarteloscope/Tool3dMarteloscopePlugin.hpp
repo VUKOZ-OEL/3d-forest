@@ -27,6 +27,9 @@
 
 class Tool3dMarteloscopeRunner;
 
+// Include std.
+#include <memory>
+
 #if defined(_MSC_VER)
     #if defined(EXPORT_3DForestTool3dMarteloscopePlugin)
         #define EXPORT_TOOL_3D_MARTELOSCOPE_PLUGIN __declspec(dllexport)
@@ -41,9 +44,6 @@ class Tool3dMarteloscopeRunner;
 class Tool3dMarteloscopePlugin : public Plugin
 {
 public:
-    Tool3dMarteloscopePlugin();
-    ~Tool3dMarteloscopePlugin();
-
     const char *name() const override { return "Tool3dMarteloscopePlugin"; }
     void initialize(Application *app) override;
     void release() override { delete this; }
@@ -52,7 +52,7 @@ public:
 
 private:
     Application *app_{nullptr};
-    Tool3dMarteloscopeRunner *runner_{nullptr};
+    std::unique_ptr<Tool3dMarteloscopeRunner> runner_;
 };
 
 extern "C" EXPORT_TOOL_3D_MARTELOSCOPE_PLUGIN Plugin *createPlugin()

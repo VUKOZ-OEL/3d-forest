@@ -33,20 +33,6 @@
 
 #define ICON(name) (ThemeIcon(app_, ":/Tool3dMarteloscopeResources/", name))
 
-Tool3dMarteloscopePlugin::Tool3dMarteloscopePlugin()
-    : app_(nullptr),
-      runner_(nullptr)
-{
-}
-
-Tool3dMarteloscopePlugin::~Tool3dMarteloscopePlugin()
-{
-    if (runner_ && runner_->isRunning())
-    {
-        runner_->stop();
-    }
-}
-
 void Tool3dMarteloscopePlugin::initialize(Application *app)
 {
     app_ = app;
@@ -68,7 +54,7 @@ void Tool3dMarteloscopePlugin::slotPlugin()
 
     if (!runner_)
     {
-        runner_ = new Tool3dMarteloscopeRunner(app_);
+        runner_ = std::make_unique<Tool3dMarteloscopeRunner>(app_);
     }
 
     try
