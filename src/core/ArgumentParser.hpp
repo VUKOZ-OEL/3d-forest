@@ -50,6 +50,10 @@ public:
              const std::string &defaultValue = "",
              const std::string &help = "",
              bool required = false);
+    void addPositional(const std::string &name,
+                       const std::string &defaultValue = "",
+                       const std::string &help = "");
+    void addExample(const std::string &example);
 
     bool parse(int argc, char *argv[]);
 
@@ -83,6 +87,8 @@ private:
 
     std::map<std::string, Option> options_;
     std::vector<std::string> insertOrder;
+    std::vector<std::string> positionalOrder_;
+    std::vector<std::string> examples_;
 
     void help() const;
     void error(const std::string &message) const;

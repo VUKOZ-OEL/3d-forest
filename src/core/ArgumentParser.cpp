@@ -52,9 +52,27 @@ void ArgumentParser::add(const std::string &shortOption,
     insertOrder.push_back(longOption);
 }
 
+void ArgumentParser::addPositional(const std::string &name,
+                                   const std::string &defaultValue,
+                                   const std::string &help)
+{
+    Option option;
+    option.longOption = name;
+    option.text = defaultValue;
+    option.help = help;
+    options_[name] = option;
+    positionalOrder_.push_back(name);
+}
+
+void ArgumentParser::addExample(const std::string &example)
+{
+    examples_.push_back(example);
+}
+
 bool ArgumentParser::parse(int argc, char *argv[])
 {
     int i = 1;
+    size_t positionalIndex = 0;
 
     if (argc > 0)
     {
@@ -97,8 +115,18 @@ bool ArgumentParser::parse(int argc, char *argv[])
         }
         else
         {
-            invalidOption(option);
-            return false;
+            if (!option.empty() && option[0] == '-')
+            {
+                invalidOption(option);
+                return false;
+            }
+            if (positionalIndex >= positionalOrder_.size())
+            {
+                error("too many arguments");
+                return false;
+            }
+            options_.at(positionalOrder_[positionalIndex++]).text = option;
+            options_.at(positionalOrder_[positionalIndex - 1]).count++;
         }
 
         i++;
@@ -174,10 +202,34 @@ void ArgumentParser::help() const
 {
     std::string indent{"    "};
 
+    std::cout << "Usage: " << programName_;
+    for (auto const &name : positionalOrder_)
+    {
+        std::cout << " [" << name << "]";
+    }
+    std::cout << std::endl << std::endl;
+
     std::cout << "name: " << std::endl;
     std::cout << indent << programName_ << " - " << description_ << std::endl;
 
     std::cout << std::endl;
+
+    if (!positionalOrder_.empty())
+    {
+        std::cout << "arguments:" << std::endl;
+        for (auto const &name : positionalOrder_)
+        {
+            auto const &argument = options_.at(name);
+            std::cout << indent << argument.longOption << " ... "
+                      << argument.help;
+            if (!argument.text.empty())
+            {
+                std::cout << ", default " << argument.text;
+            }
+            std::cout << std::endl;
+        }
+        std::cout << std::endl;
+    }
 
     std::cout << "options:" << std::endl;
     for (auto const &it : insertOrder)
@@ -214,6 +266,15 @@ void ArgumentParser::help() const
         }
 
         std::cout << std::endl;
+    }
+
+    if (!examples_.empty())
+    {
+        std::cout << std::endl << "examples:" << std::endl;
+        for (auto const &example : examples_)
+        {
+            std::cout << indent << example << std::endl;
+        }
     }
 }
 

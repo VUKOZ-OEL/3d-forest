@@ -20,6 +20,7 @@
 /** @file 3dforest.cpp */
 
 // Include 3D Forest.
+#include <ArgumentParser.hpp>
 #include <Error.hpp>
 #include <WebApplication.hpp>
 #include <WebServer.hpp>
@@ -47,50 +48,62 @@ int main(int argc, char *argv[])
 
     try
     {
-        if (argc > 5)
-        {
-            throw std::invalid_argument(
-                "Usage: 3DForestWeb [web-root] [listen-address] [port] "
-                "[allowed-origin]");
-        }
+        ArgumentParser arg("starts the 3D Forest web server");
+        arg.addPositional("web-root", "web", "Path to the web document root.");
+        arg.addPositional("listen-address",
+                          "127.0.0.1",
+                          "Address the web server listens on.");
+        arg.addPositional("port", "8080", "Web server port.");
+        arg.addPositional("allowed-origin",
+                          "http://127.0.0.1:8080",
+                          "Allowed browser origin.");
+        arg.addExample(
+            "3DForestWeb.exe web 127.0.0.1 8080 http://127.0.0.1:8080");
+        arg.addExample(
+            "3DForestWeb.exe web 0.0.0.0 8080 https://forest.example.org");
 
-        WebServer::Options options;
-        options.documentRoot =
-            std::filesystem::absolute(argc > 1 ? argv[1] : "web").string();
-        if (argc > 2)
-            options.address = argv[2];
-        if (argc > 3)
+        if (arg.parse(argc, argv))
         {
-            const unsigned long port = std::stoul(argv[3]);
+            WebServer::Options options;
+            options.documentRoot =
+                std::filesystem::absolute(arg.toString("web-root")).string();
+            options.address = arg.toString("listen-address");
+            const uint32_t port = arg.toUint32("port");
             if (port == 0 || port > 65535)
-                throw std::invalid_argument("Invalid web server port");
-            options.port = static_cast<std::uint16_t>(port);
-        }
-        if (argc > 4)
-            options.allowedOrigin = argv[4];
-
-        std::cout << "Listening on " << options.address << ':' << options.port
-                  << "; allowed browser origin: " << options.allowedOrigin
-                  << " (Ctrl+C to stop)\n";
-
-        WebServer server(options);
-
-        server.setApplicationFactory(
-            [](WebSession &session)
             {
-                auto app = std::make_unique<WebApplication>(session);
+                throw std::invalid_argument("Invalid web server port");
+            }
+            options.port = static_cast<std::uint16_t>(port);
+            options.allowedOrigin = arg.toString("allowed-origin");
 
-                app->setOrganizationName("VUKOZ v.v.i.");
-                app->setApplicationName("3D Forest");
-                app->setApplicationVersion("1.0");
+            std::cout << "Listening on " << options.address << ':'
+                      << options.port
+                      << "; allowed browser origin: " << options.allowedOrigin
+                      << " (Ctrl+C to stop)\n";
 
-                // Create this session's plugins and common UI.
-                app->init();
+            WebServer server(options);
 
-                return app;
-            });
+            server.setApplicationFactory(
+                [](WebSession &session)
+                {
+                    auto app = std::make_unique<WebApplication>(session);
 
-        rc = server.exec();
+                    app->setOrganizationName("VUKOZ v.v.i.");
+                    app->setApplicationName("3D Forest");
+                    app->setApplicationVersion("1.0");
+
+                    // Create this session's plugins and common UI.
+                    app->init();
+
+                    return app;
+                });
+
+            rc = server.exec();
+        }
+        else
+        {
+            rc = 0;
+        }
     }
     catch (std::exception &e)
     {
