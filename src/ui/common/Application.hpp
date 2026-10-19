@@ -87,7 +87,8 @@ public:
                       const ThemeIcon &icon,
                       std::function<void()> cb,
                       Widget *widget,
-                      int order = 0);
+                      int order = 0,
+                      bool openExternalWebApp = false);
 
     void createToolButton(ToolButton **result,
                           const std::string &text,

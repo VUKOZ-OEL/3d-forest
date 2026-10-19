@@ -45,7 +45,9 @@ void Tool3dMarteloscopePlugin::initialize(Application *app)
         tr("Start 3d-Marteloscope"),
         ICON("external-3d-marteloscope"),
         [this]() { slotPlugin(); },
-        nullptr);
+        nullptr,
+        0,
+        true);
 }
 
 void Tool3dMarteloscopePlugin::slotPlugin()

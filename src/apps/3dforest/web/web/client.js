@@ -8,7 +8,8 @@ const controls = document.querySelector("#controls"),
   serviceLink = document.querySelector("#service-link");
 const widgets = new Map(),
   dialogs = new Map(),
-  expanded = new Map();
+  expanded = new Map(),
+  pendingServiceTabs = new Set();
 const storageKey = "3dforest.web.session.v1";
 let token = sessionStorage.getItem(storageKey) || "",
   socket,
@@ -19,7 +20,8 @@ let token = sessionStorage.getItem(storageKey) || "",
   lastRevision = 0;
 let nextSequence = 0;
 let structure = "",
-  lastUi = null;
+  lastUi = null,
+  servicePopupBlocked = false;
 function send(message) {
   if (socket?.readyState === WebSocket.OPEN)
     socket.send(JSON.stringify(message));
@@ -186,7 +188,10 @@ function renderNavigation(items, parent, depth = 0) {
         expanded.set(item.id, !content.hidden);
         title.setAttribute("aria-expanded", String(!content.hidden));
       });
-    } else title.addEventListener("click", () => event(item.id, "triggered"));
+    } else title.addEventListener("click", () => {
+      if (item.openExternalWebApp) openServiceTab();
+      event(item.id, "triggered");
+    });
     parent.append(section);
   }
 }
@@ -430,7 +435,32 @@ function renderServiceLink(link) {
   }
   serviceLink.href = url.href;
   serviceLink.textContent = link.text;
-  serviceLink.hidden = false;
+  for (const tab of pendingServiceTabs) {
+    if (!tab.closed) {
+      tab.location.href = url.href;
+    }
+  }
+  pendingServiceTabs.clear();
+  serviceLink.hidden = !servicePopupBlocked;
+}
+function openServiceTab() {
+  const tab = window.open("about:blank", "_blank");
+  if (!tab) {
+    servicePopupBlocked = true;
+    serviceLink.hidden = true;
+    return;
+  }
+  servicePopupBlocked = false;
+  serviceLink.hidden = true;
+  tab.document.title = "Loading Marteloscope";
+  tab.document.body.style.cssText =
+    "font: 16px system-ui,sans-serif; color: #263238; margin: 3rem";
+  const heading = tab.document.createElement("h1");
+  heading.textContent = "Loading Marteloscope";
+  const message = tab.document.createElement("p");
+  message.textContent = "Starting the 3d-Marteloscope service...";
+  tab.document.body.replaceChildren(heading, message);
+  pendingServiceTabs.add(tab);
 }
 function applyUi(ui) {
   const shape = JSON.stringify([ui.navigation, ui.viewer, ui.bottom]);

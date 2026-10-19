@@ -24,6 +24,8 @@
 // Include 3D Forest.
 #include <WebSession.hpp>
 
+class StreamlitWebSocketProxy;
+
 // Include std.
 #include <cstdint>
 #include <memory>
@@ -34,8 +36,6 @@
 #include <WarningsDisable.hpp>
 
 /** WebServer. */
-class StreamlitWebSocketProxy;
-
 class EXPORT_UI_WEB WebServer
 {
 public:

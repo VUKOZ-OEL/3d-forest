@@ -57,6 +57,9 @@ public:
     bool hasPanel() const { return panel_ != nullptr; }
     Widget *panel() const { return panel_; }
 
+    void setOpenExternalWebApp(bool value) { openExternalWebApp_ = value; }
+    bool opensExternalWebApp() const { return openExternalWebApp_; }
+
     void trigger();
 
     Signal<> triggered;
@@ -67,6 +70,7 @@ private:
     std::string toolTip_;
     ThemeIcon icon_;
     Widget *panel_{nullptr};
+    bool openExternalWebApp_{false};
 };
 
 #include <WarningsEnable.hpp>

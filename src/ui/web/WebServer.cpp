@@ -370,10 +370,12 @@ public:
                                  : std::string()));
                 auto upstream = client->getConnection();
                 if (!bridge->pendingBrowserMessages.empty())
+                {
                     LOG_DEBUG(
                         << "Forwarding "
                         << bridge->pendingBrowserMessages.size()
                         << " queued browser WebSocket messages to Streamlit");
+                }
                 while (!bridge->pendingBrowserMessages.empty())
                 {
                     auto &pending = bridge->pendingBrowserMessages.front();

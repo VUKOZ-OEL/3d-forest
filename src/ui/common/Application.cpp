@@ -410,12 +410,14 @@ void Application::createAction(Plugin *owner,
                                const ThemeIcon &icon,
                                std::function<void()> cb,
                                Widget *widget,
-                               int order)
+                               int order,
+                               bool openExternalWebApp)
 {
     Action *action = new Action(text);
 
     action->setIcon(icon);
     action->setToolTip(toolTip);
+    action->setOpenExternalWebApp(openExternalWebApp);
 
     if (widget)
     {

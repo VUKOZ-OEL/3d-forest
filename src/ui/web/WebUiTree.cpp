@@ -196,6 +196,7 @@ JsonCpp::Value WebUiTree::navigation(const std::vector<NavigationItem *> &items)
         {
             node["title"] = action->text();
             node["toolTip"] = action->toolTip();
+            node["openExternalWebApp"] = action->opensExternalWebApp();
             if (action->panel())
                 node["panel"] = widget(action->panel());
             else
