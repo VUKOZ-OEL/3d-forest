@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with 3D Forest.  If not, see <https://www.gnu.org/licenses/>.
 
-set(SUB_PROJECT_NAME "3DForestWeb")
+set(SUB_PROJECT_NAME "3DForestWebServer")
 
 file(GLOB_RECURSE SOURCES "*.cpp")
 
@@ -41,6 +41,6 @@ install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)
 
 # Install web files
 install(
-    DIRECTORY web
+    DIRECTORY client
     DESTINATION bin
 )

@@ -31,7 +31,7 @@
 #include <string>
 
 // Include local.
-#define LOG_MODULE_NAME "3dforestweb"
+#define LOG_MODULE_NAME "3dforestwebserver"
 #include <Log.hpp>
 #include <WarningsDisable.hpp>
 
@@ -49,32 +49,36 @@ int main(int argc, char *argv[])
     try
     {
         ArgumentParser arg("starts the 3D Forest web server");
-        arg.addPositional("web-root", "web", "Path to the web document root.");
-        arg.addPositional("listen-address",
-                          "127.0.0.1",
-                          "Address the web server listens on.");
-        arg.addPositional("port", "8080", "Web server port.");
-        arg.addPositional("allowed-origin",
-                          "http://127.0.0.1:8080",
-                          "Allowed browser origin.");
-        arg.addExample(
-            "3DForestWeb.exe web 127.0.0.1 8080 http://127.0.0.1:8080");
-        arg.addExample(
-            "3DForestWeb.exe web 0.0.0.0 8080 https://forest.example.org");
+        arg.add("-w", "--web-root", "client", "Path to the web document root.");
+        arg.add("-l",
+                "--listen-address",
+                "127.0.0.1",
+                "Address the web server listens on.");
+        arg.add("-p", "--port", "8080", "Web server port.");
+        arg.add("-o",
+                "--allowed-origin",
+                "http://127.0.0.1:8080",
+                "Allowed browser origin.");
+        arg.addExample("3DForestWebServer.exe --web-root client "
+                       "--listen-address 127.0.0.1 --port 8080 "
+                       "--allowed-origin http://127.0.0.1:8080");
+        arg.addExample("3DForestWebServer.exe -w client "
+                       "-l 0.0.0.0 -p 8080 "
+                       "-o https://forest.example.org");
 
         if (arg.parse(argc, argv))
         {
             WebServer::Options options;
             options.documentRoot =
-                std::filesystem::absolute(arg.toString("web-root")).string();
-            options.address = arg.toString("listen-address");
-            const uint32_t port = arg.toUint32("port");
+                std::filesystem::absolute(arg.toString("--web-root")).string();
+            options.address = arg.toString("--listen-address");
+            const uint32_t port = arg.toUint32("--port");
             if (port == 0 || port > 65535)
             {
                 throw std::invalid_argument("Invalid web server port");
             }
             options.port = static_cast<std::uint16_t>(port);
-            options.allowedOrigin = arg.toString("allowed-origin");
+            options.allowedOrigin = arg.toString("--allowed-origin");
 
             std::cout << "Listening on " << options.address << ':'
                       << options.port
