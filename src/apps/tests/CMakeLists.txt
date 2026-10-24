@@ -26,6 +26,7 @@ file(GLOB_RECURSE SOURCES "*.cpp")
 file(GLOB_RECURSE SOURCES_CORE "../../core/tests/*.cpp")
 file(GLOB_RECURSE SOURCES_EDITOR "../../editor/tests/*.cpp")
 file(GLOB_RECURSE SOURCES_PLUGIN_DESCRIPTOR "../../plugins/ComputeDescriptor/tests/*.cpp")
+file(GLOB_RECURSE SOURCES_WEB "../3dforest/web/tests/*.cpp")
 
 add_executable(
     ${SUB_PROJECT_NAME}
@@ -33,6 +34,7 @@ add_executable(
     ${SOURCES_CORE}
     ${SOURCES_EDITOR}
     ${SOURCES_PLUGIN_DESCRIPTOR}
+    ${SOURCES_WEB}
     ../../plugins/ComputeDescriptor/ComputeDescriptorAction.cpp
     ../../plugins/ComputeDescriptor/ComputeDescriptorPca.cpp
 )
@@ -50,6 +52,7 @@ target_link_libraries(
     ${SUB_PROJECT_NAME}
     PUBLIC
     3DForestEditor
+    3DForestUiWeb
 )
 
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)

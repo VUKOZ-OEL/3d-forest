@@ -17,7 +17,7 @@
 
 set(SUB_PROJECT_NAME "3DForestWebServer")
 
-file(GLOB_RECURSE SOURCES "*.cpp")
+file(GLOB SOURCES "*.cpp")
 
 include(../../../../cmake/githash.cmake)
 

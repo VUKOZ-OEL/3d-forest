@@ -23,7 +23,9 @@
 #define TEST_HPP
 
 // Include std.
+#include <functional>
 #include <iostream>
+#include <utility>
 #include <vector>
 
 /** Test. */
@@ -52,12 +54,26 @@ public:
         testCases_.push_back(testCase);
     }
 
+    void addCleanup(std::function<void()> cleanup)
+    {
+        cleanups_.push_back(std::move(cleanup));
+    }
+
     void run()
     {
-        for (auto &testCase : testCases_)
+        try
         {
-            testCase->run();
+            for (auto &testCase : testCases_)
+            {
+                testCase->run();
+            }
         }
+        catch (...)
+        {
+            runCleanups();
+            throw;
+        }
+        runCleanups();
     }
 
     void addResult(const char *condition, bool pass, const char *file, int line)
@@ -88,6 +104,24 @@ private:
     int testsPassed_;
     int testsFailed_;
     std::vector<Test::TestCase *> testCases_;
+    std::vector<std::function<void()>> cleanups_;
+
+    void runCleanups()
+    {
+        for (auto cleanup = cleanups_.rbegin(); cleanup != cleanups_.rend();
+             ++cleanup)
+        {
+            try
+            {
+                (*cleanup)();
+            }
+            catch (...)
+            {
+                addResult("test cleanup", false, __FILE__, __LINE__);
+            }
+        }
+        cleanups_.clear();
+    }
 };
 
 #define TEST(cond)                                                             \

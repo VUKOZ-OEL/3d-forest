@@ -25,8 +25,12 @@
 // Include 3D Forest.
 #include <Box.hpp>
 
+// Include local.
+#include <ExportEditor.hpp>
+#include <WarningsDisable.hpp>
+
 /** Point3. */
-class Point3
+class EXPORT_EDITOR Point3
 {
 public:
     /** Point3 IO. */
@@ -81,5 +85,7 @@ inline std::ostream &operator<<(std::ostream &out, const Point3 &in)
 {
     return out << toString(in);
 }
+
+#include <WarningsEnable.hpp>
 
 #endif /* POINT_3_HPP */
