@@ -1,20 +1,47 @@
-iLand - the individual-based forest landscape and disturbance model
-===================================================================
+# iLand — Forest Landscape Model
 
-iLand is a forest landscape model and simulates how individual trees grow, compete, die, and regenerate under various climate, disturbance, and management scenarios.
-Spanning scales from watersheds to landscapes (10,000+ hectares), iLand projects forest dynamics over decades and centuries, estimating species composition, stand structure, carbon storage, 
-and potential impacts of climate change on disturbances and ecosystem services. 
+iLand is an individual-based forest landscape and disturbance model that simulates how individual trees grow, compete, die, and regenerate under different climate, disturbance, and forest management scenarios.
 
-Used by a growing research community, this open-source tool (GNU GPL) is hosted at the Technical University of Munich but employed by research groups worldwide. The model
-has been steadily developed over the last 15 years and has been used on in more than 40 peer reviewed research papers.
+Operating at scales ranging from watersheds to landscapes of 10,000+ hectares, iLand projects forest dynamics over decades and centuries. It supports the analysis of species composition, stand structure, carbon storage, climate change impacts, natural disturbances, and ecosystem services.
 
-## Resources
+Originally developed as a C++ application using the Qt framework, iLand has been used by research groups worldwide and has contributed to numerous peer-reviewed scientific publications.
 
-* Offical home page: https://iland-model.org
-* Scientifc publications: https://iland-model.org/iLand+publications
-* Discord-community-channel: https://discord.gg/e5trneUKav or https://tinyurl.com/iland-discord
+## About this port
 
-## About this version
-The original iLand is a C++ application that uses the Qt toolkit.
-This version is built as a shared library and does not require Qt.
-The library exposes a single function runilandmodel to run the iLand model.
+This repository contains a modified version of iLand adapted to build as a shared library rather than a standalone Qt application.
+
+Key differences from the original application:
+
+- **Shared library:** The model is built as a library for integration into other applications.
+- **No Qt:** All Qt dependencies have been removed.
+- **Bundled dependencies:** All other required dependencies are included in the package.
+- **Single entry point:** The library exposes `runilandmodel` as the entry point for running the model.
+
+The goal of this port is to make the iLand model available for programmatic use and integration without requiring the original Qt application.
+
+## Example build instructions
+
+```cmd
+cmake -S . -B build -G "Unix Makefiles"
+cmake --build build
+```
+
+## Tests
+
+The test suite includes a compatibility benchmark that runs this library and
+official iLand 2.1 on the permafrost borehole model, then compares their output
+databases. Their results currently match for this dataset. Running the
+benchmark requires Qt to build the official iLand 2.1 application; See the
+[benchmark instructions](tests/benchmarks/permafrost-borehole-v2.1/README.md).
+
+## Original project and resources
+
+This port is based on the original iLand forest landscape model.
+
+- **Official website:** https://iland-model.org
+- **Scientific publications:** https://iland-model.org/iLand+publications
+- **Community Discord:** https://discord.gg/e5trneUKav
+
+## License
+
+iLand is distributed under the GNU General Public License (GPL). Please refer to the original project and the license files in this repository for applicable licensing terms.

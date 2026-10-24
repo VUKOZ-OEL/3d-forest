@@ -125560,13 +125560,19 @@ SQLITE_PRIVATE void sqlite3MarkAllShadowTablesOf(sqlite3 *db, Table *pTab){
 ** restored to its original value prior to this routine returning.
 */
 SQLITE_PRIVATE int sqlite3ShadowTableName(sqlite3 *db, const char *zName){
+  char *zCopy;
   char *zTail;                  /* Pointer to the last "_" in zName */
   Table *pTab;                  /* Table that zName is a shadow of */
-  zTail = strrchr(zName, '_');
-  if( zTail==0 ) return 0;
+  zCopy = sqlite3_mprintf("%s", zName);
+  if( zCopy==0 ) return 0;
+  zTail = strrchr(zCopy, '_');
+  if( zTail==0 ){
+    sqlite3_free(zCopy);
+    return 0;
+  }
   *zTail = 0;
-  pTab = sqlite3FindTable(db, zName, 0);
-  *zTail = '_';
+  pTab = sqlite3FindTable(db, zCopy, 0);
+  sqlite3_free(zCopy);
   if( pTab==0 ) return 0;
   if( !IsVirtual(pTab) ) return 0;
   return sqlite3IsShadowTableOf(db, pTab, zName);
@@ -131580,7 +131586,7 @@ static void unistrFunc(
   }
   i = j = 0;
   while( i<nIn ){
-    char *z = strchr(&zIn[i],'\\');
+    const char *z = strchr(&zIn[i],'\\');
     if( z==0 ){
       n = nIn - i;
       memmove(&zOut[j], &zIn[i], n);

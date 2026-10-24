@@ -99,9 +99,9 @@ inline void RGenerators::seed(unsigned int oneSeed)
     legacySeed = oneSeed;
     for (int i=0;i<16;i++)
         state[i] = legacyRand();
+    g_seed = legacyRand();
     index = 0;
     x=123456789, y=362436069, z=521288629;
-    g_seed = oneSeed;
 }
 
 // static variables

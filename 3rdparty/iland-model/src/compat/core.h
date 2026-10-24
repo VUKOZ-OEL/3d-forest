@@ -221,9 +221,67 @@ class QRegularExpression;
 
 class QString {
   std::u16string s_;
-  static std::u16string decode(const std::string &v) {
-    return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}
-        .from_bytes(v);
+
+  static std::u16string decode(const std::string& v) {
+      std::u16string out;
+
+      for (std::size_t i = 0; i < v.size();) {
+          const auto b0 = static_cast<unsigned char>(v[i]);
+          char32_t cp = 0;
+          std::size_t length = 0;
+
+          if (b0 <= 0x7F) {
+              cp = b0;
+              length = 1;
+          } else if (b0 >= 0xC2 && b0 <= 0xDF) {
+              cp = b0 & 0x1F;
+              length = 2;
+          } else if (b0 >= 0xE0 && b0 <= 0xEF) {
+              cp = b0 & 0x0F;
+              length = 3;
+          } else if (b0 >= 0xF0 && b0 <= 0xF4) {
+              cp = b0 & 0x07;
+              length = 4;
+          }
+
+          bool valid = length != 0 && i + length <= v.size();
+          if (valid) {
+              for (std::size_t j = 1; j < length; ++j) {
+                  const auto b = static_cast<unsigned char>(v[i + j]);
+                  if ((b & 0xC0) != 0x80) {
+                      valid = false;
+                      break;
+                  }
+                  cp = (cp << 6) | (b & 0x3F);
+              }
+
+              // Reject overlong forms, surrogates, and out-of-range code points.
+              valid = valid &&
+                  !((length == 2 && cp < 0x80) ||
+                    (length == 3 && cp < 0x800) ||
+                    (length == 4 && cp < 0x10000) ||
+                    (cp >= 0xD800 && cp <= 0xDFFF) ||
+                    cp > 0x10FFFF);
+          }
+
+          if (!valid) {
+              out.push_back(u'\uFFFD');
+              ++i; // Skip the invalid byte and continue.
+              continue;
+          }
+
+          if (cp <= 0xFFFF) {
+              out.push_back(static_cast<char16_t>(cp));
+          } else {
+              cp -= 0x10000;
+              out.push_back(static_cast<char16_t>(0xD800 + (cp >> 10)));
+              out.push_back(static_cast<char16_t>(0xDC00 + (cp & 0x3FF)));
+          }
+
+          i += length;
+      }
+
+      return out;
   }
 
 public:
@@ -250,8 +308,44 @@ public:
   }
   static QString fromStdString(const std::string &s) { return QString(s); }
   std::string toStdString() const {
-    return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}
-        .to_bytes(s_);
+      std::string out;
+      out.reserve(s_.size() * 3); // Most UTF-16 code units need at most 3 UTF-8 bytes.
+
+      auto appendUtf8 = [&out](char32_t cp) {
+          if (cp <= 0x7F) {
+              out.push_back(static_cast<char>(cp));
+          } else if (cp <= 0x7FF) {
+              out.push_back(static_cast<char>(0xC0 | (cp >> 6)));
+              out.push_back(static_cast<char>(0x80 | (cp & 0x3F)));
+          } else if (cp <= 0xFFFF) {
+              out.push_back(static_cast<char>(0xE0 | (cp >> 12)));
+              out.push_back(static_cast<char>(0x80 | ((cp >> 6) & 0x3F)));
+              out.push_back(static_cast<char>(0x80 | (cp & 0x3F)));
+          } else {
+              out.push_back(static_cast<char>(0xF0 | (cp >> 18)));
+              out.push_back(static_cast<char>(0x80 | ((cp >> 12) & 0x3F)));
+              out.push_back(static_cast<char>(0x80 | ((cp >> 6) & 0x3F)));
+              out.push_back(static_cast<char>(0x80 | (cp & 0x3F)));
+          }
+      };
+
+      for (std::size_t i = 0; i < s_.size(); ++i) {
+          char32_t cp = s_[i];
+
+          if (cp >= 0xD800 && cp <= 0xDBFF) { // High surrogate
+              if (i + 1 < s_.size() && s_[i + 1] >= 0xDC00 && s_[i + 1] <= 0xDFFF) {
+                  cp = 0x10000 + ((cp - 0xD800) << 10) + (s_[++i] - 0xDC00);
+              } else {
+                  cp = 0xFFFD;
+              }
+          } else if (cp >= 0xDC00 && cp <= 0xDFFF) { // Unpaired low surrogate
+              cp = 0xFFFD;
+          }
+
+          appendUtf8(cp);
+      }
+
+      return out;
   }
   QByteArray toUtf8() const { return toStdString(); }
   QByteArray toLocal8Bit() const { return toUtf8(); }

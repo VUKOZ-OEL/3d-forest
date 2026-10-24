@@ -1,6 +1,7 @@
 #pragma once
 #include "core.h"
 #include <sqlite3.h>
+#include <utility>
 class QSqlQuery;
 class QSqlRecord;
 class QSqlError {

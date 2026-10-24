@@ -25,7 +25,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
         -Wno-sign-conversion
         -Wno-conversion
         -Wno-float-equal
-        -Wno-old-style-cast
+        $<$<COMPILE_LANGUAGE:CXX>:-Wno-old-style-cast>
     )
 elseif(MSVC)
     target_compile_options(qjs PRIVATE

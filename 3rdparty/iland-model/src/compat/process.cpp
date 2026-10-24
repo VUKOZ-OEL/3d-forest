@@ -1,7 +1,9 @@
 #include "compat.h"
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
 #include <windows.h>
 QString QCoreApplication::applicationDirPath() {
   std::vector<wchar_t> path(32768);

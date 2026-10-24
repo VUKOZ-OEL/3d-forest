@@ -574,7 +574,12 @@ int unevenlist[25] = { 11,13,7,17, 1,19,5,21, 9,23,3,15,
 // sort function
 bool sortPairLessThan(const QPair<int, double> &s1, const QPair<int, double> &s2)
 {
-    return s1.second < s2.second;
+    if (s1.second < s2.second)
+        return true;
+    if (s2.second < s1.second)
+        return false;
+    // Use the pixel index to order equal basal-area totals deterministically.
+    return s1.first < s2.first;
 }
 
 struct SInitPixel {
@@ -586,14 +591,28 @@ struct SInitPixel {
     SInitPixel(): basal_area(0.), resource_unit(0), h_max(-1.), locked(false) {}
 };
 
+bool sortInitPixelPositionLessThan(const SInitPixel &s1, const SInitPixel &s2)
+{
+    // Pixel offsets are unique within the grid and provide a deterministic tie-break.
+    if (s1.pixelOffset.x() != s2.pixelOffset.x())
+        return s1.pixelOffset.x() < s2.pixelOffset.x();
+    return s1.pixelOffset.y() < s2.pixelOffset.y();
+}
+
 bool sortInitPixelLessThan(const SInitPixel &s1, const SInitPixel &s2)
 {
-    return s1.basal_area < s2.basal_area;
+    if (s1.basal_area < s2.basal_area)
+        return true;
+    if (s2.basal_area < s1.basal_area)
+        return false;
+    return sortInitPixelPositionLessThan(s1, s2);
 }
 
 bool sortInitPixelUnlocked(const SInitPixel &s1, const SInitPixel &s2)
 {
-    return !s1.locked && s2.locked;
+    if (s1.locked != s2.locked)
+        return !s1.locked;
+    return sortInitPixelPositionLessThan(s1, s2);
 }
 
 /**

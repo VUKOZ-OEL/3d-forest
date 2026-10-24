@@ -136,7 +136,8 @@ bool Patches::createPatch(double x, double y, QString shape_string, int id)
     int s_id = ForestManagementEngine::standGrid()->grid().constValueAt(x,y);
     if (mStand->id() != s_id)
         return false;
-
+    // Patch creation from a shape is not implemented in this port yet.
+    return false;
 }
 
 QList<Patch*> Patches::createStrips(double width, bool horizontal)

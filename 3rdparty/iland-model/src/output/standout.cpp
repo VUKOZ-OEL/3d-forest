@@ -43,7 +43,7 @@ StandOut::StandOut()
               << OutputColumn("dbh_avg_cm", "average dbh (cm)", OutDouble)
               << OutputColumn("height_avg_m", "average tree height (m)", OutDouble)
               << OutputColumn("volume_m3", "volume (geomery, taper factor) in m3", OutDouble)
-              << OutputColumn("total_carbon_kg", "total carbon in living biomass (aboveground compartments and roots) of all living trees (including regeneration layer) (kg/ha)", OutDouble)
+              << OutputColumn("total_carbon_kg", "total carbon in living biomass (aboveground compartments and roots) of all living trees (kg/ha)", OutDouble)
               << OutputColumn("gwl_m3", "'gesamtwuchsleistung' (total growth including removed/dead trees) volume (geomery, taper factor) in m3", OutDouble)
               << OutputColumn("basal_area_m2", "total basal area at breast height (m2)", OutDouble)
               << OutputColumn("NPP_kg", "sum of NPP (aboveground + belowground) kg Biomass/ha", OutDouble)
@@ -91,7 +91,8 @@ void StandOut::exec()
             *this << currentYear() << ru->index() << ru->id() << rus->species()->id() << ru->stockableArea()/cRUArea; // keys
             // *this << ru->boundingBox().center().x() << ru->boundingBox().center().y();  // temp
             *this << stat.count() << stat.dbh_avg() << stat.height_avg()
-                    << stat.volume() << stat.totalCarbon() << stat.gwl() << stat.basalArea()
+                    // iLand 2.1's stand output excludes carbon in the regeneration layer.
+                    << stat.volume() << (stat.totalCarbon() - stat.cRegeneration()) << stat.gwl() << stat.basalArea()
                     << stat.npp() << stat.nppAbove() << stat.leafAreaIndex() << stat.cohortCount() << stat.saplingBasalArea();
             writeRow();
         }

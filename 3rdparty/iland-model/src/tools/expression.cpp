@@ -63,6 +63,7 @@
 #include <QtCore/QMutex>
 #include "global.h"
 #include "expression.h"
+#include <cstring>
 
 #include "exception.h"
 #include "expressionwrapper.h"
@@ -221,11 +222,7 @@ void Expression::setExpression(const QString& aExpression)
     if (m_expr)
         delete[] m_expr;
     m_expr=new char[ba.length()+1]; // reserve memory...
-#if defined(Q_CC_INTEL) || defined(Q_CC_GNU)
-    strcpy(m_expr, ba.constData());
-#else
-    strcpy_s(m_expr, (size_t) ba.size()+1, ba.constData());
-#endif
+    std::memcpy(m_expr, ba.constData(), static_cast<size_t>(ba.size()) + 1);
 
     m_pos=m_expr;  // set starting point...
 

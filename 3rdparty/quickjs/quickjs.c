@@ -27736,7 +27736,9 @@ static char *js_default_module_normalize_name(JSContext *ctx,
                                               const char *base_name,
                                               const char *name)
 {
-    char *filename, *p;
+    char *filename;
+    char *p;
+    const char *base_slash;
     const char *r;
     int cap;
     int len;
@@ -27746,9 +27748,9 @@ static char *js_default_module_normalize_name(JSContext *ctx,
         return js_strdup(ctx, name);
     }
 
-    p = strrchr(base_name, '/');
-    if (p)
-        len = p - base_name;
+    base_slash = strrchr(base_name, '/');
+    if (base_slash)
+        len = base_slash - base_name;
     else
         len = 0;
 

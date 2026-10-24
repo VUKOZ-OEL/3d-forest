@@ -246,11 +246,11 @@ inline void MTRand::seed()
 	// Otherwise use a hash of time() and clock() values
 	
 	// First try getting an array from /dev/urandom
-#if defined(Q_CC_INTEL) || defined(Q_CC_GNU)
-    FILE* urandom = fopen( "/dev/urandom", "rb" );
-#else
+#if defined(_WIN32)
     FILE* urandom;
     fopen_s(&urandom, "/dev/urandom", "rb" );
+#else
+    FILE* urandom = fopen( "/dev/urandom", "rb" );
 #endif
 	if( urandom )
 	{
