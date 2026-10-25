@@ -88,7 +88,10 @@ void ThreadLoop::stop()
 {
     LOG_DEBUG(<< "Stop thread.");
     setState(STATE_EXIT);
-    thread_->join();
+    if (thread_ && thread_->joinable())
+    {
+        thread_->join();
+    }
 }
 
 void ThreadLoop::wait()
@@ -99,7 +102,10 @@ void ThreadLoop::wait()
     waiting_ = true;
     condition_.notify_one();
     mutexlock.unlock();
-    thread_->join();
+    if (thread_ && thread_->joinable())
+    {
+        thread_->join();
+    }
 }
 
 void ThreadLoop::setState(State state)
