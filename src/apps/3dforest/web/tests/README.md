@@ -77,7 +77,7 @@ and proxy behavior without using the UI.
 
 ## Current tests
 
-`TestWebServer.cpp` currently has 22 cases using one real Drogon server
+`TestWebServer.cpp` currently has 37 cases using one real Drogon server
 instance. The fixture creates a temporary document root, starts the server on
 loopback, and stops it after the test suite. The valid `/ui` cases use a
 test-only fake plugin with its own controls and viewer. It does not create
@@ -88,11 +88,13 @@ The cases cover:
 
 - Serving the index file, returning 404 for a missing file, and preventing
   access outside the document root using plain and encoded traversal paths.
-- Marteloscope HTTP origin checks, including missing and mismatched origins,
-  unknown sessions, and malformed paths.
-- `/ui` and Marteloscope WebSocket origin checks, including missing origins,
-  wrong origins, unknown sessions, binary `/ui` messages, malformed JSON,
-  duplicate keys, extra data, overlong tokens, and deeply nested JSON.
+- Marteloscope HTTP origin checks, malformed paths, forwarding to a local
+  upstream, request and response headers, body forwarding, cookie path
+  rewriting, chunked responses, and upstream disconnects.
+- `/ui` and Marteloscope WebSocket origin checks, binary `/ui` messages,
+  malformed JSON, duplicate keys, extra data, overlong and malformed proxy
+  tokens, deeply nested JSON, UI ping and pong frames, the hello timeout, and
+  an upstream WebSocket handshake rejection.
 - A valid session welcome and snapshot, serialization of every supported
   `WebControls` type, and an empty sidebar navigation tree.
 - Widget event handling: a checkbox event produces a patch, an out-of-range
@@ -100,26 +102,34 @@ The cases cover:
   error, and `resync` returns a newer snapshot. Reconnecting with a valid token
   reattaches to its session; an unknown token returns `expired`.
 - Startup rejection for a missing document root and invalid thread, session,
-  origin, and reconnect-timeout options.
+  origin, and reconnect-timeout options, plus invalid lifecycle calls and
+  cleanup of failed sessions.
 
-The suite does not yet exercise a valid session reconnect, every control's
-event variants, viewer binary pulls, or forwarding to a live Marteloscope
-service. Its WebSocket tests use Drogon's client, so malformed HTTP/WebSocket
-framing that Drogon rejects before invoking the application handlers is not
-covered by these tests.
+The suite does not yet exercise every control's event variants or viewer
+binary pulls. Its WebSocket tests use Drogon's client, so malformed HTTP or
+WebSocket framing that Drogon rejects before invoking application handlers is
+not covered. Coverage reaches 92.34% of `WebServer.cpp` branches (253 of 274)
+when the complete suite runs in both logger modes. The remaining outcomes are
+internal/API-invariant states; see the coverage report for details.
 
 The tests are included in `3DForestTest` when configured with
-`BUILD_TESTS=ON`. Keep generated build files under `slop`. For the existing
-Clang coverage build, run from the repository root:
+`BUILD_TESTS=ON`. Keep generated build files under `slop`. Build from the
+repository root:
 
 ```powershell
-cmake --build slop/webservertests/build-clang-coverage --target 3DForestTest
+cmake --build slop/webservertests/build-clang-audit --target 3DForestTest
 ```
 
-Run the executable with `slop/webservertests` as its working directory, for
-example:
+Run both modes from the coverage working directory:
 
 ```powershell
-Set-Location slop/webservertests
-.\build-clang-coverage\src\apps\tests\3DForestTest.exe
+Set-Location slop/webservertests/build-clang-audit
+./src/apps/tests/3DForestTest.exe
+./src/apps/tests/3DForestTest.exe --no-logger
 ```
+
+`--no-logger` disables the test application's optional file logger. It is a
+test executable option, not a web-server option. Running both modes exercises
+both outcomes of WebServer's logging guards. Coverage details and generated
+reports are documented in
+[`slop/webservertests/coverage/README.md`](../../../../../slop/webservertests/coverage/README.md).

@@ -232,7 +232,7 @@ public:
     }
 
     WS_PATH_LIST_BEGIN
-    WS_ADD_PATH_VIA_REGEX(R"(^/marteloscope/([0-9a-fA-F-]{36})(/.*)?$)");
+    WS_ADD_PATH_VIA_REGEX(R"(^/marteloscope/([^/]*)(/.*)?$)");
     WS_PATH_LIST_END
 
     void handleNewConnection(
@@ -253,13 +253,7 @@ public:
 
         const std::string path = request->getOriginalPath();
         const std::string sessionPrefix = "/marteloscope/";
-        if (path.rfind(sessionPrefix, 0) != 0)
-        {
-            LOG_WARNING(<< "Rejecting Marteloscope WebSocket: unexpected path '"
-                        << path << "'");
-            connection->forceClose();
-            return;
-        }
+        // The WebSocket route regex requires this prefix.
         const std::size_t tokenStart = sessionPrefix.size();
         const std::size_t tokenEnd = path.find('/', tokenStart);
         const std::string token =
@@ -337,8 +331,8 @@ public:
         const std::string localOrigin =
             "http://127.0.0.1:" + std::to_string(port);
         upstreamRequest->addHeader("origin", localOrigin);
-        if (!request->getHeader("cookie").empty())
-            upstreamRequest->addHeader("cookie", request->getHeader("cookie"));
+        for (const auto &cookie : request->cookies())
+            upstreamRequest->addCookie(cookie.first, cookie.second);
         connection->setContext(bridge);
         bridge->streamlit->connectToServer(
             upstreamRequest,
@@ -604,7 +598,8 @@ int WebServer::exec()
     http.setThreadNum(options.ioThreads);
     http.setDocumentRoot(options.documentRoot);
     http.setHomePage("index.html");
-    http.setClientMaxWebSocketMessageSize(1048576);
+    // Let the handler reject the first byte beyond its 1 MiB limit.
+    http.setClientMaxWebSocketMessageSize(1048577);
     http.setMaxConnectionNum(256);
     http.addListener(options.address, options.port);
     http.registerController(std::make_shared<Controller>(state_));

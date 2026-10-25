@@ -22,15 +22,23 @@
 // Include 3D Forest.
 #include <Test.hpp>
 
+// Include std.
+#include <string>
+
 // Include local.
 #define LOG_MODULE_NAME "tests"
 #include <Log.hpp>
 
-int main()
+int main(int argc, char **argv)
 {
     int rc = 1;
 
-    LOGGER_START_FILE("log_tests.txt");
+    const bool loggerStarted =
+        argc < 2 || std::string(argv[1]) != "--no-logger";
+    if (loggerStarted)
+    {
+        LOGGER_START_FILE("log_tests.txt");
+    }
 
     try
     {
@@ -51,7 +59,10 @@ int main()
         std::cerr << "error: " << e.what() << std::endl;
     }
 
-    LOGGER_STOP_FILE;
+    if (loggerStarted)
+    {
+        LOGGER_STOP_FILE;
+    }
 
     return rc;
 }
