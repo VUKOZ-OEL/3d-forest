@@ -65,7 +65,6 @@ if(QT_VERSION_MAJOR EQUAL 5)
         Qt${QT_VERSION_MAJOR}::Gui
         Qt${QT_VERSION_MAJOR}::Widgets
         Qt${QT_VERSION_MAJOR}::OpenGL
-        Qt${QT_VERSION_MAJOR}::OpenGLWidgets
         ${OPENGL_gl_LIBRARY}
     )
 else()

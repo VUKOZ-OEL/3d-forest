@@ -32,48 +32,22 @@ include(cmake/ThirdPartyWarnings.cmake)
 # Always require threading support (e.g., pthread on Linux)
 find_package(Threads REQUIRED)
 
-# Try to locate system OpenGL
+# Locate system OpenGL, which is required by the Qt GUI.
 find_package(OpenGL QUIET)
 
-# If set, prefer Qt5 even if Qt6 is available on the system
-if(FORCE_QT5)
-    # Explicitly search for Qt5 modules used by the GUI
-    find_package(Qt5 COMPONENTS Core Gui Widgets OpenGL)
+# Try Qt6 first, then fall back to Qt5.
+find_package(Qt6 QUIET COMPONENTS Core Gui Widgets OpenGL OpenGLWidgets)
 
-    if (Qt5_FOUND AND Qt5OpenGL_FOUND AND OpenGL_FOUND)
+if(Qt6_FOUND AND OpenGL_FOUND)
+    message(STATUS "Gui with Qt6 and OpenGL found")
+    set(QT_VERSION_MAJOR 6)
+else()
+    find_package(Qt5 COMPONENTS Core Gui Widgets OpenGL QUIET)
+    if(Qt5_FOUND AND OpenGL_FOUND)
         message(STATUS "Gui with Qt5 and OpenGL found")
         set(QT_VERSION_MAJOR 5)
-    endif()
-else()
-    # Default behavior: try Qt6 first, then fall back to Qt5
-    find_package(Qt6 QUIET COMPONENTS Core Gui Widgets)
-
-    if(Qt6_FOUND)
-        find_package(Qt6 QUIET
-            COMPONENTS Core Gui Widgets
-            OPTIONAL_COMPONENTS
-                Network
-                WebEngineWidgets
-                OpenGL
-                OpenGLWidgets
-                Concurrent
-                Qml
-                Sql
-                Xml
-        )
-    endif()
-
-    if(Qt6_FOUND AND Qt6OpenGL_FOUND AND OpenGL_FOUND)
-        message(STATUS "Gui with Qt6 and OpenGL found")
-        set(QT_VERSION_MAJOR 6)
     else()
-        find_package(Qt5 COMPONENTS Core Gui Widgets OpenGL QUIET)
-        if (Qt5_FOUND AND Qt5OpenGL_FOUND AND OpenGL_FOUND)
-            message(STATUS "Gui with Qt5 and OpenGL found")
-            set(QT_VERSION_MAJOR 5)
-        else()
-            message(STATUS "Qt library for Gui not found")
-        endif()
+        message(STATUS "Qt library for Gui not found")
     endif()
 endif()
 
