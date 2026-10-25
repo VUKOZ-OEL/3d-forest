@@ -1,7 +1,6 @@
 # Build
 bin/
-build/
-build-msvc-release/
+/build*/
 installer/
 stage/
 out/
