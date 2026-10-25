@@ -490,27 +490,27 @@ public:
             connection->forceClose();
             return;
         }
-        JsonCpp::CharReaderBuilder builder;
-        builder["collectComments"] = false;
-        builder["failIfExtra"] = true;
-        builder["rejectDupKeys"] = true;
-        builder["stackLimit"] = 32;
-        JsonCpp::Value message;
-        std::string errors;
-        const std::unique_ptr<JsonCpp::CharReader> reader(
-            builder.newCharReader());
-        if (!reader->parse(text.data(),
-                           text.data() + text.size(),
-                           &message,
-                           &errors) ||
-            !message.isObject() || !message["type"].isString())
-        {
-            connection->forceClose();
-            return;
-        }
-
         try
         {
+            JsonCpp::CharReaderBuilder builder;
+            builder["collectComments"] = false;
+            builder["failIfExtra"] = true;
+            builder["rejectDupKeys"] = true;
+            builder["stackLimit"] = 32;
+            JsonCpp::Value message;
+            std::string errors;
+            const std::unique_ptr<JsonCpp::CharReader> reader(
+                builder.newCharReader());
+            if (!reader->parse(text.data(),
+                               text.data() + text.size(),
+                               &message,
+                               &errors) ||
+                !message.isObject() || !message["type"].isString())
+            {
+                connection->forceClose();
+                return;
+            }
+
             if (!context->ready.load())
             {
                 if (message["type"] != "hello" ||

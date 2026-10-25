@@ -77,15 +77,49 @@ and proxy behavior without using the UI.
 
 ## Current tests
 
-The current cases verify static file serving:
+`TestWebServer.cpp` currently has 22 cases using one real Drogon server
+instance. The fixture creates a temporary document root, starts the server on
+loopback, and stops it after the test suite. The valid `/ui` cases use a
+test-only fake plugin with its own controls and viewer. It does not create
+navigation entries; the production `WebUiTree` still builds and serializes the
+test UI.
 
-- `TestWebServerServesIndexFile` checks that `/` returns the document root's `index.html`.
-- `TestWebServerReturnsNotFound` checks that a missing file returns HTTP 404.
+The cases cover:
 
-Both test cases use the same Drogon server instance. The fixture creates a
-temporary document root and starts the server when first used; the test runner
-stops it after all test cases complete. The protocol sections above describe
-additional cases that can be added, including crafted HTTP requests and
-WebSocket frames over a raw TCP client.
+- Serving the index file, returning 404 for a missing file, and preventing
+  access outside the document root using plain and encoded traversal paths.
+- Marteloscope HTTP origin checks, including missing and mismatched origins,
+  unknown sessions, and malformed paths.
+- `/ui` and Marteloscope WebSocket origin checks, including missing origins,
+  wrong origins, unknown sessions, binary `/ui` messages, malformed JSON,
+  duplicate keys, extra data, overlong tokens, and deeply nested JSON.
+- A valid session welcome and snapshot, serialization of every supported
+  `WebControls` type, and an empty sidebar navigation tree.
+- Widget event handling: a checkbox event produces a patch, an out-of-range
+  slider event produces an error, invalid state acknowledgements produce an
+  error, and `resync` returns a newer snapshot. Reconnecting with a valid token
+  reattaches to its session; an unknown token returns `expired`.
+- Startup rejection for a missing document root and invalid thread, session,
+  origin, and reconnect-timeout options.
 
-The tests are included in the `3DForestTest` executable when configured with `BUILD_TESTS=ON`. To keep build products and test-generated files out of the source tree, configure and build in a directory under `slop`, then run `3DForestTest` with `slop/webservertests` as its working directory.
+The suite does not yet exercise a valid session reconnect, every control's
+event variants, viewer binary pulls, or forwarding to a live Marteloscope
+service. Its WebSocket tests use Drogon's client, so malformed HTTP/WebSocket
+framing that Drogon rejects before invoking the application handlers is not
+covered by these tests.
+
+The tests are included in `3DForestTest` when configured with
+`BUILD_TESTS=ON`. Keep generated build files under `slop`. For the existing
+Clang coverage build, run from the repository root:
+
+```powershell
+cmake --build slop/webservertests/build-clang-coverage --target 3DForestTest
+```
+
+Run the executable with `slop/webservertests` as its working directory, for
+example:
+
+```powershell
+Set-Location slop/webservertests
+.\build-clang-coverage\src\apps\tests\3DForestTest.exe
+```
