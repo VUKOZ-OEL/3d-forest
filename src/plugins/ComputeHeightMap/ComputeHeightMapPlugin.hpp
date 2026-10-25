@@ -59,8 +59,8 @@ public:
     void initialize(Application *app) override;
     void release() override { delete this; }
 
-    virtual bool modifierEnabled();
-    virtual void applyModifier(Page *page);
+    bool modifierEnabled() override;
+    void applyModifier(Page *page) override;
 
 private:
     Application *app_{nullptr};

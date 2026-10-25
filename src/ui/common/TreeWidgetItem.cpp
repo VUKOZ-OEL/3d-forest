@@ -37,9 +37,9 @@ TreeWidgetItem::TreeWidgetItem(const std::vector<std::string> &texts)
 
 TreeWidgetItem::TreeWidgetItem(const TreeWidgetItem &other)
     : texts_(other.texts_),
-      editable_(other.editable_),
       checkStates_(other.checkStates_),
-      backgrounds_(other.backgrounds_)
+      backgrounds_(other.backgrounds_),
+      editable_(other.editable_)
 {
     for (const auto &child : other.children_)
     {

@@ -46,7 +46,7 @@ public:
     void initialize(Application *app) override;
     void release() override { delete this; }
 
-    virtual void importFile();
+    void importFile() override;
 
     void slotImportFile();
 

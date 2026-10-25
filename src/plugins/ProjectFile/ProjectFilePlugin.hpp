@@ -48,7 +48,7 @@ public:
     void initialize(Application *app) override;
     void release() override { delete this; }
 
-    virtual bool closeProject();
+    bool closeProject() override;
 
     void slotNewProject();
     void slotOpenProject();

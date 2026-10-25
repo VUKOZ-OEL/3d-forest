@@ -90,7 +90,7 @@ void ApplicationSettingsWidget::dataChanged(bool modifiers)
 
     app_->suspendThreads();
     app_->editor().setApplicationSettings(settings_);
-    app_->emitUpdate(this, {Message::TYPE_SETTINGS});
+    app_->emitUpdate(this, Message::TYPE_SETTINGS);
 
     if (modifiers)
     {

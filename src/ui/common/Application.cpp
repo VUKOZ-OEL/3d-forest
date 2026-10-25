@@ -345,7 +345,7 @@ void Application::updateFilter(void *sender, bool final)
 
     if (final)
     {
-        emitUpdate(sender, {Message::TYPE_FILTER});
+        emitUpdate(sender, Message::TYPE_FILTER);
     }
 
     resumeThreads();

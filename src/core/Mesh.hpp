@@ -38,7 +38,7 @@ class EXPORT_CORE Mesh
 {
 public:
     /** Mesh Geometric Primitive Type. */
-    enum class EXPORT_CORE Mode
+    enum class Mode
     {
         MODE_UNKNOWN,
         MODE_POINTS,

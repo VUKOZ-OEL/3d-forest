@@ -158,7 +158,7 @@ void ViewSettingsWidget::dataChanged(bool modifiers)
 
     app_->suspendThreads();
     app_->editor().setViewSettings(settings_);
-    app_->emitUpdate(this, {Message::TYPE_SETTINGS});
+    app_->emitUpdate(this, Message::TYPE_SETTINGS);
 
     if (modifiers)
     {

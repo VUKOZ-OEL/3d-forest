@@ -251,8 +251,8 @@ public:
 // point.
 class QDataStream {
   QFile *file_ = nullptr;
-  QByteArray *buffer_ = nullptr;
   QByteArray owned_;
+  QByteArray *buffer_ = nullptr;
   size_t pos_ = 0;
   bool good_ = true;
   bool legacyFloat_ = false;

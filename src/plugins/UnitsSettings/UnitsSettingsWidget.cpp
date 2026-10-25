@@ -118,7 +118,7 @@ void UnitsSettingsWidget::dataChanged()
 
     app_->suspendThreads();
     app_->editor().setUnitsSettings(settings_);
-    app_->emitUpdate(this, {Message::TYPE_SETTINGS});
+    app_->emitUpdate(this, Message::TYPE_SETTINGS);
 }
 
 void UnitsSettingsWidget::setUnitsSettings(const UnitsSettings &settings)

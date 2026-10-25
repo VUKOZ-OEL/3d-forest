@@ -227,7 +227,7 @@ void ComputeSkeletonAction::calculateSkeleton(ComputeSkeletonData &tree)
 void ComputeSkeletonAction::stepUpdateComputeSkeleton()
 {
     LOG_DEBUG(<< "Update <" << trees_.size() << "> trees.");
-
+#if 0
     // Get copy of current segments.
     Segments segments = editor_->segments();
 
@@ -239,7 +239,7 @@ void ComputeSkeletonAction::stepUpdateComputeSkeleton()
 
     // Set new segments to editor.
     editor_->setSegments(segments);
-
+#endif
     // Finish.
     progress_.setValueStep(progress_.maximumStep());
     progress_.setValueSteps(progress_.maximumSteps());

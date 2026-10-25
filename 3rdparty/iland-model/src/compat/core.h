@@ -1313,7 +1313,7 @@ struct QMetaObject;
 #define Q_OBJECT                                                               \
 public:                                                                        \
   static QMetaObject staticMetaObject;                                         \
-  virtual const QMetaObject *portableMetaObject() const {                      \
+  const QMetaObject *portableMetaObject() const override {                     \
     return &staticMetaObject;                                                  \
   }                                                                            \
                                                                                \

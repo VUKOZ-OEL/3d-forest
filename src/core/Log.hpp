@@ -44,7 +44,7 @@
 #include <WarningsDisable.hpp>
 
 /** Log Type. */
-enum EXPORT_CORE LogType
+enum LogType
 {
     LOG_TYPE_DEBUG,
     LOG_TYPE_WARNING,
