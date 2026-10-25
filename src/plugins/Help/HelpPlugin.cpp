@@ -41,14 +41,14 @@ void HelpPlugin::initialize(Application *app)
 
     app_->createAction(
         this,
-        {{"Help", MAIN_WINDOW_MENU_HELP_PRIORITY}},
+        {{"File", MAIN_WINDOW_MENU_FILE_PRIORITY}},
         "",
         tr("About"),
         tr("About this application"),
         THEME_ICON("question"),
         [this]() { slotAbout(); },
         nullptr,
-        100);
+        999);
 }
 
 void HelpPlugin::slotAbout()
@@ -74,6 +74,10 @@ void HelpPlugin::slotAbout()
            "Uses drogon web application server, (c) An Tao\n"
            "Uses JsonCpp, (c) Baptiste Lepilleur\n"
            "Uses zlib, (c) Jean-loup Gailly and Mark Adler\n"
+           "Uses SQLite, which is in the public domain\n"
+           "Uses pugixml, (c) Arseny Kapoulkine\n"
+           "Uses QuickJS, (c) F.Bellard, Ch.Gordon, B.Noordhuis, S.Corretge\n"
+           "Uses iLand, (c) Werner Rammer and Rupert Seidl\n"
            "\n"
            "3D Forest software license:\n"
            "This program is free software and is distributed under the GNU\n"
