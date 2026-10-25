@@ -4,6 +4,7 @@ project(sqlite LANGUAGES C)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 add_library(sqlite3 sqlite3.c)
+forest_disable_third_party_warnings(sqlite3)
 target_include_directories(sqlite3 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 set_target_properties(sqlite3 PROPERTIES
     POSITION_INDEPENDENT_CODE ON

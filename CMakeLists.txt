@@ -27,6 +27,7 @@ endif()
 
 # Project-specific compiler/language flags
 include(cmake/cxxflags.cmake)
+include(cmake/ThirdPartyWarnings.cmake)
 
 # Always require threading support (e.g., pthread on Linux)
 find_package(Threads REQUIRED)

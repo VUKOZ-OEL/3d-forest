@@ -61,22 +61,7 @@ target_compile_definitions(
     $<$<CXX_COMPILER_ID:MSVC>:_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING>
 )
 
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
-    target_compile_options(
-        ${SUB_PROJECT_NAME}
-        PRIVATE
-        -Wno-sign-conversion
-        -Wno-conversion
-        -Wno-float-equal
-        -Wno-old-style-cast
-    )
-elseif(MSVC)
-    target_compile_options(
-        ${SUB_PROJECT_NAME}
-        PRIVATE
-        /wd4244
-    )
-endif()
+forest_disable_third_party_warnings(${SUB_PROJECT_NAME})
 
 target_link_libraries(
     ${SUB_PROJECT_NAME}

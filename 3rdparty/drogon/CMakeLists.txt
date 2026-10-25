@@ -100,6 +100,7 @@ endif()
 list(TRANSFORM forest_trantor_sources PREPEND "${forest_trantor_root}/")
 add_library(trantor STATIC ${forest_trantor_sources})
 add_library(Trantor::Trantor ALIAS trantor)
+forest_disable_third_party_warnings(trantor)
 
 target_compile_features(trantor PUBLIC cxx_std_17)
 set_target_properties(trantor PROPERTIES POSITION_INDEPENDENT_CODE ON)
@@ -224,6 +225,7 @@ add_library(drogon STATIC
     orm_lib/src/RestfulController.cc
 )
 add_library(Drogon::Drogon ALIAS drogon)
+forest_disable_third_party_warnings(drogon)
 
 target_compile_features(drogon PUBLIC cxx_std_17)
 set_target_properties(drogon PROPERTIES POSITION_INDEPENDENT_CODE ON)
