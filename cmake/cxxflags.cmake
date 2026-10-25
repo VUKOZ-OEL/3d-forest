@@ -21,12 +21,19 @@ message(
 )
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    message(STATUS "Clang compiler detected, adding compile flags")
-    set(CLANG_COMPILE_FLAGS "\
+    if(CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+        message(STATUS "clang-cl frontend detected, adding compile flags")
+        set(CMAKE_CXX_STANDARD 17)
+        set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    else()
+        message(STATUS "Clang frontend detected, adding compile flags")
+        set(CLANG_COMPILE_FLAGS "\
 -D_FILE_OFFSET_BITS=64 \
 -std=c++17 \
 -pedantic -Wall -Wextra"
-    )
+        )
+
+    endif()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_COMPILE_FLAGS}")
 elseif(CMAKE_COMPILER_IS_GNUCXX)
     message(STATUS "GCC compiler detected, adding compile flags")
