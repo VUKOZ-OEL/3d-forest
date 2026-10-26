@@ -130,6 +130,7 @@ ComputeHullWidget::ComputeHullWidget(Application *app)
 
     // Buttons.
     applyButton_ = new PushButton(tr("Run"));
+    applyButton_->setPrimary(true);
     applyButton_->setIcon(THEME_ICON("run"));
     applyButton_->clicked.connect([this]() { slotApply(); });
 

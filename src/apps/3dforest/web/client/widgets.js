@@ -175,6 +175,7 @@ export function createWidget(spec, emit) {
       }
       button.disabled = !p.enabled;
       button.classList.toggle("auto-raise", !!p.autoRaise);
+      button.classList.toggle("primary-action", !!p.primary);
       button.classList.toggle("text-under", p.buttonStyle === 3);
     };
   } else if (type === "LineEdit") {
@@ -311,6 +312,14 @@ export function createWidget(spec, emit) {
       () => send("valueChanged", { value: Number(input.value) }),
       () => send("sliderReleased", { value: Number(input.value) }),
     );
+    const paint = () => {
+      const span = p.maximum - p.minimum || 1;
+      input.style.setProperty(
+        "--slider-position",
+        `${Math.max(0, Math.min(100, ((Number(input.value) - p.minimum) / span) * 100))}%`,
+      );
+    };
+    input.addEventListener("input", paint);
     input.addEventListener("keydown", (e) => {
       const delta = { ArrowLeft: -1, ArrowDown: -1, ArrowRight: 1, ArrowUp: 1 }[
         e.key
@@ -321,6 +330,7 @@ export function createWidget(spec, emit) {
           p.minimum,
           Math.min(p.maximum, Number(input.value) + delta * p.singleStep),
         );
+        paint();
         send("valueChanged", { value: Number(input.value) });
       }
     });
@@ -329,6 +339,7 @@ export function createWidget(spec, emit) {
       input.min = p.minimum;
       input.max = p.maximum;
       if (!dragging()) input.value = p.value;
+      paint();
       input.disabled = !p.enabled;
       input.classList.toggle("vertical", p.orientation === 2);
       input.setAttribute("aria-label", p.name || p.toolTip || "Slider");

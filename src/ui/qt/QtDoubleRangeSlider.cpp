@@ -217,9 +217,9 @@ bool QtDoubleRangeSlider::eventFilter(QObject *object, QEvent *event)
     painter.setPen(Qt::NoPen);
     painter.setBrush(grooveColor_);
 
-    painter.drawRoundedRect(QRectF(left, centerY - 2.0, right - left, 4.0),
-                            2.0,
-                            2.0);
+    painter.drawRoundedRect(QRectF(left, centerY - 3.0, right - left, 6.0),
+                            3.0,
+                            3.0);
 
     // Selected interval between the handles.
     const qreal selectedLeft = std::min(lower.x(), upper.x());
@@ -228,9 +228,9 @@ bool QtDoubleRangeSlider::eventFilter(QObject *object, QEvent *event)
     painter.setBrush(highlightColor_);
 
     painter.drawRoundedRect(
-        QRectF(selectedLeft, centerY - 2.0, selectedRight - selectedLeft, 4.0),
-        2.0,
-        2.0);
+        QRectF(selectedLeft, centerY - 3.0, selectedRight - selectedLeft, 6.0),
+        3.0,
+        3.0);
 
     // Paint both handles last, above the groove.
     const auto drawHandle = [&](const QPoint &center)
@@ -239,7 +239,7 @@ bool QtDoubleRangeSlider::eventFilter(QObject *object, QEvent *event)
         painter.setBrush(handleColor_);
 
         painter.drawEllipse(
-            QRectF(center.x() - 7.0, center.y() - 7.0, 14.0, 14.0));
+            QRectF(center.x() - 9.0, center.y() - 9.0, 18.0, 18.0));
     };
 
     // Draw the active handle last when the handles overlap.

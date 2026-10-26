@@ -39,6 +39,9 @@ public:
     explicit QtSlider(Slider *slider, QWidget *parent = nullptr);
     virtual ~QtSlider();
 
+protected:
+    void paintEvent(QPaintEvent *event) override;
+
 private:
     Slider *slider_;
 

@@ -56,6 +56,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QStyleHints>
+#include <QTabBar>
 
 // Include local.
 #define LOG_MODULE_NAME "QtApplication"
@@ -168,7 +169,13 @@ void QtApplication::initLayout()
     sidebar_->setMinimumWidth(220);
     sidebar_->setMaximumWidth(500);
 
-    mainWindow_.setCentralWidget(splitter_);
+    QWidget *central = new QWidget(&mainWindow_);
+    QVBoxLayout *centralLayout = new QVBoxLayout(central);
+    centralLayout->setContentsMargins(0, 0, 0, 0);
+    centralLayout->setSpacing(0);
+    centralLayout->addWidget(sidebar_->categoryBar());
+    centralLayout->addWidget(splitter_, 1);
+    mainWindow_.setCentralWidget(central);
 
     // Theme colors.
     updateTheme();

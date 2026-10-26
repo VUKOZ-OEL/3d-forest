@@ -263,6 +263,7 @@ void WebControls::sync(bool enabled, bool visible)
     {
         p["text"] = w->text();
         p["icon"] = webIcon(w->icon());
+        p["primary"] = w->isPrimary();
     }
     else if (auto *w = dynamic_cast<ToolButton *>(widget_))
     {

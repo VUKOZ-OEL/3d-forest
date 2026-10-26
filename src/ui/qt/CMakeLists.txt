@@ -23,6 +23,7 @@ if(NOT QT_VERSION_MAJOR)
 endif()
 
 set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
 
 file(GLOB_RECURSE SOURCES "*.cpp")
 # file(GLOB_RECURSE SOURCES_HELP "../../plugins/Help/*.cpp")
@@ -31,6 +32,7 @@ add_library(
     ${SUB_PROJECT_NAME}
     SHARED
     ${SOURCES}
+    resources/sidebar.qrc
 #    ${SOURCES_HELP}
     ../../../3rdparty/widgets/ctk/ctkRangeSlider.cpp
     ../../../3rdparty/widgets/ctk/ctkDoubleRangeSlider.cpp

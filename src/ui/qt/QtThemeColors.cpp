@@ -59,14 +59,14 @@ void QtThemeColors::setDarkMode(bool dark)
     surface = dark ? QColor("#ececec") : QColor("#202020");
     foreground = dark ? QColor("") : QColor("");
     disabledText = dark ? QColor("") : QColor("");
-    border = dark ? QColor("#909090") : QColor("#707070");
+    border = dark ? QColor("#77837c") : QColor("#c8ced0");
     hover = dark ? QColor("#2b2b2b") : QColor("#e8e8e8");
     pressed = dark ? QColor("") : QColor("");
-    highlight = dark ? QColor("#d0d0d0") : QColor("#505050");
+    highlight = dark ? QColor("#69bd83") : QColor("#21833f");
     highlightedText = dark ? QColor("") : QColor("");
 
-    handle = dark ? QColor("#f0f0f0") : QColor("#ffffff");
-    groove = dark ? QColor("#484848") : QColor("#c6c6c6");
+    handle = dark ? QColor("#e5ece8") : QColor("#f8faf9");
+    groove = dark ? QColor("#48534d") : QColor("#d5dcda");
 
     panelBackground = dark ? QColor("#303030") : QColor("#eeeeee");
     panelBorder = dark ? QColor("#484848") : QColor("#d4d4d4");
@@ -88,13 +88,28 @@ void QtThemeColors::setDarkMode(bool dark)
 QString QtThemeColors::getStyleSheet() const
 {
     QString styleSheet;
+    const QString navRow = darkMode_ ? "#30363a" : "#edf0f2";
+    const QString navHover = darkMode_ ? "#3a4348" : "#e4e9ec";
+    const QString navActive = darkMode_ ? "#3a4145" : "#e2f2e9";
+    const QString navAccent = darkMode_ ? "#69bd83" : "#21833f";
+    const QString navBorder = darkMode_ ? "#454d52" : "#d4dadd";
+    const QString navInput = darkMode_ ? "#202020" : "#ffffff";
+    const QString navPage = darkMode_ ? "#262626" : "#f7f7f7";
+    const QString navBody = darkMode_ ? "#2c3033" : "#f0f6f3";
+    const QString checkmark = darkMode_ ? ":/UiQt/checkmark-dark.svg"
+                                        : ":/UiQt/checkmark.svg";
+    const QString arrowSuffix = darkMode_ ? "-dark.svg" : ".svg";
 
     // clang-format off
     styleSheet = 
         "QWidget[sidebarPanel=\"true\"] {"
-        "    background-color: " + panelBackground.name() + ";"
-        "    border: 1px solid " + panelBorder.name() + ";"
-        "    border-radius: 6px;"
+        "    background-color: " + navBody + ";"
+        "    border: 1px solid " + navBorder + ";"
+        "    border-top: none;"
+        "    border-radius: 3px;"
+        "}"
+        "QWidget[sidebarPanel=\"true\"], QWidget[sidebarPanel=\"true\"] QWidget {"
+        "    font-size: 14px;"
         "}"
         ""
         "QWidget#bottomPanel {"
@@ -125,12 +140,39 @@ QString QtThemeColors::getStyleSheet() const
         "    padding-right: 2px;"
         "}"
         ""
-        "QtSidebar {"
-        "    background: " + background.name() + ";"
+        "QWidget#navigationSidebar {"
+        "    background: " + navPage + ";"
+        "    font-size: 14px;"
+        "}"
+        "QTabBar#navigationCategories {"
+        "    background: " + navRow + ";"
+        "}"
+        "QTabBar#navigationCategories::tab {"
+        "    background: " + navRow + ";"
+        "    color: " + surface.name() + ";"
+        "    padding: 12px 22px;"
+        "    border-bottom: 3px solid transparent;"
+        "    font-size: 14px;"
+        "}"
+        "QTabBar#navigationCategories::tab:hover {"
+        "    background: " + navHover + ";"
+        "}"
+        "QTabBar#navigationCategories::tab:selected {"
+        "    background: " + navActive + ";"
+        "    border-bottom-color: " + navAccent + ";"
+        "}"
+        "QLabel#navigationCategoryTitle {"
+        "    font-size: 22px; font-weight: 600;"
+        "}"
+        "QLineEdit#navigationSearch {"
+        "    background: " + navInput + ";"
+        "    border: 1px solid " + navBorder + ";"
+        "    border-radius: 3px; padding: 7px 10px;"
+        "    font-size: 13px;"
         "}"
         ""
         "QTreeWidget#sidebarNavigationTree {"
-        "    background: " + background.name() + ";"
+        "    background: " + navPage + ";"
         "    color: " + surface.name() + ";"
         "    border: none;"
         "    outline: none;"
@@ -139,15 +181,10 @@ QString QtThemeColors::getStyleSheet() const
         ""
         "QTreeWidget#sidebarNavigationTree::item {"
         "    color: " + surface.name() + ";"
-        "    min-height: 30px;"
-        "    padding: 3px 8px;"
+        "    padding: 0;"
         "    border: none;"
-        "    border-radius: 7px;"
         "}"
         ""
-        "QTreeWidget#sidebarNavigationTree::item:hover {"
-        "    background: " + hover.name() + ";"
-        "}"
         ""
         "QTreeWidget#sidebarNavigationTree::branch {"
         "    background: " + background.name() + ";"
@@ -232,6 +269,99 @@ QString QtThemeColors::getStyleSheet() const
         "    qproperty-highlightColor: " + highlight.name() + ";"
         "    qproperty-borderColor: " + border.name() + ";"
         "    qproperty-handleColor: " + handle.name() + ";"
+        "}"
+        "QWidget[sidebarPanel=\"true\"] QCheckBox {"
+        "    spacing: 8px; padding: 3px 0;"
+        "}"
+        "QWidget[sidebarPanel=\"true\"] QCheckBox::indicator {"
+        "    width: 18px; height: 18px;"
+        "    border: 1px solid " + border.name() + ";"
+        "    border-radius: 2px; background: " + navInput + ";"
+        "}"
+        "QWidget[sidebarPanel=\"true\"] QCheckBox::indicator:checked {"
+        "    background: " + navAccent + "; border-color: " + navAccent + ";"
+        "    image: url(" + checkmark + ");"
+        "}"
+        "QWidget[sidebarPanel=\"true\"] QCheckBox::indicator:indeterminate {"
+        "    background: #21833f; border-color: #21833f;"
+        "    image: url(:/UiQt/indeterminate.svg);"
+        "}"
+        "QWidget[sidebarPanel=\"true\"] QCheckBox::indicator:disabled {"
+        "    background: " + groove.name() + "; border-color: " + groove.name() + ";"
+        "}"
+        "QWidget[sidebarPanel=\"true\"] QPushButton {"
+        "    min-height: 26px; max-height: 26px; padding: 3px 12px;"
+        "}"
+        "QWidget[sidebarPanel=\"true\"] QPushButton[primaryAction=\"true\"] {"
+        "    color: #ffffff; background: #21833f; border: 1px solid #21833f;"
+        "    min-width: 88px; padding: 3px 16px;"
+        "    border-radius: 3px; font-weight: 600;"
+        "}"
+        "QWidget[sidebarPanel=\"true\"] QPushButton[primaryAction=\"true\"]:hover:enabled {"
+        "    background: #277b41; border-color: #277b41;"
+        "}"
+        "QWidget[sidebarPanel=\"true\"] QPushButton[primaryAction=\"true\"]:pressed:enabled {"
+        "    background: #196731; border-color: #196731;"
+        "}"
+        "QWidget[sidebarPanel=\"true\"] QPushButton[primaryAction=\"true\"]:disabled {"
+        "    color: " + buttonDisabled.name() + "; background: " + navRow + ";"
+        "    border-color: " + navBorder + ";"
+        "}"
+        "QWidget[sidebarPanel=\"true\"] QSlider[singleValueSlider=\"true\"]::groove:horizontal {"
+        "    height: 6px; border-radius: 3px;"
+        "}"
+        "QWidget[sidebarPanel=\"true\"] QSlider[singleValueSlider=\"true\"]::handle:horizontal {"
+        "    width: 18px; margin: -6px 0; border-radius: 9px;"
+        "}"
+        "QWidget[sidebarPanel=\"true\"] QRadioButton { spacing: 8px; padding: 3px 0; }"
+        "QWidget[sidebarPanel=\"true\"] QRadioButton::indicator {"
+        "    width: 18px; height: 18px; border-radius: 9px;"
+        "    border: 1px solid " + border.name() + "; background: " + navInput + ";"
+        "}"
+        "QWidget[sidebarPanel=\"true\"] QRadioButton::indicator:checked {"
+        "    border: none; background: transparent;"
+        "    image: url(:/UiQt/radio-checked" + arrowSuffix + ");"
+        "}"
+        "QWidget[sidebarPanel=\"true\"] QRadioButton::indicator:disabled {"
+        "    background: " + groove.name() + ";"
+        "}"
+        "QWidget[sidebarPanel=\"true\"] QLineEdit,"
+        "QWidget[sidebarPanel=\"true\"] QSpinBox,"
+        "QWidget[sidebarPanel=\"true\"] QDoubleSpinBox,"
+        "QWidget[sidebarPanel=\"true\"] QComboBox {"
+        "    background: " + navInput + "; border: 1px solid " + navBorder + ";"
+        "    border-radius: 3px; padding: 3px; min-height: 22px;"
+        "}"
+        "QWidget[sidebarPanel=\"true\"] QAbstractSpinBox QLineEdit {"
+        "    border: none; background: transparent; padding: 0; min-height: 0;"
+        "}"
+        "QWidget[sidebarPanel=\"true\"] QAbstractSpinBox {"
+        "    padding-right: 20px; min-width: 58px;"
+        "}"
+        "QWidget[sidebarPanel=\"true\"] QSpinBox::up-button,"
+        "QWidget[sidebarPanel=\"true\"] QDoubleSpinBox::up-button {"
+        "    subcontrol-origin: border; subcontrol-position: top right;"
+        "    width: 18px; border-left: 1px solid " + navBorder + ";"
+        "}"
+        "QWidget[sidebarPanel=\"true\"] QSpinBox::down-button,"
+        "QWidget[sidebarPanel=\"true\"] QDoubleSpinBox::down-button {"
+        "    subcontrol-origin: border; subcontrol-position: bottom right;"
+        "    width: 18px; border-left: 1px solid " + navBorder + ";"
+        "    border-top: 1px solid " + navBorder + ";"
+        "}"
+        "QWidget[sidebarPanel=\"true\"] QSpinBox::up-arrow,"
+        "QWidget[sidebarPanel=\"true\"] QDoubleSpinBox::up-arrow {"
+        "    image: url(:/UiQt/chevron-up" + arrowSuffix + "); width: 10px; height: 6px;"
+        "}"
+        "QWidget[sidebarPanel=\"true\"] QSpinBox::down-arrow,"
+        "QWidget[sidebarPanel=\"true\"] QDoubleSpinBox::down-arrow,"
+        "QWidget[sidebarPanel=\"true\"] QComboBox::down-arrow {"
+        "    image: url(:/UiQt/chevron-down" + arrowSuffix + "); width: 10px; height: 6px;"
+        "}"
+        "QWidget[sidebarPanel=\"true\"] QComboBox { padding-right: 18px; }"
+        "QWidget[sidebarPanel=\"true\"] QComboBox::drop-down {"
+        "    subcontrol-origin: border; subcontrol-position: top right;"
+        "    width: 18px; border: none;"
         "}";
     // clang-format on
 

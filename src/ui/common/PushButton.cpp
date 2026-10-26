@@ -58,3 +58,13 @@ void PushButton::click()
 {
     clicked();
 }
+
+void PushButton::setPrimary(bool primary)
+{
+    if (primary_ == primary)
+    {
+        return;
+    }
+    primary_ = primary;
+    primaryChanged(primary_);
+}

@@ -27,6 +27,7 @@
 // Include Qt.
 #include <QPointer>
 #include <QSignalBlocker>
+#include <QStyle>
 
 // Include local.
 #define LOG_MODULE_NAME "QtPushButton"
@@ -43,6 +44,20 @@ QtPushButton::QtPushButton(PushButton *pushButton,
     // setIcon(iconConverter(pushButton_->icon()));
 
     const QPointer<QtPushButton> guard(this);
+    setProperty("primaryAction", pushButton_->isPrimary());
+    pushButton_->primaryChanged.connect(
+        [guard](bool primary)
+        {
+            if (guard)
+            {
+                guard->setProperty("primaryAction", primary);
+                guard->style()->unpolish(guard);
+                guard->style()->polish(guard);
+                guard->updateGeometry();
+                guard->updateIcon();
+                guard->update();
+            }
+        });
 
     pushButton_->textChanged.connect(
         [guard](const std::string &text)
@@ -77,5 +92,7 @@ QtPushButton::~QtPushButton()
 
 void QtPushButton::updateIcon()
 {
-    QPushButton::setIcon(toQIcon(pushButton_->icon(), app_->isDarkMode()));
+    QPushButton::setIcon(pushButton_->isPrimary()
+                            ? QIcon()
+                            : toQIcon(pushButton_->icon(), app_->isDarkMode()));
 }

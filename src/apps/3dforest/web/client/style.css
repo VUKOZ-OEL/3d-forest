@@ -9,6 +9,15 @@
   --hover: #e5edf4;
   --selection: #e9e9e9;
   --focus: #0078d4;
+  --nav-row: #edf0f2;
+  --nav-hover: #e4e9ec;
+  --nav-active: #e2f2e9;
+  --nav-accent: #21833f;
+  --nav-border: #d4dadd;
+  --nav-body: #f0f6f3;
+  --slider-groove: #d5dcda;
+  --slider-handle: #f8faf9;
+  --slider-border: #c8ced0;
   --icon-size: 16px;
   font:
     12px "Segoe UI",
@@ -56,18 +65,67 @@ select:focus-visible,
 #application {
   height: 100vh;
   display: flex;
+  flex-direction: column;
   min-width: 560px;
+}
+#categories {
+  display: flex;
+  flex: 0 0 44px;
+  overflow-x: auto;
+  background: var(--nav-row);
+  border-bottom: 1px solid var(--nav-border);
+}
+#categories .category-tab {
+  flex: none;
+  min-width: 80px;
+  padding: 0 22px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  font-size: 14px;
+}
+#categories .category-tab:hover {
+  background: var(--nav-hover);
+}
+#categories .category-tab[aria-selected="true"] {
+  background: var(--nav-active);
+  border-bottom-color: var(--nav-accent);
+}
+#workspace {
+  display: flex;
+  flex: 1;
+  min-height: 0;
 }
 #sidebar {
   flex: 0 0 276px;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   background: var(--page);
+  font-size: 14px;
 }
 #controls {
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   overflow: auto;
   scrollbar-width: thin;
-  padding-bottom: 12px;
+  padding: 0 12px 12px;
+}
+#category-title {
+  margin: 14px 12px 12px;
+  font-size: 22px;
+  font-weight: 600;
+}
+#tool-search {
+  flex: none;
+  margin: 0 12px 14px;
+  padding: 7px 10px;
+  border: 1px solid var(--nav-border);
+  border-radius: 3px;
+  background: var(--input);
+  font-size: 13px;
+  min-width: 0;
 }
 .app-splitter {
   flex: 0 0 4px;
@@ -119,28 +177,134 @@ select:focus-visible,
 #viewer > .widget > .widget-content {
   height: 100%;
 }
-.nav-title {
+#controls .nav-title {
   width: 100%;
-  height: 36px;
-  border: 0;
-  background: none;
+  min-height: 40px;
+  border: 1px solid var(--nav-border);
+  border-radius: 3px;
+  background: var(--nav-row);
   text-align: left;
-  padding: 0 10px;
-  white-space: nowrap;
+  padding: 10px 34px 10px 12px;
+  white-space: normal;
+  position: relative;
+  font-size: 14px;
 }
-.nav-title:hover {
-  background: var(--hover);
+#controls .nav-title:hover {
+  background: var(--nav-hover);
 }
-.nav-group {
-  font-weight: 700;
+#controls .nav-title[aria-expanded="true"] {
+  background: var(--nav-active);
+  border-radius: 3px 3px 0 0;
+  font-weight: 600;
+}
+.nav-title[aria-expanded]::after {
+  content: "";
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  width: 8px;
+  height: 8px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+}
+.nav-title[aria-expanded="true"]::after {
+  transform: rotate(45deg);
+  top: 13px;
+}
+.nav-section {
+  margin-bottom: 5px;
+}
+.nav-children {
+  padding: 6px 0 0 8px;
 }
 .nav-panel {
-  padding: 2px 14px 8px 8px;
+  padding: 14px 12px;
+  border: 1px solid var(--nav-border);
+  border-top: 0;
+  border-radius: 0 0 3px 3px;
+  background: var(--nav-body);
+}
+.nav-panel input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--nav-accent);
+}
+.nav-panel input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--nav-accent);
+}
+.nav-panel .check-label {
+  gap: 8px;
+  padding: 3px 0;
+}
+.nav-panel .PushButton > button {
+  min-height: 34px;
+  height: 34px;
+  max-height: 34px;
+  padding: 3px 12px;
+}
+.nav-panel .PushButton > button.primary-action {
+  background: #21833f;
+  border: 1px solid #21833f;
+  color: #fff;
+  font-weight: 600;
+  min-height: 34px;
+  min-width: 122px;
+  padding: 4px 16px;
+}
+.nav-panel .PushButton > button.primary-action:hover:not(:disabled) {
+  background: #277b41;
+  border-color: #277b41;
+}
+.nav-panel .PushButton > button.primary-action:active:not(:disabled) {
+  background: #196731;
+  border-color: #196731;
+}
+.nav-panel .primary-action .icon {
+  display: none;
+}
+.nav-panel .Slider input[type="range"] {
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, var(--nav-accent) 0 var(--slider-position), var(--slider-groove) var(--slider-position) 100%);
+}
+.nav-panel .Slider input[type="range"].vertical {
+  background: linear-gradient(to top, var(--nav-accent) 0 var(--slider-position), var(--slider-groove) var(--slider-position) 100%);
+  width: 6px;
+  height: 120px;
+}
+.nav-panel input[type="range"]::-webkit-slider-thumb {
+  width: 18px;
+  height: 18px;
+  border-color: var(--slider-border);
+  background: var(--slider-handle);
+}
+.nav-panel input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-color: var(--slider-border);
+  background: var(--slider-handle);
+}
+.nav-panel .range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--slider-groove);
+}
+.nav-panel .range-fill {
+  border-radius: 3px;
+  background: var(--nav-accent);
+}
+.nav-panel input[type="text"],
+.nav-panel input[type="number"],
+.nav-panel select {
+  min-height: 30px;
+  padding: 3px;
+  border-color: var(--nav-border);
 }
 .nav-panel > .Widget {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 5px;
+  background: transparent;
   padding: 0;
 }
 .nav-panel .layout.vbox {
@@ -765,6 +929,15 @@ body.disconnected #application {
     --grid: #414141;
     --hover: #3a4651;
     --selection: #424242;
+    --nav-row: #30363a;
+    --nav-hover: #3a4348;
+    --nav-active: #3a4145;
+    --nav-accent: #69bd83;
+    --nav-border: #454d52;
+    --nav-body: #2c3033;
+    --slider-groove: #48534d;
+    --slider-handle: #e5ece8;
+    --slider-border: #77837c;
   }
   button {
     background: linear-gradient(#393939, #303030);

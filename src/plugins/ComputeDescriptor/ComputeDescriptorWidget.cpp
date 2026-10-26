@@ -117,6 +117,7 @@ ComputeDescriptorWidget::ComputeDescriptorWidget(Application *app)
     helpButton_->clicked.connect([this]() { slotHelp(); });
 
     applyButton_ = new PushButton(tr("Run"));
+    applyButton_->setPrimary(true);
     applyButton_->setIcon(THEME_ICON("run"));
     applyButton_->clicked.connect([this]() { slotApply(); });
 

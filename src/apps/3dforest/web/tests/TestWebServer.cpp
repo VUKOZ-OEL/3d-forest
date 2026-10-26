@@ -140,6 +140,7 @@ private:
         widget->setName(name);
         if constexpr (std::is_same_v<T, PushButton>)
         {
+            widget->setPrimary(name == "PushButton");
             if (name == "FailSession")
                 widget->clicked.connect(
                     []
@@ -1111,6 +1112,10 @@ TEST_CASE(TestWebServerPublishesTestPluginWidgetsWithoutNavigation)
     TEST(snapshot["ui"]["navigation"].isArray());
     TEST(snapshot["ui"]["navigation"].empty());
     TEST(snapshot["ui"]["bottomVisible"] == true);
+    for (const auto &widget : snapshot["widgets"])
+        if (widget["type"] == "PushButton")
+            TEST(widget["properties"]["primary"].asBool() ==
+                 (widget["properties"]["name"] == "PushButton"));
 
     const std::vector<std::string> expectedTypes = {"CheckBox",
                                                     "ColorSwitch",

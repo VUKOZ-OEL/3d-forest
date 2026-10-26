@@ -34,7 +34,14 @@
 // Include Qt.
 #include <QAbstractItemView>
 #include <QFrame>
+#include <QKeyEvent>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPainter>
+#include <QSignalBlocker>
+#include <QSlider>
 #include <QStyledItemDelegate>
+#include <QTabBar>
 #include <QTreeWidget>
 #include <QVBoxLayout>
 
@@ -47,6 +54,7 @@ namespace
 // Choose an unused role in your sidebar.
 constexpr int SidebarIndentRole = Qt::UserRole + 100;
 constexpr int SidebarPanelRole = Qt::UserRole + 101;
+constexpr int SidebarExpandedRole = Qt::UserRole + 102;
 
 class SidebarTreeWidget : public QTreeWidget
 {
@@ -56,6 +64,18 @@ public:
     }
 
 protected:
+    void keyPressEvent(QKeyEvent *event) override
+    {
+        if (event->key() == Qt::Key_Space || event->key() == Qt::Key_Return ||
+            event->key() == Qt::Key_Enter)
+        {
+            Q_EMIT itemClicked(currentItem(), 0);
+            event->accept();
+            return;
+        }
+        QTreeWidget::keyPressEvent(event);
+    }
+
     void drawRow(QPainter *painter,
                  const QStyleOptionViewItem &option,
                  const QModelIndex &index) const override
@@ -82,27 +102,67 @@ public:
                const QStyleOptionViewItem &option,
                const QModelIndex &index) const override
     {
-        QStyleOptionViewItem adjusted(option);
-
         if (index.data(SidebarPanelRole).toBool())
         {
-            adjusted.state &= ~QStyle::State_MouseOver;
+            return;
         }
-        else
+        const bool dark = parent()->property("darkNavigation").toBool();
+        const bool open = option.state & QStyle::State_Open;
+        const bool hover = option.state & QStyle::State_MouseOver;
+        const QColor border(dark ? "#454d52" : "#d4dadd");
+        const QColor text(dark ? "#eeeeee" : "#202020");
+        const QColor fill(open    ? (dark ? "#3a4145" : "#e2f2e9")
+                          : hover ? (dark ? "#3a4348" : "#e4e9ec")
+                                  : (dark ? "#30363a" : "#edf0f2"));
+        QRect rect = option.rect.adjusted(index.data(SidebarIndentRole).toInt(),
+                                          2,
+                                          -1,
+                                          open ? 0 : -3);
+        painter->save();
+        painter->setRenderHint(QPainter::Antialiasing);
+        painter->setPen(border);
+        painter->setBrush(fill);
+        painter->drawRoundedRect(rect, 3, 3);
+        if ((option.state & QStyle::State_HasFocus) &&
+            (option.state & QStyle::State_KeyboardFocusChange))
         {
-            adjusted.rect.adjust(index.data(SidebarIndentRole).toInt(),
-                                 0,
-                                 0,
-                                 0);
+            painter->setPen(QPen(QColor(dark ? "#69bd83" : "#21833f"), 1));
+            painter->setBrush(Qt::NoBrush);
+            painter->drawRoundedRect(rect.adjusted(2, 2, -2, -2), 2, 2);
         }
-
-        QStyledItemDelegate::paint(painter, adjusted, index);
+        painter->setPen(text);
+        QFont font = option.font;
+        font.setBold(open);
+        painter->setFont(font);
+        const QRect label = rect.adjusted(12, 0, -32, 0);
+        painter->drawText(label,
+                          Qt::AlignVCenter | Qt::AlignLeft,
+                          option.fontMetrics.elidedText(index.data().toString(),
+                                                        Qt::ElideRight,
+                                                        label.width()));
+        if (index.model()->rowCount(index) > 0)
+        {
+            const QPoint center(rect.right() - 18, rect.center().y());
+            QPolygon arrow;
+            if (open)
+                arrow << center + QPoint(-5, -2) << center + QPoint(0, 3)
+                      << center + QPoint(5, -2);
+            else
+                arrow << center + QPoint(-2, -5) << center + QPoint(3, 0)
+                      << center + QPoint(-2, 5);
+            painter->setPen(QPen(text, 1.5));
+            painter->setBrush(Qt::NoBrush);
+            painter->drawPolyline(arrow);
+        }
+        painter->restore();
     }
 
     QSize sizeHint(const QStyleOptionViewItem &option,
                    const QModelIndex &index) const override
     {
         QSize size = QStyledItemDelegate::sizeHint(option, index);
+        if (!index.data(SidebarPanelRole).toBool())
+            size.setHeight(45);
         size.rwidth() += index.data(SidebarIndentRole).toInt();
         return size;
     }
@@ -137,6 +197,8 @@ QtSidebar::QtSidebar(NavigationTree *navigation,
       navigation_(navigation),
       app_(application)
 {
+    setObjectName("navigationSidebar");
+    setAttribute(Qt::WA_StyledBackground, true);
     tree_ = new SidebarTreeWidget(this);
     tree_->setObjectName("sidebarNavigationTree");
 
@@ -146,19 +208,42 @@ QtSidebar::QtSidebar(NavigationTree *navigation,
     tree_->setItemsExpandable(false);
     tree_->setExpandsOnDoubleClick(false);
     tree_->setSelectionMode(QAbstractItemView::NoSelection);
-    tree_->setFocusPolicy(Qt::NoFocus);
+    tree_->setFocusPolicy(Qt::StrongFocus);
     tree_->setFrameShape(QFrame::NoFrame);
     tree_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     tree_->setIndentation(0);
     tree_->setItemDelegate(new SidebarItemDelegate(tree_));
     tree_->setSortingEnabled(false);
+    categories_ = new QTabBar(this);
+    categories_->setObjectName("navigationCategories");
+    categories_->setExpanding(false);
+    categories_->setDrawBase(false);
+    categories_->setAccessibleName(tr("Tool categories"));
+    categoryTitle_ = new QLabel(this);
+    categoryTitle_->setObjectName("navigationCategoryTitle");
+    search_ = new QLineEdit(this);
+    search_->setObjectName("navigationSearch");
+    search_->setPlaceholderText(tr("Find tool..."));
+    search_->setAccessibleName(tr("Find tool in current category"));
+    search_->setClearButtonEnabled(true);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setContentsMargins(12, 10, 12, 0);
     // layout->setContentsMargins(6, 8, 6, 8);
-    layout->setSpacing(0);
+    layout->setSpacing(12);
+    layout->addWidget(categoryTitle_);
+    layout->addWidget(search_);
+    search_->hide();
     layout->addWidget(tree_);
+    QObject::connect(categories_,
+                     &QTabBar::currentChanged,
+                     this,
+                     [this](int index) { selectCategory(index); });
+    QObject::connect(search_,
+                     &QLineEdit::textChanged,
+                     this,
+                     [this]() { filterItems(); });
 
     QObject::connect(tree_,
                      &QTreeWidget::itemClicked,
@@ -249,7 +334,7 @@ void QtSidebar::addItem(NavigationItem *item)
         ++depth;
     }
 
-    qtItem->setData(0, SidebarIndentRole, depth * 8);
+    qtItem->setData(0, SidebarIndentRole, std::max(0, depth - 1) * 8);
 
     // Binding.
     Binding binding;
@@ -265,6 +350,9 @@ void QtSidebar::addItem(NavigationItem *item)
         qtItem->setExpanded(false);
 
         bindings_.push_back(binding);
+        if (!item->parent())
+            rebuildCategories();
+        filterItems();
         return;
     }
 
@@ -302,7 +390,7 @@ void QtSidebar::addItem(NavigationItem *item)
 
         contentItem->setFlags(contentItem->flags() & ~Qt::ItemIsSelectable);
 
-        qtWidget->setContentsMargins(10, 4, 4, 10);
+        qtWidget->setContentsMargins(12, 14, 12, 14);
 
         tree_->setItemWidget(contentItem, 0, qtWidget);
         contentItem->setSizeHint(0, qtWidget->sizeHint());
@@ -314,6 +402,9 @@ void QtSidebar::addItem(NavigationItem *item)
     }
 
     bindings_.push_back(binding);
+    if (!item->parent())
+        rebuildCategories();
+    filterItems();
 }
 
 void QtSidebar::addItemRecursive(NavigationItem *item)
@@ -346,6 +437,7 @@ void QtSidebar::handleItemClick(QTreeWidgetItem *qtItem)
     if (item->type() == NavigationItem::Type::Group)
     {
         qtItem->setExpanded(!qtItem->isExpanded());
+        qtItem->setData(0, SidebarExpandedRole, qtItem->isExpanded());
 
         return;
     }
@@ -360,6 +452,7 @@ void QtSidebar::handleItemClick(QTreeWidgetItem *qtItem)
     if (action->hasPanel())
     {
         qtItem->setExpanded(!qtItem->isExpanded());
+        qtItem->setData(0, SidebarExpandedRole, qtItem->isExpanded());
     }
     else
     {
@@ -386,10 +479,91 @@ void QtSidebar::removeItem(NavigationItem *item)
         delete it->qtWidget;
     }
 
+    const bool category = !item->parent();
+    if (category)
+        tree_->setRootIndex(QModelIndex());
     // Also deletes contentItem.
     delete it->qtItem;
 
     bindings_.erase(it);
+    if (category)
+        rebuildCategories(item);
+}
+
+void QtSidebar::rebuildCategories(NavigationItem *excluded)
+{
+    const QSignalBlocker blocker(categories_);
+    while (categories_->count())
+        categories_->removeTab(0);
+    int selected = -1;
+    for (NavigationItem *item : navigation_->items())
+    {
+        if (item == excluded || !findBinding(item))
+            continue;
+        const int index =
+            categories_->addTab(QString::fromStdString(item->title()));
+        categories_->setTabData(
+            index,
+            QVariant::fromValue<quintptr>(reinterpret_cast<quintptr>(item)));
+        if (item == activeCategory_)
+            selected = index;
+    }
+    if (selected < 0 && categories_->count())
+        selected = 0;
+    categories_->setCurrentIndex(selected);
+    selectCategory(selected);
+}
+
+void QtSidebar::selectCategory(int index)
+{
+    activeCategory_ = index < 0
+                          ? nullptr
+                          : reinterpret_cast<NavigationItem *>(
+                                categories_->tabData(index).value<quintptr>());
+    Binding *binding = findBinding(activeCategory_);
+    categoryTitle_->setText(index < 0 ? QString()
+                                      : categories_->tabText(index));
+    tree_->setRootIndex(binding && activeCategory_->isGroup()
+                            ? tree_->indexFromItem(binding->qtItem)
+                            : QModelIndex());
+    // A root action is a valid plugin entry too.
+    for (const Binding &entry : bindings_)
+        if (!entry.commonItem->parent())
+            entry.qtItem->setHidden(entry.commonItem != activeCategory_);
+    filterItems();
+}
+
+void QtSidebar::filterItems()
+{
+    const QString query = search_->text().trimmed();
+    std::function<bool(NavigationItem *, bool)> filter =
+        [&](NavigationItem *item, bool ancestorMatches)
+    {
+        Binding *binding = findBinding(item);
+        if (!binding)
+            return false;
+        const bool matches =
+            ancestorMatches || QString::fromStdString(item->title())
+                                   .contains(query, Qt::CaseInsensitive);
+        bool childMatches = false;
+        for (NavigationItem *child : item->children())
+            childMatches = filter(child, matches) || childMatches;
+        const bool visible = query.isEmpty() || matches || childMatches;
+        binding->qtItem->setHidden(!visible);
+        binding->qtItem->setExpanded(
+            query.isEmpty()
+                ? binding->qtItem->data(0, SidebarExpandedRole).toBool()
+                : visible);
+        return visible;
+    };
+    if (activeCategory_)
+    {
+        if (activeCategory_->isGroup())
+            for (NavigationItem *item : activeCategory_->children())
+                filter(item, false);
+        else
+            filter(activeCategory_, false);
+    }
 }
 
 int QtSidebar::itemIndex(const NavigationItem *item) const
@@ -419,14 +593,25 @@ void QtSidebar::setTheme(const QtThemeColors &themeColors)
     styleSheet_ = themeColors.getStyleSheet();
 
     setStyleSheet(styleSheet_);
+    tree_->setProperty("darkNavigation", themeColors_.isDarkMode());
+    tree_->viewport()->update();
 
     for (const Binding &binding : bindings_)
     {
         if (binding.qtWidget)
         {
             applyPanelTheme(binding.qtWidget, styleSheet_);
+            binding.qtWidget->ensurePolished();
+            if (binding.qtWidget->layout())
+            {
+                binding.qtWidget->layout()->invalidate();
+                binding.qtWidget->layout()->activate();
+            }
+            binding.contentItem->setSizeHint(0, binding.qtWidget->sizeHint());
         }
     }
+
+    tree_->doItemsLayout();
 
     updateActionIcons(themeColors_.isDarkMode());
 }
@@ -439,6 +624,16 @@ void QtSidebar::applyPanelTheme(QWidget *widget, const QString &styleSheet)
     }
 
     widget->setStyleSheet(styleSheet);
+    for (QSlider *slider : widget->findChildren<QSlider *>())
+    {
+        if (!slider->property("singleValueSlider").toBool())
+            continue;
+        slider->setProperty("sidebarSliderAccent", themeColors_.highlight);
+        slider->setProperty("sidebarSliderGroove", themeColors_.groove);
+        slider->setProperty("sidebarSliderHandle", themeColors_.handle);
+        slider->setProperty("sidebarSliderBorder", themeColors_.border);
+        slider->update();
+    }
 }
 
 void QtSidebar::updateActionIcons(bool dark)

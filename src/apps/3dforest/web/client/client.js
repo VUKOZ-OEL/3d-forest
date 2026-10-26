@@ -11,6 +11,89 @@ const widgets = new Map(),
   expanded = new Map(),
   pendingServiceTabs = new Set();
 const storageKey = "3dforest.web.session.v1";
+let activeCategory = null;
+const categoryPanels = new Map();
+const categoryBar = document.querySelector("#categories");
+const toolSearch = document.querySelector("#tool-search");
+function filterTools() {
+  const query = toolSearch.value.trim().toLocaleLowerCase();
+  function filter(parent, ancestorMatches = false) {
+    let any = false;
+    for (const section of parent.children) {
+      if (!section.classList.contains("nav-section")) continue;
+      const title = section.firstElementChild;
+      const content = title.nextElementSibling;
+      const matches =
+        ancestorMatches || title.textContent.toLocaleLowerCase().includes(query);
+      const childMatches = content?.classList.contains("nav-children")
+        ? filter(content, matches)
+        : false;
+      section.hidden = !!query && !matches && !childMatches;
+      if (content) {
+        const open = query
+          ? matches || childMatches
+          : expanded.get(section.dataset.id) ?? false;
+        content.hidden = !open;
+        title.setAttribute("aria-expanded", String(open));
+      }
+      any ||= !section.hidden;
+    }
+    return any;
+  }
+  const panel = categoryPanels.get(activeCategory);
+  if (panel) filter(panel);
+}
+toolSearch.addEventListener("input", filterTools);
+function selectCategory(id) {
+  activeCategory = id;
+  for (const tab of categoryBar.children) {
+    const selected = tab.dataset.id === id;
+    tab.setAttribute("aria-selected", String(selected));
+    tab.tabIndex = selected ? 0 : -1;
+    if (selected)
+      document.querySelector("#category-title").textContent = tab.textContent;
+  }
+  for (const [key, panel] of categoryPanels) panel.hidden = key !== id;
+  filterTools();
+}
+categoryBar.addEventListener("keydown", (e) => {
+  const tabs = [...categoryBar.children];
+  const index = tabs.indexOf(document.activeElement);
+  if (index < 0) return;
+  let next;
+  if (e.key === "ArrowRight") next = (index + 1) % tabs.length;
+  if (e.key === "ArrowLeft") next = (index + tabs.length - 1) % tabs.length;
+  if (e.key === "Home") next = 0;
+  if (e.key === "End") next = tabs.length - 1;
+  if (next === undefined) return;
+  e.preventDefault();
+  selectCategory(tabs[next].dataset.id);
+  tabs[next].focus();
+});
+function renderCategories(items) {
+  categoryBar.replaceChildren();
+  categoryPanels.clear();
+  for (const item of items) {
+    const tab = element("button", "category-tab", item.title);
+    tab.type = "button";
+    tab.dataset.id = item.id;
+    tab.id = `category-${item.id}`;
+    tab.setAttribute("role", "tab");
+    tab.setAttribute("aria-controls", `category-panel-${item.id}`);
+    const panel = element("div", "category-panel");
+    panel.id = `category-panel-${item.id}`;
+    panel.setAttribute("role", "tabpanel");
+    panel.setAttribute("aria-labelledby", tab.id);
+    renderNavigation(item.kind === "group" ? item.children : [item], panel);
+    categoryPanels.set(item.id, panel);
+    controls.append(panel);
+    tab.addEventListener("click", () => selectCategory(item.id));
+    categoryBar.append(tab);
+  }
+  if (!categoryPanels.has(activeCategory)) activeCategory = items[0]?.id ?? null;
+  document.querySelector("#category-title").textContent = "";
+  selectCategory(activeCategory);
+}
 let token = sessionStorage.getItem(storageKey) || "",
   socket,
   ready = false,
@@ -166,6 +249,7 @@ function renderNode(node) {
 function renderNavigation(items, parent, depth = 0) {
   for (const item of items) {
     const section = element("section", "nav-section");
+    section.dataset.id = item.id;
     const title = element(
       "button",
       `nav-title ${item.kind === "group" ? "nav-group" : "nav-action"}`,
@@ -173,13 +257,14 @@ function renderNavigation(items, parent, depth = 0) {
     );
     title.type = "button";
     title.title = item.toolTip || "";
-    title.style.paddingLeft = `${10 + depth * 8}px`;
     section.append(title);
     if (item.kind === "group" || item.panel) {
       const content = element("div", item.panel ? "nav-panel" : "nav-children");
       if (item.panel) content.append(renderNode(item.panel));
       renderNavigation(item.children, content, depth + 1);
       section.append(content);
+      content.id = `nav-content-${item.id}`;
+      title.setAttribute("aria-controls", content.id);
       const open = expanded.get(item.id) ?? false;
       content.hidden = !open;
       title.setAttribute("aria-expanded", String(open));
@@ -468,7 +553,7 @@ function applyUi(ui) {
     if (shape !== structure) {
       const scroll = controls.scrollTop;
       controls.replaceChildren();
-      renderNavigation(ui.navigation, controls);
+      renderCategories(ui.navigation);
       viewer.replaceChildren(...(ui.viewer ? [renderNode(ui.viewer)] : []));
       bottom.replaceChildren(...(ui.bottom ? [renderNode(ui.bottom)] : []));
       controls.scrollTop = scroll;

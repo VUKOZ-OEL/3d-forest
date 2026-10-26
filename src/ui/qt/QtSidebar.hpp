@@ -38,6 +38,9 @@ class QtApplication;
 #include <QWidget>
 class QTreeWidget;
 class QTreeWidgetItem;
+class QTabBar;
+class QLabel;
+class QLineEdit;
 
 // Include local.
 #include <ExportUiQt.hpp>
@@ -52,6 +55,7 @@ public:
                        QWidget *parent = nullptr);
 
     void setTheme(const QtThemeColors &themeColors);
+    QTabBar *categoryBar() const { return categories_; }
 
 private:
     struct Binding
@@ -80,6 +84,13 @@ private:
     QtApplication *app_;
 
     QTreeWidget *tree_{nullptr};
+    QTabBar *categories_{nullptr};
+    QLabel *categoryTitle_{nullptr};
+    QLineEdit *search_{nullptr};
+    NavigationItem *activeCategory_{nullptr};
+    void rebuildCategories(NavigationItem *excluded = nullptr);
+    void selectCategory(int index);
+    void filterItems();
 
     std::vector<Binding> bindings_;
 

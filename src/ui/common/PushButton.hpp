@@ -43,15 +43,20 @@ public:
     void setIcon(const ThemeIcon &icon);
     const ThemeIcon &icon() const { return icon_; }
 
+    void setPrimary(bool primary);
+    bool isPrimary() const { return primary_; }
+
     void click();
 
     Signal<const std::string &> textChanged;
     Signal<const ThemeIcon &> iconChanged;
+    Signal<bool> primaryChanged;
     Signal<> clicked;
 
 private:
     std::string text_;
     ThemeIcon icon_;
+    bool primary_{false};
 };
 
 #include <WarningsEnable.hpp>

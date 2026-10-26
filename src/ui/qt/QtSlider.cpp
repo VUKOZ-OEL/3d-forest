@@ -19,12 +19,19 @@
 
 /** @file QtSlider.cpp */
 
+// Include std.
+#include <algorithm>
+#include <cmath>
+
 // Include 3D Forest.
 #include <QtSlider.hpp>
 
 // Include Qt.
+#include <QPainter>
 #include <QPointer>
 #include <QSignalBlocker>
+#include <QStyle>
+#include <QStyleOptionSlider>
 
 // Include local.
 #define LOG_MODULE_NAME "QtSlider"
@@ -83,6 +90,8 @@ void QtSlider::updateSettings()
     const QSignalBlocker blocker(this);
 
     setOrientation(static_cast<Qt::Orientation>(slider_->orientation()));
+    if (orientation() == Qt::Horizontal)
+        setMinimumHeight(22);
     setRange(slider_->minimum(), slider_->maximum());
     setSingleStep(slider_->singleStep());
     setTickInterval(slider_->tickInterval());
@@ -90,4 +99,54 @@ void QtSlider::updateSettings()
         static_cast<QSlider::TickPosition>(slider_->tickPosition()));
 
     setValue(slider_->value());
+}
+
+void QtSlider::paintEvent(QPaintEvent *event)
+{
+    const QColor accent = property("sidebarSliderAccent").value<QColor>();
+    if (orientation() != Qt::Horizontal || !accent.isValid() ||
+        tickPosition() != QSlider::NoTicks)
+    {
+        QSlider::paintEvent(event);
+        return;
+    }
+    QStyleOptionSlider option;
+    initStyleOption(&option);
+    const auto center = [&](int position)
+    {
+        option.sliderPosition = position;
+        option.sliderValue = position;
+        return style()
+            ->subControlRect(QStyle::CC_Slider,
+                             &option,
+                             QStyle::SC_SliderHandle,
+                             this)
+            .center();
+    };
+    const QPoint start = center(minimum());
+    const QPoint end = center(maximum());
+    const QPoint handle = center(sliderPosition());
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+    if (!isEnabled())
+        painter.setOpacity(.45);
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(property("sidebarSliderGroove").value<QColor>());
+    painter.drawRoundedRect(QRectF(std::min(start.x(), end.x()),
+                                   handle.y() - 3,
+                                   std::abs(end.x() - start.x()),
+                                   6),
+                            3,
+                            3);
+    painter.setBrush(accent);
+    painter.drawRoundedRect(QRectF(std::min(start.x(), handle.x()),
+                                   handle.y() - 3,
+                                   std::abs(handle.x() - start.x()),
+                                   6),
+                            3,
+                            3);
+    painter.setPen(QPen(property("sidebarSliderBorder").value<QColor>(), 1));
+    painter.setBrush(property("sidebarSliderHandle").value<QColor>());
+    // Equal dimensions keep the handle circular regardless of the row height.
+    painter.drawEllipse(QRectF(handle.x() - 9, handle.y() - 9, 18, 18));
 }

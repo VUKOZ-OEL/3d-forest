@@ -9,15 +9,26 @@
   </head>
   <body>
     <div id="application">
-      <aside id="sidebar">
-        <nav id="controls" aria-label="Navigation"></nav>
-      </aside>
-      <div id="sidebar-handle" class="app-splitter"></div>
-      <main id="main">
-        <section id="viewer" aria-label="3D viewport"></section>
-        <div id="bottom-handle" class="app-splitter horizontal"></div>
-        <section id="bottom" aria-label="Results"></section>
-      </main>
+      <nav id="categories" role="tablist" aria-label="Tool categories"></nav>
+      <div id="workspace">
+        <aside id="sidebar">
+          <h1 id="category-title"></h1>
+          <input
+            id="tool-search"
+            hidden
+            type="search"
+            placeholder="Find tool..."
+            aria-label="Find tool in current category"
+          />
+          <nav id="controls" aria-label="Navigation"></nav>
+        </aside>
+        <div id="sidebar-handle" class="app-splitter"></div>
+        <main id="main">
+          <section id="viewer" aria-label="3D viewport"></section>
+          <div id="bottom-handle" class="app-splitter horizontal"></div>
+          <section id="bottom" aria-label="Results"></section>
+        </main>
+      </div>
     </div>
     <div id="connection">
       <a id="service-link" hidden target="_blank" rel="noopener noreferrer"></a>

@@ -92,6 +92,7 @@ ComputeHeightMapWidget::ComputeHeightMapWidget(
     // previewCheckBox_->setChecked(true);
 
     applyButton_ = new PushButton(tr("Apply and save"));
+    applyButton_->setPrimary(true);
     applyButton_->setDisabled(true);
     applyButton_->clicked.connect([this]() { apply(); });
 

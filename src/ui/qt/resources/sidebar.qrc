@@ -1,0 +1,13 @@
+<RCC>
+  <qresource prefix="/UiQt">
+    <file>checkmark.svg</file>
+    <file>checkmark-dark.svg</file>
+    <file>indeterminate.svg</file>
+    <file>chevron-up.svg</file>
+    <file>chevron-down.svg</file>
+    <file>chevron-up-dark.svg</file>
+    <file>chevron-down-dark.svg</file>
+    <file>radio-checked.svg</file>
+    <file>radio-checked-dark.svg</file>
+  </qresource>
+</RCC>
