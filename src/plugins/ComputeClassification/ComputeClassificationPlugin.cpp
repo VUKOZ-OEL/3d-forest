@@ -35,7 +35,7 @@ void ComputeClassificationPlugin::initialize(Application *app)
     app_ = app;
 
     app_->createAction(this,
-                       {{"Compute", MAIN_WINDOW_MENU_COMPUTE_PRIORITY}},
+                       {{"Process", MAIN_WINDOW_MENU_COMPUTE_PRIORITY}},
                        "Compute",
                        tr("Classification"),
                        tr("Classify points to ground and unassigned"),

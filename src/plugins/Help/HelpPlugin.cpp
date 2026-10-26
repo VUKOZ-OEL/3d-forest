@@ -41,14 +41,14 @@ void HelpPlugin::initialize(Application *app)
 
     app_->createAction(
         this,
-        {{"File", MAIN_WINDOW_MENU_FILE_PRIORITY}},
+        {{"Help", MAIN_WINDOW_MENU_HELP_PRIORITY}},
         "",
         tr("About"),
         tr("About this application"),
         THEME_ICON("question"),
         [this]() { slotAbout(); },
         nullptr,
-        999);
+        100);
 }
 
 void HelpPlugin::slotAbout()

@@ -33,6 +33,7 @@ class Color;
 #include <WarningsDisable.hpp>
 
 std::string webIcon(const ThemeIcon &icon);
+std::string webResourceImage(const std::string &path);
 std::string webColor(const Color &color);
 
 #include <WarningsEnable.hpp>

@@ -20,6 +20,7 @@
 /** @file TreeTablePlugin.cpp */
 
 // Include 3D Forest.
+#include <Action.hpp>
 #include <Application.hpp>
 #include <TreeTablePlugin.hpp>
 #include <TreeTableWidget.hpp>
@@ -36,16 +37,16 @@ void TreeTablePlugin::initialize(Application *app)
 
     treeTableWidget_ = new TreeTableWidget(app_);
 
-    app_->createAction(
-        this,
-        {{"Data", MAIN_WINDOW_MENU_DATA_PRIORITY}},
-        "Data",
-        tr("Tree Table"),
-        tr("Show tree table"),
-        ICON("tree-table"),
-        [this]() { app_->toggleBottomWidget(treeTableWidget_); },
-        nullptr);
-
+    auto *treeTableAction = new Action(tr("Tree Table"));
+    treeTableAction->setToolTip(tr("Show tree table"));
+    treeTableAction->setIcon(ICON("tree-table"));
+    treeTableAction->setCheckable(true);
+    treeTableAction->setChecked(true);
+    treeTableAction->triggered.connect(
+        [this]() { app_->toggleBottomWidget(treeTableWidget_); });
+    app_->addNavigationItem(this,
+                            {{"Tool", MAIN_WINDOW_MENU_TOOL_PRIORITY}},
+                            treeTableAction);
     app_->showBottomWidget(treeTableWidget_);
 }
 

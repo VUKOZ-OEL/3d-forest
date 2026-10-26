@@ -164,16 +164,15 @@ void QtApplication::initLayout()
     splitter_->setStretchFactor(1, 1);
 
     // Initial widths.
-    splitter_->setSizes({280, 920});
+    splitter_->setSizes({350, 850});
 
-    sidebar_->setMinimumWidth(220);
-    sidebar_->setMaximumWidth(500);
+    sidebar_->setMinimumWidth(280);
+    sidebar_->setMaximumWidth(550);
 
     QWidget *central = new QWidget(&mainWindow_);
     QVBoxLayout *centralLayout = new QVBoxLayout(central);
     centralLayout->setContentsMargins(0, 0, 0, 0);
     centralLayout->setSpacing(0);
-    centralLayout->addWidget(sidebar_->categoryBar());
     centralLayout->addWidget(splitter_, 1);
     mainWindow_.setCentralWidget(central);
 

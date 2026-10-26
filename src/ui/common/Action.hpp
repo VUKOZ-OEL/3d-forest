@@ -60,6 +60,11 @@ public:
     void setOpenExternalWebApp(bool value) { openExternalWebApp_ = value; }
     bool opensExternalWebApp() const { return openExternalWebApp_; }
 
+    void setCheckable(bool checkable);
+    bool isCheckable() const { return checkable_; }
+    void setChecked(bool checked);
+    bool isChecked() const { return checked_; }
+
     void trigger();
 
     Signal<> triggered;
@@ -71,6 +76,8 @@ private:
     ThemeIcon icon_;
     Widget *panel_{nullptr};
     bool openExternalWebApp_{false};
+    bool checkable_{false};
+    bool checked_{false};
 };
 
 #include <WarningsEnable.hpp>

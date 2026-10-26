@@ -104,8 +104,7 @@ void QtSlider::updateSettings()
 void QtSlider::paintEvent(QPaintEvent *event)
 {
     const QColor accent = property("sidebarSliderAccent").value<QColor>();
-    if (orientation() != Qt::Horizontal || !accent.isValid() ||
-        tickPosition() != QSlider::NoTicks)
+    if (orientation() != Qt::Horizontal || !accent.isValid())
     {
         QSlider::paintEvent(event);
         return;
@@ -145,8 +144,28 @@ void QtSlider::paintEvent(QPaintEvent *event)
                                    6),
                             3,
                             3);
-    painter.setPen(QPen(property("sidebarSliderBorder").value<QColor>(), 1));
+    if (tickPosition() != QSlider::NoTicks)
+    {
+        const int interval = std::max(
+            1, tickInterval() > 0 ? tickInterval() : singleStep());
+        const bool above = tickPosition() == QSlider::TicksAbove ||
+                           tickPosition() == QSlider::TicksBothSides;
+        const bool below = tickPosition() == QSlider::TicksBelow ||
+                           tickPosition() == QSlider::TicksBothSides;
+        painter.setPen(property("sidebarSliderGroove").value<QColor>());
+        for (qint64 value = minimum(); value <= maximum(); value += interval)
+        {
+            const int x = center(int(value)).x();
+            if (above)
+                painter.drawLine(x, 1, x, handle.y() - 5);
+            if (below)
+                painter.drawLine(x, handle.y() + 5, x, height() - 2);
+            if (maximum() - value < interval)
+                break;
+        }
+    }
+    painter.setPen(QPen(property("sidebarSliderBorder").value<QColor>(), 2));
     painter.setBrush(property("sidebarSliderHandle").value<QColor>());
     // Equal dimensions keep the handle circular regardless of the row height.
-    painter.drawEllipse(QRectF(handle.x() - 9, handle.y() - 9, 18, 18));
+    painter.drawEllipse(QPointF(handle), 8.0, 8.0);
 }

@@ -315,6 +315,7 @@ void QtTreeWidget::updateItem(TreeWidgetItem *item)
         if (item->isCheckable(column))
         {
             checkable = true;
+            qtItem->setTextAlignment(column, Qt::AlignCenter);
 
             qtItem->setCheckState(
                 column,

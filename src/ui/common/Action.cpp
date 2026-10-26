@@ -77,7 +77,37 @@ void Action::setPanel(Widget *panel)
     panel_ = panel;
 }
 
+void Action::setCheckable(bool checkable)
+{
+    if (checkable_ == checkable && (checkable || !checked_))
+    {
+        return;
+    }
+
+    checkable_ = checkable;
+    if (!checkable_)
+    {
+        checked_ = false;
+    }
+    appearanceChanged();
+}
+
+void Action::setChecked(bool checked)
+{
+    if (!checkable_ || checked_ == checked)
+    {
+        return;
+    }
+
+    checked_ = checked;
+    appearanceChanged();
+}
+
 void Action::trigger()
 {
+    if (checkable_)
+    {
+        setChecked(!checked_);
+    }
     triggered();
 }

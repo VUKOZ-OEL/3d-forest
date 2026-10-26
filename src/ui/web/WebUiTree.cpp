@@ -35,12 +35,14 @@
 #include <ToolBar.hpp>
 #include <Viewer.hpp>
 #include <WebApplication.hpp>
+#include <WebAssets.hpp>
 #include <WebControls.hpp>
 #include <WebUiTree.hpp>
 #include <WebViewer.hpp>
 
 // Include std.
 #include <algorithm>
+#include <cctype>
 #include <stdexcept>
 
 // Include local.
@@ -190,12 +192,31 @@ JsonCpp::Value WebUiTree::navigation(const std::vector<NavigationItem *> &items)
         JsonCpp::Value node{JsonCpp::objectValue};
         node["id"] = it->second;
         node["title"] = item->title();
+        if (!item->parent())
+        {
+            std::string category = item->title();
+            std::transform(category.begin(),
+                           category.end(),
+                           category.begin(),
+                           [](unsigned char c)
+                           { return char(std::tolower(c)); });
+            if (category != "file" && category != "edit" &&
+                category != "process" && category != "filter" &&
+                category != "tool" && category != "settings" &&
+                category != "help")
+                category = "tool";
+            node["icon"] = webResourceImage(
+                ":/ApplicationResources/category-" + category + "-24px.png");
+        }
         node["kind"] = item->isGroup() ? "group" : "action";
         node["children"] = navigation(item->children());
         if (auto *action = item->action())
         {
             node["title"] = action->text();
             node["toolTip"] = action->toolTip();
+            node["checkable"] = action->isCheckable();
+            if (action->isCheckable())
+                node["checked"] = action->isChecked();
             node["openExternalWebApp"] = action->opensExternalWebApp();
             if (action->panel())
                 node["panel"] = widget(action->panel());

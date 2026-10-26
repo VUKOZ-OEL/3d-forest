@@ -195,11 +195,23 @@ bool QtDoubleRangeSlider::eventFilter(QObject *object, QEvent *event)
             .center();
     };
 
-    const QPoint start = handleCenter(rangeSlider->minimum());
-    const QPoint end = handleCenter(rangeSlider->maximum());
+    const int handleInset = 10;
+    const int minCenterX =
+        std::min(handleInset, rangeSlider->width() / 2);
+    const int maxCenterX =
+        std::max(minCenterX, rangeSlider->width() - handleInset);
+    const auto insetHandleCenter = [&](int position)
+    {
+        QPoint center = handleCenter(position);
+        center.setX(std::clamp(center.x(), minCenterX, maxCenterX));
+        return center;
+    };
 
-    const QPoint lower = handleCenter(rangeSlider->minimumPosition());
-    const QPoint upper = handleCenter(rangeSlider->maximumPosition());
+    const QPoint start = insetHandleCenter(rangeSlider->minimum());
+    const QPoint end = insetHandleCenter(rangeSlider->maximum());
+
+    const QPoint lower = insetHandleCenter(rangeSlider->minimumPosition());
+    const QPoint upper = insetHandleCenter(rangeSlider->maximumPosition());
 
     const qreal left = std::min(start.x(), end.x());
     const qreal right = std::max(start.x(), end.x());
@@ -235,11 +247,10 @@ bool QtDoubleRangeSlider::eventFilter(QObject *object, QEvent *event)
     // Paint both handles last, above the groove.
     const auto drawHandle = [&](const QPoint &center)
     {
-        painter.setPen(QPen(borderColor_, 1.0));
+        painter.setPen(QPen(borderColor_, 2.0));
         painter.setBrush(handleColor_);
 
-        painter.drawEllipse(
-            QRectF(center.x() - 9.0, center.y() - 9.0, 18.0, 18.0));
+        painter.drawEllipse(QPointF(center), 8.0, 8.0);
     };
 
     // Draw the active handle last when the handles overlap.

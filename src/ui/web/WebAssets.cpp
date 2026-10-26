@@ -51,20 +51,28 @@ std::string webIcon(const ThemeIcon &icon)
 {
     if (icon.sourceBase().empty())
         return {};
-    ResourceData bytes;
     for (const char *suffix : {"-16px-color.png",
                                "-16px.png",
                                "-20px-color.png",
                                "-20px.png",
                                "-24px-color.png",
                                "-24px.png"})
-        if ((bytes = ResourceRegistry::get(icon.sourceBase() + suffix)))
-            break;
+        if (ResourceRegistry::get(icon.sourceBase() + suffix))
+            return webResourceImage(icon.sourceBase() + suffix);
+    return {};
+}
+
+std::string webResourceImage(const std::string &path)
+{
+    ResourceData bytes = ResourceRegistry::get(path);
     if (!bytes || bytes->empty())
         return {};
     static const char chars[] =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    std::string result = "data:image/png;base64,";
+    const bool svg =
+        path.size() >= 4 && path.compare(path.size() - 4, 4, ".svg") == 0;
+    std::string result =
+        svg ? "data:image/svg+xml;base64," : "data:image/png;base64,";
     for (std::size_t i = 0; i < bytes->size(); i += 3)
     {
         unsigned n = unsigned((*bytes)[i]) << 16;

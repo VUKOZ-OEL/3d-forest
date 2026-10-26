@@ -305,6 +305,7 @@ export function createItemView(type, p, send) {
           td.append(exp);
         }
         if (cell.check >= 0) {
+          const checkCell = el("span", "cell-check");
           const check = el("input");
           check.type = "checkbox";
           check.checked = cell.check === 2;
@@ -320,12 +321,12 @@ export function createItemView(type, p, send) {
               state: check.checked ? 2 : 0,
             }),
           );
-          td.append(check);
+          checkCell.append(check);
+          td.append(checkCell);
         }
         const label = el("span", "cell-label", cell.text);
         if (cell.background) {
-          label.style.background = cell.background;
-          label.classList.add("colored-cell");
+          td.style.background = cell.background;
         }
         td.append(label);
         td.addEventListener("click", (e) => {

@@ -37,6 +37,35 @@
 <file>run-20px.png</file>
 
 <!-- Common -->
+<file>category-file.svg</file>
+<file>category-edit.svg</file>
+<file>category-process.svg</file>
+<file>category-filter.svg</file>
+<file>category-tool.svg</file>
+<file>category-settings.svg</file>
+<file>category-help.svg</file>
+<file>category-file-16px.png</file>
+<file>category-file-20px.png</file>
+<file>category-file-24px.png</file>
+<file>category-edit-16px.png</file>
+<file>category-edit-20px.png</file>
+<file>category-edit-24px.png</file>
+<file>category-process-16px.png</file>
+<file>category-process-20px.png</file>
+<file>category-process-24px.png</file>
+<file>category-filter-16px.png</file>
+<file>category-filter-20px.png</file>
+<file>category-filter-24px.png</file>
+<file>category-tool-16px.png</file>
+<file>category-tool-20px.png</file>
+<file>category-tool-24px.png</file>
+<file>category-settings-16px.png</file>
+<file>category-settings-20px.png</file>
+<file>category-settings-24px.png</file>
+<file>category-help-16px.png</file>
+<file>category-help-20px.png</file>
+<file>category-help-24px.png</file>
+
 <file>eye-16px.png</file>
 <file>eye-20px.png</file>
 <file>eye-24px.png</file>

@@ -34,14 +34,15 @@
 // Include Qt.
 #include <QAbstractItemView>
 #include <QFrame>
+#include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QLabel>
 #include <QLineEdit>
 #include <QPainter>
-#include <QSignalBlocker>
+#include <QSizePolicy>
 #include <QSlider>
 #include <QStyledItemDelegate>
-#include <QTabBar>
+#include <QToolButton>
 #include <QTreeWidget>
 #include <QVBoxLayout>
 
@@ -55,6 +56,8 @@ namespace
 constexpr int SidebarIndentRole = Qt::UserRole + 100;
 constexpr int SidebarPanelRole = Qt::UserRole + 101;
 constexpr int SidebarExpandedRole = Qt::UserRole + 102;
+constexpr int SidebarSpacerRole = Qt::UserRole + 103;
+constexpr int SidebarCheckedRole = Qt::UserRole + 104;
 
 class SidebarTreeWidget : public QTreeWidget
 {
@@ -80,7 +83,8 @@ protected:
                  const QStyleOptionViewItem &option,
                  const QModelIndex &index) const override
     {
-        if (index.data(SidebarPanelRole).toBool())
+        if (index.data(SidebarPanelRole).toBool() ||
+            index.data(SidebarSpacerRole).toBool())
         {
             // The embedded panel paints itself.
             return;
@@ -106,8 +110,13 @@ public:
         {
             return;
         }
+        if (index.data(SidebarSpacerRole).toBool())
+        {
+            return;
+        }
         const bool dark = parent()->property("darkNavigation").toBool();
-        const bool open = option.state & QStyle::State_Open;
+        const bool open = (option.state & QStyle::State_Open) ||
+                          index.data(SidebarCheckedRole).toBool();
         const bool hover = option.state & QStyle::State_MouseOver;
         const QColor border(dark ? "#454d52" : "#d4dadd");
         const QColor text(dark ? "#eeeeee" : "#202020");
@@ -160,6 +169,10 @@ public:
     QSize sizeHint(const QStyleOptionViewItem &option,
                    const QModelIndex &index) const override
     {
+        if (index.data(SidebarSpacerRole).toBool())
+        {
+            return QSize(0, 10);
+        }
         QSize size = QStyledItemDelegate::sizeHint(option, index);
         if (!index.data(SidebarPanelRole).toBool())
             size.setHeight(45);
@@ -199,6 +212,12 @@ QtSidebar::QtSidebar(NavigationTree *navigation,
 {
     setObjectName("navigationSidebar");
     setAttribute(Qt::WA_StyledBackground, true);
+    categoryRail_ = new QWidget(this);
+    categoryRail_->setObjectName("navigationCategoryRail");
+    categoryLayout_ = new QVBoxLayout(categoryRail_);
+    categoryLayout_->setContentsMargins(3, 6, 3, 6);
+    categoryLayout_->setSpacing(2);
+    categoryRail_->setFixedWidth(56);
     tree_ = new SidebarTreeWidget(this);
     tree_->setObjectName("sidebarNavigationTree");
 
@@ -215,11 +234,6 @@ QtSidebar::QtSidebar(NavigationTree *navigation,
     tree_->setIndentation(0);
     tree_->setItemDelegate(new SidebarItemDelegate(tree_));
     tree_->setSortingEnabled(false);
-    categories_ = new QTabBar(this);
-    categories_->setObjectName("navigationCategories");
-    categories_->setExpanding(false);
-    categories_->setDrawBase(false);
-    categories_->setAccessibleName(tr("Tool categories"));
     categoryTitle_ = new QLabel(this);
     categoryTitle_->setObjectName("navigationCategoryTitle");
     search_ = new QLineEdit(this);
@@ -228,18 +242,20 @@ QtSidebar::QtSidebar(NavigationTree *navigation,
     search_->setAccessibleName(tr("Find tool in current category"));
     search_->setClearButtonEnabled(true);
 
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->setContentsMargins(12, 10, 12, 0);
-    // layout->setContentsMargins(6, 8, 6, 8);
-    layout->setSpacing(12);
-    layout->addWidget(categoryTitle_);
-    layout->addWidget(search_);
+    auto *panel = new QWidget(this);
+    panel->setObjectName("navigationCategoryPanel");
+    auto *panelLayout = new QVBoxLayout(panel);
+    panelLayout->setContentsMargins(12, 10, 12, 0);
+    panelLayout->setSpacing(12);
+    panelLayout->addWidget(categoryTitle_);
+    panelLayout->addWidget(search_);
     search_->hide();
-    layout->addWidget(tree_);
-    QObject::connect(categories_,
-                     &QTabBar::currentChanged,
-                     this,
-                     [this](int index) { selectCategory(index); });
+    panelLayout->addWidget(tree_);
+    auto *layout = new QHBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
+    layout->addWidget(categoryRail_);
+    layout->addWidget(panel, 1);
     QObject::connect(search_,
                      &QLineEdit::textChanged,
                      this,
@@ -262,6 +278,11 @@ QtSidebar::QtSidebar(NavigationTree *navigation,
     {
         addItemRecursive(item);
     }
+}
+
+QtSidebar::~QtSidebar()
+{
+    lifetime_.reset();
 }
 
 QtSidebar::Binding *QtSidebar::findBinding(NavigationItem *item)
@@ -366,6 +387,9 @@ void QtSidebar::addItem(NavigationItem *item)
 
     qtItem->setIcon(0, toQIcon(action->icon(), themeColors_.isDarkMode()));
     qtItem->setToolTip(0, QString::fromStdString(action->toolTip()));
+    qtItem->setData(0,
+                    SidebarCheckedRole,
+                    action->isCheckable() && action->isChecked());
 
     if (action->hasPanel())
     {
@@ -374,6 +398,10 @@ void QtSidebar::addItem(NavigationItem *item)
         contentItem->setData(0, SidebarIndentRole, 0);
         contentItem->setData(0, SidebarPanelRole, true);
         contentItem->setFlags(contentItem->flags() & ~Qt::ItemIsSelectable);
+
+        auto *panelSpacer = new QTreeWidgetItem(qtItem);
+        panelSpacer->setData(0, SidebarSpacerRole, true);
+        panelSpacer->setFlags(panelSpacer->flags() & ~Qt::ItemIsSelectable);
 
         QWidget *qtWidget = app_->createWidget(action->panel(), tree_);
 
@@ -402,6 +430,32 @@ void QtSidebar::addItem(NavigationItem *item)
     }
 
     bindings_.push_back(binding);
+    const std::weak_ptr<void> guard = lifetime_;
+    action->appearanceChanged.connect(
+        [this, guard, item, action]
+        {
+            if (guard.expired())
+            {
+                return;
+            }
+            Binding *current = findBinding(item);
+            if (!current)
+            {
+                return;
+            }
+            current->qtItem->setText(0, QString::fromStdString(action->text()));
+            current->qtItem->setIcon(
+                0,
+                toQIcon(action->icon(), themeColors_.isDarkMode()));
+            current->qtItem->setToolTip(
+                0,
+                QString::fromStdString(action->toolTip()));
+            current->qtItem->setData(0,
+                                     SidebarCheckedRole,
+                                     action->isCheckable() &&
+                                         action->isChecked());
+            tree_->viewport()->update();
+        });
     if (!item->parent())
         rebuildCategories();
     filterItems();
@@ -492,37 +546,76 @@ void QtSidebar::removeItem(NavigationItem *item)
 
 void QtSidebar::rebuildCategories(NavigationItem *excluded)
 {
-    const QSignalBlocker blocker(categories_);
-    while (categories_->count())
-        categories_->removeTab(0);
-    int selected = -1;
+    while (QLayoutItem *entry = categoryLayout_->takeAt(0))
+    {
+        if (entry->widget())
+            entry->widget()->deleteLater();
+        delete entry;
+    }
+    categoryButtons_.clear();
     for (NavigationItem *item : navigation_->items())
     {
         if (item == excluded || !findBinding(item))
             continue;
-        const int index =
-            categories_->addTab(QString::fromStdString(item->title()));
-        categories_->setTabData(
-            index,
+        const QString title = QString::fromStdString(item->title());
+        QString slug = title.toLower();
+        if (slug != "file" && slug != "edit" && slug != "process" &&
+            slug != "filter" && slug != "tool" && slug != "settings" &&
+            slug != "help")
+            slug = "tool";
+        auto *button = new QToolButton(categoryRail_);
+        button->setObjectName("navigationCategoryButton");
+        button->setText(title);
+        button->setProperty("categoryIconBase", "category-" + slug);
+        button->setIconSize(QSize(24, 24));
+        button->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+        button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        button->setCheckable(true);
+        button->setAutoExclusive(true);
+        button->setAccessibleName(title);
+        button->setMinimumHeight(56);
+        button->setProperty(
+            "navigationCategory",
             QVariant::fromValue<quintptr>(reinterpret_cast<quintptr>(item)));
-        if (item == activeCategory_)
-            selected = index;
+        categoryLayout_->addWidget(button);
+        categoryButtons_.push_back(button);
+        QObject::connect(button,
+                         &QToolButton::clicked,
+                         this,
+                         [this, item] { selectCategory(item); });
     }
-    if (selected < 0 && categories_->count())
-        selected = 0;
-    categories_->setCurrentIndex(selected);
-    selectCategory(selected);
+    categoryLayout_->addStretch(1);
+    bool activeExists = false;
+    for (NavigationItem *item : navigation_->items())
+        activeExists |=
+            item != excluded && item == activeCategory_ && findBinding(item);
+    if (!activeExists)
+        activeCategory_ = nullptr;
+    if (!activeCategory_ && !categoryButtons_.empty())
+    {
+        for (NavigationItem *item : navigation_->items())
+            if (item != excluded && findBinding(item))
+            {
+                selectCategory(item);
+                break;
+            }
+    }
+    else
+        selectCategory(activeCategory_);
+    updateCategoryIcons(themeColors_.isDarkMode());
 }
 
-void QtSidebar::selectCategory(int index)
+void QtSidebar::selectCategory(NavigationItem *item)
 {
-    activeCategory_ = index < 0
-                          ? nullptr
-                          : reinterpret_cast<NavigationItem *>(
-                                categories_->tabData(index).value<quintptr>());
+    activeCategory_ = item;
     Binding *binding = findBinding(activeCategory_);
-    categoryTitle_->setText(index < 0 ? QString()
-                                      : categories_->tabText(index));
+    categoryTitle_->setText(item ? QString::fromStdString(item->title())
+                                 : QString());
+    for (QToolButton *button : categoryButtons_)
+        button->setChecked(
+            reinterpret_cast<NavigationItem *>(
+                button->property("navigationCategory").value<quintptr>()) ==
+            item);
     tree_->setRootIndex(binding && activeCategory_->isGroup()
                             ? tree_->indexFromItem(binding->qtItem)
                             : QModelIndex());
@@ -614,6 +707,18 @@ void QtSidebar::setTheme(const QtThemeColors &themeColors)
     tree_->doItemsLayout();
 
     updateActionIcons(themeColors_.isDarkMode());
+    updateCategoryIcons(themeColors_.isDarkMode());
+}
+
+void QtSidebar::updateCategoryIcons(bool dark)
+{
+    for (QToolButton *button : categoryButtons_)
+    {
+        const std::string name =
+            button->property("categoryIconBase").toString().toStdString();
+        button->setIcon(
+            toQIcon(ThemeIcon(app_, ":/ApplicationResources/", name), dark));
+    }
 }
 
 void QtSidebar::applyPanelTheme(QWidget *widget, const QString &styleSheet)
@@ -631,7 +736,7 @@ void QtSidebar::applyPanelTheme(QWidget *widget, const QString &styleSheet)
         slider->setProperty("sidebarSliderAccent", themeColors_.highlight);
         slider->setProperty("sidebarSliderGroove", themeColors_.groove);
         slider->setProperty("sidebarSliderHandle", themeColors_.handle);
-        slider->setProperty("sidebarSliderBorder", themeColors_.border);
+        slider->setProperty("sidebarSliderBorder", themeColors_.highlight);
         slider->update();
     }
 }

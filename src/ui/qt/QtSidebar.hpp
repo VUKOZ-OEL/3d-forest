@@ -23,6 +23,7 @@
 #define QT_SIDEBAR_HPP
 
 // Include std.
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -38,7 +39,8 @@ class QtApplication;
 #include <QWidget>
 class QTreeWidget;
 class QTreeWidgetItem;
-class QTabBar;
+class QToolButton;
+class QVBoxLayout;
 class QLabel;
 class QLineEdit;
 
@@ -53,9 +55,9 @@ public:
     explicit QtSidebar(NavigationTree *navigation,
                        QtApplication *application,
                        QWidget *parent = nullptr);
+    ~QtSidebar() override;
 
     void setTheme(const QtThemeColors &themeColors);
-    QTabBar *categoryBar() const { return categories_; }
 
 private:
     struct Binding
@@ -82,15 +84,19 @@ private:
 
     NavigationTree *navigation_;
     QtApplication *app_;
+    std::shared_ptr<void> lifetime_{std::make_shared<int>(0)};
 
     QTreeWidget *tree_{nullptr};
-    QTabBar *categories_{nullptr};
+    QWidget *categoryRail_{nullptr};
+    QVBoxLayout *categoryLayout_{nullptr};
+    std::vector<QToolButton *> categoryButtons_;
     QLabel *categoryTitle_{nullptr};
     QLineEdit *search_{nullptr};
     NavigationItem *activeCategory_{nullptr};
     void rebuildCategories(NavigationItem *excluded = nullptr);
-    void selectCategory(int index);
+    void selectCategory(NavigationItem *item);
     void filterItems();
+    void updateCategoryIcons(bool dark);
 
     std::vector<Binding> bindings_;
 

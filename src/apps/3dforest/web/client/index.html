@@ -9,18 +9,20 @@
   </head>
   <body>
     <div id="application">
-      <nav id="categories" role="tablist" aria-label="Tool categories"></nav>
       <div id="workspace">
         <aside id="sidebar">
-          <h1 id="category-title"></h1>
-          <input
-            id="tool-search"
-            hidden
-            type="search"
-            placeholder="Find tool..."
-            aria-label="Find tool in current category"
-          />
-          <nav id="controls" aria-label="Navigation"></nav>
+          <nav id="categories" role="tablist" aria-label="Tool categories"></nav>
+          <div id="category-content">
+            <h1 id="category-title"></h1>
+            <input
+              id="tool-search"
+              hidden
+              type="search"
+              placeholder="Find tool..."
+              aria-label="Find tool in current category"
+            />
+            <nav id="controls" aria-label="Navigation"></nav>
+          </div>
         </aside>
         <div id="sidebar-handle" class="app-splitter"></div>
         <main id="main">

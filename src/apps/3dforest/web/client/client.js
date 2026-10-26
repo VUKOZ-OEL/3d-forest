@@ -61,8 +61,8 @@ categoryBar.addEventListener("keydown", (e) => {
   const index = tabs.indexOf(document.activeElement);
   if (index < 0) return;
   let next;
-  if (e.key === "ArrowRight") next = (index + 1) % tabs.length;
-  if (e.key === "ArrowLeft") next = (index + tabs.length - 1) % tabs.length;
+  if (e.key === "ArrowDown") next = (index + 1) % tabs.length;
+  if (e.key === "ArrowUp") next = (index + tabs.length - 1) % tabs.length;
   if (e.key === "Home") next = 0;
   if (e.key === "End") next = tabs.length - 1;
   if (next === undefined) return;
@@ -74,8 +74,13 @@ function renderCategories(items) {
   categoryBar.replaceChildren();
   categoryPanels.clear();
   for (const item of items) {
-    const tab = element("button", "category-tab", item.title);
+    const tab = element("button", "category-tab");
     tab.type = "button";
+    const icon = element("img", "category-icon");
+    icon.src = item.icon || "";
+    icon.alt = "";
+    icon.setAttribute("aria-hidden", "true");
+    tab.append(icon, element("span", "category-label", item.title));
     tab.dataset.id = item.id;
     tab.id = `category-${item.id}`;
     tab.setAttribute("role", "tab");
@@ -256,7 +261,9 @@ function renderNavigation(items, parent, depth = 0) {
       item.title,
     );
     title.type = "button";
+    title.id = `navigation-${item.id}`;
     title.title = item.toolTip || "";
+    if (item.checkable) title.setAttribute("aria-pressed", String(item.checked));
     section.append(title);
     if (item.kind === "group" || item.panel) {
       const content = element("div", item.panel ? "nav-panel" : "nav-children");
@@ -278,6 +285,23 @@ function renderNavigation(items, parent, depth = 0) {
       event(item.id, "triggered");
     });
     parent.append(section);
+  }
+}
+function navigationStructure(items) {
+  return items.map((item) => {
+    const { checked, ...structure } = item;
+    structure.children = navigationStructure(item.children || []);
+    return structure;
+  });
+}
+function updateNavigationState(items) {
+  for (const item of items) {
+    if (item.checkable) {
+      document
+        .getElementById(`navigation-${item.id}`)
+        ?.setAttribute("aria-pressed", String(item.checked));
+    }
+    updateNavigationState(item.children || []);
   }
 }
 const buttons = [
@@ -548,7 +572,11 @@ function openServiceTab() {
   pendingServiceTabs.add(tab);
 }
 function applyUi(ui) {
-  const shape = JSON.stringify([ui.navigation, ui.viewer, ui.bottom]);
+  const shape = JSON.stringify([
+    navigationStructure(ui.navigation),
+    ui.viewer,
+    ui.bottom,
+  ]);
   preserveFocus(() => {
     if (shape !== structure) {
       const scroll = controls.scrollTop;
@@ -559,6 +587,7 @@ function applyUi(ui) {
       controls.scrollTop = scroll;
       structure = shape;
     }
+    updateNavigationState(ui.navigation);
     renderDialogs(ui.dialogs || []);
   });
   bottom.hidden = !ui.bottomVisible;

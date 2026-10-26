@@ -65,32 +65,41 @@ select:focus-visible,
 #application {
   height: 100vh;
   display: flex;
-  flex-direction: column;
   min-width: 560px;
 }
 #categories {
   display: flex;
-  flex: 0 0 44px;
-  overflow-x: auto;
+  flex: 0 0 58px;
+  flex-direction: column;
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding: 6px 3px;
+  gap: 2px;
   background: var(--nav-row);
-  border-bottom: 1px solid var(--nav-border);
+  border-right: 1px solid var(--nav-border);
+}
+#categories::-webkit-scrollbar {
+  display: none;
 }
 #categories .category-tab {
-  flex: none;
-  min-width: 80px;
-  padding: 0 22px;
+  flex: 0 0 56px;
+  width: 100%;
+  padding: 5px 1px;
   border: 0;
-  border-bottom: 3px solid transparent;
-  border-radius: 0;
+  border-radius: 3px;
   background: transparent;
-  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  font-size: 10px;
 }
 #categories .category-tab:hover {
   background: var(--nav-hover);
 }
 #categories .category-tab[aria-selected="true"] {
   background: var(--nav-active);
-  border-bottom-color: var(--nav-accent);
 }
 #workspace {
   display: flex;
@@ -98,12 +107,25 @@ select:focus-visible,
   min-height: 0;
 }
 #sidebar {
-  flex: 0 0 276px;
+  flex: 0 0 346px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   overflow: hidden;
   background: var(--page);
   font-size: 14px;
+}
+#category-content {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+}
+.category-icon {
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
 }
 #controls {
   flex: 1;
@@ -197,6 +219,10 @@ select:focus-visible,
   border-radius: 3px 3px 0 0;
   font-weight: 600;
 }
+#controls .nav-title[aria-pressed="true"] {
+  background: var(--nav-active);
+  font-weight: 600;
+}
 .nav-title[aria-expanded]::after {
   content: "";
   position: absolute;
@@ -214,6 +240,9 @@ select:focus-visible,
 }
 .nav-section {
   margin-bottom: 5px;
+}
+.nav-section:has(> .nav-panel:not([hidden])) {
+  margin-bottom: 15px;
 }
 .nav-children {
   padding: 6px 0 0 8px;
@@ -278,14 +307,24 @@ select:focus-visible,
 .nav-panel input[type="range"]::-webkit-slider-thumb {
   width: 18px;
   height: 18px;
-  border-color: var(--slider-border);
-  background: var(--slider-handle);
+  aspect-ratio: 1;
+  min-width: 18px;
+  max-width: 18px;
+  box-sizing: border-box;
+  border: 2px solid var(--nav-accent);
+  border-radius: 50%;
+  background: #fff;
 }
 .nav-panel input[type="range"]::-moz-range-thumb {
   width: 16px;
   height: 16px;
-  border-color: var(--slider-border);
-  background: var(--slider-handle);
+  aspect-ratio: 1;
+  min-width: 16px;
+  max-width: 16px;
+  box-sizing: border-box;
+  border: 2px solid var(--nav-accent);
+  border-radius: 50%;
+  background: #fff;
 }
 .nav-panel .range-track {
   height: 6px;
@@ -306,6 +345,11 @@ select:focus-visible,
 .nav-panel > .Widget {
   background: transparent;
   padding: 0;
+}
+.nav-panel .TreeWidget {
+  height: 230px;
+  min-height: 230px;
+  flex: 0 0 230px;
 }
 .nav-panel .layout.vbox {
   gap: 6px;
@@ -378,10 +422,19 @@ select:focus-visible,
   margin: 0;
 }
 .GroupBox {
+  min-width: 0;
   margin: 0;
   border: 1px solid var(--border);
   border-radius: 4px;
   padding: 8px;
+}
+.GroupBox .check-label {
+  min-width: 0;
+  white-space: normal;
+}
+.GroupBox .check-label span {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .GroupBox legend {
   padding: 0 4px;
@@ -737,6 +790,18 @@ input[type="range"].vertical {
   padding: 1px 3px;
   overflow: hidden;
   max-width: 600px;
+  vertical-align: middle;
+}
+.item-view td:has(> .cell-check) {
+  position: relative;
+  padding: 0;
+}
+.cell-check {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .item-view td.selected {
   background: var(--selection);
@@ -769,8 +834,9 @@ input[type="range"].vertical {
   color: #101010;
 }
 .item-view input[type="checkbox"] {
-  vertical-align: middle;
-  margin-right: 4px;
+  display: block;
+  margin: 0;
+  accent-color: var(--nav-accent);
 }
 .item-view input[type="text"] {
   height: 25px;
@@ -957,6 +1023,9 @@ body.disconnected #application {
   }
   .dialog-title {
     background: #303030;
+  }
+  .category-icon {
+    filter: invert(1);
   }
   .icon {
     filter: invert(1);

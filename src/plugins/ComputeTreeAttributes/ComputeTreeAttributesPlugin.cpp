@@ -35,7 +35,7 @@ void ComputeTreeAttributesPlugin::initialize(Application *app)
     app_ = app;
 
     app_->createAction(this,
-                       {{"Compute", MAIN_WINDOW_MENU_COMPUTE_PRIORITY}},
+                       {{"Process", MAIN_WINDOW_MENU_COMPUTE_PRIORITY}},
                        "Compute",
                        tr("Tree Attributes"),
                        tr("Compute tree attributes"),

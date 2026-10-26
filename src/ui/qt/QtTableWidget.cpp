@@ -250,6 +250,7 @@ void QtTableWidget::copyItem(QTableWidgetItem *target,
 
     if (source.hasCheckState())
     {
+        target->setTextAlignment(Qt::AlignCenter);
         target->setCheckState(static_cast<Qt::CheckState>(source.checkState()));
     }
     else
