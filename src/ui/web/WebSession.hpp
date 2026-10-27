@@ -23,19 +23,23 @@
 
 // Include 3D Forest.
 class WebApplication;
+class WebAuthStore;
 
 // Include 3rd party.
 #include <drogon/WebSocketConnection.h>
 #include <json/json.h>
 
 // Include std.
+#include <array>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <cstdint>
 #include <deque>
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <thread>
 
@@ -52,7 +56,9 @@ public:
     using Task = std::function<void(WebApplication &)>;
     using Clock = std::chrono::steady_clock;
 
-    WebSession(std::string token, Factory factory);
+    WebSession(std::string token,
+               Factory factory,
+               std::shared_ptr<WebAuthStore> authStore = {});
     ~WebSession();
     WebSession(const WebSession &) = delete;
     WebSession &operator=(const WebSession &) = delete;
@@ -66,6 +72,8 @@ public:
     bool expired(Clock::time_point now, std::chrono::seconds timeout) const;
     bool failed() const { return failed_.load(); }
     const std::string &token() const { return token_; }
+    bool loggedIn() const { return loggedIn_; }
+    bool authenticationEnabled() const;
     void setLocalServicePort(int port) { localServicePort_ = port; }
     int localServicePort() const { return localServicePort_.load(); }
 
@@ -79,6 +87,19 @@ private:
     friend class WebApplication;
     std::string token_;
     Factory factory_;
+    std::shared_ptr<WebAuthStore> authStore_;
+    bool loggedIn_{true};
+    unsigned int authChallenges_{0};
+    Clock::time_point authWindowStart_{Clock::now()};
+    struct LoginChallenge
+    {
+        std::string username;
+        std::string nonce;
+        std::array<std::uint8_t, 32> verifier{};
+        bool known{false};
+        Clock::time_point expires;
+    };
+    std::optional<LoginChallenge> loginChallenge_;
     std::thread worker_;
     mutable std::mutex mutex_;
     std::condition_variable condition_;

@@ -21,6 +21,7 @@
 
 // Include 3D Forest.
 #include <WebApplication.hpp>
+#include <WebAuthStore.hpp>
 #include <WebServer.hpp>
 
 // Include 3rd party.
@@ -50,8 +51,13 @@
 
 struct WebServer::State
 {
-    explicit State(Options value) : options(std::move(value)) {}
+    explicit State(Options value)
+        : options(std::move(value)),
+          authStore(std::make_shared<WebAuthStore>(options.accountDirectory))
+    {
+    }
     Options options;
+    std::shared_ptr<WebAuthStore> authStore;
     WebSession::Factory factory;
     std::mutex mutex;
     std::map<std::string, std::shared_ptr<WebSession>> sessions;
@@ -89,7 +95,7 @@ struct WebServer::State
         {
             id = drogon::utils::getUuid();
         } while (sessions.count(id));
-        auto session = std::make_shared<WebSession>(id, factory);
+        auto session = std::make_shared<WebSession>(id, factory, authStore);
         sessions.emplace(id, session);
         try
         {
@@ -210,6 +216,12 @@ bool offersSubprotocol(const std::string &header, const std::string &protocol)
         start = end + 1;
     }
     return false;
+}
+
+bool isLoopbackAddress(const std::string &address)
+{
+    return address == "localhost" || address == "::1" ||
+           address == "0:0:0:0:0:0:0:1" || address.rfind("127.", 0) == 0;
 }
 
 bool shouldSkipIncomingHeader(const std::string &name)
@@ -592,12 +604,25 @@ int WebServer::exec()
     if (!options.ioThreads || !options.maxSessions ||
         options.allowedOrigin.empty() || options.reconnectTimeout.count() < 1)
         throw std::invalid_argument("Invalid server options");
+    if (options.tlsCertificate.empty() != options.tlsPrivateKey.empty())
+        throw std::invalid_argument(
+            "TLS certificate and private key must be provided together");
+    if (state_->authStore->enabled() && options.tlsCertificate.empty() &&
+        !isLoopbackAddress(options.address))
+        throw std::invalid_argument("Web accounts require TLS when listening "
+                                    "on a non-loopback address");
     state_->started = true;
     auto &http = drogon::app();
     http.setLogLevel(trantor::Logger::kWarn);
     http.setThreadNum(options.ioThreads);
     http.setDocumentRoot(options.documentRoot);
     http.setHomePage("index.html");
+    if (!options.tlsCertificate.empty())
+    {
+        if (!http.supportSSL())
+            throw std::runtime_error("This build does not include TLS support");
+        http.setSSLFiles(options.tlsCertificate, options.tlsPrivateKey);
+    }
     // Let the handler reject the first byte beyond its 1 MiB limit.
     http.setClientMaxWebSocketMessageSize(1048577);
     http.setMaxConnectionNum(256);

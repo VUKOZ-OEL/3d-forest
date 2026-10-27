@@ -46,9 +46,12 @@ public:
         std::string documentRoot{"web"};
         // Must exactly match the browser's Origin. Local-development default.
         std::string allowedOrigin{"http://127.0.0.1:8080"};
+        std::string tlsCertificate;
+        std::string tlsPrivateKey;
         unsigned int ioThreads{2};
         std::size_t maxSessions{32};
         std::chrono::seconds reconnectTimeout{120};
+        std::string accountDirectory{"accounts"};
     };
 
     WebServer();

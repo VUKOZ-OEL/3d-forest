@@ -82,6 +82,9 @@ public:
     // Per-viewer GPU vertex payload budget. Set before init(); default 128 MiB.
     void setViewerMemoryBudget(std::size_t bytes);
     std::size_t viewerMemoryBudget() const { return viewerMemoryBudget_; }
+    bool loggedIn() const override { return loggedIn_; }
+    void setLoggedIn(bool value);
+    bool authenticationEnabled() const;
 
     // Backend registration used by web adapters.
     // Common widgets stay owned by your common UI/plugin tree.
@@ -137,6 +140,7 @@ private:
     bool skipNextUiSync_{false};
     bool structureDirty_{true};
     bool initialized_{false};
+    bool loggedIn_{true};
     unsigned long long nextId_{0};
     Handler initializeHandler_;
     Handler wakeUpHandler_;

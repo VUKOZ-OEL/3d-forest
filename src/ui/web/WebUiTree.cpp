@@ -180,7 +180,8 @@ JsonCpp::Value WebUiTree::layout(Layout *common, bool enabled, bool visible)
     return node;
 }
 
-JsonCpp::Value WebUiTree::navigation(const std::vector<NavigationItem *> &items)
+JsonCpp::Value WebUiTree::navigation(const std::vector<NavigationItem *> &items,
+                                     bool loginRequired)
 {
     JsonCpp::Value result{JsonCpp::arrayValue};
     for (auto *item : items)
@@ -192,6 +193,18 @@ JsonCpp::Value WebUiTree::navigation(const std::vector<NavigationItem *> &items)
         JsonCpp::Value node{JsonCpp::objectValue};
         node["id"] = it->second;
         node["title"] = item->title();
+        bool requiresLogin = loginRequired;
+        if (!item->parent())
+        {
+            std::string category = item->title();
+            std::transform(category.begin(),
+                           category.end(),
+                           category.begin(),
+                           [](unsigned char c)
+                           { return char(std::tolower(c)); });
+            requiresLogin = category == "edit" || category == "process";
+            node["enabled"] = !requiresLogin || application_.loggedIn();
+        }
         if (!item->parent())
         {
             std::string category = item->title();
@@ -205,11 +218,11 @@ JsonCpp::Value WebUiTree::navigation(const std::vector<NavigationItem *> &items)
                 category != "tool" && category != "settings" &&
                 category != "help")
                 category = "tool";
-            node["icon"] = webResourceImage(
-                ":/ApplicationResources/category-" + category + "-24px.png");
+            node["icon"] = webResourceImage(":/ApplicationResources/category-" +
+                                            category + "-24px.png");
         }
         node["kind"] = item->isGroup() ? "group" : "action";
-        node["children"] = navigation(item->children());
+        node["children"] = navigation(item->children(), requiresLogin);
         if (auto *action = item->action())
         {
             node["title"] = action->text();
@@ -219,9 +232,15 @@ JsonCpp::Value WebUiTree::navigation(const std::vector<NavigationItem *> &items)
                 node["checked"] = action->isChecked();
             node["openExternalWebApp"] = action->opensExternalWebApp();
             if (action->panel())
-                node["panel"] = widget(action->panel());
+                node["panel"] =
+                    widget(action->panel(),
+                           !requiresLogin || application_.loggedIn());
             else
+            {
                 actions_[it->second] = action;
+                if (requiresLogin)
+                    restrictedActions_.insert(it->second);
+            }
         }
         result.append(std::move(node));
     }
@@ -234,10 +253,13 @@ void WebUiTree::sync()
     seenLayouts_.clear();
     seenNavigation_.clear();
     actions_.clear();
+    restrictedActions_.clear();
     widgetDialogs_.clear();
     currentDialog_.clear();
     JsonCpp::Value next{JsonCpp::objectValue};
     next["navigation"] = navigation(application_.navigation().items());
+    next["accountIcon"] =
+        webResourceImage(":/ApplicationResources/category-account.svg");
     if (viewer_.widget && !viewer_.lifetime.expired())
         next["viewer"] = widget(viewer_.widget);
     else
@@ -385,6 +407,8 @@ bool WebUiTree::dispatch(const JsonCpp::Value &event)
     if (it == actions_.end() || event["event"] != "triggered")
         throw std::invalid_argument("Unknown navigation action");
     Action *action = it->second;
+    if (restrictedActions_.count(id) && !application_.loggedIn())
+        throw std::invalid_argument("Sign in to use this feature");
     action->trigger();
     return true;
 }

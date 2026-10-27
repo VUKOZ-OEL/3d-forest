@@ -109,6 +109,7 @@ select:focus-visible,
 }
 #sidebar {
   flex: 0 0 346px;
+  position: relative;
   display: flex;
   flex-direction: row;
   overflow: hidden;
@@ -127,6 +128,44 @@ select:focus-visible,
   width: 24px;
   height: 24px;
   object-fit: contain;
+}
+#account-button {
+  position: absolute;
+  z-index: 2;
+  left: 10px;
+  bottom: 10px;
+  width: 38px;
+  height: 38px;
+  min-height: 38px;
+  padding: 6px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+}
+#account-button:hover {
+  background: var(--nav-hover);
+}
+#account-button:focus-visible {
+  outline: none;
+}
+#account-button img {
+  display: block;
+  width: 24px;
+  height: 24px;
+  filter: grayscale(1);
+}
+#account-status {
+  position: absolute;
+  left: 3px;
+  bottom: 3px;
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--page);
+  border-radius: 50%;
+  background: #c83434;
+}
+#account-button[data-logged-in="true"] #account-status {
+  background: #218838;
 }
 #controls {
   flex: 1;
@@ -903,6 +942,57 @@ body.disconnected #application {
   position: fixed;
   inset: 0;
   background: #0003;
+}
+#account-shade {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 12px;
+  background: #0005;
+}
+#account-dialog {
+  width: 360px;
+  max-width: 100%;
+  padding: 18px;
+  border: 1px solid var(--nav-border);
+  border-radius: 5px;
+  background: var(--page);
+  box-shadow: 0 8px 30px #0005;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+#account-dialog h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+#account-dialog input {
+  width: 100%;
+  min-height: 34px;
+  padding: 6px 8px;
+  border: 1px solid var(--nav-border);
+  border-radius: 3px;
+  background: var(--input);
+}
+#account-message {
+  min-height: 16px;
+  margin: 0;
+  color: var(--text);
+}
+.account-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+.account-actions span {
+  flex: 1;
+}
+.account-actions button {
+  min-height: 32px;
+  padding: 4px 12px;
 }
 .dialog-window {
   position: fixed;

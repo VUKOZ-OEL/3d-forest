@@ -12,6 +12,10 @@
       <div id="workspace">
         <aside id="sidebar">
           <nav id="categories" role="tablist" aria-label="Tool categories"></nav>
+          <button id="account-button" type="button" aria-label="Account" aria-haspopup="dialog" aria-expanded="false">
+            <img alt="" aria-hidden="true" />
+            <span id="account-status" aria-hidden="true"></span>
+          </button>
           <div id="category-content">
             <h1 id="category-title"></h1>
             <input
@@ -39,5 +43,21 @@
     </div>
     <div id="modal-shade" hidden></div>
     <div id="dialogs"></div>
+    <div id="account-shade" hidden>
+      <form id="account-dialog" role="dialog" aria-modal="true" aria-labelledby="account-title">
+        <h2 id="account-title">Account sign in</h2>
+        <label for="account-username">User name</label>
+        <input id="account-username" autocomplete="username" maxlength="64" required />
+        <label for="account-password">Password</label>
+        <input id="account-password" type="password" autocomplete="current-password" required />
+        <p id="account-message" role="status"></p>
+        <div class="account-actions">
+          <button id="account-logout" type="button" hidden>Sign out</button>
+          <span></span>
+          <button id="account-cancel" type="button">Cancel</button>
+          <button id="account-submit" type="submit">Sign in</button>
+        </div>
+      </form>
+    </div>
   </body>
 </html>

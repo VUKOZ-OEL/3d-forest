@@ -15,6 +15,93 @@ let activeCategory = null;
 const categoryPanels = new Map();
 const categoryBar = document.querySelector("#categories");
 const toolSearch = document.querySelector("#tool-search");
+const accountButton = document.querySelector("#account-button");
+const accountShade = document.querySelector("#account-shade");
+const accountForm = document.querySelector("#account-dialog");
+const accountUsername = document.querySelector("#account-username");
+const accountPassword = document.querySelector("#account-password");
+const accountMessage = document.querySelector("#account-message");
+const accountSubmit = document.querySelector("#account-submit");
+const accountLogout = document.querySelector("#account-logout");
+let authEnabled = false;
+let loggedIn = false;
+function accountState(enabled, signedIn, icon) {
+  authEnabled = !!enabled;
+  loggedIn = !!signedIn;
+  if (icon) {
+    const image = accountButton.querySelector("img");
+    image.src = icon;
+    image.classList.add("category-icon");
+  }
+  accountButton.title = !authEnabled
+    ? "No web accounts are configured"
+    : loggedIn
+      ? "Signed in — account options"
+      : "Sign in to edit and process data";
+  accountButton.dataset.loggedIn = String(loggedIn);
+  accountLogout.hidden = !authEnabled || !loggedIn;
+  accountSubmit.hidden = loggedIn || !authEnabled;
+  accountUsername.disabled = !authEnabled || loggedIn;
+  accountPassword.disabled = !authEnabled || loggedIn;
+  if (!loggedIn && accountShade.hidden && authEnabled)
+    accountMessage.textContent = "";
+}
+function showAccountDialog() {
+  accountShade.hidden = false;
+  accountButton.setAttribute("aria-expanded", "true");
+  accountMessage.textContent = !authEnabled
+    ? "No accounts are configured. Start the server with --add-user USERNAME to create one."
+    : loggedIn
+      ? "You are signed in."
+      : "";
+  if (authEnabled && !loggedIn) accountUsername.focus();
+  else accountButton.focus();
+}
+function hideAccountDialog() {
+  accountShade.hidden = true;
+  accountButton.setAttribute("aria-expanded", "false");
+  accountPassword.value = "";
+  accountButton.focus();
+}
+accountButton.addEventListener("click", showAccountDialog);
+document.querySelector("#account-cancel").addEventListener("click", hideAccountDialog);
+accountShade.addEventListener("click", (e) => {
+  if (e.target === accountShade) hideAccountDialog();
+});
+accountLogout.addEventListener("click", () => send({ type: "auth.logout" }));
+accountForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (!authEnabled || loggedIn) return;
+  accountMessage.textContent = "Starting sign in…";
+  accountSubmit.disabled = true;
+  send({ type: "auth.begin", username: accountUsername.value });
+});
+async function answerLoginChallenge(message) {
+  try {
+    const password = accountPassword.value;
+    accountPassword.value = "";
+    const encoder = new TextEncoder();
+    const material = await crypto.subtle.importKey(
+      "raw", encoder.encode(password), "PBKDF2", false, ["deriveBits"],
+    );
+    const verifier = new Uint8Array(await crypto.subtle.deriveBits(
+      { name: "PBKDF2", hash: "SHA-256", salt: encoder.encode(message.salt),
+        iterations: message.iterations },
+      material, 256,
+    ));
+    const key = await crypto.subtle.importKey(
+      "raw", verifier, { name: "HMAC", hash: "SHA-256" }, false, ["sign"],
+    );
+    const challenge = `3DForest web login v1\n${token}\n${message.username}\n${message.nonce}`;
+    const proof = new Uint8Array(await crypto.subtle.sign("HMAC", key, encoder.encode(challenge)));
+    const hex = [...proof].map((v) => v.toString(16).padStart(2, "0")).join("");
+    send({ type: "auth.proof", username: message.username, nonce: message.nonce, proof: hex });
+    verifier.fill(0);
+  } catch {
+    accountSubmit.disabled = false;
+    accountMessage.textContent = "Could not prepare the sign-in proof in this browser.";
+  }
+}
 function filterTools() {
   const query = toolSearch.value.trim().toLocaleLowerCase();
   function filter(parent, ancestorMatches = false) {
@@ -45,6 +132,8 @@ function filterTools() {
 }
 toolSearch.addEventListener("input", filterTools);
 function selectCategory(id) {
+  if ([...categoryBar.children].find((tab) => tab.dataset.id === id)?.disabled)
+    return;
   activeCategory = id;
   for (const tab of categoryBar.children) {
     const selected = tab.dataset.id === id;
@@ -82,6 +171,8 @@ function renderCategories(items) {
     icon.setAttribute("aria-hidden", "true");
     tab.append(icon, element("span", "category-label", item.title));
     tab.dataset.id = item.id;
+    tab.disabled = item.enabled === false;
+    if (tab.disabled) tab.title = "Sign in to open this section";
     tab.id = `category-${item.id}`;
     tab.setAttribute("role", "tab");
     tab.setAttribute("aria-controls", `category-panel-${item.id}`);
@@ -95,7 +186,9 @@ function renderCategories(items) {
     tab.addEventListener("click", () => selectCategory(item.id));
     categoryBar.append(tab);
   }
-  if (!categoryPanels.has(activeCategory)) activeCategory = items[0]?.id ?? null;
+  if (!categoryPanels.has(activeCategory) ||
+      [...categoryBar.children].find((tab) => tab.dataset.id === activeCategory)?.disabled)
+    activeCategory = [...categoryBar.children].find((tab) => !tab.disabled)?.dataset.id ?? null;
   document.querySelector("#category-title").textContent = "";
   selectCategory(activeCategory);
 }
@@ -526,6 +619,7 @@ function snapshot(m) {
       widgets.delete(id);
     }
   document.title = m.application.name || "3D Forest";
+  accountState(m.authenticationEnabled, m.loggedIn, m.ui?.accountIcon);
   renderServiceLink(m.externalLink);
   applyUi(m.ui);
   ready = true;
@@ -620,6 +714,14 @@ function connect() {
         sessionStorage.setItem(storageKey, token);
         lastRevision = 0;
         delay = 500;
+      } else if (m.type === "auth.challenge") {
+        accountMessage.textContent = "Checking password…";
+        answerLoginChallenge(m);
+      } else if (m.type === "auth.result") {
+        accountSubmit.disabled = false;
+        accountState(authEnabled, m.loggedIn ?? loggedIn);
+        accountMessage.textContent = m.message || "Sign in failed";
+        if (m.ok) hideAccountDialog();
       } else if (m.type === "snapshot" || m.type === "patch") {
         if (!Number.isSafeInteger(m.revision) || m.revision <= lastRevision)
           throw Error("Invalid state revision");
@@ -633,6 +735,8 @@ function connect() {
         if (m.type === "patch" && m.externalLink)
           renderServiceLink(m.externalLink);
         if (m.type === "patch" && m.ui) preserveFocus(() => applyUi(m.ui));
+        if (m.type === "patch" && m.ui?.accountIcon)
+          accountState(authEnabled, loggedIn, m.ui.accountIcon);
         for (const w of widgets.values()) w.update({}, m.eventSequence || 0);
         nextSequence = Math.max(nextSequence, m.eventSequence || 0);
         lastRevision = m.revision;

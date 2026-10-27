@@ -39,6 +39,7 @@ WebApplication::WebApplication(WebSession &session)
     : session_(session),
       uiTree_(std::make_unique<WebUiTree>(*this))
 {
+    loggedIn_ = session.loggedIn();
 }
 WebApplication::~WebApplication()
 {
@@ -248,6 +249,20 @@ void WebApplication::removeBottomWidget(Widget *widget)
     uiTree_->removeBottomWidget(widget);
 }
 
+bool WebApplication::authenticationEnabled() const
+{
+    return session_.authenticationEnabled();
+}
+
+void WebApplication::setLoggedIn(bool value)
+{
+    assertThread();
+    if (loggedIn_ == value)
+        return;
+    loggedIn_ = value;
+    forceUi();
+}
+
 JsonCpp::Value WebApplication::snapshot() const
 {
     JsonCpp::Value result{JsonCpp::objectValue};
@@ -255,6 +270,8 @@ JsonCpp::Value WebApplication::snapshot() const
     result["eventSequence"] = eventSequence_;
     result["application"] = metadata_;
     result["externalLink"] = externalLink_;
+    result["loggedIn"] = loggedIn_;
+    result["authenticationEnabled"] = authenticationEnabled();
     result["ui"] = uiTree_->description();
     result["widgets"] = JsonCpp::Value{JsonCpp::arrayValue};
     for (const auto &[id, entry] : widgets_)

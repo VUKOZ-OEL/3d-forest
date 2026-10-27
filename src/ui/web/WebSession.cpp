@@ -21,7 +21,10 @@
 
 // Include 3D Forest.
 #include <WebApplication.hpp>
+#include <WebAuthStore.hpp>
 #include <WebSession.hpp>
+
+#include <trantor/utils/Utilities.h>
 
 // Include std.
 #include <iostream>
@@ -37,12 +40,21 @@ namespace
 thread_local const WebSession *currentSession = nullptr;
 }
 
-WebSession::WebSession(std::string token, Factory factory)
+WebSession::WebSession(std::string token,
+                       Factory factory,
+                       std::shared_ptr<WebAuthStore> authStore)
     : token_(std::move(token)),
-      factory_(std::move(factory))
+      factory_(std::move(factory)),
+      authStore_(std::move(authStore)),
+      loggedIn_(!authStore_ || !authStore_->enabled())
 {
     if (!factory_)
         throw std::invalid_argument("Missing application factory");
+}
+
+bool WebSession::authenticationEnabled() const
+{
+    return authStore_ && authStore_->enabled();
 }
 WebSession::~WebSession()
 {
@@ -161,7 +173,134 @@ bool WebSession::receive(const drogon::WebSocketConnectionPtr &connection,
             if (connection_ != connection)
                 return;
             const auto type = message["type"].asString();
-            if (type == "ack")
+            if (type == "auth.begin")
+            {
+                if (!message["username"].isString())
+                    throw std::invalid_argument("Invalid login request");
+                const auto username = message["username"].asString();
+                const auto lockedFor = authenticationEnabled()
+                                            ? authStore_->lockoutRemaining(username)
+                                            : std::chrono::seconds::zero();
+                if (lockedFor > std::chrono::seconds::zero())
+                {
+                    JsonCpp::Value result{JsonCpp::objectValue};
+                    result["type"] = "auth.result";
+                    result["ok"] = false;
+                    result["message"] = "Too many failed attempts. Try again in " +
+                                         std::to_string(lockedFor.count()) +
+                                         " seconds.";
+                    send(result);
+                    return;
+                }
+                if (Clock::now() - authWindowStart_ >= std::chrono::minutes(1))
+                {
+                    authWindowStart_ = Clock::now();
+                    authChallenges_ = 0;
+                }
+                if (!authenticationEnabled() || authChallenges_ >= 20 ||
+                    username.empty() || username.size() > 64)
+                {
+                    JsonCpp::Value result{JsonCpp::objectValue};
+                    result["type"] = "auth.result";
+                    result["ok"] = false;
+                    result["message"] = authenticationEnabled()
+                                            ? "Login unavailable"
+                                            : "No user accounts are configured";
+                    send(result);
+                    return;
+                }
+                ++authChallenges_;
+                const auto credential = authStore_->credential(username);
+                std::array<std::uint8_t, 32> random{};
+                if (!trantor::utils::secureRandomBytes(random.data(),
+                                                       random.size()))
+                    throw std::runtime_error(
+                        "Could not create login challenge");
+                LoginChallenge challenge;
+                challenge.username = username;
+                challenge.nonce = webAuthHex(random.data(), random.size());
+                challenge.verifier = credential.verifier;
+                challenge.known = credential.known;
+                challenge.expires = Clock::now() + std::chrono::seconds(60);
+                loginChallenge_ = challenge;
+                JsonCpp::Value response{JsonCpp::objectValue};
+                response["type"] = "auth.challenge";
+                response["username"] = username;
+                response["nonce"] = challenge.nonce;
+                response["salt"] = credential.salt;
+                response["iterations"] = WebAuthStore::iterations;
+                send(response);
+            }
+            else if (type == "auth.proof")
+            {
+                if (!message["username"].isString() ||
+                    !message["nonce"].isString() ||
+                    !message["proof"].isString())
+                    throw std::invalid_argument("Invalid login proof");
+                const auto username = message["username"].asString();
+                const auto nonce = message["nonce"].asString();
+                const auto proofText = message["proof"].asString();
+                std::array<std::uint8_t, 32> proof{};
+                bool valid =
+                    authenticationEnabled() && loginChallenge_ &&
+                    authStore_->lockoutRemaining(username) ==
+                        std::chrono::seconds::zero() &&
+                    loginChallenge_->username == username &&
+                    loginChallenge_->nonce == nonce &&
+                    Clock::now() <= loginChallenge_->expires &&
+                    webAuthUnhex(proofText, proof.data(), proof.size());
+                if (valid)
+                {
+                    const auto expected =
+                        webAuthHmac(loginChallenge_->verifier,
+                                    "3DForest web login v1\n" + token_ + "\n" +
+                                        username + "\n" + nonce);
+                    const bool matches = webAuthEqual(expected.data(),
+                                                      proof.data(),
+                                                      proof.size());
+                    valid = loginChallenge_->known & matches;
+                }
+                loginChallenge_.reset();
+                if (valid)
+                {
+                    authStore_->recordSuccessfulLogin(username);
+                    loggedIn_ = true;
+                    authChallenges_ = 0;
+                    authWindowStart_ = Clock::now();
+                    app.setLoggedIn(true);
+                }
+                else if (authenticationEnabled())
+                    authStore_->recordFailedLogin(username);
+                JsonCpp::Value result{JsonCpp::objectValue};
+                result["type"] = "auth.result";
+                result["ok"] = valid;
+                result["loggedIn"] = loggedIn_;
+                const auto lockedFor = !valid && authenticationEnabled()
+                                           ? authStore_->lockoutRemaining(username)
+                                           : std::chrono::seconds::zero();
+                result["message"] = valid
+                                         ? "Signed in"
+                                         : (lockedFor > std::chrono::seconds::zero()
+                                                ? "Too many failed attempts. Try again in " +
+                                                      std::to_string(lockedFor.count()) +
+                                                      " seconds."
+                                                : "Invalid username or password");
+                send(result);
+            }
+            else if (type == "auth.logout")
+            {
+                loginChallenge_.reset();
+                loggedIn_ = !authenticationEnabled();
+                authChallenges_ = 0;
+                authWindowStart_ = Clock::now();
+                app.setLoggedIn(loggedIn_);
+                JsonCpp::Value result{JsonCpp::objectValue};
+                result["type"] = "auth.result";
+                result["ok"] = true;
+                result["loggedIn"] = loggedIn_;
+                send(result);
+            }
+            else if (type == "ack")
             {
                 if (!message["revision"].isUInt64() || awaitingAck_ == 0 ||
                     message["revision"].asUInt64() != awaitingAck_)

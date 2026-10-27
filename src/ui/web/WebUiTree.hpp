@@ -93,6 +93,7 @@ private:
     std::map<Widget *, std::shared_ptr<WebWidget>> adapters_;
     std::map<NavigationItem *, std::string> navigationIds_;
     std::map<std::string, Action *> actions_;
+    std::set<std::string> restrictedActions_;
     std::set<Widget *> seenWidgets_;
     std::set<Layout *> seenLayouts_;
     std::set<NavigationItem *> seenNavigation_;
@@ -106,7 +107,8 @@ private:
                           bool enabled = true,
                           bool visible = true);
     JsonCpp::Value layout(Layout *layout, bool enabled, bool visible);
-    JsonCpp::Value navigation(const std::vector<NavigationItem *> &items);
+    JsonCpp::Value navigation(const std::vector<NavigationItem *> &items,
+                              bool loginRequired = false);
     void forgetNavigation(NavigationItem *item);
 };
 

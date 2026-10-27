@@ -67,6 +67,9 @@ public:
     Application();
     virtual ~Application();
 
+    /// Desktop applications are always signed in; hosted apps may override.
+    virtual bool loggedIn() const { return true; }
+
     void load();
 
     Editor &editor() { return editor_; }
