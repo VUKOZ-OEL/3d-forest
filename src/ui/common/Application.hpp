@@ -91,7 +91,8 @@ public:
                       std::function<void()> cb,
                       Widget *widget,
                       int order = 0,
-                      bool openExternalWebApp = false);
+                      bool openExternalWebApp = false,
+                      bool requiresLogin = false);
 
     void createToolButton(ToolButton **result,
                           const std::string &text,

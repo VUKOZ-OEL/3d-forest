@@ -338,7 +338,11 @@ export function createItemView(type, p, send) {
               column: c,
             });
         });
-        td.addEventListener("dblclick", () => edit(td, row, c));
+        td.addEventListener("dblclick", () => {
+          if (isTree)
+            sendEvent("itemDoubleClicked", { path: row.id, column: c });
+          else edit(td, row, c);
+        });
         tr.append(td);
       });
       fragment.append(tr);

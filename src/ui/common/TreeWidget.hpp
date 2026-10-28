@@ -96,6 +96,7 @@ public:
 
     // Plugin notifications.
     Signal<TreeWidgetItem *, int> itemClicked;
+    Signal<TreeWidgetItem *, int> itemDoubleClicked;
     Signal<TreeWidgetItem *, int> itemChanged;
     Signal<> itemSelectionChanged;
 

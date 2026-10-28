@@ -356,6 +356,7 @@ function renderNavigation(items, parent, depth = 0) {
     title.type = "button";
     title.id = `navigation-${item.id}`;
     title.title = item.toolTip || "";
+    title.disabled = item.enabled === false;
     if (item.checkable) title.setAttribute("aria-pressed", String(item.checked));
     section.append(title);
     if (item.kind === "group" || item.panel) {

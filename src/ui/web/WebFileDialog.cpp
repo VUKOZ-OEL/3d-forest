@@ -27,6 +27,7 @@
 #include <LineEdit.hpp>
 #include <MessageBox.hpp>
 #include <PushButton.hpp>
+#include <ThemeIcon.hpp>
 #include <TreeWidget.hpp>
 #include <VBoxLayout.hpp>
 #include <WebApplication.hpp>
@@ -35,7 +36,11 @@
 // Include std.
 #include <algorithm>
 #include <cctype>
+#include <chrono>
+#include <cstdint>
+#include <ctime>
 #include <filesystem>
+#include <iomanip>
 #include <map>
 #include <sstream>
 
@@ -47,6 +52,13 @@ namespace fs = std::filesystem;
 
 namespace
 {
+fs::path projectsDirectory()
+{
+    auto path = fs::current_path() / "projects";
+    fs::create_directories(path);
+    return fs::canonical(path);
+}
+
 bool wildcard(const std::string &pattern, const std::string &text)
 {
     std::size_t p = 0, t = 0, star = std::string::npos, mark = 0;
@@ -76,6 +88,39 @@ bool wildcard(const std::string &pattern, const std::string &text)
         ++p;
     return p == pattern.size();
 }
+
+std::string modifiedTime(const fs::file_time_type &time)
+{
+    const auto systemTime = std::chrono::time_point_cast<
+        std::chrono::system_clock::duration>(
+        time - fs::file_time_type::clock::now() +
+        std::chrono::system_clock::now());
+    const std::time_t value = std::chrono::system_clock::to_time_t(systemTime);
+    std::tm local{};
+#ifdef _WIN32
+    localtime_s(&local, &value);
+#else
+    localtime_r(&value, &local);
+#endif
+    std::ostringstream out;
+    out << std::put_time(&local, "%Y-%m-%d %H:%M");
+    return out.str();
+}
+
+std::string fileSize(std::uintmax_t bytes)
+{
+    std::ostringstream out;
+    if (bytes < 1024)
+        out << bytes << " B";
+    else if (bytes < 1024 * 1024)
+        out << std::fixed << std::setprecision(1)
+            << (double(bytes) / 1024.0) << " KB";
+    else
+        out << std::fixed << std::setprecision(1)
+            << (double(bytes) / (1024.0 * 1024.0)) << " MB";
+    return out.str();
+}
+
 class Picker : public Dialog
 {
 public:
@@ -91,7 +136,8 @@ public:
           app_(app),
           multiple_(multiple),
           save_(save),
-          options_(options)
+          options_(options),
+          root_(projectsDirectory())
     {
         setWindowTitle(title.empty() ? (save ? "Save file" : "Open file")
                                      : title);
@@ -101,24 +147,50 @@ public:
         auto *layout = new VBoxLayout;
         setLayout(layout);
         auto *row = new HBoxLayout;
-        auto *up = new PushButton("Up");
-        auto *folder = new PushButton("Open folder");
+        back_ = new PushButton("Back");
+        forward_ = new PushButton("Forward");
+        up_ = new PushButton("Up");
+        auto *refresh = new PushButton("Refresh");
+        back_->setToolTip("Back");
+        forward_->setToolTip("Forward");
+        up_->setToolTip("Up one folder");
+        refresh->setToolTip("Refresh");
+        back_->setIcon(ThemeIcon(&app, ":/ApplicationResources/misc", "back"));
+        forward_->setIcon(
+            ThemeIcon(&app, ":/ApplicationResources/misc", "forward"));
+        up_->setIcon(ThemeIcon(&app, ":/ApplicationResources/misc", "up"));
+        refresh->setIcon(
+            ThemeIcon(&app, ":/ApplicationResources/misc", "refresh"));
         path_ = new LineEdit;
-        row->addWidget(up);
-        row->addWidget(path_, 1);
-        row->addWidget(folder);
-        layout->addWidget(new Label("Server folder"));
+        path_->setPlaceholderText("Folder path");
+        search_ = new LineEdit;
+        search_->setPlaceholderText("Search projects");
+        search_->setEnabled(false);
+        searchButton_ = new PushButton("Search");
+        searchButton_->setIcon(
+            ThemeIcon(&app, ":/ApplicationResources/misc", "search"));
+        searchButton_->setEnabled(false);
+        row->addWidget(back_);
+        row->addWidget(forward_);
+        row->addWidget(up_);
+        row->addWidget(path_, 3);
+        row->addWidget(refresh);
+        row->addWidget(searchButton_);
+        row->addWidget(search_, 2);
         layout->addLayout(row);
         tree_ = new TreeWidget;
-        tree_->setColumnCount(2);
-        tree_->setHeaderLabels({"Name", "Type"});
+        tree_->setColumnCount(5);
+        tree_->setHeaderLabels(
+            {"Name", "Date modified", "Type", "Size", "Tags"});
+        tree_->setSortingEnabled(true);
+        tree_->sortItems(2, Ui::AscendingOrder);
         tree_->setSelectionMode(multiple ? AbstractItemView::ExtendedSelection
                                          : AbstractItemView::SingleSelection);
         layout->addWidget(tree_, 1);
         name_ = new LineEdit;
-        layout->addWidget(
-            new Label(save ? "File name" : "Selected file / path"));
-        layout->addWidget(name_);
+        auto *fileRow = new HBoxLayout;
+        fileRow->addWidget(new Label("File name:"));
+        fileRow->addWidget(name_, 1);
         filter_ = new ComboBox;
         std::size_t pos = 0;
         while (pos < filter.size())
@@ -134,20 +206,20 @@ public:
         for (int i = 0; i < filter_->count(); ++i)
             if (filter_->itemText(i) == selectedFilter)
                 filter_->setValue(i, false);
-        layout->addWidget(filter_);
+        fileRow->addWidget(filter_);
+        layout->addLayout(fileRow);
         error_ = new Label;
         layout->addWidget(error_);
-        up->clicked.connect([this] { navigate(current_.parent_path()); });
-        folder->clicked.connect(
-            [this]
-            {
-                auto items = tree_->selectedItems();
-                if (!items.empty() &&
-                    fs::is_directory(paths_.at(items.front())))
-                    navigate(paths_.at(items.front()));
-            });
+        back_->clicked.connect([this] { navigateHistory(-1); });
+        forward_->clicked.connect([this] { navigateHistory(1); });
+        up_->clicked.connect([this] { navigate(current_.parent_path()); });
+        refresh->clicked.connect([this] { navigate(current_); });
         path_->returnPressed.connect([this]
                                      { navigate(fs::u8path(path_->text())); });
+        search_->textChanged.connect([this](const std::string &)
+                                     { populateDirectory(); });
+        searchButton_->clicked.connect([this] { populateDirectory(); });
+        search_->returnPressed.connect([this] { populateDirectory(); });
         name_->returnPressed.connect([this] { accept(); });
         filter_->activated.connect([this](int) { navigate(current_); });
         tree_->itemClicked.connect(
@@ -156,8 +228,22 @@ public:
                 auto p = paths_.at(item);
                 name_->setText(p.filename().u8string());
             });
-        auto start = initial.empty() ? fs::current_path()
-                                     : fs::absolute(fs::u8path(initial));
+        tree_->itemDoubleClicked.connect(
+            [this](TreeWidgetItem *item, int)
+            {
+                const auto p = paths_.at(item);
+                if (fs::is_directory(p))
+                    navigate(p);
+                else
+                {
+                    name_->setText(p.filename().u8string());
+                    accept();
+                }
+            });
+        auto start = initial.empty() ? root_ : fs::absolute(fs::u8path(initial));
+        if (!isWithinRoot(fs::is_directory(start) ? start
+                                                  : start.parent_path()))
+            start = root_;
         if (fs::is_directory(start))
             navigate(start);
         else
@@ -166,7 +252,7 @@ public:
             name_->setText(start.filename().u8string());
         }
     }
-    Size sizeHint() const override { return Size(700, 500); }
+    Size sizeHint() const override { return Size(840, 560); }
     std::vector<std::string> resultPaths;
     std::string selectedFilter() const { return filter_->currentText(); }
     void accept() override
@@ -192,6 +278,11 @@ public:
             for (auto &p : values)
             {
                 p = fs::absolute(p).lexically_normal();
+                const auto checkedPath =
+                    save_ && !fs::exists(p) ? p.parent_path() : p;
+                if (!isWithinRoot(checkedPath))
+                    throw std::runtime_error(
+                        "Select a file inside the projects folder.");
                 if (!save_ && !fs::is_regular_file(p))
                     throw std::runtime_error("Select an existing file.");
                 if (save_ && !fs::is_directory(p.parent_path()))
@@ -222,17 +313,55 @@ private:
     WebApplication &app_;
     bool multiple_, save_;
     int options_;
+    fs::path root_;
     fs::path current_;
-    LineEdit *path_, *name_;
+    std::vector<fs::path> history_;
+    std::size_t historyIndex_{0};
+    PushButton *back_{nullptr}, *forward_{nullptr}, *up_{nullptr},
+        *searchButton_{nullptr};
+    LineEdit *path_, *search_, *name_;
     TreeWidget *tree_;
     ComboBox *filter_;
     Label *error_;
     std::map<TreeWidgetItem *, fs::path> paths_;
-    void navigate(const fs::path &path)
+    void navigateHistory(int offset)
+    {
+        const auto next = static_cast<long long>(historyIndex_) + offset;
+        if (next < 0 || next >= static_cast<long long>(history_.size()))
+            return;
+        historyIndex_ = static_cast<std::size_t>(next);
+        navigate(history_[historyIndex_], false);
+    }
+    bool isWithinRoot(const fs::path &path) const
     {
         try
         {
-            auto next = fs::canonical(path);
+            const auto canonical = fs::canonical(path);
+            const auto relative = canonical.lexically_relative(root_);
+            return !relative.empty() && *relative.begin() != ".." &&
+                   !relative.is_absolute();
+        }
+        catch (...)
+        {
+            return false;
+        }
+    }
+    void navigate(const fs::path &path, bool addHistory = true)
+    {
+        try
+        {
+            auto requested = path;
+            if (requested.is_relative())
+            {
+                auto first = requested.begin();
+                if (first != requested.end() && *first == "projects")
+                    requested = requested.lexically_relative("projects");
+                requested = root_ / requested;
+            }
+            auto next = fs::canonical(requested);
+            if (!isWithinRoot(next))
+                throw std::runtime_error(
+                    "Navigation is limited to the projects folder.");
             std::vector<fs::directory_entry> entries;
             for (auto &entry : fs::directory_iterator(next))
                 entries.push_back(entry);
@@ -244,34 +373,103 @@ private:
                               return a.is_directory();
                           return a.path().filename() < b.path().filename();
                       });
+            const bool changed = current_ != next;
             current_ = next;
-            path_->setText(current_.u8string());
-            name_->setText("");
+            const auto relative = current_.lexically_relative(root_);
+            path_->setText(relative == "."
+                               ? "projects"
+                               : (fs::path("projects") / relative).u8string());
+            if (changed)
+                search_->clear();
+            if (addHistory &&
+                (history_.empty() || history_[historyIndex_] != current_))
+            {
+                history_.resize(historyIndex_ + (history_.empty() ? 0 : 1));
+                history_.push_back(current_);
+                historyIndex_ = history_.size() - 1;
+            }
+            back_->setEnabled(historyIndex_ > 0);
+            forward_->setEnabled(historyIndex_ + 1 < history_.size());
+            up_->setEnabled(current_ != root_);
+            if (changed)
+                name_->setText("");
+            populateDirectory();
+        }
+        catch (const std::exception &e)
+        {
+            error_->setText(e.what());
+        }
+    }
+    void populateDirectory()
+    {
+        try
+        {
+            std::vector<fs::directory_entry> entries;
+            for (auto &entry : fs::directory_iterator(current_))
+                entries.push_back(entry);
+            std::sort(entries.begin(),
+                      entries.end(),
+                      [](const auto &a, const auto &b)
+                      {
+                          if (a.is_directory() != b.is_directory())
+                              return a.is_directory();
+                          return a.path().filename() < b.path().filename();
+                      });
             tree_->clear();
             paths_.clear();
             error_->setText("");
-            auto f = filter_->currentText();
-            // auto begin = f.find('('), end = f.rfind(')');
-            auto begin = f.rfind('('), end = f.rfind(')');
+            auto filter = filter_->currentText();
+            auto begin = filter.rfind('('), end = filter.rfind(')');
             std::vector<std::string> patterns;
             if (begin != std::string::npos && end > begin)
             {
-                std::istringstream in(f.substr(begin + 1, end - begin - 1));
-                for (std::string s; in >> s;)
-                    patterns.push_back(s);
+                std::istringstream in(filter.substr(begin + 1, end - begin - 1));
+                for (std::string pattern; in >> pattern;)
+                    patterns.push_back(pattern);
             }
+            std::string query = search_->text();
+            std::transform(query.begin(), query.end(), query.begin(),
+                           [](unsigned char c) { return char(std::tolower(c)); });
             for (auto &entry : entries)
             {
                 auto name = entry.path().filename().u8string();
+                auto lowerName = name;
+                std::transform(lowerName.begin(), lowerName.end(),
+                               lowerName.begin(), [](unsigned char c)
+                               { return char(std::tolower(c)); });
+                if (!query.empty() && lowerName.find(query) == std::string::npos)
+                    continue;
                 bool directory = entry.is_directory();
                 if (!directory && !patterns.empty() &&
-                    !std::any_of(patterns.begin(),
-                                 patterns.end(),
-                                 [&](const auto &p)
-                                 { return wildcard(p, name); }))
+                    !std::any_of(patterns.begin(), patterns.end(),
+                                 [&](const auto &pattern)
+                                 { return wildcard(pattern, name); }))
                     continue;
-                auto *item = tree_->push_back(
-                    TreeWidgetItem({name, directory ? "Folder" : "File"}));
+                auto type = directory ? std::string("Folder")
+                                      : fs::u8path(name).extension().u8string();
+                if (!directory)
+                {
+                    if (!type.empty() && type.front() == '.')
+                        type.erase(type.begin());
+                    if (type.empty())
+                        type = "File";
+                    else
+                    {
+                        std::transform(type.begin(),
+                                       type.end(),
+                                       type.begin(),
+                                       [](unsigned char c)
+                                       { return char(std::toupper(c)); });
+                        type += " File";
+                    }
+                }
+                const auto modified = modifiedTime(entry.last_write_time());
+                const auto size = directory ? std::string{}
+                                            : fileSize(entry.file_size());
+                const std::string entryIcon = directory ? "\xf0\x9f\x93\x81 "
+                                                         : "\xf0\x9f\x93\x84 ";
+                auto *item = tree_->push_back(TreeWidgetItem(
+                    {entryIcon + name, modified, type, size, ""}));
                 paths_[item] = entry.path();
             }
         }

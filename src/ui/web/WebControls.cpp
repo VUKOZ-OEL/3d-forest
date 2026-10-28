@@ -732,6 +732,12 @@ void WebControls::handleEvent(const J &e)
                 w->itemClicked(item, c);
             return;
         }
+        if (name == "itemDoubleClicked")
+        {
+            if (!w->signalsBlocked())
+                w->itemDoubleClicked(item, c);
+            return;
+        }
         if (name == "edit")
         {
             if (!item->isEditable())

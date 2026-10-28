@@ -59,6 +59,9 @@ std::string webIcon(const ThemeIcon &icon)
                                "-24px.png"})
         if (ResourceRegistry::get(icon.sourceBase() + suffix))
             return webResourceImage(icon.sourceBase() + suffix);
+    for (const char *suffix : {"-16px.svg", "-20px.svg", "-24px.svg"})
+        if (ResourceRegistry::get(icon.sourceBase() + suffix))
+            return webResourceImage(icon.sourceBase() + suffix);
     return {};
 }
 

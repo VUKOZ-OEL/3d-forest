@@ -60,6 +60,9 @@ public:
     void setOpenExternalWebApp(bool value) { openExternalWebApp_ = value; }
     bool opensExternalWebApp() const { return openExternalWebApp_; }
 
+    void setRequiresLogin(bool value) { requiresLogin_ = value; }
+    bool requiresLogin() const { return requiresLogin_; }
+
     void setCheckable(bool checkable);
     bool isCheckable() const { return checkable_; }
     void setChecked(bool checked);
@@ -76,6 +79,7 @@ private:
     ThemeIcon icon_;
     Widget *panel_{nullptr};
     bool openExternalWebApp_{false};
+    bool requiresLogin_{false};
     bool checkable_{false};
     bool checked_{false};
 };

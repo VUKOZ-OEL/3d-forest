@@ -80,7 +80,9 @@ void ImportFilePlugin::initialize(Application *app)
         ICON("import-file"),
         [this]() { slotImportFile(); },
         nullptr,
-        600);
+        600,
+        false,
+        true);
 
     // app_->hideToolBar("File Import/Export");
 }

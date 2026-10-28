@@ -53,7 +53,9 @@ void ExportFilePlugin::initialize(Application *app)
         ICON("export-file"),
         [this]() { slotExportFile(); },
         nullptr,
-        610);
+        610,
+        false,
+        true);
 }
 
 void ExportFilePlugin::slotExportFile()

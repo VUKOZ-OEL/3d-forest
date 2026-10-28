@@ -411,13 +411,15 @@ void Application::createAction(Plugin *owner,
                                std::function<void()> cb,
                                Widget *widget,
                                int order,
-                               bool openExternalWebApp)
+                               bool openExternalWebApp,
+                               bool requiresLogin)
 {
     Action *action = new Action(text);
 
     action->setIcon(icon);
     action->setToolTip(toolTip);
     action->setOpenExternalWebApp(openExternalWebApp);
+    action->setRequiresLogin(requiresLogin);
 
     if (widget)
     {

@@ -39,6 +39,11 @@ target_link_libraries(
 
 install(TARGETS ${SUB_PROJECT_NAME} DESTINATION bin)
 
+# Create the server-side project storage directory in the install tree.
+install(CODE [[
+    file(MAKE_DIRECTORY "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/projects")
+]])
+
 # Install web files
 install(
     DIRECTORY client

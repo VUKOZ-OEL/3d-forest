@@ -20,6 +20,13 @@
 <RCC version="1.0">
 <qresource prefix="/ApplicationResources">
 
+<!-- Web file dialog controls -->
+<file>misc/back-16px.svg</file>
+<file>misc/forward-16px.svg</file>
+<file>misc/up-16px.svg</file>
+<file>misc/refresh-16px.svg</file>
+<file>misc/search-16px.svg</file>
+
 <!-- Standard -->
 <file>question-16px.png</file>
 <file>question-16px-color.png</file>

@@ -52,7 +52,9 @@ void ProjectFilePlugin::initialize(Application *app)
         ICON("create"),
         [this]() { slotNewProject(); },
         nullptr,
-        100);
+        100,
+        false,
+        true);
 
     app_->createAction(
         this,
@@ -74,7 +76,9 @@ void ProjectFilePlugin::initialize(Application *app)
         ICON("save"),
         [this]() { slotSaveProject(); },
         nullptr,
-        300);
+        300,
+        false,
+        true);
 
     app_->createAction(
         this,
@@ -85,7 +89,9 @@ void ProjectFilePlugin::initialize(Application *app)
         ICON("save-as"),
         [this]() { slotSaveAsProject(); },
         nullptr,
-        400);
+        400,
+        false,
+        true);
 
     app_->createAction(
         this,
@@ -96,7 +102,9 @@ void ProjectFilePlugin::initialize(Application *app)
         ICON("reload"),
         [this]() { slotReloadProject(); },
         nullptr,
-        500);
+        500,
+        false,
+        true);
 
     // app_->hideToolBar("File Project");
 }

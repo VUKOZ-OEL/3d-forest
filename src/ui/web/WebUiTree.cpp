@@ -225,6 +225,8 @@ JsonCpp::Value WebUiTree::navigation(const std::vector<NavigationItem *> &items,
         node["children"] = navigation(item->children(), requiresLogin);
         if (auto *action = item->action())
         {
+            requiresLogin = requiresLogin || action->requiresLogin();
+            node["enabled"] = !requiresLogin || application_.loggedIn();
             node["title"] = action->text();
             node["toolTip"] = action->toolTip();
             node["checkable"] = action->isCheckable();
