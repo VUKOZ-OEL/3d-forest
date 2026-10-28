@@ -371,8 +371,7 @@ WebAuthStore::Credential WebAuthStore::credential(
     return result;
 }
 
-std::chrono::seconds WebAuthStore::lockoutRemaining(
-    const std::string &username)
+std::chrono::seconds WebAuthStore::lockoutRemaining(const std::string &username)
 {
     std::lock_guard<std::mutex> lock(failuresMutex_);
     const auto it = failures_.find(username);
@@ -385,7 +384,8 @@ std::chrono::seconds WebAuthStore::lockoutRemaining(
         it->second.lockedUntil = {};
         return std::chrono::seconds::zero();
     }
-    return std::chrono::ceil<std::chrono::seconds>(it->second.lockedUntil - now);
+    return std::chrono::ceil<std::chrono::seconds>(it->second.lockedUntil -
+                                                   now);
 }
 
 void WebAuthStore::recordFailedLogin(const std::string &username)
@@ -397,8 +397,8 @@ void WebAuthStore::recordFailedLogin(const std::string &username)
     if (++failure.count >= 5)
     {
         failure.count = 0;
-        failure.lockedUntil = std::chrono::steady_clock::now() +
-                              std::chrono::minutes(5);
+        failure.lockedUntil =
+            std::chrono::steady_clock::now() + std::chrono::minutes(5);
     }
 }
 

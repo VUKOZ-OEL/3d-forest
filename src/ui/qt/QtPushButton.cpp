@@ -92,7 +92,8 @@ QtPushButton::~QtPushButton()
 
 void QtPushButton::updateIcon()
 {
-    QPushButton::setIcon(pushButton_->isPrimary()
-                            ? QIcon()
-                            : toQIcon(pushButton_->icon(), app_->isDarkMode()));
+    QPushButton::setIcon(
+        pushButton_->isPrimary()
+            ? QIcon()
+            : toQIcon(pushButton_->icon(), app_->isDarkMode()));
 }

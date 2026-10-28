@@ -178,17 +178,18 @@ bool WebSession::receive(const drogon::WebSocketConnectionPtr &connection,
                 if (!message["username"].isString())
                     throw std::invalid_argument("Invalid login request");
                 const auto username = message["username"].asString();
-                const auto lockedFor = authenticationEnabled()
-                                            ? authStore_->lockoutRemaining(username)
-                                            : std::chrono::seconds::zero();
+                const auto lockedFor =
+                    authenticationEnabled()
+                        ? authStore_->lockoutRemaining(username)
+                        : std::chrono::seconds::zero();
                 if (lockedFor > std::chrono::seconds::zero())
                 {
                     JsonCpp::Value result{JsonCpp::objectValue};
                     result["type"] = "auth.result";
                     result["ok"] = false;
-                    result["message"] = "Too many failed attempts. Try again in " +
-                                         std::to_string(lockedFor.count()) +
-                                         " seconds.";
+                    result["message"] =
+                        "Too many failed attempts. Try again in " +
+                        std::to_string(lockedFor.count()) + " seconds.";
                     send(result);
                     return;
                 }
@@ -275,16 +276,17 @@ bool WebSession::receive(const drogon::WebSocketConnectionPtr &connection,
                 result["type"] = "auth.result";
                 result["ok"] = valid;
                 result["loggedIn"] = loggedIn_;
-                const auto lockedFor = !valid && authenticationEnabled()
-                                           ? authStore_->lockoutRemaining(username)
-                                           : std::chrono::seconds::zero();
-                result["message"] = valid
-                                         ? "Signed in"
-                                         : (lockedFor > std::chrono::seconds::zero()
-                                                ? "Too many failed attempts. Try again in " +
-                                                      std::to_string(lockedFor.count()) +
-                                                      " seconds."
-                                                : "Invalid username or password");
+                const auto lockedFor =
+                    !valid && authenticationEnabled()
+                        ? authStore_->lockoutRemaining(username)
+                        : std::chrono::seconds::zero();
+                result["message"] =
+                    valid ? "Signed in"
+                          : (lockedFor > std::chrono::seconds::zero()
+                                 ? "Too many failed attempts. Try again in " +
+                                       std::to_string(lockedFor.count()) +
+                                       " seconds."
+                                 : "Invalid username or password");
                 send(result);
             }
             else if (type == "auth.logout")

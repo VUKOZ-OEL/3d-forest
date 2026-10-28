@@ -196,8 +196,7 @@ bool QtDoubleRangeSlider::eventFilter(QObject *object, QEvent *event)
     };
 
     const int handleInset = 10;
-    const int minCenterX =
-        std::min(handleInset, rangeSlider->width() / 2);
+    const int minCenterX = std::min(handleInset, rangeSlider->width() / 2);
     const int maxCenterX =
         std::max(minCenterX, rangeSlider->width() - handleInset);
     const auto insetHandleCenter = [&](int position)

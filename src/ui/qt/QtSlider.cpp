@@ -146,8 +146,8 @@ void QtSlider::paintEvent(QPaintEvent *event)
                             3);
     if (tickPosition() != QSlider::NoTicks)
     {
-        const int interval = std::max(
-            1, tickInterval() > 0 ? tickInterval() : singleStep());
+        const int interval =
+            std::max(1, tickInterval() > 0 ? tickInterval() : singleStep());
         const bool above = tickPosition() == QSlider::TicksAbove ||
                            tickPosition() == QSlider::TicksBothSides;
         const bool below = tickPosition() == QSlider::TicksBelow ||
