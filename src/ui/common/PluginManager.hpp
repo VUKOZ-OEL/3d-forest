@@ -47,7 +47,8 @@ public:
     void load(Application *app);
     void unload();
 
-    ViewerInterface *viewer() { return viewerPlugin_; }
+    ProjectFileInterface *projectFilePlugin() { return projectFilePlugin_; }
+    ViewerInterface *viewerPlugin() { return viewerPlugin_; }
 
 private:
     Application *app_{nullptr};

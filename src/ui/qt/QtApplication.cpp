@@ -74,6 +74,8 @@ QtApplication::~QtApplication()
 
 void QtApplication::init()
 {
+    mainWindow_.canClose = [this] { return onClose(); };
+
     initLayout();
 
     load();
@@ -119,6 +121,23 @@ int QtApplication::exec()
 void QtApplication::processEvents()
 {
     QCoreApplication::processEvents();
+}
+
+bool QtApplication::onClose()
+{
+    if (!pluginManager_.projectFilePlugin())
+    {
+        LOG_ERROR(<< "The project file plugin is not loaded"
+                     " to perform the action.");
+        return true;
+    }
+
+    if (pluginManager_.projectFilePlugin()->closeProject())
+    {
+        return true;
+    }
+
+    return false;
 }
 
 void QtApplication::initLayout()

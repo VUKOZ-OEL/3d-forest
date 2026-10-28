@@ -790,31 +790,31 @@ void Editor::applyFilters()
 void Editor::setApplicationSettings(const ApplicationSettings &settings)
 {
     settings_.setApplicationSettings(settings);
-    writeSettings();
+    // writeSettings();
 }
 
 void Editor::setRenderingSettings(const RenderingSettings &renderingSettings)
 {
     settings_.setRenderingSettings(renderingSettings);
-    writeSettings();
+    // writeSettings();
 }
 
 void Editor::setTreeSettings(const TreeSettings &treeSettings)
 {
     settings_.setTreeSettings(treeSettings);
-    writeSettings();
+    // writeSettings();
 }
 
 void Editor::setUnitsSettings(const UnitsSettings &unitsSettings)
 {
     settings_.setUnitsSettings(unitsSettings);
-    writeSettings();
+    // writeSettings();
 }
 
 void Editor::setViewSettings(const ViewSettings &viewSettings)
 {
     settings_.setViewSettings(viewSettings);
-    writeSettings();
+    // writeSettings();
 }
 
 void Editor::addModifier(ModifierInterface *modifier)

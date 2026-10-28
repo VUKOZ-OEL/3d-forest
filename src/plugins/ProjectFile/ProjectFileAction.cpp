@@ -183,6 +183,12 @@ bool ProjectFileAction::saveProject(Application *app, const std::string &path)
 
     app->suspendThreads();
 
+    if (!app->loggedIn())
+    {
+        LOG_WARNING(<< "User is not logged in.");
+        return false;
+    }
+
     if (path.empty())
     {
         // Save.
@@ -241,7 +247,7 @@ bool ProjectFileAction::closeProject(Application *app)
     app->suspendThreads();
 
     // Save changes.
-    if (app->editor().unsavedChanges())
+    if (app->loggedIn() && app->editor().unsavedChanges())
     {
         LOG_DEBUG(<< "Project has unsaved changes.");
 
@@ -282,6 +288,11 @@ bool ProjectFileAction::closeProject(Application *app)
     // Close.
     try
     {
+        if (app->loggedIn())
+        {
+            app->editor().writeSettings();
+        }
+
         app->editor().close();
     }
     catch (std::exception &e)

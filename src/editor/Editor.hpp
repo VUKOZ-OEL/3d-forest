@@ -55,6 +55,7 @@ public:
               const ImportSettings &settings = ImportSettings());
     void reload();
     void saveProject(const std::string &path);
+    void writeSettings();
     const std::string &projectPath() const { return projectPath_; }
     const std::string &projectName() const { return projectName_; }
     bool unsavedChanges() const { return unsavedChanges_; }
@@ -201,7 +202,6 @@ protected:
     PageManager pageManager_;
 
     void readSettings();
-    void writeSettings();
 
     void openProject(std::string path, bool reload);
 

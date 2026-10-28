@@ -28,6 +28,7 @@
 
 // Include 3D Forest.
 #include <Application.hpp>
+#include <QtMainWindow.hpp>
 #include <QtSidebar.hpp>
 #include <QtThemeColors.hpp>
 
@@ -65,6 +66,8 @@ public:
 
     int exec();
     void processEvents() override;
+
+    bool onClose();
 
     void setViewer(Widget *widget) override;
     void removeViewer(Widget *widget) override;
@@ -107,7 +110,7 @@ signals:
 
 private:
     QApplication &qapplication_;
-    QMainWindow mainWindow_;
+    QtMainWindow mainWindow_;
 
     QtThemeColors themeColors_;
 

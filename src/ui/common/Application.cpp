@@ -89,11 +89,11 @@ void Application::load()
     emitUpdate(this, {});
 
     LOG_DEBUG_RENDER(<< "Reset viewer.");
-    if (pluginManager_.viewer())
+    if (pluginManager_.viewerPlugin())
     {
         if (interactive_)
         {
-            pluginManager_.viewer()->resetSceneView();
+            pluginManager_.viewerPlugin()->resetSceneView();
         }
     }
     else
@@ -125,28 +125,6 @@ void Application::showError(const char *message)
 
 void Application::onThemeChanged()
 {
-}
-
-bool Application::onClose()
-{
-#if 0
-    if (!projectFilePlugin_)
-    {
-        LOG_ERROR(<< "The project file plugin is not loaded"
-                     " to perform the action.");
-        event->accept();
-        return;
-    }
-
-    if (projectFilePlugin_->closeProject())
-    {
-        return true;
-    }
-
-    return false;
-#else
-    return true;
-#endif
 }
 
 void Application::importFile()
@@ -199,11 +177,11 @@ void Application::processRenderRequest()
     LOG_DEBUG_RENDER(<< "Start rendering.");
     double t1 = Time::realTime();
 
-    if (interactive_ && pluginManager_.viewer())
+    if (interactive_ && pluginManager_.viewerPlugin())
     {
         if (renderPending_.exchange(false))
         {
-            pluginManager_.viewer()->updateScene();
+            pluginManager_.viewerPlugin()->updateScene();
         }
     }
 
@@ -220,9 +198,9 @@ void Application::slotRenderViewport(size_t viewportId)
 {
     LOG_DEBUG_RENDER(<< "Render viewport <" << viewportId << ">.");
 
-    if (interactive_ && pluginManager_.viewer())
+    if (interactive_ && pluginManager_.viewerPlugin())
     {
-        threadRender_.render(pluginManager_.viewer()->camera(viewportId));
+        threadRender_.render(pluginManager_.viewerPlugin()->camera(viewportId));
     }
 }
 
@@ -230,9 +208,9 @@ void Application::slotRenderViewports()
 {
     LOG_DEBUG_RENDER(<< "Render viewports.");
 
-    if (interactive_ && pluginManager_.viewer())
+    if (interactive_ && pluginManager_.viewerPlugin())
     {
-        threadRender_.render(pluginManager_.viewer()->camera());
+        threadRender_.render(pluginManager_.viewerPlugin()->camera());
     }
 }
 
@@ -285,9 +263,9 @@ void Application::update(void *sender,
     if (resetCamera)
     {
         LOG_DEBUG_RENDER(<< "Reset camera.");
-        if (interactive_ && pluginManager_.viewer())
+        if (interactive_ && pluginManager_.viewerPlugin())
         {
-            pluginManager_.viewer()->resetScene();
+            pluginManager_.viewerPlugin()->resetScene();
         }
     }
 
@@ -302,10 +280,10 @@ void Application::updateNewProject()
 
     setWindowTitle(editor_.projectPath());
 
-    if (interactive_ && pluginManager_.viewer())
+    if (interactive_ && pluginManager_.viewerPlugin())
     {
         std::unique_lock<std::mutex> mutexlock(editor_.editorMutex_);
-        pluginManager_.viewer()->resetSceneView();
+        pluginManager_.viewerPlugin()->resetSceneView();
     }
 
     emitUpdate(this, {});
@@ -319,9 +297,9 @@ void Application::updateData()
 
     suspendThreads();
 
-    if (interactive_ && pluginManager_.viewer())
+    if (interactive_ && pluginManager_.viewerPlugin())
     {
-        pluginManager_.viewer()->resetScene();
+        pluginManager_.viewerPlugin()->resetScene();
     }
 
     editor_.viewports().clearContent();
@@ -336,9 +314,9 @@ void Application::updateFilter(void *sender, bool final)
 
     suspendThreads();
 
-    if (interactive_ && pluginManager_.viewer())
+    if (interactive_ && pluginManager_.viewerPlugin())
     {
-        pluginManager_.viewer()->resetScene();
+        pluginManager_.viewerPlugin()->resetScene();
     }
 
     editor_.viewports().setState(Page::STATE_SELECT);

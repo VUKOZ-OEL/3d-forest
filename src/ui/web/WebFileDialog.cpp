@@ -91,10 +91,10 @@ bool wildcard(const std::string &pattern, const std::string &text)
 
 std::string modifiedTime(const fs::file_time_type &time)
 {
-    const auto systemTime = std::chrono::time_point_cast<
-        std::chrono::system_clock::duration>(
-        time - fs::file_time_type::clock::now() +
-        std::chrono::system_clock::now());
+    const auto systemTime =
+        std::chrono::time_point_cast<std::chrono::system_clock::duration>(
+            time - fs::file_time_type::clock::now() +
+            std::chrono::system_clock::now());
     const std::time_t value = std::chrono::system_clock::to_time_t(systemTime);
     std::tm local{};
 #ifdef _WIN32
@@ -113,8 +113,8 @@ std::string fileSize(std::uintmax_t bytes)
     if (bytes < 1024)
         out << bytes << " B";
     else if (bytes < 1024 * 1024)
-        out << std::fixed << std::setprecision(1)
-            << (double(bytes) / 1024.0) << " KB";
+        out << std::fixed << std::setprecision(1) << (double(bytes) / 1024.0)
+            << " KB";
     else
         out << std::fixed << std::setprecision(1)
             << (double(bytes) / (1024.0 * 1024.0)) << " MB";
@@ -240,7 +240,8 @@ public:
                     accept();
                 }
             });
-        auto start = initial.empty() ? root_ : fs::absolute(fs::u8path(initial));
+        auto start =
+            initial.empty() ? root_ : fs::absolute(fs::u8path(initial));
         if (!isWithinRoot(fs::is_directory(start) ? start
                                                   : start.parent_path()))
             start = root_;
@@ -423,25 +424,33 @@ private:
             std::vector<std::string> patterns;
             if (begin != std::string::npos && end > begin)
             {
-                std::istringstream in(filter.substr(begin + 1, end - begin - 1));
+                std::istringstream in(
+                    filter.substr(begin + 1, end - begin - 1));
                 for (std::string pattern; in >> pattern;)
                     patterns.push_back(pattern);
             }
             std::string query = search_->text();
-            std::transform(query.begin(), query.end(), query.begin(),
-                           [](unsigned char c) { return char(std::tolower(c)); });
+            std::transform(query.begin(),
+                           query.end(),
+                           query.begin(),
+                           [](unsigned char c)
+                           { return char(std::tolower(c)); });
             for (auto &entry : entries)
             {
                 auto name = entry.path().filename().u8string();
                 auto lowerName = name;
-                std::transform(lowerName.begin(), lowerName.end(),
-                               lowerName.begin(), [](unsigned char c)
+                std::transform(lowerName.begin(),
+                               lowerName.end(),
+                               lowerName.begin(),
+                               [](unsigned char c)
                                { return char(std::tolower(c)); });
-                if (!query.empty() && lowerName.find(query) == std::string::npos)
+                if (!query.empty() &&
+                    lowerName.find(query) == std::string::npos)
                     continue;
                 bool directory = entry.is_directory();
                 if (!directory && !patterns.empty() &&
-                    !std::any_of(patterns.begin(), patterns.end(),
+                    !std::any_of(patterns.begin(),
+                                 patterns.end(),
                                  [&](const auto &pattern)
                                  { return wildcard(pattern, name); }))
                     continue;
@@ -464,10 +473,10 @@ private:
                     }
                 }
                 const auto modified = modifiedTime(entry.last_write_time());
-                const auto size = directory ? std::string{}
-                                            : fileSize(entry.file_size());
-                const std::string entryIcon = directory ? "\xf0\x9f\x93\x81 "
-                                                         : "\xf0\x9f\x93\x84 ";
+                const auto size =
+                    directory ? std::string{} : fileSize(entry.file_size());
+                const std::string entryIcon =
+                    directory ? "\xf0\x9f\x93\x81 " : "\xf0\x9f\x93\x84 ";
                 auto *item = tree_->push_back(TreeWidgetItem(
                     {entryIcon + name, modified, type, size, ""}));
                 paths_[item] = entry.path();

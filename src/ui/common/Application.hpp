@@ -78,7 +78,6 @@ public:
     void showError(const char *message);
 
     void onThemeChanged();
-    bool onClose();
 
     void importFile();
 
@@ -195,10 +194,12 @@ private:
     std::atomic_bool renderPending_{false};
     bool interactive_{true};
 
-    PluginManager pluginManager_;
     NavigationTree navigation_;
     EventQueue eventQueue_;
     ResourceBundle resources_;
+
+protected:
+    PluginManager pluginManager_;
 };
 
 #include <WarningsEnable.hpp>
