@@ -53,19 +53,6 @@ FilterFilesWidget::FilterFilesWidget(Application *app) : app_(app)
                                         { slotItemSelectionChanged(); });
 
     // Tool bar buttons.
-    app_->createToolButton(&addButton_,
-                           tr("Add"),
-                           tr("Add new data set"),
-                           THEME_ICON("add"),
-                           [this]() { slotAdd(); });
-
-    app_->createToolButton(&deleteButton_,
-                           tr("Remove"),
-                           tr("Remove selected data set"),
-                           THEME_ICON("remove"),
-                           [this]() { slotDelete(); });
-    deleteButton_->setEnabled(false);
-
     app_->createToolButton(&showButton_,
                            tr("Show"),
                            tr("Make selected data sets visible"),
@@ -100,8 +87,6 @@ FilterFilesWidget::FilterFilesWidget(Application *app) : app_(app)
 
     // Tool bar.
     ToolBar *toolBar = new ToolBar;
-    toolBar->addWidget(addButton_);
-    toolBar->addWidget(deleteButton_);
     toolBar->addWidget(showButton_);
     toolBar->addWidget(hideButton_);
     toolBar->addSeparator();
@@ -209,31 +194,6 @@ void FilterFilesWidget::setDatasets(const Datasets &datasets,
     unblock();
 }
 
-void FilterFilesWidget::slotAdd()
-{
-    app_->importFile();
-}
-
-void FilterFilesWidget::slotDelete()
-{
-    std::vector<TreeWidgetItem *> items = tree_->selectedItems();
-
-    if (items.size() > 0)
-    {
-        slotSelectNone();
-
-        for (auto &item : items)
-        {
-            datasets_.erase(index(item));
-            filter_.erase(identifier(item));
-
-            delete item;
-        }
-
-        dataChanged();
-    }
-}
-
 void FilterFilesWidget::slotShow()
 {
     LOG_DEBUG(<< "Show.");
@@ -307,13 +267,11 @@ void FilterFilesWidget::slotItemSelectionChanged()
 
     if (items.size() > 0)
     {
-        deleteButton_->setEnabled(true);
         showButton_->setEnabled(true);
         hideButton_->setEnabled(true);
     }
     else
     {
-        deleteButton_->setEnabled(false);
         showButton_->setEnabled(false);
         hideButton_->setEnabled(false);
     }

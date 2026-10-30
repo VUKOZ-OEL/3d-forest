@@ -43,8 +43,6 @@ public:
 
     void slotUpdate(const Message &msg);
 
-    void slotAdd();
-    void slotDelete();
     void slotShow();
     void slotHide();
     void slotSelectAll();
@@ -68,8 +66,6 @@ protected:
     Application *app_;
 
     TreeWidget *tree_;
-    ToolButton *addButton_;
-    ToolButton *deleteButton_;
     ToolButton *showButton_;
     ToolButton *hideButton_;
     ToolButton *selectAllButton_;
