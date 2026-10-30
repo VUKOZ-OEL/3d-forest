@@ -70,7 +70,7 @@ private:
     std::string text_;
     bool numeric_{false};
 
-    int flags_{Ui::ItemIsSelectable | Ui::ItemIsEditable | Ui::ItemIsEnabled};
+    int flags_{Ui::ItemIsSelectable | Ui::ItemIsEnabled};
 
     int checkState_{-1};
     Brush background_;
