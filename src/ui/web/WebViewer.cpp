@@ -260,11 +260,14 @@ J WebViewer::sceneJson()
             vectorJson(a.isDbhValid()        ? a.dbhPosition
                        : a.isPositionValid() ? a.position
                                              : s.boundary.center());
+        item["dbhNormal"] =
+            a.isDbhValid() ? vectorJson(a.dbhNormal) : J(JsonCpp::arrayValue);
         item["diameter"] =
             (a.isDbhValid()
                  ? a.dbh
                  : .2 * editor.settings().unitsSettings().pointsPerMeter()[0]) *
             tree.dbhScale();
+        item["dbhDiameter"] = a.isDbhValid() ? a.dbh : 0.0;
         item["position"] = a.isPositionValid() ? vectorJson(a.position)
                                                : J(JsonCpp::arrayValue);
         item["height"] = a.isHeightValid() ? a.height : 0;

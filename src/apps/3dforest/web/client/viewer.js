@@ -1,4 +1,4 @@
-import { ViewerCamera, sub, add, scale, dot, length } from "./viewer-camera.js";
+import { ViewerCamera, sub, add, scale, dot, length, cross, normalize } from "./viewer-camera.js";
 const MAGIC = 0x33564657,
   HEADER = 64,
   STRIDE = 16,
@@ -472,6 +472,44 @@ export function createViewer(root, id, emit) {
         }
       }
       if (s.attributes) {
+        if (!camera.lock2d && s.dbhValid && s.dbhNormal?.length === 3) {
+          const a = s.dbhPosition,
+            radius = s.dbhDiameter * 0.5,
+            direction = normalize(s.dbhNormal),
+            axis = scale(direction, radius * 0.75),
+            first = cross(direction, [1, 0, 0]),
+            basis = normalize(length(first) > 1e-8 ? first : cross(direction, [0, 1, 0])),
+            second = normalize(cross(direction, basis)),
+            slices = 10,
+            ring = [];
+          for (let i = 0; i < slices; ++i) {
+            const angle = (2 * Math.PI * i) / slices,
+              offset = add(scale(basis, Math.cos(angle) * radius), scale(second, Math.sin(angle) * radius));
+            ring.push([add(a, offset), add(add(a, axis), offset)]);
+          }
+          const faces = ring.map((v, i) => {
+            const next = ring[(i + 1) % slices],
+              radial = normalize(add(sub(v[0], a), sub(next[0], a))),
+              light = Math.abs(dot(radial, normalize([1, 1, 1])));
+            return {
+              points: [v[0], next[0], next[1], v[1]].map(project),
+              depth: [v[0], next[0], next[1], v[1]].reduce((sum, p) => sum + (project(p)?.[2] || 0), 0) / 4,
+              shade: Math.round(110 + 100 * light),
+            };
+          }).filter((face) => face.points.every(Boolean)).sort((x, y) => y.depth - x.depth);
+          for (const face of faces) {
+            ctx.beginPath();
+            ctx.moveTo(face.points[0][0], face.points[0][1]);
+            for (let i = 1; i < face.points.length; ++i)
+              ctx.lineTo(face.points[i][0], face.points[i][1]);
+            ctx.closePath();
+            ctx.fillStyle = `rgb(${face.shade},0,0)`;
+            ctx.fill();
+            ctx.strokeStyle = "#640000";
+            ctx.lineWidth = dpr * 0.5;
+            ctx.stroke();
+          }
+        }
         ctx.strokeStyle = "#ffff00";
         if (!camera.lock2d && s.position?.length === 3) {
           const p = s.position,
