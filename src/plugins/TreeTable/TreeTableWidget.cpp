@@ -66,6 +66,10 @@ TreeTableWidget::TreeTableWidget(Application *app) : app_(app)
     // Widget.
     setLayout(mainLayout);
 
+    // LoggedIn status
+    app_->signalLoginChanged.connect([this](bool loggedIn)
+                                     { slotLoginChanged(loggedIn); });
+
     // New data.
     updatesEnabled_ = true;
     app_->signalUpdate.connect([this](const Message &msg) { slotUpdate(msg); });
@@ -129,6 +133,15 @@ void TreeTableWidget::newFilter()
 
 // -----------------------------------------------------------------------------
 // Slots.
+
+void TreeTableWidget::slotLoginChanged(bool loggedIn)
+{
+    readQsmButton_->setEnabled(loggedIn);
+    deleteQsmButton_->setEnabled(loggedIn);
+    speciesComboBox_->setEnabled(loggedIn);
+    managementStatusComboBox_->setEnabled(loggedIn);
+    exportButton_->setEnabled(loggedIn);
+}
 
 void TreeTableWidget::slotShow()
 {
@@ -368,6 +381,9 @@ ToolBar *TreeTableWidget::createToolBar()
     managementStatusComboBox_ = new ComboBox;
     managementStatusComboBox_->activated.connect(
         [this](int value) { slotManagementStatusChanged(value); });
+
+    // Initial loggedIn status
+    slotLoginChanged(app_->loggedIn());
 
     // Tool bar.
     ToolBar *toolBar = new ToolBar;

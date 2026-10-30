@@ -48,6 +48,8 @@ public:
 
     void slotUpdate(const Message &msg);
 
+    void slotLoginChanged(bool loggedIn);
+
     void slotShow();
     void slotHide();
     void slotSelectAll();
