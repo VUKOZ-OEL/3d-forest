@@ -28,7 +28,6 @@
 #include <Widget.hpp>
 class Application;
 class FilterManagementStatusTreeWidget;
-class Splitter;
 class ToolButton;
 class TreeWidget;
 class TreeWidgetItem;
@@ -73,8 +72,6 @@ protected:
     ToolButton *selectInvertButton_;
     ToolButton *selectNoneButton_;
     bool updatesEnabled_;
-
-    Splitter *splitter_;
 
     FilterManagementStatusTreeWidget *treeWidget_;
 

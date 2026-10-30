@@ -349,6 +349,7 @@ export function createItemView(type, p, send) {
     }
     if (last < rows.length) spacer((rows.length - last) * height);
     body.replaceChildren(fragment);
+    root.classList.toggle("fit-rows", isTree && p.fitRowsToContents);
   }
   root.addEventListener("scroll", () => {
     cancelAnimationFrame(frame);

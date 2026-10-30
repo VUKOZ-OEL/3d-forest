@@ -70,6 +70,9 @@ public:
         return autoResizeColumns_;
     }
 
+    void setFitRowsToContents(bool enabled);
+    bool fitRowsToContents() const { return fitRowsToContents_; }
+
     void setSelectionMode(int mode);
     int selectionMode() const { return selectionMode_; }
 
@@ -127,6 +130,7 @@ private:
     int selectionBehavior_{AbstractItemView::SelectRows};
 
     bool sortingEnabled_{false};
+    bool fitRowsToContents_{false};
     int sortColumn_{0};
     Ui::SortOrder sortOrder_{Ui::AscendingOrder};
 };

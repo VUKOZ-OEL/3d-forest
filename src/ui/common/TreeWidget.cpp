@@ -131,6 +131,17 @@ void TreeWidget::resizeColumnToContents(int column)
     resizeColumnRequested(column);
 }
 
+void TreeWidget::setFitRowsToContents(bool enabled)
+{
+    if (fitRowsToContents_ == enabled)
+    {
+        return;
+    }
+
+    fitRowsToContents_ = enabled;
+    settingsChanged();
+}
+
 void TreeWidget::setSelectionMode(int mode)
 {
     if (mode < AbstractItemView::NoSelection ||

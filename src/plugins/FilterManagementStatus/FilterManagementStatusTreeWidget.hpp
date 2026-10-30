@@ -67,6 +67,7 @@ protected:
     std::map<size_t, Status> createMap();
     void createCheckBoxList();
     void updateCheckBoxList();
+    void setCheckboxesEnabled(bool enabled);
 
     void setCheckbox(size_t idx);
 };

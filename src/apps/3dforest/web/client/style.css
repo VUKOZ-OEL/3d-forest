@@ -439,6 +439,21 @@ select:focus-visible,
 .vbox > .Splitter {
   flex: 1 1 0;
 }
+.vbox > .TreeWidget.fit-rows {
+  flex: 0 0 auto;
+  height: auto;
+  min-height: 0;
+}
+.TreeWidget.fit-rows > .widget-content {
+  display: flex;
+  flex-direction: column;
+}
+.TreeWidget.fit-rows .item-view {
+  flex: 0 0 auto;
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+}
 .stretch {
   min-width: 0;
   min-height: 0;

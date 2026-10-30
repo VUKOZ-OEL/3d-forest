@@ -40,6 +40,8 @@ FilterManagementStatusTreeWidget::FilterManagementStatusTreeWidget(
 
     // Status map.
     statusMap_ = createMap();
+    app_->signalLoginChanged.connect([this](bool loggedIn)
+                                     { setCheckboxesEnabled(loggedIn); });
 
     // Layout.
     mainLayout_ = new VBoxLayout;
@@ -85,6 +87,7 @@ void FilterManagementStatusTreeWidget::createCheckBoxList()
     for (size_t i = 0; i < checkboxList_.size(); i++)
     {
         CheckBox *checkbox = new CheckBox;
+        checkbox->setEnabled(app_->loggedIn());
         checkbox->setChecked(false);
         // auto label = core().translate(statusMap_[i].label);
         checkbox->setText(statusMap_[i].label);
@@ -101,6 +104,14 @@ void FilterManagementStatusTreeWidget::createCheckBoxList()
         mainLayout_->addWidget(checkboxList_[i]);
     }
     mainLayout_->addStretch();
+}
+
+void FilterManagementStatusTreeWidget::setCheckboxesEnabled(bool enabled)
+{
+    for (CheckBox *checkbox : checkboxList_)
+    {
+        checkbox->setEnabled(enabled);
+    }
 }
 
 void FilterManagementStatusTreeWidget::updateCheckBoxList()
@@ -122,6 +133,11 @@ void FilterManagementStatusTreeWidget::slotSetCheckbox(bool b, CheckBox *sender)
 {
     LOG_DEBUG(<< "Checkbox clicked.");
     (void)b;
+
+    if (!app_->loggedIn())
+    {
+        return;
+    }
 
     for (size_t i = 0; i < checkboxList_.size(); i++)
     {

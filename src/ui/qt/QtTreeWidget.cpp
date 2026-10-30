@@ -32,6 +32,7 @@
 #include <QHeaderView>
 #include <QPointer>
 #include <QSignalBlocker>
+#include <QSizePolicy>
 #include <QStringList>
 #include <QVariant>
 
@@ -43,6 +44,12 @@ QtTreeWidget::QtTreeWidget(TreeWidget *tree, QWidget *parent)
     : QTreeWidget(parent),
       tree_(tree)
 {
+    if (tree_->fitRowsToContents())
+    {
+        setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+        setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    }
+
     updateSettings();
 
     for (const auto &item : tree_->items())

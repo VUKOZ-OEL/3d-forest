@@ -260,6 +260,7 @@ void WebApplication::setLoggedIn(bool value)
     if (loggedIn_ == value)
         return;
     loggedIn_ = value;
+    signalLoginChanged(value);
     forceUi();
 }
 

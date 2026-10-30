@@ -124,7 +124,10 @@ export function createWidget(spec, emit) {
   if (type === "TableWidget" || type === "TreeWidget") {
     const view = createItemView(type, p, send);
     root.append(view.root);
-    apply = view.update;
+    apply = (patch) => {
+      view.update(patch);
+      root.classList.toggle("fit-rows", type === "TreeWidget" && p.fitRowsToContents);
+    };
     dispose = view.dispose || dispose;
   } else if (type === "CheckBox" || type === "RadioButton") {
     const label = element("label", "check-label");

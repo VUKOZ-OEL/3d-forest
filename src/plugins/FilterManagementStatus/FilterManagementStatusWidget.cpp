@@ -27,7 +27,6 @@
 #include <FilterManagementStatusWidget.hpp>
 #include <HBoxLayout.hpp>
 #include <Label.hpp>
-#include <Splitter.hpp>
 #include <ThemeIcon.hpp>
 #include <ToolBar.hpp>
 #include <ToolButton.hpp>
@@ -47,6 +46,7 @@ FilterManagementStatusWidget::FilterManagementStatusWidget(Application *app)
 {
     // Table.
     tree_ = new TreeWidget();
+    tree_->setFitRowsToContents(true);
     tree_->setSelectionMode(AbstractItemView::ExtendedSelection);
     tree_->setSelectionBehavior(AbstractItemView::SelectRows);
 
@@ -102,18 +102,12 @@ FilterManagementStatusWidget::FilterManagementStatusWidget(Application *app)
     // Detail.
     treeWidget_ = new FilterManagementStatusTreeWidget(app_);
 
-    // Splitter.
-    splitter_ = new Splitter;
-    splitter_->addWidget(tree_);
-    splitter_->addWidget(treeWidget_);
-    splitter_->setOrientation(Ui::Vertical);
-    splitter_->setSizes(std::vector<int>({500, 500}));
-
     // Layout.
     VBoxLayout *mainLayout = new VBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(toolBar);
-    mainLayout->addWidget(splitter_);
+    mainLayout->addWidget(tree_);
+    mainLayout->addWidget(treeWidget_);
 
     setLayout(mainLayout);
 

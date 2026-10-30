@@ -398,6 +398,7 @@ void WebControls::sync(bool enabled, bool visible)
         p["sorting"] = w->isSortingEnabled();
         p["sortColumn"] = w->sortColumn();
         p["sortOrder"] = int(w->sortOrder());
+        p["fitRowsToContents"] = w->fitRowsToContents();
     }
     patch(p);
 }

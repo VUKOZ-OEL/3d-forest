@@ -183,6 +183,9 @@ public:
 
     virtual void wakeUp();
 
+    /// Hosted applications emit this when the signed-in state changes.
+    Signal<bool> signalLoginChanged;
+
     /// Connect to this signal in your plugin to be notified about data changes.
     // void signalUpdate(void *sender, const std::set<Editor::Type> &target);
     Signal<Message> signalUpdate;
