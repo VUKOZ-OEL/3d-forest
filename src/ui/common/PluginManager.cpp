@@ -163,6 +163,11 @@ void PluginManager::load(Application *app)
 
 void PluginManager::unload()
 {
+    if (app_)
+    {
+        app_->editor().clearModifiers();
+    }
+
     for (auto &it : plugins_)
     {
         pluginManagerUnLoad(it, app_);
@@ -194,16 +199,15 @@ void PluginManager::load(const std::string &fileName)
     handle.plugin->initialize(app_);
     plugins_.push_back(handle);
 
-#if 0
     // Modifier.
     ModifierInterface *modifierInterface;
     modifierInterface = dynamic_cast<ModifierInterface *>(pluginInterface);
-    if (modifierInterface)
+    if (modifierInterface && app_)
     {
         LOG_DEBUG(<< "Add modifier plugin.");
-        editor_.addModifier(modifierInterface);
+        app_->editor().addModifier(modifierInterface);
     }
-#endif
+
     // Project file.
     ProjectFileInterface *projectFileInterface;
     projectFileInterface =

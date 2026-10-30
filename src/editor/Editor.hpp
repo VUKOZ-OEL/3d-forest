@@ -153,6 +153,7 @@ public:
     // Modifiers.
     void addModifier(ModifierInterface *modifier);
     void runModifiers(Page *page);
+    void clearModifiers();
 
     // View.
     void viewportsResize(size_t n);

@@ -834,6 +834,11 @@ void Editor::runModifiers(Page *page)
     }
 }
 
+void Editor::clearModifiers()
+{
+    modifiers_.clear();
+}
+
 void Editor::viewportsResize(size_t n)
 {
     LOG_DEBUG(<< "Set number of viewports to <" << n << ">.");
