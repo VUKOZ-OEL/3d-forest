@@ -43,6 +43,7 @@ export function createViewer(root, id, emit) {
     camera = new ViewerCamera();
   let gl,
     program,
+    attributeBuffer,
     uniforms = {},
     chunks = [],
     bytes = 0,
@@ -108,6 +109,7 @@ export function createViewer(root, id, emit) {
     gl.deleteShader(fs);
     if (!gl.getProgramParameter(program, gl.LINK_STATUS))
       throw Error(gl.getProgramInfoLog(program));
+    attributeBuffer = gl.createBuffer();
     for (const name of [
       "rotation",
       "projection",
@@ -405,6 +407,7 @@ export function createViewer(root, id, emit) {
         chunk.count,
       );
     }
+    drawDbhCylinders();
     gl.disable(gl.BLEND);
     gl.enable(gl.DEPTH_TEST);
     ctx.clearRect(0, 0, w, h);
@@ -472,44 +475,6 @@ export function createViewer(root, id, emit) {
         }
       }
       if (s.attributes) {
-        if (!camera.lock2d && s.dbhValid && s.dbhNormal?.length === 3) {
-          const a = s.dbhPosition,
-            radius = s.dbhDiameter * 0.5,
-            direction = normalize(s.dbhNormal),
-            axis = scale(direction, radius * 0.75),
-            first = cross(direction, [1, 0, 0]),
-            basis = normalize(length(first) > 1e-8 ? first : cross(direction, [0, 1, 0])),
-            second = normalize(cross(direction, basis)),
-            slices = 10,
-            ring = [];
-          for (let i = 0; i < slices; ++i) {
-            const angle = (2 * Math.PI * i) / slices,
-              offset = add(scale(basis, Math.cos(angle) * radius), scale(second, Math.sin(angle) * radius));
-            ring.push([add(a, offset), add(add(a, axis), offset)]);
-          }
-          const faces = ring.map((v, i) => {
-            const next = ring[(i + 1) % slices],
-              radial = normalize(add(sub(v[0], a), sub(next[0], a))),
-              light = Math.abs(dot(radial, normalize([1, 1, 1])));
-            return {
-              points: [v[0], next[0], next[1], v[1]].map(project),
-              depth: [v[0], next[0], next[1], v[1]].reduce((sum, p) => sum + (project(p)?.[2] || 0), 0) / 4,
-              shade: Math.round(110 + 100 * light),
-            };
-          }).filter((face) => face.points.every(Boolean)).sort((x, y) => y.depth - x.depth);
-          for (const face of faces) {
-            ctx.beginPath();
-            ctx.moveTo(face.points[0][0], face.points[0][1]);
-            for (let i = 1; i < face.points.length; ++i)
-              ctx.lineTo(face.points[i][0], face.points[i][1]);
-            ctx.closePath();
-            ctx.fillStyle = `rgb(${face.shade},0,0)`;
-            ctx.fill();
-            ctx.strokeStyle = "#640000";
-            ctx.lineWidth = dpr * 0.5;
-            ctx.stroke();
-          }
-        }
         ctx.strokeStyle = "#ffff00";
         if (!camera.lock2d && s.position?.length === 3) {
           const p = s.position,
@@ -524,6 +489,11 @@ export function createViewer(root, id, emit) {
             add(at, [0, -(b[4] - b[1]) / 2, 0]),
             add(at, [0, (b[4] - b[1]) / 2, 0]),
           );
+          if (s.crownStart > 0) {
+            const crown = add(s.position, [0, 0, s.crownStart]);
+            line(add(crown, [-(b[3] - b[0]) / 4, 0, 0]), add(crown, [(b[3] - b[0]) / 4, 0, 0]));
+            line(add(crown, [0, -(b[4] - b[1]) / 4, 0]), add(crown, [0, (b[4] - b[1]) / 4, 0]));
+          }
         }
         const p = project([(b[0] + b[3]) / 2, (b[1] + b[4]) / 2, b[5]]);
         if (p && p[0] > -200 && p[0] < w + 200 && p[1] > -50 && p[1] < h + 50) {
@@ -547,6 +517,43 @@ export function createViewer(root, id, emit) {
       ctx.stroke();
     });
     ctx.lineWidth = dpr;
+  }
+  function drawDbhCylinders() {
+    if (camera.lock2d) return;
+    const vertices = [],
+      color = [1, 0, 0, 1],
+      slices = 10;
+    for (const s of scene.segments || []) {
+      if (!s.attributes || !s.dbhValid || s.dbhNormal?.length !== 3) continue;
+      const a = s.dbhPosition,
+        radius = s.dbhDiameter * 0.5,
+        direction = normalize(s.dbhNormal),
+        axis = scale(direction, radius * 0.75),
+        first = cross(direction, [1, 0, 0]),
+        basis = normalize(length(first) > 1e-8 ? first : cross(direction, [0, 1, 0])),
+        second = normalize(cross(direction, basis)),
+        ring = [];
+      for (let i = 0; i < slices; ++i) {
+        const angle = (2 * Math.PI * i) / slices,
+          offset = add(scale(basis, Math.cos(angle) * radius), scale(second, Math.sin(angle) * radius));
+        ring.push([add(a, offset), add(add(a, axis), offset)]);
+      }
+      for (let i = 0; i < slices; ++i) {
+        const next = ring[(i + 1) % slices];
+        for (const p of [ring[i][0], next[0], next[1], ring[i][0], next[1], ring[i][1]])
+          vertices.push(...sub(p, camera.center), ...color);
+      }
+    }
+    if (!vertices.length) return;
+    gl.bindBuffer(gl.ARRAY_BUFFER, attributeBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.DYNAMIC_DRAW);
+    gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 28, 0);
+    gl.vertexAttribPointer(1, 4, gl.FLOAT, false, 28, 12);
+    gl.uniform3f(uniforms.offset, 0, 0, 0);
+    gl.uniform1i(uniforms.lighting, 1);
+    gl.disable(gl.BLEND);
+    gl.enable(gl.DEPTH_TEST);
+    gl.drawArrays(gl.TRIANGLES, 0, vertices.length / 7);
   }
   let pointer = null;
   canvas.addEventListener("contextmenu", (e) => e.preventDefault());
