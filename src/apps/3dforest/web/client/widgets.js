@@ -185,6 +185,22 @@ export function createWidget(spec, emit) {
     const input = element("input");
     input.type = "text";
     root.append(input);
+    const breadcrumbs = p.name === "file-location"
+      ? element("nav", "file-breadcrumbs") : null;
+    let breadcrumbPath;
+    if (breadcrumbs) {
+      breadcrumbs.setAttribute("aria-label", "Folder path");
+      breadcrumbs.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") e.stopPropagation();
+      });
+      root.append(breadcrumbs);
+      input.setAttribute("aria-label", "Folder path");
+      input.addEventListener("focus", () => root.classList.add("editing-path"));
+      input.addEventListener("blur", () => root.classList.remove("editing-path"));
+      breadcrumbs.addEventListener("click", (e) => {
+        if (e.target === breadcrumbs) input.focus();
+      });
+    }
     input.addEventListener("input", () =>
       send("textChanged", { text: input.value }),
     );
@@ -214,6 +230,25 @@ export function createWidget(spec, emit) {
       input.placeholder = p.placeholder || "";
       input.readOnly = p.readOnly;
       input.disabled = !p.enabled;
+      if (breadcrumbs && breadcrumbPath !== p.text) {
+        breadcrumbPath = p.text;
+        breadcrumbs.replaceChildren();
+        const parts = (p.text || "").split(/[\\/]/).filter(Boolean);
+        parts.forEach((part, index) => {
+          const button = element("button", "", part);
+          button.type = "button";
+          button.disabled = !p.enabled;
+          if (index === parts.length - 1)
+            button.setAttribute("aria-current", "location");
+          button.addEventListener("click", () =>
+            send("returnPressed", { text: parts.slice(0, index + 1).join("/") }));
+          breadcrumbs.append(button, element("span", "file-path-separator", "›"));
+        });
+        const edit = element("button", "file-edit-path", "⌄");
+        edit.title = "Edit folder path";
+        edit.addEventListener("click", () => { input.focus(); input.select(); });
+        breadcrumbs.append(edit);
+      }
     };
   } else if (type === "TextEdit") {
     const input = element("div", "text-editor");
@@ -532,6 +567,7 @@ export function createWidget(spec, emit) {
     Object.assign(p, patch);
     apply(patch);
     root.hidden = p.visible === false;
+    root.dataset.widgetName = p.name || "";
     root.title = p.toolTip || "";
     root.setAttribute("aria-disabled", String(!p.enabled));
   }

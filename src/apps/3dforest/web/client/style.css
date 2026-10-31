@@ -1096,6 +1096,165 @@ body.disconnected #application {
 .dialog-window[inert] {
   filter: brightness(0.97);
 }
+/* Explorer-style file picker. Names keep these rules local to this dialog. */
+.dialog-window:has([data-widget-name="file-toolbar"]) {
+  background: var(--input);
+}
+.dialog-window:has([data-widget-name="file-toolbar"]) .dialog-body {
+  padding: 0;
+  overflow: hidden;
+}
+[data-widget-name="file-toolbar"] {
+  padding: 10px 12px;
+  border-bottom: 30px solid var(--page);
+}
+[data-widget-name="file-toolbar"] > .widget-content > .layout {
+  gap: 10px !important;
+  padding: 0 !important;
+  align-items: center;
+}
+[data-widget-name="file-toolbar"] .PushButton button {
+  width: 26px;
+  height: 30px;
+  min-width: 0;
+  padding: 5px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+[data-widget-name="file-toolbar"] .PushButton button:hover:not(:disabled) {
+  background: var(--hover);
+}
+[data-widget-name="file-address"] {
+  border: 1px solid var(--border);
+  min-width: 100px;
+}
+[data-widget-name="file-address"]:focus-within {
+  border-color: var(--focus);
+}
+[data-widget-name="file-location"] {
+  position: relative;
+  min-width: 0;
+}
+[data-widget-name="file-location"] > input {
+  height: 32px;
+  border: 0;
+  border-radius: 0;
+  opacity: 0;
+}
+[data-widget-name="file-location"].editing-path > input {
+  opacity: 1;
+}
+.file-breadcrumbs {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.file-breadcrumbs::before {
+  content: "📁";
+  margin-right: 6px;
+}
+.editing-path .file-breadcrumbs {
+  display: none;
+}
+.file-breadcrumbs button {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 4px 6px;
+  flex-shrink: 0;
+}
+.file-breadcrumbs button:hover {
+  background: var(--hover);
+}
+.file-path-separator {
+  color: #888;
+  font-size: 16px;
+}
+.file-breadcrumbs .file-edit-path {
+  margin-left: auto;
+}
+[data-widget-name="file-search"] {
+  flex: 0 1 200px !important;
+  min-width: 100px;
+}
+[data-widget-name="file-search"] input {
+  height: 34px;
+  border-radius: 0;
+  padding: 5px 28px 5px 10px;
+  background: var(--input) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Ccircle cx='7' cy='6' r='4' fill='none' stroke='%23888' stroke-width='1.5'/%3E%3Cpath d='m10 9 4 4' stroke='%23888' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 8px center;
+}
+.dialog-window:has([data-widget-name="file-toolbar"]) .TreeWidget {
+  padding: 0 20px 0 clamp(12px, 12vw, 126px);
+}
+.dialog-window:has([data-widget-name="file-toolbar"]) .item-view {
+  border: 0;
+  border-radius: 0;
+}
+.dialog-window:has([data-widget-name="file-toolbar"]) .item-view table {
+  width: 100%;
+}
+.dialog-window:has([data-widget-name="file-toolbar"]) .item-view th {
+  font-weight: 400;
+  text-align: left;
+  border-bottom: 0;
+  padding: 2px 8px;
+  color: var(--text);
+}
+.dialog-window:has([data-widget-name="file-toolbar"]) .item-view th:nth-child(1) { width: 30%; }
+.dialog-window:has([data-widget-name="file-toolbar"]) .item-view th:nth-child(2) { width: 26%; }
+.dialog-window:has([data-widget-name="file-toolbar"]) .item-view th:nth-child(3) { width: 20%; }
+.dialog-window:has([data-widget-name="file-toolbar"]) .item-view th:nth-child(4) { width: 13%; }
+.dialog-window:has([data-widget-name="file-toolbar"]) .item-view td {
+  border: 0;
+  padding: 2px 8px;
+  text-overflow: ellipsis;
+}
+.dialog-window:has([data-widget-name="file-toolbar"]) .item-view tr:hover td:not(.selected) {
+  background: var(--hover);
+}
+.dialog-window:has([data-widget-name="file-toolbar"]) .item-view td:nth-child(4) {
+  text-align: right;
+}
+[data-widget-name="file-fields"] {
+  padding: 10px 14px 0 clamp(12px, 12vw, 126px);
+  background: var(--panel);
+}
+[data-widget-name="file-fields"] > .widget-content > .layout {
+  padding: 0 !important;
+  gap: 10px !important;
+  align-items: center;
+}
+[data-widget-name="file-fields"] .ComboBox {
+  flex: 0 1 190px !important;
+}
+[data-widget-name="file-fields"] input,
+[data-widget-name="file-fields"] select {
+  height: 25px;
+  border-radius: 0;
+}
+[data-widget-name="file-error"] {
+  background: var(--panel);
+  color: #c42b1c;
+  padding: 0 14px;
+}
+[data-widget-name="file-error"]:has(span:empty) {
+  display: none;
+}
+.dialog-window:has([data-widget-name="file-toolbar"]) .dialog-buttons {
+  padding: 6px 14px 12px;
+  gap: 14px;
+  background: var(--panel);
+}
+.dialog-window:has([data-widget-name="file-toolbar"]) .dialog-buttons button {
+  min-width: 86px;
+  min-height: 25px;
+}
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;

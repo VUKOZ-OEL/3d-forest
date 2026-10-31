@@ -145,12 +145,17 @@ public:
         setStandardButtons((save ? Save : Open) | Cancel);
         setDefaultButton(save ? Save : Open);
         auto *layout = new VBoxLayout;
+        layout->setContentsMargins(0, 0, 0, 0);
+        layout->setSpacing(0);
         setLayout(layout);
+        auto *toolbar = new Widget;
+        toolbar->setName("file-toolbar");
         auto *row = new HBoxLayout;
-        back_ = new PushButton("Back");
-        forward_ = new PushButton("Forward");
-        up_ = new PushButton("Up");
-        auto *refresh = new PushButton("Refresh");
+        toolbar->setLayout(row);
+        back_ = new PushButton;
+        forward_ = new PushButton;
+        up_ = new PushButton;
+        auto *refresh = new PushButton;
         back_->setToolTip("Back");
         forward_->setToolTip("Forward");
         up_->setToolTip("Up one folder");
@@ -162,33 +167,40 @@ public:
         refresh->setIcon(
             ThemeIcon(&app, ":/ApplicationResources/misc", "refresh"));
         path_ = new LineEdit;
+        path_->setName("file-location");
         path_->setPlaceholderText("Folder path");
         search_ = new LineEdit;
+        search_->setName("file-search");
         search_->setPlaceholderText("Search projects");
-        search_->setEnabled(false);
-        searchButton_ = new PushButton("Search");
-        searchButton_->setIcon(
-            ThemeIcon(&app, ":/ApplicationResources/misc", "search"));
-        searchButton_->setEnabled(false);
         row->addWidget(back_);
         row->addWidget(forward_);
         row->addWidget(up_);
-        row->addWidget(path_, 3);
-        row->addWidget(refresh);
-        row->addWidget(searchButton_);
-        row->addWidget(search_, 2);
-        layout->addLayout(row);
+        auto *address = new Widget;
+        address->setName("file-address");
+        auto *addressRow = new HBoxLayout;
+        addressRow->setContentsMargins(0, 0, 0, 0);
+        addressRow->setSpacing(0);
+        address->setLayout(addressRow);
+        addressRow->addWidget(path_, 1);
+        addressRow->addWidget(refresh);
+        row->addWidget(address, 1);
+        row->addWidget(search_);
+        layout->addWidget(toolbar);
         tree_ = new TreeWidget;
         tree_->setColumnCount(5);
         tree_->setHeaderLabels(
             {"Name", "Date modified", "Type", "Size", "Tags"});
         tree_->setSortingEnabled(true);
-        tree_->sortItems(2, Ui::AscendingOrder);
+        tree_->sortItems(0, Ui::AscendingOrder);
         tree_->setSelectionMode(multiple ? AbstractItemView::ExtendedSelection
                                          : AbstractItemView::SingleSelection);
         layout->addWidget(tree_, 1);
         name_ = new LineEdit;
+        name_->setName("file-name");
+        auto *fileFields = new Widget;
+        fileFields->setName("file-fields");
         auto *fileRow = new HBoxLayout;
+        fileFields->setLayout(fileRow);
         fileRow->addWidget(new Label("File name:"));
         fileRow->addWidget(name_, 1);
         filter_ = new ComboBox;
@@ -207,8 +219,9 @@ public:
             if (filter_->itemText(i) == selectedFilter)
                 filter_->setValue(i, false);
         fileRow->addWidget(filter_);
-        layout->addLayout(fileRow);
+        layout->addWidget(fileFields);
         error_ = new Label;
+        error_->setName("file-error");
         layout->addWidget(error_);
         back_->clicked.connect([this] { navigateHistory(-1); });
         forward_->clicked.connect([this] { navigateHistory(1); });
@@ -218,7 +231,6 @@ public:
                                      { navigate(fs::u8path(path_->text())); });
         search_->textChanged.connect([this](const std::string &)
                                      { populateDirectory(); });
-        searchButton_->clicked.connect([this] { populateDirectory(); });
         search_->returnPressed.connect([this] { populateDirectory(); });
         name_->returnPressed.connect([this] { accept(); });
         filter_->activated.connect([this](int) { navigate(current_); });
@@ -253,7 +265,7 @@ public:
             name_->setText(start.filename().u8string());
         }
     }
-    Size sizeHint() const override { return Size(840, 560); }
+    Size sizeHint() const override { return Size(880, 590); }
     std::vector<std::string> resultPaths;
     std::string selectedFilter() const { return filter_->currentText(); }
     void accept() override
@@ -318,8 +330,7 @@ private:
     fs::path current_;
     std::vector<fs::path> history_;
     std::size_t historyIndex_{0};
-    PushButton *back_{nullptr}, *forward_{nullptr}, *up_{nullptr},
-        *searchButton_{nullptr};
+    PushButton *back_{nullptr}, *forward_{nullptr}, *up_{nullptr};
     LineEdit *path_, *search_, *name_;
     TreeWidget *tree_;
     ComboBox *filter_;
@@ -382,6 +393,8 @@ private:
                                : (fs::path("projects") / relative).u8string());
             if (changed)
                 search_->clear();
+            search_->setPlaceholderText("Search " +
+                                        current_.filename().u8string());
             if (addHistory &&
                 (history_.empty() || history_[historyIndex_] != current_))
             {
