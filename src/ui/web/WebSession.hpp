@@ -36,7 +36,9 @@ class WebAuthStore;
 #include <condition_variable>
 #include <cstdint>
 #include <deque>
+#include <filesystem>
 #include <functional>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -77,6 +79,16 @@ public:
     void setLocalServicePort(int port) { localServicePort_ = port; }
     int localServicePort() const { return localServicePort_.load(); }
 
+    struct Download
+    {
+        std::filesystem::path directory;
+        std::filesystem::path file;
+        Clock::time_point expires{Clock::now() + std::chrono::minutes(10)};
+        ~Download();
+    };
+    std::string addDownload(std::shared_ptr<Download> download);
+    std::shared_ptr<Download> takeDownload(const std::string &id);
+
     // Server transport entry points. These enqueue work on the session thread.
     bool attach(const drogon::WebSocketConnectionPtr &connection);
     void detach(const drogon::WebSocketConnectionPtr &connection);
@@ -102,6 +114,7 @@ private:
     std::optional<LoginChallenge> loginChallenge_;
     std::thread worker_;
     mutable std::mutex mutex_;
+    std::map<std::string, std::shared_ptr<Download>> downloads_;
     std::condition_variable condition_;
     std::deque<Task> tasks_;
     bool stopping_{false};
@@ -127,6 +140,7 @@ private:
     bool canPublish() const;
     void publish(JsonCpp::Value message);
     void disconnect();
+    void expireDownloads();
 };
 
 #include <WarningsEnable.hpp>

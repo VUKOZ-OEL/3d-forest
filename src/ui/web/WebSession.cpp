@@ -24,6 +24,8 @@
 #include <WebAuthStore.hpp>
 #include <WebSession.hpp>
 
+// Include 3rd party.
+#include <drogon/utils/Utilities.h>
 #include <trantor/utils/Utilities.h>
 
 // Include std.
@@ -56,6 +58,49 @@ bool WebSession::authenticationEnabled() const
 {
     return authStore_ && authStore_->enabled();
 }
+
+WebSession::Download::~Download()
+{
+    std::error_code error;
+    if (!directory.empty())
+        std::filesystem::remove_all(directory, error);
+}
+
+std::string WebSession::addDownload(std::shared_ptr<Download> download)
+{
+    expireDownloads();
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (downloads_.size() >= 16)
+        throw std::runtime_error(
+            "Too many pending downloads. Try again later.");
+    download->expires = Clock::now() + std::chrono::minutes(10);
+    const auto id = drogon::utils::getUuid();
+    downloads_.emplace(id, std::move(download));
+    return id;
+}
+
+void WebSession::expireDownloads()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (auto it = downloads_.begin(); it != downloads_.end();)
+        if (it->second->expires < Clock::now())
+            it = downloads_.erase(it);
+        else
+            ++it;
+}
+
+std::shared_ptr<WebSession::Download> WebSession::takeDownload(
+    const std::string &id)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    const auto it = downloads_.find(id);
+    if (it == downloads_.end())
+        return {};
+    auto download = std::move(it->second);
+    downloads_.erase(it);
+    return download->expires >= Clock::now() ? download : nullptr;
+}
+
 WebSession::~WebSession()
 {
     stop();
@@ -403,6 +448,7 @@ void WebSession::run() noexcept
                       Clock::now() - sentAt_ > std::chrono::seconds(30))))
                     disconnect();
                 application_->flush();
+                expireDownloads();
             }
             catch (const std::invalid_argument &e)
             {

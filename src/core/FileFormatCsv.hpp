@@ -36,10 +36,13 @@ public:
     FileFormatCsv();
     virtual ~FileFormatCsv();
 
-    virtual void create(const FileFormatTable &table);
+    void create(const FileFormatTable &table) override;
 
-    void setFileName(const std::string &fileName) { fileName_ = fileName; }
-    virtual const std::string &fileName() const { return fileName_; }
+    void setFileName(const std::string &fileName) override
+    {
+        fileName_ = fileName;
+    }
+    const std::string &fileName() const override { return fileName_; }
 
 private:
     std::string fileName_;

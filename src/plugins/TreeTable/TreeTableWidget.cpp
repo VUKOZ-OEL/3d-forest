@@ -140,7 +140,7 @@ void TreeTableWidget::slotLoginChanged(bool loggedIn)
     deleteQsmButton_->setEnabled(loggedIn);
     speciesComboBox_->setEnabled(loggedIn);
     managementStatusComboBox_->setEnabled(loggedIn);
-    exportButton_->setEnabled(loggedIn);
+    exportButton_->setEnabled(true);
 }
 
 void TreeTableWidget::slotShow()
@@ -226,10 +226,16 @@ void TreeTableWidget::slotExport()
             std::shared_ptr<FileFormatInterface> writer = dialog.writer();
 
             // Write table data by using the writer.
-            writer->create(createExportTable());
+            app_->exportFile(dialog.fileName(),
+                             [&](const std::string &path)
+                             {
+                                 writer->setFileName(path);
+                                 writer->create(createExportTable());
+                                 return true;
+                             });
 
             // Remember the last file name used for export.
-            fileName_ = writer->fileName();
+            fileName_ = dialog.fileName();
         }
     }
     catch (std::exception &e)

@@ -38,6 +38,7 @@
 #include <cctype>
 #include <deque>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <map>
 #include <stdexcept>
@@ -639,6 +640,55 @@ int WebServer::exec()
                                   "streamlit"))
                 response->addHeader("sec-websocket-protocol", "streamlit");
         });
+    http.registerHandlerViaRegex(
+        R"(^/downloads/([0-9a-fA-F-]{36})/([0-9a-fA-F-]{36})$)",
+        [state = state_](
+            const drogon::HttpRequestPtr &request,
+            std::function<void(const drogon::HttpResponsePtr &)> &&callback,
+            std::string token,
+            std::string id)
+        {
+            const auto origin = request->getHeader("origin");
+            if ((!origin.empty() && origin != state->options.allowedOrigin) ||
+                request->getHeader("sec-fetch-site") == "cross-site")
+            {
+                auto response = drogon::HttpResponse::newHttpResponse();
+                response->setStatusCode(drogon::k403Forbidden);
+                callback(response);
+                return;
+            }
+            auto session = state->findSession(token);
+            auto download = session ? session->takeDownload(id) : nullptr;
+            auto stream =
+                download ? std::make_shared<std::ifstream>(download->file,
+                                                           std::ios::binary)
+                         : nullptr;
+            if (!stream || !*stream)
+            {
+                auto response = drogon::HttpResponse::newHttpResponse();
+                response->setStatusCode(drogon::k404NotFound);
+                callback(response);
+                return;
+            }
+            auto response = drogon::HttpResponse::newStreamResponse(
+                [download, stream](char *buffer,
+                                   std::size_t length) -> std::size_t
+                {
+                    if (!buffer)
+                    {
+                        stream->close();
+                        return 0;
+                    }
+                    stream->read(buffer, static_cast<std::streamsize>(length));
+                    return static_cast<std::size_t>(stream->gcount());
+                },
+                download->file.filename().u8string(),
+                drogon::CT_APPLICATION_OCTET_STREAM);
+            response->addHeader("Cache-Control", "no-store");
+            response->addHeader("X-Content-Type-Options", "nosniff");
+            callback(response);
+        },
+        {drogon::Get});
     http.registerHandlerViaRegex(
         R"(^/marteloscope/([0-9a-fA-F-]{36})(/.*)?$)",
         [state = state_](

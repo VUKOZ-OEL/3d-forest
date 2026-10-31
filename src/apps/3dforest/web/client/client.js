@@ -715,6 +715,17 @@ function connect() {
         sessionStorage.setItem(storageKey, token);
         lastRevision = 0;
         delay = 500;
+      } else if (m.type === "download") {
+        const url = new URL(m.url, location.origin);
+        if (url.origin !== location.origin ||
+            !url.pathname.startsWith(`/downloads/${token}/`))
+          throw Error("Invalid download URL");
+        const link = element("a");
+        link.href = url.href;
+        link.download = "";
+        document.body.append(link);
+        link.click();
+        link.remove();
       } else if (m.type === "auth.challenge") {
         accountMessage.textContent = "Checking password…";
         answerLoginChallenge(m);

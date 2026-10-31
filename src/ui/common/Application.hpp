@@ -129,6 +129,21 @@ public:
                                         std::string *selectedFilter = nullptr,
                                         int options = 0); // FileDialogOption
 
+    /** Resolve and validate an export destination for overwrite checks.
+     *  Returns an empty path for a browser download.
+     */
+    virtual std::string exportFilePath(const std::string &destination) const;
+
+    /** Run a server-side writer, then deliver its completed file to the
+     *  selected storage. Return false from write to cancel the export.
+     *  Web save pickers with AllowClientStorage return PC:/name for downloads;
+     *  server destinations are relative to projects.
+     *  the writer always receives a real filesystem path.
+     */
+    virtual bool exportFile(
+        const std::string &destination,
+        const std::function<bool(const std::string &)> &write);
+
     virtual int showDialog(Dialog &dialog);
     virtual void openDialog(Dialog &dialog);
 

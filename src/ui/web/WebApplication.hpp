@@ -108,6 +108,10 @@ public:
                                 const std::string &filter = "",
                                 std::string *selectedFilter = nullptr,
                                 int options = 0) override;
+    std::string exportFilePath(const std::string &destination) const override;
+    bool exportFile(
+        const std::string &destination,
+        const std::function<bool(const std::string &)> &write) override;
     int showDialog(Dialog &dialog) override;
     void openDialog(Dialog &dialog) override;
     Pixmap loadPixmap(const std::string &fileName) const override;

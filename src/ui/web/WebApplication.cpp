@@ -26,8 +26,12 @@
 #include <WebSession.hpp>
 #include <WebUiTree.hpp>
 
+// Include 3rd party.
+#include <drogon/utils/Utilities.h>
+
 // Include std.
 #include <algorithm>
+#include <filesystem>
 #include <stdexcept>
 #include <utility>
 
@@ -422,6 +426,89 @@ std::string WebApplication::getSaveFileName(const std::string &caption,
                                        options);
     return files.empty() ? std::string{} : files.front();
 }
+
+std::string WebApplication::exportFilePath(const std::string &destination) const
+{
+    namespace fs = std::filesystem;
+    if (destination.rfind("PC:/", 0) == 0)
+    {
+        const auto name = destination.substr(4);
+        if (name.empty() || name == "." || name == ".." ||
+            name.find_first_of("/\\\r\n\"") != std::string::npos)
+            throw std::runtime_error(
+                "Please choose a file name without folders.");
+        return {};
+    }
+    if (!loggedIn())
+        throw std::runtime_error("Sign in to export to server storage, or "
+                                 "choose PC storage in Browse.");
+    auto name = destination;
+    std::replace(name.begin(), name.end(), '\\', '/');
+    const auto relativePath = fs::u8path(name);
+    const auto invalidPath = []
+    {
+        return std::runtime_error(
+            "Use a path inside projects without '..' or an absolute path.");
+    };
+    if (name.empty() || relativePath.is_absolute() ||
+        relativePath.has_root_path() ||
+        name.find_first_of(":\r\n") != std::string::npos)
+        throw invalidPath();
+    for (const auto &part : relativePath)
+        if (part == "..")
+            throw invalidPath();
+    auto relative = relativePath;
+    if (*relative.begin() == "projects")
+        relative = relative.lexically_relative("projects");
+    if (!relative.has_filename() || relative.filename() == ".")
+        throw invalidPath();
+    std::error_code error;
+    const auto root = fs::canonical(fs::current_path() / "projects", error);
+    if (error)
+        throw std::runtime_error("The projects folder is unavailable.");
+    const auto path = (root / relative).lexically_normal();
+    const auto checked =
+        fs::canonical(fs::exists(path) ? path : path.parent_path(), error);
+    if (error)
+        throw std::runtime_error("The destination folder does not exist.");
+    const auto withinRoot = checked.lexically_relative(root);
+    if (withinRoot.empty() || withinRoot.is_absolute() ||
+        *withinRoot.begin() == ".." || fs::is_directory(path))
+        throw invalidPath();
+    return path.u8string();
+}
+
+bool WebApplication::exportFile(
+    const std::string &destination,
+    const std::function<bool(const std::string &)> &write)
+{
+    assertThread();
+    namespace fs = std::filesystem;
+    const auto serverPath = exportFilePath(destination);
+    if (serverPath.empty())
+    {
+        const auto name = destination.substr(4);
+        auto download = std::make_shared<WebSession::Download>();
+        const auto directory = fs::temp_directory_path() /
+                               ("3dforest-export-" + drogon::utils::getUuid());
+        if (!fs::create_directory(directory))
+            throw std::runtime_error("Could not create an export folder.");
+        download->directory = directory;
+        download->file = directory / fs::u8path(name);
+        if (!write(download->file.u8string()))
+            return false;
+        if (!fs::is_regular_file(download->file))
+            throw std::runtime_error("The export did not create a file.");
+        const auto id = session_.addDownload(download);
+        JsonCpp::Value message{JsonCpp::objectValue};
+        message["type"] = "download";
+        message["url"] = "/downloads/" + session_.token() + "/" + id;
+        session_.send(message);
+        return true;
+    }
+    return write(serverPath);
+}
+
 int WebApplication::showDialog(Dialog &dialog)
 {
     assertThread();

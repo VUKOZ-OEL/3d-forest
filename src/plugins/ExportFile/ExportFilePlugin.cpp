@@ -55,7 +55,7 @@ void ExportFilePlugin::initialize(Application *app)
         nullptr,
         610,
         false,
-        true);
+        false);
 }
 
 void ExportFilePlugin::slotExportFile()
@@ -71,12 +71,30 @@ void ExportFilePlugin::slotExportFile()
             std::shared_ptr<ExportFileFormatInterface> writer = dialog.writer();
             ExportFileProperties properties = dialog.properties();
 
-            ExportFileAction exportFile(&app_->editor());
-            exportFile.initialize(writer, properties);
-
-            ProgressActionDialog::run(app_, "Exporting file", &exportFile);
-
-            fileName_ = properties.fileName();
+            const auto destination = properties.fileName();
+            if (app_->exportFile(
+                    destination,
+                    [&](const std::string &path)
+                    {
+                        properties.setFileName(path);
+                        ExportFileAction exportFile(&app_->editor());
+                        exportFile.initialize(writer, properties);
+                        try
+                        {
+                            const bool completed =
+                                ProgressActionDialog::run(app_,
+                                                          "Exporting file",
+                                                          &exportFile);
+                            writer->close();
+                            return completed;
+                        }
+                        catch (...)
+                        {
+                            writer->close();
+                            throw;
+                        }
+                    }))
+                fileName_ = destination;
         }
     }
     catch (std::exception &e)

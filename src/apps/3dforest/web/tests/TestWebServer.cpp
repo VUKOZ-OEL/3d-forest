@@ -31,10 +31,12 @@
 #include <CheckBox.hpp>
 #include <ColorSwitch.hpp>
 #include <ComboBox.hpp>
+#include <Dialog.hpp>
 #include <DoubleRangeSlider.hpp>
 #include <DoubleSpinBox.hpp>
 #include <GroupBox.hpp>
 #include <Label.hpp>
+#include <Layout.hpp>
 #include <LineEdit.hpp>
 #include <Plugin.hpp>
 #include <ProgressBar.hpp>
@@ -115,6 +117,7 @@ public:
         add<PushButton>("PushButton");
         add<PushButton>("FailSession");
         add<PushButton>("BlockSession");
+        add<PushButton>("ExportDownload");
         add<RadioButton>("RadioButton");
         add<Slider>("Slider");
         add<SpinBox>("SpinBox");
@@ -153,6 +156,53 @@ private:
                         while (!release->load())
                             std::this_thread::sleep_for(
                                 std::chrono::milliseconds(1));
+                    });
+            else if (name == "ExportDownload")
+                widget->clicked.connect(
+                    [this]
+                    {
+                        webApplication_->setLoggedIn(false);
+                        bool called = false;
+                        bool rejected = false;
+                        try
+                        {
+                            webApplication_->exportFile(
+                                "projects/forbidden.csv",
+                                [&](const std::string &)
+                                {
+                                    called = true;
+                                    return true;
+                                });
+                        }
+                        catch (const std::runtime_error &)
+                        {
+                            rejected = true;
+                        }
+                        TEST(rejected && !called);
+                        std::filesystem::path cancelledPath;
+                        TEST(!webApplication_->exportFile(
+                            "PC:/cancelled.las",
+                            [&](const std::string &path)
+                            {
+                                cancelledPath = std::filesystem::u8path(path);
+                                std::ofstream out(cancelledPath,
+                                                  std::ios::binary);
+                                out << "partial";
+                                return false;
+                            }));
+                        TEST(!std::filesystem::exists(
+                            cancelledPath.parent_path()));
+                        webApplication_->exportFile(
+                            "PC:/points.las",
+                            [](const std::string &path)
+                            {
+                                std::ofstream out(std::filesystem::u8path(path),
+                                                  std::ios::binary);
+                                out << "LASF";
+                                const std::string bytes(1024 * 1024, '\0');
+                                out.write(bytes.data(), bytes.size());
+                                return bool(out);
+                            });
                     });
             else
                 widget->clicked.connect(
@@ -767,6 +817,170 @@ WebServerTestFixture &webServerFixture()
 // -----------------------------------------------------------------------------
 // Static file serving
 
+/** Exercises the real save picker with both storage destinations and guest
+ * access. */
+TEST_CASE(TestWebExportFilePickerStorage)
+{
+    class PickerApplication : public WebApplication
+    {
+    public:
+        using WebApplication::WebApplication;
+        bool signedIn{false};
+        std::function<void(Dialog &)> inspect;
+        bool loggedIn() const override { return signedIn; }
+        int showDialog(Dialog &dialog) override
+        {
+            inspect(dialog);
+            return dialog.result();
+        }
+    };
+    WebSession session("picker-test",
+                       [](WebSession &)
+                       { return std::unique_ptr<WebApplication>{}; });
+    PickerApplication app(session);
+    const auto find = [](Dialog &dialog, const std::string &name)
+    {
+        std::function<Widget *(Layout *)> search =
+            [&](Layout *layout) -> Widget *
+        {
+            if (!layout)
+                return nullptr;
+            for (const auto &item : layout->items())
+            {
+                if (auto *widget = item.widget())
+                {
+                    if (widget->name() == name)
+                        return widget;
+                    if (auto *found = search(widget->layout()))
+                        return found;
+                }
+                if (auto *found = search(item.layout()))
+                    return found;
+            }
+            return nullptr;
+        };
+        return search(dialog.layout());
+    };
+    app.inspect = [&](Dialog &dialog)
+    {
+        TEST(!find(dialog, "file-server-storage")->isEnabled());
+        TEST(!find(dialog, "file-toolbar")->isVisible());
+        TEST(find(dialog, "file-client-info")->isVisible());
+        dynamic_cast<LineEdit *>(find(dialog, "file-name"))->setText("trees");
+        dialog.accept();
+    };
+    std::string filter;
+    TEST(app.getSaveFileName("Export",
+                             "",
+                             "CSV (*.csv)",
+                             &filter,
+                             Ui::AllowClientStorage) == "PC:/trees.csv");
+    TEST(filter == "CSV (*.csv)");
+    app.signedIn = true;
+    app.inspect = [&](Dialog &dialog)
+    {
+        TEST(find(dialog, "file-server-storage")->isEnabled());
+        TEST(!find(dialog, "file-toolbar")->isVisible());
+        dynamic_cast<PushButton *>(find(dialog, "file-server-storage"))
+            ->click();
+        TEST(find(dialog, "file-toolbar")->isVisible());
+        dynamic_cast<PushButton *>(find(dialog, "file-client-storage"))
+            ->click();
+        TEST(!find(dialog, "file-toolbar")->isVisible());
+        TEST(dynamic_cast<LineEdit *>(find(dialog, "file-name"))->text() ==
+             "points.las");
+        dialog.accept();
+    };
+    TEST(app.getSaveFileName("Export",
+                             "PC:/points.las",
+                             "LAS (*.las)",
+                             nullptr,
+                             Ui::AllowClientStorage) == "PC:/points.las");
+    const auto serverName = "export-" + drogon::utils::getUuid() + ".csv";
+    app.inspect = [&](Dialog &dialog)
+    {
+        TEST(find(dialog, "file-toolbar")->isVisible());
+        dynamic_cast<LineEdit *>(find(dialog, "file-name"))
+            ->setText(serverName);
+        dialog.accept();
+    };
+    TEST(app.getSaveFileName("Export",
+                             "",
+                             "CSV (*.csv)",
+                             nullptr,
+                             Ui::AllowClientStorage) ==
+         "projects/" + serverName);
+    TEST(app.exportFilePath("projects/" + serverName) ==
+         (std::filesystem::canonical("projects") / serverName).u8string());
+    TEST(app.exportFilePath(serverName) ==
+         (std::filesystem::canonical("projects") / serverName).u8string());
+    const auto nested = std::filesystem::path("projects") /
+                        ("export-test-" + drogon::utils::getUuid());
+    std::filesystem::create_directory(nested);
+    const auto destination = (nested / "trees.csv").generic_u8string();
+    app.inspect = [&](Dialog &dialog)
+    {
+        TEST(std::filesystem::u8path(
+                 dynamic_cast<LineEdit *>(find(dialog, "file-location"))
+                     ->text()) == nested);
+        TEST(dynamic_cast<LineEdit *>(find(dialog, "file-name"))->text() ==
+             "trees.csv");
+        dialog.accept();
+    };
+    TEST(app.getSaveFileName("Export",
+                             destination,
+                             "CSV (*.csv)",
+                             nullptr,
+                             Ui::AllowClientStorage) == destination);
+    const std::vector<std::string> invalidDestinations = {
+        "../escape.csv",
+        "projects/../escape.csv",
+        "projects/sub/../../escape.csv",
+        "projects/sub/../trees.csv",
+        "projects\\..\\escape.csv",
+        "..\\escape.csv",
+        "/tmp/escape.csv",
+        "C:\\temp\\escape.csv",
+        "\\\\server\\share\\escape.csv",
+        "projects",
+        "",
+        (std::filesystem::canonical("projects") / serverName).u8string()};
+    for (const auto &invalid : invalidDestinations)
+    {
+        bool rejected = false;
+        try
+        {
+            app.exportFilePath(invalid);
+        }
+        catch (const std::runtime_error &)
+        {
+            rejected = true;
+        }
+        TEST(rejected);
+    }
+    std::error_code symlinkError;
+    const auto link = nested / "outside";
+    std::filesystem::create_directory_symlink(
+        std::filesystem::temp_directory_path(),
+        link,
+        symlinkError);
+    if (!symlinkError)
+    {
+        bool rejected = false;
+        try
+        {
+            app.exportFilePath((link / "escape.csv").generic_u8string());
+        }
+        catch (const std::runtime_error &)
+        {
+            rejected = true;
+        }
+        TEST(rejected);
+        std::filesystem::remove(link);
+    }
+    std::filesystem::remove(nested);
+}
+
 /** Serves the index by requesting the document root and checking the file. */
 TEST_CASE(TestWebServerServesIndexFile)
 {
@@ -1204,6 +1418,67 @@ TEST_CASE(TestWebServerAcceptsWidgetEventAndPublishesPatch)
     TEST(!checkboxId.empty());
     TEST(patch["widgets"][checkboxId]["checked"] == true);
     TEST(!fixture.serverFailed());
+}
+
+/** Streams server-generated binary bytes to a guest's PC using a single-use
+ * URL. */
+TEST_CASE(TestWebServerExportDownload)
+{
+    auto &fixture = webServerFixture();
+    const auto result = fixture.sendWebSocketMessage(
+        "/ui",
+        fixture.allowedOrigin(),
+        R"({"type":"hello","token":""})",
+        drogon::WebSocketMessageType::Text,
+        3,
+        [](const JsonCpp::Value &snapshot)
+        {
+            JsonCpp::Value event{JsonCpp::objectValue};
+            event["type"] = "event";
+            event["event"] = "clicked";
+            for (const auto &widget : snapshot["widgets"])
+                if (widget["properties"]["name"] == "ExportDownload")
+                    event["id"] = widget["id"];
+            JsonCpp::StreamWriterBuilder writer;
+            writer["indentation"] = "";
+            return std::vector<std::string>{
+                JsonCpp::writeString(writer, event)};
+        });
+    std::string url;
+    for (const auto &message : result.messages)
+    {
+        JsonCpp::Value value;
+        JsonCpp::CharReaderBuilder builder;
+        std::string errors;
+        std::unique_ptr<JsonCpp::CharReader> reader(builder.newCharReader());
+        if (reader->parse(message.data(),
+                          message.data() + message.size(),
+                          &value,
+                          &errors) &&
+            value["type"] == "download")
+            url = value["url"].asString();
+    }
+    TEST(!url.empty());
+    if (url.empty())
+        return;
+    const auto forbidden = fixture.get(url, "https://other.example");
+    TEST(forbidden.second &&
+         forbidden.second->statusCode() == drogon::k403Forbidden);
+    auto wrongSession = url;
+    wrongSession.replace(11, 36, "00000000-0000-0000-0000-000000000000");
+    TEST(fixture.get(wrongSession).second->statusCode() ==
+         drogon::k404NotFound);
+    const auto response = fixture.get(url);
+    TEST(response.first == drogon::ReqResult::Ok);
+    TEST(response.second && response.second->statusCode() == drogon::k200OK);
+    TEST(response.second &&
+         response.second->body() == "LASF" + std::string(1024 * 1024, '\0'));
+    TEST(response.second &&
+         response.second->getHeader("content-disposition").find("points.las") !=
+             std::string::npos);
+    TEST(response.second &&
+         response.second->getHeader("cache-control") == "no-store");
+    TEST(fixture.get(url).second->statusCode() == drogon::k404NotFound);
 }
 
 /** Returns a protocol error when a widget receives an invalid event value. */

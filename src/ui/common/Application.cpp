@@ -480,6 +480,18 @@ std::string Application::getSaveFileName(const std::string &caption,
     return "";
 }
 
+std::string Application::exportFilePath(const std::string &destination) const
+{
+    return destination;
+}
+
+bool Application::exportFile(
+    const std::string &destination,
+    const std::function<bool(const std::string &)> &write)
+{
+    return write(destination);
+}
+
 int Application::showDialog(Dialog &dialog)
 {
     return 0;

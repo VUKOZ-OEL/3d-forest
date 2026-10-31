@@ -94,7 +94,8 @@ void TreeTableExportDialog::slotBrowse()
                               fileNameLineEdit_->text(),
                               tr("Comma Separated Values (*.csv)"),
                               &selectedFilter,
-                              Ui::FileDialogOption::DontConfirmOverwrite);
+                              Ui::FileDialogOption::DontConfirmOverwrite |
+                                  Ui::FileDialogOption::AllowClientStorage);
 
     if (fileName.empty())
     {
@@ -116,7 +117,17 @@ void TreeTableExportDialog::slotAccept()
         return;
     }
 
-    if (File::exists(path))
+    try
+    {
+        path = app_->exportFilePath(path);
+    }
+    catch (const std::exception &e)
+    {
+        app_->showError(e.what());
+        return;
+    }
+
+    if (!path.empty() && File::exists(path))
     {
         int reply = MessageBox::question(app_,
                                          tr("Export File"),
@@ -155,4 +166,9 @@ std::shared_ptr<FileFormatInterface> TreeTableExportDialog::writer() const
     }
 
     return std::shared_ptr<FileFormatInterface>();
+}
+
+std::string TreeTableExportDialog::fileName() const
+{
+    return fileNameLineEdit_->text();
 }

@@ -37,6 +37,7 @@ public:
     TreeTableExportDialog(Application *app, const std::string &fileName);
 
     std::shared_ptr<FileFormatInterface> writer() const;
+    std::string fileName() const;
 
     void slotBrowse();
     void slotAccept();

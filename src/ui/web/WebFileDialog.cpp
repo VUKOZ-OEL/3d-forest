@@ -148,7 +148,32 @@ public:
         layout->setContentsMargins(0, 0, 0, 0);
         layout->setSpacing(0);
         setLayout(layout);
+        const bool allowClient = save && (options & Ui::AllowClientStorage);
+        client_ =
+            allowClient && (!app.loggedIn() || initial.rfind("PC:/", 0) == 0);
+        if (allowClient)
+        {
+            auto *storage = new Widget;
+            storage->setName("file-storage");
+            auto *storageRow = new HBoxLayout;
+            storage->setLayout(storageRow);
+            serverButton_ = new PushButton("\xe2\x98\x81 Server");
+            clientButton_ = new PushButton("\xf0\x9f\x92\xbb PC");
+            serverButton_->setName("file-server-storage");
+            clientButton_->setName("file-client-storage");
+            serverButton_->setToolTip(
+                "Save to server storage (sign-in required)");
+            clientButton_->setToolTip("Download to your PC");
+            serverButton_->setEnabled(app.loggedIn());
+            storageRow->addWidget(serverButton_);
+            storageRow->addWidget(clientButton_);
+            storageRow->addStretch();
+            layout->addWidget(storage);
+            serverButton_->clicked.connect([this] { selectStorage(false); });
+            clientButton_->clicked.connect([this] { selectStorage(true); });
+        }
         auto *toolbar = new Widget;
+        toolbar_ = toolbar;
         toolbar->setName("file-toolbar");
         auto *row = new HBoxLayout;
         toolbar->setLayout(row);
@@ -195,6 +220,10 @@ public:
         tree_->setSelectionMode(multiple ? AbstractItemView::ExtendedSelection
                                          : AbstractItemView::SingleSelection);
         layout->addWidget(tree_, 1);
+        clientInfo_ = new Label("The file will be downloaded to your PC. Your "
+                                "browser chooses the download folder.");
+        clientInfo_->setName("file-client-info");
+        layout->addWidget(clientInfo_);
         name_ = new LineEdit;
         name_->setName("file-name");
         auto *fileFields = new Widget;
@@ -233,7 +262,12 @@ public:
                                      { populateDirectory(); });
         search_->returnPressed.connect([this] { populateDirectory(); });
         name_->returnPressed.connect([this] { accept(); });
-        filter_->activated.connect([this](int) { navigate(current_); });
+        filter_->activated.connect(
+            [this](int)
+            {
+                if (!client_)
+                    populateDirectory();
+            });
         tree_->itemClicked.connect(
             [this](TreeWidgetItem *item, int)
             {
@@ -252,11 +286,13 @@ public:
                     accept();
                 }
             });
+        auto initialName =
+            initial.rfind("PC:/", 0) == 0 ? initial.substr(4) : initial;
         auto start =
-            initial.empty() ? root_ : fs::absolute(fs::u8path(initial));
+            initialName.empty() ? root_ : fs::absolute(fs::u8path(initialName));
         if (!isWithinRoot(fs::is_directory(start) ? start
                                                   : start.parent_path()))
-            start = root_;
+            start = root_ / start.filename();
         if (fs::is_directory(start))
             navigate(start);
         else
@@ -264,6 +300,7 @@ public:
             navigate(start.parent_path());
             name_->setText(start.filename().u8string());
         }
+        selectStorage(client_);
     }
     Size sizeHint() const override { return Size(880, 590); }
     std::vector<std::string> resultPaths;
@@ -272,13 +309,29 @@ public:
     {
         try
         {
+            if (client_)
+            {
+                const auto name = saveName(name_->text());
+                if (name.empty())
+                    return;
+                if (name == "." || name == ".." ||
+                    name.find_first_of("/\\\r\n\"") != std::string::npos)
+                    throw std::runtime_error(
+                        "Please choose a file name without folders.");
+                resultPaths = {"PC:/" + name};
+                Dialog::accept();
+                return;
+            }
+            if (save_ && !app_.loggedIn())
+                throw std::runtime_error("Sign in to save to server storage.");
             std::vector<fs::path> values;
             if (multiple_ && tree_->selectedItems().size() > 1)
                 for (auto *item : tree_->selectedItems())
                     values.push_back(paths_.at(item));
             else if (!name_->text().empty())
             {
-                auto p = fs::u8path(name_->text());
+                auto p =
+                    fs::u8path(save_ ? saveName(name_->text()) : name_->text());
                 values.push_back(p.is_absolute() ? p : current_ / p);
             }
             if (values.empty())
@@ -313,7 +366,11 @@ public:
             }
             resultPaths.clear();
             for (auto &p : values)
-                resultPaths.push_back(p.u8string());
+                resultPaths.push_back(
+                    save_ && (options_ & Ui::AllowClientStorage)
+                        ? (fs::path("projects") / p.lexically_relative(root_))
+                              .generic_u8string()
+                        : p.u8string());
             Dialog::accept();
         }
         catch (const std::exception &e)
@@ -325,6 +382,10 @@ public:
 private:
     WebApplication &app_;
     bool multiple_, save_;
+    bool client_{false};
+    Widget *toolbar_;
+    PushButton *serverButton_{nullptr}, *clientButton_{nullptr};
+    Label *clientInfo_;
     int options_;
     fs::path root_;
     fs::path current_;
@@ -336,6 +397,36 @@ private:
     ComboBox *filter_;
     Label *error_;
     std::map<TreeWidgetItem *, fs::path> paths_;
+    std::string saveName(const std::string &name) const
+    {
+        if (name.empty() || fs::u8path(name).has_extension())
+            return name;
+        const auto filter = filter_->currentText();
+        const auto begin = filter.find("*.");
+        if (begin == std::string::npos)
+            return name;
+        const auto end = filter.find_first_of(" ;)\t", begin + 2);
+        const auto extension = filter.substr(begin + 1, end - begin - 1);
+        return extension.find_first_of("*?") == std::string::npos
+                   ? name + extension
+                   : name;
+    }
+    void selectStorage(bool client)
+    {
+        if (!client && save_ && serverButton_ && !app_.loggedIn())
+            return;
+        client_ = client;
+        toolbar_->setVisible(!client);
+        tree_->setVisible(!client);
+        clientInfo_->setVisible(client);
+        if (serverButton_)
+        {
+            serverButton_->setPrimary(!client);
+            clientButton_->setPrimary(client);
+            serverButton_->setEnabled(app_.loggedIn());
+        }
+        error_->setText("");
+    }
     void navigateHistory(int offset)
     {
         const auto next = static_cast<long long>(historyIndex_) + offset;

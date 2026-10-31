@@ -1097,6 +1097,13 @@ body.disconnected #application {
   filter: brightness(0.97);
 }
 /* Explorer-style file picker. Names keep these rules local to this dialog. */
+[data-widget-name="file-storage"] {
+  padding: 10px 12px 0;
+}
+[data-widget-name="file-client-info"] {
+  padding: 12px;
+  white-space: normal;
+}
 .dialog-window:has([data-widget-name="file-toolbar"]) {
   background: var(--input);
 }

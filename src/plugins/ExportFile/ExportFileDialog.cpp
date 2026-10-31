@@ -148,7 +148,8 @@ void ExportFileDialog::slotBrowse()
                               tr("LAS (LASer) File (*.las);;"
                                  "Comma Separated Values (*.csv)"),
                               &selectedFilter,
-                              Ui::FileDialogOption::DontConfirmOverwrite);
+                              Ui::FileDialogOption::DontConfirmOverwrite |
+                                  Ui::FileDialogOption::AllowClientStorage);
 
     if (fileName.empty())
     {
@@ -170,7 +171,17 @@ void ExportFileDialog::slotAccept()
         return;
     }
 
-    if (File::exists(path))
+    try
+    {
+        path = app_->exportFilePath(path);
+    }
+    catch (const std::exception &e)
+    {
+        app_->showError(e.what());
+        return;
+    }
+
+    if (!path.empty() && File::exists(path))
     {
         int reply;
 

@@ -180,7 +180,9 @@ public:
         DontUseNativeDialog = 0x00000008,
         ReadOnly = 0x00000010,
         HideNameFilterDetails = 0x00000020,
-        DontUseCustomDirectoryIcons = 0x00000040
+        DontUseCustomDirectoryIcons = 0x00000040,
+        AllowClientStorage =
+            0x00000100 // Export files: web PC download or server.
     };
 };
 
